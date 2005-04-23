@@ -1,5 +1,5 @@
 -- Auctioneer
-AUCTIONEER_VERSION="2.04";
+AUCTIONEER_VERSION="3.0";
 -- Written by Norganna
 --
 -- This is an addon for World of Warcraft that works in combination with 
