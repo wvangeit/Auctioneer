@@ -130,6 +130,20 @@ function auctionKey()
 	return serverName.."-"..factionGroup;
 end
 
+local function oppositeKey()
+	local serverName = GetCVar("realmName");
+	local factionGroup = UnitFactionGroup("player");
+	if (factionGroup == "Alliance") then factionGroup="Horde"; else factionGroup="Alliance"; end
+	return serverName.."-"..factionGroup;
+end
+
+function Auctioneer_GetAuctionKey()
+	return auctionKey();
+end
+
+function Auctioneer_GetOppositeKey()
+	return oppositeKey();
+end
 
 -- returns the numeric Lootlink ID for this item name
 local function getNumericItemId(itemName)
