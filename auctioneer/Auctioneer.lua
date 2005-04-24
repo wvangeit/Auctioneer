@@ -159,8 +159,9 @@ end
 
 
 -- returns an AuctionPrices item from the table based on an item name
-local function getAuctionPriceItem(itemName)
+local function getAuctionPriceItem(itemName, from)
     local server = auctionKey();
+    if (from ~= nil) then server = from; end
 	if (AuctionPrices[server] == nil) then
 		AuctionPrices[server] = {};
 	end
@@ -169,8 +170,8 @@ end
 
 
 -- returns the auction price data for an auction
-local function getAuctionPriceData(itemName)
-	local auctionItem = getAuctionPriceItem(itemName);
+local function getAuctionPriceData(itemName, from)
+	local auctionItem = getAuctionPriceItem(itemName, from);
 	if (auctionItem == nil) then 
 		link = "0:0:0:0:0:0:0";
     else
