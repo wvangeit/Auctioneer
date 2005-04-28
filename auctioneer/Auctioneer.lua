@@ -644,6 +644,52 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 					frame:AddLine(format("%d%% have bids, %d%% have buyout", bidPct, buyPct), 0.1,0.5,0.8);
 				end
 			end
+            
+			local also = Auctioneer_GetFilterVal("also");
+			if (also ~= "on") then
+				if (also == "opposite") then
+					also = oppositeKey();
+				end
+				local itemData = getAuctionPriceData(itemID, also);
+				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+				local avgQty = math.floor(minCount / aCount);
+				local avgMin = math.floor(minPrice / minCount);
+
+				local bidPct = math.floor(bidCount / minCount * 100);
+				local avgBid = 0;
+				if (buyCount > 0) then
+					avgBid = math.floor(bidPrice / bidCount);
+				end
+				
+				local buyPct = math.floor(buyCount / minCount * 100);
+				local avgBuy = 0;
+				if (buyCount > 0) then
+					avgBuy = math.floor(buyPrice / buyCount);
+				end
+
+				if (aCount == 0) then
+					frame:AddLine(format(">> Never seen at "..also, aCount), 0.5,0.8,0.1);
+				else
+					if (Auctioneer_GetFilter("average")) then
+						if (lastName ~= "") then frame:AddLine(format("Last seen as: %s", lastName), 0.5,0.8,0.1); end
+						frame:AddLine(format(">> %d times at "..also, aCount), 0.5,0.8,0.1);
+						if (avgQty > 1) then
+							frame:AddLine(format(">> For 1: %s min/%s buy (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
+						else
+							frame:AddLine(format(">> %s min/%s buy (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
+						end
+						if (Auctioneer_GetFilter("suggest")) then
+							if (count > 1) then
+								frame:AddLine(format(">> Your %d stack: %s min/%s buy (%s bid)", count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
+							end
+						end
+					end
+					if (Auctioneer_GetFilter("stats")) then
+						frame:AddLine(format(">> %d%% have bids, %d%% have buyout", bidPct, buyPct), 0.1,0.5,0.8);
+					end
+				end
+			end            
+            
 			if ((data ~= nil) and (data.price ~= nil)) then
 				money = data.price;
 			else
