@@ -514,7 +514,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     if (aiName == nil) then return; end --if name is nil skip this auction
         
     -- construct the unique auction signature for this aution
-    local lAuctionSignature = ""..nilSafeString(aiName)..":"..nullSafe(aiCount)..":"..nullSafe(aiMinBid)..":"..nullSafe(aiBuyoutPrice);
+    local lAuctionSignature = string.format("%s:%d:%d:%d", tostring(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice));
     
     -- add this item's buyout price to the buyout price history for this item in the snapshot
     if (aiBuyoutPrice > 0) then
@@ -536,22 +536,34 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         local itemData = getAuctionPriceData(aiName);
         local count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
      
-        -- update counts and price data for this item
-        count = nullSafe(count) + 1;
-        minCount = nullSafe(minCount) + aiCount;
-        minPrice = nullSafe(minPrice) + aiMinBid;
-        if (aiBidAmount > 0) then 
-            bidCount = nullSafe(bidCount) + aiCount;
-            bidPrice = nullSafe(bidPrice) + aiBidAmount;
+     	-- Sanity check values to ensure they aren't whack. if prices are wack we dont want to skew the mean, but still can add to the median
+        local hasWackPrice = false;
+        if ((nullSafe(minCount) > 10) and (aiMinBid/aiCount > 5*minPrice/minCount)) then 
+            hasWackPrice = true;
+        elseif ((nullSafe(bidCount) > 10) and (aiBidAmount/aiCount > 5*bidPrice/bidCount)) then 
+            hasWackPrice = true;
+        elseif ((nullSafe(buyCount) > 10) and (aiBuyoutPrice/aiCount > 5*buyPrice/buyCount)) then 
+            hasWackPrice = true;
         end
-        if (aiBuyoutPrice > 0) then
-            buyCount = nullSafe(buyCount) + aiCount;
-            buyPrice = nullSafe(buyPrice) + aiBuyoutPrice;
+     
+        if (not hasWackPrice) then 
+            -- update counts and price data for this item
+            count = nullSafe(count) + 1;
+            minCount = nullSafe(minCount) + aiCount;
+            minPrice = nullSafe(minPrice) + aiMinBid;
+            if (aiBidAmount > 0) then 
+                bidCount = nullSafe(bidCount) + aiCount;
+                bidPrice = nullSafe(bidPrice) + aiBidAmount;
+            end
+            if (aiBuyoutPrice > 0) then
+                buyCount = nullSafe(buyCount) + aiCount;
+                buyPrice = nullSafe(buyPrice) + aiBuyoutPrice;
+            end
         end
     
         itemData = string.format("%d:%d:%d:%d:%d:%d:%d", count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
         
-        -- now build the list of buyout prices seen for this auction if a buyout exists for this auction        
+        -- now build the list of buyout prices seen for this auction to use to get the median        
         local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
         if (AuctionPrices[auctionKey()][aiName] and table.getn(AuctionPrices[auctionKey()][aiName].buyoutPricesHistoryList) > 0) then
             newBuyoutPricesList.setList(AuctionPrices[auctionKey()][aiName].buyoutPricesHistoryList);
@@ -561,7 +573,10 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         end        
         
         AuctionPrices[auctionKey()][aiName] = {data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
-        AHSnapshot[lAuctionSignature] = {name=nilSafeString(aiName), count=nullSafe(aiCount), quality=nullSafe(aiQuality), level=nullSafe(aiLevel), minbid=nullSafe(aiMinBid), buyout=nullSafe(aiBuyoutPrice), bidamount=nullSafe(aiBidAmount), owner=nilSafeString(aiOwner), dirty=0};
+        
+        if (aiOwner == nil) then aiOwner = "unknown"; end
+        local aiLink = GetAuctionItemLink("list", index);
+        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, name=nilSafeString(aiName), count=nullSafe(aiCount), quality=nullSafe(aiQuality), level=nullSafe(aiLevel), minbid=nullSafe(aiMinBid), buyout=nullSafe(aiBuyoutPrice), bidamount=nullSafe(aiBidAmount), owner=nilSafeString(aiOwner), dirty=0};
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
