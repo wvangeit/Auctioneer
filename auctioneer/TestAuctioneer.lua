@@ -4,7 +4,7 @@
 function assertEquals(arg1, arg2, msg)
     local passed = true;
     if (arg1 ~= arg2) then
-        Auctioneer_ChatPrint("Assertation FAILDED "..nilSafeString(msg));
+        Auctioneer_ChatPrint("Assertation FAILDED "..tostring(msg));
         expectedActual(arg1, arg2);
         passed = false;
     end
@@ -12,7 +12,7 @@ function assertEquals(arg1, arg2, msg)
 end
 
 function expectedActual(expected, actual)
-    Auctioneer_ChatPrint("expected <"..nilSafeString(expected).."> was <"..nilSafeString(actual)..">");
+    Auctioneer_ChatPrint("expected <"..tostring(expected).."> was <"..tostring(actual)..">");
 end
 
 -- ====================================================================================
@@ -42,15 +42,6 @@ function testGetMedian()
     if (not assertEquals(median, 77, "testGetMedian")) then return; end
     
     Auctioneer_ChatPrint("testGetMedian PASSED");
-end
-
-function testNilSafeString()
-    local nilStringVariable = nill;
-    local safeString = nilSafeString(nilStringVariable);
-    
-    if (not assertEquals(safeString, "", "testNilSafeString")) then return; end
-    
-    Auctioneer_ChatPrint("testNilSafeString PASSED");
 end
 
 function testBalancedList()
@@ -267,7 +258,6 @@ function doTests()
 
     loadTestData();
     testLuaScriptingComponents();
-    testNilSafeString();
     testGetMedian();
     testBalancedList();
     testFindLowestPriceByItem();

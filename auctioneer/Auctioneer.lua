@@ -58,12 +58,6 @@ AHSnapshot = {};           --Table that will hold the Auction scan results
 AHBuySellHistory = {};     --Table that holds history of auction's that you've bought out
 AHSnapshotItemPrices = {}; --Table that holds the lists of prices buy item name, for quick look up
 
--- return an empty string if str is nil
-function nilSafeString(str)
-    if (not str) then str = "" end
-    return str;
-end
-
 -- calculate the gold, silver, and copper values based the ammount of copper
 function Auctioneer_GetGSC(money)
 	if (money == nil) then money = 0; end
@@ -201,7 +195,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     -- remove defunct auctions from snapshot
     for i,a in AHSnapshot do
         if (a.dirty == 1) then
-            --Auctioneer_ChatPrint("Defunct sig: "..nilSafeString(i))
+            --Auctioneer_ChatPrint("Defunct sig: "..tostring(i))
             AHSnapshot[i] = nil;
             lDefuctAuctionsCount = lDefuctAuctionsCount + 1;
         end
@@ -597,7 +591,7 @@ end
 function doHSP(param)
     local itemName = formatItemName(param);
     local highestSellablePrice = getHighestSellablePriceForOne(itemName, false);
-    Auctioneer_ChatPrint("Highest Sellable Price for one "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice)));
+    Auctioneer_ChatPrint("Highest Sellable Price for one "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(tostring(highestSellablePrice)));
 end
 
 
