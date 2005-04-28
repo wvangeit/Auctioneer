@@ -1,5 +1,5 @@
 -- Auctioneer
-AUCTIONEER_VERSION="2.03";
+AUCTIONEER_VERSION="3.0";
 -- Written by Norganna
 --
 -- This is an addon for World of Warcraft that works in combination with 
@@ -58,6 +58,118 @@ AHSnapshot = {};           --Table that will hold the Auction scan results
 AHBuySellHistory = {};     --Table that holds history of auction's that you've bought out
 AHSnapshotItemPrices = {}; --Table that holds the lists of prices buy item name, for quick look up
 
+-- return an empty string if str is nil
+function nilSafeString(str)
+    if (not str) then str = "" end
+    return str;
+end
+
+-- calculate the gold, silver, and copper values based the ammount of copper
+function Auctioneer_GetGSC(money)
+	if (money == nil) then money = 0; end
+	local g = math.floor(money / 10000);
+	local s = math.floor((money - (g*10000)) / 100);
+	local c = math.floor(money - (g*10000) - (s*100));
+	return g,s,c;
+end
+
+-- formats money text by color for gold, silver, copper
+function Auctioneer_GetTextGSC(money)
+    local GSC_GOLD="ffd100";
+    local GSC_SILVER="e6e6e6";
+    local GSC_COPPER="c8602c";
+    local GSC_START="|cff%s%d|r";
+    local GSC_PART=".|cff%s%02d|r";
+    local GSC_NONE="|cffa0a0a0none|r";
+
+	local g, s, c = Auctioneer_GetGSC(money);
+
+	local gsc = "";
+	if (g > 0) then
+		gsc = format(GSC_START, GSC_GOLD, g);     
+		if (s > 0) then
+			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
+		end
+	elseif (s > 0) then
+		gsc = format(GSC_START, GSC_SILVER, s);
+		if (c > 0) then
+			gsc = gsc..format(GSC_PART, GSC_COPPER, c);
+		end
+	elseif (c > 0) then
+		gsc = gsc..format(GSC_START, GSC_COPPER, c);
+	else
+		gsc = GSC_NONE;
+	end
+
+	return gsc;
+end
+
+function colorTextWhite(text)
+    if (not text) then text = ""; end
+    local COLORING_START = "|cff%s%s|r";
+    local WHITE_COLOR = "e6e6e6";
+    return format(COLORING_START, WHITE_COLOR, ""..text);
+end
+
+-- used to convert variables that should be numbers but are nil to 0
+function nullSafe(val)
+	if (val == nil) then return 0; end
+	if (0 + val > 0) then return 0 + val; end
+	return 0;
+end
+
+-- subtracts a percent from a value
+function subtractPercent(value, percentLess)
+    return math.floor(value * ((100 - percentLess)/100));
+end
+
+-- returns the median value of a given table one-dimentional table
+function getMedian(valuesTable)
+    if (not valuesTable or table.getn(valuesTable) == 0) then
+        return nil; --make this function nil argument safe
+    end
+    
+    local tableSize = table.getn(valuesTable);
+    
+    if (tableSize == 1) then
+        return valuesTable[1];
+    end
+        
+    local median; -- value to return
+        
+    table.sort(valuesTable);
+    
+    if (math.mod(tableSize, 2) == 0) then --first handle the case of even table size
+        local middleIndex1 = tableSize / 2;
+        local middleIndex2 = middleIndex1 + 1;
+        local middleValue1 = valuesTable[middleIndex1];
+        local middleValue2 = valuesTable[middleIndex2];
+        median = (middleValue1 + middleValue2) / 2; --average the two middle values
+    else -- the table size is odd
+        local trueMiddleIndex = (tableSize + 1) / 2; -- calculate the middle index
+        median = valuesTable[trueMiddleIndex];
+    end
+    
+    return median;
+end
+
+-- format an itemname so it can be used as a key into a table
+local function formatItemName(s)
+   local itemName = s;
+
+    _, _, item = string.find(itemName, "%[(.-)%]") -- strip shift-clicked characters
+    if item then 
+        itemName = item;
+    end;
+    
+    -- upper case first letters of words, except for 'of' 'the'
+    itemName = string.gsub(itemName, "^(%a)", function (n) return string.upper(n) end);
+    itemName = string.gsub(itemName, "%s%a", function (n) return string.upper(n) end);
+    itemName = string.gsub(itemName, "Of", "of");
+    itemName = string.gsub(itemName, "The", "the");
+    
+    return itemName;
+end
 
 --this function sets the dirty flag to true for all the auctions in the snapshot
 --this is done to indicate that the snapshot is out of date.
