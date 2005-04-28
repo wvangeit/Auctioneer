@@ -199,6 +199,14 @@ local function getAuctionPrices(priceData)
 	return nullSafe(count),nullSafe(minCount),nullSafe(minPrice),nullSafe(bidCount),nullSafe(bidPrice),nullSafe(buyCount),nullSafe(buyPrice);
 end
 
+-- parse the data from the auction signature
+local function getItemSignature(sigData)
+	local i,j, id,auctioner,min,buyout,count,name = string.find(sigData, "^(%d+):([^:]+):(%d+):(%d+):(%d+):(.*)");
+	if (auctioner == nil) then auctioner = "unknown"; end
+	if (name == nil) then name = ""; end
+	return id,auctioner,min,buyout,count,name;
+end
+
 -- returns the current snapshot median for an item
 function getItemSnapshotMedianBuyout(itemName)
     local buyoutPrices = {};
