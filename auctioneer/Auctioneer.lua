@@ -906,6 +906,8 @@ function Auctioneer_Command(command)
 				end
 			end
 		end
+	elseif (cmd == "also") then
+		Auctioneer_SetFilter("also", param);        
 	elseif (cmd == "broker") then
         doBroker(param);
 	elseif (cmd == "percentless") then
@@ -936,6 +938,13 @@ function Auctioneer_Command(command)
 			Auctioneer_SetFilter(cmd, "on");
 			Auctioneer_ChatPrint("Displaying item's "..cmd.." data");
 		end
+	elseif (cmd == "bargains") then
+		if (not AuctionLastScan) then
+			Auctioneer_ChatPrint("You must have scanned the auction house recently to use this feature.");
+		else
+			Auctioneer_ChatPrint("Searching for bargains in last auction scan...");
+			Auctioneer_BargainScan();
+		end        
 	else
 		Auctioneer_ChatPrint("Unknown command keyword: '"..cmd.."'");
 	end
