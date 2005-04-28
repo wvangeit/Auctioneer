@@ -1071,3 +1071,134 @@ function Auctioneer_OnEvent(event)
         AuctionFrameAuctions.duration = 1440;
 	end
 end
+
+
+local function getRRP(itemID, from)
+	if (from == nil) then from = auctionKey(); end
+	if (from == "also") then from = Auctioneer_GetFilterVal(also); end
+	if ((from == "on") or (from == "off")) then return 0; end
+	if (from == "opposite") then from = oppositeKey(); end
+		
+	local itemData = getAuctionPriceData(itemID, from);
+	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice, lastName = getAuctionPrices(itemData);
+--	p("Getting data from "..from.." for "..itemID, itemData);
+
+	local bidRatio = bidCount/minCount;
+	local avgMin = minPrice/minCount;
+	local avgBid = bidPrice/bidCount;
+	local diff = avgBid - avgMin;
+	local rrp = diff * bidRatio + avgMin;
+
+--	p("br = ", bidRatio, "am = ", avgMin, "ab = ", avgBid, "dif = ", diff, "rrp = ", rrp);
+	
+	return rrp;
+end
+
+function Auctioneer_BargainScan()
+	local bargains = {};
+	local lastBargain = 0;
+	for key, val in AuctionLastScan do
+		local id,auctioner,min,buyout,count,name = getItemSignature(key);
+		local bid = val.b;
+		local link = val.l;
+
+		id = 0+ id;
+		min = 0+ min;
+		buyout = 0+buyout;
+		count = 0+count;
+
+		local itemInfo = Auctioneer_BasePrices[id];
+
+		local competition = 0;
+		if (bid == 0) then bid = min; end
+		competition = bid / min;
+
+		local vendorBuy = 0;
+		local vendorSell = 0;
+		if (itemInfo) then
+			if (itemInfo.b) then vendorBuy = 0+ itemInfo.b; end
+			if (itemInfo.s) then vendorSell = 0+ itemInfo.s; end
+		end
+
+		local serverRRP = getRRP(id) * 1.05; -- costs about 5% to auction
+		local otherRRP = getRRP(id, "also") * 1.15; -- costs about 15% to xfr to other faction
+		
+		local value = {s=serverRRP, o=otherRRP, bid=bid, buy=buyout, v=vendorSell};
+		-- p(key, value);
+		local bargain = nil;
+
+		local best = 0;
+		local profit = vendorSell-buyout;
+		local action = "";
+		if ((vendorSell > 0) and (buyout > 0) and (buyout < vendorSell)) then
+			action = "buy and trash";
+			best = profit;
+		end
+		profit = serverRRP-buyout;
+		if ((buyout > 0) and (buyout < serverRRP)) then
+			if (profit > best) then
+				if (action == "buy and trash") then
+					action = "buy and auction (or trash)";
+				else
+					action = "buy and auction";
+				end
+				best = profit;
+			end
+		end
+		profit = otherRRP-buyout;
+		if ((buyout > 0) and (buyout < otherRRP)) then
+			if (profit > best) then
+				action = "buy and transfer";
+				best = profit;
+			end
+		end
+		if (best == 0) then
+			profit = vendorSell-bid;
+			if ((vendorSell > 0) and (bid < vendorSell)) then
+				action = "bid and trash";
+				best = profit;
+			end
+			profit = serverRRP-bid;
+			if ((bid < serverRRP) and (competition < 10)) then
+				if (profit > best) then
+					if (action == "bid and trash") then
+						action = "bid and auction (or trash)";
+					else
+						action = "bid and auction";
+					end
+					best = profit;
+				end
+			end
+			profit = otherRRP-bid;
+			if ((bid < otherRRP) and (competition < 10)) then
+				if (profit > best) then
+					action = "bid and transfer";
+					best = profit;
+				end
+			end
+		end
+
+		if (best > 0) then
+			bargain = { s=key, a=action, c=competition, p=best, v=value };
+			lastBargain = lastBargain + 1;
+			bargains[lastBargain] = bargain;
+		end
+	end
+
+--	table.sort(bargains, function(a,b) return a.r>b.r or a.p>b.p end);
+
+	for i=1, 25 do
+		local b = bargains[i];
+		if  (b ~= nil) then
+			local id,auctioner,min,buyout,count,name = getItemSignature(b.s);
+			if (auctioner == nil) then auctioner = "unknown"; end
+			if (name == nil) then name = "unknown"; end
+			local action = b.a;
+			if (action == nil) then action = "unknown"; end
+			local profit = b.p;
+			if (profit == nil) then profit = 0; end
+			profit = 0+ profit;
+			Auctioneer_ChatPrint("Found a "..name.." from "..auctioner.." which you can "..action.." for "..Auctioneer_GetTextGSC(profit).." profit");
+		end
+	end
+end
