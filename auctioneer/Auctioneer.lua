@@ -211,7 +211,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     Auctioneer_ChatPrint("Previously scanned: "..colorTextWhite(lOldAuctionsCount));
     Auctioneer_ChatPrint("Defuct auctions removed: "..colorTextWhite(lDefuctAuctionsCount));
     
-    if (nullSave(lDiscrepencyCount) > 0) then
+    if (nullSafe(lDiscrepencyCount) > 0) then
         Auctioneer_ChatPrint("Discrepencies: "..colorTextWhite(lDiscrepencyCount));
     end
 end
@@ -951,7 +951,7 @@ function Auctioneer_OnLoad()
 	end
 	
 	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage("Auctioneer BROKER-0.1 v"..AUCTIONEER_VERSION.." loaded", 0.8, 0.8, 0.2);
+		DEFAULT_CHAT_FRAME:AddMessage("Auctioneer v"..AUCTIONEER_VERSION.." loaded", 0.8, 0.8, 0.2);
 	end
 end
 
