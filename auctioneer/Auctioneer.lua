@@ -571,12 +571,12 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         if (nullSafe(aiBuyoutPrice) > 0) then
             newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
         end        
-        
         AuctionPrices[auctionKey()][aiName] = {data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
         
+        -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
         local aiLink = GetAuctionItemLink("list", index);
-        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, name=nilSafeString(aiName), count=nullSafe(aiCount), quality=nullSafe(aiQuality), level=nullSafe(aiLevel), minbid=nullSafe(aiMinBid), buyout=nullSafe(aiBuyoutPrice), bidamount=nullSafe(aiBidAmount), owner=nilSafeString(aiOwner), dirty=0};
+        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, name=tostring(aiName), count=nullSafe(aiCount), quality=nullSafe(aiQuality), level=nullSafe(aiLevel), minbid=nullSafe(aiMinBid), buyout=nullSafe(aiBuyoutPrice), bidamount=nullSafe(aiBidAmount), owner=aiOwner, dirty=0};
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
