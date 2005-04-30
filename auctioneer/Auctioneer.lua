@@ -97,6 +97,12 @@ function Auctioneer_GetTextGSC(money)
 	return gsc;
 end
 
+-- return an empty string if str is nil
+function nilSafeString(str)
+    if (not str) then str = "" end
+    return str;
+end
+
 function colorTextWhite(text)
     if (not text) then text = ""; end
     local COLORING_START = "|cff%s%s|r";
@@ -194,7 +200,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     -- remove defunct auctions from snapshot
     for i,a in AHSnapshot do
         if (a.dirty == 1) then
-            --Auctioneer_ChatPrint("Defunct sig: "..tostring(i))
+            --Auctioneer_ChatPrint("Defunct sig: "..nilSafeString(i))
             AHSnapshot[i] = nil;
             lDefuctAuctionsCount = lDefuctAuctionsCount + 1;
         end
@@ -603,7 +609,7 @@ end
 function doHSP(param)
     local itemName = formatItemName(param);
     local highestSellablePrice = getHighestSellablePriceForOne(itemName, false);
-    Auctioneer_ChatPrint("Highest Sellable Price for one "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(tostring(highestSellablePrice)));
+    Auctioneer_ChatPrint("Highest Sellable Price for one "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice)));
 end
 
 
@@ -632,7 +638,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     if (aiName == nil) then return; end --if name is nil skip this auction
         
     -- construct the unique auction signature for this aution
-    local lAuctionSignature = string.format("%d:%s:%d:%d:%d", getNumericItemId(aiName), tostring(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice));
+    local lAuctionSignature = string.format("%d:%s:%d:%d:%d", getNumericItemId(aiName), nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice));
     
     -- add this item's buyout price to the buyout price history for this item in the snapshot
     if (aiBuyoutPrice > 0) then
@@ -853,7 +859,8 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 			if ((buy > 0) or (sell > 0)) then
 				local bgsc = Auctioneer_GetTextGSC(buy);
 				local sgsc = Auctioneer_GetTextGSC(sell);
-				if ((count > 1) or (quant > 1)) then
+                
+				if (count and (count > 1)) then
 					local bqgsc = Auctioneer_GetTextGSC(buy*count);
 					local sqgsc = Auctioneer_GetTextGSC(sell*count);
 					if (Auctioneer_GetFilter("vendorbuy")) then
