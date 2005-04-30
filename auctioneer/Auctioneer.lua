@@ -455,11 +455,11 @@ function doBroker(minProfit)
     -- output the list of auctions below the median
     for auctionSignature,a in auctionsBelowMedian do
         if not isItemRecipe(a.name) then
-            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
-    Auctioneer_ChatPrint("Brokering done!");
+    Auctioneer_ChatPrint("Brokering done.");
 end
 
 
@@ -473,11 +473,11 @@ function doPercentLess(percentLess)
     for auctionSignature,a in auctionsBelowMedian do
         if not isItemRecipe(a.name) then
             local snapshotMedian, count = getItemSnapshotMedianBuyout(a.name);
-            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
-    Auctioneer_ChatPrint("Brokering done!");
+    Auctioneer_ChatPrint("Percent less done.");
 end
 
 -- given an item name, find the lowest price for that item in the current AHSnapshot
@@ -583,7 +583,7 @@ function doLow(param)
     if (not auctionItem) then
         Auctioneer_ChatPrint("No auctions found for the item: "..colorTextWhite(itemName));
     else
-        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(auctionItem.count.." "..itemName).." buyout: "..Auctioneer_GetTextGSC(auctionItem.buyout).." Price for one: "..Auctioneer_GetTextGSC(auctionItem.buyout / auctionItem.count).." Owner: "..colorTextWhite(auctionItem.owner));
+        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(auctionItem.count.."x")..auctionItem.itemLink.." buyout: "..Auctioneer_GetTextGSC(auctionItem.buyout).." Price for one: "..Auctioneer_GetTextGSC(auctionItem.buyout / auctionItem.count).." Owner: "..colorTextWhite(auctionItem.owner));
     end
 end
 
@@ -1298,6 +1298,7 @@ function Auctioneer_BargainScan()
 		if  (b ~= nil) then
 		    local id,name,count,min,buyout = getItemSignature(b.s);
             local auctioner = AHSnapshot[b.s].owner;
+            local link = AHSnapshot[b.s].itemLink;
 			if (auctioner == nil) then auctioner = "unknown"; end
 			if (name == nil) then name = "unknown"; end
 			local action = b.a;
@@ -1305,7 +1306,7 @@ function Auctioneer_BargainScan()
 			local profit = b.p;
 			if (profit == nil) then profit = 0; end
 			profit = 0+ profit;
-			Auctioneer_ChatPrint("Found a "..name.." from "..auctioner.." which you can "..action.." for "..Auctioneer_GetTextGSC(profit).." profit");
+			Auctioneer_ChatPrint("Found a "..link.." from "..auctioner.." which you can "..action.." for "..Auctioneer_GetTextGSC(profit).." profit");
 		end
 	end
 end
