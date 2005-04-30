@@ -3,6 +3,6 @@
 ## Version: 3.0
 ## Notes: Displays collected information about item in the info window. Use "/lootlink scan" at AH to collect auction data. With Broker Mod.
 ## OptionalDeps: LootLink, Enchantrix
-## SavedVariables: AuctionConfig, AuctionPrices, AHSnapshot, AHBuySellHistory, AHSnapshotItemPrices
+## SavedVariables: AuctionConfig, AuctionPrices, AHSnapshot, AHSnapshotItemPrices
 Auctioneer.xml
 
