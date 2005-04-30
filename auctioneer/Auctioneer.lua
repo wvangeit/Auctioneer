@@ -462,7 +462,7 @@ function doBroker(minProfit)
     for auctionSignature,a in auctionsBelowMedian do
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
-            Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Of last "..a.buyoutSeenCount.." seen, HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
@@ -481,7 +481,7 @@ function doPercentLess(percentLess)
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
             local snapshotMedian, lastSeenCount = getUsableMedian(name);
-            Auctioneer_ChatPrint("Last "..lastSeenCount.." Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Of last "..lastSeenCount.." seen, Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
