@@ -41,7 +41,7 @@ local lMaxBuyoutHistorySize = 35;
 local MIN_PROFIT_MARGIN = 8000;
 
 -- min times an item must be seen before it can show up in the list of items below median
-MIN_BUYOUT_SEEN_COUNT = 11;
+MIN_BUYOUT_SEEN_COUNT = 7;
 
 -- max buyout price for an auction to display as a good deal item
 MAX_BUYOUT_PRICE = 300000;
@@ -748,7 +748,7 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 					else
 						frame:AddLine(format("%s min/%s buyout (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
 					end
-                    if median then
+                    if median and Auctioneer_GetFilter("median") then
                         frame:AddLine(format("Of last %d seen, buyout median: %s", medCount, Auctioneer_GetTextGSC(median)),0.1,0.8,0.5);
                     end
 				end
@@ -972,6 +972,7 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint("Usage:");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - turns the auction data display on and off");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer average (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("average").."]|r - select whether to show item's average auction price");
+        Auctioneer_ChatPrint("  |cffffffff/auctioneer median (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("median").."]|r - select whether to show item's median buyout price");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer suggest (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("suggest").."]|r - select whether to show item's suggested auction price");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer stats (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stats").."]|r - select whether to show item's bidded/buyout percentages");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendor (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor pricing");
@@ -979,7 +980,6 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorbuy (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor buy pricing (req vendor=on)");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer usage (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("usage").."]|r - select whether to show tradeskill item's usage");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer stacksize (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stacksize").."]|r - select whether to show the item's stackable size");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer upgrade [complete]|r - Upgrade your old data to the new format. You must do this once for each server/faction you want to give the data to. Once you are finished upgrading, rerun this command again with the complete parameter and it will wipe out the old data thus cleaning up some free space.");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer clear <item|all>|r - clear the specified item's lootlink data (you may shift click insert multiple items into this command, or specify only one textually) If you specify 'all' by itself, the entire dataset for this server will be cleared");
 	elseif (cmd == "on") then
 		Auctioneer_SetFilter("all", "on");
@@ -1034,7 +1034,7 @@ function Auctioneer_Command(command)
         doMedian(param);  
     elseif (cmd == "hsp") then
         doHSP(param);  
-	elseif ((cmd == "average") or (cmd == "suggest") or (cmd == "stats") or (cmd == "vendor") or (cmd == "usage") or (cmd == "stacksize") or (cmd == "vendorsell") or (cmd == "vendorbuy")) then
+	elseif ((cmd == "average") or (cmd == "median") or(cmd == "suggest") or (cmd == "stats") or (cmd == "vendor") or (cmd == "usage") or (cmd == "stacksize") or (cmd == "vendorsell") or (cmd == "vendorbuy")) then
 		if ((param == "false") or (param == "off") or (param == "no") or (param == "0")) then
 			Auctioneer_SetFilter(cmd, "off");
 			Auctioneer_ChatPrint("Not displaying item's "..cmd.." data");
