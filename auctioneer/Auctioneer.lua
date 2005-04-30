@@ -55,7 +55,6 @@ AuctionConfig = {};        --Table that stores config settings
 AuctionPrices = {};        --Table that keeps the price history of auctions
 Auction_DoneItems = {};    --Table to keep a record of auction items that have been scanned
 AHSnapshot = {};           --Table that will hold the Auction scan results
-AHBuySellHistory = {};     --Table that holds history of auction's that you've bought out
 AHSnapshotItemPrices = {}; --Table that holds the lists of prices buy item name, for quick look up
 
 -- calculate the gold, silver, and copper values based the ammount of copper
@@ -309,7 +308,7 @@ end
 local function getItemSignature(sigData)
 	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(%d+):(%d+)");
 	if (name == nil) then name = ""; end
-	return id,name,count,min,buyout;
+	return tonumber(id),name,tonumber(count),tonumber(min),tonumber(buyout);
 end
 
 -- returns the current snapshot median for an item
@@ -379,16 +378,16 @@ function getResellableAuctions(minProfit)
     Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit));
     
     for auctionSignature,a in AHSnapshot do
-        
-        local median, buyoutSeenCount = getUsableMedian(a.name);
+        local id,name,count,min,buyout = getItemSignature(auctionSignature);
+        local median, buyoutSeenCount = getUsableMedian(name);
         
         if median then -- we have a useable median
-            local highestSellablePriceForOne = getHighestSellablePriceForOne(a.name, true);
-            local totalHighestSellablePrice = highestSellablePriceForOne * a.count;
-            local profit = totalHighestSellablePrice - a.buyout;
+            local highestSellablePriceForOne = getHighestSellablePriceForOne(name, true);
+            local totalHighestSellablePrice = highestSellablePriceForOne * count;
+            local profit = totalHighestSellablePrice - buyout;
 
             --see if this auction should be added to the list of below median auctions
-            if (a.buyout > 0 and a.buyout < MAX_BUYOUT_PRICE and profit >= minProfit) then
+            if (buyout > 0 and buyout < MAX_BUYOUT_PRICE and profit >= minProfit) then
                 auctionsBelowMedian[auctionSignature] = a;
                 auctionsBelowMedian[auctionSignature].buyoutSeenCount = buyoutSeenCount;
                 auctionsBelowMedian[auctionSignature].totalHighestSellablePrice = totalHighestSellablePrice;
@@ -412,15 +411,15 @@ function getPercentLessAuctions(percentLess)
     Auctioneer_ChatPrint("Percent Less: "..percentLess.."%");
     
     for auctionSignature,a in AHSnapshot do
-   
-        local averageBuyoutForOne = math.floor(a.buyout / a.count);
+        local id,name,count,min,buyout = getItemSignature(auctionSignature);
+        local averageBuyoutForOne = math.floor(buyout / count);
         
-        local median, buyoutSeenCount = getUsableMedian(a.name);
+        local median, buyoutSeenCount = getUsableMedian(name);
         
         if median then
             local maximumBuyPriceForProfit = math.floor(median * ((100 - percentLess)/100));
-            local totalMedian = median * a.count;
-            local profit = totalMedian - a.buyout;
+            local totalMedian = median * count;
+            local profit = totalMedian - buyout;
 
             --see if this auction should be added to the list of below median auctions
             if (averageBuyoutForOne > 0 and averageBuyoutForOne <= maximumBuyPriceForProfit and profit >= MIN_PROFIT_MARGIN) then
@@ -454,6 +453,7 @@ function doBroker(minProfit)
     
     -- output the list of auctions below the median
     for auctionSignature,a in auctionsBelowMedian do
+    
         if not isItemRecipe(a.name) then
             Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
@@ -483,19 +483,20 @@ end
 -- given an item name, find the lowest price for that item in the current AHSnapshot
 -- if the item does not exist in the snapshot or the snapshot does not exist
 -- a nil is returned.
-function findLowestPriceByItem(itemName)
+function findLowestAuctionForItem(itemName)
     if (not itemName) then return nil; end
 
-    local auctionItem = nil;
+    local lowSig = nil;
     local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
-    for i,v in AHSnapshot do
-        local priceForOne = (v.buyout / v.count);
-        if (string.lower(v.name) == string.lower(itemName) and v.buyout > 0 and priceForOne < lowestPrice) then
-            auctionItem = v;
+    for sig,v in AHSnapshot do
+        local id,name,count,min,buyout = getItemSignature(sig);
+        local priceForOne = (buyout / count);
+        if (string.lower(name) == string.lower(itemName) and buyout > 0 and priceForOne < lowestPrice) then
+            lowSig = sig;
             lowestPrice = priceForOne;
         end
     end
-    return auctionItem;
+    return lowSig;
 end
 
 -- quick index to lowest snapshot price of an item
@@ -517,7 +518,7 @@ function doMedian(param)
     if (not median) then
         Auctioneer_ChatPrint("No auctions found for the item: "..colorTextWhite(itemName));
     else
-        Auctioneer_ChatPrint("Count "..count.." median buyout for 1 "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(median));
+        Auctioneer_ChatPrint("Of last "..count.." seen, median buyout for 1 "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(median));
     end    
 end
 
@@ -529,13 +530,15 @@ function getHighestSellablePriceForOne(itemName, useCachedPrices)
     local median, count = getUsableMedian(itemName);
     
     local currentLowestBuyout = nil;
-    local lowestAuction = nil;
+    local lowestAuctionSignature = nil;
+    local lowestAuctionCount, lowestAuctionBuyout;
     if useCachedPrices then
         currentLowestBuyout = getLowestPriceQuick(itemName);
     else
-        lowestAuction = findLowestPriceByItem(itemName);
-        if lowestAuction then
-            currentLowestBuyout = lowestAuction.buyout / lowestAuction.count;
+        lowestAuctionSignature = findLowestAuctionForItem(itemName);
+        if lowestAuctionSignature then
+            _, _, lowestAuctionCount, _, lowestAuctionBuyout = getItemSignature(lowestAuctionSignature);
+            currentLowestBuyout = lowestAuctionBuyout / lowestAuctionCount;
         end
     end
   
@@ -546,7 +549,7 @@ function getHighestSellablePriceForOne(itemName, useCachedPrices)
         if currentLowestBuyout then
 --~ Auctioneer_ChatPrint("inside if median then, currentLowestBuyout then");        
             lowestBuyoutPriceAllowed = subtractPercent(median, lowestAllowedPercentBelowMedian);
-            if lowestAuction and lowestAuction.owner == UnitName("player") then
+            if lowestAuctionSignature and AHSnapshot[lowestAuctionSignature].owner == UnitName("player") then
 --~ Auctioneer_ChatPrint("if lowestPriceForOne.owner == Araband then");            
                 highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
             elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > median) then
@@ -579,11 +582,13 @@ end
 function doLow(param)
     local itemName = formatItemName(param);
 
-    local auctionItem = findLowestPriceByItem(itemName, AHSnapshot);
-    if (not auctionItem) then
+    local auctionSignature = findLowestAuctionForItem(itemName, AHSnapshot);
+    local _, _, count, _, buyout = getItemSignature(auctionSignature);
+    local auction = AHSnapshot[auctionSignature];
+    if (not auctionSignature) then
         Auctioneer_ChatPrint("No auctions found for the item: "..colorTextWhite(itemName));
     else
-        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(auctionItem.count.."x")..auctionItem.itemLink.." buyout: "..Auctioneer_GetTextGSC(auctionItem.buyout).." Price for one: "..Auctioneer_GetTextGSC(auctionItem.buyout / auctionItem.count).." Owner: "..colorTextWhite(auctionItem.owner));
+        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(count.."x")..auction.itemLink.." buyout: "..Auctioneer_GetTextGSC(buyout).." Price for one: "..Auctioneer_GetTextGSC(buyout / count).." Owner: "..colorTextWhite(auction.owner));
     end
 end
 
@@ -894,16 +899,11 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
           GetAuctionItemInfo(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
           
     if bidamount == aiBuyout then -- only capture buyouts
-        local auctionSignature = aiName..":"..aiCount..":"..aiMinBid..":"..aiBuyout;
+        local auctionSignature = getNumericItemId(aiName)..":"..aiName..":"..aiCount..":"..aiMinBid..":"..aiBuyout;
         
         -- remove from snapshot
         Auctioneer_ChatPrint("Removing auction signature ".. auctionSignature .." from current AH snapshot..");
         AHSnapshot[auctionSignature] = nil;
-        
-        -- add to buy/sell history
-        local buyDateTime = date();
-        Auctioneer_ChatPrint("Saving ".. aiName .. " to purchace history database..");
-        AHBuySellHistory[aiName..":"..buyDateTime] = {name=aiName, count=aiCount, buyout=aiBuyout, texture=aiTexture, date=buyDateTime, sell=0};
     end    
 
     Auctioneer_Old_BidHandler(itemtype,itemindex,bidamount);
@@ -913,7 +913,6 @@ function Auctioneer_OnLoad()
 	RegisterForSave("AuctionConfig");
 	RegisterForSave("AuctionPrices");
     RegisterForSave("AHSnapshot");
-    RegisterForSave("AHBuySellHistory");
     RegisterForSave("AHSnapshotItemPrices");
     
     -- register events
@@ -994,6 +993,7 @@ function Auctioneer_Command(command)
 			Auctioneer_ChatPrint("Clearing all auction data for "..aKey);
 			AuctionPrices[aKey] = {};
             AHSnapshot = {};
+            AHSnapshotItemPrices = {};
         elseif (param == "snapshot") then
             Auctioneer_ChatPrint("Clearing current Auction House snapshot.");
             AHSnapshot = {};
