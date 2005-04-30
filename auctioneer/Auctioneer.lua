@@ -738,24 +738,26 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 					avgBuy = math.floor(buyPrice / buyCount);
 				end
                 
-                local median = getItemHistoricalMedian(name);
-
+                
+                local median, medCount = getUsableMedian(name);
+                
 				if (Auctioneer_GetFilter("average")) then
 					frame:AddLine(format("Seen %d times at auction total", aCount), 0.5,0.8,0.1);
 					if (avgQty > 1) then
-						frame:AddLine(format("For 1: %s min/%s median (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(median), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
+						frame:AddLine(format("For 1: %s min/%s buyout (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
 					else
-						frame:AddLine(format("%s min/%s median (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(median), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
+						frame:AddLine(format("%s min/%s buyout (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
 					end
-                    local snapshotMedian, count = getItemSnapshotMedianBuyout(name);    
-                    if snapshotMedian then
-                        frame:AddLine(format("Seen %d times in last snapshot", count));                  
-                        frame:AddLine(format("Last snapshot median for 1: "..Auctioneer_GetTextGSC(snapshotMedian)));
+                    if median then
+                        frame:AddLine(format("Of last %d seen, buyout median: %s", medCount, Auctioneer_GetTextGSC(median)),0.1,0.8,0.5);
                     end
 				end
 				if (Auctioneer_GetFilter("suggest")) then
 					if (count > 1) then
-						frame:AddLine(format("Your %d stack: %s min/%s median (%s bid)", count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(median*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
+                        local buyoutPriceForOne = median;
+                        if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
+                        if (avgMin > buyoutPriceForOne) then aveMin = buyoutPriceForOne / 2 end
+						frame:AddLine(format("Your %d stack: %s min/%s buyout (%s bid)", count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
 					end
 				end
 				if (Auctioneer_GetFilter("stats")) then
@@ -789,7 +791,6 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 					frame:AddLine(format(">> Never seen at "..also, aCount), 0.5,0.8,0.1);
 				else
 					if (Auctioneer_GetFilter("average")) then
-						if (lastName ~= "") then frame:AddLine(format("Last seen as: %s", lastName), 0.5,0.8,0.1); end
 						frame:AddLine(format(">> %d times at "..also, aCount), 0.5,0.8,0.1);
 						if (avgQty > 1) then
 							frame:AddLine(format(">> For 1: %s min/%s buy (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
@@ -1193,7 +1194,7 @@ local function getRRP(itemID, from)
 	if (from == "opposite") then from = oppositeKey(); end
 		
 	local itemData = getAuctionPriceData(itemID, from);
-	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice, lastName = getAuctionPrices(itemData);
+	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 --	p("Getting data from "..from.." for "..itemID, itemData);
 
 	local bidRatio = bidCount/minCount;
