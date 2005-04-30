@@ -306,8 +306,15 @@ end
 
 -- parse the data from the auction signature
 local function getItemSignature(sigData)
-	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(%d+):(%d+)");
+	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(.-):(.+)");
+--~ Auctioneer_ChatPrint("id="..id);
+--~ Auctioneer_ChatPrint("name="..name);
+--~ Auctioneer_ChatPrint("cout="..count);
+--~ Auctioneer_ChatPrint("min="..min);
+--~ Auctioneer_ChatPrint("buyout="..buyout);
 	if (name == nil) then name = ""; end
+    if (tonumber(min) < 0) then min = 0 end -- handle number overflow
+    if (tonumber(buyout) < 0) then buyout = 0 end -- handle number overflow
 	return tonumber(id),name,tonumber(count),tonumber(min),tonumber(buyout);
 end
 
