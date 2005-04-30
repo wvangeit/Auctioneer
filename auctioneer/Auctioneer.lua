@@ -307,10 +307,9 @@ end
 
 -- parse the data from the auction signature
 local function getItemSignature(sigData)
-	local i,j, id,auctioner,min,buyout,count,name = string.find(sigData, "^(%d+):([^:]+):(%d+):(%d+):(%d+):(.*)");
-	if (auctioner == nil) then auctioner = "unknown"; end
+	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(%d+):(%d+)");
 	if (name == nil) then name = ""; end
-	return id,auctioner,min,buyout,count,name;
+	return id,name,count,min,buyout;
 end
 
 -- returns the current snapshot median for an item
@@ -456,7 +455,7 @@ function doBroker(minProfit)
     -- output the list of auctions below the median
     for auctionSignature,a in auctionsBelowMedian do
         if not isItemRecipe(a.name) then
-            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.." "..a.name).." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
@@ -474,7 +473,7 @@ function doPercentLess(percentLess)
     for auctionSignature,a in auctionsBelowMedian do
         if not isItemRecipe(a.name) then
             local snapshotMedian, count = getItemSnapshotMedianBuyout(a.name);
-            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.." "..a.name).." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Seen "..a.buyoutSeenCount.." Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(a.buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(a.count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
         end
     end
     
@@ -620,7 +619,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     if (aiName == nil) then return; end --if name is nil skip this auction
         
     -- construct the unique auction signature for this aution
-    local lAuctionSignature = string.format("%s:%d:%d:%d", tostring(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice));
+    local lAuctionSignature = string.format("%d:%s:%d:%d:%d", getNumericItemId(aiName), tostring(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice));
     
     -- add this item's buyout price to the buyout price history for this item in the snapshot
     if (aiBuyoutPrice > 0) then
@@ -1045,7 +1044,7 @@ function Auctioneer_Command(command)
 			Auctioneer_ChatPrint("Displaying item's "..cmd.." data");
 		end
 	elseif (cmd == "bargains") then
-		if (not AuctionLastScan) then
+		if (not AHSnapshot) then
 			Auctioneer_ChatPrint("You must have scanned the auction house recently to use this feature.");
 		else
 			Auctioneer_ChatPrint("Searching for bargains in last auction scan...");
@@ -1203,13 +1202,14 @@ end
 function Auctioneer_BargainScan()
 	local bargains = {};
 	local lastBargain = 0;
-	for key, val in AuctionLastScan do
-		local id,auctioner,min,buyout,count,name = getItemSignature(key);
-		local bid = val.b;
-		local link = val.l;
+	for key, val in AHSnapshot do
+		local id,name,count,min,buyout = getItemSignature(key);
+        local auctioner = val.owner;
+		local bid = val.bidamount;
+		local link = val.itemLink;
 
-		id = 0+ id;
-		min = 0+ min;
+		id = 0+id;
+		min = 0+min;
 		buyout = 0+buyout;
 		count = 0+count;
 
@@ -1296,7 +1296,8 @@ function Auctioneer_BargainScan()
 	for i=1, 25 do
 		local b = bargains[i];
 		if  (b ~= nil) then
-			local id,auctioner,min,buyout,count,name = getItemSignature(b.s);
+		    local id,name,count,min,buyout = getItemSignature(b.s);
+            local auctioner = AHSnapshot[b.s].owner;
 			if (auctioner == nil) then auctioner = "unknown"; end
 			if (name == nil) then name = "unknown"; end
 			local action = b.a;
