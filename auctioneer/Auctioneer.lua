@@ -336,7 +336,7 @@ function getItemSnapshotMedianBuyout(itemName)
     return getMedian(buyoutPrices), table.getn(buyoutPrices);
 end
 
-local function getItemHistoricalMedian(itemName)
+local function getItemHistoricalMedianBuyout(itemName)
     local buyoutHistoryTable = getAuctionBuyoutHistory(itemName);
     local historyMedian = getMedian(buyoutHistoryTable);
     local historySeenCount = table.getn(buyoutHistoryTable);
@@ -353,7 +353,7 @@ function getUsableMedian(itemName)
     local snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemName);
    
     --get history median
-    local historyMedian, historySeenCount = getItemHistoricalMedian(itemName);
+    local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemName);
     
     if not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .15)) then
         if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
@@ -755,7 +755,14 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 						frame:AddLine(format("%s min/%s buyout (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
 					end
                     if median and Auctioneer_GetFilter("median") then
-                        frame:AddLine(format("Of last %d seen, buyout median: %s", medCount, Auctioneer_GetTextGSC(median)),0.1,0.8,0.5);
+                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(name);
+                        local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(name);
+                        if historicalMedian then
+                            frame:AddLine(format("Last %d seen, buyout median: %s", historicalMedCount, Auctioneer_GetTextGSC(historicalMedian)),0.1,0.8,0.5);
+                        end
+                        if snapshotMedian and snapshotMedCount < historicalMedCount then
+                            frame:AddLine(format("Last scan %d seen, buyout median: %s", snapshotMedCount, Auctioneer_GetTextGSC(snapshotMedian)),0.1,0.8,0.5);
+                        end
                     end
 				end
 				if (Auctioneer_GetFilter("suggest")) then
