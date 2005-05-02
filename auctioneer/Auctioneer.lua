@@ -657,7 +657,17 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     
         lNewAuctionsCount = lNewAuctionsCount + 1;
         
-        local itemData = getAuctionPriceData(aiName);
+        -- get the item data from AuctionPrices table
+        local itemData;
+        local itemID = getNumericItemId(aiName);
+        -- see if they are still using the itemID as the key
+        if AuctionPrices[auctionKey()][itemID] then
+            itemData = AuctionPrices[auctionKey()][itemID];
+            AuctionPrices[auctionKey()][itemID] = nil; --clear entry using old ID key
+        else
+            itemData = getAuctionPriceData(aiName);
+        end
+        
         local count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
      
      	-- Sanity check values to ensure they aren't whack. if prices are wack we dont want to skew the mean, but still can add to the median
