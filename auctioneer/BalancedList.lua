@@ -1,3 +1,7 @@
+--[[
+	Version: <%version%>
+	Revision: $Id$
+]]
 -----------------------------------------------------------------------------
 -- A balanced list object that always does ordered inserts and pushes off the end
 -- values in the correct direction to keep the list balanced and median values

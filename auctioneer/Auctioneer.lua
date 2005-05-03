@@ -1,5 +1,6 @@
 -- Auctioneer
-AUCTIONEER_VERSION="3.0";
+AUCTIONEER_VERSION="<%version%>";
+-- Revision: $Id$
 -- Written by Norganna
 --
 -- This is an addon for World of Warcraft that works in combination with 

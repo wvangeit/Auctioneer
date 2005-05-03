@@ -1,6 +1,8 @@
 --
 -- Base prices for Auctioneer
 -- Gathered by Norganna
+-- Version: <%version%>
+-- Revision: $Id$
 --
 
 Auctioneer_BasePrices = {
