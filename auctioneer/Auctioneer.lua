@@ -98,12 +98,12 @@ function Auctioneer_GetTextGSC(money)
 end
 
 -- return an empty string if str is nil
-function nilSafeString(str)
+local function nilSafeString(str)
     if (not str) then str = "" end
     return str;
 end
 
-function colorTextWhite(text)
+local function colorTextWhite(text)
     if (not text) then text = ""; end
     local COLORING_START = "|cff%s%s|r";
     local WHITE_COLOR = "e6e6e6";
@@ -118,8 +118,14 @@ function nullSafe(val)
 end
 
 -- subtracts a percent from a value
-function subtractPercent(value, percentLess)
+local function subtractPercent(value, percentLess)
     return math.floor(value * ((100 - percentLess)/100));
+end
+
+-- returns the integer representation of the percent less value2 is from value1
+-- example: value1=10, value2=7,  percentLess=30
+local function percentLessThan(value1, value2)
+    return 100 - math.floor((100 * tonumber(value2))/tonumber(value1));
 end
 
 -- returns the median value of a given table one-dimentional table
@@ -388,7 +394,7 @@ function getResellableAuctions(minProfit)
         minProfit = tonumber(minProfit) * 100; -- convert to copper
     end    
     
-    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit));
+    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
     
     for auctionSignature,a in AHSnapshot do
         local id,name,count,min,buyout = getItemSignature(auctionSignature);
@@ -421,7 +427,7 @@ function getPercentLessAuctions(percentLess)
          percentLess = MIN_PERCENT_LESS_THAN_MEDIAN; 
     end
     
-    Auctioneer_ChatPrint("Percent Less: "..percentLess.."%");
+    Auctioneer_ChatPrint("Percent Less than median: "..percentLess.."%");
     
     for auctionSignature,a in AHSnapshot do
         local id,name,count,min,buyout = getItemSignature(auctionSignature);
@@ -460,7 +466,6 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
-    Auctioneer_ChatPrint("Time to make some gold!");
 
     local auctionsBelowMedian = getResellableAuctions(minProfit);
     
@@ -468,7 +473,7 @@ function doBroker(minProfit)
     for auctionSignature,a in auctionsBelowMedian do
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
-            Auctioneer_ChatPrint("Of last "..a.buyoutSeenCount.." seen, HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." seen, HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Item: "..colorTextWhite(count.."x")..a.itemLink.." Seller: "..colorTextWhite(a.owner));
         end
     end
     
@@ -478,7 +483,6 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doPercentLess(percentLess)    
-    Auctioneer_ChatPrint("Time to make some gold!");
 
     local auctionsBelowMedian = getPercentLessAuctions(percentLess);
     
@@ -487,7 +491,7 @@ function doPercentLess(percentLess)
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
             local snapshotMedian, lastSeenCount = getUsableMedian(name);
-            Auctioneer_ChatPrint("Of last "..lastSeenCount.." seen, Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Auction: "..colorTextWhite(count.."x")..a.itemLink.." owner: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint("Last "..lastSeenCount.." seen, Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Item: "..colorTextWhite(count.."x")..a.itemLink.." Seller: "..colorTextWhite(a.owner).." Less: "..colorTextWhite(percentLessThan(getUsableMedian(name), buyout / count).."%"));
         end
     end
     
@@ -602,7 +606,7 @@ function doLow(param)
     else
         local _, _, count, _, buyout = getItemSignature(auctionSignature);
         local auction = AHSnapshot[auctionSignature];    
-        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(count.."x")..auction.itemLink.." buyout: "..Auctioneer_GetTextGSC(buyout).." Price for one: "..Auctioneer_GetTextGSC(buyout / count).." Owner: "..colorTextWhite(auction.owner));
+        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(count.."x")..auction.itemLink.." Buyout: "..Auctioneer_GetTextGSC(buyout).." Price for one: "..Auctioneer_GetTextGSC(buyout / count).." Seller: "..colorTextWhite(auction.owner) .. " Less than median: "..colorTextWhite(percentLessThan(getUsableMedian(itemName), buyout / count).."%"));
     end
 end
 
