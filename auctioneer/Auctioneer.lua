@@ -479,7 +479,7 @@ function doBroker(minProfit)
     for auctionSignature,a in auctionsBelowMedian do
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
-            Auctioneer_ChatPrint("Last "..a.buyoutSeenCount.." seen, HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Item: "..colorTextWhite(count.."x")..a.itemLink.." Seller: "..colorTextWhite(a.owner));
+            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..a.buyoutSeenCount.." seen HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(a.profit));
         end
     end
     
@@ -497,7 +497,7 @@ function doPercentLess(percentLess)
         local _, name, count, _, buyout = getItemSignature(auctionSignature); 
         if not isItemRecipe(name) then
             local snapshotMedian, lastSeenCount = getUsableMedian(name);
-            Auctioneer_ChatPrint("Last "..lastSeenCount.." seen, Median: "..Auctioneer_GetTextGSC(a.totalMedian).." Buyout: "..Auctioneer_GetTextGSC(buyout).." Profit: "..Auctioneer_GetTextGSC(a.profit).." Item: "..colorTextWhite(count.."x")..a.itemLink.." Seller: "..colorTextWhite(a.owner).." Less: "..colorTextWhite(percentLessThan(getUsableMedian(name), buyout / count).."%"));
+            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..lastSeenCount.." seen Median: "..Auctioneer_GetTextGSC(a.totalMedian).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Less: "..colorTextWhite(percentLessThan(getUsableMedian(name), buyout / count).."%"));
         end
     end
     
@@ -612,7 +612,7 @@ function doLow(param)
     else
         local _, _, count, _, buyout = getItemSignature(auctionSignature);
         local auction = AHSnapshot[auctionSignature];    
-        Auctioneer_ChatPrint("Found lowest "..colorTextWhite(count.."x")..auction.itemLink.." Buyout: "..Auctioneer_GetTextGSC(buyout).." Price for one: "..Auctioneer_GetTextGSC(buyout / count).." Seller: "..colorTextWhite(auction.owner) .. " Less than median: "..colorTextWhite(percentLessThan(getUsableMedian(itemName), buyout / count).."%"));
+        Auctioneer_ChatPrint(colorTextWhite(count.."x")..auction.itemLink..", BO: "..Auctioneer_GetTextGSC(buyout).." Seller: "..colorTextWhite(auction.owner).." For one: "..Auctioneer_GetTextGSC(buyout / count).." Less than median: "..colorTextWhite(percentLessThan(getUsableMedian(itemName), buyout / count).."%"));
     end
 end
 
