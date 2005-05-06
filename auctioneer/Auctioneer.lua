@@ -30,7 +30,7 @@ local lAuctioneerTooltip = nil;
 local lTotalAuctionsScannedCount = 0;
 local lNewAuctionsCount = 0;
 local lOldAuctionsCount = 0;
-local lDefuctAuctionsCount = 0;
+local lDefunctAuctionsCount = 0;
 
 -- temp table that is copied into AHSnapshotItemPrices only when a scan fully completes
 local lSnapshotItemPrices = {};
@@ -198,7 +198,7 @@ local function Auctioneer_AuctionStart_Hook()
     lTotalAuctionsScannedCount = 0;
     lNewAuctionsCount = 0;
     lOldAuctionsCount = 0;
-    lDefuctAuctionsCount = 0;
+    lDefunctAuctionsCount = 0;
 end
 
 
@@ -209,7 +209,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
         if (a.dirty == 1) then
             --Auctioneer_ChatPrint("Defunct sig: "..nilSafeString(i))
             AHSnapshot[i] = nil;
-            lDefuctAuctionsCount = lDefuctAuctionsCount + 1;
+            lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
         end
     end
     
@@ -221,7 +221,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     Auctioneer_ChatPrint("Total auctions scanned: "..colorTextWhite(lTotalAuctionsScannedCount));
     Auctioneer_ChatPrint("New auctions scanned: "..colorTextWhite(lNewAuctionsCount));
     Auctioneer_ChatPrint("Previously scanned: "..colorTextWhite(lOldAuctionsCount));
-    Auctioneer_ChatPrint("Defuct auctions removed: "..colorTextWhite(lDefuctAuctionsCount));
+    Auctioneer_ChatPrint("Defunct auctions removed: "..colorTextWhite(lDefunctAuctionsCount));
     
     if (nullSafe(lDiscrepencyCount) > 0) then
         Auctioneer_ChatPrint("Discrepencies: "..colorTextWhite(lDiscrepencyCount));
