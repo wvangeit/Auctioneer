@@ -204,12 +204,13 @@ end
 
 -- this is called when an auction scan finishes and is used for clean up
 local function Auctioneer_FinishedAuctionScan_Hook()
-    -- remove defunct auctions from snapshot
-    for i,a in AHSnapshot do
-        if (a.dirty == 1) then
-            --Auctioneer_ChatPrint("Defunct sig: "..nilSafeString(i))
-            AHSnapshot[i] = nil;
-            lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+    -- only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
+    if lTotalAuctionsScannedCount > 250 then 
+        for i,a in AHSnapshot do
+            if (a.dirty == 1) then
+                AHSnapshot[i] = nil; --clear defunct auctions
+                lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+            end
         end
     end
     
