@@ -126,7 +126,11 @@ end
 -- returns the integer representation of the percent less value2 is from value1
 -- example: value1=10, value2=7,  percentLess=30
 local function percentLessThan(value1, value2)
-    return 100 - math.floor((100 * tonumber(value2))/tonumber(value1));
+    if nullSafe(value1) > 0 then
+        return 100 - math.floor((100 * nullSafe(value2))/nullSafe(value1));
+    else
+        return 0;
+    end
 end
 
 -- returns the median value of a given table one-dimentional table
@@ -1190,19 +1194,34 @@ function Auctioneer_OnEvent(event)
 	if (event=="NEW_AUCTION_UPDATE") then
         local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
         if name then
+            local itemData = getAuctionPriceData(name);
+			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
+            
             -- get highest sellable price for buyout
             local hsp = getHighestSellablePriceForOne(name, false);
+            if hsp == 0 and buyCount > 0 then
+                hsp =  math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+            end
             
             -- calculate average min for start price
-			local itemData = getAuctionPriceData(name);
-			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
-            local avgMin = math.floor(minPrice / minCount);
-            if avgMin > hsp then
-                avgMin = hsp / 2;
+            local minbid = 0
+            if minCount > 0 then 
+                minbid = math.floor(minPrice / minCount);
             end
-                        
-            MoneyInputFrame_SetCopper(StartPrice, avgMin * count);
-            MoneyInputFrame_SetCopper(BuyoutPrice, hsp * count);
+            if minbid > hsp then
+                minbid = subtractPercent(hsp, 15); -- 15% less than median
+            end
+            
+            if hsp > 0 and minbid > 0 then
+                MoneyInputFrame_SetCopper(StartPrice, minbid * count);
+                MoneyInputFrame_SetCopper(BuyoutPrice, hsp * count);
+            elseif Auctioneer_BasePrices[getNumericItemId(name)].s then -- see if we have vendor sell info for this item
+                -- use vendor prices if no auction data available
+                local itemInfo = Auctioneer_BasePrices[getNumericItemId(name)];
+                local vendorSell = nullSafe(itemInfo.s);
+                MoneyInputFrame_SetCopper(StartPrice, (vendorSell * count) * 1.5);
+                MoneyInputFrame_SetCopper(BuyoutPrice, (vendorSell * count) * 3);
+            end
         end
 	end
     if (event=="AUCTION_HOUSE_SHOW") then
