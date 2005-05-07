@@ -434,14 +434,16 @@ local function getResellableAuctions(minProfit)
 
             --see if this auction should be added to the list of below median auctions
             if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit) then
-                auctionsBelowMedian[auctionSignature] = a;
-                auctionsBelowMedian[auctionSignature].buyoutSeenCount = buyoutSeenCount;
-                auctionsBelowMedian[auctionSignature].totalHighestSellablePrice = totalHighestSellablePrice;
-                auctionsBelowMedian[auctionSignature].profit = profit;
+                table.insert(auctionsBelowMedian, a); -- for some reason we have to use table.insert in order to use table.sort later
+                local insertedIndex = table.getn(auctionsBelowMedian);
+                auctionsBelowMedian[insertedIndex].signature = auctionSignature;
+                auctionsBelowMedian[insertedIndex].buyoutSeenCount = buyoutSeenCount;
+                auctionsBelowMedian[insertedIndex].totalHighestSellablePrice = totalHighestSellablePrice;
+                auctionsBelowMedian[insertedIndex].profit = profit;
             end
         end        
     end    
-    
+        
     return auctionsBelowMedian;
 end
 
@@ -470,11 +472,13 @@ local function getBidWorthyAuctions(minProfit)
 
             --see if this auction should be added to the list of below median auctions
             if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and a.timeLeft <= TIME_LEFT_MEDIUM) then
-                bidWorthyAuctions[auctionSignature] = a;
-                bidWorthyAuctions[auctionSignature].buyoutSeenCount = buyoutSeenCount;
-                bidWorthyAuctions[auctionSignature].totalHighestSellablePrice = totalHighestSellablePrice;
-                bidWorthyAuctions[auctionSignature].profit = profit;
-                bidWorthyAuctions[auctionSignature].currentBid = currentBid;
+                table.insert(bidWorthyAuctions, a); -- for some reason we have to use table.insert in order to use table.sort later
+                local insertedIndex = table.getn(bidWorthyAuctions);
+                bidWorthyAuctions[insertedIndex].signature = auctionSignature;
+                bidWorthyAuctions[insertedIndex].buyoutSeenCount = buyoutSeenCount;
+                bidWorthyAuctions[insertedIndex].totalHighestSellablePrice = totalHighestSellablePrice;
+                bidWorthyAuctions[insertedIndex].profit = profit;
+                bidWorthyAuctions[insertedIndex].currentBid = currentBid;
             end
         end                
     end
@@ -504,11 +508,13 @@ local function getPercentLessAuctions(percentLess)
             local profit = totalMedian - buyout;
 
             --see if this auction should be added to the list of below median auctions
-            if (averageBuyoutForOne > 0 and averageBuyoutForOne <= maximumBuyPriceForProfit and profit >= MIN_PROFIT_MARGIN) then
-                auctionsBelowMedian[auctionSignature] = a;
-                auctionsBelowMedian[auctionSignature].buyoutSeenCount = buyoutSeenCount;
-                auctionsBelowMedian[auctionSignature].totalMedian = totalMedian;
-                auctionsBelowMedian[auctionSignature].profit = profit;
+            if (averageBuyoutForOne > 0 and averageBuyoutForOne <= maximumBuyPriceForProfit and profit >= MIN_PROFIT_MARGIN) then                
+                table.insert(auctionsBelowMedian, a); -- for some reason we have to use table.insert in order to use table.sort later
+                local insertedIndex = table.getn(auctionsBelowMedian);
+                auctionsBelowMedian[insertedIndex].signature = auctionSignature;
+                auctionsBelowMedian[insertedIndex].buyoutSeenCount = buyoutSeenCount;
+                auctionsBelowMedian[insertedIndex].totalMedian = totalMedian;
+                auctionsBelowMedian[insertedIndex].profit = profit;                
             end
         end            
     end    
@@ -526,15 +532,18 @@ local function isItemRecipe(itemName)
     end
     return isRecipe;
 end
-
+    
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
 
     local auctionsBelowMedian = getResellableAuctions(minProfit);
     
+    -- sort by profit decending
+    table.sort(auctionsBelowMedian, function(a, b) return (a.profit > b.profit) end);
+    
     -- output the list of auctions below the median
-    for auctionSignature,a in auctionsBelowMedian do
-        local _, name, count, _, buyout = getItemSignature(auctionSignature); 
+    for _,a in auctionsBelowMedian do
+        local _, name, count, _, buyout = getItemSignature(a.signature); 
         if not isItemRecipe(name) then
             Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..a.buyoutSeenCount.." seen HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(a.profit));
         end
@@ -547,9 +556,11 @@ end
 function doBidBroker(minProfit)
     local bidWorthyAuctions = getBidWorthyAuctions(minProfit);
     
+    table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
+    
     -- output the list of auctions below the median
-    for auctionSignature,a in bidWorthyAuctions do
-        local _, name, count, _, buyout = getItemSignature(auctionSignature); 
+    for _,a in bidWorthyAuctions do
+        local _, name, count, _, buyout = getItemSignature(a.signature); 
         if not isItemRecipe(name) then
             Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..a.buyoutSeenCount.." seen HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." CurrentBid: "..Auctioneer_GetTextGSC(a.currentBid).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));
         end
@@ -563,9 +574,11 @@ function doPercentLess(percentLess)
 
     local auctionsBelowMedian = getPercentLessAuctions(percentLess);
     
+    table.sort(auctionsBelowMedian, function(a, b) return (a.profit > b.profit) end);
+    
     -- output the list of auctions below the median
-    for auctionSignature,a in auctionsBelowMedian do
-        local _, name, count, _, buyout = getItemSignature(auctionSignature); 
+    for _,a in auctionsBelowMedian do
+        local _, name, count, _, buyout = getItemSignature(a.signature); 
         if not isItemRecipe(name) then
             local snapshotMedian, lastSeenCount = getUsableMedian(name);
             Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..lastSeenCount.." seen Median: "..Auctioneer_GetTextGSC(a.totalMedian).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Less: "..colorTextWhite(percentLessThan(getUsableMedian(name), buyout / count).."%"));
