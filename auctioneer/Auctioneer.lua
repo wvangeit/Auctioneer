@@ -522,6 +522,9 @@ local function getPercentLessAuctions(percentLess)
     return auctionsBelowMedian;
 end
 
+local function querySnapshot(filter)
+end
+
 -- returns if an item is a recipe type
 local function isItemRecipe(itemName) 
     local isRecipe = false;
@@ -810,9 +813,10 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
-        AHSnapshot[lAuctionSignature].dirty = 0;                       --set its dirty flag to false so we know to keep it in the snapshot
-        AHSnapshot[lAuctionSignature].lastSeenTime = time();           --set the time we saw it last
-        AHSnapshot[lAuctionSignature].timeLeft = nullSafe(aiTimeLeft); --update the time left
+        AHSnapshot[lAuctionSignature].dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
+        AHSnapshot[lAuctionSignature].lastSeenTime = time();             --set the time we saw it last
+        AHSnapshot[lAuctionSignature].timeLeft = nullSafe(aiTimeLeft);   --update the time left
+        AHSnapshot[lAuctionSignature].bidamount = nullSafe(aiBidAmount); --update the current bid amount
     end
 end
 
