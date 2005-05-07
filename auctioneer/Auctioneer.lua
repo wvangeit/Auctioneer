@@ -805,12 +805,14 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
         local aiLink = GetAuctionItemLink("list", index);
-        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), dirty=0};
+        local initialTimeSeen = time();
+        AHSnapshot[lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), dirty=0};
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
-        --just set its dirty flag to false so we know to keep it in the snapshot
-        AHSnapshot[lAuctionSignature].dirty = 0; 
+        AHSnapshot[lAuctionSignature].dirty = 0;                       --set its dirty flag to false so we know to keep it in the snapshot
+        AHSnapshot[lAuctionSignature].lastSeenTime = time();           --set the time we saw it last
+        AHSnapshot[lAuctionSignature].timeLeft = nullSafe(aiTimeLeft); --update the time left
     end
 end
 
