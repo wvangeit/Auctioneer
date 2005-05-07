@@ -42,10 +42,10 @@ local lMaxBuyoutHistorySize = 35;
 local MIN_PROFIT_MARGIN = 8000;
 
 -- min times an item must be seen before it can show up in the list of items below median
-MIN_BUYOUT_SEEN_COUNT = 7;
+local MIN_BUYOUT_SEEN_COUNT = 7;
 
 -- max buyout price for an auction to display as a good deal item
-MAX_BUYOUT_PRICE = 300000;
+local MAX_BUYOUT_PRICE = 800000;
 
 -- the default percent less, only find auctions that are at a minimum this percent less than the median
 local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% by default
@@ -57,6 +57,27 @@ AuctionPrices = {};        --Table that keeps the price history of auctions
 Auction_DoneItems = {};    --Table to keep a record of auction items that have been scanned
 AHSnapshot = {};           --Table that will hold the Auction scan results
 AHSnapshotItemPrices = {}; --Table that holds the lists of prices buy item name, for quick look up
+
+-- Auction time constants
+local TIME_LEFT_SHORT = 1;
+local TIME_LEFT_MEDIUM = 2;
+local TIME_LEFT_LONG = 3;
+local TIME_LEFT_VERY_LONG = 4;
+
+-- return the string representation of the given timeLeft constant
+local function getTimeLeftString(timeLeft)
+    local timeLeftString = "";
+    if timeLeft == TIME_LEFT_SHORT then
+        timeLeftString = "Short";
+    elseif timeLeft == TIME_LEFT_MEDIUM then
+        timeLeftString = "Medium";
+    elseif timeLeft == TIME_LEFT_LONG then
+        timeLeftString = "Long";
+    elseif timeLeft == TIME_LEFT_VERY_LONG then
+        timeLeftString = "Very Long";    
+    end
+    return timeLeftString;    
+end
 
 -- calculate the gold, silver, and copper values based the ammount of copper
 function Auctioneer_GetGSC(money)
@@ -391,9 +412,9 @@ end
 --    5. The item must yeild profit >= MIN_PROFIT_MARGIN
 --
 -- @param percentLess the percent less than the median price to look for
-function getResellableAuctions(minProfit)
+local function getResellableAuctions(minProfit)
     local auctionsBelowMedian = {};
-    if (minProfit == "") then
+    if (not minProfit or minProfit == "") then
          --only find auctions that are at a minimum % less than the median
          minProfit = MIN_PROFIT_MARGIN; 
     else
@@ -412,7 +433,7 @@ function getResellableAuctions(minProfit)
             local profit = totalHighestSellablePrice - buyout;
 
             --see if this auction should be added to the list of below median auctions
-            if (buyout > 0 and buyout < MAX_BUYOUT_PRICE and profit >= minProfit) then
+            if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit) then
                 auctionsBelowMedian[auctionSignature] = a;
                 auctionsBelowMedian[auctionSignature].buyoutSeenCount = buyoutSeenCount;
                 auctionsBelowMedian[auctionSignature].totalHighestSellablePrice = totalHighestSellablePrice;
@@ -424,8 +445,44 @@ function getResellableAuctions(minProfit)
     return auctionsBelowMedian;
 end
 
+-- returns a table containing auctions that have a short or medium time left and can be bid on for profit
+local function getBidWorthyAuctions(minProfit) 
+    local bidWorthyAuctions = {};
+    if (not minProfit or minProfit == "") then
+        --only find auctions that are at a minimum % less than the median
+        minProfit = MIN_PROFIT_MARGIN; 
+    else
+        minProfit = tonumber(minProfit) * 100; -- convert to copper
+    end  
+    
+    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
+    
+    for auctionSignature, a in AHSnapshot do
+        local id,name,count,min,buyout = getItemSignature(auctionSignature);
+        local median, buyoutSeenCount = getUsableMedian(name);
+        
+        if median then -- we have a useable median
+            local highestSellablePriceForOne = getHighestSellablePriceForOne(name, true);
+            local totalHighestSellablePrice = highestSellablePriceForOne * count;
+            local currentBid = a.bidamount;
+            if currentBid == 0 then currentBid = min end
+            local profit = totalHighestSellablePrice - currentBid;
 
-function getPercentLessAuctions(percentLess)
+            --see if this auction should be added to the list of below median auctions
+            if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and a.timeLeft <= TIME_LEFT_MEDIUM) then
+                bidWorthyAuctions[auctionSignature] = a;
+                bidWorthyAuctions[auctionSignature].buyoutSeenCount = buyoutSeenCount;
+                bidWorthyAuctions[auctionSignature].totalHighestSellablePrice = totalHighestSellablePrice;
+                bidWorthyAuctions[auctionSignature].profit = profit;
+                bidWorthyAuctions[auctionSignature].currentBid = currentBid;
+            end
+        end                
+    end
+    
+    return bidWorthyAuctions;
+end
+
+local function getPercentLessAuctions(percentLess)
     local auctionsBelowMedian = {};
     
     if (percentLess == "") then
@@ -486,6 +543,20 @@ function doBroker(minProfit)
     Auctioneer_ChatPrint("Brokering done.");
 end
 
+-- builds the list of auctions that can be bought and resold for profit
+function doBidBroker(minProfit)
+    local bidWorthyAuctions = getBidWorthyAuctions(minProfit);
+    
+    -- output the list of auctions below the median
+    for auctionSignature,a in bidWorthyAuctions do
+        local _, name, count, _, buyout = getItemSignature(auctionSignature); 
+        if not isItemRecipe(name) then
+            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..a.buyoutSeenCount.." seen HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." CurrentBid: "..Auctioneer_GetTextGSC(a.currentBid).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));
+        end
+    end
+    
+    Auctioneer_ChatPrint("Bid brokering done.");
+end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doPercentLess(percentLess)    
@@ -642,6 +713,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
     lTotalAuctionsScannedCount = lTotalAuctionsScannedCount + 1;
 
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo("list", index);
+    local aiTimeLeft = GetAuctionItemTimeLeft("list", index);
    
     -- do some validation of the auction data that was returned
     if (aiCount < 1) then aiCount = 1; end
@@ -720,7 +792,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
         local aiLink = GetAuctionItemLink("list", index);
-        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), owner=aiOwner, dirty=0};
+        AHSnapshot[lAuctionSignature] = {itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), dirty=0};
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
@@ -1058,8 +1130,10 @@ function Auctioneer_Command(command)
 		Auctioneer_SetFilter("also", param);        
 	elseif (cmd == "broker") then
         doBroker(param);
+    elseif (cmd == "bidbroker") then
+        doBidBroker(param);        
 	elseif (cmd == "percentless") then
-        doPercentLess(param);        
+        doPercentLess(param);           
     elseif (cmd == "test") then
         doTests();
     elseif (cmd == "low") then
