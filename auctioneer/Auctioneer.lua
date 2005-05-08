@@ -401,6 +401,14 @@ function getUsableMedian(itemName)
     return usableMedian, count;
 end
 
+-- returns the current bid on an auction
+local function getCurrentBid(auctionSignature)
+    local _,_,_,min,_ = getItemSignature(auctionSignature);
+    local currentBid = AHSnapshot[auctionSignature].bidamount;
+    if currentBid == 0 then currentBid = min end   
+    return currentBid;     
+end
+
 -- returns a table containing auctions are good prospects for reselling for profit
 -- It decides this based on the items historical median and current median.
 -- Logic:
@@ -447,48 +455,28 @@ local function getResellableAuctions(minProfit)
     return auctionsBelowMedian;
 end
 
--- returns a table containing auctions that have a short or medium time left and can be bid on for profit
-local function getBidWorthyAuctions(minProfit) 
-    local bidWorthyAuctions = {};
-    if (not minProfit or minProfit == "") then
-        --only find auctions that are at a minimum % less than the median
-        minProfit = MIN_PROFIT_MARGIN; 
-    else
-        minProfit = tonumber(minProfit) * 100; -- convert to copper
-    end  
-    
-    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
-    
-    for auctionSignature, a in AHSnapshot do
-        local id,name,count,min,buyout = getItemSignature(auctionSignature);
-        local median, buyoutSeenCount = getUsableMedian(name);
-        
-        if median then -- we have a useable median
-            local highestSellablePriceForOne = getHighestSellablePriceForOne(name, true);
-            local totalHighestSellablePrice = highestSellablePriceForOne * count;
-            local currentBid = a.bidamount;
-            if currentBid == 0 then currentBid = min end
-            local profit = totalHighestSellablePrice - currentBid;
 
-            --see if this auction should be added to the list of below median auctions
-            if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and a.timeLeft <= TIME_LEFT_MEDIUM) then
-                table.insert(bidWorthyAuctions, a); -- for some reason we have to use table.insert in order to use table.sort later
-                local insertedIndex = table.getn(bidWorthyAuctions);
-                bidWorthyAuctions[insertedIndex].signature = auctionSignature;
-                bidWorthyAuctions[insertedIndex].buyoutSeenCount = buyoutSeenCount;
-                bidWorthyAuctions[insertedIndex].totalHighestSellablePrice = totalHighestSellablePrice;
-                bidWorthyAuctions[insertedIndex].profit = profit;
-                bidWorthyAuctions[insertedIndex].currentBid = currentBid;
-            end
-        end                
+-- filters out all auctions except those that have short or medium time remaining and meet profit requirements
+local function bidBrokerFilter(minProfit, signature)
+    local filterAuction = true;
+    local id,name,count,min,buyout = getItemSignature(signature);
+    local hsp = getHighestSellablePriceForOne(name, true);
+    
+    if getUsableMedian(name) then  -- only add if we have seen it enough times to have a usable median
+        local currentBid = getCurrentBid(signature);
+        local profit = (hsp * count) - currentBid;
+        
+        if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and AHSnapshot[signature].timeLeft <= TIME_LEFT_MEDIUM) then
+            filterAuction = false;
+        end
     end
     
-    return bidWorthyAuctions;
+    return filterAuction;
 end
 
 
 -- filters out all auctions that are not a given percentless than the median for that item.
-local function percentLess_AuctionFilter(percentLess, signature)
+local function percentLessFilter(percentLess, signature)
     local filterAuction = true;
     local id,name,count,min,buyout = getItemSignature(signature);
     local median = getUsableMedian(name);
@@ -533,7 +521,6 @@ end
     
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
-
     local auctionsBelowMedian = getResellableAuctions(minProfit);
     
     -- sort by profit decending
@@ -552,15 +539,21 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doBidBroker(minProfit)
-    local bidWorthyAuctions = getBidWorthyAuctions(minProfit);
+    if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN end
+    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
+    
+    local bidWorthyAuctions = querySnapshot(bidBrokerFilter, minProfit);
     
     table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
     
     -- output the list of auctions below the median
     for _,a in bidWorthyAuctions do
-        local _, name, count, _, buyout = getItemSignature(a.signature); 
+        local id,name,count,min,buyout = getItemSignature(a.signature); 
         if not isItemRecipe(name) then
-            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..a.buyoutSeenCount.." seen HSP: "..Auctioneer_GetTextGSC(a.totalHighestSellablePrice).." CurrentBid: "..Auctioneer_GetTextGSC(a.currentBid).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));
+            local hsp, seenCount = getHighestSellablePriceForOne(name, true);
+            local currentBid = getCurrentBid(a.signature);
+            local profit = (hsp * count) - currentBid;
+            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen HSP: "..Auctioneer_GetTextGSC(hsp * count).." CurrentBid: "..Auctioneer_GetTextGSC(currentBid).." Prof: "..Auctioneer_GetTextGSC(profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));
         end
     end
     
@@ -572,7 +565,7 @@ function doPercentLess(percentLess)
     if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_MEDIAN end
     Auctioneer_ChatPrint("Percent Less than median: "..percentLess.."%");
     
-    local auctionsBelowMedian = querySnapshot(percentLess_AuctionFilter, percentLess);
+    local auctionsBelowMedian = querySnapshot(percentLessFilter, percentLess);
     
     -- sort by profit based on median
     table.sort(auctionsBelowMedian, function(a, b)
@@ -689,7 +682,7 @@ function getHighestSellablePriceForOne(itemName, useCachedPrices)
         end
     end
     
-    return highestSellablePrice;
+    return highestSellablePrice, count;
 end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
