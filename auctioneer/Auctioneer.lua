@@ -147,7 +147,7 @@ end
 -- returns the integer representation of the percent less value2 is from value1
 -- example: value1=10, value2=7,  percentLess=30
 local function percentLessThan(value1, value2)
-    if nullSafe(value1) > 0 then
+    if nullSafe(value1) > 0 and nullSafe(value2) < nullSafe(value1) then
         return 100 - math.floor((100 * nullSafe(value2))/nullSafe(value1));
     else
         return 0;
@@ -486,43 +486,38 @@ local function getBidWorthyAuctions(minProfit)
     return bidWorthyAuctions;
 end
 
-local function getPercentLessAuctions(percentLess)
-    local auctionsBelowMedian = {};
-    
-    if (percentLess == "") then
-         --only find auctions that are at a minimum % less than the median
-         percentLess = MIN_PERCENT_LESS_THAN_MEDIAN; 
-    end
-    
-    Auctioneer_ChatPrint("Percent Less than median: "..percentLess.."%");
-    
-    for auctionSignature,a in AHSnapshot do
-        local id,name,count,min,buyout = getItemSignature(auctionSignature);
-        local averageBuyoutForOne = math.floor(buyout / count);
-        
-        local median, buyoutSeenCount = getUsableMedian(name);
-        
-        if median then
-            local maximumBuyPriceForProfit = math.floor(median * ((100 - percentLess)/100));
-            local totalMedian = median * count;
-            local profit = totalMedian - buyout;
 
-            --see if this auction should be added to the list of below median auctions
-            if (averageBuyoutForOne > 0 and averageBuyoutForOne <= maximumBuyPriceForProfit and profit >= MIN_PROFIT_MARGIN) then                
-                table.insert(auctionsBelowMedian, a); -- for some reason we have to use table.insert in order to use table.sort later
-                local insertedIndex = table.getn(auctionsBelowMedian);
-                auctionsBelowMedian[insertedIndex].signature = auctionSignature;
-                auctionsBelowMedian[insertedIndex].buyoutSeenCount = buyoutSeenCount;
-                auctionsBelowMedian[insertedIndex].totalMedian = totalMedian;
-                auctionsBelowMedian[insertedIndex].profit = profit;                
-            end
-        end            
-    end    
-    
-    return auctionsBelowMedian;
+-- filters out all auctions that are not a given percentless than the median for that item.
+local function percentLess_AuctionFilter(percentLess, signature)
+    local filterAuction = true;
+    local id,name,count,min,buyout = getItemSignature(signature);
+    local median = getUsableMedian(name);
+
+    if median then
+        --see if this auction should be not be filtered
+        local profit = (median * count) - buyout;
+        if (buyout > 0 and percentLessThan(median, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then                        
+            filterAuction = false;
+        end
+    end      
+
+    return filterAuction;
 end
 
-local function querySnapshot(filter)
+
+-- generic function for querying the snapshot with a filter function that returns true if an auction should be filtered out of the result set.
+local function querySnapshot(filter, param)
+    local queryResults = {};
+    param = param or "";
+
+    for auctionSignature,a in AHSnapshot do
+        if(not filter(param, auctionSignature)) then
+            table.insert(queryResults, a); -- for some reason we have to use table.insert in order to use table.sort later
+            queryResults[table.getn(queryResults)].signature = auctionSignature;         
+        end
+    end    
+    
+    return queryResults;
 end
 
 -- returns if an item is a recipe type
@@ -574,18 +569,26 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doPercentLess(percentLess)    
-
-    local auctionsBelowMedian = getPercentLessAuctions(percentLess);
+    if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_MEDIAN end
+    Auctioneer_ChatPrint("Percent Less than median: "..percentLess.."%");
     
-    table.sort(auctionsBelowMedian, function(a, b) return (a.profit > b.profit) end);
+    local auctionsBelowMedian = querySnapshot(percentLess_AuctionFilter, percentLess);
+    
+    -- sort by profit based on median
+    table.sort(auctionsBelowMedian, function(a, b)
+        local _, aName, aCount, _, aBuyout = getItemSignature(a.signature);             
+        local _, bName, bCount, _, bBuyout = getItemSignature(b.signature);   
+        local aProfit = (getUsableMedian(aName) * aCount) - aBuyout;    
+        local bProfit = (getUsableMedian(bName) * bCount) - bBuyout;            
+        return (aProfit > bProfit) 
+    end);
     
     -- output the list of auctions below the median
     for _,a in auctionsBelowMedian do
-        local _, name, count, _, buyout = getItemSignature(a.signature); 
-        if not isItemRecipe(name) then
-            local snapshotMedian, lastSeenCount = getUsableMedian(name);
-            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..lastSeenCount.." seen Median: "..Auctioneer_GetTextGSC(a.totalMedian).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(a.profit).." Less: "..colorTextWhite(percentLessThan(getUsableMedian(name), buyout / count).."%"));
-        end
+        local _, name, count, _, buyout = getItemSignature(a.signature);         
+        local median, seenCount = getUsableMedian(name);
+        local profit = (median * count) - buyout;
+        Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen Median: "..Auctioneer_GetTextGSC(median * count).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(profit).." Less: "..colorTextWhite(percentLessThan(median, buyout / count).."%"));
     end
     
     Auctioneer_ChatPrint("Percent less done.");
@@ -809,7 +812,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         if (aiOwner == nil) then aiOwner = "unknown"; end
         local aiLink = GetAuctionItemLink("list", index);
         local initialTimeSeen = time();
-        AHSnapshot[lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), dirty=0};
+        AHSnapshot[lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), highBidder=aiHighBidder, owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), dirty=0};
     else
         lOldAuctionsCount = lOldAuctionsCount + 1;
         --this is an auction that was already in the snapshot from a previous scan and is still in the auction house
@@ -817,6 +820,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
         AHSnapshot[lAuctionSignature].lastSeenTime = time();             --set the time we saw it last
         AHSnapshot[lAuctionSignature].timeLeft = nullSafe(aiTimeLeft);   --update the time left
         AHSnapshot[lAuctionSignature].bidamount = nullSafe(aiBidAmount); --update the current bid amount
+        AHSnapshot[lAuctionSignature].highBidder = aiHighBidder;         --update the high bidder
     end
 end
 
