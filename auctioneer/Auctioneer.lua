@@ -526,7 +526,7 @@ function doBroker(minProfit)
     -- sort by profit decending
     table.sort(auctionsBelowMedian, function(a, b) return (a.profit > b.profit) end);
     
-    -- output the list of auctions below the median
+    -- output the list of auctions
     for _,a in auctionsBelowMedian do
         local _, name, count, _, buyout = getItemSignature(a.signature); 
         if not isItemRecipe(name) then
@@ -546,15 +546,13 @@ function doBidBroker(minProfit)
     
     table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
     
-    -- output the list of auctions below the median
+    -- output the list of auctions 
     for _,a in bidWorthyAuctions do
         local id,name,count,min,buyout = getItemSignature(a.signature); 
-        if not isItemRecipe(name) then
-            local hsp, seenCount = getHighestSellablePriceForOne(name, true);
-            local currentBid = getCurrentBid(a.signature);
-            local profit = (hsp * count) - currentBid;
-            Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen HSP: "..Auctioneer_GetTextGSC(hsp * count).." CurrentBid: "..Auctioneer_GetTextGSC(currentBid).." Prof: "..Auctioneer_GetTextGSC(profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));
-        end
+        local hsp, seenCount = getHighestSellablePriceForOne(name, true);
+        local currentBid = getCurrentBid(a.signature);
+        local profit = (hsp * count) - currentBid;
+        Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen HSP: "..Auctioneer_GetTextGSC(hsp * count).." CurrentBid: "..Auctioneer_GetTextGSC(currentBid).." Prof: "..Auctioneer_GetTextGSC(profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));        
     end
     
     Auctioneer_ChatPrint("Bid brokering done.");
@@ -576,7 +574,7 @@ function doPercentLess(percentLess)
         return (aProfit > bProfit) 
     end);
     
-    -- output the list of auctions below the median
+    -- output the list of auctions
     for _,a in auctionsBelowMedian do
         local _, name, count, _, buyout = getItemSignature(a.signature);         
         local median, seenCount = getUsableMedian(name);
