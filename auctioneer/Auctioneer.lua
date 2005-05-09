@@ -356,11 +356,6 @@ end
 -- parse the data from the auction signature
 local function getItemSignature(sigData)
 	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(.-):(.+)");
---~ Auctioneer_ChatPrint("id="..id);
---~ Auctioneer_ChatPrint("name="..name);
---~ Auctioneer_ChatPrint("cout="..count);
---~ Auctioneer_ChatPrint("min="..min);
---~ Auctioneer_ChatPrint("buyout="..buyout);
 	if (name == nil) then name = ""; end
     if (tonumber(min) < 0) then min = 0 end -- handle number overflow
     if (tonumber(buyout) < 0) then buyout = 0 end -- handle number overflow
@@ -436,7 +431,7 @@ local function isBadResaleChoice(auctionSignature)
     local isBadChoice = false;
     local id,name,count,min,buyout = getItemSignature(auctionSignature);
     local auctionItem = AHSnapshot[auctionSignature];
-    
+        
     -- bad choice conditions
     if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then -- level 50 and greater greens do not sell well
         isBadChoice = true;    
@@ -449,6 +444,8 @@ local function isBadResaleChoice(auctionSignature)
         if auctionItem.quality == QUALITY_COMMON or bidPercent < 10 then
             isBadChoice = true;
         end
+    elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then -- don't display auctions that we own, or are high bidder on
+        isBadChoice = true;
     elseif auctionItem.quality == QUALITY_POOR then -- gray items are never a good choice
         isBadChoice = true;
     end
