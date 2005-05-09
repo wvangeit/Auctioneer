@@ -50,6 +50,9 @@ local MAX_BUYOUT_PRICE = 800000;
 -- the default percent less, only find auctions that are at a minimum this percent less than the median
 local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% by default
 
+-- the minimum profit/price ratio that an auction needs to be displayed as a resellable auction default is 40%
+local MIN_PROFIT_PRICE_RATIO = 0.4;
+
 
 --[[ SavedVariables --]]
 AuctionConfig = {};        --Table that stores config settings
@@ -63,6 +66,13 @@ local TIME_LEFT_SHORT = 1;
 local TIME_LEFT_MEDIUM = 2;
 local TIME_LEFT_LONG = 3;
 local TIME_LEFT_VERY_LONG = 4;
+
+-- Item quality constants
+local QUALITY_EPIC = 4;
+local QUALITY_RARE = 3;
+local QUALITY_UNCOMMON = 2;
+local QUALITY_COMMON= 1;
+local QUALITY_POOR= 0;
 
 -- return the string representation of the given timeLeft constant
 local function getTimeLeftString(timeLeft)
@@ -410,6 +420,19 @@ local function getCurrentBid(auctionSignature)
 end
 
 
+-- this filter will return true if an auction is a bad choice for reselling
+local function isBadResaleChoice(auctionSignature)
+    local isBadChoice = false;
+    local auctionItem = AHSnapshot[auctionSignature];
+    
+    -- level 50 and greater greens do not sell well
+    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then
+        isBadChoice = true;    
+    end
+    
+    return isBadChoice;
+end
+
 -- filters out all auctions except those that meet profit requirements
 local function brokerFilter(minProfit, signature)
     local filterAuction = true;
@@ -420,7 +443,7 @@ local function brokerFilter(minProfit, signature)
         local profit = (hsp * count) - buyout;
 
         --see if this auction should not be filtered
-        if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit) then
+        if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature)) then
             filterAuction = false;
         end
     end        
@@ -440,7 +463,7 @@ local function bidBrokerFilter(minProfit, signature)
         local profit = (hsp * count) - currentBid;
         
         --see if this auction should not be filtered
-        if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and AHSnapshot[signature].timeLeft <= TIME_LEFT_MEDIUM) then
+        if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and AHSnapshot[signature].timeLeft <= TIME_LEFT_MEDIUM and not isBadResaleChoice(signature)) then
             filterAuction = false;
         end
     end
