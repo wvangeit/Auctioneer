@@ -411,6 +411,17 @@ function getUsableMedian(itemName)
     return usableMedian, count;
 end
 
+-- returns if an item is a recipe type
+local function isItemRecipe(itemName) 
+    local isRecipe = false;
+    if string.find(itemName, "Pattern:") or string.find(itemName, "Recipe:") or
+       string.find(itemName, "Plans:") or string.find(itemName, "Schematic:") or
+       string.find(itemName, "Formula:") then
+        isRecipe = true;
+    end
+    return isRecipe;
+end
+
 -- returns the current bid on an auction
 local function getCurrentBid(auctionSignature)
     local _,_,_,min,_ = getItemSignature(auctionSignature);
@@ -423,11 +434,24 @@ end
 -- this filter will return true if an auction is a bad choice for reselling
 local function isBadResaleChoice(auctionSignature)
     local isBadChoice = false;
+    local id,name,count,min,buyout = getItemSignature(auctionSignature);
     local auctionItem = AHSnapshot[auctionSignature];
     
-    -- level 50 and greater greens do not sell well
-    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then
+    
+    -- bad choice conditions
+    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then -- level 50 and greater greens do not sell well
         isBadChoice = true;    
+    elseif isItemRecipe(name) then -- filter out bad recipie choices
+        local itemData = getAuctionPriceData(name);
+        local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);    
+        local bidPercent = math.floor(bidCount / minCount * 100);
+                
+        -- filter out recipies that are common or have less than 10% bid rate
+        if auctionItem.quality == QUALITY_COMMON or bidPercent < 10 then
+            isBadChoice = true;
+        end
+    elseif auctionItem.quality == QUALITY_POOR then -- gray items are never a good choice
+        isBadChoice = true;
     end
     
     return isBadChoice;
@@ -506,17 +530,7 @@ local function querySnapshot(filter, param)
     return queryResults;
 end
 
--- returns if an item is a recipe type
-local function isItemRecipe(itemName) 
-    local isRecipe = false;
-    if string.find(itemName, "Pattern:") or string.find(itemName, "Recipe:") or
-       string.find(itemName, "Plans:") or string.find(itemName, "Schematic:") or
-       string.find(itemName, "Formula:") then
-        isRecipe = true;
-    end
-    return isRecipe;
-end
-    
+
 -- method to pass to table.sort() that sorts auctions by profit descending
 local function profitComparisonSort(a, b)
         local _, aName, aCount, _, aBuyout = getItemSignature(a.signature);             
@@ -525,6 +539,7 @@ local function profitComparisonSort(a, b)
         local bProfit = (getHighestSellablePriceForOne(bName, true) * bCount) - bBuyout;            
         return (aProfit > bProfit) 
 end
+        
         
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
@@ -844,7 +859,7 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 
 				local bidPct = math.floor(bidCount / minCount * 100);
 				local avgBid = 0;
-				if (buyCount > 0) then
+				if (bidCount > 0) then
 					avgBid = math.floor(bidPrice / bidCount);
 				end
 				
@@ -900,7 +915,7 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 
 				local bidPct = math.floor(bidCount / minCount * 100);
 				local avgBid = 0;
-				if (buyCount > 0) then
+				if (bidCount > 0) then
 					avgBid = math.floor(bidPrice / bidCount);
 				end
 				
