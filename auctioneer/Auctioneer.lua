@@ -48,10 +48,10 @@ local MIN_BUYOUT_SEEN_COUNT = 7;
 local MAX_BUYOUT_PRICE = 800000;
 
 -- the default percent less, only find auctions that are at a minimum this percent less than the median
-local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% by default
+local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% default
 
--- the minimum profit/price ratio that an auction needs to be displayed as a resellable auction default is 40%
-local MIN_PROFIT_PRICE_RATIO = 0.4;
+-- the minimum profit/price percent that an auction needs to be displayed as a resellable auction
+local MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
 
 
 --[[ SavedVariables --]]
@@ -437,7 +437,6 @@ local function isBadResaleChoice(auctionSignature)
     local id,name,count,min,buyout = getItemSignature(auctionSignature);
     local auctionItem = AHSnapshot[auctionSignature];
     
-    
     -- bad choice conditions
     if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then -- level 50 and greater greens do not sell well
         isBadChoice = true;    
@@ -465,9 +464,10 @@ local function brokerFilter(minProfit, signature)
     if getUsableMedian(name) then -- we have a useable median
         local hsp = getHighestSellablePriceForOne(name, true);
         local profit = (hsp * count) - buyout;
+        local profitPricePercent = math.floor((profit / buyout) * 100);
 
         --see if this auction should not be filtered
-        if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature)) then
+        if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
             filterAuction = false;
         end
     end        
@@ -485,9 +485,10 @@ local function bidBrokerFilter(minProfit, signature)
         local currentBid = getCurrentBid(signature);
         local hsp = getHighestSellablePriceForOne(name, true);
         local profit = (hsp * count) - currentBid;
+        local profitPricePercent = math.floor((profit / currentBid) * 100);
         
         --see if this auction should not be filtered
-        if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and AHSnapshot[signature].timeLeft <= TIME_LEFT_MEDIUM and not isBadResaleChoice(signature)) then
+        if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and AHSnapshot[signature].timeLeft <= TIME_LEFT_MEDIUM and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
             filterAuction = false;
         end
     end
