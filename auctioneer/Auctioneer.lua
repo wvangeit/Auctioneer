@@ -393,12 +393,12 @@ function getUsableMedian(itemName)
     --get history median
     local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemName);
     
-    if not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .15)) then
+    if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .15))) then
         if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
             usableMedian = historyMedian;
             count = historySeenCount;
         end
-    else
+    elseif snapshotMedian then
         usableMedian = snapshotMedian;
         count = snapshotCount;
     end
