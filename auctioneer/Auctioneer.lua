@@ -1294,11 +1294,25 @@ function Auctioneer_CheckTooltipInfo(frame)
 	return 1;
 end
 
+-- this function takes copper and rounds to 5 silver below the the nearest gold if it is 15 silver above of an even gold
+-- example: this function changes 1g15s to 95s
+-- example: 1.5g will be unchanged and remain 1.5g
+local function roundDownTo95(copper)
+    local g,s,c = Auctioneer_GetGSC(copper);
+    local roundedValue = copper;
+    
+    if g > 0 and s <= 15 then
+        roundedValue = roundedValue - ((s + 5) * 100); -- subtract enough copper to round to 95 silver
+    end
+    
+    return roundedValue;
+end
 
 function Auctioneer_OnEvent(event)
 	if (event=="NEW_AUCTION_UPDATE") then
         local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
-        if name then
+        if name then  
+            local id = getNumericItemId(name);
             local itemData = getAuctionPriceData(name);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
             
@@ -1318,14 +1332,14 @@ function Auctioneer_OnEvent(event)
             end
             
             if hsp > 0 and minbid > 0 then
-                MoneyInputFrame_SetCopper(StartPrice, minbid * count);
-                MoneyInputFrame_SetCopper(BuyoutPrice, hsp * count);
-            elseif Auctioneer_BasePrices[getNumericItemId(name)].s then -- see if we have vendor sell info for this item
+                MoneyInputFrame_SetCopper(StartPrice, roundDownTo95(minbid * count));
+                MoneyInputFrame_SetCopper(BuyoutPrice, roundDownTo95(hsp * count));
+            elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
                 -- use vendor prices if no auction data available
-                local itemInfo = Auctioneer_BasePrices[getNumericItemId(name)];
+                local itemInfo = Auctioneer_BasePrices[id];
                 local vendorSell = nullSafe(itemInfo.s);
-                MoneyInputFrame_SetCopper(StartPrice, (vendorSell * count) * 1.5);
-                MoneyInputFrame_SetCopper(BuyoutPrice, (vendorSell * count) * 3);
+                MoneyInputFrame_SetCopper(StartPrice, roundDownTo95((vendorSell * count) * 1.5));
+                MoneyInputFrame_SetCopper(BuyoutPrice, roundDownTo95((vendorSell * count) * 3));
             end
         end
 	end
