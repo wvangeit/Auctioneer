@@ -440,8 +440,8 @@ local function isBadResaleChoice(auctionSignature)
         local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);    
         local bidPercent = math.floor(bidCount / minCount * 100);
                 
-        -- filter out recipies that are common or have less than 10% bid rate
-        if auctionItem.quality == QUALITY_COMMON or bidPercent < 10 then
+        -- filter out recipies that have less than 10% bid rate
+        if bidPercent < 10 then
             isBadChoice = true;
         end
     elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then -- don't display auctions that we own, or are high bidder on
@@ -1301,7 +1301,7 @@ local function roundDownTo95(copper)
     local g,s,c = Auctioneer_GetGSC(copper);
     local roundedValue = copper;
     
-    if g > 0 and s <= 15 then
+    if g > 0 and s < 10 then
         roundedValue = roundedValue - ((s + 5) * 100); -- subtract enough copper to round to 95 silver
     end
     
