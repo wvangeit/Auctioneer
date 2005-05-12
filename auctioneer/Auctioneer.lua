@@ -1312,6 +1312,7 @@ function Auctioneer_OnEvent(event)
 	if (event=="NEW_AUCTION_UPDATE") then
         local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
         if name then  
+            local startPrice, buyoutPrice;
             local id = getNumericItemId(name);
             local itemData = getAuctionPriceData(name);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
@@ -1327,19 +1328,28 @@ function Auctioneer_OnEvent(event)
             if minCount > 0 then 
                 minbid = math.floor(minPrice / minCount);
             end
-            if minbid > hsp then
-                minbid = subtractPercent(hsp, 15); -- 15% less than median
+            
+            startPrice = roundDownTo95(minbid * count);
+            buyoutPrice = roundDownTo95(nullSafe(hsp) * count);
+            
+            if startPrice > buyoutPrice then
+                startPrice = subtractPercent(buyoutPrice, 15); -- 15% less than median
             end
             
-            if hsp > 0 and minbid > 0 then
-                MoneyInputFrame_SetCopper(StartPrice, roundDownTo95(minbid * count));
-                MoneyInputFrame_SetCopper(BuyoutPrice, roundDownTo95(hsp * count));
+            if buyoutPrice > 0 and startPrice > 0 then
+                MoneyInputFrame_SetCopper(StartPrice, startPrice);
+                MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
             elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
                 -- use vendor prices if no auction data available
                 local itemInfo = Auctioneer_BasePrices[id];
                 local vendorSell = nullSafe(itemInfo.s);
-                MoneyInputFrame_SetCopper(StartPrice, roundDownTo95((vendorSell * count) * 1.5));
-                MoneyInputFrame_SetCopper(BuyoutPrice, roundDownTo95((vendorSell * count) * 3));
+                startPrice = roundDownTo95((vendorSell * count) * 1.5);
+                buyoutPrice = roundDownTo95((vendorSell * count) * 3);
+                if startPrice > buyoutPrice then
+                    startPrice = subtractPercent(buyoutPrice, 15); -- 15% less than median
+                end                
+                MoneyInputFrame_SetCopper(StartPrice, startPrice);
+                MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
             end
         end
 	end
