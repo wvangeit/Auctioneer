@@ -1333,7 +1333,7 @@ function Auctioneer_OnEvent(event)
             buyoutPrice = roundDownTo95(nullSafe(hsp) * count);
             
             if startPrice > buyoutPrice then
-                startPrice = subtractPercent(buyoutPrice, 15); -- 15% less than median
+                startPrice = roundDownTo95(subtractPercent(buyoutPrice, 15)); -- 15% less than median
             end
             
             if buyoutPrice > 0 and startPrice > 0 then
@@ -1346,7 +1346,7 @@ function Auctioneer_OnEvent(event)
                 startPrice = roundDownTo95((vendorSell * count) * 1.5);
                 buyoutPrice = roundDownTo95((vendorSell * count) * 3);
                 if startPrice > buyoutPrice then
-                    startPrice = subtractPercent(buyoutPrice, 15); -- 15% less than median
+                    startPrice = roundDownTo95(subtractPercent(buyoutPrice, 15)); -- 15% less than median
                 end                
                 MoneyInputFrame_SetCopper(StartPrice, startPrice);
                 MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
