@@ -6,8 +6,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Revision: $Id$
 -->
   <Script file="BasePrices.lua"/>
+  <Script file="AHScanning.lua"/>
   <Script file="BalancedList.lua"/>
   <Script file="Auctioneer.lua"/>
+  
   <Frame name="AuctioneerUpdateFrame" parent="UIParent">
     <Scripts>
       <OnUpdate>

@@ -1,15 +1,14 @@
 -- Auctioneer
 AUCTIONEER_VERSION="<%version%>";
 -- Revision: $Id$
--- Written by Norganna
+-- Original version written by Norganna.
+-- Contributors: Araband
 --
--- This is an addon for World of Warcraft that works in combination with 
--- LootLink to add statistical history to the auction data that is collected
+-- This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 -- when the auction is scanned, so that you can easily determine what price
 -- you will be able to sell an item for at auction or at a vendor whenever you
 -- mouse-over an item in the game
 --
--- (LootLink is an in-game item database)
 --
 
 -- Function hooks
@@ -130,7 +129,7 @@ function Auctioneer_GetTextGSC(money)
 end
 
 -- return an empty string if str is nil
-local function nilSafeString(str)
+function nilSafeString(str)
     if (not str) then str = "" end
     return str;
 end
@@ -224,7 +223,6 @@ end
 
 -- called when the auction scan starts
 local function Auctioneer_AuctionStart_Hook()
-	Auctioneer_Old_AuctionStart_Hook();
 	Auction_DoneItems = {};
     lSnapshotItemPrices = {};
     invalidateAHSnapshot();
@@ -664,34 +662,24 @@ function getHighestSellablePriceForOne(itemName, useCachedPrices)
         end
     end
   
---~ Auctioneer_ChatPrint("itemName: "..itemName.." Median: "..nullSafe(median).." count: "..nullSafe(count).." currentLowestBuyout:  "..nullSafe(currentLowestBuyout));
-
     if median then
---~ Auctioneer_ChatPrint("if median then");
         if currentLowestBuyout then
---~ Auctioneer_ChatPrint("inside if median then, currentLowestBuyout then");        
             lowestBuyoutPriceAllowed = subtractPercent(median, lowestAllowedPercentBelowMedian);
             if lowestAuctionSignature and AHSnapshot[lowestAuctionSignature].owner == UnitName("player") then
---~ Auctioneer_ChatPrint("if lowestPriceForOne.owner == Araband then");            
                 highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
             elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > median) then
---~ Auctioneer_ChatPrint("elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > median) then");            
                 -- set highest price to "Discount median"
                 highestSellablePrice = subtractPercent(median, discountMedianPercent);
             else -- use discount low
---~ Auctioneer_ChatPrint("else -- use discount low");            
                 -- set highest price to "Discount low"
                 highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
             end
         else -- no low buyout, use discount median
---~ Auctioneer_ChatPrint("else -- no low buyout, use discount median");        
             -- set highest price to "Discount median"
             highestSellablePrice = subtractPercent(median, discountMedianPercent);            
         end
     else -- no median
---~ Auctioneer_ChatPrint("else -- no median");    
         if currentLowestBuyout then
---~ Auctioneer_ChatPrint("inside else -- no median, if currentLowestBuyout then");        
             -- set highest price to "Discount low"
             highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
         end
@@ -721,11 +709,9 @@ function doHSP(param)
 end
 
 
--- Called buy lootlink hook when an auction item is scanned from the Auction house
+-- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
-local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
-	Auctioneer_Old_AuctionEntry_Hook(name, count, item, page, index);
-    
+local function Auctioneer_AuctionEntry_Hook(page, index)
 	if (not page) then
 		return;
 	end
@@ -777,7 +763,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
             itemData = getAuctionPriceData(aiName);
         end
         
-        local count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+        local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
      
      	-- Sanity check values to ensure they aren't whack. if prices are wack we dont want to skew the mean, but still can add to the median
         local hasWackPrice = false;
@@ -791,7 +777,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
      
         if (not hasWackPrice) then 
             -- update counts and price data for this item
-            count = nullSafe(count) + 1;
+            seenCount = nullSafe(seenCount) + 1;
             minCount = nullSafe(minCount) + aiCount;
             minPrice = nullSafe(minPrice) + aiMinBid;
             if (aiBidAmount > 0) then 
@@ -804,7 +790,7 @@ local function Auctioneer_AuctionEntry_Hook(name, count, item, page, index)
             end
         end
     
-        itemData = string.format("%d:%d:%d:%d:%d:%d:%d", count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
+        itemData = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
         
         -- now build the list of buyout prices seen for this auction to use to get the median        
         local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
@@ -1064,6 +1050,9 @@ function Auctioneer_OnLoad()
     -- register events
     this:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
     this:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
+    this:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
+    this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
+    
     
 	lOriginalGameTooltip_ClearMoney = GameTooltip_ClearMoney;
 	GameTooltip_ClearMoney = Auctioneer_GameTooltip_ClearMoney;
@@ -1077,18 +1066,14 @@ function Auctioneer_OnLoad()
 	Auctioneer_Old_Tooltip_Hook = LootLink_AddExtraTooltipInfo;
 	LootLink_AddExtraTooltipInfo = Auctioneer_Tooltip_Hook;
 
-	Auctioneer_Old_AuctionStart_Hook = LootLink_Event_StartAuctionScan;
-	LootLink_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
+	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
+	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
+    Auctioneer_Event_FinishedAuctionScan = Auctioneer_FinishedAuctionScan_Hook;
 
-	Auctioneer_Old_AuctionEntry_Hook = LootLink_Event_ScanAuction;
-	LootLink_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
-    
     -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
 	PlaceAuctionBid = Auctioneer_PlaceAuctionBid;
     
-    LootLink_Event_FinishedAuctionScan = Auctioneer_FinishedAuctionScan_Hook;
-
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SlashCmdList["AUCTIONEER"] = function(msg)
 		Auctioneer_Command(msg);
@@ -1117,7 +1102,7 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorbuy (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor buy pricing (req vendor=on)");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer usage (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("usage").."]|r - select whether to show tradeskill item's usage");
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer stacksize (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stacksize").."]|r - select whether to show the item's stackable size");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer clear <item|all>|r - clear the specified item's lootlink data (you may shift click insert multiple items into this command, or specify only one textually) If you specify 'all' by itself, the entire dataset for this server will be cleared");
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer clear <item|all>|r - clear the specified item's data (you may shift click insert multiple items into this command, or specify only one textually) If you specify 'all' by itself, the entire dataset for this server will be cleared");
 	elseif (cmd == "on") then
 		Auctioneer_SetFilter("all", "on");
 		Auctioneer_ChatPrint("Displaying configured auction data");
@@ -1164,7 +1149,9 @@ function Auctioneer_Command(command)
     elseif (cmd == "bidbroker") then
         doBidBroker(param);        
 	elseif (cmd == "percentless") then
-        doPercentLess(param);           
+        doPercentLess(param);      
+    elseif (cmd == "scan") then
+        Auctioneer_RequestAuctionScan();           
     elseif (cmd == "test") then
         doTests();
     elseif (cmd == "low") then
@@ -1352,16 +1339,25 @@ function Auctioneer_OnEvent(event)
                 MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
             end
         end
-	end
-    if (event=="AUCTION_HOUSE_SHOW") then
-        AuctionsShortAuctionButton:SetChecked(nil);
-        AuctionsMediumAuctionButton:SetChecked(nil);
-        AuctionsLongAuctionButton:SetChecked(nil);
-    
-        -- default to 24 hour auctions
-        AuctionsLongAuctionButton:SetChecked(1);
-        AuctionFrameAuctions.duration = 1440;
-	end
+    elseif (event=="AUCTION_HOUSE_SHOW") then
+        if Auctioneer_isScanningRequested then
+            Auctioneer_StartAuctionScan();
+        else
+            AuctionsShortAuctionButton:SetChecked(nil);
+            AuctionsMediumAuctionButton:SetChecked(nil);
+            AuctionsLongAuctionButton:SetChecked(nil);
+        
+            -- default to 24 hour auctions
+            AuctionsLongAuctionButton:SetChecked(1);
+            AuctionFrameAuctions.duration = 1440;
+        end
+	elseif(event == "AUCTION_HOUSE_CLOSED") then
+        if Auctioneer_isScanningRequested then
+		    Auctioneer_StopAuctionScan();        
+        end
+	elseif(event == "AUCTION_ITEM_LIST_UPDATE" and Auctioneer_isScanningRequested) then
+		Auctioneer_ScanAuction();   
+    end        
 end
 
 
