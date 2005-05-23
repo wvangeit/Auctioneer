@@ -4,9 +4,11 @@
 
 Auctioneer_isScanningRequested = false;
 local lCurrentAuctionPage;
+local lMajorAuctionCategories;
+local lCurrentCategoryIndex;
 
-AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning page 1...";
-AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning page %d of %d...";
+AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
+AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: auction scanning finished";
 
 -- function hooks
@@ -20,7 +22,7 @@ function Auctioneer_ScanAuction()
 
 	if( numBatchAuctions > 0 ) then
 		for auctionid = 1, numBatchAuctions do        
-            Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid);
+            Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lMajorAuctionCategories[lCurrentCategoryIndex]);
 		end
 	end
 end
@@ -50,7 +52,10 @@ local function Auctioneer_AuctionNextQuery()
 		
 		if( lCurrentAuctionPage < maxPages ) then
 			lCurrentAuctionPage = lCurrentAuctionPage + 1;
-			BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_PAGE_N, lCurrentAuctionPage + 1, maxPages + 1));
+			BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
+        elseif ( lCurrentCategoryIndex < table.getn(lMajorAuctionCategories) ) then
+            lCurrentCategoryIndex = lCurrentCategoryIndex + 1;
+            lCurrentAuctionPage = nil;
 		else
 			Auctioneer_StopAuctionScan();
 			if( totalAuctions > 0 ) then
@@ -61,9 +66,9 @@ local function Auctioneer_AuctionNextQuery()
 		end
 	else
 		lCurrentAuctionPage = 0;
-		BrowseNoResultsText:SetText(AUCTIONEER_AUCTION_SCAN_START);
+		BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_SCAN_START, lMajorAuctionCategories[lCurrentCategoryIndex]));
 	end
-	QueryAuctionItems("", "", "", nil, nil, nil, lCurrentAuctionPage, nil, nil);
+	QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
 	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
 end
 
@@ -84,6 +89,8 @@ end
 function Auctioneer_StartAuctionScan()
 	-- Start with the first page
 	lCurrentAuctionPage = nil;
+    lCurrentCategoryIndex = 1;    
+    lMajorAuctionCategories = {GetAuctionItemClasses()};
 
 	-- Hook the functions that we need for the scan
 	if( not lOriginal_CanSendAuctionQuery ) then

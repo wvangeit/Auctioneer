@@ -711,18 +711,19 @@ end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
-local function Auctioneer_AuctionEntry_Hook(page, index)
-	if (not page) then
+local function Auctioneer_AuctionEntry_Hook(page, index, category)
+    local auctionDoneKey;
+	if (not page or not index or not category) then
 		return;
+    else
+        auctionDoneKey = ""..category..page..index;
 	end
-	if (not Auction_DoneItems[page]) then
-		Auction_DoneItems[page] = {};
+	if (not Auction_DoneItems[auctionDoneKey]) then
+		Auction_DoneItems[auctionDoneKey] = true;
+    else
+        return;
 	end
-	if (Auction_DoneItems[page][index]) then
-		return;
-	end
-    Auction_DoneItems[page][index] = true;
-
+    
     lTotalAuctionsScannedCount = lTotalAuctionsScannedCount + 1;
 
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo("list", index);
