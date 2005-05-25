@@ -10,6 +10,9 @@ AUCTIONEER_VERSION="<%version%>";
 -- mouse-over an item in the game
 --
 --
+if (AUCTIONEER_VERSION == "<".."%version%>") then
+	AUCTIONEER_VERSION = "3.DEV";
+end
 
 -- Function hooks
 local lOriginalGameTooltip_OnHide;
@@ -355,8 +358,8 @@ end
 local function getItemSignature(sigData)
 	local i,j, id,name,count,min,buyout = string.find(sigData, "^(%d+):(.-):(%d+):(.-):(.+)");
 	if (name == nil) then name = ""; end
-    if (tonumber(min) < 0) then min = 0 end -- handle number overflow
-    if (tonumber(buyout) < 0) then buyout = 0 end -- handle number overflow
+    if (not min or tonumber(min) < 0) then min = 0 end -- handle number overflow
+    if (not buyout or tonumber(buyout) < 0) then buyout = 0 end -- handle number overflow
 	return tonumber(id),name,tonumber(count),tonumber(min),tonumber(buyout);
 end
 
@@ -407,12 +410,10 @@ end
 -- returns if an item is a recipe type
 local function isItemRecipe(itemName) 
     local isRecipe = false;
-    if string.find(itemName, "Pattern:") or string.find(itemName, "Recipe:") or
-       string.find(itemName, "Plans:") or string.find(itemName, "Schematic:") or
-       string.find(itemName, "Formula:") then
-        isRecipe = true;
-    end
-    return isRecipe;
+	for itemPos, itemMatch in AUCT_RECIPE_PREFIXES do
+		if (string.find(itemName, itemMatch)) then return true; end
+	end
+    return false;
 end
 
 -- returns the current bid on an auction
@@ -540,7 +541,8 @@ end
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
     if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
+	local output = string.format(AUCT_FRMT_BROKER_HEADER, Auctioneer_GetTextGSC(minProfit));
+    Auctioneer_ChatPrint(output);
     
     local resellableAuctions = querySnapshot(brokerFilter, minProfit);
     
@@ -552,16 +554,18 @@ function doBroker(minProfit)
         local id,name,count,min,buyout = getItemSignature(a.signature); 
         local hsp, seenCount = getHighestSellablePriceForOne(name, true);
         local profit = (hsp * count) - buyout;
-        Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen HSP: "..Auctioneer_GetTextGSC(hsp * count).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(profit));
+		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x"), seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit));
+        Auctioneer_ChatPrint(output);
     end
     
-    Auctioneer_ChatPrint("Brokering done.");
+    Auctioneer_ChatPrint(AUCT_FRMT_BROKER_DONE);
 end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doBidBroker(minProfit)
     if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-    Auctioneer_ChatPrint("Minimum profit: "..Auctioneer_GetTextGSC(minProfit)..", HSP = 'Highest Sellable Price'");
+	local output = string.format(AUCT_FRMT_BIDBROKER_HEADER, Auctioneer_GetTextGSC(minProfit));
+    Auctioneer_ChatPrint(output);
     
     local bidWorthyAuctions = querySnapshot(bidBrokerFilter, minProfit);
     
@@ -573,16 +577,18 @@ function doBidBroker(minProfit)
         local hsp, seenCount = getHighestSellablePriceForOne(name, true);
         local currentBid = getCurrentBid(a.signature);
         local profit = (hsp * count) - currentBid;
-        Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen HSP: "..Auctioneer_GetTextGSC(hsp * count).." CurrentBid: "..Auctioneer_GetTextGSC(currentBid).." Prof: "..Auctioneer_GetTextGSC(profit).." Time: "..colorTextWhite(getTimeLeftString(a.timeLeft)));        
+		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(currentBid), Auctioneer_GetTextGSC(profit), colorTextWhite(getTimeLeftString(a.timeLeft)));
+		Auctioneer_ChatPrint(output);
     end
     
-    Auctioneer_ChatPrint("Bid brokering done.");
+    Auctioneer_ChatPrint(AUCT_FRMT_BIDBROKER_DONE);
 end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doPercentLess(percentLess)    
     if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_MEDIAN end
-    Auctioneer_ChatPrint("Percent Less than median: "..percentLess.."%");
+	local output = string.format(AUCT_FRMT_PCTLESS_HEADER, percentLess);
+    Auctioneer_ChatPrint(output);
     
     local auctionsBelowMedian = querySnapshot(percentLessFilter, percentLess);
     
@@ -594,10 +600,11 @@ function doPercentLess(percentLess)
         local _, name, count, _, buyout = getItemSignature(a.signature);         
         local median, seenCount = getUsableMedian(name);
         local profit = (median * count) - buyout;
-        Auctioneer_ChatPrint(colorTextWhite(count.."x")..a.itemLink..", Last "..seenCount.." seen Median: "..Auctioneer_GetTextGSC(median * count).." BO: "..Auctioneer_GetTextGSC(buyout).." Prof: "..Auctioneer_GetTextGSC(profit).." Less: "..colorTextWhite(percentLessThan(median, buyout / count).."%"));
+		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(median * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(median, buyout / count)));
+        Auctioneer_ChatPrint(output);
     end
     
-    Auctioneer_ChatPrint("Percent less done.");
+    Auctioneer_ChatPrint(AUCT_FRMT_PCTLESS_DONE);
 end
 
 -- given an item name, find the lowest price for that item in the current AHSnapshot
@@ -610,7 +617,8 @@ function findLowestAuctionForItem(itemName)
     local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
     for sig,v in AHSnapshot do
         local id,name,count,min,buyout = getItemSignature(sig);
-        local priceForOne = (buyout / count);
+        local priceForOne = 0;
+		if (count and count > 0) then priceForOne = (buyout / count); end
         if (string.lower(name) == string.lower(itemName) and buyout > 0 and priceForOne < lowestPrice) then
             lowSig = sig;
             lowestPrice = priceForOne;
@@ -636,9 +644,9 @@ function doMedian(param)
     local itemName = formatItemName(param);
     local median, count = getUsableMedian(itemName);
     if (not median) then
-        Auctioneer_ChatPrint("No auctions found for the item: "..colorTextWhite(itemName));
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_NOAUCT, colorTextWhite(itemName)));
     else
-        Auctioneer_ChatPrint("Of last "..count.." seen, median buyout for 1 "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(median));
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_LINE, count, colorTextWhite(itemName), Auctioneer_GetTextGSC(median)));
     end    
 end
 
@@ -694,18 +702,18 @@ function doLow(param)
 
     local auctionSignature = findLowestAuctionForItem(itemName, AHSnapshot);
     if (not auctionSignature) then
-        Auctioneer_ChatPrint("No auctions found for the item: "..colorTextWhite(itemName));
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_NOAUCT, colorTextWhite(itemName)));
     else
         local _, _, count, _, buyout = getItemSignature(auctionSignature);
-        local auction = AHSnapshot[auctionSignature];    
-        Auctioneer_ChatPrint(colorTextWhite(count.."x")..auction.itemLink..", BO: "..Auctioneer_GetTextGSC(buyout).." Seller: "..colorTextWhite(auction.owner).." For one: "..Auctioneer_GetTextGSC(buyout / count).." Less than median: "..colorTextWhite(percentLessThan(getUsableMedian(itemName), buyout / count).."%"));
+        local auction = AHSnapshot[auctionSignature];
+		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, colorTextWhite(count.."x")..auction.itemLink, Auctioneer_GetTextGSC(buyout), colorTextWhite(auction.owner), Auctioneer_GetTextGSC(buyout / count), colorTextWhite(percentLessThan(getUsableMedian(itemName), buyout / count))));
     end
 end
 
 function doHSP(param)
     local itemName = formatItemName(param);
     local highestSellablePrice = getHighestSellablePriceForOne(itemName, false);
-    Auctioneer_ChatPrint("Highest Sellable Price for one "..colorTextWhite(itemName).." is: "..Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice)));
+    Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
 
 
@@ -856,22 +864,22 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
                 
                 
                 local median, medCount = getUsableMedian(name);
-                
+
 				if (Auctioneer_GetFilter("average")) then
-					frame:AddLine(format("Seen %d times at auction total", aCount), 0.5,0.8,0.1);
+					frame:AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount), 0.5,0.8,0.1);
 					if (avgQty > 1) then
-						frame:AddLine(format("For 1: %s min/%s buyout (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
 					else
-						frame:AddLine(format("%s min/%s buyout (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
 					end
                     if median and Auctioneer_GetFilter("median") then
                         local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(name);
                         local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(name);
                         if historicalMedian then
-                            frame:AddLine(format("Last %d seen, buyout median: %s", historicalMedCount, Auctioneer_GetTextGSC(historicalMedian)),0.1,0.8,0.5);
+                            frame:AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount, Auctioneer_GetTextGSC(historicalMedian)),0.1,0.8,0.5);
                         end
                         if snapshotMedian and snapshotMedCount < historicalMedCount then
-                            frame:AddLine(format("Last scan %d seen, buyout median: %s", snapshotMedCount, Auctioneer_GetTextGSC(snapshotMedian)),0.1,0.8,0.5);
+                            frame:AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount, Auctioneer_GetTextGSC(snapshotMedian)),0.1,0.8,0.5);
                         end
                     end
 				end
@@ -880,11 +888,11 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
                         local buyoutPriceForOne = median;
                         if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
                         if (avgMin > buyoutPriceForOne) then aveMin = buyoutPriceForOne / 2 end
-						frame:AddLine(format("Your %d stack: %s min/%s buyout (%s bid)", count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
 					end
 				end
 				if (Auctioneer_GetFilter("stats")) then
-					frame:AddLine(format("%d%% have bids, %d%% have buyout", bidPct, buyPct), 0.1,0.5,0.8);
+					frame:AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), 0.1,0.5,0.8);
 				end
 			end
             
@@ -911,23 +919,23 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 				end
 
 				if (aCount == 0) then
-					frame:AddLine(format(">> Never seen at "..also, aCount), 0.5,0.8,0.1);
+					frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also), 0.5,0.8,0.1);
 				else
 					if (Auctioneer_GetFilter("average")) then
-						frame:AddLine(format(">> %d times at "..also, aCount), 0.5,0.8,0.1);
+						frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also), 0.5,0.8,0.1);
 						if (avgQty > 1) then
-							frame:AddLine(format(">> For 1: %s min/%s buy (%s bid) [in %d's]", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
+							frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
 						else
-							frame:AddLine(format(">> %s min/%s buy (%s bid)", Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
+							frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
 						end
 						if (Auctioneer_GetFilter("suggest")) then
 							if (count > 1) then
-								frame:AddLine(format(">> Your %d stack: %s min/%s buy (%s bid)", count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
+								frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
 							end
 						end
 					end
 					if (Auctioneer_GetFilter("stats")) then
-						frame:AddLine(format(">> %d%% have bids, %d%% have buyout", bidPct, buyPct), 0.1,0.5,0.8);
+						frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), 0.1,0.5,0.8);
 					end
 				end
 			end            
@@ -971,7 +979,7 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 				uses = itemInfo.u;
 			end
 		end
-			
+
 		if (Auctioneer_GetFilter("vendor")) then
 			if ((buy > 0) or (sell > 0)) then
 				local bgsc = Auctioneer_GetTextGSC(buy);
@@ -981,20 +989,20 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 					local bqgsc = Auctioneer_GetTextGSC(buy*count);
 					local sqgsc = Auctioneer_GetTextGSC(sell*count);
 					if (Auctioneer_GetFilter("vendorbuy")) then
-						frame:AddLine(format("Buy%s %d at %s (%s ea)", buyNote, count, bqgsc, bgsc), 0.8, 0.5, 0.1);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bqgsc, bgsc), 0.8, 0.5, 0.1);
 					end
 					if (Auctioneer_GetFilter("vendorsell")) then
-						frame:AddLine(format("Sell%s %d at %s (%s ea)", sellNote, count, sqgsc, sgsc), 0.8, 0.5, 0.1);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sqgsc, sgsc), 0.8, 0.5, 0.1);
 					end
 				else
 					if (Auctioneer_GetFilter("vendorbuy")) then
 						if (Auctioneer_GetFilter("vendorsell")) then
-							frame:AddLine(format("Buy%s %s, Sell%s %s", buyNote, bgsc, sellNote, sgsc), 0.8, 0.5, 0.1);
+							frame:AddLine(string.format(AUCT_FRMT_INFO_BUYSELL, buyNote, bgsc, sellNote, sgsc), 0.8, 0.5, 0.1);
 						else 
-							frame:AddLine(format("Buy%s %s", buyNote, bgsc), 0.8, 0.5, 0.1);
+							frame:AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote, bgsc), 0.8, 0.5, 0.1);
 						end
 					elseif (Auctioneer_GetFilter("vendorsell")) then
-						frame:AddLine(format("Sell%s %s", sellNote, sgsc), 0.8, 0.5, 0.1);
+						frame:AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote, sgsc), 0.8, 0.5, 0.1);
 					end
 				end
 			end
@@ -1002,19 +1010,19 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 
 		if (Auctioneer_GetFilter("stacksize")) then
 			if (stacks > 1) then
-				frame:AddLine(format("Stacks in lots of %d", stacks));
+				frame:AddLine(string.format(AUCT_FRMT_INFO_STX, stacks));
 			end
 		end
 		if (Auctioneer_GetFilter("usage")) then
 			local reagentInfo = "";
 			if (class ~= "") then
 				if (uses ~= "") then
-					reagentInfo = "Class: "..class.." used for "..uses;
+					reagentInfo = string.format(AUCT_FRMT_INFO_CLASSUSE, class, uses);
 				else
-					reagentInfo = "Class: "..class;
+					reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, class);
 				end
 			elseif (uses ~= "") then
-				reagentInfo = "Used for: "..uses;
+				reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
 			end
 			if (reagentInfo ~= "") then
 				frame:AddLine(reagentInfo, 0.6, 0.4, 0.8);
@@ -1035,7 +1043,8 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
         local auctionSignature = getNumericItemId(aiName)..":"..aiName..":"..aiCount..":"..aiMinBid..":"..aiBuyout;
         
         -- remove from snapshot
-        Auctioneer_ChatPrint("Removing auction signature ".. auctionSignature .." from current AH snapshot..");
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_REMOVE, auctionSignature));
+		
         AHSnapshot[auctionSignature] = nil;
     end    
 
@@ -1093,41 +1102,79 @@ function Auctioneer_Command(command)
 
 	if ((cmd == "") or (cmd == "help")) then
 		Auctioneer_ChatPrint("Usage:");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - turns the auction data display on and off");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer average (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("average").."]|r - select whether to show item's average auction price");
-        Auctioneer_ChatPrint("  |cffffffff/auctioneer median (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("median").."]|r - select whether to show item's median buyout price");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer suggest (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("suggest").."]|r - select whether to show item's suggested auction price");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer stats (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stats").."]|r - select whether to show item's bidded/buyout percentages");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendor (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor pricing");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorsell (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor sell pricing (req vendor=on)");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorbuy (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - select whether to show item's vendor buy pricing (req vendor=on)");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer usage (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("usage").."]|r - select whether to show tradeskill item's usage");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer stacksize (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stacksize").."]|r - select whether to show the item's stackable size");
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer clear <item|all>|r - clear the specified item's data (you may shift click insert multiple items into this command, or specify only one textually) If you specify 'all' by itself, the entire dataset for this server will be cleared");
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer average (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("average").."]|r - " .. AUCT_HELP_AVERAGE);
+        Auctioneer_ChatPrint("  |cffffffff/auctioneer median (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("median").."]|r - " .. AUCT_HELP_MEDIAN);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer suggest (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("suggest").."]|r - " .. AUCT_HELP_SUGGEST);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer stats (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stats").."]|r - " .. AUCT_HELP_STATS);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendor (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - " .. AUCT_HELP_VENDOR);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorsell (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - " .. AUCT_HELP_VENDORSELL);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer vendorbuy (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("vendor").."]|r - " .. AUCT_HELP_VENDORBUY);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer usage (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("usage").."]|r - " .. AUCT_HELP_USAGE);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer stacksize (on|off|toggle)|r |cff2040ff["..Auctioneer_GetFilterVal("stacksize").."]|r - " .. AUCT_HELP_STACKSIZE);
+		Auctioneer_ChatPrint("  |cffffffff/auctioneer clear <item|all>|r - " .. AUCT_HELP_CLEAR);
 	elseif (cmd == "on") then
 		Auctioneer_SetFilter("all", "on");
-		Auctioneer_ChatPrint("Displaying configured auction data");
+		Auctioneer_ChatPrint(AUCT_STAT_ON);
 	elseif (cmd == "off") then
 		Auctioneer_SetFilter("all", "off");
-		Auctioneer_ChatPrint("Not displaying any auction data");
+		Auctioneer_ChatPrint(AUCT_STAT_OFF);
 	elseif (cmd == "toggle") then
 		local cur = Auctioneer_GetFilterVal("all");
 		if (cur == "off") then
 			Auctioneer_SetFilter("all", "on");
-			Auctioneer_ChatPrint("Displaying configured auction data");
+			Auctioneer_ChatPrint(AUCT_STAT_ON);
 		else
 			Auctioneer_SetFilter("all", "off");
-			Auctioneer_ChatPrint("Not displaying any auction data");
+			Auctioneer_ChatPrint(AUCT_STAT_OFF);
 		end
+	elseif (cmd == "show") then
+		local i,j, baseItemID = string.find(param, "|Hitem:(%d+):");
+		if (baseItemID) then
+			baseItemID = 0 + baseItemID;
+			Auctioneer_ChatPrint("Found item "..baseItemID);
+			if (Auctioneer_BasePrices[baseItemID]) then
+				local dinfo = Auctioneer_BasePrices[baseItemID].d;
+				if (dinfo) then
+					local meshID = Auctioneer_DisplayInfo[dinfo];
+					if (meshID) then
+						local mesh = Auctioneer_MeshData[meshID];
+						if (mesh) then
+							local i,j, class, model = string.find(mesh, "([^/]+)/(.*)");
+							if (class) then
+								Auctioneer_ShowItem(class, model);
+								AuctioneerModel:Show();
+							else Auctioneer_ChatPrint("No class for mesh "..mesh);
+							end
+						else Auctioneer_ChatPrint("No mesh for mesh id "..meshID);
+						end
+					else Auctioneer_ChatPrint("No mesh id for display item "..dinfo);
+					end
+				else Auctioneer_ChatPrint("No item display info for item "..baseItemID);
+				end
+			else Auctioneer_ChatPrint("No item info for item "..baseItemID);
+			end
+		else
+			Auctioneer_ChatPrint("Unable to find the base ItemID");
+			AuctioneerModel:Hide();
+		end
+	elseif (cmd == "id") then
+		local items = Auctioneer_GetItemLinks(param);
+		for _,item in items do
+			Auctioneer_ChatPrint("Found item "..item);
+		end
+	elseif (cmd == "fake") then
+		local msg = "Here is your |Hitem:" .. param .. "|hFake item|h, enjoy!";
+		SendChatMessage(msg, "WHISPER", this.language, UnitName("player"));
 	elseif (cmd == "clear") then
 		if (param == "all") then
 			local aKey = auctionKey();
-			Auctioneer_ChatPrint("Clearing all auction data for "..aKey);
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEARALL, aKey));
 			AuctionPrices[aKey] = {};
             AHSnapshot = {};
             AHSnapshotItemPrices = {};
         elseif (param == "snapshot") then
-            Auctioneer_ChatPrint("Clearing current Auction House snapshot.");
+            Auctioneer_ChatPrint(AUCT_FRMT_ACT_CLEARSNAP);
             AHSnapshot = {};
             AHSnapshotItemPrices = {};  
             lSnapshotItemPrices = {};            
@@ -1137,9 +1184,9 @@ function Auctioneer_Command(command)
 				local aKey = auctionKey();
 				if (AuctionPrices[aKey][item] ~= nil) then
 					AuctionPrices[aKey][item] = nil;
-					Auctioneer_ChatPrint("Clearing data for item "..item);
+					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, item));
 				else
-					Auctioneer_ChatPrint("Unable to find item "..item);
+					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, item));
 				end
 			end
 		end
@@ -1164,20 +1211,20 @@ function Auctioneer_Command(command)
 	elseif ((cmd == "average") or (cmd == "median") or(cmd == "suggest") or (cmd == "stats") or (cmd == "vendor") or (cmd == "usage") or (cmd == "stacksize") or (cmd == "vendorsell") or (cmd == "vendorbuy")) then
 		if ((param == "false") or (param == "off") or (param == "no") or (param == "0")) then
 			Auctioneer_SetFilter(cmd, "off");
-			Auctioneer_ChatPrint("Not displaying item's "..cmd.." data");
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
 		elseif (param == "toggle") then
 			local cur = Auctioneer_GetFilterVal(cmd);
 			if (cur == "on") then
 				cur = "off";
-				Auctioneer_ChatPrint("Not displaying item's "..cmd.." data");
+				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
 			else
 				cur = "on";
-				Auctioneer_ChatPrint("Displaying item's "..cmd.." data");
+				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
 			end
 			Auctioneer_SetFilter(cmd, cur);
 		else
 			Auctioneer_SetFilter(cmd, "on");
-			Auctioneer_ChatPrint("Displaying item's "..cmd.." data");
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
 		end
 	elseif (cmd == "bargains") then
 		if (not AHSnapshot) then
@@ -1187,7 +1234,7 @@ function Auctioneer_Command(command)
 			Auctioneer_BargainScan();
 		end        
 	else
-		Auctioneer_ChatPrint("Unknown command keyword: '"..cmd.."'");
+		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_UNKNOWN, cmd));
 	end
 end
 
@@ -1215,6 +1262,17 @@ function Auctioneer_ChatPrint(str)
 		DEFAULT_CHAT_FRAME:AddMessage(str, 0.0, 1.0, 0.25);
 	end
 end
+
+function Auctioneer_GetItemLinks(str)
+	local itemList = {};
+	local listSize = 0;
+	for link, item in string.gfind(str, "|Hitem:([^|]+)|h[[]([^]]+)[]]|h") do
+		listSize = listSize+1;
+		itemList[listSize] = item.." = "..link;
+	end
+	return itemList;
+end
+
 
 function Auctioneer_GetItems(str)
 	local itemList = {};
@@ -1494,3 +1552,70 @@ function Auctioneer_BargainScan()
 		end
 	end
 end
+
+--/script Auctioneer_ShowItem("Weapon", "Axe_1H_Pick_A_01");
+function Auctioneer_ShowItem(class, file)
+AuctioneerModelView:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
+
+-- Model:SetLight def:
+-- SetLight(enabled[, omni,omniX,omniY,omniZ, ambIntensity[,ambR,ambG,ambB], dirIntensity[,dirR,dirG,dirB]]);
+AuctioneerModelView:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 1.0, 0.5, 0.5, 0.8, 0.5, 0.5, 1.0);
+
+-- Model:SetPosition([ x[, y[, z]]])
+AuctioneerModelView:SetPosition(0.0, 0.0, 0.0);
+
+AuctioneerModelView:SetRotation(1.5);
+
+end
+
+function dump(...)
+	local out = "";
+	for i = 1, arg.n, 1 do
+		local d = arg[i];
+		local t = type(d);
+		if (t == "table") or (t == "userdata") then
+			out = out .. "{";
+			local first = true;
+			for k, v in d do
+				if (not first) then out = out .. ", "; end
+				first = false;
+				out = out .. dump(k);
+				out = out .. " = ";
+				out = out .. dump(v);
+			end
+			out = out .. "}";
+		elseif (t == "nil") then
+			out = out .. "NIL";
+		elseif (t == "number") then
+			out = out .. d;
+		elseif (t == "string") then
+			out = out .. "\"" .. d .. "\"";
+		elseif (t == "boolean") then
+			if (d) then
+				out = out .. "true";
+			else
+				out = out .. "false";
+			end
+		else
+			out = out .. string.upper(t) .. "??";
+		end
+
+		if (i < arg.n) then out = out .. ", "; end
+	end
+	return out;
+end
+
+function p(...)
+	local out = "";
+	for i = 1, arg.n, 1 do
+		if (i > 1) then out = out .. ", "; end
+		if (type(arg[i]) == "string") then
+			out = out .. arg[i];
+		else
+			out = out .. dump(arg[i]);
+		end
+	end
+	ChatFrame1:AddMessage(out, 1.0, 1.0, 0.0);
+end
+
+

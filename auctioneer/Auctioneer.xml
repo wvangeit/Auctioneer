@@ -5,11 +5,51 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Version: <%version%>
 	Revision: $Id$
 -->
-  <Script file="BasePrices.lua"/>
+  <Script file="localization.lua"/>
+  <Script file="ItemData.lua"/>
+  <Script file="MeshData.lua"/>
+  <Script file="DisplayInfo.lua"/>
   <Script file="AHScanning.lua"/>
   <Script file="BalancedList.lua"/>
   <Script file="Auctioneer.lua"/>
-  
+  <Frame name="AuctioneerModel" frameStrata="DIALOG" hidden="true" parent="UIParent">
+    <Size>
+	  <AbsDimension x="700" y="400"/>
+	</Size>
+	<Anchors>
+	  <Anchor point="TOPLEFT" relativeTo="UIParent" relativePoint="TOPLEFT">
+	    <Offset>
+	      <AbsDimension x="20" y="-100"/>
+	    </Offset>
+	  </Anchor>
+	</Anchors>
+    <Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+      <BackgroundInsets>
+        <AbsInset left="11" right="12" top="12" bottom="11"/>
+      </BackgroundInsets>
+      <TileSize>
+        <AbsValue val="32"/>
+      </TileSize>
+      <EdgeSize>
+        <AbsValue val="32"/>
+      </EdgeSize>
+    </Backdrop>
+	  
+  	<Frames>
+      <PlayerModel name="AuctioneerModelView" file="Item\\ObjectComponents\\Weapon\\Axe_1H_Pick_A_01.mdl">
+	    <Size>
+		  <AbsDimension x="680" y="380"/>
+		</Size>
+        <Anchors>
+          <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+            <Offset>
+              <AbsDimension x="10" y="-10"/>
+		    </Offset>
+          </Anchor>
+		</Anchors>
+      </PlayerModel>
+	</Frames>
+  </Frame>
   <Frame name="AuctioneerUpdateFrame" parent="UIParent">
     <Scripts>
       <OnUpdate>
