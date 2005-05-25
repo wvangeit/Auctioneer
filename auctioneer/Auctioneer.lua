@@ -1787,7 +1787,7 @@ function dump(...)
 	for i = 1, arg.n, 1 do
 		local d = arg[i];
 		local t = type(d);
-		if (t == "table") or (t == "userdata") then
+		if (t == "table") then
 			out = out .. "{";
 			local first = true;
 			for k, v in d do

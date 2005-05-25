@@ -61,7 +61,7 @@ function TT_Show(currentTooltip)
 	
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
-	EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "TOPLEFT", 0, 0);
+	EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0, 0);
 	EnhancedTooltip:Show();
 end
 
@@ -75,20 +75,15 @@ function TT_Clear()
 	EnhancedTooltipPreview:Hide();
 	EnhancedTooltipIcon:Hide();
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2");
-	EnhancedTooltipText1:Hide();
-	EnhancedTooltipText2:Hide();
-	EnhancedTooltipText3:Hide();
-	EnhancedTooltipText4:Hide();
-	EnhancedTooltipText5:Hide();
-	EnhancedTooltipText6:Hide();
-	EnhancedTooltipText7:Hide();
-	EnhancedTooltipText8:Hide();
-	EnhancedTooltipText9:Hide();
-	EnhancedTooltipMoney1:Hide();
-	EnhancedTooltipMoney2:Hide();
-	EnhancedTooltipMoney3:Hide();
-	EnhancedTooltipMoney4:Hide();
-	EnhancedTooltipMoney5:Hide();
+	for i = 1, 20 do
+		local ttText = getglobal("EnhancedTooltipText"..i);
+		ttText:Hide();
+		ttText:SetTextColor(1.0,1.0,1.0);
+	end
+	for i = 1, 10 do
+		local ttMoney = getglobal("EnhancedTooltipMoney"..i);
+		ttMoney:Hide();
+	end
 	EnhancedTooltip.lineCount = 0;
 	EnhancedTooltip.moneyCount = 0;
 	EnhancedTooltip.minWidth = 0;
@@ -263,11 +258,11 @@ function TT_GameTooltip_SetLootItem(this, slot)
 	end
 end
 
-function TT_GameTooltip_SetQuestItem(qtype, slot)
-	Orig_GameTooltip_SetLootItem(qtype, slot);
-	local name, texture, quantity, quality, usable = GetLootSlotInfo(qtype, slot);
+function TT_GameTooltip_SetQuestItem(this, qtype, slot)
+	Orig_GameTooltip_SetQuestItem(this, qtype, slot);
+	local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
 	TT_Clear();
-	TT_AddTooltip(GameTooltip. name, quality, quantity);
+	TT_AddTooltip(GameTooltip, name, quality, quantity);
 	TT_Show(GameTooltip);
 end
 
