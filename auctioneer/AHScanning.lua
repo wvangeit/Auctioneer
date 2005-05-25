@@ -6,6 +6,7 @@ Auctioneer_isScanningRequested = false;
 local lCurrentAuctionPage;
 local lMajorAuctionCategories;
 local lCurrentCategoryIndex;
+local lIsPageScanned;
 
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
@@ -15,19 +16,6 @@ AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: auction scanning finished";
 local lOriginal_CanSendAuctionQuery;
 local lOriginal_AuctionFrameBrowse_OnEvent;
 
-
-function Auctioneer_ScanAuction()
-	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-	local auctionid;
-
-	if( numBatchAuctions > 0 ) then
-		for auctionid = 1, numBatchAuctions do        
-            Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lMajorAuctionCategories[lCurrentCategoryIndex]);
-		end
-	end
-end
-
-
 function Auctioneer_StopAuctionScan()
 	Auctioneer_Event_StopAuctionScan();
 	
@@ -36,6 +24,7 @@ function Auctioneer_StopAuctionScan()
 		CanSendAuctionQuery = lOriginal_CanSendAuctionQuery;
 		lOriginal_CanSendAuctionQuery = nil;
 	end
+    
 	if( lOriginal_AuctionFrameBrowse_OnEvent ) then
 		AuctionFrameBrowse_OnEvent = lOriginal_AuctionFrameBrowse_OnEvent;
 		lOriginal_AuctionFrameBrowse_OnEvent = nil;
@@ -46,7 +35,7 @@ end
 
 
 local function Auctioneer_AuctionNextQuery()
-	if( lCurrentAuctionPage ) then
+	if lCurrentAuctionPage then
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		local maxPages = floor(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE);
 		
@@ -55,7 +44,7 @@ local function Auctioneer_AuctionNextQuery()
 			BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
         elseif ( lCurrentCategoryIndex < table.getn(lMajorAuctionCategories) ) then
             lCurrentCategoryIndex = lCurrentCategoryIndex + 1;
-            lCurrentAuctionPage = nil;
+            lCurrentAuctionPage = 0;
 		else
 			Auctioneer_StopAuctionScan();
 			if( totalAuctions > 0 ) then
@@ -64,18 +53,34 @@ local function Auctioneer_AuctionNextQuery()
 			end
 			return;
 		end
-	else
-		lCurrentAuctionPage = 0;
+	end
+    if not lCurrentAuctionPage or lCurrentAuctionPage == 0 then
+        if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
 		BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_SCAN_START, lMajorAuctionCategories[lCurrentCategoryIndex]));
 	end
 	QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
+    lIsPageScanned = false;
 	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
 end
 
+function Auctioneer_ScanAuction()
+	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
+	local auctionid;
+
+	if( numBatchAuctions > 0 ) then
+		for auctionid = 1, numBatchAuctions do        
+            Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lMajorAuctionCategories[lCurrentCategoryIndex]);
+		end
+        lIsPageScanned = true;
+        if CanSendAuctionQuery() then
+            Auctioneer_AuctionNextQuery();
+        end
+	end
+end
 
 local function Auctioneer_CanSendAuctionQuery()
 	local value = lOriginal_CanSendAuctionQuery();
-	if( value ) then
+	if( value and lIsPageScanned) then
 		Auctioneer_AuctionNextQuery();
 		return nil;
 	end
@@ -97,12 +102,15 @@ function Auctioneer_StartAuctionScan()
 		lOriginal_CanSendAuctionQuery = CanSendAuctionQuery;
 		CanSendAuctionQuery = Auctioneer_CanSendAuctionQuery;
 	end
+    
 	if( not lOriginal_AuctionFrameBrowse_OnEvent ) then
 		lOriginal_AuctionFrameBrowse_OnEvent = AuctionFrameBrowse_OnEvent;
 		AuctionFrameBrowse_OnEvent = Auctioneer_AuctionFrameBrowse_OnEvent;
 	end
 	
 	Auctioneer_Event_StartAuctionScan();
+    
+    Auctioneer_AuctionNextQuery();
 end
 
 
