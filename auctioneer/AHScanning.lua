@@ -71,11 +71,9 @@ function Auctioneer_ScanAuction()
 		for auctionid = 1, numBatchAuctions do        
             Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lMajorAuctionCategories[lCurrentCategoryIndex]);
 		end
-        lIsPageScanned = true;
-        if CanSendAuctionQuery() then
-            Auctioneer_AuctionNextQuery();
-        end
 	end
+    
+    lIsPageScanned = true;    
 end
 
 local function Auctioneer_CanSendAuctionQuery()
