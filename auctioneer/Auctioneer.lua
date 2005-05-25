@@ -827,13 +827,238 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     end
 end
 
+function Auctioneer_NewTooltip(frame, name, quality, count)
+	Auctioneer_OldTooltip(frame, name, quality, count);
+	if (Auctioneer_GetFilter("all")) then
+		TT_AddLine(name);
+		TT_LineQuality(quality);
+
+		local money = nil;
+		local itemInfo = nil;
+
+		local itemID = getNumericItemId(name);
+		if (itemID > 0) then
+			frame.eDone = 1;
+			local itemData = getAuctionPriceData(name);
+			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+			itemInfo = Auctioneer_BasePrices[itemID];
+
+			if (aCount == 0) then
+				TT_AddLine("Never seen at auction");
+				TT_LineColor(0.5, 0.8, 0.5);
+			else
+				local avgQty = math.floor(minCount / aCount);
+				local avgMin = math.floor(minPrice / minCount);
+
+				local bidPct = math.floor(bidCount / minCount * 100);
+				local avgBid = 0;
+				if (bidCount > 0) then
+					avgBid = math.floor(bidPrice / bidCount);
+				end
+				
+				local buyPct = math.floor(buyCount / minCount * 100);
+				local avgBuy = 0;
+				if (buyCount > 0) then
+					avgBuy = math.floor(buyPrice / buyCount);
+				end
+                
+                
+                local median, medCount = getUsableMedian(name);
+
+				if (Auctioneer_GetFilter("average")) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount));
+					TT_LineColor(0.5,0.8,0.1);
+					if (avgQty > 1) then
+						TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
+						TT_LineColor(0.1,0.8,0.5);
+					else
+						TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
+						TT_LineColor(0.1,0.8,0.5);
+					end
+                    if median and Auctioneer_GetFilter("median") then
+                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(name);
+                        local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(name);
+                        if historicalMedian then
+                            TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount, ": "), historicalMedian)
+							TT_LineColor(0.1,0.8,0.5);
+                        end
+                        if snapshotMedian and snapshotMedCount < historicalMedCount then
+                            TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount, ": "), snapshotMedian)
+							TT_LineColor(0.1,0.8,0.5);
+                        end
+                    end
+				end
+				if (Auctioneer_GetFilter("suggest")) then
+					if (count > 1) then
+                        local buyoutPriceForOne = median;
+                        if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
+                        if (avgMin > buyoutPriceForOne) then aveMin = buyoutPriceForOne / 2 end
+						TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)));
+						TT_LineColor(0.5,0.5,0.8);
+					end
+				end
+				if (Auctioneer_GetFilter("stats")) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
+					TT_LineColor(0.1,0.5,0.8);
+				end
+			end
+            
+			local also = Auctioneer_GetFilterVal("also");
+			if (also ~= "on") then
+				if (also == "opposite") then
+					also = oppositeKey();
+				end
+				local itemData = getAuctionPriceData(itemID, also);
+				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+				local avgQty = math.floor(minCount / aCount);
+				local avgMin = math.floor(minPrice / minCount);
+
+				local bidPct = math.floor(bidCount / minCount * 100);
+				local avgBid = 0;
+				if (bidCount > 0) then
+					avgBid = math.floor(bidPrice / bidCount);
+				end
+				
+				local buyPct = math.floor(buyCount / minCount * 100);
+				local avgBuy = 0;
+				if (buyCount > 0) then
+					avgBuy = math.floor(buyPrice / buyCount);
+				end
+
+				if (aCount == 0) then
+					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also));
+					TT_LineColor(0.5,0.8,0.1);
+				else
+					if (Auctioneer_GetFilter("average")) then
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also));
+						TT_LineColor(0.5,0.8,0.1);
+						if (avgQty > 1) then
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
+							TT_LineColor(0.1,0.8,0.5);
+						else
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
+							TT_LineColor(0.1,0.8,0.5);
+						end
+						if (Auctioneer_GetFilter("suggest")) then
+							if (count > 1) then
+								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)));
+								TT_LineColor(0.5,0.5,0.8);
+							end
+						end
+					end
+					if (Auctioneer_GetFilter("stats")) then
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
+						TT_LineColor(0.1,0.5,0.8);
+					end
+				end
+			end            
+            
+			if ((data ~= nil) and (data.price ~= nil)) then
+				money = data.price;
+			else
+				money = 0;
+			end
+		end
+		if (money == nil) then
+			money = 0;
+		end
+
+		local sellNote = "";
+		local buyNote = "";
+		local sell = money;
+		local buy = sell * 4;
+		local quant = 1;
+		local stacks = 1;
+		local class = "";
+		local uses = "";
+		if (itemInfo) then
+			buyNote = "*"
+			stacks = itemInfo.x;
+			if (not stacks) then stacks = 1; end
+			quant = nullSafe(itemInfo.q);
+			if (quant < 1) then quant = 1; end
+			if (quant > 1) then
+				buyNote = "*";
+			end
+			buy = nullSafe(itemInfo.b) / quant;
+			if ((not sell) or (sell == "") or (sell <= 0))  then
+				sellNote = "*"
+				sell = nullSafe(itemInfo.s);
+			end;
+			if (itemInfo.c) then
+				class = itemInfo.c;
+			end
+			if (itemInfo.u) then
+				uses = itemInfo.u;
+			end
+		end
+
+		if (Auctioneer_GetFilter("vendor")) then
+			if ((buy > 0) or (sell > 0)) then
+				local bgsc = Auctioneer_GetTextGSC(buy);
+				local sgsc = Auctioneer_GetTextGSC(sell);
+                
+				if (count and (count > 1)) then
+					local bqgsc = Auctioneer_GetTextGSC(buy*count);
+					local sqgsc = Auctioneer_GetTextGSC(sell*count);
+					if (Auctioneer_GetFilter("vendorbuy")) then
+						TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bqgsc, bgsc));
+						TT_LineColor(0.8, 0.5, 0.1);
+					end
+					if (Auctioneer_GetFilter("vendorsell")) then
+						TT_AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sqgsc, sgsc));
+						TT_LineColor(0.8, 0.5, 0.1);
+					end
+				else
+					if (Auctioneer_GetFilter("vendorbuy")) then
+						if (Auctioneer_GetFilter("vendorsell")) then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUYSELL, buyNote, bgsc, sellNote, sgsc));
+							TT_LineColor(0.8, 0.5, 0.1);
+						else 
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote, bgsc));
+							TT_LineColor(0.8, 0.5, 0.1);
+						end
+					elseif (Auctioneer_GetFilter("vendorsell")) then
+						TT_AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote, sgsc));
+						TT_LineColor(0.8, 0.5, 0.1);
+					end
+				end
+			end
+		end
+
+		if (Auctioneer_GetFilter("stacksize")) then
+			if (stacks > 1) then
+				TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks));
+			end
+		end
+		if (Auctioneer_GetFilter("usage")) then
+			local reagentInfo = "";
+			if (class ~= "") then
+				if (uses ~= "") then
+					reagentInfo = string.format(AUCT_FRMT_INFO_CLASSUSE, class, uses);
+				else
+					reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, class);
+				end
+			elseif (uses ~= "") then
+				reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
+			end
+			if (reagentInfo ~= "") then
+				TT_AddLine(reagentInfo);
+				TT_LineColor(0.6, 0.4, 0.8);
+			end
+		end
+	end
+	TT_Show(frame);
+end
+
+
 local function Auctioneer_Tooltip_Hook(frame, name, count, data)
-	Auctioneer_AddTooltipInfo(frame, name, count, data);
+--	Auctioneer_AddTooltipInfo(frame, name, count, data);
 	Auctioneer_Old_Tooltip_Hook(frame, name, count, data);
 end
 
 function Auctioneer_AddTooltipInfo(frame, name, count, data)
-	if (Auctioneer_GetFilter("all")) then
+--[[	if (Auctioneer_GetFilter("all")) then
 		local money = nil;
 		local itemInfo = nil;
 
@@ -1030,6 +1255,7 @@ function Auctioneer_AddTooltipInfo(frame, name, count, data)
 		end
 	end
 	frame:Show();
+]]
 end
 
 -- hook to capture data about an auction that was boughtout
@@ -1052,10 +1278,10 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 end
 
 function Auctioneer_OnLoad()
-	RegisterForSave("AuctionConfig");
-	RegisterForSave("AuctionPrices");
-    RegisterForSave("AHSnapshot");
-    RegisterForSave("AHSnapshotItemPrices");
+--	RegisterForSave("AuctionConfig");
+--	RegisterForSave("AuctionPrices");
+--    RegisterForSave("AHSnapshot");
+--    RegisterForSave("AHSnapshotItemPrices");
     
     -- register events
     this:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
@@ -1073,8 +1299,11 @@ function Auctioneer_OnLoad()
 	lOriginalSetItemRef = SetItemRef;
 	SetItemRef = Auctioneer_SetItemRef;
 	
-	Auctioneer_Old_Tooltip_Hook = LootLink_AddExtraTooltipInfo;
-	LootLink_AddExtraTooltipInfo = Auctioneer_Tooltip_Hook;
+--	Auctioneer_Old_Tooltip_Hook = LootLink_AddExtraTooltipInfo;
+--	LootLink_AddExtraTooltipInfo = Auctioneer_Tooltip_Hook;
+
+	Auctioneer_OldTooltip = TT_AddTooltip;
+	TT_AddTooltip = Auctioneer_NewTooltip;
 
 	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
 	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
@@ -1551,21 +1780,6 @@ function Auctioneer_BargainScan()
 			Auctioneer_ChatPrint("Found a "..link.." from "..auctioner.." which you can "..action.." for "..Auctioneer_GetTextGSC(profit).." profit");
 		end
 	end
-end
-
---/script Auctioneer_ShowItem("Weapon", "Axe_1H_Pick_A_01");
-function Auctioneer_ShowItem(class, file)
-AuctioneerModelView:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
-
--- Model:SetLight def:
--- SetLight(enabled[, omni,omniX,omniY,omniZ, ambIntensity[,ambR,ambG,ambB], dirIntensity[,dirR,dirG,dirB]]);
-AuctioneerModelView:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 1.0, 0.5, 0.5, 0.8, 0.5, 0.5, 1.0);
-
--- Model:SetPosition([ x[, y[, z]]])
-AuctioneerModelView:SetPosition(0.0, 0.0, 0.0);
-
-AuctioneerModelView:SetRotation(1.5);
-
 end
 
 function dump(...)
