@@ -7,6 +7,7 @@ local lCurrentAuctionPage;
 local lMajorAuctionCategories;
 local lCurrentCategoryIndex;
 local lIsPageScanned;
+local lScanInProgress;
 
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
@@ -31,6 +32,7 @@ function Auctioneer_StopAuctionScan()
 	end
     
     Auctioneer_isScanningRequested = false;
+	lScanInProgress = false;
 end
 
 
@@ -82,7 +84,7 @@ local function Auctioneer_CanSendAuctionQuery()
 		Auctioneer_AuctionNextQuery();
 		return nil;
 	end
-	return value;
+	return false;
 end
 
 function Auctioneer_AuctionFrameBrowse_OnEvent()
@@ -94,6 +96,7 @@ function Auctioneer_StartAuctionScan()
 	lCurrentAuctionPage = nil;
     lCurrentCategoryIndex = 1;    
     lMajorAuctionCategories = {GetAuctionItemClasses()};
+	lScanInProgress = true;
 
 	-- Hook the functions that we need for the scan
 	if( not lOriginal_CanSendAuctionQuery ) then
@@ -111,6 +114,15 @@ function Auctioneer_StartAuctionScan()
     Auctioneer_AuctionNextQuery();
 end
 
+function Auctioneer_CanScan()
+	if (lScanInProgress) then
+		return false;
+	end
+	if (not CanSendAuctionQuery()) then
+		return false;
+	end
+	return true;
+end
 
 function Auctioneer_RequestAuctionScan()
     Auctioneer_isScanningRequested = true;

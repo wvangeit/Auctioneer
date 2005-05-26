@@ -5,30 +5,56 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Version: <%version%>
 	Revision: $Id$
 -->
-  <Script file="localization.lua"/>
-  <Script file="ItemData.lua"/>
-  <Script file="MeshData.lua"/>
-  <Script file="DisplayInfo.lua"/>
-  <Script file="AHScanning.lua"/>
-  <Script file="BalancedList.lua"/>
-  <Script file="Auctioneer.lua"/>
-  <Frame name="AuctioneerUpdateFrame" parent="UIParent">
-    <Scripts>
-      <OnUpdate>
-            Auctioneer_OnUpdate(arg1);
-      </OnUpdate>
-    </Scripts>
-  </Frame>
-  <Frame name="Auctioneer" parent="UIParent" hidden="true">
-    <Scripts>
-        <OnLoad>
-          Auctioneer_OnLoad();
-        </OnLoad>
-        <OnEvent>
-            Auctioneer_OnEvent(event);
-        </OnEvent>      
-    </Scripts>
-  </Frame>
+	<Script file="localization.lua"/>
+	<Script file="ItemData.lua"/>
+	<Script file="MeshData.lua"/>
+	<Script file="DisplayInfo.lua"/>
+	<Script file="AHScanning.lua"/>
+	<Script file="BalancedList.lua"/>
+	<Script file="Auctioneer.lua"/>
+	<Frame name="AuctioneerUpdateFrame" parent="UIParent">
+		<Scripts>
+			<OnUpdate>
+				Auctioneer_OnUpdate(arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
 
+	<Frame name="Auctioneer" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Auctioneer_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				Auctioneer_OnEvent(event);
+			</OnEvent>      
+		</Scripts>
+		<Frames>
+			<Button name="BrowseScanButton" parent="AuctionFrameBrowse" inherits="UIPanelButtonTemplate" text="AUCT_TEXT_SCAN">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="BrowseSearchButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="50" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Auctioneer_RequestAuctionScan();
+					</OnClick>
+					<OnUpdate>
+						if (Auctioneer_CanScan()) then
+							this:Enable();
+						else
+							this:Disable();
+						end
+					</OnUpdate>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
 </Ui>
 

@@ -109,7 +109,8 @@ AUCT_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 AUCT_FRMT_ACT_ENABLE = "Displaying item's %s data";
 AUCT_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
-	
+
+AUCT_TEXT_SCAN = "Scan";
 
 -- Locale specific translations for the German client
 if (GetLocale() == "deDE") then

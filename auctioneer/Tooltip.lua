@@ -36,6 +36,9 @@ function TT_OnLoad()
 		GameTooltip.SetLootItem = TT_GameTooltip_SetLootItem;
 		Orig_GameTooltip_SetQuestItem = GameTooltip.SetQuestItem;
 		GameTooltip.SetQuestItem = TT_GameTooltip_SetQuestItem;
+		Orig_GameTooltip_SetInventoryItem = GameTooltip.SetInventoryItem;
+		GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
+
 
 		-- Hook the hide function so we can disappear
 		Orig_GameTooltip_OnHide = GameTooltip_OnHide;
@@ -58,10 +61,43 @@ function TT_Show(currentTooltip)
 		trackHeight = trackHeight + currentLine:GetHeight() + 1;
 	end
 	height = 20 + trackHeight;
-	
+
+	if (EnhancedTooltipPreview:IsVisible()) then
+		if (width < 256) then width = 256; end
+		EnhancedTooltipPreview:SetHeight(128 + 40);
+		EnhancedTooltipPreview:ClearAllPoints();
+		EnhancedTooltipPreview:SetWidth(width + 40);
+		EnhancedTooltipPreview:SetPoint("TOP", "EnhancedTooltip", "TOP", 0, 76-height);
+		height = height + 72;
+	end
+
+	currentTooltip:Show();
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
 	EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0, 0);
+
+	local reposition = false;
+	local fTop = currentTooltip:GetTop();
+	local fLeft = currentTooltip:GetLeft();
+	local sWidth = GetScreenWidth();
+	local sHeight = GetScreenHeight();
+	local tBottom = EnhancedTooltip:GetBottom() + 64;
+	local tRight = EnhancedTooltip:GetRight() + 20;
+	if (tBottom > sHeight) then 
+		reposition = true;
+		fTop = fTop - (tBottom - sHeight);
+	end
+	if (tRight > sWidth) then 
+		reposition = true;
+		fLeft = fLeft - (tRight - sWidth);
+	end
+	if (reposition) then
+--		p("Repositioning to", fLeft, fTop);
+		currentTooltip:ClearAllPoints();
+		-- /script GameTooltip:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 100, -100) 
+		currentTooltip:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", fLeft, (sHeight-fTop)*-1);
+	end
+	
 	EnhancedTooltip:Show();
 end
 
@@ -144,9 +180,18 @@ function TT_SetIcon(iconPath)
 end
 
 function TT_SetModel(class, file)
+	if (strsub(class, -1) == "*") then
+		class = strsub(class, 0, -2);
+		local _, race = UnitRace("player");
+		race = strsub(race, 0, 2);
+		local gender = "M";
+		if (UnitSex("player") > 0) then gender = "F"; end
+		file = file .. "_" .. race .. gender;
+	end
+--	p("Setting model: ", class, file);
 	EnhancedTooltipPreview:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
 	EnhancedTooltipPreview:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 1.0, 0.5, 0.5, 0.8, 0.5, 0.5, 1.0);
-	EnhancedTooltipPreview:SetPosition(0.0, 0.0, 0.0);
+	EnhancedTooltipPreview:SetPosition(0.6, -0.1, 0);
 	EnhancedTooltipPreview:SetRotation(1.5);
 	EnhancedTooltipPreview:Show();
 end
@@ -171,21 +216,26 @@ local function nameFromLink(link)
         return nil;
 end
 
-function TT_AddTooltip(name, frame, count)
+function TT_AddTooltip(frame, name, link, quality, count)
 
 end
 
 function TT_Chat_OnHyperlinkShow(link)
-        Orig_Chat_OnHyperlinkShow(link);
+	Orig_Chat_OnHyperlinkShow(link);
 
-        local name = ItemRefTooltipTextLeft1:GetText();
-        if( name and TT_ChatCurrentItem ~= name ) then
-                TT_ChatCurrentItem = name;
-                
-				TT_Clear();
-				TT_AddTooltip(ItemRefTooltip, name, -1, 1);
-				TT_Show(ItemRefTooltip);
-        end
+	if (ItemRefTooltip:IsVisible()) then
+		local name = ItemRefTooltipTextLeft1:GetText();
+		if( name and TT_ChatCurrentItem ~= name ) then
+			local fabricatedLink = "|H"..link.."|h["..name.."]|h";
+			TT_ChatCurrentItem = name;
+			
+			TT_Clear();
+			TT_AddTooltip(ItemRefTooltip, name, fabricatedLink, -1, 1);
+			TT_Show(ItemRefTooltip);
+		end
+	else
+		TT_Hide();
+	end
 end
 
 function TT_AuctionFrameItem_OnEnter(type, index)
@@ -197,7 +247,7 @@ function TT_AuctionFrameItem_OnEnter(type, index)
                 if( name ) then
                         local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
 						TT_Clear();
-                        TT_AddTooltip(GameTooltip, name, aiQuality, aiCount);
+                        TT_AddTooltip(GameTooltip, name, link, aiQuality, aiCount);
 						TT_Show(GameTooltip);
                 end
         end
@@ -215,7 +265,7 @@ function TT_ContainerFrameItemButton_OnEnter()
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, quality, itemCount);
+		TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
 		TT_Show(GameTooltip);
 	end
 end
@@ -237,7 +287,7 @@ function TT_ContainerFrame_Update(frame)
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 
 				TT_Clear()
-				TT_AddTooltip(GameTooltip, name, quality, itemCount);
+				TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
 				TT_Show(GameTooltip);
 			end
 		end
@@ -253,18 +303,37 @@ function TT_GameTooltip_SetLootItem(this, slot)
 	if( name ) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
 		TT_Clear()
-		TT_AddTooltip(GameTooltip, name, quality, quantity);
+		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
 end
 
 function TT_GameTooltip_SetQuestItem(this, qtype, slot)
 	Orig_GameTooltip_SetQuestItem(this, qtype, slot);
+	local link = GetQuestItemLink(slot);
 	local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
 	TT_Clear();
-	TT_AddTooltip(GameTooltip, name, quality, quantity);
+	TT_AddTooltip(GameTooltip, name, link, quality, quantity);
 	TT_Show(GameTooltip);
 end
+
+function TT_GameTooltip_SetInventoryItem(this, unit, slot)
+	local hasItem, hasCooldown, repairCost = Orig_GameTooltip_SetInventoryItem(this, unit, slot);
+	local link = GetInventoryItemLink(unit, slot);
+	if (link) then
+		local name = nameFromLink(link);
+		local quantity = GetInventoryItemCount(unit, slot);
+		local quality = GetInventoryItemQuality(unit, slot);
+		TT_Clear();
+		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_Show(GameTooltip);
+	else
+		TT_Hide();
+	end
+
+	return hasItem, hasCooldown, repairCost;
+end
+
 
 
 
