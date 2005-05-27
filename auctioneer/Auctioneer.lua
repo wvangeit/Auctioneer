@@ -212,6 +212,12 @@ local function Auctioneer_AuctionStart_Hook()
     lSnapshotItemPrices = {};
     invalidateAHSnapshot();
     
+    -- make sure AuctionPrices is initialized
+    local server = auctionKey();
+	if (AuctionPrices[server] == nil) then
+		AuctionPrices[server] = {};
+	end
+    
     -- reset scan audit counters
     lTotalAuctionsScannedCount = 0;
     lNewAuctionsCount = 0;
@@ -281,18 +287,6 @@ end
 function Auctioneer_GetOppositeKey()
 	return oppositeKey();
 end
-
--- returns the numeric Lootlink ID for this item name
---[[local function getNumericItemId(itemName)
-    local itemLink = Auctioneer_GetItemLink(itemName);
-    
-    if (not itemLink or not itemLink.i) then return 0; end
-    local i,j, baseItemID = string.find(itemLink.i, "^(%d+):");
-    if (not baseItemID) then return 0; end
-    baseItemID = 0 + baseItemID;
-    
-    return baseItemID;
-end]]
 
 local function breakLink(link)
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
@@ -1319,11 +1313,6 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 end
 
 function Auctioneer_OnLoad()
---	RegisterForSave("AuctionConfig");
---	RegisterForSave("AuctionPrices");
---    RegisterForSave("AHSnapshot");
---    RegisterForSave("AHSnapshotItemPrices");
-    
     -- register events
     this:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
     this:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
