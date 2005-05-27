@@ -65,6 +65,8 @@ function TT_Show(currentTooltip)
 	end
 	height = 20 + trackHeight;
 
+	local minWidth = width;
+
 	if (EnhancedTooltipPreview:IsVisible()) then
 		if (width < 256) then width = 256; end
 		EnhancedTooltipPreview:SetHeight(128 + 40);
@@ -75,20 +77,30 @@ function TT_Show(currentTooltip)
 	end
 
 	currentTooltip:Show();
-	EnhancedTooltip:SetHeight(height);
-	EnhancedTooltip:SetWidth(width);
-	EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0, 0);
 
 	local reposition = false;
 	local fTop = currentTooltip:GetTop();
 	local fLeft = currentTooltip:GetLeft();
+	local fWidth = currentTooltip:GetWidth();
+	local fRight = currentTooltip:GetRight();
+	local fBottom = currentTooltip:GetBottom();
+
+	if (fWidth > minWidth) and (width > fWidth) then
+		width = fWidth;
+	elseif (width < fWidth) and (width + 20 > fWidth) then
+		width = fWidth;
+	end
+
 	local sWidth = GetScreenWidth();
 	local sHeight = GetScreenHeight();
-	local tBottom = EnhancedTooltip:GetBottom() + 64;
-	local tRight = EnhancedTooltip:GetRight() + 20;
-	if (tBottom > sHeight) then 
+
+	local tBottom = fBottom - height - 64;
+	local tRight = fRight + 20;
+
+--	p("fTop:",fTop, "fLeft:",fLeft, "fBottom:",fBottom, "fRight",fRight, "fWidth:",fWidth, "sWidth:",sWidth, "sHeight:",sHeight, "tBottom",tBottom, "tRight:", tRight);
+	if (tBottom < 0) then 
 		reposition = true;
-		fTop = fTop - (tBottom - sHeight);
+		fTop = fTop - tBottom;
 	end
 	if (tRight > sWidth) then 
 		reposition = true;
@@ -97,10 +109,12 @@ function TT_Show(currentTooltip)
 	if (reposition) then
 --		p("Repositioning to", fLeft, fTop);
 		currentTooltip:ClearAllPoints();
-		-- /script GameTooltip:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 100, -100) 
 		currentTooltip:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", fLeft, (sHeight-fTop)*-1);
 	end
 	
+	EnhancedTooltip:SetHeight(height);
+	EnhancedTooltip:SetWidth(width);
+	EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0, 0);
 	EnhancedTooltip:Show();
 end
 
@@ -202,20 +216,20 @@ function TT_SetModel(class, file)
 		local typ = strsub(file, 0, 3);
 		if (typ == "Axe") then scale = 0.8; pos = 0.9; end
 		if (typ == "Bow") then scale = 1.0; pos = 0.2; end
-		if (typ == "Clu") then scale = 1.3; end
+		if (typ == "Clu") then scale = 0.9; pos = 0.8; end
 		if (typ == "Fir") then scale = 0.8; pos = 1.0; end
 		if (typ == "Gla") then scale = 1.0; end
-		if (typ == "Ham") then scale = 1.0; end
-		if (typ == "Han") then scale = 1.6; end
+		if (typ == "Ham") then scale = 0.8; end
+		if (typ == "Han") then scale = 1.3; end
 		if (typ == "Kni") then scale = 2.0; end
-		if (typ == "Mac") then scale = 0.8; end
-		if (typ == "Mis") then scale = 1.0; end
+		if (typ == "Mac") then scale = 1.0; end
+		if (typ == "Mis") then scale = 1.5; end
 		if (typ == "Pol") then scale = 0.8; end
 		if (typ == "Sta") then scale = 0.8; pos = 0.3; end
 		if (typ == "Swo") then scale = 1.0; pos = 0.8; end
 		if (typ == "Thr") then scale = 1.6; pos = 0.8; end
 		if (typ == "Tot") then scale = 1.5; end
-		if (typ == "Wan") then scale = 2.0; end
+		if (typ == "Wan") then scale = 1.8; end
 	end
 --	p("Setting model: ", class, file);
 	EnhancedTooltipPreview:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
