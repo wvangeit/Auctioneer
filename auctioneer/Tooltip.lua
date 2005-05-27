@@ -36,9 +36,12 @@ function TT_OnLoad()
 		GameTooltip.SetLootItem = TT_GameTooltip_SetLootItem;
 		Orig_GameTooltip_SetQuestItem = GameTooltip.SetQuestItem;
 		GameTooltip.SetQuestItem = TT_GameTooltip_SetQuestItem;
+		Orig_GameTooltip_SetQuestLogItem = GameTooltip.SetQuestLogItem;
+		GameTooltip.SetQuestLogItem = TT_GameTooltip_SetQuestLogItem;
 		Orig_GameTooltip_SetInventoryItem = GameTooltip.SetInventoryItem;
 		GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
-
+		Orig_GameTooltip_SetMerchantItem = GameTooltip.SetMerchantItem;
+		GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
 
 		-- Hook the hide function so we can disappear
 		Orig_GameTooltip_OnHide = GameTooltip_OnHide;
@@ -180,19 +183,46 @@ function TT_SetIcon(iconPath)
 end
 
 function TT_SetModel(class, file)
+	local scale = 1.0;
+	local pos = 0.6;
+	local gender = "M";
+	local _, race = UnitRace("player");
 	if (strsub(class, -1) == "*") then
 		class = strsub(class, 0, -2);
-		local _, race = UnitRace("player");
 		race = strsub(race, 0, 2);
-		local gender = "M";
 		if (UnitSex("player") > 0) then gender = "F"; end
 		file = file .. "_" .. race .. gender;
 	end
+	if (gender == "F") then scale = scale * 1.1; end
+	if (race == "Ta") or (race == "Or") then scale = scale * 0.9; end
+	if (race == "Gn") or (race == "Dw") then scale = scale * 1.1; end
+	if (class == "Head") then scale = scale * 1.8; pos = 0.3; end
+	if (class == "Shoulder") then scale = scale * 1.8; pos = 0.5; end
+	if (class == "Weapon") then
+		local typ = strsub(file, 0, 3);
+		if (typ == "Axe") then scale = 0.8; pos = 0.9; end
+		if (typ == "Bow") then scale = 1.0; pos = 0.2; end
+		if (typ == "Clu") then scale = 1.3; end
+		if (typ == "Fir") then scale = 0.8; pos = 1.0; end
+		if (typ == "Gla") then scale = 1.0; end
+		if (typ == "Ham") then scale = 1.0; end
+		if (typ == "Han") then scale = 1.6; end
+		if (typ == "Kni") then scale = 2.0; end
+		if (typ == "Mac") then scale = 0.8; end
+		if (typ == "Mis") then scale = 1.0; end
+		if (typ == "Pol") then scale = 0.8; end
+		if (typ == "Sta") then scale = 0.8; pos = 0.3; end
+		if (typ == "Swo") then scale = 1.0; pos = 0.8; end
+		if (typ == "Thr") then scale = 1.6; pos = 0.8; end
+		if (typ == "Tot") then scale = 1.5; end
+		if (typ == "Wan") then scale = 2.0; end
+	end
 --	p("Setting model: ", class, file);
 	EnhancedTooltipPreview:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
-	EnhancedTooltipPreview:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 1.0, 0.5, 0.5, 0.8, 0.5, 0.5, 1.0);
-	EnhancedTooltipPreview:SetPosition(0.6, -0.1, 0);
+	EnhancedTooltipPreview:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 0.9, 0.6, 0.25, 0.8, 0.25, 0.6, 0.9);
+	EnhancedTooltipPreview:SetPosition(pos, -0.1, 0);
 	EnhancedTooltipPreview:SetRotation(1.5);
+	EnhancedTooltipPreview:SetScale(scale);
 	EnhancedTooltipPreview:Show();
 end
 
@@ -215,9 +245,21 @@ local function nameFromLink(link)
         end
         return nil;
 end
+local function  qualityFromLink(link)
+	local color;
+	if (not link) then return nil; end
+	for color in string.gfind(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r") do
+		if (color == "ffa335ee") then return 4;--[[ Epic ]] end
+		if (color == "ff0070dd") then return 3;--[[ Rare ]] end
+		if (color == "ff1eff00") then return 2;--[[ Uncommon ]] end
+		if (color == "ffffffff") then return 1;--[[ Common ]] end
+		if (color == "ff9d9d9d") then return 0;--[[ Poor ]] end
+	end
+	return -1;
+end
 
-function TT_AddTooltip(frame, name, link, quality, count)
-
+function TT_AddTooltip(frame, name, link, quality, count, price)
+	-- Empty function; hook here if you want in on the action!
 end
 
 function TT_Chat_OnHyperlinkShow(link)
@@ -233,8 +275,6 @@ function TT_Chat_OnHyperlinkShow(link)
 			TT_AddTooltip(ItemRefTooltip, name, fabricatedLink, -1, 1);
 			TT_Show(ItemRefTooltip);
 		end
-	else
-		TT_Hide();
 	end
 end
 
@@ -263,6 +303,7 @@ function TT_ContainerFrameItemButton_OnEnter()
 	
 	if( name ) then
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
+		if (quality == nil) then quality = qualityFromLink(link); end
 
 		TT_Clear();
 		TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
@@ -285,6 +326,7 @@ function TT_ContainerFrame_Update(frame)
 			
 			if( name ) then
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
+				if (quality == nil) then quality = qualityFromLink(link); end
 
 				TT_Clear()
 				TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
@@ -302,6 +344,7 @@ function TT_GameTooltip_SetLootItem(this, slot)
 	local name = nameFromLink(link);
 	if( name ) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
+		if (quality == nil) then quality = qualityFromLink(link); end
 		TT_Clear()
 		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
@@ -310,11 +353,27 @@ end
 
 function TT_GameTooltip_SetQuestItem(this, qtype, slot)
 	Orig_GameTooltip_SetQuestItem(this, qtype, slot);
-	local link = GetQuestItemLink(slot);
-	local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
-	TT_Clear();
-	TT_AddTooltip(GameTooltip, name, link, quality, quantity);
-	TT_Show(GameTooltip);
+	local link = GetQuestItemLink(qtype, slot);
+	if (link) then
+		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
+		TT_Clear();
+		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_Show(GameTooltip);
+	end
+end
+
+function TT_GameTooltip_SetQuestLogItem(this, qtype, slot)
+	Orig_GameTooltip_SetQuestLogItem(this, qtype, slot);
+	local link = GetQuestLogItemLink(qtype, slot);
+	if (link) then
+		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot);
+		if (name == nil) then name = nameFromLink(link); end
+		quality = qualityFromLink(link); -- I don't trust the quality returned from the above function.
+
+		TT_Clear();
+		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_Show(GameTooltip);
+	end
 end
 
 function TT_GameTooltip_SetInventoryItem(this, unit, slot)
@@ -324,14 +383,26 @@ function TT_GameTooltip_SetInventoryItem(this, unit, slot)
 		local name = nameFromLink(link);
 		local quantity = GetInventoryItemCount(unit, slot);
 		local quality = GetInventoryItemQuality(unit, slot);
+		if (quality == nil) then quality = qualityFromLink(link); end
+
 		TT_Clear();
 		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
-	else
-		TT_Hide();
 	end
 
 	return hasItem, hasCooldown, repairCost;
+end
+
+function TT_GameTooltip_SetMerchantItem(this, slot)
+	Orig_GameTooltip_SetMerchantItem(this, slot);
+	local link = GetMerchantItemLink(slot);
+	if (link) then
+		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot);
+		local quality = qualityFromLink(link);
+		TT_Clear();
+		TT_AddTooltip(GameTooltip, name, link, quality, quantity, price);
+		TT_Show(GameTooltip);
+	end
 end
 
 

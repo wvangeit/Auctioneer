@@ -467,7 +467,7 @@ local function bidBrokerFilter(minProfit, signature)
     local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
     
-    if getUsableMedian(name) then  -- only add if we have seen it enough times to have a usable median
+    if getUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
         local currentBid = getCurrentBid(signature);
         local hsp = getHighestSellablePriceForOne(itemKey, true);
         local profit = (hsp * count) - currentBid;
@@ -864,6 +864,7 @@ end
 function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	Auctioneer_OldTooltip(frame, name, link, quality, count);
 
+	if (not link) then p("No link was passed to the client");  return; end
 	local itemID, randomProp, enchant, uniqID, lame = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 	if (Auctioneer_GetFilter("all")) then
@@ -1619,14 +1620,16 @@ local function roundDownTo95(copper)
 end
 
 function Auctioneer_FindItemInBags(findName)
-	for bag = 0, 4 do
+	for bag = 0, 4, 1 do
 		size = GetContainerNumSlots(bag);
 		if (size) then
 			for slot = size, 1, -1 do
 				local link = GetContainerItemLink(bag, slot);
-				local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
-				if (itemName == findName) then
-					return bag, slot, itemID, randomProp, enchant, uniqID;
+				if (link) then
+					local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
+					if (itemName == findName) then
+						return bag, slot, itemID, randomProp, enchant, uniqID;
+					end
 				end
 			end
 		end
