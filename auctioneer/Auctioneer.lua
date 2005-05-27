@@ -816,7 +816,7 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
         if (nullSafe(aiBuyoutPrice) > 0) then
             newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
         end        
-        AuctionPrices[auctionKey()][aiKey] = {data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
+        AuctionPrices[auctionKey()][aiKey] = {name=aiName, data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
         
         -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
