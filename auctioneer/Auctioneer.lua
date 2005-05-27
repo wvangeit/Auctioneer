@@ -916,12 +916,12 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
                     if median and Auctioneer_GetFilter("median") then
                         local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey);
                         local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
-                        if historicalMedian then
-                            TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount, ": "), historicalMedian)
+                        if historicalMedian and historicalMedCount > snapshotMedCount  then
+                            TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian)
 							TT_LineColor(0.1,0.8,0.5);
                         end
-                        if snapshotMedian and snapshotMedCount < historicalMedCount then
-                            TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount, ": "), snapshotMedian)
+                        if snapshotMedian then
+                            TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian)
 							TT_LineColor(0.1,0.8,0.5);
                         end
                     end
