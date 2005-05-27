@@ -308,7 +308,7 @@ end
 -- returns the auction price data for an auction
 local function getAuctionPriceData(itemKey, from)
 	local auctionItem = getAuctionPriceItem(itemKey, from);
-	if (auctionItem == nil) then 
+	if (auctionItem == nil) or (auctionItem.data == nil) then 
 		link = "0:0:0:0:0:0:0";
     else
         link = auctionItem.data;
@@ -863,14 +863,21 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		TT_AddLine(name);
 		TT_LineQuality(quality);
 
+		if (Auctioneer_GetFilter("showlink")) then
+			TT_AddLine("Link: " .. itemKey .. ":" .. uniqID);
+			TT_LineQuality(quality);
+		end
+
 		local money = nil;
 		local itemInfo = nil;
 
 		if (itemID > 0) then
-			Auctioneer_SetModelByID(itemID);
+			if (Auctioneer_GetFilter("mesh")) then
+				Auctioneer_SetModelByID(itemID);
+			end
+
 			frame.eDone = 1;
-            -- TODO: fix this bug, can't just look up by name anymore need to use the new AuctionPrices key too
-			local itemData = getAuctionPriceData(name);
+			local itemData = getAuctionPriceData(itemKey);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 			itemInfo = Auctioneer_BasePrices[itemID];
 
@@ -939,7 +946,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				if (also == "opposite") then
 					also = oppositeKey();
 				end
-				local itemData = getAuctionPriceData(itemID, also);
+				local itemData = getAuctionPriceData(itemKey, also);
 				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 				local avgQty = math.floor(minCount / aCount);
 				local avgMin = math.floor(minPrice / minCount);
@@ -1084,209 +1091,9 @@ end
 
 
 local function Auctioneer_Tooltip_Hook(frame, name, count, data)
---	Auctioneer_AddTooltipInfo(frame, name, count, data);
 	Auctioneer_Old_Tooltip_Hook(frame, name, count, data);
 end
-
 function Auctioneer_AddTooltipInfo(frame, name, count, data)
---[[	if (Auctioneer_GetFilter("all")) then
-		local money = nil;
-		local itemInfo = nil;
-
-		local itemID = getNumericItemId(name);
-		if (itemID > 0) then
-			frame.eDone = 1;
-			local itemData = getAuctionPriceData(name);
-			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-			itemInfo = Auctioneer_BasePrices[itemID];
-
-			if (aCount == 0) then
-				frame:AddLine("Never seen at auction", 0.5, 0.8, 0.5);
-			else
-				local avgQty = math.floor(minCount / aCount);
-				local avgMin = math.floor(minPrice / minCount);
-
-				local bidPct = math.floor(bidCount / minCount * 100);
-				local avgBid = 0;
-				if (bidCount > 0) then
-					avgBid = math.floor(bidPrice / bidCount);
-				end
-				
-				local buyPct = math.floor(buyCount / minCount * 100);
-				local avgBuy = 0;
-				if (buyCount > 0) then
-					avgBuy = math.floor(buyPrice / buyCount);
-				end
-                
-                
-                local median, medCount = getUsableMedian(name);
-
-				if (Auctioneer_GetFilter("average")) then
-					frame:AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount), 0.5,0.8,0.1);
-					if (avgQty > 1) then
-						frame:AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
-					else
-						frame:AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
-					end
-                    if median and Auctioneer_GetFilter("median") then
-                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(name);
-                        local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(name);
-                        if historicalMedian then
-                            frame:AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount, Auctioneer_GetTextGSC(historicalMedian)),0.1,0.8,0.5);
-                        end
-                        if snapshotMedian and snapshotMedCount < historicalMedCount then
-                            frame:AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount, Auctioneer_GetTextGSC(snapshotMedian)),0.1,0.8,0.5);
-                        end
-                    end
-				end
-				if (Auctioneer_GetFilter("suggest")) then
-					if (count > 1) then
-                        local buyoutPriceForOne = median;
-                        if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
-                        if (avgMin > buyoutPriceForOne) then aveMin = buyoutPriceForOne / 2 end
-						frame:AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
-					end
-				end
-				if (Auctioneer_GetFilter("stats")) then
-					frame:AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), 0.1,0.5,0.8);
-				end
-			end
-            
-			local also = Auctioneer_GetFilterVal("also");
-			if (also ~= "on") then
-				if (also == "opposite") then
-					also = oppositeKey();
-				end
-				local itemData = getAuctionPriceData(itemID, also);
-				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-				local avgQty = math.floor(minCount / aCount);
-				local avgMin = math.floor(minPrice / minCount);
-
-				local bidPct = math.floor(bidCount / minCount * 100);
-				local avgBid = 0;
-				if (bidCount > 0) then
-					avgBid = math.floor(bidPrice / bidCount);
-				end
-				
-				local buyPct = math.floor(buyCount / minCount * 100);
-				local avgBuy = 0;
-				if (buyCount > 0) then
-					avgBuy = math.floor(buyPrice / buyCount);
-				end
-
-				if (aCount == 0) then
-					frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also), 0.5,0.8,0.1);
-				else
-					if (Auctioneer_GetFilter("average")) then
-						frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also), 0.5,0.8,0.1);
-						if (avgQty > 1) then
-							frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty), 0.1,0.8,0.5);
-						else
-							frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)), 0.1,0.8,0.5);
-						end
-						if (Auctioneer_GetFilter("suggest")) then
-							if (count > 1) then
-								frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)), 0.5,0.5,0.8);
-							end
-						end
-					end
-					if (Auctioneer_GetFilter("stats")) then
-						frame:AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), 0.1,0.5,0.8);
-					end
-				end
-			end            
-            
-			if ((data ~= nil) and (data.price ~= nil)) then
-				money = data.price;
-			else
-				money = 0;
-			end
-		end
-		if (money == nil) then
-			money = 0;
-		end
-
-		local sellNote = "";
-		local buyNote = "";
-		local sell = money;
-		local buy = sell * 4;
-		local quant = 1;
-		local stacks = 1;
-		local class = "";
-		local uses = "";
-		if (itemInfo) then
-			buyNote = "*"
-			stacks = itemInfo.x;
-			if (not stacks) then stacks = 1; end
-			quant = nullSafe(itemInfo.q);
-			if (quant < 1) then quant = 1; end
-			if (quant > 1) then
-				buyNote = "*";
-			end
-			buy = nullSafe(itemInfo.b) / quant;
-			if ((not sell) or (sell == "") or (sell <= 0))  then
-				sellNote = "*"
-				sell = nullSafe(itemInfo.s);
-			end;
-			if (itemInfo.c) then
-				class = itemInfo.c;
-			end
-			if (itemInfo.u) then
-				uses = itemInfo.u;
-			end
-		end
-
-		if (Auctioneer_GetFilter("vendor")) then
-			if ((buy > 0) or (sell > 0)) then
-				local bgsc = Auctioneer_GetTextGSC(buy);
-				local sgsc = Auctioneer_GetTextGSC(sell);
-                
-				if (count and (count > 1)) then
-					local bqgsc = Auctioneer_GetTextGSC(buy*count);
-					local sqgsc = Auctioneer_GetTextGSC(sell*count);
-					if (Auctioneer_GetFilter("vendorbuy")) then
-						frame:AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bqgsc, bgsc), 0.8, 0.5, 0.1);
-					end
-					if (Auctioneer_GetFilter("vendorsell")) then
-						frame:AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sqgsc, sgsc), 0.8, 0.5, 0.1);
-					end
-				else
-					if (Auctioneer_GetFilter("vendorbuy")) then
-						if (Auctioneer_GetFilter("vendorsell")) then
-							frame:AddLine(string.format(AUCT_FRMT_INFO_BUYSELL, buyNote, bgsc, sellNote, sgsc), 0.8, 0.5, 0.1);
-						else 
-							frame:AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote, bgsc), 0.8, 0.5, 0.1);
-						end
-					elseif (Auctioneer_GetFilter("vendorsell")) then
-						frame:AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote, sgsc), 0.8, 0.5, 0.1);
-					end
-				end
-			end
-		end
-
-		if (Auctioneer_GetFilter("stacksize")) then
-			if (stacks > 1) then
-				frame:AddLine(string.format(AUCT_FRMT_INFO_STX, stacks));
-			end
-		end
-		if (Auctioneer_GetFilter("usage")) then
-			local reagentInfo = "";
-			if (class ~= "") then
-				if (uses ~= "") then
-					reagentInfo = string.format(AUCT_FRMT_INFO_CLASSUSE, class, uses);
-				else
-					reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, class);
-				end
-			elseif (uses ~= "") then
-				reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
-			end
-			if (reagentInfo ~= "") then
-				frame:AddLine(reagentInfo, 0.6, 0.4, 0.8);
-			end
-		end
-	end
-	frame:Show();
-]]
 end
 
 -- hook to capture data about an auction that was boughtout
@@ -1317,25 +1124,13 @@ function Auctioneer_OnLoad()
     this:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
     this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
     
-    
-	lOriginalGameTooltip_ClearMoney = GameTooltip_ClearMoney;
-	GameTooltip_ClearMoney = Auctioneer_GameTooltip_ClearMoney;
-
-	lOriginalGameTooltip_OnHide = GameTooltip_OnHide;
-	GameTooltip_OnHide = Auctioneer_GameTooltip_OnHide;
-
-	lOriginalSetItemRef = SetItemRef;
-	SetItemRef = Auctioneer_SetItemRef;
-	
---	Auctioneer_Old_Tooltip_Hook = LootLink_AddExtraTooltipInfo;
---	LootLink_AddExtraTooltipInfo = Auctioneer_Tooltip_Hook;
-
-	Auctioneer_OldTooltip = TT_AddTooltip;
-	TT_AddTooltip = Auctioneer_NewTooltip;
-
 	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
 	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
     Auctioneer_Event_FinishedAuctionScan = Auctioneer_FinishedAuctionScan_Hook;
+
+	-- Hook in new tooltip code
+	Auctioneer_OldTooltip = TT_AddTooltip;
+	TT_AddTooltip = Auctioneer_NewTooltip;
 
     -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
@@ -1431,14 +1226,13 @@ function Auctioneer_Command(command)
             lSnapshotItemPrices = {};            
 		else
 			local items = Auctioneer_GetItems(param);
-			for _,item in items do
+			for _,itemKey in items do
 				local aKey = auctionKey();
-                -- TODO: fix this bug
-				if (AuctionPrices[aKey][item] ~= nil) then
-					AuctionPrices[aKey][item] = nil;
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, item));
+				if (AuctionPrices[aKey][itemKey] ~= nil) then
+					AuctionPrices[aKey][itemKey] = nil;
+					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, itemKey));
 				else
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, item));
+					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, itemKey));
 				end
 			end
 		end
@@ -1460,7 +1254,7 @@ function Auctioneer_Command(command)
         doMedian(param);  
     elseif (cmd == "hsp") then
         doHSP(param);  
-	elseif ((cmd == "average") or (cmd == "median") or(cmd == "suggest") or (cmd == "stats") or (cmd == "vendor") or (cmd == "usage") or (cmd == "stacksize") or (cmd == "vendorsell") or (cmd == "vendorbuy")) then
+	elseif ((cmd == "average") or (cmd == "median") or(cmd == "suggest") or (cmd == "stats") or (cmd == "vendor") or (cmd == "usage") or (cmd == "stacksize") or (cmd == "vendorsell") or (cmd == "vendorbuy") or (cmd == "mesh") or (cmd == "showlink")) then
 		if ((param == "false") or (param == "off") or (param == "no") or (param == "0")) then
 			Auctioneer_SetFilter(cmd, "off");
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
@@ -1498,7 +1292,10 @@ end
 function Auctioneer_GetFilterVal(type)
 	if (not AuctionConfig.filters) then AuctionConfig.filters = {}; end
 	value = AuctionConfig.filters[type];
-	if (not value) then return "on"; end
+	if (not value) then
+		if (type == "showlink") then return "off"; end
+		return "on";
+	end
 	return value;
 end
 
@@ -1529,67 +1326,13 @@ end
 function Auctioneer_GetItems(str)
 	local itemList = {};
 	local listSize = 0;
-	for item in string.gfind(str, "|Hitem:[^|]+|h[[]([^]]+)[]]|h") do
+	for itemLink in string.gfind(str, "|Hitem:([^|]+)|h[[][^]]+[]]|h") do
+		local itemID, randomProp, enchant, uniqID, lame = breakLink(link);
+		local itemKey = itemID..":"..randomProp..":"..enchant;
 		listSize = listSize+1;
-		itemList[listSize] = item;
-	end
-	if (listSize == 0) then
-		listSize = listSize+1;
-		itemList[listSize] = str;
+		itemList[listSize] = itemKey;
 	end
 	return itemList;
-end
-
-
-function Auctioneer_GameTooltip_ClearMoney()
-	lOriginalGameTooltip_ClearMoney();
-	lAuctioneerCheckTooltip = Auctioneer_CheckTooltipInfo(GaeTooltip);
-end
-
-function Auctioneer_GameTooltip_OnHide()
-	lOriginalGameTooltip_OnHide();
-	GameTooltip.eDone = nil;
-	if ( lAuctioneerTooltip ) then
-		lAuctioneerTooltip.eDone = nil;
-		lAuctioneerTooltip = nil;
-	end
-end
-
-function Auctioneer_OnUpdate(elapsed)
-	lAuctioneerCheckTimer = lAuctioneerCheckTimer + elapsed;
-	if( lAuctioneerCheckTimer >= 0.2 ) then
-		if( lAuctioneerCheckTooltip ) then
-			lAuctioneerCheckTooltip = Auctioneer_CheckTooltipInfo(lAuctioneerTooltip);
-		end
-		lAuctioneerCheckTimer = 0;
-	end
-end
-
-function Auctioneer_SetItemRef(link)
-	lOriginalSetItemRef(link);
-	lAuctioneerCheckTooltip = Auctioneer_CheckTooltipInfo(ItemRefTooltip);
-end
-
-function Auctioneer_CheckTooltipInfo(frame)
-	-- If we've already added our information, no need to do it again
-	if ( not frame or frame.eDone ) then
-		return nil;
-	end
-
-	lAuctioneerTooltip = frame;
-
-	if( frame:IsVisible() ) then
-		local field = getglobal(frame:GetName().."TextLeft1");
-		if( field and field:IsVisible() ) then
-			local name = field:GetText();
-			if( name ) then
-				Auctioneer_AddTooltipInfo(frame, name);
-				return nil;
-			end
-		end
-	end
-	
-	return 1;
 end
 
 -- this function takes copper and rounds to 5 silver below the the nearest gold if it is 15 silver above of an even gold
@@ -1692,15 +1435,15 @@ function Auctioneer_OnEvent(event)
 end
 
 
-local function getRRP(itemID, from)
+local function getRRP(itemKey, from)
 	if (from == nil) then from = auctionKey(); end
 	if (from == "also") then from = Auctioneer_GetFilterVal(also); end
 	if ((from == "on") or (from == "off")) then return 0; end
 	if (from == "opposite") then from = oppositeKey(); end
 		
-	local itemData = getAuctionPriceData(itemID, from);
+	local itemData = getAuctionPriceData(itemKey, from);
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
---	p("Getting data from "..from.." for "..itemID, itemData);
+--	p("Getting data from "..from.." for "..itemKey, itemData);
 
 	local bidRatio = bidCount/minCount;
 	local avgMin = minPrice/minCount;

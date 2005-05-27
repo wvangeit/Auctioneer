@@ -13,7 +13,6 @@ function TT_OnLoad()
         if (TT_LOADED ~= nil) then 
                 return; 
         end
-
 		EnhancedTooltip:SetBackdropColor(0,0,0);
 		TT_Clear();
 
@@ -81,9 +80,10 @@ function TT_Show(currentTooltip)
 	local reposition = false;
 	local fTop = currentTooltip:GetTop();
 	local fLeft = currentTooltip:GetLeft();
-	local fWidth = currentTooltip:GetWidth();
 	local fRight = currentTooltip:GetRight();
 	local fBottom = currentTooltip:GetBottom();
+	local fWidth = currentTooltip:GetWidth();
+	local fHeight = currentTooltip:GetHeight();
 
 	if (fWidth > minWidth) and (width > fWidth) then
 		width = fWidth;
@@ -109,7 +109,7 @@ function TT_Show(currentTooltip)
 	if (reposition) then
 --		p("Repositioning to", fLeft, fTop);
 		currentTooltip:ClearAllPoints();
-		currentTooltip:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", fLeft, (sHeight-fTop)*-1);
+		currentTooltip:SetPoint("BOTTOMRIGHT", "UIParent", "TOPLEFT", fLeft+fWidth, (sHeight-fTop+fHeight)*-1 );
 	end
 	
 	EnhancedTooltip:SetHeight(height);
