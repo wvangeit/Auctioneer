@@ -542,7 +542,7 @@ function doBroker(minProfit)
 		local itemKey = id .. ":" .. rprop..":"..enchant;
         local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true);
         local profit = (hsp * count) - buyout;
-		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x"), seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit));
+		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit));
         Auctioneer_ChatPrint(output);
     end
     
