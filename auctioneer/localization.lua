@@ -65,8 +65,8 @@ AUCT_FRMT_HSP_LINE = "Highest Sellable Price for one %s is: %s";
 AUCT_FRMT_INFO_SEEN = "Seen %d times at auction total";
 AUCT_FRMT_INFO_FORONE = "For 1: %s min/%s buyout (%s bid) [in %d's]";
 AUCT_FRMT_INFO_AVERAGE = "%s min/%s buyout (%s bid)"
-AUCT_FRMT_INFO_HISTMED = "Last %d seen, buyout median: %s";
-AUCT_FRMT_INFO_SNAPMED = "Last scan %d seen, buyout median: %s";
+AUCT_FRMT_INFO_HISTMED = "Last %d seen, buyout median:";
+AUCT_FRMT_INFO_SNAPMED = "Last scan %d seen, buyout median:";
 AUCT_FRMT_INFO_YOURSTX = "Your %d stack: %s min/%s buyout (%s bid)";
 AUCT_FRMT_INFO_BIDRATE = "%d%% have bids, %d%% have buyout";
 
