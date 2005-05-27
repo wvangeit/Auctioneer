@@ -34,6 +34,7 @@ Auctioneer_BasePrices = {
 	[120]={b=4,s=1,d=10006,c=AUCT_CLAS_ARMOR},  -- Thug Pants
 	[121]={b=4,s=1,d=10008,c=AUCT_CLAS_ARMOR},  -- Thug Boots
 	[127]={b=1,s=1,d=9996,c=AUCT_CLAS_ARMOR},  -- Trapper's Shirt
+	[128]={b=5,s=1,d=396,c=AUCT_CLAS_ARMOR},  -- Deprecated Tauren Trapper's Pants
 	[129]={b=5,s=1,d=9977,c=AUCT_CLAS_ARMOR},  -- Rugged Trapper's Boots
 	[139]={b=4,s=1,d=9988,c=AUCT_CLAS_ARMOR},  -- Brawler's Pants
 	[140]={b=4,s=1,d=9992,c=AUCT_CLAS_ARMOR},  -- Brawler's Boots
@@ -83,7 +84,11 @@ Auctioneer_BasePrices = {
 	[733]={b=400,s=100,d=6428,x=20,c=AUCT_CLAS_FOOD},  -- Westfall Stew
 	[735]={b=0,s=0,d=7093},  -- Rolf and Malakai's Medallions
 	[737]={b=0,s=0,d=926,c=AUCT_CLAS_POTION},  -- Holy Spring Water
+	[738]={b=0,s=0,d=1297,q=20,x=20},  -- Sack of Barley
+	[739]={b=0,s=0,d=11994,q=20,x=20},  -- Sack of Corn
+	[740]={b=0,s=0,d=11998,q=20,x=20},  -- Sack of Rye
 	[742]={b=0,s=0,d=928},  -- A Sycamore Branch
+	[743]={b=0,s=0,d=929},  -- Bundle of Charred Oak
 	[744]={b=40000,s=10000,d=18059,c=AUCT_CLAS_ARMOR},  -- Thunderbrew's Boot Flask
 	[745]={b=0,s=0,d=1102,c=AUCT_CLAS_WRITTEN},  -- Marshal McBride's Documents
 	[748]={b=0,s=0,d=1102,c=AUCT_CLAS_WRITTEN},  -- Stormwind Armor Marker
@@ -188,6 +193,8 @@ Auctioneer_BasePrices = {
 	[890]={b=17588,s=3517,d=20386,c=AUCT_CLAS_WEAPON},  -- Twisted Chanter's Staff
 	[892]={b=1849,s=369,d=16950,c=AUCT_CLAS_ARMOR},  -- Gnoll Casting Gloves
 	[893]={b=550,s=137,d=959,x=10},  -- Dire Wolf Fang
+	[895]={b=0,s=0,d=7103,q=20,x=20},  -- Worgen Skull
+	[896]={b=0,s=0,d=959,q=20,x=20},  -- Worgen Fang
 	[897]={b=5112,s=1022,d=17011,c=AUCT_CLAS_ARMOR},  -- Madwolf Bracers
 	[899]={b=6241,s=1248,d=6459,c=AUCT_CLAS_WEAPON},  -- Venom Web Fang
 	[910]={b=0,s=0,d=3024,c=AUCT_CLAS_WRITTEN},  -- An Undelivered Letter
@@ -225,6 +232,7 @@ Auctioneer_BasePrices = {
 	[962]={b=0,s=0,d=6385},  -- Pork Belly Pie
 	[981]={b=0,s=0,d=1399},  -- Bernice's Necklace
 	[983]={b=108,s=21,d=4878,c=AUCT_CLAS_ARMOR},  -- Red Linen Sash
+	[997]={b=17,s=3,d=859,c=AUCT_CLAS_WEAPON},  -- Fire Sword of Crippling
 	[1006]={b=0,s=0,d=224},  -- Brass Collar
 	[1008]={b=720,s=144,d=1550,c=AUCT_CLAS_WEAPON},  -- Well-used Sword
 	[1009]={b=2451,s=490,d=8583,c=AUCT_CLAS_WEAPON},  -- Compact Hammer
@@ -234,6 +242,8 @@ Auctioneer_BasePrices = {
 	[1015]={b=96,s=24,d=6348,x=10,u=AUCT_TYPE_COOK},  -- Lean Wolf Flank
 	[1017]={b=400,s=100,d=1116,x=20},  -- Seasoned Wolf Kabob
 	[1019]={b=0,s=0,d=1272,q=20,x=20},  -- Red Linen Bandana
+	[1024]={b=6,s=1,d=15304,c=AUCT_CLAS_ARMOR},  -- Plate Helmet D2 (test)
+	[1027]={b=6,s=1,d=15294,c=AUCT_CLAS_ARMOR},  -- Mail Helmet A (Test)
 	[1074]={b=1965,s=491,d=6619,x=5},  -- Hard Spider Leg Tip
 	[1075]={b=0,s=0,d=7236,q=20,x=20},  -- Shadowhide Pendant
 	[1076]={b=2600,s=650,d=6012,c=AUCT_CLAS_ARMOR},  -- Defias Renegade Ring
@@ -372,6 +382,7 @@ Auctioneer_BasePrices = {
 	[1384]={b=56,s=11,d=1546,c=AUCT_CLAS_WEAPON},  -- Dull Blade
 	[1386]={b=160,s=32,d=19247,c=AUCT_CLAS_WEAPON},  -- Thistlewood Axe
 	[1387]={b=7892,s=1578,d=20087,c=AUCT_CLAS_WEAPON},  -- Ghoulfang
+	[1388]={b=71,s=14,d=20450,c=AUCT_CLAS_WEAPON},  -- Crooked Staff
 	[1389]={b=291,s=58,d=8575,c=AUCT_CLAS_WEAPON},  -- Kobold Mining Mallet
 	[1391]={b=6961,s=1392,d=20410,c=AUCT_CLAS_WEAPON},  -- Riverpaw Mystic Staff
 	[1394]={b=3700,s=740,d=5204,c=AUCT_CLAS_WEAPON},  -- Driftwood Club
@@ -649,6 +660,8 @@ Auctioneer_BasePrices = {
 	[1894]={b=0,s=0,d=3029,q=20,x=20},  -- Miners' Union Card
 	[1913]={b=742,s=148,d=5009,c=AUCT_CLAS_WEAPON},  -- Studded Blackjack
 	[1917]={b=1256,s=251,d=20435,c=AUCT_CLAS_WEAPON},  -- Jeweled Dagger
+	[1922]={b=0,s=0,d=1283},  -- Supplies for Sven
+	[1923]={b=0,s=0,d=1625},  -- Ambassador's Satchel
 	[1925]={b=3938,s=787,d=20114,c=AUCT_CLAS_WEAPON},  -- Defias Rapier
 	[1926]={b=3438,s=687,d=5225,c=AUCT_CLAS_WEAPON},  -- Weighted Sap
 	[1927]={b=3451,s=690,d=19276,c=AUCT_CLAS_WEAPON},  -- Deadmines Cleaver
@@ -756,6 +769,7 @@ Auctioneer_BasePrices = {
 	[2080]={b=32954,s=6590,d=19400,c=AUCT_CLAS_WEAPON},  -- Hillborne Axe
 	[2082]={b=1000,s=250,d=2588,c=AUCT_CLAS_CONTAINER},  -- Wizbang's Gunnysack
 	[2084]={b=28547,s=5709,d=20152,c=AUCT_CLAS_WEAPON},  -- Darksteel Bastard Sword
+	[2085]={b=60,s=15,d=1116,x=5},  -- Chunk of Flesh
 	[2087]={b=1262,s=252,d=17095,c=AUCT_CLAS_ARMOR},  -- Hard Crawler Carapace
 	[2088]={b=3648,s=729,d=6455,c=AUCT_CLAS_WEAPON},  -- Long Crawler Limb
 	[2089]={b=5567,s=1113,d=20407,c=AUCT_CLAS_WEAPON},  -- Scrimshaw Dagger
@@ -1021,6 +1035,7 @@ Auctioneer_BasePrices = {
 	[2474]={b=17233,s=3446,d=14493,c=AUCT_CLAS_ARMOR},  -- Reinforced Leather Bracers
 	[2475]={b=17298,s=3459,d=2686,c=AUCT_CLAS_ARMOR},  -- Reinforced Leather Gloves
 	[2476]={b=0,s=0,d=2376,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Chilled Basilisk Haunch
+	[2477]={b=0,s=0,d=23527,q=20,x=20},  -- Ravager's Skull
 	[2479]={b=107,s=21,d=8512,c=AUCT_CLAS_WEAPON},  -- Broad Axe
 	[2480]={b=72,s=14,d=19601,c=AUCT_CLAS_WEAPON},  -- Large Club
 	[2488]={b=536,s=107,d=22078,c=AUCT_CLAS_WEAPON},  -- Gladius
@@ -1091,6 +1106,7 @@ Auctioneer_BasePrices = {
 	[2583]={b=1796,s=359,d=13524,c=AUCT_CLAS_ARMOR},  -- Woolen Boots
 	[2584]={b=711,s=142,d=23144,c=AUCT_CLAS_ARMOR},  -- Woolen Cape
 	[2585]={b=3193,s=638,d=12669,c=AUCT_CLAS_ARMOR},  -- Gray Woolen Robe
+	[2586]={b=6,s=1,d=22033,c=AUCT_CLAS_ARMOR},  -- Gamemaster's Robe
 	[2587]={b=800,s=200,d=10892,c=AUCT_CLAS_ARMOR},  -- Gray Woolen Shirt
 	[2589]={b=55,s=13,d=7383,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_FSTAID..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Linen Cloth
 	[2590]={b=20,s=5,d=18597,x=5},  -- Forest Spider Webbing
@@ -1152,6 +1168,7 @@ Auctioneer_BasePrices = {
 	[2659]={b=0,s=0,d=18105},  -- Modr Fragment
 	[2660]={b=0,s=0,d=18104},  -- Golm Fragment
 	[2661]={b=0,s=0,d=18106},  -- Neru Fragment
+	[2662]={b=35000,s=8750,d=21712,c=AUCT_CLAS_CONTAINER},  -- Ribbly's Quiver
 	[2663]={b=35000,s=8750,d=1816,c=AUCT_CLAS_CONTAINER},  -- Ribbly's Bandolier
 	[2665]={b=20,s=5,d=6396,x=20,u=AUCT_TYPE_COOK},  -- Stormwind Seasoning Herbs
 	[2666]={b=0,s=0,d=7923},  -- Barrel of Thunder Ale
@@ -1267,7 +1284,9 @@ Auctioneer_BasePrices = {
 	[2834]={b=0,s=0,d=3152,q=20,x=20},  -- Embalming Ichor
 	[2835]={b=8,s=2,d=4714,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH},  -- Rough Stone
 	[2836]={b=60,s=15,d=4715,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH},  -- Coarse Stone
+	[2837]={b=0,s=0,d=924,c=AUCT_CLAS_WRITTEN},  -- Thurman's Letter
 	[2838]={b=240,s=60,d=4716,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH},  -- Heavy Stone
+	[2839]={b=0,s=0,d=924,c=AUCT_CLAS_QUEST},  -- A Letter to Yvette
 	[2840]={b=40,s=10,d=7391,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_MINING..", "..AUCT_TYPE_SMITH},  -- Copper Bar
 	[2841]={b=200,s=50,d=7390,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH},  -- Bronze Bar
 	[2842]={b=400,s=100,d=7355,x=20,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH},  -- Silver Bar
@@ -1286,6 +1305,7 @@ Auctioneer_BasePrices = {
 	[2855]={b=0,s=0,d=7207,q=20,x=20},  -- Putrid Claw
 	[2856]={b=0,s=0,d=2868,q=20,x=20},  -- Iron Pike
 	[2857]={b=991,s=198,d=25852,c=AUCT_CLAS_ARMOR},  -- Runed Copper Belt
+	[2858]={b=0,s=0,d=2873,q=20,x=20},  -- Darkhound Blood
 	[2859]={b=0,s=0,d=2874,q=20,x=20},  -- Vile Fin Scale
 	[2862]={b=12,s=3,d=24673,x=20},  -- Rough Sharpening Stone
 	[2863]={b=40,s=10,d=24674,x=20},  -- Coarse Sharpening Stone
@@ -1296,6 +1316,7 @@ Auctioneer_BasePrices = {
 	[2869]={b=9155,s=1831,d=9403,c=AUCT_CLAS_ARMOR},  -- Silvered Bronze Breastplate
 	[2870]={b=14677,s=2935,d=23540,c=AUCT_CLAS_ARMOR},  -- Shining Silver Breastplate
 	[2871]={b=160,s=40,d=24675,x=20},  -- Heavy Sharpening Stone
+	[2872]={b=0,s=0,d=2885,q=20,x=20},  -- Vicious Night Web Spider Venom
 	[2874]={b=0,s=0,d=3020,c=AUCT_CLAS_QUEST},  -- An Unsent Letter
 	[2875]={b=0,s=0,d=11990,q=20,x=20},  -- Scarlet Insignia Ring
 	[2876]={b=0,s=0,d=6660,q=20,x=20},  -- Duskbat Pelt
@@ -1401,6 +1422,7 @@ Auctioneer_BasePrices = {
 	[3012]={b=200,s=50,d=3331,x=5,c=AUCT_CLAS_POTION},  -- Scroll of Agility
 	[3013]={b=100,s=25,d=1093,x=5,c=AUCT_CLAS_POTION},  -- Scroll of Protection
 	[3014]={b=0,s=0,d=7040,q=20,x=20},  -- Battleworn Axe
+	[3016]={b=0,s=0,d=7139},  -- Gunther's Spellbook
 	[3017]={b=0,s=0,d=811,c=AUCT_CLAS_WRITTEN},  -- Sevren's Orders
 	[3018]={b=3906,s=781,d=23027,c=AUCT_CLAS_ARMOR},  -- Hide of Lupos
 	[3019]={b=2115,s=423,d=12682,c=AUCT_CLAS_ARMOR},  -- Noble's Robe
@@ -1414,6 +1436,7 @@ Auctioneer_BasePrices = {
 	[3027]={b=6349,s=1269,d=20670,c=AUCT_CLAS_WEAPON},  -- Heavy Recurve Bow
 	[3030]={b=300,s=0,d=26497,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Razor Arrow
 	[3033]={b=300,s=0,d=5998,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Solid Shot
+	[3035]={b=0,s=0,d=3225,c=AUCT_CLAS_FOOD},  -- Laced Pumpkin
 	[3036]={b=2578,s=515,d=5392,c=AUCT_CLAS_WEAPON},  -- Heavy Shortbow
 	[3037]={b=24071,s=4814,d=20653,c=AUCT_CLAS_WEAPON},  -- Whipwood Recurve Bow
 	[3039]={b=8052,s=1610,d=20672,c=AUCT_CLAS_WEAPON},  -- Short Ash Bow
@@ -1442,10 +1465,14 @@ Auctioneer_BasePrices = {
 	[3076]={b=3184,s=636,d=4873,c=AUCT_CLAS_ARMOR},  -- Smoldering Boots
 	[3078]={b=11572,s=2314,d=20669,c=AUCT_CLAS_WEAPON},  -- Naga Heartpiercer
 	[3079]={b=1486,s=297,d=20738,c=AUCT_CLAS_WEAPON},  -- Skorn's Rifle
+	[3080]={b=0,s=0,d=7066},  -- Candle of Beckoning
+	[3081]={b=0,s=0,d=7185},  -- Nether Gem
+	[3082]={b=0,s=0,d=2853},  -- Dargol's Skull
 	[3083]={b=0,s=0,d=7215,q=20,x=20},  -- Restabilization Cog
 	[3084]={b=0,s=0,d=7072,q=20,x=20},  -- Gyromechanic Gear
 	[3085]={b=0,s=0,d=7922},  -- Barrel of Shimmer Stout
 	[3086]={b=0,s=0,d=7922},  -- Cask of Shimmer Stout
+	[3087]={b=45,s=11,d=18115,x=10},  -- Mug of Shimmer Stout
 	[3103]={b=2334,s=466,d=8588,c=AUCT_CLAS_WEAPON},  -- Coldridge Hammer
 	[3107]={b=75,s=0,d=20779,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Keen Throwing Knife
 	[3108]={b=200,s=0,d=20773,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Heavy Throwing Dagger
@@ -1468,6 +1495,7 @@ Auctioneer_BasePrices = {
 	[3162]={b=0,s=0,d=3233,q=20,x=20},  -- Notched Rib
 	[3163]={b=0,s=0,d=2853,q=20,x=20},  -- Blackened Skull
 	[3164]={b=135,s=33,d=7357,x=10,u=AUCT_TYPE_ALCHEM},  -- Discolored Worg Heart
+	[3165]={b=0,s=0,d=983,c=AUCT_CLAS_POTION},  -- Quinn's Potion
 	[3166]={b=2039,s=407,d=12965,c=AUCT_CLAS_ARMOR},  -- Ironheart Chain
 	[3167]={b=275,s=68,d=6699,x=10},  -- Thick Spider Hair
 	[3169]={b=75,s=18,d=6002,x=10},  -- Chipped Bear Tooth
@@ -1530,15 +1558,19 @@ Auctioneer_BasePrices = {
 	[3233]={b=850,s=212,d=3410,c=AUCT_CLAS_CONTAINER},  -- Gnoll Hide Sack
 	[3234]={b=0,s=0,d=963},  -- Deliah's Ring
 	[3235]={b=1650,s=412,d=9840,c=AUCT_CLAS_ARMOR},  -- Ring of Scorn
+	[3236]={b=0,s=0,d=3152,q=20,x=20},  -- Rot Hide Ichor
+	[3237]={b=0,s=0,d=3152},  -- Sample Ichor
 	[3238]={b=0,s=0,d=3411},  -- Johaan's Findings
 	[3239]={b=12,s=3,d=24683,x=20},  -- Rough Weightstone
 	[3240]={b=40,s=10,d=24684,x=20},  -- Coarse Weightstone
 	[3241]={b=160,s=40,d=24685,x=20},  -- Heavy Weightstone
 	[3248]={b=0,s=0,d=1102,c=AUCT_CLAS_WRITTEN},  -- Translated Letter from The Embalmer
+	[3250]={b=0,s=0,d=1301},  -- Bethor's Scroll
 	[3251]={b=0,s=0,d=8452,c=AUCT_CLAS_POTION},  -- Bethor's Potion
 	[3252]={b=0,s=0,d=3029,c=AUCT_CLAS_WRITTEN},  -- Deathstalker Report
 	[3253]={b=0,s=0,d=3422,q=20,x=20},  -- Grizzled Bear Heart
 	[3254]={b=0,s=0,d=2885,q=20,x=20},  -- Skittering Blood
+	[3255]={b=0,s=0,d=3426,c=AUCT_CLAS_WRITTEN},  -- Berard's Journal
 	[3256]={b=0,s=0,d=3427,q=20,x=20},  -- Lake Skulker Moss
 	[3257]={b=0,s=0,d=3427,q=20,x=20},  -- Lake Creeper Moss
 	[3258]={b=0,s=0,d=5283},  -- Hardened Tumor
@@ -1573,6 +1605,9 @@ Auctioneer_BasePrices = {
 	[3290]={b=241,s=48,d=14509,c=AUCT_CLAS_ARMOR},  -- Ancestral Gloves
 	[3291]={b=1013,s=202,d=14511,c=AUCT_CLAS_ARMOR},  -- Ancestral Woollies
 	[3292]={b=1016,s=203,d=14513,c=AUCT_CLAS_ARMOR},  -- Ancestral Tunic
+	[3293]={b=58,s=11,d=19281,c=AUCT_CLAS_WEAPON},  -- Deadman Cleaver
+	[3294]={b=58,s=11,d=5203,c=AUCT_CLAS_WEAPON},  -- Deadman Club
+	[3295]={b=54,s=10,d=3434,c=AUCT_CLAS_WEAPON},  -- Deadman Blade
 	[3296]={b=54,s=10,d=6442,c=AUCT_CLAS_WEAPON},  -- Deadman Dagger
 	[3297]={b=0,s=0,d=3427,q=20,x=20},  -- Fel Moss
 	[3299]={b=195,s=48,d=6002,x=10},  -- Fractured Canine
@@ -1621,6 +1656,7 @@ Auctioneer_BasePrices = {
 	[3348]={b=0,s=0,d=6646,q=20,x=20},  -- Giant Crocolisk Skin
 	[3349]={b=0,s=0,d=3565},  -- Sida's Bag
 	[3352]={b=5000,s=1250,d=3568,c=AUCT_CLAS_CONTAINER},  -- Ooze-covered Bag
+	[3353]={b=0,s=0,d=6502},  -- Rune-inscribed Pendant
 	[3354]={b=0,s=0,d=6502,q=20,x=20},  -- Dalaran Pendant
 	[3355]={b=200,s=50,d=6524,x=20,c=AUCT_CLAS_HERB,u=AUCT_TYPE_ALCHEM},  -- Wild Steelbloom
 	[3356]={b=120,s=30,d=7346,x=20,c=AUCT_CLAS_HERB,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER},  -- Kingsblood
@@ -1712,6 +1748,7 @@ Auctioneer_BasePrices = {
 	[3456]={b=25500,s=6375,d=15798},  -- Dog Whistle
 	[3457]={b=2220,s=444,d=16850,c=AUCT_CLAS_ARMOR},  -- Stamped Trousers
 	[3458]={b=1670,s=334,d=6982,c=AUCT_CLAS_ARMOR},  -- Rugged Mail Gloves
+	[3460]={b=0,s=0,d=18115},  -- Johaan's Special Drink
 	[3461]={b=5029,s=1005,d=12672,c=AUCT_CLAS_ARMOR},  -- High Robe of the Adjudicator
 	[3462]={b=11418,s=2283,d=28607,c=AUCT_CLAS_WEAPON},  -- Talonstrike
 	[3463]={b=37,s=9,d=20772,x=200,c=AUCT_CLAS_WEAPON},  -- Silver Star
@@ -1746,6 +1783,7 @@ Auctioneer_BasePrices = {
 	[3495]={b=0,s=0,d=3788,c=AUCT_CLAS_POTION},  -- Elixir of Suffering
 	[3496]={b=0,s=0,d=16452,q=20,x=20},  -- Mountain Lion Blood
 	[3497]={b=0,s=0,d=3788,c=AUCT_CLAS_POTION},  -- Elixir of Pain
+	[3498]={b=0,s=0,d=9657},  -- Taretha's Necklace
 	[3499]={b=0,s=0,d=6710},  -- Burnished Gold Key
 	[3502]={b=0,s=0,d=17459,q=20,x=20},  -- Mudsnout Blossoms
 	[3505]={b=0,s=0,d=6012,q=20,x=20},  -- Alterac Signet Ring
@@ -1755,6 +1793,8 @@ Auctioneer_BasePrices = {
 	[3510]={b=0,s=0,d=7110,q=20,x=20},  -- Torn Fin Eye
 	[3511]={b=1338,s=267,d=23020,c=AUCT_CLAS_ARMOR},  -- Cloak of the People's Militia
 	[3514]={b=0,s=0,d=2853},  -- Mor'Ladim's Skull
+	[3515]={b=0,s=0,d=7030},  -- Ataeric's Staff
+	[3516]={b=0,s=0,d=7038},  -- Lescovar's Head
 	[3517]={b=0,s=0,d=7921},  -- Keg of Shindigger Stout
 	[3518]={b=0,s=0,d=1096,c=AUCT_CLAS_WRITTEN},  -- Decrypted Letter
 	[3520]={b=0,s=0,d=7921},  -- Tainted Keg
@@ -1823,8 +1863,10 @@ Auctioneer_BasePrices = {
 	[3614]={b=0,s=0,d=6669},  -- Yowler's Paw
 	[3615]={b=0,s=0,d=7038},  -- Kurzen's Head
 	[3616]={b=0,s=0,d=6521},  -- Mind's Eye
+	[3617]={b=0,s=0,d=7197},  -- Pendant of Shadow
 	[3618]={b=0,s=0,d=7135},  -- Gobbler's Head
 	[3619]={b=0,s=0,d=9515},  -- Snellig's Snuffbox
+	[3621]={b=0,s=0,d=7150},  -- Ivar's Head
 	[3622]={b=0,s=0,d=6371},  -- Essence of Nightlash
 	[3623]={b=0,s=0,d=7038},  -- Thule's Head
 	[3625]={b=0,s=0,d=7141},  -- Nek'rosh's Head
@@ -1836,6 +1878,7 @@ Auctioneer_BasePrices = {
 	[3631]={b=0,s=0,d=7042},  -- Bellygrub's Tusk
 	[3632]={b=0,s=0,d=3916},  -- Fangore's Paw
 	[3633]={b=0,s=0,d=3914},  -- Head of Gath'Ilzogg
+	[3634]={b=0,s=0,d=3917},  -- Head of Grimson
 	[3635]={b=0,s=0,d=3916},  -- Maggot Eye's Paw
 	[3636]={b=0,s=0,d=7043},  -- Scale of Old Murk-Eye
 	[3637]={b=0,s=0,d=3918},  -- Head of VanCleef
@@ -1928,6 +1971,7 @@ Auctioneer_BasePrices = {
 	[3741]={b=4614,s=922,d=17164,c=AUCT_CLAS_ARMOR},  -- Stomping Boots
 	[3742]={b=14311,s=2862,d=20667,c=AUCT_CLAS_WEAPON},  -- Bow of Plunder
 	[3743]={b=12256,s=2451,d=6275,c=AUCT_CLAS_WEAPON},  -- Sentry Buckler
+	[3744]={b=0,s=0,d=1399},  -- Bloodstone Pendant
 	[3745]={b=0,s=0,d=7218,q=20,x=20},  -- Rune of Opening
 	[3747]={b=5462,s=1092,d=11167,c=AUCT_CLAS_ARMOR},  -- Meditative Sash
 	[3748]={b=6524,s=1304,d=10169,c=AUCT_CLAS_ARMOR},  -- Feline Mantle
@@ -2070,6 +2114,7 @@ Auctioneer_BasePrices = {
 	[3908]={b=0,s=0,d=7100,q=20,x=20},  -- Zul'Mamwe Trophy
 	[3909]={b=0,s=0,d=7063},  -- Broken Armor of Ana'thek
 	[3910]={b=0,s=0,d=7171,q=20,x=20},  -- Snuff
+	[3911]={b=0,s=0,d=7205,q=20,x=20},  -- Pulsing Blue Shard
 	[3912]={b=0,s=0,d=7257},  -- Soul Gem
 	[3913]={b=0,s=0,d=6554},  -- Filled Soul Gem
 	[3914]={b=25000,s=6250,d=1283,c=AUCT_CLAS_CONTAINER},  -- Journeyman's Backpack
@@ -2388,6 +2433,7 @@ Auctioneer_BasePrices = {
 	[4373]={b=3613,s=722,d=26619,c=AUCT_CLAS_ARMOR},  -- Shadow Goggles
 	[4374]={b=800,s=200,d=25483,x=10},  -- Small Bronze Bomb
 	[4375]={b=460,s=115,d=7840,x=10,u=AUCT_TYPE_ENGINEER},  -- Whirring Bronze Gizmo
+	[4376]={b=800,s=200,d=7841},  -- Flame Deflector
 	[4377]={b=600,s=150,d=31325,x=20,u=AUCT_TYPE_ENGINEER},  -- Heavy Blasting Powder
 	[4378]={b=1400,s=350,d=18062,x=20},  -- Heavy Dynamite
 	[4379]={b=11788,s=2357,d=15835,c=AUCT_CLAS_WEAPON},  -- Silver-plated Shotgun
@@ -2422,6 +2468,7 @@ Auctioneer_BasePrices = {
 	[4408]={b=650,s=162,d=15274},  -- Schematic: Mechanical Squirrel
 	[4409]={b=800,s=200,d=15274},  -- Schematic: Small Seaforium Charge
 	[4410]={b=1000,s=250,d=15274},  -- Schematic: Shadow Goggles
+	[4411]={b=1100,s=275,d=1102},  -- Schematic: Flame Deflector
 	[4412]={b=1500,s=375,d=15274},  -- Schematic: Moonsight Rifle
 	[4413]={b=1800,s=450,d=15274},  -- Schematic: Discombobulator Ray
 	[4414]={b=1850,s=462,d=15274},  -- Schematic: Portable Bronze Mortar
@@ -2437,6 +2484,8 @@ Auctioneer_BasePrices = {
 	[4428]={b=1325,s=331,d=6699,x=5},  -- Spider Palp
 	[4429]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Deepfury's Orders
 	[4430]={b=17230,s=4307,d=9853,c=AUCT_CLAS_ARMOR},  -- Ethereal Talisman
+	[4432]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Sully Balloo's Letter
+	[4433]={b=0,s=0,d=4435,c=AUCT_CLAS_QUEST},  -- Waterlogged Envelope
 	[4434]={b=2861,s=572,d=4365,c=AUCT_CLAS_ARMOR},  -- Scarecrow Trousers
 	[4435]={b=0,s=0,d=6614,q=20,x=20},  -- Mote of Myzrael
 	[4436]={b=1657,s=331,d=9912,c=AUCT_CLAS_ARMOR},  -- Jewel-encrusted Sash
@@ -2444,6 +2493,7 @@ Auctioneer_BasePrices = {
 	[4438]={b=8464,s=1692,d=6977,c=AUCT_CLAS_ARMOR},  -- Pugilist Bracers
 	[4439]={b=8944,s=1788,d=6795,c=AUCT_CLAS_WEAPON},  -- Bruiser Club
 	[4440]={b=0,s=0,d=7246},  -- Sigil of Strom
+	[4441]={b=0,s=0,d=18078},  -- MacKreel's Moonshine
 	[4443]={b=17360,s=3472,d=11327,c=AUCT_CLAS_ARMOR},  -- Grim Pauldrons
 	[4444]={b=7450,s=1490,d=18694,c=AUCT_CLAS_WEAPON},  -- Black Husk Shield
 	[4445]={b=10341,s=2068,d=19398,c=AUCT_CLAS_WEAPON},  -- Flesh Carver
@@ -2458,6 +2508,7 @@ Auctioneer_BasePrices = {
 	[4456]={b=7768,s=1553,d=17231,c=AUCT_CLAS_ARMOR},  -- Raptor Hide Belt
 	[4457]={b=1200,s=300,d=6327,x=20,u=AUCT_TYPE_COOK},  -- Barbecued Buzzard Wing
 	[4458]={b=0,s=0,d=7245},  -- Sigil of Arathor
+	[4459]={b=600,s=150,d=18072,x=10},  -- Brittle Dragon Bone
 	[4460]={b=700,s=175,d=568,x=10},  -- Ripped Wing Webbing
 	[4461]={b=835,s=208,d=7399,x=10,u=AUCT_TYPE_LEATHER},  -- Raptor Hide
 	[4462]={b=7126,s=1425,d=23098,c=AUCT_CLAS_ARMOR},  -- Cloak of Rot
@@ -2466,6 +2517,7 @@ Auctioneer_BasePrices = {
 	[4465]={b=7928,s=1585,d=6844,c=AUCT_CLAS_ARMOR},  -- Bonefist Gauntlets
 	[4466]={b=0,s=0,d=7249},  -- Sigil of Trollbane
 	[4467]={b=0,s=0,d=7244},  -- Sigil of Ignaeus
+	[4468]={b=0,s=0,d=7239},  -- Sheathed Trol'kalar
 	[4469]={b=0,s=0,d=7216},  -- Rod of Order
 	[4470]={b=38,s=9,d=21102,x=20,u=AUCT_TYPE_ENCHANT},  -- Simple Wood
 	[4471]={b=135,s=33,d=4720},  -- Flint and Tinder
@@ -2508,14 +2560,17 @@ Auctioneer_BasePrices = {
 	[4511]={b=56284,s=11256,d=19783,c=AUCT_CLAS_WEAPON},  -- Black Water Hammer
 	[4512]={b=0,s=0,d=1504,q=20,x=20},  -- Highland Raptor Eye
 	[4513]={b=0,s=0,d=6693,q=20,x=20},  -- Raptor Heart
+	[4514]={b=0,s=0,d=4771,c=AUCT_CLAS_WRITTEN},  -- Sara Balloo's Plea
 	[4515]={b=0,s=0,d=1310},  -- Marez's Head
 	[4516]={b=0,s=0,d=7038},  -- Otto's Head
 	[4517]={b=0,s=0,d=7038},  -- Falconcrest's Head
 	[4518]={b=0,s=0,d=2616},  -- Torn Scroll Fragment
 	[4519]={b=0,s=0,d=2616},  -- Crumpled Scroll Fragment
 	[4520]={b=0,s=0,d=2616},  -- Singed Scroll Fragment
+	[4521]={b=0,s=0,d=7024,q=20,x=20},  -- Alterac Granite
 	[4522]={b=0,s=0,d=7289,q=20,x=20},  -- Witherbark Medicine Pouch
 	[4525]={b=0,s=0,d=7278},  -- Trelane's Wand of Invocation
+	[4526]={b=0,s=0,d=7202},  -- Raptor Talon Amulet
 	[4527]={b=0,s=0,d=1659},  -- Azure Agate
 	[4528]={b=0,s=0,d=7261},  -- Tor'gan's Orb
 	[4529]={b=0,s=0,d=4775},  -- Enchanted Agate
@@ -2596,6 +2651,7 @@ Auctioneer_BasePrices = {
 	[4610]={b=0,s=0,d=6393,q=20,x=20},  -- Carved Stone Urn
 	[4611]={b=200,s=50,d=13103,x=20,c=AUCT_CLAS_GEM},  -- Blue Pearl
 	[4612]={b=0,s=0,d=4826,q=20,x=20},  -- Black Drake's Heart
+	[4613]={b=0,s=0,d=20913,c=AUCT_CLAS_QUEST},  -- Corroded Black Box
 	[4614]={b=0,s=0,d=9859,c=AUCT_CLAS_QUEST},  -- Pendant of Myzrael
 	[4615]={b=0,s=0,d=4829},  -- Blacklash's Bindings
 	[4616]={b=17,s=3,d=6589,c=AUCT_CLAS_WEAPON},  -- Ryedol's Lucky Pick
@@ -2668,6 +2724,7 @@ Auctioneer_BasePrices = {
 	[4699]={b=1105,s=221,d=14555,c=AUCT_CLAS_ARMOR},  -- Seer's Belt
 	[4700]={b=1899,s=379,d=14232,c=AUCT_CLAS_ARMOR},  -- Inscribed Leather Spaulders
 	[4701]={b=1263,s=252,d=23044,c=AUCT_CLAS_ARMOR},  -- Inscribed Cloak
+	[4702]={b=0,s=0,d=7096,q=20,x=20},  -- Prospector's Pick
 	[4703]={b=0,s=0,d=7064,q=20,x=20},  -- Broken Tools
 	[4705]={b=7248,s=1449,d=25783,c=AUCT_CLAS_ARMOR},  -- Lambent Scale Pauldrons
 	[4706]={b=3438,s=687,d=25979,c=AUCT_CLAS_ARMOR},  -- Lambent Scale Cloak
@@ -2718,6 +2775,7 @@ Auctioneer_BasePrices = {
 	[4759]={b=0,s=0,d=7202,q=20,x=20},  -- Plainstrider Talon
 	[4765]={b=2877,s=575,d=7313,c=AUCT_CLAS_WEAPON},  -- Enamelled Broadsword
 	[4766]={b=2407,s=481,d=7314,c=AUCT_CLAS_WEAPON},  -- Feral Blade
+	[4767]={b=695,s=139,d=3528,c=AUCT_CLAS_ARMOR},  -- Coppercloth Gloves
 	[4768]={b=698,s=139,d=16946,c=AUCT_CLAS_ARMOR},  -- Adept's Gloves
 	[4769]={b=0,s=0,d=11207,q=20,x=20},  -- Trophy Swoop Quill
 	[4770]={b=0,s=0,d=7061,q=20,x=20},  -- Bristleback Belt
@@ -2764,6 +2822,7 @@ Auctioneer_BasePrices = {
 	[4816]={b=7518,s=1503,d=4978,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Leggings
 	[4817]={b=12311,s=2462,d=7319,c=AUCT_CLAS_WEAPON},  -- Blessed Claymore
 	[4818]={b=14273,s=2854,d=20155,c=AUCT_CLAS_WEAPON},  -- Executioner's Sword
+	[4819]={b=0,s=0,d=4110},  -- Fizsprocket's Clipboard
 	[4820]={b=8320,s=1664,d=18511,c=AUCT_CLAS_WEAPON},  -- Guardian Buckler
 	[4821]={b=6541,s=1308,d=3445,c=AUCT_CLAS_WEAPON},  -- Bear Buckler
 	[4822]={b=6746,s=1349,d=4983,c=AUCT_CLAS_WEAPON},  -- Owl's Disk
@@ -2778,6 +2837,7 @@ Auctioneer_BasePrices = {
 	[4831]={b=7858,s=1571,d=17154,c=AUCT_CLAS_ARMOR},  -- Stalking Pants
 	[4832]={b=10497,s=2099,d=22428,c=AUCT_CLAS_ARMOR},  -- Mystic Sarong
 	[4833]={b=8658,s=1731,d=6929,c=AUCT_CLAS_ARMOR},  -- Glorious Shoulders
+	[4834]={b=0,s=0,d=7234,c=AUCT_CLAS_WRITTEN},  -- Venture Co. Documents
 	[4835]={b=10550,s=2110,d=6912,c=AUCT_CLAS_ARMOR},  -- Elite Shoulders
 	[4836]={b=8002,s=2000,d=21601,c=AUCT_CLAS_WEAPON},  -- Fireproof Orb
 	[4837]={b=8002,s=2000,d=21611,c=AUCT_CLAS_WEAPON},  -- Strength of Will
@@ -2791,17 +2851,21 @@ Auctioneer_BasePrices = {
 	[4847]={b=0,s=0,d=7159},  -- Lotwil's Shackles of Elemental Binding
 	[4848]={b=0,s=0,d=8802,q=20,x=20},  -- Battleboar Snout
 	[4849]={b=0,s=0,d=2599,q=20,x=20},  -- Battleboar Flank
+	[4850]={b=0,s=0,d=7047},  -- Bristleback Attack Plans
+	[4851]={b=0,s=0,d=7047,c=AUCT_CLAS_QUEST},  -- Dirt-stained Map
 	[4852]={b=1200,s=300,d=6378,x=5},  -- Flash Bomb
 	[4854]={b=0,s=0,d=23103,c=AUCT_CLAS_QUEST},  -- Demon Scarred Cloak
 	[4859]={b=0,s=0,d=6484},  -- Burning Blade Medallion
 	[4860]={b=2965,s=741,d=4433,x=5},  -- Glistening Frenzy Scale
 	[4861]={b=596,s=119,d=5243,c=AUCT_CLAS_ARMOR},  -- Sleek Feathered Tunic
 	[4862]={b=0,s=0,d=7229,q=20,x=20},  -- Scorpid Worker Tail
+	[4863]={b=0,s=0,d=7602,q=20,x=20},  -- Gnomish Tools
 	[4864]={b=0,s=0,d=7102,q=10,x=10},  -- Minshina's Skull
 	[4865]={b=20,s=5,d=7086,x=5},  -- Ruined Pelt
 	[4866]={b=0,s=0,d=9090},  -- Zalazane's Head
 	[4867]={b=35,s=8,d=6619,x=5},  -- Broken Scorpid Leg
 	[4869]={b=0,s=0,d=3146},  -- Fizzle's Claw
+	[4870]={b=0,s=0,d=7067,q=20,x=20},  -- Canvas Scraps
 	[4871]={b=0,s=0,d=12643,q=20,x=20},  -- Searing Collar
 	[4872]={b=380,s=95,d=1504,x=5},  -- Dry Scorpid Eye
 	[4873]={b=60,s=15,d=4714,x=5},  -- Dry Hardened Barnacle
@@ -2812,11 +2876,14 @@ Auctioneer_BasePrices = {
 	[4878]={b=225,s=56,d=6617},  -- Broken Bloodstained Bow
 	[4879]={b=30,s=7,d=6700,x=5},  -- Squashed Rabbit Carcass
 	[4880]={b=345,s=86,d=2868,x=5},  -- Broken Spear
+	[4881]={b=0,s=0,d=3093,c=AUCT_CLAS_QUEST},  -- Aged Envelope
 	[4882]={b=0,s=0,d=8903},  -- Benedict's Key
 	[4883]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Admiral Proudmoore's Orders
+	[4886]={b=0,s=0,d=6694,q=20,x=20},  -- Venomtail Poison Sac
 	[4887]={b=0,s=0,d=7110,q=20,x=20},  -- Intact Makrura Eye
 	[4888]={b=0,s=0,d=3788,q=20,x=20},  -- Crawler Mucus
 	[4890]={b=0,s=0,d=18047,q=20,x=20},  -- Taillasher Egg
+	[4891]={b=0,s=0,d=4841},  -- Kron's Amulet
 	[4892]={b=0,s=0,d=7112,q=20,x=20},  -- Durotar Tiger Fur
 	[4893]={b=0,s=0,d=3672,q=20,x=20},  -- Savannah Lion Tusk
 	[4894]={b=0,s=0,d=3759,q=20,x=20},  -- Plainstrider Kidney
@@ -2825,6 +2892,7 @@ Auctioneer_BasePrices = {
 	[4897]={b=0,s=0,d=6694,q=20,x=20},  -- Thunderhawk Saliva Gland
 	[4898]={b=0,s=0,d=5283,q=20,x=20},  -- Lightning Gland
 	[4903]={b=0,s=0,d=7122,c=AUCT_CLAS_QUEST},  -- Eye of Burning Shadow
+	[4904]={b=0,s=0,d=2533,q=20,x=20},  -- Venomtail Antidote
 	[4905]={b=0,s=0,d=3146},  -- Sarkoth's Mangled Claw
 	[4906]={b=109,s=21,d=8308,c=AUCT_CLAS_ARMOR},  -- Rainwalker Boots
 	[4907]={b=65,s=13,d=8701,c=AUCT_CLAS_ARMOR},  -- Woodland Tunic
@@ -2925,9 +2993,12 @@ Auctioneer_BasePrices = {
 	[5040]={b=0,s=0,d=20321,c=AUCT_CLAS_WEAPON},  -- Shadow Hunter Knife
 	[5042]={b=50,s=12,d=6405,x=10},  -- Red Ribboned Wrapping Paper
 	[5043]={b=0,s=0,d=6404},  -- Red Ribboned Gift
+	[5044]={b=0,s=0,d=6329},  -- Blue Ribboned Gift
 	[5048]={b=50,s=12,d=6330,x=10},  -- Blue Ribboned Wrapping Paper
 	[5050]={b=0,s=0,d=8902},  -- Ignition Key
 	[5051]={b=1,s=1,d=7107,q=20,x=20,u=AUCT_TYPE_COOK},  -- Dig Rat
+	[5052]={b=0,s=0,d=6705,u=AUCT_TYPE_COOK},  -- Unconscious Dig Rat
+	[5054]={b=0,s=0,d=9167},  -- Samophlange
 	[5055]={b=0,s=0,d=7048,q=20,x=20},  -- Intact Raptor Horn
 	[5056]={b=0,s=0,d=1464,q=20,x=20},  -- Root Sample
 	[5057]={b=25,s=1,d=6390,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Ripe Watermelon
@@ -2938,7 +3009,9 @@ Auctioneer_BasePrices = {
 	[5062]={b=0,s=0,d=9826,q=20,x=20},  -- Raptor Head
 	[5063]={b=0,s=0,d=7154},  -- Kreenig Snarlsnout's Tusk
 	[5064]={b=0,s=0,d=7288,q=20,x=20},  -- Witchwing Talon
+	[5065]={b=0,s=0,d=6013,q=20,x=20},  -- Harpy Lieutenant Ring
 	[5066]={b=85,s=21,d=6377,x=10},  -- Fissure Plant
+	[5067]={b=0,s=0,d=7235},  -- Serena's Head
 	[5068]={b=0,s=0,d=6371},  -- Dried Seeds
 	[5069]={b=1465,s=293,d=6097,c=AUCT_CLAS_WEAPON},  -- Fire Wand
 	[5071]={b=2215,s=443,d=18356,c=AUCT_CLAS_WEAPON},  -- Shadow Wand
@@ -2959,6 +3032,7 @@ Auctioneer_BasePrices = {
 	[5086]={b=0,s=0,d=7295,q=20,x=20},  -- Zhevra Hooves
 	[5087]={b=0,s=0,d=6633,q=20,x=20},  -- Plainstrider Beak
 	[5088]={b=0,s=0,d=7073,c=AUCT_CLAS_WRITTEN},  -- Control Console Operating Manual
+	[5089]={b=0,s=0,d=9660},  -- Console Key
 	[5092]={b=1203,s=240,d=6101,c=AUCT_CLAS_WEAPON},  -- Charred Razormane Wand
 	[5093]={b=1238,s=247,d=20392,c=AUCT_CLAS_WEAPON},  -- Razormane Backstabber
 	[5094]={b=1168,s=233,d=5808,c=AUCT_CLAS_WEAPON},  -- Razormane War Shield
@@ -2970,6 +3044,7 @@ Auctioneer_BasePrices = {
 	[5100]={b=0,s=0,d=7086},  -- Echeyakee's Hide
 	[5101]={b=0,s=0,d=6666},  -- Ishamuhale's Fang
 	[5102]={b=0,s=0,d=8007,c=AUCT_CLAS_QUEST},  -- Owatanka's Tailspike
+	[5103]={b=0,s=0,d=11207,c=AUCT_CLAS_QUEST},  -- Washte Pawne's Feather
 	[5104]={b=0,s=0,d=7142},  -- Heart of Isha Awak
 	[5107]={b=698,s=139,d=16557,c=AUCT_CLAS_ARMOR},  -- Deckhand's Shirt
 	[5109]={b=1116,s=223,d=16589,c=AUCT_CLAS_ARMOR},  -- Stonesplinter Rags
@@ -2995,8 +3070,10 @@ Auctioneer_BasePrices = {
 	[5135]={b=570,s=142,d=6651,x=5},  -- Thin Black Claw
 	[5136]={b=710,s=177,d=6704,x=5},  -- Torn Furry Ear
 	[5137]={b=870,s=217,d=1504,x=5},  -- Bright Eyeball
+	[5138]={b=0,s=0,d=15525,c=AUCT_CLAS_QUEST},  -- Harvester's Head
 	[5140]={b=25,s=6,d=6379,x=10,u=AUCT_TYPE_POISON},  -- Flash Powder
 	[5143]={b=0,s=0,d=7262,q=20,x=20},  -- Thunder Lizard Blood
+	[5164]={b=0,s=0,d=8284},  -- Thunderhawk Wings
 	[5165]={b=0,s=0,d=19799,q=20,x=20},  -- Sunscale Feather
 	[5166]={b=0,s=0,d=4045,q=20,x=20},  -- Webwood Venom Sac
 	[5167]={b=0,s=0,d=18047,q=20,x=20},  -- Webwood Egg
@@ -3008,6 +3085,7 @@ Auctioneer_BasePrices = {
 	[5176]={b=0,s=0,d=7299,c=AUCT_CLAS_SHAMAN},  -- Fire Totem
 	[5177]={b=0,s=0,d=7299,c=AUCT_CLAS_SHAMAN},  -- Water Totem
 	[5178]={b=0,s=0,d=7299,c=AUCT_CLAS_SHAMAN},  -- Air Totem
+	[5179]={b=0,s=0,d=5283,c=AUCT_CLAS_QUEST},  -- Moss-twined Heart
 	[5180]={b=11110,s=2777,d=6494,c=AUCT_CLAS_ARMOR},  -- Necklace of Harmony
 	[5181]={b=8890,s=1778,d=23142,c=AUCT_CLAS_ARMOR},  -- Vibrant Silk Cape
 	[5182]={b=8849,s=1769,d=8000,c=AUCT_CLAS_WEAPON},  -- Shiver Blade
@@ -3045,8 +3123,10 @@ Auctioneer_BasePrices = {
 	[5214]={b=19677,s=3935,d=21020,c=AUCT_CLAS_WEAPON},  -- Wand of Eventide
 	[5215]={b=43280,s=8656,d=20815,c=AUCT_CLAS_WEAPON},  -- Ember Wand
 	[5216]={b=59108,s=11821,d=20790,c=AUCT_CLAS_WEAPON},  -- Umbral Wand
+	[5217]={b=0,s=0,d=3422},  -- Tainted Heart
 	[5218]={b=0,s=0,d=3422},  -- Cleansed Timberling Heart
 	[5219]={b=0,s=0,d=7149},  -- Inscribed Bark
+	[5220]={b=0,s=0,d=7134,q=20,x=20},  -- Gnarlpine Fang
 	[5221]={b=0,s=0,d=7164},  -- Melenas' Head
 	[5232]={b=0,s=0,d=6009,c=AUCT_CLAS_WARLOCK},  -- Minor Soulstone
 	[5233]={b=0,s=0,d=6017},  -- Stone of Relu
@@ -3108,6 +3188,7 @@ Auctioneer_BasePrices = {
 	[5327]={b=2595,s=519,d=16958,c=AUCT_CLAS_ARMOR},  -- Greasy Tinker's Pants
 	[5328]={b=1028,s=205,d=7563,c=AUCT_CLAS_ARMOR},  -- Cinched Belt
 	[5329]={b=60,s=15,d=8289,x=20},  -- Cat Figurine
+	[5332]={b=60,s=15,d=8289},  -- Glowing Cat Figurine
 	[5334]={b=0,s=0,d=18079},  -- 99-Year-Old Port
 	[5335]={b=0,s=0,d=1183},  -- A Sack of Coins
 	[5336]={b=0,s=0,d=9849,q=20,x=20},  -- Grell Earring
@@ -3126,6 +3207,7 @@ Auctioneer_BasePrices = {
 	[5349]={b=0,s=0,d=6342,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Conjured Muffin
 	[5350]={b=0,s=0,d=18081,q=20,x=20,c=AUCT_CLAS_DRINK},  -- Conjured Water
 	[5351]={b=1615,s=403,d=6011,c=AUCT_CLAS_ARMOR},  -- Bounty Hunter's Ring
+	[5352]={b=0,s=0,d=7637,c=AUCT_CLAS_QUEST},  -- Book: The Powers Below
 	[5354]={b=0,s=0,d=8919,c=AUCT_CLAS_WRITTEN},  -- Letter to Delgren
 	[5355]={b=4738,s=947,d=7662,c=AUCT_CLAS_ARMOR},  -- Beastmaster's Girdle
 	[5356]={b=12971,s=2594,d=20834,c=AUCT_CLAS_WEAPON},  -- Branding Rod
@@ -3133,12 +3215,14 @@ Auctioneer_BasePrices = {
 	[5359]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Lorgalis Manuscript
 	[5360]={b=0,s=0,d=7697,q=20,x=20},  -- Highborne Relic
 	[5361]={b=65,s=16,d=6651,x=10},  -- Fishbone Toothpick
+	[5362]={b=75,s=18,d=1504,x=5},  -- Chew Toy
 	[5363]={b=80,s=20,d=7717,x=5},  -- Folded Handkerchief
 	[5364]={b=110,s=27,d=4718,x=5},  -- Dry Salt Lick
 	[5366]={b=0,s=0,d=6554},  -- Glowing Soul Gem
 	[5367]={b=90,s=22,d=4717,x=5},  -- Primitive Rock Tool
 	[5368]={b=195,s=48,d=7718,x=5},  -- Empty Wallet
 	[5369]={b=130,s=32,d=7251,x=5},  -- Gnawed Bone
+	[5370]={b=150,s=37,d=7716,x=5},  -- Bent Spoon
 	[5371]={b=195,s=48,d=7713,x=5},  -- Piece of Coral
 	[5373]={b=290,s=72,d=15026,x=5,u=AUCT_TYPE_LEATHER},  -- Lucky Charm
 	[5374]={b=350,s=87,d=7719,x=5},  -- Small Pocket Watch
@@ -3151,6 +3235,8 @@ Auctioneer_BasePrices = {
 	[5385]={b=0,s=0,d=8007,q=20,x=20},  -- Crawler Leg
 	[5386]={b=0,s=0,d=7740,q=20,x=20},  -- Fine Moonstalker Pelt
 	[5387]={b=0,s=0,d=23108,c=AUCT_CLAS_ARMOR},  -- Enchanted Moonstalker Cloak
+	[5388]={b=0,s=0,d=7741},  -- Ran Bloodtooth's Skull
+	[5389]={b=0,s=0,d=7742},  -- Corrupted Furbolg Totem
 	[5390]={b=0,s=0,d=7744},  -- Fandral's Message
 	[5391]={b=0,s=0,d=7791},  -- Rare Earth
 	[5392]={b=127,s=25,d=6432,c=AUCT_CLAS_WEAPON},  -- Thistlewood Dagger
@@ -3168,11 +3254,13 @@ Auctioneer_BasePrices = {
 	[5413]={b=0,s=0,d=7886,q=20,x=20},  -- Moonstalker Fang
 	[5414]={b=0,s=0,d=6683,q=20,x=20},  -- Grizzled Scalp
 	[5415]={b=0,s=0,d=7866},  -- Thunderhorn Cleansing Totem
+	[5416]={b=0,s=0,d=7866},  -- Wildmane Cleansing Totem
 	[5419]={b=68,s=13,d=17002,c=AUCT_CLAS_ARMOR},  -- Feral Bracers
 	[5420]={b=1138,s=227,d=8635,c=AUCT_CLAS_ARMOR},  -- Banshee Armor
 	[5421]={b=2600,s=650,d=7899},  -- Fiery Enchantment
 	[5422]={b=3460,s=692,d=16974,c=AUCT_CLAS_ARMOR},  -- Brambleweed Leggings
 	[5423]={b=10421,s=2084,d=19221,c=AUCT_CLAS_WEAPON},  -- Boahn's Fang
+	[5424]={b=0,s=0,d=7928},  -- Ancient Statuette
 	[5425]={b=2099,s=419,d=7932,c=AUCT_CLAS_ARMOR},  -- Runescale Girdle
 	[5426]={b=8431,s=1686,d=19396,c=AUCT_CLAS_WEAPON},  -- Serpent's Kiss
 	[5427]={b=590,s=147,d=8118,x=5},  -- Crude Pocket Watch
@@ -3190,14 +3278,18 @@ Auctioneer_BasePrices = {
 	[5442]={b=0,s=0,d=7951},  -- Head of Arugal
 	[5443]={b=5335,s=1067,d=18523,c=AUCT_CLAS_WEAPON},  -- Gold-plated Buckler
 	[5444]={b=2740,s=548,d=15089,c=AUCT_CLAS_ARMOR},  -- Miner's Cape
+	[5445]={b=0,s=0,d=9865},  -- Ring of Zoram
 	[5446]={b=55,s=13,d=7954,x=20},  -- Broken Elemental Bracer
 	[5447]={b=80,s=20,d=7954,x=20},  -- Damaged Elemental Bracer
 	[5448]={b=70,s=17,d=7954,x=20},  -- Fractured Elemental Bracer
 	[5451]={b=90,s=22,d=7954,x=20},  -- Crushed Elemental Bracer
+	[5455]={b=0,s=0,d=7957,c=AUCT_CLAS_WRITTEN},  -- Divined Scroll
+	[5456]={b=0,s=0,d=7956},  -- Divining Scroll
 	[5457]={b=95,s=23,d=1496,x=10},  -- Severed Voodoo Claw
 	[5458]={b=138,s=27,d=9908,c=AUCT_CLAS_ARMOR},  -- Dirtwood Belt
 	[5459]={b=2361,s=472,d=7965,c=AUCT_CLAS_WEAPON},  -- Defender Axe
 	[5460]={b=0,s=0,d=7976},  -- Orendil's Cure
+	[5461]={b=0,s=0,d=9659},  -- Branch of Cenarius
 	[5462]={b=0,s=0,d=7982},  -- Dartol's Rod of Transformation
 	[5463]={b=0,s=0,d=7984},  -- Glowing Gem
 	[5464]={b=0,s=0,d=8033},  -- Iron Shaft
@@ -3245,6 +3337,8 @@ Auctioneer_BasePrices = {
 	[5514]={b=0,s=0,d=6851,c=AUCT_CLAS_MAGE},  -- Mana Agate
 	[5516]={b=1589,s=317,d=8028,c=AUCT_CLAS_WEAPON},  -- Threshadon Fang
 	[5519]={b=0,s=0,d=8032},  -- Iron Pommel
+	[5520]={b=0,s=0,d=8040,c=AUCT_CLAS_WRITTEN},  -- Velinde's Journal
+	[5521]={b=0,s=0,d=8042},  -- Velinde's Key
 	[5522]={b=0,s=0,d=21610,c=AUCT_CLAS_WEAPON},  -- Spellstone
 	[5523]={b=60,s=15,d=7177},  -- Small Barnacled Clam
 	[5524]={b=85,s=21,d=16212},  -- Thick-shelled Clam
@@ -3266,6 +3360,7 @@ Auctioneer_BasePrices = {
 	[5542]={b=1852,s=370,d=23131,c=AUCT_CLAS_ARMOR},  -- Pearl-clasped Cloak
 	[5543]={b=1800,s=450,d=15274},  -- Plans: Iridescent Hammer
 	[5544]={b=0,s=0,d=7741},  -- Dal Bloodclaw's Skull
+	[5547]={b=0,s=0,d=8122},  -- Reconstructed Rod
 	[5565]={b=5000,s=1250,d=6504,x=5},  -- Infernal Stone
 	[5566]={b=420,s=105,d=8232,x=5},  -- Broken Antler
 	[5567]={b=785,s=196,d=8233,x=5},  -- Silver Hook
@@ -3339,10 +3434,13 @@ Auctioneer_BasePrices = {
 	[5646]={b=0,s=0,d=21672},  -- Vial of Blessed Water
 	[5655]={b=800000,s=0,d=13108},  -- Chestnut Mare Bridle
 	[5656]={b=800000,s=0,d=13108},  -- Brown Horse Bridle
+	[5659]={b=0,s=0,d=8560,q=20,x=20},  -- Smoldering Embers
+	[5664]={b=0,s=0,d=8562,q=20,x=20},  -- Corroded Shrapnel
 	[5665]={b=800000,s=0,d=16207},  -- Horn of the Dire Wolf
 	[5668]={b=800000,s=0,d=16208},  -- Horn of the Brown Wolf
 	[5669]={b=0,s=0,d=2480},  -- Dust Devil Debris
 	[5675]={b=0,s=0,d=8564,q=20,x=20},  -- Crystalized Scales
+	[5681]={b=0,s=0,d=8283},  -- Corrosive Sap
 	[5686]={b=0,s=0,d=7164},  -- Ordanus' Head
 	[5687]={b=0,s=0,d=6554},  -- Gatekeeper's Key
 	[5689]={b=0,s=0,d=8737},  -- Sleepers' Key
@@ -3356,6 +3454,7 @@ Auctioneer_BasePrices = {
 	[5718]={b=0,s=0,d=8624},  -- Venture Co. Engineering Plans
 	[5731]={b=0,s=0,d=8626,c=AUCT_CLAS_POTION},  -- Scroll of Messaging
 	[5732]={b=0,s=0,d=8627},  -- NG-5
+	[5733]={b=0,s=0,d=7340},  -- Unidentified Ore
 	[5734]={b=0,s=0,d=8628},  -- Super Reaper 6000 Blueprints
 	[5735]={b=0,s=0,d=3411},  -- Sealed Envelope
 	[5736]={b=0,s=0,d=8629},  -- Gerenzo's Mechanical Arm
@@ -3436,6 +3535,7 @@ Auctioneer_BasePrices = {
 	[5819]={b=16009,s=3201,d=15810,c=AUCT_CLAS_ARMOR},  -- Sunblaze Coif
 	[5820]={b=8114,s=1622,d=9077,c=AUCT_CLAS_ARMOR},  -- Faerie Mantle
 	[5824]={b=0,s=0,d=9106},  -- Tablet of Will
+	[5825]={b=0,s=0,d=9305},  -- Treshala's Pendant
 	[5826]={b=0,s=0,d=7629,c=AUCT_CLAS_WRITTEN},  -- Kravel's Scheme
 	[5827]={b=0,s=0,d=4435,c=AUCT_CLAS_WRITTEN},  -- Fizzle Brassbolts' Letter
 	[5829]={b=3216,s=804,d=6633,x=5},  -- Razor-sharp Beak
@@ -3487,18 +3587,21 @@ Auctioneer_BasePrices = {
 	[5884]={b=0,s=0,d=9292,q=20,x=20},  -- Unpopped Darkmist Eye
 	[5897]={b=0,s=0,d=9319,c=AUCT_CLAS_WRITTEN},  -- Snufflenose Owner's Manual
 	[5917]={b=0,s=0,d=811,c=AUCT_CLAS_WRITTEN},  -- Spy's Report
+	[5918]={b=0,s=0,d=3914},  -- Defiant Orc Head
 	[5919]={b=0,s=0,d=9354},  -- Blackened Iron Shield
 	[5936]={b=99,s=19,d=9365,c=AUCT_CLAS_ARMOR},  -- Animal Skin Belt
 	[5938]={b=0,s=0,d=7345,q=20,x=20},  -- Pristine Crawler Leg
 	[5939]={b=100,s=20,d=9374,c=AUCT_CLAS_ARMOR},  -- Sewing Gloves
 	[5940]={b=769,s=153,d=2916,c=AUCT_CLAS_WEAPON},  -- Bone Buckler
 	[5941]={b=578,s=115,d=4339,c=AUCT_CLAS_ARMOR},  -- Brass Scale Pants
+	[5942]={b=0,s=0,d=9377},  -- Jeweled Pendant
 	[5943]={b=4202,s=840,d=9378,c=AUCT_CLAS_ARMOR},  -- Rift Bracers
 	[5944]={b=1655,s=331,d=7554,c=AUCT_CLAS_ARMOR},  -- Greaves of the People's Militia
 	[5945]={b=0,s=0,d=9396},  -- Deadmire's Tooth
 	[5946]={b=0,s=0,d=9148},  -- Sealed Note to Elling
 	[5947]={b=0,s=0,d=9397,c=AUCT_CLAS_WRITTEN},  -- Defias Docket
 	[5948]={b=0,s=0,d=9148,c=AUCT_CLAS_WRITTEN},  -- Letter to Jorgen
+	[5950]={b=0,s=0,d=9429},  -- Reethe's Badge
 	[5951]={b=165,s=41,d=9430,x=10},  -- Moist Towelette
 	[5952]={b=0,s=0,d=13531,q=20,x=20},  -- Corrupted Brain Stem
 	[5956]={b=84,s=16,d=8568,c=AUCT_CLAS_WEAPON},  -- Blacksmith's Hammer
@@ -3553,6 +3656,7 @@ Auctioneer_BasePrices = {
 	[6062]={b=142,s=28,d=16805,c=AUCT_CLAS_ARMOR},  -- Heavy Cord Bracers
 	[6063]={b=117,s=23,d=6954,c=AUCT_CLAS_ARMOR},  -- Cold Steel Gauntlets
 	[6064]={b=0,s=0,d=16265},  -- Miniature Platinum Discs
+	[6065]={b=0,s=0,d=9663},  -- Khadgar's Essays on Dimensional Convergence
 	[6066]={b=0,s=0,d=9666},  -- Khan Dez'hepah's Head
 	[6067]={b=0,s=0,d=9668,q=20,x=20},  -- Centaur Ear
 	[6068]={b=1500,s=375,d=1301,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Recipe: Shadow Oil
@@ -3560,12 +3664,16 @@ Auctioneer_BasePrices = {
 	[6070]={b=31,s=6,d=17173,c=AUCT_CLAS_ARMOR},  -- Wolfskin Bracers
 	[6071]={b=0,s=0,d=6563,q=20,x=20},  -- Draenethyst Crystal
 	[6072]={b=0,s=0,d=9666},  -- Khan Jehn's Head
+	[6073]={b=0,s=0,d=9666},  -- Khan Shaka's Head
+	[6074]={b=0,s=0,d=9711},  -- War Horn Mouthpiece
 	[6076]={b=47,s=9,d=16843,c=AUCT_CLAS_ARMOR},  -- Tapered Pants
 	[6077]={b=0,s=0,d=9728},  -- Maraudine Key Fragment
 	[6078]={b=78,s=15,d=18664,c=AUCT_CLAS_WEAPON},  -- Pikeman Shield
+	[6079]={b=0,s=0,d=9730,q=20,x=20},  -- Crude Charm
 	[6080]={b=0,s=0,d=8917,q=20,x=20},  -- Shadow Panther Heart
 	[6081]={b=0,s=0,d=9733},  -- Mire Lord Fungus
 	[6082]={b=0,s=0,d=9734},  -- Deepstrider Tumor
+	[6083]={b=0,s=0,d=9737,q=20,x=20},  -- Broken Tears
 	[6084]={b=1454,s=290,d=9738,c=AUCT_CLAS_ARMOR},  -- Stormwind Guard Leggings
 	[6085]={b=1217,s=243,d=11368,c=AUCT_CLAS_ARMOR},  -- Footman Tunic
 	[6087]={b=8639,s=1727,d=9742,c=AUCT_CLAS_ARMOR},  -- Chausses of Westfall
@@ -3602,6 +3710,7 @@ Auctioneer_BasePrices = {
 	[6147]={b=185,s=37,d=9508,c=AUCT_CLAS_ARMOR},  -- Ratty Old Belt
 	[6148]={b=223,s=44,d=16853,c=AUCT_CLAS_ARMOR},  -- Web-covered Boots
 	[6149]={b=480,s=120,d=15718,x=5,u=AUCT_TYPE_TAILOR},  -- Greater Mana Potion
+	[6150]={b=90,s=22,d=10301,x=20},  -- A Frayed Knot
 	[6166]={b=0,s=0,d=10345,q=20,x=20},  -- Coyote Jawbone
 	[6167]={b=0,s=0,d=6423,c=AUCT_CLAS_WRITTEN},  -- Neeka's Report
 	[6168]={b=0,s=0,d=9157,q=20,x=20},  -- Sawtooth Snapper Claw
@@ -3655,6 +3764,8 @@ Auctioneer_BasePrices = {
 	[6241]={b=496,s=99,d=17123,c=AUCT_CLAS_ARMOR},  -- White Linen Robe
 	[6242]={b=1217,s=243,d=12386,c=AUCT_CLAS_ARMOR},  -- Blue Linen Robe
 	[6245]={b=0,s=0,d=7289},  -- Karnitol's Satchel
+	[6246]={b=0,s=0,d=10920,q=20,x=20},  -- Hatefury Claw
+	[6247]={b=0,s=0,d=10921,q=20,x=20},  -- Hatefury Horn
 	[6248]={b=0,s=0,d=6400,q=20,x=20},  -- Scorpashi Venom
 	[6249]={b=0,s=0,d=10922,q=20,x=20},  -- Aged Kodo Hide
 	[6250]={b=0,s=0,d=10923,q=20,x=20},  -- Felhound Brain
@@ -3662,6 +3773,9 @@ Auctioneer_BasePrices = {
 	[6252]={b=0,s=0,d=6400,q=20,x=20},  -- Doomwarder Blood
 	[6253]={b=0,s=0,d=10924},  -- Leftwitch's Package
 	[6256]={b=23,s=4,d=20730,c=AUCT_CLAS_FISHING},  -- Fishing Pole
+	[6257]={b=0,s=0,d=11012,q=20,x=20},  -- Roc Gizzard
+	[6258]={b=0,s=0,d=6427,q=20,x=20},  -- Ironfur Liver
+	[6259]={b=0,s=0,d=4045,q=20,x=20},  -- Groddoc Liver
 	[6260]={b=50,s=12,d=1656,x=10,u=AUCT_TYPE_TAILOR},  -- Blue Dye
 	[6261]={b=1000,s=250,d=15736,x=10,u=AUCT_TYPE_TAILOR},  -- Orange Dye
 	[6263]={b=2947,s=589,d=11182,c=AUCT_CLAS_ARMOR},  -- Blue Overalls
@@ -3679,6 +3793,11 @@ Auctioneer_BasePrices = {
 	[6281]={b=0,s=0,d=4262,q=20,x=20},  -- Rattlecage Skull
 	[6282]={b=11219,s=2243,d=11166,c=AUCT_CLAS_ARMOR},  -- Sacred Burial Trousers
 	[6283]={b=0,s=0,d=2757,c=AUCT_CLAS_WRITTEN},  -- The Book of Ur
+	[6284]={b=0,s=0,d=11180},  -- Runes of Summoning
+	[6285]={b=0,s=0,d=11181},  -- Egalin's Grimoire
+	[6286]={b=0,s=0,d=6694},  -- Pure Hearts
+	[6287]={b=0,s=0,d=11183},  -- Atal'ai Tablet Fragment
+	[6288]={b=0,s=0,d=11185,q=20,x=20},  -- Atal'ai Tablet
 	[6289]={b=20,s=1,d=24702,q=20,x=20,u=AUCT_TYPE_COOK},  -- Raw Longjaw Mud Snapper
 	[6290]={b=25,s=1,d=18536,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Brilliant Smallfish
 	[6291]={b=20,s=1,d=18535,q=20,x=20,u=AUCT_TYPE_COOK},  -- Raw Brilliant Smallfish
@@ -3688,6 +3807,7 @@ Auctioneer_BasePrices = {
 	[6295]={b=48,s=12,d=24701,c=AUCT_CLAS_FOOD},  -- 15 Pound Mud Snapper
 	[6296]={b=115,s=28,d=6691,x=10},  -- Patch of Bat Hair
 	[6297]={b=30,s=7,d=7741,x=10},  -- Old Skull
+	[6298]={b=520,s=130,d=6666,x=20},  -- Bloody Bat Fang
 	[6299]={b=25,s=1,d=24696,q=20,x=20},  -- Sickly Looking Fish
 	[6300]={b=1775,s=443,d=6628,x=10},  -- Husk Fragment
 	[6301]={b=80,s=20,d=6375},  -- Old Teamster's Skull
@@ -3702,6 +3822,7 @@ Auctioneer_BasePrices = {
 	[6310]={b=600,s=150,d=24712,c=AUCT_CLAS_WEAPON},  -- 19 Pound Catfish
 	[6311]={b=750,s=187,d=24712,c=AUCT_CLAS_WEAPON},  -- 22 Pound Catfish
 	[6312]={b=0,s=0,d=3422},  -- Dalin's Heart
+	[6313]={b=0,s=0,d=3422},  -- Comar's Heart
 	[6314]={b=6343,s=1268,d=23082,c=AUCT_CLAS_ARMOR},  -- Wolfmaster Cape
 	[6315]={b=12733,s=2546,d=11247,c=AUCT_CLAS_WEAPON},  -- Steelarrow Crossbow
 	[6316]={b=60,s=3,d=11268,q=20,x=20},  -- Loch Frenzy Delight
@@ -3735,6 +3856,7 @@ Auctioneer_BasePrices = {
 	[6348]={b=500,s=125,d=11431},  -- Formula: Enchant Weapon - Minor Beastslayer
 	[6349]={b=500,s=125,d=11431},  -- Formula: Enchant 2H Weapon - Lesser Intellect
 	[6350]={b=1478,s=295,d=6885,c=AUCT_CLAS_ARMOR},  -- Rough Bronze Boots
+	[6351]={b=4,s=1,d=9151},  -- Dented Crate
 	[6352]={b=4,s=1,d=9822},  -- Waterlogged Crate
 	[6353]={b=4,s=1,d=12331},  -- Small Chest
 	[6354]={b=4,s=1,d=12332},  -- Small Locked Chest
@@ -3820,6 +3942,7 @@ Auctioneer_BasePrices = {
 	[6439]={b=950,s=237,d=11791,x=5},  -- Broken Binding Bracer
 	[6440]={b=63250,s=15812,d=12643,c=AUCT_CLAS_ARMOR},  -- Brainlash
 	[6441]={b=0,s=0,d=11825},  -- Shadowstalker Scalp
+	[6442]={b=0,s=0,d=15027},  -- Oracle Crystal
 	[6443]={b=0,s=0,d=11164,q=20,x=20},  -- Deviate Hide
 	[6444]={b=915,s=228,d=11889,x=5},  -- Forked Tongue
 	[6445]={b=352,s=88,d=6629,x=5},  -- Brittle Molting
@@ -3835,6 +3958,7 @@ Auctioneer_BasePrices = {
 	[6455]={b=16,s=4,d=18706,x=5},  -- Old Wagonwheel
 	[6456]={b=12,s=3,d=2885,x=10},  -- Acidic Slime
 	[6457]={b=16,s=4,d=3257,x=5},  -- Rusted Engineering Parts
+	[6458]={b=4,s=1,d=11932,q=20,x=20},  -- Oil Covered Fish
 	[6459]={b=4674,s=934,d=11935,c=AUCT_CLAS_ARMOR},  -- Savage Trodders
 	[6460]={b=4222,s=844,d=11945,c=AUCT_CLAS_ARMOR},  -- Cobrahn's Grasp
 	[6461]={b=5954,s=1190,d=11946,c=AUCT_CLAS_ARMOR},  -- Slime-encrusted Pads
@@ -3858,7 +3982,9 @@ Auctioneer_BasePrices = {
 	[6480]={b=3566,s=713,d=9541,c=AUCT_CLAS_ARMOR},  -- Slick Deviate Leggings
 	[6481]={b=3209,s=641,d=12068,c=AUCT_CLAS_ARMOR},  -- Dagmire Gauntlets
 	[6482]={b=3640,s=728,d=12070,c=AUCT_CLAS_ARMOR},  -- Firewalker Boots
+	[6486]={b=0,s=0,d=10043,q=20,x=20},  -- Singed Scale
 	[6487]={b=0,s=0,d=20931,q=20,x=20},  -- Vile Familiar Head
+	[6488]={b=0,s=0,d=12221,c=AUCT_CLAS_WRITTEN},  -- Simple Tablet
 	[6502]={b=5701,s=1140,d=12282,c=AUCT_CLAS_ARMOR},  -- Violet Scale Armor
 	[6503]={b=3814,s=762,d=12670,c=AUCT_CLAS_ARMOR},  -- Harlequin Robes
 	[6504]={b=14667,s=2933,d=20116,c=AUCT_CLAS_WEAPON},  -- Wingblade
@@ -3890,6 +4016,8 @@ Auctioneer_BasePrices = {
 	[6531]={b=2085,s=417,d=19110,c=AUCT_CLAS_ARMOR},  -- Barbaric Cloth Robe
 	[6532]={b=250,s=62,d=12423,x=20},  -- Bright Baubles
 	[6533]={b=250,s=62,d=12425,x=20,c=AUCT_CLAS_FISHING},  -- Aquadynamic Fish Attractor
+	[6534]={b=0,s=0,d=12434},  -- Forged Steel Bars
+	[6535]={b=0,s=0,d=12435},  -- Tablet of Verga
 	[6536]={b=2443,s=488,d=14739,c=AUCT_CLAS_ARMOR},  -- Willow Vest
 	[6537]={b=1051,s=210,d=12439,c=AUCT_CLAS_ARMOR},  -- Willow Boots
 	[6538]={b=2461,s=492,d=16522,c=AUCT_CLAS_ARMOR},  -- Willow Robe
@@ -3970,6 +4098,9 @@ Auctioneer_BasePrices = {
 	[6616]={b=11019,s=2203,d=16863,c=AUCT_CLAS_ARMOR},  -- Sage's Pants
 	[6617]={b=6855,s=1371,d=4904,c=AUCT_CLAS_ARMOR},  -- Sage's Mantle
 	[6622]={b=277000,s=55400,d=21554,c=AUCT_CLAS_WEAPON},  -- Sword of Zeal
+	[6624]={b=0,s=0,d=12565},  -- Ken'zigla's Draught
+	[6625]={b=0,s=0,d=12567},  -- Dirt-caked Pendant
+	[6626]={b=0,s=0,d=12567},  -- Dogran's Pendant
 	[6627]={b=13104,s=2620,d=12595,c=AUCT_CLAS_ARMOR},  -- Mutant Scale Breastplate
 	[6628]={b=1851,s=370,d=16952,c=AUCT_CLAS_ARMOR},  -- Raven's Claws
 	[6629]={b=3150,s=630,d=23141,c=AUCT_CLAS_ARMOR},  -- Sporid Cape
@@ -3980,11 +4111,16 @@ Auctioneer_BasePrices = {
 	[6634]={b=0,s=0,d=6381,q=20,x=20},  -- Ritual Salve
 	[6635]={b=0,s=0,d=6400,c=AUCT_CLAS_SHAMAN},  -- Earth Sapta
 	[6636]={b=0,s=0,d=12621,c=AUCT_CLAS_SHAMAN},  -- Fire Sapta
+	[6637]={b=0,s=0,d=6340,c=AUCT_CLAS_SHAMAN},  -- Water Sapta
+	[6640]={b=0,s=0,d=12625,q=20,x=20},  -- Felstalker Hoof
 	[6641]={b=18376,s=3675,d=20167,c=AUCT_CLAS_WEAPON},  -- Haunting Blade
 	[6642]={b=9402,s=1880,d=12632,c=AUCT_CLAS_ARMOR},  -- Phantom Armor
+	[6643]={b=25,s=6,d=18535,c=AUCT_CLAS_FOOD},  -- Bloated Smallfish
+	[6645]={b=100,s=25,d=24694,c=AUCT_CLAS_FOOD},  -- Bloated Mud Snapper
 	[6652]={b=0,s=0,d=12735},  -- Reagent Pouch
 	[6653]={b=0,s=0,d=12992,c=AUCT_CLAS_WEAPON},  -- Torch of the Dormant Flame
 	[6654]={b=0,s=0,d=12738,c=AUCT_CLAS_WEAPON},  -- Torch of the Eternal Flame
+	[6655]={b=0,s=0,d=12736},  -- Glowing Ember
 	[6656]={b=0,s=0,d=12746},  -- Rough Quartz
 	[6657]={b=20,s=5,d=12780,x=20},  -- Savory Deviate Delight
 	[6658]={b=0,s=0,d=12643},  -- Example Collar
@@ -4024,12 +4160,14 @@ Auctioneer_BasePrices = {
 	[6696]={b=25431,s=5086,d=20650,c=AUCT_CLAS_WEAPON},  -- Nightstalker Bow
 	[6697]={b=10208,s=2041,d=5116,c=AUCT_CLAS_ARMOR},  -- Batwing Mantle
 	[6709]={b=2726,s=545,d=12924,c=AUCT_CLAS_ARMOR},  -- Moonglow Vest
+	[6710]={b=550,s=137,d=1102},  -- Pattern: Moonglow Vest
 	[6712]={b=50,s=12,d=12925},  -- Practice Lock
 	[6713]={b=51,s=10,d=12928,c=AUCT_CLAS_ARMOR},  -- Ripped Pants
 	[6714]={b=300,s=75,d=18062,x=20},  -- Ez-Thro Dynamite
 	[6715]={b=85,s=21,d=7064},  -- Ruined Jumper Cables
 	[6716]={b=800,s=200,d=15274},  -- Schematic: EZ-Thro Dynamite
 	[6717]={b=0,s=0,d=8931,q=20,x=20},  -- Gaffer Jack
+	[6718]={b=0,s=0,d=7411,q=20,x=20},  -- Electropeller
 	[6719]={b=5485,s=1097,d=17134,c=AUCT_CLAS_ARMOR},  -- Windborne Belt
 	[6720]={b=16094,s=3218,d=28984,c=AUCT_CLAS_ARMOR},  -- Spirit Hunter Headdress
 	[6721]={b=7094,s=1418,d=12934,c=AUCT_CLAS_ARMOR},  -- Chestplate of Kor
@@ -4066,7 +4204,12 @@ Auctioneer_BasePrices = {
 	[6767]={b=0,s=0,d=12863},  -- Tyranis' Pendant
 	[6773]={b=36831,s=7366,d=13011,c=AUCT_CLAS_ARMOR},  -- Gelkis Marauder Chain
 	[6774]={b=11540,s=2885,d=13012,c=AUCT_CLAS_WEAPON},  -- Uthek's Finger
+	[6775]={b=0,s=0,d=13005,c=AUCT_CLAS_QUEST},  -- Tome of Divinity
+	[6776]={b=0,s=0,d=13005,c=AUCT_CLAS_QUEST},  -- Tome of Valor
 	[6780]={b=7800,s=1560,d=13023,c=AUCT_CLAS_ARMOR},  -- Lilac Sash
+	[6781]={b=0,s=0,d=18100},  -- Bartleby's Mug
+	[6782]={b=0,s=0,d=13024},  -- Marshal Haggard's Badge
+	[6783]={b=0,s=0,d=13025},  -- Dead-tooth's Key
 	[6784]={b=10159,s=2031,d=13026,c=AUCT_CLAS_ARMOR},  -- Braced Handguards
 	[6785]={b=0,s=0,d=7637},  -- Powers of the Void
 	[6786]={b=298,s=59,d=13043,c=AUCT_CLAS_ARMOR},  -- Simple Dress
@@ -4082,6 +4225,8 @@ Auctioneer_BasePrices = {
 	[6796]={b=3000,s=750,d=13057,c=AUCT_CLAS_ARMOR},  -- Red Swashbuckler's Shirt
 	[6797]={b=31812,s=6362,d=21014,c=AUCT_CLAS_WEAPON},  -- Eyepoker
 	[6798]={b=31934,s=6386,d=13060,c=AUCT_CLAS_WEAPON},  -- Blasting Hackbut
+	[6799]={b=0,s=0,d=13061},  -- Vejrek's Head
+	[6800]={b=0,s=0,d=13063,q=20,x=20},  -- Umbral Ore
 	[6801]={b=22282,s=4456,d=13077,c=AUCT_CLAS_ARMOR},  -- Baroque Apron
 	[6802]={b=91277,s=18255,d=20010,c=AUCT_CLAS_WEAPON},  -- Sword of Omen
 	[6803]={b=19540,s=4885,d=15430,c=AUCT_CLAS_WEAPON},  -- Prophetic Cane
@@ -4103,10 +4248,20 @@ Auctioneer_BasePrices = {
 	[6832]={b=18849,s=3769,d=23097,c=AUCT_CLAS_ARMOR},  -- Cloak of Blight
 	[6833]={b=2000,s=500,d=13115,c=AUCT_CLAS_ARMOR},  -- White Tuxedo Shirt
 	[6835]={b=2521,s=504,d=13117,c=AUCT_CLAS_ARMOR},  -- Black Tuxedo Pants
+	[6838]={b=0,s=0,d=9396,q=20,x=20},  -- Scorched Spider Fang
 	[6839]={b=0,s=0,d=13121,q=20,x=20},  -- Charred Horn
 	[6840]={b=0,s=0,d=13122,q=20,x=20},  -- Galvanized Horn
 	[6841]={b=0,s=0,d=4984},  -- Vial of Phlogiston
+	[6842]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Furen's Instructions
+	[6843]={b=0,s=0,d=7922},  -- Cask of Scalder
+	[6844]={b=0,s=0,d=18060,q=20,x=20},  -- Burning Blood
+	[6845]={b=0,s=0,d=13124,q=20,x=20},  -- Burning Rock
+	[6846]={b=0,s=0,d=13125,c=AUCT_CLAS_WRITTEN},  -- Defias Script
+	[6847]={b=0,s=0,d=13125,c=AUCT_CLAS_WRITTEN},  -- Dark Iron Script
+	[6848]={b=0,s=0,d=13918,q=20,x=20},  -- Searing Coral
+	[6849]={b=0,s=0,d=18054,q=20,x=20},  -- Sunscorched Shell
 	[6851]={b=0,s=0,d=19800},  -- Essence of the Exile
+	[6866]={b=0,s=0,d=13144},  -- Symbol of Life
 	[6887]={b=2000,s=5,d=4811,q=20,x=20},  -- Spotted Yellowtail
 	[6888]={b=40,s=10,d=18052,x=20},  -- Herb Baked Egg
 	[6889]={b=16,s=4,d=18046,x=10,u=AUCT_TYPE_COOK},  -- Small Egg
@@ -4132,6 +4287,9 @@ Auctioneer_BasePrices = {
 	[6913]={b=0,s=0,d=13458},  -- Heartswood Core
 	[6914]={b=0,s=0,d=1695,q=20,x=20},  -- Soran'ruk Fragment
 	[6915]={b=0,s=0,d=6564},  -- Large Soran'ruk Fragment
+	[6916]={b=0,s=0,d=13005,c=AUCT_CLAS_QUEST},  -- Tome of Divinity
+	[6926]={b=0,s=0,d=13430},  -- Furen's Notes
+	[6927]={b=0,s=0,d=13433},  -- Big Will's Ear
 	[6928]={b=0,s=0,d=13085},  -- Bloodstone Choker
 	[6929]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Bath'rah's Parchment
 	[6930]={b=0,s=0,d=13435,q=20,x=20},  -- Rod of Channeling
@@ -4168,8 +4326,10 @@ Auctioneer_BasePrices = {
 	[6989]={b=0,s=0,d=1150,q=20,x=20},  -- Vial of Hatefury Blood
 	[6990]={b=0,s=0,d=13490},  -- Lesser Infernal Stone
 	[6991]={b=0,s=0,d=9116,q=20,x=20,u=AUCT_TYPE_MINING},  -- Smoldering Coal
+	[6992]={b=0,s=0,d=13493},  -- Jordan's Ore Shipment
 	[6993]={b=0,s=0,d=13494},  -- Jordan's Refined Ore Shipment
 	[6994]={b=0,s=0,d=13495},  -- Whitestone Oak Lumber
+	[6995]={b=0,s=0,d=13703},  -- Corrupted Kor Gem
 	[6996]={b=0,s=0,d=13497,c=AUCT_CLAS_WRITTEN},  -- Jordan's Weapon Notes
 	[6997]={b=0,s=0,d=7798},  -- Tattered Manuscript
 	[6998]={b=3872,s=774,d=13500,c=AUCT_CLAS_ARMOR},  -- Nimbus Boots
@@ -4249,30 +4409,44 @@ Auctioneer_BasePrices = {
 	[7116]={b=3428,s=685,d=20602,c=AUCT_CLAS_WEAPON},  -- Heirloom Dagger
 	[7117]={b=3441,s=688,d=19776,c=AUCT_CLAS_WEAPON},  -- Heirloom Hammer
 	[7118]={b=3454,s=690,d=20161,c=AUCT_CLAS_WEAPON},  -- Heirloom Sword
+	[7119]={b=0,s=0,d=15507},  -- Twitching Antenna
 	[7120]={b=4479,s=895,d=22730,c=AUCT_CLAS_WEAPON},  -- Ruga's Bulwark
 	[7126]={b=0,s=0,d=13783,q=20,x=20},  -- Smokey Iron Ingot
 	[7127]={b=0,s=0,d=7171,q=20,x=20},  -- Powdered Azurite
+	[7128]={b=0,s=0,d=13785,q=20,x=20},  -- Uncloven Satyr Hoof
 	[7129]={b=7734,s=1546,d=13484,c=AUCT_CLAS_ARMOR},  -- Brutal Gauntlets
 	[7130]={b=11642,s=2328,d=15288,c=AUCT_CLAS_ARMOR},  -- Brutal Helm
+	[7131]={b=0,s=0,d=13799,q=20,x=20},  -- Dragonmaw Shinbone
 	[7132]={b=11692,s=2338,d=3541,c=AUCT_CLAS_ARMOR},  -- Brutal Legguards
 	[7133]={b=15493,s=3098,d=13011,c=AUCT_CLAS_ARMOR},  -- Brutal Hauberk
+	[7134]={b=0,s=0,d=13799,q=20,x=20},  -- Sturdy Dragonmaw Shinbone
+	[7135]={b=0,s=0,d=13806,q=20,x=20},  -- Broken Dragonmaw Shinbone
 	[7146]={b=0,s=0,d=8735},  -- The Scarlet Key
 	[7148]={b=85,s=21,d=31201,c=AUCT_CLAS_ARMOR},  -- Goblin Jumper Cables
 	[7166]={b=973,s=194,d=13848,c=AUCT_CLAS_WEAPON},  -- Copper Dagger
 	[7189]={b=23562,s=4712,d=20622,c=AUCT_CLAS_ARMOR},  -- Goblin Rocket Boots
+	[7190]={b=0,s=0,d=20623},  -- Scorched Rocket Boots
 	[7191]={b=0,s=0,d=16367,u=AUCT_TYPE_ENGINEER},  -- Fused Wiring
+	[7206]={b=0,s=0,d=18059},  -- Mirror Lake Water Sample
+	[7207]={b=0,s=0,d=18057},  -- Jennea's Flask
+	[7208]={b=0,s=0,d=13885},  -- Tazan's Key
+	[7209]={b=0,s=0,d=13884},  -- Tazan's Satchel
 	[7226]={b=0,s=0,d=13903},  -- Mage-tastic Gizmonitor
 	[7227]={b=0,s=0,d=13905},  -- Balnir Snapdragons
 	[7228]={b=500,s=25,d=13906,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Tigule and Foror's Strawberry Ice Cream
 	[7229]={b=1427,s=285,d=11563,c=AUCT_CLAS_ARMOR},  -- Explorer's Vest
 	[7230]={b=15515,s=3103,d=19610,c=AUCT_CLAS_WEAPON},  -- Smite's Mighty Hammer
+	[7231]={b=0,s=0,d=7695},  -- Astor's Letter of Introduction
 	[7247]={b=0,s=0,d=11449},  -- Chest of Containment Coffers
 	[7249]={b=0,s=0,d=7162,q=20,x=20},  -- Charged Rift Gem
 	[7266]={b=0,s=0,d=11181,c=AUCT_CLAS_WRITTEN},  -- Ur's Treatise on Shadow Magic
+	[7267]={b=0,s=0,d=18597,q=20,x=20,c=AUCT_CLAS_CLOTH},  -- Pristine Spider Silk
 	[7268]={b=0,s=0,d=18059},  -- Xavian Water Sample
 	[7269]={b=0,s=0,d=18057},  -- Deino's Flask
 	[7270]={b=0,s=0,d=13992,q=20,x=20},  -- Laughing Sister's Hair
+	[7271]={b=0,s=0,d=13998,q=20,x=20},  -- Flawless Ivory Tusk
 	[7272]={b=0,s=0,d=7143},  -- Bolt Charged Bramble
+	[7273]={b=0,s=0,d=14000,q=20,x=20},  -- Witherbark Totem Stick
 	[7274]={b=0,s=0,d=11181},  -- Rituals of Power
 	[7276]={b=170,s=34,d=23035,c=AUCT_CLAS_ARMOR},  -- Handstitched Leather Cloak
 	[7277]={b=142,s=28,d=14001,c=AUCT_CLAS_ARMOR},  -- Handstitched Leather Bracers
@@ -4291,11 +4465,16 @@ Auctioneer_BasePrices = {
 	[7290]={b=1600,s=400,d=1102},  -- Pattern: Red Whelp Gloves
 	[7291]={b=0,s=0,d=1695},  -- Infernal Orb
 	[7292]={b=0,s=0,d=14006,q=20,x=20},  -- Filled Containment Coffer
+	[7293]={b=0,s=0,d=14007,q=20,x=20},  -- Dalaran Mana Gem
+	[7294]={b=0,s=0,d=14008},  -- Andron's Ledger
+	[7295]={b=0,s=0,d=6645},  -- Tazan's Logbook
 	[7296]={b=225,s=56,d=14019,x=5},  -- Extinguished Torch
 	[7297]={b=0,s=0,d=21604,c=AUCT_CLAS_WEAPON},  -- Morbent's Bane
 	[7298]={b=2344,s=468,d=20425,c=AUCT_CLAS_WEAPON},  -- Blade of Cunning
+	[7306]={b=0,s=0,d=14023},  -- Fenwick's Head
 	[7307]={b=250,s=62,d=18098,x=20},  -- Flesh Eating Worm
 	[7308]={b=0,s=0,d=12328},  -- Cantation of Manifestation
+	[7309]={b=0,s=0,d=15374},  -- Dalaran Status Report
 	[7326]={b=3480,s=696,d=19132,c=AUCT_CLAS_WEAPON},  -- Thun'grim's Axe
 	[7327]={b=3493,s=698,d=20398,c=AUCT_CLAS_WEAPON},  -- Thun'grim's Dagger
 	[7328]={b=3506,s=701,d=19649,c=AUCT_CLAS_WEAPON},  -- Thun'grim's Mace
@@ -4303,6 +4482,7 @@ Auctioneer_BasePrices = {
 	[7330]={b=19615,s=3923,d=2632,c=AUCT_CLAS_WEAPON},  -- Infiltrator Buckler
 	[7331]={b=21654,s=4330,d=26046,c=AUCT_CLAS_WEAPON},  -- Phalanx Shield
 	[7332]={b=33462,s=6692,d=15003,c=AUCT_CLAS_ARMOR},  -- Regal Armor
+	[7333]={b=0,s=0,d=7276},  -- Overseer's Whistle
 	[7334]={b=7721,s=1544,d=16523,c=AUCT_CLAS_ARMOR},  -- Efflorescent Robe
 	[7335]={b=9685,s=1937,d=12482,c=AUCT_CLAS_ARMOR},  -- Grizzly Tunic
 	[7336]={b=7548,s=1509,d=14069,c=AUCT_CLAS_ARMOR},  -- Wildwood Chain
@@ -4349,6 +4529,7 @@ Auctioneer_BasePrices = {
 	[7378]={b=10731,s=2146,d=14803,c=AUCT_CLAS_ARMOR},  -- Dusky Bracers
 	[7386]={b=11937,s=2387,d=14831,c=AUCT_CLAS_ARMOR},  -- Green Whelp Bracers
 	[7387]={b=12939,s=2587,d=14832,c=AUCT_CLAS_ARMOR},  -- Dusky Belt
+	[7389]={b=0,s=0,d=3426},  -- Venture Co. Ledger
 	[7390]={b=21188,s=4237,d=17215,c=AUCT_CLAS_ARMOR},  -- Dusky Boots
 	[7391]={b=21265,s=4253,d=28734,c=AUCT_CLAS_ARMOR},  -- Swift Boots
 	[7392]={b=800,s=200,d=6646,x=5,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_ENCHANT},  -- Green Whelp Scale
@@ -4407,6 +4588,7 @@ Auctioneer_BasePrices = {
 	[7461]={b=12149,s=2429,d=25861,c=AUCT_CLAS_ARMOR},  -- Knight's Bracers
 	[7462]={b=13412,s=2682,d=25866,c=AUCT_CLAS_ARMOR},  -- Knight's Girdle
 	[7463]={b=31013,s=6202,d=4403,c=AUCT_CLAS_WEAPON},  -- Sentinel Buckler
+	[7464]={b=0,s=0,d=11180},  -- Glyphs of Summoning
 	[7465]={b=33735,s=6747,d=26065,c=AUCT_CLAS_WEAPON},  -- Knight's Crest
 	[7468]={b=33815,s=6763,d=15005,c=AUCT_CLAS_ARMOR},  -- Regal Robe
 	[7469]={b=31421,s=6284,d=15015,c=AUCT_CLAS_ARMOR},  -- Regal Leggings
@@ -4437,6 +4619,9 @@ Auctioneer_BasePrices = {
 	[7494]={b=17717,s=3543,d=25821,c=AUCT_CLAS_ARMOR},  -- Captain's Waistguard
 	[7495]={b=47792,s=9558,d=18451,c=AUCT_CLAS_WEAPON},  -- Captain's Buckler
 	[7496]={b=44412,s=8882,d=18697,c=AUCT_CLAS_WEAPON},  -- Field Plate Shield
+	[7498]={b=0,s=0,d=13025},  -- Top of Gelkak's Key
+	[7499]={b=0,s=0,d=15123},  -- Middle of Gelkak's Key
+	[7500]={b=0,s=0,d=8031},  -- Bottom of Gelkak's Key
 	[7506]={b=2000,s=500,d=15150,c=AUCT_CLAS_ARMOR},  -- Gnomish Universal Remote
 	[7507]={b=1600,s=400,d=22923,c=AUCT_CLAS_WEAPON},  -- Arcane Orb
 	[7508]={b=1600,s=400,d=22923,c=AUCT_CLAS_WEAPON},  -- Ley Orb
@@ -4488,6 +4673,10 @@ Auctioneer_BasePrices = {
 	[7559]={b=2665,s=666,d=11919,c=AUCT_CLAS_WEAPON},  -- Runic Cane
 	[7560]={b=1200,s=300,d=1102},  -- Schematic: Gnomish Universal Remote
 	[7561]={b=2000,s=500,d=1102},  -- Schematic: Goblin Jumper Cables
+	[7566]={b=0,s=0,d=16204},  -- Agamand Family Sword
+	[7567]={b=0,s=0,d=15471},  -- Agamand Family Axe
+	[7568]={b=0,s=0,d=7098},  -- Agamand Family Dagger
+	[7569]={b=0,s=0,d=16203},  -- Agamand Family Mace
 	[7586]={b=0,s=0,d=7245},  -- Tharnariun's Hope
 	[7587]={b=0,s=0,d=15510,c=AUCT_CLAS_WRITTEN},  -- Thun'grim's Instructions
 	[7606]={b=2788,s=557,d=15721,c=AUCT_CLAS_ARMOR},  -- Polar Gauntlets
@@ -4510,8 +4699,12 @@ Auctioneer_BasePrices = {
 	[7671]={b=0,s=0,d=18707},  -- Shattered Necklace Topaz
 	[7672]={b=0,s=0,d=6014},  -- Shattered Necklace Power Source
 	[7673]={b=35961,s=8990,d=9854,c=AUCT_CLAS_ARMOR},  -- Talvash's Enhancing Necklace
+	[7674]={b=0,s=0,d=15692},  -- Delivery to Mathias
+	[7675]={b=0,s=0,d=9717},  -- Defias Shipping Schedule
 	[7676]={b=120,s=30,d=18091,x=10},  -- Thistle Tea
 	[7678]={b=200,s=50,d=1102},  -- Recipe: Thistle Tea
+	[7679]={b=0,s=0,d=7886,q=20,x=20},  -- Shrike Bat Fang
+	[7680]={b=0,s=0,d=3563,q=20,x=20},  -- Jadespine Basilisk Scale
 	[7682]={b=38392,s=7678,d=6555,c=AUCT_CLAS_WEAPON},  -- Torturing Poker
 	[7683]={b=19792,s=3958,d=15720,c=AUCT_CLAS_WEAPON},  -- Bloody Brass Knuckles
 	[7684]={b=10924,s=2184,d=15800,c=AUCT_CLAS_ARMOR},  -- Bloodmage Mantle
@@ -4546,7 +4739,9 @@ Auctioneer_BasePrices = {
 	[7731]={b=13930,s=3482,d=15420,c=AUCT_CLAS_ARMOR},  -- Ghostshard Talisman
 	[7733]={b=0,s=0,d=15828},  -- Staff of Prehistoria
 	[7734]={b=61980,s=15495,d=3410,c=AUCT_CLAS_ARMOR},  -- Six Demon Bag
+	[7735]={b=0,s=0,d=13489},  -- Jannok's Rose
 	[7736]={b=59854,s=11970,d=5224,c=AUCT_CLAS_WEAPON},  -- Fight Club
+	[7737]={b=0,s=0,d=1246},  -- Sethir's Journal
 	[7738]={b=1058,s=211,d=16815,c=AUCT_CLAS_ARMOR},  -- Evergreen Gloves
 	[7739]={b=2401,s=480,d=15866,c=AUCT_CLAS_ARMOR},  -- Timberland Cape
 	[7740]={b=0,s=0,d=7366},  -- Gni'kiv Medallion
@@ -4568,17 +4763,33 @@ Auctioneer_BasePrices = {
 	[7759]={b=33619,s=6723,d=15897,c=AUCT_CLAS_ARMOR},  -- Archon Chestpiece
 	[7760]={b=30371,s=6074,d=21404,c=AUCT_CLAS_ARMOR},  -- Warchief Kilt
 	[7761]={b=56453,s=11290,d=19210,c=AUCT_CLAS_WEAPON},  -- Steelclaw Reaver
+	[7766]={b=0,s=0,d=29438},  -- Empty Brown Waterskin
+	[7767]={b=0,s=0,d=29434},  -- Empty Blue Waterskin
+	[7768]={b=0,s=0,d=29436},  -- Empty Red Waterskin
+	[7769]={b=0,s=0,d=29439},  -- Filled Brown Waterskin
+	[7770]={b=0,s=0,d=29435},  -- Filled Blue Waterskin
+	[7771]={b=0,s=0,d=29437},  -- Filled Red Waterskin
 	[7786]={b=28028,s=5605,d=15938,c=AUCT_CLAS_WEAPON},  -- Headsplitter
 	[7787]={b=19802,s=3960,d=18455,c=AUCT_CLAS_WEAPON},  -- Resplendent Guardian
 	[7806]={b=40,s=10,d=15963,x=20},  -- Lollipop
 	[7807]={b=40,s=10,d=15964,x=20},  -- Candy Bar
 	[7808]={b=40,s=10,d=15965,x=20},  -- Chocolate Square
 	[7809]={b=5124,s=1024,d=15966,c=AUCT_CLAS_ARMOR},  -- Easter Dress
+	[7810]={b=0,s=0,d=15794},  -- Vial of Purest Water
+	[7811]={b=0,s=0,d=4836},  -- Remaining Drops of Purest Water
+	[7812]={b=0,s=0,d=4829},  -- Corrupt Manifestation's Bracers
+	[7813]={b=0,s=0,d=1659},  -- Shard of Water
 	[7846]={b=0,s=0,d=7886,q=20,x=20},  -- Crag Coyote Fang
 	[7847]={b=0,s=0,d=1438,q=20,x=20},  -- Buzzard Gizzard
 	[7848]={b=0,s=0,d=18500,q=20,x=20},  -- Rock Elemental Shard
+	[7866]={b=0,s=0,d=16023},  -- Empty Thaumaturgy Vessel
+	[7867]={b=0,s=0,d=16024,q=20,x=20},  -- Vessel of Dragon's Blood
+	[7870]={b=0,s=0,d=18721},  -- Thaumaturgy Vessel Lockbox
 	[7871]={b=0,s=0,d=6357},  -- Token of Thievery
+	[7886]={b=0,s=0,d=4049},  -- Untranslated Journal
+	[7887]={b=0,s=0,d=16052},  -- Necklace and Gem Salvage
 	[7888]={b=35961,s=8990,d=9854,c=AUCT_CLAS_ARMOR},  -- Jarkal's Enhancing Necklace
+	[7906]={b=0,s=0,d=16283},  -- Horns of Nez'ra
 	[7907]={b=0,s=0,d=16065,c=AUCT_CLAS_WRITTEN},  -- Certificate of Thievery
 	[7908]={b=0,s=0,d=1134,c=AUCT_CLAS_WRITTEN},  -- Klaven Mortwake's Journal
 	[7909]={b=4000,s=1000,d=13496,x=20,c=AUCT_CLAS_GEM,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_ENGINEER},  -- Aquamarine
@@ -4631,7 +4842,9 @@ Auctioneer_BasePrices = {
 	[7965]={b=160,s=40,d=24686,x=20},  -- Solid Weightstone
 	[7966]={b=800,s=200,d=24681,x=20},  -- Solid Grinding Stone
 	[7967]={b=1000,s=250,d=16189,x=5},  -- Mithril Shield Spike
+	[7968]={b=0,s=0,d=16190},  -- Southsea Treasure
 	[7969]={b=1000,s=250,d=16205},  -- Mithril Spurs
+	[7970]={b=0,s=0,d=16206},  -- E.C.A.C.
 	[7971]={b=4000,s=1000,d=16209,x=20,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER},  -- Black Pearl
 	[7972]={b=1600,s=400,d=16210,x=10},  -- Ichor of Undeath
 	[7973]={b=185,s=46,d=16211},  -- Big-mouth Clam
@@ -4640,7 +4853,11 @@ Auctioneer_BasePrices = {
 	[7976]={b=8000,s=2000,d=1102},  -- Plans: Mithril Shield Spike
 	[7978]={b=3000,s=750,d=15274},  -- Plans: Barbaric Iron Shoulders
 	[7979]={b=3000,s=750,d=15274},  -- Plans: Barbaric Iron Breastplate
+	[7980]={b=3400,s=850,d=15274},  -- Plans: Barbaric Iron Helm
 	[7981]={b=4400,s=1100,d=15274},  -- Plans: Barbaric Iron Boots
+	[7982]={b=4400,s=1100,d=15274},  -- Plans: Barbaric Iron Gloves
+	[7983]={b=8000,s=2000,d=15274},  -- Plans: Ornate Mithril Pants
+	[7984]={b=8000,s=2000,d=15274},  -- Plans: Ornate Mithril Gloves
 	[7985]={b=8000,s=2000,d=15274},  -- Plans: Ornate Mithril Shoulder
 	[7989]={b=10000,s=2500,d=15274},  -- Plans: Mithril Spurs
 	[7990]={b=10000,s=2500,d=15274},  -- Plans: Heavy Mithril Helm
@@ -4657,6 +4874,7 @@ Auctioneer_BasePrices = {
 	[8027]={b=0,s=0,d=18718},  -- Krom Stoutarm's Treasure
 	[8028]={b=10000,s=2500,d=1102},  -- Plans: Runed Mithril Hammer
 	[8029]={b=8000,s=2000,d=15274},  -- Plans: Wicked Mithril Blade
+	[8030]={b=10000,s=2500,d=1301},  -- Plans: Ebon Shiv
 	[8046]={b=0,s=0,d=6672,c=AUCT_CLAS_WRITTEN},  -- Kearnen's Journal
 	[8047]={b=0,s=0,d=18719,q=20,x=20},  -- Magenta Fungus Cap
 	[8048]={b=0,s=0,d=16300},  -- Emerald Dreamcatcher
@@ -4686,6 +4904,7 @@ Auctioneer_BasePrices = {
 	[8084]={b=13517,s=2703,d=28401,c=AUCT_CLAS_ARMOR},  -- Light Plate Gloves
 	[8085]={b=26269,s=5253,d=28402,c=AUCT_CLAS_ARMOR},  -- Light Plate Pants
 	[8086]={b=18652,s=3730,d=28403,c=AUCT_CLAS_ARMOR},  -- Light Plate Shoulderpads
+	[8087]={b=0,s=0,d=9731},  -- Sample of Zanzil's Altered Mixture
 	[8088]={b=13335,s=2667,d=28395,c=AUCT_CLAS_ARMOR},  -- Platemail Belt
 	[8089]={b=20081,s=4016,d=28396,c=AUCT_CLAS_ARMOR},  -- Platemail Boots
 	[8090]={b=13439,s=2687,d=25829,c=AUCT_CLAS_ARMOR},  -- Platemail Bracers
@@ -4917,6 +5136,7 @@ Auctioneer_BasePrices = {
 	[8402]={b=5500,s=1375,d=1102},  -- Pattern: Tough Scorpid Helm
 	[8403]={b=4000,s=1000,d=1102},  -- Pattern: Wild Leather Shoulders
 	[8404]={b=4000,s=1000,d=1102},  -- Pattern: Wild Leather Vest
+	[8405]={b=4000,s=1000,d=1102},  -- Pattern: Wild Leather Helmet
 	[8406]={b=5000,s=1250,d=1102},  -- Pattern: Wild Leather Boots
 	[8407]={b=5000,s=1250,d=1102},  -- Pattern: Wild Leather Leggings
 	[8408]={b=5000,s=1250,d=1102},  -- Pattern: Wild Leather Cloak
@@ -4959,6 +5179,7 @@ Auctioneer_BasePrices = {
 	[8524]={b=0,s=0,d=14993,c=AUCT_CLAS_QUEST},  -- Model 4711-FTZ Power Source
 	[8525]={b=0,s=0,d=7798},  -- Zinge's Purchase Order
 	[8526]={b=0,s=0,d=17391},  -- Violet Tragan
+	[8527]={b=0,s=0,d=2592},  -- Sealed Field Testing Kit
 	[8528]={b=0,s=0,d=17397},  -- Violet Powder
 	[8529]={b=3500,s=175,d=17403,q=20,x=20,c=AUCT_CLAS_POTION},  -- Noggenfogger Elixir
 	[8544]={b=1600,s=400,d=17457,x=20},  -- Mageweave Bandage
@@ -4978,6 +5199,7 @@ Auctioneer_BasePrices = {
 	[8595]={b=800000,s=0,d=17785},  -- Blue Mechanostrider
 	[8603]={b=0,s=0,d=15734},  -- Thistleshrub Dew
 	[8623]={b=0,s=0,d=18632,c=AUCT_CLAS_QUEST},  -- OOX-17/TN Distress Beacon
+	[8626]={b=1000,s=250,d=17602,c=AUCT_CLAS_WEAPON},  -- Blue Sparkler
 	[8629]={b=800000,s=0,d=17606},  -- Reins of the Striped Nightsaber
 	[8631]={b=800000,s=0,d=17608},  -- Reins of the Striped Frostsaber
 	[8632]={b=800000,s=0,d=17608},  -- Reins of the Spotted Frostsaber
@@ -4985,10 +5207,12 @@ Auctioneer_BasePrices = {
 	[8644]={b=6000,s=1500,d=18050},  -- Fine Egg
 	[8645]={b=3000,s=750,d=18049},  -- Ordinary Egg
 	[8646]={b=1000,s=250,d=18049},  -- Bad Egg
+	[8647]={b=0,s=0,d=12331},  -- Egg Crate
 	[8663]={b=0,s=0,d=17655,c=AUCT_CLAS_ARMOR},  -- Mithril Insignia
 	[8683]={b=4,s=1,d=6410,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Clara's Fresh Apple
 	[8684]={b=0,s=0,d=18079,q=20,x=20},  -- Hinterlands Honey Ripple
 	[8685]={b=0,s=0,d=8381},  -- Dran's Ripple Delivery
+	[8686]={b=0,s=0,d=17685},  -- Mithril Pendant
 	[8687]={b=0,s=0,d=7744},  -- Sealed Description of Thredd's Visitor
 	[8703]={b=25968,s=6492,d=17776,c=AUCT_CLAS_ARMOR},  -- Signet of Expertise
 	[8704]={b=0,s=0,d=18632,c=AUCT_CLAS_QUEST},  -- OOX-09/HL Distress Beacon
@@ -5048,6 +5272,7 @@ Auctioneer_BasePrices = {
 	[9179]={b=4000,s=1000,d=3664,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Greater Intellect
 	[9186]={b=700,s=175,d=13709,x=10},  -- Mind-numbing Poison III
 	[9187]={b=2400,s=600,d=17902,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Greater Agility
+	[9189]={b=0,s=0,d=17911},  -- Shay's Bell
 	[9197]={b=2400,s=600,d=4134,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Dream Vision
 	[9206]={b=2800,s=700,d=17904,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Giants
 	[9210]={b=3000,s=750,d=9731,x=10},  -- Ghost Dye
@@ -5055,6 +5280,8 @@ Auctioneer_BasePrices = {
 	[9224]={b=2800,s=700,d=16325,x=5,u=AUCT_TYPE_ENCHANT},  -- Elixir of Demonslaying
 	[9233]={b=2000,s=500,d=15714,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Detect Demon
 	[9234]={b=0,s=0,d=1399},  -- Tiara of the Deep
+	[9235]={b=0,s=0,d=3018},  -- Pratt's Letter
+	[9236]={b=0,s=0,d=3029},  -- Jangdor's Letter
 	[9237]={b=0,s=0,d=18093,q=20,x=20},  -- Woodpaw Gnoll Mane
 	[9238]={b=0,s=0,d=8923,q=20,x=20},  -- Uncracked Scarab Shell
 	[9240]={b=0,s=0,d=17916},  -- Mallet of Zul'Farrak
@@ -5064,18 +5291,27 @@ Auctioneer_BasePrices = {
 	[9244]={b=0,s=0,d=7922},  -- Stoley's Shipment
 	[9245]={b=0,s=0,d=18080},  -- Stoley's Bottle
 	[9246]={b=0,s=0,d=7038},  -- Firebeard's Head
+	[9247]={b=0,s=0,d=3668,q=20,x=20,u=AUCT_TYPE_TAILOR},  -- Hatecrest Naga Scale
 	[9248]={b=0,s=0,d=18720},  -- Mysterious Relic
 	[9249]={b=6215,s=1553,d=6709},  -- Captain's Key
+	[9250]={b=0,s=0,d=811,c=AUCT_CLAS_QUEST},  -- Ship Schedule
 	[9251]={b=250,s=62,d=7695},  -- Upper Map Fragment
 	[9252]={b=250,s=62,d=7798},  -- Lower Map Fragment
 	[9253]={b=250,s=62,d=8927},  -- Middle Map Fragment
+	[9254]={b=0,s=0,d=1322,c=AUCT_CLAS_QUEST},  -- Cuergo's Treasure Map
+	[9255]={b=0,s=0,d=6688},  -- Lahassa Essence
+	[9256]={b=0,s=0,d=18021},  -- Imbel Essence
+	[9257]={b=0,s=0,d=18022},  -- Samha Essence
+	[9258]={b=0,s=0,d=1659},  -- Byltan Essence
 	[9259]={b=258,s=64,d=9860,x=20},  -- Troll Tribal Necklace
 	[9260]={b=1600,s=400,d=18059,x=10,u=AUCT_TYPE_ALCHEM},  -- Volatile Rum
 	[9261]={b=1000,s=250,d=4690,x=10},  -- Lead Ore
 	[9262]={b=4000,s=1000,d=17957,x=10},  -- Black Vitriol
 	[9263]={b=0,s=0,d=8556},  -- Troyas' Stave
 	[9264]={b=140,s=35,d=24216,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Shadow Power
+	[9265]={b=60,s=15,d=13100},  -- Cuergo's Hidden Treasure
 	[9266]={b=0,s=0,d=3331},  -- Woodpaw Battle Plans
+	[9275]={b=0,s=0,d=13025},  -- Cuergo's Key
 	[9276]={b=400,s=100,d=12332},  -- Pirate's Footlocker
 	[9277]={b=0,s=0,d=17922},  -- Techbot's Memory Core
 	[9278]={b=0,s=0,d=18215,q=20,x=20},  -- Essential Artificial
@@ -5107,6 +5343,7 @@ Auctioneer_BasePrices = {
 	[9304]={b=8000,s=2000,d=1301},  -- Recipe: Transmute Iron to Gold
 	[9305]={b=8000,s=2000,d=1301},  -- Recipe: Transmute Mithril to Truesilver
 	[9306]={b=0,s=0,d=18026},  -- Stave of Equinex
+	[9307]={b=0,s=0,d=6506},  -- A Sparkling Stone
 	[9308]={b=152,s=38,d=18716,x=20},  -- Grime-Encrusted Object
 	[9309]={b=0,s=0,d=8931,q=20,x=20},  -- Robo-mechanical Guts
 	[9311]={b=0,s=0,d=7798},  -- Default Stationery
@@ -5125,6 +5362,7 @@ Auctioneer_BasePrices = {
 	[9328]={b=0,s=0,d=18155},  -- Super Snapper FX
 	[9329]={b=0,s=0,d=3029,c=AUCT_CLAS_WRITTEN},  -- A Short Note
 	[9330]={b=0,s=0,d=18158,c=AUCT_CLAS_WRITTEN},  -- Snapshot of Gammerita
+	[9331]={b=0,s=0,d=18164},  -- Feralas: A History
 	[9332]={b=155,s=38,d=18170,x=20},  -- Crusted Bandages
 	[9333]={b=295,s=73,d=18172,x=20,c=AUCT_CLAS_ARMOR},  -- Tarnished Silver Necklace
 	[9334]={b=190,s=47,d=18173,x=10},  -- Cracked Pottery
@@ -5136,15 +5374,18 @@ Auctioneer_BasePrices = {
 	[9358]={b=915,s=228,d=18193,x=20},  -- A Head Rag
 	[9359]={b=97888,s=19577,d=19756,c=AUCT_CLAS_WEAPON},  -- Wirt's Third Leg
 	[9360]={b=1600,s=400,d=18059},  -- Cuergo's Gold
+	[9361]={b=1600,s=400,d=18059},  -- Cuergo's Gold with Worm
 	[9362]={b=0,s=0,d=224,c=AUCT_CLAS_ARMOR},  -- Brilliant Gold Ring
 	[9363]={b=50,s=12,d=18499},  -- Sparklematic-Wrapped Box
 	[9364]={b=0,s=0,d=18057},  -- Heavy Leaden Collection Phial
 	[9365]={b=0,s=0,d=18649},  -- High Potency Radioactive Fallout
 	[9366]={b=18446,s=3689,d=18256,c=AUCT_CLAS_ARMOR},  -- Golden Scale Gauntlets
 	[9367]={b=5000,s=1250,d=15274},  -- Plans: Golden Scale Gauntlets
+	[9368]={b=0,s=0,d=9837},  -- Jer'kai's Signet Ring
 	[9369]={b=0,s=0,d=3668,q=20,x=20},  -- Iridescent Sprite Darter Wing
 	[9370]={b=0,s=0,d=1093,c=AUCT_CLAS_QUEST},  -- Gordunni Scroll
 	[9371]={b=0,s=0,d=16209},  -- Gordunni Orb
+	[9372]={b=309681,s=61936,d=20616,c=AUCT_CLAS_WEAPON},  -- Sul'thraze the Lasher
 	[9375]={b=21101,s=4220,d=21295,c=AUCT_CLAS_ARMOR},  -- Expert Goldminer's Helmet
 	[9378]={b=56901,s=11380,d=18257,c=AUCT_CLAS_WEAPON},  -- Shovelphlange's Mining Axe
 	[9379]={b=131917,s=26383,d=20032,c=AUCT_CLAS_WEAPON},  -- Sang'thraze the Deflector
@@ -5202,6 +5443,7 @@ Auctioneer_BasePrices = {
 	[9433]={b=20669,s=4133,d=18337,c=AUCT_CLAS_ARMOR},  -- Forgotten Wraps
 	[9434]={b=28240,s=5648,d=18338,c=AUCT_CLAS_ARMOR},  -- Elemental Raiment
 	[9435]={b=14583,s=2916,d=18339,c=AUCT_CLAS_ARMOR},  -- Reticulated Bone Gauntlets
+	[9436]={b=0,s=0,d=18359},  -- Faranell's Parcel
 	[9437]={b=0,s=0,d=3563,q=20,x=20},  -- Untested Basilisk Sample
 	[9438]={b=0,s=0,d=18712,q=20,x=20},  -- Acceptable Scorpid Sample
 	[9439]={b=0,s=0,d=11164,q=20,x=20},  -- Untested Hyena Sample
@@ -5224,7 +5466,9 @@ Auctioneer_BasePrices = {
 	[9457]={b=44510,s=8902,d=18373,c=AUCT_CLAS_WEAPON},  -- Royal Diplomatic Scepter
 	[9458]={b=34589,s=6917,d=18374,c=AUCT_CLAS_WEAPON},  -- Thermaplugg's Central Core
 	[9459]={b=67801,s=13560,d=19298,c=AUCT_CLAS_WEAPON},  -- Thermaplugg's Left Arm
+	[9460]={b=0,s=0,d=13998,q=20,x=20},  -- Grimtotem Horn
 	[9461]={b=18345,s=4586,d=3258,c=AUCT_CLAS_ARMOR},  -- Charged Gear
+	[9462]={b=0,s=0,d=9151},  -- Crate of Grimtotem Horns
 	[9463]={b=0,s=0,d=18021,q=20,x=20},  -- Gordunni Cobalt
 	[9465]={b=92804,s=18560,d=18377,c=AUCT_CLAS_WEAPON},  -- Digmaster 5000
 	[9466]={b=0,s=0,d=18379},  -- Orwin's Shovel
@@ -5280,19 +5524,38 @@ Auctioneer_BasePrices = {
 	[9535]={b=7034,s=1406,d=28169,c=AUCT_CLAS_ARMOR},  -- Fire-welded Bracers
 	[9536]={b=7059,s=1411,d=18901,c=AUCT_CLAS_ARMOR},  -- Fairywing Mantle
 	[9538]={b=25852,s=6463,d=224,c=AUCT_CLAS_ARMOR},  -- Talvash's Gold Ring
+	[9539]={b=200,s=50,d=12925},  -- Box of Rations
+	[9540]={b=600,s=150,d=14006},  -- Box of Spells
+	[9541]={b=800,s=200,d=16028},  -- Box of Goodies
 	[9542]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Simple Letter
+	[9543]={b=0,s=0,d=22443,c=AUCT_CLAS_WRITTEN},  -- Simple Rune
+	[9544]={b=0,s=0,d=7629,c=AUCT_CLAS_WRITTEN},  -- Simple Memorandum
 	[9545]={b=0,s=0,d=6015,c=AUCT_CLAS_WRITTEN},  -- Simple Sigil
+	[9546]={b=0,s=0,d=1301,c=AUCT_CLAS_WRITTEN},  -- Simple Scroll
 	[9547]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Simple Note
+	[9548]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Hallowed Letter
 	[9550]={b=0,s=0,d=22443,c=AUCT_CLAS_WRITTEN},  -- Encrypted Rune
+	[9551]={b=0,s=0,d=6015,c=AUCT_CLAS_WRITTEN},  -- Encrypted Sigil
 	[9552]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Rune-Inscribed Note
 	[9553]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Etched Parchment
+	[9554]={b=0,s=0,d=18500,c=AUCT_CLAS_WRITTEN},  -- Encrypted Tablet
+	[9555]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Encrypted Letter
+	[9556]={b=0,s=0,d=22443,c=AUCT_CLAS_WRITTEN},  -- Hallowed Rune
 	[9557]={b=0,s=0,d=6015,c=AUCT_CLAS_WRITTEN},  -- Hallowed Sigil
 	[9558]={b=0,s=0,d=7629,c=AUCT_CLAS_WRITTEN},  -- Encrypted Memorandum
+	[9559]={b=0,s=0,d=1301,c=AUCT_CLAS_WRITTEN},  -- Encrypted Scroll
 	[9560]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Encrypted Parchment
+	[9561]={b=0,s=0,d=18500,c=AUCT_CLAS_WRITTEN},  -- Hallowed Tablet
+	[9562]={b=0,s=0,d=18500,c=AUCT_CLAS_WRITTEN},  -- Rune-Inscribed Tablet
 	[9563]={b=0,s=0,d=22443,c=AUCT_CLAS_WRITTEN},  -- Consecrated Rune
+	[9564]={b=0,s=0,d=18500,c=AUCT_CLAS_WRITTEN},  -- Etched Tablet
+	[9565]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Etched Note
 	[9566]={b=0,s=0,d=22443,c=AUCT_CLAS_WRITTEN},  -- Etched Rune
+	[9567]={b=0,s=0,d=6015,c=AUCT_CLAS_WRITTEN},  -- Etched Sigil
+	[9568]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Rune-Inscribed Parchment
 	[9569]={b=0,s=0,d=1301,c=AUCT_CLAS_WRITTEN},  -- Hallowed Scroll
 	[9570]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Consecrated Letter
+	[9571]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Glyphic Letter
 	[9573]={b=0,s=0,d=7629,c=AUCT_CLAS_WRITTEN},  -- Glyphic Memorandum
 	[9574]={b=0,s=0,d=1301,c=AUCT_CLAS_WRITTEN},  -- Glyphic Scroll
 	[9575]={b=0,s=0,d=18500,c=AUCT_CLAS_WRITTEN},  -- Glyphic Tablet
@@ -5998,18 +6261,24 @@ Auctioneer_BasePrices = {
 	[10443]={b=0,s=0,d=3093},  -- Singed Letter
 	[10444]={b=0,s=0,d=19225},  -- Standard Issue Flare Gun
 	[10445]={b=0,s=0,d=12925},  -- Drawing Kit
+	[10446]={b=0,s=0,d=19239},  -- Heart of Obsidion
+	[10447]={b=0,s=0,d=3920},  -- Head of Lathoric the Black
 	[10450]={b=1585,s=396,d=19530,x=20},  -- Undamaged Hippogryph Feather
 	[10454]={b=0,s=0,d=6513,c=AUCT_CLAS_QUEST},  -- Essence of Eranikus
 	[10455]={b=25859,s=6464,d=6513,c=AUCT_CLAS_ARMOR},  -- Chained Essence of Eranikus
 	[10456]={b=0,s=0,d=2588},  -- A Bulging Coin Purse
 	[10457]={b=570,s=142,d=19284,x=5},  -- Empty Sea Snail Shell
+	[10458]={b=0,s=0,d=7697},  -- Prayer to Elune
 	[10459]={b=0,s=0,d=10377},  -- Chief Sharptusk Thornmantle's Head
 	[10460]={b=2518,s=629,d=19312},  -- Hakkar'i Blood
 	[10461]={b=15410,s=3082,d=19314,c=AUCT_CLAS_ARMOR},  -- Shadowy Bracers
 	[10462]={b=18044,s=3608,d=19313,c=AUCT_CLAS_ARMOR},  -- Shadowy Belt
 	[10463]={b=7000,s=1750,d=15274},  -- Pattern: Shadoweave Mask
+	[10464]={b=0,s=0,d=19315},  -- Staff of Command
 	[10465]={b=0,s=0,d=18050},  -- Egg of Hakkar
 	[10466]={b=0,s=0,d=19316},  -- Atal'ai Stone Circle
+	[10467]={b=0,s=0,d=1283},  -- Trader's Satchel
+	[10479]={b=48,s=24,d=1283},  -- Kovic's Trading Satchel
 	[10498]={b=81,s=16,d=19394},  -- Gyromatic Micro-Adjustor
 	[10499]={b=10526,s=2105,d=19397,c=AUCT_CLAS_ARMOR},  -- Bright-Eye Goggles
 	[10500]={b=17394,s=3478,d=19399,c=AUCT_CLAS_ARMOR,u=AUCT_TYPE_ENGINEER},  -- Fire Goggles
@@ -6023,6 +6292,7 @@ Auctioneer_BasePrices = {
 	[10508]={b=44794,s=8958,d=18298,c=AUCT_CLAS_WEAPON},  -- Mithril Blunderbuss
 	[10509]={b=0,s=0,d=7050,q=4,x=4},  -- Heart of Flame
 	[10510]={b=56845,s=11369,d=20744,c=AUCT_CLAS_WEAPON},  -- Mithril Heavy-bore Rifle
+	[10511]={b=0,s=0,d=19421,q=4,x=4,c=AUCT_CLAS_POTION},  -- Golem Oil
 	[10512]={b=1000,s=2,d=19422,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Hi-Impact Mithril Slugs
 	[10513]={b=2000,s=5,d=19422,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Mithril Gyro-Shot
 	[10514]={b=3000,s=750,d=7889,x=10},  -- Mithril Frag Bomb
@@ -6041,6 +6311,7 @@ Auctioneer_BasePrices = {
 	[10548]={b=10000,s=2500,d=7326,x=5},  -- Sniper Scope
 	[10549]={b=811,s=162,d=19951,c=AUCT_CLAS_ARMOR},  -- Rancher's Trousers
 	[10550]={b=243,s=48,d=19994,c=AUCT_CLAS_ARMOR},  -- Wooly Mittens
+	[10551]={b=0,s=0,d=19459,q=10,x=10},  -- Thorium Plated Dagger
 	[10552]={b=0,s=0,d=19462},  -- Symbol of Ragnaros
 	[10553]={b=657,s=131,d=19919,c=AUCT_CLAS_ARMOR},  -- Foreman Vest
 	[10554]={b=597,s=119,d=19918,c=AUCT_CLAS_ARMOR},  -- Foreman Pants
@@ -6055,6 +6326,7 @@ Auctioneer_BasePrices = {
 	[10565]={b=0,s=0,d=7629},  -- Rubbing: Rune of Markri
 	[10566]={b=0,s=0,d=7629},  -- Rubbing: Rune of Sael'hai
 	[10567]={b=43628,s=8725,d=20649,c=AUCT_CLAS_WEAPON},  -- Quillshooter
+	[10569]={b=0,s=0,d=14006},  -- Hoard of the Black Dragonflight
 	[10570]={b=79375,s=15875,d=28796,c=AUCT_CLAS_WEAPON},  -- Manslayer
 	[10571]={b=54635,s=10927,d=19501,c=AUCT_CLAS_WEAPON},  -- Ebony Boneclub
 	[10572]={b=47960,s=9592,d=28747,c=AUCT_CLAS_WEAPON},  -- Freezing Shard
@@ -6071,6 +6343,7 @@ Auctioneer_BasePrices = {
 	[10586]={b=3000,s=750,d=7888,x=10},  -- The Big One
 	[10587]={b=6000,s=1500,d=20627,c=AUCT_CLAS_ARMOR},  -- Goblin Bomb Dispenser
 	[10588]={b=29171,s=5834,d=23166,c=AUCT_CLAS_ARMOR},  -- Goblin Rocket Helmet
+	[10589]={b=0,s=0,d=20220,c=AUCT_CLAS_QUEST},  -- Oathstone of Ysera's Dragonflight
 	[10590]={b=0,s=0,d=7074,c=AUCT_CLAS_QUEST},  -- Pocked Black Box
 	[10592]={b=600,s=150,d=19520,x=5,u=AUCT_TYPE_ENGINEER},  -- Catseye Elixir
 	[10593]={b=0,s=0,d=6673,q=20,x=20},  -- Imperfect Draenethyst Fragment
@@ -6087,7 +6360,9 @@ Auctioneer_BasePrices = {
 	[10607]={b=3600,s=900,d=1102},  -- Schematic: Deepdive Helmet
 	[10608]={b=3800,s=950,d=1102},  -- Schematic: Sniper Scope
 	[10609]={b=4000,s=1000,d=1102},  -- Schematic: Mithril Mechanical Dragonling
+	[10610]={b=0,s=0,d=19547},  -- Hetaera's Blood
 	[10620]={b=1000,s=250,d=20658,x=10,c=AUCT_CLAS_ORE,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_MINING},  -- Thorium Ore
+	[10621]={b=0,s=0,d=1301,c=AUCT_CLAS_QUEST},  -- Runed Scroll
 	[10622]={b=0,s=0,d=19562},  -- Kadrak's Flag
 	[10623]={b=123740,s=24748,d=18391,c=AUCT_CLAS_WEAPON},  -- Winter's Bite
 	[10624]={b=86246,s=17249,d=25604,c=AUCT_CLAS_WEAPON},  -- Stinging Bow
@@ -6115,6 +6390,7 @@ Auctioneer_BasePrices = {
 	[10646]={b=2000,s=500,d=20535,x=10},  -- Goblin Sapper Charge
 	[10647]={b=2000,s=500,d=17883,x=10,u=AUCT_TYPE_ENGINEER},  -- Engineer's Ink
 	[10648]={b=500,s=125,d=7744,x=10,u=AUCT_TYPE_ENGINEER},  -- Blank Parchment
+	[10649]={b=0,s=0,d=19223},  -- Nightmare Shard
 	[10652]={b=151543,s=30308,d=22213,c=AUCT_CLAS_WEAPON},  -- Will of the Mountain Giant
 	[10653]={b=8197,s=1639,d=9174,c=AUCT_CLAS_ARMOR},  -- Trailblazer Boots
 	[10654]={b=4827,s=965,d=19949,c=AUCT_CLAS_ARMOR},  -- Jutebraid Gloves
@@ -6129,6 +6405,7 @@ Auctioneer_BasePrices = {
 	[10663]={b=0,s=0,d=19576},  -- Essence of Hakkar
 	[10664]={b=0,s=0,d=7798},  -- A Note to Magus Rimtori
 	[10678]={b=0,s=0,d=3024},  -- Magatha's Note
+	[10679]={b=0,s=0,d=3024},  -- Andron's Note
 	[10680]={b=0,s=0,d=3024},  -- Jes'rimon's Note
 	[10681]={b=0,s=0,d=3024},  -- Xylem's Note
 	[10682]={b=0,s=0,d=20219},  -- Belnistrasz's Oathstone
@@ -6161,14 +6438,20 @@ Auctioneer_BasePrices = {
 	[10711]={b=33510,s=8377,d=9854,c=AUCT_CLAS_ARMOR},  -- Dragon's Blood Necklace
 	[10712]={b=0,s=0,d=2533,c=AUCT_CLAS_POTION},  -- Cuely's Elixir
 	[10713]={b=2000,s=500,d=6270,u=AUCT_TYPE_ENGINEER},  -- Plans: Inlaid Mithril Cylinder
+	[10714]={b=0,s=0,d=13496,q=20,x=20},  -- Crystallized Azsharite
+	[10715]={b=0,s=0,d=18155},  -- Kim'Jael's Scope
 	[10716]={b=3000,s=750,d=20625,c=AUCT_CLAS_ARMOR},  -- Gnomish Shrink Ray
+	[10717]={b=0,s=0,d=19658},  -- Kim'Jael's Compass
+	[10718]={b=0,s=0,d=7842},  -- Kim'Jael's Wizzlegoober
 	[10720]={b=3000,s=750,d=19662,c=AUCT_CLAS_ARMOR},  -- Gnomish Net-o-Matic Projector
 	[10721]={b=16587,s=3317,d=14832,c=AUCT_CLAS_ARMOR},  -- Gnomish Harm Prevention Belt
+	[10722]={b=0,s=0,d=19663},  -- Kim'Jael's Stuffed Chicken
 	[10724]={b=23484,s=4696,d=19665,c=AUCT_CLAS_ARMOR},  -- Gnomish Rocket Boots
 	[10725]={b=6000,s=1500,d=19666,c=AUCT_CLAS_ARMOR},  -- Gnomish Battle Chicken
 	[10726]={b=27603,s=5520,d=19667,c=AUCT_CLAS_ARMOR},  -- Gnomish Mind Control Cap
 	[10727]={b=8000,s=2000,d=20539,c=AUCT_CLAS_ARMOR},  -- Goblin Dragon Gun
 	[10728]={b=1500,s=375,d=1102},  -- Pattern: Black Swashbuckler's Shirt
+	[10738]={b=0,s=0,d=11448},  -- Shipment to Galvan
 	[10739]={b=21170,s=5292,d=15422,c=AUCT_CLAS_ARMOR},  -- Ring of Fortitude
 	[10740]={b=53464,s=10692,d=28310,c=AUCT_CLAS_ARMOR},  -- Centurion Legplates
 	[10741]={b=50318,s=10063,d=28212,c=AUCT_CLAS_ARMOR},  -- Lordrec Helmet
@@ -6182,6 +6465,7 @@ Auctioneer_BasePrices = {
 	[10749]={b=52774,s=10554,d=19728,c=AUCT_CLAS_ARMOR},  -- Avenguard Helm
 	[10750]={b=176577,s=35315,d=20569,c=AUCT_CLAS_WEAPON},  -- Lifeforce Dirk
 	[10751]={b=53170,s=10634,d=19920,c=AUCT_CLAS_ARMOR},  -- Gemburst Circlet
+	[10752]={b=0,s=0,d=19745},  -- Emerald Encrusted Chest
 	[10753]={b=0,s=0,d=19762},  -- Amulet of Grol
 	[10754]={b=0,s=0,d=19763},  -- Amulet of Sevine
 	[10755]={b=0,s=0,d=19764},  -- Amulet of Allistarj
@@ -6220,7 +6504,9 @@ Auctioneer_BasePrices = {
 	[10789]={b=0,s=0,d=1134,c=AUCT_CLAS_WRITTEN},  -- Manual of Engineering Disciplines
 	[10790]={b=0,s=0,d=3032},  -- Gnome Engineer Membership Card
 	[10791]={b=0,s=0,d=5567},  -- Goblin Engineer Membership Card
+	[10792]={b=0,s=0,d=7744},  -- Nixx's Pledge of Secrecy
 	[10793]={b=0,s=0,d=7744},  -- Overspark's Pledge of Secrecy
+	[10794]={b=0,s=0,d=7744},  -- Oglethorpe's Pledge of Secrecy
 	[10795]={b=22170,s=5542,d=9834,c=AUCT_CLAS_ARMOR},  -- Drakeclaw Band
 	[10796]={b=35930,s=8982,d=21602,c=AUCT_CLAS_WEAPON},  -- Drakestone
 	[10797]={b=175347,s=35069,d=20030,c=AUCT_CLAS_WEAPON},  -- Firebreather
@@ -6247,7 +6533,10 @@ Auctioneer_BasePrices = {
 	[10828]={b=202136,s=40427,d=20273,c=AUCT_CLAS_WEAPON},  -- Dire Nail
 	[10829]={b=42720,s=10680,d=6494,c=AUCT_CLAS_ARMOR},  -- Dragon's Eye
 	[10830]={b=3000,s=750,d=25482,x=10},  -- M73 Frag Grenade
+	[10831]={b=0,s=0,d=6506},  -- Fel Orb
+	[10832]={b=0,s=0,d=1246,c=AUCT_CLAS_WRITTEN},  -- Fel Tracker Owner's Manual
 	[10833]={b=42986,s=8597,d=19838,c=AUCT_CLAS_ARMOR},  -- Horns of Eranikus
+	[10834]={b=0,s=0,d=15692},  -- Felhound Tracker Kit
 	[10835]={b=123225,s=24645,d=19840,c=AUCT_CLAS_WEAPON},  -- Crest of Supremacy
 	[10836]={b=144946,s=28989,d=20788,c=AUCT_CLAS_WEAPON},  -- Rod of Corrosion
 	[10837]={b=194005,s=38801,d=19841,c=AUCT_CLAS_WEAPON},  -- Tooth of Eranikus
@@ -6286,6 +6575,8 @@ Auctioneer_BasePrices = {
 	[11040]={b=4,s=1,d=1442,q=20,x=20},  -- Morrowgrain
 	[11058]={b=0,s=0,d=20558},  -- Sha'ni's Nose-Ring
 	[11078]={b=0,s=0,d=4287,q=20,x=20},  -- Relic Coffer Key
+	[11079]={b=0,s=0,d=20597},  -- Gor'tesh's Lopped Off Head
+	[11080]={b=0,s=0,d=20597},  -- Gor'tesh's Lopped Off Head
 	[11081]={b=800,s=200,d=11431},  -- Formula: Enchant Shield - Lesser Protection
 	[11082]={b=9000,s=0,d=20613,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Greater Astral Essence
 	[11083]={b=2400,s=0,d=20614,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Soul Dust
@@ -6293,7 +6584,11 @@ Auctioneer_BasePrices = {
 	[11086]={b=137016,s=27403,d=20031,c=AUCT_CLAS_WEAPON},  -- Jang'thraze the Protector
 	[11098]={b=2000,s=500,d=11431},  -- Formula: Enchant Cloak - Lesser Shadow Resistance
 	[11101]={b=2500,s=625,d=11431},  -- Formula: Enchant Bracer - Lesser Strength
+	[11102]={b=0,s=0,d=20692},  -- Unhatched Sprite Darter Egg
 	[11103]={b=0,s=0,d=3093},  -- Seed Voucher
+	[11104]={b=0,s=0,d=6562},  -- Large Compass
+	[11105]={b=1,s=0,d=20710},  -- Curled Map Parchment
+	[11106]={b=0,s=0,d=20711},  -- Lion-headed Key
 	[11107]={b=0,s=0,d=20709},  -- A Small Pack
 	[11108]={b=0,s=0,d=4110,c=AUCT_CLAS_WRITTEN},  -- Faded Photograph
 	[11109]={b=25,s=6,d=7087},  -- Special Chicken Feed
@@ -6317,6 +6612,7 @@ Auctioneer_BasePrices = {
 	[11130]={b=2000,s=500,d=21206,u=AUCT_TYPE_ENCHANT},  -- Runed Golden Rod
 	[11131]={b=0,s=0,d=20789},  -- Hive Wall Sample
 	[11132]={b=0,s=0,d=20791},  -- Unused Scraping Vial
+	[11133]={b=0,s=0,d=20797},  -- Linken's Training Sword
 	[11134]={b=10000,s=0,d=20794,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Lesser Mystic Essence
 	[11135]={b=30000,s=0,d=20795,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Greater Mystic Essence
 	[11136]={b=0,s=0,d=20796},  -- Linken's Tempered Sword
@@ -6330,11 +6626,13 @@ Auctioneer_BasePrices = {
 	[11144]={b=4000,s=1000,d=21209,u=AUCT_TYPE_ENCHANT},  -- Truesilver Rod
 	[11145]={b=5000,s=1250,d=21209,u=AUCT_TYPE_ENCHANT},  -- Runed Truesilver Rod
 	[11146]={b=0,s=0,d=9167},  -- Broken and Battered Samophlange
+	[11147]={b=0,s=0,d=3426},  -- Samophlange Manual Cover
 	[11148]={b=0,s=0,d=7629,q=20,x=20},  -- Samophlange Manual Page
 	[11149]={b=0,s=0,d=6672},  -- Samophlange Manual
 	[11150]={b=3000,s=750,d=11431},  -- Formula: Enchant Gloves - Mining
 	[11151]={b=3000,s=750,d=11431},  -- Formula: Enchant Gloves - Herbalism
 	[11152]={b=3000,s=750,d=11431},  -- Formula: Enchant Gloves - Fishing
+	[11162]={b=0,s=0,d=20872},  -- Linken's Superior Sword
 	[11163]={b=3000,s=750,d=11431},  -- Formula: Enchant Bracer - Lesser Deflection
 	[11164]={b=3000,s=750,d=11431},  -- Formula: Enchant Weapon - Lesser Beastslayer
 	[11165]={b=3000,s=750,d=11431},  -- Formula: Enchant Weapon - Lesser Elemental Slayer
@@ -6342,6 +6640,8 @@ Auctioneer_BasePrices = {
 	[11167]={b=4000,s=1000,d=11431},  -- Formula: Enchant Boots - Lesser Spirit
 	[11168]={b=4000,s=1000,d=11431},  -- Formula: Enchant Shield - Lesser Block
 	[11169]={b=0,s=0,d=21032},  -- Book of Aquor
+	[11172]={b=0,s=0,d=20893,q=20,x=20},  -- Silvery Claws
+	[11173]={b=0,s=0,d=20894},  -- Irontree Heart
 	[11174]={b=20000,s=0,d=20895,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Lesser Nether Essence
 	[11175]={b=60000,s=0,d=20896,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Greater Nether Essence
 	[11176]={b=8000,s=0,d=20899,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Dream Dust
@@ -6369,10 +6669,12 @@ Auctioneer_BasePrices = {
 	[11206]={b=5000,s=1250,d=11431},  -- Formula: Enchant Cloak - Lesser Agility
 	[11207]={b=12000,s=3000,d=11431},  -- Formula: Enchant Weapon - Fiery Weapon
 	[11208]={b=5400,s=1350,d=11431},  -- Formula: Enchant Weapon - Demonslaying
+	[11222]={b=0,s=0,d=9666},  -- Head of Krom'zar
 	[11223]={b=5800,s=1450,d=11431},  -- Formula: Enchant Bracer - Deflection
 	[11224]={b=5800,s=1450,d=11431},  -- Formula: Enchant Shield - Frost Resistance
 	[11225]={b=6200,s=1550,d=11431},  -- Formula: Enchant Bracer - Greater Stamina
 	[11226]={b=6200,s=1550,d=11431},  -- Formula: Enchant Gloves - Riding Skill
+	[11227]={b=0,s=0,d=6748},  -- Piece of Krom'zar's Banner
 	[11229]={b=8481,s=1696,d=28306,c=AUCT_CLAS_ARMOR},  -- Brightscale Girdle
 	[11230]={b=0,s=0,d=20995},  -- Encased Fiery Essence
 	[11231]={b=0,s=0,d=19502,q=10,x=10},  -- Altered Black Dragonflight Molt
@@ -6385,9 +6687,12 @@ Auctioneer_BasePrices = {
 	[11267]={b=0,s=0,d=21072},  -- Elemental Shard Sample
 	[11268]={b=0,s=0,d=3920},  -- Head of Argelmach
 	[11269]={b=0,s=0,d=8560,q=10,x=10},  -- Intact Elemental Core
+	[11270]={b=0,s=0,d=7744},  -- Nixx's Signed Pledge
+	[11282]={b=0,s=0,d=7744},  -- Oglethorpe's Signed Pledge
 	[11283]={b=0,s=0,d=7744},  -- Overspark's Signed Pledge
 	[11284]={b=1000,s=1,d=19422,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Accurate Slugs
 	[11285]={b=1000,s=2,d=21091,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Jagged Arrow
+	[11286]={b=0,s=0,d=21092},  -- Thorium Shackles
 	[11287]={b=521,s=104,d=21096,c=AUCT_CLAS_WEAPON},  -- Lesser Magic Wand
 	[11288]={b=2329,s=465,d=21097,c=AUCT_CLAS_WEAPON},  -- Greater Magic Wand
 	[11289]={b=10743,s=2148,d=21098,c=AUCT_CLAS_WEAPON},  -- Lesser Mystic Wand
@@ -6406,12 +6711,16 @@ Auctioneer_BasePrices = {
 	[11312]={b=0,s=0,d=8927},  -- Lost Thunderbrew Recipe
 	[11313]={b=0,s=0,d=1310},  -- Ribbly's Head
 	[11315]={b=0,s=0,d=21149,q=10,x=10},  -- Bloodpetal Sprout
+	[11316]={b=0,s=0,d=13489,q=20,x=20},  -- Bloodpetal
 	[11318]={b=0,s=0,d=21164,q=20,x=20},  -- Atal'ai Haze
 	[11319]={b=0,s=0,d=21175},  -- Unloaded Zapper
 	[11320]={b=0,s=0,d=21189},  -- Bloodpetal Zapper
 	[11324]={b=25000,s=6250,d=19595,c=AUCT_CLAS_CONTAINER},  -- Explorer's Knapsack
 	[11325]={b=600,s=150,d=18099,x=20},  -- Dark Iron Ale Mug
 	[11362]={b=1000,s=250,d=21329,c=AUCT_CLAS_CONTAINER},  -- Medium Quiver
+	[11366]={b=0,s=0,d=7649},  -- Helendis Riverhorn's Letter
+	[11367]={b=0,s=0,d=7726},  -- Solomon's Plea to Bolvar
+	[11368]={b=0,s=0,d=16065,c=AUCT_CLAS_WRITTEN},  -- Bolvar's Decree
 	[11370]={b=2000,s=500,d=4691,x=10,u=AUCT_TYPE_MINING},  -- Dark Iron Ore
 	[11371]={b=2400,s=600,d=7389,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_MINING..", "..AUCT_TYPE_SMITH},  -- Dark Iron Bar
 	[11382]={b=3000,s=750,d=7051,x=20,u=AUCT_TYPE_ENCHANT},  -- Blood of the Mountain
@@ -6440,21 +6749,28 @@ Auctioneer_BasePrices = {
 	[11412]={b=0,s=0,d=4136},  -- Nagmara's Vial
 	[11413]={b=0,s=0,d=4136},  -- Nagmara's Filled Vial
 	[11414]={b=7315,s=1828,d=7354,x=10},  -- Grizzled Mane
+	[11415]={b=4000,s=200,d=21369,q=20,x=20},  -- Mixed Berries
 	[11416]={b=1315,s=328,d=6631,x=10},  -- Delicate Ribcage
 	[11417]={b=4816,s=1204,d=4433,x=5},  -- Feathery Wing
 	[11418]={b=2416,s=604,d=7251,x=5},  -- Hollow Wing Bone
 	[11419]={b=7600,s=1900,d=18047,x=10},  -- Mysterious Unhatched Egg
 	[11420]={b=6850,s=1712,d=21370,x=10},  -- Elegant Writing Tool
 	[11422]={b=0,s=0,d=21374},  -- Goblin Engineer's Renewal Gift
+	[11423]={b=0,s=0,d=21375},  -- Gnome Engineer's Renewal Gift
 	[11444]={b=4000,s=200,d=2376,q=20,x=20},  -- Grim Guzzler Boar
 	[11445]={b=0,s=0,d=21402},  -- Flute of the Ancients
 	[11446]={b=0,s=0,d=7695,c=AUCT_CLAS_QUEST},  -- A Crumpled Up Note
 	[11462]={b=0,s=0,d=21411},  -- Discarded Knife
+	[11463]={b=0,s=0,d=1244,c=AUCT_CLAS_QUEST},  -- Undelivered Parcel
 	[11464]={b=0,s=0,d=20219},  -- Marshal Windsor's Lost Information
 	[11465]={b=0,s=0,d=20219},  -- Marshal Windsor's Lost Information
+	[11466]={b=0,s=0,d=1093},  -- Raschal's Report
+	[11467]={b=0,s=0,d=18725,q=50,x=50},  -- Blackrock Medallion
 	[11468]={b=0,s=0,d=1281,q=20,x=20},  -- Dark Iron Fanny Pack
 	[11469]={b=17815,s=3563,d=14601,c=AUCT_CLAS_ARMOR},  -- Bloodband Bracers
 	[11470]={b=0,s=0,d=7695},  -- Tablet Transcript
+	[11471]={b=0,s=0,d=20692},  -- Fragile Sprite Darter Egg
+	[11472]={b=0,s=0,d=2599,q=10,x=10},  -- Silvermane Stalker Flank
 	[11474]={b=2000,s=500,d=18047},  -- Sprite Darter Egg
 	[11475]={b=38,s=7,d=28181,c=AUCT_CLAS_ARMOR},  -- Wine-stained Cloak
 	[11476]={b=0,s=0,d=7112},  -- U'cha's Pelt
@@ -6466,10 +6782,13 @@ Auctioneer_BasePrices = {
 	[11502]={b=32551,s=6510,d=28217,c=AUCT_CLAS_ARMOR},  -- Loreskin Shoulders
 	[11503]={b=0,s=0,d=21458,q=20,x=20},  -- Blood Amber
 	[11504]={b=0,s=0,d=1116},  -- Piece of Threshadon Carcass
+	[11507]={b=0,s=0,d=21463,q=20,x=20},  -- Spotted Hyena Pelt
+	[11508]={b=5,s=1,d=22034,c=AUCT_CLAS_ARMOR},  -- Gamemaster's Slippers
 	[11509]={b=0,s=0,d=1438,q=5,x=5},  -- Ravasaur Pheromone Gland
 	[11510]={b=0,s=0,d=30111},  -- Lar'korwi's Head
 	[11511]={b=0,s=0,d=21469},  -- Cenarion Beacon
 	[11512]={b=0,s=0,d=21470,q=20,x=20},  -- Patch of Tainted Skin
+	[11513]={b=4,s=1,d=19239,q=20,x=20},  -- Tainted Vitriol
 	[11514]={b=4,s=1,d=21471,q=20,x=20},  -- Fel Creep
 	[11515]={b=4,s=1,d=21472,q=20,x=20,c=AUCT_CLAS_WARLOCK},  -- Corrupted Soul Shard
 	[11516]={b=0,s=0,d=21473,q=100,x=100},  -- Cenarion Plant Salve
@@ -6483,6 +6802,7 @@ Auctioneer_BasePrices = {
 	[11568]={b=0,s=0,d=8631},  -- Torwa's Pouch
 	[11569]={b=0,s=0,d=2599},  -- Preserved Threshadon Meat
 	[11570]={b=0,s=0,d=1275},  -- Preserved Pheromone Mixture
+	[11582]={b=0,s=0,d=21531},  -- Fel Salve
 	[11583]={b=0,s=0,d=6410,q=10,x=10,c=AUCT_CLAS_FOOD},  -- Cactus Apple
 	[11584]={b=25,s=1,d=6410,q=20,x=20},  -- Cactus Apple Surprise
 	[11590]={b=1000,s=250,d=21556,x=5},  -- Mechanical Repair Kit
@@ -6498,6 +6818,8 @@ Auctioneer_BasePrices = {
 	[11612]={b=12000,s=3000,d=1102},  -- Plans: Dark Iron Plate
 	[11614]={b=12000,s=3000,d=15274},  -- Plans: Dark Iron Mail
 	[11615]={b=12000,s=3000,d=15274},  -- Plans: Dark Iron Shoulders
+	[11617]={b=0,s=0,d=21586},  -- Eridan's Supplies
+	[11622]={b=0,s=0,d=22651},  -- Lesser Arcanum of Rumination
 	[11623]={b=41665,s=8333,d=26137,c=AUCT_CLAS_ARMOR},  -- Spritecaster Cape
 	[11624]={b=37832,s=7566,d=28788,c=AUCT_CLAS_ARMOR},  -- Kentic Amice
 	[11625]={b=41810,s=10452,d=21595,c=AUCT_CLAS_WEAPON},  -- Enthralled Sphere
@@ -6511,10 +6833,19 @@ Auctioneer_BasePrices = {
 	[11633]={b=58650,s=11730,d=21898,c=AUCT_CLAS_ARMOR},  -- Spiderfang Carapace
 	[11634]={b=29432,s=5886,d=28741,c=AUCT_CLAS_ARMOR},  -- Silkweb Gloves
 	[11635]={b=177256,s=35451,d=28779,c=AUCT_CLAS_WEAPON},  -- Hookfang Shanker
+	[11642]={b=0,s=0,d=22651},  -- Lesser Arcanum of Constitution
+	[11643]={b=0,s=0,d=22651},  -- Lesser Arcanum of Tenacity
+	[11644]={b=0,s=0,d=22651},  -- Lesser Arcanum of Resilience
+	[11645]={b=0,s=0,d=22651},  -- Lesser Arcanum of Voracity
 	[11646]={b=0,s=0,d=22651},  -- Lesser Arcanum of Voracity
+	[11647]={b=0,s=0,d=22651},  -- Lesser Arcanum of Voracity
+	[11648]={b=0,s=0,d=22651},  -- Lesser Arcanum of Voracity
+	[11649]={b=0,s=0,d=22651},  -- Lesser Arcanum of Voracity
 	[11662]={b=31094,s=6218,d=28642,c=AUCT_CLAS_ARMOR},  -- Ban'thok Sash
 	[11665]={b=35550,s=7110,d=17263,c=AUCT_CLAS_ARMOR},  -- Ogreseer Fists
+	[11668]={b=0,s=0,d=21402,c=AUCT_CLAS_QUEST},  -- Flute of Xavaric
 	[11669]={b=68630,s=17157,d=9837,c=AUCT_CLAS_ARMOR},  -- Naglering
+	[11674]={b=0,s=0,d=21651,q=20,x=20},  -- Jadefire Felbind
 	[11675]={b=60266,s=12053,d=18979,c=AUCT_CLAS_ARMOR},  -- Shadefiend Boots
 	[11677]={b=48563,s=9712,d=28381,c=AUCT_CLAS_ARMOR},  -- Graverot Cape
 	[11678]={b=77981,s=15596,d=21578,c=AUCT_CLAS_ARMOR},  -- Carapace of Anub'shiah
@@ -6541,6 +6872,7 @@ Auctioneer_BasePrices = {
 	[11735]={b=83349,s=16669,d=21701,c=AUCT_CLAS_ARMOR},  -- Ragefury Eyepatch
 	[11736]={b=0,s=0,d=8093,c=AUCT_CLAS_WRITTEN},  -- Libram of Resilience
 	[11737]={b=0,s=0,d=1134,c=AUCT_CLAS_WRITTEN},  -- Libram of Voracity
+	[11742]={b=35000,s=8750,d=20709,c=AUCT_CLAS_CONTAINER},  -- Wayfarer's Knapsack
 	[11743]={b=153672,s=30734,d=21714,c=AUCT_CLAS_WEAPON},  -- Rockfist
 	[11744]={b=196213,s=39242,d=21715,c=AUCT_CLAS_WEAPON},  -- Bloodfist
 	[11745]={b=32825,s=6565,d=28740,c=AUCT_CLAS_ARMOR},  -- Fists of Phalanx
@@ -6587,6 +6919,9 @@ Auctioneer_BasePrices = {
 	[11822]={b=58973,s=11794,d=28660,c=AUCT_CLAS_ARMOR},  -- Omnicast Boots
 	[11823]={b=98654,s=19730,d=28728,c=AUCT_CLAS_ARMOR},  -- Luminary Kilt
 	[11824]={b=54630,s=13657,d=9847,c=AUCT_CLAS_ARMOR},  -- Cyclopean Band
+	[11825]={b=10000,s=2500,d=21833},  -- Pet Bombling
+	[11826]={b=10000,s=2500,d=9730},  -- Lil' Smoky
+	[11827]={b=2700,s=675,d=15274},  -- Schematic: Lil' Smoky
 	[11829]={b=0,s=0,d=2480,q=20,x=20},  -- Un'Goro Ash
 	[11830]={b=0,s=0,d=21834,q=20,x=20},  -- Webbed Diemetradon Scale
 	[11831]={b=0,s=0,d=21835,q=20,x=20},  -- Webbed Pterrordax Scale
@@ -6682,6 +7017,7 @@ Auctioneer_BasePrices = {
 	[11941]={b=23584,s=5896,d=7798,x=10},  -- False Documents
 	[11942]={b=21215,s=5303,d=7629,x=10},  -- Legal Documents
 	[11943]={b=85941,s=21485,d=7744},  -- Deed to Thandol Span
+	[11944]={b=35284,s=8821,d=21970},  -- Dark Iron Baby Booties
 	[11945]={b=26370,s=6592,d=9840,c=AUCT_CLAS_ARMOR},  -- Dark Iron Ring
 	[11946]={b=31650,s=7912,d=9854,c=AUCT_CLAS_ARMOR},  -- Fire Opal Necklace
 	[11947]={b=0,s=0,d=21971,q=20,x=20},  -- Filled Cursed Ooze Jar
@@ -6690,6 +7026,7 @@ Auctioneer_BasePrices = {
 	[11950]={b=0,s=0,d=21973,q=20,x=20},  -- Windblossom Berries
 	[11951]={b=0,s=0,d=21974,q=20,x=20},  -- Whipper Root Tuber
 	[11952]={b=0,s=0,d=21975,q=20,x=20},  -- Night Dragon's Breath
+	[11953]={b=0,s=0,d=20791,q=20,x=20},  -- Empty Pure Sample Jar
 	[11954]={b=0,s=0,d=21976,q=20,x=20},  -- Filled Pure Sample Jar
 	[11955]={b=0,s=0,d=21977},  -- Bag of Empty Ooze Containers
 	[11962]={b=39699,s=7939,d=17229,c=AUCT_CLAS_ARMOR},  -- Manacle Cuffs
@@ -6763,6 +7100,7 @@ Auctioneer_BasePrices = {
 	[12030]={b=28574,s=7143,d=15420,c=AUCT_CLAS_ARMOR},  -- Jet Chain
 	[12031]={b=31578,s=7894,d=9859,c=AUCT_CLAS_ARMOR},  -- Lodestone Necklace
 	[12032]={b=21587,s=5396,d=15420,c=AUCT_CLAS_ARMOR},  -- Onyx Choker
+	[12033]={b=0,s=0,d=22020},  -- Thaurissan Family Jewels
 	[12034]={b=20050,s=5012,d=9859,c=AUCT_CLAS_ARMOR},  -- Marble Necklace
 	[12035]={b=22053,s=5513,d=15420,c=AUCT_CLAS_ARMOR},  -- Obsidian Pendant
 	[12036]={b=23930,s=5982,d=9860,c=AUCT_CLAS_ARMOR},  -- Granite Necklace
@@ -6792,6 +7130,7 @@ Auctioneer_BasePrices = {
 	[12060]={b=0,s=0,d=6270},  -- Shindrell's Note
 	[12061]={b=201060,s=40212,d=28086,c=AUCT_CLAS_WEAPON},  -- Blade of Reckoning
 	[12062]={b=201827,s=40365,d=25611,c=AUCT_CLAS_WEAPON},  -- Skilled Fighting Blade
+	[12064]={b=4,s=1,d=22036,c=AUCT_CLAS_ARMOR},  -- Gamemaster Hood
 	[12065]={b=31813,s=7953,d=22037,c=AUCT_CLAS_ARMOR},  -- Ward of the Elements
 	[12066]={b=55747,s=11149,d=28251,c=AUCT_CLAS_ARMOR},  -- Shaleskin Cape
 	[12082]={b=68634,s=13726,d=28176,c=AUCT_CLAS_ARMOR},  -- Wyrmhide Spaulders
@@ -6833,6 +7172,7 @@ Auctioneer_BasePrices = {
 	[12217]={b=1200,s=300,d=21473,x=20},  -- Dragonbreath Chili
 	[12218]={b=1200,s=300,d=6353,x=20,c=AUCT_CLAS_FOOD},  -- Monster Omelet
 	[12219]={b=0,s=0,d=19330},  -- Unadorned Seal of Ascension
+	[12220]={b=0,s=0,d=7025,q=20,x=20},  -- Intact Elemental Bracer
 	[12223]={b=16,s=4,d=6704,x=10,u=AUCT_TYPE_COOK},  -- Meaty Bat Wing
 	[12224]={b=40,s=10,d=22200,x=20},  -- Crispy Bat Wing
 	[12225]={b=939,s=187,d=20618,c=AUCT_CLAS_FISHING},  -- Blump Family Fishing Pole
@@ -6876,7 +7216,11 @@ Auctioneer_BasePrices = {
 	[12284]={b=0,s=0,d=22293},  -- Draco-Incarcinatrix 900
 	[12286]={b=0,s=0,d=22299},  -- Eggscilloscope Prototype
 	[12287]={b=0,s=0,d=22303},  -- Collectronic Module
+	[12288]={b=0,s=0,d=8381},  -- Encased Corrupt Ooze
 	[12289]={b=0,s=0,d=22304},  -- Sea Turtle Remains
+	[12291]={b=0,s=0,d=6703},  -- Merged Ooze Sample
+	[12292]={b=0,s=0,d=7913},  -- Strangely Marked Box
+	[12293]={b=0,s=0,d=7331},  -- Fine Gold Thread
 	[12295]={b=1413,s=282,d=28204,c=AUCT_CLAS_ARMOR},  -- Leggings of the People's Militia
 	[12296]={b=3612,s=722,d=28248,c=AUCT_CLAS_WEAPON},  -- Spark of the People's Militia
 	[12299]={b=82,s=16,d=28221,c=AUCT_CLAS_ARMOR},  -- Netted Gloves
@@ -6884,12 +7228,14 @@ Auctioneer_BasePrices = {
 	[12301]={b=0,s=0,d=22377},  -- Bamboo Cage Key
 	[12302]={b=10000000,s=0,d=17608},  -- Reins of the Frostsaber
 	[12303]={b=10000000,s=0,d=17608},  -- Reins of the Nightsaber
+	[12323]={b=0,s=0,d=7366},  -- Unforged Seal of Ascension
 	[12324]={b=0,s=0,d=7366},  -- Forged Seal of Ascension
 	[12330]={b=10000000,s=0,d=16208},  -- Horn of the Red Wolf
 	[12334]={b=0,s=0,d=6563,q=20,x=20},  -- Frostmaul Shards
 	[12335]={b=0,s=0,d=6496},  -- Gemstone of Smolderthorn
 	[12336]={b=0,s=0,d=2516},  -- Gemstone of Spirestone
 	[12337]={b=0,s=0,d=6006},  -- Gemstone of Bloodaxe
+	[12339]={b=0,s=0,d=18721},  -- Vaelan's Gift
 	[12341]={b=0,s=0,d=22414},  -- Blackwood Fruit Sample
 	[12342]={b=0,s=0,d=16206},  -- Blackwood Grain Sample
 	[12343]={b=0,s=0,d=6417},  -- Blackwood Nut Sample
@@ -6949,14 +7295,20 @@ Auctioneer_BasePrices = {
 	[12435]={b=0,s=0,d=19800,q=20,x=20},  -- Ice Thistle E'ko
 	[12436]={b=0,s=0,d=19800,q=20,x=20},  -- Frostmaul E'ko
 	[12437]={b=0,s=0,d=8928},  -- Ridgewell's Crate
+	[12438]={b=0,s=0,d=3029,c=AUCT_CLAS_WRITTEN},  -- Tinkee's Letter
 	[12444]={b=0,s=0,d=16283,q=20,x=20},  -- Uncracked Chillwind Horn
 	[12445]={b=0,s=0,d=11448},  -- Felnok's Package
 	[12446]={b=95,s=19,d=28060,c=AUCT_CLAS_WEAPON},  -- Anvilmar Musket
 	[12447]={b=96,s=19,d=20723,c=AUCT_CLAS_WEAPON},  -- Thistlewood Bow
 	[12448]={b=96,s=19,d=28206,c=AUCT_CLAS_WEAPON},  -- Light Hunting Rifle
 	[12449]={b=96,s=19,d=28235,c=AUCT_CLAS_WEAPON},  -- Primitive Bow
+	[12450]={b=6000,s=1500,d=22634,x=20},  -- Juju Flurry
+	[12451]={b=6000,s=1500,d=22636,x=20},  -- Juju Power
+	[12455]={b=6000,s=1500,d=22639,x=20},  -- Juju Ember
+	[12457]={b=6000,s=1500,d=22641,x=20},  -- Juju Chill
 	[12458]={b=6000,s=1500,d=22642,x=20},  -- Juju Guile
 	[12459]={b=6000,s=1500,d=22634,x=20},  -- Juju Escape
+	[12460]={b=6000,s=1500,d=22643,x=20},  -- Juju Might
 	[12462]={b=101370,s=20274,d=28272,c=AUCT_CLAS_ARMOR},  -- Embrace of the Wind Serpent
 	[12463]={b=212231,s=42446,d=20198,c=AUCT_CLAS_WEAPON},  -- Drakefang Butcher
 	[12464]={b=42601,s=8520,d=28680,c=AUCT_CLAS_ARMOR},  -- Bloodfire Talons
@@ -6993,6 +7345,7 @@ Auctioneer_BasePrices = {
 	[12555]={b=57032,s=11406,d=27829,c=AUCT_CLAS_ARMOR},  -- Battlechaser's Greaves
 	[12556]={b=71585,s=14317,d=22779,c=AUCT_CLAS_ARMOR},  -- High Priestess Boots
 	[12557]={b=71841,s=14368,d=28727,c=AUCT_CLAS_ARMOR},  -- Ebonsteel Spaulders
+	[12558]={b=0,s=0,d=22765,c=AUCT_CLAS_QUEST},  -- Blue-feathered Necklace
 	[12562]={b=0,s=0,d=3331,c=AUCT_CLAS_WRITTEN},  -- Important Blackrock Documents
 	[12563]={b=0,s=0,d=5567,c=AUCT_CLAS_QUEST},  -- Warlord Goretooth's Command
 	[12564]={b=0,s=0,d=22771,c=AUCT_CLAS_QUEST},  -- Assassination Note
@@ -7001,6 +7354,7 @@ Auctioneer_BasePrices = {
 	[12567]={b=0,s=0,d=22785},  -- Filled Flasket
 	[12582]={b=255997,s=51199,d=28789,c=AUCT_CLAS_WEAPON},  -- Keris of Zul'Serak
 	[12583]={b=371731,s=74346,d=22792,c=AUCT_CLAS_WEAPON},  -- Blackhand Doomsaw
+	[12584]={b=152362,s=30472,d=27090,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Longsword
 	[12586]={b=0,s=0,d=22793,q=50,x=50},  -- Immature Venom Sac
 	[12587]={b=105159,s=21031,d=22794,c=AUCT_CLAS_ARMOR},  -- Eye of Rend
 	[12588]={b=127233,s=25446,d=22795,c=AUCT_CLAS_ARMOR},  -- Bonespike Shoulder
@@ -7015,17 +7369,22 @@ Auctioneer_BasePrices = {
 	[12607]={b=32195,s=8048,d=22838,x=20},  -- Brilliant Chromatic Scale
 	[12608]={b=55132,s=11026,d=28693,c=AUCT_CLAS_ARMOR},  -- Butcher's Apron
 	[12609]={b=102494,s=20498,d=22843,c=AUCT_CLAS_ARMOR},  -- Polychromatic Visionwrap
+	[12610]={b=61238,s=12247,d=23490,c=AUCT_CLAS_ARMOR},  -- Runic Plate Shoulders
+	[12611]={b=61468,s=12293,d=23486,c=AUCT_CLAS_ARMOR},  -- Runic Plate Boots
 	[12612]={b=64783,s=12956,d=23491,c=AUCT_CLAS_ARMOR},  -- Runic Plate Helm
+	[12613]={b=91025,s=18205,d=19730,c=AUCT_CLAS_ARMOR},  -- Runic Breastplate
 	[12614]={b=91363,s=18272,d=23485,c=AUCT_CLAS_ARMOR},  -- Runic Plate Leggings
 	[12618]={b=119863,s=23972,d=25746,c=AUCT_CLAS_ARMOR},  -- Enchanted Thorium Breastplate
 	[12619]={b=120290,s=24058,d=22882,c=AUCT_CLAS_ARMOR},  -- Enchanted Thorium Leggings
 	[12620]={b=86225,s=17245,d=22886,c=AUCT_CLAS_ARMOR},  -- Enchanted Thorium Helm
 	[12621]={b=225425,s=45085,d=22885,c=AUCT_CLAS_WEAPON},  -- Demonfork
 	[12622]={b=0,s=0,d=2599,q=10,x=10},  -- Shardtooth Meat
+	[12623]={b=0,s=0,d=2599,q=10,x=10},  -- Chillwind Meat
 	[12624]={b=103212,s=20642,d=25754,c=AUCT_CLAS_ARMOR},  -- Wildthorn Mail
 	[12626]={b=45956,s=9191,d=14618,c=AUCT_CLAS_ARMOR},  -- Funeral Cuffs
 	[12627]={b=0,s=0,d=6338},  -- Temporal Displacer
 	[12628]={b=83203,s=16640,d=22892,c=AUCT_CLAS_ARMOR},  -- Demon Forged Breastplate
+	[12630]={b=0,s=0,d=1310},  -- Head of Rend Blackhand
 	[12631]={b=44598,s=8919,d=25747,c=AUCT_CLAS_ARMOR},  -- Fiery Plate Gauntlets
 	[12632]={b=70498,s=14099,d=25835,c=AUCT_CLAS_ARMOR},  -- Storm Gauntlets
 	[12633]={b=74299,s=14859,d=22901,c=AUCT_CLAS_ARMOR},  -- Whitesoul Helm
@@ -7037,13 +7396,17 @@ Auctioneer_BasePrices = {
 	[12639]={b=76359,s=15271,d=25750,c=AUCT_CLAS_ARMOR},  -- Stronghold Gauntlets
 	[12640]={b=109471,s=21894,d=22920,c=AUCT_CLAS_ARMOR},  -- Lionheart Helm
 	[12641]={b=219182,s=43836,d=25748,c=AUCT_CLAS_ARMOR},  -- Invulnerable Mail
+	[12642]={b=0,s=0,d=1695},  -- Cleansed Infernal Orb
 	[12643]={b=300,s=75,d=24687,x=20},  -- Dense Weightstone
 	[12644]={b=800,s=200,d=24682,x=20},  -- Dense Grinding Stone
 	[12645]={b=2000,s=500,d=22924,x=5},  -- Thorium Shield Spike
+	[12646]={b=0,s=0,d=7393},  -- Infus Emerald
 	[12647]={b=0,s=0,d=4777},  -- Felhas Ruby
 	[12648]={b=0,s=0,d=7045},  -- Imprisoned Felhound Spirit
+	[12649]={b=0,s=0,d=6851},  -- Imprisoned Infernal Spirit
 	[12650]={b=0,s=0,d=22926},  -- Attuned Dampener
 	[12651]={b=180279,s=36055,d=22929,c=AUCT_CLAS_WEAPON},  -- Blackcrow
+	[12652]={b=0,s=0,d=7649},  -- Bijou's Reconnaissance Report
 	[12653]={b=181593,s=36318,d=28813,c=AUCT_CLAS_WEAPON},  -- Riphook
 	[12654]={b=250,s=62,d=22931,x=200,c=AUCT_CLAS_WEAPON},  -- Doomshot
 	[12655]={b=2000,s=500,d=22445,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_ENCHANT},  -- Enchanted Thorium Bar
@@ -7053,7 +7416,10 @@ Auctioneer_BasePrices = {
 	[12683]={b=12000,s=3000,d=15274},  -- Plans: Thorium Belt
 	[12684]={b=12000,s=3000,d=15274},  -- Plans: Thorium Bracers
 	[12685]={b=12000,s=3000,d=15274},  -- Plans: Radiant Belt
+	[12687]={b=12000,s=3000,d=1102},  -- Plans: Imperial Plate Shoulders
+	[12688]={b=12000,s=3000,d=1102},  -- Plans: Imperial Plate Belt
 	[12689]={b=14000,s=3500,d=15274},  -- Plans: Radiant Breastplate
+	[12690]={b=12000,s=3000,d=1102},  -- Plans: Imperial Plate Bracers
 	[12691]={b=16000,s=4000,d=1102},  -- Plans: Wildthorn Mail
 	[12692]={b=16000,s=4000,d=15274},  -- Plans: Thorium Shield Spike
 	[12693]={b=20000,s=5000,d=15274},  -- Plans: Thorium Boots
@@ -7062,22 +7428,31 @@ Auctioneer_BasePrices = {
 	[12696]={b=20000,s=5000,d=1102},  -- Plans: Demon Forged Breastplate
 	[12697]={b=22000,s=5500,d=15274},  -- Plans: Radiant Boots
 	[12699]={b=20000,s=5000,d=1102},  -- Plans: Fiery Plate Gauntlets
+	[12700]={b=25000,s=6250,d=1102},  -- Plans: Imperial Plate Boots
+	[12701]={b=25000,s=6250,d=1102},  -- Plans: Imperial Plate Helm
 	[12702]={b=25000,s=6250,d=15274},  -- Plans: Radiant Circlet
 	[12703]={b=40000,s=10000,d=1102},  -- Plans: Storm Gauntlets
 	[12704]={b=30000,s=7500,d=15274},  -- Plans: Thorium Leggings
+	[12705]={b=30000,s=7500,d=1102},  -- Plans: Imperial Plate Chest
+	[12707]={b=30000,s=7500,d=1102},  -- Plans: Runic Plate Boots
 	[12708]={b=0,s=0,d=11449},  -- Crossroads' Supply Crates
 	[12709]={b=289956,s=57991,d=22977,c=AUCT_CLAS_WEAPON},  -- Finkle's Skinner
 	[12710]={b=0,s=0,d=22979},  -- Glowing Hunk of the Beast's Flesh
 	[12711]={b=40000,s=10000,d=1102},  -- Plans: Whitesoul Helm
 	[12712]={b=0,s=0,d=15794},  -- Warosh's Mojo
 	[12713]={b=40000,s=10000,d=15274},  -- Plans: Radiant Leggings
+	[12715]={b=40000,s=10000,d=1102},  -- Plans: Imperial Plate Leggings
 	[12716]={b=60000,s=15000,d=1102},  -- Plans: Helm of the Great Chief
 	[12717]={b=60000,s=15000,d=1102},  -- Plans: Lionheart Helm
+	[12718]={b=60000,s=15000,d=1102},  -- Plans: Runic Breastplate
 	[12719]={b=60000,s=15000,d=1102},  -- Plans: Runic Plate Leggings
 	[12721]={b=0,s=0,d=23713},  -- Good Luck Half-Charm
 	[12722]={b=0,s=0,d=23714},  -- Good Luck Other-Half-Charm
 	[12723]={b=0,s=0,d=23715},  -- Good Luck Charm
 	[12724]={b=0,s=0,d=23146},  -- Janice's Parcel
+	[12725]={b=60000,s=15000,d=6270},  -- Plans: Enchanted Thorium Helm
+	[12726]={b=60000,s=15000,d=6270},  -- Plans: Enchanted Thorium Leggings
+	[12727]={b=60000,s=15000,d=6270},  -- Plans: Enchanted Thorium Breastplate
 	[12728]={b=80000,s=20000,d=1102},  -- Plans: Invulnerable Mail
 	[12730]={b=0,s=0,d=4110,c=AUCT_CLAS_WRITTEN},  -- Warosh's Scroll
 	[12731]={b=0,s=0,d=23150},  -- Pristine Hide of the Beast
@@ -7086,8 +7461,11 @@ Auctioneer_BasePrices = {
 	[12734]={b=0,s=0,d=7403,q=10,x=10},  -- Enchanted Scarlet Thread
 	[12735]={b=0,s=0,d=21416,q=20,x=20},  -- Frayed Abomination Stitching
 	[12736]={b=0,s=0,d=21473,q=10,x=10},  -- Frostwhisper's Embalming Fluid
+	[12737]={b=0,s=0,d=1442,q=20,x=20},  -- Gloom Weed
 	[12738]={b=0,s=0,d=13290},  -- Dalson Outhouse Key
 	[12739]={b=0,s=0,d=21807},  -- Dalson Cabinet Key
+	[12740]={b=0,s=0,d=20220},  -- Fifth Mosh'aru Tablet
+	[12741]={b=0,s=0,d=22484},  -- Sixth Mosh'aru Tablet
 	[12752]={b=114539,s=22907,d=23197,c=AUCT_CLAS_ARMOR},  -- Cap of the Scarlet Savant
 	[12753]={b=0,s=0,d=19316,q=10,x=10},  -- Skin of Shadow
 	[12756]={b=175287,s=35057,d=23199,c=AUCT_CLAS_ARMOR},  -- Leggings of Arcana
@@ -7095,7 +7473,9 @@ Auctioneer_BasePrices = {
 	[12765]={b=0,s=0,d=23201,c=AUCT_CLAS_WRITTEN},  -- Secret Note #1
 	[12766]={b=0,s=0,d=23201,c=AUCT_CLAS_WRITTEN},  -- Secret Note #2
 	[12768]={b=0,s=0,d=23201,c=AUCT_CLAS_WRITTEN},  -- Secret Note #3
+	[12770]={b=0,s=0,d=23229},  -- Bijou's Information
 	[12771]={b=0,s=0,d=22429,c=AUCT_CLAS_QUEST},  -- Empty Firewater Flask
+	[12773]={b=165399,s=33079,d=23234,c=AUCT_CLAS_WEAPON},  -- Ornate Thorium Handaxe
 	[12774]={b=180220,s=36044,d=23236,c=AUCT_CLAS_WEAPON},  -- Dawn's Edge
 	[12775]={b=199746,s=39949,d=23434,c=AUCT_CLAS_WEAPON},  -- Huge Thorium Battleaxe
 	[12776]={b=240624,s=48124,d=23240,c=AUCT_CLAS_WEAPON},  -- Enchanted Battlehammer
@@ -7124,13 +7504,20 @@ Auctioneer_BasePrices = {
 	[12809]={b=40000,s=10000,d=21072,x=20},  -- Guardian Stone
 	[12810]={b=2000,s=500,d=23292,x=10},  -- Enchanted Leather
 	[12811]={b=80000,s=20000,d=23293,x=20},  -- Righteous Orb
+	[12812]={b=0,s=0,d=23294},  -- Unfired Plate Gauntlets
 	[12813]={b=0,s=0,d=1288},  -- Flask of Mystery Goo
 	[12814]={b=0,s=0,d=18080},  -- Flame in a Bottle
 	[12815]={b=0,s=0,d=23295},  -- Beacon Torch
+	[12819]={b=16000,s=4000,d=1102},  -- Plans: Ornate Thorium Handaxe
 	[12820]={b=0,s=0,d=15787,q=10,x=10},  -- Winterfall Firewater
+	[12821]={b=16000,s=4000,d=1102},  -- Plans: Dawn's Edge
 	[12822]={b=0,s=0,d=2885,q=20,x=20},  -- Toxic Horror Droplet
+	[12823]={b=20000,s=5000,d=1102},  -- Plans: Huge Thorium Battleaxe
+	[12824]={b=20000,s=5000,d=15274},  -- Plans: Enchanted Battlehammer
+	[12825]={b=20000,s=5000,d=15274},  -- Plans: Blazing Rapier
 	[12827]={b=20000,s=5000,d=15274},  -- Plans: Serenity
 	[12828]={b=22000,s=5500,d=15274},  -- Plans: Volcanic Hammer
+	[12829]={b=0,s=0,d=7918},  -- Winterfall Crate
 	[12830]={b=22000,s=5500,d=1102},  -- Plans: Corruption
 	[12833]={b=80000,s=20000,d=1102},  -- Plans: Hammer of the Titans
 	[12834]={b=80000,s=20000,d=1102},  -- Plans: Arcanite Champion
@@ -7147,6 +7534,8 @@ Auctioneer_BasePrices = {
 	[12845]={b=0,s=0,d=9857},  -- Medallion of Faith
 	[12846]={b=0,s=0,d=23716,c=AUCT_CLAS_ARMOR},  -- Argent Dawn Commission
 	[12847]={b=0,s=0,d=23315},  -- Soul Stained Pike
+	[12848]={b=0,s=0,d=23315},  -- Blood Stained Pike
+	[12849]={b=0,s=0,d=20342},  -- Demon Kissed Sack
 	[12871]={b=32195,s=8048,d=23332},  -- Chromatic Carapace
 	[12884]={b=0,s=0,d=23358},  -- Arnak's Hoof
 	[12885]={b=0,s=0,d=2622},  -- Pamela's Doll
@@ -7299,6 +7688,7 @@ Auctioneer_BasePrices = {
 	[13083]={b=173470,s=34694,d=25133,c=AUCT_CLAS_WEAPON},  -- Garrett Family Crest
 	[13084]={b=26458,s=6614,d=6497,c=AUCT_CLAS_ARMOR},  -- Kaleidoscope Chain
 	[13085]={b=36548,s=9137,d=9657,c=AUCT_CLAS_ARMOR},  -- Horizon Choker
+	[13086]={b=10000000,s=0,d=23606},  -- Reins of the Winterspring Frostsaber
 	[13087]={b=23584,s=5896,d=9860,c=AUCT_CLAS_ARMOR},  -- River Pride Choker
 	[13088]={b=29654,s=7413,d=6522,c=AUCT_CLAS_ARMOR},  -- Gazlowe's Charm
 	[13089]={b=32156,s=8039,d=6497,c=AUCT_CLAS_ARMOR},  -- Skibi's Pendant
@@ -7376,11 +7766,13 @@ Auctioneer_BasePrices = {
 	[13173]={b=47,s=11,d=23723,x=200,c=AUCT_CLAS_WEAPON},  -- Flightblade Throwing Axe
 	[13174]={b=0,s=0,d=23725,q=30,x=30},  -- Plagued Flesh Sample
 	[13175]={b=153095,s=30619,d=25603,c=AUCT_CLAS_WEAPON},  -- Voone's Twitchbow
+	[13176]={b=0,s=0,d=23726},  -- Scourge Data
 	[13177]={b=65585,s=16396,d=6494,c=AUCT_CLAS_ARMOR},  -- Talisman of Evasion
 	[13178]={b=55130,s=13782,d=23728,c=AUCT_CLAS_ARMOR},  -- Rosewine Circle
 	[13179]={b=74583,s=14916,d=23730,c=AUCT_CLAS_ARMOR},  -- Brazecore Armguards
 	[13180]={b=0,s=0,d=23731,q=50,x=50},  -- Stratholme Holy Water
 	[13181]={b=43988,s=8797,d=23732,c=AUCT_CLAS_ARMOR},  -- Demonskin Gloves
+	[13182]={b=154429,s=30885,d=23734,c=AUCT_CLAS_WEAPON},  -- Phase Blade
 	[13183]={b=258857,s=51771,d=24740,c=AUCT_CLAS_WEAPON},  -- Venomspitter
 	[13184]={b=68191,s=13638,d=23736,c=AUCT_CLAS_ARMOR},  -- Fallbrush Handgrips
 	[13185]={b=82111,s=16422,d=23737,c=AUCT_CLAS_ARMOR},  -- Sunderseer Mantle
@@ -7403,6 +7795,7 @@ Auctioneer_BasePrices = {
 	[13204]={b=196316,s=39263,d=25619,c=AUCT_CLAS_WEAPON},  -- Bashguuder
 	[13205]={b=175155,s=35031,d=23750,c=AUCT_CLAS_WEAPON},  -- Rhombeard Protector
 	[13206]={b=99402,s=19880,d=23753,c=AUCT_CLAS_ARMOR},  -- Wolfshear Leggings
+	[13207]={b=0,s=0,d=1310},  -- Shadow Lord Fel'dan's Head
 	[13208]={b=62602,s=12520,d=23760,c=AUCT_CLAS_ARMOR},  -- Bleak Howler Armguards
 	[13209]={b=38462,s=9615,d=23763,c=AUCT_CLAS_ARMOR},  -- Seal of the Dawn
 	[13210]={b=90122,s=18024,d=23765,c=AUCT_CLAS_ARMOR},  -- Pads of the Dread Wolf
@@ -7416,8 +7809,11 @@ Auctioneer_BasePrices = {
 	[13244]={b=60342,s=12068,d=23827,c=AUCT_CLAS_ARMOR},  -- Gilded Gauntlets
 	[13245]={b=5323,s=1064,d=23835,c=AUCT_CLAS_WEAPON},  -- Kresh's Back
 	[13246]={b=268114,s=53622,d=23836,c=AUCT_CLAS_WEAPON},  -- Argent Avenger
+	[13247]={b=23350,s=5837,d=12333},  -- Quartermaster Zigris' Footlocker
 	[13248]={b=148349,s=29669,d=8257,c=AUCT_CLAS_WEAPON},  -- Burstshot Harquebus
 	[13249]={b=338914,s=67782,d=23837,c=AUCT_CLAS_WEAPON},  -- Argent Crusader
+	[13250]={b=0,s=0,d=23842,c=AUCT_CLAS_QUEST},  -- Head of Balnazzar
+	[13251]={b=0,s=0,d=23843},  -- Head of Baron Rivendare
 	[13252]={b=62170,s=12434,d=23844,c=AUCT_CLAS_ARMOR},  -- Cloudrunner Girdle
 	[13253]={b=49916,s=9983,d=23846,c=AUCT_CLAS_ARMOR},  -- Hands of Power
 	[13254]={b=107849,s=21569,d=23847,c=AUCT_CLAS_WEAPON},  -- Astral Guard
@@ -7465,8 +7861,12 @@ Auctioneer_BasePrices = {
 	[13344]={b=86053,s=17210,d=29001,c=AUCT_CLAS_ARMOR},  -- Dracorian Gauntlets
 	[13345]={b=61830,s=15457,d=24022,c=AUCT_CLAS_ARMOR},  -- Seal of Rivendare
 	[13346]={b=115591,s=23118,d=24025,c=AUCT_CLAS_ARMOR},  -- Robes of the Exalted
+	[13347]={b=0,s=0,d=6506,c=AUCT_CLAS_ARMOR},  -- Crystal of Zin-Malor
 	[13348]={b=363849,s=72769,d=24049,c=AUCT_CLAS_WEAPON},  -- Demonshear
 	[13349]={b=292144,s=58428,d=24033,c=AUCT_CLAS_WEAPON},  -- Scepter of the Unholy
+	[13350]={b=0,s=0,d=22924},  -- Insignia of the Black Guard
+	[13351]={b=0,s=0,d=24036},  -- Crimson Hammersmith's Apron
+	[13352]={b=0,s=0,d=24037},  -- Vosh'gajin's Snakestone
 	[13353]={b=41810,s=10452,d=24039,c=AUCT_CLAS_WEAPON},  -- Book of the Dead
 	[13354]={b=0,s=0,d=24044,q=20,x=20},  -- Ectoplasmic Resonator
 	[13356]={b=0,s=0,d=24057,q=20,x=20},  -- Somatic Intensifier
@@ -7480,6 +7880,7 @@ Auctioneer_BasePrices = {
 	[13364]={b=8000,s=2000,d=4110,x=20},  -- Fras Siabi's Advertisement
 	[13365]={b=8000,s=2000,d=24051,x=20},  -- Town Meeting Notice
 	[13366]={b=12000,s=3000,d=24052,x=20},  -- Ingenious Toy
+	[13367]={b=0,s=0,d=24053},  -- Wrapped Gift
 	[13368]={b=277190,s=55438,d=25614,c=AUCT_CLAS_WEAPON},  -- Bonescraper
 	[13369]={b=87634,s=17526,d=24054,c=AUCT_CLAS_ARMOR},  -- Fire Striders
 	[13370]={b=0,s=0,d=24059},  -- Vitreous Focuser
@@ -7547,6 +7948,7 @@ Auctioneer_BasePrices = {
 	[13466]={b=1000,s=250,d=24693,x=20,u=AUCT_TYPE_ALCHEM},  -- Plaguebloom
 	[13467]={b=1000,s=250,d=24691,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_ENCHANT},  -- Icecap
 	[13468]={b=4000,s=1000,d=24688,x=20},  -- Black Lotus
+	[13469]={b=0,s=0,d=3486},  -- Head of Weldon Barov
 	[13470]={b=0,s=0,d=14023},  -- Head of Alexi Barov
 	[13471]={b=0,s=0,d=16065},  -- The Deed to Brill
 	[13473]={b=28658,s=7164,d=23715,c=AUCT_CLAS_ARMOR},  -- Felstone Good Luck Charm
@@ -7560,6 +7962,8 @@ Auctioneer_BasePrices = {
 	[13481]={b=15000,s=3750,d=15274},  -- Recipe: Elixir of Brute Force
 	[13482]={b=15000,s=0,d=15274},  -- Recipe: Transmute Air to Fire
 	[13483]={b=15000,s=0,d=15274},  -- Recipe: Transmute Fire to Earth
+	[13484]={b=15000,s=0,d=15274},  -- Recipe: Transmute Earth to Water
+	[13485]={b=15000,s=0,d=15274},  -- Recipe: Transmute Water to Air
 	[13486]={b=15000,s=3750,d=15274},  -- Recipe: Transmute Undeath to Water
 	[13487]={b=15000,s=3750,d=15274},  -- Recipe: Transmute Water to Undeath
 	[13488]={b=15000,s=3750,d=15274},  -- Recipe: Transmute Life to Earth
@@ -7574,12 +7978,14 @@ Auctioneer_BasePrices = {
 	[13497]={b=24000,s=6000,d=15274,c=AUCT_CLAS_POTION},  -- Recipe: Greater Arcane Protection Potion
 	[13498]={b=91372,s=18274,d=24162,c=AUCT_CLAS_ARMOR},  -- Handcrafted Mastersmith Leggings
 	[13499]={b=24000,s=6000,d=15274,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_TAILOR},  -- Recipe: Greater Shadow Protection Potion
+	[13501]={b=30000,s=7500,d=15274,u=AUCT_TYPE_TAILOR},  -- Recipe: Major Mana Potion
 	[13502]={b=59937,s=11987,d=24164,c=AUCT_CLAS_ARMOR},  -- Handcrafted Mastersmith Girdle
 	[13503]={b=100000,s=25000,d=3667,c=AUCT_CLAS_ARMOR},  -- Alchemists' Stone
 	[13505]={b=456725,s=91345,d=24166,c=AUCT_CLAS_WEAPON},  -- Runeblade of Baron Rivendare
 	[13506]={b=20000,s=5000,d=26865,x=5},  -- Flask of Petrification
 	[13507]={b=0,s=0,d=7743,c=AUCT_CLAS_WRITTEN},  -- Cliffwatcher Longhorn Report
 	[13508]={b=19115,s=4778,d=1504},  -- Eye of Arachnida
+	[13509]={b=21573,s=5393,d=7247},  -- Clutch of Foresight
 	[13510]={b=20000,s=5000,d=24213,x=5},  -- Flask of the Titans
 	[13511]={b=20000,s=5000,d=21531,x=5},  -- Flask of Distilled Wisdom
 	[13512]={b=20000,s=5000,d=19547,x=5},  -- Flask of Supreme Power
@@ -7616,15 +8022,20 @@ Auctioneer_BasePrices = {
 	[13582]={b=0,s=0,d=24252},  -- Zergling Leash
 	[13583]={b=0,s=0,d=24251},  -- Panda Collar
 	[13584]={b=0,s=0,d=6689},  -- Diablo Stone
+	[13585]={b=0,s=0,d=6672},  -- Keepsake of Remembrance
 	[13602]={b=0,s=0,d=21610,c=AUCT_CLAS_WEAPON},  -- Greater Spellstone
 	[13603]={b=0,s=0,d=21610,c=AUCT_CLAS_WEAPON},  -- Major Spellstone
+	[13624]={b=0,s=0,d=6672},  -- Soulbound Keepsake
+	[13626]={b=0,s=0,d=3486},  -- Human Head of Ras Frostwhisper
 	[13699]={b=0,s=0,d=24380,c=AUCT_CLAS_WEAPON},  -- Firestone
 	[13700]={b=0,s=0,d=24380,c=AUCT_CLAS_WEAPON},  -- Greater Firestone
 	[13701]={b=0,s=0,d=24380,c=AUCT_CLAS_WEAPON},  -- Major Firestone
+	[13702]={b=0,s=0,d=19498,q=20,x=20},  -- Doom Weed
 	[13703]={b=0,s=0,d=24415,q=20,x=20},  -- Kodo Bone
 	[13704]={b=0,s=0,d=22071},  -- Skeleton Key
 	[13724]={b=6000,s=300,d=21203,q=20,x=20},  -- Enriched Manna Biscuit
 	[13725]={b=0,s=0,d=24496},  -- Krastinov's Bag of Horrors
+	[13752]={b=0,s=0,d=6672},  -- Soulbound Keepsake
 	[13754]={b=120,s=6,d=7176,q=20,x=20,u=AUCT_TYPE_COOK},  -- Raw Glossy Mightfish
 	[13755]={b=140,s=7,d=18537,q=20,x=20,u=AUCT_TYPE_COOK},  -- Winter Squid
 	[13756]={b=180,s=9,d=4813,q=20,x=20,u=AUCT_TYPE_COOK},  -- Raw Summer Bass
@@ -7635,6 +8046,7 @@ Auctioneer_BasePrices = {
 	[13761]={b=0,s=0,d=11448},  -- Frozen Eggs
 	[13810]={b=6000,s=300,d=24568,q=20,x=20},  -- Blessed Sunfruit
 	[13813]={b=6000,s=300,d=24570,q=20,x=20},  -- Blessed Sunfruit Juice
+	[13815]={b=0,s=0,d=24572},  -- Some Rune
 	[13816]={b=52808,s=10561,d=20225,c=AUCT_CLAS_WEAPON},  -- Fine Longsword
 	[13817]={b=93984,s=18796,d=20195,c=AUCT_CLAS_WEAPON},  -- Tapered Greatsword
 	[13818]={b=67157,s=13431,d=8478,c=AUCT_CLAS_WEAPON},  -- Jagged Axe
@@ -7647,6 +8059,7 @@ Auctioneer_BasePrices = {
 	[13825]={b=50841,s=10168,d=20721,c=AUCT_CLAS_WEAPON},  -- Primed Musket
 	[13850]={b=0,s=0,d=24592},  -- Rumbleshot's Ammo
 	[13851]={b=1250,s=312,d=21327,x=20},  -- Hot Wolf Ribs
+	[13852]={b=0,s=0,d=16065},  -- The Grand Crusader's Command
 	[13853]={b=0,s=0,d=22193,q=10,x=10},  -- Slab of Carrion Worm Meat
 	[13856]={b=25564,s=5112,d=25235,c=AUCT_CLAS_ARMOR},  -- Runecloth Belt
 	[13857]={b=54393,s=10878,d=25207,c=AUCT_CLAS_ARMOR},  -- Runecloth Tunic
@@ -7670,6 +8083,7 @@ Auctioneer_BasePrices = {
 	[13878]={b=130,s=32,d=16364},  -- 53 Pound Grouper
 	[13879]={b=140,s=35,d=16364},  -- 59 Pound Grouper
 	[13880]={b=150,s=37,d=16364},  -- 68 Pound Grouper
+	[13881]={b=400,s=100,d=4809},  -- Bloated Redgill
 	[13882]={b=240,s=60,d=16364,c=AUCT_CLAS_WEAPON},  -- 42 Pound Redgill
 	[13883]={b=240,s=60,d=16364,c=AUCT_CLAS_WEAPON},  -- 45 Pound Redgill
 	[13885]={b=200,s=50,d=16364,c=AUCT_CLAS_WEAPON},  -- 34 Pound Redgill
@@ -7683,12 +8097,22 @@ Auctioneer_BasePrices = {
 	[13897]={b=2976,s=595,d=24641,c=AUCT_CLAS_ARMOR},  -- White Traditional Hanbok
 	[13898]={b=288699,s=57739,d=24645,c=AUCT_CLAS_ARMOR},  -- Royal Dangui
 	[13899]={b=17641,s=3528,d=24639,c=AUCT_CLAS_ARMOR},  -- Red Traditional Hanbok
+	[13900]={b=137214,s=27442,d=24642,c=AUCT_CLAS_ARMOR},  -- Green Wedding Hanbok
 	[13901]={b=100,s=25,d=18705,c=AUCT_CLAS_WEAPON},  -- 15 Pound Salmon
 	[13902]={b=100,s=25,d=18705,c=AUCT_CLAS_WEAPON},  -- 18 Pound Salmon
+	[13903]={b=100,s=25,d=18705,c=AUCT_CLAS_WEAPON},  -- 22 Pound Salmon
 	[13904]={b=100,s=25,d=18705,c=AUCT_CLAS_WEAPON},  -- 25 Pound Salmon
+	[13905]={b=100,s=25,d=18705,c=AUCT_CLAS_WEAPON},  -- 29 Pound Salmon
+	[13907]={b=200,s=50,d=24629},  -- 7 Pound Lobster
+	[13908]={b=220,s=55,d=24629},  -- 9 Pound Lobster
 	[13909]={b=220,s=55,d=24629},  -- 12 Pound Lobster
+	[13910]={b=250,s=62,d=24629},  -- 15 Pound Lobster
+	[13911]={b=320,s=80,d=24629},  -- 19 Pound Lobster
+	[13912]={b=360,s=90,d=24629},  -- 21 Pound Lobster
 	[13914]={b=500,s=125,d=24715,c=AUCT_CLAS_WEAPON},  -- 70 Pound Mightfish
+	[13915]={b=500,s=125,d=24715,c=AUCT_CLAS_WEAPON},  -- 85 Pound Mightfish
 	[13918]={b=4,s=1,d=12331},  -- Reinforced Locked Chest
+	[13920]={b=0,s=0,d=22838,c=AUCT_CLAS_QUEST},  -- Healthy Dragon Scale
 	[13926]={b=40000,s=10000,d=24730,x=20,u=AUCT_TYPE_ENCHANT},  -- Golden Pearl
 	[13927]={b=32,s=8,d=7176,x=20},  -- Cooked Glossy Mightfish
 	[13928]={b=160,s=8,d=18537,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Grilled Squid
@@ -7984,6 +8408,7 @@ Auctioneer_BasePrices = {
 	[14323]={b=41612,s=8322,d=26290,c=AUCT_CLAS_ARMOR},  -- Resplendent Gauntlets
 	[14324]={b=83533,s=16706,d=26300,c=AUCT_CLAS_ARMOR},  -- Resplendent Sarong
 	[14325]={b=66023,s=13204,d=26298,c=AUCT_CLAS_ARMOR},  -- Resplendent Epaulets
+	[14326]={b=97399,s=19479,d=28993,c=AUCT_CLAS_ARMOR},  -- Resplendent Robes
 	[14327]={b=38296,s=7659,d=26284,c=AUCT_CLAS_ARMOR},  -- Resplendent Belt
 	[14329]={b=70332,s=14066,d=26225,c=AUCT_CLAS_ARMOR},  -- Eternal Boots
 	[14330]={b=44812,s=8962,d=26216,c=AUCT_CLAS_ARMOR},  -- Eternal Bindings
@@ -8114,6 +8539,7 @@ Auctioneer_BasePrices = {
 	[14490]={b=20000,s=5000,d=1102},  -- Pattern: Cindercloth Pants
 	[14491]={b=20000,s=5000,d=1102},  -- Pattern: Runecloth Pants
 	[14492]={b=20000,s=5000,d=1102},  -- Pattern: Felcloth Boots
+	[14493]={b=20000,s=5000,d=1102},  -- Pattern: Robe of Winter Night
 	[14494]={b=22000,s=5500,d=1102},  -- Pattern: Brightcloth Pants
 	[14496]={b=22000,s=5500,d=1102},  -- Pattern: Felcloth Hood
 	[14497]={b=22000,s=5500,d=1102},  -- Pattern: Mooncloth Leggings
@@ -8128,6 +8554,7 @@ Auctioneer_BasePrices = {
 	[14506]={b=40000,s=10000,d=1102},  -- Pattern: Felcloth Robe
 	[14507]={b=40000,s=10000,d=1102},  -- Pattern: Mooncloth Shoulders
 	[14508]={b=60000,s=15000,d=1102},  -- Pattern: Felcloth Shoulders
+	[14512]={b=60000,s=15000,d=1102},  -- Pattern: Truefaith Vestments
 	[14513]={b=60000,s=15000,d=1102},  -- Pattern: Robe of the Archmage
 	[14514]={b=60000,s=15000,d=1102},  -- Pattern: Robe of the Void
 	[14522]={b=156591,s=31318,d=25111,c=AUCT_CLAS_ARMOR},  -- Maelstrom Leggings
@@ -8220,6 +8647,7 @@ Auctioneer_BasePrices = {
 	[14622]={b=42553,s=8510,d=25224,c=AUCT_CLAS_ARMOR},  -- Deathbone Gauntlets
 	[14623]={b=85428,s=17085,d=25226,c=AUCT_CLAS_ARMOR},  -- Deathbone Legguards
 	[14624]={b=102891,s=20578,d=24102,c=AUCT_CLAS_ARMOR},  -- Deathbone Chestplate
+	[14625]={b=0,s=0,d=23520},  -- Symbol of Lost Honor
 	[14626]={b=103664,s=20732,d=25245,c=AUCT_CLAS_ARMOR},  -- Necropile Robe
 	[14627]={b=800,s=200,d=1102},  -- Pattern: Bright Yellow Shirt
 	[14628]={b=0,s=0,d=25246},  -- Imbued Skeletal Fragments
@@ -8407,6 +8835,7 @@ Auctioneer_BasePrices = {
 	[14867]={b=89014,s=17802,d=26884,c=AUCT_CLAS_ARMOR},  -- Warleader's Leggings
 	[14868]={b=65547,s=13109,d=26885,c=AUCT_CLAS_ARMOR},  -- Warleader's Shoulders
 	[14869]={b=37886,s=7577,d=26878,c=AUCT_CLAS_ARMOR},  -- Warleader's Bracers
+	[14872]={b=0,s=0,d=15692},  -- Tirion's Gift
 	[14894]={b=0,s=0,d=25542},  -- Lily Root
 	[14895]={b=24524,s=4904,d=26654,c=AUCT_CLAS_ARMOR},  -- Saltstone Surcoat
 	[14896]={b=17091,s=3418,d=26652,c=AUCT_CLAS_ARMOR},  -- Saltstone Sabatons
@@ -8516,6 +8945,7 @@ Auctioneer_BasePrices = {
 	[15019]={b=1833,s=366,d=27667,c=AUCT_CLAS_ARMOR},  -- Lupine Mantle
 	[15042]={b=0,s=0,d=25661},  -- Empty Termite Jar
 	[15043]={b=0,s=0,d=25662,q=100,x=100},  -- Plagueland Termites
+	[15044]={b=0,s=0,d=25807},  -- Barrel of Plagueland Termites
 	[15045]={b=99692,s=19938,d=25671,c=AUCT_CLAS_ARMOR},  -- Green Dragonscale Breastplate
 	[15046]={b=112410,s=22482,d=25673,c=AUCT_CLAS_ARMOR},  -- Green Dragonscale Leggings
 	[15047]={b=149181,s=29836,d=25675,c=AUCT_CLAS_ARMOR},  -- Red Dragonscale Breastplate
@@ -8865,6 +9295,7 @@ Auctioneer_BasePrices = {
 	[15407]={b=2000,s=500,d=6660,x=5,c=AUCT_CLAS_HIDE,u=AUCT_TYPE_LEATHER},  -- Cured Rugged Hide
 	[15408]={b=2000,s=500,d=568,x=20,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_LEATHER},  -- Heavy Scorpid Scale
 	[15409]={b=4000,s=1000,d=7127,x=20,u=AUCT_TYPE_LEATHER},  -- Refined Deeprock Salt
+	[15410]={b=20000,s=5000,d=20914,x=20},  -- Scale of Onyxia
 	[15411]={b=41135,s=10283,d=23716,c=AUCT_CLAS_ARMOR},  -- Mark of Fordring
 	[15412]={b=2000,s=500,d=21363,x=20,c=AUCT_CLAS_LEATHER},  -- Green Dragonscale
 	[15413]={b=112596,s=22519,d=26373,c=AUCT_CLAS_ARMOR},  -- Ornate Adamantium Breastplate
@@ -8894,16 +9325,20 @@ Auctioneer_BasePrices = {
 	[15437]={b=66506,s=13301,d=26271,c=AUCT_CLAS_ARMOR},  -- Supreme Cape
 	[15438]={b=61324,s=12264,d=29013,c=AUCT_CLAS_ARMOR},  -- Supreme Gloves
 	[15439]={b=96936,s=19387,d=28850,c=AUCT_CLAS_ARMOR},  -- Supreme Crown
+	[15440]={b=123537,s=24707,d=27615,c=AUCT_CLAS_ARMOR},  -- Supreme Leggings
 	[15441]={b=92977,s=18595,d=27618,c=AUCT_CLAS_ARMOR},  -- Supreme Shoulders
 	[15442]={b=137166,s=27433,d=27610,c=AUCT_CLAS_ARMOR},  -- Supreme Breastplate
 	[15443]={b=5598,s=1119,d=28199,c=AUCT_CLAS_WEAPON},  -- Kris of Orgrimmar
 	[15444]={b=7023,s=1404,d=28228,c=AUCT_CLAS_WEAPON},  -- Staff of Orgrimmar
 	[15445]={b=5637,s=1127,d=28191,c=AUCT_CLAS_WEAPON},  -- Hammer of Orgrimmar
+	[15447]={b=0,s=0,d=26382},  -- Living Rot
+	[15448]={b=0,s=0,d=25469},  -- Coagulated Rot
 	[15449]={b=2127,s=425,d=16850,c=AUCT_CLAS_ARMOR},  -- Ghastly Trousers
 	[15450]={b=2669,s=533,d=28147,c=AUCT_CLAS_ARMOR},  -- Dredgemire Leggings
 	[15451]={b=3216,s=643,d=2922,c=AUCT_CLAS_ARMOR},  -- Gargoyle Leggings
 	[15452]={b=1075,s=215,d=28168,c=AUCT_CLAS_ARMOR},  -- Featherbead Bracers
 	[15453]={b=1349,s=269,d=28247,c=AUCT_CLAS_ARMOR},  -- Savannah Bracers
+	[15454]={b=0,s=0,d=26383},  -- Mortar and Pestle
 	[15455]={b=17705,s=3541,d=28323,c=AUCT_CLAS_ARMOR},  -- Dustfall Robes
 	[15456]={b=22211,s=4442,d=17155,c=AUCT_CLAS_ARMOR},  -- Lightstep Leggings
 	[15457]={b=5671,s=1134,d=26012,c=AUCT_CLAS_ARMOR},  -- Desert Shoulders
@@ -9153,6 +9588,7 @@ Auctioneer_BasePrices = {
 	[15707]={b=36078,s=7215,d=26435,c=AUCT_CLAS_ARMOR},  -- Brantwood Sash
 	[15708]={b=44825,s=8965,d=26436,c=AUCT_CLAS_ARMOR},  -- Blight Leather Gloves
 	[15709]={b=36352,s=7270,d=26437,c=AUCT_CLAS_ARMOR},  -- Gearforge Girdle
+	[15710]={b=0,s=0,d=20614},  -- Cenarion Lunardust
 	[15722]={b=0,s=0,d=21794},  -- Spraggle's Canteen
 	[15723]={b=11300,s=2825,d=19873},  -- Tea with Sugar
 	[15724]={b=12000,s=3000,d=1102},  -- Pattern: Heavy Scorpid Bracers
@@ -9161,6 +9597,7 @@ Auctioneer_BasePrices = {
 	[15727]={b=12000,s=3000,d=1102},  -- Pattern: Heavy Scorpid Vest
 	[15728]={b=12000,s=3000,d=1102},  -- Pattern: Wicked Leather Bracers
 	[15729]={b=12000,s=3000,d=1102},  -- Pattern: Chimeric Gloves
+	[15730]={b=12000,s=3000,d=1102},  -- Pattern: Red Dragonscale Breastplate
 	[15731]={b=14000,s=3500,d=1102},  -- Pattern: Runic Leather Gauntlets
 	[15732]={b=14000,s=3500,d=1102},  -- Pattern: Volcanic Leggings
 	[15733]={b=14000,s=3500,d=1102},  -- Pattern: Green Dragonscale Leggings
@@ -9206,6 +9643,7 @@ Auctioneer_BasePrices = {
 	[15774]={b=40000,s=10000,d=1102},  -- Pattern: Heavy Scorpid Shoulders
 	[15775]={b=40000,s=10000,d=1102},  -- Pattern: Volcanic Shoulders
 	[15776]={b=40000,s=10000,d=1102},  -- Pattern: Runic Leather Armor
+	[15777]={b=60000,s=15000,d=1102},  -- Pattern: Runic Leather Shoulders
 	[15778]={b=5000,s=1250,d=26461},  -- Mechanical Yeti
 	[15779]={b=60000,s=15000,d=1102},  -- Pattern: Frostsaber Tunic
 	[15781]={b=60000,s=15000,d=6270},  -- Pattern: Black Dragonscale Leggings
@@ -9230,6 +9668,7 @@ Auctioneer_BasePrices = {
 	[15800]={b=180413,s=36082,d=26477,c=AUCT_CLAS_WEAPON},  -- Intrepid Shortsword
 	[15801]={b=179303,s=35860,d=26479,c=AUCT_CLAS_WEAPON},  -- Valiant Shortsword
 	[15802]={b=58243,s=11648,d=17256,c=AUCT_CLAS_ARMOR},  -- Mooncloth Boots
+	[15803]={b=0,s=0,d=1246},  -- Book of the Ancients
 	[15804]={b=47873,s=9574,d=25958,c=AUCT_CLAS_ARMOR},  -- Cerise Drape
 	[15805]={b=58650,s=14662,d=26491,c=AUCT_CLAS_WEAPON},  -- Penelope's Rose
 	[15806]={b=256366,s=51273,d=26494,c=AUCT_CLAS_WEAPON},  -- Mirah's Song
@@ -9246,8 +9685,11 @@ Auctioneer_BasePrices = {
 	[15823]={b=45958,s=9191,d=26512,c=AUCT_CLAS_ARMOR},  -- Bricksteel Gauntlets
 	[15824]={b=75307,s=15061,d=26513,c=AUCT_CLAS_ARMOR},  -- Astoria Robes
 	[15825]={b=96512,s=19302,d=26514,c=AUCT_CLAS_ARMOR},  -- Traphook Jerkin
+	[15826]={b=0,s=0,d=21845},  -- Curative Animal Salve
 	[15827]={b=112961,s=22592,d=26515,c=AUCT_CLAS_ARMOR},  -- Jadescale Breastplate
 	[15842]={b=0,s=0,d=8545},  -- Empty Dreadmist Peak Sampler
+	[15843]={b=0,s=0,d=26531},  -- Filled Dreadmist Peak Sampler
+	[15844]={b=0,s=0,d=8545},  -- Empty Cliffspring Falls Sampler
 	[15845]={b=0,s=0,d=26531},  -- Filled Cliffspring Falls Sampler
 	[15846]={b=30000,s=7500,d=18632},  -- Salt Shaker
 	[15847]={b=0,s=0,d=1317,c=AUCT_CLAS_WRITTEN},  -- Quel'Thalas Registry
@@ -9279,10 +9721,16 @@ Auctioneer_BasePrices = {
 	[15873]={b=32578,s=8144,d=18119,c=AUCT_CLAS_ARMOR},  -- Ragged John's Neverending Cup
 	[15874]={b=0,s=0,d=26552},  -- Soft-shelled Clam
 	[15875]={b=0,s=0,d=7856,c=AUCT_CLAS_FOOD},  -- Rotten Apple
+	[15876]={b=0,s=0,d=26381},  -- Nathanos' Chest
+	[15877]={b=0,s=0,d=26571,c=AUCT_CLAS_FISHING},  -- Shrine Bauble
 	[15878]={b=0,s=0,d=4287},  -- Rackmore's Silver Key
 	[15879]={b=0,s=0,d=1769},  -- Overlord Ror's Claw
 	[15880]={b=0,s=0,d=7164},  -- Head of Ramstein the Gorger
 	[15881]={b=0,s=0,d=6706},  -- Rackmore's Golden Key
+	[15882]={b=0,s=0,d=26582},  -- Half Pendant of Aquatic Endurance
+	[15883]={b=0,s=0,d=26583},  -- Half Pendant of Aquatic Agility
+	[15884]={b=0,s=0,d=8093},  -- Augustus' Receipt Book
+	[15885]={b=0,s=0,d=26584},  -- Pendant of the Sea Lion
 	[15886]={b=0,s=0,d=1262},  -- Timolain's Phylactery
 	[15887]={b=147908,s=29581,d=26921,c=AUCT_CLAS_WEAPON},  -- Heroic Guard
 	[15890]={b=129157,s=25831,d=26855,c=AUCT_CLAS_WEAPON},  -- Vanguard Shield
@@ -9302,8 +9750,16 @@ Auctioneer_BasePrices = {
 	[15911]={b=0,s=0,d=26595},  -- Taming Rod
 	[15912]={b=4594,s=1148,d=28471,c=AUCT_CLAS_WEAPON},  -- Buccaneer's Orb
 	[15913]={b=0,s=0,d=26595},  -- Taming Rod
+	[15914]={b=0,s=0,d=26595},  -- Taming Rod
+	[15915]={b=0,s=0,d=26595},  -- Taming Rod
+	[15916]={b=0,s=0,d=26595},  -- Taming Rod
+	[15917]={b=0,s=0,d=26595},  -- Taming Rod
 	[15918]={b=19392,s=4848,d=28472,c=AUCT_CLAS_WEAPON},  -- Conjurer's Sphere
+	[15919]={b=0,s=0,d=26595},  -- Taming Rod
+	[15920]={b=0,s=0,d=26595},  -- Taming Rod
 	[15921]={b=0,s=0,d=26595},  -- Taming Rod
+	[15922]={b=0,s=0,d=26595},  -- Taming Rod
+	[15923]={b=0,s=0,d=26595},  -- Taming Rod
 	[15924]={b=0,s=0,d=22193,q=10,x=10,u=AUCT_TYPE_COOK},  -- Soft-shelled Clam Meat
 	[15925]={b=1758,s=439,d=28462,c=AUCT_CLAS_WEAPON},  -- Journeyman's Stave
 	[15926]={b=3210,s=802,d=28464,c=AUCT_CLAS_WEAPON},  -- Spellbinder Orb
@@ -9406,6 +9862,7 @@ Auctioneer_BasePrices = {
 	[16112]={b=2200,s=550,d=8117},  -- Manual: Heavy Silk Bandage
 	[16113]={b=5000,s=1250,d=8117},  -- Manual: Mageweave Bandage
 	[16114]={b=0,s=0,d=7867},  -- Foreman's Blackjack
+	[16115]={b=0,s=0,d=8928},  -- Osric's Crate
 	[16166]={b=25,s=1,d=26731,q=20,x=20},  -- Bean Soup
 	[16167]={b=125,s=6,d=26732,q=20,x=20},  -- Versicolor Treat
 	[16168]={b=2000,s=100,d=26735,q=20,x=20},  -- Heaven Peach
@@ -9442,11 +9899,16 @@ Auctioneer_BasePrices = {
 	[16246]={b=24000,s=6000,d=7798},  -- Formula: Enchant Bracer - Superior Strength
 	[16247]={b=24000,s=6000,d=7798},  -- Formula: Enchant Weapon - Superior Impact
 	[16248]={b=24000,s=6000,d=7798},  -- Formula: Enchant Weapon - Unholy
+	[16249]={b=30000,s=7500,d=7798},  -- Formula: Enchant 2H Weapon - Major Intellect
+	[16250]={b=30000,s=7500,d=7798},  -- Formula: Enchant Weapon - Superior Striking
 	[16251]={b=30000,s=7500,d=7798},  -- Formula: Enchant Bracer - Superior Stamina
 	[16252]={b=30000,s=7500,d=7798},  -- Formula: Enchant Weapon - Crusader
+	[16254]={b=30000,s=7500,d=7798},  -- Formula: Enchant Weapon - Lifestealing
 	[16255]={b=30000,s=7500,d=7798},  -- Formula: Enchant 2H Weapon - Major Spirit
 	[16262]={b=0,s=0,d=6349},  -- Nessa's Collection
 	[16263]={b=0,s=0,d=3023,c=AUCT_CLAS_WRITTEN},  -- Laird's Response
+	[16282]={b=0,s=0,d=7382},  -- Bundle of Hides
+	[16283]={b=0,s=0,d=1168},  -- Ahanu's Leather Goods
 	[16302]={b=100,s=25,d=1246},  -- Grimoire of Firebolt (Rank 2)
 	[16303]={b=0,s=0,d=26924,c=AUCT_CLAS_QUEST},  -- Ursangous's Paw
 	[16304]={b=0,s=0,d=26925,c=AUCT_CLAS_QUEST},  -- Shadumbra's Head
@@ -9480,6 +9942,7 @@ Auctioneer_BasePrices = {
 	[16335]={b=40000,s=10000,d=30797,c=AUCT_CLAS_ARMOR},  -- Senior Sergeant's Insignia
 	[16341]={b=21425,s=4285,d=27088,c=AUCT_CLAS_ARMOR},  -- Sergeant's Cloak
 	[16342]={b=44154,s=8830,d=27087,c=AUCT_CLAS_ARMOR},  -- Sergeant's Cape
+	[16345]={b=151892,s=30378,d=27089,c=AUCT_CLAS_WEAPON},  -- High Warlord's Blade
 	[16346]={b=2000,s=500,d=1246},  -- Grimoire of Torment (Rank 2)
 	[16347]={b=6000,s=1500,d=1246},  -- Grimoire of Torment (Rank 3)
 	[16348]={b=11000,s=2750,d=1246},  -- Grimoire of Torment (Rank 4)
@@ -9502,6 +9965,7 @@ Auctioneer_BasePrices = {
 	[16365]={b=14000,s=3500,d=1246},  -- Grimoire of Suffering (Rank 3)
 	[16366]={b=26000,s=6500,d=1246},  -- Grimoire of Suffering (Rank 4)
 	[16368]={b=5000,s=1250,d=1246},  -- Grimoire of Lash of Pain (Rank 2)
+	[16369]={b=42081,s=8416,d=31063,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Silk Boots
 	[16371]={b=9000,s=2250,d=1246},  -- Grimoire of Lash of Pain (Rank 3)
 	[16372]={b=12000,s=3000,d=1246},  -- Grimoire of Lash of Pain (Rank 4)
 	[16373]={b=18000,s=4500,d=1246},  -- Grimoire of Lash of Pain (Rank 5)
@@ -9522,10 +9986,153 @@ Auctioneer_BasePrices = {
 	[16388]={b=9000,s=2250,d=1246},  -- Grimoire of Spell Lock (Rank 1)
 	[16389]={b=18000,s=4500,d=1246},  -- Grimoire of Spell Lock (Rank 2)
 	[16390]={b=11000,s=2750,d=1246},  -- Grimoire of Paranoia
+	[16391]={b=28261,s=5652,d=31064,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Silk Gloves
+	[16392]={b=53190,s=10638,d=31068,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Leather Boots
+	[16393]={b=53384,s=10676,d=31070,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Dragonhide Footwraps
+	[16396]={b=36942,s=7388,d=31075,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Leather Gauntlets
+	[16397]={b=37072,s=7414,d=31071,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Dragonhide Gloves
+	[16401]={b=67983,s=13596,d=31244,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Chain Boots
+	[16403]={b=41118,s=8223,d=31245,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Chain Gauntlets
+	[16405]={b=41433,s=8286,d=26752,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Plate Boots
+	[16406]={b=27728,s=5545,d=31086,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Plate Gauntlets
 	[16408]={b=0,s=0,d=27227,c=AUCT_CLAS_QUEST},  -- Befouled Water Globe
+	[16409]={b=42068,s=8413,d=31082,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Lamellar Sabatons
+	[16410]={b=28152,s=5630,d=30321,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Lamellar Gauntlets
+	[16413]={b=58463,s=11692,d=31057,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Silk Raiment
+	[16414]={b=58676,s=11735,d=27230,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Silk Leggings
+	[16415]={b=44167,s=8833,d=27231,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Silk Spaulders
+	[16416]={b=44322,s=8864,d=27232,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Crown
+	[16417]={b=74137,s=14827,d=31072,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Leather Armor
+	[16418]={b=55802,s=11160,d=31077,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Leather Veil
+	[16419]={b=74670,s=14934,d=31073,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Leather Legguards
+	[16420]={b=56197,s=11239,d=31076,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Leather Spaulders
+	[16421]={b=75195,s=15039,d=31074,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Dragonhide Tunic
+	[16422]={b=75461,s=15092,d=27235,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Dragonhide Leggings
+	[16423]={b=51392,s=10278,d=27236,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Dragonhide Epaulets
+	[16424]={b=51586,s=10317,d=27234,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Dragonhide Shroud
+	[16425]={b=82858,s=16571,d=31241,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Chain Hauberk
+	[16426]={b=83178,s=16635,d=31242,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Chain Leggings
+	[16427]={b=64619,s=12923,d=31247,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Chain Pauldrons
+	[16428]={b=64573,s=12914,d=31246,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Chain Helmet
+	[16429]={b=43208,s=8641,d=28934,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Plate Helm
+	[16430]={b=57824,s=11564,d=31083,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Plate Chestguard
+	[16431]={b=58031,s=11606,d=26659,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Plate Leggings
+	[16432]={b=43683,s=8736,d=26662,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Plate Pauldrons
+	[16433]={b=58457,s=11691,d=30315,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Lamellar Breastplate
+	[16434]={b=44003,s=8800,d=30316,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Lamellar Headguard
+	[16435]={b=58878,s=11775,d=31084,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Lamellar Leggings
+	[16436]={b=44318,s=8863,d=31085,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Lamellar Shoulders
+	[16437]={b=65383,s=13076,d=30337,c=AUCT_CLAS_ARMOR},  -- Marshal's Silk Footwraps
+	[16440]={b=44054,s=8810,d=30339,c=AUCT_CLAS_ARMOR},  -- Marshal's Silk Gloves
+	[16441]={b=66316,s=13263,d=30341,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Coronet
+	[16442]={b=88726,s=17745,d=30342,c=AUCT_CLAS_ARMOR},  -- Marshal's Silk Leggings
+	[16443]={b=82809,s=16561,d=30343,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Silk Vestments
+	[16444]={b=62342,s=12468,d=30336,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Silk Spaulders
+	[16446]={b=78506,s=15701,d=30333,c=AUCT_CLAS_ARMOR},  -- Marshal's Leather Footguards
+	[16448]={b=52729,s=10545,d=30334,c=AUCT_CLAS_ARMOR},  -- Marshal's Dragonhide Gauntlets
+	[16449]={b=79387,s=15877,d=30328,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Dragonhide Spaulders
+	[16450]={b=106231,s=21246,d=30329,c=AUCT_CLAS_ARMOR},  -- Marshal's Dragonhide Legguards
+	[16451]={b=79967,s=15993,d=30330,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Dragonhide Helmet
+	[16452]={b=107014,s=21402,d=30327,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Dragonhide Breastplate
+	[16453]={b=107405,s=21481,d=30327,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Leather Chestpiece
+	[16454]={b=53893,s=10778,d=30334,c=AUCT_CLAS_ARMOR},  -- Marshal's Leather Handgrips
+	[16455]={b=81133,s=16226,d=30330,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Leather Mask
+	[16456]={b=108569,s=21713,d=30329,c=AUCT_CLAS_ARMOR},  -- Marshal's Leather Leggings
+	[16457]={b=81712,s=16342,d=30328,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Leather Epaulets
+	[16459]={b=76459,s=15291,d=30333,c=AUCT_CLAS_ARMOR},  -- Marshal's Dragonhide Boots
+	[16462]={b=93211,s=18642,d=30323,c=AUCT_CLAS_ARMOR},  -- Marshal's Chain Boots
+	[16463]={b=62100,s=12420,d=30326,c=AUCT_CLAS_ARMOR},  -- Marshal's Chain Grips
+	[16465]={b=93846,s=18769,d=30312,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Chain Helm
+	[16466]={b=125598,s=25119,d=30311,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Chain Breastplate
+	[16467]={b=126068,s=25213,d=30313,c=AUCT_CLAS_ARMOR},  -- Marshal's Chain Legguards
+	[16468]={b=95325,s=19065,d=30314,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Chain Spaulders
+	[16471]={b=42644,s=8528,d=30321,c=AUCT_CLAS_ARMOR},  -- Marshal's Lamellar Gloves
+	[16472]={b=64195,s=12839,d=30319,c=AUCT_CLAS_ARMOR},  -- Marshal's Lamellar Boots
+	[16473]={b=85907,s=17181,d=30315,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Lamellar Chestplate
+	[16474]={b=64665,s=12933,d=30316,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Lamellar Faceguard
+	[16475]={b=88777,s=17755,d=30317,c=AUCT_CLAS_ARMOR},  -- Marshal's Lamellar Legplates
+	[16476]={b=60456,s=12091,d=30318,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Lamellar Pauldrons
+	[16477]={b=80921,s=16184,d=30315,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Plate Armor
+	[16478]={b=60926,s=12185,d=30316,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Plate Helm
+	[16479]={b=81548,s=16309,d=30317,c=AUCT_CLAS_ARMOR},  -- Marshal's Plate Legguards
+	[16480]={b=61389,s=12277,d=30318,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Plate Shoulderguards
+	[16483]={b=62094,s=12418,d=30319,c=AUCT_CLAS_ARMOR},  -- Marshal's Plate Boots
+	[16484]={b=41548,s=8309,d=30321,c=AUCT_CLAS_ARMOR},  -- Marshal's Plate Gauntlets
+	[16485]={b=42556,s=8511,d=31097,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Silk Footwraps
 	[16486]={b=28477,s=5695,d=27255,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Silk Cuffs
+	[16487]={b=28584,s=5716,d=31098,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Silk Gloves
+	[16489]={b=43191,s=8638,d=31099,c=AUCT_CLAS_ARMOR},  -- Champion's Silk Hood
+	[16490]={b=57801,s=11560,d=26144,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Silk Pants
+	[16491]={b=59534,s=11906,d=31102,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Silk Robes
+	[16492]={b=44810,s=8962,d=31100,c=AUCT_CLAS_ARMOR},  -- Champion's Silk Shoulderpads
+	[16494]={b=56412,s=11282,d=27263,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Dragonhide Boots
+	[16496]={b=34268,s=6853,d=27265,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Dragonhide Gauntlets
 	[16497]={b=34402,s=6880,d=30801,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Leather Armguards
+	[16498]={b=51802,s=10360,d=31035,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Leather Treads
+	[16499]={b=34664,s=6932,d=31036,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Leather Vices
+	[16501]={b=52396,s=10479,d=28935,c=AUCT_CLAS_ARMOR},  -- Champion's Dragonhide Spaulders
+	[16502]={b=70128,s=14025,d=27267,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Dragonhide Trousers
+	[16503]={b=52790,s=10558,d=28106,c=AUCT_CLAS_ARMOR},  -- Champion's Dragonhide Helm
+	[16504]={b=70653,s=14130,d=31037,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Dragonhide Breastplate
+	[16505]={b=70920,s=14184,d=31039,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Leather Hauberk
+	[16506]={b=53384,s=10676,d=30358,c=AUCT_CLAS_ARMOR},  -- Champion's Leather Headguard
+	[16507]={b=55014,s=11002,d=31038,c=AUCT_CLAS_ARMOR},  -- Champion's Leather Mantle
+	[16508]={b=73619,s=14723,d=31040,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Leather Leggings
+	[16509]={b=44331,s=8866,d=31050,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Plate Boots
+	[16510]={b=29657,s=5931,d=31051,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Plate Gloves
+	[16513]={b=59955,s=11991,d=27274,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Plate Armor
+	[16514]={b=45121,s=9024,d=30071,c=AUCT_CLAS_ARMOR},  -- Champion's Plate Headguard
+	[16515]={b=60375,s=12075,d=31052,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Plate Legguards
+	[16516]={b=41118,s=8223,d=31049,c=AUCT_CLAS_ARMOR},  -- Champion's Plate Pauldrons
+	[16518]={b=62426,s=12485,d=31183,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Mail Walkers
+	[16519]={b=41593,s=8318,d=27279,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Mail Grips
+	[16521]={b=62862,s=12572,d=30072,c=AUCT_CLAS_ARMOR},  -- Champion's Mail Helm
+	[16522]={b=84136,s=16827,d=31185,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Mail Chestpiece
+	[16523]={b=86745,s=17349,d=31186,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Mail Legguards
+	[16524]={b=65588,s=13117,d=30382,c=AUCT_CLAS_ARMOR},  -- Champion's Mail Shoulders
+	[16525]={b=87375,s=17475,d=31048,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Chain Breastplate
+	[16526]={b=65771,s=13154,d=31184,c=AUCT_CLAS_ARMOR},  -- Champion's Chain Headguard
+	[16527]={b=88015,s=17603,d=30367,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Chain Leggings
+	[16528]={b=66545,s=13309,d=31047,c=AUCT_CLAS_ARMOR},  -- Champion's Chain Pauldrons
+	[16530]={b=44482,s=8896,d=31182,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Chain Gauntlets
+	[16531]={b=67261,s=13452,d=31181,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Chain Boots
 	[16532]={b=44802,s=8960,d=27277,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Mail Wristguards
+	[16533]={b=66087,s=13217,d=30352,c=AUCT_CLAS_ARMOR},  -- Warlord's Silk Cowl
+	[16534]={b=88430,s=17686,d=27259,c=AUCT_CLAS_ARMOR},  -- General's Silk Trousers
+	[16535]={b=88743,s=17748,d=30351,c=AUCT_CLAS_ARMOR},  -- Warlord's Silk Raiment
+	[16536]={b=60437,s=12087,d=30350,c=AUCT_CLAS_ARMOR},  -- Warlord's Silk Amice
+	[16539]={b=62818,s=12563,d=30344,c=AUCT_CLAS_ARMOR},  -- General's Silk Boots
+	[16540]={b=42031,s=8406,d=30379,c=AUCT_CLAS_ARMOR},  -- General's Silk Handguards
+	[16541]={b=84375,s=16875,d=30373,c=AUCT_CLAS_ARMOR},  -- Warlord's Plate Armor
+	[16542]={b=63516,s=12703,d=30374,c=AUCT_CLAS_ARMOR},  -- Warlord's Plate Headpiece
+	[16543]={b=85001,s=17000,d=30375,c=AUCT_CLAS_ARMOR},  -- General's Plate Leggings
+	[16544]={b=63979,s=12795,d=30928,c=AUCT_CLAS_ARMOR},  -- Warlord's Plate Shoulders
+	[16545]={b=64214,s=12842,d=30370,c=AUCT_CLAS_ARMOR},  -- General's Plate Boots
+	[16548]={b=43275,s=8655,d=30371,c=AUCT_CLAS_ARMOR},  -- General's Plate Gauntlets
+	[16549]={b=108580,s=21716,d=30357,c=AUCT_CLAS_ARMOR},  -- Warlord's Dragonhide Hauberk
+	[16550]={b=81728,s=16345,d=30358,c=AUCT_CLAS_ARMOR},  -- Warlord's Dragonhide Helmet
+	[16551]={b=82022,s=16404,d=30360,c=AUCT_CLAS_ARMOR},  -- Warlord's Dragonhide Epaulets
+	[16552]={b=109744,s=21948,d=30359,c=AUCT_CLAS_ARMOR},  -- General's Dragonhide Leggings
+	[16554]={b=82895,s=16579,d=30356,c=AUCT_CLAS_ARMOR},  -- General's Dragonhide Boots
+	[16555]={b=51560,s=10312,d=30355,c=AUCT_CLAS_ARMOR},  -- General's Dragonhide Gloves
+	[16558]={b=78221,s=15644,d=30356,c=AUCT_CLAS_ARMOR},  -- General's Leather Treads
+	[16560]={b=52533,s=10506,d=30355,c=AUCT_CLAS_ARMOR},  -- General's Leather Mitts
+	[16561]={b=79094,s=15818,d=30358,c=AUCT_CLAS_ARMOR},  -- Warlord's Leather Helm
+	[16562]={b=79387,s=15877,d=30360,c=AUCT_CLAS_ARMOR},  -- Warlord's Leather Spaulders
+	[16563]={b=106231,s=21246,d=30357,c=AUCT_CLAS_ARMOR},  -- Warlord's Leather Breastplate
+	[16564]={b=106622,s=21324,d=30359,c=AUCT_CLAS_ARMOR},  -- General's Leather Legguards
+	[16565]={b=128417,s=25683,d=30365,c=AUCT_CLAS_ARMOR},  -- Warlord's Chain Chestpiece
+	[16566]={b=96665,s=19333,d=30366,c=AUCT_CLAS_ARMOR},  -- Warlord's Chain Helmet
+	[16567]={b=129343,s=25868,d=30367,c=AUCT_CLAS_ARMOR},  -- General's Chain Legguards
+	[16568]={b=97793,s=19558,d=30368,c=AUCT_CLAS_ARMOR},  -- Warlord's Chain Shoulders
+	[16569]={b=98146,s=19629,d=30361,c=AUCT_CLAS_ARMOR},  -- General's Chain Boots
+	[16571]={b=60932,s=12186,d=30363,c=AUCT_CLAS_ARMOR},  -- General's Chain Gloves
+	[16573]={b=92513,s=18502,d=30361,c=AUCT_CLAS_ARMOR},  -- General's Mail Boots
+	[16574]={b=61631,s=12326,d=30363,c=AUCT_CLAS_ARMOR},  -- General's Mail Gauntlets
+	[16577]={b=124671,s=24934,d=30365,c=AUCT_CLAS_ARMOR},  -- Warlord's Mail Armor
+	[16578]={b=93846,s=18769,d=30366,c=AUCT_CLAS_ARMOR},  -- Warlord's Mail Helm
+	[16579]={b=125598,s=25119,d=30367,c=AUCT_CLAS_ARMOR},  -- General's Mail Leggings
+	[16580]={b=94971,s=18994,d=30368,c=AUCT_CLAS_ARMOR},  -- Warlord's Mail Spaulders
 	[16581]={b=0,s=0,d=6688,q=20,x=20},  -- Resonite Crystal
 	[16583]={b=10000,s=2500,d=27454,x=5},  -- Demonic Figurine
 	[16602]={b=0,s=0,d=27471,q=20,x=20},  -- Troll Charm
@@ -9649,9 +10256,11 @@ Auctioneer_BasePrices = {
 	[16766]={b=2000,s=100,d=24733,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Undermine Clam Chowder
 	[16767]={b=3000,s=750,d=1102,c=AUCT_CLAS_FOOD},  -- Recipe: Undermine Clam Chowder
 	[16768]={b=150000,s=37500,d=28187,c=AUCT_CLAS_WEAPON},  -- Furbolg Medicine Pouch
+	[16769]={b=133081,s=26616,d=28194,c=AUCT_CLAS_WEAPON},  -- Furbolg Medicine Totem
 	[16782]={b=0,s=0,d=27227,c=AUCT_CLAS_QUEST},  -- Strange Water Globe
 	[16783]={b=0,s=0,d=1093,q=20,x=20},  -- Bundle of Reports
 	[16784]={b=0,s=0,d=6614,q=20,x=20},  -- Sapphire of Aku'Mai
+	[16785]={b=0,s=0,d=18010,c=AUCT_CLAS_WRITTEN},  -- Rexxar's Testament
 	[16786]={b=0,s=0,d=1504,q=20,x=20},  -- Black Dragonspawn Eye
 	[16787]={b=0,s=0,d=28261,c=AUCT_CLAS_ARMOR},  -- Amulet of Draconic Subversion
 	[16788]={b=25476,s=5095,d=28407,c=AUCT_CLAS_WEAPON},  -- Captain Rackmore's Wheel
@@ -9689,6 +10298,7 @@ Auctioneer_BasePrices = {
 	[16821]={b=162380,s=32476,d=29937,c=AUCT_CLAS_ARMOR},  -- Nightslayer Cover
 	[16822]={b=217329,s=43465,d=18969,c=AUCT_CLAS_ARMOR},  -- Nightslayer Pants
 	[16823]={b=163597,s=32719,d=29768,c=AUCT_CLAS_ARMOR},  -- Nightslayer Shoulder Pads
+	[16824]={b=164214,s=32842,d=6720,c=AUCT_CLAS_ARMOR},  -- Nightslayer Boots
 	[16825]={b=109887,s=21977,d=29763,c=AUCT_CLAS_ARMOR},  -- Nightslayer Bracelets
 	[16826]={b=110286,s=22057,d=29766,c=AUCT_CLAS_ARMOR},  -- Nightslayer Gloves
 	[16827]={b=110698,s=22139,d=29762,c=AUCT_CLAS_ARMOR},  -- Nightslayer Belt
@@ -9733,6 +10343,10 @@ Auctioneer_BasePrices = {
 	[16866]={b=135851,s=27170,d=31260,c=AUCT_CLAS_ARMOR},  -- Helm of Might
 	[16867]={b=181792,s=36358,d=29849,c=AUCT_CLAS_ARMOR},  -- Legplates of Might
 	[16868]={b=136824,s=27364,d=31024,c=AUCT_CLAS_ARMOR},  -- Pauldrons of Might
+	[16869]={b=0,s=0,d=28497},  -- The Skull of Scryer
+	[16870]={b=0,s=0,d=28497},  -- The Skull of Somnus
+	[16871]={b=0,s=0,d=28497},  -- The Skull of Chronalis
+	[16872]={b=0,s=0,d=28497},  -- The Skull of Axtroz
 	[16873]={b=11271,s=2254,d=28522,c=AUCT_CLAS_ARMOR},  -- Braidfur Gloves
 	[16882]={b=0,s=0,d=15692},  -- Battered Junkbox
 	[16883]={b=0,s=0,d=15692},  -- Worn Junkbox
@@ -9740,6 +10354,7 @@ Auctioneer_BasePrices = {
 	[16885]={b=0,s=0,d=15590},  -- Heavy Junkbox
 	[16886]={b=27462,s=5492,d=28586,c=AUCT_CLAS_WEAPON},  -- Outlaw Sabre
 	[16887]={b=7954,s=1988,d=28588,c=AUCT_CLAS_WEAPON},  -- Witch's Finger
+	[16888]={b=0,s=0,d=26584},  -- Dull Drakefire Amulet
 	[16889]={b=15467,s=3093,d=28592,c=AUCT_CLAS_WEAPON},  -- Polished Walking Staff
 	[16890]={b=12416,s=2483,d=28593,c=AUCT_CLAS_WEAPON},  -- Slatemetal Cutlass
 	[16891]={b=8485,s=1697,d=28608,c=AUCT_CLAS_WEAPON},  -- Claystone Shortsword
@@ -9754,21 +10369,26 @@ Auctioneer_BasePrices = {
 	[16906]={b=276527,s=55305,d=29748,c=AUCT_CLAS_ARMOR},  -- Bloodfang Boots
 	[16907]={b=185021,s=37004,d=29749,c=AUCT_CLAS_ARMOR},  -- Bloodfang Gloves
 	[16908]={b=278535,s=55707,d=29750,c=AUCT_CLAS_ARMOR},  -- Bloodfang Hood
+	[16909]={b=346046,s=69209,d=25683,c=AUCT_CLAS_ARMOR},  -- Bloodfang Pants
 	[16910]={b=173692,s=34738,d=29747,c=AUCT_CLAS_ARMOR},  -- Bloodfang Belt
 	[16911]={b=174361,s=34872,d=21753,c=AUCT_CLAS_ARMOR},  -- Bloodfang Bracers
 	[16913]={b=140546,s=28109,d=29781,c=AUCT_CLAS_ARMOR},  -- Netherwind Gloves
 	[16914]={b=211623,s=42324,d=29873,c=AUCT_CLAS_ARMOR},  -- Netherwind Crown
+	[16915]={b=283235,s=56647,d=29782,c=AUCT_CLAS_ARMOR},  -- Netherwind Pants
 	[16917]={b=214012,s=42802,d=4924,c=AUCT_CLAS_ARMOR},  -- Netherwind Mantle
 	[16919]={b=215619,s=43123,d=29767,c=AUCT_CLAS_ARMOR},  -- Boots of Transcendence
 	[16920]={b=144281,s=28856,d=29781,c=AUCT_CLAS_ARMOR},  -- Handguards of Transcendence
 	[16921]={b=217204,s=43440,d=29780,c=AUCT_CLAS_ARMOR},  -- Halo of Transcendence
+	[16922]={b=290677,s=58135,d=29782,c=AUCT_CLAS_ARMOR},  -- Leggings of Transcendence
 	[16925]={b=150767,s=30153,d=29783,c=AUCT_CLAS_ARMOR},  -- Belt of Transcendence
 	[16926]={b=151303,s=30260,d=29779,c=AUCT_CLAS_ARMOR},  -- Bindings of Transcendence
+	[16928]={b=137868,s=27573,d=29856,c=AUCT_CLAS_ARMOR},  -- Nemesis Gloves
 	[16929]={b=207605,s=41521,d=29862,c=AUCT_CLAS_ARMOR},  -- Nemesis Skullcap
 	[16932]={b=209994,s=41998,d=29866,c=AUCT_CLAS_ARMOR},  -- Nemesis Spaulders
 	[16934]={b=141067,s=28213,d=29854,c=AUCT_CLAS_ARMOR},  -- Nemesis Bracers
 	[16936]={b=213186,s=42637,d=29809,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Belt
 	[16937]={b=322412,s=64482,d=29815,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Spaulders
+	[16938]={b=429587,s=85917,d=29814,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Legguards
 	[16939]={b=323363,s=64672,d=29817,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Helm
 	[16940]={b=216379,s=43275,d=29811,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Gauntlets
 	[16941]={b=335892,s=67178,d=29813,c=AUCT_CLAS_ARMOR},  -- Dragonstalker's Greaves
@@ -9778,10 +10398,12 @@ Auctioneer_BasePrices = {
 	[16949]={b=312759,s=62551,d=29791,c=AUCT_CLAS_ARMOR},  -- Greaves of Ten Storms
 	[16951]={b=139446,s=27889,d=29876,c=AUCT_CLAS_ARMOR},  -- Judgement Bindings
 	[16952]={b=139981,s=27996,d=29875,c=AUCT_CLAS_ARMOR},  -- Judgement Belt
+	[16954]={b=282077,s=56415,d=29878,c=AUCT_CLAS_ARMOR},  -- Judgement Legplates
 	[16955]={b=212361,s=42472,d=29881,c=AUCT_CLAS_ARMOR},  -- Judgement Crown
 	[16957]={b=219723,s=43944,d=29879,c=AUCT_CLAS_ARMOR},  -- Judgement Sabatons
 	[16959]={b=147539,s=29507,d=29859,c=AUCT_CLAS_ARMOR},  -- Bracelets of Wrath
 	[16960]={b=148074,s=29614,d=29864,c=AUCT_CLAS_ARMOR},  -- Waistband of Wrath
+	[16962]={b=298263,s=59652,d=25226,c=AUCT_CLAS_ARMOR},  -- Legplates of Wrath
 	[16963]={b=224501,s=44900,d=29865,c=AUCT_CLAS_ARMOR},  -- Helm of Wrath
 	[16964]={b=150203,s=30040,d=29860,c=AUCT_CLAS_ARMOR},  -- Gauntlets of Wrath
 	[16967]={b=0,s=0,d=24715,c=AUCT_CLAS_WEAPON},  -- Feralas Ahi
@@ -9790,6 +10412,8 @@ Auctioneer_BasePrices = {
 	[16970]={b=0,s=0,d=28622},  -- Misty Reed Mahi Mahi
 	[16971]={b=1200,s=300,d=16211,x=20},  -- Clamlette Surprise
 	[16972]={b=0,s=0,d=6748},  -- Karang's Banner
+	[16973]={b=0,s=0,d=17898},  -- Vial of Dire Water
+	[16974]={b=0,s=0,d=28732},  -- Empty Water Vial
 	[16975]={b=4067,s=813,d=28746,c=AUCT_CLAS_ARMOR},  -- Warsong Sash
 	[16976]={b=0,s=0,d=10365},  -- Murgut's Totem
 	[16977]={b=7242,s=1448,d=28749,c=AUCT_CLAS_ARMOR},  -- Warsong Boots
@@ -9827,11 +10451,17 @@ Auctioneer_BasePrices = {
 	[17010]={b=8000,s=2000,d=28840,x=10},  -- Fiery Core
 	[17011]={b=8000,s=2000,d=28841,x=10},  -- Lava Core
 	[17012]={b=4000,s=1000,d=28842,x=10},  -- Core Leather
+	[17013]={b=132207,s=26441,d=28843,c=AUCT_CLAS_ARMOR},  -- Dark Iron Leggings
 	[17014]={b=63189,s=12637,d=28844,c=AUCT_CLAS_ARMOR},  -- Dark Iron Bracers
+	[17015]={b=318693,s=63738,d=28848,c=AUCT_CLAS_WEAPON},  -- Dark Iron Reaver
+	[17016]={b=319868,s=63973,d=23276,c=AUCT_CLAS_WEAPON},  -- Dark Iron Destroyer
+	[17017]={b=180000,s=45000,d=1102},  -- Pattern: Flarecore Mantle
 	[17018]={b=80000,s=20000,d=1102},  -- Pattern: Flarecore Gloves
 	[17020]={b=1000,s=250,d=28854,x=20},  -- Arcane Powder
 	[17021]={b=700,s=175,d=28855,x=20},  -- Wild Berries
 	[17022]={b=150000,s=37500,d=1102},  -- Pattern: Corehound Boots
+	[17023]={b=160000,s=40000,d=1102},  -- Pattern: Molten Helm
+	[17025]={b=160000,s=40000,d=1102},  -- Pattern: Black Dragonscale Boots
 	[17026]={b=1000,s=250,d=28858,x=20},  -- Wild Thornroot
 	[17028]={b=700,s=175,d=28860,x=20},  -- Holy Candle
 	[17029]={b=1000,s=250,d=28861,x=20},  -- Sacred Candle
@@ -9852,13 +10482,20 @@ Auctioneer_BasePrices = {
 	[17046]={b=23983,s=4796,d=28873,c=AUCT_CLAS_WEAPON},  -- Gutterblade
 	[17047]={b=6565,s=1313,d=12473,c=AUCT_CLAS_ARMOR},  -- Luminescent Amice
 	[17048]={b=1600,s=400,d=18119,x=10},  -- Rumsey Rum
+	[17049]={b=90000,s=22500,d=6270},  -- Plans: Fiery Chain Girdle
 	[17050]={b=62683,s=12536,d=28990,c=AUCT_CLAS_ARMOR},  -- Chan's Imperial Robes
+	[17051]={b=70000,s=17500,d=6270},  -- Plans: Dark Iron Bracers
+	[17052]={b=180000,s=45000,d=6270},  -- Plans: Dark Iron Leggings
+	[17053]={b=200000,s=50000,d=6270},  -- Plans: Fiery Chain Shoulders
 	[17054]={b=143942,s=28788,d=28876,c=AUCT_CLAS_WEAPON},  -- Joonho's Mercy
 	[17055]={b=133735,s=26747,d=15887,c=AUCT_CLAS_WEAPON},  -- Changuk Smasher
 	[17056]={b=30,s=7,d=28877,x=20},  -- Light Feather
 	[17057]={b=30,s=7,d=28878,x=20},  -- Shiny Fish Scales
 	[17058]={b=30,s=7,d=15773,x=20,c=AUCT_CLAS_POTION},  -- Fish Oil
+	[17059]={b=220000,s=55000,d=6270},  -- Plans: Dark Iron Reaver
+	[17060]={b=220000,s=55000,d=6270},  -- Plans: Dark Iron Destroyer
 	[17062]={b=2200,s=550,d=1102},  -- Recipe: Mithril Head Trout
+	[17063]={b=95846,s=23961,d=9840,c=AUCT_CLAS_ARMOR},  -- Band of Accuria
 	[17064]={b=183658,s=45914,d=26374,c=AUCT_CLAS_ARMOR},  -- Shard of the Scale
 	[17065]={b=133525,s=33381,d=4841,c=AUCT_CLAS_ARMOR},  -- Medallion of Steadfast Might
 	[17066]={b=289852,s=57970,d=29701,c=AUCT_CLAS_WEAPON},  -- Drillborer Disk
@@ -9869,11 +10506,16 @@ Auctioneer_BasePrices = {
 	[17071]={b=522363,s=104472,d=29167,c=AUCT_CLAS_WEAPON},  -- Gutgore Ripper
 	[17072]={b=308082,s=61616,d=29163,c=AUCT_CLAS_WEAPON},  -- Blastershot Launcher
 	[17073]={b=568157,s=113631,d=29168,c=AUCT_CLAS_WEAPON},  -- Earthshaker
+	[17074]={b=492571,s=98514,d=29176,c=AUCT_CLAS_WEAPON},  -- Shadowstrike
 	[17075]={b=395437,s=79087,d=29132,c=AUCT_CLAS_WEAPON},  -- Vis'kag the Bloodletter
+	[17076]={b=982192,s=196438,d=29170,c=AUCT_CLAS_WEAPON},  -- Bonereaver's Edge
 	[17077]={b=284484,s=56896,d=29195,c=AUCT_CLAS_WEAPON},  -- Crimson Shocker
 	[17078]={b=119909,s=23981,d=29719,c=AUCT_CLAS_ARMOR},  -- Sapphiron Drape
+	[17102]={b=193445,s=38689,d=29824,c=AUCT_CLAS_ARMOR},  -- Cloak of the Shrouded Mists
 	[17103]={b=559117,s=111823,d=29677,c=AUCT_CLAS_WEAPON},  -- Azuresong Mageblade
 	[17105]={b=510891,s=102178,d=29714,c=AUCT_CLAS_WEAPON},  -- Aurastone Hammer
+	[17106]={b=439804,s=87960,d=29702,c=AUCT_CLAS_WEAPON},  -- Malistar's Defender
+	[17107]={b=187685,s=37537,d=29827,c=AUCT_CLAS_ARMOR},  -- Dragon's Blood Cape
 	[17109]={b=134500,s=33625,d=9858,c=AUCT_CLAS_ARMOR},  -- Choker of Enlightenment
 	[17110]={b=98595,s=24648,d=29697,c=AUCT_CLAS_ARMOR},  -- Seal of the Archmagus
 	[17111]={b=138595,s=34648,d=6484,c=AUCT_CLAS_ARMOR},  -- Blazefury Medallion
@@ -9896,6 +10538,7 @@ Auctioneer_BasePrices = {
 	[17190]={b=34609,s=6921,d=18516,c=AUCT_CLAS_WEAPON},  -- Ornate Buckler
 	[17191]={b=0,s=0,d=29730},  -- Scepter of Celebras
 	[17192]={b=4399,s=879,d=2324,c=AUCT_CLAS_WEAPON},  -- Reinforced Targe
+	[17193]={b=611554,s=122310,d=29699,c=AUCT_CLAS_WEAPON},  -- Sulfuron Hammer
 	[17194]={b=10,s=0,d=29164,q=20,x=20},  -- Holiday Spices
 	[17195]={b=10,s=0,d=29165,q=20,x=20},  -- Mistletoe
 	[17196]={b=50,s=12,d=18079,x=20},  -- Holiday Spirits
@@ -9904,25 +10547,91 @@ Auctioneer_BasePrices = {
 	[17200]={b=25,s=6,d=811},  -- Recipe: Gingerbread Cookie
 	[17201]={b=240,s=60,d=811},  -- Recipe: Egg Nog
 	[17202]={b=10,s=0,d=29169,q=20,x=20},  -- Snowball
+	[17203]={b=400000,s=100000,d=29174,x=20},  -- Sulfuron Ingot
 	[17222]={b=1200,s=300,d=29193,x=20},  -- Spider Sausage
+	[17223]={b=485373,s=97074,d=29191,c=AUCT_CLAS_WEAPON},  -- Thunderstrike
+	[17242]={b=0,s=0,d=13290},  -- Key to Salem's Chest
+	[17262]={b=0,s=0,d=13290},  -- James' Key
 	[17303]={b=10,s=2,d=29442,x=10},  -- Blue Ribboned Wrapping Paper
 	[17304]={b=10,s=2,d=29440,x=10},  -- Green Ribboned Wrapping Paper
+	[17306]={b=0,s=0,d=15711,q=100,x=100},  -- Stormpike Soldier's Blood
 	[17307]={b=10,s=2,d=29443,x=10},  -- Purple Ribboned Wrapping Paper
+	[17309]={b=0,s=0,d=29311,q=20,x=20},  -- Discordant Bracers
+	[17310]={b=0,s=0,d=21672},  -- Aspect of Neptulos
 	[17322]={b=0,s=0,d=24730},  -- Eye of the Emberseer
+	[17326]={b=0,s=0,d=22024,q=100,x=100},  -- Stormpike Soldier's Flesh
+	[17327]={b=0,s=0,d=25475,q=100,x=100},  -- Stormpike Lieutenant's Flesh
+	[17328]={b=0,s=0,d=25467,q=100,x=100},  -- Stormpike Commander's Flesh
 	[17329]={b=0,s=0,d=29315},  -- Hand of Lucifron
 	[17330]={b=0,s=0,d=29314},  -- Hand of Sulfuron
+	[17331]={b=0,s=0,d=29317},  -- Hand of Gehennas
+	[17332]={b=0,s=0,d=29316},  -- Hand of Shazzrah
 	[17333]={b=0,s=0,d=21672},  -- Aqual Quintessence
 	[17344]={b=25,s=1,d=29331,q=20,x=20},  -- Candy Cane
 	[17345]={b=0,s=0,d=6703,q=20,x=20},  -- Silithid Goo
 	[17346]={b=0,s=0,d=29351},  -- Encrusted Silithid Object
 	[17355]={b=0,s=0,d=3093,c=AUCT_CLAS_WRITTEN},  -- Rabine's Letter
+	[17402]={b=2000,s=500,d=18117,x=20},  -- Greatfather's Winter Ale
 	[17403]={b=150,s=37,d=18080,x=20},  -- Steamwheedle Fizzy Spirits
+	[17404]={b=125,s=6,d=19873,q=20,x=20},  -- Blended Bean Brew
+	[17405]={b=1000,s=50,d=18091,q=20,x=20},  -- Green Garden Tea
 	[17406]={b=125,s=6,d=6425,q=20,x=20},  -- Holiday Cheesewheel
 	[17407]={b=1000,s=50,d=1041,q=20,x=20},  -- Graccu's Homemade Meat Pie
+	[17408]={b=2000,s=100,d=25469,q=20,x=20},  -- Spicy Beefstick
 	[17413]={b=31000,s=7750,d=1143},  -- Codex: Prayer of Fortitude
 	[17414]={b=59000,s=14750,d=1143},  -- Codex: Prayer of Fortitude II
+	[17422]={b=10,s=2,d=29468,x=100},  -- Armor Scraps
 	[17508]={b=36350,s=7270,d=4405,c=AUCT_CLAS_WEAPON},  -- Forcestone Buckler
 	[17523]={b=53790,s=10758,d=29630,c=AUCT_CLAS_ARMOR},  -- Smokey's Drape
+	[17562]={b=43683,s=8736,d=31059,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Dreadweave Boots
+	[17564]={b=29332,s=5866,d=31060,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Dreadweave Gloves
+	[17566]={b=44318,s=8863,d=30341,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Headguard
+	[17567]={b=59304,s=11860,d=30385,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Dreadweave Leggings
+	[17568]={b=55273,s=11054,d=31053,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Dreadweave Robe
+	[17569]={b=41614,s=8322,d=31066,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Dreadweave Mantle
+	[17570]={b=41774,s=8354,d=27258,c=AUCT_CLAS_ARMOR},  -- Champion's Dreadweave Hood
+	[17571]={b=55912,s=11182,d=31032,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Dreadweave Leggings
+	[17572]={b=56119,s=11223,d=27260,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Dreadweave Robe
+	[17573]={b=42249,s=8449,d=30381,c=AUCT_CLAS_ARMOR},  -- Champion's Dreadweave Shoulders
+	[17576]={b=42724,s=8544,d=31026,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Dreadweave Boots
+	[17577]={b=28589,s=5717,d=27256,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Dreadweave Gloves
+	[17578]={b=63275,s=12655,d=30341,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Coronal
+	[17579]={b=84680,s=16936,d=30385,c=AUCT_CLAS_ARMOR},  -- Marshal's Dreadweave Leggings
+	[17580]={b=63738,s=12747,d=30336,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Dreadweave Shoulders
+	[17581]={b=85298,s=17059,d=30343,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Dreadweave Robe
+	[17583]={b=64437,s=12887,d=30337,c=AUCT_CLAS_ARMOR},  -- Marshal's Dreadweave Boots
+	[17584]={b=44236,s=8847,d=30339,c=AUCT_CLAS_ARMOR},  -- Marshal's Dreadweave Gloves
+	[17586]={b=60469,s=12093,d=30344,c=AUCT_CLAS_ARMOR},  -- General's Dreadweave Boots
+	[17588]={b=40621,s=8124,d=30379,c=AUCT_CLAS_ARMOR},  -- General's Dreadweave Gloves
+	[17590]={b=61402,s=12280,d=30350,c=AUCT_CLAS_ARMOR},  -- Warlord's Dreadweave Mantle
+	[17591]={b=61631,s=12326,d=30352,c=AUCT_CLAS_ARMOR},  -- Warlord's Dreadweave Hood
+	[17592]={b=82487,s=16497,d=30351,c=AUCT_CLAS_ARMOR},  -- Warlord's Dreadweave Robe
+	[17593]={b=82801,s=16560,d=30380,c=AUCT_CLAS_ARMOR},  -- General's Dreadweave Pants
+	[17594]={b=42405,s=8481,d=31061,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Satin Boots
+	[17596]={b=28480,s=5696,d=31062,c=AUCT_CLAS_ARMOR},  -- Knight-Lieutenant's Satin Gloves
+	[17598]={b=43035,s=8607,d=31065,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Diadem
+	[17599]={b=57594,s=11518,d=25198,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Satin Leggings
+	[17600]={b=59333,s=11866,d=31058,c=AUCT_CLAS_ARMOR},  -- Knight-Captain's Satin Robes
+	[17601]={b=44659,s=8931,d=31067,c=AUCT_CLAS_ARMOR},  -- Lieutenant Commander's Satin Amice
+	[17602]={b=65878,s=13175,d=30341,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Headdress
+	[17603]={b=88150,s=17630,d=30385,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Satin Pants
+	[17604]={b=66347,s=13269,d=30336,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Satin Mantle
+	[17605]={b=88777,s=17755,d=30343,c=AUCT_CLAS_ARMOR},  -- Field Marshal's Satin Vestments
+	[17607]={b=60691,s=12138,d=30337,c=AUCT_CLAS_ARMOR},  -- Marshal's Satin Sandals
+	[17608]={b=40617,s=8123,d=30339,c=AUCT_CLAS_ARMOR},  -- Marshal's Satin Gloves
+	[17610]={b=41761,s=8352,d=31030,c=AUCT_CLAS_ARMOR},  -- Champion's Satin Cowl
+	[17611]={b=55895,s=11179,d=31033,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Satin Trousers
+	[17612]={b=56108,s=11221,d=30351,c=AUCT_CLAS_ARMOR},  -- Legionnaire's Satin Vestments
+	[17613]={b=42236,s=8447,d=31031,c=AUCT_CLAS_ARMOR},  -- Champion's Satin Shoulderpads
+	[17616]={b=43860,s=8772,d=31027,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Satin Boots
+	[17617]={b=29344,s=5868,d=31028,c=AUCT_CLAS_ARMOR},  -- Blood Guard's Satin Gloves
+	[17618]={b=64938,s=12987,d=30344,c=AUCT_CLAS_ARMOR},  -- General's Satin Boots
+	[17620]={b=43605,s=8721,d=30347,c=AUCT_CLAS_ARMOR},  -- General's Satin Gloves
+	[17622]={b=65871,s=13174,d=30350,c=AUCT_CLAS_ARMOR},  -- Warlord's Satin Mantle
+	[17623]={b=66106,s=13221,d=30352,c=AUCT_CLAS_ARMOR},  -- Warlord's Satin Cowl
+	[17624]={b=88455,s=17691,d=30351,c=AUCT_CLAS_ARMOR},  -- Warlord's Satin Robes
+	[17625]={b=88760,s=17752,d=30380,c=AUCT_CLAS_ARMOR},  -- General's Satin Leggings
+	[17662]={b=0,s=0,d=8928},  -- Stolen Treats
 	[17682]={b=35000,s=8750,d=1317},  -- Book: Gift of the Wild
 	[17683]={b=59000,s=14750,d=1317},  -- Book: Gift of the Wild II
 	[17684]={b=0,s=0,d=29731,q=30,x=30},  -- Theradric Crystal Carving
@@ -9939,6 +10648,7 @@ Auctioneer_BasePrices = {
 	[17703]={b=0,s=0,d=29691},  -- Celebrian Diamond
 	[17704]={b=45890,s=9178,d=29759,c=AUCT_CLAS_WEAPON},  -- Edge of Winter
 	[17705]={b=164272,s=32854,d=29769,c=AUCT_CLAS_WEAPON},  -- Thrash Blade
+	[17706]={b=3800,s=950,d=15274},  -- Plans: Edge of Winter
 	[17707]={b=46525,s=11631,d=29842,c=AUCT_CLAS_ARMOR},  -- Gemshard Heart
 	[17708]={b=140,s=35,d=4136,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Frost Power
 	[17709]={b=2000,s=500,d=1301},  -- Recipe: Elixir of Frost Power
@@ -9954,9 +10664,12 @@ Auctioneer_BasePrices = {
 	[17719]={b=160530,s=32106,d=29897,c=AUCT_CLAS_WEAPON},  -- Inventor's Focal Sword
 	[17720]={b=2400,s=600,d=15274},  -- Schematic: Snowmaster 9000
 	[17721]={b=11340,s=2268,d=29898,c=AUCT_CLAS_ARMOR},  -- Gloves of the Greatfather
+	[17722]={b=2800,s=700,d=1102},  -- Pattern: Gloves of the Greatfather
 	[17723]={b=3000,s=750,d=29901,c=AUCT_CLAS_ARMOR},  -- Green Holiday Shirt
 	[17724]={b=1500,s=375,d=1102},  -- Pattern: Green Holiday Shirt
 	[17725]={b=3000,s=750,d=11431},  -- Formula: Enchant Weapon - Winter Might
+	[17726]={b=0,s=0,d=29902},  -- Smokywood Pastures Special Gift
+	[17727]={b=0,s=0,d=24053},  -- Smokywood Pastures Gift Pack
 	[17728]={b=62291,s=12458,d=29904,c=AUCT_CLAS_ARMOR},  -- Albino Crocscale Boots
 	[17730]={b=214759,s=42951,d=29907,c=AUCT_CLAS_WEAPON},  -- Gatorbite Axe
 	[17732]={b=51916,s=10383,d=29908,c=AUCT_CLAS_ARMOR},  -- Rotgrip Mantle
@@ -9974,6 +10687,7 @@ Auctioneer_BasePrices = {
 	[17744]={b=36125,s=9031,d=29922,c=AUCT_CLAS_ARMOR},  -- Heart of Noxxion
 	[17745]={b=112599,s=22519,d=29924,c=AUCT_CLAS_WEAPON},  -- Noxious Shooter
 	[17746]={b=28618,s=5723,d=29925,c=AUCT_CLAS_ARMOR},  -- Noxxion's Shackles
+	[17747]={b=2000,s=500,d=6624,x=5},  -- Razorlash Root
 	[17748]={b=45539,s=9107,d=29927,c=AUCT_CLAS_ARMOR},  -- Vinerot Sandals
 	[17749]={b=57126,s=11425,d=29928,c=AUCT_CLAS_ARMOR},  -- Phytoskin Spaulders
 	[17750]={b=23848,s=4769,d=29929,c=AUCT_CLAS_ARMOR},  -- Chloromesh Girdle
@@ -10008,6 +10722,11 @@ Auctioneer_BasePrices = {
 	[17781]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- The Pariah's Instructions
 	[17922]={b=576,s=115,d=30171,c=AUCT_CLAS_ARMOR},  -- Lionfur Armor
 	[17943]={b=160783,s=32156,d=29910,c=AUCT_CLAS_WEAPON},  -- Fist of Stone
+	[17963]={b=854,s=213,d=3568},  -- Green Sack of Gems
+	[17964]={b=22050,s=5512,d=1282},  -- Gray Sack of Gems
+	[17965]={b=854,s=213,d=1168},  -- Yellow Sack of Gems
+	[17966]={b=35000,s=8750,d=30271,c=AUCT_CLAS_CONTAINER},  -- Onyxia Hide Backpack
+	[17982]={b=95846,s=23961,d=28682,c=AUCT_CLAS_ARMOR},  -- Ragnaros Core
 	[18022]={b=42837,s=10709,d=28830,c=AUCT_CLAS_ARMOR},  -- Royal Seal of Alexis
 	[18042]={b=4000,s=10,d=30433,q=200,x=200,c=AUCT_CLAS_WEAPON},  -- Thorium Headed Arrow
 	[18043]={b=64563,s=12912,d=2373,c=AUCT_CLAS_ARMOR},  -- Coal Miner Boots
@@ -10024,6 +10743,14 @@ Auctioneer_BasePrices = {
 	[18151]={b=0,s=0,d=8547},  -- Filled Amethyst Phial
 	[18152]={b=0,s=0,d=8547},  -- Amethyst Phial
 	[18154]={b=0,s=0,d=30658},  -- Blizzard Stationery
+	[18160]={b=200,s=50,d=1102},  -- Recipe: Thistle Tea
+	[18168]={b=282082,s=56416,d=30561,c=AUCT_CLAS_WEAPON},  -- Force Reactive Disk
+	[18169]={b=100000,s=25000,d=30562},  -- Flame Mantle of the Dawn
+	[18170]={b=100000,s=25000,d=30563},  -- Frost Mantle of the Dawn
+	[18171]={b=100000,s=25000,d=30564},  -- Arcane Mantle of the Dawn
+	[18172]={b=100000,s=25000,d=30565},  -- Nature Mantle of the Dawn
+	[18173]={b=100000,s=25000,d=30566},  -- Shadow Mantle of the Dawn
+	[18182]={b=400000,s=100000,d=30567},  -- Chromatic Mantle of the Dawn
 	[18202]={b=452881,s=90576,d=30594,c=AUCT_CLAS_WEAPON},  -- Eskhandar's Left Claw
 	[18203]={b=454525,s=90905,d=30595,c=AUCT_CLAS_WEAPON},  -- Eskhandar's Right Claw
 	[18204]={b=136851,s=27370,d=30577,c=AUCT_CLAS_ARMOR},  -- Eskhandar's Pelt
@@ -10038,15 +10765,26 @@ Auctioneer_BasePrices = {
 	[18238]={b=16608,s=3321,d=15753,c=AUCT_CLAS_ARMOR},  -- Shadowskin Gloves
 	[18239]={b=3500,s=875,d=1102},  -- Pattern: Shadowskin Gloves
 	[18240]={b=0,s=0,d=292,q=20,x=20},  -- Ogre Tannin
+	[18241]={b=1000000,s=0,d=30608},  -- Black War Steed Bridle
+	[18242]={b=1000000,s=0,d=17606},  -- Reins of the Black War Tiger
+	[18243]={b=1000000,s=0,d=17785},  -- Black Battlestrider
+	[18244]={b=1000000,s=0,d=17343},  -- Black War Ram
+	[18245]={b=1000000,s=0,d=16208},  -- Horn of the Black War Wolf
+	[18246]={b=1000000,s=0,d=17494},  -- Whistle of the Black War Raptor
+	[18247]={b=1000000,s=0,d=29447},  -- Black War Kodo
+	[18248]={b=1000000,s=0,d=17786},  -- Red Skeletal Warhorse
 	[18249]={b=0,s=0,d=20802},  -- Crescent Key
 	[18250]={b=0,s=0,d=22071},  -- Gordok Shackle Key
+	[18251]={b=20000,s=5000,d=30647,x=10},  -- Core Armor Kit
 	[18253]={b=60,s=15,d=24217,x=5,c=AUCT_CLAS_POTION},  -- Major Rejuvenation Potion
 	[18254]={b=72,s=18,d=26733,x=20},  -- Runn Tum Tuber Surprise
 	[18255]={b=60,s=15,d=21974,x=20},  -- Runn Tum Tuber
 	[18256]={b=30000,s=1500,d=18077,q=20,x=20},  -- Imbued Vial
+	[18257]={b=200000,s=50000,d=6270,c=AUCT_CLAS_POTION},  -- Recipe: Major Rejuvination Potion
 	[18258]={b=0,s=0,d=30611},  -- Gordok Ogre Suit
 	[18261]={b=0,s=0,d=1103},  -- Book of Incantations
 	[18262]={b=5000,s=1250,d=21072,x=20},  -- Elemental Sharpening Stone
+	[18263]={b=84557,s=16911,d=27972,c=AUCT_CLAS_ARMOR},  -- Flarecore Wraps
 	[18266]={b=0,s=0,d=7737},  -- Gordok Courtyard Key
 	[18267]={b=20000,s=5000,d=1301},  -- Recipe: Runn Tum Tuber Surprise
 	[18268]={b=0,s=0,d=3118},  -- Gordok Inner Door Key
@@ -10058,6 +10796,7 @@ Auctioneer_BasePrices = {
 	[18287]={b=200,s=50,d=18080,x=20},  -- Evermurky
 	[18288]={b=1000,s=250,d=7921,x=20},  -- Molasses Firewater
 	[18289]={b=38804,s=9701,d=9860,c=AUCT_CLAS_ARMOR},  -- Barbed Thorn Necklace
+	[18291]={b=120000,s=30000,d=6270},  -- Schematic: Force Reactive Disk
 	[18294]={b=1000,s=250,d=3665,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Greater Water Breathing
 	[18295]={b=57913,s=11582,d=30639,c=AUCT_CLAS_ARMOR},  -- Phasing Boots
 	[18296]={b=57448,s=11489,d=30643,c=AUCT_CLAS_ARMOR},  -- Marksman Bands
@@ -10088,6 +10827,9 @@ Auctioneer_BasePrices = {
 	[18326]={b=45184,s=9036,d=30686,c=AUCT_CLAS_ARMOR},  -- Razor Gauntlets
 	[18327]={b=46880,s=9376,d=30688,c=AUCT_CLAS_ARMOR},  -- Whipvine Cord
 	[18328]={b=70583,s=14116,d=30689,c=AUCT_CLAS_ARMOR},  -- Shadewood Cloak
+	[18329]={b=0,s=0,d=30690},  -- Arcanum of Rapidity
+	[18330]={b=0,s=0,d=30690},  -- Arcanum of Focus
+	[18331]={b=0,s=0,d=30690},  -- Arcanum of Protection
 	[18332]={b=0,s=0,d=12547,c=AUCT_CLAS_WRITTEN},  -- Libram of Rapidity
 	[18333]={b=0,s=0,d=6672,c=AUCT_CLAS_WRITTEN},  -- Libram of Focus
 	[18334]={b=0,s=0,d=1317,c=AUCT_CLAS_WRITTEN},  -- Libram of Protection
@@ -10100,6 +10842,7 @@ Auctioneer_BasePrices = {
 	[18343]={b=58462,s=14615,d=9836,c=AUCT_CLAS_ARMOR},  -- Petrified Band
 	[18344]={b=56480,s=11296,d=25706,c=AUCT_CLAS_ARMOR},  -- Stonebark Gauntlets
 	[18345]={b=58908,s=14727,d=9840,c=AUCT_CLAS_ARMOR},  -- Murmuring Ring
+	[18346]={b=81726,s=16345,d=30698,c=AUCT_CLAS_ARMOR},  -- Threadbare Trousers
 	[18347]={b=215336,s=43067,d=30699,c=AUCT_CLAS_WEAPON},  -- Well Balanced Axe
 	[18348]={b=563257,s=112651,d=30858,c=AUCT_CLAS_WEAPON},  -- Quel'Serrar
 	[18349]={b=62270,s=12454,d=30702,c=AUCT_CLAS_ARMOR},  -- Gauntlets of Accuracy
@@ -10167,30 +10910,41 @@ Auctioneer_BasePrices = {
 	[18412]={b=0,s=0,d=30780},  -- Core Fragment
 	[18413]={b=85353,s=17070,d=30783,c=AUCT_CLAS_ARMOR},  -- Cloak of Warding
 	[18414]={b=120000,s=30000,d=1096},  -- Pattern: Belt of the Archmage
+	[18415]={b=40000,s=10000,d=6270},  -- Pattern: Felcloth Gloves
 	[18416]={b=40000,s=10000,d=6270},  -- Pattern: Inferno Gloves
+	[18417]={b=40000,s=10000,d=6270},  -- Pattern: Mooncloth Gloves
+	[18418]={b=40000,s=10000,d=6270},  -- Pattern: Cloak of Warding
 	[18420]={b=356184,s=71236,d=30792,c=AUCT_CLAS_WEAPON},  -- Bonecrusher
 	[18421]={b=128705,s=25741,d=30793,c=AUCT_CLAS_ARMOR},  -- Backwood Helm
+	[18422]={b=0,s=0,d=30794,c=AUCT_CLAS_QUEST},  -- Head of Onyxia
+	[18423]={b=0,s=0,d=30794,c=AUCT_CLAS_QUEST},  -- Head of Onyxia
 	[18424]={b=102979,s=20595,d=30795,c=AUCT_CLAS_ARMOR},  -- Sedge Boots
 	[18425]={b=22150,s=5537,d=30796,c=AUCT_CLAS_WEAPON},  -- Kreeg's Mug
 	[18426]={b=0,s=0,d=18597},  -- Lethtendris's Web
 	[18427]={b=6611,s=1322,d=27088,c=AUCT_CLAS_ARMOR},  -- Sergeant's Cloak
 	[18428]={b=30000,s=7500,d=30797,c=AUCT_CLAS_ARMOR},  -- Senior Sergeant's Insignia
 	[18429]={b=29447,s=5889,d=27273,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Plate Bracers
+	[18430]={b=14391,s=2878,d=27273,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Plate Bracers
 	[18432]={b=21742,s=4348,d=27277,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Mail Wristguards
 	[18434]={b=37468,s=7493,d=27262,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Dragonhide Armguards
 	[18435]={b=18311,s=3662,d=30801,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Leather Armguards
 	[18436]={b=17086,s=3417,d=27262,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Dragonhide Armguards
+	[18437]={b=13721,s=2744,d=27255,c=AUCT_CLAS_ARMOR},  -- First Sergeant's Silk Cuffs
 	[18440]={b=6443,s=1288,d=27087,c=AUCT_CLAS_ARMOR},  -- Sergeant's Cape
 	[18441]={b=20891,s=4178,d=27087,c=AUCT_CLAS_ARMOR},  -- Sergeant's Cape
 	[18442]={b=20000,s=5000,d=30799,c=AUCT_CLAS_ARMOR},  -- Master Sergeant's Insignia
 	[18443]={b=40000,s=10000,d=30799,c=AUCT_CLAS_ARMOR},  -- Master Sergeant's Insignia
 	[18444]={b=30000,s=7500,d=30799,c=AUCT_CLAS_ARMOR},  -- Master Sergeant's Insignia
 	[18445]={b=29021,s=5804,d=27223,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Plate Wristguards
+	[18447]={b=14235,s=2847,d=27223,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Plate Wristguards
 	[18448]={b=44007,s=8801,d=31248,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Chain Armguards
+	[18449]={b=21507,s=4301,d=31248,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Chain Armguards
 	[18450]={b=79073,s=15814,d=30802,c=AUCT_CLAS_ARMOR},  -- Robe of Combustion
 	[18451]={b=49420,s=9884,d=30803,c=AUCT_CLAS_ARMOR},  -- Hyena Hide Belt
 	[18452]={b=34553,s=6910,d=30804,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Dragonhide Armsplints
 	[18453]={b=16716,s=3343,d=30804,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Dragonhide Armsplints
+	[18454]={b=5774,s=1154,d=30805,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Leather Armsplints
+	[18455]={b=16716,s=3343,d=30805,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Leather Armsplints
 	[18456]={b=28065,s=5613,d=30806,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Silk Cuffs
 	[18457]={b=13373,s=2674,d=30806,c=AUCT_CLAS_ARMOR},  -- Sergeant Major's Silk Cuffs
 	[18458]={b=61064,s=12212,d=26103,c=AUCT_CLAS_ARMOR},  -- Modest Armguards
@@ -10222,8 +10976,11 @@ Auctioneer_BasePrices = {
 	[18485]={b=172849,s=34569,d=20900,c=AUCT_CLAS_WEAPON},  -- Observer's Shield
 	[18486]={b=108417,s=21683,d=30824,c=AUCT_CLAS_ARMOR},  -- Mooncloth Robe
 	[18487]={b=40000,s=10000,d=1102},  -- Pattern: Mooncloth Robe
+	[18488]={b=0,s=0,d=6511},  -- Heated Ancient Blade
+	[18489]={b=0,s=0,d=20797},  -- Unfired Ancient Blade
 	[18490]={b=93277,s=18655,d=30825,c=AUCT_CLAS_ARMOR},  -- Insightful Hood
 	[18491]={b=203475,s=40695,d=30827,c=AUCT_CLAS_WEAPON},  -- Lorespinner
+	[18492]={b=0,s=0,d=30828},  -- Treated Ancient Blade
 	[18493]={b=71165,s=14233,d=30829,c=AUCT_CLAS_ARMOR},  -- Bulky Iron Spaulders
 	[18494]={b=107223,s=21444,d=30830,c=AUCT_CLAS_ARMOR},  -- Denwatcher's Shoulders
 	[18495]={b=83851,s=16770,d=30831,c=AUCT_CLAS_ARMOR},  -- Redoubt Cloak
@@ -10244,6 +11001,7 @@ Auctioneer_BasePrices = {
 	[18510]={b=104449,s=20889,d=30850,c=AUCT_CLAS_ARMOR},  -- Hide of the Wild
 	[18511]={b=104855,s=20971,d=30851,c=AUCT_CLAS_ARMOR},  -- Shifting Cloak
 	[18512]={b=16000,s=4000,d=30852,x=5},  -- Larval Acid
+	[18513]={b=0,s=0,d=20797,c=AUCT_CLAS_QUEST},  -- A Dull and Flat Elven Blade
 	[18514]={b=60000,s=15000,d=6270},  -- Pattern: Girdle of Insight
 	[18515]={b=60000,s=15000,d=6270},  -- Pattern: Mongoose Boots
 	[18516]={b=60000,s=15000,d=6270},  -- Pattern: Swift Flight Bracers
@@ -10285,21 +11043,43 @@ Auctioneer_BasePrices = {
 	[18586]={b=59413,s=14853,d=9823,c=AUCT_CLAS_ARMOR},  -- Lonetree's Circle
 	[18587]={b=8000,s=2000,d=31203,c=AUCT_CLAS_ARMOR},  -- Goblin Jumper Cables XL
 	[18588]={b=800,s=200,d=18063,x=20},  -- Ez-Thro Dynamite II
+	[18590]={b=0,s=0,d=15788,q=30,x=30},  -- Raging Beast's Blood
+	[18591]={b=0,s=0,d=30952},  -- Case of Blood
 	[18594]={b=12000,s=3000,d=30999,x=10},  -- Powerful Seaforium Charge
+	[18597]={b=0,s=0,d=30959},  -- Orcish Orphan Whistle
 	[18598]={b=0,s=0,d=30959},  -- Human Orphan Whistle
 	[18600]={b=48000,s=12000,d=1103},  -- Tome of Arcane Brilliance
+	[18601]={b=0,s=0,d=6689},  -- Glowing Crystal Prison
 	[18602]={b=0,s=0,d=30875,c=AUCT_CLAS_WEAPON},  -- Tome of Sacrifice
+	[18603]={b=0,s=0,d=3663,q=15,x=15},  -- Satyr Blood
+	[18604]={b=0,s=0,d=6688,q=5,x=5},  -- Tears of the Hederine
+	[18605]={b=0,s=0,d=6689},  -- Imprisoned Doomguard
+	[18606]={b=50000,s=12500,d=31256},  -- Alliance Battle Standard
+	[18607]={b=50000,s=12500,d=31257},  -- Horde Battle Standard
+	[18608]={b=0,s=0,d=31347,c=AUCT_CLAS_WEAPON},  -- Benediction
+	[18609]={b=0,s=0,d=31346,c=AUCT_CLAS_WEAPON},  -- Anathema
 	[18610]={b=181,s=36,d=5139,c=AUCT_CLAS_WEAPON},  -- Keen Machete
 	[18611]={b=139,s=27,d=9975,c=AUCT_CLAS_ARMOR},  -- Gnarlpine Leggings
 	[18612]={b=171,s=34,d=6845,c=AUCT_CLAS_ARMOR},  -- Bloody Chain Boots
+	[18622]={b=0,s=0,d=21072},  -- Flawless Fel Essence (Jaedenar)
+	[18623]={b=0,s=0,d=21072},  -- Flawless Fel Essence (Dark Portal)
+	[18624]={b=0,s=0,d=21072},  -- Flawless Fel Essence (Azshara)
+	[18625]={b=0,s=0,d=8560},  -- Kroshius' Infernal Core
+	[18626]={b=0,s=0,d=20874},  -- Fel Fire
+	[18629]={b=500000,s=0,d=19239},  -- Black Lodestone
 	[18631]={b=12000,s=3000,d=30995,x=10},  -- Truesilver Transformer
 	[18632]={b=1000,s=50,d=16837,q=20,x=20},  -- Moonbrook Riot Taffy
 	[18633]={b=125,s=6,d=30996,q=20,x=20},  -- Styleen's Sour Suckerpop
 	[18634]={b=50000,s=12500,d=31199,c=AUCT_CLAS_ARMOR},  -- Gyrofreeze Ice Reflector
 	[18635]={b=2000,s=100,d=30997,q=20,x=20},  -- Bellara's Nutterbar
+	[18636]={b=400,s=100,d=7064},  -- Ruined Jumper Cables XL
 	[18637]={b=2400,s=600,d=31204,c=AUCT_CLAS_ARMOR},  -- Major Recombobulator
+	[18638]={b=50000,s=12500,d=31198,c=AUCT_CLAS_ARMOR},  -- Hyper-Radiant Flame Reflector
+	[18639]={b=50000,s=12500,d=31200,c=AUCT_CLAS_ARMOR},  -- Ultra-Flash Shadow Reflector
 	[18640]={b=0,s=0,d=24591,q=2,x=2},  -- Happy Fun Rock
 	[18641]={b=2000,s=500,d=18062,x=20},  -- Dense Dynamite
+	[18642]={b=0,s=0,d=8927},  -- Jaina's Autograph
+	[18643]={b=0,s=0,d=7629},  -- Cairne's Hoofprint
 	[18645]={b=6000,s=1500,d=31202},  -- Alarm-O-Bot
 	[18646]={b=0,s=0,d=31029,c=AUCT_CLAS_ARMOR},  -- The Eye of Divinity
 	[18647]={b=1800,s=450,d=1301},  -- Schematic: Red Firework
@@ -10312,17 +11092,23 @@ Auctioneer_BasePrices = {
 	[18654]={b=16000,s=4000,d=15274},  -- Schematic: Gnomish Alarm-O-Bot
 	[18655]={b=16000,s=4000,d=15274},  -- Schematic: Major Recombobulator
 	[18656]={b=16000,s=4000,d=1301},  -- Schematic: Powerful Seaforium Charge
+	[18657]={b=20000,s=5000,d=15274},  -- Schematic: Hyper-Radiant Flame Reflector
+	[18658]={b=24000,s=6000,d=15274},  -- Schematic: Ultra-Flash Shadow Reflector
+	[18659]={b=0,s=0,d=31034},  -- Splinter of Nordrassil
 	[18660]={b=30000,s=7500,d=31205},  -- World Enlarger
 	[18661]={b=12000,s=3000,d=15274},  -- Schematic: World Enlarger
 	[18662]={b=20,s=5,d=31197,x=5},  -- Heavy Leather Ball
+	[18663]={b=1500000,s=0,d=7155},  -- J'eevee's Jar
 	[18664]={b=100,s=25,d=31095,c=AUCT_CLAS_WRITTEN},  -- A Treatise on Military Ranks
 	[18665]={b=0,s=0,d=31096,c=AUCT_CLAS_ARMOR},  -- The Eye of Shadow
+	[18670]={b=500000,s=0,d=2616},  -- Xorothian Glyphs
 	[18671]={b=225923,s=45184,d=31119,c=AUCT_CLAS_WEAPON},  -- Baron Charr's Sceptre
 	[18672]={b=71420,s=17855,d=31120,c=AUCT_CLAS_WEAPON},  -- Elemental Ember
 	[18673]={b=144591,s=28918,d=31121,c=AUCT_CLAS_WEAPON},  -- Avalanchion's Stony Hide
 	[18674]={b=88014,s=22003,d=9836,c=AUCT_CLAS_ARMOR},  -- Hardened Stone Band
 	[18675]={b=100,s=25,d=4742,c=AUCT_CLAS_WRITTEN},  -- Military Ranks of the Horde & Alliance
 	[18676]={b=80404,s=16080,d=31122,c=AUCT_CLAS_ARMOR},  -- Sash of the Windreaver
+	[18677]={b=62439,s=12487,d=15148,c=AUCT_CLAS_ARMOR},  -- Zephyr Cloak
 	[18678]={b=106541,s=26635,d=9853,c=AUCT_CLAS_ARMOR},  -- Tempestria's Frozen Necklace
 	[18679]={b=100546,s=25136,d=28831,c=AUCT_CLAS_ARMOR},  -- Frigid Ring
 	[18680]={b=189474,s=37894,d=30926,c=AUCT_CLAS_WEAPON},  -- Ancient Bone Bow
@@ -10331,6 +11117,8 @@ Auctioneer_BasePrices = {
 	[18683]={b=255504,s=51100,d=31126,c=AUCT_CLAS_WEAPON},  -- Hammer of the Vesper
 	[18684]={b=144564,s=36141,d=9840,c=AUCT_CLAS_ARMOR},  -- Dimly Opalescent Ring
 	[18686]={b=122638,s=24527,d=31130,c=AUCT_CLAS_ARMOR},  -- Bone Golem Shoulders
+	[18687]={b=1500000,s=0,d=13123},  -- Xorothian Stardust
+	[18688]={b=0,s=0,d=7155},  -- Imp in a Jar
 	[18689]={b=82301,s=16460,d=31131,c=AUCT_CLAS_ARMOR},  -- Phantasmal Cloak
 	[18690]={b=110130,s=22026,d=25226,c=AUCT_CLAS_ARMOR},  -- Wraithplate Leggings
 	[18691]={b=125601,s=31400,d=15420,c=AUCT_CLAS_ARMOR},  -- Dark Advisor's Pendant
@@ -10342,19 +11130,31 @@ Auctioneer_BasePrices = {
 	[18697]={b=54339,s=10867,d=31140,c=AUCT_CLAS_ARMOR},  -- Coldstone Slippers
 	[18698]={b=71811,s=14362,d=21958,c=AUCT_CLAS_ARMOR},  -- Tattered Leather Hood
 	[18699]={b=76119,s=15223,d=31142,c=AUCT_CLAS_ARMOR},  -- Icy Tomb Spaulders
+	[18700]={b=54552,s=10910,d=27048,c=AUCT_CLAS_ARMOR},  -- Malefic Bracers
 	[18701]={b=145640,s=36410,d=28733,c=AUCT_CLAS_ARMOR},  -- Innervating Band
 	[18702]={b=47443,s=9488,d=31143,c=AUCT_CLAS_ARMOR},  -- Belt of the Ordained
+	[18703]={b=0,s=0,d=31144,c=AUCT_CLAS_QUEST},  -- Ancient Petrified Leaf
+	[18704]={b=0,s=0,d=31145},  -- Mature Blue Dragon Sinew
+	[18705]={b=0,s=0,d=31146},  -- Mature Black Dragon Sinew
 	[18706]={b=40124,s=10031,d=31147,c=AUCT_CLAS_ARMOR},  -- Arena Master
+	[18707]={b=0,s=0,d=31148},  -- Ancient Rune Etched Stave
+	[18708]={b=0,s=0,d=31150,c=AUCT_CLAS_WRITTEN},  -- Petrified Bark
 	[18709]={b=28794,s=5758,d=31151,c=AUCT_CLAS_ARMOR},  -- Arena Wristguards
 	[18710]={b=36122,s=7224,d=31159,c=AUCT_CLAS_ARMOR},  -- Arena Bracers
 	[18711]={b=43502,s=8700,d=31160,c=AUCT_CLAS_ARMOR},  -- Arena Bands
 	[18712]={b=29105,s=5821,d=31161,c=AUCT_CLAS_ARMOR},  -- Arena Vambraces
+	[18713]={b=0,s=0,d=31338,c=AUCT_CLAS_WEAPON},  -- Rhok'delar, Longbow of the Ancient Keepers
+	[18714]={b=0,s=0,d=31162,c=AUCT_CLAS_CONTAINER},  -- Ancient Sinew Wrapped Lamina
+	[18715]={b=903890,s=180778,d=31163,c=AUCT_CLAS_WEAPON},  -- Lok'delar, Stave of the Ancient Keepers
 	[18716]={b=93277,s=18655,d=31166,c=AUCT_CLAS_ARMOR},  -- Ash Covered Boots
 	[18717]={b=344091,s=68818,d=23239,c=AUCT_CLAS_WEAPON},  -- Hammer of the Grand Crusader
 	[18718]={b=82901,s=16580,d=31167,c=AUCT_CLAS_ARMOR},  -- Grand Crusader's Helm
+	[18719]={b=0,s=0,d=3422},  -- The Traitor's Heart
 	[18720]={b=83532,s=16706,d=13672,c=AUCT_CLAS_ARMOR},  -- Shroud of the Nathrezim
+	[18721]={b=74724,s=14944,d=31171,c=AUCT_CLAS_ARMOR},  -- Barrage Girdle
 	[18722]={b=53442,s=10688,d=31173,c=AUCT_CLAS_ARMOR},  -- Death Grips
 	[18723]={b=167814,s=41953,d=6539,c=AUCT_CLAS_ARMOR},  -- Animated Chain Necklace
+	[18724]={b=0,s=0,d=31146},  -- Enchanted Black Dragon Sinew
 	[18725]={b=299636,s=59927,d=31174,c=AUCT_CLAS_WEAPON},  -- Peacemaker
 	[18726]={b=56480,s=11296,d=31175,c=AUCT_CLAS_ARMOR},  -- Magistrate's Cuffs
 	[18727]={b=72438,s=14487,d=31177,c=AUCT_CLAS_ARMOR},  -- Crimson Felt Hat
@@ -10374,14 +11174,31 @@ Auctioneer_BasePrices = {
 	[18743]={b=67777,s=13555,d=15163,c=AUCT_CLAS_ARMOR},  -- Gracious Cape
 	[18744]={b=56859,s=11371,d=31196,c=AUCT_CLAS_ARMOR},  -- Plaguebat Fur Gloves
 	[18745]={b=81194,s=16238,d=2311,c=AUCT_CLAS_ARMOR},  -- Sacred Cloth Leggings
+	[18746]={b=0,s=0,d=31208},  -- Divination Scryer
+	[18749]={b=0,s=0,d=1695},  -- Charger's Lost Soul
+	[18752]={b=0,s=0,d=31211},  -- Exorcism Censer
+	[18753]={b=0,s=0,d=31212},  -- Arcanite Barding
 	[18754]={b=52306,s=10461,d=31213,c=AUCT_CLAS_ARMOR},  -- Fel Hardened Bracers
 	[18755]={b=215646,s=43129,d=31237,c=AUCT_CLAS_WEAPON},  -- Xorothian Firestick
 	[18756]={b=167101,s=33420,d=31216,c=AUCT_CLAS_WEAPON},  -- Dreadguard's Protector
 	[18757]={b=80813,s=16162,d=31217,c=AUCT_CLAS_ARMOR},  -- Diabolic Mantle
 	[18758]={b=270363,s=54072,d=20574,c=AUCT_CLAS_WEAPON},  -- Specter's Blade
 	[18759]={b=339223,s=67844,d=31219,c=AUCT_CLAS_WEAPON},  -- Malicious Axe
+	[18760]={b=123465,s=30866,d=9839,c=AUCT_CLAS_ARMOR},  -- Necromantic Band
 	[18761]={b=196150,s=39230,d=31220,c=AUCT_CLAS_WEAPON},  -- Oblivion's Touch
 	[18762]={b=110526,s=27631,d=31223,c=AUCT_CLAS_WEAPON},  -- Shard of the Green Flame
+	[18766]={b=10000000,s=0,d=17608},  -- Reins of the Swift Frostsaber
+	[18767]={b=10000000,s=0,d=17608},  -- Reins of the Swift Mistsaber
+	[18769]={b=0,s=0,d=7139,c=AUCT_CLAS_QUEST},  -- Advanced Armorsmithing I - Enchanted Thorium Platemail
+	[18770]={b=0,s=0,d=7139,c=AUCT_CLAS_QUEST},  -- Advanced Armorsmithing II - Enchanted Thorium Platemail
+	[18771]={b=0,s=0,d=7139,c=AUCT_CLAS_QUEST},  -- Advanced Armorsmithing III - Enchanted Thorium Platemail
+	[18772]={b=10000000,s=0,d=17785},  -- Swift Green Mechanostrider
+	[18773]={b=10000000,s=0,d=17785},  -- Swift White Mechanostrider
+	[18774]={b=10000000,s=0,d=17785},  -- Swift Yellow Mechanostrider
+	[18775]={b=0,s=0,d=7087},  -- Manna-Enriched Horse Feed
+	[18776]={b=10000000,s=0,d=25132},  -- Swift Palomino
+	[18777]={b=10000000,s=0,d=25132},  -- Swift Brown Steed
+	[18778]={b=10000000,s=0,d=25132},  -- Swift White Steed
 	[18779]={b=0,s=0,d=24153},  -- Bottom Half of Advanced Armorsmithing: Volume I
 	[18780]={b=0,s=0,d=24153},  -- Top Half of Advanced Armorsmithing: Volume I
 	[18781]={b=0,s=0,d=31238},  -- Bottom Half of Advanced Armorsmithing: Volume II
@@ -10391,46 +11208,100 @@ Auctioneer_BasePrices = {
 	[18785]={b=10000000,s=0,d=17343},  -- Swift White Ram
 	[18786]={b=10000000,s=0,d=17343},  -- Swift Brown Ram
 	[18787]={b=10000000,s=0,d=17343},  -- Swift Gray Ram
+	[18788]={b=10000000,s=0,d=17494},  -- Swift Blue Raptor
+	[18789]={b=10000000,s=0,d=17494},  -- Swift Green Raptor
+	[18790]={b=10000000,s=0,d=17494},  -- Swift Orange Raptor
 	[18791]={b=10000000,s=0,d=17786},  -- Purple Skeletal Warhorse
+	[18792]={b=0,s=0,d=31350},  -- Blessed Arcanite Barding
 	[18793]={b=10000000,s=0,d=29448},  -- Great White Kodo
+	[18794]={b=10000000,s=0,d=29447},  -- Great Brown Kodo
+	[18795]={b=10000000,s=0,d=29448},  -- Great Gray Kodo
 	[18796]={b=10000000,s=0,d=16208},  -- Horn of the Swift Brown Wolf
 	[18797]={b=10000000,s=0,d=16207},  -- Horn of the Swift Timber Wolf
 	[18798]={b=10000000,s=0,d=16207},  -- Horn of the Swift Gray Wolf
+	[18799]={b=0,s=0,d=6014},  -- Charger's Redeemed Soul
+	[18802]={b=60000,s=5000,d=16325,q=5,x=5,c=AUCT_CLAS_POTION},  -- Shadowy Potion
+	[18803]={b=677972,s=135594,d=31265,c=AUCT_CLAS_WEAPON},  -- Finkle's Lava Dredger
+	[18804]={b=0,s=0,d=6430},  -- Lord Grayson's Satchel
 	[18805]={b=546375,s=109275,d=31266,c=AUCT_CLAS_WEAPON},  -- Core Hound Tooth
+	[18806]={b=168806,s=33761,d=31271,c=AUCT_CLAS_ARMOR},  -- Core Forged Greaves
+	[18807]={b=128980,s=25796,d=31268,c=AUCT_CLAS_ARMOR},  -- Helm of Latent Power
 	[18808]={b=113326,s=22665,d=31276,c=AUCT_CLAS_ARMOR},  -- Gloves of the Hypnotic Flame
+	[18809]={b=108057,s=21611,d=31278,c=AUCT_CLAS_ARMOR},  -- Sash of Whispered Secrets
 	[18810]={b=203394,s=40678,d=16526,c=AUCT_CLAS_ARMOR},  -- Wild Growth Spaulders
 	[18811]={b=163328,s=32665,d=24159,c=AUCT_CLAS_ARMOR},  -- Fireproof Cloak
 	[18812]={b=162290,s=32458,d=31280,c=AUCT_CLAS_ARMOR},  -- Wristguards of True Flight
 	[18813]={b=0,s=0,d=9823,c=AUCT_CLAS_ARMOR},  -- Ring of Binding
+	[18814]={b=0,s=0,d=1399,c=AUCT_CLAS_ARMOR},  -- Choker of the Fire Lord
+	[18815]={b=256380,s=64095,d=31282,c=AUCT_CLAS_ARMOR},  -- Essence of the Pure Flame
+	[18817]={b=319878,s=63975,d=31286,c=AUCT_CLAS_ARMOR},  -- Crown of Destruction
+	[18818]={b=0,s=0,d=8093,c=AUCT_CLAS_WRITTEN},  -- Mor'zul's Instructions
+	[18819]={b=0,s=0,d=31211},  -- Rohan's Exorcism Censer
 	[18820]={b=0,s=0,d=31287,c=AUCT_CLAS_ARMOR},  -- Talisman of Ephemeral Power
 	[18821]={b=256120,s=64030,d=9835,c=AUCT_CLAS_ARMOR},  -- Quick Strike Ring
 	[18822]={b=628843,s=125768,d=31288,c=AUCT_CLAS_WEAPON},  -- Obsidian Edged Blade
 	[18823]={b=132532,s=26506,d=31290,c=AUCT_CLAS_ARMOR},  -- Aged Core Leather Gloves
 	[18824]={b=167591,s=33518,d=31295,c=AUCT_CLAS_ARMOR},  -- Magma Tempered Boots
+	[18825]={b=84340,s=16868,d=11257,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Aegis
+	[18826]={b=84632,s=16926,d=23825,c=AUCT_CLAS_WEAPON},  -- High Warlord's Shield Wall
+	[18827]={b=153626,s=30725,d=31299,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Handaxe
+	[18828]={b=154170,s=30834,d=31300,c=AUCT_CLAS_WEAPON},  -- High Warlord's Cleaver
 	[18829]={b=244517,s=48903,d=31298,c=AUCT_CLAS_ARMOR},  -- Deep Earth Spaulders
+	[18830]={b=175663,s=35132,d=31302,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Sunderer
+	[18831]={b=176343,s=35268,d=31303,c=AUCT_CLAS_WEAPON},  -- High Warlord's Battle Axe
 	[18832]={b=520447,s=104089,d=31309,c=AUCT_CLAS_WEAPON},  -- Brutality Blade
+	[18833]={b=106610,s=21322,d=31307,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Bullseye
 	[18834]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
+	[18835]={b=107426,s=21485,d=30926,c=AUCT_CLAS_WEAPON},  -- High Warlord's Recurve
+	[18836]={b=107834,s=21566,d=22929,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Repeater
+	[18837]={b=108231,s=21646,d=31310,c=AUCT_CLAS_WEAPON},  -- High Warlord's Crossbow
+	[18838]={b=148747,s=29749,d=31311,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Dirk
+	[18839]={b=1000,s=250,d=29352,x=5,c=AUCT_CLAS_POTION},  -- Combat Healing Potion
+	[18840]={b=149834,s=29966,d=31312,c=AUCT_CLAS_WEAPON},  -- High Warlord's Razor
+	[18841]={b=1100,s=275,d=29354,x=5,u=AUCT_TYPE_TAILOR},  -- Combat Mana Potion
 	[18842]={b=693232,s=138646,d=20298,c=AUCT_CLAS_WEAPON},  -- Staff of Dominance
+	[18843]={b=151451,s=30290,d=31314,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Right Knuckles
+	[18844]={b=151995,s=30399,d=31315,c=AUCT_CLAS_WEAPON},  -- High Warlord's Right Claw
 	[18845]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18846]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
+	[18847]={b=153612,s=30722,d=31316,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Left Knuckles
+	[18848]={b=154141,s=30828,d=31317,c=AUCT_CLAS_WEAPON},  -- High Warlord's Left Claw
 	[18849]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18850]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18851]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18852]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18853]={b=15000,s=3750,d=31306,c=AUCT_CLAS_ARMOR},  -- Insignia of the Horde
 	[18854]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
+	[18855]={b=110336,s=22067,d=28769,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Hand Cannon
 	[18856]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
 	[18857]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
 	[18858]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
 	[18859]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
+	[18860]={b=112353,s=22470,d=31319,c=AUCT_CLAS_WEAPON},  -- High Warlord's Street Sweeper
 	[18861]={b=142467,s=28493,d=31320,c=AUCT_CLAS_ARMOR},  -- Flamewaker Legplates
 	[18862]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
 	[18863]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
 	[18864]={b=15000,s=3750,d=31318,c=AUCT_CLAS_ARMOR},  -- Insignia of the Alliance
+	[18865]={b=152509,s=30501,d=19713,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Punisher
+	[18866]={b=153053,s=30610,d=31321,c=AUCT_CLAS_WEAPON},  -- High Warlord's Bludgeon
+	[18867]={b=191978,s=38395,d=31322,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Battle Hammer
+	[18868]={b=192658,s=38531,d=31323,c=AUCT_CLAS_WEAPON},  -- High Warlord's Pulverizer
+	[18869]={b=174946,s=34989,d=18306,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Glaive
 	[18870]={b=156920,s=31384,d=31327,c=AUCT_CLAS_ARMOR},  -- Helm of the Lifegiver
+	[18871]={b=181156,s=36231,d=31328,c=AUCT_CLAS_WEAPON},  -- High Warlord's Pig Sticker
 	[18872]={b=151971,s=30394,d=31331,c=AUCT_CLAS_ARMOR},  -- Manastorm Leggings
+	[18873]={b=182516,s=36503,d=31330,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Stave
+	[18874]={b=183196,s=36639,d=31332,c=AUCT_CLAS_WEAPON},  -- High Warlord's War Staff
 	[18875]={b=192227,s=38445,d=31333,c=AUCT_CLAS_ARMOR},  -- Salamander Scale Pants
+	[18876]={b=184537,s=36907,d=20166,c=AUCT_CLAS_WEAPON},  -- Grand Marshal's Claymore
+	[18877]={b=185217,s=37043,d=31334,c=AUCT_CLAS_WEAPON},  -- High Warlord's Greatsword
 	[18878]={b=428226,s=85645,d=31337,c=AUCT_CLAS_WEAPON},  -- Sorcerous Dagger
 	[18879]={b=213456,s=53364,d=9836,c=AUCT_CLAS_ARMOR},  -- Heavy Dark Iron Ring
+	[18880]={b=0,s=0,d=14023},  -- Darkreaver's Head
+	[18902]={b=10000000,s=0,d=17608},  -- Reins of the Swift Stormsaber
+	[18922]={b=0,s=0,d=7235},  -- Simone's Head
+	[18923]={b=0,s=0,d=31353},  -- Klinfran's Head
+	[18924]={b=0,s=0,d=31353},  -- Solenor's Head
+	[18925]={b=0,s=0,d=31353},  -- Artorius's Head
 };
 

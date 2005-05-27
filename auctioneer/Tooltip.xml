@@ -366,15 +366,11 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					<OnLoad>
 						this.rps = 0.1;
 						this.rotation = 1.5;
-						this.elapsedTime = 0;
-						this.counter = 1;
 					</OnLoad>
 					<OnHide>
 						this.rotation = 1.5;
-						this.elapsedTime = 0;
 					</OnHide>
 					<OnUpdate>
-						this.elapsedTime = this.elapsedTime + arg1;
 						if (this:IsVisible()) then
 							this.rotation = this.rotation + (arg1 * 2 * PI * this.rps);
 							if ( this.rotation &lt; 0 ) then
