@@ -590,7 +590,7 @@ function doPercentLess(percentLess)
 		local itemKey = id ..":"..rprop..":"..enchant;
         local median, seenCount = getUsableMedian(itemKey);
         local profit = (median * count) - buyout;
-		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(median * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(median, buyout / count)));
+		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(median * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(median, buyout / count).."%"));
         Auctioneer_ChatPrint(output);
     end
     
@@ -600,18 +600,16 @@ end
 -- given an item name, find the lowest price for that item in the current AHSnapshot
 -- if the item does not exist in the snapshot or the snapshot does not exist
 -- a nil is returned.
-function findLowestAuctionForItem(itemKey)
-    if (not itemKey) then return nil; end
-	local i,j, itemID, itemRand = string.find(itemKey, "(%d+):(%d+)");
-	if (itemID == nil) then return nil; end
-
+function findLowestAuctionForItem(itemName)
+    if (not itemName) then return nil; end
+	
     local lowSig = nil;
     local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
     for sig,v in AHSnapshot do
         local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(sig);
         local priceForOne = 0;
 		if (count and count > 0) then priceForOne = (buyout / count); end
-        if (id == itemID and rprop == itemRand and buyout > 0 and priceForOne < lowestPrice) then
+        if (itemName == name and buyout > 0 and priceForOne < lowestPrice) then
             lowSig = sig;
             lowestPrice = priceForOne;
         end
@@ -693,15 +691,15 @@ end
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
 function doLow(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
-	local itemKey = itemID..":"..randomProp..":"..enchant;
-
-    local auctionSignature = findLowestAuctionForItem(itemKey, AHSnapshot);
+	
+    local auctionSignature = findLowestAuctionForItem(itemName);
     if (not auctionSignature) then
-        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_NOAUCT, colorTextWhite(itemName)));
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_NOAUCT, colorTextWhite(itemName)));
     else
         local _,_,_, _, count, _, buyout, _ = getItemSignature(auctionSignature);
         local auction = AHSnapshot[auctionSignature];
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, colorTextWhite(count.."x")..auction.itemLink, Auctioneer_GetTextGSC(buyout), colorTextWhite(auction.owner), Auctioneer_GetTextGSC(buyout / count), colorTextWhite(percentLessThan(getUsableMedian(itemKey), buyout / count))));
+        local itemKey = itemID..":"..randomProp..":"..enchant;
+		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, colorTextWhite(count.."x")..auction.itemLink, Auctioneer_GetTextGSC(buyout), colorTextWhite(auction.owner), Auctioneer_GetTextGSC(buyout / count), colorTextWhite(percentLessThan(getUsableMedian(itemKey), buyout / count).."%")));
     end
 end
 

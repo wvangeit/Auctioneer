@@ -54,12 +54,12 @@ AUCT_FRMT_BIDBROKER_LINE = "%s, Last %s seen, HSP: %s, CurrentBid: %s, Prof: %s,
 AUCT_FRMT_BIDBROKER_DONE = "Bid brokering done";
 
 AUCT_FRMT_PCTLESS_HEADER = "Percent Less than median: %d%%";
-AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, Median: %s, BO: %s, Prof: %s, Less %s%%";
+AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, Median: %s, BO: %s, Prof: %s, Less %s";
 AUCT_FRMT_PCTLESS_DONE = "Percent less done.";
 
 AUCT_FRMT_NOAUCT = "No auctions found for the item: %s";
 AUCT_FRMT_MEDIAN_LINE = "Of last %d seen, median buyout for 1 %s is: %s";
-AUCT_FRMT_LOW_LINE = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s%%";
+AUCT_FRMT_LOW_LINE = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
 AUCT_FRMT_HSP_LINE = "Highest Sellable Price for one %s is: %s";
 
 AUCT_FRMT_INFO_SEEN = "Seen %d times at auction total";
