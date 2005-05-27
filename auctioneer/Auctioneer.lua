@@ -770,14 +770,17 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
         
         -- get the item data from AuctionPrices table
         local itemData;
+        local buyoutPricesHistory;
         -- see if they are still using the itemID as the key
-        if AuctionPrices[auctionKey()][itemID] then
-            itemData = AuctionPrices[auctionKey()][itemID];
-            AuctionPrices[auctionKey()][itemID] = nil; --clear entry using old ID key
+        if AuctionPrices[auctionKey()][aiItemID] then
+            itemData = AuctionPrices[auctionKey()][aiItemID];
+            AuctionPrices[auctionKey()][aiItemID] = nil; --clear entry using old ID key
 		-- else, see if they are still using the item name as the key
-        elseif AuctionPrices[auctionKey()][itemID] then
-            itemData = AuctionPrices[auctionKey()][aiName];
-            AuctionPrices[auctionKey()][aiName] = nil; --clear entry using old ID key
+        elseif AuctionPrices[auctionKey()][aiName] then
+            itemData = AuctionPrices[auctionKey()][aiName].data;
+            buyoutPricesHistory = AuctionPrices[auctionKey()][aiName].buyoutPricesHistoryList;
+            AuctionPrices[auctionKey()][aiKey] = {data=itemData, buyoutPricesHistoryList=buyoutPricesHistory};            
+            AuctionPrices[auctionKey()][aiName] = nil; --clear entry using old Item Name key       
         else
             itemData = getAuctionPriceData(aiKey);
         end
@@ -873,6 +876,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		if (itemID > 0) then
 			Auctioneer_SetModelByID(itemID);
 			frame.eDone = 1;
+            -- TODO: fix this bug, can't just look up by name anymore need to use the new AuctionPrices key too
 			local itemData = getAuctionPriceData(name);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 			itemInfo = Auctioneer_BasePrices[itemID];
@@ -1441,6 +1445,7 @@ function Auctioneer_Command(command)
 			local items = Auctioneer_GetItems(param);
 			for _,item in items do
 				local aKey = auctionKey();
+                -- TODO: fix this bug
 				if (AuctionPrices[aKey][item] ~= nil) then
 					AuctionPrices[aKey][item] = nil;
 					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, item));
