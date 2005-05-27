@@ -213,9 +213,9 @@ local function Auctioneer_AuctionStart_Hook()
     invalidateAHSnapshot();
     
     -- make sure AuctionPrices is initialized
-    local server = auctionKey();
-	if (AuctionPrices[server] == nil) then
-		AuctionPrices[server] = {};
+    local serverFaction = auctionKey();
+	if (AuctionPrices[serverFaction] == nil) then
+		AuctionPrices[serverFaction] = {};
 	end
     
     -- reset scan audit counters
@@ -253,19 +253,6 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     end
 end
 
-
--- returns a LootLink item link
---[[local function Auctioneer_GetItemLink(itemName)
-	if (ItemLinks == nil) then
-		return nil; 
-	end
-	if (ItemLinks[itemName] == nil) then 
-		return nil; 
-	end
-	return ItemLinks[itemName];
-end]]
-
-
 --returns the auction prices key to get the prices for this server and faction
 function auctionKey()
 	local serverName = GetCVar("realmName");
@@ -295,19 +282,28 @@ end
 
 
 -- returns an AuctionPrices item from the table based on an item name
-local function getAuctionPriceItem(itemKey, from)
-    local server = auctionKey();
-    if (from ~= nil) then server = from; end
-	if (AuctionPrices[server] == nil) then
-		AuctionPrices[server] = {};
-	end
-    return AuctionPrices[server][itemKey];
+local function getAuctionPriceItem(itemKey, from, name, id)
+    local serverFaction = auctionKey();
+    local auctionPriceItem;
+    
+    if (from ~= nil) then serverFaction = from; end
+	if (AuctionPrices[serverFaction] == nil) then
+		AuctionPrices[serverFaction] = {};
+    elseif AuctionPrices[serverFaction][itemKey] then
+        auctionPriceItem = AuctionPrices[serverFaction][itemKey];
+    elseif AuctionPrices[serverFaction][name] then
+        auctionPriceItem = AuctionPrices[serverFaction][name];
+    elseif AuctionPrices[serverFaction][id] then
+        auctionPriceItem = AuctionPrices[serverFaction][id];
+    end
+    
+    return auctionPriceItem;
 end
 
 
--- returns the auction price data for an auction
-local function getAuctionPriceData(itemKey, from)
-	local auctionItem = getAuctionPriceItem(itemKey, from);
+-- wrapper for getting AuctionPrices data that is backward compatible with old AuctionPrices keys
+local function getAuctionPriceData(itemKey, from, name, id)
+	local auctionItem = getAuctionPriceItem(itemKey, from, name, id);
 	if (auctionItem == nil) or (auctionItem.data == nil) then 
 		link = "0:0:0:0:0:0:0";
     else
@@ -317,9 +313,10 @@ local function getAuctionPriceData(itemKey, from)
 end
 
 
+
 -- returns the auction buyout history for this item
-function getAuctionBuyoutHistory(itemKey)
-	local auctionItem = getAuctionPriceItem(itemKey);
+function getAuctionBuyoutHistory(itemKey, name)
+	local auctionItem = getAuctionPriceItem(itemKey, nil, name);
 	if (auctionItem == nil) then 
 		buyoutHistory = {};
     else
@@ -356,8 +353,8 @@ function getItemSnapshotMedianBuyout(itemKey)
     return getMedian(buyoutPrices), table.getn(buyoutPrices);
 end
 
-local function getItemHistoricalMedianBuyout(itemKey)
-    local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey);
+local function getItemHistoricalMedianBuyout(itemKey, name)
+    local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
     local historyMedian = getMedian(buyoutHistoryTable);
     local historySeenCount = table.getn(buyoutHistoryTable);
     return historyMedian, historySeenCount;
@@ -365,7 +362,7 @@ end
 
 -- this function returns the most accurate median possible, 
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
-function getUsableMedian(itemKey)
+function getUsableMedian(itemKey, name)
     local usableMedian = nil;
     local count = nil;
 
@@ -373,7 +370,7 @@ function getUsableMedian(itemKey)
     local snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemKey);
    
     --get history median
-    local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey);
+    local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
     
     if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .15))) then
         if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
@@ -747,7 +744,7 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     if (aiBuyoutPrice > 0) then
         local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
         if (not lSnapshotItemPrices[aiKey]) then
-            lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}};
+            lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
         else
             table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
         end
@@ -877,7 +874,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			end
 
 			frame.eDone = 1;
-			local itemData = getAuctionPriceData(itemKey);
+			local itemData = getAuctionPriceData(itemKey, nil, name, itemID);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 			itemInfo = Auctioneer_BasePrices[itemID];
 
@@ -899,9 +896,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				if (buyCount > 0) then
 					avgBuy = math.floor(buyPrice / buyCount);
 				end
-                
-                
-                local median, medCount = getUsableMedian(itemKey);
+                                
+                local median, medCount = getUsableMedian(itemKey, name);
 
 				if (Auctioneer_GetFilter("average")) then
 					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount));
@@ -914,9 +910,9 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						TT_LineColor(0.1,0.8,0.5);
 					end
                     if median and Auctioneer_GetFilter("median") then
-                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey);
+                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
                         local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
-                        if historicalMedian and historicalMedCount > snapshotMedCount  then
+                        if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
                             TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian)
 							TT_LineColor(0.1,0.8,0.5);
                         end
@@ -946,7 +942,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				if (also == "opposite") then
 					also = oppositeKey();
 				end
-				local itemData = getAuctionPriceData(itemKey, also);
+				local itemData = getAuctionPriceData(itemKey, also, name, itemID);
 				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 				local avgQty = math.floor(minCount / aCount);
 				local avgMin = math.floor(minPrice / minCount);
@@ -1374,7 +1370,7 @@ function Auctioneer_OnEvent(event)
 			local bag, slot, id, rprop, enchant, uniq = Auctioneer_FindItemInBags(name);
 			if (bag ~= nil) then
 				local itemKey = id..":"..rprop..":"..enchant;
-				local itemData = getAuctionPriceData(itemKey);
+				local itemData = getAuctionPriceData(itemKey, nil, name, id);
 				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
 				
 				-- get highest sellable price for buyout
@@ -1433,29 +1429,6 @@ function Auctioneer_OnEvent(event)
 		Auctioneer_ScanAuction();   
     end        
 end
-
-
-local function getRRP(itemKey, from)
-	if (from == nil) then from = auctionKey(); end
-	if (from == "also") then from = Auctioneer_GetFilterVal(also); end
-	if ((from == "on") or (from == "off")) then return 0; end
-	if (from == "opposite") then from = oppositeKey(); end
-		
-	local itemData = getAuctionPriceData(itemKey, from);
-	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
---	p("Getting data from "..from.." for "..itemKey, itemData);
-
-	local bidRatio = bidCount/minCount;
-	local avgMin = minPrice/minCount;
-	local avgBid = bidPrice/bidCount;
-	local diff = avgBid - avgMin;
-	local rrp = diff * bidRatio + avgMin;
-
---	p("br = ", bidRatio, "am = ", avgMin, "ab = ", avgBid, "dif = ", diff, "rrp = ", rrp);
-	
-	return rrp;
-end
-
 
 function dump(...)
 	local out = "";
