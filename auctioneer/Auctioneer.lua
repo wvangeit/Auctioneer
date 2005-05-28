@@ -14,6 +14,8 @@ if (AUCTIONEER_VERSION == "<".."%version%>") then
 	AUCTIONEER_VERSION = "3.DEV";
 end
 
+local MAX_ALLOWED_FORMAT_INT = 2000000000; -- numbers much greater than this overflow when using format("%d")
+
 -- Function hooks
 local lOriginalGameTooltip_OnHide;
 local lOriginalGameTooltip_ClearMoney;
@@ -79,6 +81,7 @@ local QUALITY_POOR= 0;
 -- return the string representation of the given timeLeft constant
 local function getTimeLeftString(timeLeft)
     local timeLeftString = "";
+    -- TODO: localize these strings
     if timeLeft == TIME_LEFT_SHORT then
         timeLeftString = "Short";
     elseif timeLeft == TIME_LEFT_MEDIUM then
@@ -336,8 +339,6 @@ end
 local function getItemSignature(sigData)
 	local i,j, id,rprop,enchant,name,count,min,buyout,uniq = string.find(sigData, "^(%d+):(%d+):(%d+):(.-):(%d+):(.-):(%d+):(.+)");
 	if (name == nil) then name = ""; end
-    if (not min or tonumber(min) < 0) then min = 0 end -- handle number overflow
-    if (not buyout or tonumber(buyout) < 0) then buyout = 0 end -- handle number overflow
 	return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
 end
 
@@ -372,7 +373,7 @@ function getUsableMedian(itemKey, name)
     --get history median
     local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
     
-    if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .15))) then
+    if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .20))) then
         if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
             usableMedian = historyMedian;
             count = historySeenCount;
@@ -597,8 +598,9 @@ end
 -- given an item name, find the lowest price for that item in the current AHSnapshot
 -- if the item does not exist in the snapshot or the snapshot does not exist
 -- a nil is returned.
-function findLowestAuctionForItem(itemName)
-    if (not itemName) then return nil; end
+function findLowestAuctionForItem(itemKey)
+	local i,j, itemID, itemRand = string.find(itemKey, "(%d+):(%d+):%d+");
+	if (itemID == nil) then return nil; end
 	
     local lowSig = nil;
     local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
@@ -606,7 +608,7 @@ function findLowestAuctionForItem(itemName)
         local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(sig);
         local priceForOne = 0;
 		if (count and count > 0) then priceForOne = (buyout / count); end
-        if (itemName == name and buyout > 0 and priceForOne < lowestPrice) then
+        if (tonumber(itemID) == tonumber(id) and tonumber(itemRand) == tonumber(rprop) and buyout > 0 and priceForOne < lowestPrice) then 
             lowSig = sig;
             lowestPrice = priceForOne;
         end
@@ -641,7 +643,7 @@ end
 
 function getHighestSellablePriceForOne(itemKey, useCachedPrices)
     local highestSellablePrice = 0;
-    local lowestAllowedPercentBelowMedian = 40;
+    local lowestAllowedPercentBelowMedian = 30;
     local discountLowPercent = 5;
     local discountMedianPercent = 20;
     local median, count = getUsableMedian(itemKey);
@@ -649,13 +651,16 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices)
     local currentLowestBuyout = nil;
     local lowestAuctionSignature = nil;
     local lowestAuctionCount, lowestAuctionBuyout;
-    if useCachedPrices then
+--~ p("useCachedPrices: "..tostring(useCachedPrices));               
+    if useCachedPrices then    
         currentLowestBuyout = getLowestPriceQuick(itemKey);
+--~ p("currentLowestBuyout: "..currentLowestBuyout);           
     else
         lowestAuctionSignature = findLowestAuctionForItem(itemKey);
         if lowestAuctionSignature then
             _,_,_, _, lowestAuctionCount, _, lowestAuctionBuyout, _ = getItemSignature(lowestAuctionSignature);
             currentLowestBuyout = lowestAuctionBuyout / lowestAuctionCount;
+--~ p("currentLowestBuyout: "..currentLowestBuyout);           
         end
     end
   
@@ -666,18 +671,22 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices)
                 highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
             elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > median) then
                 -- set highest price to "Discount median"
+--~ p("Discount median case 1");                 
                 highestSellablePrice = subtractPercent(median, discountMedianPercent);
             else -- use discount low
                 -- set highest price to "Discount low"
+--~ p("Discount low case 1");                
                 highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
             end
         else -- no low buyout, use discount median
             -- set highest price to "Discount median"
+--~ p("Discount median case 2");            
             highestSellablePrice = subtractPercent(median, discountMedianPercent);            
         end
     else -- no median
         if currentLowestBuyout then
             -- set highest price to "Discount low"
+--~ p("Discount low case 2");            
             highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
         end
     end
@@ -688,8 +697,9 @@ end
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
 function doLow(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
-	
-    local auctionSignature = findLowestAuctionForItem(itemName);
+	local itemKey = itemID..":"..randomProp..":"..enchant;
+    
+    local auctionSignature = findLowestAuctionForItem(itemKey);
     if (not auctionSignature) then
         Auctioneer_ChatPrint(string.format(AUCT_FRMT_NOAUCT, colorTextWhite(itemName)));
     else
@@ -730,8 +740,8 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     local aiTimeLeft = GetAuctionItemTimeLeft("list", index);
    
     -- do some validation of the auction data that was returned
-    if (aiCount < 1) then aiCount = 1; end
-    if (aiName == nil) then return; end --if name is nil skip this auction
+    if (aiCount < 1) then aiCount = 1; end    
+    if (aiName == nil or tonumber(aiBuyoutPrice) > MAX_ALLOWED_FORMAT_INT or tonumber(aiMinBid) > MAX_ALLOWED_FORMAT_INT) then return; end
         
 	local aiLink = GetAuctionItemLink("list", index);
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = breakLink(aiLink);
@@ -741,14 +751,13 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     local lAuctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice), aiUniqID);
     
     -- add this item's buyout price to the buyout price history for this item in the snapshot
-    if (aiBuyoutPrice > 0) then
-        local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
-        if (not lSnapshotItemPrices[aiKey]) then
-            lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
-        else
-            table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
-        end
+    local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
+    if (not lSnapshotItemPrices[aiKey]) then
+        lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
+    else
+        table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
     end
+    
     
     --if this auction is not in the snapshot add it to the AuctionPrices and AHSnapshot    
     if (not AHSnapshot[lAuctionSignature]) then 
