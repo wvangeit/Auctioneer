@@ -408,6 +408,15 @@ function getUsableMedian(itemKey, name)
     return usableMedian, count;
 end
 
+-- returns true if they link is likely a player made item
+local function isPossiblePlayerMadeItem(link)
+    local itemID, randomProp, enchant, uniqID = breakLink(link);
+    if randomProp == 0 and uniqID > 0 then
+        return true;
+    end
+    return false;
+end
+
 -- returns if an item is a recipe type
 local function isItemRecipe(itemName) 
     local isRecipe = false;
@@ -744,16 +753,14 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices)
     local highestSellablePrice = 0;
     local lowestAllowedPercentBelowMedian = 30;
     local discountLowPercent = 5;
-    local discountMedianPercent = 20;
+    local discountMedianPercent = 15;
     local median, count = getUsableMedian(itemKey);
     
     local currentLowestBuyout = nil;
     local lowestAuctionSignature = nil;
-    local lowestAuctionCount, lowestAuctionBuyout;
---~ p("useCachedPrices: "..tostring(useCachedPrices));               
+    local lowestAuctionCount, lowestAuctionBuyout;         
     if useCachedPrices then    
         currentLowestBuyout = getLowestPriceQuick(itemKey);
---~ p("currentLowestBuyout: "..currentLowestBuyout);           
     else
         lowestAuctionSignature = findLowestAuctionForItem(itemKey);
         if lowestAuctionSignature then
@@ -795,7 +802,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices)
 end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
-function doLow(link)
+local function doLow(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
     
@@ -811,14 +818,13 @@ function doLow(link)
     end
 end
 
-function doHSP(link)
+local function doHSP(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 
     local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false);
     Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
-
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
@@ -852,11 +858,13 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     local lAuctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice), aiUniqID);
     
     -- add this item's buyout price to the buyout price history for this item in the snapshot
-    local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
-    if (not lSnapshotItemPrices[aiKey]) then
-        lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
-    else
-        table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
+    if aiBuyoutPrice > 0 then
+        local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
+        if (not lSnapshotItemPrices[aiKey]) then
+            lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
+        else
+            table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
+        end
     end
     
     
@@ -1340,13 +1348,13 @@ function Auctioneer_Command(command)
     elseif (cmd == AUCT_CMD_SCAN) then
         Auctioneer_RequestAuctionScan();           
     elseif (cmd == "test") then
-        doTests();
+        doTest();
     elseif (cmd == "low") then
         doLow(param);   
     elseif (cmd == "med") then
         doMedian(param);  
     elseif (cmd == "hsp") then
-        doHSP(param);  
+        doHSP(param);           
 	elseif (
 		(cmd == AUCT_SHOW_AVERAGE) or 
 		(cmd == AUCT_SHOW_MEDIAN) or
