@@ -102,10 +102,15 @@ function TT_Show(currentTooltip)
 		reposition = true;
 		fTop = fTop - tBottom;
 	end
-	if (tRight > sWidth) then 
+	if (fRight > sWidth) then 
 		reposition = true;
 		fLeft = fLeft - (tRight - sWidth);
 	end
+	if (fRight - width < 0) then
+		reposition = true;
+		fLeft = fLeft + (width - fRight);
+	end
+
 	if (reposition) then
 --		p("Repositioning to", fLeft, fTop);
 		currentTooltip:ClearAllPoints();
@@ -157,6 +162,8 @@ function TT_AddLine(lineText, moneyAmount)
 		money:SetPoint("LEFT", line:GetName(), "RIGHT", TT_MoneySpacing, 0);
 		lineWidth = lineWidth + money:GetWidth() + TT_MoneySpacing;
 		MoneyFrame_Update(money:GetName(), math.floor(moneyAmount));
+		getglobal("EnhancedTooltipMoney"..curMoney.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
+		getglobal("EnhancedTooltipMoney"..curMoney.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
 		money:Show();
 		EnhancedTooltip.moneyCount = curMoney;
 	end

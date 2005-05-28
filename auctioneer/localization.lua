@@ -57,6 +57,10 @@ AUCT_FRMT_PCTLESS_HEADER = "Percent Less than median: %d%%";
 AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, Median: %s, BO: %s, Prof: %s, Less %s";
 AUCT_FRMT_PCTLESS_DONE = "Percent less done.";
 
+AUCT_FRMT_COMPETE_HEADER = "Competing auctions at least %d silver less.";
+AUCT_FRMT_COMPETE_LINE = "%s, Bid: %s, BO %s, %s less";
+AUCT_FRMT_COMPETE_DONE = "Competing auctions done.";
+
 AUCT_FRMT_NOAUCT = "No auctions found for the item: %s";
 AUCT_FRMT_MEDIAN_LINE = "Of last %d seen, median buyout for 1 %s is: %s";
 AUCT_FRMT_LOW_LINE = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
@@ -77,27 +81,66 @@ AUCT_FRMT_INFO_CLASSUSE = "Class: %s used for %s";
 AUCT_FRMT_INFO_CLASS = "Class: %s";
 AUCT_FRMT_INFO_USE = "Used for: %s";
 
-AUCT_FRMT_INFO_BUY = "Buy%s %s";
-AUCT_FRMT_INFO_SELL = "Sell%s %s";
-AUCT_FRMT_INFO_BUYSELL = "Buy%s %s, Sell%s %s";
-AUCT_FRMT_INFO_BUYMULT = "Buy%s %d at %s (%s ea)";
-AUCT_FRMT_INFO_SELLMULT = "Sell%s %d at %s (%s ea)";
+AUCT_FRMT_INFO_BUY = "Buy%s from vendor";
+AUCT_FRMT_INFO_SELL = "Sell%s to vendor";
+AUCT_FRMT_INFO_BUYMULT = "Buy%s %d (%s each)";
+AUCT_FRMT_INFO_SELLMULT = "Sell%s %d (%s each)";
 
 AUCT_FRMT_INFO_STX = "Stacks in lots of %d";
 
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
 
-AUCT_HELP_ONOFF = "turns the auction data display on and off";
-AUCT_HELP_AVERAGE = "select whether to show item's average auction price";
-AUCT_HELP_MEDIAN = "select whether to show item's median buyout price";
-AUCT_HELP_SUGGEST = "select whether to show item's suggested auction price";
-AUCT_HELP_STATS = "select whether to show item's bidded/buyout percentages";
-AUCT_HELP_VENDOR = "select whether to show item's vendor pricing";
-AUCT_HELP_VENDORSELL = "select whether to show item's vendor sell pricing (req vendor=on)";
-AUCT_HELP_VENDORBUY = "select whether to show item's vendor buy pricing (req vendor=on)";
-AUCT_HELP_USAGE = "select whether to show tradeskill item's usage";
-AUCT_HELP_STACKSIZE = "select whether to show the item's stackable size";
-AUCT_HELP_CLEAR = "clear the specified item's data (you may shift click insert multiple items into this command, or specify only one textually) If you specify 'all' by itself, the entire dataset for this server will be cleared";
+AUCT_CMD_OFF = "off";
+AUCT_CMD_ON = "on";
+AUCT_CMD_TOGGLE = "toggle";
+AUCT_CMD_CLEAR = "clear";
+AUCT_CMD_CLEAR_ALL = "all";
+AUCT_CMD_CLEAR_SNAPSHOT = "snapshot";
+AUCT_CMD_ALSO = "also";
+AUCT_CMD_ALSO_OPPOSITE = "opposite";
+AUCT_CMD_BROKER = "broker";
+AUCT_CMD_BIDBROKER = "bidbroker";
+AUCT_CMD_BIDBROKER_SHORT = "bb";
+AUCT_CMD_PERCENTLESS = "percentless";
+AUCT_CMD_PERCENTLESS_SHORT = "pl";
+AUCT_CMD_COMPETE = "compete";
+AUCT_CMD_SCAN = "scan";
+
+AUCT_OPT_CLEAR = "<[item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..">";
+AUCT_OPT_ALSO = "<realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..">"
+AUCT_OPT_BROKER = "[silver_profit]";
+AUCT_OPT_BIDBROKER = "[silver_profit]";
+AUCT_OPT_PERCENTLESS = "[percent]";
+AUCT_OPT_COMPETE = "[silver_less]";
+AUCT_OPT_SCAN = "[category]";
+
+AUCT_SHOW_AVERAGE = "show-average";
+AUCT_SHOW_MEDIAN = "show-median";
+AUCT_SHOW_STACK = "show-stack";
+AUCT_SHOW_STATS = "show-stats";
+AUCT_SHOW_SUGGEST = "show-suggest";
+AUCT_SHOW_USAGE = "show-usage";
+AUCT_SHOW_VENDOR = "show-vendor";
+AUCT_SHOW_VENDOR_BUY = "show-vendor-buy";
+AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
+
+AUCT_HELP_ONOFF = "Turns the auction data display on and off";
+AUCT_HELP_AVERAGE = "Select whether to show item's average auction price";
+AUCT_HELP_MEDIAN = "Select whether to show item's median buyout price";
+AUCT_HELP_SUGGEST = "Select whether to show item's suggested auction price";
+AUCT_HELP_STATS = "Select whether to show item's bidded/buyout percentages";
+AUCT_HELP_VENDOR = "Select whether to show item's vendor pricing";
+AUCT_HELP_VENDOR_SELL = "Select whether to show item's vendor sell pricing (req show-vendor=on)";
+AUCT_HELP_VENDOR_BUY = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
+AUCT_HELP_USAGE = "Select whether to show tradeskill item's usage";
+AUCT_HELP_STACK = "Select whether to show the item's stackable size";
+AUCT_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
+AUCT_HELP_ALSO = "Also display another server's values in the tooltip. The special keyword \"opposite\" means the opposite faction.";
+AUCT_HELP_BROKER = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
+AUCT_HELP_BIDBROKER = "Show short or medium term auctions from the recent scan that may be bid on for profit";
+AUCT_HELP_PERCENTLESS = "Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
+AUCT_HELP_COMPETE = "Show any recently scanned auctions whose buyout is less than one of your items";
+AUCT_HELP_SCAN = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane)";
 
 AUCT_STAT_ON = "Displaying configured auction data";
 AUCT_STAT_OFF = "Not displaying any auction data";

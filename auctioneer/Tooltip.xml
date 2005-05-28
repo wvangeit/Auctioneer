@@ -13,7 +13,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<Frames>
 			<Button name="$parentCopperButton">
 				<Size>
-					<AbsDimension x="32" y="10"/>
+					<AbsDimension x="26" y="10"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT">
@@ -49,7 +49,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Button>
 			<Button name="$parentSilverButton">
 				<Size>
-					<AbsDimension x="32" y="10"/>
+					<AbsDimension x="22" y="10"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentCopperButton" relativePoint="LEFT">
@@ -85,7 +85,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Button>
 			<Button name="$parentGoldButton">
 				<Size>
-					<AbsDimension x="32" y="10"/>
+					<AbsDimension x="26" y="10"/>
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentSilverButton" relativePoint="LEFT">
