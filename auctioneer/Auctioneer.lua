@@ -522,7 +522,10 @@ local function competingFilter(minLess, signature, myAuctions)
 	local itemKey = id..":"..rprop..":"..enchant;
    
 	local auctKey = sanifyAHSnapshot();
-    if (AHSnapshot[auctKey][signature].owner ~= UnitName("player")) and (myAuctions[itemKey]) and (buyout+minLess < myAuctions[itemKey]) then
+    if (AHSnapshot[auctKey][signature].owner ~= UnitName("player")) and
+		(myAuctions[itemKey]) and
+		(buyout > 0) and
+		(buyout+minLess < myAuctions[itemKey]) then
 		return false;
     end
     return true;
@@ -632,8 +635,8 @@ function doBidBroker(minProfit)
 end
 
 function doCompeting(minLess)
-    if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS else minLess = tonumber(minLess) * 100  end
-	local output = string.format(AUCT_FRMT_COMPETE_HEADER, minLess);
+    if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS * 100 else minLess = tonumber(minLess) * 100  end
+	local output = string.format(AUCT_FRMT_COMPETE_HEADER, Auctioneer_GetTextGSC(minLess));
     Auctioneer_ChatPrint(output);
     
     local myAuctions = querySnapshot(auctionOwnerFilter, UnitName("player"));
@@ -668,9 +671,13 @@ function doCompeting(minLess)
 			bidPrice = "No bids ("..bidPrice..")";
 		end
 
+		local myBuyout = myHighestPrices[itemKey];
 		local buyPrice = Auctioneer_GetTextGSC(buyoutForOne).."ea";
+		local myPrice = Auctioneer_GetTextGSC(myBuyout).."ea";
+		local priceLess = myBuyout - buyoutForOne;
+		local lessPrice = Auctioneer_GetTextGSC(priceLess);
 
-		local output = string.format(AUCT_FRMT_COMPETE_LINE, colorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, Auctioneer_GetTextGSC(buyoutForOne - myHighestPrices[itemKey]).."ea");
+		local output = string.format(AUCT_FRMT_COMPETE_LINE, colorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 		Auctioneer_ChatPrint(output);
     end
     

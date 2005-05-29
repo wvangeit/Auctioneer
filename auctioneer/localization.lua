@@ -57,8 +57,8 @@ AUCT_FRMT_PCTLESS_HEADER = "Percent Less than median: %d%%";
 AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, Median: %s, BO: %s, Prof: %s, Less %s";
 AUCT_FRMT_PCTLESS_DONE = "Percent less done.";
 
-AUCT_FRMT_COMPETE_HEADER = "Competing auctions at least %d silver less.";
-AUCT_FRMT_COMPETE_LINE = "%s, Bid: %s, BO %s, %s less";
+AUCT_FRMT_COMPETE_HEADER = "Competing auctions at least %s less per item.";
+AUCT_FRMT_COMPETE_LINE = "%s, Bid: %s, BO %s vs %s, %s less";
 AUCT_FRMT_COMPETE_DONE = "Competing auctions done.";
 
 AUCT_FRMT_NOAUCT = "No auctions found for the item: %s";
