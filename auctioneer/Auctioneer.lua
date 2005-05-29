@@ -65,6 +65,7 @@ local MIN_BID_PERCENT = 10;
 
 
 --[[ SavedVariables --]]
+AuctionBids = {};          --Table that stores all your bids
 AuctionConfig = {};        --Table that stores config settings
 AuctionPrices = {};        --Table that keeps the price history of auctions
 Auction_DoneItems = {};    --Table to keep a record of auction items that have been scanned
@@ -1283,14 +1284,28 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
     local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement,
           aiBuyout, aiBidAmount, aiHighBidder, aiOwner =
           GetAuctionItemInfo(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
-          
+
+    local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyout), aiUniqID);
+
+	local playerName = UnitName("player");
+	local eventTime = time();
+	if (not AuctionBids[playerName]) then
+		AuctionBids[playerName] = {};
+	end
+	AuctionBids[playerName][eventTime] = {
+		signature = auctionSignature,
+		bidAmount = bidamount,
+		itemOwner = aiOwner,
+		prevBidder = aiHighBidder,
+		itemWon = false;
+	}
+		
     if bidamount == aiBuyout then -- only capture buyouts
-        local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyout), aiUniqID);
-        
         -- remove from snapshot
         Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_REMOVE, auctionSignature));
 		local auctKey = sanifyAHSnapshot();
         AHSnapshot[auctKey][auctionSignature] = nil;
+		AuctionBids[playerName][eventTime].itemWon=true;
     end    
 
     Auctioneer_Old_BidHandler(itemtype,itemindex,bidamount);
