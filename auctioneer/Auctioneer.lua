@@ -60,6 +60,9 @@ local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% default
 -- the minimum profit/price percent that an auction needs to be displayed as a resellable auction
 local MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
 
+-- the minimum percent of bids placed on an item to be considered an "in-demand" enough item to be traded, this is only applied to Weapons and Armor and Recipies
+local MIN_BID_PERCENT = 10;
+
 
 --[[ SavedVariables --]]
 AuctionConfig = {};        --Table that stores config settings
@@ -304,6 +307,10 @@ local function breakLink(link)
 	return tonumber(itemID), tonumber(randomProp), tonumber(enchant), tonumber(uniqID), name;
 end
 
+local function breakItemKey(itemKey)
+	local i,j, itemID, randomProp, enchant = string.find(itemKey, "(%d+):(%d+):(%d+)");
+	return tonumber(itemID), tonumber(randomProp), tonumber(enchant);
+end
 
 -- returns an AuctionPrices item from the table based on an item name
 local function getAuctionPriceItem(itemKey, from, name, id)
@@ -363,6 +370,16 @@ local function getItemSignature(sigData)
 	return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
 end
 
+-- returns the category i.e. "Weapon", "Armor" for an item
+local function getItemCategory(itemKey)
+    local category;
+    local auctionItem = getAuctionPriceItem(itemKey);
+    if auctionItem then 
+        category = auctionItem.category;
+    end
+    return category;
+end
+
 -- returns the current snapshot median for an item
 function getItemSnapshotMedianBuyout(itemKey)
     local buyoutPrices = {};
@@ -409,8 +426,7 @@ function getUsableMedian(itemKey, name)
 end
 
 -- returns true if they link is likely a player made item
-local function isPossiblePlayerMadeItem(link)
-    local itemID, randomProp, enchant, uniqID = breakLink(link);
+local function isPossiblePlayerMadeItem(randomProp, uniqID)
     if randomProp == 0 and uniqID > 0 then
         return true;
     end
@@ -443,19 +459,15 @@ local function isBadResaleChoice(auctionSignature)
 	local itemKey = id..":"..rprop..":"..enchant;
 	local auctKey = sanifyAHSnapshot();
     local auctionItem = AHSnapshot[auctKey][auctionSignature];
+    local itemData = getAuctionPriceData(itemKey);
+    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);    
+    local bidPercent = math.floor(bidCount / minCount * 100);
         
     -- bad choice conditions
-    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON) then -- level 50 and greater greens do not sell well
+    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then -- level 50 and greater greens do not sell well
         isBadChoice = true;    
-    elseif isItemRecipe(name) then -- filter out bad recipie choices
-        local itemData = getAuctionPriceData(itemKey);
-        local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);    
-        local bidPercent = math.floor(bidCount / minCount * 100);
-                
-        -- filter out recipies that have less than 10% bid rate
-        if bidPercent < 10 then
-            isBadChoice = true;
-        end
+    elseif isItemRecipe(name) and bidPercent < MIN_BID_PERCENT then -- filter out bad recipie choices                
+        isBadChoice = true;
     elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then -- don't display auctions that we own, or are high bidder on
         isBadChoice = true;
     elseif auctionItem.quality == QUALITY_POOR then -- gray items are never a good choice
@@ -472,7 +484,7 @@ local function brokerFilter(minProfit, signature)
 	local itemKey = id..":"..rprop..":"..enchant;
         
     if getUsableMedian(itemKey) then -- we have a useable median
-        local hsp = getHighestSellablePriceForOne(itemKey, true);
+        local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
         local profit = (hsp * count) - buyout;
         local profitPricePercent = math.floor((profit / buyout) * 100);
 
@@ -494,7 +506,7 @@ local function bidBrokerFilter(minProfit, signature)
     
     if getUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
         local currentBid = getCurrentBid(signature);
-        local hsp = getHighestSellablePriceForOne(itemKey, true);
+        local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
         local profit = (hsp * count) - currentBid;
         local profitPricePercent = math.floor((profit / currentBid) * 100);
         
@@ -575,8 +587,8 @@ local function profitComparisonSort(a, b)
         local bid,brprop,benchant, bName, bCount, _, bBuyout, _ = getItemSignature(b.signature);
 		local aItemKey = aid .. ":" .. arprop..":"..aenchant;
 		local bItemKey = bid .. ":" .. brprop..":"..benchant;
-        local aProfit = (getHighestSellablePriceForOne(aItemKey, true) * aCount) - aBuyout;    
-        local bProfit = (getHighestSellablePriceForOne(bItemKey, true) * bCount) - bBuyout;            
+        local aProfit = (getHighestSellablePriceForOne(aItemKey, true, AHSnapshot[sanifyAHSnapshot()][a.signature].category) * aCount) - aBuyout;    
+        local bProfit = (getHighestSellablePriceForOne(bItemKey, true, AHSnapshot[sanifyAHSnapshot()][b.signature].category) * bCount) - bBuyout;            
         return (aProfit > bProfit) 
 end
         
@@ -596,7 +608,7 @@ function doBroker(minProfit)
     for _,a in resellableAuctions do
         local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature); 
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-        local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true);
+        local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, a.category);
         local profit = (hsp * count) - buyout;
 		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit));
         Auctioneer_ChatPrint(output);
@@ -619,7 +631,7 @@ function doBidBroker(minProfit)
     for _,a in bidWorthyAuctions do
         local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature); 
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-        local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true);
+        local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, a.category);
         local currentBid = getCurrentBid(a.signature);
         local profit = (hsp * count) - currentBid;
 
@@ -712,7 +724,7 @@ end
 -- if the item does not exist in the snapshot or the snapshot does not exist
 -- a nil is returned.
 function findLowestAuctionForItem(itemKey)
-	local i,j, itemID, itemRand = string.find(itemKey, "(%d+):(%d+):%d+");
+	local itemID, itemRand, enchant = breakItemKey(itemKey);
 	if (itemID == nil) then return nil; end
 	
     local lowSig = nil;
@@ -756,12 +768,42 @@ function doMedian(link)
     end    
 end
 
-function getHighestSellablePriceForOne(itemKey, useCachedPrices)
+local function getBidBasedSellablePrice(itemKey)
+    local itemData = getAuctionPriceData(itemKey);
+    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);      
+    local bidBasedSellPrice = 0;
+    local typicalBuyout = 0;
+    local aveBuyout = 0;
+    local aveBid = 0;
+    if buyCount > 0 then
+        aveBuyout = (buyPrice / buyCount);
+    end
+    if bidCount > 0 then
+        aveBid = (bidPrice / bidCount);
+    end
+    
+    local medianBuyout = getUsableMedian(itemKey)
+    if medianBuyout then
+        typicalBuyout = math.min(aveBuyout, medianBuyout)        
+    else
+        typicalBuyout = aveBuyout
+    end
+    
+    bidBasedSellPrice = (typicalBuyout + aveBid) / 2;
+    
+    return bidBasedSellPrice;
+end
+
+function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
+    if not category then category = "" end
+    local bidBasedCategories = {Weapon=1, Armor=1, Recipe=1, Miscellaneous=1};
     local highestSellablePrice = 0;
-    local lowestAllowedPercentBelowMedian = 30;
+    local marketPrice = 0;
+    local lowestAllowedPercentBelowMarket = 30;
     local discountLowPercent = 5;
-    local discountMedianPercent = 15;
-    local median, count = getUsableMedian(itemKey);
+    local discountMarketPercent = 15;
+    local buyoutMedian, count = getUsableMedian(itemKey);
+    
     
     local currentLowestBuyout = nil;
     local lowestAuctionSignature = nil;
@@ -776,32 +818,45 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices)
 --~ p("currentLowestBuyout: "..currentLowestBuyout);           
         end
     end
+
+    if bidBasedCategories[category] then
+--~ p("bid based");    
+        marketPrice = getBidBasedSellablePrice(itemKey)
+    else
+--~ p("buyout based");    
+        marketPrice = buyoutMedian;
+    end
   
-    if median then
+    if marketPrice and marketPrice > 0 then
         if currentLowestBuyout then
-            lowestBuyoutPriceAllowed = subtractPercent(median, lowestAllowedPercentBelowMedian);
+            lowestBuyoutPriceAllowed = subtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
 			local auctKey = sanifyAHSnapshot();
             if lowestAuctionSignature and AHSnapshot[auctKey][lowestAuctionSignature].owner == UnitName("player") then
                 highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
-            elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > median) then
-                -- set highest price to "Discount median"
---~ p("Discount median case 1");                 
-                highestSellablePrice = subtractPercent(median, discountMedianPercent);
+            elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > marketPrice) then
+                -- set highest price to "Discount market"
+--~ p("Discount market case 1");                 
+                highestSellablePrice = subtractPercent(marketPrice, discountMarketPercent);
             else -- use discount low
                 -- set highest price to "Discount low"
 --~ p("Discount low case 1");                
                 highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
             end
-        else -- no low buyout, use discount median
-            -- set highest price to "Discount median"
---~ p("Discount median case 2");            
-            highestSellablePrice = subtractPercent(median, discountMedianPercent);            
+        else -- no low buyout, use discount market
+            -- set highest price to "Discount market"
+--~ p("Discount market case 2");            
+            highestSellablePrice = subtractPercent(marketPrice, discountMarketPercent);            
         end
-    else -- no median
+    else -- no market
         if currentLowestBuyout then
             -- set highest price to "Discount low"
 --~ p("Discount low case 2");            
             highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
+--~         elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
+--~ p("vendor price");           
+--~             -- use vendor prices if no auction data available
+--~             local itemInfo = Auctioneer_BasePrices[id];
+--~             local vendorSell = nullSafe(itemInfo.s); -- use vendor prices
         end
     end
     
@@ -828,9 +883,14 @@ end
 local function doHSP(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
-
-    local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false);
+    local category = getItemCategory(itemKey);
+p(category);    
+    local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, category);
     Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice))));
+end
+
+local function doTest(param)
+    p(getBidBasedSellablePrice(param));
 end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
@@ -937,7 +997,7 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
         if (nullSafe(aiBuyoutPrice) > 0) then
             newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
         end        
-        AuctionPrices[auctionKey()][aiKey] = {name=aiName, data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
+        AuctionPrices[auctionKey()][aiKey] = {name=aiName, category=category, data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
         
         -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
@@ -1355,7 +1415,7 @@ function Auctioneer_Command(command)
     elseif (cmd == AUCT_CMD_SCAN) then
         Auctioneer_RequestAuctionScan();           
     elseif (cmd == "test") then
-        doTest();
+        doTest(param);
     elseif (cmd == "low") then
         doLow(param);   
     elseif (cmd == "med") then
