@@ -63,6 +63,9 @@ local MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
 -- the minimum percent of bids placed on an item to be considered an "in-demand" enough item to be traded, this is only applied to Weapons and Armor and Recipies
 local MIN_BID_PERCENT = 10;
 
+-- categories that the brokers and HSP look at the bid data for
+local BID_BASED_CATEGORIES = {Weapon=1, Armor=1, Recipe=1, Miscellaneous=1};
+
 
 --[[ SavedVariables --]]
 AuctionBids = {};          --Table that stores all your bids
@@ -468,12 +471,14 @@ local function isBadResaleChoice(auctionSignature)
     local bidPercent = math.floor(bidCount / minCount * 100);
         
     -- bad choice conditions
-    if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then -- level 50 and greater greens do not sell well
-        isBadChoice = true;    
-    elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then -- don't display auctions that we own, or are high bidder on
-        isBadChoice = true;
-    elseif auctionItem.quality == QUALITY_POOR then -- gray items are never a good choice
-        isBadChoice = true;
+    if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
+        isBadChoice = true; -- bidbased items should have a minimum bid percent
+    elseif (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
+        isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
+    elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
+        isBadChoice = true; -- don't display auctions that we own, or are high bidder on
+    elseif auctionItem.quality == QUALITY_POOR then 
+        isBadChoice = true; -- gray items are never a good choice
     end
     
     return isBadChoice;
@@ -798,7 +803,6 @@ end
 
 function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     if not category then category = "" end
-    local bidBasedCategories = {Weapon=1, Armor=1, Recipe=1, Miscellaneous=1};
     local highestSellablePrice = 0;
     local marketPrice = 0;
     local lowestAllowedPercentBelowMarket = 30;
@@ -821,7 +825,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
         end
     end
 
-    if bidBasedCategories[category] and not getItemPlayerMade(itemKey) then
+    if BID_BASED_CATEGORIES[category] and not getItemPlayerMade(itemKey) then
 --~ p("bid based");    
         marketPrice = getBidBasedSellablePrice(itemKey)
     else
@@ -886,8 +890,7 @@ end
 local function doHSP(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
-    local category = getItemCategory(itemKey);
-p(category);    
+    local category = getItemCategory(itemKey); 
     local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, category);
     Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
@@ -1568,7 +1571,7 @@ function Auctioneer_OnEvent(event)
 				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
 				
 				-- get highest sellable price for buyout
-				local hsp = getHighestSellablePriceForOne(itemKey, false);
+				local hsp = getHighestSellablePriceForOne(itemKey, false, getItemCategory(itemKey));
 				if hsp == 0 and buyCount > 0 then
 					hsp =  math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
@@ -1579,12 +1582,8 @@ function Auctioneer_OnEvent(event)
 					minbid = math.floor(minPrice / minCount);
 				end
 				
-				startPrice = roundDownTo95(minbid * count);
 				buyoutPrice = roundDownTo95(nullSafe(hsp) * count);
-				
-				if startPrice > buyoutPrice then
-					startPrice = roundDownTo95(subtractPercent(buyoutPrice, 15)); -- 15% less than buyout
-				end
+				startPrice = roundDownTo95(subtractPercent(buyoutPrice, 20)); -- 15% less than buyout
 				
 				if buyoutPrice > 0 and startPrice > 0 then
 					MoneyInputFrame_SetCopper(StartPrice, startPrice);
