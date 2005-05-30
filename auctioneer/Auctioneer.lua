@@ -43,7 +43,7 @@ local lSnapshotItemPrices = {};
 local lMaxBuyoutHistorySize = 35;
 
 -- min median buyout price for an item to show up in the list of items below median
-local MIN_PROFIT_MARGIN = 8000;
+local MIN_PROFIT_MARGIN = 5000;
 
 -- min median buyout price for an item to show up in the list of items below median
 local DEFAULT_COMPETE_LESS = 5;
@@ -55,7 +55,7 @@ local MIN_BUYOUT_SEEN_COUNT = 5;
 local MAX_BUYOUT_PRICE = 800000;
 
 -- the default percent less, only find auctions that are at a minimum this percent less than the median
-local MIN_PERCENT_LESS_THAN_MEDIAN = 60; -- 60% default
+local MIN_PERCENT_LESS_THAN_HSP = 60; -- 60% default
 
 -- the minimum profit/price percent that an auction needs to be displayed as a resellable auction
 local MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
@@ -556,13 +556,13 @@ local function percentLessFilter(percentLess, signature)
     local filterAuction = true;
     local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-    local median = getUsableMedian(itemKey);
+    local category = AHSnapshot[sanifyAHSnapshot()][signature].category;
+    local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, category);
 
-    if median then
-        local profit = (median * count) - buyout;
-        
+    if hsp > 0 and nullSafe(seenCount) > 0 then
+        local profit = (hsp * count) - buyout;
         --see if this auction should not be filtered
-        if (buyout > 0 and percentLessThan(median, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then                        
+        if (buyout > 0 and percentLessThan(hsp, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then                        
             filterAuction = false;
         end
     end      
@@ -642,11 +642,11 @@ function doBidBroker(minProfit)
         local currentBid = getCurrentBid(a.signature);
         local profit = (hsp * count) - currentBid;
 
-		local bidText = Auctioneer_GetTextGSC(currentBid);
+		local bidText = AUCT_FRMT_BIDBROKER_CURBID;
 		if (currentBid == min) then
-			bidText = "none ("..bidText.." min)";
+			bidText = AUCT_FRMT_BIDBROKER_MINBID;
 		end
-		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), bidText, Auctioneer_GetTextGSC(profit), colorTextWhite(getTimeLeftString(a.timeLeft)));
+		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), bidText, Auctioneer_GetTextGSC(currentBid), Auctioneer_GetTextGSC(profit), colorTextWhite(getTimeLeftString(a.timeLeft)));
 		Auctioneer_ChatPrint(output);
     end
     
@@ -705,22 +705,23 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function doPercentLess(percentLess)    
-    if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_MEDIAN end
+    if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
 	local output = string.format(AUCT_FRMT_PCTLESS_HEADER, percentLess);
     Auctioneer_ChatPrint(output);
     
-    local auctionsBelowMedian = querySnapshot(percentLessFilter, percentLess);
+    local auctionsBelowHSP = querySnapshot(percentLessFilter, percentLess);
     
     -- sort by profit based on median
-    table.sort(auctionsBelowMedian, profitComparisonSort);
+    table.sort(auctionsBelowHSP, profitComparisonSort);
     
     -- output the list of auctions
-    for _,a in auctionsBelowMedian do
+    for _,a in auctionsBelowHSP do
         local id,rprop,enchant, name, count,_,buyout,_ = getItemSignature(a.signature);         
 		local itemKey = id ..":"..rprop..":"..enchant;
-        local median, seenCount = getUsableMedian(itemKey);
-        local profit = (median * count) - buyout;
-		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(median * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(median, buyout / count).."%"));
+        local category = AHSnapshot[sanifyAHSnapshot()][a.signature].category;
+        local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, category);         
+		local profit = (hsp * count) - buyout;
+ 		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(hsp, buyout / count).."%"));
         Auctioneer_ChatPrint(output);
     end
     
