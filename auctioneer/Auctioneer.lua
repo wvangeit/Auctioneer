@@ -1295,7 +1295,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
     local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyout), aiUniqID);
 
 	local playerName = UnitName("player");
-	local eventTime = time();
+	local eventTime = "e"..time();
 	if (not AuctionBids[playerName]) then
 		AuctionBids[playerName] = {};
 	end
