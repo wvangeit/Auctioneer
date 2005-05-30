@@ -49,7 +49,7 @@ local MIN_PROFIT_MARGIN = 8000;
 local DEFAULT_COMPETE_LESS = 5;
 
 -- min times an item must be seen before it can show up in the list of items below median
-local MIN_BUYOUT_SEEN_COUNT = 7;
+local MIN_BUYOUT_SEEN_COUNT = 5;
 
 -- max buyout price for an auction to display as a good deal item
 local MAX_BUYOUT_PRICE = 800000;
