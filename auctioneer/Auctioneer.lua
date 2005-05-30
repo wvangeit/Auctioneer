@@ -381,6 +381,16 @@ local function getItemCategory(itemKey)
     return category;
 end
 
+
+local function getItemPlayerMade(itemKey)
+    local playerMade;
+    local auctionItem = getAuctionPriceItem(itemKey);
+    if auctionItem then 
+        playerMade = auctionItem.playerMade;
+    end
+    return playerMade;
+end
+
 -- returns the current snapshot median for an item
 function getItemSnapshotMedianBuyout(itemKey)
     local buyoutPrices = {};
@@ -427,7 +437,8 @@ function getUsableMedian(itemKey, name)
 end
 
 -- returns true if they link is likely a player made item
-local function isPossiblePlayerMadeItem(randomProp, uniqID)
+local function isPossiblePlayerMadeItem(link)
+    local itemID, randomProp, enchant, uniqID = breakLink(link);
     if randomProp == 0 and uniqID > 0 then
         return true;
     end
@@ -820,14 +831,15 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
         end
     end
 
-    if bidBasedCategories[category] then
+    if bidBasedCategories[category] and not getItemPlayerMade(itemKey) then
 --~ p("bid based");    
         marketPrice = getBidBasedSellablePrice(itemKey)
     else
 --~ p("buyout based");    
         marketPrice = buyoutMedian;
     end
-  
+--~ p("marketPrice: ", marketPrice);  
+
     if marketPrice and marketPrice > 0 then
         if currentLowestBuyout then
             lowestBuyoutPriceAllowed = subtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
@@ -998,11 +1010,10 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
         if (nullSafe(aiBuyoutPrice) > 0) then
             newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
         end        
-        AuctionPrices[auctionKey()][aiKey] = {name=aiName, category=category, data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
+        AuctionPrices[auctionKey()][aiKey] = {name=aiName, category=category, playerMade=isPossiblePlayerMadeItem(aiLink), data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
         
         -- finaly add the auction to the snapshot
         if (aiOwner == nil) then aiOwner = "unknown"; end
-        local aiLink = GetAuctionItemLink("list", index);
         local initialTimeSeen = time();
         AHSnapshot[auctKey][lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), highBidder=aiHighBidder, owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), category=category, dirty=0};
     else
