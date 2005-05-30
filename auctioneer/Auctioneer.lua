@@ -445,14 +445,6 @@ local function isPossiblePlayerMadeItem(link)
     return false;
 end
 
--- returns if an item is a recipe type
-local function isItemRecipe(itemName) 
-    local isRecipe = false;
-	for itemPos, itemMatch in AUCT_RECIPE_PREFIXES do
-		if (string.find(itemName, itemMatch)) then return true; end
-	end
-    return false;
-end
 
 -- returns the current bid on an auction
 local function getCurrentBid(auctionSignature)
@@ -478,8 +470,6 @@ local function isBadResaleChoice(auctionSignature)
     -- bad choice conditions
     if (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then -- level 50 and greater greens do not sell well
         isBadChoice = true;    
-    elseif isItemRecipe(name) and bidPercent < MIN_BID_PERCENT then -- filter out bad recipie choices                
-        isBadChoice = true;
     elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then -- don't display auctions that we own, or are high bidder on
         isBadChoice = true;
     elseif auctionItem.quality == QUALITY_POOR then -- gray items are never a good choice
