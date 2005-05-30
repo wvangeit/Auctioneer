@@ -809,6 +809,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     local discountLowPercent = 5;
     local discountMarketPercent = 15;
     local buyoutMedian, count = getUsableMedian(itemKey);
+    local id = breakItemKey(itemKey);
     
     
     local currentLowestBuyout = nil;
@@ -859,11 +860,12 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
             -- set highest price to "Discount low"
 --~ p("Discount low case 2");            
             highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
---~         elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
---~ p("vendor price");           
---~             -- use vendor prices if no auction data available
---~             local itemInfo = Auctioneer_BasePrices[id];
---~             local vendorSell = nullSafe(itemInfo.s); -- use vendor prices
+        elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
+            -- use vendor prices if no auction data available
+--~ p("vendor sell price");                    
+            local itemInfo = Auctioneer_BasePrices[id];
+            local vendorSell = nullSafe(itemInfo.s); -- use vendor prices
+            highestSellablePrice = vendorSell * 3;               
         end
     end
     
@@ -1575,31 +1577,12 @@ function Auctioneer_OnEvent(event)
 				if hsp == 0 and buyCount > 0 then
 					hsp =  math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
-				
-				-- calculate average min for start price
-				local minbid = 0
-				if minCount > 0 then 
-					minbid = math.floor(minPrice / minCount);
-				end
-				
+								
 				buyoutPrice = roundDownTo95(nullSafe(hsp) * count);
 				startPrice = roundDownTo95(subtractPercent(buyoutPrice, 20)); -- 15% less than buyout
 				
-				if buyoutPrice > 0 and startPrice > 0 then
-					MoneyInputFrame_SetCopper(StartPrice, startPrice);
-					MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
-				elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
-					-- use vendor prices if no auction data available
-					local itemInfo = Auctioneer_BasePrices[id];
-					local vendorSell = nullSafe(itemInfo.s);
-					startPrice = roundDownTo95((vendorSell * count) * 1.5);
-					buyoutPrice = roundDownTo95((vendorSell * count) * 3);
-					if startPrice > buyoutPrice then
-						startPrice = roundDownTo95(subtractPercent(buyoutPrice, 15)); -- 15% less than buyout
-					end                
-					MoneyInputFrame_SetCopper(StartPrice, startPrice);
-					MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);
-				end
+                MoneyInputFrame_SetCopper(StartPrice, startPrice);
+                MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);				
 			end
         end
     elseif (event=="AUCTION_HOUSE_SHOW") then
