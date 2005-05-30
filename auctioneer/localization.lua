@@ -50,11 +50,13 @@ AUCT_FRMT_BROKER_LINE = "%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
 AUCT_FRMT_BROKER_DONE = "Brokering done";
 
 AUCT_FRMT_BIDBROKER_HEADER = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
-AUCT_FRMT_BIDBROKER_LINE = "%s, Last %s seen, HSP: %s, CurrentBid: %s, Prof: %s, Time: %s";
+AUCT_FRMT_BIDBROKER_MINBID = "minBid"
+AUCT_FRMT_BIDBROKER_CURBID = "currentBid"
+AUCT_FRMT_BIDBROKER_LINE = "%s, Last %s seen, HSP: %s, %s: %s, Prof: %s, Time: %s";
 AUCT_FRMT_BIDBROKER_DONE = "Bid brokering done";
 
-AUCT_FRMT_PCTLESS_HEADER = "Percent Less than median: %d%%";
-AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, Median: %s, BO: %s, Prof: %s, Less %s";
+AUCT_FRMT_PCTLESS_HEADER = "Percent Less than Highest Sellable Price (HSP): %d%%";
+AUCT_FRMT_PCTLESS_LINE = "%s, Last %d seen, HSP: %s, BO: %s, Prof: %s, Less %s";
 AUCT_FRMT_PCTLESS_DONE = "Percent less done.";
 
 AUCT_FRMT_COMPETE_HEADER = "Competing auctions at least %s less per item.";
