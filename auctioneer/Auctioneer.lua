@@ -339,14 +339,12 @@ end
 -- wrapper for getting AuctionPrices data that is backward compatible with old AuctionPrices keys
 local function getAuctionPriceData(itemKey, from, name, id)
 	local auctionItem = getAuctionPriceItem(itemKey, from, name, id);
-	if (auctionItem == nil) or (auctionItem.data == nil) then 
-		link = "0:0:0:0:0:0:0";
-    else
-        link = auctionItem.data;
+    local data = "0:0:0:0:0:0:0";
+	if auctionItem and auctionItem.data then 
+        data = auctionItem.data;
 	end
-	return link;
+	return data;
 end
-
 
 
 -- returns the auction buyout history for this item
@@ -392,6 +390,32 @@ local function getItemPlayerMade(itemKey)
         playerMade = auctionItem.playerMade;
     end
     return playerMade;
+end
+
+-- return all of the averages for an item
+-- Returns: avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount
+local function getMeans(itemKey, from, name, id)
+    local itemData = getAuctionPriceData(itemKey, from, name, id);
+    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+    local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty;
+    
+    if aCount > 0 then
+        avgQty = math.floor(minCount / aCount);        
+        avgMin = math.floor(minPrice / minCount);   
+        bidPct = math.floor(bidCount / minCount * 100);
+        buyPct = math.floor(buyCount / minCount * 100);
+        
+        avgBid = 0;
+        if (bidCount > 0) then
+            avgBid = math.floor(bidPrice / bidCount);
+        end
+        
+        avgBuy = 0;
+        if (buyCount > 0) then
+            avgBuy = math.floor(buyPrice / buyCount);
+        end
+    end
+    return avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount;
 end
 
 -- returns the current snapshot median for an item
@@ -778,26 +802,18 @@ end
 
 local function getBidBasedSellablePrice(itemKey)
     local itemData = getAuctionPriceData(itemKey);
-    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);      
+    local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = getMeans(itemKey);     
     local bidBasedSellPrice = 0;
     local typicalBuyout = 0;
-    local aveBuyout = 0;
-    local aveBid = 0;
-    if buyCount > 0 then
-        aveBuyout = (buyPrice / buyCount);
-    end
-    if bidCount > 0 then
-        aveBid = (bidPrice / bidCount);
-    end
     
-    local medianBuyout = getUsableMedian(itemKey)
+    local medianBuyout = getUsableMedian(itemKey);
     if medianBuyout then
-        typicalBuyout = math.min(aveBuyout, medianBuyout)        
+        typicalBuyout = math.min(avgBuy, medianBuyout)  ;      
     else
-        typicalBuyout = aveBuyout
+        typicalBuyout = avgBuy;
     end
     
-    bidBasedSellPrice = (typicalBuyout + aveBid) / 2;
+    bidBasedSellPrice = (typicalBuyout + avgBid) / 2;
     
     return bidBasedSellPrice;
 end
@@ -806,13 +822,15 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     if not category then category = "" end
     local highestSellablePrice = 0;
     local marketPrice = 0;
+    local commonBuyout = 0;
     local lowestAllowedPercentBelowMarket = 30;
     local discountLowPercent = 5;
     local discountMarketPercent = 15;
     local buyoutMedian, count = getUsableMedian(itemKey);
+    local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,meanCount = getMeans(itemKey);     
     local id = breakItemKey(itemKey);
     
-    
+    -- get the lowest auction for this item
     local currentLowestBuyout = nil;
     local lowestAuctionSignature = nil;
     local lowestAuctionCount, lowestAuctionBuyout;         
@@ -825,14 +843,22 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
             currentLowestBuyout = lowestAuctionBuyout / lowestAuctionCount;
 --~ p("currentLowestBuyout: "..currentLowestBuyout);           
         end
+    end    
+    
+    -- assign the best common buyout
+    if buyoutMedian then
+        commonBuyout = buyoutMedian;
+    elseif meanCount > 0 then  
+        commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
     end
-
+    
+    -- assign the best market price
     if BID_BASED_CATEGORIES[category] and not getItemPlayerMade(itemKey) then
 --~ p("bid based");    
         marketPrice = getBidBasedSellablePrice(itemKey)
     else
 --~ p("buyout based");    
-        marketPrice = buyoutMedian;
+        marketPrice = commonBuyout;
     end
 --~ p("marketPrice: ", marketPrice);  
 
@@ -1120,7 +1146,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 					if (count > 1) then
                         local buyoutPriceForOne = median;
                         if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
-                        if (avgMin > buyoutPriceForOne) then aveMin = buyoutPriceForOne / 2 end
+                        if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+                        if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
 						TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)));
 						TT_LineColor(0.5,0.5,0.8);
 					end
