@@ -851,7 +851,6 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     elseif meanCount > 0 then  
         commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
     end
-p(commonBuyout)    
     
     -- assign the best market price
     if BID_BASED_CATEGORIES[category] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
