@@ -9,6 +9,8 @@
 if (TOOLTIPS_INCLUDED == nil) then
 TOOLTIPS_INCLUDED = true;
 
+TT_CurrentTip = nil;
+
 function TT_OnLoad()
         if (TT_LOADED ~= nil) then 
                 return; 
@@ -51,6 +53,11 @@ function TT_OnLoad()
 end
 
 function TT_Show(currentTooltip)
+	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) then
+		currentTooltip:Show();
+		return;
+	end
+
 	local height = 20;
 	local width = EnhancedTooltip.minWidth;
 	local lineCount = EnhancedTooltip.lineCount;
@@ -149,6 +156,15 @@ end
 
 TT_MoneySpacing = 4;
 function TT_AddLine(lineText, moneyAmount)
+	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) and (TT_CurrentTip) then
+		if (moneyAmount) then
+			TT_CurrentTip:AddLine(lineText .. ": " .. Auctioneer_GetTextGSC(moneyAmount));
+		else
+			TT_CurrentTip:AddLine(lineText);
+		end
+		return;
+	end
+
 	local curLine = EnhancedTooltip.lineCount + 1;
 	local line = getglobal("EnhancedTooltipText"..curLine);
 	line:SetText(lineText);
@@ -174,6 +190,11 @@ function TT_AddLine(lineText, moneyAmount)
 end
 
 function TT_LineColor(r, g, b)
+	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) and (TT_CurrentTip) then
+		local lastLine = getglobal(TT_CurrentTip:GetName().."TextLeft"..TT_CurrentTip:NumLines());
+		lastLine:SetTextColor(r,g,b);
+		return;
+	end
 	local curLine = EnhancedTooltip.lineCount;
 	if (curLine == 0) then return; end
 	local line = getglobal("EnhancedTooltipText"..curLine);
@@ -222,7 +243,7 @@ function TT_SetModel(class, file)
 	if (class == "Weapon") then
 		local typ = strsub(file, 0, 3);
 		if (typ == "Axe") then scale = 0.8; pos = 0.9; end
-		if (typ == "Bow") then scale = 1.0; pos = 0.2; end
+		if (typ == "Bow") then scale = 1.0; pos = 0.5; end
 		if (typ == "Clu") then scale = 0.9; pos = 0.8; end
 		if (typ == "Fir") then scale = 0.8; pos = 1.0; end
 		if (typ == "Gla") then scale = 1.0; end
@@ -239,11 +260,15 @@ function TT_SetModel(class, file)
 		if (typ == "Wan") then scale = 1.8; end
 	end
 --	p("Setting model: ", class, file);
-	EnhancedTooltipPreview:SetModel("Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx");
+	local model = "Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx";
+	EnhancedTooltipPreview:SetModel(model);
 	EnhancedTooltipPreview:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 0.9, 0.6, 0.25, 0.8, 0.25, 0.6, 0.9);
 	EnhancedTooltipPreview:SetPosition(pos, -0.1, 0);
-	EnhancedTooltipPreview:SetRotation(1.5);
 	EnhancedTooltipPreview:SetScale(scale);
+	if (EnhancedTooltipPreview.model ~= model) then
+		EnhancedTooltipPreview.model = model;
+		EnhancedTooltipPreview:SetRotation(1.5);
+	end
 	EnhancedTooltipPreview:Show();
 end
 
@@ -279,6 +304,11 @@ local function  qualityFromLink(link)
 	return -1;
 end
 
+function TT_TooltipCall(frame, name, link, quality, count, price)
+	TT_CurrentTip = frame;
+	TT_AddTooltip(frame, name, link, quality, count, price);
+end
+
 function TT_AddTooltip(frame, name, link, quality, count, price)
 	-- Empty function; hook here if you want in on the action!
 end
@@ -293,7 +323,7 @@ function TT_Chat_OnHyperlinkShow(link)
 			TT_ChatCurrentItem = name;
 			
 			TT_Clear();
-			TT_AddTooltip(ItemRefTooltip, name, fabricatedLink, -1, 1);
+			TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1);
 			TT_Show(ItemRefTooltip);
 		end
 	end
@@ -308,7 +338,7 @@ function TT_AuctionFrameItem_OnEnter(type, index)
                 if( name ) then
                         local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
 						TT_Clear();
-                        TT_AddTooltip(GameTooltip, name, link, aiQuality, aiCount);
+                        TT_TooltipCall(GameTooltip, name, link, aiQuality, aiCount);
 						TT_Show(GameTooltip);
                 end
         end
@@ -327,7 +357,7 @@ function TT_ContainerFrameItemButton_OnEnter()
 		if (quality == nil) then quality = qualityFromLink(link); end
 
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
+		TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
 		TT_Show(GameTooltip);
 	end
 end
@@ -350,7 +380,7 @@ function TT_ContainerFrame_Update(frame)
 				if (quality == nil) then quality = qualityFromLink(link); end
 
 				TT_Clear()
-				TT_AddTooltip(GameTooltip, name, link, quality, itemCount);
+				TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
 				TT_Show(GameTooltip);
 			end
 		end
@@ -367,7 +397,7 @@ function TT_GameTooltip_SetLootItem(this, slot)
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
 		TT_Clear()
-		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
 end
@@ -378,7 +408,7 @@ function TT_GameTooltip_SetQuestItem(this, qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
 end
@@ -392,7 +422,7 @@ function TT_GameTooltip_SetQuestLogItem(this, qtype, slot)
 		quality = qualityFromLink(link); -- I don't trust the quality returned from the above function.
 
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
 end
@@ -407,7 +437,7 @@ function TT_GameTooltip_SetInventoryItem(this, unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link); end
 
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, link, quality, quantity);
+		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
 
@@ -421,7 +451,7 @@ function TT_GameTooltip_SetMerchantItem(this, slot)
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot);
 		local quality = qualityFromLink(link);
 		TT_Clear();
-		TT_AddTooltip(GameTooltip, name, link, quality, quantity, price);
+		TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
 		TT_Show(GameTooltip);
 	end
 end

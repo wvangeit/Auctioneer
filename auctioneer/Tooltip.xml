@@ -367,9 +367,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						this.rps = 0.1;
 						this.rotation = 1.5;
 					</OnLoad>
-					<OnHide>
-						this.rotation = 1.5;
-					</OnHide>
 					<OnUpdate>
 						if (this:IsVisible()) then
 							this.rotation = this.rotation + (arg1 * 2 * PI * this.rps);

@@ -339,9 +339,13 @@ end
 -- wrapper for getting AuctionPrices data that is backward compatible with old AuctionPrices keys
 local function getAuctionPriceData(itemKey, from, name, id)
 	local auctionItem = getAuctionPriceItem(itemKey, from, name, id);
-    local data = "0:0:0:0:0:0:0";
-	if auctionItem and auctionItem.data then 
-        data = auctionItem.data;
+	local data = "0:0:0:0:0:0:0";
+	if (auctionItem ~= nil) then
+		if (type(auctionItem) == "table") and (auctionItem.data ~= nil) then 
+			data = auctionItem.data;
+		elseif (type(auctionItem) == "string") then
+			data = auctionItem;
+		end
 	end
 	return data;
 end
@@ -1050,6 +1054,9 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
 end
 
 function Auctioneer_SetModelByID(itemID)
+	if ( (not Auctioneer_GetFilter(AUCT_SHOW_MESH)) or (Auctioneer_GetFilter(AUCT_CMD_EMBED)) ) then
+		return;
+	end
 	if (Auctioneer_BasePrices[itemID]) then
 		local dinfo = Auctioneer_BasePrices[itemID].d;
 		if (dinfo) then
@@ -1077,8 +1084,12 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	local itemID, randomProp, enchant, uniqID, lame = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 	if (Auctioneer_GetFilter("all")) then
-		TT_AddLine(name);
-		TT_LineQuality(quality);
+		if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) then
+			TT_AddLine(" ");
+		else
+			TT_AddLine(name);
+			TT_LineQuality(quality);
+		end
 
 		if (Auctioneer_GetFilter(AUCT_SHOW_LINK)) then
 			TT_AddLine("Link: " .. itemKey .. ":" .. uniqID);
@@ -1099,7 +1110,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			itemInfo = Auctioneer_BasePrices[itemID];
 
 			if (aCount == 0) then
-				TT_AddLine("Never seen at auction");
+				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, "auction"));
 				TT_LineColor(0.5, 0.8, 0.5);
 			else
 				local avgQty = math.floor(minCount / aCount);
@@ -1159,7 +1170,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			end
             
 			local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
-			if (also ~= "on") then
+			if (also ~= "on") and (also ~= "off") then
 				if (also == "opposite") then
 					also = oppositeKey();
 				end
@@ -1398,6 +1409,9 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR_BUY, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR_BUY), AUCT_HELP_VENDOR_BUY));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_USAGE, Auctioneer_GetFilterVal(AUCT_SHOW_USAGE), AUCT_HELP_USAGE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STACK, Auctioneer_GetFilterVal(AUCT_SHOW_STACK), AUCT_HELP_STACK));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_LINK, Auctioneer_GetFilterVal(AUCT_SHOW_LINK), AUCT_HELP_LINK));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
 
 		lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_CLEAR, AUCT_OPT_CLEAR, AUCT_HELP_CLEAR));
@@ -1483,6 +1497,7 @@ function Auctioneer_Command(command)
 		(cmd == AUCT_SHOW_VENDOR_BUY) or 
 		(cmd == AUCT_SHOW_MESH) or 
 		(cmd == AUCT_SHOW_LINK) or 
+		(cmd == AUCT_CMD_EMBED) or 
 		(cmd == AUCT_SHOW_HSP)
 	) then
 		if (param == AUCT_CMD_OFF) then
@@ -1516,7 +1531,8 @@ function Auctioneer_GetFilterVal(type)
 	if (not AuctionConfig.filters) then AuctionConfig.filters = {}; end
 	value = AuctionConfig.filters[type];
 	if (not value) then
-		if (type == "showlink") then return "off"; end
+		if (type == AUCT_SHOW_LINK) then return "off"; end
+		if (type == AUCT_CMD_EMBED) then return "off"; end
 		return "on";
 	end
 	return value;
