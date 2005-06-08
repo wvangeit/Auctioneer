@@ -1,5 +1,5 @@
 ## Title: Auctioneer
-## Interface: 1300
+## Interface: 1500
 ## Version: <%version%>
 ## Revision: $Id$
 ## Notes: Displays collected information about item in the info window. Use "/lootlink scan" at AH to collect auction data. With Broker Mod.
