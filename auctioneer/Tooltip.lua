@@ -11,6 +11,22 @@ TOOLTIPS_INCLUDED = true;
 
 TT_CurrentTip = nil;
 
+local Orig_Chat_OnHyperlinkShow;
+local Orig_AuctionFrameItem_OnEnter;
+local Orig_ContainerFrameItemButton_OnEnter;
+local Orig_ContainerFrame_Update;
+local Orig_GameTooltip_SetLootItem;
+local Orig_GameTooltip_SetQuestItem;
+local Orig_GameTooltip_SetQuestLogItem;
+local Orig_GameTooltip_SetInventoryItem;
+local Orig_GameTooltip_SetMerchantItem;
+local Orig_GameTooltip_SetTradeSkillItem;
+local Orig_GameTooltip_SetOwner;
+local Orig_IMInv_ItemButton_OnEnter;
+local Orig_ItemsMatrixItemButton_OnEnter;
+local Orig_LootLinkItemButton_OnEnter;
+local Orig_GameTooltip_OnHide;
+
 function TT_OnLoad()
         if (TT_LOADED ~= nil) then 
                 return; 
@@ -43,6 +59,20 @@ function TT_OnLoad()
 		GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
 		Orig_GameTooltip_SetMerchantItem = GameTooltip.SetMerchantItem;
 		GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
+		Orig_GameTooltip_SetTradeSkillItem = GameTooltip.SetTradeSkillItem;
+		GameTooltip.SetTradeSkillItem = TT_GameTooltip_SetTradeSkillItem;
+		Orig_GameTooltip_SetOwner = GameTooltip.SetOwner;
+		GameTooltip.SetOwner = TT_GameTooltip_SetOwner;
+
+		-- Hook the ItemsMatrix tooltip functions
+		Orig_IMInv_ItemButton_OnEnter = IMInv_ItemButton_OnEnter;
+		IMInv_ItemButton_OnEnter = TT_IMInv_ItemButton_OnEnter;
+		Orig_ItemsMatrixItemButton_OnEnter = ItemsMatrixItemButton_OnEnter;
+		ItemsMatrixItemButton_OnEnter = TT_ItemsMatrixItemButton_OnEnter;
+
+		-- Hook the LootLink tooltip function
+		Orig_LootLinkItemButton_OnEnter = LootLinkItemButton_OnEnter;
+		LootLinkItemButton_OnEnter = TT_LootLinkItemButton_OnEnter;
 
 		-- Hook the hide function so we can disappear
 		Orig_GameTooltip_OnHide = GameTooltip_OnHide;
@@ -50,6 +80,19 @@ function TT_OnLoad()
 
 
         TT_LOADED = true;
+end
+
+local function getRect(object)
+	local rect = {};
+	rect.t = object:GetTop() or 0; 
+	rect.l = object:GetLeft() or 0;
+	rect.b = object:GetBottom() or 0;
+	rect.r = object:GetRight() or 0;
+	rect.w = object:GetWidth() or 0;
+	rect.h = object:GetHeight() or 0;
+	rect.cx = rect.l + (rect.w / 2);
+	rect.cy = rect.t - (rect.h / 2);
+	return rect;
 end
 
 function TT_Show(currentTooltip)
@@ -82,51 +125,68 @@ function TT_Show(currentTooltip)
 		height = height + 72;
 	end
 
-	currentTooltip:Show();
-
-	local reposition = false;
-	local fTop = currentTooltip:GetTop();
-	local fLeft = currentTooltip:GetLeft();
-	local fRight = currentTooltip:GetRight();
-	local fBottom = currentTooltip:GetBottom();
-	local fWidth = currentTooltip:GetWidth();
-	local fHeight = currentTooltip:GetHeight();
-
-	if (fWidth > minWidth) and (width > fWidth) then
-		width = fWidth;
-	elseif (width < fWidth) and (width + 20 > fWidth) then
-		width = fWidth;
-	end
-
 	local sWidth = GetScreenWidth();
 	local sHeight = GetScreenHeight();
 
-	local tBottom = fBottom - height - 64;
-	local tRight = fRight + 20;
+	local parentObject = currentTooltip.owner;
+	if (parentObject) then
+		local align = currentTooltip.anchor;
 
---	p("fTop:",fTop, "fLeft:",fLeft, "fBottom:",fBottom, "fRight",fRight, "fWidth:",fWidth, "sWidth:",sWidth, "sHeight:",sHeight, "tBottom",tBottom, "tRight:", tRight);
-	if (tBottom < 0) then 
-		reposition = true;
-		fTop = fTop - tBottom;
-	end
-	if (fRight > sWidth) then 
-		reposition = true;
-		fLeft = fLeft - (tRight - sWidth);
-	end
-	if (fRight - width < 0) then
-		reposition = true;
-		fLeft = fLeft + (width - fRight);
-	end
+		local parentRect = getRect(currentTooltip.owner);
+		
+		local xAnchor, yAnchor;
+		if (align == "ANCHOR_RIGHT") then
+			xAnchor = "RIGHT";
+		elseif (align == "ANCHOR_LEFT") then
+			xAnchor = "LEFT";
+		elseif (parentRect.cx < 6*sWidth/10) then
+			xAnchor = "RIGHT";
+		else
+			xAnchor = "LEFT";
+		end
+		if (parentRect.cy < sHeight/2) then
+			yAnchor = "TOP";
+		else
+			yAnchor = "BOTTOM";
+		end
 
-	if (reposition) then
---		p("Repositioning to", fLeft, fTop);
 		currentTooltip:ClearAllPoints();
-		currentTooltip:SetPoint("BOTTOMRIGHT", "UIParent", "TOPLEFT", fLeft+fWidth, (sHeight-fTop+fHeight)*-1 );
+		EnhancedTooltip:ClearAllPoints();
+		local anchor = yAnchor..xAnchor;
+
+		if (anchor == "TOPLEFT") then
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5,5);
+			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,5);
+		elseif (anchor == "TOPRIGHT") then
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5,5);
+			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0);
+		elseif (anchor == "BOTTOMLEFT") then
+			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5,-5);
+			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
+		else -- BOTTOMRIGHT
+			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5,-5);
+			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
+		end
+	else
+		-- No parent
+		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
+		currentTooltip:Show();
+		local tipRect = getRect(currentTooltip);
+
+		if (tipRect.b - height < 60) then
+			currentTooltip:ClearAllPoints();
+			currentTooltip:SetPoint("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", tipRect.l, height+60);
+		end;
+		EnhancedTooltip:ClearAllPoints();
+		if (tipRect.cx < 6*sWidth/10) then
+			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
+		else
+			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
+		end
 	end
 	
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
-	EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0, 0);
 	EnhancedTooltip:Show();
 end
 
@@ -272,12 +332,8 @@ function TT_SetModel(class, file)
 	EnhancedTooltipPreview:Show();
 end
 
-
-function TT_GameTooltip_OnEvent(ev)
-	p("Game Tooltip Event: " .. ev);
-end
-
 function TT_GameTooltip_OnHide()
+	Orig_GameTooltip_OnHide();
 	TT_Hide();
 end
 
@@ -302,6 +358,17 @@ local function  qualityFromLink(link)
 		if (color == "ff9d9d9d") then return 0;--[[ Poor ]] end
 	end
 	return -1;
+end
+local function fakeLink(item, quality, name)
+	if (quality == nil) then quality = -1; end
+	if (name == nil) then name = "unknown"; end
+	local color = "ffffff";
+	if (quality == 4) then color = "a335ee";
+	elseif (quality == 3) then color = "0070dd";
+	elseif (quality == 2) then color = "1eff00";
+	elseif (quality == 0) then color = "9d9d9d";
+	end
+	return "|cff"..color.. "|H"..item.."|h["..name.."]|h|r";
 end
 
 function TT_TooltipCall(frame, name, link, quality, count, price)
@@ -456,7 +523,85 @@ function TT_GameTooltip_SetMerchantItem(this, slot)
 	end
 end
 
+function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
+	Orig_GameTooltip_SetTradeSkillItem(this, skill, slot);
+	local link;
+	if (slot) then
+		link = GetTradeSkillReagentItemLink(skill, slot);
+		if (link) then
+			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot);
+			local quality = qualityFromLink(link);
+			TT_Clear();
+			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
+			TT_Show(GameTooltip);
+		end
+	else
+		link = GetTradeSkillItemLink(skill);
+		if (link) then
+			local name = nameFromLink(link);
+			local quality = qualityFromLink(link);
+			TT_Clear();
+			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+			TT_Show(GameTooltip);
+		end
+	end
+end
 
+function TT_IMInv_ItemButton_OnEnter()
+	Orig_IMInv_ItemButton_OnEnter();
+	if(not IM_InvList) then return; end
+	local id = this:GetID();
+	p("got id", id);
+
+	if(id == 0) then
+		id = this:GetParent():GetID();
+	end
+	local offset = FauxScrollFrame_GetOffset(ItemsMatrix_IC_ScrollFrame);
+	local item = IM_InvList[id + offset];
+
+	p("got item", item);
+	if (not item) then return; end
+	local imlink = ItemsMatrix_GetHyperlink(item.name);
+	local link = fakeLink(imlink, item.quality, item.name);
+	p("got link", link);
+	if (link) then
+		TT_Clear();
+		TT_TooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0);
+		TT_Show(GameTooltip);
+	end
+end
+
+function TT_ItemsMatrixItemButton_OnEnter()
+	Orig_ItemsMatrixItemButton_OnEnter();
+	local link = ItemsMatrix_GetHyperlink(this:GetText());
+	if (link and ItemsMatrix_GetLinkPatternCount(link) == 4) then
+		local name = this:GetText();
+		local quality = qualityFromLink(link);
+		TT_Clear();
+		TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+		TT_Show(GameTooltip);
+	end
+end
+
+function TT_LootLinkItemButton_OnEnter()
+	Orig_LootLinkItemButton_OnEnter();
+	local link = LootLink_GetHyperlink(this:GetText());
+	if (link) then
+		local name = this:GetText();
+		local quality = qualityFromLink(link);
+		TT_Clear();
+		TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+		TT_Show(GameTooltip);
+	end
+end
+
+function TT_GameTooltip_SetOwner(this, owner, anchor)
+	Orig_GameTooltip_SetOwner(this, owner, anchor);
+	this.owner = owner;
+	this.anchor = anchor;
+
+--	TT_Align(this);
+end
 
 
 end

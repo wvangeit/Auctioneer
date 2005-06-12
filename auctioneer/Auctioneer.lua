@@ -308,12 +308,12 @@ end
 
 local function breakLink(link)
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
-	return tonumber(itemID), tonumber(randomProp), tonumber(enchant), tonumber(uniqID), name;
+	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name;
 end
 
 local function breakItemKey(itemKey)
 	local i,j, itemID, randomProp, enchant = string.find(itemKey, "(%d+):(%d+):(%d+)");
-	return tonumber(itemID), tonumber(randomProp), tonumber(enchant);
+	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0);
 end
 
 -- returns an AuctionPrices item from the table based on an item name
@@ -932,6 +932,13 @@ local function doTest(param)
     p(getBidBasedSellablePrice(param));
 end
 
+
+-- Hook into this function if you want notification when we find a link.
+function Auctioneer_ProcessLink(link)
+	if (ItemsMatrix_ProcessLink ~= nil) then ItemsMatrix_ProcessLink("", link, 1); end
+	if (LootLink_ProcessLink ~= nil) then LootLink_ProcessLink("", link, 1); end
+end
+
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
 local function Auctioneer_AuctionEntry_Hook(page, index, category)
@@ -957,6 +964,9 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
     if (aiName == nil or tonumber(aiBuyoutPrice) > MAX_ALLOWED_FORMAT_INT or tonumber(aiMinBid) > MAX_ALLOWED_FORMAT_INT) then return; end
         
 	local aiLink = GetAuctionItemLink("list", index);
+	-- Call some interested iteminfo addons
+	Auctioneer_ProcessLink(aiLink);
+	
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = breakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 
