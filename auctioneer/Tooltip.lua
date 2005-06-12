@@ -74,6 +74,16 @@ function TT_OnLoad()
 		Orig_LootLinkItemButton_OnEnter = LootLinkItemButton_OnEnter;
 		LootLinkItemButton_OnEnter = TT_LootLinkItemButton_OnEnter;
 
+		-- Hook the AllInOneInventory tooltip function
+		if (AllInOneInventory_ModifyItemTooltip ~= nil) then
+			Orig_AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip;
+			AllInOneInventory_ModifyItemTooltip = TT_AllInOneInventory_ModifyItemTooltip;
+			TT_AIOI_Hooked = true;
+		else
+			TT_AIOI_Hooked = false;
+			this:RegisterEvent("PLAYER_ENTERING_WORLD");
+		end
+
 		-- Hook the hide function so we can disappear
 		Orig_GameTooltip_OnHide = GameTooltip_OnHide;
 		GameTooltip_OnHide = TT_GameTooltip_OnHide;
@@ -81,6 +91,25 @@ function TT_OnLoad()
 
         TT_LOADED = true;
 end
+
+function TT_OnEvent(event)
+	if (event == "PLAYER_ENTERING_WORLD") then
+
+		-- Since AIOI lists Auctioneer as an option dependancy, we may not have 
+		-- registered the event hooks above... Check here to make certain!
+		if (not TT_AIOI_Hooked) then
+			if (AllInOneInventory_ModifyItemTooltip ~= nil) then
+				Orig_AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip;
+				AllInOneInventory_ModifyItemTooltip = TT_AllInOneInventory_ModifyItemTooltip;
+				this:UnregisterEvent(event);
+				TT_AIOI_Hooked = true;
+			end
+		else
+			this:UnregisterEvent(event);
+		end
+	end
+end
+
 
 local function getRect(object)
 	local rect = {};
@@ -591,6 +620,28 @@ function TT_LootLinkItemButton_OnEnter()
 		local quality = qualityFromLink(link);
 		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+		TT_Show(GameTooltip);
+	end
+end
+
+function TT_AllInOneInventory_ModifyItemTooltip(bag, slot, tooltip)
+	Orig_AllInOneInventory_ModifyItemTooltip(bag, slot, tooltip);
+
+	local tooltip = getglobal(tooltipName);
+	if (not tooltip) then
+		tooltip = getglobal("GameTooltip");
+		tooltipName = "GameTooltip";
+	end
+	if (not tooltip) then return false; end
+
+	local link = GetContainerItemLink(bag, slot);
+	local name = nameFromLink(link);
+	if (name) then
+		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag, slot);
+		if (quality == nil) then quality = qualityFromLink(link); end
+
+		TT_Clear();
+		TT_TooltipCall(GameTooltip, name, link, quality, itemCount, 0);
 		TT_Show(GameTooltip);
 	end
 end
