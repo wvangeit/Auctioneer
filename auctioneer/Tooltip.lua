@@ -612,15 +612,29 @@ function TT_ItemsMatrixItemButton_OnEnter()
 	end
 end
 
+local function getLootLinkServer()
+	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")];
+end
+
+local function getLootLinkLink(name)
+	local itemLink = ItemLinks[name];
+	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
+		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4");
+		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r";
+		return link;
+	end
+	return nil;
+end
+
 function TT_LootLinkItemButton_OnEnter()
 	Orig_LootLinkItemButton_OnEnter();
-	local link = LootLink_GetHyperlink(this:GetText());
+	local name = this:GetText();
+	local link = getLootLinkLink(name);
 	if (link) then
-		local name = this:GetText();
 		local quality = qualityFromLink(link);
 		TT_Clear();
-		TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
-		TT_Show(GameTooltip);
+		TT_TooltipCall(LootLinkTooltip, name, link, quality, 1, 0);
+		TT_Show(LootLinkTooltip);
 	end
 end
 

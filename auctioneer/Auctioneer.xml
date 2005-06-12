@@ -29,7 +29,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="BrowseSearchButton" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="50" y="0"/>
+							<AbsDimension x="58" y="38"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
