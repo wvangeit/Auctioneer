@@ -16,11 +16,6 @@ end
 
 local MAX_ALLOWED_FORMAT_INT = 2000000000; -- numbers much greater than this overflow when using format("%d")
 
--- Function hooks
-local lOriginalGameTooltip_OnHide;
-local lOriginalGameTooltip_ClearMoney;
-local lOriginalSetItemRef;
-
 -- If non-nil, check for appearance of GameTooltip for adding information
 local lAuctioneerCheckTooltip;
 
@@ -167,6 +162,9 @@ end
 -- subtracts a percent from a value
 local function subtractPercent(value, percentLess)
     return math.floor(value * ((100 - percentLess)/100));
+end
+local function addPercent(value, percentMore)
+    return math.floor(value * ((100 + percentMore)/100));
 end
 
 -- returns the integer representation of the percent less value2 is from value1
@@ -429,17 +427,17 @@ function getItemSnapshotMedianBuyout(itemKey)
     if AHSnapshotItemPrices[auctKey][itemKey] then 
         buyoutPrices = AHSnapshotItemPrices[auctKey][itemKey].buyoutPrices;
     else
-        return nil, nil;
+        return 0, 0;
     end
 
-    return getMedian(buyoutPrices), table.getn(buyoutPrices);
+    return getMedian(buyoutPrices) or 0, table.getn(buyoutPrices) or 0;
 end
 
 local function getItemHistoricalMedianBuyout(itemKey, name)
     local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
     local historyMedian = getMedian(buyoutHistoryTable);
     local historySeenCount = table.getn(buyoutHistoryTable);
-    return historyMedian, historySeenCount;
+    return historyMedian or 0, historySeenCount or 0;
 end
 
 -- this function returns the most accurate median possible, 
@@ -524,7 +522,7 @@ local function brokerFilter(minProfit, signature)
         local profitPricePercent = math.floor((profit / buyout) * 100);
 
         --see if this auction should not be filtered
-        if (buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+        if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
             filterAuction = false;
         end
     end        
@@ -789,7 +787,7 @@ function getLowestPriceQuick(itemKey)
         lowestPriceForOne = buyoutPrices[1];
     end
     
-    return lowestPriceForOne;
+    return lowestPriceForOne or 0;
 end
 
 function doMedian(link)
@@ -817,19 +815,23 @@ local function getBidBasedSellablePrice(itemKey)
         typicalBuyout = avgBuy;
     end
     
-    bidBasedSellPrice = (typicalBuyout + avgBid) / 2;
-    
+    bidBasedSellPrice = (3*typicalBuyout + avgBid) / 4;
     return bidBasedSellPrice;
 end
 
 function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     if not category then category = "" end
     local highestSellablePrice = 0;
+	local warn = AUCT_FRMT_WARN_NODATA;
     local marketPrice = 0;
     local commonBuyout = 0;
-    local lowestAllowedPercentBelowMarket = 30;
-    local discountLowPercent = 5;
-    local discountMarketPercent = 15;
+
+    local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
+    local discountLowPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT));
+    local discountMarketPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT_DEFAULT));
+	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT));
+	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
+
     local buyoutMedian, count = getUsableMedian(itemKey);
     local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,meanCount = getMeans(itemKey);     
     local id = breakItemKey(itemKey);
@@ -850,57 +852,61 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
     end    
     
     -- assign the best common buyout
-    if buyoutMedian then
+    if buyoutMedian and buyoutMedian > 0 then
         commonBuyout = buyoutMedian;
-    elseif meanCount > 0 then  
+    elseif meanCount and meanCount > 0 then  
         commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
     end
     
     -- assign the best market price
     if BID_BASED_CATEGORIES[category] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
---~ p("bid based");    
+--p("bid based");    
         marketPrice = getBidBasedSellablePrice(itemKey)
     else
---~ p("buyout based");    
+--p("buyout based");    
         marketPrice = commonBuyout;
     end
---~ p("marketPrice: ", marketPrice);  
+--p("marketPrice: ", marketPrice);  
 
     if marketPrice and marketPrice > 0 then
-        if currentLowestBuyout then
+        if currentLowestBuyout and currentLowestBuyout > 0 then
             lowestBuyoutPriceAllowed = subtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
 			local auctKey = sanifyAHSnapshot();
             if lowestAuctionSignature and AHSnapshot[auctKey][lowestAuctionSignature].owner == UnitName("player") then
                 highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
-            elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) or (currentLowestBuyout > marketPrice) then
-                -- set highest price to "Discount market"
---~ p("Discount market case 1");                 
+				warn = AUCT_FRMT_WARN_MYPRICE;
+            elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) then
                 highestSellablePrice = subtractPercent(marketPrice, discountMarketPercent);
+				warn = AUCT_FRMT_WARN_TOOLOW;
+			elseif (currentLowestBuyout > marketPrice) then
+                highestSellablePrice = subtractPercent(marketPrice, discountNoCompetitionPercent);
+				warn = AUCT_FRMT_WARN_ABOVEMKT;
             else -- use discount low
                 -- set highest price to "Discount low"
---~ p("Discount low case 1");                
                 highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
+				warn = string.format(AUCT_FRMT_WARN_UNDERCUT, discountLowPercent);
             end
-        else -- no low buyout, use discount market
-            -- set highest price to "Discount market"
---~ p("Discount market case 2");            
-            highestSellablePrice = subtractPercent(marketPrice, discountMarketPercent);            
+        else -- no low buyout, use discount no competition
+            -- set highest price to "Discount no competition"
+            highestSellablePrice = subtractPercent(marketPrice, discountNoCompetitionPercent);
+			warn = AUCT_FRMT_WARN_NOCOMP;
         end
     else -- no market
-        if currentLowestBuyout then
+        if currentLowestBuyout and currentLowestBuyout > 0 then
             -- set highest price to "Discount low"
 --~ p("Discount low case 2");            
             highestSellablePrice = subtractPercent(currentLowestBuyout, discountLowPercent);
-        elseif Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
+			warn = string.format(AUCT_FRMT_WARN_UNDERCUT, discountLowPercent);
+        elseif Auctioneer_BasePrices and Auctioneer_BasePrices[id] and Auctioneer_BasePrices[id].s then -- see if we have vendor sell info for this item
             -- use vendor prices if no auction data available
---~ p("vendor sell price");                    
             local itemInfo = Auctioneer_BasePrices[id];
-            local vendorSell = nullSafe(itemInfo.s); -- use vendor prices
-            highestSellablePrice = vendorSell * 3;               
+			local vendorSell = nullSafe(itemInfo.s); -- use vendor prices
+			highestSellablePrice = addPercent(vendorSell, vendorSellMarkupPercent);
+			warn = string.format(AUCT_FRMT_WARN_MARKUP, vendorSellMarkupPercent);
         end
     end
     
-    return highestSellablePrice, count;
+    return highestSellablePrice, count, marketPrice, warn;
 end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
@@ -1095,7 +1101,9 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 	if (Auctioneer_GetFilter("all")) then
 		if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) then
-			TT_AddLine(" ");
+			if (Auctioneer_GetFilter(AUCT_SHOW_EMBED_BLANK)) then
+				TT_AddLine(" ");
+			end
 		else
 			TT_AddLine(name);
 			TT_LineQuality(quality);
@@ -1395,6 +1403,33 @@ function Auctioneer_OnLoad()
 	if ( DEFAULT_CHAT_FRAME ) then 
 		DEFAULT_CHAT_FRAME:AddMessage("Auctioneer v"..AUCTIONEER_VERSION.." loaded", 0.8, 0.8, 0.2);
 	end
+
+	Auctioneer_ConfigureAH();
+end
+
+function Auctioneer_ConfigureAH()
+	AuctionsPriceText:ClearAllPoints();
+	AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -56);
+	AuctionsBuyoutText:ClearAllPoints();
+	AuctionsBuyoutText:SetPoint("TOPLEFT", "AuctionsPriceText", "TOPLEFT", 0, -36);
+	AuctionsBuyoutErrorText:ClearAllPoints();
+	AuctionsBuyoutErrorText:SetPoint("TOPLEFT", "AuctionsBuyoutText", "TOPLEFT", 0, -32);
+	AuctionsDurationText:ClearAllPoints();
+	AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -10);
+	AuctionsDepositText:ClearAllPoints();
+	AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -34);
+	if (AuctionInfo ~= nil) then
+		AuctionInfo:ClearAllPoints();
+		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36);
+	end
+
+	AuctionsShortAuctionButtonText:SetText("2");
+	AuctionsMediumAuctionButtonText:SetText("8");
+	AuctionsMediumAuctionButton:ClearAllPoints();
+	AuctionsMediumAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsShortAuctionButton", "BOTTOMRIGHT", 20,0);
+	AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
+	AuctionsLongAuctionButton:ClearAllPoints();
+	AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
 end
 
 function Auctioneer_Command(command)
@@ -1420,8 +1455,18 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_USAGE, Auctioneer_GetFilterVal(AUCT_SHOW_USAGE), AUCT_HELP_USAGE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STACK, Auctioneer_GetFilterVal(AUCT_SHOW_STACK), AUCT_HELP_STACK));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_LINK, Auctioneer_GetFilterVal(AUCT_SHOW_LINK), AUCT_HELP_LINK));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_AUTOFILL, Auctioneer_GetFilterVal(AUCT_CMD_AUTOFILL), AUCT_HELP_AUTOFILL));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_EMBED_BLANK, Auctioneer_GetFilterVal(AUCT_SHOW_EMBED_BLANK), AUCT_HELP_EMBED_BLANK));
+
+		lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT), AUCT_HELP_PCT_MARKUP));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN, Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT), AUCT_HELP_PCT_BIDMARKDOWN));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT), AUCT_HELP_PCT_NOCOMP));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT), AUCT_HELP_PCT_UNDERLOW));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT_DEFAULT), AUCT_HELP_PCT_UNDERMKT));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT), AUCT_HELP_PCT_MAXLESS));
 
 		lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_CLEAR, AUCT_OPT_CLEAR, AUCT_HELP_CLEAR));
@@ -1496,6 +1541,17 @@ function Auctioneer_Command(command)
     elseif (cmd == "hsp") then
         doHSP(param);           
 	elseif (
+		(cmd == AUCT_CMD_PCT_BIDMARKDOWN) or
+		(cmd == AUCT_CMD_PCT_MARKUP) or
+		(cmd == AUCT_CMD_PCT_MAXLESS) or
+		(cmd == AUCT_CMD_PCT_NOCOMP) or
+		(cmd == AUCT_CMD_PCT_UNDERLOW) or
+		(cmd == AUCT_CMD_PCT_UNDERMKT)
+	) then
+		local paramVal = tonumber(param);
+		Auctioneer_SetFilter(cmd, paramVal);
+		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, cmd, paramVal.."%"));
+	elseif (
 		(cmd == AUCT_SHOW_AVERAGE) or 
 		(cmd == AUCT_SHOW_MEDIAN) or
 		(cmd == AUCT_SHOW_SUGGEST) or 
@@ -1508,6 +1564,8 @@ function Auctioneer_Command(command)
 		(cmd == AUCT_SHOW_MESH) or 
 		(cmd == AUCT_SHOW_LINK) or 
 		(cmd == AUCT_CMD_EMBED) or 
+		(cmd == AUCT_CMD_AUTOFILL) or 
+		(cmd == AUCT_SHOW_EMBED_BLANK) or 
 		(cmd == AUCT_SHOW_HSP)
 	) then
 		if (param == AUCT_CMD_OFF) then
@@ -1537,13 +1595,14 @@ function Auctioneer_SetFilter(type, value)
 	AuctionConfig.filters[type] = value;
 end
 
-function Auctioneer_GetFilterVal(type)
+function Auctioneer_GetFilterVal(type, default)
+	if (default == nil) then default = "on"; end
 	if (not AuctionConfig.filters) then AuctionConfig.filters = {}; end
 	value = AuctionConfig.filters[type];
 	if (not value) then
 		if (type == AUCT_SHOW_LINK) then return "off"; end
 		if (type == AUCT_CMD_EMBED) then return "off"; end
-		return "on";
+		return default;
 	end
 	return value;
 end
@@ -1558,6 +1617,39 @@ end
 function Auctioneer_ChatPrint(str)
 	if ( DEFAULT_CHAT_FRAME ) then 
 		DEFAULT_CHAT_FRAME:AddMessage(str, 0.0, 1.0, 0.25);
+	end
+end
+
+
+function Auctioneer_Auctions_Clear()
+	for i = 1, 5 do
+		getglobal("AuctionInfoText"..i):Hide();
+		getglobal("AuctionInfoMoney"..i):Hide();
+	end
+	AuctionInfoWarnText:Hide();
+end
+
+function Auctioneer_Auctions_SetWarn(textStr)
+	if (AuctionInfoWarnText == nil) then p("Error, no text for AuctionInfo line "..line); end
+	AuctionInfoWarnText:SetText(textStr);
+	AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
+	AuctionInfoWarnText:Show();
+end
+
+function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
+	local text = getglobal("AuctionInfoText"..line);
+	local money = getglobal("AuctionInfoMoney"..line);
+	if (text == nil) then p("Error, no text for AuctionInfo line "..line); end
+	if (money == nil) then p("Error, no money for AuctionInfo line "..line); end
+	text:SetText(textStr);
+	text:Show();
+	if (money ~= nil) then
+		MoneyFrame_Update("AuctionInfoMoney"..line, math.floor(nullSafe(moneyAmount)));
+		getglobal("AuctionInfoMoney"..line.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
+		getglobal("AuctionInfoMoney"..line.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
+		money:Show();
+	else
+		money:Hide();
 	end
 end
 
@@ -1616,6 +1708,7 @@ function Auctioneer_FindItemInBags(findName)
 end
 
 function Auctioneer_OnEvent(event)
+--	p("Event", event);
 	if (event=="NEW_AUCTION_UPDATE") then
         local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
         if name then  
@@ -1625,21 +1718,49 @@ function Auctioneer_OnEvent(event)
 				local itemKey = id..":"..rprop..":"..enchant;
 				local itemData = getAuctionPriceData(itemKey, nil, name, id);
 				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);            
-				
-				-- get highest sellable price for buyout
-				local hsp = getHighestSellablePriceForOne(itemKey, false, getItemCategory(itemKey));
+
+        		local currentLowestBuyout = getLowestPriceQuick(itemKey);
+				local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
+				local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
+
+				Auctioneer_Auctions_Clear();
+				Auctioneer_Auctions_SetLine(1, string.format(AUCT_FRMT_AUCTINFO_HIST, historicalMedCount), historicalMedian * count); 
+				Auctioneer_Auctions_SetLine(2, string.format(AUCT_FRMT_AUCTINFO_SNAP, snapshotMedCount), snapshotMedian * count); 
+				if (snapshotMedCount and snapshotMedCount > 0) then
+					Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_LOW, currentLowestBuyout * count);
+				else
+					Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_NOLOW);
+				end
+                local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
+
+				local hsp, hspCount, mktPrice, warn = getHighestSellablePriceForOne(itemKey, false, getItemCategory(itemKey));
 				if hsp == 0 and buyCount > 0 then
-					hsp =  math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
 								
-				buyoutPrice = roundDownTo95(nullSafe(hsp) * count);
-				startPrice = roundDownTo95(subtractPercent(buyoutPrice, 20)); -- 15% less than buyout
+				local discountBidPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT));
+				local buyPrice = roundDownTo95(nullSafe(hsp) * count);
+				local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
 				
-                MoneyInputFrame_SetCopper(StartPrice, startPrice);
-                MoneyInputFrame_SetCopper(BuyoutPrice, buyoutPrice);				
+				if (Auctioneer_GetFilter(AUCT_CMD_AUTOFILL)) then
+					Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_MKTPRICE, nullSafe(mktPrice)*count);
+					Auctioneer_Auctions_SetLine(5, AUCT_FRMT_AUCTINFO_ORIG, blizPrice);
+					Auctioneer_Auctions_SetWarn(warn);
+					MoneyInputFrame_SetCopper(StartPrice, bidPrice);
+					MoneyInputFrame_SetCopper(BuyoutPrice, buyPrice);
+				else
+					Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_SUGBID, bidPrice);
+					Auctioneer_Auctions_SetLine(5, AUCT_FRMT_AUCTINFO_SUGBUY, buyPrice);
+					Auctioneer_Auctions_SetWarn(warn);
+				end
+			else
+				Auctioneer_Auctions_Clear();
 			end
-        end
+		else
+			Auctioneer_Auctions_Clear();
+		end
     elseif (event=="AUCTION_HOUSE_SHOW") then
+		Auctioneer_ConfigureAH();
         if Auctioneer_isScanningRequested then
             Auctioneer_StartAuctionScan();
         else

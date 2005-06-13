@@ -12,6 +12,7 @@ TOOLTIPS_INCLUDED = true;
 TT_CurrentTip = nil;
 
 local Orig_Chat_OnHyperlinkShow;
+local Orig_Chat_OnHyperlinkHide;
 local Orig_AuctionFrameItem_OnEnter;
 local Orig_ContainerFrameItemButton_OnEnter;
 local Orig_ContainerFrame_Update;
@@ -21,6 +22,7 @@ local Orig_GameTooltip_SetQuestLogItem;
 local Orig_GameTooltip_SetInventoryItem;
 local Orig_GameTooltip_SetMerchantItem;
 local Orig_GameTooltip_SetTradeSkillItem;
+local Orig_GameTooltip_SetAuctionSellItem;
 local Orig_GameTooltip_SetOwner;
 local Orig_IMInv_ItemButton_OnEnter;
 local Orig_ItemsMatrixItemButton_OnEnter;
@@ -37,6 +39,8 @@ function TT_OnLoad()
         -- Hook in alternative Chat/Hyperlinking code
         Orig_Chat_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
         ChatFrame_OnHyperlinkShow = TT_Chat_OnHyperlinkShow;
+        Orig_Chat_OnHyperlinkHide = ChatFrame_OnHyperlinkHide;
+        ChatFrame_OnHyperlinkHide = TT_Chat_OnHyperlinkHide;
 
         -- Hook in alternative Auctionhouse tooltip code
         Orig_AuctionFrameItem_OnEnter = AuctionFrameItem_OnEnter;
@@ -61,6 +65,9 @@ function TT_OnLoad()
 		GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
 		Orig_GameTooltip_SetTradeSkillItem = GameTooltip.SetTradeSkillItem;
 		GameTooltip.SetTradeSkillItem = TT_GameTooltip_SetTradeSkillItem;
+		Orig_GameTooltip_SetAuctionSellItem = GameTooltip.SetAuctionSellItem;
+		GameTooltip.SetAuctionSellItem = TT_GameTooltip_SetAuctionSellItem;
+
 		Orig_GameTooltip_SetOwner = GameTooltip.SetOwner;
 		GameTooltip.SetOwner = TT_GameTooltip_SetOwner;
 
@@ -196,6 +203,21 @@ function TT_Show(currentTooltip)
 			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5,-5);
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
 		end
+
+		if (EquipCompare_OnUpdate ~= nil) then EquipCompare_OnUpdate(); end
+		if (ComparisonTooltip1 and ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
+			if (xAnchor == "RIGHT") then
+				ComparisonTooltip1:ClearAllPoints();
+				ComparisonTooltip1:SetPoint("BOTTOMLEFT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
+				ComparisonTooltip2:ClearAllPoints();
+				ComparisonTooltip2:SetPoint("BOTTOMLEFT", "ComparisonTooltip1", "BOTTOMRIGHT", 0,0);
+			else
+				ComparisonTooltip1:ClearAllPoints();
+				ComparisonTooltip1:SetPoint("BOTTOMRIGHT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
+				ComparisonTooltip2:ClearAllPoints();
+				ComparisonTooltip2:SetPoint("BOTTOMRIGHT", "ComparisonTooltip1", "BOTTOMLEFT", 0,0);
+			end
+		end
 	else
 		-- No parent
 		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
@@ -212,7 +234,16 @@ function TT_Show(currentTooltip)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
 		end
+
+		if (ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
+			ComparisonTooltip1:ClearAllPoints();
+			ComparisonTooltip1:SetPoint("BOTTOMRIGHT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
+			ComparisonTooltip2:ClearAllPoints();
+			ComparisonTooltip2:SetPoint("BOTTOMRIGHT", "ComparisonTooltip1", "BOTTOMLEFT", 0,0);
+		end
 	end
+	
+	
 	
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
@@ -363,7 +394,9 @@ end
 
 function TT_GameTooltip_OnHide()
 	Orig_GameTooltip_OnHide();
-	TT_Hide();
+	if (TT_CurrentTip == GameTooltip) then
+		TT_Hide();
+	end
 end
 
 local function nameFromLink(link)
@@ -414,7 +447,7 @@ function TT_Chat_OnHyperlinkShow(link)
 
 	if (ItemRefTooltip:IsVisible()) then
 		local name = ItemRefTooltipTextLeft1:GetText();
-		if( name and TT_ChatCurrentItem ~= name ) then
+		if (name and TT_ChatCurrentItem ~= name) then
 			local fabricatedLink = "|H"..link.."|h["..name.."]|h";
 			TT_ChatCurrentItem = name;
 			
@@ -425,19 +458,26 @@ function TT_Chat_OnHyperlinkShow(link)
 	end
 end
 
-function TT_AuctionFrameItem_OnEnter(type, index)
-        Orig_AuctionFrameItem_OnEnter(type, index);
+function TT_Chat_OnHyperlinkHide(link)
+	Orig_Chat_OnHyperlinkHide();
+	if (TT_CurrentTip == ItemRefTooltip) then
+		TT_Hide();
+	end
+end
 
-        local link = GetAuctionItemLink(type, index);
-        if( link ) then
-                local name = nameFromLink(link);
-                if( name ) then
-                        local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
-						TT_Clear();
-                        TT_TooltipCall(GameTooltip, name, link, aiQuality, aiCount);
-						TT_Show(GameTooltip);
-                end
-        end
+function TT_AuctionFrameItem_OnEnter(type, index)
+	Orig_AuctionFrameItem_OnEnter(type, index);
+
+	local link = GetAuctionItemLink(type, index);
+	if (link) then
+		local name = nameFromLink(link);
+		if (name) then
+			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
+			TT_Clear();
+			TT_TooltipCall(GameTooltip, name, link, aiQuality, aiCount);
+			TT_Show(GameTooltip);
+		end
+	end
 end
 
 function TT_ContainerFrameItemButton_OnEnter()
@@ -448,7 +488,7 @@ function TT_ContainerFrameItemButton_OnEnter()
 	local link = GetContainerItemLink(frameID, buttonID);
 	local name = nameFromLink(link);
 	
-	if( name ) then
+	if (name) then
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 		if (quality == nil) then quality = qualityFromLink(link); end
 
@@ -466,12 +506,12 @@ function TT_ContainerFrame_Update(frame)
 	local iButton;
 	for iButton = 1, frame.size do
 		local button = getglobal(frameName.."Item"..iButton);
-		if( GameTooltip:IsOwned(button) ) then
+		if (GameTooltip:IsOwned(button)) then
 			local buttonID = button:GetID();
 			local link = GetContainerItemLink(frameID, buttonID);
 			local name = nameFromLink(link);
 			
-			if( name ) then
+			if (name) then
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 				if (quality == nil) then quality = qualityFromLink(link); end
 
@@ -489,7 +529,7 @@ function TT_GameTooltip_SetLootItem(this, slot)
 	
 	local link = GetLootSlotLink(slot);
 	local name = nameFromLink(link);
-	if( name ) then
+	if (name) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
 		TT_Clear()
@@ -576,11 +616,26 @@ function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
 	end
 end
 
+function TT_GameTooltip_SetAuctionSellItem(this)
+	Orig_GameTooltip_SetAuctionSellItem(this);
+    local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo();
+	if (name) then
+		local bag, slot = Auctioneer_FindItemInBags(name);
+		if (bag) then
+			local link = GetContainerItemLink(bag, slot);
+			if (link) then
+				TT_Clear();
+				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
+				TT_Show(GameTooltip);
+			end
+		end
+	end
+end
+
 function TT_IMInv_ItemButton_OnEnter()
 	Orig_IMInv_ItemButton_OnEnter();
 	if(not IM_InvList) then return; end
 	local id = this:GetID();
-	p("got id", id);
 
 	if(id == 0) then
 		id = this:GetParent():GetID();
@@ -588,11 +643,9 @@ function TT_IMInv_ItemButton_OnEnter()
 	local offset = FauxScrollFrame_GetOffset(ItemsMatrix_IC_ScrollFrame);
 	local item = IM_InvList[id + offset];
 
-	p("got item", item);
 	if (not item) then return; end
 	local imlink = ItemsMatrix_GetHyperlink(item.name);
 	local link = fakeLink(imlink, item.quality, item.name);
-	p("got link", link);
 	if (link) then
 		TT_Clear();
 		TT_TooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0);
@@ -602,12 +655,12 @@ end
 
 function TT_ItemsMatrixItemButton_OnEnter()
 	Orig_ItemsMatrixItemButton_OnEnter();
-	local link = ItemsMatrix_GetHyperlink(this:GetText());
-	if (link and ItemsMatrix_GetLinkPatternCount(link) == 4) then
+	local imlink = ItemsMatrix_GetHyperlink(this:GetText());
+	if (link) then
 		local name = this:GetText();
-		local quality = qualityFromLink(link);
+		link = fakeLink(imlink, -1, name);
 		TT_Clear();
-		TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+		TT_TooltipCall(GameTooltip, name, link, -1, 1, 0);
 		TT_Show(GameTooltip);
 	end
 end
@@ -664,7 +717,7 @@ function TT_GameTooltip_SetOwner(this, owner, anchor)
 	Orig_GameTooltip_SetOwner(this, owner, anchor);
 	this.owner = owner;
 	this.anchor = anchor;
-
+--	p("This tooltip owned by", owner:GetName());
 --	TT_Align(this);
 end
 

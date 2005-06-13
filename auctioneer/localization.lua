@@ -92,6 +92,23 @@ AUCT_FRMT_INFO_STX = "Stacks in lots of %d";
 
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
 
+AUCT_FRMT_AUCTINFO_HIST = "%d historical";
+AUCT_FRMT_AUCTINFO_SNAP = "%d last scan";
+AUCT_FRMT_AUCTINFO_LOW = "Snapshot low";
+AUCT_FRMT_AUCTINFO_NOLOW = "Item not seen last snapshot";
+AUCT_FRMT_AUCTINFO_ORIG = "Original bid";
+AUCT_FRMT_AUCTINFO_SUGBUY = "Suggested buyout";
+AUCT_FRMT_AUCTINFO_SUGBID = "Suggested bid";
+AUCT_FRMT_AUCTINFO_MKTPRICE = "Market price";
+
+AUCT_FRMT_WARN_MARKUP = "Marking up vendor by %s%%";
+AUCT_FRMT_WARN_UNDERCUT = "Undercutting by %s%%";
+AUCT_FRMT_WARN_NOCOMP = "No competition";
+AUCT_FRMT_WARN_ABOVEMKT = "Competiton above market";
+AUCT_FRMT_WARN_TOOLOW = "Cannot match lowest price";
+AUCT_FRMT_WARN_MYPRICE = "Using my current price";
+AUCT_FRMT_WARN_NODATA = "No data for HSP";
+
 AUCT_CMD_OFF = "off";
 AUCT_CMD_ON = "on";
 AUCT_CMD_TOGGLE = "toggle";
@@ -109,6 +126,16 @@ AUCT_CMD_PERCENTLESS_SHORT = "pl";
 AUCT_CMD_COMPETE = "compete";
 AUCT_CMD_SCAN = "scan";
 
+AUCT_CMD_AUTOFILL = "autofill";
+
+AUCT_CMD_PCT_BIDMARKDOWN = "pct-bidmarkdown";
+AUCT_CMD_PCT_MARKUP      = "pct-markup";
+AUCT_CMD_PCT_MAXLESS     = "pct-maxless";
+AUCT_CMD_PCT_NOCOMP      = "pct-nocomp";
+AUCT_CMD_PCT_UNDERLOW    = "pct-underlow";
+AUCT_CMD_PCT_UNDERMKT    = "pct-undermkt";
+
+
 AUCT_OPT_CLEAR = "<[item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..">";
 AUCT_OPT_ALSO = "<realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..">"
 AUCT_OPT_BROKER = "[silver_profit]";
@@ -116,6 +143,21 @@ AUCT_OPT_BIDBROKER = "[silver_profit]";
 AUCT_OPT_PERCENTLESS = "[percent]";
 AUCT_OPT_COMPETE = "[silver_less]";
 AUCT_OPT_SCAN = "[category]";
+
+AUCT_OPT_PCT_BIDMARKDOWN = "<percent>";
+AUCT_OPT_PCT_MARKUP = "<percent>";
+AUCT_OPT_PCT_MAXLESS = "<percent>";
+AUCT_OPT_PCT_NOCOMP = "<percent>";
+AUCT_OPT_PCT_UNDERLOW = "<percent>";
+AUCT_OPT_PCT_UNDERMKT = "<percent>";
+
+AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = 20;
+AUCT_OPT_PCT_MARKUP_DEFAULT = 300;
+AUCT_OPT_PCT_MAXLESS_DEFAULT = 30;
+AUCT_OPT_PCT_NOCOMP_DEFAULT = 2;
+AUCT_OPT_PCT_UNDERLOW_DEFAULT = 5;
+AUCT_OPT_PCT_UNDERMKT_DEFAULT = 20;
+
 
 AUCT_SHOW_AVERAGE = "show-average";
 AUCT_SHOW_LINK = "show-link";
@@ -128,6 +170,7 @@ AUCT_SHOW_USAGE = "show-usage";
 AUCT_SHOW_VENDOR = "show-vendor";
 AUCT_SHOW_VENDOR_BUY = "show-vendor-buy";
 AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
+AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
 
 AUCT_HELP_ONOFF = "Turns the auction data display on and off";
 AUCT_HELP_AVERAGE = "Select whether to show item's average auction price";
@@ -141,6 +184,8 @@ AUCT_HELP_VENDOR_SELL = "Select whether to show item's vendor sell pricing (req 
 AUCT_HELP_VENDOR_BUY = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
 AUCT_HELP_USAGE = "Select whether to show tradeskill item's usage";
 AUCT_HELP_STACK = "Select whether to show the item's stackable size";
+AUCT_HELP_EMBED_BLANK = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
+
 AUCT_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
 AUCT_HELP_ALSO = "Also display another server's values in the tooltip. The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
 AUCT_HELP_BROKER = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
@@ -149,6 +194,15 @@ AUCT_HELP_EMBED = "Embed the text in the original game tooltip (note: certain fe
 AUCT_HELP_PERCENTLESS = "Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
 AUCT_HELP_COMPETE = "Show any recently scanned auctions whose buyout is less than one of your items";
 AUCT_HELP_SCAN = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane)";
+AUCT_HELP_AUTOFILL = "Set whether to autofill prices when dropping new auction items into the auction house window";
+
+AUCT_HELP_PCT_BIDMARKDOWN = "Set the percentage that Auctioneer will mark down bids from the buyout price";
+AUCT_HELP_PCT_MARKUP = "The percentage that vendor prices will be marked up when no other values are available";
+AUCT_HELP_PCT_MAXLESS = "Set the maximum percentage that auctioneer will undercut market value before it gives up";
+AUCT_HELP_PCT_NOCOMP = "The percentage that Auctioneer will undercut market value when there is no competition";
+AUCT_HELP_PCT_UNDERLOW = "Set the percentage that Auctioneer will undercut the lowest auction price";
+AUCT_HELP_PCT_UNDERMKT = "Percentage to cut market value by when unable to beat competition (due to maxless)";
+
 
 AUCT_STAT_ON = "Displaying configured auction data";
 AUCT_STAT_OFF = "Not displaying any auction data";
@@ -159,6 +213,7 @@ AUCT_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 AUCT_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 AUCT_FRMT_ACT_ENABLE = "Displaying item's %s data";
 AUCT_FRMT_ACT_DISABLE = "Not displaying item's %s data";
+AUCT_FRMT_ACT_SET = "Set %s to '%s'";
 AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
 
 AUCT_TEXT_SCAN = "Scan";
