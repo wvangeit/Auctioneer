@@ -235,7 +235,7 @@ function TT_Show(currentTooltip)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
 		end
 
-		if (ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
+		if (ComparisonTooltip1 and ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
 			ComparisonTooltip1:ClearAllPoints();
 			ComparisonTooltip1:SetPoint("BOTTOMRIGHT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
 			ComparisonTooltip2:ClearAllPoints();
@@ -625,7 +625,7 @@ function TT_GameTooltip_SetAuctionSellItem(this)
 			local link = GetContainerItemLink(bag, slot);
 			if (link) then
 				TT_Clear();
-				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
+				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price;
 				TT_Show(GameTooltip);
 			end
 		end
