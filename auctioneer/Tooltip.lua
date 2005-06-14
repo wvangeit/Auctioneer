@@ -12,7 +12,6 @@ TOOLTIPS_INCLUDED = true;
 TT_CurrentTip = nil;
 
 local Orig_Chat_OnHyperlinkShow;
-local Orig_Chat_OnHyperlinkHide;
 local Orig_AuctionFrameItem_OnEnter;
 local Orig_ContainerFrameItemButton_OnEnter;
 local Orig_ContainerFrame_Update;
@@ -39,8 +38,6 @@ function TT_OnLoad()
         -- Hook in alternative Chat/Hyperlinking code
         Orig_Chat_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
         ChatFrame_OnHyperlinkShow = TT_Chat_OnHyperlinkShow;
-        Orig_Chat_OnHyperlinkHide = ChatFrame_OnHyperlinkHide;
-        ChatFrame_OnHyperlinkHide = TT_Chat_OnHyperlinkHide;
 
         -- Hook in alternative Auctionhouse tooltip code
         Orig_AuctionFrameItem_OnEnter = AuctionFrameItem_OnEnter;
@@ -394,7 +391,10 @@ end
 
 function TT_GameTooltip_OnHide()
 	Orig_GameTooltip_OnHide();
-	if (TT_CurrentTip == GameTooltip) then
+	local curName = "";
+	local hidingName = this:GetName();
+	if (TT_CurrentTip) then curName = TT_CurrentTip:GetName(); end
+	if (curName == hidingName) then
 		TT_Hide();
 	end
 end
@@ -455,13 +455,6 @@ function TT_Chat_OnHyperlinkShow(link)
 			TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1);
 			TT_Show(ItemRefTooltip);
 		end
-	end
-end
-
-function TT_Chat_OnHyperlinkHide(link)
-	Orig_Chat_OnHyperlinkHide();
-	if (TT_CurrentTip == ItemRefTooltip) then
-		TT_Hide();
 	end
 end
 
@@ -625,7 +618,7 @@ function TT_GameTooltip_SetAuctionSellItem(this)
 			local link = GetContainerItemLink(bag, slot);
 			if (link) then
 				TT_Clear();
-				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price;
+				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
 				TT_Show(GameTooltip);
 			end
 		end
