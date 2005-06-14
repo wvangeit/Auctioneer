@@ -136,13 +136,16 @@ AUCT_CMD_PCT_UNDERLOW    = "pct-underlow";
 AUCT_CMD_PCT_UNDERMKT    = "pct-undermkt";
 
 
-AUCT_OPT_CLEAR = "<[item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..">";
-AUCT_OPT_ALSO = "<realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..">"
-AUCT_OPT_BROKER = "[silver_profit]";
-AUCT_OPT_BIDBROKER = "[silver_profit]";
-AUCT_OPT_PERCENTLESS = "[percent]";
-AUCT_OPT_COMPETE = "[silver_less]";
-AUCT_OPT_SCAN = "[category]";
+AUCT_OPT_CLEAR = "([Item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
+AUCT_OPT_ALSO = "(realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..")"
+AUCT_OPT_BROKER = "<silver_profit>";
+AUCT_OPT_BIDBROKER = "<silver_profit>";
+AUCT_OPT_PERCENTLESS = "<percent>";
+AUCT_OPT_COMPETE = "<silver_less>";
+AUCT_OPT_SCAN = "<category>";
+AUCT_OPT_SCALE = "<scale_factor>";
+
+AUCT_OPT_SCALE_DEFAULT = 1.0;
 
 AUCT_OPT_PCT_BIDMARKDOWN = "<percent>";
 AUCT_OPT_PCT_MARKUP = "<percent>";
@@ -253,6 +256,83 @@ if (GetLocale() == "deDE") then
 
 -- Locale specific translations for the French client
 elseif (GetLocale() == "frFR") then
+	AUCT_CLAS_ARMOR = "Armure";
+	AUCT_CLAS_CLOTH = "Tissu";
+	AUCT_CLAS_CONTAINER = "Conteneur";
+	AUCT_CLAS_DRINK = "Boisson";
+	AUCT_CLAS_FISHING = "P\195\141che";
+	AUCT_CLAS_FOOD = "Nourriture";
+	AUCT_CLAS_GEM = "Gemme";
+	AUCT_CLAS_HERB = "Plante";
+	AUCT_CLAS_HIDE = "Peau";
+	AUCT_CLAS_LEATHER = "Cuir";
+	AUCT_CLAS_MAGE = "Mage";
+	AUCT_CLAS_ORE = "Minerai";
+	AUCT_CLAS_POTION = "Potion";
+	AUCT_CLAS_QUEST = "Qu\195\141te";
+	AUCT_CLAS_SHAMAN = "Chaman";
+	AUCT_CLAS_WARLOCK = "D\195\136moniste";
+	AUCT_CLAS_WEAPON = "Arme";
+	AUCT_CLAS_WRITTEN = "Ecrit";
+	AUCT_TYPE_ALCHEM = "Alchimie";
+	AUCT_TYPE_COOK = "Cuisine";
+	AUCT_TYPE_ENCHANT = "Enchantement";
+	AUCT_TYPE_ENGINEER = "Ing\195\136nieur";
+	AUCT_TYPE_FSTAID = "Premiers Soins";
+	AUCT_TYPE_LEATHER = "Travail du Cuir";
+	AUCT_TYPE_MINING = "Minage";
+	AUCT_TYPE_POISON = "Poison";
+	AUCT_TYPE_SMITH = "Forgeron";
+	AUCT_TYPE_TAILOR = "Tailleur";
+
+	AUCT_RECIPE_PREFIXES = {
+		"Recette: ", "Patron: ", "Plans: ", "Sch\195\136ma: ", "Formule: "
+	};
+
+	AUCT_FRMT_BROKER_HEADER = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Imm\195\136diat'";
+	AUCT_FRMT_BROKER_LINE = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
+	AUCT_FRMT_BROKER_DONE = "Brokering termin\195\136";
+
+	AUCT_FRMT_BIDBROKER_HEADER = "Profit minimum: %s, HSP = 'Prix de vente maximum'";
+	AUCT_FRMT_BIDBROKER_MINBID = "EnchMin"
+	AUCT_FRMT_BIDBROKER_CURBID = "EnchAct"
+	AUCT_FRMT_BIDBROKER_LINE = "%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
+	AUCT_FRMT_BIDBROKER_DONE = "Bid brokering termin\195\136";
+
+	AUCT_FRMT_PCTLESS_HEADER = "Percentage inf\195\136rieur au HSP: %d%%";
+	AUCT_FRMT_PCTLESS_LINE = "%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
+	AUCT_FRMT_PCTLESS_DONE = "Percentage inf\195\136rieur termin\195\136.";
+
+	AUCT_FRMT_COMPETE_HEADER = "Encheres comp\195\136titives au moins %s de moins par objet.";
+	AUCT_FRMT_COMPETE_LINE = "%s, Ench: %s, BO %s vs %s, %s de moins";
+	AUCT_FRMT_COMPETE_DONE = "Ench\195\139res comp\195\136titives termin\195\136es.";
+
+	AUCT_FRMT_NOAUCT = "Pas d'ench\195\139re trouv\195\136e pour l'objet: %s";
+	AUCT_FRMT_MEDIAN_LINE = "Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
+	AUCT_FRMT_LOW_LINE = "%s, BO: %s, Vendeur: %s, L'unit\195\136: %s, Moins de la moyenne: %s";
+	AUCT_FRMT_HSP_LINE = "Prix de vente maximum pour un %s est de: %s";
+
+	AUCT_FRMT_INFO_SEEN = "Vu %d fois aux ench\195\139res";
+	AUCT_FRMT_INFO_FORONE = "Pour 1: %s min/%s achat (%s ench\195\139re) [par %d]";
+	AUCT_FRMT_INFO_AVERAGE = "%s min/%s achat (%s ench\195\139re)"
+	AUCT_FRMT_INFO_HISTMED = "Derniers %d vus, achat moyen:";
+	AUCT_FRMT_INFO_SNAPMED = "Vu %d fois au dernier scan, achat moyen:";
+	AUCT_FRMT_INFO_YOURSTX = "Votre pile de %d: %s min/%s achat (%s ench\195\139re)";
+	AUCT_FRMT_INFO_BIDRATE = "%d%% avec ench\195\139re, %d%% avec achat imm\195\136diat";
+
+	AUCT_FRMT_INFO_NEVER = "Jamais vu aux ench\195\139res";
+	AUCT_FRMT_INFO_ALSOSEEN = "Vu %d fois aux %s";
+
+	AUCT_FRMT_INFO_CLASSUSE = "Classe: %s utilis\195\136 pour %s";
+	AUCT_FRMT_INFO_CLASS = "Classe: %s";
+	AUCT_FRMT_INFO_USE = "Utilis\195\136 pour: %s";
+
+	AUCT_FRMT_INFO_BUY = "Achat%s au marchand";
+	AUCT_FRMT_INFO_SELL = "Vente%s au marchand";
+	AUCT_FRMT_INFO_BUYMULT = "Achat%s %d (%s chacun)";
+	AUCT_FRMT_INFO_SELLMULT = "Vente%s %d (%s chacun)";
+
+	AUCT_FRMT_INFO_STX = "Pile par lots de %d";
 
 end
 
