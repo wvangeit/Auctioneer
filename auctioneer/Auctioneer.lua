@@ -1392,7 +1392,11 @@ function Auctioneer_OnLoad()
     -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
 	PlaceAuctionBid = Auctioneer_PlaceAuctionBid;
-    
+   
+   	-- Hook in the FilterButton_SetType
+	Auctioneer_Old_FilterButton_SetType = FilterButton_SetType;
+	FilterButton_SetType = Auctioneer_FilterButton_SetType;
+
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
 	SLASH_AUCTIONEER2 = "/auc";
@@ -1406,6 +1410,42 @@ function Auctioneer_OnLoad()
 
 	Auctioneer_ConfigureAH();
 end
+
+local function findFilterClass(text)
+	local totalFilters = getn(CLASS_FILTERS);
+	for currentFilter=1, totalFilters do
+		if (text == CLASS_FILTERS[currentFilter]) then
+			return currentFilter, totalFilters;
+		end
+	end
+	return 0, totalFilters;
+end
+
+function Auctioneer_FilterButton_SetType(button, type, text, isLast)
+	Auctioneer_Old_FilterButton_SetType(button, type, text, isLast);
+
+	local buttonName = button:GetName();
+	local i,j, buttonID = string.find(buttonName, "(%d+)$");
+
+	local checkbox = getglobal(button:GetName().."Checkbox");
+	if (type == "class") then
+		local classid, maxid = findFilterClass(text);
+		if (classid > 0) then
+			checkbox:SetFilter("scan-class"..classid);
+			checkbox:Show();
+			if (classid == maxid) and (buttonID < 15) then
+				for i=buttonID+1, 15 do
+					getglobal("AuctionFilterButton"..i):Hide();
+				end
+			end
+		else
+			checkbox.Hide();
+		end
+	else
+		checkbox.Hide();
+	end
+end
+		
 
 function Auctioneer_ConfigureAH()
 	AuctionsPriceText:ClearAllPoints();
