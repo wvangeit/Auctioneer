@@ -25,6 +25,7 @@ AUCT_CLAS_SHAMAN = "Shaman";
 AUCT_CLAS_WARLOCK = "Warlock";
 AUCT_CLAS_WEAPON = "Weapon";
 AUCT_CLAS_WRITTEN = "Written";
+
 AUCT_TYPE_ALCHEM = "Alchemy";
 AUCT_TYPE_COOK = "Cook";
 AUCT_TYPE_ENCHANT = "Enchant";
@@ -35,14 +36,18 @@ AUCT_TYPE_MINING = "Mining";
 AUCT_TYPE_POISON = "Poison";
 AUCT_TYPE_SMITH = "Smith";
 AUCT_TYPE_TAILOR = "Tailor";
+
 AUCT_RECIPE_PREFIXES = {
-"Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: "
+	"Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: "
 };
+
 AUCT_TIME_SHORT = "Short";
 AUCT_TIME_MED = "Medium";
 AUCT_TIME_LONG = "Long";
 AUCT_TIME_VLONG = "Very Long";
+
 AUCT_FRMT_WELCOME = "Auctioneer v%s loaded";
+
 AUCT_FRMT_BROKER_HEADER = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
 AUCT_FRMT_BROKER_LINE = "%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
 AUCT_FRMT_BROKER_DONE = "Brokering done";
@@ -61,6 +66,7 @@ AUCT_FRMT_NOAUCT = "No auctions found for the item: %s";
 AUCT_FRMT_MEDIAN_LINE = "Of last %d seen, median buyout for 1 %s is: %s";
 AUCT_FRMT_LOW_LINE = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
 AUCT_FRMT_HSP_LINE = "Highest Sellable Price for one %s is: %s";
+
 AUCT_FRMT_INFO_SEEN = "Seen %d times at auction total";
 AUCT_FRMT_INFO_FORONE = "For 1: %s min/%s buyout (%s bid) [in %d's]";
 AUCT_FRMT_INFO_AVERAGE = "%s min/%s buyout (%s bid)"
@@ -78,7 +84,9 @@ AUCT_FRMT_INFO_SELL = "Sell%s to vendor";
 AUCT_FRMT_INFO_BUYMULT = "Buy%s %d (%s each)";
 AUCT_FRMT_INFO_SELLMULT = "Sell%s %d (%s each)";
 AUCT_FRMT_INFO_STX = "Stacks in lots of %d";
+
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
+
 AUCT_FRMT_AUCTINFO_HIST = "%d historical";
 AUCT_FRMT_AUCTINFO_SNAP = "%d last scan";
 AUCT_FRMT_AUCTINFO_LOW = "Snapshot low";
@@ -87,6 +95,7 @@ AUCT_FRMT_AUCTINFO_ORIG = "Original bid";
 AUCT_FRMT_AUCTINFO_SUGBUY = "Suggested buyout";
 AUCT_FRMT_AUCTINFO_SUGBID = "Suggested bid";
 AUCT_FRMT_AUCTINFO_MKTPRICE = "Market price";
+
 AUCT_FRMT_WARN_MARKUP = "Marking up vendor by %s%%";
 AUCT_FRMT_WARN_UNDERCUT = "Undercutting by %s%%";
 AUCT_FRMT_WARN_NOCOMP = "No competition";
@@ -94,6 +103,7 @@ AUCT_FRMT_WARN_ABOVEMKT = "Competiton above market";
 AUCT_FRMT_WARN_TOOLOW = "Cannot match lowest price";
 AUCT_FRMT_WARN_MYPRICE = "Using my current price";
 AUCT_FRMT_WARN_NODATA = "No data for HSP";
+
 AUCT_CMD_OFF = "off";
 AUCT_CMD_ON = "on";
 AUCT_CMD_TOGGLE = "toggle";
@@ -102,6 +112,7 @@ AUCT_CMD_CLEAR_ALL = "all";
 AUCT_CMD_CLEAR_SNAPSHOT = "snapshot";
 AUCT_CMD_ALSO = "also";
 AUCT_CMD_ALSO_OPPOSITE = "opposite";
+
 AUCT_CMD_BROKER = "broker";
 AUCT_CMD_BIDBROKER = "bidbroker";
 AUCT_CMD_BIDBROKER_SHORT = "bb";
@@ -111,12 +122,14 @@ AUCT_CMD_PERCENTLESS_SHORT = "pl";
 AUCT_CMD_COMPETE = "compete";
 AUCT_CMD_SCAN = "scan";
 AUCT_CMD_AUTOFILL = "autofill";
+
 AUCT_CMD_PCT_BIDMARKDOWN = "pct-bidmarkdown";
 AUCT_CMD_PCT_MARKUP      = "pct-markup";
 AUCT_CMD_PCT_MAXLESS     = "pct-maxless";
 AUCT_CMD_PCT_NOCOMP      = "pct-nocomp";
 AUCT_CMD_PCT_UNDERLOW    = "pct-underlow";
 AUCT_CMD_PCT_UNDERMKT    = "pct-undermkt";
+
 AUCT_OPT_CLEAR = "([Item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
 AUCT_OPT_ALSO = "(realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..")"
 AUCT_OPT_BROKER = "<silver_profit>";
@@ -126,18 +139,21 @@ AUCT_OPT_COMPETE = "<silver_less>";
 AUCT_OPT_SCAN = "<category>";
 AUCT_OPT_SCALE = "<scale_factor>";
 AUCT_OPT_SCALE_DEFAULT = 1.0;
+
 AUCT_OPT_PCT_BIDMARKDOWN = "<percent>";
 AUCT_OPT_PCT_MARKUP = "<percent>";
 AUCT_OPT_PCT_MAXLESS = "<percent>";
 AUCT_OPT_PCT_NOCOMP = "<percent>";
 AUCT_OPT_PCT_UNDERLOW = "<percent>";
 AUCT_OPT_PCT_UNDERMKT = "<percent>";
+
 AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = 20;
 AUCT_OPT_PCT_MARKUP_DEFAULT = 300;
 AUCT_OPT_PCT_MAXLESS_DEFAULT = 30;
 AUCT_OPT_PCT_NOCOMP_DEFAULT = 2;
 AUCT_OPT_PCT_UNDERLOW_DEFAULT = 5;
 AUCT_OPT_PCT_UNDERMKT_DEFAULT = 20;
+
 AUCT_SHOW_AVERAGE = "show-average";
 AUCT_SHOW_LINK = "show-link";
 AUCT_SHOW_MEDIAN = "show-median";
@@ -150,6 +166,7 @@ AUCT_SHOW_VENDOR = "show-vendor";
 AUCT_SHOW_VENDOR_BUY = "show-vendor-buy";
 AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
 AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
+
 AUCT_HELP_ONOFF = "Turns the auction data display on and off";
 AUCT_HELP_AVERAGE = "Select whether to show item's average auction price";
 AUCT_HELP_LINK = "Select whether to show the link id in the tooltip";
@@ -178,8 +195,10 @@ AUCT_HELP_PCT_MAXLESS = "Set the maximum percentage that auctioneer will undercu
 AUCT_HELP_PCT_NOCOMP = "The percentage that Auctioneer will undercut market value when there is no competition";
 AUCT_HELP_PCT_UNDERLOW = "Set the percentage that Auctioneer will undercut the lowest auction price";
 AUCT_HELP_PCT_UNDERMKT = "Percentage to cut market value by when unable to beat competition (due to maxless)";
+
 AUCT_STAT_ON = "Displaying configured auction data";
 AUCT_STAT_OFF = "Not displaying any auction data";
+
 AUCT_FRMT_ACT_CLEARALL = "Clearing all auction data for %s";
 AUCT_FRMT_ACT_CLEARSNAP = "Clearing current Auction House snapshot.";
 AUCT_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
@@ -188,9 +207,11 @@ AUCT_FRMT_ACT_ENABLE = "Displaying item's %s data";
 AUCT_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 AUCT_FRMT_ACT_SET = "Set %s to '%s'";
 AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
+
 AUCT_TEXT_SCAN = "Scan";
 AUCT_TEXT_AUCTION = "auction";
 AUCT_TEXT_NONE = "none";
+
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
@@ -206,6 +227,7 @@ if GetLocale() == "deDE" then
 	AUCT_CLAS_LEATHER = "Leder";
 	AUCT_CLAS_ORE = "Erz";
 	AUCT_CLAS_POTION = "Zaubertrank";
+	
 	AUCT_TYPE_ALCHEM = "Alchemie";
 	AUCT_TYPE_COOK = "Koch";
 	AUCT_TYPE_ENCHANT = "Verzaubern";
@@ -216,6 +238,7 @@ if GetLocale() == "deDE" then
 	AUCT_TYPE_POISON = "Giftmischer";
 	AUCT_TYPE_SMITH = "Schmied";
 	AUCT_TYPE_TAILOR = "Schneider";
+	
 
 -- The following definitions are missing in this locale:
 --	AUCTIONEER_AUCTION_PAGE_N = "";
@@ -392,8 +415,9 @@ end
 -- Locale strings for the frFR locale
 if GetLocale() == "frFR" then
 	AUCT_RECIPE_PREFIXES = {
-	"Rezept: ", "Muster: ", "Pl\195\164ne: ", "Bauplan: ", "Formel: "
+		"Rezept: ", "Muster: ", "Pl\195\164ne: ", "Bauplan: ", "Formel: "
 	};
+	
 	AUCT_CLAS_ARMOR = "R\195\188stung";
 	AUCT_CLAS_CLOTH = "Stoff";
 	AUCT_CLAS_CONTAINER = "Tasche";
@@ -412,6 +436,7 @@ if GetLocale() == "frFR" then
 	AUCT_CLAS_WARLOCK = "Hexenmeister";
 	AUCT_CLAS_WEAPON = "Waffe";
 	AUCT_CLAS_WRITTEN = "Notizen";
+	
 	AUCT_TYPE_ALCHEM = "Alchemie";
 	AUCT_TYPE_COOK = "Koch";
 	AUCT_TYPE_ENCHANT = "Verzaubern";
@@ -422,11 +447,14 @@ if GetLocale() == "frFR" then
 	AUCT_TYPE_POISON = "Giftmischer";
 	AUCT_TYPE_SMITH = "Schmied";
 	AUCT_TYPE_TAILOR = "Schneider";
+	
 	AUCT_TIME_SHORT = "Court";
 	AUCT_TIME_MED = "Moyen";
 	AUCT_TIME_LONG = "Long";
 	AUCT_TIME_VLONG = "Tr\195\168s Long";
+	
 	AUCT_TEXT_SCAN = "Scanne";
+	
 	AUCT_FRMT_BROKER_HEADER = "Mindest Profit: %s, HVP = 'H\195\182chster verk\195\164uflicher Preis'";
 	AUCT_FRMT_BROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Prof: %s";
 	AUCT_FRMT_BROKER_DONE = "Brokering fertig";
@@ -435,9 +463,11 @@ if GetLocale() == "frFR" then
 	AUCT_FRMT_BIDBROKER_CURBID = "akt.Gebot"
 	AUCT_FRMT_BIDBROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, %s: %s, Prof: %s, Mal: %s";
 	AUCT_FRMT_BIDBROKER_DONE = "Gebot brokering fertig";
+	
 	AUCT_FRMT_PCTLESS_HEADER = "Prozent billiger als der 'H\195\182chster verk\195\164uflicher Preis (HVP)': %d%%";
 	AUCT_FRMT_PCTLESS_LINE = "%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
 	AUCT_FRMT_PCTLESS_DONE = "Prozent unter HSP fertig.";
+	
 	AUCT_FRMT_COMPETE_HEADER = "Konkurrierende Auktionen zuletzt %s billiger pro Gegenstand.";
 	AUCT_FRMT_COMPETE_LINE = "%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
 	AUCT_FRMT_COMPETE_DONE = "Konkurrierende Auktionen fertig.";
@@ -445,6 +475,7 @@ if GetLocale() == "frFR" then
 	AUCT_FRMT_MEDIAN_LINE = "Der letzten %d gesehen, Median Sofortkauf f\195\188r 1 %s ist: %s";
 	AUCT_FRMT_LOW_LINE = "%s, Sofortkauf: %s, Verk\195\164ufer: %s, f\195\188r eins: %s, unter dem Median: %s";
 	AUCT_FRMT_HSP_LINE = "H\195\182chster verk\195\164uflicher Preis f\195\188r eins %s ist: %s";
+	
 	AUCT_FRMT_INFO_SEEN = "Insgesamt %d mal gesehen in Auktionen";
 	AUCT_FRMT_INFO_FORONE = "F\195\188r 1: %s min/%s Sofortkauf (%s geboten) [in %d's]";
 	AUCT_FRMT_INFO_AVERAGE = "%s min/%s Sofortkauf (%s geboten)"
@@ -462,12 +493,15 @@ if GetLocale() == "frFR" then
 	AUCT_FRMT_INFO_BUYMULT = "Kauf%s %d (%s einzeln)";
 	AUCT_FRMT_INFO_SELLMULT = "Verkauf%s %d (%s einzeln)";
 	AUCT_FRMT_INFO_STX = "Stapelbar bis %d St\195\188ck";
+	
 	AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Schnappschuss.";
+	
 	-- AH Scanning localizations
 	AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Scan de la cat\195\169gorie '%s': page 1...";
 	AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Scan de la cat\195\169gorie '%s': page %d sur %d";
 	AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: Scan termin\195\169";
 	AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez \195\160 un commisaire-priseur.";
+	
 
 -- The following definitions are missing in this locale:
 --	AUCT_CMD_ALSO = "";
