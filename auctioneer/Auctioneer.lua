@@ -1421,28 +1421,35 @@ local function findFilterClass(text)
 	return 0, totalFilters;
 end
 
+function AuctFilter_SetFilter(checkbox, filter)
+	checkbox.filterVal = filter;
+	checkbox:SetChecked(Auctioneer_GetFilter(filter));
+	checkbox:SetScale(0.5);
+	checkbox:Show();
+end
+
 function Auctioneer_FilterButton_SetType(button, type, text, isLast)
 	Auctioneer_Old_FilterButton_SetType(button, type, text, isLast);
 
 	local buttonName = button:GetName();
 	local i,j, buttonID = string.find(buttonName, "(%d+)$");
+	buttonID = tonumber(buttonID);
 
 	local checkbox = getglobal(button:GetName().."Checkbox");
 	if (type == "class") then
 		local classid, maxid = findFilterClass(text);
 		if (classid > 0) then
-			checkbox:SetFilter("scan-class"..classid);
-			checkbox:Show();
+			AuctFilter_SetFilter(checkbox, "scan-class"..classid);
 			if (classid == maxid) and (buttonID < 15) then
 				for i=buttonID+1, 15 do
 					getglobal("AuctionFilterButton"..i):Hide();
 				end
 			end
 		else
-			checkbox.Hide();
+			checkbox:Hide();
 		end
 	else
-		checkbox.Hide();
+		checkbox:Hide();
 	end
 end
 		
