@@ -649,9 +649,9 @@ end
 function TT_ItemsMatrixItemButton_OnEnter()
 	Orig_ItemsMatrixItemButton_OnEnter();
 	local imlink = ItemsMatrix_GetHyperlink(this:GetText());
-	if (link) then
+	if (imlink) then
 		local name = this:GetText();
-		link = fakeLink(imlink, -1, name);
+		local link = fakeLink(imlink, -1, name);
 		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, -1, 1, 0);
 		TT_Show(GameTooltip);
