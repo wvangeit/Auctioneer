@@ -1,84 +1,70 @@
+AUCT_CLAS_ARMOR = "Armure";
+AUCT_CLAS_CLOTH = "Tissu";
+AUCT_CLAS_CONTAINER = "Conteneur";
+AUCT_CLAS_DRINK = "Boisson";
+AUCT_CLAS_FISHING = "Pêche";
+AUCT_CLAS_FOOD = "Nourriture";
+AUCT_CLAS_GEM = "Gemme";
+AUCT_CLAS_HERB = "Plante";
+AUCT_CLAS_HIDE = "Peau";
+AUCT_CLAS_LEATHER = "Cuir";
+AUCT_CLAS_MAGE = "Mage";
+AUCT_CLAS_ORE = "Minerai";
+AUCT_CLAS_POTION = "Potion";
+AUCT_CLAS_QUEST = "Quête";
+AUCT_CLAS_SHAMAN = "Chaman";
+AUCT_CLAS_WARLOCK = "Démoniste";
+AUCT_CLAS_WEAPON = "Arme";
+AUCT_CLAS_WRITTEN = "Ecrit";
+
+AUCT_TYPE_ALCHEM = "Alchimie";
+AUCT_TYPE_COOK = "Cuisine";
+AUCT_TYPE_ENCHANT = "Enchantement";
+AUCT_TYPE_ENGINEER = "Ingénieur";
+AUCT_TYPE_FSTAID = "Premiers Soins";
+AUCT_TYPE_LEATHER = "Travail du Cuir";
+AUCT_TYPE_MINING = "Minage";
+AUCT_TYPE_POISON = "Poison";
+AUCT_TYPE_SMITH = "Forgeron";
+AUCT_TYPE_TAILOR = "Tailleur";
 AUCT_RECIPE_PREFIXES = {
-	"Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: "
+	"Recette: ", "Patron: ", "Plans: ", "Schéma: ", "Formule: "
 };
-
-AUCT_CLAS_ARMOR = "Rüstung";
-AUCT_CLAS_CLOTH = "Stoff";
-AUCT_CLAS_CONTAINER = "Tasche";
-AUCT_CLAS_DRINK = "Trank";
-AUCT_CLAS_FISHING = "Angeln";
-AUCT_CLAS_FOOD = "Nahrung";
-AUCT_CLAS_GEM = "Juwel";
-AUCT_CLAS_HERB = "Kraut";
-AUCT_CLAS_HIDE = "Balg";
-AUCT_CLAS_LEATHER = "Leder";
-AUCT_CLAS_MAGE = "Magier";
-AUCT_CLAS_ORE = "Erz";
-AUCT_CLAS_POTION = "Zaubertrank";
-AUCT_CLAS_QUEST = "Quest";
-AUCT_CLAS_SHAMAN = "Shamane";
-AUCT_CLAS_WARLOCK = "Hexenmeister";
-AUCT_CLAS_WEAPON = "Waffe";
-AUCT_CLAS_WRITTEN = "Notizen";
-
-AUCT_TYPE_ALCHEM = "Alchemie";
-AUCT_TYPE_COOK = "Koch";
-AUCT_TYPE_ENCHANT = "Verzaubern";
-AUCT_TYPE_ENGINEER = "Ingenieur";
-AUCT_TYPE_FSTAID = "Heilkunst";
-AUCT_TYPE_LEATHER = "Lederverarb";
-AUCT_TYPE_MINING = "Bergbau";
-AUCT_TYPE_POISON = "Giftmischer";
-AUCT_TYPE_SMITH = "Schmied";
-AUCT_TYPE_TAILOR = "Schneider";
-
-AUCT_TIME_SHORT = "Court";
-AUCT_TIME_MED = "Moyen";
-AUCT_TIME_LONG = "Long";
-AUCT_TIME_VLONG = "Très Long";
-
-AUCT_TEXT_SCAN = "Scanne";
-
-AUCT_FRMT_BROKER_HEADER = "Mindest Profit: %s, HVP = 'Höchster verkäuflicher Preis'";
-AUCT_FRMT_BROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE = "Brokering fertig";
-AUCT_FRMT_BIDBROKER_HEADER = "Mindest Profit: %s, HVP = 'Höchster verkäuflicher Preis'";
-AUCT_FRMT_BIDBROKER_MINBID = "min.Gebot"
-AUCT_FRMT_BIDBROKER_CURBID = "akt.Gebot"
-AUCT_FRMT_BIDBROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, %s: %s, Prof: %s, Mal: %s";
-AUCT_FRMT_BIDBROKER_DONE = "Gebot brokering fertig";
-
-AUCT_FRMT_PCTLESS_HEADER = "Prozent billiger als der 'Höchster verkäuflicher Preis (HVP)': %d%%";
-AUCT_FRMT_PCTLESS_LINE = "%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
-AUCT_FRMT_PCTLESS_DONE = "Prozent unter HSP fertig.";
-
-AUCT_FRMT_COMPETE_HEADER = "Konkurrierende Auktionen zuletzt %s billiger pro Gegenstand.";
-AUCT_FRMT_COMPETE_LINE = "%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
-AUCT_FRMT_COMPETE_DONE = "Konkurrierende Auktionen fertig.";
-AUCT_FRMT_NOAUCT = "Keine Aktionen für diesen Gegenstand gefunden: %s";
-AUCT_FRMT_MEDIAN_LINE = "Der letzten %d gesehen, Median Sofortkauf für 1 %s ist: %s";
-AUCT_FRMT_LOW_LINE = "%s, Sofortkauf: %s, Verkäufer: %s, für eins: %s, unter dem Median: %s";
-AUCT_FRMT_HSP_LINE = "Höchster verkäuflicher Preis für eins %s ist: %s";
-
-AUCT_FRMT_INFO_SEEN = "Insgesamt %d mal gesehen in Auktionen";
-AUCT_FRMT_INFO_FORONE = "Für 1: %s min/%s Sofortkauf (%s geboten) [in %d's]";
-AUCT_FRMT_INFO_AVERAGE = "%s min/%s Sofortkauf (%s geboten)"
-AUCT_FRMT_INFO_HISTMED = "Zuletzt %d gesehen, Sofortkauf Median:";
-AUCT_FRMT_INFO_SNAPMED = "Letzter Scan %d gesehen, Sofortkauf Median:";
-AUCT_FRMT_INFO_YOURSTX = "Ihr %d Stapel: %s min/%s Sofortkauf (%s geboten)";
-AUCT_FRMT_INFO_BIDRATE = "%d%% hatten gebote, %d%% hatten Sofortkauf";
-AUCT_FRMT_INFO_NEVER = "Nie gesehen in einer %s";
-AUCT_FRMT_INFO_ALSOSEEN = "Gesehen %d mal in einer %s";
-AUCT_FRMT_INFO_CLASSUSE = "Klasse: %s genutzt für %s";
-AUCT_FRMT_INFO_CLASS = "Klasse: %s";
-AUCT_FRMT_INFO_USE = "Genutzt für: %s";
-AUCT_FRMT_INFO_BUY = "Kauf%s bei Händler";
-AUCT_FRMT_INFO_SELL = "Verkauf%s bei Händler";
-AUCT_FRMT_INFO_BUYMULT = "Kauf%s %d (%s einzeln)";
-AUCT_FRMT_INFO_SELLMULT = "Verkauf%s %d (%s einzeln)";
-AUCT_FRMT_INFO_STX = "Stapelbar bis %d Stück";
-
-AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Schnappschuss.";
+AUCT_FRMT_BROKER_HEADER = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
+AUCT_FRMT_BROKER_LINE = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
+AUCT_FRMT_BROKER_DONE = "Brokering terminé";
+AUCT_FRMT_BIDBROKER_HEADER = "Profit minimum: %s, HSP = 'Prix de vente maximum'";
+AUCT_FRMT_BIDBROKER_MINBID = "EnchMin"
+AUCT_FRMT_BIDBROKER_CURBID = "EnchAct"
+AUCT_FRMT_BIDBROKER_LINE = "%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
+AUCT_FRMT_BIDBROKER_DONE = "Bid brokering terminé";
+AUCT_FRMT_PCTLESS_HEADER = "Percentage inférieur au HSP: %d%%";
+AUCT_FRMT_PCTLESS_LINE = "%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
+AUCT_FRMT_PCTLESS_DONE = "Percentage inférieur terminé.";
+AUCT_FRMT_COMPETE_HEADER = "Encheres compétitives au moins %s de moins par objet.";
+AUCT_FRMT_COMPETE_LINE = "%s, Ench: %s, BO %s vs %s, %s de moins";
+AUCT_FRMT_COMPETE_DONE = "Enchères compétitives terminées.";
+AUCT_FRMT_NOAUCT = "Pas d'enchère trouvée pour l'objet: %s";
+AUCT_FRMT_MEDIAN_LINE = "Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
+AUCT_FRMT_LOW_LINE = "%s, BO: %s, Vendeur: %s, L'unité: %s, Moins de la moyenne: %s";
+AUCT_FRMT_HSP_LINE = "Prix de vente maximum pour un %s est de: %s";
+AUCT_FRMT_INFO_SEEN = "Vu %d fois aux enchères";
+AUCT_FRMT_INFO_FORONE = "Pour 1: %s min/%s achat (%s enchère) [par %d]";
+AUCT_FRMT_INFO_AVERAGE = "%s min/%s achat (%s enchère)"
+AUCT_FRMT_INFO_HISTMED = "Derniers %d vus, achat moyen:";
+AUCT_FRMT_INFO_SNAPMED = "Vu %d fois au dernier scan, achat moyen:";
+AUCT_FRMT_INFO_YOURSTX = "Votre pile de %d: %s min/%s achat (%s enchère)";
+AUCT_FRMT_INFO_BIDRATE = "%d%% avec enchère, %d%% avec achat immédiat";
+AUCT_FRMT_INFO_NEVER = "Jamais vu aux enchères";
+AUCT_FRMT_INFO_ALSOSEEN = "Vu %d fois aux %s";
+AUCT_FRMT_INFO_CLASSUSE = "Classe: %s utilisé pour %s";
+AUCT_FRMT_INFO_CLASS = "Classe: %s";
+AUCT_FRMT_INFO_USE = "Utilisé pour: %s";
+AUCT_FRMT_INFO_BUY = "Achat%s au marchand";
+AUCT_FRMT_INFO_SELL = "Vente%s au marchand";
+AUCT_FRMT_INFO_BUYMULT = "Achat%s %d (%s chacun)";
+AUCT_FRMT_INFO_SELLMULT = "Vente%s %d (%s chacun)";
+AUCT_FRMT_INFO_STX = "Pile par lots de %d";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Scan de la catégorie '%s': page 1...";
