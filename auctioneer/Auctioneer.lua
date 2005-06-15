@@ -88,13 +88,13 @@ local function getTimeLeftString(timeLeft)
     local timeLeftString = "";
     -- TODO: localize these strings
     if timeLeft == TIME_LEFT_SHORT then
-        timeLeftString = "Short";
+        timeLeftString = AUCT_TIME_SHORT;
     elseif timeLeft == TIME_LEFT_MEDIUM then
-        timeLeftString = "Medium";
+        timeLeftString = AUCT_TIME_MED;
     elseif timeLeft == TIME_LEFT_LONG then
-        timeLeftString = "Long";
+        timeLeftString = AUCT_TIME_LONG;
     elseif timeLeft == TIME_LEFT_VERY_LONG then
-        timeLeftString = "Very Long";    
+        timeLeftString = AUCT_TIME_VLONG;
     end
     return timeLeftString;    
 end
@@ -115,7 +115,7 @@ function Auctioneer_GetTextGSC(money)
     local GSC_COPPER="c8602c";
     local GSC_START="|cff%s%d|r";
     local GSC_PART=".|cff%s%02d|r";
-    local GSC_NONE="|cffa0a0a0none|r";
+    local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
 
 	local g, s, c = Auctioneer_GetGSC(money);
 
@@ -1128,7 +1128,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			itemInfo = Auctioneer_BasePrices[itemID];
 
 			if (aCount == 0) then
-				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, "auction"));
+				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, AUCT_TEXT_AUCTION));
 				TT_LineColor(0.5, 0.8, 0.5);
 			else
 				local avgQty = math.floor(minCount / aCount);
@@ -1189,7 +1189,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
             
 			local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
 			if (also ~= "on") and (also ~= "off") then
-				if (also == "opposite") then
+				if (also == AUCT_CMD_ALSO_OPPOSITE) then
 					also = oppositeKey();
 				end
 				local itemData = getAuctionPriceData(itemKey, also, name, itemID);
@@ -1405,7 +1405,7 @@ function Auctioneer_OnLoad()
 	end
 	
 	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage("Auctioneer v"..AUCTIONEER_VERSION.." loaded", 0.8, 0.8, 0.2);
+		DEFAULT_CHAT_FRAME:AddMessage(string.format(AUCT_FRMT_WELCOME, AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 	end
 
 	Auctioneer_ConfigureAH();

@@ -1,0 +1,17 @@
+AUCT_CLAS_DRINK = "Trunk";
+AUCT_CLAS_FOOD = "Nahrung";
+AUCT_CLAS_GEM = "Juwel";
+AUCT_CLAS_HERB = "Kraut";
+AUCT_CLAS_LEATHER = "Leder";
+AUCT_CLAS_ORE = "Erz";
+AUCT_CLAS_POTION = "Zaubertrank";
+AUCT_TYPE_ALCHEM = "Alchemie";
+AUCT_TYPE_COOK = "Koch";
+AUCT_TYPE_ENCHANT = "Verzaubern";
+AUCT_TYPE_ENGINEER = "Ingenieur";
+AUCT_TYPE_FSTAID = "Heilkunst";
+AUCT_TYPE_LEATHER = "Lederverarb";
+AUCT_TYPE_MINING = "Bergbau";
+AUCT_TYPE_POISON = "Giftmischer";
+AUCT_TYPE_SMITH = "Schmied";
+AUCT_TYPE_TAILOR = "Schneider";

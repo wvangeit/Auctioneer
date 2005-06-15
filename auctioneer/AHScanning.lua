@@ -9,10 +9,6 @@ local lCurrentCategoryIndex;
 local lIsPageScanned;
 local lScanInProgress;
 
-AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
-AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
-AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: auction scanning finished";
-
 -- function hooks
 local lOriginal_CanSendAuctionQuery;
 local lOriginal_AuctionFrameBrowse_OnEvent;
@@ -142,7 +138,7 @@ function Auctioneer_RequestAuctionScan()
     
         Auctioneer_StartAuctionScan();
     else
-        Auctioneer_ChatPrint("Auctioneer will perform a full auction scan the next time you talk to an auctioneer.");
+        Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NEXTTIME);
     end
 end
 
