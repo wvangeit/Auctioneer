@@ -1165,8 +1165,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 							TT_LineColor(0.1,0.8,0.5);
 						end
 					else -- Verbose mode
-						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, avgQty));
+						if (count > 1) then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count));
 							TT_LineColor(0.4,0.5,1.0);
 							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, Auctioneer_GetTextGSC(avgMin)), avgMin*count);
 							TT_LineColor(0.4,0.5,0.8);
@@ -1181,8 +1181,12 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", Auctioneer_GetTextGSC(avgBuy)), avgBuy*count);
 								TT_LineColor(0.4,0.5,0.9);
 							end
+							if (median) then
+								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count);
+								TT_LineColor(0.4,0.5,0.95);
+							end
 						else
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_ONE, avgQty));
+							TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE);
 							TT_LineColor(0.4,0.5,1.0);
 							TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin);
 							TT_LineColor(0.4,0.5,0.8);
@@ -1197,6 +1201,14 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy);
 								TT_LineColor(0.4,0.5,0.9);
 							end
+							if (median) then
+								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median);
+								TT_LineColor(0.4,0.5,0.95);
+							end
+						end
+						if (avgQty > 1) then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_STACKSIZE, avgQty));
+							TT_LineColor(0.4,0.5,1.0);
 						end
 					end
 
