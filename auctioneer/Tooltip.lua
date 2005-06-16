@@ -244,6 +244,17 @@ function TT_Show(currentTooltip)
 	
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
+	
+	for i = 1, 10 do
+		local ttMoney = getglobal("EnhancedTooltipMoney"..i);
+		if (ttMoney.myLine ~= nil) then
+			ttMoneyWidth = ttMoney:GetWidth();
+			ttMoneyLineWidth = getglobal(ttMoney.myLine):GetWidth();
+			ttMoney:ClearAllPoints();
+			ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - TT_MoneySpacing*2, 0);
+		end
+	end
+	
 	EnhancedTooltip:Show();
 end
 
@@ -264,6 +275,7 @@ function TT_Clear()
 	end
 	for i = 1, 10 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i);
+		ttMoney.myLine = nil;
 		ttMoney:Hide();
 	end
 	EnhancedTooltip.lineCount = 0;
@@ -285,19 +297,22 @@ function TT_AddLine(lineText, moneyAmount)
 	local curLine = EnhancedTooltip.lineCount + 1;
 	local line = getglobal("EnhancedTooltipText"..curLine);
 	line:SetText(lineText);
-	local lineWidth = line:GetWidth();
 	line:SetTextColor(1.0, 1.0, 1.0);
 	line:Show();
+	local lineWidth = line:GetWidth();
+
 	EnhancedTooltip.lineCount = curLine;
 	if (moneyAmount ~= nil) and (moneyAmount > 0) then
 		local curMoney = EnhancedTooltip.moneyCount + 1;
 		local money = getglobal("EnhancedTooltipMoney"..curMoney);
 		money:SetPoint("LEFT", line:GetName(), "RIGHT", TT_MoneySpacing, 0);
-		lineWidth = lineWidth + money:GetWidth() + TT_MoneySpacing;
 		MoneyFrame_Update(money:GetName(), math.floor(moneyAmount));
+		money.myLine = line:GetName();
+		money:Show();
+		local moneyWidth = money:GetWidth();
+		lineWidth = lineWidth + moneyWidth + TT_MoneySpacing;
 		getglobal("EnhancedTooltipMoney"..curMoney.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
 		getglobal("EnhancedTooltipMoney"..curMoney.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
-		money:Show();
 		EnhancedTooltip.moneyCount = curMoney;
 	end
 	lineWidth = lineWidth + 20;

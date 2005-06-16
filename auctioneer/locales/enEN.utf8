@@ -44,7 +44,7 @@ AUCT_FRMT_BROKER_LINE = "%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
 AUCT_FRMT_BROKER_DONE = "Brokering done";
 AUCT_FRMT_BIDBROKER_HEADER = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
 AUCT_FRMT_BIDBROKER_MINBID = "minBid"
-AUCT_FRMT_BIDBROKER_CURBID = "currentBid"
+AUCT_FRMT_BIDBROKER_CURBID = "curBid"
 AUCT_FRMT_BIDBROKER_LINE = "%s, Last %s seen, HSP: %s, %s: %s, Prof: %s, Time: %s";
 AUCT_FRMT_BIDBROKER_DONE = "Bid brokering done";
 AUCT_FRMT_PCTLESS_HEADER = "Percent Less than Highest Sellable Price (HSP): %d%%";
@@ -54,17 +54,18 @@ AUCT_FRMT_COMPETE_HEADER = "Competing auctions at least %s less per item.";
 AUCT_FRMT_COMPETE_LINE = "%s, Bid: %s, BO %s vs %s, %s less";
 AUCT_FRMT_COMPETE_DONE = "Competing auctions done.";
 AUCT_FRMT_NOAUCT = "No auctions found for the item: %s";
-AUCT_FRMT_MEDIAN_LINE = "Of last %d seen, median buyout for 1 %s is: %s";
+AUCT_FRMT_MEDIAN_LINE = "Of last %d seen, median BO for 1 %s is: %s";
 AUCT_FRMT_LOW_LINE = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
 AUCT_FRMT_HSP_LINE = "Highest Sellable Price for one %s is: %s";
 
 AUCT_FRMT_INFO_SEEN = "Seen %d times at auction total";
-AUCT_FRMT_INFO_FORONE = "For 1: %s min/%s buyout (%s bid) [in %d's]";
-AUCT_FRMT_INFO_AVERAGE = "%s min/%s buyout (%s bid)"
-AUCT_FRMT_INFO_HISTMED = "Last %d seen, buyout median:";
-AUCT_FRMT_INFO_SNAPMED = "Last scan %d seen, buyout median:";
-AUCT_FRMT_INFO_YOURSTX = "Your %d stack: %s min/%s buyout (%s bid)";
-AUCT_FRMT_INFO_BIDRATE = "%d%% have bids, %d%% have buyout";
+AUCT_FRMT_INFO_FORONE = "For 1: %s min/%s BO (%s bid) [in %d's]";
+AUCT_FRMT_INFO_AVERAGE = "%s min/%s BO (%s bid)"
+AUCT_FRMT_INFO_HISTMED = "Last %d, BO median:";
+AUCT_FRMT_INFO_SNAPMED = "Scan %d, BO median:";
+AUCT_FRMT_INFO_YOURSTX = "Your %d stack: %s min/%s BO (%s bid)";
+
+AUCT_FRMT_INFO_BIDRATE = "%d%% have bid, %d%% have BO";
 AUCT_FRMT_INFO_NEVER = "Never seen at %s";
 AUCT_FRMT_INFO_ALSOSEEN = "Seen %d times at %s";
 AUCT_FRMT_INFO_CLASSUSE = "Class: %s used for %s";
@@ -75,6 +76,21 @@ AUCT_FRMT_INFO_SELL = "Sell%s to vendor";
 AUCT_FRMT_INFO_BUYMULT = "Buy%s %d (%s each)";
 AUCT_FRMT_INFO_SELLMULT = "Sell%s %d (%s each)";
 AUCT_FRMT_INFO_STX = "Stacks in lots of %d";
+
+AUCT_FRMT_INFO_HEAD_MULTI = "Averages for %d items:";
+AUCT_FRMT_INFO_MIN_MULTI = "  Minimum (%s ea)";
+AUCT_FRMT_INFO_BID_MULTI = "  Bidded (%s%s ea)";
+AUCT_FRMT_INFO_BUY_MULTI = "  Buyout (%s%s ea)";
+
+AUCT_FRMT_INFO_HEAD_ONE = "Averages for this item:";
+AUCT_FRMT_INFO_MIN_ONE = "  Minimum bid";
+AUCT_FRMT_INFO_BID_ONE = "  Bidded%s";
+AUCT_FRMT_INFO_BUY_ONE = "  Buyout%s";
+
+AUCT_FRMT_INFO_BUYMEDIAN = "  Buyout median";
+
+AUCT_FRMT_INFO_STACKSIZE = "  Average stack size: %d";
+
 
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
 
@@ -97,6 +113,9 @@ AUCT_FRMT_WARN_NODATA = "No data for HSP";
 
 AUCT_CMD_OFF = "off";
 AUCT_CMD_ON = "on";
+AUCT_CMD_ALT = "alt";
+AUCT_CMD_CTRL = "ctrl";
+AUCT_CMD_SHIFT = "shift";
 AUCT_CMD_TOGGLE = "toggle";
 AUCT_CMD_CLEAR = "clear";
 AUCT_CMD_CLEAR_ALL = "all";
@@ -145,6 +164,7 @@ AUCT_OPT_PCT_NOCOMP_DEFAULT = 2;
 AUCT_OPT_PCT_UNDERLOW_DEFAULT = 5;
 AUCT_OPT_PCT_UNDERMKT_DEFAULT = 20;
 
+AUCT_SHOW_VERBOSE = "show-verbose";
 AUCT_SHOW_AVERAGE = "show-average";
 AUCT_SHOW_LINK = "show-link";
 AUCT_SHOW_MEDIAN = "show-median";
@@ -159,6 +179,7 @@ AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
 AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
 
 AUCT_HELP_ONOFF = "Turns the auction data display on and off";
+AUCT_HELP_VERBOSE = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
 AUCT_HELP_AVERAGE = "Select whether to show item's average auction price";
 AUCT_HELP_LINK = "Select whether to show the link id in the tooltip";
 AUCT_HELP_MEDIAN = "Select whether to show item's median buyout price";
@@ -196,6 +217,7 @@ AUCT_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 AUCT_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 AUCT_FRMT_ACT_ENABLE = "Displaying item's %s data";
 AUCT_FRMT_ACT_DISABLE = "Not displaying item's %s data";
+AUCT_FRMT_ACT_ENABLED_ON = "Displaying item's %s on %s";
 AUCT_FRMT_ACT_SET = "Set %s to '%s'";
 AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
 

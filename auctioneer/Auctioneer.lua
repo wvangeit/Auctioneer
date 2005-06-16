@@ -1073,6 +1073,11 @@ function Auctioneer_SetModelByID(itemID)
 	if ( (not Auctioneer_GetFilter(AUCT_SHOW_MESH)) or (Auctioneer_GetFilter(AUCT_CMD_EMBED)) ) then
 		return;
 	end
+	local showMesh = Auctioneer_GetFilterVal(AUCT_SHOW_MESH);
+	if (showMesh == AUCT_CMD_ALT) and (not IsAltKeyDown()) then return; end
+	if (showMesh == AUCT_CMD_CTRL) and (not IsControlKeyDown()) then return; end
+	if (showMesh == AUCT_CMD_SHIFT) and (not IsShiftKeyDown()) then return; end
+
 	if (Auctioneer_BasePrices[itemID]) then
 		local dinfo = Auctioneer_BasePrices[itemID].d;
 		if (dinfo) then
@@ -1151,39 +1156,78 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then
 					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount));
 					TT_LineColor(0.5,0.8,0.1);
-					if (avgQty > 1) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
-						TT_LineColor(0.1,0.8,0.5);
-					else
-						TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
-						TT_LineColor(0.1,0.8,0.5);
-					end
-                    if median and Auctioneer_GetFilter(AUCT_SHOW_MEDIAN) then
-                        local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
-                        local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
-                        if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
-                            TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian)
+					if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
+						if (avgQty > 1) then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
 							TT_LineColor(0.1,0.8,0.5);
-                        end
-                        if snapshotMedian then
-                            TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian)
+						else
+							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
 							TT_LineColor(0.1,0.8,0.5);
-                        end
-                    end
-				end
-				if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
-					if (count > 1) then
-                        local buyoutPriceForOne = median;
-                        if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
-                        if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-                        if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-						TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)));
-						TT_LineColor(0.5,0.5,0.8);
+						end
+					else -- Verbose mode
+						if (avgQty > 1) then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, avgQty));
+							TT_LineColor(0.4,0.5,1.0);
+							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, Auctioneer_GetTextGSC(avgMin)), avgMin*count);
+							TT_LineColor(0.4,0.5,0.8);
+							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", Auctioneer_GetTextGSC(avgBid)), avgBid*count);
+								TT_LineColor(0.4,0.5,0.85);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", Auctioneer_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_LineColor(0.4,0.5,0.9);
+							else
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", Auctioneer_GetTextGSC(avgBid)), avgBid*count);
+								TT_LineColor(0.4,0.5,0.85);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", Auctioneer_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_LineColor(0.4,0.5,0.9);
+							end
+						else
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_ONE, avgQty));
+							TT_LineColor(0.4,0.5,1.0);
+							TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin);
+							TT_LineColor(0.4,0.5,0.8);
+							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, " "..bidPct.."%"), avgBid);
+								TT_LineColor(0.4,0.5,0.85);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, " "..buyPct.."%"), avgBuy);
+								TT_LineColor(0.4,0.5,0.9);
+							else
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, ""), avgBid);
+								TT_LineColor(0.4,0.5,0.85);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy);
+								TT_LineColor(0.4,0.5,0.9);
+							end
+						end
+					end
+
+					if median and Auctioneer_GetFilter(AUCT_SHOW_MEDIAN) then
+						local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
+						local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
+						if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian)
+							TT_LineColor(0.1,0.8,0.5);
+						end
+						if snapshotMedian then
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian)
+							TT_LineColor(0.1,0.8,0.5);
+						end
 					end
 				end
-				if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-					TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
-					TT_LineColor(0.1,0.5,0.8);
+				if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
+					if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
+						if (count > 1) then
+							local buyoutPriceForOne = median;
+							if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
+							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)));
+							TT_LineColor(0.5,0.5,0.8);
+						end
+					end
+					if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
+						TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
+						TT_LineColor(0.1,0.5,0.8);
+					end
 				end
 			end
             
@@ -1492,6 +1536,7 @@ function Auctioneer_Command(command)
 
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
 		
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VERBOSE, Auctioneer_GetFilterVal(AUCT_SHOW_VERBOSE), AUCT_HELP_VERBOSE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_AVERAGE, Auctioneer_GetFilterVal(AUCT_SHOW_AVERAGE), AUCT_HELP_AVERAGE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MEDIAN, Auctioneer_GetFilterVal(AUCT_SHOW_MEDIAN), AUCT_HELP_MEDIAN));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_SUGGEST, Auctioneer_GetFilterVal(AUCT_SHOW_SUGGEST), AUCT_HELP_SUGGEST));
@@ -1503,11 +1548,12 @@ function Auctioneer_Command(command)
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STACK, Auctioneer_GetFilterVal(AUCT_SHOW_STACK), AUCT_HELP_STACK));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_LINK, Auctioneer_GetFilterVal(AUCT_SHOW_LINK), AUCT_HELP_LINK));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_AUTOFILL, Auctioneer_GetFilterVal(AUCT_CMD_AUTOFILL), AUCT_HELP_AUTOFILL));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_EMBED_BLANK, Auctioneer_GetFilterVal(AUCT_SHOW_EMBED_BLANK), AUCT_HELP_EMBED_BLANK));
 
 		lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, "("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_ALT.."|"..AUCT_CMD_CTRL.."|"..AUCT_CMD_SHIFT..")" ,Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
+
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT), AUCT_HELP_PCT_MARKUP));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN, Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT), AUCT_HELP_PCT_BIDMARKDOWN));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT), AUCT_HELP_PCT_NOCOMP));
@@ -1599,6 +1645,7 @@ function Auctioneer_Command(command)
 		Auctioneer_SetFilter(cmd, paramVal);
 		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, cmd, paramVal.."%"));
 	elseif (
+		(cmd == AUCT_SHOW_VERBOSE) or 
 		(cmd == AUCT_SHOW_AVERAGE) or 
 		(cmd == AUCT_SHOW_MEDIAN) or
 		(cmd == AUCT_SHOW_SUGGEST) or 
@@ -1608,7 +1655,6 @@ function Auctioneer_Command(command)
 		(cmd == AUCT_SHOW_STACK) or 
 		(cmd == AUCT_SHOW_VENDOR_SELL) or 
 		(cmd == AUCT_SHOW_VENDOR_BUY) or 
-		(cmd == AUCT_SHOW_MESH) or 
 		(cmd == AUCT_SHOW_LINK) or 
 		(cmd == AUCT_CMD_EMBED) or 
 		(cmd == AUCT_CMD_AUTOFILL) or 
@@ -1618,6 +1664,31 @@ function Auctioneer_Command(command)
 		if (param == AUCT_CMD_OFF) then
 			Auctioneer_SetFilter(cmd, "off");
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
+		elseif (param == AUCT_CMD_TOGGLE) then
+			local cur = Auctioneer_GetFilterVal(cmd);
+			if (cur == "on") then
+				cur = "off";
+				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
+			else
+				cur = "on";
+				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
+			end
+			Auctioneer_SetFilter(cmd, cur);
+		else
+			Auctioneer_SetFilter(cmd, "on");
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
+		end
+	elseif (cmd == AUCT_SHOW_MESH) then
+		if (param == AUCT_CMD_OFF) then
+			Auctioneer_SetFilter(cmd, "off");
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
+		elseif (
+			(param == AUCT_CMD_ALT) or
+			(param == AUCT_CMD_CTRL) or
+			(param == AUCT_CMD_SHIFT)
+		) then
+			Auctioneer_SetFilter(cmd, param);
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLED_ON, cmd, param));
 		elseif (param == AUCT_CMD_TOGGLE) then
 			local cur = Auctioneer_GetFilterVal(cmd);
 			if (cur == "on") then
