@@ -113,7 +113,7 @@ function Auctioneer_StartAuctionScan()
     -- first make sure that we have at least one category to scan
     lCurrentCategoryIndex = 0;
     if not nextIndex() then
-        Auctioneer_ChatPrint("You must have at least one category selected to scan.");
+        Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NOCAT);
         return;
     end
 
