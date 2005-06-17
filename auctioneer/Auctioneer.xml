@@ -175,7 +175,15 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Frame>
 		</Frames>
 	</Frame>
-	<CheckButton name="AuctFilterTemplate" inherits="OptionsCheckButtonTemplate" hidden="true" virtual="true">
+	<CheckButton name="AuctFilterTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 		<Scripts>
 			<OnClick>
 				if (this.filterVal) then
