@@ -16,9 +16,9 @@ local lOriginal_AuctionFrameBrowse_OnEvent;
 
 -- get the next category index to based on what categories have been configured to be scanned
 local function nextIndex()
-    local catIndex = lCurrentCategoryIndex + 1;
+    local catIndex = nil;
     
-    for i=catIndex,table.getn(lMajorAuctionCategories) do
+    for i = lCurrentCategoryIndex + 1, table.getn(lMajorAuctionCategories) do
         if tostring(Auctioneer_GetFilterVal("scan-class"..i)) == "on" then
             catIndex = i;
             break;
