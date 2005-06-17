@@ -13,6 +13,26 @@ local lScanInProgress;
 local lOriginal_CanSendAuctionQuery;
 local lOriginal_AuctionFrameBrowse_OnEvent;
 
+
+-- get the next category index to based on what categories have been configured to be scanned
+local function nextIndex()
+    local catIndex = lCurrentCategoryIndex + 1;
+    
+    for i=catIndex,table.getn(lMajorAuctionCategories) do
+        if tostring(Auctioneer_GetFilterVal("scan-class"..i)) == "on" then
+            catIndex = i;
+            break;
+        end
+            
+        if i == table.getn(lMajorAuctionCategories) then
+            catIndex = nil;
+            break;
+        end
+    end
+        
+    return catIndex;
+end
+
 function Auctioneer_StopAuctionScan()
 	Auctioneer_Event_StopAuctionScan();
 	
@@ -40,8 +60,8 @@ local function Auctioneer_AuctionNextQuery()
 		if( lCurrentAuctionPage < maxPages ) then
 			lCurrentAuctionPage = lCurrentAuctionPage + 1;
 			BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
-        elseif ( lCurrentCategoryIndex < table.getn(lMajorAuctionCategories) ) then
-            lCurrentCategoryIndex = lCurrentCategoryIndex + 1;
+        elseif nextIndex() then
+            lCurrentCategoryIndex = nextIndex();
             lCurrentAuctionPage = 0;
 		else
 			Auctioneer_StopAuctionScan();
@@ -88,10 +108,18 @@ function Auctioneer_AuctionFrameBrowse_OnEvent()
 end
 
 function Auctioneer_StartAuctionScan()
+    lMajorAuctionCategories = {GetAuctionItemClasses()};
+
+    -- first make sure that we have at least one category to scan
+    lCurrentCategoryIndex = 0;
+    if not nextIndex() then
+        Auctioneer_ChatPrint("You must have at least one category selected to scan.");
+        return;
+    end
+
 	-- Start with the first page
 	lCurrentAuctionPage = nil;
-    lCurrentCategoryIndex = 1;    
-    lMajorAuctionCategories = {GetAuctionItemClasses()};
+    lCurrentCategoryIndex = nextIndex();
 	lScanInProgress = true;
 
 	-- Hook the functions that we need for the scan

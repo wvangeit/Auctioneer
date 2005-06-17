@@ -258,7 +258,7 @@ local function Auctioneer_FinishedAuctionScan_Hook()
     -- only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
 	local auctKey = sanifyAHSnapshot();
 
-    if lTotalAuctionsScannedCount > 250 then 
+    if lTotalAuctionsScannedCount >= 50 then 
         for i,a in AHSnapshot[auctKey] do
             if (a.dirty == 1) then
                 AHSnapshot[auctKey][i] = nil; --clear defunct auctions
