@@ -146,7 +146,7 @@ AUCT_OPT_BROKER = "<silver_profit>";
 AUCT_OPT_BIDBROKER = "<silver_profit>";
 AUCT_OPT_PERCENTLESS = "<percent>";
 AUCT_OPT_COMPETE = "<silver_less>";
-AUCT_OPT_SCAN = "<category>";
+AUCT_OPT_SCAN = "";
 AUCT_OPT_SCALE = "<scale_factor>";
 AUCT_OPT_SCALE_DEFAULT = 1.0;
 
@@ -199,7 +199,7 @@ AUCT_HELP_BIDBROKER = "Show short or medium term auctions from the recent scan t
 AUCT_HELP_EMBED = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
 AUCT_HELP_PERCENTLESS = "Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
 AUCT_HELP_COMPETE = "Show any recently scanned auctions whose buyout is less than one of your items";
-AUCT_HELP_SCAN = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane)";
+AUCT_HELP_SCAN = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
 AUCT_HELP_AUTOFILL = "Set whether to autofill prices when dropping new auction items into the auction house window";
 AUCT_HELP_PCT_BIDMARKDOWN = "Set the percentage that Auctioneer will mark down bids from the buyout price";
 AUCT_HELP_PCT_MARKUP = "The percentage that vendor prices will be marked up when no other values are available";
