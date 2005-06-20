@@ -129,8 +129,10 @@ local function getRect(object)
 end
 
 function TT_Show(currentTooltip)
-	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) then
+	if (EnhancedTooltip.hasEmbed) then
 		currentTooltip:Show();
+	end
+	if (not EnhancedTooltip.hasData) then
 		return;
 	end
 
@@ -265,6 +267,9 @@ end
 
 function TT_Clear()
 	TT_Hide();
+	EnhancedTooltip.hasEmbed = false;
+	EnhancedTooltip.curEmbed = false;
+	EnhancedTooltip.hasData = false;
 	EnhancedTooltipPreview:Hide();
 	EnhancedTooltipIcon:Hide();
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2");
@@ -283,16 +288,61 @@ function TT_Clear()
 	EnhancedTooltip.minWidth = 0;
 end
 
+-- calculate the gold, silver, and copper values based the ammount of copper
+function TT_GetGSC(money)
+	if (money == nil) then money = 0; end
+	local g = math.floor(money / 10000);
+	local s = math.floor((money - (g*10000)) / 100);
+	local c = math.floor(money - (g*10000) - (s*100));
+	return g,s,c;
+end
+
+-- formats money text by color for gold, silver, copper
+function TT_GetTextGSC(money)
+    local GSC_GOLD="ffd100";
+    local GSC_SILVER="e6e6e6";
+    local GSC_COPPER="c8602c";
+    local GSC_START="|cff%s%d|r";
+    local GSC_PART=".|cff%s%02d|r";
+    local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
+
+	local g, s, c = TT_GetGSC(money);
+
+	local gsc = "";
+	if (g > 0) then
+		gsc = format(GSC_START, GSC_GOLD, g);     
+		if (s > 0) then
+			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
+		end
+	elseif (s > 0) then
+		gsc = format(GSC_START, GSC_SILVER, s);
+		if (c > 0) then
+			gsc = gsc..format(GSC_PART, GSC_COPPER, c);
+		end
+	elseif (c > 0) then
+		gsc = gsc..format(GSC_START, GSC_COPPER, c);
+	else
+		gsc = GSC_NONE;
+	end
+
+	return gsc;
+end
+
 TT_MoneySpacing = 4;
-function TT_AddLine(lineText, moneyAmount)
-	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) and (TT_CurrentTip) then
+function TT_AddLine(lineText, moneyAmount, embed)
+	if (embed == nil) then embed = TT_EMBED; end
+	if (embed) and (TT_CurrentTip) then
+		EnhancedTooltip.hasEmbed = true;
+		EnhancedTooltip.curEmbed = true;
 		if (moneyAmount) then
-			TT_CurrentTip:AddLine(lineText .. ": " .. Auctioneer_GetTextGSC(moneyAmount));
+			TT_CurrentTip:AddLine(lineText .. ": " .. TT_GetTextGSC(moneyAmount));
 		else
 			TT_CurrentTip:AddLine(lineText);
 		end
 		return;
 	end
+	EnhancedTooltip.hasData = true;
+	EnhancedTooltip.curEmbed = false;
 
 	local curLine = EnhancedTooltip.lineCount + 1;
 	local line = getglobal("EnhancedTooltipText"..curLine);
@@ -322,7 +372,7 @@ function TT_AddLine(lineText, moneyAmount)
 end
 
 function TT_LineColor(r, g, b)
-	if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) and (TT_CurrentTip) then
+	if (EnhancedTooltip.curEmbed) and (TT_CurrentTip) then
 		local lastLine = getglobal(TT_CurrentTip:GetName().."TextLeft"..TT_CurrentTip:NumLines());
 		lastLine:SetTextColor(r,g,b);
 		return;
@@ -463,7 +513,7 @@ function TT_Chat_OnHyperlinkShow(link)
 	if (ItemRefTooltip:IsVisible()) then
 		local name = ItemRefTooltipTextLeft1:GetText();
 		if (name and TT_ChatCurrentItem ~= name) then
-			local fabricatedLink = "|H"..link.."|h["..name.."]|h";
+			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
 			TT_ChatCurrentItem = name;
 			
 			TT_Clear();

@@ -99,44 +99,12 @@ local function getTimeLeftString(timeLeft)
     return timeLeftString;    
 end
 
--- calculate the gold, silver, and copper values based the ammount of copper
 function Auctioneer_GetGSC(money)
-	if (money == nil) then money = 0; end
-	local g = math.floor(money / 10000);
-	local s = math.floor((money - (g*10000)) / 100);
-	local c = math.floor(money - (g*10000) - (s*100));
+	local g,s,c = TT_GetGSC(money);
 	return g,s,c;
 end
-
--- formats money text by color for gold, silver, copper
 function Auctioneer_GetTextGSC(money)
-    local GSC_GOLD="ffd100";
-    local GSC_SILVER="e6e6e6";
-    local GSC_COPPER="c8602c";
-    local GSC_START="|cff%s%d|r";
-    local GSC_PART=".|cff%s%02d|r";
-    local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
-
-	local g, s, c = Auctioneer_GetGSC(money);
-
-	local gsc = "";
-	if (g > 0) then
-		gsc = format(GSC_START, GSC_GOLD, g);     
-		if (s > 0) then
-			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
-		end
-	elseif (s > 0) then
-		gsc = format(GSC_START, GSC_SILVER, s);
-		if (c > 0) then
-			gsc = gsc..format(GSC_PART, GSC_COPPER, c);
-		end
-	elseif (c > 0) then
-		gsc = gsc..format(GSC_START, GSC_COPPER, c);
-	else
-		gsc = GSC_NONE;
-	end
-
-	return gsc;
+	return TT_GetGSC(money);
 end
 
 -- return an empty string if str is nil
@@ -629,7 +597,7 @@ end
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
     if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(AUCT_FRMT_BROKER_HEADER, Auctioneer_GetTextGSC(minProfit));
+	local output = string.format(AUCT_FRMT_BROKER_HEADER, TT_GetTextGSC(minProfit));
     Auctioneer_ChatPrint(output);
     
     local resellableAuctions = querySnapshot(brokerFilter, minProfit);
@@ -643,7 +611,7 @@ function doBroker(minProfit)
 		local itemKey = id .. ":" .. rprop..":"..enchant;
         local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, a.category);
         local profit = (hsp * count) - buyout;
-		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit));
+		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
         Auctioneer_ChatPrint(output);
     end
     
@@ -653,7 +621,7 @@ end
 -- builds the list of auctions that can be bought and resold for profit
 function doBidBroker(minProfit)
     if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(AUCT_FRMT_BIDBROKER_HEADER, Auctioneer_GetTextGSC(minProfit));
+	local output = string.format(AUCT_FRMT_BIDBROKER_HEADER, TT_GetTextGSC(minProfit));
     Auctioneer_ChatPrint(output);
     
     local bidWorthyAuctions = querySnapshot(bidBrokerFilter, minProfit);
@@ -672,7 +640,7 @@ function doBidBroker(minProfit)
 		if (currentBid == min) then
 			bidText = AUCT_FRMT_BIDBROKER_MINBID;
 		end
-		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), bidText, Auctioneer_GetTextGSC(currentBid), Auctioneer_GetTextGSC(profit), colorTextWhite(getTimeLeftString(a.timeLeft)));
+		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), colorTextWhite(getTimeLeftString(a.timeLeft)));
 		Auctioneer_ChatPrint(output);
     end
     
@@ -681,7 +649,7 @@ end
 
 function doCompeting(minLess)
     if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS * 100 else minLess = tonumber(minLess) * 100  end
-	local output = string.format(AUCT_FRMT_COMPETE_HEADER, Auctioneer_GetTextGSC(minLess));
+	local output = string.format(AUCT_FRMT_COMPETE_HEADER, TT_GetTextGSC(minLess));
     Auctioneer_ChatPrint(output);
     
     local myAuctions = querySnapshot(auctionOwnerFilter, UnitName("player"));
@@ -711,16 +679,16 @@ function doCompeting(minLess)
 			bidForOne = currentBid/count;
 		end
 
-		local bidPrice = Auctioneer_GetTextGSC(bidForOne).."ea";
+		local bidPrice = TT_GetTextGSC(bidForOne).."ea";
 		if (currentBid == min) then
 			bidPrice = "No bids ("..bidPrice..")";
 		end
 
 		local myBuyout = myHighestPrices[itemKey];
-		local buyPrice = Auctioneer_GetTextGSC(buyoutForOne).."ea";
-		local myPrice = Auctioneer_GetTextGSC(myBuyout).."ea";
+		local buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
+		local myPrice = TT_GetTextGSC(myBuyout).."ea";
 		local priceLess = myBuyout - buyoutForOne;
-		local lessPrice = Auctioneer_GetTextGSC(priceLess);
+		local lessPrice = TT_GetTextGSC(priceLess);
 
 		local output = string.format(AUCT_FRMT_COMPETE_LINE, colorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 		Auctioneer_ChatPrint(output);
@@ -747,7 +715,7 @@ function doPercentLess(percentLess)
         local category = AHSnapshot[sanifyAHSnapshot()][a.signature].category;
         local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, category);         
 		local profit = (hsp * count) - buyout;
- 		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, Auctioneer_GetTextGSC(hsp * count), Auctioneer_GetTextGSC(buyout), Auctioneer_GetTextGSC(profit), colorTextWhite(percentLessThan(hsp, buyout / count).."%"));
+ 		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), colorTextWhite(percentLessThan(hsp, buyout / count).."%"));
         Auctioneer_ChatPrint(output);
     end
     
@@ -798,7 +766,7 @@ function doMedian(link)
     if (not median) then
         Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_NOAUCT, colorTextWhite(itemName)));
     else
-        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_LINE, count, colorTextWhite(itemName), Auctioneer_GetTextGSC(median)));
+        Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_LINE, count, colorTextWhite(itemName), TT_GetTextGSC(median)));
     end    
 end
 
@@ -922,7 +890,7 @@ local function doLow(link)
 		local auctKey = sanifyAHSnapshot();
         local auction = AHSnapshot[auctKey][auctionSignature];
         local itemKey = itemID..":"..randomProp..":"..enchant;
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, colorTextWhite(count.."x")..auction.itemLink, Auctioneer_GetTextGSC(buyout), colorTextWhite(auction.owner), Auctioneer_GetTextGSC(buyout / count), colorTextWhite(percentLessThan(getUsableMedian(itemKey), buyout / count).."%")));
+		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, colorTextWhite(count.."x")..auction.itemLink, TT_GetTextGSC(buyout), colorTextWhite(auction.owner), TT_GetTextGSC(buyout / count), colorTextWhite(percentLessThan(getUsableMedian(itemKey), buyout / count).."%")));
     end
 end
 
@@ -931,7 +899,7 @@ local function doHSP(link)
 	local itemKey = itemID..":"..randomProp..":"..enchant;
     local category = getItemCategory(itemKey); 
     local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, category);
-    Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), Auctioneer_GetTextGSC(nilSafeString(highestSellablePrice))));
+    Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), TT_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
 
 local function doTest(param)
@@ -1158,27 +1126,27 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 					TT_LineColor(0.5,0.8,0.1);
 					if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
 						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty));
 							TT_LineColor(0.1,0.8,0.5);
 						else
-							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)));
 							TT_LineColor(0.1,0.8,0.5);
 						end
 					else -- Verbose mode
 						if (count > 1) then
 							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count));
 							TT_LineColor(0.4,0.5,1.0);
-							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, Auctioneer_GetTextGSC(avgMin)), avgMin*count);
+							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, TT_GetTextGSC(avgMin)), avgMin*count);
 							TT_LineColor(0.4,0.5,0.8);
 							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", Auctioneer_GetTextGSC(avgBid)), avgBid*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", TT_GetTextGSC(avgBid)), avgBid*count);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", Auctioneer_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", TT_GetTextGSC(avgBuy)), avgBuy*count);
 								TT_LineColor(0.4,0.5,0.9);
 							else
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", Auctioneer_GetTextGSC(avgBid)), avgBid*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", TT_GetTextGSC(avgBid)), avgBid*count);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", Auctioneer_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", TT_GetTextGSC(avgBuy)), avgBuy*count);
 								TT_LineColor(0.4,0.5,0.9);
 							end
 							if (median) then
@@ -1232,7 +1200,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 							if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
 							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
 							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(buyoutPriceForOne*count), Auctioneer_GetTextGSC(avgBid*count)));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)));
 							TT_LineColor(0.5,0.5,0.8);
 						end
 					end
@@ -1273,15 +1241,15 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also));
 						TT_LineColor(0.5,0.8,0.1);
 						if (avgQty > 1) then
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid), avgQty));
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty));
 							TT_LineColor(0.1,0.8,0.5);
 						else
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, Auctioneer_GetTextGSC(avgMin), Auctioneer_GetTextGSC(avgBuy), Auctioneer_GetTextGSC(avgBid)));
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)));
 							TT_LineColor(0.1,0.8,0.5);
 						end
 						if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
 							if (count > 1) then
-								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, Auctioneer_GetTextGSC(avgMin*count), Auctioneer_GetTextGSC(avgBuy*count), Auctioneer_GetTextGSC(avgBid*count)));
+								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)));
 								TT_LineColor(0.5,0.5,0.8);
 							end
 						end
@@ -1335,12 +1303,12 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 		if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR)) then
 			if ((buy > 0) or (sell > 0)) then
-				local bgsc = Auctioneer_GetTextGSC(buy);
-				local sgsc = Auctioneer_GetTextGSC(sell);
+				local bgsc = TT_GetTextGSC(buy);
+				local sgsc = TT_GetTextGSC(sell);
                 
 				if (count and (count > 1)) then
-					local bqgsc = Auctioneer_GetTextGSC(buy*count);
-					local sqgsc = Auctioneer_GetTextGSC(sell*count);
+					local bqgsc = TT_GetTextGSC(buy*count);
+					local sqgsc = TT_GetTextGSC(sell*count);
 					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
 						TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bgsc), buy*count);
 						TT_LineColor(0.8, 0.5, 0.1);
@@ -1444,6 +1412,7 @@ function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
 	Auctioneer_OldTooltip = TT_AddTooltip;
 	TT_AddTooltip = Auctioneer_NewTooltip;
+	DEFAULT_CHAT_FRAME:AddMessage("Hooked auctioneer tooltip");
 
     -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
@@ -1810,7 +1779,7 @@ end
 -- example: this function changes 1g15s to 95s
 -- example: 1.5g will be unchanged and remain 1.5g
 local function roundDownTo95(copper)
-    local g,s,c = Auctioneer_GetGSC(copper);
+    local g,s,c = TT_GetGSC(copper);
     local roundedValue = copper;
     
     if g > 0 and s < 10 then
