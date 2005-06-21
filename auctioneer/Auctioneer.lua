@@ -1069,21 +1069,25 @@ end
 function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	Auctioneer_OldTooltip(frame, name, link, quality, count);
 
+
 	if (not link) then p("No link was passed to the client");  return; end
 	local itemID, randomProp, enchant, uniqID, lame = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
+
+	local embedded = Auctioneer_GetFilter(AUCT_CMD_EMBED);
+
 	if (Auctioneer_GetFilter("all")) then
-		if (Auctioneer_GetFilter(AUCT_CMD_EMBED)) then
+		if (embedded) then
 			if (Auctioneer_GetFilter(AUCT_SHOW_EMBED_BLANK)) then
-				TT_AddLine(" ");
+				TT_AddLine(" ", nil, embedded);
 			end
 		else
-			TT_AddLine(name);
+			TT_AddLine(name, nil, embedded);
 			TT_LineQuality(quality);
 		end
 
 		if (Auctioneer_GetFilter(AUCT_SHOW_LINK)) then
-			TT_AddLine("Link: " .. itemKey .. ":" .. uniqID);
+			TT_AddLine("Link: " .. itemKey .. ":" .. uniqID, nil, embedded);
 			TT_LineQuality(quality);
 		end
 
@@ -1101,7 +1105,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			itemInfo = Auctioneer_BasePrices[itemID];
 
 			if (aCount == 0) then
-				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, AUCT_TEXT_AUCTION));
+				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, AUCT_TEXT_AUCTION), nil, embedded);
 				TT_LineColor(0.5, 0.8, 0.5);
 			else
 				local avgQty = math.floor(minCount / aCount);
@@ -1122,60 +1126,60 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
                 local median, medCount = getUsableMedian(itemKey, name);
 
 				if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then
-					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount));
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount), nil, embedded);
 					TT_LineColor(0.5,0.8,0.1);
 					if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
 						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
 							TT_LineColor(0.1,0.8,0.5);
 						else
-							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
 							TT_LineColor(0.1,0.8,0.5);
 						end
 					else -- Verbose mode
 						if (count > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count), nil, embedded);
 							TT_LineColor(0.4,0.5,1.0);
-							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, TT_GetTextGSC(avgMin)), avgMin*count);
+							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, TT_GetTextGSC(avgMin)), avgMin*count, embedded);
 							TT_LineColor(0.4,0.5,0.8);
 							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", TT_GetTextGSC(avgBid)), avgBid*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", TT_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
 								TT_LineColor(0.4,0.5,0.9);
 							else
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", TT_GetTextGSC(avgBid)), avgBid*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", TT_GetTextGSC(avgBuy)), avgBuy*count);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
 								TT_LineColor(0.4,0.5,0.9);
 							end
 							if (median) then
-								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count);
+								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count, embedded);
 								TT_LineColor(0.4,0.5,0.95);
 							end
 						else
-							TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE);
+							TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE, nil, embedded);
 							TT_LineColor(0.4,0.5,1.0);
-							TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin);
+							TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin, embedded);
 							TT_LineColor(0.4,0.5,0.8);
 							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, " "..bidPct.."%"), avgBid);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, " "..bidPct.."%"), avgBid, embedded);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, " "..buyPct.."%"), avgBuy);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, " "..buyPct.."%"), avgBuy, embedded);
 								TT_LineColor(0.4,0.5,0.9);
 							else
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, ""), avgBid);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, ""), avgBid, embedded);
 								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy);
+								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy, embedded);
 								TT_LineColor(0.4,0.5,0.9);
 							end
 							if (median) then
-								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median);
+								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median, embedded);
 								TT_LineColor(0.4,0.5,0.95);
 							end
 						end
 						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_STACKSIZE, avgQty));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_STACKSIZE, avgQty), nil, embedded);
 							TT_LineColor(0.4,0.5,1.0);
 						end
 					end
@@ -1184,11 +1188,11 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
 						local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
 						if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian)
+							TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian, embedded)
 							TT_LineColor(0.1,0.8,0.5);
 						end
 						if snapshotMedian then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian)
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian, embedded)
 							TT_LineColor(0.1,0.8,0.5);
 						end
 					end
@@ -1200,12 +1204,12 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 							if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
 							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
 							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)));
+							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						end
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
+						TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
 						TT_LineColor(0.1,0.5,0.8);
 					end
 				end
@@ -1234,28 +1238,28 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				end
 
 				if (aCount == 0) then
-					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also));
+					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also), nil, embedded);
 					TT_LineColor(0.5,0.8,0.1);
 				else
 					if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then
-						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also));
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also), nil, embedded);
 						TT_LineColor(0.5,0.8,0.1);
 						if (avgQty > 1) then
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty));
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
 							TT_LineColor(0.1,0.8,0.5);
 						else
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)));
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
 							TT_LineColor(0.1,0.8,0.5);
 						end
 						if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
 							if (count > 1) then
-								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)));
+								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
 								TT_LineColor(0.5,0.5,0.8);
 							end
 						end
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct));
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
 						TT_LineColor(0.1,0.5,0.8);
 					end
 				end
@@ -1310,20 +1314,20 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 					local bqgsc = TT_GetTextGSC(buy*count);
 					local sqgsc = TT_GetTextGSC(sell*count);
 					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bgsc), buy*count);
+						TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bgsc), buy*count, embedded);
 						TT_LineColor(0.8, 0.5, 0.1);
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sgsc), sell*count);
+						TT_AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sgsc), sell*count, embedded);
 						TT_LineColor(0.8, 0.5, 0.1);
 					end
 				else
 					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote), buy);
+						TT_AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote), buy, embedded);
 						TT_LineColor(0.8, 0.5, 0.1);
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote), sell);
+						TT_AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote), sell, embedded);
 						TT_LineColor(0.8, 0.5, 0.1);
 					end
 				end
@@ -1332,7 +1336,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 		if (Auctioneer_GetFilter(AUCT_SHOW_STACK)) then
 			if (stacks > 1) then
-				TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks));
+				TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks), nil, embedded);
 			end
 		end
 		if (Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
@@ -1347,7 +1351,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
 			end
 			if (reagentInfo ~= "") then
-				TT_AddLine(reagentInfo);
+				TT_AddLine(reagentInfo, nil, embedded);
 				TT_LineColor(0.6, 0.4, 0.8);
 			end
 		end
