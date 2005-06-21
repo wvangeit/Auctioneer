@@ -2,8 +2,7 @@
 ## Interface: 1500
 ## Version: <%version%>
 ## Revision: $Id$
-## Notes: Displays collected information about item in the info window. Use "/lootlink scan" at AH to collect auction data. With Broker Mod.
-## OptionalDeps: LootLink, ItemsMatrix, AllInOneInventory, EquipCompare
+## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
+## OptionalDeps: EnhancedTooltip
 ## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
-Tooltip.xml
 Auctioneer.xml
