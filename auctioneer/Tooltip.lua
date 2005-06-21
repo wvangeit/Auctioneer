@@ -475,11 +475,9 @@ local function nameFromLink(link)
         return nil;
 end
 local function  qualityFromLink(link)
-	p("QFL: Decoding link", link);
 	local color;
 	if (not link) then return nil; end
 	for color in string.gfind(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r") do
-		p("QFL: Found color "..color);
 		if (color == "ffa335ee") then return 4;--[[ Epic ]] end
 		if (color == "ff0070dd") then return 3;--[[ Rare ]] end
 		if (color == "ff1eff00") then return 2;--[[ Uncommon ]] end
@@ -558,7 +556,6 @@ function TT_ContainerFrameItemButton_OnEnter()
 	
 	if (name) then
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
-		p("Got quality: ",quality, "for link", link);
 		if (quality==nil or quality==-1) then quality = qualityFromLink(link); end
 
 		TT_Clear();
