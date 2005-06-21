@@ -203,20 +203,6 @@ function TT_Show(currentTooltip)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
 		end
 
-		if (EquipCompare_OnUpdate ~= nil) then EquipCompare_OnUpdate(); end
-		if (ComparisonTooltip1 and ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
-			if (xAnchor == "RIGHT") then
-				ComparisonTooltip1:ClearAllPoints();
-				ComparisonTooltip1:SetPoint("BOTTOMLEFT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
-				ComparisonTooltip2:ClearAllPoints();
-				ComparisonTooltip2:SetPoint("BOTTOMLEFT", "ComparisonTooltip1", "BOTTOMRIGHT", 0,0);
-			else
-				ComparisonTooltip1:ClearAllPoints();
-				ComparisonTooltip1:SetPoint("BOTTOMRIGHT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
-				ComparisonTooltip2:ClearAllPoints();
-				ComparisonTooltip2:SetPoint("BOTTOMRIGHT", "ComparisonTooltip1", "BOTTOMLEFT", 0,0);
-			end
-		end
 	else
 		-- No parent
 		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
