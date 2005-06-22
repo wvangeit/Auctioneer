@@ -6,8 +6,11 @@
 
 -- Example: /script TT_Clear(); TT_AddLine("ItemName"); TT_LineQuality(3); TT_AddLine("Average bid: ", 105000); TT_AddLine("Median bid: ", 110000); TT_AddLine("Vendor buy: ", 9050); TT_AddLine("Vendor sell: ", 25000); TT_Show(GameTooltip);
 
+
 if (TOOLTIPS_INCLUDED == nil) then
 TOOLTIPS_INCLUDED = true;
+
+ENHTOOLTIP_VERSION = "<%version%>";
 
 TT_CurrentTip = nil;
 
@@ -27,6 +30,10 @@ local Orig_IMInv_ItemButton_OnEnter;
 local Orig_ItemsMatrixItemButton_OnEnter;
 local Orig_LootLinkItemButton_OnEnter;
 local Orig_GameTooltip_OnHide;
+
+if (ENHTOOLTIP_VERSION == "<".."%version%>") then
+	ENHTOOLTIP_VERSION = "1.0.DEV";
+end
 
 function TT_OnLoad()
         if (TT_LOADED ~= nil) then 
