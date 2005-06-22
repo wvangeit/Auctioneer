@@ -23,6 +23,7 @@ local Orig_GameTooltip_SetQuestItem;
 local Orig_GameTooltip_SetQuestLogItem;
 local Orig_GameTooltip_SetInventoryItem;
 local Orig_GameTooltip_SetMerchantItem;
+local Orig_GameTooltip_SetCraftItem;
 local Orig_GameTooltip_SetTradeSkillItem;
 local Orig_GameTooltip_SetAuctionSellItem;
 local Orig_GameTooltip_SetOwner;
@@ -67,6 +68,8 @@ function TT_OnLoad()
 		GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
 		Orig_GameTooltip_SetMerchantItem = GameTooltip.SetMerchantItem;
 		GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
+		Orig_GameTooltip_SetCraftItem = GameTooltip.SetCraftItem;
+		GameTooltip.SetCraftItem = TT_GameTooltip_SetCraftItem;
 		Orig_GameTooltip_SetTradeSkillItem = GameTooltip.SetTradeSkillItem;
 		GameTooltip.SetTradeSkillItem = TT_GameTooltip_SetTradeSkillItem;
 		Orig_GameTooltip_SetAuctionSellItem = GameTooltip.SetAuctionSellItem;
@@ -177,13 +180,13 @@ function TT_Show(currentTooltip)
 		local parentRect = getRect(currentTooltip.owner);
 		
 		local xAnchor, yAnchor;
-		if (align == "ANCHOR_RIGHT") then
+		if (parentRect.l - width < sWidth * 0.2) then
+			xAnchor = "RIGHT";
+		elseif (parentRect.r + width < sWidth * 0.8) then
+			xAnchor = "LEFT";
+		elseif (align == "ANCHOR_RIGHT") then
 			xAnchor = "RIGHT";
 		elseif (align == "ANCHOR_LEFT") then
-			xAnchor = "LEFT";
-		elseif (parentRect.cx < 6*sWidth/10) then
-			xAnchor = "RIGHT";
-		else
 			xAnchor = "LEFT";
 		end
 		if (parentRect.cy < sHeight/2) then
@@ -198,7 +201,7 @@ function TT_Show(currentTooltip)
 
 		if (anchor == "TOPLEFT") then
 			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5,5);
-			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,5);
+			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,0);
 		elseif (anchor == "TOPRIGHT") then
 			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5,5);
 			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0);
@@ -226,16 +229,16 @@ function TT_Show(currentTooltip)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0);
 		end
-
-		if (ComparisonTooltip1 and ComparisonTooltip1:IsVisible() and ComparisonTooltip1:GetHeight()+10 > currentTooltip:GetHeight()) then
-			ComparisonTooltip1:ClearAllPoints();
-			ComparisonTooltip1:SetPoint("BOTTOMRIGHT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0);
-			ComparisonTooltip2:ClearAllPoints();
-			ComparisonTooltip2:SetPoint("BOTTOMRIGHT", "ComparisonTooltip1", "BOTTOMLEFT", 0,0);
-		end
 	end
 	
 	
+	local cWidth = currentTooltip:GetWidth();
+	if (cWidth < width) then
+		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20);
+		currentTooltip:Show();
+	elseif (cWidth > width) then
+		width = cWidth;
+	end
 	
 	EnhancedTooltip:SetHeight(height);
 	EnhancedTooltip:SetWidth(width);
@@ -648,6 +651,30 @@ function TT_GameTooltip_SetMerchantItem(this, slot)
 		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
 		TT_Show(GameTooltip);
+	end
+end
+
+function TT_GameTooltip_SetCraftItem(this, skill, slot)
+	Orig_GameTooltip_SetCraftItem(this, skill, slot);
+	local link;
+	if (slot) then
+		link = GetCraftReagentItemLink(skill, slot);
+		if (link) then
+			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot);
+			local quality = qualityFromLink(link);
+			TT_Clear();
+			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
+			TT_Show(GameTooltip);
+		end
+	else
+		link = GetCraftItemLink(skill);
+		if (link) then
+			local name = nameFromLink(link);
+			local quality = qualityFromLink(link);
+			TT_Clear();
+			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
+			TT_Show(GameTooltip);
+		end
 	end
 end
 

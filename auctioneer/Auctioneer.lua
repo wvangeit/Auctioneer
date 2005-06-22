@@ -1416,7 +1416,6 @@ function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
 	Auctioneer_OldTooltip = TT_AddTooltip;
 	TT_AddTooltip = Auctioneer_NewTooltip;
-	DEFAULT_CHAT_FRAME:AddMessage("Hooked auctioneer tooltip");
 
     -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
