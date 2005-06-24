@@ -98,6 +98,7 @@ local function getTimeLeftString(timeLeft)
     end
     return timeLeftString;    
 end
+Auctioneer_GetTimeLeftString = getTimeLeftString;
 
 function Auctioneer_GetGSC(money)
 	local g,s,c = TT_GetGSC(money);
@@ -119,6 +120,7 @@ local function colorTextWhite(text)
     local WHITE_COLOR = "e6e6e6";
     return format(COLORING_START, WHITE_COLOR, ""..text);
 end
+Auctioneer_ColorTextWhite = colorTextWhite;
 
 -- used to convert variables that should be numbers but are nil to 0
 function nullSafe(val)
@@ -144,6 +146,7 @@ local function percentLessThan(value1, value2)
         return 0;
     end
 end
+Auctioneer_PercentLessThan = percentLessThan;
 
 -- returns the median value of a given table one-dimentional table
 function getMedian(valuesTable)
@@ -189,6 +192,7 @@ local function sanifyAHSnapshot()
 	end
 	return auctKey;
 end
+Auctioneer_SanifyAHSnapshot = sanifyAHSnapshot;
 
 --this function sets the dirty flag to true for all the auctions in the snapshot
 --this is done to indicate that the snapshot is out of date.
@@ -263,6 +267,7 @@ local function oppositeKey()
 	if (factionGroup == "Alliance") then factionGroup="Horde"; else factionGroup="Alliance"; end
 	return serverName.."-"..factionGroup;
 end
+Auctioneer_OppositeKey = oppositeKey;
 
 function Auctioneer_GetAuctionKey()
 	return auctionKey();
@@ -276,11 +281,13 @@ local function breakLink(link)
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name;
 end
+Auctioneer_BreakLink = breakLink;
 
 local function breakItemKey(itemKey)
 	local i,j, itemID, randomProp, enchant = string.find(itemKey, "(%d+):(%d+):(%d+)");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0);
 end
+Auctioneer_BreakItemKey = breakItemKey;
 
 -- returns an AuctionPrices item from the table based on an item name
 local function getAuctionPriceItem(itemKey, from, name, id)
@@ -300,7 +307,7 @@ local function getAuctionPriceItem(itemKey, from, name, id)
     
     return auctionPriceItem;
 end
-
+Auctioneer_GetAuctionPriceItem = getAuctionPriceItem;
 
 -- wrapper for getting AuctionPrices data that is backward compatible with old AuctionPrices keys
 local function getAuctionPriceData(itemKey, from, name, id)
@@ -315,7 +322,7 @@ local function getAuctionPriceData(itemKey, from, name, id)
 	end
 	return data;
 end
-
+Auctioneer_GetAuctionPriceData = getAuctionPriceData;
 
 -- returns the auction buyout history for this item
 function getAuctionBuyoutHistory(itemKey, name)
@@ -334,6 +341,7 @@ local function getAuctionPrices(priceData)
 	local i,j, count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = string.find(priceData, "^(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)");
 	return nullSafe(count),nullSafe(minCount),nullSafe(minPrice),nullSafe(bidCount),nullSafe(bidPrice),nullSafe(buyCount),nullSafe(buyPrice);
 end
+Auctioneer_GetAuctionPrices = getAuctionPrices;
 
 -- parse the data from the auction signature
 local function getItemSignature(sigData)
@@ -341,6 +349,7 @@ local function getItemSignature(sigData)
 	if (name == nil) then name = ""; end
 	return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
 end
+Auctioneer_GetItemSignature = getItemSignature;
 
 -- returns the category i.e. "Weapon", "Armor" for an item
 local function getItemCategory(itemKey)
@@ -351,7 +360,7 @@ local function getItemCategory(itemKey)
     end
     return category;
 end
-
+Auctioneer_GetItemCategory = getItemCategory;
 
 local function isItemPlayerMade(itemKey)
     local playerMade;
@@ -361,6 +370,7 @@ local function isItemPlayerMade(itemKey)
     end
     return playerMade;
 end
+Auctioneer_IsItemPlayerMade = isItemPlayerMade;
 
 -- return all of the averages for an item
 -- Returns: avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount
@@ -387,9 +397,10 @@ local function getMeans(itemKey, from, name, id)
     end
     return avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount;
 end
+Aucioneer_GetMeans = getMeans;
 
 -- returns the current snapshot median for an item
-function getItemSnapshotMedianBuyout(itemKey)
+local function getItemSnapshotMedianBuyout(itemKey)
     local buyoutPrices = {};
 	local auctKey = sanifyAHSnapshot();
     if AHSnapshotItemPrices[auctKey][itemKey] then 
@@ -400,6 +411,7 @@ function getItemSnapshotMedianBuyout(itemKey)
 
     return getMedian(buyoutPrices) or 0, table.getn(buyoutPrices) or 0;
 end
+Auctioneer_GetItemSnapshotMedianBuyout = getItemSnapshotMedianBuyout;
 
 local function getItemHistoricalMedianBuyout(itemKey, name)
     local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
@@ -407,10 +419,11 @@ local function getItemHistoricalMedianBuyout(itemKey, name)
     local historySeenCount = table.getn(buyoutHistoryTable);
     return historyMedian or 0, historySeenCount or 0;
 end
+Auctioneer_GetItemHistoricalMedianBuyout = getItemHistoricalMedianBuyout;
 
 -- this function returns the most accurate median possible, 
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
-function getUsableMedian(itemKey, name)
+local function getUsableMedian(itemKey, name)
     local usableMedian = nil;
     local count = nil;
 
@@ -432,6 +445,7 @@ function getUsableMedian(itemKey, name)
     
     return usableMedian, count;
 end
+Auctioneer_GetUsableMedian = getUsableMedian;
 
 -- returns true if they link is likely a player made item
 local function isPossiblePlayerMadeItem(link)
@@ -441,6 +455,7 @@ local function isPossiblePlayerMadeItem(link)
     end
     return false;
 end
+Auctioneer_IsPossiblePlayerMadeItem = isPossiblePlayerMadeItem;
 
 
 -- returns the current bid on an auction
@@ -451,7 +466,7 @@ local function getCurrentBid(auctionSignature)
     if currentBid == 0 then currentBid = min end   
     return currentBid;     
 end
-
+Auctioneer_GetCurrentBid = getCurrentBid;
 
 -- this filter will return true if an auction is a bad choice for reselling
 local function isBadResaleChoice(auctionSignature)
@@ -477,6 +492,7 @@ local function isBadResaleChoice(auctionSignature)
     
     return isBadChoice;
 end
+Auctioneer_IsBadResaleChoice = isBadResaleChoice;
 
 -- filters out all auctions except those that meet profit requirements
 local function brokerFilter(minProfit, signature)
@@ -580,6 +596,7 @@ local function querySnapshot(filter, param, extra1, extra2)
     
     return queryResults;
 end
+Auctioneer_QuerySnapshot = querySnapshot;
 
 
 -- method to pass to table.sort() that sorts auctions by profit descending
@@ -592,6 +609,7 @@ local function profitComparisonSort(a, b)
         local bProfit = (getHighestSellablePriceForOne(bItemKey, true, AHSnapshot[sanifyAHSnapshot()][b.signature].category) * bCount) - bBuyout;            
         return (aProfit > bProfit) 
 end
+Auctioneer_ProfitComparisonSort = profitComparisonSort;
         
         
 -- builds the list of auctions that can be bought and resold for profit
@@ -730,7 +748,7 @@ function findLowestAuctionForItem(itemKey)
 	if (itemID == nil) then return nil; end
 	
     local lowSig = nil;
-    local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
+	local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
 	local auctKey = sanifyAHSnapshot();
     for sig,v in AHSnapshot[auctKey] do
         local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(sig);
@@ -1427,7 +1445,7 @@ function Auctioneer_OnLoad()
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
-	SLASH_AUCTIONEER2 = "/auc";
+	SLASH_AUCTIONEER3 = "/auc";
 	SlashCmdList["AUCTIONEER"] = function(msg)
 		Auctioneer_Command(msg);
 	end

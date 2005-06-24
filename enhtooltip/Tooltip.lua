@@ -188,6 +188,8 @@ function TT_Show(currentTooltip)
 			xAnchor = "RIGHT";
 		elseif (align == "ANCHOR_LEFT") then
 			xAnchor = "LEFT";
+		else
+			xAnchor = "RIGHT";
 		end
 		if (parentRect.cy < sHeight/2) then
 			yAnchor = "TOP";
@@ -470,6 +472,8 @@ local function nameFromLink(link)
         end
         return nil;
 end
+TT_NameFromLink = nameFromLink;
+
 local function  qualityFromLink(link)
 	local color;
 	if (not link) then return nil; end
@@ -482,6 +486,8 @@ local function  qualityFromLink(link)
 	end
 	return -1;
 end
+TT_QualityFromLink = qualityFromLink;
+
 local function fakeLink(item, quality, name)
 	if (quality == nil) then quality = -1; end
 	if (name == nil) then name = "unknown"; end
@@ -493,6 +499,7 @@ local function fakeLink(item, quality, name)
 	end
 	return "|cff"..color.. "|H"..item.."|h["..name.."]|h|r";
 end
+TT_FakeLink = fakeLink;
 
 function TT_TooltipCall(frame, name, link, quality, count, price)
 	TT_CurrentTip = frame;
