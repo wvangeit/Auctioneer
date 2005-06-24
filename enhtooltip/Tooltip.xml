@@ -346,6 +346,96 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<FontString name="$parentText21" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText20" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText22" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText21" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText23" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText22" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText24" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText23" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText25" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText24" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText26" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText25" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText27" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText26" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText28" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText27" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText29" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText28" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentText30" inherits="GameFontNormalSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentText29" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
@@ -479,6 +569,116 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Scripts>
 			</Frame>
 			<Frame name="$parentMoney10" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney11" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney12" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney13" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney14" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney15" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney16" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney17" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney18" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney19" inherits="TinyMoneyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad();
+						MoneyFrame_SetType("STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentMoney20" inherits="TinyMoneyFrameTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
 				</Anchors>

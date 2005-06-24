@@ -271,12 +271,12 @@ function TT_Clear()
 	EnhancedTooltipPreview:Hide();
 	EnhancedTooltipIcon:Hide();
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2");
-	for i = 1, 20 do
+	for i = 1, 30 do
 		local ttText = getglobal("EnhancedTooltipText"..i);
 		ttText:Hide();
 		ttText:SetTextColor(1.0,1.0,1.0);
 	end
-	for i = 1, 10 do
+	for i = 1, 20 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i);
 		ttMoney.myLine = nil;
 		ttMoney:Hide();
