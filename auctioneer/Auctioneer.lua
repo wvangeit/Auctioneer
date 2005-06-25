@@ -1426,6 +1426,8 @@ function Auctioneer_OnLoad()
     this:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
     this:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
     this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
+
+    this:RegisterEvent("VARIABLES_LOADED"); -- get called when our vars have loaded
     
 	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
 	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
@@ -1472,6 +1474,14 @@ function AuctFilter_SetFilter(checkbox, filter)
 	checkbox:SetChecked(Auctioneer_GetFilter(filter));
 	checkbox:SetScale(0.5);
 	checkbox:Show();
+end
+
+function Auctioneer_GetLocale()
+	local locale = Auctioneer_GetFilterVal('locale');
+	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
+		return locale;
+	end
+	return GetLocale();
 end
 
 function Auctioneer_FilterButton_SetType(button, type, text, isLast)
@@ -1555,6 +1565,7 @@ function Auctioneer_Command(command)
 
 		lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, "("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_ALT.."|"..AUCT_CMD_CTRL.."|"..AUCT_CMD_SHIFT..")" ,Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
+		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_LOCALE, AUCT_OPT_LOCALE, Auctioneer_GetFilterVal('locale'), AUCT_HELP_LOCALE));
 
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT), AUCT_HELP_PCT_MARKUP));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN, Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT), AUCT_HELP_PCT_BIDMARKDOWN));
@@ -1617,6 +1628,21 @@ function Auctioneer_Command(command)
 		end
 	elseif (cmd == AUCT_CMD_ALSO) then
 		Auctioneer_SetFilter("also", param);        
+	elseif (cmd == AUCT_CMD_LOCALE) then
+		if (AUCT_VALID_LOCALES[param]) then
+			Auctioneer_SetFilter('locale', param);
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, param));
+			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
+		elseif (param == '') or (param == 'default') or (param == 'off') then
+			Auctioneer_SetFilter('locale', 'default');
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, 'default'));
+			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
+		else
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
+			for locale, _ in AUCT_VALID_LOCALES do
+				Auctioneer_ChatPrint("  "..locale);
+			end
+		end
 	elseif (cmd == AUCT_CMD_BROKER) then
         doBroker(param);
     elseif (cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT) then
@@ -1898,6 +1924,10 @@ function Auctioneer_OnEvent(event)
         end
 	elseif(event == "AUCTION_ITEM_LIST_UPDATE" and Auctioneer_isScanningRequested) then
 		Auctioneer_ScanAuction();   
+
+	elseif (event == "VARIABLES_LOADED") then
+		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
+
     end        
 end
 

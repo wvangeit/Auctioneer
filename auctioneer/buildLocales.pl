@@ -23,7 +23,8 @@ for $file (<locales/????.utf8>) {
 	push(@valid, $locale);
 }
 
-print OUT "AUCT_VALID_LOCALES = {\"".join("\" = true, \"", @valid)."\" = true};\n\n";
+print OUT "AUCT_VALID_LOCALES = {[\"".join("\"] = true, [\"", @valid)."\"] = true};\n\n";
+print OUT "function Auctioneer_SetLocaleStrings(locale)\n";
 
 print OUT "-- Default locale strings are defined in English\n";
 open(DATA, "< locales/enUS.utf8");
@@ -43,7 +44,7 @@ print OUT "\n";
 for $locale (@locales) {
 	%localized = ();
 	print OUT "-- Locale strings for the $locale locale\n";
-	print OUT "if Auctioneer_GetLocale() == \"$locale\" then\n";
+	print OUT "if locale == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
 		s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
@@ -74,4 +75,7 @@ for $locale (@locales) {
 	
 	print OUT "end\n\n";
 }
+
+print OUT "end\n\nAuctioneer_SetLocaleStrings(GetLocale);\n\n";
+
 
