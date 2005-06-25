@@ -27,9 +27,9 @@ AUCT_TYPE_MINING = "Minage";
 AUCT_TYPE_POISON = "Poison";
 AUCT_TYPE_SMITH = "Forgeron";
 AUCT_TYPE_TAILOR = "Tailleur";
-AUCT_RECIPE_PREFIXES = {
-	"Recette: ", "Patron: ", "Plans: ", "Schéma: ", "Formule: "
-};
+
+AUCT_RECIPE_PREFIXES = { "Recette: ", "Patron: ", "Plans: ", "Schéma: ", "Formule: " };
+
 AUCT_FRMT_BROKER_HEADER = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
 AUCT_FRMT_BROKER_LINE = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
 AUCT_FRMT_BROKER_DONE = "Brokering terminé";

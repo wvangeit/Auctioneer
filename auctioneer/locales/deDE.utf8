@@ -1,6 +1,4 @@
-AUCT_RECIPE_PREFIXES = {
-	"Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: "
-};
+AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: " };
 
 AUCT_CLAS_ARMOR = "Rüstung";
 AUCT_CLAS_CLOTH = "Stoff";

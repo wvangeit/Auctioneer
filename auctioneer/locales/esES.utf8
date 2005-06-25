@@ -28,9 +28,7 @@ AUCT_TYPE_POISON = "Poison";
 AUCT_TYPE_SMITH = "Smith";
 AUCT_TYPE_TAILOR = "Tailor";
 
-AUCT_RECIPE_PREFIXES = {
-	"Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: "
-};
+AUCT_RECIPE_PREFIXES = { "Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: " };
 
 AUCT_TIME_SHORT = "Short";
 AUCT_TIME_MED = "Medium";

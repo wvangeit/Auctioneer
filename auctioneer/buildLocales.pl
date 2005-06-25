@@ -14,24 +14,27 @@ print OUT << 'EOD';
 
 EOD
 
-for $file (<locales/*.utf8>) {
+for $file (<locales/????.utf8>) {
 	$file =~ /locales.([^.]+).utf8/;
 	$locale = $1;
-	if ($locale ne "enEN") {
+	if ($locale ne "enUS") {
 		push(@locales, $locale);
 	}
+	push(@valid, $locale);
 }
 
+print OUT "AUCT_VALID_LOCALES = {\"".join("\" = true, \"", @valid)."\" = true};\n\n";
+
 print OUT "-- Default locale strings are defined in English\n";
-open(DATA, "< locales/enEN.utf8");
+open(DATA, "< locales/enUS.utf8");
 while (<DATA>) {
 	s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
 	s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
 	s/\-\-.*$//;
-	if (/^(\w+)\s*=/) {
-		$defined{$1} = 1;
+	if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
+		$defined{$1} = $2;
 	}
-	print OUT "$_ ";
+	print OUT "$_";
 }
 close DATA;
 
@@ -40,15 +43,20 @@ print OUT "\n";
 for $locale (@locales) {
 	%localized = ();
 	print OUT "-- Locale strings for the $locale locale\n";
-	print OUT "if GetLocale() == \"$locale\" then\n";
+	print OUT "if Auctioneer_GetLocale() == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
 		s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
 		s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
-		if (s/^(\w+)\s*=\s*/$1=/) {
-			$localized{$1} = 1;
+		if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
+			if ($2 ne $defined{$1}) {
+				$localized{$1} = $2;
+				print OUT "$_";
+			}
 		}
-		print OUT "$_";
+		else {
+			print OUT "$_";
+		}
 	}
 	close DATA;
 	print OUT "\n";
