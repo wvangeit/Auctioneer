@@ -74,8 +74,8 @@ AUCT_FRMT_INFO_CLASS = "Klasse: %s";
 AUCT_FRMT_INFO_USE = "Benutzt für: %s";
 AUCT_FRMT_INFO_BUY = "Einkauf beim Händler";
 AUCT_FRMT_INFO_SELL = "Verkauf beim Händler";
-AUCT_FRMT_INFO_BUYMULT = "Einkauf für %d (%s pro Stück)";
-AUCT_FRMT_INFO_SELLMULT = "Verkauf für %d (%s pro Stück)";
+AUCT_FRMT_INFO_BUYMULT = "Einkauf für %s %d (%s pro Stück)";
+AUCT_FRMT_INFO_SELLMULT = "Verkauf für %s %d (%s pro Stück)";
 AUCT_FRMT_INFO_STX = "Stapelbar bis %d Stück";
 
 AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Schnappschuss.";
