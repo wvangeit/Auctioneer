@@ -212,7 +212,7 @@ Auctioneer_BasePrices = {
 	[926]={b=9784,s=1956,d=22108,c=AUCT_CLAS_WEAPON},  -- Battle Axe
 	[927]={b=6953,s=1390,d=22106,c=AUCT_CLAS_WEAPON},  -- Double Axe
 	[928]={b=9860,s=1972,d=22151,c=AUCT_CLAS_WEAPON},  -- Long Staff
-	[929]={b=300,s=75,d=15712,x=5,c=AUCT_CLAS_POTION},  -- Healing Potion
+	[929]={b=300,s=75,d=15712,x=5,c=AUCT_CLAS_POTION,u=AUCT_TYPE_TAILOR},  -- Healing Potion
 	[932]={b=2550,s=637,d=6430,c=AUCT_CLAS_CONTAINER},  -- Fel Steed Saddlebags
 	[933]={b=10000,s=2500,d=1282,c=AUCT_CLAS_CONTAINER},  -- Large Rucksack
 	[934]={b=53411,s=10682,d=19405,c=AUCT_CLAS_WEAPON},  -- Stalvan's Reaper
@@ -1681,7 +1681,7 @@ Auctioneer_BasePrices = {
 	[3382]={b=40,s=10,d=15734,x=5,c=AUCT_CLAS_POTION},  -- Weak Troll's Blood Potion
 	[3383]={b=400,s=100,d=15745,x=5,u=AUCT_TYPE_LEATHER},  -- Elixir of Wisdom
 	[3384]={b=80,s=20,d=292,x=5,c=AUCT_CLAS_POTION},  -- Minor Magic Resistance Potion
-	[3385]={b=120,s=30,d=15716,x=5,u=AUCT_TYPE_TAILOR},  -- Lesser Mana Potion
+	[3385]={b=120,s=30,d=15716,x=5,c=AUCT_CLAS_POTION,u=AUCT_TYPE_TAILOR},  -- Lesser Mana Potion
 	[3386]={b=140,s=35,d=15750,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Poison Resistance
 	[3387]={b=120,s=30,d=24213,x=5,c=AUCT_CLAS_POTION},  -- Limited Invulnerability Potion
 	[3388]={b=160,s=40,d=15770,x=5,c=AUCT_CLAS_POTION},  -- Strong Troll's Blood Potion
@@ -2043,7 +2043,7 @@ Auctioneer_BasePrices = {
 	[3824]={b=600,s=150,d=17469,x=5,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Shadow Oil
 	[3825]={b=440,s=110,d=15790,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Fortitude
 	[3826]={b=420,s=105,d=15793,x=5,c=AUCT_CLAS_POTION},  -- Mighty Troll's Blood Potion
-	[3827]={b=480,s=120,d=15717,x=5,u=AUCT_TYPE_TAILOR},  -- Mana Potion
+	[3827]={b=480,s=120,d=15717,x=5,c=AUCT_CLAS_POTION,u=AUCT_TYPE_TAILOR},  -- Mana Potion
 	[3828]={b=600,s=150,d=4137,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Detect Lesser Invisibility
 	[3829]={b=600,s=150,d=15794,x=5,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Frost Oil
 	[3830]={b=2000,s=500,d=1301},  -- Recipe: Elixir of Fortitude
