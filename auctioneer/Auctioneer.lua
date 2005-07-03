@@ -1,5 +1,5 @@
 -- Auctioneer
-AUCTIONEER_VERSION="<%version%>";
+AUCTIONEER_VERSION="3.0.9";
 -- Revision: $Id$
 -- Original version written by Norganna.
 -- Contributors: Araband
@@ -85,18 +85,18 @@ local QUALITY_POOR= 0;
 
 -- return the string representation of the given timeLeft constant
 local function getTimeLeftString(timeLeft)
-    local timeLeftString = "";
-    -- TODO: localize these strings
-    if timeLeft == TIME_LEFT_SHORT then
-        timeLeftString = AUCT_TIME_SHORT;
-    elseif timeLeft == TIME_LEFT_MEDIUM then
-        timeLeftString = AUCT_TIME_MED;
-    elseif timeLeft == TIME_LEFT_LONG then
-        timeLeftString = AUCT_TIME_LONG;
-    elseif timeLeft == TIME_LEFT_VERY_LONG then
-        timeLeftString = AUCT_TIME_VLONG;
-    end
-    return timeLeftString;    
+	local timeLeftString = "";
+	-- TODO: localize these strings
+	if timeLeft == TIME_LEFT_SHORT then
+		timeLeftString = AUCT_TIME_SHORT;
+	elseif timeLeft == TIME_LEFT_MEDIUM then
+		timeLeftString = AUCT_TIME_MED;
+	elseif timeLeft == TIME_LEFT_LONG then
+		timeLeftString = AUCT_TIME_LONG;
+	elseif timeLeft == TIME_LEFT_VERY_LONG then
+		timeLeftString = AUCT_TIME_VLONG;
+	end
+	return timeLeftString;
 end
 Auctioneer_GetTimeLeftString = getTimeLeftString;
 
@@ -110,15 +110,15 @@ end
 
 -- return an empty string if str is nil
 function nilSafeString(str)
-    if (not str) then str = "" end
-    return str;
+	if (not str) then str = "" end
+	return str;
 end
 
 local function colorTextWhite(text)
-    if (not text) then text = ""; end
-    local COLORING_START = "|cff%s%s|r";
-    local WHITE_COLOR = "e6e6e6";
-    return format(COLORING_START, WHITE_COLOR, ""..text);
+	if (not text) then text = ""; end
+	local COLORING_START = "|cff%s%s|r";
+	local WHITE_COLOR = "e6e6e6";
+	return format(COLORING_START, WHITE_COLOR, ""..text);
 end
 Auctioneer_ColorTextWhite = colorTextWhite;
 
@@ -131,51 +131,51 @@ end
 
 -- subtracts a percent from a value
 local function subtractPercent(value, percentLess)
-    return math.floor(value * ((100 - percentLess)/100));
+	return math.floor(value * ((100 - percentLess)/100));
 end
 local function addPercent(value, percentMore)
-    return math.floor(value * ((100 + percentMore)/100));
+	return math.floor(value * ((100 + percentMore)/100));
 end
 
 -- returns the integer representation of the percent less value2 is from value1
 -- example: value1=10, value2=7,  percentLess=30
 local function percentLessThan(value1, value2)
-    if nullSafe(value1) > 0 and nullSafe(value2) < nullSafe(value1) then
-        return 100 - math.floor((100 * nullSafe(value2))/nullSafe(value1));
-    else
-        return 0;
-    end
+	if nullSafe(value1) > 0 and nullSafe(value2) < nullSafe(value1) then
+		return 100 - math.floor((100 * nullSafe(value2))/nullSafe(value1));
+	else
+		return 0;
+	end
 end
 Auctioneer_PercentLessThan = percentLessThan;
 
 -- returns the median value of a given table one-dimentional table
 function getMedian(valuesTable)
-    if (not valuesTable or table.getn(valuesTable) == 0) then
-        return nil; --make this function nil argument safe
-    end
-    
-    local tableSize = table.getn(valuesTable);
-    
-    if (tableSize == 1) then
-        return valuesTable[1];
-    end
-        
-    local median; -- value to return
-        
-    table.sort(valuesTable);
-    
-    if (math.mod(tableSize, 2) == 0) then --first handle the case of even table size
-        local middleIndex1 = tableSize / 2;
-        local middleIndex2 = middleIndex1 + 1;
-        local middleValue1 = valuesTable[middleIndex1];
-        local middleValue2 = valuesTable[middleIndex2];
-        median = (middleValue1 + middleValue2) / 2; --average the two middle values
-    else -- the table size is odd
-        local trueMiddleIndex = (tableSize + 1) / 2; -- calculate the middle index
-        median = valuesTable[trueMiddleIndex];
-    end
-    
-    return median;
+	if (not valuesTable or table.getn(valuesTable) == 0) then
+		return nil; --make this function nil argument safe
+	end
+
+	local tableSize = table.getn(valuesTable);
+
+	if (tableSize == 1) then
+		return valuesTable[1];
+	end
+
+	local median; -- value to return
+
+	table.sort(valuesTable);
+
+	if (math.mod(tableSize, 2) == 0) then --first handle the case of even table size
+		local middleIndex1 = tableSize / 2;
+		local middleIndex2 = middleIndex1 + 1;
+		local middleValue1 = valuesTable[middleIndex1];
+		local middleValue2 = valuesTable[middleIndex2];
+		median = (middleValue1 + middleValue2) / 2; --average the two middle values
+	else -- the table size is odd
+		local trueMiddleIndex = (tableSize + 1) / 2; -- calculate the middle index
+		median = valuesTable[trueMiddleIndex];
+	end
+
+	return median;
 end
 
 local function sanifyAHSnapshot()
@@ -197,61 +197,59 @@ Auctioneer_SanifyAHSnapshot = sanifyAHSnapshot;
 --this function sets the dirty flag to true for all the auctions in the snapshot
 --this is done to indicate that the snapshot is out of date.
 local function invalidateAHSnapshot()
-    -- invalidate the snapshot
+	-- invalidate the snapshot
 	local auctKey = sanifyAHSnapshot();
-    for i,a in AHSnapshot[auctKey] do
-        a.dirty = 1;
-    end
+	for i,a in AHSnapshot[auctKey] do
+		a.dirty = 1;
+	end
 end
-
 
 -- called when the auction scan starts
 local function Auctioneer_AuctionStart_Hook()
 	Auction_DoneItems = {};
-    lSnapshotItemPrices = {};
-    invalidateAHSnapshot();
-    
-    -- make sure AuctionPrices is initialized
-    local serverFaction = auctionKey();
+	lSnapshotItemPrices = {};
+	invalidateAHSnapshot();
+
+	-- make sure AuctionPrices is initialized
+	local serverFaction = auctionKey();
 	if (AuctionPrices[serverFaction] == nil) then
 		AuctionPrices[serverFaction] = {};
 	end
-    
-    -- reset scan audit counters
-    lTotalAuctionsScannedCount = 0;
-    lNewAuctionsCount = 0;
-    lOldAuctionsCount = 0;
-    lDefunctAuctionsCount = 0;
-end
 
+	-- reset scan audit counters
+	lTotalAuctionsScannedCount = 0;
+	lNewAuctionsCount = 0;
+	lOldAuctionsCount = 0;
+	lDefunctAuctionsCount = 0;
+end
 
 -- this is called when an auction scan finishes and is used for clean up
 local function Auctioneer_FinishedAuctionScan_Hook()
-    -- only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
+	-- only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
 	local auctKey = sanifyAHSnapshot();
 
-    if lTotalAuctionsScannedCount >= 50 then 
-        for i,a in AHSnapshot[auctKey] do
-            if (a.dirty == 1) then
-                AHSnapshot[auctKey][i] = nil; --clear defunct auctions
-                lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
-            end
-        end
-    end
-    
-    -- copy the item prices into the Saved item prices table
-    AHSnapshotItemPrices[auctKey] = lSnapshotItemPrices;
+	if lTotalAuctionsScannedCount >= 50 then 
+		for i,a in AHSnapshot[auctKey] do
+			if (a.dirty == 1) then
+				AHSnapshot[auctKey][i] = nil; --clear defunct auctions
+				lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+			end
+		end
+	end
 
-    local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
-    
-    Auctioneer_ChatPrint("Total auctions scanned: "..colorTextWhite(lTotalAuctionsScannedCount));
-    Auctioneer_ChatPrint("New auctions scanned: "..colorTextWhite(lNewAuctionsCount));
-    Auctioneer_ChatPrint("Previously scanned: "..colorTextWhite(lOldAuctionsCount));
-    Auctioneer_ChatPrint("Defunct auctions removed: "..colorTextWhite(lDefunctAuctionsCount));
-    
-    if (nullSafe(lDiscrepencyCount) > 0) then
-        Auctioneer_ChatPrint("Discrepencies: "..colorTextWhite(lDiscrepencyCount));
-    end
+	-- copy the item prices into the Saved item prices table
+	AHSnapshotItemPrices[auctKey] = lSnapshotItemPrices;
+
+	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
+
+	Auctioneer_ChatPrint("Total auctions scanned: "..colorTextWhite(lTotalAuctionsScannedCount));
+	Auctioneer_ChatPrint("New auctions scanned: "..colorTextWhite(lNewAuctionsCount));
+	Auctioneer_ChatPrint("Previously scanned: "..colorTextWhite(lOldAuctionsCount));
+	Auctioneer_ChatPrint("Defunct auctions removed: "..colorTextWhite(lDefunctAuctionsCount));
+
+	if (nullSafe(lDiscrepencyCount) > 0) then
+		Auctioneer_ChatPrint("Discrepencies: "..colorTextWhite(lDiscrepencyCount));
+	end
 end
 
 --returns the auction prices key to get the prices for this server and faction
@@ -291,21 +289,21 @@ Auctioneer_BreakItemKey = breakItemKey;
 
 -- returns an AuctionPrices item from the table based on an item name
 local function getAuctionPriceItem(itemKey, from, name, id)
-    local serverFaction = auctionKey();
-    local auctionPriceItem;
-    
-    if (from ~= nil) then serverFaction = from; end
+	local serverFaction = auctionKey();
+	local auctionPriceItem;
+
+	if (from ~= nil) then serverFaction = from; end
 	if (AuctionPrices[serverFaction] == nil) then
 		AuctionPrices[serverFaction] = {};
-    elseif AuctionPrices[serverFaction][itemKey] then
-        auctionPriceItem = AuctionPrices[serverFaction][itemKey];
-    elseif AuctionPrices[serverFaction][name] then
-        auctionPriceItem = AuctionPrices[serverFaction][name];
-    elseif AuctionPrices[serverFaction][id] then
-        auctionPriceItem = AuctionPrices[serverFaction][id];
-    end
-    
-    return auctionPriceItem;
+	elseif AuctionPrices[serverFaction][itemKey] then
+		auctionPriceItem = AuctionPrices[serverFaction][itemKey];
+	elseif AuctionPrices[serverFaction][name] then
+		auctionPriceItem = AuctionPrices[serverFaction][name];
+	elseif AuctionPrices[serverFaction][id] then
+		auctionPriceItem = AuctionPrices[serverFaction][id];
+	end
+
+	return auctionPriceItem;
 end
 Auctioneer_GetAuctionPriceItem = getAuctionPriceItem;
 
@@ -329,12 +327,11 @@ function getAuctionBuyoutHistory(itemKey, name)
 	local auctionItem = getAuctionPriceItem(itemKey, nil, name);
 	if (auctionItem == nil) then 
 		buyoutHistory = {};
-    else
-        buyoutHistory = auctionItem.buyoutPricesHistoryList;
+	else
+		buyoutHistory = auctionItem.buyoutPricesHistoryList;
 	end
 	return buyoutHistory;
 end
-
 
 -- returns the parsed auction price data
 local function getAuctionPrices(priceData)
@@ -353,167 +350,165 @@ Auctioneer_GetItemSignature = getItemSignature;
 
 -- returns the category i.e. "Weapon", "Armor" for an item
 local function getItemCategory(itemKey)
-    local category;
-    local auctionItem = getAuctionPriceItem(itemKey);
-    if auctionItem then 
-        category = auctionItem.category;
-    end
-    return category;
+	local category;
+	local auctionItem = getAuctionPriceItem(itemKey);
+	if auctionItem then 
+		category = auctionItem.category;
+	end
+	return category;
 end
 Auctioneer_GetItemCategory = getItemCategory;
 
 local function isItemPlayerMade(itemKey)
-    local playerMade;
-    local auctionItem = getAuctionPriceItem(itemKey);
-    if auctionItem then 
-        playerMade = auctionItem.playerMade;
-    end
-    return playerMade;
+	local playerMade;
+	local auctionItem = getAuctionPriceItem(itemKey);
+	if auctionItem then 
+		playerMade = auctionItem.playerMade;
+	end
+	return playerMade;
 end
 Auctioneer_IsItemPlayerMade = isItemPlayerMade;
 
 -- return all of the averages for an item
 -- Returns: avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount
 local function getMeans(itemKey, from, name, id)
-    local itemData = getAuctionPriceData(itemKey, from, name, id);
-    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-    local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty;
-    
-    if aCount > 0 then
-        avgQty = math.floor(minCount / aCount);        
-        avgMin = math.floor(minPrice / minCount);   
-        bidPct = math.floor(bidCount / minCount * 100);
-        buyPct = math.floor(buyCount / minCount * 100);
-        
-        avgBid = 0;
-        if (bidCount > 0) then
-            avgBid = math.floor(bidPrice / bidCount);
-        end
-        
-        avgBuy = 0;
-        if (buyCount > 0) then
-            avgBuy = math.floor(buyPrice / buyCount);
-        end
-    end
-    return avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount;
+	local itemData = getAuctionPriceData(itemKey, from, name, id);
+	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty;
+
+	if aCount > 0 then
+		avgQty = math.floor(minCount / aCount);
+		avgMin = math.floor(minPrice / minCount);
+		bidPct = math.floor(bidCount / minCount * 100);
+		buyPct = math.floor(buyCount / minCount * 100);
+
+		avgBid = 0;
+		if (bidCount > 0) then
+			avgBid = math.floor(bidPrice / bidCount);
+		end
+
+		avgBuy = 0;
+		if (buyCount > 0) then
+			avgBuy = math.floor(buyPrice / buyCount);
+		end
+	end
+	return avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount;
 end
 Aucioneer_GetMeans = getMeans;
 
 -- returns the current snapshot median for an item
 local function getItemSnapshotMedianBuyout(itemKey)
-    local buyoutPrices = {};
+	local buyoutPrices = {};
 	local auctKey = sanifyAHSnapshot();
-    if AHSnapshotItemPrices[auctKey][itemKey] then 
-        buyoutPrices = AHSnapshotItemPrices[auctKey][itemKey].buyoutPrices;
-    else
-        return 0, 0;
-    end
+	if AHSnapshotItemPrices[auctKey][itemKey] then 
+		buyoutPrices = AHSnapshotItemPrices[auctKey][itemKey].buyoutPrices;
+	else
+		return 0, 0;
+	end
 
-    return getMedian(buyoutPrices) or 0, table.getn(buyoutPrices) or 0;
+	return getMedian(buyoutPrices) or 0, table.getn(buyoutPrices) or 0;
 end
 Auctioneer_GetItemSnapshotMedianBuyout = getItemSnapshotMedianBuyout;
 
 local function getItemHistoricalMedianBuyout(itemKey, name)
-    local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
-    local historyMedian = getMedian(buyoutHistoryTable);
-    local historySeenCount = table.getn(buyoutHistoryTable);
-    return historyMedian or 0, historySeenCount or 0;
+	local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
+	local historyMedian = getMedian(buyoutHistoryTable);
+	local historySeenCount = table.getn(buyoutHistoryTable);
+	return historyMedian or 0, historySeenCount or 0;
 end
 Auctioneer_GetItemHistoricalMedianBuyout = getItemHistoricalMedianBuyout;
 
 -- this function returns the most accurate median possible, 
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
 local function getUsableMedian(itemKey, name)
-    local usableMedian = nil;
-    local count = nil;
+	local usableMedian = nil;
+	local count = nil;
 
-    --get snapshot median
-    local snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemKey);
-   
-    --get history median
-    local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
-    
-    if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .20))) then
-        if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
-            usableMedian = historyMedian;
-            count = historySeenCount;
-        end
-    elseif snapshotMedian then
-        usableMedian = snapshotMedian;
-        count = snapshotCount;
-    end
-    
-    return usableMedian, count;
+	--get snapshot median
+	local snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemKey);
+
+	--get history median
+	local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
+
+	if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .20))) then
+		if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
+			usableMedian = historyMedian;
+			count = historySeenCount;
+		end
+		elseif snapshotMedian then
+			usableMedian = snapshotMedian;
+			count = snapshotCount;
+		end
+
+	return usableMedian, count;
 end
 Auctioneer_GetUsableMedian = getUsableMedian;
 
 -- returns true if they link is likely a player made item
 local function isPossiblePlayerMadeItem(link)
-    local itemID, randomProp, enchant, uniqID = breakLink(link);
-    if randomProp == 0 and uniqID > 0 then
-        return true;
-    end
-    return false;
+	local itemID, randomProp, enchant, uniqID = breakLink(link);
+	if randomProp == 0 and uniqID > 0 then
+		return true;
+	end
+	return false;
 end
 Auctioneer_IsPossiblePlayerMadeItem = isPossiblePlayerMadeItem;
 
-
 -- returns the current bid on an auction
 local function getCurrentBid(auctionSignature)
-    local _,_,_, _, _,min,_,_ = getItemSignature(auctionSignature);
+	local _,_,_, _, _,min,_,_ = getItemSignature(auctionSignature);
 	local auctKey = sanifyAHSnapshot();
-    local currentBid = AHSnapshot[auctKey][auctionSignature].bidamount;
-    if currentBid == 0 then currentBid = min end   
-    return currentBid;     
+	local currentBid = AHSnapshot[auctKey][auctionSignature].bidamount;
+	if currentBid == 0 then currentBid = min end
+		return currentBid;
 end
 Auctioneer_GetCurrentBid = getCurrentBid;
 
 -- this filter will return true if an auction is a bad choice for reselling
 local function isBadResaleChoice(auctionSignature)
-    local isBadChoice = false;
-    local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(auctionSignature);
+	local isBadChoice = false;
+	local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(auctionSignature);
 	local itemKey = id..":"..rprop..":"..enchant;
 	local auctKey = sanifyAHSnapshot();
-    local auctionItem = AHSnapshot[auctKey][auctionSignature];
-    local itemData = getAuctionPriceData(itemKey);
-    local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);    
-    local bidPercent = math.floor(bidCount / minCount * 100);
-        
-    -- bad choice conditions
-    if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
-        isBadChoice = true; -- bidbased items should have a minimum bid percent
-    elseif (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
-        isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
-    elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
-        isBadChoice = true; -- don't display auctions that we own, or are high bidder on
-    elseif auctionItem.quality == QUALITY_POOR then 
-        isBadChoice = true; -- gray items are never a good choice
-    end
-    
-    return isBadChoice;
+	local auctionItem = AHSnapshot[auctKey][auctionSignature];
+	local itemData = getAuctionPriceData(itemKey);
+	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+	local bidPercent = math.floor(bidCount / minCount * 100);
+
+	-- bad choice conditions
+	if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
+		isBadChoice = true; -- bidbased items should have a minimum bid percent
+	elseif (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
+		isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
+	elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
+		isBadChoice = true; -- don't display auctions that we own, or are high bidder on
+	elseif auctionItem.quality == QUALITY_POOR then 
+		isBadChoice = true; -- gray items are never a good choice
+	end
+
+	return isBadChoice;
 end
 Auctioneer_IsBadResaleChoice = isBadResaleChoice;
 
 -- filters out all auctions except those that meet profit requirements
 local function brokerFilter(minProfit, signature)
-    local filterAuction = true;
-    local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
+	local filterAuction = true;
+	local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
-        
-    if getUsableMedian(itemKey) then -- we have a useable median
-        local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
-        local profit = (hsp * count) - buyout;
-        local profitPricePercent = math.floor((profit / buyout) * 100);
 
-        --see if this auction should not be filtered
-        if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
-            filterAuction = false;
-        end
-    end        
-    
-    return filterAuction;
+	if getUsableMedian(itemKey) then -- we have a useable median
+		local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
+		local profit = (hsp * count) - buyout;
+		local profitPricePercent = math.floor((profit / buyout) * 100);
+
+		--see if this auction should not be filtered
+		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not isBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+			filterAuction = false;
+		end
+	end
+
+	return filterAuction;
 end
-
 
 -- filters out all auctions except those that have short or medium time remaining and meet profit requirements
 local function bidBrokerFilter(minProfit, signature)
@@ -1087,296 +1082,339 @@ end
 function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	Auctioneer_OldTooltip(frame, name, link, quality, count);
 
-
 	if (not link) then p("No link was passed to the client");  return; end
+
+	-- nothing to do, if auctioneer is disabled
+	if (not Auctioneer_GetFilter("all")) then
+		TT_Show(frame);
+	   return;
+	end;
+	
+	-- initialize local variables
 	local itemID, randomProp, enchant, uniqID, lame = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
-
 	local embedded = Auctioneer_GetFilter(AUCT_CMD_EMBED);
 
-	if (Auctioneer_GetFilter("all")) then
-		if (embedded) then
-			if (Auctioneer_GetFilter(AUCT_SHOW_EMBED_BLANK)) then
-				TT_AddLine(" ", nil, embedded);
-			end
-		else
-			TT_AddLine(name, nil, embedded);
-			TT_LineQuality(quality);
+	-- OUTPUT: seperator line
+	if (embedded) then
+		if (Auctioneer_GetFilter(AUCT_SHOW_EMBED_BLANK)) then
+			TT_AddLine(" ", nil, embedded);
+		end
+	else
+		TT_AddLine(name, nil, embedded);
+		TT_LineQuality(quality);
+	end
+
+	if (Auctioneer_GetFilter(AUCT_SHOW_LINK)) then
+		-- OUTPUT: show item link
+		TT_AddLine("Link: " .. itemKey .. ":" .. uniqID, nil, embedded);
+		TT_LineQuality(quality);
+	end
+
+	local money = nil;
+	local itemInfo = nil;
+
+	-- show item info
+	if (itemID > 0) then
+		-- prepare mesh
+		if (Auctioneer_GetFilter(AUCT_SHOW_MESH)) then
+			Auctioneer_SetModelByID(itemID);
 		end
 
-		if (Auctioneer_GetFilter(AUCT_SHOW_LINK)) then
-			TT_AddLine("Link: " .. itemKey .. ":" .. uniqID, nil, embedded);
-			TT_LineQuality(quality);
-		end
+		frame.eDone = 1;
+		local itemData = getAuctionPriceData(itemKey, nil, name, itemID);
+		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+		itemInfo = Auctioneer_BasePrices[itemID];
 
-		local money = nil;
-		local itemInfo = nil;
+		-- show auction info
+		if (aCount == 0) then
+			-- OUTPUT: "Never seen at auction"
+			TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, AUCT_TEXT_AUCTION), nil, embedded);
+			TT_LineColor(0.5, 0.8, 0.5);
+		else -- (aCount > 0)
+			-- calculate auction values
+			local avgQty = math.floor(minCount / aCount);
+			local avgMin = math.floor(minPrice / minCount);
 
-		if (itemID > 0) then
-			if (Auctioneer_GetFilter(AUCT_SHOW_MESH)) then
-				Auctioneer_SetModelByID(itemID);
+			local bidPct = math.floor(bidCount / minCount * 100);
+			local avgBid = 0;
+			if (bidCount > 0) then
+				avgBid = math.floor(bidPrice / bidCount);
 			end
 
-			frame.eDone = 1;
-			local itemData = getAuctionPriceData(itemKey, nil, name, itemID);
+			local buyPct = math.floor(buyCount / minCount * 100);
+			local avgBuy = 0;
+			if (buyCount > 0) then
+				avgBuy = math.floor(buyPrice / buyCount);
+			end
+
+			local median, medCount = getUsableMedian(itemKey, name);
+
+			if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then -- show item's average auction price
+				-- OUTPUT: "Seen [aCount] times at auction total"
+				TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount), nil, embedded);
+				TT_LineColor(0.5,0.8,0.1);
+				if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then -- default mode
+					if (avgQty > 1) then
+						-- OUTPUT: "For 1: [avgMin] min/[avgBuy] BO ([avgBid] bid) [in [avgQty]'s]"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
+						TT_LineColor(0.1,0.8,0.5);
+					else -- (avgQty = 1)
+						-- OUTPUT: "[avgMin] min/[avgBuy] BO ([avgBid] bid)"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
+						TT_LineColor(0.1,0.8,0.5);
+					end
+				else -- verbose mode
+					if (count > 1) then
+						-- OUTPUT: "Averages for [count] items:"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count), nil, embedded);
+						TT_LineColor(0.4,0.5,1.0);
+						-- OUTPUT: "  Minimum ([avgMin] ea)"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, TT_GetTextGSC(avgMin)), avgMin*count, embedded);
+						TT_LineColor(0.4,0.5,0.8);
+						if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then -- show buyout/bidded percentages
+							-- OUTPUT: "  Bidded ([bidPct]%, [avgBid] ea)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
+							TT_LineColor(0.4,0.5,0.85);
+							-- OUTPUT: "  Buyout ([buyPct]%, [avgBuy] ea)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
+							TT_LineColor(0.4,0.5,0.9);
+						else -- don't show buyout/bidded percentages
+							-- OUTPUT: "  Bidded ([avgBid] ea)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
+							TT_LineColor(0.4,0.5,0.85);
+							-- OUTPUT: "  Buyout ([avgBuy] ea)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
+							TT_LineColor(0.4,0.5,0.9);
+						end
+						if (median) then
+							-- OUTPUT: "  Buyout median"
+							TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count, embedded);
+							TT_LineColor(0.4,0.5,0.95);
+						end
+					else -- (count = 1)
+					   -- OUTPUT: "Averages for this item:"
+						TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE, nil, embedded);
+						TT_LineColor(0.4,0.5,1.0);
+						-- OUTPUT: "  Minimum bid"
+						TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin, embedded);
+						TT_LineColor(0.4,0.5,0.8);
+						if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then -- show buyout/bidded percentages
+							-- OUTPUT: "  Bidded [bidPct]%"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, " "..bidPct.."%"), avgBid, embedded);
+							TT_LineColor(0.4,0.5,0.85);
+							-- OUTPUT: "  Buyout [buyPct]%"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, " "..buyPct.."%"), avgBuy, embedded);
+							TT_LineColor(0.4,0.5,0.9);
+						else -- don't show buyout/bidded percentages
+						   -- OUTPUT: "  Bidded [bidPct]%"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, ""), avgBid, embedded);
+							TT_LineColor(0.4,0.5,0.85);
+							-- OUTPUT: "  Buyout [buyPct]%"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy, embedded);
+							TT_LineColor(0.4,0.5,0.9);
+						end
+						if (median) then
+							-- OUTPUT: "  Buyout median"
+							TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median, embedded);
+							TT_LineColor(0.4,0.5,0.95);
+						end
+					end
+					if (avgQty > 1) then
+						-- OUTPUT: "  Average stack size: [avgQty] items"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_STACKSIZE, avgQty), nil, embedded);
+						TT_LineColor(0.4,0.5,1.0);
+					end
+				end
+
+				if median and Auctioneer_GetFilter(AUCT_SHOW_MEDIAN) then -- show item's median buyout price
+					local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
+					local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
+					if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
+						-- OUTPUT: "Last [historicalMedCount], median BO (ea)"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian, embedded)
+						TT_LineColor(0.1,0.8,0.5);
+					end
+					if snapshotMedian then
+						-- OUTPUT: "Scanned [snapshotMedCount], median BO (ea)"
+						TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian, embedded)
+						TT_LineColor(0.1,0.8,0.5);
+					end
+				end
+			end -- if(Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) - show item's average auction price
+
+			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
+			if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then -- show item's suggested auction price
+				local buyoutPriceForOne = median;
+				if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
+				if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+				if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+				if (count > 1) then
+					-- OUTPUT: "Suggested price for your [count] stack: [avgMin*count] min/[buyoutPriceForOne*count] BO ([avgBid*count] bid)"
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+					TT_LineColor(0.5,0.5,0.8);
+				else -- count = 0 | 1
+					-- OUTPUT: "Suggested price: [avgMin] min/[buyoutPriceForOne] BO ([avgBid*count] bid)"
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+					TT_LineColor(0.5,0.5,0.8);
+				end
+			end
+			if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
+				if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then -- show buyout/bidded percentages
+					-- OUTPUT: "[bidPct]% have bid, [buyPct]% have BO"
+					TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
+					TT_LineColor(0.1,0.5,0.8);
+				end
+			end
+		end -- (aCount > 0)
+
+		local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
+		if (also ~= "on") and (also ~= "off") then
+			if (also == AUCT_CMD_ALSO_OPPOSITE) then
+				also = oppositeKey();
+			end
+			local itemData = getAuctionPriceData(itemKey, also, name, itemID);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-			itemInfo = Auctioneer_BasePrices[itemID];
+			local avgQty = math.floor(minCount / aCount);
+			local avgMin = math.floor(minPrice / minCount);
+
+			local bidPct = math.floor(bidCount / minCount * 100);
+			local avgBid = 0;
+			if (bidCount > 0) then
+				avgBid = math.floor(bidPrice / bidCount);
+			end
+
+			local buyPct = math.floor(buyCount / minCount * 100);
+			local avgBuy = 0;
+			if (buyCount > 0) then
+				avgBuy = math.floor(buyPrice / buyCount);
+			end
 
 			if (aCount == 0) then
-				TT_AddLine(string.format(AUCT_FRMT_INFO_NEVER, AUCT_TEXT_AUCTION), nil, embedded);
-				TT_LineColor(0.5, 0.8, 0.5);
+				TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also), nil, embedded);
+				TT_LineColor(0.5,0.8,0.1);
 			else
-				local avgQty = math.floor(minCount / aCount);
-				local avgMin = math.floor(minPrice / minCount);
-
-				local bidPct = math.floor(bidCount / minCount * 100);
-				local avgBid = 0;
-				if (bidCount > 0) then
-					avgBid = math.floor(bidPrice / bidCount);
-				end
-				
-				local buyPct = math.floor(buyCount / minCount * 100);
-				local avgBuy = 0;
-				if (buyCount > 0) then
-					avgBuy = math.floor(buyPrice / buyCount);
-				end
-                                
-                local median, medCount = getUsableMedian(itemKey, name);
-
 				if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then
-					TT_AddLine(string.format(AUCT_FRMT_INFO_SEEN, aCount), nil, embedded);
+					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also), nil, embedded);
 					TT_LineColor(0.5,0.8,0.1);
-					if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
-						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
-							TT_LineColor(0.1,0.8,0.5);
-						else
-							TT_AddLine(string.format(AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
-							TT_LineColor(0.1,0.8,0.5);
-						end
-					else -- Verbose mode
-						if (count > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HEAD_MULTI, count), nil, embedded);
-							TT_LineColor(0.4,0.5,1.0);
-							TT_AddLine(string.format(AUCT_FRMT_INFO_MIN_MULTI, TT_GetTextGSC(avgMin)), avgMin*count, embedded);
-							TT_LineColor(0.4,0.5,0.8);
-							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, bidPct.."%, ", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
-								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, buyPct.."%, ", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
-								TT_LineColor(0.4,0.5,0.9);
-							else
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_MULTI, "", TT_GetTextGSC(avgBid)), avgBid*count, embedded);
-								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_MULTI, "", TT_GetTextGSC(avgBuy)), avgBuy*count, embedded);
-								TT_LineColor(0.4,0.5,0.9);
-							end
-							if (median) then
-								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count, embedded);
-								TT_LineColor(0.4,0.5,0.95);
-							end
-						else
-							TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE, nil, embedded);
-							TT_LineColor(0.4,0.5,1.0);
-							TT_AddLine(AUCT_FRMT_INFO_MIN_ONE, avgMin, embedded);
-							TT_LineColor(0.4,0.5,0.8);
-							if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, " "..bidPct.."%"), avgBid, embedded);
-								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, " "..buyPct.."%"), avgBuy, embedded);
-								TT_LineColor(0.4,0.5,0.9);
-							else
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BID_ONE, ""), avgBid, embedded);
-								TT_LineColor(0.4,0.5,0.85);
-								TT_AddLine(string.format(AUCT_FRMT_INFO_BUY_ONE, ""), avgBuy, embedded);
-								TT_LineColor(0.4,0.5,0.9);
-							end
-							if (median) then
-								TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median, embedded);
-								TT_LineColor(0.4,0.5,0.95);
-							end
-						end
-						if (avgQty > 1) then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_STACKSIZE, avgQty), nil, embedded);
-							TT_LineColor(0.4,0.5,1.0);
-						end
+					if (avgQty > 1) then
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
+						TT_LineColor(0.1,0.8,0.5);
+					else
+						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
+						TT_LineColor(0.1,0.8,0.5);
 					end
-
-					if median and Auctioneer_GetFilter(AUCT_SHOW_MEDIAN) then
-						local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
-						local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
-						if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian, embedded)
-							TT_LineColor(0.1,0.8,0.5);
-						end
-						if snapshotMedian then
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SNAPMED, snapshotMedCount), snapshotMedian, embedded)
-							TT_LineColor(0.1,0.8,0.5);
-						end
-					end
-				end
-				if (not Auctioneer_GetFilter(AUCT_SHOW_VERBOSE)) then
 					if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
 						if (count > 1) then
-							local buyoutPriceForOne = median;
-							if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
-							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-							if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-							TT_AddLine(string.format(AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+							-- OUTPUT: "Suggested price for your [count] stack: [avgMin*count] min/[buyoutPriceForOne*count] BO ([avgBid*count] bid)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+							TT_LineColor(0.5,0.5,0.8);
+						else -- count = 0 | 1
+							-- OUTPUT: "Suggested price: [avgMin] min/[buyoutPriceForOne] BO ([avgBid*count] bid)"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						end
 					end
-					if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
-						TT_LineColor(0.1,0.5,0.8);
-					end
 				end
-			end
-            
-			local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
-			if (also ~= "on") and (also ~= "off") then
-				if (also == AUCT_CMD_ALSO_OPPOSITE) then
-					also = oppositeKey();
+				if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
+					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
+					TT_LineColor(0.1,0.5,0.8);
 				end
-				local itemData = getAuctionPriceData(itemKey, also, name, itemID);
-				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-				local avgQty = math.floor(minCount / aCount);
-				local avgMin = math.floor(minPrice / minCount);
-
-				local bidPct = math.floor(bidCount / minCount * 100);
-				local avgBid = 0;
-				if (bidCount > 0) then
-					avgBid = math.floor(bidPrice / bidCount);
-				end
-				
-				local buyPct = math.floor(buyCount / minCount * 100);
-				local avgBuy = 0;
-				if (buyCount > 0) then
-					avgBuy = math.floor(buyPrice / buyCount);
-				end
-
-				if (aCount == 0) then
-					TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_NEVER, also), nil, embedded);
-					TT_LineColor(0.5,0.8,0.1);
-				else
-					if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then
-						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_ALSOSEEN, aCount, also), nil, embedded);
-						TT_LineColor(0.5,0.8,0.1);
-						if (avgQty > 1) then
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_FORONE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid), avgQty), nil, embedded);
-							TT_LineColor(0.1,0.8,0.5);
-						else
-							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_AVERAGE, TT_GetTextGSC(avgMin), TT_GetTextGSC(avgBuy), TT_GetTextGSC(avgBid)), nil, embedded);
-							TT_LineColor(0.1,0.8,0.5);
-						end
-						if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
-							if (count > 1) then
-								TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_YOURSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
-								TT_LineColor(0.5,0.5,0.8);
-							end
-						end
-					end
-					if (Auctioneer_GetFilter(AUCT_SHOW_STATS)) then
-						TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_BIDRATE, bidPct, buyPct), nil, embedded);
-						TT_LineColor(0.1,0.5,0.8);
-					end
-				end
-			end            
-            
-			if ((data ~= nil) and (data.price ~= nil)) then
-				money = data.price;
-			else
-				money = 0;
 			end
 		end
-		if (money == nil) then
+
+		if ((data ~= nil) and (data.price ~= nil)) then
+			money = data.price;
+		else
 			money = 0;
 		end
+	end -- if (itemID > 0)
+	if (money == nil) then
+		money = 0;
+	end
 
-		local sellNote = "";
-		local buyNote = "";
-		local sell = money;
-		local buy = sell * 4;
-		local quant = 1;
-		local stacks = 1;
-		local class = "";
-		local uses = "";
-		if (itemInfo) then
-			buyNote = "*"
-			stacks = itemInfo.x;
-			if (not stacks) then stacks = 1; end
-			quant = nullSafe(itemInfo.q);
-			if (quant < 1) then quant = 1; end
-			if (quant > 1) then
-				buyNote = "*";
-			end
-			buy = nullSafe(itemInfo.b) / quant;
-			if ((not sell) or (sell == "") or (sell <= 0))  then
-				sellNote = "*"
-				sell = nullSafe(itemInfo.s);
-			end;
-			if (itemInfo.c) then
-				class = itemInfo.c;
-			end
-			if (itemInfo.u) then
-				uses = itemInfo.u;
-			end
+	local sellNote = "";
+	local buyNote = "";
+	local sell = money;
+	local buy = sell * 4;
+	local quant = 1;
+	local stacks = 1;
+	local class = "";
+	local uses = "";
+	if (itemInfo) then
+		buyNote = "*"
+		stacks = itemInfo.x;
+		if (not stacks) then stacks = 1; end
+		quant = nullSafe(itemInfo.q);
+		if (quant < 1) then quant = 1; end
+		if (quant > 1) then
+			buyNote = "*";
 		end
+		buy = nullSafe(itemInfo.b) / quant;
+		if ((not sell) or (sell == "") or (sell <= 0))  then
+			sellNote = "*"
+			sell = nullSafe(itemInfo.s);
+		end;
+		if (itemInfo.c) then
+			class = itemInfo.c;
+		end
+		if (itemInfo.u) then
+			uses = itemInfo.u;
+		end
+	end
 
-		if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR)) then
-			if ((buy > 0) or (sell > 0)) then
-				local bgsc = TT_GetTextGSC(buy);
-				local sgsc = TT_GetTextGSC(sell);
-                
-				if (count and (count > 1)) then
-					local bqgsc = TT_GetTextGSC(buy*count);
-					local sqgsc = TT_GetTextGSC(sell*count);
-					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bgsc), buy*count, embedded);
-						TT_LineColor(0.8, 0.5, 0.1);
-					end
-					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sgsc), sell*count, embedded);
-						TT_LineColor(0.8, 0.5, 0.1);
-					end
-				else
-					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote), buy, embedded);
-						TT_LineColor(0.8, 0.5, 0.1);
-					end
-					if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
-						TT_AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote), sell, embedded);
-						TT_LineColor(0.8, 0.5, 0.1);
-					end
+	if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR)) then
+		if ((buy > 0) or (sell > 0)) then
+			local bgsc = TT_GetTextGSC(buy);
+			local sgsc = TT_GetTextGSC(sell);
+
+			if (count and (count > 1)) then
+				local bqgsc = TT_GetTextGSC(buy*count);
+				local sqgsc = TT_GetTextGSC(sell*count);
+				if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_BUYMULT, buyNote, count, bgsc), buy*count, embedded);
+					TT_LineColor(0.8, 0.5, 0.1);
+				end
+				if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SELLMULT, sellNote, count, sgsc), sell*count, embedded);
+					TT_LineColor(0.8, 0.5, 0.1);
+				end
+			else
+				if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_BUY)) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_BUY, buyNote), buy, embedded);
+					TT_LineColor(0.8, 0.5, 0.1);
+				end
+				if (Auctioneer_GetFilter(AUCT_SHOW_VENDOR_SELL)) then
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SELL, sellNote), sell, embedded);
+					TT_LineColor(0.8, 0.5, 0.1);
 				end
 			end
 		end
+	end
 
-		if (Auctioneer_GetFilter(AUCT_SHOW_STACK)) then
-			if (stacks > 1) then
-				TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks), nil, embedded);
-			end
+	if (Auctioneer_GetFilter(AUCT_SHOW_STACK)) then
+		if (stacks > 1) then
+			TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks), nil, embedded);
 		end
-		if (Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
-			local reagentInfo = "";
-			if (class ~= "") then
-				if (uses ~= "") then
-					reagentInfo = string.format(AUCT_FRMT_INFO_CLASSUSE, class, uses);
-				else
-					reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, class);
-				end
-			elseif (uses ~= "") then
-				reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
+	end
+	if (Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
+		local reagentInfo = "";
+		if (class ~= "") then
+			if (uses ~= "") then
+				reagentInfo = string.format(AUCT_FRMT_INFO_CLASSUSE, class, uses);
+			else
+				reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, class);
 			end
-			if (reagentInfo ~= "") then
-				TT_AddLine(reagentInfo, nil, embedded);
-				TT_LineColor(0.6, 0.4, 0.8);
-			end
+		elseif (uses ~= "") then
+			reagentInfo = string.format(AUCT_FRMT_INFO_USE, uses);
+		end
+		if (reagentInfo ~= "") then
+			TT_AddLine(reagentInfo, nil, embedded);
+			TT_LineColor(0.6, 0.4, 0.8);
 		end
 	end
 	TT_Show(frame);
 end
-
 
 local function Auctioneer_Tooltip_Hook(frame, name, count, data)
 	Auctioneer_Old_Tooltip_Hook(frame, name, count, data);
@@ -1437,11 +1475,11 @@ function Auctioneer_OnLoad()
 	Auctioneer_OldTooltip = TT_AddTooltip;
 	TT_AddTooltip = Auctioneer_NewTooltip;
 
-    -- Hook PlaceAuctionBid
+   -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
 	PlaceAuctionBid = Auctioneer_PlaceAuctionBid;
-   
-   	-- Hook in the FilterButton_SetType
+
+  	-- Hook in the FilterButton_SetType
 	Auctioneer_Old_FilterButton_SetType = FilterButton_SetType;
 	FilterButton_SetType = Auctioneer_FilterButton_SetType;
 
@@ -1451,7 +1489,7 @@ function Auctioneer_OnLoad()
 	SlashCmdList["AUCTIONEER"] = function(msg)
 		Auctioneer_Command(msg);
 	end
-	
+
 	if ( DEFAULT_CHAT_FRAME ) then 
 		DEFAULT_CHAT_FRAME:AddMessage(string.format(AUCT_FRMT_WELCOME, AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 	end
@@ -1508,7 +1546,6 @@ function Auctioneer_FilterButton_SetType(button, type, text, isLast)
 		checkbox:Hide();
 	end
 end
-		
 
 function Auctioneer_ConfigureAH()
 	AuctionsPriceText:ClearAllPoints();
@@ -1547,7 +1584,7 @@ function Auctioneer_Command(command)
 		local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
 		Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
-		
+
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VERBOSE, Auctioneer_GetFilterVal(AUCT_SHOW_VERBOSE), AUCT_HELP_VERBOSE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_AVERAGE, Auctioneer_GetFilterVal(AUCT_SHOW_AVERAGE), AUCT_HELP_AVERAGE));
 		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MEDIAN, Auctioneer_GetFilterVal(AUCT_SHOW_MEDIAN), AUCT_HELP_MEDIAN));
@@ -1603,17 +1640,17 @@ function Auctioneer_Command(command)
 			local aKey = auctionKey();
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEARALL, aKey));
 			AuctionPrices[aKey] = {};
-            AHSnapshot = {};
-            AHSnapshot[auctionKey()] = {};
-            AHSnapshotItemPrices = {};
-            AHSnapshotItemPrices[auctionKey()] = {};
-        elseif (param == AUCT_CMD_CLEAR_SNAPSHOT) then
-            Auctioneer_ChatPrint(AUCT_FRMT_ACT_CLEARSNAP);
-            AHSnapshot = {};
-            AHSnapshot[auctionKey()] = {};
-            AHSnapshotItemPrices = {};  
-            AHSnapshotItemPrices[auctionKey()] = {};  
-            lSnapshotItemPrices = {};            
+			AHSnapshot = {};
+			AHSnapshot[auctionKey()] = {};
+			AHSnapshotItemPrices = {};
+			AHSnapshotItemPrices[auctionKey()] = {};
+		elseif (param == AUCT_CMD_CLEAR_SNAPSHOT) then
+			Auctioneer_ChatPrint(AUCT_FRMT_ACT_CLEARSNAP);
+			AHSnapshot = {};
+			AHSnapshot[auctionKey()] = {};
+			AHSnapshotItemPrices = {};  
+			AHSnapshotItemPrices[auctionKey()] = {};
+			lSnapshotItemPrices = {}; 
 		else
 			local items = Auctioneer_GetItems(param);
 			for _,itemKey in items do
@@ -1627,7 +1664,7 @@ function Auctioneer_Command(command)
 			end
 		end
 	elseif (cmd == AUCT_CMD_ALSO) then
-		Auctioneer_SetFilter("also", param);        
+		Auctioneer_SetFilter("also", param);
 	elseif (cmd == AUCT_CMD_LOCALE) then
 		if (AUCT_VALID_LOCALES[param]) then
 			Auctioneer_SetFilter('locale', param);
@@ -1644,23 +1681,23 @@ function Auctioneer_Command(command)
 			end
 		end
 	elseif (cmd == AUCT_CMD_BROKER) then
-        doBroker(param);
-    elseif (cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT) then
-        doBidBroker(param);
+		doBroker(param);
+	elseif (cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT) then
+		doBidBroker(param);
 	elseif (cmd == AUCT_CMD_PERCENTLESS) or (cmd == AUCT_CMD_PERCENTLESS_SHORT) then
-        doPercentLess(param);      
+		doPercentLess(param);
 	elseif (cmd == AUCT_CMD_COMPETE) then
-        doCompeting(param);      
-    elseif (cmd == AUCT_CMD_SCAN) then
-        Auctioneer_RequestAuctionScan();           
-    elseif (cmd == "test") then
-        doTest(param);
-    elseif (cmd == "low") then
-        doLow(param);   
-    elseif (cmd == "med") then
-        doMedian(param);  
-    elseif (cmd == "hsp") then
-        doHSP(param);           
+		doCompeting(param);
+	elseif (cmd == AUCT_CMD_SCAN) then
+		Auctioneer_RequestAuctionScan();
+	elseif (cmd == "test") then
+		doTest(param);
+	elseif (cmd == "low") then
+		doLow(param);
+	elseif (cmd == "med") then
+		doMedian(param);
+	elseif (cmd == "hsp") then
+		doHSP(param);
 	elseif (
 		(cmd == AUCT_CMD_PCT_BIDMARKDOWN) or
 		(cmd == AUCT_CMD_PCT_MARKUP) or
@@ -1826,14 +1863,14 @@ end
 -- example: this function changes 1g15s to 95s
 -- example: 1.5g will be unchanged and remain 1.5g
 local function roundDownTo95(copper)
-    local g,s,c = TT_GetGSC(copper);
-    local roundedValue = copper;
-    
-    if g > 0 and s < 10 then
-        roundedValue = roundedValue - ((s + 5) * 100); -- subtract enough copper to round to 95 silver
-    end
-    
-    return roundedValue;
+	local g,s,c = TT_GetGSC(copper);
+	local roundedValue = copper;
+
+	if g > 0 and s < 10 then
+		roundedValue = roundedValue - ((s + 5) * 100); -- subtract enough copper to round to 95 silver
+	end
+
+	return roundedValue;
 end
 
 function Auctioneer_FindItemInBags(findName)
