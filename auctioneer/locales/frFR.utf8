@@ -53,7 +53,6 @@ AUCT_FRMT_INFO_FORONE = "Pour 1: %s min/%s achat (%s enchère) [par %d]";
 AUCT_FRMT_INFO_AVERAGE = "%s min/%s achat (%s enchère)"
 AUCT_FRMT_INFO_HISTMED = "Derniers %d vus, achat moyen:";
 AUCT_FRMT_INFO_SNAPMED = "Vu %d fois au dernier scan, achat moyen:";
-AUCT_FRMT_INFO_YOURSTX = "Votre pile de %d: %s min/%s achat (%s enchère)";
 AUCT_FRMT_INFO_BIDRATE = "%d%% avec enchère, %d%% avec achat immédiat";
 AUCT_FRMT_INFO_NEVER = "Jamais vu aux enchères";
 AUCT_FRMT_INFO_ALSOSEEN = "Vu %d fois aux %s";
