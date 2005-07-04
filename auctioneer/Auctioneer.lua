@@ -289,10 +289,14 @@ Auctioneer_BreakItemKey = breakItemKey;
 
 -- returns an AuctionPrices item from the table based on an item name
 local function getAuctionPriceItem(itemKey, from, name, id)
-	local serverFaction = auctionKey();
+	local serverFaction;
 	local auctionPriceItem;
 
-	if (from ~= nil) then serverFaction = from; end
+	if (from ~= nil) then
+		serverFaction = from;
+	else
+		serverFaction = auctionKey();
+	end;
 	if (AuctionPrices[serverFaction] == nil) then
 		AuctionPrices[serverFaction] = {};
 	elseif AuctionPrices[serverFaction][itemKey] then
@@ -430,7 +434,7 @@ local function getUsableMedian(itemKey, name)
 	--get history median
 	local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
 
-	if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian + (historyMedian * .20))) then
+	if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian * 1.20)) then
 		if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
 			usableMedian = historyMedian;
 			count = historySeenCount;
