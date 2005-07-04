@@ -10,8 +10,8 @@ AUCT_CLAS_HIDE = "Piel";
 AUCT_CLAS_LEATHER = "Cuero";
 AUCT_CLAS_MAGE = "Mago";
 AUCT_CLAS_ORE = "Mineral";
-AUCT_CLAS_POTION = "Poción";
-AUCT_CLAS_QUEST = "Búsquedas";
+AUCT_CLAS_POTION = "PociÃ³n";
+AUCT_CLAS_QUEST = "BÃºsquedas";
 AUCT_CLAS_SHAMAN = "Chamanes";
 AUCT_CLAS_WARLOCK = "Brujos";
 AUCT_CLAS_WEAPON = "Arma";
@@ -20,12 +20,12 @@ AUCT_CLAS_WRITTEN = "Escrito";
 AUCT_TYPE_ALCHEM = "Alquimia";
 AUCT_TYPE_COOK = "Cocina";
 AUCT_TYPE_ENCHANT = "Encantar";
-AUCT_TYPE_ENGINEER = "Ingienería";
+AUCT_TYPE_ENGINEER = "IngienerÃ­a";
 AUCT_TYPE_FSTAID = "Primeros Auxilios";
-AUCT_TYPE_LEATHER = "Peletería";
-AUCT_TYPE_MINING = "Minerál";
+AUCT_TYPE_LEATHER = "PeleterÃ­a";
+AUCT_TYPE_MINING = "MinerÃ¡l";
 AUCT_TYPE_POISON = "Veneno";
-AUCT_TYPE_SMITH = "Herrería";
+AUCT_TYPE_SMITH = "HerrerÃ­a";
 AUCT_TYPE_TAILOR = "Sastre";
 
 AUCT_RECIPE_PREFIXES = { "Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: " };
@@ -48,18 +48,18 @@ AUCT_FRMT_BIDBROKER_DONE = "Corredor de ofertas finalizado";
 AUCT_FRMT_PCTLESS_HEADER = "Porcentaje bajo el Precio Maximo Vendible (PMV): %d%%";
 AUCT_FRMT_PCTLESS_LINE = "%s, Ultimo(s) %d visto(s), PMV: %s, OC: %s, Ganancia: %s, menos %s";
 AUCT_FRMT_PCTLESS_DONE = "Porcentajes menores finalizado.";
-AUCT_FRMT_COMPETE_HEADER = "Subastas compitiendo por al menos %s debajo por artículo.";
+AUCT_FRMT_COMPETE_HEADER = "Subastas compitiendo por al menos %s debajo por artÃ­culo.";
 AUCT_FRMT_COMPETE_LINE = "%s, Oferta: %s, OC %s vs %s, %s menos";
 AUCT_FRMT_COMPETE_DONE = "Subastas compitiendo finalizado.";
-AUCT_FRMT_NOAUCT = "No se hallaron subastas para el artículo: %s";
-AUCT_FRMT_MEDIAN_LINE = "De los últimos(s) %d vistos, OC mediano por 1 %s es: %s";
+AUCT_FRMT_NOAUCT = "No se hallaron subastas para el artÃ­culo: %s";
+AUCT_FRMT_MEDIAN_LINE = "De los Ãºltimos(s) %d vistos, OC mediano por 1 %s es: %s";
 AUCT_FRMT_LOW_LINE = "%s, BO: %s, Vendedor: %s, Por uno: %s, Menos que el mediano: %s";
 AUCT_FRMT_HSP_LINE = "Precio Maximo Vendible por uno %s es: %s";
 
 AUCT_FRMT_INFO_SEEN = "Visto un total de %d veces en subasta";
 AUCT_FRMT_INFO_FORONE = "Por 1: %s min/%s OC (%s oferta) [en %d's]";
 AUCT_FRMT_INFO_AVERAGE = "%s min/%s OC (%s oferta)"
-AUCT_FRMT_INFO_HISTMED = "Último(s) %d, OC mediano (c/u)";
+AUCT_FRMT_INFO_HISTMED = "Ãšltimo(s) %d, OC mediano (c/u)";
 AUCT_FRMT_INFO_SNAPMED = "Explorados %d, OC mediano (c/u)";
 
 AUCT_FRMT_INFO_BIDRATE = "%d%% tienen ofertas, %d%% tienen OC";
@@ -72,32 +72,32 @@ AUCT_FRMT_INFO_BUY = "Compra a %s del vendedor";
 AUCT_FRMT_INFO_SELL = "Vende a %s al vendedor";
 AUCT_FRMT_INFO_BUYMULT = "Compra %s %d (%s c/u)";
 AUCT_FRMT_INFO_SELLMULT = "Vende %s %d (%s c/u)";
-AUCT_FRMT_INFO_STX = "Amontonable en lotes %d artículos por paquete";
+AUCT_FRMT_INFO_STX = "Amontonable en lotes %d artÃ­culos por paquete";
 
-AUCT_FRMT_INFO_HEAD_MULTI = "Promedios para %d artículos:";
+AUCT_FRMT_INFO_HEAD_MULTI = "Promedios para %d artÃ­culos:";
 AUCT_FRMT_INFO_MIN_MULTI = "  Minimo (%s c/u)";
 AUCT_FRMT_INFO_BID_MULTI = "  Oferta (%s%s c/u)";
-AUCT_FRMT_INFO_BUY_MULTI = "  Opción a compra(%s%s c/u)";
+AUCT_FRMT_INFO_BUY_MULTI = "  OpciÃ³n a compra(%s%s c/u)";
 
-AUCT_FRMT_INFO_HEAD_ONE = "Promedios para este artículo:";
-AUCT_FRMT_INFO_MIN_ONE = "  Oferta mínima";
+AUCT_FRMT_INFO_HEAD_ONE = "Promedios para este artÃ­culo:";
+AUCT_FRMT_INFO_MIN_ONE = "  Oferta mÃ­nima";
 AUCT_FRMT_INFO_BID_ONE = " %s con propuestas";
-AUCT_FRMT_INFO_BUY_ONE = " %s con opción a compra";
+AUCT_FRMT_INFO_BUY_ONE = " %s con opciÃ³n a compra";
 
-AUCT_FRMT_INFO_BUYMEDIAN = "  Opción a compra mediano";
+AUCT_FRMT_INFO_BUYMEDIAN = "  OpciÃ³n a compra mediano";
 
-AUCT_FRMT_INFO_STACKSIZE = "  Tamaño promedio del paquete: %d artículos";
+AUCT_FRMT_INFO_STACKSIZE = "  TamaÃ±o promedio del paquete: %d artÃ­culos";
 
-AUCT_FRMT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:"; 
+AUCT_FRMT_UNKNOWN_LOCALE = "La localizaciÃ³n que usted especifico ('%s') no es valida. Locales vÃ¡lidos son:"; 
 
 AUCT_FRMT_ACT_REMOVE = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
-AUCT_FRMT_AUCTINFO_HIST = "%d Histórico";
-AUCT_FRMT_AUCTINFO_SNAP = "%d Ultima exploración";
+AUCT_FRMT_AUCTINFO_HIST = "%d HistÃ³rico";
+AUCT_FRMT_AUCTINFO_SNAP = "%d Ultima exploraciÃ³n";
 AUCT_FRMT_AUCTINFO_LOW = "Imagen baja";
-AUCT_FRMT_AUCTINFO_NOLOW = "Artículo no fue visto en ultima imagen";
+AUCT_FRMT_AUCTINFO_NOLOW = "ArtÃ­culo no fue visto en ultima imagen";
 AUCT_FRMT_AUCTINFO_ORIG = "Oferta Original";
-AUCT_FRMT_AUCTINFO_SUGBUY = "Opción a compra sugerida";
+AUCT_FRMT_AUCTINFO_SUGBUY = "OpciÃ³n a compra sugerida";
 AUCT_FRMT_AUCTINFO_SUGBID = "Oferta sugerida";
 AUCT_FRMT_AUCTINFO_MKTPRICE = "Precio del mercado";
 
@@ -139,8 +139,8 @@ AUCT_CMD_PCT_NOCOMP      = "pct-nocomp";
 AUCT_CMD_PCT_UNDERLOW    = "pct-bajomenor";
 AUCT_CMD_PCT_UNDERMKT    = "pct-bajomercado";
 
-AUCT_OPT_CLEAR = "([Artículo]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
-AUCT_OPT_ALSO = "(reino-facción|"..AUCT_CMD_ALSO_OPPOSITE..")"
+AUCT_OPT_CLEAR = "([ArtÃ­culo]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
+AUCT_OPT_ALSO = "(reino-facciÃ³n|"..AUCT_CMD_ALSO_OPPOSITE..")"
 AUCT_OPT_LOCALE = "<localidad>";
 AUCT_OPT_BROKER = "<ganancia_plata>";
 AUCT_OPT_BIDBROKER = "<ganancia_plata>";
@@ -180,45 +180,45 @@ AUCT_SHOW_EMBED_BLANK = "ver-integrado-lineavacia";
 
 AUCT_HELP_ONOFF = "Enciande o apaga la informacion sobre subastas";
 AUCT_HELP_VERBOSE = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
-AUCT_HELP_AVERAGE = "Selecciona para mostrar precio promedio de la subasta para el artículo";
-AUCT_HELP_LINK = "Selecciona para mostrar el numero de enlace del artículo en la caja de ayuda";
-AUCT_HELP_MEDIAN = "Selecciona para mostrar el precio promedio para la opción a compra";
-AUCT_HELP_MESH = "Selecciona para mostrar la imagen del artículo, si existe una";
-AUCT_HELP_SUGGEST = "Selecciona para mostrar el precio sugerido de subasta para el artículo";
-AUCT_HELP_STATS = "Selecciona para mostrar porcentajes para ofertas/opción a compra del artículo";
-AUCT_HELP_VENDOR = "Selecciona para mostrar precios de vendedor para el artículo";
+AUCT_HELP_AVERAGE = "Selecciona para mostrar precio promedio de la subasta para el artÃ­culo";
+AUCT_HELP_LINK = "Selecciona para mostrar el numero de enlace del artÃ­culo en la caja de ayuda";
+AUCT_HELP_MEDIAN = "Selecciona para mostrar el precio promedio para la opciÃ³n a compra";
+AUCT_HELP_MESH = "Selecciona para mostrar la imagen del artÃ­culo, si existe una";
+AUCT_HELP_SUGGEST = "Selecciona para mostrar el precio sugerido de subasta para el artÃ­culo";
+AUCT_HELP_STATS = "Selecciona para mostrar porcentajes para ofertas/opciÃ³n a compra del artÃ­culo";
+AUCT_HELP_VENDOR = "Selecciona para mostrar precios de vendedor para el artÃ­culo";
 AUCT_HELP_VENDOR_SELL = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor=encendido)";
 AUCT_HELP_VENDOR_BUY = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor=encendido)";
-AUCT_HELP_USAGE = "Selecciona para mostrar uso del artículo en profesiones";
-AUCT_HELP_STACK = "Selecciona para mostrar tamaño maximo del paquete";
+AUCT_HELP_USAGE = "Selecciona para mostrar uso del artÃ­culo en profesiones";
+AUCT_HELP_STACK = "Selecciona para mostrar tamaÃ±o maximo del paquete";
 AUCT_HELP_EMBED_BLANK = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-AUCT_HELP_CLEAR = "Eliminar la informacion existente sobre el artículo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las claves \"todo\" or \"imagen\"";
+AUCT_HELP_CLEAR = "Eliminar la informacion existente sobre el artÃ­culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las claves \"todo\" or \"imagen\"";
 AUCT_HELP_ALSO = "Mostrar valores de otros servidores en la caja de ayuda. Palabra especial \"opuesto\" significa faccion opuesta, \"apagar\" desabilita la funcion.";
 AUCT_HELP_LOCALE = "Cambiar la localidad que Auctioneer usa para sus mensajes";
-AUCT_HELP_BROKER = "Muestra las subastas de la exploración mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
-AUCT_HELP_BIDBROKER = "Muestra subastas de corto o medio termino de la exploración mas reciente a las cuales se puede poner una oferta y obtener ganancia";
-AUCT_HELP_EMBED = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opción es seleccionada)";
+AUCT_HELP_BROKER = "Muestra las subastas de la exploraciÃ³n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
+AUCT_HELP_BIDBROKER = "Muestra subastas de corto o medio termino de la exploraciÃ³n mas reciente a las cuales se puede poner una oferta y obtener ganancia";
+AUCT_HELP_EMBED = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opciÃ³n es seleccionada)";
 AUCT_HELP_PERCENTLESS = "Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio vendible mas alto.";
-AUCT_HELP_COMPETE = "Muestra cualquier subasta explorada recientemente cuya opción a compra es menor que alguno de tus artículos";
-AUCT_HELP_SCAN = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un botón en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
-AUCT_HELP_AUTOFILL = "Auto-completar precios cuando se añadan artículos a subastar en el panel de la casa de subastas";
+AUCT_HELP_COMPETE = "Muestra cualquier subasta explorada recientemente cuya opciÃ³n a compra es menor que alguno de tus artÃ­culos";
+AUCT_HELP_SCAN = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un botÃ³n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
+AUCT_HELP_AUTOFILL = "Auto-completar precios cuando se aÃ±adan artÃ­culos a subastar en el panel de la casa de subastas";
 AUCT_HELP_PCT_BIDMARKDOWN = "Ajusta el porcentaje del precio de compra por debajo del cual Auctioneer marcara las ofertas";
 AUCT_HELP_PCT_MARKUP = "El porcentaje que sera incrementado el precio de venta del vendedor cuando no existan otros valores disponibles.";
 AUCT_HELP_PCT_MAXLESS = "Ajusta el maximo porcentaje por debajo del valor de mercado que Auctioneer tratara de igualar antes de darse por vencido.";
-AUCT_HELP_PCT_NOCOMP = "El porcentaje bajo el precio del mercado que Auctioneer usará cuando no hay competencia";
-AUCT_HELP_PCT_UNDERLOW = "Ajusta el porcentaje bajo el menor precio mínimo de subasta que Auctioneer aplicará";
+AUCT_HELP_PCT_NOCOMP = "El porcentaje bajo el precio del mercado que Auctioneer usarÃ¡ cuando no hay competencia";
+AUCT_HELP_PCT_UNDERLOW = "Ajusta el porcentaje bajo el menor precio mÃ­nimo de subasta que Auctioneer aplicarÃ¡";
 AUCT_HELP_PCT_UNDERMKT = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
 
 AUCT_STAT_ON = "Mostrando la configuracion corriente para la informacion de subastas";
 AUCT_STAT_OFF = "Ocultando toda la informacion de subastas";
 
-AUCT_FRMT_ACT_CLEARALL = "Eliminando toda la información de subastas para %s";
+AUCT_FRMT_ACT_CLEARALL = "Eliminando toda la informaciÃ³n de subastas para %s";
 AUCT_FRMT_ACT_CLEARSNAP = "Eliminando la imagen actual de la casa de subastas.";
 AUCT_FRMT_ACT_CLEAR_OK = "Informacion eliminada para el item: %s";
-AUCT_FRMT_ACT_CLEAR_FAIL = "Imposible encontrar artículo: %s";
-AUCT_FRMT_ACT_ENABLE = "Mostrando informacion del artículo: %s ";
+AUCT_FRMT_ACT_CLEAR_FAIL = "Imposible encontrar artÃ­culo: %s";
+AUCT_FRMT_ACT_ENABLE = "Mostrando informacion del artÃ­culo: %s ";
 AUCT_FRMT_ACT_DISABLE = "Ocultando informacion de articulo: %s ";
-AUCT_FRMT_ACT_ENABLED_ON = "Mostrando artículos %s en %s";
+AUCT_FRMT_ACT_ENABLED_ON = "Mostrando artÃ­culos %s en %s";
 AUCT_FRMT_ACT_SET = "Ajustado %s a '%s'";
 AUCT_FRMT_ACT_UNKNOWN = "Comando o palabra clave desconocida: '%s'";
 
@@ -227,8 +227,8 @@ AUCT_TEXT_AUCTION = "Subasta";
 AUCT_TEXT_NONE = "ningun";
 
 -- AH Scanning localizations
-AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Explorando \"%s\" página 1...";
-AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Explorando \"%s\" página %d de %d";
-AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: La exploración de las subastas ha finalizado";
+AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Explorando \"%s\" pÃ¡gina 1...";
+AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Explorando \"%s\" pÃ¡gina %d de %d";
+AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: La exploraciÃ³n de las subastas ha finalizado";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que hable con un subastador.";
 AUCTIONEER_AUCTION_SCAN_NOCAT = "Usted debe tener al menos una categoria seleccionada para explorar.";
