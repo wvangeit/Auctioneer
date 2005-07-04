@@ -1,5 +1,5 @@
 -- Auctioneer
-AUCTIONEER_VERSION="3.0.9";
+AUCTIONEER_VERSION="<%version%>";
 -- Revision: $Id$
 -- Original version written by Norganna.
 -- Contributors: Araband
@@ -1078,6 +1078,9 @@ function Auctioneer_SetModelByID(itemID)
 	end
 end
 
+function Auctioneer_ItemPopup(name, link, quality, count)
+	return true;
+end
 
 function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	Auctioneer_OldTooltip(frame, name, link, quality, count);
@@ -1474,6 +1477,8 @@ function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
 	Auctioneer_OldTooltip = TT_AddTooltip;
 	TT_AddTooltip = Auctioneer_NewTooltip;
+	Auctioneer_OldPopup = TT_ItemPopup;
+	TT_ItemPopup = Auctioneer_ItemPopup;
 
    -- Hook PlaceAuctionBid
 	Auctioneer_Old_BidHandler = PlaceAuctionBid;
