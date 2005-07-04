@@ -1,3 +1,4 @@
+-- Encoded in UTF﻿8
 AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: " };
 
 AUCT_CLAS_ARMOR = "Rüstung";
