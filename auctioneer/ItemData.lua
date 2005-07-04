@@ -4370,13 +4370,13 @@ Auctioneer_BasePrices = {
 	[7072]={b=600,s=150,d=3668,x=10,u=AUCT_TYPE_TAILOR},  -- Naga Scale
 	[7073]={b=25,s=6,d=6002,x=5},  -- Broken Fang
 	[7074]={b=16,s=4,d=7048,x=5},  -- Chipped Claw
-	[7075]={b=1600,s=400,d=8560,x=10,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_LEATHER},  -- Core of Earth
+	[7075]={b=1600,s=400,d=8560,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_LEATHER},  -- Core of Earth
 	[7076]={b=1600,s=400,d=23754,x=10},  -- Essence of Earth
-	[7077]={b=1600,s=400,d=21583,x=10,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Heart of Fire
+	[7077]={b=1600,s=400,d=21583,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Heart of Fire
 	[7078]={b=1600,s=400,d=23287,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Essence of Fire
-	[7079]={b=1600,s=400,d=8025,x=10,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Globe of Water
+	[7079]={b=1600,s=400,d=8025,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Globe of Water
 	[7080]={b=1600,s=400,d=13689,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Essence of Water
-	[7081]={b=1600,s=400,d=13687,x=10},  -- Breath of Wind
+	[7081]={b=1600,s=400,d=13687,x=10,u=AUCT_TYPE_ENCHANT},  -- Breath of Wind
 	[7082]={b=1600,s=400,d=23284,x=10,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER},  -- Essence of Air
 	[7083]={b=0,s=0,d=7279},  -- Purified Kor Gem
 	[7084]={b=1400,s=350,d=15274},  -- Pattern: Crimson Silk Shoulders
@@ -4846,7 +4846,7 @@ Auctioneer_BasePrices = {
 	[7969]={b=1000,s=250,d=16205},  -- Mithril Spurs
 	[7970]={b=0,s=0,d=16206},  -- E.C.A.C.
 	[7971]={b=4000,s=1000,d=16209,x=20,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_LEATHER},  -- Black Pearl
-	[7972]={b=1600,s=400,d=16210,x=10},  -- Ichor of Undeath
+	[7972]={b=1600,s=400,d=16210,x=10,u=AUCT_TYPE_ENCHANT},  -- Ichor of Undeath
 	[7973]={b=185,s=46,d=16211},  -- Big-mouth Clam
 	[7974]={b=200,s=50,d=22193,x=10,u=AUCT_TYPE_COOK},  -- Zesty Clam Meat
 	[7975]={b=6000,s=1500,d=15274},  -- Plans: Heavy Mithril Pants
