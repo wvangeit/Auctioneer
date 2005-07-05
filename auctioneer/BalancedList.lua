@@ -18,18 +18,28 @@ function newBalancedList(paramSize)
     -- and you insert(2) then your list would become {1,2,2,3}.
     local insert =  function (value)
         if (not value) then return; end
-    
-        local insertPos = 1;
+
+        local insertPos = 0
+        local left      = 1
+        local right     = getn(self.list)
+        local middle
         -- insert in sorded order
-        for i,v in self.list do
-            -- find the position to insert the value
-            if (value < v) then 
-                insertPos = i;
-                break;
-            end
-            insertPos = i + 1;
+        while (left <= right) do
+        	middle = math.floor((right-left) / 2) + left
+        	if (value < self.list[middle]) then
+        		right = middle - 1
+        	elseif (value > self.list[middle]) then
+        		left = middle + 1
+        	else
+        		insertPos = middle
+        		break
+        	end
         end
-        
+        -- TODO: Check how to optimize that too
+        if (insertPos == 0) then
+        	insertPos = left;
+        end
+
         table.insert(self.list, insertPos, value);
         
         -- see if we need to balance the list
