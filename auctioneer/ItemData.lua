@@ -3,6 +3,7 @@
 -- Gathered by Norganna
 --
 
+function Auctioneer_BuildBaseData()
 Auctioneer_BasePrices = {
 	[25]={b=35,s=7,d=1542,c=AUCT_CLAS_WEAPON},  -- Worn Shortsword
 	[35]={b=47,s=9,d=472,c=AUCT_CLAS_WEAPON},  -- Bent Staff
@@ -11304,4 +11305,6 @@ Auctioneer_BasePrices = {
 	[18924]={b=0,s=0,d=31353},  -- Solenor's Head
 	[18925]={b=0,s=0,d=31353},  -- Artorius's Head
 };
+end
 
+Auctioneer_BuildBaseData();

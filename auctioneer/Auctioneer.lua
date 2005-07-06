@@ -1679,6 +1679,7 @@ function Auctioneer_Command(command)
 			Auctioneer_SetFilter('locale', param);
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, param));
 			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
+			Auctioneer_BuildBaseData();
 		elseif (param == '') or (param == 'default') or (param == 'off') then
 			Auctioneer_SetFilter('locale', 'default');
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, 'default'));
@@ -1973,7 +1974,7 @@ function Auctioneer_OnEvent(event)
 
 	elseif (event == "VARIABLES_LOADED") then
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-
+		Auctioneer_BuildBaseData();
     end        
 end
 
