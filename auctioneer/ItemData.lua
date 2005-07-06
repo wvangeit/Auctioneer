@@ -116,7 +116,7 @@ Auctioneer_BasePrices = {
 	[780]={b=0,s=0,d=6628,q=20,x=20,u=AUCT_TYPE_COOK},  -- Torn Murloc Fin
 	[781]={b=552,s=110,d=19644,c=AUCT_CLAS_WEAPON},  -- Stone Gnoll Hammer
 	[782]={b=0,s=0,d=1329,q=20,x=20},  -- Painted Gnoll Armband
-	[783]={b=200,s=50,d=6687,x=5,c=AUCT_CLAS_LEATHER},  -- Light Hide
+	[783]={b=200,s=50,d=6687,x=5,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_LEATHER},  -- Light Hide
 	[785]={b=80,s=20,d=7341,x=20,c=AUCT_CLAS_HERB,u=AUCT_TYPE_ALCHEM},  -- Mageroyal
 	[787]={b=25,s=1,d=24697,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Slitherskin Mackerel
 	[789]={b=9847,s=1969,d=19699,c=AUCT_CLAS_WEAPON},  -- Stout Battlehammer
@@ -1018,7 +1018,7 @@ Auctioneer_BasePrices = {
 	[2454]={b=80,s=20,d=15733,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Lion's Strength
 	[2455]={b=40,s=10,d=15715,x=5,u=AUCT_TYPE_TAILOR},  -- Minor Mana Potion
 	[2456]={b=60,s=15,d=2345,x=5,c=AUCT_CLAS_POTION},  -- Minor Rejuvenation Potion
-	[2457]={b=60,s=15,d=15738,x=5,u=AUCT_TYPE_LEATHER},  -- Elixir of Minor Agility
+	[2457]={b=60,s=15,d=15738,x=5,c=AUCT_CLAS_POTION,u=AUCT_TYPE_LEATHER},  -- Elixir of Minor Agility
 	[2458]={b=60,s=15,d=15792,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Minor Fortitude
 	[2459]={b=100,s=25,d=15742,x=5,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_SMITH},  -- Swiftness Potion
 	[2463]={b=13695,s=2739,d=16900,c=AUCT_CLAS_ARMOR},  -- Studded Doublet
@@ -1331,8 +1331,8 @@ Auctioneer_BasePrices = {
 	[2886]={b=20,s=5,d=2904,x=10,u=AUCT_TYPE_COOK},  -- Crag Boar Rib
 	[2888]={b=40,s=10,d=21327,x=20,u=AUCT_TYPE_COOK},  -- Beer Basted Boar Ribs
 	[2889]={b=240,s=60,d=811,u=AUCT_TYPE_COOK},  -- Recipe: Beer Basted Boar Ribs
-	[2892]={b=120,s=30,d=13707,x=10,u=AUCT_TYPE_POISON},  -- Deadly Poison
-	[2893]={b=220,s=55,d=13707,x=10},  -- Deadly Poison II
+	[2892]={b=120,s=30,d=13707,x=10,c=AUCT_CLAS_POISON},  -- Deadly Poison
+	[2893]={b=220,s=55,d=13707,x=10,c=AUCT_CLAS_POISON},  -- Deadly Poison II
 	[2894]={b=50,s=12,d=18117,x=10,u=AUCT_TYPE_COOK},  -- Rhapsody Malt
 	[2898]={b=162,s=32,d=2967,c=AUCT_CLAS_ARMOR},  -- Mountaineer Chestpiece
 	[2899]={b=846,s=169,d=16949,c=AUCT_CLAS_ARMOR},  -- Wendigo Collar
@@ -1359,7 +1359,7 @@ Auctioneer_BasePrices = {
 	[2928]={b=20,s=5,d=6371,x=20,u=AUCT_TYPE_POISON},  -- Dust of Decay
 	[2930]={b=50,s=12,d=6400,x=10,u=AUCT_TYPE_POISON},  -- Essence of Pain
 	[2933]={b=15000,s=3750,d=9845,c=AUCT_CLAS_ARMOR},  -- Seal of Wrynn
-	[2934]={b=30,s=7,d=7400,x=10,c=AUCT_CLAS_LEATHER},  -- Ruined Leather Scraps
+	[2934]={b=30,s=7,d=7400,x=10,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_LEATHER},  -- Ruined Leather Scraps
 	[2939]={b=0,s=0,d=3004},  -- Crocolisk Tear
 	[2940]={b=175,s=43,d=1769,x=5},  -- Bloody Bear Paw
 	[2941]={b=17761,s=3552,d=20359,c=AUCT_CLAS_WEAPON},  -- Prison Shank
@@ -1667,8 +1667,8 @@ Auctioneer_BasePrices = {
 	[3365]={b=16,s=3,d=16664,c=AUCT_CLAS_ARMOR},  -- Frayed Bracers
 	[3369]={b=100,s=25,d=6396,x=20,c=AUCT_CLAS_HERB,u=AUCT_TYPE_ALCHEM},  -- Grave Moss
 	[3370]={b=50,s=10,d=7881,c=AUCT_CLAS_ARMOR},  -- Patchwork Belt
-	[3371]={b=20,s=1,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM},  -- Empty Vial
-	[3372]={b=200,s=10,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM},  -- Leaded Vial
+	[3371]={b=20,s=1,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_POISON},  -- Empty Vial
+	[3372]={b=200,s=10,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_POISON},  -- Leaded Vial
 	[3373]={b=71,s=14,d=16804,c=AUCT_CLAS_ARMOR},  -- Patchwork Bracers
 	[3374]={b=227,s=45,d=16554,c=AUCT_CLAS_ARMOR},  -- Calico Belt
 	[3375]={b=152,s=30,d=16555,c=AUCT_CLAS_ARMOR},  -- Calico Bracers
@@ -1685,7 +1685,7 @@ Auctioneer_BasePrices = {
 	[3386]={b=140,s=35,d=15750,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Poison Resistance
 	[3387]={b=120,s=30,d=24213,x=5,c=AUCT_CLAS_POTION},  -- Limited Invulnerability Potion
 	[3388]={b=160,s=40,d=15770,x=5,c=AUCT_CLAS_POTION},  -- Strong Troll's Blood Potion
-	[3389]={b=160,s=40,d=15773,x=5,u=AUCT_TYPE_LEATHER},  -- Elixir of Defense
+	[3389]={b=160,s=40,d=15773,x=5,c=AUCT_CLAS_POTION,u=AUCT_TYPE_LEATHER},  -- Elixir of Defense
 	[3390]={b=140,s=35,d=15787,x=5,u=AUCT_TYPE_LEATHER},  -- Elixir of Lesser Agility
 	[3391]={b=80,s=20,d=15789,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Ogre's Strength
 	[3392]={b=8317,s=1663,d=21310,c=AUCT_CLAS_ARMOR},  -- Ringed Helm
@@ -1995,8 +1995,8 @@ Auctioneer_BasePrices = {
 	[3770]={b=500,s=25,d=6350,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Mutton Chop
 	[3771]={b=1000,s=50,d=4113,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Wild Hog Shank
 	[3772]={b=0,s=0,d=18079,q=20,x=20,c=AUCT_CLAS_DRINK},  -- Conjured Spring Water
-	[3775]={b=52,s=13,d=13708,x=10,u=AUCT_TYPE_POISON},  -- Crippling Poison
-	[3776]={b=700,s=175,d=2947,x=10},  -- Crippling Poison II
+	[3775]={b=52,s=13,d=13708,x=10,c=AUCT_TYPE_POISON},  -- Crippling Poison
+	[3776]={b=700,s=175,d=2947,x=10,c=AUCT_CLAS_POISON},  -- Crippling Poison II
 	[3777]={b=40,s=10,d=6371,x=20,u=AUCT_TYPE_POISON},  -- Lethargy Root
 	[3778]={b=7705,s=1541,d=20660,c=AUCT_CLAS_WEAPON},  -- Taut Compound Bow
 	[3779]={b=14175,s=2835,d=19287,c=AUCT_CLAS_WEAPON},  -- Hefty War Axe
@@ -2312,10 +2312,10 @@ Auctioneer_BasePrices = {
 	[4197]={b=13828,s=2765,d=12980,c=AUCT_CLAS_ARMOR},  -- Berylline Pads
 	[4213]={b=10000,s=2500,d=1246},  -- Grimoire of Doom
 	[4231]={b=440,s=110,d=5086,x=10,c=AUCT_CLAS_HIDE,u=AUCT_TYPE_LEATHER},  -- Cured Light Hide
-	[4232]={b=500,s=125,d=21463,x=5,c=AUCT_CLAS_LEATHER},  -- Medium Hide
+	[4232]={b=500,s=125,d=21463,x=5,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_LEATHER},  -- Medium Hide
 	[4233]={b=800,s=200,d=7112,x=10,c=AUCT_CLAS_HIDE,u=AUCT_TYPE_LEATHER},  -- Cured Medium Hide
 	[4234]={b=600,s=150,d=7410,x=10,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_LEATHER..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Heavy Leather
-	[4235]={b=800,s=200,d=11164,x=5,c=AUCT_CLAS_LEATHER},  -- Heavy Hide
+	[4235]={b=800,s=200,d=11164,x=5,c=AUCT_CLAS_LEATHER,u=AUCT_TYPE_LEATHER},  -- Heavy Hide
 	[4236]={b=900,s=225,d=3164,x=10,c=AUCT_CLAS_HIDE,u=AUCT_TYPE_LEATHER},  -- Cured Heavy Hide
 	[4237]={b=174,s=34,d=9501,c=AUCT_CLAS_ARMOR},  -- Handstitched Leather Belt
 	[4238]={b=800,s=200,d=3410,c=AUCT_CLAS_CONTAINER},  -- Linen Bag
@@ -2349,7 +2349,7 @@ Auctioneer_BasePrices = {
 	[4278]={b=100,s=25,d=7148,x=20},  -- Lesser Bloodstone Ore
 	[4289]={b=50,s=12,d=6396,x=20,u=AUCT_TYPE_LEATHER},  -- Salt
 	[4290]={b=3576,s=715,d=4400,c=AUCT_CLAS_WEAPON},  -- Dust Bowl
-	[4291]={b=500,s=125,d=12105,x=20,u=AUCT_TYPE_TAILOR},  -- Silken Thread
+	[4291]={b=500,s=125,d=12105,x=20,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Silken Thread
 	[4292]={b=800,s=200,d=1102},  -- Pattern: Green Woolen Bag
 	[4293]={b=650,s=162,d=1102},  -- Pattern: Hillman's Leather Vest
 	[4294]={b=1600,s=400,d=1102},  -- Pattern: Hillman's Belt
@@ -3071,7 +3071,7 @@ Auctioneer_BasePrices = {
 	[5136]={b=710,s=177,d=6704,x=5},  -- Torn Furry Ear
 	[5137]={b=870,s=217,d=1504,x=5},  -- Bright Eyeball
 	[5138]={b=0,s=0,d=15525,c=AUCT_CLAS_QUEST},  -- Harvester's Head
-	[5140]={b=25,s=6,d=6379,x=10,u=AUCT_TYPE_POISON},  -- Flash Powder
+	[5140]={b=25,s=6,d=6379,x=10},  -- Flash Powder
 	[5143]={b=0,s=0,d=7262,q=20,x=20},  -- Thunder Lizard Blood
 	[5164]={b=0,s=0,d=8284},  -- Thunderhawk Wings
 	[5165]={b=0,s=0,d=19799,q=20,x=20},  -- Sunscale Feather
@@ -3132,7 +3132,7 @@ Auctioneer_BasePrices = {
 	[5233]={b=0,s=0,d=6017},  -- Stone of Relu
 	[5234]={b=0,s=0,d=6016},  -- Flagongut's Fossil
 	[5236]={b=14394,s=2878,d=20916,c=AUCT_CLAS_WEAPON},  -- Combustible Wand
-	[5237]={b=72,s=18,d=13709,x=10,u=AUCT_TYPE_POISON},  -- Mind-numbing Poison
+	[5237]={b=72,s=18,d=13709,x=10,c=AUCT_CLAS_POISON},  -- Mind-numbing Poison
 	[5238]={b=35727,s=7145,d=20787,c=AUCT_CLAS_WEAPON},  -- Pitchwood Wand
 	[5239]={b=38731,s=7746,d=20776,c=AUCT_CLAS_WEAPON},  -- Blackbone Wand
 	[5240]={b=6220,s=1244,d=6101,c=AUCT_CLAS_WEAPON},  -- Torchlight Wand
@@ -3347,7 +3347,7 @@ Auctioneer_BasePrices = {
 	[5527]={b=380,s=95,d=7177,x=20},  -- Goblin Deviled Clams
 	[5528]={b=800,s=200,d=1102,c=AUCT_CLAS_FOOD},  -- Recipe: Clam Chowder
 	[5529]={b=500,s=125,d=6371,x=20},  -- Tomb Dust
-	[5530]={b=500,s=125,d=8052,x=20,u=AUCT_TYPE_POISON},  -- Blinding Powder
+	[5530]={b=500,s=125,d=8052,x=20},  -- Blinding Powder
 	[5533]={b=0,s=0,d=9129},  -- Ilkrud Magthrull's Tome
 	[5534]={b=0,s=0,d=7416},  -- Parker's Lunch
 	[5535]={b=0,s=0,d=8093,c=AUCT_CLAS_WRITTEN},  -- Compendium of the Fallen
@@ -4294,11 +4294,11 @@ Auctioneer_BasePrices = {
 	[6929]={b=0,s=0,d=7798,c=AUCT_CLAS_WRITTEN},  -- Bath'rah's Parchment
 	[6930]={b=0,s=0,d=13435,q=20,x=20},  -- Rod of Channeling
 	[6931]={b=0,s=0,d=2757},  -- Moldy Tome
-	[6947]={b=22,s=5,d=13710,x=10,u=AUCT_TYPE_POISON},  -- Instant Poison
+	[6947]={b=22,s=5,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison
 	[6948]={b=0,s=0,d=6418},  -- Hearthstone
-	[6949]={b=80,s=20,d=13710,x=10},  -- Instant Poison II
-	[6950]={b=120,s=30,d=13710,x=10},  -- Instant Poison III
-	[6951]={b=300,s=75,d=13709,x=10},  -- Mind-numbing Poison II
+	[6949]={b=80,s=20,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison II
+	[6950]={b=120,s=30,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison III
+	[6951]={b=300,s=75,d=13709,x=10,c=AUCT_CLAS_POISON},  -- Mind-numbing Poison II
 	[6952]={b=0,s=0,d=7169,q=20,x=20},  -- Thick Bear Fur
 	[6953]={b=37297,s=7459,d=13466,c=AUCT_CLAS_WEAPON},  -- Verigan's Fist
 	[6966]={b=3468,s=693,d=19135,c=AUCT_CLAS_WEAPON},  -- Elunite Axe
@@ -4366,7 +4366,7 @@ Auctioneer_BasePrices = {
 	[7068]={b=1600,s=400,d=20874,x=10,u=AUCT_TYPE_ENCHANT..", "..AUCT_TYPE_ENGINEER..", "..AUCT_TYPE_SMITH..", "..AUCT_TYPE_TAILOR},  -- Elemental Fire
 	[7069]={b=1600,s=400,d=23755,x=10,u=AUCT_TYPE_TAILOR},  -- Elemental Air
 	[7070]={b=1600,s=400,d=4136,x=10,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Elemental Water
-	[7071]={b=400,s=100,d=13692,x=5,u=AUCT_TYPE_TAILOR},  -- Iron Buckle
+	[7071]={b=400,s=100,d=13692,x=5,u=AUCT_TYPE_LEATHER..", "..AUCT_TYPE_TAILOR},  -- Iron Buckle
 	[7072]={b=600,s=150,d=3668,x=10,u=AUCT_TYPE_TAILOR},  -- Naga Scale
 	[7073]={b=25,s=6,d=6002,x=5},  -- Broken Fang
 	[7074]={b=16,s=4,d=7048,x=5},  -- Chipped Claw
@@ -5240,10 +5240,10 @@ Auctioneer_BasePrices = {
 	[8846]={b=1000,s=250,d=19494,x=20,c=AUCT_CLAS_HERB,u=AUCT_TYPE_ALCHEM},  -- Gromsblood
 	[8923]={b=200,s=50,d=1288,x=10,u=AUCT_TYPE_POISON},  -- Essence of Agony
 	[8924]={b=100,s=25,d=6379,x=20,u=AUCT_TYPE_POISON},  -- Dust of Deterioration
-	[8925]={b=2500,s=125,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM},  -- Crystal Vial
-	[8926]={b=300,s=75,d=13710,x=10},  -- Instant Poison IV
-	[8927]={b=400,s=100,d=13710,x=10},  -- Instant Poison V
-	[8928]={b=500,s=125,d=13710,x=10},  -- Instant Poison VI
+	[8925]={b=2500,s=125,d=18077,q=20,x=20,u=AUCT_TYPE_ALCHEM..", "..AUCT_TYPE_POISON},  -- Crystal Vial
+	[8926]={b=300,s=75,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison IV
+	[8927]={b=400,s=100,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison V
+	[8928]={b=500,s=125,d=13710,x=10,c=AUCT_CLAS_POISON},  -- Instant Poison VI
 	[8932]={b=4000,s=200,d=21906,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Alterac Swiss
 	[8948]={b=4000,s=200,d=17880,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Dried King Bolete
 	[8949]={b=800,s=200,d=17882,x=5,u=AUCT_TYPE_LEATHER},  -- Elixir of Agility
@@ -5255,8 +5255,8 @@ Auctioneer_BasePrices = {
 	[8957]={b=4000,s=200,d=24718,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Spinefin Halibut
 	[8959]={b=3200,s=160,d=24718,q=20,x=20,c=AUCT_CLAS_FOOD},  -- Raw Spinefin Halibut
 	[8973]={b=0,s=0,d=7373,q=20,x=20,c=AUCT_CLAS_LEATHER},  -- Thick Yeti Hide
-	[8984]={b=400,s=100,d=13707,x=10},  -- Deadly Poison III
-	[8985]={b=600,s=150,d=13707,x=10},  -- Deadly Poison IV
+	[8984]={b=400,s=100,d=13707,x=10,c=AUCT_CLAS_POISON},  -- Deadly Poison III
+	[8985]={b=600,s=150,d=13707,x=10,c=AUCT_CLAS_POISON},  -- Deadly Poison IV
 	[9030]={b=800,s=200,d=926,x=5,c=AUCT_CLAS_POTION},  -- Restorative Elixir
 	[9036]={b=80,s=20,d=1215,x=5,c=AUCT_CLAS_POTION},  -- Magic Resistance Potion
 	[9060]={b=4000,s=1000,d=7397,x=20,u=AUCT_TYPE_ENGINEER},  -- Inlaid Mithril Cylinder
@@ -5270,7 +5270,7 @@ Auctioneer_BasePrices = {
 	[9172]={b=2000,s=500,d=17898,x=5,c=AUCT_CLAS_POTION},  -- Invisibility Potion
 	[9173]={b=0,s=0,d=17899},  -- Goblin Transponder
 	[9179]={b=4000,s=1000,d=3664,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Greater Intellect
-	[9186]={b=700,s=175,d=13709,x=10},  -- Mind-numbing Poison III
+	[9186]={b=700,s=175,d=13709,x=10,c=AUCT_CLAS_POISON},  -- Mind-numbing Poison III
 	[9187]={b=2400,s=600,d=17902,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Greater Agility
 	[9189]={b=0,s=0,d=17911},  -- Shay's Bell
 	[9197]={b=2400,s=600,d=4134,x=5,c=AUCT_CLAS_POTION},  -- Elixir of Dream Vision
@@ -6551,11 +6551,11 @@ Auctioneer_BasePrices = {
 	[10846]={b=80717,s=16143,d=19898,c=AUCT_CLAS_ARMOR},  -- Bloodshot Greaves
 	[10847]={b=284608,s=56921,d=20571,c=AUCT_CLAS_WEAPON},  -- Dragon's Call
 	[10858]={b=3000,s=750,d=1102},  -- Plans: Solid Iron Maul
-	[10918]={b=170,s=42,d=13708,x=10,u=AUCT_TYPE_POISON},  -- Wound Poison
+	[10918]={b=170,s=42,d=13708,x=10,c=AUCT_CLAS_POISON},  -- Wound Poison
 	[10919]={b=1074,s=214,d=20476,c=AUCT_CLAS_ARMOR},  -- Apothecary Gloves
-	[10920]={b=270,s=67,d=13708,x=10},  -- Wound Poison II
-	[10921]={b=500,s=125,d=13708,x=10},  -- Wound Poison III
-	[10922]={b=700,s=175,d=13708,x=10},  -- Wound Poison IV
+	[10920]={b=270,s=67,d=13708,x=10,c=AUCT_CLAS_POISON},  -- Wound Poison II
+	[10921]={b=500,s=125,d=13708,x=10,c=AUCT_CLAS_POISON},  -- Wound Poison III
+	[10922]={b=700,s=175,d=13708,x=10,c=AUCT_CLAS_POISON},  -- Wound Poison IV
 	[10938]={b=800,s=0,d=20608,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Lesser Magic Essence
 	[10939]={b=2400,s=0,d=20609,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Greater Magic Essence
 	[10940]={b=800,s=0,d=20611,q=10,x=10,u=AUCT_TYPE_ENCHANT},  -- Strange Dust
@@ -7158,10 +7158,10 @@ Auctioneer_BasePrices = {
 	[12202]={b=350,s=87,d=2599,x=10,u=AUCT_TYPE_COOK},  -- Tiger Meat
 	[12203]={b=350,s=87,d=25466,x=10,u=AUCT_TYPE_COOK},  -- Red Wolf Meat
 	[12204]={b=450,s=112,d=25472,x=10,u=AUCT_TYPE_COOK},  -- Heavy Kodo Meat
-	[12205]={b=450,s=112,d=22193,x=10},  -- White Spider Meat
+	[12205]={b=450,s=112,d=22193,x=10,u=AUCT_TYPE_COOK},  -- White Spider Meat
 	[12206]={b=450,s=112,d=22193,x=10,u=AUCT_TYPE_COOK},  -- Tender Crab Meat
 	[12207]={b=600,s=150,d=18052,x=10,u=AUCT_TYPE_COOK},  -- Giant Egg
-	[12208]={b=600,s=150,d=2599,x=10},  -- Tender Wolf Meat
+	[12208]={b=600,s=150,d=2599,x=10,u=AUCT_TYPE_COOK},  -- Tender Wolf Meat
 	[12209]={b=380,s=95,d=22194,x=20},  -- Lean Wolf Steak
 	[12210]={b=1200,s=300,d=22195,x=20,c=AUCT_CLAS_FOOD},  -- Roast Raptor
 	[12212]={b=1200,s=300,d=21473,x=20},  -- Jungle Stew
