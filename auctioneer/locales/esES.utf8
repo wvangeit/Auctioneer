@@ -11,6 +11,7 @@ AUCT_CLAS_HIDE = "Piel";
 AUCT_CLAS_LEATHER = "Cuero";
 AUCT_CLAS_MAGE = "Mago";
 AUCT_CLAS_ORE = "Mineral";
+AUCT_CLAS_POISON = "Veneno";
 AUCT_CLAS_POTION = "Poción";
 AUCT_CLAS_QUEST = "Búsquedas";
 AUCT_CLAS_SHAMAN = "Chamanes";
@@ -62,6 +63,8 @@ AUCT_FRMT_INFO_FORONE = "Por 1: %s min/%s OC (%s oferta) [en %d's]";
 AUCT_FRMT_INFO_AVERAGE = "%s min/%s OC (%s oferta)"
 AUCT_FRMT_INFO_HISTMED = "Último(s) %d, OC mediano (c/u)";
 AUCT_FRMT_INFO_SNAPMED = "Explorados %d, OC mediano (c/u)";
+AUCT_FRMT_INFO_SGSTSTX = "Precio sugerido para su lote de %d: %s min/%s OC (%s oferta)";
+AUCT_FRMT_INFO_SGST = "Precio sugerido: %s min/%s OC (%s oferta)";
 
 AUCT_FRMT_INFO_BIDRATE = "%d%% tienen ofertas, %d%% tienen OC";
 AUCT_FRMT_INFO_NEVER = "Nunca visto en %s";
