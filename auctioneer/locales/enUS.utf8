@@ -11,6 +11,7 @@ AUCT_CLAS_HIDE = "Hide";
 AUCT_CLAS_LEATHER = "Leather";
 AUCT_CLAS_MAGE = "Mage";
 AUCT_CLAS_ORE = "Ore";
+AUCT_CLAS_POISON = "Poison";
 AUCT_CLAS_POTION = "Potion";
 AUCT_CLAS_QUEST = "Quest";
 AUCT_CLAS_SHAMAN = "Shaman";

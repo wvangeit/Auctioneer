@@ -1,4 +1,4 @@
--- Encoded in UTF﻿8
+﻿-- Encoded in UTF?8
 AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: " };
 
 AUCT_CLAS_ARMOR = "Rüstung";
@@ -13,6 +13,7 @@ AUCT_CLAS_HIDE = "Balg";
 AUCT_CLAS_LEATHER = "Leder";
 AUCT_CLAS_MAGE = "Magier";
 AUCT_CLAS_ORE = "Erz";
+AUCT_CLAS_POISON = "Gift";
 AUCT_CLAS_POTION = "Trank";
 AUCT_CLAS_QUEST = "Quest";
 AUCT_CLAS_SHAMAN = "Shamane";
