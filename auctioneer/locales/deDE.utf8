@@ -32,10 +32,10 @@ AUCT_TYPE_POISON = "Giftmischer";
 AUCT_TYPE_SMITH = "Schmied";
 AUCT_TYPE_TAILOR = "Schneider";
 
-AUCT_TIME_SHORT = "Court";
-AUCT_TIME_MED = "Moyen";
-AUCT_TIME_LONG = "Long";
-AUCT_TIME_VLONG = "Très Long";
+AUCT_TIME_SHORT = "Kurz";
+AUCT_TIME_MED = "Mittel";
+AUCT_TIME_LONG = "Lang";
+AUCT_TIME_VLONG = "Sehr lang";
 
 AUCT_TEXT_SCAN = "Scanne";
 
