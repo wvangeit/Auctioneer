@@ -2522,7 +2522,7 @@ Auctioneer_BasePrices = {
 	[4469]={b=0,s=0,d=7216},  -- Rod of Order
 	[4470]={b=38,s=9,d=21102,x=20,u=AUCT_TYPE_ENCHANT},  -- Simple Wood
 	[4471]={b=135,s=33,d=4720},  -- Flint and Tinder
-	[4472]={b=0,s=0,d=2616,c=AUCT_CLAS_POTION},  -- Scroll of Myzrael
+	[4472]={b=0,s=0,d=2616},  -- Scroll of Myzrael
 	[4473]={b=0,s=0,d=7118},  -- Eldritch Shackles
 	[4474]={b=21037,s=4207,d=12883,c=AUCT_CLAS_WEAPON},  -- Ravenwood Bow
 	[4476]={b=13672,s=2734,d=12650,c=AUCT_CLAS_ARMOR},  -- Beastwalker Robe
