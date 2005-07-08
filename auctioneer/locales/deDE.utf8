@@ -17,7 +17,7 @@ AUCT_CLAS_QUEST     = "Quest";
 AUCT_CLAS_SHAMAN    = "Schamane";
 AUCT_CLAS_WARLOCK   = "Hexenmeister";
 AUCT_CLAS_WEAPON    = "Waffe";
-AUCT_CLAS_WRITTEN   = "Schrift";
+AUCT_CLAS_WRITTEN   = "Schriftstück";
 
 AUCT_TYPE_ALCHEM   = "Alchimist";
 AUCT_TYPE_COOK     = "Koch";
