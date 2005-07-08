@@ -30,13 +30,14 @@ print OUT "function Auctioneer_SetLocaleStrings(locale)\n";
 print OUT "-- Default locale strings are defined in English\n";
 open(DATA, "< locales/enUS.utf8");
 while (<DATA>) {
+	s/\xEF\xBB\xBF//;
 	s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
 	s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
 	s/\-\-.*$//;
 	if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
 		$defined{$1} = $2;
 	}
-	print OUT "$_ \n";
+	print OUT "$_\n";
 }
 close DATA;
 
@@ -48,12 +49,13 @@ for $locale (@locales) {
 	print OUT "if locale == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
+		s/\xEF\xBB\xBF//;
 		s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
 		s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
 		if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
 			if ($2 ne $defined{$1}) {
 				$localized{$1} = $2;
-				print OUT "$_ \n";
+				print OUT "$_\n";
 			}
 		}
 		else {
