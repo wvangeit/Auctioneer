@@ -48,6 +48,7 @@ for $locale (@locales) {
 	print OUT "if locale == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
+		s/\xEF\xBB\xBF//;
 		s/[\r\n]+//g; s/^\s+//; s/\s+$//; s/\-\-.*$//;
 		s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
 		if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
