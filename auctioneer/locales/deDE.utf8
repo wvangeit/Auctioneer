@@ -1,83 +1,201 @@
-ï»¿-- Encoded in UTF8
-AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "PlÃ¤ne: ", "Bauplan: ", "Formel: " };
-
-AUCT_CLAS_ARMOR = "RÃ¼stung";
-AUCT_CLAS_CLOTH = "Stoff";
+-- Encoded in UTF8
+AUCT_CLAS_ARMOR     = "Rüstung";
+AUCT_CLAS_CLOTH     = "Stoff";
 AUCT_CLAS_CONTAINER = "Tasche";
-AUCT_CLAS_DRINK = "Trank";
-AUCT_CLAS_FISHING = "Angeln";
-AUCT_CLAS_FOOD = "Nahrung";
-AUCT_CLAS_GEM = "Edelstein";
-AUCT_CLAS_HERB = "Kraut";
-AUCT_CLAS_HIDE = "Balg";
-AUCT_CLAS_LEATHER = "Leder";
-AUCT_CLAS_MAGE = "Magier";
-AUCT_CLAS_ORE = "Erz";
-AUCT_CLAS_POISON = "Gift";
-AUCT_CLAS_POTION = "Trank";
-AUCT_CLAS_QUEST = "Quest";
-AUCT_CLAS_SHAMAN = "Shamane";
-AUCT_CLAS_WARLOCK = "Hexenmeister";
-AUCT_CLAS_WEAPON = "Waffe";
-AUCT_CLAS_WRITTEN = "Notizen";
+AUCT_CLAS_DRINK     = "Getränk";
+AUCT_CLAS_FISHING   = "Angeln";
+AUCT_CLAS_FOOD      = "Nahrung";
+AUCT_CLAS_GEM       = "Edelstein";
+AUCT_CLAS_HERB      = "Kraut";
+AUCT_CLAS_HIDE      = "Balg";
+AUCT_CLAS_LEATHER   = "Leder";
+AUCT_CLAS_MAGE      = "Magie";
+AUCT_CLAS_ORE       = "Erz";
+AUCT_CLAS_POISON    = "Gift";
+AUCT_CLAS_POTION    = "Trank";
+AUCT_CLAS_QUEST     = "Quest";
+AUCT_CLAS_SHAMAN    = "Schamane";
+AUCT_CLAS_WARLOCK   = "Hexenmeister";
+AUCT_CLAS_WEAPON    = "Waffe";
+AUCT_CLAS_WRITTEN   = "Schrift";
 
-AUCT_TYPE_ALCHEM = "Alchemist";
-AUCT_TYPE_COOK = "Koch";
-AUCT_TYPE_ENCHANT = "Verzauberer";
+AUCT_TYPE_ALCHEM   = "Alchimist";
+AUCT_TYPE_COOK     = "Koch";
+AUCT_TYPE_ENCHANT  = "Verzauberer";
 AUCT_TYPE_ENGINEER = "Ingenieur";
-AUCT_TYPE_FSTAID = "Erste Hilfe";
-AUCT_TYPE_LEATHER = "Lederverarb";
-AUCT_TYPE_MINING = "Bergbau";
-AUCT_TYPE_POISON = "Giftmischer";
-AUCT_TYPE_SMITH = "Schmied";
-AUCT_TYPE_TAILOR = "Schneider";
+AUCT_TYPE_FSTAID   = "Erste Hilfe";
+AUCT_TYPE_LEATHER  = "Lederverarbeiter";
+AUCT_TYPE_MINING   = "Bergbau";
+AUCT_TYPE_POISON   = "Giftmischer";
+AUCT_TYPE_SMITH    = "Schmied";
+AUCT_TYPE_TAILOR   = "Schneider";
+
+AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: " };
 
 AUCT_TIME_SHORT = "Kurz";
-AUCT_TIME_MED = "Mittel";
-AUCT_TIME_LONG = "Lang";
+AUCT_TIME_MED   = "Mittel";
+AUCT_TIME_LONG  = "Lang";
 AUCT_TIME_VLONG = "Sehr lang";
 
-AUCT_TEXT_SCAN = "Scanne";
+AUCT_FRMT_WELCOME = "Auctioneer v%s geladen";
 
-AUCT_FRMT_BROKER_HEADER = "Mindestprofit: %s, HVP = 'HÃ¶chster verkÃ¤uflicher Preis'";
-AUCT_FRMT_BROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE = "Brokering fertig";
+AUCT_FRMT_BROKER_HEADER    = "Mindestprofit: %s, HVP = 'Höchster verkäuflicher Preis'";
+AUCT_FRMT_BROKER_LINE      = "%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Profit: %s";
+AUCT_FRMT_BROKER_DONE      = "Brokern fertig";
+AUCT_FRMT_BIDBROKER_HEADER = "Mindest Profit: %s, HVP = 'Höchster verkäuflicher Preis'";
+AUCT_FRMT_BIDBROKER_MINBID = "min. Gebot"
+AUCT_FRMT_BIDBROKER_CURBID = "akt. Gebot"
+AUCT_FRMT_BIDBROKER_LINE   = "%s, zuletzt %s gesehen, HVP: %s, %s: %s, Profit: %s, Restzeit: %s";
+AUCT_FRMT_BIDBROKER_DONE   = "Gebotbrokern fertig";
+AUCT_FRMT_PCTLESS_HEADER   = "Prozent billiger als der 'Höchster verkäuflicher Preis (HVP)': %d%%";
+AUCT_FRMT_PCTLESS_LINE     = "%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
+AUCT_FRMT_PCTLESS_DONE     = "Prozent unter HSP fertig.";
+AUCT_FRMT_COMPETE_HEADER   = "Konkurrierende Auktionen mindestens %s billiger pro Stück.";
+AUCT_FRMT_COMPETE_LINE     = "%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
+AUCT_FRMT_COMPETE_DONE     = "Konkurrierende Auktionen fertig.";
+AUCT_FRMT_NOAUCT           = "Keine Aktionen für %s gefunden.";
+AUCT_FRMT_MEDIAN_LINE      = "Der Median der %d zuletzt gesehenen %s liegt bei %s/Stück.";
+AUCT_FRMT_LOW_LINE         = "%s, Sofortkauf: %s, Verkäufer: %s, %s/Stück, %s unter dem Median";
+AUCT_FRMT_HSP_LINE         = "Höchster verkäuflicher Preis pro %s ist: %s";
 
-AUCT_FRMT_BIDBROKER_HEADER = "Mindest Profit: %s, HVP = 'HÃ¶chster verkÃ¤uflicher Preis'";
-AUCT_FRMT_BIDBROKER_MINBID = "min.Gebot"
-AUCT_FRMT_BIDBROKER_CURBID = "akt.Gebot"
-AUCT_FRMT_BIDBROKER_LINE = "%s, zuletzt %s gesehen, HVP: %s, %s: %s, Prof: %s, Mal: %s";
-AUCT_FRMT_BIDBROKER_DONE = "Gebotbrokering fertig";
+AUCT_FRMT_INFO_SEEN        = "Insgesamt %d mal in Auktionen gesehen";
+AUCT_FRMT_INFO_FORONE      = "Pro Stück: %s min/%s Sofortkauf (%s geboten) [in %d]";
+AUCT_FRMT_INFO_AVERAGE     = "%s min/%s Sofortkauf (%s geboten)"
+AUCT_FRMT_INFO_HISTMED     = "Sofortkauf-Median (pro Stück) der %d letzten Auktionen:";
+AUCT_FRMT_INFO_SNAPMED     = "Sofortkauf-Median (pro Stück) aus %d gescannten Auktionen:";
+AUCT_FRMT_INFO_SGSTSTX     = "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s geboten)";
+AUCT_FRMT_INFO_SGST        = "Empfohlener Preis: %s min/%s Sofortkauf (%s geboten)";
 
-AUCT_FRMT_PCTLESS_HEADER = "Prozent billiger als der 'HÃ¶chster verkÃ¤uflicher Preis (HVP)': %d%%";
-AUCT_FRMT_PCTLESS_LINE = "%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
-AUCT_FRMT_PCTLESS_DONE = "Prozent unter HSP fertig.";
+AUCT_FRMT_INFO_BIDRATE  = "%d%% haben Gebote, %d%% haben Sofortkauf";
+AUCT_FRMT_INFO_NEVER    = "Noch in keiner %s gesehen";
+AUCT_FRMT_INFO_ALSOSEEN = "%d mal in einer %s gesehen";
+AUCT_FRMT_INFO_CLASSUSE = "Klasse: %s - Benutzt für %s";
+AUCT_FRMT_INFO_CLASS    = "Klasse: %s";
+AUCT_FRMT_INFO_USE      = "Benutzt für: %s";
+AUCT_FRMT_INFO_BUY      = "Einkauf%s beim Händler";
+AUCT_FRMT_INFO_SELL     = "Verkauf%s beim Händler";
+AUCT_FRMT_INFO_BUYMULT  = "Einkauf%s für %d (%s pro Stück)";
+AUCT_FRMT_INFO_SELLMULT = "Verkauf%s für %d (%s pro Stück)";
+AUCT_FRMT_INFO_STX      = "%d pro Stapel";
 
-AUCT_FRMT_COMPETE_HEADER = "Konkurrierende Auktionen zuletzt %s billiger pro Gegenstand.";
-AUCT_FRMT_COMPETE_LINE = "%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
-AUCT_FRMT_COMPETE_DONE = "Konkurrierende Auktionen fertig.";
-AUCT_FRMT_NOAUCT = "Keine Aktionen fÃ¼r diesen Gegenstand gefunden: %s";
-AUCT_FRMT_MEDIAN_LINE = "Zuletzt %d gesehen, Median Sofortkauf fÃ¼r 1 %s ist: %s";
-AUCT_FRMT_LOW_LINE = "%s, Sofortkauf: %s, VerkÃ¤ufer: %s, fÃ¼r eins: %s, unter dem Median: %s";
-AUCT_FRMT_HSP_LINE = "HÃ¶chster verkÃ¤uflicher Preis fÃ¼r eins %s ist: %s";
+AUCT_FRMT_INFO_HEAD_MULTI = "Durchschnitt für %d Stück:";
+AUCT_FRMT_INFO_MIN_MULTI  = "  Minimum (%s pro Stück)";
+AUCT_FRMT_INFO_BID_MULTI  = "  Geboten (%s%s pro Stück)";
+AUCT_FRMT_INFO_BUY_MULTI  = "  Sofortkauf (%s%s pro Stück)";
 
-AUCT_FRMT_INFO_SEEN = "%d mal insgesamt gesehen";
-AUCT_FRMT_INFO_FORONE = "FÃ¼r 1: %s min/%s Sofortkauf (%s geboten) [in %d's]";
-AUCT_FRMT_INFO_AVERAGE = "%s min/%s Sofortkauf (%s geboten)"
-AUCT_FRMT_INFO_HISTMED = "Zuletzt %d gesehen, Sofortkauf Median:";
-AUCT_FRMT_INFO_SNAPMED = "Beim letzten Scan %d gesehen, Sofortkauf Median:";
-AUCT_FRMT_INFO_SGSTSTX = "Empfohlener Preis fÃ¼r deinen %der Stapel: %s min/%s Sofortkauf (%s geboten)";
-AUCT_FRMT_INFO_SGST = "Empfohlener Preis: %s min/%s Sofortkauf (%s geboten)";
-AUCT_FRMT_INFO_BIDRATE = "%d%% hatten Gebote, %d%% hatten Sofortkauf";
-AUCT_FRMT_INFO_NEVER = "Noch in keiner Auktion gesehen";
-AUCT_FRMT_INFO_ALSOSEEN = "Gesehen %d mal in einer %s";
-AUCT_FRMT_INFO_CLASSUSE = "Klasse: %s genutzt fÃ¼r %s";
-AUCT_FRMT_INFO_CLASS = "Klasse: %s";
-AUCT_FRMT_INFO_USE = "Benutzt fÃ¼r: %s";
-AUCT_FRMT_INFO_BUY = "Einkauf beim HÃ¤ndler";
-AUCT_FRMT_INFO_SELL = "Verkauf beim HÃ¤ndler";
-AUCT_FRMT_INFO_BUYMULT = "Einkauf%s fÃ¼r %d (%s pro StÃ¼ck)";
-AUCT_FRMT_INFO_SELLMULT = "Verkauf%s fÃ¼r %d (%s pro StÃ¼ck)";
-AUCT_FRMT_INFO_STX = "Stapelbar bis %d StÃ¼ck";
+AUCT_FRMT_INFO_HEAD_ONE = "Durchschnitt für diesen Gegenstand:";
+AUCT_FRMT_INFO_MIN_ONE  = "  Minimum";
+AUCT_FRMT_INFO_BID_ONE  = "  Geboten%s";
+AUCT_FRMT_INFO_BUY_ONE  = "  Sofortkauf%s";
 
-AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Schnappschuss.";
+AUCT_FRMT_INFO_BUYMEDIAN = "  Sofortkauf-Median";
+
+AUCT_FRMT_INFO_STACKSIZE = "  Durchschnittliche Stapelgröße: %d Stück";
+
+AUCT_FRMT_UNKNOWN_LOCALE = "Die angegebene Sprache: ('%s') ist unbekannt. Folgende Sprachen sind gültig:"; 
+
+AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
+
+AUCT_FRMT_AUCTINFO_HIST     = "%d historisch";
+AUCT_FRMT_AUCTINFO_SNAP     = "%d aus dem letzten Scan";
+AUCT_FRMT_AUCTINFO_LOW      = "kleines Abbild";
+AUCT_FRMT_AUCTINFO_NOLOW    = "Gegenstand nicht im letzten Abbild";
+AUCT_FRMT_AUCTINFO_ORIG     = "Original-Gebot";
+AUCT_FRMT_AUCTINFO_SUGBUY   = "Empfohlener Sofortkaufpreis";
+AUCT_FRMT_AUCTINFO_SUGBID   = "Empfohlenes Gebot";
+AUCT_FRMT_AUCTINFO_MKTPRICE = "Marktpreis";
+
+AUCT_FRMT_WARN_MARKUP   = "%s%% erhöhter Händlerpreis";
+AUCT_FRMT_WARN_UNDERCUT = "Unterbiete um %s%%";
+AUCT_FRMT_WARN_NOCOMP   = "Monopol";
+AUCT_FRMT_WARN_ABOVEMKT = "Konkurrenz verkauft überteuert";
+AUCT_FRMT_WARN_TOOLOW   = "Konkurrenz ist zu günstig";
+AUCT_FRMT_WARN_MYPRICE  = "Verwende eigenen Preis";
+AUCT_FRMT_WARN_NODATA   = "Keine HVP-Daten";
+
+AUCT_CMD_OFF            = "off";
+AUCT_CMD_ON             = "on";
+AUCT_CMD_ALT            = "alt";
+AUCT_CMD_CTRL           = "ctrl";
+AUCT_CMD_SHIFT          = "shift";
+AUCT_CMD_TOGGLE         = "toggle";
+AUCT_CMD_CLEAR          = "clear";
+AUCT_CMD_CLEAR_ALL      = "all";
+AUCT_CMD_CLEAR_SNAPSHOT = "snapshot";
+AUCT_CMD_ALSO           = "also";
+AUCT_CMD_ALSO_OPPOSITE  = "opposite";
+AUCT_CMD_LOCALE         = "locale";
+
+AUCT_CMD_BROKER            = "broker";
+AUCT_CMD_BIDBROKER         = "bidbroker";
+AUCT_CMD_BIDBROKER_SHORT   = "bb";
+AUCT_CMD_EMBED             = "embed";
+AUCT_CMD_PERCENTLESS       = "percentless";
+AUCT_CMD_PERCENTLESS_SHORT = "pl";
+AUCT_CMD_COMPETE           = "compete";
+AUCT_CMD_SCAN              = "scan";
+AUCT_CMD_AUTOFILL          = "autofill";
+
+AUCT_CMD_PCT_BIDMARKDOWN = "pct-bidmarkdown";
+AUCT_CMD_PCT_MARKUP      = "pct-markup";
+AUCT_CMD_PCT_MAXLESS     = "pct-maxless";
+AUCT_CMD_PCT_NOCOMP      = "pct-nocomp";
+AUCT_CMD_PCT_UNDERLOW    = "pct-underlow";
+AUCT_CMD_PCT_UNDERMKT    = "pct-undermkt";
+
+AUCT_OPT_CLEAR         = "([Gegenstand]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
+AUCT_OPT_ALSO          = "(Fraktion|"..AUCT_CMD_ALSO_OPPOSITE..")"
+AUCT_OPT_LOCALE        = "<Sprache>";
+AUCT_OPT_BROKER        = "<Gewinn in Silber>";
+AUCT_OPT_BIDBROKER     = "<Gewinn in Silber>";
+AUCT_OPT_PERCENTLESS   = "<Prozent>";
+AUCT_OPT_COMPETE       = "<Preisnachlass in Silber>";
+AUCT_OPT_SCAN          = "";
+AUCT_OPT_SCALE         = "<Skalierungsfaktor>";
+AUCT_OPT_SCALE_DEFAULT = 1.0;
+
+AUCT_OPT_PCT_BIDMARKDOWN = "<Prozent>";
+AUCT_OPT_PCT_MARKUP      = "<Prozent>";
+AUCT_OPT_PCT_MAXLESS     = "<Prozent>";
+AUCT_OPT_PCT_NOCOMP      = "<Prozent>";
+AUCT_OPT_PCT_UNDERLOW    = "<Prozent>";
+AUCT_OPT_PCT_UNDERMKT    = "<Prozent>";
+
+AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = 20;
+AUCT_OPT_PCT_MARKUP_DEFAULT      = 300;
+AUCT_OPT_PCT_MAXLESS_DEFAULT     = 30;
+AUCT_OPT_PCT_NOCOMP_DEFAULT      = 2;
+AUCT_OPT_PCT_UNDERLOW_DEFAULT    = 5;
+AUCT_OPT_PCT_UNDERMKT_DEFAULT    = 20;
+
+AUCT_SHOW_VERBOSE     = "show-verbose";
+AUCT_SHOW_AVERAGE     = "show-average";
+AUCT_SHOW_LINK        = "show-link";
+AUCT_SHOW_MEDIAN      = "show-median";
+AUCT_SHOW_MESH        = "show-mesh";
+AUCT_SHOW_STACK       = "show-stack";
+AUCT_SHOW_STATS       = "show-stats";
+AUCT_SHOW_SUGGEST     = "show-suggest";
+AUCT_SHOW_USAGE       = "show-usage";
+AUCT_SHOW_VENDOR      = "show-vendor";
+AUCT_SHOW_VENDOR_BUY  = "show-vendor-buy";
+AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
+AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
+
+AUCT_SHOW_VERBOSE = "show-verbose";
+AUCT_SHOW_AVERAGE = "show-average";
+AUCT_SHOW_LINK = "show-link";
+AUCT_SHOW_MEDIAN = "show-median";
+AUCT_SHOW_MESH = "show-mesh";
+AUCT_SHOW_STACK = "show-stack";
+AUCT_SHOW_STATS = "show-stats";
+AUCT_SHOW_SUGGEST = "show-suggest";
+AUCT_SHOW_USAGE = "show-usage";
+AUCT_SHOW_VENDOR = "show-vendor";
+AUCT_SHOW_VENDOR_BUY = "show-vendor-buy";
+AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
+AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
+
+AUCT_TEXT_SCAN    = "Scanne";
+AUCT_TEXT_AUCTION = "Auktion";
+AUCT_TEXT_NONE    = "keine";
