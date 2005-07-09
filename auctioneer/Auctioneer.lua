@@ -611,6 +611,32 @@ end
 Auctioneer_ProfitComparisonSort = profitComparisonSort;
 
 
+-- function returns true, if the given parameter is a valid option for the also command, false otherwise
+local function isValidAlso(also)
+	-- make also a required parameter
+	if (also == nil) then
+		return false	-- missing parameter
+	end
+
+	if (also == 'opposite') or (also == 'off') then
+		return true	-- allow special keywords
+	end
+
+	-- check if string matches: "[realm]-[faction]"
+	local s, e, r, f = string.find(also, "^(.+)-(.+)$")
+	if (s == nil) then
+		return false	-- invalid string
+	end
+
+	-- check if faction = "Horde" or "Alliance"
+	if (f ~= 'Horde') and (f ~= 'Alliance') then
+		return false	-- invalid faction
+	end
+
+	return true
+end
+
+
 -- builds the list of auctions that can be bought and resold for profit
 function doBroker(minProfit)
 	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
@@ -1276,7 +1302,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		end -- (aCount > 0)
 
 		local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
-		if (also ~= "on") and (also ~= "off") then
+		if (IsValidAlso(also)) and (also ~= "off") then
 			if (also == AUCT_CMD_ALSO_OPPOSITE) then
 				also = oppositeKey();
 			end
@@ -1673,6 +1699,10 @@ function Auctioneer_Command(command)
 			end
 		end
 	elseif (cmd == AUCT_CMD_ALSO) then
+		if (not isValidAlso(param)) then
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_RF, param))
+			return
+		end
 		Auctioneer_SetFilter("also", param);
 	elseif (cmd == AUCT_CMD_LOCALE) then
 		if (AUCT_VALID_LOCALES[param]) then
