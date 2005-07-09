@@ -4015,7 +4015,7 @@ Auctioneer_BasePrices = {
 	[6529]={b=50,s=12,d=12410,x=20,c=AUCT_CLAS_FISHING},  -- Shiny Bauble
 	[6530]={b=100,s=25,d=18097,x=20,u=AUCT_TYPE_ENGINEER},  -- Nightcrawlers
 	[6531]={b=2085,s=417,d=19110,c=AUCT_CLAS_ARMOR},  -- Barbaric Cloth Robe
-	[6532]={b=250,s=62,d=12423,x=20},  -- Bright Baubles
+	[6532]={b=250,s=62,d=12423,x=20,c=AUCT_CLAS_FISHING},  -- Bright Baubles
 	[6533]={b=250,s=62,d=12425,x=20,c=AUCT_CLAS_FISHING},  -- Aquadynamic Fish Attractor
 	[6534]={b=0,s=0,d=12434},  -- Forged Steel Bars
 	[6535]={b=0,s=0,d=12435},  -- Tablet of Verga
