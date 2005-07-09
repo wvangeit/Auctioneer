@@ -1949,14 +1949,20 @@ function Auctioneer_OnEvent(event)
 		local itemData = getAuctionPriceData(itemKey, nil, name, id);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 
-		local _,_,_,_,_,_,currentLowestBuyout = getItemSignature(findLowestAuctionForItem(itemKey));
+        -- find the current lowest buyout for 1 of these in the current snapshot
+        local currentLowestBuyout = findLowestAuctionForItem(itemKey)
+        if currentLowestBuyout then
+		    _,_,_,_,lowStackCount,_,currentLowestBuyout = getItemSignature(currentLowestBuyout);
+            currentLowestBuyout = currentLowestBuyout / lowStackCount;
+        end 
+        
 		local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
 		local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
 
 		Auctioneer_Auctions_Clear();
 		Auctioneer_Auctions_SetLine(1, string.format(AUCT_FRMT_AUCTINFO_HIST, historicalMedCount), historicalMedian * count); 
 		Auctioneer_Auctions_SetLine(2, string.format(AUCT_FRMT_AUCTINFO_SNAP, snapshotMedCount), snapshotMedian * count); 
-		if (snapshotMedCount and snapshotMedCount > 0) then
+		if (snapshotMedCount and snapshotMedCount > 0 and currentLowestBuyout) then
 			Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_LOW, currentLowestBuyout * count);
 		else
 			Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_NOLOW);
