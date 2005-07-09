@@ -1302,7 +1302,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		end -- (aCount > 0)
 
 		local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
-		if (IsValidAlso(also)) and (also ~= "off") then
+		if (isValidAlso(also)) and (also ~= "off") then
 			if (also == AUCT_CMD_ALSO_OPPOSITE) then
 				also = oppositeKey();
 			end
@@ -1949,7 +1949,7 @@ function Auctioneer_OnEvent(event)
 		local itemData = getAuctionPriceData(itemKey, nil, name, id);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 
-		local currentLowestBuyout = getLowestPriceQuick(itemKey);
+		local _,_,_,_,_,_,currentLowestBuyout = getItemSignature(findLowestAuctionForItem(itemKey));
 		local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
 		local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
 
