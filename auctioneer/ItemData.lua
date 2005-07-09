@@ -4013,7 +4013,7 @@ Auctioneer_BasePrices = {
 	[6527]={b=937,s=187,d=12422,c=AUCT_CLAS_ARMOR},  -- Ancestral Robe
 	[6528]={b=1792,s=358,d=16567,c=AUCT_CLAS_ARMOR},  -- Spellbinder Robe
 	[6529]={b=50,s=12,d=12410,x=20,c=AUCT_CLAS_FISHING},  -- Shiny Bauble
-	[6530]={b=100,s=25,d=18097,x=20,u=AUCT_TYPE_ENGINEER},  -- Nightcrawlers
+	[6530]={b=100,s=25,d=18097,x=20,c=AUCT_CLAS_FISHING,u=AUCT_TYPE_ENGINEER},  -- Nightcrawlers
 	[6531]={b=2085,s=417,d=19110,c=AUCT_CLAS_ARMOR},  -- Barbaric Cloth Robe
 	[6532]={b=250,s=62,d=12423,x=20,c=AUCT_CLAS_FISHING},  -- Bright Baubles
 	[6533]={b=250,s=62,d=12425,x=20,c=AUCT_CLAS_FISHING},  -- Aquadynamic Fish Attractor
@@ -5571,7 +5571,7 @@ Auctioneer_BasePrices = {
 	[9589]={b=0,s=0,d=18514,q=20,x=20},  -- Encrusted Minerals
 	[9590]={b=0,s=0,d=929},  -- Splintered Log
 	[9591]={b=0,s=0,d=18517,q=20,x=20},  -- Resilient Sinew
-	[9592]={b=0,s=0,d=18519,q=30,x=30},  -- Metallic Fragments
+	[9592]={b=0,s=0,d=18519,x=40},  -- Metallic Fragments
 	[9593]={b=0,s=0,d=18524,q=20,x=20},  -- Treant Muisek
 	[9594]={b=0,s=0,d=18094,q=20,x=20},  -- Wildkin Muisek
 	[9595]={b=0,s=0,d=18525,q=20,x=20},  -- Hippogryph Muisek
