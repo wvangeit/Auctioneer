@@ -1288,7 +1288,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 					TT_LineColor(0.5,0.5,0.8);
 				else -- count = 0 | 1
 					-- OUTPUT: "Suggested price: [avgMin] min/[buyoutPriceForOne] BO ([avgBid*count] bid)"
-					TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin), TT_GetTextGSC(buyoutPriceForOne), TT_GetTextGSC(avgBid)), nil, embedded);
 					TT_LineColor(0.5,0.5,0.8);
 				end
 			end
