@@ -92,7 +92,8 @@ AUCT_FRMT_INFO_BUYMEDIAN = "  Buyout median";
 
 AUCT_FRMT_INFO_STACKSIZE = "  Average stack size: %d items";
 
-AUCT_FRMT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:"; 
+AUCT_FRMT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
+AUCT_FRMT_UNKNOWN_RF     = "Invalid parameter ('%s'). The parameter must be formated like: [realm]-[faction]. For example: Al'Akir-Horde";
 
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
 
@@ -197,7 +198,7 @@ AUCT_HELP_USAGE = "Select whether to show tradeskill item's usage";
 AUCT_HELP_STACK = "Select whether to show the item's stackable size";
 AUCT_HELP_EMBED_BLANK = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
 AUCT_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
-AUCT_HELP_ALSO = "Also display another server's values in the tooltip. The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
+AUCT_HELP_ALSO = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
 AUCT_HELP_LOCALE = "Change the locale that is used to display auctioneer messages";
 AUCT_HELP_BROKER = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
 AUCT_HELP_BIDBROKER = "Show short or medium term auctions from the recent scan that may be bid on for profit";

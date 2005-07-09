@@ -92,7 +92,8 @@ AUCT_FRMT_INFO_BUYMEDIAN = "  Sofortkauf-Median";
 
 AUCT_FRMT_INFO_STACKSIZE = "  Durchschnittliche Stapelgröße: %d Stück";
 
-AUCT_FRMT_UNKNOWN_LOCALE = "Die angegebene Sprache: ('%s') ist unbekannt. Folgende Sprachen sind gültig:"; 
+AUCT_FRMT_UNKNOWN_LOCALE = "Die angegebene Sprache ('%s') ist unbekannt. Folgende Sprachen sind gültig:";
+AUCT_FRMT_UNKNOWN_RF     = "Der angegebene Parameter ('%s') ist ungültig. Der Parameter muss das Format: [Realm]-[Fraktion] haben. Zum Beispiel: Kil'Jaeden-Alliance";
 
 AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
 
@@ -144,7 +145,7 @@ AUCT_CMD_PCT_UNDERLOW    = "pct-underlow";
 AUCT_CMD_PCT_UNDERMKT    = "pct-undermkt";
 
 AUCT_OPT_CLEAR         = "([Gegenstand]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
-AUCT_OPT_ALSO          = "(Fraktion|"..AUCT_CMD_ALSO_OPPOSITE..")"
+AUCT_OPT_ALSO          = "(Realm-Fraktion|"..AUCT_CMD_ALSO_OPPOSITE..")"
 AUCT_OPT_LOCALE        = "<Sprache>";
 AUCT_OPT_BROKER        = "<Gewinn in Silber>";
 AUCT_OPT_BIDBROKER     = "<Gewinn in Silber>";
@@ -197,7 +198,7 @@ AUCT_HELP_USAGE           = "Schaltet die Anzeige des Verwendungszweckes für Ha
 AUCT_HELP_STACK           = "Schaltet die Anzeige der Stapelgröße ein/aus.";
 AUCT_HELP_EMBED_BLANK     = "Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
 AUCT_HELP_CLEAR           = "Löscht die Daten der angegebene Gegenstände (Gegenstände durch Shift+Linksklick dem Befehl hinzufügen) Es können auch die speziellen Keywords \"all\" und \"snapshot\" hinzugefügt werden.";
-AUCT_HELP_ALSO            = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Das spezielle Keywort \"opposite\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalität.";
+AUCT_HELP_ALSO            = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms für Realm und den Namen der Faktion für Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"opposite\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalität.";
 AUCT_HELP_LOCALE          = "Ändert die für die Ausgabe der Auctioneer-Meldungen verwendete Sprache.";
 AUCT_HELP_BROKER          = "Zeigt alle Auktionen des zuletzt durchgeführten Scans an, die per Sofortkauf gekauft und mit Gewinn wieder verkauft werden können.";
 AUCT_HELP_BIDBROKER       = "Zeigt alle Auktionen des zuletzt durchgeführten Scans mit kurzer oder mittlerer Restlaufzeit an, die per Gebot ersteigert und mit Gewinn wieder verkauft werden können.";
