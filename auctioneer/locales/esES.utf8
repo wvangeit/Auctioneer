@@ -93,6 +93,7 @@ AUCT_FRMT_INFO_BUYMEDIAN = "  Opción a compra mediano";
 AUCT_FRMT_INFO_STACKSIZE = "  Tamaño promedio del paquete: %d artículos";
 
 AUCT_FRMT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:"; 
+AUCT_FRMT_UNKNOWN_RF     = "Parametro inválido ('%s'). El parámetro debe de estar en la forma de: [reino]-[facción]. Por ejemplo: Al'Akir-Horde";
 
 AUCT_FRMT_ACT_REMOVE = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
@@ -196,8 +197,8 @@ AUCT_HELP_VENDOR_BUY = "Selecciona para mostrar precio de compra del vendedor (r
 AUCT_HELP_USAGE = "Selecciona para mostrar uso del artículo en profesiones";
 AUCT_HELP_STACK = "Selecciona para mostrar tamaño maximo del paquete";
 AUCT_HELP_EMBED_BLANK = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-AUCT_HELP_CLEAR = "Eliminar la informacion existente sobre el artículo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las claves \"todo\" or \"imagen\"";
-AUCT_HELP_ALSO_OLD = "Mostrar valores de otros servidores en la caja de ayuda. Palabra especial \"opuesto\" significa faccion opuesta, \"apagar\" desabilita la funcion.";
+AUCT_HELP_CLEAR = "Eliminar la informacion existente sobre el artículo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
+AUCT_HELP_ALSO = "Mostrar también los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facción escribe el nombre de la facción. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facción opuesta, \"apagar\" desabilita la función.";
 AUCT_HELP_LOCALE = "Cambiar la localidad que Auctioneer usa para sus mensajes";
 AUCT_HELP_BROKER = "Muestra las subastas de la exploración mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
 AUCT_HELP_BIDBROKER = "Muestra subastas de corto o medio termino de la exploración mas reciente a las cuales se puede poner una oferta y obtener ganancia";
