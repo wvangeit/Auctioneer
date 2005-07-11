@@ -227,7 +227,7 @@ AUCT_FRMT_ACT_ENABLED_ON = "Zeige %s auf %s";
 AUCT_FRMT_ACT_SET        = "Setze %s auf '%s'";
 AUCT_FRMT_ACT_UNKNOWN    = "Unbekannter Befehl: '%s'";
 
-AUCT_TEXT_SCAN    = "Scanne";
+AUCT_TEXT_SCAN    = "Scannen";
 AUCT_TEXT_AUCTION = "Auktion";
 AUCT_TEXT_NONE    = "keine";
 
