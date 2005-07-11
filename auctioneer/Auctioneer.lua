@@ -1605,6 +1605,9 @@ function Auctioneer_ConfigureAH()
 	AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
 	AuctionsLongAuctionButton:ClearAllPoints();
 	AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
+	
+	-- set UI-texts
+	BrowseScanButton:SetText(AUCT_TEXT_SCAN);
 end
 
 function Auctioneer_Command(command)
