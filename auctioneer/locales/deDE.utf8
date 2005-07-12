@@ -20,16 +20,16 @@ AUCT_CLAS_WARLOCK   = "Hexenmeister";
 AUCT_CLAS_WEAPON    = "Waffe";
 AUCT_CLAS_WRITTEN   = "Schriftstück";
 
-AUCT_TYPE_ALCHEM   = "Alchimist";
-AUCT_TYPE_COOK     = "Koch";
-AUCT_TYPE_ENCHANT  = "Verzauberer";
-AUCT_TYPE_ENGINEER = "Ingenieur";
+AUCT_TYPE_ALCHEM   = "Alchimie";
+AUCT_TYPE_COOK     = "Kochen";
+AUCT_TYPE_ENCHANT  = "Verzauberungen";
+AUCT_TYPE_ENGINEER = "Ingenieurskunst";
 AUCT_TYPE_FSTAID   = "Erste Hilfe";
-AUCT_TYPE_LEATHER  = "Lederverarbeiter";
+AUCT_TYPE_LEATHER  = "Lederverarbeitung";
 AUCT_TYPE_MINING   = "Bergbau";
-AUCT_TYPE_POISON   = "Giftmischer";
-AUCT_TYPE_SMITH    = "Schmied";
-AUCT_TYPE_TAILOR   = "Schneider";
+AUCT_TYPE_POISON   = "Gifte";
+AUCT_TYPE_SMITH    = "Schmieden";
+AUCT_TYPE_TAILOR   = "Schneiderei";
 
 AUCT_RECIPE_PREFIXES = { "Rezept: ", "Muster: ", "Pläne: ", "Bauplan: ", "Formel: " };
 
@@ -100,18 +100,18 @@ AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbil
 
 AUCT_FRMT_AUCTINFO_HIST     = "%d historisch";
 AUCT_FRMT_AUCTINFO_SNAP     = "%d aus dem letzten Scan";
-AUCT_FRMT_AUCTINFO_LOW      = "kleines Abbild";
-AUCT_FRMT_AUCTINFO_NOLOW    = "Gegenstand nicht im letzten Abbild";
+AUCT_FRMT_AUCTINFO_LOW      = "günstigster Snapshot";
+AUCT_FRMT_AUCTINFO_NOLOW    = "Nicht im letzten Snapshot gesehn";
 AUCT_FRMT_AUCTINFO_ORIG     = "Original-Gebot";
-AUCT_FRMT_AUCTINFO_SUGBUY   = "Empfohlener Sofortkaufpreis";
-AUCT_FRMT_AUCTINFO_SUGBID   = "Empfohlenes Gebot";
+AUCT_FRMT_AUCTINFO_SUGBUY   = "Empf. Sofortkauf";
+AUCT_FRMT_AUCTINFO_SUGBID   = "Empf. Gebot";
 AUCT_FRMT_AUCTINFO_MKTPRICE = "Marktpreis";
 
 AUCT_FRMT_WARN_MARKUP   = "%s%% erhöhter Händlerpreis";
 AUCT_FRMT_WARN_UNDERCUT = "Unterbiete um %s%%";
 AUCT_FRMT_WARN_NOCOMP   = "Monopol";
-AUCT_FRMT_WARN_ABOVEMKT = "Konkurrenz verkauft überteuert";
-AUCT_FRMT_WARN_TOOLOW   = "Konkurrenz ist zu günstig";
+AUCT_FRMT_WARN_ABOVEMKT = "Konkurrenz keine Gefahr";
+AUCT_FRMT_WARN_TOOLOW   = "Konkurrenz zu günstig";
 AUCT_FRMT_WARN_MYPRICE  = "Verwende eigenen Preis";
 AUCT_FRMT_WARN_NODATA   = "Keine HVP-Daten";
 
