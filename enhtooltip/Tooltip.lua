@@ -13,6 +13,7 @@ TOOLTIPS_INCLUDED = true;
 ENHTOOLTIP_VERSION = "<%version%>";
 
 TT_CurrentTip = nil;
+TT_PopupKey = "alt";
 
 local Orig_Chat_OnHyperlinkShow;
 local Orig_AuctionFrameItem_OnEnter;
@@ -501,7 +502,7 @@ local function fakeLink(item, quality, name)
 end
 TT_FakeLink = fakeLink;
 
-function TT_TooltipCall(frame, name, link, quality, count, price)
+function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup)
 	TT_CurrentTip = frame;
 	if (quality==nil or quality==-1) then
 		local linkQuality = qualityFromLink(link);
@@ -511,25 +512,52 @@ function TT_TooltipCall(frame, name, link, quality, count, price)
 			quality = -1;
 		end
 	end
-	TT_AddTooltip(frame, name, link, quality, count, price);
+
+	local showTip = true;
+	if ((forcePopup == true) or
+		((forcePopup == nil) and
+		 ((TT_PopupKey == "ctrl" and IsControlKeyDown()) or
+		  (TT_PopupKey == "alt" and IsAltKeyDown()) or
+		  (TT_PopupKey == "shift" and IsShiftKeyDown())))) then
+		if (TT_ItemPopup(name, fabricatedLink, -1, 1)) then
+			showTip = false;
+		end
+	end
+	
+	if (showTip) then
+		TT_AddTooltip(frame, name, link, quality, count, price);
+	else
+		frame:Hide();
+		TT_Clear();
+		TT_Hide();
+
+	end
 end
 
 function TT_AddTooltip(frame, name, link, quality, count, price)
 	-- Empty function; hook here if you want in on the action!
 end
 
-function TT_Chat_OnHyperlinkShow(link)
-	Orig_Chat_OnHyperlinkShow(link);
+function TT_ItemPopup(name, link, quality, count, price)
+	-- Empty function; hook here if you want to maybe display a popup menu
+end
 
+function TT_Chat_OnHyperlinkShow(link, button)
+	Orig_Chat_OnHyperlinkShow(link, button);
+	
 	if (ItemRefTooltip:IsVisible()) then
 		local name = ItemRefTooltipTextLeft1:GetText();
 		if (name and TT_ChatCurrentItem ~= name) then
 			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
 			TT_ChatCurrentItem = name;
 			
-			TT_Clear();
-			TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1);
-			TT_Show(ItemRefTooltip);
+			if (button == "RightButton") then
+				TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1, 0, true);
+			else
+				TT_Clear();
+				TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1, 0);
+				TT_Show(ItemRefTooltip);
+			end
 		end
 	end
 end
