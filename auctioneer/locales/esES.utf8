@@ -19,25 +19,25 @@ AUCT_CLAS_WARLOCK = "Brujos";
 AUCT_CLAS_WEAPON = "Arma";
 AUCT_CLAS_WRITTEN = "Escrito";
 
-AUCT_TYPE_ALCHEM = "Alquimia";
-AUCT_TYPE_COOK = "Cocina";
+AUCT_TYPE_ALCHEM = "Alquímia";
+AUCT_TYPE_COOK = "Cocinar";
 AUCT_TYPE_ENCHANT = "Encantar";
 AUCT_TYPE_ENGINEER = "Ingienería";
 AUCT_TYPE_FSTAID = "Primeros Auxilios";
 AUCT_TYPE_LEATHER = "Peletería";
-AUCT_TYPE_MINING = "Minerál";
+AUCT_TYPE_MINING = "Minería";
 AUCT_TYPE_POISON = "Veneno";
 AUCT_TYPE_SMITH = "Herrería";
-AUCT_TYPE_TAILOR = "Sastre";
+AUCT_TYPE_TAILOR = "Sastrería";
 
-AUCT_RECIPE_PREFIXES = { "Recipe: ", "Pattern: ", "Plans: ", "Schematic: ", "Formula: " };
+AUCT_RECIPE_PREFIXES = { "Receta: ", "Patrón: ", "Plano: ", "Esquema: ", "Fórmula: " };
 
-AUCT_TIME_SHORT = "Short";
-AUCT_TIME_MED = "Medium";
-AUCT_TIME_LONG = "Long";
-AUCT_TIME_VLONG = "Very Long";
+AUCT_TIME_SHORT = "Corto";
+AUCT_TIME_MED = "Mediano";
+AUCT_TIME_LONG = "Largo";
+AUCT_TIME_VLONG = "Muy Largo";
 
-AUCT_FRMT_WELCOME = "Auctioneer v%s cargado";
+AUCT_FRMT_WELCOME = "Auctioneer versión %s cargado";
 
 AUCT_FRMT_BROKER_HEADER = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
 AUCT_FRMT_BROKER_LINE = "%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
@@ -72,11 +72,11 @@ AUCT_FRMT_INFO_ALSOSEEN = "Visto %d veces a %s";
 AUCT_FRMT_INFO_CLASSUSE = "Clase: %s usado para %s";
 AUCT_FRMT_INFO_CLASS = "Clase: %s";
 AUCT_FRMT_INFO_USE = "Usado para: %s";
-AUCT_FRMT_INFO_BUY = "Compra a %s del vendedor";
-AUCT_FRMT_INFO_SELL = "Vende a %s al vendedor";
+AUCT_FRMT_INFO_BUY = "Compra%s del vendedor";
+AUCT_FRMT_INFO_SELL = "Vende%s al vendedor";
 AUCT_FRMT_INFO_BUYMULT = "Compra %s %d (%s c/u)";
 AUCT_FRMT_INFO_SELLMULT = "Vende %s %d (%s c/u)";
-AUCT_FRMT_INFO_STX = "Amontonable en lotes %d artículos por paquete";
+AUCT_FRMT_INFO_STX = "Amontonable en lotes de artículos %d por paquete";
 
 AUCT_FRMT_INFO_HEAD_MULTI = "Promedios para %d artículos:";
 AUCT_FRMT_INFO_MIN_MULTI = "  Minimo (%s c/u)";
@@ -97,9 +97,9 @@ AUCT_FRMT_UNKNOWN_RF     = "Parametro inválido ('%s'). El parámetro debe de es
 
 AUCT_FRMT_ACT_REMOVE = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
-AUCT_FRMT_AUCTINFO_HIST = "%d Histórico";
-AUCT_FRMT_AUCTINFO_SNAP = "%d Ultima exploración";
-AUCT_FRMT_AUCTINFO_LOW = "Imagen baja";
+AUCT_FRMT_AUCTINFO_HIST = "%d Históricamente";
+AUCT_FRMT_AUCTINFO_SNAP = "%d en la última exploración";
+AUCT_FRMT_AUCTINFO_LOW = "Mínimo de la última exploración";
 AUCT_FRMT_AUCTINFO_NOLOW = "Artículo no fue visto en ultima imagen";
 AUCT_FRMT_AUCTINFO_ORIG = "Oferta Original";
 AUCT_FRMT_AUCTINFO_SUGBUY = "Opción a compra sugerida";
@@ -107,19 +107,19 @@ AUCT_FRMT_AUCTINFO_SUGBID = "Oferta sugerida";
 AUCT_FRMT_AUCTINFO_MKTPRICE = "Precio del mercado";
 
 AUCT_FRMT_WARN_MARKUP = "Superando vendedor por %s%%";
-AUCT_FRMT_WARN_UNDERCUT = "Socavando el precio por %s%%";
+AUCT_FRMT_WARN_UNDERCUT = "Socavando por %s%%";
 AUCT_FRMT_WARN_NOCOMP = "Sin competencia";
 AUCT_FRMT_WARN_ABOVEMKT = "Competencia sobre mercado";
 AUCT_FRMT_WARN_TOOLOW = "Imposible igualar minimo";
 AUCT_FRMT_WARN_MYPRICE = "Usando mi precio actual";
-AUCT_FRMT_WARN_NODATA = "Sin data para PMV";
+AUCT_FRMT_WARN_NODATA = "Sin información para PMV";
 
 AUCT_CMD_OFF = "apagado";
 AUCT_CMD_ON = "prendido";
 AUCT_CMD_ALT = "alt";
 AUCT_CMD_CTRL = "ctrl";
 AUCT_CMD_SHIFT = "shift";
-AUCT_CMD_TOGGLE = "toggle";
+AUCT_CMD_TOGGLE = "invertir";
 AUCT_CMD_CLEAR = "despejado";
 AUCT_CMD_CLEAR_ALL = "todo";
 AUCT_CMD_CLEAR_SNAPSHOT = "imagen";
@@ -183,7 +183,7 @@ AUCT_SHOW_VENDOR_BUY = "ver-vendedor-compra";
 AUCT_SHOW_VENDOR_SELL = "ver-vendedor-venta";
 AUCT_SHOW_EMBED_BLANK = "ver-integrado-lineavacia";
 
-AUCT_HELP_ONOFF = "Enciande o apaga la informacion sobre subastas";
+AUCT_HELP_ONOFF = "Enciande o apaga la informacion sobre las subastas";
 AUCT_HELP_VERBOSE = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
 AUCT_HELP_AVERAGE = "Selecciona para mostrar precio promedio de la subasta para el artículo";
 AUCT_HELP_LINK = "Selecciona para mostrar el numero de enlace del artículo en la caja de ayuda";
@@ -192,8 +192,8 @@ AUCT_HELP_MESH = "Selecciona para mostrar la imagen del artículo, si existe una
 AUCT_HELP_SUGGEST = "Selecciona para mostrar el precio sugerido de subasta para el artículo";
 AUCT_HELP_STATS = "Selecciona para mostrar porcentajes para ofertas/opción a compra del artículo";
 AUCT_HELP_VENDOR = "Selecciona para mostrar precios de vendedor para el artículo";
-AUCT_HELP_VENDOR_SELL = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor=encendido)";
-AUCT_HELP_VENDOR_BUY = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor=encendido)";
+AUCT_HELP_VENDOR_SELL = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
+AUCT_HELP_VENDOR_BUY = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
 AUCT_HELP_USAGE = "Selecciona para mostrar uso del artículo en profesiones";
 AUCT_HELP_STACK = "Selecciona para mostrar tamaño maximo del paquete";
 AUCT_HELP_EMBED_BLANK = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
