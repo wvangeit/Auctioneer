@@ -618,7 +618,7 @@ local function isValidAlso(also)
 		return false	-- missing parameter
 	end
 
-	if (also == 'opposite') or (also == AUCT_CMD_ALSO_OPPOSITE) or (also == 'off') then
+	if (also == 'opposite') or (also == 'off') then
 		return true	-- allow special keywords
 	end
 
@@ -1702,12 +1702,12 @@ function Auctioneer_Command(command)
 			end
 		end
 	elseif (cmd == AUCT_CMD_ALSO) then
+		if (param == AUCT_CMD_ALSO_OPPOSITE) then
+			param = "opposite";
+		end
 		if (not isValidAlso(param)) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_RF, param))
 			return
-		end
-		if (param == AUCT_CMD_ALSO_OPPOSITE) then
-			param == "opposite";
 		end
 		Auctioneer_SetFilter("also", param);
 	elseif (cmd == AUCT_CMD_LOCALE) then
