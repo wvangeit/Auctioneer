@@ -618,7 +618,7 @@ local function isValidAlso(also)
 		return false	-- missing parameter
 	end
 
-	if (also == 'opposite') or (also == 'off') then
+	if (also == 'opposite') or (also == AUCT_CMD_ALSO_OPPOSITE) or (also == 'off') then
 		return true	-- allow special keywords
 	end
 
@@ -1301,9 +1301,9 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			end
 		end -- (aCount > 0)
 
-		local also = Auctioneer_GetFilterVal(AUCT_CMD_ALSO);
+		local also = Auctioneer_GetFilterVal("also");
 		if (isValidAlso(also)) and (also ~= "off") then
-			if (also == AUCT_CMD_ALSO_OPPOSITE) then
+			if (also == "opposite") then
 				also = oppositeKey();
 			end
 			local itemData = getAuctionPriceData(itemKey, also, name, itemID);
@@ -1705,6 +1705,9 @@ function Auctioneer_Command(command)
 		if (not isValidAlso(param)) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_RF, param))
 			return
+		end
+		if (param == AUCT_CMD_ALSO_OPPOSITE) then
+			param == "opposite";
 		end
 		Auctioneer_SetFilter("also", param);
 	elseif (cmd == AUCT_CMD_LOCALE) then
