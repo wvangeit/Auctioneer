@@ -1,5 +1,6 @@
 ﻿-- Encoded in UTF8
 AUCT_CLAS_ARMOR = "Armadura";
+AUCT_CLAS_BANDAGE = "Vendaje"
 AUCT_CLAS_CLOTH = "Tela";
 AUCT_CLAS_CONTAINER = "Contenedor";
 AUCT_CLAS_DRINK = "Bebida";
