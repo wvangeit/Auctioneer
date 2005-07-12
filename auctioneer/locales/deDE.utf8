@@ -1,5 +1,6 @@
 ﻿-- Encoded in UTF8
 AUCT_CLAS_ARMOR     = "Rüstung";
+AUCT_CLAS_BANDAGE   = "Verband"
 AUCT_CLAS_CLOTH     = "Stoff";
 AUCT_CLAS_CONTAINER = "Tasche";
 AUCT_CLAS_DRINK     = "Getränk";
