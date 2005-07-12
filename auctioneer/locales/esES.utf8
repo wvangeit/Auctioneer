@@ -69,7 +69,7 @@ AUCT_FRMT_INFO_SGST = "Precio sugerido: %s min/%s OC (%s oferta)";
 
 AUCT_FRMT_INFO_BIDRATE = "%d%% tienen ofertas, %d%% tienen OC";
 AUCT_FRMT_INFO_NEVER = "Nunca visto en %s";
-AUCT_FRMT_INFO_ALSOSEEN = "Visto %d veces a %s";
+AUCT_FRMT_INFO_ALSOSEEN = "Visto %d veces en %s";
 AUCT_FRMT_INFO_CLASSUSE = "Clase: %s usado para %s";
 AUCT_FRMT_INFO_CLASS = "Clase: %s";
 AUCT_FRMT_INFO_USE = "Usado para: %s";
