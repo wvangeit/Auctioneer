@@ -1,5 +1,5 @@
 ## Title: EnhancedTooltip
-## Interface: 1500
+## Interface: 1600
 ## Version: <%version%>
 ## Revision: $Id$
 ## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips
