@@ -80,12 +80,12 @@ AUCT_FRMT_INFO_SELLMULT = "Verkauf%s für %d (%s pro Stück)";
 AUCT_FRMT_INFO_STX      = "%d pro Stapel";
 
 AUCT_FRMT_INFO_HEAD_MULTI = "Durchschnitt für %d Stück:";
-AUCT_FRMT_INFO_MIN_MULTI  = "  Minimum (%s pro Stück)";
+AUCT_FRMT_INFO_MIN_MULTI  = "  Min. Startgebot (%s pro Stück)";
 AUCT_FRMT_INFO_BID_MULTI  = "  Geboten (%s%s pro Stück)";
 AUCT_FRMT_INFO_BUY_MULTI  = "  Sofortkauf (%s%s pro Stück)";
 
 AUCT_FRMT_INFO_HEAD_ONE = "Durchschnitt für diesen Gegenstand:";
-AUCT_FRMT_INFO_MIN_ONE  = "  Minimum";
+AUCT_FRMT_INFO_MIN_ONE  = "  Min. Startgebot";
 AUCT_FRMT_INFO_BID_ONE  = "  Geboten%s";
 AUCT_FRMT_INFO_BUY_ONE  = "  Sofortkauf%s";
 
@@ -99,7 +99,7 @@ AUCT_FRMT_UNKNOWN_RF     = "Der angegebene Parameter ('%s') ist ungültig. Der P
 AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
 
 AUCT_FRMT_AUCTINFO_HIST     = "%d historisch";
-AUCT_FRMT_AUCTINFO_SNAP     = "%d aus dem letzten Scan";
+AUCT_FRMT_AUCTINFO_SNAP     = "%d aus letztem Scan";
 AUCT_FRMT_AUCTINFO_LOW      = "günstigster Snapshot";
 AUCT_FRMT_AUCTINFO_NOLOW    = "Nicht im letzten Snapshot gesehn";
 AUCT_FRMT_AUCTINFO_ORIG     = "Original-Gebot";
@@ -230,7 +230,7 @@ AUCT_FRMT_ACT_UNKNOWN    = "Unbekannter Befehl: '%s'";
 
 AUCT_TEXT_SCAN    = "Scannen";
 AUCT_TEXT_AUCTION = "Auktion";
-AUCT_TEXT_NONE    = "keine";
+AUCT_TEXT_NONE    = "nichts";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START    = "Auctioneer: Scanne %s Seite 1...";
