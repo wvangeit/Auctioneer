@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml-stylesheet type="text/xsl" href="devdoc.xsl"?>
+<devdoc title="Auctioneer Developer's Documentation">
+	<file name="auctioneer.lua">
+		<function name="getTimeLeftString" createdBy="unknown" locale="true">
+			<parameter name="timeLeft">
+			</parameter>
+			<return type="string">
+				string representation of the given timeLeft constant
+			</return>
+			<description>
+				return the string representation of the given timeLeft constant
+			</description>
+		</function>
+		<function name="Auctioneer_GetGSC" createdBy="unknown" locale="false">
+			<parameter name="money">
+			</parameter>
+			<return type="integer">
+				amount of gold in the given money parameter
+			</return>
+			<return type="integer">
+				amount of silver in the given money parameter
+			</return>
+			<return type="integer">
+				amount of cupper in the given money parameter
+			</return>
+			<description>
+			</description>
+		</function>
+		<function name="Auctioneer_GetTextGSC" createdBy="unknown" locale="false">
+			<parameter name="money">
+			</parameter>
+			<return type="string">
+			</return>
+			<description>
+			</description>
+		</function>
+		<function name="nilSafeString" createdBy="unknown" locale="false">
+			<parameter name="str">
+			</parameter>
+			<return type="string">
+			</return>
+			<description>
+				return an empty string if str is nil
+			</description>
+		</function>
+		<function name="colorTextWhite" createdBy="unknown" locale="true">
+			<parameter name="text">
+			</parameter>
+			<return type="string">
+			</return>
+			<description>
+			</description>
+		</function>
+		<function name="nullSafe" createdBy="unknown" locale="false">
+			<parameter name="val">
+			</parameter>
+			<return type="integer">
+			</return>
+			<description>
+				used to convert variables that should be numbers but are nil to 0
+			</description>
+		</function>
+		<function name="subtractPercent" createdBy="unknown" locale="true">
+			<parameter name="value">
+			</parameter>
+			<parameter name="percentLess">
+			</parameter>
+			<return type="integer">
+			</return>
+			<description>
+				subtracts a percent from a value
+			</description>
+		</function>
+		<function name="addPercent" createdBy="unknown" locale="true">
+			<parameter name="value">
+			</parameter>
+			<parameter name="percentMore">
+			</parameter>
+			<return type="integer">
+			</return>
+			<description>
+			</description>
+		</function>
+	</file>
+</devdoc>
