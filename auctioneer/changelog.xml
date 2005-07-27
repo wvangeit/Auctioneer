@@ -1,0 +1,43 @@
+<changelog>
+	<nextrelease>
+		<bugfix id="bugfix2" fixedby="Luke1410" date="2005-07-27 22:04">
+			<file name="locales/deDE.utf8">
+				<change constant="AUCT_FRMT_AUCTINFO_SNAP" />
+				<change constant="AUCT_TEXT_NONE" />
+			</file>
+			<public>
+				Cut a string a bit to fit into the frame.
+				Fixed a wrong translated string.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix1" submitedby="bizarrojack" fixedby="Luke1410" date="2005-07-27 19:49">
+			<file name="locales/enUS.utf8">
+				<change constant="AUCT_FRMT_INFO_MIN_ONE" />
+				<change constant="AUCT_FRMT_INFO_MIN_MULTI" />
+			</file>
+			<file name="locales/esES.utf8">
+				<change constant="AUCT_FRMT_INFO_MIN_ONE" />
+				<change constant="AUCT_FRMT_INFO_MIN_MULTI" />
+			</file>
+			<file name="locales/deDE.utf8">
+				<change constant="AUCT_FRMT_INFO_MIN_ONE" />
+				<change constant="AUCT_FRMT_INFO_MIN_MULTI" />
+			</file>
+			<developer>
+				Replaced minimum by start bid, as suggested by bizarrojack in https://sourceforge.net/forum/forum.php?thread_id=1315789&forum_id=478100.
+				Spain translation might be wrong, french localisationfile doesn't contain those constants atm.
+			</developer>
+			<public>
+				The overaul minimum startbid is now correctly named start bid. Before it was called &quot;minimum&quot; which could be easily misunderstood.
+			</public>
+		</bugfix>
+	</nextrelease>
+	<release version="3.0.10" date="">
+<!--
+      Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
+		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" date="" replacebugfix="bugfix1" text="replace"></bugfix>
+		<added id="addition1" by="Alabana" text="concatenate"></added>
+		<removed id="remove1"></removed>
+-->
+	</release>
+</changelog>
