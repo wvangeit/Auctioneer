@@ -80,12 +80,12 @@ AUCT_FRMT_INFO_SELLMULT = "Sell%s %d (%s each)";
 AUCT_FRMT_INFO_STX = "Stacks in lots of %d";
 
 AUCT_FRMT_INFO_HEAD_MULTI = "Averages for %d items:";
-AUCT_FRMT_INFO_MIN_MULTI = "  Minimum (%s ea)";
+AUCT_FRMT_INFO_MIN_MULTI = "  Start bid (%s ea)";
 AUCT_FRMT_INFO_BID_MULTI = "  Bidded (%s%s ea)";
 AUCT_FRMT_INFO_BUY_MULTI = "  Buyout (%s%s ea)";
 
 AUCT_FRMT_INFO_HEAD_ONE = "Averages for this item:";
-AUCT_FRMT_INFO_MIN_ONE = "  Minimum bid";
+AUCT_FRMT_INFO_MIN_ONE = "  Start bid";
 AUCT_FRMT_INFO_BID_ONE = "  Bidded%s";
 AUCT_FRMT_INFO_BUY_ONE = "  Buyout%s";
 
