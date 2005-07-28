@@ -77,8 +77,19 @@
             </xsl:attribute>
             <xsl:apply-templates select="." mode="sectionNum"/><!--<xsl:eval>sectionNum(this)</xsl:eval>-->
             <xsl:text> </xsl:text>
-            <xsl:value-of select="@name"/>
-          </a>         
+            <xsl:if test="@locale='true'">
+            	<span style="color:#00cc00">
+        	<xsl:value-of select="@name"/>
+        	<xsl:text> (locale)</xsl:text>
+	        </span>
+            </xsl:if>
+            <xsl:if test="@locale='false'">
+            	<span style="color:#ff0000">
+        	<xsl:value-of select="@name"/>
+        	<xsl:text> (global)</xsl:text>
+	        </span>
+            </xsl:if>
+          </a>
       </h3>
       <xsl:apply-templates/>
    </xsl:template>
