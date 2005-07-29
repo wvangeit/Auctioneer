@@ -1,0 +1,132 @@
+<itemdatachanges>
+	<change id="3729">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="4457">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="4536">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="4593">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="4603">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="5479">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="5527">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6289">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6291">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6308">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6361">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6887">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6888">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="8364">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="8365">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12209">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12212">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12215">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12216">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12224">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13754">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13755">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13756">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13758">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13759">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13760">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13851">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13888">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13889">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13893">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13927">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13929">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13930">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13931">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13932">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13933">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13934">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="13935">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="17058">
+		<remove type="class" />
+	</change>
+	<change id="17222">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="18045">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+<!-- example
+	<add id="" />
+	<change id="">
+		<replace type="class" value="AUCT_CLASS_COOK" with="AUCT_CLASS_LEATHER" />
+		<add type="usage" value="AUCT_TYPE_BANDAGE" />
+	</change>
+-->
+</itemdatachanges>

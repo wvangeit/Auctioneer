@@ -1,5 +1,13 @@
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix3" fixedby="Luke1410" date="2005-07-29 13:40">
+			<file name="itemdata.xml">
+			</file>
+			<public>
+				added 40 itemclasses - especially food
+				fixed 1 itemclass: Fish Oil is nolonger marked as a potion
+			</public>
+		</bugfix>
 		<bugfix id="bugfix2" fixedby="Luke1410" date="2005-07-27 22:04">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_FRMT_AUCTINFO_SNAP" />
