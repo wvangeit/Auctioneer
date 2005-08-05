@@ -80,12 +80,12 @@ AUCT_FRMT_INFO_SELLMULT = "Vende %s %d (%s c/u)";
 AUCT_FRMT_INFO_STX = "Amontonable en lotes de artículos %d por paquete";
 
 AUCT_FRMT_INFO_HEAD_MULTI = "Promedios para %d artículos:";
-AUCT_FRMT_INFO_MIN_MULTI = "  Oferta mínima (%s c/u)";
+AUCT_FRMT_INFO_MIN_MULTI = "  Oferta a empezar (%s c/u)";
 AUCT_FRMT_INFO_BID_MULTI = "  Oferta (%s%s c/u)";
 AUCT_FRMT_INFO_BUY_MULTI = "  Opción a compra(%s%s c/u)";
 
 AUCT_FRMT_INFO_HEAD_ONE = "Promedios para este artículo:";
-AUCT_FRMT_INFO_MIN_ONE = "  Oferta mínima";
+AUCT_FRMT_INFO_MIN_ONE = "  Oferta a empezar";
 AUCT_FRMT_INFO_BID_ONE = " %s con propuestas";
 AUCT_FRMT_INFO_BUY_ONE = " %s con opción a compra";
 
