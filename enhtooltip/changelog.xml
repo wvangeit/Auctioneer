@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<changelog>
+	<nextrelease>
+		<added id="addition1" codedby="Luke1410" timestamp="2005-08-05 00:19">
+			<file name="Tooltip.lua">
+				<change function="TT_GetTextGSC" />
+			</file>
+			<developer>
+				Added a new optional parameter to TT_GetTextGSC, to allow the exact amount being print to the tooltip.
+				If the second parameter is set to true, the amount of copper will also be printed out, even if the given money value is > 1g.
+				That functionality was needed to print the correct suggested price to the tooltip.
+			</developer>
+		</added>
+	</nextrelease>
+<!--
+		Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
+		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" timestamp="" replacebugfix="bugfix1" text="replace"></bugfix>
+		<added id="addition1" by="Alabana" text="concatenate"></added>
+		<removed id="remove1"></removed>
+-->
+</changelog>

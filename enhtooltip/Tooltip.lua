@@ -297,7 +297,10 @@ function TT_GetGSC(money)
 end
 
 -- formats money text by color for gold, silver, copper
-function TT_GetTextGSC(money)
+function TT_GetTextGSC(money, exact)
+	if not exact then
+	   exact = false
+	end
     local GSC_GOLD="ffd100";
     local GSC_SILVER="e6e6e6";
     local GSC_COPPER="c8602c";
@@ -312,6 +315,9 @@ function TT_GetTextGSC(money)
 		gsc = format(GSC_START, GSC_GOLD, g);     
 		if (s > 0) then
 			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
+		end
+		if exact then
+		   gsc = gsc..format(GSC_PART,GSC_COPPER, c);
 		end
 	elseif (s > 0) then
 		gsc = format(GSC_START, GSC_SILVER, s);
