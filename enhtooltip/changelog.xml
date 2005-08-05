@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix1" codedby="Luke1410" sourceforgeid="1238391" timestamp="2005-08-05 01:10"
+			<file name="Tooltip.lua">
+				<change function="TT_Show" />
+			</file>
+			<developer>
+				changed the line: "elseif (parentRect.r + width < sWidth * 0.8) then" to "elseif (parentRect.r + width > sWidth * 0.8) then" as suggested by the sourceforgeuser (see sourceforgeid).
+			</developer>
+			<public>
+				the tooltip could swap over the right side of the window
+			</public>
+		</bugfix>
 		<added id="addition1" codedby="Luke1410" timestamp="2005-08-05 00:19">
 			<file name="Tooltip.lua">
 				<change function="TT_GetTextGSC" />

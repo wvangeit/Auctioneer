@@ -183,7 +183,7 @@ function TT_Show(currentTooltip)
 		local xAnchor, yAnchor;
 		if (parentRect.l - width < sWidth * 0.2) then
 			xAnchor = "RIGHT";
-		elseif (parentRect.r + width < sWidth * 0.8) then
+		elseif (parentRect.r + width > sWidth * 0.8) then
 			xAnchor = "LEFT";
 		elseif (align == "ANCHOR_RIGHT") then
 			xAnchor = "RIGHT";
