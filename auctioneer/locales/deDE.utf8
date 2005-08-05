@@ -64,8 +64,8 @@ AUCT_FRMT_INFO_FORONE      = "Pro Stück: %s min/%s Sofortkauf (%s geboten) [in 
 AUCT_FRMT_INFO_AVERAGE     = "%s min/%s Sofortkauf (%s geboten)"
 AUCT_FRMT_INFO_HISTMED     = "Sofortkauf-Median (pro Stück) der %d letzten Auktionen:";
 AUCT_FRMT_INFO_SNAPMED     = "Sofortkauf-Median (pro Stück) aus %d gescannten Auktionen:";
-AUCT_FRMT_INFO_SGSTSTX     = "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s geboten)";
-AUCT_FRMT_INFO_SGST        = "Empfohlener Preis: %s min/%s Sofortkauf (%s geboten)";
+AUCT_FRMT_INFO_SGSTSTX     = "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf";
+AUCT_FRMT_INFO_SGST        = "Empfohlener Preis: %s min/%s Sofortkauf";
 
 AUCT_FRMT_INFO_BIDRATE  = "%d%% haben Gebote, %d%% haben Sofortkauf";
 AUCT_FRMT_INFO_NEVER    = "Noch in keiner %s gesehen";
