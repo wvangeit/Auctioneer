@@ -501,7 +501,7 @@ local function brokerFilter(minProfit, signature)
 	local itemKey = id..":"..rprop..":"..enchant;
 
 	if getUsableMedian(itemKey) then -- we have a useable median
-		local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
+		local hsp = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local profitPricePercent = math.floor((profit / buyout) * 100);
 
@@ -522,7 +522,7 @@ local function bidBrokerFilter(minProfit, signature)
 
 	if getUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
 		local currentBid = getCurrentBid(signature);
-		local hsp = getHighestSellablePriceForOne(itemKey, true, AHSnapshot[sanifyAHSnapshot()][signature].category);
+		local hsp = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - currentBid;
 		local profitPricePercent = math.floor((profit / currentBid) * 100);
 
@@ -565,8 +565,7 @@ local function percentLessFilter(percentLess, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-	local category = AHSnapshot[sanifyAHSnapshot()][signature].category;
-	local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, category);
+	local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 
 	if hsp > 0 and nullSafe(seenCount) > 0 then
 		local profit = (hsp * count) - buyout;
@@ -604,8 +603,9 @@ local function profitComparisonSort(a, b)
 	local bid,brprop,benchant, bName, bCount, _, bBuyout, _ = getItemSignature(b.signature);
 	local aItemKey = aid .. ":" .. arprop..":"..aenchant;
 	local bItemKey = bid .. ":" .. brprop..":"..benchant;
-	local aProfit = (getHighestSellablePriceForOne(aItemKey, true, AHSnapshot[sanifyAHSnapshot()][a.signature].category) * aCount) - aBuyout;
-	local bProfit = (getHighestSellablePriceForOne(bItemKey, true, AHSnapshot[sanifyAHSnapshot()][b.signature].category) * bCount) - bBuyout;
+	local realm = auctionKey()
+	local aProfit = (getHighestSellablePriceForOne(aItemKey, true, realm) * aCount) - aBuyout;
+	local bProfit = (getHighestSellablePriceForOne(bItemKey, true, realm) * bCount) - bBuyout;
 	return (aProfit > bProfit) 
 end
 Auctioneer_ProfitComparisonSort = profitComparisonSort;
@@ -652,7 +652,7 @@ function doBroker(minProfit)
 	for _,a in resellableAuctions do
 		local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature); 
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, a.category);
+		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
 		Auctioneer_ChatPrint(output);
@@ -675,7 +675,7 @@ function doBidBroker(minProfit)
 	for _,a in bidWorthyAuctions do
 		local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature);
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, a.category);
+		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local currentBid = getCurrentBid(a.signature);
 		local profit = (hsp * count) - currentBid;
 
@@ -741,7 +741,7 @@ function doCompeting(minLess)
 end
 
 -- builds the list of auctions that can be bought and resold for profit
-function doPercentLess(percentLess)    
+function doPercentLess(percentLess)
 	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
 	local output = string.format(AUCT_FRMT_PCTLESS_HEADER, percentLess);
 	Auctioneer_ChatPrint(output);
@@ -755,8 +755,7 @@ function doPercentLess(percentLess)
 	for _,a in auctionsBelowHSP do
 		local id,rprop,enchant, name, count,_,buyout,_ = getItemSignature(a.signature);
 		local itemKey = id ..":"..rprop..":"..enchant;
-		local category = AHSnapshot[sanifyAHSnapshot()][a.signature].category;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, category);
+		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), colorTextWhite(percentLessThan(hsp, buyout / count).."%"));
 		Auctioneer_ChatPrint(output);
@@ -771,7 +770,7 @@ end
 function findLowestAuctionForItem(itemKey)
 	local itemID, itemRand, enchant = breakItemKey(itemKey);
 	if (itemID == nil) then return nil; end
-	
+
 	local lowSig = nil;
 	local lowestPrice = 9000000; -- initialize to a very high value, 900 gold
 	local auctKey = sanifyAHSnapshot();
@@ -830,12 +829,32 @@ local function getBidBasedSellablePrice(itemKey)
 	return bidBasedSellPrice;
 end
 
-function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
-	if not category then category = "" end
+-- returns the best market price - 0, if no market price could be calculated
+local function getMarketPrice(itemKey, auctKey)
+	-- make sure to call this function with valid parameters! No check is being performed!
+
+	if BID_BASED_CATEGORIES[nilSafeString(getItemCategory(itemKey))] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
+		return getBidBasedSellablePrice(itemKey)
+	end
+
+	local buyoutMedian = nullSafe(getUsableMedian(itemKey))
+	if buyoutMedian > 0 then
+		return buyoutMedian
+	end
+
+	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = getMeans(itemKey)
+	meanCount = nullSafe(meanCount)
+	if meanCount > 0 then
+		return avgBuy -- if a usable median does not exist, use the average buyout instead
+	end
+
+	return 0
+end
+
+function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 	local highestSellablePrice = 0;
 	local warn = AUCT_FRMT_WARN_NODATA;
-	local marketPrice = 0;
-	local commonBuyout = 0;
+	local marketPrice = getMarketPrice(itemKey, realm);
 
 	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
 	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT));
@@ -844,7 +863,6 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
 	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
 
 	local buyoutMedian, count = getUsableMedian(itemKey);
-	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,meanCount = getMeans(itemKey);
 	local id = breakItemKey(itemKey);
 
 	-- get the lowest auction for this item
@@ -862,24 +880,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, category)
 		end
 	end
 
-	-- assign the best common buyout
-	if buyoutMedian and buyoutMedian > 0 then
-		commonBuyout = buyoutMedian;
-	elseif meanCount and meanCount > 0 then
-		commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
-	end
-
-	-- assign the best market price
-	if BID_BASED_CATEGORIES[category] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
---p("bid based");
-		marketPrice = getBidBasedSellablePrice(itemKey)
-	else
---p("buyout based");
-		marketPrice = commonBuyout;
-	end
---p("marketPrice: ", marketPrice);
-
-	if marketPrice and marketPrice > 0 then
+	if marketPrice > 0 then
 		if currentLowestBuyout and currentLowestBuyout > 0 then
 			lowestBuyoutPriceAllowed = subtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
 			local auctKey = sanifyAHSnapshot();
@@ -940,8 +941,7 @@ end
 local function doHSP(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
-	local category = getItemCategory(itemKey); 
-	local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, category);
+	local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, auctionKey());
 	Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), TT_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
 
@@ -974,16 +974,17 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
 	lTotalAuctionsScannedCount = lTotalAuctionsScannedCount + 1;
 
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo("list", index);
-	local aiTimeLeft = GetAuctionItemTimeLeft("list", index);
 
 	-- do some validation of the auction data that was returned
-	if (aiCount < 1) then aiCount = 1; end    
 	if (aiName == nil or tonumber(aiBuyoutPrice) > MAX_ALLOWED_FORMAT_INT or tonumber(aiMinBid) > MAX_ALLOWED_FORMAT_INT) then return; end
+	if (aiCount < 1) then aiCount = 1; end
 
+	-- get other auctiondata
+	local aiTimeLeft = GetAuctionItemTimeLeft("list", index);
 	local aiLink = GetAuctionItemLink("list", index);
 	-- Call some interested iteminfo addons
 	Auctioneer_ProcessLink(aiLink);
-	
+
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = breakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 
@@ -1001,75 +1002,9 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
 	end
 
 
-	--if this auction is not in the snapshot add it to the AuctionPrices and AHSnapshot    
+	-- if this auction is in the snapshot, do not add it to the AuctionPrices and AHSnapshot
 	local auctKey = sanifyAHSnapshot();
-	if (not AHSnapshot[auctKey][lAuctionSignature]) then 
-
-		--Auctioneer_ChatPrint("New sig: "..lAuctionSignature);
-
-		lNewAuctionsCount = lNewAuctionsCount + 1;
-
-		-- get the item data from AuctionPrices table
-		local itemData;
-		local buyoutPricesHistory;
-		-- see if they are still using the itemID as the key
-		if AuctionPrices[auctionKey()][aiItemID] then
-			itemData = AuctionPrices[auctionKey()][aiItemID];
-			AuctionPrices[auctionKey()][aiItemID] = nil; --clear entry using old ID key
-		-- else, see if they are still using the item name as the key
-		elseif AuctionPrices[auctionKey()][aiName] then
-			itemData = AuctionPrices[auctionKey()][aiName].data;
-			buyoutPricesHistory = AuctionPrices[auctionKey()][aiName].buyoutPricesHistoryList;
-			AuctionPrices[auctionKey()][aiKey] = {data=itemData, buyoutPricesHistoryList=buyoutPricesHistory};
-			AuctionPrices[auctionKey()][aiName] = nil; --clear entry using old Item Name key
-		else
-			itemData = getAuctionPriceData(aiKey);
-		end
-
-		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
-
-		-- Sanity check values to ensure they aren't whack. if prices are wack we dont want to skew the mean, but still can add to the median
-		local hasWackPrice = false;
-		if ((nullSafe(minCount) > 10) and (aiMinBid/aiCount > 5*minPrice/minCount)) then
-			hasWackPrice = true;
-		elseif ((nullSafe(bidCount) > 10) and (aiBidAmount/aiCount > 5*bidPrice/bidCount)) then
-			hasWackPrice = true;
-		elseif ((nullSafe(buyCount) > 10) and (aiBuyoutPrice/aiCount > 5*buyPrice/buyCount)) then
-			hasWackPrice = true;
-		end
-
-		if (not hasWackPrice) then 
-			-- update counts and price data for this item
-			seenCount = nullSafe(seenCount) + 1;
-			minCount = nullSafe(minCount) + aiCount;
-			minPrice = nullSafe(minPrice) + aiMinBid;
-			if (aiBidAmount > 0) then 
-				bidCount = nullSafe(bidCount) + aiCount;
-				bidPrice = nullSafe(bidPrice) + aiBidAmount;
-			end
-			if (aiBuyoutPrice > 0) then
-				buyCount = nullSafe(buyCount) + aiCount;
-				buyPrice = nullSafe(buyPrice) + aiBuyoutPrice;
-			end
-		end
-
-		itemData = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
-
-		-- now build the list of buyout prices seen for this auction to use to get the median
-		local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
-		if (AuctionPrices[auctionKey()][aiKey] and table.getn(AuctionPrices[auctionKey()][aiKey].buyoutPricesHistoryList) > 0) then
-			newBuyoutPricesList.setList(AuctionPrices[auctionKey()][aiKey].buyoutPricesHistoryList);
-		end
-		if (nullSafe(aiBuyoutPrice) > 0) then
-			newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
-		end
-		AuctionPrices[auctionKey()][aiKey] = {name=aiName, category=category, playerMade=isPossiblePlayerMadeItem(aiLink), data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
-
-		-- finaly add the auction to the snapshot
-		if (aiOwner == nil) then aiOwner = "unknown"; end
-		local initialTimeSeen = time();
-		AHSnapshot[auctKey][lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), highBidder=aiHighBidder, owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), category=category, dirty=0};
-	else
+	if (AHSnapshot[auctKey][lAuctionSignature]) then 
 		lOldAuctionsCount = lOldAuctionsCount + 1;
 		--this is an auction that was already in the snapshot from a previous scan and is still in the auction house
 		AHSnapshot[auctKey][lAuctionSignature].dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
@@ -1077,7 +1012,89 @@ local function Auctioneer_AuctionEntry_Hook(page, index, category)
 		AHSnapshot[auctKey][lAuctionSignature].timeLeft = nullSafe(aiTimeLeft);   --update the time left
 		AHSnapshot[auctKey][lAuctionSignature].bidamount = nullSafe(aiBidAmount); --update the current bid amount
 		AHSnapshot[auctKey][lAuctionSignature].highBidder = aiHighBidder;         --update the high bidder
+		return
 	end
+
+	-- this auction is not in the snapshot, so add it to the AuctionPrices and AHSnapshot
+	--Auctioneer_ChatPrint("New sig: "..lAuctionSignature);
+
+	lNewAuctionsCount = lNewAuctionsCount + 1;
+
+	-- get the item data from AuctionPrices table
+	local itemData;
+	local buyoutPricesHistory;
+
+	-- correct old SavedVariables-format
+	-- see if they are still using the itemID as the key
+	if AuctionPrices[auctionKey()][aiItemID] then
+		itemData = AuctionPrices[auctionKey()][aiItemID];
+		AuctionPrices[auctionKey()][aiItemID] = nil; --clear entry using old ID key
+	-- else, see if they are still using the item name as the key
+	elseif AuctionPrices[auctionKey()][aiName] then
+		itemData = AuctionPrices[auctionKey()][aiName].data;
+		buyoutPricesHistory = AuctionPrices[auctionKey()][aiName].buyoutPricesHistoryList;
+		AuctionPrices[auctionKey()][aiKey] = {data=itemData, buyoutPricesHistoryList=buyoutPricesHistory};
+		AuctionPrices[auctionKey()][aiName] = nil; --clear entry using old Item Name key
+	else
+		itemData = getAuctionPriceData(aiKey);
+	end
+
+	local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
+
+	-- Sanity check values to ensure they aren't whack. if prices are wack we dont want to skew the mean, but still can add to the median
+	local hasWackPrice = false;
+	if ((nullSafe(minCount) > 10) and (aiMinBid/aiCount > 5*minPrice/minCount)) then
+		hasWackPrice = true;
+	elseif ((nullSafe(bidCount) > 10) and (aiBidAmount/aiCount > 5*bidPrice/bidCount)) then
+		hasWackPrice = true;
+	elseif ((nullSafe(buyCount) > 10) and (aiBuyoutPrice/aiCount > 5*buyPrice/buyCount)) then
+		hasWackPrice = true;
+	end
+
+	if (not hasWackPrice) then 
+		-- update counts and price data for this item
+		seenCount = nullSafe(seenCount) + 1;
+		minCount = nullSafe(minCount) + aiCount;
+		minPrice = nullSafe(minPrice) + aiMinBid;
+		if (aiBidAmount > 0) then 
+			bidCount = nullSafe(bidCount) + aiCount;
+			bidPrice = nullSafe(bidPrice) + aiBidAmount;
+		end
+		if (aiBuyoutPrice > 0) then
+			buyCount = nullSafe(buyCount) + aiCount;
+			buyPrice = nullSafe(buyPrice) + aiBuyoutPrice;
+		end
+	end
+
+	itemData = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
+
+	-- now build the list of buyout prices seen for this auction to use to get the median
+	local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
+	if (AuctionPrices[auctionKey()][aiKey] and table.getn(AuctionPrices[auctionKey()][aiKey].buyoutPricesHistoryList) > 0) then
+		newBuyoutPricesList.setList(AuctionPrices[auctionKey()][aiKey].buyoutPricesHistoryList);
+	end
+	if (nullSafe(aiBuyoutPrice) > 0) then
+		newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
+	end
+	AuctionPrices[auctionKey()][aiKey] = {name=aiName, category=category, playerMade=isPossiblePlayerMadeItem(aiLink), data=itemData, buyoutPricesHistoryList=newBuyoutPricesList.getList()};
+
+	-- finaly add the auction to the snapshot
+	if (aiOwner == nil) then aiOwner = "unknown"; end
+	local initialTimeSeen = time();
+	AHSnapshot[auctKey][lAuctionSignature] = {initialSeenTime=initialTimeSeen, lastSeenTime=initialTimeSeen, itemLink=aiLink, quality=nullSafe(aiQuality), level=nullSafe(aiLevel), bidamount=nullSafe(aiBidAmount), highBidder=aiHighBidder, owner=aiOwner, timeLeft=nullSafe(aiTimeLeft), category=category, dirty=0};
+end
+
+-- this function takes copper and rounds to 5 silver below the the nearest gold if it is less than 15 silver above of an even gold
+-- example: this function changes 1g9s to 95s
+-- example: 1.5g will be unchanged and remain 1.5g
+local function roundDownTo95(copper)
+	local g,s,c = TT_GetGSC(copper);
+
+	if g > 0 and s < 10 then
+		return (copper - ((s + 5) * 100)); -- subtract enough copper to round to 95 silver
+	end
+
+	return copper;
 end
 
 function Auctioneer_SetModelByID(itemID)
@@ -1225,7 +1242,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 							TT_AddLine(AUCT_FRMT_INFO_BUYMEDIAN, median * count, embedded);
 							TT_LineColor(0.4,0.5,0.95);
 						end
-					else -- (count = 1)
+					else -- (count = 0 | 1)
 					   -- OUTPUT: "Averages for this item:"
 						TT_AddLine(AUCT_FRMT_INFO_HEAD_ONE, nil, embedded);
 						TT_LineColor(0.4,0.5,1.0);
@@ -1278,17 +1295,24 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then -- show item's suggested auction price
-				local buyoutPriceForOne = median;
-				if not buyoutPriceForOne then buyoutPriceForOne = avgBuy end
-				if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
-				if (avgMin > buyoutPriceForOne) then avgMin = buyoutPriceForOne / 2 end
+				local hsp = getHighestSellablePriceForOne(itemKey, false, auctionKey());
+				if hsp == 0 and buyCount > 0 then
+					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+				end
+				local discountBidPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT));
+				local countFix = count
+				if countFix == 0 then
+					countFix = 1
+				end
+				local buyPrice = roundDownTo95(nullSafe(hsp) * countFix);
+				local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
 				if (count > 1) then
-					-- OUTPUT: "Suggested price for your [count] stack: [avgMin*count] min/[buyoutPriceForOne*count] BO ([avgBid*count] bid)"
-					TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(buyoutPriceForOne*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 					TT_LineColor(0.5,0.5,0.8);
 				else -- count = 0 | 1
-					-- OUTPUT: "Suggested price: [avgMin] min/[buyoutPriceForOne] BO ([avgBid*count] bid)"
-					TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin), TT_GetTextGSC(buyoutPriceForOne), TT_GetTextGSC(avgBid)), nil, embedded);
+					-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
+					TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 					TT_LineColor(0.5,0.5,0.8);
 				end
 			end
@@ -1338,13 +1362,24 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						TT_LineColor(0.1,0.8,0.5);
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
+						local hsp = getHighestSellablePriceForOne(itemKey, false, also);
+						if hsp == 0 and buyCount > 0 then
+							hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+						end
+						local discountBidPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT));
+						local countFix = count
+						if countFix == 0 then
+							countFix = 1
+						end
+						local buyPrice = roundDownTo95(nullSafe(hsp) * countFix);
+						local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
 						if (count > 1) then
-							-- OUTPUT: "Suggested price for your [count] stack: [avgMin*count] min/[buyoutPriceForOne*count] BO ([avgBid*count] bid)"
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+							-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						else -- count = 0 | 1
-							-- OUTPUT: "Suggested price: [avgMin] min/[buyoutPriceForOne] BO ([avgBid*count] bid)"
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(avgMin*count), TT_GetTextGSC(avgBuy*count), TT_GetTextGSC(avgBid*count)), nil, embedded);
+							-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
+							TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						end
 					end
@@ -1905,19 +1940,6 @@ function Auctioneer_GetItems(str)
 	return itemList;
 end
 
--- this function takes copper and rounds to 5 silver below the the nearest gold if it is less than 15 silver above of an even gold
--- example: this function changes 1g9s to 95s
--- example: 1.5g will be unchanged and remain 1.5g
-local function roundDownTo95(copper)
-	local g,s,c = TT_GetGSC(copper);
-
-	if g > 0 and s < 10 then
-		return (copper - ((s + 5) * 100)); -- subtract enough copper to round to 95 silver
-	end
-
-	return copper;
-end
-
 function Auctioneer_FindItemInBags(findName)
 	for bag = 0, 4, 1 do
 		size = GetContainerNumSlots(bag);
@@ -1939,6 +1961,7 @@ function Auctioneer_OnEvent(event)
 --	p("Event", event);
 	if (event=="NEW_AUCTION_UPDATE") then
 		local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
+
 		if (not name) then
 			Auctioneer_Auctions_Clear()
 			return
@@ -1946,6 +1969,18 @@ function Auctioneer_OnEvent(event)
 
 		local bag, slot, id, rprop, enchant, uniq = Auctioneer_FindItemInBags(name);
 		if (bag == nil) then
+			-- is the item one of your bags?
+			local i
+			for i = 0, 4, 1 do
+				if name == GetBagName(i) then
+					id, rprop, enchant, uniq = breakLink(GetInventoryItemLink("player", ContainerIDToInventoryID(i)))
+					break
+				end
+			end
+		end
+
+		-- still no corresponding item found?
+		if id == nil then
 			Auctioneer_Auctions_Clear()
 			return
 		end
@@ -1955,13 +1990,13 @@ function Auctioneer_OnEvent(event)
 		local itemData = getAuctionPriceData(itemKey, nil, name, id);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = getAuctionPrices(itemData);
 
-        -- find the current lowest buyout for 1 of these in the current snapshot
-        local currentLowestBuyout = findLowestAuctionForItem(itemKey)
-        if currentLowestBuyout then
-		    _,_,_,_,lowStackCount,_,currentLowestBuyout = getItemSignature(currentLowestBuyout);
-            currentLowestBuyout = currentLowestBuyout / lowStackCount;
-        end 
-        
+		-- find the current lowest buyout for 1 of these in the current snapshot
+		local currentLowestBuyout = findLowestAuctionForItem(itemKey)
+		if currentLowestBuyout then
+			_,_,_,_,lowStackCount,_,currentLowestBuyout = getItemSignature(currentLowestBuyout);
+			currentLowestBuyout = currentLowestBuyout / lowStackCount;
+		end
+
 		local historicalMedian, historicalMedCount = getItemHistoricalMedianBuyout(itemKey, name);
 		local snapshotMedian, snapshotMedCount = getItemSnapshotMedianBuyout(itemKey);
 
@@ -1975,17 +2010,21 @@ function Auctioneer_OnEvent(event)
 		end
 		local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
 
-		local hsp, hspCount, mktPrice, warn = getHighestSellablePriceForOne(itemKey, false, getItemCategory(itemKey));
+		-- calculates the suggested prices
+		local hsp, hspCount, mktPrice, warn = getHighestSellablePriceForOne(itemKey, false, auctionKey());
 		if hsp == 0 and buyCount > 0 then
 			hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 		end
-
 		local discountBidPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT));
-		local buyPrice = roundDownTo95(nullSafe(hsp) * count);
+		local countFix = count
+		if countFix == 0 then
+			countFix = 1
+		end
+		local buyPrice = roundDownTo95(nullSafe(hsp) * countFix);
 		local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
 
 		if (Auctioneer_GetFilter(AUCT_CMD_AUTOFILL)) then
-			Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_MKTPRICE, nullSafe(mktPrice)*count);
+			Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_MKTPRICE, nullSafe(mktPrice)*countFix);
 			Auctioneer_Auctions_SetLine(5, AUCT_FRMT_AUCTINFO_ORIG, blizPrice);
 			Auctioneer_Auctions_SetWarn(warn);
 			MoneyInputFrame_SetCopper(StartPrice, bidPrice);

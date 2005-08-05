@@ -1,6 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<bugfix id="bugfix3" fixedby="Luke1410" date="2005-07-29 13:40">
+		<optimization id="optimization2" by="Luke1410" type="small" timestamp="2005-08-04 21:26">
+			<file name="auctioneer.lua">
+				<change function="getHighestSellablePriceForOne" />
+				<change function="doHSP" />
+				<change function="Auctioneer_OnEvent" />
+				<change function="brokerFilter" />
+				<change function="bidBrokerFilter" />
+				<change function="percentLessFilter" />
+				<change function="profitComparisonSort" />
+				<change function="doBroker" />
+				<change function="doBidBroker" />
+				<change function="doPercentLess" />
+			</file>
+			<developer>
+				removed the category-parameter from getHighestSellablePriceForOne, which is no longer needed due to the replacement of the getMarketPriceFunction
+				Changed the functioncalls, to match the new prototype
+				Also fixed some (hopefully) last whitespaces
+			</developer>
+		</optimization>
+		<optimization id="optimization1" by="Luke1410" type="small" timestamp="2005-07-14 22:05">
+			<file name="auctioneer.lua">
+				<change function="nextIndex" />
+			</file>
+			<developer>
+				removed the if-construct and the local variable by replacing the for-breaks with direct returns
+			</developer>
+		</optimization>
+		<bugfix id="bugfix5" codedby="Luke1410" timestamp="2005-08-05 00:23">
+			<file name="auctioneer.lua">
+				<change function="Auctioneer_OnEvent" />
+			</file>
+			<developer>
+				added a check after Auctioneer_FindItemInBags(), to see, if the item placed into the AH is an empty bag, before auctioneer would show no suggested price in the AH for empty bags taken from the player's bagslots
+			</developer>
+			<public>
+				Auctioneer will now display suggested prices for empty bags taken from the player's directly from the player's bagbar.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix4" codedby="Luke1410" timestamp="2005-08-04 22:24" sourceforgeid="1236446">
+			<file name="auctioneer.lua">
+				<add function="getMarketPrice" />
+				<change function="getHighestSellablePriceForOne" />
+				<change function="Auctioneer_NewTooltip" />
+			</file>
+			<file name="locales/deDE.utf8">
+				<change constant="AUCT_FRMT_INFO_SGST" />
+				<change constant="AUCT_FRMT_INFO_SGSTSTX" />
+			</file>
+			<file name="locales/esES.utf8">
+				<change constant="AUCT_FRMT_INFO_SGST" />
+				<change constant="AUCT_FRMT_INFO_SGSTSTX" />
+			</file>
+			<file name="locales/enEN.utf8">
+				<change constant="AUCT_FRMT_INFO_SGST" />
+				<change constant="AUCT_FRMT_INFO_SGSTSTX" />
+			</file>
+			<developer>
+				removed the code which calculates the marketprice from getHighestSellablePriceForOne and added it to a seperate function: getMarketPrice
+				added the realm-parameter to getHighestSellablePriceForOne, which is used by getMarketPrice and needed for Auctioneer_NewTooltip (suggested price for alternative realms)
+				replaced the calculations of the suggested prices in Auctioneer_NewTooltip by the calculation done in Auctioneer_OnEvent
+				Changed the tooltipoutput for suggested prices and removed the bid-value (it doesn't make any sense here)
+			</developer>
+			<public>
+				The suggested price shown in the tooltip differed from the one which was displayed when putting a new item in the AH.
+				Also removed the (xxx bidded) text in the suggested price-line, as it had no purpose at all.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix3" codedby="Luke1410" timestamp="2005-07-29 13:40">
 			<file name="itemdata.xml">
 			</file>
 			<public>
@@ -8,7 +76,7 @@
 				fixed 1 itemclass: Fish Oil is nolonger marked as a potion
 			</public>
 		</bugfix>
-		<bugfix id="bugfix2" fixedby="Luke1410" date="2005-07-27 22:04">
+		<bugfix id="bugfix2" fixedby="Luke1410" timestamp="2005-07-27 22:04">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_FRMT_AUCTINFO_SNAP" />
 				<change constant="AUCT_TEXT_NONE" />
@@ -18,7 +86,7 @@
 				Fixed a wrong translated string.
 			</public>
 		</bugfix>
-		<bugfix id="bugfix1" submitedby="bizarrojack" fixedby="Luke1410" date="2005-07-27 19:49">
+		<bugfix id="bugfix1" submitedby="bizarrojack" codedby="Luke1410" timestamp="2005-07-27 19:49">
 			<file name="locales/enUS.utf8">
 				<change constant="AUCT_FRMT_INFO_MIN_ONE" />
 				<change constant="AUCT_FRMT_INFO_MIN_MULTI" />
@@ -42,8 +110,8 @@
 	</nextrelease>
 	<release version="3.0.10" date="">
 <!--
-      Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
-		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" date="" replacebugfix="bugfix1" text="replace"></bugfix>
+		Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
+		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" timestamp="" replacebugfix="bugfix1" text="replace"></bugfix>
 		<added id="addition1" by="Alabana" text="concatenate"></added>
 		<removed id="remove1"></removed>
 -->
