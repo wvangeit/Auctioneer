@@ -12,6 +12,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AHScanning.lua"/>
 	<Script file="BalancedList.lua"/>
 	<Script file="Auctioneer.lua"/>
+	<Script file="converter.lua"/>
 	<Frame name="Auctioneer" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>

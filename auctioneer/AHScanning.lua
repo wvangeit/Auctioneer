@@ -79,7 +79,7 @@ function Auctioneer_ScanAuction()
 
 	if( numBatchAuctions > 0 ) then
 		for auctionid = 1, numBatchAuctions do
-			Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lMajorAuctionCategories[lCurrentCategoryIndex]);
+			Auctioneer_Event_ScanAuction(lCurrentAuctionPage, auctionid, lCurrentCategoryIndex);
 		end
 	end
 

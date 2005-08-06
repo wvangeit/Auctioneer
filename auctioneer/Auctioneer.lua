@@ -59,7 +59,17 @@ local MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
 local MIN_BID_PERCENT = 10;
 
 -- categories that the brokers and HSP look at the bid data for
-local BID_BASED_CATEGORIES = {Weapon=1, Armor=1, Recipe=1, Miscellaneous=1};
+--  1 = weapon
+--  2 = armor
+--  3 = container
+--  4 = dissipatable
+--  5 = tradeskillitems
+--  6 = projectile
+--  7 = quiver
+--  8 = recipe
+--  9 = reagence
+-- 10 = miscellaneous
+local BID_BASED_CATEGORIES = {[1]=true, [2]=true, [8]=true, [10]=true}
 
 
 --[[ SavedVariables --]]
@@ -352,14 +362,19 @@ local function getItemSignature(sigData)
 end
 Auctioneer_GetItemSignature = getItemSignature;
 
--- returns the category i.e. "Weapon", "Armor" for an item
+-- returns the category i.e. category number 1..10 for an item or 0, if there is no recorded category
 local function getItemCategory(itemKey)
-	local category;
 	local auctionItem = getAuctionPriceItem(itemKey);
-	if auctionItem then 
-		category = auctionItem.category;
+
+	if not auctionItem then
+	   return 0
 	end
-	return category;
+	
+	if not auctionItem.category then
+		return 0
+	end
+
+	return auctionItem.category;
 end
 Auctioneer_GetItemCategory = getItemCategory;
 
@@ -832,23 +847,26 @@ end
 -- returns the best market price - 0, if no market price could be calculated
 local function getMarketPrice(itemKey, auctKey)
 	-- make sure to call this function with valid parameters! No check is being performed!
+	local buyoutMedian = nullSafe(getUsableMedian(itemKey))
+	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = getMeans(itemKey)
+	local commonBuyout = 0
 
-	if BID_BASED_CATEGORIES[nilSafeString(getItemCategory(itemKey))] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
+	-- assign the best common buyout
+	if buyoutMedian > 0 then
+		commonBuyout = buyoutMedian
+	elseif meanCount and meanCount > 0 then
+		commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
+	end
+
+	if BID_BASED_CATEGORIES[getItemCategory(itemKey)] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
 		return getBidBasedSellablePrice(itemKey)
 	end
 
-	local buyoutMedian = nullSafe(getUsableMedian(itemKey))
 	if buyoutMedian > 0 then
 		return buyoutMedian
 	end
-
-	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = getMeans(itemKey)
-	meanCount = nullSafe(meanCount)
-	if meanCount > 0 then
-		return avgBuy -- if a usable median does not exist, use the average buyout instead
-	end
-
-	return 0
+	
+	return commonBuyout
 end
 
 function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
@@ -960,10 +978,11 @@ end
 -- we save the aution item to our tables, increment our counts etc
 local function Auctioneer_AuctionEntry_Hook(page, index, category)
 	local auctionDoneKey;
+	local strCat = {GetAuctionItemClasses()}
 	if (not page or not index or not category) then
 		return;
 	else
-		auctionDoneKey = ""..category..page..index;
+		auctionDoneKey = ""..strCat[category]..page..index;
 	end
 	if (not Auction_DoneItems[auctionDoneKey]) then
 		Auction_DoneItems[auctionDoneKey] = true;
@@ -2055,12 +2074,11 @@ function Auctioneer_OnEvent(event)
 		Auctioneer_ScanAuction();
 
 	elseif (event == "VARIABLES_LOADED") then
+		Auctioneer_ConvertData()
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 		Auctioneer_BuildBaseData();
 	end
 end
-
-
 
 function dump(...)
 	local out = "";
