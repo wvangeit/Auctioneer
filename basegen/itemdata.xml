@@ -122,6 +122,9 @@
 	<change id="18045">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="9260">
+		<add type="type" value="AUCT_TYPE_ALCHEM" />
+	</change>
 <!-- example
 	<add id="" />
 	<change id="">
