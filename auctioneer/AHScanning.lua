@@ -104,9 +104,6 @@ function Auctioneer_StartAuctionScan()
 
 	-- first make sure that we have at least one category to scan
 	lCurrentCategoryIndex = 0;
-	-- TODO: decide if this optimization will work correctly: - has to check, if lCurrentCategoryIndex works well in other functions
-	-- lCurrentCategoryIndex = nextIndex()
-	--if not lCurrentCategoryIndex then
 	if not nextIndex() then
 		Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NOCAT);
 		return;
@@ -114,7 +111,6 @@ function Auctioneer_StartAuctionScan()
 
 	-- Start with the first page
 	lCurrentAuctionPage = nil;
-	-- TODO: erase next line, if optimization works
 	lCurrentCategoryIndex = nextIndex();
 	lScanInProgress = true;
 
