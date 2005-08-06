@@ -28,6 +28,57 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix8" codedby="Luke1410" sourceforgeid="1253054" submitedby="lovepump" timestamp="2005-08-06 19:27">
+			<file name="itemdata.xml" />
+			<public>
+				Black Vitriol is now listed as an item used for alchemy
+			</public>
+		</bugfix>
+		<bugfix id="bugfix7" codedby="Luke1410" timestamp="2005-08-06 18:55">
+			<file name="auctioneer.lua">
+				<change constant="BID_BASED_CATEGORIES" />
+				<change function="getItemCategory" />
+				<change function="Auctioneer_AuctionEntry_Hook" />
+			</file>
+			<file name="converter.lua">
+				<added function="GetAuctionPricesVersion" />
+				<added function="SetAuctionPricesVersion" />
+				<added function="GetAHSnapshotVersion" />
+				<added function="SetAHSnapshotVersion" />
+				<added function="ConvertCatStringToCatInt" />
+				<added function="UpgradeAuctionPricesTo_1_0" />
+				<added function="UpgradeAuctionPrices" />
+				<added function="UpgradeAHSnapshotTo_1_0" />
+				<added function="UpgradeAHSnapshot" />
+				<added function="Auctioneer_ConvertData" />
+			</file>
+			<file name="AHScanning">
+				<change function="Auctioneer_ScanAuction" />
+			</file>
+			<file name="Auctioneer.xml">
+				<added element="Script file=&quot;converter.lua&quot;" />
+			</file>
+			<developer>
+				BID_BASED_CATEGORIES used the english category-names as it's keyvalue and compared it to the strings returned by GetAuctionItemClasses. That only worked fine for the English client. For others (like the German/French client) the comparisons always returned false, even if they should be true, as the GetAuctionItemClasses returns the localized strings (Armor = R&uuml;stung, Weapon = Waffen, etc.).
+				A converter has also been added which is called once when the VARIABLES LOADED event is raised to convert old categorydata to the new format. This converter can easily be adjusted to new datachanges and takes very little time if the data has already been converted.
+				All corresponding calls have been changed. The stringvalue still used for auctionDoneKey in GetAuctionItemClasses.
+				The prototype of Auctioneer_AuctionEntry_Hook has also be changed. The last value should now be the integer representative of the category (was the string value).
+				Also did some tiny code optimizations in some of the abovementioned functions.
+			</developer>
+			<public>
+				If you used another clientversion than the english one, auctioneer didn't always use bidbased prices, when it should have.
+				As a sideeffect, that bugfix also reduced the memoryusage a bit.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix6" codedby="Luke1410" replacebugfix="bugfix4" sourceforgeid="1253325" text="concatenate" timestamp="2005-08-06 18:50">
+			<file name="auctioneer.lua">
+				<change function="getMarketPrice" />
+			</file>
+			<developer>
+				removed a nil-comparision error, introduced in bugfix4, which was caused by not calculating the commonBuyout value
+			</developer>
+		</bugfix>
+		</bugfix>
 		<bugfix id="bugfix5" codedby="Luke1410" timestamp="2005-08-05 00:23">
 			<file name="auctioneer.lua">
 				<change function="Auctioneer_OnEvent" />
@@ -36,7 +87,7 @@
 				added a check after Auctioneer_FindItemInBags(), to see, if the item placed into the AH is an empty bag, before auctioneer would show no suggested price in the AH for empty bags taken from the player's bagslots
 			</developer>
 			<public>
-				Auctioneer will now display suggested prices for empty bags taken from the player's directly from the player's bagbar.
+				Auctioneer will now display suggested prices for empty bags taken directly from the player's bagbar.
 			</public>
 		</bugfix>
 		<bugfix id="bugfix4" codedby="Luke1410" timestamp="2005-08-04 22:24" sourceforgeid="1236446">
@@ -69,8 +120,7 @@
 			</public>
 		</bugfix>
 		<bugfix id="bugfix3" codedby="Luke1410" timestamp="2005-07-29 13:40">
-			<file name="itemdata.xml">
-			</file>
+			<file name="itemdata.xml" />
 			<public>
 				added 40 itemclasses - especially food
 				fixed 1 itemclass: Fish Oil is nolonger marked as a potion
