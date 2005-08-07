@@ -28,6 +28,14 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix10" codedby="Luke1410" timestamp="2005-08-07 22:00">
+			<file name="auctioneer.lua">
+				<change function="Auctioneer_NewTooltip" />
+			</file>
+			<public>
+				The &quot;&gt;&gt;&quot; was missing before the suggested price line in the tooltip for the alternate realm/faction.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix9" codedby="Luke1410" replacebugfix="bugfix7" sourceforgeid="1253331" sbumitby="araband" text="concatenate" timestamp="2005-08-07 21:47">
 			<file name="auctioneer.lua">
 				<change function="getMarketPrice" />

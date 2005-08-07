@@ -1407,11 +1407,11 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
 						if (count > 1) then
 							-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_SGSTSTX, count, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						else -- count = 0 | 1
 							-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-							TT_AddLine(string.format(AUCT_FRMT_INFO_SGST, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
+							TT_AddLine(string.format(">> "..AUCT_FRMT_INFO_SGST, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
 							TT_LineColor(0.5,0.5,0.8);
 						end
 					end
