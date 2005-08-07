@@ -337,8 +337,8 @@ end
 Auctioneer_GetAuctionPriceData = getAuctionPriceData;
 
 -- returns the auction buyout history for this item
-function getAuctionBuyoutHistory(itemKey, name)
-	local auctionItem = getAuctionPriceItem(itemKey, nil, name);
+function getAuctionBuyoutHistory(itemKey, name, realm)
+	local auctionItem = getAuctionPriceItem(itemKey, realm, name);
 	if (auctionItem == nil) then 
 		buyoutHistory = {};
 	else
@@ -418,7 +418,7 @@ Aucioneer_GetMeans = getMeans;
 -- returns the current snapshot median for an item
 local function getItemSnapshotMedianBuyout(itemKey)
 	local buyoutPrices = {};
-	local auctKey = sanifyAHSnapshot();
+	local auctKey = sanifyAHSnapshot()
 	if AHSnapshotItemPrices[auctKey][itemKey] then 
 		buyoutPrices = AHSnapshotItemPrices[auctKey][itemKey].buyoutPrices;
 	else
@@ -429,8 +429,11 @@ local function getItemSnapshotMedianBuyout(itemKey)
 end
 Auctioneer_GetItemSnapshotMedianBuyout = getItemSnapshotMedianBuyout;
 
-local function getItemHistoricalMedianBuyout(itemKey, name)
-	local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name);
+local function getItemHistoricalMedianBuyout(itemKey, name, realm)
+	if not realm then
+		realm = auctionKey()
+	end
+	local buyoutHistoryTable = getAuctionBuyoutHistory(itemKey, name, realm);
 	local historyMedian = getMedian(buyoutHistoryTable);
 	local historySeenCount = table.getn(buyoutHistoryTable);
 	return historyMedian or 0, historySeenCount or 0;
@@ -439,25 +442,35 @@ Auctioneer_GetItemHistoricalMedianBuyout = getItemHistoricalMedianBuyout;
 
 -- this function returns the most accurate median possible, 
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
-local function getUsableMedian(itemKey, name)
+local function getUsableMedian(itemKey, name, realm)
 	local usableMedian = nil;
 	local count = nil;
+	if not realm then
+		realm = auctionKey();
+	end
 
 	--get snapshot median
-	local snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemKey);
+	local snapshotMedian, snapshotCount
+	-- only use Snapshot, when calculating current realm's marketPrice
+	-- won't make any sense to use alternate realm's snapshotdata as that data might me out of date
+	if realm == auctionKey() then
+		snapshotMedian, snapshotCount = getItemSnapshotMedianBuyout(itemKey)
+	else
+		snapshotMedian = nil
+	end
 
 	--get history median
-	local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name);
+	local historyMedian, historySeenCount = getItemHistoricalMedianBuyout(itemKey, name, realm);
 
 	if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian * 1.20)) then
 		if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
 			usableMedian = historyMedian;
 			count = historySeenCount;
 		end
-		elseif snapshotMedian then
-			usableMedian = snapshotMedian;
-			count = snapshotCount;
-		end
+	elseif snapshotMedian then
+		usableMedian = snapshotMedian;
+		count = snapshotCount;
+	end
 
 	return usableMedian, count;
 end
@@ -827,13 +840,13 @@ function doMedian(link)
 	end
 end
 
-local function getBidBasedSellablePrice(itemKey)
-	local itemData = getAuctionPriceData(itemKey);
-	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = getMeans(itemKey);
+local function getBidBasedSellablePrice(itemKey, realm)
+	local itemData = getAuctionPriceData(itemKey, realm);
+	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = getMeans(itemKey, realm);
 	local bidBasedSellPrice = 0;
 	local typicalBuyout = 0;
 
-	local medianBuyout = getUsableMedian(itemKey);
+	local medianBuyout = getUsableMedian(itemKey, nil, realm);
 	if medianBuyout then
 		typicalBuyout = math.min(avgBuy, medianBuyout)  ;
 	else
@@ -845,10 +858,10 @@ local function getBidBasedSellablePrice(itemKey)
 end
 
 -- returns the best market price - 0, if no market price could be calculated
-local function getMarketPrice(itemKey, auctKey)
+local function getMarketPrice(itemKey, realm)
 	-- make sure to call this function with valid parameters! No check is being performed!
-	local buyoutMedian = nullSafe(getUsableMedian(itemKey))
-	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = getMeans(itemKey)
+	local buyoutMedian = nullSafe(getUsableMedian(itemKey, realm))
+	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = getMeans(itemKey, realm)
 	local commonBuyout = 0
 
 	-- assign the best common buyout
@@ -859,20 +872,19 @@ local function getMarketPrice(itemKey, auctKey)
 	end
 
 	if BID_BASED_CATEGORIES[getItemCategory(itemKey)] and not (isItemPlayerMade(itemKey) and commonBuyout < 100000) then
-		return getBidBasedSellablePrice(itemKey)
+		return getBidBasedSellablePrice(itemKey, realm) -- returns bibasedSellablePrice for bidbaseditems, playermade items or if the buyoutprice is not present or less than 10g
 	end
 
-	if buyoutMedian > 0 then
-		return buyoutMedian
-	end
-	
-	return commonBuyout
+	return commonBuyout -- returns buyoutMedian, if present - returns avgBuy otherwise, if meanCount > 0 - returns 0 otherwise
 end
 
-function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
+local function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
+	-- WARNING! if useCachedPrices = true, realm SHOULD ALWAYS BE auctionKey()!!!! Otherwise the result is undefined!
+	-- No check is being performed atm, to save some performance
 	local highestSellablePrice = 0;
 	local warn = AUCT_FRMT_WARN_NODATA;
 	local marketPrice = getMarketPrice(itemKey, realm);
+	local playerRealm = auctionKey()
 
 	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
 	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT));
@@ -880,7 +892,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT));
 	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
 
-	local buyoutMedian, count = getUsableMedian(itemKey);
+	local buyoutMedian, count = getUsableMedian(itemKey, realm);
 	local id = breakItemKey(itemKey);
 
 	-- get the lowest auction for this item
@@ -889,7 +901,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 	local lowestAuctionCount, lowestAuctionBuyout;
 	if useCachedPrices then
 		currentLowestBuyout = getLowestPriceQuick(itemKey);
-	else
+	elseif realm == playerRealm then
 		lowestAuctionSignature = findLowestAuctionForItem(itemKey);
 		if lowestAuctionSignature then
 			_,_,_, _, lowestAuctionCount, _, lowestAuctionBuyout, _ = getItemSignature(lowestAuctionSignature);
@@ -899,10 +911,10 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 	end
 
 	if marketPrice > 0 then
+		-- Note: urentLowestBuyout is nil, incase the realm is not the current player's realm
 		if currentLowestBuyout and currentLowestBuyout > 0 then
 			lowestBuyoutPriceAllowed = subtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
-			local auctKey = sanifyAHSnapshot();
-			if lowestAuctionSignature and AHSnapshot[auctKey][lowestAuctionSignature].owner == UnitName("player") then
+			if lowestAuctionSignature and AHSnapshot[playerRealm][lowestAuctionSignature].owner == UnitName("player") then
 				highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
 				warn = AUCT_FRMT_WARN_MYPRICE;
 			elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) then
@@ -922,6 +934,7 @@ function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 			warn = AUCT_FRMT_WARN_NOCOMP;
 		end
 	else -- no market
+		-- Note: urentLowestBuyout is nil, incase the realm is not the current player's realm
 		if currentLowestBuyout and currentLowestBuyout > 0 then
 			-- set highest price to "Discount low"
 --~ p("Discount low case 2");

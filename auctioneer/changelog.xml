@@ -28,6 +28,20 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix9" codedby="Luke1410" replacebugfix="bugfix7" sourceforgeid="1253331" sbumitby="araband" text="concatenate" timestamp="2005-08-07 21:47">
+			<file name="auctioneer.lua">
+				<change function="getMarketPrice" />
+				<change function="getItemHistoricalMedianBuyout" />
+				<change function="getAuctionBuyoutHistory" />
+				<change function="getUsableMedian" />
+				<change function="getBidBasedSellablePrice" />
+				<change function="getHighestSellablePriceForOne" />
+			</file>
+			<developer>
+				Missed to change the functions called in getHighestSellablePriceForOne and getMarketPrice to use alternate realms/factions.
+				Where needed, I've added a new optional parameter to the functions which allows to work with data from other realms/factions.
+			</developer>
+		</bugfix>
 		<bugfix id="bugfix8" codedby="Luke1410" sourceforgeid="1253054" submitedby="lovepump" timestamp="2005-08-06 19:27">
 			<file name="itemdata.xml" />
 			<public>
