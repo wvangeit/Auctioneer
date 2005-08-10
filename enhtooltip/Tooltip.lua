@@ -496,6 +496,10 @@ end
 TT_QualityFromLink = qualityFromLink;
 
 local function fakeLink(item, quality, name)
+	-- make this function nilSafe, as it's a global one and might be used by external addons
+	if not item then
+		return nil
+	end
 	if (quality == nil) then quality = -1; end
 	if (name == nil) then name = "unknown"; end
 	local color = "ffffff";

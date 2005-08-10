@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<bugfix id="bugfix1" codedby="Luke1410" sourceforgeid="1238391" timestamp="2005-08-05 01:10"
+		<bugfix id="bugfix2" codedby="Luke1410" sourceforgeid="1254284" sbumitby="Derkyle" timestamp="2005-09-05 21:40">
+			<file name="Tooltip.lua">
+				<change function="fakeLink" />
+			</file>
+			<developer>
+				The reported error had been caused by a bug in ItemsMatrix. IM's function: ItemsMatrix_GetHyperlink returned nil because of an error which caused a nil error in TT_IMInv_ItemButton_OnEnter.
+				As fakeLink is a global function (TT_FakeLink), I changed that function to be nilsafe, so it won't cause any more errormessages for users, even if external addons cause trouble.
+			</developer>
+			<public>
+				Fixed the "attempt to call global `ItemsMatrix_GetHyperlink' (a nil value)"-bug (you should upgrade ItemsMatrix to version 15 or greater, too!)
+			</public>
+		</bugfix>
+		<bugfix id="bugfix1" codedby="Luke1410" sourceforgeid="1238391" timestamp="2005-08-05 01:10">
 			<file name="Tooltip.lua">
 				<change function="TT_Show" />
 			</file>
