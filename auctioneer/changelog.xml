@@ -28,6 +28,31 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix12" codedby="Luke1410" sourceforgeid="1234501" timestamp="2005-08-09 23:49">
+			<file name="auctioneer.lua">
+				<function="Auctioneer_NewTooltip" />
+			</file>
+			<developer>
+				Removed the data reference from the function, as that global no longer exists and the value was only used to calculate the sell/buy prices for items with an itemID <= 0.
+				For those items there is currently no sell/buy value calculated (as I have no idea, what an itemId <= 0 could mean)
+				Also removed the now useless local money variable and replaced the initialization of sell/buy.
+			</developer>
+			<public>
+				fixed the "attempt to index global `data' (a string value)" bug
+			</public>
+		</bugfix>
+		<bugfix id="bugfix11" codedby="Luke1410" sourceforgeid="1249072" timestamp="2005-08-09 23:24">
+			<file name="auctioneer.lua">
+				<function="Auctioneer_ProcessLink" />
+			</file>
+			<developer>
+				Major typo fixed in that function. Instead of xxxxx_ProcessLinks, xxxxx_ProcessLink was tried to call which never existed and therefore the integration into IM/LL never worked.
+				Also changed the parameters to match the latest versions of both addons.
+			</developer>
+			<public>
+				Fixed incompatibilitybug with latest versions of ItemsMatrix and Lootlink
+			</public>
+		</bugfix>
 		<bugfix id="bugfix10" codedby="Luke1410" timestamp="2005-08-07 22:00">
 			<file name="auctioneer.lua">
 				<change function="Auctioneer_NewTooltip" />
@@ -36,7 +61,7 @@
 				The &quot;&gt;&gt;&quot; was missing before the suggested price line in the tooltip for the alternate realm/faction.
 			</public>
 		</bugfix>
-		<bugfix id="bugfix9" codedby="Luke1410" replacebugfix="bugfix7" sourceforgeid="1253331" sbumitby="araband" text="concatenate" timestamp="2005-08-07 21:47">
+		<bugfix id="bugfix9" codedby="Luke1410" replacebugfix="bugfix7" sourceforgeid="1253331" text="concatenate" timestamp="2005-08-07 21:47">
 			<file name="auctioneer.lua">
 				<change function="getMarketPrice" />
 				<change function="getItemHistoricalMedianBuyout" />
