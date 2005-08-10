@@ -983,8 +983,18 @@ end
 
 -- Hook into this function if you want notification when we find a link.
 function Auctioneer_ProcessLink(link)
-	if (ItemsMatrix_ProcessLink ~= nil) then ItemsMatrix_ProcessLink("", link, 1); end
-	if (LootLink_ProcessLink ~= nil) then LootLink_ProcessLink("", link, 1); end
+	if (ItemsMatrix_ProcessLinks ~= nil) then
+		ItemsMatrix_ProcessLinks(	link, -- itemlink
+											nil,  -- not used atm
+											nil,  -- vendorprice - TODO: not calculatable in AH?
+											nil	-- event - TODO: donno, maybe only for chatevents?
+										)
+	end
+	if (LootLink_ProcessLinks ~= nil) then
+		LootLink_ProcessLinks(	link, -- itemlink
+										true  -- TODO: uncertain? - ah is a trustable source?
+									);
+	end
 end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
@@ -1163,7 +1173,7 @@ end
 
 function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	Auctioneer_OldTooltip(frame, name, link, quality, count);
-
+	
 	if (not link) then p("No link was passed to the client");  return; end
 
 	-- nothing to do, if auctioneer is disabled
