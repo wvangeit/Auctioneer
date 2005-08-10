@@ -123,8 +123,15 @@
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="9260">
-		<add type="type" value="AUCT_TYPE_ALCHEM" />
+		<add type="usage" value="AUCT_TYPE_ALCHEM" />
 	</change>
+	<change id="12238">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6303">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<add id="19119" sellvalue="5803" />
 <!-- example
 	<add id="" />
 	<change id="">
