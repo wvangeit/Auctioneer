@@ -1203,7 +1203,6 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		TT_LineQuality(quality);
 	end
 
-	local money = nil;
 	local itemInfo = nil;
 
 	-- show item info
@@ -1432,21 +1431,11 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				end
 			end
 		end
-
-		if ((data ~= nil) and (data.price ~= nil)) then
-			money = data.price;
-		else
-			money = 0;
-		end
 	end -- if (itemID > 0)
-	if (money == nil) then
-		money = 0;
-	end
-
 	local sellNote = "";
 	local buyNote = "";
-	local sell = money;
-	local buy = sell * 4;
+	local sell = 0;
+	local buy = 0;
 	local quant = 1;
 	local stacks = 1;
 	local class = "";
@@ -1461,10 +1450,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			buyNote = "*";
 		end
 		buy = nullSafe(itemInfo.b) / quant;
-		if ((not sell) or (sell == "") or (sell <= 0))  then
-			sellNote = "*"
-			sell = nullSafe(itemInfo.s);
-		end;
+		sellNote = "*"
+		sell = nullSafe(itemInfo.s);
 		if (itemInfo.c) then
 			class = itemInfo.c;
 		end
