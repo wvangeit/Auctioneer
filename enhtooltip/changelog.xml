@@ -1,7 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<bugfix id="bugfix2" codedby="Luke1410" sourceforgeid="1254284" sbumitby="Derkyle" timestamp="2005-09-05 21:40">
+		<bugfix id="bugfix3" codedby="Luke1410" sourceforgeid="1240137" submitby="pandarus" timestamp="2005-08-10 20:15">
+			<file name="Tooltip.lua">
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				The WoW parameters of the function "ChatFrame_OnHyperlinkShow" was changed in WoW 1.6.0.
+			</developer>
+			<public>
+				The rightclickmenu on characternames in the chatmenu works again. Thx to pandarus for providing the patch.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix2" codedby="Luke1410" sourceforgeid="1254284" sbumitby="Derkyle" timestamp="2005-08-09 21:40">
 			<file name="Tooltip.lua">
 				<change function="fakeLink" />
 			</file>

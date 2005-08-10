@@ -552,20 +552,20 @@ function TT_ItemPopup(name, link, quality, count, price)
 	-- Empty function; hook here if you want to maybe display a popup menu
 end
 
-function TT_Chat_OnHyperlinkShow(link, button)
-	Orig_Chat_OnHyperlinkShow(link, button);
-	
+function TT_Chat_OnHyperlinkShow(name, link, button)
+	Orig_Chat_OnHyperlinkShow(name, link, button);
+
 	if (ItemRefTooltip:IsVisible()) then
-		local name = ItemRefTooltipTextLeft1:GetText();
-		if (name and TT_ChatCurrentItem ~= name) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
-			TT_ChatCurrentItem = name;
+		local itemName = ItemRefTooltipTextLeft1:GetText();
+		if (itemName and TT_ChatCurrentItem ~= itemName) then
+			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
+			TT_ChatCurrentItem = itemName;
 			
 			if (button == "RightButton") then
-				TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1, 0, true);
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
 			else
 				TT_Clear();
-				TT_TooltipCall(ItemRefTooltip, name, fabricatedLink, -1, 1, 0);
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
 				TT_Show(ItemRefTooltip);
 			end
 		end
