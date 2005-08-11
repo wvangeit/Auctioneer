@@ -881,17 +881,18 @@ end
 function Auctioneer_GetHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
 	-- make sure that if useCachedPrices is set to true, realm is the current one - otherwise it won't make any sense and the result could be undefined.
 	-- check added, as it's a global function and should not cause any problems even when called with invalid parameters
-	if (not itemKey) or                                     -- make itemKey a required parameter
-		 (not useCachedPrices) or                            -- make useCachedPrices a required parameter
-		 (not realm) or                                      -- make realm a required parameter
-		 (useCachedPrices and realm ~= auctionKey()) then    -- using cachedPrices with alternative realms is not supported atm
+	local playerRealm = auctionKey()
+	
+	if (itemKey == nil) or                                 -- make itemKey a required parameter
+		 (useCachedPrices == nil) or                        -- make useCachedPrices a required parameter
+		 (realm == nil) or                                  -- make realm a required parameter
+		 (useCachedPrices and realm ~= playerRealm) then    -- using cachedPrices with alternative realms is not supported atm
 		return nil
 	end
 
 	local highestSellablePrice = 0;
 	local warn = AUCT_FRMT_WARN_NODATA;
 	local marketPrice = getMarketPrice(itemKey, realm);
-	local playerRealm = auctionKey()
 
 	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
 	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT));

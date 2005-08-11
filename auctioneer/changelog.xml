@@ -28,6 +28,15 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix14" codedby="Luke1410" replacebugfix="bugfix13" text="concatenate" timestamp="2005-08-12 09:51">
+			<file name="auctioneer.lua">
+				<function="Auctioneer_GetHighestSellablePriceForOne" />
+			</file>
+			<developer>
+				The parametervalidation was bugged. Instead of only checking for nil values, it also checked if useCachedPrices was true, so the function always returned nil, if it shouldn't work with CachedPrices.
+				Also changed the code to only call auctionKey() once.
+			</developer>
+		</bugfix>
 		<bugfix id="bugfix13" codedby="Luke1410" replacebugfix="bugfix7" text="concatenate" timestamp="2005-08-11 23:41">
 			<file name="auctioneer.lua">
 				<function="Auctioneer_GetHighestSellablePriceForOne" />
