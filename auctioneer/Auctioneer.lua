@@ -529,7 +529,7 @@ local function brokerFilter(minProfit, signature)
 	local itemKey = id..":"..rprop..":"..enchant;
 
 	if getUsableMedian(itemKey) then -- we have a useable median
-		local hsp = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+		local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local profitPricePercent = math.floor((profit / buyout) * 100);
 
@@ -550,7 +550,7 @@ local function bidBrokerFilter(minProfit, signature)
 
 	if getUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
 		local currentBid = getCurrentBid(signature);
-		local hsp = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+		local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - currentBid;
 		local profitPricePercent = math.floor((profit / currentBid) * 100);
 
@@ -593,7 +593,7 @@ local function percentLessFilter(percentLess, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-	local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+	local hsp, seenCount = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 
 	if hsp > 0 and nullSafe(seenCount) > 0 then
 		local profit = (hsp * count) - buyout;
@@ -632,8 +632,8 @@ local function profitComparisonSort(a, b)
 	local aItemKey = aid .. ":" .. arprop..":"..aenchant;
 	local bItemKey = bid .. ":" .. brprop..":"..benchant;
 	local realm = auctionKey()
-	local aProfit = (getHighestSellablePriceForOne(aItemKey, true, realm) * aCount) - aBuyout;
-	local bProfit = (getHighestSellablePriceForOne(bItemKey, true, realm) * bCount) - bBuyout;
+	local aProfit = (Auctioneer_GetHighestSellablePriceForOne(aItemKey, true, realm) * aCount) - aBuyout;
+	local bProfit = (Auctioneer_GetHighestSellablePriceForOne(bItemKey, true, realm) * bCount) - bBuyout;
 	return (aProfit > bProfit) 
 end
 Auctioneer_ProfitComparisonSort = profitComparisonSort;
@@ -680,7 +680,7 @@ function doBroker(minProfit)
 	for _,a in resellableAuctions do
 		local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature); 
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+		local hsp, seenCount = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local output = string.format(AUCT_FRMT_BROKER_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
 		Auctioneer_ChatPrint(output);
@@ -703,7 +703,7 @@ function doBidBroker(minProfit)
 	for _,a in bidWorthyAuctions do
 		local id,rprop,enchant, name, count,min,buyout,uniq = getItemSignature(a.signature);
 		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+		local hsp, seenCount = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local currentBid = getCurrentBid(a.signature);
 		local profit = (hsp * count) - currentBid;
 
@@ -783,7 +783,7 @@ function doPercentLess(percentLess)
 	for _,a in auctionsBelowHSP do
 		local id,rprop,enchant, name, count,_,buyout,_ = getItemSignature(a.signature);
 		local itemKey = id ..":"..rprop..":"..enchant;
-		local hsp, seenCount = getHighestSellablePriceForOne(itemKey, true, auctionKey());
+		local hsp, seenCount = Auctioneer_GetHighestSellablePriceForOne(itemKey, true, auctionKey());
 		local profit = (hsp * count) - buyout;
 		local output = string.format(AUCT_FRMT_PCTLESS_LINE, colorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), colorTextWhite(percentLessThan(hsp, buyout / count).."%"));
 		Auctioneer_ChatPrint(output);
@@ -878,9 +878,16 @@ local function getMarketPrice(itemKey, realm)
 	return commonBuyout -- returns buyoutMedian, if present - returns avgBuy otherwise, if meanCount > 0 - returns 0 otherwise
 end
 
-local function getHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
-	-- WARNING! if useCachedPrices = true, realm SHOULD ALWAYS BE auctionKey()!!!! Otherwise the result is undefined!
-	-- No check is being performed atm, to save some performance
+function Auctioneer_GetHighestSellablePriceForOne(itemKey, useCachedPrices, realm)
+	-- make sure that if useCachedPrices is set to true, realm is the current one - otherwise it won't make any sense and the result could be undefined.
+	-- check added, as it's a global function and should not cause any problems even when called with invalid parameters
+	if (not itemKey) or                                     -- make itemKey a required parameter
+		 (not useCachedPrices) or                            -- make useCachedPrices a required parameter
+		 (not realm) or                                      -- make realm a required parameter
+		 (useCachedPrices and realm ~= auctionKey()) then    -- using cachedPrices with alternative realms is not supported atm
+		return nil
+	end
+
 	local highestSellablePrice = 0;
 	local warn = AUCT_FRMT_WARN_NODATA;
 	local marketPrice = getMarketPrice(itemKey, realm);
@@ -972,7 +979,7 @@ end
 local function doHSP(link)
 	local itemID, randomProp, enchant, uniqID, itemName = breakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
-	local highestSellablePrice = getHighestSellablePriceForOne(itemKey, false, auctionKey());
+	local highestSellablePrice = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, auctionKey());
 	Auctioneer_ChatPrint(string.format(AUCT_FRMT_HSP_LINE, colorTextWhite(itemName), TT_GetTextGSC(nilSafeString(highestSellablePrice))));
 end
 
@@ -1336,7 +1343,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then -- show item's suggested auction price
-				local hsp = getHighestSellablePriceForOne(itemKey, false, auctionKey());
+				local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, auctionKey());
 				if hsp == 0 and buyCount > 0 then
 					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
@@ -1403,7 +1410,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						TT_LineColor(0.1,0.8,0.5);
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
-						local hsp = getHighestSellablePriceForOne(itemKey, false, also);
+						local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, also);
 						if hsp == 0 and buyCount > 0 then
 							hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 						end
@@ -2040,7 +2047,7 @@ function Auctioneer_OnEvent(event)
 		local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
 
 		-- calculates the suggested prices
-		local hsp, hspCount, mktPrice, warn = getHighestSellablePriceForOne(itemKey, false, auctionKey());
+		local hsp, hspCount, mktPrice, warn = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, auctionKey());
 		if hsp == 0 and buyCount > 0 then
 			hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 		end
