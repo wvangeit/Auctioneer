@@ -4,5 +4,6 @@
 ## Revision: $Id$
 ## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
 ## Dependancies: EnhTooltip
+## OptionalDeps: Khaos
 ## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
 Auctioneer.xml
