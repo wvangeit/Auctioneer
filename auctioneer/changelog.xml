@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<new id="newfeature1" codedby="MentalPower" type="big" timestamp="2005-08-17 12:24">
+		<improvement id="improvement1" codedby="MentalPower" timestamp="2005-08-17 12:24">
 			<file name="auctioneer.lua">
 				<add function="Auctioneer_GUI_Command" />
 				<add function="Auctioneer_Register" />
@@ -16,7 +16,7 @@
 			<public>
 				Khaos support has been added! All of the options that you can set via the /auctioneer commands has been integrated into a Khaos-based GUI. Enjoy!
 			</public>
-		</new>
+		</improvement>
 		<optimization id="optimization2" by="Luke1410" type="small" timestamp="2005-08-04 21:26">
 			<file name="auctioneer.lua">
 				<change function="getHighestSellablePriceForOne" />
@@ -46,7 +46,7 @@
 		</optimization>
 		<bugfix id="bugfix14" codedby="Luke1410" replacebugfix="bugfix13" text="concatenate" timestamp="2005-08-12 09:51">
 			<file name="auctioneer.lua">
-				<function="Auctioneer_GetHighestSellablePriceForOne" />
+				<change function="Auctioneer_GetHighestSellablePriceForOne" />
 			</file>
 			<developer>
 				The parametervalidation was bugged. Instead of only checking for nil values, it also checked if useCachedPrices was true, so the function always returned nil, if it shouldn't work with CachedPrices.
@@ -55,7 +55,7 @@
 		</bugfix>
 		<bugfix id="bugfix13" codedby="Luke1410" replacebugfix="bugfix7" text="concatenate" timestamp="2005-08-11 23:41">
 			<file name="auctioneer.lua">
-				<function="Auctioneer_GetHighestSellablePriceForOne" />
+				<change function="Auctioneer_GetHighestSellablePriceForOne" />
 			</file>
 			<developer>
 				As this function is also used by Enchantrix, I made it global again and changed the name to match the other global ones.
@@ -64,7 +64,7 @@
 		</bugfix>
 		<bugfix id="bugfix12" codedby="Luke1410" sourceforgeid="1234501" timestamp="2005-08-09 23:49">
 			<file name="auctioneer.lua">
-				<function="Auctioneer_NewTooltip" />
+				<change function="Auctioneer_NewTooltip" />
 			</file>
 			<developer>
 				Removed the data reference from the function, as that global no longer exists and the value was only used to calculate the sell/buy prices for items with an itemID <= 0.
@@ -77,7 +77,7 @@
 		</bugfix>
 		<bugfix id="bugfix11" codedby="Luke1410" sourceforgeid="1249072" timestamp="2005-08-09 23:24">
 			<file name="auctioneer.lua">
-				<function="Auctioneer_ProcessLink" />
+				<change function="Auctioneer_ProcessLink" />
 			</file>
 			<developer>
 				Major typo fixed in that function. Instead of xxxxx_ProcessLinks, xxxxx_ProcessLink was tried to call which never existed and therefore the integration into IM/LL never worked.
@@ -122,16 +122,16 @@
 				<change function="Auctioneer_AuctionEntry_Hook" />
 			</file>
 			<file name="converter.lua">
-				<added function="GetAuctionPricesVersion" />
-				<added function="SetAuctionPricesVersion" />
-				<added function="GetAHSnapshotVersion" />
-				<added function="SetAHSnapshotVersion" />
-				<added function="ConvertCatStringToCatInt" />
-				<added function="UpgradeAuctionPricesTo_1_0" />
-				<added function="UpgradeAuctionPrices" />
-				<added function="UpgradeAHSnapshotTo_1_0" />
-				<added function="UpgradeAHSnapshot" />
-				<added function="Auctioneer_ConvertData" />
+				<add function="GetAuctionPricesVersion" />
+				<add function="SetAuctionPricesVersion" />
+				<add function="GetAHSnapshotVersion" />
+				<add function="SetAHSnapshotVersion" />
+				<add function="ConvertCatStringToCatInt" />
+				<add function="UpgradeAuctionPricesTo_1_0" />
+				<add function="UpgradeAuctionPrices" />
+				<add function="UpgradeAHSnapshotTo_1_0" />
+				<add function="UpgradeAHSnapshot" />
+				<add function="Auctioneer_ConvertData" />
 			</file>
 			<file name="AHScanning">
 				<change function="Auctioneer_ScanAuction" />
