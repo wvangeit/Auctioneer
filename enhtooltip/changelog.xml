@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix4" codedby="Luke1410" sourceforgeid="1249951" timestamp="2005-08-20 10:58">
+			<file name="Tooltip.lua">
+				<added variable="TT_OldChatLinkItem" />
+				<added function="EnhTooltip_OnHyperLinkShow" />
+				<change function="TT_Chat_OnHyperlinkShow" />
+				<change function="TT_GameTooltip_OnHide" />
+			</file>
+			<public>
+				Only when /auctioneer embed = off: Moving the mouse over an item in your bagpack while there was already an item shown using a chatlink, the old enhTooltip disappeared while the WoW-Iteminfo was still displayed. Now the EnhTooltip will be displayed again, when you no longer mouse over the bagpackitem.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix3" codedby="Luke1410" sourceforgeid="1240137" submitby="pandarus" timestamp="2005-08-10 20:15">
 			<file name="Tooltip.lua">
 				<change function="TT_Chat_OnHyperlinkShow" />

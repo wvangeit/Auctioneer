@@ -14,6 +14,7 @@ ENHTOOLTIP_VERSION = "<%version%>";
 
 TT_CurrentTip = nil;
 TT_PopupKey = "alt";
+TT_OldChatLinkItem = nil -- used to save last chat-link-item for redisplaying, if needed
 
 local Orig_Chat_OnHyperlinkShow;
 local Orig_AuctionFrameItem_OnEnter;
@@ -38,73 +39,73 @@ if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 end
 
 function TT_OnLoad()
-        if (TT_LOADED ~= nil) then 
-                return; 
-        end
+	if (TT_LOADED ~= nil) then 
+		return; 
+	end
 		EnhancedTooltip:SetBackdropColor(0,0,0);
 		TT_Clear();
 
-        -- Hook in alternative Chat/Hyperlinking code
-        Orig_Chat_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
-        ChatFrame_OnHyperlinkShow = TT_Chat_OnHyperlinkShow;
+	-- Hook in alternative Chat/Hyperlinking code
+	Orig_Chat_OnHyperlinkShow = ChatFrame_OnHyperlinkShow;
+	ChatFrame_OnHyperlinkShow = TT_Chat_OnHyperlinkShow;
 
-        -- Hook in alternative Auctionhouse tooltip code
-        Orig_AuctionFrameItem_OnEnter = AuctionFrameItem_OnEnter;
-        AuctionFrameItem_OnEnter = TT_AuctionFrameItem_OnEnter;
+	-- Hook in alternative Auctionhouse tooltip code
+	Orig_AuctionFrameItem_OnEnter = AuctionFrameItem_OnEnter;
+	AuctionFrameItem_OnEnter = TT_AuctionFrameItem_OnEnter;
 
-		-- Container frame linking
-		Orig_ContainerFrameItemButton_OnEnter = ContainerFrameItemButton_OnEnter;
-		ContainerFrameItemButton_OnEnter = TT_ContainerFrameItemButton_OnEnter;
-		Orig_ContainerFrame_Update = ContainerFrame_Update;
-		ContainerFrame_Update = TT_ContainerFrame_Update;
+	-- Container frame linking
+	Orig_ContainerFrameItemButton_OnEnter = ContainerFrameItemButton_OnEnter;
+	ContainerFrameItemButton_OnEnter = TT_ContainerFrameItemButton_OnEnter;
+	Orig_ContainerFrame_Update = ContainerFrame_Update;
+	ContainerFrame_Update = TT_ContainerFrame_Update;
 
-		-- Game tooltips
-		Orig_GameTooltip_SetLootItem = GameTooltip.SetLootItem;
-		GameTooltip.SetLootItem = TT_GameTooltip_SetLootItem;
-		Orig_GameTooltip_SetQuestItem = GameTooltip.SetQuestItem;
-		GameTooltip.SetQuestItem = TT_GameTooltip_SetQuestItem;
-		Orig_GameTooltip_SetQuestLogItem = GameTooltip.SetQuestLogItem;
-		GameTooltip.SetQuestLogItem = TT_GameTooltip_SetQuestLogItem;
-		Orig_GameTooltip_SetInventoryItem = GameTooltip.SetInventoryItem;
-		GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
-		Orig_GameTooltip_SetMerchantItem = GameTooltip.SetMerchantItem;
-		GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
-		Orig_GameTooltip_SetCraftItem = GameTooltip.SetCraftItem;
-		GameTooltip.SetCraftItem = TT_GameTooltip_SetCraftItem;
-		Orig_GameTooltip_SetTradeSkillItem = GameTooltip.SetTradeSkillItem;
-		GameTooltip.SetTradeSkillItem = TT_GameTooltip_SetTradeSkillItem;
-		Orig_GameTooltip_SetAuctionSellItem = GameTooltip.SetAuctionSellItem;
-		GameTooltip.SetAuctionSellItem = TT_GameTooltip_SetAuctionSellItem;
+	-- Game tooltips
+	Orig_GameTooltip_SetLootItem = GameTooltip.SetLootItem;
+	GameTooltip.SetLootItem = TT_GameTooltip_SetLootItem;
+	Orig_GameTooltip_SetQuestItem = GameTooltip.SetQuestItem;
+	GameTooltip.SetQuestItem = TT_GameTooltip_SetQuestItem;
+	Orig_GameTooltip_SetQuestLogItem = GameTooltip.SetQuestLogItem;
+	GameTooltip.SetQuestLogItem = TT_GameTooltip_SetQuestLogItem;
+	Orig_GameTooltip_SetInventoryItem = GameTooltip.SetInventoryItem;
+	GameTooltip.SetInventoryItem = TT_GameTooltip_SetInventoryItem;
+	Orig_GameTooltip_SetMerchantItem = GameTooltip.SetMerchantItem;
+	GameTooltip.SetMerchantItem = TT_GameTooltip_SetMerchantItem;
+	Orig_GameTooltip_SetCraftItem = GameTooltip.SetCraftItem;
+	GameTooltip.SetCraftItem = TT_GameTooltip_SetCraftItem;
+	Orig_GameTooltip_SetTradeSkillItem = GameTooltip.SetTradeSkillItem;
+	GameTooltip.SetTradeSkillItem = TT_GameTooltip_SetTradeSkillItem;
+	Orig_GameTooltip_SetAuctionSellItem = GameTooltip.SetAuctionSellItem;
+	GameTooltip.SetAuctionSellItem = TT_GameTooltip_SetAuctionSellItem;
 
-		Orig_GameTooltip_SetOwner = GameTooltip.SetOwner;
-		GameTooltip.SetOwner = TT_GameTooltip_SetOwner;
+	Orig_GameTooltip_SetOwner = GameTooltip.SetOwner;
+	GameTooltip.SetOwner = TT_GameTooltip_SetOwner;
 
-		-- Hook the ItemsMatrix tooltip functions
-		Orig_IMInv_ItemButton_OnEnter = IMInv_ItemButton_OnEnter;
-		IMInv_ItemButton_OnEnter = TT_IMInv_ItemButton_OnEnter;
-		Orig_ItemsMatrixItemButton_OnEnter = ItemsMatrixItemButton_OnEnter;
-		ItemsMatrixItemButton_OnEnter = TT_ItemsMatrixItemButton_OnEnter;
+	-- Hook the ItemsMatrix tooltip functions
+	Orig_IMInv_ItemButton_OnEnter = IMInv_ItemButton_OnEnter;
+	IMInv_ItemButton_OnEnter = TT_IMInv_ItemButton_OnEnter;
+	Orig_ItemsMatrixItemButton_OnEnter = ItemsMatrixItemButton_OnEnter;
+	ItemsMatrixItemButton_OnEnter = TT_ItemsMatrixItemButton_OnEnter;
 
-		-- Hook the LootLink tooltip function
-		Orig_LootLinkItemButton_OnEnter = LootLinkItemButton_OnEnter;
-		LootLinkItemButton_OnEnter = TT_LootLinkItemButton_OnEnter;
+	-- Hook the LootLink tooltip function
+	Orig_LootLinkItemButton_OnEnter = LootLinkItemButton_OnEnter;
+	LootLinkItemButton_OnEnter = TT_LootLinkItemButton_OnEnter;
 
-		-- Hook the AllInOneInventory tooltip function
-		if (AllInOneInventory_ModifyItemTooltip ~= nil) then
-			Orig_AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip;
-			AllInOneInventory_ModifyItemTooltip = TT_AllInOneInventory_ModifyItemTooltip;
-			TT_AIOI_Hooked = true;
-		else
-			TT_AIOI_Hooked = false;
-			this:RegisterEvent("PLAYER_ENTERING_WORLD");
-		end
+	-- Hook the AllInOneInventory tooltip function
+	if (AllInOneInventory_ModifyItemTooltip ~= nil) then
+		Orig_AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip;
+		AllInOneInventory_ModifyItemTooltip = TT_AllInOneInventory_ModifyItemTooltip;
+		TT_AIOI_Hooked = true;
+	else
+		TT_AIOI_Hooked = false;
+		this:RegisterEvent("PLAYER_ENTERING_WORLD");
+	end
 
-		-- Hook the hide function so we can disappear
-		Orig_GameTooltip_OnHide = GameTooltip_OnHide;
-		GameTooltip_OnHide = TT_GameTooltip_OnHide;
+	-- Hook the hide function so we can disappear
+	Orig_GameTooltip_OnHide = GameTooltip_OnHide;
+	GameTooltip_OnHide = TT_GameTooltip_OnHide;
 
 
-        TT_LOADED = true;
+	TT_LOADED = true;
 end
 
 function TT_OnEvent(event)
@@ -264,6 +265,28 @@ function TT_Hide()
 	TT_ChatCurrentItem = "";
 end
 
+local function EnhTooltip_OnHyperLinkShow(name, link, button)
+	if (ItemRefTooltip:IsVisible()) then
+		local itemName = ItemRefTooltipTextLeft1:GetText();
+		if (itemName and TT_ChatCurrentItem ~= itemName) then
+			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
+			TT_ChatCurrentItem = itemName;
+
+			if (button == "RightButton") then
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
+			else
+				TT_Clear();
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
+				TT_Show(ItemRefTooltip);
+				-- save the currently shown item, to redisplay it, if needed
+				TT_OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
+			end
+		end
+	else
+		TT_OldChatLinkItem = nil -- mark curHyperLink as obsolete
+	end
+end
+
 function TT_Clear()
 	TT_Hide();
 	EnhancedTooltip.hasEmbed = false;
@@ -301,18 +324,18 @@ function TT_GetTextGSC(money, exact)
 	if not exact then
 	   exact = false
 	end
-    local GSC_GOLD="ffd100";
-    local GSC_SILVER="e6e6e6";
-    local GSC_COPPER="c8602c";
-    local GSC_START="|cff%s%d|r";
-    local GSC_PART=".|cff%s%02d|r";
-    local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
+	local GSC_GOLD="ffd100";
+	local GSC_SILVER="e6e6e6";
+	local GSC_COPPER="c8602c";
+	local GSC_START="|cff%s%d|r";
+	local GSC_PART=".|cff%s%02d|r";
+	local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
 
 	local g, s, c = TT_GetGSC(money);
 
 	local gsc = "";
 	if (g > 0) then
-		gsc = format(GSC_START, GSC_GOLD, g);     
+		gsc = format(GSC_START, GSC_GOLD, g);
 		if (s > 0) then
 			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
 		end
@@ -467,17 +490,21 @@ function TT_GameTooltip_OnHide()
 	if (curName == hidingName) then
 		TT_Hide();
 	end
+	-- redisplay itemlink info, if the ItemRefTooltip is still displayed
+	if TT_OldChatLinkItem then
+		EnhTooltip_OnHyperLinkShow(TT_OldChatLinkItem.name, TT_OldChatLinkItem.link, TT_OldChatLinkItem.button)
+	end
 end
 
 local function nameFromLink(link)
-        local name;
-        if( not link ) then
-                return nil;
-        end
-        for name in string.gfind(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r") do
-                return name;
-        end
-        return nil;
+	local name;
+	if( not link ) then
+		return nil;
+	end
+	for name in string.gfind(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r") do
+		return name;
+	end
+	return nil;
 end
 TT_NameFromLink = nameFromLink;
 
@@ -540,7 +567,6 @@ function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup)
 		frame:Hide();
 		TT_Clear();
 		TT_Hide();
-
 	end
 end
 
@@ -554,22 +580,8 @@ end
 
 function TT_Chat_OnHyperlinkShow(name, link, button)
 	Orig_Chat_OnHyperlinkShow(name, link, button);
-
-	if (ItemRefTooltip:IsVisible()) then
-		local itemName = ItemRefTooltipTextLeft1:GetText();
-		if (itemName and TT_ChatCurrentItem ~= itemName) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
-			TT_ChatCurrentItem = itemName;
-			
-			if (button == "RightButton") then
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
-			else
-				TT_Clear();
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
-				TT_Show(ItemRefTooltip);
-			end
-		end
-	end
+	-- using own function to display the EnhTooltip, to allow redisplaying it, if needed
+	EnhTooltip_OnHyperLinkShow(name, link, button)
 end
 
 function TT_AuctionFrameItem_OnEnter(type, index)
@@ -851,6 +863,5 @@ function TT_GameTooltip_SetOwner(this, owner, anchor)
 --	p("This tooltip owned by", owner:GetName());
 --	TT_Align(this);
 end
-
 
 end
