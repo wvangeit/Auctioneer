@@ -44,6 +44,19 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix15" codedby="Luke1410" timestamp="2005-08-21 20:48">
+			<file name="auctioneer.lua">
+				<change function="Auctioneer_AuctionEntry_Hook" />
+			</file>
+			<developer>
+				Because the identifier created to provide auctioneer to add duplicated scans was not unique in all cases, some indexes on specified pages, were never added to the database.
+				I.e. page 11-14, 21-24, 31-34... item 1-9 were never scanned. That was caused by the identifier being the same as the one used for page 1,2,3,... item 11-49.
+				Also changed the identifier to no longer use the categoryname. Instead it now uses the corresponding categorynumber, too.
+			</developer>
+			<public>
+				Fixed a bug that resulted in some items having been overleapt while scanning the AH.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix14" codedby="Luke1410" replacebugfix="bugfix13" text="concatenate" timestamp="2005-08-12 09:51">
 			<file name="auctioneer.lua">
 				<change function="Auctioneer_GetHighestSellablePriceForOne" />

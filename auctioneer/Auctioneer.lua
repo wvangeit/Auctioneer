@@ -1012,11 +1012,10 @@ end
 -- we save the aution item to our tables, increment our counts etc
 local function Auctioneer_AuctionEntry_Hook(page, index, category)
 	local auctionDoneKey;
-	local strCat = {GetAuctionItemClasses()}
 	if (not page or not index or not category) then
 		return;
 	else
-		auctionDoneKey = ""..strCat[category]..page..index;
+		auctionDoneKey = category.."-"..page.."-"..index;
 	end
 	if (not Auction_DoneItems[auctionDoneKey]) then
 		Auction_DoneItems[auctionDoneKey] = true;
