@@ -10,7 +10,7 @@ AUCT_CLAS_GEM       = "Edelstein";
 AUCT_CLAS_HERB      = "Kraut";
 AUCT_CLAS_HIDE      = "Balg";
 AUCT_CLAS_LEATHER   = "Leder";
-AUCT_CLAS_MAGE      = "Magie";
+AUCT_CLAS_MAGE      = "Magier";
 AUCT_CLAS_ORE       = "Erz";
 AUCT_CLAS_POISON    = "Gift";
 AUCT_CLAS_POTION    = "Trank";
@@ -28,6 +28,7 @@ AUCT_TYPE_FSTAID   = "Erste Hilfe";
 AUCT_TYPE_LEATHER  = "Lederverarbeitung";
 AUCT_TYPE_MINING   = "Bergbau";
 AUCT_TYPE_POISON   = "Gifte";
+AUCT_TYPE_PRIEST   = "Zauber - Priester";
 AUCT_TYPE_SMITH    = "Schmieden";
 AUCT_TYPE_TAILOR   = "Schneiderei";
 
