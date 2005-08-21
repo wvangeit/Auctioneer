@@ -1,4 +1,13 @@
 <itemdatachanges>
+	<change id="2287">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="2289">
+		<remove type="class" value="AUCT_CLAS_POTION" />
+	</change>
+	<change id="2290">
+		<remove type="class" value="AUCT_CLAS_POTION" />
+	</change>
 	<change id="3729">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
@@ -20,16 +29,25 @@
 	<change id="5527">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="5635">
+		<add type="usage" value="ACUCT_TYPE_ALCHEM" />
+	</change>
 	<change id="6289">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="6291">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="6303">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
 	<change id="6308">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="6361">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="6362">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="6887">
@@ -44,6 +62,12 @@
 	<change id="8365">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="9260">
+		<add type="usage" value="AUCT_TYPE_ALCHEM" />
+	</change>
+	<change id="10841">
+		<replace type="class" value="AUCT_CLAS_DRINK" />
+	</change>
 	<change id="12209">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
@@ -57,6 +81,9 @@
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="12224">
+		<add type="class" value="AUCT_CLAS_FOOD" />
+	</change>
+	<change id="12238">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
 	<change id="13754">
@@ -113,6 +140,9 @@
 	<change id="13935">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="17056">
+		<add type="usage" value="AUCT_TYPE_PRIEST" />
+	</change>
 	<change id="17058">
 		<remove type="class" />
 	</change>
@@ -122,16 +152,12 @@
 	<change id="18045">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
-	<change id="9260">
-		<add type="usage" value="AUCT_TYPE_ALCHEM" />
-	</change>
-	<change id="12238">
-		<add type="class" value="AUCT_CLAS_FOOD" />
-	</change>
-	<change id="6303">
-		<add type="class" value="AUCT_CLAS_FOOD" />
-	</change>
+	<add id="19022" sellvalue="27861" />
 	<add id="19119" sellvalue="5803" />
+	<add id="19120" class="AUCT_CLAS_ARMOR" sellvalue="16283" />
+	<add id="19121" class="AUCT_CLAS_ARMOR" />
+	<add id="19144" class="AUCT_CLAS_WEAPON" />
+	<add id="19159" class="AUCT_CLAS_ARMOR" sellvalue="21141" />
 <!-- example
 	<add id="" />
 	<change id="">
