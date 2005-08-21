@@ -28,6 +28,7 @@ AUCT_TYPE_FSTAID = "1stAid";
 AUCT_TYPE_LEATHER = "Leather";
 AUCT_TYPE_MINING = "Mining";
 AUCT_TYPE_POISON = "Poison";
+AUCT_TYPE_PRIEST = "Magic - Priest";
 AUCT_TYPE_SMITH = "Smith";
 AUCT_TYPE_TAILOR = "Tailor";
 
