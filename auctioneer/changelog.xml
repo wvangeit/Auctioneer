@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<improvement id="improvement2" codedby="Luke1410" timestamp="2005-08-21 21:49">
+			<file name="locales/enUS.uft8">
+				<add constant="AUCT_TYPE_PRIEST" />
+			</file>
+			<file name="locales/deDE.utf8">
+				<add constant="AUCT_TYPE_PRIEST" />
+			</file>
+			<public>
+				New usagetype added: "Magic - Priest"
+			</public>
+		</improvement>
 		<improvement id="improvement1" codedby="MentalPower" timestamp="2005-08-17 12:24">
 			<file name="auctioneer.lua">
 				<add function="Auctioneer_GUI_Command" />
@@ -44,6 +55,14 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix17" codedby="Luke1410" timestamp="2005-08-21 21:51">
+			<file name="locales/deDE.utf8">
+				<change constant="AUCT_CLAS_MAGE" />
+			</file>
+			<public>
+				Corrected tiny typo in the German translation.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix16" codedby="Luke1410" sourceforgeid="1265493" timestamp="2005-08-21 21:42">
 			<file name="itemdata.xml" />
 			<public>
