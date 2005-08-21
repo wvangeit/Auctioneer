@@ -44,6 +44,12 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix16" codedby="Luke1410" sourceforgeid="1265493" timestamp="2005-08-21 21:42">
+			<file name="itemdata.xml" />
+			<public>
+				Shapr Claw is listed as being also used for alchemy now.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix15" codedby="Luke1410" timestamp="2005-08-21 20:48">
 			<file name="auctioneer.lua">
 				<change function="Auctioneer_AuctionEntry_Hook" />
@@ -216,9 +222,10 @@
 		<bugfix id="bugfix3" codedby="Luke1410" timestamp="2005-08-11 23:43">
 			<file name="itemdata.xml" />
 			<public>
-				added 42 itemclasses - especially food
-				fixed 1 itemclass: Fish Oil is nolonger marked as a potion
-				added 1 new item
+				added 47 itemclasses - especially food
+				corrected 3 itemclass
+				added 7 new items
+				added 1 usage-type
 			</public>
 		</bugfix>
 		<bugfix id="bugfix2" fixedby="Luke1410" timestamp="2005-07-27 22:04">
