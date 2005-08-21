@@ -14,7 +14,7 @@ ENHTOOLTIP_VERSION = "<%version%>";
 
 TT_CurrentTip = nil;
 TT_PopupKey = "alt";
-TT_OldChatLinkItem = nil -- used to save last chat-link-item for redisplaying, if needed
+local OldChatLinkItem = nil -- used to save last chat-link-item for redisplaying, if needed
 
 local Orig_Chat_OnHyperlinkShow;
 local Orig_AuctionFrameItem_OnEnter;
@@ -279,11 +279,11 @@ local function EnhTooltip_OnHyperLinkShow(name, link, button)
 				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
 				TT_Show(ItemRefTooltip);
 				-- save the currently shown item, to redisplay it, if needed
-				TT_OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
+				OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
 			end
 		end
 	else
-		TT_OldChatLinkItem = nil -- mark curHyperLink as obsolete
+		OldChatLinkItem = nil -- mark curHyperLink as obsolete
 	end
 end
 
@@ -491,8 +491,8 @@ function TT_GameTooltip_OnHide()
 		TT_Hide();
 	end
 	-- redisplay itemlink info, if the ItemRefTooltip is still displayed
-	if TT_OldChatLinkItem then
-		EnhTooltip_OnHyperLinkShow(TT_OldChatLinkItem.name, TT_OldChatLinkItem.link, TT_OldChatLinkItem.button)
+	if OldChatLinkItem then
+		EnhTooltip_OnHyperLinkShow(OldChatLinkItem.name, OldChatLinkItem.link, OldChatLinkItem.button)
 	end
 end
 
