@@ -19,17 +19,20 @@ AUCT_CLAS_SHAMAN = "Chamanes";
 AUCT_CLAS_WARLOCK = "Brujos";
 AUCT_CLAS_WEAPON = "Arma";
 AUCT_CLAS_WRITTEN = "Escrito";
+AUCT_CLAS_PRIEST = "Sacerdote";
 
 AUCT_TYPE_ALCHEM = "Alquímia";
 AUCT_TYPE_COOK = "Cocinar";
 AUCT_TYPE_ENCHANT = "Encantar";
-AUCT_TYPE_ENGINEER = "Ingienería";
+AUCT_TYPE_ENGINEER = "Ingeniería";
 AUCT_TYPE_FSTAID = "Primeros Auxilios";
 AUCT_TYPE_LEATHER = "Peletería";
 AUCT_TYPE_MINING = "Minería";
 AUCT_TYPE_POISON = "Veneno";
+AUCT_TYPE_PRIEST = "Mágico - Sacerdote";
 AUCT_TYPE_SMITH = "Herrería";
 AUCT_TYPE_TAILOR = "Sastrería";
+
 
 AUCT_RECIPE_PREFIXES = { "Receta: ", "Patrón: ", "Plano: ", "Esquema: ", "Fórmula: " };
 
