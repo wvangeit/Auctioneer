@@ -59,6 +59,9 @@
 	<change id="8364">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
+	<change id="7972">
+		<add type="usage" value="AUCT_TYPE_ALCHEM" />
+	</change>
 	<change id="8365">
 		<add type="class" value="AUCT_CLAS_FOOD" />
 	</change>
