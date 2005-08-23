@@ -55,6 +55,12 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 2:50">
+			<file name="itemdata.xml" />
+			<public>
+				Ichor of Undeathis listed as being also used for alchemy, now.
+			</public>
+		</bugfix>
 		<bugfix id="bugfix17" codedby="Luke1410" timestamp="2005-08-21 21:51">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_CLAS_MAGE" />
@@ -66,7 +72,7 @@
 		<bugfix id="bugfix16" codedby="Luke1410" sourceforgeid="1265493" timestamp="2005-08-21 21:42">
 			<file name="itemdata.xml" />
 			<public>
-				Shapr Claw is listed as being also used for alchemy now.
+				Shapr Claw is listed as being also used for alchemy, now.
 			</public>
 		</bugfix>
 		<bugfix id="bugfix15" codedby="Luke1410" timestamp="2005-08-21 20:48">
