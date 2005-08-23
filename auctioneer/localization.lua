@@ -69,6 +69,7 @@ AUCT_TYPE_FSTAID="1stAid";
 AUCT_TYPE_LEATHER="Leather";
 AUCT_TYPE_MINING="Mining";
 AUCT_TYPE_POISON="Poison";
+AUCT_TYPE_PRIEST="Magic - Priest";
 AUCT_TYPE_SMITH="Smith";
 AUCT_TYPE_TAILOR="Tailor";
 
@@ -105,8 +106,8 @@ AUCT_FRMT_INFO_FORONE="For 1: %s min/%s BO (%s bid) [in %d's]";
 AUCT_FRMT_INFO_AVERAGE="%s min/%s BO (%s bid)"
 AUCT_FRMT_INFO_HISTMED="Last %d, median BO (ea)";
 AUCT_FRMT_INFO_SNAPMED="Scanned %d, median BO (ea)";
-AUCT_FRMT_INFO_SGSTSTX="Suggested price for your %d stack: %s min/%s BO (%s bid)";
-AUCT_FRMT_INFO_SGST="Suggested price: %s min/%s BO (%s bid)";
+AUCT_FRMT_INFO_SGSTSTX="Suggested price for your %d stack: %s min/%s BO";
+AUCT_FRMT_INFO_SGST="Suggested price: %s min/%s BO";
 
 AUCT_FRMT_INFO_BIDRATE="%d%% have bid, %d%% have BO";
 AUCT_FRMT_INFO_NEVER="Never seen at %s";
@@ -121,12 +122,12 @@ AUCT_FRMT_INFO_SELLMULT="Sell%s %d (%s each)";
 AUCT_FRMT_INFO_STX="Stacks in lots of %d";
 
 AUCT_FRMT_INFO_HEAD_MULTI="Averages for %d items:";
-AUCT_FRMT_INFO_MIN_MULTI="  Minimum (%s ea)";
+AUCT_FRMT_INFO_MIN_MULTI="  Starting bid (%s ea)";
 AUCT_FRMT_INFO_BID_MULTI="  Bidded (%s%s ea)";
 AUCT_FRMT_INFO_BUY_MULTI="  Buyout (%s%s ea)";
 
 AUCT_FRMT_INFO_HEAD_ONE="Averages for this item:";
-AUCT_FRMT_INFO_MIN_ONE="  Minimum bid";
+AUCT_FRMT_INFO_MIN_ONE="  Starting bid";
 AUCT_FRMT_INFO_BID_ONE="  Bidded%s";
 AUCT_FRMT_INFO_BUY_ONE="  Buyout%s";
 
@@ -294,7 +295,7 @@ AUCT_CLAS_GEM="Edelstein";
 AUCT_CLAS_HERB="Kraut";
 AUCT_CLAS_HIDE="Balg";
 AUCT_CLAS_LEATHER="Leder";
-AUCT_CLAS_MAGE="Magie";
+AUCT_CLAS_MAGE="Magier";
 AUCT_CLAS_ORE="Erz";
 AUCT_CLAS_POISON="Gift";
 AUCT_CLAS_POTION="Trank";
@@ -303,16 +304,17 @@ AUCT_CLAS_WARLOCK="Hexenmeister";
 AUCT_CLAS_WEAPON="Waffe";
 AUCT_CLAS_WRITTEN="Schriftst\195\188ck";
 
-AUCT_TYPE_ALCHEM="Alchimist";
-AUCT_TYPE_COOK="Koch";
-AUCT_TYPE_ENCHANT="Verzauberer";
-AUCT_TYPE_ENGINEER="Ingenieur";
+AUCT_TYPE_ALCHEM="Alchimie";
+AUCT_TYPE_COOK="Kochen";
+AUCT_TYPE_ENCHANT="Verzauberungen";
+AUCT_TYPE_ENGINEER="Ingenieurskunst";
 AUCT_TYPE_FSTAID="Erste Hilfe";
-AUCT_TYPE_LEATHER="Lederverarbeiter";
+AUCT_TYPE_LEATHER="Lederverarbeitung";
 AUCT_TYPE_MINING="Bergbau";
-AUCT_TYPE_POISON="Giftmischer";
-AUCT_TYPE_SMITH="Schmied";
-AUCT_TYPE_TAILOR="Schneider";
+AUCT_TYPE_POISON="Gifte";
+AUCT_TYPE_PRIEST="Zauber - Priester";
+AUCT_TYPE_SMITH="Schmieden";
+AUCT_TYPE_TAILOR="Schneiderei";
 
 AUCT_RECIPE_PREFIXES={ "Rezept: ", "Muster: ", "Pl\195\164ne: ", "Bauplan: ", "Formel: " };
 
@@ -347,8 +349,8 @@ AUCT_FRMT_INFO_FORONE="Pro St\195\188ck: %s min/%s Sofortkauf (%s geboten) [in %
 AUCT_FRMT_INFO_AVERAGE="%s min/%s Sofortkauf (%s geboten)"
 AUCT_FRMT_INFO_HISTMED="Sofortkauf-Median (pro St\195\188ck) der %d letzten Auktionen:";
 AUCT_FRMT_INFO_SNAPMED="Sofortkauf-Median (pro St\195\188ck) aus %d gescannten Auktionen:";
-AUCT_FRMT_INFO_SGSTSTX="Empfohlener Preis f\195\188r diesen %der Stapel: %s min/%s Sofortkauf (%s geboten)";
-AUCT_FRMT_INFO_SGST="Empfohlener Preis: %s min/%s Sofortkauf (%s geboten)";
+AUCT_FRMT_INFO_SGSTSTX="Empfohlener Preis f\195\188r diesen %der Stapel: %s min/%s Sofortkauf";
+AUCT_FRMT_INFO_SGST="Empfohlener Preis: %s min/%s Sofortkauf";
 
 AUCT_FRMT_INFO_BIDRATE="%d%% haben Gebote, %d%% haben Sofortkauf";
 AUCT_FRMT_INFO_NEVER="Noch in keiner %s gesehen";
@@ -363,12 +365,12 @@ AUCT_FRMT_INFO_SELLMULT="Verkauf%s f\195\188r %d (%s pro St\195\188ck)";
 AUCT_FRMT_INFO_STX="%d pro Stapel";
 
 AUCT_FRMT_INFO_HEAD_MULTI="Durchschnitt f\195\188r %d St\195\188ck:";
-AUCT_FRMT_INFO_MIN_MULTI="  Minimum (%s pro St\195\188ck)";
+AUCT_FRMT_INFO_MIN_MULTI="  Min. Startgebot (%s pro St\195\188ck)";
 AUCT_FRMT_INFO_BID_MULTI="  Geboten (%s%s pro St\195\188ck)";
 AUCT_FRMT_INFO_BUY_MULTI="  Sofortkauf (%s%s pro St\195\188ck)";
 
 AUCT_FRMT_INFO_HEAD_ONE="Durchschnitt f\195\188r diesen Gegenstand:";
-AUCT_FRMT_INFO_MIN_ONE="  Minimum";
+AUCT_FRMT_INFO_MIN_ONE="  Min. Startgebot";
 AUCT_FRMT_INFO_BID_ONE="  Geboten%s";
 AUCT_FRMT_INFO_BUY_ONE="  Sofortkauf%s";
 
@@ -382,19 +384,19 @@ AUCT_FRMT_UNKNOWN_RF="Der angegebene Parameter ('%s') ist ung\195\188ltig. Der P
 AUCT_FRMT_ACT_REMOVE="Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
 
 AUCT_FRMT_AUCTINFO_HIST="%d historisch";
-AUCT_FRMT_AUCTINFO_SNAP="%d aus dem letzten Scan";
-AUCT_FRMT_AUCTINFO_LOW="kleines Abbild";
-AUCT_FRMT_AUCTINFO_NOLOW="Gegenstand nicht im letzten Abbild";
+AUCT_FRMT_AUCTINFO_SNAP="%d aus letztem Scan";
+AUCT_FRMT_AUCTINFO_LOW="g\195\188nstigster Snapshot";
+AUCT_FRMT_AUCTINFO_NOLOW="Nicht im letzten Snapshot gesehn";
 AUCT_FRMT_AUCTINFO_ORIG="Original-Gebot";
-AUCT_FRMT_AUCTINFO_SUGBUY="Empfohlener Sofortkaufpreis";
-AUCT_FRMT_AUCTINFO_SUGBID="Empfohlenes Gebot";
+AUCT_FRMT_AUCTINFO_SUGBUY="Empf. Sofortkauf";
+AUCT_FRMT_AUCTINFO_SUGBID="Empf. Gebot";
 AUCT_FRMT_AUCTINFO_MKTPRICE="Marktpreis";
 
 AUCT_FRMT_WARN_MARKUP="%s%% erh\195\182hter H\195\164ndlerpreis";
 AUCT_FRMT_WARN_UNDERCUT="Unterbiete um %s%%";
 AUCT_FRMT_WARN_NOCOMP="Monopol";
-AUCT_FRMT_WARN_ABOVEMKT="Konkurrenz verkauft \195\188berteuert";
-AUCT_FRMT_WARN_TOOLOW="Konkurrenz ist zu g\195\188nstig";
+AUCT_FRMT_WARN_ABOVEMKT="Konkurrenz keine Gefahr";
+AUCT_FRMT_WARN_TOOLOW="Konkurrenz zu g\195\188nstig";
 AUCT_FRMT_WARN_MYPRICE="Verwende eigenen Preis";
 AUCT_FRMT_WARN_NODATA="Keine HVP-Daten";
 
@@ -465,7 +467,7 @@ AUCT_FRMT_ACT_UNKNOWN="Unbekannter Befehl: '%s'";
 
 AUCT_TEXT_SCAN="Scannen";
 AUCT_TEXT_AUCTION="Auktion";
-AUCT_TEXT_NONE="keine";
+AUCT_TEXT_NONE="nichts";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START="Auctioneer: Scanne %s Seite 1...";
@@ -531,6 +533,7 @@ end
 if locale == "esES" then
 -- Encoded in UTF8
 AUCT_CLAS_ARMOR="Armadura";
+AUCT_CLAS_BANDAGE="Vendaje"
 AUCT_CLAS_CLOTH="Tela";
 AUCT_CLAS_CONTAINER="Contenedor";
 AUCT_CLAS_DRINK="Bebida";
@@ -549,21 +552,29 @@ AUCT_CLAS_SHAMAN="Chamanes";
 AUCT_CLAS_WARLOCK="Brujos";
 AUCT_CLAS_WEAPON="Arma";
 AUCT_CLAS_WRITTEN="Escrito";
+AUCT_CLAS_PRIEST="Sacerdote";
 
-AUCT_TYPE_ALCHEM="Alquimia";
-AUCT_TYPE_COOK="Cocina";
+AUCT_TYPE_ALCHEM="Alqu\195\173mia";
+AUCT_TYPE_COOK="Cocinar";
 AUCT_TYPE_ENCHANT="Encantar";
-AUCT_TYPE_ENGINEER="Ingiener\195\173a";
+AUCT_TYPE_ENGINEER="Ingenier\195\173a";
 AUCT_TYPE_FSTAID="Primeros Auxilios";
 AUCT_TYPE_LEATHER="Peleter\195\173a";
-AUCT_TYPE_MINING="Miner\195\161l";
+AUCT_TYPE_MINING="Miner\195\173a";
 AUCT_TYPE_POISON="Veneno";
+AUCT_TYPE_PRIEST="M\195\161gico - Sacerdote";
 AUCT_TYPE_SMITH="Herrer\195\173a";
-AUCT_TYPE_TAILOR="Sastre";
+AUCT_TYPE_TAILOR="Sastrer\195\173a";
 
 
+AUCT_RECIPE_PREFIXES={ "Receta: ", "Patr\195\179n: ", "Plano: ", "Esquema: ", "F\195\179rmula: " };
 
-AUCT_FRMT_WELCOME="Auctioneer v%s cargado";
+AUCT_TIME_SHORT="Corto";
+AUCT_TIME_MED="Mediano";
+AUCT_TIME_LONG="Largo";
+AUCT_TIME_VLONG="Muy Largo";
+
+AUCT_FRMT_WELCOME="Auctioneer versi\195\179n %s cargado";
 
 AUCT_FRMT_BROKER_HEADER="Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
 AUCT_FRMT_BROKER_LINE="%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
@@ -589,28 +600,28 @@ AUCT_FRMT_INFO_FORONE="Por 1: %s min/%s OC (%s oferta) [en %d's]";
 AUCT_FRMT_INFO_AVERAGE="%s min/%s OC (%s oferta)"
 AUCT_FRMT_INFO_HISTMED="\195\154ltimo(s) %d, OC mediano (c/u)";
 AUCT_FRMT_INFO_SNAPMED="Explorados %d, OC mediano (c/u)";
-AUCT_FRMT_INFO_SGSTSTX="Precio sugerido para su lote de %d: %s min/%s OC (%s oferta)";
-AUCT_FRMT_INFO_SGST="Precio sugerido: %s min/%s OC (%s oferta)";
+AUCT_FRMT_INFO_SGSTSTX="Precio sugerido para su lote de %d: %s min/%s OC";
+AUCT_FRMT_INFO_SGST="Precio sugerido: %s min/%s OC";
 
 AUCT_FRMT_INFO_BIDRATE="%d%% tienen ofertas, %d%% tienen OC";
 AUCT_FRMT_INFO_NEVER="Nunca visto en %s";
-AUCT_FRMT_INFO_ALSOSEEN="Visto %d veces a %s";
+AUCT_FRMT_INFO_ALSOSEEN="Visto %d veces en %s";
 AUCT_FRMT_INFO_CLASSUSE="Clase: %s usado para %s";
 AUCT_FRMT_INFO_CLASS="Clase: %s";
 AUCT_FRMT_INFO_USE="Usado para: %s";
-AUCT_FRMT_INFO_BUY="Compra a %s del vendedor";
-AUCT_FRMT_INFO_SELL="Vende a %s al vendedor";
+AUCT_FRMT_INFO_BUY="Compra%s del vendedor";
+AUCT_FRMT_INFO_SELL="Vende%s al vendedor";
 AUCT_FRMT_INFO_BUYMULT="Compra %s %d (%s c/u)";
 AUCT_FRMT_INFO_SELLMULT="Vende %s %d (%s c/u)";
-AUCT_FRMT_INFO_STX="Amontonable en lotes %d art\195\173culos por paquete";
+AUCT_FRMT_INFO_STX="Amontonable en lotes de art\195\173culos %d por paquete";
 
 AUCT_FRMT_INFO_HEAD_MULTI="Promedios para %d art\195\173culos:";
-AUCT_FRMT_INFO_MIN_MULTI="  Minimo (%s c/u)";
+AUCT_FRMT_INFO_MIN_MULTI="  Oferta a empezar (%s c/u)";
 AUCT_FRMT_INFO_BID_MULTI="  Oferta (%s%s c/u)";
 AUCT_FRMT_INFO_BUY_MULTI="  Opci\195\179n a compra(%s%s c/u)";
 
 AUCT_FRMT_INFO_HEAD_ONE="Promedios para este art\195\173culo:";
-AUCT_FRMT_INFO_MIN_ONE="  Oferta m\195\173nima";
+AUCT_FRMT_INFO_MIN_ONE="  Oferta a empezar";
 AUCT_FRMT_INFO_BID_ONE=" %s con propuestas";
 AUCT_FRMT_INFO_BUY_ONE=" %s con opci\195\179n a compra";
 
@@ -623,9 +634,9 @@ AUCT_FRMT_UNKNOWN_RF="Parametro inv\195\161lido ('%s'). El par\195\161metro debe
 
 AUCT_FRMT_ACT_REMOVE="Eliminando firma %s de la imagen actual de la casa de subastas.";
 
-AUCT_FRMT_AUCTINFO_HIST="%d Hist\195\179rico";
-AUCT_FRMT_AUCTINFO_SNAP="%d Ultima exploraci\195\179n";
-AUCT_FRMT_AUCTINFO_LOW="Imagen baja";
+AUCT_FRMT_AUCTINFO_HIST="%d Hist\195\179ricamente";
+AUCT_FRMT_AUCTINFO_SNAP="%d en la \195\186ltima exploraci\195\179n";
+AUCT_FRMT_AUCTINFO_LOW="M\195\173nimo de la \195\186ltima exploraci\195\179n";
 AUCT_FRMT_AUCTINFO_NOLOW="Art\195\173culo no fue visto en ultima imagen";
 AUCT_FRMT_AUCTINFO_ORIG="Oferta Original";
 AUCT_FRMT_AUCTINFO_SUGBUY="Opci\195\179n a compra sugerida";
@@ -633,15 +644,16 @@ AUCT_FRMT_AUCTINFO_SUGBID="Oferta sugerida";
 AUCT_FRMT_AUCTINFO_MKTPRICE="Precio del mercado";
 
 AUCT_FRMT_WARN_MARKUP="Superando vendedor por %s%%";
-AUCT_FRMT_WARN_UNDERCUT="Socavando el precio por %s%%";
+AUCT_FRMT_WARN_UNDERCUT="Socavando por %s%%";
 AUCT_FRMT_WARN_NOCOMP="Sin competencia";
 AUCT_FRMT_WARN_ABOVEMKT="Competencia sobre mercado";
 AUCT_FRMT_WARN_TOOLOW="Imposible igualar minimo";
 AUCT_FRMT_WARN_MYPRICE="Usando mi precio actual";
-AUCT_FRMT_WARN_NODATA="Sin data para PMV";
+AUCT_FRMT_WARN_NODATA="Sin informaci\195\179n para PMV";
 
 AUCT_CMD_OFF="apagado";
 AUCT_CMD_ON="prendido";
+AUCT_CMD_TOGGLE="invertir";
 AUCT_CMD_CLEAR="despejado";
 AUCT_CMD_CLEAR_ALL="todo";
 AUCT_CMD_CLEAR_SNAPSHOT="imagen";
@@ -696,7 +708,7 @@ AUCT_SHOW_VENDOR_BUY="ver-vendedor-compra";
 AUCT_SHOW_VENDOR_SELL="ver-vendedor-venta";
 AUCT_SHOW_EMBED_BLANK="ver-integrado-lineavacia";
 
-AUCT_HELP_ONOFF="Enciande o apaga la informacion sobre subastas";
+AUCT_HELP_ONOFF="Enciande o apaga la informacion sobre las subastas";
 AUCT_HELP_VERBOSE="Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
 AUCT_HELP_AVERAGE="Selecciona para mostrar precio promedio de la subasta para el art\195\173culo";
 AUCT_HELP_LINK="Selecciona para mostrar el numero de enlace del art\195\173culo en la caja de ayuda";
@@ -705,8 +717,8 @@ AUCT_HELP_MESH="Selecciona para mostrar la imagen del art\195\173culo, si existe
 AUCT_HELP_SUGGEST="Selecciona para mostrar el precio sugerido de subasta para el art\195\173culo";
 AUCT_HELP_STATS="Selecciona para mostrar porcentajes para ofertas/opci\195\179n a compra del art\195\173culo";
 AUCT_HELP_VENDOR="Selecciona para mostrar precios de vendedor para el art\195\173culo";
-AUCT_HELP_VENDOR_SELL="Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor=encendido)";
-AUCT_HELP_VENDOR_BUY="Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor=encendido)";
+AUCT_HELP_VENDOR_SELL="Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
+AUCT_HELP_VENDOR_BUY="Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
 AUCT_HELP_USAGE="Selecciona para mostrar uso del art\195\173culo en profesiones";
 AUCT_HELP_STACK="Selecciona para mostrar tama\195\177o maximo del paquete";
 AUCT_HELP_EMBED_BLANK="Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
@@ -753,12 +765,10 @@ AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccion
 
 
 -- The following definitions are missing in this locale:
---	AUCT_CLAS_BANDAGE = "";
 --	AUCT_CMD_ALT = "";
 --	AUCT_CMD_CTRL = "";
 --	AUCT_CMD_PCT_NOCOMP = "";
 --	AUCT_CMD_SHIFT = "";
---	AUCT_CMD_TOGGLE = "";
 --	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
 --	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
 --	AUCT_OPT_PCT_MAXLESS_DEFAULT = "";
@@ -767,11 +777,6 @@ AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccion
 --	AUCT_OPT_PCT_UNDERMKT_DEFAULT = "";
 --	AUCT_OPT_SCALE_DEFAULT = "";
 --	AUCT_OPT_SCAN = "";
---	AUCT_RECIPE_PREFIXES = "";
---	AUCT_TIME_LONG = "";
---	AUCT_TIME_MED = "";
---	AUCT_TIME_SHORT = "";
---	AUCT_TIME_VLONG = "";
 end
 
 -- Locale strings for the frFR locale
@@ -997,6 +1002,7 @@ AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison d
 --	AUCT_TIME_SHORT = "";
 --	AUCT_TIME_VLONG = "";
 --	AUCT_TYPE_POISON = "";
+--	AUCT_TYPE_PRIEST = "";
 end
 
 end

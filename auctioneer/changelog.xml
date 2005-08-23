@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<optimization id="optimization3" by="MentalPower" timestamp="2005-08-23 21:37">
+			<file name="auctioneer.lua">
+				<add function="Auctioneer_New_Command"/>
+				<add function="Auctioneer_ChatPrint_Help"/>
+				<add function="Auctioneer_OnOff"/>
+				<add function="Auctioneer_Clear"/>
+				<add function="Auctioneer_AlsoInclude"/>
+				<add function="Auctioneer_MeshOnOff"/>
+				<add function="Auctioneer_GenVarSet"/>
+				<add function="Auctioneer_PercentVarSet"/>
+				<delete function="Auctioneer_GUI_Command"/>
+				<delete function="Auctioneer_Command"/>
+			</file>
+			<developer>
+				The command handler has been cleaned and expanded to include support for direct GUI calls without requiring a separate function. The old functions are still there (they are currently commented out) however I will remove them as soon as the new ones get an extensive shakedown. I will also then change the current Khaos code to use the member functions instead of the main one. I won't add a "Public" changelog comment since this change will be transparent to the end-user.
+			</developer>
+		</optimization>	
 		<improvement id="improvement2" codedby="Luke1410" timestamp="2005-08-21 21:49">
 			<file name="locales/enUS.uft8">
 				<add constant="AUCT_TYPE_PRIEST" />
@@ -14,9 +31,12 @@
 		</improvement>
 		<improvement id="improvement1" codedby="MentalPower" timestamp="2005-08-17 12:24">
 			<file name="auctioneer.lua">
+				<change function="Auctioneer_OnLoad"/>
 				<add function="Auctioneer_GUI_Command" />
 				<add function="Auctioneer_Register" />
 				<add function="Auctioneer_Register_Khaos" />
+				<add constant="Auctioneer_GUI_Registered"/>
+				<add constant="Auctioneer_Khaos_Registered"/>
 			</file>
 			<file name="auctioneer.toc">
 				<add constant="OptionalDeps" />
@@ -25,7 +45,7 @@
 				Khaos support has been added!! I know it is not pretty (I myself don't like the implementation very much) but it works so far. To the end user the experience will be mostly seamless. I am still working on a Auctioneer-to-Khaos update mechanism, but that will be with the much needed implementation revamp.
 			</developer>
 			<public>
-				Khaos support has been added! All of the options that you can set via the /auctioneer commands has been integrated into a Khaos-based GUI. Enjoy!
+				Khaos support has been added! All of the options that you can set via the /auctioneer commands have been integrated into a Khaos-based GUI. Enjoy!
 			</public>
 		</improvement>
 		<optimization id="optimization2" by="Luke1410" type="small" timestamp="2005-08-04 21:26">
