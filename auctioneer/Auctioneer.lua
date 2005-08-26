@@ -1596,7 +1596,7 @@ function Auctioneer_OnLoad()
 	SLASH_AUCTIONEER2 = "/auction";
 	SLASH_AUCTIONEER3 = "/auc";
 	SlashCmdList["AUCTIONEER"] = function(msg)
-		Auctioneer_New_Command(msg, nil);
+		Auctioneer_Command(msg, nil);
 	end
 
 	if ( DEFAULT_CHAT_FRAME ) then 
@@ -1645,7 +1645,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Enable Auctioneer";
 				helptext=AUCT_HELP_ONOFF;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("on", "GUI") else Auctioneer_New_Command("off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("on", "GUI") else Auctioneer_Command("off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return AUCT_STAT_ON else return AUCT_STAT_OFF end end;
 				check=true;
 				default={checked=true};
@@ -1661,7 +1661,7 @@ function Auctioneer_Register_Khaos()
 				text="Change locale to";
 				helptext=AUCT_HELP_LOCALE;
 				callback = function(state)
-					Auctioneer_New_Command("locale "..state.value, "GUI");
+					Auctioneer_Command("locale "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, state.value);
@@ -1680,7 +1680,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Verbose Mode";
 				helptext=AUCT_HELP_VERBOSE;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-average on", "GUI") else Auctioneer_New_Command("show-average off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-average on", "GUI") else Auctioneer_Command("show-average off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-average")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-average")) end end;
 				check=true;
 				default={checked=true};
@@ -1692,7 +1692,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Stats";
 				helptext=AUCT_HELP_STATS;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-stats on", "GUI") else Auctioneer_New_Command("show-stats off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-stats on", "GUI") else Auctioneer_Command("show-stats off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-stats")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-stats")) end end;
 				check=true;
 				default={checked=true};
@@ -1711,7 +1711,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Averages";
 				helptext=AUCT_HELP_AVERAGE;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-average on", "GUI") else Auctioneer_New_Command("show-average off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-average on", "GUI") else Auctioneer_Command("show-average off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-average")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-average")) end end;
 				check=true;
 				default={checked=true};
@@ -1723,7 +1723,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Medians";
 				helptext=AUCT_HELP_MEDIAN;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-median on", "GUI") else Auctioneer_New_Command("show-median off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-median on", "GUI") else Auctioneer_Command("show-median off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-median")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-average")) end end;
 				check=true;
 				default={checked=true};
@@ -1735,7 +1735,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Suggested Prices";
 				helptext=AUCT_HELP_SUGGEST;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-suggest on", "GUI") else Auctioneer_New_Command("show-suggest off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-suggest on", "GUI") else Auctioneer_Command("show-suggest off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-suggest")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-suggest")) end end;
 				check=true;
 				default={checked=true};
@@ -1754,7 +1754,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Vendor Prices";
 				helptext=AUCT_HELP_VENDOR;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-vendor on", "GUI") else Auctioneer_New_Command("show-vendor off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-vendor on", "GUI") else Auctioneer_Command("show-vendor off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-vendor")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-vendor")) end end;
 				check=true;
 				default={checked=true};
@@ -1766,7 +1766,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Vendor Buy Prices";
 				helptext=AUCT_HELP_VENDOR_BUY;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-vendor-buy on", "GUI") else Auctioneer_New_Command("show-vendor-buy off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-vendor-buy on", "GUI") else Auctioneer_Command("show-vendor-buy off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-vendor-buy")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-vendor-buy")) end end;
 				check=true;
 				default={checked=true};
@@ -1778,7 +1778,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Vendor Sell Prices";
 				helptext=AUCT_HELP_VENDOR_SELL;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-vendor-sell on", "GUI") else Auctioneer_New_Command("show-vendor-sell off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-vendor-sell on", "GUI") else Auctioneer_Command("show-vendor-sell off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-vendor-sell")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-vendor-sell")) end end;
 				check=true;
 				default={checked=true};
@@ -1797,7 +1797,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Embed info in in-game tooltip";
 				helptext=AUCT_HELP_EMBED;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("embed on", "GUI") else Auctioneer_New_Command("embed off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("embed on", "GUI") else Auctioneer_Command("embed off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "embed")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "embed")) end end;
 				check=true;
 				default={checked=false};
@@ -1809,7 +1809,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show blankline in in-game tooltip";
 				helptext=AUCT_HELP_EMBED_BLANK;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-embed-blankline on", "GUI") else Auctioneer_New_Command("show-embed-blankline off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-embed-blankline on", "GUI") else Auctioneer_Command("show-embed-blankline off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-embed-blankline")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-embed-blankline")) end end;
 				check=true;
 				default={checked=false};
@@ -1832,7 +1832,7 @@ function Auctioneer_Register_Khaos()
 				};
 				text="Clear All Auctioneer Data";
 				helptext="Click here to clear all of the auctioneer data.";
-				callback=function() Auctioneer_New_Command("clear all", "GUI") end;
+				callback=function() Auctioneer_Command("clear all", "GUI") end;
 				feedback=string.format(AUCT_FRMT_ACT_CLEARALL,  "for the current server-faction");
 				difficulty=3;
 			};
@@ -1844,7 +1844,7 @@ function Auctioneer_Register_Khaos()
 				};
 				text="Clear snapshot data";
 				helptext="Click here to clear the last Auctioneer snapshot data.";
-				callback=function() Auctioneer_New_Command("clear snapshot", "GUI")end;
+				callback=function() Auctioneer_Command("clear snapshot", "GUI")end;
 				feedback=AUCT_FRMT_ACT_CLEARSNAP;
 				difficulty=3;
 			};
@@ -1864,7 +1864,7 @@ function Auctioneer_Register_Khaos()
 				text="Bid Markdown Percent";
 				helptext=AUCT_HELP_PCT_BIDMARKDOWN;
 				callback = function(state)
-					Auctioneer_New_Command("pct-bidmarkdown "..state.value, "GUI");
+					Auctioneer_Command("pct-bidmarkdown "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-bidmarkdown, state.value.."%");
@@ -1886,7 +1886,7 @@ function Auctioneer_Register_Khaos()
 				text="Vendor Price Markup Percent";
 				helptext=AUCT_HELP_PCT_MARKUP;
 				callback = function(state)
-					Auctioneer_New_Command("pct-markup "..state.value, "GUI");
+					Auctioneer_Command("pct-markup "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-markup, state.value.."%");
@@ -1908,7 +1908,7 @@ function Auctioneer_Register_Khaos()
 				text="Max Market Undercut Percent";
 				helptext=AUCT_HELP_PCT_MAXLESS;
 				callback = function(state)
-					Auctioneer_New_Command("pct-maxless "..state.value, "GUI");
+					Auctioneer_Command("pct-maxless "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-maxless, state.value.."%");
@@ -1930,7 +1930,7 @@ function Auctioneer_Register_Khaos()
 				text="No Competition Undercut Percent";
 				helptext=AUCT_HELP_PCT_NOCOMP;
 				callback = function(state)
-					Auctioneer_New_Command("pct-nocomp "..state.value, "GUI");
+					Auctioneer_Command("pct-nocomp "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-nocomp, state.value.."%");
@@ -1952,7 +1952,7 @@ function Auctioneer_Register_Khaos()
 				text="Lowest Auction Undercut";
 				helptext=AUCT_HELP_PCT_UNDERLOW;
 				callback = function(state)
-					Auctioneer_New_Command("pct-underlow "..state.value, "GUI");
+					Auctioneer_Command("pct-underlow "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-underlow, state.value.."%");
@@ -1974,7 +1974,7 @@ function Auctioneer_Register_Khaos()
 				text="Undercut Market When Maxless";
 				helptext=AUCT_HELP_PCT_UNDERMKT;
 				callback = function(state)
-					Auctioneer_New_Command("pct-undermkt "..state.value, "GUI");
+					Auctioneer_Command("pct-undermkt "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					return string.format(AUCT_FRMT_ACT_SET, pct-undermkt, state.value.."%");
@@ -1999,7 +1999,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Autofill prices in the AH";
 				helptext=AUCT_HELP_AUTOFILL;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("autofill on", "GUI") else Auctioneer_New_Command("autofill off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("autofill on", "GUI") else Auctioneer_Command("autofill off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "autofill")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "autofill")) end end;
 				check=true;
 				default={checked=true};
@@ -2015,7 +2015,7 @@ function Auctioneer_Register_Khaos()
 				text="Also display data for";
 				helptext=AUCT_HELP_ALSO;
 				callback = function(state)
-					Auctioneer_New_Command("also "..state.value, "GUI");
+					Auctioneer_Command("also "..state.value, "GUI");
 				end;
 				feedback = function (state)
 					if (state.value == opposite) then
@@ -2041,7 +2041,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Include data from opposite faction";
 				helptext=AUCT_HELP_ALSO;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("also opposite", "GUI") else Auctioneer_New_Command("also ", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("also opposite", "GUI") else Auctioneer_Command("also ", "GUI") end end;
 				feedback=function(state) if (state.checked) then return "Now including opposite faction data" else return "Not including opposite faction data" end end;
 				check=true;
 				default={checked=false};
@@ -2056,7 +2056,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Highest Sellable Price (HSP)";
 				helptext=AUCT_HELP_HSP;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-hsp on", "GUI") else Auctioneer_New_Command("show-hsp off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-hsp on", "GUI") else Auctioneer_Command("show-hsp off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-hsp")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-hsp")) end end;
 				check=true;
 				default={checked=false};
@@ -2069,7 +2069,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show Item Mesh";
 				helptext=AUCT_HELP_MESH;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-mesh on", "GUI") else Auctioneer_New_Command("show-mesh off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-mesh on", "GUI") else Auctioneer_Command("show-mesh off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-mesh")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-mesh")) end end;
 				check=true;
 				default={checked=true};
@@ -2081,7 +2081,7 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text="Show LinkID";
 				helptext=AUCT_HELP_LINK;
-				callback=function(state) if (state.checked) then Auctioneer_New_Command("show-link on", "GUI") else Auctioneer_New_Command("show-link off", "GUI") end end;
+				callback=function(state) if (state.checked) then Auctioneer_Command("show-link on", "GUI") else Auctioneer_Command("show-link off", "GUI") end end;
 				feedback=function(state) if (state.checked) then return (string.format(AUCT_FRMT_ACT_ENABLE, "show-link")) else return (string.format(AUCT_FRMT_ACT_DISABLE, "show-link")) end end;
 				check=true;
 				default={checked=false};
@@ -2180,7 +2180,7 @@ function Auctioneer_ConfigureAH()
 end
 
 --Cleaner Command Handling Functions (added by MentalPower)
-function Auctioneer_New_Command(command, source)
+function Auctioneer_Command(command, source)
 	
 	--To print or not to print, that is the question...
 	local chatprint = nil;
@@ -2527,428 +2527,7 @@ function Auctioneer_PercentVarSet(variable, param, chatprint)
 	end
 end
 
---[[
---The following two functions are in the process of being phased out in favor of the Auctioneer_New_Command(command, source) function that has built-in support for GUI calls (ie. silent mode).
-function Auctioneer_Command(command)
-	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
-	if (not cmd) then cmd = command; end
-	if (not cmd) then cmd = ""; end
-	if (not param) then param = ""; end
-
-	if ((cmd == "") or (cmd == "help")) then
-		Auctioneer_ChatPrint("Usage:");
-		local onOffToggle = " ("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_TOGGLE..")";
-		local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
-
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
-
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VERBOSE, Auctioneer_GetFilterVal(AUCT_SHOW_VERBOSE), AUCT_HELP_VERBOSE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_AVERAGE, Auctioneer_GetFilterVal(AUCT_SHOW_AVERAGE), AUCT_HELP_AVERAGE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MEDIAN, Auctioneer_GetFilterVal(AUCT_SHOW_MEDIAN), AUCT_HELP_MEDIAN));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_SUGGEST, Auctioneer_GetFilterVal(AUCT_SHOW_SUGGEST), AUCT_HELP_SUGGEST));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STATS, Auctioneer_GetFilterVal(AUCT_SHOW_STATS), AUCT_HELP_STATS));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR), AUCT_HELP_VENDOR));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR_SELL, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR_SELL), AUCT_HELP_VENDOR_SELL));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR_BUY, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR_BUY), AUCT_HELP_VENDOR_BUY));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_USAGE, Auctioneer_GetFilterVal(AUCT_SHOW_USAGE), AUCT_HELP_USAGE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STACK, Auctioneer_GetFilterVal(AUCT_SHOW_STACK), AUCT_HELP_STACK));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_LINK, Auctioneer_GetFilterVal(AUCT_SHOW_LINK), AUCT_HELP_LINK));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_AUTOFILL, Auctioneer_GetFilterVal(AUCT_CMD_AUTOFILL), AUCT_HELP_AUTOFILL));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_EMBED_BLANK, Auctioneer_GetFilterVal(AUCT_SHOW_EMBED_BLANK), AUCT_HELP_EMBED_BLANK));
-
-		lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, "("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_ALT.."|"..AUCT_CMD_CTRL.."|"..AUCT_CMD_SHIFT..")" ,Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_LOCALE, AUCT_OPT_LOCALE, Auctioneer_GetFilterVal('locale'), AUCT_HELP_LOCALE));
-
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT), AUCT_HELP_PCT_MARKUP));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN, Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT), AUCT_HELP_PCT_BIDMARKDOWN));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT), AUCT_HELP_PCT_NOCOMP));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT), AUCT_HELP_PCT_UNDERLOW));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT_DEFAULT), AUCT_HELP_PCT_UNDERMKT));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT), AUCT_HELP_PCT_MAXLESS));
-
-		lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_CLEAR, AUCT_OPT_CLEAR, AUCT_HELP_CLEAR));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_ALSO, AUCT_OPT_ALSO, AUCT_HELP_ALSO));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_BROKER, AUCT_OPT_BROKER, AUCT_HELP_BROKER));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_BIDBROKER, AUCT_OPT_BIDBROKER, AUCT_HELP_BIDBROKER));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PERCENTLESS, AUCT_OPT_PERCENTLESS, AUCT_HELP_PERCENTLESS));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_COMPETE, AUCT_OPT_COMPETE, AUCT_HELP_COMPETE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_SCAN, AUCT_OPT_SCAN, AUCT_HELP_SCAN));
-
-	elseif (cmd == AUCT_CMD_ON) then
-		Auctioneer_SetFilter("all", "on");
-		Auctioneer_ChatPrint(AUCT_STAT_ON);
-	elseif (cmd == AUCT_CMD_OFF) then
-		Auctioneer_SetFilter("all", "off");
-		Auctioneer_ChatPrint(AUCT_STAT_OFF);
-	elseif (cmd == AUCT_CMD_TOGGLE) then
-		local cur = Auctioneer_GetFilterVal("all");
-		if (cur == "off") then
-			Auctioneer_SetFilter("all", "on");
-			Auctioneer_ChatPrint(AUCT_STAT_ON);
-		else
-			Auctioneer_SetFilter("all", "off");
-			Auctioneer_ChatPrint(AUCT_STAT_OFF);
-		end
-	elseif (cmd == AUCT_CMD_CLEAR) then
-		if (param == AUCT_CMD_CLEAR_ALL) then
-			local aKey = auctionKey();
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEARALL, aKey));
-			AuctionPrices[aKey] = {};
-			AHSnapshot = {};
-			AHSnapshot[auctionKey()] = {};
-			AHSnapshotItemPrices = {};
-			AHSnapshotItemPrices[auctionKey()] = {};
-		elseif (param == AUCT_CMD_CLEAR_SNAPSHOT) then
-			Auctioneer_ChatPrint(AUCT_FRMT_ACT_CLEARSNAP);
-			AHSnapshot = {};
-			AHSnapshot[auctionKey()] = {};
-			AHSnapshotItemPrices = {};  
-			AHSnapshotItemPrices[auctionKey()] = {};
-			lSnapshotItemPrices = {}; 
-		else
-			local items = Auctioneer_GetItems(param);
-			for _,itemKey in items do
-				local aKey = auctionKey();
-				if (AuctionPrices[aKey][itemKey] ~= nil) then
-					AuctionPrices[aKey][itemKey] = nil;
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, itemKey));
-				else
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, itemKey));
-				end
-			end
-		end
-	elseif (cmd == AUCT_CMD_ALSO) then
-		if (param == AUCT_CMD_ALSO_OPPOSITE) then
-			param = "opposite";
-		end
-		if (not isValidAlso(param)) then
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_RF, param))
-			return
-		end
-		Auctioneer_SetFilter("also", param);
-	elseif (cmd == AUCT_CMD_LOCALE) then
-		if (AUCT_VALID_LOCALES[param]) then
-			Auctioneer_SetFilter('locale', param);
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, param));
-			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-			Auctioneer_BuildBaseData();
-		elseif (param == '') or (param == 'default') or (param == 'off') then
-			Auctioneer_SetFilter('locale', 'default');
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, 'default'));
-			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-		else
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
-			for locale, _ in AUCT_VALID_LOCALES do
-				Auctioneer_ChatPrint("  "..locale);
-			end
-		end
-	elseif (cmd == AUCT_CMD_BROKER) then
-		doBroker(param);
-	elseif (cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT) then
-		doBidBroker(param);
-	elseif (cmd == AUCT_CMD_PERCENTLESS) or (cmd == AUCT_CMD_PERCENTLESS_SHORT) then
-		doPercentLess(param);
-	elseif (cmd == AUCT_CMD_COMPETE) then
-		doCompeting(param);
-	elseif (cmd == AUCT_CMD_SCAN) then
-		Auctioneer_RequestAuctionScan();
-	elseif (cmd == "test") then
-		doTest(param);
-	elseif (cmd == "low") then
-		doLow(param);
-	elseif (cmd == "med") then
-		doMedian(param);
-	elseif (cmd == "hsp") then
-		doHSP(param);
-	elseif (
-		(cmd == AUCT_CMD_PCT_BIDMARKDOWN) or
-		(cmd == AUCT_CMD_PCT_MARKUP) or
-		(cmd == AUCT_CMD_PCT_MAXLESS) or
-		(cmd == AUCT_CMD_PCT_NOCOMP) or
-		(cmd == AUCT_CMD_PCT_UNDERLOW) or
-		(cmd == AUCT_CMD_PCT_UNDERMKT)
-	) then
-		local paramVal = tonumber(param);
-		Auctioneer_SetFilter(cmd, paramVal);
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, cmd, paramVal.."%"));
-	elseif (
-		(cmd == AUCT_SHOW_VERBOSE) or 
-		(cmd == AUCT_SHOW_AVERAGE) or 
-		(cmd == AUCT_SHOW_MEDIAN) or
-		(cmd == AUCT_SHOW_SUGGEST) or 
-		(cmd == AUCT_SHOW_STATS) or 
-		(cmd == AUCT_SHOW_VENDOR) or 
-		(cmd == AUCT_SHOW_USAGE) or 
-		(cmd == AUCT_SHOW_STACK) or 
-		(cmd == AUCT_SHOW_VENDOR_SELL) or 
-		(cmd == AUCT_SHOW_VENDOR_BUY) or 
-		(cmd == AUCT_SHOW_LINK) or 
-		(cmd == AUCT_CMD_EMBED) or 
-		(cmd == AUCT_CMD_AUTOFILL) or 
-		(cmd == AUCT_SHOW_EMBED_BLANK) or 
-		(cmd == AUCT_SHOW_HSP)
-	) then
-		if (param == AUCT_CMD_OFF) then
-			Auctioneer_SetFilter(cmd, "off");
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
-		elseif (param == AUCT_CMD_TOGGLE) then
-			local cur = Auctioneer_GetFilterVal(cmd);
-			if (cur == "on") then
-				cur = "off";
-				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
-			else
-				cur = "on";
-				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
-			end
-			Auctioneer_SetFilter(cmd, cur);
-		else
-			Auctioneer_SetFilter(cmd, "on");
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
-		end
-	elseif (cmd == AUCT_SHOW_MESH) then
-		if (param == AUCT_CMD_OFF) then
-			Auctioneer_SetFilter(cmd, "off");
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
-		elseif (
-			(param == AUCT_CMD_ALT) or
-			(param == AUCT_CMD_CTRL) or
-			(param == AUCT_CMD_SHIFT)
-		) then
-			Auctioneer_SetFilter(cmd, param);
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLED_ON, cmd, param));
-		elseif (param == AUCT_CMD_TOGGLE) then
-			local cur = Auctioneer_GetFilterVal(cmd);
-			if (cur == "on") then
-				cur = "off";
-				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DISABLE, cmd));
-			else
-				cur = "on";
-				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
-			end
-			Auctioneer_SetFilter(cmd, cur);
-		else
-			Auctioneer_SetFilter(cmd, "on");
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_ENABLE, cmd));
-		end
-	else
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_UNKNOWN, cmd));
-	end
-end
-
--- This function is a haxored version of the one above (Auctioneer_Command(command)) but modified to be able to be called from the GUI script using static keywords and in order to not spam the chat window. 
--- A new function called Auctioneer_New_Command(command, source) is being built in order to eliminate the need for this function and also to clean-up its code a bit.
-
-function Auctioneer_GUI_Command(command)
-	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
-	if (not cmd) then cmd = command; end
-	if (not cmd) then cmd = ""; end
-	if (not param) then param = ""; end
-
-		if ((cmd == "") or (cmd == "help")) then
-		Auctioneer_ChatPrint("Usage:");
-		local onOffToggle = " ("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_TOGGLE..")";
-		local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
-
-		Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
-
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VERBOSE, Auctioneer_GetFilterVal(AUCT_SHOW_VERBOSE), AUCT_HELP_VERBOSE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_AVERAGE, Auctioneer_GetFilterVal(AUCT_SHOW_AVERAGE), AUCT_HELP_AVERAGE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MEDIAN, Auctioneer_GetFilterVal(AUCT_SHOW_MEDIAN), AUCT_HELP_MEDIAN));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_SUGGEST, Auctioneer_GetFilterVal(AUCT_SHOW_SUGGEST), AUCT_HELP_SUGGEST));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STATS, Auctioneer_GetFilterVal(AUCT_SHOW_STATS), AUCT_HELP_STATS));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR), AUCT_HELP_VENDOR));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR_SELL, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR_SELL), AUCT_HELP_VENDOR_SELL));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VENDOR_BUY, Auctioneer_GetFilterVal(AUCT_SHOW_VENDOR_BUY), AUCT_HELP_VENDOR_BUY));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_USAGE, Auctioneer_GetFilterVal(AUCT_SHOW_USAGE), AUCT_HELP_USAGE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_STACK, Auctioneer_GetFilterVal(AUCT_SHOW_STACK), AUCT_HELP_STACK));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_LINK, Auctioneer_GetFilterVal(AUCT_SHOW_LINK), AUCT_HELP_LINK));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_AUTOFILL, Auctioneer_GetFilterVal(AUCT_CMD_AUTOFILL), AUCT_HELP_AUTOFILL));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_EMBED_BLANK, Auctioneer_GetFilterVal(AUCT_SHOW_EMBED_BLANK), AUCT_HELP_EMBED_BLANK));
-
-		lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_MESH, "("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_ALT.."|"..AUCT_CMD_CTRL.."|"..AUCT_CMD_SHIFT..")" ,Auctioneer_GetFilterVal(AUCT_SHOW_MESH), AUCT_HELP_MESH));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_LOCALE, AUCT_OPT_LOCALE, Auctioneer_GetFilterVal('locale'), AUCT_HELP_LOCALE));
-
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT), AUCT_HELP_PCT_MARKUP));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN, Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT), AUCT_HELP_PCT_BIDMARKDOWN));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP, Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT), AUCT_HELP_PCT_NOCOMP));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT), AUCT_HELP_PCT_UNDERLOW));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT, Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT_DEFAULT), AUCT_HELP_PCT_UNDERMKT));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS, Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT), AUCT_HELP_PCT_MAXLESS));
-
-		lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_CLEAR, AUCT_OPT_CLEAR, AUCT_HELP_CLEAR));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_ALSO, AUCT_OPT_ALSO, AUCT_HELP_ALSO));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_BROKER, AUCT_OPT_BROKER, AUCT_HELP_BROKER));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_BIDBROKER, AUCT_OPT_BIDBROKER, AUCT_HELP_BIDBROKER));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_PERCENTLESS, AUCT_OPT_PERCENTLESS, AUCT_HELP_PERCENTLESS));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_COMPETE, AUCT_OPT_COMPETE, AUCT_HELP_COMPETE));
-		Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_SCAN, AUCT_OPT_SCAN, AUCT_HELP_SCAN));
-	
-	
-	elseif (cmd == "on") then
-		Auctioneer_SetFilter("all", "on");
-	elseif (cmd == "off") then
-		Auctioneer_SetFilter("all", "off");
-	elseif (cmd == "toggle") then
-		local cur = Auctioneer_GetFilterVal("all");
-		if (cur == "off") then
-			Auctioneer_SetFilter("all", "on");
-		else
-			Auctioneer_SetFilter("all", "off");
-		end
-	elseif (cmd == "clear") then
-		if (param == "all") then
-			local aKey = auctionKey();
-			AuctionPrices[aKey] = {};
-			AHSnapshot = {};
-			AHSnapshot[auctionKey()] = {};
-			AHSnapshotItemPrices = {};
-			AHSnapshotItemPrices[auctionKey()] = {};
-		elseif (param == "snapshot") then
-			AHSnapshot = {};
-			AHSnapshot[auctionKey()] = {};
-			AHSnapshotItemPrices = {};  
-			AHSnapshotItemPrices[auctionKey()] = {};
-			lSnapshotItemPrices = {}; 
-		--Currently not possible in Khaos
-		else
-			local items = Auctioneer_GetItems(param);
-			for _,itemKey in items do
-				local aKey = auctionKey();
-				if (AuctionPrices[aKey][itemKey] ~= nil) then
-					AuctionPrices[aKey][itemKey] = nil;
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, itemKey));
-				else
-					Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, itemKey));
-				end
-			end
-		
-		end
-	elseif (cmd == "also") then
-		if (param == "opposite") then
-			param = "opposite";
-		elseif (param == "opposite") then
-			param = "";
-		elseif (param == "") then
-			param = "";
-		end
-		if (not isValidAlso(param)) then
-			return
-		end
-		Auctioneer_SetFilter("also", param);
-	elseif (cmd == "locale") then
-		if (AUCT_VALID_LOCALES[param]) then
-			Auctioneer_SetFilter('locale', param);
-			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-			Auctioneer_BuildBaseData();
-		elseif (param == '') or (param == 'default') or (param == 'off') then
-			Auctioneer_SetFilter('locale', 'default');
-			Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-		--To implement later.
-		
-		else
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
-			for locale, _ in AUCT_VALID_LOCALES do
-				Auctioneer_ChatPrint("  "..locale);
-			end
-		end
-	
-	--TODO: Implement with the Earth library.
-	
-	elseif (cmd == AUCT_CMD_BROKER) then
-		doBroker(param);
-	elseif (cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT) then
-		doBidBroker(param);
-	elseif (cmd == AUCT_CMD_PERCENTLESS) or (cmd == AUCT_CMD_PERCENTLESS_SHORT) then
-		doPercentLess(param);
-	elseif (cmd == AUCT_CMD_COMPETE) then
-		doCompeting(param);
-	elseif (cmd == AUCT_CMD_SCAN) then
-		Auctioneer_RequestAuctionScan();
-	elseif (cmd == "test") then
-		doTest(param);
-	elseif (cmd == "low") then
-		doLow(param);
-	elseif (cmd == "med") then
-		doMedian(param);
-	elseif (cmd == "hsp") then
-		doHSP(param);
-	elseif (
-		(cmd == "pct-bidmarkdown") or
-		(cmd == "pct-markup") or
-		(cmd == "pct-maxless") or
-		(cmd == "pct-nocomp") or
-		(cmd == "pct-underlow") or
-		(cmd == "pct-undermkt")
-	) then
-		local paramVal = tonumber(param);
-		Auctioneer_SetFilter(cmd, paramVal);
-	
-	
-	elseif (
-		(cmd == "show-verbose") or 
-		(cmd == "show-average") or 
-		(cmd == "show-median") or
-		(cmd == "show-suggest") or 
-		(cmd == "show-stats") or 
-		(cmd == "show-vendor") or 
-		(cmd == "show-usage") or 
-		(cmd == "show-stack") or 
-		(cmd == "show-vendor-sell") or 
-		(cmd == "show-vendor-buy") or 
-		(cmd == "show-link") or 
-		(cmd == "embed") or 
-		(cmd == "autofill") or 
-		(cmd == "show-embed-blankline") or 
-		(cmd == "show-hsp")
-	) then
-		if (param == "off") then
-			Auctioneer_SetFilter(cmd, "off");
-		elseif (param == "toggle") then
-			local cur = Auctioneer_GetFilterVal(cmd);
-			if (cur == "on") then
-				cur = "off";
-			else
-				cur = "on";
-			end
-			Auctioneer_SetFilter(cmd, cur);
-		else
-			Auctioneer_SetFilter(cmd, "on");
-		end
-	elseif (cmd == "show-mesh") then
-		if (param == "off") then
-			Auctioneer_SetFilter(cmd, "off");
-		elseif (
-			(param == "alt") or
-			(param == "ctrl") or
-			(param == "shift")
-		) then
-			Auctioneer_SetFilter(cmd, param);
-		elseif (param == "toggle") then
-			local cur = Auctioneer_GetFilterVal(cmd);
-			if (cur == "on") then
-				cur = "off";
-			else
-				cur = "on";
-			end
-			Auctioneer_SetFilter(cmd, cur);
-		else
-			Auctioneer_SetFilter(cmd, "on");
-		end
-	elseif (cmd == "nil") then
-		--Do Nothing :)	
-	else
-		--Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_UNKNOWN, cmd));
-	end
-	
-end
-]]--
-
+--This marks the end of the New Command processing code.
 function Auctioneer_SetFilter(type, value)
 	if (not AuctionConfig.filters) then AuctionConfig.filters = {}; end
 	AuctionConfig.filters[type] = value;

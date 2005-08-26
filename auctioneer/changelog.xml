@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<optimization id="optimization4" by="MentalPower" timestamp="2005-08-26 13:43">
+			<file name="auctioneer.lua">
+				<delete function="Auctioneer_New_Command"/>
+				<add function="Auctioneer_Command"/>
+			</file>
+			<developer>
+				As promised in optimization3 after a few days of shakedown, the old commented command handling code has been deleted and the new code main function renamed from Auctioneer_new_Command() to Auctioneer_Command() and as such the filesize has been reduced by ~20kb (Yay!). Just like last time I won't add a "Public" changelog comment since this change will be transparent to the end-user.
+			</developer>
+		</optimization>
 		<optimization id="optimization3" by="MentalPower" timestamp="2005-08-23 21:37">
 			<file name="auctioneer.lua">
 				<add function="Auctioneer_New_Command"/>
