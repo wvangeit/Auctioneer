@@ -2443,7 +2443,7 @@ function Auctioneer_AlsoInclude(param, chatprint)
 		end
 		return
 	end
-		Auctioneer_SetFilter("also", param);
+	Auctioneer_SetFilter("also", param);
 end
 
 
@@ -2520,6 +2520,14 @@ end
 function Auctioneer_PercentVarSet(variable, param, chatprint)
 
 	local paramVal = tonumber(param);
+	if paramVal == nil then
+		-- failed to convert the param to a number
+		if chatprint then
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_ARG, param, variable))
+		end
+		return -- invalid argument, don't do anything
+	end
+	-- param is a valid number, save it
 	Auctioneer_SetFilter(variable, paramVal);
 
 	if (chatprint == true) then

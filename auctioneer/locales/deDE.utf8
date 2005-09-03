@@ -96,6 +96,7 @@ AUCT_FRMT_INFO_STACKSIZE = "  Durchschnittliche Stapelgröße: %d Stück";
 
 AUCT_FRMT_UNKNOWN_LOCALE = "Die angegebene Sprache ('%s') ist unbekannt. Folgende Sprachen sind gültig:";
 AUCT_FRMT_UNKNOWN_RF     = "Der angegebene Parameter ('%s') ist ungültig. Der Parameter muss das Format: [Realm]-[Fraktion] haben. Zum Beispiel: Kil'Jaeden-Alliance";
+AUCT_FRMT_UNKNOWN_ARG    = "'%s' ist kein gültiges Argument für '%s'";
 
 AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
 

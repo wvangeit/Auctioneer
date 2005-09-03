@@ -96,6 +96,7 @@ AUCT_FRMT_INFO_STACKSIZE = "  Average stack size: %d items";
 
 AUCT_FRMT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
 AUCT_FRMT_UNKNOWN_RF     = "Invalid parameter ('%s'). The parameter must be formated like: [realm]-[faction]. For example: Al'Akir-Horde";
+AUCT_FRMT_UNKNOWN_ARG    = "'%s' is no valid argument for '%s'";
 
 AUCT_FRMT_ACT_REMOVE = "Removing auction signature %s from current AH snapshot.";
 

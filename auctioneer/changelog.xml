@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<optimization id="optimization4" by="MentalPower" timestamp="2005-08-26 13:43">
+		<optimization id="optimization4" by="MentalPower" timestamp="2005-08-26 13:43" replace="optimization3" text="concatenate" type="small">
 			<file name="auctioneer.lua">
 				<delete function="Auctioneer_New_Command"/>
 				<add function="Auctioneer_Command"/>
@@ -10,7 +10,7 @@
 				As promised in optimization3 after a few days of shakedown, the old commented command handling code has been deleted and the new code main function renamed from Auctioneer_new_Command() to Auctioneer_Command() and as such the filesize has been reduced by ~20kb (Yay!). Just like last time I won't add a "Public" changelog comment since this change will be transparent to the end-user.
 			</developer>
 		</optimization>
-		<optimization id="optimization3" by="MentalPower" timestamp="2005-08-23 21:37">
+		<optimization id="optimization3" by="MentalPower" timestamp="2005-08-23 21:37" replace="improvement1" text="concatenate"  type="medium">
 			<file name="auctioneer.lua">
 				<add function="Auctioneer_New_Command"/>
 				<add function="Auctioneer_ChatPrint_Help"/>
@@ -84,6 +84,23 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
+		<bugfix id="bugfix19" codedby="Luke1410" reportedby="Deathdragon" sourceforgeid="1281068" timestamp="2005-09-03 0:49">
+			<file name="auctioneer.lua">
+				<change function="Auctioneer_Command" />
+			</file>
+			<file name="locales/enUS.utf8">
+				<added constant="AUCT_FRMT_UNKNOWN_ARG" />
+			</file>
+			<file name="locales/deDE.utf8">
+				<added constant="AUCT_FRMT_UNKNOWN_ARG" />
+			</file>
+			<public>
+				Giving invalid or no arguments to pct-bidmarkdown, pct-markup, pct-maxless, pct-nocomp, pct-underlow or pct-undermkt no longer result in a nil error.
+			</public>
+			<developer>
+				Added missing validation to the second argument for those commands. If the argument is invalid (tonumber returns nil), a error message is printed to the chatchannel and the current settings are not changed.
+			</developer>
+		</bugfix>
 		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 2:50">
 			<file name="itemdata.xml" />
 			<public>
