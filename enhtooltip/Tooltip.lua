@@ -265,28 +265,6 @@ function TT_Hide()
 	TT_ChatCurrentItem = "";
 end
 
-local function EnhTooltip_OnHyperLinkShow(name, link, button)
-	if (ItemRefTooltip:IsVisible()) then
-		local itemName = ItemRefTooltipTextLeft1:GetText();
-		if (itemName and TT_ChatCurrentItem ~= itemName) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
-			TT_ChatCurrentItem = itemName;
-
-			if (button == "RightButton") then
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
-			else
-				TT_Clear();
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
-				TT_Show(ItemRefTooltip);
-				-- save the currently shown item, to redisplay it, if needed
-				OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
-			end
-		end
-	else
-		OldChatLinkItem = nil -- mark curHyperLink as obsolete
-	end
-end
-
 function TT_Clear()
 	TT_Hide();
 	EnhancedTooltip.hasEmbed = false;
@@ -490,9 +468,18 @@ function TT_GameTooltip_OnHide()
 	if (curName == hidingName) then
 		TT_Hide();
 	end
-	-- redisplay itemlink info, if the ItemRefTooltip is still displayed
-	if OldChatLinkItem then
-		EnhTooltip_OnHyperLinkShow(OldChatLinkItem.name, OldChatLinkItem.link, OldChatLinkItem.button)
+
+	if this == ItemRefTooltip then
+		-- closing chatreferenceTT?
+		OldChatLinkItem = nil -- remove old chatlink data
+	elseif OldChatLinkItem then
+		-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
+
+		local Backup = {["name"]=OldChatLinkItem.name, ["link"]=OldChatLinkItem.link, ["button"]=OldChatLinkItem.button}
+		-- redisplay old chatlinkdata, if there was one before
+		HideUIPanel(ItemRefTooltip)
+		TT_Chat_OnHyperlinkShow(Backup.name, Backup.link, Backup.button)
+		ShowUIPanel(ItemRefTooltip)
 	end
 end
 
@@ -580,8 +567,24 @@ end
 
 function TT_Chat_OnHyperlinkShow(name, link, button)
 	Orig_Chat_OnHyperlinkShow(name, link, button);
-	-- using own function to display the EnhTooltip, to allow redisplaying it, if needed
-	EnhTooltip_OnHyperLinkShow(name, link, button)
+
+	if (ItemRefTooltip:IsVisible()) then
+		local itemName = ItemRefTooltipTextLeft1:GetText();
+		if (itemName and TT_ChatCurrentItem ~= itemName) then
+			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
+			TT_ChatCurrentItem = itemName;
+
+			if (button == "RightButton") then
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
+			else
+				TT_Clear();
+				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
+				TT_Show(ItemRefTooltip);
+				-- save the currently shown item, to redisplay it, if needed
+				OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
+			end
+		end
+	end
 end
 
 function TT_AuctionFrameItem_OnEnter(type, index)

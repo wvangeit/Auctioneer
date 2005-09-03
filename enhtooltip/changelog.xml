@@ -12,10 +12,20 @@
 				Replaced the global variable TT_OldChatLinkItem with its local counterpart: OldChatLinkItem, as there's no need to have a global one.
 			</developer>
 		</optimization>
+		<bugfix id="bugfix5" codedby="Luke1410" sourceforgeid="1272712" replace="optimization1" text="concatenate" timestamp="2005-09-03 02:47">
+			<file name="Tooltip.lua">
+				<remove function="EnhTooltip_OnHyperLinkShow" />
+				<change function="TT_GameTooltip_OnHide" />
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				In embed mode, the enhtooltiptext in the itemreftooltip became duplicated. This has been fixed. The itemreftooltip will now also adjust, when switching to/from embed mode while it is being displayed.
+			</developer>
+		</bugfix>
 		<bugfix id="bugfix4" codedby="Luke1410" sourceforgeid="1249951" timestamp="2005-08-20 10:58">
 			<file name="Tooltip.lua">
-				<added variable="TT_OldChatLinkItem" />
-				<added function="EnhTooltip_OnHyperLinkShow" />
+				<add variable="TT_OldChatLinkItem" />
+				<add function="EnhTooltip_OnHyperLinkShow" />
 				<change function="TT_Chat_OnHyperlinkShow" />
 				<change function="TT_GameTooltip_OnHide" />
 			</file>
@@ -57,7 +67,7 @@
 				the tooltip could swap over the right side of the window
 			</public>
 		</bugfix>
-		<added id="addition1" codedby="Luke1410" timestamp="2005-08-05 00:19">
+		<added id="improvement1" codedby="Luke1410" timestamp="2005-08-05 00:19">
 			<file name="Tooltip.lua">
 				<change function="TT_GetTextGSC" />
 			</file>
