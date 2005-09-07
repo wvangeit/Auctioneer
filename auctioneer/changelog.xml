@@ -84,7 +84,7 @@
 				removed the if-construct and the local variable by replacing the for-breaks with direct returns
 			</developer>
 		</optimization>
-		<bugfix id="bugfix19" codedby="Luke1410" reportedby="Deathdragon" sourceforgeid="1281068" timestamp="2005-09-03 0:49">
+		<bugfix id="bugfix19" codedby="Luke1410" reportedby="Deathdragon" sourceforgeid="1281068" timestamp="2005-09-03 00:49">
 			<file name="auctioneer.lua">
 				<change function="Auctioneer_Command" />
 			</file>
@@ -101,7 +101,7 @@
 				Added missing validation to the second argument for those commands. If the argument is invalid (tonumber returns nil), a error message is printed to the chatchannel and the current settings are not changed.
 			</developer>
 		</bugfix>
-		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 2:50">
+		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 02:50">
 			<file name="itemdata.xml" />
 			<public>
 				Ichor of Undeathis listed as being also used for alchemy, now.
@@ -299,14 +299,18 @@
 				added 1 usage-type
 			</public>
 		</bugfix>
-		<bugfix id="bugfix2" fixedby="Luke1410" timestamp="2005-07-27 22:04">
+		<bugfix id="bugfix2" fixedby="Luke1410" timestamp="2005-09-04 15:30">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_FRMT_AUCTINFO_SNAP" />
+				<change constant="AUCT_FRMT_AUCTINFO_LOW" />
 				<change constant="AUCT_TEXT_NONE" />
 			</file>
-			<public>
-				Cut a string a bit to fit into the frame.
+			<developer>
+				Cut two strings a bit to better fit into the frame.
 				Fixed a wrong translated string.
+			</developer>
+			<public>
+				Some small corrections to the German localisation.
 			</public>
 		</bugfix>
 		<bugfix id="bugfix1" submitedby="bizarrojack" codedby="Luke1410" timestamp="2005-07-27 19:49">

@@ -102,7 +102,7 @@ AUCT_FRMT_ACT_REMOVE = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbil
 
 AUCT_FRMT_AUCTINFO_HIST     = "%d historisch";
 AUCT_FRMT_AUCTINFO_SNAP     = "%d aus letztem Scan";
-AUCT_FRMT_AUCTINFO_LOW      = "günstigster Snapshot";
+AUCT_FRMT_AUCTINFO_LOW      = "billigster Snapshot";
 AUCT_FRMT_AUCTINFO_NOLOW    = "Nicht im letzten Snapshot gesehn";
 AUCT_FRMT_AUCTINFO_ORIG     = "Original-Gebot";
 AUCT_FRMT_AUCTINFO_SUGBUY   = "Empf. Sofortkauf";
