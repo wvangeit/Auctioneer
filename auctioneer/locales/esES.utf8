@@ -98,6 +98,8 @@ AUCT_FRMT_INFO_STACKSIZE = "  Tamaño promedio del paquete: %d artículos";
 
 AUCT_FRMT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:"; 
 AUCT_FRMT_UNKNOWN_RF     = "Parametro inválido ('%s'). El parámetro debe de estar en la forma de: [reino]-[facción]. Por ejemplo: Al'Akir-Horde";
+AUCT_FRMT_UNKNOWN_ARG    = "'%s' no es un argumento valido de '%s'";
+
 
 AUCT_FRMT_ACT_REMOVE = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
