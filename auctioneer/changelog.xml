@@ -1,6 +1,129 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<improvement id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
+			<file name="Auctioneer.lua">
+				<change function="Auctioneer_OnOff"/>
+				<change function="Auctioneer_AlsoInclude"/>
+				<change function="Auctioneer_MeshOnOff"/>
+				<change function="Auctioneer_GenVarSet"/>
+				<change function="Auctioneer_PercentVarSet"/>
+			</file>
+			<file name="locales\enUS.utf8">
+				<add constant="AUCTIONEER_GUI_MAIN_HELP"/>
+				<add constant="AUCTIONEER_GUI_MAIN_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_LOCALE"/>
+				<add constant="AUCTIONEER_GUI_VERBOSE"/>
+				<add constant="AUCTIONEER_GUI_STATS_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_STATS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_STATS_HELP"/>
+				<add constant="AUCTIONEER_GUI_AVERAGES"/>
+				<add constant="AUCTIONEER_GUI_MEDIAN"/>
+				<add constant="AUCTIONEER_GUI_SUGGEST"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HELP"/>
+				<add constant="AUCTIONEER_GUI_VENDOR"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_BUY"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_SELL"/>
+				<add constant="AUCTIONEER_GUI_EMBED_HEADER"/>
+				<add constant="AUCTIONEER_GUI_EMBED"/>
+				<add constant="AUCTIONEER_GUI_EMBED_BLANKLINE"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HELP"/>
+				<add constant="AUCTIONEER_GUI_BIDMARKDOWN"/>
+				<add constant="AUCTIONEER_GUI_MARKUP"/>
+				<add constant="AUCTIONEER_GUI_MAXLESS"/>
+				<add constant="AUCTIONEER_GUI_NOCOMP"/>
+				<add constant="AUCTIONEER_GUI_UNDERLOW"/>
+				<add constant="AUCTIONEER_GUI_UNDERMKT"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HEADER"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HELP"/>
+				<add constant="AUCTIONEER_GUI_AUTOFILL"/>
+				<add constant="AUCTIONEER_GUI_ALSO"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OPPOSITE"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OFF"/>
+				<add constant="AUCTIONEER_GUI_ALSO_DISPLAY"/>
+				<add constant="AUCTIONEER_GUI_MESH"/>
+				<add constant="AUCTIONEER_GUI_MESH_OFF"/>
+				<add constant="AUCTIONEER_GUI_MESH_SHIFT"/>
+				<add constant="AUCTIONEER_GUI_MESH_CTRL"/>
+				<add constant="AUCTIONEER_GUI_MESH_ALT"/>
+				<add constant="AUCTIONEER_GUI_MESH_MODIFIER_HELP"/>
+				<add constant="AUCTIONEER_GUI_LINK"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_HELP"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_FEEDBACK"/>
+			</file>
+			<file name="locales\esES.utf8">
+				<add constant="AUCTIONEER_GUI_MAIN_HELP"/>
+				<add constant="AUCTIONEER_GUI_MAIN_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_LOCALE"/>
+				<add constant="AUCTIONEER_GUI_VERBOSE"/>
+				<add constant="AUCTIONEER_GUI_STATS_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_STATS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_STATS_HELP"/>
+				<add constant="AUCTIONEER_GUI_AVERAGES"/>
+				<add constant="AUCTIONEER_GUI_MEDIAN"/>
+				<add constant="AUCTIONEER_GUI_SUGGEST"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HELP"/>
+				<add constant="AUCTIONEER_GUI_VENDOR"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_BUY"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_SELL"/>
+				<add constant="AUCTIONEER_GUI_EMBED_HEADER"/>
+				<add constant="AUCTIONEER_GUI_EMBED"/>
+				<add constant="AUCTIONEER_GUI_EMBED_BLANKLINE"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HELP"/>
+				<add constant="AUCTIONEER_GUI_BIDMARKDOWN"/>
+				<add constant="AUCTIONEER_GUI_MARKUP"/>
+				<add constant="AUCTIONEER_GUI_MAXLESS"/>
+				<add constant="AUCTIONEER_GUI_NOCOMP"/>
+				<add constant="AUCTIONEER_GUI_UNDERLOW"/>
+				<add constant="AUCTIONEER_GUI_UNDERMKT"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HEADER"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HELP"/>
+				<add constant="AUCTIONEER_GUI_AUTOFILL"/>
+				<add constant="AUCTIONEER_GUI_ALSO"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OPPOSITE"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OFF"/>
+				<add constant="AUCTIONEER_GUI_ALSO_DISPLAY"/>
+				<add constant="AUCTIONEER_GUI_MESH"/>
+				<add constant="AUCTIONEER_GUI_MESH_OFF"/>
+				<add constant="AUCTIONEER_GUI_MESH_SHIFT"/>
+				<add constant="AUCTIONEER_GUI_MESH_CTRL"/>
+				<add constant="AUCTIONEER_GUI_MESH_ALT"/>
+				<add constant="AUCTIONEER_GUI_MESH_MODIFIER_HELP"/>
+				<add constant="AUCTIONEER_GUI_LINK"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_HELP"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_FEEDBACK"/>
+			</file>
+			<developer>
+				I've modified all of the command handlers to alert Khaos in the event a variable is changed by way of slash commands. I've also included localization strings to the Khaos menu options. I've also modified the Auctioneer_AlsoInclude function to alert when the feature has been turned on and off. Lastly I've optimized some of the GUI config options to make them more intuitive.
+			</developer>
+			<public>
+				A button has been added to the Khaos configuration screen to reload the UI since this is the only way to change the language of the Khaos config to match that of Auctioneer.
+			</public>
+		</improvement>
 		<optimization id="optimization4" by="MentalPower" timestamp="2005-08-26 13:43" replace="optimization3" text="concatenate" type="small">
 			<file name="auctioneer.lua">
 				<delete function="Auctioneer_New_Command"/>
