@@ -3,6 +3,7 @@
 	<nextrelease>
 		<improvement id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
 			<file name="Auctioneer.lua">
+				<add function="Auctioneer_SetLocale"/>
 				<change function="Auctioneer_OnOff"/>
 				<change function="Auctioneer_AlsoInclude"/>
 				<change function="Auctioneer_MeshOnOff"/>
