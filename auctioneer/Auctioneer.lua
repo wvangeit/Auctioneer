@@ -1905,7 +1905,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-bidmarkdown "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-bidmarkdown, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-bidmarkdown", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT;
@@ -1928,7 +1928,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-markup "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-markup, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-markup", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_MARKUP_DEFAULT;
@@ -1951,7 +1951,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-maxless "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-maxless, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-maxless", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_MAXLESS_DEFAULT;
@@ -1974,7 +1974,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-nocomp "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-nocomp, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-nocomp", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_NOCOMP_DEFAULT;
@@ -1997,7 +1997,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-underlow "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-underlow, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-underlow", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_UNDERLOW_DEFAULT;
@@ -2020,7 +2020,7 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_Command("pct-undermkt "..state.value, "GUI");
 				end;
 				feedback = function (state)
-					return string.format(AUCT_FRMT_ACT_SET, pct-undermkt, state.value.."%");
+					return string.format(AUCT_FRMT_ACT_SET, "pct-undermkt", state.value.."%");
 				end;
 				default = {
 					value = AUCT_OPT_PCT_UNDERMKT_DEFAULT;
