@@ -233,6 +233,7 @@ AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
 AUCT_TEXT_SCAN = "Scan";
 AUCT_TEXT_AUCTION = "auction";
 AUCT_TEXT_NONE = "none";
+AUCT_TEXT_USAGE = "Usage:";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
@@ -240,6 +241,11 @@ AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: auction scanning finished";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 AUCTIONEER_AUCTION_SCAN_NOCAT = "You must have at least one category selected to scan.";
+AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total auctions scanned: ";
+AUCTIONEER_AUCTION_NEW_AUCTS = "New auctions scanned: ";
+AUCTIONEER_AUCTION_OLD_AUCTS = "Previously scanned: ";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Defunct auctions removed: ";
+AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepencies: ";
 
 -- GUI localizations
 

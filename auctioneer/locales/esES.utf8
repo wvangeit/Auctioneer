@@ -236,13 +236,19 @@ AUCT_FRMT_ACT_UNKNOWN = "Comando o palabra clave desconocida: '%s'";
 AUCT_TEXT_SCAN = "Explorar";
 AUCT_TEXT_AUCTION = "Subasta";
 AUCT_TEXT_NONE = "ningun";
+AUCT_TEXT_USAGE = "Uso:";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Explorando \"%s\" página 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Explorando \"%s\" página %d de %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: La exploración de las subastas ha finalizado";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que hable con un subastador.";
-AUCTIONEER_AUCTION_SCAN_NOCAT = "Usted debe tener al menos una categoria seleccionada para explorar.";
+AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
+AUCTIONEER_AUCTION_SCAN_NOCAT = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
+AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total de subastas exploradas: ";
+AUCTIONEER_AUCTION_NEW_AUCTS = "Nuevas subastas exploradas: ";
+AUCTIONEER_AUCTION_OLD_AUCTS = "Subastas exploradas previamente: ";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Subastas viejas removidas: ";
+AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepancias: ";
 
 -- GUI localizations
 

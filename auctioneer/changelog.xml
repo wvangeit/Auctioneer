@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
-		<improvement id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
+		<improvement id="improvement3" codedby="MentalPower" reportedby="Luke1410" sourceforgeid="1265613" timestamp="2005-09-12 07:00">
+			<file name="locales\enUS.utf8">
+				<add constant="AUCT_TEXT_USAGE"/>
+				<add constant="AUCTIONEER_AUCTION_TOTAL_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_NEW_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_OLD_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DEFUNCT_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DISCREPANCIES"/>
+			</file>
+			<file name="locales\esES.utf8">
+				<add constant="AUCT_TEXT_USAGE"/>
+				<add constant="AUCTIONEER_AUCTION_TOTAL_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_NEW_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_OLD_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DEFUNCT_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DISCREPANCIES"/>
+			</file>
+			<developer>
+				Well, I had some time to burn so I added the required constants for the "Usage:" bit printed from the /auc help command and the End of scan statistics. These have also been translated to spanish.
+			</developer>
+			<public>
+				The beginning of the "/auc help" command is now properly translated. Also translated are the end of scan statistics.
+			</public>
+		</improvement>
+		<optimization id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
 			<file name="Auctioneer.lua">
 				<add function="Auctioneer_SetLocale"/>
 				<change function="Auctioneer_OnOff"/>
@@ -124,7 +148,7 @@
 			<public>
 				A button has been added to the Khaos configuration screen to reload the UI since this is the only way to change the language of the Khaos config to match that of Auctioneer.
 			</public>
-		</improvement>
+		</optimization>
 		<optimization id="optimization4" by="MentalPower" timestamp="2005-08-26 13:43" replace="optimization3" text="concatenate" type="small">
 			<file name="auctioneer.lua">
 				<delete function="Auctioneer_New_Command"/>

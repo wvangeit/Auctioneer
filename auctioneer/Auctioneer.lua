@@ -255,13 +255,13 @@ local function Auctioneer_FinishedAuctionScan_Hook()
 
 	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
 
-	Auctioneer_ChatPrint("Total auctions scanned: "..colorTextWhite(lTotalAuctionsScannedCount));
-	Auctioneer_ChatPrint("New auctions scanned: "..colorTextWhite(lNewAuctionsCount));
-	Auctioneer_ChatPrint("Previously scanned: "..colorTextWhite(lOldAuctionsCount));
-	Auctioneer_ChatPrint("Defunct auctions removed: "..colorTextWhite(lDefunctAuctionsCount));
+	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_TOTAL_AUCTS, colorTextWhite(lTotalAuctionsScannedCount)));
+	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_NEW_AUCTS, colorTextWhite(lNewAuctionsCount)));
+	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_OLD_AUCTS, colorTextWhite(lOldAuctionsCount)));
+	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_DEFUNCT_AUCTS, colorTextWhite(lDefunctAuctionsCount)));
 
 	if (nullSafe(lDiscrepencyCount) > 0) then
-		Auctioneer_ChatPrint("Discrepencies: "..colorTextWhite(lDiscrepencyCount));
+		Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_DISCREPANCIES, colorTextWhite(lDiscrepencyCount)));
 	end
 end
 
@@ -2425,7 +2425,7 @@ function Auctioneer_ChatPrint_Help()
 	local onOffToggle = " ("..AUCT_CMD_ON.."|"..AUCT_CMD_OFF.."|"..AUCT_CMD_TOGGLE..")";
 	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
-	Auctioneer_ChatPrint("Usage:");
+	Auctioneer_ChatPrint(AUCT_TEXT_USAGE);
 	Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. AUCT_HELP_ONOFF);
 	
 	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_VERBOSE, Auctioneer_GetFilterVal(AUCT_SHOW_VERBOSE), AUCT_HELP_VERBOSE));
