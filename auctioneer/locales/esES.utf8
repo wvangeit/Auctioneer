@@ -146,7 +146,7 @@ AUCT_CMD_AUTOFILL = "autoinsertar";
 AUCT_CMD_PCT_BIDMARKDOWN = "pct-menosoferta";
 AUCT_CMD_PCT_MARKUP      = "pct-mas";
 AUCT_CMD_PCT_MAXLESS     = "pct-sinmaximo";
-AUCT_CMD_PCT_NOCOMP      = "pct-nocomp";
+AUCT_CMD_PCT_NOCOMP      = "pct-sincomp";
 AUCT_CMD_PCT_UNDERLOW    = "pct-bajomenor";
 AUCT_CMD_PCT_UNDERMKT    = "pct-bajomercado";
 

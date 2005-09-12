@@ -274,6 +274,7 @@ AUCT_FRMT_ACT_UNKNOWN="Unknown command keyword: '%s'";
 AUCT_TEXT_SCAN="Scan";
 AUCT_TEXT_AUCTION="auction";
 AUCT_TEXT_NONE="none";
+AUCT_TEXT_USAGE="Usage:";
 
 
 AUCTIONEER_AUCTION_SCAN_START="Auctioneer: scanning %s page 1...";
@@ -281,6 +282,11 @@ AUCTIONEER_AUCTION_PAGE_N="Auctioneer: scanning %s page %d of %d";
 AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: auction scanning finished";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 AUCTIONEER_AUCTION_SCAN_NOCAT="You must have at least one category selected to scan.";
+AUCTIONEER_AUCTION_TOTAL_AUCTS="Total auctions scanned: ";
+AUCTIONEER_AUCTION_NEW_AUCTS="New auctions scanned: ";
+AUCTIONEER_AUCTION_OLD_AUCTS="Previously scanned: ";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS="Defunct auctions removed: ";
+AUCTIONEER_AUCTION_DISCREPANCIES="Discrepencies: ";
 
 
 
@@ -534,6 +540,11 @@ AUCTIONEER_AUCTION_SCAN_NOCAT="Es muss mindestens eine Kategorie ausgew\195\164h
 
 
 -- The following definitions are missing in this locale:
+--	AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "";
+--	AUCTIONEER_AUCTION_DISCREPANCIES = "";
+--	AUCTIONEER_AUCTION_NEW_AUCTS = "";
+--	AUCTIONEER_AUCTION_OLD_AUCTS = "";
+--	AUCTIONEER_AUCTION_TOTAL_AUCTS = "";
 --	AUCTIONEER_GUI_ALSO = "";
 --	AUCTIONEER_GUI_ALSO_DISPLAY = "";
 --	AUCTIONEER_GUI_ALSO_OFF = "";
@@ -635,6 +646,7 @@ AUCTIONEER_AUCTION_SCAN_NOCAT="Es muss mindestens eine Kategorie ausgew\195\164h
 --	AUCT_SHOW_VENDOR_BUY = "";
 --	AUCT_SHOW_VENDOR_SELL = "";
 --	AUCT_SHOW_VERBOSE = "";
+--	AUCT_TEXT_USAGE = "";
 end
 
 -- Locale strings for the esES locale
@@ -784,6 +796,7 @@ AUCT_CMD_AUTOFILL="autoinsertar";
 AUCT_CMD_PCT_BIDMARKDOWN="pct-menosoferta";
 AUCT_CMD_PCT_MARKUP="pct-mas";
 AUCT_CMD_PCT_MAXLESS="pct-sinmaximo";
+AUCT_CMD_PCT_NOCOMP="pct-sincomp";
 AUCT_CMD_PCT_UNDERLOW="pct-bajomenor";
 AUCT_CMD_PCT_UNDERMKT="pct-bajomercado";
 
@@ -865,13 +878,19 @@ AUCT_FRMT_ACT_UNKNOWN="Comando o palabra clave desconocida: '%s'";
 AUCT_TEXT_SCAN="Explorar";
 AUCT_TEXT_AUCTION="Subasta";
 AUCT_TEXT_NONE="ningun";
+AUCT_TEXT_USAGE="Uso:";
 
 -- AH Scanning localizations
 AUCTIONEER_AUCTION_SCAN_START="Auctioneer: Explorando \"%s\" p\195\161gina 1...";
 AUCTIONEER_AUCTION_PAGE_N="Auctioneer: Explorando \"%s\" p\195\161gina %d de %d";
 AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: La exploraci\195\179n de las subastas ha finalizado";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer ejecutara una exploracion de las subastas la proxima vez que hable con un subastador.";
-AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccionada para explorar.";
+AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
+AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccionada para poder explorar.";
+AUCTIONEER_AUCTION_TOTAL_AUCTS="Total de subastas exploradas: ";
+AUCTIONEER_AUCTION_NEW_AUCTS="Nuevas subastas exploradas: ";
+AUCTIONEER_AUCTION_OLD_AUCTS="Subastas exploradas previamente: ";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS="Subastas viejas removidas: ";
+AUCTIONEER_AUCTION_DISCREPANCIES="Discrepancias: ";
 
 -- GUI localizations
 
@@ -931,7 +950,6 @@ AUCTIONEER_GUI_RELOADUI_FEEDBACK="Recargando el Interf\195\161z de WoW";
 -- The following definitions are missing in this locale:
 --	AUCT_CMD_ALT = "";
 --	AUCT_CMD_CTRL = "";
---	AUCT_CMD_PCT_NOCOMP = "";
 --	AUCT_CMD_SHIFT = "";
 --	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
 --	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
@@ -1019,7 +1037,12 @@ AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison d
 
 
 -- The following definitions are missing in this locale:
+--	AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "";
+--	AUCTIONEER_AUCTION_DISCREPANCIES = "";
+--	AUCTIONEER_AUCTION_NEW_AUCTS = "";
+--	AUCTIONEER_AUCTION_OLD_AUCTS = "";
 --	AUCTIONEER_AUCTION_SCAN_NOCAT = "";
+--	AUCTIONEER_AUCTION_TOTAL_AUCTS = "";
 --	AUCTIONEER_GUI_ALSO = "";
 --	AUCTIONEER_GUI_ALSO_DISPLAY = "";
 --	AUCTIONEER_GUI_ALSO_OFF = "";
@@ -1214,6 +1237,7 @@ AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison d
 --	AUCT_TEXT_AUCTION = "";
 --	AUCT_TEXT_NONE = "";
 --	AUCT_TEXT_SCAN = "";
+--	AUCT_TEXT_USAGE = "";
 --	AUCT_TIME_LONG = "";
 --	AUCT_TIME_MED = "";
 --	AUCT_TIME_SHORT = "";
