@@ -236,16 +236,17 @@ AUCT_TEXT_NONE = "none";
 AUCT_TEXT_USAGE = "Usage:";
 
 -- AH Scanning localizations
+
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: scanning %s page 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: scanning %s page %d of %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: auction scanning finished";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 AUCTIONEER_AUCTION_SCAN_NOCAT = "You must have at least one category selected to scan.";
-AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total auctions scanned: ";
-AUCTIONEER_AUCTION_NEW_AUCTS = "New auctions scanned: ";
-AUCTIONEER_AUCTION_OLD_AUCTS = "Previously scanned: ";
-AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Defunct auctions removed: ";
-AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepencies: ";
+AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total auctions scanned: %s";
+AUCTIONEER_AUCTION_NEW_AUCTS = "New auctions scanned: %s";
+AUCTIONEER_AUCTION_OLD_AUCTS = "Previously scanned: %s";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Defunct auctions removed: %s";
+AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepencies: %s";
 
 -- GUI localizations
 
@@ -271,6 +272,7 @@ AUCTIONEER_GUI_CLEAR_HEADER = "Clear Data";
 AUCTIONEER_GUI_CLEAR_HELP = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
 AUCTIONEER_GUI_CLEARALL = "Clear All Auctioneer Data";
 AUCTIONEER_GUI_CLEARALL_HELP = "Click here to clear all of auctioneer data for the current server-realm.";
+AUCTIONEER_GUI_CLEARALL_NOTE = "for the current server-faction";
 AUCTIONEER_GUI_CLEARALL_BUTTON = "Clear All";
 AUCTIONEER_GUI_CLEARSNAP = "Clear Snapshot data";
 AUCTIONEER_GUI_CLEARSNAP_HELP = "Click here to clear the last Auctioneer snapshot data.";

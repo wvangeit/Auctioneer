@@ -19,7 +19,6 @@ AUCT_CLAS_SHAMAN = "Chamanes";
 AUCT_CLAS_WARLOCK = "Brujos";
 AUCT_CLAS_WEAPON = "Arma";
 AUCT_CLAS_WRITTEN = "Escrito";
-AUCT_CLAS_PRIEST = "Sacerdote";
 
 AUCT_TYPE_ALCHEM = "Alquímia";
 AUCT_TYPE_COOK = "Cocinar";
@@ -32,7 +31,6 @@ AUCT_TYPE_POISON = "Veneno";
 AUCT_TYPE_PRIEST = "Mágico - Sacerdote";
 AUCT_TYPE_SMITH = "Herrería";
 AUCT_TYPE_TAILOR = "Sastrería";
-
 
 AUCT_RECIPE_PREFIXES = { "Receta: ", "Patrón: ", "Plano: ", "Esquema: ", "Fórmula: " };
 
@@ -99,7 +97,6 @@ AUCT_FRMT_INFO_STACKSIZE = "  Tamaño promedio del paquete: %d artículos";
 AUCT_FRMT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:"; 
 AUCT_FRMT_UNKNOWN_RF     = "Parametro inválido ('%s'). El parámetro debe de estar en la forma de: [reino]-[facción]. Por ejemplo: Al'Akir-Horde";
 AUCT_FRMT_UNKNOWN_ARG    = "'%s' no es un argumento valido de '%s'";
-
 
 AUCT_FRMT_ACT_REMOVE = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
@@ -239,16 +236,17 @@ AUCT_TEXT_NONE = "ningun";
 AUCT_TEXT_USAGE = "Uso:";
 
 -- AH Scanning localizations
+
 AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Explorando \"%s\" página 1...";
 AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Explorando \"%s\" página %d de %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: La exploración de las subastas ha finalizado";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 AUCTIONEER_AUCTION_SCAN_NOCAT = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
-AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total de subastas exploradas: ";
-AUCTIONEER_AUCTION_NEW_AUCTS = "Nuevas subastas exploradas: ";
-AUCTIONEER_AUCTION_OLD_AUCTS = "Subastas exploradas previamente: ";
-AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Subastas viejas removidas: ";
-AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepancias: ";
+AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total de subastas exploradas: %s";
+AUCTIONEER_AUCTION_NEW_AUCTS = "Nuevas subastas exploradas: %s";
+AUCTIONEER_AUCTION_OLD_AUCTS = "Subastas exploradas previamente: %s";
+AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "Subastas viejas removidas: %s";
+AUCTIONEER_AUCTION_DISCREPANCIES = "Discrepancias: %s";
 
 -- GUI localizations
 
@@ -274,6 +272,7 @@ AUCTIONEER_GUI_CLEAR_HEADER = "Eliminar Información";
 AUCTIONEER_GUI_CLEAR_HELP = "Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la información o solamente la imágen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
 AUCTIONEER_GUI_CLEARALL = "Eliminar toda la información";
 AUCTIONEER_GUI_CLEARALL_HELP = "Seleccione aqui para eliminar toda la información de Auctioneer para el reino-facción corriente.";
+AUCTIONEER_GUI_CLEARALL_NOTE = "el reino-facción corriente.";
 AUCTIONEER_GUI_CLEARALL_BUTTON = "Eliminar Todo";
 AUCTIONEER_GUI_CLEARSNAP = "Eliminar imagen corriente";
 AUCTIONEER_GUI_CLEARSNAP_HELP = "Presione aqui para eliminar la ultima imagen de informacion de Auctioneer.";

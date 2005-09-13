@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<optimization id="optimization6" codedby="MentalPower" timestamp="2005-09-12 10:38" replace="optimization5" text="concatenate" type="small">
+			<file name="Auctioneer.lua">
+				<change function="Auctioneer_Register_Khaos"/>
+				<change function="Auctioneer_MeshOnOff"/>
+				<change function="Auctioneer_GenVarSet"/>
+			</file>
+			<file name="locales\enUS.utf8">
+				<add constant="AUCTIONEER_GUI_CLEARALL_NOTE"/>
+			</file>
+			<file name="locales\esES.utf8">
+				<add constant="AUCTIONEER_GUI_CLEARALL_NOTE"/>
+			</file>
+			<developer>
+				I've reorganized the Khaos config order in auctioneer (as per tester suggestions) to make it more streamlined. I've also changed most of the id's to use the localized strings. I've modified the Auctioneer_MeshOnOff and Auctioneer_GenVarSet so that if no parameters are passed the function toggles automatically. The, hopefully last, string has been transfered to the localization files. No Public note neccessary in my opinion.
+			</developer>
+		</optimization>
 		<improvement id="improvement3" codedby="MentalPower" reportedby="Luke1410" sourceforgeid="1265613" timestamp="2005-09-12 07:00">
 			<file name="locales\enUS.utf8">
 				<add constant="AUCT_TEXT_USAGE"/>
@@ -28,6 +44,7 @@
 		<optimization id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
 			<file name="Auctioneer.lua">
 				<add function="Auctioneer_SetLocale"/>
+				<change function="Auctioneer_Register_Khaos"/>
 				<change function="Auctioneer_OnOff"/>
 				<change function="Auctioneer_AlsoInclude"/>
 				<change function="Auctioneer_MeshOnOff"/>
