@@ -1,6 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 02:50">
+			<file name="itemdata.xml" />
+			<public>
+				Ichor of Undeathis listed as being also used for alchemy, now.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix16" codedby="Luke1410" sourceforgeid="1265493" timestamp="2005-08-21 21:42">
+			<file name="itemdata.xml" />
+			<public>
+				Sharp Claw is listed as being also used for alchemy, now.
+			</public>
+		</bugfix>
+		<bugfix id="bugfix8" codedby="Luke1410" sourceforgeid="1253054" submitedby="lovepump" timestamp="2005-08-06 19:27">
+			<file name="itemdata.xml" />
+			<public>
+				Black Vitriol is now listed as an item used for alchemy
+			</public>
+		</bugfix>
+		<bugfix id="bugfix3" codedby="Luke1410" timestamp="2005-08-11 23:43">
+			<file name="itemdata.xml" />
+			<public>
+				added 47 itemclasses - especially food
+				corrected 3 itemclass
+				added 7 new items
+				added 1 usage-type
+			</public>
+		</bugfix>
+	</nextrelease>
+	<release version="3.0.11" timestamp="2005-09-14 08:22">
 		<optimization id="optimization6" codedby="MentalPower" timestamp="2005-09-12 10:38" replace="optimization5" text="concatenate" type="small">
 			<file name="Auctioneer.lua">
 				<change function="Auctioneer_Register_Khaos"/>
@@ -332,24 +361,12 @@
 				Added missing validation to the second argument for those commands. If the argument is invalid (tonumber returns nil), a error message is printed to the chatchannel and the current settings are not changed.
 			</developer>
 		</bugfix>
-		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 02:50">
-			<file name="itemdata.xml" />
-			<public>
-				Ichor of Undeathis listed as being also used for alchemy, now.
-			</public>
-		</bugfix>
 		<bugfix id="bugfix17" codedby="Luke1410" timestamp="2005-08-21 21:51">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_CLAS_MAGE" />
 			</file>
 			<public>
 				Corrected tiny typo in the German translation.
-			</public>
-		</bugfix>
-		<bugfix id="bugfix16" codedby="Luke1410" sourceforgeid="1265493" timestamp="2005-08-21 21:42">
-			<file name="itemdata.xml" />
-			<public>
-				Shapr Claw is listed as being also used for alchemy, now.
 			</public>
 		</bugfix>
 		<bugfix id="bugfix15" codedby="Luke1410" timestamp="2005-08-21 20:48">
@@ -429,12 +446,6 @@
 				Missed to change the functions called in getHighestSellablePriceForOne and getMarketPrice to use alternate realms/factions.
 				Where needed, I've added a new optional parameter to the functions which allows to work with data from other realms/factions.
 			</developer>
-		</bugfix>
-		<bugfix id="bugfix8" codedby="Luke1410" sourceforgeid="1253054" submitedby="lovepump" timestamp="2005-08-06 19:27">
-			<file name="itemdata.xml" />
-			<public>
-				Black Vitriol is now listed as an item used for alchemy
-			</public>
 		</bugfix>
 		<bugfix id="bugfix7" codedby="Luke1410" timestamp="2005-08-06 18:55">
 			<file name="auctioneer.lua">
@@ -521,15 +532,6 @@
 				Also removed the (xxx bidded) text in the suggested price-line, as it had no purpose at all.
 			</public>
 		</bugfix>
-		<bugfix id="bugfix3" codedby="Luke1410" timestamp="2005-08-11 23:43">
-			<file name="itemdata.xml" />
-			<public>
-				added 47 itemclasses - especially food
-				corrected 3 itemclass
-				added 7 new items
-				added 1 usage-type
-			</public>
-		</bugfix>
 		<bugfix id="bugfix2" fixedby="Luke1410" timestamp="2005-09-04 15:30">
 			<file name="locales/deDE.utf8">
 				<change constant="AUCT_FRMT_AUCTINFO_SNAP" />
@@ -565,8 +567,8 @@
 				The overaul minimum startbid is now correctly named start bid. Before it was called &quot;minimum&quot; which could be easily misunderstood.
 			</public>
 		</bugfix>
-	</nextrelease>
-	<release version="3.0.10" date="">
+	</release>
+	<release version="3.0.10" timestamp="">
 <!--
 		Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
 		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" timestamp="" replacebugfix="bugfix1" text="replace"></bugfix>
