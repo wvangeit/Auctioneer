@@ -7,18 +7,22 @@
 				<change function="Auctioneer_MeshOnOff"/>
 				<change function="Auctioneer_GenVarSet"/>
 			</file>
-			<file name="locales\enUS.utf8">
+			<file name="locales/deDE.utf8">
 				<add constant="AUCTIONEER_GUI_CLEARALL_NOTE"/>
 			</file>
-			<file name="locales\esES.utf8">
+			<file name="locales/enUS.utf8">
+				<add constant="AUCTIONEER_GUI_CLEARALL_NOTE"/>
+			</file>
+			<file name="locales/esES.utf8">
 				<add constant="AUCTIONEER_GUI_CLEARALL_NOTE"/>
 			</file>
 			<developer>
-				I've reorganized the Khaos config order in auctioneer (as per tester suggestions) to make it more streamlined. I've also changed most of the id's to use the localized strings. I've modified the Auctioneer_MeshOnOff and Auctioneer_GenVarSet so that if no parameters are passed the function toggles automatically. The, hopefully last, string has been transfered to the localization files. No Public note neccessary in my opinion.
+				I've reorganized the Khaos config order in auctioneer (as per tester suggestions) to make it more streamlined. I've also changed most of the id's to use the localized strings. I've modified the Auctioneer_MeshOnOff and Auctioneer_GenVarSet so that if no parameters are passed the function toggles automatically. The, hopefully last, string has been transfered to the localization files. No Public note neccessary in my opinion. [addition by Luke1410: also added the German translation]
+			</developer>
 			</developer>
 		</optimization>
-		<improvement id="improvement3" codedby="MentalPower" reportedby="Luke1410" sourceforgeid="1265613" timestamp="2005-09-12 07:00">
-			<file name="locales\enUS.utf8">
+		<bugfix id="bugfix20" codedby="MentalPower" sourceforgeid="1265613" timestamp="2005-09-12 07:00">
+			<file name="locales/deDE.utf8">
 				<add constant="AUCT_TEXT_USAGE"/>
 				<add constant="AUCTIONEER_AUCTION_TOTAL_AUCTS"/>
 				<add constant="AUCTIONEER_AUCTION_NEW_AUCTS"/>
@@ -26,7 +30,15 @@
 				<add constant="AUCTIONEER_AUCTION_DEFUNCT_AUCTS"/>
 				<add constant="AUCTIONEER_AUCTION_DISCREPANCIES"/>
 			</file>
-			<file name="locales\esES.utf8">
+			<file name="locales/enUS.utf8">
+				<add constant="AUCT_TEXT_USAGE"/>
+				<add constant="AUCTIONEER_AUCTION_TOTAL_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_NEW_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_OLD_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DEFUNCT_AUCTS"/>
+				<add constant="AUCTIONEER_AUCTION_DISCREPANCIES"/>
+			</file>
+			<file name="locales/esES.utf8">
 				<add constant="AUCT_TEXT_USAGE"/>
 				<add constant="AUCTIONEER_AUCTION_TOTAL_AUCTS"/>
 				<add constant="AUCTIONEER_AUCTION_NEW_AUCTS"/>
@@ -35,12 +47,12 @@
 				<add constant="AUCTIONEER_AUCTION_DISCREPANCIES"/>
 			</file>
 			<developer>
-				Well, I had some time to burn so I added the required constants for the "Usage:" bit printed from the /auc help command and the End of scan statistics. These have also been translated to spanish.
+				Well, I had some time to burn so I added the required constants for the "Usage:" bit printed from the /auc help command and the End of scan statistics. These have also been translated to spanish. [addition by Luke1410: also added the German translation]
 			</developer>
 			<public>
 				The beginning of the "/auc help" command is now properly translated. Also translated are the end of scan statistics.
 			</public>
-		</improvement>
+		</bugfix>
 		<optimization id="optimization5" codedby="MentalPower" timestamp="2005-09-11 20:27" replace="optimization4" text="concatenate" type="small">
 			<file name="Auctioneer.lua">
 				<add function="Auctioneer_SetLocale"/>
@@ -51,7 +63,7 @@
 				<change function="Auctioneer_GenVarSet"/>
 				<change function="Auctioneer_PercentVarSet"/>
 			</file>
-			<file name="locales\enUS.utf8">
+			<file name="locales/deDE.utf8">
 				<add constant="AUCTIONEER_GUI_MAIN_HELP"/>
 				<add constant="AUCTIONEER_GUI_MAIN_ENABLE"/>
 				<add constant="AUCTIONEER_GUI_LOCALE"/>
@@ -105,7 +117,61 @@
 				<add constant="AUCTIONEER_GUI_RELOADUI_BUTTON"/>
 				<add constant="AUCTIONEER_GUI_RELOADUI_FEEDBACK"/>
 			</file>
-			<file name="locales\esES.utf8">
+			<file name="locales/enUS.utf8">
+				<add constant="AUCTIONEER_GUI_MAIN_HELP"/>
+				<add constant="AUCTIONEER_GUI_MAIN_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_LOCALE"/>
+				<add constant="AUCTIONEER_GUI_VERBOSE"/>
+				<add constant="AUCTIONEER_GUI_STATS_ENABLE"/>
+				<add constant="AUCTIONEER_GUI_STATS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_STATS_HELP"/>
+				<add constant="AUCTIONEER_GUI_AVERAGES"/>
+				<add constant="AUCTIONEER_GUI_MEDIAN"/>
+				<add constant="AUCTIONEER_GUI_SUGGEST"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_HELP"/>
+				<add constant="AUCTIONEER_GUI_VENDOR"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_BUY"/>
+				<add constant="AUCTIONEER_GUI_VENDOR_SELL"/>
+				<add constant="AUCTIONEER_GUI_EMBED_HEADER"/>
+				<add constant="AUCTIONEER_GUI_EMBED"/>
+				<add constant="AUCTIONEER_GUI_EMBED_BLANKLINE"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HEADER"/>
+				<add constant="AUCTIONEER_GUI_CLEAR_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARALL_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_HELP"/>
+				<add constant="AUCTIONEER_GUI_CLEARSNAP_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HEADER"/>
+				<add constant="AUCTIONEER_GUI_PERCENTS_HELP"/>
+				<add constant="AUCTIONEER_GUI_BIDMARKDOWN"/>
+				<add constant="AUCTIONEER_GUI_MARKUP"/>
+				<add constant="AUCTIONEER_GUI_MAXLESS"/>
+				<add constant="AUCTIONEER_GUI_NOCOMP"/>
+				<add constant="AUCTIONEER_GUI_UNDERLOW"/>
+				<add constant="AUCTIONEER_GUI_UNDERMKT"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HEADER"/>
+				<add constant="AUCTIONEER_GUI_OTHER_HELP"/>
+				<add constant="AUCTIONEER_GUI_AUTOFILL"/>
+				<add constant="AUCTIONEER_GUI_ALSO"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OPPOSITE"/>
+				<add constant="AUCTIONEER_GUI_ALSO_OFF"/>
+				<add constant="AUCTIONEER_GUI_ALSO_DISPLAY"/>
+				<add constant="AUCTIONEER_GUI_MESH"/>
+				<add constant="AUCTIONEER_GUI_MESH_OFF"/>
+				<add constant="AUCTIONEER_GUI_MESH_SHIFT"/>
+				<add constant="AUCTIONEER_GUI_MESH_CTRL"/>
+				<add constant="AUCTIONEER_GUI_MESH_ALT"/>
+				<add constant="AUCTIONEER_GUI_MESH_MODIFIER_HELP"/>
+				<add constant="AUCTIONEER_GUI_LINK"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_HELP"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_BUTTON"/>
+				<add constant="AUCTIONEER_GUI_RELOADUI_FEEDBACK"/>
+			</file>
+			<file name="locales/esES.utf8">
 				<add constant="AUCTIONEER_GUI_MAIN_HELP"/>
 				<add constant="AUCTIONEER_GUI_MAIN_ENABLE"/>
 				<add constant="AUCTIONEER_GUI_LOCALE"/>
@@ -160,7 +226,7 @@
 				<add constant="AUCTIONEER_GUI_RELOADUI_FEEDBACK"/>
 			</file>
 			<developer>
-				I've modified all of the command handlers to alert Khaos in the event a variable is changed by way of slash commands. I've also included localization strings to the Khaos menu options. I've also modified the Auctioneer_AlsoInclude function to alert when the feature has been turned on and off. Lastly I've optimized some of the GUI config options to make them more intuitive.
+				I've modified all of the command handlers to alert Khaos in the event a variable is changed by way of slash commands. I've also included localization strings to the Khaos menu options. I've also modified the Auctioneer_AlsoInclude function to alert when the feature has been turned on and off. Lastly I've optimized some of the GUI config options to make them more intuitive. [addition by Luke1410: also added the German translation]
 			</developer>
 			<public>
 				A button has been added to the Khaos configuration screen to reload the UI since this is the only way to change the language of the Khaos config to match that of Auctioneer.
