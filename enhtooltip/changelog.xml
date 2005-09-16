@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix6" codedby="Luke1410" sourceforgeid="1292439" timestamp="2005-09-03 02:47">
+			<file name="Tooltip.lua">
+				<change function="TT_Chat_OnHyperlinkShow" />
+			</file>
+			<developer>
+				Used the wrong argument to generate the fabricatedLink. Though not sure in which case the second argument (which normally is the complete link) is nil, fixed that issue.
+				Though I could not test it myself, I'm almost 100% sure that this fixes the bug.
+			</developer>
+			<public>
+				Fixed the "error in Tooltip line 575 issue" when clicking on itemlinks in the chatwindow introduced in Tooltip 3.0.5.
+			</public>
+		</bugfix>
+	</nextrelease>
+	<release version="3.0.5" timestamp="2005-09-14 08:22">
 		<optimization id="optimization1" codedby="Luke1410" replace="bugfix4" text="concatenate" timestamp="2005-08-21 14:30">
 			<file name="Tooltip.lua">
 				<remove variable="TT_OldChatLinkItem" />
@@ -77,7 +91,7 @@
 				That functionality was needed to print the correct suggested price to the tooltip.
 			</developer>
 		</added>
-	</nextrelease>
+	</release>
 <!--
 		Just a small example how that changelog is used,... will be removed as soon as a dtd has been written.
 		<bugfix id="bugfix1" sourceforgeid="" submitby="" fixedby="" timestamp="" replacebugfix="bugfix1" text="replace"></bugfix>

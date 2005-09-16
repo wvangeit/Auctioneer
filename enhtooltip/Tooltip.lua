@@ -475,7 +475,7 @@ function TT_GameTooltip_OnHide()
 	elseif OldChatLinkItem then
 		-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
 
-		local Backup = {["name"]=OldChatLinkItem.name, ["link"]=OldChatLinkItem.link, ["button"]=OldChatLinkItem.button}
+		local Backup = {["link"]=OldChatLinkItem.link, ["completeLink"]=OldChatLinkItem.completeLink, ["button"]=OldChatLinkItem.button}
 		-- redisplay old chatlinkdata, if there was one before
 		HideUIPanel(ItemRefTooltip)
 		TT_Chat_OnHyperlinkShow(Backup.name, Backup.link, Backup.button)
@@ -565,14 +565,14 @@ function TT_ItemPopup(name, link, quality, count, price)
 	-- Empty function; hook here if you want to maybe display a popup menu
 end
 
-function TT_Chat_OnHyperlinkShow(name, link, button)
-	Orig_Chat_OnHyperlinkShow(name, link, button);
+function TT_Chat_OnHyperlinkShow(link, completeLink, button)
+	Orig_Chat_OnHyperlinkShow(link, completeLink, button);
 
 	if (ItemRefTooltip:IsVisible()) then
-		local itemName = ItemRefTooltipTextLeft1:GetText();
-		if (itemName and TT_ChatCurrentItem ~= itemName) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..itemName.."]|h|r";
-			TT_ChatCurrentItem = itemName;
+		local name = ItemRefTooltipTextLeft1:GetText();
+		if (name and TT_ChatCurrentItem ~= name) then
+			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
+			TT_ChatCurrentItem = name;
 
 			if (button == "RightButton") then
 				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
@@ -581,7 +581,7 @@ function TT_Chat_OnHyperlinkShow(name, link, button)
 				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
 				TT_Show(ItemRefTooltip);
 				-- save the currently shown item, to redisplay it, if needed
-				OldChatLinkItem = {["name"]=name, ["link"]=link, ["button"]=button}
+				OldChatLinkItem = {["link"]=link, ["completeLink"]=completeLink, ["button"]=button}
 			end
 		end
 	end
