@@ -401,6 +401,8 @@ end
 
 function Auctioneer_GetItemDataByID(itemID)
 	local baseData = Auctioneer_BasePrices[itemID];
+	if (not baseData) then return nil end
+
 	local baseSplit = Auctioneer_Split(baseData, ":");
 	local buy = tonumber(baseSplit[1]);
 	local sell = tonumber(baseSplit[2]);
@@ -1698,7 +1700,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks), nil, embedded);
 		end
 	end
-	if (Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
+	if (ItemInfo and Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
 		local reagentInfo = "";
 		if (itemInfo.classText) then
 			reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, itemInfo.classText);
