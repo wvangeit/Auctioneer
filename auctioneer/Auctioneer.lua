@@ -380,6 +380,9 @@ function Auctioneer_Split(str, at)
 	local splut = {};
 	local pos = 1;
 	
+	if (not str) then str = "" end
+	if (not at) then table.insert(splut, str) end
+	
 	local match, mend = string.find(str, at, pos, true);
 	while match do
 		table.insert(splut, string.sub(str, pos, match-1));
