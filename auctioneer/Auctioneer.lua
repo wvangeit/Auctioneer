@@ -1838,8 +1838,6 @@ function Auctioneer_FindClass(cName, sName)
 	end
 	return 0,0;
 end
-	
-					
 
 
 function Auctioneer_Register()
@@ -2083,33 +2081,6 @@ function Auctioneer_Convert()
 	AuctionPrices = nil;
 	AuctionBids = nil;
 	AuctionConfig.version = 30200;
-end
-
-function Auctioneer_GUI_radioTestCallback(state)
-
-	if (state == "shift") then
-		Auctioneer_Command("show-mesh shift", "GUI")
-
-	elseif (state == "ctrl") then
-		Auctioneer_Command("show-mesh ctrl", "GUI")
-
-	elseif (state == "alt") then
-		Auctioneer_Command("show-mesh ctrl", "GUI")
-
-	elseif (state == "off") then
-		Auctioneer_Command("show-mesh on", "GUI")
-	end
-end
-
-
-function Auctioneer_GUI_radioTestFeedback(state)
-
-	if ((state == "shift") or (state == "ctrl") or (state == "alt")) then
-		return string.format(AUCT_FRMT_ACT_ENABLED_ON, AUCT_SHOW_MESH, state.value);
-
-	else
-		return string.format(AUCT_FRMT_ACT_ENABLE, AUCT_SHOW_MESH);
-	end
 end
 
 
@@ -2371,7 +2342,7 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;
 			};
 			{
-				id="pct-bidmarkdown";
+				id=AUCT_CMD_PCT_BIDMARKDOWN;
 				type=K_EDITBOX;
 				setup = {
 					callOn = {"enter", "tab"};
@@ -2394,7 +2365,7 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;				
 			};
 			{
-				id="pct-markup";
+				id=AUCT_CMD_PCT_MARKUP;
 				type=K_EDITBOX;
 				setup = {
 					callOn = {"enter", "tab"};
@@ -2417,7 +2388,7 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;
 			};
 			{
-				id="pct-maxless";
+				id=AUCT_CMD_PCT_MAXLESS;
 				type=K_EDITBOX;
 				setup = {
 					callOn = {"enter", "tab"};
@@ -2440,7 +2411,7 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;
 			};
 			{
-				id="pct-nocomp";
+				id=AUCT_CMD_PCT_NOCOMP;
 				type=K_EDITBOX;
 				setup = {
 					callOn = {"enter", "tab"};
@@ -2463,7 +2434,7 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;
 			};
 			{
-				id="pct-underlow";
+				id=AUCT_CMD_PCT_UNDERLOW;
 				type=K_EDITBOX;
 				setup = {
 					callOn = {"enter", "tab"};
@@ -2717,6 +2688,9 @@ function Auctioneer_Command(command, source)
 	elseif ((cmd == AUCT_CMD_LOCALE) or (cmd == "locale")) then
 		Auctioneer_SetLocale(param, chatprint);
 
+	elseif ((cmd == AUCT_CMD_DEFAULT) or (cmd == "default")) then
+		Auctioneer_Default(param, chatprint);
+
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
 	elseif ((cmd == AUCT_CMD_BROKER) or (cmd == "broker")) then
 		doBroker(param);
@@ -2742,7 +2716,7 @@ function Auctioneer_Command(command, source)
 		Auctioneer_DoMedian(param);
 
 	elseif (cmd == "hsp") then
-		Auctioneer_DoHSP(param, Auctioneer_GetAuctionKey());
+		Auctioneer_DoHSP(param);
 
 	elseif (
 		((cmd == AUCT_CMD_EMBED) or (cmd == "embed")) or
@@ -2848,7 +2822,7 @@ function Auctioneer_OnOff(state, chatprint)
 
 	elseif ((state == AUCT_CMD_TOGGLE) or (state == "toggle")) then
 		state = Auctioneer_GetFilterVal("all");
-		
+
 		if (state == "off") then
 			Auctioneer_SetFilter("all", "on");
 		else
@@ -2861,13 +2835,13 @@ function Auctioneer_OnOff(state, chatprint)
 		if ((state == AUCT_CMD_ON) or (state == "on")) then
 			Auctioneer_ChatPrint(AUCT_STAT_ON);
 
-			if (Khaos) then
+			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", true);
 			end
 		else
 			Auctioneer_ChatPrint(AUCT_STAT_OFF);
 
-			if (Khaos) then
+			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", false);
 			end
 		end
@@ -2912,13 +2886,14 @@ function Auctioneer_Clear(param, chatprint)
 
 		if ((param == AUCT_CMD_CLEAR_ALL) or (param == "all")) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEARALL, aKey));
-			
+
 		elseif ((param == AUCT_CMD_CLEAR_SNAPSHOT) or (param == "snapshot")) then
 			Auctioneer_ChatPrint(AUCT_FRMT_ACT_CLEARSNAP);
 
 		else
 			if (clearok == true) then
 				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_OK, itemKey));
+
 			else
 				Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_CLEAR_FAIL, itemKey));
 			end
@@ -2945,7 +2920,7 @@ function Auctioneer_AlsoInclude(param, chatprint)
 	
 	if (chatprint == true) then 
 		
-		if (Khaos) then 
+		if (Auctioneer_Khaos_Registered) then 
 			Khaos.setSetKeyParameter("Auctioneer", "AuctioneerInclude", "value", param);
 		end
 
@@ -2984,25 +2959,47 @@ local validLocale=nil;
 		if ((validLocale == true) and (AUCT_VALID_LOCALES[param])) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, param));
 			
-			if (Khaos) then
+			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerLocale", "value", param);
 			end
 
 		elseif (validLocale == nil) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
+
 			for locale, _ in AUCT_VALID_LOCALES do
 				Auctioneer_ChatPrint("  "..locale);
 			end
 
 		else
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, AUCT_CMD_LOCALE, 'default'));
-			
-			if (Khaos) then
+
+			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerLocale", "value", "default");
 			end
 		end
 	end
 end
+
+
+function Auctioneer_Default(param, chatprint)
+
+	if ((param == AUCT_CMD_CLEAR_ALL) or (param == "all") or (param == "") or (param == nil)) then
+		AuctionConfig = {};
+
+	else
+		Auctioneer_SetFilter(param, nil);
+	end
+
+	if (chatprint == true) then
+		if ((param == AUCT_CMD_CLEAR_ALL) or (param == "all")) then
+			Auctioneer_ChatPrint(AUCT_FRMT_ACT_DEFAULTALL);
+
+		else
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_DEFAULT, param));
+		end
+	end
+end
+
 
 function Auctioneer_GenVarSet(variable, param, chatprint)
 
@@ -3017,9 +3014,11 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 
 		if (param == "on") then
 			param = "off";
+
 		else
 			param = "on";
 		end
+
 		Auctioneer_SetFilter(variable, param);
 	end
 
@@ -3030,13 +3029,13 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 
 			--Account for different key name in the embed variable
 			if ((variable == AUCT_CMD_EMBED) or (variable == "embed")) then
-				
-				if (Khaos) then
+
+				if (Auctioneer_Khaos_Registered) then
 					Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEmbed", "checked", true);
 				end
 			else
-				
-				if (Khaos) then
+
+				if (Auctioneer_Khaos_Registered) then
 					Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
 				end
 			end
@@ -3046,13 +3045,13 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 
 			--Account for different key name in the embed variable
 			if ((variable == AUCT_CMD_EMBED) or (variable == "embed")) then
-				
-				if (Khaos) then
+
+				if (Auctioneer_Khaos_Registered) then
 					Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEmbed", "checked", false);
 				end
 			else
-				
-				if (Khaos) then
+
+				if (Auctioneer_Khaos_Registered) then
 					Khaos.setSetKeyParameter("Auctioneer", variable, "checked", false);
 				end
 			end
@@ -3067,7 +3066,7 @@ function Auctioneer_PercentVarSet(variable, param, chatprint)
 	if paramVal == nil then
 		-- failed to convert the param to a number
 		if chatprint then
-			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_ARG, param, variable))
+			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_ARG, param, variable));
 		end
 		return -- invalid argument, don't do anything
 	end
@@ -3076,8 +3075,8 @@ function Auctioneer_PercentVarSet(variable, param, chatprint)
 
 	if (chatprint == true) then
 		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_SET, variable, paramVal.."%"));
-		
-		if (Khaos) then
+
+		if (Auctioneer_Khaos_Registered) then
 			Khaos.setSetKeyParameter("Auctioneer", variable, "value", paramVal);
 		end
 	end

@@ -124,6 +124,7 @@ AUCT_CMD_CLEAR_SNAPSHOT = "snapshot";
 AUCT_CMD_ALSO = "also";
 AUCT_CMD_ALSO_OPPOSITE = "opposite";
 AUCT_CMD_LOCALE = "locale";
+AUCT_CMD_DEFAULT = "default";
 
 AUCT_CMD_BROKER = "broker";
 AUCT_CMD_BIDBROKER = "bidbroker";
@@ -222,6 +223,8 @@ AUCT_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 AUCT_FRMT_ACT_ENABLED_ON = "Displaying item's %s on %s";
 AUCT_FRMT_ACT_SET = "Set %s to '%s'";
 AUCT_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
+AUCT_FRMT_ACT_DEFAULTALL = "All Auctioneer options have been reset to default settings.";
+AUCT_FRMT_ACT_DEFAULT = "Auctioneer's %s option has been reset to default settings";
 
 AUCT_TEXT_SCAN = "Scan";
 AUCT_TEXT_AUCTION = "auction";

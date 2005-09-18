@@ -1,6 +1,91 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<improvement id="improvement3" codedby="MentalPower" reportedby="vampirish" norgannabbid="http://norganna.org/bb/index.php?showtopic=190&hl=default" timestamp="2005-09-18 06:11">
+			<file name="Auctioneer.lua">
+				<add function="Auctioneer_Default"/>
+				<change function="Auctioneer_Register_Khaos"/>
+				<change function="Auctioneer_Command"/>
+				<change function="Auctioneer_OnOff"/>
+				<change function="Auctioneer_AlsoInclude"/>
+				<change function="Auctioneer_SetLocale"/>
+				<change function="Auctioneer_Default"/>
+				<change function="Auctioneer_GenVarSet"/>
+				<change function="Auctioneer_PercentVarSet"/>
+			</file>
+			<file name="enUS.utf8">
+				<add constant="AUCT_FRMT_ACT_DEFAULTALL"/>
+				<add constant="AUCT_FRMT_ACT_DEFAULT"/>
+			</file>
+			<file name="esES.utf8">
+				<delete constant="AUCT_CLAS_ARMOR"/>
+				<delete constant="AUCT_CLAS_BANDAGE"/>
+				<delete constant="AUCT_CLAS_CLOTH"/>
+				<delete constant="AUCT_CLAS_CONTAINER"/>
+				<delete constant="AUCT_CLAS_DRINK"/>
+				<delete constant="AUCT_CLAS_FISHING"/>
+				<delete constant="AUCT_CLAS_FOOD"/>
+				<delete constant="AUCT_CLAS_GEM"/>
+				<delete constant="AUCT_CLAS_HERB"/>
+				<delete constant="AUCT_CLAS_HIDE"/>
+				<delete constant="AUCT_CLAS_LEATHER"/>
+				<delete constant="AUCT_CLAS_MAGE"/>
+				<delete constant="AUCT_CLAS_ORE"/>
+				<delete constant="AUCT_CLAS_POISON"/>
+				<delete constant="AUCT_CLAS_POTION"/>
+				<delete constant="AUCT_CLAS_QUEST"/>
+				<delete constant="AUCT_CLAS_SHAMAN"/>
+				<delete constant="AUCT_CLAS_WARLOCK"/>
+				<delete constant="AUCT_CLAS_WEAPON"/>
+				<delete constant="AUCT_CLAS_WRITTEN"/>
+				<delete constant="AUCT_TYPE_ALCHEM"/>
+				<delete constant="AUCT_TYPE_COOK"/>
+				<delete constant="AUCT_TYPE_ENCHANT"/>
+				<delete constant="AUCT_TYPE_ENGINEER"/>
+				<delete constant="AUCT_TYPE_FSTAID"/>
+				<delete constant="AUCT_TYPE_LEATHER"/>
+				<delete constant="AUCT_TYPE_MINING"/>
+				<delete constant="AUCT_TYPE_POISON"/>
+				<delete constant="AUCT_TYPE_PRIEST"/>
+				<delete constant="AUCT_TYPE_SMITH"/>
+				<delete constant="AUCT_TYPE_TAILOR"/>
+				<add constant="AUCT_ADDIT_ALCOHOL"/>
+				<add constant="AUCT_ADDIT_BUFF"/>
+				<add constant="AUCT_ADDIT_DRINK"/>
+				<add constant="AUCT_ADDIT_FIREWORK"/>
+				<add constant="AUCT_ADDIT_FOOD"/>
+				<add constant="AUCT_ADDIT_GIFTWRAP"/>
+				<add constant="AUCT_ADDIT_LURE"/>
+				<add constant="AUCT_ADDIT_POISON"/>
+				<add constant="AUCT_ADDIT_POTION"/>
+				<add constant="AUCT_ADDIT_RESTORATIVE"/>
+				<add constant="AUCT_ADDIT_SCROLL"/>
+				<add constant="AUCT_SKILL_ALCHEMY"/>
+				<add constant="AUCT_SKILL_BLACKSMITHING"/>
+				<add constant="AUCT_SKILL_COOKING"/>
+				<add constant="AUCT_SKILL_ENCHANTING"/>
+				<add constant="AUCT_SKILL_ENGINEERING"/>
+				<add constant="AUCT_SKILL_FIRSTAID"/>
+				<add constant="AUCT_SKILL_LEATHERWORKING"/>
+				<add constant="AUCT_SKILL_MINING"/>
+				<add constant="AUCT_SKILL_TAILORING"/>
+				<add constant="AUCT_SKILL_DRUID"/>
+				<add constant="AUCT_SKILL_MAGE"/>
+				<add constant="AUCT_SKILL_PALADIN"/>
+				<add constant="AUCT_SKILL_PRIEST"/>
+				<add constant="AUCT_SKILL_ROGUE"/>
+				<add constant="AUCT_SKILL_SHAMAN"/>
+				<add constant="AUCT_SKILL_WARLOCK"/>
+				<add constant="AUCT_FRMT_ACT_DEFAULTALL"/>
+				<add constant="AUCT_FRMT_ACT_DEFAULT"/>
+			</file>
+			<developer>
+				Ok, main change here is that I added a /auc default command that resets the options to default, this command will be added to the Khaos GUI shortly. Secondary changes are that I translated the strings used in this function to spanish. Since I did this I noticed that we had quite a few new strings so I translated those too and deleted the old ones from the esES.utf8 file. I also took the liberty of expanding the xml schema to include non sourceforge suggestions/bugs/requests.
+			</developer>
+			<public>
+				There is now a "/auctioneer default" command that accepts a setting name to reset that setting to it's default option. If no setting name is sent then the function will set all options to default settings. This function is not currently implemented in the Khaos configuration system, however it will be added shortly.
+			</public>
+		</improvement>
 		<bugfix id="bugfix18" codedby="Luke1410" reportedby="lovepump" sourceforgeid="1266665" timestamp="2005-08-23 02:50">
 			<file name="itemdata.xml" />
 			<public>
