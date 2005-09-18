@@ -18,29 +18,34 @@ function newBalancedList(paramSize)
     -- and you insert(2) then your list would become {1,2,2,3}.
     local insert =  function (value)
         if (not value) then return; end
+		local val = tonumber(value) or 0;
 
         local insertPos = 0
         local left      = 1
         local right     = getn(self.list)
+		local middleVal
         local middle
         -- insert in sorded order
-        while (left <= right) do
-        	middle = math.floor((right-left) / 2) + left
-        	if (value < self.list[middle]) then
-        		right = middle - 1
-        	elseif (value > self.list[middle]) then
-        		left = middle + 1
-        	else
-        		insertPos = middle
-        		break
-        	end
-        end
+		if (right) then
+			while (left <= right) do
+				middle = math.floor((right-left) / 2) + left
+				middleVal = tonumber(self.list[middle]) or 0
+				if (val < middleVal) then
+					right = middle - 1
+				elseif (val > middleVal) then
+					left = middle + 1
+				else
+					insertPos = middle
+					break
+				end
+			end
+		end
         -- TODO: Check how to optimize that too
         if (insertPos == 0) then
         	insertPos = left;
         end
 
-        table.insert(self.list, insertPos, value);
+        table.insert(self.list, insertPos, val);
         
         -- see if we need to balance the list
         if (self.maxSize ~= nil and table.getn(self.list) > self.maxSize) then
@@ -78,7 +83,7 @@ function newBalancedList(paramSize)
     
     -- retrieves the value in the list at this position
     local get = function(pos)
-        return self.list[pos];
+        return tonumber(self.list[pos]);
     end
     
     local getMaxSize = function()

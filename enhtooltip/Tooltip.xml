@@ -439,36 +439,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<PlayerModel name="$parentPreview" hidden="true">
-				<Anchors>
-					<Anchor point="TOPLEFT">
-						<Offset>
-							<AbsDimension x="10" y="-10"/>
-						</Offset>
-					</Anchor>
-					<Anchor point="BOTTOMRIGHT">
-						<Offset>
-							<AbsDimension x="-10" y="10"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						this.rps = 0.1;
-						this.rotation = 1.5;
-					</OnLoad>
-					<OnUpdate>
-						if (this:IsVisible()) then
-							this.rotation = this.rotation + (arg1 * 2 * PI * this.rps);
-							if ( this.rotation &lt; 0 ) then
-								this.rotation = this.rotation + (2 * PI);
-							end
-							this:SetRotation(this.rotation);
-						end
-					</OnUpdate>
-				</Scripts>
-			</PlayerModel>
-
 			<Frame name="$parentMoney1" inherits="TinyMoneyFrameTemplate" hidden="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="LEFT"/>
@@ -700,6 +670,14 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnEvent>
 				TT_OnEvent(event);
 			</OnEvent>
+		</Scripts>
+	</Frame>
+
+	<Frame name="EnhancedUpdate" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				TT_OnUpdate(arg1);
+			</OnUpdate>
 		</Scripts>
 	</Frame>
 

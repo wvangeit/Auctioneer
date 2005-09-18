@@ -6,7 +6,6 @@
 
 -- Example: /script TT_Clear(); TT_AddLine("ItemName"); TT_LineQuality(3); TT_AddLine("Average bid: ", 105000); TT_AddLine("Median bid: ", 110000); TT_AddLine("Vendor buy: ", 9050); TT_AddLine("Vendor sell: ", 25000); TT_Show(GameTooltip);
 
-
 if (TOOLTIPS_INCLUDED == nil) then
 TOOLTIPS_INCLUDED = true;
 
@@ -163,15 +162,6 @@ function TT_Show(currentTooltip)
 
 	local minWidth = width;
 
-	if (EnhancedTooltipPreview:IsVisible()) then
-		if (width < 256) then width = 256; end
-		EnhancedTooltipPreview:SetHeight(128 + 40);
-		EnhancedTooltipPreview:ClearAllPoints();
-		EnhancedTooltipPreview:SetWidth(width + 40);
-		EnhancedTooltipPreview:SetPoint("TOP", "EnhancedTooltip", "TOP", 0, 76-height);
-		height = height + 72;
-	end
-
 	local sWidth = GetScreenWidth();
 	local sHeight = GetScreenHeight();
 
@@ -263,6 +253,7 @@ end
 function TT_Hide()
 	EnhancedTooltip:Hide();
 	TT_ChatCurrentItem = "";
+	TT_HideAt = 0;
 end
 
 function TT_Clear()
@@ -270,7 +261,6 @@ function TT_Clear()
 	EnhancedTooltip.hasEmbed = false;
 	EnhancedTooltip.curEmbed = false;
 	EnhancedTooltip.hasData = false;
-	EnhancedTooltipPreview:Hide();
 	EnhancedTooltipIcon:Hide();
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2");
 	for i = 1, 30 do
@@ -313,20 +303,20 @@ function TT_GetTextGSC(money, exact)
 
 	local gsc = "";
 	if (g > 0) then
-		gsc = format(GSC_START, GSC_GOLD, g);
+		gsc = string.format(GSC_START, GSC_GOLD, g);     
 		if (s > 0) then
-			gsc = gsc..format(GSC_PART, GSC_SILVER, s);
+			gsc = gsc..string.format(GSC_PART, GSC_SILVER, s);
 		end
 		if exact then
-		   gsc = gsc..format(GSC_PART,GSC_COPPER, c);
+		   gsc = gsc..string.format(GSC_PART,GSC_COPPER, c);
 		end
 	elseif (s > 0) then
-		gsc = format(GSC_START, GSC_SILVER, s);
+		gsc = string.format(GSC_START, GSC_SILVER, s);
 		if (c > 0) then
-			gsc = gsc..format(GSC_PART, GSC_COPPER, c);
+			gsc = gsc..string.format(GSC_PART, GSC_COPPER, c);
 		end
 	elseif (c > 0) then
-		gsc = gsc..format(GSC_START, GSC_COPPER, c);
+		gsc = gsc..string.format(GSC_START, GSC_COPPER, c);
 	else
 		gsc = GSC_NONE;
 	end
@@ -412,74 +402,44 @@ function TT_SetIcon(iconPath)
 	end
 end
 
-function TT_SetModel(class, file)
-	local scale = 1.0;
-	local pos = 0.6;
-	local gender = "M";
-	local _, race = UnitRace("player");
-	if (strsub(class, -1) == "*") then
-		class = strsub(class, 0, -2);
-		race = strsub(race, 0, 2);
-		if (UnitSex("player") > 0) then gender = "F"; end
-		file = file .. "_" .. race .. gender;
-	end
-	if (gender == "F") then scale = scale * 1.1; end
-	if (race == "Ta") or (race == "Or") then scale = scale * 0.9; end
-	if (race == "Gn") or (race == "Dw") then scale = scale * 1.1; end
-	if (class == "Head") then scale = scale * 1.8; pos = 0.3; end
-	if (class == "Shoulder") then scale = scale * 1.8; pos = 0.5; end
-	if (class == "Weapon") then
-		local typ = strsub(file, 0, 3);
-		if (typ == "Axe") then scale = 0.8; pos = 0.9; end
-		if (typ == "Bow") then scale = 1.0; pos = 0.5; end
-		if (typ == "Clu") then scale = 0.9; pos = 0.8; end
-		if (typ == "Fir") then scale = 0.8; pos = 1.0; end
-		if (typ == "Gla") then scale = 1.0; end
-		if (typ == "Ham") then scale = 0.8; end
-		if (typ == "Han") then scale = 1.3; end
-		if (typ == "Kni") then scale = 2.0; end
-		if (typ == "Mac") then scale = 1.0; end
-		if (typ == "Mis") then scale = 1.5; end
-		if (typ == "Pol") then scale = 0.8; end
-		if (typ == "Sta") then scale = 0.8; pos = 0.3; end
-		if (typ == "Swo") then scale = 1.0; pos = 0.8; end
-		if (typ == "Thr") then scale = 1.6; pos = 0.8; end
-		if (typ == "Tot") then scale = 1.5; end
-		if (typ == "Wan") then scale = 1.8; end
-	end
---	p("Setting model: ", class, file);
-	local model = "Item\\ObjectComponents\\" .. class .. "\\" .. file .. ".mdx";
-	EnhancedTooltipPreview:SetModel(model);
-	EnhancedTooltipPreview:SetLight(1, 0.2, 0, -0.9, -0.707, 0.7, 0.9, 0.6, 0.25, 0.8, 0.25, 0.6, 0.9);
-	EnhancedTooltipPreview:SetPosition(pos, -0.1, 0);
-	EnhancedTooltipPreview:SetScale(scale);
-	if (EnhancedTooltipPreview.model ~= model) then
-		EnhancedTooltipPreview.model = model;
-		EnhancedTooltipPreview:SetRotation(1.5);
-	end
-	EnhancedTooltipPreview:Show();
-end
+function TT_SetModel(class, file) return nil end
 
+TT_CurTime = 0;
+TT_HideAt = 0;
 function TT_GameTooltip_OnHide()
 	Orig_GameTooltip_OnHide();
 	local curName = "";
 	local hidingName = this:GetName();
 	if (TT_CurrentTip) then curName = TT_CurrentTip:GetName(); end
 	if (curName == hidingName) then
-		TT_Hide();
+		TT_HideObj = hidingName;
+		TT_HideAt = TT_CurTime + 0.1;
 	end
+end
 
-	if this == ItemRefTooltip then
-		-- closing chatreferenceTT?
-		OldChatLinkItem = nil -- remove old chatlink data
-	elseif OldChatLinkItem then
-		-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
+function TT_OnUpdate(elapsed)
+	TT_CurTime = TT_CurTime + elapsed;
+	TT_CheckHide();
+end
 
-		local Backup = {["link"]=OldChatLinkItem.link, ["completeLink"]=OldChatLinkItem.completeLink, ["button"]=OldChatLinkItem.button}
-		-- redisplay old chatlinkdata, if there was one before
-		HideUIPanel(ItemRefTooltip)
-		TT_Chat_OnHyperlinkShow(Backup.name, Backup.link, Backup.button)
-		ShowUIPanel(ItemRefTooltip)
+function TT_CheckHide()
+	if (TT_HideAt == 0) then return end
+	TT_CurrentItem = nil;
+
+	if (TT_CurTime >= TT_HideAt) then
+		TT_Hide();
+		if (TT_HideObj and TT_HideObj == "ItemRefTooltip") then
+			-- closing chatreferenceTT?
+			OldChatLinkItem = nil -- remove old chatlink data
+		elseif OldChatLinkItem then
+			-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
+
+			local Backup = {name=OldChatLinkItem.name, link=OldChatLinkItem.link, hyperlink=OldChatLinkItem.hyperlink, button=OldChatLinkItem.button}
+			-- redisplay old chatlinkdata, if there was one before
+			HideUIPanel(ItemRefTooltip)
+			TT_Chat_OnHyperlinkShow(Backup.link, Backup.hyperlink, Backup.button)
+			ShowUIPanel(ItemRefTooltip)
+		end
 	end
 end
 
@@ -494,6 +454,17 @@ local function nameFromLink(link)
 	return nil;
 end
 TT_NameFromLink = nameFromLink;
+
+local function hyperlinkFromLink(link)
+        if( not link ) then
+                return nil;
+        end
+        for hyperlink in string.gfind(link, "|H([^|]+)|h") do
+                return hyperlink;
+        end
+        return nil;
+end
+TT_HyperlinkFromLink = hyperlinkFromLink;
 
 local function  qualityFromLink(link)
 	local color;
@@ -526,8 +497,22 @@ local function fakeLink(item, quality, name)
 end
 TT_FakeLink = fakeLink;
 
-function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup)
+function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	TT_CurrentTip = frame;
+	TT_HideAt = 0;
+
+	local itemSig = frame:GetName();
+	if (link) then itemSig = itemSig..link end
+	if (count) then itemSig = itemSig..count end
+	if (price) then itemSig = itemSig..price end
+	
+	if (TT_CurrentItem and TT_CurrentItem == itemSig) then
+		-- We are already showing this... No point doing it again.
+		return;
+	end
+
+	TT_CurrentItem = itemSig;
+	
 	if (quality==nil or quality==-1) then
 		local linkQuality = qualityFromLink(link);
 		if (linkQuality and linkQuality > -1) then
@@ -536,24 +521,33 @@ function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup)
 			quality = -1;
 		end
 	end
+	if (hyperlink == nil) then hyperlink = link end
+	local extract = hyperlinkFromLink(hyperlink);
+	if (extract) then hyperlink = extract end
 
 	local showTip = true;
-	if ((forcePopup == true) or
-		((forcePopup == nil) and
-		 ((TT_PopupKey == "ctrl" and IsControlKeyDown()) or
-		  (TT_PopupKey == "alt" and IsAltKeyDown()) or
-		  (TT_PopupKey == "shift" and IsShiftKeyDown())))) then
-		if (TT_ItemPopup(name, fabricatedLink, -1, 1)) then
+	local popupKeyPressed = (
+		(TT_PopupKey == "ctrl" and IsControlKeyDown()) or
+		(TT_PopupKey == "alt" and IsAltKeyDown()) or
+		(TT_PopupKey == "shift" and IsShiftKeyDown())
+	);
+	
+	if ((forcePopup == true) or ((forcePopup == nil) and (popupKeyPressed))) then
+		local popupTest = TT_ItemPopup(name, link, quality, count, price, hyperlink);
+		if (popupTest) then
 			showTip = false;
 		end
 	end
 	
 	if (showTip) then
+		TT_Clear();
 		TT_AddTooltip(frame, name, link, quality, count, price);
+		TT_Show(frame);
+		return true;
 	else
 		frame:Hide();
-		TT_Clear();
 		TT_Hide();
+		return false;
 	end
 end
 
@@ -561,27 +555,34 @@ function TT_AddTooltip(frame, name, link, quality, count, price)
 	-- Empty function; hook here if you want in on the action!
 end
 
-function TT_ItemPopup(name, link, quality, count, price)
+function TT_ItemPopup(name, link, quality, count, price, hyperlink)
 	-- Empty function; hook here if you want to maybe display a popup menu
+
+	-- This function should return true if some addon somewhere wants to popup it's own menu.
+	-- If this function returns true, then EnhTooltip will not show a tooltip.
+
+	-- NOTE: You should only answer false if you recognize the link, and are sure
+	-- you want to popup something.
+
+	-- Otherwise just pass the return value back up the chain.
+
+	return false; 
 end
 
-function TT_Chat_OnHyperlinkShow(link, completeLink, button)
-	Orig_Chat_OnHyperlinkShow(link, completeLink, button);
+function TT_Chat_OnHyperlinkShow(link, hyperlink, button)
+	Orig_Chat_OnHyperlinkShow(link, hyperlink, button);
 
 	if (ItemRefTooltip:IsVisible()) then
-		local name = ItemRefTooltipTextLeft1:GetText();
-		if (name and TT_ChatCurrentItem ~= name) then
-			local fabricatedLink = "|cff000000|H"..link.."|h["..name.."]|h|r";
-			TT_ChatCurrentItem = name;
+		local itemName = ItemRefTooltipTextLeft1:GetText();
+		if (itemName and TT_ChatCurrentItem ~= itemName) then
+			TT_ChatCurrentItem = itemName;
 
+			local testPopup = false;
 			if (button == "RightButton") then
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0, true);
-			else
-				TT_Clear();
-				TT_TooltipCall(ItemRefTooltip, itemName, fabricatedLink, -1, 1, 0);
-				TT_Show(ItemRefTooltip);
-				-- save the currently shown item, to redisplay it, if needed
-				OldChatLinkItem = {["link"]=link, ["completeLink"]=completeLink, ["button"]=button}
+				testPopup = true;
+			end
+			if (TT_TooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, hyperlink)) then 
+				OldChatLinkItem = {name=name, link=link, hyperlink=hyperlink, button=button};
 			end
 		end
 	end
@@ -595,7 +596,6 @@ function TT_AuctionFrameItem_OnEnter(type, index)
 		local name = nameFromLink(link);
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
-			TT_Clear();
 			TT_TooltipCall(GameTooltip, name, link, aiQuality, aiCount);
 			TT_Show(GameTooltip);
 		end
@@ -614,7 +614,6 @@ function TT_ContainerFrameItemButton_OnEnter()
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 		if (quality==nil or quality==-1) then quality = qualityFromLink(link); end
 
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
 		TT_Show(GameTooltip);
 	end
@@ -637,7 +636,6 @@ function TT_ContainerFrame_Update(frame)
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
 				if (quality == nil) then quality = qualityFromLink(link); end
 
-				TT_Clear()
 				TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
 				TT_Show(GameTooltip);
 			end
@@ -654,7 +652,6 @@ function TT_GameTooltip_SetLootItem(this, slot)
 	if (name) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
-		TT_Clear()
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
@@ -665,7 +662,6 @@ function TT_GameTooltip_SetQuestItem(this, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot);
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
@@ -679,7 +675,6 @@ function TT_GameTooltip_SetQuestLogItem(this, qtype, slot)
 		if (name == nil) then name = nameFromLink(link); end
 		quality = qualityFromLink(link); -- I don't trust the quality returned from the above function.
 
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
@@ -694,7 +689,6 @@ function TT_GameTooltip_SetInventoryItem(this, unit, slot)
 		local quality = GetInventoryItemQuality(unit, slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
 
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
 		TT_Show(GameTooltip);
 	end
@@ -708,7 +702,6 @@ function TT_GameTooltip_SetMerchantItem(this, slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot);
 		local quality = qualityFromLink(link);
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
 		TT_Show(GameTooltip);
 	end
@@ -722,7 +715,6 @@ function TT_GameTooltip_SetCraftItem(this, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot);
 			local quality = qualityFromLink(link);
-			TT_Clear();
 			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
 			TT_Show(GameTooltip);
 		end
@@ -731,7 +723,6 @@ function TT_GameTooltip_SetCraftItem(this, skill, slot)
 		if (link) then
 			local name = nameFromLink(link);
 			local quality = qualityFromLink(link);
-			TT_Clear();
 			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
 			TT_Show(GameTooltip);
 		end
@@ -746,7 +737,6 @@ function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot);
 			local quality = qualityFromLink(link);
-			TT_Clear();
 			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
 			TT_Show(GameTooltip);
 		end
@@ -755,9 +745,32 @@ function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
 		if (link) then
 			local name = nameFromLink(link);
 			local quality = qualityFromLink(link);
-			TT_Clear();
 			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
 			TT_Show(GameTooltip);
+		end
+	end
+end
+
+-- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
+function TT_BreakLink(link)
+	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
+	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name;
+end
+
+
+function TT_FindItemInBags(findName)
+	for bag = 0, 4, 1 do
+		size = GetContainerNumSlots(bag);
+		if (size) then
+			for slot = size, 1, -1 do
+				local link = GetContainerItemLink(bag, slot);
+				if (link) then
+					local itemID, randomProp, enchant, uniqID, itemName = TT_BreakLink(link);
+					if (itemName == findName) then
+						return bag, slot, itemID, randomProp, enchant, uniqID;
+					end
+				end
+			end
 		end
 	end
 end
@@ -766,11 +779,10 @@ function TT_GameTooltip_SetAuctionSellItem(this)
 	Orig_GameTooltip_SetAuctionSellItem(this);
     local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo();
 	if (name) then
-		local bag, slot = Auctioneer_FindItemInBags(name);
+		local bag, slot = TT_FindItemInBags(name);
 		if (bag) then
 			local link = GetContainerItemLink(bag, slot);
 			if (link) then
-				TT_Clear();
 				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
 				TT_Show(GameTooltip);
 			end
@@ -793,7 +805,6 @@ function TT_IMInv_ItemButton_OnEnter()
 	local imlink = ItemsMatrix_GetHyperlink(item.name);
 	local link = fakeLink(imlink, item.quality, item.name);
 	if (link) then
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0);
 		TT_Show(GameTooltip);
 	end
@@ -805,7 +816,6 @@ function TT_ItemsMatrixItemButton_OnEnter()
 	if (imlink) then
 		local name = this:GetText();
 		local link = fakeLink(imlink, -1, name);
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, -1, 1, 0);
 		TT_Show(GameTooltip);
 	end
@@ -831,7 +841,6 @@ function TT_LootLinkItemButton_OnEnter()
 	local link = getLootLinkLink(name);
 	if (link) then
 		local quality = qualityFromLink(link);
-		TT_Clear();
 		TT_TooltipCall(LootLinkTooltip, name, link, quality, 1, 0);
 		TT_Show(LootLinkTooltip);
 	end
@@ -853,7 +862,6 @@ function TT_AllInOneInventory_ModifyItemTooltip(bag, slot, tooltip)
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag, slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
 
-		TT_Clear();
 		TT_TooltipCall(GameTooltip, name, link, quality, itemCount, 0);
 		TT_Show(GameTooltip);
 	end
@@ -863,8 +871,6 @@ function TT_GameTooltip_SetOwner(this, owner, anchor)
 	Orig_GameTooltip_SetOwner(this, owner, anchor);
 	this.owner = owner;
 	this.anchor = anchor;
---	p("This tooltip owned by", owner:GetName());
---	TT_Align(this);
 end
 
 end

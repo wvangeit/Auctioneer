@@ -8,14 +8,17 @@ local lMajorAuctionCategories;
 local lCurrentCategoryIndex;
 local lIsPageScanned;
 local lScanInProgress;
+local lFullScan;
 
 -- function hooks
 local lOriginal_CanSendAuctionQuery;
 local lOriginal_AuctionFrameBrowse_OnEvent;
 
+-- TODO: If all categories are selected, then we should do a complete scan rather than a one-by-one scan.
 
 -- get the next category index to based on what categories have been configured to be scanned
 local function nextIndex()
+	if (lCurrentCategoryIndex == nil) then lCurrentCategoryIndex = 0 end
 	for i = lCurrentCategoryIndex + 1, table.getn(lMajorAuctionCategories) do
 		if tostring(Auctioneer_GetFilterVal("scan-class"..i)) == "on" then
 			return i;
@@ -43,16 +46,23 @@ function Auctioneer_StopAuctionScan()
 	lScanInProgress = false;
 end
 
-
+local lPageStartedAt;
 local function Auctioneer_AuctionNextQuery()
+	lCheckPage = nil;
 	if lCurrentAuctionPage then
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		local maxPages = floor(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE);
 
 		if( lCurrentAuctionPage < maxPages ) then
+			lPageStartedAt = time();
 			lCurrentAuctionPage = lCurrentAuctionPage + 1;
-			BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
+			if lFullScan then
+				BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_PAGE_N, AUCT_TEXT_AUCTION, lCurrentAuctionPage + 1, maxPages + 1));
+			else
+				BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
+			end
 		elseif nextIndex() then
+			lPageStartedAt = time();
 			lCurrentCategoryIndex = nextIndex();
 			lCurrentAuctionPage = 0;
 		else
@@ -65,12 +75,42 @@ local function Auctioneer_AuctionNextQuery()
 		end
 	end
 	if not lCurrentAuctionPage or lCurrentAuctionPage == 0 then
+		lPageStartedAt = time();
 		if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
-		BrowseNoResultsText:SetText(format(AUCTIONEER_AUCTION_SCAN_START, lMajorAuctionCategories[lCurrentCategoryIndex]));
+		if lFullScan then
+			BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_SCAN_START, AUCT_TEXT_AUCTION));
+		else
+			BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_SCAN_START, lMajorAuctionCategories[lCurrentCategoryIndex]));
+		end
 	end
-	QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
+	if (lFullScan) then
+		QueryAuctionItems("", "", "", nil, nil, nil, lCurrentAuctionPage, nil, nil);
+	else
+		QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
+	end
+
 	lIsPageScanned = false;
 	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
+end
+
+local lCheckPage = nil;
+local lCheckSize = nil;
+local lCheckPos = nil;
+function Auctioneer_CheckCompleteScan()
+	if (lCheckPage ~= lCurrentAuctionPage) or (not lCheckSize) or (not lCheckPos) then
+		lCheckSize = GetNumAuctionItems("list");
+		lCheckPage = lCurrentAuctionPage;
+		lCheckPos = 1;
+	end
+
+	if lCheckPage and lCheckSize > 0 then
+		for auctionid = lCheckPos, lCheckSize do
+			lCheckPos = auctionid;
+			local _,_,_,_,_,_,_,_,_,_,_, owner = GetAuctionItemInfo("list", auctionid);
+			if (owner == nil) then return false end
+		end
+	end
+	return true;
 end
 
 function Auctioneer_ScanAuction()
@@ -88,7 +128,13 @@ end
 
 local function Auctioneer_CanSendAuctionQuery()
 	local value = lOriginal_CanSendAuctionQuery();
-	if( value and lIsPageScanned) then
+	if (value and lIsPageScanned) then
+		Auctioneer_AuctionNextQuery();
+		return nil;
+	end
+	local pageElapsed = time() - lPageStartedAt;
+	if (pageElapsed > 60) then
+		Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_SCAN_REDO, 60));
 		Auctioneer_AuctionNextQuery();
 		return nil;
 	end
@@ -102,16 +148,27 @@ end
 function Auctioneer_StartAuctionScan()
 	lMajorAuctionCategories = {GetAuctionItemClasses()};
 
-	-- first make sure that we have at least one category to scan
-	lCurrentCategoryIndex = 0;
-	if not nextIndex() then
-		Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NOCAT);
-		return;
+	lFullScan = true;
+	for i = 1, table.getn(lMajorAuctionCategories) do
+		if tostring(Auctioneer_GetFilterVal("scan-class"..i)) ~= "on" then
+			lFullScan = false;
+		end
+	end
+
+	if (lFullScan) then
+		lCurrentCategoryIndex = table.getn(lMajorAuctionCategories);
+	else
+		-- first make sure that we have at least one category to scan
+		lCurrentCategoryIndex = nextIndex();
+		if not lCurrentCategoryIndex then
+			lCurrentCategoryIndex = 0;
+			Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NOCAT);
+			return;
+		end
 	end
 
 	-- Start with the first page
 	lCurrentAuctionPage = nil;
-	lCurrentCategoryIndex = nextIndex();
 	lScanInProgress = true;
 
 	-- Hook the functions that we need for the scan
