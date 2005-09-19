@@ -532,11 +532,14 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
 	AuctionConfig.info[itemKey] = string.format("%s|%s", iData.category, iData.name);
 	Auctioneer_HSPCache[auctKey][itemKey] = nil;
+
+	local median = Auctioneer_GetMedian(iData.buyoutPricesHistoryList);
+	AuctionConfig.stats['histmed'][server][itemKey] = median;
 end
 
 -- Returns the auction buyout history for this item
-function Auctioneer_GetAuctionBuyoutHistory(itemKey)
-	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey);
+function Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey)
+	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
 	if (auctionItem == nil) then 
 		buyoutHistory = {};
 	else
@@ -600,9 +603,9 @@ function Auctioneer_GetMeans(itemKey, from)
 end
 
 -- Returns the current snapshot median for an item
-function Auctioneer_GetItemSnapshotMedianBuyout(itemKey)
+function Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey)
 	local buyoutPrices = {};
-	local auctKey = Auctioneer_GetAuctionKey();
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
 	local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
 	if (sbuy) then
 		buyoutPrices = sbuy.buyoutPrices;
@@ -612,18 +615,45 @@ function Auctioneer_GetItemSnapshotMedianBuyout(itemKey)
 
 	local snapMedian = Auctioneer_GetMedian(buyoutPrices);
 	local snapSeenCount = table.getn(buyoutPrices);
+
+	if (snapSeenCount >= MIN_BUYOUT_SEEN_COUNT) then
+		AuctionConfig.stats['snapmed'][auctKey][itemKey] = snapMedian;
+	end
 	return tonumber(snapMedian) or 0, snapSeenCount or 0;
 end
 
-function Auctioneer_GetItemHistoricalMedianBuyout(itemKey)
+function Auctioneer_GetSnapMedian(itemKey, auctKey)
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
+	local stat = AuctionConfig.stats['histmed'][auctKey][itemKey];
+	if (not stat) then
+		stat = Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey);
+	end
+	return stat or 0;
+end
+
+function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey)
 	local historyMedian = 0;
 	local historySeenCount = 0;
-	local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey);
+	local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
 	if (buyoutHistoryTable) then
 		historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
 		historySeenCount = table.getn(buyoutHistoryTable);
 	end
+
+	if (historySeenCount >= MIN_BUYOUT_SEEN_COUNT) then
+		AuctionConfig.stats['histmed'][auctKey][itemKey] = historyMedian;
+	end
 	return tonumber(historyMedian) or 0, historySeenCount or 0;
+end
+
+function Auctioneer_GetHistMedian(itemKey, auctKey)
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
+	local stat = AuctionConfig.stats['histmed'][auctKey][itemKey];
+	if (stat) then return stat end
+	if (not stat) then
+		stat = Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey);
+	end
+	return stat or 0;
 end
 
 -- this function returns the most accurate median possible, 
@@ -640,7 +670,7 @@ function Auctioneer_GetUsableMedian(itemKey, realm)
 	-- only use Snapshot, when calculating current realm's marketPrice
 	-- won't make any sense to use alternate realm's snapshotdata as that data might me out of date
 	if realm == Auctioneer_GetAuctionKey() then
-		snapshotMedian, snapshotCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey)
+		snapshotMedian = Auctioneer_GetSnapMedian(itemKey, realm)
 	else
 		snapshotMedian = nil
 	end
@@ -1901,6 +1931,8 @@ end
 
 function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
 --	p("Getting snapshot for", auctKey, catID, auctSig);
+	if (not catID) then catID = 0 end
+
 	if (not AuctionConfig.snap[auctKey]) then
 		AuctionConfig.snap[auctKey] = {};
 	end
@@ -1966,6 +1998,9 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 	local level = iData.level;
 	local left = iData.timeLeft;
 	local qual = iData.quality;
+
+	if (not cat) then cat = 0 end
+
 	if (not AuctionConfig.snap[server]) then
 		AuctionConfig.snap[server] = {};
 	end
@@ -1995,6 +2030,8 @@ function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = {};
 	end
+	local median = Auctioneer_GetMedian(iData.buyoutPrices);
+	AuctionConfig.stats['snapmed'][server][itemKey] = median;
 end
 
 function Auctioneer_Convert()
