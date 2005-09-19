@@ -141,6 +141,7 @@ end
 
 function TT_Show(currentTooltip)
 	if (EnhancedTooltip.hasEmbed) then
+		TT_EmbedRender();
 		currentTooltip:Show();
 	end
 	if (not EnhancedTooltip.hasData) then
@@ -276,6 +277,7 @@ function TT_Clear()
 	EnhancedTooltip.lineCount = 0;
 	EnhancedTooltip.moneyCount = 0;
 	EnhancedTooltip.minWidth = 0;
+	TT_Lines = {};
 end
 
 -- calculate the gold, silver, and copper values based the ammount of copper
@@ -324,17 +326,30 @@ function TT_GetTextGSC(money, exact)
 	return gsc;
 end
 
+TT_Lines = {};
+function TT_EmbedRender()
+	for pos, lData in TT_Lines do
+		TT_CurrentTip:AddLine(lData.line);
+		if (lData.r) then
+			local lastLine = getglobal(TT_CurrentTip:GetName().."TextLeft"..TT_CurrentTip:NumLines());
+			lastLine:SetTextColor(lData.r,lData.g,lData.b);
+		end
+	end
+end
+
 TT_MoneySpacing = 4;
 function TT_AddLine(lineText, moneyAmount, embed)
 	if (embed == nil) then embed = TT_EMBED; end
 	if (embed) and (TT_CurrentTip) then
 		EnhancedTooltip.hasEmbed = true;
 		EnhancedTooltip.curEmbed = true;
+		local line = "";
 		if (moneyAmount) then
-			TT_CurrentTip:AddLine(lineText .. ": " .. TT_GetTextGSC(moneyAmount));
+			line = lineText .. ": " .. TT_GetTextGSC(moneyAmount);
 		else
-			TT_CurrentTip:AddLine(lineText);
+			line = lineText;
 		end
+		table.insert(TT_Lines, {line = line});
 		return;
 	end
 	EnhancedTooltip.hasData = true;
@@ -369,8 +384,10 @@ end
 
 function TT_LineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (TT_CurrentTip) then
-		local lastLine = getglobal(TT_CurrentTip:GetName().."TextLeft"..TT_CurrentTip:NumLines());
-		lastLine:SetTextColor(r,g,b);
+		local n = table.getn(TT_Lines);
+		TT_Lines[n].r = r;
+		TT_Lines[n].g = g;
+		TT_Lines[n].b = b;
 		return;
 	end
 	local curLine = EnhancedTooltip.lineCount;
