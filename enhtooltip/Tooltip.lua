@@ -4,7 +4,6 @@
   $Id$
 ]]
 
--- Example: /script TT_Clear(); TT_AddLine("ItemName"); TT_LineQuality(3); TT_AddLine("Average bid: ", 105000); TT_AddLine("Median bid: ", 110000); TT_AddLine("Vendor buy: ", 9050); TT_AddLine("Vendor sell: ", 25000); TT_Show(GameTooltip);
 
 if (TOOLTIPS_INCLUDED == nil) then
 TOOLTIPS_INCLUDED = true;
@@ -140,6 +139,7 @@ local function getRect(object)
 end
 
 function TT_Show(currentTooltip)
+	if (TT_Show_Ignore) then return end
 	if (EnhancedTooltip.hasEmbed) then
 		TT_EmbedRender();
 		currentTooltip:Show();
@@ -558,7 +558,9 @@ function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup, hy
 	
 	if (showTip) then
 		TT_Clear();
+		TT_Show_Ignore = true;
 		TT_AddTooltip(frame, name, link, quality, count, price);
+		TT_Show_Ignore = false;
 		TT_Show(frame);
 		return true;
 	else
@@ -586,8 +588,8 @@ function TT_ItemPopup(name, link, quality, count, price, hyperlink)
 	return false; 
 end
 
-function TT_Chat_OnHyperlinkShow(link, hyperlink, button)
-	Orig_Chat_OnHyperlinkShow(link, hyperlink, button);
+function TT_Chat_OnHyperlinkShow(hyperlink, link, button, ...)
+	Orig_Chat_OnHyperlinkShow(hyperlink, link, button);
 
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText();
@@ -614,7 +616,6 @@ function TT_AuctionFrameItem_OnEnter(type, index)
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index);
 			TT_TooltipCall(GameTooltip, name, link, aiQuality, aiCount);
-			TT_Show(GameTooltip);
 		end
 	end
 end
@@ -632,7 +633,6 @@ function TT_ContainerFrameItemButton_OnEnter()
 		if (quality==nil or quality==-1) then quality = qualityFromLink(link); end
 
 		TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -654,7 +654,6 @@ function TT_ContainerFrame_Update(frame)
 				if (quality == nil) then quality = qualityFromLink(link); end
 
 				TT_TooltipCall(GameTooltip, name, link, quality, itemCount);
-				TT_Show(GameTooltip);
 			end
 		end
 	end
@@ -670,7 +669,6 @@ function TT_GameTooltip_SetLootItem(this, slot)
 		local texture, item, quantity, quality = GetLootSlotInfo(slot);
 		if (quality == nil) then quality = qualityFromLink(link); end
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -680,7 +678,6 @@ function TT_GameTooltip_SetQuestItem(this, qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot);
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -693,7 +690,6 @@ function TT_GameTooltip_SetQuestLogItem(this, qtype, slot)
 		quality = qualityFromLink(link); -- I don't trust the quality returned from the above function.
 
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -707,7 +703,6 @@ function TT_GameTooltip_SetInventoryItem(this, unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link); end
 
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity);
-		TT_Show(GameTooltip);
 	end
 
 	return hasItem, hasCooldown, repairCost;
@@ -720,7 +715,6 @@ function TT_GameTooltip_SetMerchantItem(this, slot)
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot);
 		local quality = qualityFromLink(link);
 		TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -733,7 +727,6 @@ function TT_GameTooltip_SetCraftItem(this, skill, slot)
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot);
 			local quality = qualityFromLink(link);
 			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
-			TT_Show(GameTooltip);
 		end
 	else
 		link = GetCraftItemLink(skill);
@@ -741,7 +734,6 @@ function TT_GameTooltip_SetCraftItem(this, skill, slot)
 			local name = nameFromLink(link);
 			local quality = qualityFromLink(link);
 			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
-			TT_Show(GameTooltip);
 		end
 	end
 end
@@ -755,7 +747,6 @@ function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot);
 			local quality = qualityFromLink(link);
 			TT_TooltipCall(GameTooltip, name, link, quality, quantity, 0);
-			TT_Show(GameTooltip);
 		end
 	else
 		link = GetTradeSkillItemLink(skill);
@@ -763,7 +754,6 @@ function TT_GameTooltip_SetTradeSkillItem(this, skill, slot)
 			local name = nameFromLink(link);
 			local quality = qualityFromLink(link);
 			TT_TooltipCall(GameTooltip, name, link, quality, 1, 0);
-			TT_Show(GameTooltip);
 		end
 	end
 end
@@ -801,7 +791,6 @@ function TT_GameTooltip_SetAuctionSellItem(this)
 			local link = GetContainerItemLink(bag, slot);
 			if (link) then
 				TT_TooltipCall(GameTooltip, name, link, quality, quantity, price);
-				TT_Show(GameTooltip);
 			end
 		end
 	end
@@ -823,7 +812,6 @@ function TT_IMInv_ItemButton_OnEnter()
 	local link = fakeLink(imlink, item.quality, item.name);
 	if (link) then
 		TT_TooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -834,7 +822,6 @@ function TT_ItemsMatrixItemButton_OnEnter()
 		local name = this:GetText();
 		local link = fakeLink(imlink, -1, name);
 		TT_TooltipCall(GameTooltip, name, link, -1, 1, 0);
-		TT_Show(GameTooltip);
 	end
 end
 
@@ -859,7 +846,6 @@ function TT_LootLinkItemButton_OnEnter()
 	if (link) then
 		local quality = qualityFromLink(link);
 		TT_TooltipCall(LootLinkTooltip, name, link, quality, 1, 0);
-		TT_Show(LootLinkTooltip);
 	end
 end
 
@@ -880,7 +866,6 @@ function TT_AllInOneInventory_ModifyItemTooltip(bag, slot, tooltip)
 		if (quality == nil) then quality = qualityFromLink(link); end
 
 		TT_TooltipCall(GameTooltip, name, link, quality, itemCount, 0);
-		TT_Show(GameTooltip);
 	end
 end
 
