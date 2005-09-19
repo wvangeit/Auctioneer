@@ -139,7 +139,7 @@ local function getRect(object)
 end
 
 function TT_Show(currentTooltip)
-	if (TT_Show_Ignore) then return end
+	if (TT_Show_Ignore == true) then return end
 	if (EnhancedTooltip.hasEmbed) then
 		TT_EmbedRender();
 		currentTooltip:Show();
@@ -514,6 +514,7 @@ local function fakeLink(item, quality, name)
 end
 TT_FakeLink = fakeLink;
 
+TT_Show_Ignore = false;
 function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	TT_CurrentTip = frame;
 	TT_HideAt = 0;
@@ -525,6 +526,7 @@ function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup, hy
 	
 	if (TT_CurrentItem and TT_CurrentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
+		TT_Show(TT_CurrentTip);
 		return;
 	end
 
