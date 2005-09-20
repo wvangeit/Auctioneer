@@ -179,6 +179,24 @@ function Auctioneer_PercentLessThan(value1, value2)
 	end
 end
 
+function Auctioneer_GetLowest(valuesTable)
+	if (not valuesTable or table.getn(valuesTable) == 0) then
+		return nil, nil;
+	end
+	local tableSize = table.getn(valuesTable);
+	local lowest = tonumber(valuesTable[1]) or 0;
+	local second = nil
+	if (tableSize > 1) then
+		for i=2, tableSize do
+			second = tonumber(valuesTable[i]) or 0;
+			if (second > lowest) then
+				return lowest, second;
+			end
+		end
+	end
+	return lowest, nil;
+end
+
 -- Returns the median value of a given table one-dimentional table
 function Auctioneer_GetMedian(valuesTable)
 	if (not valuesTable or table.getn(valuesTable) == 0) then
@@ -380,6 +398,7 @@ function Auctioneer_Split(str, at)
 	local splut = {};
 	local pos = 1;
 	
+	if (type(str) ~= "string") then return nil end
 	if (not str) then str = "" end
 	if (not at) then table.insert(splut, str) end
 	
@@ -531,10 +550,16 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
 	AuctionConfig.info[itemKey] = string.format("%s|%s", iData.category, iData.name);
-	Auctioneer_HSPCache[auctKey][itemKey] = nil;
+	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
+		Auctioneer_HSPCache[auctKey][itemKey] = nil;
+	end
+	Auctioneer_GetHSP(itemKey, auctKey);
 
 	local median = Auctioneer_GetMedian(iData.buyoutPricesHistoryList);
-	AuctionConfig.stats['histmed'][server][itemKey] = median;
+	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
+	if (not AuctionConfig.stats.histmed) then AuctionConfig.stats.histmed = {} end
+	if (not AuctionConfig.stats.histmed[server]) then AuctionConfig.stats.histmed[server] = {} end
+	AuctionConfig.stats.histmed[server][itemKey] = median;
 end
 
 -- Returns the auction buyout history for this item
@@ -603,57 +628,89 @@ function Auctioneer_GetMeans(itemKey, from)
 end
 
 -- Returns the current snapshot median for an item
-function Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey)
-	local buyoutPrices = {};
-	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
-	local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
-	if (sbuy) then
-		buyoutPrices = sbuy.buyoutPrices;
-	else
-		return 0, 0;
+function Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices)
+	if (not buyoutPrices) then
+		buyoutPrices = {};
+		if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
+		local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
+		if (sbuy) then
+			buyoutPrices = sbuy.buyoutPrices;
+		else
+			return 0, 0;
+		end
 	end
 
 	local snapMedian = Auctioneer_GetMedian(buyoutPrices);
 	local snapSeenCount = table.getn(buyoutPrices);
 
+	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
+	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
+	if (not AuctionConfig.stats.snapmed[auctKey]) then AuctionConfig.stats.snapmed[auctKey] = {} end
+	if (not AuctionConfig.stats.snapcount) then AuctionConfig.stats.snapcount = {} end
+	if (not AuctionConfig.stats.snapcount[auctKey]) then AuctionConfig.stats.snapcount[auctKey] = {} end
 	if (snapSeenCount >= MIN_BUYOUT_SEEN_COUNT) then
-		AuctionConfig.stats['snapmed'][auctKey][itemKey] = snapMedian;
+		AuctionConfig.stats.snapmed[auctKey][itemKey] = snapMedian;
+		AuctionConfig.stats.snapcount[auctKey][itemKey] = snapSeenCount;
+	else
+		AuctionConfig.stats.snapmed[auctKey][itemKey] = 0;
+		AuctionConfig.stats.snapcount[auctKey][itemKey] = 0;
 	end
+
 	return tonumber(snapMedian) or 0, snapSeenCount or 0;
 end
 
-function Auctioneer_GetSnapMedian(itemKey, auctKey)
+function Auctioneer_GetSnapMedian(itemKey, auctKey, buyoutPrices)
 	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
-	local stat = AuctionConfig.stats['histmed'][auctKey][itemKey];
-	if (not stat) then
-		stat = Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey);
+	local stat = nil; local count = nil;
+	if (AuctionConfig.stats and AuctionConfig.stats.snapmed and AuctionConfig.stats.snapmed[auctKey]) then
+		stat = AuctionConfig.stats.snapmed[auctKey][itemKey];
+		count = AuctionConfig.stats.snapcount[auctKey][itemKey];
 	end
-	return stat or 0;
+	if (not stat) then
+		stat, count = Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices);
+	end
+	return stat or 0, count or 0;
 end
 
-function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey)
+function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistoryTable)
 	local historyMedian = 0;
 	local historySeenCount = 0;
-	local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
-	if (buyoutHistoryTable) then
-		historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
-		historySeenCount = table.getn(buyoutHistoryTable);
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
+	if (not buyoutHistoryTable) then
+		local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
+		if (buyoutHistoryTable) then
+			historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
+			historySeenCount = table.getn(buyoutHistoryTable);
+		end
 	end
 
+	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
+	if (not AuctionConfig.stats.histmed) then AuctionConfig.stats.histmed = {} end
+	if (not AuctionConfig.stats.histmed[auctKey]) then AuctionConfig.stats.histmed[auctKey] = {} end
+	if (not AuctionConfig.stats.histcount) then AuctionConfig.stats.histcount = {} end
+	if (not AuctionConfig.stats.histcount[auctKey]) then AuctionConfig.stats.histcount[auctKey] = {} end
 	if (historySeenCount >= MIN_BUYOUT_SEEN_COUNT) then
-		AuctionConfig.stats['histmed'][auctKey][itemKey] = historyMedian;
+		AuctionConfig.stats.histmed[auctKey][itemKey] = historyMedian;
+		AuctionConfig.stats.histcount[auctKey][itemKey] = historySeenCount;
+	else
+		AuctionConfig.stats.histmed[auctKey][itemKey] = 0;
+		AuctionConfig.stats.histcount[auctKey][itemKey] = 0;
 	end
-	return tonumber(historyMedian) or 0, historySeenCount or 0;
+
+	return tonumber(historyMedian) or 0, tonumber(historySeenCount) or 0;
 end
 
-function Auctioneer_GetHistMedian(itemKey, auctKey)
+function Auctioneer_GetHistMedian(itemKey, auctKey, buyoutHistoryTable)
 	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
-	local stat = AuctionConfig.stats['histmed'][auctKey][itemKey];
-	if (stat) then return stat end
-	if (not stat) then
-		stat = Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey);
+	local stat = nil; local count = nil;
+	if (AuctionConfig.stats and AuctionConfig.stats.histmed and AuctionConfig.stats.histmed[auctKey]) then
+		stat = AuctionConfig.stats.histmed[auctKey][itemKey];
+		count = AuctionConfig.stats.histcount[auctKey][itemKey];
 	end
-	return stat or 0;
+	if (not stat) then
+		stat, count = Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistoryTable);
+	end
+	return stat or 0, count or 0;
 end
 
 -- this function returns the most accurate median possible, 
@@ -666,29 +723,22 @@ function Auctioneer_GetUsableMedian(itemKey, realm)
 	end
 
 	--get snapshot median
-	local snapshotMedian, snapshotCount
+	local snapshotMedian = nil;
 	-- only use Snapshot, when calculating current realm's marketPrice
 	-- won't make any sense to use alternate realm's snapshotdata as that data might me out of date
 	if realm == Auctioneer_GetAuctionKey() then
-		snapshotMedian = Auctioneer_GetSnapMedian(itemKey, realm)
-	else
-		snapshotMedian = nil
+		snapshotMedian, snapCount = Auctioneer_GetSnapMedian(itemKey, realm)
 	end
 
 	--get history median
-	local historyMedian, historySeenCount = Auctioneer_GetItemHistoricalMedianBuyout(itemKey, realm);
+	local historyMedian, histCount = Auctioneer_GetHistMedian(itemKey, realm);
 
-	if historyMedian and (not snapshotMedian or snapshotCount < MIN_BUYOUT_SEEN_COUNT or snapshotMedian > (historyMedian * 1.20)) then
-		if historySeenCount >= MIN_BUYOUT_SEEN_COUNT then -- could not obtain a usable median
-			usableMedian = historyMedian;
-			count = historySeenCount;
-		end
-	elseif snapshotMedian then
+	if snapshotMedian>0 and (historyMedian==0 or snapshotMedian<(historyMedian * 1.2)) then
 		usableMedian = snapshotMedian;
-		count = snapshotCount;
+	elseif (historyMedian) then
+		usableMedian = historyMedian;
 	end
-
-	return usableMedian, count;
+	return usableMedian;
 end
 
 function Auctioneer_IsPlayerMade(itemKey)
@@ -781,7 +831,8 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 		--see if this auction should not be filtered
 		local auctKey = Auctioneer_GetAuctionKey();
 		local itemCat = Auctioneer_GetCatForKey(itemKey);
-		local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature)
+		local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+--		p("Got snap:", snap, auctKey, itemCat, signature);
 		if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and snap.timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
 			filterAuction = false;
 		end
@@ -823,9 +874,9 @@ function Auctioneer_PercentLessFilter(percentLess, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-	local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+	local hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 
-	if hsp > 0 and nullSafe(seenCount) > 0 then
+	if hsp > 0 then
 		local profit = (hsp * count) - buyout;
 		--see if this auction should not be filtered
 		if (buyout > 0 and Auctioneer_PercentLessThan(hsp, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then
@@ -1057,23 +1108,6 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	return lowSig, lowestPrice, nextSig, nextLowest;
 end
 
--- Quick index to lowest snapshot price of an item
-function Auctioneer_GetLowestPriceQuick(auctSig)
-	local lowestPriceForOne = nil;
-
-	local auctKey = Auctioneer_GetAuctionKey();
-	local itemKey = Auctioneer_GetKeyFromSig(auctSig);
-	local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
-	--p("Found", sbuy);
-	if (sbuy) then
-		buyoutPrices = sbuy.buyoutPrices;
-		table.sort(buyoutPrices);
-		lowestPriceForOne = buyoutPrices[1];
-	end
-
-	return lowestPriceForOne or 0;
-end
-
 function Auctioneer_DoMedian(link)
 	local itemID, randomProp, enchant, uniqID, itemName = TT_BreakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
@@ -1086,8 +1120,11 @@ function Auctioneer_DoMedian(link)
 	end
 end
 
-function Auctioneer_GetBidBasedSellablePrice(itemKey, realm)
-	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = Auctioneer_GetMeans(itemKey, realm);
+function Auctioneer_GetBidBasedSellablePrice(itemKey,realm, avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount)
+	-- We can pass these values along if we have them.
+	if (seenCount == nil) then
+		avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = Auctioneer_GetMeans(itemKey, realm);
+	end
 	local bidBasedSellPrice = 0;
 	local typicalBuyout = 0;
 
@@ -1104,7 +1141,6 @@ end
 
 -- returns the best market price - 0, if no market price could be calculated
 function Auctioneer_GetMarketPrice(itemKey, realm)
-	--p("Getting market price for", itemKey, realm);
 	-- make sure to call this function with valid parameters! No check is being performed!
 	local buyoutMedian = nullSafe(Auctioneer_GetUsableMedian(itemKey, realm))
 	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = Auctioneer_GetMeans(itemKey, realm)
@@ -1114,24 +1150,25 @@ function Auctioneer_GetMarketPrice(itemKey, realm)
 	if buyoutMedian > 0 then
 		commonBuyout = buyoutMedian
 	elseif meanCount and meanCount > 0 then
-		commonBuyout = avgBuy; -- if a usable median does not exist, use the average buyout instead
+		-- if a usable median does not exist, use the average buyout instead
+		commonBuyout = avgBuy;
 	end
 
 	local playerMade, skill, level = Auctioneer_IsPlayerMade(itemKey);
 	if BID_BASED_CATEGORIES[Auctioneer_GetItemCategory(itemKey)] and not (playerMade and level < 250 and commonBuyout < 100000) then
-		return Auctioneer_GetBidBasedSellablePrice(itemKey, realm) -- returns bibasedSellablePrice for bidbaseditems, playermade items or if the buyoutprice is not present or less than 10g
+		-- returns bibasedSellablePrice for bidbaseditems, playermade items or if the buyoutprice is not present or less than 10g
+		return Auctioneer_GetBidBasedSellablePrice(itemKey,realm, avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount)
 	end
 
-	return commonBuyout -- returns buyoutMedian, if present - returns avgBuy otherwise, if meanCount > 0 - returns 0 otherwise
+	-- returns buyoutMedian, if present - returns avgBuy otherwise, if meanCount > 0 - returns 0 otherwise
+	return commonBuyout
 end
 
 -- Returns market information relating to the HighestSellablePrice for one of the given items.
 -- If you use cached data it may be affected by buying/selling items.
+HSPCOUNT = 0; CACHECOUNT = 0;
 function Auctioneer_GetHSP(itemKey, realm)
 	if not category then category = 0 end
-	-- check added, as it's a global function and should not cause any problems even when called with invalid parameters
-	local playerRealm = Auctioneer_GetAuctionKey();
-	--p("player realm is", playerRealm);
 	
 	if (itemKey == nil) then                                 -- make itemKey a required parameter
 		p("ERROR: Calling Auctioneer_GetHSP(itemKey, realm) - Function requires valid itemKey.");
@@ -1139,17 +1176,11 @@ function Auctioneer_GetHSP(itemKey, realm)
 	end
 	if (realm == nil) then
 		p("WARNING: Auctioneer_GetHSP(itemKey, realm) - Defaulting to player realm.");
-		realm = playerRealm;
+		realm = Auctioneer_GetAuctionKey();
 	end
 
-	local highestSellablePrice = 0;
-	local warn = AUCT_FRMT_WARN_NODATA;
-	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
-	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm);
-
-	if (not Auctioneer_HSPCache) then
-		Auctioneer_HSPCache = {};
-	end
+	if (not Auctioneer_HSPCache) then Auctioneer_HSPCache = {}; end
+	CACHECOUNT = CACHECOUNT + 1;
 
 	if (not Auctioneer_HSPCache[realm]) then Auctioneer_HSPCache[realm] = {} end
 	local cached = Auctioneer_HSPCache[realm][itemKey];
@@ -1157,6 +1188,12 @@ function Auctioneer_GetHSP(itemKey, realm)
 		local cache = Auctioneer_Split(cached, ";");
 		return tonumber(cache[1]), tonumber(cache[2]), tonumber(cache[3]), cache[4], tonumber(cache[5]), cache[6];
 	end
+	HSPCOUNT = HSPCOUNT + 1;
+
+	local highestSellablePrice = 0;
+	local warn = AUCT_FRMT_WARN_NODATA;
+	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
+	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm);
 
 	-- Get our user-set pricing parameters
 	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
@@ -1179,18 +1216,24 @@ function Auctioneer_GetHSP(itemKey, realm)
 	local nextLowestBuyout = nil;
 	local nextLowestCount = nil;
 
-	if (realm == playerRealm) then
-		local lowSig, lowPrice, nextSig, nextPrice = Auctioneer_FindLowestAuctions(itemKey);
-		if lowSig then
-			currentLowestSig = lowSig;
-			currentLowestBuyout = lowPrice;
-			nextLowestSig = nextSig;
-			nextLowestBuyout = nextPrice;
-		end
+	local lowSig, lowPrice, nextSig, nextPrice = Auctioneer_FindLowestAuctions(itemKey, realm);
+	if lowSig then
+		currentLowestSig = lowSig;
+		currentLowestBuyout = lowPrice;
+		nextLowestSig = nextSig;
+		nextLowestBuyout = nextPrice;
 	end
 
 	local hsp, market, warn = Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, currentLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent);
 	local nexthsp, _, nextwarn = Auctioneer_DeterminePrice(id, realm, marketPrice, nextLowestBuyout, nextLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent);
+
+
+	if (not hsp) then
+		p("Unable to calc HSP for",id, realm, marketPrice, currentLowestBuyout, currentLowestSig);
+		hsp = 0;
+		warn = "";
+	end
+	if (not nexthsp) then nexthsp = 0; nextwarn = ""; end
 
 --	p("Auction data: ", hsp, histCount, market, warn, nexthsp, nextwarn);
 
@@ -1296,6 +1339,7 @@ end
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
 function Auctioneer_AuctionEntry_Hook(page, index, category)
+--	p("Processing page", page, "item", index);
 	local auctionDoneKey;
 	if (not page or not index or not category) then
 		return;
@@ -1352,6 +1396,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 	
 	-- If we haven't seen this item (it's not in the old snapshot)
 	if (not snap) then 
+--		p("No snap");
 		lNewAuctionsCount = lNewAuctionsCount + 1;
 
 		-- now build the list of buyout prices seen for this auction to use to get the median
@@ -1373,7 +1418,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		auctionPriceItem.buyoutPricesHistoryList = newBuyoutPricesList.getList();
 		auctionPriceItem.name = aiName;
 		auctionPriceItem.category = itemCat;
-		Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, auctionPriceItem);
+		Auctioneer_SaveAuctionPriceItem(auctKey, aiKey, auctionPriceItem);
 
 		-- finaly add the auction to the snapshot
 		if (aiOwner == nil) then aiOwner = "unknown"; end
@@ -1394,6 +1439,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		};
 
 	else
+--		p("Snap!");
 		lOldAuctionsCount = lOldAuctionsCount + 1;
 		--this is an auction that was already in the snapshot from a previous scan and is still in the auction house
 		snap.dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
@@ -1418,9 +1464,10 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 	-- nothing to do, if auctioneer is disabled
 	if (not Auctioneer_GetFilter("all")) then
-		TT_Show(frame);
-	   return;
+		return;
 	end;
+	
+	local auctKey = Auctioneer_GetAuctionKey();
 	
 	-- initialize local variables
 	local itemID, randomProp, enchant, uniqID, lame = TT_BreakLink(link);
@@ -1448,7 +1495,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 	-- show item info
 	if (itemID > 0) then
 		frame.eDone = 1;
-		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey);
+		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 
 		itemInfo = Auctioneer_GetItemData(itemKey);
@@ -1475,7 +1522,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				avgBuy = math.floor(buyPrice / buyCount);
 			end
 
-			local median, medCount = Auctioneer_GetUsableMedian(itemKey);
+			local median, medCount = Auctioneer_GetUsableMedian(itemKey, auctKey);
 
 			if (Auctioneer_GetFilter(AUCT_SHOW_AVERAGE)) then -- show item's average auction price
 				-- OUTPUT: "Seen [aCount] times at auction total"
@@ -1555,8 +1602,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 				end
 
 				if median and Auctioneer_GetFilter(AUCT_SHOW_MEDIAN) then -- show item's median buyout price
-					local historicalMedian, historicalMedCount = Auctioneer_GetItemHistoricalMedianBuyout(itemKey);
-					local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey);
+					local historicalMedian, historicalMedCount = Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey);
+					local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey);
 					if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
 						-- OUTPUT: "Last [historicalMedCount], median BO (ea)"
 						TT_AddLine(string.format(AUCT_FRMT_INFO_HISTMED, historicalMedCount), historicalMedian, embedded)
@@ -1572,7 +1619,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then -- show item's suggested auction price
-				local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
+				local hsp = Auctioneer_GetHSP(itemKey, auctKey);
 				if hsp == 0 and buyCount > 0 then
 					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
@@ -1639,7 +1686,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						TT_LineColor(0.1,0.8,0.5);
 					end
 					if (Auctioneer_GetFilter(AUCT_SHOW_SUGGEST)) then
-						local hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, also);
+						local hsp = Auctioneer_GetHSP(itemKey, also);
 						if hsp == 0 and buyCount > 0 then
 							hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 						end
@@ -1730,7 +1777,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			TT_AddLine(string.format(AUCT_FRMT_INFO_STX, stacks), nil, embedded);
 		end
 	end
-	if (ItemInfo and Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
+	if (itemInfo and Auctioneer_GetFilter(AUCT_SHOW_USAGE)) then
 		local reagentInfo = "";
 		if (itemInfo.classText) then
 			reagentInfo = string.format(AUCT_FRMT_INFO_CLASS, itemInfo.classText);
@@ -1743,7 +1790,6 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 			TT_LineColor(0.6, 0.4, 0.8);
 		end
 	end
-	TT_Show(frame);
 end
 
 function Auctioneer_Tooltip_Hook(frame, name, count, data)
@@ -1786,6 +1832,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 		AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		AuctionConfig.bids[playerName][eventTime].itemWon = true;
 		Auctioneer_HSPCache[auctKey][aiKey] = nil;
+		Auctioneer_GetHSP(aiKey, auctKey);
 	end
 
 	Auctioneer_Old_BidHandler(itemtype,itemindex,bidamount);
@@ -2011,10 +2058,11 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner); 
 --		p("Saving", server, cat, sig, "as", saveData); 
 		AuctionConfig.snap[server][cat][sig] = saveData;
+		local itemKey = Auctioneer_GetKeyFromSig(sig);
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
-			local itemKey = Auctioneer_GetKeyFromSig(sig);
-			Auctioneer_HSPCache[server][itemKey] = {};
+			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
+		Auctioneer_GetHSP(itemKey, server);
 --	else
 --		p("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
 	end
@@ -2028,10 +2076,17 @@ function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	end
 	AuctionConfig.sbuy[server][itemKey] = hist;
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
-		Auctioneer_HSPCache[server][itemKey] = {};
+		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
+	Auctioneer_GetHSP(itemKey, server);
 	local median = Auctioneer_GetMedian(iData.buyoutPrices);
-	AuctionConfig.stats['snapmed'][server][itemKey] = median;
+	local low, second = Auctioneer_GetLowest(iData.buyoutPrices);
+
+	local median = Auctioneer_GetMedian(iData.buyoutPrices);
+	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
+	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
+	if (not AuctionConfig.stats.snapmed[server]) then AuctionConfig.stats.snapmed[server] = {} end
+	AuctionConfig.stats.snapmed[server][itemKey] = median;
 end
 
 function Auctioneer_Convert()
