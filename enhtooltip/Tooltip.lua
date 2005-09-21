@@ -451,10 +451,10 @@ function TT_CheckHide()
 		elseif OldChatLinkItem then
 			-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
 
-			local Backup = {name=OldChatLinkItem.name, link=OldChatLinkItem.link, hyperlink=OldChatLinkItem.hyperlink, button=OldChatLinkItem.button}
+			local Backup = {['reference']=OldChatLinkItem.reference, ['link']=OldChatLinkItem.link, ['button']=OldChatLinkItem.button}
 			-- redisplay old chatlinkdata, if there was one before
 			HideUIPanel(ItemRefTooltip)
-			TT_Chat_OnHyperlinkShow(Backup.link, Backup.hyperlink, Backup.button)
+			TT_Chat_OnHyperlinkShow(Backup.reference, Backup.link, Backup.button)
 			ShowUIPanel(ItemRefTooltip)
 		end
 	end
@@ -590,8 +590,8 @@ function TT_ItemPopup(name, link, quality, count, price, hyperlink)
 	return false; 
 end
 
-function TT_Chat_OnHyperlinkShow(hyperlink, link, button, ...)
-	Orig_Chat_OnHyperlinkShow(hyperlink, link, button);
+function TT_Chat_OnHyperlinkShow(reference, link, button, ...)
+	Orig_Chat_OnHyperlinkShow(reference, link, button);
 
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText();
@@ -603,7 +603,7 @@ function TT_Chat_OnHyperlinkShow(hyperlink, link, button, ...)
 				testPopup = true;
 			end
 			if (TT_TooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, hyperlink)) then 
-				OldChatLinkItem = {name=name, link=link, hyperlink=hyperlink, button=button};
+				OldChatLinkItem = {['reference']=reference, ['link']=link, ['button']=button}
 			end
 		end
 	end
