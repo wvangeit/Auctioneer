@@ -2137,9 +2137,11 @@ end
 
 function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	local hist = "";
-	for pos, hPrice in pairs(iData.buyoutPrices) do
-		if (hist == "") then hist = string.format("%d", hPrice);
-		else hist = string.format("%s:%d", hist, hPrice); end
+	if (iData.buyoutPrices) then
+		for pos, hPrice in pairs(iData.buyoutPrices) do
+			if (hist == "") then hist = string.format("%d", hPrice);
+			else hist = string.format("%s:%d", hist, hPrice); end
+		end
 	end
 	AuctionConfig.sbuy[server][itemKey] = hist;
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
