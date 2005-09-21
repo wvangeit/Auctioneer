@@ -413,11 +413,13 @@ function Auctioneer_Split(str, at)
 
 	if (type(str) ~= "string") then return nil end
 	if (not str) then str = "" end
-	if (not at) then table.insert(splut, str) end
-
-	for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-		table.insert(splut, n);
-		if (c == '') then break end
+	if (not at)
+		then table.insert(splut, str)
+	else
+		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+			table.insert(splut, n);
+			if (c == '') then break end
+		end
 	end
 	return splut;
 	
@@ -621,7 +623,7 @@ function Auctioneer_GetItemSignature(sigData)
 	return nil;
 end
 
--- Returns the category i.e. "Weapon", "Armor" for an item
+-- Returns the category i.e. 1, 2 for an item
 function Auctioneer_GetItemCategory(itemKey)
 	local category;
 	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey);
@@ -1498,7 +1500,10 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
 
 		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(aiKey, auctKey);
-		if (not auctionPriceItem) then auctionPriceItem = {} end
+		if (not auctionPriceItem) then auctionPriceItem = {}
+		p("Unexpected error - marked: Auctioneer_AuctionEntry_Hook --- aiKey:"..nilSafeString(aiKey))
+		-- TODO: Norganna? :)
+		end
 		
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
@@ -2248,21 +2253,44 @@ function Auctioneer_Convert()
 				if (hyphen and not colon) then
 					AuctionConfig.data[server] = {};
 					for sig, iData in pairs(sData) do
-						local catName = Auctioneer_GetCatName(tonumber(iData.category));
-						if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
-						local cat = iData.category;
-						local data = iData.data;
-						local hist = "";
-						local name = iData.name;
-						if (iData.buyoutPricesHistoryList) then
-							for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
-								if (hist == "") then hist = string.format("%d", hPrice);
-								else hist = string.format("%s:%d", hist, hPrice); end
+						local catName
+						local cat
+						local data
+						local sname
+						local hist = ""
+						-- addded by Luke1410 to convert old 2.x data to the new 3.2 format
+						if type(iData) == "string" then
+							local oldData = iData
+
+							-- category
+							local _, _, _, _, catName = GetItemInfo(sig)
+							if catName == nil then
+								-- !!!item not seen since serverrestart!!!
+								cat = 0 -- mark as unknown
+							else
+								cat = Auctioneer_GetCatNumberByName(catName)
+							end
+
+							-- data/name
+							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.+)")
+							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
+							name = sname
+						else
+							catName = Auctioneer_GetCatName(tonumber(iData.category));
+							if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
+							cat = iData.category;
+							data = iData.data;
+							name = iData.name;
+							if (iData.buyoutPricesHistoryList) then
+								for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
+									if (hist == "") then hist = string.format("%d", hPrice);
+									else hist = string.format("%s:%d", hist, hPrice); end
+								end
 							end
 						end
 						if (name) then
 							local newData = string.format("%s|%s", data, hist);
-							local newInfo = string.format("%s|%s", cat, iData.name);
+							local newInfo = string.format("%s|%s", cat, name);
 							AuctionConfig.data[server][sig] = newData;
 							AuctionConfig.info[sig] = newInfo;
 						end
