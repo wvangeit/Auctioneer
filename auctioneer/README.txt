@@ -1,5 +1,5 @@
 Auctioneer <%version%>
 $Id$
 -------------------------------
-FROM: http://norgs.internutter.org
+FROM: http://auctioneeraddon.com/
 

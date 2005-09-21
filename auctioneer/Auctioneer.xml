@@ -7,10 +7,16 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 -->
 	<Script file="localization.lua"/>
 	<Script file="ItemData.lua"/>
-	<Script file="MeshData.lua"/>
-	<Script file="DisplayInfo.lua"/>
 	<Script file="AHScanning.lua"/>
 	<Script file="BalancedList.lua"/>
+	<Script file="AucCommand.lua"/>
+	<Script file="AucConvert.lua"/>
+	<Script file="AucCore.lua"/>
+	<Script file="AucFilter.lua"/>
+	<Script file="AucScanner.lua"/>
+	<Script file="AucStatistic.lua"/>
+	<Script file="AucTooltip.lua"/>
+	<Script file="AucUtil.lua"/>
 	<Script file="Auctioneer.lua"/>
 	<Frame name="Auctioneer" parent="UIParent" hidden="true">
 		<Scripts>
