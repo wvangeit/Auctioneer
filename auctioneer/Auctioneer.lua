@@ -35,7 +35,7 @@ local lDefunctAuctionsCount = 0;
 local lSnapshotItemPrices = {};
 
 -- The maximum number of elements we store in our buyout prices history table 
-local lMaxBuyoutHistorySize = 100;
+local lMaxBuyoutHistorySize = 35;
 
 -- Min median buyout price for an item to show up in the list of items below median
 local MIN_PROFIT_MARGIN = 5000;
@@ -206,7 +206,7 @@ function Auctioneer_GetMedian(valuesTable)
 	local tableSize = table.getn(valuesTable);
 
 	if (tableSize == 1) then
-		return tonumber(valuesTable[1]);
+		return tonumber(valuesTable[1]), 1;
 	end
 
 	local median; -- value to return
@@ -224,7 +224,7 @@ function Auctioneer_GetMedian(valuesTable)
 		median = valuesTable[trueMiddleIndex];
 	end
 
-	return tonumber(median);
+	return tonumber(median), tableSize or 0;
 end
 
 -- We don't use this function anymore but other code may.
@@ -243,10 +243,10 @@ function Auctioneer_InvalidateAHSnapshot()
 	if (not AuctionConfig.snap[auctKey]) then
 		AuctionConfig.snap[auctKey] = {};
 	end
-	for cat,cData in AuctionConfig.snap[auctKey] do
+	for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 		-- Only invalidate the class group if we will be scanning it.
 		if (Auctioneer_GetFilter("scan-class"..cat)) then
-			for iKey, iData in cData do
+			for iKey, iData in pairs(cData) do
 				-- The first char is the dirty flag (purposely)
 				AuctionConfig.snap[auctKey][cat][iKey] = "1" .. string.sub(iData,2);
 			end
@@ -281,8 +281,8 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	local endTime = time();
 	if lTotalAuctionsScannedCount >= 50 then 
-		for cat,cData in AuctionConfig.snap[auctKey] do
-			for iKey, iData in cData do
+		for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
+			for iKey, iData in pairs(cData) do
 				local snap = Auctioneer_GetSnapshotInfoFromData(iData);
 				if (snap.dirty == 1) then
 					-- This item should have been seen, but wasn't.
@@ -305,7 +305,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 						buyList.insert(buyout);
 
 						local hist = "";
-						for pos, item in buyList.list do
+						for pos, item in pairs(buyList.list) do
 							if (hist == "") then hist = hist..item
 							else hist = hist..":"..item;
 							end
@@ -328,7 +328,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 						bidList.insert(snap.bidamount);
 
 						local hist = "";
-						for pos, item in bidList.list do
+						for pos, item in pairs(bidList.list) do
 							if (hist == "") then hist = hist..item
 							else hist = hist..":"..item;
 							end
@@ -351,8 +351,9 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	-- Copy the item prices into the Saved item prices table
 	local hist = "";
-	for sig, iData in lSnapshotItemPrices do
-		for pos, hPrice in iData.buyoutPrices do
+	for sig, iData in pairs(lSnapshotItemPrices) do
+		hist = "";
+		for pos, hPrice in pairs(iData.buyoutPrices) do
 			if (hist == "") then hist = string.format("%d", hPrice);
 			else hist = string.format("%s:%d", hist, hPrice); end
 		end
@@ -396,20 +397,28 @@ end
 
 function Auctioneer_Split(str, at)
 	local splut = {};
-	local pos = 1;
-	
-	if (type(str) ~= "string") then return nil end
-	if (not str) then str = "" end
-	if (not at) then table.insert(splut, str) end
-	
-	local match, mend = string.find(str, at, pos, true);
-	while match do
-		table.insert(splut, string.sub(str, pos, match-1));
-		pos = mend+1;
-		match, mend = string.find(str, at, pos, true);
+	for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+		table.insert(splut, n);
+		if (c == '') then break end
 	end
-	table.insert(splut, string.sub(str, pos));
 	return splut;
+	
+--	local pos = 1;
+--	
+--	if (type(str) ~= "string") then return nil end
+--	if (not str) then str = "" end
+--	if (not at) then table.insert(splut, str) end
+--	
+--	local match, mend = string.find(str, at, pos, true);
+--	while match do
+----		if (safe and string.sub(str, mend+1, mend+1) == " ") then
+----			match, mend = string.find(str, at, mend+1, true);
+----		end
+--		table.insert(splut, string.sub(str, pos, match-1));
+--		pos = mend+1;
+--		match, mend = string.find(str, at, pos, true);
+--	end
+--	table.insert(splut, string.sub(str, pos));
 end
 
 function Auctioneer_GetItemData(itemKey)
@@ -461,7 +470,7 @@ function Auctioneer_GetItemDataByID(itemID)
 	if (usedby ~= '') then
 		local usedList = Auctioneer_Split(usedby, ",");
 		local usage = "";
-		for pos, userSkill in usedList do
+		for pos, userSkill in pairs(usedList) do
 			local skillName = Auctioneer_Skills[tonumber(userSkill)];
 			local localized = "Unknown";
 			if (not skillName) then
@@ -540,10 +549,12 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (not itemKey) then return end
 	if (not iData) then return end
 
+	if (not AuctionConfig.info) then AuctionConfig.info = {}; end
+	if (not AuctionConfig.data) then AuctionConfig.data = {}; end
 	if (not AuctionConfig.data[auctKey]) then AuctionConfig.data[auctKey] = {}; end
 
 	local hist = "";
-	for pos, hPrice in iData.buyoutPricesHistoryList do
+	for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
 		if (hist == "") then hist = string.format("%d", hPrice);
 		else hist = string.format("%s:%d", hist, hPrice); end
 	end
@@ -553,13 +564,13 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
 		Auctioneer_HSPCache[auctKey][itemKey] = nil;
 	end
-	Auctioneer_GetHSP(itemKey, auctKey);
+	--Auctioneer_GetHSP(itemKey, auctKey);
 
 	local median = Auctioneer_GetMedian(iData.buyoutPricesHistoryList);
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
 	if (not AuctionConfig.stats.histmed) then AuctionConfig.stats.histmed = {} end
-	if (not AuctionConfig.stats.histmed[server]) then AuctionConfig.stats.histmed[server] = {} end
-	AuctionConfig.stats.histmed[server][itemKey] = median;
+	if (not AuctionConfig.stats.histmed[itemKey]) then AuctionConfig.stats.histmed[itemKey] = {} end
+	AuctionConfig.stats.histmed[itemKey][itemKey] = median;
 end
 
 -- Returns the auction buyout history for this item
@@ -582,9 +593,11 @@ end
 
 -- Parse the data from the auction signature
 function Auctioneer_GetItemSignature(sigData)
-	local i,j, id,rprop,enchant,name,count,min,buyout,uniq = string.find(sigData, "^(%d+):(%d+):(%d+):(.-):(%d+):(.-):(%d+):(.+)");
-	if (name == nil) then name = ""; end
-	return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
+	for id,rprop,enchant,name,count,min,buyout,uniq in string.gfind(sigData, "(%d+):(%d+):(%d+):(.-):(%d+):(.-):(%d+):(.+)") do
+		if (name == nil) then name = ""; end
+		return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
+	end
+	return nil;
 end
 
 -- Returns the category i.e. "Weapon", "Armor" for an item
@@ -664,6 +677,8 @@ function Auctioneer_GetSnapMedian(itemKey, auctKey, buyoutPrices)
 	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.snapmed and AuctionConfig.stats.snapmed[auctKey]) then
 		stat = AuctionConfig.stats.snapmed[auctKey][itemKey];
+	end
+	if (AuctionConfig.stats and AuctionConfig.stats.snapcount and AuctionConfig.stats.snapcount[auctKey]) then
 		count = AuctionConfig.stats.snapcount[auctKey][itemKey];
 	end
 	if (not stat) then
@@ -715,7 +730,7 @@ end
 
 -- this function returns the most accurate median possible, 
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
-function Auctioneer_GetUsableMedian(itemKey, realm)
+function Auctioneer_GetUsableMedian(itemKey, realm, buyoutPrices)
 	local usableMedian = nil;
 	local count = nil;
 	if not realm then
@@ -727,7 +742,7 @@ function Auctioneer_GetUsableMedian(itemKey, realm)
 	-- only use Snapshot, when calculating current realm's marketPrice
 	-- won't make any sense to use alternate realm's snapshotdata as that data might me out of date
 	if realm == Auctioneer_GetAuctionKey() then
-		snapshotMedian, snapCount = Auctioneer_GetSnapMedian(itemKey, realm)
+		snapshotMedian, snapCount = Auctioneer_GetSnapMedian(itemKey, realm, buyoutPrices)
 	end
 
 	--get history median
@@ -763,7 +778,7 @@ function Auctioneer_GetCurrentBid(auctionSignature)
 	local itemCat = Auctioneer_GetCatForSig(auctionSignature);
 	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
 	if (not snap) then return 0 end
-	local currentBid = snap.bidamount;
+	local currentBid = tonumber(snap.bidamount) or 0;
 	if currentBid == 0 then currentBid = min end
 	return currentBid;
 end
@@ -779,15 +794,17 @@ function Auctioneer_IsBadResaleChoice(auctionSignature)
 	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, from);
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 	local bidPercent = math.floor(bidCount / minCount * 100);
+	local itemLevel = tonumber(auctionItem.level);
+	local itemQuality = tonumber(auctionItem.quality);
 
 	-- bad choice conditions
 	if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
 		isBadChoice = true; -- bidbased items should have a minimum bid percent
-	elseif (auctionItem.level >= 50 and auctionItem.quality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
+	elseif (itemLevel >= 50 and itemQuality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
 		isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
 	elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
 		isBadChoice = true; -- don't display auctions that we own, or are high bidder on
-	elseif auctionItem.quality == QUALITY_POOR then 
+	elseif itemQuality == QUALITY_POOR then 
 		isBadChoice = true; -- gray items are never a good choice
 	end
 
@@ -821,20 +838,32 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 	local itemKey = id..":"..rprop..":"..enchant;
 
 	if Auctioneer_GetUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
-		local currentBid = Auctioneer_GetCurrentBid(signature);
-		local hsp, _,_,_, nhsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
-
-		local profit = (hsp * count) - currentBid;
-		local profitPricePercent = math.floor((profit / currentBid) * 100);
-
-		--see if this auction should not be filtered
 		local auctKey = Auctioneer_GetAuctionKey();
-		local itemCat = Auctioneer_GetCatForKey(itemKey);
-		local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
---		p("Got snap:", snap, auctKey, itemCat, signature);
-		if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and snap.timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
-			filterAuction = false;
+		local currentBid = Auctioneer_GetCurrentBid(signature);
+		local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
+		local buyoutValues = {};
+		if (sbuy) then buyoutValues = sbuy.buyoutPrices end
+		local lowest, second = Auctioneer_GetLowest(buyoutValues);
+
+		-- Take a generous stab in the dark at what the HSP will be
+		-- If the current bid falls under that value, only then should
+		-- we go to the effort of calculating actual profit.
+		-- Note: if second == nil, this indicates no competition.
+		if (second == nil or currentBid < second * 1.2) then
+			local hsp, _,_,_, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
+			-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
+
+			local profit = (hsp * count) - currentBid;
+			local profitPricePercent = math.floor((profit / currentBid) * 100);
+
+			--see if this auction should not be filtered
+			local auctKey = Auctioneer_GetAuctionKey();
+			local itemCat = Auctioneer_GetCatForKey(itemKey);
+			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+			local timeLeft = tonumber(snap.timeLeft);
+			if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+				filterAuction = false;
+			end
 		end
 	end
 
@@ -894,8 +923,8 @@ function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
 	param = param or "";
 
 	local auctKey = Auctioneer_GetAuctionKey();
-	for itemCat, iData in AuctionConfig.snap[auctKey] do
-		for auctionSignature, data in iData do
+	for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
+		for auctionSignature, data in pairs(iData) do
 			if(not filter(param, auctionSignature, extra1, extra2)) then
 				local a = Auctioneer_GetSnapshotFromData(data);
 				table.insert(queryResults, a); -- for some reason we have to use table.insert in order to use table.sort later
@@ -961,7 +990,7 @@ function Auctioneer_DoBroker(minProfit)
 	table.sort(resellableAuctions, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in resellableAuctions do
+	for _,a in pairs(resellableAuctions) do
 		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature); 
 		local itemKey = id .. ":" .. rprop..":"..enchant;
 		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
@@ -984,7 +1013,7 @@ function Auctioneer_DoBidBroker(minProfit)
 	table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
 
 	-- output the list of auctions
-	for _,a in bidWorthyAuctions do
+	for _,a in pairs(bidWorthyAuctions) do
 		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
 		local itemKey = id .. ":" .. rprop..":"..enchant;
 		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
@@ -1009,7 +1038,7 @@ function Auctioneer_DoCompeting(minLess)
 
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
 	local myHighestPrices = {}
-	for _,a in myAuctions do
+	for _,a in pairs(myAuctions) do
 		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
 		if (count > 1) then buyout = buyout/count; end
 		local itemKey = id .. ":" .. rprop..":"..enchant;
@@ -1022,7 +1051,7 @@ function Auctioneer_DoCompeting(minLess)
 	table.sort(competingAuctions, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in competingAuctions do
+	for _,a in pairs(competingAuctions) do
 		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
 		local itemKey = id .. ":" .. rprop..":"..enchant;
 		local currentBid = Auctioneer_GetCurrentBid(a.signature);
@@ -1064,7 +1093,7 @@ function Auctioneer_DoPercentLess(percentLess)
 	table.sort(auctionsBelowHSP, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in auctionsBelowHSP do
+	for _,a in pairs(auctionsBelowHSP) do
 		local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer_GetItemSignature(a.signature);
 		local itemKey = id ..":"..rprop..":"..enchant;
 		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
@@ -1085,23 +1114,32 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	if (not auctKey) then
 		auctKey = Auctioneer_GetAuctionKey();
 	end
+	local itemCat = Auctioneer_GetCatForKey(itemKey);
+	itemKeyCmp = itemID..":"..itemRand..":";
+	itemKeyLen = string.len(itemKey)+1;
 
 	local lowSig = nil;
 	local nextSig = nil;
 	local lowestPrice = 0;
 	local nextLowest = 0;
-	for catID, cData in AuctionConfig.snap[auctKey] do
-		--p("Get cat, cData", catID, cData);
-		for sig, sData in cData do
-			--p("Get sig, sData", sig, sData);
-			local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
-			local priceForOne = 0;
-			if (count and count > 0) then priceForOne = (buyout / count); end
-			if (tonumber(itemID) == tonumber(id) and tonumber(itemRand) == tonumber(rprop) and buyout > 0 and (lowestPrice == 0 or priceForOne < lowestPrice)) then 
-				nextSig = lowSig;
-				nextLowest = lowestPrice;
-				lowSig = sig;
-				lowestPrice = priceForOne;
+	local catItems = nil;
+	if (AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
+		catItems = AuctionConfig.snap[auctKey][itemCat];
+	end
+	if (catItems) then
+		for sig, sData in pairs(AuctionConfig.snap[auctKey][itemCat]) do
+			-- Quickly check for a match without decoding the string.
+			if (string.sub(sig, 1, itemKeyLen) == itemKeyCmp) then
+				-- If there is a match, then decode the string.
+				local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
+				local priceForOne = 0;
+				if (count and count > 0) then priceForOne = (buyout / count); end
+				if (buyout > 0 and (lowestPrice == 0 or priceForOne < lowestPrice)) then 
+					nextSig = lowSig;
+					nextLowest = lowestPrice;
+					lowSig = sig;
+					lowestPrice = priceForOne;
+				end
 			end
 		end
 	end
@@ -1140,9 +1178,9 @@ function Auctioneer_GetBidBasedSellablePrice(itemKey,realm, avgMin,avgBuy,avgBid
 end
 
 -- returns the best market price - 0, if no market price could be calculated
-function Auctioneer_GetMarketPrice(itemKey, realm)
+function Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues)
 	-- make sure to call this function with valid parameters! No check is being performed!
-	local buyoutMedian = nullSafe(Auctioneer_GetUsableMedian(itemKey, realm))
+	local buyoutMedian = nullSafe(Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues))
 	local avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, meanCount = Auctioneer_GetMeans(itemKey, realm)
 	local commonBuyout = 0
 
@@ -1167,7 +1205,7 @@ end
 -- Returns market information relating to the HighestSellablePrice for one of the given items.
 -- If you use cached data it may be affected by buying/selling items.
 HSPCOUNT = 0; CACHECOUNT = 0;
-function Auctioneer_GetHSP(itemKey, realm)
+function Auctioneer_GetHSP(itemKey, realm, buyoutValues)
 	if not category then category = 0 end
 	
 	if (itemKey == nil) then                                 -- make itemKey a required parameter
@@ -1193,7 +1231,11 @@ function Auctioneer_GetHSP(itemKey, realm)
 	local highestSellablePrice = 0;
 	local warn = AUCT_FRMT_WARN_NODATA;
 	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
-	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm);
+	if (not buyoutValues) then
+		buyoutValues = Auctioneer_GetSnapshotInfo(itemKey, realm);
+	end
+	
+	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues);
 
 	-- Get our user-set pricing parameters
 	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
@@ -1202,7 +1244,7 @@ function Auctioneer_GetHSP(itemKey, realm)
 	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT));
 	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
 
-	local _, histCount = Auctioneer_GetUsableMedian(itemKey, realm);
+	local _, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);
 
 	local id = Auctioneer_BreakItemKey(itemKey);
@@ -1406,6 +1448,18 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		if (not auctionPriceItem) then auctionPriceItem = {} end
 		
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
+		seenCount = seenCount + 1;
+		minCount = minCount + 1;
+		minPrice = minPrice + nullSafe(aiMinBid);
+		if (nullSafe(aiBidAmount) > 0) then
+			bidCount = bidCount + 1;
+			bidPrice = bidPrice + nullSafe(aiBidAmount);
+		end
+		if (nullSafe(aiBuyoutPrice) > 0) then
+			buyCount = buyCount + 1;
+			buyPrice = buyPrice + nullSafe(aiBuyoutPrice);
+		end
+		auctionPriceItem.data = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
 
 		local bph = auctionPriceItem.buyoutPricesHistoryList;
 		if (bph and table.getn(bph) > 0) then
@@ -1832,7 +1886,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 		AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		AuctionConfig.bids[playerName][eventTime].itemWon = true;
 		Auctioneer_HSPCache[auctKey][aiKey] = nil;
-		Auctioneer_GetHSP(aiKey, auctKey);
+		--Auctioneer_GetHSP(aiKey, auctKey);
 	end
 
 	Auctioneer_Old_BidHandler(itemtype,itemindex,bidamount);
@@ -1902,10 +1956,10 @@ function Auctioneer_LoadCategorySubClasses(c, ...)
 end
 
 function Auctioneer_FindClass(cName, sName)
-	for class, cData in AuctionConfig.classes do
+	for class, cData in pairs(AuctionConfig.classes) do
 		if (cData.name == cName) then
 			if (sName == nil) then return class, 0; end
-			for sClass, sData in cData do
+			for sClass, sData in pairs(cData) do
 				if (sClass ~= "name") and (sData == sName) then
 					return class, sClass;
 				end
@@ -1941,7 +1995,7 @@ end
 
 function Auctioneer_GetCatNumberByName(name)
 	if (not name) then return 0 end
-	for cat, class in AuctionConfig.classes do
+	for cat, class in pairs(AuctionConfig.classes) do
 		if (name == class.name) then
 			return cat;
 		end
@@ -1977,7 +2031,6 @@ function Auctioneer_GetInfo(itemKey)
 end
 
 function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
---	p("Getting snapshot for", auctKey, catID, auctSig);
 	if (not catID) then catID = 0 end
 
 	if (not AuctionConfig.snap[auctKey]) then
@@ -1995,28 +2048,21 @@ function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
 end
 
 function Auctioneer_GetSnapshotFromData(snap)
-	local snapsplit = Auctioneer_Split(snap, ";");
-	local dirty		= tonumber(snapsplit[1]);
-	local bid	    = tonumber(snapsplit[2]);
-	local level		= tonumber(snapsplit[3]);
-	local quality	= tonumber(snapsplit[4]);
-	local left		= tonumber(snapsplit[5]);
-	local fseen		= tonumber(snapsplit[6]);
-	local last		= tonumber(snapsplit[7]);
-	local link		= snapsplit[8];
-	local owner		= snapsplit[9];
-	return {
-		bidamount = bid,
-		owner = owner,
-		dirty = dirty,
-		lastSeenTime = last,
-		itemLink = link,
-		category = cat,
-		initialSeenTime = fseen,
-		level = level,
-		timeLeft = left,
-		quality = quality,
-	};
+	for dirty,bid,level,quality,left,fseen,last,link,owner in string.gfind(snap, "(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);([^;]+);(.+)") do
+		return {
+			bidamount = bid,
+			owner = owner,
+			dirty = dirty,
+			lastSeenTime = last,
+			itemLink = link,
+			category = cat,
+			initialSeenTime = fseen,
+			level = level,
+			timeLeft = left,
+			quality = quality,
+		};
+	end
+	return nil;
 end
 
 function Auctioneer_GetSnapshotInfo(auctKey, itemKey)
@@ -2062,7 +2108,7 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
-		Auctioneer_GetHSP(itemKey, server);
+		--Auctioneer_GetHSP(itemKey, server);
 --	else
 --		p("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
 	end
@@ -2070,7 +2116,7 @@ end
 
 function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	local hist = "";
-	for pos, hPrice in iData.buyoutPrices do
+	for pos, hPrice in pairs(iData.buyoutPrices) do
 		if (hist == "") then hist = string.format("%d", hPrice);
 		else hist = string.format("%s:%d", hist, hPrice); end
 	end
@@ -2078,15 +2124,17 @@ function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
-	Auctioneer_GetHSP(itemKey, server);
-	local median = Auctioneer_GetMedian(iData.buyoutPrices);
+	--Auctioneer_GetHSP(itemKey, server);
+	local median, seenCount = Auctioneer_GetMedian(iData.buyoutPrices);
 	local low, second = Auctioneer_GetLowest(iData.buyoutPrices);
 
-	local median = Auctioneer_GetMedian(iData.buyoutPrices);
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
 	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
 	if (not AuctionConfig.stats.snapmed[server]) then AuctionConfig.stats.snapmed[server] = {} end
+	if (not AuctionConfig.stats.snapcount) then AuctionConfig.stats.snapcount = {} end
+	if (not AuctionConfig.stats.snapcount[server]) then AuctionConfig.stats.snapcount[server] = {} end
 	AuctionConfig.stats.snapmed[server][itemKey] = median;
+	AuctionConfig.stats.snapcount[server][itemKey] = seenCount;
 end
 
 function Auctioneer_Convert()
@@ -2096,14 +2144,14 @@ function Auctioneer_Convert()
 		AuctionConfig.info = {};
 		AuctionConfig.snap = {};
 		AuctionConfig.sbuy = {};
-		for server, sData in AHSnapshot do
+		for server, sData in pairs(AHSnapshot) do
 			local colon = string.find(server, ":");
 			local hyphen = string.find(server, "-");
 			if (hyphen and not colon) then
 				if (not AuctionConfig.snap[server]) then
 					AuctionConfig.snap[server] = {};
 				end
-				for sig, iData in sData do
+				for sig, iData in pairs(sData) do
 					local catName = Auctioneer_GetCatName(tonumber(iData.category));
 					if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
 					local cat = iData.category;
@@ -2112,32 +2160,32 @@ function Auctioneer_Convert()
 			end
 		end
 		
-		for server, sData in AHSnapshotItemPrices do
+		for server, sData in pairs(AHSnapshotItemPrices) do
 			local colon = string.find(server, ":");
 			local hyphen = string.find(server, "-");
 			if (hyphen and not colon) then
 				if (not AuctionConfig.sbuy[server]) then
 					AuctionConfig.sbuy[server] = {};
 				end
-				for itemKey, iData in sData do
+				for itemKey, iData in pairs(sData) do
 					Auctioneer_SaveSnapshotInfo(server, itemKey, iData);
 				end
 			end
 		end
 
-		for server, sData in AuctionPrices do
+		for server, sData in pairs(AuctionPrices) do
 			local colon = string.find(server, ":");
 			local hyphen = string.find(server, "-");
 			if (hyphen and not colon) then
 				AuctionConfig.data[server] = {};
-				for sig, iData in sData do
+				for sig, iData in pairs(sData) do
 					local catName = Auctioneer_GetCatName(tonumber(iData.category));
 					if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
 					local cat = iData.category;
 					local data = iData.data;
 					local hist = "";
 					local name = iData.name;
-					for pos, hPrice in iData.buyoutPricesHistoryList do
+					for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
 						if (hist == "") then hist = string.format("%d", hPrice);
 						else hist = string.format("%s:%d", hist, hPrice); end
 					end
@@ -2152,9 +2200,9 @@ function Auctioneer_Convert()
 		end
 		
 		AuctionConfig.bids = {};
-		for player, pData in AuctionBids do
+		for player, pData in pairs(AuctionBids) do
 			AuctionConfig.bids[player] = {};
-			for time, bData in pData do
+			for time, bData in pairs(pData) do
 				local amount = bData.bidAmount;
 				local sig = bData.signature;
 				local owner = bData.itemOwner;
@@ -2964,7 +3012,7 @@ function Auctioneer_Clear(param, chatprint)
 	else
 
 		local items = Auctioneer_GetItems(param);
-		for _,itemKey in items do
+		for _,itemKey in pairs(items) do
 			if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 				AuctionConfig.data[aKey][itemKey] = nil;
 				clearok = true;
@@ -3058,7 +3106,7 @@ local validLocale=nil;
 		elseif (validLocale == nil) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
 
-			for locale, _ in AUCT_VALID_LOCALES do
+			for locale, _ in pairs(AUCT_VALID_LOCALES) do
 				Auctioneer_ChatPrint("  "..locale);
 			end
 
@@ -3309,7 +3357,7 @@ function Auctioneer_OnEvent(event)
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 
         -- Find the current lowest buyout for 1 of these in the current snapshot
-        local currentLowestBuyout = Auctioneer_FindLowestAuctions(itemKey)
+        local currentLowestBuyout = Auctioneer_FindLowestAuctions(itemKey);
         if currentLowestBuyout then
 		    _,_,_,_,lowStackCount,_,currentLowestBuyout = Auctioneer_GetItemSignature(currentLowestBuyout);
             currentLowestBuyout = currentLowestBuyout / lowStackCount;
@@ -3413,7 +3461,7 @@ function dump(...)
 		if (t == "table") then
 			out = out .. "{";
 			local first = true;
-			for k, v in d do
+			for k, v in pairs(d) do
 				if (not first) then out = out .. ", "; end
 				first = false;
 				out = out .. dump(k);
@@ -3446,7 +3494,10 @@ function p(...)
 	local out = "";
 	for i = 1, arg.n, 1 do
 		if (i > 1) then out = out .. ", "; end
-		if (type(arg[i]) == "string") then
+		local t = type(arg[i]);
+		if (t == "string") then
+			out = out .. '"'..arg[i]..'"';
+		elseif (t == "number") then
 			out = out .. arg[i];
 		else
 			out = out .. dump(arg[i]);
