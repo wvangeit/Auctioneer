@@ -111,14 +111,14 @@ function Auctioneer_GetItemDataByID(itemID)
 	local cat = CLASS_TO_CATEGORY_MAP[class];
 
 	local dataItem = {
-		buy = buy,
-		sell = sell,
-		class = class,
-		cat = cat,
-		quality = quality,
-		stack = stack,
-		additional = additional,
-		usedby = usedby,
+		['buy'] = buy,
+		['sell'] = sell,
+		['class'] = class,
+		['cat'] = cat,
+		['quality'] = quality,
+		['stack'] = stack,
+		['additional'] = additional,
+		['usedby'] = usedby,
 	};
 
 --	p("Data item so far", dataItem);
@@ -130,7 +130,7 @@ function Auctioneer_GetItemDataByID(itemID)
 	end
 	local catName = Auctioneer_GetCatName(cat);
 	if (not catName) then
---		p("Cat name is", catName, "for cat", cat);
+--		p("Cat name is ", catName, " for cat ", cat);
 		dataItem.classText = "Unknown"..addition;
 	else
 		dataItem.classText = catName..addition;
