@@ -95,6 +95,7 @@ AuctionConfig.version = 30200;
 
 -- Table to store our cached HSP values (since they're expensive to calculate)
 Auctioneer_HSPCache = {};
+Auctioneer_Lowests = {};
 
 
 -- Auction time constants
@@ -281,30 +282,31 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	local endTime = time();
 	if lTotalAuctionsScannedCount >= 50 then 
+		local snap,lastSeen,expiredSeconds,itemKey,buyList,listStr,listSplit,buyout,hist;
 		for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 			for iKey, iData in pairs(cData) do
-				local snap = Auctioneer_GetSnapshotInfoFromData(iData);
+				snap = Auctioneer_GetSnapshotInfoFromData(iData);
 				if (snap.dirty == 1) then
 					-- This item should have been seen, but wasn't.
 					-- We need to work out if it expired before or after it's time
-					local lastSeen = snap.lastSeenTime;
-					local expiredSeconds = endTime - lastSeen;
+					lastSeen = snap.lastSeenTime;
+					expiredSeconds = endTime - lastSeen;
 					if (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
 						-- Whoa! This item was bought out.
-						local itemKey = Auctioneer_GetKeyFromSig(iKey);
+						itemKey = Auctioneer_GetKeyFromSig(iKey);
 						if (not AuctionConfig.success) then AuctionConfig.success = {} end
 						if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
 						if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
-						local buyList = newBalancedList(lMaxBuyoutHistorySize);
-						local listStr = AuctionConfig.success.buy[auctKey][itemKey];
+						buyList = newBalancedList(lMaxBuyoutHistorySize);
+						listStr = AuctionConfig.success.buy[auctKey][itemKey];
 						if (listStr) then
-							local listSplit = Enchantrix_Split(listStr, ":");
+							listSplit = Enchantrix_Split(listStr, ":");
 							buyList.setList(listSplit);
 						end
-						local _,_,_,_,_,_,buyout = Auctioneer_GetItemSignature(iKey); 
+						x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey); 
 						buyList.insert(buyout);
 
-						local hist = "";
+						hist = "";
 						for pos, item in pairs(buyList.list) do
 							if (hist == "") then hist = hist..item
 							else hist = hist..":"..item;
@@ -315,19 +317,19 @@ function Auctioneer_FinishedAuctionScan_Hook()
 					if (snap.timeLeft == 1) and (snap.bidamount > 0) then
 						-- This one expired at the final time interval, so it's likely
 						-- that this is the best bid value we'll get for it.
-						local itemKey = Auctioneer_GetKeyFromSig(iKey);
+						itemKey = Auctioneer_GetKeyFromSig(iKey);
 						if (not AuctionConfig.success) then AuctionConfig.success = {} end
 						if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
 						if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
-						local bidList = newBalancedList(lMaxBuyoutHistorySize);
-						local listStr = AuctionConfig.success.bid[auctKey][itemKey];
+						bidList = newBalancedList(lMaxBuyoutHistorySize);
+						listStr = AuctionConfig.success.bid[auctKey][itemKey];
 						if (listStr) then
-							local listSplit = Enchantrix_Split(listStr, ":");
+							listSplit = Enchantrix_Split(listStr, ":");
 							bidList.setList(listSplit);
 						end
 						bidList.insert(snap.bidamount);
 
-						local hist = "";
+						hist = "";
 						for pos, item in pairs(bidList.list) do
 							if (hist == "") then hist = hist..item
 							else hist = hist..":"..item;
@@ -358,6 +360,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 			else hist = string.format("%s:%d", hist, hPrice); end
 		end
 		AuctionConfig.sbuy[auctKey][sig] = hist;
+		lSnapshotItemPrices[sig] = nil;
 	end
 
 	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
@@ -470,14 +473,12 @@ function Auctioneer_GetItemDataByID(itemID)
 	if (usedby ~= '') then
 		local usedList = Auctioneer_Split(usedby, ",");
 		local usage = "";
+		local skillName, localized,localeString;
 		for pos, userSkill in pairs(usedList) do
-			local skillName = Auctioneer_Skills[tonumber(userSkill)];
-			local localized = "Unknown";
-			if (not skillName) then
---				p("Get skill name for", userSkill, "returned", skillName);
-			else
-				local localeString = "AUCT_SKILL_"..string.upper(skillName);
---				p("Getting global", localeString);
+			skillName = Auctioneer_Skills[tonumber(userSkill)];
+			localized = "Unknown";
+			if (skillName) then
+				localeString = "AUCT_SKILL_"..string.upper(skillName);
 				localized = getglobal(localeString);
 			end
 			if (usage == "") then
@@ -564,7 +565,7 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
 		Auctioneer_HSPCache[auctKey][itemKey] = nil;
 	end
-	--Auctioneer_GetHSP(itemKey, auctKey);
+	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 
 	local median = Auctioneer_GetMedian(iData.buyoutPricesHistoryList);
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
@@ -738,13 +739,7 @@ function Auctioneer_GetUsableMedian(itemKey, realm, buyoutPrices)
 	end
 
 	--get snapshot median
-	local snapshotMedian = nil;
-	-- only use Snapshot, when calculating current realm's marketPrice
-	-- won't make any sense to use alternate realm's snapshotdata as that data might me out of date
-	if realm == Auctioneer_GetAuctionKey() then
-		snapshotMedian, snapCount = Auctioneer_GetSnapMedian(itemKey, realm, buyoutPrices)
-	end
-
+	local snapshotMedian, snapCount = Auctioneer_GetSnapMedian(itemKey, realm, buyoutPrices)
 	--get history median
 	local historyMedian, histCount = Auctioneer_GetHistMedian(itemKey, realm);
 
@@ -773,7 +768,7 @@ end
 
 -- Returns the current bid on an auction
 function Auctioneer_GetCurrentBid(auctionSignature)
-	local _,_,_, _, _,min,_,_ = Auctioneer_GetItemSignature(auctionSignature);
+	local x,x,x, x, x,min,x,_ = Auctioneer_GetItemSignature(auctionSignature);
 	local auctKey = Auctioneer_GetAuctionKey();
 	local itemCat = Auctioneer_GetCatForSig(auctionSignature);
 	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
@@ -850,7 +845,7 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 		-- we go to the effort of calculating actual profit.
 		-- Note: if second == nil, this indicates no competition.
 		if (second == nil or currentBid < second * 1.2) then
-			local hsp, _,_,_, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
+			local hsp, x,x,x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
 			-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
 
 			local profit = (hsp * count) - currentBid;
@@ -922,13 +917,14 @@ function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
 	local queryResults = {};
 	param = param or "";
 
+	local a;
 	local auctKey = Auctioneer_GetAuctionKey();
 	for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
 		for auctionSignature, data in pairs(iData) do
 			if(not filter(param, auctionSignature, extra1, extra2)) then
-				local a = Auctioneer_GetSnapshotFromData(data);
-				table.insert(queryResults, a); -- for some reason we have to use table.insert in order to use table.sort later
-				queryResults[table.getn(queryResults)].signature = auctionSignature;
+				a = Auctioneer_GetSnapshotFromData(data);
+				a.signature = auctionSignature;
+				table.insert(queryResults, a);
 			end
 		end
 	end
@@ -940,8 +936,8 @@ Auctioneer_QuerySnapshot = Auctioneer_QuerySnapshot;
 
 -- method to pass to table.sort() that sorts auctions by profit descending
 function Auctioneer_ProfitComparisonSort(a, b)
-	local aid,arprop,aenchant, aName, aCount, _, aBuyout, _ = Auctioneer_GetItemSignature(a.signature);
-	local bid,brprop,benchant, bName, bCount, _, bBuyout, _ = Auctioneer_GetItemSignature(b.signature);
+	local aid,arprop,aenchant, aName, aCount, x, aBuyout, x = Auctioneer_GetItemSignature(a.signature);
+	local bid,brprop,benchant, bName, bCount, x, bBuyout, x = Auctioneer_GetItemSignature(b.signature);
 	local aItemKey = aid .. ":" .. arprop..":"..aenchant;
 	local bItemKey = bid .. ":" .. brprop..":"..benchant;
 	local realm = Auctioneer_GetAuctionKey()
@@ -990,12 +986,13 @@ function Auctioneer_DoBroker(minProfit)
 	table.sort(resellableAuctions, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in pairs(resellableAuctions) do
-		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature); 
-		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		local profit = (hsp * count) - buyout;
-		local output = string.format(AUCT_FRMT_BROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
+	local id,rprop,enchant,name,count,min,buyout,uniq,itemKey,hsp,seenCount,profit,output;
+	for pos,a in pairs(resellableAuctions) do
+		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature); 
+		itemKey = id .. ":" .. rprop..":"..enchant;
+		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+		profit = (hsp * count) - buyout;
+		output = string.format(AUCT_FRMT_BROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
 		Auctioneer_ChatPrint(output);
 	end
 
@@ -1013,18 +1010,19 @@ function Auctioneer_DoBidBroker(minProfit)
 	table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
 
 	-- output the list of auctions
-	for _,a in pairs(bidWorthyAuctions) do
-		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
-		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		local currentBid = Auctioneer_GetCurrentBid(a.signature);
-		local profit = (hsp * count) - currentBid;
+	local id,rprop,enchant, name, count,min,buyout,uniq,itemKey,hsp,seenCount,currentBid,profit,bidText,output;
+	for pos,a in pairs(bidWorthyAuctions) do
+		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+		itemKey = id .. ":" .. rprop..":"..enchant;
+		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+		currentBid = Auctioneer_GetCurrentBid(a.signature);
+		profit = (hsp * count) - currentBid;
 
-		local bidText = AUCT_FRMT_BIDBROKER_CURBID;
+		bidText = AUCT_FRMT_BIDBROKER_CURBID;
 		if (currentBid == min) then
 			bidText = AUCT_FRMT_BIDBROKER_MINBID;
 		end
-		local output = string.format(AUCT_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+		output = string.format(AUCT_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
 		Auctioneer_ChatPrint(output);
 	end
 
@@ -1038,43 +1036,44 @@ function Auctioneer_DoCompeting(minLess)
 
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
 	local myHighestPrices = {}
-	for _,a in pairs(myAuctions) do
-		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+	local id,rprop,enchant,name,count,min,buyout,uniq,itemKey,competingAuctions,currentBid,buyoutForOne,bidForOne,bidPrice,myBuyout,buyPrice,myPrice,priceLess,lessPrice,output;
+	for pos,a in pairs(myAuctions) do
+		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
 		if (count > 1) then buyout = buyout/count; end
-		local itemKey = id .. ":" .. rprop..":"..enchant;
+		itemKey = id .. ":" .. rprop..":"..enchant;
 		if (not myHighestPrices[itemKey]) or (myHighestPrices[itemKey] < buyout) then
 			myHighestPrices[itemKey] = buyout;
 		end
 	end
-	local competingAuctions = Auctioneer_QuerySnapshot(Auctioneer_CompetingFilter, minLess, myHighestPrices);
+	competingAuctions = Auctioneer_QuerySnapshot(Auctioneer_CompetingFilter, minLess, myHighestPrices);
 
 	table.sort(competingAuctions, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in pairs(competingAuctions) do
-		local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
-		local itemKey = id .. ":" .. rprop..":"..enchant;
-		local currentBid = Auctioneer_GetCurrentBid(a.signature);
+	for pos,a in pairs(competingAuctions) do
+		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+		itemKey = id .. ":" .. rprop..":"..enchant;
+		currentBid = Auctioneer_GetCurrentBid(a.signature);
 
-		local buyoutForOne = buyout;
-		local bidForOne = currentBid;
+		buyoutForOne = buyout;
+		bidForOne = currentBid;
 		if (count > 1) then
 			buyoutForOne = buyout/count;
 			bidForOne = currentBid/count;
 		end
 
-		local bidPrice = TT_GetTextGSC(bidForOne).."ea";
+		bidPrice = TT_GetTextGSC(bidForOne).."ea";
 		if (currentBid == min) then
 			bidPrice = "No bids ("..bidPrice..")";
 		end
 
-		local myBuyout = myHighestPrices[itemKey];
-		local buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
-		local myPrice = TT_GetTextGSC(myBuyout).."ea";
-		local priceLess = myBuyout - buyoutForOne;
-		local lessPrice = TT_GetTextGSC(priceLess);
+		myBuyout = myHighestPrices[itemKey];
+		buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
+		myPrice = TT_GetTextGSC(myBuyout).."ea";
+		priceLess = myBuyout - buyoutForOne;
+		lessPrice = TT_GetTextGSC(priceLess);
 
-		local output = string.format(AUCT_FRMT_COMPETE_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
+		output = string.format(AUCT_FRMT_COMPETE_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 		Auctioneer_ChatPrint(output);
 	end
 
@@ -1093,12 +1092,13 @@ function Auctioneer_DoPercentLess(percentLess)
 	table.sort(auctionsBelowHSP, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for _,a in pairs(auctionsBelowHSP) do
-		local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer_GetItemSignature(a.signature);
-		local itemKey = id ..":"..rprop..":"..enchant;
-		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		local profit = (hsp * count) - buyout;
-		local output = string.format(AUCT_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
+	local id,rprop,enchant,name,count,buyout,itemKey,hsp,seenCount,profit,output,x;
+	for pos,a in pairs(auctionsBelowHSP) do
+		id,rprop,enchant, name, count,x,buyout,x = Auctioneer_GetItemSignature(a.signature);
+		itemKey = id ..":"..rprop..":"..enchant;
+		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+		profit = (hsp * count) - buyout;
+		output = string.format(AUCT_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
 		Auctioneer_ChatPrint(output);
 	end
 
@@ -1114,36 +1114,50 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	if (not auctKey) then
 		auctKey = Auctioneer_GetAuctionKey();
 	end
-	local itemCat = Auctioneer_GetCatForKey(itemKey);
-	itemKeyCmp = itemID..":"..itemRand..":";
-	itemKeyLen = string.len(itemKey)+1;
+	if not (Auctioneer_Lowests and Auctioneer_Lowests.built) then Auctioneer_BuildLowestCache(auctKey) end
 
+	lowKey = itemID..":"..itemRand..":";
+
+	local itemCat = nil;
 	local lowSig = nil;
 	local nextSig = nil;
 	local lowestPrice = 0;
 	local nextLowest = 0;
-	local catItems = nil;
-	if (AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
-		catItems = AuctionConfig.snap[auctKey][itemCat];
+
+	local lows = Auctioneer_Lowests[lowKey];
+	if (lows) then
+		lowSig = lows.lowSig;
+		nextSig = lows.nextSig;
+		lowestPrice = lows.lowestPrice or 0;
+		nextLowest = lows.nextLowest or 0;
+		itemCat = lows.cat;
 	end
-	if (catItems) then
-		for sig, sData in pairs(AuctionConfig.snap[auctKey][itemCat]) do
-			-- Quickly check for a match without decoding the string.
-			if (string.sub(sig, 1, itemKeyLen) == itemKeyCmp) then
-				-- If there is a match, then decode the string.
-				local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
-				local priceForOne = 0;
-				if (count and count > 0) then priceForOne = (buyout / count); end
-				if (buyout > 0 and (lowestPrice == 0 or priceForOne < lowestPrice)) then 
-					nextSig = lowSig;
-					nextLowest = lowestPrice;
-					lowSig = sig;
-					lowestPrice = priceForOne;
-				end
+
+	return lowSig, lowestPrice, nextSig, nextLowest, itemCat;
+end
+
+function Auctioneer_BuildLowestCache(auctKey)
+	Auctioneer_Lowests = {};
+	local id, rprop, enchant, name, count, min, buyout, uniq, lowKey, priceForOne, curSig, curLowest;
+	for itemCat, cData in pairs(AuctionConfig.snap[auctKey]) do
+		for sig, sData in pairs(cData) do
+			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
+			lowKey = id..":"..rprop;
+			if (not Auctioneer_Lowests[lowKey]) then Auctioneer_Lowests[lowKey] = {} end
+			
+			priceForOne = buyout;
+			if (count and count > 0) then priceForOne = (buyout / count); end
+				
+			curSig = Auctioneer_Lowests[lowKey].lowSig;
+			curLowest = Auctioneer_Lowests[lowKey].lowestPrice or 0;
+			if (buyout > 0 and (curLowest == 0 or priceForOne < curLowest)) then 
+				Auctioneer_Lowests[lowKey] = {
+					nextSig = curSig, nextLowest = curLowest, lowSig = sig, lowestPrice = priceForOne, cat = itemCat
+				};
 			end
 		end
 	end
-	return lowSig, lowestPrice, nextSig, nextLowest;
+	Auctioneer_Lowests.built = true;
 end
 
 function Auctioneer_DoMedian(link)
@@ -1205,9 +1219,7 @@ end
 -- Returns market information relating to the HighestSellablePrice for one of the given items.
 -- If you use cached data it may be affected by buying/selling items.
 HSPCOUNT = 0; CACHECOUNT = 0;
-function Auctioneer_GetHSP(itemKey, realm, buyoutValues)
-	if not category then category = 0 end
-	
+function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	if (itemKey == nil) then                                 -- make itemKey a required parameter
 		p("ERROR: Calling Auctioneer_GetHSP(itemKey, realm) - Function requires valid itemKey.");
 		return nil;
@@ -1244,7 +1256,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues)
 	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT));
 	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
 
-	local _, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
+	local x, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);
 
 	local id = Auctioneer_BreakItemKey(itemKey);
@@ -1258,7 +1270,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues)
 	local nextLowestBuyout = nil;
 	local nextLowestCount = nil;
 
-	local lowSig, lowPrice, nextSig, nextPrice = Auctioneer_FindLowestAuctions(itemKey, realm);
+	local lowSig, lowPrice, nextSig, nextPrice, itemCat = Auctioneer_FindLowestAuctions(itemKey, realm);
 	if lowSig then
 		currentLowestSig = lowSig;
 		currentLowestBuyout = lowPrice;
@@ -1266,8 +1278,10 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues)
 		nextLowestBuyout = nextPrice;
 	end
 
-	local hsp, market, warn = Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, currentLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent);
-	local nexthsp, _, nextwarn = Auctioneer_DeterminePrice(id, realm, marketPrice, nextLowestBuyout, nextLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent);
+	if (not itemCat) then itemCat = Auctioneer_GetCatForKey(itemKey) end
+
+	local hsp, market, warn = Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, currentLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent, itemCat);
+	local nexthsp, x, nextwarn = Auctioneer_DeterminePrice(id, realm, marketPrice, nextLowestBuyout, nextLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent, itemCat);
 
 
 	if (not hsp) then
@@ -1287,16 +1301,21 @@ end
 Auctioneer_GetHighestSellablePriceForOne = Auctioneer_GetHSP;
 getHighestSellablePriceForOne = Auctioneer_GetHSP;
 
-function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, currentLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent)
+function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, currentLowestSig, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent, itemCat)
 
 	local warn, highestSellablePrice, lowestBuyoutPriceAllowed;
 	
 	if marketPrice and marketPrice > 0 then
 		if currentLowestBuyout and currentLowestBuyout > 0 then
 			lowestBuyoutPriceAllowed = Auctioneer_SubtractPercent(marketPrice, lowestAllowedPercentBelowMarket);
-			local itemCat = Auctioneer_GetCatForSig(currentLowestSig);
---			p("Getting cat for sig", currentLowestSig, itemCat);
-			local snap = Auctioneer_GetSnapshot(realm, itemCat, currentLowestSig);
+			if (not itemCat) then itemCat = Auctioneer_GetCatForSig(currentLowestSig) end
+
+			-- since we don't want to decode the full data unless there's a chance it belongs to the player
+			-- do a substring search for the players name first.
+			local snap;
+			if (string.find(AuctionConfig.snap[realm][itemCat][currentLowestSig], UnitName("player"), 1, true)) then
+				snap = Auctioneer_GetSnapshot(realm, itemCat, currentLowestSig);
+			end
 			if snap and snap.owner == UnitName("player") then
 				highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
 				warn = AUCT_FRMT_WARN_MYPRICE;
@@ -1349,7 +1368,7 @@ function Auctioneer_DoLow(link)
 		local auctKey = Auctioneer_GetAuctionKey();
 		local itemCat = Auctioneer_GetCatForKey(itemKey);
 		local auction = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
-		local _,_,_, _, count, _, buyout, _ = Auctioneer_GetItemSignature(auctionSignature);
+		local x,x,x, x, count, x, buyout, x = Auctioneer_GetItemSignature(auctionSignature);
 		Auctioneer_ChatPrint(string.format(AUCT_FRMT_LOW_LINE, Auctioneer_ColorTextWhite(count.."x")..auction.itemLink, TT_GetTextGSC(buyout), Auctioneer_ColorTextWhite(auction.owner), TT_GetTextGSC(buyout / count), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(Auctioneer_GetUsableMedian(itemKey), buyout / count).."%")));
 	end
 end
@@ -1886,6 +1905,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 		AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		AuctionConfig.bids[playerName][eventTime].itemWon = true;
 		Auctioneer_HSPCache[auctKey][aiKey] = nil;
+		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 		--Auctioneer_GetHSP(aiKey, auctKey);
 	end
 
@@ -2108,6 +2128,7 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
+		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 		--Auctioneer_GetHSP(itemKey, server);
 --	else
 --		p("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
@@ -2124,6 +2145,7 @@ function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
+	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	--Auctioneer_GetHSP(itemKey, server);
 	local median, seenCount = Auctioneer_GetMedian(iData.buyoutPrices);
 	local low, second = Auctioneer_GetLowest(iData.buyoutPrices);
@@ -2216,8 +2238,8 @@ function Auctioneer_Convert()
 	end
 
 	-- Now the conversion is complete, wipe out the old data
-	AHSnapshot = {};
-	AHSnapshotItemPrices = {};
+	AHSnapshot = nil;
+	AHSnapshotItemPrices = nil;
 	AuctionPrices = nil;
 	AuctionBids = nil;
 	AuctionConfig.version = 30200;
@@ -2833,7 +2855,7 @@ function Auctioneer_Command(command, source)
 
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
 	elseif ((cmd == AUCT_CMD_BROKER) or (cmd == "broker")) then
-		doBroker(param);
+		Auctioneer_DoBroker(param);
 
 	elseif ((cmd == AUCT_CMD_BIDBROKER) or (cmd == AUCT_CMD_BIDBROKER_SHORT)
 		or (cmd == "bidbroker") or (cmd == "bb")) then
@@ -3012,7 +3034,7 @@ function Auctioneer_Clear(param, chatprint)
 	else
 
 		local items = Auctioneer_GetItems(param);
-		for _,itemKey in pairs(items) do
+		for pos,itemKey in pairs(items) do
 			if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 				AuctionConfig.data[aKey][itemKey] = nil;
 				clearok = true;
@@ -3106,7 +3128,7 @@ local validLocale=nil;
 		elseif (validLocale == nil) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
 
-			for locale, _ in pairs(AUCT_VALID_LOCALES) do
+			for locale, x in pairs(AUCT_VALID_LOCALES) do
 				Auctioneer_ChatPrint("  "..locale);
 			end
 
@@ -3300,8 +3322,9 @@ end
 function Auctioneer_GetItems(str)
 	local itemList = {};
 	local listSize = 0;
+	local itemKey;
 	for itemID, randomProp, enchant, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
-		local itemKey = itemID..":"..randomProp..":"..enchant;
+		itemKey = itemID..":"..randomProp..":"..enchant;
 		listSize = listSize+1;
 		itemList[listSize] = itemKey;
 	end
@@ -3351,7 +3374,7 @@ function Auctioneer_OnEvent(event)
 			return
 		end
 
-		local startPrice, buyoutPrice;
+		local startPrice, buyoutPrice, x;
 		local itemKey = id..":"..rprop..":"..enchant;
 		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
@@ -3359,7 +3382,7 @@ function Auctioneer_OnEvent(event)
         -- Find the current lowest buyout for 1 of these in the current snapshot
         local currentLowestBuyout = Auctioneer_FindLowestAuctions(itemKey);
         if currentLowestBuyout then
-		    _,_,_,_,lowStackCount,_,currentLowestBuyout = Auctioneer_GetItemSignature(currentLowestBuyout);
+		    x,x,x,x,lowStackCount,x,currentLowestBuyout = Auctioneer_GetItemSignature(currentLowestBuyout);
             currentLowestBuyout = currentLowestBuyout / lowStackCount;
         end 
         
