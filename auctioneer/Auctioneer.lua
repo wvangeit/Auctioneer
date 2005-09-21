@@ -283,66 +283,72 @@ function Auctioneer_FinishedAuctionScan_Hook()
 	local endTime = time();
 	if lTotalAuctionsScannedCount >= 50 then 
 		local snap,lastSeen,expiredSeconds,itemKey,buyList,listStr,listSplit,buyout,hist;
-		for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
-			for iKey, iData in pairs(cData) do
-				snap = Auctioneer_GetSnapshotInfoFromData(iData);
-				if (snap.dirty == 1) then
-					-- This item should have been seen, but wasn't.
-					-- We need to work out if it expired before or after it's time
-					lastSeen = snap.lastSeenTime;
-					expiredSeconds = endTime - lastSeen;
-					if (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
-						-- Whoa! This item was bought out.
-						itemKey = Auctioneer_GetKeyFromSig(iKey);
-						if (not AuctionConfig.success) then AuctionConfig.success = {} end
-						if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
-						if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
-						buyList = newBalancedList(lMaxBuyoutHistorySize);
-						listStr = AuctionConfig.success.buy[auctKey][itemKey];
-						if (listStr) then
-							listSplit = Enchantrix_Split(listStr, ":");
-							buyList.setList(listSplit);
-						end
-						x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey); 
-						buyList.insert(buyout);
-
-						hist = "";
-						for pos, item in pairs(buyList.list) do
-							if (hist == "") then hist = hist..item
-							else hist = hist..":"..item;
+		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
+			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
+				for iKey, iData in pairs(cData) do
+					snap = Auctioneer_GetSnapshotInfoFromData(iData);
+					if (snap.dirty == 1) then
+						-- This item should have been seen, but wasn't.
+						-- We need to work out if it expired before or after it's time
+						lastSeen = snap.lastSeenTime;
+						expiredSeconds = endTime - lastSeen;
+						if (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
+							-- Whoa! This item was bought out.
+							itemKey = Auctioneer_GetKeyFromSig(iKey);
+							if (not AuctionConfig.success) then AuctionConfig.success = {} end
+							if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
+							if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
+							buyList = newBalancedList(lMaxBuyoutHistorySize);
+							listStr = AuctionConfig.success.buy[auctKey][itemKey];
+							if (listStr) then
+								listSplit = Enchantrix_Split(listStr, ":");
+								buyList.setList(listSplit);
 							end
-						end
-						AuctionConfig.success.buy[auctKey][itemKey] = hist;
-					end
-					if (snap.timeLeft == 1) and (snap.bidamount > 0) then
-						-- This one expired at the final time interval, so it's likely
-						-- that this is the best bid value we'll get for it.
-						itemKey = Auctioneer_GetKeyFromSig(iKey);
-						if (not AuctionConfig.success) then AuctionConfig.success = {} end
-						if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
-						if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
-						bidList = newBalancedList(lMaxBuyoutHistorySize);
-						listStr = AuctionConfig.success.bid[auctKey][itemKey];
-						if (listStr) then
-							listSplit = Enchantrix_Split(listStr, ":");
-							bidList.setList(listSplit);
-						end
-						bidList.insert(snap.bidamount);
+							x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey); 
+							buyList.insert(buyout);
 
-						hist = "";
-						for pos, item in pairs(bidList.list) do
-							if (hist == "") then hist = hist..item
-							else hist = hist..":"..item;
+							hist = "";
+							if (buyList and buyList.list) then
+								for pos, item in pairs(buyList.list) do
+									if (hist == "") then hist = hist..item
+									else hist = hist..":"..item;
+									end
+								end
 							end
+							AuctionConfig.success.buy[auctKey][itemKey] = hist;
 						end
-						AuctionConfig.success.bid[auctKey][itemKey] = hist;
+						if (snap.timeLeft == 1) and (snap.bidamount > 0) then
+							-- This one expired at the final time interval, so it's likely
+							-- that this is the best bid value we'll get for it.
+							itemKey = Auctioneer_GetKeyFromSig(iKey);
+							if (not AuctionConfig.success) then AuctionConfig.success = {} end
+							if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
+							if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
+							bidList = newBalancedList(lMaxBuyoutHistorySize);
+							listStr = AuctionConfig.success.bid[auctKey][itemKey];
+							if (listStr) then
+								listSplit = Enchantrix_Split(listStr, ":");
+								bidList.setList(listSplit);
+							end
+							bidList.insert(snap.bidamount);
+
+							hist = "";
+							if (bidList and bidList.list) then
+								for pos, item in pairs(bidList.list) do
+									if (hist == "") then hist = hist..item
+									else hist = hist..":"..item;
+									end
+								end
+							end
+							AuctionConfig.success.bid[auctKey][itemKey] = hist;
+						end
 					end
-				end
-					
-				if (string.sub(iData, 1,1) == "1") then
-					
-					AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
-					lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+						
+					if (string.sub(iData, 1,1) == "1") then
+						
+						AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
+						lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+					end
 				end
 			end
 		end
@@ -353,14 +359,18 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	-- Copy the item prices into the Saved item prices table
 	local hist = "";
-	for sig, iData in pairs(lSnapshotItemPrices) do
-		hist = "";
-		for pos, hPrice in pairs(iData.buyoutPrices) do
-			if (hist == "") then hist = string.format("%d", hPrice);
-			else hist = string.format("%s:%d", hist, hPrice); end
+	if (lSnapshotItemPrices) then
+		for sig, iData in pairs(lSnapshotItemPrices) do
+			hist = "";
+			if (iData.buyoutPrices) then
+				for pos, hPrice in pairs(iData.buyoutPrices) do
+					if (hist == "") then hist = string.format("%d", hPrice);
+					else hist = string.format("%s:%d", hist, hPrice); end
+				end
+			end
+			AuctionConfig.sbuy[auctKey][sig] = hist;
+			lSnapshotItemPrices[sig] = nil;
 		end
-		AuctionConfig.sbuy[auctKey][sig] = hist;
-		lSnapshotItemPrices[sig] = nil;
 	end
 
 	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
@@ -400,6 +410,11 @@ end
 
 function Auctioneer_Split(str, at)
 	local splut = {};
+
+	if (type(str) ~= "string") then return nil end
+	if (not str) then str = "" end
+	if (not at) then table.insert(splut, str) end
+
 	for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
 		table.insert(splut, n);
 		if (c == '') then break end
@@ -474,17 +489,19 @@ function Auctioneer_GetItemDataByID(itemID)
 		local usedList = Auctioneer_Split(usedby, ",");
 		local usage = "";
 		local skillName, localized,localeString;
-		for pos, userSkill in pairs(usedList) do
-			skillName = Auctioneer_Skills[tonumber(userSkill)];
-			localized = "Unknown";
-			if (skillName) then
-				localeString = "AUCT_SKILL_"..string.upper(skillName);
-				localized = getglobal(localeString);
-			end
-			if (usage == "") then
-				usage = localized;
-			else
-				usage = usage .. ", " .. localized;
+		if (usedList) then
+			for pos, userSkill in pairs(usedList) do
+				skillName = Auctioneer_Skills[tonumber(userSkill)];
+				localized = "Unknown";
+				if (skillName) then
+					localeString = "AUCT_SKILL_"..string.upper(skillName);
+					localized = getglobal(localeString);
+				end
+				if (usage == "") then
+					usage = localized;
+				else
+					usage = usage .. ", " .. localized;
+				end
 			end
 		end
 		dataItem.usageText = usage;
@@ -555,9 +572,11 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (not AuctionConfig.data[auctKey]) then AuctionConfig.data[auctKey] = {}; end
 
 	local hist = "";
-	for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
-		if (hist == "") then hist = string.format("%d", hPrice);
-		else hist = string.format("%s:%d", hist, hPrice); end
+	if (iData and iData.buyoutPricesHistoryList) then
+		for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
+			if (hist == "") then hist = string.format("%d", hPrice);
+			else hist = string.format("%s:%d", hist, hPrice); end
+		end
 	end
 
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
@@ -594,6 +613,7 @@ end
 
 -- Parse the data from the auction signature
 function Auctioneer_GetItemSignature(sigData)
+	if (not sigData) then return nil end
 	for id,rprop,enchant,name,count,min,buyout,uniq in string.gfind(sigData, "(%d+):(%d+):(%d+):(.-):(%d+):(.-):(%d+):(.+)") do
 		if (name == nil) then name = ""; end
 		return tonumber(id),tonumber(rprop),tonumber(enchant),name,tonumber(count),tonumber(min),tonumber(buyout),tonumber(uniq);
@@ -919,12 +939,14 @@ function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
 
 	local a;
 	local auctKey = Auctioneer_GetAuctionKey();
-	for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
-		for auctionSignature, data in pairs(iData) do
-			if(not filter(param, auctionSignature, extra1, extra2)) then
-				a = Auctioneer_GetSnapshotFromData(data);
-				a.signature = auctionSignature;
-				table.insert(queryResults, a);
+	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
+		for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
+			for auctionSignature, data in pairs(iData) do
+				if(not filter(param, auctionSignature, extra1, extra2)) then
+					a = Auctioneer_GetSnapshotFromData(data);
+					a.signature = auctionSignature;
+					table.insert(queryResults, a);
+				end
 			end
 		end
 	end
@@ -987,13 +1009,15 @@ function Auctioneer_DoBroker(minProfit)
 
 	-- output the list of auctions
 	local id,rprop,enchant,name,count,min,buyout,uniq,itemKey,hsp,seenCount,profit,output;
-	for pos,a in pairs(resellableAuctions) do
-		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature); 
-		itemKey = id .. ":" .. rprop..":"..enchant;
-		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		profit = (hsp * count) - buyout;
-		output = string.format(AUCT_FRMT_BROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
-		Auctioneer_ChatPrint(output);
+	if (resellableAuctions) then
+		for pos,a in pairs(resellableAuctions) do
+			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature); 
+			itemKey = id .. ":" .. rprop..":"..enchant;
+			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+			profit = (hsp * count) - buyout;
+			output = string.format(AUCT_FRMT_BROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
+			Auctioneer_ChatPrint(output);
+		end
 	end
 
 	Auctioneer_ChatPrint(AUCT_FRMT_BROKER_DONE);
@@ -1011,19 +1035,21 @@ function Auctioneer_DoBidBroker(minProfit)
 
 	-- output the list of auctions
 	local id,rprop,enchant, name, count,min,buyout,uniq,itemKey,hsp,seenCount,currentBid,profit,bidText,output;
-	for pos,a in pairs(bidWorthyAuctions) do
-		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
-		itemKey = id .. ":" .. rprop..":"..enchant;
-		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		currentBid = Auctioneer_GetCurrentBid(a.signature);
-		profit = (hsp * count) - currentBid;
+	if (bidWorthyAuctions) then
+		for pos,a in pairs(bidWorthyAuctions) do
+			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+			itemKey = id .. ":" .. rprop..":"..enchant;
+			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+			currentBid = Auctioneer_GetCurrentBid(a.signature);
+			profit = (hsp * count) - currentBid;
 
-		bidText = AUCT_FRMT_BIDBROKER_CURBID;
-		if (currentBid == min) then
-			bidText = AUCT_FRMT_BIDBROKER_MINBID;
+			bidText = AUCT_FRMT_BIDBROKER_CURBID;
+			if (currentBid == min) then
+				bidText = AUCT_FRMT_BIDBROKER_MINBID;
+			end
+			output = string.format(AUCT_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+			Auctioneer_ChatPrint(output);
 		end
-		output = string.format(AUCT_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
-		Auctioneer_ChatPrint(output);
 	end
 
 	Auctioneer_ChatPrint(AUCT_FRMT_BIDBROKER_DONE);
@@ -1037,12 +1063,14 @@ function Auctioneer_DoCompeting(minLess)
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
 	local myHighestPrices = {}
 	local id,rprop,enchant,name,count,min,buyout,uniq,itemKey,competingAuctions,currentBid,buyoutForOne,bidForOne,bidPrice,myBuyout,buyPrice,myPrice,priceLess,lessPrice,output;
-	for pos,a in pairs(myAuctions) do
-		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
-		if (count > 1) then buyout = buyout/count; end
-		itemKey = id .. ":" .. rprop..":"..enchant;
-		if (not myHighestPrices[itemKey]) or (myHighestPrices[itemKey] < buyout) then
-			myHighestPrices[itemKey] = buyout;
+	if (myAuctions) then
+		for pos,a in pairs(myAuctions) do
+			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+			if (count > 1) then buyout = buyout/count; end
+			itemKey = id .. ":" .. rprop..":"..enchant;
+			if (not myHighestPrices[itemKey]) or (myHighestPrices[itemKey] < buyout) then
+				myHighestPrices[itemKey] = buyout;
+			end
 		end
 	end
 	competingAuctions = Auctioneer_QuerySnapshot(Auctioneer_CompetingFilter, minLess, myHighestPrices);
@@ -1050,31 +1078,33 @@ function Auctioneer_DoCompeting(minLess)
 	table.sort(competingAuctions, Auctioneer_ProfitComparisonSort);
 
 	-- output the list of auctions
-	for pos,a in pairs(competingAuctions) do
-		id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
-		itemKey = id .. ":" .. rprop..":"..enchant;
-		currentBid = Auctioneer_GetCurrentBid(a.signature);
+	if (competingAuctions) then
+		for pos,a in pairs(competingAuctions) do
+			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+			itemKey = id .. ":" .. rprop..":"..enchant;
+			currentBid = Auctioneer_GetCurrentBid(a.signature);
 
-		buyoutForOne = buyout;
-		bidForOne = currentBid;
-		if (count > 1) then
-			buyoutForOne = buyout/count;
-			bidForOne = currentBid/count;
+			buyoutForOne = buyout;
+			bidForOne = currentBid;
+			if (count > 1) then
+				buyoutForOne = buyout/count;
+				bidForOne = currentBid/count;
+			end
+
+			bidPrice = TT_GetTextGSC(bidForOne).."ea";
+			if (currentBid == min) then
+				bidPrice = "No bids ("..bidPrice..")";
+			end
+
+			myBuyout = myHighestPrices[itemKey];
+			buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
+			myPrice = TT_GetTextGSC(myBuyout).."ea";
+			priceLess = myBuyout - buyoutForOne;
+			lessPrice = TT_GetTextGSC(priceLess);
+
+			output = string.format(AUCT_FRMT_COMPETE_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
+			Auctioneer_ChatPrint(output);
 		end
-
-		bidPrice = TT_GetTextGSC(bidForOne).."ea";
-		if (currentBid == min) then
-			bidPrice = "No bids ("..bidPrice..")";
-		end
-
-		myBuyout = myHighestPrices[itemKey];
-		buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
-		myPrice = TT_GetTextGSC(myBuyout).."ea";
-		priceLess = myBuyout - buyoutForOne;
-		lessPrice = TT_GetTextGSC(priceLess);
-
-		output = string.format(AUCT_FRMT_COMPETE_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
-		Auctioneer_ChatPrint(output);
 	end
 
 	Auctioneer_ChatPrint(AUCT_FRMT_COMPETE_DONE);
@@ -1093,13 +1123,15 @@ function Auctioneer_DoPercentLess(percentLess)
 
 	-- output the list of auctions
 	local id,rprop,enchant,name,count,buyout,itemKey,hsp,seenCount,profit,output,x;
-	for pos,a in pairs(auctionsBelowHSP) do
-		id,rprop,enchant, name, count,x,buyout,x = Auctioneer_GetItemSignature(a.signature);
-		itemKey = id ..":"..rprop..":"..enchant;
-		hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		profit = (hsp * count) - buyout;
-		output = string.format(AUCT_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
-		Auctioneer_ChatPrint(output);
+	if (auctionsBelowHSP) then
+		for pos,a in pairs(auctionsBelowHSP) do
+			id,rprop,enchant, name, count,x,buyout,x = Auctioneer_GetItemSignature(a.signature);
+			itemKey = id ..":"..rprop..":"..enchant;
+			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+			profit = (hsp * count) - buyout;
+			output = string.format(AUCT_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
+			Auctioneer_ChatPrint(output);
+		end
 	end
 
 	Auctioneer_ChatPrint(AUCT_FRMT_PCTLESS_DONE);
@@ -1139,21 +1171,23 @@ end
 function Auctioneer_BuildLowestCache(auctKey)
 	Auctioneer_Lowests = {};
 	local id, rprop, enchant, name, count, min, buyout, uniq, lowKey, priceForOne, curSig, curLowest;
-	for itemCat, cData in pairs(AuctionConfig.snap[auctKey]) do
-		for sig, sData in pairs(cData) do
-			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
-			lowKey = id..":"..rprop;
-			if (not Auctioneer_Lowests[lowKey]) then Auctioneer_Lowests[lowKey] = {} end
-			
-			priceForOne = buyout;
-			if (count and count > 0) then priceForOne = (buyout / count); end
+	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
+		for itemCat, cData in pairs(AuctionConfig.snap[auctKey]) do
+			for sig, sData in pairs(cData) do
+				id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
+				lowKey = id..":"..rprop;
+				if (not Auctioneer_Lowests[lowKey]) then Auctioneer_Lowests[lowKey] = {} end
 				
-			curSig = Auctioneer_Lowests[lowKey].lowSig;
-			curLowest = Auctioneer_Lowests[lowKey].lowestPrice or 0;
-			if (buyout > 0 and (curLowest == 0 or priceForOne < curLowest)) then 
-				Auctioneer_Lowests[lowKey] = {
-					nextSig = curSig, nextLowest = curLowest, lowSig = sig, lowestPrice = priceForOne, cat = itemCat
-				};
+				priceForOne = buyout;
+				if (count and count > 0) then priceForOne = (buyout / count); end
+					
+				curSig = Auctioneer_Lowests[lowKey].lowSig;
+				curLowest = Auctioneer_Lowests[lowKey].lowestPrice or 0;
+				if (buyout > 0 and (curLowest == 0 or priceForOne < curLowest)) then 
+					Auctioneer_Lowests[lowKey] = {
+						nextSig = curSig, nextLowest = curLowest, lowSig = sig, lowestPrice = priceForOne, cat = itemCat
+					};
+				end
 			end
 		end
 	end
@@ -1976,15 +2010,17 @@ function Auctioneer_LoadCategorySubClasses(c, ...)
 end
 
 function Auctioneer_FindClass(cName, sName)
-	for class, cData in pairs(AuctionConfig.classes) do
-		if (cData.name == cName) then
-			if (sName == nil) then return class, 0; end
-			for sClass, sData in pairs(cData) do
-				if (sClass ~= "name") and (sData == sName) then
-					return class, sClass;
+	if (AuctionConfig and AuctionConfig.classes) then 
+		for class, cData in pairs(AuctionConfig.classes) do
+			if (cData.name == cName) then
+				if (sName == nil) then return class, 0; end
+				for sClass, sData in pairs(cData) do
+					if (sClass ~= "name") and (sData == sName) then
+						return class, sClass;
+					end
 				end
+				return class, 0;
 			end
-			return class, 0;
 		end
 	end
 	return 0,0;
@@ -2015,9 +2051,11 @@ end
 
 function Auctioneer_GetCatNumberByName(name)
 	if (not name) then return 0 end
-	for cat, class in pairs(AuctionConfig.classes) do
-		if (name == class.name) then
-			return cat;
+	if (AuctionConfig and AuctionConfig.classes) then 
+		for cat, class in pairs(AuctionConfig.classes) do
+			if (name == class.name) then
+				return cat;
+			end
 		end
 	end
 	return 0;
@@ -2068,6 +2106,8 @@ function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
 end
 
 function Auctioneer_GetSnapshotFromData(snap)
+	if (not snap) then return nil end
+
 	for dirty,bid,level,quality,left,fseen,last,link,owner in string.gfind(snap, "(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);([^;]+);(.+)") do
 		return {
 			bidamount = bid,
@@ -2137,7 +2177,7 @@ end
 
 function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 	local hist = "";
-	if (iData.buyoutPrices) then
+	if (iData and iData.buyoutPrices) then
 		for pos, hPrice in pairs(iData.buyoutPrices) do
 			if (hist == "") then hist = string.format("%d", hPrice);
 			else hist = string.format("%s:%d", hist, hPrice); end
@@ -2168,73 +2208,83 @@ function Auctioneer_Convert()
 		AuctionConfig.info = {};
 		AuctionConfig.snap = {};
 		AuctionConfig.sbuy = {};
-		for server, sData in pairs(AHSnapshot) do
-			local colon = string.find(server, ":");
-			local hyphen = string.find(server, "-");
-			if (hyphen and not colon) then
-				if (not AuctionConfig.snap[server]) then
-					AuctionConfig.snap[server] = {};
-				end
-				for sig, iData in pairs(sData) do
-					local catName = Auctioneer_GetCatName(tonumber(iData.category));
-					if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
-					local cat = iData.category;
-					Auctioneer_SaveSnapshot(server, cat, sig, iData);
+		if (AHSnapshot) then
+			for server, sData in pairs(AHSnapshot) do
+				local colon = string.find(server, ":");
+				local hyphen = string.find(server, "-");
+				if (hyphen and not colon) then
+					if (not AuctionConfig.snap[server]) then
+						AuctionConfig.snap[server] = {};
+					end
+					for sig, iData in pairs(sData) do
+						local catName = Auctioneer_GetCatName(tonumber(iData.category));
+						if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
+						local cat = iData.category;
+						Auctioneer_SaveSnapshot(server, cat, sig, iData);
+					end
 				end
 			end
 		end
 		
-		for server, sData in pairs(AHSnapshotItemPrices) do
-			local colon = string.find(server, ":");
-			local hyphen = string.find(server, "-");
-			if (hyphen and not colon) then
-				if (not AuctionConfig.sbuy[server]) then
-					AuctionConfig.sbuy[server] = {};
-				end
-				for itemKey, iData in pairs(sData) do
-					Auctioneer_SaveSnapshotInfo(server, itemKey, iData);
+		if (AHSnapshotItemPrices) then
+			for server, sData in pairs(AHSnapshotItemPrices) do
+				local colon = string.find(server, ":");
+				local hyphen = string.find(server, "-");
+				if (hyphen and not colon) then
+					if (not AuctionConfig.sbuy[server]) then
+						AuctionConfig.sbuy[server] = {};
+					end
+					for itemKey, iData in pairs(sData) do
+						Auctioneer_SaveSnapshotInfo(server, itemKey, iData);
+					end
 				end
 			end
 		end
 
-		for server, sData in pairs(AuctionPrices) do
-			local colon = string.find(server, ":");
-			local hyphen = string.find(server, "-");
-			if (hyphen and not colon) then
-				AuctionConfig.data[server] = {};
-				for sig, iData in pairs(sData) do
-					local catName = Auctioneer_GetCatName(tonumber(iData.category));
-					if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
-					local cat = iData.category;
-					local data = iData.data;
-					local hist = "";
-					local name = iData.name;
-					for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
-						if (hist == "") then hist = string.format("%d", hPrice);
-						else hist = string.format("%s:%d", hist, hPrice); end
-					end
-					if (name) then
-						local newData = string.format("%s|%s", data, hist);
-						local newInfo = string.format("%s|%s", cat, iData.name);
-						AuctionConfig.data[server][sig] = newData;
-						AuctionConfig.info[sig] = newInfo;
+		if (AuctionPrices) then
+			for server, sData in pairs(AuctionPrices) do
+				local colon = string.find(server, ":");
+				local hyphen = string.find(server, "-");
+				if (hyphen and not colon) then
+					AuctionConfig.data[server] = {};
+					for sig, iData in pairs(sData) do
+						local catName = Auctioneer_GetCatName(tonumber(iData.category));
+						if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
+						local cat = iData.category;
+						local data = iData.data;
+						local hist = "";
+						local name = iData.name;
+						if (iData.buyoutPricesHistoryList) then
+							for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
+								if (hist == "") then hist = string.format("%d", hPrice);
+								else hist = string.format("%s:%d", hist, hPrice); end
+							end
+						end
+						if (name) then
+							local newData = string.format("%s|%s", data, hist);
+							local newInfo = string.format("%s|%s", cat, iData.name);
+							AuctionConfig.data[server][sig] = newData;
+							AuctionConfig.info[sig] = newInfo;
+						end
 					end
 				end
 			end
 		end
 		
 		AuctionConfig.bids = {};
-		for player, pData in pairs(AuctionBids) do
-			AuctionConfig.bids[player] = {};
-			for time, bData in pairs(pData) do
-				local amount = bData.bidAmount;
-				local sig = bData.signature;
-				local owner = bData.itemOwner;
-				local won = bData.itemWon;
-				if (won) then won = "1"; else won = "0"; end
+		if (AuctionBids) then
+			for player, pData in pairs(AuctionBids) do
+				AuctionConfig.bids[player] = {};
+				for time, bData in pairs(pData) do
+					local amount = bData.bidAmount;
+					local sig = bData.signature;
+					local owner = bData.itemOwner;
+					local won = bData.itemWon;
+					if (won) then won = "1"; else won = "0"; end
 
-				local newBid = string.format("%s|%s|%s|%s", sig, amount, won, owner);
-				AuctionConfig.bids[player][time] = newBid;
+					local newBid = string.format("%s|%s|%s|%s", sig, amount, won, owner);
+					AuctionConfig.bids[player][time] = newBid;
+				end
 			end
 		end
 	end
@@ -3036,12 +3086,14 @@ function Auctioneer_Clear(param, chatprint)
 	else
 
 		local items = Auctioneer_GetItems(param);
-		for pos,itemKey in pairs(items) do
-			if (AuctionConfig.data[aKey][itemKey] ~= nil) then
-				AuctionConfig.data[aKey][itemKey] = nil;
-				clearok = true;
-			else
-				clearok = false;
+		if (items) then
+			for pos,itemKey in pairs(items) do
+				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
+					AuctionConfig.data[aKey][itemKey] = nil;
+					clearok = true;
+				else
+					clearok = false;
+				end
 			end
 		end
 	end
@@ -3130,8 +3182,10 @@ local validLocale=nil;
 		elseif (validLocale == nil) then
 			Auctioneer_ChatPrint(string.format(AUCT_FRMT_UNKNOWN_LOCALE, param));
 
-			for locale, x in pairs(AUCT_VALID_LOCALES) do
-				Auctioneer_ChatPrint("  "..locale);
+			if (AUCT_VALID_LOCALES) then
+				for locale, x in pairs(AUCT_VALID_LOCALES) do
+					Auctioneer_ChatPrint("  "..locale);
+				end
 			end
 
 		else
@@ -3311,6 +3365,7 @@ function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
 end
 
 function Auctioneer_GetItemLinks(str)
+	if (not str) then return nil end
 	local itemList = {};
 	local listSize = 0;
 	for link, item in string.gfind(str, "|Hitem:([^|]+)|h[[]([^]]+)[]]|h") do
@@ -3322,6 +3377,7 @@ end
 
 
 function Auctioneer_GetItems(str)
+	if (not str) then return nil end
 	local itemList = {};
 	local listSize = 0;
 	local itemKey;
@@ -3486,12 +3542,14 @@ function dump(...)
 		if (t == "table") then
 			out = out .. "{";
 			local first = true;
-			for k, v in pairs(d) do
-				if (not first) then out = out .. ", "; end
-				first = false;
-				out = out .. dump(k);
-				out = out .. " = ";
-				out = out .. dump(v);
+			if (d) then
+				for k, v in pairs(d) do
+					if (not first) then out = out .. ", "; end
+					first = false;
+					out = out .. dump(k);
+					out = out .. " = ";
+					out = out .. dump(v);
+				end
 			end
 			out = out .. "}";
 		elseif (t == "nil") then
