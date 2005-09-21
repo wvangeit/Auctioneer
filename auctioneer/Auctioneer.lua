@@ -1501,9 +1501,6 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 
 		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(aiKey, auctKey);
 		if (not auctionPriceItem) then auctionPriceItem = {}
-		p("Unexpected error - marked: Auctioneer_AuctionEntry_Hook --- aiKey:"..nilSafeString(aiKey))
-		-- TODO: Norganna? :)
-		end
 		
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
