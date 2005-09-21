@@ -12,6 +12,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AucCommand.lua"/>
 	<Script file="AucConvert.lua"/>
 	<Script file="AucCore.lua"/>
+	<Script file="AucData.lua"/>
 	<Script file="AucFilter.lua"/>
 	<Script file="AucScanner.lua"/>
 	<Script file="AucStatistic.lua"/>
