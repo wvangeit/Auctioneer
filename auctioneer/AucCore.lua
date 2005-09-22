@@ -7,8 +7,9 @@
 	Functions central to the major operation of Auctioneer. 
 ]]
 
+AUCTIONEER_VERSION = "<%version%>";
 if (AUCTIONEER_VERSION == "<".."%version%>") then
-	AUCTIONEER_VERSION = "3.DEV";
+	AUCTIONEER_VERSION = "3.1.DEV";
 end
 
 MAX_ALLOWED_FORMAT_INT = 2000000000; -- numbers much greater than this overflow when using format("%d")
@@ -126,7 +127,7 @@ function Auctioneer_GetItemDataByID(itemID)
 	local addition = "";
 	if (additional ~= "") then
 --		p("Get localization for", additional);
-		addition = " - "..getglobal("AUCT_ADDIT_"..string.upper(additional));
+		addition = " - ".._AUCT["Addit"..additional];
 	end
 	local catName = Auctioneer_GetCatName(cat);
 	if (not catName) then
@@ -139,14 +140,13 @@ function Auctioneer_GetItemDataByID(itemID)
 	if (usedby ~= '') then
 		local usedList = Auctioneer_Split(usedby, ",");
 		local usage = "";
-		local skillName, localized,localeString;
+		local skillName, localized, localeString;
 		if (usedList) then
 			for pos, userSkill in pairs(usedList) do
 				skillName = Auctioneer_Skills[tonumber(userSkill)];
 				localized = "Unknown";
 				if (skillName) then
-					localeString = "AUCT_SKILL_"..string.upper(skillName);
-					localized = getglobal(localeString);
+					localized = _AUCT["Skill"..skillName];
 				end
 				if (usage == "") then
 					usage = localized;
@@ -247,9 +247,8 @@ end
 -- Returns the auction buyout history for this item
 function Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey)
 	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
-	if (auctionItem == nil) then 
-		buyoutHistory = {};
-	else
+	local buyoutHistory = {};
+	if (auctionItem) then 
 		buyoutHistory = auctionItem.buyoutPricesHistoryList;
 	end
 	return buyoutHistory;
@@ -431,15 +430,15 @@ function Auctioneer_AddonLoaded()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
 		StaticPopupDialogs["CONVERT_AUCTIONEER"] = {
-			text = AUCT_MESG_CONVERT,
-			button1 = AUCT_MESG_CONVERT_YES,
-			button2 = AUCT_MESG_CONVERT_NO,
+			text = _AUCT['MesgConvert'],
+			button1 = _AUCT['MesgConvertYes'],
+			button2 = _AUCT['MesgConvertNo'],
 			OnAccept = function()
 				Auctioneer_Convert();
 				Auctioneer_LockAndLoad();
 			end,
 			OnCancel = function()
-				Auctioneer_ChatPrint(AUCT_MESG_NOTCONVERTING);
+				Auctioneer_ChatPrint(_AUCT['MesgNotconverting']);
 			end,
 			timeout = 0,
 			whileDead = 1,
@@ -478,7 +477,7 @@ function Auctioneer_LockAndLoad()
 	end
 
 	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage(string.format(AUCT_FRMT_WELCOME, AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
+		DEFAULT_CHAT_FRAME:AddMessage(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 	end
 
 	-- Rearranges elements in the AH window.

@@ -56,9 +56,11 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 			local auctKey = Auctioneer_GetAuctionKey();
 			local itemCat = Auctioneer_GetCatForKey(itemKey);
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
-			local timeLeft = tonumber(snap.timeLeft);
-			if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
-				filterAuction = false;
+			if (snap) then
+				local timeLeft = tonumber(snap.timeLeft);
+				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+					filterAuction = false;
+				end
 			end
 		end
 	end
@@ -70,7 +72,7 @@ function Auctioneer_AuctionOwnerFilter(owner, signature)
 	local auctKey = Auctioneer_GetAuctionKey();
 	local itemCat = Auctioneer_GetCatForSig(signature);
 	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
-	if (snap.owner == owner) then
+	if (snap and snap.owner == owner) then
 		return false;
 	end
 	return true;
@@ -84,7 +86,7 @@ function Auctioneer_CompetingFilter(minLess, signature, myAuctions)
 	local auctKey = Auctioneer_GetAuctionKey();
 	local itemCat = Auctioneer_GetCatForSig(signature);
 	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
-	if (snap.owner ~= UnitName("player")) and
+	if (snap and snap.owner ~= UnitName("player")) and
 		(myAuctions[itemKey]) and
 		(buyout > 0) and
 		(buyout+minLess < myAuctions[itemKey]) then
@@ -139,7 +141,7 @@ Auctioneer_QuerySnapshot = Auctioneer_QuerySnapshot;
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBroker(minProfit)
 	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(AUCT_FRMT_BROKER_HEADER, TT_GetTextGSC(minProfit));
+	local output = string.format(_AUCT['FrmtBrokerHeader'], TT_GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local resellableAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit);
@@ -155,18 +157,18 @@ function Auctioneer_DoBroker(minProfit)
 			itemKey = id .. ":" .. rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(AUCT_FRMT_BROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
+			output = string.format(_AUCT['FrmtBrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(AUCT_FRMT_BROKER_DONE);
+	Auctioneer_ChatPrint(_AUCT['FrmtBrokerDone']);
 end
 
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBidBroker(minProfit)
 	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(AUCT_FRMT_BIDBROKER_HEADER, TT_GetTextGSC(minProfit));
+	local output = string.format(_AUCT['FrmtBidbrokerHeader'], TT_GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit);
@@ -183,21 +185,21 @@ function Auctioneer_DoBidBroker(minProfit)
 			currentBid = Auctioneer_GetCurrentBid(a.signature);
 			profit = (hsp * count) - currentBid;
 
-			bidText = AUCT_FRMT_BIDBROKER_CURBID;
+			bidText = _AUCT['FrmtBidbrokerCurbid'];
 			if (currentBid == min) then
-				bidText = AUCT_FRMT_BIDBROKER_MINBID;
+				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
-			output = string.format(AUCT_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(AUCT_FRMT_BIDBROKER_DONE);
+	Auctioneer_ChatPrint(_AUCT['FrmtBidbrokerDone']);
 end
 
 function Auctioneer_DoCompeting(minLess)
 	if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS * 100 else minLess = tonumber(minLess) * 100  end
-	local output = string.format(AUCT_FRMT_COMPETE_HEADER, TT_GetTextGSC(minLess));
+	local output = string.format(_AUCT['FrmtCompeteHeader'], TT_GetTextGSC(minLess));
 	Auctioneer_ChatPrint(output);
 
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
@@ -242,18 +244,18 @@ function Auctioneer_DoCompeting(minLess)
 			priceLess = myBuyout - buyoutForOne;
 			lessPrice = TT_GetTextGSC(priceLess);
 
-			output = string.format(AUCT_FRMT_COMPETE_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
+			output = string.format(_AUCT['FrmtCompeteLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(AUCT_FRMT_COMPETE_DONE);
+	Auctioneer_ChatPrint(_AUCT['FrmtCompeteDone']);
 end
 
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoPercentLess(percentLess)    
 	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
-	local output = string.format(AUCT_FRMT_PCTLESS_HEADER, percentLess);
+	local output = string.format(_AUCT['FrmtPctlessHeader'], percentLess);
 	Auctioneer_ChatPrint(output);
 
 	local auctionsBelowHSP = Auctioneer_QuerySnapshot(Auctioneer_PercentLessFilter, percentLess);
@@ -269,12 +271,12 @@ function Auctioneer_DoPercentLess(percentLess)
 			itemKey = id ..":"..rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(AUCT_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
+			output = string.format(_AUCT['FrmtPctlessLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(AUCT_FRMT_PCTLESS_DONE);
+	Auctioneer_ChatPrint(_AUCT['FrmtPctlessDone']);
 end
 
 

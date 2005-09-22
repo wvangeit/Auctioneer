@@ -57,6 +57,7 @@ function Auctioneer_Convert()
 						local catName
 						local cat
 						local data
+						local name
 						local sname
 						local hist = ""
 						-- addded by Luke1410 to convert old 2.x data to the new 3.2 format

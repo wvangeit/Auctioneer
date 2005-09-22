@@ -35,1297 +35,1018 @@
 
 
 
+_AUCT = {};
+
 AUCT_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
 
 function Auctioneer_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
-
-
-AUCT_ADDIT_ALCOHOL="Alcohol";
-AUCT_ADDIT_BUFF="Buff";
-AUCT_ADDIT_DRINK="Drink";
-AUCT_ADDIT_FIREWORK="Firework";
-AUCT_ADDIT_FOOD="Food";
-AUCT_ADDIT_GIFTWRAP="Giftwrap";
-AUCT_ADDIT_LURE="Lure";
-AUCT_ADDIT_POISON="Poison";
-AUCT_ADDIT_POTION="Potion";
-AUCT_ADDIT_RESTORATIVE="Restorative";
-AUCT_ADDIT_SCROLL="Scroll";
-
-AUCT_SKILL_ALCHEMY="Alchemy";
-AUCT_SKILL_BLACKSMITHING="Smithing";
-AUCT_SKILL_COOKING="Cooking";
-AUCT_SKILL_ENCHANTING="Enchanting";
-AUCT_SKILL_ENGINEERING="Engineering";
-AUCT_SKILL_FIRSTAID="First Aid";
-AUCT_SKILL_LEATHERWORKING="Leatherworking";
-AUCT_SKILL_MINING="Mining";
-AUCT_SKILL_TAILORING="Tailoring";
-AUCT_SKILL_DRUID="Druid spells";
-AUCT_SKILL_MAGE="Mage spells";
-AUCT_SKILL_PALADIN="Paladin spells";
-AUCT_SKILL_PRIEST="Priest spells";
-AUCT_SKILL_ROGUE="Rogue spells";
-AUCT_SKILL_SHAMAN="Shaman spells";
-AUCT_SKILL_WARLOCK="Warlock spells";
-
-AUCT_TIME_SHORT="Short";
-AUCT_TIME_MED="Medium";
-AUCT_TIME_LONG="Long";
-AUCT_TIME_VLONG="Very Long";
-
-AUCT_FRMT_WELCOME="Auctioneer v%s loaded";
-
-AUCT_FRMT_BROKER_HEADER="Minimum profit: %s, HSP = 'Highest Sellable Price'";
-AUCT_FRMT_BROKER_LINE="%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE="Brokering done";
-AUCT_FRMT_BIDBROKER_HEADER="Minimum profit: %s, HSP = 'Highest Sellable Price'";
-AUCT_FRMT_BIDBROKER_MINBID="minBid"
-AUCT_FRMT_BIDBROKER_CURBID="curBid"
-AUCT_FRMT_BIDBROKER_LINE="%s, Last %s seen, HSP: %s, %s: %s, Prof: %s, Time: %s";
-AUCT_FRMT_BIDBROKER_DONE="Bid brokering done";
-AUCT_FRMT_PCTLESS_HEADER="Percent Less than Highest Sellable Price (HSP): %d%%";
-AUCT_FRMT_PCTLESS_LINE="%s, Last %d seen, HSP: %s, BO: %s, Prof: %s, Less %s";
-AUCT_FRMT_PCTLESS_DONE="Percent less done.";
-AUCT_FRMT_COMPETE_HEADER="Competing auctions at least %s less per item.";
-AUCT_FRMT_COMPETE_LINE="%s, Bid: %s, BO %s vs %s, %s less";
-AUCT_FRMT_COMPETE_DONE="Competing auctions done.";
-AUCT_FRMT_NOAUCT="No auctions found for the item: %s";
-AUCT_FRMT_MEDIAN_LINE="Of last %d seen, median BO for 1 %s is: %s";
-AUCT_FRMT_LOW_LINE="%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
-AUCT_FRMT_HSP_LINE="Highest Sellable Price for one %s is: %s";
-
-AUCT_FRMT_INFO_SEEN="Seen %d times at auction total";
-AUCT_FRMT_INFO_FORONE="For 1: %s min/%s BO (%s bid) [in %d's]";
-AUCT_FRMT_INFO_AVERAGE="%s min/%s BO (%s bid)"
-AUCT_FRMT_INFO_HISTMED="Last %d, median BO (ea)";
-AUCT_FRMT_INFO_SNAPMED="Scanned %d, median BO (ea)";
-AUCT_FRMT_INFO_SGSTSTX="Suggested price for your %d stack: %s min/%s BO";
-AUCT_FRMT_INFO_SGST="Suggested price: %s min/%s BO";
-
-AUCT_FRMT_INFO_BIDRATE="%d%% have bid, %d%% have BO";
-AUCT_FRMT_INFO_NEVER="Never seen at %s";
-AUCT_FRMT_INFO_ALSOSEEN="Seen %d times at %s";
-AUCT_FRMT_INFO_CLASSUSE="Class: %s used for %s";
-AUCT_FRMT_INFO_CLASS="Class: %s";
-AUCT_FRMT_INFO_USE="Used for: %s";
-AUCT_FRMT_INFO_BUY="Buy%s from vendor";
-AUCT_FRMT_INFO_SELL="Sell%s to vendor";
-AUCT_FRMT_INFO_BUYMULT="Buy%s %d (%s each)";
-AUCT_FRMT_INFO_SELLMULT="Sell%s %d (%s each)";
-AUCT_FRMT_INFO_STX="Stacks in lots of %d";
-
-AUCT_FRMT_INFO_HEAD_MULTI="Averages for %d items:";
-AUCT_FRMT_INFO_MIN_MULTI="  Starting bid (%s ea)";
-AUCT_FRMT_INFO_BID_MULTI="  Bidded (%s%s ea)";
-AUCT_FRMT_INFO_BUY_MULTI="  Buyout (%s%s ea)";
-
-AUCT_FRMT_INFO_HEAD_ONE="Averages for this item:";
-AUCT_FRMT_INFO_MIN_ONE="  Starting bid";
-AUCT_FRMT_INFO_BID_ONE="  Bidded%s";
-AUCT_FRMT_INFO_BUY_ONE="  Buyout%s";
-
-AUCT_FRMT_INFO_BUYMEDIAN="  Buyout median";
-
-AUCT_FRMT_INFO_STACKSIZE="  Average stack size: %d items";
-
-AUCT_FRMT_UNKNOWN_LOCALE="The locale you specified ('%s') is unknown. Valid locales are:";
-AUCT_FRMT_UNKNOWN_RF="Invalid parameter ('%s'). The parameter must be formated like: [realm]-[faction]. For example: Al'Akir-Horde";
-AUCT_FRMT_UNKNOWN_ARG="'%s' is no valid argument for '%s'";
-
-AUCT_FRMT_ACT_REMOVE="Removing auction signature %s from current AH snapshot.";
-
-AUCT_FRMT_AUCTINFO_HIST="%d historical";
-AUCT_FRMT_AUCTINFO_SNAP="%d last scan";
-AUCT_FRMT_AUCTINFO_LOW="Snapshot low";
-AUCT_FRMT_AUCTINFO_NOLOW="Item not seen last snapshot";
-AUCT_FRMT_AUCTINFO_ORIG="Original bid";
-AUCT_FRMT_AUCTINFO_SUGBUY="Suggested buyout";
-AUCT_FRMT_AUCTINFO_SUGBID="Suggested bid";
-AUCT_FRMT_AUCTINFO_MKTPRICE="Market price";
-
-AUCT_FRMT_WARN_MARKUP="Marking up vendor by %s%%";
-AUCT_FRMT_WARN_UNDERCUT="Undercutting by %s%%";
-AUCT_FRMT_WARN_NOCOMP="No competition";
-AUCT_FRMT_WARN_ABOVEMKT="Competiton above market";
-AUCT_FRMT_WARN_TOOLOW="Cannot match lowest price";
-AUCT_FRMT_WARN_MYPRICE="Using my current price";
-AUCT_FRMT_WARN_NODATA="No data for HSP";
-
-AUCT_CMD_OFF="off";
-AUCT_CMD_ON="on";
-AUCT_CMD_ALT="alt";
-AUCT_CMD_CTRL="ctrl";
-AUCT_CMD_SHIFT="shift";
-AUCT_CMD_TOGGLE="toggle";
-AUCT_CMD_CLEAR="clear";
-AUCT_CMD_CLEAR_ALL="all";
-AUCT_CMD_CLEAR_SNAPSHOT="snapshot";
-AUCT_CMD_ALSO="also";
-AUCT_CMD_ALSO_OPPOSITE="opposite";
-AUCT_CMD_LOCALE="locale";
-AUCT_CMD_DEFAULT="default";
-
-AUCT_CMD_BROKER="broker";
-AUCT_CMD_BIDBROKER="bidbroker";
-AUCT_CMD_BIDBROKER_SHORT="bb";
-AUCT_CMD_EMBED="embed";
-AUCT_CMD_PERCENTLESS="percentless";
-AUCT_CMD_PERCENTLESS_SHORT="pl";
-AUCT_CMD_COMPETE="compete";
-AUCT_CMD_SCAN="scan";
-AUCT_CMD_AUTOFILL="autofill";
-
-AUCT_CMD_PCT_BIDMARKDOWN="pct-bidmarkdown";
-AUCT_CMD_PCT_MARKUP="pct-markup";
-AUCT_CMD_PCT_MAXLESS="pct-maxless";
-AUCT_CMD_PCT_NOCOMP="pct-nocomp";
-AUCT_CMD_PCT_UNDERLOW="pct-underlow";
-AUCT_CMD_PCT_UNDERMKT="pct-undermkt";
-
-AUCT_OPT_CLEAR="([Item]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
-AUCT_OPT_ALSO="(realm-faction|"..AUCT_CMD_ALSO_OPPOSITE..")"
-AUCT_OPT_LOCALE="<locale>";
-AUCT_OPT_BROKER="<silver_profit>";
-AUCT_OPT_BIDBROKER="<silver_profit>";
-AUCT_OPT_PERCENTLESS="<percent>";
-AUCT_OPT_COMPETE="<silver_less>";
-AUCT_OPT_SCAN="";
-AUCT_OPT_SCALE="<scale_factor>";
-AUCT_OPT_SCALE_DEFAULT=1.0;
-
-AUCT_OPT_PCT_BIDMARKDOWN="<percent>";
-AUCT_OPT_PCT_MARKUP="<percent>";
-AUCT_OPT_PCT_MAXLESS="<percent>";
-AUCT_OPT_PCT_NOCOMP="<percent>";
-AUCT_OPT_PCT_UNDERLOW="<percent>";
-AUCT_OPT_PCT_UNDERMKT="<percent>";
-
-AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT=20;
-AUCT_OPT_PCT_MARKUP_DEFAULT=300;
-AUCT_OPT_PCT_MAXLESS_DEFAULT=30;
-AUCT_OPT_PCT_NOCOMP_DEFAULT=2;
-AUCT_OPT_PCT_UNDERLOW_DEFAULT=5;
-AUCT_OPT_PCT_UNDERMKT_DEFAULT=20;
-
-AUCT_SHOW_VERBOSE="show-verbose";
-AUCT_SHOW_AVERAGE="show-average";
-AUCT_SHOW_LINK="show-link";
-AUCT_SHOW_MEDIAN="show-median";
-AUCT_SHOW_STACK="show-stack";
-AUCT_SHOW_STATS="show-stats";
-AUCT_SHOW_SUGGEST="show-suggest";
-AUCT_SHOW_USAGE="show-usage";
-AUCT_SHOW_VENDOR="show-vendor";
-AUCT_SHOW_VENDOR_BUY="show-vendor-buy";
-AUCT_SHOW_VENDOR_SELL="show-vendor-sell";
-AUCT_SHOW_EMBED_BLANK="show-embed-blankline";
-AUCT_SHOW_REDO="show-warning";
-
-AUCT_HELP_ONOFF="Turns the auction data display on and off";
-AUCT_HELP_VERBOSE="Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
-AUCT_HELP_AVERAGE="Select whether to show item's average auction price";
-AUCT_HELP_LINK="Select whether to show the link id in the tooltip";
-AUCT_HELP_MEDIAN="Select whether to show item's median buyout price";
-AUCT_HELP_SUGGEST="Select whether to show item's suggested auction price";
-AUCT_HELP_STATS="Select whether to show item's bidded/buyout percentages";
-AUCT_HELP_VENDOR="Select whether to show item's vendor pricing";
-AUCT_HELP_VENDOR_SELL="Select whether to show item's vendor sell pricing (req show-vendor=on)";
-AUCT_HELP_VENDOR_BUY="Select whether to show item's vendor buy pricing (req show-vendor=on)";
-AUCT_HELP_USAGE="Select whether to show tradeskill item's usage";
-AUCT_HELP_STACK="Select whether to show the item's stackable size";
-AUCT_HELP_EMBED_BLANK="Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
-AUCT_HELP_CLEAR="Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
-AUCT_HELP_ALSO="Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
-AUCT_HELP_LOCALE="Change the locale that is used to display auctioneer messages";
-AUCT_HELP_BROKER="Show any auctions from the most recent scan that may be bid on and then resold for profit";
-AUCT_HELP_BIDBROKER="Show short or medium term auctions from the recent scan that may be bid on for profit";
-AUCT_HELP_EMBED="Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
-AUCT_HELP_PERCENTLESS="Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
-AUCT_HELP_COMPETE="Show any recently scanned auctions whose buyout is less than one of your items";
-AUCT_HELP_SCAN="Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
-AUCT_HELP_AUTOFILL="Set whether to autofill prices when dropping new auction items into the auction house window";
-AUCT_HELP_PCT_BIDMARKDOWN="Set the percentage that Auctioneer will mark down bids from the buyout price";
-AUCT_HELP_PCT_MARKUP="The percentage that vendor prices will be marked up when no other values are available";
-AUCT_HELP_PCT_MAXLESS="Set the maximum percentage that auctioneer will undercut market value before it gives up";
-AUCT_HELP_PCT_NOCOMP="The percentage that Auctioneer will undercut market value when there is no competition";
-AUCT_HELP_PCT_UNDERLOW="Set the percentage that Auctioneer will undercut the lowest auction price";
-AUCT_HELP_PCT_UNDERMKT="Percentage to cut market value by when unable to beat competition (due to maxless)";
-AUCT_HELP_REDO="Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
-
-AUCT_STAT_ON="Displaying configured auction data";
-AUCT_STAT_OFF="Not displaying any auction data";
-
-AUCT_FRMT_ACT_CLEARALL="Clearing all auction data for %s";
-AUCT_FRMT_ACT_CLEARSNAP="Clearing current Auction House snapshot.";
-AUCT_FRMT_ACT_CLEAR_OK="Cleared data for item: %s";
-AUCT_FRMT_ACT_CLEAR_FAIL="Unable to find item: %s";
-AUCT_FRMT_ACT_ENABLE="Displaying item's %s data";
-AUCT_FRMT_ACT_DISABLE="Not displaying item's %s data";
-AUCT_FRMT_ACT_ENABLED_ON="Displaying item's %s on %s";
-AUCT_FRMT_ACT_SET="Set %s to '%s'";
-AUCT_FRMT_ACT_UNKNOWN="Unknown command keyword: '%s'";
-AUCT_FRMT_ACT_DEFAULTALL="All Auctioneer options have been reset to default settings.";
-AUCT_FRMT_ACT_DEFAULT="Auctioneer's %s option has been reset to default settings";
-
-AUCT_TEXT_SCAN="Scan";
-AUCT_TEXT_AUCTION="auction";
-AUCT_TEXT_NONE="none";
-AUCT_TEXT_USAGE="Usage:";
-
-
-
-AUCTIONEER_AUCTION_SCAN_START="Auctioneer: scanning %s page 1...";
-AUCTIONEER_AUCTION_PAGE_N="Auctioneer: scanning %s page %d of %d";
-AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: auction scanning finished";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
-AUCTIONEER_AUCTION_SCAN_NOCAT="You must have at least one category selected to scan.";
-AUCTIONEER_AUCTION_SCAN_REDO="Current page took more than %d seconds to complete, retrying page.";
-
-AUCT_MESG_CONVERT="Auctioneer Database Conversion. Please backup SavedVariables.lua first.%s%s";
-AUCT_MESG_NOTCONVERTING="Auctioneer is not converting your database, but will not function until you do.";
-AUCT_MESG_CONVERT_YES="Convert";
-AUCT_MESG_CONVERT_NO="Disable Auctioneer";
-
-AUCTIONEER_AUCTION_TOTAL_AUCTS="Total auctions scanned: %s";
-AUCTIONEER_AUCTION_NEW_AUCTS="New auctions scanned: %s";
-AUCTIONEER_AUCTION_OLD_AUCTS="Previously scanned: %s";
-AUCTIONEER_AUCTION_DEFUNCT_AUCTS="Defunct auctions removed: %s";
-AUCTIONEER_AUCTION_DISCREPANCIES="Discrepencies: %s";
-
-
-
-AUCTIONEER_GUI_MAIN_HELP="Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
-AUCTIONEER_GUI_MAIN_ENABLE="Enable Auctioneer";
-AUCTIONEER_GUI_LOCALE="Set locale to";
-AUCTIONEER_GUI_VERBOSE="Verbose Mode";
-AUCTIONEER_GUI_STATS_ENABLE="Show Stats";
-AUCTIONEER_GUI_STATS_HEADER="Item Price Statistics";
-AUCTIONEER_GUI_STATS_HELP="Show the following statistics in the tooltip.";
-AUCTIONEER_GUI_AVERAGES="Show Averages";
-AUCTIONEER_GUI_MEDIAN="Show Medians";
-AUCTIONEER_GUI_SUGGEST="Show Suggested Prices";
-AUCTIONEER_GUI_VENDOR_HEADER="Vendor Prices";
-AUCTIONEER_GUI_VENDOR_HELP="Options related to NPC buy/sell prices.";
-AUCTIONEER_GUI_VENDOR="Show Vendor Prices";
-AUCTIONEER_GUI_VENDOR_BUY="Show Vendor Buy Prices";
-AUCTIONEER_GUI_VENDOR_SELL="Show Vendor Sell Prices";
-AUCTIONEER_GUI_EMBED_HEADER="Embed";
-AUCTIONEER_GUI_EMBED="Embed info in in-game tooltip";
-AUCTIONEER_GUI_EMBED_BLANKLINE="Show blankline in in-game tooltip";
-AUCTIONEER_GUI_CLEAR_HEADER="Clear Data";
-AUCTIONEER_GUI_CLEAR_HELP="Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
-AUCTIONEER_GUI_CLEARALL="Clear All Auctioneer Data";
-AUCTIONEER_GUI_CLEARALL_HELP="Click here to clear all of auctioneer data for the current server-realm.";
-AUCTIONEER_GUI_CLEARALL_NOTE="for the current server-faction";
-AUCTIONEER_GUI_CLEARALL_BUTTON="Clear All";
-AUCTIONEER_GUI_CLEARSNAP="Clear Snapshot data";
-AUCTIONEER_GUI_CLEARSNAP_HELP="Click here to clear the last Auctioneer snapshot data.";
-AUCTIONEER_GUI_CLEARSNAP_BUTTON="Clear Snapshot";
-AUCTIONEER_GUI_PERCENTS_HEADER="Auctioneer Threshold Percents";
-AUCTIONEER_GUI_PERCENTS_HELP="WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
-AUCTIONEER_GUI_BIDMARKDOWN="Bid Markdown Percent";
-AUCTIONEER_GUI_MARKUP="Vendor Price Markup Percent";
-AUCTIONEER_GUI_MAXLESS="Max Market Undercut Percent";
-AUCTIONEER_GUI_NOCOMP="No Competition Undercut Percent";
-AUCTIONEER_GUI_UNDERLOW="Lowest Auction Undercut";
-AUCTIONEER_GUI_UNDERMKT="Undercut Market When Maxless";
-AUCTIONEER_GUI_OTHER_HEADER="Other Options";
-AUCTIONEER_GUI_OTHER_HELP="Miscellaneous Auctioneer Options";
-AUCTIONEER_GUI_AUTOFILL="Autofill prices in the AH";
-AUCTIONEER_GUI_ALSO="Also display data for";
-AUCTIONEER_GUI_ALSO_OPPOSITE="Now also displaying data for opposite faction.";
-AUCTIONEER_GUI_ALSO_OFF="No longer displaying other realm-faction data.";
-AUCTIONEER_GUI_ALSO_DISPLAY="Displaying data for %s";
-AUCTIONEER_GUI_MESH="Show Item Mesh";
-AUCTIONEER_GUI_MESH_OFF="No keyboard modifiers";
-AUCTIONEER_GUI_MESH_SHIFT="Shift key modifier";
-AUCTIONEER_GUI_MESH_CTRL="Ctrl key modifier";
-AUCTIONEER_GUI_MESH_ALT="Alt key modifier";
-AUCTIONEER_GUI_MESH_MODIFIER_HELP="Select whether to require keyboard modifiers to show the item's mesh.\nIf turned on you will have to hold down the selected key to show the item's mesh in the tooltip.";
-AUCTIONEER_GUI_LINK="Show LinkID";
-AUCTIONEER_GUI_RELOADUI="Reload User Interface";
-AUCTIONEER_GUI_RELOADUI_HELP="Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
-AUCTIONEER_GUI_RELOADUI_BUTTON="ReloadUI";
-AUCTIONEER_GUI_RELOADUI_FEEDBACK="Now Reloading the WoW UI";
+	
+	
+	_AUCT['AdditAlcohol'] = "Alcohol";
+	_AUCT['AdditBuff'] = "Buff";
+	_AUCT['AdditDrink'] = "Drink";
+	_AUCT['AdditFirework'] = "Firework";
+	_AUCT['AdditFood'] = "Food";
+	_AUCT['AdditGiftwrap'] = "Giftwrap";
+	_AUCT['AdditLure'] = "Lure";
+	_AUCT['AdditPoison'] = "Poison";
+	_AUCT['AdditPotion'] = "Potion";
+	_AUCT['AdditRestorative'] = "Restorative";
+	_AUCT['AdditScroll'] = "Scroll";
+	
+	_AUCT['SkillAlchemy'] = "Alchemy";
+	_AUCT['SkillBlacksmithing'] = "Smithing";
+	_AUCT['SkillCooking'] = "Cooking";
+	_AUCT['SkillEnchanting'] = "Enchanting";
+	_AUCT['SkillEngineering'] = "Engineering";
+	_AUCT['SkillFirstaid'] = "First Aid";
+	_AUCT['SkillLeatherworking'] = "Leatherworking";
+	_AUCT['SkillMining'] = "Mining";
+	_AUCT['SkillTailoring'] = "Tailoring";
+	_AUCT['SkillDruid'] = "Druid spells";
+	_AUCT['SkillMage'] = "Mage spells";
+	_AUCT['SkillPaladin'] = "Paladin spells";
+	_AUCT['SkillPriest'] = "Priest spells";
+	_AUCT['SkillRogue'] = "Rogue spells";
+	_AUCT['SkillShaman'] = "Shaman spells";
+	_AUCT['SkillWarlock'] = "Warlock spells";
+	
+	_AUCT['TimeShort'] = "Short";
+	_AUCT['TimeMed'] = "Medium";
+	_AUCT['TimeLong'] = "Long";
+	_AUCT['TimeVlong'] = "Very Long";
+	
+	_AUCT['FrmtWelcome'] = "Auctioneer v%s loaded";
+	
+	_AUCT['FrmtBrokerHeader'] = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
+	_AUCT['FrmtBrokerLine'] = "%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
+	_AUCT['FrmtBrokerDone'] = "Brokering done";
+	_AUCT['FrmtBidbrokerHeader'] = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
+	_AUCT['FrmtBidbrokerMinbid'] = "minBid"
+	_AUCT['FrmtBidbrokerCurbid'] = "curBid"
+	_AUCT['FrmtBidbrokerLine'] = "%s, Last %s seen, HSP: %s, %s: %s, Prof: %s, Time: %s";
+	_AUCT['FrmtBidbrokerDone'] = "Bid brokering done";
+	_AUCT['FrmtPctlessHeader'] = "Percent Less than Highest Sellable Price (HSP): %d%%";
+	_AUCT['FrmtPctlessLine'] = "%s, Last %d seen, HSP: %s, BO: %s, Prof: %s, Less %s";
+	_AUCT['FrmtPctlessDone'] = "Percent less done.";
+	_AUCT['FrmtCompeteHeader'] = "Competing auctions at least %s less per item.";
+	_AUCT['FrmtCompeteLine'] = "%s, Bid: %s, BO %s vs %s, %s less";
+	_AUCT['FrmtCompeteDone'] = "Competing auctions done.";
+	_AUCT['FrmtNoauct'] = "No auctions found for the item: %s";
+	_AUCT['FrmtMedianLine'] = "Of last %d seen, median BO for 1 %s is: %s";
+	_AUCT['FrmtLowLine'] = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
+	_AUCT['FrmtHspLine'] = "Highest Sellable Price for one %s is: %s";
+	
+	_AUCT['FrmtInfoSeen'] = "Seen %d times at auction total";
+	_AUCT['FrmtInfoForone'] = "For 1: %s min/%s BO (%s bid) [in %d's]";
+	_AUCT['FrmtInfoAverage'] = "%s min/%s BO (%s bid)"
+	_AUCT['FrmtInfoHistmed'] = "Last %d, median BO (ea)";
+	_AUCT['FrmtInfoSnapmed'] = "Scanned %d, median BO (ea)";
+	_AUCT['FrmtInfoSgststx'] = "Suggested price for your %d stack: %s min/%s BO";
+	_AUCT['FrmtInfoSgst'] = "Suggested price: %s min/%s BO";
+	
+	_AUCT['FrmtInfoBidrate'] = "%d%% have bid, %d%% have BO";
+	_AUCT['FrmtInfoNever'] = "Never seen at %s";
+	_AUCT['FrmtInfoAlsoseen'] = "Seen %d times at %s";
+	_AUCT['FrmtInfoClassuse'] = "Class: %s used for %s";
+	_AUCT['FrmtInfoClass'] = "Class: %s";
+	_AUCT['FrmtInfoUse'] = "Used for: %s";
+	_AUCT['FrmtInfoBuy'] = "Buy%s from vendor";
+	_AUCT['FrmtInfoSell'] = "Sell%s to vendor";
+	_AUCT['FrmtInfoBuymult'] = "Buy%s %d (%s each)";
+	_AUCT['FrmtInfoSellmult'] = "Sell%s %d (%s each)";
+	_AUCT['FrmtInfoStx'] = "Stacks in lots of %d";
+	
+	_AUCT['FrmtInfoHeadMulti'] = "Averages for %d items:";
+	_AUCT['FrmtInfoMinMulti'] = "  Starting bid (%s ea)";
+	_AUCT['FrmtInfoBidMulti'] = "  Bidded (%s%s ea)";
+	_AUCT['FrmtInfoBuyMulti'] = "  Buyout (%s%s ea)";
+	
+	_AUCT['FrmtInfoHeadOne'] = "Averages for this item:";
+	_AUCT['FrmtInfoMinOne'] = "  Starting bid";
+	_AUCT['FrmtInfoBidOne'] = "  Bidded%s";
+	_AUCT['FrmtInfoBuyOne'] = "  Buyout%s";
+	
+	_AUCT['FrmtInfoBuymedian'] = "  Buyout median";
+	
+	_AUCT['FrmtInfoStacksize'] = "  Average stack size: %d items";
+	
+	_AUCT['FrmtUnknownLocale'] = "The locale you specified ('%s') is unknown. Valid locales are:";
+	_AUCT['FrmtUnknownRf']     = "Invalid parameter ('%s'). The parameter must be formated like: [realm]-[faction]. For example: Al'Akir-Horde";
+	_AUCT['FrmtUnknownArg']    = "'%s' is no valid argument for '%s'";
+	
+	_AUCT['FrmtActRemove'] = "Removing auction signature %s from current AH snapshot.";
+	
+	_AUCT['FrmtAuctinfoHist'] = "%d historical";
+	_AUCT['FrmtAuctinfoSnap'] = "%d last scan";
+	_AUCT['FrmtAuctinfoLow'] = "Snapshot low";
+	_AUCT['FrmtAuctinfoNolow'] = "Item not seen last snapshot";
+	_AUCT['FrmtAuctinfoOrig'] = "Original bid";
+	_AUCT['FrmtAuctinfoSugbuy'] = "Suggested buyout";
+	_AUCT['FrmtAuctinfoSugbid'] = "Suggested bid";
+	_AUCT['FrmtAuctinfoMktprice'] = "Market price";
+	
+	_AUCT['FrmtWarnMarkup'] = "Marking up vendor by %s%%";
+	_AUCT['FrmtWarnUndercut'] = "Undercutting by %s%%";
+	_AUCT['FrmtWarnNocomp'] = "No competition";
+	_AUCT['FrmtWarnAbovemkt'] = "Competiton above market";
+	_AUCT['FrmtWarnToolow'] = "Cannot match lowest price";
+	_AUCT['FrmtWarnMyprice'] = "Using my current price";
+	_AUCT['FrmtWarnNodata'] = "No data for HSP";
+	
+	_AUCT['CmdOff'] = "off";
+	_AUCT['CmdOn'] = "on";
+	_AUCT['CmdAlt'] = "alt";
+	_AUCT['CmdCtrl'] = "ctrl";
+	_AUCT['CmdShift'] = "shift";
+	_AUCT['CmdToggle'] = "toggle";
+	_AUCT['CmdClear'] = "clear";
+	_AUCT['CmdClearAll'] = "all";
+	_AUCT['CmdClearSnapshot'] = "snapshot";
+	_AUCT['CmdAlso'] = "also";
+	_AUCT['CmdAlsoOpposite'] = "opposite";
+	_AUCT['CmdLocale'] = "locale";
+	_AUCT['CmdDefault'] = "default";
+	
+	_AUCT['CmdBroker'] = "broker";
+	_AUCT['CmdBidbroker'] = "bidbroker";
+	_AUCT['CmdBidbrokerShort'] = "bb";
+	_AUCT['CmdEmbed'] = "embed";
+	_AUCT['CmdPercentless'] = "percentless";
+	_AUCT['CmdPercentlessShort'] = "pl";
+	_AUCT['CmdCompete'] = "compete";
+	_AUCT['CmdScan'] = "scan";
+	_AUCT['CmdAutofill'] = "autofill";
+	
+	_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
+	_AUCT['CmdPctMarkup']      = "pct-markup";
+	_AUCT['CmdPctMaxless']     = "pct-maxless";
+	_AUCT['CmdPctNocomp']      = "pct-nocomp";
+	_AUCT['CmdPctUnderlow']    = "pct-underlow";
+	_AUCT['CmdPctUndermkt']    = "pct-undermkt";
+	
+	_AUCT['OptClear'] = "([Item]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
+	_AUCT['OptAlso'] = "(realm-faction|".._AUCT['CmdAlsoOpposite']..")"
+	_AUCT['OptLocale'] = "<locale>";
+	_AUCT['OptBroker'] = "<silver_profit>";
+	_AUCT['OptBidbroker'] = "<silver_profit>";
+	_AUCT['OptPercentless'] = "<percent>";
+	_AUCT['OptCompete'] = "<silver_less>";
+	_AUCT['OptScan'] = "";
+	_AUCT['OptScale'] = "<scale_factor>";
+	_AUCT['OptScaleDefault'] = 1.0;
+	
+	_AUCT['OptPctBidmarkdown'] = "<percent>";
+	_AUCT['OptPctMarkup'] = "<percent>";
+	_AUCT['OptPctMaxless'] = "<percent>";
+	_AUCT['OptPctNocomp'] = "<percent>";
+	_AUCT['OptPctUnderlow'] = "<percent>";
+	_AUCT['OptPctUndermkt'] = "<percent>";
+	
+	_AUCT['OptPctBidmarkdownDefault'] = 20;
+	_AUCT['OptPctMarkupDefault'] = 300;
+	_AUCT['OptPctMaxlessDefault'] = 30;
+	_AUCT['OptPctNocompDefault'] = 2;
+	_AUCT['OptPctUnderlowDefault'] = 5;
+	_AUCT['OptPctUndermktDefault'] = 20;
+	
+	_AUCT['ShowVerbose'] = "show-verbose";
+	_AUCT['ShowAverage'] = "show-average";
+	_AUCT['ShowLink'] = "show-link";
+	_AUCT['ShowMedian'] = "show-median";
+	_AUCT['ShowStack'] = "show-stack";
+	_AUCT['ShowStats'] = "show-stats";
+	_AUCT['ShowSuggest'] = "show-suggest";
+	_AUCT['ShowUsage'] = "show-usage";
+	_AUCT['ShowVendor'] = "show-vendor";
+	_AUCT['ShowVendorBuy'] = "show-vendor-buy";
+	_AUCT['ShowVendorSell'] = "show-vendor-sell";
+	_AUCT['ShowEmbedBlank'] = "show-embed-blankline";
+	_AUCT['ShowRedo'] = "show-warning";
+	
+	_AUCT['HelpOnoff'] = "Turns the auction data display on and off";
+	_AUCT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
+	_AUCT['HelpAverage'] = "Select whether to show item's average auction price";
+	_AUCT['HelpLink'] = "Select whether to show the link id in the tooltip";
+	_AUCT['HelpMedian'] = "Select whether to show item's median buyout price";
+	_AUCT['HelpSuggest'] = "Select whether to show item's suggested auction price";
+	_AUCT['HelpStats'] = "Select whether to show item's bidded/buyout percentages";
+	_AUCT['HelpVendor'] = "Select whether to show item's vendor pricing";
+	_AUCT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)";
+	_AUCT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
+	_AUCT['HelpUsage'] = "Select whether to show tradeskill item's usage";
+	_AUCT['HelpStack'] = "Select whether to show the item's stackable size";
+	_AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
+	_AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
+	_AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
+	_AUCT['HelpLocale'] = "Change the locale that is used to display auctioneer messages";
+	_AUCT['HelpBroker'] = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
+	_AUCT['HelpBidbroker'] = "Show short or medium term auctions from the recent scan that may be bid on for profit";
+	_AUCT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
+	_AUCT['HelpPercentless'] = "Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
+	_AUCT['HelpCompete'] = "Show any recently scanned auctions whose buyout is less than one of your items";
+	_AUCT['HelpScan'] = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
+	_AUCT['HelpAutofill'] = "Set whether to autofill prices when dropping new auction items into the auction house window";
+	_AUCT['HelpPctBidmarkdown'] = "Set the percentage that Auctioneer will mark down bids from the buyout price";
+	_AUCT['HelpPctMarkup'] = "The percentage that vendor prices will be marked up when no other values are available";
+	_AUCT['HelpPctMaxless'] = "Set the maximum percentage that auctioneer will undercut market value before it gives up";
+	_AUCT['HelpPctNocomp'] = "The percentage that Auctioneer will undercut market value when there is no competition";
+	_AUCT['HelpPctUnderlow'] = "Set the percentage that Auctioneer will undercut the lowest auction price";
+	_AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
+	_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
+	
+	_AUCT['StatOn'] = "Displaying configured auction data";
+	_AUCT['StatOff'] = "Not displaying any auction data";
+	
+	_AUCT['FrmtActClearall'] = "Clearing all auction data for %s";
+	_AUCT['FrmtActClearsnap'] = "Clearing current Auction House snapshot.";
+	_AUCT['FrmtActClearOk'] = "Cleared data for item: %s";
+	_AUCT['FrmtActClearFail'] = "Unable to find item: %s";
+	_AUCT['FrmtActEnable'] = "Displaying item's %s data";
+	_AUCT['FrmtActDisable'] = "Not displaying item's %s data";
+	_AUCT['FrmtActEnabledOn'] = "Displaying item's %s on %s";
+	_AUCT['FrmtActSet'] = "Set %s to '%s'";
+	_AUCT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
+	_AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
+	_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to default settings";
+	
+	_AUCT['TextScan'] = "Scan";
+	_AUCT['TextAuction'] = "auction";
+	_AUCT['TextNone'] = "none";
+	_AUCT['TextUsage'] = "Usage:";
+	
+	
+	
+	_AUCT['AuctionScanStart'] = "Auctioneer: scanning %s page 1...";
+	_AUCT['AuctionPageN'] = "Auctioneer: scanning %s page %d of %d";
+	_AUCT['AuctionScanDone'] = "Auctioneer: auction scanning finished";
+	_AUCT['AuctionScanNexttime'] = "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
+	_AUCT['AuctionScanNocat'] = "You must have at least one category selected to scan.";
+	_AUCT['AuctionScanRedo'] = "Current page took more than %d seconds to complete, retrying page.";
+	
+	_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup SavedVariables.lua first.%s%s";
+	_AUCT['MesgNotconverting'] = "Auctioneer is not converting your database, but will not function until you do.";
+	_AUCT['MesgConvertYes'] = "Convert";
+	_AUCT['MesgConvertNo'] = "Disable Auctioneer";
+	
+	_AUCT['AuctionTotalAucts'] = "Total auctions scanned: %s";
+	_AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
+	_AUCT['AuctionOldAucts'] = "Previously scanned: %s";
+	_AUCT['AuctionDefunctAucts'] = "Defunct auctions removed: %s";
+	_AUCT['AuctionDiscrepancies'] = "Discrepencies: %s";
+	
+	
+	
+	_AUCT['GuiMainHelp'] = "Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
+	_AUCT['GuiMainEnable'] = "Enable Auctioneer";
+	_AUCT['GuiLocale'] = "Set locale to";
+	_AUCT['GuiVerbose'] = "Verbose Mode";
+	_AUCT['GuiStatsEnable'] = "Show Stats";
+	_AUCT['GuiStatsHeader'] = "Item Price Statistics";
+	_AUCT['GuiStatsHelp'] = "Show the following statistics in the tooltip.";
+	_AUCT['GuiAverages'] = "Show Averages";
+	_AUCT['GuiMedian'] = "Show Medians";
+	_AUCT['GuiSuggest'] = "Show Suggested Prices";
+	_AUCT['GuiVendorHeader'] = "Vendor Prices";
+	_AUCT['GuiVendorHelp'] = "Options related to NPC buy/sell prices.";
+	_AUCT['GuiVendor'] = "Show Vendor Prices";
+	_AUCT['GuiVendorBuy'] = "Show Vendor Buy Prices";
+	_AUCT['GuiVendorSell'] = "Show Vendor Sell Prices";
+	_AUCT['GuiEmbedHeader'] = "Embed";
+	_AUCT['GuiEmbed'] = "Embed info in in-game tooltip";
+	_AUCT['GuiEmbedBlankline'] = "Show blankline in in-game tooltip";
+	_AUCT['GuiClearHeader'] = "Clear Data";
+	_AUCT['GuiClearHelp'] = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
+	_AUCT['GuiClearall'] = "Clear All Auctioneer Data";
+	_AUCT['GuiClearallHelp'] = "Click here to clear all of auctioneer data for the current server-realm.";
+	_AUCT['GuiClearallNote'] = "for the current server-faction";
+	_AUCT['GuiClearallButton'] = "Clear All";
+	_AUCT['GuiClearsnap'] = "Clear Snapshot data";
+	_AUCT['GuiClearsnapHelp'] = "Click here to clear the last Auctioneer snapshot data.";
+	_AUCT['GuiClearsnapButton'] = "Clear Snapshot";
+	_AUCT['GuiPercentsHeader'] = "Auctioneer Threshold Percents";
+	_AUCT['GuiPercentsHelp'] = "WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
+	_AUCT['GuiBidmarkdown'] = "Bid Markdown Percent";
+	_AUCT['GuiMarkup'] = "Vendor Price Markup Percent";
+	_AUCT['GuiMaxless'] = "Max Market Undercut Percent";
+	_AUCT['GuiNocomp'] = "No Competition Undercut Percent";
+	_AUCT['GuiUnderlow'] = "Lowest Auction Undercut";
+	_AUCT['GuiUndermkt'] = "Undercut Market When Maxless";
+	_AUCT['GuiOtherHeader'] = "Other Options";
+	_AUCT['GuiOtherHelp'] = "Miscellaneous Auctioneer Options";
+	_AUCT['GuiAutofill'] = "Autofill prices in the AH";
+	_AUCT['GuiAlso'] = "Also display data for";
+	_AUCT['GuiAlsoOpposite'] = "Now also displaying data for opposite faction.";
+	_AUCT['GuiAlsoOff'] = "No longer displaying other realm-faction data.";
+	_AUCT['GuiAlsoDisplay'] = "Displaying data for %s";
+	_AUCT['GuiMesh'] = "Show Item Mesh";
+	_AUCT['GuiMeshOff'] = "No keyboard modifiers";
+	_AUCT['GuiMeshShift'] = "Shift key modifier";
+	_AUCT['GuiMeshCtrl'] = "Ctrl key modifier";
+	_AUCT['GuiMeshAlt'] = "Alt key modifier";
+	_AUCT['GuiMeshModifierHelp'] = "Select whether to require keyboard modifiers to show the item's mesh.\nIf turned on you will have to hold down the selected key to show the item's mesh in the tooltip.";
+	_AUCT['GuiLink'] = "Show LinkID";
+	_AUCT['GuiReloadui'] = "Reload User Interface";
+	_AUCT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
+	_AUCT['GuiReloaduiButton'] = "ReloadUI";
+	_AUCT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI";
 -- Locale strings for the deDE locale
 if locale == "deDE" then
--- Encoded in UTF8
-AUCT_CLAS_ARMOR="R\195\188stung";
-AUCT_CLAS_BANDAGE="Verband"
-AUCT_CLAS_CLOTH="Stoff";
-AUCT_CLAS_CONTAINER="Tasche";
-AUCT_CLAS_DRINK="Getr\195\164nk";
-AUCT_CLAS_FISHING="Angeln";
-AUCT_CLAS_FOOD="Nahrung";
-AUCT_CLAS_GEM="Edelstein";
-AUCT_CLAS_HERB="Kraut";
-AUCT_CLAS_HIDE="Balg";
-AUCT_CLAS_LEATHER="Leder";
-AUCT_CLAS_MAGE="Magier";
-AUCT_CLAS_ORE="Erz";
-AUCT_CLAS_POISON="Gift";
-AUCT_CLAS_POTION="Trank";
-AUCT_CLAS_QUEST="Quest";
-AUCT_CLAS_SHAMAN="Schamane";
-AUCT_CLAS_WARLOCK="Hexenmeister";
-AUCT_CLAS_WEAPON="Waffe";
-AUCT_CLAS_WRITTEN="Schriftst\195\188ck";
-
-AUCT_TYPE_ALCHEM="Alchimie";
-AUCT_TYPE_COOK="Kochen";
-AUCT_TYPE_ENCHANT="Verzauberungen";
-AUCT_TYPE_ENGINEER="Ingenieurskunst";
-AUCT_TYPE_FSTAID="Erste Hilfe";
-AUCT_TYPE_LEATHER="Lederverarbeitung";
-AUCT_TYPE_MINING="Bergbau";
-AUCT_TYPE_POISON="Gifte";
-AUCT_TYPE_PRIEST="Zauber - Priester";
-AUCT_TYPE_SMITH="Schmieden";
-AUCT_TYPE_TAILOR="Schneiderei";
-
-AUCT_RECIPE_PREFIXES={ "Rezept: ", "Muster: ", "Pl\195\164ne: ", "Bauplan: ", "Formel: " };
-
-AUCT_TIME_SHORT="Kurz";
-AUCT_TIME_MED="Mittel";
-AUCT_TIME_LONG="Lang";
-AUCT_TIME_VLONG="Sehr lang";
-
-AUCT_FRMT_WELCOME="Auctioneer v%s geladen";
-
-AUCT_FRMT_BROKER_HEADER="Mindestprofit: %s, HVP = 'H\195\182chster verk\195\164uflicher Preis'";
-AUCT_FRMT_BROKER_LINE="%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Profit: %s";
-AUCT_FRMT_BROKER_DONE="Brokern fertig";
-AUCT_FRMT_BIDBROKER_HEADER="Mindest Profit: %s, HVP = 'H\195\182chster verk\195\164uflicher Preis'";
-AUCT_FRMT_BIDBROKER_MINBID="min. Gebot"
-AUCT_FRMT_BIDBROKER_CURBID="akt. Gebot"
-AUCT_FRMT_BIDBROKER_LINE="%s, zuletzt %s gesehen, HVP: %s, %s: %s, Profit: %s, Restzeit: %s";
-AUCT_FRMT_BIDBROKER_DONE="Gebotbrokern fertig";
-AUCT_FRMT_PCTLESS_HEADER="Prozent billiger als der 'H\195\182chster verk\195\164uflicher Preis (HVP)': %d%%";
-AUCT_FRMT_PCTLESS_LINE="%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
-AUCT_FRMT_PCTLESS_DONE="Prozent unter HSP fertig.";
-AUCT_FRMT_COMPETE_HEADER="Konkurrierende Auktionen mindestens %s billiger pro St\195\188ck.";
-AUCT_FRMT_COMPETE_LINE="%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
-AUCT_FRMT_COMPETE_DONE="Konkurrierende Auktionen fertig.";
-AUCT_FRMT_NOAUCT="Keine Aktionen f\195\188r %s gefunden.";
-AUCT_FRMT_MEDIAN_LINE="Der Median der %d zuletzt gesehenen %s liegt bei %s/St\195\188ck.";
-AUCT_FRMT_LOW_LINE="%s, Sofortkauf: %s, Verk\195\164ufer: %s, %s/St\195\188ck, %s unter dem Median";
-AUCT_FRMT_HSP_LINE="H\195\182chster verk\195\164uflicher Preis pro %s ist: %s";
-
-AUCT_FRMT_INFO_SEEN="Insgesamt %d mal in Auktionen gesehen";
-AUCT_FRMT_INFO_FORONE="Pro St\195\188ck: %s min/%s Sofortkauf (%s geboten) [in %d]";
-AUCT_FRMT_INFO_AVERAGE="%s min/%s Sofortkauf (%s geboten)"
-AUCT_FRMT_INFO_HISTMED="Sofortkauf-Median (pro St\195\188ck) der %d letzten Auktionen:";
-AUCT_FRMT_INFO_SNAPMED="Sofortkauf-Median (pro St\195\188ck) aus %d gescannten Auktionen:";
-AUCT_FRMT_INFO_SGSTSTX="Empfohlener Preis f\195\188r diesen %der Stapel: %s min/%s Sofortkauf";
-AUCT_FRMT_INFO_SGST="Empfohlener Preis: %s min/%s Sofortkauf";
-
-AUCT_FRMT_INFO_BIDRATE="%d%% haben Gebote, %d%% haben Sofortkauf";
-AUCT_FRMT_INFO_NEVER="Noch in keiner %s gesehen";
-AUCT_FRMT_INFO_ALSOSEEN="%d mal in einer %s gesehen";
-AUCT_FRMT_INFO_CLASSUSE="Klasse: %s - Benutzt f\195\188r %s";
-AUCT_FRMT_INFO_CLASS="Klasse: %s";
-AUCT_FRMT_INFO_USE="Benutzt f\195\188r: %s";
-AUCT_FRMT_INFO_BUY="Einkauf%s beim H\195\164ndler";
-AUCT_FRMT_INFO_SELL="Verkauf%s beim H\195\164ndler";
-AUCT_FRMT_INFO_BUYMULT="Einkauf%s f\195\188r %d (%s pro St\195\188ck)";
-AUCT_FRMT_INFO_SELLMULT="Verkauf%s f\195\188r %d (%s pro St\195\188ck)";
-AUCT_FRMT_INFO_STX="%d pro Stapel";
-
-AUCT_FRMT_INFO_HEAD_MULTI="Durchschnitt f\195\188r %d St\195\188ck:";
-AUCT_FRMT_INFO_MIN_MULTI="  Min. Startgebot (%s pro St\195\188ck)";
-AUCT_FRMT_INFO_BID_MULTI="  Geboten (%s%s pro St\195\188ck)";
-AUCT_FRMT_INFO_BUY_MULTI="  Sofortkauf (%s%s pro St\195\188ck)";
-
-AUCT_FRMT_INFO_HEAD_ONE="Durchschnitt f\195\188r diesen Gegenstand:";
-AUCT_FRMT_INFO_MIN_ONE="  Min. Startgebot";
-AUCT_FRMT_INFO_BID_ONE="  Geboten%s";
-AUCT_FRMT_INFO_BUY_ONE="  Sofortkauf%s";
-
-AUCT_FRMT_INFO_BUYMEDIAN="  Sofortkauf-Median";
-
-AUCT_FRMT_INFO_STACKSIZE="  Durchschnittliche Stapelgr\195\182\195\159e: %d St\195\188ck";
-
-AUCT_FRMT_UNKNOWN_LOCALE="Die angegebene Sprache ('%s') ist unbekannt. Folgende Sprachen sind g\195\188ltig:";
-AUCT_FRMT_UNKNOWN_RF="Der angegebene Parameter ('%s') ist ung\195\188ltig. Der Parameter muss das Format: [Realm]-[Fraktion] haben. Zum Beispiel: Kil'Jaeden-Alliance";
-AUCT_FRMT_UNKNOWN_ARG="'%s' ist kein g\195\188ltiges Argument f\195\188r '%s'";
-
-AUCT_FRMT_ACT_REMOVE="Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
-
-AUCT_FRMT_AUCTINFO_HIST="%d historisch";
-AUCT_FRMT_AUCTINFO_SNAP="%d aus letztem Scan";
-AUCT_FRMT_AUCTINFO_LOW="billigster Snapshot";
-AUCT_FRMT_AUCTINFO_NOLOW="Nicht im letzten Snapshot gesehn";
-AUCT_FRMT_AUCTINFO_ORIG="Original-Gebot";
-AUCT_FRMT_AUCTINFO_SUGBUY="Empf. Sofortkauf";
-AUCT_FRMT_AUCTINFO_SUGBID="Empf. Gebot";
-AUCT_FRMT_AUCTINFO_MKTPRICE="Marktpreis";
-
-AUCT_FRMT_WARN_MARKUP="%s%% erh\195\182hter H\195\164ndlerpreis";
-AUCT_FRMT_WARN_UNDERCUT="Unterbiete um %s%%";
-AUCT_FRMT_WARN_NOCOMP="Monopol";
-AUCT_FRMT_WARN_ABOVEMKT="Konkurrenz keine Gefahr";
-AUCT_FRMT_WARN_TOOLOW="Konkurrenz zu g\195\188nstig";
-AUCT_FRMT_WARN_MYPRICE="Verwende eigenen Preis";
-AUCT_FRMT_WARN_NODATA="Keine HVP-Daten";
-
-
-
-
-AUCT_OPT_CLEAR="([Gegenstand]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
-AUCT_OPT_ALSO="(Realm-Fraktion|"..AUCT_CMD_ALSO_OPPOSITE..")"
-AUCT_OPT_LOCALE="<Sprache>";
-AUCT_OPT_BROKER="<Gewinn in Silber>";
-AUCT_OPT_BIDBROKER="<Gewinn in Silber>";
-AUCT_OPT_PERCENTLESS="<Prozent>";
-AUCT_OPT_COMPETE="<Preisnachlass in Silber>";
-AUCT_OPT_SCALE="<Skalierungsfaktor>";
-
-AUCT_OPT_PCT_BIDMARKDOWN="<Prozent>";
-AUCT_OPT_PCT_MARKUP="<Prozent>";
-AUCT_OPT_PCT_MAXLESS="<Prozent>";
-AUCT_OPT_PCT_NOCOMP="<Prozent>";
-AUCT_OPT_PCT_UNDERLOW="<Prozent>";
-AUCT_OPT_PCT_UNDERMKT="<Prozent>";
-
-
-
-AUCT_HELP_ONOFF="Schaltet die Anzeige der Auktionsdaten ein/aus.";
-AUCT_HELP_VERBOSE="Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
-AUCT_HELP_AVERAGE="Schaltet die Anzeige des durchschnittlichen Auktionspreises ein/aus.";
-AUCT_HELP_LINK="Schaltet die Anzeige der Link-ID im Tooltip ein/aus.";
-AUCT_HELP_MEDIAN="Schaltet die Anzeige des Median-Sofortkaufpreises ein/aus.";
-AUCT_HELP_SUGGEST="Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
-AUCT_HELP_STATS="Schaltet die Prozentanzeige der/des Gebote/Sofortkaufes ein/aus.";
-AUCT_HELP_VENDOR="Schaltet die Anzeige des H\195\164ndlerpreieses ein/aus.";
-AUCT_HELP_VENDOR_SELL="Schaltet die Anzeige des H\195\164ndlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-AUCT_HELP_VENDOR_BUY="Schaltet die Anzeige des H\195\164ndlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-AUCT_HELP_USAGE="Schaltet die Anzeige des Verwendungszweckes f\195\188r Handwerker ein/aus.";
-AUCT_HELP_STACK="Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
-AUCT_HELP_EMBED_BLANK="Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
-AUCT_HELP_CLEAR="L\195\182scht die Daten der angegebene Gegenst\195\164nde (Gegenst\195\164nde durch Shift+Linksklick dem Befehl hinzuf\195\188gen) Es k\195\182nnen auch die speziellen Keywords \"all\" und \"snapshot\" hinzugef\195\188gt werden.";
-AUCT_HELP_ALSO="Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms f\195\188r Realm und den Namen der Faktion f\195\188r Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"opposite\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalit\195\164t.";
-AUCT_HELP_LOCALE="\195\132ndert die f\195\188r die Ausgabe der Auctioneer-Meldungen verwendete Sprache.";
-AUCT_HELP_BROKER="Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, die per Sofortkauf gekauft und mit Gewinn wieder verkauft werden k\195\182nnen.";
-AUCT_HELP_BIDBROKER="Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans mit kurzer oder mittlerer Restlaufzeit an, die per Gebot ersteigert und mit Gewinn wieder verkauft werden k\195\182nnen.";
-AUCT_HELP_EMBED="Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
-AUCT_HELP_PERCENTLESS="Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, deren Sofortkaufpreis einen gewissen Prozentsatz unter dem h\195\182chstm\195\182glichen Verkaufspreis liegt.";
-AUCT_HELP_COMPETE="Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, deren Sofortkaufpreis geringer ist als der eines eigenen im AH angebotenen Gegenstandes.";
-AUCT_HELP_SCAN="F\195\188hrt einen Scan des Auktionshauses beim n\195\164chsten Besuch durch bzw. sofort, wenn man schon dort ist (es gibt ebenfalls einen Knopf im Auktionshausfenster). \195\156ber die Auswahlboxen k\195\182nnen die zu scannenden Kategorien gew\195\164hlt werden.";
-AUCT_HELP_AUTOFILL="Gibt an, ob die Preise automatisch ausgef\195\188llt werden sollen, wenn ein Gegenstand ins Auktionshaus gelegt wird.";
-AUCT_HELP_PCT_BIDMARKDOWN="Legt den Prozentsatz fest, um den das Mindestgebot niedriger als der Sofortkaufpreis ist.";
-AUCT_HELP_PCT_MARKUP="Legt den Prozentsatz f\195\188r erh\195\182hte H\195\164ndlerpreise fest, der verwendet wird, falls sonst keine anderen Werte verf\195\188gbar sind.";
-AUCT_HELP_PCT_MAXLESS="Legt den maximalen Prozentsatz fest, um den der Marktpreis versucht wird zu verringern, bevor aufgegeben wird";
-AUCT_HELP_PCT_NOCOMP="Legt den Prozentsatz fest, um den der Marktpreis gesenkt wird, wenn kein konkurierendes Angebot existiert.";
-AUCT_HELP_PCT_UNDERLOW="Legt den Prozentsatz fest, um den das g\195\188nstigste konkurierende Angebot unterboten wird.";
-AUCT_HELP_PCT_UNDERMKT="Legt den Prozentsatz fest, um den der Marktpreis gesenkt wird, wenn durch den gew\195\164hlten Preozentsatz f\195\188r maxless ein konkurierendes Angebot nicht unterboten werden kann.";
-
-AUCT_STAT_ON="Anzeige der festgelegten Auktionsdaten";
-AUCT_STAT_OFF="Keine Anzeige der Auktionsdaten";
-
-AUCT_FRMT_ACT_CLEARALL="L\195\182sche alle Auktionsdaten f\195\188r %s";
-AUCT_FRMT_ACT_CLEARSNAP="L\195\182sche aktuelles Auktionshaus-Abbild.";
-AUCT_FRMT_ACT_CLEAR_OK="Daten f\195\188r %s wurden gel\195\182scht";
-AUCT_FRMT_ACT_CLEAR_FAIL="Kann %s nicht finden";
-AUCT_FRMT_ACT_ENABLE="Zeige Daten f\195\188r %s an";
-AUCT_FRMT_ACT_DISABLE="Zeige keine Daten f\195\188r %s an";
-AUCT_FRMT_ACT_ENABLED_ON="Zeige %s auf %s";
-AUCT_FRMT_ACT_SET="Setze %s auf '%s'";
-AUCT_FRMT_ACT_UNKNOWN="Unbekannter Befehl: '%s'";
-
-AUCT_TEXT_SCAN="Scannen";
-AUCT_TEXT_AUCTION="Auktion";
-AUCT_TEXT_NONE="nichts";
-AUCT_TEXT_USAGE="Syntax:";
-
--- AH Scanning localizations
-AUCTIONEER_AUCTION_SCAN_START="Auctioneer: Scanne %s Seite 1...";
-AUCTIONEER_AUCTION_PAGE_N="Auctioneer: Scanne %s Seite %d von %d";
-AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: Scanvorgang abgeschlossen";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer wird einen kompletten Auktionsscan durchf\195\188hren, wenn das n\195\164chste mal mit einem Auktionator gesprochen wird.";
-AUCTIONEER_AUCTION_SCAN_NOCAT="Es muss mindestens eine Kategorie ausgew\195\164hlt sein, um den Scanvorgang zu starten.";
-AUCTIONEER_AUCTION_TOTAL_AUCTS="Insgesammt gescannte Auktionen: %s";
-AUCTIONEER_AUCTION_NEW_AUCTS="Davon neu: %s";
-AUCTIONEER_AUCTION_OLD_AUCTS="Davon alt: %s";
-AUCTIONEER_AUCTION_DEFUNCT_AUCTS="Abgelaufene Auktionen: %s";
-AUCTIONEER_AUCTION_DISCREPANCIES="Unstimmigkeiten: %s";
-
--- GUI localizations
-
-
--- The following definitions are missing in this locale:
---	AUCTIONEER_AUCTION_SCAN_REDO = "";
---	AUCTIONEER_GUI_ALSO = "";
---	AUCTIONEER_GUI_ALSO_DISPLAY = "";
---	AUCTIONEER_GUI_ALSO_OFF = "";
---	AUCTIONEER_GUI_ALSO_OPPOSITE = "";
---	AUCTIONEER_GUI_AUTOFILL = "";
---	AUCTIONEER_GUI_AVERAGES = "";
---	AUCTIONEER_GUI_BIDMARKDOWN = "";
---	AUCTIONEER_GUI_CLEARALL = "";
---	AUCTIONEER_GUI_CLEARALL_BUTTON = "";
---	AUCTIONEER_GUI_CLEARALL_HELP = "";
---	AUCTIONEER_GUI_CLEARALL_NOTE = "";
---	AUCTIONEER_GUI_CLEARSNAP = "";
---	AUCTIONEER_GUI_CLEARSNAP_BUTTON = "";
---	AUCTIONEER_GUI_CLEARSNAP_HELP = "";
---	AUCTIONEER_GUI_CLEAR_HEADER = "";
---	AUCTIONEER_GUI_CLEAR_HELP = "";
---	AUCTIONEER_GUI_EMBED = "";
---	AUCTIONEER_GUI_EMBED_BLANKLINE = "";
---	AUCTIONEER_GUI_EMBED_HEADER = "";
---	AUCTIONEER_GUI_LINK = "";
---	AUCTIONEER_GUI_LOCALE = "";
---	AUCTIONEER_GUI_MAIN_ENABLE = "";
---	AUCTIONEER_GUI_MAIN_HELP = "";
---	AUCTIONEER_GUI_MARKUP = "";
---	AUCTIONEER_GUI_MAXLESS = "";
---	AUCTIONEER_GUI_MEDIAN = "";
---	AUCTIONEER_GUI_MESH = "";
---	AUCTIONEER_GUI_MESH_ALT = "";
---	AUCTIONEER_GUI_MESH_CTRL = "";
---	AUCTIONEER_GUI_MESH_MODIFIER_HELP = "";
---	AUCTIONEER_GUI_MESH_OFF = "";
---	AUCTIONEER_GUI_MESH_SHIFT = "";
---	AUCTIONEER_GUI_NOCOMP = "";
---	AUCTIONEER_GUI_OTHER_HEADER = "";
---	AUCTIONEER_GUI_OTHER_HELP = "";
---	AUCTIONEER_GUI_PERCENTS_HEADER = "";
---	AUCTIONEER_GUI_PERCENTS_HELP = "";
---	AUCTIONEER_GUI_RELOADUI = "";
---	AUCTIONEER_GUI_RELOADUI_BUTTON = "";
---	AUCTIONEER_GUI_RELOADUI_FEEDBACK = "";
---	AUCTIONEER_GUI_RELOADUI_HELP = "";
---	AUCTIONEER_GUI_STATS_ENABLE = "";
---	AUCTIONEER_GUI_STATS_HEADER = "";
---	AUCTIONEER_GUI_STATS_HELP = "";
---	AUCTIONEER_GUI_SUGGEST = "";
---	AUCTIONEER_GUI_UNDERLOW = "";
---	AUCTIONEER_GUI_UNDERMKT = "";
---	AUCTIONEER_GUI_VENDOR = "";
---	AUCTIONEER_GUI_VENDOR_BUY = "";
---	AUCTIONEER_GUI_VENDOR_HEADER = "";
---	AUCTIONEER_GUI_VENDOR_HELP = "";
---	AUCTIONEER_GUI_VENDOR_SELL = "";
---	AUCTIONEER_GUI_VERBOSE = "";
---	AUCT_ADDIT_ALCOHOL = "";
---	AUCT_ADDIT_BUFF = "";
---	AUCT_ADDIT_DRINK = "";
---	AUCT_ADDIT_FIREWORK = "";
---	AUCT_ADDIT_FOOD = "";
---	AUCT_ADDIT_GIFTWRAP = "";
---	AUCT_ADDIT_LURE = "";
---	AUCT_ADDIT_POISON = "";
---	AUCT_ADDIT_POTION = "";
---	AUCT_ADDIT_RESTORATIVE = "";
---	AUCT_ADDIT_SCROLL = "";
---	AUCT_CMD_ALSO = "";
---	AUCT_CMD_ALSO_OPPOSITE = "";
---	AUCT_CMD_ALT = "";
---	AUCT_CMD_AUTOFILL = "";
---	AUCT_CMD_BIDBROKER = "";
---	AUCT_CMD_BIDBROKER_SHORT = "";
---	AUCT_CMD_BROKER = "";
---	AUCT_CMD_CLEAR = "";
---	AUCT_CMD_CLEAR_ALL = "";
---	AUCT_CMD_CLEAR_SNAPSHOT = "";
---	AUCT_CMD_COMPETE = "";
---	AUCT_CMD_CTRL = "";
---	AUCT_CMD_DEFAULT = "";
---	AUCT_CMD_EMBED = "";
---	AUCT_CMD_LOCALE = "";
---	AUCT_CMD_OFF = "";
---	AUCT_CMD_ON = "";
---	AUCT_CMD_PCT_BIDMARKDOWN = "";
---	AUCT_CMD_PCT_MARKUP = "";
---	AUCT_CMD_PCT_MAXLESS = "";
---	AUCT_CMD_PCT_NOCOMP = "";
---	AUCT_CMD_PCT_UNDERLOW = "";
---	AUCT_CMD_PCT_UNDERMKT = "";
---	AUCT_CMD_PERCENTLESS = "";
---	AUCT_CMD_PERCENTLESS_SHORT = "";
---	AUCT_CMD_SCAN = "";
---	AUCT_CMD_SHIFT = "";
---	AUCT_CMD_TOGGLE = "";
---	AUCT_FRMT_ACT_DEFAULT = "";
---	AUCT_FRMT_ACT_DEFAULTALL = "";
---	AUCT_HELP_REDO = "";
---	AUCT_MESG_CONVERT = "";
---	AUCT_MESG_CONVERT_NO = "";
---	AUCT_MESG_CONVERT_YES = "";
---	AUCT_MESG_NOTCONVERTING = "";
---	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
---	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
---	AUCT_OPT_PCT_MAXLESS_DEFAULT = "";
---	AUCT_OPT_PCT_NOCOMP_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERLOW_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERMKT_DEFAULT = "";
---	AUCT_OPT_SCALE_DEFAULT = "";
---	AUCT_OPT_SCAN = "";
---	AUCT_SHOW_AVERAGE = "";
---	AUCT_SHOW_EMBED_BLANK = "";
---	AUCT_SHOW_LINK = "";
---	AUCT_SHOW_MEDIAN = "";
---	AUCT_SHOW_REDO = "";
---	AUCT_SHOW_STACK = "";
---	AUCT_SHOW_STATS = "";
---	AUCT_SHOW_SUGGEST = "";
---	AUCT_SHOW_USAGE = "";
---	AUCT_SHOW_VENDOR = "";
---	AUCT_SHOW_VENDOR_BUY = "";
---	AUCT_SHOW_VENDOR_SELL = "";
---	AUCT_SHOW_VERBOSE = "";
---	AUCT_SKILL_ALCHEMY = "";
---	AUCT_SKILL_BLACKSMITHING = "";
---	AUCT_SKILL_COOKING = "";
---	AUCT_SKILL_DRUID = "";
---	AUCT_SKILL_ENCHANTING = "";
---	AUCT_SKILL_ENGINEERING = "";
---	AUCT_SKILL_FIRSTAID = "";
---	AUCT_SKILL_LEATHERWORKING = "";
---	AUCT_SKILL_MAGE = "";
---	AUCT_SKILL_MINING = "";
---	AUCT_SKILL_PALADIN = "";
---	AUCT_SKILL_PRIEST = "";
---	AUCT_SKILL_ROGUE = "";
---	AUCT_SKILL_SHAMAN = "";
---	AUCT_SKILL_TAILORING = "";
---	AUCT_SKILL_WARLOCK = "";
+		-- Encoded in UTF8
+		_AUCT['ClasArmor'] = "R\195\188stung";
+		_AUCT['ClasBandage'] = "Verband"
+		_AUCT['ClasCloth'] = "Stoff";
+		_AUCT['ClasContainer'] = "Tasche";
+		_AUCT['ClasDrink'] = "Getr\195\164nk";
+		_AUCT['ClasFishing'] = "Angeln";
+		_AUCT['ClasFood'] = "Nahrung";
+		_AUCT['ClasGem'] = "Edelstein";
+		_AUCT['ClasHerb'] = "Kraut";
+		_AUCT['ClasHide'] = "Balg";
+		_AUCT['ClasLeather'] = "Leder";
+		_AUCT['ClasMage'] = "Magier";
+		_AUCT['ClasOre'] = "Erz";
+		_AUCT['ClasPoison'] = "Gift";
+		_AUCT['ClasPotion'] = "Trank";
+		_AUCT['ClasQuest'] = "Quest";
+		_AUCT['ClasShaman'] = "Schamane";
+		_AUCT['ClasWarlock'] = "Hexenmeister";
+		_AUCT['ClasWeapon'] = "Waffe";
+		_AUCT['ClasWritten'] = "Schriftst\195\188ck";
+		
+		_AUCT['TypeAlchem'] = "Alchimie";
+		_AUCT['TypeCook'] = "Kochen";
+		_AUCT['TypeEnchant'] = "Verzauberungen";
+		_AUCT['TypeEngineer'] = "Ingenieurskunst";
+		_AUCT['TypeFstaid'] = "Erste Hilfe";
+		_AUCT['TypeLeather'] = "Lederverarbeitung";
+		_AUCT['TypeMining'] = "Bergbau";
+		_AUCT['TypePoison'] = "Gifte";
+		_AUCT['TypePriest'] = "Zauber - Priester";
+		_AUCT['TypeSmith'] = "Schmieden";
+		_AUCT['TypeTailor'] = "Schneiderei";
+		
+		_AUCT['RecipePrefixes'] = { "Rezept: ", "Muster: ", "Pl\195\164ne: ", "Bauplan: ", "Formel: " };
+		
+		_AUCT['TimeShort'] = "Kurz";
+		_AUCT['TimeMed']   = "Mittel";
+		_AUCT['TimeLong']  = "Lang";
+		_AUCT['TimeVlong'] = "Sehr lang";
+		
+		_AUCT['FrmtWelcome'] = "Auctioneer v%s geladen";
+		
+		_AUCT['FrmtBrokerHeader']    = "Mindestprofit: %s, HVP = 'H\195\182chster verk\195\164uflicher Preis'";
+		_AUCT['FrmtBrokerLine']      = "%s, zuletzt %s gesehen, HVP: %s, Sofortkauf: %s, Profit: %s";
+		_AUCT['FrmtBrokerDone']      = "Brokern fertig";
+		_AUCT['FrmtBidbrokerHeader'] = "Mindest Profit: %s, HVP = 'H\195\182chster verk\195\164uflicher Preis'";
+		_AUCT['FrmtBidbrokerMinbid'] = "min. Gebot"
+		_AUCT['FrmtBidbrokerCurbid'] = "akt. Gebot"
+		_AUCT['FrmtBidbrokerLine']   = "%s, zuletzt %s gesehen, HVP: %s, %s: %s, Profit: %s, Restzeit: %s";
+		_AUCT['FrmtBidbrokerDone']   = "Gebotbrokern fertig";
+		_AUCT['FrmtPctlessHeader']   = "Prozent billiger als der 'H\195\182chster verk\195\164uflicher Preis (HVP)': %d%%";
+		_AUCT['FrmtPctlessLine']     = "%s, zuletzt %d gesehen, HSP: %s, Sofortkauf: %s, Prof: %s, Billiger %s";
+		_AUCT['FrmtPctlessDone']     = "Prozent unter HSP fertig.";
+		_AUCT['FrmtCompeteHeader']   = "Konkurrierende Auktionen mindestens %s billiger pro St\195\188ck.";
+		_AUCT['FrmtCompeteLine']     = "%s, Gebot: %s, Sofortkauf %s vs %s, %s billiger";
+		_AUCT['FrmtCompeteDone']     = "Konkurrierende Auktionen fertig.";
+		_AUCT['FrmtNoauct']           = "Keine Aktionen f\195\188r %s gefunden.";
+		_AUCT['FrmtMedianLine']      = "Der Median der %d zuletzt gesehenen %s liegt bei %s/St\195\188ck.";
+		_AUCT['FrmtLowLine']         = "%s, Sofortkauf: %s, Verk\195\164ufer: %s, %s/St\195\188ck, %s unter dem Median";
+		_AUCT['FrmtHspLine']         = "H\195\182chster verk\195\164uflicher Preis pro %s ist: %s";
+		
+		_AUCT['FrmtInfoSeen']        = "Insgesamt %d mal in Auktionen gesehen";
+		_AUCT['FrmtInfoForone']      = "Pro St\195\188ck: %s min/%s Sofortkauf (%s geboten) [in %d]";
+		_AUCT['FrmtInfoAverage']     = "%s min/%s Sofortkauf (%s geboten)"
+		_AUCT['FrmtInfoHistmed']     = "Sofortkauf-Median (pro St\195\188ck) der %d letzten Auktionen:";
+		_AUCT['FrmtInfoSnapmed']     = "Sofortkauf-Median (pro St\195\188ck) aus %d gescannten Auktionen:";
+		_AUCT['FrmtInfoSgststx']     = "Empfohlener Preis f\195\188r diesen %der Stapel: %s min/%s Sofortkauf";
+		_AUCT['FrmtInfoSgst']        = "Empfohlener Preis: %s min/%s Sofortkauf";
+		
+		_AUCT['FrmtInfoBidrate']  = "%d%% haben Gebote, %d%% haben Sofortkauf";
+		_AUCT['FrmtInfoNever']    = "Noch in keiner %s gesehen";
+		_AUCT['FrmtInfoAlsoseen'] = "%d mal in einer %s gesehen";
+		_AUCT['FrmtInfoClassuse'] = "Klasse: %s - Benutzt f\195\188r %s";
+		_AUCT['FrmtInfoClass']    = "Klasse: %s";
+		_AUCT['FrmtInfoUse']      = "Benutzt f\195\188r: %s";
+		_AUCT['FrmtInfoBuy']      = "Einkauf%s beim H\195\164ndler";
+		_AUCT['FrmtInfoSell']     = "Verkauf%s beim H\195\164ndler";
+		_AUCT['FrmtInfoBuymult']  = "Einkauf%s f\195\188r %d (%s pro St\195\188ck)";
+		_AUCT['FrmtInfoSellmult'] = "Verkauf%s f\195\188r %d (%s pro St\195\188ck)";
+		_AUCT['FrmtInfoStx']      = "%d pro Stapel";
+		
+		_AUCT['FrmtInfoHeadMulti'] = "Durchschnitt f\195\188r %d St\195\188ck:";
+		_AUCT['FrmtInfoMinMulti']  = "  Min. Startgebot (%s pro St\195\188ck)";
+		_AUCT['FrmtInfoBidMulti']  = "  Geboten (%s%s pro St\195\188ck)";
+		_AUCT['FrmtInfoBuyMulti']  = "  Sofortkauf (%s%s pro St\195\188ck)";
+		
+		_AUCT['FrmtInfoHeadOne'] = "Durchschnitt f\195\188r diesen Gegenstand:";
+		_AUCT['FrmtInfoMinOne']  = "  Min. Startgebot";
+		_AUCT['FrmtInfoBidOne']  = "  Geboten%s";
+		_AUCT['FrmtInfoBuyOne']  = "  Sofortkauf%s";
+		
+		_AUCT['FrmtInfoBuymedian'] = "  Sofortkauf-Median";
+		
+		_AUCT['FrmtInfoStacksize'] = "  Durchschnittliche Stapelgr\195\182\195\159e: %d St\195\188ck";
+		
+		_AUCT['FrmtUnknownLocale'] = "Die angegebene Sprache ('%s') ist unbekannt. Folgende Sprachen sind g\195\188ltig:";
+		_AUCT['FrmtUnknownRf']     = "Der angegebene Parameter ('%s') ist ung\195\188ltig. Der Parameter muss das Format: [Realm]-[Fraktion] haben. Zum Beispiel: Kil'Jaeden-Alliance";
+		_AUCT['FrmtUnknownArg']    = "'%s' ist kein g\195\188ltiges Argument f\195\188r '%s'";
+		
+		_AUCT['FrmtActRemove'] = "Entferne Aktionssignatur %s von dem derzeitigen AH-Abbild.";
+		
+		_AUCT['FrmtAuctinfoHist']     = "%d historisch";
+		_AUCT['FrmtAuctinfoSnap']     = "%d aus letztem Scan";
+		_AUCT['FrmtAuctinfoLow']      = "billigster Snapshot";
+		_AUCT['FrmtAuctinfoNolow']    = "Nicht im letzten Snapshot gesehn";
+		_AUCT['FrmtAuctinfoOrig']     = "Original-Gebot";
+		_AUCT['FrmtAuctinfoSugbuy']   = "Empf. Sofortkauf";
+		_AUCT['FrmtAuctinfoSugbid']   = "Empf. Gebot";
+		_AUCT['FrmtAuctinfoMktprice'] = "Marktpreis";
+		
+		_AUCT['FrmtWarnMarkup']   = "%s%% erh\195\182hter H\195\164ndlerpreis";
+		_AUCT['FrmtWarnUndercut'] = "Unterbiete um %s%%";
+		_AUCT['FrmtWarnNocomp']   = "Monopol";
+		_AUCT['FrmtWarnAbovemkt'] = "Konkurrenz keine Gefahr";
+		_AUCT['FrmtWarnToolow']   = "Konkurrenz zu g\195\188nstig";
+		_AUCT['FrmtWarnMyprice']  = "Verwende eigenen Preis";
+		_AUCT['FrmtWarnNodata']   = "Keine HVP-Daten";
+		
+		_AUCT['CmdOff']            = "off";
+		_AUCT['CmdOn']             = "on";
+		_AUCT['CmdAlt']            = "alt";
+		_AUCT['CmdCtrl']           = "ctrl";
+		_AUCT['CmdShift']          = "shift";
+		_AUCT['CmdToggle']         = "toggle";
+		_AUCT['CmdClear']          = "clear";
+		_AUCT['CmdClearAll']      = "all";
+		_AUCT['CmdClearSnapshot'] = "snapshot";
+		_AUCT['CmdAlso']           = "also";
+		_AUCT['CmdAlsoOpposite']  = "opposite";
+		_AUCT['CmdLocale']         = "locale";
+		
+		_AUCT['CmdBroker']            = "broker";
+		_AUCT['CmdBidbroker']         = "bidbroker";
+		_AUCT['CmdBidbrokerShort']   = "bb";
+		_AUCT['CmdEmbed']             = "embed";
+		_AUCT['CmdPercentless']       = "percentless";
+		_AUCT['CmdPercentlessShort'] = "pl";
+		_AUCT['CmdCompete']           = "compete";
+		_AUCT['CmdScan']              = "scan";
+		_AUCT['CmdAutofill']          = "autofill";
+		
+		_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
+		_AUCT['CmdPctMarkup']      = "pct-markup";
+		_AUCT['CmdPctMaxless']     = "pct-maxless";
+		_AUCT['CmdPctNocomp']      = "pct-nocomp";
+		_AUCT['CmdPctUnderlow']    = "pct-underlow";
+		_AUCT['CmdPctUndermkt']    = "pct-undermkt";
+		
+		_AUCT['OptClear']         = "([Gegenstand]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
+		_AUCT['OptAlso']          = "(Realm-Fraktion|".._AUCT['CmdAlsoOpposite']..")"
+		_AUCT['OptLocale']        = "<Sprache>";
+		_AUCT['OptBroker']        = "<Gewinn in Silber>";
+		_AUCT['OptBidbroker']     = "<Gewinn in Silber>";
+		_AUCT['OptPercentless']   = "<Prozent>";
+		_AUCT['OptCompete']       = "<Preisnachlass in Silber>";
+		_AUCT['OptScan']          = "";
+		_AUCT['OptScale']         = "<Skalierungsfaktor>";
+		_AUCT['OptScaleDefault'] = 1.0;
+		
+		_AUCT['OptPctBidmarkdown'] = "<Prozent>";
+		_AUCT['OptPctMarkup']      = "<Prozent>";
+		_AUCT['OptPctMaxless']     = "<Prozent>";
+		_AUCT['OptPctNocomp']      = "<Prozent>";
+		_AUCT['OptPctUnderlow']    = "<Prozent>";
+		_AUCT['OptPctUndermkt']    = "<Prozent>";
+		
+		_AUCT['OptPctBidmarkdownDefault'] = 20;
+		_AUCT['OptPctMarkupDefault']      = 300;
+		_AUCT['OptPctMaxlessDefault']     = 30;
+		_AUCT['OptPctNocompDefault']      = 2;
+		_AUCT['OptPctUnderlowDefault']    = 5;
+		_AUCT['OptPctUndermktDefault']    = 20;
+		
+		_AUCT['ShowVerbose']     = "show-verbose";
+		_AUCT['ShowAverage']     = "show-average";
+		_AUCT['ShowLink']        = "show-link";
+		_AUCT['ShowMedian']      = "show-median";
+		_AUCT['ShowStack']       = "show-stack";
+		_AUCT['ShowStats']       = "show-stats";
+		_AUCT['ShowSuggest']     = "show-suggest";
+		_AUCT['ShowUsage']       = "show-usage";
+		_AUCT['ShowVendor']      = "show-vendor";
+		_AUCT['ShowVendorBuy']  = "show-vendor-buy";
+		_AUCT['ShowVendorSell'] = "show-vendor-sell";
+		_AUCT['ShowEmbedBlank'] = "show-embed-blankline";
+		
+		_AUCT['HelpOnoff']           = "Schaltet die Anzeige der Auktionsdaten ein/aus.";
+		_AUCT['HelpVerbose']         = "Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
+		_AUCT['HelpAverage']         = "Schaltet die Anzeige des durchschnittlichen Auktionspreises ein/aus.";
+		_AUCT['HelpLink']            = "Schaltet die Anzeige der Link-ID im Tooltip ein/aus.";
+		_AUCT['HelpMedian']          = "Schaltet die Anzeige des Median-Sofortkaufpreises ein/aus.";
+		_AUCT['HelpSuggest']         = "Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
+		_AUCT['HelpStats']           = "Schaltet die Prozentanzeige der/des Gebote/Sofortkaufes ein/aus.";
+		_AUCT['HelpVendor']          = "Schaltet die Anzeige des H\195\164ndlerpreieses ein/aus.";
+		_AUCT['HelpVendorSell']     = "Schaltet die Anzeige des H\195\164ndlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+		_AUCT['HelpVendorBuy']      = "Schaltet die Anzeige des H\195\164ndlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+		_AUCT['HelpUsage']           = "Schaltet die Anzeige des Verwendungszweckes f\195\188r Handwerker ein/aus.";
+		_AUCT['HelpStack']           = "Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
+		_AUCT['HelpEmbedBlank']     = "Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
+		_AUCT['HelpClear']           = "L\195\182scht die Daten der angegebene Gegenst\195\164nde (Gegenst\195\164nde durch Shift+Linksklick dem Befehl hinzuf\195\188gen) Es k\195\182nnen auch die speziellen Keywords \"all\" und \"snapshot\" hinzugef\195\188gt werden.";
+		_AUCT['HelpAlso']            = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms f\195\188r Realm und den Namen der Faktion f\195\188r Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"opposite\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalit\195\164t.";
+		_AUCT['HelpLocale']          = "\195\132ndert die f\195\188r die Ausgabe der Auctioneer-Meldungen verwendete Sprache.";
+		_AUCT['HelpBroker']          = "Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, die per Sofortkauf gekauft und mit Gewinn wieder verkauft werden k\195\182nnen.";
+		_AUCT['HelpBidbroker']       = "Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans mit kurzer oder mittlerer Restlaufzeit an, die per Gebot ersteigert und mit Gewinn wieder verkauft werden k\195\182nnen.";
+		_AUCT['HelpEmbed']           = "Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
+		_AUCT['HelpPercentless']     = "Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, deren Sofortkaufpreis einen gewissen Prozentsatz unter dem h\195\182chstm\195\182glichen Verkaufspreis liegt.";
+		_AUCT['HelpCompete']         = "Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, deren Sofortkaufpreis geringer ist als der eines eigenen im AH angebotenen Gegenstandes.";
+		_AUCT['HelpScan']            = "F\195\188hrt einen Scan des Auktionshauses beim n\195\164chsten Besuch durch bzw. sofort, wenn man schon dort ist (es gibt ebenfalls einen Knopf im Auktionshausfenster). \195\156ber die Auswahlboxen k\195\182nnen die zu scannenden Kategorien gew\195\164hlt werden.";
+		_AUCT['HelpAutofill']        = "Gibt an, ob die Preise automatisch ausgef\195\188llt werden sollen, wenn ein Gegenstand ins Auktionshaus gelegt wird.";
+		_AUCT['HelpPctBidmarkdown'] = "Legt den Prozentsatz fest, um den das Mindestgebot niedriger als der Sofortkaufpreis ist.";
+		_AUCT['HelpPctMarkup']      = "Legt den Prozentsatz f\195\188r erh\195\182hte H\195\164ndlerpreise fest, der verwendet wird, falls sonst keine anderen Werte verf\195\188gbar sind.";
+		_AUCT['HelpPctMaxless']     = "Legt den maximalen Prozentsatz fest, um den der Marktpreis versucht wird zu verringern, bevor aufgegeben wird";
+		_AUCT['HelpPctNocomp']      = "Legt den Prozentsatz fest, um den der Marktpreis gesenkt wird, wenn kein konkurierendes Angebot existiert.";
+		_AUCT['HelpPctUnderlow']    = "Legt den Prozentsatz fest, um den das g\195\188nstigste konkurierende Angebot unterboten wird.";
+		_AUCT['HelpPctUndermkt']    = "Legt den Prozentsatz fest, um den der Marktpreis gesenkt wird, wenn durch den gew\195\164hlten Preozentsatz f\195\188r maxless ein konkurierendes Angebot nicht unterboten werden kann.";
+		
+		_AUCT['StatOn']  = "Anzeige der festgelegten Auktionsdaten";
+		_AUCT['StatOff'] = "Keine Anzeige der Auktionsdaten";
+		
+		_AUCT['FrmtActClearall']   = "L\195\182sche alle Auktionsdaten f\195\188r %s";
+		_AUCT['FrmtActClearsnap']  = "L\195\182sche aktuelles Auktionshaus-Abbild.";
+		_AUCT['FrmtActClearOk']   = "Daten f\195\188r %s wurden gel\195\182scht";
+		_AUCT['FrmtActClearFail'] = "Kann %s nicht finden";
+		_AUCT['FrmtActEnable']     = "Zeige Daten f\195\188r %s an";
+		_AUCT['FrmtActDisable']    = "Zeige keine Daten f\195\188r %s an";
+		_AUCT['FrmtActEnabledOn'] = "Zeige %s auf %s";
+		_AUCT['FrmtActSet']        = "Setze %s auf '%s'";
+		_AUCT['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
+		
+		_AUCT['TextScan']    = "Scannen";
+		_AUCT['TextAuction'] = "Auktion";
+		_AUCT['TextNone']    = "nichts";
+		_AUCT['TextUsage']   = "Syntax:";
+		
+		-- AH Scanning localizations
+		_AUCT['AuctionScanStart']    = "Auctioneer: Scanne %s Seite 1...";
+		_AUCT['AuctionPageN']        = "Auctioneer: Scanne %s Seite %d von %d";
+		_AUCT['AuctionScanDone']     = "Auctioneer: Scanvorgang abgeschlossen";
+		_AUCT['AuctionScanNexttime'] = "Auctioneer wird einen kompletten Auktionsscan durchf\195\188hren, wenn das n\195\164chste mal mit einem Auktionator gesprochen wird.";
+		_AUCT['AuctionScanNocat']    = "Es muss mindestens eine Kategorie ausgew\195\164hlt sein, um den Scanvorgang zu starten.";
+		_AUCT['AuctionTotalAucts']   = "Insgesammt gescannte Auktionen: %s";
+		_AUCT['AuctionNewAucts']     = "Davon neu: %s";
+		_AUCT['AuctionOldAucts']     = "Davon alt: %s";
+		_AUCT['AuctionDefunctAucts'] = "Abgelaufene Auktionen: %s";
+		_AUCT['AuctionDiscrepancies'] = "Unstimmigkeiten: %s";
+		
+		-- GUI localizations
+		_AUCT['GuiMainHelp']          = "Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
+		_AUCT['GuiMainEnable']        = "Enable Auctioneer";
+		_AUCT['GuiLocale']             = "Set locale to";
+		_AUCT['GuiVerbose']            = "Verbose Mode";
+		_AUCT['GuiStatsEnable']       = "Show Stats";
+		_AUCT['GuiStatsHeader']       = "Item Price Statistics";
+		_AUCT['GuiStatsHelp']         = "Show the following statistics in the tooltip.";
+		_AUCT['GuiAverages']           = "Show Averages";
+		_AUCT['GuiMedian']             = "Show Medians";
+		_AUCT['GuiSuggest']            = "Show Suggested Prices";
+		_AUCT['GuiVendorHeader']      = "Vendor Prices";
+		_AUCT['GuiVendorHelp']        = "Options related to NPC buy/sell prices.";
+		_AUCT['GuiVendor']             = "Show Vendor Prices";
+		_AUCT['GuiVendorBuy']         = "Show Vendor Buy Prices";
+		_AUCT['GuiVendorSell']        = "Show Vendor Sell Prices";
+		_AUCT['GuiEmbedHeader']       = "Embed";
+		_AUCT['GuiEmbed']              = "Embed info in in-game tooltip";
+		_AUCT['GuiEmbedBlankline']    = "Show blankline in in-game tooltip";
+		_AUCT['GuiClearHeader']       = "Clear Data";
+		_AUCT['GuiClearHelp']         = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
+		_AUCT['GuiClearall']           = "Clear All Auctioneer Data";
+		_AUCT['GuiClearallHelp']      = "Click here to clear all of auctioneer data for the current server-realm.";
+		_AUCT['GuiClearallNote']      = "for the current server-faction";
+		_AUCT['GuiClearallButton']    = "Clear All";
+		_AUCT['GuiClearsnap']          = "Clear Snapshot data";
+		_AUCT['GuiClearsnapHelp']     = "Click here to clear the last Auctioneer snapshot data.";
+		_AUCT['GuiClearsnapButton']   = "Clear Snapshot";
+		_AUCT['GuiPercentsHeader']    = "Auctioneer Threshold Percents";
+		_AUCT['GuiPercentsHelp']      = "WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
+		_AUCT['GuiBidmarkdown']        = "Bid Markdown Percent";
+		_AUCT['GuiMarkup']             = "Vendor Price Markup Percent";
+		_AUCT['GuiMaxless']            = "Max Market Undercut Percent";
+		_AUCT['GuiNocomp']             = "No Competition Undercut Percent";
+		_AUCT['GuiUnderlow']           = "Lowest Auction Undercut";
+		_AUCT['GuiUndermkt']           = "Undercut Market When Maxless";
+		_AUCT['GuiOtherHeader']       = "Other Options";
+		_AUCT['GuiOtherHelp']         = "Miscellaneous Auctioneer Options";
+		_AUCT['GuiAutofill']           = "Autofill prices in the AH";
+		_AUCT['GuiAlso']               = "Also display data for";
+		_AUCT['GuiAlsoOpposite']      = "Now also displaying data for opposite faction.";
+		_AUCT['GuiAlsoOff']           = "No longer displaying other realm-faction data.";
+		_AUCT['GuiAlsoDisplay']       = "Displaying data for %s";
+		_AUCT['GuiMesh']               = "Show Item Mesh";
+		_AUCT['GuiMeshOff']           = "No keyboard modifiers";
+		_AUCT['GuiMeshShift']         = "Shift key modifier";
+		_AUCT['GuiMeshCtrl']          = "Ctrl key modifier";
+		_AUCT['GuiMeshAlt']           = "Alt key modifier";
+		_AUCT['GuiMeshModifierHelp'] = "Select whether to require keyboard modifiers to show the item's mesh.\nIf turned on you will have to hold down the selected key to show the item's mesh in the tooltip.";
+		_AUCT['GuiLink']               = "Show LinkID";
+		_AUCT['GuiReloadui']           = "Reload User Interface";
+		_AUCT['GuiReloaduiHelp']      = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
+		_AUCT['GuiReloaduiButton']    = "ReloadUI";
+		_AUCT['GuiReloaduiFeedback']  = "Now Reloading the WoW UI";
 end
 
 -- Locale strings for the esES locale
 if locale == "esES" then
--- Encoded in UTF8
-
-AUCT_ADDIT_BUFF="Mejora";
-AUCT_ADDIT_DRINK="Bebida";
-AUCT_ADDIT_FIREWORK="Fuegos Artificiales";
-AUCT_ADDIT_FOOD="Comida";
-AUCT_ADDIT_GIFTWRAP="Envoltura";
-AUCT_ADDIT_LURE="Se\195\177uelo";
-AUCT_ADDIT_POISON="Veneno";
-AUCT_ADDIT_POTION="Poci\195\179n";
-AUCT_ADDIT_RESTORATIVE="Restaurativo";
-AUCT_ADDIT_SCROLL="Voluta";
-
-AUCT_SKILL_ALCHEMY="Alqu\195\173mia";
-AUCT_SKILL_BLACKSMITHING="Herrer\195\173a";
-AUCT_SKILL_COOKING="Cocinar";
-AUCT_SKILL_ENCHANTING="Encantar";
-AUCT_SKILL_ENGINEERING="Ingenier\195\173a";
-AUCT_SKILL_FIRSTAID="Primeros Auxilios";
-AUCT_SKILL_LEATHERWORKING="Peleter\195\173a";
-AUCT_SKILL_MINING="Miner\195\173a";
-AUCT_SKILL_TAILORING="Sastrer\195\173a";
-AUCT_SKILL_DRUID="Encantos de Druidas";
-AUCT_SKILL_MAGE="Encantos de Magos";
-AUCT_SKILL_PALADIN="Encantos de Paladines";
-AUCT_SKILL_PRIEST="Encantos de Sacerdotes";
-AUCT_SKILL_ROGUE="Encantos de P\195\173caros";
-AUCT_SKILL_SHAMAN="Encantos de Chamanes";
-AUCT_SKILL_WARLOCK="Encantos de Brujos";
-
-AUCT_TIME_SHORT="Corto";
-AUCT_TIME_MED="Mediano";
-AUCT_TIME_LONG="Largo";
-AUCT_TIME_VLONG="Muy Largo";
-
-AUCT_FRMT_WELCOME="Auctioneer versi\195\179n %s cargado";
-
-AUCT_FRMT_BROKER_HEADER="Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
-AUCT_FRMT_BROKER_LINE="%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE="Corredor finalizado";
-AUCT_FRMT_BIDBROKER_HEADER="Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
-AUCT_FRMT_BIDBROKER_MINBID="OfertaMinima"
-AUCT_FRMT_BIDBROKER_CURBID="OfertaCorriente"
-AUCT_FRMT_BIDBROKER_LINE="%s, Ultimo(s) %s visto(s), PMV: %s, %s: %s, Ganancia: %s, Tiempo: %s";
-AUCT_FRMT_BIDBROKER_DONE="Corredor de ofertas finalizado";
-AUCT_FRMT_PCTLESS_HEADER="Porcentaje bajo el Precio Maximo Vendible (PMV): %d%%";
-AUCT_FRMT_PCTLESS_LINE="%s, Ultimo(s) %d visto(s), PMV: %s, OC: %s, Ganancia: %s, menos %s";
-AUCT_FRMT_PCTLESS_DONE="Porcentajes menores finalizado.";
-AUCT_FRMT_COMPETE_HEADER="Subastas compitiendo por al menos %s debajo por art\195\173culo.";
-AUCT_FRMT_COMPETE_LINE="%s, Oferta: %s, OC %s vs %s, %s menos";
-AUCT_FRMT_COMPETE_DONE="Subastas compitiendo finalizado.";
-AUCT_FRMT_NOAUCT="No se hallaron subastas para el art\195\173culo: %s";
-AUCT_FRMT_MEDIAN_LINE="De los \195\186ltimos(s) %d vistos, OC mediano por 1 %s es: %s";
-AUCT_FRMT_LOW_LINE="%s, BO: %s, Vendedor: %s, Por uno: %s, Menos que el mediano: %s";
-AUCT_FRMT_HSP_LINE="Precio Maximo Vendible por uno %s es: %s";
-
-AUCT_FRMT_INFO_SEEN="Visto un total de %d veces en subasta";
-AUCT_FRMT_INFO_FORONE="Por 1: %s min/%s OC (%s oferta) [en %d's]";
-AUCT_FRMT_INFO_AVERAGE="%s min/%s OC (%s oferta)"
-AUCT_FRMT_INFO_HISTMED="\195\154ltimo(s) %d, OC mediano (c/u)";
-AUCT_FRMT_INFO_SNAPMED="Explorados %d, OC mediano (c/u)";
-AUCT_FRMT_INFO_SGSTSTX="Precio sugerido para su lote de %d: %s min/%s OC";
-AUCT_FRMT_INFO_SGST="Precio sugerido: %s min/%s OC";
-
-AUCT_FRMT_INFO_BIDRATE="%d%% tienen ofertas, %d%% tienen OC";
-AUCT_FRMT_INFO_NEVER="Nunca visto en %s";
-AUCT_FRMT_INFO_ALSOSEEN="Visto %d veces en %s";
-AUCT_FRMT_INFO_CLASSUSE="Clase: %s usado para %s";
-AUCT_FRMT_INFO_CLASS="Clase: %s";
-AUCT_FRMT_INFO_USE="Usado para: %s";
-AUCT_FRMT_INFO_BUY="Compra%s del vendedor";
-AUCT_FRMT_INFO_SELL="Vende%s al vendedor";
-AUCT_FRMT_INFO_BUYMULT="Compra %s %d (%s c/u)";
-AUCT_FRMT_INFO_SELLMULT="Vende %s %d (%s c/u)";
-AUCT_FRMT_INFO_STX="Amontonable en lotes de art\195\173culos %d por paquete";
-
-AUCT_FRMT_INFO_HEAD_MULTI="Promedios para %d art\195\173culos:";
-AUCT_FRMT_INFO_MIN_MULTI="  Oferta a empezar (%s c/u)";
-AUCT_FRMT_INFO_BID_MULTI="  Oferta (%s%s c/u)";
-AUCT_FRMT_INFO_BUY_MULTI="  Opci\195\179n a compra(%s%s c/u)";
-
-AUCT_FRMT_INFO_HEAD_ONE="Promedios para este art\195\173culo:";
-AUCT_FRMT_INFO_MIN_ONE="  Oferta a empezar";
-AUCT_FRMT_INFO_BID_ONE=" %s con propuestas";
-AUCT_FRMT_INFO_BUY_ONE=" %s con opci\195\179n a compra";
-
-AUCT_FRMT_INFO_BUYMEDIAN="  Opci\195\179n a compra mediano";
-
-AUCT_FRMT_INFO_STACKSIZE="  Tama\195\177o promedio del paquete: %d art\195\173culos";
-
-AUCT_FRMT_UNKNOWN_LOCALE="La localizaci\195\179n que usted especifico ('%s') no es valida. Locales v\195\161lidos son:"; 
-AUCT_FRMT_UNKNOWN_RF="Parametro inv\195\161lido ('%s'). El par\195\161metro debe de estar en la forma de: [reino]-[facci\195\179n]. Por ejemplo: Al'Akir-Horde";
-AUCT_FRMT_UNKNOWN_ARG="'%s' no es un argumento valido de '%s'";
-
-AUCT_FRMT_ACT_REMOVE="Eliminando firma %s de la imagen actual de la casa de subastas.";
-
-AUCT_FRMT_AUCTINFO_HIST="%d Hist\195\179ricamente";
-AUCT_FRMT_AUCTINFO_SNAP="%d en la \195\186ltima exploraci\195\179n";
-AUCT_FRMT_AUCTINFO_LOW="M\195\173nimo de la \195\186ltima exploraci\195\179n";
-AUCT_FRMT_AUCTINFO_NOLOW="Art\195\173culo no fue visto en ultima imagen";
-AUCT_FRMT_AUCTINFO_ORIG="Oferta Original";
-AUCT_FRMT_AUCTINFO_SUGBUY="Opci\195\179n a compra sugerida";
-AUCT_FRMT_AUCTINFO_SUGBID="Oferta sugerida";
-AUCT_FRMT_AUCTINFO_MKTPRICE="Precio del mercado";
-
-AUCT_FRMT_WARN_MARKUP="Superando vendedor por %s%%";
-AUCT_FRMT_WARN_UNDERCUT="Socavando por %s%%";
-AUCT_FRMT_WARN_NOCOMP="Sin competencia";
-AUCT_FRMT_WARN_ABOVEMKT="Competencia sobre mercado";
-AUCT_FRMT_WARN_TOOLOW="Imposible igualar minimo";
-AUCT_FRMT_WARN_MYPRICE="Usando mi precio actual";
-AUCT_FRMT_WARN_NODATA="Sin informaci\195\179n para PMV";
-
-AUCT_CMD_OFF="apagado";
-AUCT_CMD_ON="prendido";
-AUCT_CMD_TOGGLE="invertir";
-AUCT_CMD_CLEAR="despejado";
-AUCT_CMD_CLEAR_ALL="todo";
-AUCT_CMD_CLEAR_SNAPSHOT="imagen";
-AUCT_CMD_ALSO="tambien";
-AUCT_CMD_ALSO_OPPOSITE="opuesta";
-AUCT_CMD_LOCALE="localidad";
-AUCT_CMD_DEFAULT="original";
-
-AUCT_CMD_BROKER="corredor";
-AUCT_CMD_BIDBROKER="corredorofertas";
-AUCT_CMD_BIDBROKER_SHORT="co";
-AUCT_CMD_EMBED="integrado";
-AUCT_CMD_PERCENTLESS="porcientomenos";
-AUCT_CMD_PERCENTLESS_SHORT="pm";
-AUCT_CMD_COMPETE="competir";
-AUCT_CMD_SCAN="explorar";
-AUCT_CMD_AUTOFILL="autoinsertar";
-
-AUCT_CMD_PCT_BIDMARKDOWN="pct-menosoferta";
-AUCT_CMD_PCT_MARKUP="pct-mas";
-AUCT_CMD_PCT_MAXLESS="pct-sinmaximo";
-AUCT_CMD_PCT_NOCOMP="pct-sincomp";
-AUCT_CMD_PCT_UNDERLOW="pct-bajomenor";
-AUCT_CMD_PCT_UNDERMKT="pct-bajomercado";
-
-AUCT_OPT_CLEAR="([Art\195\173culo]|"..AUCT_CMD_CLEAR_ALL.."|"..AUCT_CMD_CLEAR_SNAPSHOT..")";
-AUCT_OPT_ALSO="(reino-facci\195\179n|"..AUCT_CMD_ALSO_OPPOSITE..")"
-AUCT_OPT_LOCALE="<localidad>";
-AUCT_OPT_BROKER="<ganancia_plata>";
-AUCT_OPT_BIDBROKER="<ganancia_plata>";
-AUCT_OPT_PERCENTLESS="<porciento>";
-AUCT_OPT_COMPETE="<plata_menos>";
-AUCT_OPT_SCALE="<escala>";
-
-AUCT_OPT_PCT_BIDMARKDOWN="<porciento>";
-AUCT_OPT_PCT_MARKUP="<porciento>";
-AUCT_OPT_PCT_MAXLESS="<porciento>";
-AUCT_OPT_PCT_NOCOMP="<porciento>";
-AUCT_OPT_PCT_UNDERLOW="<porciento>";
-AUCT_OPT_PCT_UNDERMKT="<porciento>";
-
-
-AUCT_SHOW_VERBOSE="ver-literal";
-AUCT_SHOW_AVERAGE="ver-promedio";
-AUCT_SHOW_LINK="ver-enlace";
-AUCT_SHOW_MEDIAN="ver-mediano";
-AUCT_SHOW_STACK="ver-paquete";
-AUCT_SHOW_STATS="ver-estadisticas";
-AUCT_SHOW_SUGGEST="ver-sugerencia";
-AUCT_SHOW_USAGE="ver-uso";
-AUCT_SHOW_VENDOR="ver-vendedor";
-AUCT_SHOW_VENDOR_BUY="ver-vendedor-compra";
-AUCT_SHOW_VENDOR_SELL="ver-vendedor-venta";
-AUCT_SHOW_EMBED_BLANK="ver-integrado-lineavacia";
-AUCT_SHOW_REDO="ver-advertencia";
-
-AUCT_HELP_ONOFF="Enciande o apaga la informacion sobre las subastas";
-AUCT_HELP_VERBOSE="Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
-AUCT_HELP_AVERAGE="Selecciona para mostrar precio promedio de la subasta para el art\195\173culo";
-AUCT_HELP_LINK="Selecciona para mostrar el numero de enlace del art\195\173culo en la caja de ayuda";
-AUCT_HELP_MEDIAN="Selecciona para mostrar el precio promedio para la opci\195\179n a compra";
-AUCT_HELP_SUGGEST="Selecciona para mostrar el precio sugerido de subasta para el art\195\173culo";
-AUCT_HELP_STATS="Selecciona para mostrar porcentajes para ofertas/opci\195\179n a compra del art\195\173culo";
-AUCT_HELP_VENDOR="Selecciona para mostrar precios de vendedor para el art\195\173culo";
-AUCT_HELP_VENDOR_SELL="Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
-AUCT_HELP_VENDOR_BUY="Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
-AUCT_HELP_USAGE="Selecciona para mostrar uso del art\195\173culo en profesiones";
-AUCT_HELP_STACK="Selecciona para mostrar tama\195\177o maximo del paquete";
-AUCT_HELP_EMBED_BLANK="Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-AUCT_HELP_CLEAR="Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
-AUCT_HELP_ALSO="Mostrar tambi\195\169n los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facci\195\179n escribe el nombre de la facci\195\179n. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facci\195\179n opuesta, \"apagar\" desabilita la funci\195\179n.";
-AUCT_HELP_LOCALE="Cambiar la localidad que Auctioneer usa para sus mensajes";
-AUCT_HELP_BROKER="Muestra las subastas de la exploraci\195\179n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
-AUCT_HELP_BIDBROKER="Muestra subastas de corto o medio termino de la exploraci\195\179n mas reciente a las cuales se puede poner una oferta y obtener ganancia";
-AUCT_HELP_EMBED="Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
-AUCT_HELP_PERCENTLESS="Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio vendible mas alto.";
-AUCT_HELP_COMPETE="Muestra cualquier subasta explorada recientemente cuya opci\195\179n a compra es menor que alguno de tus art\195\173culos";
-AUCT_HELP_SCAN="Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un bot\195\179n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
-AUCT_HELP_AUTOFILL="Auto-completar precios cuando se a\195\177adan art\195\173culos a subastar en el panel de la casa de subastas";
-AUCT_HELP_PCT_BIDMARKDOWN="Ajusta el porcentaje del precio de compra por debajo del cual Auctioneer marcara las ofertas";
-AUCT_HELP_PCT_MARKUP="El porcentaje que sera incrementado el precio de venta del vendedor cuando no existan otros valores disponibles.";
-AUCT_HELP_PCT_MAXLESS="Ajusta el maximo porcentaje por debajo del valor de mercado que Auctioneer tratara de igualar antes de darse por vencido.";
-AUCT_HELP_PCT_NOCOMP="El porcentaje bajo el precio del mercado que Auctioneer usar\195\161 cuando no hay competencia";
-AUCT_HELP_PCT_UNDERLOW="Ajusta el porcentaje bajo el menor precio m\195\173nimo de subasta que Auctioneer aplicar\195\161";
-AUCT_HELP_PCT_UNDERMKT="Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
-AUCT_HELP_REDO="Selecciona para mostrat una advertencia cuando la p\195\161gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
-
-AUCT_STAT_ON="Mostrando la configuracion corriente para la informacion de subastas";
-AUCT_STAT_OFF="Ocultando toda la informacion de subastas";
-
-AUCT_FRMT_ACT_CLEARALL="Eliminando toda la informaci\195\179n de subastas para %s";
-AUCT_FRMT_ACT_CLEARSNAP="Eliminando la imagen actual de la casa de subastas.";
-AUCT_FRMT_ACT_CLEAR_OK="Informacion eliminada para el art\195\173culo: %s";
-AUCT_FRMT_ACT_CLEAR_FAIL="Imposible encontrar art\195\173culo: %s";
-AUCT_FRMT_ACT_ENABLE="Mostrando informacion del art\195\173culo: %s ";
-AUCT_FRMT_ACT_DISABLE="Ocultando informacion de articulo: %s ";
-AUCT_FRMT_ACT_ENABLED_ON="Mostrando %s de los art\195\173culos usando %s";
-AUCT_FRMT_ACT_SET="%s ajustado(a) a '%s'";
-AUCT_FRMT_ACT_UNKNOWN="Comando o palabra clave desconocida: '%s'";
-AUCT_FRMT_ACT_DEFAULTALL="Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
-AUCT_FRMT_ACT_DEFAULT="La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
-
-AUCT_TEXT_SCAN="Explorar";
-AUCT_TEXT_AUCTION="Subasta";
-AUCT_TEXT_NONE="ningun";
-AUCT_TEXT_USAGE="Uso:";
-
--- AH Scanning localizations
-
-AUCTIONEER_AUCTION_SCAN_START="Auctioneer: Explorando \"%s\" p\195\161gina 1...";
-AUCTIONEER_AUCTION_PAGE_N="Auctioneer: Explorando \"%s\" p\195\161gina %d de %d";
-AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: La exploraci\195\179n de las subastas ha finalizado";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
-AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccionada para poder explorar.";
-AUCTIONEER_AUCTION_SCAN_REDO="La p\195\161gina corriente ha tomado mas de %d segundos para completar. Tratando p\195\161gina otra vez.";
-
-AUCT_MESG_CONVERT="Conversi\195\179n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
-AUCT_MESG_NOTCONVERTING="Auctioneer no convertir\195\161 su base de datos, pero no funcionar\195\161 hasta que la base de datos sea convertida.";
-AUCT_MESG_CONVERT_YES="Convertir";
-AUCT_MESG_CONVERT_NO="Deshabilitar Auctioneer";
-
-AUCTIONEER_AUCTION_TOTAL_AUCTS="Total de subastas exploradas: %s";
-AUCTIONEER_AUCTION_NEW_AUCTS="Nuevas subastas exploradas: %s";
-AUCTIONEER_AUCTION_OLD_AUCTS="Subastas exploradas previamente: %s";
-AUCTIONEER_AUCTION_DEFUNCT_AUCTS="Subastas viejas removidas: %s";
-AUCTIONEER_AUCTION_DISCREPANCIES="Discrepancias: %s";
-
--- GUI localizations
-
-AUCTIONEER_GUI_MAIN_HELP="Contiene ajustes para Auctioneer \nun aditamento que muestra informacion sobre art\195\173culos y analiza informaci\195\179n de subastas. \nSeleccione \"Explorar\" en la casa de subastas para coleccionar informacion sobre las subastas.";
-AUCTIONEER_GUI_MAIN_ENABLE="Encender Auctioneer";
-AUCTIONEER_GUI_LOCALE="Ajustar localidad a";
-AUCTIONEER_GUI_VERBOSE="Modo literal";
-AUCTIONEER_GUI_STATS_ENABLE="Ver estad\195\173sticas";
-AUCTIONEER_GUI_STATS_HEADER="Estad\195\173sticas de precios de art\195\173culos";
-AUCTIONEER_GUI_STATS_HELP="Mostrar las siguientes estad\195\173sticas en la caja de ayuda.";
-AUCTIONEER_GUI_AVERAGES="Mostrar Promedios";
-AUCTIONEER_GUI_MEDIAN="Mostrar Medianos";
-AUCTIONEER_GUI_SUGGEST="Mostrar Precios Sugeridos";
-AUCTIONEER_GUI_VENDOR_HEADER="Precios de Vendedor";
-AUCTIONEER_GUI_VENDOR_HELP="Opciones relacionadas a precios de compra/venta a vendedores";
-AUCTIONEER_GUI_VENDOR="Mostrar Precios a Vendedores";
-AUCTIONEER_GUI_VENDOR_BUY="Mostrar precios de compra a vendedores";
-AUCTIONEER_GUI_VENDOR_SELL="Mostrar precios de venta a vendedores";
-AUCTIONEER_GUI_EMBED_HEADER="Integraci\195\179n";
-AUCTIONEER_GUI_EMBED="Integrar informaci\195\179n en la caja de ayuda";
-AUCTIONEER_GUI_EMBED_BLANKLINE="Mostrar linea en blanco.";
-AUCTIONEER_GUI_CLEAR_HEADER="Eliminar Informaci\195\179n";
-AUCTIONEER_GUI_CLEAR_HELP="Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la informaci\195\179n o solamente la im\195\161gen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
-AUCTIONEER_GUI_CLEARALL="Eliminar toda la informaci\195\179n";
-AUCTIONEER_GUI_CLEARALL_HELP="Seleccione aqui para eliminar toda la informaci\195\179n de Auctioneer para el reino-facci\195\179n corriente.";
-AUCTIONEER_GUI_CLEARALL_NOTE="el reino-facci\195\179n corriente.";
-AUCTIONEER_GUI_CLEARALL_BUTTON="Eliminar Todo";
-AUCTIONEER_GUI_CLEARSNAP="Eliminar imagen corriente";
-AUCTIONEER_GUI_CLEARSNAP_HELP="Presione aqui para eliminar la ultima imagen de informacion de Auctioneer.";
-AUCTIONEER_GUI_CLEARSNAP_BUTTON="Eliminar Imagen";
-AUCTIONEER_GUI_PERCENTS_HEADER="Limites de Porcentajes de Auctioneer";
-AUCTIONEER_GUI_PERCENTS_HELP="ADVERTENCIA: Las siguientes opciones son para usuarios expertos SOLAMENTE.\nAjuste los siguientes valores para cambiar cuan agresivo es Auctioneer al determinar niveles provechosos.";
-AUCTIONEER_GUI_BIDMARKDOWN="Porciento menos oferta";
-AUCTIONEER_GUI_MARKUP="Porciento sobre vendedor";
-AUCTIONEER_GUI_MAXLESS="Porciento m\195\161ximo bajo mercado";
-AUCTIONEER_GUI_NOCOMP="Porciento sin competencia.";
-AUCTIONEER_GUI_UNDERLOW="Porciento bajo menor subasta";
-AUCTIONEER_GUI_UNDERMKT="Porciento bajo mercado";
-AUCTIONEER_GUI_OTHER_HEADER="Otras Opciones";
-AUCTIONEER_GUI_OTHER_HELP="Opciones miscel\195\161neas de Auctioneer";
-AUCTIONEER_GUI_AUTOFILL="Autocompletar precios en la casa de subastas";
-AUCTIONEER_GUI_ALSO="Tambi\195\169n mostrar valores para";
-AUCTIONEER_GUI_ALSO_OPPOSITE="Mostrando informaci\195\179n para la facci\195\179n opuesta.";
-AUCTIONEER_GUI_ALSO_OFF="No mostrando informaci\195\179n para otro reino-facci\195\179n";
-AUCTIONEER_GUI_ALSO_DISPLAY="Mostrando informaci\195\179n para %s";
-AUCTIONEER_GUI_MESH="Ver im\195\161gen de art\195\173culo";
-AUCTIONEER_GUI_MESH_OFF="Ning\195\186n modificador de teclado";
-AUCTIONEER_GUI_MESH_SHIFT="Usar tecla de Shift";
-AUCTIONEER_GUI_MESH_CTRL="Usar tecla de Ctrl";
-AUCTIONEER_GUI_MESH_ALT="Usar tecla de Alt";
-AUCTIONEER_GUI_MESH_MODIFIER_HELP="Seleccionar si desea usar una tecla del teclado como requisito para ver la im\195\161gen de un art\195\173culo.\nSi esta opci\195\179n es encendida usted tendra que apretar la tecla para ver la im\195\161gen del art\195\173culo en la caja de ayuda.";
-AUCTIONEER_GUI_LINK="Ver numero de enlace";
-AUCTIONEER_GUI_RELOADUI="Recargar Interf\195\161z";
-AUCTIONEER_GUI_RELOADUI_HELP="Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
-AUCTIONEER_GUI_RELOADUI_BUTTON="Recargar";
-AUCTIONEER_GUI_RELOADUI_FEEDBACK="Recargando el Interf\195\161z de WoW";
-
--- The following definitions are missing in this locale:
---	AUCT_ADDIT_ALCOHOL = "";
---	AUCT_CMD_ALT = "";
---	AUCT_CMD_CTRL = "";
---	AUCT_CMD_SHIFT = "";
---	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
---	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
---	AUCT_OPT_PCT_MAXLESS_DEFAULT = "";
---	AUCT_OPT_PCT_NOCOMP_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERLOW_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERMKT_DEFAULT = "";
---	AUCT_OPT_SCALE_DEFAULT = "";
---	AUCT_OPT_SCAN = "";
+		-- Encoded in UTF8
+		
+		_AUCT['AdditAlcohol'] = "Alcohol";
+		_AUCT['AdditBuff'] = "Mejora";
+		_AUCT['AdditDrink'] = "Bebida";
+		_AUCT['AdditFirework'] = "Fuegos Artificiales";
+		_AUCT['AdditFood'] = "Comida";
+		_AUCT['AdditGiftwrap'] = "Envoltura";
+		_AUCT['AdditLure'] = "Se\195\177uelo";
+		_AUCT['AdditPoison'] = "Veneno";
+		_AUCT['AdditPotion'] = "Poci\195\179n";
+		_AUCT['AdditRestorative'] = "Restaurativo";
+		_AUCT['AdditScroll'] = "Voluta";
+		
+		_AUCT['SkillAlchemy'] = "Alqu\195\173mia";
+		_AUCT['SkillBlacksmithing'] = "Herrer\195\173a";
+		_AUCT['SkillCooking'] = "Cocinar";
+		_AUCT['SkillEnchanting'] = "Encantar";
+		_AUCT['SkillEngineering'] = "Ingenier\195\173a";
+		_AUCT['SkillFirstaid'] = "Primeros Auxilios";
+		_AUCT['SkillLeatherworking'] = "Peleter\195\173a";
+		_AUCT['SkillMining'] = "Miner\195\173a";
+		_AUCT['SkillTailoring'] = "Sastrer\195\173a";
+		_AUCT['SkillDruid'] = "Encantos de Druidas";
+		_AUCT['SkillMage'] = "Encantos de Magos";
+		_AUCT['SkillPaladin'] = "Encantos de Paladines";
+		_AUCT['SkillPriest'] = "Encantos de Sacerdotes";
+		_AUCT['SkillRogue'] = "Encantos de P\195\173caros";
+		_AUCT['SkillShaman'] = "Encantos de Chamanes";
+		_AUCT['SkillWarlock'] = "Encantos de Brujos";
+		
+		_AUCT['TimeShort'] = "Corto";
+		_AUCT['TimeMed'] = "Mediano";
+		_AUCT['TimeLong'] = "Largo";
+		_AUCT['TimeVlong'] = "Muy Largo";
+		
+		_AUCT['FrmtWelcome'] = "Auctioneer versi\195\179n %s cargado";
+		
+		_AUCT['FrmtBrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
+		_AUCT['FrmtBrokerLine'] = "%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
+		_AUCT['FrmtBrokerDone'] = "Corredor finalizado";
+		_AUCT['FrmtBidbrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
+		_AUCT['FrmtBidbrokerMinbid'] = "OfertaMinima"
+		_AUCT['FrmtBidbrokerCurbid'] = "OfertaCorriente"
+		_AUCT['FrmtBidbrokerLine'] = "%s, Ultimo(s) %s visto(s), PMV: %s, %s: %s, Ganancia: %s, Tiempo: %s";
+		_AUCT['FrmtBidbrokerDone'] = "Corredor de ofertas finalizado";
+		_AUCT['FrmtPctlessHeader'] = "Porcentaje bajo el Precio Maximo Vendible (PMV): %d%%";
+		_AUCT['FrmtPctlessLine'] = "%s, Ultimo(s) %d visto(s), PMV: %s, OC: %s, Ganancia: %s, menos %s";
+		_AUCT['FrmtPctlessDone'] = "Porcentajes menores finalizado.";
+		_AUCT['FrmtCompeteHeader'] = "Subastas compitiendo por al menos %s debajo por art\195\173culo.";
+		_AUCT['FrmtCompeteLine'] = "%s, Oferta: %s, OC %s vs %s, %s menos";
+		_AUCT['FrmtCompeteDone'] = "Subastas compitiendo finalizado.";
+		_AUCT['FrmtNoauct'] = "No se hallaron subastas para el art\195\173culo: %s";
+		_AUCT['FrmtMedianLine'] = "De los \195\186ltimos(s) %d vistos, OC mediano por 1 %s es: %s";
+		_AUCT['FrmtLowLine'] = "%s, BO: %s, Vendedor: %s, Por uno: %s, Menos que el mediano: %s";
+		_AUCT['FrmtHspLine'] = "Precio Maximo Vendible por uno %s es: %s";
+		
+		_AUCT['FrmtInfoSeen'] = "Visto un total de %d veces en subasta";
+		_AUCT['FrmtInfoForone'] = "Por 1: %s min/%s OC (%s oferta) [en %d's]";
+		_AUCT['FrmtInfoAverage'] = "%s min/%s OC (%s oferta)"
+		_AUCT['FrmtInfoHistmed'] = "\195\154ltimo(s) %d, OC mediano (c/u)";
+		_AUCT['FrmtInfoSnapmed'] = "Explorados %d, OC mediano (c/u)";
+		_AUCT['FrmtInfoSgststx'] = "Precio sugerido para su lote de %d: %s min/%s OC";
+		_AUCT['FrmtInfoSgst'] = "Precio sugerido: %s min/%s OC";
+		
+		_AUCT['FrmtInfoBidrate'] = "%d%% tienen ofertas, %d%% tienen OC";
+		_AUCT['FrmtInfoNever'] = "Nunca visto en %s";
+		_AUCT['FrmtInfoAlsoseen'] = "Visto %d veces en %s";
+		_AUCT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
+		_AUCT['FrmtInfoClass'] = "Clase: %s";
+		_AUCT['FrmtInfoUse'] = "Usado para: %s";
+		_AUCT['FrmtInfoBuy'] = "Compra%s del vendedor";
+		_AUCT['FrmtInfoSell'] = "Vende%s al vendedor";
+		_AUCT['FrmtInfoBuymult'] = "Compra %s %d (%s c/u)";
+		_AUCT['FrmtInfoSellmult'] = "Vende %s %d (%s c/u)";
+		_AUCT['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
+		
+		_AUCT['FrmtInfoHeadMulti'] = "Promedios para %d art\195\173culos:";
+		_AUCT['FrmtInfoMinMulti'] = "  Oferta a empezar (%s c/u)";
+		_AUCT['FrmtInfoBidMulti'] = "  Oferta (%s%s c/u)";
+		_AUCT['FrmtInfoBuyMulti'] = "  Opci\195\179n a compra(%s%s c/u)";
+		
+		_AUCT['FrmtInfoHeadOne'] = "Promedios para este art\195\173culo:";
+		_AUCT['FrmtInfoMinOne'] = "  Oferta a empezar";
+		_AUCT['FrmtInfoBidOne'] = " %s con propuestas";
+		_AUCT['FrmtInfoBuyOne'] = " %s con opci\195\179n a compra";
+		
+		_AUCT['FrmtInfoBuymedian'] = "  Opci\195\179n a compra mediano";
+		
+		_AUCT['FrmtInfoStacksize'] = "  Tama\195\177o promedio del paquete: %d art\195\173culos";
+		
+		_AUCT['FrmtUnknownLocale'] = "La localizaci\195\179n que usted especifico ('%s') no es valida. Locales v\195\161lidos son:"; 
+		_AUCT['FrmtUnknownRf']     = "Parametro inv\195\161lido ('%s'). El par\195\161metro debe de estar en la forma de: [reino]-[facci\195\179n]. Por ejemplo: Al'Akir-Horde";
+		_AUCT['FrmtUnknownArg']    = "'%s' no es un argumento valido de '%s'";
+		
+		_AUCT['FrmtActRemove'] = "Eliminando firma %s de la imagen actual de la casa de subastas.";
+		
+		_AUCT['FrmtAuctinfoHist'] = "%d Hist\195\179ricamente";
+		_AUCT['FrmtAuctinfoSnap'] = "%d en la \195\186ltima exploraci\195\179n";
+		_AUCT['FrmtAuctinfoLow'] = "M\195\173nimo de la \195\186ltima exploraci\195\179n";
+		_AUCT['FrmtAuctinfoNolow'] = "Art\195\173culo no fue visto en ultima imagen";
+		_AUCT['FrmtAuctinfoOrig'] = "Oferta Original";
+		_AUCT['FrmtAuctinfoSugbuy'] = "Opci\195\179n a compra sugerida";
+		_AUCT['FrmtAuctinfoSugbid'] = "Oferta sugerida";
+		_AUCT['FrmtAuctinfoMktprice'] = "Precio del mercado";
+		
+		_AUCT['FrmtWarnMarkup'] = "Superando vendedor por %s%%";
+		_AUCT['FrmtWarnUndercut'] = "Socavando por %s%%";
+		_AUCT['FrmtWarnNocomp'] = "Sin competencia";
+		_AUCT['FrmtWarnAbovemkt'] = "Competencia sobre mercado";
+		_AUCT['FrmtWarnToolow'] = "Imposible igualar minimo";
+		_AUCT['FrmtWarnMyprice'] = "Usando mi precio actual";
+		_AUCT['FrmtWarnNodata'] = "Sin informaci\195\179n para PMV";
+		
+		_AUCT['CmdOff'] = "apagado";
+		_AUCT['CmdOn'] = "prendido";
+		_AUCT['CmdAlt'] = "alt";
+		_AUCT['CmdCtrl'] = "ctrl";
+		_AUCT['CmdShift'] = "shift";
+		_AUCT['CmdToggle'] = "invertir";
+		_AUCT['CmdClear'] = "despejado";
+		_AUCT['CmdClearAll'] = "todo";
+		_AUCT['CmdClearSnapshot'] = "imagen";
+		_AUCT['CmdAlso'] = "tambien";
+		_AUCT['CmdAlsoOpposite'] = "opuesta";
+		_AUCT['CmdLocale'] = "localidad";
+		_AUCT['CmdDefault'] = "original";
+		
+		_AUCT['CmdBroker'] = "corredor";
+		_AUCT['CmdBidbroker'] = "corredorofertas";
+		_AUCT['CmdBidbrokerShort'] = "co";
+		_AUCT['CmdEmbed'] = "integrado";
+		_AUCT['CmdPercentless'] = "porcientomenos";
+		_AUCT['CmdPercentlessShort'] = "pm";
+		_AUCT['CmdCompete'] = "competir";
+		_AUCT['CmdScan'] = "explorar";
+		_AUCT['CmdAutofill'] = "autoinsertar";
+		
+		_AUCT['CmdPctBidmarkdown'] = "pct-menosoferta";
+		_AUCT['CmdPctMarkup']      = "pct-mas";
+		_AUCT['CmdPctMaxless']     = "pct-sinmaximo";
+		_AUCT['CmdPctNocomp']      = "pct-sincomp";
+		_AUCT['CmdPctUnderlow']    = "pct-bajomenor";
+		_AUCT['CmdPctUndermkt']    = "pct-bajomercado";
+		
+		_AUCT['OptClear'] = "([Art\195\173culo]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
+		_AUCT['OptAlso'] = "(reino-facci\195\179n|".._AUCT['CmdAlsoOpposite']..")"
+		_AUCT['OptLocale'] = "<localidad>";
+		_AUCT['OptBroker'] = "<ganancia_plata>";
+		_AUCT['OptBidbroker'] = "<ganancia_plata>";
+		_AUCT['OptPercentless'] = "<porciento>";
+		_AUCT['OptCompete'] = "<plata_menos>";
+		_AUCT['OptScan'] = "";
+		_AUCT['OptScale'] = "<escala>";
+		_AUCT['OptScaleDefault'] = 1.0;
+		
+		_AUCT['OptPctBidmarkdown'] = "<porciento>";
+		_AUCT['OptPctMarkup'] = "<porciento>";
+		_AUCT['OptPctMaxless'] = "<porciento>";
+		_AUCT['OptPctNocomp'] = "<porciento>";
+		_AUCT['OptPctUnderlow'] = "<porciento>";
+		_AUCT['OptPctUndermkt'] = "<porciento>";
+		
+		_AUCT['OptPctBidmarkdownDefault'] = 20;
+		_AUCT['OptPctMarkupDefault'] = 300;
+		_AUCT['OptPctMaxlessDefault'] = 30;
+		_AUCT['OptPctNocompDefault'] = 2;
+		_AUCT['OptPctUnderlowDefault'] = 5;
+		_AUCT['OptPctUndermktDefault'] = 20;
+		
+		_AUCT['ShowVerbose'] = "ver-literal";
+		_AUCT['ShowAverage'] = "ver-promedio";
+		_AUCT['ShowLink'] = "ver-enlace";
+		_AUCT['ShowMedian'] = "ver-mediano";
+		_AUCT['ShowStack'] = "ver-paquete";
+		_AUCT['ShowStats'] = "ver-estadisticas";
+		_AUCT['ShowSuggest'] = "ver-sugerencia";
+		_AUCT['ShowUsage'] = "ver-uso";
+		_AUCT['ShowVendor'] = "ver-vendedor";
+		_AUCT['ShowVendorBuy'] = "ver-vendedor-compra";
+		_AUCT['ShowVendorSell'] = "ver-vendedor-venta";
+		_AUCT['ShowEmbedBlank'] = "ver-integrado-lineavacia";
+		_AUCT['ShowRedo'] = "ver-advertencia";
+		
+		_AUCT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
+		_AUCT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
+		_AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el art\195\173culo";
+		_AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del art\195\173culo en la caja de ayuda";
+		_AUCT['HelpMedian'] = "Selecciona para mostrar el precio promedio para la opci\195\179n a compra";
+		_AUCT['HelpSuggest'] = "Selecciona para mostrar el precio sugerido de subasta para el art\195\173culo";
+		_AUCT['HelpStats'] = "Selecciona para mostrar porcentajes para ofertas/opci\195\179n a compra del art\195\173culo";
+		_AUCT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art\195\173culo";
+		_AUCT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
+		_AUCT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
+		_AUCT['HelpUsage'] = "Selecciona para mostrar uso del art\195\173culo en profesiones";
+		_AUCT['HelpStack'] = "Selecciona para mostrar tama\195\177o maximo del paquete";
+		_AUCT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
+		_AUCT['HelpClear'] = "Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
+		_AUCT['HelpAlso'] = "Mostrar tambi\195\169n los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facci\195\179n escribe el nombre de la facci\195\179n. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facci\195\179n opuesta, \"apagar\" desabilita la funci\195\179n.";
+		_AUCT['HelpLocale'] = "Cambiar la localidad que Auctioneer usa para sus mensajes";
+		_AUCT['HelpBroker'] = "Muestra las subastas de la exploraci\195\179n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
+		_AUCT['HelpBidbroker'] = "Muestra subastas de corto o medio termino de la exploraci\195\179n mas reciente a las cuales se puede poner una oferta y obtener ganancia";
+		_AUCT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
+		_AUCT['HelpPercentless'] = "Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio vendible mas alto.";
+		_AUCT['HelpCompete'] = "Muestra cualquier subasta explorada recientemente cuya opci\195\179n a compra es menor que alguno de tus art\195\173culos";
+		_AUCT['HelpScan'] = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un bot\195\179n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
+		_AUCT['HelpAutofill'] = "Auto-completar precios cuando se a\195\177adan art\195\173culos a subastar en el panel de la casa de subastas";
+		_AUCT['HelpPctBidmarkdown'] = "Ajusta el porcentaje del precio de compra por debajo del cual Auctioneer marcara las ofertas";
+		_AUCT['HelpPctMarkup'] = "El porcentaje que sera incrementado el precio de venta del vendedor cuando no existan otros valores disponibles.";
+		_AUCT['HelpPctMaxless'] = "Ajusta el maximo porcentaje por debajo del valor de mercado que Auctioneer tratara de igualar antes de darse por vencido.";
+		_AUCT['HelpPctNocomp'] = "El porcentaje bajo el precio del mercado que Auctioneer usar\195\161 cuando no hay competencia";
+		_AUCT['HelpPctUnderlow'] = "Ajusta el porcentaje bajo el menor precio m\195\173nimo de subasta que Auctioneer aplicar\195\161";
+		_AUCT['HelpPctUndermkt'] = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
+		_AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la p\195\161gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
+		
+		_AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
+		_AUCT['StatOff'] = "Ocultando toda la informacion de subastas";
+		
+		_AUCT['FrmtActClearall'] = "Eliminando toda la informaci\195\179n de subastas para %s";
+		_AUCT['FrmtActClearsnap'] = "Eliminando la imagen actual de la casa de subastas.";
+		_AUCT['FrmtActClearOk'] = "Informacion eliminada para el art\195\173culo: %s";
+		_AUCT['FrmtActClearFail'] = "Imposible encontrar art\195\173culo: %s";
+		_AUCT['FrmtActEnable'] = "Mostrando informacion del art\195\173culo: %s ";
+		_AUCT['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
+		_AUCT['FrmtActEnabledOn'] = "Mostrando %s de los art\195\173culos usando %s";
+		_AUCT['FrmtActSet'] = "%s ajustado(a) a '%s'";
+		_AUCT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
+		_AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
+		_AUCT['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
+		
+		_AUCT['TextScan'] = "Explorar";
+		_AUCT['TextAuction'] = "Subasta";
+		_AUCT['TextNone'] = "ningun";
+		_AUCT['TextUsage'] = "Uso:";
+		
+		-- AH Scanning localizations
+		
+		_AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" p\195\161gina 1...";
+		_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" p\195\161gina %d de %d";
+		_AUCT['AuctionScanDone'] = "Auctioneer: La exploraci\195\179n de las subastas ha finalizado";
+		_AUCT['AuctionScanNexttime'] = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
+		_AUCT['AuctionScanNocat'] = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
+		_AUCT['AuctionScanRedo'] = "La p\195\161gina corriente ha tomado mas de %d segundos para completar. Tratando p\195\161gina otra vez.";
+		
+		_AUCT['MesgConvert'] = "Conversi\195\179n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
+		_AUCT['MesgNotconverting'] = "Auctioneer no convertir\195\161 su base de datos, pero no funcionar\195\161 hasta que la base de datos sea convertida.";
+		_AUCT['MesgConvertYes'] = "Convertir";
+		_AUCT['MesgConvertNo'] = "Deshabilitar Auctioneer";
+		
+		_AUCT['AuctionTotalAucts'] = "Total de subastas exploradas: %s";
+		_AUCT['AuctionNewAucts'] = "Nuevas subastas exploradas: %s";
+		_AUCT['AuctionOldAucts'] = "Subastas exploradas previamente: %s";
+		_AUCT['AuctionDefunctAucts'] = "Subastas viejas removidas: %s";
+		_AUCT['AuctionDiscrepancies'] = "Discrepancias: %s";
+		
+		-- GUI localizations
+		
+		_AUCT['GuiMainHelp'] = "Contiene ajustes para Auctioneer \nun aditamento que muestra informacion sobre art\195\173culos y analiza informaci\195\179n de subastas. \nSeleccione \"Explorar\" en la casa de subastas para coleccionar informacion sobre las subastas.";
+		_AUCT['GuiMainEnable'] = "Encender Auctioneer";
+		_AUCT['GuiLocale'] = "Ajustar localidad a";
+		_AUCT['GuiVerbose'] = "Modo literal";
+		_AUCT['GuiStatsEnable'] = "Ver estad\195\173sticas";
+		_AUCT['GuiStatsHeader'] = "Estad\195\173sticas de precios de art\195\173culos";
+		_AUCT['GuiStatsHelp'] = "Mostrar las siguientes estad\195\173sticas en la caja de ayuda.";
+		_AUCT['GuiAverages'] = "Mostrar Promedios";
+		_AUCT['GuiMedian'] = "Mostrar Medianos";
+		_AUCT['GuiSuggest'] = "Mostrar Precios Sugeridos";
+		_AUCT['GuiVendorHeader'] = "Precios de Vendedor";
+		_AUCT['GuiVendorHelp'] = "Opciones relacionadas a precios de compra/venta a vendedores";
+		_AUCT['GuiVendor'] = "Mostrar Precios a Vendedores";
+		_AUCT['GuiVendorBuy'] = "Mostrar precios de compra a vendedores";
+		_AUCT['GuiVendorSell'] = "Mostrar precios de venta a vendedores";
+		_AUCT['GuiEmbedHeader'] = "Integraci\195\179n";
+		_AUCT['GuiEmbed'] = "Integrar informaci\195\179n en la caja de ayuda";
+		_AUCT['GuiEmbedBlankline'] = "Mostrar linea en blanco.";
+		_AUCT['GuiClearHeader'] = "Eliminar Informaci\195\179n";
+		_AUCT['GuiClearHelp'] = "Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la informaci\195\179n o solamente la im\195\161gen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
+		_AUCT['GuiClearall'] = "Eliminar toda la informaci\195\179n";
+		_AUCT['GuiClearallHelp'] = "Seleccione aqui para eliminar toda la informaci\195\179n de Auctioneer para el reino-facci\195\179n corriente.";
+		_AUCT['GuiClearallNote'] = "el reino-facci\195\179n corriente.";
+		_AUCT['GuiClearallButton'] = "Eliminar Todo";
+		_AUCT['GuiClearsnap'] = "Eliminar imagen corriente";
+		_AUCT['GuiClearsnapHelp'] = "Presione aqui para eliminar la ultima imagen de informacion de Auctioneer.";
+		_AUCT['GuiClearsnapButton'] = "Eliminar Imagen";
+		_AUCT['GuiPercentsHeader'] = "Limites de Porcentajes de Auctioneer";
+		_AUCT['GuiPercentsHelp'] = "ADVERTENCIA: Las siguientes opciones son para usuarios expertos SOLAMENTE.\nAjuste los siguientes valores para cambiar cuan agresivo es Auctioneer al determinar niveles provechosos.";
+		_AUCT['GuiBidmarkdown'] = "Porciento menos oferta";
+		_AUCT['GuiMarkup'] = "Porciento sobre vendedor";
+		_AUCT['GuiMaxless'] = "Porciento m\195\161ximo bajo mercado";
+		_AUCT['GuiNocomp'] = "Porciento sin competencia.";
+		_AUCT['GuiUnderlow'] = "Porciento bajo menor subasta";
+		_AUCT['GuiUndermkt'] = "Porciento bajo mercado";
+		_AUCT['GuiOtherHeader'] = "Otras Opciones";
+		_AUCT['GuiOtherHelp'] = "Opciones miscel\195\161neas de Auctioneer";
+		_AUCT['GuiAutofill'] = "Autocompletar precios en la casa de subastas";
+		_AUCT['GuiAlso'] = "Tambi\195\169n mostrar valores para";
+		_AUCT['GuiAlsoOpposite'] = "Mostrando informaci\195\179n para la facci\195\179n opuesta.";
+		_AUCT['GuiAlsoOff'] = "No mostrando informaci\195\179n para otro reino-facci\195\179n";
+		_AUCT['GuiAlsoDisplay'] = "Mostrando informaci\195\179n para %s";
+		_AUCT['GuiMesh'] = "Ver im\195\161gen de art\195\173culo";
+		_AUCT['GuiMeshOff'] = "Ning\195\186n modificador de teclado";
+		_AUCT['GuiMeshShift'] = "Usar tecla de Shift";
+		_AUCT['GuiMeshCtrl'] = "Usar tecla de Ctrl";
+		_AUCT['GuiMeshAlt'] = "Usar tecla de Alt";
+		_AUCT['GuiMeshModifierHelp'] = "Seleccionar si desea usar una tecla del teclado como requisito para ver la im\195\161gen de un art\195\173culo.\nSi esta opci\195\179n es encendida usted tendra que apretar la tecla para ver la im\195\161gen del art\195\173culo en la caja de ayuda.";
+		_AUCT['GuiLink'] = "Ver numero de enlace";
+		_AUCT['GuiReloadui'] = "Recargar Interf\195\161z";
+		_AUCT['GuiReloaduiHelp'] = "Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
+		_AUCT['GuiReloaduiButton'] = "Recargar";
+		_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf\195\161z de WoW";
 end
 
 -- Locale strings for the frFR locale
 if locale == "frFR" then
--- Encoded in UTF8
-AUCT_CLAS_ARMOR="Armure";
-AUCT_CLAS_CLOTH="Tissu";
-AUCT_CLAS_CONTAINER="Conteneur";
-AUCT_CLAS_DRINK="Boisson";
-AUCT_CLAS_FISHING="P\195\170che";
-AUCT_CLAS_FOOD="Nourriture";
-AUCT_CLAS_GEM="Gemme";
-AUCT_CLAS_HERB="Plante";
-AUCT_CLAS_HIDE="Peau";
-AUCT_CLAS_LEATHER="Cuir";
-AUCT_CLAS_MAGE="Mage";
-AUCT_CLAS_ORE="Minerai";
-AUCT_CLAS_POTION="Potion";
-AUCT_CLAS_QUEST="Qu\195\170te";
-AUCT_CLAS_SHAMAN="Chaman";
-AUCT_CLAS_WARLOCK="D\195\169moniste";
-AUCT_CLAS_WEAPON="Arme";
-AUCT_CLAS_WRITTEN="Ecrit";
+		-- Encoded in UTF8
+		_AUCT['ClasArmor'] = "Armure";
+		_AUCT['ClasCloth'] = "Tissu";
+		_AUCT['ClasContainer'] = "Conteneur";
+		_AUCT['ClasDrink'] = "Boisson";
+		_AUCT['ClasFishing'] = "P\195\170che";
+		_AUCT['ClasFood'] = "Nourriture";
+		_AUCT['ClasGem'] = "Gemme";
+		_AUCT['ClasHerb'] = "Plante";
+		_AUCT['ClasHide'] = "Peau";
+		_AUCT['ClasLeather'] = "Cuir";
+		_AUCT['ClasMage'] = "Mage";
+		_AUCT['ClasOre'] = "Minerai";
+		_AUCT['ClasPotion'] = "Potion";
+		_AUCT['ClasQuest'] = "Qu\195\170te";
+		_AUCT['ClasShaman'] = "Chaman";
+		_AUCT['ClasWarlock'] = "D\195\169moniste";
+		_AUCT['ClasWeapon'] = "Arme";
+		_AUCT['ClasWritten'] = "Ecrit";
+		
+		_AUCT['TypeAlchem'] = "Alchimie";
+		_AUCT['TypeCook'] = "Cuisine";
+		_AUCT['TypeEnchant'] = "Enchantement";
+		_AUCT['TypeEngineer'] = "Ing\195\169nieur";
+		_AUCT['TypeFstaid'] = "Premiers Soins";
+		_AUCT['TypeLeather'] = "Travail du Cuir";
+		_AUCT['TypeMining'] = "Minage";
+		_AUCT['TypePoison'] = "Poison";
+		_AUCT['TypeSmith'] = "Forgeron";
+		_AUCT['TypeTailor'] = "Tailleur";
+		
+		_AUCT['RecipePrefixes'] = { "Recette: ", "Patron: ", "Plans: ", "Sch\195\169ma: ", "Formule: " };
+		
+		_AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Imm\195\169diat'";
+		_AUCT['FrmtBrokerLine'] = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
+		_AUCT['FrmtBrokerDone'] = "Brokering termin\195\169";
+		_AUCT['FrmtBidbrokerHeader'] = "Profit minimum: %s, HSP = 'Prix de vente maximum'";
+		_AUCT['FrmtBidbrokerMinbid'] = "EnchMin"
+		_AUCT['FrmtBidbrokerCurbid'] = "EnchAct"
+		_AUCT['FrmtBidbrokerLine'] = "%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
+		_AUCT['FrmtBidbrokerDone'] = "Bid brokering termin\195\169";
+		_AUCT['FrmtPctlessHeader'] = "Percentage inf\195\169rieur au HSP: %d%%";
+		_AUCT['FrmtPctlessLine'] = "%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
+		_AUCT['FrmtPctlessDone'] = "Percentage inf\195\169rieur termin\195\169.";
+		_AUCT['FrmtCompeteHeader'] = "Encheres comp\195\169titives au moins %s de moins par objet.";
+		_AUCT['FrmtCompeteLine'] = "%s, Ench: %s, BO %s vs %s, %s de moins";
+		_AUCT['FrmtCompeteDone'] = "Ench\195\168res comp\195\169titives termin\195\169es.";
+		_AUCT['FrmtNoauct'] = "Pas d'ench\195\168re trouv\195\169e pour l'objet: %s";
+		_AUCT['FrmtMedianLine'] = "Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
+		_AUCT['FrmtLowLine'] = "%s, BO: %s, Vendeur: %s, L'unit\195\169: %s, Moins de la moyenne: %s";
+		_AUCT['FrmtHspLine'] = "Prix de vente maximum pour un %s est de: %s";
+		_AUCT['FrmtInfoSeen'] = "Vu %d fois aux ench\195\168res";
+		_AUCT['FrmtInfoForone'] = "Pour 1: %s min/%s achat (%s ench\195\168re) [par %d]";
+		_AUCT['FrmtInfoAverage'] = "%s min/%s achat (%s ench\195\168re)"
+		_AUCT['FrmtInfoHistmed'] = "Derniers %d vus, achat moyen:";
+		_AUCT['FrmtInfoSnapmed'] = "Vu %d fois au dernier scan, achat moyen:";
+		_AUCT['FrmtInfoBidrate'] = "%d%% avec ench\195\168re, %d%% avec achat imm\195\169diat";
+		_AUCT['FrmtInfoNever'] = "Jamais vu aux ench\195\168res";
+		_AUCT['FrmtInfoAlsoseen'] = "Vu %d fois aux %s";
+		_AUCT['FrmtInfoClassuse'] = "Classe: %s utilis\195\169 pour %s";
+		_AUCT['FrmtInfoClass'] = "Classe: %s";
+		_AUCT['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
+		_AUCT['FrmtInfoBuy'] = "Achat%s au marchand";
+		_AUCT['FrmtInfoSell'] = "Vente%s au marchand";
+		_AUCT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
+		_AUCT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
+		_AUCT['FrmtInfoStx'] = "Pile par lots de %d";
+		
+		-- AH Scanning localizations
+		_AUCT['AuctionScanStart'] = "Auctioneer: Scan de la cat\195\169gorie '%s': page 1...";
+		_AUCT['AuctionPageN'] = "Auctioneer: Scan de la cat\195\169gorie '%s': page %d sur %d";
+		_AUCT['AuctionScanDone'] = "Auctioneer: Scan termin\195\169";
+		_AUCT['AuctionScanNexttime'] = "Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez \195\160 un commisaire-priseur.";
+		
 
-AUCT_TYPE_ALCHEM="Alchimie";
-AUCT_TYPE_COOK="Cuisine";
-AUCT_TYPE_ENCHANT="Enchantement";
-AUCT_TYPE_ENGINEER="Ing\195\169nieur";
-AUCT_TYPE_FSTAID="Premiers Soins";
-AUCT_TYPE_LEATHER="Travail du Cuir";
-AUCT_TYPE_MINING="Minage";
-AUCT_TYPE_POISON="Poison";
-AUCT_TYPE_SMITH="Forgeron";
-AUCT_TYPE_TAILOR="Tailleur";
-
-AUCT_RECIPE_PREFIXES={ "Recette: ", "Patron: ", "Plans: ", "Sch\195\169ma: ", "Formule: " };
-
-AUCT_FRMT_BROKER_HEADER="Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Imm\195\169diat'";
-AUCT_FRMT_BROKER_LINE="%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE="Brokering termin\195\169";
-AUCT_FRMT_BIDBROKER_HEADER="Profit minimum: %s, HSP = 'Prix de vente maximum'";
-AUCT_FRMT_BIDBROKER_MINBID="EnchMin"
-AUCT_FRMT_BIDBROKER_CURBID="EnchAct"
-AUCT_FRMT_BIDBROKER_LINE="%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
-AUCT_FRMT_BIDBROKER_DONE="Bid brokering termin\195\169";
-AUCT_FRMT_PCTLESS_HEADER="Percentage inf\195\169rieur au HSP: %d%%";
-AUCT_FRMT_PCTLESS_LINE="%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
-AUCT_FRMT_PCTLESS_DONE="Percentage inf\195\169rieur termin\195\169.";
-AUCT_FRMT_COMPETE_HEADER="Encheres comp\195\169titives au moins %s de moins par objet.";
-AUCT_FRMT_COMPETE_LINE="%s, Ench: %s, BO %s vs %s, %s de moins";
-AUCT_FRMT_COMPETE_DONE="Ench\195\168res comp\195\169titives termin\195\169es.";
-AUCT_FRMT_NOAUCT="Pas d'ench\195\168re trouv\195\169e pour l'objet: %s";
-AUCT_FRMT_MEDIAN_LINE="Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
-AUCT_FRMT_LOW_LINE="%s, BO: %s, Vendeur: %s, L'unit\195\169: %s, Moins de la moyenne: %s";
-AUCT_FRMT_HSP_LINE="Prix de vente maximum pour un %s est de: %s";
-AUCT_FRMT_INFO_SEEN="Vu %d fois aux ench\195\168res";
-AUCT_FRMT_INFO_FORONE="Pour 1: %s min/%s achat (%s ench\195\168re) [par %d]";
-AUCT_FRMT_INFO_AVERAGE="%s min/%s achat (%s ench\195\168re)"
-AUCT_FRMT_INFO_HISTMED="Derniers %d vus, achat moyen:";
-AUCT_FRMT_INFO_SNAPMED="Vu %d fois au dernier scan, achat moyen:";
-AUCT_FRMT_INFO_BIDRATE="%d%% avec ench\195\168re, %d%% avec achat imm\195\169diat";
-AUCT_FRMT_INFO_NEVER="Jamais vu aux ench\195\168res";
-AUCT_FRMT_INFO_ALSOSEEN="Vu %d fois aux %s";
-AUCT_FRMT_INFO_CLASSUSE="Classe: %s utilis\195\169 pour %s";
-AUCT_FRMT_INFO_CLASS="Classe: %s";
-AUCT_FRMT_INFO_USE="Utilis\195\169 pour: %s";
-AUCT_FRMT_INFO_BUY="Achat%s au marchand";
-AUCT_FRMT_INFO_SELL="Vente%s au marchand";
-AUCT_FRMT_INFO_BUYMULT="Achat%s %d (%s chacun)";
-AUCT_FRMT_INFO_SELLMULT="Vente%s %d (%s chacun)";
-AUCT_FRMT_INFO_STX="Pile par lots de %d";
-
--- AH Scanning localizations
-AUCTIONEER_AUCTION_SCAN_START="Auctioneer: Scan de la cat\195\169gorie '%s': page 1...";
-AUCTIONEER_AUCTION_PAGE_N="Auctioneer: Scan de la cat\195\169gorie '%s': page %d sur %d";
-AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: Scan termin\195\169";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez \195\160 un commisaire-priseur.";
-
-
-
--- The following definitions are missing in this locale:
---	AUCTIONEER_AUCTION_DEFUNCT_AUCTS = "";
---	AUCTIONEER_AUCTION_DISCREPANCIES = "";
---	AUCTIONEER_AUCTION_NEW_AUCTS = "";
---	AUCTIONEER_AUCTION_OLD_AUCTS = "";
---	AUCTIONEER_AUCTION_SCAN_NOCAT = "";
---	AUCTIONEER_AUCTION_SCAN_REDO = "";
---	AUCTIONEER_AUCTION_TOTAL_AUCTS = "";
---	AUCTIONEER_GUI_ALSO = "";
---	AUCTIONEER_GUI_ALSO_DISPLAY = "";
---	AUCTIONEER_GUI_ALSO_OFF = "";
---	AUCTIONEER_GUI_ALSO_OPPOSITE = "";
---	AUCTIONEER_GUI_AUTOFILL = "";
---	AUCTIONEER_GUI_AVERAGES = "";
---	AUCTIONEER_GUI_BIDMARKDOWN = "";
---	AUCTIONEER_GUI_CLEARALL = "";
---	AUCTIONEER_GUI_CLEARALL_BUTTON = "";
---	AUCTIONEER_GUI_CLEARALL_HELP = "";
---	AUCTIONEER_GUI_CLEARALL_NOTE = "";
---	AUCTIONEER_GUI_CLEARSNAP = "";
---	AUCTIONEER_GUI_CLEARSNAP_BUTTON = "";
---	AUCTIONEER_GUI_CLEARSNAP_HELP = "";
---	AUCTIONEER_GUI_CLEAR_HEADER = "";
---	AUCTIONEER_GUI_CLEAR_HELP = "";
---	AUCTIONEER_GUI_EMBED = "";
---	AUCTIONEER_GUI_EMBED_BLANKLINE = "";
---	AUCTIONEER_GUI_EMBED_HEADER = "";
---	AUCTIONEER_GUI_LINK = "";
---	AUCTIONEER_GUI_LOCALE = "";
---	AUCTIONEER_GUI_MAIN_ENABLE = "";
---	AUCTIONEER_GUI_MAIN_HELP = "";
---	AUCTIONEER_GUI_MARKUP = "";
---	AUCTIONEER_GUI_MAXLESS = "";
---	AUCTIONEER_GUI_MEDIAN = "";
---	AUCTIONEER_GUI_MESH = "";
---	AUCTIONEER_GUI_MESH_ALT = "";
---	AUCTIONEER_GUI_MESH_CTRL = "";
---	AUCTIONEER_GUI_MESH_MODIFIER_HELP = "";
---	AUCTIONEER_GUI_MESH_OFF = "";
---	AUCTIONEER_GUI_MESH_SHIFT = "";
---	AUCTIONEER_GUI_NOCOMP = "";
---	AUCTIONEER_GUI_OTHER_HEADER = "";
---	AUCTIONEER_GUI_OTHER_HELP = "";
---	AUCTIONEER_GUI_PERCENTS_HEADER = "";
---	AUCTIONEER_GUI_PERCENTS_HELP = "";
---	AUCTIONEER_GUI_RELOADUI = "";
---	AUCTIONEER_GUI_RELOADUI_BUTTON = "";
---	AUCTIONEER_GUI_RELOADUI_FEEDBACK = "";
---	AUCTIONEER_GUI_RELOADUI_HELP = "";
---	AUCTIONEER_GUI_STATS_ENABLE = "";
---	AUCTIONEER_GUI_STATS_HEADER = "";
---	AUCTIONEER_GUI_STATS_HELP = "";
---	AUCTIONEER_GUI_SUGGEST = "";
---	AUCTIONEER_GUI_UNDERLOW = "";
---	AUCTIONEER_GUI_UNDERMKT = "";
---	AUCTIONEER_GUI_VENDOR = "";
---	AUCTIONEER_GUI_VENDOR_BUY = "";
---	AUCTIONEER_GUI_VENDOR_HEADER = "";
---	AUCTIONEER_GUI_VENDOR_HELP = "";
---	AUCTIONEER_GUI_VENDOR_SELL = "";
---	AUCTIONEER_GUI_VERBOSE = "";
---	AUCT_ADDIT_ALCOHOL = "";
---	AUCT_ADDIT_BUFF = "";
---	AUCT_ADDIT_DRINK = "";
---	AUCT_ADDIT_FIREWORK = "";
---	AUCT_ADDIT_FOOD = "";
---	AUCT_ADDIT_GIFTWRAP = "";
---	AUCT_ADDIT_LURE = "";
---	AUCT_ADDIT_POISON = "";
---	AUCT_ADDIT_POTION = "";
---	AUCT_ADDIT_RESTORATIVE = "";
---	AUCT_ADDIT_SCROLL = "";
---	AUCT_CMD_ALSO = "";
---	AUCT_CMD_ALSO_OPPOSITE = "";
---	AUCT_CMD_ALT = "";
---	AUCT_CMD_AUTOFILL = "";
---	AUCT_CMD_BIDBROKER = "";
---	AUCT_CMD_BIDBROKER_SHORT = "";
---	AUCT_CMD_BROKER = "";
---	AUCT_CMD_CLEAR = "";
---	AUCT_CMD_CLEAR_ALL = "";
---	AUCT_CMD_CLEAR_SNAPSHOT = "";
---	AUCT_CMD_COMPETE = "";
---	AUCT_CMD_CTRL = "";
---	AUCT_CMD_DEFAULT = "";
---	AUCT_CMD_EMBED = "";
---	AUCT_CMD_LOCALE = "";
---	AUCT_CMD_OFF = "";
---	AUCT_CMD_ON = "";
---	AUCT_CMD_PCT_BIDMARKDOWN = "";
---	AUCT_CMD_PCT_MARKUP = "";
---	AUCT_CMD_PCT_MAXLESS = "";
---	AUCT_CMD_PCT_NOCOMP = "";
---	AUCT_CMD_PCT_UNDERLOW = "";
---	AUCT_CMD_PCT_UNDERMKT = "";
---	AUCT_CMD_PERCENTLESS = "";
---	AUCT_CMD_PERCENTLESS_SHORT = "";
---	AUCT_CMD_SCAN = "";
---	AUCT_CMD_SHIFT = "";
---	AUCT_CMD_TOGGLE = "";
---	AUCT_FRMT_ACT_CLEARALL = "";
---	AUCT_FRMT_ACT_CLEARSNAP = "";
---	AUCT_FRMT_ACT_CLEAR_FAIL = "";
---	AUCT_FRMT_ACT_CLEAR_OK = "";
---	AUCT_FRMT_ACT_DEFAULT = "";
---	AUCT_FRMT_ACT_DEFAULTALL = "";
---	AUCT_FRMT_ACT_DISABLE = "";
---	AUCT_FRMT_ACT_ENABLE = "";
---	AUCT_FRMT_ACT_ENABLED_ON = "";
---	AUCT_FRMT_ACT_REMOVE = "";
---	AUCT_FRMT_ACT_SET = "";
---	AUCT_FRMT_ACT_UNKNOWN = "";
---	AUCT_FRMT_AUCTINFO_HIST = "";
---	AUCT_FRMT_AUCTINFO_LOW = "";
---	AUCT_FRMT_AUCTINFO_MKTPRICE = "";
---	AUCT_FRMT_AUCTINFO_NOLOW = "";
---	AUCT_FRMT_AUCTINFO_ORIG = "";
---	AUCT_FRMT_AUCTINFO_SNAP = "";
---	AUCT_FRMT_AUCTINFO_SUGBID = "";
---	AUCT_FRMT_AUCTINFO_SUGBUY = "";
---	AUCT_FRMT_INFO_BID_MULTI = "";
---	AUCT_FRMT_INFO_BID_ONE = "";
---	AUCT_FRMT_INFO_BUYMEDIAN = "";
---	AUCT_FRMT_INFO_BUY_MULTI = "";
---	AUCT_FRMT_INFO_BUY_ONE = "";
---	AUCT_FRMT_INFO_HEAD_MULTI = "";
---	AUCT_FRMT_INFO_HEAD_ONE = "";
---	AUCT_FRMT_INFO_MIN_MULTI = "";
---	AUCT_FRMT_INFO_MIN_ONE = "";
---	AUCT_FRMT_INFO_SGST = "";
---	AUCT_FRMT_INFO_SGSTSTX = "";
---	AUCT_FRMT_INFO_STACKSIZE = "";
---	AUCT_FRMT_UNKNOWN_ARG = "";
---	AUCT_FRMT_UNKNOWN_LOCALE = "";
---	AUCT_FRMT_UNKNOWN_RF = "";
---	AUCT_FRMT_WARN_ABOVEMKT = "";
---	AUCT_FRMT_WARN_MARKUP = "";
---	AUCT_FRMT_WARN_MYPRICE = "";
---	AUCT_FRMT_WARN_NOCOMP = "";
---	AUCT_FRMT_WARN_NODATA = "";
---	AUCT_FRMT_WARN_TOOLOW = "";
---	AUCT_FRMT_WARN_UNDERCUT = "";
---	AUCT_FRMT_WELCOME = "";
---	AUCT_HELP_ALSO = "";
---	AUCT_HELP_AUTOFILL = "";
---	AUCT_HELP_AVERAGE = "";
---	AUCT_HELP_BIDBROKER = "";
---	AUCT_HELP_BROKER = "";
---	AUCT_HELP_CLEAR = "";
---	AUCT_HELP_COMPETE = "";
---	AUCT_HELP_EMBED = "";
---	AUCT_HELP_EMBED_BLANK = "";
---	AUCT_HELP_LINK = "";
---	AUCT_HELP_LOCALE = "";
---	AUCT_HELP_MEDIAN = "";
---	AUCT_HELP_ONOFF = "";
---	AUCT_HELP_PCT_BIDMARKDOWN = "";
---	AUCT_HELP_PCT_MARKUP = "";
---	AUCT_HELP_PCT_MAXLESS = "";
---	AUCT_HELP_PCT_NOCOMP = "";
---	AUCT_HELP_PCT_UNDERLOW = "";
---	AUCT_HELP_PCT_UNDERMKT = "";
---	AUCT_HELP_PERCENTLESS = "";
---	AUCT_HELP_REDO = "";
---	AUCT_HELP_SCAN = "";
---	AUCT_HELP_STACK = "";
---	AUCT_HELP_STATS = "";
---	AUCT_HELP_SUGGEST = "";
---	AUCT_HELP_USAGE = "";
---	AUCT_HELP_VENDOR = "";
---	AUCT_HELP_VENDOR_BUY = "";
---	AUCT_HELP_VENDOR_SELL = "";
---	AUCT_HELP_VERBOSE = "";
---	AUCT_MESG_CONVERT = "";
---	AUCT_MESG_CONVERT_NO = "";
---	AUCT_MESG_CONVERT_YES = "";
---	AUCT_MESG_NOTCONVERTING = "";
---	AUCT_OPT_ALSO = "";
---	AUCT_OPT_BIDBROKER = "";
---	AUCT_OPT_BROKER = "";
---	AUCT_OPT_CLEAR = "";
---	AUCT_OPT_COMPETE = "";
---	AUCT_OPT_LOCALE = "";
---	AUCT_OPT_PCT_BIDMARKDOWN = "";
---	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
---	AUCT_OPT_PCT_MARKUP = "";
---	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
---	AUCT_OPT_PCT_MAXLESS = "";
---	AUCT_OPT_PCT_MAXLESS_DEFAULT = "";
---	AUCT_OPT_PCT_NOCOMP = "";
---	AUCT_OPT_PCT_NOCOMP_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERLOW = "";
---	AUCT_OPT_PCT_UNDERLOW_DEFAULT = "";
---	AUCT_OPT_PCT_UNDERMKT = "";
---	AUCT_OPT_PCT_UNDERMKT_DEFAULT = "";
---	AUCT_OPT_PERCENTLESS = "";
---	AUCT_OPT_SCALE = "";
---	AUCT_OPT_SCALE_DEFAULT = "";
---	AUCT_OPT_SCAN = "";
---	AUCT_SHOW_AVERAGE = "";
---	AUCT_SHOW_EMBED_BLANK = "";
---	AUCT_SHOW_LINK = "";
---	AUCT_SHOW_MEDIAN = "";
---	AUCT_SHOW_REDO = "";
---	AUCT_SHOW_STACK = "";
---	AUCT_SHOW_STATS = "";
---	AUCT_SHOW_SUGGEST = "";
---	AUCT_SHOW_USAGE = "";
---	AUCT_SHOW_VENDOR = "";
---	AUCT_SHOW_VENDOR_BUY = "";
---	AUCT_SHOW_VENDOR_SELL = "";
---	AUCT_SHOW_VERBOSE = "";
---	AUCT_SKILL_ALCHEMY = "";
---	AUCT_SKILL_BLACKSMITHING = "";
---	AUCT_SKILL_COOKING = "";
---	AUCT_SKILL_DRUID = "";
---	AUCT_SKILL_ENCHANTING = "";
---	AUCT_SKILL_ENGINEERING = "";
---	AUCT_SKILL_FIRSTAID = "";
---	AUCT_SKILL_LEATHERWORKING = "";
---	AUCT_SKILL_MAGE = "";
---	AUCT_SKILL_MINING = "";
---	AUCT_SKILL_PALADIN = "";
---	AUCT_SKILL_PRIEST = "";
---	AUCT_SKILL_ROGUE = "";
---	AUCT_SKILL_SHAMAN = "";
---	AUCT_SKILL_TAILORING = "";
---	AUCT_SKILL_WARLOCK = "";
---	AUCT_STAT_OFF = "";
---	AUCT_STAT_ON = "";
---	AUCT_TEXT_AUCTION = "";
---	AUCT_TEXT_NONE = "";
---	AUCT_TEXT_SCAN = "";
---	AUCT_TEXT_USAGE = "";
---	AUCT_TIME_LONG = "";
---	AUCT_TIME_MED = "";
---	AUCT_TIME_SHORT = "";
---	AUCT_TIME_VLONG = "";
 end
 
 end

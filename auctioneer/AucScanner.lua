@@ -173,13 +173,13 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
 
-	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_TOTAL_AUCTS, Auctioneer_ColorTextWhite(lTotalAuctionsScannedCount)));
-	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_NEW_AUCTS, Auctioneer_ColorTextWhite(lNewAuctionsCount)));
-	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_OLD_AUCTS, Auctioneer_ColorTextWhite(lOldAuctionsCount)));
-	Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_DEFUNCT_AUCTS, Auctioneer_ColorTextWhite(lDefunctAuctionsCount)));
+	Auctioneer_ChatPrint(string.format(_AUCT['AuctionTotalAucts'], Auctioneer_ColorTextWhite(lTotalAuctionsScannedCount)));
+	Auctioneer_ChatPrint(string.format(_AUCT['AuctionNewAucts'], Auctioneer_ColorTextWhite(lNewAuctionsCount)));
+	Auctioneer_ChatPrint(string.format(_AUCT['AuctionOldAucts'], Auctioneer_ColorTextWhite(lOldAuctionsCount)));
+	Auctioneer_ChatPrint(string.format(_AUCT['AuctionDefunctAucts'], Auctioneer_ColorTextWhite(lDefunctAuctionsCount)));
 
 	if (nullSafe(lDiscrepencyCount) > 0) then
-		Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_DISCREPANCIES, Auctioneer_ColorTextWhite(lDiscrepencyCount)));
+		Auctioneer_ChatPrint(string.format(_AUCT['AuctionDiscrepancies'], Auctioneer_ColorTextWhite(lDiscrepencyCount)));
 	end
 end
 
@@ -339,7 +339,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 
 	if bidamount == aiBuyout then -- only capture buyouts
 		-- remove from snapshot
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_ACT_REMOVE, auctionSignature));
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActRemove'], auctionSignature));
 		local auctKey = Auctioneer_GetAuctionKey();
 		local itemCat = Auctioneer_GetCatForKey(aiKey);
 		AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
@@ -376,7 +376,7 @@ function Auctioneer_ConfigureAH()
 	AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
 	
 	-- set UI-texts
-	BrowseScanButton:SetText(AUCT_TEXT_SCAN);
+	BrowseScanButton:SetText(_AUCT['TextScan']);
 end
 
 function Auctioneer_Auctions_Clear()
@@ -454,12 +454,12 @@ function Auctioneer_NewAuction()
 	local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey);
 
 	Auctioneer_Auctions_Clear();
-	Auctioneer_Auctions_SetLine(1, string.format(AUCT_FRMT_AUCTINFO_HIST, historicalMedCount), historicalMedian * count); 
-	Auctioneer_Auctions_SetLine(2, string.format(AUCT_FRMT_AUCTINFO_SNAP, snapshotMedCount), snapshotMedian * count); 
+	Auctioneer_Auctions_SetLine(1, string.format(_AUCT['FrmtAuctinfoHist'], historicalMedCount), historicalMedian * count); 
+	Auctioneer_Auctions_SetLine(2, string.format(_AUCT['FrmtAuctinfoSnap'], snapshotMedCount), snapshotMedian * count); 
 	if (snapshotMedCount and snapshotMedCount > 0 and currentLowestBuyout) then
-		Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_LOW, currentLowestBuyout * count);
+		Auctioneer_Auctions_SetLine(3, _AUCT['FrmtAuctinfoLow'], currentLowestBuyout * count);
 	else
-		Auctioneer_Auctions_SetLine(3, AUCT_FRMT_AUCTINFO_NOLOW);
+		Auctioneer_Auctions_SetLine(3, _AUCT['FrmtAuctinfoNolow']);
 	end
 	local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
 
@@ -467,7 +467,7 @@ function Auctioneer_NewAuction()
 	if hsp == 0 and buyCount > 0 then
 		hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 	end
-	local discountBidPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_BIDMARKDOWN, AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT));
+	local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
 	local countFix = count
 	if countFix == 0 then
 		countFix = 1
@@ -475,15 +475,15 @@ function Auctioneer_NewAuction()
 	local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
 	local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 
-	if (Auctioneer_GetFilter(AUCT_CMD_AUTOFILL)) then
-		Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_MKTPRICE, nullSafe(mktPrice)*countFix);
-		Auctioneer_Auctions_SetLine(5, AUCT_FRMT_AUCTINFO_ORIG, blizPrice);
+	if (Auctioneer_GetFilter(_AUCT['CmdAutofill'])) then
+		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoMktprice'], nullSafe(mktPrice)*countFix);
+		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoOrig'], blizPrice);
 		Auctioneer_Auctions_SetWarn(warn);
 		MoneyInputFrame_SetCopper(StartPrice, bidPrice);
 		MoneyInputFrame_SetCopper(BuyoutPrice, buyPrice);
 	else
-		Auctioneer_Auctions_SetLine(4, AUCT_FRMT_AUCTINFO_SUGBID, bidPrice);
-		Auctioneer_Auctions_SetLine(5, AUCT_FRMT_AUCTINFO_SUGBUY, buyPrice);
+		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoSugbid'], bidPrice);
+		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoSugbuy'], buyPrice);
 		Auctioneer_Auctions_SetWarn(warn);
 	end
 end

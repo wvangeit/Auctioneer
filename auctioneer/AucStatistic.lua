@@ -225,28 +225,32 @@ function Auctioneer_GetCurrentBid(auctionSignature)
 end
 
 -- This filter will return true if an auction is a bad choice for reselling
-function Auctioneer_IsBadResaleChoice(auctionSignature)
+function Auctioneer_IsBadResaleChoice(auctSig, auctKey)
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
+
 	local isBadChoice = false;
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(auctionSignature);
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(auctSig);
 	local itemKey = id..":"..rprop..":"..enchant;
-	local auctKey = Auctioneer_GetAuctionKey();
 	local itemCat = Auctioneer_GetCatForKey(itemKey);
-	local auctionItem = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
-	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, from);
+	local auctionItem = Auctioneer_GetSnapshot(auctKey, itemCat, auctSig);
+	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 	local bidPercent = math.floor(bidCount / minCount * 100);
-	local itemLevel = tonumber(auctionItem.level);
-	local itemQuality = tonumber(auctionItem.quality);
 
-	-- bad choice conditions
-	if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
-		isBadChoice = true; -- bidbased items should have a minimum bid percent
-	elseif (itemLevel >= 50 and itemQuality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
-		isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
-	elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
-		isBadChoice = true; -- don't display auctions that we own, or are high bidder on
-	elseif itemQuality == QUALITY_POOR then 
-		isBadChoice = true; -- gray items are never a good choice
+	if (auctionItem) then
+		local itemLevel = tonumber(auctionItem.level);
+		local itemQuality = tonumber(auctionItem.quality);
+
+		-- bad choice conditions
+		if BID_BASED_CATEGORIES[auctionItem.category] and bidPercent < MIN_BID_PERCENT then 
+			isBadChoice = true; -- bidbased items should have a minimum bid percent
+		elseif (itemLevel >= 50 and itemQuality == QUALITY_UNCOMMON and bidPercent < MIN_BID_PERCENT) then 
+			isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well  
+		elseif auctionItem.owner == UnitName("player") or auctionItem.highBidder then 
+			isBadChoice = true; -- don't display auctions that we own, or are high bidder on
+		elseif itemQuality == QUALITY_POOR then 
+			isBadChoice = true; -- gray items are never a good choice
+		end
 	end
 
 	return isBadChoice;
@@ -288,7 +292,7 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	end
 	if not (Auctioneer_Lowests and Auctioneer_Lowests.built) then Auctioneer_BuildLowestCache(auctKey) end
 
-	lowKey = itemID..":"..itemRand..":";
+	local lowKey = itemID..":"..itemRand..":";
 
 	local itemCat = nil;
 	local lowSig = nil;
@@ -340,9 +344,10 @@ function Auctioneer_DoMedian(link)
 
 	local median, count = Auctioneer_GetUsableMedian(itemKey);
 	if (not median) then
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_NOAUCT, Auctioneer_ColorTextWhite(itemName)));
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianNoauct'], Auctioneer_ColorTextWhite(itemName)));
 	else
-		Auctioneer_ChatPrint(string.format(AUCT_FRMT_MEDIAN_LINE, count, Auctioneer_ColorTextWhite(itemName), TT_GetTextGSC(median)));
+		if (not count) then count = 0 end
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianLine'], count, Auctioneer_ColorTextWhite(itemName), TT_GetTextGSC(median)));
 	end
 end
 
@@ -355,13 +360,19 @@ function Auctioneer_GetBidBasedSellablePrice(itemKey,realm, avgMin,avgBuy,avgBid
 	local typicalBuyout = 0;
 
 	local medianBuyout = Auctioneer_GetUsableMedian(itemKey, realm);
-	if medianBuyout then
-		typicalBuyout = math.min(avgBuy, medianBuyout)  ;
+	if medianBuyout and avgBuy then
+		typicalBuyout = math.min(avgBuy, medianBuyout);
+	elseif medianBuyout then
+		typicalBuyout = medianBuyout;
 	else
-		typicalBuyout = avgBuy;
+		typicalBuyout = avgBuy or 0;
 	end
 
-	bidBasedSellPrice = math.floor((3*typicalBuyout + avgBid) / 4);
+	if (avgBid) then
+		bidBasedSellPrice = math.floor((3*typicalBuyout + avgBid) / 4);
+	else
+		bidBasedSellPrice = typicalBuyout;
+	end
 	return bidBasedSellPrice;
 end
 
@@ -415,7 +426,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	HSPCOUNT = HSPCOUNT + 1;
 
 	local highestSellablePrice = 0;
-	local warn = AUCT_FRMT_WARN_NODATA;
+	local warn = _AUCT['FrmtWarnNodata'];
 	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
 	if (not buyoutValues) then
 		buyoutValues = Auctioneer_GetSnapshotInfo(itemKey, realm);
@@ -424,11 +435,11 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues);
 
 	-- Get our user-set pricing parameters
-	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MAXLESS, AUCT_OPT_PCT_MAXLESS_DEFAULT));
-	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERLOW, AUCT_OPT_PCT_UNDERLOW_DEFAULT));
-	local discountMarketPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_UNDERMKT, AUCT_OPT_PCT_UNDERMKT_DEFAULT));
-	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_NOCOMP, AUCT_OPT_PCT_NOCOMP_DEFAULT));
-	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(AUCT_CMD_PCT_MARKUP, AUCT_OPT_PCT_MARKUP_DEFAULT));
+	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless'], _AUCT['OptPctMaxlessDefault']));
+	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow'], _AUCT['OptPctUnderlowDefault']));
+	local discountMarketPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt'], _AUCT['OptPctUndermktDefault']));
+	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp'], _AUCT['OptPctNocompDefault']));
+	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup'], _AUCT['OptPctMarkupDefault']));
 
 	local x, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);
@@ -492,22 +503,22 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			end
 			if snap and snap.owner == UnitName("player") then
 				highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
-				warn = AUCT_FRMT_WARN_MYPRICE;
+				warn = _AUCT['FrmtWarnMyprice'];
 			elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) then
 				highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountMarketPercent);
-				warn = AUCT_FRMT_WARN_TOOLOW;
+				warn = _AUCT['FrmtWarnToolow'];
 			elseif (currentLowestBuyout > marketPrice) then
 				highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
-				warn = AUCT_FRMT_WARN_ABOVEMKT;
+				warn = _AUCT['FrmtWarnAbovemkt'];
 			else -- use discount low
 				-- set highest price to "Discount low"
 				highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
-				warn = string.format(AUCT_FRMT_WARN_UNDERCUT, discountLowPercent);
+				warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
 			end
 		else -- no low buyout, use discount no competition
 			-- set highest price to "Discount no competition"
 			highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
-			warn = AUCT_FRMT_WARN_NOCOMP;
+			warn = _AUCT['FrmtWarnNocomp'];
 		end
 	else -- no market
 		-- Note: urentLowestBuyout is nil, incase the realm is not the current player's realm
@@ -515,14 +526,14 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			-- set highest price to "Discount low"
 --~ p("Discount low case 2");
 			highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
-			warn = string.format(AUCT_FRMT_WARN_UNDERCUT, discountLowPercent);
+			warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
 		else
 			local baseData = Auctioneer_GetItemDataByID(id);
 			if (baseData and baseData.sell) then
 				-- use vendor prices if no auction data available
 				local vendorSell = nullSafe(baseData.sell); -- use vendor prices
 				highestSellablePrice = Auctioneer_AddPercent(vendorSell, vendorSellMarkupPercent);
-				warn = string.format(AUCT_FRMT_WARN_MARKUP, vendorSellMarkupPercent);
+				warn = string.format(_AUCT['FrmtWarnMarkup'], vendorSellMarkupPercent);
 			end
 		end
 	end

@@ -57,9 +57,9 @@ local function Auctioneer_AuctionNextQuery()
 			lPageStartedAt = time();
 			lCurrentAuctionPage = lCurrentAuctionPage + 1;
 			if lFullScan then
-				BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_PAGE_N, AUCT_TEXT_AUCTION, lCurrentAuctionPage + 1, maxPages + 1));
+				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], _AUCT['TextAuction'], lCurrentAuctionPage + 1, maxPages + 1));
 			else
-				BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_PAGE_N, lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
+				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
 			end
 		elseif nextIndex() then
 			lPageStartedAt = time();
@@ -68,7 +68,7 @@ local function Auctioneer_AuctionNextQuery()
 		else
 			Auctioneer_StopAuctionScan();
 			if( totalAuctions > 0 ) then
-				BrowseNoResultsText:SetText(AUCTIONEER_AUCTION_SCAN_DONE);
+				BrowseNoResultsText:SetText(_AUCT['AuctionScanDone']);
 				Auctioneer_Event_FinishedAuctionScan();
 			end
 			return;
@@ -78,9 +78,9 @@ local function Auctioneer_AuctionNextQuery()
 		lPageStartedAt = time();
 		if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
 		if lFullScan then
-			BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_SCAN_START, AUCT_TEXT_AUCTION));
+			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], _AUCT['TextAuction']));
 		else
-			BrowseNoResultsText:SetText(string.format(AUCTIONEER_AUCTION_SCAN_START, lMajorAuctionCategories[lCurrentCategoryIndex]));
+			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], lMajorAuctionCategories[lCurrentCategoryIndex]));
 		end
 	end
 	if (lFullScan) then
@@ -134,8 +134,8 @@ local function Auctioneer_CanSendAuctionQuery()
 	end
 	local pageElapsed = time() - lPageStartedAt;
 	if (pageElapsed > 60) then
-		if (Auctioneer_GetFilter(AUCT_SHOW_REDO)) then
-			Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_SCAN_REDO, 60));
+		if (Auctioneer_GetFilter(_AUCT['ShowRedo'])) then
+			Auctioneer_ChatPrint(string.format(_AUCT['AuctionScanRedo'], 60));
 		end
 		Auctioneer_AuctionNextQuery();
 		return nil;
@@ -164,7 +164,7 @@ function Auctioneer_StartAuctionScan()
 		lCurrentCategoryIndex = nextIndex();
 		if not lCurrentCategoryIndex then
 			lCurrentCategoryIndex = 0;
-			Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NOCAT);
+			Auctioneer_ChatPrint(_AUCT['AuctionScanNocat']);
 			return;
 		end
 	end
@@ -217,7 +217,7 @@ function Auctioneer_RequestAuctionScan()
 	
 		Auctioneer_StartAuctionScan();
 	else
-		Auctioneer_ChatPrint(AUCTIONEER_AUCTION_SCAN_NEXTTIME);
+		Auctioneer_ChatPrint(_AUCT['AuctionScanNexttime']);
 	end
 end
 

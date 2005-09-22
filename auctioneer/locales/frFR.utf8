@@ -31,44 +31,44 @@ AUCT_TYPE_TAILOR = "Tailleur";
 
 AUCT_RECIPE_PREFIXES = { "Recette: ", "Patron: ", "Plans: ", "Schéma: ", "Formule: " };
 
-AUCT_FRMT_BROKER_HEADER = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
-AUCT_FRMT_BROKER_LINE = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
-AUCT_FRMT_BROKER_DONE = "Brokering terminé";
-AUCT_FRMT_BIDBROKER_HEADER = "Profit minimum: %s, HSP = 'Prix de vente maximum'";
-AUCT_FRMT_BIDBROKER_MINBID = "EnchMin"
-AUCT_FRMT_BIDBROKER_CURBID = "EnchAct"
-AUCT_FRMT_BIDBROKER_LINE = "%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
-AUCT_FRMT_BIDBROKER_DONE = "Bid brokering terminé";
-AUCT_FRMT_PCTLESS_HEADER = "Percentage inférieur au HSP: %d%%";
-AUCT_FRMT_PCTLESS_LINE = "%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
-AUCT_FRMT_PCTLESS_DONE = "Percentage inférieur terminé.";
-AUCT_FRMT_COMPETE_HEADER = "Encheres compétitives au moins %s de moins par objet.";
-AUCT_FRMT_COMPETE_LINE = "%s, Ench: %s, BO %s vs %s, %s de moins";
-AUCT_FRMT_COMPETE_DONE = "Enchères compétitives terminées.";
-AUCT_FRMT_NOAUCT = "Pas d'enchère trouvée pour l'objet: %s";
-AUCT_FRMT_MEDIAN_LINE = "Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
-AUCT_FRMT_LOW_LINE = "%s, BO: %s, Vendeur: %s, L'unité: %s, Moins de la moyenne: %s";
-AUCT_FRMT_HSP_LINE = "Prix de vente maximum pour un %s est de: %s";
-AUCT_FRMT_INFO_SEEN = "Vu %d fois aux enchères";
-AUCT_FRMT_INFO_FORONE = "Pour 1: %s min/%s achat (%s enchère) [par %d]";
-AUCT_FRMT_INFO_AVERAGE = "%s min/%s achat (%s enchère)"
-AUCT_FRMT_INFO_HISTMED = "Derniers %d vus, achat moyen:";
-AUCT_FRMT_INFO_SNAPMED = "Vu %d fois au dernier scan, achat moyen:";
-AUCT_FRMT_INFO_BIDRATE = "%d%% avec enchère, %d%% avec achat immédiat";
-AUCT_FRMT_INFO_NEVER = "Jamais vu aux enchères";
-AUCT_FRMT_INFO_ALSOSEEN = "Vu %d fois aux %s";
-AUCT_FRMT_INFO_CLASSUSE = "Classe: %s utilisé pour %s";
-AUCT_FRMT_INFO_CLASS = "Classe: %s";
-AUCT_FRMT_INFO_USE = "Utilisé pour: %s";
-AUCT_FRMT_INFO_BUY = "Achat%s au marchand";
-AUCT_FRMT_INFO_SELL = "Vente%s au marchand";
-AUCT_FRMT_INFO_BUYMULT = "Achat%s %d (%s chacun)";
-AUCT_FRMT_INFO_SELLMULT = "Vente%s %d (%s chacun)";
-AUCT_FRMT_INFO_STX = "Pile par lots de %d";
+_AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
+_AUCT['FrmtBrokerLine'] = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
+_AUCT['FrmtBrokerDone'] = "Brokering terminé";
+_AUCT['FrmtBidbrokerHeader'] = "Profit minimum: %s, HSP = 'Prix de vente maximum'";
+_AUCT['FrmtBidbrokerMinbid'] = "EnchMin"
+_AUCT['FrmtBidbrokerCurbid'] = "EnchAct"
+_AUCT['FrmtBidbrokerLine'] = "%s, Derniers %s vus, HSP: %s, %s: %s, Prof: %s, Temps: %s";
+_AUCT['FrmtBidbrokerDone'] = "Bid brokering terminé";
+_AUCT['FrmtPctlessHeader'] = "Percentage inférieur au HSP: %d%%";
+_AUCT['FrmtPctlessLine'] = "%s, Derniers %d vus, HSP: %s, AI: %s, Prof: %s, Moins %s";
+_AUCT['FrmtPctlessDone'] = "Percentage inférieur terminé.";
+_AUCT['FrmtCompeteHeader'] = "Encheres compétitives au moins %s de moins par objet.";
+_AUCT['FrmtCompeteLine'] = "%s, Ench: %s, BO %s vs %s, %s de moins";
+_AUCT['FrmtCompeteDone'] = "Enchères compétitives terminées.";
+_AUCT['FrmtNoauct'] = "Pas d'enchère trouvée pour l'objet: %s";
+_AUCT['FrmtMedianLine'] = "Des derniers %d vus, l'achat moyen pour 1 %s est de: %s";
+_AUCT['FrmtLowLine'] = "%s, BO: %s, Vendeur: %s, L'unité: %s, Moins de la moyenne: %s";
+_AUCT['FrmtHspLine'] = "Prix de vente maximum pour un %s est de: %s";
+_AUCT['FrmtInfoSeen'] = "Vu %d fois aux enchères";
+_AUCT['FrmtInfoForone'] = "Pour 1: %s min/%s achat (%s enchère) [par %d]";
+_AUCT['FrmtInfoAverage'] = "%s min/%s achat (%s enchère)"
+_AUCT['FrmtInfoHistmed'] = "Derniers %d vus, achat moyen:";
+_AUCT['FrmtInfoSnapmed'] = "Vu %d fois au dernier scan, achat moyen:";
+_AUCT['FrmtInfoBidrate'] = "%d%% avec enchère, %d%% avec achat immédiat";
+_AUCT['FrmtInfoNever'] = "Jamais vu aux enchères";
+_AUCT['FrmtInfoAlsoseen'] = "Vu %d fois aux %s";
+_AUCT['FrmtInfoClassuse'] = "Classe: %s utilisé pour %s";
+_AUCT['FrmtInfoClass'] = "Classe: %s";
+_AUCT['FrmtInfoUse'] = "Utilisé pour: %s";
+_AUCT['FrmtInfoBuy'] = "Achat%s au marchand";
+_AUCT['FrmtInfoSell'] = "Vente%s au marchand";
+_AUCT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
+_AUCT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
+_AUCT['FrmtInfoStx'] = "Pile par lots de %d";
 
 -- AH Scanning localizations
-AUCTIONEER_AUCTION_SCAN_START = "Auctioneer: Scan de la catégorie '%s': page 1...";
-AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Scan de la catégorie '%s': page %d sur %d";
-AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: Scan terminé";
-AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez à un commisaire-priseur.";
+_AUCT['AuctionScanStart'] = "Auctioneer: Scan de la catégorie '%s': page 1...";
+_AUCT['AuctionPageN'] = "Auctioneer: Scan de la catégorie '%s': page %d sur %d";
+_AUCT['AuctionScanDone'] = "Auctioneer: Scan terminé";
+_AUCT['AuctionScanNexttime'] = "Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez à un commisaire-priseur.";
 

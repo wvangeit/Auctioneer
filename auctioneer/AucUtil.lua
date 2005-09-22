@@ -31,13 +31,13 @@ function Auctioneer_GetTimeLeftString(timeLeft)
 	local timeLeftString = "";
 	-- TODO: localize these strings
 	if timeLeft == TIME_LEFT_SHORT then
-		timeLeftString = AUCT_TIME_SHORT;
+		timeLeftString = _AUCT['TimeShort'];
 	elseif timeLeft == TIME_LEFT_MEDIUM then
-		timeLeftString = AUCT_TIME_MED;
+		timeLeftString = _AUCT['TimeMed'];
 	elseif timeLeft == TIME_LEFT_LONG then
-		timeLeftString = AUCT_TIME_LONG;
+		timeLeftString = _AUCT['TimeLong'];
 	elseif timeLeft == TIME_LEFT_VERY_LONG then
-		timeLeftString = AUCT_TIME_VLONG;
+		timeLeftString = _AUCT['TimeVlong'];
 	end
 	return timeLeftString;
 end

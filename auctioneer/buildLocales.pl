@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+open PERLCONV, "> perlconv";
+print PERLCONV "#!/usr/bin/perl -pi\n\n";
+
 open OUT, "> localization.lua";
 print OUT << 'EOD';
 --[[
@@ -29,6 +32,7 @@ for $file (<locales/????.utf8>) {
 	push(@valid, $locale);
 }
 
+print OUT "_AUCT = {};\n\n";
 print OUT "AUCT_VALID_LOCALES = {[\"".join("\"] = true, [\"", @valid)."\"] = true};\n\n";
 print OUT "function Auctioneer_SetLocaleStrings(locale)\n";
 
@@ -39,10 +43,23 @@ while (<DATA>) {
 	s/[\r\n]+/\n/g;
 	s/([\200-\377])/sprintf("\\%d",ord($1))/eg;
 	s/\-\-.*$//;
-	if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
+	if (/^(\w+)\s*=\s*(.*)/) {
 		$defined{$1} = $2;
+		$key = $1;
+		$val = $2;
+		if ($key =~ /^AUCT(IONEER)?_([A-Z_]+)/) {
+			$keyname = $2;
+			$keyname =~ s/_/ /g;
+			$keyname = ucfirst(lc($keyname));
+			$keyname =~ s/ ([^ ]+)/ucfirst($1)/ge;
+			$_ = "_AUCT['$keyname'] = $val\n";
+			print PERLCONV "s/$key/_AUCT['$keyname']/g;\n";
+		}
+		else {
+			$_ = "$key = $val\n";
+		}
 	}
-	print OUT "$_";
+	print OUT "\t$_";
 }
 close DATA;
 
@@ -60,11 +77,23 @@ for $locale (@locales) {
 		if (s/^(\w+)\s*=\s*(.*)/$1=$2/) {
 			if ($2 ne $defined{$1}) {
 				$localized{$1} = $2;
-				print OUT "$_";
+				$key = $1;
+				$val = $2;
+				if ($key =~ /^AUCT(IONEER)?_([A-Z_]+)/) {
+					$keyname = $2;
+					$keyname =~ s/_/ /g;
+					$keyname = ucfirst(lc($keyname));
+					$keyname =~ s/ ([^ ]+)/ucfirst($1)/ge;
+					$_ = "_AUCT['$keyname'] = $val\n";
+				}
+				else {
+					$_ = "$key = $val;\n";
+				}
+				print OUT "\t\t$_";
 			}
 		}
 		else {
-			print OUT "$_";
+			print OUT "\t\t$_";
 		}
 	}
 	close DATA;
@@ -74,10 +103,10 @@ for $locale (@locales) {
 	for $defined (sort(keys(%defined))) {
 		unless ($localized{$defined}) {
 			unless ($missing) {
-				print OUT "\n-- The following definitions are missing in this locale:\n";
+				print OUT "\n\t\t-- The following definitions are missing in this locale:\n";
 				$missing = 1;
 			}
-			print OUT"--\t$defined = \"\";\n";
+			print OUT"\t\t--\t$defined = \"\";\n";
 		}
 	}
 	
