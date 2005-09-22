@@ -74,6 +74,10 @@ function Auctioneer_Convert()
 
 							-- data/name
 							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.+)")
+							if s7 == nil then
+								p("TODO!!!!! Very old format? iData = "..iData)
+								p("Please report to: http://norganna.org/bb/index.php?showtopic=226")
+							end
 							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
 							name = sname
 						else
