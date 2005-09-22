@@ -180,6 +180,7 @@ AUCT_SHOW_VENDOR = "show-vendor";
 AUCT_SHOW_VENDOR_BUY = "show-vendor-buy";
 AUCT_SHOW_VENDOR_SELL = "show-vendor-sell";
 AUCT_SHOW_EMBED_BLANK = "show-embed-blankline";
+AUCT_SHOW_REDO = "show-warning";
 
 AUCT_HELP_ONOFF = "Turns the auction data display on and off";
 AUCT_HELP_VERBOSE = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
@@ -210,6 +211,7 @@ AUCT_HELP_PCT_MAXLESS = "Set the maximum percentage that auctioneer will undercu
 AUCT_HELP_PCT_NOCOMP = "The percentage that Auctioneer will undercut market value when there is no competition";
 AUCT_HELP_PCT_UNDERLOW = "Set the percentage that Auctioneer will undercut the lowest auction price";
 AUCT_HELP_PCT_UNDERMKT = "Percentage to cut market value by when unable to beat competition (due to maxless)";
+AUCT_HELP_REDO = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 
 AUCT_STAT_ON = "Displaying configured auction data";
 AUCT_STAT_OFF = "Not displaying any auction data";
@@ -306,4 +308,3 @@ AUCTIONEER_GUI_RELOADUI = "Reload User Interface";
 AUCTIONEER_GUI_RELOADUI_HELP = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 AUCTIONEER_GUI_RELOADUI_BUTTON = "ReloadUI";
 AUCTIONEER_GUI_RELOADUI_FEEDBACK = "Now Reloading the WoW UI";
-

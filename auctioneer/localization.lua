@@ -221,6 +221,7 @@ AUCT_SHOW_VENDOR="show-vendor";
 AUCT_SHOW_VENDOR_BUY="show-vendor-buy";
 AUCT_SHOW_VENDOR_SELL="show-vendor-sell";
 AUCT_SHOW_EMBED_BLANK="show-embed-blankline";
+AUCT_SHOW_REDO="show-warning";
 
 AUCT_HELP_ONOFF="Turns the auction data display on and off";
 AUCT_HELP_VERBOSE="Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
@@ -251,6 +252,7 @@ AUCT_HELP_PCT_MAXLESS="Set the maximum percentage that auctioneer will undercut 
 AUCT_HELP_PCT_NOCOMP="The percentage that Auctioneer will undercut market value when there is no competition";
 AUCT_HELP_PCT_UNDERLOW="Set the percentage that Auctioneer will undercut the lowest auction price";
 AUCT_HELP_PCT_UNDERMKT="Percentage to cut market value by when unable to beat competition (due to maxless)";
+AUCT_HELP_REDO="Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 
 AUCT_STAT_ON="Displaying configured auction data";
 AUCT_STAT_OFF="Not displaying any auction data";
@@ -347,8 +349,6 @@ AUCTIONEER_GUI_RELOADUI="Reload User Interface";
 AUCTIONEER_GUI_RELOADUI_HELP="Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 AUCTIONEER_GUI_RELOADUI_BUTTON="ReloadUI";
 AUCTIONEER_GUI_RELOADUI_FEEDBACK="Now Reloading the WoW UI";
-
-
 -- Locale strings for the deDE locale
 if locale == "deDE" then
 -- Encoded in UTF8
@@ -650,6 +650,7 @@ AUCTIONEER_AUCTION_DISCREPANCIES="Unstimmigkeiten: %s";
 --	AUCT_CMD_TOGGLE = "";
 --	AUCT_FRMT_ACT_DEFAULT = "";
 --	AUCT_FRMT_ACT_DEFAULTALL = "";
+--	AUCT_HELP_REDO = "";
 --	AUCT_MESG_CONVERT = "";
 --	AUCT_MESG_CONVERT_NO = "";
 --	AUCT_MESG_CONVERT_YES = "";
@@ -666,6 +667,7 @@ AUCTIONEER_AUCTION_DISCREPANCIES="Unstimmigkeiten: %s";
 --	AUCT_SHOW_EMBED_BLANK = "";
 --	AUCT_SHOW_LINK = "";
 --	AUCT_SHOW_MEDIAN = "";
+--	AUCT_SHOW_REDO = "";
 --	AUCT_SHOW_STACK = "";
 --	AUCT_SHOW_STATS = "";
 --	AUCT_SHOW_SUGGEST = "";
@@ -864,6 +866,7 @@ AUCT_SHOW_VENDOR="ver-vendedor";
 AUCT_SHOW_VENDOR_BUY="ver-vendedor-compra";
 AUCT_SHOW_VENDOR_SELL="ver-vendedor-venta";
 AUCT_SHOW_EMBED_BLANK="ver-integrado-lineavacia";
+AUCT_SHOW_REDO="ver-advertencia";
 
 AUCT_HELP_ONOFF="Enciande o apaga la informacion sobre las subastas";
 AUCT_HELP_VERBOSE="Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
@@ -894,6 +897,7 @@ AUCT_HELP_PCT_MAXLESS="Ajusta el maximo porcentaje por debajo del valor de merca
 AUCT_HELP_PCT_NOCOMP="El porcentaje bajo el precio del mercado que Auctioneer usar\195\161 cuando no hay competencia";
 AUCT_HELP_PCT_UNDERLOW="Ajusta el porcentaje bajo el menor precio m\195\173nimo de subasta que Auctioneer aplicar\195\161";
 AUCT_HELP_PCT_UNDERMKT="Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
+AUCT_HELP_REDO="Selecciona para mostrat una advertencia cuando la p\195\161gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 
 AUCT_STAT_ON="Mostrando la configuracion corriente para la informacion de subastas";
 AUCT_STAT_OFF="Ocultando toda la informacion de subastas";
@@ -922,6 +926,13 @@ AUCTIONEER_AUCTION_PAGE_N="Auctioneer: Explorando \"%s\" p\195\161gina %d de %d"
 AUCTIONEER_AUCTION_SCAN_DONE="Auctioneer: La exploraci\195\179n de las subastas ha finalizado";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 AUCTIONEER_AUCTION_SCAN_NOCAT="Usted debe tener al menos una categoria seleccionada para poder explorar.";
+AUCTIONEER_AUCTION_SCAN_REDO="La p\195\161gina corriente ha tomado mas de %d segundos para completar. Tratando p\195\161gina otra vez.";
+
+AUCT_MESG_CONVERT="Conversi\195\179n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
+AUCT_MESG_NOTCONVERTING="Auctioneer no convertir\195\161 su base de datos, pero no funcionar\195\161 hasta que la base de datos sea convertida.";
+AUCT_MESG_CONVERT_YES="Convertir";
+AUCT_MESG_CONVERT_NO="Deshabilitar Auctioneer";
+
 AUCTIONEER_AUCTION_TOTAL_AUCTS="Total de subastas exploradas: %s";
 AUCTIONEER_AUCTION_NEW_AUCTS="Nuevas subastas exploradas: %s";
 AUCTIONEER_AUCTION_OLD_AUCTS="Subastas exploradas previamente: %s";
@@ -985,15 +996,10 @@ AUCTIONEER_GUI_RELOADUI_BUTTON="Recargar";
 AUCTIONEER_GUI_RELOADUI_FEEDBACK="Recargando el Interf\195\161z de WoW";
 
 -- The following definitions are missing in this locale:
---	AUCTIONEER_AUCTION_SCAN_REDO = "";
 --	AUCT_ADDIT_ALCOHOL = "";
 --	AUCT_CMD_ALT = "";
 --	AUCT_CMD_CTRL = "";
 --	AUCT_CMD_SHIFT = "";
---	AUCT_MESG_CONVERT = "";
---	AUCT_MESG_CONVERT_NO = "";
---	AUCT_MESG_CONVERT_YES = "";
---	AUCT_MESG_NOTCONVERTING = "";
 --	AUCT_OPT_PCT_BIDMARKDOWN_DEFAULT = "";
 --	AUCT_OPT_PCT_MARKUP_DEFAULT = "";
 --	AUCT_OPT_PCT_MAXLESS_DEFAULT = "";
@@ -1245,6 +1251,7 @@ AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison d
 --	AUCT_HELP_PCT_UNDERLOW = "";
 --	AUCT_HELP_PCT_UNDERMKT = "";
 --	AUCT_HELP_PERCENTLESS = "";
+--	AUCT_HELP_REDO = "";
 --	AUCT_HELP_SCAN = "";
 --	AUCT_HELP_STACK = "";
 --	AUCT_HELP_STATS = "";
@@ -1284,6 +1291,7 @@ AUCTIONEER_AUCTION_SCAN_NEXTTIME="Auctioneer fera un scan complet de la maison d
 --	AUCT_SHOW_EMBED_BLANK = "";
 --	AUCT_SHOW_LINK = "";
 --	AUCT_SHOW_MEDIAN = "";
+--	AUCT_SHOW_REDO = "";
 --	AUCT_SHOW_STACK = "";
 --	AUCT_SHOW_STATS = "";
 --	AUCT_SHOW_SUGGEST = "";

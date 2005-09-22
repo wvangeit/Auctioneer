@@ -134,7 +134,9 @@ local function Auctioneer_CanSendAuctionQuery()
 	end
 	local pageElapsed = time() - lPageStartedAt;
 	if (pageElapsed > 60) then
-		Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_SCAN_REDO, 60));
+		if (Auctioneer_GetFilter(AUCT_SHOW_REDO)) then
+			Auctioneer_ChatPrint(string.format(AUCTIONEER_AUCTION_SCAN_REDO, 60));
+		end
 		Auctioneer_AuctionNextQuery();
 		return nil;
 	end

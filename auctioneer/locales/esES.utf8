@@ -180,6 +180,7 @@ AUCT_SHOW_VENDOR = "ver-vendedor";
 AUCT_SHOW_VENDOR_BUY = "ver-vendedor-compra";
 AUCT_SHOW_VENDOR_SELL = "ver-vendedor-venta";
 AUCT_SHOW_EMBED_BLANK = "ver-integrado-lineavacia";
+AUCT_SHOW_REDO = "ver-advertencia";
 
 AUCT_HELP_ONOFF = "Enciande o apaga la informacion sobre las subastas";
 AUCT_HELP_VERBOSE = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
@@ -210,6 +211,7 @@ AUCT_HELP_PCT_MAXLESS = "Ajusta el maximo porcentaje por debajo del valor de mer
 AUCT_HELP_PCT_NOCOMP = "El porcentaje bajo el precio del mercado que Auctioneer usará cuando no hay competencia";
 AUCT_HELP_PCT_UNDERLOW = "Ajusta el porcentaje bajo el menor precio mínimo de subasta que Auctioneer aplicará";
 AUCT_HELP_PCT_UNDERMKT = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
+AUCT_HELP_REDO = "Selecciona para mostrat una advertencia cuando la página corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 
 AUCT_STAT_ON = "Mostrando la configuracion corriente para la informacion de subastas";
 AUCT_STAT_OFF = "Ocultando toda la informacion de subastas";
@@ -238,6 +240,13 @@ AUCTIONEER_AUCTION_PAGE_N = "Auctioneer: Explorando \"%s\" página %d de %d";
 AUCTIONEER_AUCTION_SCAN_DONE = "Auctioneer: La exploración de las subastas ha finalizado";
 AUCTIONEER_AUCTION_SCAN_NEXTTIME = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 AUCTIONEER_AUCTION_SCAN_NOCAT = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
+AUCTIONEER_AUCTION_SCAN_REDO = "La página corriente ha tomado mas de %d segundos para completar. Tratando página otra vez.";
+
+AUCT_MESG_CONVERT = "Conversión de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
+AUCT_MESG_NOTCONVERTING = "Auctioneer no convertirá su base de datos, pero no funcionará hasta que la base de datos sea convertida.";
+AUCT_MESG_CONVERT_YES = "Convertir";
+AUCT_MESG_CONVERT_NO = "Deshabilitar Auctioneer";
+
 AUCTIONEER_AUCTION_TOTAL_AUCTS = "Total de subastas exploradas: %s";
 AUCTIONEER_AUCTION_NEW_AUCTS = "Nuevas subastas exploradas: %s";
 AUCTIONEER_AUCTION_OLD_AUCTS = "Subastas exploradas previamente: %s";

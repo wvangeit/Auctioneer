@@ -596,6 +596,7 @@ function Auctioneer_Command(command, source)
 		((cmd == AUCT_SHOW_VENDOR_BUY) or (cmd == "show-vendor-buy")) or
 		((cmd == AUCT_SHOW_VENDOR_SELL) or (cmd == "show-vendor-sell")) or		
 		((cmd == AUCT_SHOW_EMBED_BLANK) or (cmd == "show-embed-blankline")) or
+		((cmd == AUCT_SHOW_REDO) or (cmd == "show-redowarning")) or
 		((cmd == AUCT_SHOW_HSP) or (cmd == "show-hsp")) --This command has not yet been implemented.
 	) then
 		Auctioneer_GenVarSet(cmd, param, chatprint);
@@ -640,6 +641,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_AUTOFILL, Auctioneer_GetFilterVal(AUCT_CMD_AUTOFILL), AUCT_HELP_AUTOFILL));
 	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_EMBED, Auctioneer_GetFilterVal(AUCT_CMD_EMBED), AUCT_HELP_EMBED));
 	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_EMBED_BLANK, Auctioneer_GetFilterVal(AUCT_SHOW_EMBED_BLANK), AUCT_HELP_EMBED_BLANK));
+	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_SHOW_REDO, Auctioneer_GetFilterVal(AUCT_SHOW_REDO), AUCT_HELP_REDO));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer_ChatPrint(string.format(lineFormat, AUCT_CMD_LOCALE, AUCT_OPT_LOCALE, Auctioneer_GetFilterVal('locale'), AUCT_HELP_LOCALE));

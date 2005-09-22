@@ -1,6 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<improvement id="improvement4" codedby="MentalPower" timestamp="2005-09-21 19:42">
+			<file name="AHScanning.lua">
+				<change function="Auctioneer_CanSendAuctionQuery"/>
+			</file>
+			<file name="AucCommand.lua">
+				<change function="Auctioneer_Command"/>
+				<change function="Auctioneer_ChatPrint_Help"/>
+			</file>
+			<file name="enUS.utf8">
+				<add constant="AUCT_SHOW_REDO"/>
+				<add constant="AUCT_HELP_REDO"/>
+			</file>
+			<file name="esES.utf8">
+				<add constant="AUCT_SHOW_REDO"/>
+				<add constant="AUCT_HELP_REDO"/>
+				<add constant="AUCT_MESG_CONVERT"/>
+				<add constant="AUCT_MESG_NOTCONVERTING"/>
+				<add constant="AUCT_MESG_CONVERT_YES"/>
+				<add constant="AUCT_MESG_CONVERT_NO"/>
+			</file>
+			<developer>
+				Added show-warning to the list of commands so that the users have the option of turning the warning on or off. Also updated the esES localization with the new strings :)
+			</developer>
+			<public>
+				There is now a "/auctioneer show-warning" command that accepts either a on or off setting to select whether to warn when a page in the AH has taken too long to scan
+			</public>
+		</improvement>
 		<improvement id="improvement3" codedby="MentalPower" reportedby="vampirish" norgannabbid="http://norganna.org/bb/index.php?showtopic=190&hl=default" timestamp="2005-09-18 06:11">
 			<file name="Auctioneer.lua">
 				<add function="Auctioneer_Default"/>
