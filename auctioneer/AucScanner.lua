@@ -342,7 +342,9 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActRemove'], auctionSignature));
 		local auctKey = Auctioneer_GetAuctionKey();
 		local itemCat = Auctioneer_GetCatForKey(aiKey);
-		AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
+		if (itemCat and AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey] and AuctionConfig.snap[auctKey][itemCat]) then
+			AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
+		end
 		AuctionConfig.bids[playerName][eventTime].itemWon = true;
 		Auctioneer_HSPCache[auctKey][aiKey] = nil;
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
