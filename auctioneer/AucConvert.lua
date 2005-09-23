@@ -112,12 +112,14 @@ function Auctioneer_Convert()
 				for time, bData in pairs(pData) do
 					local amount = bData.bidAmount;
 					local sig = bData.signature;
-					local owner = bData.itemOwner;
+					local owner = bData.itemOwner or "unknown";
 					local won = bData.itemWon;
 					if (won) then won = "1"; else won = "0"; end
 
-					local newBid = string.format("%s|%s|%s|%s", sig, amount, won, owner);
-					AuctionConfig.bids[player][time] = newBid;
+					if (player and time and amount and sig and won) then
+						local newBid = string.format("%s|%s|%s|%s", sig, amount, won, owner);
+						AuctionConfig.bids[player][time] = newBid;
+					ed
 				end
 			end
 		end
