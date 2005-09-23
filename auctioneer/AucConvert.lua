@@ -119,7 +119,7 @@ function Auctioneer_Convert()
 					if (player and time and amount and sig and won) then
 						local newBid = string.format("%s|%s|%s|%s", sig, amount, won, owner);
 						AuctionConfig.bids[player][time] = newBid;
-					ed
+					end
 				end
 			end
 		end
