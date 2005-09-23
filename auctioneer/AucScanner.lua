@@ -326,6 +326,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 
 	local playerName = UnitName("player");
 	local eventTime = "e"..time();
+	if (not AuctionConfig.bids) then AuctionConfig.bids = {} end
 	if (not AuctionConfig.bids[playerName]) then
 		AuctionConfig.bids[playerName] = {};
 	end
