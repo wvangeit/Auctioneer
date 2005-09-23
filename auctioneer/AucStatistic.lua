@@ -155,10 +155,10 @@ function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistor
 	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
 	if (not buyoutHistoryTable) then
 		local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
-		if (buyoutHistoryTable) then
-			historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
-			historySeenCount = table.getn(buyoutHistoryTable);
-		end
+	end
+	if (buyoutHistoryTable) then
+		historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
+		historySeenCount = table.getn(buyoutHistoryTable);
 	end
 
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
@@ -206,10 +206,12 @@ function Auctioneer_GetUsableMedian(itemKey, realm, buyoutPrices)
 
 	if snapshotMedian>0 and (historyMedian==0 or snapshotMedian<(historyMedian * 1.2)) then
 		usableMedian = snapshotMedian;
+		count = snapCount;
 	elseif (historyMedian) then
 		usableMedian = historyMedian;
+		count = histCount;
 	end
-	return usableMedian;
+	return usableMedian, count;
 end
 
 -- Returns the current bid on an auction

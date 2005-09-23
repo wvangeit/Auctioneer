@@ -14,12 +14,12 @@ function Auctioneer_BrokerFilter(minProfit, signature)
 	local itemKey = id..":"..rprop..":"..enchant;
 
 	if Auctioneer_GetUsableMedian(itemKey) then -- we have a useable median
-		local hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 		local profit = (hsp * count) - buyout;
 		local profitPricePercent = math.floor((profit / buyout) * 100);
 
 		--see if this auction should not be filtered
-		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount > MIN_BUYOUT_SEEN_COUNT) then
 			filterAuction = false;
 		end
 	end
@@ -46,7 +46,7 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 		-- we go to the effort of calculating actual profit.
 		-- Note: if second == nil, this indicates no competition.
 		if (second == nil or currentBid < second * 1.2) then
-			local hsp, x,x,x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
+			local hsp, seenCount, x, x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
 			-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
 
 			local profit = (hsp * count) - currentBid;
@@ -58,7 +58,7 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 			if (snap) then
 				local timeLeft = tonumber(snap.timeLeft);
-				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount > MIN_BUYOUT_SEEN_COUNT) then
 					filterAuction = false;
 				end
 			end
@@ -189,7 +189,8 @@ function Auctioneer_DoBidBroker(minProfit)
 			if (currentBid == min) then
 				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
-			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+			p("a", a);
+			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
 			Auctioneer_ChatPrint(output);
 		end
 	end
