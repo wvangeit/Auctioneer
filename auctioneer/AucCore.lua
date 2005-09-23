@@ -84,6 +84,7 @@ CLASS_TO_CATEGORY_MAP = {
 --[[ SavedVariables --]]
 AuctionConfig = {};        --Table that stores config settings
 Auction_DoneItems = {};    --Table to keep a record of auction items that have been scanned
+AuctionBackup = {}			--Table to backup old data which can't be converted at once
 AuctionConfig.version = 30200;
 
 -- Table to store our cached HSP values (since they're expensive to calculate)

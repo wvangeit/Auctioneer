@@ -7,6 +7,15 @@
 	Functions that allow auctioneer to upgrade the data formats when necessary.
 ]]
 
+-- helperfunction to backup data, which can't be converted atm
+local function Auctioneer_Backup(server, sig, data)
+	if AuctionBackup[server] == nil then
+		AuctionBackup[server] = {}
+	end
+	
+	AuctionBackup[server][sig] = data
+end
+
 function Auctioneer_Convert()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
@@ -57,31 +66,43 @@ function Auctioneer_Convert()
 						local catName
 						local cat
 						local data
-						local name
-						local sname
+						local name = nil
 						local hist = ""
-						-- addded by Luke1410 to convert old 2.x data to the new 3.2 format
+						local newsig = sig
 						if type(iData) == "string" then
+							-- 2.x -> 3.1							
 							local oldData = iData
 
 							-- category
-							local _, _, _, _, catName = GetItemInfo(sig)
+							name, _, _, _, catName = GetItemInfo(sig)
 							if catName == nil then
 								-- !!!item not seen since serverrestart!!!
 								cat = 0 -- mark as unknown
 							else
 								cat = Auctioneer_GetCatNumberByName(catName)
 							end
+							
+							-- signatue
+							newsig = newsig..':0:0'
 
 							-- data/name
-							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.+)")
-							if s7 == nil then
-								p("TODO!!!!! Very old format? iData = "..iData)
-								p("Please report to: http://norganna.org/bb/index.php?showtopic=226")
-							end
+							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.*)")
 							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
-							name = sname
+							if (name == nil) or (name == '') then
+								name = sname
+							end
+							if (name == nil) or (name == '') then
+								-- ouch ! can't convert the old data atm since no valid itemname can be found
+								-- backing it up so we might convert it later
+								Auctioneer_Backup(server, sig, iData)
+							end
+						elseif iData.category == nil then
+							-- unknown dataformat
+							-- ouch ! strange dataformat, can't convert atm since there is no way to get the itemid right now
+							-- backing it up so we might convert it later
+							Auctioneer_Backup(server, sig, iData)
 						else
+							-- 3.0 -> 3.1
 							catName = Auctioneer_GetCatName(tonumber(iData.category));
 							if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
 							cat = iData.category;
@@ -97,8 +118,8 @@ function Auctioneer_Convert()
 						if (name) then
 							local newData = string.format("%s|%s", data, hist);
 							local newInfo = string.format("%s|%s", cat, name);
-							AuctionConfig.data[server][sig] = newData;
-							AuctionConfig.info[sig] = newInfo;
+							AuctionConfig.data[server][newsig] = newData;
+							AuctionConfig.info[newsig] = newInfo;
 						end
 					end
 				end
