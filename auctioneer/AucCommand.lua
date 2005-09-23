@@ -811,7 +811,6 @@ local validLocale=nil;
 	elseif (AUCT_VALID_LOCALES[param]) then
 		Auctioneer_SetFilter('locale', param);
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-		Auctioneer_BuildBaseData();
 		validLocale=true;
 
 	elseif (param == '') or (param == 'default') or (param == 'off') then
