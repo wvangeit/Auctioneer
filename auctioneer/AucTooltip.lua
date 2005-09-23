@@ -206,7 +206,7 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 		local also = Auctioneer_GetFilterVal("also");
 		if (Auctioneer_IsValidAlso(also)) and (also ~= "off") then
 			if (also == "opposite") then
-				also = oppositeKey();
+				also = Auctioneer_GetOppositeKey();
 			end
 			local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, also);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
@@ -249,8 +249,8 @@ function Auctioneer_NewTooltip(frame, name, link, quality, count)
 						if countFix == 0 then
 							countFix = 1
 						end
-						local buyPrice = roundDownTo95(nullSafe(hsp) * countFix);
-						local bidPrice = roundDownTo95(subtractPercent(buyPrice, discountBidPercent));
+						local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
+						local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 						if (count > 1) then
 							-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
 							TT_AddLine(string.format(">> ".._AUCT['FrmtInfoSgststx'], count, TT_GetTextGSC(bidPrice, true), TT_GetTextGSC(buyPrice, true)), nil, embedded);
