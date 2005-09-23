@@ -5,6 +5,8 @@
 ]]
 
 
+TOOLTIPS_INCLUDED = getglobal("TOOLTIPS_INCLUDED");
+
 if (TOOLTIPS_INCLUDED == nil) then
 TOOLTIPS_INCLUDED = true;
 
@@ -294,12 +296,15 @@ function TT_GetTextGSC(money, exact)
 	if not exact then
 	   exact = false
 	end
+
+	local TT_TEXT_NONE = "0";
+	
 	local GSC_GOLD="ffd100";
 	local GSC_SILVER="e6e6e6";
 	local GSC_COPPER="c8602c";
 	local GSC_START="|cff%s%d|r";
 	local GSC_PART=".|cff%s%02d|r";
-	local GSC_NONE="|cffa0a0a0"..AUCT_TEXT_NONE.."|r";
+	local GSC_NONE="|cffa0a0a0"..TT_TEXT_NONE.."|r";
 
 	local g, s, c = TT_GetGSC(money);
 
