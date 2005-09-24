@@ -759,10 +759,10 @@ function Auctioneer_Clear(param, chatprint)
 
 		else
 			if (clearok == true) then
-				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearOk'], itemKey));
+				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearOk'], param));
 
 			else
-				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearFail'], itemKey));
+				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearFail'], param));
 			end
 		end
 	end

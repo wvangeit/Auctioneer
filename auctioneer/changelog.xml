@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix19" codedby="MentalPower" timestamp="2005-09-23 02:50">
+			<file name="AucCommand.lua">
+				<change function="Auctioneer_Clear"/>
+			</file>
+			<public>
+				The /auctioneer clear [Item Link] function now reports completion corrently.
+			</public>
+		</bugfix>
 		<improvement id="improvement4" codedby="MentalPower" timestamp="2005-09-21 19:42">
 			<file name="AHScanning.lua">
 				<change function="Auctioneer_CanSendAuctionQuery"/>
