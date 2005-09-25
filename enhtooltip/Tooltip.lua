@@ -12,8 +12,16 @@ TOOLTIPS_INCLUDED = true;
 
 ENHTOOLTIP_VERSION = "<%version%>";
 
-TT_CurrentTip = nil;
-TT_PopupKey = "alt";
+-- global variables
+TT_Show_Ignore  = false
+TT_MoneySpacing = 4
+TT_Lines        = {}
+TT_CurTime      = 0
+TT_HideAt       = 0
+TT_CurrentTip   = nil
+TT_PopupKey     = "alt"
+
+-- local variables
 local OldChatLinkItem = nil -- used to save last chat-link-item for redisplaying, if needed
 
 local Orig_Chat_OnHyperlinkShow;
@@ -331,7 +339,6 @@ function TT_GetTextGSC(money, exact)
 	return gsc;
 end
 
-TT_Lines = {};
 function TT_EmbedRender()
 	for pos, lData in TT_Lines do
 		TT_CurrentTip:AddLine(lData.line);
@@ -342,7 +349,6 @@ function TT_EmbedRender()
 	end
 end
 
-TT_MoneySpacing = 4;
 function TT_AddLine(lineText, moneyAmount, embed)
 	if (embed == nil) then embed = TT_EMBED; end
 	if (embed) and (TT_CurrentTip) then
@@ -426,8 +432,6 @@ end
 
 function TT_SetModel(class, file) return nil end
 
-TT_CurTime = 0;
-TT_HideAt = 0;
 function TT_GameTooltip_OnHide()
 	Orig_GameTooltip_OnHide();
 	local curName = "";
@@ -444,6 +448,23 @@ function TT_OnUpdate(elapsed)
 	TT_CheckHide();
 end
 
+local function EnhancedTT_Chat_OnHyperlinkShow(reference, link, button)
+	if (ItemRefTooltip:IsVisible()) then
+		local itemName = ItemRefTooltipTextLeft1:GetText();
+		if (itemName and TT_ChatCurrentItem ~= itemName) then
+			TT_ChatCurrentItem = itemName;
+
+			local testPopup = false;
+			if (button == "RightButton") then
+				testPopup = true;
+			end
+			if (TT_TooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)) then 
+				OldChatLinkItem = {['reference']=reference, ['link']=link, ['button']=button, ['embed']=EnhancedTooltip.hasEmbed}
+			end
+		end
+	end
+end
+
 function TT_CheckHide()
 	if (TT_HideAt == 0) then return end
 	TT_CurrentItem = nil;
@@ -456,11 +477,11 @@ function TT_CheckHide()
 		elseif OldChatLinkItem then
 			-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
 
-			local Backup = {['reference']=OldChatLinkItem.reference, ['link']=OldChatLinkItem.link, ['button']=OldChatLinkItem.button}
+			local Backup = {['reference']=OldChatLinkItem.reference, ['link']=OldChatLinkItem.link, ['button']=OldChatLinkItem.button, ['embed']=OldChatLinkItem.embed}
 			-- redisplay old chatlinkdata, if there was one before
-			HideUIPanel(ItemRefTooltip)
-			TT_Chat_OnHyperlinkShow(Backup.reference, Backup.link, Backup.button)
-			ShowUIPanel(ItemRefTooltip)
+			if not OldChatLinkItem.embed then
+				EnhancedTT_Chat_OnHyperlinkShow(Backup.reference, Backup.link, Backup.button)
+			end
 		end
 	end
 end
@@ -519,7 +540,6 @@ local function fakeLink(item, quality, name)
 end
 TT_FakeLink = fakeLink;
 
-TT_Show_Ignore = false;
 function TT_TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	TT_CurrentTip = frame;
 	TT_HideAt = 0;
@@ -596,22 +616,8 @@ function TT_ItemPopup(name, link, quality, count, price, hyperlink)
 end
 
 function TT_Chat_OnHyperlinkShow(reference, link, button, ...)
-	Orig_Chat_OnHyperlinkShow(reference, link, button);
-
-	if (ItemRefTooltip:IsVisible()) then
-		local itemName = ItemRefTooltipTextLeft1:GetText();
-		if (itemName and TT_ChatCurrentItem ~= itemName) then
-			TT_ChatCurrentItem = itemName;
-
-			local testPopup = false;
-			if (button == "RightButton") then
-				testPopup = true;
-			end
-			if (TT_TooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, hyperlink)) then 
-				OldChatLinkItem = {['reference']=reference, ['link']=link, ['button']=button}
-			end
-		end
-	end
+	Orig_Chat_OnHyperlinkShow(reference, link, button)
+	EnhancedTT_Chat_OnHyperlinkShow(reference, link, button)
 end
 
 function TT_AuctionFrameItem_OnEnter(type, index)
