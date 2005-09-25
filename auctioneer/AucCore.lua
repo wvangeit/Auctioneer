@@ -430,13 +430,14 @@ function Auctioneer_AddonLoaded()
 
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
+		thisPointer = this
 		StaticPopupDialogs["CONVERT_AUCTIONEER"] = {
 			text = _AUCT['MesgConvert'],
 			button1 = _AUCT['MesgConvertYes'],
 			button2 = _AUCT['MesgConvertNo'],
 			OnAccept = function()
 				Auctioneer_Convert();
-				Auctioneer_LockAndLoad();
+				Auctioneer_LockAndLoad(thisPointer);
 			end,
 			OnCancel = function()
 				Auctioneer_ChatPrint(_AUCT['MesgNotconverting']);
@@ -447,16 +448,21 @@ function Auctioneer_AddonLoaded()
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
 	else
-		Auctioneer_LockAndLoad();
+		Auctioneer_LockAndLoad(this);
 	end
 end
 
-function Auctioneer_LockAndLoad()
+function Auctioneer_LockAndLoad(thisPointer)
+	-- make thisPointer an optional parameter
+	if thisPointer == nil then
+		thisPointer = this -- defaulting to this
+	end
+
 	-- register events
-	this:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
-	this:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
-	this:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
-	this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
+	thisPointer:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
+	thisPointer:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
+	thisPointer:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
+	thisPointer:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
 
 	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
 	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;

@@ -16,6 +16,18 @@ local function Auctioneer_Backup(server, sig, data)
 	AuctionBackup[server][sig] = data
 end
 
+local function Auctioneer_IsSortedList(list)
+	local v = 0
+	for i=1, table.getn(list) do
+		if list[i] < v then
+			return false
+		else
+			v = list[i]
+		end
+	end
+	return true
+end
+
 function Auctioneer_Convert()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
@@ -87,6 +99,10 @@ function Auctioneer_Convert()
 
 							-- data/name
 							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.*)")
+							if s7 == nil then
+								p("TODO: old dataformat: "..iData)
+								p("Please report to: http://norganna.org/bb/index.php?showtopic=226")
+							end
 							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
 							if (name == nil) or (name == '') then
 								name = sname
@@ -109,6 +125,10 @@ function Auctioneer_Convert()
 							data = iData.data;
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
+								if not Auctioneer_IsSortedList(iData.buyoutPricesHistoryList) then
+									p("TODO: old dataformat with unsorted buyoutHistory! "..sig)
+									p("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
+								end
 								for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
 									if (hist == "") then hist = string.format("%d", hPrice);
 									else hist = string.format("%s:%d", hist, hPrice); end

@@ -859,7 +859,7 @@ function Auctioneer_Default(param, chatprint)
 	end
 
 	if (chatprint == true) then
-		if ((param == _AUCT['CmdClearAll']) or (param == "all")) then
+		if ((param == _AUCT['CmdClearAll']) or (param == "all") or (param == "") or (param == nil)) then
 			Auctioneer_ChatPrint(_AUCT['FrmtActDefaultall']);
 
 		else
@@ -880,11 +880,11 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 	elseif ((param == _AUCT['CmdToggle']) or (param == "toggle") or (param == nil) or (param == "")) then
 		param = Auctioneer_GetFilterVal(variable);
 
-		if (param == "on") then
-			param = "off";
+		if ((param == _AUCT['CmdOn']) or (param == "on")) then
+			param = _AUCT['CmdOff'];
 
 		else
-			param = "on";
+			param = _AUCT['CmdOn'];
 		end
 
 		Auctioneer_SetFilter(variable, param);
@@ -970,8 +970,8 @@ end
 
 function Auctioneer_GetFilter(filter)
 	value = Auctioneer_GetFilterVal(filter);
-	if (value == "on") then return true;
-	elseif (value == "off") then return false; end
+	if ((value == _AUCT['CmdOn']) or (value == "on")) then return true;
+	elseif ((value == _AUCT['CmdOff']) or (value == "off")) then return false; end
 	return true;
 end
 

@@ -1,12 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<bugfix id="bugfix20" codedby="MentalPower" timestamp="2005-09-24 07:30">
+			<file name="AucCommand.lua">
+				<change function="Auctioneer_Default"/>
+				<change function="Auctioneer_GenVarSet"/>
+				<change function="Auctioneer_GetFilter"/>
+			</file>
+			<file name="changelog.xml"/>
+			<developer>
+				All variables that use the Auctioneer_GenVarSet() function to change their variables now toggle properly, as oposed to always being turned on if localized strings were used. Auctioneer_GetFilter() has been modified to provide correct return values if localized strings are used. The Auctioneer_Default() function has been changed to also accept nil and blank parameters to clear all auctioneer data. The changelog.xml file is now formatted as UTF-8 as the header says instead of ANSI.
+			</developer>
+		</bugfix>
 		<bugfix id="bugfix19" codedby="MentalPower" timestamp="2005-09-23 02:50">
 			<file name="AucCommand.lua">
 				<change function="Auctioneer_Clear"/>
 			</file>
 			<public>
-				The /auctioneer clear [Item Link] function now reports completion corrently.
+				The /auctioneer clear [Item Link] function now correctly reports completion instead of erroring out.
 			</public>
 		</bugfix>
 		<improvement id="improvement4" codedby="MentalPower" timestamp="2005-09-21 19:42">
