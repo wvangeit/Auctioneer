@@ -475,12 +475,10 @@ function TT_CheckHide()
 			-- closing chatreferenceTT?
 			OldChatLinkItem = nil -- remove old chatlink data
 		elseif OldChatLinkItem then
-			-- closing another tooltip (expecting that the gametooltip-mouseoverTT is being closed)
-
-			local Backup = {['reference']=OldChatLinkItem.reference, ['link']=OldChatLinkItem.link, ['button']=OldChatLinkItem.button, ['embed']=OldChatLinkItem.embed}
-			-- redisplay old chatlinkdata, if there was one before
+			-- closing another tooltip
+			-- redisplay old chatlinkdata, if it was not embeded
 			if not OldChatLinkItem.embed then
-				EnhancedTT_Chat_OnHyperlinkShow(Backup.reference, Backup.link, Backup.button)
+				EnhancedTT_Chat_OnHyperlinkShow(OldChatLinkItem.reference, OldChatLinkItem.link, OldChatLinkItem.button)
 			end
 		end
 	end
