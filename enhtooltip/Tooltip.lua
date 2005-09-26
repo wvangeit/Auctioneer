@@ -9,26 +9,95 @@
 	  hookType = "tooltip" or "popup"
 	  hookFunc is your function that you want to be called
 	  position is an order that you want to be called in (lower is earlier)
-	    [ Auctioneer is hooked at position 50, enchantrix is 150 ]
+	    [ Auctioneer is hooked at position 50, Enchantrix is 150 ]
 
   Then use the following functions:
+  
     EnhTooltip.HideTooltip()
+	  - Causes the enhanced tooltip to vanish.
+	  
     EnhTooltip.ClearTooltip()
+	  - Clears the current tooltip of contents and hides it.
+	  
     EnhTooltip.GetGSC(money)
+	  - Returns the given money (in copper) amount in gold, silver and copper.
+	  
     EnhTooltip.GetTextGSC(money, exact)
+	  - Returns the money (in copper) amount as colored text, suitable for display.
+	    If exact evaluates to true, then the text will be exact, otherwise rounded.
+		
     EnhTooltip.AddLine(lineText, moneyAmount, embed)
+	  - Adds the lineText to the tooltip.
+	    If moneyAmount is supplied, the line has a money amount right-aligned after it.
+		It embed evaluates to true, then the line is placed at the end of the game tooltip
+		  and the money amount is converted to a textual form.
+		  
     EnhTooltip.LineColor(r, g, b)
+	  - Changes the color of the most recently added line to the given R,G,B value.
+	    The R,G,B values are floating point values from 0.0 (dark) to 1.0 (bright)
+		
     EnhTooltip.LineQuality(quality)
+	  - Changes the color of the most recently added line to the quality color of the
+	      item that is supplied in the quality parameter.
+		  
     EnhTooltip.SetIcon(iconPath)
+	  - Adds an icon to the current tooltip, where the texture path is set to that of
+	      the iconPath parameter.
+		  
     EnhTooltip.NameFromLink(link)
+	  - Given a link, returns the embedded item name.
+	  
     EnhTooltip.HyperlinkFromLink(link)
+	  - Given a link, returns the blizzard hyperlink (eg: "item:12345:0:321:0")
+	  
     EnhTooltip.QualityFromLink(link)
-    EnhTooltip.FakeLink(item, quality, name)
+	  - Given a link, returns the numerical quality value (0=Poor/Gray ... 4=Epic/Purple)
+	  
+    EnhTooltip.FakeLink(hyperlink, quality, name)
+	  - Given a hyperlink, a numerical quality and an item name, does it's best to fabricate
+	      as authentic a link as it can. This link may not be suitable for messaging however.
+		  
     EnhTooltip.AddHook(hookType, hookFunc, position)
+	  - Allows dependant addons to register a function for inclusion at key moments.
+	    Where:
+		  hookType = The type of event to be notified of. One of:
+            tooltip - A tooltip is being displayed, hookFunc will be called as:
+			  addTooltipHook(frame, name, link, quality, count, price)
+			popup - A tooltip may be displayed, unless you want to popup something:
+			  popped = checkPopupHook(name, link, quality, count, price, hyperlink)
+			  (If your function returns true, then we won't present a tooltip)
+		  hookFunction = Your function (prototyped as above) that we will call.
+		  position = A number that determines calling order
+		    The default position if not supplied is 100.
+			A lower number will make your tooltip information display earlier (higher)
+			A higher number will call your tooltip later (lower)
+			Auctioneer (if installed) gets called at position 50.
+			Enchantrix (if installed) gets called at position 150.
+			
     EnhTooltip.BreakLink(link)
+	  - Given an item link, splits it into it's component parts as follows:
+		  itemID, randomProperty, enchantment, uniqueID, itemName = EnhTooltip.BreakLink(link)
+	    Note that the return order is not the same as the order of the items in the link
+		  (ie: randomProp and enchant are reversed from their link order)
+		  
     EnhTooltip.FindItemInBags(findName)
-    EnhTooltip.DoPlayerEnters()
+	  - Searches through your bags to find an item with the given name (exact match)
+	    It returns the following information about the item:
+		  bag, slot, itemID, randomProp, enchant, uniqID = EnhTooltip.FindItemInBags(itemName)
+		  
     EnhTooltip.SetElapsed(elapsed)
+	  - If a value is given, adds the elapsed interval to our own internal timer.
+	    Checks to see if it is time to hide the tooltip.
+	    Returns the total elapsed time that the tooltip has been displayed since startup.
+		
+	EnhTooltip.SetMoneySpacing(spacing)
+	  - Sets the amount of padding (if provided) that money should be given in the tooltips.
+	    Returns the current spacing.
+		
+	EnhTooltip.SetPopupKey(key)
+	  - Sets a key (if provided), which if pressed while a tooltip is being displayed, checks
+	      for hooked functions that may wish to provide popups.
+	    Returns the current key.
 
 ]]
 
@@ -38,7 +107,9 @@ if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 	ENHTOOLTIP_VERSION = "1.0.DEV"
 end
 
--- local variables
+--[[
+---- Initialize a storage space that all our functions can see
+--]]
 local self = {
 	showIgnore = false,
 	moneySpacing = 4,
@@ -406,7 +477,6 @@ local function nameFromLink(link)
 	end
 	return nil
 end
-NameFromLink = nameFromLink
 
 local function hyperlinkFromLink(link)
 		if( not link ) then
@@ -417,7 +487,6 @@ local function hyperlinkFromLink(link)
 		end
 		return nil
 end
-HyperlinkFromLink = hyperlinkFromLink
 
 local function qualityFromLink(link)
 	local color
@@ -431,11 +500,10 @@ local function qualityFromLink(link)
 	end
 	return -1
 end
-QualityFromLink = qualityFromLink
 
-local function fakeLink(item, quality, name)
+local function fakeLink(hyperlink, quality, name)
 	-- make this function nilSafe, as it's a global one and might be used by external addons
-	if not item then
+	if not hyperlink then
 		return nil
 	end
 	if (quality == nil) then quality = -1 end
@@ -446,9 +514,8 @@ local function fakeLink(item, quality, name)
 	elseif (quality == 2) then color = "1eff00"
 	elseif (quality == 0) then color = "9d9d9d"
 	end
-	return "|cff"..color.. "|H"..item.."|h["..name.."]|h|r"
+	return "|cff"..color.. "|H"..hyperlink.."|h["..name.."]|h|r"
 end
-FakeLink = fakeLink
 
 local function addTooltip(frame, name, link, quality, count, price)
 	if (self.notifyFuncs and self.notifyFuncs.tooltip) then
@@ -838,25 +905,25 @@ local function doPlayerEnters()
 end
 
 local function setElapsed(elapsed)
-	self.eventTimer = self.eventTimer + elapsed
-	checkHide()
-end
-
-local function OnUpdate(elapsed)
-	EnhTooltip.SetElapsed(elapsed)
-end
-
-local function OnEvent(event)
-	if (event == "PLAYER_ENTERING_WORLD") then
-		EnhTooltip:DoPlayerEnters();
-		this:UnregisterEvent(event)
+	if (elapsed) then
+		self.eventTimer = self.eventTimer + elapsed
 	end
+	checkHide()
+	return self.eventTimer;
 end
 
-local function newTT()
-	EnhancedTooltip:SetBackdropColor(0,0,0)
-	clearTooltip()
-	
+local function setMoneySpacing(spacing)
+	if (spacing ~= nil) then self.moneySpacing = spacing end
+	return self.moneySpacing;
+end
+
+local function setPopupKey(key)
+	if (key ~= nil) then self.forcePopupKey = key end
+	return self.forcePopupKey;
+end
+
+
+local function ttInitialize()
 	--[[
 	----  Establish hooks to all the game tooltips.
 	--]]
@@ -930,15 +997,30 @@ local function newTT()
 	GameTooltip_OnHide = gtHookOnHide
 end
 
-local function OnLoad()
-	newTT()
+-- =============== EVENT HANDLERS =============== --
+
+function TT_OnLoad()
+	EnhancedTooltip:SetBackdropColor(0,0,0)
+	clearTooltip()
+	ttInitialize()
 end
 
--- =============== LOCAL FUNCTIONS DONE =============== --
+function TT_OnUpdate(elapsed)
+	setElapsed(elapsed)
+end
 
--- global functions
+function TT_OnEvent(event)
+	if (event == "PLAYER_ENTERING_WORLD") then
+		EnhTooltip.DoPlayerEnters();
+		this:UnregisterEvent(event)
+	end
+end
+
+
+-- =============== DEFINE ACCESS OBJECT =============== --
+
+-- Global object
 EnhTooltip = {
-	['AddLine']           = addLine,
 	['HideTooltip']       = hideTooltip,
 	['ClearTooltip']      = clearTooltip,
 	['GetGSC']            = getGSC,
@@ -955,12 +1037,8 @@ EnhTooltip = {
 	['BreakLink']         = breakLink,
 	['FindItemInBags']    = findItemInBags,
 	['DoPlayerEnters']    = doPlayerEnters,
-	['SetElapsed']        = setElapsed
+	['SetElapsed']        = setElapsed,
+  	['SetMoneySpacing']   = setMoneySpacing,
+  	['SetPopupKey']       = setPopupKey,
 }
 
--- functions not intended to be used by the public
-_EnhTooltip_Shadow = {
-	['OnEvent']  = OnEvent,
-	['OnLoad']   = OnLoad,
-	['OnUpdate'] = OnUpdate
-}

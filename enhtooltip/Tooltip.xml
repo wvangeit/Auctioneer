@@ -665,10 +665,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="EnhancedTooltip" inherits="EnhancedTooltipTemplate" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
-				_EnhTooltip_Shadow.OnLoad();
+				TT_OnLoad();
 			</OnLoad>
 			<OnEvent>
-				_EnhTooltip_Shadow.OnEvent(event);
+				TT_OnEvent(event);
 			</OnEvent>
 		</Scripts>
 	</Frame>
@@ -676,7 +676,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="EnhancedUpdate" parent="UIParent" hidden="false">
 		<Scripts>
 			<OnUpdate>
-				_EnhTooltip_Shadow.OnUpdate(arg1);
+				TT_OnUpdate(arg1);
 			</OnUpdate>
 		</Scripts>
 	</Frame>
