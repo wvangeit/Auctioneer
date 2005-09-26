@@ -215,7 +215,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 	-- Call some interested iteminfo addons
 	Auctioneer_ProcessLink(aiLink);
 	
-	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = TT_BreakLink(aiLink);
+	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 	local hyperlink = string.format("item:%d:%d:%d:%d", aiItemID, aiEnchant, aiRandomProp, aiUniqID);
 
@@ -316,7 +316,7 @@ end
 function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 	-- get the info for this auction
 	local aiLink = GetAuctionItemLink(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
-	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = TT_BreakLink(aiLink);
+	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement,
 		aiBuyout, aiBidAmount, aiHighBidder, aiOwner =
@@ -423,7 +423,7 @@ function Auctioneer_NewAuction()
 		return
 	end
 
-	local bag, slot, id, rprop, enchant, uniq = TT_FindItemInBags(name);
+	local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
 	if (bag == nil) then
 		-- is the item one of your bags?
 		local i

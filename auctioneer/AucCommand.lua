@@ -1030,7 +1030,7 @@ end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
 function Auctioneer_DoLow(link)
-	local itemID, randomProp, enchant, uniqID, itemName = TT_BreakLink(link);
+	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 
 	local auctionSignature = Auctioneer_FindLowestAuctions(itemKey);
@@ -1041,15 +1041,15 @@ function Auctioneer_DoLow(link)
 		local itemCat = Auctioneer_GetCatForKey(itemKey);
 		local auction = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
 		local x,x,x, x, count, x, buyout, x = Auctioneer_GetItemSignature(auctionSignature);
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtLowLine'], Auctioneer_ColorTextWhite(count.."x")..auction.itemLink, TT_GetTextGSC(buyout), Auctioneer_ColorTextWhite(auction.owner), TT_GetTextGSC(buyout / count), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(Auctioneer_GetUsableMedian(itemKey), buyout / count).."%")));
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtLowLine'], Auctioneer_ColorTextWhite(count.."x")..auction.itemLink, EnhTooltip.GetTextGSC(buyout), Auctioneer_ColorTextWhite(auction.owner), EnhTooltip.GetTextGSC(buyout / count), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(Auctioneer_GetUsableMedian(itemKey), buyout / count).."%")));
 	end
 end
 
 function Auctioneer_DoHSP(link)
-	local itemID, randomProp, enchant, uniqID, itemName = TT_BreakLink(link);
+	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 	local highestSellablePrice = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-	Auctioneer_ChatPrint(string.format(_AUCT['FrmtHspLine'], Auctioneer_ColorTextWhite(itemName), TT_GetTextGSC(nilSafeString(highestSellablePrice))));
+	Auctioneer_ChatPrint(string.format(_AUCT['FrmtHspLine'], Auctioneer_ColorTextWhite(itemName), EnhTooltip.GetTextGSC(nilSafeString(highestSellablePrice))));
 end
 
 

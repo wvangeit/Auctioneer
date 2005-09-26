@@ -43,11 +43,11 @@ function Auctioneer_GetTimeLeftString(timeLeft)
 end
 
 function Auctioneer_GetGSC(money)
-	local g,s,c = TT_GetGSC(money);
+	local g,s,c = EnhTooltip.GetGSC(money);
 	return g,s,c;
 end
 function Auctioneer_GetTextGSC(money)
-	return TT_GetGSC(money);
+	return EnhTooltip.GetGSC(money);
 end
 
 -- return an empty string if str is nil
@@ -90,8 +90,8 @@ function Auctioneer_GetOppositeKey()
 	return serverName.."-"..factionGroup;
 end
 
-Auctioneer_BreakLink = TT_BreakLink;
-Auctioneer_FindItemInBags = TT_FindItemInBags;
+Auctioneer_BreakLink = EnhTooltip.BreakLink;
+Auctioneer_FindItemInBags = EnhTooltip.FindItemInBags;
 
 
 -- Given an item key, breaks it into it's itemID, randomProperty and enchantProperty

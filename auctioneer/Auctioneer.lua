@@ -13,10 +13,7 @@ AUCTIONEER_VERSION="<%version%>";
 
 function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
-	Auctioneer_OldTooltip = TT_AddTooltip;
-	TT_AddTooltip = Auctioneer_NewTooltip;
-	Auctioneer_OldPopup = TT_ItemPopup;
-	TT_ItemPopup = Auctioneer_ItemPopup;
+	EnhTooltip.AddHook("tooltip", Auctioneer_HookTooltip, 50);
 
 	this:RegisterEvent("VARIABLES_LOADED"); -- get called when our vars have loaded
 end

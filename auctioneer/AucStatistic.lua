@@ -275,7 +275,7 @@ Auctioneer_ProfitComparisonSort = Auctioneer_ProfitComparisonSort;
 -- example: this function changes 1g9s to 95s
 -- example: 1.5g will be unchanged and remain 1.5g
 function Auctioneer_RoundDownTo95(copper)
-	local g,s,c = TT_GetGSC(copper);
+	local g,s,c = EnhTooltip.GetGSC(copper);
 	if g > 0 and s < 10 then
 		return (copper - ((s + 5) * 100)); -- subtract enough copper to round to 95 silver
 	end
@@ -341,7 +341,7 @@ function Auctioneer_BuildLowestCache(auctKey)
 end
 
 function Auctioneer_DoMedian(link)
-	local itemID, randomProp, enchant, uniqID, itemName = TT_BreakLink(link);
+	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);
 	local itemKey = itemID..":"..randomProp..":"..enchant;
 
 	local median, count = Auctioneer_GetUsableMedian(itemKey);
@@ -349,7 +349,7 @@ function Auctioneer_DoMedian(link)
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianNoauct'], Auctioneer_ColorTextWhite(itemName)));
 	else
 		if (not count) then count = 0 end
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianLine'], count, Auctioneer_ColorTextWhite(itemName), TT_GetTextGSC(median)));
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianLine'], count, Auctioneer_ColorTextWhite(itemName), EnhTooltip.GetTextGSC(median)));
 	end
 end
 

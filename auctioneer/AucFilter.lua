@@ -141,7 +141,7 @@ Auctioneer_QuerySnapshot = Auctioneer_QuerySnapshot;
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBroker(minProfit)
 	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(_AUCT['FrmtBrokerHeader'], TT_GetTextGSC(minProfit));
+	local output = string.format(_AUCT['FrmtBrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local resellableAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit);
@@ -157,7 +157,7 @@ function Auctioneer_DoBroker(minProfit)
 			itemKey = id .. ":" .. rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(_AUCT['FrmtBrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit));
+			output = string.format(_AUCT['FrmtBrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit));
 			Auctioneer_ChatPrint(output);
 		end
 	end
@@ -168,7 +168,7 @@ end
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBidBroker(minProfit)
 	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
-	local output = string.format(_AUCT['FrmtBidbrokerHeader'], TT_GetTextGSC(minProfit));
+	local output = string.format(_AUCT['FrmtBidbrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit);
@@ -190,7 +190,7 @@ function Auctioneer_DoBidBroker(minProfit)
 				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
 			p("a", a);
-			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), bidText, TT_GetTextGSC(currentBid), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
+			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
 			Auctioneer_ChatPrint(output);
 		end
 	end
@@ -200,7 +200,7 @@ end
 
 function Auctioneer_DoCompeting(minLess)
 	if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS * 100 else minLess = tonumber(minLess) * 100  end
-	local output = string.format(_AUCT['FrmtCompeteHeader'], TT_GetTextGSC(minLess));
+	local output = string.format(_AUCT['FrmtCompeteHeader'], EnhTooltip.GetTextGSC(minLess));
 	Auctioneer_ChatPrint(output);
 
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
@@ -234,16 +234,16 @@ function Auctioneer_DoCompeting(minLess)
 				bidForOne = currentBid/count;
 			end
 
-			bidPrice = TT_GetTextGSC(bidForOne).."ea";
+			bidPrice = EnhTooltip.GetTextGSC(bidForOne).."ea";
 			if (currentBid == min) then
 				bidPrice = "No bids ("..bidPrice..")";
 			end
 
 			myBuyout = myHighestPrices[itemKey];
-			buyPrice = TT_GetTextGSC(buyoutForOne).."ea";
-			myPrice = TT_GetTextGSC(myBuyout).."ea";
+			buyPrice = EnhTooltip.GetTextGSC(buyoutForOne).."ea";
+			myPrice = EnhTooltip.GetTextGSC(myBuyout).."ea";
 			priceLess = myBuyout - buyoutForOne;
-			lessPrice = TT_GetTextGSC(priceLess);
+			lessPrice = EnhTooltip.GetTextGSC(priceLess);
 
 			output = string.format(_AUCT['FrmtCompeteLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 			Auctioneer_ChatPrint(output);
@@ -272,7 +272,7 @@ function Auctioneer_DoPercentLess(percentLess)
 			itemKey = id ..":"..rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(_AUCT['FrmtPctlessLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, TT_GetTextGSC(hsp * count), TT_GetTextGSC(buyout), TT_GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
+			output = string.format(_AUCT['FrmtPctlessLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
 			Auctioneer_ChatPrint(output);
 		end
 	end
