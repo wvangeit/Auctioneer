@@ -1,35 +1,19 @@
 ﻿-- Encoded in UTF8
-AUCT_CLAS_ARMOR = "Armure";
-AUCT_CLAS_CLOTH = "Tissu";
-AUCT_CLAS_CONTAINER = "Conteneur";
-AUCT_CLAS_DRINK = "Boisson";
-AUCT_CLAS_FISHING = "Pêche";
-AUCT_CLAS_FOOD = "Nourriture";
-AUCT_CLAS_GEM = "Gemme";
-AUCT_CLAS_HERB = "Plante";
-AUCT_CLAS_HIDE = "Peau";
-AUCT_CLAS_LEATHER = "Cuir";
-AUCT_CLAS_MAGE = "Mage";
-AUCT_CLAS_ORE = "Minerai";
-AUCT_CLAS_POTION = "Potion";
-AUCT_CLAS_QUEST = "Quête";
-AUCT_CLAS_SHAMAN = "Chaman";
-AUCT_CLAS_WARLOCK = "Démoniste";
-AUCT_CLAS_WEAPON = "Arme";
-AUCT_CLAS_WRITTEN = "Ecrit";
+_AUCT['AdditBuff']        = "Buff";
+_AUCT['AdditDrink']       = "Boisson";
+_AUCT['AdditFood']        = "Nourriture";
+_AUCT['AdditPoison']      = "Poison";
+_AUCT['AdditPotion']      = "Potion";
 
-AUCT_TYPE_ALCHEM = "Alchimie";
-AUCT_TYPE_COOK = "Cuisine";
-AUCT_TYPE_ENCHANT = "Enchantement";
-AUCT_TYPE_ENGINEER = "Ingénieur";
-AUCT_TYPE_FSTAID = "Premiers Soins";
-AUCT_TYPE_LEATHER = "Travail du Cuir";
-AUCT_TYPE_MINING = "Minage";
-AUCT_TYPE_POISON = "Poison";
-AUCT_TYPE_SMITH = "Forgeron";
-AUCT_TYPE_TAILOR = "Tailleur";
-
-AUCT_RECIPE_PREFIXES = { "Recette: ", "Patron: ", "Plans: ", "Schéma: ", "Formule: " };
+_AUCT['SkillAlchemy']        = "Alchimie";
+_AUCT['SkillBlacksmithing']  = "Forgeron";
+_AUCT['SkillCooking']        = "Cuisine";
+_AUCT['SkillEnchanting']     = "Enchantement";
+_AUCT['SkillEngineering']    = "Ingénieur";
+_AUCT['SkillFirstaid']       = "Premiers Soins";
+_AUCT['SkillLeatherworking'] = "Travail du Cuir";
+_AUCT['SkillMining']         = "Minage";
+_AUCT['SkillTailoring']      = "Tailleur";
 
 _AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
 _AUCT['FrmtBrokerLine'] = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
