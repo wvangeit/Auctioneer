@@ -1042,3 +1042,30 @@ EnhTooltip = {
   	['SetPopupKey']       = setPopupKey,
 }
 
+
+
+--- Temporary backwards compatibility ---
+-- This will go away eventually, so upgrade now!
+function TT_AddTooltip() end
+EnhTooltip.AddHook("tooltip", TT_AddTooltip, 100)
+TT_HideTooltip       = hideTooltip
+TT_ClearTooltip      = clearTooltip
+TT_GetGSC            = getGSC
+TT_GetTextGSC        = getTextGSC
+TT_AddLine           = addLine
+TT_LineColor         = lineColor
+TT_LineQuality       = lineQuality
+TT_SetIcon           = setIcon
+TT_NameFromLink      = nameFromLink
+TT_HyperlinkFromLink = hyperlinkFromLink
+TT_QualityFromLink   = qualityFromLink
+TT_FakeLink          = fakeLink
+TT_AddHook           = addHook
+TT_BreakLink         = breakLink
+TT_FindItemInBags    = findItemInBags
+TT_DoPlayerEnters    = doPlayerEnters
+TT_SetElapsed        = setElapsed
+TT_SetMoneySpacing   = setMoneySpacing
+TT_SetPopupKey       = setPopupKey
+-- DO NOT USE THESE FUNCTIONS IN NEW ADDONS --
+-- Use the EnhTooltip object instead --
