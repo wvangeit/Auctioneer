@@ -84,6 +84,7 @@ function Auctioneer_Convert()
 						if type(iData) == "string" then
 							-- 2.x -> 3.1							
 							local oldData = iData
+							local s1, s2, s3, s4, s5, s6, s7, sname
 
 							-- category
 							name, _, _, _, catName = GetItemInfo(sig)
@@ -98,10 +99,9 @@ function Auctioneer_Convert()
 							newsig = newsig..':0:0'
 
 							-- data/name
-							local i, j, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.*)")
-							if s7 == nil then
-								p("TODO: old dataformat: "..iData)
-								p("Please report to: http://norganna.org/bb/index.php?showtopic=226")
+							_, _, s1, s2, s3, s4, s5, s6, s7, sname = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(.+)")
+							if s1 == nil then
+								_, _, s1, s2, s3, s4, s5, s6, s7 = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
 							end
 							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
 							if (name == nil) or (name == '') then
