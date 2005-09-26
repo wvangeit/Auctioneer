@@ -350,7 +350,6 @@ function TT_EmbedRender()
 end
 
 function TT_AddLine(lineText, moneyAmount, embed)
-	if (embed == nil) then embed = TT_EMBED; end
 	if (embed) and (TT_CurrentTip) then
 		EnhancedTooltip.hasEmbed = true;
 		EnhancedTooltip.curEmbed = true;
