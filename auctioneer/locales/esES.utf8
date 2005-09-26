@@ -1,4 +1,4 @@
--- Encoded in UTF8
+Ôªø-- Encoded in UTF8
 
 _AUCT['AdditAlcohol'] = "Alcohol";
 _AUCT['AdditBuff'] = "Mejora";
@@ -6,26 +6,26 @@ _AUCT['AdditDrink'] = "Bebida";
 _AUCT['AdditFirework'] = "Fuegos Artificiales";
 _AUCT['AdditFood'] = "Comida";
 _AUCT['AdditGiftwrap'] = "Envoltura";
-_AUCT['AdditLure'] = "SeÒuelo";
+_AUCT['AdditLure'] = "Se√±uelo";
 _AUCT['AdditPoison'] = "Veneno";
-_AUCT['AdditPotion'] = "PociÛn";
+_AUCT['AdditPotion'] = "Poci√≥n";
 _AUCT['AdditRestorative'] = "Restaurativo";
 _AUCT['AdditScroll'] = "Voluta";
 
-_AUCT['SkillAlchemy'] = "AlquÌmia";
-_AUCT['SkillBlacksmithing'] = "HerrerÌa";
+_AUCT['SkillAlchemy'] = "Alqu√≠mia";
+_AUCT['SkillBlacksmithing'] = "Herrer√≠a";
 _AUCT['SkillCooking'] = "Cocinar";
 _AUCT['SkillEnchanting'] = "Encantar";
-_AUCT['SkillEngineering'] = "IngenierÌa";
+_AUCT['SkillEngineering'] = "Ingenier√≠a";
 _AUCT['SkillFirstaid'] = "Primeros Auxilios";
-_AUCT['SkillLeatherworking'] = "PeleterÌa";
-_AUCT['SkillMining'] = "MinerÌa";
-_AUCT['SkillTailoring'] = "SastrerÌa";
+_AUCT['SkillLeatherworking'] = "Peleter√≠a";
+_AUCT['SkillMining'] = "Miner√≠a";
+_AUCT['SkillTailoring'] = "Sastrer√≠a";
 _AUCT['SkillDruid'] = "Encantos de Druidas";
 _AUCT['SkillMage'] = "Encantos de Magos";
 _AUCT['SkillPaladin'] = "Encantos de Paladines";
 _AUCT['SkillPriest'] = "Encantos de Sacerdotes";
-_AUCT['SkillRogue'] = "Encantos de PÌcaros";
+_AUCT['SkillRogue'] = "Encantos de P√≠caros";
 _AUCT['SkillShaman'] = "Encantos de Chamanes";
 _AUCT['SkillWarlock'] = "Encantos de Brujos";
 
@@ -34,7 +34,7 @@ _AUCT['TimeMed'] = "Mediano";
 _AUCT['TimeLong'] = "Largo";
 _AUCT['TimeVlong'] = "Muy Largo";
 
-_AUCT['FrmtWelcome'] = "Auctioneer versiÛn %s cargado";
+_AUCT['FrmtWelcome'] = "Auctioneer versi√≥n %s cargado";
 
 _AUCT['FrmtBrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
 _AUCT['FrmtBrokerLine'] = "%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
@@ -47,18 +47,18 @@ _AUCT['FrmtBidbrokerDone'] = "Corredor de ofertas finalizado";
 _AUCT['FrmtPctlessHeader'] = "Porcentaje bajo el Precio Maximo Vendible (PMV): %d%%";
 _AUCT['FrmtPctlessLine'] = "%s, Ultimo(s) %d visto(s), PMV: %s, OC: %s, Ganancia: %s, menos %s";
 _AUCT['FrmtPctlessDone'] = "Porcentajes menores finalizado.";
-_AUCT['FrmtCompeteHeader'] = "Subastas compitiendo por al menos %s debajo por artÌculo.";
+_AUCT['FrmtCompeteHeader'] = "Subastas compitiendo por al menos %s debajo por art√≠culo.";
 _AUCT['FrmtCompeteLine'] = "%s, Oferta: %s, OC %s vs %s, %s menos";
 _AUCT['FrmtCompeteDone'] = "Subastas compitiendo finalizado.";
-_AUCT['FrmtNoauct'] = "No se hallaron subastas para el artÌculo: %s";
-_AUCT['FrmtMedianLine'] = "De los ˙ltimos(s) %d vistos, OC mediano por 1 %s es: %s";
+_AUCT['FrmtNoauct'] = "No se hallaron subastas para el art√≠culo: %s";
+_AUCT['FrmtMedianLine'] = "De los √∫ltimos(s) %d vistos, OC mediano por 1 %s es: %s";
 _AUCT['FrmtLowLine'] = "%s, BO: %s, Vendedor: %s, Por uno: %s, Menos que el mediano: %s";
 _AUCT['FrmtHspLine'] = "Precio Maximo Vendible por uno %s es: %s";
 
 _AUCT['FrmtInfoSeen'] = "Visto un total de %d veces en subasta";
 _AUCT['FrmtInfoForone'] = "Por 1: %s min/%s OC (%s oferta) [en %d's]";
 _AUCT['FrmtInfoAverage'] = "%s min/%s OC (%s oferta)"
-_AUCT['FrmtInfoHistmed'] = "⁄ltimo(s) %d, OC mediano (c/u)";
+_AUCT['FrmtInfoHistmed'] = "√öltimo(s) %d, OC mediano (c/u)";
 _AUCT['FrmtInfoSnapmed'] = "Explorados %d, OC mediano (c/u)";
 _AUCT['FrmtInfoSgststx'] = "Precio sugerido para su lote de %d: %s min/%s OC";
 _AUCT['FrmtInfoSgst'] = "Precio sugerido: %s min/%s OC";
@@ -73,34 +73,34 @@ _AUCT['FrmtInfoBuy'] = "Compra%s del vendedor";
 _AUCT['FrmtInfoSell'] = "Vende%s al vendedor";
 _AUCT['FrmtInfoBuymult'] = "Compra %s %d (%s c/u)";
 _AUCT['FrmtInfoSellmult'] = "Vende %s %d (%s c/u)";
-_AUCT['FrmtInfoStx'] = "Amontonable en lotes de artÌculos %d por paquete";
+_AUCT['FrmtInfoStx'] = "Amontonable en lotes de art√≠culos %d por paquete";
 
-_AUCT['FrmtInfoHeadMulti'] = "Promedios para %d artÌculos:";
+_AUCT['FrmtInfoHeadMulti'] = "Promedios para %d art√≠culos:";
 _AUCT['FrmtInfoMinMulti'] = "  Oferta a empezar (%s c/u)";
 _AUCT['FrmtInfoBidMulti'] = "  Oferta (%s%s c/u)";
-_AUCT['FrmtInfoBuyMulti'] = "  OpciÛn a compra(%s%s c/u)";
+_AUCT['FrmtInfoBuyMulti'] = "  Opci√≥n a compra(%s%s c/u)";
 
-_AUCT['FrmtInfoHeadOne'] = "Promedios para este artÌculo:";
+_AUCT['FrmtInfoHeadOne'] = "Promedios para este art√≠culo:";
 _AUCT['FrmtInfoMinOne'] = "  Oferta a empezar";
 _AUCT['FrmtInfoBidOne'] = " %s con propuestas";
-_AUCT['FrmtInfoBuyOne'] = " %s con opciÛn a compra";
+_AUCT['FrmtInfoBuyOne'] = " %s con opci√≥n a compra";
 
-_AUCT['FrmtInfoBuymedian'] = "  OpciÛn a compra mediano";
+_AUCT['FrmtInfoBuymedian'] = "  Opci√≥n a compra mediano";
 
-_AUCT['FrmtInfoStacksize'] = "  TamaÒo promedio del paquete: %d artÌculos";
+_AUCT['FrmtInfoStacksize'] = "  Tama√±o promedio del paquete: %d art√≠culos";
 
-_AUCT['FrmtUnknownLocale'] = "La localizaciÛn que usted especifico ('%s') no es valida. Locales v·lidos son:"; 
-_AUCT['FrmtUnknownRf']     = "Parametro inv·lido ('%s'). El par·metro debe de estar en la forma de: [reino]-[facciÛn]. Por ejemplo: Al'Akir-Horde";
+_AUCT['FrmtUnknownLocale'] = "La localizaci√≥n que usted especifico ('%s') no es valida. Locales v√°lidos son:"; 
+_AUCT['FrmtUnknownRf']     = "Parametro inv√°lido ('%s'). El par√°metro debe de estar en la forma de: [reino]-[facci√≥n]. Por ejemplo: Al'Akir-Horde";
 _AUCT['FrmtUnknownArg']    = "'%s' no es un argumento valido de '%s'";
 
 _AUCT['FrmtActRemove'] = "Eliminando firma %s de la imagen actual de la casa de subastas.";
 
-_AUCT['FrmtAuctinfoHist'] = "%d HistÛricamente";
-_AUCT['FrmtAuctinfoSnap'] = "%d en la ˙ltima exploraciÛn";
-_AUCT['FrmtAuctinfoLow'] = "MÌnimo de la ˙ltima exploraciÛn";
-_AUCT['FrmtAuctinfoNolow'] = "ArtÌculo no fue visto en ultima imagen";
+_AUCT['FrmtAuctinfoHist'] = "%d Hist√≥ricamente";
+_AUCT['FrmtAuctinfoSnap'] = "%d en la √∫ltima exploraci√≥n";
+_AUCT['FrmtAuctinfoLow'] = "M√≠nimo de la √∫ltima exploraci√≥n";
+_AUCT['FrmtAuctinfoNolow'] = "Art√≠culo no fue visto en ultima imagen";
 _AUCT['FrmtAuctinfoOrig'] = "Oferta Original";
-_AUCT['FrmtAuctinfoSugbuy'] = "OpciÛn a compra sugerida";
+_AUCT['FrmtAuctinfoSugbuy'] = "Opci√≥n a compra sugerida";
 _AUCT['FrmtAuctinfoSugbid'] = "Oferta sugerida";
 _AUCT['FrmtAuctinfoMktprice'] = "Precio del mercado";
 
@@ -110,7 +110,7 @@ _AUCT['FrmtWarnNocomp'] = "Sin competencia";
 _AUCT['FrmtWarnAbovemkt'] = "Competencia sobre mercado";
 _AUCT['FrmtWarnToolow'] = "Imposible igualar minimo";
 _AUCT['FrmtWarnMyprice'] = "Usando mi precio actual";
-_AUCT['FrmtWarnNodata'] = "Sin informaciÛn para PMV";
+_AUCT['FrmtWarnNodata'] = "Sin informaci√≥n para PMV";
 
 _AUCT['CmdOff'] = "apagado";
 _AUCT['CmdOn'] = "prendido";
@@ -143,8 +143,8 @@ _AUCT['CmdPctNocomp']      = "pct-sincomp";
 _AUCT['CmdPctUnderlow']    = "pct-bajomenor";
 _AUCT['CmdPctUndermkt']    = "pct-bajomercado";
 
-_AUCT['OptClear'] = "([ArtÌculo]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
-_AUCT['OptAlso'] = "(reino-facciÛn|".._AUCT['CmdAlsoOpposite']..")"
+_AUCT['OptClear'] = "([Art√≠culo]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
+_AUCT['OptAlso'] = "(reino-facci√≥n|".._AUCT['CmdAlsoOpposite']..")"
 _AUCT['OptLocale'] = "<localidad>";
 _AUCT['OptBroker'] = "<ganancia_plata>";
 _AUCT['OptBidbroker'] = "<ganancia_plata>";
@@ -184,49 +184,49 @@ _AUCT['ShowRedo'] = "ver-advertencia";
 
 _AUCT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
 _AUCT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
-_AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el artÌculo";
-_AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del artÌculo en la caja de ayuda";
-_AUCT['HelpMedian'] = "Selecciona para mostrar el precio promedio para la opciÛn a compra";
-_AUCT['HelpSuggest'] = "Selecciona para mostrar el precio sugerido de subasta para el artÌculo";
-_AUCT['HelpStats'] = "Selecciona para mostrar porcentajes para ofertas/opciÛn a compra del artÌculo";
-_AUCT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el artÌculo";
+_AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el art√≠culo";
+_AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del art√≠culo en la caja de ayuda";
+_AUCT['HelpMedian'] = "Selecciona para mostrar el precio promedio para la opci√≥n a compra";
+_AUCT['HelpSuggest'] = "Selecciona para mostrar el precio sugerido de subasta para el art√≠culo";
+_AUCT['HelpStats'] = "Selecciona para mostrar porcentajes para ofertas/opci√≥n a compra del art√≠culo";
+_AUCT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art√≠culo";
 _AUCT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
 _AUCT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
-_AUCT['HelpUsage'] = "Selecciona para mostrar uso del artÌculo en profesiones";
-_AUCT['HelpStack'] = "Selecciona para mostrar tamaÒo maximo del paquete";
+_AUCT['HelpUsage'] = "Selecciona para mostrar uso del art√≠culo en profesiones";
+_AUCT['HelpStack'] = "Selecciona para mostrar tama√±o maximo del paquete";
 _AUCT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-_AUCT['HelpClear'] = "Eliminar la informacion existente sobre el artÌculo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
-_AUCT['HelpAlso'] = "Mostrar tambiÈn los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facciÛn escribe el nombre de la facciÛn. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facciÛn opuesta, \"apagar\" desabilita la funciÛn.";
+_AUCT['HelpClear'] = "Eliminar la informacion existente sobre el art√≠culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
+_AUCT['HelpAlso'] = "Mostrar tambi√©n los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facci√≥n escribe el nombre de la facci√≥n. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facci√≥n opuesta, \"apagar\" desabilita la funci√≥n.";
 _AUCT['HelpLocale'] = "Cambiar la localidad que Auctioneer usa para sus mensajes";
-_AUCT['HelpBroker'] = "Muestra las subastas de la exploraciÛn mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
-_AUCT['HelpBidbroker'] = "Muestra subastas de corto o medio termino de la exploraciÛn mas reciente a las cuales se puede poner una oferta y obtener ganancia";
-_AUCT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opciÛn es seleccionada)";
+_AUCT['HelpBroker'] = "Muestra las subastas de la exploraci√≥n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
+_AUCT['HelpBidbroker'] = "Muestra subastas de corto o medio termino de la exploraci√≥n mas reciente a las cuales se puede poner una oferta y obtener ganancia";
+_AUCT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci√≥n es seleccionada)";
 _AUCT['HelpPercentless'] = "Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio vendible mas alto.";
-_AUCT['HelpCompete'] = "Muestra cualquier subasta explorada recientemente cuya opciÛn a compra es menor que alguno de tus artÌculos";
-_AUCT['HelpScan'] = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un botÛn en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
-_AUCT['HelpAutofill'] = "Auto-completar precios cuando se aÒadan artÌculos a subastar en el panel de la casa de subastas";
+_AUCT['HelpCompete'] = "Muestra cualquier subasta explorada recientemente cuya opci√≥n a compra es menor que alguno de tus art√≠culos";
+_AUCT['HelpScan'] = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un bot√≥n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
+_AUCT['HelpAutofill'] = "Auto-completar precios cuando se a√±adan art√≠culos a subastar en el panel de la casa de subastas";
 _AUCT['HelpPctBidmarkdown'] = "Ajusta el porcentaje del precio de compra por debajo del cual Auctioneer marcara las ofertas";
 _AUCT['HelpPctMarkup'] = "El porcentaje que sera incrementado el precio de venta del vendedor cuando no existan otros valores disponibles.";
 _AUCT['HelpPctMaxless'] = "Ajusta el maximo porcentaje por debajo del valor de mercado que Auctioneer tratara de igualar antes de darse por vencido.";
-_AUCT['HelpPctNocomp'] = "El porcentaje bajo el precio del mercado que Auctioneer usar· cuando no hay competencia";
-_AUCT['HelpPctUnderlow'] = "Ajusta el porcentaje bajo el menor precio mÌnimo de subasta que Auctioneer aplicar·";
+_AUCT['HelpPctNocomp'] = "El porcentaje bajo el precio del mercado que Auctioneer usar√° cuando no hay competencia";
+_AUCT['HelpPctUnderlow'] = "Ajusta el porcentaje bajo el menor precio m√≠nimo de subasta que Auctioneer aplicar√°";
 _AUCT['HelpPctUndermkt'] = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
-_AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la p·gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
+_AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la p√°gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 
 _AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 _AUCT['StatOff'] = "Ocultando toda la informacion de subastas";
 
-_AUCT['FrmtActClearall'] = "Eliminando toda la informaciÛn de subastas para %s";
+_AUCT['FrmtActClearall'] = "Eliminando toda la informaci√≥n de subastas para %s";
 _AUCT['FrmtActClearsnap'] = "Eliminando la imagen actual de la casa de subastas.";
-_AUCT['FrmtActClearOk'] = "Informacion eliminada para el artÌculo: %s";
-_AUCT['FrmtActClearFail'] = "Imposible encontrar artÌculo: %s";
-_AUCT['FrmtActEnable'] = "Mostrando informacion del artÌculo: %s ";
+_AUCT['FrmtActClearOk'] = "Informacion eliminada para el art√≠culo: %s";
+_AUCT['FrmtActClearFail'] = "Imposible encontrar art√≠culo: %s";
+_AUCT['FrmtActEnable'] = "Mostrando informacion del art√≠culo: %s ";
 _AUCT['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
-_AUCT['FrmtActEnabledOn'] = "Mostrando %s de los artÌculos usando %s";
+_AUCT['FrmtActEnabledOn'] = "Mostrando %s de los art√≠culos usando %s";
 _AUCT['FrmtActSet'] = "%s ajustado(a) a '%s'";
 _AUCT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
-_AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f·brica.";
-_AUCT['FrmtActDefault'] = "La opciÛn %s de Auctioneer ha sido revertida a su configuraciÛn de f·brica.";
+_AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f√°brica.";
+_AUCT['FrmtActDefault'] = "La opci√≥n %s de Auctioneer ha sido revertida a su configuraci√≥n de f√°brica.";
 
 _AUCT['TextScan'] = "Explorar";
 _AUCT['TextAuction'] = "Subasta";
@@ -235,15 +235,15 @@ _AUCT['TextUsage'] = "Uso:";
 
 -- AH Scanning localizations
 
-_AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" p·gina 1...";
-_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" p·gina %d de %d";
-_AUCT['AuctionScanDone'] = "Auctioneer: La exploraciÛn de las subastas ha finalizado";
+_AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" p√°gina 1...";
+_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" p√°gina %d de %d";
+_AUCT['AuctionScanDone'] = "Auctioneer: La exploraci√≥n de las subastas ha finalizado";
 _AUCT['AuctionScanNexttime'] = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 _AUCT['AuctionScanNocat'] = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
-_AUCT['AuctionScanRedo'] = "La p·gina corriente ha tomado mas de %d segundos para completar. Tratando p·gina otra vez.";
+_AUCT['AuctionScanRedo'] = "La p√°gina corriente ha tomado mas de %d segundos para completar. Tratando p√°gina otra vez.";
 
-_AUCT['MesgConvert'] = "ConversiÛn de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
-_AUCT['MesgNotconverting'] = "Auctioneer no convertir· su base de datos, pero no funcionar· hasta que la base de datos sea convertida.";
+_AUCT['MesgConvert'] = "Conversi√≥n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
+_AUCT['MesgNotconverting'] = "Auctioneer no convertir√° su base de datos, pero no funcionar√° hasta que la base de datos sea convertida.";
 _AUCT['MesgConvertYes'] = "Convertir";
 _AUCT['MesgConvertNo'] = "Deshabilitar Auctioneer";
 
@@ -255,13 +255,13 @@ _AUCT['AuctionDiscrepancies'] = "Discrepancias: %s";
 
 -- GUI localizations
 
-_AUCT['GuiMainHelp'] = "Contiene ajustes para Auctioneer \nun aditamento que muestra informacion sobre artÌculos y analiza informaciÛn de subastas. \nSeleccione \"Explorar\" en la casa de subastas para coleccionar informacion sobre las subastas.";
+_AUCT['GuiMainHelp'] = "Contiene ajustes para Auctioneer \nun aditamento que muestra informacion sobre art√≠culos y analiza informaci√≥n de subastas. \nSeleccione \"Explorar\" en la casa de subastas para coleccionar informacion sobre las subastas.";
 _AUCT['GuiMainEnable'] = "Encender Auctioneer";
 _AUCT['GuiLocale'] = "Ajustar localidad a";
 _AUCT['GuiVerbose'] = "Modo literal";
-_AUCT['GuiStatsEnable'] = "Ver estadÌsticas";
-_AUCT['GuiStatsHeader'] = "EstadÌsticas de precios de artÌculos";
-_AUCT['GuiStatsHelp'] = "Mostrar las siguientes estadÌsticas en la caja de ayuda.";
+_AUCT['GuiStatsEnable'] = "Ver estad√≠sticas";
+_AUCT['GuiStatsHeader'] = "Estad√≠sticas de precios de art√≠culos";
+_AUCT['GuiStatsHelp'] = "Mostrar las siguientes estad√≠sticas en la caja de ayuda.";
 _AUCT['GuiAverages'] = "Mostrar Promedios";
 _AUCT['GuiMedian'] = "Mostrar Medianos";
 _AUCT['GuiSuggest'] = "Mostrar Precios Sugeridos";
@@ -270,14 +270,14 @@ _AUCT['GuiVendorHelp'] = "Opciones relacionadas a precios de compra/venta a vend
 _AUCT['GuiVendor'] = "Mostrar Precios a Vendedores";
 _AUCT['GuiVendorBuy'] = "Mostrar precios de compra a vendedores";
 _AUCT['GuiVendorSell'] = "Mostrar precios de venta a vendedores";
-_AUCT['GuiEmbedHeader'] = "IntegraciÛn";
-_AUCT['GuiEmbed'] = "Integrar informaciÛn en la caja de ayuda";
+_AUCT['GuiEmbedHeader'] = "Integraci√≥n";
+_AUCT['GuiEmbed'] = "Integrar informaci√≥n en la caja de ayuda";
 _AUCT['GuiEmbedBlankline'] = "Mostrar linea en blanco.";
-_AUCT['GuiClearHeader'] = "Eliminar InformaciÛn";
-_AUCT['GuiClearHelp'] = "Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la informaciÛn o solamente la im·gen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
-_AUCT['GuiClearall'] = "Eliminar toda la informaciÛn";
-_AUCT['GuiClearallHelp'] = "Seleccione aqui para eliminar toda la informaciÛn de Auctioneer para el reino-facciÛn corriente.";
-_AUCT['GuiClearallNote'] = "el reino-facciÛn corriente.";
+_AUCT['GuiClearHeader'] = "Eliminar Informaci√≥n";
+_AUCT['GuiClearHelp'] = "Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la informaci√≥n o solamente la im√°gen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
+_AUCT['GuiClearall'] = "Eliminar toda la informaci√≥n";
+_AUCT['GuiClearallHelp'] = "Seleccione aqui para eliminar toda la informaci√≥n de Auctioneer para el reino-facci√≥n corriente.";
+_AUCT['GuiClearallNote'] = "el reino-facci√≥n corriente.";
 _AUCT['GuiClearallButton'] = "Eliminar Todo";
 _AUCT['GuiClearsnap'] = "Eliminar imagen corriente";
 _AUCT['GuiClearsnapHelp'] = "Presione aqui para eliminar la ultima imagen de informacion de Auctioneer.";
@@ -286,19 +286,19 @@ _AUCT['GuiPercentsHeader'] = "Limites de Porcentajes de Auctioneer";
 _AUCT['GuiPercentsHelp'] = "ADVERTENCIA: Las siguientes opciones son para usuarios expertos SOLAMENTE.\nAjuste los siguientes valores para cambiar cuan agresivo es Auctioneer al determinar niveles provechosos.";
 _AUCT['GuiBidmarkdown'] = "Porciento menos oferta";
 _AUCT['GuiMarkup'] = "Porciento sobre vendedor";
-_AUCT['GuiMaxless'] = "Porciento m·ximo bajo mercado";
+_AUCT['GuiMaxless'] = "Porciento m√°ximo bajo mercado";
 _AUCT['GuiNocomp'] = "Porciento sin competencia.";
 _AUCT['GuiUnderlow'] = "Porciento bajo menor subasta";
 _AUCT['GuiUndermkt'] = "Porciento bajo mercado";
 _AUCT['GuiOtherHeader'] = "Otras Opciones";
-_AUCT['GuiOtherHelp'] = "Opciones miscel·neas de Auctioneer";
+_AUCT['GuiOtherHelp'] = "Opciones miscel√°neas de Auctioneer";
 _AUCT['GuiAutofill'] = "Autocompletar precios en la casa de subastas";
-_AUCT['GuiAlso'] = "TambiÈn mostrar valores para";
-_AUCT['GuiAlsoOpposite'] = "Mostrando informaciÛn para la facciÛn opuesta.";
-_AUCT['GuiAlsoOff'] = "No mostrando informaciÛn para otro reino-facciÛn";
-_AUCT['GuiAlsoDisplay'] = "Mostrando informaciÛn para %s";
+_AUCT['GuiAlso'] = "Tambi√©n mostrar valores para";
+_AUCT['GuiAlsoOpposite'] = "Mostrando informaci√≥n para la facci√≥n opuesta.";
+_AUCT['GuiAlsoOff'] = "No mostrando informaci√≥n para otro reino-facci√≥n";
+_AUCT['GuiAlsoDisplay'] = "Mostrando informaci√≥n para %s";
 _AUCT['GuiLink'] = "Ver numero de enlace";
-_AUCT['GuiReloadui'] = "Recargar Interf·z";
-_AUCT['GuiReloaduiHelp'] = "Presione aqui para recargar el interf·z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraciÛn sea el mismo que el de Auctioneer.\nNota: Esta operaciÛn puede tomar unos minutos.";
+_AUCT['GuiReloadui'] = "Recargar Interf√°z";
+_AUCT['GuiReloaduiHelp'] = "Presione aqui para recargar el interf√°z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci√≥n sea el mismo que el de Auctioneer.\nNota: Esta operaci√≥n puede tomar unos minutos.";
 _AUCT['GuiReloaduiButton'] = "Recargar";
-_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf·z de WoW";
+_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf√°z de WoW";
