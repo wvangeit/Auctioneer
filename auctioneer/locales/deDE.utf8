@@ -69,10 +69,10 @@ _AUCT['FrmtInfoAlsoseen'] = "%d mal in einer %s gesehen";
 _AUCT['FrmtInfoClassuse'] = "Klasse: %s - Benutzt für %s";
 _AUCT['FrmtInfoClass']    = "Klasse: %s";
 _AUCT['FrmtInfoUse']      = "Benutzt für: %s";
-_AUCT['FrmtInfoBuy']      = "Einkauf%s beim Händler";
-_AUCT['FrmtInfoSell']     = "Verkauf%s beim Händler";
-_AUCT['FrmtInfoBuymult']  = "Einkauf%s für %d (%s pro Stück)";
-_AUCT['FrmtInfoSellmult'] = "Verkauf%s für %d (%s pro Stück)";
+_AUCT['FrmtInfoBuy']      = "Einkauf beim Händler";
+_AUCT['FrmtInfoSell']     = "Verkauf beim Händler";
+_AUCT['FrmtInfoBuymult']  = "Einkauf für %d (%s pro Stück)";
+_AUCT['FrmtInfoSellmult'] = "Verkauf für %d (%s pro Stück)";
 _AUCT['FrmtInfoStx']      = "%d pro Stapel";
 
 _AUCT['FrmtInfoHeadMulti'] = "Durchschnitt für %d Stück:";
