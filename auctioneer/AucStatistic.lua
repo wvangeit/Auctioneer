@@ -413,6 +413,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	end
 	if (realm == nil) then
 		p("WARNING: Auctioneer_GetHSP(itemKey, realm) - Defaulting to player realm.");
+		p("This is only some debugging code. THIS IS NO BUG!");
 		realm = Auctioneer_GetAuctionKey();
 	end
 
