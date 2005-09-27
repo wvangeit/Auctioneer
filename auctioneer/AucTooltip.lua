@@ -263,8 +263,6 @@ function Auctioneer_HookTooltip(frame, name, link, quality, count)
 			end
 		end
 	end -- if (itemID > 0)
-	local sellNote = "";
-	local buyNote = "";
 	local sell = 0;
 	local buy = 0;
 	local stacks = 1;
@@ -300,20 +298,20 @@ function Auctioneer_HookTooltip(frame, name, link, quality, count)
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count);
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count);
 				if (Auctioneer_GetFilter(_AUCT['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuymult'], buyNote, count, bgsc), buy*count, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuymult'], count, bgsc), buy*count, embedded);
 					EnhTooltip.LineColor(0.8, 0.5, 0.1);
 				end
 				if (Auctioneer_GetFilter(_AUCT['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSellmult'], sellNote, count, sgsc), sell*count, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSellmult'], count, sgsc), sell*count, embedded);
 					EnhTooltip.LineColor(0.8, 0.5, 0.1);
 				end
 			else
 				if (Auctioneer_GetFilter(_AUCT['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuy'], buyNote), buy, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuy']), buy, embedded);
 					EnhTooltip.LineColor(0.8, 0.5, 0.1);
 				end
 				if (Auctioneer_GetFilter(_AUCT['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSell'], sellNote), sell, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSell']), sell, embedded);
 					EnhTooltip.LineColor(0.8, 0.5, 0.1);
 				end
 			end
