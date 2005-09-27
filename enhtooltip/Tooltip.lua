@@ -127,13 +127,66 @@ local self = {
 
 -- =============== LOCAL FUNCTIONS =============== --
 
-local function hideTooltip()
+-- prottypes for all local functions
+
+local hideTooltip
+local clearTooltip
+local getRect
+local showTooltip
+local getGSC
+local getTextGSC
+local embedRender
+local addLine
+local lineColor
+local lineQuality
+local setIcon
+local gtHookOnHide
+local doHyperlink
+local checkHide
+local nameFromLink
+local hyperlinkFromLink
+local qualityFromLink
+local fakeLink
+local addTooltip
+local tooltipCall
+local addHook
+local checkPopup
+local chatHookOnHyperlinkShow
+local afHookOnEnter
+local cfHookOnEnter
+local cfHookUpdate
+local gtHookSetLootItem
+local gtHookSetQuestItem
+local gtHookSetQuestLogItem
+local gtHookSetInventoryItem
+local gtHookSetMerchantItem
+local gtHookSetCraftItem
+local gtHookSetTradeSkillItem
+local breakLink
+local findItemInBags
+local gtHookSetAuctionSellItem
+local imiHookOnEnter
+local imHookOnEnter
+local getLootLinkServer
+local getLootLinkLink
+local llHookOnEnter
+local aioHookModifyItemTooltip
+local gtHookSetOwner
+local doPlayerEnters
+local setElapsed
+local setMoneySpacing
+local setPopupKey
+local ttInitialize
+
+-- functiondefinitions
+
+function hideTooltip()
 	EnhancedTooltip:Hide()
 	self.currentItem = ""
 	self.hideTime = 0
 end
 
-local function clearTooltip()
+function clearTooltip()
 	hideTooltip()
 	EnhancedTooltip.hasEmbed = false
 	EnhancedTooltip.curEmbed = false
@@ -156,7 +209,7 @@ local function clearTooltip()
 	self.embedLines = {}
 end
 
-local function getRect(object)
+function getRect(object)
 	local rect = {}
 	rect.t = object:GetTop() or 0
 	rect.l = object:GetLeft() or 0
@@ -169,7 +222,7 @@ local function getRect(object)
 	return rect
 end
 
-local function showTooltip(currentTooltip)
+function showTooltip(currentTooltip)
 	if (self.showIgnore == true) then return end
 	if (EnhancedTooltip.hasEmbed) then
 		embedRender()
@@ -283,7 +336,7 @@ local function showTooltip(currentTooltip)
 end
 
 -- calculate the gold, silver, and copper values based the ammount of copper
-local function getGSC(money)
+function getGSC(money)
 	if (money == nil) then money = 0 end
 	local g = math.floor(money / 10000)
 	local s = math.floor((money - (g*10000)) / 100)
@@ -292,7 +345,7 @@ local function getGSC(money)
 end
 
 -- formats money text by color for gold, silver, copper
-local function getTextGSC(money, exact)
+function getTextGSC(money, exact)
 	if not exact then
 	   exact = false
 	end
@@ -330,7 +383,7 @@ local function getTextGSC(money, exact)
 		return gsc
 end
 
-local function embedRender()
+function embedRender()
 	for pos, lData in self.embedLines do
 		self.currentGametip:AddLine(lData.line)
 		if (lData.r) then
@@ -340,7 +393,7 @@ local function embedRender()
 	end
 end
 
-local function addLine(lineText, moneyAmount, embed)
+function addLine(lineText, moneyAmount, embed)
 	if (embed) and (self.currentGametip) then
 		EnhancedTooltip.hasEmbed = true
 		EnhancedTooltip.curEmbed = true
@@ -383,7 +436,7 @@ local function addLine(lineText, moneyAmount, embed)
 	end
 end
 
-local function lineColor(r, g, b)
+function lineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then
 		local n = table.getn(self.embedLines)
 		self.embedLines[n].r = r
@@ -397,7 +450,7 @@ local function lineColor(r, g, b)
 	line:SetTextColor(r, g, b)
 end
 
-local function lineQuality(quality)
+function lineQuality(quality)
 	if ( quality ) then
 		local color = ITEM_QUALITY_COLORS[quality]
 		lineColor(color.r, color.g, color.b)
@@ -406,7 +459,7 @@ local function lineQuality(quality)
 	end
 end
 
-local function setIcon(iconPath)
+function setIcon(iconPath)
 	EnhancedTooltipIcon:SetTexture(iconPath)
 	EnhancedTooltipIcon:Show()
 	local width = EnhancedTooltipIcon:GetWidth()
@@ -420,7 +473,7 @@ local function setIcon(iconPath)
 	end
 end
 
-local function gtHookOnHide()
+function gtHookOnHide()
 	self.hooks.gtOnHide()
 	local curName = ""
 	local hidingName = this:GetName()
@@ -431,7 +484,7 @@ local function gtHookOnHide()
 	end
 end
 
-local function doHyperlink(reference, link, button)
+function doHyperlink(reference, link, button)
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
 		if (itemName and self.currentItem ~= itemName) then
@@ -448,7 +501,7 @@ local function doHyperlink(reference, link, button)
 	end
 end
 
-local function checkHide()
+function checkHide()
 	if (self.hideTime == 0) then return end
 	self.currentItem = nil
 
@@ -467,7 +520,7 @@ local function checkHide()
 	end
 end
 
-local function nameFromLink(link)
+function nameFromLink(link)
 	local name
 	if( not link ) then
 		return nil
@@ -478,7 +531,7 @@ local function nameFromLink(link)
 	return nil
 end
 
-local function hyperlinkFromLink(link)
+function hyperlinkFromLink(link)
 		if( not link ) then
 				return nil
 		end
@@ -488,7 +541,7 @@ local function hyperlinkFromLink(link)
 		return nil
 end
 
-local function qualityFromLink(link)
+function qualityFromLink(link)
 	local color
 	if (not link) then return nil end
 	for color in string.gfind(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r") do
@@ -501,7 +554,7 @@ local function qualityFromLink(link)
 	return -1
 end
 
-local function fakeLink(hyperlink, quality, name)
+function fakeLink(hyperlink, quality, name)
 	-- make this function nilSafe, as it's a global one and might be used by external addons
 	if not hyperlink then
 		return nil
@@ -517,7 +570,7 @@ local function fakeLink(hyperlink, quality, name)
 	return "|cff"..color.. "|H"..hyperlink.."|h["..name.."]|h|r"
 end
 
-local function addTooltip(frame, name, link, quality, count, price)
+function addTooltip(frame, name, link, quality, count, price)
 	if (self.notifyFuncs and self.notifyFuncs.tooltip) then
 		for pos, addTooltipHook in self.notifyFuncs.tooltip do
 			addTooltipHook(frame, name, link, quality, count, price)
@@ -525,7 +578,7 @@ local function addTooltip(frame, name, link, quality, count, price)
 	end
 end
 
-local function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
+function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	self.currentGametip = frame
 	self.hideTime = 0
 
@@ -582,7 +635,7 @@ local function tooltipCall(frame, name, link, quality, count, price, forcePopup,
 	end
 end
 
-local function addHook(hookType, hookFunc, position)
+function addHook(hookType, hookFunc, position)
 	local insertPos = tonumber(position) or 100
 
 	if (self.notify[hookType]) then
@@ -608,7 +661,7 @@ local function addHook(hookType, hookFunc, position)
 	end
 end
 
-local function checkPopup(name, link, quality, count, price, hyperlink)
+function checkPopup(name, link, quality, count, price, hyperlink)
 	if (self.notifyFuncs and self.notifyFuncs.tooltip) then
 		for pos, checkPopupHook in self.notifyFuncs.popup do
 			if (checkPopupHook(name, link, quality, count, price, hyperlink)) then
@@ -619,12 +672,12 @@ local function checkPopup(name, link, quality, count, price, hyperlink)
 	return false 
 end
 
-local function chatHookOnHyperlinkShow(reference, link, button, ...)
+function chatHookOnHyperlinkShow(reference, link, button, ...)
 	self.hooks.chatOnHyperlinkShow(reference, link, button)
 	doHyperlink(reference, link, button)
 end
 
-local function afHookOnEnter(type, index)
+function afHookOnEnter(type, index)
 	self.hooks.afOnEnter(type, index)
 
 	local link = GetAuctionItemLink(type, index)
@@ -637,7 +690,7 @@ local function afHookOnEnter(type, index)
 	end
 end
 
-local function cfHookOnEnter()
+function cfHookOnEnter()
 	self.hooks.cfOnEnter()
 
 	local frameID = this:GetParent():GetID()
@@ -653,7 +706,7 @@ local function cfHookOnEnter()
 	end
 end
 
-local function cfHookUpdate(frame)
+function cfHookUpdate(frame)
 	self.hooks.cfUpdate(frame)
 
 	local frameID = frame:GetID()
@@ -676,7 +729,7 @@ local function cfHookUpdate(frame)
 	end
 end
 
-local function gtHookSetLootItem(this, slot)
+function gtHookSetLootItem(this, slot)
 	self.hooks.gtSetLootItem(this, slot)
 		
 	local link = GetLootSlotLink(slot)
@@ -688,7 +741,7 @@ local function gtHookSetLootItem(this, slot)
 	end
 end
 
-local function gtHookSetQuestItem(this, qtype, slot)
+function gtHookSetQuestItem(this, qtype, slot)
 	self.hooks.gtSetQuestItem(this, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
@@ -697,7 +750,7 @@ local function gtHookSetQuestItem(this, qtype, slot)
 	end
 end
 
-local function gtHookSetQuestLogItem(this, qtype, slot)
+function gtHookSetQuestLogItem(this, qtype, slot)
 	self.hooks.gtSetQuestLogItem(this, qtype, slot)
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
@@ -709,7 +762,7 @@ local function gtHookSetQuestLogItem(this, qtype, slot)
 	end
 end
 
-local function gtHookSetInventoryItem(this, unit, slot)
+function gtHookSetInventoryItem(this, unit, slot)
 	local hasItem, hasCooldown, repairCost = self.hooks.gtSetInventoryItem(this, unit, slot)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
@@ -724,7 +777,7 @@ local function gtHookSetInventoryItem(this, unit, slot)
 	return hasItem, hasCooldown, repairCost
 end
 
-local function gtHookSetMerchantItem(this, slot)
+function gtHookSetMerchantItem(this, slot)
 	self.hooks.gtSetMerchantItem(this, slot)
 	local link = GetMerchantItemLink(slot)
 	if (link) then
@@ -734,7 +787,7 @@ local function gtHookSetMerchantItem(this, slot)
 	end
 end
 
-local function gtHookSetCraftItem(this, skill, slot)
+function gtHookSetCraftItem(this, skill, slot)
 	self.hooks.gtSetCraftItem(this, skill, slot)
 	local link
 	if (slot) then
@@ -754,7 +807,7 @@ local function gtHookSetCraftItem(this, skill, slot)
 	end
 end
 
-local function gtHookSetTradeSkillItem(this, skill, slot)
+function gtHookSetTradeSkillItem(this, skill, slot)
 	self.hooks.gtSetTradeSkillItem(this, skill, slot)
 	local link
 	if (slot) then
@@ -775,13 +828,13 @@ local function gtHookSetTradeSkillItem(this, skill, slot)
 end
 
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
-local function breakLink(link)
+function breakLink(link)
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name
 end
 
 
-local function findItemInBags(findName)
+function findItemInBags(findName)
 	for bag = 0, 4, 1 do
 		size = GetContainerNumSlots(bag)
 		if (size) then
@@ -798,7 +851,7 @@ local function findItemInBags(findName)
 	end
 end
 
-local function gtHookSetAuctionSellItem(this)
+function gtHookSetAuctionSellItem(this)
 	self.hooks.gtSetAuctionSellItem(this)
 	local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name) then
@@ -812,7 +865,7 @@ local function gtHookSetAuctionSellItem(this)
 	end
 end
 
-local function imiHookOnEnter()
+function imiHookOnEnter()
 	self.hooks.imiOnEnter()
 	if(not IM_InvList) then return end
 	local id = this:GetID()
@@ -831,7 +884,7 @@ local function imiHookOnEnter()
 	end
 end
 
-local function imHookOnEnter()
+function imHookOnEnter()
 	self.hooks.imOnEnter()
 	local imlink = ItemsMatrix_GetHyperlink(this:GetText())
 	if (imlink) then
@@ -841,11 +894,11 @@ local function imHookOnEnter()
 	end
 end
 
-local function getLootLinkServer()
+function getLootLinkServer()
 	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")]
 end
 
-local function getLootLinkLink(name)
+function getLootLinkLink(name)
 	local itemLink = ItemLinks[name]
 	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
 		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
@@ -855,7 +908,7 @@ local function getLootLinkLink(name)
 	return nil
 end
 
-local function llHookOnEnter()
+function llHookOnEnter()
 	self.hooks.llOnEnter()
 	local name = this:GetText()
 	local link = getLootLinkLink(name)
@@ -865,7 +918,7 @@ local function llHookOnEnter()
 	end
 end
 
-local function aioHookModifyItemTooltip(bag, slot, tooltip)
+function aioHookModifyItemTooltip(bag, slot, tooltip)
 	self.hooks.aioModifyItemTooltip(bag, slot, tooltip)
 
 	local tooltip = getglobal(tooltipName)
@@ -885,14 +938,14 @@ local function aioHookModifyItemTooltip(bag, slot, tooltip)
 	end
 end
 
-local function gtHookSetOwner(this, owner, anchor)
+function gtHookSetOwner(this, owner, anchor)
 	self.hooks.gtSetOwner(this, owner, anchor)
 	this.owner = owner
 	this.anchor = anchor
 end
 
 
-local function doPlayerEnters()
+function doPlayerEnters()
 	-- Since AIOI lists Auctioneer as an option dependancy, we may not have 
 	-- registered the event hooks above... Check here to make certain!
 	if (not AIOI_Hooked) then
@@ -904,7 +957,7 @@ local function doPlayerEnters()
 	end
 end
 
-local function setElapsed(elapsed)
+function setElapsed(elapsed)
 	if (elapsed) then
 		self.eventTimer = self.eventTimer + elapsed
 	end
@@ -912,18 +965,18 @@ local function setElapsed(elapsed)
 	return self.eventTimer;
 end
 
-local function setMoneySpacing(spacing)
+function setMoneySpacing(spacing)
 	if (spacing ~= nil) then self.moneySpacing = spacing end
 	return self.moneySpacing;
 end
 
-local function setPopupKey(key)
+function setPopupKey(key)
 	if (key ~= nil) then self.forcePopupKey = key end
 	return self.forcePopupKey;
 end
 
 
-local function ttInitialize()
+function ttInitialize()
 	--[[
 	----  Establish hooks to all the game tooltips.
 	--]]
