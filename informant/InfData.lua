@@ -22,7 +22,7 @@ Informant.SetSkills({
 	[-9]="Warlock",
 })
 
-Informant.SetReqirements({
+Informant.SetRequirements({
 	[8207]="165:240",
 	[10501]="202:220",
 	[8204]="165:225",
