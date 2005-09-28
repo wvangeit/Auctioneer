@@ -520,7 +520,7 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
 		else
 			local baseData;
-			if (Informer) then baseData = Informer.GetItem(id) end
+			if (Informant) then baseData = Informant.GetItem(id) end
 
 			if (baseData and baseData.sell) then
 				-- use vendor prices if no auction data available

@@ -3,7 +3,7 @@
 --
 
 -- Skills that are needed below
-Informer.SetSkills({
+Informant.SetSkills({
 	[171]="Alchemy",
 	[164]="Blacksmithing",
 	[185]="Cooking",
@@ -22,7 +22,7 @@ Informer.SetSkills({
 	[-9]="Warlock",
 })
 
-Informer.SetReqirements({
+Informant.SetReqirements({
 	[8207]="165:240",
 	[10501]="202:220",
 	[8204]="165:225",
@@ -576,7 +576,7 @@ Informer.SetReqirements({
 	[19059]="197:300",
 })
 
-Informer.SetVendors({
+Informant.SetVendors({
 	[1]="Aayndia Floralwind <Expert Leatherworker>",
 	[2]="Abe Winters <Apprentice Armorer>",
 	[3]="Abigail Shiel <Trade Supplies>",
@@ -1362,7 +1362,7 @@ Informer.SetVendors({
 })
 
 -- The base item data
-Informer.SetDatabase({
+Informant.SetDatabase({
 	[12884]="0:0:0:0:1:::0:0:", -- Arnak's Hoof
 	[12650]="0:0:0:0:1:::0:0:", -- Attuned Dampener
 	[7227]="0:0:0:0:1:::0:0:", -- Balnir Snapdragons

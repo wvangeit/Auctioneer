@@ -21,8 +21,8 @@
 -- @param itemId The ID portion of the item link (the first of the four numbers).
 -- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
 function Auctioneer_GetVendorBuyPrice(itemId)
-	if (Informer) then
-		local ret = Informer.GetItem(itemId)
+	if (Informant) then
+		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.buy end
 	end
 	return nil;
@@ -36,8 +36,8 @@ end
 -- @param itemId The ID portion of the item link (the first of the four numbers).
 -- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
 function Auctioneer_GetVendorSellPrice(itemId)
-	if (Informer) then
-		local ret = Informer.GetItem(itemId)
+	if (Informant) then
+		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.sell end
 	end
 	return nil;

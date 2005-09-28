@@ -81,15 +81,15 @@ Auctioneer_Lowests = {};
 
 function Auctioneer_GetItemData(itemKey)
 	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
-	if (Informer) then
-		return Informer.GetItem(itemID);
+	if (Informant) then
+		return Informant.GetItem(itemID);
 	end
 	return nil; 
 end
 
 function Auctioneer_GetItemDataByID(itemID)
-	if (Informer) then
-		return Informer.GetItem(itemID);
+	if (Informant) then
+		return Informant.GetItem(itemID);
 	end
 	return nil; 
 end

@@ -1,28 +1,28 @@
 ﻿-- Encoded in UTF8
-_INFORMER['AdditBuff']        = "Buff";
-_INFORMER['AdditDrink']       = "Boisson";
-_INFORMER['AdditFood']        = "Nourriture";
-_INFORMER['AdditPoison']      = "Poison";
-_INFORMER['AdditPotion']      = "Potion";
+_INFORMANT['AdditBuff']        = "Buff";
+_INFORMANT['AdditDrink']       = "Boisson";
+_INFORMANT['AdditFood']        = "Nourriture";
+_INFORMANT['AdditPoison']      = "Poison";
+_INFORMANT['AdditPotion']      = "Potion";
 
-_INFORMER['SkillAlchemy']        = "Alchimie";
-_INFORMER['SkillBlacksmithing']  = "Forgeron";
-_INFORMER['SkillCooking']        = "Cuisine";
-_INFORMER['SkillEnchanting']     = "Enchantement";
-_INFORMER['SkillEngineering']    = "Ingénieur";
-_INFORMER['SkillFirstaid']       = "Premiers Soins";
-_INFORMER['SkillLeatherworking'] = "Travail du Cuir";
-_INFORMER['SkillMining']         = "Minage";
-_INFORMER['SkillTailoring']      = "Tailleur";
+_INFORMANT['SkillAlchemy']        = "Alchimie";
+_INFORMANT['SkillBlacksmithing']  = "Forgeron";
+_INFORMANT['SkillCooking']        = "Cuisine";
+_INFORMANT['SkillEnchanting']     = "Enchantement";
+_INFORMANT['SkillEngineering']    = "Ingénieur";
+_INFORMANT['SkillFirstaid']       = "Premiers Soins";
+_INFORMANT['SkillLeatherworking'] = "Travail du Cuir";
+_INFORMANT['SkillMining']         = "Minage";
+_INFORMANT['SkillTailoring']      = "Tailleur";
 
-_INFORMER['FrmtInfoClassuse'] = "Classe: %s utilisé pour %s";
-_INFORMER['FrmtInfoClass'] = "Classe: %s";
-_INFORMER['FrmtInfoUse'] = "Utilisé pour: %s";
-_INFORMER['FrmtInfoBuy'] = "Achat%s au marchand";
-_INFORMER['FrmtInfoSell'] = "Vente%s au marchand";
-_INFORMER['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
-_INFORMER['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
-_INFORMER['FrmtInfoStx'] = "Pile par lots de %d";
+_INFORMANT['FrmtInfoClassuse'] = "Classe: %s utilisé pour %s";
+_INFORMANT['FrmtInfoClass'] = "Classe: %s";
+_INFORMANT['FrmtInfoUse'] = "Utilisé pour: %s";
+_INFORMANT['FrmtInfoBuy'] = "Achat%s au marchand";
+_INFORMANT['FrmtInfoSell'] = "Vente%s au marchand";
+_INFORMANT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
+_INFORMANT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
+_INFORMANT['FrmtInfoStx'] = "Pile par lots de %d";
 
 -- AH Scanning localizations
 

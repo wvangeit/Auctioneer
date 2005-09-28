@@ -29,9 +29,9 @@ for $file (<locales/????.utf8>) {
 	push(@valid, $locale);
 }
 
-print OUT "_INFORMER = {};\n\n";
-print OUT "INFORMER_VALID_LOCALES = {[\"".join("\"] = true, [\"", @valid)."\"] = true};\n\n";
-print OUT "function Informer_SetLocaleStrings(locale)\n";
+print OUT "_INFORMANT = {};\n\n";
+print OUT "INFORMANT_VALID_LOCALES = {[\"".join("\"] = true, [\"", @valid)."\"] = true};\n\n";
+print OUT "function Informant_SetLocaleStrings(locale)\n";
 
 print OUT "-- Default locale strings are defined in English\n";
 open(DATA, "< locales/enUS.utf8");
@@ -91,6 +91,6 @@ for $locale (@locales) {
 	print OUT "end\n\n";
 }
 
-print OUT "end\n\nInformer_SetLocaleStrings(GetLocale);\n\n";
+print OUT "end\n\nInformant_SetLocaleStrings(GetLocale);\n\n";
 
 

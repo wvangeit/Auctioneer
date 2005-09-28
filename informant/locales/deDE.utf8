@@ -1,74 +1,74 @@
 ﻿-- Encoded in UTF8
 
-_INFORMER['AdditAlcohol']     = "Alkohol";
-_INFORMER['AdditBuff']        = "Buff";
-_INFORMER['AdditDrink']       = "Getränk";
-_INFORMER['AdditFirework']    = "Feuerwerk";
-_INFORMER['AdditFood']        = "Nahrung";
-_INFORMER['AdditGiftwrap']    = "Geschenkpapier";
-_INFORMER['AdditLure']        = "Köder";
-_INFORMER['AdditPoison']      = "Gift";
-_INFORMER['AdditPotion']      = "Trank";
-_INFORMER['AdditRestorative'] = "Stärkungstrank";
-_INFORMER['AdditScroll']      = "Zauberspruchrolle";
+_INFORMANT['AdditAlcohol']     = "Alkohol";
+_INFORMANT['AdditBuff']        = "Buff";
+_INFORMANT['AdditDrink']       = "Getränk";
+_INFORMANT['AdditFirework']    = "Feuerwerk";
+_INFORMANT['AdditFood']        = "Nahrung";
+_INFORMANT['AdditGiftwrap']    = "Geschenkpapier";
+_INFORMANT['AdditLure']        = "Köder";
+_INFORMANT['AdditPoison']      = "Gift";
+_INFORMANT['AdditPotion']      = "Trank";
+_INFORMANT['AdditRestorative'] = "Stärkungstrank";
+_INFORMANT['AdditScroll']      = "Zauberspruchrolle";
 
-_INFORMER['SkillAlchemy']        = "Alchimie";
-_INFORMER['SkillBlacksmithing']  = "Schmieden";
-_INFORMER['SkillCooking']        = "Kochen";
-_INFORMER['SkillEnchanting']     = "Verzauberungen";
-_INFORMER['SkillEngineering']    = "Ingenieurskunst";
-_INFORMER['SkillFirstaid']       = "Erste Hilfe";
-_INFORMER['SkillLeatherworking'] = "Lederverarbeitung";
-_INFORMER['SkillMining']         = "Bergbau";
-_INFORMER['SkillTailoring']      = "Schneiderei";
-_INFORMER['SkillDruid']          = "Druidenzauber";
-_INFORMER['SkillMage']           = "Magierzauber";
-_INFORMER['SkillPaladin']        = "Paladinzauber";
-_INFORMER['SkillPriest']         = "Priesterzauber";
-_INFORMER['SkillRogue']          = "Diebeszubehör";
-_INFORMER['SkillShaman']         = "Schamanenzauber";
-_INFORMER['SkillWarlock']        = "Hexerzauber";
+_INFORMANT['SkillAlchemy']        = "Alchimie";
+_INFORMANT['SkillBlacksmithing']  = "Schmieden";
+_INFORMANT['SkillCooking']        = "Kochen";
+_INFORMANT['SkillEnchanting']     = "Verzauberungen";
+_INFORMANT['SkillEngineering']    = "Ingenieurskunst";
+_INFORMANT['SkillFirstaid']       = "Erste Hilfe";
+_INFORMANT['SkillLeatherworking'] = "Lederverarbeitung";
+_INFORMANT['SkillMining']         = "Bergbau";
+_INFORMANT['SkillTailoring']      = "Schneiderei";
+_INFORMANT['SkillDruid']          = "Druidenzauber";
+_INFORMANT['SkillMage']           = "Magierzauber";
+_INFORMANT['SkillPaladin']        = "Paladinzauber";
+_INFORMANT['SkillPriest']         = "Priesterzauber";
+_INFORMANT['SkillRogue']          = "Diebeszubehör";
+_INFORMANT['SkillShaman']         = "Schamanenzauber";
+_INFORMANT['SkillWarlock']        = "Hexerzauber";
 
-_INFORMER['FrmtWelcome'] = "Informer v%s geladen";
+_INFORMANT['FrmtWelcome'] = "Informant v%s geladen";
 
-_INFORMER['FrmtInfoClass']    = "Klasse: %s";
-_INFORMER['FrmtInfoUse']      = "Benutzt für: %s";
-_INFORMER['FrmtInfoBuy']      = "Einkauf beim Händler";
-_INFORMER['FrmtInfoSell']     = "Verkauf beim Händler";
-_INFORMER['FrmtInfoBuymult']  = "Einkauf für %d (%s pro Stück)";
-_INFORMER['FrmtInfoSellmult'] = "Verkauf für %d (%s pro Stück)";
-_INFORMER['FrmtInfoStx']      = "%d pro Stapel";
+_INFORMANT['FrmtInfoClass']    = "Klasse: %s";
+_INFORMANT['FrmtInfoUse']      = "Benutzt für: %s";
+_INFORMANT['FrmtInfoBuy']      = "Einkauf beim Händler";
+_INFORMANT['FrmtInfoSell']     = "Verkauf beim Händler";
+_INFORMANT['FrmtInfoBuymult']  = "Einkauf für %d (%s pro Stück)";
+_INFORMANT['FrmtInfoSellmult'] = "Verkauf für %d (%s pro Stück)";
+_INFORMANT['FrmtInfoStx']      = "%d pro Stapel";
 
-_INFORMER['CmdOff']           = "off";
-_INFORMER['CmdOn']            = "on";
-_INFORMER['CmdToggle']        = "toggle";
-_INFORMER['CmdDefault']       = "default";
+_INFORMANT['CmdOff']           = "off";
+_INFORMANT['CmdOn']            = "on";
+_INFORMANT['CmdToggle']        = "toggle";
+_INFORMANT['CmdDefault']       = "default";
 
-_INFORMER['CmdEmbed']            = "embed";
+_INFORMANT['CmdEmbed']            = "embed";
 
-_INFORMER['ShowStack']      = "show-stack";
-_INFORMER['ShowUsage']      = "show-usage";
-_INFORMER['ShowVendor']     = "show-vendor";
-_INFORMER['ShowVendorBuy']  = "show-vendor-buy";
-_INFORMER['ShowVendorSell'] = "show-vendor-sell";
+_INFORMANT['ShowStack']      = "show-stack";
+_INFORMANT['ShowUsage']      = "show-usage";
+_INFORMANT['ShowVendor']     = "show-vendor";
+_INFORMANT['ShowVendorBuy']  = "show-vendor-buy";
+_INFORMANT['ShowVendorSell'] = "show-vendor-sell";
 
-_INFORMER['HelpOnoff']          = "Schaltet die Anzeige der Auktionsdaten ein/aus.";
-_INFORMER['HelpVerbose']        = "Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
-_INFORMER['HelpVendor']         = "Schaltet die Anzeige des Händlerpreieses ein/aus.";
-_INFORMER['HelpVendorSell']     = "Schaltet die Anzeige des Händlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-_INFORMER['HelpVendorBuy']      = "Schaltet die Anzeige des Händlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-_INFORMER['HelpUsage']          = "Schaltet die Anzeige des Verwendungszweckes für Handwerker ein/aus.";
-_INFORMER['HelpStack']          = "Schaltet die Anzeige der Stapelgröße ein/aus.";
-_INFORMER['HelpEmbed']          = "Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
+_INFORMANT['HelpOnoff']          = "Schaltet die Anzeige der Auktionsdaten ein/aus.";
+_INFORMANT['HelpVerbose']        = "Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
+_INFORMANT['HelpVendor']         = "Schaltet die Anzeige des Händlerpreieses ein/aus.";
+_INFORMANT['HelpVendorSell']     = "Schaltet die Anzeige des Händlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+_INFORMANT['HelpVendorBuy']      = "Schaltet die Anzeige des Händlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+_INFORMANT['HelpUsage']          = "Schaltet die Anzeige des Verwendungszweckes für Handwerker ein/aus.";
+_INFORMANT['HelpStack']          = "Schaltet die Anzeige der Stapelgröße ein/aus.";
+_INFORMANT['HelpEmbed']          = "Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
 
-_INFORMER['StatOn']  = "Auktionsdaten werden angezeigt.";
-_INFORMER['StatOff'] = "Auktionsdaten werden nicht angezeigt.";
+_INFORMANT['StatOn']  = "Auktionsdaten werden angezeigt.";
+_INFORMANT['StatOff'] = "Auktionsdaten werden nicht angezeigt.";
 
-_INFORMER['FrmtActEnable']     = "%s wird angezeigt";
-_INFORMER['FrmtActDisable']    = "%s wird nicht angezeigt";
-_INFORMER['FrmtActEnabledOn']  = "Zeige %s auf %s";
-_INFORMER['FrmtActSet']        = "Setze %s auf '%s'";
-_INFORMER['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
-_INFORMER['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zurückgesetzt.";
-_INFORMER['FrmtActDefault']    = "%s wurde auf den Standardwert zurückgesetzt.";
+_INFORMANT['FrmtActEnable']     = "%s wird angezeigt";
+_INFORMANT['FrmtActDisable']    = "%s wird nicht angezeigt";
+_INFORMANT['FrmtActEnabledOn']  = "Zeige %s auf %s";
+_INFORMANT['FrmtActSet']        = "Setze %s auf '%s'";
+_INFORMANT['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
+_INFORMANT['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zurückgesetzt.";
+_INFORMANT['FrmtActDefault']    = "%s wurde auf den Standardwert zurückgesetzt.";
 

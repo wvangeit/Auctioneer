@@ -1,96 +1,96 @@
 ﻿-- Encoded in UTF8
 
-_INFORMER['AdditAlcohol'] = "Alcohol";
-_INFORMER['AdditBuff'] = "Mejora";
-_INFORMER['AdditDrink'] = "Bebida";
-_INFORMER['AdditFirework'] = "Fuegos Artificiales";
-_INFORMER['AdditFood'] = "Comida";
-_INFORMER['AdditGiftwrap'] = "Envoltura";
-_INFORMER['AdditLure'] = "Señuelo";
-_INFORMER['AdditPoison'] = "Veneno";
-_INFORMER['AdditPotion'] = "Poción";
-_INFORMER['AdditRestorative'] = "Restaurativo";
-_INFORMER['AdditScroll'] = "Voluta";
+_INFORMANT['AdditAlcohol'] = "Alcohol";
+_INFORMANT['AdditBuff'] = "Mejora";
+_INFORMANT['AdditDrink'] = "Bebida";
+_INFORMANT['AdditFirework'] = "Fuegos Artificiales";
+_INFORMANT['AdditFood'] = "Comida";
+_INFORMANT['AdditGiftwrap'] = "Envoltura";
+_INFORMANT['AdditLure'] = "Señuelo";
+_INFORMANT['AdditPoison'] = "Veneno";
+_INFORMANT['AdditPotion'] = "Poción";
+_INFORMANT['AdditRestorative'] = "Restaurativo";
+_INFORMANT['AdditScroll'] = "Voluta";
 
-_INFORMER['SkillAlchemy'] = "Alquímia";
-_INFORMER['SkillBlacksmithing'] = "Herrería";
-_INFORMER['SkillCooking'] = "Cocinar";
-_INFORMER['SkillEnchanting'] = "Encantar";
-_INFORMER['SkillEngineering'] = "Ingeniería";
-_INFORMER['SkillFirstaid'] = "Primeros Auxilios";
-_INFORMER['SkillLeatherworking'] = "Peletería";
-_INFORMER['SkillMining'] = "Minería";
-_INFORMER['SkillTailoring'] = "Sastrería";
-_INFORMER['SkillDruid'] = "Encantos de Druidas";
-_INFORMER['SkillMage'] = "Encantos de Magos";
-_INFORMER['SkillPaladin'] = "Encantos de Paladines";
-_INFORMER['SkillPriest'] = "Encantos de Sacerdotes";
-_INFORMER['SkillRogue'] = "Encantos de Pícaros";
-_INFORMER['SkillShaman'] = "Encantos de Chamanes";
-_INFORMER['SkillWarlock'] = "Encantos de Brujos";
-
-
-_INFORMER['FrmtWelcome'] = "Auctioneer versión %s cargado";
+_INFORMANT['SkillAlchemy'] = "Alquímia";
+_INFORMANT['SkillBlacksmithing'] = "Herrería";
+_INFORMANT['SkillCooking'] = "Cocinar";
+_INFORMANT['SkillEnchanting'] = "Encantar";
+_INFORMANT['SkillEngineering'] = "Ingeniería";
+_INFORMANT['SkillFirstaid'] = "Primeros Auxilios";
+_INFORMANT['SkillLeatherworking'] = "Peletería";
+_INFORMANT['SkillMining'] = "Minería";
+_INFORMANT['SkillTailoring'] = "Sastrería";
+_INFORMANT['SkillDruid'] = "Encantos de Druidas";
+_INFORMANT['SkillMage'] = "Encantos de Magos";
+_INFORMANT['SkillPaladin'] = "Encantos de Paladines";
+_INFORMANT['SkillPriest'] = "Encantos de Sacerdotes";
+_INFORMANT['SkillRogue'] = "Encantos de Pícaros";
+_INFORMANT['SkillShaman'] = "Encantos de Chamanes";
+_INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 
 
-
-_INFORMER['FrmtInfoClassuse'] = "Clase: %s usado para %s";
-_INFORMER['FrmtInfoClass'] = "Clase: %s";
-_INFORMER['FrmtInfoUse'] = "Usado para: %s";
-_INFORMER['FrmtInfoBuy'] = "Compra del vendedor";
-_INFORMER['FrmtInfoSell'] = "Vende al vendedor";
-_INFORMER['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
-_INFORMER['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
-_INFORMER['FrmtInfoStx'] = "Amontonable en lotes de artículos %d por paquete";
-
-_INFORMER['FrmtInfoBuyMulti'] = "  Opción a compra(%s%s c/u)";
-
-_INFORMER['FrmtInfoBuyOne'] = " %s con opción a compra";
-
-_INFORMER['FrmtInfoBuymedian'] = "  Opción a compra mediano";
+_INFORMANT['FrmtWelcome'] = "Auctioneer versión %s cargado";
 
 
 
+_INFORMANT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
+_INFORMANT['FrmtInfoClass'] = "Clase: %s";
+_INFORMANT['FrmtInfoUse'] = "Usado para: %s";
+_INFORMANT['FrmtInfoBuy'] = "Compra del vendedor";
+_INFORMANT['FrmtInfoSell'] = "Vende al vendedor";
+_INFORMANT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
+_INFORMANT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
+_INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de artículos %d por paquete";
 
+_INFORMANT['FrmtInfoBuyMulti'] = "  Opción a compra(%s%s c/u)";
 
+_INFORMANT['FrmtInfoBuyOne'] = " %s con opción a compra";
 
-_INFORMER['CmdOff'] = "apagado";
-_INFORMER['CmdOn'] = "prendido";
-_INFORMER['CmdToggle'] = "invertir";
-_INFORMER['CmdDefault'] = "original";
-
-_INFORMER['CmdEmbed'] = "integrado";
+_INFORMANT['FrmtInfoBuymedian'] = "  Opción a compra mediano";
 
 
 
 
 
-_INFORMER['ShowStack'] = "ver-paquete";
-_INFORMER['ShowUsage'] = "ver-uso";
-_INFORMER['ShowVendor'] = "ver-vendedor";
-_INFORMER['ShowVendorBuy'] = "ver-vendedor-compra";
-_INFORMER['ShowVendorSell'] = "ver-vendedor-venta";
 
-_INFORMER['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
-_INFORMER['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
-_INFORMER['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el artículo";
-_INFORMER['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
-_INFORMER['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
-_INFORMER['HelpUsage'] = "Selecciona para mostrar uso del artículo en profesiones";
-_INFORMER['HelpStack'] = "Selecciona para mostrar tamaño maximo del paquete";
-_INFORMER['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-_INFORMER['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opción es seleccionada)";
+_INFORMANT['CmdOff'] = "apagado";
+_INFORMANT['CmdOn'] = "prendido";
+_INFORMANT['CmdToggle'] = "invertir";
+_INFORMANT['CmdDefault'] = "original";
 
-_INFORMER['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
-_INFORMER['StatOff'] = "Ocultando toda la informacion de subastas";
+_INFORMANT['CmdEmbed'] = "integrado";
 
-_INFORMER['FrmtActEnable'] = "Mostrando informacion del artículo: %s ";
-_INFORMER['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
-_INFORMER['FrmtActEnabledOn'] = "Mostrando %s de los artículos usando %s";
-_INFORMER['FrmtActSet'] = "%s ajustado(a) a '%s'";
-_INFORMER['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
-_INFORMER['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de fábrica.";
-_INFORMER['FrmtActDefault'] = "La opción %s de Auctioneer ha sido revertida a su configuración de fábrica.";
+
+
+
+
+_INFORMANT['ShowStack'] = "ver-paquete";
+_INFORMANT['ShowUsage'] = "ver-uso";
+_INFORMANT['ShowVendor'] = "ver-vendedor";
+_INFORMANT['ShowVendorBuy'] = "ver-vendedor-compra";
+_INFORMANT['ShowVendorSell'] = "ver-vendedor-venta";
+
+_INFORMANT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
+_INFORMANT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
+_INFORMANT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el artículo";
+_INFORMANT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
+_INFORMANT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
+_INFORMANT['HelpUsage'] = "Selecciona para mostrar uso del artículo en profesiones";
+_INFORMANT['HelpStack'] = "Selecciona para mostrar tamaño maximo del paquete";
+_INFORMANT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
+_INFORMANT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opción es seleccionada)";
+
+_INFORMANT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
+_INFORMANT['StatOff'] = "Ocultando toda la informacion de subastas";
+
+_INFORMANT['FrmtActEnable'] = "Mostrando informacion del artículo: %s ";
+_INFORMANT['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
+_INFORMANT['FrmtActEnabledOn'] = "Mostrando %s de los artículos usando %s";
+_INFORMANT['FrmtActSet'] = "%s ajustado(a) a '%s'";
+_INFORMANT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
+_INFORMANT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de fábrica.";
+_INFORMANT['FrmtActDefault'] = "La opción %s de Auctioneer ha sido revertida a su configuración de fábrica.";
 
 
 -- AH Scanning localizations

@@ -6,9 +6,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Revision: $Id$
 -->
 	<Script file="localization.lua"/>
-	<Script file="Informer.lua"/>
+	<Script file="Informant.lua"/>
 	<Script file="InfData.lua"/>
-	<Frame name="InformerFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true">
+	<Frame name="InformantFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true">
 		<Size><AbsDimension x="512" y="800"/></Size>
 		<Anchors><Anchor point="CENTER"/></Anchors>
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
@@ -30,7 +30,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-				<FontString name="InformerFrameTitle" inherits="GameFontNormal" text="TITLE">
+				<FontString name="InformantFrameTitle" inherits="GameFontNormal" text="TITLE">
 					<Anchors>
 						<Anchor point="TOP" relativeTo="$parent"></Anchor>
 					</Anchors>

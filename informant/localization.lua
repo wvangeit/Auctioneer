@@ -35,108 +35,108 @@
 
 
 
-_INFORMER = {};
+_INFORMANT = {};
 
-INFORMER_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
+INFORMANT_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
 
-function Informer_SetLocaleStrings(locale)
+function Informant_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
 	
 	
-	_INFORMER['AdditAlcohol'] = "Alcohol";
-	_INFORMER['AdditBuff'] = "Buff";
-	_INFORMER['AdditDrink'] = "Drink";
-	_INFORMER['AdditFirework'] = "Firework";
-	_INFORMER['AdditFood'] = "Food";
-	_INFORMER['AdditGiftwrap'] = "Giftwrap";
-	_INFORMER['AdditLure'] = "Lure";
-	_INFORMER['AdditPoison'] = "Poison";
-	_INFORMER['AdditPotion'] = "Potion";
-	_INFORMER['AdditRestorative'] = "Restorative";
-	_INFORMER['AdditScroll'] = "Scroll";
+	_INFORMANT['AdditAlcohol'] = "Alcohol";
+	_INFORMANT['AdditBuff'] = "Buff";
+	_INFORMANT['AdditDrink'] = "Drink";
+	_INFORMANT['AdditFirework'] = "Firework";
+	_INFORMANT['AdditFood'] = "Food";
+	_INFORMANT['AdditGiftwrap'] = "Giftwrap";
+	_INFORMANT['AdditLure'] = "Lure";
+	_INFORMANT['AdditPoison'] = "Poison";
+	_INFORMANT['AdditPotion'] = "Potion";
+	_INFORMANT['AdditRestorative'] = "Restorative";
+	_INFORMANT['AdditScroll'] = "Scroll";
 	
-	_INFORMER['SkillAlchemy'] = "Alchemy";
-	_INFORMER['SkillBlacksmithing'] = "Smithing";
-	_INFORMER['SkillCooking'] = "Cooking";
-	_INFORMER['SkillEnchanting'] = "Enchanting";
-	_INFORMER['SkillEngineering'] = "Engineering";
-	_INFORMER['SkillFirstaid'] = "First Aid";
-	_INFORMER['SkillLeatherworking'] = "Leatherworking";
-	_INFORMER['SkillMining'] = "Mining";
-	_INFORMER['SkillTailoring'] = "Tailoring";
-	_INFORMER['SkillDruid'] = "Druid spells";
-	_INFORMER['SkillMage'] = "Mage spells";
-	_INFORMER['SkillPaladin'] = "Paladin spells";
-	_INFORMER['SkillPriest'] = "Priest spells";
-	_INFORMER['SkillRogue'] = "Rogue skills";
-	_INFORMER['SkillShaman'] = "Shaman spells";
-	_INFORMER['SkillWarlock'] = "Warlock spells";
-	
-	
-	_INFORMER['FrmtWelcome'] = "Auctioneer v%s loaded";
+	_INFORMANT['SkillAlchemy'] = "Alchemy";
+	_INFORMANT['SkillBlacksmithing'] = "Smithing";
+	_INFORMANT['SkillCooking'] = "Cooking";
+	_INFORMANT['SkillEnchanting'] = "Enchanting";
+	_INFORMANT['SkillEngineering'] = "Engineering";
+	_INFORMANT['SkillFirstaid'] = "First Aid";
+	_INFORMANT['SkillLeatherworking'] = "Leatherworking";
+	_INFORMANT['SkillMining'] = "Mining";
+	_INFORMANT['SkillTailoring'] = "Tailoring";
+	_INFORMANT['SkillDruid'] = "Druid spells";
+	_INFORMANT['SkillMage'] = "Mage spells";
+	_INFORMANT['SkillPaladin'] = "Paladin spells";
+	_INFORMANT['SkillPriest'] = "Priest spells";
+	_INFORMANT['SkillRogue'] = "Rogue skills";
+	_INFORMANT['SkillShaman'] = "Shaman spells";
+	_INFORMANT['SkillWarlock'] = "Warlock spells";
 	
 	
-	_INFORMER['FrmtInfoMerchants'] = "Sold by %d merchants";
-	_INFORMER['FrmtInfoQuest'] = "Quest item in %d quests";
-	_INFORMER['FrmtInfoClassuse'] = "Class: %s used for %s";
-	_INFORMER['FrmtInfoClass'] = "Class: %s";
-	_INFORMER['FrmtInfoUse'] = "Used for: %s";
-	_INFORMER['FrmtInfoBuy'] = "Buy from vendor";
-	_INFORMER['FrmtInfoSell'] = "Sell to vendor";
-	_INFORMER['FrmtInfoBuymult'] = "Buy %d (%s each)";
-	_INFORMER['FrmtInfoSellmult'] = "Sell %d (%s each)";
-	_INFORMER['FrmtInfoStx'] = "Stacks in lots of %d";
-	
-	_INFORMER['FrmtInfoBuyMulti'] = "  Buyout (%s%s ea)";
-	
-	_INFORMER['FrmtInfoBuyOne'] = "  Buyout%s";
-	
-	_INFORMER['FrmtInfoBuymedian'] = "  Buyout median";
+	_INFORMANT['FrmtWelcome'] = "Auctioneer v%s loaded";
 	
 	
+	_INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants";
+	_INFORMANT['FrmtInfoQuest'] = "Quest item in %d quests";
+	_INFORMANT['FrmtInfoClassuse'] = "Class: %s used for %s";
+	_INFORMANT['FrmtInfoClass'] = "Class: %s";
+	_INFORMANT['FrmtInfoUse'] = "Used for: %s";
+	_INFORMANT['FrmtInfoBuy'] = "Buy from vendor";
+	_INFORMANT['FrmtInfoSell'] = "Sell to vendor";
+	_INFORMANT['FrmtInfoBuymult'] = "Buy %d (%s each)";
+	_INFORMANT['FrmtInfoSellmult'] = "Sell %d (%s each)";
+	_INFORMANT['FrmtInfoStx'] = "Stacks in lots of %d";
 	
+	_INFORMANT['FrmtInfoBuyMulti'] = "  Buyout (%s%s ea)";
 	
+	_INFORMANT['FrmtInfoBuyOne'] = "  Buyout%s";
 	
-	
-	_INFORMER['CmdOff'] = "off";
-	_INFORMER['CmdOn'] = "on";
-	_INFORMER['CmdToggle'] = "toggle";
-	_INFORMER['CmdDefault'] = "default";
-	
-	_INFORMER['CmdEmbed'] = "embed";
+	_INFORMANT['FrmtInfoBuymedian'] = "  Buyout median";
 	
 	
 	
 	
 	
-	_INFORMER['ShowStack'] = "show-stack";
-	_INFORMER['ShowUsage'] = "show-usage";
-	_INFORMER['ShowQuest'] = "show-quest";
-	_INFORMER['ShowMerchant'] = "show-merchant";
-	_INFORMER['ShowVendor'] = "show-vendor";
-	_INFORMER['ShowVendorBuy'] = "show-vendor-buy";
-	_INFORMER['ShowVendorSell'] = "show-vendor-sell";
 	
-	_INFORMER['HelpOnoff'] = "Turns the auction data display on and off";
-	_INFORMER['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
-	_INFORMER['HelpVendor'] = "Select whether to show item's vendor pricing";
-	_INFORMER['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)";
-	_INFORMER['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
-	_INFORMER['HelpUsage'] = "Select whether to show tradeskill item's usage";
-	_INFORMER['HelpStack'] = "Select whether to show the item's stackable size";
-	_INFORMER['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
-	_INFORMER['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
+	_INFORMANT['CmdOff'] = "off";
+	_INFORMANT['CmdOn'] = "on";
+	_INFORMANT['CmdToggle'] = "toggle";
+	_INFORMANT['CmdDefault'] = "default";
 	
-	_INFORMER['StatOn'] = "Displaying configured auction data";
-	_INFORMER['StatOff'] = "Not displaying any auction data";
+	_INFORMANT['CmdEmbed'] = "embed";
 	
-	_INFORMER['FrmtActEnable'] = "Displaying item's %s data";
-	_INFORMER['FrmtActDisable'] = "Not displaying item's %s data";
-	_INFORMER['FrmtActEnabledOn'] = "Displaying item's %s on %s";
-	_INFORMER['FrmtActSet'] = "Set %s to '%s'";
-	_INFORMER['FrmtActUnknown'] = "Unknown command keyword: '%s'";
-	_INFORMER['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
-	_INFORMER['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
+	
+	
+	
+	
+	_INFORMANT['ShowStack'] = "show-stack";
+	_INFORMANT['ShowUsage'] = "show-usage";
+	_INFORMANT['ShowQuest'] = "show-quest";
+	_INFORMANT['ShowMerchant'] = "show-merchant";
+	_INFORMANT['ShowVendor'] = "show-vendor";
+	_INFORMANT['ShowVendorBuy'] = "show-vendor-buy";
+	_INFORMANT['ShowVendorSell'] = "show-vendor-sell";
+	
+	_INFORMANT['HelpOnoff'] = "Turns the auction data display on and off";
+	_INFORMANT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
+	_INFORMANT['HelpVendor'] = "Select whether to show item's vendor pricing";
+	_INFORMANT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)";
+	_INFORMANT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
+	_INFORMANT['HelpUsage'] = "Select whether to show tradeskill item's usage";
+	_INFORMANT['HelpStack'] = "Select whether to show the item's stackable size";
+	_INFORMANT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
+	_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
+	
+	_INFORMANT['StatOn'] = "Displaying configured auction data";
+	_INFORMANT['StatOff'] = "Not displaying any auction data";
+	
+	_INFORMANT['FrmtActEnable'] = "Displaying item's %s data";
+	_INFORMANT['FrmtActDisable'] = "Not displaying item's %s data";
+	_INFORMANT['FrmtActEnabledOn'] = "Displaying item's %s on %s";
+	_INFORMANT['FrmtActSet'] = "Set %s to '%s'";
+	_INFORMANT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
+	_INFORMANT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
+	_INFORMANT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
 	
 	
 	
@@ -151,77 +151,77 @@ function Informer_SetLocaleStrings(locale)
 if locale == "deDE" then
 		-- Encoded in UTF8
 		
-		_INFORMER['AdditAlcohol']     = "Alkohol";
-		_INFORMER['AdditBuff']        = "Buff";
-		_INFORMER['AdditDrink']       = "Getr\195\164nk";
-		_INFORMER['AdditFirework']    = "Feuerwerk";
-		_INFORMER['AdditFood']        = "Nahrung";
-		_INFORMER['AdditGiftwrap']    = "Geschenkpapier";
-		_INFORMER['AdditLure']        = "K\195\182der";
-		_INFORMER['AdditPoison']      = "Gift";
-		_INFORMER['AdditPotion']      = "Trank";
-		_INFORMER['AdditRestorative'] = "St\195\164rkungstrank";
-		_INFORMER['AdditScroll']      = "Zauberspruchrolle";
+		_INFORMANT['AdditAlcohol']     = "Alkohol";
+		_INFORMANT['AdditBuff']        = "Buff";
+		_INFORMANT['AdditDrink']       = "Getr\195\164nk";
+		_INFORMANT['AdditFirework']    = "Feuerwerk";
+		_INFORMANT['AdditFood']        = "Nahrung";
+		_INFORMANT['AdditGiftwrap']    = "Geschenkpapier";
+		_INFORMANT['AdditLure']        = "K\195\182der";
+		_INFORMANT['AdditPoison']      = "Gift";
+		_INFORMANT['AdditPotion']      = "Trank";
+		_INFORMANT['AdditRestorative'] = "St\195\164rkungstrank";
+		_INFORMANT['AdditScroll']      = "Zauberspruchrolle";
 		
-		_INFORMER['SkillAlchemy']        = "Alchimie";
-		_INFORMER['SkillBlacksmithing']  = "Schmieden";
-		_INFORMER['SkillCooking']        = "Kochen";
-		_INFORMER['SkillEnchanting']     = "Verzauberungen";
-		_INFORMER['SkillEngineering']    = "Ingenieurskunst";
-		_INFORMER['SkillFirstaid']       = "Erste Hilfe";
-		_INFORMER['SkillLeatherworking'] = "Lederverarbeitung";
-		_INFORMER['SkillMining']         = "Bergbau";
-		_INFORMER['SkillTailoring']      = "Schneiderei";
-		_INFORMER['SkillDruid']          = "Druidenzauber";
-		_INFORMER['SkillMage']           = "Magierzauber";
-		_INFORMER['SkillPaladin']        = "Paladinzauber";
-		_INFORMER['SkillPriest']         = "Priesterzauber";
-		_INFORMER['SkillRogue']          = "Diebeszubeh\195\182r";
-		_INFORMER['SkillShaman']         = "Schamanenzauber";
-		_INFORMER['SkillWarlock']        = "Hexerzauber";
+		_INFORMANT['SkillAlchemy']        = "Alchimie";
+		_INFORMANT['SkillBlacksmithing']  = "Schmieden";
+		_INFORMANT['SkillCooking']        = "Kochen";
+		_INFORMANT['SkillEnchanting']     = "Verzauberungen";
+		_INFORMANT['SkillEngineering']    = "Ingenieurskunst";
+		_INFORMANT['SkillFirstaid']       = "Erste Hilfe";
+		_INFORMANT['SkillLeatherworking'] = "Lederverarbeitung";
+		_INFORMANT['SkillMining']         = "Bergbau";
+		_INFORMANT['SkillTailoring']      = "Schneiderei";
+		_INFORMANT['SkillDruid']          = "Druidenzauber";
+		_INFORMANT['SkillMage']           = "Magierzauber";
+		_INFORMANT['SkillPaladin']        = "Paladinzauber";
+		_INFORMANT['SkillPriest']         = "Priesterzauber";
+		_INFORMANT['SkillRogue']          = "Diebeszubeh\195\182r";
+		_INFORMANT['SkillShaman']         = "Schamanenzauber";
+		_INFORMANT['SkillWarlock']        = "Hexerzauber";
 		
-		_INFORMER['FrmtWelcome'] = "Informer v%s geladen";
+		_INFORMANT['FrmtWelcome'] = "Informant v%s geladen";
 		
-		_INFORMER['FrmtInfoClass']    = "Klasse: %s";
-		_INFORMER['FrmtInfoUse']      = "Benutzt f\195\188r: %s";
-		_INFORMER['FrmtInfoBuy']      = "Einkauf beim H\195\164ndler";
-		_INFORMER['FrmtInfoSell']     = "Verkauf beim H\195\164ndler";
-		_INFORMER['FrmtInfoBuymult']  = "Einkauf f\195\188r %d (%s pro St\195\188ck)";
-		_INFORMER['FrmtInfoSellmult'] = "Verkauf f\195\188r %d (%s pro St\195\188ck)";
-		_INFORMER['FrmtInfoStx']      = "%d pro Stapel";
+		_INFORMANT['FrmtInfoClass']    = "Klasse: %s";
+		_INFORMANT['FrmtInfoUse']      = "Benutzt f\195\188r: %s";
+		_INFORMANT['FrmtInfoBuy']      = "Einkauf beim H\195\164ndler";
+		_INFORMANT['FrmtInfoSell']     = "Verkauf beim H\195\164ndler";
+		_INFORMANT['FrmtInfoBuymult']  = "Einkauf f\195\188r %d (%s pro St\195\188ck)";
+		_INFORMANT['FrmtInfoSellmult'] = "Verkauf f\195\188r %d (%s pro St\195\188ck)";
+		_INFORMANT['FrmtInfoStx']      = "%d pro Stapel";
 		
-		_INFORMER['CmdOff']           = "off";
-		_INFORMER['CmdOn']            = "on";
-		_INFORMER['CmdToggle']        = "toggle";
-		_INFORMER['CmdDefault']       = "default";
+		_INFORMANT['CmdOff']           = "off";
+		_INFORMANT['CmdOn']            = "on";
+		_INFORMANT['CmdToggle']        = "toggle";
+		_INFORMANT['CmdDefault']       = "default";
 		
-		_INFORMER['CmdEmbed']            = "embed";
+		_INFORMANT['CmdEmbed']            = "embed";
 		
-		_INFORMER['ShowStack']      = "show-stack";
-		_INFORMER['ShowUsage']      = "show-usage";
-		_INFORMER['ShowVendor']     = "show-vendor";
-		_INFORMER['ShowVendorBuy']  = "show-vendor-buy";
-		_INFORMER['ShowVendorSell'] = "show-vendor-sell";
+		_INFORMANT['ShowStack']      = "show-stack";
+		_INFORMANT['ShowUsage']      = "show-usage";
+		_INFORMANT['ShowVendor']     = "show-vendor";
+		_INFORMANT['ShowVendorBuy']  = "show-vendor-buy";
+		_INFORMANT['ShowVendorSell'] = "show-vendor-sell";
 		
-		_INFORMER['HelpOnoff']          = "Schaltet die Anzeige der Auktionsdaten ein/aus.";
-		_INFORMER['HelpVerbose']        = "Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
-		_INFORMER['HelpVendor']         = "Schaltet die Anzeige des H\195\164ndlerpreieses ein/aus.";
-		_INFORMER['HelpVendorSell']     = "Schaltet die Anzeige des H\195\164ndlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-		_INFORMER['HelpVendorBuy']      = "Schaltet die Anzeige des H\195\164ndlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-		_INFORMER['HelpUsage']          = "Schaltet die Anzeige des Verwendungszweckes f\195\188r Handwerker ein/aus.";
-		_INFORMER['HelpStack']          = "Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
-		_INFORMER['HelpEmbed']          = "Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
+		_INFORMANT['HelpOnoff']          = "Schaltet die Anzeige der Auktionsdaten ein/aus.";
+		_INFORMANT['HelpVerbose']        = "Schaltet die detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen ein/aus. Deaktivieren reduziert die Datenanzeige auf eine Zeile.";
+		_INFORMANT['HelpVendor']         = "Schaltet die Anzeige des H\195\164ndlerpreieses ein/aus.";
+		_INFORMANT['HelpVendorSell']     = "Schaltet die Anzeige des H\195\164ndlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+		_INFORMANT['HelpVendorBuy']      = "Schaltet die Anzeige des H\195\164ndlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
+		_INFORMANT['HelpUsage']          = "Schaltet die Anzeige des Verwendungszweckes f\195\188r Handwerker ein/aus.";
+		_INFORMANT['HelpStack']          = "Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
+		_INFORMANT['HelpEmbed']          = "Bindet den Auktionsinfotext in den WoW-Tooltip ein (Hinweis: Einige Funktionen sind in diesem Modus deaktiviert).";
 		
-		_INFORMER['StatOn']  = "Auktionsdaten werden angezeigt.";
-		_INFORMER['StatOff'] = "Auktionsdaten werden nicht angezeigt.";
+		_INFORMANT['StatOn']  = "Auktionsdaten werden angezeigt.";
+		_INFORMANT['StatOff'] = "Auktionsdaten werden nicht angezeigt.";
 		
-		_INFORMER['FrmtActEnable']     = "%s wird angezeigt";
-		_INFORMER['FrmtActDisable']    = "%s wird nicht angezeigt";
-		_INFORMER['FrmtActEnabledOn']  = "Zeige %s auf %s";
-		_INFORMER['FrmtActSet']        = "Setze %s auf '%s'";
-		_INFORMER['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
-		_INFORMER['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zur\195\188ckgesetzt.";
-		_INFORMER['FrmtActDefault']    = "%s wurde auf den Standardwert zur\195\188ckgesetzt.";
+		_INFORMANT['FrmtActEnable']     = "%s wird angezeigt";
+		_INFORMANT['FrmtActDisable']    = "%s wird nicht angezeigt";
+		_INFORMANT['FrmtActEnabledOn']  = "Zeige %s auf %s";
+		_INFORMANT['FrmtActSet']        = "Setze %s auf '%s'";
+		_INFORMANT['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
+		_INFORMANT['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zur\195\188ckgesetzt.";
+		_INFORMANT['FrmtActDefault']    = "%s wurde auf den Standardwert zur\195\188ckgesetzt.";
 		
 
 end
@@ -230,97 +230,97 @@ end
 if locale == "esES" then
 		-- Encoded in UTF8
 		
-		_INFORMER['AdditAlcohol'] = "Alcohol";
-		_INFORMER['AdditBuff'] = "Mejora";
-		_INFORMER['AdditDrink'] = "Bebida";
-		_INFORMER['AdditFirework'] = "Fuegos Artificiales";
-		_INFORMER['AdditFood'] = "Comida";
-		_INFORMER['AdditGiftwrap'] = "Envoltura";
-		_INFORMER['AdditLure'] = "Se\195\177uelo";
-		_INFORMER['AdditPoison'] = "Veneno";
-		_INFORMER['AdditPotion'] = "Poci\195\179n";
-		_INFORMER['AdditRestorative'] = "Restaurativo";
-		_INFORMER['AdditScroll'] = "Voluta";
+		_INFORMANT['AdditAlcohol'] = "Alcohol";
+		_INFORMANT['AdditBuff'] = "Mejora";
+		_INFORMANT['AdditDrink'] = "Bebida";
+		_INFORMANT['AdditFirework'] = "Fuegos Artificiales";
+		_INFORMANT['AdditFood'] = "Comida";
+		_INFORMANT['AdditGiftwrap'] = "Envoltura";
+		_INFORMANT['AdditLure'] = "Se\195\177uelo";
+		_INFORMANT['AdditPoison'] = "Veneno";
+		_INFORMANT['AdditPotion'] = "Poci\195\179n";
+		_INFORMANT['AdditRestorative'] = "Restaurativo";
+		_INFORMANT['AdditScroll'] = "Voluta";
 		
-		_INFORMER['SkillAlchemy'] = "Alqu\195\173mia";
-		_INFORMER['SkillBlacksmithing'] = "Herrer\195\173a";
-		_INFORMER['SkillCooking'] = "Cocinar";
-		_INFORMER['SkillEnchanting'] = "Encantar";
-		_INFORMER['SkillEngineering'] = "Ingenier\195\173a";
-		_INFORMER['SkillFirstaid'] = "Primeros Auxilios";
-		_INFORMER['SkillLeatherworking'] = "Peleter\195\173a";
-		_INFORMER['SkillMining'] = "Miner\195\173a";
-		_INFORMER['SkillTailoring'] = "Sastrer\195\173a";
-		_INFORMER['SkillDruid'] = "Encantos de Druidas";
-		_INFORMER['SkillMage'] = "Encantos de Magos";
-		_INFORMER['SkillPaladin'] = "Encantos de Paladines";
-		_INFORMER['SkillPriest'] = "Encantos de Sacerdotes";
-		_INFORMER['SkillRogue'] = "Encantos de P\195\173caros";
-		_INFORMER['SkillShaman'] = "Encantos de Chamanes";
-		_INFORMER['SkillWarlock'] = "Encantos de Brujos";
-		
-		
-		_INFORMER['FrmtWelcome'] = "Auctioneer versi\195\179n %s cargado";
+		_INFORMANT['SkillAlchemy'] = "Alqu\195\173mia";
+		_INFORMANT['SkillBlacksmithing'] = "Herrer\195\173a";
+		_INFORMANT['SkillCooking'] = "Cocinar";
+		_INFORMANT['SkillEnchanting'] = "Encantar";
+		_INFORMANT['SkillEngineering'] = "Ingenier\195\173a";
+		_INFORMANT['SkillFirstaid'] = "Primeros Auxilios";
+		_INFORMANT['SkillLeatherworking'] = "Peleter\195\173a";
+		_INFORMANT['SkillMining'] = "Miner\195\173a";
+		_INFORMANT['SkillTailoring'] = "Sastrer\195\173a";
+		_INFORMANT['SkillDruid'] = "Encantos de Druidas";
+		_INFORMANT['SkillMage'] = "Encantos de Magos";
+		_INFORMANT['SkillPaladin'] = "Encantos de Paladines";
+		_INFORMANT['SkillPriest'] = "Encantos de Sacerdotes";
+		_INFORMANT['SkillRogue'] = "Encantos de P\195\173caros";
+		_INFORMANT['SkillShaman'] = "Encantos de Chamanes";
+		_INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 		
 		
-		
-		_INFORMER['FrmtInfoClassuse'] = "Clase: %s usado para %s";
-		_INFORMER['FrmtInfoClass'] = "Clase: %s";
-		_INFORMER['FrmtInfoUse'] = "Usado para: %s";
-		_INFORMER['FrmtInfoBuy'] = "Compra del vendedor";
-		_INFORMER['FrmtInfoSell'] = "Vende al vendedor";
-		_INFORMER['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
-		_INFORMER['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
-		_INFORMER['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
-		
-		_INFORMER['FrmtInfoBuyMulti'] = "  Opci\195\179n a compra(%s%s c/u)";
-		
-		_INFORMER['FrmtInfoBuyOne'] = " %s con opci\195\179n a compra";
-		
-		_INFORMER['FrmtInfoBuymedian'] = "  Opci\195\179n a compra mediano";
+		_INFORMANT['FrmtWelcome'] = "Auctioneer versi\195\179n %s cargado";
 		
 		
 		
+		_INFORMANT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
+		_INFORMANT['FrmtInfoClass'] = "Clase: %s";
+		_INFORMANT['FrmtInfoUse'] = "Usado para: %s";
+		_INFORMANT['FrmtInfoBuy'] = "Compra del vendedor";
+		_INFORMANT['FrmtInfoSell'] = "Vende al vendedor";
+		_INFORMANT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
+		_INFORMANT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
+		_INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
 		
+		_INFORMANT['FrmtInfoBuyMulti'] = "  Opci\195\179n a compra(%s%s c/u)";
 		
+		_INFORMANT['FrmtInfoBuyOne'] = " %s con opci\195\179n a compra";
 		
-		_INFORMER['CmdOff'] = "apagado";
-		_INFORMER['CmdOn'] = "prendido";
-		_INFORMER['CmdToggle'] = "invertir";
-		_INFORMER['CmdDefault'] = "original";
-		
-		_INFORMER['CmdEmbed'] = "integrado";
+		_INFORMANT['FrmtInfoBuymedian'] = "  Opci\195\179n a compra mediano";
 		
 		
 		
 		
 		
-		_INFORMER['ShowStack'] = "ver-paquete";
-		_INFORMER['ShowUsage'] = "ver-uso";
-		_INFORMER['ShowVendor'] = "ver-vendedor";
-		_INFORMER['ShowVendorBuy'] = "ver-vendedor-compra";
-		_INFORMER['ShowVendorSell'] = "ver-vendedor-venta";
 		
-		_INFORMER['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
-		_INFORMER['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
-		_INFORMER['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art\195\173culo";
-		_INFORMER['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
-		_INFORMER['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
-		_INFORMER['HelpUsage'] = "Selecciona para mostrar uso del art\195\173culo en profesiones";
-		_INFORMER['HelpStack'] = "Selecciona para mostrar tama\195\177o maximo del paquete";
-		_INFORMER['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
-		_INFORMER['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
+		_INFORMANT['CmdOff'] = "apagado";
+		_INFORMANT['CmdOn'] = "prendido";
+		_INFORMANT['CmdToggle'] = "invertir";
+		_INFORMANT['CmdDefault'] = "original";
 		
-		_INFORMER['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
-		_INFORMER['StatOff'] = "Ocultando toda la informacion de subastas";
+		_INFORMANT['CmdEmbed'] = "integrado";
 		
-		_INFORMER['FrmtActEnable'] = "Mostrando informacion del art\195\173culo: %s ";
-		_INFORMER['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
-		_INFORMER['FrmtActEnabledOn'] = "Mostrando %s de los art\195\173culos usando %s";
-		_INFORMER['FrmtActSet'] = "%s ajustado(a) a '%s'";
-		_INFORMER['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
-		_INFORMER['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
-		_INFORMER['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
+		
+		
+		
+		
+		_INFORMANT['ShowStack'] = "ver-paquete";
+		_INFORMANT['ShowUsage'] = "ver-uso";
+		_INFORMANT['ShowVendor'] = "ver-vendedor";
+		_INFORMANT['ShowVendorBuy'] = "ver-vendedor-compra";
+		_INFORMANT['ShowVendorSell'] = "ver-vendedor-venta";
+		
+		_INFORMANT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
+		_INFORMANT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
+		_INFORMANT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art\195\173culo";
+		_INFORMANT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
+		_INFORMANT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
+		_INFORMANT['HelpUsage'] = "Selecciona para mostrar uso del art\195\173culo en profesiones";
+		_INFORMANT['HelpStack'] = "Selecciona para mostrar tama\195\177o maximo del paquete";
+		_INFORMANT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
+		_INFORMANT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
+		
+		_INFORMANT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
+		_INFORMANT['StatOff'] = "Ocultando toda la informacion de subastas";
+		
+		_INFORMANT['FrmtActEnable'] = "Mostrando informacion del art\195\173culo: %s ";
+		_INFORMANT['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
+		_INFORMANT['FrmtActEnabledOn'] = "Mostrando %s de los art\195\173culos usando %s";
+		_INFORMANT['FrmtActSet'] = "%s ajustado(a) a '%s'";
+		_INFORMANT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
+		_INFORMANT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
+		_INFORMANT['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
 		
 		
 		-- AH Scanning localizations
@@ -336,30 +336,30 @@ end
 -- Locale strings for the frFR locale
 if locale == "frFR" then
 		-- Encoded in UTF8
-		_INFORMER['AdditBuff']        = "Buff";
-		_INFORMER['AdditDrink']       = "Boisson";
-		_INFORMER['AdditFood']        = "Nourriture";
-		_INFORMER['AdditPoison']      = "Poison";
-		_INFORMER['AdditPotion']      = "Potion";
+		_INFORMANT['AdditBuff']        = "Buff";
+		_INFORMANT['AdditDrink']       = "Boisson";
+		_INFORMANT['AdditFood']        = "Nourriture";
+		_INFORMANT['AdditPoison']      = "Poison";
+		_INFORMANT['AdditPotion']      = "Potion";
 		
-		_INFORMER['SkillAlchemy']        = "Alchimie";
-		_INFORMER['SkillBlacksmithing']  = "Forgeron";
-		_INFORMER['SkillCooking']        = "Cuisine";
-		_INFORMER['SkillEnchanting']     = "Enchantement";
-		_INFORMER['SkillEngineering']    = "Ing\195\169nieur";
-		_INFORMER['SkillFirstaid']       = "Premiers Soins";
-		_INFORMER['SkillLeatherworking'] = "Travail du Cuir";
-		_INFORMER['SkillMining']         = "Minage";
-		_INFORMER['SkillTailoring']      = "Tailleur";
+		_INFORMANT['SkillAlchemy']        = "Alchimie";
+		_INFORMANT['SkillBlacksmithing']  = "Forgeron";
+		_INFORMANT['SkillCooking']        = "Cuisine";
+		_INFORMANT['SkillEnchanting']     = "Enchantement";
+		_INFORMANT['SkillEngineering']    = "Ing\195\169nieur";
+		_INFORMANT['SkillFirstaid']       = "Premiers Soins";
+		_INFORMANT['SkillLeatherworking'] = "Travail du Cuir";
+		_INFORMANT['SkillMining']         = "Minage";
+		_INFORMANT['SkillTailoring']      = "Tailleur";
 		
-		_INFORMER['FrmtInfoClassuse'] = "Classe: %s utilis\195\169 pour %s";
-		_INFORMER['FrmtInfoClass'] = "Classe: %s";
-		_INFORMER['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
-		_INFORMER['FrmtInfoBuy'] = "Achat%s au marchand";
-		_INFORMER['FrmtInfoSell'] = "Vente%s au marchand";
-		_INFORMER['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
-		_INFORMER['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
-		_INFORMER['FrmtInfoStx'] = "Pile par lots de %d";
+		_INFORMANT['FrmtInfoClassuse'] = "Classe: %s utilis\195\169 pour %s";
+		_INFORMANT['FrmtInfoClass'] = "Classe: %s";
+		_INFORMANT['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
+		_INFORMANT['FrmtInfoBuy'] = "Achat%s au marchand";
+		_INFORMANT['FrmtInfoSell'] = "Vente%s au marchand";
+		_INFORMANT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
+		_INFORMANT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
+		_INFORMANT['FrmtInfoStx'] = "Pile par lots de %d";
 		
 		-- AH Scanning localizations
 		
@@ -368,5 +368,5 @@ end
 
 end
 
-Informer_SetLocaleStrings(GetLocale);
+Informant_SetLocaleStrings(GetLocale);
 

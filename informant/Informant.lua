@@ -1,14 +1,14 @@
 --[[
-----  Informer
+----  Informant
 ----  An addon for World of Warcraft that shows pertinent information about
 ----  an item in a tooltip when you hover over the item in the game.
 ----  <%version%>
 ----  $Id$
 --]]
 
-INFORMER_VERSION = "<%version%>"
-if (INFORMER_VERSION == "<".."%version%>") then
-	INFORMER_VERSION = "1.0.0.DEV"
+INFORMANT_VERSION = "<%version%>"
+if (INFORMANT_VERSION == "<".."%version%>") then
+	INFORMANT_VERSION = "1.0.0.DEV"
 end
 
 -- GLOBAL FUNCTION PROTOTYPES:
@@ -28,7 +28,7 @@ local getCatName, split
 -- LOCAL VARIABLES
 
 local self = {}
-local InformerConfig = {}
+local InformantConfig = {}
 
 -- LOCAL DEFINES
 
@@ -95,7 +95,7 @@ function getItem(itemID)
 
 	local addition = ""
 	if (additional ~= "") then
-		addition = " - ".._INFORMER["Addit"..additional]
+		addition = " - ".._INFORMANT["Addit"..additional]
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
@@ -113,7 +113,7 @@ function getItem(itemID)
 				skillName = self.skills[tonumber(userSkill)]
 				localized = "Unknown"
 				if (skillName) then
-					localized = _INFORMER["Skill"..skillName]
+					localized = _INFORMANT["Skill"..skillName]
 				end
 				if (usage == "") then
 					usage = localized
@@ -158,36 +158,36 @@ end
 
 function setSkills(skills)
 	self.skills = skills
-	Informer.SetSkills = nil -- Set only once
+	Informant.SetSkills = nil -- Set only once
 end
 
 function setRequirements(requirements)
 	self.requirements = requirements
-	Informer.SetReqirements = nil -- Set only once
+	Informant.SetReqirements = nil -- Set only once
 end
 
 function setVendors(vendors)
 	self.vendors = vendors
-	Informer.SetVendors = nil -- Set only once
+	Informant.SetVendors = nil -- Set only once
 end
 
 function setDatabase(database)
 	self.database = database
-	Informer.SetDatabase = nil -- Set only once
+	Informant.SetDatabase = nil -- Set only once
 end
 
 
 function setFilter(type, value)
-	if (not InformerConfig.filters) then InformerConfig.filters = {} end
-	InformerConfig.filters[type] = value
+	if (not InformantConfig.filters) then InformantConfig.filters = {} end
+	InformantConfig.filters[type] = value
 end
 
 function getFilterVal(type, default)
 	if (default == nil) then default = "on" end
-	if (not InformerConfig.filters) then InformerConfig.filters = {} end
-	local value = InformerConfig.filters[type]
+	if (not InformantConfig.filters) then InformantConfig.filters = {} end
+	local value = InformantConfig.filters[type]
 	if (not value) then
-		if (type == _INFORMER['CmdEmbed']) then return "off" end
+		if (type == _INFORMANT['CmdEmbed']) then return "off" end
 		return default
 	end
 	return value
@@ -195,8 +195,8 @@ end
 
 function getFilter(filter)
 	value = getFilterVal(filter)
-	if ((value == _INFORMER['CmdOn']) or (value == "on")) then return true
-	elseif ((value == _INFORMER['CmdOff']) or (value == "off")) then return false end
+	if ((value == _INFORMANT['CmdOn']) or (value == "on")) then return true
+	elseif ((value == _INFORMANT['CmdOff']) or (value == "off")) then return false end
 	return true
 end
 
@@ -215,7 +215,7 @@ function tooltipHandler(frame, name, link, quality, count)
 	local stacks = 1
 	
 	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(link)
-	if (itemID > 0) and (Informer) then
+	if (itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
 	end
 	if (itemInfo) then
@@ -242,9 +242,9 @@ function tooltipHandler(frame, name, link, quality, count)
 		buy = buy/quant
 	end
 
-	local embedded = getFilter(_INFORMER['CmdEmbed'])
+	local embedded = getFilter(_INFORMANT['CmdEmbed'])
 
-	if (getFilter(_INFORMER['ShowVendor'])) then
+	if (getFilter(_INFORMANT['ShowVendor'])) then
 		if ((buy > 0) or (sell > 0)) then
 			local bgsc = EnhTooltip.GetTextGSC(buy)
 			local sgsc = EnhTooltip.GetTextGSC(sell)
@@ -252,59 +252,59 @@ function tooltipHandler(frame, name, link, quality, count)
 			if (count and (count > 1)) then
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
-				if (getFilter(_INFORMER['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoBuymult'], count, bgsc), buy*count, embedded)
+				if (getFilter(_INFORMANT['ShowVendorBuy'])) then
+					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuymult'], count, bgsc), buy*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
-				if (getFilter(_INFORMER['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoSellmult'], count, sgsc), sell*count, embedded)
+				if (getFilter(_INFORMANT['ShowVendorSell'])) then
+					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSellmult'], count, sgsc), sell*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			else
-				if (getFilter(_INFORMER['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoBuy']), buy, embedded)
+				if (getFilter(_INFORMANT['ShowVendorBuy'])) then
+					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuy']), buy, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
-				if (getFilter(_INFORMER['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoSell']), sell, embedded)
+				if (getFilter(_INFORMANT['ShowVendorSell'])) then
+					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSell']), sell, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			end
 		end
 	end
 
-	if (getFilter(_INFORMER['ShowStack'])) then
+	if (getFilter(_INFORMANT['ShowStack'])) then
 		if (stacks > 1) then
-			EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoStx'], stacks), nil, embedded)
+			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], stacks), nil, embedded)
 		end
 	end
-	if (itemInfo and getFilter(_INFORMER['ShowMerchant'])) then
+	if (itemInfo and getFilter(_INFORMANT['ShowMerchant'])) then
 		if (itemInfo.vendors) then
 			local merchantCount = table.getn(itemInfo.vendors);
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoMerchants'], merchantCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embed);
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
 			end
 		end
 	end
-	if (itemInfo and getFilter(_INFORMER['ShowUsage'])) then
+	if (itemInfo and getFilter(_INFORMANT['ShowUsage'])) then
 		local reagentInfo = ""
 		if (itemInfo.classText) then
-			reagentInfo = string.format(_INFORMER['FrmtInfoClass'], itemInfo.classText)
+			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 		if (itemInfo.usageText) then
-			reagentInfo = string.format(_INFORMER['FrmtInfoUse'], itemInfo.usageText)
+			reagentInfo = string.format(_INFORMANT['FrmtInfoUse'], itemInfo.usageText)
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 	end
-	if (itemInfo and getFilter(_INFORMER['ShowQuest'])) then
+	if (itemInfo and getFilter(_INFORMANT['ShowQuest'])) then
 		if (itemInfo.quests) then
 			local questCount = table.getn(itemInfo.quests);
 			if (questCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMER['FrmtInfoQuest'], questCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed);
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
 			end
 		end
@@ -313,8 +313,8 @@ end
 
 -- GLOBAL OBJECT
 
-Informer = {
-	version = INFORMER_VERSION,
+Informant = {
+	version = INFORMANT_VERSION,
 	GetItem = getItem,
 
 	-- These functions are only meant for internal use.
