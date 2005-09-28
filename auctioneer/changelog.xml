@@ -1,6 +1,40 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <changelog>
 	<nextrelease>
+		<optimization id="optimization7" codedby="MentalPower" timestamp="2005-09-27 10:30">
+			<file name="AucCommand.lua">
+				<change function="Auctioneer_Register_Khaos"/>
+				<change function="Auctioneer_ChatPrint_Help"/>
+				<change function="Auctioneer_Default"/>
+			</file>
+			<file name="enUS.utf8">
+				<change constant="_AUCT['FrmtActDefault']"/>
+				<add constant="_AUCT['OptDefault']"/>
+				<add constant="_AUCT['HelpDefault']"/>
+				<add constant="_AUCT['FrmtActDefault']"/>
+				<add constant="_AUCT['GuiRedo']"/>
+				<add constant="_AUCT['GuiDefaultAllButton']"/>
+				<add constant="_AUCT['GuiDefaultAll']"/>
+				<add constant="_AUCT['GuiDefaultAllHelp']"/>
+				<add constant="_AUCT['GuiDefaultOption']"/>
+			</file>
+			<file name="enUS.utf8">
+				<add constant="_AUCT['OptDefault']"/>
+				<add constant="_AUCT['HelpDefault']"/>
+				<add constant="_AUCT['FrmtActDefault']"/>
+				<add constant="_AUCT['GuiRedo']"/>
+				<add constant="_AUCT['GuiDefaultAllButton']"/>
+				<add constant="_AUCT['GuiDefaultAll']"/>
+				<add constant="_AUCT['GuiDefaultAllHelp']"/>
+				<add constant="_AUCT['GuiDefaultOption']"/>
+			</file>
+			<developer>
+				The Auctioneer_Register_Khaos() function has been changed to use the direct option modifying functions (Auctioneer_Default(), Auctioneer_GenVarSet(), etc) instead of piggybacking on top of the Auctioneer_Command() function. The same function has been formatted to make it a bit easier to read. Two options have been added to the Khaos config system, the /auc show-warning and the /auc default equivalents. New strings have been added to the English and Spanish localization files to support those additions. These were also added to the text outputed by the Auctioneer_ChatPrint_Help(). A small typo was fixed in the _AUCT['FrmtActDefault'] constant.
+			</developer>
+			<public>
+				The Khaos-based config system for Auctioneer has been updated with the "/auctioneer show-warning" and the "/auctioneer default" equivalents.
+			</public>
+		</optimization>
 		<bugfix id="bugfix20" codedby="MentalPower" timestamp="2005-09-24 07:30">
 			<file name="AucCommand.lua">
 				<change function="Auctioneer_Default"/>

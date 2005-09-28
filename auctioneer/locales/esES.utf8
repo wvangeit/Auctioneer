@@ -153,6 +153,7 @@ _AUCT['OptCompete'] = "<plata_menos>";
 _AUCT['OptScan'] = "";
 _AUCT['OptScale'] = "<escala>";
 _AUCT['OptScaleDefault'] = 1.0;
+_AUCT['OptDefault'] = "";
 
 _AUCT['OptPctBidmarkdown'] = "<porciento>";
 _AUCT['OptPctMarkup'] = "<porciento>";
@@ -212,6 +213,7 @@ _AUCT['HelpPctNocomp'] = "El porcentaje bajo el precio del mercado que Auctionee
 _AUCT['HelpPctUnderlow'] = "Ajusta el porcentaje bajo el menor precio mínimo de subasta que Auctioneer aplicará";
 _AUCT['HelpPctUndermkt'] = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
 _AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la página corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
+_AUCT['HelpDefault'] = "Revertir una opción de Auctioneer a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de fábrica."
 
 _AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 _AUCT['StatOff'] = "Ocultando toda la informacion de subastas";
@@ -302,3 +304,8 @@ _AUCT['GuiReloadui'] = "Recargar Interfáz";
 _AUCT['GuiReloaduiHelp'] = "Presione aqui para recargar el interfáz de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuración sea el mismo que el de Auctioneer.\nNota: Esta operación puede tomar unos minutos.";
 _AUCT['GuiReloaduiButton'] = "Recargar";
 _AUCT['GuiReloaduiFeedback'] = "Recargando el Interfáz de WoW";
+_AUCT['GuiRedo'] = "Mostrar Advertencia de Exploración";
+_AUCT['GuiDefaultAllButton'] = "Revertir All";
+_AUCT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
+_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de fábrica.\nADVERTENCIA: Esta acción NO es reversible.";
+_AUCT['GuiDefaultOption'] = "Revertir esta opción";

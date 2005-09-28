@@ -153,6 +153,7 @@ _AUCT['OptCompete'] = "<silver_less>";
 _AUCT['OptScan'] = "";
 _AUCT['OptScale'] = "<scale_factor>";
 _AUCT['OptScaleDefault'] = 1.0;
+_AUCT['OptDefault'] = "";
 
 _AUCT['OptPctBidmarkdown'] = "<percent>";
 _AUCT['OptPctMarkup'] = "<percent>";
@@ -212,6 +213,7 @@ _AUCT['HelpPctNocomp'] = "The percentage that Auctioneer will undercut market va
 _AUCT['HelpPctUnderlow'] = "Set the percentage that Auctioneer will undercut the lowest auction price";
 _AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
 _AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
+_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 
 _AUCT['StatOn'] = "Displaying configured auction data";
 _AUCT['StatOff'] = "Not displaying any auction data";
@@ -226,7 +228,7 @@ _AUCT['FrmtActEnabledOn'] = "Displaying item's %s on %s";
 _AUCT['FrmtActSet'] = "Set %s to '%s'";
 _AUCT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
 _AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
-_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to default settings";
+_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
 
 _AUCT['TextScan'] = "Scan";
 _AUCT['TextAuction'] = "auction";
@@ -302,3 +304,8 @@ _AUCT['GuiReloadui'] = "Reload User Interface";
 _AUCT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 _AUCT['GuiReloaduiButton'] = "ReloadUI";
 _AUCT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI";
+_AUCT['GuiRedo'] = "Show Long Scan Warning";
+_AUCT['GuiDefaultAllButton'] = "Reset All";
+_AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
+_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
+_AUCT['GuiDefaultOption'] = "Reset this setting";

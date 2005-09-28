@@ -47,8 +47,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiMainEnable'];
 				helptext=_AUCT['HelpOnoff'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(_AUCT['CmdOn'], "GUI") else Auctioneer_Command(_AUCT['CmdOff'], "GUI") end end;
-				feedback=function(state) if (state.checked) then return _AUCT['StatOn'] else return _AUCT['StatOff'] end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_OnOff(_AUCT['CmdOn']);
+					else
+						Auctioneer_OnOff(_AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _AUCT['StatOn'];
+					else
+						return _AUCT['StatOff'];
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -63,7 +75,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiLocale'];
 				helptext=_AUCT['HelpLocale'];
 				callback = function(state)
-					Auctioneer_Command(_AUCT['CmdLocale'].." "..state.value, "GUI");
+					Auctioneer_SetLocale(state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdLocale'], state.value);
@@ -85,17 +97,56 @@ function Auctioneer_Register_Khaos()
 				};
 				text=_AUCT['GuiReloadui'];
 				helptext=_AUCT['GuiReloaduiHelp'];
-				callback=function() ReloadUI() end;
+				callback=function()
+					ReloadUI();
+				end;
 				feedback=_AUCT['GuiReloaduiFeedback'];
 				difficulty=3;
+			};
+			{
+				id=_AUCT['ShowRedo'];
+				type=K_TEXT;
+				text=_AUCT['GuiRedo'];
+				helptext=_AUCT['HelpRedo'];
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowRedo'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowRedo'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowRedo']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowRedo']));
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={AuctioneerEnable={checked=true;}};
+				difficulty=1;
 			};
 			{
 				id=_AUCT['ShowVerbose'];
 				type=K_TEXT;
 				text=_AUCT['GuiVerbose'];
 				helptext=_AUCT['HelpVerbose'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowVerbose'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowVerbose'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVerbose'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVerbose'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowVerbose'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowVerbose'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVerbose']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVerbose']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -114,8 +165,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiStatsEnable'];
 				helptext=_AUCT['HelpStats'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowStats'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowStats'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowStats'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowStats'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowStats'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowStats'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowStats']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowStats']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -127,8 +190,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiAverages'];
 				helptext=_AUCT['HelpAverage'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowAverage'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowAverage'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowAverage'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowAverage'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowAverage'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowAverage'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowAverage']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowAverage']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -140,8 +215,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiMedian'];
 				helptext=_AUCT['HelpMedian'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowMedian'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowMedian'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowMedian'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowMedian'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowMedian'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowMedian'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowMedian']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowMedian']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -153,8 +240,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiSuggest'];
 				helptext=_AUCT['HelpSuggest'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowSuggest'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowSuggest'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowSuggest'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowSuggest'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowSuggest'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowSuggest'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowSuggest']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowSuggest']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -174,8 +273,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiVendor'];
 				helptext=_AUCT['HelpVendor'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowVendor'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowVendor'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendor'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendor'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowVendor'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowVendor'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendor']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendor']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -187,8 +298,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiVendorBuy'];
 				helptext=_AUCT['HelpVendorBuy'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowVendorBuy'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowVendorBuy'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorBuy'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorBuy'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowVendorBuy'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowVendorBuy'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorBuy']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorBuy']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -200,8 +323,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiVendorSell'];
 				helptext=_AUCT['HelpVendorSell'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowVendorSell'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowVendorSell'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorSell'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorSell'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowVendorSell'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowVendorSell'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorSell']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorSell']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -221,8 +356,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiEmbed'];
 				helptext=_AUCT['HelpEmbed'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['CmdEmbed'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['CmdEmbed'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdEmbed'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdEmbed'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['CmdEmbed'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['CmdEmbed'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdEmbed']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdEmbed']));
+					end
+				end;
 				check=true;
 				default={checked=false};
 				disabled={checked=false};
@@ -234,8 +381,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiEmbedBlankline'];
 				helptext=_AUCT['HelpEmbedBlank'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowEmbedBlank'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowEmbedBlank'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowEmbedBlank'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowEmbedBlank'])) end end;
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['ShowEmbedBlank'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['ShowEmbedBlank'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowEmbedBlank']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowEmbedBlank']));
+					end
+				end;
 				check=true;
 				default={checked=false};
 				disabled={checked=false};
@@ -257,7 +416,9 @@ function Auctioneer_Register_Khaos()
 				};
 				text=_AUCT['GuiClearall'];
 				helptext=_AUCT['GuiClearallHelp'];
-				callback=function() Auctioneer_Command(string.format(_AUCT['CmdClear'].." ".._AUCT['CmdClearAll']), "GUI") end;
+				callback=function()
+					Auctioneer_Clear(_AUCT['CmdClearAll']);
+				end;
 				feedback=string.format(_AUCT['FrmtActClearall'],  _AUCT['GuiClearallNote']);
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=3;
@@ -270,7 +431,9 @@ function Auctioneer_Register_Khaos()
 				};
 				text=_AUCT['GuiClearsnap'];
 				helptext=_AUCT['GuiClearsnapHelp'];
-				callback=function() Auctioneer_Command(string.format(_AUCT['CmdClear'].." ".._AUCT['CmdClearSnapshot']), "GUI")end;
+				callback=function()
+					Auctioneer_Clear(_AUCT['CmdClearSnapshot']);
+				end;
 				feedback=_AUCT['FrmtActClearsnap'];
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=3;
@@ -291,7 +454,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiBidmarkdown'];
 				helptext=_AUCT['HelpPctBidmarkdown'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctBidmarkdown'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctBidmarkdown'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctBidmarkdown'], state.value.."%");
@@ -314,7 +477,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiMarkup'];
 				helptext=_AUCT['HelpPctMarkup'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctMarkup'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctMarkup'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctMarkup'], state.value.."%");
@@ -337,7 +500,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiMaxless'];
 				helptext=_AUCT['HelpPctMaxless'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctMaxless'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctMaxless'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctMaxless'], state.value.."%");
@@ -360,7 +523,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiNocomp'];
 				helptext=_AUCT['HelpPctNocomp'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctNocomp'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctNocomp'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctNocomp'], state.value.."%");
@@ -383,7 +546,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiUnderlow'];
 				helptext=_AUCT['HelpPctUnderlow'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctUnderlow'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctUnderlow'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctUnderlow'], state.value.."%");
@@ -406,7 +569,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiUndermkt'];
 				helptext=_AUCT['HelpPctUndermkt'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdPctUndermkt'].." "..state.value), "GUI");
+					Auctioneer_PercentVarSet(_AUCT['CmdPctUndermkt'], state.value);
 				end;
 				feedback = function (state)
 					return string.format(_AUCT['FrmtActSet'], _AUCT['CmdPctUndermkt'], state.value.."%");
@@ -432,8 +595,20 @@ function Auctioneer_Register_Khaos()
 				type=K_TEXT;
 				text=_AUCT['GuiAutofill'];
 				helptext=_AUCT['HelpAutofill'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['CmdAutofill'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['CmdAutofill'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdAutofill'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdAutofill'])) end end;
+				callback=function(state) 
+					if (state.checked) then
+						Auctioneer_GenVarSet(_AUCT['CmdAutofill'], _AUCT['CmdOn']);
+					else
+						Auctioneer_GenVarSet(_AUCT['CmdAutofill'], _AUCT['CmdOff']);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdAutofill']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdAutofill']));
+					end
+				end;
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
@@ -449,12 +624,12 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT['GuiAlso'];
 				helptext=_AUCT['HelpAlso'];
 				callback = function(state)
-					Auctioneer_Command(string.format(_AUCT['CmdAlso'].." "..state.value), "GUI");
+					Auctioneer_AlsoInclude(state.value);
 				end;
 				feedback = function (state)
-					if (state.value == opposite) then
+					if (state.value == _AUCT['CmdAlsoOpposite']) then
 						return _AUCT['GuiAlsoOpposite'];
-					elseif (state.value == off) then
+					elseif (state.value == _AUCT['CmdOff']) then
 						return _AUCT['GuiAlsoOff'];
 					elseif (not Auctioneer_IsValidAlso(param)) then
 						string.format(_AUCT['FrmtUnknownRf'], state.value)
@@ -471,28 +646,67 @@ function Auctioneer_Register_Khaos()
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=2;
 			};
-			--Oops, not yet implemented :)
-			--[[
 			{
-				id=AUCT_SHOW_HSP;
-				type=K_TEXT;
-				text="Show Highest Sellable Price (HSP)";
-				helptext=AUCT_HELP_HSP;
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(AUCT_SHOW_HSP.." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(AUCT_SHOW_HSP.." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], AUCT_SHOW_HSP)) else return (string.format(_AUCT['FrmtActDisable'], AUCT_SHOW_HSP)) end end;
-				check=true;
-				default={checked=false};
-				disabled={checked=false};
+				id="DefaultAll";
+				type=K_BUTTON;
+				setup={
+					buttonText = _AUCT['GuiDefaultAllButton'];
+				};
+				text=_AUCT['GuiDefaultAll'];
+				helptext=_AUCT['GuiDefaultAllHelp'];
+				callback=function() 
+					Auctioneer_Default(_AUCT['CmdClearAll']);
+				end;
+				feedback=_AUCT['FrmtActDefaultall'];
+				dependencies={AuctioneerEnable={checked=true;}};
+				difficulty=1;
+			};
+			{
+				id="DefaultOption";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"enter", "tab"};
+				};
+				text=_AUCT['GuiDefaultOption'];
+				helptext=_AUCT['HelpDefault'];
+				callback = function(state)
+					Auctioneer_Default(state.value);
+				end;
+				feedback = function (state)
+					if (state.value == _AUCT['CmdClearAll']) then
+						return _AUCT['FrmtActDefaultall'];
+					else
+						return string.format(_AUCT['FrmtActDefault'], state.value);
+					end
+				end;
+				default = {
+					value = nil;
+				};
+				disabled = {
+					value = nil;
+				};
+				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=3;
 			};
-			]]--
 			{
 				id=_AUCT['ShowLink'];
 				type=K_TEXT;
 				text=_AUCT['GuiLink'];
 				helptext=_AUCT['HelpLink'];
-				callback=function(state) if (state.checked) then Auctioneer_Command(string.format(_AUCT['ShowLink'].." ".._AUCT['CmdOn']), "GUI") else Auctioneer_Command(string.format(_AUCT['ShowLink'].." ".._AUCT['CmdOff']), "GUI") end end;
-				feedback=function(state) if (state.checked) then return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowLink'])) else return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowLink'])) end end;
+				callback=function(state) 
+					if (state.checked) then 
+						Auctioneer_GenVarSet(_AUCT['ShowLink'],_AUCT['CmdOn']);
+					else 
+						Auctioneer_GenVarSet(_AUCT['ShowLink'],_AUCT['CmdOff']);
+					end 
+				end;
+				feedback=function(state) 
+					if (state.checked) then 
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowLink'])) 
+					else 
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowLink'])) 
+					end 
+				end;
 				check=true;
 				default={checked=false};
 				disabled={checked=false};
@@ -661,6 +875,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdPercentless'], _AUCT['OptPercentless'], _AUCT['HelpPercentless']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdCompete'], _AUCT['OptCompete'], _AUCT['HelpCompete']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdScan'], _AUCT['OptScan'], _AUCT['HelpScan']));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdDefault'], _AUCT['OptDefault'], _AUCT['HelpDefault']));
 
 end
 
@@ -848,16 +1063,20 @@ local validLocale=nil;
 	end
 end
 
-
+--This function was added by MentalPower to implement the /auc default command
 function Auctioneer_Default(param, chatprint)
 
-	if ((param == _AUCT['CmdClearAll']) or (param == "all") or (param == "") or (param == nil)) then
+	if (param == nil) then
+		return
+
+	elseif ((param == _AUCT['CmdClearAll']) or (param == "all") or (param == "")) then
 		AuctionConfig = {};
 
 	else
 		Auctioneer_SetFilter(param, nil);
 	end
 
+	--@TODO: Move the default setting for the different functions over here to be able to communicate to Khaos what those setting are.
 	if (chatprint == true) then
 		if ((param == _AUCT['CmdClearAll']) or (param == "all") or (param == "") or (param == nil)) then
 			Auctioneer_ChatPrint(_AUCT['FrmtActDefaultall']);
