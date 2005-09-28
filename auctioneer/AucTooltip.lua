@@ -46,8 +46,6 @@ function Auctioneer_HookTooltip(frame, name, link, quality, count)
 		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
 		local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 
-		itemInfo = Auctioneer_GetItemData(itemKey);
-
 		-- show auction info
 		if (aCount == 0) then
 			-- OUTPUT: "Never seen at auction"
@@ -263,79 +261,6 @@ function Auctioneer_HookTooltip(frame, name, link, quality, count)
 			end
 		end
 	end -- if (itemID > 0)
-	local sell = 0;
-	local buy = 0;
-	local stacks = 1;
-	if (itemInfo) then
-		stacks = itemInfo.stack;
-		if (not stacks) then stacks = 1; end
-
-		buy = nullSafe(itemInfo.buy);
-		sell = nullSafe(itemInfo.sell);
-
-		quant = stacks;
-		if (sell > 0) then
-			local ratio = buy / sell;
-			if ((ratio > 3) and (ratio < 6)) then
-				quant = 1;
-			else
-				ratio = buy / (sell * 5);
-				if ((ratio > 3) and (ratio < 6)) then
-					quant = 5;
-				end
-			end
-		end
-
-		buy = buy/quant;
-	end
-
-	if (Auctioneer_GetFilter(_AUCT['ShowVendor'])) then
-		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy);
-			local sgsc = EnhTooltip.GetTextGSC(sell);
-
-			if (count and (count > 1)) then
-				local bqgsc = EnhTooltip.GetTextGSC(buy*count);
-				local sqgsc = EnhTooltip.GetTextGSC(sell*count);
-				if (Auctioneer_GetFilter(_AUCT['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuymult'], count, bgsc), buy*count, embedded);
-					EnhTooltip.LineColor(0.8, 0.5, 0.1);
-				end
-				if (Auctioneer_GetFilter(_AUCT['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSellmult'], count, sgsc), sell*count, embedded);
-					EnhTooltip.LineColor(0.8, 0.5, 0.1);
-				end
-			else
-				if (Auctioneer_GetFilter(_AUCT['ShowVendorBuy'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuy']), buy, embedded);
-					EnhTooltip.LineColor(0.8, 0.5, 0.1);
-				end
-				if (Auctioneer_GetFilter(_AUCT['ShowVendorSell'])) then
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSell']), sell, embedded);
-					EnhTooltip.LineColor(0.8, 0.5, 0.1);
-				end
-			end
-		end
-	end
-
-	if (Auctioneer_GetFilter(_AUCT['ShowStack'])) then
-		if (stacks > 1) then
-			EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoStx'], stacks), nil, embedded);
-		end
-	end
-	if (itemInfo and Auctioneer_GetFilter(_AUCT['ShowUsage'])) then
-		local reagentInfo = "";
-		if (itemInfo.classText) then
-			reagentInfo = string.format(_AUCT['FrmtInfoClass'], itemInfo.classText);
-			EnhTooltip.AddLine(reagentInfo, nil, embedded);
-			EnhTooltip.LineColor(0.6, 0.4, 0.8);
-		end
-		if (itemInfo.usageText) then
-			reagentInfo = string.format(_AUCT['FrmtInfoUse'], itemInfo.usageText);
-			EnhTooltip.AddLine(reagentInfo, nil, embedded);
-			EnhTooltip.LineColor(0.6, 0.4, 0.8);
-		end
-	end
 end
 
 

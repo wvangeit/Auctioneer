@@ -1,0 +1,9 @@
+## Title: Informer
+## Interface: 1700
+## Version: <%version%>
+## Revision: $Id$
+## Notes: Displays item info in tootips.
+## Dependancies: EnhTooltip
+## SavedVariables: InformerConfig
+Informer.xml
+

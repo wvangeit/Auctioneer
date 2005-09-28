@@ -121,7 +121,7 @@ local self = {
 	forcePopupKey = "alt",
 	oldChatItem = nil,
 	hooks = {},
-	notify = { tooltip = {}, popup = {} },
+	notify = { tooltip = {}, popup = {}, merchant = {} },
 	notifyFuncs = {},
 }
 
@@ -150,6 +150,8 @@ local fakeLink
 local addTooltip
 local tooltipCall
 local addHook
+local merchantItem
+local merchantScan
 local checkPopup
 local chatHookOnHyperlinkShow
 local afHookOnEnter
@@ -235,7 +237,12 @@ function showTooltip(currentTooltip)
 	local height = 20
 	local width = EnhancedTooltip.minWidth
 	local lineCount = EnhancedTooltip.lineCount
-	if (lineCount == 0) then hideTooltip() return end
+	if (lineCount == 0) then
+		if (not EnhancedTooltip.hasEmbed) then 
+			hideTooltip()
+			return 
+		end
+	end
 
 	local firstLine = EnhancedTooltipText1
 	local trackHeight = firstLine:GetHeight()
@@ -503,7 +510,6 @@ end
 
 function checkHide()
 	if (self.hideTime == 0) then return end
-	self.currentItem = nil
 
 	if (self.eventTimer >= self.hideTime) then
 		hideTooltip()
@@ -627,6 +633,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 		addTooltip(frame, name, link, quality, count, price)
 		self.showIgnore = false
 		showTooltip(frame)
+		self.currentItem = itemSig
 		return true
 	else
 		frame:Hide()
@@ -649,7 +656,7 @@ function addHook(hookType, hookFunc, position)
 	for ht, hData in self.notify do
 		self.notifyFuncs[ht] = {}
 
-		local sortedPos = {};
+		local sortedPos = {}
 		for hp, hf in hData do
 			table.insert(sortedPos, hp)
 		end
@@ -658,6 +665,26 @@ function addHook(hookType, hookFunc, position)
 		for rp, hp in sortedPos do
 			table.insert(self.notifyFuncs[ht], hData[hp])
 		end
+	end
+end
+
+function merchantItem(merchant, slot, name, link, quality, count, price, limit)
+	if (self.notifyFuncs and self.notifyFuncs.merchant) then
+		for pos, merchantHook in self.notifyFuncs.merchant do
+			merchantHook(frame, name, link, quality, count, price)
+		end
+	end
+end
+
+function merchantScan()
+	local npcName = UnitName("NPC")
+	local numMerchantItems = GetMerchantNumItems()
+	local link, quality, name, texture, price, quantity, numAvailable, isUsable
+	for i=1, numMerchantItems, 1 do
+		link = GetMerchantItemLink(i)
+		quality = qualityFromLink(link)
+		name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
+		merchantItem(npcName, i, name, link, quality, quantity, price, numAvailable)
 	end
 end
 
@@ -962,17 +989,17 @@ function setElapsed(elapsed)
 		self.eventTimer = self.eventTimer + elapsed
 	end
 	checkHide()
-	return self.eventTimer;
+	return self.eventTimer
 end
 
 function setMoneySpacing(spacing)
 	if (spacing ~= nil) then self.moneySpacing = spacing end
-	return self.moneySpacing;
+	return self.moneySpacing
 end
 
 function setPopupKey(key)
 	if (key ~= nil) then self.forcePopupKey = key end
-	return self.forcePopupKey;
+	return self.forcePopupKey
 end
 
 
@@ -1043,6 +1070,7 @@ function ttInitialize()
 	else
 		AIOI_Hooked = false
 		this:RegisterEvent("PLAYER_ENTERING_WORLD")
+		this:RegisterEvent("MERCHANT_SHOW")
 	end
 
 	-- Hook the hide function so we can disappear
@@ -1064,8 +1092,10 @@ end
 
 function TT_OnEvent(event)
 	if (event == "PLAYER_ENTERING_WORLD") then
-		EnhTooltip.DoPlayerEnters();
+		doPlayerEnters()
 		this:UnregisterEvent(event)
+	elseif (event == "MERCHANT_SHOW") then
+		merchantScan()
 	end
 end
 

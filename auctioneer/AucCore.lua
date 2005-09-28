@@ -68,18 +68,6 @@ MIN_BID_PERCENT = 10;
 --  9 = reagence
 -- 10 = miscellaneous
 BID_BASED_CATEGORIES = {[1]=true, [2]=true, [8]=true, [10]=true}
-CLASS_TO_CATEGORY_MAP = {
-	[2]  = 1,
-	[4]  = 2,
-	[1]  = 3,
-	[0]  = 4,
-	[7]  = 5,
-	[6]  = 6,
-	[11] = 7,
-	[9]  = 8,
-	[5]  = 9,
-	[15] = 10,
-};
 
 --[[ SavedVariables --]]
 AuctionConfig = {};        --Table that stores config settings
@@ -91,89 +79,20 @@ AuctionConfig.version = 30200;
 Auctioneer_HSPCache = {};
 Auctioneer_Lowests = {};
 
-
 function Auctioneer_GetItemData(itemKey)
 	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
---	p("Looking for", itemKey, itemID);
-	return Auctioneer_GetItemDataByID(itemID);
+	if (Informer) then
+		return Informer.GetItem(itemID);
+	end
+	return nil; 
 end
 
 function Auctioneer_GetItemDataByID(itemID)
-	local baseData = Auctioneer_BasePrices[itemID];
-	if (not baseData) then return nil end
-
-	local baseSplit = Auctioneer_Split(baseData, ":");
-	local buy = tonumber(baseSplit[1]);
-	local sell = tonumber(baseSplit[2]);
-	local class = tonumber(baseSplit[3]);
-	local quality = tonumber(baseSplit[4]);
-	local stack = tonumber(baseSplit[5]);
-	local additional = baseSplit[6];
-	local usedby = baseSplit[7];
-	local cat = CLASS_TO_CATEGORY_MAP[class];
-
-	local dataItem = {
-		['buy'] = buy,
-		['sell'] = sell,
-		['class'] = class,
-		['cat'] = cat,
-		['quality'] = quality,
-		['stack'] = stack,
-		['additional'] = additional,
-		['usedby'] = usedby,
-	};
-
---	p("Data item so far", dataItem);
-
-	local addition = "";
-	if (additional ~= "") then
---		p("Get localization for", additional);
-		addition = " - ".._AUCT["Addit"..additional];
+	if (Informer) then
+		return Informer.GetItem(itemID);
 	end
-	local catName = Auctioneer_GetCatName(cat);
-	if (not catName) then
---		p("Cat name is ", catName, " for cat ", cat);
-		dataItem.classText = "Unknown"..addition;
-	else
-		dataItem.classText = catName..addition;
-	end
-	
-	if (usedby ~= '') then
-		local usedList = Auctioneer_Split(usedby, ",");
-		local usage = "";
-		local skillName, localized, localeString;
-		if (usedList) then
-			for pos, userSkill in pairs(usedList) do
-				skillName = Auctioneer_Skills[tonumber(userSkill)];
-				localized = "Unknown";
-				if (skillName) then
-					localized = _AUCT["Skill"..skillName];
-				end
-				if (usage == "") then
-					usage = localized;
-				else
-					usage = usage .. ", " .. localized;
-				end
-			end
-		end
-		dataItem.usageText = usage;
-	end
-
-	local reqSkill = 0;
-	local reqLevel = 0;
-	local skillsRequired = Auctioneer_SkillsRequired[itemID];
-	if (skillsRequired) then
-		local skillSplit = Auctioneer_Split(skillsRequired, ":");
-		reqSkill = skillSplit[1];
-		reqLevel = skillSplit[2];
-	end
-	dataItem.isPlayerMade = (reqSkill ~= 0);
-	dataItem.reqSkill = reqSkill;
-	dataItem.reqLevel = reqLevel;
-
-	return dataItem;
+	return nil; 
 end
-		
 
 -- Returns an AuctionConfig.data item from the table based on an item name
 function Auctioneer_GetAuctionPriceItem(itemKey, from)

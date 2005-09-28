@@ -519,7 +519,9 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
 			warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
 		else
-			local baseData = Auctioneer_GetItemDataByID(id);
+			local baseData;
+			if (Informer) then baseData = Informer.GetItem(id) end
+
 			if (baseData and baseData.sell) then
 				-- use vendor prices if no auction data available
 				local vendorSell = nullSafe(baseData.sell); -- use vendor prices

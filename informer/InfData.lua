@@ -2,9 +2,8 @@
 -- Auctioneer ItemData
 --
 
-
 -- Skills that are needed below
-Auctioneer_Skills = {
+Informer.SetSkills({
 	[171]="Alchemy",
 	[164]="Blacksmithing",
 	[185]="Cooking",
@@ -21,9 +20,9 @@ Auctioneer_Skills = {
 	[-7]="Shaman",
 	[197]="Tailoring",
 	[-9]="Warlock",
-};
+})
 
-Auctioneer_SkillsRequired = {
+Informer.SetReqirements({
 	[8207]="165:240",
 	[10501]="202:220",
 	[8204]="165:225",
@@ -575,9 +574,9 @@ Auctioneer_SkillsRequired = {
 	[19057]="164:300",
 	[19058]="165:300",
 	[19059]="197:300",
-};
+})
 
-Auctioneer_Vendors = {
+Informer.SetVendors({
 	[1]="Aayndia Floralwind <Expert Leatherworker>",
 	[2]="Abe Winters <Apprentice Armorer>",
 	[3]="Abigail Shiel <Trade Supplies>",
@@ -1360,10 +1359,10 @@ Auctioneer_Vendors = {
 	[892]="Zlagk <Butcher>",
 	[893]="Zora Guthrek <Trade Goods>",
 	[894]="Zulrg <Weaponsmith>",
-};
+})
 
 -- The base item data
-Auctioneer_BasePrices = {
+Informer.SetDatabase({
 	[12884]="0:0:0:0:1:::0:0:", -- Arnak's Hoof
 	[12650]="0:0:0:0:1:::0:0:", -- Attuned Dampener
 	[7227]="0:0:0:0:1:::0:0:", -- Balnir Snapdragons
@@ -13057,6 +13056,5 @@ Auctioneer_BasePrices = {
 	[19257]="400000:100000:15:0:1:::0:0:", -- Warlords Deck
 	[19030]="8000000:0:15:0:1:::1:0:774", -- Stormpike Battle Charger
 	[18564]="0:0:15:0:1:::0:0:", -- Bindings of the Windseeker
-};
-
+})
 
