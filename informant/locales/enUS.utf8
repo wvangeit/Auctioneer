@@ -30,7 +30,7 @@ _INFORMANT['SkillShaman'] = "Shaman spells";
 _INFORMANT['SkillWarlock'] = "Warlock spells";
 
 
-_INFORMANT['FrmtWelcome'] = "Auctioneer v%s loaded";
+_INFORMANT['FrmtWelcome'] = "Informant v%s loaded";
 
 
 _INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants";

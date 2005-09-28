@@ -30,7 +30,7 @@ _INFORMANT['SkillShaman'] = "Encantos de Chamanes";
 _INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 
 
-_INFORMANT['FrmtWelcome'] = "Auctioneer versión %s cargado";
+_INFORMANT['FrmtWelcome'] = "Informant versión %s cargado";
 
 
 

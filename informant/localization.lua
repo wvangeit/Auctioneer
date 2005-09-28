@@ -73,7 +73,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['SkillWarlock'] = "Warlock spells";
 	
 	
-	_INFORMANT['FrmtWelcome'] = "Auctioneer v%s loaded";
+	_INFORMANT['FrmtWelcome'] = "Informant v%s loaded";
 	
 	
 	_INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants";
@@ -260,7 +260,7 @@ if locale == "esES" then
 		_INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 		
 		
-		_INFORMANT['FrmtWelcome'] = "Auctioneer versi\195\179n %s cargado";
+		_INFORMANT['FrmtWelcome'] = "Informant versi\195\179n %s cargado";
 		
 		
 		
