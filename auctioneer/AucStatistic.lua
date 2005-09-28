@@ -115,8 +115,7 @@ function Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices)
 		end
 	end
 
-	local snapMedian = Auctioneer_GetMedian(buyoutPrices);
-	local snapSeenCount = table.getn(buyoutPrices);
+	local snapMedian, snapSeenCount = Auctioneer_GetMedian(buyoutPrices);
 
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
 	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
@@ -157,22 +156,11 @@ function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistor
 		local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
 	end
 	if (buyoutHistoryTable) then
-		historyMedian = Auctioneer_GetMedian(buyoutHistoryTable);
-		historySeenCount = table.getn(buyoutHistoryTable);
+		historyMedian, historySeenCount = Auctioneer_GetMedian(buyoutHistoryTable);
 	end
 
-	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
-	if (not AuctionConfig.stats.histmed) then AuctionConfig.stats.histmed = {} end
-	if (not AuctionConfig.stats.histmed[auctKey]) then AuctionConfig.stats.histmed[auctKey] = {} end
-	if (not AuctionConfig.stats.histcount) then AuctionConfig.stats.histcount = {} end
-	if (not AuctionConfig.stats.histcount[auctKey]) then AuctionConfig.stats.histcount[auctKey] = {} end
-	if (historySeenCount >= MIN_BUYOUT_SEEN_COUNT) then
-		AuctionConfig.stats.histmed[auctKey][itemKey] = historyMedian;
-		AuctionConfig.stats.histcount[auctKey][itemKey] = historySeenCount;
-	else
-		AuctionConfig.stats.histmed[auctKey][itemKey] = 0;
-		AuctionConfig.stats.histcount[auctKey][itemKey] = 0;
-	end
+	-- save median to the savedvariablesfile
+	Auctioneer_HistMed(auctKey, itemKey, historyMedian, historySeenCount)
 
 	return tonumber(historyMedian) or 0, tonumber(historySeenCount) or 0;
 end

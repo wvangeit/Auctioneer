@@ -18,6 +18,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AucStatistic.lua"/>
 	<Script file="AucTooltip.lua"/>
 	<Script file="AucUtil.lua"/>
+	<Script file="AucStorage.lua"/>
 	<Script file="Auctioneer.lua"/>
 	<Frame name="Auctioneer" parent="UIParent" hidden="true">
 		<Scripts>
