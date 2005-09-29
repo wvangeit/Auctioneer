@@ -163,7 +163,7 @@ end
 
 function setRequirements(requirements)
 	self.requirements = requirements
-	Informant.SetReqirements = nil -- Set only once
+	Informant.SetRequirements = nil -- Set only once
 end
 
 function setVendors(vendors)
@@ -319,7 +319,7 @@ Informant = {
 
 	-- These functions are only meant for internal use.
 	SetSkills = setSkills,
-	SetReqirements = setRequirements,
+	SetRequirements = setRequirements,
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
 }
