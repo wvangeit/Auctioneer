@@ -1,6 +1,6 @@
 --[[
   Additional function hooks to allow hooks into more tooltips
-  <%version%>
+  1.0.7.0326
   $Id$
 
   All you should need to do as a client is call:
@@ -102,7 +102,7 @@
 ]]
 
 -- setting version number
-ENHTOOLTIP_VERSION = "<%version%>"
+ENHTOOLTIP_VERSION = "1.0.7.0326"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 	ENHTOOLTIP_VERSION = "1.0.DEV"
 end
@@ -155,12 +155,12 @@ local merchantScan
 local checkPopup
 local chatHookOnHyperlinkShow
 local afHookOnEnter
-local cfHookOnEnter
 local cfHookUpdate
 local gtHookSetLootItem
 local gtHookSetQuestItem
 local gtHookSetQuestLogItem
 local gtHookSetInventoryItem
+local gtHookSetBagItem
 local gtHookSetMerchantItem
 local gtHookSetCraftItem
 local gtHookSetTradeSkillItem
@@ -172,9 +172,7 @@ local imHookOnEnter
 local getLootLinkServer
 local getLootLinkLink
 local llHookOnEnter
-local aioHookModifyItemTooltip
 local gtHookSetOwner
-local doPlayerEnters
 local setElapsed
 local setMoneySpacing
 local setPopupKey
@@ -208,11 +206,17 @@ function clearTooltip()
 	EnhancedTooltip.lineCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
-	self.embedLines = {}
+	for curLine in self.embedLines do
+		self.embedLines[curLine] = nil;
+	end
+	table.setn(self.embedLines, 0);
 end
 
-function getRect(object)
-	local rect = {}
+function getRect(object, curRect)
+	local rect = curRect
+	if (not rect) then
+		rect = {}
+	end
 	rect.t = object:GetTop() or 0
 	rect.l = object:GetLeft() or 0
 	rect.b = object:GetBottom() or 0
@@ -261,12 +265,12 @@ function showTooltip(currentTooltip)
 	if (parentObject) then
 		local align = currentTooltip.anchor
 
-		local parentRect = getRect(currentTooltip.owner)
-			
+		enhTooltipParentRect = getRect(currentTooltip.owner, enhTooltipParentRect)
+
 		local xAnchor, yAnchor
-		if (parentRect.l - width < sWidth * 0.2) then
+		if (enhTooltipParentRect.l - width < sWidth * 0.2) then
 			xAnchor = "RIGHT"
-		elseif (parentRect.r + width > sWidth * 0.8) then
+		elseif (enhTooltipParentRect.r + width > sWidth * 0.8) then
 			xAnchor = "LEFT"
 		elseif (align == "ANCHOR_RIGHT") then
 			xAnchor = "RIGHT"
@@ -275,7 +279,7 @@ function showTooltip(currentTooltip)
 		else
 			xAnchor = "RIGHT"
 		end
-		if (parentRect.cy < sHeight/2) then
+		if (enhTooltipParentRect.cy < sHeight/2) then
 			yAnchor = "TOP"
 		else
 			yAnchor = "BOTTOM"
@@ -303,14 +307,14 @@ function showTooltip(currentTooltip)
 		-- No parent
 		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
 		currentTooltip:Show()
-		local tipRect = getRect(currentTooltip)
+		enhTooltipTipRect = getRect(currentTooltip, enhTooltipTipRect)
 
-		if (tipRect.b - height < 60) then
+		if (enhTooltipTipRect.b - height < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", tipRect.l, height+60)
+			currentTooltip:SetPoint("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", enhTooltipTipRect.l, height+60)
 		end
 		EnhancedTooltip:ClearAllPoints()
-		if (tipRect.cx < 6*sWidth/10) then
+		if (enhTooltipTipRect.cx < 6*sWidth/10) then
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
@@ -531,9 +535,10 @@ function nameFromLink(link)
 	if( not link ) then
 		return nil
 	end
-	for name in string.gfind(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r") do
-		return name
-	end
+	_, _, name = string.find(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
+ 	if (name) then
+		return name;
+ 	end
 	return nil
 end
 
@@ -541,21 +546,23 @@ function hyperlinkFromLink(link)
 		if( not link ) then
 				return nil
 		end
-		for hyperlink in string.gfind(link, "|H([^|]+)|h") do
-				return hyperlink
-		end
+		_, _, hyperlink = string.find(link, "|H([^|]+)|h");
+	 	if (hyperlink) then
+			return hyperlink;
+	 	end
 		return nil
 end
 
 function qualityFromLink(link)
 	local color
 	if (not link) then return nil end
-	for color in string.gfind(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r") do
-		if (color == "ffa335ee") then return 4 --[[ Epic ]] end
-		if (color == "ff0070dd") then return 3 --[[ Rare ]] end
-		if (color == "ff1eff00") then return 2 --[[ Uncommon ]] end
-		if (color == "ffffffff") then return 1 --[[ Common ]] end
-		if (color == "ff9d9d9d") then return 0 --[[ Poor ]] end
+	_, _, color = string.find(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
+	if (color) then
+		if (color == "ffa335ee") then return 4;--[[ Epic ]] end
+		if (color == "ff0070dd") then return 3;--[[ Rare ]] end
+		if (color == "ff1eff00") then return 2;--[[ Uncommon ]] end
+		if (color == "ffffffff") then return 1;--[[ Common ]] end
+		if (color == "ff9d9d9d") then return 0;--[[ Poor ]] end
 	end
 	return -1
 end
@@ -717,22 +724,6 @@ function afHookOnEnter(type, index)
 	end
 end
 
-function cfHookOnEnter()
-	self.hooks.cfOnEnter()
-
-	local frameID = this:GetParent():GetID()
-	local buttonID = this:GetID()
-	local link = GetContainerItemLink(frameID, buttonID)
-	local name = nameFromLink(link)
-		
-	if (name) then
-		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
-		if (quality==nil or quality==-1) then quality = qualityFromLink(link) end
-
-		tooltipCall(GameTooltip, name, link, quality, itemCount)
-	end
-end
-
 function cfHookUpdate(frame)
 	self.hooks.cfUpdate(frame)
 
@@ -756,8 +747,8 @@ function cfHookUpdate(frame)
 	end
 end
 
-function gtHookSetLootItem(this, slot)
-	self.hooks.gtSetLootItem(this, slot)
+function gtHookSetLootItem(frame, slot)
+	self.hooks.gtSetLootItem(frame, slot)
 		
 	local link = GetLootSlotLink(slot)
 	local name = nameFromLink(link)
@@ -768,8 +759,8 @@ function gtHookSetLootItem(this, slot)
 	end
 end
 
-function gtHookSetQuestItem(this, qtype, slot)
-	self.hooks.gtSetQuestItem(this, qtype, slot)
+function gtHookSetQuestItem(frame, qtype, slot)
+	self.hooks.gtSetQuestItem(frame, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot)
@@ -777,8 +768,8 @@ function gtHookSetQuestItem(this, qtype, slot)
 	end
 end
 
-function gtHookSetQuestLogItem(this, qtype, slot)
-	self.hooks.gtSetQuestLogItem(this, qtype, slot)
+function gtHookSetQuestLogItem(frame, qtype, slot)
+	self.hooks.gtSetQuestLogItem(frame, qtype, slot)
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot)
@@ -789,8 +780,22 @@ function gtHookSetQuestLogItem(this, qtype, slot)
 	end
 end
 
-function gtHookSetInventoryItem(this, unit, slot)
-	local hasItem, hasCooldown, repairCost = self.hooks.gtSetInventoryItem(this, unit, slot)
+function gtHookSetBagItem(frame, frameID, buttonID)
+	self.hooks.gtSetBagItem(frame, frameID, buttonID)
+
+	local link = GetContainerItemLink(frameID, buttonID)
+	local name = nameFromLink(link)
+
+	if (name) then
+		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
+		if (quality==nil or quality==-1) then quality = qualityFromLink(link) end
+
+		tooltipCall(GameTooltip, name, link, quality, itemCount)
+	end
+end
+
+function gtHookSetInventoryItem(frame, unit, slot)
+	local hasItem, hasCooldown, repairCost = self.hooks.gtSetInventoryItem(frame, unit, slot)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
 		local name = nameFromLink(link)
@@ -804,8 +809,8 @@ function gtHookSetInventoryItem(this, unit, slot)
 	return hasItem, hasCooldown, repairCost
 end
 
-function gtHookSetMerchantItem(this, slot)
-	self.hooks.gtSetMerchantItem(this, slot)
+function gtHookSetMerchantItem(frame, slot)
+	self.hooks.gtSetMerchantItem(frame, slot)
 	local link = GetMerchantItemLink(slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot)
@@ -814,8 +819,8 @@ function gtHookSetMerchantItem(this, slot)
 	end
 end
 
-function gtHookSetCraftItem(this, skill, slot)
-	self.hooks.gtSetCraftItem(this, skill, slot)
+function gtHookSetCraftItem(frame, skill, slot)
+	self.hooks.gtSetCraftItem(frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetCraftReagentItemLink(skill, slot)
@@ -834,8 +839,8 @@ function gtHookSetCraftItem(this, skill, slot)
 	end
 end
 
-function gtHookSetTradeSkillItem(this, skill, slot)
-	self.hooks.gtSetTradeSkillItem(this, skill, slot)
+function gtHookSetTradeSkillItem(frame, skill, slot)
+	self.hooks.gtSetTradeSkillItem(frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetTradeSkillReagentItemLink(skill, slot)
@@ -878,8 +883,8 @@ function findItemInBags(findName)
 	end
 end
 
-function gtHookSetAuctionSellItem(this)
-	self.hooks.gtSetAuctionSellItem(this)
+function gtHookSetAuctionSellItem(frame)
+	self.hooks.gtSetAuctionSellItem(frame)
 	local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name) then
 		local bag, slot = findItemInBags(name)
@@ -945,43 +950,10 @@ function llHookOnEnter()
 	end
 end
 
-function aioHookModifyItemTooltip(bag, slot, tooltip)
-	self.hooks.aioModifyItemTooltip(bag, slot, tooltip)
-
-	local tooltip = getglobal(tooltipName)
-	if (not tooltip) then
-		tooltip = getglobal("GameTooltip")
-		tooltipName = "GameTooltip"
-	end
-	if (not tooltip) then return false end
-
-	local link = GetContainerItemLink(bag, slot)
-	local name = nameFromLink(link)
-	if (name) then
-		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag, slot)
-		if (quality == nil) then quality = qualityFromLink(link) end
-
-		tooltipCall(tooltip, name, link, quality, itemCount, 0)
-	end
-end
-
-function gtHookSetOwner(this, owner, anchor)
-	self.hooks.gtSetOwner(this, owner, anchor)
-	this.owner = owner
-	this.anchor = anchor
-end
-
-
-function doPlayerEnters()
-	-- Since AIOI lists Auctioneer as an option dependancy, we may not have 
-	-- registered the event hooks above... Check here to make certain!
-	if (not AIOI_Hooked) then
-		if (AllInOneInventory_ModifyItemTooltip ~= nil) then
-			self.hooks.aioModifyItemTooltip = AllInOneInventory_ModifyItemTooltip
-			AllInOneInventory_ModifyItemTooltip = aioHookModifyItemTooltip 
-			AIOI_Hooked = true
-		end
-	end
+function gtHookSetOwner(frame, owner, anchor)
+	self.hooks.gtSetOwner(frame, owner, anchor)
+	frame.owner = owner
+	frame.anchor = anchor
 end
 
 function setElapsed(elapsed)
@@ -1002,6 +974,7 @@ function setPopupKey(key)
 	return self.forcePopupKey
 end
 
+
 function ttInitialize()
 	--[[
 	----  Establish hooks to all the game tooltips.
@@ -1016,9 +989,6 @@ function ttInitialize()
 	AuctionFrameItem_OnEnter = afHookOnEnter
 
 	-- Container frame linking
-	self.hooks.cfOnEnter = ContainerFrameItemButton_OnEnter
-	ContainerFrameItemButton_OnEnter = cfHookOnEnter
-
 	self.hooks.cfUpdate = ContainerFrame_Update
 	ContainerFrame_Update = cfHookUpdate
 
@@ -1034,6 +1004,9 @@ function ttInitialize()
 	
 	self.hooks.gtSetInventoryItem = GameTooltip.SetInventoryItem
 	GameTooltip.SetInventoryItem = gtHookSetInventoryItem
+
+	self.hooks.gtSetBagItem = GameTooltip.SetBagItem
+	GameTooltip.SetBagItem = gtHookSetBagItem
 	
 	self.hooks.gtSetMerchantItem = GameTooltip.SetMerchantItem
 	GameTooltip.SetMerchantItem = gtHookSetMerchantItem
@@ -1061,17 +1034,6 @@ function ttInitialize()
 	self.hooks.llOnEnter = LootLinkItemButton_OnEnter
 	LootLinkItemButton_OnEnter = llHookOnEnter
 
-	-- Hook the AllInOneInventory tooltip function
-	if (AllInOneInventory_ModifyItemTooltip ~= nil) then
-		self.hooks.aioModifyItemTooltip = AllInOneInventory_ModifyItemTooltip
-		AllInOneInventory_ModifyItemTooltip = aioHookModifyItemTooltip
-		AIOI_Hooked = true
-	else
-		AIOI_Hooked = false
-		
-		this:RegisterEvent("PLAYER_ENTERING_WORLD")
-	end
-
 	-- Hook the hide function so we can disappear
 	self.hooks.gtOnHide = GameTooltip_OnHide
 	GameTooltip_OnHide = gtHookOnHide
@@ -1092,10 +1054,7 @@ function TT_OnUpdate(elapsed)
 end
 
 function TT_OnEvent(event)
-	if (event == "PLAYER_ENTERING_WORLD") then
-		doPlayerEnters()
-		this:UnregisterEvent(event)
-	elseif (event == "MERCHANT_SHOW") then
+	if (event == "MERCHANT_SHOW") then
 		merchantScan()
 	end
 end
@@ -1120,7 +1079,6 @@ EnhTooltip = {
 	['AddHook']           = addHook,
 	['BreakLink']         = breakLink,
 	['FindItemInBags']    = findItemInBags,
-	['DoPlayerEnters']    = doPlayerEnters,
 	['SetElapsed']        = setElapsed,
   	['SetMoneySpacing']   = setMoneySpacing,
   	['SetPopupKey']       = setPopupKey,
@@ -1147,7 +1105,6 @@ TT_FakeLink          = fakeLink
 TT_AddHook           = addHook
 TT_BreakLink         = breakLink
 TT_FindItemInBags    = findItemInBags
-TT_DoPlayerEnters    = doPlayerEnters
 TT_SetElapsed        = setElapsed
 TT_SetMoneySpacing   = setMoneySpacing
 TT_SetPopupKey       = setPopupKey
