@@ -961,7 +961,7 @@ function aioHookModifyItemTooltip(bag, slot, tooltip)
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag, slot)
 		if (quality == nil) then quality = qualityFromLink(link) end
 
-		tooltipCall(GameTooltip, name, link, quality, itemCount, 0)
+		tooltipCall(tooltip, name, link, quality, itemCount, 0)
 	end
 end
 
@@ -977,8 +977,8 @@ function doPlayerEnters()
 	-- registered the event hooks above... Check here to make certain!
 	if (not AIOI_Hooked) then
 		if (AllInOneInventory_ModifyItemTooltip ~= nil) then
-			self.hooks.AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip
-			AllInOneInventory_ModifyItemTooltip = AllInOneInventory_ModifyItemTooltip
+			self.hooks.aioModifyItemTooltip = AllInOneInventory_ModifyItemTooltip
+			AllInOneInventory_ModifyItemTooltip = aioHookModifyItemTooltip 
 			AIOI_Hooked = true
 		end
 	end
@@ -1001,7 +1001,6 @@ function setPopupKey(key)
 	if (key ~= nil) then self.forcePopupKey = key end
 	return self.forcePopupKey
 end
-
 
 function ttInitialize()
 	--[[
@@ -1069,13 +1068,15 @@ function ttInitialize()
 		AIOI_Hooked = true
 	else
 		AIOI_Hooked = false
+		
 		this:RegisterEvent("PLAYER_ENTERING_WORLD")
-		this:RegisterEvent("MERCHANT_SHOW")
 	end
 
 	-- Hook the hide function so we can disappear
 	self.hooks.gtOnHide = GameTooltip_OnHide
 	GameTooltip_OnHide = gtHookOnHide
+
+	this:RegisterEvent("MERCHANT_SHOW")
 end
 
 -- =============== EVENT HANDLERS =============== --
