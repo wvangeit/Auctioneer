@@ -43,6 +43,32 @@ function Informant_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
 	
 	
+	BINDING_HEADER_INFORMANT_HEADER = "Informer"
+	BINDING_NAME_INFORMANT_POPUPDOWN = "Toggle Information Window"
+	
+	
+	_INFORMANT['Welcome'] = {
+		"|c40ff50ffWelcome to Informant|r",
+		"",
+		"Since this is the first time you are using",
+		"Informant, this message appears to let you",
+		"know that you must set a key to show this",
+		"window from within the |cffffffffKeybindings|r section",
+		"of the |cffffffffGame Menu|r.",
+		"",
+		"From then on to view advanced information",
+		"about items in your inventory, simply move",
+		"your mouse over the item you want to see",
+		"information about and press the key that",
+		"you bound, and this window will popup,",
+		"filled with information about that item.",
+		"",
+		"At that point, simply press the key again,",
+		"or click the close button on this frame.",
+		"",
+		"Click the close button now to continue.",
+	}
+	
 	_INFORMANT['AdditAlcohol'] = "Alcohol";
 	_INFORMANT['AdditBuff'] = "Buff";
 	_INFORMANT['AdditDrink'] = "Drink";
@@ -60,7 +86,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['SkillCooking'] = "Cooking";
 	_INFORMANT['SkillEnchanting'] = "Enchanting";
 	_INFORMANT['SkillEngineering'] = "Engineering";
-	_INFORMANT['SkillFirstaid'] = "First Aid";
+	_INFORMANT['SkillFirstAid'] = "First Aid";
 	_INFORMANT['SkillLeatherworking'] = "Leatherworking";
 	_INFORMANT['SkillMining'] = "Mining";
 	_INFORMANT['SkillTailoring'] = "Tailoring";
@@ -74,7 +100,7 @@ function Informant_SetLocaleStrings(locale)
 	
 	
 	_INFORMANT['FrmtWelcome'] = "Informant v%s loaded";
-	
+	_INFORMANT['FrameTitle'] = "Informant Item Information";
 	
 	_INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants";
 	_INFORMANT['FrmtInfoQuest'] = "Quest item in %d quests";
@@ -87,14 +113,21 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['FrmtInfoSellmult'] = "Sell %d (%s each)";
 	_INFORMANT['FrmtInfoStx'] = "Stacks in lots of %d";
 	
-	_INFORMANT['FrmtInfoBuyMulti'] = "  Buyout (%s%s ea)";
 	
-	_INFORMANT['FrmtInfoBuyOne'] = "  Buyout%s";
+	_INFORMANT['InfoHeader'] = "Information on |cff%s%s|r"
 	
-	_INFORMANT['FrmtInfoBuymedian'] = "  Buyout median";
+	_INFORMANT['InfoVendorHeader'] = "Available from %d merchants:"
+	_INFORMANT['InfoVendorName'] = "  %s"
 	
+	_INFORMANT['InfoQuestHeader'] = "Used in %d quests:"
+	_INFORMANT['InfoQuestName'] = "  %s"
 	
+	_INFORMANT['InfoPlayerMade'] = "Made by level %d %s"
 	
+	_INFORMANT['InfoNoItem'] = {
+		"You must first move over an item,",
+		"then press the activation key",
+	}
 	
 	
 	
@@ -168,7 +201,7 @@ if locale == "deDE" then
 		_INFORMANT['SkillCooking']        = "Kochen";
 		_INFORMANT['SkillEnchanting']     = "Verzauberungen";
 		_INFORMANT['SkillEngineering']    = "Ingenieurskunst";
-		_INFORMANT['SkillFirstaid']       = "Erste Hilfe";
+		_INFORMANT['SkillFirstAid']       = "Erste Hilfe";
 		_INFORMANT['SkillLeatherworking'] = "Lederverarbeitung";
 		_INFORMANT['SkillMining']         = "Bergbau";
 		_INFORMANT['SkillTailoring']      = "Schneiderei";
@@ -224,6 +257,10 @@ if locale == "deDE" then
 		_INFORMANT['FrmtActDefault']    = "%s wurde auf den Standardwert zur\195\188ckgesetzt.";
 		
 
+
+		-- The following definitions are missing in this locale:
+		--	BINDING_HEADER_INFORMANT_HEADER = "";
+		--	BINDING_NAME_INFORMANT_POPUPDOWN = "";
 end
 
 -- Locale strings for the esES locale
@@ -247,7 +284,7 @@ if locale == "esES" then
 		_INFORMANT['SkillCooking'] = "Cocinar";
 		_INFORMANT['SkillEnchanting'] = "Encantar";
 		_INFORMANT['SkillEngineering'] = "Ingenier\195\173a";
-		_INFORMANT['SkillFirstaid'] = "Primeros Auxilios";
+		_INFORMANT['SkillFirstAid'] = "Primeros Auxilios";
 		_INFORMANT['SkillLeatherworking'] = "Peleter\195\173a";
 		_INFORMANT['SkillMining'] = "Miner\195\173a";
 		_INFORMANT['SkillTailoring'] = "Sastrer\195\173a";
@@ -331,6 +368,10 @@ if locale == "esES" then
 		-- GUI localizations
 		
 
+
+		-- The following definitions are missing in this locale:
+		--	BINDING_HEADER_INFORMANT_HEADER = "";
+		--	BINDING_NAME_INFORMANT_POPUPDOWN = "";
 end
 
 -- Locale strings for the frFR locale
@@ -347,7 +388,7 @@ if locale == "frFR" then
 		_INFORMANT['SkillCooking']        = "Cuisine";
 		_INFORMANT['SkillEnchanting']     = "Enchantement";
 		_INFORMANT['SkillEngineering']    = "Ing\195\169nieur";
-		_INFORMANT['SkillFirstaid']       = "Premiers Soins";
+		_INFORMANT['SkillFirstAid']       = "Premiers Soins";
 		_INFORMANT['SkillLeatherworking'] = "Travail du Cuir";
 		_INFORMANT['SkillMining']         = "Minage";
 		_INFORMANT['SkillTailoring']      = "Tailleur";
@@ -364,6 +405,10 @@ if locale == "frFR" then
 		-- AH Scanning localizations
 		
 
+
+		-- The following definitions are missing in this locale:
+		--	BINDING_HEADER_INFORMANT_HEADER = "";
+		--	BINDING_NAME_INFORMANT_POPUPDOWN = "";
 end
 
 end

@@ -173,6 +173,8 @@ function Auctioneer_GetHistMedian(itemKey, auctKey, buyoutHistoryTable)
 	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.histmed and AuctionConfig.stats.histmed[auctKey]) then
 		stat = AuctionConfig.stats.histmed[auctKey][itemKey];
+	end
+	if (AuctionConfig.stats.histcount and AuctionConfig.stats.histcount[auctKey]) then
 		count = AuctionConfig.stats.histcount[auctKey][itemKey];
 	end
 	if (not stat) then

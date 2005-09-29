@@ -23,12 +23,19 @@ local getItem--(itemID);     itemID is the first value in a blizzard hyperlink i
 
 local setSkills, setRequirements, setVendors, setDatabase
 local tooltipHandler, getFilterVal, getFilter, setFilter
-local getCatName, split
+local frameConfig, frameActive, scrollUpdate, getRowCount
+local getCatName, split, showHideInfo, processEvent
+local skillToName
 
 -- LOCAL VARIABLES
 
 local self = {}
-local InformantConfig = {}
+local lines = {}
+local itemInfo = nil
+
+-- GLOBAL VARIABLES
+
+InformantConfig = {}
 
 -- LOCAL DEFINES
 
@@ -43,12 +50,12 @@ CLASS_TO_CATEGORY_MAP = {
 	[9]  = 8,
 	[5]  = 9,
 	[15] = 10,
-};
+}
 
 -- FUNCTION DEFINITIONS
 
 function split(str, at)
-	local splut = {};
+	local splut = {}
 
 	if (type(str) ~= "string") then return nil end
 	if (not str) then str = "" end
@@ -56,11 +63,24 @@ function split(str, at)
 		then table.insert(splut, str)
 	else
 		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-			table.insert(splut, n);
+			table.insert(splut, n)
 			if (c == '') then break end
 		end
 	end
-	return splut;
+	return splut
+end
+
+function skillToName(userSkill)
+	local skillName = self.skills[tonumber(userSkill)]
+	local localized = "Unknown"
+	if (skillName) then
+		if (_INFORMANT["Skill"..skillName]) then
+			localized = _INFORMANT["Skill"..skillName]
+		else
+			localized = "Unknown:"..skillName;
+		end
+	end
+	return localized, skillName
 end
 
 function getItem(itemID)
@@ -108,18 +128,16 @@ function getItem(itemID)
 		local usedList = split(usedby, ",")
 		local skillName, localized, localeString
 		local usage = ""
+		dataItem.usedList = {}
 		if (usedList) then
 			for pos, userSkill in pairs(usedList) do
-				skillName = self.skills[tonumber(userSkill)]
-				localized = "Unknown"
-				if (skillName) then
-					localized = _INFORMANT["Skill"..skillName]
-				end
+				localized = skillToName(userSkill)
 				if (usage == "") then
 					usage = localized
 				else
 					usage = usage .. ", " .. localized
 				end
+				table.insert(dataItem.usedList, localized);
 			end
 		end
 		dataItem.usageText = usage
@@ -127,14 +145,19 @@ function getItem(itemID)
 
 	local reqSkill = 0
 	local reqLevel = 0
+	local skillName = ""
+
 	local skillsRequired = self.requirements[itemID]
 	if (skillsRequired) then
 		local skillSplit = split(skillsRequired, ":")
 		reqSkill = skillSplit[1]
 		reqLevel = skillSplit[2]
+		skillName = skillToName(reqSkill)
 	end
+
 	dataItem.isPlayerMade = (reqSkill ~= 0)
 	dataItem.reqSkill = reqSkill
+	dataItem.reqSkillName = skillName
 	dataItem.reqLevel = reqLevel
 
 	if (merchantlist ~= '') then
@@ -217,6 +240,10 @@ function tooltipHandler(frame, name, link, quality, count)
 	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(link)
 	if (itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
+		itemInfo.itemName = name;
+		itemInfo.itemLink = link;
+		itemInfo.itemCount = count;
+		itemInfo.itemQuality = quality;
 	end
 	if (itemInfo) then
 		stacks = itemInfo.stack
@@ -241,6 +268,10 @@ function tooltipHandler(frame, name, link, quality, count)
 
 		buy = buy/quant
 	end
+
+	itemInfo.itemBuy = buy;
+	itemInfo.itemSell = sell;
+	itemInfo.itemQuant = quant;
 
 	local embedded = getFilter(_INFORMANT['CmdEmbed'])
 
@@ -280,9 +311,9 @@ function tooltipHandler(frame, name, link, quality, count)
 	end
 	if (itemInfo and getFilter(_INFORMANT['ShowMerchant'])) then
 		if (itemInfo.vendors) then
-			local merchantCount = table.getn(itemInfo.vendors);
+			local merchantCount = table.getn(itemInfo.vendors)
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embed)
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
 			end
 		end
@@ -302,13 +333,185 @@ function tooltipHandler(frame, name, link, quality, count)
 	end
 	if (itemInfo and getFilter(_INFORMANT['ShowQuest'])) then
 		if (itemInfo.quests) then
-			local questCount = table.getn(itemInfo.quests);
+			local questCount = table.getn(itemInfo.quests)
 			if (questCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed)
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
 			end
 		end
 	end
+end
+
+function showHideInfo()
+	if (InformantFrame:IsVisible()) then
+		InformantFrame:Hide();
+	elseif (itemInfo) then
+		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
+		local quality = itemInfo.itemQuality or itemInfo.quality or 0;
+		
+		local color = "ffffff"
+		if (quality == 4) then color = "a335ee"
+		elseif (quality == 3) then color = "0070dd"
+		elseif (quality == 2) then color = "1eff00"
+		elseif (quality == 0) then color = "9d9d9d"
+		end
+
+		clear()
+		addLine(string.format(_INFORMANT['InfoHeader'], color, itemInfo.itemName));
+	
+		local buy = itemInfo.itemBuy or itemInfo.buy or 0;
+		local sell = itemInfo.itemSell or itemInfo.sell or 0;
+		local quant = itemInfo.itemQuant or itemInfo.quantity or 0;
+		local count = itemInfo.itemCount or 1;
+	
+		if ((buy > 0) or (sell > 0)) then
+			local bgsc = EnhTooltip.GetTextGSC(buy)
+			local sgsc = EnhTooltip.GetTextGSC(sell)
+
+			if (count and (count > 1)) then
+				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
+				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
+				addLine(string.format(_INFORMANT['FrmtInfoBuymult'], count, bgsc)..": "..bqgsc, "ee8822")
+				addLine(string.format(_INFORMANT['FrmtInfoSellmult'], count, sgsc)..": "..sqgsc, "ee8822")
+			else
+				addLine(string.format(_INFORMANT['FrmtInfoBuy'])..": "..bgsc, "ee8822")
+				addLine(string.format(_INFORMANT['FrmtInfoSell'])..": "..sgsc, "ee8822")
+			end
+		end
+
+		if (itemInfo.stack > 1) then
+			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], itemInfo.stack))
+		end
+
+		local reagentInfo = ""
+		if (itemInfo.classText) then
+			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
+			addLine(reagentInfo, "aa66ee")
+		end
+		if (itemInfo.usageText) then
+			reagentInfo = string.format(_INFORMANT['FrmtInfoUse'], itemInfo.usageText)
+			addLine(reagentInfo, "aa66ee")
+		end
+
+		if (itemInfo.isPlayerMade) then
+			addLine(string.format(_INFORMANT['InfoPlayerMade'], itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
+		end
+
+		if (itemInfo.quests) then
+			local questCount = table.getn(itemInfo.quests)
+			if (questCount > 0) then
+				addLine("")
+				addLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed)
+				addLine(string.format(_INFORMANT['InfoQuestHeader'], questCount), "70ee90");
+				local questName
+				for pos, quest in itemInfo.quests do
+					questName = getQuestName(quest);
+					addLine(string.format(_INFORMANT['InfoQuestName'], quest), "80ee80");
+				end
+			end
+		end
+
+		if (itemInfo.vendors) then
+			local vendorCount = table.getn(itemInfo.vendors);
+			if (vendorCount > 0) then
+				addLine("")
+				addLine(string.format(_INFORMANT['InfoVendorHeader'], vendorCount), "ddff40");
+				for pos, merchant in itemInfo.vendors do
+					addLine(string.format(_INFORMANT['InfoVendorName'], merchant), "eeee40");
+				end
+			end
+		end
+		InformantFrame:Show();
+	else
+		clear();
+		addLine(_INFORMANT['InfoNoItem'], "ff4010");
+		InformantFrame:Show();
+	end
+end
+
+
+function frameConfig()
+	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+
+	this:RegisterEvent("ADDON_LOADED");
+end
+
+function processEvent(event)
+	if (event == "ADDON_LOADED") then
+		if (not InformantConfig) then
+			InformantConfig = {}
+		end
+		
+		if (not InformantConfig.welcomed) then
+			clear();
+			addLine(_INFORMANT['Welcome']);
+			InformantConfig.welcomed = true;
+		end
+	end
+end
+
+function frameActive(isActive)
+	if (isActive) then
+		scrollUpdate(0)
+	end
+end
+
+function getRowCount()
+	return table.getn(lines)
+end
+
+function scrollUpdate(offset)
+	local numLines = getRowCount()
+	if (numLines > 25) then
+		if (not offset) then
+			offset = FauxScrollFrame_GetOffset(InformantFrameScrollBar)
+		else
+			if (offset > numLines - 25) then offset = numLines - 25; end
+			FauxScrollFrame_SetOffset(InformantFrameScrollBar, offset)
+		end
+	else
+		offset = 0
+	end
+	local line
+	for i=1, 25 do
+		line = lines[i+offset]
+		local f = getglobal("InformantFrameText"..i)
+		if (line) then
+			f:SetText(line)
+			f:Show()
+		else
+			f:Hide()
+		end
+	end
+	if (numLines > 25) then
+		FauxScrollFrame_Update(InformantFrameScrollBar, numLines, 25, numLines) 
+		InformantFrameScrollBar:Show()
+	else
+		InformantFrameScrollBar:Hide()
+	end
+end
+
+function addLine(text, color)
+	if (type(text) == "table") then
+		for pos, line in text do
+			addLine(line, color)
+		end
+		return
+	end
+
+	if (not text) then
+		table.insert(lines, "nil");
+	elseif (color) then
+		table.insert(lines, string.format("|cff%s%s|r", color, text))
+	else
+		table.insert(lines, text)
+	end
+	scrollUpdate()
+end
+
+function clear()
+	lines = {}
+	scrollUpdate()
 end
 
 -- GLOBAL OBJECT
@@ -316,12 +519,20 @@ end
 Informant = {
 	version = INFORMANT_VERSION,
 	GetItem = getItem,
+	GetRowCount = getRowCount,
+	AddLine = addLine,
+	Clear = clear,
+	ShowHideInfo = showHideInfo,
 
 	-- These functions are only meant for internal use.
 	SetSkills = setSkills,
 	SetRequirements = setRequirements,
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
+	FrameConfig = frameConfig,
+	FrameActive = frameActive,
+	ProcessEvent = processEvent,
+	ScrollUpdate = scrollUpdate,
 }
 
 
