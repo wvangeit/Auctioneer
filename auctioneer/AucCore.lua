@@ -157,10 +157,8 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	end
 	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 
-	local median, count = Auctioneer_GetMedian(iData.buyoutPricesHistoryList);
-
 	-- save median to the savedvariablesfile
-	Auctioneer_HistMed(auctKey, itemKey, Auctioneer_GetMedian(iData.buyoutPricesHistoryList))
+	Auctioneer_SetHistMed(auctKey, itemKey, Auctioneer_GetMedian(iData.buyoutPricesHistoryList))
 end
 
 -- Returns the auction buyout history for this item

@@ -7,7 +7,7 @@
 	Functions that allow auctioneer writing/reading data to/from its savedvariables file.
 ]]
 
-function Auctioneer_HistMed(auctKey, itemKey, median, count)
+function Auctioneer_SetHistMed(auctKey, itemKey, median, count)
 	if (not AuctionConfig.stats)                    then AuctionConfig.stats = {}                    end
 	if (not AuctionConfig.stats.histmed)            then AuctionConfig.stats.histmed = {}            end
 	if (not AuctionConfig.stats.histmed[auctKey])   then AuctionConfig.stats.histmed[auctKey] = {}   end

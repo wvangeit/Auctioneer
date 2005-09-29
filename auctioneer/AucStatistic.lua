@@ -45,8 +45,11 @@ end
 
 -- Returns the median value of a given table one-dimentional table
 function Auctioneer_GetMedian(valuesTable)
-	if (not valuesTable or table.getn(valuesTable) == 0) then
-		return nil; --make this function nil argument safe
+	if (valuesTable == nil) or (type(valuesTable) ~= "table") then
+		return nil   -- make valuesTable a required table argument
+	end
+	if table.getn(valuesTable) == 0 then
+		return 0, 0; -- if there is an empty table, returns median = 0, count = 0
 	end
 
 	local tableSize = table.getn(valuesTable);
@@ -160,7 +163,7 @@ function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistor
 	end
 
 	-- save median to the savedvariablesfile
-	Auctioneer_HistMed(auctKey, itemKey, historyMedian, historySeenCount)
+	Auctioneer_SetHistMed(auctKey, itemKey, historyMedian, historySeenCount)
 
 	return tonumber(historyMedian) or 0, tonumber(historySeenCount) or 0;
 end
@@ -282,7 +285,7 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	end
 	if not (Auctioneer_Lowests and Auctioneer_Lowests.built) then Auctioneer_BuildLowestCache(auctKey) end
 
-	local lowKey = itemID..":"..itemRand..":";
+	local lowKey = itemID..":"..itemRand;
 
 	local itemCat = nil;
 	local lowSig = nil;
@@ -420,17 +423,17 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	local warn = _AUCT['FrmtWarnNodata'];
 	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
 	if (not buyoutValues) then
-		buyoutValues = Auctioneer_GetSnapshotInfo(itemKey, realm);
+		buyoutValues = Auctioneer_GetSnapshotInfo(realm, itemKey);
 	end
 	
 	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues);
 
 	-- Get our user-set pricing parameters
-	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless'], _AUCT['OptPctMaxlessDefault']));
-	local discountLowPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow'], _AUCT['OptPctUnderlowDefault']));
-	local discountMarketPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt'], _AUCT['OptPctUndermktDefault']));
-	local discountNoCompetitionPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp'], _AUCT['OptPctNocompDefault']));
-	local vendorSellMarkupPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup'], _AUCT['OptPctMarkupDefault']));
+	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless'],  _AUCT['OptPctMaxlessDefault']));
+	local discountLowPercent              = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow'], _AUCT['OptPctUnderlowDefault']));
+	local discountMarketPercent           = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt'], _AUCT['OptPctUndermktDefault']));
+	local discountNoCompetitionPercent    = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp'],   _AUCT['OptPctNocompDefault']));
+	local vendorSellMarkupPercent         = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup'],   _AUCT['OptPctMarkupDefault']));
 
 	local x, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);
@@ -467,7 +470,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	end
 	if (not nexthsp) then nexthsp = 0; nextwarn = ""; end
 
---	p("Auction data: ", hsp, histCount, market, warn, nexthsp, nextwarn);
+	--p("Auction data: ", hsp, histCount, market, warn, nexthsp, nextwarn);
 
 	local cache = string.format("%d;%d;%d;%s;%d;%s", hsp,histCount,market,warn, nexthsp,nextwarn);
 	Auctioneer_HSPCache[realm][itemKey] = cache;
