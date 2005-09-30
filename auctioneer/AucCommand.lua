@@ -271,7 +271,6 @@ function Auctioneer_Register_Khaos()
 			};
 			{
 				id=_AUCT['ShowVendor'];
-				key="AuctioneerVendor";
 				type=K_TEXT;
 				text=_AUCT['GuiVendor'];
 				helptext=_AUCT['HelpVendor'];
@@ -354,7 +353,6 @@ function Auctioneer_Register_Khaos()
 			};
 			{
 				id=_AUCT['CmdEmbed'];
-				key="AuctioneerEmbed";
 				type=K_TEXT;
 				text=_AUCT['GuiEmbed'];
 				helptext=_AUCT['HelpEmbed'];
@@ -1121,34 +1119,13 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 
 		if ((param == _AUCT['CmdOn']) or (param == "on")) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActEnable'], variable));
-
-			--Account for different key name in the embed variable
-			if ((variable == _AUCT['CmdEmbed']) or (variable == "embed")) then
-
-				if (Auctioneer_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEmbed", "checked", true);
-				end
-			else
-
-				if (Auctioneer_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
-				end
+			if (Auctioneer_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
 			end
-
 		elseif ((param == _AUCT['CmdOff']) or (param == "off")) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActDisable'], variable));
-
-			--Account for different key name in the embed variable
-			if ((variable == _AUCT['CmdEmbed']) or (variable == "embed")) then
-
-				if (Auctioneer_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEmbed", "checked", false);
-				end
-			else
-
-				if (Auctioneer_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Auctioneer", variable, "checked", false);
-				end
+			if (Auctioneer_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Auctioneer", variable, "checked", false);
 			end
 		end
 	end
