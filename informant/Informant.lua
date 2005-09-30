@@ -438,15 +438,27 @@ end
 
 function processEvent(event)
 	if (event == "ADDON_LOADED") then
-		if (not InformantConfig) then
-			InformantConfig = {}
+		if (arg1 == "Informat") then
+			if (not InformatConfig) then
+				InformatConfig = { };
+			end
+
+			if (InformatConfig.position) then
+				InformatFrame:ClearAllPoints();
+				InformatFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformatConfig.position.x, InformatConfig.position.y);
+			end
+
+			if (not InformantConfig.welcomed) then
+				clear();
+				addLine(_INFORMANT['Welcome']);
+				InformantConfig.welcomed = true;
+			end
 		end
-		
-		if (not InformantConfig.welcomed) then
-			clear();
-			addLine(_INFORMANT['Welcome']);
-			InformantConfig.welcomed = true;
+	elseif (event == "PLAYER_LEAVING_WORLD") then
+		if (not InformatConfig.position) then
+			InformatConfig.position = { };
 		end
+		InformatConfig.position.x, InformatConfig.position.y = InformatFrame:GetCenter();
 	end
 end
 

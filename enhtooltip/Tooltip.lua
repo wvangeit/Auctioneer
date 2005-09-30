@@ -1,6 +1,6 @@
 --[[
   Additional function hooks to allow hooks into more tooltips
-  1.0.7.0326
+  <%version%>
   $Id$
 
   All you should need to do as a client is call:
@@ -102,7 +102,7 @@
 ]]
 
 -- setting version number
-ENHTOOLTIP_VERSION = "1.0.7.0326"
+ENHTOOLTIP_VERSION = "<%version%>"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 	ENHTOOLTIP_VERSION = "1.0.DEV"
 end
