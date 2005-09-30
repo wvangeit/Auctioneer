@@ -100,7 +100,9 @@ function Auctioneer_Register_Khaos()
 				callback=function()
 					ReloadUI();
 				end;
-				feedback=_AUCT['GuiReloaduiFeedback'];
+				feedback=function()
+					return _AUCT['GuiReloaduiFeedback'];
+				end;
 				difficulty=3;
 			};
 			{
@@ -419,7 +421,9 @@ function Auctioneer_Register_Khaos()
 				callback=function()
 					Auctioneer_Clear(_AUCT['CmdClearAll']);
 				end;
-				feedback=string.format(_AUCT['FrmtActClearall'],  _AUCT['GuiClearallNote']);
+				feedback=function()
+					return string.format(_AUCT['FrmtActClearall'],  _AUCT['GuiClearallNote']);
+				end;
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=3;
 			};
@@ -434,7 +438,9 @@ function Auctioneer_Register_Khaos()
 				callback=function()
 					Auctioneer_Clear(_AUCT['CmdClearSnapshot']);
 				end;
-				feedback=_AUCT['FrmtActClearsnap'];
+				feedback=function()
+					return _AUCT['FrmtActClearsnap'];
+				end;
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=3;
 			};
@@ -657,7 +663,9 @@ function Auctioneer_Register_Khaos()
 				callback=function() 
 					Auctioneer_Default(_AUCT['CmdClearAll']);
 				end;
-				feedback=_AUCT['FrmtActDefaultall'];
+				feedback=function()
+					return _AUCT['FrmtActDefaultall'];
+				end;
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=1;
 			};
@@ -680,13 +688,13 @@ function Auctioneer_Register_Khaos()
 					end
 				end;
 				default = {
-					value = nil;
+					value = "";
 				};
 				disabled = {
-					value = nil;
+					value = "";
 				};
 				dependencies={AuctioneerEnable={checked=true;}};
-				difficulty=3;
+				difficulty=4;
 			};
 			{
 				id=_AUCT['ShowLink'];
@@ -1066,10 +1074,10 @@ end
 --This function was added by MentalPower to implement the /auc default command
 function Auctioneer_Default(param, chatprint)
 
-	if (param == nil) then
+	if ( (param == nil) or (param == "") ) then
 		return
 
-	elseif ((param == _AUCT['CmdClearAll']) or (param == "all") or (param == "")) then
+	elseif ((param == _AUCT['CmdClearAll']) or (param == "all")) then
 		AuctionConfig = {};
 
 	else
