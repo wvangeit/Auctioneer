@@ -74,46 +74,23 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	local endTime = time();
 	if lTotalAuctionsScannedCount >= 50 then 
+		local dropCount, buyCount, bidCount, expCount;
+		dropCount = 0;
+		buyCount = 0;
+		bidCount = 0;
+		expCount = 0;
 		local snap,lastSeen,expiredSeconds,itemKey,buyList,listStr,listSplit,buyout,hist;
 		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 				for iKey, iData in pairs(cData) do
-					snap = Auctioneer_GetSnapshotInfoFromData(iData);
-					if (snap.dirty == 1) then
+					snap = Auctioneer_GetSnapshotFromData(iData);
+					if (snap.dirty == "1") then
 						-- This item should have been seen, but wasn't.
 						-- We need to work out if it expired before or after it's time
 						lastSeen = snap.lastSeenTime;
 						expiredSeconds = endTime - lastSeen;
-						--p("Expired item", iKey, cat, "last seen", lastSeen, expiredSeconds, "ago (",endTime,")");
-						--p("Snap", snap);
-						if (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
-							--p("Bought out");
-							-- Whoa! This item was bought out.
-							itemKey = Auctioneer_GetKeyFromSig(iKey);
-							if (not AuctionConfig.success) then AuctionConfig.success = {} end
-							if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
-							if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
-							buyList = newBalancedList(lMaxBuyoutHistorySize);
-							listStr = AuctionConfig.success.buy[auctKey][itemKey];
-							if (listStr) then
-								listSplit = Enchantrix_Split(listStr, ":");
-								buyList.setList(listSplit);
-							end
-							x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey); 
-							buyList.insert(buyout);
-
-							hist = "";
-							if (buyList and buyList.list) then
-								for pos, item in pairs(buyList.list) do
-									if (hist == "") then hist = hist..item
-									else hist = hist..":"..item;
-									end
-								end
-							end
-							AuctionConfig.success.buy[auctKey][itemKey] = hist;
-						end
 						if (snap.timeLeft == 1) and (snap.bidamount > 0) then
-							p("Bid out");
+							bidCount = bidCount+1;
 							-- This one expired at the final time interval, so it's likely
 							-- that this is the best bid value we'll get for it.
 							itemKey = Auctioneer_GetKeyFromSig(iKey);
@@ -123,7 +100,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 							bidList = newBalancedList(lMaxBuyoutHistorySize);
 							listStr = AuctionConfig.success.bid[auctKey][itemKey];
 							if (listStr) then
-								listSplit = Enchantrix_Split(listStr, ":");
+								listSplit = Auctioneer_Split(listStr, ":");
 								bidList.setList(listSplit);
 							end
 							bidList.insert(snap.bidamount);
@@ -137,8 +114,41 @@ function Auctioneer_FinishedAuctionScan_Hook()
 								end
 							end
 							AuctionConfig.success.bid[auctKey][itemKey] = hist;
+						elseif (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
+							-- Whoa! This item was bought out.
+							itemKey = Auctioneer_GetKeyFromSig(iKey);
+							if (not AuctionConfig.success) then AuctionConfig.success = {} end
+
+							x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey);
+							if (buyout > 0) then
+								buyCount = buyCount+1;
+								if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
+								if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
+								buyList = newBalancedList(lMaxBuyoutHistorySize);
+								listStr = AuctionConfig.success.buy[auctKey][itemKey];
+								if (listStr) then
+									listSplit = Auctioneer_Split(listStr, ":");
+									buyList.setList(listSplit);
+								end
+								buyList.insert(buyout);
+
+								hist = "";
+								local listItems = buyList.getList();
+								for pos, item in pairs(listItems) do
+									if (hist == "") then hist = hist..item
+									else hist = hist..":"..item;
+									end
+								end
+								AuctionConfig.success.buy[auctKey][itemKey] = hist;
+							else
+								if (not AuctionConfig.success.drop) then AuctionConfig.success.drop = {} end
+								if (not AuctionConfig.success.drop[auctKey]) then AuctionConfig.success.drop[auctKey] = {} end
+								local cancelCount = tonumber(AuctionConfig.success.drop[auctKey][itemKey]) or 0
+								AuctionConfig.success.drop[auctKey][itemKey] = cancelCount + 1;
+								dropCount = dropCount + 1;
+							end
 						else
-							--p("Expired out");
+							expCount = expCount+1;
 						end
 					end
 						
@@ -150,6 +160,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 				end
 			end
 		end
+		p("Final counts", dropCount, buyCount, bidCount, expCount);
 	end
 
 	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
