@@ -19,7 +19,7 @@ function Auctioneer_BrokerFilter(minProfit, signature)
 		local profitPricePercent = math.floor((profit / buyout) * 100);
 
 		--see if this auction should not be filtered
-		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount > MIN_BUYOUT_SEEN_COUNT) then
+		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
 			filterAuction = false;
 		end
 	end
@@ -58,7 +58,7 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 			if (snap) then
 				local timeLeft = tonumber(snap.timeLeft);
-				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount > MIN_BUYOUT_SEEN_COUNT) then
+				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
 					filterAuction = false;
 				end
 			end
@@ -101,9 +101,9 @@ function Auctioneer_PercentLessFilter(percentLess, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-	local hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+	local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 
-	if hsp > 0 then
+	if hsp > 0 and seenCount >= MIN_BUYOUT_SEEN_COUNT then
 		local profit = (hsp * count) - buyout;
 		--see if this auction should not be filtered
 		if (buyout > 0 and Auctioneer_PercentLessThan(hsp, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then

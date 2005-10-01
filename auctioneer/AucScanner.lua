@@ -466,7 +466,7 @@ function Auctioneer_NewAuction()
 	end
 	local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
 
-	local hsp, hspCount, mktPrice, warn = Auctioneer_GetHSP(itemKey, auctionKey);
+	local hsp, hspCount, mktPrice, warn = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 	if hsp == 0 and buyCount > 0 then
 		hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 	end
