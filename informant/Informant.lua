@@ -77,7 +77,7 @@ function skillToName(userSkill)
 		if (_INFORMANT["Skill"..skillName]) then
 			localized = _INFORMANT["Skill"..skillName]
 		else
-			localized = "Unknown:"..skillName;
+			localized = "Unknown:"..skillName
 		end
 	end
 	return localized, skillName
@@ -123,7 +123,7 @@ function getItem(itemID)
 	else
 		dataItem.classText = catName..addition
 	end
-	
+
 	if (usedby ~= '') then
 		local usedList = split(usedby, ",")
 		local skillName, localized, localeString
@@ -137,7 +137,7 @@ function getItem(itemID)
 				else
 					usage = usage .. ", " .. localized
 				end
-				table.insert(dataItem.usedList, localized);
+				table.insert(dataItem.usedList, localized)
 			end
 		end
 		dataItem.usageText = usage
@@ -236,14 +236,14 @@ function tooltipHandler(frame, name, link, quality, count)
 	local sell = 0
 	local buy = 0
 	local stacks = 1
-	
+
 	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(link)
 	if (itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
-		itemInfo.itemName = name;
-		itemInfo.itemLink = link;
-		itemInfo.itemCount = count;
-		itemInfo.itemQuality = quality;
+		itemInfo.itemName = name
+		itemInfo.itemLink = link
+		itemInfo.itemCount = count
+		itemInfo.itemQuality = quality
 	end
 	if (itemInfo) then
 		stacks = itemInfo.stack
@@ -269,9 +269,9 @@ function tooltipHandler(frame, name, link, quality, count)
 		buy = buy/quant
 	end
 
-	itemInfo.itemBuy = buy;
-	itemInfo.itemSell = sell;
-	itemInfo.itemQuant = quant;
+	itemInfo.itemBuy = buy
+	itemInfo.itemSell = sell
+	itemInfo.itemQuant = quant
 
 	local embedded = getFilter(_INFORMANT['CmdEmbed'])
 
@@ -344,11 +344,11 @@ end
 
 function showHideInfo()
 	if (InformantFrame:IsVisible()) then
-		InformantFrame:Hide();
+		InformantFrame:Hide()
 	elseif (itemInfo) then
 		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
-		local quality = itemInfo.itemQuality or itemInfo.quality or 0;
-		
+		local quality = itemInfo.itemQuality or itemInfo.quality or 0
+
 		local color = "ffffff"
 		if (quality == 4) then color = "a335ee"
 		elseif (quality == 3) then color = "0070dd"
@@ -357,13 +357,13 @@ function showHideInfo()
 		end
 
 		clear()
-		addLine(string.format(_INFORMANT['InfoHeader'], color, itemInfo.itemName));
-	
-		local buy = itemInfo.itemBuy or itemInfo.buy or 0;
-		local sell = itemInfo.itemSell or itemInfo.sell or 0;
-		local quant = itemInfo.itemQuant or itemInfo.quantity or 0;
-		local count = itemInfo.itemCount or 1;
-	
+		addLine(string.format(_INFORMANT['InfoHeader'], color, itemInfo.itemName))
+
+		local buy = itemInfo.itemBuy or itemInfo.buy or 0
+		local sell = itemInfo.itemSell or itemInfo.sell or 0
+		local quant = itemInfo.itemQuant or itemInfo.quantity or 0
+		local count = itemInfo.itemCount or 1
+
 		if ((buy > 0) or (sell > 0)) then
 			local bgsc = EnhTooltip.GetTextGSC(buy)
 			local sgsc = EnhTooltip.GetTextGSC(sell)
@@ -402,30 +402,30 @@ function showHideInfo()
 			if (questCount > 0) then
 				addLine("")
 				addLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed)
-				addLine(string.format(_INFORMANT['InfoQuestHeader'], questCount), "70ee90");
+				addLine(string.format(_INFORMANT['InfoQuestHeader'], questCount), "70ee90")
 				local questName
 				for pos, quest in itemInfo.quests do
-					questName = getQuestName(quest);
-					addLine(string.format(_INFORMANT['InfoQuestName'], quest), "80ee80");
+					questName = getQuestName(quest)
+					addLine(string.format(_INFORMANT['InfoQuestName'], quest), "80ee80")
 				end
 			end
 		end
 
 		if (itemInfo.vendors) then
-			local vendorCount = table.getn(itemInfo.vendors);
+			local vendorCount = table.getn(itemInfo.vendors)
 			if (vendorCount > 0) then
 				addLine("")
-				addLine(string.format(_INFORMANT['InfoVendorHeader'], vendorCount), "ddff40");
+				addLine(string.format(_INFORMANT['InfoVendorHeader'], vendorCount), "ddff40")
 				for pos, merchant in itemInfo.vendors do
-					addLine(string.format(_INFORMANT['InfoVendorName'], merchant), "eeee40");
+					addLine(string.format(_INFORMANT['InfoVendorName'], merchant), "eeee40")
 				end
 			end
 		end
-		InformantFrame:Show();
+		InformantFrame:Show()
 	else
-		clear();
-		addLine(_INFORMANT['InfoNoItem'], "ff4010");
-		InformantFrame:Show();
+		clear()
+		addLine(_INFORMANT['InfoNoItem'], "ff4010")
+		InformantFrame:Show()
 	end
 end
 
@@ -433,32 +433,34 @@ end
 function frameConfig()
 	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
 
-	this:RegisterEvent("ADDON_LOADED");
+	this:RegisterEvent("ADDON_LOADED")
 end
 
 function processEvent(event)
 	if (event == "ADDON_LOADED") then
-		if (arg1 == "Informat") then
-			if (not InformatConfig) then
-				InformatConfig = { };
+		if (arg1 == "Informant") then
+			if (not Informant) then
+				InformantConfig = { }
 			end
 
-			if (InformatConfig.position) then
-				InformatFrame:ClearAllPoints();
-				InformatFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformatConfig.position.x, InformatConfig.position.y);
+			if (InformantConfig.position) then
+				InformantFrame:ClearAllPoints()
+				InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
 			end
 
 			if (not InformantConfig.welcomed) then
-				clear();
-				addLine(_INFORMANT['Welcome']);
-				InformantConfig.welcomed = true;
+				clear()
+				addLine(_INFORMANT['Welcome'])
+				InformantConfig.welcomed = true
 			end
+
+			Informant.InitCommands()
 		end
 	elseif (event == "PLAYER_LEAVING_WORLD") then
-		if (not InformatConfig.position) then
-			InformatConfig.position = { };
+		if (not InformantConfig.position) then
+			InformantConfig.position = { }
 		end
-		InformatConfig.position.x, InformatConfig.position.y = InformatFrame:GetCenter();
+		InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
 	end
 end
 
@@ -478,7 +480,7 @@ function scrollUpdate(offset)
 		if (not offset) then
 			offset = FauxScrollFrame_GetOffset(InformantFrameScrollBar)
 		else
-			if (offset > numLines - 25) then offset = numLines - 25; end
+			if (offset > numLines - 25) then offset = numLines - 25 end
 			FauxScrollFrame_SetOffset(InformantFrameScrollBar, offset)
 		end
 	else
@@ -496,7 +498,7 @@ function scrollUpdate(offset)
 		end
 	end
 	if (numLines > 25) then
-		FauxScrollFrame_Update(InformantFrameScrollBar, numLines, 25, numLines) 
+		FauxScrollFrame_Update(InformantFrameScrollBar, numLines, 25, numLines)
 		InformantFrameScrollBar:Show()
 	else
 		InformantFrameScrollBar:Hide()
@@ -512,7 +514,7 @@ function addLine(text, color)
 	end
 
 	if (not text) then
-		table.insert(lines, "nil");
+		table.insert(lines, "nil")
 	elseif (color) then
 		table.insert(lines, string.format("|cff%s%s|r", color, text))
 	else
