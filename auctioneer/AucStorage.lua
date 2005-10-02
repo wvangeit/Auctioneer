@@ -21,3 +21,18 @@ function Auctioneer_SetHistMed(auctKey, itemKey, median, count)
 		AuctionConfig.stats.histcount[auctKey][itemKey] = 0
 	end
 end
+
+function Auctioneer_SetSnapMed(auctKey, itemKey, median, count)
+	if (not AuctionConfig.stats)                    then AuctionConfig.stats = {}                    end
+	if (not AuctionConfig.stats.snapmed)            then AuctionConfig.stats.snapmed = {}            end
+	if (not AuctionConfig.stats.snapmed[auctKey])   then AuctionConfig.stats.snapmed[auctKey] = {}   end
+	if (not AuctionConfig.stats.snapcount)          then AuctionConfig.stats.snapcount = {}          end
+	if (not AuctionConfig.stats.snapcount[auctKey]) then AuctionConfig.stats.snapcount[auctKey] = {} end
+	if (count >= MIN_BUYOUT_SEEN_COUNT) then
+		AuctionConfig.stats.snapmed[auctKey][itemKey]   = median
+		AuctionConfig.stats.snapcount[auctKey][itemKey] = count
+	else
+		AuctionConfig.stats.snapmed[auctKey][itemKey]   = 0
+		AuctionConfig.stats.snapcount[auctKey][itemKey] = 0
+	end
+end

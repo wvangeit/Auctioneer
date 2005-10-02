@@ -107,31 +107,19 @@ end
 
 -- Returns the current snapshot median for an item
 function Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices)
+	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
 	if (not buyoutPrices) then
-		buyoutPrices = {};
-		if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
 		local sbuy = Auctioneer_GetSnapshotInfo(auctKey, itemKey);
-		if (sbuy) then
-			buyoutPrices = sbuy.buyoutPrices;
-		else
+		if (not sbuy) then
 			return 0, 0;
 		end
+		buyoutPrices = sbuy.buyoutPrices;
 	end
 
 	local snapMedian, snapSeenCount = Auctioneer_GetMedian(buyoutPrices);
 
-	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
-	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
-	if (not AuctionConfig.stats.snapmed[auctKey]) then AuctionConfig.stats.snapmed[auctKey] = {} end
-	if (not AuctionConfig.stats.snapcount) then AuctionConfig.stats.snapcount = {} end
-	if (not AuctionConfig.stats.snapcount[auctKey]) then AuctionConfig.stats.snapcount[auctKey] = {} end
-	if (snapSeenCount >= MIN_BUYOUT_SEEN_COUNT) then
-		AuctionConfig.stats.snapmed[auctKey][itemKey] = snapMedian;
-		AuctionConfig.stats.snapcount[auctKey][itemKey] = snapSeenCount;
-	else
-		AuctionConfig.stats.snapmed[auctKey][itemKey] = 0;
-		AuctionConfig.stats.snapcount[auctKey][itemKey] = 0;
-	end
+	-- save median to the savedvariablesfile
+    Auctioneer_SetSnapMed(auctKey, itemKey, snapMedian, snapSeenCount)
 
 	return tonumber(snapMedian) or 0, snapSeenCount or 0;
 end
@@ -141,8 +129,6 @@ function Auctioneer_GetSnapMedian(itemKey, auctKey, buyoutPrices)
 	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.snapmed and AuctionConfig.stats.snapmed[auctKey]) then
 		stat = AuctionConfig.stats.snapmed[auctKey][itemKey];
-	end
-	if (AuctionConfig.stats and AuctionConfig.stats.snapcount and AuctionConfig.stats.snapcount[auctKey]) then
 		count = AuctionConfig.stats.snapcount[auctKey][itemKey];
 	end
 	if (not stat) then
@@ -156,14 +142,14 @@ function Auctioneer_GetItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistor
 	local historySeenCount = 0;
 	if (not auctKey) then auctKey = Auctioneer_GetAuctionKey() end
 	if (not buyoutHistoryTable) then
-		local buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
+		buyoutHistoryTable = Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey);
 	end
 	if (buyoutHistoryTable) then
 		historyMedian, historySeenCount = Auctioneer_GetMedian(buyoutHistoryTable);
 	end
 
 	-- save median to the savedvariablesfile
-	Auctioneer_SetHistMed(auctKey, itemKey, historyMedian, historySeenCount)
+	Auctioneer_SetHistMed(auctKey, itemKey, historyMedian, historySeenCount);
 
 	return tonumber(historyMedian) or 0, tonumber(historySeenCount) or 0;
 end
@@ -173,8 +159,6 @@ function Auctioneer_GetHistMedian(itemKey, auctKey, buyoutHistoryTable)
 	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.histmed and AuctionConfig.stats.histmed[auctKey]) then
 		stat = AuctionConfig.stats.histmed[auctKey][itemKey];
-	end
-	if (AuctionConfig.stats.histcount and AuctionConfig.stats.histcount[auctKey]) then
 		count = AuctionConfig.stats.histcount[auctKey][itemKey];
 	end
 	if (not stat) then

@@ -98,23 +98,10 @@ function Auctioneer_FinishedAuctionScan_Hook()
 							if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
 							if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
 							bidList = newBalancedList(lMaxBuyoutHistorySize);
-							listStr = AuctionConfig.success.bid[auctKey][itemKey];
-							if (listStr) then
-								listSplit = Auctioneer_Split(listStr, ":");
-								bidList.setList(listSplit);
-							end
+							bidList.setList(Auctioneer_LoadMedianList(AuctionConfig.success.bid[auctKey][itemKey]));
 							bidList.insert(snap.bidamount);
-
-							hist = "";
-							if (bidList and bidList.list) then
-								for pos, item in pairs(bidList.list) do
-									if (hist == "") then hist = hist..item
-									else hist = hist..":"..item;
-									end
-								end
-							end
-							AuctionConfig.success.bid[auctKey][itemKey] = hist;
-						elseif (expiredSeconds < TIME_LEFT_SECONDS[tonumber(snap.timeLeft)]) then
+							AuctionConfig.success.bid[auctKey][itemKey] = Auctioneer_StoreMedianList (bidList.getList());
+						elseif (expiredSeconds < TIME_LEFT_SECONDS[snap.timeLeft]) then
 							-- Whoa! This item was bought out.
 							itemKey = Auctioneer_GetKeyFromSig(iKey);
 							if (not AuctionConfig.success) then AuctionConfig.success = {} end
@@ -125,21 +112,9 @@ function Auctioneer_FinishedAuctionScan_Hook()
 								if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
 								if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
 								buyList = newBalancedList(lMaxBuyoutHistorySize);
-								listStr = AuctionConfig.success.buy[auctKey][itemKey];
-								if (listStr) then
-									listSplit = Auctioneer_Split(listStr, ":");
-									buyList.setList(listSplit);
-								end
+								buyList.setList(Auctioneer_LoadMedianList(AuctionConfig.success.buy[auctKey][itemKey]));
 								buyList.insert(buyout);
-
-								hist = "";
-								local listItems = buyList.getList();
-								for pos, item in pairs(listItems) do
-									if (hist == "") then hist = hist..item
-									else hist = hist..":"..item;
-									end
-								end
-								AuctionConfig.success.buy[auctKey][itemKey] = hist;
+								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer_StoreMedianList (buyList.getList());
 							else
 								if (not AuctionConfig.success.drop) then AuctionConfig.success.drop = {} end
 								if (not AuctionConfig.success.drop[auctKey]) then AuctionConfig.success.drop[auctKey] = {} end
@@ -153,7 +128,6 @@ function Auctioneer_FinishedAuctionScan_Hook()
 					end
 						
 					if (string.sub(iData, 1,1) == "1") then
-						
 						AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
 						lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
 					end
@@ -167,17 +141,9 @@ function Auctioneer_FinishedAuctionScan_Hook()
 	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
 
 	-- Copy the item prices into the Saved item prices table
-	local hist = "";
 	if (lSnapshotItemPrices) then
 		for sig, iData in pairs(lSnapshotItemPrices) do
-			hist = "";
-			if (iData.buyoutPrices) then
-				for pos, hPrice in pairs(iData.buyoutPrices) do
-					if (hist == "") then hist = string.format("%d", hPrice);
-					else hist = string.format("%s:%d", hist, hPrice); end
-				end
-			end
-			AuctionConfig.sbuy[auctKey][sig] = hist;
+			AuctionConfig.sbuy[auctKey][sig] = Auctioneer_StoreMedianList(iData.buyoutPrices);
 			lSnapshotItemPrices[sig] = nil;
 		end
 	end
@@ -244,6 +210,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 			lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
 		else
 			table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
+			table.sort(lSnapshotItemPrices[aiKey].buyoutPrices);
 		end
 	end
 
@@ -341,13 +308,8 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 	if (not AuctionConfig.bids[playerName]) then
 		AuctionConfig.bids[playerName] = {};
 	end
-	AuctionConfig.bids[playerName][eventTime] = {
-		signature = auctionSignature,
-		bidAmount = bidamount,
-		itemOwner = aiOwner,
-		prevBidder = aiHighBidder,
-		itemWon = false;
-	}
+
+	AuctionConfig.bids[playerName][eventTime] = string.format("%s|%s|%s|%s|%s", auctionSignature, bidamount, 0, aiOwner, aiHighBidder or "unknown");
 
 	if bidamount == aiBuyout then -- only capture buyouts
 		-- remove from snapshot
@@ -357,7 +319,7 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 		if (itemCat and AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey] and AuctionConfig.snap[auctKey][itemCat]) then
 			AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		end
-		AuctionConfig.bids[playerName][eventTime].itemWon = true;
+		AuctionConfig.bids[playerName][eventTime] = string.format("%s|%s|%s|%s|%s", auctionSignature, bidamount, 1, aiOwner, aiHighBidder or "unknown");
 		Auctioneer_HSPCache[auctKey][aiKey] = nil;
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	end

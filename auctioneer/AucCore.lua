@@ -94,6 +94,51 @@ function Auctioneer_GetItemDataByID(itemID)
 	return nil; 
 end
 
+function Auctioneer_StoreMedianList(list)
+	local hist = "";
+	local function GrowList(last, n)
+		if (n == 1) then
+			if (hist == "") then hist = last;
+			else hist = string.format("%s:%d", hist, last); end
+		elseif (n ~= 0) then
+			if (hist == "") then hist = string.format("%dx%d", last, n);
+			else hist = string.format("%s:%dx%d", hist, last, n); end
+		end
+	end
+	local n = 0;
+	local last = 0;
+	for pos, hPrice in pairs(list) do
+		if (pos == 1) then
+			last = hPrice;
+		elseif (hPrice ~= last) then
+			GrowList(last, n)
+			last = hPrice;
+			n = 0;
+		end
+		n = n + 1
+	end
+	GrowList(last, n)
+	return hist;
+end
+
+function Auctioneer_LoadMedianList(str)
+	local splut = {};
+	if (str) then
+		for x,c in string.gfind(str, '([^%:]*)(%:?)') do
+			local _,_,y,n = string.find(x, '(%d*)x(%d*)')
+			if (y == nil) then
+				table.insert(splut, tonumber(x));
+			else
+				for i = 1,n do
+					table.insert(splut, tonumber(y));
+				end
+			end
+			if (c == '') then break end
+		end
+	end
+	return splut;
+end
+
 -- Returns an AuctionConfig.data item from the table based on an item name
 function Auctioneer_GetAuctionPriceItem(itemKey, from)
 	local serverFaction;
@@ -117,12 +162,12 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 	if (data) then
 		local dataItem = Auctioneer_Split(data, "|");
 		auctionPriceItem.data = dataItem[1];
-		auctionPriceItem.buyoutPricesHistoryList = Auctioneer_Split(dataItem[2], ":");
+		auctionPriceItem.buyoutPricesHistoryList = Auctioneer_LoadMedianList(dataItem[2]);
 	end
 	if (info) then
 		local infoItem = Auctioneer_Split(info, "|");
-		auctionPriceItem.category = infoItem[2];
-		auctionPriceItem.name = infoItem[3];
+		auctionPriceItem.category = infoItem[1];
+		auctionPriceItem.name = infoItem[2];
 	end
 
 	local playerMade, reqSkill, reqLevel = Auctioneer_IsPlayerMade(itemKey);
@@ -142,13 +187,7 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (not AuctionConfig.data) then AuctionConfig.data = {}; end
 	if (not AuctionConfig.data[auctKey]) then AuctionConfig.data[auctKey] = {}; end
 
-	local hist = "";
-	if (iData and iData.buyoutPricesHistoryList) then
-		for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
-			if (hist == "") then hist = string.format("%d", hPrice);
-			else hist = string.format("%s:%d", hist, hPrice); end
-		end
-	end
+	local hist = Auctioneer_StoreMedianList(iData.buyoutPricesHistoryList);
 
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
 	AuctionConfig.info[itemKey] = string.format("%s|%s", iData.category, iData.name);
@@ -196,7 +235,7 @@ function Auctioneer_GetItemCategory(itemKey)
 		category = auctionItem.category;
 	end
 
-	return auctionItem.category;
+	return category;
 end
 
 function Auctioneer_IsPlayerMade(itemKey)
@@ -248,15 +287,15 @@ function Auctioneer_GetSnapshotFromData(snap)
 
 	for dirty,bid,level,quality,left,fseen,last,link,owner in string.gfind(snap, "(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);([^;]+);(.+)") do
 		return {
-			bidamount = bid,
+			bidamount = tonumber(bid),
 			owner = owner,
 			dirty = dirty,
-			lastSeenTime = last,
+			lastSeenTime = tonumber(last),
 			itemLink = link,
 			category = cat,
-			initialSeenTime = fseen,
+			initialSeenTime = tonumber(fseen),
 			level = level,
-			timeLeft = left,
+			timeLeft = tonumber(left),
 			quality = quality,
 		};
 	end
@@ -273,7 +312,7 @@ function Auctioneer_GetSnapshotInfo(auctKey, itemKey)
 end
 
 function Auctioneer_GetSnapshotInfoFromData(buy)
-	local buysplit = Auctioneer_Split(buy, ":");
+	local buysplit = Auctioneer_LoadMedianList(buy);
 	return {
 		buyoutPrices = buysplit,
 	};
@@ -313,14 +352,7 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 end
 
 function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
-	local hist = "";
-	if (iData and iData.buyoutPrices) then
-		for pos, hPrice in pairs(iData.buyoutPrices) do
-			if (hist == "") then hist = string.format("%d", hPrice);
-			else hist = string.format("%s:%d", hist, hPrice); end
-		end
-	end
-	AuctionConfig.sbuy[server][itemKey] = hist;
+	AuctionConfig.sbuy[server][itemKey] = Auctioneer_StoreMedianList(iData.buyoutPrices);
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
