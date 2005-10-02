@@ -240,12 +240,13 @@ function tooltipHandler(frame, name, link, quality, count)
 	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(link)
 	if (itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
+	end
+	if (itemInfo) then
 		itemInfo.itemName = name
 		itemInfo.itemLink = link
 		itemInfo.itemCount = count
 		itemInfo.itemQuality = quality
-	end
-	if (itemInfo) then
+
 		stacks = itemInfo.stack
 		if (not stacks) then stacks = 1 end
 
