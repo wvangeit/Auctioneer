@@ -43,7 +43,7 @@ function Informant_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
 	
 	
-	BINDING_HEADER_INFORMANT_HEADER = "Informer"
+	BINDING_HEADER_INFORMANT_HEADER = "Informant"
 	BINDING_NAME_INFORMANT_POPUPDOWN = "Toggle Information Window"
 	
 	_INFORMANT['Welcome'] = {
@@ -132,6 +132,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['CmdDefault'] = "default"
 	_INFORMANT['CmdLocale'] = "locale"
 	_INFORMANT['CmdEmbed'] = "embed"
+	_INFORMANT['CmdClearAll'] = "all";
 	
 	_INFORMANT['OptLocale'] = "<locale>"
 	
@@ -161,6 +162,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['FrmtActUnknown'] = "Unknown command keyword: '%s'"
 	_INFORMANT['FrmtActDefaultall'] = "All informant options have been reset to default settings."
 	_INFORMANT['FrmtActDefault'] = "Informant's %s option has been reset to its default setting"
+	_INFORMANT['FrmtUnknownLocale'] = "The locale you specified ('%s') is unknown. Valid locales are:";
 	
 	
 	

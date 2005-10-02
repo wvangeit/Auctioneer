@@ -9,7 +9,7 @@
 --]]
 
 
-local doHelp, onOff, genVarSet, chatPrint, registerKhaos
+local commandHandler, doHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, setLocale, getLocale
 
 Informant_Slash_Registered = nil
 Informant_GUI_Registered = nil
@@ -21,7 +21,7 @@ Informant.InitCommands = function()
 	SLASH_INFORMANT3 = "/info"
 	SLASH_INFORMANT4 = "/inf"
 	SlashCmdList["INFORMANT"] = function(msg)
-		Informant.CommandHandler(msg, nil)
+		Informant.commandHandler(msg, nil)
 	end
 
 	if (Khaos) then
@@ -35,7 +35,7 @@ end
 
 
 --Cleaner Command Handling Functions (added by MentalPower)
-Informant.CommandHandler = function (command, source)
+Informant.commandHandler = function (command, source)
 
 	--To print or not to print, that is the question...
 	local chatprint = nil
@@ -50,17 +50,17 @@ Informant.CommandHandler = function (command, source)
 
 	--Now for the real Command handling
 	if ((cmd == "") or (cmd == "help")) then
-		doHelp()
+		Informant.doHelp()
 		return
 
 	elseif (((cmd == _INFORMANT['CmdOn']) or (cmd == "on")) or ((cmd == _INFORMANT['CmdOff']) or (cmd == "off")) or ((cmd == _INFORMANT['CmdToggle']) or (cmd == "toggle"))) then
-		onOff(cmd, chatprint)
+		Informant.onOff(cmd, chatprint)
 
 	elseif ((cmd == _INFORMANT['CmdLocale']) or (cmd == "locale")) then
-		setLocale(param, chatprint)
+		Informant.setLocale(param, chatprint)
 
 	elseif ((cmd == _INFORMANT['CmdDefault']) or (cmd == "default")) then
-		restoreDefault(param, chatprint)
+		Informant.restoreDefault(param, chatprint)
 
 	elseif (
 		((cmd == _INFORMANT['CmdEmbed']) or (cmd == "embed")) or
@@ -72,7 +72,7 @@ Informant.CommandHandler = function (command, source)
 		((cmd == _INFORMANT['ShowVendorBuy']) or (cmd == "show-vendor-buy")) or
 		((cmd == _INFORMANT['ShowVendorSell']) or (cmd == "show-vendor-sell"))
 	) then
-		genVarSet(cmd, param, chatprint)
+		Informant.genVarSet(cmd, param, chatprint)
 
 	else
 		if (chatprint == true) then
@@ -130,9 +130,9 @@ function onOff(state, chatprint)
 		state = Informant.GetFilterVal("all")
 
 		if (state == "off") then
-			Informant.SetFilter("all", "on")
+			Informant.setFilter("all", "on")
 		else
-			Informant.SetFilter("all", "off")
+			Informant.setFilter("all", "off")
 		end
 	end
 
@@ -156,15 +156,84 @@ function onOff(state, chatprint)
 	return state
 end
 
+function setLocale(param, chatprint)
+
+local validLocale=nil;
+
+	if (param == Informant.getLocale()) then
+		--Do Nothing
+		validLocale=true;
+	elseif (INFORMANT_VALID_LOCALES[param]) then
+		Informant.setFilter('locale', param);
+		Informant_SetLocaleStrings(Informant.getLocale());
+		validLocale=true;
+
+	elseif (param == '') or (param == 'default') or (param == 'off') then
+		Informant.setFilter('locale', 'default');
+		Informant_SetLocaleStrings(Informant.getLocale());
+		validLocale=true;
+	end
+	
+	
+	if (chatprint == true) then
+
+		if ((validLocale == true) and (INFORMANT_VALID_LOCALES[param])) then
+			Informant.chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], param));
+			
+			if (Informant_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Informant", "InformantLocale", "value", param);
+			end
+
+		elseif (validLocale == nil) then
+			Informant.chatPrint(string.format(_INFORMANT['FrmtUnknownLocale'], param));
+
+			if (INFORMANT_VALID_LOCALES) then
+				for locale, x in pairs(INFORMANT_VALID_LOCALES) do
+					Informant.chatPrint("  "..locale);
+				end
+			end
+
+		else
+			Informant.chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], 'default'));
+
+			if (Informant_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Informant", "InformantLocale", "value", "default");
+			end
+		end
+	end
+end
+
+function restoreDefault(param, chatprint)
+	if ( (param == nil) or (param == "") ) then
+		return
+
+	elseif ((param == _INFORMANT['CmdClearAll']) or (param == "all")) then
+		InformantConfig.filters = {};
+
+	else
+		Informant.setFilter(param, nil);
+	end
+
+	--@TODO: Move the default setting for the different functions over here to be able to communicate to Khaos what those setting are.
+	if (chatprint == true) then
+		if ((param == _INFORMANT['CmdClearAll']) or (param == "all")) then
+			Informant.chatPrint(_INFORMANT['FrmtActDefaultall']);
+
+		else
+			Informant.chatPrint(string.format(_INFORMANT['FrmtActDefault'], param));
+		end
+	end
+end
+
 function genVarSet(variable, param, chatprint)
 	if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
-		Informant.SetFilter(variable, "on")
+		Informant.setFilter(variable, "on")
 
 	elseif ((param == _INFORMANT['CmdOff']) or (param == "off")) then
-		Informant.SetFilter(variable, "off")
+		Informant.setFilter(variable, "off")
 
 	elseif ((param == _INFORMANT['CmdToggle']) or (param == "toggle") or (param == nil) or (param == "")) then
-		param = Informant.GetFilterVal(variable)
+		param = Informant.getFilterVal(variable)
 
 		if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
 			param = _INFORMANT['CmdOff']
@@ -173,7 +242,7 @@ function genVarSet(variable, param, chatprint)
 			param = _INFORMANT['CmdOn']
 		end
 
-		Informant.SetFilter(variable, param)
+		Informant.setFilter(variable, param)
 	end
 
 	if (chatprint == true) then
@@ -181,33 +250,15 @@ function genVarSet(variable, param, chatprint)
 		if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
 			Informant.ChatPrint(string.format(_INFORMANT['FrmtActEnable'], variable))
 
-			--Account for different key name in the embed variable
-			if ((variable == _INFORMANT['CmdEmbed']) or (variable == "embed")) then
-
-				if (Informant_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Informant", "InformantEmbed", "checked", true)
-				end
-			else
-
-				if (Informant_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Informant", variable, "checked", true)
-				end
+			if (Informant_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Informant", variable, "checked", true)
 			end
 
 		elseif ((param == _INFORMANT['CmdOff']) or (param == "off")) then
 			Informant.ChatPrint(string.format(_INFORMANT['FrmtActDisable'], variable))
 
-			--Account for different key name in the embed variable
-			if ((variable == _INFORMANT['CmdEmbed']) or (variable == "embed")) then
-
-				if (Informant_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Informant", "InformantEmbed", "checked", false)
-				end
-			else
-
-				if (Informant_Khaos_Registered) then
-					Khaos.setSetKeyParameter("Informant", variable, "checked", false)
-				end
+			if (Informant_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Informant", variable, "checked", false)
 			end
 		end
 	end
@@ -249,9 +300,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpOnoff'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_OnOff(_INFORMANT['CmdOn'])
+						Informant.onOff(_INFORMANT['CmdOn'])
 					else
-						Informant_OnOff(_INFORMANT['CmdOff'])
+						Informant.onOff(_INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -275,16 +326,16 @@ function registerKhaos()
 				text=_INFORMANT['GuiLocale'],
 				helptext=_INFORMANT['HelpLocale'],
 				callback = function(state)
-					Informant_SetLocale(state.value)
+					Informant.setLocale(state.value)
 				end,
 				feedback = function (state)
 					return string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], state.value)
 				end,
 				default = {
-					value = Informant_GetLocale()
+					value = Informant.getLocale()
 				},
 				disabled = {
-					value = Informant_GetLocale()
+					value = Informant.getLocale()
 				},
 				dependencies={InformantEnable={checked=true}},
 				difficulty=2,
@@ -300,7 +351,9 @@ function registerKhaos()
 				callback=function()
 					ReloadUI()
 				end,
-				feedback=_INFORMANT['GuiReloaduiFeedback'],
+				feedback=function()
+					return _INFORMANT['GuiReloaduiFeedback'];
+				end;
 				difficulty=3,
 			},
 			{
@@ -318,9 +371,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpStack'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -344,9 +397,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpUsage'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -370,9 +423,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpQuest'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -396,9 +449,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpMerchant'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -429,9 +482,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpVendor'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -454,9 +507,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpVendorBuy'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -479,9 +532,9 @@ function registerKhaos()
 				helptext=_INFORMANT['HelpVendorSell'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -507,15 +560,14 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['CmdEmbed'],
-				key="InformantEmbed",
 				type=K_TEXT,
 				text=_INFORMANT['GuiEmbed'],
 				helptext=_INFORMANT['HelpEmbed'],
 				callback=function(state)
 					if (state.checked) then
-						Informant_GenVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOn'])
+						Informant.genVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOn'])
 					else
-						Informant_GenVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOff'])
+						Informant.genVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -547,9 +599,11 @@ function registerKhaos()
 				text=_INFORMANT['GuiDefaultAll'],
 				helptext=_INFORMANT['GuiDefaultAllHelp'],
 				callback=function()
-					Informant_Default(_INFORMANT['CmdClearAll'])
+					Informant.restoreDefault(_INFORMANT['CmdClearAll'])
 				end,
-				feedback=_INFORMANT['FrmtActDefaultall'],
+				feedback=function()
+					return _INFORMANT['FrmtActDefaultall'];
+				end;
 				dependencies={InformantEnable={checked=true}},
 				difficulty=1,
 			},
@@ -562,7 +616,7 @@ function registerKhaos()
 				text=_INFORMANT['GuiDefaultOption'],
 				helptext=_INFORMANT['HelpDefault'],
 				callback = function(state)
-					Informant_Default(state.value)
+					Informant.restoreDefault(state.value)
 				end,
 				feedback = function (state)
 					if (state.value == _INFORMANT['CmdClearAll']) then
@@ -578,7 +632,7 @@ function registerKhaos()
 					value = nil
 				},
 				dependencies={InformantEnable={checked=true}},
-				difficulty=3,
+				difficulty=4,
 			},
 		}
 	}
@@ -594,4 +648,12 @@ function chatPrint(msg)
 	if (DEFAULT_CHAT_FRAME) then 
 		DEFAULT_CHAT_FRAME:AddMessage(msg, 0.0, 0.25, 1.0);
 	end
+end
+
+function getLocale()
+	local locale = Informant.getFilterVal('locale');
+	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
+		return locale;
+	end
+	return GetLocale();
 end
