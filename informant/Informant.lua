@@ -549,7 +549,7 @@ Informant = {
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
-	SetFilter = setFilter,
+	SetFilter = setFilter
 }
 
 

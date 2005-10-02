@@ -21,7 +21,7 @@ Informant.InitCommands = function()
 	SLASH_INFORMANT3 = "/info"
 	SLASH_INFORMANT4 = "/inf"
 	SlashCmdList["INFORMANT"] = function(msg)
-		Informant.commandHandler(msg, nil)
+		commandHandler(msg, nil)
 	end
 
 	if (Khaos) then
@@ -35,7 +35,7 @@ end
 
 
 --Cleaner Command Handling Functions (added by MentalPower)
-Informant.commandHandler = function (command, source)
+commandHandler = function (command, source)
 
 	--To print or not to print, that is the question...
 	local chatprint = nil
@@ -302,7 +302,7 @@ function registerKhaos()
 					if (state.checked) then
 						onOff(_INFORMANT['CmdOn'])
 					else
-						nOff(_INFORMANT['CmdOff'])
+						onOff(_INFORMANT['CmdOff'])
 					end
 				end,
 				feedback=function(state)
@@ -626,10 +626,10 @@ function registerKhaos()
 					end
 				end,
 				default = {
-					value = nil
+					value = ""
 				},
 				disabled = {
-					value = nil
+					value = ""
 				},
 				dependencies={InformantEnable={checked=true}},
 				difficulty=4,
