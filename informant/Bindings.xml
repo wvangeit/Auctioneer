@@ -1,0 +1,12 @@
+<Bindings>
+<!--
+
+	Informant
+	Version: <%version%>
+
+-->
+	<!-- Pop up and down the information window -->
+	<Binding name="INFORMANT_POPUPDOWN" header="INFORMANT_HEADER">
+		Informant.ShowHideInfo();
+	</Binding>
+</Bindings>
