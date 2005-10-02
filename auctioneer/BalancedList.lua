@@ -22,7 +22,7 @@ function newBalancedList(paramSize)
 
         local insertPos = 0
         local left      = 1
-        local right     = getn(self.list)
+        local right     = table.getn(self.list)
 		local middleVal
         local middle
         -- insert in sorded order
