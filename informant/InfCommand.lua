@@ -85,10 +85,10 @@ end
 function doHelp()
 
 	local onOffToggle = " (".._INFORMANT['CmdOn'].."|".._INFORMANT['CmdOff'].."|".._INFORMANT['CmdToggle']..")"
-	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s"
+	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
 	chatPrint(_INFORMANT['TextUsage'])
-	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cff2040ff["..Informant.GetFilterVal("all").."]|r - " .. _INFORMANT['HelpOnoff'])
+	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..Informant.GetFilterVal("all").."]|r - " .. _INFORMANT['HelpOnoff'])
 
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendor'], Informant.GetFilterVal(_INFORMANT['ShowVendor']), _INFORMANT['HelpVendor']))
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], Informant.GetFilterVal(_INFORMANT['ShowVendorSell']), _INFORMANT['HelpVendorSell']))
@@ -97,7 +97,7 @@ function doHelp()
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowStack'], Informant.GetFilterVal(_INFORMANT['ShowStack']), _INFORMANT['HelpStack']))
 	chatPrint(string.format(lineFormat, _INFORMANT['CmdEmbed'], Informant.GetFilterVal(_INFORMANT['CmdEmbed']), _INFORMANT['HelpEmbed']))
 
-	lineFormat = "  |cffffffff/informant %s %s|r |cff2040ff[%s]|r - %s"
+	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
 	chatPrint(string.format(lineFormat, _INFORMANT['CmdLocale'], _INFORMANT['OptLocale'], Informant.GetFilterVal('locale'), _INFORMANT['HelpLocale']))
 
 	lineFormat = "  |cffffffff/informant %s %s|r - %s"
