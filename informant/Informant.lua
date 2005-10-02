@@ -241,34 +241,34 @@ function tooltipHandler(frame, name, link, quality, count)
 	if (itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
 	end
-	if (itemInfo) then
-		itemInfo.itemName = name
-		itemInfo.itemLink = link
-		itemInfo.itemCount = count
-		itemInfo.itemQuality = quality
+	if (not itemInfo) then return end
+	
+	itemInfo.itemName = name
+	itemInfo.itemLink = link
+	itemInfo.itemCount = count
+	itemInfo.itemQuality = quality
 
-		stacks = itemInfo.stack
-		if (not stacks) then stacks = 1 end
+	stacks = itemInfo.stack
+	if (not stacks) then stacks = 1 end
 
-		buy = tonumber(itemInfo.buy) or 0
-		sell = tonumber(itemInfo.sell) or 0
-		quant = tonumber(itemInfo.quantity) or 0
+	buy = tonumber(itemInfo.buy) or 0
+	sell = tonumber(itemInfo.sell) or 0
+	quant = tonumber(itemInfo.quantity) or 0
 
-		if (quant == 0) and (sell > 0) then
-			local ratio = buy / sell
+	if (quant == 0) and (sell > 0) then
+		local ratio = buy / sell
+		if ((ratio > 3) and (ratio < 6)) then
+			quant = 1
+		else
+			ratio = buy / (sell * 5)
 			if ((ratio > 3) and (ratio < 6)) then
-				quant = 1
-			else
-				ratio = buy / (sell * 5)
-				if ((ratio > 3) and (ratio < 6)) then
-					quant = 5
-				end
+				quant = 5
 			end
 		end
-		if (quant == 0) then quant = 1 end
-
-		buy = buy/quant
 	end
+	if (quant == 0) then quant = 1 end
+
+	buy = buy/quant
 
 	itemInfo.itemBuy = buy
 	itemInfo.itemSell = sell
@@ -310,7 +310,7 @@ function tooltipHandler(frame, name, link, quality, count)
 			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], stacks), nil, embedded)
 		end
 	end
-	if (itemInfo and getFilter(_INFORMANT['ShowMerchant'])) then
+	if (getFilter(_INFORMANT['ShowMerchant'])) then
 		if (itemInfo.vendors) then
 			local merchantCount = table.getn(itemInfo.vendors)
 			if (merchantCount > 0) then
@@ -319,7 +319,7 @@ function tooltipHandler(frame, name, link, quality, count)
 			end
 		end
 	end
-	if (itemInfo and getFilter(_INFORMANT['ShowUsage'])) then
+	if (getFilter(_INFORMANT['ShowUsage'])) then
 		local reagentInfo = ""
 		if (itemInfo.classText) then
 			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
@@ -332,7 +332,7 @@ function tooltipHandler(frame, name, link, quality, count)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 	end
-	if (itemInfo and getFilter(_INFORMANT['ShowQuest'])) then
+	if (getFilter(_INFORMANT['ShowQuest'])) then
 		if (itemInfo.quests) then
 			local questCount = table.getn(itemInfo.quests)
 			if (questCount > 0) then
@@ -381,7 +381,7 @@ function showHideInfo()
 		end
 
 		if (itemInfo.stack > 1) then
-			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], itemInfo.stack))
+			addLine(string.format(_INFORMANT['FrmtInfoStx'], itemInfo.stack))
 		end
 
 		local reagentInfo = ""
