@@ -547,6 +547,9 @@ Informant = {
 	FrameActive = frameActive,
 	ProcessEvent = processEvent,
 	ScrollUpdate = scrollUpdate,
+	GetFilter = getFilter,
+	GetFilterVal = getFilterVal,
+	SetFilter = setFilter,
 }
 
 
