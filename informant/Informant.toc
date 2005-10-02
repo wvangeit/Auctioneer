@@ -4,6 +4,7 @@
 ## Revision: $Id$
 ## Notes: Displays item info in tootips.
 ## Dependancies: EnhTooltip
+## OptionalDeps: Khaos
 ## SavedVariables: InformantConfig
 Informant.xml
 
