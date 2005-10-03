@@ -281,7 +281,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	
 	
 	_AUCT['AuctionScanStart'] = "Auctioneer: scanning %s page 1...";
-	_AUCT['AuctionPageN'] = "Auctioneer: scanning %s page %d of %d";
+	_AUCT['AuctionPageN'] = "Auctioneer: scanning %s page %d of %d\nAuctions per second: %s\nEstimated time left: %s";
 	_AUCT['AuctionScanDone'] = "Auctioneer: auction scanning finished";
 	_AUCT['AuctionScanNexttime'] = "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 	_AUCT['AuctionScanNocat'] = "You must have at least one category selected to scan.";

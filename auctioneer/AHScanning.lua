@@ -9,6 +9,7 @@ local lCurrentCategoryIndex;
 local lIsPageScanned;
 local lScanInProgress;
 local lFullScan;
+local lScanStartedAt;
 
 -- function hooks
 local lOriginal_CanSendAuctionQuery;
@@ -53,13 +54,23 @@ local function Auctioneer_AuctionNextQuery()
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		local maxPages = floor(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE);
 
+		local auctionsPerSecond = ( lTotalAuctionsScannedCount / ( GetTime() - lScanStartedAt ) );
+		local auctionETA = ( ( totalAuctions - lTotalAuctionsScannedCount ) / auctionsPerSecond );
+		auctionsPerSecond = floor( auctionsPerSecond * 100 ) / 100;
+		if ( type(auctionsPerSecond) ~= "number" ) then
+			auctionsPerSecond = "";
+		else
+			auctionsPerSecond = tostring(auctionsPerSecond);
+		end
+		local ETAString = SecondsToTime(auctionETA);
+
 		if( lCurrentAuctionPage < maxPages ) then
 			lPageStartedAt = time();
 			lCurrentAuctionPage = lCurrentAuctionPage + 1;
 			if lFullScan then
-				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], _AUCT['TextAuction'], lCurrentAuctionPage + 1, maxPages + 1));
+				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], _AUCT['TextAuction'], lCurrentAuctionPage + 1, maxPages + 1, auctionsPerSecond, ETAString));
 			else
-				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1));
+				BrowseNoResultsText:SetText(string.format(_AUCT['AuctionPageN'], lMajorAuctionCategories[lCurrentCategoryIndex],lCurrentAuctionPage + 1, maxPages + 1, auctionsPerSecond, ETAString));
 			end
 		elseif nextIndex() then
 			lPageStartedAt = time();
@@ -185,7 +196,8 @@ function Auctioneer_StartAuctionScan()
 	end
 	
 	Auctioneer_Event_StartAuctionScan();
-	
+
+	lScanStartedAt = GetTime();
 	Auctioneer_AuctionNextQuery();
 end
 
