@@ -238,7 +238,7 @@ _AUCT['TextUsage'] = "Uso:";
 -- AH Scanning localizations
 
 _AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" página 1...";
-_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" página %d de %d";
+_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" página %d de %d\nSubastas por segundo: %s\nTiempo estimado para completar: %s";
 _AUCT['AuctionScanDone'] = "Auctioneer: La exploración de las subastas ha finalizado";
 _AUCT['AuctionScanNexttime'] = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 _AUCT['AuctionScanNocat'] = "Usted debe tener al menos una categoria seleccionada para poder explorar.";

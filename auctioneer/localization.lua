@@ -902,7 +902,7 @@ if locale == "esES" then
 		-- AH Scanning localizations
 		
 		_AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" p\195\161gina 1...";
-		_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" p\195\161gina %d de %d";
+		_AUCT['AuctionPageN'] = "Auctioneer: Explorando \"%s\" p\195\161gina %d de %d\nSubastas por segundo: %s\nTiempo estimado para completar: %s";
 		_AUCT['AuctionScanDone'] = "Auctioneer: La exploraci\195\179n de las subastas ha finalizado";
 		_AUCT['AuctionScanNexttime'] = "Auctioneer ejecutara una exploracion de las subastas la proxima vez que usted hable con un subastador.";
 		_AUCT['AuctionScanNocat'] = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
