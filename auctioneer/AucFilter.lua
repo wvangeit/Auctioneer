@@ -189,7 +189,7 @@ function Auctioneer_DoBidBroker(minProfit)
 			if (currentBid == min) then
 				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
-			--p("a", a);
+			--Auctioneer_p("a", a);
 			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
 			Auctioneer_ChatPrint(output);
 		end
@@ -254,7 +254,7 @@ function Auctioneer_DoCompeting(minLess)
 end
 
 -- builds the list of auctions that can be bought and resold for profit
-function Auctioneer_DoPercentLess(percentLess)    
+function Auctioneer_DoPercentLess(percentLess)
 	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
 	local output = string.format(_AUCT['FrmtPctlessHeader'], percentLess);
 	Auctioneer_ChatPrint(output);

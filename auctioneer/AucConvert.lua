@@ -12,7 +12,7 @@ local function Auctioneer_Backup(server, sig, data)
 	if AuctionBackup[server] == nil then
 		AuctionBackup[server] = {}
 	end
-	
+
 	AuctionBackup[server][sig] = data
 end
 
@@ -54,7 +54,7 @@ function Auctioneer_Convert()
 			for server, sData in pairs(AHSnapshotItemPrices) do
 				local colon = string.find(server, ":");
 				local hyphen = string.find(server, "-");
-				if (hyphen and not colon) then
+				if (hyphen and not colon) and (sData.buyoutPrices == nil) then
 					if (not AuctionConfig.sbuy[server]) then
 						AuctionConfig.sbuy[server] = {};
 					end
@@ -100,14 +100,30 @@ function Auctioneer_Convert()
 							if s1 == nil then
 								_, _, s1, s2, s3, s4, s5, s6, s7 = string.find(iData, "(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
 							end
-							data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
-							if (name == nil) or (name == '') then
-								name = sname
-							end
-							if (name == nil) or (name == '') then
-								-- ouch ! can't convert the old data atm since no valid itemname can be found
+							if s1 == nil then
+								-- unsuported, likely corrupt format (for example: s7 = -727389968)
+
+								-- set name = '' to name = nil
+								name = nil
+
 								-- backing it up so we might convert it later
 								Auctioneer_Backup(server, sig, iData)
+							else
+								if (name == nil) or (name == '') then
+									name = sname
+								end
+								if (name == nil) or (name == '') then
+									-- ouch ! can't convert the old data atm since no valid itemname can be found
+
+									-- set name = '' to name = nil
+									name = nil
+
+									-- backing it up so we might convert it later
+									Auctioneer_Backup(server, sig, iData)
+								else
+									-- only set the data, if the name has successfully been identified
+									data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
+								end
 							end
 						elseif iData.category == nil then
 							-- unknown dataformat
@@ -123,8 +139,8 @@ function Auctioneer_Convert()
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
 								if not Auctioneer_IsSortedList(iData.buyoutPricesHistoryList) then
-									p("TODO: old dataformat with unsorted buyoutHistory! "..sig)
-									p("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
+									Auctioneer_p("TODO: old dataformat with unsorted buyoutHistory! "..sig)
+									Auctioneer_p("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
 								end
 								hist = Auctioneer_StoreMedianList (iData.buyoutPricesHistoryList);
 							end

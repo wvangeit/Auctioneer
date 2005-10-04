@@ -134,7 +134,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 				end
 			end
 		end
-		p("Final counts", dropCount, buyCount, bidCount, expCount);
+		Auctioneer_p("Final counts", dropCount, buyCount, bidCount, expCount);
 	end
 
 	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
@@ -163,7 +163,7 @@ end
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
 function Auctioneer_AuctionEntry_Hook(page, index, category)
---	p("Processing page", page, "item", index);
+--	Auctioneer_p("Processing page", page, "item", index);
 	local auctionDoneKey;
 	if (not page or not index or not category) then
 		return;
@@ -221,7 +221,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 	
 	-- If we haven't seen this item (it's not in the old snapshot)
 	if (not snap) then 
---		p("No snap");
+--		Auctioneer_p("No snap");
 		lNewAuctionsCount = lNewAuctionsCount + 1;
 
 		-- now build the list of buyout prices seen for this auction to use to get the median
@@ -276,7 +276,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		};
 
 	else
---		p("Snap!");
+--		Auctioneer_p("Snap!");
 		lOldAuctionsCount = lOldAuctionsCount + 1;
 		--this is an auction that was already in the snapshot from a previous scan and is still in the auction house
 		snap.dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
@@ -364,7 +364,7 @@ function Auctioneer_Auctions_Clear()
 end
 
 function Auctioneer_Auctions_SetWarn(textStr)
-	if (AuctionInfoWarnText == nil) then p("Error, no text for AuctionInfo line "..line); end
+	if (AuctionInfoWarnText == nil) then Auctioneer_p("Error, no text for AuctionInfo line "..line); end
 	AuctionInfoWarnText:SetText(textStr);
 	AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
 	AuctionInfoWarnText:Show();
@@ -373,8 +373,8 @@ end
 function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
 	local text = getglobal("AuctionInfoText"..line);
 	local money = getglobal("AuctionInfoMoney"..line);
-	if (text == nil) then p("Error, no text for AuctionInfo line "..line); end
-	if (money == nil) then p("Error, no money for AuctionInfo line "..line); end
+	if (text == nil) then Auctioneer_p("Error, no text for AuctionInfo line "..line); end
+	if (money == nil) then Auctioneer_p("Error, no money for AuctionInfo line "..line); end
 	text:SetText(textStr);
 	text:Show();
 	if (money ~= nil) then

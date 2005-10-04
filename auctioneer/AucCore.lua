@@ -147,11 +147,11 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 	if (from ~= nil) then serverFaction = from;
 	else serverFaction = Auctioneer_GetAuctionKey(); end;
 	
-	--p("Getting data from/for", serverFaction, itemKey);
+	--Auctioneer_p("Getting data from/for", serverFaction, itemKey);
 	if (AuctionConfig.data == nil) then AuctionConfig.data = {}; end
 	if (AuctionConfig.info == nil) then AuctionConfig.info = {}; end
 	if (AuctionConfig.data[serverFaction] == nil) then
---		p("Data from serverfaction is nil");
+		--Auctioneer_p("Data from serverfaction is nil");
 		AuctionConfig.data[serverFaction] = {};
 	else
 		data = AuctionConfig.data[serverFaction][itemKey];
@@ -339,15 +339,15 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 	end
 	if (dirty~=nil and bid~=nil and level~=nil and qual~=nil and left~=nil and fseen~=nil and last~=nil and link~=nil and owner~=nil) then 
 		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner); 
---		p("Saving", server, cat, sig, "as", saveData); 
+		--Auctioneer_p("Saving", server, cat, sig, "as", saveData); 
 		AuctionConfig.snap[server][cat][sig] = saveData;
 		local itemKey = Auctioneer_GetKeyFromSig(sig);
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
---	else
---		p("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
+	--else
+		--Auctioneer_p("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
 	end
 end
 

@@ -81,7 +81,7 @@ end
 function Auctioneer_GetMeans(itemKey, from)
 	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, from);
 	if (not auctionPriceItem.data) then
---		p("Error, GetAuctionPriceItem", itemKey, from, "returns", auctionPriceItem);
+--		Auctioneer_p("Error, GetAuctionPriceItem", itemKey, from, "returns", auctionPriceItem);
 	end
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty;
@@ -385,12 +385,12 @@ end
 HSPCOUNT = 0; CACHECOUNT = 0;
 function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	if (itemKey == nil) then                                 -- make itemKey a required parameter
-		p("ERROR: Calling Auctioneer_GetHSP(itemKey, realm) - Function requires valid itemKey.");
+		Auctioneer_p("ERROR: Calling Auctioneer_GetHSP(itemKey, realm) - Function requires valid itemKey.");
 		return nil;
 	end
 	if (realm == nil) then
-		p("WARNING: Auctioneer_GetHSP(itemKey, realm) - Defaulting to player realm.");
-		p("This is only some debugging code. THIS IS NO BUG!");
+		Auctioneer_p("WARNING: Auctioneer_GetHSP(itemKey, realm) - Defaulting to player realm.");
+		Auctioneer_p("This is only some debugging code. THIS IS NO BUG!");
 		realm = Auctioneer_GetAuctionKey();
 	end
 
@@ -407,7 +407,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 
 	local highestSellablePrice = 0;
 	local warn = _AUCT['FrmtWarnNodata'];
-	--p("Getting HSP, calling GetMarketPrice", itemKey, realm);
+	--Auctioneer_p("Getting HSP, calling GetMarketPrice", itemKey, realm);
 	if (not buyoutValues) then
 		buyoutValues = Auctioneer_GetSnapshotInfo(realm, itemKey);
 	end
@@ -450,13 +450,13 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 
 
 	if (not hsp) then
-		p("Unable to calc HSP for",id, realm, marketPrice, currentLowestBuyout, currentLowestSig);
+		Auctioneer_p("Unable to calc HSP for",id, realm, marketPrice, currentLowestBuyout, currentLowestSig);
 		hsp = 0;
 		warn = "";
 	end
 	if (not nexthsp) then nexthsp = 0; nextwarn = ""; end
 
-	--p("Auction data: ", hsp, histCount, market, warn, nexthsp, nextwarn);
+	--Auctioneer_p("Auction data: ", hsp, histCount, market, warn, nexthsp, nextwarn);
 
 	local cache = string.format("%d;%d;%d;%s;%d;%s", hsp,histCount,market,warn, nexthsp,nextwarn);
 	Auctioneer_HSPCache[realm][itemKey] = cache;
@@ -504,7 +504,7 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 		-- Note: urentLowestBuyout is nil, incase the realm is not the current player's realm
 		if currentLowestBuyout and currentLowestBuyout > 0 then
 			-- set highest price to "Discount low"
---~ p("Discount low case 2");
+-- Auctioneer_p("Discount low case 2");
 			highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
 			warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
 		else

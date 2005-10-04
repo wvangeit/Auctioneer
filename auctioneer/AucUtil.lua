@@ -285,7 +285,7 @@ function dump(...)
 	return out;
 end
 
-function p(...)
+function Auctioneer_p(...)
 	local out = "";
 	for i = 1, arg.n, 1 do
 		if (i > 1) then out = out .. ", "; end

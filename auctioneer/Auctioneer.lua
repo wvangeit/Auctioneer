@@ -20,7 +20,7 @@ end
 
 
 function Auctioneer_OnEvent(event)
---	p("Event", event);
+--	Auctioneer_p("Event", event);
 	if (event=="NEW_AUCTION_UPDATE") then
 		Auctioneer_NewAuction();
 	elseif (event=="AUCTION_HOUSE_SHOW") then
