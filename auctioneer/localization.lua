@@ -700,15 +700,15 @@ if locale == "esES" then
 		
 		_AUCT['FrmtWelcome'] = "Auctioneer versi\195\179n %s cargado";
 		
-		_AUCT['FrmtBrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
+		_AUCT['FrmtBrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo de Venta'";
 		_AUCT['FrmtBrokerLine'] = "%s, Ultimo(s) %s visto(s), PMV: %s, BO: %s, Prof: %s";
 		_AUCT['FrmtBrokerDone'] = "Corredor finalizado";
-		_AUCT['FrmtBidbrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo Vendible'";
+		_AUCT['FrmtBidbrokerHeader'] = "Ganancia Minima: %s, PMV = 'Precio Maximo de Venta'";
 		_AUCT['FrmtBidbrokerMinbid'] = "OfertaMinima"
 		_AUCT['FrmtBidbrokerCurbid'] = "OfertaCorriente"
 		_AUCT['FrmtBidbrokerLine'] = "%s, Ultimo(s) %s visto(s), PMV: %s, %s: %s, Ganancia: %s, Tiempo: %s";
 		_AUCT['FrmtBidbrokerDone'] = "Corredor de ofertas finalizado";
-		_AUCT['FrmtPctlessHeader'] = "Porcentaje bajo el Precio Maximo Vendible (PMV): %d%%";
+		_AUCT['FrmtPctlessHeader'] = "Porcentaje bajo el Precio Maximo de Venta (PMV): %d%%";
 		_AUCT['FrmtPctlessLine'] = "%s, Ultimo(s) %d visto(s), PMV: %s, OC: %s, Ganancia: %s, menos %s";
 		_AUCT['FrmtPctlessDone'] = "Porcentajes menores finalizado.";
 		_AUCT['FrmtCompeteHeader'] = "Subastas compitiendo por al menos %s debajo por art\195\173culo.";
@@ -717,7 +717,7 @@ if locale == "esES" then
 		_AUCT['FrmtNoauct'] = "No se hallaron subastas para el art\195\173culo: %s";
 		_AUCT['FrmtMedianLine'] = "De los \195\186ltimos(s) %d vistos, OC mediano por 1 %s es: %s";
 		_AUCT['FrmtLowLine'] = "%s, BO: %s, Vendedor: %s, Por uno: %s, Menos que el mediano: %s";
-		_AUCT['FrmtHspLine'] = "Precio Maximo Vendible por uno %s es: %s";
+		_AUCT['FrmtHspLine'] = "Precio Maximo de Venta por uno %s es: %s";
 		
 		_AUCT['FrmtInfoSeen'] = "Visto un total de %d veces en subasta";
 		_AUCT['FrmtInfoForone'] = "Por 1: %s min/%s OC (%s oferta) [en %d's]";
@@ -782,7 +782,7 @@ if locale == "esES" then
 		_AUCT['CmdCtrl'] = "ctrl";
 		_AUCT['CmdShift'] = "shift";
 		_AUCT['CmdToggle'] = "invertir";
-		_AUCT['CmdClear'] = "despejado";
+		_AUCT['CmdClear'] = "borrar";
 		_AUCT['CmdClearAll'] = "todo";
 		_AUCT['CmdClearSnapshot'] = "imagen";
 		_AUCT['CmdAlso'] = "tambien";
@@ -847,7 +847,7 @@ if locale == "esES" then
 		_AUCT['ShowEmbedBlank'] = "ver-integrado-lineavacia";
 		_AUCT['ShowRedo'] = "ver-advertencia";
 		
-		_AUCT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
+		_AUCT['HelpOnoff'] = "Enciende o apaga la informacion sobre las subastas";
 		_AUCT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
 		_AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el art\195\173culo";
 		_AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del art\195\173culo en la caja de ayuda";
@@ -865,8 +865,8 @@ if locale == "esES" then
 		_AUCT['HelpLocale'] = "Cambiar la localidad que Auctioneer usa para sus mensajes";
 		_AUCT['HelpBroker'] = "Muestra las subastas de la exploraci\195\179n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
 		_AUCT['HelpBidbroker'] = "Muestra subastas de corto o medio termino de la exploraci\195\179n mas reciente a las cuales se puede poner una oferta y obtener ganancia";
-		_AUCT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
-		_AUCT['HelpPercentless'] = "Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio vendible mas alto.";
+		_AUCT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: algunas capacidades se desabilitan cuando esta opci\195\179n es seleccionada)";
+		_AUCT['HelpPercentless'] = "Muestra cualquier subasta recientemente explorada en la que la compra de participaciones es un porcentaje menor del precio de venta mas alto.";
 		_AUCT['HelpCompete'] = "Muestra cualquier subasta explorada recientemente cuya opci\195\179n a compra es menor que alguno de tus art\195\173culos";
 		_AUCT['HelpScan'] = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un bot\195\179n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
 		_AUCT['HelpAutofill'] = "Auto-completar precios cuando se a\195\177adan art\195\173culos a subastar en el panel de la casa de subastas";
@@ -880,7 +880,7 @@ if locale == "esES" then
 		_AUCT['HelpDefault'] = "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica."
 		
 		_AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
-		_AUCT['StatOff'] = "Ocultando toda la informacion de subastas";
+		_AUCT['StatOff'] = "Ocultando toda informaci\195\179n de subastas";
 		
 		_AUCT['FrmtActClearall'] = "Eliminando toda la informaci\195\179n de subastas para %s";
 		_AUCT['FrmtActClearsnap'] = "Eliminando la imagen actual de la casa de subastas.";
