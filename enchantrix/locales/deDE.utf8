@@ -1,0 +1,107 @@
+﻿-- Encoded in UTF8
+-- German localization for Enchantrix by FtKxDE
+-- http://norganna.org/bb/index.php?s=&showtopic=334&view=findpost&p=1561
+
+ENCH_FRMT_WELCOME = "Enchantrix v%s geladen";
+ENCH_FRMT_CREDIT = " (gehe zu http://enchantrix.org/ um deine Daten zu übertragen)";
+
+ENCH_CMD_OFF = "aus";
+ENCH_CMD_ON = "an";
+ENCH_CMD_TOGGLE = "toggle";
+ENCH_CMD_CLEAR = "leeren";
+ENCH_CMD_CLEAR_ALL = "alle";
+
+ENCH_CMD_FIND_BUYAUCT = "prozentlos";
+ENCH_CMD_FIND_BIDAUCT = "Angebotsmakler";
+
+ENCH_CMD_FIND_BUYAUCT_SHORT = "pl";
+ENCH_CMD_FIND_BIDAUCT_SHORT = "bb";
+
+ENCH_OPT_CLEAR = "([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_FIND_BUYAUCT = "<percent>";
+ENCH_OPT_FIND_BIDAUCT = "<silver>";
+
+ENCH_SHOW_EMBED = "zeige-eingebunden";
+ENCH_SHOW_HEADER = "zeige-kopf";
+ENCH_SHOW_COUNT = "zeige-anzahl";
+ENCH_SHOW_RATE = "zeige-kurs";
+ENCH_SHOW_VALUE = "zeige-wert";
+ENCH_SHOW_GUESS_AUCTIONEER_HSP = "valuate-hvp";
+ENCH_SHOW_GUESS_AUCTIONEER_MED = "valuate-median";
+ENCH_SHOW_GUESS_BASELINE = "valuate-grundpreis";
+
+ENCH_HELP_ONOFF = "Schaltet Anzeige Entzauberungsdaten ein oder aus";
+ENCH_HELP_EMBED = "Zeige Text im normalen Tooltip (Hinweis: Einige Funktionen stehen dann nicht zur Verfügung)";
+ENCH_HELP_HEADER = "Auswählen ob die Kopfzeile angezeigt werden soll";
+ENCH_HELP_COUNT = "Auswählen ob genaue Anzahl angezeigt wird";
+ENCH_HELP_RATE = "Auswählen ob ungefährer Wert des Entzaubern angezeigt wird";
+
+ENCH_HELP_VALUE = "Auswählen ob geschätzte Werte der Entzauberung aufgrund ähnlicher Gegenstände angezeigt werden";
+ENCH_HELP_GUESS_AUCTIONEER_HSP = "Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den höchsten Verkaufspreis (HVP) für das Entzaubern";
+ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den durchschnittlichen Wert für das Entzaubern";
+ENCH_HELP_GUESS_NOAUCTIONEER = "Die Befehle "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." und "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." sind nicht verfügbar weil Auctioneer nicht installiert ist";
+ENCH_HELP_GUESS_BASELINE = "Wenn Wertebestimmung aktiv ist, (auctioneer nicht benötigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
+
+ENCH_HELP_CLEAR = "Lösche Daten dieses Gegenstandes (Gegenstände mit Shift-Klick einfügen zum Befehl) Alles löschen mit Befehl \"alle\"";
+ENCH_HELP_FIND_BUYAUCT = "Suche Auktionen deren Entzauberwert einen gewissen Prozentsatz unter dem Sofortkaufpreis liegt";
+ENCH_HELP_FIND_BIDAUCT = "Suche Auktionen deren Entzauberwert einen gewissen Wert unter dem Bietpreis liegt";
+
+ENCH_STAT_ON = "Zeige eingestellte Entzauberungsdaten";
+ENCH_STAT_OFF = "Zeige keine Entzauberungsdaten";
+
+ENCH_FRMT_ACT_CLEARALL = "Lösche alle Auktionsdaten für %s";
+ENCH_FRMT_ACT_CLEAR_OK = "Lösche Daten für Gegenstand %s";
+ENCH_FRMT_ACT_CLEAR_FAIL = "Kann Gegenstand %s nicht finden";
+ENCH_FRMT_ACT_ENABLE = "Zeige Daten von Gegenstand %s";
+ENCH_FRMT_ACT_DISABLE = "Zeige keine Daten von Gegenstand %s";
+ENCH_FRMT_ACT_ENABLED_ON = "Zeige Gegenstand %s auf %s";
+ENCH_FRMT_ACT_SET = "Setze %s zu '%s'";
+ENCH_FRMT_ACT_UNKNOWN = "Unbekannter Befehl: '%s'";
+
+ENCH_FRMT_DISINTO = "Entzaubern zu:";
+ENCH_FRMT_FOUND = "%s wird entzaubert zu:";
+ENCH_FRMT_USAGE = "Benutzung:";
+
+ENCH_FRMT_COUNTS = " (basis=%d, alt=%d, neu=%d)";
+ENCH_FRMT_VALUE_AUCT_HSP = "Entzaubern Gesamtwert (HSP)";
+ENCH_FRMT_VALUE_AUCT_MED = "Entzaubern Gesamtwert (Median)";
+ENCH_FRMT_VALUE_MARKET = "Entzaubern Gesamtwert (Baseline)";
+
+ENCH_FRMT_BIDBROKER_HEADER = "Auktionen mit %s Silber Einsparung auf durchschnittlichen Entzauberungswert:";
+ENCH_FRMT_BIDBROKER_MINBID = "minGeb"
+ENCH_FRMT_BIDBROKER_CURBID = "aktGeb"
+ENCH_FRMT_BIDBROKER_LINE = "%s, Wert bei: %s, %s: %s, Gespart: %s, weniger %s, Zeit: %s";
+ENCH_FRMT_BIDBROKER_DONE = "Angebotsmakler fertig";
+
+ENCH_FRMT_PCTLESS_HEADER = "Auktionen mit %d%% Einsparung auf durchschnittlichen Entzauberungswert:";
+ENCH_FRMT_PCTLESS_LINE = "%s,Wert bei: %s, SK: %s, Erspart: %s, weniger %s";
+ENCH_FRMT_PCTLESS_DONE = "Prozent weniger fertig.";
+
+ENCH_ARG_SPELL_NAME = "Entzaubern";
+
+
+EssenceItemIDs = {};
+EssenceItemIDs["Große Astral-Essenz"] = 11082;
+EssenceItemIDs["Große ewige Essenz"] = 16203;
+EssenceItemIDs["Große Magie-Essenz"] = 10939;
+EssenceItemIDs["Große Mystiker-Essenz"] = 11135;
+EssenceItemIDs["Große Nether-Essenz"] = 11175;
+EssenceItemIDs["Geringe Astral-Essenz"] = 10998;
+EssenceItemIDs["Geringe ewige Essenz"] = 16202;
+EssenceItemIDs["Geringe Magie-Essenz"] = 10938;
+EssenceItemIDs["Geringe Mystiker-Essenz"] = 11134;
+EssenceItemIDs["Geringe Nether-Essenz"] = 11174;
+EssenceItemIDs["Großer glänzender Splitter"] = 14344;
+EssenceItemIDs["Großer gleißender Splitter"] = 11084;
+EssenceItemIDs["Großer leuchtender Splitter"] = 11139;
+EssenceItemIDs["Großer strahlender Splitter"] = 11178;
+EssenceItemIDs["Kleiner glänzender Splitter"] = 14343;
+EssenceItemIDs["Kleiner gleißender Splitter"] = 10978;
+EssenceItemIDs["Kleiner leuchtender Splitter"] = 11138;
+EssenceItemIDs["Kleiner strahlender Splitter"] = 11177;
+EssenceItemIDs["Traumstaub"] = 11176;
+EssenceItemIDs["Illusions Staub"] = 16204;
+EssenceItemIDs["Seelenstaub"] = 11083;
+EssenceItemIDs["Seltsamer Staub"] = 10940;
+EssenceItemIDs["Visionenstaub"] = 11137;
+
