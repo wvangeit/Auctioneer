@@ -269,7 +269,7 @@ function Enchantrix_FullDiff(invA, invB)
 end
 
 function Enchantrix_OnEvent(event)
-	if ((event == "SPELLCAST_START") and (arg1 == "Disenchant")) then
+	if ((event == "SPELLCAST_START") and (arg1 == ENCH_ARG_SPELLNAME)) then
 		Enchantrix_Disenchanting = true;
 		Enchantrix_WaitingPush = false;
 		Enchantrix_StartInv = Enchantrix_TakeInventory();

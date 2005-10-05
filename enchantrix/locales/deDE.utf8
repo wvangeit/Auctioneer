@@ -5,6 +5,8 @@
 ENCH_FRMT_WELCOME = "Enchantrix v%s geladen";
 ENCH_FRMT_CREDIT = " (gehe zu http://enchantrix.org/ um deine Daten zu übertragen)";
 
+ENCH_ARG_SPELLNAME = "Entzaubern";
+
 ENCH_CMD_OFF = "aus";
 ENCH_CMD_ON = "an";
 ENCH_CMD_TOGGLE = "toggle";
@@ -77,8 +79,6 @@ ENCH_FRMT_PCTLESS_HEADER = "Auktionen mit %d%% Einsparung auf durchschnittlichen
 ENCH_FRMT_PCTLESS_LINE = "%s,Wert bei: %s, SK: %s, Erspart: %s, weniger %s";
 ENCH_FRMT_PCTLESS_DONE = "Prozent weniger fertig.";
 
-ENCH_ARG_SPELL_NAME = "Entzaubern";
-
 
 EssenceItemIDs = {};
 EssenceItemIDs["Große Astral-Essenz"] = 11082;
@@ -104,4 +104,3 @@ EssenceItemIDs["Illusions Staub"] = 16204;
 EssenceItemIDs["Seelenstaub"] = 11083;
 EssenceItemIDs["Seltsamer Staub"] = 10940;
 EssenceItemIDs["Visionenstaub"] = 11137;
-

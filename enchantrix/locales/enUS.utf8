@@ -1,8 +1,11 @@
 ﻿-- Encoded in UTF8
 -- English localization for Enchantrix
 
+
 ENCH_FRMT_WELCOME = "Enchantrix v%s loaded";
 ENCH_FRMT_CREDIT = "  (go to http://enchantrix.org/ to share your data)";
+
+ENCH_ARG_SPELLNAME = "Disenchant";
 
 ENCH_CMD_OFF = "off";
 ENCH_CMD_ON = "on";
@@ -101,4 +104,3 @@ EssenceItemIDs["Illusion Dust"] = 16204;
 EssenceItemIDs["Soul Dust"] = 11083;
 EssenceItemIDs["Strange Dust"] = 10940;
 EssenceItemIDs["Vision Dust"] = 11137;
-

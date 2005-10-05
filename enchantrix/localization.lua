@@ -46,8 +46,11 @@
 
 
 
+
 ENCH_FRMT_WELCOME = "Enchantrix v%s loaded";
 ENCH_FRMT_CREDIT = "  (go to http://enchantrix.org/ to share your data)";
+
+ENCH_ARG_SPELLNAME = "Disenchant";
 
 ENCH_CMD_OFF = "off";
 ENCH_CMD_ON = "on";
@@ -146,8 +149,6 @@ EssenceItemIDs["Illusion Dust"] = 16204;
 EssenceItemIDs["Soul Dust"] = 11083;
 EssenceItemIDs["Strange Dust"] = 10940;
 EssenceItemIDs["Vision Dust"] = 11137;
-
-
 -- Locale strings for the deDE locale
 if GetLocale() == "deDE" then
 -- Encoded in UTF8
@@ -156,6 +157,8 @@ if GetLocale() == "deDE" then
 
 ENCH_FRMT_WELCOME="Enchantrix v%s geladen";
 ENCH_FRMT_CREDIT=" (gehe zu http://enchantrix.org/ um deine Daten zu \195\188bertragen)";
+
+ENCH_ARG_SPELLNAME="Entzaubern";
 
 ENCH_CMD_OFF="aus";
 ENCH_CMD_ON="an";
@@ -229,8 +232,6 @@ ENCH_FRMT_PCTLESS_HEADER="Auktionen mit %d%% Einsparung auf durchschnittlichen E
 ENCH_FRMT_PCTLESS_LINE="%s,Wert bei: %s, SK: %s, Erspart: %s, weniger %s";
 ENCH_FRMT_PCTLESS_DONE="Prozent weniger fertig.";
 
-ENCH_ARG_SPELL_NAME="Entzaubern";
-
 
 EssenceItemIDs={};
 EssenceItemIDs["Gro\195\159e Astral-Essenz"] = 11082;
@@ -256,7 +257,115 @@ EssenceItemIDs["Illusions Staub"] = 16204;
 EssenceItemIDs["Seelenstaub"] = 11083;
 EssenceItemIDs["Seltsamer Staub"] = 10940;
 EssenceItemIDs["Visionenstaub"] = 11137;
+end
+
+-- Locale strings for the esES locale
+if GetLocale() == "esES" then
+-- Encoded in UTF8
+-- English localization for Enchantrix
 
 
+ENCH_FRMT_WELCOME="Enchantrix versi\195\179n %s cargado";
+ENCH_FRMT_CREDIT="  (vaya a http://enchantrix.org/ para compart\195\173r su data)";
+
+ENCH_ARG_SPELLNAME="Disenchant"; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
+
+ENCH_CMD_OFF="apagado";
+ENCH_CMD_ON="prendido";
+ENCH_CMD_TOGGLE="invertir";
+ENCH_CMD_CLEAR="borrar";
+ENCH_CMD_CLEAR_ALL="todo";
+
+ENCH_CMD_FIND_BUYAUCT="porcientomenos";
+ENCH_CMD_FIND_BIDAUCT="corredorofertas";
+
+ENCH_CMD_FIND_BUYAUCT_SHORT="pm";
+ENCH_CMD_FIND_BIDAUCT_SHORT="co";
+
+ENCH_OPT_CLEAR="([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_FIND_BUYAUCT="<percent>";
+ENCH_OPT_FIND_BIDAUCT="<silver>";
+
+ENCH_SHOW_EMBED="ver-integrado";
+ENCH_SHOW_HEADER="ver-titulo";
+ENCH_SHOW_COUNT="ver-cuenta";
+ENCH_SHOW_RATE="ver-razon";
+ENCH_SHOW_VALUE="ver-valor";
+ENCH_SHOW_GUESS_AUCTIONEER_HSP="valorizar-pmv";
+ENCH_SHOW_GUESS_AUCTIONEER_MED="valorizar-mediano";
+ENCH_SHOW_GUESS_BASELINE="valorizar-referencia";
+
+ENCH_HELP_ONOFF="Enciende o apaga la informaci\195\179n de encantos";
+ENCH_HELP_EMBED="Insertar el texto en la caja de ayuda original del juego (nota: Algunas capacidades se desabilitan cuando esta opci\195\179n es seleccionada)";
+ENCH_HELP_HEADER="Selecciona para mostrar la l\195\173nea del t\195\173tulo";
+ENCH_HELP_COUNT="Selecciona para mostrar los valores exactos de la base de datos";
+ENCH_HELP_RATE="Selecciona para mostrar las cantidades promedio de los desencantamientos";
+
+ENCH_HELP_VALUE="Selecciona para mostrar el precio estimado de los art\195\173culos basandose en la proporci\195\179n de los desencantamientos posibles";
+ENCH_HELP_GUESS_AUCTIONEER_HSP="Si la valorizaci\195\179n esta seleccionada, y usted tiene Auctioneer instalado, mostrar la valorizaci\195\179n de los desencantamientos del art\195\173culo basandose en los precios m\195\161ximos de venta (PMV) de Auctioneer.";
+ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Si la valorizaci\195\179n esta seleccionada, y usted tiene Auctioneer instalado, mostrar la valorizaci\195\179n de los desencantamientos del art\195\173culo basandose en los precios medianos de Auctioneer.";
+ENCH_HELP_GUESS_NOAUCTIONEER="Los comandos "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." y "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." no estan disponibles porque usted no tiene Auctioneer instalado";
+ENCH_HELP_GUESS_BASELINE="Si la valorizaci\195\179n esta seleccionada, (Auctioneer no es necesario) mostrar la valorizaci\195\179n de los desencantamientos del art\195\173culo, basandose en los valores de referencia incluidos.";
+
+ENCH_HELP_CLEAR="Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabra clave \"todo\"";
+ENCH_HELP_FIND_BUYAUCT="Encontrar subastas donde el valor posible de los desencantamientos es un cierto porciento menos que el precio de la opci\195\179n a compra";
+ENCH_HELP_FIND_BIDAUCT="Encontrar subastas donde el valor posible de los desencantamientos es una cierta cantidad de plata menos que el precio de oferta";
+
+ENCH_STAT_ON="Mostrando la configuracion corriente para la informacion de los desencantamientos";
+ENCH_STAT_OFF="Ocultando toda informaci\195\179n de los desencantamientos";
+
+ENCH_FRMT_ACT_CLEARALL="Eliminando toda informaci\195\179n de desencantamientos para %s";
+ENCH_FRMT_ACT_CLEAR_OK="Informacion eliminada para el art\195\173culo: %s";
+ENCH_FRMT_ACT_CLEAR_FAIL="Imposible encontrar art\195\173culo: %s";
+ENCH_FRMT_ACT_ENABLE="Mostrando informacion del art\195\173culo: %s ";
+ENCH_FRMT_ACT_DISABLE="Ocultando informacion de articulo: %s ";
+ENCH_FRMT_ACT_ENABLED_ON="Mostrando %s de los art\195\173culos usando %s";
+ENCH_FRMT_ACT_SET="%s ajustado(a) a '%s'";
+ENCH_FRMT_ACT_UNKNOWN="Comando o palabra clave desconocida: '%s'";
+
+ENCH_FRMT_DISINTO="Se convierte en:";
+ENCH_FRMT_FOUND="Se encontro que %s se convierte en:";
+ENCH_FRMT_USAGE="Uso:";
+
+ENCH_FRMT_COUNTS="    (referencia=%d, viejo=%d, nuevo=%d)";
+ENCH_FRMT_VALUE_AUCT_HSP="Valor de desencantamientos (PMV)";
+ENCH_FRMT_VALUE_AUCT_MED="Valor de desencantamientos (Mediano)";
+ENCH_FRMT_VALUE_MARKET="Valor de desencantamientos (Referencia)";
+
+ENCH_FRMT_BIDBROKER_HEADER="Ofertas teniendo promedios de ahorros de %s plata en el valor de los desencantamientos:";
+ENCH_FRMT_BIDBROKER_MINBID="ofertaMin"
+ENCH_FRMT_BIDBROKER_CURBID="ofertaCorr"
+ENCH_FRMT_BIDBROKER_LINE="%s, Valorado en: %s, %s: %s, Ahorra: %s, Menos %s, Tiempo: %s";
+ENCH_FRMT_BIDBROKER_DONE="Corredor de ofertas finalizado";
+
+ENCH_FRMT_PCTLESS_HEADER="Opciones a compra teniendo %d%% de ahorro sobre el precio promedio de desencantar el art\195\173culo:";
+ENCH_FRMT_PCTLESS_LINE="%s, Valorado en: %s, OC: %s, Ahorra: %s, Menos %s";
+ENCH_FRMT_PCTLESS_DONE="Porcentajes menores finalizado.";
+
+
+EssenceItemIDs={};
+EssenceItemIDs["Greater Astral Essence"] = 11082;
+EssenceItemIDs["Greater Eternal Essence"] = 16203;
+EssenceItemIDs["Greater Magic Essence"] = 10939;
+EssenceItemIDs["Greater Mystic Essence"] = 11135;
+EssenceItemIDs["Greater Nether Essence"] = 11175;
+EssenceItemIDs["Lesser Astral Essence"] = 10998;
+EssenceItemIDs["Lesser Eternal Essence"] = 16202;
+EssenceItemIDs["Lesser Magic Essence"] = 10938;
+EssenceItemIDs["Lesser Mystic Essence"] = 11134;
+EssenceItemIDs["Lesser Nether Essence"] = 11174;
+EssenceItemIDs["Large Brilliant Shard"] = 14344;
+EssenceItemIDs["Large Glimmering Shard"] = 11084;
+EssenceItemIDs["Large Glowing Shard"] = 11139;
+EssenceItemIDs["Large Radiant Shard"] = 11178;
+EssenceItemIDs["Small Brilliant Shard"] = 14343;
+EssenceItemIDs["Small Glimmering Shard"] = 10978;
+EssenceItemIDs["Small Glowing Shard"] = 11138;
+EssenceItemIDs["Small Radiant Shard"] = 11177;
+EssenceItemIDs["Dream Dust"] = 11176;
+EssenceItemIDs["Illusion Dust"] = 16204;
+EssenceItemIDs["Soul Dust"] = 11083;
+EssenceItemIDs["Strange Dust"] = 10940;
+EssenceItemIDs["Vision Dust"] = 11137;
 end
 
