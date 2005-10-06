@@ -888,7 +888,7 @@ end
 --The Auctioneer_OnOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
 --If "on" or "off" is specified in the " state" variable then Auctioneer's state is changed to that value,
 --If "toggle" is specified then it will toggle Auctioneer's state (if currently on then it will be turned off and vice-versa)
---If no keyword is specified then the functione will simply return the current state
+--If no keyword is specified then the function will simply return the current state
 --
 --If chatprint is "true" then the state will also be printed to the user.
 
