@@ -28,15 +28,19 @@ for $i (1..6) {
 for $i (1..5) { print OUT "\n"; }
 
 
-for $file (<locales/*.utf8>) {
+for $file (<locales/????.utf8>) {
 	$file =~ /locales.([^.]+).utf8/;
 	$locale = $1;
 	if ($locale ne "enUS") {
 		push(@locales, $locale);
 	}
+	push(@valid, $locale);
 }
 
-print OUT "-- Default locale strings are defined in English\n";
+print OUT "ENCH_VALID_LOCALES = {[\"".join("\"] = true, [\"", @valid)."\"] = true};\n\n";
+print OUT "function Enchantrix_SetLocaleStrings(locale)\n";
+
+print OUT "\t-- Default locale strings are defined in English\n";
 open(DATA, "< locales/enUS.utf8");
 while (<DATA>) {
 	s/\xEF\xBB\xBF//;
@@ -47,7 +51,7 @@ while (<DATA>) {
 		$defined{$1} = 1;
 	}
 	if ($_ ne "") {
-		print OUT "$_";
+		print OUT "\t$_";
 	}
 }
 close DATA;
@@ -56,8 +60,8 @@ print OUT "\n";
 
 for $locale (@locales) {
 	%localized = ();
-	print OUT "-- Locale strings for the $locale locale\n";
-	print OUT "if GetLocale() == \"$locale\" then\n";
+	print OUT "\n\n\t-- Locale strings for the $locale locale\n";
+	print OUT "\tif locale == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
 		s/\xEF\xBB\xBF//;
@@ -66,7 +70,7 @@ for $locale (@locales) {
 		if (s/^(\w+)\s*=\s*/$1=/) {
 			$localized{$1} = 1;
 		}
-		print OUT "$_";
+		print OUT "\t\t$_";
 	}
 	close DATA;
 	print OUT "\n";
@@ -82,6 +86,7 @@ for $locale (@locales) {
 		}
 	}
 	
-	print OUT "end\n\n";
+	print OUT "\tend\n\n";
 }
 
+print OUT "end\n\nEnchantrix_SetLocaleStrings(GetLocale);\n\n";

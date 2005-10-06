@@ -12,6 +12,7 @@ ENCH_CMD_ON = "on";
 ENCH_CMD_TOGGLE = "toggle";
 ENCH_CMD_CLEAR = "clear";
 ENCH_CMD_CLEAR_ALL = "all";
+ENCH_CMD_LOCALE = "locale";
 
 ENCH_CMD_FIND_BUYAUCT = "percentless";
 ENCH_CMD_FIND_BIDAUCT = "bidbroker";
@@ -59,6 +60,7 @@ ENCH_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 ENCH_FRMT_ACT_ENABLED_ON = "Displaying item's %s on %s";
 ENCH_FRMT_ACT_SET = "Set %s to '%s'";
 ENCH_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
+ENCH_FRMT_ACT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
 
 ENCH_FRMT_DISINTO = "Disenchants into:";
 ENCH_FRMT_FOUND = "Found that %s disenchants into:";

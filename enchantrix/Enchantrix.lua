@@ -389,14 +389,72 @@ function Enchantrix_OnLoad()
 	end
 end
 
-function Enchantrix_Command(command)
+--Cleaner Command Handling Functions (added by MentalPower)
+function Enchantrix_Command(command, source)
+	
+	--To print or not to print, that is the question...
+	local chatprint = nil;
+	if (source == "GUI") then 
+		chatprint = false;
+	else 
+		chatprint = true;
+	end;
+	
+	--Divide the large command into smaller logical sections (Shameless copy from the original function)
 	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
-	if (not cmd) then cmd = command; end
-	if (not cmd) then cmd = ""; end
-	if (not param) then param = ""; end
+
+	if (not cmd) then
+		cmd = command;
+	end
+
+	if (not cmd) then
+		cmd = "";
+	end
+
+	if (not param) then
+		param = "";
+	end
 
 	if ((cmd == "") or (cmd == "help")) then
-		Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
+		Enchantrix_ChatPrint_Help();
+		return;
+
+	elseif (((cmd == ENCH_CMD_ON) or (cmd == "on")) or ((cmd == ENCH_CMD_OFF) or (cmd == "off")) or ((cmd == ENCH_CMD_TOGGLE) or (cmd == "toggle"))) then
+		Enchantrix_OnOff(cmd, chatprint);
+
+	elseif ((cmd == ENCH_CMD_CLEAR) or (cmd == "clear")) then
+		Auctioneer_Clear(param, chatprint);
+
+	elseif ((cmd == ENCH_CMD_LOCALE) or (cmd == "locale")) then
+		Enchantrix_SetLocale(param, chatprint);
+
+	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
+	elseif (cmd == ENCH_CMD_FIND_BIDAUCT) or (cmd == ENCH_CMD_FIND_BIDAUCT_SHORT) then
+		Enchantrix_DoBidBroker(param);
+
+	elseif (cmd == ENCH_CMD_FIND_BUYAUCT) or (cmd == ENCH_CMD_FIND_BUYAUCT_SHORT) then
+		Enchantrix_DoPercentLess(param);
+
+	elseif (
+		((cmd == ENCH_SHOW_EMBED) or (cmd == "show-embedded")) or
+		((cmd == ENCH_SHOW_HEADER) or (cmd == "show-header")) or
+		((cmd == ENCH_SHOW_COUNT) or (cmd == "show-count")) or
+		((cmd == ENCH_SHOW_RATE) or (cmd == "show-rate")) or
+		((cmd == ENCH_SHOW_VALUE) or (cmd == "show-value")) or
+		((cmd == ENCH_SHOW_GUESS_AUCTIONEER_HSP) or (cmd == "valuate-hsp")) or
+		((cmd == ENCH_SHOW_GUESS_AUCTIONEER_MED) or (cmd == "valuate-median")) or
+		((cmd == ENCH_SHOW_GUESS_BASELINE) or (cmd == "valuate-baseline"))
+	) then
+		Enchantrix_GenVarSet(cmd, param, chatprint);
+
+	elseif (chatprint == true) then
+		Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN, cmd));
+	end
+end
+
+--Help ME!! (The Handler) (Another shameless copy from the original function)
+function Enchantrix_ChatPrint_Help()
+Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		local onOffToggle = " ("..ENCH_CMD_ON.."|"..ENCH_CMD_OFF.."|"..ENCH_CMD_TOGGLE..")";
 		local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
@@ -420,71 +478,171 @@ function Enchantrix_Command(command)
 		
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BIDAUCT, ENCH_OPT_FIND_BIDAUCT, ENCH_HELP_FIND_BIDAUCT));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BUYAUCT, ENCH_OPT_FIND_BUYAUCT, ENCH_HELP_FIND_BUYAUCT));
+end
 
-	elseif (cmd == ENCH_CMD_ON) then
+--The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
+--If "on" or "off" is specified in the " state" variable then Enchantrix's state is changed to that value,
+--If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
+--If no keyword is specified then the function will simply return the current state
+--
+--If chatprint is "true" then the state will also be printed to the user.
+
+function Enchantrix_OnOff(state, chatprint)
+
+	if ((state == nil) or (state == "")) then
+		state = Enchantrix_GetFilterVal("all");
+
+
+	elseif ((state == ENCH_CMD_ON) or (state == "on")) then
 		Enchantrix_SetFilter("all", "on");
-		Enchantrix_ChatPrint(ENCH_STAT_ON);
-	elseif (cmd == ENCH_CMD_OFF) then
+
+
+	elseif ((state == ENCH_CMD_OFF) or (state == "off")) then
 		Enchantrix_SetFilter("all", "off");
-		Enchantrix_ChatPrint(ENCH_STAT_OFF);
-	elseif (cmd == ENCH_CMD_TOGGLE) then
-		local cur = Enchantrix_GetFilterVal("all");
-		if (cur == "off") then
+
+
+	elseif ((state == ENCH_CMD_TOGGLE) or (state == "toggle")) then
+		state = Enchantrix_GetFilterVal("all");
+
+		if (state == "off") then
 			Enchantrix_SetFilter("all", "on");
-			Enchantrix_ChatPrint(ENCH_STAT_ON);
 		else
 			Enchantrix_SetFilter("all", "off");
-			Enchantrix_ChatPrint(ENCH_STAT_OFF);
 		end
-	elseif (cmd == ENCH_CMD_CLEAR) then
-		if (param == ENCH_CMD_CLEAR_ALL) then
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEARALL, aKey));
-			EnchantedLocal = {};
-		else
-			local items = Enchantrix_GetSigs(param);
-			for _,itemKey in items do
-				local aKey = itemKey.s;
-				local aName = itemKey.n;
-				EnchantedLocal[aKey] = { z=true };
-				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEAR_OK, aName));
-			end
-		end
-	elseif (cmd == ENCH_CMD_FIND_BIDAUCT) or (cmd == ENCH_CMD_FIND_BIDAUCT_SHORT) then
-		Enchantrix_DoBidBroker(param);
-	elseif (cmd == ENCH_CMD_FIND_BUYAUCT) or (cmd == ENCH_CMD_FIND_BUYAUCT_SHORT) then
-		Enchantrix_DoPercentLess(param);
+	end
 
-	elseif (
-		(cmd == ENCH_SHOW_EMBED) or
-		(cmd == ENCH_SHOW_HEADER) or
-		(cmd == ENCH_SHOW_COUNT) or
-		(cmd == ENCH_SHOW_RATE) or
-		(cmd == ENCH_SHOW_VALUE) or
-		(cmd == ENCH_SHOW_GUESS_AUCTIONEER_HSP) or
-		(cmd == ENCH_SHOW_GUESS_AUCTIONEER_MED) or
-		(cmd == ENCH_SHOW_GUESS_BASELINE)
-	) then
-		if (param == ENCH_CMD_OFF) then
-			Enchantrix_SetFilter(cmd, "off");
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, cmd));
-		elseif (param == ENCH_CMD_TOGGLE) then
-			local cur = Enchantrix_GetFilterVal(cmd);
-			if (cur == "on") then
-				cur = "off";
-				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, cmd));
-			else
-				cur = "on";
-				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, cmd));
+	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
+	if (chatprint == true) then
+		if ((state == ENCH_CMD_ON) or (state == "on")) then
+			Enchantrix_ChatPrint(ENCH_STAT_ON);
+
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", "EnchantrixEnable", "checked", true);
 			end
-			Enchantrix_SetFilter(cmd, cur);
 		else
-			Enchantrix_SetFilter(cmd, "on");
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, cmd));
+			Enchantrix_ChatPrint(ENCH_STAT_OFF);
+
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", "EnchantrixEnable", "checked", false);
+			end
 		end
+	end
+
+	return state;	
+end
+
+--The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
+function Enchantrix_Clear(param, chatprint)
+
+	if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then		
+		EnchantedLocal = {};
+
 	else
-		Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN, cmd));
+		local items = Enchantrix_GetSigs(param);
+
+		for _,itemKey in items do
+
+			local aKey = itemKey.s;
+			local aName = itemKey.n;
+			EnchantedLocal[aKey] = { z=true };
+		end
+	end
+
+	if (chatprint == true) then
+
+		if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEARALL, aKey));
+
+		else
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEAR_OK, aName));
+		end
 	end
 end
+
+function Enchantrix_SetLocale(param, chatprint)
+
+local validLocale=nil;
+
+	if (param == Enchantrix_GetLocale()) then
+		--Do Nothing
+		validLocale=true;
+	elseif (ENCH_VALID_LOCALES[param]) then
+		Enchantrix_SetFilter('locale', param);
+		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
+		validLocale=true;
+
+	elseif (param == '') or (param == 'default') or (param == 'off') then
+		Enchantrix_SetFilter('locale', 'default');
+		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
+		validLocale=true;
+	end
+	
+	
+	if (chatprint == true) then
+
+		if ((validLocale == true) and (ENCH_VALID_LOCALES[param])) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, param));
+			
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", "EnchantrixLocale", "value", param);
+			end
+
+		elseif (validLocale == nil) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN_LOCALE, param));
+
+			if (ENCH_VALID_LOCALES) then
+				for locale, x in pairs(ENCH_VALID_LOCALES) do
+					Enchantrix_ChatPrint("  "..locale);
+				end
+			end
+
+		else
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, 'default'));
+
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", "EnchantrixLocale", "value", "default");
+			end
+		end
+	end
+end
+
+function Enchantrix_GenVarSet(variable, param, chatprint)
+
+	if ((param == ENCH_CMD_ON) or (param == "on")) then
+		Enchantrix_SetFilter(variable, "on");
+
+	elseif ((param == ENCH_CMD_OFF) or (param == "off")) then
+		Enchantrix_SetFilter(variable, "off");
+
+	elseif ((param == ENCH_CMD_TOGGLE) or (param == "toggle") or (param == nil) or (param == "")) then
+		param = Enchantrix_GetFilterVal(variable);
+
+		if ((param == ENCH_CMD_ON) or (param == "on")) then
+			param = ENCH_CMD_OFF;
+
+		else
+			param = ENCH_CMD_ON;
+		end
+
+		Enchantrix_SetFilter(variable, param);
+	end
+
+	if (chatprint == true) then	
+
+		if ((param == ENCH_CMD_ON) or (param == "on")) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, variable));
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", variable, "checked", true);
+			end
+		elseif ((param == ENCH_CMD_OFF) or (param == "off")) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, variable));
+			if (Enchantrix_Khaos_Registered) then
+				Khaos.setSetKeyParameter("Enchantrix", variable, "checked", false);
+			end
+		end
+	end
+end
+
 
 function Enchantrix_SetFilter(type, value)
 	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
@@ -510,6 +668,13 @@ function Enchantrix_GetFilter(filter)
 	return true;
 end
 
+function Enchantrix_GetLocale()
+	local locale = Enchantrix_GetFilterVal('locale');
+	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
+		return locale;
+	end
+	return GetLocale();
+end
 
 function Enchantrix_GetSigs(str)
 	local itemList = {};
@@ -993,5 +1158,3 @@ function Enchantrix_FindSigInBags(sig)
 		end
 	end
 end
-
-

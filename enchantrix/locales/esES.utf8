@@ -5,13 +5,14 @@
 ENCH_FRMT_WELCOME = "Enchantrix versión %s cargado";
 ENCH_FRMT_CREDIT = "  (vaya a http://enchantrix.org/ para compartír su data)";
 
-ENCH_ARG_SPELLNAME = "Disenchant"; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
+--ENCH_ARG_SPELLNAME = "Disenchant"; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
 
 ENCH_CMD_OFF = "apagado";
 ENCH_CMD_ON = "prendido";
 ENCH_CMD_TOGGLE = "invertir";
 ENCH_CMD_CLEAR = "borrar";
 ENCH_CMD_CLEAR_ALL = "todo";
+ENCH_CMD_LOCALE = "localidad";
 
 ENCH_CMD_FIND_BUYAUCT = "porcientomenos";
 ENCH_CMD_FIND_BIDAUCT = "corredorofertas";
@@ -59,6 +60,7 @@ ENCH_FRMT_ACT_DISABLE = "Ocultando informacion de articulo: %s ";
 ENCH_FRMT_ACT_ENABLED_ON = "Mostrando %s de los artículos usando %s";
 ENCH_FRMT_ACT_SET = "%s ajustado(a) a '%s'";
 ENCH_FRMT_ACT_UNKNOWN = "Comando o palabra clave desconocida: '%s'";
+ENCH_FRMT_ACT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:";
 
 ENCH_FRMT_DISINTO = "Se convierte en:";
 ENCH_FRMT_FOUND = "Se encontro que %s se convierte en:";
