@@ -1034,8 +1034,8 @@ local validLocale=nil;
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 		validLocale=true;
 
-	elseif (param == '') or (param == 'default') or (param == 'off') then
-		Auctioneer_SetFilter('locale', 'default');
+	elseif ((param == '') or (param == _AUCT['CmdDefault']) or (param == 'default') or (param == _AUCT['CmdOff']) or (param == 'off')) then
+		Auctioneer_SetFilter('locale', _AUCT['CmdDefault']);
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 		validLocale=true;
 	end
@@ -1060,10 +1060,10 @@ local validLocale=nil;
 			end
 
 		else
-			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdLocale'], 'default'));
+			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdLocale'], _AUCT['CmdDefault']));
 
 			if (Auctioneer_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerLocale", "value", "default");
+				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerLocale", "value", _AUCT['CmdDefault']);
 			end
 		end
 	end
@@ -1122,6 +1122,7 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
 			end
+
 		elseif ((param == _AUCT['CmdOff']) or (param == "off")) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActDisable'], variable));
 			if (Auctioneer_Khaos_Registered) then
