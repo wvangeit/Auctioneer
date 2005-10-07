@@ -962,9 +962,49 @@ function Auctioneer_Clear(param, chatprint)
 			for pos,itemKey in pairs(items) do
 				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 					AuctionConfig.data[aKey][itemKey] = nil;
-					clearok = true;
+
+					if (AuctionConfig.stats[snapmed][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats[snapmed][aKey][itemKey] = nil;
+					end
+
+					if (AuctionConfig.stats[histmed][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats[histmed][aKey][itemKey] = nil;
+					end
+
+					if (AuctionConfig.stats[histcount][aKey][itemKey] ~= nil) then 
+						AuctionConfig.stats[histcount][aKey][itemKey] = nil;
+					end
+
+					if (AuctionConfig.stats[snapcount][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats[snapcount][aKey][itemKey] = nil;
+					end
+
+					if (AuctionConfig.sbuy[aKey][itemKey] ~= nil) then
+						AuctionConfig.sbuy[aKey][itemKey] = nil;
+					end
+
+					local count = 0;
+					while (AuctionConfig.snap[aKey][count] ~= nil) do
+
+						if (AuctionConfig.snap[aKey][count][itemKey] ~= nil) then
+							AuctionConfig.snap[aKey][count][itemKey] =nil;
+						end
+
+					count = count+1;
+					end
+
+					if (Auctioneer_HSPCache[aKey][itemKey] ~= nil) then
+						Auctioneer_HSPCache[aKey][itemKey] = nil;
+					end
+
+					--These are not included in the print statemet below because there could be the possiblity that an item's data was cleared but another's was not
+					if (chatprint == true) then
+						Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearOk'], param));
+					end
 				else
-					clearok = false;
+					if (chatprint == true) then
+						Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearFail'], param));
+					end
 				end
 			end
 		end
@@ -977,14 +1017,6 @@ function Auctioneer_Clear(param, chatprint)
 
 		elseif ((param == _AUCT['CmdClearSnapshot']) or (param == "snapshot")) then
 			Auctioneer_ChatPrint(_AUCT['FrmtActClearsnap']);
-
-		else
-			if (clearok == true) then
-				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearOk'], param));
-
-			else
-				Auctioneer_ChatPrint(string.format(_AUCT['FrmtActClearFail'], param));
-			end
 		end
 	end
 end
