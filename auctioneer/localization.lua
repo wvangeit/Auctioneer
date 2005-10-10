@@ -196,7 +196,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptScan'] = "";
 	_AUCT['OptScale'] = "<scale_factor>";
 	_AUCT['OptScaleDefault'] = 1.0;
-	_AUCT['OptDefault'] = "";
+	_AUCT['OptDefault'] = "(|<option>".._AUCT['CmdClearAll']..")";;
 	
 	_AUCT['OptPctBidmarkdown'] = "<percent>";
 	_AUCT['OptPctMarkup'] = "<percent>";
@@ -241,7 +241,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
 	_AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
 	_AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
-	_AUCT['HelpLocale'] = "Change the locale that is used to display auctioneer messages";
+	_AUCT['HelpLocale'] = "Change the locale that is used to display Auctioneer messages";
 	_AUCT['HelpBroker'] = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
 	_AUCT['HelpBidbroker'] = "Show short or medium term auctions from the recent scan that may be bid on for profit";
 	_AUCT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
@@ -251,7 +251,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpAutofill'] = "Set whether to autofill prices when dropping new auction items into the auction house window";
 	_AUCT['HelpPctBidmarkdown'] = "Set the percentage that Auctioneer will mark down bids from the buyout price";
 	_AUCT['HelpPctMarkup'] = "The percentage that vendor prices will be marked up when no other values are available";
-	_AUCT['HelpPctMaxless'] = "Set the maximum percentage that auctioneer will undercut market value before it gives up";
+	_AUCT['HelpPctMaxless'] = "Set the maximum percentage that Auctioneer will undercut market value before it gives up";
 	_AUCT['HelpPctNocomp'] = "The percentage that Auctioneer will undercut market value when there is no competition";
 	_AUCT['HelpPctUnderlow'] = "Set the percentage that Auctioneer will undercut the lowest auction price";
 	_AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
@@ -296,7 +296,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
 	_AUCT['AuctionOldAucts'] = "Previously scanned: %s";
 	_AUCT['AuctionDefunctAucts'] = "Defunct auctions removed: %s";
-	_AUCT['AuctionDiscrepancies'] = "Discrepencies: %s";
+	_AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
 	
 	
 	
@@ -321,7 +321,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiClearHeader'] = "Clear Data";
 	_AUCT['GuiClearHelp'] = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
 	_AUCT['GuiClearall'] = "Clear All Auctioneer Data";
-	_AUCT['GuiClearallHelp'] = "Click here to clear all of auctioneer data for the current server-realm.";
+	_AUCT['GuiClearallHelp'] = "Click here to clear all of Auctioneer data for the current server-realm.";
 	_AUCT['GuiClearallNote'] = "for the current server-faction";
 	_AUCT['GuiClearallButton'] = "Clear All";
 	_AUCT['GuiClearsnap'] = "Clear Snapshot data";
