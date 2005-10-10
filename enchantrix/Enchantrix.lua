@@ -296,18 +296,24 @@ function Enchantrix_OnEvent(event)
 			Enchantrix_Disenchants.exists = true;
 		end
 	end
-	if ((event == "UNIT_INVENTORY_CHANGED") and (arg1 == "player") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
-
+	if ((event == "BAG_UPDATE") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
+		
 		-- /script inv = Enchantrix_TakeInventory()
 		-- /script p(Enchantrix_FullDiff(inv, Enchantrix_TakeInventory()))
 		-- /script p(Enchantrix_FullDiff(Enchantrix_StartInv, Enchantrix_TakeInventory()))
 		local nowInv = Enchantrix_TakeInventory();
 		local invDiff = Enchantrix_FullDiff(Enchantrix_StartInv, nowInv);
 
-
 		local foundItem = "";
 		for sig, data in invDiff do
 			if (data.d == -1) then
+				if (foundItem ~= "") then
+					-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
+					Enchantrix_Disenchants = {};
+					Enchantrix_Disenchanting = false;
+					Enchantrix_WaitingPush = false;					
+					return;
+				end					
 				foundItem = data;
 			end
 		end
@@ -319,8 +325,8 @@ function Enchantrix_OnEvent(event)
 				gainedItem[sig] = data;
 			end
 		end
-
-
+		if (next(gainedItem) == nil) then return; end
+		
 		if (EnchantedLocal[foundItem.n]) then
 			EnchantedLocal[foundItem.s] = { o = ""..EnchantedLocal[foundItem.n] };
 		end
@@ -369,7 +375,7 @@ function Enchantrix_OnLoad()
 	this:RegisterEvent("SPELLCAST_START");
 	this:RegisterEvent("SPELLCAST_STOP");
 	this:RegisterEvent("ITEM_PUSH");
-	this:RegisterEvent("UNIT_INVENTORY_CHANGED");
+	this:RegisterEvent("BAG_UPDATE");
 	
 	Enchantrix_DisenchantCount = 0;
 	Enchantrix_DisenchantResult = {};
