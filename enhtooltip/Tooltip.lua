@@ -104,7 +104,7 @@
 -- setting version number
 ENHTOOLTIP_VERSION = "<%version%>"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
-	ENHTOOLTIP_VERSION = "1.0.DEV"
+	ENHTOOLTIP_VERSION = "3.1.DEV"
 end
 
 --[[
@@ -558,6 +558,7 @@ function qualityFromLink(link)
 	if (not link) then return nil end
 	_, _, color = string.find(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
 	if (color) then
+		if (color == "ffff8000") then return 5;--[[ Legendary ]] end
 		if (color == "ffa335ee") then return 4;--[[ Epic ]] end
 		if (color == "ff0070dd") then return 3;--[[ Rare ]] end
 		if (color == "ff1eff00") then return 2;--[[ Uncommon ]] end
@@ -575,7 +576,8 @@ function fakeLink(hyperlink, quality, name)
 	if (quality == nil) then quality = -1 end
 	if (name == nil) then name = "unknown" end
 	local color = "ffffff"
-	if (quality == 4) then color = "a335ee"
+	if (quality == 5) then color = "ff8000"
+	elseif (quality == 4) then color = "a335ee"
 	elseif (quality == 3) then color = "0070dd"
 	elseif (quality == 2) then color = "1eff00"
 	elseif (quality == 0) then color = "9d9d9d"
