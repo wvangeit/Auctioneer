@@ -45,6 +45,7 @@ function Auctioneer_StopAuctionScan()
 	
 	Auctioneer_isScanningRequested = false;
 	lScanInProgress = false;
+	lCurrentCategoryIndex = 0;
 end
 
 local lPageStartedAt;
