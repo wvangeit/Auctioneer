@@ -196,7 +196,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptScan'] = "";
 	_AUCT['OptScale'] = "<scale_factor>";
 	_AUCT['OptScaleDefault'] = 1.0;
-	_AUCT['OptDefault'] = "(|<option>".._AUCT['CmdClearAll']..")";;
+	_AUCT['OptDefault'] = "(|<option>".._AUCT['CmdClearAll']..")";
 	
 	_AUCT['OptPctBidmarkdown'] = "<percent>";
 	_AUCT['OptPctMarkup'] = "<percent>";
