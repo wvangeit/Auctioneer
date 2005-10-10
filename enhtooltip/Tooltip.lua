@@ -816,7 +816,7 @@ function gtHookSetQuestLogItem(frame, qtype, slot)
 end
 
 function gtHookSetBagItem(frame, frameID, buttonID)
-	self.hooks.gtSetBagItem(frame, frameID, buttonID)
+	local hasCooldown, repairCost = self.hooks.gtSetBagItem(frame, frameID, buttonID)
 
 	local link = GetContainerItemLink(frameID, buttonID)
 	local name = nameFromLink(link)
@@ -827,6 +827,8 @@ function gtHookSetBagItem(frame, frameID, buttonID)
 
 		tooltipCall(GameTooltip, name, link, quality, itemCount)
 	end
+	
+	return hasCooldown, repairCost
 end
 
 function gtHookSetInventoryItem(frame, unit, slot)
