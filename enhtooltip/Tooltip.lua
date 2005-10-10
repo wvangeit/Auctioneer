@@ -42,7 +42,7 @@
     EnhTooltip.LineSize_Large()
       - Changes the size of the font string to 12
       
-    EnhTooltip.LineSize_Large()
+    EnhTooltip.LineSize_Small()
       - Changes the size of the font string to 10
 		
     EnhTooltip.LineQuality(quality)
