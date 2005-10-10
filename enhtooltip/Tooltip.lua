@@ -136,7 +136,7 @@ local self = {
 
 -- =============== LOCAL FUNCTIONS =============== --
 
--- prottypes for all local functions
+-- prototypes for all local functions
 
 local hideTooltip
 local clearTooltip
@@ -187,7 +187,7 @@ local setMoneySpacing
 local setPopupKey
 local ttInitialize
 
--- functiondefinitions
+-- function definitions
 
 function hideTooltip()
 	EnhancedTooltip:Hide()
@@ -356,7 +356,7 @@ function showTooltip(currentTooltip)
 	EnhancedTooltip:Show()
 end
 
--- calculate the gold, silver, and copper values based the ammount of copper
+-- calculate the gold, silver, and copper values based the amount of copper
 function getGSC(money)
 	if (money == nil) then money = 0 end
 	local g = math.floor(money / 10000)
