@@ -325,10 +325,8 @@ function Enchantrix_OnEvent(event)
 			EnchantedLocal[foundItem.s] = { o = ""..EnchantedLocal[foundItem.n] };
 		end
 
-		if (not EnchantedLocal[foundItem.s]) then
-			EnchantedLocal[foundItem.s] = {};
-		end
-
+		local itemData = Enchantrix_GetLocal(foundItem.s);
+		
 		DEFAULT_CHAT_FRAME:AddMessage(string.format(ENCH_FRMT_FOUND, foundItem.l), 0.8, 0.8, 0.2);
 		for sig, data in gainedItem do
 			local i,j, strItemID = string.find(sig, "^(%d+):");
@@ -337,16 +335,18 @@ function Enchantrix_OnEvent(event)
 			if (itemID > 0) and (ItemEssences[itemID]) then
 				-- We are interested cause this is an essence that was gained since last snaphot
 				local iCount = 0; local dCount = 0;
-				local curData = EnchantedLocal[foundItem.s][itemID];
+				local curData = itemData[itemID];
 				if (curData == nil) then curData = {}; end
 				if (curData.i) then iCount = tonumber(curData.i); end
 				if (curData.d) then dCount = tonumber(curData.d); end
 				curData.i = ""..(iCount + 1);
 				curData.d = ""..(dCount + data.d);
-				EnchantedLocal[foundItem.s][itemID] = curData;
+				itemData[itemID] = curData;
 				DEFAULT_CHAT_FRAME:AddMessage("  " .. data.n .. " x" .. data.d, 0.6, 0.6, 0.1);
 			end
 		end
+		
+		Enchantrix_SaveLocal(foundItem.s, itemData);
 
 		Enchantrix_Disenchants = {};
 		Enchantrix_Disenchanting = false;
