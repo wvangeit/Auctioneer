@@ -5,7 +5,7 @@
 ENCH_FRMT_WELCOME = "Enchantrix versión %s cargado";
 ENCH_FRMT_CREDIT = "  (vaya a http://enchantrix.org/ para compartír su data)";
 
---ENCH_ARG_SPELLNAME = "Disenchant"; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
+ENCH_ARG_SPELLNAME = ENCH_ARG_SPELLNAME; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
 
 ENCH_CMD_OFF = "apagado";
 ENCH_CMD_ON = "prendido";
@@ -13,6 +13,7 @@ ENCH_CMD_TOGGLE = "invertir";
 ENCH_CMD_CLEAR = "borrar";
 ENCH_CMD_CLEAR_ALL = "todo";
 ENCH_CMD_LOCALE = "localidad";
+ENCH_CMD_DEFAULT = "original";
 
 ENCH_CMD_FIND_BUYAUCT = "porcientomenos";
 ENCH_CMD_FIND_BIDAUCT = "corredorofertas";
@@ -21,14 +22,16 @@ ENCH_CMD_FIND_BUYAUCT_SHORT = "pm";
 ENCH_CMD_FIND_BIDAUCT_SHORT = "co";
 
 ENCH_OPT_CLEAR = "([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_LOCALE = "<localidad>";
 ENCH_OPT_FIND_BUYAUCT = "<percent>";
 ENCH_OPT_FIND_BIDAUCT = "<silver>";
+ENCH_OPT_FIND_BIDAUCT = "(<opción>|"..ENCH_CMD_CLEAR_ALL..")";
 
-ENCH_SHOW_EMBED = "ver-integrado";
-ENCH_SHOW_HEADER = "ver-titulo";
-ENCH_SHOW_COUNT = "ver-cuenta";
-ENCH_SHOW_RATE = "ver-razon";
-ENCH_SHOW_VALUE = "ver-valor";
+ENCH_SHOW_EMBED = "integrar";
+ENCH_SHOW_HEADER = "titulo";
+ENCH_SHOW_COUNT = "conteo";
+ENCH_SHOW_RATE = "razones";
+ENCH_SHOW_VALUE = "valorizar";
 ENCH_SHOW_GUESS_AUCTIONEER_HSP = "valorizar-pmv";
 ENCH_SHOW_GUESS_AUCTIONEER_MED = "valorizar-mediano";
 ENCH_SHOW_GUESS_BASELINE = "valorizar-referencia";
@@ -46,8 +49,10 @@ ENCH_HELP_GUESS_NOAUCTIONEER = "Los comandos "..ENCH_SHOW_GUESS_AUCTIONEER_HSP..
 ENCH_HELP_GUESS_BASELINE = "Si la valorización esta seleccionada, (Auctioneer no es necesario) mostrar la valorización de los desencantamientos del artículo, basandose en los valores de referencia incluidos.";
 
 ENCH_HELP_CLEAR = "Eliminar la informacion existente sobre el artículo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabra clave \"todo\"";
+ENCH_HELP_LOCALE = "Cambiar la localidad que Enchantrix usa para sus mensajes";
 ENCH_HELP_FIND_BUYAUCT = "Encontrar subastas donde el valor posible de los desencantamientos es un cierto porciento menos que el precio de la opción a compra";
 ENCH_HELP_FIND_BIDAUCT = "Encontrar subastas donde el valor posible de los desencantamientos es una cierta cantidad de plata menos que el precio de oferta";
+ENCH_HELP_DEFAULT = "Revertir una opción de Enchantrix a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Enchantrix a sus configuraciones de fábrica."
 
 ENCH_STAT_ON = "Mostrando la configuracion corriente para la informacion de los desencantamientos";
 ENCH_STAT_OFF = "Ocultando toda información de los desencantamientos";
@@ -59,8 +64,11 @@ ENCH_FRMT_ACT_ENABLE = "Mostrando informacion del artículo: %s ";
 ENCH_FRMT_ACT_DISABLE = "Ocultando informacion de articulo: %s ";
 ENCH_FRMT_ACT_ENABLED_ON = "Mostrando %s de los artículos usando %s";
 ENCH_FRMT_ACT_SET = "%s ajustado(a) a '%s'";
+
 ENCH_FRMT_ACT_UNKNOWN = "Comando o palabra clave desconocida: '%s'";
 ENCH_FRMT_ACT_UNKNOWN_LOCALE = "La localización que usted especifico ('%s') no es valida. Locales válidos son:";
+ENCH_FRMT_ACT_DEFAULT_ALL= "Todas las opciones de Enchantrix han sido revertidas a sus configuraciones de fábrica.";
+ENCH_FRMT_ACT_DEFAULT = "La opción %s de Enchantrix ha sido revertida a su configuración de fábrica.";
 
 ENCH_FRMT_DISINTO = "Se convierte en:";
 ENCH_FRMT_FOUND = "Se encontro que %s se convierte en:";

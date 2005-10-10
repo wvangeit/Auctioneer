@@ -13,6 +13,7 @@ ENCH_CMD_TOGGLE = "toggle";
 ENCH_CMD_CLEAR = "clear";
 ENCH_CMD_CLEAR_ALL = "all";
 ENCH_CMD_LOCALE = "locale";
+ENCH_CMD_DEFAULT = "default";
 
 ENCH_CMD_FIND_BUYAUCT = "percentless";
 ENCH_CMD_FIND_BIDAUCT = "bidbroker";
@@ -21,14 +22,16 @@ ENCH_CMD_FIND_BUYAUCT_SHORT = "pl";
 ENCH_CMD_FIND_BIDAUCT_SHORT = "bb";
 
 ENCH_OPT_CLEAR = "([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_LOCALE = "<locale>";
 ENCH_OPT_FIND_BUYAUCT = "<percent>";
 ENCH_OPT_FIND_BIDAUCT = "<silver>";
+ENCH_OPT_FIND_BIDAUCT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
 
-ENCH_SHOW_EMBED = "show-embedded";
-ENCH_SHOW_HEADER = "show-header";
-ENCH_SHOW_COUNT = "show-count";
-ENCH_SHOW_RATE = "show-rate";
-ENCH_SHOW_VALUE = "show-value";
+ENCH_SHOW_EMBED = "embed";
+ENCH_SHOW_HEADER = "header";
+ENCH_SHOW_COUNT = "counts";
+ENCH_SHOW_RATE = "rates";
+ENCH_SHOW_VALUE = "valuate";
 ENCH_SHOW_GUESS_AUCTIONEER_HSP = "valuate-hsp";
 ENCH_SHOW_GUESS_AUCTIONEER_MED = "valuate-median";
 ENCH_SHOW_GUESS_BASELINE = "valuate-baseline";
@@ -46,8 +49,10 @@ ENCH_HELP_GUESS_NOAUCTIONEER = "The "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." and "..
 ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 
 ENCH_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
+ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix messages";
 ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
+ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
 
 ENCH_STAT_ON = "Displaying configured enchant data";
 ENCH_STAT_OFF = "Not displaying any enchant data";
@@ -59,8 +64,11 @@ ENCH_FRMT_ACT_ENABLE = "Displaying item's %s data";
 ENCH_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 ENCH_FRMT_ACT_ENABLED_ON = "Displaying item's %s on %s";
 ENCH_FRMT_ACT_SET = "Set %s to '%s'";
+
 ENCH_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
 ENCH_FRMT_ACT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
+ENCH_FRMT_ACT_DEFAULT_ALL= "All Enchantrix options have been reset to default settings.";
+ENCH_FRMT_ACT_DEFAULT = "Enchantrix's %s option has been reset to its default setting";
 
 ENCH_FRMT_DISINTO = "Disenchants into:";
 ENCH_FRMT_FOUND = "Found that %s disenchants into:";

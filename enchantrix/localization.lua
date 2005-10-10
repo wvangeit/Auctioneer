@@ -61,6 +61,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_CMD_CLEAR = "clear";
 	ENCH_CMD_CLEAR_ALL = "all";
 	ENCH_CMD_LOCALE = "locale";
+	ENCH_CMD_DEFAULT = "default";
 	
 	ENCH_CMD_FIND_BUYAUCT = "percentless";
 	ENCH_CMD_FIND_BIDAUCT = "bidbroker";
@@ -69,14 +70,16 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_CMD_FIND_BIDAUCT_SHORT = "bb";
 	
 	ENCH_OPT_CLEAR = "([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+	ENCH_OPT_LOCALE = "<locale>";
 	ENCH_OPT_FIND_BUYAUCT = "<percent>";
 	ENCH_OPT_FIND_BIDAUCT = "<silver>";
+	ENCH_OPT_FIND_BIDAUCT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
 	
-	ENCH_SHOW_EMBED = "show-embedded";
-	ENCH_SHOW_HEADER = "show-header";
-	ENCH_SHOW_COUNT = "show-count";
-	ENCH_SHOW_RATE = "show-rate";
-	ENCH_SHOW_VALUE = "show-value";
+	ENCH_SHOW_EMBED = "embed";
+	ENCH_SHOW_HEADER = "header";
+	ENCH_SHOW_COUNT = "counts";
+	ENCH_SHOW_RATE = "rates";
+	ENCH_SHOW_VALUE = "valuate";
 	ENCH_SHOW_GUESS_AUCTIONEER_HSP = "valuate-hsp";
 	ENCH_SHOW_GUESS_AUCTIONEER_MED = "valuate-median";
 	ENCH_SHOW_GUESS_BASELINE = "valuate-baseline";
@@ -94,8 +97,10 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 	
 	ENCH_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
+	ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix messages";
 	ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 	ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
+	ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
 	
 	ENCH_STAT_ON = "Displaying configured enchant data";
 	ENCH_STAT_OFF = "Not displaying any enchant data";
@@ -107,8 +112,11 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_ACT_DISABLE = "Not displaying item's %s data";
 	ENCH_FRMT_ACT_ENABLED_ON = "Displaying item's %s on %s";
 	ENCH_FRMT_ACT_SET = "Set %s to '%s'";
+	
 	ENCH_FRMT_ACT_UNKNOWN = "Unknown command keyword: '%s'";
 	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
+	ENCH_FRMT_ACT_DEFAULT_ALL= "All Enchantrix options have been reset to default settings.";
+	ENCH_FRMT_ACT_DEFAULT = "Enchantrix's %s option has been reset to its default setting";
 	
 	ENCH_FRMT_DISINTO = "Disenchants into:";
 	ENCH_FRMT_FOUND = "Found that %s disenchants into:";
@@ -266,8 +274,14 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Visionenstaub"] = 11137;
 
 -- The following definitions are missing in this locale:
+--	ENCH_CMD_DEFAULT = "";
 --	ENCH_CMD_LOCALE = "";
+--	ENCH_FRMT_ACT_DEFAULT = "";
+--	ENCH_FRMT_ACT_DEFAULT_ALL = "";
 --	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "";
+--	ENCH_HELP_DEFAULT = "";
+--	ENCH_HELP_LOCALE = "";
+--	ENCH_OPT_LOCALE = "";
 	end
 
 
@@ -281,7 +295,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_WELCOME="Enchantrix versi\195\179n %s cargado";
 		ENCH_FRMT_CREDIT="  (vaya a http://enchantrix.org/ para compart\195\173r su data)";
 		
-		--ENCH_ARG_SPELLNAME = "Disenchant"; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
+		ENCH_ARG_SPELLNAME=ENCH_ARG_SPELLNAME; --Since there is currently no Spanish WoW client, changing this value to a localized version would essentially break Enchantrix.
 		
 		ENCH_CMD_OFF="apagado";
 		ENCH_CMD_ON="prendido";
@@ -289,6 +303,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_CMD_CLEAR="borrar";
 		ENCH_CMD_CLEAR_ALL="todo";
 		ENCH_CMD_LOCALE="localidad";
+		ENCH_CMD_DEFAULT="original";
 		
 		ENCH_CMD_FIND_BUYAUCT="porcientomenos";
 		ENCH_CMD_FIND_BIDAUCT="corredorofertas";
@@ -297,14 +312,16 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_CMD_FIND_BIDAUCT_SHORT="co";
 		
 		ENCH_OPT_CLEAR="([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_LOCALE="<localidad>";
 		ENCH_OPT_FIND_BUYAUCT="<percent>";
 		ENCH_OPT_FIND_BIDAUCT="<silver>";
+		ENCH_OPT_FIND_BIDAUCT="(<opci\195\179n>|"..ENCH_CMD_CLEAR_ALL..")";
 		
-		ENCH_SHOW_EMBED="ver-integrado";
-		ENCH_SHOW_HEADER="ver-titulo";
-		ENCH_SHOW_COUNT="ver-cuenta";
-		ENCH_SHOW_RATE="ver-razon";
-		ENCH_SHOW_VALUE="ver-valor";
+		ENCH_SHOW_EMBED="integrar";
+		ENCH_SHOW_HEADER="titulo";
+		ENCH_SHOW_COUNT="conteo";
+		ENCH_SHOW_RATE="razones";
+		ENCH_SHOW_VALUE="valorizar";
 		ENCH_SHOW_GUESS_AUCTIONEER_HSP="valorizar-pmv";
 		ENCH_SHOW_GUESS_AUCTIONEER_MED="valorizar-mediano";
 		ENCH_SHOW_GUESS_BASELINE="valorizar-referencia";
@@ -322,8 +339,10 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_GUESS_BASELINE="Si la valorizaci\195\179n esta seleccionada, (Auctioneer no es necesario) mostrar la valorizaci\195\179n de los desencantamientos del art\195\173culo, basandose en los valores de referencia incluidos.";
 		
 		ENCH_HELP_CLEAR="Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabra clave \"todo\"";
+		ENCH_HELP_LOCALE="Cambiar la localidad que Enchantrix usa para sus mensajes";
 		ENCH_HELP_FIND_BUYAUCT="Encontrar subastas donde el valor posible de los desencantamientos es un cierto porciento menos que el precio de la opci\195\179n a compra";
 		ENCH_HELP_FIND_BIDAUCT="Encontrar subastas donde el valor posible de los desencantamientos es una cierta cantidad de plata menos que el precio de oferta";
+		ENCH_HELP_DEFAULT="Revertir una opci\195\179n de Enchantrix a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Enchantrix a sus configuraciones de f\195\161brica."
 		
 		ENCH_STAT_ON="Mostrando la configuracion corriente para la informacion de los desencantamientos";
 		ENCH_STAT_OFF="Ocultando toda informaci\195\179n de los desencantamientos";
@@ -335,8 +354,11 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_ACT_DISABLE="Ocultando informacion de articulo: %s ";
 		ENCH_FRMT_ACT_ENABLED_ON="Mostrando %s de los art\195\173culos usando %s";
 		ENCH_FRMT_ACT_SET="%s ajustado(a) a '%s'";
+		
 		ENCH_FRMT_ACT_UNKNOWN="Comando o palabra clave desconocida: '%s'";
 		ENCH_FRMT_ACT_UNKNOWN_LOCALE="La localizaci\195\179n que usted especifico ('%s') no es valida. Locales v\195\161lidos son:";
+		ENCH_FRMT_ACT_DEFAULT_ALL="Todas las opciones de Enchantrix han sido revertidas a sus configuraciones de f\195\161brica.";
+		ENCH_FRMT_ACT_DEFAULT="La opci\195\179n %s de Enchantrix ha sido revertida a su configuraci\195\179n de f\195\161brica.";
 		
 		ENCH_FRMT_DISINTO="Se convierte en:";
 		ENCH_FRMT_FOUND="Se encontro que %s se convierte en:";
@@ -382,9 +404,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Soul Dust"] = 11083;
 		EssenceItemIDs["Strange Dust"] = 10940;
 		EssenceItemIDs["Vision Dust"] = 11137;
-
--- The following definitions are missing in this locale:
---	ENCH_ARG_SPELLNAME = "";
 	end
 
 end

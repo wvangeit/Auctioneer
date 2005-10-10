@@ -56,7 +56,7 @@ local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
 
 
 if (ENCHANTRIX_VERSION == "<".."%version%>") then
-	ENCHANTRIX_VERSION = "2.0.DEV";
+	ENCHANTRIX_VERSION = "3.1.DEV";
 end
 
 function Enchantrix_CheckTooltipInfo(frame)
@@ -407,19 +407,10 @@ function Enchantrix_Command(command, source)
 	end;
 	
 	--Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
-
-	if (not cmd) then
-		cmd = command;
-	end
-
-	if (not cmd) then
-		cmd = "";
-	end
-
-	if (not param) then
-		param = "";
-	end
+	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$")
+	if (not cmd) then cmd = command end
+	if (not cmd) then cmd = "" end
+	if (not param) then param = "" end
 
 	if ((cmd == "") or (cmd == "help")) then
 		Enchantrix_ChatPrint_Help();
@@ -434,6 +425,9 @@ function Enchantrix_Command(command, source)
 	elseif ((cmd == ENCH_CMD_LOCALE) or (cmd == "locale")) then
 		Enchantrix_SetLocale(param, chatprint);
 
+	elseif ((cmd == ENCH_CMD_DEFAULT) or (cmd == "default")) then
+		Enchantrix_Default(param, chatprint);
+
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
 	elseif (cmd == ENCH_CMD_FIND_BIDAUCT) or (cmd == ENCH_CMD_FIND_BIDAUCT_SHORT) then
 		Enchantrix_DoBidBroker(param);
@@ -441,12 +435,13 @@ function Enchantrix_Command(command, source)
 	elseif (cmd == ENCH_CMD_FIND_BUYAUCT) or (cmd == ENCH_CMD_FIND_BUYAUCT_SHORT) then
 		Enchantrix_DoPercentLess(param);
 
+	--These commands have been changed to match those used by Auctioneer/Informant. Others have been simplified.
 	elseif (
-		((cmd == ENCH_SHOW_EMBED) or (cmd == "show-embedded")) or
-		((cmd == ENCH_SHOW_HEADER) or (cmd == "show-header")) or
-		((cmd == ENCH_SHOW_COUNT) or (cmd == "show-count")) or
-		((cmd == ENCH_SHOW_RATE) or (cmd == "show-rate")) or
-		((cmd == ENCH_SHOW_VALUE) or (cmd == "show-value")) or
+		((cmd == ENCH_SHOW_EMBED) or (cmd == "embed")) or
+		((cmd == ENCH_SHOW_HEADER) or (cmd == "header")) or
+		((cmd == ENCH_SHOW_COUNT) or (cmd == "counts")) or
+		((cmd == ENCH_SHOW_RATE) or (cmd == "rates")) or
+		((cmd == ENCH_SHOW_VALUE) or (cmd == "valuate")) or
 		((cmd == ENCH_SHOW_GUESS_AUCTIONEER_HSP) or (cmd == "valuate-hsp")) or
 		((cmd == ENCH_SHOW_GUESS_AUCTIONEER_MED) or (cmd == "valuate-median")) or
 		((cmd == ENCH_SHOW_GUESS_BASELINE) or (cmd == "valuate-baseline"))
@@ -480,10 +475,13 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_GUESS_BASELINE, Enchantrix_GetFilterVal(ENCH_SHOW_GUESS_BASELINE), ENCH_HELP_GUESS_BASELINE));
 
 		lineFormat = "  |cffffffff/enchantrix %s %s|r - %s";
+		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_LOCALE, ENCH_OPT_LOCALE, ENCH_HELP_LOCALE));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_CLEAR, ENCH_OPT_CLEAR, ENCH_HELP_CLEAR));
 		
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BIDAUCT, ENCH_OPT_FIND_BIDAUCT, ENCH_HELP_FIND_BIDAUCT));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BUYAUCT, ENCH_OPT_FIND_BUYAUCT, ENCH_HELP_FIND_BUYAUCT));
+		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_DEFAULT, ENCH_OPT_DEFAULT, ENCH_HELP_DEFAULT));
+		
 end
 
 --The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
@@ -611,6 +609,31 @@ local validLocale=nil;
 		end
 	end
 end
+
+--This function was added by MentalPower to implement the /enx default command
+function Enchantrix_Default(param, chatprint)
+
+	if ( (param == nil) or (param == "") ) then
+		return
+
+	elseif ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then
+		EnchantConfig.filters = {};
+
+	else
+		Enchantrix_SetFilter(param, nil);
+	end
+
+	--@TODO: Move the default setting for the different functions over here to be able to communicate to Khaos what those setting are.
+	if (chatprint == true) then
+		if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all") or (param == "") or (param == nil)) then
+			Enchantrix_ChatPrint(ENCH_FRMT_ACT_DEFAULT_ALL);
+
+		else
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DEFAULT, param));
+		end
+	end
+end
+
 
 function Enchantrix_GenVarSet(variable, param, chatprint)
 
