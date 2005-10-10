@@ -31,10 +31,19 @@
 	    If moneyAmount is supplied, the line has a money amount right-aligned after it.
 		It embed evaluates to true, then the line is placed at the end of the game tooltip
 		  and the money amount is converted to a textual form.
-		  
+
+	EnhTooltip.AddSeparator()
+	  - Adds an empty line to the tooltip.
+
     EnhTooltip.LineColor(r, g, b)
 	  - Changes the color of the most recently added line to the given R,G,B value.
 	    The R,G,B values are floating point values from 0.0 (dark) to 1.0 (bright)
+
+    EnhTooltip.LineSize_Large()
+      - Changes the size of the font string to 12
+      
+    EnhTooltip.LineSize_Large()
+      - Changes the size of the font string to 10
 		
     EnhTooltip.LineQuality(quality)
 	  - Changes the color of the most recently added line to the quality color of the
@@ -197,6 +206,7 @@ function clearTooltip()
 		local ttText = getglobal("EnhancedTooltipText"..i)
 		ttText:Hide()
 		ttText:SetTextColor(1.0,1.0,1.0)
+		ttText:SetFont("Fonts\\FRIZQT__.TTF", 10);
 	end
 	for i = 1, 20 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
@@ -447,6 +457,15 @@ function addLine(lineText, moneyAmount, embed)
 	end
 end
 
+function addSeparator()
+    local curLine = EnhancedTooltip.lineCount +1;
+	local line = getglobal("EnhancedTooltipText"..curLine)
+	line:SetText(" ");
+	line:SetTextColor(1.0, 1.0, 1.0);
+	line:Show();
+	EnhancedTooltip.lineCount = curLine
+end
+
 function lineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then
 		local n = table.getn(self.embedLines)
@@ -459,6 +478,20 @@ function lineColor(r, g, b)
 	if (curLine == 0) then return end
 	local line = getglobal("EnhancedTooltipText"..curLine)
 	line:SetTextColor(r, g, b)
+end
+
+function lineSize_Large()
+    local curLine = EnhancedTooltip.lineCount
+    if (curLine == 0) then return end
+    local line = getglobal("EnhancedTooltipText"..curLine)
+    line:SetFont("Fonts\\FRIZQT__.TTF", 12)
+end
+
+function lineSize_Small()
+    local curLine = EnhancedTooltip.lineCount
+    if (curLine == 0) then return end
+    local line = getglobal("EnhancedTooltipText"..curLine)
+    line:SetFont("Fonts\\FRIZQT__.TTF", 10)
 end
 
 function lineQuality(quality)
@@ -1073,6 +1106,9 @@ EnhTooltip = {
 	['AddLine']           = addLine,
 	['LineColor']         = lineColor,
 	['LineQuality']       = lineQuality,
+  	['LineSize_Large']    = lineSize_Large,
+  	['LineSize_Small']    = lineSize_Small,
+    ['AddSeparator']      = addSeparator,
 	['SetIcon']           = setIcon,
 	['NameFromLink']      = nameFromLink,
 	['HyperlinkFromLink'] = hyperlinkFromLink,
