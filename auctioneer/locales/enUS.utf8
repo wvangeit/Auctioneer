@@ -253,7 +253,7 @@ _AUCT['AuctionTotalAucts'] = "Total auctions scanned: %s";
 _AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
 _AUCT['AuctionOldAucts'] = "Previously scanned: %s";
 _AUCT['AuctionDefunctAucts'] = "Defunct auctions removed: %s";
-_AUCT['AuctionDiscrepancies'] = "Discrepencies: %s";
+_AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
 
 -- GUI localizations
 

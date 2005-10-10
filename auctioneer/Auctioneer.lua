@@ -10,6 +10,9 @@ AUCTIONEER_VERSION="<%version%>";
 -- mouse-over an item in the game
 --
 --
+if (AUCTIONEER_VERSION == "<".."%version%>") then
+	AUCTIONEER_VERSION = "3.1.DEV";
+end
 
 function Auctioneer_OnLoad()
 	-- Hook in new tooltip code

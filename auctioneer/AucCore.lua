@@ -7,10 +7,6 @@
 	Functions central to the major operation of Auctioneer. 
 ]]
 
-AUCTIONEER_VERSION = "<%version%>";
-if (AUCTIONEER_VERSION == "<".."%version%>") then
-	AUCTIONEER_VERSION = "3.1.DEV";
-end
 
 MAX_ALLOWED_FORMAT_INT = 2000000000; -- numbers much greater than this overflow when using format("%d")
 
