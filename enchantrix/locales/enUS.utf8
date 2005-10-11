@@ -25,7 +25,7 @@ ENCH_OPT_CLEAR = "([Item]|"..ENCH_CMD_CLEAR_ALL..")";
 ENCH_OPT_LOCALE = "<locale>";
 ENCH_OPT_FIND_BUYAUCT = "<percent>";
 ENCH_OPT_FIND_BIDAUCT = "<silver>";
-ENCH_OPT_FIND_BIDAUCT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_DEFAULT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
 
 ENCH_SHOW_EMBED = "embed";
 ENCH_SHOW_HEADER = "header";

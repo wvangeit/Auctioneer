@@ -73,7 +73,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_OPT_LOCALE = "<locale>";
 	ENCH_OPT_FIND_BUYAUCT = "<percent>";
 	ENCH_OPT_FIND_BIDAUCT = "<silver>";
-	ENCH_OPT_FIND_BIDAUCT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
+	ENCH_OPT_DEFAULT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
 	
 	ENCH_SHOW_EMBED = "embed";
 	ENCH_SHOW_HEADER = "header";
@@ -331,6 +331,7 @@ function Enchantrix_SetLocaleStrings(locale)
 --	ENCH_GUI_VALUATE_MEDIAN = "";
 --	ENCH_HELP_DEFAULT = "";
 --	ENCH_HELP_LOCALE = "";
+--	ENCH_OPT_DEFAULT = "";
 --	ENCH_OPT_LOCALE = "";
 	end
 
@@ -365,7 +366,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_OPT_LOCALE="<localidad>";
 		ENCH_OPT_FIND_BUYAUCT="<percent>";
 		ENCH_OPT_FIND_BIDAUCT="<silver>";
-		ENCH_OPT_FIND_BIDAUCT="(<opci\195\179n>|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_DEFAULT="(<opci\195\179n>|"..ENCH_CMD_CLEAR_ALL..")";
 		
 		ENCH_SHOW_EMBED="integrar";
 		ENCH_SHOW_HEADER="titulo";
@@ -571,6 +572,7 @@ function Enchantrix_SetLocaleStrings(locale)
 --	ENCH_HELP_RATE = "";
 --	ENCH_HELP_VALUE = "";
 --	ENCH_OPT_CLEAR = "";
+--	ENCH_OPT_DEFAULT = "";
 --	ENCH_OPT_FIND_BIDAUCT = "";
 --	ENCH_OPT_FIND_BUYAUCT = "";
 --	ENCH_OPT_LOCALE = "";
