@@ -1,5 +1,5 @@
 ## Title: Enchantrix
-## Interface: 1700 
+## Interface: 1800 
 ## Version: <%version%>
 ## Revision: $Id$
 ## Notes: Display information in item tooltips pertaining to the results of disenchanting said item.
