@@ -8,7 +8,7 @@
 ]]
 
 function Auctioneer_HookTooltip(frame, name, link, quality, count)
-	if (not link) then Auctioneer_p("No link was passed to the client");  return; end
+	if (not link) then Auctioneer_Print("No link was passed to the client");  return; end
 
 	-- nothing to do, if auctioneer is disabled
 	if (not Auctioneer_GetFilter("all")) then

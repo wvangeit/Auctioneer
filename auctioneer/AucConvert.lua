@@ -139,8 +139,8 @@ function Auctioneer_Convert()
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
 								if not Auctioneer_IsSortedList(iData.buyoutPricesHistoryList) then
-									Auctioneer_p("TODO: old dataformat with unsorted buyoutHistory! "..sig)
-									Auctioneer_p("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
+									Auctioneer_Print("TODO: old dataformat with unsorted buyoutHistory! "..sig)
+									Auctioneer_Print("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
 								end
 								hist = Auctioneer_StoreMedianList (iData.buyoutPricesHistoryList);
 							end

@@ -189,7 +189,7 @@ function Auctioneer_DoBidBroker(minProfit)
 			if (currentBid == min) then
 				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
-			--Auctioneer_p("a", a);
+			Auctioneer_Print("a", a);
 			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
 			Auctioneer_ChatPrint(output);
 		end

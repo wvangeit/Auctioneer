@@ -285,7 +285,8 @@ function dump(...)
 	return out;
 end
 
-function Auctioneer_p(...)
+function Auctioneer_Print(...)
+	if not (Auctioneer_Debug) then return; end
 	local out = "";
 	for i = 1, arg.n, 1 do
 		if (i > 1) then out = out .. ", "; end

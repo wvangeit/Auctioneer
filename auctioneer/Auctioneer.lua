@@ -14,16 +14,18 @@ if (AUCTIONEER_VERSION == "<".."%version%>") then
 	AUCTIONEER_VERSION = "3.1.DEV";
 end
 
+Auctioneer_Debug = false; --Note, setting this value to true will cause a lot of chat spam. Especially OnLoad and when scanning the AH.
+
 function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
 	EnhTooltip.AddHook("tooltip", Auctioneer_HookTooltip, 50);
 
-	this:RegisterEvent("VARIABLES_LOADED"); -- get called when our vars have loaded
+	this:RegisterEvent("ADDON_LOADED"); -- get called when our vars have loaded
 end
 
 
 function Auctioneer_OnEvent(event)
---	Auctioneer_p("Event", event);
+	Auctioneer_Print("Event", event);
 	if (event=="NEW_AUCTION_UPDATE") then
 		Auctioneer_NewAuction();
 	elseif (event=="AUCTION_HOUSE_SHOW") then
@@ -32,7 +34,7 @@ function Auctioneer_OnEvent(event)
 		Auctioneer_AuctHouseClose();
 	elseif(event == "AUCTION_ITEM_LIST_UPDATE" and Auctioneer_isScanningRequested) then
 		Auctioneer_AuctHouseUpdate();
-	elseif (event == "VARIABLES_LOADED") then
+	elseif ((event == "ADDON_LOADED") and (arg1 == "Auctioneer")) then
 		Auctioneer_AddonLoaded();
 	end
 end
