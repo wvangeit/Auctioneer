@@ -57,7 +57,7 @@ ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may als
 ENCH_STAT_ON = "Displaying configured enchant data";
 ENCH_STAT_OFF = "Not displaying any enchant data";
 
-ENCH_FRMT_ACT_CLEARALL = "Clearing all auction data for %s";
+ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data for %s";
 ENCH_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 ENCH_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 ENCH_FRMT_ACT_ENABLE = "Displaying item's %s data";
@@ -89,6 +89,33 @@ ENCH_FRMT_PCTLESS_HEADER = "Buyouts having %d%% savings over average item disenc
 ENCH_FRMT_PCTLESS_LINE = "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
 
+--GUI localizations
+
+ENCH_GUI_MAIN_HELP = "Contains settings for Enchantrix \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
+ENCH_GUI_MAIN_ENABLE = "Enable Enchantrix";
+ENCH_GUI_LOCALE = "Set locale to";
+ENCH_GUI_RELOADUI_BUTTON = "ReloadUI";
+ENCH_GUI_RELOADUI = "Reload User Interface";
+ENCH_GUI_RELOADUI_HELP = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
+ENCH_GUI_RELADUI_FEEDBACK = "Now Reloading the WoW UI";
+ENCH_GUI_EMBED = "Embed info in in-game tooltip";
+ENCH_GUI_VALUATE_HEADER = "Valuation";
+ENCH_GUI_VALUATE_ENABLE = "Enable Valuation";
+ENCH_GUI_VALUATE_AVERAGES = "Valuate with Enchantrix Averages";
+ENCH_GUI_VALUATE_MEDIAN = "Valuate with Enchantrix Medians";
+ENCH_GUI_VALUATE_BASELINE = "Valuate with Built-in Data";
+ENCH_GUI_OTHER_HEADER = "Other Options";
+ENCH_GUI_OTHER_HELP = "Miscellaneous Enchantrix Options";
+ENCH_GUI_CLEARALL_BUTTON = "Clear All";
+ENCH_GUI_CLEARALL = "Clear All Enchantrix Data";
+ENCH_GUI_CLEARALL_HELP = "Click here to clear all of Enchantrix data for the current server-realm.";
+ENCH_GUI_CLEARALL_NOTE = "for the current server-faction";
+ENCH_GUI_DEFAULT_ALL_BUTTON = "Reset All";
+ENCH_GUI_DEFAULT_ALL = "Reset All Enchantrix Options";
+ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
+ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
+
+--ID Numbers
 
 EssenceItemIDs = {};
 EssenceItemIDs["Greater Astral Essence"] = 11082;

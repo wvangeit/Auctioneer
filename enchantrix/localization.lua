@@ -42,7 +42,7 @@
 
 
 
-ENCH_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true};
+ENCH_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
 
 function Enchantrix_SetLocaleStrings(locale)
 	-- Default locale strings are defined in English
@@ -105,7 +105,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_STAT_ON = "Displaying configured enchant data";
 	ENCH_STAT_OFF = "Not displaying any enchant data";
 	
-	ENCH_FRMT_ACT_CLEARALL = "Clearing all auction data for %s";
+	ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data for %s";
 	ENCH_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 	ENCH_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 	ENCH_FRMT_ACT_ENABLE = "Displaying item's %s data";
@@ -136,6 +136,33 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_PCTLESS_HEADER = "Buyouts having %d%% savings over average item disenchant value:";
 	ENCH_FRMT_PCTLESS_LINE = "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 	ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
+	
+	
+	
+	ENCH_GUI_MAIN_HELP = "Contains settings for Enchantrix \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
+	ENCH_GUI_MAIN_ENABLE = "Enable Enchantrix";
+	ENCH_GUI_LOCALE = "Set locale to";
+	ENCH_GUI_RELOADUI_BUTTON = "ReloadUI";
+	ENCH_GUI_RELOADUI = "Reload User Interface";
+	ENCH_GUI_RELOADUI_HELP = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
+	ENCH_GUI_RELADUI_FEEDBACK = "Now Reloading the WoW UI";
+	ENCH_GUI_EMBED = "Embed info in in-game tooltip";
+	ENCH_GUI_VALUATE_HEADER = "Valuation";
+	ENCH_GUI_VALUATE_ENABLE = "Enable Valuation";
+	ENCH_GUI_VALUATE_AVERAGES = "Valuate with Enchantrix Averages";
+	ENCH_GUI_VALUATE_MEDIAN = "Valuate with Enchantrix Medians";
+	ENCH_GUI_VALUATE_BASELINE = "Valuate with Built-in Data";
+	ENCH_GUI_OTHER_HEADER = "Other Options";
+	ENCH_GUI_OTHER_HELP = "Miscellaneous Enchantrix Options";
+	ENCH_GUI_CLEARALL_BUTTON = "Clear All";
+	ENCH_GUI_CLEARALL = "Clear All Enchantrix Data";
+	ENCH_GUI_CLEARALL_HELP = "Click here to clear all of Enchantrix data for the current server-realm.";
+	ENCH_GUI_CLEARALL_NOTE = "for the current server-faction";
+	ENCH_GUI_DEFAULT_ALL_BUTTON = "Reset All";
+	ENCH_GUI_DEFAULT_ALL = "Reset All Enchantrix Options";
+	ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
+	ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
+	
 	
 	
 	EssenceItemIDs = {};
@@ -279,6 +306,29 @@ function Enchantrix_SetLocaleStrings(locale)
 --	ENCH_FRMT_ACT_DEFAULT = "";
 --	ENCH_FRMT_ACT_DEFAULT_ALL = "";
 --	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "";
+--	ENCH_GUI_CLEARALL = "";
+--	ENCH_GUI_CLEARALL_BUTTON = "";
+--	ENCH_GUI_CLEARALL_HELP = "";
+--	ENCH_GUI_CLEARALL_NOTE = "";
+--	ENCH_GUI_DEFAULT_ALL = "";
+--	ENCH_GUI_DEFAULT_ALL_BUTTON = "";
+--	ENCH_GUI_DEFAULT_ALL_HELP = "";
+--	ENCH_GUI_DEFAULT_OPTION = "";
+--	ENCH_GUI_EMBED = "";
+--	ENCH_GUI_LOCALE = "";
+--	ENCH_GUI_MAIN_ENABLE = "";
+--	ENCH_GUI_MAIN_HELP = "";
+--	ENCH_GUI_OTHER_HEADER = "";
+--	ENCH_GUI_OTHER_HELP = "";
+--	ENCH_GUI_RELADUI_FEEDBACK = "";
+--	ENCH_GUI_RELOADUI = "";
+--	ENCH_GUI_RELOADUI_BUTTON = "";
+--	ENCH_GUI_RELOADUI_HELP = "";
+--	ENCH_GUI_VALUATE_AVERAGES = "";
+--	ENCH_GUI_VALUATE_BASELINE = "";
+--	ENCH_GUI_VALUATE_ENABLE = "";
+--	ENCH_GUI_VALUATE_HEADER = "";
+--	ENCH_GUI_VALUATE_MEDIAN = "";
 --	ENCH_HELP_DEFAULT = "";
 --	ENCH_HELP_LOCALE = "";
 --	ENCH_OPT_LOCALE = "";
@@ -404,6 +454,137 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Soul Dust"] = 11083;
 		EssenceItemIDs["Strange Dust"] = 10940;
 		EssenceItemIDs["Vision Dust"] = 11137;
+
+-- The following definitions are missing in this locale:
+--	ENCH_GUI_CLEARALL = "";
+--	ENCH_GUI_CLEARALL_BUTTON = "";
+--	ENCH_GUI_CLEARALL_HELP = "";
+--	ENCH_GUI_CLEARALL_NOTE = "";
+--	ENCH_GUI_DEFAULT_ALL = "";
+--	ENCH_GUI_DEFAULT_ALL_BUTTON = "";
+--	ENCH_GUI_DEFAULT_ALL_HELP = "";
+--	ENCH_GUI_DEFAULT_OPTION = "";
+--	ENCH_GUI_EMBED = "";
+--	ENCH_GUI_LOCALE = "";
+--	ENCH_GUI_MAIN_ENABLE = "";
+--	ENCH_GUI_MAIN_HELP = "";
+--	ENCH_GUI_OTHER_HEADER = "";
+--	ENCH_GUI_OTHER_HELP = "";
+--	ENCH_GUI_RELADUI_FEEDBACK = "";
+--	ENCH_GUI_RELOADUI = "";
+--	ENCH_GUI_RELOADUI_BUTTON = "";
+--	ENCH_GUI_RELOADUI_HELP = "";
+--	ENCH_GUI_VALUATE_AVERAGES = "";
+--	ENCH_GUI_VALUATE_BASELINE = "";
+--	ENCH_GUI_VALUATE_ENABLE = "";
+--	ENCH_GUI_VALUATE_HEADER = "";
+--	ENCH_GUI_VALUATE_MEDIAN = "";
+	end
+
+
+
+	-- Locale strings for the frFR locale
+	if locale == "frFR" then
+		-- Encoded in UTF8
+		-- French localization for Enchantrix
+		
+		
+
+
+-- The following definitions are missing in this locale:
+--	ENCH_ARG_SPELLNAME = "";
+--	ENCH_CMD_CLEAR = "";
+--	ENCH_CMD_CLEAR_ALL = "";
+--	ENCH_CMD_DEFAULT = "";
+--	ENCH_CMD_FIND_BIDAUCT = "";
+--	ENCH_CMD_FIND_BIDAUCT_SHORT = "";
+--	ENCH_CMD_FIND_BUYAUCT = "";
+--	ENCH_CMD_FIND_BUYAUCT_SHORT = "";
+--	ENCH_CMD_LOCALE = "";
+--	ENCH_CMD_OFF = "";
+--	ENCH_CMD_ON = "";
+--	ENCH_CMD_TOGGLE = "";
+--	ENCH_FRMT_ACT_CLEARALL = "";
+--	ENCH_FRMT_ACT_CLEAR_FAIL = "";
+--	ENCH_FRMT_ACT_CLEAR_OK = "";
+--	ENCH_FRMT_ACT_DEFAULT = "";
+--	ENCH_FRMT_ACT_DEFAULT_ALL = "";
+--	ENCH_FRMT_ACT_DISABLE = "";
+--	ENCH_FRMT_ACT_ENABLE = "";
+--	ENCH_FRMT_ACT_ENABLED_ON = "";
+--	ENCH_FRMT_ACT_SET = "";
+--	ENCH_FRMT_ACT_UNKNOWN = "";
+--	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "";
+--	ENCH_FRMT_BIDBROKER_CURBID = "";
+--	ENCH_FRMT_BIDBROKER_DONE = "";
+--	ENCH_FRMT_BIDBROKER_HEADER = "";
+--	ENCH_FRMT_BIDBROKER_LINE = "";
+--	ENCH_FRMT_BIDBROKER_MINBID = "";
+--	ENCH_FRMT_COUNTS = "";
+--	ENCH_FRMT_CREDIT = "";
+--	ENCH_FRMT_DISINTO = "";
+--	ENCH_FRMT_FOUND = "";
+--	ENCH_FRMT_PCTLESS_DONE = "";
+--	ENCH_FRMT_PCTLESS_HEADER = "";
+--	ENCH_FRMT_PCTLESS_LINE = "";
+--	ENCH_FRMT_USAGE = "";
+--	ENCH_FRMT_VALUE_AUCT_HSP = "";
+--	ENCH_FRMT_VALUE_AUCT_MED = "";
+--	ENCH_FRMT_VALUE_MARKET = "";
+--	ENCH_FRMT_WELCOME = "";
+--	ENCH_GUI_CLEARALL = "";
+--	ENCH_GUI_CLEARALL_BUTTON = "";
+--	ENCH_GUI_CLEARALL_HELP = "";
+--	ENCH_GUI_CLEARALL_NOTE = "";
+--	ENCH_GUI_DEFAULT_ALL = "";
+--	ENCH_GUI_DEFAULT_ALL_BUTTON = "";
+--	ENCH_GUI_DEFAULT_ALL_HELP = "";
+--	ENCH_GUI_DEFAULT_OPTION = "";
+--	ENCH_GUI_EMBED = "";
+--	ENCH_GUI_LOCALE = "";
+--	ENCH_GUI_MAIN_ENABLE = "";
+--	ENCH_GUI_MAIN_HELP = "";
+--	ENCH_GUI_OTHER_HEADER = "";
+--	ENCH_GUI_OTHER_HELP = "";
+--	ENCH_GUI_RELADUI_FEEDBACK = "";
+--	ENCH_GUI_RELOADUI = "";
+--	ENCH_GUI_RELOADUI_BUTTON = "";
+--	ENCH_GUI_RELOADUI_HELP = "";
+--	ENCH_GUI_VALUATE_AVERAGES = "";
+--	ENCH_GUI_VALUATE_BASELINE = "";
+--	ENCH_GUI_VALUATE_ENABLE = "";
+--	ENCH_GUI_VALUATE_HEADER = "";
+--	ENCH_GUI_VALUATE_MEDIAN = "";
+--	ENCH_HELP_CLEAR = "";
+--	ENCH_HELP_COUNT = "";
+--	ENCH_HELP_DEFAULT = "";
+--	ENCH_HELP_EMBED = "";
+--	ENCH_HELP_FIND_BIDAUCT = "";
+--	ENCH_HELP_FIND_BUYAUCT = "";
+--	ENCH_HELP_GUESS_AUCTIONEER_HSP = "";
+--	ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "";
+--	ENCH_HELP_GUESS_BASELINE = "";
+--	ENCH_HELP_GUESS_NOAUCTIONEER = "";
+--	ENCH_HELP_HEADER = "";
+--	ENCH_HELP_LOCALE = "";
+--	ENCH_HELP_ONOFF = "";
+--	ENCH_HELP_RATE = "";
+--	ENCH_HELP_VALUE = "";
+--	ENCH_OPT_CLEAR = "";
+--	ENCH_OPT_FIND_BIDAUCT = "";
+--	ENCH_OPT_FIND_BUYAUCT = "";
+--	ENCH_OPT_LOCALE = "";
+--	ENCH_SHOW_COUNT = "";
+--	ENCH_SHOW_EMBED = "";
+--	ENCH_SHOW_GUESS_AUCTIONEER_HSP = "";
+--	ENCH_SHOW_GUESS_AUCTIONEER_MED = "";
+--	ENCH_SHOW_GUESS_BASELINE = "";
+--	ENCH_SHOW_HEADER = "";
+--	ENCH_SHOW_RATE = "";
+--	ENCH_SHOW_VALUE = "";
+--	ENCH_STAT_OFF = "";
+--	ENCH_STAT_ON = "";
+--	EssenceItemIDs = "";
 	end
 
 end

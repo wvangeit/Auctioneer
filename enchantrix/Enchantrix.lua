@@ -12,6 +12,10 @@ disenchants into to the items that you mouse-over in the game.
 ]]
 ENCHANTRIX_VERSION = "<%version%>";
 
+-- GUI Init Variables (Added by MentalPower)
+Auctioneer_GUI_Registered = nil;
+Auctioneer_Khaos_Registered = nil;
+
 EnchantedLocal = {};
 EnchantConfig = {};
 
@@ -389,10 +393,312 @@ function Enchantrix_OnLoad()
 		Enchantrix_Command(msg);
 	end
 
-	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage(string.format(ENCH_FRMT_WELCOME, ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
-		DEFAULT_CHAT_FRAME:AddMessage(ENCH_FRMT_CREDIT, 0.6, 0.6, 0.1);
+	Enchantrix_ChatPrint(string.format(ENCH_FRMT_WELCOME, ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
+	Enchantrix_ChatPrint(ENCH_FRMT_CREDIT, 0.6, 0.6, 0.1);
+
+	--GUI Registration code added by MentalPower	
+	Enchantrix_Register();
+end
+
+function Enchantrix_Register()
+	if (Khaos) then
+		if (not Enchantrix_Khaos_Registered) then
+			Enchantrix_GUI_Registered = Enchantrix_Register_Khaos();
+		end
 	end
+	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
+	if (Enchantrix_GUI_Registered == true) then
+		return true;
+	else 
+		return false;
+	end
+end
+
+function Enchantrix_Register_Khaos()
+	local optionSet = {
+		id="Enchantrix";
+		text="Enchantrix";
+		helptext=ENCH_GUI_MAIN_HELP;
+		difficulty=1;
+		default={checked=true};
+		options={
+			{
+				id="Header";
+				text="Enchantrix";
+				helptext=ENCH_GUI_MAIN_HELP;
+				type=K_HEADER;
+				difficulty=1;
+			};
+			{
+				id="EnchantrixEnable";
+				type=K_TEXT;
+				text=ENCH_GUI_MAIN_ENABLE;
+				helptext=ENCH_HELP_ONOFF;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_OnOff(ENCH_CMD_ON);
+					else
+						Enchantrix_OnOff(ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return ENCH_STAT_ON;
+					else
+						return ENCH_STAT_OFF;
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				difficulty=1;
+			};
+			{
+				id="EnchantrixLocale";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"enter", "tab"};
+				};
+				text=ENCH_GUI_LOCALE;
+				helptext=ENCH_HELP_LOCALE;
+				callback = function(state)
+					Enchantrix_SetLocale(state.value);
+				end;
+				feedback = function (state)
+					return string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, state.value);
+				end;
+				default = {
+					value = Enchantrix_GetLocale();
+				};
+				disabled = {
+					value = Enchantrix_GetLocale();
+				};
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=2;				
+			};
+			{
+				id="ReloadUI";
+				type=K_BUTTON;
+				setup={
+					buttonText = ENCH_GUI_RELOADUI_BUTTON;
+				};
+				text=ENCH_GUI_RELOADUI;
+				helptext=ENCH_GUI_RELOADUI_HELP;
+				callback=function()
+					ReloadUI();
+				end;
+				feedback=function()
+					return ENCH_GUI_RELADUI_FEEDBACK;
+				end;
+				difficulty=3;
+			};
+			{
+				id=ENCH_SHOW_EMBED;
+				type=K_TEXT;
+				text=ENCH_GUI_EMBED;
+				helptext=ENCH_HELP_EMBED;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_GenVarSet(ENCH_SHOW_EMBED, ENCH_CMD_ON);
+					else
+						Enchantrix_GenVarSet(ENCH_SHOW_EMBED, ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_EMBED));
+					else
+						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_EMBED));
+					end
+				end;
+				check=true;
+				default={checked=false};
+				disabled={checked=false};
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=1;
+			};
+			{
+				id="EnchantrixValuateHeader";
+				type=K_HEADER;
+				text=ENCH_GUI_VALUATE_HEADER;
+				helptext=ENCH_HELP_VALUE;
+				difficulty=2;
+			};
+			{
+				id=ENCH_SHOW_VALUE;
+				type=K_TEXT;
+				text=ENCH_GUI_VALUATE_ENABLE;
+				helptext=ENCH_HELP_VALUE;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_GenVarSet(ENCH_SHOW_VALUE, ENCH_CMD_ON);
+					else
+						Enchantrix_GenVarSet(ENCH_SHOW_VALUE, ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_VALUE));
+					else
+						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_VALUE));
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=1;
+			};
+			{
+				id=ENCH_SHOW_GUESS_AUCTIONEER_HSP;
+				type=K_TEXT;
+				text=ENCH_GUI_VALUATE_AVERAGES;
+				helptext=ENCH_HELP_GUESS_AUCTIONEER_HSP;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_ON);
+					else
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
+					else
+						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={AuctioneerEnable={checked=true;}, ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id=ENCH_SHOW_GUESS_AUCTIONEER_MED;
+				type=K_TEXT;
+				text=ENCH_GUI_VALUATE_MEDIAN;
+				helptext=ENCH_HELP_GUESS_AUCTIONEER_MEDIAN;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_ON);
+					else
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
+					else
+						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={AuctioneerEnable={checked=true;}, ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id=ENCH_SHOW_GUESS_BASELINE;
+				type=K_TEXT;
+				text=ENCH_GUI_VALUATE_BASELINE;
+				helptext=ENCH_HELP_GUESS_BASELINE;
+				callback=function(state)
+					if (state.checked) then
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_BASELINE, ENCH_CMD_ON);
+					else
+						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_BASELINE, ENCH_CMD_OFF);
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_BASELINE));
+					else
+						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_BASELINE));
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="EnchantrixOtherHeader";
+				type=K_HEADER;
+				text=ENCH_GUI_OTHER_HEADER;
+				helptext=ENCH_GUI_OTHER_HELP;
+				difficulty=1;
+			};
+			{
+				id="EnchantrixClearAll";
+				type=K_BUTTON;
+				setup={
+					buttonText = ENCH_GUI_CLEARALL_BUTTON;
+				};
+				text=ENCH_GUI_CLEARALL;
+				helptext=ENCH_GUI_CLEARALL_HELP;
+				callback=function()
+					Enchantrix_Clear(ENCH_CMD_CLEAR_ALL);
+				end;
+				feedback=function()
+					return string.format(ENCH_FRMT_ACT_CLEARALL,  ENCH_GUI_CLEARALL_NOTE);
+				end;
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=3;
+			};
+			{
+				id="DefaultAll";
+				type=K_BUTTON;
+				setup={
+					buttonText = ENCH_GUI_DEFAULT_ALL_BUTTON;
+				};
+				text=ENCH_GUI_DEFAULT_ALL;
+				helptext=ENCH_GUI_DEFAULT_ALL_HELP;
+				callback=function() 
+					Enchantrix_Default(ENCH_CMD_CLEAR_ALL);
+				end;
+				feedback=function()
+					return ENCH_FRMT_ACT_DEFAULT_ALL;
+				end;
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=1;
+			};
+			{
+				id="DefaultOption";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"enter", "tab"};
+				};
+				text=ENCH_GUI_DEFAULT_OPTION;
+				helptext=ENCH_HELP_DEFAULT;
+				callback = function(state)
+					Enchantrix_Default(state.value);
+				end;
+				feedback = function (state)
+					if (state.value == ENCH_CMD_CLEAR_ALL) then
+						return ENCH_FRMT_ACT_DEFAULT_ALL;
+					else
+						return string.format(ENCH_FRMT_ACT_DEFAULT, state.value);
+					end
+				end;
+				default = {
+					value = "";
+				};
+				disabled = {
+					value = "";
+				};
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=4;
+			};
+		};
+	};
+
+	Khaos.registerOptionSet("tooltip",optionSet);
+	Enchantrix_Khaos_Registered = true;
+	
+	return true;
 end
 
 --Cleaner Command Handling Functions (added by MentalPower)
