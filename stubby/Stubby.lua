@@ -148,6 +148,7 @@ function registerAddonHook(addonName, waiterName, hookFunction, ...)
 	else
 		local addon = string.lower(addonName)
 		if (not config.loads[addon]) then config.loads[addon] = {} end
+		if (not config.loads[addon][waiterName]) then config.loads[addon][waiterName] = {} end
 		table.insert(config.loads[addon][waiterName], { f=hookFunction, a=arg })
 	end
 end
@@ -168,6 +169,7 @@ function registerEventHook(eventType, waiterName, hookFunction, ...)
 		config.events[eventType] = {}
 		StubbyFrame:RegisterEvent(eventType);
 	end
+	if (not config.events[eventType][waiterName]) then config.events[eventType][waiterName] = {} end
 	table.insert(config.events[eventType][waiterName], { f=hookFunction, a=arg })
 end
 function eventWatcher(eventType)
