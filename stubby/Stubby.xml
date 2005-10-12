@@ -1,0 +1,21 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+<!--
+        Version: <%version%>
+        Revision: $Id$
+-->
+	<Script file="Stubby.lua"/>
+	<Frame name="StubbyFrame" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				RegisterEvent("ADDON_LOADED");
+			</OnLoad>
+			<OnEvent>
+				if (event == "ADDON_LOADED") then
+					Stubby.LoadWatcher(arg1);
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>

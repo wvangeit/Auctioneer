@@ -1,0 +1,8 @@
+## Title: Stubby
+## Interface: 1800
+## Version: <%version%>
+## Revision: $Id$
+## Notes: Allows on-demand addons to load upon event notification
+## SavedVariables: StubbyConfig
+Stubby.xml
+
