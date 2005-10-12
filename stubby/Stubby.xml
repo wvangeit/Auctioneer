@@ -9,12 +9,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="StubbyFrame" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
-				RegisterEvent("ADDON_LOADED");
+				RegisterEvent("ADDON_LOADED")
 			</OnLoad>
 			<OnEvent>
-				if (event == "ADDON_LOADED") then
-					Stubby.LoadWatcher(arg1);
-				end
+				Stubby.Events(event, arg1)
 			</OnEvent>
 		</Scripts>
 	</Frame>
