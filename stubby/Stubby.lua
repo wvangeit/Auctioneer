@@ -29,16 +29,16 @@
 ----
 ---------------------------------------------------------------------
 ----  Example code:
-----    Stubby.RegisterTrigger("myAddonLoader", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddon, \"myAddon\")")
+----    Stubby.RegisterTrigger("myAddon", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddon, \"myAddon\")")
 ----    This code will run every time stubby starts up, and will 
 ----    cause your addon to be loaded whenever the Blizzard_AuctionUI
 ----    addon is loaded.
-----    What it does is register a trigger called "myAddonLoader"
+----    What it does is register a trigger for an addon called "myAddon"
 ----    which upon Stubby's execution calls another Stubby function,
 ----    RegisterAddonHook against the addon called "Blizzard_AuctionUI"
 ----    if this addon is currently loaded, it will call
-----    LoadAddon("myAddon") immediatly, else it will wait until
-----    Blizzard_AuctionUI is loaded and then call LoadAddon("myAddon")
+----    LoadAddOn("myAddon") immediately, else it will wait until
+----    Blizzard_AuctionUI is loaded and then call LoadAddOn("myAddon")
 ----    
 ----    Many more complex triggers can be created, even to the extent
 ----    of creating functions and programming logic, slash command
@@ -154,6 +154,7 @@ function registerAddonHook(addonName, waiterName, hookFunction, ...)
 		end
 	end
 end
+
 function loadWatcher(loadedAddon)
 	local addon = string.lower(loadedAddon)
 	if (config.loads[addon]) then
@@ -177,6 +178,7 @@ function registerEventHook(eventType, waiterName, hookFunction, ...)
 		config.events[eventType][waiterName] = { f=hookFunction, a=arg }
 	end
 end
+
 function eventWatcher(eventType)
 	if (config.events[eventType]) then
 		local waiterName, hookDetail
@@ -227,13 +229,11 @@ local function checkAddons()
 	end
 end
 local function shouldInspectAddon(addonName)
-	if not StubbyConfig.inspected then StubbyConfig.inpected = {} end
-	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
 	if not StubbyConfig.inspected[addonName] then return true end
 	return false
 end
 local function inspectAddon(addonName, title, info)
-	LoadAddon(addonName)
+	LoadAddOn(addonName)
 	StubbyConfig.inspected[addonName] = true
 	StubbyConfig.addinfo[addonName] = title.."|"..info
 end
@@ -244,7 +244,7 @@ local function searchForNewAddons()
 		requiresLoad = false
 		name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(i)
 		if (IsAddOnLoadOnDemand(i) and shouldInspectAddon(name) and loadable) then
-			local addonDeps = { GetAddOnDependancies(i) }
+			local addonDeps = { GetAddOnDependencies(i) }
 			for _, dependancy in pairs(addonDeps) do
 				if (string.lower(dependancy) == "stubby") then
 					requiresLoad = true
@@ -261,7 +261,7 @@ end
 local function runTriggers()
 	if (not StubbyConfig.triggers) then return end
 	for addon, trigger in StubbyConfig.triggers do
-		if (IsAddOnLoaded(addon) and IsAddonLoadOnDemand(addon)) then
+		if (not IsAddOnLoaded(addon) and IsAddOnLoadOnDemand(addon)) then
 			RunScript(trigger)
 		end
 	end
@@ -269,6 +269,9 @@ end
 
 
 local function onLoaded()
+	if not StubbyConfig.inspected then StubbyConfig.inspected = {} end
+	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
+
 	checkAddons()
 	-- Run all of our triggers to setup the respective addons functions.
 	runTriggers()
