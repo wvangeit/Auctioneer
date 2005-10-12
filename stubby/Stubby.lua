@@ -1,8 +1,31 @@
 --[[  This addon's sole purpose is to hook and execute functions.
-----  
+----  The publically accessible functions of this library are:
 ----
+----  Stubby.RegisterFunctionHook(functionName, position, hookFunc, ...)
+----    Hook into the function with the same name as the string 
+----    "functionName" at the given position ( -int .. +int )
+----    A negative position causes your hook to be called before
+----    the original function, and a positive after it. Please
+----    leave ample space for other addons to position themselves
+----    around you if they wish.
+----    Your function hookFunc(...) is called in the correct
+----    sequence when the original function is invoked.
 ----
+----  Stubby.RegisterAddonHook(addonName, waiterName, hookFunction, ...)
+----    Waits for addon "addonName" to load then calls your
+----    hookFunction(...) when it is loaded (or immediatly if the
+----    addon is already loaded (so you don't have to check)
+----    "waiterName" is your addon name, and is used to index your
+----    hookFunction into the lookup table.
 ----
+----  Stubby.RegisterTrigger(triggerName, triggerCode)
+----    Registers a trigger (named triggerName) with the
+----    associated code to be run every time Stubby starts up.
+----    triggerCode is a string with the lua code you want
+----    Stubby to run for you. You may want to use this if your
+----    addon is load on demand and you want to set up a command
+----    handler or a hook into a Blizzard function which will
+----    trigger the loading of your addon.
 --]]
 local registerFunctionHook, registerAddonHook, registerTrigger, loadWatcher
 
@@ -41,7 +64,7 @@ end
 local function hookCall(funcName, arguments)
 	local orig = Stubby.GetOrigFunc(funcName);
 	for _,func in pairs(calls.functions[funcName]) do
-		if (orig and func.p >= 100) then
+		if (orig and func.p >= 0) then
 			orig(unpack(arguments))
 			orig = nil
 		end
@@ -63,13 +86,24 @@ end
 
 -- This function causes a given function to be hooked by stubby and
 -- configures the hook function to be called at the given position.
+-- The original function gets executed a position 0. Use a negative
+-- number to get called before the original function, and positive
+-- number to get called after the original function. Default position
+-- is 200. If someone else is already using your number, you will get
+-- automatically moved up for after or down for before. Please also
+-- leave space for other people who may need to position their hooks
+-- in between your hook and the original.
 function registerFunctionHook(functionName, position, hookFunc, ...)
 	local insertPos = tonumber(position) or 200
 	local funcObj = { f=hookFunc, a=arg, p=position };
 
 	if (calls.functions[hookType]) then
 		while (calls.functions[hookType][insertPos]) do
-			insertPos = insertPos + 1
+			if (position >= 0) then
+				insertPos = insertPos + 1
+			else
+				insertPos = insertPos - 1
+			end
 		end
 		calls.functions[functionName][insertPos] = funcObj
 	end		
@@ -99,9 +133,27 @@ function loadWatcher(loadedAddon)
 	end
 end
 
+-- This function registers a trigger. This is a piece of code
+-- specified as a string, which Stubby will execute on your behalf
+-- when we are first loaded. This code can do anything a normal
+-- lua script can, such as create global functions, register a
+-- command handler, hook into functions, load your addon etc.
+-- Leaving triggerCode nil will remove your trigger.
+function registerTrigger(triggerName, triggerCode)
+	local triggerIndex = string.lower(triggerName);
+	StubbyConfig.triggers[triggerIndex] = nil
+	if (triggerCode) then
+		StubbyConfig.triggers[triggerIndex] = triggerCode;
+	end
+end
+
+-- Setup our Stubby global object. All interaction is done
+-- via the methods exposed here.
 Stubby = {
 	LoadWatcher = loadWatcher,
+	RegisterTrigger = registerTrigger,
 	RegisterAddonHook = registerAddonHook,
+	RegisterFunctionHook = registerFunctionHook,
 };
 
 
@@ -136,8 +188,20 @@ local function searchForNewAddons()
 	end
 end
 
+-- This function runs through the trigger scripts we have, and if the
+-- related addon is not loaded yet, runs the trigger script.
+local function runTriggers()
+	for addon, trigger in Stubby.triggers do
+		if (IsAddOnLoaded(addon) and IsAddonLoadOnDemand(addon)) then
+			RunScript(trigger)
+		end
+	end
+end
 
 
--- Trigger the search for new life and new civilizations... or just addons maybe.
+
+-- Run all of our triggers to setup the respective addons functions.
+runTriggers()
+-- The search for new life and new civilizations... or just addons maybe.
 searchForNewAddons()
 
