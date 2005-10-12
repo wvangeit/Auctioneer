@@ -166,7 +166,7 @@ end
 function registerEventHook(eventType, waiterName, hookFunction, ...)
 	if (not config.events[eventType]) then 
 		config.events[eventType] = {}
-		RegisterEvent(eventType);
+		StubbyFrame:RegisterEvent(eventType);
 	end
 	table.insert(config.events[eventType][waiterName], { f=hookFunction, a=arg })
 end
@@ -213,7 +213,7 @@ local function searchForNewAddons()
 	for i=1, addonCount do
 		requiresLoad = false;
 		name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(i)
-		if (IsAddonLoadOnDemand(i) and shouldInspectAddon(name) and loadable) then
+		if (IsAddOnLoadOnDemand(i) and shouldInspectAddon(name) and loadable) then
 			local addonDeps = { GetAddOnDependancies(i) }
 			for _, dependancy in pairs(addonDeps) do
 				if (string.lower(dependancy) == "stubby") then
@@ -259,7 +259,9 @@ end
 Stubby = {
 	Events = events,
 	LoadWatcher = loadWatcher,
+	EventWatcher = eventWatcher,
 	RegisterTrigger = registerTrigger,
+	RegisterEventHook = registerEventHook,
 	RegisterAddonHook = registerAddonHook,
 	RegisterFunctionHook = registerFunctionHook,
 };
