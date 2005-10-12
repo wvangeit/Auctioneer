@@ -1,5 +1,5 @@
 ## Title: Informant
-## Interface: 1700
+## Interface: 1800
 ## Version: <%version%>
 ## Revision: $Id$
 ## Notes: Displays item info in tootips.
