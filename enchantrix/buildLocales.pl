@@ -79,14 +79,14 @@ for $locale (@locales) {
 	for $defined (sort(keys(%defined))) {
 		unless ($localized{$defined}) {
 			unless ($missing) {
-				print OUT "\n-- The following definitions are missing in this locale:\n";
+				print OUT "\n\t\t-- The following definitions are missing in this locale:\n";
 				$missing = 1;
 			}
-			print OUT"--\t$defined = \"\";\n";
+			print OUT"\t\t--\t$defined = \"\";\n";
 		}
 	}
 	
-	print OUT "\tend\n\n";
+	print OUT "\n\tend\n\n";
 }
 
 print OUT "end\n\nEnchantrix_SetLocaleStrings(GetLocale);\n\n";

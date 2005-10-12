@@ -89,28 +89,31 @@ ENCH_FRMT_PCTLESS_HEADER = "Opciones a compra teniendo %d%% de ahorro sobre el p
 ENCH_FRMT_PCTLESS_LINE = "%s, Valorado en: %s, OC: %s, Ahorra: %s, Menos %s";
 ENCH_FRMT_PCTLESS_DONE = "Porcentajes menores finalizado.";
 
+--GUI localizations
 
-EssenceItemIDs = {};
-EssenceItemIDs["Greater Astral Essence"] = 11082;
-EssenceItemIDs["Greater Eternal Essence"] = 16203;
-EssenceItemIDs["Greater Magic Essence"] = 10939;
-EssenceItemIDs["Greater Mystic Essence"] = 11135;
-EssenceItemIDs["Greater Nether Essence"] = 11175;
-EssenceItemIDs["Lesser Astral Essence"] = 10998;
-EssenceItemIDs["Lesser Eternal Essence"] = 16202;
-EssenceItemIDs["Lesser Magic Essence"] = 10938;
-EssenceItemIDs["Lesser Mystic Essence"] = 11134;
-EssenceItemIDs["Lesser Nether Essence"] = 11174;
-EssenceItemIDs["Large Brilliant Shard"] = 14344;
-EssenceItemIDs["Large Glimmering Shard"] = 11084;
-EssenceItemIDs["Large Glowing Shard"] = 11139;
-EssenceItemIDs["Large Radiant Shard"] = 11178;
-EssenceItemIDs["Small Brilliant Shard"] = 14343;
-EssenceItemIDs["Small Glimmering Shard"] = 10978;
-EssenceItemIDs["Small Glowing Shard"] = 11138;
-EssenceItemIDs["Small Radiant Shard"] = 11177;
-EssenceItemIDs["Dream Dust"] = 11176;
-EssenceItemIDs["Illusion Dust"] = 16204;
-EssenceItemIDs["Soul Dust"] = 11083;
-EssenceItemIDs["Strange Dust"] = 10940;
-EssenceItemIDs["Vision Dust"] = 11137;
+ENCH_GUI_MAIN_HELP = "Contiene ajustes para Enchantrix \nun aditamento que muestra información en la caja de ayuda con relación a los resultados de desencantar el artículo.";
+ENCH_GUI_MAIN_ENABLE = "Encender Enchantrix";
+ENCH_GUI_LOCALE = "Ajustar localidad a";
+ENCH_GUI_RELOADUI_BUTTON = "Recargar";
+ENCH_GUI_RELOADUI = "Recargar Interfáz";
+ENCH_GUI_RELOADUI_HELP = "Presione aqui para recargar el interfáz de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuración sea el mismo que el de Auctioneer.\nNota: Esta operación puede tomar unos minutos.";
+ENCH_GUI_RELOADUI_FEEDBACK = "Recargando el Interfáz de WoW";
+ENCH_GUI_EMBED = "Integrar información en la caja de ayuda";
+ENCH_GUI_VALUATE_HEADER = "Valorizaciónes";
+ENCH_GUI_VALUATE_ENABLE = "Encender Valorizaciónes";
+ENCH_GUI_VALUATE_AVERAGES = "Valorizar con promedios de Auctioneer";
+ENCH_GUI_VALUATE_MEDIAN = "Valorizar con medianos de Auctioneer";
+ENCH_GUI_VALUATE_BASELINE = "Valorizar con valores de referencia";
+ENCH_GUI_OTHER_HEADER = "Otras Opciones";
+ENCH_GUI_OTHER_HELP = "Opciones misceláneas de Enchantrix";
+ENCH_GUI_CLEARALL_BUTTON = "Eliminar Todo";
+ENCH_GUI_CLEARALL = "Eliminar toda la información";
+ENCH_GUI_CLEARALL_HELP = "Seleccione aqui para eliminar toda la información de Enchantrix para el reino-facción corriente.";
+ENCH_GUI_CLEARALL_NOTE = "el reino-facción corriente.";
+ENCH_GUI_DEFAULT_ALL_BUTTON = "Revertir Todo";
+ENCH_GUI_DEFAULT_ALL = "Revertir todas las opciones de Enchantrix";
+ENCH_GUI_DEFAULT_ALL_HELP= "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de fábrica.\nADVERTENCIA: Esta acción NO es reversible.";
+ENCH_GUI_DEFAULT_OPTION = "Revertir esta opción";
+
+--ID Numbers 
+--This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.

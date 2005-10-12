@@ -488,7 +488,7 @@ function Enchantrix_Register_Khaos()
 					ReloadUI();
 				end;
 				feedback=function()
-					return ENCH_GUI_RELADUI_FEEDBACK;
+					return ENCH_GUI_RELOADUI_FEEDBACK;
 				end;
 				difficulty=3;
 			};
