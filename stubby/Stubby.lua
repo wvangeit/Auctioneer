@@ -18,8 +18,8 @@
 ----    "waiterName" is your addon name, and is used to index your
 ----    hookFunction into the lookup table.
 ----
-----  Stubby.RegisterTrigger(triggerName, triggerCode)
-----    Registers a trigger (named triggerName) with the
+----  Stubby.RegisterTrigger(triggerAddon, triggerCode)
+----    Registers a trigger (for addon triggerAddon) with the
 ----    associated code to be run every time Stubby starts up.
 ----    triggerCode is a string with the lua code you want
 ----    Stubby to run for you. You may want to use this if your
@@ -29,7 +29,7 @@
 ----
 ---------------------------------------------------------------------
 ----  Example code:
-----    Stubby.RegisterTrigger("myAddonLoader", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddon, \"myAddon\")");
+----    Stubby.RegisterTrigger("myAddonLoader", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddon, \"myAddon\")")
 ----    This code will run every time stubby starts up, and will 
 ----    cause your addon to be loaded whenever the Blizzard_AuctionUI
 ----    addon is loaded.
@@ -78,8 +78,8 @@ local function rebuildNotifications(notifyItems)
 		-- Process the sorted request list and insert in correct
 		-- order into the call list.
 		for _,requestedPos in sortedPositions do
-			local func = hData[requestedPos];
-			func.pos = requestedPos;
+			local func = hData[requestedPos]
+			func.pos = requestedPos
 			table.insert(notifyFuncs[hookType], hData[requestedPos])
 		end
 	end
@@ -90,25 +90,25 @@ end
 -- functions in order and the original call at just before
 -- position 100.
 local function hookCall(funcName, arguments)
-	local orig = Stubby.GetOrigFunc(funcName);
+	local orig = Stubby.GetOrigFunc(funcName)
 	for _,func in pairs(config.calls.functions[funcName]) do
 		if (orig and func.p >= 0) then
 			orig(unpack(arguments))
 			orig = nil
 		end
-		func.f(unpack(func.a));
+		func.f(unpack(func.a))
 	end
 end
 
 -- This function automatically hooks Stubby in place of the
 -- original function, dynamically.
-Stubby_NewFunction = nil;
+Stubby_NewFunction = nil
 local function hookInto(functionName)
 	if (config.hooks.functions[functionName]) then return end
-	config.hooks.origFuncs[functionName] = getglobal(functionName);
+	config.hooks.origFuncs[functionName] = getglobal(functionName)
 	
-	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall(\""..functionName.."\", arg) end");
-	setglobal(functionName, Stubby_NewFunction);
+	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall(\""..functionName.."\", arg) end")
+	setglobal(functionName, Stubby_NewFunction)
 	Stubby_NewFunction = nil
 end
 
@@ -123,7 +123,7 @@ end
 -- in between your hook and the original.
 function registerFunctionHook(functionName, position, hookFunc, ...)
 	local insertPos = tonumber(position) or 200
-	local funcObj = { f=hookFunc, a=arg, p=position };
+	local funcObj = { f=hookFunc, a=arg, p=position }
 
 	if (config.calls.functions[hookType]) then
 		while (config.calls.functions[hookType][insertPos]) do
@@ -144,19 +144,22 @@ end
 -- but not before)
 function registerAddonHook(addonName, waiterName, hookFunction, ...)
 	if (IsAddOnLoaded(addonName)) then
-		hookFunction(unpack(arg));
+		hookFunction(unpack(arg))
 	else
 		local addon = string.lower(addonName)
 		if (not config.loads[addon]) then config.loads[addon] = {} end
-		if (not config.loads[addon][waiterName]) then config.loads[addon][waiterName] = {} end
-		table.insert(config.loads[addon][waiterName], { f=hookFunction, a=arg })
+		config.loads[addon][waiterName] = nil
+		if (hookFunction) then
+			config.loads[addon][waiterName] = { f=hookFunction, a=arg }
+		end
 	end
 end
 function loadWatcher(loadedAddon)
-	if (config.loads[loadedAddon]) then
+	local addon = string.lower(loadedAddon)
+	if (config.loads[addon]) then
 		local waiterName, hookDetail
-		for waiterName, hookDetail in config.loads[loadedAddon] do
-			hookDetail.f(unpack(hookDetail.a));
+		for waiterName, hookDetail in config.loads[addon] do
+			hookDetail.f(unpack(hookDetail.a))
 		end
 	end
 end
@@ -167,16 +170,18 @@ end
 function registerEventHook(eventType, waiterName, hookFunction, ...)
 	if (not config.events[eventType]) then 
 		config.events[eventType] = {}
-		StubbyFrame:RegisterEvent(eventType);
+		StubbyFrame:RegisterEvent(eventType)
 	end
-	if (not config.events[eventType][waiterName]) then config.events[eventType][waiterName] = {} end
-	table.insert(config.events[eventType][waiterName], { f=hookFunction, a=arg })
+	config.events[eventType][waiterName] = nil
+	if (hookFunction) then
+		config.events[eventType][waiterName] = { f=hookFunction, a=arg }
+	end
 end
 function eventWatcher(eventType)
 	if (config.events[eventType]) then
 		local waiterName, hookDetail
 		for waiterName, hookDetail in config.events[eventType] do
-			hookDetail.f(unpack(hookDetail.a));
+			hookDetail.f(unpack(hookDetail.a))
 		end
 	end
 end
@@ -187,12 +192,12 @@ end
 -- lua script can, such as create global functions, register a
 -- command handler, hook into functions, load your addon etc.
 -- Leaving triggerCode nil will remove your trigger.
-function registerTrigger(triggerName, triggerCode)
-	local triggerIndex = string.lower(triggerName);
+function registerTrigger(triggerAddon, triggerCode)
+	local triggerIndex = string.lower(triggerAddon)
 	if (not StubbyConfig.triggers) then StubbyConfig.triggers = {} end
 	StubbyConfig.triggers[triggerIndex] = nil
 	if (triggerCode) then
-		StubbyConfig.triggers[triggerIndex] = triggerCode;
+		StubbyConfig.triggers[triggerIndex] = triggerCode
 	end
 end
 
@@ -200,31 +205,54 @@ end
 -- Functions to check through all addons for dependants.
 -- If any exist that we don't know about, and have a dependancy of us, then we will load them
 -- once to give them a chance to register themselves with us.
+local function checkAddons()
+	if not StubbyConfig.inspected then return end
+	local goodList = {}
+	local addonCount = GetNumAddOns()
+	local name, title, notes
+	for i=1, addonCount do
+		name, title, notes = GetAddOnInfo(i)
+		if (StubbyConfig.inspected and StubbyConfig.inspected[name]) then
+			local infoCompare = title.."|"..notes
+			if (infoCompare == StubbyConfig.addinfo[name]) then
+				goodList[name] = true
+			end
+		end
+	end
+	for name,_ in StubbyConfig.inspected do
+		if (not goodList[name]) then
+			StubbyConfig.inspected[name] = nil
+			StubbyConfig.addinfo[name] = nil
+		end
+	end
+end
 local function shouldInspectAddon(addonName)
 	if not StubbyConfig.inspected then StubbyConfig.inpected = {} end
+	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
 	if not StubbyConfig.inspected[addonName] then return true end
-	return false;
+	return false
 end
-local function inspectAddon(addonName)
-	LoadAddon(addonName);
-	StubbyConfig.inspected[addonName] = true;
+local function inspectAddon(addonName, title, info)
+	LoadAddon(addonName)
+	StubbyConfig.inspected[addonName] = true
+	StubbyConfig.addinfo[addonName] = title.."|"..info
 end
 local function searchForNewAddons()
-	local addonCount = GetNumAddOns();
+	local addonCount = GetNumAddOns()
 	local name, title, notes, enabled, loadable, reason, security, requiresLoad
 	for i=1, addonCount do
-		requiresLoad = false;
+		requiresLoad = false
 		name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(i)
 		if (IsAddOnLoadOnDemand(i) and shouldInspectAddon(name) and loadable) then
 			local addonDeps = { GetAddOnDependancies(i) }
 			for _, dependancy in pairs(addonDeps) do
 				if (string.lower(dependancy) == "stubby") then
-					requiresLoad = true;
+					requiresLoad = true
 				end
 			end
 		end
 
-		if (requiresLoad) then inspectAddon(name) end
+		if (requiresLoad) then inspectAddon(name, title, notes) end
 	end
 end
 
@@ -241,6 +269,7 @@ end
 
 
 local function onLoaded()
+	checkAddons()
 	-- Run all of our triggers to setup the respective addons functions.
 	runTriggers()
 	-- The search for new life and new civilizations... or just addons maybe.
@@ -250,15 +279,27 @@ end
 function events(event, param)
 	if (event == "ADDON_LOADED") then
 		if (param == "Stubby") then onLoaded() end
-		Stubby.LoadWatcher(param);
+		Stubby.LoadWatcher(param)
 	end
-	Stubby.EventWatcher();
+	Stubby.EventWatcher(event)
 end
 
+local function chatPrint(...)
+	if ( DEFAULT_CHAT_FRAME ) then 
+		local msg = ""
+		for i=1, table.getn(arg) do
+			if i==1 then msg = arg[i]
+			else msg = msg.." "..arg[i]
+			end
+		end
+		DEFAULT_CHAT_FRAME:AddMessage(msg, 1.0, 0.35, 0.15)
+	end
+end
 
 -- Setup our Stubby global object. All interaction is done
 -- via the methods exposed here.
 Stubby = {
+	Print = chatPrint,
 	Events = events,
 	LoadWatcher = loadWatcher,
 	EventWatcher = eventWatcher,
@@ -266,6 +307,6 @@ Stubby = {
 	RegisterEventHook = registerEventHook,
 	RegisterAddonHook = registerAddonHook,
 	RegisterFunctionHook = registerFunctionHook,
-};
+}
 
 
