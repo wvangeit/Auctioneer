@@ -1,5 +1,5 @@
 ## Title: Auctioneer
-## Interface: 1700
+## Interface: 1800
 ## Version: <%version%>
 ## Revision: $Id$
 ## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
