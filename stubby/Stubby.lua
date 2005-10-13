@@ -54,7 +54,7 @@ local loadWatcher
 
 local config = {
 	hooks = { functions={}, origFuncs={} },
-	calls = { functions={} },
+	calls = { functions={}, callList={} },
 	loads = {},
 	events = {},
 }
@@ -79,8 +79,7 @@ local function rebuildNotifications(notifyItems)
 		-- order into the call list.
 		for _,requestedPos in sortedPositions do
 			local func = hData[requestedPos]
-			func.pos = requestedPos
-			table.insert(notifyFuncs[hookType], hData[requestedPos])
+			table.insert(notifyFuncs[hookType], func)
 		end
 	end
 	return notifyFuncs
@@ -91,7 +90,14 @@ end
 -- position 100.
 local function hookCall(funcName, arguments)
 	local orig = Stubby.GetOrigFunc(funcName)
-	for _,func in pairs(config.calls.functions[funcName]) do
+	if (not orig) then return end
+
+	local callees = {}
+	if config.calls and config.calls.callList and config.calls.callList[funcName] then
+		callees = config.calls.callList[funcName]
+	end
+	
+	for _,func in pairs(callees) do
 		if (orig and func.p >= 0) then
 			orig(unpack(arguments))
 			orig = nil
@@ -105,19 +111,30 @@ local function hookCall(funcName, arguments)
 			func.f(unpack(params))
 		end
 	end
+	if (orig) then orig(unpack(arguments)) end
 end
 
 -- This function automatically hooks Stubby in place of the
 -- original function, dynamically.
+Stubby_OldFunction = nil
 Stubby_NewFunction = nil
 local function hookInto(functionName)
 	if (config.hooks.functions[functionName]) then return end
-	config.hooks.origFuncs[functionName] = getglobal(functionName)
-	
-	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall(\""..functionName.."\", arg) end")
-	setglobal(functionName, Stubby_NewFunction)
+	RunScript("Stubby_OldFunction = "..functionName)
+	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall('"..functionName.."', arg) end")
+	RunScript(functionName.." = Stubby_NewFunction")
+	config.hooks.origFuncs[functionName] = Stubby_OldFunction;
+	Stubby_OldFunction = nil
 	Stubby_NewFunction = nil
 end
+
+local function getOrigFunc(functionName)
+	if (config.hooks) and (config.hooks.origFuncs) then
+		return config.hooks.origFuncs[functionName]
+	end
+end
+	
+
 
 -- This function causes a given function to be hooked by stubby and
 -- configures the hook function to be called at the given position.
@@ -132,8 +149,10 @@ function registerFunctionHook(functionName, position, hookFunc, ...)
 	local insertPos = tonumber(position) or 200
 	local funcObj = { f=hookFunc, a=arg, p=position }
 
-	if (config.calls.functions[hookType]) then
-		while (config.calls.functions[hookType][insertPos]) do
+	if (not config.calls) then config.calls = {} end
+	if (not config.calls.functions) then config.calls.functions = {} end
+	if (config.calls.functions[functionName]) then
+		while (config.calls.functions[functionName][insertPos]) do
 			if (position >= 0) then
 				insertPos = insertPos + 1
 			else
@@ -141,7 +160,11 @@ function registerFunctionHook(functionName, position, hookFunc, ...)
 			end
 		end
 		config.calls.functions[functionName][insertPos] = funcObj
-	end		
+	else
+		config.calls.functions[functionName] = {}
+		config.calls.functions[functionName][insertPos] = funcObj
+	end
+	config.calls.callList = rebuildNotifications(config.calls.functions);
 	hookInto(functionName)
 end
 
@@ -311,6 +334,8 @@ end
 Stubby = {
 	Print = chatPrint,
 	Events = events,
+	HookCall = hookCall,
+	GetOrigFunc = getOrigFunc,
 	LoadWatcher = loadWatcher,
 	EventWatcher = eventWatcher,
 	RegisterTrigger = registerTrigger,
