@@ -1,10 +1,13 @@
-## Title: Informant
+## Title: Informant <%version%>
+## Notes: Displays detailed item information in tootips, and can produce item reports by binding an infomation window to a keypress.
+##
 ## Interface: 1800
-## Version: <%version%>
-## Revision: $Id$
-## Notes: Displays item info in tootips.
 ## Dependancies: EnhTooltip
 ## OptionalDeps: Khaos
 ## SavedVariables: InformantConfig
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/dl/Informant
 Informant.xml
 

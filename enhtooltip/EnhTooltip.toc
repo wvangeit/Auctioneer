@@ -1,7 +1,11 @@
-## Title: EnhancedTooltip
-## Interface: 1700
+## Title: EnhTooltip <%version%>
+## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips
+##
+## Interface: 1800
+## Dependancies: Stubby
+## OptionalDeps: LootLink, ItemsMatrix, AllInOneInventory, ImprovedErrorFrame
+##
 ## Version: <%version%>
 ## Revision: $Id$
-## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips
-## OptionalDeps: LootLink, ItemsMatrix, AllInOneInventory
+## URL: http://auctioneeraddon.com/dl/EnhTooltip
 Tooltip.xml

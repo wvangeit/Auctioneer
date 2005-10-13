@@ -762,6 +762,10 @@ function Auctioneer_Command(command, source)
 	elseif (((cmd == _AUCT['CmdOn']) or (cmd == "on")) or ((cmd == _AUCT['CmdOff']) or (cmd == "off")) or ((cmd == _AUCT['CmdToggle']) or (cmd == "toggle"))) then
 		Auctioneer_OnOff(cmd, chatprint);
 
+	elseif ((cmd == _AUCT['CmdDisable']) or (cmd == "disable")) then
+		Auctioneer_ChatPrint(_AUCT['DisableMsg']);
+		Stubby.SetConfig("Auctioneer", "LoadType", "never");
+
 	elseif ((cmd == _AUCT['CmdClear']) or (cmd == "clear")) then
 		Auctioneer_Clear(param, chatprint);
 
@@ -846,6 +850,7 @@ function Auctioneer_ChatPrint_Help()
 
 	Auctioneer_ChatPrint(_AUCT['TextUsage']);
 	Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetFilterVal("all").."]|r - " .. _AUCT['HelpOnoff']);
+	Auctioneer_ChatPrint("  |cffffffff/auctioneer ".._AUCT['CmdDisable'].."|r - " .. _AUCT['HelpDisable']);
 	
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowVerbose'], Auctioneer_GetFilterVal(_AUCT['ShowVerbose']), _AUCT['HelpVerbose']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowAverage'], Auctioneer_GetFilterVal(_AUCT['ShowAverage']), _AUCT['HelpAverage']));
@@ -1227,7 +1232,6 @@ end
 function AuctFilter_SetFilter(checkbox, filter)
 	checkbox.filterVal = filter;
 	checkbox:SetChecked(Auctioneer_GetFilter(filter));
-	checkbox:SetScale(0.5);
 	checkbox:Show();
 end
 
@@ -1241,6 +1245,7 @@ end
 
 function Auctioneer_FilterButton_SetType(button, type, text, isLast)
 	Auctioneer_Old_FilterButton_SetType(button, type, text, isLast);
+	EnhTooltip.DebugPrint("Setting button", button:GetName(), type, text, isLast);
 
 	local buttonName = button:GetName();
 	local i,j, buttonID = string.find(buttonName, "(%d+)$");

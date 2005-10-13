@@ -1,8 +1,11 @@
-## Title: Stubby
+## Title: Stubby <%version%>
+## Notes: Allows on-demand addons to load automatically based upon simple event notification hooks
+##
 ## Interface: 1800
+## SavedVariables: StubbyConfig
+##
 ## Version: <%version%>
 ## Revision: $Id$
-## Notes: Allows on-demand addons to load upon event notification
-## SavedVariables: StubbyConfig
+## URL: http://auctioneeraddon.com/dl/Stubby
 Stubby.xml
 

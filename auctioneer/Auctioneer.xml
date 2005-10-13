@@ -25,22 +25,12 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnLoad>
 				Auctioneer_OnLoad();
 			</OnLoad>
-			<OnEvent>
-				Auctioneer_OnEvent(event);
-			</OnEvent>      
 		</Scripts>
 		<Frames>
-			<Button name="BrowseScanButton" parent="AuctionFrameBrowse" inherits="UIPanelButtonTemplate">
+			<Button name="BrowseScanButton" inherits="UIPanelButtonTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="AuctionFrameMoneyFrame" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="5" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
 				<Scripts>
 					<OnClick>
 						Auctioneer_RequestAuctionScan();
@@ -185,7 +175,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	</Frame>
 	<CheckButton name="AuctFilterTemplate" hidden="true" virtual="true">
 		<Size>
-			<AbsDimension x="32" y="32"/>
+			<AbsDimension x="16" y="16"/>
 		</Size>
 		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
 		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
@@ -204,140 +194,20 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnClick>
 		</Scripts>
 	</CheckButton>
-	<CheckButton name="AuctionFilterButton1Checkbox" parent="AuctionFilterButton1" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton1" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton2Checkbox" parent="AuctionFilterButton2" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton2" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton3Checkbox" parent="AuctionFilterButton3" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton3" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton4Checkbox" parent="AuctionFilterButton4" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton4" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton5Checkbox" parent="AuctionFilterButton5" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton5" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton6Checkbox" parent="AuctionFilterButton6" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton6" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton7Checkbox" parent="AuctionFilterButton7" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton7" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton8Checkbox" parent="AuctionFilterButton8" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton8" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton9Checkbox" parent="AuctionFilterButton9" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton9" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton10Checkbox" parent="AuctionFilterButton10" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton10" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton11Checkbox" parent="AuctionFilterButton11" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton11" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton12Checkbox" parent="AuctionFilterButton12" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton12" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton13Checkbox" parent="AuctionFilterButton13" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton13" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton14Checkbox" parent="AuctionFilterButton14" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton14" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
-	<CheckButton name="AuctionFilterButton15Checkbox" parent="AuctionFilterButton15" inherits="AuctFilterTemplate" hidden="true">
-		<Anchors>
-			<Anchor point="RIGHT" relativeTo="AuctionFilterButton15" relativePoint="RIGHT">
-				<Offset>
-					<AbsDimension x="-5" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
-	</CheckButton>
+	<CheckButton name="AuctionFilterButton1Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton2Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton3Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton4Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton5Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton6Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton7Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton8Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton9Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton10Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton11Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton12Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton13Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton14Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
+	<CheckButton name="AuctionFilterButton15Checkbox" inherits="AuctFilterTemplate" hidden="true"/>
 </Ui>
 

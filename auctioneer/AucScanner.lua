@@ -134,7 +134,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 				end
 			end
 		end
-		Auctioneer_Print("Final counts", dropCount, buyCount, bidCount, expCount);
+		EnhTooltip.DebugPrint("Final counts", dropCount, buyCount, bidCount, expCount);
 	end
 
 	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
@@ -163,7 +163,7 @@ end
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
 function Auctioneer_AuctionEntry_Hook(page, index, category)
-	Auctioneer_Print("Processing page", page, "item", index);
+	EnhTooltip.DebugPrint("Processing page", page, "item", index);
 	local auctionDoneKey;
 	if (not page or not index or not category) then
 		return;
@@ -221,7 +221,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 	
 	-- If we haven't seen this item (it's not in the old snapshot)
 	if (not snap) then 
-		Auctioneer_Print("No snap");
+		EnhTooltip.DebugPrint("No snap");
 		lNewAuctionsCount = lNewAuctionsCount + 1;
 
 		-- now build the list of buyout prices seen for this auction to use to get the median
@@ -233,14 +233,14 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
 		minCount = minCount + 1;
-		minPrice = minPrice + nullSafe(aiMinBid);
+		minPrice = minPrice + math.ceil(nullSafe(aiMinBid) / aiCount);
 		if (nullSafe(aiBidAmount) > 0) then
 			bidCount = bidCount + 1;
-			bidPrice = bidPrice + nullSafe(aiBidAmount);
+			bidPrice = bidPrice + math.ceil(nullSafe(aiBidAmount) / aiCount);
 		end
 		if (nullSafe(aiBuyoutPrice) > 0) then
 			buyCount = buyCount + 1;
-			buyPrice = buyPrice + nullSafe(aiBuyoutPrice);
+			buyPrice = buyPrice + math.ceil(nullSafe(aiBuyoutPrice) / aiCount);
 		end
 		auctionPriceItem.data = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
 
@@ -249,7 +249,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 			newBuyoutPricesList.setList(bph);
 		end
 		if (nullSafe(aiBuyoutPrice) > 0) then
-			newBuyoutPricesList.insert(math.floor(aiBuyoutPrice / aiCount));
+			newBuyoutPricesList.insert(math.ceil(aiBuyoutPrice / aiCount));
 		end
 
 		auctionPriceItem.buyoutPricesHistoryList = newBuyoutPricesList.getList();
@@ -276,7 +276,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 		};
 
 	else
-		Auctioneer_Print("Snap!");
+		EnhTooltip.DebugPrint("Snap!");
 		lOldAuctionsCount = lOldAuctionsCount + 1;
 		--this is an auction that was already in the snapshot from a previous scan and is still in the auction house
 		snap.dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
@@ -328,31 +328,45 @@ function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
 end
 
 function Auctioneer_ConfigureAH()
-	AuctionsPriceText:ClearAllPoints();
-	AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -56);
-	AuctionsBuyoutText:ClearAllPoints();
-	AuctionsBuyoutText:SetPoint("TOPLEFT", "AuctionsPriceText", "TOPLEFT", 0, -36);
-	AuctionsBuyoutErrorText:ClearAllPoints();
-	AuctionsBuyoutErrorText:SetPoint("TOPLEFT", "AuctionsBuyoutText", "TOPLEFT", 0, -32);
-	AuctionsDurationText:ClearAllPoints();
-	AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -10);
-	AuctionsDepositText:ClearAllPoints();
-	AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -34);
-	if (AuctionInfo ~= nil) then
-		AuctionInfo:ClearAllPoints();
-		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36);
-	end
+	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
+		EnhTooltip.DebugPrint("Configuring AuctionUI");
+		AuctionsPriceText:ClearAllPoints();
+		AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -56);
+		AuctionsBuyoutText:ClearAllPoints();
+		AuctionsBuyoutText:SetPoint("TOPLEFT", "AuctionsPriceText", "TOPLEFT", 0, -36);
+		AuctionsBuyoutErrorText:ClearAllPoints();
+		AuctionsBuyoutErrorText:SetPoint("TOPLEFT", "AuctionsBuyoutText", "TOPLEFT", 0, -32);
+		AuctionsDurationText:ClearAllPoints();
+		AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -10);
+		AuctionsDepositText:ClearAllPoints();
+		AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -34);
+		if (AuctionInfo ~= nil) then
+			AuctionInfo:ClearAllPoints();
+			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36);
+		end
 
-	AuctionsShortAuctionButtonText:SetText("2");
-	AuctionsMediumAuctionButtonText:SetText("8");
-	AuctionsMediumAuctionButton:ClearAllPoints();
-	AuctionsMediumAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsShortAuctionButton", "BOTTOMRIGHT", 20,0);
-	AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
-	AuctionsLongAuctionButton:ClearAllPoints();
-	AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
-	
-	-- set UI-texts
-	BrowseScanButton:SetText(_AUCT['TextScan']);
+		AuctionsShortAuctionButtonText:SetText("2");
+		AuctionsMediumAuctionButtonText:SetText("8");
+		AuctionsMediumAuctionButton:ClearAllPoints();
+		AuctionsMediumAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsShortAuctionButton", "BOTTOMRIGHT", 20,0);
+		AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
+		AuctionsLongAuctionButton:ClearAllPoints();
+		AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
+		
+		-- set UI-texts
+		BrowseScanButton:SetText(_AUCT['TextScan']);
+		BrowseScanButton:SetParent("AuctionFrameBrowse");
+		BrowseScanButton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0);
+		BrowseScanButton:Show();
+
+		local obj
+		for i=1, 15 do
+			obj = getglobal("AuctionFilterButton"..i.."Checkbox")
+			obj:SetParent("AuctionFilterButton"..i)
+			obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
+		end
+		AuctionFrameFilters_UpdateClasses()
+	end
 end
 
 function Auctioneer_Auctions_Clear()
@@ -364,7 +378,7 @@ function Auctioneer_Auctions_Clear()
 end
 
 function Auctioneer_Auctions_SetWarn(textStr)
-	if (AuctionInfoWarnText == nil) then Auctioneer_Print("Error, no text for AuctionInfo line "..line); end
+	if (AuctionInfoWarnText == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
 	AuctionInfoWarnText:SetText(textStr);
 	AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
 	AuctionInfoWarnText:Show();
@@ -373,12 +387,12 @@ end
 function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
 	local text = getglobal("AuctionInfoText"..line);
 	local money = getglobal("AuctionInfoMoney"..line);
-	if (text == nil) then Auctioneer_Print("Error, no text for AuctionInfo line "..line); end
-	if (money == nil) then Auctioneer_Print("Error, no money for AuctionInfo line "..line); end
+	if (text == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
+	if (money == nil) then EnhTooltip.DebugPrint("Error, no money for AuctionInfo line "..line); end
 	text:SetText(textStr);
 	text:Show();
 	if (money ~= nil) then
-		MoneyFrame_Update("AuctionInfoMoney"..line, math.floor(nullSafe(moneyAmount)));
+		MoneyFrame_Update("AuctionInfoMoney"..line, math.ceil(nullSafe(moneyAmount)));
 		getglobal("AuctionInfoMoney"..line.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
 		getglobal("AuctionInfoMoney"..line.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
 		money:Show();
@@ -441,7 +455,7 @@ function Auctioneer_NewAuction()
 
 	local hsp, hspCount, mktPrice, warn = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 	if hsp == 0 and buyCount > 0 then
-		hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+		hsp = math.ceil(buyPrice / buyCount); -- use mean buyout if median not available
 	end
 	local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
 	local countFix = count
@@ -487,7 +501,7 @@ function Auctioneer_AuctHouseClose()
 end
 
 function Auctioneer_AuctHouseUpdate()
-	if (Auctioneer_CheckCompleteScan()) then
+	if (Auctioneer_isScanningRequested and Auctioneer_CheckCompleteScan()) then
 		Auctioneer_ScanAuction();
 	end
 end

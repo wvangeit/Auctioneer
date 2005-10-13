@@ -11,11 +11,11 @@
 ----    Your function hookFunc(...) is called in the correct
 ----    sequence when the original function is invoked.
 ----
-----  Stubby.RegisterAddonHook(addonName, waiterName, hookFunction, ...)
+----  Stubby.RegisterAddonHook(addonName, ownerAddon, hookFunction, ...)
 ----    Waits for addon "addonName" to load then calls your
 ----    hookFunction(...) when it is loaded (or immediatly if the
 ----    addon is already loaded (so you don't have to check)
-----    "waiterName" is your addon name, and is used to index your
+----    "ownerAddon" is your addon name, and is used to index your
 ----    hookFunction into the lookup table.
 ----
 ----  Stubby.RegisterTrigger(triggerAddon, triggerCode)
@@ -29,7 +29,7 @@
 ----
 ---------------------------------------------------------------------
 ----  Example code:
-----    Stubby.RegisterTrigger("myAddon", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddon, \"myAddon\")")
+----    Stubby.RegisterTrigger("myAddon", "Stubby.RegisterAddonHook(\"Blizzard_AuctionUI\", \"myAddon\", LoadAddOn, \"myAddon\")")
 ----    This code will run every time stubby starts up, and will 
 ----    cause your addon to be loaded whenever the Blizzard_AuctionUI
 ----    addon is loaded.
@@ -45,6 +45,13 @@
 ----    handlers, etc.
 ----    
 --]]
+local createFunctionLoadTrigger
+local createEventLoadTrigger
+local createAddonLoadTrigger
+local unregisterFunctionHook
+local unregisterAddonHook
+local unregisterEventHook
+local unregisterTrigger
 local registerFunctionHook
 local registerAddonHook
 local registerEventHook
@@ -87,10 +94,12 @@ end
 
 -- This function's purpose is to execute all the attached
 -- functions in order and the original call at just before
--- position 100.
+-- position 0.
 local function hookCall(funcName, arguments)
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
+
+	local retVal = {};
 
 	local callees = {}
 	if config.calls and config.calls.callList and config.calls.callList[funcName] then
@@ -99,15 +108,16 @@ local function hookCall(funcName, arguments)
 	
 	for _,func in pairs(callees) do
 		if (orig and func.p >= 0) then
-			orig(unpack(arguments))
+			retVal = { orig(unpack(arguments)) }
 			orig = nil
 		end
 		if (not func.a or func.a == {}) then
 			func.f(unpack(arguments))
 		else
 			local params = {}
-			for _,param in func.a do table.insert(params, param) end
-			for _,param in arguments do table.insert(params, param) end
+			for i=1, table.getn(func.a) do table.insert(params, func.a[i]) end
+			for i=1, table.getn(arguments) do table.insert(params, arguments[i]) end
+			if (retVal ~= {}) then table.insert(params, retVal) end
 			func.f(unpack(params))
 		end
 	end
@@ -168,29 +178,43 @@ function registerFunctionHook(functionName, position, hookFunc, ...)
 	config.calls.callList = rebuildNotifications(config.calls.functions);
 	hookInto(functionName)
 end
+function unregisterFunctionHook(functionName, hookFunc)
+	if not (config.calls and config.calls.functions and config.calls.functions[functionName]) then return end
+	for pos, funcObj in config.calls.functions[functionName] do
+		if (funcObj and funcObj.f == hookFunc) then
+			config.calls.functions[functionName][pos] = nil
+		end
+	end
+end
 
 -- This function registers a given function to be called when a given
 -- addon is loaded, or immediatly if it is already loaded (this can be
 -- used to setup a hooking function to execute when an addon is loaded
 -- but not before)
-function registerAddonHook(addonName, waiterName, hookFunction, ...)
+function registerAddonHook(addonName, ownerAddon, hookFunction, ...)
 	if (IsAddOnLoaded(addonName)) then
 		hookFunction(unpack(arg))
 	else
 		local addon = string.lower(addonName)
 		if (not config.loads[addon]) then config.loads[addon] = {} end
-		config.loads[addon][waiterName] = nil
+		config.loads[addon][ownerAddon] = nil
 		if (hookFunction) then
-			config.loads[addon][waiterName] = { f=hookFunction, a=arg }
+			config.loads[addon][ownerAddon] = { f=hookFunction, a=arg }
 		end
+	end
+end
+function unregisterAddonHook(addonName, ownerAddon)
+	local addon = string.lower(addonName)
+	if (config.loads and config.loads[addon] and config.loads[addon][ownerAddon]) then
+		config.loads[addon][ownerAddon] = nil
 	end
 end
 
 function loadWatcher(loadedAddon)
 	local addon = string.lower(loadedAddon)
 	if (config.loads[addon]) then
-		local waiterName, hookDetail
-		for waiterName, hookDetail in config.loads[addon] do
+		local ownerAddon, hookDetail
+		for ownerAddon, hookDetail in config.loads[addon] do
 			hookDetail.f(unpack(hookDetail.a))
 		end
 	end
@@ -199,26 +223,32 @@ end
 -- This function registers a given function to be called when a given
 -- event is fired (this can be used to activate an addon upon reciept
 -- of a given event etc)
-function registerEventHook(eventType, waiterName, hookFunction, ...)
+function registerEventHook(eventType, ownerAddon, hookFunction, ...)
 	if (not config.events[eventType]) then 
 		config.events[eventType] = {}
 		StubbyFrame:RegisterEvent(eventType)
 	end
-	config.events[eventType][waiterName] = nil
+	config.events[eventType][ownerAddon] = nil
 	if (hookFunction) then
-		config.events[eventType][waiterName] = { f=hookFunction, a=arg }
+		config.events[eventType][ownerAddon] = { f=hookFunction, a=arg }
+	end
+end
+function unregisterEventHook(eventType, ownerAddon)
+	local addon = string.lower(addonName)
+	if (config.events and config.events[eventType] and config.events[eventType][ownerAddon]) then
+		config.events[eventType][ownerAddon] = nil
 	end
 end
 
 function eventWatcher(eventType)
 	if (config.events[eventType]) then
-		local waiterName, hookDetail
-		for waiterName, hookDetail in config.events[eventType] do
+		local ownerAddon, hookDetail
+		for ownerAddon, hookDetail in config.events[eventType] do
 			local params = {}
-			for _,param in hookDetail.a do table.insert(params, param) end
+			for i=1, table.getn(hookDetail.a) do table.insert(params, hookDetail.a[i]) end
 			table.insert(params, event);
 			local maxParam = 0;
-			for i = 1, 25 do if getglobal("arg"..pos) then maxParam = i end end
+			for i = 1, 25 do if getglobal("arg"..i) then maxParam = i end end
 			if (maxParam > 0) then
 				for i = 1, maxParam do
 					table.insert(params, getglobal("arg"..i))
@@ -235,15 +265,55 @@ end
 -- lua script can, such as create global functions, register a
 -- command handler, hook into functions, load your addon etc.
 -- Leaving triggerCode nil will remove your trigger.
-function registerTrigger(triggerAddon, triggerCode)
-	local triggerIndex = string.lower(triggerAddon)
+function registerTrigger(ownerAddon, triggerName, triggerCode)
+	local ownerIndex = string.lower(ownerAddon)
+	local triggerIndex = string.lower(triggerName)
 	if (not StubbyConfig.triggers) then StubbyConfig.triggers = {} end
-	StubbyConfig.triggers[triggerIndex] = nil
+	if (not StubbyConfig.triggers[ownerIndex]) then StubbyConfig.triggers[ownerIndex] = {} end
+	StubbyConfig.triggers[ownerIndex][triggerIndex] = nil
 	if (triggerCode) then
-		StubbyConfig.triggers[triggerIndex] = triggerCode
+		StubbyConfig.triggers[ownerIndex][triggerIndex] = triggerCode
+	end
+end
+function unregisterTrigger(ownerAddon, triggerName)
+	local ownerIndex = string.lower(ownerAddon)
+	local triggerIndex = string.lower(triggerName)
+	if not (StubbyConfig.triggers) then return end
+	if not (ownerIndex and StubbyConfig.triggers[ownerIndex]) then return end
+	if (triggerIndex == nil) then
+		StubbyConfig.triggers[ownerIndex] = nil
+	else
+		StubbyConfig.triggers[ownerIndex][triggerIndex] = nil
 	end
 end
 
+function createAddonLoadTrigger(ownerAddon, triggerAddon)
+	registerTrigger(ownerAddon, triggerAddon.."AddonLoader",
+		'local function hookFunction() '..
+			'LoadAddOn("'..ownerAddon..'") '..
+			'Stubby.UnregisterAddonHook("'..triggerAddon..'", "'..ownerAddon..'") '..
+		'end '..
+		'Stubby.RegisterAddonHook("'..triggerAddon..'", "'..ownerAddon..'", hookFunction)'
+	);
+end
+function createFunctionLoadTrigger(ownerAddon, triggerFunction)
+	registerTrigger(ownerAddon, triggerFunction.."FunctionLoader",
+		'local function hookFunction() '..
+			'LoadAddOn("'..ownerAddon..'") '..
+			'Stubby.UnregisterFunctionHook("'..triggerFunction..'", hookFunction) '..
+		'end '..
+		'Stubby.RegisterFunctionHook("'..triggerFunction..'", 200, "'..ownerAddon..'", hookFunction)'
+	);
+end
+function createEventLoadTrigger(ownerAddon, triggerEvent)
+	registerTrigger(ownerAddon, triggerEvent.."FunctionLoader",
+		'local function hookFunction() '..
+			'LoadAddOn("'..ownerAddon..'") '..
+			'Stubby.UnregisterEventHook("'..triggerEvent..'", "'..ownerAddon..'") '..
+		'end '..
+		'Stubby.RegisterEventHook("'..triggerEvent..'", "'..ownerAddon..'", hookFunction)'
+	);
+end
 
 -- Functions to check through all addons for dependants.
 -- If any exist that we don't know about, and have a dependancy of us, then we will load them
@@ -309,15 +379,18 @@ local function runTriggers()
 end
 
 
-local function onLoaded()
-	if not StubbyConfig.inspected then StubbyConfig.inspected = {} end
-	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
-
+local function onWorldStart()
 	checkAddons()
 	-- Run all of our triggers to setup the respective addons functions.
 	runTriggers()
 	-- The search for new life and new civilizations... or just addons maybe.
 	searchForNewAddons()
+end
+
+local function onLoaded()
+	if not StubbyConfig.inspected then StubbyConfig.inspected = {} end
+	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
+	Stubby.RegisterEventHook("PLAYER_LOGIN", "Stubby", onWorldStart)
 end
 
 function events(event, param)
@@ -340,12 +413,63 @@ local function chatPrint(...)
 	end
 end
 
+-- This function allows a trigger to store a configuration variable
+-- by default the variable is per character unless isGlobal is set.
+local function setConfig(ownerAddon, variable, value, isGlobal)
+	local ownerIndex = string.lower(ownerAddon)
+	local varIndex = string.lower(variable)
+	if (isGlobal) then
+		varIndex = string.lower(UnitName("player")) .. ":" .. varIndex
+	end
+
+	if (not StubbyConfig.configs) then StubbyConfig.configs = {} end
+	if (not StubbyConfig.configs[ownerIndex]) then StubbyConfig.configs[ownerIndex] = {} end
+	StubbyConfig.configs[ownerIndex][varIndex] = value
+end
+
+-- This function gets a config variable stored by the above function
+-- it will prefer a player specific variable over a global with the
+-- same name
+local function getConfig(ownerAddon, variable)
+	local ownerIndex = string.lower(ownerAddon)
+	local globalIndex = string.lower(variable)
+	local playerIndex = string.lower(UnitName("player")) .. ":" .. globalIndex
+
+	if (not StubbyConfig.configs) then return end
+	if (not StubbyConfig.configs[ownerIndex]) then return end
+	local curValue = StubbyConfig.configs[ownerIndex][playerIndex]
+	if (curValue == nil) then
+		curValue = StubbyConfig.configs[ownerIndex][globalIndex]
+	end
+end
+
+-- This function clears the config variable specified (both the
+-- global and player specific) or all config variables for the
+-- ownerAddon if no variable is specified
+local function clearConfig(ownerAddon, variable)
+	local ownerIndex = string.lower(ownerAddon)
+	if (not StubbyConfig.configs) then return end
+	if (not StubbyConfig.configs[ownerIndex]) then return end
+	if (variable) then
+		local globalIndex = string.lower(variable)
+		local playerIndex = string.lower(UnitName("player")) .. ":" .. globalIndex
+		StubbyConfig.configs[ownerIndex][globalIndex] = nil
+		StubbyConfig.configs[ownerIndex][playerIndex] = nil
+	else
+		StubbyConfig.configs[ownerIndex] = nil
+	end
+end
+
+
 -- Setup our Stubby global object. All interaction is done
 -- via the methods exposed here.
 Stubby = {
 	Print = chatPrint,
 	Events = events,
 	HookCall = hookCall,
+	SetConfig = setConfig,
+	GetConfig = getConfig,
+	ClearConfig = clearConfig,
 	GetOrigFunc = getOrigFunc,
 	LoadWatcher = loadWatcher,
 	EventWatcher = eventWatcher,
@@ -353,6 +477,13 @@ Stubby = {
 	RegisterEventHook = registerEventHook,
 	RegisterAddonHook = registerAddonHook,
 	RegisterFunctionHook = registerFunctionHook,
+	UnregisterTrigger = unregisterTrigger,
+	UnregisterEventHook = unregisterEventHook,
+	UnregisterAddonHook = unregisterAddonHook,
+	UnregisterFunctionHook = unregisterFunctionHook,
+	CreateAddonLoadTrigger = createAddonLoadTrigger,
+	CreateEventLoadTrigger = createEventLoadTrigger,
+	CreateFunctionLoadTrigger = createFunctionLoadTrigger,
 }
 
 

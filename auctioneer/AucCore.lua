@@ -143,11 +143,11 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 	if (from ~= nil) then serverFaction = from;
 	else serverFaction = Auctioneer_GetAuctionKey(); end;
 	
-	Auctioneer_Print("Getting data from/for", serverFaction, itemKey);
+	EnhTooltip.DebugPrint("Getting data from/for", serverFaction, itemKey);
 	if (AuctionConfig.data == nil) then AuctionConfig.data = {}; end
 	if (AuctionConfig.info == nil) then AuctionConfig.info = {}; end
 	if (AuctionConfig.data[serverFaction] == nil) then
-		Auctioneer_Print("Data from serverfaction is nil");
+		EnhTooltip.DebugPrint("Data from serverfaction is nil");
 		AuctionConfig.data[serverFaction] = {};
 	else
 		data = AuctionConfig.data[serverFaction][itemKey];
@@ -335,7 +335,7 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 	end
 	if (dirty~=nil and bid~=nil and level~=nil and qual~=nil and left~=nil and fseen~=nil and last~=nil and link~=nil and owner~=nil) then 
 		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner); 
-		Auctioneer_Print("Saving", server, cat, sig, "as", saveData); 
+		EnhTooltip.DebugPrint("Saving", server, cat, sig, "as", saveData); 
 		AuctionConfig.snap[server][cat][sig] = saveData;
 		local itemKey = Auctioneer_GetKeyFromSig(sig);
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
@@ -343,7 +343,7 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 		end
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	else
-		Auctioneer_Print("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
+		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
 	end
 end
 
@@ -396,6 +396,11 @@ function Auctioneer_AddonLoaded()
 	end
 end
 
+local function hookAuctionHouse()
+	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
+	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
+end
+
 function Auctioneer_LockAndLoad(thisPointer)
 	-- make thisPointer an optional parameter
 	if thisPointer == nil then
@@ -403,22 +408,16 @@ function Auctioneer_LockAndLoad(thisPointer)
 	end
 
 	-- register events
-	thisPointer:RegisterEvent("NEW_AUCTION_UPDATE"); -- event that is fired when item changed in new auction frame
-	thisPointer:RegisterEvent("AUCTION_HOUSE_SHOW"); -- auction house window opened
-	thisPointer:RegisterEvent("AUCTION_HOUSE_CLOSED"); -- auction house window closed
-	thisPointer:RegisterEvent("AUCTION_ITEM_LIST_UPDATE"); -- event for scanning
+	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
+	Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", Auctioneer_AuctHouseShow);
+	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
+	Stubby.RegisterEventHook("AUCTION_ITEM_LIST_UPDATE", "Auctioneer", Auctioneer_AuctHouseUpdate);
 
-	Auctioneer_Event_StartAuctionScan = Auctioneer_AuctionStart_Hook;
-	Auctioneer_Event_ScanAuction = Auctioneer_AuctionEntry_Hook;
-	Auctioneer_Event_FinishedAuctionScan = Auctioneer_FinishedAuctionScan_Hook;
+	Stubby.RegisterFunctionHook("Auctioneer_Event_StartAuctionScan", 200, Auctioneer_AuctionStart_Hook);
+	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
+	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
 
-	-- Hook PlaceAuctionBid
-	Auctioneer_Old_BidHandler = PlaceAuctionBid;
-	PlaceAuctionBid = Auctioneer_PlaceAuctionBid;
-
-	-- Hook in the FilterButton_SetType
-	Auctioneer_Old_FilterButton_SetType = FilterButton_SetType;
-	FilterButton_SetType = Auctioneer_FilterButton_SetType;
+	Stubby.RegisterAddonHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse());
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";

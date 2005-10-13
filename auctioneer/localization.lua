@@ -161,6 +161,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdCtrl'] = "ctrl";
 	_AUCT['CmdShift'] = "shift";
 	_AUCT['CmdToggle'] = "toggle";
+	_AUCT['CmdDisable'] = "disable";
 	_AUCT['CmdClear'] = "clear";
 	_AUCT['CmdClearAll'] = "all";
 	_AUCT['CmdClearSnapshot'] = "snapshot";
@@ -227,6 +228,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['ShowRedo'] = "show-warning";
 	
 	_AUCT['HelpOnoff'] = "Turns the auction data display on and off";
+	_AUCT['HelpDisable'] = "Stops auctioneer from automatically loading next time you log in";
 	_AUCT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
 	_AUCT['HelpAverage'] = "Select whether to show item's average auction price";
 	_AUCT['HelpLink'] = "Select whether to show the link id in the tooltip";
@@ -257,6 +259,8 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
 	_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
+	
+	_AUCT['DisableMsg'] = "Disabling automatic loading af Auctioneer";
 	
 	_AUCT['StatOn'] = "Displaying configured auction data";
 	_AUCT['StatOff'] = "Not displaying any auction data";
@@ -352,6 +356,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
 	_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
+
 -- Locale strings for the deDE locale
 if locale == "deDE" then
 		-- Encoded in UTF8
@@ -969,7 +974,7 @@ if locale == "esES" then
 		_AUCT['GuiReloaduiButton'] = "Recargar";
 		_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf\195\161z de WoW";
 		_AUCT['GuiRedo'] = "Mostrar Advertencia de Exploraci\195\179n";
-		_AUCT['GuiDefaultAllButton'] = "Revertir All";
+		_AUCT['GuiDefaultAllButton'] = "Revertir Todo";
 		_AUCT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
 		_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_AUCT['GuiDefaultOption'] = "Revertir esta opci\195\179n";

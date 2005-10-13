@@ -231,7 +231,7 @@ function getCatName(catID)
 	end
 end
 
-function tooltipHandler(frame, name, link, quality, count)
+function tooltipHandler(frame, name, link, quality, count, price)
 	local quant = 0
 	local sell = 0
 	local buy = 0
@@ -430,39 +430,31 @@ function showHideInfo()
 	end
 end
 
-
-function frameConfig()
+local function onLoad()
+	Stubby.Print("Executing OnLoad")
+	if (not InformantFrameTitle) then return end
 	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
 
-	this:RegisterEvent("ADDON_LOADED")
+	if (not InformantConfig) then InformantConfig = { } end
+	if (InformantConfig.position) then
+		InformantFrame:ClearAllPoints()
+		InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
+	end
+
+	if (not InformantConfig.welcomed) then
+		clear()
+		addLine(_INFORMANT['Welcome'])
+		InformantConfig.welcomed = true
+	end
+
+	Informant.InitCommands()
 end
 
-function processEvent(event)
-	if (event == "ADDON_LOADED") then
-		if (arg1 == "Informant") then
-			if (not Informant) then
-				InformantConfig = { }
-			end
-
-			if (InformantConfig.position) then
-				InformantFrame:ClearAllPoints()
-				InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
-			end
-
-			if (not InformantConfig.welcomed) then
-				clear()
-				addLine(_INFORMANT['Welcome'])
-				InformantConfig.welcomed = true
-			end
-
-			Informant.InitCommands()
-		end
-	elseif (event == "PLAYER_LEAVING_WORLD") then
-		if (not InformantConfig.position) then
-			InformantConfig.position = { }
-		end
-		InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
+function onQuit()
+	if (not InformantConfig.position) then
+		InformantConfig.position = { }
 	end
+	InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
 end
 
 function frameActive(isActive)
@@ -544,15 +536,14 @@ Informant = {
 	SetRequirements = setRequirements,
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
-	FrameConfig = frameConfig,
 	FrameActive = frameActive,
-	ProcessEvent = processEvent,
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
 	SetFilter = setFilter
 }
 
-
-EnhTooltip.AddHook("tooltip", tooltipHandler, 120)
+Stubby.RegisterAddonHook("Informant", "Informant", onLoad)
+Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
+Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, tooltipHandler)
 

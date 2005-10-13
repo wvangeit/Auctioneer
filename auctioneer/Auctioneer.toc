@@ -1,9 +1,17 @@
-## Title: Auctioneer
+## Title: Auctioneer <%version%>
+## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
+##
 ## Interface: 1800
+## LoadOnDemand: 1
+## Dependancies: EnhTooltip, Stubby
+## OptionalDeps: Informant, Khaos
+## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
+##
 ## Version: <%version%>
 ## Revision: $Id$
-## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
-## Dependancies: EnhTooltip
-## OptionalDeps: Informant, Khaos
-## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices, Auctioneer_HSPCache, AuctionBackup
+## URL: http://auctioneeraddon.com/
+##
+..\..\FrameXML\Fonts.xml
+..\..\FrameXML\UIPanelTemplates.xml
+..\..\FrameXML\MoneyFrame.xml
 Auctioneer.xml
