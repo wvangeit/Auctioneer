@@ -119,13 +119,14 @@ end
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
 local function hookInto(functionName)
-	if (config.hooks.functions[functionName]) then return end
+	if (config.hooks.origFuncs[functionName]) then return end
 	RunScript("Stubby_OldFunction = "..functionName)
 	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall('"..functionName.."', arg) end")
 	RunScript(functionName.." = Stubby_NewFunction")
+	config.hooks.functions[functionName] = Stubby_NewFunction;
 	config.hooks.origFuncs[functionName] = Stubby_OldFunction;
-	Stubby_OldFunction = nil
 	Stubby_NewFunction = nil
+	Stubby_OldFunction = nil
 end
 
 local function getOrigFunc(functionName)
