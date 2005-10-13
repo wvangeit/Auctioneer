@@ -1,5 +1,5 @@
-## Title: Informant <%version%>
-## Notes: Displays detailed item information in tootips, and can produce item reports by binding an infomation window to a keypress.
+## Title: Informant
+## Notes: Displays detailed item information in tootips, and can produce item reports by binding an infomation window to a keypress [<%version%>]
 ##
 ## Interface: 1800
 ## Dependancies: EnhTooltip

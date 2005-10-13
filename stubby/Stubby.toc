@@ -1,5 +1,5 @@
-## Title: Stubby <%version%>
-## Notes: Allows on-demand addons to load automatically based upon simple event notification hooks
+## Title: Stubby
+## Notes: Allows on-demand addons to load automatically based upon simple event notification hooks [<%version%>]
 ##
 ## Interface: 1800
 ## SavedVariables: StubbyConfig

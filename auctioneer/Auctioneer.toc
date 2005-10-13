@@ -1,5 +1,5 @@
-## Title: Auctioneer <%version%>
-## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data.
+## Title: Auctioneer
+## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data. [<%version%>]
 ##
 ## Interface: 1800
 ## LoadOnDemand: 1

@@ -1,5 +1,5 @@
-## Title: EnhTooltip <%version%>
-## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips
+## Title: EnhTooltip
+## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips [<%version%>]
 ##
 ## Interface: 1800
 ## Dependancies: Stubby
