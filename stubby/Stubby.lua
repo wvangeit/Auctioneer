@@ -99,7 +99,10 @@ local function hookCall(funcName, arguments)
 		if (not func.a or func.a == {}) then
 			func.f(unpack(arguments))
 		else
-			func.f(unpack(func.a), unpack(arguments))
+			local params = {}
+			for _,param in func.a do table.insert(params, param) end
+			for _,param in arguments do table.insert(params, param) end
+			func.f(unpack(params))
 		end
 	end
 end
