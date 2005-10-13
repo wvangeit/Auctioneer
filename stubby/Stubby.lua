@@ -214,7 +214,17 @@ function eventWatcher(eventType)
 	if (config.events[eventType]) then
 		local waiterName, hookDetail
 		for waiterName, hookDetail in config.events[eventType] do
-			hookDetail.f(unpack(hookDetail.a))
+			local params = {}
+			for _,param in hookDetail.a do table.insert(params, param) end
+			table.insert(params, event);
+			local maxParam = 0;
+			for i = 1, 25 do if getglobal("arg"..pos) then maxParam = i end end
+			if (maxParam > 0) then
+				for i = 1, maxParam do
+					table.insert(params, getglobal("arg"..i))
+				end
+			end
+			hookDetail.f(unpack(params))
 		end
 	end
 end
