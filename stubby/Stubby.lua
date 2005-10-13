@@ -96,7 +96,11 @@ local function hookCall(funcName, arguments)
 			orig(unpack(arguments))
 			orig = nil
 		end
-		func.f(unpack(func.a))
+		if (not func.a or func.a == {}) then
+			func.f(unpack(arguments))
+		else
+			func.f(unpack(func.a), unpack(arguments))
+		end
 	end
 end
 
