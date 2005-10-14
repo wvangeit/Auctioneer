@@ -417,7 +417,7 @@ function Auctioneer_LockAndLoad(thisPointer)
 	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
 	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
 
-	Stubby.RegisterAddonHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse());
+	Stubby.RegisterAddonHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";

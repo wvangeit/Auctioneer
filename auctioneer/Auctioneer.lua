@@ -28,8 +28,8 @@ function Auctioneer_OnLoad()
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterTrigger("Auctioneer", "CommandHandler",
 		'local function cmdHandler(msg) '..
-			'local i,j, cmd, param = string.find(string.lower(command), "^([^ ]+) (.+)$") '..
-			'if (not cmd) then cmd = string.lower(command) end  '..
+			'local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$") '..
+			'if (not cmd) then cmd = string.lower(msg) end  '..
 			'if (not cmd) then cmd = "" end  '..
 			'if (not param) then param = "" end '..
 			'if (cmd == "load") then '..

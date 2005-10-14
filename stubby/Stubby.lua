@@ -221,7 +221,7 @@ function loadWatcher(loadedAddon)
 end
 
 -- This function registers a given function to be called when a given
--- event is fired (this can be used to activate an addon upon reciept
+-- event is fired (this can be used to activate an addon upon receipt
 -- of a given event etc)
 function registerEventHook(eventType, ownerAddon, hookFunction, ...)
 	if (not config.events[eventType]) then 
@@ -371,10 +371,14 @@ end
 -- related addon is not loaded yet, runs the trigger script.
 local function runTriggers()
 	if (not StubbyConfig.triggers) then return end
-	for addon, trigger in StubbyConfig.triggers do
+	for addon, triggers in StubbyConfig.triggers do
 		if (not IsAddOnLoaded(addon) and IsAddOnLoadOnDemand(addon)) then
 			local _, _, _, _, loadable = GetAddOnInfo(addon)
-			if (loadable) then RunScript(trigger); end
+			if (loadable) then
+				for _, trigger in pairs(triggers) do
+					RunScript(trigger)
+				end
+			end
 		end
 	end
 end
