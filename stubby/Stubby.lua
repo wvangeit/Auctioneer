@@ -111,17 +111,20 @@ local function hookCall(funcName, arguments)
 			retVal = { orig(unpack(arguments)) }
 			orig = nil
 		end
-		if (not func.a or func.a == {}) then
+		
+		if (not func.a and retVal == {} ) then
 			func.f(unpack(arguments))
 		else
 			local params = {}
-			for i=1, table.getn(func.a) do table.insert(params, func.a[i]) end
+			if (func.a) then for i=1, table.getn(func.a) do table.insert(params, func.a[i]) end end
 			for i=1, table.getn(arguments) do table.insert(params, arguments[i]) end
 			if (retVal ~= {}) then table.insert(params, retVal) end
 			func.f(unpack(params))
 		end
 	end
 	if (orig) then orig(unpack(arguments)) end
+	
+	return unpack(retVal)
 end
 
 -- This function automatically hooks Stubby in place of the
@@ -131,7 +134,7 @@ Stubby_NewFunction = nil
 local function hookInto(functionName)
 	if (config.hooks.origFuncs[functionName]) then return end
 	RunScript("Stubby_OldFunction = "..functionName)
-	RunScript("Stubby_NewFunction = function(...) Stubby.HookCall('"..functionName.."', arg) end")
+	RunScript("Stubby_NewFunction = function(...) return Stubby.HookCall('"..functionName.."', arg) end")
 	RunScript(functionName.." = Stubby_NewFunction")
 	config.hooks.functions[functionName] = Stubby_NewFunction;
 	config.hooks.origFuncs[functionName] = Stubby_OldFunction;
@@ -159,6 +162,7 @@ end
 function registerFunctionHook(functionName, position, hookFunc, ...)
 	local insertPos = tonumber(position) or 200
 	local funcObj = { f=hookFunc, a=arg, p=position }
+	if (table.getn(arg) == 0) then funcObj.a = nil; end
 
 	if (not config.calls) then config.calls = {} end
 	if (not config.calls.functions) then config.calls.functions = {} end
