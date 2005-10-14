@@ -373,7 +373,8 @@ local function runTriggers()
 	if (not StubbyConfig.triggers) then return end
 	for addon, trigger in StubbyConfig.triggers do
 		if (not IsAddOnLoaded(addon) and IsAddOnLoadOnDemand(addon)) then
-			RunScript(trigger)
+			local _, _, _, _, loadable = GetAddOnInfo(addon)
+			if (loadable) then RunScript(trigger); end
 		end
 	end
 end

@@ -2,7 +2,7 @@
 ## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips [<%version%>]
 ##
 ## Interface: 1800
-## Dependancies: Stubby
+## Dependencies: Stubby
 ## OptionalDeps: LootLink, ItemsMatrix, AllInOneInventory, ImprovedErrorFrame
 ##
 ## Version: <%version%>

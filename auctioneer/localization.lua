@@ -260,7 +260,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 	
-	_AUCT['DisableMsg'] = "Disabling automatic loading af Auctioneer";
+	_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 	
 	_AUCT['StatOn'] = "Displaying configured auction data";
 	_AUCT['StatOff'] = "Not displaying any auction data";

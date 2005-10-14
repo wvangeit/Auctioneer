@@ -3,7 +3,7 @@
 ##
 ## Interface: 1800
 ## LoadOnDemand: 1
-## Dependancies: EnhTooltip, Stubby
+## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Informant, Khaos
 ## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
 ##

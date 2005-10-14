@@ -2,7 +2,7 @@
 ## Notes: Displays detailed item information in tootips, and can produce item reports by binding an infomation window to a keypress [<%version%>]
 ##
 ## Interface: 1800
-## Dependancies: EnhTooltip
+## Dependencies: EnhTooltip
 ## OptionalDeps: Khaos
 ## SavedVariables: InformantConfig
 ##
