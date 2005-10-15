@@ -816,7 +816,7 @@ function callBankHook()
 	EnhTooltip.BankHook(0)
 end
 
-function callBagHook(event, bagNumber, ...)
+function callBagHook(funcVars, event, bagNumber)
 	if (bagNumber >= 5) and (bagNumber < 10) then
 		if not (BankFrame and BankFrame:IsVisible()) then return end
 		EnhTooltip.BankHook(bagNumber)
@@ -825,8 +825,8 @@ function callBagHook(event, bagNumber, ...)
 	end
 end
 
-function callTradeHook(type, event, selID)
-	EnhTooltip.TradeHook(type, selID)
+function callTradeHook(funcVars, event, selID)
+	EnhTooltip.TradeHook(funcVars[1], selID)
 end
 
 
@@ -835,11 +835,11 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function chatHookOnHyperlinkShow(reference, link, button, ...)
+function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
 	doHyperlink(reference, link, button)
 end
 
-function afHookOnEnter(type, index)
+function afHookOnEnter(funcArgs, retVal, type, index)
 	local link = GetAuctionItemLink(type, index)
 	if (link) then
 		local name = nameFromLink(link)
@@ -850,7 +850,7 @@ function afHookOnEnter(type, index)
 	end
 end
 
-function cfHookUpdate(frame)
+function cfHookUpdate(funcArgs, retVal, frame)
 	local frameID = frame:GetID()
 	local frameName = frame:GetName()
 	local iButton
@@ -871,7 +871,7 @@ function cfHookUpdate(frame)
 	end
 end
 
-function gtHookSetLootItem(frame, slot)
+function gtHookSetLootItem(funcArgs, retVal, frame, slot)
 	local link = GetLootSlotLink(slot)
 	local name = nameFromLink(link)
 	if (name) then
@@ -881,7 +881,7 @@ function gtHookSetLootItem(frame, slot)
 	end
 end
 
-function gtHookSetQuestItem(frame, qtype, slot)
+function gtHookSetQuestItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot)
@@ -889,7 +889,7 @@ function gtHookSetQuestItem(frame, qtype, slot)
 	end
 end
 
-function gtHookSetQuestLogItem(frame, qtype, slot)
+function gtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot)
@@ -900,7 +900,7 @@ function gtHookSetQuestLogItem(frame, qtype, slot)
 	end
 end
 
-function gtHookSetBagItem(frame, frameID, buttonID, retVal)
+function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 	local hasCooldown = retVal[1]
 	local repairCost = retVal[2]
 
@@ -917,7 +917,7 @@ function gtHookSetBagItem(frame, frameID, buttonID, retVal)
 	return hasCooldown, repairCost
 end
 
-function gtHookSetInventoryItem(frame, unit, slot, retVal)
+function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 	local hasItem = retVal[1]
 	local hasCooldown = retVal[2]
 	local repairCost = retVal[3]
@@ -931,11 +931,9 @@ function gtHookSetInventoryItem(frame, unit, slot, retVal)
 
 		tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
-
-	return hasItem, hasCooldown, repairCost
 end
 
-function gtHookSetMerchantItem(frame, slot)
+function gtHookSetMerchantItem(funcArgs, retVal, frame, slot)
 	local link = GetMerchantItemLink(slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot)
@@ -944,7 +942,7 @@ function gtHookSetMerchantItem(frame, slot)
 	end
 end
 
-function gtHookSetCraftItem(frame, skill, slot)
+function gtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetCraftReagentItemLink(skill, slot)
@@ -963,7 +961,7 @@ function gtHookSetCraftItem(frame, skill, slot)
 	end
 end
 
-function gtHookSetTradeSkillItem(frame, skill, slot)
+function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetTradeSkillReagentItemLink(skill, slot)
@@ -984,6 +982,7 @@ end
 
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
 function breakLink(link)
+	if (type(link) ~= 'string') then return end
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name
 end
@@ -1006,7 +1005,7 @@ function findItemInBags(findName)
 	end
 end
 
-function gtHookSetAuctionSellItem(frame)
+function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name) then
 		local bag, slot = findItemInBags(name)
@@ -1050,7 +1049,7 @@ function getLootLinkServer()
 	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")]
 end
 
-function getLootLinkLink(name)
+function getLootLinkLink(funcArgs, retVal, name)
 	local itemLink = ItemLinks[name]
 	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
 		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
@@ -1069,7 +1068,7 @@ function llHookOnEnter()
 	end
 end
 
-function gtHookSetOwner(frame, owner, anchor)
+function gtHookSetOwner(funcArgs, retVal, frame, owner, anchor)
 	frame.owner = owner
 	frame.anchor = anchor
 end
@@ -1228,11 +1227,11 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide);
 
 	-- Establish hooks for us to use.
-	Stubby.RegisterAddonHook("Blizzard_AuctionUI", "EnhTooltip", hookAuctionHouse)
-	Stubby.RegisterAddonHook("ItemsMatrix", "EnhTooltip", hookItemsMatrix)
-	Stubby.RegisterAddonHook("LootLink", "EnhTooltip", hookLootLink)
-	Stubby.RegisterAddonHook("Blizzard_TradeSkillUI", "EnhTooltip", hookTradeskill)
-	Stubby.RegisterAddonHook("Blizzard_CraftUI", "EnhTooltip", hookCraft)
+	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "EnhTooltip", hookAuctionHouse)
+	Stubby.RegisterAddOnHook("ItemsMatrix", "EnhTooltip", hookItemsMatrix)
+	Stubby.RegisterAddOnHook("LootLink", "EnhTooltip", hookLootLink)
+	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "EnhTooltip", hookTradeskill)
+	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", hookCraft)
 
 	-- Register event notification
 	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", merchantScanner);

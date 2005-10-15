@@ -1374,33 +1374,6 @@ function Auctioneer_GetLocale()
 	return GetLocale();
 end
 
-function Auctioneer_FilterButton_SetType(button, type, text, isLast)
-	Auctioneer_Old_FilterButton_SetType(button, type, text, isLast);
-	EnhTooltip.DebugPrint("Setting button", button:GetName(), type, text, isLast);
-
-	local buttonName = button:GetName();
-	local i,j, buttonID = string.find(buttonName, "(%d+)$");
-	buttonID = tonumber(buttonID);
-
-	local checkbox = getglobal(button:GetName().."Checkbox");
-	if (type == "class") then
-		local classid, maxid = Auctioneer_FindFilterClass(text);
-		if (classid > 0) then
-			AuctFilter_SetFilter(checkbox, "scan-class"..classid);
-			if (classid == maxid) and (buttonID < 15) then
-				for i=buttonID+1, 15 do
-					getglobal("AuctionFilterButton"..i):Hide();
-				end
-			end
-		else
-			checkbox:Hide();
-		end
-	else
-		checkbox:Hide();
-	end
-end
-
-
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
 function Auctioneer_DoLow(link)
 	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);

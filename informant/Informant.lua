@@ -231,7 +231,7 @@ function getCatName(catID)
 	end
 end
 
-function tooltipHandler(frame, name, link, quality, count, price)
+function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 	local quant = 0
 	local sell = 0
 	local buy = 0
@@ -347,6 +347,8 @@ function showHideInfo()
 	if (InformantFrame:IsVisible()) then
 		InformantFrame:Hide()
 	elseif (itemInfo) then
+		InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+
 		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
 		local quality = itemInfo.itemQuality or itemInfo.quality or 0
 
@@ -431,7 +433,6 @@ function showHideInfo()
 end
 
 local function onLoad()
-	Stubby.Print("Executing OnLoad")
 	if (not InformantFrameTitle) then return end
 	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
 
@@ -543,7 +544,7 @@ Informant = {
 	SetFilter = setFilter
 }
 
-Stubby.RegisterAddonHook("Informant", "Informant", onLoad)
+Stubby.RegisterAddOnHook("Informant", "Informant", onLoad)
 Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
 Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, tooltipHandler)
 

@@ -85,7 +85,7 @@ function Enchantrix_CheckTooltipInfo(frame)
 	return 1;
 end
 
-function Enchantrix_HookTooltip(frame, name, link, quality, count)
+function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local embed = Enchantrix_GetFilter(ENCH_SHOW_EMBED);
 
 	local sig, sigNR = Enchantrix_SigFromLink(link);
@@ -272,8 +272,8 @@ function Enchantrix_FullDiff(invA, invB)
 	return diffData;
 end
 
-function Enchantrix_OnEvent(event)
-	if ((event == "SPELLCAST_START") and (arg1 == ENCH_ARG_SPELLNAME)) then
+function Enchantrix_OnEvent(funcVars, event, argument)
+	if ((event == "SPELLCAST_START") and (argument == ENCH_ARG_SPELLNAME)) then
 		Enchantrix_Disenchanting = true;
 		Enchantrix_WaitingPush = false;
 		Enchantrix_StartInv = Enchantrix_TakeInventory();
@@ -372,15 +372,51 @@ end
 
 function Enchantrix_OnLoad()
 	-- Hook in new tooltip code
-	EnhTooltip.AddHook("tooltip", Enchantrix_HookTooltip, 150);
+	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, Enchantrix_HookTooltip)
 
-	this:RegisterEvent("SPELLCAST_FAILED");
-	this:RegisterEvent("SPELLCAST_INTERRUPTED");
-	this:RegisterEvent("SPELLCAST_START");
-	this:RegisterEvent("SPELLCAST_STOP");
-	this:RegisterEvent("ITEM_PUSH");
-	this:RegisterEvent("BAG_UPDATE");
-	
+	Stubby.RegisterEventHook("SPELLCAST_FAILED", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("SPELLCAST_START", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("SPELLCAST_STOP", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("ITEM_PUSH", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("BAG_UPDATE", "Enchantrix", Enchantrix_OnEvent);
+
+	-- Register our temporary command hook with stubby
+	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
+		local function cmdHandler(msg)
+			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
+			if (not cmd) then cmd = string.lower(msg) end 
+			if (not cmd) then cmd = "" end 
+			if (not param) then param = "" end
+			if (cmd == "load") then
+				if (param == "") then
+					Stubby.Print("Manually loading Enchantrix...")
+					LoadAddOn("Enchantrix")
+				elseif (param == "always") then
+					Stubby.Print("Setting Enchantrix to always load for this character")
+					Stubby.SetConfig("Enchantrix", "LoadType", param)
+					LoadAddOn("Enchantrix")
+				elseif (param == "never") then
+					Stubby.Print("Setting Enchantrix to never load automatically for this character (you may still load manually)")
+					Stubby.SetConfig("Enchantrix", "LoadType", param)
+				else
+					Stubby.Print("Your command was not understood")
+				end
+			else
+				Stubby.Print("Enchantrix is currently not loaded.")
+				Stubby.Print("  You may load it now by typing |cffffffff/enchantrix load|r")
+				Stubby.Print("  You may also set your loading preferences for this character by using the following commands:")
+				Stubby.Print("  |cffffffff/enchantrix load always|r - Enchantrix will always load for this character")
+				Stubby.Print("  |cffffffff/enchantrix load never|r - Enchantrix will never load automatically for this character (you may still load it manually)")
+			end
+		end
+		SLASH_ENCHANTRIX1 = "/enchantrix"
+		SLASH_ENCHANTRIX2 = "/enchant"
+		SLASH_ENCHANTRIX3 = "/enx"
+		SlashCmdList["ENCHANTRIX"] = cmdHandler
+	]]);
+
+
 	Enchantrix_DisenchantCount = 0;
 	Enchantrix_DisenchantResult = {};
 	Enchantrix_Disenchanting = false;

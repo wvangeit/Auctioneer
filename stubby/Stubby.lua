@@ -199,9 +199,9 @@ local function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
 			if (orig and func.p >= 0) then
 				r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
 					= orig(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-				for i=1, 20 do if getglobal("r"..i) then returns = true end end
-				if (returns) then
+				if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r29 then
 					retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
+					returns = true
 				end
 				orig = nil
 			end
@@ -211,7 +211,9 @@ local function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14
 	if (orig) then
 		r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
 			= orig(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-		for i=1, 20 do if getglobal("r"..i) then returns = true end end
+		if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r29 then
+			returns = true
+		end
 	end
 	if (returns) then
 		return r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
@@ -343,7 +345,7 @@ function eventWatcher(event)
 	end
 end
 
--- This function registers a boot. This is a piece of code
+-- This function registers boot code. This is a piece of code
 -- specified as a string, which Stubby will execute on your behalf
 -- when we are first loaded. This code can do anything a normal
 -- lua script can, such as create global functions, register a
@@ -502,7 +504,7 @@ local function chatPrint(...)
 	end
 end
 
--- This function allows a boot to store a configuration variable
+-- This function allows boot code to store a configuration variable
 -- by default the variable is per character unless isGlobal is set.
 local function setConfig(ownerAddOn, variable, value, isGlobal)
 	local ownerIndex = string.lower(ownerAddOn)

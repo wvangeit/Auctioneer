@@ -7,7 +7,8 @@
 	Functions to present and draw the tooltips.
 ]]
 
-function Auctioneer_HookTooltip(frame, name, link, quality, count)
+function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, count)
+	EnhTooltip.DebugPrint("Displaying "..name)
 	if (not link) then EnhTooltip.DebugPrint("No link was passed to the client");  return; end
 
 	-- nothing to do, if auctioneer is disabled

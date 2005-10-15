@@ -8,4 +8,5 @@
 ## Version: <%version%>
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
+TinyMoneyFrame.xml
 Tooltip.xml

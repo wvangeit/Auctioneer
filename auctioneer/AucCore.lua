@@ -234,19 +234,19 @@ function Auctioneer_GetItemCategory(itemKey)
 	return category;
 end
 
-function Auctioneer_IsPlayerMade(itemKey)
-	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
-	
-	local reqSkill = 0;
-	local reqLevel = 0;
-	
-	local skillsRequired = Auctioneer_SkillsRequired[itemID];
-	if (skillsRequired) then
-		local skillSplit = Auctioneer_Split(skillsRequired, ":");
-		reqSkill = skillSplit[1];
-		reqLevel = skillSplit[2];
+function Auctioneer_IsPlayerMade(itemKey, itemData)
+	if (not itemData) and (Informant) then
+		local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey)
+		itemData = Informant.GetItem(itemID)
 	end
-	return (reqSkill ~= 0), reqSkill, reqLevel;
+	
+	local reqSkill = 0
+	local reqLevel = 0
+	if (itemData) then
+		reqSkill = itemData.reqSkill
+		reqLevel = itemData.reqLevel
+	end
+	return (reqSkill ~= 0), reqSkill, reqLevel
 end
 
 function Auctioneer_GetInfo(itemKey)
@@ -417,7 +417,7 @@ function Auctioneer_LockAndLoad(thisPointer)
 	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
 	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
 
-	Stubby.RegisterAddonHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse);
+	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";

@@ -162,7 +162,7 @@ end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
-function Auctioneer_AuctionEntry_Hook(page, index, category)
+function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 	EnhTooltip.DebugPrint("Processing page", page, "item", index);
 	local auctionDoneKey;
 	if (not page or not index or not category) then
@@ -291,7 +291,7 @@ function Auctioneer_AuctionEntry_Hook(page, index, category)
 end
 
 -- hook to capture data about an auction that was boughtout
-function Auctioneer_PlaceAuctionBid(itemtype, itemindex, bidamount)
+function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	-- get the info for this auction
 	local aiLink = GetAuctionItemLink(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
@@ -362,10 +362,15 @@ function Auctioneer_ConfigureAH()
 		local obj
 		for i=1, 15 do
 			obj = getglobal("AuctionFilterButton"..i.."Checkbox")
-			obj:SetParent("AuctionFilterButton"..i)
-			obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
+			if (obj) then
+				obj:SetParent("AuctionFilterButton"..i)
+				obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
+			end
 		end
 		AuctionFrameFilters_UpdateClasses()
+
+		AuctionInfo:SetParent("AuctionFrameAuctions")
+		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36)
 	end
 end
 
@@ -505,5 +510,31 @@ function Auctioneer_AuctHouseUpdate()
 		Auctioneer_ScanAuction();
 	end
 end
+
+function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, isLast)
+	EnhTooltip.DebugPrint("Setting button", button:GetName(), type, text, isLast);
+
+	local buttonName = button:GetName();
+	local i,j, buttonID = string.find(buttonName, "(%d+)$");
+	buttonID = tonumber(buttonID);
+
+	local checkbox = getglobal(button:GetName().."Checkbox");
+	if (type == "class") then
+		local classid, maxid = Auctioneer_FindFilterClass(text);
+		if (classid > 0) then
+			AuctFilter_SetFilter(checkbox, "scan-class"..classid);
+			if (classid == maxid) and (buttonID < 15) then
+				for i=buttonID+1, 15 do
+					getglobal("AuctionFilterButton"..i):Hide();
+				end
+			end
+		else
+			checkbox:Hide();
+		end
+	else
+		checkbox:Hide();
+	end
+end
+
 
 

@@ -6,7 +6,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Revision: $Id$
 -->
 	<Script file="localization.lua"/>
-	<Script file="ItemData.lua"/>
 	<Script file="AHScanning.lua"/>
 	<Script file="BalancedList.lua"/>
 	<Script file="AucAPI.lua"/>

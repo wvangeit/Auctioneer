@@ -15,9 +15,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<Anchors><Anchor point="CENTER"/></Anchors>
 		<TitleRegion setAllPoints="true"/>
 		<Scripts>
-			<OnLoad>
-				Stubby.Print("FrameLoaded");
-			</OnLoad>
 			<OnShow>
 				Informant.FrameActive(true);
 			</OnShow>
