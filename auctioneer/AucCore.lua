@@ -426,9 +426,7 @@ function Auctioneer_LockAndLoad(thisPointer)
 		Auctioneer_Command(msg, nil);
 	end
 
-	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
-	end
+	Auctioneer_ChatPrint(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 
 	-- Rearranges elements in the AH window.
 	Auctioneer_ConfigureAH();

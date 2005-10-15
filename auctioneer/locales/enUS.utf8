@@ -126,6 +126,7 @@ _AUCT['CmdAlso'] = "also";
 _AUCT['CmdAlsoOpposite'] = "opposite";
 _AUCT['CmdLocale'] = "locale";
 _AUCT['CmdDefault'] = "default";
+_AUCT['CmdPrintin'] = "printin";
 
 _AUCT['CmdBroker'] = "broker";
 _AUCT['CmdBidbroker'] = "bidbroker";
@@ -154,7 +155,8 @@ _AUCT['OptCompete'] = "<silver_less>";
 _AUCT['OptScan'] = "";
 _AUCT['OptScale'] = "<scale_factor>";
 _AUCT['OptScaleDefault'] = 1.0;
-_AUCT['OptDefault'] = "(|<option>".._AUCT['CmdClearAll']..")";
+_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
+_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
 
 _AUCT['OptPctBidmarkdown'] = "<percent>";
 _AUCT['OptPctMarkup'] = "<percent>";
@@ -216,6 +218,7 @@ _AUCT['HelpPctUnderlow'] = "Set the percentage that Auctioneer will undercut the
 _AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
 _AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 _AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
+_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
 
 _AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 
@@ -233,6 +236,7 @@ _AUCT['FrmtActSet'] = "Set %s to '%s'";
 _AUCT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
 _AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
 _AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
+_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
 
 _AUCT['TextScan'] = "Scan";
 _AUCT['TextAuction'] = "auction";
@@ -313,3 +317,4 @@ _AUCT['GuiDefaultAllButton'] = "Reset All";
 _AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
 _AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 _AUCT['GuiDefaultOption'] = "Reset this setting";
+_AUCT['GuiPrintin'] = "Select the desired message frame";

@@ -241,8 +241,7 @@ function Auctioneer_LoadCategorySubClasses(c, ...)
 end
 
 function Auctioneer_ChatPrint(str)
-	if ( DEFAULT_CHAT_FRAME ) then 
-		DEFAULT_CHAT_FRAME:AddMessage(str, 0.0, 1.0, 0.25);
+	if getglobal("ChatFrame"..Auctioneer_GetFrameIndex()) then
+		getglobal("ChatFrame"..Auctioneer_GetFrameIndex()):AddMessage(str, 0.0, 1.0, 0.25);
 	end
 end
-

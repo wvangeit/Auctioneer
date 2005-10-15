@@ -262,7 +262,8 @@ function Auctioneer_Register_Khaos()
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=2;
 			};
-			{
+			--These functions have been removed from Auctioneer and placed in the Informant AddOn, as such their Khaos config options have been removed to prevent confusion.
+			--[[{
 				id="AuctioneerVendorHeader";
 				type=K_HEADER;
 				text=_AUCT['GuiVendorHeader'];
@@ -343,7 +344,7 @@ function Auctioneer_Register_Khaos()
 				disabled={checked=false};
 				dependencies={AuctioneerVendor={checked=true;}, AuctioneerEnable={checked=true;}};
 				difficulty=2;
-			};
+			};]]
 			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
@@ -693,6 +694,31 @@ function Auctioneer_Register_Khaos()
 				};
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=4;
+			};		
+			{
+				id="AuctioneerPrintFrame";
+				type=K_PULLDOWN;
+				setup = {
+					options = Auctioneer_GetFrameNames();
+					multiSelect = false;
+				};
+				text=_AUCT['GuiPrintin'];
+				helptext=_AUCT['HelpPrintin'];
+				callback=function(state)
+					Auctioneer_SetFrame(state.value);
+				end;
+				feedback=function(state)
+					local _, frameName = Auctioneer_GetFrameNames(state.value)
+					return string.format(_AUCT['FrmtPrintin'], frameName);
+				end;
+				default = {
+					value=1;
+				};
+				disabled = {
+					value=1;
+				};
+				dependencies={AuctioneerEnable={checked=true;}};
+				difficulty=3;
 			};
 			{
 				id=_AUCT['ShowLink'];
@@ -777,6 +803,9 @@ function Auctioneer_Command(command, source)
 
 	elseif ((cmd == _AUCT['CmdDefault']) or (cmd == "default")) then
 		Auctioneer_Default(param, chatprint);
+	
+	elseif ((cmd == _AUCT['CmdPrintin']) or (cmd == "printin")) then
+		Auctioneer_SetFrame(param, chatprint)
 
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
 	elseif ((cmd == _AUCT['CmdBroker']) or (cmd == "broker")) then
@@ -887,6 +916,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdCompete'], _AUCT['OptCompete'], _AUCT['HelpCompete']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdScan'], _AUCT['OptScan'], _AUCT['HelpScan']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdDefault'], _AUCT['OptDefault'], _AUCT['HelpDefault']));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdPrintin'], _AUCT['OptPrintin'], _AUCT['HelpPrintin']));
 
 end
 
@@ -928,12 +958,24 @@ function Auctioneer_OnOff(state, chatprint)
 
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", true);
+
+				if (Enchantrix) then
+					Khaos.setSetKeyParameter("Enchantrix", "ValuateKey", "checked", true);
+					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_HSP", "helptext", ENCH_HELP_GUESS_AUCTIONEER_HSP);
+					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_MED", "helptext", ENCH_HELP_GUESS_AUCTIONEER_MEDIAN);
+				end
 			end
 		else
 			Auctioneer_ChatPrint(_AUCT['StatOff']);
 
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", false);
+
+				if (Enchantrix) then
+					Khaos.setSetKeyParameter("Enchantrix", "ValuateKey", "checked", false);
+					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_HSP", "helptext", ENCH_HELP_GUESS_NOAUCTIONEER);
+					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_MED", "helptext", ENCH_HELP_GUESS_NOAUCTIONEER);
+				end
 			end
 		end
 	end
@@ -1126,6 +1168,95 @@ function Auctioneer_Default(param, chatprint)
 
 		else
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActDefault'], param));
+		end
+	end
+end
+
+--The following three functions were added by MentalPower to implement the /auc print-in command
+function Auctioneer_GetFrameNames(index)
+
+	local frames = {};
+	local frameName = "";
+
+	for i=1,10 do 
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i);
+
+		if ( name == "" ) then 
+			if (i == 1) then
+				frames["General"] = 1;
+			elseif (i == 2) then
+				frames["Combat"] = 2;
+			end
+		else 
+			frames[name] = i;
+		end
+	end
+
+	if (index) then
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(index);
+
+		if ( name == "" ) then 
+			if (index == 1) then
+				frameName = "General";
+			elseif (index == 2) then
+				frameName = "Combat";
+			end
+		else 
+			frameName = name;
+		end
+	end
+	
+	return frames, frameName;
+end
+
+
+function Auctioneer_GetFrameIndex()
+
+	if (not AuctionConfig.filters) then AuctionConfig.filters = {}; end
+	local value = AuctionConfig.filters["printframe"];
+
+	if (not value) then
+		return 1;
+	end
+	return value;
+end
+
+
+function Auctioneer_SetFrame(frame, chatprint)
+	local frameNumber
+	local frameVal
+	frameVal = tonumber(frame)
+
+	--If no arguments are passed, then set it to the default frame.
+	if not (frame) then 
+		frameNumber = 1;
+
+	--If the frame argument is a number then set our chatframe to that number.
+	elseif ((frameVal) ~= nil) then 
+		frameNumber = frameVal;
+
+	--If the frame argument is a string, find out if there's a chatframe with that name, and set our chatframe to that index. If not set it to the default frame.
+	elseif (type(frame) == "string") then
+		allFrames = Auctioneer_GetFrameNames();
+		if (allFrames[frame]) then
+			frameNumber = allFrames[frame];
+		else
+			frameNumber = 1;
+		end
+
+	--If the argument is something else, set our chatframe to it's default value.
+	else
+		frameNumber = 1;
+	end
+
+	Auctioneer_SetFilter("printframe", frameNumber);
+
+	if (chatprint == true) then
+		local _, frameName = Auctioneer_GetFrameNames(frameNumber);
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+
+		if (Auctioneer_Khaos_Registered) then
+			Khaos.setSetKeyParameter("Auctioneer", "AuctioneerPrintFrame", "state.value", frameNumber);
 		end
 	end
 end

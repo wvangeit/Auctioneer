@@ -125,6 +125,7 @@ _AUCT['CmdAlso'] = "tambien";
 _AUCT['CmdAlsoOpposite'] = "opuesta";
 _AUCT['CmdLocale'] = "localidad";
 _AUCT['CmdDefault'] = "original";
+_AUCT['CmdPrintin'] = "imprime";
 
 _AUCT['CmdBroker'] = "corredor";
 _AUCT['CmdBidbroker'] = "corredorofertas";
@@ -153,7 +154,8 @@ _AUCT['OptCompete'] = "<plata_menos>";
 _AUCT['OptScan'] = "";
 _AUCT['OptScale'] = "<escala>";
 _AUCT['OptScaleDefault'] = 1.0;
-_AUCT['OptDefault'] = "";
+_AUCT['OptDefault'] = "(<opción>|".._AUCT['CmdClearAll']..")";
+_AUCT['OptPrintin'] = "(<indiceVentana>[Número]|<nombreVentana>[Serie])";
 
 _AUCT['OptPctBidmarkdown'] = "<porciento>";
 _AUCT['OptPctMarkup'] = "<porciento>";
@@ -214,6 +216,7 @@ _AUCT['HelpPctUnderlow'] = "Ajusta el porcentaje bajo el menor precio mínimo de
 _AUCT['HelpPctUndermkt'] = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
 _AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la página corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 _AUCT['HelpDefault'] = "Revertir una opción de Auctioneer a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de fábrica."
+_AUCT['HelpPrintin'] = "Selecciona cual ventana de mensajes va a usar Auctioneer para imprimir su informacion. Puede especificar el nombre o el índice de la ventana.";
 
 _AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 _AUCT['StatOff'] = "Ocultando toda información de subastas";
@@ -309,3 +312,4 @@ _AUCT['GuiDefaultAllButton'] = "Revertir Todo";
 _AUCT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
 _AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de fábrica.\nADVERTENCIA: Esta acción NO es reversible.";
 _AUCT['GuiDefaultOption'] = "Revertir esta opción";
+_AUCT['GuiPrintin'] = "Seleccione la ventana deseada";

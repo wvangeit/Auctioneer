@@ -169,6 +169,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdAlsoOpposite'] = "opposite";
 	_AUCT['CmdLocale'] = "locale";
 	_AUCT['CmdDefault'] = "default";
+	_AUCT['CmdPrintin'] = "printin";
 	
 	_AUCT['CmdBroker'] = "broker";
 	_AUCT['CmdBidbroker'] = "bidbroker";
@@ -197,7 +198,8 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptScan'] = "";
 	_AUCT['OptScale'] = "<scale_factor>";
 	_AUCT['OptScaleDefault'] = 1.0;
-	_AUCT['OptDefault'] = "(|<option>".._AUCT['CmdClearAll']..")";
+	_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
+	_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
 	
 	_AUCT['OptPctBidmarkdown'] = "<percent>";
 	_AUCT['OptPctMarkup'] = "<percent>";
@@ -259,6 +261,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
 	_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
+	_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
 	
 	_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 	
@@ -276,6 +279,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
 	_AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
 	_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
+	_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
 	
 	_AUCT['TextScan'] = "Scan";
 	_AUCT['TextAuction'] = "auction";
@@ -356,6 +360,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
 	_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
+	_AUCT['GuiPrintin'] = "Select the desired message frame";
 
 -- Locale strings for the deDE locale
 if locale == "deDE" then
@@ -794,6 +799,7 @@ if locale == "esES" then
 		_AUCT['CmdAlsoOpposite'] = "opuesta";
 		_AUCT['CmdLocale'] = "localidad";
 		_AUCT['CmdDefault'] = "original";
+		_AUCT['CmdPrintin'] = "imprime";
 		
 		_AUCT['CmdBroker'] = "corredor";
 		_AUCT['CmdBidbroker'] = "corredorofertas";
@@ -822,7 +828,8 @@ if locale == "esES" then
 		_AUCT['OptScan'] = "";
 		_AUCT['OptScale'] = "<escala>";
 		_AUCT['OptScaleDefault'] = 1.0;
-		_AUCT['OptDefault'] = "";
+		_AUCT['OptDefault'] = "(<opci\195\179n>|".._AUCT['CmdClearAll']..")";
+		_AUCT['OptPrintin'] = "(<indiceVentana>[N\195\186mero]|<nombreVentana>[Serie])";
 		
 		_AUCT['OptPctBidmarkdown'] = "<porciento>";
 		_AUCT['OptPctMarkup'] = "<porciento>";
@@ -883,6 +890,7 @@ if locale == "esES" then
 		_AUCT['HelpPctUndermkt'] = "Porcentaje a usar cuando sea imposible vencer a la competencia (debido al sinmaximo)";
 		_AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la p\195\161gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 		_AUCT['HelpDefault'] = "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica."
+		_AUCT['HelpPrintin'] = "Selecciona cual ventana de mensajes va a usar Auctioneer para imprimir su informacion. Puede especificar el nombre o el \195\173ndice de la ventana.";
 		
 		_AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 		_AUCT['StatOff'] = "Ocultando toda informaci\195\179n de subastas";
@@ -978,6 +986,7 @@ if locale == "esES" then
 		_AUCT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
 		_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_AUCT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
+		_AUCT['GuiPrintin'] = "Seleccione la ventana deseada";
 end
 
 -- Locale strings for the frFR locale
