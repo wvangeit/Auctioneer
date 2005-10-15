@@ -365,7 +365,6 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['ShowStack'],
-				key="InformantStack",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoStack'],
 				helptext=_INFORMANT['HelpStack'],
@@ -391,7 +390,6 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['ShowUsage'],
-				key="InformantUsage",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoUsage'],
 				helptext=_INFORMANT['HelpUsage'],
@@ -417,7 +415,6 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['ShowQuest'],
-				key="InformantQuest",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoQuest'],
 				helptext=_INFORMANT['HelpQuest'],
@@ -443,7 +440,6 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['ShowMerchant'],
-				key="InformantMerchant",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoMerchant'],
 				helptext=_INFORMANT['HelpMerchant'],
@@ -476,7 +472,6 @@ function registerKhaos()
 			},
 			{
 				id=_INFORMANT['ShowVendor'],
-				key="InformantVendor",
 				type=K_TEXT,
 				text=_INFORMANT['GuiVendor'],
 				helptext=_INFORMANT['HelpVendor'],
