@@ -227,7 +227,7 @@ Stubby_NewFunction = nil
 local function hookInto(triggerFunction)
 	if (config.hooks.origFuncs[triggerFunction]) then return end
 	RunScript("Stubby_OldFunction = "..triggerFunction)
-	RunScript("Stubby_NewFunction = function(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) Stubby.HookCall('"..triggerFunction.."', a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) end")
+	RunScript("Stubby_NewFunction = function(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) return Stubby.HookCall('"..triggerFunction.."', a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) end")
 	RunScript(triggerFunction.." = Stubby_NewFunction")
 	config.hooks.functions[triggerFunction] = Stubby_NewFunction;
 	config.hooks.origFuncs[triggerFunction] = Stubby_OldFunction;
