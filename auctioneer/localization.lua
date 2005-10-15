@@ -169,7 +169,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdAlsoOpposite'] = "opposite";
 	_AUCT['CmdLocale'] = "locale";
 	_AUCT['CmdDefault'] = "default";
-	_AUCT['CmdPrintin'] = "printin";
+	_AUCT['CmdPrintin'] = "print-in";
 	
 	_AUCT['CmdBroker'] = "broker";
 	_AUCT['CmdBidbroker'] = "bidbroker";
@@ -799,7 +799,7 @@ if locale == "esES" then
 		_AUCT['CmdAlsoOpposite'] = "opuesta";
 		_AUCT['CmdLocale'] = "localidad";
 		_AUCT['CmdDefault'] = "original";
-		_AUCT['CmdPrintin'] = "imprime";
+		_AUCT['CmdPrintin'] = "imprimir-en";
 		
 		_AUCT['CmdBroker'] = "corredor";
 		_AUCT['CmdBidbroker'] = "corredorofertas";

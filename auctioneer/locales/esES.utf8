@@ -125,7 +125,7 @@ _AUCT['CmdAlso'] = "tambien";
 _AUCT['CmdAlsoOpposite'] = "opuesta";
 _AUCT['CmdLocale'] = "localidad";
 _AUCT['CmdDefault'] = "original";
-_AUCT['CmdPrintin'] = "imprime";
+_AUCT['CmdPrintin'] = "imprimir-en";
 
 _AUCT['CmdBroker'] = "corredor";
 _AUCT['CmdBidbroker'] = "corredorofertas";

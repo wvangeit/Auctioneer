@@ -126,7 +126,7 @@ _AUCT['CmdAlso'] = "also";
 _AUCT['CmdAlsoOpposite'] = "opposite";
 _AUCT['CmdLocale'] = "locale";
 _AUCT['CmdDefault'] = "default";
-_AUCT['CmdPrintin'] = "printin";
+_AUCT['CmdPrintin'] = "print-in";
 
 _AUCT['CmdBroker'] = "broker";
 _AUCT['CmdBidbroker'] = "bidbroker";
