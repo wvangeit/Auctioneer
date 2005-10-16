@@ -65,12 +65,16 @@ function Auctioneer_OnLoad()
 		local function checkLoad(event)
 			if (Stubby.GetConfig("Auctioneer", "LoadType") == "auctionhouse") then
 				LoadAddOn("Auctioneer")
+			else
+				BrowseNoResultsText:SetText("]].._AUCT['MesgNotLoaded']..[[");
 			end
 		end
 		Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", checkLoad)
 		local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
 		if (loadType == "always") then
 			LoadAddOn("Auctioneer")
+		else
+			Stubby.Print("]].._AUCT['MesgNotLoaded']..[[");
 		end
 	]]);
 end

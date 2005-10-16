@@ -24,13 +24,14 @@ Informant.InitCommands = function()
 		commandHandler(msg, nil)
 	end
 
+	chatPrint(string.format(_INFORMANT['FrmtWelcome'], INFORMANT_VERSION))
+
 	if (Khaos) then
 		if (not Informant_Khaos_Registered) then
 			Informant_GUI_Registered = registerKhaos()
 			if (Informant_GUI_Registered == true) then return true end
 		end
 	end
-
 end
 
 
@@ -89,6 +90,8 @@ function doHelp()
 
 	chatPrint(_INFORMANT['TextUsage'])
 	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..Informant.GetFilterVal("all").."]|r - " .. _INFORMANT['HelpOnoff'])
+
+	chatPrint("  |cffffffff/informant ".._INFORMANT['CmdDisable'].."|r - " .. _INFORMANT['HelpDisable']);
 
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendor'], Informant.GetFilterVal(_INFORMANT['ShowVendor']), _INFORMANT['HelpVendor']))
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], Informant.GetFilterVal(_INFORMANT['ShowVendorSell']), _INFORMANT['HelpVendorSell']))
@@ -641,7 +644,7 @@ end
 
 function chatPrint(msg)
 	if (DEFAULT_CHAT_FRAME) then 
-		DEFAULT_CHAT_FRAME:AddMessage(msg, 0.0, 0.25, 1.0);
+		DEFAULT_CHAT_FRAME:AddMessage(msg, 0.25, 0.55, 1.0);
 	end
 end
 

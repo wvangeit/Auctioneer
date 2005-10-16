@@ -58,6 +58,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_CMD_OFF = "off";
 	ENCH_CMD_ON = "on";
 	ENCH_CMD_TOGGLE = "toggle";
+	ENCH_CMD_DISABLE = "disable";
 	ENCH_CMD_CLEAR = "clear";
 	ENCH_CMD_CLEAR_ALL = "all";
 	ENCH_CMD_LOCALE = "locale";
@@ -85,6 +86,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_SHOW_GUESS_BASELINE = "valuate-baseline";
 	
 	ENCH_HELP_ONOFF = "Turns the enchant data display on and off";
+	ENCH_HELP_DISABLE = "Stops enchantrix from automatically loading next time you log in";
 	ENCH_HELP_EMBED = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
 	ENCH_HELP_HEADER = "Select whether to show the header line";
 	ENCH_HELP_COUNT = "Select whether to show the exact counts in the database";
@@ -101,6 +103,8 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 	ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 	ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
+	
+	ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 	
 	ENCH_STAT_ON = "Displaying configured enchant data";
 	ENCH_STAT_OFF = "Not displaying any enchant data";
@@ -303,6 +307,7 @@ function Enchantrix_SetLocaleStrings(locale)
 
 		-- The following definitions are missing in this locale:
 		--	ENCH_CMD_DEFAULT = "";
+		--	ENCH_CMD_DISABLE = "";
 		--	ENCH_CMD_LOCALE = "";
 		--	ENCH_FRMT_ACT_DEFAULT = "";
 		--	ENCH_FRMT_ACT_DEFAULT_ALL = "";
@@ -331,7 +336,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_VALUATE_HEADER = "";
 		--	ENCH_GUI_VALUATE_MEDIAN = "";
 		--	ENCH_HELP_DEFAULT = "";
+		--	ENCH_HELP_DISABLE = "";
 		--	ENCH_HELP_LOCALE = "";
+		--	ENCH_MESG_NOTLOADED = "";
 		--	ENCH_OPT_DEFAULT = "";
 		--	ENCH_OPT_LOCALE = "";
 
@@ -462,6 +469,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		--This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
 
 		-- The following definitions are missing in this locale:
+		--	ENCH_CMD_DISABLE = "";
+		--	ENCH_HELP_DISABLE = "";
+		--	ENCH_MESG_NOTLOADED = "";
 		--	EssenceItemIDs = "";
 
 	end
@@ -481,6 +491,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_CMD_CLEAR = "";
 		--	ENCH_CMD_CLEAR_ALL = "";
 		--	ENCH_CMD_DEFAULT = "";
+		--	ENCH_CMD_DISABLE = "";
 		--	ENCH_CMD_FIND_BIDAUCT = "";
 		--	ENCH_CMD_FIND_BIDAUCT_SHORT = "";
 		--	ENCH_CMD_FIND_BUYAUCT = "";
@@ -543,6 +554,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_CLEAR = "";
 		--	ENCH_HELP_COUNT = "";
 		--	ENCH_HELP_DEFAULT = "";
+		--	ENCH_HELP_DISABLE = "";
 		--	ENCH_HELP_EMBED = "";
 		--	ENCH_HELP_FIND_BIDAUCT = "";
 		--	ENCH_HELP_FIND_BUYAUCT = "";
@@ -555,6 +567,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_ONOFF = "";
 		--	ENCH_HELP_RATE = "";
 		--	ENCH_HELP_VALUE = "";
+		--	ENCH_MESG_NOTLOADED = "";
 		--	ENCH_OPT_CLEAR = "";
 		--	ENCH_OPT_DEFAULT = "";
 		--	ENCH_OPT_FIND_BIDAUCT = "";

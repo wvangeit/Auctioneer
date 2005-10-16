@@ -300,6 +300,8 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['MesgConvertYes'] = "Convert";
 	_AUCT['MesgConvertNo'] = "Disable Auctioneer";
 	
+	_AUCT['MesgNotLoaded'] = "Auctioneer is not loaded. Type /auctioneer for more info.";
+	
 	_AUCT['AuctionTotalAucts'] = "Total auctions scanned: %s";
 	_AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
 	_AUCT['AuctionOldAucts'] = "Previously scanned: %s";

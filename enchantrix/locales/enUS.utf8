@@ -10,6 +10,7 @@ ENCH_ARG_SPELLNAME = "Disenchant";
 ENCH_CMD_OFF = "off";
 ENCH_CMD_ON = "on";
 ENCH_CMD_TOGGLE = "toggle";
+ENCH_CMD_DISABLE = "disable";
 ENCH_CMD_CLEAR = "clear";
 ENCH_CMD_CLEAR_ALL = "all";
 ENCH_CMD_LOCALE = "locale";
@@ -37,6 +38,7 @@ ENCH_SHOW_GUESS_AUCTIONEER_MED = "valuate-median";
 ENCH_SHOW_GUESS_BASELINE = "valuate-baseline";
 
 ENCH_HELP_ONOFF = "Turns the enchant data display on and off";
+ENCH_HELP_DISABLE = "Stops enchantrix from automatically loading next time you log in";
 ENCH_HELP_EMBED = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
 ENCH_HELP_HEADER = "Select whether to show the header line";
 ENCH_HELP_COUNT = "Select whether to show the exact counts in the database";
@@ -53,6 +55,8 @@ ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix message
 ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
+
+ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 
 ENCH_STAT_ON = "Displaying configured enchant data";
 ENCH_STAT_OFF = "Not displaying any enchant data";

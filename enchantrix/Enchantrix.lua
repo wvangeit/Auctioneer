@@ -419,6 +419,8 @@ function Enchantrix_OnLoad()
 		local loadType = Stubby.GetConfig("Enchantrix", "LoadType")
 		if (loadType == "always") then
 			LoadAddOn("Enchantrix")
+		else
+			Stubby.Print("]]..ENCH_MESG_NOTLOADED..[[")
 		end
 	]]);
 
@@ -808,6 +810,8 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 
 		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix_GetFilterVal("all").."]|r - " .. ENCH_HELP_ONOFF);
 		
+		Auctioneer_ChatPrint("  |cffffffff/enchantrix "..ENCH_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
+
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_HEADER, Enchantrix_GetFilterVal(ENCH_SHOW_HEADER), ENCH_HELP_HEADER));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_COUNT, Enchantrix_GetFilterVal(ENCH_SHOW_COUNT), ENCH_HELP_COUNT));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_RATE, Enchantrix_GetFilterVal(ENCH_SHOW_RATE), ENCH_HELP_RATE));

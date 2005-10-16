@@ -20,12 +20,27 @@ local getItem--(itemID);     itemID is the first value in a blizzard hyperlink i
 
 
 -- LOCAL FUNCTION PROTOTYPES:
-
-local setSkills, setRequirements, setVendors, setDatabase
-local tooltipHandler, getFilterVal, getFilter, setFilter
-local frameConfig, frameActive, scrollUpdate, getRowCount
-local getCatName, split, showHideInfo, processEvent
-local skillToName
+local addLine          -- addLine(text, color)
+local clear            -- clear()
+local frameActive      -- frameActive(isActive)
+local frameLoaded      -- frameLoaded()
+local getCatName       -- getCatName(catID)
+local getFilter        -- getFilter(filter)
+local getFilterVal     -- getFilterVal(type, default)
+local getItem          -- getItem(itemID)
+local getRowCount      -- getRowCount()
+local onLoad           -- onLoad()
+local onQuit           -- onQuit()
+local scrollUpdate     -- scrollUpdate(offset)
+local setDatabase      -- setDatabase(database)
+local setFilter        -- setFilter(type, value)
+local setRequirements  -- setRequirements(requirements)
+local setSkills        -- setSkills(skills)
+local setVendors       -- setVendors(vendors)
+local showHideInfo     -- showHideInfo()
+local skillToName      -- skillToName(userSkill)
+local split            -- split(str, at)
+local tooltipHandler   -- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 
 -- LOCAL VARIABLES
 
@@ -432,11 +447,18 @@ function showHideInfo()
 	end
 end
 
-local function onLoad()
-	if (not InformantFrameTitle) then return end
+function onQuit()
+	if (not InformantConfig.position) then
+		InformantConfig.position = { }
+	end
+	InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
+end
+
+function onLoad()
+	if (not InformantConfig) then InformantConfig = { } end
+
 	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
 
-	if (not InformantConfig) then InformantConfig = { } end
 	if (InformantConfig.position) then
 		InformantFrame:ClearAllPoints()
 		InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
@@ -451,11 +473,59 @@ local function onLoad()
 	Informant.InitCommands()
 end
 
-function onQuit()
-	if (not InformantConfig.position) then
-		InformantConfig.position = { }
-	end
-	InformantConfig.position.x, InformantConfig.position.y = InformantFrame:GetCenter()
+local function frameLoaded()
+	Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
+	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, tooltipHandler)
+
+	onLoad()
+
+	-- Setup the default for stubby to always load (people can override this on a
+	-- per toon basis)
+	Stubby.SetConfig("Informant", "LoadType", "always", true)
+
+	-- Register our temporary command hook with stubby
+	Stubby.RegisterBootCode("Informant", "CommandHandler", [[
+		local function cmdHandler(msg)
+			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
+			if (not cmd) then cmd = string.lower(msg) end 
+			if (not cmd) then cmd = "" end 
+			if (not param) then param = "" end
+			if (cmd == "load") then
+				if (param == "") then
+					Stubby.Print("Manually loading Informant...")
+					LoadAddOn("Informant")
+				elseif (param == "always") then
+					Stubby.Print("Setting Informant to always load for this character")
+					Stubby.SetConfig("Informant", "LoadType", param)
+					LoadAddOn("Informant")
+				elseif (param == "never") then
+					Stubby.Print("Setting Informant to never load automatically for this character (you may still load manually)")
+					Stubby.SetConfig("Informant", "LoadType", param)
+				else
+					Stubby.Print("Your command was not understood")
+				end
+			else
+				Stubby.Print("Informant is currently not loaded.")
+				Stubby.Print("  You may load it now by typing |cffffffff/informant load|r")
+				Stubby.Print("  You may also set your loading preferences for this character by using the following commands:")
+				Stubby.Print("  |cffffffff/informant load always|r - Informant will always load for this character")
+				Stubby.Print("  |cffffffff/informant load never|r - Informant will never load automatically for this character (you may still load it manually)")
+			end
+		end
+		SLASH_INFORMANT1 = "/informant"
+		SLASH_INFORMANT2 = "/inform"
+		SLASH_INFORMANT3 = "/info"
+		SLASH_INFORMANT4 = "/inf"
+		SlashCmdList["INFORMANT"] = cmdHandler
+	]]);
+	Stubby.RegisterBootCode("Informant", "Triggers", [[
+		local loadType = Stubby.GetConfig("Informant", "LoadType")
+		if (loadType == "always") then
+			LoadAddOn("Informant")
+		else
+			Stubby.Print("]].._INFORMANT['MesgNotLoaded']..[[");
+		end
+	]]);
 end
 
 function frameActive(isActive)
@@ -538,13 +608,10 @@ Informant = {
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
 	FrameActive = frameActive,
+	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
 	SetFilter = setFilter
 }
-
-Stubby.RegisterAddOnHook("Informant", "Informant", onLoad)
-Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
-Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, tooltipHandler)
 

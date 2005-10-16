@@ -129,6 +129,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['CmdOff'] = "off"
 	_INFORMANT['CmdOn'] = "on"
 	_INFORMANT['CmdToggle'] = "toggle"
+	_INFORMANT['CmdDisable'] = "disable";
 	_INFORMANT['CmdDefault'] = "default"
 	_INFORMANT['CmdLocale'] = "locale"
 	_INFORMANT['CmdEmbed'] = "embed"
@@ -145,6 +146,7 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['ShowVendorSell'] = "show-vendor-sell"
 	
 	_INFORMANT['HelpOnoff'] = "Turns the auction data display on and off"
+	_INFORMANT['HelpDisable'] = "Stops informant from automatically loading next time you log in";
 	_INFORMANT['HelpVendor'] = "Select whether to show item's vendor pricing"
 	_INFORMANT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)"
 	_INFORMANT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)"
@@ -156,6 +158,8 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['HelpLocale'] = "Change the locale that is used to display informant messages"
 	_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
 	_INFORMANT['HelpDefault'] = "Set an informant option to it's default value. You may also specify the special keyword \"all\" to set all informant options to their default values."
+	
+	_INFORMANT['MesgNotLoaded'] = "Informant is not loaded. Type /informant for more info.";
 	
 	_INFORMANT['FrmtActEnable'] = "Displaying item's %s data"
 	_INFORMANT['FrmtActDisable'] = "Not displaying item's %s data"

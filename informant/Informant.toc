@@ -2,12 +2,15 @@
 ## Notes: Displays detailed item information in tootips, and can produce item reports by binding an infomation window to a keypress [<%version%>]
 ##
 ## Interface: 1800
-## Dependencies: EnhTooltip
+## LoadOnDemand: 1
+## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
 ## SavedVariables: InformantConfig
 ##
 ## Version: <%version%>
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Informant
+..\..\FrameXML\Fonts.xml
+..\..\FrameXML\UIPanelTemplates.xml
 Informant.xml
 

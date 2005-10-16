@@ -257,6 +257,8 @@ _AUCT['MesgNotconverting'] = "Auctioneer is not converting your database, but wi
 _AUCT['MesgConvertYes'] = "Convert";
 _AUCT['MesgConvertNo'] = "Disable Auctioneer";
 
+_AUCT['MesgNotLoaded'] = "Auctioneer is not loaded. Type /auctioneer for more info.";
+
 _AUCT['AuctionTotalAucts'] = "Total auctions scanned: %s";
 _AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
 _AUCT['AuctionOldAucts'] = "Previously scanned: %s";
