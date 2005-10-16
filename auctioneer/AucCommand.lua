@@ -1249,14 +1249,21 @@ function Auctioneer_SetFrame(frame, chatprint)
 		frameNumber = 1;
 	end
 
+	local _, frameName
+	if (chatprint == true) then
+		_, frameName = Auctioneer_GetFrameNames(frameNumber);
+		if (Auctioneer_GetFrameIndex() ~= frameNumber) then
+			Auctioneer_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+		end
+	end
+	
 	Auctioneer_SetFilter("printframe", frameNumber);
 
 	if (chatprint == true) then
-		local _, frameName = Auctioneer_GetFrameNames(frameNumber);
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
 
 		if (Auctioneer_Khaos_Registered) then
-			Khaos.setSetKeyParameter("Auctioneer", "AuctioneerPrintFrame", "state.value", frameNumber);
+			Khaos.setSetKeyParameter("Auctioneer", "AuctioneerPrintFrame", "value", frameNumber);
 		end
 	end
 end
