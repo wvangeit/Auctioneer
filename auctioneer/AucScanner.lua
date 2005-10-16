@@ -319,12 +319,14 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 		if (itemCat and AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey] and AuctionConfig.snap[auctKey][itemCat]) then
 			AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		end
+		if (not AuctionConfig.bids) then AuctionConfig.bids = {} end
+		if (not AuctionConfig.bids[playerName]) then AuctionConfig.bids[playerName] = {} end
 		AuctionConfig.bids[playerName][eventTime] = string.format("%s|%s|%s|%s|%s", auctionSignature, bidamount, 1, aiOwner, aiHighBidder or "unknown");
-		Auctioneer_HSPCache[auctKey][aiKey] = nil;
+		if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
+			Auctioneer_HSPCache[auctKey][aiKey] = nil;
+		end
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	end
-
-	Auctioneer_Old_BidHandler(itemtype,itemindex,bidamount);
 end
 
 function Auctioneer_ConfigureAH()
@@ -369,8 +371,10 @@ function Auctioneer_ConfigureAH()
 		end
 		AuctionFrameFilters_UpdateClasses()
 
-		AuctionInfo:SetParent("AuctionFrameAuctions")
-		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36)
+		if (AuctionInfo) then
+			AuctionInfo:SetParent("AuctionFrameAuctions")
+			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36)
+		end
 	end
 end
 
@@ -519,20 +523,22 @@ function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, i
 	buttonID = tonumber(buttonID);
 
 	local checkbox = getglobal(button:GetName().."Checkbox");
-	if (type == "class") then
-		local classid, maxid = Auctioneer_FindFilterClass(text);
-		if (classid > 0) then
-			AuctFilter_SetFilter(checkbox, "scan-class"..classid);
-			if (classid == maxid) and (buttonID < 15) then
-				for i=buttonID+1, 15 do
-					getglobal("AuctionFilterButton"..i):Hide();
+	if checkbox then
+		if (type == "class") then
+			local classid, maxid = Auctioneer_FindFilterClass(text);
+			if (classid > 0) then
+				AuctFilter_SetFilter(checkbox, "scan-class"..classid);
+				if (classid == maxid) and (buttonID < 15) then
+					for i=buttonID+1, 15 do
+						getglobal("AuctionFilterButton"..i):Hide();
+					end
 				end
+			else
+				checkbox:Hide();
 			end
 		else
 			checkbox:Hide();
 		end
-	else
-		checkbox:Hide();
 	end
 end
 

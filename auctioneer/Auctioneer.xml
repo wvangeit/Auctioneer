@@ -45,17 +45,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Button>
 		</Frames>
 	</Frame>
-	<Frame name="AuctionInfo" parent="AuctionFrameAuctions">
+	<Frame name="AuctionInfo">
 		<Size>
 			<AbsDimension x="160" y="80"/>
 		</Size>
-		<Anchors>
-			<Anchor point="TOPLEFT" relativeTo="AuctionsDepositText" relativePoint="TOPLEFT">
-				<Offset>
-					<AbsDimension x="-4" y="-36"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
 		<Layers>
 			<Layer level="INFO">
 				<FontString name="$parentText1" inherits="GameFontNormalSmall" hidden="true">

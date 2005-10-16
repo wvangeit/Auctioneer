@@ -415,7 +415,12 @@ function Enchantrix_OnLoad()
 		SLASH_ENCHANTRIX3 = "/enx"
 		SlashCmdList["ENCHANTRIX"] = cmdHandler
 	]]);
-
+	Stubby.RegisterBootCode("Enchantrix", "Triggers", [[
+		local loadType = Stubby.GetConfig("Enchantrix", "LoadType")
+		if (loadType == "always") then
+			LoadAddOn("Enchantrix")
+		end
+	]]);
 
 	Enchantrix_DisenchantCount = 0;
 	Enchantrix_DisenchantResult = {};

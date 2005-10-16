@@ -130,19 +130,6 @@
 	UnregisterBootCode(ownerAddOn, bootName)
 
 --]]
-local createFunctionLoadBootCode
-local createEventLoadBootCode
-local createAddOnLoadBootCode
-local unregisterFunctionHook
-local unregisterAddOnHook
-local unregisterEventHook
-local unregisterBootCode
-local registerFunctionHook
-local registerAddOnHook
-local registerEventHook
-local registerBootCode
-local eventWatcher
-local loadWatcher
 
 local config = {
 	hooks = { functions={}, origFuncs={} },
@@ -153,9 +140,44 @@ local config = {
 
 StubbyConfig = {}
 
+
+-- Function prototypes
+local chatPrint                      -- chatPrint(...)
+local checkAddOns                    -- checkAddOns()
+local clearConfig                    -- clearConfig(ownerAddOn, variable)
+local createAddOnLoadBootCode        -- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
+local createEventLoadBootCode        -- createEventLoadBootCode(ownerAddOn, triggerEvent)
+local createFunctionLoadBootCode     -- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
+local eventWatcher                   -- eventWatcher(event)
+local events                         -- events(event, param)
+local getConfig                      -- getConfig(ownerAddOn, variable)
+local getOrigFunc                    -- getOrigFunc(triggerFunction)
+local hookCall                       -- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+local hookInto                       -- hookInto(triggerFunction)
+local inspectAddOn                   -- inspectAddOn(addonName, title, info)
+local loadWatcher                    -- loadWatcher(loadedAddOn)
+local onLoaded                       -- onLoaded()
+local onWorldStart                   -- onWorldStart()
+local rebuildNotifications           -- rebuildNotifications(notifyItems)
+local registerAddOnHook              -- registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
+local registerBootCode               -- registerBootCode(ownerAddOn, bootName, bootCode)
+local registerEventHook              -- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
+local registerFunctionHook           -- registerFunctionHook(triggerFunction, position, hookFunc, ...)
+local runBootCodes                   -- runBootCodes()
+local searchForNewAddOns             -- searchForNewAddOns()
+local setConfig                      -- setConfig(ownerAddOn, variable, value, isGlobal)
+local shouldInspectAddOn             -- shouldInspectAddOn(addonName)
+local unregisterAddOnHook            -- unregisterAddOnHook(triggerAddOn, ownerAddOn)
+local unregisterBootCode             -- unregisterBootCode(ownerAddOn, bootName)
+local unregisterEventHook            -- unregisterEventHook(triggerEvent, ownerAddOn)
+local unregisterFunctionHook         -- unregisterFunctionHook(triggerFunction, hookFunc)
+
+
+-- Function definitions
+
 -- This function takes all the items and their requested orders
 -- and assigns an actual ordering to them.
-local function rebuildNotifications(notifyItems)
+function rebuildNotifications(notifyItems)
 	local notifyFuncs = {}
 	for hookType, hData in notifyItems do
 		notifyFuncs[hookType] = {}
@@ -180,9 +202,8 @@ end
 -- This function's purpose is to execute all the attached
 -- functions in order and the original call at just before
 -- position 0.
-
 local r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
-local function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
 
@@ -224,7 +245,7 @@ end
 -- original function, dynamically.
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
-local function hookInto(triggerFunction)
+function hookInto(triggerFunction)
 	if (config.hooks.origFuncs[triggerFunction]) then return end
 	RunScript("Stubby_OldFunction = "..triggerFunction)
 	RunScript("Stubby_NewFunction = function(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) return Stubby.HookCall('"..triggerFunction.."', a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) end")
@@ -235,13 +256,12 @@ local function hookInto(triggerFunction)
 	Stubby_OldFunction = nil
 end
 
-local function getOrigFunc(triggerFunction)
+function getOrigFunc(triggerFunction)
 	if (config.hooks) and (config.hooks.origFuncs) then
 		return config.hooks.origFuncs[triggerFunction]
 	end
 end
 	
-
 
 -- This function causes a given function to be hooked by stubby and
 -- configures the hook function to be called at the given position.
@@ -404,7 +424,7 @@ end
 -- Functions to check through all addons for dependants.
 -- If any exist that we don't know about, and have a dependancy of us, then we will load them
 -- once to give them a chance to register themselves with us.
-local function checkAddOns()
+function checkAddOns()
 	if not StubbyConfig.inspected then return end
 	local goodList = {}
 	local addonCount = GetNumAddOns()
@@ -425,16 +445,16 @@ local function checkAddOns()
 		end
 	end
 end
-local function shouldInspectAddOn(addonName)
+function shouldInspectAddOn(addonName)
 	if not StubbyConfig.inspected[addonName] then return true end
 	return false
 end
-local function inspectAddOn(addonName, title, info)
+function inspectAddOn(addonName, title, info)
 	LoadAddOn(addonName)
 	StubbyConfig.inspected[addonName] = true
 	StubbyConfig.addinfo[addonName] = title.."|"..info
 end
-local function searchForNewAddOns()
+function searchForNewAddOns()
 	local addonCount = GetNumAddOns()
 	local name, title, notes, enabled, loadable, reason, security, requiresLoad
 	for i=1, addonCount do
@@ -455,13 +475,13 @@ end
 
 -- This function runs through the boot scripts we have, and if the
 -- related addon is not loaded yet, runs the boot script.
-local function runBootCodes()
+function runBootCodes()
 	if (not StubbyConfig.boots) then return end
 	for addon, boots in StubbyConfig.boots do
 		if (not IsAddOnLoaded(addon) and IsAddOnLoadOnDemand(addon)) then
 			local _, _, _, _, loadable = GetAddOnInfo(addon)
 			if (loadable) then
-				for _, boot in pairs(boots) do
+				for bootname, boot in pairs(boots) do
 					RunScript(boot)
 				end
 			end
@@ -470,21 +490,26 @@ local function runBootCodes()
 end
 
 
-local function onWorldStart()
+function onWorldStart()
+	-- Check for expired or updated addons and remove their boot codes.
 	checkAddOns()
+
 	-- Run all of our boots to setup the respective addons functions.
 	runBootCodes()
+
 	-- The search for new life and new civilizations... or just addons maybe.
 	searchForNewAddOns()
 end
 
-local function onLoaded()
+function onLoaded()
 	if not StubbyConfig.inspected then StubbyConfig.inspected = {} end
 	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Stubby", onWorldStart)
 end
 
 function events(event, param)
+	if (not event) then event = "" end
+	if (not param) then param = "" end
 	if (event == "ADDON_LOADED") then
 		if (param == "Stubby") then onLoaded() end
 		Stubby.LoadWatcher(param)
@@ -492,7 +517,7 @@ function events(event, param)
 	Stubby.EventWatcher(event)
 end
 
-local function chatPrint(...)
+function chatPrint(...)
 	if ( DEFAULT_CHAT_FRAME ) then 
 		local msg = ""
 		for i=1, table.getn(arg) do
@@ -506,7 +531,7 @@ end
 
 -- This function allows boot code to store a configuration variable
 -- by default the variable is per character unless isGlobal is set.
-local function setConfig(ownerAddOn, variable, value, isGlobal)
+function setConfig(ownerAddOn, variable, value, isGlobal)
 	local ownerIndex = string.lower(ownerAddOn)
 	local varIndex = string.lower(variable)
 	if (isGlobal) then
@@ -521,7 +546,7 @@ end
 -- This function gets a config variable stored by the above function
 -- it will prefer a player specific variable over a global with the
 -- same name
-local function getConfig(ownerAddOn, variable)
+function getConfig(ownerAddOn, variable)
 	local ownerIndex = string.lower(ownerAddOn)
 	local globalIndex = string.lower(variable)
 	local playerIndex = string.lower(UnitName("player")) .. ":" .. globalIndex
@@ -532,12 +557,13 @@ local function getConfig(ownerAddOn, variable)
 	if (curValue == nil) then
 		curValue = StubbyConfig.configs[ownerIndex][globalIndex]
 	end
+	return curValue
 end
 
 -- This function clears the config variable specified (both the
 -- global and player specific) or all config variables for the
 -- ownerAddOn if no variable is specified
-local function clearConfig(ownerAddOn, variable)
+function clearConfig(ownerAddOn, variable)
 	local ownerIndex = string.lower(ownerAddOn)
 	if (not StubbyConfig.configs) then return end
 	if (not StubbyConfig.configs[ownerIndex]) then return end
@@ -576,5 +602,4 @@ Stubby = {
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
 }
-
 

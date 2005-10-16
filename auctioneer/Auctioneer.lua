@@ -23,8 +23,6 @@ function Auctioneer_OnLoad()
 	-- Get called when our vars have loaded
 	Stubby.RegisterAddOnHook("Auctioneer", "Auctioneer", Auctioneer_AddonLoaded);
 
-	EnhTooltip.DebugPrint("Registering triggers!")
-
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Auctioneer", "CommandHandler", [[
 		local function cmdHandler(msg)
@@ -70,6 +68,10 @@ function Auctioneer_OnLoad()
 			end
 		end
 		Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", checkLoad)
+		local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
+		if (loadType == "always") then
+			LoadAddOn("Auctioneer")
+		end
 	]]);
 end
 
