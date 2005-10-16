@@ -381,7 +381,6 @@ function Auctioneer_AddonLoaded()
 			button2 = _AUCT['MesgConvertNo'],
 			OnAccept = function()
 				Auctioneer_Convert();
-				Auctioneer_LockAndLoad(thisPointer);
 			end,
 			OnCancel = function()
 				Auctioneer_ChatPrint(_AUCT['MesgNotconverting']);
@@ -391,9 +390,8 @@ function Auctioneer_AddonLoaded()
 			exclusive = 1
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
-	else
-		Auctioneer_LockAndLoad(this);
 	end
+	Auctioneer_LockAndLoad(this);
 end
 
 local function hookAuctionHouse()
@@ -401,13 +399,7 @@ local function hookAuctionHouse()
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
 end
 
-function Auctioneer_LockAndLoad(thisPointer)
-	-- make thisPointer an optional parameter
-	if thisPointer == nil then
-		thisPointer = this -- defaulting to this
-	end
-
-	-- register events
+function Auctioneer_LockAndLoad()
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", Auctioneer_AuctHouseShow);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
