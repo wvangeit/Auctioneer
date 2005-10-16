@@ -187,7 +187,7 @@ _AUCT['ShowEmbedBlank'] = "show-embed-blankline";
 _AUCT['ShowRedo'] = "show-warning";
 
 _AUCT['HelpOnoff'] = "Turns the auction data display on and off";
-_AUCT['HelpDisable'] = "Stops auctioneer from automatically loading next time you log in";
+_AUCT['HelpDisable'] = "Stops Auctioneer from automatically loading next time you log in";
 _AUCT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
 _AUCT['HelpAverage'] = "Select whether to show item's average auction price";
 _AUCT['HelpLink'] = "Select whether to show the link id in the tooltip";
@@ -252,7 +252,7 @@ _AUCT['AuctionScanNexttime'] = "Auctioneer will perform a full auction scan the 
 _AUCT['AuctionScanNocat'] = "You must have at least one category selected to scan.";
 _AUCT['AuctionScanRedo'] = "Current page took more than %d seconds to complete, retrying page.";
 
-_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup SavedVariables\Auctioneer.lua first.%s%s";
+_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup your SavedVariables\\Auctioneer.lua first.%s%s";
 _AUCT['MesgNotconverting'] = "Auctioneer is not converting your database, but will not function until you do.";
 _AUCT['MesgConvertYes'] = "Convert";
 _AUCT['MesgConvertNo'] = "Disable Auctioneer";

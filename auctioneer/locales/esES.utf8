@@ -118,6 +118,7 @@ _AUCT['CmdAlt'] = "alt";
 _AUCT['CmdCtrl'] = "ctrl";
 _AUCT['CmdShift'] = "shift";
 _AUCT['CmdToggle'] = "invertir";
+_AUCT['CmdDisable'] = "deshabilitar";
 _AUCT['CmdClear'] = "borrar";
 _AUCT['CmdClearAll'] = "todo";
 _AUCT['CmdClearSnapshot'] = "imagen";
@@ -186,6 +187,7 @@ _AUCT['ShowEmbedBlank'] = "ver-integrado-lineavacia";
 _AUCT['ShowRedo'] = "ver-advertencia";
 
 _AUCT['HelpOnoff'] = "Enciende o apaga la informacion sobre las subastas";
+_AUCT['HelpDisable'] = "Impide que Auctioneer se carge automaticamente la proxima vez que usted entre al juego";
 _AUCT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
 _AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el artículo";
 _AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del artículo en la caja de ayuda";
@@ -218,6 +220,8 @@ _AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la página c
 _AUCT['HelpDefault'] = "Revertir una opción de Auctioneer a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de fábrica."
 _AUCT['HelpPrintin'] = "Selecciona cual ventana de mensajes va a usar Auctioneer para imprimir su informacion. Puede especificar el nombre o el índice de la ventana.";
 
+_AUCT['DisableMsg'] = "Deshabilitando la auto-carga de Auctioneer";
+
 _AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 _AUCT['StatOff'] = "Ocultando toda información de subastas";
 
@@ -232,6 +236,7 @@ _AUCT['FrmtActSet'] = "%s ajustado(a) a '%s'";
 _AUCT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
 _AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de fábrica.";
 _AUCT['FrmtActDefault'] = "La opción %s de Auctioneer ha sido revertida a su configuración de fábrica.";
+_AUCT['FrmtPrintin'] = "Los mensajes de Auctioneer se imprimirán en la ventana de comunicación \"%s\"";
 
 _AUCT['TextScan'] = "Explorar";
 _AUCT['TextAuction'] = "Subasta";
@@ -251,6 +256,8 @@ _AUCT['MesgConvert'] = "Conversión de base de datos de Auctioneer. Favor de hac
 _AUCT['MesgNotconverting'] = "Auctioneer no convertirá su base de datos, pero no funcionará hasta que la base de datos sea convertida.";
 _AUCT['MesgConvertYes'] = "Convertir";
 _AUCT['MesgConvertNo'] = "Deshabilitar Auctioneer";
+
+_AUCT['MesgNotLoaded'] = "Auctioneer no esta cargado. Escriba /auctioneer para mas información.";
 
 _AUCT['AuctionTotalAucts'] = "Total de subastas exploradas: %s";
 _AUCT['AuctionNewAucts'] = "Nuevas subastas exploradas: %s";
