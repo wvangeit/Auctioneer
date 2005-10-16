@@ -1016,20 +1016,20 @@ function Auctioneer_Clear(param, chatprint)
 				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 					AuctionConfig.data[aKey][itemKey] = nil;
 
-					if (AuctionConfig.stats[snapmed][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats[snapmed][aKey][itemKey] = nil;
+					if (AuctionConfig.stats["snapmed"][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats["snapmed"][aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats[histmed][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats[histmed][aKey][itemKey] = nil;
+					if (AuctionConfig.stats["histmed"][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats["histmed"][aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats[histcount][aKey][itemKey] ~= nil) then 
-						AuctionConfig.stats[histcount][aKey][itemKey] = nil;
+					if (AuctionConfig.stats["histcount"][aKey][itemKey] ~= nil) then 
+						AuctionConfig.stats["histcount"][aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats[snapcount][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats[snapcount][aKey][itemKey] = nil;
+					if (AuctionConfig.stats["snapcount"][aKey][itemKey] ~= nil) then
+						AuctionConfig.stats["snapcount"][aKey][itemKey] = nil;
 					end
 
 					if (AuctionConfig.sbuy[aKey][itemKey] ~= nil) then
