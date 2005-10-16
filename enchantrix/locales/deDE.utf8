@@ -39,10 +39,10 @@ ENCH_HELP_COUNT = "Auswählen ob genaue Anzahl angezeigt wird";
 ENCH_HELP_RATE = "Auswählen ob ungefährer Wert des Entzaubern angezeigt wird";
 
 ENCH_HELP_VALUE = "Auswählen ob geschätzte Werte der Entzauberung aufgrund ähnlicher Gegenstände angezeigt werden";
-ENCH_HELP_GUESS_AUCTIONEER_HSP = "Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den höchsten Verkaufspreis (HVP) für das Entzaubern";
-ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den durchschnittlichen Wert für das Entzaubern";
+ENCH_HELP_GUESS_AUCTIONEER_HSP = "Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den höchsten Verkaufspreis (HVP) für das Entzaubern";
+ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den durchschnittlichen Wert für das Entzaubern";
 ENCH_HELP_GUESS_NOAUCTIONEER = "Die Befehle "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." und "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." sind nicht verfügbar weil Auctioneer nicht installiert ist";
-ENCH_HELP_GUESS_BASELINE = "Wenn Wertebestimmung aktiv ist, (auctioneer nicht benötigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
+ENCH_HELP_GUESS_BASELINE = "Wenn Wertebestimmung aktiv ist, (Auctioneer nicht benötigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
 
 ENCH_HELP_CLEAR = "Lösche Daten dieses Gegenstandes (Gegenstände mit Shift-Klick einfügen zum Befehl) Alles löschen mit Befehl \"alle\"";
 ENCH_HELP_FIND_BUYAUCT = "Suche Auktionen deren Entzauberwert einen gewissen Prozentsatz unter dem Sofortkaufpreis liegt";

@@ -93,10 +93,10 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_RATE = "Select whether to show the average quantity of disenchant";
 	
 	ENCH_HELP_VALUE = "Select whether to show item's estimated values based on the proportions of possible disenchants";
-	ENCH_HELP_GUESS_AUCTIONEER_HSP = "If valuation is enabled, and you have auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
-	ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "If valuation is enabled, and you have auctioneer installed, display the median based valuation of disenchanting the item.";
+	ENCH_HELP_GUESS_AUCTIONEER_HSP = "If valuation is enabled, and you have Auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
+	ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "If valuation is enabled, and you have Auctioneer installed, display the median based valuation of disenchanting the item.";
 	ENCH_HELP_GUESS_NOAUCTIONEER = "The "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." and "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." commands are not available because you do not have auctioneer installed";
-	ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
+	ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (Auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 	
 	ENCH_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 	ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix messages";
@@ -239,10 +239,10 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_RATE="Ausw\195\164hlen ob ungef\195\164hrer Wert des Entzaubern angezeigt wird";
 		
 		ENCH_HELP_VALUE="Ausw\195\164hlen ob gesch\195\164tzte Werte der Entzauberung aufgrund \195\164hnlicher Gegenst\195\164nde angezeigt werden";
-		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den h\195\182chsten Verkaufspreis (HVP) f\195\188r das Entzaubern";
-		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn Wertebestimmung aktiv ist, und auctioneer installiert ist, zeige den durchschnittlichen Wert f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den h\195\182chsten Verkaufspreis (HVP) f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den durchschnittlichen Wert f\195\188r das Entzaubern";
 		ENCH_HELP_GUESS_NOAUCTIONEER="Die Befehle "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." und "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." sind nicht verf\195\188gbar weil Auctioneer nicht installiert ist";
-		ENCH_HELP_GUESS_BASELINE="Wenn Wertebestimmung aktiv ist, (auctioneer nicht ben\195\182tigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
+		ENCH_HELP_GUESS_BASELINE="Wenn Wertebestimmung aktiv ist, (Auctioneer nicht ben\195\182tigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
 		
 		ENCH_HELP_CLEAR="L\195\182sche Daten dieses Gegenstandes (Gegenst\195\164nde mit Shift-Klick einf\195\188gen zum Befehl) Alles l\195\182schen mit Befehl \"alle\"";
 		ENCH_HELP_FIND_BUYAUCT="Suche Auktionen deren Entzauberwert einen gewissen Prozentsatz unter dem Sofortkaufpreis liegt";

@@ -1,5 +1,5 @@
 --
--- Auctioneer ItemData
+-- Informant ItemData
 --
 
 -- Skills that are needed below

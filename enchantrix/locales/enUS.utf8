@@ -45,10 +45,10 @@ ENCH_HELP_COUNT = "Select whether to show the exact counts in the database";
 ENCH_HELP_RATE = "Select whether to show the average quantity of disenchant";
 
 ENCH_HELP_VALUE = "Select whether to show item's estimated values based on the proportions of possible disenchants";
-ENCH_HELP_GUESS_AUCTIONEER_HSP = "If valuation is enabled, and you have auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
-ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "If valuation is enabled, and you have auctioneer installed, display the median based valuation of disenchanting the item.";
+ENCH_HELP_GUESS_AUCTIONEER_HSP = "If valuation is enabled, and you have Auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
+ENCH_HELP_GUESS_AUCTIONEER_MEDIAN = "If valuation is enabled, and you have Auctioneer installed, display the median based valuation of disenchanting the item.";
 ENCH_HELP_GUESS_NOAUCTIONEER = "The "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." and "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." commands are not available because you do not have auctioneer installed";
-ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
+ENCH_HELP_GUESS_BASELINE = "If valuation is enabled, (Auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 
 ENCH_HELP_CLEAR = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix messages";

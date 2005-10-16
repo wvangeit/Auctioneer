@@ -219,29 +219,19 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['ShowAverage'] = "show-average";
 	_AUCT['ShowLink'] = "show-link";
 	_AUCT['ShowMedian'] = "show-median";
-	_AUCT['ShowStack'] = "show-stack";
 	_AUCT['ShowStats'] = "show-stats";
 	_AUCT['ShowSuggest'] = "show-suggest";
-	_AUCT['ShowUsage'] = "show-usage";
-	_AUCT['ShowVendor'] = "show-vendor";
-	_AUCT['ShowVendorBuy'] = "show-vendor-buy";
-	_AUCT['ShowVendorSell'] = "show-vendor-sell";
 	_AUCT['ShowEmbedBlank'] = "show-embed-blankline";
 	_AUCT['ShowRedo'] = "show-warning";
 	
 	_AUCT['HelpOnoff'] = "Turns the auction data display on and off";
-	_AUCT['HelpDisable'] = "Stops auctioneer from automatically loading next time you log in";
+	_AUCT['HelpDisable'] = "Stops Auctioneer from automatically loading next time you log in";
 	_AUCT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
 	_AUCT['HelpAverage'] = "Select whether to show item's average auction price";
 	_AUCT['HelpLink'] = "Select whether to show the link id in the tooltip";
 	_AUCT['HelpMedian'] = "Select whether to show item's median buyout price";
 	_AUCT['HelpSuggest'] = "Select whether to show item's suggested auction price";
 	_AUCT['HelpStats'] = "Select whether to show item's bidded/buyout percentages";
-	_AUCT['HelpVendor'] = "Select whether to show item's vendor pricing";
-	_AUCT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)";
-	_AUCT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)";
-	_AUCT['HelpUsage'] = "Select whether to show tradeskill item's usage";
-	_AUCT['HelpStack'] = "Select whether to show the item's stackable size";
 	_AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
 	_AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
 	_AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
@@ -295,7 +285,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['AuctionScanNocat'] = "You must have at least one category selected to scan.";
 	_AUCT['AuctionScanRedo'] = "Current page took more than %d seconds to complete, retrying page.";
 	
-	_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup SavedVariables\Auctioneer.lua first.%s%s";
+	_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup your SavedVariables\\Auctioneer.lua first.%s%s";
 	_AUCT['MesgNotconverting'] = "Auctioneer is not converting your database, but will not function until you do.";
 	_AUCT['MesgConvertYes'] = "Convert";
 	_AUCT['MesgConvertNo'] = "Disable Auctioneer";
@@ -363,7 +353,6 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
-
 -- Locale strings for the deDE locale
 if locale == "deDE" then
 		-- Encoded in UTF8
@@ -540,13 +529,8 @@ if locale == "deDE" then
 		_AUCT['ShowAverage']    = "show-average";
 		_AUCT['ShowLink']       = "show-link";
 		_AUCT['ShowMedian']     = "show-median";
-		_AUCT['ShowStack']      = "show-stack";
 		_AUCT['ShowStats']      = "show-stats";
 		_AUCT['ShowSuggest']    = "show-suggest";
-		_AUCT['ShowUsage']      = "show-usage";
-		_AUCT['ShowVendor']     = "show-vendor";
-		_AUCT['ShowVendorBuy']  = "show-vendor-buy";
-		_AUCT['ShowVendorSell'] = "show-vendor-sell";
 		_AUCT['ShowEmbedBlank'] = "show-embed-blankline";
 		_AUCT['ShowRedo']       = "show-warning";
 		
@@ -557,11 +541,6 @@ if locale == "deDE" then
 		_AUCT['HelpMedian']         = "Schaltet die Anzeige des Median-Sofortkaufpreises ein/aus.";
 		_AUCT['HelpSuggest']        = "Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
 		_AUCT['HelpStats']          = "Schaltet die Prozentanzeige der/des Gebote/Sofortkaufes ein/aus.";
-		_AUCT['HelpVendor']         = "Schaltet die Anzeige des H\195\164ndlerpreieses ein/aus.";
-		_AUCT['HelpVendorSell']     = "Schaltet die Anzeige des H\195\164ndlerverkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-		_AUCT['HelpVendorBuy']      = "Schaltet die Anzeige des H\195\164ndlerkaufspreises ein/aus (show-vendor muss eingeschaltet sein).";
-		_AUCT['HelpUsage']          = "Schaltet die Anzeige des Verwendungszweckes f\195\188r Handwerker ein/aus.";
-		_AUCT['HelpStack']          = "Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
 		_AUCT['HelpEmbedBlank']     = "Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
 		_AUCT['HelpClear']          = "L\195\182scht die Daten der angegebene Gegenst\195\164nde (Gegenst\195\164nde durch Shift+Linksklick dem Befehl hinzuf\195\188gen) Es k\195\182nnen auch die speziellen Keywords \"all\" und \"snapshot\" hinzugef\195\188gt werden.";
 		_AUCT['HelpAlso']           = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms f\195\188r Realm und den Namen der Faktion f\195\188r Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"opposite\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalit\195\164t.";
@@ -610,7 +589,7 @@ if locale == "deDE" then
 		_AUCT['AuctionScanNocat']    = "Es muss mindestens eine Kategorie ausgew\195\164hlt sein, um den Scanvorgang zu starten.";
 		_AUCT['AuctionScanRedo']     = "Aktuelle Seite braucht l\195\164nger als %d Sekunden. Fahre mit n\195\164chster Seite fort.";
 		
-		_AUCT['MesgConvert']       = "Auctioneer Datenbankkonvertierung. Bitte zuerst ein Backup von SavedVariables\Auctioneer.lua anlegen!%s%s";
+		_AUCT['MesgConvert']       = "Auctioneer Datenbankkonvertierung. Bitte zuerst ein Backup von SavedVariables\\Auctioneer.lua anlegen!%s%s";
 		_AUCT['MesgNotconverting'] = "Auctioneers Datenbank wird nicht konvertiert. Auctioneer bleibt deaktiviert, solange die Datenbank nicht konvertiert wurde.";
 		_AUCT['MesgConvertYes']    = "Konvertieren";
 		_AUCT['MesgConvertNo']     = "Auctioneer deaktivieren";
@@ -794,6 +773,7 @@ if locale == "esES" then
 		_AUCT['CmdCtrl'] = "ctrl";
 		_AUCT['CmdShift'] = "shift";
 		_AUCT['CmdToggle'] = "invertir";
+		_AUCT['CmdDisable'] = "deshabilitar";
 		_AUCT['CmdClear'] = "borrar";
 		_AUCT['CmdClearAll'] = "todo";
 		_AUCT['CmdClearSnapshot'] = "imagen";
@@ -851,28 +831,19 @@ if locale == "esES" then
 		_AUCT['ShowAverage'] = "ver-promedio";
 		_AUCT['ShowLink'] = "ver-enlace";
 		_AUCT['ShowMedian'] = "ver-mediano";
-		_AUCT['ShowStack'] = "ver-paquete";
 		_AUCT['ShowStats'] = "ver-estadisticas";
 		_AUCT['ShowSuggest'] = "ver-sugerencia";
-		_AUCT['ShowUsage'] = "ver-uso";
-		_AUCT['ShowVendor'] = "ver-vendedor";
-		_AUCT['ShowVendorBuy'] = "ver-vendedor-compra";
-		_AUCT['ShowVendorSell'] = "ver-vendedor-venta";
 		_AUCT['ShowEmbedBlank'] = "ver-integrado-lineavacia";
 		_AUCT['ShowRedo'] = "ver-advertencia";
 		
 		_AUCT['HelpOnoff'] = "Enciende o apaga la informacion sobre las subastas";
+		_AUCT['HelpDisable'] = "Impide que Auctioneer se carge automaticamente la proxima vez que usted entre al juego";
 		_AUCT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
 		_AUCT['HelpAverage'] = "Selecciona para mostrar precio promedio de la subasta para el art\195\173culo";
 		_AUCT['HelpLink'] = "Selecciona para mostrar el numero de enlace del art\195\173culo en la caja de ayuda";
 		_AUCT['HelpMedian'] = "Selecciona para mostrar el precio promedio para la opci\195\179n a compra";
 		_AUCT['HelpSuggest'] = "Selecciona para mostrar el precio sugerido de subasta para el art\195\173culo";
 		_AUCT['HelpStats'] = "Selecciona para mostrar porcentajes para ofertas/opci\195\179n a compra del art\195\173culo";
-		_AUCT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art\195\173culo";
-		_AUCT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
-		_AUCT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
-		_AUCT['HelpUsage'] = "Selecciona para mostrar uso del art\195\173culo en profesiones";
-		_AUCT['HelpStack'] = "Selecciona para mostrar tama\195\177o maximo del paquete";
 		_AUCT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
 		_AUCT['HelpClear'] = "Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
 		_AUCT['HelpAlso'] = "Mostrar tambi\195\169n los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facci\195\179n escribe el nombre de la facci\195\179n. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facci\195\179n opuesta, \"apagar\" desabilita la funci\195\179n.";
@@ -894,6 +865,8 @@ if locale == "esES" then
 		_AUCT['HelpDefault'] = "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica."
 		_AUCT['HelpPrintin'] = "Selecciona cual ventana de mensajes va a usar Auctioneer para imprimir su informacion. Puede especificar el nombre o el \195\173ndice de la ventana.";
 		
+		_AUCT['DisableMsg'] = "Deshabilitando la auto-carga de Auctioneer";
+		
 		_AUCT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
 		_AUCT['StatOff'] = "Ocultando toda informaci\195\179n de subastas";
 		
@@ -908,6 +881,7 @@ if locale == "esES" then
 		_AUCT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
 		_AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
 		_AUCT['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
+		_AUCT['FrmtPrintin'] = "Los mensajes de Auctioneer se imprimir\195\161n en la ventana de comunicaci\195\179n \"%s\"";
 		
 		_AUCT['TextScan'] = "Explorar";
 		_AUCT['TextAuction'] = "Subasta";
@@ -923,10 +897,12 @@ if locale == "esES" then
 		_AUCT['AuctionScanNocat'] = "Usted debe tener al menos una categoria seleccionada para poder explorar.";
 		_AUCT['AuctionScanRedo'] = "La p\195\161gina corriente ha tomado mas de %d segundos para completar. Tratando p\195\161gina otra vez.";
 		
-		_AUCT['MesgConvert'] = "Conversi\195\179n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables.lua para la reserva primero.%s%s";
+		_AUCT['MesgConvert'] = "Conversi\195\179n de base de datos de Auctioneer. Favor de hacer una copia del SavedVariables\\Auctioneer.lua para la reserva primero.%s%s";
 		_AUCT['MesgNotconverting'] = "Auctioneer no convertir\195\161 su base de datos, pero no funcionar\195\161 hasta que la base de datos sea convertida.";
 		_AUCT['MesgConvertYes'] = "Convertir";
 		_AUCT['MesgConvertNo'] = "Deshabilitar Auctioneer";
+		
+		_AUCT['MesgNotLoaded'] = "Auctioneer no esta cargado. Escriba /auctioneer para mas informaci\195\179n.";
 		
 		_AUCT['AuctionTotalAucts'] = "Total de subastas exploradas: %s";
 		_AUCT['AuctionNewAucts'] = "Nuevas subastas exploradas: %s";

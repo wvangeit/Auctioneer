@@ -262,89 +262,6 @@ function Auctioneer_Register_Khaos()
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=2;
 			};
-			--These functions have been removed from Auctioneer and placed in the Informant AddOn, as such their Khaos config options have been removed to prevent confusion.
-			--[[{
-				id="AuctioneerVendorHeader";
-				type=K_HEADER;
-				text=_AUCT['GuiVendorHeader'];
-				helptext=_AUCT['GuiVendorHelp'];
-				difficulty=1;
-			};
-			{
-				id=_AUCT['ShowVendor'];
-				type=K_TEXT;
-				text=_AUCT['GuiVendor'];
-				helptext=_AUCT['HelpVendor'];
-				callback=function(state)
-					if (state.checked) then
-						Auctioneer_GenVarSet(_AUCT['ShowVendor'], _AUCT['CmdOn']);
-					else
-						Auctioneer_GenVarSet(_AUCT['ShowVendor'], _AUCT['CmdOff']);
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendor']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendor']));
-					end
-				end;
-				check=true;
-				default={checked=true};
-				disabled={checked=false};
-				dependencies={AuctioneerEnable={checked=true;}};
-				difficulty=1;
-			};
-			{
-				id=_AUCT['ShowVendorBuy'];
-				type=K_TEXT;
-				text=_AUCT['GuiVendorBuy'];
-				helptext=_AUCT['HelpVendorBuy'];
-				callback=function(state)
-					if (state.checked) then
-						Auctioneer_GenVarSet(_AUCT['ShowVendorBuy'], _AUCT['CmdOn']);
-					else
-						Auctioneer_GenVarSet(_AUCT['ShowVendorBuy'], _AUCT['CmdOff']);
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorBuy']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorBuy']));
-					end
-				end;
-				check=true;
-				default={checked=true};
-				disabled={checked=false};
-				dependencies={AuctioneerVendor={checked=true;}, AuctioneerEnable={checked=true;}};
-				difficulty=2;
-			};
-			{
-				id=_AUCT['ShowVendorSell'];
-				type=K_TEXT;
-				text=_AUCT['GuiVendorSell'];
-				helptext=_AUCT['HelpVendorSell'];
-				callback=function(state)
-					if (state.checked) then
-						Auctioneer_GenVarSet(_AUCT['ShowVendorSell'], _AUCT['CmdOn']);
-					else
-						Auctioneer_GenVarSet(_AUCT['ShowVendorSell'], _AUCT['CmdOff']);
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVendorSell']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVendorSell']));
-					end
-				end;
-				check=true;
-				default={checked=true};
-				disabled={checked=false};
-				dependencies={AuctioneerVendor={checked=true;}, AuctioneerEnable={checked=true;}};
-				difficulty=2;
-			};]]
 			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
@@ -847,13 +764,8 @@ function Auctioneer_Command(command, source)
 		((cmd == _AUCT['ShowAverage']) or (cmd == "show-average")) or
 		((cmd == _AUCT['ShowLink']) or (cmd == "show-link")) or
 		((cmd == _AUCT['ShowMedian']) or (cmd == "show median")) or
-		((cmd == _AUCT['ShowStack']) or (cmd == "show-stack")) or
 		((cmd == _AUCT['ShowStats']) or (cmd == "show-stats")) or
 		((cmd == _AUCT['ShowSuggest']) or (cmd == "show-suggest")) or
-		((cmd == _AUCT['ShowUsage']) or (cmd == "show-usage")) or
-		((cmd == _AUCT['ShowVendor']) or (cmd == "show-vendor")) or
-		((cmd == _AUCT['ShowVendorBuy']) or (cmd == "show-vendor-buy")) or
-		((cmd == _AUCT['ShowVendorSell']) or (cmd == "show-vendor-sell")) or		
 		((cmd == _AUCT['ShowEmbedBlank']) or (cmd == "show-embed-blankline")) or
 		((cmd == _AUCT['ShowRedo']) or (cmd == "show-redowarning")) or
 		((cmd == AUCT_SHOW_HSP) or (cmd == "show-hsp")) --This command has not yet been implemented.
@@ -892,11 +804,6 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowMedian'], Auctioneer_GetFilterVal(_AUCT['ShowMedian']), _AUCT['HelpMedian']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowSuggest'], Auctioneer_GetFilterVal(_AUCT['ShowSuggest']), _AUCT['HelpSuggest']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowStats'], Auctioneer_GetFilterVal(_AUCT['ShowStats']), _AUCT['HelpStats']));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowVendor'], Auctioneer_GetFilterVal(_AUCT['ShowVendor']), _AUCT['HelpVendor']));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowVendorSell'], Auctioneer_GetFilterVal(_AUCT['ShowVendorSell']), _AUCT['HelpVendorSell']));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowVendorBuy'], Auctioneer_GetFilterVal(_AUCT['ShowVendorBuy']), _AUCT['HelpVendorBuy']));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowUsage'], Auctioneer_GetFilterVal(_AUCT['ShowUsage']), _AUCT['HelpUsage']));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowStack'], Auctioneer_GetFilterVal(_AUCT['ShowStack']), _AUCT['HelpStack']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowLink'], Auctioneer_GetFilterVal(_AUCT['ShowLink']), _AUCT['HelpLink']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdAutofill'], Auctioneer_GetFilterVal(_AUCT['CmdAutofill']), _AUCT['HelpAutofill']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdEmbed'], Auctioneer_GetFilterVal(_AUCT['CmdEmbed']), _AUCT['HelpEmbed']));
