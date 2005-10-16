@@ -23,7 +23,14 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<Scripts>
 			<OnLoad>
 				Auctioneer_OnLoad();
+				this:RegisterEvent("ADDON_LOADED")
 			</OnLoad>
+			<OnEvent>
+				if (event ==  "ADDON_LOADED" and arg1 == "Auctioneer") then
+					Auctioneer_AddonLoaded()
+					this:UnregisterEvent("ADDON_LOADED")
+				end
+			</OnEvent>
 		</Scripts>
 		<Frames>
 			<Button name="BrowseScanButton" inherits="UIPanelButtonTemplate" hidden="true">

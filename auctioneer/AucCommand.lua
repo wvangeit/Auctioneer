@@ -792,6 +792,12 @@ function Auctioneer_Command(command, source)
 		Auctioneer_ChatPrint(_AUCT['DisableMsg']);
 		Stubby.SetConfig("Auctioneer", "LoadType", "never");
 
+	elseif (cmd == "load") then
+		if (param == "always") or (param == "never") or (param == "auctionhouse") then
+			Auctioneer_ChatPrint("Setting Auctioneer to "..param.." load for this toon");
+			Stubby.SetConfig("Enchantrix", "LoadType", param);
+		end
+
 	elseif ((cmd == _AUCT['CmdClear']) or (cmd == "clear")) then
 		Auctioneer_Clear(param, chatprint);
 

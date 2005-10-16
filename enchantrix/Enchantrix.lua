@@ -768,6 +768,15 @@ function Enchantrix_Command(command, source)
 	elseif (((cmd == ENCH_CMD_ON) or (cmd == "on")) or ((cmd == ENCH_CMD_OFF) or (cmd == "off")) or ((cmd == ENCH_CMD_TOGGLE) or (cmd == "toggle"))) then
 		Enchantrix_OnOff(cmd, chatprint);
 
+	elseif ((cmd == ENCH_CMD_DISABLE) or (cmd == "disable")) then
+		Stubby.SetConfig("Enchantrix", "LoadType", "never");
+
+	elseif (cmd == "load") then
+		if (param == "always") or (param == "never") then
+			Enchantrix_ChatPrint("Setting Enchantrix_ChatPrint to "..param.." load for this toon");
+			Stubby.SetConfig("Enchantrix", "LoadType", param);
+		end
+
 	elseif ((cmd == ENCH_CMD_CLEAR) or (cmd == "clear")) then
 		Auctioneer_Clear(param, chatprint);
 
@@ -810,7 +819,7 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 
 		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix_GetFilterVal("all").."]|r - " .. ENCH_HELP_ONOFF);
 		
-		Auctioneer_ChatPrint("  |cffffffff/enchantrix "..ENCH_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
+		Auctioneer_ChatPrint("  |cffffffff/enchantrix "..ENCH_CMD_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
 
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_HEADER, Enchantrix_GetFilterVal(ENCH_SHOW_HEADER), ENCH_HELP_HEADER));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_COUNT, Enchantrix_GetFilterVal(ENCH_SHOW_COUNT), ENCH_HELP_COUNT));

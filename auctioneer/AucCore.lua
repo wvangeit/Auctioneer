@@ -367,6 +367,8 @@ end
 
 
 function Auctioneer_AddonLoaded()
+	if (AuctionConfig) then
+	end
 	Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 
 	-- Load the category and subcategory id's
@@ -392,6 +394,7 @@ function Auctioneer_AddonLoaded()
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
 	else
+		p("Going ahead and loading auctioneer");
 		Auctioneer_LockAndLoad(this);
 	end
 end

@@ -20,9 +20,6 @@ function Auctioneer_OnLoad()
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, Auctioneer_HookTooltip);
 
-	-- Get called when our vars have loaded
-	Stubby.RegisterAddOnHook("Auctioneer", "Auctioneer", Auctioneer_AddonLoaded);
-
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Auctioneer", "CommandHandler", [[
 		local function cmdHandler(msg)
