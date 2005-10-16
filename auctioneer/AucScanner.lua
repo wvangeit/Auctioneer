@@ -374,6 +374,7 @@ function Auctioneer_ConfigureAH()
 		if (AuctionInfo) then
 			AuctionInfo:SetParent("AuctionFrameAuctions")
 			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36)
+			AuctionInfo:Show()
 		end
 	end
 end

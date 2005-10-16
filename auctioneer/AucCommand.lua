@@ -795,7 +795,7 @@ function Auctioneer_Command(command, source)
 	elseif (cmd == "load") then
 		if (param == "always") or (param == "never") or (param == "auctionhouse") then
 			Auctioneer_ChatPrint("Setting Auctioneer to "..param.." load for this toon");
-			Stubby.SetConfig("Enchantrix", "LoadType", param);
+			Stubby.SetConfig("Auctioneer", "LoadType", param);
 		end
 
 	elseif ((cmd == _AUCT['CmdClear']) or (cmd == "clear")) then

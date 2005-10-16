@@ -374,7 +374,6 @@ function Auctioneer_AddonLoaded()
 
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
-		thisPointer = this
 		StaticPopupDialogs["CONVERT_AUCTIONEER"] = {
 			text = _AUCT['MesgConvert'],
 			button1 = _AUCT['MesgConvertYes'],
@@ -391,15 +390,10 @@ function Auctioneer_AddonLoaded()
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
 	end
-	Auctioneer_LockAndLoad(this);
+	Auctioneer_LockAndLoad();
 end
 
 local function hookAuctionHouse()
-	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
-	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
-end
-
-function Auctioneer_LockAndLoad()
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", Auctioneer_AuctHouseShow);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
@@ -409,6 +403,11 @@ function Auctioneer_LockAndLoad()
 	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
 	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
 
+	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
+	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
+end
+
+function Auctioneer_LockAndLoad()
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
