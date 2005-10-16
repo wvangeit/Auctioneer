@@ -901,8 +901,8 @@ function gtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
 end
 
 function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
-	local hasCooldown = retVal[1]
-	local repairCost = retVal[2]
+	-- local hasCooldown = retVal[1]
+	-- local repairCost = retVal[2]
 
 	local link = GetContainerItemLink(frameID, buttonID)
 	local name = nameFromLink(link)
@@ -913,14 +913,12 @@ function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 
 		tooltipCall(GameTooltip, name, link, quality, itemCount)
 	end
-	
-	return hasCooldown, repairCost
 end
 
 function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
-	local hasItem = retVal[1]
-	local hasCooldown = retVal[2]
-	local repairCost = retVal[3]
+	-- local hasItem = retVal[1]
+	-- local hasCooldown = retVal[2]
+	-- local repairCost = retVal[3]
 
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
