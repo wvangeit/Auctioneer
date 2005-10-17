@@ -131,6 +131,7 @@
 
 --]]
 
+local cleanList
 local config = {
 	hooks = { functions={}, origFuncs={} },
 	calls = { functions={}, callList={} },
@@ -165,6 +166,8 @@ local registerEventHook              -- registerEventHook(triggerEvent, ownerAdd
 local registerFunctionHook           -- registerFunctionHook(triggerFunction, position, hookFunc, ...)
 local runBootCodes                   -- runBootCodes()
 local searchForNewAddOns             -- searchForNewAddOns()
+local cleanUpAddOnData               -- cleanUpAddOnData()
+local cleanUpAddOnConfigs            -- cleanUpAddOnConfigs()
 local setConfig                      -- setConfig(ownerAddOn, variable, value, isGlobal)
 local shouldInspectAddOn             -- shouldInspectAddOn(addonName)
 local unregisterAddOnHook            -- unregisterAddOnHook(triggerAddOn, ownerAddOn)
@@ -350,6 +353,7 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 		config.events[triggerEvent][ownerAddOn] = { f=hookFunction, a=arg }
 	end
 end
+
 function unregisterEventHook(triggerEvent, ownerAddOn)
 	if (config.events and config.events[triggerEvent] and config.events[triggerEvent][ownerAddOn]) then
 		config.events[triggerEvent][ownerAddOn] = nil
@@ -381,6 +385,7 @@ function registerBootCode(ownerAddOn, bootName, bootCode)
 		StubbyConfig.boots[ownerIndex][bootIndex] = bootCode
 	end
 end
+
 function unregisterBootCode(ownerAddOn, bootName)
 	local ownerIndex = string.lower(ownerAddOn)
 	local bootIndex = string.lower(bootName)
@@ -402,6 +407,7 @@ function createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 		'Stubby.RegisterAddOnHook("'..triggerAddOn..'", "'..ownerAddOn..'", hookFunction)'
 	);
 end
+
 function createFunctionLoadBootCode(ownerAddOn, triggerFunction)
 	registerBootCode(ownerAddOn, triggerFunction.."FunctionLoader",
 		'local function hookFunction() '..
@@ -411,6 +417,7 @@ function createFunctionLoadBootCode(ownerAddOn, triggerFunction)
 		'Stubby.RegisterFunctionHook("'..triggerFunction..'", 200, "'..ownerAddOn..'", hookFunction)'
 	);
 end
+
 function createEventLoadBootCode(ownerAddOn, triggerEvent)
 	registerBootCode(ownerAddOn, triggerEvent.."FunctionLoader",
 		'local function hookFunction() '..
@@ -445,15 +452,69 @@ function checkAddOns()
 		end
 	end
 end
+
+-- Cleans up boot codes for removed addons and prompts for deletion of their
+-- configurations.
+function cleanUpAddOnData()
+	if (not StubbyConfig.boots) then return; end
+	
+	for b in pairs(StubbyConfig.boots) do
+		local _,title = GetAddOnInfo(b)
+		if (not title) then
+			StubbyConfig.boots[b] = nil
+			
+			if (StubbyConfig.configs) then
+				if (cleanList == nil) then cleanList = {}; end
+				table.insert(cleanList, b)
+			end
+		end
+	end
+	
+	if (cleanList) then	cleanUpAddOnConfigs(); end
+end
+
+-- Shows confirmation dialogs to clean configuration for addons that have
+-- just been removed. Warning: Calls itself recursively until done.
+function cleanUpAddOnConfigs()
+	if (not cleanList) then return; end
+
+	local addonIndex = table.getn(cleanList)
+	local addonName = cleanList[addonIndex]
+
+	if (addonIndex == 1) then
+		cleanList = nil
+	else
+		table.remove(cleanList, addonIndex)
+	end
+	
+	StaticPopupDialogs["CLEANUP_STUBBY" .. addonIndex] = {
+		text = "The AddOn \"" .. addonName .. "\" is no longer available. Do you wish to delete it's loading preferences?",
+		button1 = "Delete",
+		button2 = "Keep",
+		OnAccept = function()
+			StubbyConfig.configs[addonName] = nil
+			cleanUpAddOnConfigs();
+		end,
+		OnCancel = function()
+			cleanUpAddOnConfigs();
+		end,
+		timeout = 0,
+		whileDead = 1,
+	};
+	StaticPopup_Show("CLEANUP_STUBBY" .. addonIndex, "","");
+end
+
 function shouldInspectAddOn(addonName)
 	if not StubbyConfig.inspected[addonName] then return true end
 	return false
 end
+
 function inspectAddOn(addonName, title, info)
 	LoadAddOn(addonName)
 	StubbyConfig.inspected[addonName] = true
 	StubbyConfig.addinfo[addonName] = title.."|"..info
 end
+
 function searchForNewAddOns()
 	local addonCount = GetNumAddOns()
 	local name, title, notes, enabled, loadable, reason, security, requiresLoad
@@ -499,6 +560,9 @@ function onWorldStart()
 
 	-- The search for new life and new civilizations... or just addons maybe.
 	searchForNewAddOns()
+	
+	-- Delete data for removed addons
+	cleanUpAddOnData()
 end
 
 function onLoaded()
