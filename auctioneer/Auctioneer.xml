@@ -52,7 +52,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Button>
 		</Frames>
 	</Frame>
-	<Frame name="AuctionInfo">
+	<Frame name="AuctionInfo" hidden="true">
 		<Size>
 			<AbsDimension x="160" y="80"/>
 		</Size>
@@ -172,6 +172,46 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Frame>
 		</Frames>
 	</Frame>
+	<Frame name="AuctPriceRemember" hidden="true">
+		<Size>
+			<AbsDimension x="160" y="80"/>
+		</Size>
+		<Layers>
+			<Layer level="INFO">
+				<FontString name="$parentText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="18" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+	<CheckButton name="AuctPriceRememberCheck" hidden="true">
+		<Size>
+			<AbsDimension x="20" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="AuctPriceRemember" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+		<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+		<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+		<Scripts>
+			<OnClick>
+				Auctioneer_RememberPrice()
+			</OnClick>
+		</Scripts>
+	</CheckButton>
 	<CheckButton name="AuctFilterTemplate" hidden="true" virtual="true">
 		<Size>
 			<AbsDimension x="16" y="16"/>

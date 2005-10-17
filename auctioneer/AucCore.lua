@@ -403,6 +403,7 @@ local function hookAuctionHouse()
 	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
 	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
 
+	Stubby.RegisterFunctionHook("StartAuction", 200, Auctioneer_StartAuction)
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
 
@@ -415,8 +416,12 @@ local function hookAuctionHouse()
 			if (CursorHasItem() and Auctioneer_GetFilter(_AUCT['CmdAuctionClick'])) then
 				ClickAuctionSellItemButton()
 				AuctionsFrameAuctions_ValidateAuction()
-				if (CursorHasItem()) then
-					PutItemInBackpack()
+				local start = MoneyInputFrame_GetCopper(StartPrice)
+				local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
+				local duration = AuctionFrameAuctions.duration
+				if (AuctionsCreateAuctionButton:IsEnabled()) then
+					StartAuction(start, buy, duration);
+					Auctioneer_ChatPrint(string.format(_AUCT['FrmtAutostart'], EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
 				end
 			end
 		else

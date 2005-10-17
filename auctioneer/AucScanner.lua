@@ -290,6 +290,18 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 	Auctioneer_SaveSnapshot(auctKey, itemCat, lAuctionSignature, snap);
 end
 
+-- hook into the auction starting process
+function Auctioneer_StartAuction(funcArgs, retVal, start, buy, duration)
+	if (AuctPriceRememberCheck:GetChecked()) then
+		if (not AuctionConfig.fixedprice) then AuctionConfig.fixedprice = {} end
+		local count = Auctioneer_CurAuctionCount
+		AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = string.format("%d:%d:%d", math.ceil(start/count), math.ceil(buy/count), duration)
+	end
+	Auctioneer_CurAuctionItem = nil
+	Auctioneer_CurAuctionCount = nil
+	AuctPriceRememberCheck:SetChecked(false)
+end
+
 -- hook to capture data about an auction that was boughtout
 function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	-- get the info for this auction
@@ -333,21 +345,22 @@ function Auctioneer_ConfigureAH()
 	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
 		EnhTooltip.DebugPrint("Configuring AuctionUI");
 		AuctionsPriceText:ClearAllPoints();
-		AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -56);
+		AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -53);
 		AuctionsBuyoutText:ClearAllPoints();
-		AuctionsBuyoutText:SetPoint("TOPLEFT", "AuctionsPriceText", "TOPLEFT", 0, -36);
+		AuctionsBuyoutText:SetPoint("TOPLEFT", "AuctionsPriceText", "TOPLEFT", 0, -33);
 		AuctionsBuyoutErrorText:ClearAllPoints();
-		AuctionsBuyoutErrorText:SetPoint("TOPLEFT", "AuctionsBuyoutText", "TOPLEFT", 0, -32);
+		AuctionsBuyoutErrorText:SetPoint("TOPLEFT", "AuctionsBuyoutText", "TOPLEFT", 0, -29);
 		AuctionsDurationText:ClearAllPoints();
-		AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -10);
+		AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -7);
 		AuctionsDepositText:ClearAllPoints();
-		AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -34);
+		AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -31);
 		if (AuctionInfo ~= nil) then
 			AuctionInfo:ClearAllPoints();
-			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36);
+			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -33);
 		end
 
 		AuctionsShortAuctionButtonText:SetText("2");
+		AuctionsMediumAuctionButton:SetPoint("TOPLEFT", "AuctionsDurationText", "BOTTOMLEFT", 3, 1);
 		AuctionsMediumAuctionButtonText:SetText("8");
 		AuctionsMediumAuctionButton:ClearAllPoints();
 		AuctionsMediumAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsShortAuctionButton", "BOTTOMRIGHT", 20,0);
@@ -373,9 +386,37 @@ function Auctioneer_ConfigureAH()
 
 		if (AuctionInfo) then
 			AuctionInfo:SetParent("AuctionFrameAuctions")
-			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -36)
+			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -51)
 			AuctionInfo:Show()
+
+			AuctPriceRemember:SetParent("AuctionFrameAuctions")
+			AuctPriceRemember:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -6)
+			AuctPriceRemember:Show()
+			AuctPriceRememberText:SetText(_AUCT['GuiRememberText'])
+			AuctPriceRememberCheck:SetParent("AuctionFrameAuctions")
+			AuctPriceRememberCheck:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -2)
+			AuctPriceRememberCheck:Show()
 		end
+	end
+end
+
+function Auctioneer_RememberPrice()
+	if (not Auctioneer_CurAuctionItem) then
+		AuctPriceRememberCheck:SetChecked(false)
+		return
+	end
+
+	if (not AuctPriceRememberCheck:GetChecked()) then
+		if (AuctionConfig.fixedprice) then
+			AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = nil
+		end
+	else
+		if (not AuctionConfig.fixedprice) then AuctionConfig.fixedprice = {} end
+		local count = Auctioneer_CurAuctionCount
+		local start = MoneyInputFrame_GetCopper(StartPrice)
+		local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
+		local dur = AuctionFrameAuctions.duration
+		AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = string.format("%d:%d:%d", math.ceil(start/count), math.ceil(buy/count), dur)
 	end
 end
 
@@ -414,6 +455,10 @@ end
 
 function Auctioneer_NewAuction()
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
+	local countFix = count
+	if countFix == 0 then
+		countFix = 1
+	end
 
 	if (not name) then
 		Auctioneer_Auctions_Clear()
@@ -440,8 +485,16 @@ function Auctioneer_NewAuction()
 
 	local startPrice, buyoutPrice, x;
 	local itemKey = id..":"..rprop..":"..enchant;
+	Auctioneer_CurAuctionItem = itemKey;
+	Auctioneer_CurAuctionCount = countFix;
 	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey);
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
+
+	if (AuctionConfig.fixedprice and AuctionConfig.fixedprice[itemKey]) then
+		AuctPriceRememberCheck:SetChecked(true)
+	else
+		AuctPriceRememberCheck:SetChecked(false)
+	end
 
 	-- Find the current lowest buyout for 1 of these in the current snapshot
 	local currentLowestBuyout = Auctioneer_FindLowestAuctions(itemKey);
@@ -468,14 +521,27 @@ function Auctioneer_NewAuction()
 		hsp = math.ceil(buyPrice / buyCount); -- use mean buyout if median not available
 	end
 	local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
-	local countFix = count
-	if countFix == 0 then
-		countFix = 1
-	end
 	local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
 	local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 
-	if (Auctioneer_GetFilter(_AUCT['CmdAutofill'])) then
+	if (AuctionConfig.fixedprice and AuctionConfig.fixedprice[itemKey]) then
+		local i,j, start,buy,dur = string.find(AuctionConfig.fixedprice[itemKey], "(%d+):(%d+):(%d+)");
+		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoSugbid'], bidPrice);
+		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoSugbuy'], buyPrice);
+		Auctioneer_Auctions_SetWarn(_AUCT['FrmtWarnUser']);
+		MoneyInputFrame_SetCopper(StartPrice, start*countFix);
+		MoneyInputFrame_SetCopper(BuyoutPrice, buy*countFix);
+		if (dur == 1440) then
+			AuctionFrameAuctions.duration = dur;
+			AuctionsLongAuctionButton:SetChecked(1);
+		elseif (dur == 480) then
+			AuctionFrameAuctions.duration = dur;
+			AuctionsMediumAuctionButton:SetChecked(1);
+		elseif (dur == 120) then
+			AuctionFrameAuctions.duration = dur;
+			AuctionsShortAuctionButton:SetChecked(1);
+		end
+	elseif (Auctioneer_GetFilter(_AUCT['CmdAutofill'])) then
 		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoMktprice'], nullSafe(mktPrice)*countFix);
 		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoOrig'], blizPrice);
 		Auctioneer_Auctions_SetWarn(warn);

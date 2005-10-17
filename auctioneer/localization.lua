@@ -154,6 +154,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtWarnToolow'] = "Cannot match lowest price";
 	_AUCT['FrmtWarnMyprice'] = "Using my current price";
 	_AUCT['FrmtWarnNodata'] = "No data for HSP";
+	_AUCT['FrmtWarnUser'] = "Using user pricing";
 	
 	_AUCT['CmdOff'] = "off";
 	_AUCT['CmdOn'] = "on";
@@ -170,7 +171,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdLocale'] = "locale";
 	_AUCT['CmdDefault'] = "default";
 	_AUCT['CmdPrintin'] = "print-in";
-	
+	_AUCT['CmdAuctionClick'] = "auction-click";
 	_AUCT['CmdBroker'] = "broker";
 	_AUCT['CmdBidbroker'] = "bidbroker";
 	_AUCT['CmdBidbrokerShort'] = "bb";
@@ -252,6 +253,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 	_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
+	_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
 	
 	_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 	
@@ -270,6 +272,8 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
 	_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
 	_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
+	_AUCT['FrmtAutostart'] = "Automatically starting auction for %s minimum, %s buyout (%dh)"
+	
 	
 	_AUCT['TextScan'] = "Scan";
 	_AUCT['TextAuction'] = "auction";
@@ -299,6 +303,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
 	
 	
+	_AUCT['GuiRememberText'] = "Remember price";
 	
 	_AUCT['GuiMainHelp'] = "Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
 	_AUCT['GuiMainEnable'] = "Enable Auctioneer";
@@ -353,6 +358,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
+
 -- Locale strings for the deDE locale
 if locale == "deDE" then
 		-- Encoded in UTF8
