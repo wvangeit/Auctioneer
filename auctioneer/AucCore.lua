@@ -415,6 +415,9 @@ local function hookAuctionHouse()
 			if (CursorHasItem() and Auctioneer_GetFilter(_AUCT['CmdAuctionClick'])) then
 				ClickAuctionSellItemButton()
 				AuctionsFrameAuctions_ValidateAuction()
+				if (CursorHasItem()) then
+					PutItemInBackpack()
+				end
 			end
 		else
 			Auctioneer_Orig_PickupContainerItem(bag, item)
