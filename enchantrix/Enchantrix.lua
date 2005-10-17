@@ -299,6 +299,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 			Enchantrix_Disenchants[arg2] = receivedItem;
 			Enchantrix_Disenchants.exists = true;
 		end
+		return;
 	end
 	if ((event == "BAG_UPDATE") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
 		
@@ -819,7 +820,7 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 
 		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix_GetFilterVal("all").."]|r - " .. ENCH_HELP_ONOFF);
 		
-		Auctioneer_ChatPrint("  |cffffffff/enchantrix "..ENCH_CMD_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
+		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..ENCH_CMD_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
 
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_HEADER, Enchantrix_GetFilterVal(ENCH_SHOW_HEADER), ENCH_HELP_HEADER));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_COUNT, Enchantrix_GetFilterVal(ENCH_SHOW_COUNT), ENCH_HELP_COUNT));

@@ -470,7 +470,7 @@ function cleanUpAddOnData()
 		end
 	end
 	
-	if (cleanList) then	cleanUpAddOnConfigs(); end
+	if (cleanList) then cleanUpAddOnConfigs(); end
 end
 
 -- Shows confirmation dialogs to clean configuration for addons that have
