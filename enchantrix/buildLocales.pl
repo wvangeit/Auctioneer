@@ -89,4 +89,4 @@ for $locale (@locales) {
 	print OUT "\n\tend\n\n";
 }
 
-print OUT "end\n\nEnchantrix_SetLocaleStrings(GetLocale);\n\n";
+print OUT "end\n\nEnchantrix_SetLocaleStrings(GetLocale());\n\n";

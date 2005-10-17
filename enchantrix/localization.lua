@@ -589,5 +589,5 @@ function Enchantrix_SetLocaleStrings(locale)
 
 end
 
-Enchantrix_SetLocaleStrings(GetLocale);
+Enchantrix_SetLocaleStrings(GetLocale());
 
