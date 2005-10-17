@@ -760,6 +760,7 @@ function Auctioneer_Command(command, source)
 	elseif (
 		((cmd == _AUCT['CmdEmbed']) or (cmd == "embed")) or
 		((cmd == _AUCT['CmdAutofill']) or (cmd == "autofill")) or
+		((cmd == _AUCT['CmdAuctionClick']) or (cmd == "auction-click")) or
 		((cmd == _AUCT['ShowVerbose']) or (cmd == "show-verbose")) or
 		((cmd == _AUCT['ShowAverage']) or (cmd == "show-average")) or
 		((cmd == _AUCT['ShowLink']) or (cmd == "show-link")) or
@@ -809,6 +810,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdEmbed'], Auctioneer_GetFilterVal(_AUCT['CmdEmbed']), _AUCT['HelpEmbed']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowEmbedBlank'], Auctioneer_GetFilterVal(_AUCT['ShowEmbedBlank']), _AUCT['HelpEmbedBlank']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['ShowRedo'], Auctioneer_GetFilterVal(_AUCT['ShowRedo']), _AUCT['HelpRedo']));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdAuctionClick'], Auctioneer_GetFilterVal(_AUCT['CmdAuctionClick']), _AUCT['HelpAuctionClick']));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdLocale'], _AUCT['OptLocale'], Auctioneer_GetFilterVal('locale'), _AUCT['HelpLocale']));

@@ -405,6 +405,22 @@ local function hookAuctionHouse()
 
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
+
+	Auctioneer_Orig_PickupContainerItem = PickupContainerItem
+	PickupContainerItem = function(...)
+		local bag = arg[1]
+		local item = arg[2]
+		if (not CursorHasItem() and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
+			Auctioneer_Orig_PickupContainerItem(bag, item)
+			if (CursorHasItem() and Auctioneer_GetFilter(_AUCT['CmdAuctionClick'])) then
+				ClickAuctionSellItemButton()
+				AuctionsFrameAuctions_ValidateAuction()
+			end
+		else
+			Auctioneer_Orig_PickupContainerItem(bag, item)
+		end
+	end
+		
 end
 
 function Auctioneer_LockAndLoad()

@@ -127,7 +127,7 @@ _AUCT['CmdAlsoOpposite'] = "opposite";
 _AUCT['CmdLocale'] = "locale";
 _AUCT['CmdDefault'] = "default";
 _AUCT['CmdPrintin'] = "print-in";
-
+_AUCT['CmdAuctionClick'] = "auction-click";
 _AUCT['CmdBroker'] = "broker";
 _AUCT['CmdBidbroker'] = "bidbroker";
 _AUCT['CmdBidbrokerShort'] = "bb";
@@ -209,6 +209,7 @@ _AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to bea
 _AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
 _AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 _AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
+_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item to place it in the new auctions window"; 
 
 _AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 
