@@ -329,7 +329,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		if (itemInfo.vendors) then
 			local merchantCount = table.getn(itemInfo.vendors)
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embed)
+				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
 			end
 		end
