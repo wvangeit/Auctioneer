@@ -14,6 +14,7 @@ local lScanStartedAt;
 -- function hooks
 local lOriginal_CanSendAuctionQuery;
 local lOriginal_AuctionFrameBrowse_OnEvent;
+local lOriginal_AuctionFrameBrowse_Update;
 
 -- TODO: If all categories are selected, then we should do a complete scan rather than a one-by-one scan.
 
@@ -43,9 +44,34 @@ function Auctioneer_StopAuctionScan()
 		lOriginal_AuctionFrameBrowse_OnEvent = nil;
 	end
 	
+	if( lOriginal_AuctionFrameBrowse_Update ) then
+		AuctionFrameBrowse_Update = lOriginal_AuctionFrameBrowse_Update;
+		lOriginal_AuctionFrameBrowse_Update = nil;
+	end
+	
 	Auctioneer_isScanningRequested = false;
 	lScanInProgress = false;
 	lCurrentCategoryIndex = 0;
+end
+
+local function Auctioneer_AuctionSubmitQuery()
+	if not lCurrentAuctionPage or lCurrentAuctionPage == 0 then
+		lPageStartedAt = time();
+		if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
+		if lFullScan then
+			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], _AUCT['TextAuction']));
+		else
+			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], lMajorAuctionCategories[lCurrentCategoryIndex]));
+		end
+	end
+	if (lFullScan) then
+		QueryAuctionItems("", "", "", nil, nil, nil, lCurrentAuctionPage, nil, nil);
+	else
+		QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
+	end
+
+	lIsPageScanned = false;
+	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
 end
 
 local lPageStartedAt;
@@ -86,23 +112,7 @@ local function Auctioneer_AuctionNextQuery()
 			return;
 		end
 	end
-	if not lCurrentAuctionPage or lCurrentAuctionPage == 0 then
-		lPageStartedAt = time();
-		if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
-		if lFullScan then
-			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], _AUCT['TextAuction']));
-		else
-			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], lMajorAuctionCategories[lCurrentCategoryIndex]));
-		end
-	end
-	if (lFullScan) then
-		QueryAuctionItems("", "", "", nil, nil, nil, lCurrentAuctionPage, nil, nil);
-	else
-		QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
-	end
-
-	lIsPageScanned = false;
-	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
+	Auctioneer_AuctionSubmitQuery();
 end
 
 local lCheckPage = nil;
@@ -144,20 +154,28 @@ local function Auctioneer_CanSendAuctionQuery()
 		Auctioneer_AuctionNextQuery();
 		return nil;
 	end
-	local pageElapsed = time() - lPageStartedAt;
-	if (pageElapsed > 60) then
-		if (Auctioneer_GetFilter(_AUCT['ShowRedo'])) then
-			Auctioneer_ChatPrint(string.format(_AUCT['AuctionScanRedo'], 60));
+	if (lPageStartedAt) then
+		local pageElapsed = time() - lPageStartedAt;
+		if (pageElapsed > 20) then
+			if (Auctioneer_GetFilter(_AUCT['ShowRedo'])) then
+				Auctioneer_ChatPrint(string.format(_AUCT['AuctionScanRedo'], 20));
+			end
+			Auctioneer_AuctionSubmitQuery();
+			return nil;
 		end
-		Auctioneer_AuctionNextQuery();
-		return nil;
+		return false;
 	end
-	return false;
 end
 
 function Auctioneer_AuctionFrameBrowse_OnEvent()
 	-- Intentionally empty; don't allow the auction UI to update while we're scanning
 end
+
+function Auctioneer_AuctionFrameBrowse_Update()
+	-- Intentionally empty; don't allow the auction UI to update while we're scanning
+end
+
+
 
 function Auctioneer_StartAuctionScan()
 	lMajorAuctionCategories = {GetAuctionItemClasses()};
@@ -194,6 +212,11 @@ function Auctioneer_StartAuctionScan()
 	if( not lOriginal_AuctionFrameBrowse_OnEvent ) then
 		lOriginal_AuctionFrameBrowse_OnEvent = AuctionFrameBrowse_OnEvent;
 		AuctionFrameBrowse_OnEvent = Auctioneer_AuctionFrameBrowse_OnEvent;
+	end
+	
+	if( not lOriginal_AuctionFrameBrowse_Update ) then
+		lOriginal_AuctionFrameBrowse_Update = AuctionFrameBrowse_Update;
+		AuctionFrameBrowse_Update = Auctioneer_AuctionFrameBrowse_Update;
 	end
 	
 	Auctioneer_Event_StartAuctionScan();
