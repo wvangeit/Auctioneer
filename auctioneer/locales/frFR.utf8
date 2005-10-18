@@ -1,19 +1,4 @@
 ﻿-- Encoded in UTF8
-_AUCT['AdditBuff']        = "Buff";
-_AUCT['AdditDrink']       = "Boisson";
-_AUCT['AdditFood']        = "Nourriture";
-_AUCT['AdditPoison']      = "Poison";
-_AUCT['AdditPotion']      = "Potion";
-
-_AUCT['SkillAlchemy']        = "Alchimie";
-_AUCT['SkillBlacksmithing']  = "Forgeron";
-_AUCT['SkillCooking']        = "Cuisine";
-_AUCT['SkillEnchanting']     = "Enchantement";
-_AUCT['SkillEngineering']    = "Ingénieur";
-_AUCT['SkillFirstaid']       = "Premiers Soins";
-_AUCT['SkillLeatherworking'] = "Travail du Cuir";
-_AUCT['SkillMining']         = "Minage";
-_AUCT['SkillTailoring']      = "Tailleur";
 
 _AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Immédiat'";
 _AUCT['FrmtBrokerLine'] = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
@@ -41,14 +26,6 @@ _AUCT['FrmtInfoSnapmed'] = "Vu %d fois au dernier scan, achat moyen:";
 _AUCT['FrmtInfoBidrate'] = "%d%% avec enchère, %d%% avec achat immédiat";
 _AUCT['FrmtInfoNever'] = "Jamais vu aux enchères";
 _AUCT['FrmtInfoAlsoseen'] = "Vu %d fois aux %s";
-_AUCT['FrmtInfoClassuse'] = "Classe: %s utilisé pour %s";
-_AUCT['FrmtInfoClass'] = "Classe: %s";
-_AUCT['FrmtInfoUse'] = "Utilisé pour: %s";
-_AUCT['FrmtInfoBuy'] = "Achat%s au marchand";
-_AUCT['FrmtInfoSell'] = "Vente%s au marchand";
-_AUCT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
-_AUCT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
-_AUCT['FrmtInfoStx'] = "Pile par lots de %d";
 
 -- AH Scanning localizations
 _AUCT['AuctionScanStart'] = "Auctioneer: Scan de la catégorie '%s': page 1...";

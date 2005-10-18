@@ -43,35 +43,6 @@ function Auctioneer_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
 	
 	
-	_AUCT['AdditAlcohol'] = "Alcohol";
-	_AUCT['AdditBuff'] = "Buff";
-	_AUCT['AdditDrink'] = "Drink";
-	_AUCT['AdditFirework'] = "Firework";
-	_AUCT['AdditFood'] = "Food";
-	_AUCT['AdditGiftwrap'] = "Giftwrap";
-	_AUCT['AdditLure'] = "Lure";
-	_AUCT['AdditPoison'] = "Poison";
-	_AUCT['AdditPotion'] = "Potion";
-	_AUCT['AdditRestorative'] = "Restorative";
-	_AUCT['AdditScroll'] = "Scroll";
-	
-	_AUCT['SkillAlchemy'] = "Alchemy";
-	_AUCT['SkillBlacksmithing'] = "Smithing";
-	_AUCT['SkillCooking'] = "Cooking";
-	_AUCT['SkillEnchanting'] = "Enchanting";
-	_AUCT['SkillEngineering'] = "Engineering";
-	_AUCT['SkillFirstaid'] = "First Aid";
-	_AUCT['SkillLeatherworking'] = "Leatherworking";
-	_AUCT['SkillMining'] = "Mining";
-	_AUCT['SkillTailoring'] = "Tailoring";
-	_AUCT['SkillDruid'] = "Druid spells";
-	_AUCT['SkillMage'] = "Mage spells";
-	_AUCT['SkillPaladin'] = "Paladin spells";
-	_AUCT['SkillPriest'] = "Priest spells";
-	_AUCT['SkillRogue'] = "Rogue skills";
-	_AUCT['SkillShaman'] = "Shaman spells";
-	_AUCT['SkillWarlock'] = "Warlock spells";
-	
 	_AUCT['TimeShort'] = "Short";
 	_AUCT['TimeMed'] = "Medium";
 	_AUCT['TimeLong'] = "Long";
@@ -109,14 +80,6 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtInfoBidrate'] = "%d%% have bid, %d%% have BO";
 	_AUCT['FrmtInfoNever'] = "Never seen at %s";
 	_AUCT['FrmtInfoAlsoseen'] = "Seen %d times at %s";
-	_AUCT['FrmtInfoClassuse'] = "Class: %s used for %s";
-	_AUCT['FrmtInfoClass'] = "Class: %s";
-	_AUCT['FrmtInfoUse'] = "Used for: %s";
-	_AUCT['FrmtInfoBuy'] = "Buy from vendor";
-	_AUCT['FrmtInfoSell'] = "Sell to vendor";
-	_AUCT['FrmtInfoBuymult'] = "Buy %d (%s each)";
-	_AUCT['FrmtInfoSellmult'] = "Sell %d (%s each)";
-	_AUCT['FrmtInfoStx'] = "Stacks in lots of %d";
 	
 	_AUCT['FrmtInfoHeadMulti'] = "Averages for %d items:";
 	_AUCT['FrmtInfoMinMulti'] = "  Starting bid (%s ea)";
@@ -363,35 +326,6 @@ function Auctioneer_SetLocaleStrings(locale)
 if locale == "deDE" then
 		-- Encoded in UTF8
 		
-		_AUCT['AdditAlcohol']     = "Alkohol";
-		_AUCT['AdditBuff']        = "Buff";
-		_AUCT['AdditDrink']       = "Getr\195\164nk";
-		_AUCT['AdditFirework']    = "Feuerwerk";
-		_AUCT['AdditFood']        = "Nahrung";
-		_AUCT['AdditGiftwrap']    = "Geschenkpapier";
-		_AUCT['AdditLure']        = "K\195\182der";
-		_AUCT['AdditPoison']      = "Gift";
-		_AUCT['AdditPotion']      = "Trank";
-		_AUCT['AdditRestorative'] = "St\195\164rkungstrank";
-		_AUCT['AdditScroll']      = "Zauberspruchrolle";
-		
-		_AUCT['SkillAlchemy']        = "Alchimie";
-		_AUCT['SkillBlacksmithing']  = "Schmieden";
-		_AUCT['SkillCooking']        = "Kochen";
-		_AUCT['SkillEnchanting']     = "Verzauberungen";
-		_AUCT['SkillEngineering']    = "Ingenieurskunst";
-		_AUCT['SkillFirstaid']       = "Erste Hilfe";
-		_AUCT['SkillLeatherworking'] = "Lederverarbeitung";
-		_AUCT['SkillMining']         = "Bergbau";
-		_AUCT['SkillTailoring']      = "Schneiderei";
-		_AUCT['SkillDruid']          = "Druidenzauber";
-		_AUCT['SkillMage']           = "Magierzauber";
-		_AUCT['SkillPaladin']        = "Paladinzauber";
-		_AUCT['SkillPriest']         = "Priesterzauber";
-		_AUCT['SkillRogue']          = "Diebeszubeh\195\182r";
-		_AUCT['SkillShaman']         = "Schamanenzauber";
-		_AUCT['SkillWarlock']        = "Hexerzauber";
-		
 		_AUCT['TimeShort'] = "Kurz";
 		_AUCT['TimeMed']   = "Mittel";
 		_AUCT['TimeLong']  = "Lang";
@@ -429,14 +363,6 @@ if locale == "deDE" then
 		_AUCT['FrmtInfoBidrate']  = "%d%% haben Gebote, %d%% haben Sofortkauf";
 		_AUCT['FrmtInfoNever']    = "Noch in keiner %s gesehen";
 		_AUCT['FrmtInfoAlsoseen'] = "%d mal in einer %s gesehen";
-		_AUCT['FrmtInfoClassuse'] = "Klasse: %s - Benutzt f\195\188r %s";
-		_AUCT['FrmtInfoClass']    = "Klasse: %s";
-		_AUCT['FrmtInfoUse']      = "Benutzt f\195\188r: %s";
-		_AUCT['FrmtInfoBuy']      = "Einkauf beim H\195\164ndler";
-		_AUCT['FrmtInfoSell']     = "Verkauf beim H\195\164ndler";
-		_AUCT['FrmtInfoBuymult']  = "Einkauf f\195\188r %d (%s pro St\195\188ck)";
-		_AUCT['FrmtInfoSellmult'] = "Verkauf f\195\188r %d (%s pro St\195\188ck)";
-		_AUCT['FrmtInfoStx']      = "%d pro Stapel";
 		
 		_AUCT['FrmtInfoHeadMulti'] = "Durchschnitt f\195\188r %d St\195\188ck:";
 		_AUCT['FrmtInfoMinMulti']  = "  Min. Startgebot (%s pro St\195\188ck)";
@@ -618,11 +544,6 @@ if locale == "deDE" then
 		_AUCT['GuiAverages']         = "Zeige den Durchschnitt an.";
 		_AUCT['GuiMedian']           = "Zeige den Median an.";
 		_AUCT['GuiSuggest']          = "Zeige empfohlene Preise an.";
-		_AUCT['GuiVendorHeader']     = "Zeige H\195\164ndlerpreise an.";
-		_AUCT['GuiVendorHelp']       = "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreise von NPCs.";
-		_AUCT['GuiVendor']           = "Zeige H\195\164ndlerpreise an.";
-		_AUCT['GuiVendorBuy']        = "Zeige H\195\164ndler-Einkaufspreise an";
-		_AUCT['GuiVendorSell']       = "Zeige H\195\164ndler-Verkaufspreise an";
 		_AUCT['GuiEmbedHeader']      = "Integriert";
 		_AUCT['GuiEmbed']            = "Integriere Informationen in den ingame-Tooltip.";
 		_AUCT['GuiEmbedBlankline']   = "F\195\188ge leere Zeile in den ingame-Tooltip hinzu.";
@@ -661,35 +582,6 @@ end
 if locale == "esES" then
 		-- Encoded in UTF8
 		
-		_AUCT['AdditAlcohol'] = "Alcohol";
-		_AUCT['AdditBuff'] = "Mejora";
-		_AUCT['AdditDrink'] = "Bebida";
-		_AUCT['AdditFirework'] = "Fuegos Artificiales";
-		_AUCT['AdditFood'] = "Comida";
-		_AUCT['AdditGiftwrap'] = "Envoltura";
-		_AUCT['AdditLure'] = "Se\195\177uelo";
-		_AUCT['AdditPoison'] = "Veneno";
-		_AUCT['AdditPotion'] = "Poci\195\179n";
-		_AUCT['AdditRestorative'] = "Restaurativo";
-		_AUCT['AdditScroll'] = "Voluta";
-		
-		_AUCT['SkillAlchemy'] = "Alqu\195\173mia";
-		_AUCT['SkillBlacksmithing'] = "Herrer\195\173a";
-		_AUCT['SkillCooking'] = "Cocinar";
-		_AUCT['SkillEnchanting'] = "Encantar";
-		_AUCT['SkillEngineering'] = "Ingenier\195\173a";
-		_AUCT['SkillFirstaid'] = "Primeros Auxilios";
-		_AUCT['SkillLeatherworking'] = "Peleter\195\173a";
-		_AUCT['SkillMining'] = "Miner\195\173a";
-		_AUCT['SkillTailoring'] = "Sastrer\195\173a";
-		_AUCT['SkillDruid'] = "Encantos de Druidas";
-		_AUCT['SkillMage'] = "Encantos de Magos";
-		_AUCT['SkillPaladin'] = "Encantos de Paladines";
-		_AUCT['SkillPriest'] = "Encantos de Sacerdotes";
-		_AUCT['SkillRogue'] = "Encantos de P\195\173caros";
-		_AUCT['SkillShaman'] = "Encantos de Chamanes";
-		_AUCT['SkillWarlock'] = "Encantos de Brujos";
-		
 		_AUCT['TimeShort'] = "Corto";
 		_AUCT['TimeMed'] = "Mediano";
 		_AUCT['TimeLong'] = "Largo";
@@ -727,14 +619,6 @@ if locale == "esES" then
 		_AUCT['FrmtInfoBidrate'] = "%d%% tienen ofertas, %d%% tienen OC";
 		_AUCT['FrmtInfoNever'] = "Nunca visto en %s";
 		_AUCT['FrmtInfoAlsoseen'] = "Visto %d veces en %s";
-		_AUCT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
-		_AUCT['FrmtInfoClass'] = "Clase: %s";
-		_AUCT['FrmtInfoUse'] = "Usado para: %s";
-		_AUCT['FrmtInfoBuy'] = "Compra del vendedor";
-		_AUCT['FrmtInfoSell'] = "Vende al vendedor";
-		_AUCT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
-		_AUCT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
-		_AUCT['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
 		
 		_AUCT['FrmtInfoHeadMulti'] = "Promedios para %d art\195\173culos:";
 		_AUCT['FrmtInfoMinMulti'] = "  Oferta a empezar (%s c/u)";
@@ -976,21 +860,6 @@ end
 -- Locale strings for the frFR locale
 if locale == "frFR" then
 		-- Encoded in UTF8
-		_AUCT['AdditBuff']        = "Buff";
-		_AUCT['AdditDrink']       = "Boisson";
-		_AUCT['AdditFood']        = "Nourriture";
-		_AUCT['AdditPoison']      = "Poison";
-		_AUCT['AdditPotion']      = "Potion";
-		
-		_AUCT['SkillAlchemy']        = "Alchimie";
-		_AUCT['SkillBlacksmithing']  = "Forgeron";
-		_AUCT['SkillCooking']        = "Cuisine";
-		_AUCT['SkillEnchanting']     = "Enchantement";
-		_AUCT['SkillEngineering']    = "Ing\195\169nieur";
-		_AUCT['SkillFirstaid']       = "Premiers Soins";
-		_AUCT['SkillLeatherworking'] = "Travail du Cuir";
-		_AUCT['SkillMining']         = "Minage";
-		_AUCT['SkillTailoring']      = "Tailleur";
 		
 		_AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Imm\195\169diat'";
 		_AUCT['FrmtBrokerLine'] = "%s, Derniers %s vus, HSP: %s, AI: %s, Prof: %s";
@@ -1018,14 +887,6 @@ if locale == "frFR" then
 		_AUCT['FrmtInfoBidrate'] = "%d%% avec ench\195\168re, %d%% avec achat imm\195\169diat";
 		_AUCT['FrmtInfoNever'] = "Jamais vu aux ench\195\168res";
 		_AUCT['FrmtInfoAlsoseen'] = "Vu %d fois aux %s";
-		_AUCT['FrmtInfoClassuse'] = "Classe: %s utilis\195\169 pour %s";
-		_AUCT['FrmtInfoClass'] = "Classe: %s";
-		_AUCT['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
-		_AUCT['FrmtInfoBuy'] = "Achat%s au marchand";
-		_AUCT['FrmtInfoSell'] = "Vente%s au marchand";
-		_AUCT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
-		_AUCT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
-		_AUCT['FrmtInfoStx'] = "Pile par lots de %d";
 		
 		-- AH Scanning localizations
 		_AUCT['AuctionScanStart'] = "Auctioneer: Scan de la cat\195\169gorie '%s': page 1...";

@@ -1,34 +1,5 @@
 ﻿-- Encoded in UTF8
 
-_AUCT['AdditAlcohol']     = "Alkohol";
-_AUCT['AdditBuff']        = "Buff";
-_AUCT['AdditDrink']       = "Getränk";
-_AUCT['AdditFirework']    = "Feuerwerk";
-_AUCT['AdditFood']        = "Nahrung";
-_AUCT['AdditGiftwrap']    = "Geschenkpapier";
-_AUCT['AdditLure']        = "Köder";
-_AUCT['AdditPoison']      = "Gift";
-_AUCT['AdditPotion']      = "Trank";
-_AUCT['AdditRestorative'] = "Stärkungstrank";
-_AUCT['AdditScroll']      = "Zauberspruchrolle";
-
-_AUCT['SkillAlchemy']        = "Alchimie";
-_AUCT['SkillBlacksmithing']  = "Schmieden";
-_AUCT['SkillCooking']        = "Kochen";
-_AUCT['SkillEnchanting']     = "Verzauberungen";
-_AUCT['SkillEngineering']    = "Ingenieurskunst";
-_AUCT['SkillFirstaid']       = "Erste Hilfe";
-_AUCT['SkillLeatherworking'] = "Lederverarbeitung";
-_AUCT['SkillMining']         = "Bergbau";
-_AUCT['SkillTailoring']      = "Schneiderei";
-_AUCT['SkillDruid']          = "Druidenzauber";
-_AUCT['SkillMage']           = "Magierzauber";
-_AUCT['SkillPaladin']        = "Paladinzauber";
-_AUCT['SkillPriest']         = "Priesterzauber";
-_AUCT['SkillRogue']          = "Diebeszubehör";
-_AUCT['SkillShaman']         = "Schamanenzauber";
-_AUCT['SkillWarlock']        = "Hexerzauber";
-
 _AUCT['TimeShort'] = "Kurz";
 _AUCT['TimeMed']   = "Mittel";
 _AUCT['TimeLong']  = "Lang";
@@ -66,14 +37,6 @@ _AUCT['FrmtInfoSgst']        = "Empfohlener Preis: %s min/%s Sofortkauf";
 _AUCT['FrmtInfoBidrate']  = "%d%% haben Gebote, %d%% haben Sofortkauf";
 _AUCT['FrmtInfoNever']    = "Noch in keiner %s gesehen";
 _AUCT['FrmtInfoAlsoseen'] = "%d mal in einer %s gesehen";
-_AUCT['FrmtInfoClassuse'] = "Klasse: %s - Benutzt für %s";
-_AUCT['FrmtInfoClass']    = "Klasse: %s";
-_AUCT['FrmtInfoUse']      = "Benutzt für: %s";
-_AUCT['FrmtInfoBuy']      = "Einkauf beim Händler";
-_AUCT['FrmtInfoSell']     = "Verkauf beim Händler";
-_AUCT['FrmtInfoBuymult']  = "Einkauf für %d (%s pro Stück)";
-_AUCT['FrmtInfoSellmult'] = "Verkauf für %d (%s pro Stück)";
-_AUCT['FrmtInfoStx']      = "%d pro Stapel";
 
 _AUCT['FrmtInfoHeadMulti'] = "Durchschnitt für %d Stück:";
 _AUCT['FrmtInfoMinMulti']  = "  Min. Startgebot (%s pro Stück)";
@@ -255,11 +218,6 @@ _AUCT['GuiStatsHelp']        = "Zeigt die folgenden Statistiken im Tooltip an.";
 _AUCT['GuiAverages']         = "Zeige den Durchschnitt an.";
 _AUCT['GuiMedian']           = "Zeige den Median an.";
 _AUCT['GuiSuggest']          = "Zeige empfohlene Preise an.";
-_AUCT['GuiVendorHeader']     = "Zeige Händlerpreise an.";
-_AUCT['GuiVendorHelp']       = "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreise von NPCs.";
-_AUCT['GuiVendor']           = "Zeige Händlerpreise an.";
-_AUCT['GuiVendorBuy']        = "Zeige Händler-Einkaufspreise an";
-_AUCT['GuiVendorSell']       = "Zeige Händler-Verkaufspreise an";
 _AUCT['GuiEmbedHeader']      = "Integriert";
 _AUCT['GuiEmbed']            = "Integriere Informationen in den ingame-Tooltip.";
 _AUCT['GuiEmbedBlankline']   = "Füge leere Zeile in den ingame-Tooltip hinzu.";

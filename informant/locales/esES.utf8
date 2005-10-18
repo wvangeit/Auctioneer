@@ -33,8 +33,6 @@ _INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 _INFORMANT['FrmtWelcome'] = "Informant versión %s cargado";
 
 
-
-_INFORMANT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
 _INFORMANT['FrmtInfoClass'] = "Clase: %s";
 _INFORMANT['FrmtInfoUse'] = "Usado para: %s";
 _INFORMANT['FrmtInfoBuy'] = "Compra del vendedor";
@@ -42,17 +40,6 @@ _INFORMANT['FrmtInfoSell'] = "Vende al vendedor";
 _INFORMANT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
 _INFORMANT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
 _INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de artículos %d por paquete";
-
-_INFORMANT['FrmtInfoBuyMulti'] = "  Opción a compra(%s%s c/u)";
-
-_INFORMANT['FrmtInfoBuyOne'] = " %s con opción a compra";
-
-_INFORMANT['FrmtInfoBuymedian'] = "  Opción a compra mediano";
-
-
-
-
-
 
 _INFORMANT['CmdOff'] = "apagado";
 _INFORMANT['CmdOn'] = "prendido";

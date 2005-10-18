@@ -1,34 +1,5 @@
 ﻿-- Encoded in UTF8
 
-_AUCT['AdditAlcohol'] = "Alcohol";
-_AUCT['AdditBuff'] = "Mejora";
-_AUCT['AdditDrink'] = "Bebida";
-_AUCT['AdditFirework'] = "Fuegos Artificiales";
-_AUCT['AdditFood'] = "Comida";
-_AUCT['AdditGiftwrap'] = "Envoltura";
-_AUCT['AdditLure'] = "Señuelo";
-_AUCT['AdditPoison'] = "Veneno";
-_AUCT['AdditPotion'] = "Poción";
-_AUCT['AdditRestorative'] = "Restaurativo";
-_AUCT['AdditScroll'] = "Voluta";
-
-_AUCT['SkillAlchemy'] = "Alquímia";
-_AUCT['SkillBlacksmithing'] = "Herrería";
-_AUCT['SkillCooking'] = "Cocinar";
-_AUCT['SkillEnchanting'] = "Encantar";
-_AUCT['SkillEngineering'] = "Ingeniería";
-_AUCT['SkillFirstaid'] = "Primeros Auxilios";
-_AUCT['SkillLeatherworking'] = "Peletería";
-_AUCT['SkillMining'] = "Minería";
-_AUCT['SkillTailoring'] = "Sastrería";
-_AUCT['SkillDruid'] = "Encantos de Druidas";
-_AUCT['SkillMage'] = "Encantos de Magos";
-_AUCT['SkillPaladin'] = "Encantos de Paladines";
-_AUCT['SkillPriest'] = "Encantos de Sacerdotes";
-_AUCT['SkillRogue'] = "Encantos de Pícaros";
-_AUCT['SkillShaman'] = "Encantos de Chamanes";
-_AUCT['SkillWarlock'] = "Encantos de Brujos";
-
 _AUCT['TimeShort'] = "Corto";
 _AUCT['TimeMed'] = "Mediano";
 _AUCT['TimeLong'] = "Largo";
@@ -66,14 +37,6 @@ _AUCT['FrmtInfoSgst'] = "Precio sugerido: %s min/%s OC";
 _AUCT['FrmtInfoBidrate'] = "%d%% tienen ofertas, %d%% tienen OC";
 _AUCT['FrmtInfoNever'] = "Nunca visto en %s";
 _AUCT['FrmtInfoAlsoseen'] = "Visto %d veces en %s";
-_AUCT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
-_AUCT['FrmtInfoClass'] = "Clase: %s";
-_AUCT['FrmtInfoUse'] = "Usado para: %s";
-_AUCT['FrmtInfoBuy'] = "Compra del vendedor";
-_AUCT['FrmtInfoSell'] = "Vende al vendedor";
-_AUCT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
-_AUCT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
-_AUCT['FrmtInfoStx'] = "Amontonable en lotes de artículos %d por paquete";
 
 _AUCT['FrmtInfoHeadMulti'] = "Promedios para %d artículos:";
 _AUCT['FrmtInfoMinMulti'] = "  Oferta a empezar (%s c/u)";

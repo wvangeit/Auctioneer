@@ -72,3 +72,11 @@ _INFORMANT['FrmtActUnknown']    = "Unbekannter Befehl: '%s'";
 _INFORMANT['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zurückgesetzt.";
 _INFORMANT['FrmtActDefault']    = "%s wurde auf den Standardwert zurückgesetzt.";
 
+
+-- GUI localizations
+
+_INFORMANT['GuiVendorHeader']     = "Zeige Händlerpreise an.";
+_INFORMANT['GuiVendorHelp']       = "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreise von NPCs.";
+_INFORMANT['GuiVendor']           = "Zeige Händlerpreise an.";
+_INFORMANT['GuiVendorBuy']        = "Zeige Händler-Einkaufspreise an";
+_INFORMANT['GuiVendorSell']       = "Zeige Händler-Verkaufspreise an";

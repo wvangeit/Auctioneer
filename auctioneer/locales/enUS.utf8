@@ -1,34 +1,5 @@
 ﻿-- Encoded in UTF8
 
-_AUCT['AdditAlcohol'] = "Alcohol";
-_AUCT['AdditBuff'] = "Buff";
-_AUCT['AdditDrink'] = "Drink";
-_AUCT['AdditFirework'] = "Firework";
-_AUCT['AdditFood'] = "Food";
-_AUCT['AdditGiftwrap'] = "Giftwrap";
-_AUCT['AdditLure'] = "Lure";
-_AUCT['AdditPoison'] = "Poison";
-_AUCT['AdditPotion'] = "Potion";
-_AUCT['AdditRestorative'] = "Restorative";
-_AUCT['AdditScroll'] = "Scroll";
-
-_AUCT['SkillAlchemy'] = "Alchemy";
-_AUCT['SkillBlacksmithing'] = "Smithing";
-_AUCT['SkillCooking'] = "Cooking";
-_AUCT['SkillEnchanting'] = "Enchanting";
-_AUCT['SkillEngineering'] = "Engineering";
-_AUCT['SkillFirstaid'] = "First Aid";
-_AUCT['SkillLeatherworking'] = "Leatherworking";
-_AUCT['SkillMining'] = "Mining";
-_AUCT['SkillTailoring'] = "Tailoring";
-_AUCT['SkillDruid'] = "Druid spells";
-_AUCT['SkillMage'] = "Mage spells";
-_AUCT['SkillPaladin'] = "Paladin spells";
-_AUCT['SkillPriest'] = "Priest spells";
-_AUCT['SkillRogue'] = "Rogue skills";
-_AUCT['SkillShaman'] = "Shaman spells";
-_AUCT['SkillWarlock'] = "Warlock spells";
-
 _AUCT['TimeShort'] = "Short";
 _AUCT['TimeMed'] = "Medium";
 _AUCT['TimeLong'] = "Long";
@@ -66,14 +37,6 @@ _AUCT['FrmtInfoSgst'] = "Suggested price: %s min/%s BO";
 _AUCT['FrmtInfoBidrate'] = "%d%% have bid, %d%% have BO";
 _AUCT['FrmtInfoNever'] = "Never seen at %s";
 _AUCT['FrmtInfoAlsoseen'] = "Seen %d times at %s";
-_AUCT['FrmtInfoClassuse'] = "Class: %s used for %s";
-_AUCT['FrmtInfoClass'] = "Class: %s";
-_AUCT['FrmtInfoUse'] = "Used for: %s";
-_AUCT['FrmtInfoBuy'] = "Buy from vendor";
-_AUCT['FrmtInfoSell'] = "Sell to vendor";
-_AUCT['FrmtInfoBuymult'] = "Buy %d (%s each)";
-_AUCT['FrmtInfoSellmult'] = "Sell %d (%s each)";
-_AUCT['FrmtInfoStx'] = "Stacks in lots of %d";
 
 _AUCT['FrmtInfoHeadMulti'] = "Averages for %d items:";
 _AUCT['FrmtInfoMinMulti'] = "  Starting bid (%s ea)";

@@ -59,7 +59,6 @@ _INFORMANT['FrameTitle'] = "Informant Item Information"
 
 _INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants"
 _INFORMANT['FrmtInfoQuest'] = "Quest item in %d quests"
-_INFORMANT['FrmtInfoClassuse'] = "Class: %s used for %s"
 _INFORMANT['FrmtInfoClass'] = "Class: %s"
 _INFORMANT['FrmtInfoUse'] = "Used for: %s"
 _INFORMANT['FrmtInfoBuy'] = "Buy from vendor"

@@ -15,7 +15,6 @@ _INFORMANT['SkillLeatherworking'] = "Travail du Cuir";
 _INFORMANT['SkillMining']         = "Minage";
 _INFORMANT['SkillTailoring']      = "Tailleur";
 
-_INFORMANT['FrmtInfoClassuse'] = "Classe: %s utilisé pour %s";
 _INFORMANT['FrmtInfoClass'] = "Classe: %s";
 _INFORMANT['FrmtInfoUse'] = "Utilisé pour: %s";
 _INFORMANT['FrmtInfoBuy'] = "Achat%s au marchand";

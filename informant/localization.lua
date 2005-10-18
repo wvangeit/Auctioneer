@@ -102,7 +102,6 @@ function Informant_SetLocaleStrings(locale)
 	
 	_INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants"
 	_INFORMANT['FrmtInfoQuest'] = "Quest item in %d quests"
-	_INFORMANT['FrmtInfoClassuse'] = "Class: %s used for %s"
 	_INFORMANT['FrmtInfoClass'] = "Class: %s"
 	_INFORMANT['FrmtInfoUse'] = "Used for: %s"
 	_INFORMANT['FrmtInfoBuy'] = "Buy from vendor"
@@ -277,6 +276,14 @@ if locale == "deDE" then
 		_INFORMANT['FrmtActDefaultall'] = "Alle Einstellungen wurden auf Standardwerte zur\195\188ckgesetzt.";
 		_INFORMANT['FrmtActDefault']    = "%s wurde auf den Standardwert zur\195\188ckgesetzt.";
 		
+		
+		-- GUI localizations
+		
+		_INFORMANT['GuiVendorHeader']     = "Zeige H\195\164ndlerpreise an.";
+		_INFORMANT['GuiVendorHelp']       = "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreise von NPCs.";
+		_INFORMANT['GuiVendor']           = "Zeige H\195\164ndlerpreise an.";
+		_INFORMANT['GuiVendorBuy']        = "Zeige H\195\164ndler-Einkaufspreise an";
+		_INFORMANT['GuiVendorSell']       = "Zeige H\195\164ndler-Verkaufspreise an";
 
 
 		-- The following definitions are missing in this locale:
@@ -321,8 +328,6 @@ if locale == "esES" then
 		_INFORMANT['FrmtWelcome'] = "Informant versi\195\179n %s cargado";
 		
 		
-		
-		_INFORMANT['FrmtInfoClassuse'] = "Clase: %s usado para %s";
 		_INFORMANT['FrmtInfoClass'] = "Clase: %s";
 		_INFORMANT['FrmtInfoUse'] = "Usado para: %s";
 		_INFORMANT['FrmtInfoBuy'] = "Compra del vendedor";
@@ -330,17 +335,6 @@ if locale == "esES" then
 		_INFORMANT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
 		_INFORMANT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
 		_INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
-		
-		_INFORMANT['FrmtInfoBuyMulti'] = "  Opci\195\179n a compra(%s%s c/u)";
-		
-		_INFORMANT['FrmtInfoBuyOne'] = " %s con opci\195\179n a compra";
-		
-		_INFORMANT['FrmtInfoBuymedian'] = "  Opci\195\179n a compra mediano";
-		
-		
-		
-		
-		
 		
 		_INFORMANT['CmdOff'] = "apagado";
 		_INFORMANT['CmdOn'] = "prendido";
@@ -414,7 +408,6 @@ if locale == "frFR" then
 		_INFORMANT['SkillMining']         = "Minage";
 		_INFORMANT['SkillTailoring']      = "Tailleur";
 		
-		_INFORMANT['FrmtInfoClassuse'] = "Classe: %s utilis\195\169 pour %s";
 		_INFORMANT['FrmtInfoClass'] = "Classe: %s";
 		_INFORMANT['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
 		_INFORMANT['FrmtInfoBuy'] = "Achat%s au marchand";
