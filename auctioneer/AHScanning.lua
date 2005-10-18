@@ -52,11 +52,11 @@ function Auctioneer_StopAuctionScan()
 	Auctioneer_isScanningRequested = false;
 	lScanInProgress = false;
 	lCurrentCategoryIndex = 0;
+	lPageStartedAt = nil;
 end
 
 local function Auctioneer_AuctionSubmitQuery()
 	if not lCurrentAuctionPage or lCurrentAuctionPage == 0 then
-		lPageStartedAt = time();
 		if not lCurrentAuctionPage then lCurrentAuctionPage = 0 end
 		if lFullScan then
 			BrowseNoResultsText:SetText(string.format(_AUCT['AuctionScanStart'], _AUCT['TextAuction']));
@@ -69,6 +69,7 @@ local function Auctioneer_AuctionSubmitQuery()
 	else
 		QueryAuctionItems("", "", "", nil, lCurrentCategoryIndex, nil, lCurrentAuctionPage, nil, nil);
 	end
+	lPageStartedAt = time();
 
 	lIsPageScanned = false;
 	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
