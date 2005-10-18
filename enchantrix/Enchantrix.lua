@@ -273,6 +273,7 @@ function Enchantrix_FullDiff(invA, invB)
 end
 
 function Enchantrix_OnEvent(funcVars, event, argument)
+	
 	if ((event == "SPELLCAST_START") and (argument == ENCH_ARG_SPELLNAME)) then
 		Enchantrix_Disenchanting = true;
 		Enchantrix_WaitingPush = false;
@@ -362,6 +363,8 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 		Enchantrix_Disenchants = {};
 		Enchantrix_Disenchanting = false;
 		Enchantrix_WaitingPush = false;
+		
+		return
 	end
 end
 
@@ -437,11 +440,18 @@ function Enchantrix_OnLoad()
 		Enchantrix_Command(msg);
 	end
 
-	Enchantrix_ChatPrint(string.format(ENCH_FRMT_WELCOME, ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
-	Enchantrix_ChatPrint(ENCH_FRMT_CREDIT, 0.6, 0.6, 0.1);
-
 	--GUI Registration code added by MentalPower	
 	Enchantrix_Register();
+end
+
+-- This function differs from Enchantrix_OnLoad in that it is executed
+-- after variables have been loaded.
+function Enchantrix_AddonLoaded()
+	Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
+	this:UnregisterEvent("ADDON_LOADED")
+		
+	Enchantrix_ChatPrint(string.format(ENCH_FRMT_WELCOME, ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
+	Enchantrix_ChatPrint(ENCH_FRMT_CREDIT, 0.6, 0.6, 0.1);
 end
 
 function Enchantrix_Register()
@@ -925,8 +935,7 @@ function Enchantrix_Clear(param, chatprint)
 end
 
 function Enchantrix_SetLocale(param, chatprint)
-
-local validLocale=nil;
+	local validLocale=nil;
 
 	if (param == Enchantrix_GetLocale()) then
 		--Do Nothing
