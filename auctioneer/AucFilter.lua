@@ -7,31 +7,12 @@
 	Functions to filter auctions based upon various parameters.
 ]]
 
--- filters out all auctions except those that meet profit requirements
-function Auctioneer_BrokerFilter(minProfit, signature)
+-- filters out all auctions except those that have no more than maximumTime remaining and meet profit requirements
+function Auctioneer_BrokerFilter(minProfit, signature, maximumTime)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
-
-	if Auctioneer_GetUsableMedian(itemKey) then -- we have a useable median
-		local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-		local profit = (hsp * count) - buyout;
-		local profitPricePercent = math.floor((profit / buyout) * 100);
-
-		--see if this auction should not be filtered
-		if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and profit >= minProfit and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
-			filterAuction = false;
-		end
-	end
-
-	return filterAuction;
-end
-
--- filters out all auctions except those that have short or medium time remaining and meet profit requirements
-function Auctioneer_BidBrokerFilter(minProfit, signature)
-	local filterAuction = true;
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
-	local itemKey = id..":"..rprop..":"..enchant;
+	if (not maximumTime) then maximumTime = 100000 end
 
 	if Auctioneer_GetUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
 		local auctKey = Auctioneer_GetAuctionKey();
@@ -58,7 +39,10 @@ function Auctioneer_BidBrokerFilter(minProfit, signature)
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 			if (snap) then
 				local timeLeft = tonumber(snap.timeLeft);
-				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_MEDIUM and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
+				local elapsedTime = time() - tonumber(snap.lastSeenTime);
+				local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+
+				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM] and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
 					filterAuction = false;
 				end
 			end
@@ -101,13 +85,25 @@ function Auctioneer_PercentLessFilter(percentLess, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
-	local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+	local auctKey = Auctioneer_GetAuctionKey();
+
+	local hsp, seenCount = Auctioneer_GetHSP(itemKey, auctKey)
 
 	if hsp > 0 and seenCount >= MIN_BUYOUT_SEEN_COUNT then
 		local profit = (hsp * count) - buyout;
 		--see if this auction should not be filtered
 		if (buyout > 0 and Auctioneer_PercentLessThan(hsp, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then
-			filterAuction = false;
+			local itemCat = Auctioneer_GetCatForKey(itemKey);
+			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+			if (snap) then
+				local timeLeft = tonumber(snap.timeLeft);
+				local elapsedTime = time() - tonumber(snap.lastSeenTime);
+				local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+
+				if (secondsLeft > 0) then
+					filterAuction = false;
+				end
+			end
 		end
 	end
 
@@ -171,7 +167,7 @@ function Auctioneer_DoBidBroker(minProfit)
 	local output = string.format(_AUCT['FrmtBidbrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
-	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit);
+	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit, TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM]);
 
 	table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
 
