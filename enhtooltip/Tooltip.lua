@@ -1215,6 +1215,7 @@ function ttInitialize()
 	-- Game tooltips
 	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, gtHookSetQuestItem);
+	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, gtHookSetQuestLogItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, gtHookSetInventoryItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem);
