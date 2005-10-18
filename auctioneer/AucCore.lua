@@ -393,7 +393,8 @@ function Auctioneer_AddonLoaded()
 	Auctioneer_LockAndLoad();
 end
 
-local function hookAuctionHouse()
+-- This is the old (local) hookAuctionHouse() function
+function Auctioneer_HookAuctionHouse()
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", Auctioneer_AuctHouseShow);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
@@ -406,6 +407,7 @@ local function hookAuctionHouse()
 	Stubby.RegisterFunctionHook("StartAuction", 200, Auctioneer_StartAuction)
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
+	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer_AuctionFrameFilters_UpdateClasses);
 
 	Auctioneer_Orig_PickupContainerItem = PickupContainerItem
 	PickupContainerItem = function(...)
@@ -432,7 +434,7 @@ local function hookAuctionHouse()
 end
 
 function Auctioneer_LockAndLoad()
-	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "Auctioneer", hookAuctionHouse);
+	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, Auctioneer_ConfigureAH);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";

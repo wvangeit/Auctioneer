@@ -341,8 +341,9 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 	end
 end
 
+local lAHConfigPending = true
 function Auctioneer_ConfigureAH()
-	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
+	if (lAHConfigPending and IsAddOnLoaded("Blizzard_AuctionUI")) then
 		EnhTooltip.DebugPrint("Configuring AuctionUI");
 		AuctionsPriceText:ClearAllPoints();
 		AuctionsPriceText:SetPoint("TOPLEFT", "AuctionsItemText", "TOPLEFT", 0, -53);
@@ -374,16 +375,6 @@ function Auctioneer_ConfigureAH()
 		BrowseScanButton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0);
 		BrowseScanButton:Show();
 
-		local obj
-		for i=1, 15 do
-			obj = getglobal("AuctionFilterButton"..i.."Checkbox")
-			if (obj) then
-				obj:SetParent("AuctionFilterButton"..i)
-				obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
-			end
-		end
-		AuctionFrameFilters_UpdateClasses()
-
 		if (AuctionInfo) then
 			AuctionInfo:SetParent("AuctionFrameAuctions")
 			AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -51)
@@ -396,6 +387,21 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:SetParent("AuctionFrameAuctions")
 			AuctPriceRememberCheck:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -2)
 			AuctPriceRememberCheck:Show()
+		end
+		
+		Auctioneer_HookAuctionHouse()
+		AuctionFrameFilters_UpdateClasses()
+		lAHConfigPending = nil
+	end
+end
+
+function Auctioneer_AuctionFrameFilters_UpdateClasses()
+	local obj
+	for i=1, 15 do
+		obj = getglobal("AuctionFilterButton"..i.."Checkbox")
+		if (obj) then
+			obj:SetParent("AuctionFilterButton"..i)
+			obj:SetPoint("RIGHT", "AuctionFilterButton"..i, "RIGHT", -5,0)
 		end
 	end
 end
@@ -555,7 +561,6 @@ function Auctioneer_NewAuction()
 end
 
 function Auctioneer_AuctHouseShow()
-	Auctioneer_ConfigureAH();
 	if Auctioneer_isScanningRequested then
 		Auctioneer_StartAuctionScan();
 	else
