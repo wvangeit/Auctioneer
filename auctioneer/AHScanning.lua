@@ -10,6 +10,7 @@ local lIsPageScanned;
 local lScanInProgress;
 local lFullScan;
 local lScanStartedAt;
+local lPageStartedAt;
 
 -- function hooks
 local lOriginal_CanSendAuctionQuery;
@@ -75,7 +76,6 @@ local function Auctioneer_AuctionSubmitQuery()
 	Auctioneer_Event_AuctionQuery(lCurrentAuctionPage);
 end
 
-local lPageStartedAt;
 local function Auctioneer_AuctionNextQuery()
 	lCheckPage = nil;
 	if lCurrentAuctionPage then
