@@ -598,7 +598,7 @@ end
 function setConfig(ownerAddOn, variable, value, isGlobal)
 	local ownerIndex = string.lower(ownerAddOn)
 	local varIndex = string.lower(variable)
-	if (isGlobal) then
+	if (not isGlobal) then
 		varIndex = string.lower(UnitName("player")) .. ":" .. varIndex
 	end
 
