@@ -16,15 +16,6 @@ local function Auctioneer_Backup(server, sig, data)
 	AuctionBackup[server][sig] = data
 end
 
-local function Auctioneer_IsSortedList(list)
-	for i=2, table.getn(list) do
-		if list[i] < list[i-1] then
-			return false
-		end
-	end
-	return true
-end
-
 function Auctioneer_Convert()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
@@ -138,10 +129,6 @@ function Auctioneer_Convert()
 							data = iData.data;
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
-								if not Auctioneer_IsSortedList(iData.buyoutPricesHistoryList) then
-									EnhTooltip.DebugPrint("TODO: old dataformat with unsorted buyoutHistory! "..sig)
-									EnhTooltip.DebugPrint("Please copy/paste the corresponding entry in SavedVariables/auctioneer.lua to: http://norganna.org/bb/index.php?showtopic=226")
-								end
 								hist = Auctioneer_StoreMedianList (iData.buyoutPricesHistoryList);
 							end
 						end
