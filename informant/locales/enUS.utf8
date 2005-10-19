@@ -4,6 +4,7 @@ BINDING_HEADER_INFORMANT_HEADER = "Informant"
 BINDING_NAME_INFORMANT_POPUPDOWN = "Toggle Information Window"
 
 _INFORMANT['Welcome'] = {
+
 	"|c40ff50ffWelcome to Informant|r",
 	"",
 	"Since this is the first time you are using",
@@ -23,6 +24,7 @@ _INFORMANT['Welcome'] = {
 	"or click the close button on this frame.",
 	"",
 	"Click the close button now to continue.",
+	
 }
 
 _INFORMANT['AdditAlcohol'] = "Alcohol"
@@ -101,8 +103,8 @@ _INFORMANT['ShowVendor'] = "show-vendor"
 _INFORMANT['ShowVendorBuy'] = "show-vendor-buy"
 _INFORMANT['ShowVendorSell'] = "show-vendor-sell"
 
-_INFORMANT['HelpOnoff'] = "Turns the auction data display on and off"
-_INFORMANT['HelpDisable'] = "Stops informant from automatically loading next time you log in";
+_INFORMANT['HelpOnoff'] = "Turns the information data display on and off"
+_INFORMANT['HelpDisable'] = "Stops Informant from automatically loading next time you log in";
 _INFORMANT['HelpVendor'] = "Select whether to show item's vendor pricing"
 _INFORMANT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)"
 _INFORMANT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)"
@@ -112,7 +114,6 @@ _INFORMANT['HelpMerchant'] = "Select whether to show merchants who supply items"
 _INFORMANT['HelpStack'] = "Select whether to show the item's stackable size"
 _INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
 _INFORMANT['HelpLocale'] = "Change the locale that is used to display informant messages"
-_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
 _INFORMANT['HelpDefault'] = "Set an informant option to it's default value. You may also specify the special keyword \"all\" to set all informant options to their default values."
 
 _INFORMANT['MesgNotLoaded'] = "Informant is not loaded. Type /informant for more info.";
@@ -142,7 +143,6 @@ _INFORMANT['GuiInfoStack'] = "Show stack sizes"
 _INFORMANT['GuiInfoUsage'] = "Show usage information"
 _INFORMANT['GuiInfoQuest'] = "Show quest information"
 _INFORMANT['GuiInfoMerchant'] = "Show merchants"
-_INFORMANT['GuiVendorSell'] = "Show Vendor Sell Prices"
 _INFORMANT['GuiEmbedHeader'] = "Embed"
 _INFORMANT['GuiEmbed'] = "Embed info in in-game tooltip"
 _INFORMANT['GuiOtherHeader'] = "Other Options"
@@ -155,4 +155,3 @@ _INFORMANT['GuiDefaultAllButton'] = "Reset All"
 _INFORMANT['GuiDefaultAll'] = "Reset All Informant Options"
 _INFORMANT['GuiDefaultAllHelp'] = "Click here to set all Informant options to their default values.\nWARNING: This action is NOT undoable."
 _INFORMANT['GuiDefaultOption'] = "Reset this setting"
-

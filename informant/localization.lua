@@ -37,7 +37,7 @@
 
 _INFORMANT = {};
 
-INFORMANT_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
+INFORMANT_VALID_LOCALES = {["daDK"] = true, ["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
 
 function Informant_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
@@ -47,6 +47,7 @@ function Informant_SetLocaleStrings(locale)
 	BINDING_NAME_INFORMANT_POPUPDOWN = "Toggle Information Window"
 	
 	_INFORMANT['Welcome'] = {
+	
 		"|c40ff50ffWelcome to Informant|r",
 		"",
 		"Since this is the first time you are using",
@@ -66,6 +67,7 @@ function Informant_SetLocaleStrings(locale)
 		"or click the close button on this frame.",
 		"",
 		"Click the close button now to continue.",
+		
 	}
 	
 	_INFORMANT['AdditAlcohol'] = "Alcohol"
@@ -144,8 +146,8 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['ShowVendorBuy'] = "show-vendor-buy"
 	_INFORMANT['ShowVendorSell'] = "show-vendor-sell"
 	
-	_INFORMANT['HelpOnoff'] = "Turns the auction data display on and off"
-	_INFORMANT['HelpDisable'] = "Stops informant from automatically loading next time you log in";
+	_INFORMANT['HelpOnoff'] = "Turns the information data display on and off"
+	_INFORMANT['HelpDisable'] = "Stops Informant from automatically loading next time you log in";
 	_INFORMANT['HelpVendor'] = "Select whether to show item's vendor pricing"
 	_INFORMANT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)"
 	_INFORMANT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)"
@@ -155,7 +157,6 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['HelpStack'] = "Select whether to show the item's stackable size"
 	_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
 	_INFORMANT['HelpLocale'] = "Change the locale that is used to display informant messages"
-	_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
 	_INFORMANT['HelpDefault'] = "Set an informant option to it's default value. You may also specify the special keyword \"all\" to set all informant options to their default values."
 	
 	_INFORMANT['MesgNotLoaded'] = "Informant is not loaded. Type /informant for more info.";
@@ -185,7 +186,6 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['GuiInfoUsage'] = "Show usage information"
 	_INFORMANT['GuiInfoQuest'] = "Show quest information"
 	_INFORMANT['GuiInfoMerchant'] = "Show merchants"
-	_INFORMANT['GuiVendorSell'] = "Show Vendor Sell Prices"
 	_INFORMANT['GuiEmbedHeader'] = "Embed"
 	_INFORMANT['GuiEmbed'] = "Embed info in in-game tooltip"
 	_INFORMANT['GuiOtherHeader'] = "Other Options"
@@ -198,7 +198,170 @@ function Informant_SetLocaleStrings(locale)
 	_INFORMANT['GuiDefaultAll'] = "Reset All Informant Options"
 	_INFORMANT['GuiDefaultAllHelp'] = "Click here to set all Informant options to their default values.\nWARNING: This action is NOT undoable."
 	_INFORMANT['GuiDefaultOption'] = "Reset this setting"
-	
+-- Locale strings for the daDK locale
+if locale == "daDK" then
+		-- Encoded in UTF8
+		
+		
+		_INFORMANT['Welcome'] = {
+			"|c40ff50ffWelcome to Informant|r",
+			"",
+			"Since this is the first time you are using",
+			"Informant, this message appears to let you",
+			"know that you must set a key to show this",
+			"window from within the |cffffffffKeybindings|r section",
+			"of the |cffffffffGame Menu|r.",
+			"",
+			"From then on to view advanced information",
+			"about items in your inventory, simply move",
+			"your mouse over the item you want to see",
+			"information about and press the key that",
+			"you bound, and this window will popup,",
+			"filled with information about that item.",
+			"",
+			"At that point, simply press the key again,",
+			"or click the close button on this frame.",
+			"",
+			"Click the close button now to continue.",
+		}
+		
+		_INFORMANT['AdditAlcohol'] = "Alcohol"
+		_INFORMANT['AdditBuff'] = "Buff"
+		_INFORMANT['AdditDrink'] = "Drink"
+		_INFORMANT['AdditFirework'] = "Firework"
+		_INFORMANT['AdditFood'] = "Food"
+		_INFORMANT['AdditGiftwrap'] = "Giftwrap"
+		_INFORMANT['AdditLure'] = "Lure"
+		_INFORMANT['AdditPoison'] = "Poison"
+		_INFORMANT['AdditPotion'] = "Potion"
+		_INFORMANT['AdditRestorative'] = "Restorative"
+		_INFORMANT['AdditScroll'] = "Scroll"
+		
+		_INFORMANT['SkillAlchemy'] = "Alchemy"
+		_INFORMANT['SkillBlacksmithing'] = "Smithing"
+		_INFORMANT['SkillCooking'] = "Cooking"
+		_INFORMANT['SkillEnchanting'] = "Enchanting"
+		_INFORMANT['SkillEngineering'] = "Engineering"
+		_INFORMANT['SkillFirstAid'] = "First Aid"
+		_INFORMANT['SkillLeatherworking'] = "Leatherworking"
+		_INFORMANT['SkillMining'] = "Mining"
+		_INFORMANT['SkillTailoring'] = "Tailoring"
+		_INFORMANT['SkillDruid'] = "Druid spells"
+		_INFORMANT['SkillMage'] = "Mage spells"
+		_INFORMANT['SkillPaladin'] = "Paladin spells"
+		_INFORMANT['SkillPriest'] = "Priest spells"
+		_INFORMANT['SkillRogue'] = "Rogue skills"
+		_INFORMANT['SkillShaman'] = "Shaman spells"
+		_INFORMANT['SkillWarlock'] = "Warlock spells"
+		
+		_INFORMANT['FrmtWelcome'] = "Informant v%s loaded"
+		_INFORMANT['FrameTitle'] = "Informant Item Information"
+		
+		_INFORMANT['FrmtInfoMerchants'] = "Sold by %d merchants"
+		_INFORMANT['FrmtInfoQuest'] = "Quest item in %d quests"
+		_INFORMANT['FrmtInfoClass'] = "Class: %s"
+		_INFORMANT['FrmtInfoUse'] = "Used for: %s"
+		_INFORMANT['FrmtInfoBuy'] = "Buy from vendor"
+		_INFORMANT['FrmtInfoSell'] = "Sell to vendor"
+		_INFORMANT['FrmtInfoBuymult'] = "Buy %d (%s each)"
+		_INFORMANT['FrmtInfoSellmult'] = "Sell %d (%s each)"
+		_INFORMANT['FrmtInfoStx'] = "Stacks in lots of %d"
+		
+		_INFORMANT['InfoHeader'] = "Information on |cff%s%s|r"
+		
+		_INFORMANT['InfoVendorHeader'] = "Available from %d merchants:"
+		_INFORMANT['InfoVendorName'] = "  %s"
+		
+		_INFORMANT['InfoQuestHeader'] = "Used in %d quests:"
+		_INFORMANT['InfoQuestName'] = "  %s"
+		
+		_INFORMANT['InfoPlayerMade'] = "Made by level %d %s"
+		
+		_INFORMANT['InfoNoItem'] = {
+			"You must first move over an item,",
+			"then press the activation key",
+		}
+		
+		_INFORMANT['CmdOff'] = "off"
+		_INFORMANT['CmdOn'] = "on"
+		_INFORMANT['CmdToggle'] = "toggle"
+		_INFORMANT['CmdDisable'] = "disable";
+		_INFORMANT['CmdDefault'] = "default"
+		_INFORMANT['CmdLocale'] = "locale"
+		_INFORMANT['CmdEmbed'] = "embed"
+		_INFORMANT['CmdClearAll'] = "all";
+		
+		_INFORMANT['OptLocale'] = "<locale>"
+		
+		_INFORMANT['ShowStack'] = "show-stack"
+		_INFORMANT['ShowUsage'] = "show-usage"
+		_INFORMANT['ShowQuest'] = "show-quest"
+		_INFORMANT['ShowMerchant'] = "show-merchant"
+		_INFORMANT['ShowVendor'] = "show-vendor"
+		_INFORMANT['ShowVendorBuy'] = "show-vendor-buy"
+		_INFORMANT['ShowVendorSell'] = "show-vendor-sell"
+		
+		_INFORMANT['HelpOnoff'] = "Turns the auction data display on and off"
+		_INFORMANT['HelpDisable'] = "Stops informant from automatically loading next time you log in";
+		_INFORMANT['HelpVendor'] = "Select whether to show item's vendor pricing"
+		_INFORMANT['HelpVendorSell'] = "Select whether to show item's vendor sell pricing (req show-vendor=on)"
+		_INFORMANT['HelpVendorBuy'] = "Select whether to show item's vendor buy pricing (req show-vendor=on)"
+		_INFORMANT['HelpUsage'] = "Select whether to show tradeskill items' usage"
+		_INFORMANT['HelpQuest'] = "Select whether to show quests items' usage"
+		_INFORMANT['HelpMerchant'] = "Select whether to show merchants who supply items"
+		_INFORMANT['HelpStack'] = "Select whether to show the item's stackable size"
+		_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
+		_INFORMANT['HelpLocale'] = "Change the locale that is used to display informant messages"
+		_INFORMANT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
+		_INFORMANT['HelpDefault'] = "Set an informant option to it's default value. You may also specify the special keyword \"all\" to set all informant options to their default values."
+		
+		_INFORMANT['MesgNotLoaded'] = "Informant is not loaded. Type /informant for more info.";
+		
+		_INFORMANT['FrmtActEnable'] = "Displaying item's %s data"
+		_INFORMANT['FrmtActDisable'] = "Not displaying item's %s data"
+		_INFORMANT['FrmtActEnabledOn'] = "Displaying item's %s on %s"
+		_INFORMANT['FrmtActSet'] = "Set %s to '%s'"
+		_INFORMANT['FrmtActUnknown'] = "Unknown command keyword: '%s'"
+		_INFORMANT['FrmtActDefaultall'] = "All informant options have been reset to default settings."
+		_INFORMANT['FrmtActDefault'] = "Informant's %s option has been reset to its default setting"
+		_INFORMANT['FrmtUnknownLocale'] = "The locale you specified ('%s') is unknown. Valid locales are:";
+		
+		-- GUI localizations
+		
+		_INFORMANT['GuiMainHelp'] = "Contains settings for Informant \nan AddOn that displays detailed item information"
+		_INFORMANT['GuiMainEnable'] = "Enable Informant"
+		_INFORMANT['GuiLocale'] = "Set locale to"
+		_INFORMANT['GuiVendorHeader'] = "Vendor Prices"
+		_INFORMANT['GuiVendorHelp'] = "Options related to NPC buy/sell prices."
+		_INFORMANT['GuiVendor'] = "Show Vendor Prices"
+		_INFORMANT['GuiVendorBuy'] = "Show Vendor Buy Prices"
+		_INFORMANT['GuiVendorSell'] = "Show Vendor Sell Prices"
+		_INFORMANT['GuiInfoHeader'] = "Additional information"
+		_INFORMANT['GuiInfoHelp'] = "Controls what additional information is shown in tooltips"
+		_INFORMANT['GuiInfoStack'] = "Show stack sizes"
+		_INFORMANT['GuiInfoUsage'] = "Show usage information"
+		_INFORMANT['GuiInfoQuest'] = "Show quest information"
+		_INFORMANT['GuiInfoMerchant'] = "Show merchants"
+		_INFORMANT['GuiVendorSell'] = "Show Vendor Sell Prices"
+		_INFORMANT['GuiEmbedHeader'] = "Embed"
+		_INFORMANT['GuiEmbed'] = "Embed info in in-game tooltip"
+		_INFORMANT['GuiOtherHeader'] = "Other Options"
+		_INFORMANT['GuiOtherHelp'] = "Miscellaneous Informant Options"
+		_INFORMANT['GuiReloadui'] = "Reload User Interface"
+		_INFORMANT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes."
+		_INFORMANT['GuiReloaduiButton'] = "ReloadUI"
+		_INFORMANT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI"
+		_INFORMANT['GuiDefaultAllButton'] = "Reset All"
+		_INFORMANT['GuiDefaultAll'] = "Reset All Informant Options"
+		_INFORMANT['GuiDefaultAllHelp'] = "Click here to set all Informant options to their default values.\nWARNING: This action is NOT undoable."
+		_INFORMANT['GuiDefaultOption'] = "Reset this setting"
+		
+
+
+		-- The following definitions are missing in this locale:
+		--	BINDING_HEADER_INFORMANT_HEADER = "";
+		--	BINDING_NAME_INFORMANT_POPUPDOWN = "";
+end
 
 -- Locale strings for the deDE locale
 if locale == "deDE" then
@@ -295,6 +458,31 @@ end
 if locale == "esES" then
 		-- Encoded in UTF8
 		
+		
+		_INFORMANT['Welcome'] = {
+			"|c40ff50ffBienvenido a Informant|r",
+			"",
+			"Ya que esta es la primera vez que usted usa",
+			"Informant, este mansaje aparece para dejarle",
+			"saber que usted debe de designar una tecla",
+			"desde dentro de la secci\195\179n de \"|cffffffffKeybindings|r\"",
+			"del \"|cffffffffGame Menu|r\" del juego para ",
+			"hacer aparecer esta ventana.",
+			"",
+			"Desde ese punto en adelante, para ver informaci\195\179n",
+			"avanzada de los art\195\173culos en su inventario,",
+			"simplememnte mueva su mouse sobre el art\195\173culo",
+			"del cual quiera ver la informaci\195\179n y oprima la tecla",
+			"que usted escogio, y esta ventana aparecer\195\161,",
+			"llena con informaci\195\179n sobre ese art\195\173culo.",
+			"",
+			"Cuando quiera cerrar la ventana, simplemente",
+			"oprime la tecla de nuevo o presione el bot\195\179n",
+			"de \"Close\" para cerrarla.",
+			"",
+			"Presione el bot\195\179n de \"Close\" para continuar.",
+		}
+		
 		_INFORMANT['AdditAlcohol'] = "Alcohol";
 		_INFORMANT['AdditBuff'] = "Mejora";
 		_INFORMANT['AdditDrink'] = "Bebida";
@@ -320,51 +508,71 @@ if locale == "esES" then
 		_INFORMANT['SkillMage'] = "Encantos de Magos";
 		_INFORMANT['SkillPaladin'] = "Encantos de Paladines";
 		_INFORMANT['SkillPriest'] = "Encantos de Sacerdotes";
-		_INFORMANT['SkillRogue'] = "Encantos de P\195\173caros";
+		_INFORMANT['SkillRogue'] = "Habilidades de P\195\173caros";
 		_INFORMANT['SkillShaman'] = "Encantos de Chamanes";
 		_INFORMANT['SkillWarlock'] = "Encantos de Brujos";
 		
-		
 		_INFORMANT['FrmtWelcome'] = "Informant versi\195\179n %s cargado";
+		_INFORMANT['FrameTitle'] = "Informaci\195\179n de Informant del Art\195\173culo."
 		
-		
+		_INFORMANT['FrmtInfoMerchants'] = "Vendido por %d mercaderes"
+		_INFORMANT['FrmtInfoQuest'] = "Art\195\173culo usado en %d busquedas"
 		_INFORMANT['FrmtInfoClass'] = "Clase: %s";
 		_INFORMANT['FrmtInfoUse'] = "Usado para: %s";
 		_INFORMANT['FrmtInfoBuy'] = "Compra del vendedor";
 		_INFORMANT['FrmtInfoSell'] = "Vende al vendedor";
 		_INFORMANT['FrmtInfoBuymult'] = "Compra %d (%s c/u)";
 		_INFORMANT['FrmtInfoSellmult'] = "Vende %d (%s c/u)";
-		_INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de art\195\173culos %d por paquete";
+		_INFORMANT['FrmtInfoStx'] = "Amontonable en lotes de %d art\195\173culos por paquete";
+		
+		_INFORMANT['InfoHeader'] = "Informaci\195\179n en |cff%s%s|r"
+		
+		_INFORMANT['InfoVendorHeader'] = "Disponible a trav\195\169z de %d mercaderes:"
+		_INFORMANT['InfoVendorName'] = "  %s"
+		
+		_INFORMANT['InfoQuestHeader'] = "Art\195\173culo usado en %d busquedas"
+		_INFORMANT['InfoQuestName'] = "  %s"
+		
+		_INFORMANT['InfoPlayerMade'] = "Hecho por %s nivel %d"
+		
+		_INFORMANT['InfoNoItem'] = {
+			"Debe de pasar por encima de un art\195\173culo,",
+			"y luego apretar la tecla de activaci\195\179n",
+		}
 		
 		_INFORMANT['CmdOff'] = "apagado";
 		_INFORMANT['CmdOn'] = "prendido";
 		_INFORMANT['CmdToggle'] = "invertir";
+		_INFORMANT['CmdDisable'] = "deshabilitar";
 		_INFORMANT['CmdDefault'] = "original";
-		
+		_INFORMANT['CmdLocale'] = "localidad"
 		_INFORMANT['CmdEmbed'] = "integrado";
+		_INFORMANT['CmdClearAll'] = "todo";
 		
-		
-		
-		
+		_INFORMANT['OptLocale'] = "<localidad>"
 		
 		_INFORMANT['ShowStack'] = "ver-paquete";
 		_INFORMANT['ShowUsage'] = "ver-uso";
+		_INFORMANT['ShowQuest'] = "ver-aventura"
+		_INFORMANT['ShowMerchant'] = "ver-mercader"
 		_INFORMANT['ShowVendor'] = "ver-vendedor";
 		_INFORMANT['ShowVendorBuy'] = "ver-vendedor-compra";
 		_INFORMANT['ShowVendorSell'] = "ver-vendedor-venta";
 		
-		_INFORMANT['HelpOnoff'] = "Enciande o apaga la informacion sobre las subastas";
-		_INFORMANT['HelpVerbose'] = "Selecciona para mostrar promedios literales (O apaga para que aparezcan en una sola linea)";
+		_INFORMANT['HelpOnoff'] = "Enciande o apaga la informacion sobre los art\195\173culos";
+		_INFORMANT['HelpDisable'] = "Impide que Informant se carge automaticamente la proxima vez que usted entre al juego";
 		_INFORMANT['HelpVendor'] = "Selecciona para mostrar precios de vendedor para el art\195\173culo";
 		_INFORMANT['HelpVendorSell'] = "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
 		_INFORMANT['HelpVendorBuy'] = "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
 		_INFORMANT['HelpUsage'] = "Selecciona para mostrar uso del art\195\173culo en profesiones";
+		_INFORMANT['HelpQuest'] = "Selecciona para mostrar informacion sobre art\195\173culos de b\195\186squedas"
+		_INFORMANT['HelpMerchant'] = "Selecciona para mostrar los mercaderes que venden el art\195\173culo"
 		_INFORMANT['HelpStack'] = "Selecciona para mostrar tama\195\177o maximo del paquete";
-		_INFORMANT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
 		_INFORMANT['HelpEmbed'] = "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
+		_INFORMANT['HelpLocale'] = "Cambiar la localidad que Informant usa para sus mensajes";
+		_INFORMANT['HelpDefault'] = "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica."
 		
-		_INFORMANT['StatOn'] = "Mostrando la configuracion corriente para la informacion de subastas";
-		_INFORMANT['StatOff'] = "Ocultando toda la informacion de subastas";
+		_INFORMANT['MesgNotLoaded'] = "Informant no esta cargado. Escriba /auctioneer para mas informaci\195\179n.";
 		
 		_INFORMANT['FrmtActEnable'] = "Mostrando informacion del art\195\173culo: %s ";
 		_INFORMANT['FrmtActDisable'] = "Ocultando informacion de articulo: %s ";
@@ -373,16 +581,36 @@ if locale == "esES" then
 		_INFORMANT['FrmtActUnknown'] = "Comando o palabra clave desconocida: '%s'";
 		_INFORMANT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
 		_INFORMANT['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
-		
-		
-		-- AH Scanning localizations
-		
-		
-		
+		_INFORMANT['FrmtUnknownLocale'] = "La localizaci\195\179n que usted especifico ('%s') no es valida. Locales v\195\161lidos son:"; 
 		
 		-- GUI localizations
 		
-
+		_INFORMANT['GuiMainHelp'] = "Contiene ajustes para Informant \nun aditamento que muestra informaci\195\179n detallada de los art\195\173culos"
+		_INFORMANT['GuiMainEnable'] = "Encender Informant"
+		_INFORMANT['GuiLocale'] = "Ajustar localidad a";
+		_INFORMANT['GuiVendorHeader'] = "Vendor Prices"
+		_INFORMANT['GuiVendorHelp'] = "Options related to NPC buy/sell prices."
+		_INFORMANT['GuiVendor'] = "Mostrar Precios a Vendedores";
+		_INFORMANT['GuiVendorBuy'] = "Mostrar precios de compra a vendedores";
+		_INFORMANT['GuiVendorSell'] = "Mostrar precios de venta a vendedores";
+		_INFORMANT['GuiInfoHeader'] = "Informaci\195\179n Adicional"
+		_INFORMANT['GuiInfoHelp'] = "Controla que informaci\195\179n Intormant muestra en las cajas de ayuda"
+		_INFORMANT['GuiInfoStack'] = "Ver tama\195\177o de paquete"
+		_INFORMANT['GuiInfoUsage'] = "Ver informaci\195\179n de uso"
+		_INFORMANT['GuiInfoQuest'] = "Ver informaci\195\179n de busquedas"
+		_INFORMANT['GuiInfoMerchant'] = "Ver mercaderes"
+		_INFORMANT['GuiEmbedHeader'] = "Integraci\195\179n"
+		_INFORMANT['GuiEmbed'] = "Integrar informaci\195\179n en la caja de ayuda";
+		_INFORMANT['GuiOtherHeader'] = "Otras Opciones"
+		_INFORMANT['GuiOtherHelp'] = "Opciones miscel\195\161neas de Informant";
+		_INFORMANT['GuiReloadui'] = "Recargar Interf\195\161z";
+		_INFORMANT['GuiReloaduiHelp'] = "Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
+		_INFORMANT['GuiReloaduiButton'] = "Recargar";
+		_INFORMANT['GuiReloaduiFeedback'] = "Recargando el Interf\195\161z de WoW";
+		_INFORMANT['GuiDefaultAllButton'] = "Revertir Todo";
+		_INFORMANT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
+		_INFORMANT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
+		_INFORMANT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
 
 		-- The following definitions are missing in this locale:
 		--	BINDING_HEADER_INFORMANT_HEADER = "";
