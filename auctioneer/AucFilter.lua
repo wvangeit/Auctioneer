@@ -7,13 +7,45 @@
 	Functions to filter auctions based upon various parameters.
 ]]
 
+function Auctioneer_BrokerFilter(minProfit, signature)
+	local filterAuction = true;
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
+	local itemKey = id..":"..rprop..":"..enchant;
+
+	if (buyout and buyout > 0 and buyout <= MAX_BUYOUT_PRICE and Auctioneer_GetUsableMedian(itemKey)) then
+		local auctKey = Auctioneer_GetAuctionKey();
+		local itemCat = Auctioneer_GetCatForKey(itemKey);
+		local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+			
+		if (snap) then
+			local timeLeft = snap.timeLeft;
+			local elapsedTime = time() - snap.lastSeenTime;
+			local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+			
+			if (secondsLeft > 0) then
+				local hsp, seenCount = Auctioneer_GetHSP(itemKey, auctKey);
+				local profit = (hsp * count) - buyout;
+				local profitPricePercent = math.floor((profit / buyout) * 100);
+
+				if (profit >= minProfit and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then
+					filterAuction = false;
+				end
+			end
+			
+		end
+	end
+
+	return filterAuction;
+end
+
+
 -- filters out all auctions except those that have no more than maximumTime remaining and meet profit requirements
-function Auctioneer_BrokerFilter(minProfit, signature, maximumTime)
+function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
 	if (not maximumTime) then maximumTime = 100000 end
-
+	
 	if Auctioneer_GetUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
 		local auctKey = Auctioneer_GetAuctionKey();
 		local currentBid = Auctioneer_GetCurrentBid(signature);
@@ -26,24 +58,24 @@ function Auctioneer_BrokerFilter(minProfit, signature, maximumTime)
 		-- If the current bid falls under that value, only then should
 		-- we go to the effort of calculating actual profit.
 		-- Note: if second == nil, this indicates no competition.
-		if (second == nil or currentBid < second * 1.2) then
-			local hsp, seenCount, x, x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
-			-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
-
-			local profit = (hsp * count) - currentBid;
-			local profitPricePercent = math.floor((profit / currentBid) * 100);
-
-			--see if this auction should not be filtered
-			local auctKey = Auctioneer_GetAuctionKey();
+		if (second == nil or currentBid < second * 1.2 and currentBid <= MAX_BUYOUT_PRICE) then
 			local itemCat = Auctioneer_GetCatForKey(itemKey);
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+
 			if (snap) then
 				local timeLeft = tonumber(snap.timeLeft);
 				local elapsedTime = time() - tonumber(snap.lastSeenTime);
 				local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
 
-				if (currentBid <= MAX_BUYOUT_PRICE and profit >= minProfit and timeLeft <= TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM] and not Auctioneer_IsBadResaleChoice(signature) and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT) then
-					filterAuction = false;
+				if (secondsLeft <= maximumTime and secondsLeft > 0) then
+					-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
+					local hsp, seenCount, x, x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
+					local profit = (hsp * count) - currentBid;
+					local profitPricePercent = math.floor((profit / currentBid) * 100);
+
+					if (profit >= minProfit and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
+						filterAuction = false;
+					end
 				end
 			end
 		end
@@ -118,10 +150,11 @@ function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
 
 	local a;
 	local auctKey = Auctioneer_GetAuctionKey();
+	
 	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 		for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
 			for auctionSignature, data in pairs(iData) do
-				if(not filter(param, auctionSignature, extra1, extra2)) then
+				if (not filter(param, auctionSignature, extra1, extra2)) then
 					a = Auctioneer_GetSnapshotFromData(data);
 					a.signature = auctionSignature;
 					table.insert(queryResults, a);
@@ -141,7 +174,7 @@ function Auctioneer_DoBroker(minProfit)
 	Auctioneer_ChatPrint(output);
 
 	local resellableAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit);
-
+	
 	-- sort by profit decending
 	table.sort(resellableAuctions, Auctioneer_ProfitComparisonSort);
 
@@ -167,7 +200,7 @@ function Auctioneer_DoBidBroker(minProfit)
 	local output = string.format(_AUCT['FrmtBidbrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
-	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit, TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM]);
+	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit, TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM]);
 
 	table.sort(bidWorthyAuctions, function(a, b) return (a.timeLeft < b.timeLeft) end);
 
@@ -186,7 +219,9 @@ function Auctioneer_DoBidBroker(minProfit)
 				bidText = _AUCT['FrmtBidbrokerMinbid'];
 			end
 			EnhTooltip.DebugPrint("a", a);
-			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(tonumber(a.timeLeft))));
+			
+			-- local secondsLeft = TIME_LEFT_SECONDS[a.timeLeft] + a.lastSeenTime - time()
+			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
 			Auctioneer_ChatPrint(output);
 		end
 	end

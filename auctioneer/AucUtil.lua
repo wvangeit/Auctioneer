@@ -29,7 +29,6 @@ QUALITY_POOR= 0;
 -- return the string representation of the given timeLeft constant
 function Auctioneer_GetTimeLeftString(timeLeft)
 	local timeLeftString = "";
-	-- TODO: localize these strings
 	if timeLeft == TIME_LEFT_SHORT then
 		timeLeftString = _AUCT['TimeShort'];
 	elseif timeLeft == TIME_LEFT_MEDIUM then
@@ -40,6 +39,17 @@ function Auctioneer_GetTimeLeftString(timeLeft)
 		timeLeftString = _AUCT['TimeVlong'];
 	end
 	return timeLeftString;
+end
+
+function Auctioneer_GetSecondsLeftString(secondsLeft)
+	local timeLeft = nil;
+	for i = table.getn(TIME_LEFT_SECONDS), 1, -1 do
+		if (secondsLeft >= TIME_LEFT_SECONDS[i]) then
+			timeLeft = i;
+			break
+		end
+	end
+	return Auctioneer_GetTimeLeftString(timeLeft);
 end
 
 function Auctioneer_GetGSC(money)
