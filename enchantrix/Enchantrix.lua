@@ -1143,18 +1143,18 @@ function Enchantrix_SetFrame(frame, chatprint)
 		frameNumber = 1;
 	end
 
-	Enchantrix_SetFilter("printframe", frameNumber);
-	
 	local _, frameName
 	if (chatprint == true) then
 		_, frameName = Enchantrix_GetFrameNames(frameNumber);
 		if (Enchantrix_GetFrameIndex() ~= frameNumber) then
-			Enchantrix_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_PRINTIN, frameName));
 		end
 	end
 	
+	Enchantrix_SetFilter("printframe", frameNumber);
+	
 	if (chatprint == true) then
-		Enchantrix_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+		Enchantrix_ChatPrint(string.format(ENCH_FRMT_PRINTIN, frameName));
 
 		if (Enchantrix_Khaos_Registered) then
 			Khaos.setSetKeyParameter("Enchantrix", "EnchantrixPrintFrame", "value", frameNumber);
