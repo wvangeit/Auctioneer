@@ -269,7 +269,7 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	if (not auctKey) then
 		auctKey = Auctioneer_GetAuctionKey();
 	end
-	if not (Auctioneer_Lowests and Auctioneer_Lowests.built) then Auctioneer_BuildLowestCache(auctKey) end
+	if not (Auctioneer_Lowests and Auctioneer_Lowests[auctKey] and Auctioneer_Lowests[auctKey].built) then Auctioneer_BuildLowestCache(auctKey) end
 
 	local lowKey = itemID..":"..itemRand;
 
@@ -279,7 +279,7 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 	local lowestPrice = 0;
 	local nextLowest = 0;
 
-	local lows = Auctioneer_Lowests[lowKey];
+	local lows = Auctioneer_Lowests[auctKey][lowKey];
 	if (lows) then
 		lowSig = lows.lowSig;
 		nextSig = lows.nextSig;
@@ -292,29 +292,31 @@ function Auctioneer_FindLowestAuctions(itemKey, auctKey)
 end
 
 function Auctioneer_BuildLowestCache(auctKey)
-	Auctioneer_Lowests = {};
+	if (Auctioneer_Lowests == nil) then Auctioneer_Lowests = {}; end
+	Auctioneer_Lowests[auctKey] = {}
+
 	local id, rprop, enchant, name, count, min, buyout, uniq, lowKey, priceForOne, curSig, curLowest;
 	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 		for itemCat, cData in pairs(AuctionConfig.snap[auctKey]) do
 			for sig, sData in pairs(cData) do
 				id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(sig);
 				lowKey = id..":"..rprop;
-				if (not Auctioneer_Lowests[lowKey]) then Auctioneer_Lowests[lowKey] = {} end
+				if (not Auctioneer_Lowests[auctKey][lowKey]) then Auctioneer_Lowests[auctKey][lowKey] = {} end
 				
 				priceForOne = buyout;
 				if (count and count > 0) then priceForOne = (buyout / count); end
 					
-				curSig = Auctioneer_Lowests[lowKey].lowSig;
-				curLowest = Auctioneer_Lowests[lowKey].lowestPrice or 0;
+				curSig = Auctioneer_Lowests[auctKey][lowKey].lowSig;
+				curLowest = Auctioneer_Lowests[auctKey][lowKey].lowestPrice or 0;
 				if (buyout > 0 and (curLowest == 0 or priceForOne < curLowest)) then 
-					Auctioneer_Lowests[lowKey] = {
+					Auctioneer_Lowests[auctKey][lowKey] = {
 						nextSig = curSig, nextLowest = curLowest, lowSig = sig, lowestPrice = priceForOne, cat = itemCat
 					};
 				end
 			end
 		end
 	end
-	Auctioneer_Lowests.built = true;
+	Auctioneer_Lowests[auctKey].built = true;
 end
 
 function Auctioneer_DoMedian(link)
