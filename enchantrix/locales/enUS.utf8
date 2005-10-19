@@ -97,6 +97,9 @@ ENCH_FRMT_PCTLESS_LINE = "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
 ENCH_FRMT_PRINTIN = "Encantrix's messages will now print on the \"%s\" chat frame";
 
+ENCH_TEXT_GENERAL = "General";
+ENCH_TEXT_COMBAT = "Combat";
+
 --GUI localizations
 
 ENCH_GUI_MAIN_HELP = "Contains settings for Enchantrix \nan AddOn that displays information in item tooltips pertaining to the results of disenchanting said item.";

@@ -97,6 +97,9 @@ ENCH_FRMT_PCTLESS_LINE = "%s, Valorado en: %s, OC: %s, Ahorra: %s, Menos %s";
 ENCH_FRMT_PCTLESS_DONE = "Porcentajes menores finalizado.";
 ENCH_FRMT_PRINTIN = "Los mensajes de Enchantrix se imprimirán en la ventana de comunicación \"%s\"";
 
+ENCH_TEXT_GENERAL = ENCH_TEXT_GENERAL;
+ENCH_TEXT_COMBAT = ENCH_TEXT_COMBAT;
+
 --GUI localizations
 
 ENCH_GUI_MAIN_HELP = "Contiene ajustes para Enchantrix \nun aditamento que muestra información en la caja de ayuda con relación a los resultados de desencantar el artículo.";

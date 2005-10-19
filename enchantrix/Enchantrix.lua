@@ -1077,9 +1077,9 @@ function Enchantrix_GetFrameNames(index)
 
 		if ( name == "" ) then 
 			if (i == 1) then
-				frames["General"] = 1;
+				frames[ENCH_TEXT_GENERAL] = 1;
 			elseif (i == 2) then
-				frames["Combat"] = 2;
+				frames[ENCH_TEXT_COMBAT] = 2;
 			end
 		else 
 			frames[name] = i;
@@ -1091,9 +1091,9 @@ function Enchantrix_GetFrameNames(index)
 
 		if ( name == "" ) then 
 			if (index == 1) then
-				frameName = "General";
+				frameName = ENCH_TEXT_GENERAL;
 			elseif (index == 2) then
-				frameName = "Combat";
+				frameName = ENCH_TEXT_COMBAT;
 			end
 		else 
 			frameName = name;
