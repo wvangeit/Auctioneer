@@ -145,6 +145,9 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
 	ENCH_FRMT_PRINTIN = "Encantrix's messages will now print on the \"%s\" chat frame";
 	
+	ENCH_TEXT_GENERAL = "General";
+	ENCH_TEXT_COMBAT = "Combat";
+	
 	
 	
 	ENCH_GUI_MAIN_HELP = "Contains settings for Enchantrix \nan AddOn that displays information in item tooltips pertaining to the results of disenchanting said item.";
@@ -357,6 +360,10 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Vision Dust"] = 11137;
 
 
+		-- The following definitions are missing in this locale:
+		--	ENCH_TEXT_COMBAT = "";
+		--	ENCH_TEXT_GENERAL = "";
+
 	end
 
 
@@ -460,6 +467,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_PCTLESS_LINE="%s, Wert bei: %s, SK: %s, Ersparnis: %s, %s weniger";
 		ENCH_FRMT_PCTLESS_DONE="Die Auktionssuche (Prozent unter Sofortkauf) ist abgeschlossen.";
 		ENCH_FRMT_PRINTIN="Die Enchantrix-Meldungen werden nun im Chat-Fenster \"%s\" angezeigt";
+		
+		ENCH_TEXT_GENERAL="Allgemein";
+		ENCH_TEXT_COMBAT="Kampflog";
 		
 		
 		
@@ -620,6 +630,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_PCTLESS_DONE="Porcentajes menores finalizado.";
 		ENCH_FRMT_PRINTIN="Los mensajes de Enchantrix se imprimir\195\161n en la ventana de comunicaci\195\179n \"%s\"";
 		
+		ENCH_TEXT_GENERAL=ENCH_TEXT_GENERAL;
+		ENCH_TEXT_COMBAT=ENCH_TEXT_COMBAT;
+		
 		--GUI localizations
 		
 		ENCH_GUI_MAIN_HELP="Contiene ajustes para Enchantrix \nun aditamento que muestra informaci\195\179n en la caja de ayuda con relaci\195\179n a los resultados de desencantar el art\195\173culo.";
@@ -764,6 +777,8 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_SHOW_VALUE = "";
 		--	ENCH_STAT_OFF = "";
 		--	ENCH_STAT_ON = "";
+		--	ENCH_TEXT_COMBAT = "";
+		--	ENCH_TEXT_GENERAL = "";
 		--	EssenceItemIDs = "";
 
 	end

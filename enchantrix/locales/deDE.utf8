@@ -96,6 +96,9 @@ ENCH_FRMT_PCTLESS_LINE="%s, Wert bei: %s, SK: %s, Ersparnis: %s, %s weniger";
 ENCH_FRMT_PCTLESS_DONE="Die Auktionssuche (Prozent unter Sofortkauf) ist abgeschlossen.";
 ENCH_FRMT_PRINTIN = "Die Enchantrix-Meldungen werden nun im Chat-Fenster \"%s\" angezeigt";
 
+ENCH_TEXT_GENERAL = "Allgemein";
+ENCH_TEXT_COMBAT = "Kampflog";
+
 
 
 ENCH_GUI_MAIN_HELP = "Einstellungen für Enchantrix, einem AddOn das Informationen über die möglichen Entzauberungen eines Gegenstands in Tooltips anzeigt.";
