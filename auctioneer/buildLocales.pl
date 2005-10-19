@@ -1,8 +1,5 @@
 #!/usr/bin/perl
 
-open PERLCONV, "> perlconv";
-print PERLCONV "#!/usr/bin/perl -pi\n\n";
-
 open OUT, "> localization.lua";
 print OUT << 'EOD';
 --[[
@@ -47,17 +44,7 @@ while (<DATA>) {
 		$defined{$1} = $2;
 		$key = $1;
 		$val = $2;
-		if ($key =~ /^AUCT(IONEER)?_([A-Z_]+)/) {
-			$keyname = $2;
-			$keyname =~ s/_/ /g;
-			$keyname = ucfirst(lc($keyname));
-			$keyname =~ s/ ([^ ]+)/ucfirst($1)/ge;
-			$_ = "_AUCT['$keyname'] = $val\n";
-			print PERLCONV "s/$key/_AUCT['$keyname']/g;\n";
-		}
-		else {
-			$_ = "$key = $val\n";
-		}
+		$_ = "$key = $val\n";
 	}
 	print OUT "\t$_";
 }
@@ -68,7 +55,7 @@ print OUT "\n";
 for $locale (@locales) {
 	%localized = ();
 	print OUT "-- Locale strings for the $locale locale\n";
-	print OUT "if locale == \"$locale\" then\n";
+	print OUT "\tif locale == \"$locale\" then\n";
 	open(DATA, "< locales/$locale.utf8");
 	while (<DATA>) {
 		s/\xEF\xBB\xBF//;
@@ -79,16 +66,7 @@ for $locale (@locales) {
 				$localized{$1} = $2;
 				$key = $1;
 				$val = $2;
-				if ($key =~ /^AUCT(IONEER)?_([A-Z_]+)/) {
-					$keyname = $2;
-					$keyname =~ s/_/ /g;
-					$keyname = ucfirst(lc($keyname));
-					$keyname =~ s/ ([^ ]+)/ucfirst($1)/ge;
-					$_ = "_AUCT['$keyname'] = $val\n";
-				}
-				else {
-					$_ = "$key = $val;\n";
-				}
+				$_ = "$key = $val;\n";
 				print OUT "\t\t$_";
 			}
 		}
@@ -110,7 +88,7 @@ for $locale (@locales) {
 		}
 	}
 	
-	print OUT "end\n\n";
+	print OUT "\tend\n\n";
 }
 
 print OUT "end\n\nAuctioneer_SetLocaleStrings(GetLocale);\n\n";

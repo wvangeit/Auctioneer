@@ -243,6 +243,9 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['TextNone'] = "none";
 	_AUCT['TextUsage'] = "Usage:";
 	
+	_AUCT['TextGeneral'] = "General";
+	_AUCT['TextCombat'] = "Combat";
+	
 	
 	
 	_AUCT['AuctionScanStart'] = "Auctioneer: scanning %s page 1...";
@@ -323,7 +326,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
 
 -- Locale strings for the daDK locale
-if locale == "daDK" then
+	if locale == "daDK" then
 		-- Encoded in UTF8
 		
 		_AUCT['TimeShort'] = "Short";
@@ -605,10 +608,10 @@ if locale == "daDK" then
 		_AUCT['GuiDefaultOption'] = "Reset this setting";
 		_AUCT['GuiPrintin'] = "Select the desired message frame";
 
-end
+	end
 
 -- Locale strings for the deDE locale
-if locale == "deDE" then
+	if locale == "deDE" then
 		-- Encoded in UTF8
 		
 		_AUCT['TimeShort'] = "Kurz";
@@ -861,10 +864,10 @@ if locale == "deDE" then
 		_AUCT['GuiReloaduiHelp']     = "Hier klicken, um das Benutzerinterface neu zu laden, damit die gew\195\164hlte Sprache f\195\188r Auctioneer aktiviert wird, sofern sie ge\195\164ndert wurde.\nHinweis: Dies kann je nach System/Anzahl aktiver Addons \195\188ber eine Minute dauern.";
 		_AUCT['GuiReloaduiButton']   = "ReloadUI";
 		_AUCT['GuiReloaduiFeedback'] = "Lade jetzt das WoW-UI neu.";
-end
+	end
 
 -- Locale strings for the esES locale
-if locale == "esES" then
+	if locale == "esES" then
 		-- Encoded in UTF8
 		
 		_AUCT['TimeShort'] = "Corto";
@@ -1063,6 +1066,9 @@ if locale == "esES" then
 		_AUCT['TextNone'] = "ningun";
 		_AUCT['TextUsage'] = "Uso:";
 		
+		_AUCT['TextGeneral'] = _AUCT['TextGeneral'];
+		_AUCT['TextCombat'] = _AUCT['TextCombat'];
+		
 		-- AH Scanning localizations
 		
 		_AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" p\195\161gina 1...";
@@ -1140,10 +1146,10 @@ if locale == "esES" then
 		_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_AUCT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
 		_AUCT['GuiPrintin'] = "Seleccione la ventana deseada";
-end
+	end
 
 -- Locale strings for the frFR locale
-if locale == "frFR" then
+	if locale == "frFR" then
 		-- Encoded in UTF8
 		
 		_AUCT['FrmtBrokerHeader'] = "Profit Minimum: %s, HSP = 'Prix de vente maximum', AI = 'Achat Imm\195\169diat'";
@@ -1180,7 +1186,7 @@ if locale == "frFR" then
 		_AUCT['AuctionScanNexttime'] = "Auctioneer fera un scan complet de la maison des ventes la prochaine fois que vous parlerez \195\160 un commisaire-priseur.";
 		
 
-end
+	end
 
 end
 
