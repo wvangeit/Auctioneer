@@ -1,7 +1,7 @@
 ﻿-- Encoded in UTF8
 
-BINDING_HEADER_INFORMANT_HEADER = "Informant"
-BINDING_NAME_INFORMANT_POPUPDOWN = "Toggle Information Window"
+BINDING_HEADER_INFORMANT_HEADER = BINDING_HEADER_INFORMANT_HEADER
+BINDING_NAME_INFORMANT_POPUPDOWN = "Invertír la ventana de Informant"
 
 _INFORMANT['Welcome'] = {
 	"|c40ff50ffBienvenido a Informant|r",

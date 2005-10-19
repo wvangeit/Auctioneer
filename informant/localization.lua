@@ -458,6 +458,8 @@ end
 if locale == "esES" then
 		-- Encoded in UTF8
 		
+		BINDING_HEADER_INFORMANT_HEADER = BINDING_HEADER_INFORMANT_HEADER;
+		BINDING_NAME_INFORMANT_POPUPDOWN = "Invert\195\173r la ventana de Informant";
 		
 		_INFORMANT['Welcome'] = {
 			"|c40ff50ffBienvenido a Informant|r",
@@ -611,10 +613,6 @@ if locale == "esES" then
 		_INFORMANT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
 		_INFORMANT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_INFORMANT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
-
-		-- The following definitions are missing in this locale:
-		--	BINDING_HEADER_INFORMANT_HEADER = "";
-		--	BINDING_NAME_INFORMANT_POPUPDOWN = "";
 end
 
 -- Locale strings for the frFR locale
