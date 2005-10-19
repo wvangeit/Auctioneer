@@ -461,7 +461,7 @@ function Auctioneer_LockAndLoad()
 		local slot = this:GetID()
 
 		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
-		if (count > 1 and not noSplit) then
+		if (count and count > 1 and not noSplit) then
 			if (button == "RightButton") and (IsAltKeyDown()) then
 				local splitCount = math.floor(count / 2)
 				local emptyBag, emptySlot = Auctioneer_FindEmptySlot()

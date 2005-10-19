@@ -75,7 +75,7 @@
 
   RegisterFunctionHook allows you to hook into a function.
   * The triggerFunction is a string that names the function you
-    want to hook into. eg: "GameTooltip.SetOwner
+    want to hook into. eg: "GameTooltip.SetOwner"
   * The position is a negative or positive number that defines
     the actual calling order of the addon. The smaller or more
     negative the number, the earlier in the call sequence your
