@@ -200,6 +200,9 @@ _AUCT['TextAuction'] = "auction";
 _AUCT['TextNone'] = "none";
 _AUCT['TextUsage'] = "Usage:";
 
+_AUCT['TextGeneral'] = "General";
+_AUCT['TextCombat'] = "Combat";
+
 -- AH Scanning localizations
 
 _AUCT['AuctionScanStart'] = "Auctioneer: scanning %s page 1...";

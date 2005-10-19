@@ -484,13 +484,13 @@ function Auctioneer_LockAndLoad()
 		Auctioneer_Command(msg, nil);
 	end
 
-	Auctioneer_ChatPrint(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
-
 	-- Rearranges elements in the AH window.
 	Auctioneer_ConfigureAH();
 	
 	--GUI Registration code added by MentalPower	
 	Auctioneer_Register();
+
+	Auctioneer_ChatPrint(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 end
 
 

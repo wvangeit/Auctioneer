@@ -196,6 +196,9 @@ _AUCT['TextAuction'] = "Subasta";
 _AUCT['TextNone'] = "ningun";
 _AUCT['TextUsage'] = "Uso:";
 
+_AUCT['TextGeneral'] = _AUCT['TextGeneral'];
+_AUCT['TextCombat'] = _AUCT['TextCombat'];
+
 -- AH Scanning localizations
 
 _AUCT['AuctionScanStart'] = "Auctioneer: Explorando \"%s\" página 1...";
