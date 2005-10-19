@@ -42,7 +42,7 @@
 
 
 
-ENCH_VALID_LOCALES = {["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
+ENCH_VALID_LOCALES = {["daDK"] = true, ["deDE"] = true, ["enUS"] = true, ["esES"] = true, ["frFR"] = true};
 
 function Enchantrix_SetLocaleStrings(locale)
 	-- Default locale strings are defined in English
@@ -63,6 +63,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_CMD_CLEAR_ALL = "all";
 	ENCH_CMD_LOCALE = "locale";
 	ENCH_CMD_DEFAULT = "default";
+	ENCH_CMD_PRINTIN = "print-in";
 	
 	ENCH_CMD_FIND_BUYAUCT = "percentless";
 	ENCH_CMD_FIND_BIDAUCT = "bidbroker";
@@ -75,6 +76,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_OPT_FIND_BUYAUCT = "<percent>";
 	ENCH_OPT_FIND_BIDAUCT = "<silver>";
 	ENCH_OPT_DEFAULT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
+	ENCH_OPT_PRINTIN = "(<frameIndex>[Number]|<frameName>[String])";
 	
 	ENCH_SHOW_EMBED = "embed";
 	ENCH_SHOW_HEADER = "header";
@@ -199,100 +201,305 @@ function Enchantrix_SetLocaleStrings(locale)
 
 
 
-	-- Locale strings for the deDE locale
-	if locale == "deDE" then
+	-- Locale strings for the daDK locale
+	if locale == "daDK" then
 		-- Encoded in UTF8
-		-- German localization for Enchantrix by FtKxDE
-		-- http://norganna.org/bb/index.php?s=&showtopic=334&view=findpost&p=1561
+		-- English localization for Enchantrix
 		
-		ENCH_FRMT_WELCOME="Enchantrix v%s geladen";
-		ENCH_FRMT_CREDIT=" (gehe zu http://enchantrix.org/ um deine Daten zu \195\188bertragen)";
 		
-		ENCH_ARG_SPELLNAME="Entzaubern";
+		ENCH_FRMT_WELCOME="Enchantrix v%s loaded";
+		ENCH_FRMT_CREDIT="  (go to http://enchantrix.org/ to share your data)";
 		
-		ENCH_CMD_OFF="aus";
-		ENCH_CMD_ON="an";
+		ENCH_ARG_SPELLNAME="Disenchant";
+		
+		ENCH_CMD_OFF="off";
+		ENCH_CMD_ON="on";
 		ENCH_CMD_TOGGLE="toggle";
-		ENCH_CMD_CLEAR="leeren";
-		ENCH_CMD_CLEAR_ALL="alle";
+		ENCH_CMD_DISABLE="disable";
+		ENCH_CMD_CLEAR="clear";
+		ENCH_CMD_CLEAR_ALL="all";
+		ENCH_CMD_LOCALE="locale";
+		ENCH_CMD_DEFAULT="default";
+		ENCH_CMD_PRINTIN="print-in";
 		
-		ENCH_CMD_FIND_BUYAUCT="prozentlos";
-		ENCH_CMD_FIND_BIDAUCT="Angebotsmakler";
+		ENCH_CMD_FIND_BUYAUCT="percentless";
+		ENCH_CMD_FIND_BIDAUCT="bidbroker";
 		
 		ENCH_CMD_FIND_BUYAUCT_SHORT="pl";
 		ENCH_CMD_FIND_BIDAUCT_SHORT="bb";
 		
 		ENCH_OPT_CLEAR="([Item]|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_LOCALE="<locale>";
 		ENCH_OPT_FIND_BUYAUCT="<percent>";
 		ENCH_OPT_FIND_BIDAUCT="<silver>";
+		ENCH_OPT_DEFAULT="(<option>|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_PRINTIN="(<frameIndex>[Number]|<frameName>[String])";
 		
-		ENCH_SHOW_EMBED="zeige-eingebunden";
-		ENCH_SHOW_HEADER="zeige-kopf";
-		ENCH_SHOW_COUNT="zeige-anzahl";
-		ENCH_SHOW_RATE="zeige-kurs";
-		ENCH_SHOW_VALUE="zeige-wert";
-		ENCH_SHOW_GUESS_AUCTIONEER_HSP="valuate-hvp";
+		ENCH_SHOW_EMBED="embed";
+		ENCH_SHOW_HEADER="header";
+		ENCH_SHOW_COUNT="counts";
+		ENCH_SHOW_RATE="rates";
+		ENCH_SHOW_VALUE="valuate";
+		ENCH_SHOW_GUESS_AUCTIONEER_HSP="valuate-hsp";
 		ENCH_SHOW_GUESS_AUCTIONEER_MED="valuate-median";
-		ENCH_SHOW_GUESS_BASELINE="valuate-grundpreis";
+		ENCH_SHOW_GUESS_BASELINE="valuate-baseline";
 		
-		ENCH_HELP_ONOFF="Schaltet Anzeige Entzauberungsdaten ein oder aus";
-		ENCH_HELP_EMBED="Zeige Text im normalen Tooltip (Hinweis: Einige Funktionen stehen dann nicht zur Verf\195\188gung)";
+		ENCH_HELP_ONOFF="Turns the enchant data display on and off";
+		ENCH_HELP_DISABLE="Stops enchantrix from automatically loading next time you log in";
+		ENCH_HELP_EMBED="Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
+		ENCH_HELP_HEADER="Select whether to show the header line";
+		ENCH_HELP_COUNT="Select whether to show the exact counts in the database";
+		ENCH_HELP_RATE="Select whether to show the average quantity of disenchant";
+		
+		ENCH_HELP_VALUE="Select whether to show item's estimated values based on the proportions of possible disenchants";
+		ENCH_HELP_GUESS_AUCTIONEER_HSP="If valuation is enabled, and you have Auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
+		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="If valuation is enabled, and you have Auctioneer installed, display the median based valuation of disenchanting the item.";
+		ENCH_HELP_GUESS_NOAUCTIONEER="The "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." and "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." commands are not available because you do not have auctioneer installed";
+		ENCH_HELP_GUESS_BASELINE="If valuation is enabled, (Auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
+		
+		ENCH_HELP_CLEAR="Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
+		ENCH_HELP_LOCALE="Change the locale that is used to display Enchantrix messages";
+		ENCH_HELP_FIND_BUYAUCT="Find auctions whose possible disenchant value is a certain percent less than the buyout price";
+		ENCH_HELP_FIND_BIDAUCT="Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
+		ENCH_HELP_DEFAULT="Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
+		ENCH_HELP_PRINTIN="Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
+		
+		ENCH_MESG_NOTLOADED="Enchantrix is not loaded. Type /enchantrix for more info.";
+		
+		ENCH_STAT_ON="Displaying configured enchant data";
+		ENCH_STAT_OFF="Not displaying any enchant data";
+		
+		ENCH_FRMT_ACT_CLEARALL="Clearing all enchant data for %s";
+		ENCH_FRMT_ACT_CLEAR_OK="Cleared data for item: %s";
+		ENCH_FRMT_ACT_CLEAR_FAIL="Unable to find item: %s";
+		ENCH_FRMT_ACT_ENABLE="Displaying item's %s data";
+		ENCH_FRMT_ACT_DISABLE="Not displaying item's %s data";
+		ENCH_FRMT_ACT_ENABLED_ON="Displaying item's %s on %s";
+		ENCH_FRMT_ACT_SET="Set %s to '%s'";
+		
+		ENCH_FRMT_ACT_UNKNOWN="Unknown command keyword: '%s'";
+		ENCH_FRMT_ACT_UNKNOWN_LOCALE="The locale you specified ('%s') is unknown. Valid locales are:";
+		ENCH_FRMT_ACT_DEFAULT_ALL="All Enchantrix options have been reset to default settings.";
+		ENCH_FRMT_ACT_DEFAULT="Enchantrix's %s option has been reset to its default setting";
+		
+		ENCH_FRMT_DISINTO="Disenchants into:";
+		ENCH_FRMT_FOUND="Found that %s disenchants into:";
+		ENCH_FRMT_USAGE="Usage:";
+		
+		ENCH_FRMT_COUNTS="    (base=%d, old=%d, new=%d)";
+		ENCH_FRMT_VALUE_AUCT_HSP="Disenchant value (HSP)";
+		ENCH_FRMT_VALUE_AUCT_MED="Disenchant value (Median)";
+		ENCH_FRMT_VALUE_MARKET="Disenchant value (Baseline)";
+		
+		ENCH_FRMT_BIDBROKER_HEADER="Bids having %s silver savings on average disenchant value:";
+		ENCH_FRMT_BIDBROKER_MINBID="minBid"
+		ENCH_FRMT_BIDBROKER_CURBID="curBid"
+		ENCH_FRMT_BIDBROKER_LINE="%s, Valued at: %s, %s: %s, Save: %s, Less %s, Time: %s";
+		ENCH_FRMT_BIDBROKER_DONE="Bid brokering done";
+		
+		ENCH_FRMT_PCTLESS_HEADER="Buyouts having %d%% savings over average item disenchant value:";
+		ENCH_FRMT_PCTLESS_LINE="%s, Valued at: %s, BO: %s, Save: %s, Less %s";
+		ENCH_FRMT_PCTLESS_DONE="Percent less done.";
+		ENCH_FRMT_PRINTIN="Encantrix's messages will now print on the \"%s\" chat frame";
+		
+		--GUI localizations
+		
+		ENCH_GUI_MAIN_HELP="Contains settings for Enchantrix \nan AddOn that displays information in item tooltips pertaining to the results of disenchanting said item.";
+		ENCH_GUI_MAIN_ENABLE="Enable Enchantrix";
+		ENCH_GUI_LOCALE="Set locale to";
+		ENCH_GUI_RELOADUI_BUTTON="ReloadUI";
+		ENCH_GUI_RELOADUI="Reload User Interface";
+		ENCH_GUI_RELOADUI_HELP="Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
+		ENCH_GUI_RELOADUI_FEEDBACK="Now Reloading the WoW UI";
+		ENCH_GUI_EMBED="Embed info in in-game tooltip";
+		ENCH_GUI_VALUATE_HEADER="Valuation";
+		ENCH_GUI_VALUATE_ENABLE="Enable Valuation";
+		ENCH_GUI_VALUATE_AVERAGES="Valuate with Auctioneer Averages";
+		ENCH_GUI_VALUATE_MEDIAN="Valuate with Auctioneer Medians";
+		ENCH_GUI_VALUATE_BASELINE="Valuate with Built-in Data";
+		ENCH_GUI_OTHER_HEADER="Other Options";
+		ENCH_GUI_OTHER_HELP="Miscellaneous Enchantrix Options";
+		ENCH_GUI_CLEARALL_BUTTON="Clear All";
+		ENCH_GUI_CLEARALL="Clear All Enchantrix Data";
+		ENCH_GUI_CLEARALL_HELP="Click here to clear all of Enchantrix data for the current server-realm.";
+		ENCH_GUI_CLEARALL_NOTE="for the current server-faction";
+		ENCH_GUI_DEFAULT_ALL_BUTTON="Reset All";
+		ENCH_GUI_DEFAULT_ALL="Reset All Enchantrix Options";
+		ENCH_GUI_DEFAULT_ALL_HELP="Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
+		ENCH_GUI_DEFAULT_OPTION="Reset this setting";
+		ENCH_GUI_PRINTIN="Select the desired message frame";
+		
+		--ID Numbers
+		
+		EssenceItemIDs={};
+		EssenceItemIDs["Greater Astral Essence"] = 11082;
+		EssenceItemIDs["Greater Eternal Essence"] = 16203;
+		EssenceItemIDs["Greater Magic Essence"] = 10939;
+		EssenceItemIDs["Greater Mystic Essence"] = 11135;
+		EssenceItemIDs["Greater Nether Essence"] = 11175;
+		EssenceItemIDs["Lesser Astral Essence"] = 10998;
+		EssenceItemIDs["Lesser Eternal Essence"] = 16202;
+		EssenceItemIDs["Lesser Magic Essence"] = 10938;
+		EssenceItemIDs["Lesser Mystic Essence"] = 11134;
+		EssenceItemIDs["Lesser Nether Essence"] = 11174;
+		EssenceItemIDs["Large Brilliant Shard"] = 14344;
+		EssenceItemIDs["Large Glimmering Shard"] = 11084;
+		EssenceItemIDs["Large Glowing Shard"] = 11139;
+		EssenceItemIDs["Large Radiant Shard"] = 11178;
+		EssenceItemIDs["Small Brilliant Shard"] = 14343;
+		EssenceItemIDs["Small Glimmering Shard"] = 10978;
+		EssenceItemIDs["Small Glowing Shard"] = 11138;
+		EssenceItemIDs["Small Radiant Shard"] = 11177;
+		EssenceItemIDs["Dream Dust"] = 11176;
+		EssenceItemIDs["Illusion Dust"] = 16204;
+		EssenceItemIDs["Soul Dust"] = 11083;
+		EssenceItemIDs["Strange Dust"] = 10940;
+		EssenceItemIDs["Vision Dust"] = 11137;
+
+
+	end
+
+
+
+	-- Locale strings for the deDE locale
+	if locale == "deDE" then
+		-- Encoded in UTF8
+		-- German localization for Enchantrix by FtKxDE
+		
+		ENCH_FRMT_WELCOME="Enchantrix v%s geladen";
+		ENCH_FRMT_CREDIT=" (besuche http://enchantrix.org/ um deine Daten zur Verf\195\188gung zu stellen)";
+		
+		ENCH_ARG_SPELLNAME="Entzaubern";
+		
+		ENCH_CMD_OFF="off";
+		ENCH_CMD_ON="on";
+		ENCH_CMD_TOGGLE="toggle";
+		ENCH_CMD_DISABLE="disable";
+		ENCH_CMD_CLEAR="clear";
+		ENCH_CMD_CLEAR_ALL="all";
+		ENCH_CMD_LOCALE="locale";
+		ENCH_CMD_DEFAULT="default";
+		ENCH_CMD_PRINTIN="print-in";
+		
+		ENCH_CMD_FIND_BUYAUCT="percentless";
+		ENCH_CMD_FIND_BIDAUCT="bidbroker";
+		
+		ENCH_CMD_FIND_BUYAUCT_SHORT="pl";
+		ENCH_CMD_FIND_BIDAUCT_SHORT="bb";
+		
+		ENCH_OPT_CLEAR="([Gegenstand]|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_LOCALE="<Gebietsschema>";
+		ENCH_OPT_FIND_BUYAUCT="<Prozent>";
+		ENCH_OPT_FIND_BIDAUCT="<Silber>";
+		ENCH_OPT_DEFAULT="(<Option>|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_PRINTIN="(<Index>[Nummer]|<Name>[Zeichenfolge])";
+		
+		ENCH_SHOW_EMBED="embed";
+		ENCH_SHOW_HEADER="header";
+		ENCH_SHOW_COUNT="counts";
+		ENCH_SHOW_RATE="rates";
+		ENCH_SHOW_VALUE="valuate";
+		ENCH_SHOW_GUESS_AUCTIONEER_HSP="valuate-hsp";
+		ENCH_SHOW_GUESS_AUCTIONEER_MED="valuate-median";
+		ENCH_SHOW_GUESS_BASELINE="valuate-baseline";
+		
+		ENCH_HELP_ONOFF="Schaltet die Anzeige von Entzauberungsdaten ein oder aus";
+		ENCH_HELP_DISABLE="Verhindert das automatische Laden von Enchantrix beim Login";
+		ENCH_HELP_EMBED="Zeige den Text im In-Game Tooltip \n(Hinweis: Einige Funktionen stehen dann nicht zur Verf\195\188gung)";
 		ENCH_HELP_HEADER="Ausw\195\164hlen ob die Kopfzeile angezeigt werden soll";
-		ENCH_HELP_COUNT="Ausw\195\164hlen ob genaue Anzahl angezeigt wird";
-		ENCH_HELP_RATE="Ausw\195\164hlen ob ungef\195\164hrer Wert des Entzaubern angezeigt wird";
+		ENCH_HELP_COUNT="Ausw\195\164hlen ob die genaue Anzahl der Entzauberungen aus der Datenbank angezeigt wird";
+		ENCH_HELP_RATE="Ausw\195\164hlen ob die durchschnittliche Anzahl der Entzauberungen angezeigt wird";
 		
-		ENCH_HELP_VALUE="Ausw\195\164hlen ob gesch\195\164tzte Werte der Entzauberung aufgrund \195\164hnlicher Gegenst\195\164nde angezeigt werden";
-		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den h\195\182chsten Verkaufspreis (HVP) f\195\188r das Entzaubern";
-		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn Wertebestimmung aktiv ist, und Auctioneer installiert ist, zeige den durchschnittlichen Wert f\195\188r das Entzaubern";
-		ENCH_HELP_GUESS_NOAUCTIONEER="Die Befehle "..ENCH_SHOW_GUESS_AUCTIONEER_HSP.." und "..ENCH_SHOW_GUESS_AUCTIONEER_MED.." sind nicht verf\195\188gbar weil Auctioneer nicht installiert ist";
-		ENCH_HELP_GUESS_BASELINE="Wenn Wertebestimmung aktiv ist, (Auctioneer nicht ben\195\182tigt) zeige Grundpreise aufgrund eingebauter fester Preisliste";
+		ENCH_HELP_VALUE="Ausw\195\164hlen ob gesch\195\164tzte Verkaufspreise aufgrund \nder Anteile an m\195\182glichen Entzauberungen angezeigt werden";
+		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den durchschnittlichen Verkaufspreis (Auctioneer-HSP) f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den mittleren Verkaufspreis (Auctioneer-MEDIAN) f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_NOAUCTIONEER="Die Befehle \""..ENCH_SHOW_GUESS_AUCTIONEER_HSP.."\" und \""..ENCH_SHOW_GUESS_AUCTIONEER_MED.."\" sind nicht verf\195\188gbar weil Auctioneer nicht installiert ist";
+		ENCH_HELP_GUESS_BASELINE="Wenn die Wertsch\195\164tzung aktiviert ist, zeige den \195\188blichen Verkaufspreis aus der internen Preisliste (Auctioneer wird nicht ben\195\182tigt)";
 		
-		ENCH_HELP_CLEAR="L\195\182sche Daten dieses Gegenstandes (Gegenst\195\164nde mit Shift-Klick einf\195\188gen zum Befehl) Alles l\195\182schen mit Befehl \"alle\"";
-		ENCH_HELP_FIND_BUYAUCT="Suche Auktionen deren Entzauberwert einen gewissen Prozentsatz unter dem Sofortkaufpreis liegt";
-		ENCH_HELP_FIND_BIDAUCT="Suche Auktionen deren Entzauberwert einen gewissen Wert unter dem Bietpreis liegt";
+		ENCH_HELP_CLEAR="L\195\182sche die Daten des angegebenen Gegenstands (Gegenst\195\164nde m\195\188ssen mit Shift-Klick einf\195\188gt werden). Mit dem Schl\195\188sselwort \""..ENCH_CMD_CLEAR_ALL.."\" werden alle Daten gel\195\182scht.";
+		ENCH_HELP_LOCALE="\195\132ndern des Gebietsschemas das zur Anzeige \nvon Enchantrix-Meldungen verwendet wird";
+		ENCH_HELP_FIND_BUYAUCT="Suche Auktionen deren Entzauberungswert einen bestimmten Prozentsatz unter dem Sofortkaufpreis liegt";
+		ENCH_HELP_FIND_BIDAUCT="Suche Auktionen deren Entzauberungswert einen bestimmten Betrag (in Silber) unter dem Gebotspreis liegt";
+		ENCH_HELP_DEFAULT="Setzt die angegebene Enchantrix-Option auf ihren Standardwert zur\195\188ck. Mit dem Schl\195\188sselwort \""..ENCH_CMD_CLEAR_ALL.."\" werden alle Enchantrix-Optionen zur\195\188ckgesetzt."
+		ENCH_HELP_PRINTIN="Ausw\195\164hlen in welchem Fenster die Enchantrix-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
 		
-		ENCH_STAT_ON="Zeige eingestellte Entzauberungsdaten";
-		ENCH_STAT_OFF="Zeige keine Entzauberungsdaten";
+		ENCH_MESG_NOTLOADED="Enchantrix ist nicht geladen. Geben Sie /enchantrix ein um mehr Informationen zu erhalten.";
 		
-		ENCH_FRMT_ACT_CLEARALL="L\195\182sche alle Auktionsdaten f\195\188r %s";
-		ENCH_FRMT_ACT_CLEAR_OK="L\195\182sche Daten f\195\188r Gegenstand %s";
+		ENCH_STAT_ON="Die Anzeige von Entzauberungsdaten wurde aktiviert";
+		ENCH_STAT_OFF="Die Anzeige von Entzauberungsdaten wurde deaktiviert";
+		
+		ENCH_FRMT_ACT_CLEARALL="L\195\182sche alle Entzauberungsdaten f\195\188r %s";
+		ENCH_FRMT_ACT_CLEAR_OK="Daten f\195\188r Gegenstand %s gel\195\182scht";
 		ENCH_FRMT_ACT_CLEAR_FAIL="Kann Gegenstand %s nicht finden";
 		ENCH_FRMT_ACT_ENABLE="Zeige Daten von Gegenstand %s";
 		ENCH_FRMT_ACT_DISABLE="Zeige keine Daten von Gegenstand %s";
 		ENCH_FRMT_ACT_ENABLED_ON="Zeige Gegenstand %s auf %s";
 		ENCH_FRMT_ACT_SET="Setze %s zu '%s'";
+		
 		ENCH_FRMT_ACT_UNKNOWN="Unbekannter Befehl: '%s'";
+		ENCH_FRMT_ACT_UNKNOWN_LOCALE="Das angegebene Gebietsschema ('%s') ist unbekannt. G\195\188ltige Gebietsschemen sind:";
+		ENCH_FRMT_ACT_DEFAULT_ALL="Alle Enchantrix-Optionen wurden auf die Standardwerte zur\195\188ckgesetzt.";
+		ENCH_FRMT_ACT_DEFAULT="Die Enchantrix-Option '%s' wurde auf den Standardwert zur\195\188ckgesetzt.";
 		
-		ENCH_FRMT_DISINTO="Entzaubern zu:";
+		ENCH_FRMT_DISINTO="M\195\182gliche Entzauberung zu:";
 		ENCH_FRMT_FOUND="%s wird entzaubert zu:";
-		ENCH_FRMT_USAGE="Benutzung:";
+		ENCH_FRMT_USAGE="Verwendung:";
 		
-		ENCH_FRMT_COUNTS=" (basis=%d, alt=%d, neu=%d)";
-		ENCH_FRMT_VALUE_AUCT_HSP="Entzaubern Gesamtwert (HSP)";
-		ENCH_FRMT_VALUE_AUCT_MED="Entzaubern Gesamtwert (Median)";
-		ENCH_FRMT_VALUE_MARKET="Entzaubern Gesamtwert (Baseline)";
+		ENCH_FRMT_COUNTS=" (Basis=%d, Alt=%d, Neu=%d)";
+		ENCH_FRMT_VALUE_AUCT_HSP="Durchschnittl. Wert (HSP)";
+		ENCH_FRMT_VALUE_AUCT_MED="Mittlerer Wert (MEDIAN)";
+		ENCH_FRMT_VALUE_MARKET="\195\156blicher Wert (Built-In)";
 		
-		ENCH_FRMT_BIDBROKER_HEADER="Auktionen mit %s Silber Einsparung auf durchschnittlichen Entzauberungswert:";
+		ENCH_FRMT_BIDBROKER_HEADER="Auktionen mit %s Silber Einsparung auf den durchschnittlichen Entzauberungswert:";
 		ENCH_FRMT_BIDBROKER_MINBID="minGeb"
 		ENCH_FRMT_BIDBROKER_CURBID="aktGeb"
-		ENCH_FRMT_BIDBROKER_LINE="%s, Wert bei: %s, %s: %s, Gespart: %s, weniger %s, Zeit: %s";
-		ENCH_FRMT_BIDBROKER_DONE="Angebotsmakler fertig";
+		ENCH_FRMT_BIDBROKER_LINE="%s, Wert bei: %s, %s: %s, Ersparnis: %s, %s weniger, Zeit: %s";
+		ENCH_FRMT_BIDBROKER_DONE="Die Auktionssuche (Betrag unter Gebotspreis) ist abgeschlossen.";
 		
 		ENCH_FRMT_PCTLESS_HEADER="Auktionen mit %d%% Einsparung auf durchschnittlichen Entzauberungswert:";
-		ENCH_FRMT_PCTLESS_LINE="%s,Wert bei: %s, SK: %s, Erspart: %s, weniger %s";
-		ENCH_FRMT_PCTLESS_DONE="Prozent weniger fertig.";
+		ENCH_FRMT_PCTLESS_LINE="%s, Wert bei: %s, SK: %s, Ersparnis: %s, %s weniger";
+		ENCH_FRMT_PCTLESS_DONE="Die Auktionssuche (Prozent unter Sofortkauf) ist abgeschlossen.";
+		ENCH_FRMT_PRINTIN="Die Enchantrix-Meldungen werden nun im Chat-Fenster \"%s\" angezeigt";
+		
+		
+		
+		ENCH_GUI_MAIN_HELP="Einstellungen f\195\188r Enchantrix, einem AddOn das Informationen \195\188ber die m\195\182glichen Entzauberungen eines Gegenstands in Tooltips anzeigt.";
+		ENCH_GUI_MAIN_ENABLE="Enchantrix aktivieren";
+		ENCH_GUI_LOCALE="Setze das Gebietsschema auf";
+		ENCH_GUI_RELOADUI_BUTTON="Neu laden";
+		ENCH_GUI_RELOADUI="Benutzeroberfl\195\164che neu laden";
+		ENCH_GUI_RELOADUI_HELP="Hier klicken um die WoW-Benutzeroberfl\195\164che nach einer \n\195\132nderung des Gebietsschemas neu zu laden, und dadurch \ndie Sprache des Konfigurationsmen\195\188s diesem entspricht.\nHinweis: Dieser Vorgang kann einige Minuten dauern.";
+		ENCH_GUI_RELOADUI_FEEDBACK="WoW-Benutzeroberfl\195\164che wird neu geladen";
+		ENCH_GUI_EMBED="In-Game Tooltip zur Anzeige verwenden";
+		ENCH_GUI_VALUATE_HEADER="Wertsch\195\164tzung";
+		ENCH_GUI_VALUATE_ENABLE="Wertsch\195\164tzung aktivieren";
+		ENCH_GUI_VALUATE_AVERAGES="Durchschnittlichen VKP anzeigen (Auctioneer)";
+		ENCH_GUI_VALUATE_MEDIAN="Mittleren Verkaufpreis anzeigen (Auctioneer)";
+		ENCH_GUI_VALUATE_BASELINE="\195\156blichen Verkaufspreis anzeigen (Built-In Preisliste)";
+		ENCH_GUI_OTHER_HEADER="Sonstige Optionen";
+		ENCH_GUI_OTHER_HELP="Sonstige Enchantrix-Optionen";
+		ENCH_GUI_CLEARALL_BUTTON="Alles l\195\182schen";
+		ENCH_GUI_CLEARALL="Alle Enchantrix-Daten l\195\182schen";
+		ENCH_GUI_CLEARALL_HELP="Hier klicken um alle Enchantrix-Daten auf dem aktuellen Realm zu l\195\182schen.";
+		ENCH_GUI_CLEARALL_NOTE="der aktuellen Fraktion auf dem aktuellen Realm";
+		ENCH_GUI_DEFAULT_ALL_BUTTON="Zur\195\188cksetzen";
+		ENCH_GUI_DEFAULT_ALL="Alle Einstellungen zur\195\188cksetzen";
+		ENCH_GUI_DEFAULT_ALL_HELP="Hier klicken um alle Enchantrix-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT r\195\188ckg\195\164ngig gemacht werden.";
+		ENCH_GUI_DEFAULT_OPTION="Zur\195\188cksetzen folgender Einstellung";
+		ENCH_GUI_PRINTIN="Gew\195\188nschtes Fenster f\195\188r Meldungen ausw\195\164hlen";
+		
 		
 		
 		EssenceItemIDs={};
-		EssenceItemIDs["Gro\195\159e Astral-Essenz"] = 11082;
+		EssenceItemIDs["Gro\195\159e Astralessenz"] = 11082;
 		EssenceItemIDs["Gro\195\159e ewige Essenz"] = 16203;
 		EssenceItemIDs["Gro\195\159e Magie-Essenz"] = 10939;
-		EssenceItemIDs["Gro\195\159e Mystiker-Essenz"] = 11135;
+		EssenceItemIDs["Gro\195\159e Mystikeressenz"] = 11135;
 		EssenceItemIDs["Gro\195\159e Nether-Essenz"] = 11175;
-		EssenceItemIDs["Geringe Astral-Essenz"] = 10998;
+		EssenceItemIDs["Geringe Astralessenz"] = 10998;
 		EssenceItemIDs["Geringe ewige Essenz"] = 16202;
 		EssenceItemIDs["Geringe Magie-Essenz"] = 10938;
-		EssenceItemIDs["Geringe Mystiker-Essenz"] = 11134;
+		EssenceItemIDs["Geringe Mystikeressenz"] = 11134;
 		EssenceItemIDs["Geringe Nether-Essenz"] = 11174;
 		EssenceItemIDs["Gro\195\159er gl\195\164nzender Splitter"] = 14344;
 		EssenceItemIDs["Gro\195\159er glei\195\159ender Splitter"] = 11084;
@@ -303,50 +510,10 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Kleiner leuchtender Splitter"] = 11138;
 		EssenceItemIDs["Kleiner strahlender Splitter"] = 11177;
 		EssenceItemIDs["Traumstaub"] = 11176;
-		EssenceItemIDs["Illusions Staub"] = 16204;
+		EssenceItemIDs["Illusionsstaub"] = 16204;
 		EssenceItemIDs["Seelenstaub"] = 11083;
 		EssenceItemIDs["Seltsamer Staub"] = 10940;
 		EssenceItemIDs["Visionenstaub"] = 11137;
-
-		-- The following definitions are missing in this locale:
-		--	ENCH_CMD_DEFAULT = "";
-		--	ENCH_CMD_DISABLE = "";
-		--	ENCH_CMD_LOCALE = "";
-		--	ENCH_FRMT_ACT_DEFAULT = "";
-		--	ENCH_FRMT_ACT_DEFAULT_ALL = "";
-		--	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "";
-		--	ENCH_FRMT_PRINTIN = "";
-		--	ENCH_GUI_CLEARALL = "";
-		--	ENCH_GUI_CLEARALL_BUTTON = "";
-		--	ENCH_GUI_CLEARALL_HELP = "";
-		--	ENCH_GUI_CLEARALL_NOTE = "";
-		--	ENCH_GUI_DEFAULT_ALL = "";
-		--	ENCH_GUI_DEFAULT_ALL_BUTTON = "";
-		--	ENCH_GUI_DEFAULT_ALL_HELP = "";
-		--	ENCH_GUI_DEFAULT_OPTION = "";
-		--	ENCH_GUI_EMBED = "";
-		--	ENCH_GUI_LOCALE = "";
-		--	ENCH_GUI_MAIN_ENABLE = "";
-		--	ENCH_GUI_MAIN_HELP = "";
-		--	ENCH_GUI_OTHER_HEADER = "";
-		--	ENCH_GUI_OTHER_HELP = "";
-		--	ENCH_GUI_PRINTIN = "";
-		--	ENCH_GUI_RELOADUI = "";
-		--	ENCH_GUI_RELOADUI_BUTTON = "";
-		--	ENCH_GUI_RELOADUI_FEEDBACK = "";
-		--	ENCH_GUI_RELOADUI_HELP = "";
-		--	ENCH_GUI_VALUATE_AVERAGES = "";
-		--	ENCH_GUI_VALUATE_BASELINE = "";
-		--	ENCH_GUI_VALUATE_ENABLE = "";
-		--	ENCH_GUI_VALUATE_HEADER = "";
-		--	ENCH_GUI_VALUATE_MEDIAN = "";
-		--	ENCH_HELP_DEFAULT = "";
-		--	ENCH_HELP_DISABLE = "";
-		--	ENCH_HELP_LOCALE = "";
-		--	ENCH_HELP_PRINTIN = "";
-		--	ENCH_MESG_NOTLOADED = "";
-		--	ENCH_OPT_DEFAULT = "";
-		--	ENCH_OPT_LOCALE = "";
 
 	end
 
@@ -371,6 +538,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_CMD_CLEAR_ALL="todo";
 		ENCH_CMD_LOCALE="localidad";
 		ENCH_CMD_DEFAULT="original";
+		ENCH_CMD_PRINTIN="imprimir-en";
 		
 		ENCH_CMD_FIND_BUYAUCT="porcientomenos";
 		ENCH_CMD_FIND_BIDAUCT="corredorofertas";
@@ -383,6 +551,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_OPT_FIND_BUYAUCT="<percent>";
 		ENCH_OPT_FIND_BIDAUCT="<silver>";
 		ENCH_OPT_DEFAULT="(<opci\195\179n>|"..ENCH_CMD_CLEAR_ALL..")";
+		ENCH_OPT_PRINTIN="(<indiceVentana>[N\195\186mero]|<nombreVentana>[Serie])";
 		
 		ENCH_SHOW_EMBED="integrar";
 		ENCH_SHOW_HEADER="titulo";
@@ -506,6 +675,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_CMD_LOCALE = "";
 		--	ENCH_CMD_OFF = "";
 		--	ENCH_CMD_ON = "";
+		--	ENCH_CMD_PRINTIN = "";
 		--	ENCH_CMD_TOGGLE = "";
 		--	ENCH_FRMT_ACT_CLEARALL = "";
 		--	ENCH_FRMT_ACT_CLEAR_FAIL = "";
@@ -583,6 +753,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_OPT_FIND_BIDAUCT = "";
 		--	ENCH_OPT_FIND_BUYAUCT = "";
 		--	ENCH_OPT_LOCALE = "";
+		--	ENCH_OPT_PRINTIN = "";
 		--	ENCH_SHOW_COUNT = "";
 		--	ENCH_SHOW_EMBED = "";
 		--	ENCH_SHOW_GUESS_AUCTIONEER_HSP = "";
