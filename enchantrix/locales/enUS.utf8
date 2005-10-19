@@ -15,6 +15,7 @@ ENCH_CMD_CLEAR = "clear";
 ENCH_CMD_CLEAR_ALL = "all";
 ENCH_CMD_LOCALE = "locale";
 ENCH_CMD_DEFAULT = "default";
+ENCH_CMD_PRINTIN = "print-in";
 
 ENCH_CMD_FIND_BUYAUCT = "percentless";
 ENCH_CMD_FIND_BIDAUCT = "bidbroker";
@@ -27,6 +28,7 @@ ENCH_OPT_LOCALE = "<locale>";
 ENCH_OPT_FIND_BUYAUCT = "<percent>";
 ENCH_OPT_FIND_BIDAUCT = "<silver>";
 ENCH_OPT_DEFAULT = "(<option>|"..ENCH_CMD_CLEAR_ALL..")";
+ENCH_OPT_PRINTIN = "(<frameIndex>[Number]|<frameName>[String])";
 
 ENCH_SHOW_EMBED = "embed";
 ENCH_SHOW_HEADER = "header";
@@ -55,6 +57,7 @@ ENCH_HELP_LOCALE = "Change the locale that is used to display Enchantrix message
 ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
+ENCH_HELP_PRINTIN = "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
 
 ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 
@@ -92,6 +95,7 @@ ENCH_FRMT_BIDBROKER_DONE = "Bid brokering done";
 ENCH_FRMT_PCTLESS_HEADER = "Buyouts having %d%% savings over average item disenchant value:";
 ENCH_FRMT_PCTLESS_LINE = "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
+ENCH_FRMT_PRINTIN = "Encantrix's messages will now print on the \"%s\" chat frame";
 
 --GUI localizations
 
@@ -118,6 +122,7 @@ ENCH_GUI_DEFAULT_ALL_BUTTON = "Reset All";
 ENCH_GUI_DEFAULT_ALL = "Reset All Enchantrix Options";
 ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
+ENCH_GUI_PRINTIN = "Select the desired message frame";
 
 --ID Numbers
 

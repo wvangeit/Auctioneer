@@ -369,14 +369,16 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 end
 
 function Enchantrix_ChatPrint(str)
-	if ( DEFAULT_CHAT_FRAME ) then
-		DEFAULT_CHAT_FRAME:AddMessage(str, 1.0, 0.5, 0.25);
+	if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
+		getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(str, 1.0, 0.5, 0.25);
 	end
 end
 
 function Enchantrix_OnLoad()
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, Enchantrix_HookTooltip)
+
+	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix_AuctioneerLoaded);
 
 	Stubby.RegisterEventHook("SPELLCAST_FAILED", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", Enchantrix_OnEvent);
@@ -469,7 +471,7 @@ function Enchantrix_Register()
 end
 
 function Enchantrix_Register_Khaos()
-	local optionSet = {
+	Enchantrix_optionSet = {
 		id="Enchantrix";
 		text="Enchantrix";
 		helptext=ENCH_GUI_MAIN_HELP;
@@ -580,6 +582,7 @@ function Enchantrix_Register_Khaos()
 			};
 			{
 				id=ENCH_SHOW_VALUE;
+				key="EnchantrixValuate";
 				type=K_TEXT;
 				text=ENCH_GUI_VALUATE_ENABLE;
 				helptext=ENCH_HELP_VALUE;
@@ -604,56 +607,6 @@ function Enchantrix_Register_Khaos()
 				difficulty=1;
 			};
 			{
-				id=ENCH_SHOW_GUESS_AUCTIONEER_HSP;
-				type=K_TEXT;
-				text=ENCH_GUI_VALUATE_AVERAGES;
-				helptext=ENCH_HELP_GUESS_AUCTIONEER_HSP;
-				callback=function(state)
-					if (state.checked) then
-						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_ON);
-					else
-						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_OFF);
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
-					else
-						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
-					end
-				end;
-				check=true;
-				default={checked=true};
-				disabled={checked=false};
-				dependencies={AuctioneerEnable={checked=true;}, ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
-				difficulty=2;
-			};
-			{
-				id=ENCH_SHOW_GUESS_AUCTIONEER_MED;
-				type=K_TEXT;
-				text=ENCH_GUI_VALUATE_MEDIAN;
-				helptext=ENCH_HELP_GUESS_AUCTIONEER_MEDIAN;
-				callback=function(state)
-					if (state.checked) then
-						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_ON);
-					else
-						Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_OFF);
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
-					else
-						return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
-					end
-				end;
-				check=true;
-				default={checked=true};
-				disabled={checked=false};
-				dependencies={AuctioneerEnable={checked=true;}, ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
-				difficulty=2;
-			};
-			{
 				id=ENCH_SHOW_GUESS_BASELINE;
 				type=K_TEXT;
 				text=ENCH_GUI_VALUATE_BASELINE;
@@ -675,7 +628,7 @@ function Enchantrix_Register_Khaos()
 				check=true;
 				default={checked=true};
 				disabled={checked=false};
-				dependencies={ENCH_SHOW_VALUE={checked=true}, EnchantrixEnable={checked=true;}};
+				dependencies={EnchantrixValuate={checked=true;}, EnchantrixEnable={checked=true;}};
 				difficulty=2;
 			};
 			{
@@ -720,6 +673,31 @@ function Enchantrix_Register_Khaos()
 				difficulty=1;
 			};
 			{
+				id="EnchantrixPrintFrame";
+				type=K_PULLDOWN;
+				setup = {
+					options = Enchantrix_GetFrameNames();
+					multiSelect = false;
+				};
+				text=ENCH_GUI_PRINTIN;
+				helptext=ENCH_HELP_PRINTIN;
+				callback=function(state)
+					Enchantrix_SetFrame(state.value);
+				end;
+				feedback=function(state)
+					local _, frameName = Enchantrix_GetFrameNames(state.value)
+					return string.format(ENCH_FRMT_PRINTIN, frameName);
+				end;
+				default = {
+					value=Enchantrix_GetFrameIndex();
+				};
+				disabled = {
+					value=Enchantrix_GetFrameIndex();
+				};
+				dependencies={EnchantrixEnable={checked=true;}};
+				difficulty=3;
+			};
+			{
 				id="DefaultOption";
 				type=K_EDITBOX;
 				setup = {
@@ -749,10 +727,90 @@ function Enchantrix_Register_Khaos()
 		};
 	};
 
-	Khaos.registerOptionSet("tooltip",optionSet);
+	Khaos.registerOptionSet("tooltip",Enchantrix_optionSet);
 	Enchantrix_Khaos_Registered = true;
 	
 	return true;
+end
+
+function Enchantrix_AuctioneerLoaded()
+if (Enchantrix_Khaos_Registered) then
+	Enchantrix_ChatPrint("function called");
+
+	if (Enchantrix_optionSet.options[8].id == ENCH_SHOW_GUESS_AUCTIONEER_HSP) then
+		Enchantrix_ChatPrint("options already added");
+		return nil;
+	end
+	
+	local AuctioneerOptions = {
+		{
+			id=ENCH_SHOW_GUESS_AUCTIONEER_HSP;
+			type=K_TEXT;
+			text=ENCH_GUI_VALUATE_AVERAGES;
+			helptext=ENCH_HELP_GUESS_AUCTIONEER_HSP;
+			callback=function(state)
+				if (state.checked) then
+					Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_ON);
+				else
+					Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_HSP, ENCH_CMD_OFF);
+				end
+			end;
+			feedback=function(state)
+				if (state.checked) then
+					return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
+				else
+					return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_HSP));
+				end
+			end;
+			check=true;
+			default={checked=true};
+			disabled={checked=false};
+			dependencies={EnchantrixAuctioneer={checked=true;}, EnchantrixValuate={checked=true;}, EnchantrixEnable={checked=true;}};
+			difficulty=2;
+		};
+		{
+			id=ENCH_SHOW_GUESS_AUCTIONEER_MED;
+			type=K_TEXT;
+			text=ENCH_GUI_VALUATE_MEDIAN;
+			helptext=ENCH_HELP_GUESS_AUCTIONEER_MEDIAN;
+			callback=function(state)
+				if (state.checked) then
+					Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_ON);
+				else
+					Enchantrix_GenVarSet(ENCH_SHOW_GUESS_AUCTIONEER_MED, ENCH_CMD_OFF);
+				end
+			end;
+			feedback=function(state)
+				if (state.checked) then
+					return (string.format(ENCH_FRMT_ACT_ENABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
+				else
+					return (string.format(ENCH_FRMT_ACT_DISABLE, ENCH_SHOW_GUESS_AUCTIONEER_MED));
+				end
+			end;
+			check=true;
+			default={checked=true};
+			disabled={checked=false};
+			dependencies={EnchantrixAuctioneer={checked=true;}, EnchantrixValuate={checked=true;}, EnchantrixEnable={checked=true;}};
+			difficulty=2;
+		};
+	};
+
+	Enchantrix_ChatPrint("unregistering");
+	Khaos.unregisterOptionSet("Enchantrix");
+	Enchantrix_ChatPrint("refreshing");
+	Khaos.refresh();
+	
+	Enchantrix_ChatPrint("tinsert 1");
+	tinsert (Enchantrix_optionSet.options, 8, AuctioneerOptions[1]);
+	Enchantrix_ChatPrint("tinsert2");
+	tinsert (Enchantrix_optionSet.options, 9, AuctioneerOptions[2]);
+
+	Enchantrix_ChatPrint("registering");
+	Khaos.registerOptionSet("tooltip",Enchantrix_optionSet);
+	Enchantrix_ChatPrint("refresh2");
+	Khaos.refresh();
+	Enchantrix_ChatPrint("end");
+	end
 end
 
 --Cleaner Command Handling Functions (added by MentalPower)
@@ -784,7 +842,7 @@ function Enchantrix_Command(command, source)
 
 	elseif (cmd == "load") then
 		if (param == "always") or (param == "never") then
-			Enchantrix_ChatPrint("Setting Enchantrix_ChatPrint to "..param.." load for this toon");
+			Enchantrix_ChatPrint("Setting Enchantrix to "..param.." load for this toon");
 			Stubby.SetConfig("Enchantrix", "LoadType", param);
 		end
 
@@ -796,6 +854,9 @@ function Enchantrix_Command(command, source)
 
 	elseif ((cmd == ENCH_CMD_DEFAULT) or (cmd == "default")) then
 		Enchantrix_Default(param, chatprint);
+
+	elseif ((cmd == ENCH_CMD_PRINTIN) or (cmd == "print-in")) then
+		Enchantrix_SetFrame(param, chatprint)
 
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
 	elseif (cmd == ENCH_CMD_FIND_BIDAUCT) or (cmd == ENCH_CMD_FIND_BIDAUCT_SHORT) then
@@ -852,6 +913,7 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BIDAUCT, ENCH_OPT_FIND_BIDAUCT, ENCH_HELP_FIND_BIDAUCT));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_FIND_BUYAUCT, ENCH_OPT_FIND_BUYAUCT, ENCH_HELP_FIND_BUYAUCT));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_DEFAULT, ENCH_OPT_DEFAULT, ENCH_HELP_DEFAULT));
+		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_CMD_PRINTIN, ENCH_OPT_PRINTIN, ENCH_HELP_PRINTIN));
 		
 end
 
@@ -1004,6 +1066,102 @@ function Enchantrix_Default(param, chatprint)
 	end
 end
 
+--The following three functions were added by MentalPower to implement the /enx print-in command
+function Enchantrix_GetFrameNames(index)
+
+	local frames = {};
+	local frameName = "";
+
+	for i=1,10 do 
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i);
+
+		if ( name == "" ) then 
+			if (i == 1) then
+				frames["General"] = 1;
+			elseif (i == 2) then
+				frames["Combat"] = 2;
+			end
+		else 
+			frames[name] = i;
+		end
+	end
+
+	if (index) then
+		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(index);
+
+		if ( name == "" ) then 
+			if (index == 1) then
+				frameName = "General";
+			elseif (index == 2) then
+				frameName = "Combat";
+			end
+		else 
+			frameName = name;
+		end
+	end
+	
+	return frames, frameName;
+end
+
+
+function Enchantrix_GetFrameIndex()
+
+	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
+	local value = EnchantConfig.filters["printframe"];
+
+	if (not value) then
+		return 1;
+	end
+	return value;
+end
+
+
+function Enchantrix_SetFrame(frame, chatprint)
+	local frameNumber
+	local frameVal
+	frameVal = tonumber(frame)
+
+	--If no arguments are passed, then set it to the default frame.
+	if not (frame) then 
+		frameNumber = 1;
+
+	--If the frame argument is a number then set our chatframe to that number.
+	elseif ((frameVal) ~= nil) then 
+		frameNumber = frameVal;
+
+	--If the frame argument is a string, find out if there's a chatframe with that name, and set our chatframe to that index. If not set it to the default frame.
+	elseif (type(frame) == "string") then
+		allFrames = Enchantrix_GetFrameNames();
+		if (allFrames[frame]) then
+			frameNumber = allFrames[frame];
+		else
+			frameNumber = 1;
+		end
+
+	--If the argument is something else, set our chatframe to it's default value.
+	else
+		frameNumber = 1;
+	end
+
+	Enchantrix_SetFilter("printframe", frameNumber);
+	
+	local _, frameName
+	if (chatprint == true) then
+		_, frameName = Enchantrix_GetFrameNames(frameNumber);
+		if (Enchantrix_GetFrameIndex() ~= frameNumber) then
+			Enchantrix_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+		end
+	end
+	
+	if (chatprint == true) then
+		Enchantrix_ChatPrint(string.format(_AUCT['FrmtPrintin'], frameName));
+
+		if (Enchantrix_Khaos_Registered) then
+			Khaos.setSetKeyParameter("Enchantrix", "EnchantrixPrintFrame", "value", frameNumber);
+		end
+	end
+end
+
 
 function Enchantrix_GenVarSet(variable, param, chatprint)
 
@@ -1030,11 +1188,14 @@ function Enchantrix_GenVarSet(variable, param, chatprint)
 
 		if ((param == ENCH_CMD_ON) or (param == "on")) then
 			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, variable));
+
 			if (Enchantrix_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Enchantrix", variable, "checked", true);
 			end
+
 		elseif ((param == ENCH_CMD_OFF) or (param == "off")) then
 			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, variable));
+
 			if (Enchantrix_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Enchantrix", variable, "checked", false);
 			end

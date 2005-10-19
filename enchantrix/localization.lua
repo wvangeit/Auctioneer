@@ -103,6 +103,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a certain percent less than the buyout price";
 	ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 	ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
+	ENCH_HELP_PRINTIN = "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
 	
 	ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 	
@@ -140,6 +141,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_PCTLESS_HEADER = "Buyouts having %d%% savings over average item disenchant value:";
 	ENCH_FRMT_PCTLESS_LINE = "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 	ENCH_FRMT_PCTLESS_DONE = "Percent less done.";
+	ENCH_FRMT_PRINTIN = "Encantrix's messages will now print on the \"%s\" chat frame";
 	
 	
 	
@@ -166,6 +168,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_GUI_DEFAULT_ALL = "Reset All Enchantrix Options";
 	ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 	ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
+	ENCH_GUI_PRINTIN = "Select the desired message frame";
 	
 	
 	
@@ -312,6 +315,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_FRMT_ACT_DEFAULT = "";
 		--	ENCH_FRMT_ACT_DEFAULT_ALL = "";
 		--	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "";
+		--	ENCH_FRMT_PRINTIN = "";
 		--	ENCH_GUI_CLEARALL = "";
 		--	ENCH_GUI_CLEARALL_BUTTON = "";
 		--	ENCH_GUI_CLEARALL_HELP = "";
@@ -326,6 +330,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_MAIN_HELP = "";
 		--	ENCH_GUI_OTHER_HEADER = "";
 		--	ENCH_GUI_OTHER_HELP = "";
+		--	ENCH_GUI_PRINTIN = "";
 		--	ENCH_GUI_RELOADUI = "";
 		--	ENCH_GUI_RELOADUI_BUTTON = "";
 		--	ENCH_GUI_RELOADUI_FEEDBACK = "";
@@ -338,6 +343,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_DEFAULT = "";
 		--	ENCH_HELP_DISABLE = "";
 		--	ENCH_HELP_LOCALE = "";
+		--	ENCH_HELP_PRINTIN = "";
 		--	ENCH_MESG_NOTLOADED = "";
 		--	ENCH_OPT_DEFAULT = "";
 		--	ENCH_OPT_LOCALE = "";
@@ -360,6 +366,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_CMD_OFF="apagado";
 		ENCH_CMD_ON="prendido";
 		ENCH_CMD_TOGGLE="invertir";
+		ENCH_CMD_DISABLE="deshabilitar";
 		ENCH_CMD_CLEAR="borrar";
 		ENCH_CMD_CLEAR_ALL="todo";
 		ENCH_CMD_LOCALE="localidad";
@@ -387,6 +394,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_SHOW_GUESS_BASELINE="valorizar-referencia";
 		
 		ENCH_HELP_ONOFF="Enciende o apaga la informaci\195\179n de encantos";
+		ENCH_HELP_DISABLE="Impide que Enchantrix se carge automaticamente la proxima vez que usted entre al juego";
 		ENCH_HELP_EMBED="Insertar el texto en la caja de ayuda original del juego (nota: Algunas capacidades se desabilitan cuando esta opci\195\179n es seleccionada)";
 		ENCH_HELP_HEADER="Selecciona para mostrar la l\195\173nea del t\195\173tulo";
 		ENCH_HELP_COUNT="Selecciona para mostrar los valores exactos de la base de datos";
@@ -403,6 +411,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_FIND_BUYAUCT="Encontrar subastas donde el valor posible de los desencantamientos es un cierto porciento menos que el precio de la opci\195\179n a compra";
 		ENCH_HELP_FIND_BIDAUCT="Encontrar subastas donde el valor posible de los desencantamientos es una cierta cantidad de plata menos que el precio de oferta";
 		ENCH_HELP_DEFAULT="Revertir una opci\195\179n de Enchantrix a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Enchantrix a sus configuraciones de f\195\161brica."
+		ENCH_HELP_PRINTIN="Selecciona cual ventana de mensajes va a usar Enchantrix para imprimir su informacion. Puede especificar el nombre o el \195\173ndice de la ventana.";
+		
+		ENCH_MESG_NOTLOADED="Enchantrix no esta cargado. Escriba /enchantrix para mas informaci\195\179n.";
 		
 		ENCH_STAT_ON="Mostrando la configuracion corriente para la informacion de los desencantamientos";
 		ENCH_STAT_OFF="Ocultando toda informaci\195\179n de los desencantamientos";
@@ -438,6 +449,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_PCTLESS_HEADER="Opciones a compra teniendo %d%% de ahorro sobre el precio promedio de desencantar el art\195\173culo:";
 		ENCH_FRMT_PCTLESS_LINE="%s, Valorado en: %s, OC: %s, Ahorra: %s, Menos %s";
 		ENCH_FRMT_PCTLESS_DONE="Porcentajes menores finalizado.";
+		ENCH_FRMT_PRINTIN="Los mensajes de Enchantrix se imprimir\195\161n en la ventana de comunicaci\195\179n \"%s\"";
 		
 		--GUI localizations
 		
@@ -464,15 +476,10 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_DEFAULT_ALL="Revertir todas las opciones de Enchantrix";
 		ENCH_GUI_DEFAULT_ALL_HELP="Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		ENCH_GUI_DEFAULT_OPTION="Revertir esta opci\195\179n";
+		ENCH_GUI_PRINTIN="Seleccione la ventana deseada";
 		
 		--ID Numbers 
-		--This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
-
-		-- The following definitions are missing in this locale:
-		--	ENCH_CMD_DISABLE = "";
-		--	ENCH_HELP_DISABLE = "";
-		--	ENCH_MESG_NOTLOADED = "";
-		--	EssenceItemIDs = "";
+		EssenceItemIDs=EssenceItemIDs; --This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
 
 	end
 
@@ -482,7 +489,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	if locale == "frFR" then
 		-- Encoded in UTF8
 		-- French localization for Enchantrix
-		
+		-- Were currently looking for french translators. Apply at norganna.com/bb
 		
 
 
@@ -523,6 +530,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_FRMT_PCTLESS_DONE = "";
 		--	ENCH_FRMT_PCTLESS_HEADER = "";
 		--	ENCH_FRMT_PCTLESS_LINE = "";
+		--	ENCH_FRMT_PRINTIN = "";
 		--	ENCH_FRMT_USAGE = "";
 		--	ENCH_FRMT_VALUE_AUCT_HSP = "";
 		--	ENCH_FRMT_VALUE_AUCT_MED = "";
@@ -542,6 +550,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_MAIN_HELP = "";
 		--	ENCH_GUI_OTHER_HEADER = "";
 		--	ENCH_GUI_OTHER_HELP = "";
+		--	ENCH_GUI_PRINTIN = "";
 		--	ENCH_GUI_RELOADUI = "";
 		--	ENCH_GUI_RELOADUI_BUTTON = "";
 		--	ENCH_GUI_RELOADUI_FEEDBACK = "";
@@ -565,6 +574,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_HEADER = "";
 		--	ENCH_HELP_LOCALE = "";
 		--	ENCH_HELP_ONOFF = "";
+		--	ENCH_HELP_PRINTIN = "";
 		--	ENCH_HELP_RATE = "";
 		--	ENCH_HELP_VALUE = "";
 		--	ENCH_MESG_NOTLOADED = "";
