@@ -393,6 +393,23 @@ function Auctioneer_AddonLoaded()
 	Auctioneer_LockAndLoad();
 end
 
+function Auctioneer_FindEmptySlot()
+	local name, i
+	for bag = 0, 4 do
+		name = GetBagName(bag)
+		i = string.find(name, '(Quiver|Ammo|Bandolier)')
+		if not i then
+			for slot = 1, GetContainerNumSlots(bag),1 do
+				if not (GetContainerItemInfo(bag,slot)) then
+					return bag, slot;
+				end
+			end
+		end
+	end
+end
+
+
+
 -- This is the old (local) hookAuctionHouse() function
 function Auctioneer_HookAuctionHouse()
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
@@ -430,11 +447,35 @@ function Auctioneer_HookAuctionHouse()
 			Auctioneer_Orig_PickupContainerItem(bag, item)
 		end
 	end
-		
+
 end
 
 function Auctioneer_LockAndLoad()
 	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, Auctioneer_ConfigureAH);
+
+	Auctioneer_Orig_ContainerFrameItemButton_OnClick = ContainerFrameItemButton_OnClick 
+	ContainerFrameItemButton_OnClick = function(...)
+		local button = arg[1]
+		local ignoreShift = arg[2]
+		local bag = this:GetParent():GetID()
+		local slot = this:GetID()
+
+		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
+		if (count > 1 and not noSplit) then
+			if (button == "RightButton") and (IsAltKeyDown()) then
+				local splitCount = math.floor(count / 2)
+				local emptyBag, emptySlot = Auctioneer_FindEmptySlot()
+				if (emptyBag) then
+					SplitContainerItem(bag, slot, splitCount)
+					PickupContainerItem(emptyBag, emptySlot)
+				else
+					Auctioneer_ChatPrint("Can't split, all bags are full")
+				end
+				return
+			end
+		end
+		Auctioneer_Orig_ContainerFrameItemButton_OnClick(unpack(arg))
+	end
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
