@@ -717,18 +717,14 @@ function Enchantrix_GenVarSet(variable, param, chatprint)
 		param = Enchantrix_DelocalizeFilterVal(param);	
 	end
 	
-	local enabled;
-	
 	if (param == 'on' or param == 'off') then
 		Enchantrix_SetFilter(variable, param);
 	elseif (param == 'toggle' or param == nil or param == "") then
 		Enchantrix_SetFilter(variable, not Enchantrix_GetFilter(variable))
-		enabled = Enchantrix_GetFilterVal(variable);
 	end
 
-	-- Enchantrix_ChatPrint("Enchantrix_GenVarSet " .. variable)
 	if (chatprint == true) then	
-		if (enabled) then
+		if (Enchantrix_GetFilterVal(variable)) then
 			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, variable));
 			setKhaosSetKeyParameter(variable, "checked", true);
 		else
