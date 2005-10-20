@@ -79,8 +79,7 @@ function Enchantrix_GetLocale()
 	if (locale ~= 'default') then
 		return locale;
 	end
-	return 'esES';
-	--return GetLocale();
+	return GetLocale();
 end
 
 function Enchantrix_GetLocalizedCmdString(value)
