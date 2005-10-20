@@ -380,6 +380,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		-- Encoded in UTF8
 		-- German localization for Enchantrix by FtKxDE
 		
+		
 		ENCH_FRMT_WELCOME="Enchantrix v%s geladen";
 		ENCH_FRMT_CREDIT=" (besuche http://enchantrix.org/ um deine Daten zur Verf\195\188gung zu stellen)";
 		
@@ -425,8 +426,8 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_RATE="Ausw\195\164hlen ob die durchschnittliche Anzahl der Entzauberungen angezeigt wird";
 		
 		ENCH_HELP_VALUE="Ausw\195\164hlen ob gesch\195\164tzte Verkaufspreise aufgrund \nder Anteile an m\195\182glichen Entzauberungen angezeigt werden";
-		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den durchschnittlichen Verkaufspreis (Auctioneer-HSP) f\195\188r das Entzaubern";
-		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den mittleren Verkaufspreis (Auctioneer-MEDIAN) f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_AUCTIONEER_HSP="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den maximalen Verkaufspreis (Auctioneer-HSP) f\195\188r das Entzaubern";
+		ENCH_HELP_GUESS_AUCTIONEER_MEDIAN="Wenn die Wertsch\195\164tzung aktiviert und Auctioneer installiert ist, zeige den durchschnittlichen Verkaufspreis (Auctioneer-MEDIAN) f\195\188r das Entzaubern";
 		ENCH_HELP_GUESS_NOAUCTIONEER="Die Befehle \""..ENCH_SHOW_GUESS_AUCTIONEER_HSP.."\" und \""..ENCH_SHOW_GUESS_AUCTIONEER_MED.."\" sind nicht verf\195\188gbar weil Auctioneer nicht installiert ist";
 		ENCH_HELP_GUESS_BASELINE="Wenn die Wertsch\195\164tzung aktiviert ist, zeige den \195\188blichen Verkaufspreis aus der internen Preisliste (Auctioneer wird nicht ben\195\182tigt)";
 		
@@ -438,6 +439,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_PRINTIN="Ausw\195\164hlen in welchem Fenster die Enchantrix-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
 		
 		ENCH_MESG_NOTLOADED="Enchantrix ist nicht geladen. Geben Sie /enchantrix ein um mehr Informationen zu erhalten.";
+		ENCH_MESG_DISABLE="Das automatische Laden von Enchantrix wird deaktiviert";
 		
 		ENCH_STAT_ON="Die Anzeige von Entzauberungsdaten wurde aktiviert";
 		ENCH_STAT_OFF="Die Anzeige von Entzauberungsdaten wurde deaktiviert";
@@ -455,14 +457,15 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_ACT_DEFAULT_ALL="Alle Enchantrix-Optionen wurden auf die Standardwerte zur\195\188ckgesetzt.";
 		ENCH_FRMT_ACT_DEFAULT="Die Enchantrix-Option '%s' wurde auf den Standardwert zur\195\188ckgesetzt.";
 		
+		
 		ENCH_FRMT_DISINTO="M\195\182gliche Entzauberung zu:";
 		ENCH_FRMT_FOUND="%s wird entzaubert zu:";
 		ENCH_FRMT_USAGE="Verwendung:";
 		
 		ENCH_FRMT_COUNTS=" (Basis=%d, Alt=%d, Neu=%d)";
-		ENCH_FRMT_VALUE_AUCT_HSP="Durchschnittl. Wert (HSP)";
-		ENCH_FRMT_VALUE_AUCT_MED="Mittlerer Wert (MEDIAN)";
-		ENCH_FRMT_VALUE_MARKET="\195\156blicher Wert (Built-In)";
+		ENCH_FRMT_VALUE_AUCT_HSP="Entzauberungswert (Maximum)";
+		ENCH_FRMT_VALUE_AUCT_MED="Entzauberungswert (Durchschnitt)";
+		ENCH_FRMT_VALUE_MARKET="Entzauberungswert (Built-In)";
 		
 		ENCH_FRMT_BIDBROKER_HEADER="Auktionen mit %s Silber Einsparung auf den durchschnittlichen Entzauberungswert:";
 		ENCH_FRMT_BIDBROKER_MINBID="minGeb"
@@ -488,10 +491,12 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_RELOADUI_HELP="Hier klicken um die WoW-Benutzeroberfl\195\164che nach einer \n\195\132nderung des Gebietsschemas neu zu laden, und dadurch \ndie Sprache des Konfigurationsmen\195\188s diesem entspricht.\nHinweis: Dieser Vorgang kann einige Minuten dauern.";
 		ENCH_GUI_RELOADUI_FEEDBACK="WoW-Benutzeroberfl\195\164che wird neu geladen";
 		ENCH_GUI_EMBED="In-Game Tooltip zur Anzeige verwenden";
+		ENCH_GUI_COUNT="Zeige die genaue Anzahl aus der Datenbank"
+		ENCH_GUI_RATE="Zeige die durchschnittliche Anzahl der Entzauberungen";
 		ENCH_GUI_VALUATE_HEADER="Wertsch\195\164tzung";
 		ENCH_GUI_VALUATE_ENABLE="Wertsch\195\164tzung aktivieren";
-		ENCH_GUI_VALUATE_AVERAGES="Durchschnittlichen VKP anzeigen (Auctioneer)";
-		ENCH_GUI_VALUATE_MEDIAN="Mittleren Verkaufpreis anzeigen (Auctioneer)";
+		ENCH_GUI_VALUATE_AVERAGES="H\195\182chstm\195\182glichen Verkaufspreis anzeigen (Auctioneer)";
+		ENCH_GUI_VALUATE_MEDIAN="Durchschnittlichen Verkaufspreis anzeigen (Auctioneer)";
 		ENCH_GUI_VALUATE_BASELINE="\195\156blichen Verkaufspreis anzeigen (Built-In Preisliste)";
 		ENCH_GUI_OTHER_HEADER="Sonstige Optionen";
 		ENCH_GUI_OTHER_HELP="Sonstige Enchantrix-Optionen";
@@ -531,11 +536,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Seelenstaub"] = 11083;
 		EssenceItemIDs["Seltsamer Staub"] = 10940;
 		EssenceItemIDs["Visionenstaub"] = 11137;
-
-		-- The following definitions are missing in this locale:
-		--	ENCH_GUI_COUNT = "";
-		--	ENCH_GUI_RATE = "";
-		--	ENCH_MESG_DISABLE = "";
 
 	end
 
