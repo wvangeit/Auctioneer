@@ -64,7 +64,7 @@ ENCH_MESG_NOTLOADED = "Enchantrix no esta cargado. Escriba /enchantrix para mas 
 ENCH_STAT_ON = "Mostrando la configuracion corriente para la informacion de los desencantamientos";
 ENCH_STAT_OFF = "Ocultando toda información de los desencantamientos";
 
-ENCH_FRMT_ACT_CLEARALL = "Eliminando toda información de desencantamientos para %s";
+ENCH_FRMT_ACT_CLEARALL = "Eliminando toda información de desencantamientos";
 ENCH_FRMT_ACT_CLEAR_OK = "Informacion eliminada para el artículo: %s";
 ENCH_FRMT_ACT_CLEAR_FAIL = "Imposible encontrar artículo: %s";
 ENCH_FRMT_ACT_ENABLE = "Mostrando informacion del artículo: %s ";

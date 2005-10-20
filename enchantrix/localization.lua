@@ -108,11 +108,12 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_PRINTIN = "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
 	
 	ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
+	ENCH_MESG_DISABLE = "Disabling automatic loading of Enchantrix";
 	
 	ENCH_STAT_ON = "Displaying configured enchant data";
 	ENCH_STAT_OFF = "Not displaying any enchant data";
 	
-	ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data for %s";
+	ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data";
 	ENCH_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 	ENCH_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 	ENCH_FRMT_ACT_ENABLE = "Displaying item's %s data";
@@ -124,6 +125,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_ACT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Valid locales are:";
 	ENCH_FRMT_ACT_DEFAULT_ALL= "All Enchantrix options have been reset to default settings.";
 	ENCH_FRMT_ACT_DEFAULT = "Enchantrix's %s option has been reset to its default setting";
+	
 	
 	ENCH_FRMT_DISINTO = "Disenchants into:";
 	ENCH_FRMT_FOUND = "Found that %s disenchants into:";
@@ -158,6 +160,8 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_GUI_RELOADUI_HELP = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 	ENCH_GUI_RELOADUI_FEEDBACK = "Now Reloading the WoW UI";
 	ENCH_GUI_EMBED = "Embed info in in-game tooltip";
+	ENCH_GUI_COUNT = "Show the exact counts in the database"
+	ENCH_GUI_RATE = "Show the average quantity of disenchant";
 	ENCH_GUI_VALUATE_HEADER = "Valuation";
 	ENCH_GUI_VALUATE_ENABLE = "Enable Valuation";
 	ENCH_GUI_VALUATE_AVERAGES = "Valuate with Auctioneer Averages";
@@ -272,7 +276,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_STAT_ON="Displaying configured enchant data";
 		ENCH_STAT_OFF="Not displaying any enchant data";
 		
-		ENCH_FRMT_ACT_CLEARALL="Clearing all enchant data for %s";
+		ENCH_FRMT_ACT_CLEARALL="Clearing all enchant data";
 		ENCH_FRMT_ACT_CLEAR_OK="Cleared data for item: %s";
 		ENCH_FRMT_ACT_CLEAR_FAIL="Unable to find item: %s";
 		ENCH_FRMT_ACT_ENABLE="Displaying item's %s data";
@@ -361,6 +365,9 @@ function Enchantrix_SetLocaleStrings(locale)
 
 
 		-- The following definitions are missing in this locale:
+		--	ENCH_GUI_COUNT = "";
+		--	ENCH_GUI_RATE = "";
+		--	ENCH_MESG_DISABLE = "";
 		--	ENCH_TEXT_COMBAT = "";
 		--	ENCH_TEXT_GENERAL = "";
 
@@ -435,7 +442,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_STAT_ON="Die Anzeige von Entzauberungsdaten wurde aktiviert";
 		ENCH_STAT_OFF="Die Anzeige von Entzauberungsdaten wurde deaktiviert";
 		
-		ENCH_FRMT_ACT_CLEARALL="L\195\182sche alle Entzauberungsdaten f\195\188r %s";
+		ENCH_FRMT_ACT_CLEARALL="L\195\182sche alle Entzauberungsdaten";
 		ENCH_FRMT_ACT_CLEAR_OK="Daten f\195\188r Gegenstand %s gel\195\182scht";
 		ENCH_FRMT_ACT_CLEAR_FAIL="Kann Gegenstand %s nicht finden";
 		ENCH_FRMT_ACT_ENABLE="Zeige Daten von Gegenstand %s";
@@ -525,6 +532,11 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Seltsamer Staub"] = 10940;
 		EssenceItemIDs["Visionenstaub"] = 11137;
 
+		-- The following definitions are missing in this locale:
+		--	ENCH_GUI_COUNT = "";
+		--	ENCH_GUI_RATE = "";
+		--	ENCH_MESG_DISABLE = "";
+
 	end
 
 
@@ -597,7 +609,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_STAT_ON="Mostrando la configuracion corriente para la informacion de los desencantamientos";
 		ENCH_STAT_OFF="Ocultando toda informaci\195\179n de los desencantamientos";
 		
-		ENCH_FRMT_ACT_CLEARALL="Eliminando toda informaci\195\179n de desencantamientos para %s";
+		ENCH_FRMT_ACT_CLEARALL="Eliminando toda informaci\195\179n de desencantamientos";
 		ENCH_FRMT_ACT_CLEAR_OK="Informacion eliminada para el art\195\173culo: %s";
 		ENCH_FRMT_ACT_CLEAR_FAIL="Imposible encontrar art\195\173culo: %s";
 		ENCH_FRMT_ACT_ENABLE="Mostrando informacion del art\195\173culo: %s ";
@@ -663,6 +675,11 @@ function Enchantrix_SetLocaleStrings(locale)
 		--ID Numbers 
 		EssenceItemIDs=EssenceItemIDs; --This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
 
+		-- The following definitions are missing in this locale:
+		--	ENCH_GUI_COUNT = "";
+		--	ENCH_GUI_RATE = "";
+		--	ENCH_MESG_DISABLE = "";
+
 	end
 
 
@@ -723,6 +740,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_CLEARALL_BUTTON = "";
 		--	ENCH_GUI_CLEARALL_HELP = "";
 		--	ENCH_GUI_CLEARALL_NOTE = "";
+		--	ENCH_GUI_COUNT = "";
 		--	ENCH_GUI_DEFAULT_ALL = "";
 		--	ENCH_GUI_DEFAULT_ALL_BUTTON = "";
 		--	ENCH_GUI_DEFAULT_ALL_HELP = "";
@@ -734,6 +752,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_OTHER_HEADER = "";
 		--	ENCH_GUI_OTHER_HELP = "";
 		--	ENCH_GUI_PRINTIN = "";
+		--	ENCH_GUI_RATE = "";
 		--	ENCH_GUI_RELOADUI = "";
 		--	ENCH_GUI_RELOADUI_BUTTON = "";
 		--	ENCH_GUI_RELOADUI_FEEDBACK = "";
@@ -760,6 +779,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_PRINTIN = "";
 		--	ENCH_HELP_RATE = "";
 		--	ENCH_HELP_VALUE = "";
+		--	ENCH_MESG_DISABLE = "";
 		--	ENCH_MESG_NOTLOADED = "";
 		--	ENCH_OPT_CLEAR = "";
 		--	ENCH_OPT_DEFAULT = "";

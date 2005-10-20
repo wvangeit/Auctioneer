@@ -7,6 +7,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 -->
 	<Script file="localization.lua"/>
 	<Script file="DisenchantList.lua"/>
+	<Script file="EnxUtil.lua"/>
+	<Script file="EnxCommand.lua"/>
 	<Script file="Enchantrix.lua"/>
 	<Frame name="Enchantrix" parent="UIParent" hidden="true">
 		<Scripts>

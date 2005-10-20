@@ -63,7 +63,7 @@ ENCH_MESG_NOTLOADED = "Enchantrix ist nicht geladen. Geben Sie /enchantrix ein u
 ENCH_STAT_ON="Die Anzeige von Entzauberungsdaten wurde aktiviert";
 ENCH_STAT_OFF="Die Anzeige von Entzauberungsdaten wurde deaktiviert";
 
-ENCH_FRMT_ACT_CLEARALL="Lösche alle Entzauberungsdaten für %s";
+ENCH_FRMT_ACT_CLEARALL="Lösche alle Entzauberungsdaten";
 ENCH_FRMT_ACT_CLEAR_OK="Daten für Gegenstand %s gelöscht";
 ENCH_FRMT_ACT_CLEAR_FAIL="Kann Gegenstand %s nicht finden";
 ENCH_FRMT_ACT_ENABLE="Zeige Daten von Gegenstand %s";

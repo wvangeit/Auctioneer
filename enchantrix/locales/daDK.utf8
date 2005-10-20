@@ -64,7 +64,7 @@ ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.
 ENCH_STAT_ON = "Displaying configured enchant data";
 ENCH_STAT_OFF = "Not displaying any enchant data";
 
-ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data for %s";
+ENCH_FRMT_ACT_CLEARALL = "Clearing all enchant data";
 ENCH_FRMT_ACT_CLEAR_OK = "Cleared data for item: %s";
 ENCH_FRMT_ACT_CLEAR_FAIL = "Unable to find item: %s";
 ENCH_FRMT_ACT_ENABLE = "Displaying item's %s data";
