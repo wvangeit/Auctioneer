@@ -499,7 +499,13 @@ end
 
 function Enchantrix_GetFilter(filter)
 	value = Enchantrix_GetFilterVal(filter);
-	return (value ~= "off");
+	if (value == 'on') then
+		return true;
+	elseif (value == 'off') then
+		return false;
+	else
+		return value;
+	end
 end
 
 function Enchantrix_GetSigs(str)

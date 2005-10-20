@@ -74,6 +74,9 @@ end
 --		Localization functions
 --]]
 
+Enchantrix_CommandMap = nil;
+Enchantrix_CommandMapRev = nil;
+
 function Enchantrix_GetLocale()
 	local locale = Enchantrix_GetFilterVal('locale');
 	if (locale ~= 'default') then
@@ -110,4 +113,18 @@ function Enchantrix_LocalizeFilterVal(value)
 	else
 		return value;
 	end
+end
+
+-- Turns a localized slash command into the generic English version of the command
+function Enchantrix_DelocalizeCommand(cmd)
+	if (not Enchantrix_CommandMap) then Enchantrix_BuildCommandMap();end
+	local result = Enchantrix_CommandMap[cmd];
+	if (result) then return result; else return cmd; end
+end
+
+-- Translate a generic English slash command to the localized version, if available
+function Enchantrix_LocalizeCommand(cmd)
+	if (not Enchantrix_CommandMap) then	Enchantrix_BuildCommandMap(); end
+	local result = Enchantrix_CommandMapRev[cmd];
+	if (result) then return result; else return cmd; end
 end

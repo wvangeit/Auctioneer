@@ -137,7 +137,7 @@ function Enchantrix_Register_Khaos()
 				dependencies={all={checked=true;}};
 				difficulty=3;
 			};			
-			{
+			--[[
 				id='rates';
 				type=K_TEXT;
 				text=ENCH_GUI_RATE;
@@ -157,7 +157,7 @@ function Enchantrix_Register_Khaos()
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
-			};			
+			]]--
 			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
@@ -312,12 +312,10 @@ end
 function Enchantrix_AuctioneerLoaded()
 	if (not Enchantrix_Khaos_Registered) then return; end
 	
-	Enchantrix_ChatPrint("function called");
-	
-	local insertPos = 10;
+	local insertPos = 9;
 
-	if (Enchantrix_optionSet.options[insertPos].id == ENCH_SHOW_GUESS_AUCTIONEER_HSP) then
-		Enchantrix_ChatPrint("options already added");
+	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
+		EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): options already added");
 		return nil;
 	end
 	
@@ -366,25 +364,70 @@ function Enchantrix_AuctioneerLoaded()
 		};
 	};
 
-	Enchantrix_ChatPrint("unregistering");
+	EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): unregistering");
 	Khaos.unregisterOptionSet("Enchantrix");
-	Enchantrix_ChatPrint("refreshing");
 	Khaos.refresh();
 	
 	for i, opt in ipairs(AuctioneerOptions) do
 		tinsert(Enchantrix_optionSet.options, insertPos + i - 1, opt);
 	end
 		
-	Enchantrix_ChatPrint("registering");
-	Khaos.registerOptionSet("tooltip",Enchantrix_optionSet);
-	Enchantrix_ChatPrint("refresh2");
+	EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): registering");
+	Khaos.registerOptionSet("tooltip", Enchantrix_optionSet);
 	Khaos.refresh();
-	Enchantrix_ChatPrint("end");
 end
 
 local function setKhaosSetKeyParameter(key, parameter, value)
 	if (Enchantrix_Khaos_Registered) then
-		Khaos.setSetKeyParameter("Enchantrix", key, parameter, value)
+		if (Khaos.getSetKey("Enchantrix", key)) then
+			Khaos.setSetKeyParameter("Enchantrix", key, parameter, value)
+		else
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+		end
+	end
+end
+
+local function setKhaosSetKeyValue(key, value)
+	if (Enchantrix_Khaos_Registered) then
+		local kKey = Khaos.getSetKey("Enchantrix", key)
+		
+		if (not kKey) then
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+		elseif (kKey.checked ~= nil) then
+			-- EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): setting ", value, " for key ", key)
+			Khaos.setSetKeyParameter("Enchantrix", key, "checked", value)
+		elseif (kKey.value ~= nil) then
+			Khaos.setSetKeyParameter("Enchantrix", key, "value", value)
+		else
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): don't know how to update key ", key)
+		end
+	end
+end
+
+function Enchantrix_BuildCommandMap()
+	Enchantrix_CommandMap = {
+			[ENCH_CMD_DISABLE] = 'disable',
+			[ENCH_CMD_CLEAR] = 'clear',
+			[ENCH_CMD_LOCALE] = 'locale',
+			[ENCH_CMD_DEFAULT] = 'default',
+			[ENCH_CMD_PRINTIN] = 'print-in',
+			[ENCH_CMD_FIND_BIDAUCT] = 'bidbroker',
+			[ENCH_CMD_FIND_BIDAUCT_SHORT] = 'bidbroker',
+			[ENCH_CMD_FIND_BUYAUCT] = 'percentless',
+			[ENCH_CMD_FIND_BUYAUCT_SHORT] = 'percentless',
+			[ENCH_SHOW_EMBED] = 'embed',
+			[ENCH_SHOW_COUNT] = 'counts',
+			--[ENCH_SHOW_RATE] = 'rates',
+			--[ENCH_SHOW_HEADER] = 'header',
+			[ENCH_SHOW_VALUE] = 'valuate',
+			[ENCH_SHOW_GUESS_AUCTIONEER_HSP] = 'valuate-hsp',
+			[ENCH_SHOW_GUESS_AUCTIONEER_MED] = 'valuate-median',
+			[ENCH_SHOW_GUESS_BASELINE] = 'valuate-baseline',
+		}
+		
+	Enchantrix_CommandMapRev = {}
+	for k,v in pairs(Enchantrix_CommandMap) do
+		Enchantrix_CommandMapRev[v] = k;
 	end
 end
 
@@ -405,66 +448,52 @@ function Enchantrix_Command(command, source)
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
 	if (not param) then param = "" end
+	cmd = Enchantrix_DelocalizeCommand(cmd)
 
 	if ((cmd == "") or (cmd == "help")) then
+		-- /enchantrix help
 		Enchantrix_ChatPrint_Help();
 		return;
-
 	elseif (((cmd == ENCH_CMD_ON) or (cmd == "on")) or ((cmd == ENCH_CMD_OFF) or (cmd == "off")) or ((cmd == ENCH_CMD_TOGGLE) or (cmd == "toggle"))) then
+		-- /enchantrix on|off|toggle
 		Enchantrix_OnOff(cmd, chatprint);
-
-	elseif ((cmd == ENCH_CMD_DISABLE) or (cmd == "disable")) then
+	elseif (cmd == 'disable') then
+		-- /enchantrix disable
 		Enchantrix_ChatPrint(ENCH_MESG_DISABLE);
 		Stubby.SetConfig("Enchantrix", "LoadType", "never");
-
-	elseif (cmd == "load") then
+	elseif (cmd == 'load') then
+		-- /enchantrix load always|never
 		if (param == "always") or (param == "never") then
 			Enchantrix_ChatPrint("Setting Enchantrix to "..param.." load for this toon");
 			Stubby.SetConfig("Enchantrix", "LoadType", param);
 		end
-
-	elseif ((cmd == ENCH_CMD_CLEAR) or (cmd == "clear")) then
+	elseif (cmd == 'clear') then
+		-- /enchantrix clear
 		Enchantrix_Clear(param, chatprint);
-
-	elseif ((cmd == ENCH_CMD_LOCALE) or (cmd == "locale")) then
+	elseif (cmd == 'locale') then
+		-- /enchantrix locale
 		Enchantrix_SetLocale(param, chatprint);
-
-	elseif ((cmd == ENCH_CMD_DEFAULT) or (cmd == "default")) then
+	elseif (cmd == 'default') then
+		-- /enchantrix default
 		Enchantrix_Default(param, chatprint);
-
-	elseif ((cmd == ENCH_CMD_PRINTIN) or (cmd == "print-in")) then
+	elseif (cmd == 'print-in') then
+		-- /enchantrix print-in
 		Enchantrix_SetFrame(param, chatprint)
-
-	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
-	elseif (cmd == ENCH_CMD_FIND_BIDAUCT) or (cmd == ENCH_CMD_FIND_BIDAUCT_SHORT) then
+	elseif (cmd == 'bidbroker') then
+		-- /enchantrix bidbroker
 		Enchantrix_DoBidBroker(param);
-
-	elseif (cmd == ENCH_CMD_FIND_BUYAUCT) or (cmd == ENCH_CMD_FIND_BUYAUCT_SHORT) then
+	elseif (cmd == 'percentless') then
 		Enchantrix_DoPercentLess(param);
-
-	--These commands have been changed to match those used by Auctioneer/Informant. Others have been simplified.
-	elseif (cmd == ENCH_SHOW_EMBED or cmd == 'embed') then
-		Enchantrix_GenVarSet('embed', param, chatprint);
-	elseif (cmd == ENCH_SHOW_HEADER or cmd == 'header') then
-		Enchantrix_GenVarSet('header', param, chatprint);
-	elseif (cmd == ENCH_SHOW_COUNT or cmd == 'counts') then
-		Enchantrix_GenVarSet('counts', param, chatprint);
-	elseif (cmd == ENCH_SHOW_RATE or cmd == 'rates') then
-		Enchantrix_GenVarSet('rates', param, chatprint);
-	elseif (cmd == ENCH_SHOW_VALUE or cmd == 'valuate') then
-		Enchantrix_GenVarSet('valuate', param, chatprint);
-	elseif (cmd == ENCH_SHOW_GUESS_AUCTIONEER_HSP or cmd == 'valuate-hsp') then
-		Enchantrix_GenVarSet('valuate-hsp', param, chatprint);
-	elseif (cmd == ENCH_SHOW_GUESS_AUCTIONEER_MED or cmd == 'valuate-median') then
-		Enchantrix_GenVarSet('valuate-median', param, chatprint);
-	elseif (cmd == ENCH_SHOW_GUESS_BASELINE or cmd == 'valuate-baseline') then
-		Enchantrix_GenVarSet('valuate-baseline', param, chatprint);
-	elseif (chatprint == true) then
+	-- elseif (cmd == ENCH_SHOW_HEADER or cmd == 'header') then
+	--	Enchantrix_GenVarSet('header', param, chatprint);
+	elseif (cmd=='embed' or cmd=='valuate' or
+			-- cmd=='counts' or cmd=='rates' or
+			cmd=='valuate-hsp' or cmd=='valuate-median' or cmd=='valuate-baseline') then
+		Enchantrix_GenVarSet(cmd, param, chatprint);
+	elseif (chatprint) then
 		Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN, cmd));
 	end
 end
-
-
 
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function Enchantrix_ChatPrint_Help()
@@ -476,9 +505,9 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		
 		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..ENCH_CMD_DISABLE.."|r - " .. ENCH_HELP_DISABLE);
 
-		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_HEADER, Enchantrix_GetLocalizedFilterVal('header'), ENCH_HELP_HEADER));
+		-- Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_HEADER, Enchantrix_GetLocalizedFilterVal('header'), ENCH_HELP_HEADER));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_COUNT, Enchantrix_GetLocalizedFilterVal('counts'), ENCH_HELP_COUNT));
-		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_RATE, Enchantrix_GetLocalizedFilterVal('rates'), ENCH_HELP_RATE));
+		-- Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_RATE, Enchantrix_GetLocalizedFilterVal('rates'), ENCH_HELP_RATE));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_EMBED, Enchantrix_GetLocalizedFilterVal('embed'), ENCH_HELP_EMBED));
 		Enchantrix_ChatPrint(string.format(lineFormat, ENCH_SHOW_VALUE, Enchantrix_GetLocalizedFilterVal('valuate'), ENCH_HELP_VALUE));
 		if (AUCTIONEER_VERSION) then
@@ -501,7 +530,7 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 end
 
 --The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
---If "on" or "off" is specified in the " state" variable then Enchantrix's state is changed to that value,
+--If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
 --If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
 --If no keyword is specified then the function will simply return the current state
 --
@@ -536,21 +565,19 @@ end
 function Enchantrix_Clear(param, chatprint)
 	if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then		
 		EnchantedLocal = {};
+		if (chatprint) then
+			Enchantrix_ChatPrint(ENCH_FRMT_ACT_CLEARALL);
+		end
 	else
 		local items = Enchantrix_GetSigs(param);
-
 		for _,itemKey in items do
 			local aKey = itemKey.s;
 			local aName = itemKey.n;
 			EnchantedLocal[aKey] = { z=true };
-		end
-	end
 
-	if (chatprint == true) then
-		if ((param == ENCH_CMD_CLEAR_ALL) or (param == 'all')) then
-			Enchantrix_ChatPrint(ENCH_FRMT_ACT_CLEARALL);
-		else
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEAR_OK, aName));
+			if (chatprint) then
+				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_CLEAR_OK, aName));
+			end
 		end
 	end
 end
@@ -565,50 +592,61 @@ function Enchantrix_SetLocale(param, chatprint)
 	elseif (ENCH_VALID_LOCALES[param]) then
 		Enchantrix_SetFilter('locale', param);
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
+		Enchantrix_CommandMap = nil
 		validLocale=true;
 	elseif (param == '') or (param == 'default') or (param == 'off') then
 		Enchantrix_SetFilter('locale', 'default');
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
+		Enchantrix_CommandMap = nil
 		validLocale=true;
 	end
 	
-	if (chatprint == true) then
-		if ((validLocale == true) and (ENCH_VALID_LOCALES[param])) then
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, param));
-			setKhaosSetKeyParameter("locale", "value", param);
-		elseif (validLocale == nil) then
+	if (chatprint) then
+		if (validLocale) then
+			if (ENCH_VALID_LOCALES[param]) then
+				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, param));
+				setKhaosSetKeyParameter('locale', "value", param);
+			else
+				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, Enchantrix_LocalizeFilterVal('default')));
+				setKhaosSetKeyParameter('locale', "value", 'default');
+			end			
+		else
 			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN_LOCALE, param));
 			if (ENCH_VALID_LOCALES) then
 				for locale, x in pairs(ENCH_VALID_LOCALES) do
-					Enchantrix_ChatPrint("  "..locale);
+					Enchantrix_ChatPrint("  " .. locale);
 				end
 			end
-		else
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, Enchantrix_LocalizeFilterVal('default')));
-			setKhaosSetKeyParameter("locale", "value", "default");
 		end
 	end
 end
 
 --This function was added by MentalPower to implement the /enx default command
 function Enchantrix_Default(param, chatprint)
+	local paramLocalized
+	
 	if ( (param == nil) or (param == "") ) then
 		return
 	elseif ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then
+		param = "all"
 		EnchantConfig.filters = {};
 	else
+		paramLocalized = param
+		param = Enchantrix_DelocalizeCommand(param)
 		Enchantrix_SetFilter(param, nil);
 	end
 	
 	Enchantrix_SetFilterDefaults();		-- Apply defaults for settings that went missing 
-
-	--@TODO: Communicate the applied default settings to Khaos.
-	if (chatprint == true) then
-		if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all") or (param == "") or (param == nil)) then
+	
+	if (chatprint) then
+		if (param == "all") then
 			Enchantrix_ChatPrint(ENCH_FRMT_ACT_DEFAULT_ALL);
-
+			for k,v in pairs(EnchantConfig.filters) do
+				setKhaosSetKeyValue(k, Enchantrix_GetFilter(k));
+			end
 		else
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DEFAULT, param));
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DEFAULT, paramLocalized));
+			setKhaosSetKeyValue(param, Enchantrix_GetFilter(param));
 		end
 	end
 end
@@ -723,12 +761,12 @@ function Enchantrix_GenVarSet(variable, param, chatprint)
 		Enchantrix_SetFilter(variable, not Enchantrix_GetFilter(variable))
 	end
 
-	if (chatprint == true) then	
-		if (Enchantrix_GetFilterVal(variable)) then
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, variable));
+	if (chatprint) then	
+		if (Enchantrix_GetFilter(variable)) then
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_ENABLE, Enchantrix_LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", true);
 		else
-			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, variable));
+			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_DISABLE, Enchantrix_LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", false);
 		end
 	end
