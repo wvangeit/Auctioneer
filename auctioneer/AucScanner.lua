@@ -388,7 +388,11 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -2)
 			AuctPriceRememberCheck:Show()
 		end
-		
+
+		--Protect the auction frame from being closed if we should
+		--Need to change true, to something that gets the state of an option
+		Auctioneer_ProtectAuctionFrame(true);
+
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil

@@ -255,3 +255,19 @@ function Auctioneer_ChatPrint(str)
 		getglobal("ChatFrame"..Auctioneer_GetFrameIndex()):AddMessage(str, 0.0, 1.0, 0.25);
 	end
 end
+
+function Auctioneer_ProtectAuctionFrame(enable)
+	if (AuctionFrame) then
+		if (enable) then
+			if ( GetDoublewideFrame() == "AuctionFrame" ) then
+				SetDoublewideFrame(nil)
+			end
+			UIPanelWindows["AuctionFrame"] = nil
+		else
+			if ( AuctionFrame:IsVisible() ) then
+				SetDoublewideFrame("AuctionFrame")
+			end
+			UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
+		end
+	end
+end
