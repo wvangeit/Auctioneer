@@ -253,6 +253,8 @@ end
 function Auctioneer_ChatPrint(str)
 	if getglobal("ChatFrame"..Auctioneer_GetFrameIndex()) then
 		getglobal("ChatFrame"..Auctioneer_GetFrameIndex()):AddMessage(str, 0.0, 1.0, 0.25);
+	elseif (DEFAULT_CHAT_FRAME) then 
+		DEFAULT_CHAT_FRAME:AddMessage(str, 0.0, 1.0, 0.25);
 	end
 end
 
