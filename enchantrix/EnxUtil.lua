@@ -70,9 +70,9 @@ function Enchantrix_SetFilterDefaults()
 	end
 end
 
---[[							
---		Localization functions
---]]
+--------------------------------------
+--		Localization functions		--
+--------------------------------------
 
 Enchantrix_CommandMap = nil;
 Enchantrix_CommandMapRev = nil;
@@ -94,13 +94,13 @@ function Enchantrix_GetLocalizedFilterVal(key)
 end
 
 function Enchantrix_DelocalizeFilterVal(value)
-	if (value == ENCH_CMD_ON or value == 'on') then
+	if (value == ENCH_CMD_ON) then
 		return 'on';
-	elseif (value == ENCH_CMD_OFF or value == 'off') then
+	elseif (value == ENCH_CMD_OFF) then
 		return 'off';
-	elseif (value == ENCH_CMD_DEFAULT or value == 'default') then
+	elseif (value == ENCH_CMD_DEFAULT) then
 		return 'default';
-	elseif (value == ENCH_CMD_TOGGLE or value == 'toggle') then
+	elseif (value == ENCH_CMD_TOGGLE) then
 		return 'toggle';
 	else
 		return value;
