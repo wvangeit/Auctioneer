@@ -386,6 +386,8 @@ end
 function Enchantrix_ChatPrint(str)
 	if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
 		getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(str, 1.0, 0.5, 0.25);
+	elseif (DEFAULT_CHAT_FRAME) then 
+		DEFAULT_CHAT_FRAME:AddMessage(str, 1.0, 0.5, 0.25);
 	end
 end
 

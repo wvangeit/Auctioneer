@@ -137,7 +137,7 @@ function Enchantrix_Register_Khaos()
 				dependencies={all={checked=true;}};
 				difficulty=3;
 			};			
-			--[[
+			--[[{
 				id='rates';
 				type=K_TEXT;
 				text=ENCH_GUI_RATE;
@@ -157,7 +157,7 @@ function Enchantrix_Register_Khaos()
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
-			]]--
+			};]]--
 			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
@@ -311,14 +311,13 @@ end
 
 function Enchantrix_AuctioneerLoaded()
 	if (not Enchantrix_Khaos_Registered) then return; end
-	
+
 	local insertPos = 9;
 
 	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
-		EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): options already added");
 		return nil;
 	end
-	
+
 	local AuctioneerOptions = {
 		{
 			id='valuate-hsp';
@@ -364,15 +363,13 @@ function Enchantrix_AuctioneerLoaded()
 		};
 	};
 
-	EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): unregistering");
 	Khaos.unregisterOptionSet("Enchantrix");
 	Khaos.refresh();
-	
+
 	for i, opt in ipairs(AuctioneerOptions) do
 		tinsert(Enchantrix_optionSet.options, insertPos + i - 1, opt);
 	end
-		
-	EnhTooltip.DebugPrint("Enchantrix_AuctioneerLoaded(): registering");
+
 	Khaos.registerOptionSet("tooltip", Enchantrix_optionSet);
 	Khaos.refresh();
 end
