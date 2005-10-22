@@ -261,15 +261,22 @@ end
 function Auctioneer_ProtectAuctionFrame(enable)
 	if (AuctionFrame) then
 		if (enable) then
-			if ( GetDoublewideFrame() == AuctionFrame) then
+			if ( GetDoublewideFrame() == AuctionFrame ) then
 				SetDoublewideFrame(nil)
 			end
 			UIPanelWindows["AuctionFrame"] = nil
+			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_UIPanelWindowBackup.AuctionFrame ) then
+				MobileFrames_UIPanelWindowBackup.AuctionFrame = nil;
+			end
 		else
+			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList["AuctionFrame"] ) then
+				MobileFrames_UIPanelWindowBackup.AuctionFrame = { area = "doublewide", pushable = 0 };
+			else
+				UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
+			end
 			if ( AuctionFrame:IsVisible() ) then
 				SetDoublewideFrame(AuctionFrame)
 			end
-			UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
 		end
 	end
 end
