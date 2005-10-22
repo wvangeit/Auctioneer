@@ -8,8 +8,15 @@
 ----  options via slash command, Khaos, MyAddon etc.
 --]]
 
+-- function prototypes
+local commandHandler, cmdHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, cmdLocale, setLocale
+local setKhaosSetKeyValue
 
-local commandHandler, doHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, setLocale, getLocale
+-- Localization function prototypes
+local delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, buildCommandMap
+
+local commandMap = nil;
+local commandMapRev = nil;
 
 Informant_Slash_Registered = nil
 Informant_GUI_Registered = nil
@@ -34,10 +41,49 @@ Informant.InitCommands = function()
 	end
 end
 
+function setKhaosSetKeyValue(key, value)
+	if (Auctioneer_Khaos_Registered) then
+		local kKey = Khaos.getSetKey("Informant", key)
+
+		if (not kKey) then
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+		elseif (kKey.checked ~= nil) then
+			if (type(value) == "string") then value = (value == "on"); end
+			Khaos.setSetKeyParameter("Informant", key, "checked", value)
+		elseif (kKey.value ~= nil) then
+			Khaos.setSetKeyParameter("Informant", key, "value", value)
+		else
+			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
+		end
+	end
+end
+
+function buildCommandMap()
+	commandMap = {
+			[_INFORMANT['CmdOn']] = 'on',
+			[_INFORMANT['CmdOff']] = 'off',
+			[_INFORMANT['CmdToggle']] = 'toggle',
+			[_INFORMANT['CmdDisable']] = 'disable',
+			[_INFORMANT['CmdLocale']] = 'locale',
+			[_INFORMANT['CmdDefault']] = 'default',
+			[_INFORMANT['CmdEmbed']] = 'embed',
+			[_INFORMANT['ShowStack']] = 'show-stack',
+			[_INFORMANT['ShowUsage']] = 'show-usage',
+			[_INFORMANT['ShowQuest']] = 'show-quest',
+			[_INFORMANT['ShowMerchant']] = 'show-merchant',
+			[_INFORMANT['ShowVendor']] = 'show-vendor',
+			[_INFORMANT['ShowVendorBuy']] = 'show-vendor-buy',
+			[_INFORMANT['ShowVendorSell']] = 'show-vendor-sell',
+		}
+
+	commandMapRev = {}
+	for k,v in pairs(commandMap) do
+		commandMapRev[v] = k;
+	end
+end
 
 --Cleaner Command Handling Functions (added by MentalPower)
-commandHandler = function (command, source)
-
+function commandHandler(command, source)
 	--To print or not to print, that is the question...
 	local chatprint = nil
 	if (source == "GUI") then chatprint = false
@@ -48,73 +94,60 @@ commandHandler = function (command, source)
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
 	if (not param) then param = "" end
+	cmd = delocalizeCommand(cmd);
 
 	--Now for the real Command handling
 	if ((cmd == "") or (cmd == "help")) then
-		doHelp()
+		cmdHelp()
 		return
 
-	elseif (((cmd == _INFORMANT['CmdOn']) or (cmd == "on")) or ((cmd == _INFORMANT['CmdOff']) or (cmd == "off")) or ((cmd == _INFORMANT['CmdToggle']) or (cmd == "toggle"))) then
+	elseif (cmd == "on" or cmd == "off" or cmd == "toggle") then
 		onOff(cmd, chatprint)
-
-	elseif ((cmd == _INFORMANT['CmdDisable']) or (cmd == "disable")) then
+	elseif (cmd == "disable") then
 		Stubby.SetConfig("Informant", "LoadType", "never");
-
 	elseif (cmd == "load") then
 		if (param == "always") or (param == "never") then
 			chatPrint("Setting Informant to "..param.." load for this toon");
 			Stubby.SetConfig("Informant", "LoadType", param);
 		end
-
-	elseif ((cmd == _INFORMANT['CmdLocale']) or (cmd == "locale")) then
-		setLocale(param, chatprint)
-
-	elseif ((cmd == _INFORMANT['CmdDefault']) or (cmd == "default")) then
+	elseif (cmd == "locale") then
+		cmdLocale(param, chatprint)
+	elseif (cmd == "default") then
 		restoreDefault(param, chatprint)
-
-	elseif (
-		((cmd == _INFORMANT['CmdEmbed']) or (cmd == "embed")) or
-		((cmd == _INFORMANT['ShowStack']) or (cmd == "show-stack")) or
-		((cmd == _INFORMANT['ShowUsage']) or (cmd == "show-usage")) or
-		((cmd == _INFORMANT['ShowQuest']) or (cmd == "show-vendor")) or
-		((cmd == _INFORMANT['ShowMerchant']) or (cmd == "show-vendor")) or
-		((cmd == _INFORMANT['ShowVendor']) or (cmd == "show-vendor")) or
-		((cmd == _INFORMANT['ShowVendorBuy']) or (cmd == "show-vendor-buy")) or
-		((cmd == _INFORMANT['ShowVendorSell']) or (cmd == "show-vendor-sell"))
-	) then
+	elseif (cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
+			cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
+			cmd == "show-vendor-buy" or cmd == "show-vendor-sell") then
 		genVarSet(cmd, param, chatprint)
-
 	else
-		if (chatprint == true) then
+		if (chatprint) then
 			chatPrint(string.format(_INFORMANT['FrmtActUnknown'], cmd))
 		end
 	end
 end
 
 --Help ME!! (The Handler) (Another shameless copy from the original function)
-function doHelp()
+function cmdHelp()
 
 	local onOffToggle = " (".._INFORMANT['CmdOn'].."|".._INFORMANT['CmdOff'].."|".._INFORMANT['CmdToggle']..")"
 	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
 	chatPrint(_INFORMANT['TextUsage'])
-	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..Informant.GetFilterVal("all").."]|r - " .. _INFORMANT['HelpOnoff'])
+	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _INFORMANT['HelpOnoff'])
 
 	chatPrint("  |cffffffff/informant ".._INFORMANT['CmdDisable'].."|r - " .. _INFORMANT['HelpDisable']);
 
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendor'], Informant.GetFilterVal(_INFORMANT['ShowVendor']), _INFORMANT['HelpVendor']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], Informant.GetFilterVal(_INFORMANT['ShowVendorSell']), _INFORMANT['HelpVendorSell']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorBuy'], Informant.GetFilterVal(_INFORMANT['ShowVendorBuy']), _INFORMANT['HelpVendorBuy']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowUsage'], Informant.GetFilterVal(_INFORMANT['ShowUsage']), _INFORMANT['HelpUsage']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowStack'], Informant.GetFilterVal(_INFORMANT['ShowStack']), _INFORMANT['HelpStack']))
-	chatPrint(string.format(lineFormat, _INFORMANT['CmdEmbed'], Informant.GetFilterVal(_INFORMANT['CmdEmbed']), _INFORMANT['HelpEmbed']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendor'], getLocalizedFilterVal('show-vendor'), _INFORMANT['HelpVendor']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], getLocalizedFilterVal('show-vendor-sell'), _INFORMANT['HelpVendorSell']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorBuy'], getLocalizedFilterVal('show-vendor-buy'), _INFORMANT['HelpVendorBuy']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowUsage'], getLocalizedFilterVal('show-usage'), _INFORMANT['HelpUsage']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowStack'], getLocalizedFilterVal('show-stack'), _INFORMANT['HelpStack']))
+	chatPrint(string.format(lineFormat, _INFORMANT['CmdEmbed'], getLocalizedFilterVal('embed'), _INFORMANT['HelpEmbed']))
 
 	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
-	chatPrint(string.format(lineFormat, _INFORMANT['CmdLocale'], _INFORMANT['OptLocale'], Informant.GetFilterVal('locale'), _INFORMANT['HelpLocale']))
+	chatPrint(string.format(lineFormat, _INFORMANT['CmdLocale'], _INFORMANT['OptLocale'], getLocalizedFilterVal('locale'), _INFORMANT['HelpLocale']))
 
 	lineFormat = "  |cffffffff/informant %s %s|r - %s"
 	chatPrint(string.format(lineFormat, _INFORMANT['CmdDefault'], "", _INFORMANT['HelpDefault']))
-
 end
 
 --The onOff(state, chatprint) function handles the state of the Informant AddOn (whether it is currently on or off)
@@ -124,7 +157,7 @@ end
 --
 --If chatprint is "true" then the state will also be printed to the user.
 
-function onOff(state, chatprint)
+local function onOff(state, chatprint)
 
 	if ((state == nil) or (state == "")) then
 		state = Informant.GetFilterVal("all")
@@ -168,125 +201,82 @@ function onOff(state, chatprint)
 	return state
 end
 
-function setLocale(param, chatprint)
+function cmdLocale(param, chatprint)
+	param = delocalizeFilterVal(param);
+	local validLocale = nil;
 
-local validLocale=nil;
-
-	if (param == getLocale()) then
-		--Do Nothing
-		validLocale=true;
-	elseif (INFORMANT_VALID_LOCALES[param]) then
-		Informant.SetFilter('locale', param);
-		Informant_SetLocaleStrings(getLocale());
-		validLocale=true;
-
-	elseif (param == '') or (param == 'default') or (param == 'off') then
-		Informant.SetFilter('locale', 'default');
-		Informant_SetLocaleStrings(getLocale());
-		validLocale=true;
+	if (param == Informant.GetFilterVal('locale')) then
+		validLocale = true;
+	elseif (setLocale(param)) then
+		validLocale = true;
 	end
-	
-	
-	if (chatprint == true) then
 
-		if ((validLocale == true) and (INFORMANT_VALID_LOCALES[param])) then
-			chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], param));
-			
-			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", "InformantLocale", "value", param);
-			end
-
-		elseif (validLocale == nil) then
+	if (chatprint) then
+		if (validLocale) then
+			chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], localizeFilterVal(param)));
+		else
 			chatPrint(string.format(_INFORMANT['FrmtUnknownLocale'], param));
-
 			if (INFORMANT_VALID_LOCALES) then
 				for locale, x in pairs(INFORMANT_VALID_LOCALES) do
 					chatPrint("  "..locale);
 				end
-			end
-
-		else
-			chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], 'default'));
-
-			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", "InformantLocale", "value", "default");
 			end
 		end
 	end
 end
 
 function restoreDefault(param, chatprint)
+	local oldLocale = InformantConfig.filters['locale']
+	
 	if ( (param == nil) or (param == "") ) then
 		return
-
 	elseif ((param == _INFORMANT['CmdClearAll']) or (param == "all")) then
+		param = "all";
 		InformantConfig.filters = {};
-
 	else
+		paramLocalized = param
+		param = delocalizeCommand(param)
 		Informant.SetFilter(param, nil);
 	end
+	
+	-- Apply defaults for settings that went missing
+	Informant.SetFilterDefaults();		
+	
+	-- Apply new locale if needed 
+	if (oldLocale ~= InformantConfig.filters['locale']) then setLocale(InformantConfig.filters['locale']); end
 
-	--@TODO: Move the default setting for the different functions over here to be able to communicate to Khaos what those setting are.
-	if (chatprint == true) then
-		if ((param == _INFORMANT['CmdClearAll']) or (param == "all")) then
+	if (chatprint) then
+		if (param == "all") then
 			chatPrint(_INFORMANT['FrmtActDefaultall']);
-
+			for k,v in pairs(InformantConfig.filters) do
+				setKhaosSetKeyValue(k, Informant.GetFilterVal(k));
+			end
 		else
-			chatPrint(string.format(_INFORMANT['FrmtActDefault'], param));
+			chatPrint(string.format(_INFORMANT['FrmtActDefault'], paramLocalized));
+			setKhaosSetKeyValue(param, Informant.GetFilterVal(param));
 		end
 	end
 end
 
 function genVarSet(variable, param, chatprint)
-	if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
-		Informant.SetFilter(variable, "on")
+	if (type(param) == "string") then
+		param = delocalizeFilterVal(param);
+	end
 
-	elseif ((param == _INFORMANT['CmdOff']) or (param == "off")) then
-		Informant.SetFilter(variable, "off")
+	if (param == "on" or param == "off" or type(param) == "boolean") then
+		Informant.SetFilter(variable, param);
+	elseif (param == "toggle" or param == nil or param == "") then
+		param = Informant.SetFilter(variable, not Informant.GetFilter(variable));
+	end
 
-	elseif ((param == _INFORMANT['CmdToggle']) or (param == "toggle") or (param == nil) or (param == "")) then
-		param = Informant.GetFilterVal(variable)
-
-		if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
-			param = _INFORMANT['CmdOff']
-
+	if (chatprint) then
+		if (Informant.GetFilter(variable)) then
+			chatPrint(string.format(_INFORMANT['FrmtActEnable'], localizeCommand(variable)))
+			setKhaosSetKeyValue(variable, true)
 		else
-			param = _INFORMANT['CmdOn']
+			chatPrint(string.format(_INFORMANT['FrmtActDisable'], localizeCommand(variable)))
+			setKhaosSetKeyValue(variable, false)
 		end
-
-		Informant.SetFilter(variable, param)
-	end
-
-	if (chatprint == true) then
-
-		if ((param == _INFORMANT['CmdOn']) or (param == "on")) then
-			chatPrint(string.format(_INFORMANT['FrmtActEnable'], variable))
-
-			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", variable, "checked", true)
-			end
-
-		elseif ((param == _INFORMANT['CmdOff']) or (param == "off")) then
-			chatPrint(string.format(_INFORMANT['FrmtActDisable'], variable))
-
-			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", variable, "checked", false)
-			end
-		end
-	end
-end
-
-Informant.Register = function()
-	if (Khaos) then
-		if (not Informant_Khaos_Registered) then
-			Informant_GUI_Registered = Informant_Register_Khaos()
-		end
-	end
-	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
-	if (Informant_GUI_Registered == true) then
-		return true
-	else
-		return false
 	end
 end
 
@@ -306,16 +296,12 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id="InformantEnable",
+				id="enabled",
 				type=K_TEXT,
 				text=_INFORMANT['GuiMainEnable'],
 				helptext=_INFORMANT['HelpOnoff'],
 				callback=function(state)
-					if (state.checked) then
-						onOff(_INFORMANT['CmdOn'])
-					else
-						onOff(_INFORMANT['CmdOff'])
-					end
+					onOff(state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -330,7 +316,7 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id="InformantLocale",
+				id="locale",
 				type=K_EDITBOX,
 				setup = {
 					callOn = {"enter", "tab"}
@@ -338,7 +324,7 @@ function registerKhaos()
 				text=_INFORMANT['GuiLocale'],
 				helptext=_INFORMANT['HelpLocale'],
 				callback = function(state)
-					setLocale(state.value)
+					cmdLocale(state.value)
 				end,
 				feedback = function (state)
 					return string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], state.value)
@@ -349,7 +335,7 @@ function registerKhaos()
 				disabled = {
 					value = getLocale()
 				},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=2,
 			},
 			{
@@ -376,16 +362,12 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['ShowStack'],
+				id="show-stack",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoStack'],
 				helptext=_INFORMANT['HelpStack'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowStack'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-stack", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -397,20 +379,16 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['ShowUsage'],
+				id="show-usage",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoUsage'],
 				helptext=_INFORMANT['HelpUsage'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowUsage'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-usage", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -422,20 +400,17 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
+			--[[
 			{
-				id=_INFORMANT['ShowQuest'],
+				id="show-quest",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoQuest'],
 				helptext=_INFORMANT['HelpQuest'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowQuest'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-quest", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -447,20 +422,16 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['ShowMerchant'],
+				id="show-merchant",
 				type=K_TEXT,
 				text=_INFORMANT['GuiInfoMerchant'],
 				helptext=_INFORMANT['HelpMerchant'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowMerchant'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-merchant", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -472,9 +443,10 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
+			]]
 			{
 				id="InformantVendorHeader",
 				type=K_HEADER,
@@ -483,16 +455,12 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['ShowVendor'],
+				id="show-vendor",
 				type=K_TEXT,
 				text=_INFORMANT['GuiVendor'],
 				helptext=_INFORMANT['HelpVendor'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowVendor'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-vendor", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -504,20 +472,16 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['ShowVendorBuy'],
+				id="show-vendor-buy",
 				type=K_TEXT,
 				text=_INFORMANT['GuiVendorBuy'],
 				helptext=_INFORMANT['HelpVendorBuy'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowVendorBuy'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-vendor-buy", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -529,20 +493,16 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantVendor={checked=true}, InformantEnable={checked=true}},
+				dependencies={["show-vendor"]={checked=true}, enabled={checked=true}},
 				difficulty=2,
 			},
 			{
-				id=_INFORMANT['ShowVendorSell'],
+				id="show-vendor-sell",
 				type=K_TEXT,
 				text=_INFORMANT['GuiVendorSell'],
 				helptext=_INFORMANT['HelpVendorSell'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['ShowVendorSell'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("show-vendor-sell", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -554,7 +514,7 @@ function registerKhaos()
 				check=true,
 				default={checked=true},
 				disabled={checked=false},
-				dependencies={InformantVendor={checked=true}, InformantEnable={checked=true}},
+				dependencies={["show-vendor"]={checked=true}, enabled={checked=true}},
 				difficulty=2,
 			},
 
@@ -566,16 +526,12 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id=_INFORMANT['CmdEmbed'],
+				id="embed",
 				type=K_TEXT,
 				text=_INFORMANT['GuiEmbed'],
 				helptext=_INFORMANT['HelpEmbed'],
 				callback=function(state)
-					if (state.checked) then
-						genVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOn'])
-					else
-						genVarSet(_INFORMANT['CmdEmbed'], _INFORMANT['CmdOff'])
-					end
+					genVarSet("embed", state.checked)				
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -587,7 +543,7 @@ function registerKhaos()
 				check=true,
 				default={checked=false},
 				disabled={checked=false},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
 			{
@@ -650,6 +606,46 @@ function registerKhaos()
 	return true
 end
 
+Informant.Register = function()
+	if (Khaos) then
+		if (not Informant_Khaos_Registered) then
+			Informant_GUI_Registered = registerKhaos()
+		end
+	end
+	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
+	if (Informant_GUI_Registered == true) then
+		return true
+	else
+		return false
+	end
+end
+
+function setLocale(locale)
+	locale = delocalizeFilterVal(locale);
+	
+	if (INFORMANT_VALID_LOCALES[locale]) then
+		Informant.SetFilter('locale', locale);		
+	elseif (locale == '') or (locale == 'default') or (locale == 'off') then
+		locale = 'default';
+		Informant.SetFilter('locale', 'default');
+	else
+		return false;
+	end
+
+	Informant_SetLocaleStrings(Informant.GetLocale());
+	commandMap = nil;
+	commandMapRev = nil;
+		
+	if Khaos and Informant_Khaos_Registered then
+		setKhaosSetKeyValue('locale', locale);
+		Khaos.unregisterOptionSet("Informant");
+		Khaos.refresh();
+		registerKhaos();
+		Khaos.refresh();
+	end
+	
+	return true;
+end
 
 function chatPrint(msg)
 	if (DEFAULT_CHAT_FRAME) then 
@@ -657,10 +653,55 @@ function chatPrint(msg)
 	end
 end
 
-function getLocale()
-	local locale = Informant.GetFilterVal('locale');
-	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
-		return locale;
-	end
-	return GetLocale();
+--------------------------------------
+--		Localization functions		--
+--------------------------------------
+
+function delocalizeFilterVal(value)
+	if (value == _INFORMANT['CmdOn']) then
+		return 'on';
+	elseif (value == _INFORMANT['CmdOff']) then
+		return 'off';
+	elseif (value == _INFORMANT['CmdDefault']) then
+		return 'default';
+	elseif (value == _INFORMANT['CmdToggle']) then
+		return 'toggle';
+	else
+		return value;
+	end	
 end
+
+function localizeFilterVal(value)
+	local result
+	if (value == 'on') then
+		result = _INFORMANT['CmdOn'];
+	elseif (value == 'off') then
+		result = _INFORMANT['CmdOff'];
+	elseif (value == 'default') then
+		result = _INFORMANT['CmdDefault'];
+	elseif (value == 'toggle') then
+		result = _INFORMANT['CmdToggle'];
+	end
+	if (result) then return result; else return value; end
+end
+
+function getLocalizedFilterVal(key)
+	return localizeFilterVal(Informant.GetFilterVal(key))
+end
+
+-- Turns a localized slash command into the generic English version of the command
+function delocalizeCommand(cmd)
+	if (not commandMap) then buildCommandMap(); end
+	local result = commandMap[cmd];
+	if (result) then return result; else return cmd; end
+end
+
+-- Translate a generic English slash command to the localized version, if available
+function localizeCommand(cmd)
+	if (not commandMapRev) then buildCommandMap(); end
+	local result = commandMapRev[cmd];
+	if (result) then return result; else return cmd; end
+end
+
+-- Globally accessible functions
+Informant.SetLocale = setLocale;

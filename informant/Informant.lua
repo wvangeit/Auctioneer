@@ -20,27 +20,30 @@ local getItem--(itemID);     itemID is the first value in a blizzard hyperlink i
 
 
 -- LOCAL FUNCTION PROTOTYPES:
-local addLine          -- addLine(text, color)
-local clear            -- clear()
-local frameActive      -- frameActive(isActive)
-local frameLoaded      -- frameLoaded()
-local getCatName       -- getCatName(catID)
-local getFilter        -- getFilter(filter)
-local getFilterVal     -- getFilterVal(type, default)
-local getItem          -- getItem(itemID)
-local getRowCount      -- getRowCount()
-local onLoad           -- onLoad()
-local onQuit           -- onQuit()
-local scrollUpdate     -- scrollUpdate(offset)
-local setDatabase      -- setDatabase(database)
-local setFilter        -- setFilter(type, value)
-local setRequirements  -- setRequirements(requirements)
-local setSkills        -- setSkills(skills)
-local setVendors       -- setVendors(vendors)
-local showHideInfo     -- showHideInfo()
-local skillToName      -- skillToName(userSkill)
-local split            -- split(str, at)
-local tooltipHandler   -- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
+local addLine            -- addLine(text, color)
+local clear              -- clear()
+local frameActive        -- frameActive(isActive)
+local frameLoaded        -- frameLoaded()
+local getCatName         -- getCatName(catID)
+local getFilter          -- getFilter(filter)
+local getFilterVal       -- getFilterVal(type)
+local getItem            -- getItem(itemID)
+local getRowCount        -- getRowCount()
+local onEvent            -- onEvent(event)
+local onLoad             -- onLoad()
+local onVariablesLoaded  -- onVariablesLoaded()
+local onQuit             -- onQuit()
+local scrollUpdate       -- scrollUpdate(offset)
+local setDatabase        -- setDatabase(database)
+local setFilter          -- setFilter(key, value)
+local setFilterDefaults  -- setFilterDefaults()
+local setRequirements    -- setRequirements(requirements)
+local setSkills          -- setSkills(skills)
+local setVendors         -- setVendors(vendors)
+local showHideInfo       -- showHideInfo()
+local skillToName        -- skillToName(userSkill)
+local split              -- split(str, at)
+local tooltipHandler     -- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 
 -- LOCAL VARIABLES
 
@@ -66,6 +69,15 @@ CLASS_TO_CATEGORY_MAP = {
 	[5]  = 9,
 	[15] = 10,
 }
+
+local filterDefaults = {
+		['all'] = 'on',
+		['embed'] = 'off',
+		['locale'] = 'default',
+		['show-vendor'] = 'on',
+		['show-vendor-buy'] = 'on',
+		['show-vendor-sell'] = 'on',
+	}
 
 -- FUNCTION DEFINITIONS
 
@@ -215,20 +227,28 @@ function setDatabase(database)
 end
 
 
-function setFilter(type, value)
-	if (not InformantConfig.filters) then InformantConfig.filters = {} end
-	InformantConfig.filters[type] = value
+function setFilter(key, value)
+	if (not InformantConfig.filters) then
+		InformantConfig.filters = {};
+		setFilterDefaults()
+	end
+	if (type(value) == "boolean") then
+		if (value) then
+			InformantConfig.filters[key] = 'on';
+		else
+			InformantConfig.filters[key] = 'off';
+		end
+	else
+		InformantConfig.filters[key] = value;
+	end
 end
 
-function getFilterVal(type, default)
-	if (default == nil) then default = "on" end
-	if (not InformantConfig.filters) then InformantConfig.filters = {} end
-	local value = InformantConfig.filters[type]
-	if (not value) then
-		if (type == _INFORMANT['CmdEmbed']) then return "off" end
-		return default
+function getFilterVal(type)
+	if (not InformantConfig.filters) then
+		InformantConfig.filters = {}
+		setFilterDefaults()
 	end
-	return value
+	return InformantConfig.filters[type]
 end
 
 function getFilter(filter)
@@ -236,6 +256,14 @@ function getFilter(filter)
 	if ((value == _INFORMANT['CmdOn']) or (value == "on")) then return true
 	elseif ((value == _INFORMANT['CmdOff']) or (value == "off")) then return false end
 	return true
+end
+
+function getLocale()
+	local locale = Informant.GetFilterVal('locale');
+	if (locale ~= 'on') and (locale ~= 'off') and (locale ~= 'default') then
+		return locale;
+	end
+	return GetLocale();
 end
 
 local categories
@@ -455,22 +483,14 @@ function onQuit()
 end
 
 function onLoad()
-	if (not InformantConfig) then InformantConfig = { } end
+	this:RegisterEvent("ADDON_LOADED")
+	
+	if (not InformantConfig) then
+		InformantConfig = {}
+		setFilterDefaults()	
+	end
 
 	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
-
-	if (InformantConfig.position) then
-		InformantFrame:ClearAllPoints()
-		InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
-	end
-
-	if (not InformantConfig.welcomed) then
-		clear()
-		addLine(_INFORMANT['Welcome'])
-		InformantConfig.welcomed = true
-	end
-
-	Informant.InitCommands()
 end
 
 local function frameLoaded()
@@ -526,6 +546,33 @@ local function frameLoaded()
 			Stubby.Print("]].._INFORMANT['MesgNotLoaded']..[[");
 		end
 	]]);
+end
+
+function onVariablesLoaded()
+	Informant.SetLocale(getLocale())
+	setFilterDefaults()
+	
+	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+
+	if (InformantConfig.position) then
+		InformantFrame:ClearAllPoints()
+		InformantFrame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", InformantConfig.position.x, InformantConfig.position.y)
+	end
+
+	if (not InformantConfig.welcomed) then
+		clear()
+		addLine(_INFORMANT['Welcome'])
+		InformantConfig.welcomed = true
+	end
+	
+	Informant.InitCommands()
+end
+
+function onEvent(event)
+	if (event == "ADDON_LOADED" and arg1 == "Informant") then
+		onVariablesLoaded()
+		this:UnregisterEvent("ADDON_LOADED")
+	end
 end
 
 function frameActive(isActive)
@@ -592,6 +639,15 @@ function clear()
 	scrollUpdate()
 end
 
+function setFilterDefaults()
+	if (not InformantConfig.filters) then InformantConfig.filters = {}; end
+	for k,v in pairs(filterDefaults) do
+		if (InformantConfig.filters[k] == nil) then
+			InformantConfig.filters[k] = v;
+		end
+	end
+end
+
 -- GLOBAL OBJECT
 
 Informant = {
@@ -612,6 +668,9 @@ Informant = {
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
-	SetFilter = setFilter
+	GetLocale = getLocale,
+	OnEvent = onEvent,
+	SetFilter = setFilter,
+	SetFilterDefaults = setFilterDefaults,
 }
 

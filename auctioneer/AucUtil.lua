@@ -296,10 +296,6 @@ end
 Auctioneer_CommandMap = nil;
 Auctioneer_CommandMapRev = nil;
 
-function Enchantrix_GetLocalizedCmdString(value)
-	return getglobal("ENCH_CMD_" .. string.upper(value))
-end
-
 function Auctioneer_DelocalizeFilterVal(value)
 	if (value == _AUCT['CmdOn']) then
 		return 'on';

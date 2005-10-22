@@ -24,6 +24,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnHide>
 				Informant.FrameActive(false);
 			</OnHide>
+			<OnEvent>
+				Informant.OnEvent(event);
+			</OnEvent>
 		</Scripts>
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\TutorialFrame\TutorialFrameBorder" tile="true">
 			<BackgroundInsets>
