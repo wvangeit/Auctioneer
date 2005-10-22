@@ -221,6 +221,26 @@ function Auctioneer_Register_Khaos()
 				difficulty=1;
 			};
 			{
+				id="protect-window";
+				type=K_PULLDOWN;
+				setup = {
+					options = { _AUCT['CmdProtectWindow0'], _AUCT['CmdProtectWindow1'], _AUCT['CmdProtectWindow2'] };
+					multiSelect = false;
+				};
+				text=_AUCT['GuiProtectWindow'];
+				helptext=_AUCT['HelpProtectWindow'];
+				callback=function(state)
+					Auctioneer_CmdProtectWindow(state.value);
+				end;
+				feedback=function(state)
+					return string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')]);
+				end;
+				default = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
+				disabled = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
+				dependencies={enabled={checked=true;}};
+				difficulty=3;
+			};			
+			{
 				id="show-verbose";
 				type=K_TEXT;
 				text=_AUCT['GuiVerbose'];
@@ -737,6 +757,7 @@ function Auctioneer_BuildCommandMap()
 			[_AUCT['CmdCompete']] = 'compete',
 			[_AUCT['CmdScan']] = 'scan',
 			[_AUCT['CmdAutofill']] = 'autofill',
+			[_AUCT['CmdProtectWindow']] = 'protect-window',
 			[_AUCT['CmdBroker']] = 'broker';
 			[_AUCT['CmdBidbroker']] = 'bidbroker',
 			[_AUCT['CmdBidbrokerShort']] = 'bidbroker',
@@ -808,6 +829,8 @@ function Auctioneer_Command(command, source)
 		Auctioneer_DoCompeting(param);
 	elseif (cmd == 'scan') then
 		Auctioneer_RequestAuctionScan();
+	elseif (cmd == 'protect-window') then
+		Auctioneer_CmdProtectWindow(param, chatprint);
 	elseif (cmd == 'low') then
 		Auctioneer_DoLow(param);
 	elseif (cmd == 'med') then
@@ -852,6 +875,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdAuctionClick'], Auctioneer_GetLocalizedFilterVal('auction-click'), _AUCT['HelpAuctionClick']));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdProtectWindow'], _AUCT['OptProtectWindow'], _AUCT['CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')], _AUCT['HelpProtectWindow']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdLocale'], _AUCT['OptLocale'], Auctioneer_GetLocalizedFilterVal("locale"), _AUCT['HelpLocale']));
 
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdPctMarkup'], _AUCT['OptPctMarkup'], Auctioneer_GetFilterVal('pct-markup'), _AUCT['HelpPctMarkup']));
@@ -1167,6 +1191,27 @@ function Auctioneer_SetFrame(frame, chatprint)
 	end
 end
 
+function Auctioneer_CmdProtectWindow(param, chatprint)
+	local mode;
+	
+	if (param == 'never' or param == 'off' or param == _AUCT['CmdProtectWindow0'] or param == _AUCT['CmdOff']) then
+		mode = 0;
+	elseif (param == 'scan' or param == _AUCT['CmdProtectWindow1']) then
+		mode = 1;
+	elseif (param == 'always' or param == _AUCT['CmdProtectWindow2']) then
+		mode = 2;
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtUnknownArg'], param, Auctioneer_DelocalizeCommand("protect-window")));
+		return
+	end
+	
+	Auctioneer_SetFilter("protect-window", mode);
+	
+	if (chatprint) then
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow' .. mode]));
+		setKhaosSetKeyVale("protect-window", _AUCT['CmdProtectWindow' .. mode]);
+	end
+end
 
 function Auctioneer_GenVarSet(variable, param, chatprint)
 	if (type(param) == "string") then

@@ -144,6 +144,10 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdCompete'] = "compete";
 	_AUCT['CmdScan'] = "scan";
 	_AUCT['CmdAutofill'] = "autofill";
+	_AUCT['CmdProtectWindow'] = "protect-window"
+	_AUCT['CmdProtectWindow0'] = "never"
+	_AUCT['CmdProtectWindow1'] = "scan"
+	_AUCT['CmdProtectWindow2'] = "always"
 	
 	_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
 	_AUCT['CmdPctMarkup']      = "pct-markup";
@@ -164,6 +168,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptScaleDefault'] = 1.0;
 	_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
 	_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
+	_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."|".._AUCT['CmdProtectWindow1'].."|".._AUCT['CmdProtectWindow2']..")";
 	
 	_AUCT['OptPctBidmarkdown'] = "<percent>";
 	_AUCT['OptPctMarkup'] = "<percent>";
@@ -171,13 +176,6 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptPctNocomp'] = "<percent>";
 	_AUCT['OptPctUnderlow'] = "<percent>";
 	_AUCT['OptPctUndermkt'] = "<percent>";
-	
-	_AUCT['OptPctBidmarkdownDefault'] = 20;
-	_AUCT['OptPctMarkupDefault'] = 300;
-	_AUCT['OptPctMaxlessDefault'] = 30;
-	_AUCT['OptPctNocompDefault'] = 2;
-	_AUCT['OptPctUnderlowDefault'] = 5;
-	_AUCT['OptPctUndermktDefault'] = 20;
 	
 	_AUCT['ShowVerbose'] = "show-verbose";
 	_AUCT['ShowAverage'] = "show-average";
@@ -217,6 +215,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 	_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
 	_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
+	_AUCT['HelpProtectWindow'] = "Prevents you from accidentally closing the Auction House interface.";
 	
 	_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 	
@@ -236,7 +235,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
 	_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
 	_AUCT['FrmtAutostart'] = "Automatically starting auction for %s minimum, %s buyout (%dh)"
-	
+	_AUCT['FrmtProtectWindow'] = "Auction House window protection set to: %s";
 	
 	_AUCT['TextScan'] = "Scan";
 	_AUCT['TextAuction'] = "auction";
@@ -324,6 +323,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
+	_AUCT['GuiProtectWindow'] = "Prevent accidental closing of AH window";
 
 -- Locale strings for the daDK locale
 	if locale == "daDK" then
@@ -457,13 +457,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptPctNocomp'] = "<procent>";
 		_AUCT['OptPctUnderlow'] = "<procent>";
 		_AUCT['OptPctUndermkt'] = "<procent>";
-		
-		_AUCT['OptPctBidmarkdownDefault'] = 20;
-		_AUCT['OptPctMarkupDefault'] = 300;
-		_AUCT['OptPctMaxlessDefault'] = 30;
-		_AUCT['OptPctNocompDefault'] = 2;
-		_AUCT['OptPctUnderlowDefault'] = 5;
-		_AUCT['OptPctUndermktDefault'] = 20;
 		
 		_AUCT['ShowVerbose'] = "show-verbose";
 		_AUCT['ShowAverage'] = "show-average";
@@ -738,13 +731,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptPctUnderlow']    = "<Prozent>";
 		_AUCT['OptPctUndermkt']    = "<Prozent>";
 		
-		_AUCT['OptPctBidmarkdownDefault'] = 20;
-		_AUCT['OptPctMarkupDefault']      = 300;
-		_AUCT['OptPctMaxlessDefault']     = 30;
-		_AUCT['OptPctNocompDefault']      = 2;
-		_AUCT['OptPctUnderlowDefault']    = 5;
-		_AUCT['OptPctUndermktDefault']    = 20;
-		
 		_AUCT['ShowVerbose']    = "show-verbose";
 		_AUCT['ShowAverage']    = "show-average";
 		_AUCT['ShowLink']       = "show-link";
@@ -998,13 +984,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptPctUnderlow'] = "<porciento>";
 		_AUCT['OptPctUndermkt'] = "<porciento>";
 		
-		_AUCT['OptPctBidmarkdownDefault'] = 20;
-		_AUCT['OptPctMarkupDefault'] = 300;
-		_AUCT['OptPctMaxlessDefault'] = 30;
-		_AUCT['OptPctNocompDefault'] = 2;
-		_AUCT['OptPctUnderlowDefault'] = 5;
-		_AUCT['OptPctUndermktDefault'] = 20;
-		
 		_AUCT['ShowVerbose'] = "ver-literal";
 		_AUCT['ShowAverage'] = "ver-promedio";
 		_AUCT['ShowLink'] = "ver-enlace";
@@ -1190,5 +1169,5 @@ function Auctioneer_SetLocaleStrings(locale)
 
 end
 
-Auctioneer_SetLocaleStrings(GetLocale);
+Auctioneer_SetLocaleStrings(GetLocale());
 

@@ -65,6 +65,11 @@ function Auctioneer_AuctionStart_Hook()
 	lNewAuctionsCount = 0;
 	lOldAuctionsCount = 0;
 	lDefunctAuctionsCount = 0;
+	
+	-- Protect AuctionFrame if we should
+	if (Auctioneer_GetFilterVal('protect-window') == 1) then
+		Auctioneer_ProtectAuctionFrame(true);
+	end
 end
 
 -- This is called when an auction scan finishes and is used for clean up
@@ -389,14 +394,13 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:Show()
 		end
 
-		--Protect the auction frame from being closed if we should
-		--Need to change true, to something that gets the state of an option
-		Auctioneer_ProtectAuctionFrame(true);
-
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
 	end
+	
+	--Protect the auction frame from being closed if we should
+	Auctioneer_ProtectAuctionFrame(Auctioneer_GetFilterVal('protect-window') == 2);
 end
 
 function Auctioneer_AuctionFrameFilters_UpdateClasses()

@@ -54,6 +54,11 @@ function Auctioneer_StopAuctionScan()
 	lScanInProgress = false;
 	lCurrentCategoryIndex = 0;
 	lPageStartedAt = nil;
+	
+	-- Unprotect AuctionFrame if we should
+	if (Auctioneer_GetFilterVal('protect-window') == 1) then
+		Auctioneer_ProtectAuctionFrame(false);
+	end
 end
 
 local function Auctioneer_AuctionSubmitQuery()

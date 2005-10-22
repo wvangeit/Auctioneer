@@ -82,6 +82,7 @@ Auctioneer_FilterDefaults = {
 		["embed"] = "off",
 		["also"] = "off",
 		["auction-click"] = "on",
+		["protect-window"] = 1,
 		["show-link"] = "on",
 		["show-embed-blankline"] = "off",
 		["show-verbose"] = "on",
