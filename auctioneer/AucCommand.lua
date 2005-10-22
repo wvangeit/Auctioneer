@@ -1202,11 +1202,11 @@ end
 function Auctioneer_CmdProtectWindow(param, chatprint)
 	local mode;
 	
-	if (param == 'never' or param == 'off' or param == _AUCT['CmdProtectWindow0'] or param == _AUCT['CmdOff'] or param == "0") then
+	if (param == 'never' or param == 'off' or param == _AUCT['CmdProtectWindow0'] or param == _AUCT['CmdOff'] or tonumber(param) == 0) then
 		mode = 0;
-	elseif (param == 'scan' or param == _AUCT['CmdProtectWindow1'] or param == "1") then
+	elseif (param == 'scan' or param == _AUCT['CmdProtectWindow1'] or tonumber(param) == 1) then
 		mode = 1;
-	elseif (param == 'always' or param == _AUCT['CmdProtectWindow2'] or param == "2") then
+	elseif (param == 'always' or param == _AUCT['CmdProtectWindow2'] or tonumber(param) == 2) then
 		mode = 2;
 	else
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtUnknownArg'], param, Auctioneer_DelocalizeCommand("protect-window")));
@@ -1217,7 +1217,7 @@ function Auctioneer_CmdProtectWindow(param, chatprint)
 	
 	if (chatprint) then
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow' .. mode]));
-		setKhaosSetKeyVale("protect-window", _AUCT['CmdProtectWindow' .. mode]);
+		setKhaosSetKeyValue("protect-window", mode);
 	end
 end
 
