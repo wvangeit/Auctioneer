@@ -847,7 +847,7 @@ function Auctioneer_Command(command, source)
 		Auctioneer_DoHSP(param);
 	elseif (cmd == 'embed' or cmd == 'autofill' or cmd == 'auction-click' or
 			cmd == 'show-verbose' or cmd == 'show-average' or cmd == 'show-link' or
-			cmd == 'show median' or cmd == 'show-stats' or cmd == 'show-suggest' or
+			cmd == 'show-median' or cmd == 'show-stats' or cmd == 'show-suggest' or
 			cmd == 'show-embed-blankline' or cmd == 'show-warning') then
 		Auctioneer_GenVarSet(cmd, param, chatprint);
 	elseif (cmd == 'pct-bidmarkdown' or cmd == 'pct-markup' or cmd == "pct-maxless" or
