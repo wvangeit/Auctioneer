@@ -417,11 +417,11 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues);
 
 	-- Get our user-set pricing parameters
-	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless'],  _AUCT['OptPctMaxlessDefault']));
-	local discountLowPercent              = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow'], _AUCT['OptPctUnderlowDefault']));
-	local discountMarketPercent           = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt'], _AUCT['OptPctUndermktDefault']));
-	local discountNoCompetitionPercent    = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp'],   _AUCT['OptPctNocompDefault']));
-	local vendorSellMarkupPercent         = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup'],   _AUCT['OptPctMarkupDefault']));
+	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless']));
+	local discountLowPercent              = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow']));
+	local discountMarketPercent           = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt']));
+	local discountNoCompetitionPercent    = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp']));
+	local vendorSellMarkupPercent         = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup']));
 
 	local x, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);

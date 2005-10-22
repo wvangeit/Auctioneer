@@ -91,6 +91,6 @@ for $locale (@locales) {
 	print OUT "\tend\n\n";
 }
 
-print OUT "end\n\nAuctioneer_SetLocaleStrings(GetLocale);\n\n";
+print OUT "end\n\nAuctioneer_SetLocaleStrings(GetLocale());\n\n";
 
 

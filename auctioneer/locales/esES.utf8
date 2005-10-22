@@ -128,13 +128,6 @@ _AUCT['OptPctNocomp'] = "<porciento>";
 _AUCT['OptPctUnderlow'] = "<porciento>";
 _AUCT['OptPctUndermkt'] = "<porciento>";
 
-_AUCT['OptPctBidmarkdownDefault'] = 20;
-_AUCT['OptPctMarkupDefault'] = 300;
-_AUCT['OptPctMaxlessDefault'] = 30;
-_AUCT['OptPctNocompDefault'] = 2;
-_AUCT['OptPctUnderlowDefault'] = 5;
-_AUCT['OptPctUndermktDefault'] = 20;
-
 _AUCT['ShowVerbose'] = "ver-literal";
 _AUCT['ShowAverage'] = "ver-promedio";
 _AUCT['ShowLink'] = "ver-enlace";

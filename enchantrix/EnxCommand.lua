@@ -590,11 +590,13 @@ function Enchantrix_SetLocale(param, chatprint)
 		Enchantrix_SetFilter('locale', param);
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		Enchantrix_CommandMap = nil
+		Enchantrix_CommandMapRev = nil
 		validLocale=true;
 	elseif (param == '') or (param == 'default') or (param == 'off') then
 		Enchantrix_SetFilter('locale', 'default');
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		Enchantrix_CommandMap = nil
+		Enchantrix_CommandMapRev = nil
 		validLocale=true;
 	end
 	

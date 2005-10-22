@@ -169,7 +169,15 @@ Auctioneer_QuerySnapshot = Auctioneer_QuerySnapshot;
 
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBroker(minProfit)
-	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
+	if not minProfit or minProfit == "" then
+		minProfit = MIN_PROFIT_MARGIN
+	elseif (tonumber(minProfit)) then
+		minProfit = tonumber(minProfit) * 100
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minProfit))
+		return
+	end
+	
 	local output = string.format(_AUCT['FrmtBrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
@@ -196,7 +204,15 @@ end
 
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoBidBroker(minProfit)
-	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN else minProfit = tonumber(minProfit) * 100  end
+	if not minProfit or minProfit == "" then
+		minProfit = MIN_PROFIT_MARGIN
+	elseif (tonumber(minProfit)) then
+		minProfit = tonumber(minProfit) * 100
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minProfit))
+		return
+	end
+	
 	local output = string.format(_AUCT['FrmtBidbrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
@@ -230,7 +246,15 @@ function Auctioneer_DoBidBroker(minProfit)
 end
 
 function Auctioneer_DoCompeting(minLess)
-	if not minLess or minLess == "" then minLess = DEFAULT_COMPETE_LESS * 100 else minLess = tonumber(minLess) * 100  end
+	if not minLess or minLess == "" then
+		minLess = DEFAULT_COMPETE_LESS * 100
+	elseif (tonumber(minLess)) then
+		minLess = tonumber(minLess) * 100
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minLess))
+		return
+	end
+	
 	local output = string.format(_AUCT['FrmtCompeteHeader'], EnhTooltip.GetTextGSC(minLess));
 	Auctioneer_ChatPrint(output);
 

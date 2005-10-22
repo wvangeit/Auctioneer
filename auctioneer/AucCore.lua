@@ -75,6 +75,41 @@ AuctionConfig.version = 30200;
 Auctioneer_HSPCache = {};
 Auctioneer_Lowests = {};
 
+-- Default filter configuration
+Auctioneer_FilterDefaults = {
+		["all"] = "on",
+		["autofill"] = "on",
+		["embed"] = "off",
+		["also"] = "off",
+		["auction-click"] = "on",
+		["show-link"] = "on",
+		["show-embed-blankline"] = "off",
+		["show-verbose"] = "on",
+		["show-stats"] = "on",
+		["show-average"] = "on",
+		["show-median"] = "on",
+		["show-suggest"] = "on",
+		["show-warning"] = "on",
+		["scan-class1"]  = "on",
+		["scan-class2"]  = "on",
+		["scan-class3"]  = "on",
+		["scan-class4"]  = "on",
+		["scan-class5"]  = "on",
+		["scan-class6"]  = "on",
+		["scan-class7"]  = "on",
+		["scan-class8"]  = "on",
+		["scan-class9"]  = "on",
+		["scan-class10"] = "on",
+		['printframe'] = 1,
+		['pct-bidmarkdown'] = 20,
+		['pct-markup'] = 300,
+		['pct-maxless'] = 30, 
+		['pct-nocomp'] = 2,
+		['pct-underlow'] = 5,
+		['pct-undermkt'] = 20,
+		['locale'] = 'default',
+	}
+
 function Auctioneer_GetItemData(itemKey)
 	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
 	if (Informant) then
@@ -371,6 +406,8 @@ function Auctioneer_AddonLoaded()
 
 	-- Load the category and subcategory id's
 	Auctioneer_LoadCategories();
+
+	Auctioneer_SetFilterDefaults();
 
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then

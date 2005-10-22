@@ -170,7 +170,7 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 				if hsp == 0 and buyCount > 0 then
 					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
-				local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
+				local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown']));
 				local countFix = count
 				if countFix == 0 then
 					countFix = 1
@@ -237,7 +237,7 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 						if hsp == 0 and buyCount > 0 then
 							hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 						end
-						local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
+						local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown']));
 						local countFix = count
 						if countFix == 0 then
 							countFix = 1

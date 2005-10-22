@@ -89,10 +89,6 @@ function Enchantrix_GetLocalizedCmdString(value)
 	return getglobal("ENCH_CMD_" .. string.upper(value))
 end
 
-function Enchantrix_GetLocalizedFilterVal(key)
-	return Enchantrix_GetLocalizedCmdString(Enchantrix_GetFilterVal(key))
-end
-
 function Enchantrix_DelocalizeFilterVal(value)
 	if (value == ENCH_CMD_ON) then
 		return 'on';
@@ -114,6 +110,11 @@ function Enchantrix_LocalizeFilterVal(value)
 		return value;
 	end
 end
+
+function Enchantrix_GetLocalizedFilterVal(key)
+	return Enchantrix_LocalizeFilterVal(Enchantrix_GetFilterVal(key))
+end
+
 
 -- Turns a localized slash command into the generic English version of the command
 function Enchantrix_DelocalizeCommand(cmd)

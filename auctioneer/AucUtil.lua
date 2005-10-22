@@ -261,22 +261,80 @@ end
 function Auctioneer_ProtectAuctionFrame(enable)
 	if (AuctionFrame) then
 		if (enable) then
-			if ( GetDoublewideFrame() == AuctionFrame ) then
+			if ( GetDoublewideFrame() == AuctionFrame) then
 				SetDoublewideFrame(nil)
 			end
 			UIPanelWindows["AuctionFrame"] = nil
-			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_UIPanelWindowBackup.AuctionFrame ) then
-				MobileFrames_UIPanelWindowBackup.AuctionFrame = nil;
-			end
 		else
-			if (	MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList["AuctionFrame"] ) then
-				MobileFrames_UIPanelWindowBackup.AuctionFrame = { area = "doublewide", pushable = 0 };
-			else
-				UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
-			end
 			if ( AuctionFrame:IsVisible() ) then
 				SetDoublewideFrame(AuctionFrame)
 			end
+			UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
 		end
 	end
+end
+
+function Auctioneer_SetFilterDefaults()
+	for k,v in pairs(Auctioneer_FilterDefaults) do
+		if (AuctionConfig.filters[k] == nil) then
+			AuctionConfig.filters[k] = v;
+		end
+	end
+end
+
+--------------------------------------
+--		Localization functions		--
+--------------------------------------
+
+Auctioneer_CommandMap = nil;
+Auctioneer_CommandMapRev = nil;
+
+function Enchantrix_GetLocalizedCmdString(value)
+	return getglobal("ENCH_CMD_" .. string.upper(value))
+end
+
+function Auctioneer_DelocalizeFilterVal(value)
+	if (value == _AUCT['CmdOn']) then
+		return 'on';
+	elseif (value == _AUCT['CmdOff']) then
+		return 'off';
+	elseif (value == _AUCT['CmdDefault']) then
+		return 'default';
+	elseif (value == _AUCT['CmdToggle']) then
+		return 'toggle';
+	else
+		return value;
+	end	
+end
+
+function Auctioneer_LocalizeFilterVal(value)
+	local result
+	if (value == 'on') then
+		result = _AUCT['CmdOn'];
+	elseif (value == 'off') then
+		result = _AUCT['CmdOff'];
+	elseif (value == 'default') then
+		result = _AUCT['CmdDefault'];
+	elseif (value == 'toggle') then
+		result = _AUCT['CmdToggle'];
+	end
+	if (result) then return result; else return value; end
+end
+
+function Auctioneer_GetLocalizedFilterVal(key)
+	return Auctioneer_LocalizeFilterVal(Auctioneer_GetFilterVal(key))
+end
+
+-- Turns a localized slash command into the generic English version of the command
+function Auctioneer_DelocalizeCommand(cmd)
+	if (not Auctioneer_CommandMap) then Auctioneer_BuildCommandMap();end
+	local result = Auctioneer_CommandMap[cmd];
+	if (result) then return result; else return cmd; end
+end
+
+-- Translate a generic English slash command to the localized version, if available
+function Auctioneer_LocalizeCommand(cmd)
+	if (not Auctioneer_CommandMapRev) then Auctioneer_BuildCommandMap(); end
+	local result = Auctioneer_CommandMapRev[cmd];
+	if (result) then return result; else return cmd; end
 end

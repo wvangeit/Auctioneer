@@ -124,13 +124,6 @@ _AUCT['OptPctNocomp']      = "<Prozent>";
 _AUCT['OptPctUnderlow']    = "<Prozent>";
 _AUCT['OptPctUndermkt']    = "<Prozent>";
 
-_AUCT['OptPctBidmarkdownDefault'] = 20;
-_AUCT['OptPctMarkupDefault']      = 300;
-_AUCT['OptPctMaxlessDefault']     = 30;
-_AUCT['OptPctNocompDefault']      = 2;
-_AUCT['OptPctUnderlowDefault']    = 5;
-_AUCT['OptPctUndermktDefault']    = 20;
-
 _AUCT['ShowVerbose']    = "show-verbose";
 _AUCT['ShowAverage']    = "show-average";
 _AUCT['ShowLink']       = "show-link";
