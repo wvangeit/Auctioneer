@@ -91,6 +91,6 @@ for $locale (@locales) {
 	print OUT "end\n\n";
 }
 
-print OUT "end\n\nInformant_SetLocaleStrings(GetLocale);\n\n";
+print OUT "end\n\nInformant_SetLocaleStrings(GetLocale());\n\n";
 
 

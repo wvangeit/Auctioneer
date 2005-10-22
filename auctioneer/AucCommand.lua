@@ -33,7 +33,6 @@ local function convertConfig(t, key, values, ...)
 			v = t[localizedKey];
 			t[localizedKey] = nil;
 			modified = true;
-			Auctioneer_ChatPrint("removing old key " .. localizedKey)
 		end
 	end
 	if (t[key] ~= nil) then v = t[key]; end
@@ -42,7 +41,6 @@ local function convertConfig(t, key, values, ...)
 		if (values[v] ~= nil) then
 			t[key] = values[v];
 			modified = true;
-			Auctioneer_ChatPrint("Converting value " .. v .. " to " .. values[v])
 		else
 			t[key] = v;
 		end
@@ -90,6 +88,11 @@ function Auctioneer_Convert_Khaos()
 			{ 'also',					convertOnOff,	'AuctioneerInclude' },
 			{ 'enabled',				convertOnOff,	'AuctioneerEnable' },
 		}
+		
+	-- Prepend placeholder for the table parameter
+	for i,c in ipairs(conversions) do
+		table.insert(c, 1, nil)
+	end			
 
 	for i,config in ipairs(Khaos_Configurations) do
 		if (not config.configuration or not config.configuration.Auctioneer) then break; end
@@ -97,7 +100,9 @@ function Auctioneer_Convert_Khaos()
 		local converted = false;
 		-- Run the defined conversions
 		for i,c in ipairs(conversions) do
-			table.insert(c, 1, config.configuration.Auctioneer)
+			-- Replace first parameter with actual table to process
+			-- Inserting here will cause problems for the second iteration
+			c[1] = config.configuration.Auctioneer
 			converted = convertConfig(unpack(c)) or converted
 		end
 
