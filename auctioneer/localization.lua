@@ -329,81 +329,81 @@ function Auctioneer_SetLocaleStrings(locale)
 	if locale == "daDK" then
 		-- Encoded in UTF8
 		
-		_AUCT['TimeShort'] = "Short";
+		_AUCT['TimeShort'] = "Kort";
 		_AUCT['TimeMed'] = "Medium";
-		_AUCT['TimeLong'] = "Long";
-		_AUCT['TimeVlong'] = "Very Long";
+		_AUCT['TimeLong'] = "Lang";
+		_AUCT['TimeVlong'] = "Meget Lang";
 		
-		_AUCT['FrmtWelcome'] = "Auctioneer v%s loaded";
+		_AUCT['FrmtWelcome'] = "Auctioneer v%s er indl\195\166st";
 		
-		_AUCT['FrmtBrokerHeader'] = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
+		_AUCT['FrmtBrokerHeader'] = "Minimum profit: %s, HSP = 'H\195\184jeste S\195\166lgende Pris'";
 		_AUCT['FrmtBrokerLine'] = "%s, Last %s seen, HSP: %s, BO: %s, Prof: %s";
-		_AUCT['FrmtBrokerDone'] = "Brokering done";
-		_AUCT['FrmtBidbrokerHeader'] = "Minimum profit: %s, HSP = 'Highest Sellable Price'";
-		_AUCT['FrmtBidbrokerMinbid'] = "minBid"
-		_AUCT['FrmtBidbrokerCurbid'] = "curBid"
-		_AUCT['FrmtBidbrokerLine'] = "%s, Last %s seen, HSP: %s, %s: %s, Prof: %s, Time: %s";
-		_AUCT['FrmtBidbrokerDone'] = "Bid brokering done";
-		_AUCT['FrmtPctlessHeader'] = "Percent Less than Highest Sellable Price (HSP): %d%%";
-		_AUCT['FrmtPctlessLine'] = "%s, Last %d seen, HSP: %s, BO: %s, Prof: %s, Less %s";
-		_AUCT['FrmtPctlessDone'] = "Percent less done.";
-		_AUCT['FrmtCompeteHeader'] = "Competing auctions at least %s less per item.";
-		_AUCT['FrmtCompeteLine'] = "%s, Bid: %s, BO %s vs %s, %s less";
+		_AUCT['FrmtBrokerDone'] = "Liste f\195\166rdig.";
+		_AUCT['FrmtBidbrokerHeader'] = "Minimum profit: %s, HSP = 'H\195\184jeste S\195\166lgende Pris'";
+		_AUCT['FrmtBidbrokerMinbid'] = "Mindste bud";
+		_AUCT['FrmtBidbrokerCurbid'] = "Nuv\195\166rende bud";
+		_AUCT['FrmtBidbrokerLine'] = "%s, sidst %s set, HSP: %s, %s: %s, Profit: %s, Tid: %s";
+		_AUCT['FrmtBidbrokerDone'] = "Prisliste f\195\166rdig";
+		_AUCT['FrmtPctlessHeader'] = "Procent mindre end h\195\184seste s\195\166lgende pris(HSP): %d%%";
+		_AUCT['FrmtPctlessLine'] = "%s, sidst %d set, HSP: %s, BO: %s, Profit: %s, Mindre %s";
+		_AUCT['FrmtPctlessDone'] = "Udregning af Procenter f\195\166rdig.";
+		_AUCT['FrmtCompeteHeader'] = "Konkurerende auktioner er mindst %s under pr. vare.";
+		_AUCT['FrmtCompeteLine'] = "%s, Bud: %s, BO %s mod %s, %s mindre";
 		_AUCT['FrmtCompeteDone'] = "Competing auctions done.";
-		_AUCT['FrmtNoauct'] = "No auctions found for the item: %s";
-		_AUCT['FrmtMedianLine'] = "Of last %d seen, median BO for 1 %s is: %s";
-		_AUCT['FrmtLowLine'] = "%s, BO: %s, Seller: %s, For one: %s, Less than median: %s";
-		_AUCT['FrmtHspLine'] = "Highest Sellable Price for one %s is: %s";
+		_AUCT['FrmtNoauct'] = "Ingen auktioner blev fundet for: %s";
+		_AUCT['FrmtMedianLine'] = "Af sidste %d set, middel BO for 1 %s er: %s";
+		_AUCT['FrmtLowLine'] = "%s, BO: %s, s\195\166lger: %s, For en: %s, under middel: %s";
+		_AUCT['FrmtHspLine'] = "H\195\184jeste S\195\166lgende Pris for en %s er: %s";
 		
-		_AUCT['FrmtInfoSeen'] = "Seen %d times at auction total";
-		_AUCT['FrmtInfoForone'] = "For 1: %s min/%s BO (%s bid) [in %d's]";
-		_AUCT['FrmtInfoAverage'] = "%s min/%s BO (%s bid)"
-		_AUCT['FrmtInfoHistmed'] = "Last %d, median BO (ea)";
-		_AUCT['FrmtInfoSnapmed'] = "Scanned %d, median BO (ea)";
-		_AUCT['FrmtInfoSgststx'] = "Suggested price for your %d stack: %s min/%s BO";
-		_AUCT['FrmtInfoSgst'] = "Suggested price: %s min/%s BO";
+		_AUCT['FrmtInfoSeen'] = "Set %d gange p\195\165 auktion ialt";
+		_AUCT['FrmtInfoForone'] = "For 1: %s min/%s BO (%s bud) [i %d's]";
+		_AUCT['FrmtInfoAverage'] = "%s min/%s BO (%s bud)";
+		_AUCT['FrmtInfoHistmed'] = "Sidste %d, middel BO (stk)";
+		_AUCT['FrmtInfoSnapmed'] = "Skannede %d, middel BO (stk)";
+		_AUCT['FrmtInfoSgststx'] = "Prisforslag for dine %d stk: %s min/%s BO";
+		_AUCT['FrmtInfoSgst'] = "Prisforslag: %s min/%s BO";
 		
-		_AUCT['FrmtInfoBidrate'] = "%d%% have bid, %d%% have BO";
-		_AUCT['FrmtInfoNever'] = "Never seen at %s";
-		_AUCT['FrmtInfoAlsoseen'] = "Seen %d times at %s";
+		_AUCT['FrmtInfoBidrate'] = "%d%% har budt, %d%% har BO";
+		_AUCT['FrmtInfoNever'] = "Aldrig set p\195\165 %s";
+		_AUCT['FrmtInfoAlsoseen'] = "Set %d gange p\195\165 %s";
 		
-		_AUCT['FrmtInfoHeadMulti'] = "Averages for %d items:";
-		_AUCT['FrmtInfoMinMulti'] = "  Starting bid (%s ea)";
-		_AUCT['FrmtInfoBidMulti'] = "  Bidded (%s%s ea)";
-		_AUCT['FrmtInfoBuyMulti'] = "  Buyout (%s%s ea)";
+		_AUCT['FrmtInfoHeadMulti'] = "Middel for %d stk.:";
+		_AUCT['FrmtInfoMinMulti'] = "  Start bud (%s stk.)";
+		_AUCT['FrmtInfoBidMulti'] = "  Bud (%s%s stk.)";
+		_AUCT['FrmtInfoBuyMulti'] = "  Opk\195\184bt (%s%s Stk)";
 		
-		_AUCT['FrmtInfoHeadOne'] = "Averages for this item:";
-		_AUCT['FrmtInfoMinOne'] = "  Starting bid";
-		_AUCT['FrmtInfoBidOne'] = "  Bidded%s";
-		_AUCT['FrmtInfoBuyOne'] = "  Buyout%s";
+		_AUCT['FrmtInfoHeadOne'] = "Middel for denne vare:";
+		_AUCT['FrmtInfoMinOne'] = "  Start bud";
+		_AUCT['FrmtInfoBidOne'] = "  Bud%s";
+		_AUCT['FrmtInfoBuyOne'] = "  Opk\195\184bt%s";
 		
-		_AUCT['FrmtInfoBuymedian'] = "  Buyout median";
+		_AUCT['FrmtInfoBuymedian'] = "  Opk\195\184bs median";
 		
-		_AUCT['FrmtInfoStacksize'] = "  Average stack size: %d items";
+		_AUCT['FrmtInfoStacksize'] = "  Normal bundt st\195\184rrelse: %d stk.";
 		
-		_AUCT['FrmtUnknownLocale'] = "The locale you specified ('%s') is unknown. Valid locales are:";
-		_AUCT['FrmtUnknownRf']     = "Invalid parameter ('%s'). The parameter must be formated like: [realm]-[faction]. For example: Al'Akir-Horde";
-		_AUCT['FrmtUnknownArg']    = "'%s' is no valid argument for '%s'";
+		_AUCT['FrmtUnknownLocale'] = "Sproget du har valgt: ('%s') findes ikke. Gyldige sprog er:";
+		_AUCT['FrmtUnknownRf']     = "Ugyldig parameter ('%s'). Parameteret skal se s\195\165dan ud: [realm]-[faction]. Eksempelvis: Al'Akir-Horde";
+		_AUCT['FrmtUnknownArg']    = "'%s' er ikke et gyldigt argument for '%s'";
 		
-		_AUCT['FrmtActRemove'] = "Removing auction signature %s from current AH snapshot.";
+		_AUCT['FrmtActRemove'] = "Fjerner auktion %s fra auktionshuset.";
 		
-		_AUCT['FrmtAuctinfoHist'] = "%d historical";
-		_AUCT['FrmtAuctinfoSnap'] = "%d last scan";
-		_AUCT['FrmtAuctinfoLow'] = "Snapshot low";
-		_AUCT['FrmtAuctinfoNolow'] = "Item not seen last snapshot";
-		_AUCT['FrmtAuctinfoOrig'] = "Original bid";
-		_AUCT['FrmtAuctinfoSugbuy'] = "Suggested buyout";
-		_AUCT['FrmtAuctinfoSugbid'] = "Suggested bid";
-		_AUCT['FrmtAuctinfoMktprice'] = "Market price";
+		_AUCT['FrmtAuctinfoHist'] = "%d histoisk";
+		_AUCT['FrmtAuctinfoSnap'] = "%d sidst set";
+		_AUCT['FrmtAuctinfoLow'] = "Mindste pris";
+		_AUCT['FrmtAuctinfoNolow'] = "Ikke set ved sidste skanning.Item not seen last snapshot";
+		_AUCT['FrmtAuctinfoOrig'] = "Oprindeligt bud";
+		_AUCT['FrmtAuctinfoSugbuy'] = "Foresl\195\165et opk\195\184bspris";
+		_AUCT['FrmtAuctinfoSugbid'] = "Foresl\195\165et bud";
+		_AUCT['FrmtAuctinfoMktprice'] = "Markets pris";
 		
-		_AUCT['FrmtWarnMarkup'] = "Marking up vendor by %s%%";
-		_AUCT['FrmtWarnUndercut'] = "Undercutting by %s%%";
-		_AUCT['FrmtWarnNocomp'] = "No competition";
-		_AUCT['FrmtWarnAbovemkt'] = "Competiton above market";
-		_AUCT['FrmtWarnToolow'] = "Cannot match lowest price";
-		_AUCT['FrmtWarnMyprice'] = "Using my current price";
-		_AUCT['FrmtWarnNodata'] = "No data for HSP";
-		_AUCT['FrmtWarnUser'] = "Using user pricing";
+		_AUCT['FrmtWarnMarkup'] = "Overbyde forhandlere med %s%%";
+		_AUCT['FrmtWarnUndercut'] = "Underbyde med %s%%";
+		_AUCT['FrmtWarnNocomp'] = "Ingen konkurrence";
+		_AUCT['FrmtWarnAbovemkt'] = "Din pris ligger over markedet";
+		_AUCT['FrmtWarnToolow'] = "Din pris ligger under markedet";
+		_AUCT['FrmtWarnMyprice'] = "Bruger din nuv\195\166rende pris";
+		_AUCT['FrmtWarnNodata'] = "Ingen data for HSP";
+		_AUCT['FrmtWarnUser'] = "Bruger din nuv\195\166rende pris";
 		
 		_AUCT['CmdOff'] = "off";
 		_AUCT['CmdOn'] = "on";
@@ -439,24 +439,24 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdPctUndermkt']    = "pct-undermkt";
 		
 		_AUCT['OptClear'] = "([Item]|".._AUCT['CmdClearAll'].."|".._AUCT['CmdClearSnapshot']..")";
-		_AUCT['OptAlso'] = "(realm-faction|".._AUCT['CmdAlsoOpposite']..")"
-		_AUCT['OptLocale'] = "<locale>";
-		_AUCT['OptBroker'] = "<silver_profit>";
-		_AUCT['OptBidbroker'] = "<silver_profit>";
-		_AUCT['OptPercentless'] = "<percent>";
-		_AUCT['OptCompete'] = "<silver_less>";
+		_AUCT['OptAlso'] = "(realm-faction|".._AUCT['CmdAlsoOpposite']..")";
+		_AUCT['OptLocale'] = "<sprog>";
+		_AUCT['OptBroker'] = "<fortjenste_i_ s\195\184lv>";
+		_AUCT['OptBidbroker'] = "<fortjenste_i_ s\195\184lv>";
+		_AUCT['OptPercentless'] = "<procent>";
+		_AUCT['OptCompete'] = "<S\195\184lv_under>";
 		_AUCT['OptScan'] = "";
-		_AUCT['OptScale'] = "<scale_factor>";
+		_AUCT['OptScale'] = "<skalerings_faktor>";
 		_AUCT['OptScaleDefault'] = 1.0;
 		_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
 		_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
 		
-		_AUCT['OptPctBidmarkdown'] = "<percent>";
-		_AUCT['OptPctMarkup'] = "<percent>";
-		_AUCT['OptPctMaxless'] = "<percent>";
-		_AUCT['OptPctNocomp'] = "<percent>";
-		_AUCT['OptPctUnderlow'] = "<percent>";
-		_AUCT['OptPctUndermkt'] = "<percent>";
+		_AUCT['OptPctBidmarkdown'] = "<procent>";
+		_AUCT['OptPctMarkup'] = "<procent>";
+		_AUCT['OptPctMaxless'] = "<procent>";
+		_AUCT['OptPctNocomp'] = "<procent>";
+		_AUCT['OptPctUnderlow'] = "<procent>";
+		_AUCT['OptPctUndermkt'] = "<procent>";
 		
 		_AUCT['OptPctBidmarkdownDefault'] = 20;
 		_AUCT['OptPctMarkupDefault'] = 300;
@@ -474,139 +474,139 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['ShowEmbedBlank'] = "show-embed-blankline";
 		_AUCT['ShowRedo'] = "show-warning";
 		
-		_AUCT['HelpOnoff'] = "Turns the auction data display on and off";
-		_AUCT['HelpDisable'] = "Stops Auctioneer from automatically loading next time you log in";
-		_AUCT['HelpVerbose'] = "Select whether to show averages and suggestions verbosely (or off to show them on a single line)";
-		_AUCT['HelpAverage'] = "Select whether to show item's average auction price";
-		_AUCT['HelpLink'] = "Select whether to show the link id in the tooltip";
-		_AUCT['HelpMedian'] = "Select whether to show item's median buyout price";
-		_AUCT['HelpSuggest'] = "Select whether to show item's suggested auction price";
-		_AUCT['HelpStats'] = "Select whether to show item's bidded/buyout percentages";
-		_AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
-		_AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
-		_AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
-		_AUCT['HelpLocale'] = "Change the locale that is used to display Auctioneer messages";
-		_AUCT['HelpBroker'] = "Show any auctions from the most recent scan that may be bid on and then resold for profit";
-		_AUCT['HelpBidbroker'] = "Show short or medium term auctions from the recent scan that may be bid on for profit";
-		_AUCT['HelpEmbed'] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
-		_AUCT['HelpPercentless'] = "Show any recently scanned auctions whose buyout is a certain percent less than the highest sellable price";
-		_AUCT['HelpCompete'] = "Show any recently scanned auctions whose buyout is less than one of your items";
-		_AUCT['HelpScan'] = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
-		_AUCT['HelpAutofill'] = "Set whether to autofill prices when dropping new auction items into the auction house window";
-		_AUCT['HelpPctBidmarkdown'] = "Set the percentage that Auctioneer will mark down bids from the buyout price";
-		_AUCT['HelpPctMarkup'] = "The percentage that vendor prices will be marked up when no other values are available";
-		_AUCT['HelpPctMaxless'] = "Set the maximum percentage that Auctioneer will undercut market value before it gives up";
-		_AUCT['HelpPctNocomp'] = "The percentage that Auctioneer will undercut market value when there is no competition";
-		_AUCT['HelpPctUnderlow'] = "Set the percentage that Auctioneer will undercut the lowest auction price";
-		_AUCT['HelpPctUndermkt'] = "Percentage to cut market value by when unable to beat competition (due to maxless)";
-		_AUCT['HelpRedo'] = "Select whether to show a warning when the currently scanned AH page has taken too long to scan due to server lag.";
-		_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
-		_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
-		_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
+		_AUCT['HelpOnoff'] = "Sl\195\165r visning af auktions data til og fra.";
+		_AUCT['HelpDisable'] = "G\195\184r at Auctioneer ikke indl\195\166ses automatisk n\195\166ste gang du logger ind.";
+		_AUCT['HelpVerbose'] = "V\195\166lger hvordan teksten formuleres. (forslag, middelpriser eller off for at vise dem p\195\165 en enkelt linje.)";
+		_AUCT['HelpAverage'] = "V\195\166lger om middelprisen p\195\165 en auktion skal vises.";
+		_AUCT['HelpLink'] = "V\195\166lger om der skal vises link id i tooltippet.";
+		_AUCT['HelpMedian'] = "V\195\166lger om der skal vises middel opk\195\184bspris.";
+		_AUCT['HelpSuggest'] = "V\195\166lger om der skal vises foresl\195\165et salgspris ved auktion.";
+		_AUCT['HelpStats'] = "V\195\166lger om der skal vises bud/opk\195\184bs pris i procenter.";
+		_AUCT['HelpEmbedBlank'] = "V\195\166lg om der skal v\195\166re blanke linjer mellem tooltip info og auktions info n\195\165r embedded mode er valgt";
+		_AUCT['HelpClear'] = "Sletter data for et specifikt objekt (du skal shift-klikke p\195\165 objektet s\195\165 det kommer ned i kommando boxen.) Du kan ogs\195\165 specifisere enkelte n\195\184gle ord som all eller snapshot";
+		_AUCT['HelpAlso'] = "Viser ogs\195\165 en anden servers priser i tooltipet. For realm, inds\195\166t realmnavnet og faction navnet. Som eksempel: \"/auctioneer also Al'Akir-Horde\". Det speciale n\195\184gleord \"opposite\" betyder den modstridne fraktion, \"off\" stopper denne funktion.";
+		_AUCT['HelpLocale'] = "Skifter sprog p\195\165 auctioneer scriptet.";
+		_AUCT['HelpBroker'] = "Viser auktioner fra sidste scanning som kan blive opk\195\184bt og solgt med fortjeneste.";
+		_AUCT['HelpBidbroker'] = "Viser korte og middel auktioner som kan blive budt p\195\165 og solgt med fortjeneste.";
+		_AUCT['HelpEmbed'] = "Indrammer teksten i spillets egen tooltip (bem\195\166rk: nogle muligheder vil v\195\166re utilg\195\166ngelige i denne mode.)";
+		_AUCT['HelpPercentless'] = "Viser objekter fra sidste skanning hvis opk\195\184bspris er en bestemt procent lavere end den h\195\184jst s\195\166lgende pris.";
+		_AUCT['HelpCompete'] = "Viser objekter fra sidste skanning som har lavere opk\195\184bspris end dine ting.";
+		_AUCT['HelpScan'] = "Udf\195\184rer en scan af auktionshuset n\195\166ste gang du bes\195\184ger det, eller mens du er der.(Der er ogs\195\165 en knap i auktionshuset under browse, der kan du ogs\195\165 v\195\166lge hvilke katagorier du \195\184nsker at skanne ved at bruge flueben..";
+		_AUCT['HelpAutofill'] = "S\195\166t om Auctioneer skal autoudfylde priser n\195\165r objekter overf\195\184res til auktionshusets boks.";
+		_AUCT['HelpPctBidmarkdown'] = "S\195\166t procenter Auctioneer vil s\195\166tte prisen under objektets opk\195\184bspris.";
+		_AUCT['HelpPctMarkup'] = "Procenten som Auctioneer vil overbyde forhandleren p\195\165 et objekt hvor prisen ikke kendes.";
+		_AUCT['HelpPctMaxless'] = "S\195\166t den maksimale procent som Auctioneer vil g\195\165 under markeds v\195\166rdi inden den giver op.";
+		_AUCT['HelpPctNocomp'] = "Procenten Auctioneer vil g\195\165 under markedet pris n\195\165r der ikke findes konkurrenter";
+		_AUCT['HelpPctUnderlow'] = "S\195\166t procenter some Auctioneer vil g\195\165 under den laveste pris";
+		_AUCT['HelpPctUndermkt'] = "Procenter Auctioneer vil bruge hvis den ikke kan g\195\165 under konkurrenter (pga. maks/min)";
+		_AUCT['HelpRedo'] = "V\195\166lg om der skal vises en advarsel hvis den nuv\195\166rende skanning har taget for lang tid p\195\165 grund af server lag.";
+		_AUCT['HelpDefault'] = "S\195\166tter Auctioneer til dens standart v\195\166rdi. Du kan eventuelt bruge n\195\184gleord som: \"all\" for at s\195\166tte alle valg til deres standard v\195\166rdier.";
+		_AUCT['HelpPrintin'] = "V\195\166lg hvilken ramme Auctioneer vil skrive til. Du kan enten angive et ramme navn eller rammens indeks nummer.";
+		_AUCT['HelpAuctionClick'] = "Giver dig mulighed for at Alt-klikke p\195\165 et objekt i dine tasker for automatisk at starte en auktion for det";
 		
-		_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
+		_AUCT['DisableMsg'] = "Stopper automatisk indl\195\166sning af Auctioneer";
 		
-		_AUCT['StatOn'] = "Displaying configured auction data";
-		_AUCT['StatOff'] = "Not displaying any auction data";
+		_AUCT['StatOn'] = "Viser kofigureret auktions data.";
+		_AUCT['StatOff'] = "Viser ikke nogen auktions data.";
 		
-		_AUCT['FrmtActClearall'] = "Clearing all auction data for %s";
-		_AUCT['FrmtActClearsnap'] = "Clearing current Auction House snapshot.";
-		_AUCT['FrmtActClearOk'] = "Cleared data for item: %s";
-		_AUCT['FrmtActClearFail'] = "Unable to find item: %s";
-		_AUCT['FrmtActEnable'] = "Displaying item's %s data";
-		_AUCT['FrmtActDisable'] = "Not displaying item's %s data";
-		_AUCT['FrmtActEnabledOn'] = "Displaying item's %s on %s";
-		_AUCT['FrmtActSet'] = "Set %s to '%s'";
-		_AUCT['FrmtActUnknown'] = "Unknown command keyword: '%s'";
-		_AUCT['FrmtActDefaultall'] = "All Auctioneer options have been reset to default settings.";
-		_AUCT['FrmtActDefault'] = "Auctioneer's %s option has been reset to its default setting";
-		_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
-		_AUCT['FrmtAutostart'] = "Automatically starting auction for %s minimum, %s buyout (%dh)"
+		_AUCT['FrmtActClearall'] = "Fjerner alle data for auktionen %s";
+		_AUCT['FrmtActClearsnap'] = "Fjerner nuv\195\166rende Auktionhus data.";
+		_AUCT['FrmtActClearOk'] = "Fjerner data for objektet: %s";
+		_AUCT['FrmtActClearFail'] = "Kan ikke finde objektet: %s";
+		_AUCT['FrmtActEnable'] = "Viser data for: %s ";
+		_AUCT['FrmtActDisable'] = "Viser ikke data for: %s ";
+		_AUCT['FrmtActEnabledOn'] = "Viser objektet: %s p\195\165 %s";
+		_AUCT['FrmtActSet'] = "S\195\166tter %s til '%s'";
+		_AUCT['FrmtActUnknown'] = "Ukendt commando eller n\195\184gleord: '%s'";
+		_AUCT['FrmtActDefaultall'] = "Alle Auctioneers valg er blevet nulstillet til standard v\195\166rdier.";
+		_AUCT['FrmtActDefault'] = "Auctioneer's %s valg er blevet nulstillet til standard v\195\166rdier";
+		_AUCT['FrmtPrintin'] = "Auctioneer's beskeder vil du blive skrevet til \"%s\" chat ramme";
+		_AUCT['FrmtAutostart'] = "Starter automatisk auktion for %s minimum, %s opk\195\184b (%dh)";
 		
 		
-		_AUCT['TextScan'] = "Scan";
-		_AUCT['TextAuction'] = "auction";
-		_AUCT['TextNone'] = "none";
-		_AUCT['TextUsage'] = "Usage:";
+		_AUCT['TextScan'] = "Skan";
+		_AUCT['TextAuction'] = "auktion";
+		_AUCT['TextNone'] = "ingen";
+		_AUCT['TextUsage'] = "Brug:";
 		
 		-- AH Scanning localizations
 		
-		_AUCT['AuctionScanStart'] = "Auctioneer: scanning %s page 1...";
-		_AUCT['AuctionPageN'] = "Auctioneer: scanning %s page %d of %d\nAuctions per second: %s\nEstimated time left: %s";
-		_AUCT['AuctionScanDone'] = "Auctioneer: auction scanning finished";
-		_AUCT['AuctionScanNexttime'] = "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
-		_AUCT['AuctionScanNocat'] = "You must have at least one category selected to scan.";
-		_AUCT['AuctionScanRedo'] = "Current page took more than %d seconds to complete, retrying page.";
+		_AUCT['AuctionScanStart'] = "Auctioneer: skanner %s side 1...";
+		_AUCT['AuctionPageN'] = "Auctioneer: skanner nu %s side %d af %d\nAuktioner pr sekund: %s\nBeregnet tid tilbage: %s";
+		_AUCT['AuctionScanDone'] = "Auctioneer: Skanningen af auktionerne er f\195\166rdig.";
+		_AUCT['AuctionScanNexttime'] = "Auctioneer vil udf\195\184re en komplet scanning af auktionshuset n\195\166ste gang du snakker med en auktion\195\166r.";
+		_AUCT['AuctionScanNocat'] = "Du skal v\195\166lge mindst en kategori for at kan skanne.";
+		_AUCT['AuctionScanRedo'] = "Nuv\195\166rende side tog mere end %d sekunder at f\195\166rdig\195\184re, fors\195\184ger at indl\195\166se siden igen.";
 		
-		_AUCT['MesgConvert'] = "Auctioneer Database Conversion. Please backup your SavedVariables\\Auctioneer.lua first.%s%s";
-		_AUCT['MesgNotconverting'] = "Auctioneer is not converting your database, but will not function until you do.";
-		_AUCT['MesgConvertYes'] = "Convert";
-		_AUCT['MesgConvertNo'] = "Disable Auctioneer";
+		_AUCT['MesgConvert'] = "Konventere Auctioneer Databasen. Tag venligst en backup af SavedVariables\\Auctioneer.lua inden.%s%s";
+		_AUCT['MesgNotconverting'] = "Auctioneer konventere ikke din database, men vil ikke virke f\195\184r du g\195\184r.";
+		_AUCT['MesgConvertYes'] = "Konventer nu";
+		_AUCT['MesgConvertNo'] = "Indl\195\166s ikke Auctioneer";
 		
-		_AUCT['MesgNotLoaded'] = "Auctioneer is not loaded. Type /auctioneer for more info.";
+		_AUCT['MesgNotLoaded'] = "Auctioneer er ikke indl\195\166st. Skriv /auctioneer for mere info.";
 		
-		_AUCT['AuctionTotalAucts'] = "Total auctions scanned: %s";
-		_AUCT['AuctionNewAucts'] = "New auctions scanned: %s";
-		_AUCT['AuctionOldAucts'] = "Previously scanned: %s";
-		_AUCT['AuctionDefunctAucts'] = "Defunct auctions removed: %s";
-		_AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
+		_AUCT['AuctionTotalAucts'] = "Auktioner skannet ialt: %s";
+		_AUCT['AuctionNewAucts'] = "Nye auktioner skannet: %s";
+		_AUCT['AuctionOldAucts'] = "Skannet f\195\184r: %s";
+		_AUCT['AuctionDefunctAucts'] = "Afsluttede auktioner fjernet: %s";
+		_AUCT['AuctionDiscrepancies'] = "Uoverensstemmelser: %s";
 		
 		-- GUI localizations
-		_AUCT['GuiRememberText'] = "Remember price";
+		_AUCT['GuiRememberText'] = "Husk prisen";
 		
-		_AUCT['GuiMainHelp'] = "Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
-		_AUCT['GuiMainEnable'] = "Enable Auctioneer";
-		_AUCT['GuiLocale'] = "Set locale to";
-		_AUCT['GuiVerbose'] = "Verbose Mode";
-		_AUCT['GuiStatsEnable'] = "Show Stats";
-		_AUCT['GuiStatsHeader'] = "Item Price Statistics";
-		_AUCT['GuiStatsHelp'] = "Show the following statistics in the tooltip.";
-		_AUCT['GuiAverages'] = "Show Averages";
-		_AUCT['GuiMedian'] = "Show Medians";
-		_AUCT['GuiSuggest'] = "Show Suggested Prices";
-		_AUCT['GuiVendorHeader'] = "Vendor Prices";
-		_AUCT['GuiVendorHelp'] = "Options related to NPC buy/sell prices.";
-		_AUCT['GuiVendor'] = "Show Vendor Prices";
-		_AUCT['GuiVendorBuy'] = "Show Vendor Buy Prices";
-		_AUCT['GuiVendorSell'] = "Show Vendor Sell Prices";
-		_AUCT['GuiEmbedHeader'] = "Embed";
-		_AUCT['GuiEmbed'] = "Embed info in in-game tooltip";
-		_AUCT['GuiEmbedBlankline'] = "Show blankline in in-game tooltip";
-		_AUCT['GuiClearHeader'] = "Clear Data";
-		_AUCT['GuiClearHelp'] = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
-		_AUCT['GuiClearall'] = "Clear All Auctioneer Data";
-		_AUCT['GuiClearallHelp'] = "Click here to clear all of Auctioneer data for the current server-realm.";
-		_AUCT['GuiClearallNote'] = "for the current server-faction";
-		_AUCT['GuiClearallButton'] = "Clear All";
-		_AUCT['GuiClearsnap'] = "Clear Snapshot data";
-		_AUCT['GuiClearsnapHelp'] = "Click here to clear the last Auctioneer snapshot data.";
-		_AUCT['GuiClearsnapButton'] = "Clear Snapshot";
+		_AUCT['GuiMainHelp'] = "Indeholder v\195\166rdier for Auctioneer \nan AddOn som viser information og analysere data. \nKlik p\195\165 \"Skan\" knappen p\195\165 AH for at indsamle auktions data.";
+		_AUCT['GuiMainEnable'] = "Start Auctioneer";
+		_AUCT['GuiLocale'] = "S\195\166t sprog til";
+		_AUCT['GuiVerbose'] = "Tekst Mode";
+		_AUCT['GuiStatsEnable'] = "Vis Stats";
+		_AUCT['GuiStatsHeader'] = "Objekt Pris Statestik";
+		_AUCT['GuiStatsHelp'] = "Vis f\195\184lgende statestikker i tooltippet.";
+		_AUCT['GuiAverages'] = "Vis middel";
+		_AUCT['GuiMedian'] = "Vis middel";
+		_AUCT['GuiSuggest'] = "Vis foresl\195\165ede priser";
+		_AUCT['GuiVendorHeader'] = "Forhandler priser";
+		_AUCT['GuiVendorHelp'] = "Valg med relation til ISP k\195\184b/salg priser.";
+		_AUCT['GuiVendor'] = "Vis forhandlernes priser";
+		_AUCT['GuiVendorBuy'] = "Vis forhandlernes k\195\184bs pris";
+		_AUCT['GuiVendorSell'] = "Vis forhandlernes salgs pris";
+		_AUCT['GuiEmbedHeader'] = "Indrammet";
+		_AUCT['GuiEmbed'] = "Indrammet info i spillets tooltip";
+		_AUCT['GuiEmbedBlankline'] = "Viser blank linje i spillets tooltip";
+		_AUCT['GuiClearHeader'] = "Slet Data";
+		_AUCT['GuiClearHelp'] = "Slet Auctioneer data. \nV\195\166lg alle data eller det nuv\195\166rende snapshot.\nADVARSEL: Disse handlinger kan IKKE fortrydes.";
+		_AUCT['GuiClearall'] = "Slet Alle Auctioneer Data";
+		_AUCT['GuiClearallHelp'] = "Klik her for at fjere all data fra Auctioneer for den nuv\195\166rende server og realm.";
+		_AUCT['GuiClearallNote'] = "for den nuv\195\166rende server-faction";
+		_AUCT['GuiClearallButton'] = "Slet alt";
+		_AUCT['GuiClearsnap'] = "Slet Snapshot data";
+		_AUCT['GuiClearsnapHelp'] = "Klik her for at slette den sidste skanning af auktionen.";
+		_AUCT['GuiClearsnapButton'] = "Fjern Snapshot";
 		_AUCT['GuiPercentsHeader'] = "Auctioneer Threshold Percents";
-		_AUCT['GuiPercentsHelp'] = "WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
-		_AUCT['GuiBidmarkdown'] = "Bid Markdown Percent";
-		_AUCT['GuiMarkup'] = "Vendor Price Markup Percent";
-		_AUCT['GuiMaxless'] = "Max Market Undercut Percent";
-		_AUCT['GuiNocomp'] = "No Competition Undercut Percent";
-		_AUCT['GuiUnderlow'] = "Lowest Auction Undercut";
-		_AUCT['GuiUndermkt'] = "Undercut Market When Maxless";
-		_AUCT['GuiOtherHeader'] = "Other Options";
-		_AUCT['GuiOtherHelp'] = "Miscellaneous Auctioneer Options";
-		_AUCT['GuiAutofill'] = "Autofill prices in the AH";
-		_AUCT['GuiAlso'] = "Also display data for";
-		_AUCT['GuiAlsoOpposite'] = "Now also displaying data for opposite faction.";
-		_AUCT['GuiAlsoOff'] = "No longer displaying other realm-faction data.";
-		_AUCT['GuiAlsoDisplay'] = "Displaying data for %s";
-		_AUCT['GuiLink'] = "Show LinkID";
-		_AUCT['GuiReloadui'] = "Reload User Interface";
-		_AUCT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
-		_AUCT['GuiReloaduiButton'] = "ReloadUI";
-		_AUCT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI";
-		_AUCT['GuiRedo'] = "Show Long Scan Warning";
-		_AUCT['GuiDefaultAllButton'] = "Reset All";
-		_AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
-		_AUCT['GuiDefaultAllHelp'] = "Click here to set all Auctioneer options to their default values.\nWARNING: This action is NOT undoable.";
-		_AUCT['GuiDefaultOption'] = "Reset this setting";
-		_AUCT['GuiPrintin'] = "Select the desired message frame";
+		_AUCT['GuiPercentsHelp'] = "Advarsel: De f\195\184lgende valgmuligheder er KUN for Superbrugere.\nVed at \195\166ndre p\195\165 f\195\184lgende muligheder \195\166ndre du hvor aggresivt Auctioneer vil v\195\166re n\195\165r den udregner profit.";
+		_AUCT['GuiBidmarkdown'] = "Neds\195\166t bud med xx procent";
+		_AUCT['GuiMarkup'] = "Procent overbud iht. forhandler";
+		_AUCT['GuiMaxless'] = "Procent maks. under markeds pris";
+		_AUCT['GuiNocomp'] = "Procent under markedets pris ved ingen konkurence";
+		_AUCT['GuiUnderlow'] = "Laveste auktionspris";
+		_AUCT['GuiUndermkt'] = "Underbyd markedet n\195\165r der ingen maxpris findes.";
+		_AUCT['GuiOtherHeader'] = "Andre valg";
+		_AUCT['GuiOtherHelp'] = "Diverse valg til Auctioneer";
+		_AUCT['GuiAutofill'] = "Autoudfyld priser p\195\165 AH";
+		_AUCT['GuiAlso'] = "Vis ogs\195\165 data for";
+		_AUCT['GuiAlsoOpposite'] = "Viser nu ogs\195\165 data for modsatte fraktion.";
+		_AUCT['GuiAlsoOff'] = "Viser ikke l\195\166ngre data fra andre realm-fraktioner.";
+		_AUCT['GuiAlsoDisplay'] = "Viser data for %s";
+		_AUCT['GuiLink'] = "Viser LinkID";
+		_AUCT['GuiReloadui'] = "Genindl\195\166ser brugerflade.";
+		_AUCT['GuiReloaduiHelp'] = "Klik her for at genindl\195\166se WoW brugerfladen efter at have \195\166ndret sprog.\nBem\195\166rk: Dette kan tage et par minutter.";
+		_AUCT['GuiReloaduiButton'] = "Genindl\195\166sUI";
+		_AUCT['GuiReloaduiFeedback'] = "Genindl\195\166ser nu WoW UI";
+		_AUCT['GuiRedo'] = "Vis advarsel ved lang skanning.";
+		_AUCT['GuiDefaultAllButton'] = "Nulstil alt";
+		_AUCT['GuiDefaultAll'] = "Nulstil alle Auctioneer valg";
+		_AUCT['GuiDefaultAllHelp'] = "Klik her for at s\195\166tte alle Auctioneer valg til standard v\195\166rdier.\nADVARSEL: Denne handling kan IKKE fortrydes.";
+		_AUCT['GuiDefaultOption'] = "Nulstil denne ops\195\166tning.";
+		_AUCT['GuiPrintin'] = "V\195\166lg den \195\184nskede chat ramme.";
 
 	end
 

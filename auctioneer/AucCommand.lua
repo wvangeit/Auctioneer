@@ -28,7 +28,7 @@ function Auctioneer_Register()
 end
 
 function Auctioneer_Register_Khaos()
-	local optionSet = {
+	local Auctioneer_optionSet = {
 		id="Auctioneer";
 		text="Auctioneer";
 		helptext=_AUCT['GuiMainHelp'];
@@ -271,6 +271,7 @@ function Auctioneer_Register_Khaos()
 			};
 			{
 				id=_AUCT['CmdEmbed'];
+				--key="AuctioneerEmbed";
 				type=K_TEXT;
 				text=_AUCT['GuiEmbed'];
 				helptext=_AUCT['HelpEmbed'];
@@ -316,7 +317,7 @@ function Auctioneer_Register_Khaos()
 				check=true;
 				default={checked=false};
 				disabled={checked=false};
-				dependencies={AuctioneerEmbed={checked=true;}, AuctioneerEnable={checked=true;}};
+				dependencies={embed={checked=true;}, AuctioneerEnable={checked=true;}};
 				difficulty=1;
 			};
 			{
@@ -611,7 +612,7 @@ function Auctioneer_Register_Khaos()
 				};
 				dependencies={AuctioneerEnable={checked=true;}};
 				difficulty=4;
-			};		
+			};
 			{
 				id="AuctioneerPrintFrame";
 				type=K_PULLDOWN;
@@ -664,8 +665,9 @@ function Auctioneer_Register_Khaos()
 			};
 		};
 	};
-
-	Khaos.registerOptionSet("tooltip",optionSet);
+	
+	Khaos.registerOptionSet("tooltip",Auctioneer_optionSet);
+	Khaos.refresh();
 	Auctioneer_Khaos_Registered = true;
 	
 	return true;
@@ -727,7 +729,7 @@ function Auctioneer_Command(command, source)
 	elseif ((cmd == _AUCT['CmdDefault']) or (cmd == "default")) then
 		Auctioneer_Default(param, chatprint);
 	
-	elseif ((cmd == _AUCT['CmdPrintin']) or (cmd == "printin")) then
+	elseif ((cmd == _AUCT['CmdPrintin']) or (cmd == "print-in")) then
 		Auctioneer_SetFrame(param, chatprint)
 
 	--The following are copied verbatim from the original function. These functions are not supported in the current Khaos-based GUI implementation and as such have been left intact.
@@ -768,8 +770,7 @@ function Auctioneer_Command(command, source)
 		((cmd == _AUCT['ShowStats']) or (cmd == "show-stats")) or
 		((cmd == _AUCT['ShowSuggest']) or (cmd == "show-suggest")) or
 		((cmd == _AUCT['ShowEmbedBlank']) or (cmd == "show-embed-blankline")) or
-		((cmd == _AUCT['ShowRedo']) or (cmd == "show-redowarning")) or
-		((cmd == AUCT_SHOW_HSP) or (cmd == "show-hsp")) --This command has not yet been implemented.
+		((cmd == _AUCT['ShowRedo']) or (cmd == "show-redowarning"))
 	) then
 		Auctioneer_GenVarSet(cmd, param, chatprint);
 
@@ -873,24 +874,12 @@ function Auctioneer_OnOff(state, chatprint)
 
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", true);
-
-				if (Enchantrix) then
-					Khaos.setSetKeyParameter("Enchantrix", "ValuateKey", "checked", true);
-					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_HSP", "helptext", ENCH_HELP_GUESS_AUCTIONEER_HSP);
-					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_MED", "helptext", ENCH_HELP_GUESS_AUCTIONEER_MEDIAN);
-				end
 			end
 		else
 			Auctioneer_ChatPrint(_AUCT['StatOff']);
 
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", "AuctioneerEnable", "checked", false);
-
-				if (Enchantrix) then
-					Khaos.setSetKeyParameter("Enchantrix", "ValuateKey", "checked", false);
-					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_HSP", "helptext", ENCH_HELP_GUESS_NOAUCTIONEER);
-					Khaos.setSetKeyParameter("Enchantrix", "ENCH_SHOW_GUESS_AUCTIONEER_MED", "helptext", ENCH_HELP_GUESS_NOAUCTIONEER);
-				end
 			end
 		end
 	end
@@ -1098,9 +1087,9 @@ function Auctioneer_GetFrameNames(index)
 
 		if ( name == "" ) then 
 			if (i == 1) then
-				frames["General"] = 1;
+				frames[_AUCT['TextGeneral']] = 1;
 			elseif (i == 2) then
-				frames["Combat"] = 2;
+				frames[_AUCT['TextCombat']] = 2;
 			end
 		else 
 			frames[name] = i;
@@ -1112,9 +1101,9 @@ function Auctioneer_GetFrameNames(index)
 
 		if ( name == "" ) then 
 			if (index == 1) then
-				frameName = "General";
+				frameName = _AUCT['TextGeneral'];
 			elseif (index == 2) then
-				frameName = "Combat";
+				frameName = _AUCT['TextCombat'];
 			end
 		else 
 			frameName = name;
@@ -1209,12 +1198,14 @@ function Auctioneer_GenVarSet(variable, param, chatprint)
 
 		if ((param == _AUCT['CmdOn']) or (param == "on")) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActEnable'], variable));
-			if (Auctioneer_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
-			end
+
+				if (Auctioneer_Khaos_Registered) then
+					Khaos.setSetKeyParameter("Auctioneer", variable, "checked", true);
+				end
 
 		elseif ((param == _AUCT['CmdOff']) or (param == "off")) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActDisable'], variable));
+
 			if (Auctioneer_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Auctioneer", variable, "checked", false);
 			end
