@@ -191,7 +191,7 @@ _AUCT['AuctionScanRedo']     = "Aktuelle Seite braucht länger als %d Sekunden. 
 _AUCT['MesgConvert']       = "Auctioneer Datenbankkonvertierung. Bitte zuerst ein Backup von SavedVariables\\Auctioneer.lua anlegen!%s%s";
 _AUCT['MesgNotconverting'] = "Auctioneers Datenbank wird nicht konvertiert. Auctioneer bleibt deaktiviert, solange die Datenbank nicht konvertiert wurde.";
 _AUCT['MesgConvertYes']    = "Konvertieren";
-_AUCT['MesgConvertNo']     = "Auctioneer deaktivieren";
+_AUCT['MesgConvertNo']     = "Deaktivieren";
 
 _AUCT['AuctionTotalAucts']    = "Insgesammt gescannte Auktionen: %s";
 _AUCT['AuctionNewAucts']      = "Davon neu: %s";
