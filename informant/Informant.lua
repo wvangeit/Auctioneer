@@ -44,12 +44,14 @@ local showHideInfo       -- showHideInfo()
 local skillToName        -- skillToName(userSkill)
 local split              -- split(str, at)
 local tooltipHandler     -- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
+local getKeyBindProfile  -- getKeyBindProfile()
 
 -- LOCAL VARIABLES
 
 local self = {}
 local lines = {}
 local itemInfo = nil
+local variablesLoaded = false;
 
 -- GLOBAL VARIABLES
 
@@ -565,6 +567,21 @@ function onVariablesLoaded()
 		InformantConfig.welcomed = true
 	end
 	
+	-- Restore key bindings
+	-- This workaround is required for LoadOnDemand addons since their saved
+	-- bindings are deleted upon login.
+	local profile = getKeyBindProfile();
+	if (InformantConfig and InformantConfig.bindings) then
+		if (not	InformantConfig.bindings[profile]) then profile = 'global'; end
+		if (InformantConfig.bindings[profile]) then
+			DEFAULT_CHAT_FRAME:AddMessage("Restoring from profile " .. profile)
+			for _,key in ipairs(InformantConfig.bindings[profile]) do
+				SetBinding(key, 'INFORMANT_POPUPDOWN')
+			end		
+		end
+	end
+	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
+	
 	Informant.InitCommands()
 end
 
@@ -572,6 +589,16 @@ function onEvent(event)
 	if (event == "ADDON_LOADED" and arg1 == "Informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
+	elseif (event == "UPDATE_BINDINGS") then
+		-- Store key bindings for Informant
+		local key1, key2 = GetBindingKey('INFORMANT_POPUPDOWN');
+		local profile = getKeyBindProfile();
+		
+		if (not InformantConfig.bindings) then InformantConfig.bindings = {}; end
+		if (not InformantConfig.bindings[profile]) then InformantConfig.bindings[profile] = {}; end
+		
+		InformantConfig.bindings[profile][1] = key1;
+		InformantConfig.bindings[profile][2] = key2;
 	end
 end
 
@@ -646,6 +673,15 @@ function setFilterDefaults()
 			InformantConfig.filters[k] = v;
 		end
 	end
+end
+
+-- Key binding helper functions
+
+function getKeyBindProfile()
+	if (IsAddOnLoaded("PerCharBinding")) then
+		return GetRealmName() .. ":" .. UnitName("player")
+	end
+	return 'global'
 end
 
 -- GLOBAL OBJECT
