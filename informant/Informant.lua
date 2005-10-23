@@ -51,7 +51,6 @@ local getKeyBindProfile  -- getKeyBindProfile()
 local self = {}
 local lines = {}
 local itemInfo = nil
-local variablesLoaded = false;
 
 -- GLOBAL VARIABLES
 
