@@ -419,7 +419,7 @@ if locale == "deDE" then
 		_INFORMANT['InfoQuestHeader'] = "Ben\195\182tigt f\195\188r %d Quests:"
 		_INFORMANT['InfoQuestName'] = "  %s"
 		
-		_INFORMANT['InfoPlayerMade'] = "Herstellbar bei %s Level %d"
+		_INFORMANT['InfoPlayerMade'] = "Herstellbar mit Level %d %s"
 		
 		_INFORMANT['InfoNoItem'] = {
 			"Bevor die Aktivierungstaste gedr\195\188ckt wird, mu\195\159",

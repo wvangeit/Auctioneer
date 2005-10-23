@@ -53,7 +53,7 @@ _INFORMANT['InfoVendorName'] = "  %s"
 _INFORMANT['InfoQuestHeader'] = "Benötigt für %d Quests:"
 _INFORMANT['InfoQuestName'] = "  %s"
 
-_INFORMANT['InfoPlayerMade'] = "Herstellbar bei %s Level %d"
+_INFORMANT['InfoPlayerMade'] = "Herstellbar mit Level %d %s"
 
 _INFORMANT['InfoNoItem'] = {
 	"Bevor die Aktivierungstaste gedrückt wird, muß",
