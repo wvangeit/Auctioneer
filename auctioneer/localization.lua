@@ -789,7 +789,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		-- AH Scanning localizations
 		
 		_AUCT['AuctionScanStart']    = "Auctioneer: Scanne %s Seite 1...";
-		_AUCT['AuctionPageN']        = "Auctioneer: Scanne %s Seite %d von %d";
+		_AUCT['AuctionPageN']        = "Auctioneer: Scanne %s Seite %d von %d\nAuktionen pro Sekunde: %s\nGesch\195\164tzte Restzeit: %s";
 		_AUCT['AuctionScanDone']     = "Auctioneer: Scanvorgang abgeschlossen";
 		_AUCT['AuctionScanNexttime'] = "Auctioneer wird einen kompletten Auktionsscan durchf\195\188hren, wenn das n\195\164chste mal mit einem Auktionator gesprochen wird.";
 		_AUCT['AuctionScanNocat']    = "Es muss mindestens eine Kategorie ausgew\195\164hlt sein, um den Scanvorgang zu starten.";
@@ -798,7 +798,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['MesgConvert']       = "Auctioneer Datenbankkonvertierung. Bitte zuerst ein Backup von SavedVariables\\Auctioneer.lua anlegen!%s%s";
 		_AUCT['MesgNotconverting'] = "Auctioneers Datenbank wird nicht konvertiert. Auctioneer bleibt deaktiviert, solange die Datenbank nicht konvertiert wurde.";
 		_AUCT['MesgConvertYes']    = "Konvertieren";
-		_AUCT['MesgConvertNo']     = "Auctioneer deaktivieren";
+		_AUCT['MesgConvertNo']     = "Deaktivieren";
 		
 		_AUCT['AuctionTotalAucts']    = "Insgesammt gescannte Auktionen: %s";
 		_AUCT['AuctionNewAucts']      = "Davon neu: %s";

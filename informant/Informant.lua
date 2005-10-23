@@ -573,7 +573,6 @@ function onVariablesLoaded()
 	if (InformantConfig and InformantConfig.bindings) then
 		if (not	InformantConfig.bindings[profile]) then profile = 'global'; end
 		if (InformantConfig.bindings[profile]) then
-			DEFAULT_CHAT_FRAME:AddMessage("Restoring from profile " .. profile)
 			for _,key in ipairs(InformantConfig.bindings[profile]) do
 				SetBinding(key, 'INFORMANT_POPUPDOWN')
 			end		

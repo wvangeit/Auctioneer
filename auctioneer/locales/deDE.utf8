@@ -182,7 +182,7 @@ _AUCT['TextUsage']   = "Syntax:";
 -- AH Scanning localizations
 
 _AUCT['AuctionScanStart']    = "Auctioneer: Scanne %s Seite 1...";
-_AUCT['AuctionPageN']        = "Auctioneer: Scanne %s Seite %d von %d";
+_AUCT['AuctionPageN']        = "Auctioneer: Scanne %s Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
 _AUCT['AuctionScanDone']     = "Auctioneer: Scanvorgang abgeschlossen";
 _AUCT['AuctionScanNexttime'] = "Auctioneer wird einen kompletten Auktionsscan durchführen, wenn das nächste mal mit einem Auktionator gesprochen wird.";
 _AUCT['AuctionScanNocat']    = "Es muss mindestens eine Kategorie ausgewählt sein, um den Scanvorgang zu starten.";
