@@ -269,6 +269,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	
 	
 	_AUCT['GuiRememberText'] = "Remember price";
+	_AUCT['GuiNoWorldMap'] = "Auctioneer: suppressed displaying of world map"
 	
 	_AUCT['GuiMainHelp'] = "Contains settings for Auctioneer \nan AddOn that displays item info and analyzes auction data. \nClick the \"Scan\" button at the AH to collect auction data.";
 	_AUCT['GuiMainEnable'] = "Enable Auctioneer";

@@ -286,6 +286,8 @@ function Auctioneer_ProtectAuctionFrame(enable)
 			ToggleWorldMap = function ()
 				if ( ( not Auctioneer_ProtectionEnabled ) or ( not ( AuctionFrame and AuctionFrame:IsVisible() ) ) ) then
 					Auctioneer_ToggleWorldMap();
+				else
+					UIErrorsFrame:AddMessage(_AUCT['GuiNoWorldMap'], 0, 1, 0, 1.0, UIERRORS_HOLD_TIME)
 				end
 			end
 		else
