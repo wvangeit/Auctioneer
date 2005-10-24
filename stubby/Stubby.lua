@@ -1,4 +1,6 @@
 --[[  Stubby
+  
+  $Id$
 
   Stubby is an addon that allows you to register boot code for
   your addon.
@@ -128,7 +130,23 @@
 	UnregisterAddOnHook(triggerAddOn, ownerAddOn)
 	UnregisterEventHook(triggerEvent, ownerAddOn)
 	UnregisterBootCode(ownerAddOn, bootName)
-
+	
+  There is also a single exposed 'constant' allowing you to do
+  some basic version checking for compatibility:
+    Stubby.VERSION                (introduced in revision 507)
+  This constant is Stubby's revision number, a simple positive
+  integer that will increase by an arbitrary amount with each
+  new version of Stubby.
+    Current $Revision$
+  
+  Example:
+  -------------------------------------------
+    if (Stubby.VERSION and Stubby.VERSION >= 507) then
+    	-- Register boot code
+    else
+    	Stubby.Print("You need to update your version of Stubby!"
+    end
+  -------------------------------------------  
 --]]
 
 local cleanList
@@ -641,10 +659,17 @@ function clearConfig(ownerAddOn, variable)
 	end
 end
 
+-- Extract the revision number from SVN keyword string
+local function getRevision()
+	local found, _, rev = string.find("$Revision$", "(%d+)")
+	if (found ~= nil) then return tonumber(rev); end
+	return nil
+end
 
 -- Setup our Stubby global object. All interaction is done
 -- via the methods exposed here.
 Stubby = {
+	VERSION = getRevision(),
 	Print = chatPrint,
 	Events = events,
 	HookCall = hookCall,
@@ -666,4 +691,3 @@ Stubby = {
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
 }
-
