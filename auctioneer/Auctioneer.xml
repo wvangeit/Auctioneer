@@ -115,7 +115,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentMoney1" inherits="TinyMoneyFrameTemplate" hidden="true">
+			<Frame name="$parentMoney1" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText1" relativePoint="RIGHT"/>
 				</Anchors>
@@ -126,7 +126,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Frame name="$parentMoney2" inherits="TinyMoneyFrameTemplate" hidden="true">
+			<Frame name="$parentMoney2" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText2" relativePoint="RIGHT"/>
 				</Anchors>
@@ -137,7 +137,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Frame name="$parentMoney3" inherits="TinyMoneyFrameTemplate" hidden="true">
+			<Frame name="$parentMoney3" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText3" relativePoint="RIGHT"/>
 				</Anchors>
@@ -148,7 +148,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Frame name="$parentMoney4" inherits="TinyMoneyFrameTemplate" hidden="true">
+			<Frame name="$parentMoney4" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText4" relativePoint="RIGHT"/>
 				</Anchors>
@@ -159,7 +159,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Frame name="$parentMoney5" inherits="TinyMoneyFrameTemplate" hidden="true">
+			<Frame name="$parentMoney5" inherits="TinyMoneyFrameTemplate" hidden="true" toplevel="true">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentText5" relativePoint="RIGHT"/>
 				</Anchors>
