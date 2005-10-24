@@ -258,24 +258,52 @@ function Auctioneer_ChatPrint(str)
 	end
 end
 
+--[[ Pass true to protect the Auction Frame from being undesireably closed, not true to disable this ]]--
 function Auctioneer_ProtectAuctionFrame(enable)
+	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
+		--Handle enabling of protection
 		if (enable) then
+			--Remember that we are now protecting the frame
+			Auctioneer_ProtectionEnabled = true;
+			--If the frame is the current doublewide frame, then clear the doublewide
 			if ( GetDoublewideFrame() == AuctionFrame ) then
 				SetDoublewideFrame(nil)
 			end
+			--Remove the frame from the UI frame handling system
 			UIPanelWindows["AuctionFrame"] = nil
-			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_UIPanelWindowBackup.AuctionFrame ) then
+			--If mobile frames is around, then remove AuctionFrame from Mobile Frames handling system
+			if (MobileFrames_UIPanelWindowBackup) then
 				MobileFrames_UIPanelWindowBackup.AuctionFrame = nil;
 			end
+			if (MobileFrames_UIPanelsVisible) then
+				MobileFrames_UIPanelsVisible.AuctionFrame = nil;
+			end
+			--Hook the function to show the WorldMap, WorldMap has internal code that forces all these frames to close
+			--so for it, we have to prevent it from showing at all
+			if (not Auctioneer_ToggleWorldMap) then
+				Auctioneer_ToggleWorldMap = ToggleWorldMap;
+			end
+			ToggleWorldMap = function ()
+				if ( ( not Auctioneer_ProtectionEnabled ) or ( not ( AuctionFrame and AuctionFrame:IsVisible() ) ) ) then
+					Auctioneer_ToggleWorldMap();
+				end
+			end
 		else
+			--Handle disabling of protection
+			Auctioneer_ProtectionEnabled = nil;
+			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
 			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList["AuctionFrame"] ) then
 				MobileFrames_UIPanelWindowBackup.AuctionFrame = { area = "doublewide", pushable = 0 };
+				if ( MobileFrames_UIPanelsVisible and AuctionFrame:IsVisible() ) then
+					MobileFrames_UIPanelsVisible.AuctionFrame = 0;
+				end
 			else
+				--Put the frame back into the UI frame handling system
 				UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
-			end
-			if ( AuctionFrame:IsVisible() ) then
-				SetDoublewideFrame(AuctionFrame)
+				if ( AuctionFrame:IsVisible() ) then
+					SetDoublewideFrame(AuctionFrame)
+				end
 			end
 		end
 	end
