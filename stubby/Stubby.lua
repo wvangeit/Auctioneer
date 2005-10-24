@@ -144,7 +144,7 @@
     if (Stubby.VERSION and Stubby.VERSION >= 507) then
     	-- Register boot code
     else
-    	Stubby.Print("You need to update your version of Stubby!"
+    	Stubby.Print("You need to update your version of Stubby!")
     end
   -------------------------------------------  
 --]]
