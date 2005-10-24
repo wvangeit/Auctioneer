@@ -129,9 +129,8 @@ end
 
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
 function Auctioneer_IsValidAlso(also)
-	-- make also a required parameter
-	if (also == nil) then
-		return false	-- missing parameter
+	if (also == nil or type(also) ~= "string") then
+		return false
 	end
 
 	if (also == 'opposite') or (also == 'off') then

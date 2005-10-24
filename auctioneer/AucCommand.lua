@@ -611,9 +611,9 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_AlsoInclude(state.value);
 				end;
 				feedback = function (state)
-					if (state.value == _AUCT['CmdAlsoOpposite']) then
+					if (state.value == _AUCT['CmdAlsoOpposite'] or state.value == "opposite") then
 						return _AUCT['GuiAlsoOpposite'];
-					elseif (state.value == _AUCT['CmdOff']) then
+					elseif (state.value == _AUCT['CmdOff'] or state.value == "off") then
 						return _AUCT['GuiAlsoOff'];
 					elseif (not Auctioneer_IsValidAlso(param)) then
 						string.format(_AUCT['FrmtUnknownRf'], state.value)
@@ -1011,6 +1011,8 @@ end
 
 
 function Auctioneer_AlsoInclude(param, chatprint)
+	local localizedParam = param;
+	param = Auctioneer_DelocalizeFilterVal(param);
 	if ((param == _AUCT['CmdAlsoOpposite']) or (param == "opposite")) then
 		param = "opposite";
 	end
@@ -1027,10 +1029,10 @@ function Auctioneer_AlsoInclude(param, chatprint)
 	if (chatprint) then
 		setKhaosSetKeyValue('also', param);
 
-		if ((param == _AUCT['CmdOff']) or (param == "off")) then
+		if (param == "off") then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActDisable'], _AUCT['CmdAlso']));
 		else
-			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdAlso'], param));
+			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdAlso'], localizedParam));
 		end
 	end
 end
