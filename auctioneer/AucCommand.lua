@@ -51,6 +51,8 @@ end
 
 -- Convert Khaos options to standardized keys and values
 function Auctioneer_Convert_Khaos()
+	if (not Khaos_Configurations) then return; end
+
 	-- Array that maps localized versions of strings to standardized
 	local convertOnOff = {	['apagado'] = 'off',	-- esES
 							['prendido'] = 'on',	-- esES
@@ -95,19 +97,19 @@ function Auctioneer_Convert_Khaos()
 	end			
 
 	for i,config in ipairs(Khaos_Configurations) do
-		if (not config.configuration or not config.configuration.Auctioneer) then break; end
-
-		local converted = false;
-		-- Run the defined conversions
-		for i,c in ipairs(conversions) do
-			-- Replace first parameter with actual table to process
-			-- Inserting here will cause problems for the second iteration
-			c[1] = config.configuration.Auctioneer
-			converted = convertConfig(unpack(c)) or converted
-		end
-
-		if (converted) then
-			Auctioneer_ChatPrint("Converted old Khaos configuration \"" .. config.name .. "\"")
+		if (config.configuration and config.configuration.Auctioneer) then
+			local converted = false;
+			-- Run the defined conversions
+			for i,c in ipairs(conversions) do
+				-- Replace first parameter with actual table to process
+				-- Inserting here will cause problems for the second iteration
+				c[1] = config.configuration.Auctioneer
+				converted = convertConfig(unpack(c)) or converted
+			end
+	
+			if (converted) then
+				Auctioneer_ChatPrint("Converted old Khaos configuration \"" .. config.name .. "\"")
+			end
 		end
 	end
 end

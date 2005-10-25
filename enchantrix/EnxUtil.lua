@@ -29,6 +29,8 @@ end
 
 -- Convert Enchantrix filters to standardized keys and values
 function Enchantrix_ConvertFilters()
+	-- Abort if there's nothing to convert
+	if (not EnchantConfig or not EnchantConfig.filters) then return; end
 
 	-- Array that maps localized versions of strings to standardized
 	local convertOnOff = {	['apagado'] = 'off',	-- esES
@@ -63,6 +65,9 @@ function Enchantrix_ConvertFilters()
 end
 
 function Enchantrix_SetFilterDefaults()
+	if (not EnchantConfig) then EnchantConfig = {}; end
+	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
+	
 	for k,v in pairs(Enchantrix_FilterDefaults) do
 		if (EnchantConfig.filters[k] == nil) then
 			EnchantConfig.filters[k] = v;
