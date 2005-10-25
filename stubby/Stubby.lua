@@ -593,7 +593,7 @@ function events(event, param)
 	if (not event) then event = "" end
 	if (not param) then param = "" end
 	if (event == "ADDON_LOADED") then
-		if (param == "Stubby") then onLoaded() end
+		if (string.lower(param) == "stubby") then onLoaded() end
 		Stubby.LoadWatcher(param)
 	end
 	Stubby.EventWatcher(event)
