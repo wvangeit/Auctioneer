@@ -686,10 +686,10 @@ if locale == "frFR" then
 		
 		_INFORMANT['FrmtInfoClass'] = "Classe: %s";
 		_INFORMANT['FrmtInfoUse'] = "Utilis\195\169 pour: %s";
-		_INFORMANT['FrmtInfoBuy'] = "Achat%s au marchand";
-		_INFORMANT['FrmtInfoSell'] = "Vente%s au marchand";
-		_INFORMANT['FrmtInfoBuymult'] = "Achat%s %d (%s chacun)";
-		_INFORMANT['FrmtInfoSellmult'] = "Vente%s %d (%s chacun)";
+		_INFORMANT['FrmtInfoBuy'] = "Achat au marchand";
+		_INFORMANT['FrmtInfoSell'] = "Vente au marchand";
+		_INFORMANT['FrmtInfoBuymult'] = "Achat %d (%s chacun)";
+		_INFORMANT['FrmtInfoSellmult'] = "Vente %d (%s chacun)";
 		_INFORMANT['FrmtInfoStx'] = "Pile par lots de %d";
 		
 		-- AH Scanning localizations
