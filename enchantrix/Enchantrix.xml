@@ -17,7 +17,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
         		this:RegisterEvent("ADDON_LOADED")
       		</OnLoad>
 			<OnEvent>
-				if (event == "ADDON_LOADED" and arg1 == "Enchantrix") then
+				if (event == "ADDON_LOADED" and string.lower(arg1) == "enchantrix") then
 					Enchantrix_AddonLoaded()
 					this:UnregisterEvent("ADDON_LOADED")
 				end

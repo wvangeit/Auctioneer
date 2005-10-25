@@ -8,7 +8,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="localization.lua"/>
 	<Script file="Informant.lua"/>
 	<Script file="InfCommand.lua"/>
-	<Script file="InfTrades.lua"/>
 	<Script file="InfData.lua"/>
 	<Frame name="InformantFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true" moveable="true">
 		<Size><AbsDimension x="380" y="380"/></Size>

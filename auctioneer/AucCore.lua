@@ -403,6 +403,7 @@ end
 
 
 function Auctioneer_AddonLoaded()
+	Auctioneer_ChatPrint("Auctioneer_AddonLoaded()")
 	Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 
 	-- Load the category and subcategory id's

@@ -584,7 +584,7 @@ function onVariablesLoaded()
 end
 
 function onEvent(event)
-	if (event == "ADDON_LOADED" and arg1 == "Informant") then
+	if (event == "ADDON_LOADED" and string.lower(arg1) == "informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
 	elseif (event == "UPDATE_BINDINGS") then
