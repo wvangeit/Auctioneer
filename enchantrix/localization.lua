@@ -508,7 +508,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_DEFAULT_ALL="Alle Einstellungen zur\195\188cksetzen";
 		ENCH_GUI_DEFAULT_ALL_HELP="Hier klicken um alle Enchantrix-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT r\195\188ckg\195\164ngig gemacht werden.";
 		ENCH_GUI_DEFAULT_OPTION="Zur\195\188cksetzen folgender Einstellung";
-		ENCH_GUI_PRINTIN="Gew\195\188nschtes Fenster f\195\188r Meldungen ausw\195\164hlen";
+		ENCH_GUI_PRINTIN="Fenster f\195\188r Meldungen ausw\195\164hlen";
 		
 		
 		

@@ -129,7 +129,7 @@ ENCH_GUI_DEFAULT_ALL_BUTTON = "Zurücksetzen";
 ENCH_GUI_DEFAULT_ALL = "Alle Einstellungen zurücksetzen";
 ENCH_GUI_DEFAULT_ALL_HELP= "Hier klicken um alle Enchantrix-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT rückgängig gemacht werden.";
 ENCH_GUI_DEFAULT_OPTION = "Zurücksetzen folgender Einstellung";
-ENCH_GUI_PRINTIN = "Gewünschtes Fenster für Meldungen auswählen";
+ENCH_GUI_PRINTIN = "Fenster für Meldungen auswählen";
 
 
 
