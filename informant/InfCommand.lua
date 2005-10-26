@@ -228,6 +228,7 @@ end
 
 function restoreDefault(param, chatprint)
 	local oldLocale = InformantConfig.filters['locale']
+	local paramLocalized
 	
 	if ( (param == nil) or (param == "") ) then
 		return
