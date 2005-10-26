@@ -580,6 +580,8 @@ function Auctioneer_AuctHouseShow()
 		AuctionsLongAuctionButton:SetChecked(1);
 		AuctionFrameAuctions.duration = 1440;
 	end
+	SetDoublewideFrame(nil);
+	UIPanelWindows["AuctionFrame"] = nil;
 end
 
 
