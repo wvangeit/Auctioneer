@@ -281,11 +281,6 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiAverages'] = "Show Averages";
 	_AUCT['GuiMedian'] = "Show Medians";
 	_AUCT['GuiSuggest'] = "Show Suggested Prices";
-	_AUCT['GuiVendorHeader'] = "Vendor Prices";
-	_AUCT['GuiVendorHelp'] = "Options related to NPC buy/sell prices.";
-	_AUCT['GuiVendor'] = "Show Vendor Prices";
-	_AUCT['GuiVendorBuy'] = "Show Vendor Buy Prices";
-	_AUCT['GuiVendorSell'] = "Show Vendor Sell Prices";
 	_AUCT['GuiEmbedHeader'] = "Embed";
 	_AUCT['GuiEmbed'] = "Embed info in in-game tooltip";
 	_AUCT['GuiEmbedBlankline'] = "Show blankline in in-game tooltip";
@@ -558,11 +553,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiAverages'] = "Vis middel";
 		_AUCT['GuiMedian'] = "Vis middel";
 		_AUCT['GuiSuggest'] = "Vis foresl\195\165ede priser";
-		_AUCT['GuiVendorHeader'] = "Forhandler priser";
-		_AUCT['GuiVendorHelp'] = "Valg med relation til ISP k\195\184b/salg priser.";
-		_AUCT['GuiVendor'] = "Vis forhandlernes priser";
-		_AUCT['GuiVendorBuy'] = "Vis forhandlernes k\195\184bs pris";
-		_AUCT['GuiVendorSell'] = "Vis forhandlernes salgs pris";
 		_AUCT['GuiEmbedHeader'] = "Indrammet";
 		_AUCT['GuiEmbed'] = "Indrammet info i spillets tooltip";
 		_AUCT['GuiEmbedBlankline'] = "Viser blank linje i spillets tooltip";
@@ -846,11 +836,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiAverages'] = "Zeige den Durchschnitt an.";
 		_AUCT['GuiMedian'] = "Zeige den Median an.";
 		_AUCT['GuiSuggest'] = "Zeige empfohlene Preise an.";
-		_AUCT['GuiVendorHeader'] = "H\195\164ndlerpreise";
-		_AUCT['GuiVendorHelp'] = "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreise von NPCs.";
-		_AUCT['GuiVendor'] = "Zeige H\195\164ndlerpreise an";
-		_AUCT['GuiVendorBuy'] = "Zeige die H\195\164ndler-Einkaufspreise an";
-		_AUCT['GuiVendorSell'] = "Zeige die H\195\164ndler-Verkaufspreise an";
 		_AUCT['GuiEmbedHeader'] = "Art der Anzeige";
 		_AUCT['GuiEmbed'] = "In-Game Tooltip zur Anzeige verwenden";
 		_AUCT['GuiEmbedBlankline'] = "Leerzeile in den In-Game Tooltip einf\195\188gen";
@@ -1122,11 +1107,6 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiAverages'] = "Mostrar Promedios";
 		_AUCT['GuiMedian'] = "Mostrar Medianos";
 		_AUCT['GuiSuggest'] = "Mostrar Precios Sugeridos";
-		_AUCT['GuiVendorHeader'] = "Precios de Vendedor";
-		_AUCT['GuiVendorHelp'] = "Opciones relacionadas a precios de compra/venta a vendedores";
-		_AUCT['GuiVendor'] = "Mostrar Precios a Vendedores";
-		_AUCT['GuiVendorBuy'] = "Mostrar precios de compra a vendedores";
-		_AUCT['GuiVendorSell'] = "Mostrar precios de venta a vendedores";
 		_AUCT['GuiEmbedHeader'] = "Integraci\195\179n";
 		_AUCT['GuiEmbed'] = "Integrar informaci\195\179n en la caja de ayuda";
 		_AUCT['GuiEmbedBlankline'] = "Mostrar linea en blanco.";
