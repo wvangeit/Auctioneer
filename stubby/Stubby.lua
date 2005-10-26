@@ -228,6 +228,7 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
 
+	local res;
 	local retVal = nil
 	local returns = false
 
@@ -247,7 +248,18 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 				end
 				orig = nil
 			end
-			func.f(func.a, retVal, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20);
+			local res, addit = func.f(func.a, retVal, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20);
+			if (type(res) == 'string') then
+				if (res == 'abort') then return end
+				if (res == 'killorig') then orig = nil end
+				if (res == 'setreturn') then
+					retVal = addit
+					returns = true
+				end
+				if (res == 'setparams') then
+					a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 = unpack(addit)
+				end
+			end
 		end
 	end
 	if (orig) then

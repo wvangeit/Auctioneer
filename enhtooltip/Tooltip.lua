@@ -637,8 +637,11 @@ function doHyperlink(reference, link, button)
 			if (button == "RightButton") then
 				testPopup = true
 			end
-			if (tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)) then 
+			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
+			if (callRes == true) then 
 				self.oldChatItem = {['reference']=reference, ['link']=link, ['button']=button, ['embed']=EnhancedTooltip.hasEmbed}
+			elseif (callRes == false) then
+				return false;
 			end
 		end
 	end
@@ -836,6 +839,16 @@ end
 ------------------------
 
 function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
+	if (IsAltKeyDown()) and (AuctionFrame:IsVisible()) then
+		AuctionFrameTab_OnClick(1)
+		local itemID, randomProp, enchant, uniqID, itemName = breakLink(link)
+		if (itemName) then
+			QueryAuctionItems(itemName, "", "", nil, nil, nil, 0, nil, nil)
+			ItemRefTooltip:Hide()
+		end
+		return
+	end
+
 	doHyperlink(reference, link, button)
 end
 
@@ -1143,7 +1156,7 @@ function debugPrint(...)
 	local name, shown;
 	for i=1, NUM_CHAT_WINDOWS do
 		name,_,_,_,_,_,shown = GetChatWindowInfo(i);
-		if (name == "ETTDebug") then debugWin = i; break; end
+		if (string.lower(name) == "ettdebug") then debugWin = i; break; end
 	end
 	if (debugWin == 0) then return end
 

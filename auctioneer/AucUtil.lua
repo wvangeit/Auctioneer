@@ -13,10 +13,11 @@ TIME_LEFT_LONG = 3;
 TIME_LEFT_VERY_LONG = 4;
 
 TIME_LEFT_SECONDS = {
-	[1] = 0,      -- Could expire any second... the current bid is relatively accurate.
-	[2] = 1800,   -- If it disappears within 30 mins of last seing it, it was BO'd
-	[3] = 7200,   -- Ditto but for 2 hours.
-	[4] = 28800,  -- 8 hours.
+	[0] = 0,      -- Could expire any second... the current bid is relatively accurate.
+	[1] = 1800,   -- If it disappears within 30 mins of last seing it, it was BO'd
+	[2] = 7200,   -- Ditto but for 2 hours.
+	[3] = 28800,  -- 8 hours.
+	[4] = 86400,  -- 24 hours.
 }
 
 -- Item quality constants
