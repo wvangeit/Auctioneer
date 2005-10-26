@@ -432,7 +432,7 @@ function showTooltip(currentTooltip)
 	EnhancedTooltip:SetHeight(height)
 	EnhancedTooltip:SetWidth(width)
 	
-	for i = 1, 10 do
+	for i = 1, 20 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
 		if (ttMoney.myLine ~= nil) then
 			ttMoneyWidth = ttMoney:GetWidth()
