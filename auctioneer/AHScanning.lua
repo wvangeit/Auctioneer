@@ -121,6 +121,7 @@ local function Auctioneer_AuctionNextQuery()
 	Auctioneer_AuctionSubmitQuery();
 end
 
+local lCheckStartTime = nil;
 local lCheckPage = nil;
 local lCheckSize = nil;
 local lCheckPos = nil;
@@ -129,9 +130,14 @@ function Auctioneer_CheckCompleteScan()
 		lCheckSize = GetNumAuctionItems("list");
 		lCheckPage = lCurrentAuctionPage;
 		lCheckPos = 1;
+		lCheckStartTime = time()
 	end
 
 	if lCheckPage and lCheckSize > 0 then
+		if (time() - lCheckStartTime > 10) then 
+			-- Sometimes they never return an owner.
+			return true
+		end
 		for auctionid = lCheckPos, lCheckSize do
 			lCheckPos = auctionid;
 			local _,_,_,_,_,_,_,_,_,_,_, owner = GetAuctionItemInfo("list", auctionid);
