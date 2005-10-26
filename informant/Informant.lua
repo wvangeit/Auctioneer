@@ -78,6 +78,8 @@ local filterDefaults = {
 		['show-vendor'] = 'on',
 		['show-vendor-buy'] = 'on',
 		['show-vendor-sell'] = 'on',
+		['show-usage'] = 'on',
+		
 	}
 
 -- FUNCTION DEFINITIONS
