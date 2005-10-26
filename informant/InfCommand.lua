@@ -158,7 +158,7 @@ end
 --
 --If chatprint is "true" then the state will also be printed to the user.
 
-local function onOff(state, chatprint)
+function onOff(state, chatprint)
 
 	if ((state == nil) or (state == "")) then
 		state = Informant.GetFilterVal("all")
