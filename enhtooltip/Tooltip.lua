@@ -1047,7 +1047,7 @@ function getLootLinkServer()
 	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")]
 end
 
-function getLootLinkLink(funcArgs, retVal, name)
+function getLootLinkLink(name)
 	local itemLink = ItemLinks[name]
 	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
 		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
@@ -1143,7 +1143,7 @@ function debugPrint(...)
 	local name, shown;
 	for i=1, NUM_CHAT_WINDOWS do
 		name,_,_,_,_,_,shown = GetChatWindowInfo(i);
-		if (string.lower(name) == "debug") then debugWin = i; break; end
+		if (name == "ETTDebug") then debugWin = i; break; end
 	end
 	if (debugWin == 0) then return end
 
