@@ -140,6 +140,7 @@ function cmdHelp()
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], getLocalizedFilterVal('show-vendor-sell'), _INFORMANT['HelpVendorSell']))
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorBuy'], getLocalizedFilterVal('show-vendor-buy'), _INFORMANT['HelpVendorBuy']))
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowUsage'], getLocalizedFilterVal('show-usage'), _INFORMANT['HelpUsage']))
+	chatPrint(string.format(lineFormat, _INFORMANT['ShowMerchant'], getLocalizedFilterVal('show-merchant'), _INFORMANT['HelpMerchant']))
 	chatPrint(string.format(lineFormat, _INFORMANT['ShowStack'], getLocalizedFilterVal('show-stack'), _INFORMANT['HelpStack']))
 	chatPrint(string.format(lineFormat, _INFORMANT['CmdEmbed'], getLocalizedFilterVal('embed'), _INFORMANT['HelpEmbed']))
 
@@ -425,6 +426,7 @@ function registerKhaos()
 				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
+			]]
 			{
 				id="show-merchant",
 				type=K_TEXT,
@@ -446,7 +448,6 @@ function registerKhaos()
 				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
-			]]
 			{
 				id="InformantVendorHeader",
 				type=K_HEADER,
