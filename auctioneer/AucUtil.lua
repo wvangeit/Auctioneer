@@ -257,7 +257,15 @@ function Auctioneer_ChatPrint(str)
 	end
 end
 
---[[ Pass true to protect the Auction Frame from being undesireably closed, not true to disable this ]]--
+function Auctioneer_SetFilterDefaults()
+	for k,v in pairs(Auctioneer_FilterDefaults) do
+		if (AuctionConfig.filters[k] == nil) then
+			AuctionConfig.filters[k] = v;
+		end
+	end
+end
+
+-- Pass true to protect the Auction Frame from being undesireably closed, not true to disable this
 function Auctioneer_ProtectAuctionFrame(enable)
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
@@ -290,7 +298,7 @@ function Auctioneer_ProtectAuctionFrame(enable)
 					UIErrorsFrame:AddMessage(_AUCT['GuiNoWorldMap'], 0, 1, 0, 1.0, UIERRORS_HOLD_TIME)
 				end
 			end
-		else
+		elseif (Auctioneer_ProtectionEnabled) then
 			--Handle disabling of protection
 			Auctioneer_ProtectionEnabled = nil;
 			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
@@ -306,14 +314,6 @@ function Auctioneer_ProtectAuctionFrame(enable)
 					SetDoublewideFrame(AuctionFrame)
 				end
 			end
-		end
-	end
-end
-
-function Auctioneer_SetFilterDefaults()
-	for k,v in pairs(Auctioneer_FilterDefaults) do
-		if (AuctionConfig.filters[k] == nil) then
-			AuctionConfig.filters[k] = v;
 		end
 	end
 end

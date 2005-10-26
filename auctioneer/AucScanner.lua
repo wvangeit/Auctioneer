@@ -398,9 +398,6 @@ function Auctioneer_ConfigureAH()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
 	end
-	
-	--Protect the auction frame from being closed if we should
-	Auctioneer_ProtectAuctionFrame(Auctioneer_GetFilterVal('protect-window') == 2);
 end
 
 function Auctioneer_AuctionFrameFilters_UpdateClasses()
@@ -580,8 +577,11 @@ function Auctioneer_AuctHouseShow()
 		AuctionsLongAuctionButton:SetChecked(1);
 		AuctionFrameAuctions.duration = 1440;
 	end
-	SetDoublewideFrame(nil);
-	UIPanelWindows["AuctionFrame"] = nil;
+	
+	-- Protect the auction frame from being closed if we should
+	if (Auctioneer_GetFilterVal('protect-window') == 2) then
+		Auctioneer_ProtectAuctionFrame(true);
+	end
 end
 
 
@@ -589,6 +589,9 @@ function Auctioneer_AuctHouseClose()
 	if Auctioneer_isScanningRequested then
 		Auctioneer_StopAuctionScan();
 	end
+	
+	-- Unprotect the auction frame
+	Auctioneer_ProtectAuctionFrame(false);
 end
 
 function Auctioneer_AuctHouseUpdate()
