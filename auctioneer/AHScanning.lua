@@ -169,7 +169,7 @@ local function Auctioneer_CanSendAuctionQuery()
 	if (lPageStartedAt) then
 		local pageElapsed = time() - lPageStartedAt;
 		if (pageElapsed > 20) then
-			if (Auctioneer_GetFilter(_AUCT['ShowRedo'])) then
+			if (Auctioneer_GetFilter('show-warning')) then
 				Auctioneer_ChatPrint(string.format(_AUCT['AuctionScanRedo'], 20));
 			end
 			Auctioneer_AuctionSubmitQuery();

@@ -534,7 +534,7 @@ function Auctioneer_NewAuction()
 	if hsp == 0 and buyCount > 0 then
 		hsp = math.ceil(buyPrice / buyCount); -- use mean buyout if median not available
 	end
-	local discountBidPercent = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctBidmarkdown'], _AUCT['OptPctBidmarkdownDefault']));
+	local discountBidPercent = tonumber(Auctioneer_GetFilterVal('pct-bidmarkdown'));
 	local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
 	local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 
@@ -555,7 +555,7 @@ function Auctioneer_NewAuction()
 			AuctionFrameAuctions.duration = dur;
 			AuctionsShortAuctionButton:SetChecked(1);
 		end
-	elseif (Auctioneer_GetFilter(_AUCT['CmdAutofill'])) then
+	elseif (Auctioneer_GetFilter('autofill')) then
 		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoMktprice'], nullSafe(mktPrice)*countFix);
 		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoOrig'], blizPrice);
 		Auctioneer_Auctions_SetWarn(warn);

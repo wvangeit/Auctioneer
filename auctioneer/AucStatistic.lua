@@ -417,11 +417,11 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	local marketPrice = Auctioneer_GetMarketPrice(itemKey, realm, buyoutValues);
 
 	-- Get our user-set pricing parameters
-	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMaxless']));
-	local discountLowPercent              = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUnderlow']));
-	local discountMarketPercent           = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctUndermkt']));
-	local discountNoCompetitionPercent    = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctNocomp']));
-	local vendorSellMarkupPercent         = tonumber(Auctioneer_GetFilterVal(_AUCT['CmdPctMarkup']));
+	local lowestAllowedPercentBelowMarket = tonumber(Auctioneer_GetFilterVal('pct-maxless'));
+	local discountLowPercent              = tonumber(Auctioneer_GetFilterVal('pct-underlow'));
+	local discountMarketPercent           = tonumber(Auctioneer_GetFilterVal('pct-undermkt'));
+	local discountNoCompetitionPercent    = tonumber(Auctioneer_GetFilterVal('pct-nocomp'));
+	local vendorSellMarkupPercent         = tonumber(Auctioneer_GetFilterVal('pct-markup'));
 
 	local x, histCount = Auctioneer_GetUsableMedian(itemKey, realm, buyoutValues);
 	histCount = nullSafe(histCount);
@@ -489,13 +489,17 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) then
 				highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountMarketPercent);
 				warn = _AUCT['FrmtWarnToolow'];
-			elseif (currentLowestBuyout > marketPrice) then
-				highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
-				warn = _AUCT['FrmtWarnAbovemkt'];
-			else -- use discount low
-				-- set highest price to "Discount low"
-				highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
-				warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
+			else
+				if (currentLowestBuyout > marketPrice) then
+					highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
+					warn = _AUCT['FrmtWarnAbovemkt'];
+				end
+				-- Account for negative discountNoCompetitionPercent values
+				if (currentLowestBuyout <= marketPrice or highestSellablePrice >= currentLowestBuyout) then
+					-- set highest price to "Discount low"
+					highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
+					warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
+				end
 			end
 		else -- no low buyout, use discount no competition
 			-- set highest price to "Discount no competition"

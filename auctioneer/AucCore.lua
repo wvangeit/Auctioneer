@@ -470,7 +470,7 @@ function Auctioneer_HookAuctionHouse()
 		local item = arg[2]
 		if (not CursorHasItem() and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
 			Auctioneer_Orig_PickupContainerItem(bag, item)
-			if (CursorHasItem() and Auctioneer_GetFilter(_AUCT['CmdAuctionClick'])) then
+			if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
 				ClickAuctionSellItemButton()
 				AuctionsFrameAuctions_ValidateAuction()
 				local start = MoneyInputFrame_GetCopper(StartPrice)
