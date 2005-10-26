@@ -60,7 +60,8 @@ function Auctioneer_OnLoad()
 	]]);
 	Stubby.RegisterBootCode("Auctioneer", "Triggers", [[
 		local function checkLoad(event)
-			if (Stubby.GetConfig("Auctioneer", "LoadType") == "auctionhouse") then
+			local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
+			if (loadType == "auctionhouse" or not loadType) then
 				LoadAddOn("Auctioneer")
 			else
 				BrowseNoResultsText:SetText("]].._AUCT['MesgNotLoaded']..[[");
