@@ -318,9 +318,9 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	itemInfo.itemSell = sell
 	itemInfo.itemQuant = quant
 
-	local embedded = getFilter(_INFORMANT['CmdEmbed'])
+	local embedded = getFilter('embed')
 
-	if (getFilter(_INFORMANT['ShowVendor'])) then
+	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then
 			local bgsc = EnhTooltip.GetTextGSC(buy)
 			local sgsc = EnhTooltip.GetTextGSC(sell)
@@ -328,20 +328,20 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 			if (count and (count > 1)) then
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
-				if (getFilter(_INFORMANT['ShowVendorBuy'])) then
+				if (getFilter('show-vendor-buy')) then
 					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuymult'], count, bgsc), buy*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
-				if (getFilter(_INFORMANT['ShowVendorSell'])) then
+				if (getFilter('show-vendor-sell')) then
 					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSellmult'], count, sgsc), sell*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			else
-				if (getFilter(_INFORMANT['ShowVendorBuy'])) then
+				if (getFilter('show-vendor-buy')) then
 					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuy']), buy, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
-				if (getFilter(_INFORMANT['ShowVendorSell'])) then
+				if (getFilter('show-vendor-sell')) then
 					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSell']), sell, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
@@ -349,12 +349,12 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		end
 	end
 
-	if (getFilter(_INFORMANT['ShowStack'])) then
+	if (getFilter('show-stack')) then
 		if (stacks > 1) then
 			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], stacks), nil, embedded)
 		end
 	end
-	if (getFilter(_INFORMANT['ShowMerchant'])) then
+	if (getFilter('show-merchant')) then
 		if (itemInfo.vendors) then
 			local merchantCount = table.getn(itemInfo.vendors)
 			if (merchantCount > 0) then
@@ -363,7 +363,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 			end
 		end
 	end
-	if (getFilter(_INFORMANT['ShowUsage'])) then
+	if (getFilter('show-usage')) then
 		local reagentInfo = ""
 		if (itemInfo.classText) then
 			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
@@ -376,7 +376,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 	end
-	if (getFilter(_INFORMANT['ShowQuest'])) then
+	if (getFilter('show-quest')) then
 		if (itemInfo.quests) then
 			local questCount = table.getn(itemInfo.quests)
 			if (questCount > 0) then
