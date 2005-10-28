@@ -37,9 +37,13 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchors>
 					<TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
 				</NormalTexture>
-				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
-						<Anchor point="LEFT"/>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-12" y="0"/>
+							</Offset>
+						</Anchor>
 					</Anchors>
 				</NormalText>
 				<PushedTextOffset>
@@ -73,9 +77,13 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchors>
 					<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
 				</NormalTexture>
-				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT">
 					<Anchors>
-						<Anchor point="LEFT"/>
+						<Anchor point="RIGHT">
+							<Offset>
+								<AbsDimension x="-12" y="0"/>
+							</Offset>
+						</Anchor>
 					</Anchors>
 				</NormalText>
 				<PushedTextOffset>
@@ -127,7 +135,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				MoneyFrame_OnEvent();
 			</OnEvent>
 			<OnShow>
-				MoneyFrame_UpdateMoney();
+				TinyMoneyFrame_UpdateMoney();
 			</OnShow>
 			<OnHide>
 				if ( this.hasPickup == 1 ) then

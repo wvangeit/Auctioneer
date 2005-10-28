@@ -530,7 +530,7 @@ function addLine(lineText, moneyAmount, embed)
 		local curMoney = EnhancedTooltip.moneyCount + 1
 		local money = getglobal("EnhancedTooltipMoney"..curMoney)
 		money:SetPoint("LEFT", line:GetName(), "RIGHT", self.moneySpacing, 0)
-		MoneyFrame_Update(money:GetName(), math.floor(moneyAmount))
+		TinyMoneyFrame_Update(money:GetName(), math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money:Show()
 		local moneyWidth = money:GetWidth()
