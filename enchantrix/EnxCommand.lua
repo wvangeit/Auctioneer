@@ -93,7 +93,7 @@ function Enchantrix_Register_Khaos()
 				feedback=function()
 					return ENCH_GUI_RELOADUI_FEEDBACK;
 				end;
-				difficulty=3;
+				difficulty=4;
 			};
 			{
 				id='embed';
@@ -305,6 +305,7 @@ function Enchantrix_Register_Khaos()
 
 	Khaos.registerOptionSet("tooltip",Enchantrix_optionSet);
 	Enchantrix_Khaos_Registered = true;
+	Khaos.refresh();
 	
 	return true;
 end
@@ -397,6 +398,20 @@ local function setKhaosSetKeyValue(key, value)
 			Khaos.setSetKeyParameter("Enchantrix", key, "value", value)
 		else
 			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): don't know how to update key ", key)
+		end
+	end
+end
+
+local function resetKhaos()
+	if (Enchantrix_Khaos_Registered) then
+		
+		Khaos.unregisterOptionSet("Enchantrix");
+		Enchantrix_Khaos_Registered = false;
+		
+		Enchantrix_Register_Khaos();
+		
+		if(Auctioneer) then
+			Enchantrix_AuctioneerLoaded();
 		end
 	end
 end
@@ -591,12 +606,16 @@ function Enchantrix_SetLocale(param, chatprint)
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		Enchantrix_CommandMap = nil
 		Enchantrix_CommandMapRev = nil
+		setKhaosSetKeyParameter('locale', "value", param);
+		resetKhaos();
 		validLocale=true;
 	elseif (param == '') or (param == 'default') or (param == 'off') then
 		Enchantrix_SetFilter('locale', 'default');
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		Enchantrix_CommandMap = nil
 		Enchantrix_CommandMapRev = nil
+		setKhaosSetKeyParameter('locale', "value", 'default');
+		resetKhaos();
 		validLocale=true;
 	end
 	
@@ -604,10 +623,8 @@ function Enchantrix_SetLocale(param, chatprint)
 		if (validLocale) then
 			if (ENCH_VALID_LOCALES[param]) then
 				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, param));
-				setKhaosSetKeyParameter('locale', "value", param);
 			else
 				Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_SET, ENCH_CMD_LOCALE, Enchantrix_LocalizeFilterVal('default')));
-				setKhaosSetKeyParameter('locale', "value", 'default');
 			end			
 		else
 			Enchantrix_ChatPrint(string.format(ENCH_FRMT_ACT_UNKNOWN_LOCALE, param));

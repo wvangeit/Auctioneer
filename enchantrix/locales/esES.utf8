@@ -60,6 +60,7 @@ ENCH_HELP_DEFAULT = "Revertir una opción de Enchantrix a su configuración de f
 ENCH_HELP_PRINTIN = "Selecciona cual ventana de mensajes va a usar Enchantrix para imprimir su informacion. Puede especificar el nombre o el índice de la ventana.";
 
 ENCH_MESG_NOTLOADED = "Enchantrix no esta cargado. Escriba /enchantrix para mas información.";
+ENCH_MESG_DISABLE = "Deshabilitando la carga automática de Enchantrix";
 
 ENCH_STAT_ON = "Mostrando la configuracion corriente para la informacion de los desencantamientos";
 ENCH_STAT_OFF = "Ocultando toda información de los desencantamientos";
@@ -110,6 +111,8 @@ ENCH_GUI_RELOADUI = "Recargar Interfáz";
 ENCH_GUI_RELOADUI_HELP = "Presione aqui para recargar el interfáz de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuración sea el mismo que el de Auctioneer.\nNota: Esta operación puede tomar unos minutos.";
 ENCH_GUI_RELOADUI_FEEDBACK = "Recargando el Interfáz de WoW";
 ENCH_GUI_EMBED = "Integrar información en la caja de ayuda";
+ENCH_GUI_COUNT = "Var valores exactos"
+ENCH_GUI_RATE = "Ver cantidad promedio";
 ENCH_GUI_VALUATE_HEADER = "Valorizaciónes";
 ENCH_GUI_VALUATE_ENABLE = "Encender Valorizaciónes";
 ENCH_GUI_VALUATE_AVERAGES = "Valorizar con promedios de Auctioneer";
@@ -128,4 +131,5 @@ ENCH_GUI_DEFAULT_OPTION = "Revertir esta opción";
 ENCH_GUI_PRINTIN = "Seleccione la ventana deseada";
 
 --ID Numbers 
+
 EssenceItemIDs = EssenceItemIDs; --This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.

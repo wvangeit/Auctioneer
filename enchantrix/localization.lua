@@ -126,7 +126,6 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_FRMT_ACT_DEFAULT_ALL= "All Enchantrix options have been reset to default settings.";
 	ENCH_FRMT_ACT_DEFAULT = "Enchantrix's %s option has been reset to its default setting";
 	
-	
 	ENCH_FRMT_DISINTO = "Disenchants into:";
 	ENCH_FRMT_FOUND = "Found that %s disenchants into:";
 	ENCH_FRMT_USAGE = "Usage:";
@@ -605,6 +604,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_PRINTIN="Selecciona cual ventana de mensajes va a usar Enchantrix para imprimir su informacion. Puede especificar el nombre o el \195\173ndice de la ventana.";
 		
 		ENCH_MESG_NOTLOADED="Enchantrix no esta cargado. Escriba /enchantrix para mas informaci\195\179n.";
+		ENCH_MESG_DISABLE="Deshabilitando la carga autom\195\161tica de Enchantrix";
 		
 		ENCH_STAT_ON="Mostrando la configuracion corriente para la informacion de los desencantamientos";
 		ENCH_STAT_OFF="Ocultando toda informaci\195\179n de los desencantamientos";
@@ -655,6 +655,8 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_RELOADUI_HELP="Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
 		ENCH_GUI_RELOADUI_FEEDBACK="Recargando el Interf\195\161z de WoW";
 		ENCH_GUI_EMBED="Integrar informaci\195\179n en la caja de ayuda";
+		ENCH_GUI_COUNT="Var valores exactos"
+		ENCH_GUI_RATE="Ver cantidad promedio";
 		ENCH_GUI_VALUATE_HEADER="Valorizaci\195\179nes";
 		ENCH_GUI_VALUATE_ENABLE="Encender Valorizaci\195\179nes";
 		ENCH_GUI_VALUATE_AVERAGES="Valorizar con promedios de Auctioneer";
@@ -673,12 +675,8 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_PRINTIN="Seleccione la ventana deseada";
 		
 		--ID Numbers 
+		
 		EssenceItemIDs=EssenceItemIDs; --This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
-
-		-- The following definitions are missing in this locale:
-		--	ENCH_GUI_COUNT = "";
-		--	ENCH_GUI_RATE = "";
-		--	ENCH_MESG_DISABLE = "";
 
 	end
 

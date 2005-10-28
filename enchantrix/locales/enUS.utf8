@@ -78,7 +78,6 @@ ENCH_FRMT_ACT_UNKNOWN_LOCALE = "The locale you specified ('%s') is unknown. Vali
 ENCH_FRMT_ACT_DEFAULT_ALL= "All Enchantrix options have been reset to default settings.";
 ENCH_FRMT_ACT_DEFAULT = "Enchantrix's %s option has been reset to its default setting";
 
-
 ENCH_FRMT_DISINTO = "Disenchants into:";
 ENCH_FRMT_FOUND = "Found that %s disenchants into:";
 ENCH_FRMT_USAGE = "Usage:";
