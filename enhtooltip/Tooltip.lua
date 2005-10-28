@@ -431,6 +431,7 @@ function showTooltip(currentTooltip)
 		
 	EnhancedTooltip:SetHeight(height)
 	EnhancedTooltip:SetWidth(width)
+	EnhancedTooltip:Show()
 	
 	for i = 1, 20 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
@@ -441,8 +442,6 @@ function showTooltip(currentTooltip)
 			ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
 		end
 	end
-		
-	EnhancedTooltip:Show()
 end
 
 -- calculate the gold, silver, and copper values based the amount of copper
