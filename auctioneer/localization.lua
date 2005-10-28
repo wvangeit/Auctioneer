@@ -1141,7 +1141,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf\195\161z de WoW";
 		_AUCT['GuiRedo'] = "Mostrar Advertencia de Exploraci\195\179n";
 		_AUCT['GuiDefaultAllButton'] = "Revertir Todo";
-		_AUCT['GuiDefaultAll'] = "Revertir todas las opciones de Auctioneer";
+		_AUCT['GuiDefaultAll'] = "Revertir todas las opciones";
 		_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_AUCT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
 		_AUCT['GuiPrintin'] = "Seleccione la ventana deseada";

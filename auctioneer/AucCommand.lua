@@ -204,7 +204,7 @@ function Auctioneer_Register_Khaos()
 				feedback=function()
 					return _AUCT['GuiReloaduiFeedback'];
 				end;
-				difficulty=3;
+				difficulty=4;
 			};
 			{
 				id="show-warning";
@@ -719,6 +719,7 @@ function Auctioneer_Register_Khaos()
 
 	Khaos.registerOptionSet("tooltip", optionSet);
 	Auctioneer_Khaos_Registered = true;
+	Khaos.refresh();
 
 	return true;
 end
@@ -747,6 +748,16 @@ local function setKhaosSetKeyValue(key, value)
 		else
 			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
 		end
+	end
+end
+
+local function resetKhaos()
+	if (Auctioneer_Khaos_Registered) then
+		
+		Khaos.unregisterOptionSet("Auctioneer");
+		Auctioneer_Khaos_Registered = false;
+		
+		Auctioneer_Register_Khaos();
 	end
 end
 
@@ -937,22 +948,25 @@ end
 --The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function Auctioneer_Clear(param, chatprint)
 
-	local aKey = Auctioneer_GetAuctionKey();
-	local clearok = nil;
-
 	if ((param == _AUCT['CmdClearAll']) or (param == "all")) then
+
 		AuctionConfig.data = {};
 		AuctionConfig.info = {};
 		AuctionConfig.snap = {};
 		AuctionConfig.sbuy = {};
 	elseif ((param == _AUCT['CmdClearSnapshot']) or (param == "snapshot")) then
+
 		AuctionConfig.snap = {};
 		AuctionConfig.sbuy = {};
 		lSnapshotItemPrices = {};
 	else
+
+		local aKey = Auctioneer_GetAuctionKey();
 		local items = Auctioneer_GetItems(param);
+
 		if (items) then
 			for pos,itemKey in pairs(items) do
+
 				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 					AuctionConfig.data[aKey][itemKey] = nil;
 
@@ -978,6 +992,7 @@ function Auctioneer_Clear(param, chatprint)
 
 					local count = 0;
 					while (AuctionConfig.snap[aKey][count] ~= nil) do
+
 						if (AuctionConfig.snap[aKey][count][itemKey] ~= nil) then
 							AuctionConfig.snap[aKey][count][itemKey] =nil;
 						end
@@ -1052,19 +1067,22 @@ function Auctioneer_SetLocale(param, chatprint)
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 		Auctioneer_CommandMap = nil
 		Auctioneer_CommandMapRev = nil
+		setKhaosSetKeyValue('locale', param);
+		resetKhaos();
 		validLocale=true;
 	elseif ((param == '') or (param == _AUCT['CmdDefault']) or (param == 'default') or (param == _AUCT['CmdOff']) or (param == 'off')) then
 		Auctioneer_SetFilter('locale', _AUCT['CmdDefault']);
 		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
 		Auctioneer_CommandMap = nil
 		Auctioneer_CommandMapRev = nil
+		setKhaosSetKeyValue('locale', param);
+		resetKhaos();
 		validLocale=true;
 	end
 
 	if (chatprint) then
 		if (validLocale and (AUCT_VALID_LOCALES[param])) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdLocale'], param));
-			setKhaosSetKeyValue('locale', param);
 		elseif (not validLocale) then
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtUnknownLocale'], param));
 			if (AUCT_VALID_LOCALES) then
@@ -1074,7 +1092,6 @@ function Auctioneer_SetLocale(param, chatprint)
 			end
 		else
 			Auctioneer_ChatPrint(string.format(_AUCT['FrmtActSet'], _AUCT['CmdLocale'], _AUCT['CmdDefault']));
-			setKhaosSetKeyValue('locale', param);
 		end
 	end
 end
