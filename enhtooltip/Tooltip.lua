@@ -935,9 +935,19 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
 		local name = nameFromLink(link)
-		local quantity = GetInventoryItemCount(unit, slot)
+		local quantity
+		if (slot >= 20 and slot <= 23) then
+			-- Workaround for bag slots. Quiver slots report the number of
+			-- arrows in there instead of 1 for the actual bag.
+			-- And well, bags aren't stackable anyway, so here you go:
+			quantity = 1
+		else
+			GetInventoryItemCount(unit, slot)
+		end
 		local quality = GetInventoryItemQuality(unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link) end
+
+		EnhTooltip.DebugPrint("gtHookSetInventoryItem", slot)
 
 		tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
