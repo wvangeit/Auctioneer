@@ -1004,12 +1004,12 @@ function Auctioneer_OnOff(state, chatprint)
 	if (state == 'on' or state == 'off') then
 		Auctioneer_SetFilter('all', state);
 	elseif (state == 'toggle') then
-		Auctioneer_SetFilter(not Auctioneer_GetFilter(all));
+		Auctioneer_SetFilter('all', not Auctioneer_GetFilter('all'));
 	end
 
 	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint) then
-		state = Auctioneer_GetFilter(all)
+		state = Auctioneer_GetFilter('all')
 		setKhaosSetKeyValue("enabled", state)
 
 		if (state) then
