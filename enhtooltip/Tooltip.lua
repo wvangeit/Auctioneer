@@ -947,8 +947,6 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 		local quality = GetInventoryItemQuality(unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link) end
 
-		EnhTooltip.DebugPrint("gtHookSetInventoryItem", slot)
-
 		tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
