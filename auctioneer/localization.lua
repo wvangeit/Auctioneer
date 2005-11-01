@@ -719,6 +719,11 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdProtectWindow0'] = "never"
 		_AUCT['CmdProtectWindow1'] = "scan"
 		_AUCT['CmdProtectWindow2'] = "always"
+		_AUCT['CmdAuctionDuration'] = "auction-duration"
+		_AUCT['CmdAuctionDuration0'] = "last"
+		_AUCT['CmdAuctionDuration1'] = "2h"
+		_AUCT['CmdAuctionDuration2'] = "8h"
+		_AUCT['CmdAuctionDuration3'] = "24h"
 		
 		_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
 		_AUCT['CmdPctMarkup'] = "pct-markup";
@@ -739,7 +744,8 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptScaleDefault'] = 1.0;
 		_AUCT['OptDefault'] = "(<Option>|".._AUCT['CmdClearAll']..")";
 		_AUCT['OptPrintin'] = "(<Index>[Nummer]|<Name>[Zeichenfolge])";
-		_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."|".._AUCT['CmdProtectWindow1'].."|".._AUCT['CmdProtectWindow2']..")";
+		_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."||".._AUCT['CmdProtectWindow1'].."||".._AUCT['CmdProtectWindow2']..")";
+		_AUCT['OptAuctionDuration'] = "(".._AUCT['CmdAuctionDuration0'].."||".._AUCT['CmdAuctionDuration1'].."||".._AUCT['CmdAuctionDuration2'].."||".._AUCT['CmdAuctionDuration3']..")";
 		
 		_AUCT['OptPctBidmarkdown'] = "<Prozent>";
 		_AUCT['OptPctMarkup'] = "<Prozent>";
@@ -787,6 +793,8 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpPrintin'] = "Ausw\195\164hlen in welchem Fenster die Auctioneer-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
 		_AUCT['HelpAuctionClick'] = "Erlaubt es mittels Alt-Klick automatisch eine Auktion f\195\188r einen Gegenstand aus deiner Tasche zu starten";
 		_AUCT['HelpProtectWindow'] = "Verhindert das versehentliche Schlie\195\159en des Auktionshaus-Fensters.";
+		_AUCT['HelpAuctionDuration'] = "Setzt die Standard-Auktionsdauer beim \195\150ffnen des Auktionshaus-Fensters";
+		_AUCT['HelpLoad'] = "\195\132ndert das Ladeverhalten von Auctioneer f\195\188r diesen Charakter";
 		
 		_AUCT['DisableMsg'] = "Das automatische Laden von Auctioneer wird deaktiviert";
 		
@@ -807,6 +815,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['FrmtPrintin'] = "Die Auctioneer-Meldungen werden nun im Chat-Fenster \"%s\" angezeigt";
 		_AUCT['FrmtAutostart'] = "Automatischer Start der Auktion f\195\188r %s Minimum, %s Sofortkauf (%dh)"
 		_AUCT['FrmtProtectWindow'] = "Der Schutzmodus des Auktionshaus-Fensters wurde auf \"%s\" gesetzt";
+		_AUCT['FrmtAuctionDuration'] = "Die Standard-Auktionsdauer wurde auf \"%s\" gesetzt";
 		
 		_AUCT['TextScan'] = "Scannen";
 		_AUCT['TextAuction'] = "Auktion";
@@ -891,6 +900,13 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiDefaultOption'] = "Zur\195\188cksetzen folgender Einstellung";
 		_AUCT['GuiPrintin'] = "Fenster f\195\188r Meldungen ausw\195\164hlen";
 		_AUCT['GuiProtectWindow'] = "Schlie\195\159en des AH-Fensters verhindern";
+		_AUCT['GuiAuctionDuration'] = "Standard-Auktionsdauer";
+		_AUCT['GuiAuctionHouseHeader'] = "Auktionshaus-Fenster";
+		_AUCT['GuiAuctionHouseHeaderHelp'] = "\195\132ndert das Verhalten des Auktionshaus-Fensters";
+		_AUCT['GuiLoad'] = "Auctioneer automatisch laden";
+		_AUCT['GuiLoad_Never'] = 'nie';
+		_AUCT['GuiLoad_Always'] = 'immer';
+		_AUCT['GuiLoad_AuctionHouse'] = 'im Auktionshaus';
 	end
 
 -- Locale strings for the esES locale
