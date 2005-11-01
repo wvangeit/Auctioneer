@@ -43,6 +43,7 @@ function Auctioneer_SetLocaleStrings(locale)
 -- Default locale strings are defined in English
 	
 	
+	
 	_AUCT['TimeShort'] = "Short";
 	_AUCT['TimeMed'] = "Medium";
 	_AUCT['TimeLong'] = "Long";
@@ -148,6 +149,11 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdProtectWindow0'] = "never"
 	_AUCT['CmdProtectWindow1'] = "scan"
 	_AUCT['CmdProtectWindow2'] = "always"
+	_AUCT['CmdAuctionDuration'] = "auction-duration"
+	_AUCT['CmdAuctionDuration0'] = "last"
+	_AUCT['CmdAuctionDuration1'] = "2h"
+	_AUCT['CmdAuctionDuration2'] = "8h"
+	_AUCT['CmdAuctionDuration3'] = "24h"
 	
 	_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
 	_AUCT['CmdPctMarkup']      = "pct-markup";
@@ -168,7 +174,8 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['OptScaleDefault'] = 1.0;
 	_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
 	_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
-	_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."|".._AUCT['CmdProtectWindow1'].."|".._AUCT['CmdProtectWindow2']..")";
+	_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."||".._AUCT['CmdProtectWindow1'].."||".._AUCT['CmdProtectWindow2']..")";
+	_AUCT['OptAuctionDuration'] = "(".._AUCT['CmdAuctionDuration0'].."||".._AUCT['CmdAuctionDuration1'].."||".._AUCT['CmdAuctionDuration2'].."||".._AUCT['CmdAuctionDuration3']..")";
 	
 	_AUCT['OptPctBidmarkdown'] = "<percent>";
 	_AUCT['OptPctMarkup'] = "<percent>";
@@ -215,7 +222,9 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpDefault'] = "Set an Auctioneer option to it's default value. You may also specify the special keyword \"all\" to set all Auctioneer options to their default values."
 	_AUCT['HelpPrintin'] = "Select which frame Auctioneer will print out it's messages. You can either specify the frame's name or the frame's index.";
 	_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
-	_AUCT['HelpProtectWindow'] = "Prevents you from accidentally closing the Auction House interface.";
+	_AUCT['HelpProtectWindow'] = "Prevents you from accidentally closing the Auction House interface";
+	_AUCT['HelpAuctionDuration'] = "Set the default auction duration upon opening the Auction House interface";
+	_AUCT['HelpLoad'] = "Change Auctioneer's load settings for this toon";
 	
 	_AUCT['DisableMsg'] = "Disabling automatic loading of Auctioneer";
 	
@@ -236,6 +245,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['FrmtPrintin'] = "Auctioneer's messages will now print on the \"%s\" chat frame";
 	_AUCT['FrmtAutostart'] = "Automatically starting auction for %s minimum, %s buyout (%dh)"
 	_AUCT['FrmtProtectWindow'] = "Auction House window protection set to: %s";
+	_AUCT['FrmtAuctionDuration'] = "Default auction duration set to: %s";
 	
 	_AUCT['TextScan'] = "Scan";
 	_AUCT['TextAuction'] = "auction";
@@ -320,7 +330,13 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiDefaultOption'] = "Reset this setting";
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
 	_AUCT['GuiProtectWindow'] = "Prevent accidental closing of AH window";
-
+	_AUCT['GuiAuctionDuration'] = "Default auction duration";
+	_AUCT['GuiAuctionHouseHeader'] = "Auction House window";
+	_AUCT['GuiAuctionHouseHeaderHelp'] = "Change the behavior of the Auction House window";
+	_AUCT['GuiLoad'] = "Load Auctioneer automatically";
+	_AUCT['GuiLoad_Never'] = 'never';
+	_AUCT['GuiLoad_Always'] = 'always';
+	_AUCT['GuiLoad_AuctionHouse'] = 'at Auction House';
 -- Locale strings for the daDK locale
 	if locale == "daDK" then
 		-- Encoded in UTF8

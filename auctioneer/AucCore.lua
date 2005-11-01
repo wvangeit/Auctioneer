@@ -102,6 +102,8 @@ Auctioneer_FilterDefaults = {
 		["scan-class9"]  = "on",
 		["scan-class10"] = "on",
 		['printframe'] = 1,
+		['last-auction-duration'] = 1440,
+		['auction-duration'] = 3,
 		['pct-bidmarkdown'] = 20,
 		['pct-markup'] = 300,
 		['pct-maxless'] = 30, 
@@ -463,6 +465,7 @@ function Auctioneer_HookAuctionHouse()
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
 	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer_AuctionFrameFilters_UpdateClasses);
+	Stubby.RegisterFunctionHook("AuctionsRadioButton_OnClick", 200, Auctioneer_OnChangeAuctionDuration);
 
 	Auctioneer_Orig_PickupContainerItem = PickupContainerItem
 	PickupContainerItem = function(...)

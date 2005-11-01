@@ -124,6 +124,42 @@ function Auctioneer_GetKhaosDefault(filter)
 	end
 end
 
+
+local function setKhaosSetKeyParameter(key, parameter, value)
+	if (Auctioneer_Khaos_Registered) then
+		if (Khaos.getSetKey("Auctioneer", key)) then
+			Khaos.setSetKeyParameter("Auctioneer", key, parameter, value)
+		else
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+		end
+	end
+end
+
+local function setKhaosSetKeyValue(key, value)
+	if (Auctioneer_Khaos_Registered) then
+		local kKey = Khaos.getSetKey("Auctioneer", key)
+
+		if (not kKey) then
+			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+		elseif (kKey.checked ~= nil) then
+			if (type(value) == "string") then value = (value == "on"); end
+			Khaos.setSetKeyParameter("Auctioneer", key, "checked", value)
+		elseif (kKey.value ~= nil) then
+			Khaos.setSetKeyParameter("Auctioneer", key, "value", value)
+		else
+			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
+		end
+	end
+end
+
+local function getKhaosLocaleList()
+	local options = { [_AUCT['CmdDefault']] = 'default' };
+	for locale, _ in pairs(AUCT_VALID_LOCALES) do
+		options[locale] = locale;
+	end
+	return options
+end
+		
 function Auctioneer_Register_Khaos()
 
 	-- Convert old Khaos settings to current optionSet
@@ -168,10 +204,31 @@ function Auctioneer_Register_Khaos()
 				difficulty=1;
 			};
 			{
-				id="locale";
-				type=K_EDITBOX;
+				id="LoadSettings";
+				type=K_PULLDOWN;
 				setup = {
-					callOn = {"enter", "tab"};
+					options = {
+						[_AUCT['GuiLoad_Always']] = 'always',
+						[_AUCT['GuiLoad_Never']] = 'never',
+						[_AUCT['GuiLoad_AuctionHouse']] = 'auctionhouse' };
+					multiSelect = false;
+				};
+				text=_AUCT['GuiLoad'];
+				helptext=_AUCT['HelpLoad'];
+				callback=function(state) end;
+				feedback=function(state)
+					Auctioneer_Command("load " .. state.value, "GUI")
+				end;
+				default={value = 'auctionhouse'};
+				disabled={value = 'never'};
+				difficulty=1;
+			};			
+			{
+				id="locale";
+				type=K_PULLDOWN;
+				setup = {
+					options = getKhaosLocaleList();
+					multiSelect = false;
 				};
 				text=_AUCT['GuiLocale'];
 				helptext=_AUCT['HelpLocale'];
@@ -189,87 +246,6 @@ function Auctioneer_Register_Khaos()
 				};
 				dependencies={enabled={checked=true;}};
 				difficulty=2;
-			};
-			{
-				id="ReloadUI";
-				type=K_BUTTON;
-				setup={
-					buttonText = _AUCT['GuiReloaduiButton'];
-				};
-				text=_AUCT['GuiReloadui'];
-				helptext=_AUCT['GuiReloaduiHelp'];
-				callback=function()
-					ReloadUI();
-				end;
-				feedback=function()
-					return _AUCT['GuiReloaduiFeedback'];
-				end;
-				difficulty=4;
-			};
-			{
-				id="show-warning";
-				type=K_TEXT;
-				text=_AUCT['GuiRedo'];
-				helptext=_AUCT['HelpRedo'];
-				callback=function(state)
-					Auctioneer_GenVarSet("show-warning", state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowRedo']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowRedo']));
-					end
-				end;
-				check=true;
-				default={checked=Auctioneer_GetKhaosDefault('show-warning')};
-				disabled={checked=false};
-				dependencies={enabled={checked=true;}};
-				difficulty=1;
-			};
-			{
-				id="protect-window";
-				type=K_PULLDOWN;
-				setup = {
-					options = {
-						[_AUCT['CmdProtectWindow0']] = 0,
-						[_AUCT['CmdProtectWindow1']] = 1,
-						[_AUCT['CmdProtectWindow2']] = 2 };
-					multiSelect = false;
-				};
-				text=_AUCT['GuiProtectWindow'];
-				helptext=_AUCT['HelpProtectWindow'];
-				callback=function(state)
-					Auctioneer_CmdProtectWindow(state.value);
-				end;
-				feedback=function(state)
-					return string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')]);
-				end;
-				default = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
-				disabled = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
-				dependencies={enabled={checked=true;}};
-				difficulty=3;
-			};			
-			{
-				id="show-verbose";
-				type=K_TEXT;
-				text=_AUCT['GuiVerbose'];
-				helptext=_AUCT['HelpVerbose'];
-				callback=function(state)
-					Auctioneer_GenVarSet("show-verbose", state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVerbose']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVerbose']));
-					end
-				end;
-				check=true;
-				default={checked=Auctioneer_GetKhaosDefault('show-verbose')};
-				disabled={checked=false};
-				dependencies={enabled={checked=true;}};
-				difficulty=1;
 			};
 			{
 				id="AuctioneerStatsHeader";
@@ -362,6 +338,123 @@ function Auctioneer_Register_Khaos()
 				dependencies={enabled={checked=true;}};
 				difficulty=2;
 			};
+			{
+				id="show-verbose";
+				type=K_TEXT;
+				text=_AUCT['GuiVerbose'];
+				helptext=_AUCT['HelpVerbose'];
+				callback=function(state)
+					Auctioneer_GenVarSet("show-verbose", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowVerbose']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowVerbose']));
+					end
+				end;
+				check=true;
+				default={checked=Auctioneer_GetKhaosDefault('show-verbose')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=1;
+			};			
+			{
+				id="AuctioneerAuctionHouseHeader";
+				type=K_HEADER;
+				text=_AUCT['GuiAuctionHouseHeader'];
+				helptext=_AUCT['GuiAuctionHouseHeaderHelp'];
+				difficulty=1;
+			};
+			{
+				id="autofill";
+				type=K_TEXT;
+				text=_AUCT['GuiAutofill'];
+				helptext=_AUCT['HelpAutofill'];
+				callback=function(state)
+					Auctioneer_GenVarSet("autofill", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdAutofill']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdAutofill']));
+					end
+				end;
+				check=true;
+				default={checked=Auctioneer_GetKhaosDefault('autofill')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=1;
+			};
+			{
+				id="auction-duration";
+				type=K_PULLDOWN;
+				setup = {
+					options = {
+						[_AUCT['CmdAuctionDuration0']] = 0,
+						[_AUCT['CmdAuctionDuration1']] = 1,
+						[_AUCT['CmdAuctionDuration2']] = 2,
+						[_AUCT['CmdAuctionDuration3']] = 3 };
+					multiSelect = false;
+				};
+				text=_AUCT['GuiAuctionDuration'];
+				helptext=_AUCT['HelpAuctionDuration'];
+				callback=function(state)
+					Auctioneer_CmdAuctionDuration(state.value);
+				end;
+				feedback=function(state)
+					return string.format(_AUCT['FrmtAuctionDuration'], _AUCT['CmdAuctionDuration'..Auctioneer_GetFilterVal('auction-duration')]);
+				end;
+				default = { value = _AUCT['CmdAuctionDuration'..Auctioneer_FilterDefaults['auction-duration']] };
+				disabled = { value = _AUCT['CmdAuctionDuration'..Auctioneer_FilterDefaults['auction-duration']] };
+				dependencies={enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="protect-window";
+				type=K_PULLDOWN;
+				setup = {
+					options = {
+						[_AUCT['CmdProtectWindow0']] = 0,
+						[_AUCT['CmdProtectWindow1']] = 1,
+						[_AUCT['CmdProtectWindow2']] = 2 };
+					multiSelect = false;
+				};
+				text=_AUCT['GuiProtectWindow'];
+				helptext=_AUCT['HelpProtectWindow'];
+				callback=function(state)
+					Auctioneer_CmdProtectWindow(state.value);
+				end;
+				feedback=function(state)
+					return string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')]);
+				end;
+				default = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
+				disabled = { value = _AUCT['CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']] };
+				dependencies={enabled={checked=true;}};
+				difficulty=3;
+			};			
+			{
+				id="show-warning";
+				type=K_TEXT;
+				text=_AUCT['GuiRedo'];
+				helptext=_AUCT['HelpRedo'];
+				callback=function(state)
+					Auctioneer_GenVarSet("show-warning", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowRedo']));
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowRedo']));
+					end
+				end;
+				check=true;
+				default={checked=Auctioneer_GetKhaosDefault('show-warning')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=1;
+			};			
 			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
@@ -581,27 +674,6 @@ function Auctioneer_Register_Khaos()
 				difficulty=1;
 			};
 			{
-				id="autofill";
-				type=K_TEXT;
-				text=_AUCT['GuiAutofill'];
-				helptext=_AUCT['HelpAutofill'];
-				callback=function(state)
-					Auctioneer_GenVarSet("autofill", state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['CmdAutofill']));
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['CmdAutofill']));
-					end
-				end;
-				check=true;
-				default={checked=Auctioneer_GetKhaosDefault('autofill')};
-				disabled={checked=false};
-				dependencies={enabled={checked=true;}};
-				difficulty=1;
-			};
-			{
 				id="also";
 				type=K_EDITBOX;
 				setup = {
@@ -628,6 +700,48 @@ function Auctioneer_Register_Khaos()
 				dependencies={enabled={checked=true;}};
 				difficulty=2;
 			};
+			{
+				id="printframe";
+				type=K_PULLDOWN;
+				setup = {
+					options = Auctioneer_GetFrameNames();
+					multiSelect = false;
+				};
+				text=_AUCT['GuiPrintin'];
+				helptext=_AUCT['HelpPrintin'];
+				callback=function(state)
+					Auctioneer_SetFrame(state.value);
+				end;
+				feedback=function(state)
+					local _, frameName = Auctioneer_GetFrameNames(state.value)
+					return string.format(_AUCT['FrmtPrintin'], frameName);
+				end;
+				default = { value = Auctioneer_GetKhaosDefault('printframe') };
+				disabled = { value = Auctioneer_GetKhaosDefault('printframe') };
+				dependencies={enabled={checked=true;}};
+				difficulty=3;
+			};
+			{
+				id="show-link";
+				type=K_TEXT;
+				text=_AUCT['GuiLink'];
+				helptext=_AUCT['HelpLink'];
+				callback=function(state)
+					Auctioneer_GenVarSet("show-link", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowLink']))
+					else
+						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowLink']))
+					end
+				end;
+				check=true;
+				default={Auctioneer_GetKhaosDefault('show-link')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=3;
+			};			
 			{
 				id="DefaultAll";
 				type=K_BUTTON;
@@ -673,46 +787,20 @@ function Auctioneer_Register_Khaos()
 				difficulty=4;
 			};
 			{
-				id="printframe";
-				type=K_PULLDOWN;
-				setup = {
-					options = Auctioneer_GetFrameNames();
-					multiSelect = false;
+				id="ReloadUI";
+				type=K_BUTTON;
+				setup={
+					buttonText = _AUCT['GuiReloaduiButton'];
 				};
-				text=_AUCT['GuiPrintin'];
-				helptext=_AUCT['HelpPrintin'];
-				callback=function(state)
-					Auctioneer_SetFrame(state.value);
+				text=_AUCT['GuiReloadui'];
+				helptext=_AUCT['GuiReloaduiHelp'];
+				callback=function()
+					ReloadUI();
 				end;
-				feedback=function(state)
-					local _, frameName = Auctioneer_GetFrameNames(state.value)
-					return string.format(_AUCT['FrmtPrintin'], frameName);
+				feedback=function()
+					return _AUCT['GuiReloaduiFeedback'];
 				end;
-				default = { value = Auctioneer_GetKhaosDefault('printframe') };
-				disabled = { value = Auctioneer_GetKhaosDefault('printframe') };
-				dependencies={enabled={checked=true;}};
-				difficulty=3;
-			};
-			{
-				id="show-link";
-				type=K_TEXT;
-				text=_AUCT['GuiLink'];
-				helptext=_AUCT['HelpLink'];
-				callback=function(state)
-					Auctioneer_GenVarSet("show-link", state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_AUCT['FrmtActEnable'], _AUCT['ShowLink']))
-					else
-						return (string.format(_AUCT['FrmtActDisable'], _AUCT['ShowLink']))
-					end
-				end;
-				check=true;
-				default={Auctioneer_GetKhaosDefault('show-link')};
-				disabled={checked=false};
-				dependencies={enabled={checked=true;}};
-				difficulty=3;
+				difficulty=4;
 			};
 		};
 	};
@@ -720,35 +808,14 @@ function Auctioneer_Register_Khaos()
 	Khaos.registerOptionSet("tooltip", optionSet);
 	Auctioneer_Khaos_Registered = true;
 	Khaos.refresh();
+	
+	-- This setting is not actually stored in the Khaos option set and
+	-- requires special treatment to be updated
+	local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
+	if (not loadType) then loadType = "auctionhouse"; end
+	setKhaosSetKeyValue("LoadSettings", loadType)
 
 	return true;
-end
-
-local function setKhaosSetKeyParameter(key, parameter, value)
-	if (Auctioneer_Khaos_Registered) then
-		if (Khaos.getSetKey("Auctioneer", key)) then
-			Khaos.setSetKeyParameter("Auctioneer", key, parameter, value)
-		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
-		end
-	end
-end
-
-local function setKhaosSetKeyValue(key, value)
-	if (Auctioneer_Khaos_Registered) then
-		local kKey = Khaos.getSetKey("Auctioneer", key)
-
-		if (not kKey) then
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
-		elseif (kKey.checked ~= nil) then
-			if (type(value) == "string") then value = (value == "on"); end
-			Khaos.setSetKeyParameter("Auctioneer", key, "checked", value)
-		elseif (kKey.value ~= nil) then
-			Khaos.setSetKeyParameter("Auctioneer", key, "value", value)
-		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
-		end
-	end
 end
 
 local function resetKhaos()
@@ -778,6 +845,7 @@ function Auctioneer_BuildCommandMap()
 			[_AUCT['CmdCompete']] = 'compete',
 			[_AUCT['CmdScan']] = 'scan',
 			[_AUCT['CmdAutofill']] = 'autofill',
+			[_AUCT['CmdAuctionDuration']] = 'auction-duration',
 			[_AUCT['CmdProtectWindow']] = 'protect-window',
 			[_AUCT['CmdBroker']] = 'broker';
 			[_AUCT['CmdBidbroker']] = 'bidbroker',
@@ -825,10 +893,14 @@ function Auctioneer_Command(command, source)
 	elseif (cmd == 'disable') then
 		Auctioneer_ChatPrint(_AUCT['DisableMsg']);
 		Stubby.SetConfig("Auctioneer", "LoadType", "never");
+		setKhaosSetKeyValue("LoadSettings", "never")
 	elseif (cmd == 'load') then
 		if (param == "always") or (param == "never") or (param == "auctionhouse") then
-			Auctioneer_ChatPrint("Setting Auctioneer to "..param.." load for this toon");
 			Stubby.SetConfig("Auctioneer", "LoadType", param);
+			if (chatprint) then
+				Auctioneer_ChatPrint("Setting Auctioneer to "..param.." load for this toon");
+				setKhaosSetKeyValue("LoadSettings", param)
+			end
 		end
 	elseif (cmd == 'clear') then
 		Auctioneer_Clear(param, chatprint);
@@ -852,6 +924,8 @@ function Auctioneer_Command(command, source)
 		Auctioneer_RequestAuctionScan();
 	elseif (cmd == 'protect-window') then
 		Auctioneer_CmdProtectWindow(param, chatprint);
+	elseif (cmd == 'auction-duration') then
+		Auctioneer_CmdAuctionDuration(param, chatprint);
 	elseif (cmd == 'low') then
 		Auctioneer_DoLow(param);
 	elseif (cmd == 'med') then
@@ -897,6 +971,7 @@ function Auctioneer_ChatPrint_Help()
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdProtectWindow'], _AUCT['OptProtectWindow'], _AUCT['CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')], _AUCT['HelpProtectWindow']));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdAuctionDuration'], _AUCT['OptAuctionDuration'], _AUCT['CmdAuctionDuration'..Auctioneer_GetFilterVal('auction-duration')], _AUCT['HelpAuctionDuration']));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdLocale'], _AUCT['OptLocale'], Auctioneer_GetLocalizedFilterVal("locale"), _AUCT['HelpLocale']));
 
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT['CmdPctMarkup'], _AUCT['OptPctMarkup'], Auctioneer_GetFilterVal('pct-markup'), _AUCT['HelpPctMarkup']));
@@ -1240,6 +1315,31 @@ function Auctioneer_CmdProtectWindow(param, chatprint)
 		Auctioneer_ChatPrint(string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdProtectWindow' .. mode]));
 		setKhaosSetKeyValue("protect-window", mode);
 	end
+end
+
+function Auctioneer_CmdAuctionDuration(param, chatprint)
+	local mode;
+	
+	if (param == 'last' or param == _AUCT['CmdAuctionDuration0'] or tonumber(param) == 0) then
+		mode = 0;
+	elseif (param == '2h' or param == _AUCT['CmdAuctionDuration1'] or tonumber(param) == 1) then
+		mode = 1;
+	elseif (param == '8h' or param == _AUCT['CmdAuctionDuration2'] or tonumber(param) == 2) then
+		mode = 2;
+	elseif (param == '24h' or param == _AUCT['CmdAuctionDuration3'] or tonumber(param) == 3) then
+		mode = 3;
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtUnknownArg'], param, Auctioneer_DelocalizeCommand("auction-duration")));
+		return
+	end
+	
+	Auctioneer_SetFilter("auction-duration", mode);
+	
+	if (chatprint) then
+		Auctioneer_ChatPrint(string.format(_AUCT['FrmtProtectWindow'], _AUCT['CmdAuctionDuration' .. mode]));
+		setKhaosSetKeyValue("protect-window", mode);
+	end
+
 end
 
 function Auctioneer_GenVarSet(variable, param, chatprint)

@@ -542,16 +542,7 @@ function Auctioneer_NewAuction()
 		Auctioneer_Auctions_SetWarn(_AUCT['FrmtWarnUser']);
 		MoneyInputFrame_SetCopper(StartPrice, start*countFix);
 		MoneyInputFrame_SetCopper(BuyoutPrice, buy*countFix);
-		if (dur == 1440) then
-			AuctionFrameAuctions.duration = dur;
-			AuctionsLongAuctionButton:SetChecked(1);
-		elseif (dur == 480) then
-			AuctionFrameAuctions.duration = dur;
-			AuctionsMediumAuctionButton:SetChecked(1);
-		elseif (dur == 120) then
-			AuctionFrameAuctions.duration = dur;
-			AuctionsShortAuctionButton:SetChecked(1);
-		end
+		Auctioneer_SetAuctionDuration(tonumber(dur));
 	elseif (Auctioneer_GetFilter('autofill')) then
 		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoMktprice'], nullSafe(mktPrice)*countFix);
 		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoOrig'], blizPrice);
@@ -566,21 +557,21 @@ function Auctioneer_NewAuction()
 end
 
 function Auctioneer_AuctHouseShow()
-	if Auctioneer_isScanningRequested then
-		Auctioneer_StartAuctionScan();
+	-- Set the default auction duration
+	if (Auctioneer_GetFilterVal('auction-duration') > 0) then
+		Auctioneer_SetAuctionDuration(Auctioneer_GetFilterVal('auction-duration'))
 	else
-		AuctionsShortAuctionButton:SetChecked(nil);
-		AuctionsMediumAuctionButton:SetChecked(nil);
-		AuctionsLongAuctionButton:SetChecked(nil);
-
-		-- default to 24 hour auctions
-		AuctionsLongAuctionButton:SetChecked(1);
-		AuctionFrameAuctions.duration = 1440;
+		Auctioneer_SetAuctionDuration(Auctioneer_GetFilterVal('last-auction-duration'))
 	end
 	
 	-- Protect the auction frame from being closed if we should
 	if (Auctioneer_GetFilterVal('protect-window') == 2) then
 		Auctioneer_ProtectAuctionFrame(true);
+	end
+	
+	-- Start scanning if so requested
+	if Auctioneer_isScanningRequested then
+		Auctioneer_StartAuctionScan();
 	end
 end
 
@@ -627,5 +618,31 @@ function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, i
 	end
 end
 
+local ignoreAuctionDurationChange = nil
+function Auctioneer_OnChangeAuctionDuration()
+	if (ignoreAuctionDurationChange) then
+		ignoreAuctionDurationChange = nil;
+		return
+	end
+	Auctioneer_SetFilter('last-auction-duration', AuctionFrameAuctions.duration)
+end
 
+function Auctioneer_SetAuctionDuration(duration, persist)
+	local durationIndex
+	if (duration >= 1 and duration <= 3) then
+		durationIndex = duration
+	elseif (duration == 120) then
+		durationIndex = 1
+	elseif (duration == 480) then
+		durationIndex = 2
+	elseif (duration == 1440) then
+		durationIndex = 3
+	else
+		EnhTooltip.DebugPrint("Auctioneer_SetAuctionDuration(): invalid duration ", duration)
+		return
+	end
+	
+	if (not persist) then ignoreAuctionDurationChange = true; end
+	AuctionsRadioButton_OnClick(durationIndex);
+end
 
