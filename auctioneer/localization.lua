@@ -136,6 +136,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdDefault'] = "default";
 	_AUCT['CmdPrintin'] = "print-in";
 	_AUCT['CmdAuctionClick'] = "auction-click";
+	
 	_AUCT['CmdBroker'] = "broker";
 	_AUCT['CmdBidbroker'] = "bidbroker";
 	_AUCT['CmdBidbrokerShort'] = "bb";
@@ -145,6 +146,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['CmdCompete'] = "compete";
 	_AUCT['CmdScan'] = "scan";
 	_AUCT['CmdAutofill'] = "autofill";
+	
 	_AUCT['CmdProtectWindow'] = "protect-window"
 	_AUCT['CmdProtectWindow0'] = "never"
 	_AUCT['CmdProtectWindow1'] = "scan"
@@ -202,6 +204,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpSuggest'] = "Select whether to show item's suggested auction price";
 	_AUCT['HelpStats'] = "Select whether to show item's bidded/buyout percentages";
 	_AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
+	
 	_AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
 	_AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
 	_AUCT['HelpLocale'] = "Change the locale that is used to display Auctioneer messages";
@@ -212,6 +215,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['HelpCompete'] = "Show any recently scanned auctions whose buyout is less than one of your items";
 	_AUCT['HelpScan'] = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
 	_AUCT['HelpAutofill'] = "Set whether to autofill prices when dropping new auction items into the auction house window";
+	
 	_AUCT['HelpPctBidmarkdown'] = "Set the percentage that Auctioneer will mark down bids from the buyout price";
 	_AUCT['HelpPctMarkup'] = "The percentage that vendor prices will be marked up when no other values are available";
 	_AUCT['HelpPctMaxless'] = "Set the maximum percentage that Auctioneer will undercut market value before it gives up";
@@ -278,6 +282,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
 	
 	
+	
 	_AUCT['GuiRememberText'] = "Remember price";
 	_AUCT['GuiNoWorldMap'] = "Auctioneer: suppressed displaying of world map"
 	
@@ -286,14 +291,17 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiLocale'] = "Set locale to";
 	_AUCT['GuiVerbose'] = "Verbose Mode";
 	_AUCT['GuiStatsEnable'] = "Show Stats";
+	
 	_AUCT['GuiStatsHeader'] = "Item Price Statistics";
 	_AUCT['GuiStatsHelp'] = "Show the following statistics in the tooltip.";
 	_AUCT['GuiAverages'] = "Show Averages";
 	_AUCT['GuiMedian'] = "Show Medians";
 	_AUCT['GuiSuggest'] = "Show Suggested Prices";
+	
 	_AUCT['GuiEmbedHeader'] = "Embed";
 	_AUCT['GuiEmbed'] = "Embed info in in-game tooltip";
 	_AUCT['GuiEmbedBlankline'] = "Show blankline in in-game tooltip";
+	
 	_AUCT['GuiClearHeader'] = "Clear Data";
 	_AUCT['GuiClearHelp'] = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
 	_AUCT['GuiClearall'] = "Clear All Auctioneer Data";
@@ -303,6 +311,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiClearsnap'] = "Clear Snapshot data";
 	_AUCT['GuiClearsnapHelp'] = "Click here to clear the last Auctioneer snapshot data.";
 	_AUCT['GuiClearsnapButton'] = "Clear Snapshot";
+	
 	_AUCT['GuiPercentsHeader'] = "Auctioneer Threshold Percents";
 	_AUCT['GuiPercentsHelp'] = "WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
 	_AUCT['GuiBidmarkdown'] = "Bid Markdown Percent";
@@ -311,6 +320,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiNocomp'] = "No Competition Undercut Percent";
 	_AUCT['GuiUnderlow'] = "Lowest Auction Undercut";
 	_AUCT['GuiUndermkt'] = "Undercut Market When Maxless";
+	
 	_AUCT['GuiOtherHeader'] = "Other Options";
 	_AUCT['GuiOtherHelp'] = "Miscellaneous Auctioneer Options";
 	_AUCT['GuiAutofill'] = "Autofill prices in the AH";
@@ -323,6 +333,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 	_AUCT['GuiReloaduiButton'] = "ReloadUI";
 	_AUCT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI";
+	
 	_AUCT['GuiRedo'] = "Show Long Scan Warning";
 	_AUCT['GuiDefaultAllButton'] = "Reset All";
 	_AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
@@ -331,6 +342,7 @@ function Auctioneer_SetLocaleStrings(locale)
 	_AUCT['GuiPrintin'] = "Select the desired message frame";
 	_AUCT['GuiProtectWindow'] = "Prevent accidental closing of AH window";
 	_AUCT['GuiAuctionDuration'] = "Default auction duration";
+	
 	_AUCT['GuiAuctionHouseHeader'] = "Auction House window";
 	_AUCT['GuiAuctionHouseHeaderHelp'] = "Change the behavior of the Auction House window";
 	_AUCT['GuiLoad'] = "Load Auctioneer automatically";
@@ -340,6 +352,7 @@ function Auctioneer_SetLocaleStrings(locale)
 -- Locale strings for the daDK locale
 	if locale == "daDK" then
 		-- Encoded in UTF8
+		
 		
 		_AUCT['TimeShort'] = "Kort";
 		_AUCT['TimeMed'] = "Medium";
@@ -433,6 +446,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdDefault'] = "default";
 		_AUCT['CmdPrintin'] = "print-in";
 		_AUCT['CmdAuctionClick'] = "auction-click";
+		
 		_AUCT['CmdBroker'] = "broker";
 		_AUCT['CmdBidbroker'] = "bidbroker";
 		_AUCT['CmdBidbrokerShort'] = "bb";
@@ -442,6 +456,16 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdCompete'] = "compete";
 		_AUCT['CmdScan'] = "scan";
 		_AUCT['CmdAutofill'] = "autofill";
+		
+		_AUCT['CmdProtectWindow'] = "protect-window"
+		_AUCT['CmdProtectWindow0'] = "never"
+		_AUCT['CmdProtectWindow1'] = "scan"
+		_AUCT['CmdProtectWindow2'] = "always"
+		_AUCT['CmdAuctionDuration'] = "auction-duration"
+		_AUCT['CmdAuctionDuration0'] = "last"
+		_AUCT['CmdAuctionDuration1'] = "2h"
+		_AUCT['CmdAuctionDuration2'] = "8h"
+		_AUCT['CmdAuctionDuration3'] = "24h"
 		
 		_AUCT['CmdPctBidmarkdown'] = "pct-bidmarkdown";
 		_AUCT['CmdPctMarkup']      = "pct-markup";
@@ -462,6 +486,8 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptScaleDefault'] = 1.0;
 		_AUCT['OptDefault'] = "(<option>|".._AUCT['CmdClearAll']..")";
 		_AUCT['OptPrintin'] = "(<frameIndex>[Number]|<frameName>[String])";
+		_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."||".._AUCT['CmdProtectWindow1'].."||".._AUCT['CmdProtectWindow2']..")";
+		_AUCT['OptAuctionDuration'] = "(".._AUCT['CmdAuctionDuration0'].."||".._AUCT['CmdAuctionDuration1'].."||".._AUCT['CmdAuctionDuration2'].."||".._AUCT['CmdAuctionDuration3']..")";
 		
 		_AUCT['OptPctBidmarkdown'] = "<procent>";
 		_AUCT['OptPctMarkup'] = "<procent>";
@@ -488,6 +514,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpSuggest'] = "V\195\166lger om der skal vises foresl\195\165et salgspris ved auktion.";
 		_AUCT['HelpStats'] = "V\195\166lger om der skal vises bud/opk\195\184bs pris i procenter.";
 		_AUCT['HelpEmbedBlank'] = "V\195\166lg om der skal v\195\166re blanke linjer mellem tooltip info og auktions info n\195\165r embedded mode er valgt";
+		
 		_AUCT['HelpClear'] = "Sletter data for et specifikt objekt (du skal shift-klikke p\195\165 objektet s\195\165 det kommer ned i kommando boxen.) Du kan ogs\195\165 specifisere enkelte n\195\184gle ord som all eller snapshot";
 		_AUCT['HelpAlso'] = "Viser ogs\195\165 en anden servers priser i tooltipet. For realm, inds\195\166t realmnavnet og faction navnet. Som eksempel: \"/auctioneer also Al'Akir-Horde\". Det speciale n\195\184gleord \"opposite\" betyder den modstridne fraktion, \"off\" stopper denne funktion.";
 		_AUCT['HelpLocale'] = "Skifter sprog p\195\165 auctioneer scriptet.";
@@ -498,6 +525,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpCompete'] = "Viser objekter fra sidste skanning som har lavere opk\195\184bspris end dine ting.";
 		_AUCT['HelpScan'] = "Udf\195\184rer en scan af auktionshuset n\195\166ste gang du bes\195\184ger det, eller mens du er der.(Der er ogs\195\165 en knap i auktionshuset under browse, der kan du ogs\195\165 v\195\166lge hvilke katagorier du \195\184nsker at skanne ved at bruge flueben..";
 		_AUCT['HelpAutofill'] = "S\195\166t om Auctioneer skal autoudfylde priser n\195\165r objekter overf\195\184res til auktionshusets boks.";
+		
 		_AUCT['HelpPctBidmarkdown'] = "S\195\166t procenter Auctioneer vil s\195\166tte prisen under objektets opk\195\184bspris.";
 		_AUCT['HelpPctMarkup'] = "Procenten som Auctioneer vil overbyde forhandleren p\195\165 et objekt hvor prisen ikke kendes.";
 		_AUCT['HelpPctMaxless'] = "S\195\166t den maksimale procent som Auctioneer vil g\195\165 under markeds v\195\166rdi inden den giver op.";
@@ -508,6 +536,9 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpDefault'] = "S\195\166tter Auctioneer til dens standart v\195\166rdi. Du kan eventuelt bruge n\195\184gleord som: \"all\" for at s\195\166tte alle valg til deres standard v\195\166rdier.";
 		_AUCT['HelpPrintin'] = "V\195\166lg hvilken ramme Auctioneer vil skrive til. Du kan enten angive et ramme navn eller rammens indeks nummer.";
 		_AUCT['HelpAuctionClick'] = "Giver dig mulighed for at Alt-klikke p\195\165 et objekt i dine tasker for automatisk at starte en auktion for det";
+		_AUCT['HelpProtectWindow'] = "Prevents you from accidentally closing the Auction House interface";
+		_AUCT['HelpAuctionDuration'] = "Set the default auction duration upon opening the Auction House interface";
+		_AUCT['HelpLoad'] = "Change Auctioneer's load settings for this toon";
 		
 		_AUCT['DisableMsg'] = "Stopper automatisk indl\195\166sning af Auctioneer";
 		
@@ -527,12 +558,16 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['FrmtActDefault'] = "Auctioneer's %s valg er blevet nulstillet til standard v\195\166rdier";
 		_AUCT['FrmtPrintin'] = "Auctioneer's beskeder vil du blive skrevet til \"%s\" chat ramme";
 		_AUCT['FrmtAutostart'] = "Starter automatisk auktion for %s minimum, %s opk\195\184b (%dh)";
-		
+		_AUCT['FrmtProtectWindow'] = "Auction House window protection set to: %s";
+		_AUCT['FrmtAuctionDuration'] = "Default auction duration set to: %s";
 		
 		_AUCT['TextScan'] = "Skan";
 		_AUCT['TextAuction'] = "auktion";
 		_AUCT['TextNone'] = "ingen";
 		_AUCT['TextUsage'] = "Brug:";
+		
+		_AUCT['TextGeneral'] = "General";
+		_AUCT['TextCombat'] = "Combat";
 		
 		-- AH Scanning localizations
 		
@@ -557,21 +592,26 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['AuctionDiscrepancies'] = "Uoverensstemmelser: %s";
 		
 		-- GUI localizations
+		
 		_AUCT['GuiRememberText'] = "Husk prisen";
+		_AUCT['GuiNoWorldMap'] = "Auctioneer: suppressed displaying of world map"
 		
 		_AUCT['GuiMainHelp'] = "Indeholder v\195\166rdier for Auctioneer \nan AddOn som viser information og analysere data. \nKlik p\195\165 \"Skan\" knappen p\195\165 AH for at indsamle auktions data.";
 		_AUCT['GuiMainEnable'] = "Start Auctioneer";
 		_AUCT['GuiLocale'] = "S\195\166t sprog til";
 		_AUCT['GuiVerbose'] = "Tekst Mode";
 		_AUCT['GuiStatsEnable'] = "Vis Stats";
+		
 		_AUCT['GuiStatsHeader'] = "Objekt Pris Statestik";
 		_AUCT['GuiStatsHelp'] = "Vis f\195\184lgende statestikker i tooltippet.";
 		_AUCT['GuiAverages'] = "Vis middel";
 		_AUCT['GuiMedian'] = "Vis middel";
 		_AUCT['GuiSuggest'] = "Vis foresl\195\165ede priser";
+		
 		_AUCT['GuiEmbedHeader'] = "Indrammet";
 		_AUCT['GuiEmbed'] = "Indrammet info i spillets tooltip";
 		_AUCT['GuiEmbedBlankline'] = "Viser blank linje i spillets tooltip";
+		
 		_AUCT['GuiClearHeader'] = "Slet Data";
 		_AUCT['GuiClearHelp'] = "Slet Auctioneer data. \nV\195\166lg alle data eller det nuv\195\166rende snapshot.\nADVARSEL: Disse handlinger kan IKKE fortrydes.";
 		_AUCT['GuiClearall'] = "Slet Alle Auctioneer Data";
@@ -581,6 +621,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiClearsnap'] = "Slet Snapshot data";
 		_AUCT['GuiClearsnapHelp'] = "Klik her for at slette den sidste skanning af auktionen.";
 		_AUCT['GuiClearsnapButton'] = "Fjern Snapshot";
+		
 		_AUCT['GuiPercentsHeader'] = "Auctioneer Threshold Percents";
 		_AUCT['GuiPercentsHelp'] = "Advarsel: De f\195\184lgende valgmuligheder er KUN for Superbrugere.\nVed at \195\166ndre p\195\165 f\195\184lgende muligheder \195\166ndre du hvor aggresivt Auctioneer vil v\195\166re n\195\165r den udregner profit.";
 		_AUCT['GuiBidmarkdown'] = "Neds\195\166t bud med xx procent";
@@ -589,6 +630,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiNocomp'] = "Procent under markedets pris ved ingen konkurence";
 		_AUCT['GuiUnderlow'] = "Laveste auktionspris";
 		_AUCT['GuiUndermkt'] = "Underbyd markedet n\195\165r der ingen maxpris findes.";
+		
 		_AUCT['GuiOtherHeader'] = "Andre valg";
 		_AUCT['GuiOtherHelp'] = "Diverse valg til Auctioneer";
 		_AUCT['GuiAutofill'] = "Autoudfyld priser p\195\165 AH";
@@ -601,18 +643,28 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiReloaduiHelp'] = "Klik her for at genindl\195\166se WoW brugerfladen efter at have \195\166ndret sprog.\nBem\195\166rk: Dette kan tage et par minutter.";
 		_AUCT['GuiReloaduiButton'] = "Genindl\195\166sUI";
 		_AUCT['GuiReloaduiFeedback'] = "Genindl\195\166ser nu WoW UI";
+		
 		_AUCT['GuiRedo'] = "Vis advarsel ved lang skanning.";
 		_AUCT['GuiDefaultAllButton'] = "Nulstil alt";
 		_AUCT['GuiDefaultAll'] = "Nulstil alle Auctioneer valg";
 		_AUCT['GuiDefaultAllHelp'] = "Klik her for at s\195\166tte alle Auctioneer valg til standard v\195\166rdier.\nADVARSEL: Denne handling kan IKKE fortrydes.";
 		_AUCT['GuiDefaultOption'] = "Nulstil denne ops\195\166tning.";
 		_AUCT['GuiPrintin'] = "V\195\166lg den \195\184nskede chat ramme.";
-
+		_AUCT['GuiProtectWindow'] = "Prevent accidental closing of AH window";
+		_AUCT['GuiAuctionDuration'] = "Default auction duration";
+		
+		_AUCT['GuiAuctionHouseHeader'] = "Auction House window";
+		_AUCT['GuiAuctionHouseHeaderHelp'] = "Change the behavior of the Auction House window";
+		_AUCT['GuiLoad'] = "Load Auctioneer automatically";
+		_AUCT['GuiLoad_Never'] = 'never';
+		_AUCT['GuiLoad_Always'] = 'always';
+		_AUCT['GuiLoad_AuctionHouse'] = 'at Auction House';
 	end
 
 -- Locale strings for the deDE locale
 	if locale == "deDE" then
 		-- Encoded in UTF8
+		
 		
 		_AUCT['TimeShort'] = "Kurz";
 		_AUCT['TimeMed'] = "Mittel";
@@ -706,6 +758,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdDefault'] = "default";
 		_AUCT['CmdPrintin'] = "print-in";
 		_AUCT['CmdAuctionClick'] = "auction-click";
+		
 		_AUCT['CmdBroker'] = "broker";
 		_AUCT['CmdBidbroker'] = "bidbroker";
 		_AUCT['CmdBidbrokerShort'] = "bb";
@@ -715,6 +768,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdCompete'] = "compete";
 		_AUCT['CmdScan'] = "scan";
 		_AUCT['CmdAutofill'] = "autofill";
+		
 		_AUCT['CmdProtectWindow'] = "protect-window"
 		_AUCT['CmdProtectWindow0'] = "never"
 		_AUCT['CmdProtectWindow1'] = "scan"
@@ -772,6 +826,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpSuggest'] = "Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
 		_AUCT['HelpStats'] = "Schaltet die Prozentanzeige der/des Gebote/Sofortkaufes ein/aus.";
 		_AUCT['HelpEmbedBlank'] = "Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
+		
 		_AUCT['HelpClear'] = "L\195\182scht die Daten der angegebene Gegenst\195\164nde (Gegenst\195\164nde durch Shift+Linksklick dem Befehl hinzuf\195\188gen) Es k\195\182nnen auch die speziellen Keywords \"".._AUCT['CmdClearAll'].."\" und \"".._AUCT['CmdClearSnapshot'].."\" hinzugef\195\188gt werden.";
 		_AUCT['HelpAlso'] = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms f\195\188r Realm und den Namen der Faktion f\195\188r Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"".._AUCT['CmdAlsoOpposite'].."\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalit\195\164t.";
 		_AUCT['HelpLocale'] = "\195\132ndert das Gebietsschema das zur Anzeige von Auctioneer-Meldungen verwendet wird.";
@@ -782,6 +837,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpCompete'] = "Zeigt alle Auktionen des zuletzt durchgef\195\188hrten Scans an, deren Sofortkaufpreis geringer ist als der eines eigenen im AH angebotenen Gegenstandes.";
 		_AUCT['HelpScan'] = "F\195\188hrt einen Scan des Auktionshauses beim n\195\164chsten Besuch durch bzw. sofort, wenn man schon dort ist (es gibt ebenfalls einen Knopf im Auktionshausfenster). \195\156ber die Auswahlboxen k\195\182nnen die zu scannenden Kategorien gew\195\164hlt werden.";
 		_AUCT['HelpAutofill'] = "Gibt an, ob die Preise automatisch ausgef\195\188llt werden sollen, wenn ein Gegenstand ins Auktionshaus gelegt wird.";
+		
 		_AUCT['HelpPctBidmarkdown'] = "Legt den Prozentsatz fest, um den das Mindestgebot niedriger als der Sofortkaufpreis ist.";
 		_AUCT['HelpPctMarkup'] = "Legt den Prozentsatz f\195\188r erh\195\182hte H\195\164ndlerpreise fest, der verwendet wird, falls sonst keine anderen Werte verf\195\188gbar sind.";
 		_AUCT['HelpPctMaxless'] = "Legt den maximalen Prozentsatz fest, um den der Marktpreis versucht wird zu verringern, bevor aufgegeben wird";
@@ -848,6 +904,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['AuctionDiscrepancies'] = "Unstimmigkeiten: %s";
 		
 		-- GUI localizations
+		
 		_AUCT['GuiRememberText'] = "Preis merken";
 		_AUCT['GuiNoWorldMap'] = "Auctioneer: Die Anzeige der Weltkarte wurde unterdr\195\188ckt"
 		
@@ -856,14 +913,17 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiLocale'] = "Setze das Gebietsschema auf";
 		_AUCT['GuiVerbose'] = "Detaillierte Informationen";
 		_AUCT['GuiStatsEnable'] = "Statistiken anzeigen";
+		
 		_AUCT['GuiStatsHeader'] = "Preisstatistiken";
 		_AUCT['GuiStatsHelp'] = "Zeigt die folgenden Statistiken im Tooltip an.";
 		_AUCT['GuiAverages'] = "Zeige den Durchschnitt an.";
 		_AUCT['GuiMedian'] = "Zeige den Median an.";
 		_AUCT['GuiSuggest'] = "Zeige empfohlene Preise an.";
+		
 		_AUCT['GuiEmbedHeader'] = "Art der Anzeige";
 		_AUCT['GuiEmbed'] = "In-Game Tooltip zur Anzeige verwenden";
 		_AUCT['GuiEmbedBlankline'] = "Leerzeile in den In-Game Tooltip einf\195\188gen";
+		
 		_AUCT['GuiClearHeader'] = "Daten l\195\182schen";
 		_AUCT['GuiClearHelp'] = "Auctioneerdaten l\195\182schen.\nW\195\164hle entweder alle Daten oder nur den aktuellen Snapshot aus.\nWARNUNG: Das L\195\182schen kann nicht r\195\188ckg\195\164ngig gemacht werden!"
 		_AUCT['GuiClearall'] = "L\195\182sche alle Auctioneerdaten";
@@ -873,6 +933,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiClearsnap'] = "Snapshotdaten l\195\182schen";
 		_AUCT['GuiClearsnapHelp'] = "Hier dr\195\188cken, um die aktuellen Snapshotdaten von Auctioneer zu l\195\182schen.";
 		_AUCT['GuiClearsnapButton'] = "L\195\182schen";
+		
 		_AUCT['GuiPercentsHeader'] = "Auctioneer Prozentschwellwerte";
 		_AUCT['GuiPercentsHelp'] = "WARNUNG: Die folgenden Einstellungen sind nur f\195\188r erfahrene Benutzer.\nDie folgenden Werte k\195\182nnen ge\195\164ndert werden, um festzulegen, wie aggressiv Auctioneer vorgehen soll, um den profitabelsten Preis zu berechnen.";
 		_AUCT['GuiBidmarkdown'] = "Gebot um x% unterbieten";
@@ -881,6 +942,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiNocomp'] = "Marktpreis um x% im Monopol\nverringern";
 		_AUCT['GuiUnderlow'] = "Marktpreis um x% verringern, wenn\nKonkurrenz keine Gefahr ist";
 		_AUCT['GuiUndermkt'] = "Marktpreis um x% verringern, wenn\nKonkurrenz zu g\195\188nstig ist";
+		
 		_AUCT['GuiOtherHeader'] = "Sonstige Optionen";
 		_AUCT['GuiOtherHelp'] = "Sonstige Auctioneer-Optionen";
 		_AUCT['GuiAutofill'] = "Preise im Auktionshaus automatisch eintragen";
@@ -893,6 +955,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiReloaduiHelp'] = "Hier klicken um die WoW-Benutzeroberfl\195\164che nach einer \n\195\132nderung des Gebietsschemas neu zu laden, und dadurch \ndie Sprache des Konfigurationsmen\195\188s diesem entspricht.\nHinweis: Dieser Vorgang kann einige Minuten dauern.";
 		_AUCT['GuiReloaduiButton'] = "Neu laden";
 		_AUCT['GuiReloaduiFeedback'] = "WoW-Benutzeroberfl\195\164che wird neu geladen";
+		
 		_AUCT['GuiRedo'] = "Zeige Warnung bei langer Scan-Dauer";
 		_AUCT['GuiDefaultAllButton'] = "Zur\195\188cksetzen";
 		_AUCT['GuiDefaultAll'] = "Alle Einstellungen zur\195\188cksetzen";
@@ -901,6 +964,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiPrintin'] = "Fenster f\195\188r Meldungen ausw\195\164hlen";
 		_AUCT['GuiProtectWindow'] = "Schlie\195\159en des AH-Fensters verhindern";
 		_AUCT['GuiAuctionDuration'] = "Standard-Auktionsdauer";
+		
 		_AUCT['GuiAuctionHouseHeader'] = "Auktionshaus-Fenster";
 		_AUCT['GuiAuctionHouseHeaderHelp'] = "\195\132ndert das Verhalten des Auktionshaus-Fensters";
 		_AUCT['GuiLoad'] = "Auctioneer automatisch laden";
@@ -912,6 +976,7 @@ function Auctioneer_SetLocaleStrings(locale)
 -- Locale strings for the esES locale
 	if locale == "esES" then
 		-- Encoded in UTF8
+		
 		
 		_AUCT['TimeShort'] = "Corto";
 		_AUCT['TimeMed'] = "Mediano";
@@ -987,6 +1052,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['FrmtWarnToolow'] = "Imposible igualar minimo";
 		_AUCT['FrmtWarnMyprice'] = "Usando mi precio actual";
 		_AUCT['FrmtWarnNodata'] = "Sin informaci\195\179n para PMV";
+		_AUCT['FrmtWarnUser'] = "Usando precio de usuario";
 		
 		_AUCT['CmdOff'] = "apagado";
 		_AUCT['CmdOn'] = "prendido";
@@ -1003,6 +1069,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdLocale'] = "localidad";
 		_AUCT['CmdDefault'] = "original";
 		_AUCT['CmdPrintin'] = "imprimir-en";
+		_AUCT['CmdAuctionClick'] = "auction-click";
 		
 		_AUCT['CmdBroker'] = "corredor";
 		_AUCT['CmdBidbroker'] = "corredorofertas";
@@ -1013,6 +1080,16 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['CmdCompete'] = "competir";
 		_AUCT['CmdScan'] = "explorar";
 		_AUCT['CmdAutofill'] = "autoinsertar";
+		
+		_AUCT['CmdProtectWindow'] = "protejer-ventana"
+		_AUCT['CmdProtectWindow0'] = "nunca"
+		_AUCT['CmdProtectWindow1'] = "explorar"
+		_AUCT['CmdProtectWindow2'] = "siempre"
+		_AUCT['CmdAuctionDuration'] = "duracion-subasta"
+		_AUCT['CmdAuctionDuration0'] = "ultima"
+		_AUCT['CmdAuctionDuration1'] = "2h"
+		_AUCT['CmdAuctionDuration2'] = "8h"
+		_AUCT['CmdAuctionDuration3'] = "24h"
 		
 		_AUCT['CmdPctBidmarkdown'] = "pct-menosoferta";
 		_AUCT['CmdPctMarkup']      = "pct-mas";
@@ -1033,6 +1110,8 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['OptScaleDefault'] = 1.0;
 		_AUCT['OptDefault'] = "(<opci\195\179n>|".._AUCT['CmdClearAll']..")";
 		_AUCT['OptPrintin'] = "(<indiceVentana>[N\195\186mero]|<nombreVentana>[Serie])";
+		_AUCT['OptProtectWindow'] = "(".._AUCT['CmdProtectWindow0'].."||".._AUCT['CmdProtectWindow1'].."||".._AUCT['CmdProtectWindow2']..")";
+		_AUCT['OptAuctionDuration'] = "(".._AUCT['CmdAuctionDuration0'].."||".._AUCT['CmdAuctionDuration1'].."||".._AUCT['CmdAuctionDuration2'].."||".._AUCT['CmdAuctionDuration3']..")";
 		
 		_AUCT['OptPctBidmarkdown'] = "<porciento>";
 		_AUCT['OptPctMarkup'] = "<porciento>";
@@ -1060,6 +1139,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpStats'] = "Selecciona para mostrar porcentajes para ofertas/opci\195\179n a compra del art\195\173culo";
 		_AUCT['HelpEmbedBlank'] = "Selecciona para mostrar una linea en blanco entre informacion de la caja de ayuda y la informacion de subasta cuando el modo integrado esta seleccionado";
 		_AUCT['HelpClear'] = "Eliminar la informacion existente sobre el art\195\173culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabras claves \"todo\" or \"imagen\"";
+		
 		_AUCT['HelpAlso'] = "Mostrar tambi\195\169n los valores de otros servidores en la caja de ayuda. Para el reino escribe el nombre del reino y para facci\195\179n escribe el nombre de la facci\195\179n. Por ejemplo: \"/auctioneer tambien Al'Akir-Horde\". La palabra clave \"opuesta\" significa facci\195\179n opuesta, \"apagar\" desabilita la funci\195\179n.";
 		_AUCT['HelpLocale'] = "Cambiar la localidad que Auctioneer usa para sus mensajes";
 		_AUCT['HelpBroker'] = "Muestra las subastas de la exploraci\195\179n mas reciente en las cuales se puede poner una oferta para luego revenderlas para ganancia";
@@ -1069,6 +1149,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpCompete'] = "Muestra cualquier subasta explorada recientemente cuya opci\195\179n a compra es menor que alguno de tus art\195\173culos";
 		_AUCT['HelpScan'] = "Realiza una exploracion de la casa de subastas en la proxima visita, o mientras este alli (tambien existe un bot\195\179n en el panel de la casa de subastas). Seleccione alli las categorias a explorar.";
 		_AUCT['HelpAutofill'] = "Auto-completar precios cuando se a\195\177adan art\195\173culos a subastar en el panel de la casa de subastas";
+		
 		_AUCT['HelpPctBidmarkdown'] = "Ajusta el porcentaje del precio de compra por debajo del cual Auctioneer marcara las ofertas";
 		_AUCT['HelpPctMarkup'] = "El porcentaje que sera incrementado el precio de venta del vendedor cuando no existan otros valores disponibles.";
 		_AUCT['HelpPctMaxless'] = "Ajusta el maximo porcentaje por debajo del valor de mercado que Auctioneer tratara de igualar antes de darse por vencido.";
@@ -1078,6 +1159,10 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['HelpRedo'] = "Selecciona para mostrat una advertencia cuando la p\195\161gina corriente en la casa de subastas ha tomado demasiado tiempo para explorar debido a problemas con el servidor.";
 		_AUCT['HelpDefault'] = "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica."
 		_AUCT['HelpPrintin'] = "Selecciona cual ventana de mensajes va a usar Auctioneer para imprimir su informacion. Puede especificar el nombre o el \195\173ndice de la ventana.";
+		_AUCT['HelpAuctionClick'] = "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
+		_AUCT['HelpProtectWindow'] = "Previene que usted cierre accidentalmente el interf\195\161z de la Casa de Subastas";
+		_AUCT['HelpAuctionDuration'] = "Fijar la duraci\195\179n de las subastas al abrir el interf\195\161z de la Casa de Subastas";
+		_AUCT['HelpLoad'] = "Cambiar las opciones de carga de Auctioneer para este personaje";
 		
 		_AUCT['DisableMsg'] = "Deshabilitando la auto-carga de Auctioneer";
 		
@@ -1096,6 +1181,9 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['FrmtActDefaultall'] = "Todas las opciones de Auctioneer han sido revertidas a sus configuraciones de f\195\161brica.";
 		_AUCT['FrmtActDefault'] = "La opci\195\179n %s de Auctioneer ha sido revertida a su configuraci\195\179n de f\195\161brica.";
 		_AUCT['FrmtPrintin'] = "Los mensajes de Auctioneer se imprimir\195\161n en la ventana de comunicaci\195\179n \"%s\"";
+		_AUCT['FrmtAutostart'] = "Comenzando subasta automaticamente por %s m\195\173nimo, %s opci\195\179n a compra (%dh)"
+		_AUCT['FrmtProtectWindow'] = "Protecci\195\179n de la ventana de la Casa de Subastas fijado a: %s";
+		_AUCT['FrmtAuctionDuration'] = "Duraci\195\179n de las subastas fijado a: %s";
 		
 		_AUCT['TextScan'] = "Explorar";
 		_AUCT['TextAuction'] = "Subasta";
@@ -1129,19 +1217,25 @@ function Auctioneer_SetLocaleStrings(locale)
 		
 		-- GUI localizations
 		
+		_AUCT['GuiRememberText'] = "Recordar precio";
+		_AUCT['GuiNoWorldMap'] = "Auctioneer: suprimi\195\179 la exhibici\195\179n del mapa del mundo"
+		
 		_AUCT['GuiMainHelp'] = "Contiene ajustes para Auctioneer \nun aditamento que muestra informacion sobre art\195\173culos y analiza informaci\195\179n de subastas. \nSeleccione \"Explorar\" en la casa de subastas para coleccionar informacion sobre las subastas.";
 		_AUCT['GuiMainEnable'] = "Encender Auctioneer";
 		_AUCT['GuiLocale'] = "Ajustar localidad a";
 		_AUCT['GuiVerbose'] = "Modo literal";
 		_AUCT['GuiStatsEnable'] = "Ver estad\195\173sticas";
+		
 		_AUCT['GuiStatsHeader'] = "Estad\195\173sticas de precios de art\195\173culos";
 		_AUCT['GuiStatsHelp'] = "Mostrar las siguientes estad\195\173sticas en la caja de ayuda.";
 		_AUCT['GuiAverages'] = "Mostrar Promedios";
 		_AUCT['GuiMedian'] = "Mostrar Medianos";
 		_AUCT['GuiSuggest'] = "Mostrar Precios Sugeridos";
+		
 		_AUCT['GuiEmbedHeader'] = "Integraci\195\179n";
 		_AUCT['GuiEmbed'] = "Integrar informaci\195\179n en la caja de ayuda";
 		_AUCT['GuiEmbedBlankline'] = "Mostrar linea en blanco.";
+		
 		_AUCT['GuiClearHeader'] = "Eliminar Informaci\195\179n";
 		_AUCT['GuiClearHelp'] = "Elimina la informacion de Auctioneer. \nSelecciona si eliminar toda la informaci\195\179n o solamente la im\195\161gen corriente.\nADVERTENCIA: Estas acciones NO son reversibles.";
 		_AUCT['GuiClearall'] = "Eliminar toda la informaci\195\179n";
@@ -1151,6 +1245,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiClearsnap'] = "Eliminar imagen corriente";
 		_AUCT['GuiClearsnapHelp'] = "Presione aqui para eliminar la ultima imagen de informacion de Auctioneer.";
 		_AUCT['GuiClearsnapButton'] = "Eliminar Imagen";
+		
 		_AUCT['GuiPercentsHeader'] = "Limites de Porcentajes de Auctioneer";
 		_AUCT['GuiPercentsHelp'] = "ADVERTENCIA: Las siguientes opciones son para usuarios expertos SOLAMENTE.\nAjuste los siguientes valores para cambiar cuan agresivo es Auctioneer al determinar niveles provechosos.";
 		_AUCT['GuiBidmarkdown'] = "Porciento menos oferta";
@@ -1159,6 +1254,7 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiNocomp'] = "Porciento sin competencia.";
 		_AUCT['GuiUnderlow'] = "Porciento bajo menor subasta";
 		_AUCT['GuiUndermkt'] = "Porciento bajo mercado";
+		
 		_AUCT['GuiOtherHeader'] = "Otras Opciones";
 		_AUCT['GuiOtherHelp'] = "Opciones miscel\195\161neas de Auctioneer";
 		_AUCT['GuiAutofill'] = "Autocompletar precios en la casa de subastas";
@@ -1171,12 +1267,22 @@ function Auctioneer_SetLocaleStrings(locale)
 		_AUCT['GuiReloaduiHelp'] = "Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
 		_AUCT['GuiReloaduiButton'] = "Recargar";
 		_AUCT['GuiReloaduiFeedback'] = "Recargando el Interf\195\161z de WoW";
+		
 		_AUCT['GuiRedo'] = "Mostrar Advertencia de Exploraci\195\179n";
 		_AUCT['GuiDefaultAllButton'] = "Revertir Todo";
 		_AUCT['GuiDefaultAll'] = "Revertir todas las opciones";
 		_AUCT['GuiDefaultAllHelp'] = "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
 		_AUCT['GuiDefaultOption'] = "Revertir esta opci\195\179n";
 		_AUCT['GuiPrintin'] = "Seleccione la ventana deseada";
+		_AUCT['GuiProtectWindow'] = "Prevenir el cierre de la ventana de la CDS";
+		_AUCT['GuiAuctionDuration'] = "Duraci\195\179n de las subastas";
+		
+		_AUCT['GuiAuctionHouseHeader'] = "Ventana de la Casa de Subastas";
+		_AUCT['GuiAuctionHouseHeaderHelp'] = "Modificar el comportamiento de la ventana de la Casa de Subastas";
+		_AUCT['GuiLoad'] = "Cargar Auctioneer auctomaticamente";
+		_AUCT['GuiLoad_Never'] = 'nunca';
+		_AUCT['GuiLoad_Always'] = 'siempre';
+		_AUCT['GuiLoad_AuctionHouse'] = 'en la Casa de Subastas';
 	end
 
 -- Locale strings for the frFR locale
