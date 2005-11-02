@@ -310,12 +310,12 @@ end
 -- hook to capture data about an auction that was boughtout
 function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	-- get the info for this auction
-	local aiLink = GetAuctionItemLink(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
+	local aiLink = GetAuctionItemLink(itemtype, itemindex);
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement,
 		aiBuyout, aiBidAmount, aiHighBidder, aiOwner =
-		GetAuctionItemInfo(AuctionFrame.type, GetSelectedAuctionItem(AuctionFrame.type));
+		GetAuctionItemInfo(itemtype, itemindex);
 
 	local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyout), aiUniqID);
 

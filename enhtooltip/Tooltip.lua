@@ -942,6 +942,8 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 			-- And well, bags aren't stackable anyway, so here you go:
 			quantity = 1
 		else
+			-- Should be 1 for anything but quivers, because even empty slots
+			-- return 1.. but who knows what crazy stuff Blizzard will add ;)
 			quantity = GetInventoryItemCount(unit, slot)
 		end
 		local quality = GetInventoryItemQuality(unit, slot)
