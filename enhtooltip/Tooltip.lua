@@ -942,7 +942,7 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 			-- And well, bags aren't stackable anyway, so here you go:
 			quantity = 1
 		else
-			GetInventoryItemCount(unit, slot)
+			quantity = GetInventoryItemCount(unit, slot)
 		end
 		local quality = GetInventoryItemQuality(unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link) end
