@@ -93,6 +93,7 @@ _AUCT['CmdLocale'] = "locale";
 _AUCT['CmdDefault'] = "default";
 _AUCT['CmdPrintin'] = "print-in";
 _AUCT['CmdAuctionClick'] = "auction-click";
+
 _AUCT['CmdBroker'] = "broker";
 _AUCT['CmdBidbroker'] = "bidbroker";
 _AUCT['CmdBidbrokerShort'] = "bb";
@@ -102,6 +103,7 @@ _AUCT['CmdPercentlessShort'] = "pl";
 _AUCT['CmdCompete'] = "compete";
 _AUCT['CmdScan'] = "scan";
 _AUCT['CmdAutofill'] = "autofill";
+
 _AUCT['CmdProtectWindow'] = "protect-window"
 _AUCT['CmdProtectWindow0'] = "never"
 _AUCT['CmdProtectWindow1'] = "scan"
@@ -159,6 +161,7 @@ _AUCT['HelpMedian'] = "Select whether to show item's median buyout price";
 _AUCT['HelpSuggest'] = "Select whether to show item's suggested auction price";
 _AUCT['HelpStats'] = "Select whether to show item's bidded/buyout percentages";
 _AUCT['HelpEmbedBlank'] = "Select whether to show a blank line between the tooltip info and the auction info when embedded mode is on";
+
 _AUCT['HelpClear'] = "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keywords \"all\" or \"snapshot\"";
 _AUCT['HelpAlso'] = "Also display another server's values in the tooltip. For realm, insert the realmname and for faction the faction's name. For example: \"/auctioneer also Al'Akir-Horde\". The special keyword \"opposite\" means the opposite faction, \"off\" disables the functionality.";
 _AUCT['HelpLocale'] = "Change the locale that is used to display Auctioneer messages";
@@ -169,6 +172,7 @@ _AUCT['HelpPercentless'] = "Show any recently scanned auctions whose buyout is a
 _AUCT['HelpCompete'] = "Show any recently scanned auctions whose buyout is less than one of your items";
 _AUCT['HelpScan'] = "Perform a scan of the auction house at the next visit, or while you are there (there is also a button in the auction pane). Choose which categories you want to scan with the checkboxes.";
 _AUCT['HelpAutofill'] = "Set whether to autofill prices when dropping new auction items into the auction house window";
+
 _AUCT['HelpPctBidmarkdown'] = "Set the percentage that Auctioneer will mark down bids from the buyout price";
 _AUCT['HelpPctMarkup'] = "The percentage that vendor prices will be marked up when no other values are available";
 _AUCT['HelpPctMaxless'] = "Set the maximum percentage that Auctioneer will undercut market value before it gives up";
@@ -235,6 +239,7 @@ _AUCT['AuctionDefunctAucts'] = "Defunct auctions removed: %s";
 _AUCT['AuctionDiscrepancies'] = "Discrepancies: %s";
 
 -- GUI localizations
+
 _AUCT['GuiRememberText'] = "Remember price";
 _AUCT['GuiNoWorldMap'] = "Auctioneer: suppressed displaying of world map"
 
@@ -243,14 +248,17 @@ _AUCT['GuiMainEnable'] = "Enable Auctioneer";
 _AUCT['GuiLocale'] = "Set locale to";
 _AUCT['GuiVerbose'] = "Verbose Mode";
 _AUCT['GuiStatsEnable'] = "Show Stats";
+
 _AUCT['GuiStatsHeader'] = "Item Price Statistics";
 _AUCT['GuiStatsHelp'] = "Show the following statistics in the tooltip.";
 _AUCT['GuiAverages'] = "Show Averages";
 _AUCT['GuiMedian'] = "Show Medians";
 _AUCT['GuiSuggest'] = "Show Suggested Prices";
+
 _AUCT['GuiEmbedHeader'] = "Embed";
 _AUCT['GuiEmbed'] = "Embed info in in-game tooltip";
 _AUCT['GuiEmbedBlankline'] = "Show blankline in in-game tooltip";
+
 _AUCT['GuiClearHeader'] = "Clear Data";
 _AUCT['GuiClearHelp'] = "Clears Auctioneer data. \nSelect either all data or the current snapshot.\nWARNING: These actions are NOT undoable.";
 _AUCT['GuiClearall'] = "Clear All Auctioneer Data";
@@ -260,6 +268,7 @@ _AUCT['GuiClearallButton'] = "Clear All";
 _AUCT['GuiClearsnap'] = "Clear Snapshot data";
 _AUCT['GuiClearsnapHelp'] = "Click here to clear the last Auctioneer snapshot data.";
 _AUCT['GuiClearsnapButton'] = "Clear Snapshot";
+
 _AUCT['GuiPercentsHeader'] = "Auctioneer Threshold Percents";
 _AUCT['GuiPercentsHelp'] = "WARNING: The following setting are for Power Users ONLY.\nAdjust the following values to change how aggresive Auctioneer will be when deciding profitable levels.";
 _AUCT['GuiBidmarkdown'] = "Bid Markdown Percent";
@@ -268,6 +277,7 @@ _AUCT['GuiMaxless'] = "Max Market Undercut Percent";
 _AUCT['GuiNocomp'] = "No Competition Undercut Percent";
 _AUCT['GuiUnderlow'] = "Lowest Auction Undercut";
 _AUCT['GuiUndermkt'] = "Undercut Market When Maxless";
+
 _AUCT['GuiOtherHeader'] = "Other Options";
 _AUCT['GuiOtherHelp'] = "Miscellaneous Auctioneer Options";
 _AUCT['GuiAutofill'] = "Autofill prices in the AH";
@@ -280,6 +290,7 @@ _AUCT['GuiReloadui'] = "Reload User Interface";
 _AUCT['GuiReloaduiHelp'] = "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 _AUCT['GuiReloaduiButton'] = "ReloadUI";
 _AUCT['GuiReloaduiFeedback'] = "Now Reloading the WoW UI";
+
 _AUCT['GuiRedo'] = "Show Long Scan Warning";
 _AUCT['GuiDefaultAllButton'] = "Reset All";
 _AUCT['GuiDefaultAll'] = "Reset All Auctioneer Options";
@@ -288,6 +299,7 @@ _AUCT['GuiDefaultOption'] = "Reset this setting";
 _AUCT['GuiPrintin'] = "Select the desired message frame";
 _AUCT['GuiProtectWindow'] = "Prevent accidental closing of AH window";
 _AUCT['GuiAuctionDuration'] = "Default auction duration";
+
 _AUCT['GuiAuctionHouseHeader'] = "Auction House window";
 _AUCT['GuiAuctionHouseHeaderHelp'] = "Change the behavior of the Auction House window";
 _AUCT['GuiLoad'] = "Load Auctioneer automatically";

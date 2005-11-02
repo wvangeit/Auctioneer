@@ -1,5 +1,6 @@
 ﻿-- Encoded in UTF8
 
+
 _AUCT['TimeShort'] = "Kurz";
 _AUCT['TimeMed'] = "Mittel";
 _AUCT['TimeLong'] = "Lang";
@@ -92,6 +93,7 @@ _AUCT['CmdLocale'] = "locale";
 _AUCT['CmdDefault'] = "default";
 _AUCT['CmdPrintin'] = "print-in";
 _AUCT['CmdAuctionClick'] = "auction-click";
+
 _AUCT['CmdBroker'] = "broker";
 _AUCT['CmdBidbroker'] = "bidbroker";
 _AUCT['CmdBidbrokerShort'] = "bb";
@@ -101,6 +103,7 @@ _AUCT['CmdPercentlessShort'] = "pl";
 _AUCT['CmdCompete'] = "compete";
 _AUCT['CmdScan'] = "scan";
 _AUCT['CmdAutofill'] = "autofill";
+
 _AUCT['CmdProtectWindow'] = "protect-window"
 _AUCT['CmdProtectWindow0'] = "never"
 _AUCT['CmdProtectWindow1'] = "scan"
@@ -158,6 +161,7 @@ _AUCT['HelpMedian'] = "Schaltet die Anzeige des Median-Sofortkaufpreises ein/aus
 _AUCT['HelpSuggest'] = "Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
 _AUCT['HelpStats'] = "Schaltet die Prozentanzeige der/des Gebote/Sofortkaufes ein/aus.";
 _AUCT['HelpEmbedBlank'] = "Schaltet die Anzeige einer Leerzeile zwischen der Tooltipinfo und der Auktionsinfo im Embedded-Mode ein/aus.";
+
 _AUCT['HelpClear'] = "Löscht die Daten der angegebene Gegenstände (Gegenstände durch Shift+Linksklick dem Befehl hinzufügen) Es können auch die speziellen Keywords \"".._AUCT['CmdClearAll'].."\" und \"".._AUCT['CmdClearSnapshot'].."\" hinzugefügt werden.";
 _AUCT['HelpAlso'] = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms für Realm und den Namen der Faktion für Fraktion ein. Zum Beispiel: \"/auctioneer also Kil'Jaeden-Alliance\". Das spezielle Keywort \"".._AUCT['CmdAlsoOpposite'].."\" bedeutet die gegnerische Franktion, \"off\" deaktiviert die Funktionalität.";
 _AUCT['HelpLocale'] = "Ändert das Gebietsschema das zur Anzeige von Auctioneer-Meldungen verwendet wird.";
@@ -168,6 +172,7 @@ _AUCT['HelpPercentless'] = "Zeigt alle Auktionen des zuletzt durchgeführten Sca
 _AUCT['HelpCompete'] = "Zeigt alle Auktionen des zuletzt durchgeführten Scans an, deren Sofortkaufpreis geringer ist als der eines eigenen im AH angebotenen Gegenstandes.";
 _AUCT['HelpScan'] = "Führt einen Scan des Auktionshauses beim nächsten Besuch durch bzw. sofort, wenn man schon dort ist (es gibt ebenfalls einen Knopf im Auktionshausfenster). Über die Auswahlboxen können die zu scannenden Kategorien gewählt werden.";
 _AUCT['HelpAutofill'] = "Gibt an, ob die Preise automatisch ausgefüllt werden sollen, wenn ein Gegenstand ins Auktionshaus gelegt wird.";
+
 _AUCT['HelpPctBidmarkdown'] = "Legt den Prozentsatz fest, um den das Mindestgebot niedriger als der Sofortkaufpreis ist.";
 _AUCT['HelpPctMarkup'] = "Legt den Prozentsatz für erhöhte Händlerpreise fest, der verwendet wird, falls sonst keine anderen Werte verfügbar sind.";
 _AUCT['HelpPctMaxless'] = "Legt den maximalen Prozentsatz fest, um den der Marktpreis versucht wird zu verringern, bevor aufgegeben wird";
@@ -234,6 +239,7 @@ _AUCT['AuctionDefunctAucts'] = "Abgelaufene Auktionen: %s";
 _AUCT['AuctionDiscrepancies'] = "Unstimmigkeiten: %s";
 
 -- GUI localizations
+
 _AUCT['GuiRememberText'] = "Preis merken";
 _AUCT['GuiNoWorldMap'] = "Auctioneer: Die Anzeige der Weltkarte wurde unterdrückt"
 
@@ -242,14 +248,17 @@ _AUCT['GuiMainEnable'] = "Auctioneer aktivieren";
 _AUCT['GuiLocale'] = "Setze das Gebietsschema auf";
 _AUCT['GuiVerbose'] = "Detaillierte Informationen";
 _AUCT['GuiStatsEnable'] = "Statistiken anzeigen";
+
 _AUCT['GuiStatsHeader'] = "Preisstatistiken";
 _AUCT['GuiStatsHelp'] = "Zeigt die folgenden Statistiken im Tooltip an.";
 _AUCT['GuiAverages'] = "Zeige den Durchschnitt an.";
 _AUCT['GuiMedian'] = "Zeige den Median an.";
 _AUCT['GuiSuggest'] = "Zeige empfohlene Preise an.";
+
 _AUCT['GuiEmbedHeader'] = "Art der Anzeige";
 _AUCT['GuiEmbed'] = "In-Game Tooltip zur Anzeige verwenden";
 _AUCT['GuiEmbedBlankline'] = "Leerzeile in den In-Game Tooltip einfügen";
+
 _AUCT['GuiClearHeader'] = "Daten löschen";
 _AUCT['GuiClearHelp'] = "Auctioneerdaten löschen.\nWähle entweder alle Daten oder nur den aktuellen Snapshot aus.\nWARNUNG: Das Löschen kann nicht rückgängig gemacht werden!"
 _AUCT['GuiClearall'] = "Lösche alle Auctioneerdaten";
@@ -259,6 +268,7 @@ _AUCT['GuiClearallButton'] = "Alles löschen";
 _AUCT['GuiClearsnap'] = "Snapshotdaten löschen";
 _AUCT['GuiClearsnapHelp'] = "Hier drücken, um die aktuellen Snapshotdaten von Auctioneer zu löschen.";
 _AUCT['GuiClearsnapButton'] = "Löschen";
+
 _AUCT['GuiPercentsHeader'] = "Auctioneer Prozentschwellwerte";
 _AUCT['GuiPercentsHelp'] = "WARNUNG: Die folgenden Einstellungen sind nur für erfahrene Benutzer.\nDie folgenden Werte können geändert werden, um festzulegen, wie aggressiv Auctioneer vorgehen soll, um den profitabelsten Preis zu berechnen.";
 _AUCT['GuiBidmarkdown'] = "Gebot um x% unterbieten";
@@ -267,6 +277,7 @@ _AUCT['GuiMaxless'] = "Marktpreis um max. x% unterbieten";
 _AUCT['GuiNocomp'] = "Marktpreis um x% im Monopol\nverringern";
 _AUCT['GuiUnderlow'] = "Marktpreis um x% verringern, wenn\nKonkurrenz keine Gefahr ist";
 _AUCT['GuiUndermkt'] = "Marktpreis um x% verringern, wenn\nKonkurrenz zu günstig ist";
+
 _AUCT['GuiOtherHeader'] = "Sonstige Optionen";
 _AUCT['GuiOtherHelp'] = "Sonstige Auctioneer-Optionen";
 _AUCT['GuiAutofill'] = "Preise im Auktionshaus automatisch eintragen";
@@ -279,6 +290,7 @@ _AUCT['GuiReloadui'] = "Benutzeroberfläche neu laden";
 _AUCT['GuiReloaduiHelp'] = "Hier klicken um die WoW-Benutzeroberfläche nach einer \nÄnderung des Gebietsschemas neu zu laden, und dadurch \ndie Sprache des Konfigurationsmenüs diesem entspricht.\nHinweis: Dieser Vorgang kann einige Minuten dauern.";
 _AUCT['GuiReloaduiButton'] = "Neu laden";
 _AUCT['GuiReloaduiFeedback'] = "WoW-Benutzeroberfläche wird neu geladen";
+
 _AUCT['GuiRedo'] = "Zeige Warnung bei langer Scan-Dauer";
 _AUCT['GuiDefaultAllButton'] = "Zurücksetzen";
 _AUCT['GuiDefaultAll'] = "Alle Einstellungen zurücksetzen";
@@ -287,6 +299,7 @@ _AUCT['GuiDefaultOption'] = "Zurücksetzen folgender Einstellung";
 _AUCT['GuiPrintin'] = "Fenster für Meldungen auswählen";
 _AUCT['GuiProtectWindow'] = "Schließen des AH-Fensters verhindern";
 _AUCT['GuiAuctionDuration'] = "Standard-Auktionsdauer";
+
 _AUCT['GuiAuctionHouseHeader'] = "Auktionshaus-Fenster";
 _AUCT['GuiAuctionHouseHeaderHelp'] = "Ändert das Verhalten des Auktionshaus-Fensters";
 _AUCT['GuiLoad'] = "Auctioneer automatisch laden";
