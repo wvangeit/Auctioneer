@@ -11,6 +11,5 @@
 ..\..\FrameXML\Fonts.xml
 ..\..\FrameXML\UIPanelTemplates.xml
 ..\..\FrameXML\MoneyFrame.xml
-TinyMoneyFrame.lua
 TinyMoneyFrame.xml
 Tooltip.xml

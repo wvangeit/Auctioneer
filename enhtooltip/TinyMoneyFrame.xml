@@ -5,6 +5,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	Version: <%version%>
 	Revision: $Id$
 -->
+	<Script file="TinyMoneyFrame.lua"/>
+	
 	<Frame name="TinyMoneyFrameTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="128" y="10"/>
