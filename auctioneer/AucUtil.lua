@@ -271,7 +271,7 @@ function Auctioneer_ProtectAuctionFrame(enable)
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
 		--Handle enabling of protection
-		if (enable) then
+		if (enable and not Auctioneer_ProtectionEnabled and AuctionFrame:IsShown()) then
 			--Remember that we are now protecting the frame
 			Auctioneer_ProtectionEnabled = true;
 			--If the frame is the current doublewide frame, then clear the doublewide

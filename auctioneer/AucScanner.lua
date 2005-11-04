@@ -393,6 +393,13 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -2)
 			AuctPriceRememberCheck:Show()
 		end
+		
+		-- Protect the auction frame from being closed.
+		-- This call is to ensure the window is protected even after you
+		-- manually load Auctioneer while already showing the AuctionFrame
+		if (Auctioneer_GetFilterVal('protect-window') == 2) then
+			Auctioneer_ProtectAuctionFrame(true);  
+		end
 
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()

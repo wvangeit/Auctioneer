@@ -453,7 +453,7 @@ end
 -- This is the old (local) hookAuctionHouse() function
 function Auctioneer_HookAuctionHouse()
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
-	Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", Auctioneer_AuctHouseShow);
+	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, Auctioneer_AuctHouseShow);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
 	Stubby.RegisterEventHook("AUCTION_ITEM_LIST_UPDATE", "Auctioneer", Auctioneer_AuctHouseUpdate);
 
@@ -492,7 +492,7 @@ function Auctioneer_HookAuctionHouse()
 end
 
 function Auctioneer_LockAndLoad()
-	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, Auctioneer_ConfigureAH);
+	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 200, Auctioneer_ConfigureAH);
 
 	Auctioneer_Orig_ContainerFrameItemButton_OnClick = ContainerFrameItemButton_OnClick 
 	ContainerFrameItemButton_OnClick = function(...)

@@ -17,6 +17,15 @@ if (AUCTIONEER_VERSION == "<".."%version%>") then
 end
 
 function Auctioneer_OnLoad()
+	-- Unhook some boot triggers if necessary.
+	-- These might not exist on initial loading or if an addon depends on Auctioneer
+	if (Auctioneer_CheckLoad) then
+		Stubby.UnregisterFunctionHook("AuctionFrame_LoadUI", Auctioneer_CheckLoad);
+	end
+	if (Auctioneer_ShowNotLoaded) then
+		Stubby.UnregisterFunctionHook("AuctionFrame_Show", Auctioneer_ShowNotLoaded);
+	end
+
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, Auctioneer_HookTooltip);
 
@@ -59,16 +68,21 @@ function Auctioneer_OnLoad()
 		SlashCmdList["AUCTIONEER"] = cmdHandler
 	]]);
 	Stubby.RegisterBootCode("Auctioneer", "Triggers", [[
-		local function checkLoad(event)
+		function Auctioneer_CheckLoad()
 			local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
 			if (loadType == "auctionhouse" or not loadType) then
 				LoadAddOn("Auctioneer")
-				Auctioneer_AuctHouseShow()
-			else
-				BrowseNoResultsText:SetText("]].._AUCT['MesgNotLoaded']..[[");
 			end
 		end
-		Stubby.RegisterEventHook("AUCTION_HOUSE_SHOW", "Auctioneer", checkLoad)
+		function Auctioneer_ShowNotLoaded()
+			BrowseNoResultsText:SetText("]].._AUCT['MesgNotLoaded']..[[");
+		end
+		local function onLoaded()
+			Stubby.UnregisterAddOnHook("Auctioneer", "Auctioneer")
+			Stubby.RegisterFunctionHook("AuctionFrame_Show", 100, Auctioneer_ShowNotLoaded)
+		end
+		Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, Auctioneer_CheckLoad)
+		Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "Auctioneer", onLoaded)
 		local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
 		if (loadType == "always") then
 			LoadAddOn("Auctioneer")
