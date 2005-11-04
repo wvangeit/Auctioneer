@@ -394,11 +394,6 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:Show()
 		end
 
-		-- Protect the auction frame from being closed if we should
-		if (Auctioneer_GetFilterVal('protect-window') == 2) then
-			Auctioneer_ProtectAuctionFrame(true);
-		end
-
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
