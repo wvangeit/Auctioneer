@@ -249,7 +249,7 @@ end
 
 function Auctioneer_RequestAuctionScan()
 	Auctioneer_isScanningRequested = true;
-	if( AuctionFrame:IsVisible() ) then
+	if (AuctionFrame and AuctionFrame:IsVisible()) then
 		local iButton;
 		local button;
 	
