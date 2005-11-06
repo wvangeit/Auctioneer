@@ -1,6 +1,12 @@
--- AHScanning
--- Functions for scanning the AH
--- Thanks to Telo for the LootLink code from which this was based.
+--[[
+	Auctioneer Addon for World of Warcraft(tm).
+	Version: <%version%>
+	Revision: $Id$
+
+	AHScanning
+	Functions for scanning the AH
+	Thanks to Telo for the LootLink code from which this was based.
+]]
 
 Auctioneer_isScanningRequested = false;
 local lCurrentAuctionPage;
