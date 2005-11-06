@@ -129,7 +129,26 @@ function Auctioneer_Convert()
 							data = iData.data;
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
-								hist = Auctioneer_StoreMedianList (iData.buyoutPricesHistoryList);
+								-- Check history list for corrupted data that several people seem to have.
+								-- Looks like some other item's "data" string. Example:
+								--	["9778:1182:0"] = {
+								--		["playerMade"] = false,
+								--		["name"] = "Bandit Buckler of the Bear",
+								--		["category"] = 2,
+								--		["data"] = "4:4:8230:0:0:3:11500",
+								--		["buyoutPricesHistoryList"] = {
+								--			[1] = 2500,
+								--			[2] = 3000,
+								--			[3] = "16:16:12756:0:0:9:23888",
+								--		},
+								--	},
+								for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
+									if (type(hPrice) ~= "number") then
+										-- unrecognized entry in the history list, nuke it :(
+										iData.buyoutPricesHistoryList[pos] = nil;
+									end
+								end
+								hist = Auctioneer_StoreMedianList(iData.buyoutPricesHistoryList);
 							end
 						end
 						if (name) then
