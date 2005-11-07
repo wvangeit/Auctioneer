@@ -78,8 +78,10 @@ function Auctioneer_OnLoad()
 			BrowseNoResultsText:SetText("]].._AUCT['MesgNotLoaded']..[[");
 		end
 		local function onLoaded()
-			Stubby.UnregisterAddOnHook("Auctioneer", "Auctioneer")
-			Stubby.RegisterFunctionHook("AuctionFrame_Show", 100, Auctioneer_ShowNotLoaded)
+			Stubby.UnregisterAddOnHook("Blizzard_AuctionUI", "Auctioneer")
+			if (not IsAddOnLoaded("Auctioneer")) then
+				Stubby.RegisterFunctionHook("AuctionFrame_Show", 100, Auctioneer_ShowNotLoaded)
+			end
 		end
 		Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, Auctioneer_CheckLoad)
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "Auctioneer", onLoaded)

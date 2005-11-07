@@ -54,7 +54,6 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			EnhTooltip.LineColor(0.5, 0.8, 0.5);
 		else -- (aCount > 0)
 			-- calculate auction values
-			local avgQty = math.floor(minCount / aCount);
 			local avgMin = math.floor(minPrice / minCount);
 
 			local bidPct = math.floor(bidCount / minCount * 100);
@@ -76,15 +75,9 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 				EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSeen'], aCount), nil, embedded);
 				EnhTooltip.LineColor(0.5,0.8,0.1);
 				if (not Auctioneer_GetFilter('show-verbose')) then -- default mode
-					if (avgQty > 1) then
-						-- OUTPUT: "For 1: [avgMin] min/[avgBuy] BO ([avgBid] bid) [in [avgQty]'s]"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoForone'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid), avgQty), nil, embedded);
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					else -- (avgQty = 1)
-						-- OUTPUT: "[avgMin] min/[avgBuy] BO ([avgBid] bid)"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					end
+					-- OUTPUT: "[avgMin] min/[avgBuy] BO ([avgBid] bid)"
+					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
+					EnhTooltip.LineColor(0.1,0.8,0.5);
 				else -- verbose mode
 					if (count > 1) then
 						-- OUTPUT: "Averages for [count] items:"
@@ -140,11 +133,6 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 							EnhTooltip.AddLine(_AUCT['FrmtInfoBuymedian'], median, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.95);
 						end
-					end
-					if (avgQty > 1) then
-						-- OUTPUT: "  Average stack size: [avgQty] items"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoStacksize'], avgQty), nil, embedded);
-						EnhTooltip.LineColor(0.4,0.5,1.0);
 					end
 				end
 
@@ -203,7 +191,6 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			end
 			local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, also);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
-			local avgQty = math.floor(minCount / aCount);
 			local avgMin = math.floor(minPrice / minCount);
 
 			local bidPct = math.floor(bidCount / minCount * 100);
@@ -225,13 +212,8 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 				if (Auctioneer_GetFilter('show-average')) then
 					EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoAlsoseen'], aCount, also), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.8,0.1);
-					if (avgQty > 1) then
-						EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoForone'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid), avgQty), nil, embedded);
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					else
-						EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					end
+					EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
+					EnhTooltip.LineColor(0.1,0.8,0.5);
 					if (Auctioneer_GetFilter('show-suggest')) then
 						local hsp = Auctioneer_GetHSP(itemKey, also);
 						if hsp == 0 and buyCount > 0 then
