@@ -1,5 +1,5 @@
 ## Title: Stubby
-## Notes: Allows on-demand addons to load automatically based upon simple event notification hooks [<%version%>]
+## Notes: Allows on-demand addons to load automatically based upon simple event notification hooks [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
 ## Interface: 1800
 ## SavedVariables: StubbyConfig

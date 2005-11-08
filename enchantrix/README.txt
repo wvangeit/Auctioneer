@@ -1,4 +1,4 @@
 Enchantrix v<%version%>
 -------------------------------
-FROM: http://enchantrix.sf.net
+FROM: http://enchantrix.org
 
