@@ -1,5 +1,5 @@
 ## Title: Informant
-## Notes: Displays detailed item information in tooltips, and can produce item reports by binding an infomation window to a keypress [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
+## Notes: Displays detailed item information in tooltips, and can produce item reports by binding an information window to a keypress [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
 ## Interface: 1800
 ## LoadOnDemand: 1
