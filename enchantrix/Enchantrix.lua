@@ -232,7 +232,7 @@ function Enchantrix_TakeInventory()
 	local bagid, slotid, size;
 	local inventory = {};
 
-	for bagid = 0, 4, 1 do
+	for bagid = 0, 10, 1 do -- Changed from 4 to 10 by FtKxDE to include bank bags as well
 		inventory[bagid] = {};
 
 		size = GetContainerNumSlots(bagid);
@@ -411,6 +411,16 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 		
 		return
 	end
+	-- Added by FtKxDE
+	-- Unable to determine which item was disenchanted when disenchanting from a bank slot, ignore DE to avoid incorrect data
+	if ((event == "PLAYERBANKSLOTS_CHANGED") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
+		
+		Enchantrix_Disenchants = {};
+		Enchantrix_Disenchanting = false;
+		Enchantrix_WaitingPush = false;
+		
+		return;
+	end
 end
 
 function Enchantrix_ChatPrint(str)
@@ -433,6 +443,8 @@ function Enchantrix_OnLoad()
 	Stubby.RegisterEventHook("SPELLCAST_STOP", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("ITEM_PUSH", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("BAG_UPDATE", "Enchantrix", Enchantrix_OnEvent);
+	-- Added by FtKxDE (see changes in function "Enchantrix_OnEvent" for details)
+	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "Enchantrix", Enchantrix_OnEvent);
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
