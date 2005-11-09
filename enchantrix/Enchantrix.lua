@@ -384,7 +384,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 
 		local itemData = Enchantrix_GetLocal(foundItem.s);
 		
-		DEFAULT_CHAT_FRAME:AddMessage(string.format(ENCH_FRMT_FOUND, foundItem.l), 0.8, 0.8, 0.2);
+		Enchantrix_ChatPrint(string.format(ENCH_FRMT_FOUND, foundItem.l), 0.8, 0.8, 0.2);
 		for sig, data in gainedItem do
 			local i,j, strItemID = string.find(sig, "^(%d+):");
 			local itemID = 0;
@@ -399,7 +399,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 				curData.i = ""..(iCount + 1);
 				curData.d = ""..(dCount + data.d);
 				itemData[itemID] = curData;
-				DEFAULT_CHAT_FRAME:AddMessage("  " .. data.n .. " x" .. data.d, 0.6, 0.6, 0.1);
+				Enchantrix_ChatPrint("  " .. data.n .. " x" .. data.d, 0.6, 0.6, 0.1);
 			end
 		end
 		
@@ -423,11 +423,21 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 	end
 end
 
-function Enchantrix_ChatPrint(str)
-	if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
-		getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(str, 1.0, 0.5, 0.25);
-	elseif (DEFAULT_CHAT_FRAME) then 
-		DEFAULT_CHAT_FRAME:AddMessage(str, 1.0, 0.5, 0.25);
+function Enchantrix_ChatPrint(text, red, green, blue, alpha, holdTime)
+
+	if (red and green and blue) then
+		if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
+			getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(text, red, green, blue, alpha, holdTime);
+		elseif (DEFAULT_CHAT_FRAME) then 
+			DEFAULT_CHAT_FRAME:AddMessage(text, red, green, blue, alpha, holdTime);
+		end
+
+	else
+		if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
+			getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(text, 1.0, 0.5, 0.25);
+		elseif (DEFAULT_CHAT_FRAME) then 
+			DEFAULT_CHAT_FRAME:AddMessage(text, 1.0, 0.5, 0.25);
+		end
 	end
 end
 
