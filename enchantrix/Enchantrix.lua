@@ -259,6 +259,31 @@ function Enchantrix_TakeInventory()
 			end
 		end
 	end
+
+	-- Added by FtKxDE to include player's inventory
+	inventory["inv"] = {};
+	
+	for slotid = 0, 19, 1 do
+		inventory["inv"][slotid] = {};
+		
+		local link = GetInventoryItemLink("player", slotid);
+		if( link ) then
+			local name = Enchantrix_NameFromLink(link);
+			local sig = Enchantrix_SigFromLink(link);
+			local texture = GetInventoryItemTexture("player", slotid);
+			local itemCount = GetInventoryItemCount("player", slotid);
+			if ((not itemCount) or (itemCount < 1)) then
+				itemCount = 1;
+			end
+			if (name) then
+				inventory["inv"][slotid].name = name;
+				inventory["inv"][slotid].tx = texture;
+				inventory["inv"][slotid].sig = sig;
+				inventory["inv"][slotid].link = link;
+				inventory["inv"][slotid].count = itemCount;
+			end
+		end
+	end
 	return inventory;
 end
 
@@ -365,7 +390,13 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 				foundItem = data;
 			end
 		end
-		if (foundItem == "") then return; end
+		if (foundItem == "") then
+			-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
+			Enchantrix_Disenchants = {};
+			Enchantrix_Disenchanting = false;
+			Enchantrix_WaitingPush = false;					
+			return;
+		end
 		
 		local gainedItem = {};
 		for sig, data in invDiff do
@@ -408,16 +439,6 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 		
 		return
 	end
-	-- Added by FtKxDE
-	-- Unable to determine which item was disenchanted when disenchanting from a bank slot, ignore DE to avoid incorrect data
-	if ((event == "PLAYERBANKSLOTS_CHANGED") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
-		
-		Enchantrix_Disenchants = {};
-		Enchantrix_Disenchanting = false;
-		Enchantrix_WaitingPush = false;
-		
-		return;
-	end
 end
 
 function Enchantrix_ChatPrint(text, red, green, blue, alpha, holdTime)
@@ -450,8 +471,6 @@ function Enchantrix_OnLoad()
 	Stubby.RegisterEventHook("SPELLCAST_STOP", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("ITEM_PUSH", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("BAG_UPDATE", "Enchantrix", Enchantrix_OnEvent);
-	-- Added by FtKxDE (see changes in function "Enchantrix_OnEvent" for details)
-	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "Enchantrix", Enchantrix_OnEvent);
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
