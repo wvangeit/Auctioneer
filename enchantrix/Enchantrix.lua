@@ -245,9 +245,6 @@ function Enchantrix_TakeInventory()
 					local name = Enchantrix_NameFromLink(link);
 					local sig = Enchantrix_SigFromLink(link);
 					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bagid, slotid);
-					if (quality > -1) and (quality < 2) and (DisenchantList[sig]) then 
-						EnchantedLocal = { z = true; };
-					end
 					if ((not itemCount) or (itemCount < 1)) then
 						itemCount = 1;
 					end
@@ -819,17 +816,18 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 
 	-- Automatically convert any named EnchantedLocal items to new items
 	if (name and EnchantedLocal[name]) then
-		for dName, count in EnchantedLocal[name] do
+		local iData = Enchantrix_GetLocal(name)
+		for dName, count in iData do
 			local dSig = EssenceItemIDs[dName];
 			if (dSig ~= nil) then
-				if (not EnchantedLocal[sig]) then EnchantedLocal[sig] = {}; end
-				if (not EnchantedLocal[sig][dSig]) then EnchantedLocal[sig][dSig] = {}; end
-				local oCount = tonumber(EnchantedLocal[sig][dSig].o);
+				if (not iData[dSig]) then iData[dSig] = {}; end
+				local oCount = tonumber(iData[dSig].o);
 				if (oCount == nil) then oCount = 0; end
-				EnchantedLocal[sig][dSig].o = ""..count;
+				iData[dSig].o = ""..count;
 			end
 		end
 		EnchantedLocal[name] = nil;
+		Enchantrix_SaveLocal(sig, iData);
 	end
 
 	-- If there is data, then work out the disenchant data
