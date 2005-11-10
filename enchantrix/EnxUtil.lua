@@ -58,17 +58,17 @@ function Enchantrix_ConvertFilters()
 							['on'] = 'default',
 							}
 	
-	-- Format: standardizedKey,		valueMap,		localizedKey,			localizedKey			...
+	-- Format: standardizedKey,		valueMap,		esES,					deDE (old)			...
 	local conversions = {
 			{ 'all',				convertOnOff },
-			{ 'embed',				convertOnOff,	'integrar' },
-			{ 'header',				convertOnOff,	'titulo' },
-			{ 'counts',				convertOnOff,	'conteo' },
-			{ 'rates',				convertOnOff,	'razones' },
-			{ 'valuate',			convertOnOff,	'valorizar' },
-			{ 'valuate-hsp',		convertOnOff,	'valorizar-pmv' },
+			{ 'embed',				convertOnOff,	'integrar',				'zeige-eingebunden' },
+			{ 'header',				convertOnOff,	'titulo',				'zeige-kopf'},
+			{ 'counts',				convertOnOff,	'conteo',				'zeige-anzahl' },
+			{ 'rates',				convertOnOff,	'razones',				'zeige-kurs' },
+			{ 'valuate',			convertOnOff,	'valorizar',			'zeige-wert' },
+			{ 'valuate-hsp',		convertOnOff,	'valorizar-pmv',		'valuate-hvp' },
 			{ 'valuate-median',		convertOnOff,	'valorizar-mediano' },
-			{ 'valuate-baseline',	convertOnOff,	'valorizar-referencia' },
+			{ 'valuate-baseline',	convertOnOff,	'valorizar-referencia', 'valuate-grundpreis' },
 			{ 'locale',				localeConvMap },
 		}
 		
