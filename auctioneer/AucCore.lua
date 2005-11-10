@@ -518,7 +518,7 @@ function Auctioneer_LockAndLoad()
 
 		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
 		if (count and count > 1 and not noSplit) then
-			if (button == "RightButton") and (IsAltKeyDown()) then
+			if (button == "RightButton") and (IsControlKeyDown()) then
 				local splitCount = math.floor(count / 2)
 				local emptyBag, emptySlot = Auctioneer_FindEmptySlot()
 				if (emptyBag) then
@@ -526,6 +526,17 @@ function Auctioneer_LockAndLoad()
 					PickupContainerItem(emptyBag, emptySlot)
 				else
 					Auctioneer_ChatPrint("Can't split, all bags are full")
+				end
+				return
+			end
+		end
+
+		local link = GetContainerItemLink(bag, slot)
+		if (link) then
+			if (button == "RightButton") and (IsAltKeyDown()) then
+				local itemName = EnhTooltip.NameFromLink(link)
+				if (itemName) then
+					QueryAuctionItems(itemName, "", "", nil, nil, nil, 0, nil, nil)
 				end
 				return
 			end
