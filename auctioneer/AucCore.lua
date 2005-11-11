@@ -533,7 +533,8 @@ function Auctioneer_LockAndLoad()
 
 		local link = GetContainerItemLink(bag, slot)
 		if (link) then
-			if (button == "RightButton") and (IsAltKeyDown()) then
+			if (button == "RightButton") and (IsAltKeyDown()) and (AuctionFrame:IsVisible()) then
+				AuctionFrameTab_OnClick(1)
 				local itemName = EnhTooltip.NameFromLink(link)
 				if (itemName) then
 					QueryAuctionItems(itemName, "", "", nil, nil, nil, 0, nil, nil)
