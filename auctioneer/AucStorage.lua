@@ -51,3 +51,72 @@ function Auctioneer_SetSnapMed(auctKey, itemKey, median, count)
 		AuctionConfig.stats.snapcount[auctKey][itemKey] = 0
 	end
 end
+
+function Auctioneer_GetFixedPrice(itemKey, count, auctKey)
+	if (auctKey == nil) then
+		auctKey = Auctioneer_GetAuctionKey();
+	end
+	
+	if (not count) then count = 1; end
+	
+	local i, j;
+	local start, buy, stackSize, dur;
+	if (not AuctionConfig or not AuctionConfig.fixedprice) then
+		-- No fixed prices stored at all, do nothing
+	elseif (auctKey and AuctionConfig.fixedprice[auctKey] and AuctionConfig.fixedprice[auctKey][itemKey]) then
+		-- Get fixed price for this realm/faction
+		i,j, start,buy,stackSize,dur = string.find(AuctionConfig.fixedprice[auctKey][itemKey], "(%d+):(%d+):(%d+):(%d+)");
+	elseif (AuctionConfig.fixedprice["global"]) then
+		-- Get global fixed price
+		i,j, start,buy,stackSize,dur = string.find(AuctionConfig.fixedprice["global"][itemKey], "(%d+):(%d+):(%d+):(%d+)");
+	end
+	
+	-- Return nil when no fixed price is found
+	if (not i) then	return nil;	end
+	
+	-- Calculate and return prices for desired stack size
+	if (not stackSize) then stackSize = 1; end
+	return Auctioneer_Round(start*count/stackSize), Auctioneer_Round(buy*count/stackSize), tonumber(dur);
+end
+
+function Auctioneer_SetFixedPrice(itemKey, startingBid, buyout, duration, count, auctKey)
+	if (auctKey == nil) then
+		auctKey = Auctioneer_GetAuctionKey();
+	elseif (auctKey == false) then
+		auctKey = "global";
+	end	
+	
+	if (not count) then count = 1; end
+
+	-- Check if any of the data actually changed, to avoid drifting prices when
+	-- auctioned with different stack sizes
+	oldStart, oldBuyout, oldDur = Auctioneer_GetFixedPrice(itemKey, count, auctKey);
+	if (oldStart == startingBid and oldBuyout == buyout and oldDur == duration) then return; end
+	
+	-- Create table structure for storage if needed
+	if (not AuctionConfig) then AuctionConfig = {}; end
+	if (not AuctionConfig.fixedprice) then AuctionConfig.fixedprice = {}; end
+	if (not AuctionConfig.fixedprice[auctKey]) then AuctionConfig.fixedprice[auctKey] = {}; end
+	
+	-- Store the new fixed price
+	AuctionConfig.fixedprice[auctKey][itemKey] = string.format("%d:%d:%d:%d", startingBid, buyout, count, duration)
+end
+
+function Auctioneer_DeleteFixedPrice(itemKey, auctKey)
+	if (auctKey == nil) then
+		auctKey = Auctioneer_GetAuctionKey();
+	end
+	
+	-- No fixed prices, we're done here
+	if (not AuctionConfig or not AuctionConfig.fixedprice) then return; end
+	
+	-- Delete realm/faction specific fixed price
+	if (auctKey and AuctionConfig.fixedprice[auctKey]) then
+		AuctionConfig.fixedprice[auctKey][itemKey] = nil;
+	end
+	
+	-- Delete global fixed price
+	if (AuctionConfig.fixedprice["global"]) then
+		AuctionConfig.fixedprice["global"][itemKey] = nil;
+	end
+end

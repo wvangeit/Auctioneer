@@ -445,6 +445,20 @@ function Auctioneer_AddonLoaded()
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
 	end
+	
+	-- Auto-convert to per-auctKey fixed prices
+	if (AuctionConfig.version == 30200) then
+		if (AuctionConfig.fixedprice) then
+			local fixedPrices = AuctionConfig.fixedprice;
+			for k, v in fixedPrices do
+				local i,j, start,buy,dur = string.find(v, "(%d+):(%d+):(%d+)");
+				fixedPrices[k] = string.format("%s:%s:%d:%s", start, buy, 1, dur)
+			end
+			AuctionConfig.fixedprice = { ["global"] = fixedPrices };
+		end
+		AuctionConfig.version = 30201
+	end
+	
 	Auctioneer_LockAndLoad();
 end
 

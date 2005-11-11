@@ -313,9 +313,7 @@ end
 -- hook into the auction starting process
 function Auctioneer_StartAuction(funcArgs, retVal, start, buy, duration)
 	if (AuctPriceRememberCheck:GetChecked()) then
-		if (not AuctionConfig.fixedprice) then AuctionConfig.fixedprice = {} end
-		local count = Auctioneer_CurAuctionCount
-		AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = string.format("%d:%d:%d", math.ceil(start/count), math.ceil(buy/count), duration)
+		Auctioneer_SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, duration, Auctioneer_CurAuctionCount)
 	end
 	Auctioneer_CurAuctionItem = nil
 	Auctioneer_CurAuctionCount = nil
@@ -440,16 +438,13 @@ function Auctioneer_RememberPrice()
 	end
 
 	if (not AuctPriceRememberCheck:GetChecked()) then
-		if (AuctionConfig.fixedprice) then
-			AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = nil
-		end
+		Auctioneer_DeleteFixedPrice(Auctioneer_CurAuctionItem)
 	else
-		if (not AuctionConfig.fixedprice) then AuctionConfig.fixedprice = {} end
 		local count = Auctioneer_CurAuctionCount
 		local start = MoneyInputFrame_GetCopper(StartPrice)
 		local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
 		local dur = AuctionFrameAuctions.duration
-		AuctionConfig.fixedprice[Auctioneer_CurAuctionItem] = string.format("%d:%d:%d", math.ceil(start/count), math.ceil(buy/count), dur)
+		Auctioneer_SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, dur, count)
 	end
 end
 
@@ -523,7 +518,7 @@ function Auctioneer_NewAuction()
 	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey);
 	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 
-	if (AuctionConfig.fixedprice and AuctionConfig.fixedprice[itemKey]) then
+	if (Auctioneer_GetFixedPrice(itemKey)) then
 		AuctPriceRememberCheck:SetChecked(true)
 	else
 		AuctPriceRememberCheck:SetChecked(false)
@@ -557,13 +552,13 @@ function Auctioneer_NewAuction()
 	local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
 	local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 
-	if (AuctionConfig.fixedprice and AuctionConfig.fixedprice[itemKey]) then
-		local i,j, start,buy,dur = string.find(AuctionConfig.fixedprice[itemKey], "(%d+):(%d+):(%d+)");
+	if (Auctioneer_GetFixedPrice(itemKey)) then
+		local start, buy, dur = Auctioneer_GetFixedPrice(itemKey, countFix)
 		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoSugbid'], bidPrice);
 		Auctioneer_Auctions_SetLine(5, _AUCT['FrmtAuctinfoSugbuy'], buyPrice);
 		Auctioneer_Auctions_SetWarn(_AUCT['FrmtWarnUser']);
-		MoneyInputFrame_SetCopper(StartPrice, start*countFix);
-		MoneyInputFrame_SetCopper(BuyoutPrice, buy*countFix);
+		MoneyInputFrame_SetCopper(StartPrice, start);
+		MoneyInputFrame_SetCopper(BuyoutPrice, buy);
 		Auctioneer_SetAuctionDuration(tonumber(dur));
 	elseif (Auctioneer_GetFilter('autofill')) then
 		Auctioneer_Auctions_SetLine(4, _AUCT['FrmtAuctinfoMktprice'], nullSafe(mktPrice)*countFix);

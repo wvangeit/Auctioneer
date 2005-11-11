@@ -196,13 +196,13 @@ function Auctioneer_Convert()
 			end
 		end
 	end
-
+	
 	-- Now the conversion is complete, wipe out the old data
 	AHSnapshot = nil;
 	AHSnapshotItemPrices = nil;
 	AuctionPrices = nil;
 	AuctionBids = nil;
-	AuctionConfig.version = 30200;
+	AuctionConfig.version = 30201;
 end
 
 

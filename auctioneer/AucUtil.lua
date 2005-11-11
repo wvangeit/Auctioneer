@@ -334,6 +334,14 @@ function Auctioneer_ProtectAuctionFrame(enable)
 	end
 end
 
+function Auctioneer_Round(x)
+	local y = math.floor(x);
+	if (x - y >= 0.5) then
+		return y + 1;
+	end
+	return y;
+end
+
 --------------------------------------
 --		Localization functions		--
 --------------------------------------
