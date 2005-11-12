@@ -526,9 +526,6 @@ function Enchantrix_OnLoad()
 	SlashCmdList["ENCHANTRIX"] = function(msg)
 		Enchantrix_Command(msg);
 	end
-
-	--GUI Registration code added by MentalPower	
-	Enchantrix_Register();
 end
 
 -- This function differs from Enchantrix_OnLoad in that it is executed
@@ -538,6 +535,9 @@ function Enchantrix_AddonLoaded()
 
 	Enchantrix_ConvertFilters();		-- Convert old localized settings
 	Enchantrix_SetFilterDefaults();		-- Apply defaults
+
+	--GUI Registration code added by MentalPower	
+	Enchantrix_Register();
 
 	Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		

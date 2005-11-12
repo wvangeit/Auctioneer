@@ -444,8 +444,8 @@ function Enchantrix_BuildCommandMap()
 			[ENCH_CMD_FIND_BUYAUCT_SHORT] = 'percentless',
 			[ENCH_SHOW_EMBED] = 'embed',
 			[ENCH_SHOW_COUNT] = 'counts',
-			--[ENCH_SHOW_RATE] = 'rates',
-			--[ENCH_SHOW_HEADER] = 'header',
+			-- [ENCH_SHOW_RATE] = 'rates',
+			-- [ENCH_SHOW_HEADER] = 'header',
 			[ENCH_SHOW_VALUE] = 'valuate',
 			[ENCH_SHOW_GUESS_AUCTIONEER_HSP] = 'valuate-hsp',
 			[ENCH_SHOW_GUESS_AUCTIONEER_MED] = 'valuate-median',
@@ -459,10 +459,10 @@ function Enchantrix_BuildCommandMap()
 end
 
 
---Cleaner Command Handling Functions (added by MentalPower)
+-- Cleaner Command Handling Functions (added by MentalPower)
 function Enchantrix_Command(command, source)
 	
-	--To print or not to print, that is the question...
+	-- To print or not to print, that is the question...
 	local chatprint = nil;
 	if (source == "GUI") then 
 		chatprint = false;
@@ -470,7 +470,7 @@ function Enchantrix_Command(command, source)
 		chatprint = true;
 	end;
 	
-	--Divide the large command into smaller logical sections (Shameless copy from the original function)
+	-- Divide the large command into smaller logical sections (Shameless copy from the original function)
 	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$")
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
@@ -522,7 +522,7 @@ function Enchantrix_Command(command, source)
 	end
 end
 
---Help ME!! (The Handler) (Another shameless copy from the original function)
+-- Help ME!! (The Handler) (Another shameless copy from the original function)
 function Enchantrix_ChatPrint_Help()
 Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		local onOffToggle = " ("..ENCH_CMD_ON.."|"..ENCH_CMD_OFF.."|"..ENCH_CMD_TOGGLE..")";
@@ -556,12 +556,12 @@ Enchantrix_ChatPrint(ENCH_FRMT_USAGE);
 		
 end
 
---The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
---If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
---If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
---If no keyword is specified then the function will simply return the current state
+-- The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
+-- If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
+-- If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
+-- If no keyword is specified then the function will simply return the current state
 --
---If chatprint is "true" then the state will also be printed to the user.
+-- If chatprint is "true" then the state will also be printed to the user.
 
 function Enchantrix_OnOff(state, chatprint)
 	state = Enchantrix_DelocalizeFilterVal(state)
@@ -574,7 +574,7 @@ function Enchantrix_OnOff(state, chatprint)
 		Enchantrix_SetFilter('all', not Enchantrix_GetFilter('all'))
 	end
 
-	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
+	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint == true) then
 		if (Enchantrix_GetFilter('all')) then
 			Enchantrix_ChatPrint(ENCH_STAT_ON);
@@ -588,7 +588,7 @@ function Enchantrix_OnOff(state, chatprint)
 	return state;	
 end
 
---The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
+-- The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function Enchantrix_Clear(param, chatprint)
 	if ((param == ENCH_CMD_CLEAR_ALL) or (param == "all")) then		
 		EnchantedLocal = {};
@@ -611,27 +611,29 @@ end
 
 function Enchantrix_SetLocale(param, chatprint)
 	param = Enchantrix_DelocalizeFilterVal(param)
-	local validLocale=nil;
-
-	if (param == Enchantrix_GetLocale()) then
-		--Do Nothing
-		validLocale=true;
-	elseif (ENCH_VALID_LOCALES[param]) then
-		Enchantrix_SetFilter('locale', param);
+	local validLocale = nil;
+	local newLocale = nil;
+	
+	if (ENCH_VALID_LOCALES[param]) then
+		if (param ~= Enchantrix_GetFilterVal('locale')) then
+			Enchantrix_SetFilter('locale', param);
+			newLocale = true;
+		end
+		validLocale = true;
+	elseif (param == '') or (param == 'default') or (param == 'off') then
+		if (Enchantrix_GetLocale() ~= GetLocale()) then
+			newLocale = true;
+		end
+		Enchantrix_SetFilter('locale', 'default');
+		validLocale = true;
+	end
+	
+	if (newLocale) then
 		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
 		Enchantrix_CommandMap = nil
 		Enchantrix_CommandMapRev = nil
 		setKhaosSetKeyParameter('locale', "value", param);
 		resetKhaos();
-		validLocale=true;
-	elseif (param == '') or (param == 'default') or (param == 'off') then
-		Enchantrix_SetFilter('locale', 'default');
-		Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
-		Enchantrix_CommandMap = nil
-		Enchantrix_CommandMapRev = nil
-		setKhaosSetKeyParameter('locale', "value", 'default');
-		resetKhaos();
-		validLocale=true;
 	end
 	
 	if (chatprint) then
@@ -652,7 +654,7 @@ function Enchantrix_SetLocale(param, chatprint)
 	end
 end
 
---This function was added by MentalPower to implement the /enx default command
+-- This function was added by MentalPower to implement the /enx default command
 function Enchantrix_Default(param, chatprint)
 	local paramLocalized
 	
@@ -684,7 +686,7 @@ end
 
 
 
---The following three functions were added by MentalPower to implement the /enx print-in command
+-- The following three functions were added by MentalPower to implement the /enx print-in command
 function Enchantrix_GetFrameNames(index)
 
 	local frames = {};
@@ -739,15 +741,15 @@ function Enchantrix_SetFrame(frame, chatprint)
 	local frameVal
 	frameVal = tonumber(frame)
 
-	--If no arguments are passed, then set it to the default frame.
+	-- If no arguments are passed, then set it to the default frame.
 	if not (frame) then 
 		frameNumber = 1;
 
-	--If the frame argument is a number then set our chatframe to that number.
+	-- If the frame argument is a number then set our chatframe to that number.
 	elseif ((frameVal) ~= nil) then 
 		frameNumber = frameVal;
 
-	--If the frame argument is a string, find out if there's a chatframe with that name, and set our chatframe to that index. If not set it to the default frame.
+	-- If the frame argument is a string, find out if there's a chatframe with that name, and set our chatframe to that index. If not set it to the default frame.
 	elseif (type(frame) == "string") then
 		allFrames = Enchantrix_GetFrameNames();
 		if (allFrames[frame]) then
@@ -756,7 +758,7 @@ function Enchantrix_SetFrame(frame, chatprint)
 			frameNumber = 1;
 		end
 
-	--If the argument is something else, set our chatframe to it's default value.
+	-- If the argument is something else, set our chatframe to it's default value.
 	else
 		frameNumber = 1;
 	end

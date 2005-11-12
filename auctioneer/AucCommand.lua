@@ -1146,29 +1146,31 @@ end
 
 
 function Auctioneer_SetLocale(param, chatprint)
-	local validLocale=nil;
 	param = Auctioneer_DelocalizeFilterVal(param);
+	local validLocale = nil;
+	local newLocale = nil;
 
-	if (param == Auctioneer_GetLocale()) then
-		--Do Nothing
-		validLocale=true;
-	elseif (AUCT_VALID_LOCALES[param]) then
-		Auctioneer_SetFilter('locale', param);
-		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-		Auctioneer_CommandMap = nil
-		Auctioneer_CommandMapRev = nil
-		setKhaosSetKeyValue('locale', param);
-		resetKhaos();
-		validLocale=true;
-	elseif ((param == '') or (param == _AUCT['CmdDefault']) or (param == 'default') or (param == _AUCT['CmdOff']) or (param == 'off')) then
-		Auctioneer_SetFilter('locale', _AUCT['CmdDefault']);
-		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-		Auctioneer_CommandMap = nil
-		Auctioneer_CommandMapRev = nil
-		setKhaosSetKeyValue('locale', param);
-		resetKhaos();
-		validLocale=true;
+	if (AUCT_VALID_LOCALES[param]) then
+		if (param ~= Auctioneer_GetFilterVal('locale')) then
+			Auctioneer_SetFilter('locale', param);
+			newLocale = true;
+		end
+		validLocale = true;
+	elseif ((param == '') or (param == 'default') or (param == 'off')) then
+		if (Auctioneer_GetLocale() ~= GetLocale()) then
+			newLocale = true;
+		end
+		Auctioneer_SetFilter('locale', 'default');
+		validLocale = true;
 	end
+	
+	if (newLocale) then
+		Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
+		Auctioneer_CommandMap = nil
+		Auctioneer_CommandMapRev = nil
+		setKhaosSetKeyValue('locale', param);
+		resetKhaos();
+	end	
 
 	if (chatprint) then
 		if (validLocale and (AUCT_VALID_LOCALES[param])) then
