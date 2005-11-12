@@ -1157,10 +1157,11 @@ function Auctioneer_SetLocale(param, chatprint)
 		end
 		validLocale = true;
 	elseif ((param == '') or (param == 'default') or (param == 'off')) then
+		param = 'default';
 		if (Auctioneer_GetLocale() ~= GetLocale()) then
 			newLocale = true;
 		end
-		Auctioneer_SetFilter('locale', 'default');
+		Auctioneer_SetFilter('locale', param);
 		validLocale = true;
 	end
 	
