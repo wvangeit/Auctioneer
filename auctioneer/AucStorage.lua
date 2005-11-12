@@ -66,7 +66,7 @@ function Auctioneer_GetFixedPrice(itemKey, count, auctKey)
 	elseif (auctKey and AuctionConfig.fixedprice[auctKey] and AuctionConfig.fixedprice[auctKey][itemKey]) then
 		-- Get fixed price for this realm/faction
 		i,j, start,buy,stackSize,dur = string.find(AuctionConfig.fixedprice[auctKey][itemKey], "(%d+):(%d+):(%d+):(%d+)");
-	elseif (AuctionConfig.fixedprice["global"]) then
+	elseif (AuctionConfig.fixedprice["global"] and AuctionConfig.fixedprice["global"][itemKey]) then
 		-- Get global fixed price
 		i,j, start,buy,stackSize,dur = string.find(AuctionConfig.fixedprice["global"][itemKey], "(%d+):(%d+):(%d+):(%d+)");
 	end
