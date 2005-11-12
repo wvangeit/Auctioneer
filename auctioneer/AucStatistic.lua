@@ -494,8 +494,11 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 
 			-- since we don't want to decode the full data unless there's a chance it belongs to the player
 			-- do a substring search for the players name first.
+			-- For some reason AuctionConfig.snap[realm][itemCat][currentLowestSig] sometimes doesn't
+			-- exist, even if currentLowestBuyout is set. Added a check for this as a workaround, but
+			-- the real cause should probably be tracked down - Thorarin
 			local snap;
-			if (string.find(AuctionConfig.snap[realm][itemCat][currentLowestSig], UnitName("player"), 1, true)) then
+			if (AuctionConfig.snap[realm][itemCat][currentLowestSig] and string.find(AuctionConfig.snap[realm][itemCat][currentLowestSig], UnitName("player"), 1, true)) then
 				snap = Auctioneer_GetSnapshot(realm, itemCat, currentLowestSig);
 			end
 			if snap and snap.owner == UnitName("player") then
