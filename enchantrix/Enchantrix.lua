@@ -260,6 +260,33 @@ function Enchantrix_TakeInventory()
 		end
 	end
 
+	-- Added by FtKxDE to include bank slots
+	inventory["bank"] = {};
+
+	size = GetContainerNumSlots(BANK_CONTAINER);
+	if( size ) then
+		for slotid = size, 1, -1 do
+			inventory["bank"][slotid] = {};
+
+			local link = GetContainerItemLink(BANK_CONTAINER, slotid);
+			if( link ) then
+				local name = Enchantrix_NameFromLink(link);
+				local sig = Enchantrix_SigFromLink(link);
+				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(BANK_CONTAINER, slotid);
+				if ((not itemCount) or (itemCount < 1)) then
+					itemCount = 1;
+				end
+				if (name) then
+					inventory["bank"][slotid].name = name;
+					inventory["bank"][slotid].tx = texture;
+					inventory["bank"][slotid].sig = sig;
+					inventory["bank"][slotid].link = link;
+					inventory["bank"][slotid].count = itemCount;
+				end
+			end
+		end
+	end
+	
 	-- Added by FtKxDE to include player's inventory
 	inventory["inv"] = {};
 	
