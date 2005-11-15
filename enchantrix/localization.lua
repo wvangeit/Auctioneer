@@ -700,13 +700,43 @@ function Enchantrix_SetLocaleStrings(locale)
 	-- Locale strings for the frFR locale
 	if locale == "frFR" then
 		-- Encoded in UTF8
-		-- French localization for Enchantrix
+		-- French localization for Enchantrix by Geoffrey (see http://norganna.org/bb/index.php?s=&showtopic=576&view=findpost&p=3082)
 		-- Were currently looking for french translators. Apply at norganna.com/bb
 		
-
+		
+		ENCH_ARG_SPELLNAME="D\195\169senchanter";
+		
+		
+		ENCH_FRMT_DISINTO="Ce d\195\169senchante en:";
+		
+		
+		
+		EssenceItemIDs={};
+		EssenceItemIDs["Essence astrale sup\195\169rieure"] = 11082;
+		EssenceItemIDs["Essence \195\169ternelle sup\195\169rieure"] = 16203;
+		EssenceItemIDs["Essence de magie sup\195\169rieure"] = 10939;
+		EssenceItemIDs["Essence mystique sup\195\169rieure"] = 11135;
+		EssenceItemIDs["Essence du n\195\169ant sup\195\169rieure"] = 11175;
+		EssenceItemIDs["Essence astrale inf\195\169rieure"] = 10998;
+		EssenceItemIDs["Essence \195\169ternelle inf\195\169rieure"] = 16202;
+		EssenceItemIDs["Essence de magie inf\195\169rieure"] = 10938;
+		EssenceItemIDs["Essence mystique inf\195\169rieure"] = 11134;
+		EssenceItemIDs["Essence du n\195\169ant inf\195\169rieure"] = 11174;
+		EssenceItemIDs["Grand \195\169clat brillant"] = 14344;
+		EssenceItemIDs["Gros \195\169clat scintillant"] = 11084;
+		EssenceItemIDs["Gros \195\169clat lumineux"] = 11139;
+		EssenceItemIDs["Gros \195\169clat irradiant"] = 11178;
+		EssenceItemIDs["Petit \195\169clat brillant"] = 14343;
+		EssenceItemIDs["Petit \195\169clat scintillant"] = 10978;
+		EssenceItemIDs["Petit \195\169clat lumineux"] = 11138;
+		EssenceItemIDs["Petit \195\169clat irradiant"] = 11177;
+		EssenceItemIDs["Poussi\195\168re de r\195\170ve"] = 11176;
+		EssenceItemIDs["Poudre d'illusion"] = 16204;
+		EssenceItemIDs["Poussi\195\168re d'\195\162me"] = 11083;
+		EssenceItemIDs["Poussi\195\168re \195\169trange"] = 10940;
+		EssenceItemIDs["Poussi\195\168re de vision"] = 11137;
 
 		-- The following definitions are missing in this locale:
-		--	ENCH_ARG_SPELLNAME = "";
 		--	ENCH_CMD_CLEAR = "";
 		--	ENCH_CMD_CLEAR_ALL = "";
 		--	ENCH_CMD_DEFAULT = "";
@@ -738,7 +768,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_FRMT_BIDBROKER_MINBID = "";
 		--	ENCH_FRMT_COUNTS = "";
 		--	ENCH_FRMT_CREDIT = "";
-		--	ENCH_FRMT_DISINTO = "";
 		--	ENCH_FRMT_FOUND = "";
 		--	ENCH_FRMT_PCTLESS_DONE = "";
 		--	ENCH_FRMT_PCTLESS_HEADER = "";
@@ -812,7 +841,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_STAT_ON = "";
 		--	ENCH_TEXT_COMBAT = "";
 		--	ENCH_TEXT_GENERAL = "";
-		--	EssenceItemIDs = "";
 
 	end
 
