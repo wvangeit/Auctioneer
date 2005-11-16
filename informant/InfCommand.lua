@@ -297,6 +297,14 @@ function genVarSet(variable, param, chatprint)
 	end
 end
 
+local function getKhaosLocaleList()
+	local options = { [_INFORMANT['CmdDefault']] = 'default' };
+	for locale, _ in pairs(INFORMANT_VALID_LOCALES) do
+		options[locale] = locale;
+	end
+	return options
+end
+
 function registerKhaos()
 	local optionSet = {
 		id="Informant",
@@ -333,28 +341,29 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
-				id="locale",
-				type=K_EDITBOX,
+				id="locale";
+				type=K_PULLDOWN;
 				setup = {
-					callOn = {"enter", "tab"}
-				},
-				text=_INFORMANT['GuiLocale'],
-				helptext=_INFORMANT['HelpLocale'],
+					options = getKhaosLocaleList();
+					multiSelect = false;
+				};
+				text=_INFORMANT['GuiLocale'];
+				helptext=_INFORMANT['HelpLocale'];
 				callback = function(state)
-					cmdLocale(state.value)
-				end,
+					cmdLocale(state.value);
+				end;
 				feedback = function (state)
-					return string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], state.value)
-				end,
+					return string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], state.value);
+				end;
 				default = {
-					value = getLocale()
-				},
+					value = getLocale();
+				};
 				disabled = {
-					value = getLocale()
-				},
-				dependencies={enabled={checked=true}},
-				difficulty=2,
-			},
+					value = getLocale();
+				};
+				dependencies={enabled={checked=true;}};
+				difficulty=2;
+			};			
 			{
 				id="ReloadUI",
 				type=K_BUTTON,

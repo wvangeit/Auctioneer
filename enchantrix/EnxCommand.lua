@@ -31,6 +31,13 @@ function Enchantrix_GetKhaosDefault(filter)
 	end
 end
 
+local function getKhaosLocaleList()
+	local options = { [ENCH_CMD_DEFAULT] = 'default' };
+	for locale, _ in pairs(ENCH_VALID_LOCALES) do
+		options[locale] = locale;
+	end
+	return options
+end
 
 function Enchantrix_Register_Khaos()
 	Enchantrix_optionSet = {
@@ -72,10 +79,11 @@ function Enchantrix_Register_Khaos()
 				difficulty=1;
 			};
 			{
-				id='locale';
-				type=K_EDITBOX;
+				id="locale";
+				type=K_PULLDOWN;
 				setup = {
-					callOn = {"enter", "tab"};
+					options = getKhaosLocaleList();
+					multiSelect = false;
 				};
 				text=ENCH_GUI_LOCALE;
 				helptext=ENCH_HELP_LOCALE;
@@ -92,8 +100,8 @@ function Enchantrix_Register_Khaos()
 					value = Enchantrix_GetLocale();
 				};
 				dependencies={all={checked=true;}};
-				difficulty=2;				
-			};
+				difficulty=2;
+			};			
 			{
 				id="ReloadUI";
 				type=K_BUTTON;
