@@ -521,8 +521,8 @@ function Enchantrix_Command(command, source)
 		Enchantrix_DoPercentLess(param);
 	-- elseif (cmd == ENCH_SHOW_HEADER or cmd == 'header') then
 	--	Enchantrix_GenVarSet('header', param, chatprint);
-	elseif (cmd=='embed' or cmd=='valuate' or
-			-- cmd=='counts' or cmd=='rates' or
+	elseif (cmd=='embed' or cmd=='valuate' or cmd=='counts' or
+			-- cmd=='rates' or
 			cmd=='valuate-hsp' or cmd=='valuate-median' or cmd=='valuate-baseline') then
 		Enchantrix_GenVarSet(cmd, param, chatprint);
 	elseif (chatprint) then
