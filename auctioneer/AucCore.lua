@@ -552,7 +552,15 @@ function Auctioneer_LockAndLoad()
 					AuctionFrameTab_OnClick(1)
 					local itemName = EnhTooltip.NameFromLink(link)
 					if (itemName) then
-						QueryAuctionItems(itemName, "", "", nil, nil, nil, 0, nil, nil)
+						BrowseName:SetText(itemName)
+						BrowseMinLevel:SetText("")
+						BrowseMaxLevel:SetText("")
+						AuctionFrameBrowse.selectedInvtypeIndex = nil
+						AuctionFrameBrowse.selectedClassIndex = nil
+						AuctionFrameBrowse.selectedSubclassIndex = nil
+						IsUsableCheckButton:SetChecked(0)
+						UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+						AuctionFrameBrowse_Search()
 					end
 					return
 				end

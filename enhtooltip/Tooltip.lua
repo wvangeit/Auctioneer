@@ -857,7 +857,15 @@ function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
 		AuctionFrameTab_OnClick(1)
 		local itemID, randomProp, enchant, uniqID, itemName = breakLink(link)
 		if (itemName) then
-			QueryAuctionItems(itemName, "", "", nil, nil, nil, 0, nil, nil)
+			BrowseName:SetText(itemName)
+			BrowseMinLevel:SetText("")
+			BrowseMaxLevel:SetText("")
+			AuctionFrameBrowse.selectedInvtypeIndex = nil
+			AuctionFrameBrowse.selectedClassIndex = nil
+			AuctionFrameBrowse.selectedSubclassIndex = nil
+			IsUsableCheckButton:SetChecked(0)
+			UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+			AuctionFrameBrowse_Search()
 			ItemRefTooltip:Hide()
 		end
 		return
