@@ -131,7 +131,7 @@ ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their de
 ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
 ENCH_GUI_PRINTIN = "Select the desired message frame";
 	
-ENCH_GUI_LOAD = "Load Auctioneer automatically";
+ENCH_GUI_LOAD = "Load Enchantrix automatically";
 ENCH_GUI_LOAD_NEVER = 'Never';
 ENCH_GUI_LOAD_ALWAYS = 'Always';
 

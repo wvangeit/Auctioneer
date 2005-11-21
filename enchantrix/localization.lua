@@ -193,8 +193,8 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 	ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
 	ENCH_GUI_PRINTIN = "Select the desired message frame";
-	
-	ENCH_GUI_LOAD = "Load Auctioneer automatically";
+		
+	ENCH_GUI_LOAD = "Load Enchantrix automatically";
 	ENCH_GUI_LOAD_NEVER = 'Never';
 	ENCH_GUI_LOAD_ALWAYS = 'Always';
 	
@@ -460,6 +460,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_HELP_FIND_BIDAUCT="Suche Auktionen deren Entzauberungswert einen bestimmten Betrag (in Silber) unter dem Gebotspreis liegt";
 		ENCH_HELP_DEFAULT="Setzt die angegebene Enchantrix-Option auf ihren Standardwert zur\195\188ck. Mit dem Schl\195\188sselwort \""..ENCH_CMD_CLEAR_ALL.."\" werden alle Enchantrix-Optionen zur\195\188ckgesetzt."
 		ENCH_HELP_PRINTIN="Ausw\195\164hlen in welchem Fenster die Enchantrix-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
+		ENCH_HELP_LOAD="\195\132ndert das Ladeverhalten von Enchantrix f\195\188r diesen Charakter";
 		
 		ENCH_MESG_NOTLOADED="Enchantrix ist nicht geladen. Geben Sie /enchantrix ein um mehr Informationen zu erhalten.";
 		ENCH_MESG_DISABLE="Das automatische Laden von Enchantrix wird deaktiviert";
@@ -479,7 +480,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_FRMT_ACT_UNKNOWN_LOCALE="Das angegebene Gebietsschema ('%s') ist unbekannt. G\195\188ltige Gebietsschemen sind:";
 		ENCH_FRMT_ACT_DEFAULT_ALL="Alle Enchantrix-Optionen wurden auf die Standardwerte zur\195\188ckgesetzt.";
 		ENCH_FRMT_ACT_DEFAULT="Die Enchantrix-Option '%s' wurde auf den Standardwert zur\195\188ckgesetzt.";
-		
 		
 		ENCH_FRMT_DISINTO="M\195\182gliche Entzauberung zu:";
 		ENCH_FRMT_FOUND="%s wird entzaubert zu:";
@@ -504,7 +504,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_TEXT_GENERAL="Allgemein";
 		ENCH_TEXT_COMBAT="Kampflog";
 		
-		
+		--GUI localizations
 		
 		ENCH_GUI_MAIN_HELP="Einstellungen f\195\188r Enchantrix, einem AddOn das Informationen \195\188ber die m\195\182glichen Entzauberungen eines Gegenstands in Tooltips anzeigt.";
 		ENCH_GUI_MAIN_ENABLE="Enchantrix aktivieren";
@@ -533,7 +533,11 @@ function Enchantrix_SetLocaleStrings(locale)
 		ENCH_GUI_DEFAULT_OPTION="Zur\195\188cksetzen folgender Einstellung";
 		ENCH_GUI_PRINTIN="Fenster f\195\188r Meldungen ausw\195\164hlen";
 		
+		ENCH_GUI_LOAD="Enchantrix automatisch laden";
+		ENCH_GUI_LOAD_NEVER='nie';
+		ENCH_GUI_LOAD_ALWAYS='immer';
 		
+		--ID Numbers
 		
 		EssenceItemIDs={};
 		EssenceItemIDs["Gro\195\159e Astralessenz"] = 11082;
@@ -559,12 +563,6 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Seelenstaub"] = 11083;
 		EssenceItemIDs["Seltsamer Staub"] = 10940;
 		EssenceItemIDs["Visionenstaub"] = 11137;
-
-		-- The following definitions are missing in this locale:
-		--	ENCH_GUI_LOAD = "";
-		--	ENCH_GUI_LOAD_ALWAYS = "";
-		--	ENCH_GUI_LOAD_NEVER = "";
-		--	ENCH_HELP_LOAD = "";
 
 	end
 

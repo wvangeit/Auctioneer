@@ -58,6 +58,7 @@ ENCH_HELP_FIND_BUYAUCT = "Suche Auktionen deren Entzauberungswert einen bestimmt
 ENCH_HELP_FIND_BIDAUCT = "Suche Auktionen deren Entzauberungswert einen bestimmten Betrag (in Silber) unter dem Gebotspreis liegt";
 ENCH_HELP_DEFAULT = "Setzt die angegebene Enchantrix-Option auf ihren Standardwert zurück. Mit dem Schlüsselwort \""..ENCH_CMD_CLEAR_ALL.."\" werden alle Enchantrix-Optionen zurückgesetzt."
 ENCH_HELP_PRINTIN = "Auswählen in welchem Fenster die Enchantrix-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
+ENCH_HELP_LOAD = "Ändert das Ladeverhalten von Enchantrix für diesen Charakter";
 
 ENCH_MESG_NOTLOADED = "Enchantrix ist nicht geladen. Geben Sie /enchantrix ein um mehr Informationen zu erhalten.";
 ENCH_MESG_DISABLE = "Das automatische Laden von Enchantrix wird deaktiviert";
@@ -77,7 +78,6 @@ ENCH_FRMT_ACT_UNKNOWN = "Unbekannter Befehl: '%s'";
 ENCH_FRMT_ACT_UNKNOWN_LOCALE = "Das angegebene Gebietsschema ('%s') ist unbekannt. Gültige Gebietsschemen sind:";
 ENCH_FRMT_ACT_DEFAULT_ALL = "Alle Enchantrix-Optionen wurden auf die Standardwerte zurückgesetzt.";
 ENCH_FRMT_ACT_DEFAULT = "Die Enchantrix-Option '%s' wurde auf den Standardwert zurückgesetzt.";
-
 
 ENCH_FRMT_DISINTO = "Mögliche Entzauberung zu:";
 ENCH_FRMT_FOUND = "%s wird entzaubert zu:";
@@ -102,7 +102,7 @@ ENCH_FRMT_PRINTIN = "Die Enchantrix-Meldungen werden nun im Chat-Fenster \"%s\" 
 ENCH_TEXT_GENERAL = "Allgemein";
 ENCH_TEXT_COMBAT = "Kampflog";
 
-
+--GUI localizations
 
 ENCH_GUI_MAIN_HELP = "Einstellungen für Enchantrix, einem AddOn das Informationen über die möglichen Entzauberungen eines Gegenstands in Tooltips anzeigt.";
 ENCH_GUI_MAIN_ENABLE = "Enchantrix aktivieren";
@@ -131,7 +131,11 @@ ENCH_GUI_DEFAULT_ALL_HELP= "Hier klicken um alle Enchantrix-Optionen auf ihren S
 ENCH_GUI_DEFAULT_OPTION = "Zurücksetzen folgender Einstellung";
 ENCH_GUI_PRINTIN = "Fenster für Meldungen auswählen";
 
+ENCH_GUI_LOAD = "Enchantrix automatisch laden";
+ENCH_GUI_LOAD_NEVER = 'nie';
+ENCH_GUI_LOAD_ALWAYS = 'immer';
 
+--ID Numbers
 
 EssenceItemIDs = {};
 EssenceItemIDs["Große Astralessenz"] = 11082;
