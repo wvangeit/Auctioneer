@@ -1,6 +1,10 @@
-;NSIS Modern User Interface
-;Header Bitmap Example Script
-;Written by Joost Verburg
+;NSIS Install script for Norganna's AddOns
+;Written by MentalPower
+
+;--------------------------------
+;Set Compression Standard
+
+	SetCompressor /SOLID /FINAL lzma
 
 ;--------------------------------
 ;Include Modern UI
@@ -62,14 +66,14 @@
 ;License Language String
 
 	LicenseLangString MUILicense ${LANG_ENGLISH} GPL.txt
-	LicenseLangString MUILicense ${LANG_FRENCH} GPL.txt
-	LicenseLangString MUILicense ${LANG_GERMAN} GPL.txt
-	LicenseLangString MUILicense ${LANG_SPANISH} GPL.txt
-	LicenseLangString MUILicense ${LANG_SIMPCHINESE} GPL.txt
-	LicenseLangString MUILicense ${LANG_TRADCHINESE} GPL.txt
-	LicenseLangString MUILicense ${LANG_KOREAN} GPL.txt
-	LicenseLangString MUILicense ${LANG_ITALIAN} GPL.txt
-	LicenseLangString MUILicense ${LANG_DANISH} GPL.txt
+	LicenseLangString MUILicense ${LANG_FRENCH} "Licenses\French GPL.txt"
+	LicenseLangString MUILicense ${LANG_GERMAN} "Licenses\German GPL.txt"
+	LicenseLangString MUILicense ${LANG_SPANISH} "Licenses\Spanish GPL.txt"
+	LicenseLangString MUILicense ${LANG_SIMPCHINESE} "Licenses\Chinese Simplified GPL.txt"
+	LicenseLangString MUILicense ${LANG_TRADCHINESE} "Licenses\Chinese Traditional GPL.txt"
+	LicenseLangString MUILicense ${LANG_KOREAN} "Licenses\Korean GPL.txt"
+	LicenseLangString MUILicense ${LANG_ITALIAN} "Licenses\Italian GPL.txt"
+	LicenseLangString MUILicense ${LANG_DANISH} "Licenses\Danish GPL.txt"
 
 ;--------------------------------
 ;Reserve Files
@@ -82,13 +86,14 @@
 
 ;--------------------------------
 ;Installer Sections
+;@TODO: Add Intalation Options like "Full", "Enchantrix", "AuctioneerOnly", etc.
+;@TODO: Add descriptions to the different sections and also make those descriptions localizable.
 
 Section "Libraries"
 
 SectionIn RO
 
 ;EnhTT
-;AddSize 96
 
 	SetOutPath "$INSTDIR\Interface\AddOns\EnhTooltip"
 	File "..\EnhTooltip\EnhTooltip.toc"
@@ -97,11 +102,10 @@ SectionIn RO
 	File "GPL.txt"
 	File "nopatch"
 
-	;Create uninstaller
+;Create uninstaller
 	WriteUninstaller "$INSTDIR\Norganna's Uninstaller.exe"
 
 ;Stubby
-;AddSize 47
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Stubby"
 	File "..\Stubby\Stubby.toc"
@@ -110,11 +114,24 @@ SectionIn RO
 	File "GPL.txt"
 	File "nopatch"
 
+;Add our information to the Windows Add/Remove Control Panel
+
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "DisplayName" "Norganna's AddOns"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "UninstallString" "$INSTDIR\Norganna's Uninstaller.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "InstallLocation" "$INSTDIR\Interface\AddOns\"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "Publisher" "Norganna"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "HelpLink" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "URLUpdateInfo" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "URLInfoAbout" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "DisplayVersion" "<%version%>"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "VersionMajor" 3
+
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "NoModify" 1
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "NoRepair" 1
+
 SectionEnd
 
 Section "Auctioneer"
-
-;AddSize 337
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer"
 	File "..\Auctioneer\Auctioneer.toc"
@@ -128,8 +145,6 @@ SectionEnd
 
 Section "Enchantrix"
 
-;AddSize 737
-
 	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix"
 	File "..\Enchantrix\Enchantrix.toc"
 	File "..\Enchantrix\*.xml"
@@ -141,8 +156,6 @@ Section "Enchantrix"
 SectionEnd
 
 Section "Informant"
-
-;AddSize 853
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Informant"
 	File "..\Informant\Informant.toc"
@@ -164,19 +177,20 @@ FunctionEnd
 ;--------------------------------
 ;Descriptions
 
-	;Language strings
-	LangString DESC_SecDummy ${LANG_ENGLISH} "A test section."
+	#Language strings
+	; LangString DESC_SecDummy ${LANG_ENGLISH} "A test section."
 
-	;Assign language strings to sections
-	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-		!insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} $(DESC_SecDummy)
-	!insertmacro MUI_FUNCTION_DESCRIPTION_END
+	#Assign language strings to sections
+	; !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+		; !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} $(DESC_SecDummy)
+	; !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
 ;Uninstaller Section
 
 Section "un.Libraries"
 ;If this section is selected delete everything
+;@TODO: Make it so it will ONLY delete the installed files instead of the entire folders.
 
 ;EnhTT
 	RMDir /r "$INSTDIR\Interface\AddOns\EnhTooltip"
@@ -199,6 +213,9 @@ Section "un.Libraries"
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
+
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna"
+
 SectionEnd
 
 Section "un.Auctioneer"
