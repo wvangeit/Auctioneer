@@ -58,6 +58,7 @@ ENCH_HELP_FIND_BUYAUCT = "Find auctions whose possible disenchant value is a cer
 ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
 ENCH_HELP_PRINTIN = "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
+ENCH_HELP_LOAD = "Change Enchantrix's load settings for this toon";
 
 ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 ENCH_MESG_DISABLE = "Disabling automatic loading of Enchantrix";
@@ -129,6 +130,10 @@ ENCH_GUI_DEFAULT_ALL = "Reset All Enchantrix Options";
 ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
 ENCH_GUI_PRINTIN = "Select the desired message frame";
+	
+ENCH_GUI_LOAD = "Load Auctioneer automatically";
+ENCH_GUI_LOAD_NEVER = 'Never';
+ENCH_GUI_LOAD_ALWAYS = 'Always';
 
 --ID Numbers
 

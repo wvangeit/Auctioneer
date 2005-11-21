@@ -121,6 +121,7 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_HELP_FIND_BIDAUCT = "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 	ENCH_HELP_DEFAULT = "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values."
 	ENCH_HELP_PRINTIN = "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
+	ENCH_HELP_LOAD = "Change Enchantrix's load settings for this toon";
 	
 	ENCH_MESG_NOTLOADED = "Enchantrix is not loaded. Type /enchantrix for more info.";
 	ENCH_MESG_DISABLE = "Disabling automatic loading of Enchantrix";
@@ -192,6 +193,10 @@ function Enchantrix_SetLocaleStrings(locale)
 	ENCH_GUI_DEFAULT_ALL_HELP= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 	ENCH_GUI_DEFAULT_OPTION = "Reset this setting";
 	ENCH_GUI_PRINTIN = "Select the desired message frame";
+	
+	ENCH_GUI_LOAD = "Load Auctioneer automatically";
+	ENCH_GUI_LOAD_NEVER = 'Never';
+	ENCH_GUI_LOAD_ALWAYS = 'Always';
 	
 	
 	
@@ -380,7 +385,11 @@ function Enchantrix_SetLocaleStrings(locale)
 
 		-- The following definitions are missing in this locale:
 		--	ENCH_GUI_COUNT = "";
+		--	ENCH_GUI_LOAD = "";
+		--	ENCH_GUI_LOAD_ALWAYS = "";
+		--	ENCH_GUI_LOAD_NEVER = "";
 		--	ENCH_GUI_RATE = "";
+		--	ENCH_HELP_LOAD = "";
 		--	ENCH_MESG_DISABLE = "";
 		--	ENCH_TEXT_COMBAT = "";
 		--	ENCH_TEXT_GENERAL = "";
@@ -551,6 +560,12 @@ function Enchantrix_SetLocaleStrings(locale)
 		EssenceItemIDs["Seltsamer Staub"] = 10940;
 		EssenceItemIDs["Visionenstaub"] = 11137;
 
+		-- The following definitions are missing in this locale:
+		--	ENCH_GUI_LOAD = "";
+		--	ENCH_GUI_LOAD_ALWAYS = "";
+		--	ENCH_GUI_LOAD_NEVER = "";
+		--	ENCH_HELP_LOAD = "";
+
 	end
 
 
@@ -693,6 +708,12 @@ function Enchantrix_SetLocaleStrings(locale)
 		
 		EssenceItemIDs=EssenceItemIDs; --This section has been removed from this file because, like the Disenchanting spell name, there is no Spanish WoW client.
 
+		-- The following definitions are missing in this locale:
+		--	ENCH_GUI_LOAD = "";
+		--	ENCH_GUI_LOAD_ALWAYS = "";
+		--	ENCH_GUI_LOAD_NEVER = "";
+		--	ENCH_HELP_LOAD = "";
+
 	end
 
 
@@ -788,6 +809,9 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_GUI_DEFAULT_ALL_HELP = "";
 		--	ENCH_GUI_DEFAULT_OPTION = "";
 		--	ENCH_GUI_EMBED = "";
+		--	ENCH_GUI_LOAD = "";
+		--	ENCH_GUI_LOAD_ALWAYS = "";
+		--	ENCH_GUI_LOAD_NEVER = "";
 		--	ENCH_GUI_LOCALE = "";
 		--	ENCH_GUI_MAIN_ENABLE = "";
 		--	ENCH_GUI_MAIN_HELP = "";
@@ -816,6 +840,7 @@ function Enchantrix_SetLocaleStrings(locale)
 		--	ENCH_HELP_GUESS_BASELINE = "";
 		--	ENCH_HELP_GUESS_NOAUCTIONEER = "";
 		--	ENCH_HELP_HEADER = "";
+		--	ENCH_HELP_LOAD = "";
 		--	ENCH_HELP_LOCALE = "";
 		--	ENCH_HELP_ONOFF = "";
 		--	ENCH_HELP_PRINTIN = "";
