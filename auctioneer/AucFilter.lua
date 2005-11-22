@@ -189,11 +189,11 @@ function Auctioneer_DoBroker(minProfit)
 	elseif (tonumber(minProfit)) then
 		minProfit = tonumber(minProfit) * 100
 	else
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minProfit))
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActUnknown'), minProfit))
 		return
 	end
 	
-	local output = string.format(_AUCT['FrmtBrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
+	local output = string.format(_AUCT('FrmtBrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local resellableAuctions = Auctioneer_QuerySnapshot(Auctioneer_BrokerFilter, minProfit);
@@ -209,12 +209,12 @@ function Auctioneer_DoBroker(minProfit)
 			itemKey = id .. ":" .. rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(_AUCT['FrmtBrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit));
+			output = string.format(_AUCT('FrmtBrokerLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(_AUCT['FrmtBrokerDone']);
+	Auctioneer_ChatPrint(_AUCT('FrmtBrokerDone'));
 end
 
 -- builds the list of auctions that can be bought and resold for profit
@@ -224,11 +224,11 @@ function Auctioneer_DoBidBroker(minProfit)
 	elseif (tonumber(minProfit)) then
 		minProfit = tonumber(minProfit) * 100
 	else
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minProfit))
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActUnknown'), minProfit))
 		return
 	end
 	
-	local output = string.format(_AUCT['FrmtBidbrokerHeader'], EnhTooltip.GetTextGSC(minProfit));
+	local output = string.format(_AUCT('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
 	Auctioneer_ChatPrint(output);
 
 	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit, TIME_LEFT_SECONDS[TIME_LEFT_MEDIUM]);
@@ -245,19 +245,19 @@ function Auctioneer_DoBidBroker(minProfit)
 			currentBid = Auctioneer_GetCurrentBid(a.signature);
 			profit = (hsp * count) - currentBid;
 
-			bidText = _AUCT['FrmtBidbrokerCurbid'];
+			bidText = _AUCT('FrmtBidbrokerCurbid');
 			if (currentBid == min) then
-				bidText = _AUCT['FrmtBidbrokerMinbid'];
+				bidText = _AUCT('FrmtBidbrokerMinbid');
 			end
 			EnhTooltip.DebugPrint("a", a);
 			
 			-- local secondsLeft = TIME_LEFT_SECONDS[a.timeLeft] + a.lastSeenTime - time()
-			output = string.format(_AUCT['FrmtBidbrokerLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+			output = string.format(_AUCT('FrmtBidbrokerLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(_AUCT['FrmtBidbrokerDone']);
+	Auctioneer_ChatPrint(_AUCT('FrmtBidbrokerDone'));
 end
 
 function Auctioneer_DoCompeting(minLess)
@@ -266,11 +266,11 @@ function Auctioneer_DoCompeting(minLess)
 	elseif (tonumber(minLess)) then
 		minLess = tonumber(minLess) * 100
 	else
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtActUnknown'], minLess))
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActUnknown'), minLess))
 		return
 	end
 	
-	local output = string.format(_AUCT['FrmtCompeteHeader'], EnhTooltip.GetTextGSC(minLess));
+	local output = string.format(_AUCT('FrmtCompeteHeader'), EnhTooltip.GetTextGSC(minLess));
 	Auctioneer_ChatPrint(output);
 
 	local myAuctions = Auctioneer_QuerySnapshot(Auctioneer_AuctionOwnerFilter, UnitName("player"));
@@ -315,18 +315,18 @@ function Auctioneer_DoCompeting(minLess)
 			priceLess = myBuyout - buyoutForOne;
 			lessPrice = EnhTooltip.GetTextGSC(priceLess);
 
-			output = string.format(_AUCT['FrmtCompeteLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
+			output = string.format(_AUCT('FrmtCompeteLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, bidPrice, buyPrice, myPrice, lessPrice);
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(_AUCT['FrmtCompeteDone']);
+	Auctioneer_ChatPrint(_AUCT('FrmtCompeteDone'));
 end
 
 -- builds the list of auctions that can be bought and resold for profit
 function Auctioneer_DoPercentLess(percentLess)
 	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
-	local output = string.format(_AUCT['FrmtPctlessHeader'], percentLess);
+	local output = string.format(_AUCT('FrmtPctlessHeader'), percentLess);
 	Auctioneer_ChatPrint(output);
 
 	local auctionsBelowHSP = Auctioneer_QuerySnapshot(Auctioneer_PercentLessFilter, percentLess);
@@ -342,12 +342,12 @@ function Auctioneer_DoPercentLess(percentLess)
 			itemKey = id ..":"..rprop..":"..enchant;
 			hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 			profit = (hsp * count) - buyout;
-			output = string.format(_AUCT['FrmtPctlessLine'], Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
+			output = string.format(_AUCT('FrmtPctlessLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, seenCount, EnhTooltip.GetTextGSC(hsp * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(hsp, buyout / count).."%"));
 			Auctioneer_ChatPrint(output);
 		end
 	end
 
-	Auctioneer_ChatPrint(_AUCT['FrmtPctlessDone']);
+	Auctioneer_ChatPrint(_AUCT('FrmtPctlessDone'));
 end
 
 

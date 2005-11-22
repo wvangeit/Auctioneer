@@ -106,17 +106,17 @@ function Enchantrix_GetLocale()
 end
 
 function Enchantrix_GetLocalizedCmdString(value)
-	return getglobal("ENCH_CMD_" .. string.upper(value))
+	return getglobal("_ENCH('Cmd_')" .. string.upper(value))
 end
 
 function Enchantrix_DelocalizeFilterVal(value)
-	if (value == ENCH_CMD_ON) then
+	if (value == _ENCH('CmdOn')) then
 		return 'on';
-	elseif (value == ENCH_CMD_OFF) then
+	elseif (value == _ENCH('CmdOff')) then
 		return 'off';
-	elseif (value == ENCH_CMD_DEFAULT) then
+	elseif (value == _ENCH('CmdDefault')) then
 		return 'default';
-	elseif (value == ENCH_CMD_TOGGLE) then
+	elseif (value == _ENCH('CmdToggle')) then
 		return 'toggle';
 	else
 		return value;

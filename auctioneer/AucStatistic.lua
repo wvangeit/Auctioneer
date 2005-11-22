@@ -340,10 +340,10 @@ function Auctioneer_DoMedian(link)
 
 	local median, count = Auctioneer_GetUsableMedian(itemKey);
 	if (not median) then
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianNoauct'], Auctioneer_ColorTextWhite(itemName)));
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtMedianNoauct'), Auctioneer_ColorTextWhite(itemName)));
 	else
 		if (not count) then count = 0 end
-		Auctioneer_ChatPrint(string.format(_AUCT['FrmtMedianLine'], count, Auctioneer_ColorTextWhite(itemName), EnhTooltip.GetTextGSC(median)));
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtMedianLine'), count, Auctioneer_ColorTextWhite(itemName), EnhTooltip.GetTextGSC(median)));
 	end
 end
 
@@ -423,7 +423,7 @@ function Auctioneer_GetHSP(itemKey, realm, buyoutValues, itemCat)
 	HSPCOUNT = HSPCOUNT + 1;
 
 	local highestSellablePrice = 0;
-	local warn = _AUCT['FrmtWarnNodata'];
+	local warn = _AUCT('FrmtWarnNodata');
 	EnhTooltip.DebugPrint("Getting HSP, calling GetMarketPrice", itemKey, realm);
 	if (not buyoutValues) then
 		buyoutValues = Auctioneer_GetSnapshotInfo(realm, itemKey);
@@ -503,26 +503,26 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			end
 			if snap and snap.owner == UnitName("player") then
 				highestSellablePrice = currentLowestBuyout; -- If I am the lowest seller use same low price
-				warn = _AUCT['FrmtWarnMyprice'];
+				warn = _AUCT('FrmtWarnMyprice');
 			elseif (currentLowestBuyout < lowestBuyoutPriceAllowed) then
 				highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountMarketPercent);
-				warn = _AUCT['FrmtWarnToolow'];
+				warn = _AUCT('FrmtWarnToolow');
 			else
 				if (currentLowestBuyout > marketPrice) then
 					highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
-					warn = _AUCT['FrmtWarnAbovemkt'];
+					warn = _AUCT('FrmtWarnAbovemkt');
 				end
 				-- Account for negative discountNoCompetitionPercent values
 				if (currentLowestBuyout <= marketPrice or highestSellablePrice >= currentLowestBuyout) then
 					-- set highest price to "Discount low"
 					highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
-					warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
+					warn = string.format(_AUCT('FrmtWarnUndercut'), discountLowPercent);
 				end
 			end
 		else -- no low buyout, use discount no competition
 			-- set highest price to "Discount no competition"
 			highestSellablePrice = Auctioneer_SubtractPercent(marketPrice, discountNoCompetitionPercent);
-			warn = _AUCT['FrmtWarnNocomp'];
+			warn = _AUCT('FrmtWarnNocomp');
 		end
 	else -- no market
 		-- Note: urentLowestBuyout is nil, incase the realm is not the current player's realm
@@ -530,7 +530,7 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 			-- set highest price to "Discount low"
 			EnhTooltip.DebugPrint("Discount low case 2");
 			highestSellablePrice = Auctioneer_SubtractPercent(currentLowestBuyout, discountLowPercent);
-			warn = string.format(_AUCT['FrmtWarnUndercut'], discountLowPercent);
+			warn = string.format(_AUCT('FrmtWarnUndercut'), discountLowPercent);
 		else
 			local baseData;
 			if (Informant) then baseData = Informant.GetItem(id) end
@@ -539,7 +539,7 @@ function Auctioneer_DeterminePrice(id, realm, marketPrice, currentLowestBuyout, 
 				-- use vendor prices if no auction data available
 				local vendorSell = nullSafe(baseData.sell); -- use vendor prices
 				highestSellablePrice = Auctioneer_AddPercent(vendorSell, vendorSellMarkupPercent);
-				warn = string.format(_AUCT['FrmtWarnMarkup'], vendorSellMarkupPercent);
+				warn = string.format(_AUCT('FrmtWarnMarkup'), vendorSellMarkupPercent);
 			end
 		end
 	end

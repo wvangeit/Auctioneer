@@ -46,13 +46,13 @@ QUALITY_POOR= 0;
 function Auctioneer_GetTimeLeftString(timeLeft)
 	local timeLeftString = "";
 	if timeLeft == TIME_LEFT_SHORT then
-		timeLeftString = _AUCT['TimeShort'];
+		timeLeftString = _AUCT('TimeShort');
 	elseif timeLeft == TIME_LEFT_MEDIUM then
-		timeLeftString = _AUCT['TimeMed'];
+		timeLeftString = _AUCT('TimeMed');
 	elseif timeLeft == TIME_LEFT_LONG then
-		timeLeftString = _AUCT['TimeLong'];
+		timeLeftString = _AUCT('TimeLong');
 	elseif timeLeft == TIME_LEFT_VERY_LONG then
-		timeLeftString = _AUCT['TimeVlong'];
+		timeLeftString = _AUCT('TimeVlong');
 	end
 	return timeLeftString;
 end
@@ -311,7 +311,7 @@ function Auctioneer_ProtectAuctionFrame(enable)
 				if ( ( not Auctioneer_ProtectionEnabled ) or ( not ( AuctionFrame and AuctionFrame:IsVisible() ) ) ) then
 					Auctioneer_ToggleWorldMap();
 				else
-					UIErrorsFrame:AddMessage(_AUCT['GuiNoWorldMap'], 0, 1, 0, 1.0, UIERRORS_HOLD_TIME)
+					UIErrorsFrame:AddMessage(_AUCT('GuiNoWorldMap'), 0, 1, 0, 1.0, UIERRORS_HOLD_TIME)
 				end
 			end
 		elseif (Auctioneer_ProtectionEnabled) then
@@ -350,13 +350,13 @@ Auctioneer_CommandMap = nil;
 Auctioneer_CommandMapRev = nil;
 
 function Auctioneer_DelocalizeFilterVal(value)
-	if (value == _AUCT['CmdOn']) then
+	if (value == _AUCT('CmdOn')) then
 		return 'on';
-	elseif (value == _AUCT['CmdOff']) then
+	elseif (value == _AUCT('CmdOff')) then
 		return 'off';
-	elseif (value == _AUCT['CmdDefault']) then
+	elseif (value == _AUCT('CmdDefault')) then
 		return 'default';
-	elseif (value == _AUCT['CmdToggle']) then
+	elseif (value == _AUCT('CmdToggle')) then
 		return 'toggle';
 	else
 		return value;
@@ -366,13 +366,13 @@ end
 function Auctioneer_LocalizeFilterVal(value)
 	local result
 	if (value == 'on') then
-		result = _AUCT['CmdOn'];
+		result = _AUCT('CmdOn');
 	elseif (value == 'off') then
-		result = _AUCT['CmdOff'];
+		result = _AUCT('CmdOff');
 	elseif (value == 'default') then
-		result = _AUCT['CmdDefault'];
+		result = _AUCT('CmdDefault');
 	elseif (value == 'toggle') then
-		result = _AUCT['CmdToggle'];
+		result = _AUCT('CmdToggle');
 	end
 	if (result) then return result; else return value; end
 end

@@ -121,8 +121,8 @@ function skillToName(userSkill)
 	local skillName = self.skills[tonumber(userSkill)]
 	local localized = "Unknown"
 	if (skillName) then
-		if (_INFORMANT["Skill"..skillName]) then
-			localized = _INFORMANT["Skill"..skillName]
+		if (_INFM("Skill"..skillName)) then
+			localized = _INFM("Skill"..skillName)
 		else
 			localized = "Unknown:"..skillName
 		end
@@ -162,7 +162,7 @@ function getItem(itemID)
 
 	local addition = ""
 	if (additional ~= "") then
-		addition = " - ".._INFORMANT["Addit"..additional]
+		addition = " - ".._INFM("Addit"..additional)
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
@@ -273,8 +273,8 @@ end
 
 function getFilter(filter)
 	value = getFilterVal(filter)
-	if ((value == _INFORMANT['CmdOn']) or (value == "on")) then return true
-	elseif ((value == _INFORMANT['CmdOff']) or (value == "off")) then return false end
+	if ((value == _INFM('CmdOn')) or (value == "on")) then return true
+	elseif ((value == _INFM('CmdOff')) or (value == "off")) then return false end
 	return true
 end
 
@@ -348,20 +348,20 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuymult'], count, bgsc), buy*count, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc), buy*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSellmult'], count, sgsc), sell*count, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc), sell*count, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			else
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoBuy']), buy, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuy')), buy, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoSell']), sell, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSell')), sell, embedded)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			end
@@ -370,14 +370,14 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 
 	if (getFilter('show-stack')) then
 		if (stacks > 1) then
-			EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoStx'], stacks), nil, embedded)
+			EnhTooltip.AddLine(string.format(_INFM('FrmtInfoStx'), stacks), nil, embedded)
 		end
 	end
 	if (getFilter('show-merchant')) then
 		if (itemInfo.vendors) then
 			local merchantCount = table.getn(itemInfo.vendors)
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoMerchants'], merchantCount), nil, embedded)
+				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoMerchants'), merchantCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
 			end
 		end
@@ -385,12 +385,12 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	if (getFilter('show-usage')) then
 		local reagentInfo = ""
 		if (itemInfo.classText) then
-			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
+			reagentInfo = string.format(_INFM('FrmtInfoClass'), itemInfo.classText)
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 		if (itemInfo.usageText) then
-			reagentInfo = string.format(_INFORMANT['FrmtInfoUse'], itemInfo.usageText)
+			reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
@@ -399,7 +399,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		if (itemInfo.quests) then
 			local questCount = table.getn(itemInfo.quests)
 			if (questCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed)
+				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
 			end
 		end
@@ -410,7 +410,7 @@ function showHideInfo()
 	if (InformantFrame:IsVisible()) then
 		InformantFrame:Hide()
 	elseif (itemInfo) then
-		InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+		InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
 		local quality = itemInfo.itemQuality or itemInfo.quality or 0
@@ -423,7 +423,7 @@ function showHideInfo()
 		end
 
 		clear()
-		addLine(string.format(_INFORMANT['InfoHeader'], color, itemInfo.itemName))
+		addLine(string.format(_INFM('InfoHeader'), color, itemInfo.itemName))
 
 		local buy = itemInfo.itemBuy or itemInfo.buy or 0
 		local sell = itemInfo.itemSell or itemInfo.sell or 0
@@ -437,42 +437,42 @@ function showHideInfo()
 			if (count and (count > 1)) then
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
-				addLine(string.format(_INFORMANT['FrmtInfoBuymult'], count, bgsc)..": "..bqgsc, "ee8822")
-				addLine(string.format(_INFORMANT['FrmtInfoSellmult'], count, sgsc)..": "..sqgsc, "ee8822")
+				addLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc)..": "..bqgsc, "ee8822")
+				addLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc)..": "..sqgsc, "ee8822")
 			else
-				addLine(string.format(_INFORMANT['FrmtInfoBuy'])..": "..bgsc, "ee8822")
-				addLine(string.format(_INFORMANT['FrmtInfoSell'])..": "..sgsc, "ee8822")
+				addLine(string.format(_INFM('FrmtInfoBuy'))..": "..bgsc, "ee8822")
+				addLine(string.format(_INFM('FrmtInfoSell'))..": "..sgsc, "ee8822")
 			end
 		end
 
 		if (itemInfo.stack > 1) then
-			addLine(string.format(_INFORMANT['FrmtInfoStx'], itemInfo.stack))
+			addLine(string.format(_INFM('FrmtInfoStx'), itemInfo.stack))
 		end
 
 		local reagentInfo = ""
 		if (itemInfo.classText) then
-			reagentInfo = string.format(_INFORMANT['FrmtInfoClass'], itemInfo.classText)
+			reagentInfo = string.format(_INFM('FrmtInfoClass'), itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
 		if (itemInfo.usageText) then
-			reagentInfo = string.format(_INFORMANT['FrmtInfoUse'], itemInfo.usageText)
+			reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.isPlayerMade) then
-			addLine(string.format(_INFORMANT['InfoPlayerMade'], itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
+			addLine(string.format(_INFM('InfoPlayerMade'), itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
 		end
 
 		if (itemInfo.quests) then
 			local questCount = table.getn(itemInfo.quests)
 			if (questCount > 0) then
 				addLine("")
-				addLine(string.format(_INFORMANT['FrmtInfoQuest'], questCount), nil, embed)
-				addLine(string.format(_INFORMANT['InfoQuestHeader'], questCount), "70ee90")
+				addLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
+				addLine(string.format(_INFM('InfoQuestHeader'), questCount), "70ee90")
 				local questName
 				for pos, quest in itemInfo.quests do
 					questName = getQuestName(quest)
-					addLine(string.format(_INFORMANT['InfoQuestName'], quest), "80ee80")
+					addLine(string.format(_INFM('InfoQuestName'), quest), "80ee80")
 				end
 			end
 		end
@@ -481,16 +481,16 @@ function showHideInfo()
 			local vendorCount = table.getn(itemInfo.vendors)
 			if (vendorCount > 0) then
 				addLine("")
-				addLine(string.format(_INFORMANT['InfoVendorHeader'], vendorCount), "ddff40")
+				addLine(string.format(_INFM('InfoVendorHeader'), vendorCount), "ddff40")
 				for pos, merchant in itemInfo.vendors do
-					addLine(string.format(_INFORMANT['InfoVendorName'], merchant), "eeee40")
+					addLine(string.format(_INFM('InfoVendorName'), merchant), "eeee40")
 				end
 			end
 		end
 		InformantFrame:Show()
 	else
 		clear()
-		addLine(_INFORMANT['InfoNoItem'], "ff4010")
+		addLine(_INFM('InfoNoItem'), "ff4010")
 		InformantFrame:Show()
 	end
 end
@@ -510,7 +510,7 @@ function onLoad()
 		setFilterDefaults()	
 	end
 
-	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 end
 
 local function frameLoaded()
@@ -563,7 +563,7 @@ local function frameLoaded()
 		if (loadType == "always") then
 			LoadAddOn("Informant")
 		else
-			Stubby.Print("]].._INFORMANT['MesgNotLoaded']..[[");
+			Stubby.Print("]].._INFM('MesgNotLoaded')..[[");
 		end
 	]]);
 end
@@ -572,7 +572,7 @@ function onVariablesLoaded()
 	Informant.SetLocale(getLocale())
 	setFilterDefaults()
 	
-	InformantFrameTitle:SetText(_INFORMANT['FrameTitle'])
+	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 	if (InformantConfig.position) then
 		InformantFrame:ClearAllPoints()
@@ -581,7 +581,7 @@ function onVariablesLoaded()
 
 	if (not InformantConfig.welcomed) then
 		clear()
-		addLine(_INFORMANT['Welcome'])
+		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
 	

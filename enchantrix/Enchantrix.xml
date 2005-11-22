@@ -20,7 +20,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="localization.lua"/>
+	<Script file="Babylonian.lua"/>
+	<Script file="EnxStrings.lua"/>
+	<Script file="EnxLocale.lua"/>
+
 	<Script file="DisenchantList.lua"/>
 	<Script file="EnxUtil.lua"/>
 	<Script file="EnxCommand.lua"/>
@@ -37,6 +40,13 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					this:UnregisterEvent("ADDON_LOADED")
 				end
 			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="EnchantrixScheduler" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnUpdate>
+				Enchantrix_OnUpdate(arg1);
+			</OnUpdate>
 		</Scripts>
 	</Frame>
 </Ui>

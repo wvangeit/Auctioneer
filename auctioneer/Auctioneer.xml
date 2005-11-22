@@ -20,9 +20,12 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="localization.lua"/>
-	<Script file="AHScanning.lua"/>
+	<Script file="Babylonian.lua"/>
+	<Script file="AucStrings.lua"/>
+	<Script file="AucLocale.lua"/>
+
 	<Script file="BalancedList.lua"/>
+	<Script file="AHScanning.lua"/>
 	<Script file="AucAPI.lua"/>
 	<Script file="AucCommand.lua"/>
 	<Script file="AucConvert.lua"/>

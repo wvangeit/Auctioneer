@@ -46,7 +46,7 @@ Informant.InitCommands = function()
 		commandHandler(msg, nil)
 	end
 
-	chatPrint(string.format(_INFORMANT['FrmtWelcome'], INFORMANT_VERSION))
+	chatPrint(string.format(_INFM('FrmtWelcome'), INFORMANT_VERSION))
 
 	if (Khaos) then
 		if (not Informant_Khaos_Registered) then
@@ -75,20 +75,20 @@ end
 
 function buildCommandMap()
 	commandMap = {
-			[_INFORMANT['CmdOn']] = 'on',
-			[_INFORMANT['CmdOff']] = 'off',
-			[_INFORMANT['CmdToggle']] = 'toggle',
-			[_INFORMANT['CmdDisable']] = 'disable',
-			[_INFORMANT['CmdLocale']] = 'locale',
-			[_INFORMANT['CmdDefault']] = 'default',
-			[_INFORMANT['CmdEmbed']] = 'embed',
-			[_INFORMANT['ShowStack']] = 'show-stack',
-			[_INFORMANT['ShowUsage']] = 'show-usage',
-			[_INFORMANT['ShowQuest']] = 'show-quest',
-			[_INFORMANT['ShowMerchant']] = 'show-merchant',
-			[_INFORMANT['ShowVendor']] = 'show-vendor',
-			[_INFORMANT['ShowVendorBuy']] = 'show-vendor-buy',
-			[_INFORMANT['ShowVendorSell']] = 'show-vendor-sell',
+			[_INFM('CmdOn')] = 'on',
+			[_INFM('CmdOff')] = 'off',
+			[_INFM('CmdToggle')] = 'toggle',
+			[_INFM('CmdDisable')] = 'disable',
+			[_INFM('CmdLocale')] = 'locale',
+			[_INFM('CmdDefault')] = 'default',
+			[_INFM('CmdEmbed')] = 'embed',
+			[_INFM('ShowStack')] = 'show-stack',
+			[_INFM('ShowUsage')] = 'show-usage',
+			[_INFM('ShowQuest')] = 'show-quest',
+			[_INFM('ShowMerchant')] = 'show-merchant',
+			[_INFM('ShowVendor')] = 'show-vendor',
+			[_INFM('ShowVendorBuy')] = 'show-vendor-buy',
+			[_INFM('ShowVendorSell')] = 'show-vendor-sell',
 		}
 
 	commandMapRev = {}
@@ -135,7 +135,7 @@ function commandHandler(command, source)
 		genVarSet(cmd, param, chatprint)
 	else
 		if (chatprint) then
-			chatPrint(string.format(_INFORMANT['FrmtActUnknown'], cmd))
+			chatPrint(string.format(_INFM('FrmtActUnknown'), cmd))
 		end
 	end
 end
@@ -143,27 +143,27 @@ end
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function cmdHelp()
 
-	local onOffToggle = " (".._INFORMANT['CmdOn'].."|".._INFORMANT['CmdOff'].."|".._INFORMANT['CmdToggle']..")"
+	local onOffToggle = " (".._INFM('CmdOn').."|".._INFM('CmdOff').."|".._INFM('CmdToggle')..")"
 	local lineFormat = "  |cffffffff/informant %s "..onOffToggle.."|r |cffff4020[%s]|r - %s"
 
-	chatPrint(_INFORMANT['TextUsage'])
-	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _INFORMANT['HelpOnoff'])
+	chatPrint(_INFM('TextUsage'))
+	chatPrint("  |cffffffff/informant "..onOffToggle.."|r |cffff4020["..getLocalizedFilterVal('all').."]|r - " .. _INFM('HelpOnoff'))
 
-	chatPrint("  |cffffffff/informant ".._INFORMANT['CmdDisable'].."|r - " .. _INFORMANT['HelpDisable']);
+	chatPrint("  |cffffffff/informant ".._INFM('CmdDisable').."|r - " .. _INFM('HelpDisable'));
 
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendor'], getLocalizedFilterVal('show-vendor'), _INFORMANT['HelpVendor']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorSell'], getLocalizedFilterVal('show-vendor-sell'), _INFORMANT['HelpVendorSell']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowVendorBuy'], getLocalizedFilterVal('show-vendor-buy'), _INFORMANT['HelpVendorBuy']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowUsage'], getLocalizedFilterVal('show-usage'), _INFORMANT['HelpUsage']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowMerchant'], getLocalizedFilterVal('show-merchant'), _INFORMANT['HelpMerchant']))
-	chatPrint(string.format(lineFormat, _INFORMANT['ShowStack'], getLocalizedFilterVal('show-stack'), _INFORMANT['HelpStack']))
-	chatPrint(string.format(lineFormat, _INFORMANT['CmdEmbed'], getLocalizedFilterVal('embed'), _INFORMANT['HelpEmbed']))
+	chatPrint(string.format(lineFormat, _INFM('ShowVendor'), getLocalizedFilterVal('show-vendor'), _INFM('HelpVendor')))
+	chatPrint(string.format(lineFormat, _INFM('ShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _INFM('HelpVendorSell')))
+	chatPrint(string.format(lineFormat, _INFM('ShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _INFM('HelpVendorBuy')))
+	chatPrint(string.format(lineFormat, _INFM('ShowUsage'), getLocalizedFilterVal('show-usage'), _INFM('HelpUsage')))
+	chatPrint(string.format(lineFormat, _INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
+	chatPrint(string.format(lineFormat, _INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
+	chatPrint(string.format(lineFormat, _INFM('CmdEmbed'), getLocalizedFilterVal('embed'), _INFM('HelpEmbed')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
-	chatPrint(string.format(lineFormat, _INFORMANT['CmdLocale'], _INFORMANT['OptLocale'], getLocalizedFilterVal('locale'), _INFORMANT['HelpLocale']))
+	chatPrint(string.format(lineFormat, _INFM('CmdLocale'), _INFM('OptLocale'), getLocalizedFilterVal('locale'), _INFM('HelpLocale')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r - %s"
-	chatPrint(string.format(lineFormat, _INFORMANT['CmdDefault'], "", _INFORMANT['HelpDefault']))
+	chatPrint(string.format(lineFormat, _INFM('CmdDefault'), "", _INFM('HelpDefault')))
 end
 
 --The onOff(state, chatprint) function handles the state of the Informant AddOn (whether it is currently on or off)
@@ -179,15 +179,15 @@ function onOff(state, chatprint)
 		state = Informant.GetFilterVal("all")
 
 
-	elseif ((state == _INFORMANT['CmdOn']) or (state == "on")) then
+	elseif ((state == _INFM('CmdOn')) or (state == "on")) then
 		Informant.SetFilter("all", "on")
 
 
-	elseif ((state == _INFORMANT['CmdOff']) or (state == "off")) then
+	elseif ((state == _INFM('CmdOff')) or (state == "off")) then
 		Informant.SetFilter("all", "off")
 
 
-	elseif ((state == _INFORMANT['CmdToggle']) or (state == "toggle")) then
+	elseif ((state == _INFM('CmdToggle')) or (state == "toggle")) then
 		state = Informant.GetFilterVal("all")
 
 		if (state == "off") then
@@ -199,14 +199,14 @@ function onOff(state, chatprint)
 
 	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint == true) then
-		if ((state == _INFORMANT['CmdOn']) or (state == "on")) then
-			chatPrint(_INFORMANT['StatOn'])
+		if ((state == _INFM('CmdOn')) or (state == "on")) then
+			chatPrint(_INFM('StatOn'))
 
 			if (Informant_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Informant", "InformantEnable", "checked", true)
 			end
 		else
-			chatPrint(_INFORMANT['StatOff'])
+			chatPrint(_INFM('StatOff'))
 
 			if (Informant_Khaos_Registered) then
 				Khaos.setSetKeyParameter("Informant", "InformantEnable", "checked", false)
@@ -229,9 +229,9 @@ function cmdLocale(param, chatprint)
 
 	if (chatprint) then
 		if (validLocale) then
-			chatPrint(string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], localizeFilterVal(param)));
+			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), localizeFilterVal(param)));
 		else
-			chatPrint(string.format(_INFORMANT['FrmtUnknownLocale'], param));
+			chatPrint(string.format(_INFM('FrmtUnknownLocale'), param));
 			if (INFORMANT_VALID_LOCALES) then
 				for locale, x in pairs(INFORMANT_VALID_LOCALES) do
 					chatPrint("  "..locale);
@@ -247,7 +247,7 @@ function restoreDefault(param, chatprint)
 	
 	if ( (param == nil) or (param == "") ) then
 		return
-	elseif ((param == _INFORMANT['CmdClearAll']) or (param == "all")) then
+	elseif ((param == _INFM('CmdClearAll')) or (param == "all")) then
 		param = "all";
 		InformantConfig.filters = {};
 	else
@@ -264,12 +264,12 @@ function restoreDefault(param, chatprint)
 
 	if (chatprint) then
 		if (param == "all") then
-			chatPrint(_INFORMANT['FrmtActDefaultall']);
+			chatPrint(_INFM('FrmtActDefaultall'));
 			for k,v in pairs(InformantConfig.filters) do
 				setKhaosSetKeyValue(k, Informant.GetFilterVal(k));
 			end
 		else
-			chatPrint(string.format(_INFORMANT['FrmtActDefault'], paramLocalized));
+			chatPrint(string.format(_INFM('FrmtActDefault'), paramLocalized));
 			setKhaosSetKeyValue(param, Informant.GetFilterVal(param));
 		end
 	end
@@ -288,17 +288,17 @@ function genVarSet(variable, param, chatprint)
 
 	if (chatprint) then
 		if (Informant.GetFilter(variable)) then
-			chatPrint(string.format(_INFORMANT['FrmtActEnable'], localizeCommand(variable)))
+			chatPrint(string.format(_INFM('FrmtActEnable'), localizeCommand(variable)))
 			setKhaosSetKeyValue(variable, true)
 		else
-			chatPrint(string.format(_INFORMANT['FrmtActDisable'], localizeCommand(variable)))
+			chatPrint(string.format(_INFM('FrmtActDisable'), localizeCommand(variable)))
 			setKhaosSetKeyValue(variable, false)
 		end
 	end
 end
 
 local function getKhaosLocaleList()
-	local options = { [_INFORMANT['CmdDefault']] = 'default' };
+	local options = { [_INFM('CmdDefault')] = 'default' };
 	for locale, _ in pairs(INFORMANT_VALID_LOCALES) do
 		options[locale] = locale;
 	end
@@ -309,30 +309,30 @@ function registerKhaos()
 	local optionSet = {
 		id="Informant",
 		text="Informant",
-		helptext=_INFORMANT['GuiMainHelp'],
+		helptext=_INFM('GuiMainHelp'),
 		difficulty=1,
 		default={checked=true},
 		options={
 			{
 				id="Header",
 				text="Informant",
-				helptext=_INFORMANT['GuiMainHelp'],
+				helptext=_INFM('GuiMainHelp'),
 				type=K_HEADER,
 				difficulty=1,
 			},
 			{
 				id="enabled",
 				type=K_TEXT,
-				text=_INFORMANT['GuiMainEnable'],
-				helptext=_INFORMANT['HelpOnoff'],
+				text=_INFM('GuiMainEnable'),
+				helptext=_INFM('HelpOnoff'),
 				callback=function(state)
 					onOff(state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return _INFORMANT['StatOn']
+						return _INFM('StatOn')
 					else
-						return _INFORMANT['StatOff']
+						return _INFM('StatOff')
 					end
 				end,
 				check=true,
@@ -347,13 +347,13 @@ function registerKhaos()
 					options = getKhaosLocaleList();
 					multiSelect = false;
 				};
-				text=_INFORMANT['GuiLocale'];
-				helptext=_INFORMANT['HelpLocale'];
+				text=_INFM('GuiLocale');
+				helptext=_INFM('HelpLocale');
 				callback = function(state)
 					cmdLocale(state.value);
 				end;
 				feedback = function (state)
-					return string.format(_INFORMANT['FrmtActSet'], _INFORMANT['CmdLocale'], state.value);
+					return string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), state.value);
 				end;
 				default = {
 					value = getLocale();
@@ -368,38 +368,38 @@ function registerKhaos()
 				id="ReloadUI",
 				type=K_BUTTON,
 				setup={
-					buttonText = _INFORMANT['GuiReloaduiButton']
+					buttonText = _INFM('GuiReloaduiButton')
 				},
-				text=_INFORMANT['GuiReloadui'],
-				helptext=_INFORMANT['GuiReloaduiHelp'],
+				text=_INFM('GuiReloadui'),
+				helptext=_INFM('GuiReloaduiHelp'),
 				callback=function()
 					ReloadUI()
 				end,
 				feedback=function()
-					return _INFORMANT['GuiReloaduiFeedback'];
+					return _INFM('GuiReloaduiFeedback');
 				end;
 				difficulty=3,
 			},
 			{
 				id="InformantInfoHeader",
 				type=K_HEADER,
-				text=_INFORMANT['GuiInfoHeader'],
-				helptext=_INFORMANT['GuiInfoHelp'],
+				text=_INFM('GuiInfoHeader'),
+				helptext=_INFM('GuiInfoHelp'),
 				difficulty=1,
 			},
 			{
 				id="show-stack",
 				type=K_TEXT,
-				text=_INFORMANT['GuiInfoStack'],
-				helptext=_INFORMANT['HelpStack'],
+				text=_INFM('GuiInfoStack'),
+				helptext=_INFM('HelpStack'),
 				callback=function(state)
 					genVarSet("show-stack", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'],  _INFORMANT['ShowStack']))
+						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowStack')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowStack']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowStack')))
 					end
 				end,
 				check=true,
@@ -411,16 +411,16 @@ function registerKhaos()
 			{
 				id="show-usage",
 				type=K_TEXT,
-				text=_INFORMANT['GuiInfoUsage'],
-				helptext=_INFORMANT['HelpUsage'],
+				text=_INFM('GuiInfoUsage'),
+				helptext=_INFM('HelpUsage'),
 				callback=function(state)
 					genVarSet("show-usage", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'],  _INFORMANT['ShowUsage']))
+						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowUsage')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowUsage']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowUsage')))
 					end
 				end,
 				check=true,
@@ -433,16 +433,16 @@ function registerKhaos()
 			{
 				id="show-quest",
 				type=K_TEXT,
-				text=_INFORMANT['GuiInfoQuest'],
-				helptext=_INFORMANT['HelpQuest'],
+				text=_INFM('GuiInfoQuest'),
+				helptext=_INFM('HelpQuest'),
 				callback=function(state)
 					genVarSet("show-quest", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'],  _INFORMANT['ShowQuest']))
+						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowQuest')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowQuest']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowQuest')))
 					end
 				end,
 				check=true,
@@ -455,16 +455,16 @@ function registerKhaos()
 			{
 				id="show-merchant",
 				type=K_TEXT,
-				text=_INFORMANT['GuiInfoMerchant'],
-				helptext=_INFORMANT['HelpMerchant'],
+				text=_INFM('GuiInfoMerchant'),
+				helptext=_INFM('HelpMerchant'),
 				callback=function(state)
 					genVarSet("show-merchant", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'],  _INFORMANT['ShowMerchant']))
+						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowMerchant')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowMerchant']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowMerchant')))
 					end
 				end,
 				check=true,
@@ -476,23 +476,23 @@ function registerKhaos()
 			{
 				id="InformantVendorHeader",
 				type=K_HEADER,
-				text=_INFORMANT['GuiVendorHeader'],
-				helptext=_INFORMANT['GuiVendorHelp'],
+				text=_INFM('GuiVendorHeader'),
+				helptext=_INFM('GuiVendorHelp'),
 				difficulty=1,
 			},
 			{
 				id="show-vendor",
 				type=K_TEXT,
-				text=_INFORMANT['GuiVendor'],
-				helptext=_INFORMANT['HelpVendor'],
+				text=_INFM('GuiVendor'),
+				helptext=_INFM('HelpVendor'),
 				callback=function(state)
 					genVarSet("show-vendor", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'], _INFORMANT['ShowVendor']))
+						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendor')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowVendor']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendor')))
 					end
 				end,
 				check=true,
@@ -504,16 +504,16 @@ function registerKhaos()
 			{
 				id="show-vendor-buy",
 				type=K_TEXT,
-				text=_INFORMANT['GuiVendorBuy'],
-				helptext=_INFORMANT['HelpVendorBuy'],
+				text=_INFM('GuiVendorBuy'),
+				helptext=_INFM('HelpVendorBuy'),
 				callback=function(state)
 					genVarSet("show-vendor-buy", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'], _INFORMANT['ShowVendorBuy']))
+						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendorBuy')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowVendorBuy']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendorBuy')))
 					end
 				end,
 				check=true,
@@ -525,16 +525,16 @@ function registerKhaos()
 			{
 				id="show-vendor-sell",
 				type=K_TEXT,
-				text=_INFORMANT['GuiVendorSell'],
-				helptext=_INFORMANT['HelpVendorSell'],
+				text=_INFM('GuiVendorSell'),
+				helptext=_INFM('HelpVendorSell'),
 				callback=function(state)
 					genVarSet("show-vendor-sell", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'], _INFORMANT['ShowVendorSell']))
+						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendorSell')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['ShowVendorSell']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendorSell')))
 					end
 				end,
 				check=true,
@@ -547,23 +547,23 @@ function registerKhaos()
 			{
 				id="InformantEmbedHeader",
 				type=K_HEADER,
-				text=_INFORMANT['GuiEmbedHeader'],
-				helptext=_INFORMANT['HelpEmbed'],
+				text=_INFM('GuiEmbedHeader'),
+				helptext=_INFM('HelpEmbed'),
 				difficulty=1,
 			},
 			{
 				id="embed",
 				type=K_TEXT,
-				text=_INFORMANT['GuiEmbed'],
-				helptext=_INFORMANT['HelpEmbed'],
+				text=_INFM('GuiEmbed'),
+				helptext=_INFM('HelpEmbed'),
 				callback=function(state)
 					genVarSet("embed", state.checked)				
 				end,
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_INFORMANT['FrmtActEnable'], _INFORMANT['CmdEmbed']))
+						return (string.format(_INFM('FrmtActEnable'), _INFM('CmdEmbed')))
 					else
-						return (string.format(_INFORMANT['FrmtActDisable'], _INFORMANT['CmdEmbed']))
+						return (string.format(_INFM('FrmtActDisable'), _INFM('CmdEmbed')))
 					end
 				end,
 				check=true,
@@ -575,23 +575,23 @@ function registerKhaos()
 			{
 				id="InformantOtherHeader",
 				type=K_HEADER,
-				text=_INFORMANT['GuiOtherHeader'],
-				helptext=_INFORMANT['GuiOtherHelp'],
+				text=_INFM('GuiOtherHeader'),
+				helptext=_INFM('GuiOtherHelp'),
 				difficulty=1,
 			},
 			{
 				id="DefaultAll",
 				type=K_BUTTON,
 				setup={
-					buttonText = _INFORMANT['GuiDefaultAllButton']
+					buttonText = _INFM('GuiDefaultAllButton')
 				},
-				text=_INFORMANT['GuiDefaultAll'],
-				helptext=_INFORMANT['GuiDefaultAllHelp'],
+				text=_INFM('GuiDefaultAll'),
+				helptext=_INFM('GuiDefaultAllHelp'),
 				callback=function()
-					restoreDefault(_INFORMANT['CmdClearAll'])
+					restoreDefault(_INFM('CmdClearAll'))
 				end,
 				feedback=function()
-					return _INFORMANT['FrmtActDefaultall'];
+					return _INFM('FrmtActDefaultall');
 				end;
 				dependencies={InformantEnable={checked=true}},
 				difficulty=1,
@@ -602,16 +602,16 @@ function registerKhaos()
 				setup = {
 					callOn = {"enter", "tab"}
 				},
-				text=_INFORMANT['GuiDefaultOption'],
-				helptext=_INFORMANT['HelpDefault'],
+				text=_INFM('GuiDefaultOption'),
+				helptext=_INFM('HelpDefault'),
 				callback = function(state)
 					restoreDefault(state.value)
 				end,
 				feedback = function (state)
-					if (state.value == _INFORMANT['CmdClearAll']) then
-						return _INFORMANT['FrmtActDefaultall']
+					if (state.value == _INFM('CmdClearAll')) then
+						return _INFM('FrmtActDefaultall')
 					else
-						return string.format(_INFORMANT['FrmtActDefault'], state.value)
+						return string.format(_INFM('FrmtActDefault'), state.value)
 					end
 				end,
 				default = {
@@ -648,17 +648,23 @@ end
 
 function setLocale(locale)
 	locale = delocalizeFilterVal(locale);
-	
-	if (INFORMANT_VALID_LOCALES[locale]) then
-		Informant.SetFilter('locale', locale);		
-	elseif (locale == '') or (locale == 'default') or (locale == 'off') then
-		locale = 'default';
-		Informant.SetFilter('locale', 'default');
+	if (locale == '') then
+		Auctioneer_ChatPrint(_INFM("HelpLocale")..":");
+		local locales = "  ";
+		for locale, data in InformantLocalizations do
+			locales = locales .. " " .. locale;
+		end
+		Auctioneer_ChatPrint(locales);
+		return;
+	elseif (param == 'default') or (param == 'off') then
+		Babylonian.SetOrder('');
 	else
-		return false;
+		Babylonian.SetOrder(locale);
 	end
 
-	Informant_SetLocaleStrings(Informant.GetLocale());
+	BINDING_HEADER_INFORMANT_HEADER = "Informant";
+	BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('MesgToggleWindow');
+
 	commandMap = nil;
 	commandMapRev = nil;
 		
@@ -684,13 +690,13 @@ end
 --------------------------------------
 
 function delocalizeFilterVal(value)
-	if (value == _INFORMANT['CmdOn']) then
+	if (value == _INFM('CmdOn')) then
 		return 'on';
-	elseif (value == _INFORMANT['CmdOff']) then
+	elseif (value == _INFM('CmdOff')) then
 		return 'off';
-	elseif (value == _INFORMANT['CmdDefault']) then
+	elseif (value == _INFM('CmdDefault')) then
 		return 'default';
-	elseif (value == _INFORMANT['CmdToggle']) then
+	elseif (value == _INFM('CmdToggle')) then
 		return 'toggle';
 	else
 		return value;
@@ -700,13 +706,13 @@ end
 function localizeFilterVal(value)
 	local result
 	if (value == 'on') then
-		result = _INFORMANT['CmdOn'];
+		result = _INFM('CmdOn');
 	elseif (value == 'off') then
-		result = _INFORMANT['CmdOff'];
+		result = _INFM('CmdOff');
 	elseif (value == 'default') then
-		result = _INFORMANT['CmdDefault'];
+		result = _INFM('CmdDefault');
 	elseif (value == 'toggle') then
-		result = _INFORMANT['CmdToggle'];
+		result = _INFM('CmdToggle');
 	end
 	if (result) then return result; else return value; end
 end

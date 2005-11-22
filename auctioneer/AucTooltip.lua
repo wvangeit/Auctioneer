@@ -65,7 +65,7 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		-- show auction info
 		if (aCount == 0) then
 			-- OUTPUT: "Never seen at auction"
-			EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoNever'], _AUCT['TextAuction']), nil, embedded);
+			EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoNever'), _AUCT('TextAuction')), nil, embedded);
 			EnhTooltip.LineColor(0.5, 0.8, 0.5);
 		else -- (aCount > 0)
 			-- calculate auction values
@@ -87,65 +87,65 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 
 			if (Auctioneer_GetFilter('show-average')) then -- show item's average auction price
 				-- OUTPUT: "Seen [aCount] times at auction total"
-				EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSeen'], aCount), nil, embedded);
+				EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSeen'), aCount), nil, embedded);
 				EnhTooltip.LineColor(0.5,0.8,0.1);
 				if (not Auctioneer_GetFilter('show-verbose')) then -- default mode
 					-- OUTPUT: "[avgMin] min/[avgBuy] BO ([avgBid] bid)"
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoAverage'), EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
 					EnhTooltip.LineColor(0.1,0.8,0.5);
 				else -- verbose mode
 					if (count > 1) then
 						-- OUTPUT: "Averages for [count] items:"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoHeadMulti'], count), nil, embedded);
+						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoHeadMulti'), count), nil, embedded);
 						EnhTooltip.LineColor(0.4,0.5,1.0);
 						-- OUTPUT: "  Minimum ([avgMin] ea)"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoMinMulti'], EnhTooltip.GetTextGSC(avgMin)), avgMin*count, embedded);
+						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoMinMulti'), EnhTooltip.GetTextGSC(avgMin)), avgMin*count, embedded);
 						EnhTooltip.LineColor(0.4,0.5,0.8);
 						if (Auctioneer_GetFilter('show-stats')) then -- show buyout/bidded percentages
 							-- OUTPUT: "  Bidded ([bidPct]%, [avgBid] ea)"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBidMulti'], bidPct.."%, ", EnhTooltip.GetTextGSC(avgBid)), avgBid*count, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBidMulti'), bidPct.."%, ", EnhTooltip.GetTextGSC(avgBid)), avgBid*count, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.85);
 							-- OUTPUT: "  Buyout ([buyPct]%, [avgBuy] ea)"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuyMulti'], buyPct.."%, ", EnhTooltip.GetTextGSC(avgBuy)), avgBuy*count, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBuyMulti'), buyPct.."%, ", EnhTooltip.GetTextGSC(avgBuy)), avgBuy*count, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.9);
 						else -- don't show buyout/bidded percentages
 							-- OUTPUT: "  Bidded ([avgBid] ea)"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBidMulti'], "", EnhTooltip.GetTextGSC(avgBid)), avgBid*count, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBidMulti'), "", EnhTooltip.GetTextGSC(avgBid)), avgBid*count, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.85);
 							-- OUTPUT: "  Buyout ([avgBuy] ea)"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuyMulti'], "", EnhTooltip.GetTextGSC(avgBuy)), avgBuy*count, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBuyMulti'), "", EnhTooltip.GetTextGSC(avgBuy)), avgBuy*count, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.9);
 						end
 						if (median) then
 							-- OUTPUT: "  Buyout median"
-							EnhTooltip.AddLine(_AUCT['FrmtInfoBuymedian'], median * count, embedded);
+							EnhTooltip.AddLine(_AUCT('FrmtInfoBuymedian'), median * count, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.95);
 						end
 					else -- (count = 0 | 1)
 					   -- OUTPUT: "Averages for this item:"
-						EnhTooltip.AddLine(_AUCT['FrmtInfoHeadOne'], nil, embedded);
+						EnhTooltip.AddLine(_AUCT('FrmtInfoHeadOne'), nil, embedded);
 						EnhTooltip.LineColor(0.4,0.5,1.0);
 						-- OUTPUT: "  Minimum bid"
-						EnhTooltip.AddLine(_AUCT['FrmtInfoMinOne'], avgMin, embedded);
+						EnhTooltip.AddLine(_AUCT('FrmtInfoMinOne'), avgMin, embedded);
 						EnhTooltip.LineColor(0.4,0.5,0.8);
 						if (Auctioneer_GetFilter('show-stats')) then -- show buyout/bidded percentages
 							-- OUTPUT: "  Bidded [bidPct]%"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBidOne'], " "..bidPct.."%"), avgBid, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBidOne'), " "..bidPct.."%"), avgBid, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.85);
 							-- OUTPUT: "  Buyout [buyPct]%"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuyOne'], " "..buyPct.."%"), avgBuy, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBuyOne'), " "..buyPct.."%"), avgBuy, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.9);
 						else -- don't show buyout/bidded percentages
 						   -- OUTPUT: "  Bidded [bidPct]%"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBidOne'], ""), avgBid, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBidOne'), ""), avgBid, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.85);
 							-- OUTPUT: "  Buyout [buyPct]%"
-							EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBuyOne'], ""), avgBuy, embedded);
+							EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBuyOne'), ""), avgBuy, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.9);
 						end
 						if (median) then
 							-- OUTPUT: "  Buyout median"
-							EnhTooltip.AddLine(_AUCT['FrmtInfoBuymedian'], median, embedded);
+							EnhTooltip.AddLine(_AUCT('FrmtInfoBuymedian'), median, embedded);
 							EnhTooltip.LineColor(0.4,0.5,0.95);
 						end
 					end
@@ -156,12 +156,12 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 					local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey, auctKey);
 					if historicalMedian and historicalMedCount > nullSafe(snapshotMedCount)  then
 						-- OUTPUT: "Last [historicalMedCount], median BO (ea)"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoHistmed'], historicalMedCount), historicalMedian, embedded)
+						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoHistmed'), historicalMedCount), historicalMedian, embedded)
 						EnhTooltip.LineColor(0.1,0.8,0.5);
 					end
 					if snapshotMedian then
 						-- OUTPUT: "Scanned [snapshotMedCount], median BO (ea)"
-						EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSnapmed'], snapshotMedCount), snapshotMedian, embedded)
+						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSnapmed'), snapshotMedCount), snapshotMedian, embedded)
 						EnhTooltip.LineColor(0.1,0.8,0.5);
 					end
 				end
@@ -182,18 +182,18 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 				local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 				if (count > 1) then
 					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSgststx'], count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSgststx'), count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				else -- count = 0 | 1
 					-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoSgst'], EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSgst'), EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				end
 			end
 			if (not Auctioneer_GetFilter('show-verbose')) then
 				if (Auctioneer_GetFilter('show-stats')) then -- show buyout/bidded percentages
 					-- OUTPUT: "[bidPct]% have bid, [buyPct]% have BO"
-					EnhTooltip.AddLine(string.format(_AUCT['FrmtInfoBidrate'], bidPct, buyPct), nil, embedded);
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoBidrate'), bidPct, buyPct), nil, embedded);
 					EnhTooltip.LineColor(0.1,0.5,0.8);
 				end
 			end
@@ -221,13 +221,13 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			end
 
 			if (aCount == 0) then
-				EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoNever'], also), nil, embedded);
+				EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoNever'), also), nil, embedded);
 				EnhTooltip.LineColor(0.5,0.8,0.1);
 			else
 				if (Auctioneer_GetFilter('show-average')) then
-					EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoAlsoseen'], aCount, also), nil, embedded);
+					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoAlsoseen'), aCount, also), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.8,0.1);
-					EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoAverage'], EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
+					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoAverage'), EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
 					EnhTooltip.LineColor(0.1,0.8,0.5);
 					if (Auctioneer_GetFilter('show-suggest')) then
 						local hsp = Auctioneer_GetHSP(itemKey, also);
@@ -243,17 +243,17 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 						local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
 						if (count > 1) then
 							-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-							EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoSgststx'], count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+							EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoSgststx'), count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 							EnhTooltip.LineColor(0.5,0.5,0.8);
 						else -- count = 0 | 1
 							-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-							EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoSgst'], EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+							EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoSgst'), EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 							EnhTooltip.LineColor(0.5,0.5,0.8);
 						end
 					end
 				end
 				if (Auctioneer_GetFilter('show-stats')) then
-					EnhTooltip.AddLine(string.format(">> ".._AUCT['FrmtInfoBidrate'], bidPct, buyPct), nil, embedded);
+					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoBidrate'), bidPct, buyPct), nil, embedded);
 					EnhTooltip.LineColor(0.1,0.5,0.8);
 				end
 			end

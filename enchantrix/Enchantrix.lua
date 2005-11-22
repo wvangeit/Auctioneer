@@ -92,9 +92,6 @@ Enchantrix_FilterDefaults = {
 	}
 
 local ItemEssences = {};
-for name, id in EssenceItemIDs do
-	ItemEssences[id] = name;
-end
 
 
 local MAX_BUYOUT_PRICE = 800000;
@@ -169,7 +166,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		local note = "";
 		if (not totals.exact) then note = "*"; end
 
-		EnhTooltip.AddLine(ENCH_FRMT_DISINTO..note, nil, embed);
+		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..note, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
 		for dSig, counts in disenchantsTo do
 			if (counts.rate > 1) then
@@ -180,7 +177,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			EnhTooltip.LineColor(0.6,0.6,0.1);
 
 			if (Enchantrix_GetFilter('counts')) then
-				EnhTooltip.AddLine(string.format(ENCH_FRMT_COUNTS, counts.bCount, counts.oCount, counts.dCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_ENCH('FrmtCounts'), counts.bCount, counts.oCount, counts.dCount), nil, embed);
 				EnhTooltip.LineColor(0.5,0.5,0.0);
 			end
 		end
@@ -189,15 +186,15 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			local confidence = totals.conf;
 
 			if (Enchantrix_GetFilter('valuate-hsp') and totals.hspValue > 0) then
-				EnhTooltip.AddLine(ENCH_FRMT_VALUE_AUCT_HSP, totals.hspValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totals.hspValue * confidence, embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix_GetFilter('valuate-median') and totals.medValue > 0) then
-				EnhTooltip.AddLine(ENCH_FRMT_VALUE_AUCT_MED, totals.medValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totals.medValue * confidence, embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix_GetFilter('valuate-baseline') and totals.mktValue > 0) then
-				EnhTooltip.AddLine(ENCH_FRMT_VALUE_MARKET, totals.mktValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totals.mktValue * confidence, embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 		end
@@ -366,9 +363,90 @@ function Enchantrix_FullDiff(invA, invB)
 	return diffData;
 end
 
+ItemEssences = {};
+EssenceItemIDs = {};
+local essences = {
+	11082, 16203, 10939, 11135, 11175, 10998, 16202, 10938,
+	11134, 11174, 14344, 11084, 11139, 11178, 14343, 10978,
+	11138, 11177, 11176, 16204, 11083, 10940, 11137
+}
+local hackEssencePos = 0;
+local elapsedTime = 0;
+
+function Enchantrix_OnUpdate(elapsed)
+	elapsedTime = elapsedTime + elapsed;
+	if (elapsedTime > 0.01) then elapsedTime = elapsedTime - 0.01;
+	else return; end
+
+    if (hackEssencePos < 0) then return; end
+
+	-- Check to see if we already have the localized data saved away.
+	if (EnchantConfig and EnchantConfig.essences and EnchantConfig.essences[GetLocale()]) then
+		ItemEssences = EnchantConfig.essences[GetLocale()];
+
+		-- Go through the essences
+		for pos, essence in essences do
+			-- Check the local cache for a fresher entry
+			local iName = GetItemInfo(essence);
+			-- If there isn't one, use the SV cached copy
+			if (not iName) then iName = EnchantConfig.essences[GetLocale()][essence] end
+			-- If there was one missing, clear the SV cache and redo the lot
+			if (not iName) then
+				EnchantConfig.essences[GetLocale()] = nil;
+				return
+			end
+			-- Store the item value
+			ItemEssences[essence] = iName;
+		end
+		
+		-- Cause the next loop to succeed
+		hackEssencePos = 1000;
+	end
+
+	-- Get the previously mined data and save it away.
+	if (hackEssencePos > 0) then
+		local essence = essences[hackEssencePos];
+
+		-- If we are done, store the data and turn this loop off.
+		if (not essence) then
+			-- Save this data into the SV Cache
+			if (not EnchantConfig) then EnchantConfig = {} end
+			if (not EnchantConfig.essences) then EnchantConfig.essences = {} end
+			EnchantConfig.essences[GetLocale()] = ItemEssences
+
+			-- Stop the update events from firing
+			EnchantrixScheduler:Hide();
+			hackEssencePos = -1;
+
+			-- Build a lookup array for the essence item names
+			for id, name in ItemEssences do
+				EssenceItemIDs[name] = id
+			end
+			return;
+		end
+
+		-- Get the item info for the mined data from the prior loop.
+		local iName = GetItemInfo(essence);
+		if (not iName) then
+			-- Still hasn't downloaded
+			return
+		end
+		ItemEssences[essence] = iName;
+	end
+
+	-- It's time to mine the data... It's possible the below code could cause disconnects
+	-- directly after server restarts/on really new servers... That's why we cache it.
+	hackEssencePos = hackEssencePos + 1;
+	essence = essences[hackEssencePos];
+	if (essence) then
+		GameTooltip:SetHyperlink("item:"..essence..":0:0:0");
+		GameTooltip:Hide();
+	end
+end
+	
 function Enchantrix_OnEvent(funcVars, event, argument)
 	
-	if ((event == "SPELLCAST_START") and (argument == ENCH_ARG_SPELLNAME)) then
+	if ((event == "SPELLCAST_START") and (argument == _ENCH('ArgSpellname'))) then
 		Enchantrix_Disenchanting = true;
 		Enchantrix_WaitingPush = false;
 		Enchantrix_StartInv = Enchantrix_TakeInventory();
@@ -439,7 +517,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 
 		local itemData = Enchantrix_GetLocal(foundItem.s);
 		
-		Enchantrix_ChatPrint(string.format(ENCH_FRMT_FOUND, foundItem.l), 0.8, 0.8, 0.2);
+		Enchantrix_ChatPrint(string.format(_ENCH('FrmtFound'), foundItem.l), 0.8, 0.8, 0.2);
 		for sig, data in gainedItem do
 			local i,j, strItemID = string.find(sig, "^(%d+):");
 			local itemID = 0;
@@ -538,7 +616,7 @@ function Enchantrix_OnLoad()
 		if (loadType == "always") then
 			LoadAddOn("Enchantrix")
 		else
-			Stubby.Print("]]..ENCH_MESG_NOTLOADED..[[")
+			Stubby.Print("]].._ENCH('MesgNotloaded')..[[")
 		end
 	]]);
 
@@ -566,10 +644,8 @@ function Enchantrix_AddonLoaded()
 	--GUI Registration code added by MentalPower	
 	Enchantrix_Register();
 
-	Enchantrix_SetLocaleStrings(Enchantrix_GetLocale());
-		
-	Enchantrix_ChatPrint(string.format(ENCH_FRMT_WELCOME, ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
-	Enchantrix_ChatPrint(ENCH_FRMT_CREDIT, 0.6, 0.6, 0.1);
+	Enchantrix_ChatPrint(string.format(_ENCH('FrmtWelcome'), ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
+	Enchantrix_ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1);
 end
 
 
@@ -721,7 +797,7 @@ function Enchantrix_DoPercentLess(percentLess)
 	end
 
     if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
-	local output = string.format(ENCH_FRMT_PCTLESS_HEADER, percentLess);
+	local output = string.format(_ENCH('FrmtPctlessHeader'), percentLess);
     Enchantrix_ChatPrint(output);
     
 	Enchantrix_PriceCache = {t=time()};
@@ -740,13 +816,13 @@ function Enchantrix_DoPercentLess(percentLess)
 				local value = Enchantrix_ProfitMargins[a.signature].value;
 				local margin = Enchantrix_ProfitMargins[a.signature].margin;
 				local profit = Enchantrix_ProfitMargins[a.signature].profit;
-				local output = string.format(ENCH_FRMT_PCTLESS_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"));
+				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"));
 				Auctioneer_ChatPrint(output);
 			end
 		end
     end
     
-    Auctioneer_ChatPrint(ENCH_FRMT_PCTLESS_DONE);
+    Auctioneer_ChatPrint(_ENCH('FrmtPctlessDone'));
 end
 
 function Enchantrix_DoBidBroker(minProfit)
@@ -759,7 +835,7 @@ function Enchantrix_DoBidBroker(minProfit)
 	end
 
     if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN; else minProfit = tonumber(minProfit) * 100; end
-	local output = string.format(ENCH_FRMT_BIDBROKER_HEADER, EnhTooltip.GetTextGSC(minProfit));
+	local output = string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
     Enchantrix_ChatPrint(output);
     
 	Enchantrix_PriceCache = {t=time()};
@@ -779,17 +855,17 @@ function Enchantrix_DoBidBroker(minProfit)
 				local value = Enchantrix_ProfitMargins[a.signature].value;
 				local margin = Enchantrix_ProfitMargins[a.signature].margin;
 				local profit = Enchantrix_ProfitMargins[a.signature].profit;
-				local bidText = ENCH_FRMT_BIDBROKER_CURBID;
+				local bidText = _ENCH('FrmtBidbrokerCurbid');
 				if (currentBid == min) then
-					bidText = ENCH_FRMT_BIDBROKER_MINBID;
+					bidText = _ENCH('FrmtBidbrokerMinbid');
 				end
-				local output = string.format(ENCH_FRMT_BIDBROKER_LINE, Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+				local output = string.format(_ENCH('FrmtBidbrokerLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
 				Enchantrix_ChatPrint(output);
 			end
 		end
     end
     
-    Enchantrix_ChatPrint(ENCH_FRMT_BIDBROKER_DONE);
+    Enchantrix_ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end
 
 function Enchantrix_GetAuctionItemDisenchants(auctionSignature, useCache)

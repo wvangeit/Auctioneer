@@ -420,8 +420,6 @@ end
 
 
 function Auctioneer_AddonLoaded()
-	Auctioneer_SetLocaleStrings(Auctioneer_GetLocale());
-
 	-- Load the category and subcategory id's
 	Auctioneer_LoadCategories();
 
@@ -430,14 +428,14 @@ function Auctioneer_AddonLoaded()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
 		StaticPopupDialogs["CONVERT_AUCTIONEER"] = {
-			text = _AUCT['MesgConvert'],
-			button1 = _AUCT['MesgConvertYes'],
-			button2 = _AUCT['MesgConvertNo'],
+			text = _AUCT('MesgConvert'),
+			button1 = _AUCT('MesgConvertYes'),
+			button2 = _AUCT('MesgConvertNo'),
 			OnAccept = function()
 				Auctioneer_Convert();
 			end,
 			OnCancel = function()
-				Auctioneer_ChatPrint(_AUCT['MesgNotconverting']);
+				Auctioneer_ChatPrint(_AUCT('MesgNotconverting'));
 			end,
 			timeout = 0,
 			whileDead = 1,
@@ -510,7 +508,7 @@ function Auctioneer_HookAuctionHouse()
 				local duration = AuctionFrameAuctions.duration
 				if (AuctionsCreateAuctionButton:IsEnabled()) then
 					StartAuction(start, buy, duration);
-					Auctioneer_ChatPrint(string.format(_AUCT['FrmtAutostart'], EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
+					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
 				end
 			end
 		else
@@ -582,7 +580,7 @@ function Auctioneer_LockAndLoad()
 	--GUI Registration code added by MentalPower	
 	Auctioneer_Register();
 
-	Auctioneer_ChatPrint(string.format(_AUCT['FrmtWelcome'], AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
+	Auctioneer_ChatPrint(string.format(_AUCT('FrmtWelcome'), AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 end
 
 
