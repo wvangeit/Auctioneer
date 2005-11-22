@@ -7,16 +7,17 @@
 	SetCompressor /SOLID /FINAL lzma
 
 ;--------------------------------
-;Include Modern UI
+;Include Modern UI and Section Handling
 
 	!include "MUI.nsh"
+	!include "Sections.nsh"
 
 ;--------------------------------
 ;General
 
 	;Name and file
-	Name "Norganna's AddOns"
-	OutFile "Norganna.exe"
+	Name "Auctioneer AddOns"
+	OutFile "Auctioneer.exe"
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\World of Warcraft"
@@ -28,7 +29,7 @@
 ;Interface Configuration
 
 	!define MUI_HEADERIMAGE
-	!define MUI_HEADERIMAGE_BITMAP "Header.bmp" ; optional
+	!define MUI_HEADERIMAGE_BITMAP "Header.bmp"
 	!define MUI_ICON "Install.ico"
 	!define MUI_UNICON "UnInstall.ico"
 	!define MUI_WELCOMEFINISHPAGE_BITMAP "Welcome.bmp"
@@ -53,27 +54,35 @@
 ;Languages
  
 	!insertmacro MUI_LANGUAGE "English"
-	!insertmacro MUI_LANGUAGE "Spanish"
-	!insertmacro MUI_LANGUAGE "French"
 	!insertmacro MUI_LANGUAGE "German"
-	!insertmacro MUI_LANGUAGE "Italian"
-	!insertmacro MUI_LANGUAGE "Danish"
+	!insertmacro MUI_LANGUAGE "French"
+	!insertmacro MUI_LANGUAGE "Korean"
 	!insertmacro MUI_LANGUAGE "SimpChinese"
 	!insertmacro MUI_LANGUAGE "TradChinese"
-	!insertmacro MUI_LANGUAGE "Korean"
+	!insertmacro MUI_LANGUAGE "Spanish"
+	!insertmacro MUI_LANGUAGE "Danish"
+	!insertmacro MUI_LANGUAGE "Italian"
+	!insertmacro MUI_LANGUAGE "Turkish"
+	!insertmacro MUI_LANGUAGE "Czech"
+	!insertmacro MUI_LANGUAGE "Portuguese"
+	!insertmacro MUI_LANGUAGE "PortugueseBR"
 
 ;--------------------------------
 ;License Language String
 
 	LicenseLangString MUILicense ${LANG_ENGLISH} GPL.txt
-	LicenseLangString MUILicense ${LANG_FRENCH} "Licenses\French GPL.txt"
 	LicenseLangString MUILicense ${LANG_GERMAN} "Licenses\German GPL.txt"
-	LicenseLangString MUILicense ${LANG_SPANISH} "Licenses\Spanish GPL.txt"
+	LicenseLangString MUILicense ${LANG_FRENCH} "Licenses\French GPL.txt"
+	LicenseLangString MUILicense ${LANG_KOREAN} "Licenses\Korean GPL.txt"
 	LicenseLangString MUILicense ${LANG_SIMPCHINESE} "Licenses\Chinese Simplified GPL.txt"
 	LicenseLangString MUILicense ${LANG_TRADCHINESE} "Licenses\Chinese Traditional GPL.txt"
-	LicenseLangString MUILicense ${LANG_KOREAN} "Licenses\Korean GPL.txt"
-	LicenseLangString MUILicense ${LANG_ITALIAN} "Licenses\Italian GPL.txt"
+	LicenseLangString MUILicense ${LANG_SPANISH} "Licenses\Spanish GPL.txt"
 	LicenseLangString MUILicense ${LANG_DANISH} "Licenses\Danish GPL.txt"
+	LicenseLangString MUILicense ${LANG_ITALIAN} "Licenses\Italian GPL.txt"
+	LicenseLangString MUILicense ${LANG_TURKISH} "Licenses\Turkish GPL.txt"
+	LicenseLangString MUILicense ${LANG_CZECH} "Licenses\Czech GPL.txt"
+	LicenseLangString MUILicense ${LANG_PORTUGUESE} "Licenses\Portuguese GPL.txt"
+	LicenseLangString MUILicense ${LANG_PORTUGUESEBR} "Licenses\PortugueseBR GPL.txt"
 
 ;--------------------------------
 ;Reserve Files
@@ -86,12 +95,15 @@
 
 ;--------------------------------
 ;Installer Sections
-;@TODO: Add Intalation Options like "Full", "Enchantrix", "AuctioneerOnly", etc.
 ;@TODO: Add descriptions to the different sections and also make those descriptions localizable.
 
-Section "Libraries"
+InstType "Full"
+InstType "Auctioneer Only"
+InstType "Libraries Only"
 
-SectionIn RO
+Section "!Libraries" Libraries
+
+SectionIn 1 2 3 RO
 
 ;EnhTT
 
@@ -103,7 +115,7 @@ SectionIn RO
 	File "nopatch"
 
 ;Create uninstaller
-	WriteUninstaller "$INSTDIR\Norganna's Uninstaller.exe"
+	WriteUninstaller "$INSTDIR\Auctioneer Uninstaller.exe"
 
 ;Stubby
 
@@ -116,22 +128,24 @@ SectionIn RO
 
 ;Add our information to the Windows Add/Remove Control Panel
 
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "DisplayName" "Norganna's AddOns"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "UninstallString" "$INSTDIR\Norganna's Uninstaller.exe"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "InstallLocation" "$INSTDIR\Interface\AddOns\"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "Publisher" "Norganna"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "HelpLink" "www.norganna.org"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "URLUpdateInfo" "www.norganna.org"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "URLInfoAbout" "www.norganna.org"
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "DisplayVersion" "<%version%>"
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "VersionMajor" 3
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "DisplayName" "Auctioneer AddOns"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "UninstallString" "$INSTDIR\Auctioneer Uninstaller.exe"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "InstallLocation" "$INSTDIR\Interface\AddOns\"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "Publisher" "Norganna"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "HelpLink" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "URLUpdateInfo" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "URLInfoAbout" "www.norganna.org"
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "DisplayVersion" "<%version%>"
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "VersionMajor" 3
 
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "NoModify" 1
-	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna" "NoRepair" 1
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "NoModify" 1
+	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "NoRepair" 1
 
 SectionEnd
 
-Section "Auctioneer"
+Section "Auctioneer" Auctioneer
+
+	SectionIn 1 2
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer"
 	File "..\Auctioneer\Auctioneer.toc"
@@ -143,7 +157,9 @@ Section "Auctioneer"
 
 SectionEnd
 
-Section "Enchantrix"
+Section "Enchantrix" Enchantrix
+
+	SectionIn 1
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix"
 	File "..\Enchantrix\Enchantrix.toc"
@@ -155,7 +171,9 @@ Section "Enchantrix"
 
 SectionEnd
 
-Section "Informant"
+Section "Informant" Informant
+
+	SectionIn 1
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Informant"
 	File "..\Informant\Informant.toc"
@@ -165,6 +183,7 @@ Section "Informant"
 	File "nopatch"
 
 SectionEnd
+
 ;--------------------------------
 ;Installer Functions
 
@@ -177,20 +196,44 @@ FunctionEnd
 ;--------------------------------
 ;Descriptions
 
-	#Language strings
-	; LangString DESC_SecDummy ${LANG_ENGLISH} "A test section."
+	;Language strings
+	
+	;English
+	LangString DESC_Libraries ${LANG_ENGLISH} "This will install Stubby and Enhanced Tooltips. $\n$\nThese are required for the other AddOns to work."
+	LangString DESC_Auctioneer ${LANG_ENGLISH} "This will install Auctioneer. $\n$\nThis AddOn scans and analyzes the World of Warcraft Auction House and gives item price recomendations."
+	LangString DESC_Enchantrix ${LANG_ENGLISH} "This will install Enchantrix. $\n$\nThis AddOn attempts to predict what components an item will disenchant into."
+	LangString DESC_Informant ${LANG_ENGLISH} "This will install Informant. $\n$\nThis AddOn gives detailed information on the properties and uses of an item."
+	
+	;Spanish
+	LangString DESC_Libraries ${LANG_SPANISH} "Esto instalará Stubby y Enhanced Tooltips. $\n$\nEstos son necesarios para la operación de los otros AddOns."
+	LangString DESC_Auctioneer ${LANG_SPANISH} "Esto instalará Auctioneer. $\n$\nEste AddOn explora y analiza la Casa de Subastas de World of Warcraft y da recomendaciones de precios de artículos."
+	LangString DESC_Enchantrix ${LANG_SPANISH} "Esto instalará Enchantrix. $\n$\nEste AddOn trata de predecir el resultado de desencantar artículos."
+	LangString DESC_Informant ${LANG_SPANISH} "Esto instalará Informant. $\n$\nEste AddOn da información detallada de las propiedades y usos de los artículos."
 
-	#Assign language strings to sections
-	; !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-		; !insertmacro MUI_DESCRIPTION_TEXT ${SecDummy} $(DESC_SecDummy)
-	; !insertmacro MUI_FUNCTION_DESCRIPTION_END
+	; Assign language strings to sections
+	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${Libraries} $(DESC_Libraries)
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${Auctioneer} $(DESC_Auctioneer)
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${Enchantrix} $(DESC_Enchantrix)
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${Informant} $(DESC_Informant)
+
+	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 ;--------------------------------
 ;Uninstaller Section
 
-Section "un.Libraries"
+InstType "un.All"
+InstType "un.AddOns"
+
+Section "!un.Libraries" un.Libraries
 ;If this section is selected delete everything
 ;@TODO: Make it so it will ONLY delete the installed files instead of the entire folders.
+
+	SectionIn 1
 
 ;EnhTT
 	RMDir /r "$INSTDIR\Interface\AddOns\EnhTooltip"
@@ -208,17 +251,19 @@ Section "un.Libraries"
 	RMDir /r "$INSTDIR\Interface\AddOns\Informant"
 
 ;Un-Installer
-	Delete "$INSTDIR\Norganna's Uninstaller.exe"
+	Delete "$INSTDIR\Auctioneer Uninstaller.exe"
 
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
 
-	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Norganna"
+	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer"
 
 SectionEnd
 
-Section "un.Auctioneer"
+Section "un.Auctioneer" un.Auctioneer
+
+	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Auctioneer"
 
@@ -228,7 +273,9 @@ Section "un.Auctioneer"
 
 SectionEnd
 
-Section "un.Enchantrix"
+Section "un.Enchantrix" un.Enchantrix
+
+	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Enchantrix"
 
@@ -238,7 +285,9 @@ Section "un.Enchantrix"
 
 SectionEnd
 
-Section "un.Informant"
+Section "un.Informant" un.Informant
+
+	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Informant"
 
@@ -247,3 +296,12 @@ Section "un.Informant"
 	RMDir "$INSTDIR"
 
 SectionEnd
+
+;--------------------------------
+;UnInstaller Functions
+
+Function un.onInit
+
+	!insertmacro MUI_LANGDLL_DISPLAY
+
+FunctionEnd
