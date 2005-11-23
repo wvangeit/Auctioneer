@@ -299,7 +299,7 @@ end
 
 local function getKhaosLocaleList()
 	local options = { [_INFM('CmdDefault')] = 'default' };
-	for locale, _ in pairs(INFORMANT_VALID_LOCALES) do
+	for locale, data in InformantLocalizations do
 		options[locale] = locale;
 	end
 	return options
@@ -649,12 +649,12 @@ end
 function setLocale(locale)
 	locale = delocalizeFilterVal(locale);
 	if (locale == '') then
-		Auctioneer_ChatPrint(_INFM("HelpLocale")..":");
+		Informant_ChatPrint(_INFM("HelpLocale")..":");
 		local locales = "  ";
 		for locale, data in InformantLocalizations do
 			locales = locales .. " " .. locale;
 		end
-		Auctioneer_ChatPrint(locales);
+		Informant_ChatPrint(locales);
 		return;
 	elseif (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');

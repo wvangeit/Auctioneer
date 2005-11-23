@@ -33,7 +33,7 @@ end
 
 local function getKhaosLocaleList()
 	local options = { [_ENCH('CmdDefault')] = 'default' };
-	for locale, _ in pairs(_ENCH('ValidLocales')) do
+	for locale, data in EnchantrixLocalizations do
 		options[locale] = locale;
 	end
 	return options
@@ -102,7 +102,7 @@ function Enchantrix_Register_Khaos()
 				dependencies={all={checked=true;}};
 				difficulty=2;
 			};
-			{
+			--[[{
 				id="LoadSettings";
 				type=K_PULLDOWN;
 				setup = {
@@ -120,7 +120,7 @@ function Enchantrix_Register_Khaos()
 				default={value = 'always'};
 				disabled={value = 'never'};
 				difficulty=1;
-			};
+			};]]
 			{
 				id="ReloadUI";
 				type=K_BUTTON;
@@ -355,7 +355,7 @@ end
 function Enchantrix_AuctioneerLoaded()
 	if (not Enchantrix_Khaos_Registered) then return; end
 
-	local insertPos = 9;
+	local insertPos = 10;
 
 	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
 		return nil;

@@ -220,7 +220,6 @@ function Auctioneer_GetCatForSig(auctSig)
 end
 
 
-
 function Auctioneer_GetItemLinks(str)
 	if (not str) then return nil end
 	local itemList = {};
@@ -242,6 +241,17 @@ function Auctioneer_GetItems(str)
 		itemKey = itemID..":"..randomProp..":"..enchant;
 		listSize = listSize+1;
 		itemList[listSize] = itemKey;
+	end
+	return itemList;
+end
+
+function Auctioneer_GetItemHyperlinks(str)
+	if (not str) then return nil end
+	local itemList = {};
+	local listSize = 0;
+	for color, item, name in string.gfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
+		listSize = listSize+1;
+		itemList[listSize] = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r"
 	end
 	return itemList;
 end

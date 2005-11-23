@@ -169,7 +169,7 @@ end
 
 local function getKhaosLocaleList()
 	local options = { [_AUCT('CmdDefault')] = 'default' };
-	for locale, _ in pairs(AUCT_VALID_LOCALES) do
+	for locale, data in AuctioneerLocalizations do
 		options[locale] = locale;
 	end
 	return options
@@ -1029,6 +1029,7 @@ function Auctioneer_OnOff(state, chatprint)
 
 		if (state) then
 			Auctioneer_ChatPrint(_AUCT('StatOn'));
+
 		else
 			Auctioneer_ChatPrint(_AUCT('StatOff'));
 		end
@@ -1053,6 +1054,7 @@ function Auctioneer_Clear(param, chatprint)
 
 		local aKey = Auctioneer_GetAuctionKey();
 		local items = Auctioneer_GetItems(param);
+		local itemLinks = Auctioneer_GetItemHyperlinks(param);
 
 		if (items) then
 			for pos,itemKey in pairs(items) do
@@ -1096,11 +1098,11 @@ function Auctioneer_Clear(param, chatprint)
 					--These are not included in the print statement below because there could be the possiblity
 					--that an item's data was cleared but another's was not
 					if (chatprint) then
-						Auctioneer_ChatPrint(string.format(_AUCT('FrmtActClearOk'), param));
+						Auctioneer_ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
 					end
 				else
 					if (chatprint) then
-						Auctioneer_ChatPrint(string.format(_AUCT('FrmtActClearFail'), param));
+						Auctioneer_ChatPrint(string.format(_AUCT('FrmtActClearFail'), itemLinks[pos]));
 					end
 				end
 			end
@@ -1110,6 +1112,7 @@ function Auctioneer_Clear(param, chatprint)
 	if (chatprint) then
 		if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActClearall'), aKey));
+
 		elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 			Auctioneer_ChatPrint(_AUCT('FrmtActClearsnap'));
 		end
@@ -1138,6 +1141,7 @@ function Auctioneer_AlsoInclude(param, chatprint)
 
 		if (param == "off") then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActDisable'), _AUCT('CmdAlso')));
+
 		else
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdAlso'), localizedParam));
 		end
@@ -1155,8 +1159,10 @@ function Auctioneer_SetLocale(param, chatprint)
 		end
 		Auctioneer_ChatPrint(locales);
 		return;
+
 	elseif (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
+
 	else
 		Babylonian.SetOrder(param);
 	end
@@ -1183,9 +1189,11 @@ function Auctioneer_Default(param, chatprint)
 
 	if ( (param == nil) or (param == "") ) then
 		return
+
 	elseif ((param == _AUCT('CmdClearAll')) or (param == "all")) then
 		param = "all"
 		AuctionConfig.filters = {};
+
 	else
 		paramLocalized = param
 		param = Auctioneer_DelocalizeCommand(param)
@@ -1200,6 +1208,7 @@ function Auctioneer_Default(param, chatprint)
 			for k,v in pairs(AuctionConfig.filters) do
 				setKhaosSetKeyValue(k, Auctioneer_GetFilterVal(k));
 			end
+
 		else
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActDefault'), paramLocalized));
 			setKhaosSetKeyValue(param, Auctioneer_GetFilterVal(param));
@@ -1219,9 +1228,11 @@ function Auctioneer_GetFrameNames(index)
 		if ( name == "" ) then
 			if (i == 1) then
 				frames[_AUCT('TextGeneral')] = 1;
+
 			elseif (i == 2) then
 				frames[_AUCT('TextCombat')] = 2;
 			end
+
 		else
 			frames[name] = i;
 		end
@@ -1233,9 +1244,11 @@ function Auctioneer_GetFrameNames(index)
 		if ( name == "" ) then
 			if (index == 1) then
 				frameName = _AUCT('TextGeneral');
+
 			elseif (index == 2) then
 				frameName = _AUCT('TextCombat');
 			end
+
 		else
 			frameName = name;
 		end
@@ -1307,10 +1320,13 @@ function Auctioneer_CmdProtectWindow(param, chatprint)
 	
 	if (param == 'never' or param == 'off' or param == _AUCT('CmdProtectWindow0') or param == _AUCT('CmdOff') or tonumber(param) == 0) then
 		mode = 0;
+
 	elseif (param == 'scan' or param == _AUCT('CmdProtectWindow1') or tonumber(param) == 1) then
 		mode = 1;
+
 	elseif (param == 'always' or param == _AUCT('CmdProtectWindow2') or tonumber(param) == 2) then
 		mode = 2;
+
 	else
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_DelocalizeCommand("protect-window")));
 		return
@@ -1329,19 +1345,23 @@ function Auctioneer_CmdAuctionDuration(param, chatprint)
 	
 	if (param == 'last' or param == _AUCT('CmdAuctionDuration0') or tonumber(param) == 0) then
 		mode = 0;
+
 	elseif (param == '2h' or param == _AUCT('CmdAuctionDuration1') or tonumber(param) == 1) then
 		mode = 1;
+
 	elseif (param == '8h' or param == _AUCT('CmdAuctionDuration2') or tonumber(param) == 2) then
 		mode = 2;
+
 	elseif (param == '24h' or param == _AUCT('CmdAuctionDuration3') or tonumber(param) == 3) then
 		mode = 3;
+
 	else
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_DelocalizeCommand("auction-duration")));
 		return
 	end
-	
+
 	Auctioneer_SetFilter("auction-duration", mode);
-	
+
 	if (chatprint) then
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdAuctionDuration' .. mode)));
 		setKhaosSetKeyValue("protect-window", mode);
@@ -1376,6 +1396,7 @@ function Auctioneer_PercentVarSet(variable, param, chatprint)
 	local paramVal = tonumber(param);
 	if paramVal == nil then
 		-- failed to convert the param to a number
+
 		if chatprint then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, variable));
 		end
@@ -1398,9 +1419,11 @@ function Auctioneer_SetFilter(key, value)
 	if (type(value) == "boolean") then
 		if (value) then
 			AuctionConfig.filters[key] = 'on';
+
 		else
 			AuctionConfig.filters[key] = 'off';
 		end
+
 	else
 		AuctionConfig.filters[key] = value;
 	end
@@ -1417,6 +1440,7 @@ end
 function Auctioneer_GetFilter(filter)
 	value = Auctioneer_GetFilterVal(filter);
 	if ((value == _AUCT('CmdOn')) or (value == "on")) then return true;
+
 	elseif ((value == _AUCT('CmdOff')) or (value == "off")) then return false; end
 	return true;
 end
@@ -1449,26 +1473,40 @@ end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
 function Auctioneer_DoLow(link)
-	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);
-	local itemKey = itemID..":"..randomProp..":"..enchant;
 
-	local auctionSignature = Auctioneer_FindLowestAuctions(itemKey);
-	if (not auctionSignature) then
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtNoauct'), Auctioneer_ColorTextWhite(itemName)));
-	else
-		local auctKey = Auctioneer_GetAuctionKey();
-		local itemCat = Auctioneer_GetCatForKey(itemKey);
-		local auction = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
-		local x,x,x, x, count, x, buyout, x = Auctioneer_GetItemSignature(auctionSignature);
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtLowLine'), Auctioneer_ColorTextWhite(count.."x")..auction.itemLink, EnhTooltip.GetTextGSC(buyout), Auctioneer_ColorTextWhite(auction.owner), EnhTooltip.GetTextGSC(buyout / count), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(Auctioneer_GetUsableMedian(itemKey), buyout / count).."%")));
+	local auctKey = Auctioneer_GetAuctionKey();
+	local items = Auctioneer_GetItems(param);
+	local itemLinks = Auctioneer_GetItemHyperlinks(param);
+
+	if (items) then
+		for pos,itemKey in pairs(items) do
+
+			local auctionSignature = Auctioneer_FindLowestAuctions(itemKey);
+			if (not auctionSignature) then
+				Auctioneer_ChatPrint(string.format(_AUCT('FrmtNoauct'), itemLinks[pos]));
+
+			else
+				local itemCat = Auctioneer_GetCatForKey(itemKey);
+				local auction = Auctioneer_GetSnapshot(auctKey, itemCat, auctionSignature);
+				local x,x,x, x, count, x, buyout, x = Auctioneer_GetItemSignature(auctionSignature);
+					Auctioneer_ChatPrint(string.format(_AUCT('FrmtLowLine'), Auctioneer_ColorTextWhite(count.."x")..auction.itemLink, EnhTooltip.GetTextGSC(buyout), Auctioneer_ColorTextWhite(auction.owner), EnhTooltip.GetTextGSC(buyout / count), Auctioneer_ColorTextWhite(Auctioneer_PercentLessThan(Auctioneer_GetUsableMedian(itemKey), buyout / count).."%")));
+			end
+		end
 	end
 end
 
 function Auctioneer_DoHSP(link)
-	local itemID, randomProp, enchant, uniqID, itemName = EnhTooltip.BreakLink(link);
-	local itemKey = itemID..":"..randomProp..":"..enchant;
-	local highestSellablePrice = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-	Auctioneer_ChatPrint(string.format(_AUCT('FrmtHspLine'), Auctioneer_ColorTextWhite(itemName), EnhTooltip.GetTextGSC(nilSafeString(highestSellablePrice))));
+
+	local items = Auctioneer_GetItems(param);
+	local itemLinks = Auctioneer_GetItemHyperlinks(param);
+
+	if (items) then
+		for pos,itemKey in pairs(items) do
+
+			local highestSellablePrice = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+			Auctioneer_ChatPrint(string.format(_AUCT('FrmtHspLine'), itemLinks[pos], EnhTooltip.GetTextGSC(nilSafeString(highestSellablePrice))));
+		end
+	end
 end
 
 
