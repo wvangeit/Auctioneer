@@ -106,7 +106,7 @@ function Enchantrix_GetLocale()
 end
 
 function Enchantrix_GetLocalizedCmdString(value)
-	return getglobal("_ENCH('Cmd_')" .. string.upper(value))
+	return _ENCH('Cmd'..string.upper(string.sub(value,1,1))..string.sub(value,2))
 end
 
 function Enchantrix_DelocalizeFilterVal(value)

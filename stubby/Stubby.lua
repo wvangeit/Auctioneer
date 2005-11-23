@@ -459,7 +459,7 @@ function createFunctionLoadBootCode(ownerAddOn, triggerFunction)
 			'LoadAddOn("'..ownerAddOn..'") '..
 			'Stubby.UnregisterFunctionHook("'..triggerFunction..'", hookFunction) '..
 		'end '..
-		'Stubby.RegisterFunctionHook("'..triggerFunction..'", 200, "'..ownerAddOn..'", hookFunction)'
+		'Stubby.RegisterFunctionHook("'..triggerFunction..'", 200, hookFunction)'
 	);
 end
 
