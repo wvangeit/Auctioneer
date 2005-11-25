@@ -674,11 +674,11 @@ function Enchantrix_SetLocale(param, chatprint)
 		Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
 	end
 
-	commandMap = nil;
-	commandMapRev = nil;
+	Enchantrix_CommandMap = nil;
+	Enchantrix_CommandMapRev = nil;
 		
 	if Khaos and Enchantrix_Khaos_Registered then
-		setKhaosSetKeyValue('locale', locale);
+		setKhaosSetKeyParameter('locale', "value", param);
 		Khaos.unregisterOptionSet("Enchantrix");
 		Khaos.refresh();
 		resetKhaos();

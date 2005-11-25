@@ -19,7 +19,7 @@ function _AUCT(stringKey, locale)
 			return Babylonian.FetchString(AuctioneerLocalizations, GetLocale(), stringKey);
 		end
 	elseif (Auctioneer_CustomLocalizations[stringKey]) then
-		return Babylonian.FetchString(AuctioneerLocalizations, Auctioneer_CustomLocalizations[stringKey])
+		return Babylonian.FetchString(AuctioneerLocalizations, Auctioneer_CustomLocalizations[stringKey], stringKey)
 	else
 		return Babylonian.GetString(AuctioneerLocalizations, stringKey)
 	end

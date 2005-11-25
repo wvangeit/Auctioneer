@@ -1171,14 +1171,14 @@ function Auctioneer_SetLocale(param, chatprint)
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
 	end
 
-	commandMap = nil;
-	commandMapRev = nil;
+	Auctioneer_CommandMap = nil;
+	Auctioneer_CommandMapRev = nil;
 		
-	if Khaos and Informant_Khaos_Registered then
-		setKhaosSetKeyValue('locale', locale);
+	if Khaos and Auctioneer_Khaos_Registered then
+		setKhaosSetKeyValue('locale', param);
 		Khaos.unregisterOptionSet("Auctioneer");
 		Khaos.refresh();
-		registerKhaos();
+		resetKhaos();
 		Khaos.refresh();
 	end
 	
