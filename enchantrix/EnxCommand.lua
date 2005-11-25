@@ -677,11 +677,11 @@ function Enchantrix_SetLocale(param, chatprint)
 	commandMap = nil;
 	commandMapRev = nil;
 		
-	if Khaos and Informant_Khaos_Registered then
+	if Khaos and Enchantrix_Khaos_Registered then
 		setKhaosSetKeyValue('locale', locale);
-		Khaos.unregisterOptionSet("Informant");
+		Khaos.unregisterOptionSet("Enchantrix");
 		Khaos.refresh();
-		registerKhaos();
+		resetKhaos();
 		Khaos.refresh();
 	end
 end

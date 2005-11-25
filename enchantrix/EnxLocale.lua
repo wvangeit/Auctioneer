@@ -19,7 +19,7 @@ function _ENCH(stringKey, locale)
 			return Babylonian.FetchString(EnchantrixLocalizations, GetLocale(), stringKey);
 		end
 	elseif (Enchantrix_CustomLocalizations[stringKey]) then
-		return Babylonian.FetchString(EnchantrixLocalizations, Enchantrix_CustomLocalizations[stringKey])
+		return Babylonian.FetchString(EnchantrixLocalizations, Enchantrix_CustomLocalizations[stringKey], stringKey)
 	else
 		return Babylonian.GetString(EnchantrixLocalizations, stringKey)
 	end
