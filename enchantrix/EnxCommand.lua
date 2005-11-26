@@ -27,7 +27,7 @@ function Enchantrix_GetKhaosDefault(filter)
 	elseif (Enchantrix_FilterDefaults[filter] == 'off') then
 		return false;
 	else
-		return Enchantrix_FilterDefaults[filter]
+		return Enchantrix_FilterDefaults[filter];
 	end
 end
 
@@ -130,7 +130,11 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiReloadui');
 				helptext=_ENCH('GuiReloaduiHelp');
 				callback=function()
-					ReloadUI();
+					if(ReloadUI) then
+						ReloadUIHandler("5");
+					else
+						ReloadUI();
+					end
 				end;
 				feedback=function()
 					return _ENCH('GuiReloaduiFeedback');
@@ -358,7 +362,7 @@ function Enchantrix_AuctioneerLoaded()
 	local insertPos = 10;
 
 	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
-		return nil;
+		return;
 	end
 
 	local AuctioneerOptions = {
@@ -409,11 +413,11 @@ function Enchantrix_AuctioneerLoaded()
 	Khaos.unregisterOptionSet("Enchantrix");
 	Khaos.refresh();
 
-	Enchantrix_optionSet.options[insertPos - 1].helptext = ENCH_HELP_VALUE;
+	Enchantrix_optionSet.options[insertPos - 1].helptext = _ENCH('HelpValue');
 	
 	for i, opt in ipairs(AuctioneerOptions) do
 		tinsert(Enchantrix_optionSet.options, insertPos + i - 1, opt);
-	end
+	end]]
 
 	Khaos.registerOptionSet("tooltip", Enchantrix_optionSet);
 	Khaos.refresh();

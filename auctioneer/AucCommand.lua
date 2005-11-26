@@ -705,7 +705,7 @@ function Auctioneer_Register_Khaos()
 					elseif (state.value == _AUCT('CmdOff') or state.value == "off") then
 						return _AUCT('GuiAlsoOff');
 					elseif (not Auctioneer_IsValidAlso(param)) then
-						string.format(_AUCT('FrmtUnknownRf'), state.value)
+						return string.format(_AUCT('FrmtUnknownRf'), state.value);
 					else
 						return string.format(_AUCT('GuiAlsoDisplay'), state.value);
 					end
@@ -810,7 +810,11 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT('GuiReloadui');
 				helptext=_AUCT('GuiReloaduiHelp');
 				callback=function()
-					ReloadUI();
+					if(ReloadUI) then
+						ReloadUIHandler("5");
+					else
+						ReloadUI();
+					end
 				end;
 				feedback=function()
 					return _AUCT('GuiReloaduiFeedback');
