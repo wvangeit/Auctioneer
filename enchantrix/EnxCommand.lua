@@ -359,7 +359,7 @@ end
 function Enchantrix_AuctioneerLoaded()
 	if (not Enchantrix_Khaos_Registered) then return; end
 
-	local insertPos = 10;
+	local insertPos = 9;
 
 	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
 		return;
@@ -382,9 +382,9 @@ function Enchantrix_AuctioneerLoaded()
 				end
 			end;
 			check=true;
-			default={checked=Enchantrix_GetKhaosDefault('valuate-hsp')};
-			disabled={checked=false};
-			dependencies={EnchantrixAuctioneer={checked=true;}, valuate={checked=true;}, all={checked=true;}};
+			default={checked = Enchantrix_GetKhaosDefault('valuate-hsp')};
+			disabled={checked = false};
+			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
 		};
 		{
@@ -403,22 +403,21 @@ function Enchantrix_AuctioneerLoaded()
 				end
 			end;
 			check=true;
-			default={checked=Enchantrix_GetKhaosDefault('valuate-median')};
-			disabled={checked=false};
-			dependencies={EnchantrixAuctioneer={checked=true;}, valuate={checked=true;}, all={checked=true;}};
+			default={checked = Enchantrix_GetKhaosDefault('valuate-median')};
+			disabled={checked = false};
+			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
 		};
 	};
 
 	Khaos.unregisterOptionSet("Enchantrix");
-	Khaos.refresh();
 
 	Enchantrix_optionSet.options[insertPos - 1].helptext = _ENCH('HelpValue');
 	
 	for i, opt in ipairs(AuctioneerOptions) do
 		tinsert(Enchantrix_optionSet.options, insertPos + i - 1, opt);
-	end]]
-
+	end
+	
 	Khaos.registerOptionSet("tooltip", Enchantrix_optionSet);
 	Khaos.refresh();
 end
@@ -455,7 +454,7 @@ local function resetKhaos()
 
 		Khaos.unregisterOptionSet("Enchantrix");
 		Enchantrix_Khaos_Registered = false;
-		
+
 		Enchantrix_Register_Khaos();
 
 		if(Auctioneer) then
@@ -660,6 +659,11 @@ end
 
 function Enchantrix_SetLocale(param, chatprint)
 	param = Enchantrix_DelocalizeFilterVal(param)
+	
+	if (param == Enchantrix_LocaleLastSet) then
+		return
+	end
+
 	if (param == '') then
 		Enchantrix_ChatPrint(_ENCH("HelpLocale")..":");
 		local locales = "  ";
@@ -674,19 +678,18 @@ function Enchantrix_SetLocale(param, chatprint)
 		Babylonian.SetOrder(param);
 	end
 
-	if (chatPrint) then
-		Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
-	end
+	Enchantrix_LocaleLastSet = param;
 
 	Enchantrix_CommandMap = nil;
 	Enchantrix_CommandMapRev = nil;
-		
-	if Khaos and Enchantrix_Khaos_Registered then
+
+	if (chatPrint) then
+		Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
 		setKhaosSetKeyParameter('locale', "value", param);
-		Khaos.unregisterOptionSet("Enchantrix");
-		Khaos.refresh();
+	end
+
+	if (Khaos and Enchantrix_Khaos_Registered) then
 		resetKhaos();
-		Khaos.refresh();
 	end
 end
 

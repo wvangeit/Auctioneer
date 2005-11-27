@@ -1157,6 +1157,11 @@ end
 
 function Auctioneer_SetLocale(param, chatprint)
 	param = Auctioneer_DelocalizeFilterVal(param);
+
+	if (param == Auctioneer_LocaleLastSet) then
+		return
+	end
+
 	if (param == '') then
 		Auctioneer_ChatPrint(_AUCT("HelpLocale")..":");
 		local locales = "  ";
@@ -1175,17 +1180,16 @@ function Auctioneer_SetLocale(param, chatprint)
 
 	if (chatPrint) then
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
+		setKhaosSetKeyValue('locale', param);
 	end
+
+	Auctioneer_LocaleLastSet = param;
 
 	Auctioneer_CommandMap = nil;
 	Auctioneer_CommandMapRev = nil;
 		
 	if Khaos and Auctioneer_Khaos_Registered then
-		setKhaosSetKeyValue('locale', param);
-		Khaos.unregisterOptionSet("Auctioneer");
-		Khaos.refresh();
 		resetKhaos();
-		Khaos.refresh();
 	end
 	
 end
