@@ -284,6 +284,9 @@ function Auctioneer_ChatPrint(str)
 end
 
 function Auctioneer_SetFilterDefaults()
+	if (not AuctionConfig.filters) then
+		AuctionConfig.filters = {};
+	end
 	for k,v in pairs(Auctioneer_FilterDefaults) do
 		if (AuctionConfig.filters[k] == nil) then
 			AuctionConfig.filters[k] = v;

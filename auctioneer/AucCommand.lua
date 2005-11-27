@@ -1155,32 +1155,50 @@ function Auctioneer_AlsoInclude(param, chatprint)
 end
 
 
+local function isValidLocale(param)
+
+	if((AuctioneerLocalizations) and AuctioneerLocalizations[param]) then
+		return true;
+
+	else
+		return false;
+	end
+end
+
+
 function Auctioneer_SetLocale(param, chatprint)
 	param = Auctioneer_DelocalizeFilterVal(param);
+	local validLocale = nil;
 
 	if (param == Auctioneer_LocaleLastSet) then
-		return
-	end
-
-	if (param == '') then
-		Auctioneer_ChatPrint(_AUCT("HelpLocale")..":");
-		local locales = "  ";
-		for locale, data in AuctioneerLocalizations do
-			locales = locales .. " " .. locale;
-		end
-		Auctioneer_ChatPrint(locales);
-		return;
+		validLocale = true;
 
 	elseif (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
+		validLocale = true;
+
+	elseif (isValidLocale(param)) then
+		Babylonian.SetOrder(param);
+		validLocale = true;
 
 	else
-		Babylonian.SetOrder(param);
+		validLocale = false;
 	end
 
-	if (chatPrint) then
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
-		setKhaosSetKeyValue('locale', param);
+	
+	if (chatprint) then
+		if (validLocale) then
+			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
+			setKhaosSetKeyValue('locale', param);
+
+		else
+			Auctioneer_ChatPrint(string.format(_AUCT("FrmtUnknownLocale"), param));
+			local locales = "    ";
+			for locale, data in pairs(AuctioneerLocalizations) do
+				locales = locales .. " '" .. locale .. "' ";
+			end
+			Auctioneer_ChatPrint(locales);
+		end
 	end
 
 	Auctioneer_LocaleLastSet = param;
@@ -1190,9 +1208,9 @@ function Auctioneer_SetLocale(param, chatprint)
 		
 	if Khaos and Auctioneer_Khaos_Registered then
 		resetKhaos();
-	end
-	
+	end	
 end
+
 
 function Auctioneer_Default(param, chatprint)
 	local paramLocalized

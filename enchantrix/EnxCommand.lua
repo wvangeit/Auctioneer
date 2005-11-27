@@ -656,39 +656,57 @@ function Enchantrix_Clear(param, chatprint)
 	end
 end
 
+local function isValidLocale(param)
+
+	if((EnchantrixLocalizations) and EnchantrixLocalizations[param]) then
+		return true;
+
+	else
+		return false;
+	end
+end
 
 function Enchantrix_SetLocale(param, chatprint)
 	param = Enchantrix_DelocalizeFilterVal(param)
-	
-	if (param == Enchantrix_LocaleLastSet) then
-		return
-	end
+	local validLocale = nil;
 
-	if (param == '') then
-		Enchantrix_ChatPrint(_ENCH("HelpLocale")..":");
-		local locales = "  ";
-		for locale, data in EnchantrixLocalizations do
-			locales = locales .. " " .. locale;
-		end
-		Enchantrix_ChatPrint(locales);
-		return;
+	if (param == Enchantrix_LocaleLastSet) then
+		validLocale = true;
+
 	elseif (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
-	else
+		validLocale = true;
+
+	elseif (isValidLocale(param)) then
 		Babylonian.SetOrder(param);
+		validLocale = true;
+
+	else
+		validLocale = false;
+	end
+
+
+	if (chatprint) then
+		if (validLocale) then
+			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
+			setKhaosSetKeyValue('locale', param);
+
+		else
+			Enchantrix_ChatPrint(string.format(_ENCH("FrmtUnknownLocale"), param));
+			local locales = "    ";
+			for locale, data in pairs(EnchantrixLocalizations) do
+				locales = locales .. " '" .. locale .. "' ";
+			end
+			Enchantrix_ChatPrint(locales);
+		end
 	end
 
 	Enchantrix_LocaleLastSet = param;
 
 	Enchantrix_CommandMap = nil;
 	Enchantrix_CommandMapRev = nil;
-
-	if (chatPrint) then
-		Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
-		setKhaosSetKeyParameter('locale', "value", param);
-	end
-
-	if (Khaos and Enchantrix_Khaos_Registered) then
+		
+	if Khaos and Enchantrix_Khaos_Registered then
 		resetKhaos();
 	end
 end

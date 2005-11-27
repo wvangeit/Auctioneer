@@ -24,7 +24,7 @@
 --]]
 
 -- function prototypes
-local commandHandler, cmdHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, cmdLocale, setLocale
+local commandHandler, cmdHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, cmdLocale, setLocale, isValidLocale
 local setKhaosSetKeyValue
 
 -- Localization function prototypes
@@ -57,7 +57,7 @@ Informant.InitCommands = function()
 end
 
 function setKhaosSetKeyValue(key, value)
-	if (Auctioneer_Khaos_Registered) then
+	if (Informant_Khaos_Registered) then
 		local kKey = Khaos.getSetKey("Informant", key)
 
 		if (not kKey) then
@@ -126,7 +126,7 @@ function commandHandler(command, source)
 			Stubby.SetConfig("Informant", "LoadType", param);
 		end
 	elseif (cmd == "locale") then
-		cmdLocale(param, chatprint)
+		setLocale(param, chatprint)
 	elseif (cmd == "default") then
 		restoreDefault(param, chatprint)
 	elseif (cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
@@ -217,16 +217,23 @@ function onOff(state, chatprint)
 	return state
 end
 
-function cmdLocale(param, chatprint)
+--Function decomisioned untill further notice
+--[[function cmdLocale(param, chatprint)
 	param = delocalizeFilterVal(param);
 	local validLocale = nil;
 
+	if (param == Informant_LocaleLastSet) then
+		return
+	end
+	
 	if (param == Informant.GetFilterVal('locale')) then
 		validLocale = true;
 	elseif (setLocale(param)) then
 		validLocale = true;
 	end
 
+	Informant_LocaleLastSet = param;
+	
 	if (chatprint) then
 		if (validLocale) then
 			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), localizeFilterVal(param)));
@@ -239,7 +246,7 @@ function cmdLocale(param, chatprint)
 			end
 		end
 	end
-end
+end]]
 
 function restoreDefault(param, chatprint)
 	local oldLocale = InformantConfig.filters['locale']
@@ -350,7 +357,7 @@ function registerKhaos()
 				text=_INFM('GuiLocale');
 				helptext=_INFM('HelpLocale');
 				callback = function(state)
-					cmdLocale(state.value);
+					setLocale(state.value);
 				end;
 				feedback = function (state)
 					return string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), state.value);
@@ -628,8 +635,19 @@ function registerKhaos()
 
 	Khaos.registerOptionSet("tooltip",optionSet)
 	Informant_Khaos_Registered = true
+	Khaos.refresh();
 
 	return true
+end
+
+local function resetKhaos()
+	if (Informant_Khaos_Registered) then
+		
+		Khaos.unregisterOptionSet("Informant");
+		Informant_Khaos_Registered = false;
+		
+		registerKhaos();
+	end
 end
 
 Informant.Register = function()
@@ -646,37 +664,63 @@ Informant.Register = function()
 	end
 end
 
-function setLocale(locale)
-	locale = delocalizeFilterVal(locale);
-	if (locale == '') then
-		Informant_ChatPrint(_INFM("HelpLocale")..":");
-		local locales = "  ";
-		for locale, data in InformantLocalizations do
-			locales = locales .. " " .. locale;
-		end
-		Informant_ChatPrint(locales);
-		return;
+function setLocale(param, chatprint)
+	param = delocalizeFilterVal(param);
+	local validLocale = nil;
+	
+	if (param == Informant_LocaleLastSet) then
+		validLocale = true;
+
 	elseif (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
+		validLocale = true;
+
+	elseif (isValidLocale(param)) then
+		Babylonian.SetOrder(param);
+		validLocale = true;
+
 	else
-		Babylonian.SetOrder(locale);
+		validLocale = false;
 	end
 
 	BINDING_HEADER_INFORMANT_HEADER = "Informant";
 	BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('MesgToggleWindow');
 
+	if (chatprint) then
+		if (validLocale) then
+			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), param));
+			setKhaosSetKeyValue('locale', param);
+
+		else
+			chatPrint(string.format(_INFM("FrmtUnknownLocale"), param));
+			local locales = "    ";
+			for locale, data in pairs(InformantLocalizations) do
+				locales = locales .. " '" .. locale .. "' ";
+			end
+			chatPrint(locales);
+		end
+	end
+
+	Informant_LocaleLastSet = param;
+
 	commandMap = nil;
 	commandMapRev = nil;
 		
 	if Khaos and Informant_Khaos_Registered then
-		setKhaosSetKeyValue('locale', locale);
-		Khaos.unregisterOptionSet("Informant");
-		Khaos.refresh();
-		registerKhaos();
-		Khaos.refresh();
+		resetKhaos();
 	end
 	
 	return true;
+end
+
+function isValidLocale(param)
+
+	if((InformantLocalizations) and InformantLocalizations[param]) then
+		return true;
+
+	else
+		return false;
+	end
 end
 
 function chatPrint(msg)
