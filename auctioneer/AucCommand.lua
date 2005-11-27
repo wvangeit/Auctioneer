@@ -130,12 +130,14 @@ function Auctioneer_Convert_Khaos()
 end
 
 function Auctioneer_GetKhaosDefault(filter)
-	if (Auctioneer_FilterDefaults[filter] == 'on') then
+	if (filter == "also") then
+		return Auctioneer_FilterDefaults[filter];
+	elseif (Auctioneer_FilterDefaults[filter] == 'on') then
 		return true;
 	elseif (Auctioneer_FilterDefaults[filter] == 'off') then
 		return false;
 	else
-		return Auctioneer_FilterDefaults[filter]
+		return Auctioneer_FilterDefaults[filter];
 	end
 end
 
@@ -700,12 +702,12 @@ function Auctioneer_Register_Khaos()
 					Auctioneer_AlsoInclude(state.value);
 				end;
 				feedback = function (state)
-					if (state.value == _AUCT('CmdAlsoOpposite') or state.value == "opposite") then
-						return _AUCT('GuiAlsoOpposite');
-					elseif (state.value == _AUCT('CmdOff') or state.value == "off") then
+					if ((state.value == _AUCT('CmdOff')) or (state.value == "off")) then
 						return _AUCT('GuiAlsoOff');
-					elseif (not Auctioneer_IsValidAlso(param)) then
-						return string.format(_AUCT('FrmtUnknownRf'), state.value);
+					elseif ((state.value == _AUCT('CmdAlsoOpposite')) or (state.value == "opposite")) then
+						return _AUCT('GuiAlsoOpposite');
+					elseif (not Auctioneer_IsValidAlso(state.value)) then
+						return string.format(_AUCT('FrmtUnknownArg'), state.value, _AUCT('CmdAlso'))
 					else
 						return string.format(_AUCT('GuiAlsoDisplay'), state.value);
 					end
