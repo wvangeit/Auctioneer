@@ -218,21 +218,21 @@ FunctionEnd
 
 	;Korean
 	LangString DESC_Libraries ${LANG_KOREAN} ""
-	LangString DESC_Auctioneer ${LANG_KOREAN} ""
+	LangString DESC_Auctioneer ${LANG_KOREAN} "경매�?��?� 설치합니다.$\n$\n�?� 애드온�?� 월드 오브 워�?�래프트�?� 경매 아�?�템�?� 검색, 분�?하여 추천 가격�?� 제안해 주는 애드온 입니다."
 	LangString DESC_Enchantrix ${LANG_KOREAN} ""
 	LangString DESC_Informant ${LANG_KOREAN} ""
 
 	;Simplified Chinese
-	LangString DESC_Libraries ${LANG_SIMPCHINESE} ""
-	LangString DESC_Auctioneer ${LANG_SIMPCHINESE} "�?�将安装Auctioneer(�?�?�行助手)$\n$\n这个�?�件能扫�??和分�?魔兽世界里的�?�?�行，并给你价格上的建议。"
-	LangString DESC_Enchantrix ${LANG_SIMPCHINESE} ""
-	LangString DESC_Informant ${LANG_SIMPCHINESE} ""
+	LangString DESC_Libraries ${LANG_SIMPCHINESE} "这将安装Stubby and Enhanced Tooltips(Stubby&增强�??示). $\n$\n这些必需为�?�一�?�件�?作。 "
+	LangString DESC_Auctioneer ${LANG_SIMPCHINESE} "这将安装Auctioneer(�?�?�助手)$\n$\n这个濒件能扫瞄和分�?魔兽世界里的拿忖行，并给你价格上的建议。"
+	LangString DESC_Enchantrix ${LANG_SIMPCHINESE} "这将安装 Enchantrix(附魔助手). $\n$\n这个�?�件试图分�?物�?分解为那些组件并高亮显示."
+	LangString DESC_Informant ${LANG_SIMPCHINESE} "这将安装 Informant(信�?��??供者).$\n$\n这个�?�件�??供关于物产和用途详细的信�?�"
 
 	;Traditional Chinese
-	LangString DESC_Libraries ${LANG_TRADCHINESE} ""
-	LangString DESC_Auctioneer ${LANG_TRADCHINESE} "�?�将安装Auctioneer(�?�?�行助手)$\n$\n这个�?�件能扫�??和分�?魔兽世界里的�?�?�行，并给你价格上的建议。"
-	LangString DESC_Enchantrix ${LANG_TRADCHINESE} ""
-	LangString DESC_Informant ${LANG_TRADCHINESE} ""
+	LangString DESC_Libraries ${LANG_TRADCHINESE} "这将安装Stubby and Enhanced Tooltips(Stubby&增强�??示). $\n$\n这些必需为�?�一�?�件�?作。 "
+	LangString DESC_Auctioneer ${LANG_TRADCHINESE} "这将安装Auctioneer(�?�?�助手)$\n$\n这个濒件能扫瞄和分�?魔兽世界里的拿忖行，并给你价格上的建议。"
+	LangString DESC_Enchantrix ${LANG_TRADCHINESE} "这将安装 Enchantrix(附魔助手). $\n$\n这个�?�件试图分�?物�?分解为那些组件并高亮显示."
+	LangString DESC_Informant ${LANG_TRADCHINESE} "这将安装 Informant(信�?��??供者).$\n$\n这个�?�件�??供关于物产和用途详细的信�?�"
 
 	;Spanish
 	LangString DESC_Libraries ${LANG_SPANISH} "Esto instalará Stubby y Enhanced Tooltips. $\n$\nEstos son necesarios para la operación de los otros AddOns."
