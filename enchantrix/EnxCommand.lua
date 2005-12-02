@@ -658,7 +658,9 @@ end
 
 local function isValidLocale(param)
 
-	if((EnchantrixLocalizations) and EnchantrixLocalizations[param]) then
+	--EnhTooltip.DebugPrint("Enchantrix.isValidlocale("..param..")");
+
+	if((EnchantrixLocalizations) and (EnchantrixLocalizations[param])) then
 		return true;
 
 	else
@@ -668,6 +670,8 @@ end
 
 function Enchantrix_SetLocale(param, chatprint)
 	param = Enchantrix_DelocalizeFilterVal(param)
+	if not Enchantrix_LocaleLastSet then Enchantrix_LocaleLastSet = ""; end
+	--EnhTooltip.DebugPrint("Enchantrix_SetLocale("..param..") | "..Enchantrix_LocaleLastSet);
 	local validLocale = nil;
 
 	if (param == Enchantrix_LocaleLastSet) then
@@ -689,7 +693,10 @@ function Enchantrix_SetLocale(param, chatprint)
 	if (chatprint) then
 		if (validLocale) then
 			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
-			setKhaosSetKeyValue('locale', param);
+			if not (param == Enchantrix_LocaleLastSet) then
+				EnhTooltip.DebugPrint("Changing Enchantrix's Khaos Language");
+				setKhaosSetKeyValue('locale', param);
+			end
 
 		else
 			Enchantrix_ChatPrint(string.format(_ENCH("FrmtUnknownLocale"), param));
@@ -700,15 +707,17 @@ function Enchantrix_SetLocale(param, chatprint)
 			Enchantrix_ChatPrint(locales);
 		end
 	end
+		
+	if Khaos and Enchantrix_Khaos_Registered then
+		if not (param == Enchantrix_LocaleLastSet) then
+			resetKhaos();
+		end
+	end
 
 	Enchantrix_LocaleLastSet = param;
 
 	Enchantrix_CommandMap = nil;
 	Enchantrix_CommandMapRev = nil;
-		
-	if Khaos and Enchantrix_Khaos_Registered then
-		resetKhaos();
-	end
 end
 
 -- This function was added by MentalPower to implement the /enx default command
@@ -848,7 +857,7 @@ function Enchantrix_SetFrame(frame, chatprint)
 
 	if (chatprint == true) then
 		Enchantrix_ChatPrint(string.format(_ENCH('FrmtPrintin'), frameName));
-		setKhaosSetKeyParameter("EnchantrixPrintFrame", "value", frameNumber);
+		setKhaosSetKeyValue("printframe", frameNumber);
 	end
 end
 

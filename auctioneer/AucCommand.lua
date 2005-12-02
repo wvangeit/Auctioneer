@@ -1155,9 +1155,11 @@ function Auctioneer_AlsoInclude(param, chatprint)
 end
 
 
-local function isValidLocale(param)
+function Auctioneer_isValidLocale(param)
 
-	if((AuctioneerLocalizations) and AuctioneerLocalizations[param]) then
+	--EnhTooltip.DebugPrint("Auctioneer.isValidlocale("..param..")");
+
+	if((AuctioneerLocalizations) and (AuctioneerLocalizations[param])) then
 		return true;
 
 	else
@@ -1168,6 +1170,8 @@ end
 
 function Auctioneer_SetLocale(param, chatprint)
 	param = Auctioneer_DelocalizeFilterVal(param);
+	if not Auctioneer_LocaleLastSet then Auctioneer_LocaleLastSet = ""; end
+	--EnhTooltip.DebugPrint("Auctioneer_SetLocale("..param..") | "..Auctioneer_LocaleLastSet);
 	local validLocale = nil;
 
 	if (param == Auctioneer_LocaleLastSet) then
@@ -1177,7 +1181,7 @@ function Auctioneer_SetLocale(param, chatprint)
 		Babylonian.SetOrder('');
 		validLocale = true;
 
-	elseif (isValidLocale(param)) then
+	elseif (Auctioneer_isValidLocale(param)) then
 		Babylonian.SetOrder(param);
 		validLocale = true;
 
@@ -1189,7 +1193,10 @@ function Auctioneer_SetLocale(param, chatprint)
 	if (chatprint) then
 		if (validLocale) then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
-			setKhaosSetKeyValue('locale', param);
+			if not (param == Auctioneer_LocaleLastSet) then
+				EnhTooltip.DebugPrint("Changing Auctioneer's Khaos Language");
+				setKhaosSetKeyValue('locale', param);
+			end
 
 		else
 			Auctioneer_ChatPrint(string.format(_AUCT("FrmtUnknownLocale"), param));
@@ -1201,14 +1208,16 @@ function Auctioneer_SetLocale(param, chatprint)
 		end
 	end
 
+	if (Khaos and Auctioneer_Khaos_Registered) then
+		if not (param == Auctioneer_LocaleLastSet) then
+			resetKhaos();
+		end
+	end	
+
 	Auctioneer_LocaleLastSet = param;
 
 	Auctioneer_CommandMap = nil;
 	Auctioneer_CommandMapRev = nil;
-		
-	if Khaos and Auctioneer_Khaos_Registered then
-		resetKhaos();
-	end	
 end
 
 
@@ -1336,10 +1345,7 @@ function Auctioneer_SetFrame(frame, chatprint)
 
 	if (chatprint == true) then
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtPrintin'), frameName));
-
-		if (Auctioneer_Khaos_Registered) then
-			Khaos.setSetKeyParameter("Auctioneer", "AuctioneerPrintFrame", "value", frameNumber);
-		end
+		setKhaosSetKeyValue("printframe", frameNumber);
 	end
 end
 

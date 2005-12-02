@@ -666,6 +666,7 @@ end
 
 function setLocale(param, chatprint)
 	param = delocalizeFilterVal(param);
+	if not Informant_LocaleLastSet then Informant_LocaleLastSet = ""; end
 	local validLocale = nil;
 	
 	if (param == Informant_LocaleLastSet) then
@@ -689,7 +690,10 @@ function setLocale(param, chatprint)
 	if (chatprint) then
 		if (validLocale) then
 			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), param));
-			setKhaosSetKeyValue('locale', param);
+			if not (param == Informant_LocaleLastSet) then
+				EnhTooltip.DebugPrint("Changing Informant's Khaos Language");
+				setKhaosSetKeyValue('locale', param);
+			end
 
 		else
 			chatPrint(string.format(_INFM("FrmtUnknownLocale"), param));
@@ -701,21 +705,23 @@ function setLocale(param, chatprint)
 		end
 	end
 
+	if Khaos and Informant_Khaos_Registered then
+		if not (param == Informant_LocaleLastSet) then
+			resetKhaos();
+		end
+	end
+
 	Informant_LocaleLastSet = param;
 
 	commandMap = nil;
 	commandMapRev = nil;
-		
-	if Khaos and Informant_Khaos_Registered then
-		resetKhaos();
-	end
-	
+
 	return true;
 end
 
 function isValidLocale(param)
 
-	if((InformantLocalizations) and InformantLocalizations[param]) then
+	if((InformantLocalizations) and (InformantLocalizations[param])) then
 		return true;
 
 	else
