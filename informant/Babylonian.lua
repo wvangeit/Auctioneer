@@ -1,12 +1,33 @@
 --[[
 
-	Babylonian.lua
+	Babylonian
+	A sub-addon that manages the locales for other addons.
+	<%version%>
+	$Id$
+	
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GLP.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ]]
 
 local self = {}
+if (not self.update) then self.update = {}; end
+--Local function prototypes
+local split, setOrder, getOrder, fetchString, getString, registerAddOn, unRegisterAddOn, updateKhaos, isAddOnRegistered
 
-local function split(str, at)
+function split(str, at)
 	local splut = {}
 	if (type(str) ~= "string") then return nil end
 	if (not str) then str = "" end
@@ -17,19 +38,22 @@ local function split(str, at)
 	return splut
 end
 
-local function setOrder(order)
+function setOrder(order)
 	if (not order) then self.order = {}
 	else self.order = split(order, ",") end
 	table.insert(self.order, GetLocale())
 	table.insert(self.order, "enUS")
+	if not(self.order[1] == getOrder()) then
+		updateKhaos()
+	end
 	SetCVar("BabylonianOrder", order)
 end
 
-local function getOrder(order)
+function getOrder(order)
 	return GetCVar("BabylonianOrder")
 end
 
-local function fetchString(stringTable, locale, stringKey)
+function fetchString(stringTable, locale, stringKey)
 	if (type(stringTable)=="table" and
 		type(stringTable[locale])=="table" and
 		stringTable[locale][stringKey]) then
@@ -37,7 +61,7 @@ local function fetchString(stringTable, locale, stringKey)
 	end
 end
 
-local function getString(stringTable, stringKey, default)
+function getString(stringTable, stringKey, default)
 	local val
 	for i=1, table.getn(self.order) do
 		val = fetchString(stringTable, self.order[i], stringKey)
@@ -46,12 +70,58 @@ local function getString(stringTable, stringKey, default)
 	return default
 end
 
+--The following three functions were added to work around some Khaos behaviours.
+function registerAddOn(AddOn, updateFunction)
+
+	--Make both arguments required and make sure that they're the right type
+	if ((not AddOn) or (not type(AddOn) == "string")) or ((not updateFunction) or (not type(updateFunction) == "function")) then
+		EnhTooltip.DebugPrint("Invalid arguments passed to Babylonian.RegisterAddOn() |"..AddOn.." | "..updateFunction);
+		return
+	end
+
+	EnhTooltip.DebugPrint("Registering '"..AddOn.."' with Babylonian");
+	self.update[AddOn] = updateFunction;
+end
+
+function unRegisterAddOn(AddOn)
+
+	--Again make sure the argument exists and that its the right type
+	if ((not AddOn) or (not type(AddOn) == "string")) then
+		return
+	end
+
+	EnhTooltip.DebugPrint("UnRegistering '"..AddOn.."' with Babylonian");
+	self.update[AddOn] = nil;
+end
+
+function isAddOnRegistered(AddOn)
+
+	--Again make sure the argument exists and that its the right type
+	if ((not AddOn) or (not type(AddOn) == "string")) then
+		return nil;
+	end
+	
+	return (self.update[AddOn] ~= nil);
+end
+
+function updateKhaos()
+local table = self.update
+
+	for AddOn, updateFunction in table do
+		EnhTooltip.DebugPrint("Updating '"..AddOn.."'s Khaos Locale");
+		updateFunction(nil, nil, true);
+	end
+end
+
 if (not Babylonian) then
 	Babylonian = {
 		['SetOrder'] = setOrder,
 		['GetOrder'] = getOrder,
 		['GetString'] = getString,
 		['FetchString'] = fetchString,
+		['RegisterAddOn'] = registerAddOn,
+		['UnRegisterAddOn'] = unRegisterAddOn,
+		['IsAddOnRegistered'] = isAddOnRegistered,
 	}
 	RegisterCVar("BabylonianOrder", "")
 	setOrder(getOrder())

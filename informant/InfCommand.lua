@@ -664,9 +664,16 @@ Informant.Register = function()
 	end
 end
 
-function setLocale(param, chatprint)
+function setLocale(param, chatprint, updateKhaos)
 	param = delocalizeFilterVal(param);
-	if not Informant_LocaleLastSet then Informant_LocaleLastSet = ""; end
+	if not Informant_LocaleLastSet then 
+		Informant_LocaleLastSet = ""; 
+	end
+
+	if not Babylonian.IsAddOnRegistered("Informant") then 
+		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
+	end
+
 	local validLocale = nil;
 	
 	if (param == Informant_LocaleLastSet) then
@@ -705,13 +712,15 @@ function setLocale(param, chatprint)
 		end
 	end
 
-	if Khaos and Informant_Khaos_Registered then
-		if not (param == Informant_LocaleLastSet) then
+	if (Khaos and Informant_Khaos_Registered) then
+		if (not (param == Informant_LocaleLastSet)) or (updateKhaos) then
 			resetKhaos();
 		end
 	end
 
-	Informant_LocaleLastSet = param;
+	if (param) then 
+		Informant_LocaleLastSet = param;
+	end
 
 	commandMap = nil;
 	commandMapRev = nil;

@@ -1168,10 +1168,17 @@ function Auctioneer_isValidLocale(param)
 end
 
 
-function Auctioneer_SetLocale(param, chatprint)
+function Auctioneer_SetLocale(param, chatprint, updateKhaos)
 	param = Auctioneer_DelocalizeFilterVal(param);
-	if not Auctioneer_LocaleLastSet then Auctioneer_LocaleLastSet = ""; end
-	--EnhTooltip.DebugPrint("Auctioneer_SetLocale("..param..") | "..Auctioneer_LocaleLastSet);
+	
+	if not Auctioneer_LocaleLastSet then 
+		Auctioneer_LocaleLastSet = ""; 
+	end
+
+	if not Babylonian.IsAddOnRegistered("Auctioneer") then 
+		Babylonian.RegisterAddOn("Auctioneer", Auctioneer_SetLocale);
+	end
+	
 	local validLocale = nil;
 
 	if (param == Auctioneer_LocaleLastSet) then
@@ -1209,12 +1216,14 @@ function Auctioneer_SetLocale(param, chatprint)
 	end
 
 	if (Khaos and Auctioneer_Khaos_Registered) then
-		if not (param == Auctioneer_LocaleLastSet) then
+		if (not (param == Auctioneer_LocaleLastSet)) or (updateKhaos) then
 			resetKhaos();
 		end
 	end	
 
-	Auctioneer_LocaleLastSet = param;
+	if (param) then 
+		Auctioneer_LocaleLastSet = param;
+	end
 
 	Auctioneer_CommandMap = nil;
 	Auctioneer_CommandMapRev = nil;

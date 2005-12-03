@@ -668,10 +668,16 @@ local function isValidLocale(param)
 	end
 end
 
-function Enchantrix_SetLocale(param, chatprint)
+function Enchantrix_SetLocale(param, chatprint, updateKhaos)
 	param = Enchantrix_DelocalizeFilterVal(param)
-	if not Enchantrix_LocaleLastSet then Enchantrix_LocaleLastSet = ""; end
-	--EnhTooltip.DebugPrint("Enchantrix_SetLocale("..param..") | "..Enchantrix_LocaleLastSet);
+	if not Enchantrix_LocaleLastSet then 
+		Enchantrix_LocaleLastSet = ""; 
+	end
+
+	if not Babylonian.IsAddOnRegistered("Enchantrix") then 
+		Babylonian.RegisterAddOn("Enchantrix", Enchantrix_SetLocale);
+	end
+
 	local validLocale = nil;
 
 	if (param == Enchantrix_LocaleLastSet) then
@@ -709,12 +715,14 @@ function Enchantrix_SetLocale(param, chatprint)
 	end
 		
 	if Khaos and Enchantrix_Khaos_Registered then
-		if not (param == Enchantrix_LocaleLastSet) then
+		if not ((param == Enchantrix_LocaleLastSet)) or (updateKhaos) then
 			resetKhaos();
 		end
 	end
 
-	Enchantrix_LocaleLastSet = param;
+	if (param) then 
+		Enchantrix_LocaleLastSet = param;
+	end
 
 	Enchantrix_CommandMap = nil;
 	Enchantrix_CommandMapRev = nil;

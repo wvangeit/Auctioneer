@@ -721,6 +721,7 @@ Informant = {
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
+	SetLocale = setLocale,
 	GetLocale = getLocale,
 	OnEvent = onEvent,
 	SetFilter = setFilter,
