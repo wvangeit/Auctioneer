@@ -699,7 +699,7 @@ function Enchantrix_SetLocale(param, chatprint)
 			end
 
 		else
-			Enchantrix_ChatPrint(string.format(_ENCH("FrmtUnknownLocale"), param));
+			Enchantrix_ChatPrint(string.format(_ENCH("FrmtActUnknownLocale"), param));
 			local locales = "    ";
 			for locale, data in pairs(EnchantrixLocalizations) do
 				locales = locales .. " '" .. locale .. "' ";
