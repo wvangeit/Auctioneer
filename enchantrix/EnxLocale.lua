@@ -9,6 +9,7 @@
 Enchantrix_CustomLocalizations = {
 	['TextGeneral'] = GetLocale(),
 	['TextCombat'] = GetLocale(),
+	['ArgSpellname'] = GetLocale(),
 }
 
 function _ENCH(stringKey, locale)

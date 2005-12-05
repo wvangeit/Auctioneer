@@ -44,6 +44,7 @@ function setOrder(order)
 	table.insert(self.order, GetLocale())
 	table.insert(self.order, "enUS")
 	if not(self.order[1] == getOrder()) then
+		SetCVar("BabylonianOrder", order)
 		updateKhaos()
 	end
 	SetCVar("BabylonianOrder", order)

@@ -576,9 +576,13 @@ function Auctioneer_LockAndLoad()
 
 	-- Rearranges elements in the AH window.
 	Auctioneer_ConfigureAH();
-	
+
 	--GUI Registration code added by MentalPower	
 	Auctioneer_Register();
+
+	if not Babylonian.IsAddOnRegistered("Auctioneer") then 
+		Babylonian.RegisterAddOn("Auctioneer", Auctioneer_SetLocale);
+	end
 
 	Auctioneer_ChatPrint(string.format(_AUCT('FrmtWelcome'), AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
 end

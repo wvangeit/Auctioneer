@@ -88,9 +88,9 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiLocale');
 				helptext=_ENCH('HelpLocale');
 				callback = function(state)
-					Enchantrix_SetLocale(state.value);
 				end;
 				feedback = function (state)
+					Enchantrix_SetLocale(state.value);
 					return string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), state.value);
 				end;
 				default = {
@@ -102,17 +102,17 @@ function Enchantrix_Register_Khaos()
 				dependencies={all={checked=true;}};
 				difficulty=2;
 			};
-			--[[{
+			{
 				id="LoadSettings";
 				type=K_PULLDOWN;
 				setup = {
 					options = {
-						[ENCH_GUI_LOAD_ALWAYS] = 'always',
-						[ENCH_GUI_LOAD_NEVER] = 'never',};
+						[_ENCH('GuiLoad_Always')] = 'always',
+						[_ENCH('GuiLoad_Never')] = 'never',};
 					multiSelect = false;
 				};
-				text=ENCH_GUI_LOAD;
-				helptext=ENCH_HELP_LOAD;
+				text=_ENCH('GuiLoad');
+				helptext=_ENCH('HelpLoad');
 				callback=function(state) end;
 				feedback=function(state)
 					Enchantrix_Command("load " .. state.value, "GUI");
@@ -120,7 +120,7 @@ function Enchantrix_Register_Khaos()
 				default={value = 'always'};
 				disabled={value = 'never'};
 				difficulty=1;
-			};]]
+			};
 			{
 				id="ReloadUI";
 				type=K_BUTTON;
@@ -670,6 +670,7 @@ end
 
 function Enchantrix_SetLocale(param, chatprint, updateKhaos)
 	param = Enchantrix_DelocalizeFilterVal(param)
+
 	if not Enchantrix_LocaleLastSet then 
 		Enchantrix_LocaleLastSet = ""; 
 	end
@@ -700,7 +701,6 @@ function Enchantrix_SetLocale(param, chatprint, updateKhaos)
 		if (validLocale) then
 			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
 			if not (param == Enchantrix_LocaleLastSet) then
-				EnhTooltip.DebugPrint("Changing Enchantrix's Khaos Language");
 				setKhaosSetKeyValue('locale', param);
 			end
 
@@ -713,9 +713,13 @@ function Enchantrix_SetLocale(param, chatprint, updateKhaos)
 			Enchantrix_ChatPrint(locales);
 		end
 	end
-		
-	if Khaos and Enchantrix_Khaos_Registered then
+
+	if (Khaos and Enchantrix_Khaos_Registered) then
 		if not ((param == Enchantrix_LocaleLastSet)) or (updateKhaos) then
+			if (updateKhaos) then
+				EnhTooltip.DebugPrint("Enchantrix: Babylonian.GetOrder() = "..Babylonian.GetOrder());
+				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
+			end
 			resetKhaos();
 		end
 	end

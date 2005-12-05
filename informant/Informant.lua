@@ -4,7 +4,7 @@
 	an item in a tooltip when you hover over the item in the game.
 	<%version%>
 	$Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -305,7 +305,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		itemInfo = getItem(itemID)
 	end
 	if (not itemInfo) then return end
-	
+
 	itemInfo.itemName = name
 	itemInfo.itemLink = link
 	itemInfo.itemCount = count
@@ -504,7 +504,7 @@ end
 
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
-	
+
 	if (not InformantConfig) then
 		InformantConfig = {}
 		setFilterDefaults()	
@@ -571,7 +571,7 @@ end
 function onVariablesLoaded()
 	Informant.SetLocale(getLocale())
 	setFilterDefaults()
-	
+
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 	if (InformantConfig.position) then
@@ -584,7 +584,7 @@ function onVariablesLoaded()
 		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
-	
+
 	-- Restore key bindings
 	-- This workaround is required for LoadOnDemand addons since their saved
 	-- bindings are deleted upon login.
@@ -598,8 +598,12 @@ function onVariablesLoaded()
 		end
 	end
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
-	
+
 	Informant.InitCommands()
+
+	if not Babylonian.IsAddOnRegistered("Informant") then 
+		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
+	end
 end
 
 function onEvent(event)

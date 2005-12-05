@@ -250,9 +250,9 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT('GuiLocale');
 				helptext=_AUCT('HelpLocale');
 				callback = function(state)
-					Auctioneer_SetLocale(state.value);
 				end;
 				feedback = function (state)
+					Auctioneer_SetLocale(state.value);
 					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), state.value);
 				end;
 				default = {
@@ -1196,12 +1196,11 @@ function Auctioneer_SetLocale(param, chatprint, updateKhaos)
 		validLocale = false;
 	end
 
-	
+
 	if (chatprint) then
 		if (validLocale) then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
 			if not (param == Auctioneer_LocaleLastSet) then
-				EnhTooltip.DebugPrint("Changing Auctioneer's Khaos Language");
 				setKhaosSetKeyValue('locale', param);
 			end
 
@@ -1218,6 +1217,9 @@ function Auctioneer_SetLocale(param, chatprint, updateKhaos)
 	if (Khaos and Auctioneer_Khaos_Registered) then
 		if (not (param == Auctioneer_LocaleLastSet)) or (updateKhaos) then
 			resetKhaos();
+			if (updateKhaos) then
+				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
+			end
 		end
 	end	
 

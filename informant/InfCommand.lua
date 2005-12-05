@@ -357,9 +357,9 @@ function registerKhaos()
 				text=_INFM('GuiLocale');
 				helptext=_INFM('HelpLocale');
 				callback = function(state)
-					setLocale(state.value);
 				end;
 				feedback = function (state)
+					setLocale(state.value);
 					return string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), state.value);
 				end;
 				default = {
@@ -380,7 +380,11 @@ function registerKhaos()
 				text=_INFM('GuiReloadui'),
 				helptext=_INFM('GuiReloaduiHelp'),
 				callback=function()
-					ReloadUI()
+					if(ReloadUI) then
+						ReloadUIHandler("5");
+					else
+						ReloadUI();
+					end
 				end,
 				feedback=function()
 					return _INFM('GuiReloaduiFeedback');
@@ -698,7 +702,6 @@ function setLocale(param, chatprint, updateKhaos)
 		if (validLocale) then
 			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), param));
 			if not (param == Informant_LocaleLastSet) then
-				EnhTooltip.DebugPrint("Changing Informant's Khaos Language");
 				setKhaosSetKeyValue('locale', param);
 			end
 
@@ -714,6 +717,9 @@ function setLocale(param, chatprint, updateKhaos)
 
 	if (Khaos and Informant_Khaos_Registered) then
 		if (not (param == Informant_LocaleLastSet)) or (updateKhaos) then
+			if (updateKhaos) then
+				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
+			end
 			resetKhaos();
 		end
 	end

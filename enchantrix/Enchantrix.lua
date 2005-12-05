@@ -283,10 +283,10 @@ function Enchantrix_TakeInventory()
 			end
 		end
 	end
-	
+
 	-- Added by FtKxDE to include player's inventory
 	inventory["inv"] = {};
-	
+
 	for slotid = 0, 19, 1 do
 		inventory["inv"][slotid] = {};
 		
@@ -644,6 +644,10 @@ function Enchantrix_AddonLoaded()
 	--GUI Registration code added by MentalPower	
 	Enchantrix_Register();
 
+	if not Babylonian.IsAddOnRegistered("Enchantrix") then 
+		Babylonian.RegisterAddOn("Enchantrix", Enchantrix_SetLocale);
+	end
+
 	Enchantrix_ChatPrint(string.format(_ENCH('FrmtWelcome'), ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
 	Enchantrix_ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1);
 end
@@ -863,13 +867,13 @@ function Enchantrix_DoBidBroker(minProfit)
 				Enchantrix_ChatPrint(output);
 			end
 		end
-    end
-    
-    Enchantrix_ChatPrint(_ENCH('FrmtBidbrokerDone'));
+	end
+
+	Enchantrix_ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end
 
 function Enchantrix_GetAuctionItemDisenchants(auctionSignature, useCache)
-    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(auctionSignature);
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(auctionSignature);
 	local sig = string.format("%d:%d:%d", id, enchant, rprop);
 	local sigNR = string.format("%d:%d:%d", id, 0, 0);
 	return Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache);
@@ -878,7 +882,7 @@ end
 function Enchantrix_Split(str, at)
 	local splut = {};
 	local pos = 1;
-	
+
 	local match, mend = string.find(str, at, pos, true);
 	while match do
 		table.insert(splut, string.sub(str, pos, match-1));
