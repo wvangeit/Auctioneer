@@ -34,7 +34,8 @@
 	!define MUI_UNICON "UnInstall.ico"
 	!define MUI_WELCOMEFINISHPAGE_BITMAP "Welcome.bmp"
 	!define MUI_ABORTWARNING
-
+	!define WNDTITLE "World of Warcraft"
+	
 ;--------------------------------
 ;Pages
 
@@ -95,7 +96,6 @@
 
 ;--------------------------------
 ;Installer Sections
-;@TODO: Add descriptions to the different sections and also make those descriptions localizable.
 
 InstType "Full"
 InstType "Auctioneer Only"
@@ -188,9 +188,14 @@ SectionEnd
 ;Installer Functions
 
 Function .onInit
+	retryCheck:
+	FindWindow $0 "" "${WNDTITLE}"
+		StrCmp $0 0 continueInstall
+		MessageBox MB_ICONSTOP|MB_ABORTRETRYIGNORE|MB_DEFBUTTON1  "AddOns should not be modified while World of Warcraft is running, please close WoW before proceeding." IDIGNORE continueInstall IDRETRY retryCheck
+	Abort
+	continueInstall:
 
 	!insertmacro MUI_LANGDLL_DISPLAY
-
 FunctionEnd
 
 ;--------------------------------
@@ -198,86 +203,8 @@ FunctionEnd
 
 	;Language strings
 
-	;English
-	LangString DESC_Libraries ${LANG_ENGLISH} "This will install Stubby and Enhanced Tooltips. $\n$\nThese are required for the other AddOns to work."
-	LangString DESC_Auctioneer ${LANG_ENGLISH} "This will install Auctioneer. $\n$\nThis AddOn scans and analyzes the World of Warcraft Auction House and gives item price recomendations."
-	LangString DESC_Enchantrix ${LANG_ENGLISH} "This will install Enchantrix. $\n$\nThis AddOn attempts to predict what components an item will disenchant into."
-	LangString DESC_Informant ${LANG_ENGLISH} "This will install Informant. $\n$\nThis AddOn gives detailed information on the properties and uses of an item."
-
-	;German
-	LangString DESC_Libraries ${LANG_GERMAN} "Dieses Programm installiert Stubby und Enhanced Tooltips. $\n$\nDiese werden für die Funktion der anderen AddOns benötigt."
-	LangString DESC_Auctioneer ${LANG_GERMAN} "Dieses Programm installiert Auctioneer. $\n$\nDieses Addon durchsucht die verschiedenen Auktionshäuser von World of Warcraft, um die Preise für Gegenstände zu analysieren und mit diesen Daten Preisempfehlungen zu geben."
-	LangString DESC_Enchantrix ${LANG_GERMAN} "Dieses Programm installiert Enchantrix. $\n$\nDieses AddOn versucht zu bestimmen, welche Materialien beim entzaubern eines Gegenstands entstehen."
-	LangString DESC_Informant ${LANG_GERMAN} "Dieses Programm installiert Informant. $\n$\nDieses Addon zeigt detaillierte Information über Eigenschaften und Verwendungen eines Gegenstands an."
-
-	;French
-	LangString DESC_Libraries ${LANG_FRENCH} "Ce programme va installer Stubby et Enhanced Tooltips. $\n$\nCes addOns sont nécessaires pour le bon fonctionnement des autres AddOns."
-	LangString DESC_Auctioneer ${LANG_FRENCH} "Ce programme va installer Auctioneer. $\n$\nCette AddOn scan et analyse les enchères de l'hotel des ventes et donne des recommandations de prix."
-	LangString DESC_Enchantrix ${LANG_FRENCH} "Ce programme va installer Enchantrix. $\n$\nCette AddOn tente de prédire quels composants vont être obtenus par le désenchantement d'un objet."
-	LangString DESC_Informant ${LANG_FRENCH} "Ce programme va installer Informant. $\n$\nCette AddOn donne des informations detaillée sur les propriétées et l'utilisation d'un objet."
-
-	;Korean
-	LangString DESC_Libraries ${LANG_KOREAN} ""
-	LangString DESC_Auctioneer ${LANG_KOREAN} "경매�?��?� 설치합니다.$\n$\n�?� 애드온�?� 월드 오브 워�?�래프트�?� 경매 아�?�템�?� 검색, 분�?하여 추천 가격�?� 제안해 주는 애드온 입니다."
-	LangString DESC_Enchantrix ${LANG_KOREAN} ""
-	LangString DESC_Informant ${LANG_KOREAN} ""
-
-	;Simplified Chinese
-	LangString DESC_Libraries ${LANG_SIMPCHINESE} "这将安装Stubby and Enhanced Tooltips(Stubby&增强�??示). $\n$\n这些必需为�?�一�?�件�?作。 "
-	LangString DESC_Auctioneer ${LANG_SIMPCHINESE} "这将安装Auctioneer(�?�?�助手)$\n$\n这个濒件能扫瞄和分�?魔兽世界里的拿忖行，并给你价格上的建议。"
-	LangString DESC_Enchantrix ${LANG_SIMPCHINESE} "这将安装 Enchantrix(附魔助手). $\n$\n这个�?�件试图分�?物�?分解为那些组件并高亮显示."
-	LangString DESC_Informant ${LANG_SIMPCHINESE} "这将安装 Informant(信�?��??供者).$\n$\n这个�?�件�??供关于物产和用途详细的信�?�"
-
-	;Traditional Chinese
-	LangString DESC_Libraries ${LANG_TRADCHINESE} "这将安装Stubby and Enhanced Tooltips(Stubby&增强�??示). $\n$\n这些必需为�?�一�?�件�?作。 "
-	LangString DESC_Auctioneer ${LANG_TRADCHINESE} "这将安装Auctioneer(�?�?�助手)$\n$\n这个濒件能扫瞄和分�?魔兽世界里的拿忖行，并给你价格上的建议。"
-	LangString DESC_Enchantrix ${LANG_TRADCHINESE} "这将安装 Enchantrix(附魔助手). $\n$\n这个�?�件试图分�?物�?分解为那些组件并高亮显示."
-	LangString DESC_Informant ${LANG_TRADCHINESE} "这将安装 Informant(信�?��??供者).$\n$\n这个�?�件�??供关于物产和用途详细的信�?�"
-
-	;Spanish
-	LangString DESC_Libraries ${LANG_SPANISH} "Esto instalará Stubby y Enhanced Tooltips. $\n$\nEstos son necesarios para la operación de los otros AddOns."
-	LangString DESC_Auctioneer ${LANG_SPANISH} "Esto instalará Auctioneer. $\n$\nEste AddOn explora y analiza la Casa de Subastas de World of Warcraft y da recomendaciones de precios de artículos."
-	LangString DESC_Enchantrix ${LANG_SPANISH} "Esto instalará Enchantrix. $\n$\nEste AddOn trata de predecir el resultado de desencantar artículos."
-	LangString DESC_Informant ${LANG_SPANISH} "	Esto instalará Informant. $\n$\nEste AddOn da información detallada de las propiedades y usos de los artículos."
-
-	;Danish
-	LangString DESC_Libraries ${LANG_DANISH} "Dette vil installere Stubby og Enhanced Tooltips. De er påkrævet for at få de andre AddOns til at virke."
-	LangString DESC_Auctioneer ${LANG_DANISH} "Dette vil installere Auctioneer. Dette AddOn skanner og analysere auktionshusene i World of Warcraft og giver tips til varepriser."
-	LangString DESC_Enchantrix ${LANG_DANISH} "Dette vil installere Enchantrix. Dette AddOn forsøger at forudsige hvilke komponenter et given item/genstand vil disenchante til."
-	LangString DESC_Informant ${LANG_DANISH} "Dette vil installere Informant. Dette AddOn giver detaljerede informationer om de egenskaber og brugsmåder et item/genstand har."
-
-	;Italian
-	LangString DESC_Libraries ${LANG_ITALIAN} "Questo programma installerà Stubby e Enhanced Tooltips. $\n$\nQuesti componenti sono necessari per il funzionamento degli altri AddOn."
-	LangString DESC_Auctioneer ${LANG_ITALIAN} "Questo programma installerà Auctioneer. $\n$\nQuesto AddOn scorre e analizza la Casa d'Aste di World of Warcraft e fornisce raccomandazioni sul prezzo degli articoli."
-	LangString DESC_Enchantrix ${LANG_ITALIAN} "Questo programma installerà Enchatrix. $\n$\nQuesto AddOn prova a predìre i componenti nei quali un articolo sarà disincantato."
-	LangString DESC_Informant ${LANG_ITALIAN} "Questo programma installerà Informant. $\n$\nQuesto AddOn fornisce informazioni dettagliate sulle proprietà e gli usi di un oggetto."
-
-	;Turkish
-	LangString DESC_Libraries ${LANG_TURKISH} "Bu Stubby ve Enhanced Tooltips i yükleyecektir. $\n$\nBunlar diger AddOn ların çalişması için gereklidir."
-	LangString DESC_Auctioneer ${LANG_TURKISH} "Bu Auctıoneer i yükleyecektir. $\n$\nBu Addon the World of Warcraft Müzayede Evini tarar, analiz eder ve parça fiyatlandırması için tavsiyelerede bulunur."
-	LangString DESC_Enchantrix ${LANG_TURKISH} "Bu Enchantrix i yükleyecektir. $\n$\nBu Addon bir parçanın disenchant yapılması halinde nelere donüşeceğini tahmin etmeye çalışır."
-	LangString DESC_Informant ${LANG_TURKISH} "Bu Informant i yükleyecektir. $\n$\nBu Addon bir parçanın özellikleri hakkında detaylı bilgi ve kullanım bilgilerini verir."
-
-	;Czech
-	LangString DESC_Libraries ${LANG_CZECH} ""
-	LangString DESC_Auctioneer ${LANG_CZECH} ""
-	LangString DESC_Enchantrix ${LANG_CZECH} ""
-	LangString DESC_Informant ${LANG_CZECH} ""
-
-	;Portuguese
-	LangString DESC_Libraries ${LANG_PORTUGUESE} ""
-	LangString DESC_Auctioneer ${LANG_PORTUGUESE} ""
-	LangString DESC_Enchantrix ${LANG_PORTUGUESE} ""
-	LangString DESC_Informant ${LANG_PORTUGUESE} ""
-
-	;Brazilian Portuguese
-	LangString DESC_Libraries ${LANG_PORTUGUESEBR} ""
-	LangString DESC_Auctioneer ${LANG_PORTUGUESEBR} ""
-	LangString DESC_Enchantrix ${LANG_PORTUGUESEBR} ""
-	LangString DESC_Informant ${LANG_PORTUGUESEBR} ""
+	!include InsStrings.nsh
 	
-	
-
 	; Assign language strings to sections
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
@@ -369,7 +296,12 @@ SectionEnd
 ;UnInstaller Functions
 
 Function un.onInit
+	retryCheck:
+	FindWindow $0 "" "${WNDTITLE}"
+		StrCmp $0 0 continueInstall
+		MessageBox MB_ICONSTOP|MB_ABORTRETRYIGNORE|MB_DEFBUTTON1  "AddOns should not be modified while World of Warcraft is running, please close WoW before proceeding." IDIGNORE continueInstall IDRETRY retryCheck
+	Abort
+	continueInstall:
 
 	!insertmacro MUI_LANGDLL_DISPLAY
-
 FunctionEnd
