@@ -50,7 +50,7 @@ function setOrder(order)
 	SetCVar("BabylonianOrder", order)
 end
 
-function getOrder(order)
+function getOrder()
 	return GetCVar("BabylonianOrder")
 end
 
@@ -110,7 +110,7 @@ local table = self.update
 
 	for AddOn, updateFunction in table do
 		EnhTooltip.DebugPrint("Updating '"..AddOn.."'s Khaos Locale");
-		updateFunction(nil, nil, true);
+		updateFunction(getOrder(), nil, true);
 	end
 end
 

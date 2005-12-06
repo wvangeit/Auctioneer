@@ -569,7 +569,6 @@ local function frameLoaded()
 end
 
 function onVariablesLoaded()
-	Informant.SetLocale(getLocale())
 	setFilterDefaults()
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
