@@ -935,9 +935,9 @@ function Auctioneer_Command(command, source)
 		Auctioneer_SetFrame(param, chatprint)
 	elseif (cmd == 'broker') then
 		Auctioneer_DoBroker(param);
-	elseif (cmd == 'bidbroker') then
+	elseif (cmd == 'bidbroker' or cmd == "bb") then
 		Auctioneer_DoBidBroker(param);
-	elseif (cmd == 'percentless') then
+	elseif (cmd == 'percentless' or cmd == "pl") then
 		Auctioneer_DoPercentLess(param);
 	elseif (cmd == 'compete') then
 		Auctioneer_DoCompeting(param);
