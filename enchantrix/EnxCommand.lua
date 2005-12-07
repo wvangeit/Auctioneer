@@ -550,11 +550,11 @@ function Enchantrix_Command(command, source)
 		-- /enchantrix print-in
 		Enchantrix_SetFrame(param, chatprint)
 
-	elseif (cmd == 'bidbroker') then
+	elseif (cmd == 'bidbroker' or cmd == 'bb') then
 		-- /enchantrix bidbroker
 		Enchantrix_DoBidBroker(param);
 
-	elseif (cmd == 'percentless') then
+	elseif (cmd == 'percentless' or cmd == 'pl') then
 		Enchantrix_DoPercentLess(param);
 
 	-- elseif (cmd == _ENCH('ShowHeader') or cmd == 'header') then
