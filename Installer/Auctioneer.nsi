@@ -1,6 +1,25 @@
-;NSIS Install script for Norganna's AddOns
-;Written by MentalPower
+/*
+	NSIS Install script for Norganna's Auctioneer AddOns
+	Written by MentalPower
 
+	Version: <%version%>
+	Revision: $Id$
+	
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GLP.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 ;--------------------------------
 ;Set Compression Standard
 
@@ -35,7 +54,7 @@
 	!define MUI_WELCOMEFINISHPAGE_BITMAP "Welcome.bmp"
 	!define MUI_ABORTWARNING
 	!define WNDTITLE "World of Warcraft"
-	
+
 ;--------------------------------
 ;Pages
 
@@ -103,9 +122,9 @@ InstType "Libraries Only"
 
 Section "!Libraries" Libraries
 
-SectionIn 1 2 3 RO
+	SectionIn 1 2 3
 
-;EnhTT
+	;EnhTT
 
 	SetOutPath "$INSTDIR\Interface\AddOns\EnhTooltip"
 	File "..\EnhTooltip\EnhTooltip.toc"
@@ -114,10 +133,7 @@ SectionIn 1 2 3 RO
 	File "GPL.txt"
 	File "nopatch"
 
-;Create uninstaller
-	WriteUninstaller "$INSTDIR\Auctioneer Uninstaller.exe"
-
-;Stubby
+	;Stubby
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Stubby"
 	File "..\Stubby\Stubby.toc"
@@ -126,7 +142,17 @@ SectionIn 1 2 3 RO
 	File "GPL.txt"
 	File "nopatch"
 
-;Add our information to the Windows Add/Remove Control Panel
+SectionEnd
+
+Section "UnInstaller" UnInstaller
+
+	SectionIn 1 2 3
+
+	;Create uninstaller
+	WriteUninstaller "$INSTDIR\Auctioneer Uninstaller.exe"
+
+
+;	Add our information to the Windows Add/Remove Control Panel
 
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "DisplayName" "Auctioneer AddOns"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "UninstallString" "$INSTDIR\Auctioneer Uninstaller.exe"
@@ -198,17 +224,34 @@ Function .onInit
 	!insertmacro MUI_LANGDLL_DISPLAY
 FunctionEnd
 
+Function .onVerifyInstDir
+	IfFileExists $INSTDIR\WoW.exe PathGood
+		Abort
+	PathGood:
+FunctionEnd
+
+Function .onSelChange
+	GetCurInstType $0
+	IntCmp $0 3 Yes Yes No
+	Yes:
+		!insertmacro SetSectionFlag Libraries 5
+	No:
+FunctionEnd
+
+
 ;--------------------------------
 ;Descriptions
 
 	;Language strings
 
 	!include InsStrings.nsh
-	
+
 	; Assign language strings to sections
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
 		!insertmacro MUI_DESCRIPTION_TEXT ${Libraries} $(DESC_Libraries)
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${UnInstaller} $(DESC_UnInstaller)
 
 		!insertmacro MUI_DESCRIPTION_TEXT ${Auctioneer} $(DESC_Auctioneer)
 
@@ -225,32 +268,28 @@ InstType "un.All"
 InstType "un.AddOns"
 
 Section "!un.Libraries" un.Libraries
-;If this section is selected delete everything
-;@TODO: Make it so it will ONLY delete the installed files instead of the entire folders.
 
 	SectionIn 1
 
-;EnhTT
+;	EnhTT
 	RMDir /r "$INSTDIR\Interface\AddOns\EnhTooltip"
 
-;Stubby
+;	Stubby
 	RMDir /r "$INSTDIR\Interface\AddOns\Stubby"
-
-;Auctioneer
-	RMDir /r "$INSTDIR\Interface\AddOns\Auctioneer"
-
-;Enchantrix
-	RMDir /r "$INSTDIR\Interface\AddOns\Enchantrix"
-
-;Informant
-	RMDir /r "$INSTDIR\Interface\AddOns\Informant"
-
-;Un-Installer
-	Delete "$INSTDIR\Auctioneer Uninstaller.exe"
 
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
+
+
+
+SectionEnd
+
+Section "un.UnInstaller" un.UnInstaller
+
+	SectionIn 1
+
+	Delete "$INSTDIR\Auctioneer Uninstaller.exe"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer"
 
@@ -299,9 +338,23 @@ Function un.onInit
 	retryCheck:
 	FindWindow $0 "" "${WNDTITLE}"
 		StrCmp $0 0 continueInstall
-		MessageBox MB_ICONSTOP|MB_ABORTRETRYIGNORE|MB_DEFBUTTON1  "AddOns should not be modified while World of Warcraft is running, please close WoW before proceeding." IDIGNORE continueInstall IDRETRY retryCheck
+		MessageBox MB_ICONSTOP|MB_ABORTRETRYIGNORE|MB_DEFBUTTON1 "AddOns should not be modified while World of Warcraft is running, please close WoW before proceeding." IDIGNORE continueInstall IDRETRY retryCheck
 	Abort
 	continueInstall:
 
 	!insertmacro MUI_LANGDLL_DISPLAY
+FunctionEnd
+
+Function un.onVerifyInstDir
+	IfFileExists $INSTDIR\WoW.exe PathGood
+		Abort
+	PathGood:
+FunctionEnd
+
+Function un.onSelChange
+	GetCurInstType $0
+	IntCmp $0 3 Yes Yes No
+	Yes:
+		!insertmacro SetSectionFlag Libraries 5
+	No:
 FunctionEnd
