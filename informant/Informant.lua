@@ -4,7 +4,7 @@
 	an item in a tooltip when you hover over the item in the game.
 	<%version%>
 	$Id$
-
+	
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -305,7 +305,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		itemInfo = getItem(itemID)
 	end
 	if (not itemInfo) then return end
-
+	
 	itemInfo.itemName = name
 	itemInfo.itemLink = link
 	itemInfo.itemCount = count
@@ -504,13 +504,14 @@ end
 
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
-
+	
 	if (not InformantConfig) then
 		InformantConfig = {}
 		setFilterDefaults()	
 	end
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
+--	Informant.InitTrades();
 end
 
 local function frameLoaded()
@@ -570,7 +571,7 @@ end
 
 function onVariablesLoaded()
 	setFilterDefaults()
-
+	
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 	if (InformantConfig.position) then
@@ -583,7 +584,7 @@ function onVariablesLoaded()
 		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
-
+	
 	-- Restore key bindings
 	-- This workaround is required for LoadOnDemand addons since their saved
 	-- bindings are deleted upon login.
@@ -597,12 +598,12 @@ function onVariablesLoaded()
 		end
 	end
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
-
+	
 	Informant.InitCommands()
 
-	if not Babylonian.IsAddOnRegistered("Informant") then 
-		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
-	end
+	if not Babylonian.IsAddOnRegistered("Informant") then  
+		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);  
+	end 
 end
 
 function onEvent(event)
@@ -663,20 +664,57 @@ function scrollUpdate(offset)
 	end
 end
 
-function addLine(text, color)
+function testWrap(text)
+	InformantFrameTextTest:SetText(text)
+	if (InformantFrameTextTest:GetWidth() < InformantFrame:GetWidth() - 20) then
+		return text, ""
+	end
+
+	local pos, test, best, rest
+	best = text
+	rest = nil
+	pos = string.find(text, " ")
+	while (pos) do
+		test = string.sub(text, 1, pos-1)
+		InformantFrameTextTest:SetText(test)
+		if (InformantFrameTextTest:GetWidth() < InformantFrame:GetWidth() - 20) or (not rest) then
+			best = test
+			rest = string.sub(test, pos+1)
+		else
+			break
+		end
+		pos = string.find(text, " ", pos+1)
+	end
+	return best, rest
+end
+
+function addLine(text, color, level)
+	if (text == nil) then return end
+	if (not level) then level = 1 end
+	if (level > 100) then
+		p("ABORT at level 100", text, color, level);
+		return
+	end
+
 	if (type(text) == "table") then
 		for pos, line in text do
-			addLine(line, color)
+			addLine(line, color, level)
 		end
 		return
 	end
 
 	if (not text) then
 		table.insert(lines, "nil")
-	elseif (color) then
-		table.insert(lines, string.format("|cff%s%s|r", color, text))
 	else
-		table.insert(lines, text)
+		local best, rest = testWrap(text)
+		if (color) then
+			table.insert(lines, string.format("|cff%s%s|r", color, best))
+		else
+			table.insert(lines, best)
+		end
+		if (rest) and (rest ~= "") then
+			addLine(rest, color, level+1)
+		end
 	end
 	scrollUpdate()
 end
