@@ -36,7 +36,7 @@
 
 	;Name and file
 	Name "Auctioneer AddOns"
-	OutFile "Auctioneer.exe"
+	OutFile "AuctioneerSetup.exe"
 
 	;Default installation folder
 	InstallDir "$PROGRAMFILES\World of Warcraft"
