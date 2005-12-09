@@ -1479,7 +1479,11 @@ function Auctioneer_GetFilterVal(type)
 		AuctionConfig.filters = {};
 		Auctioneer_SetFilterDefaults();
 	end
-	return AuctionConfig.filters[type];
+	local val = AuctionConfig.filters[type];
+	if (val == nil) then
+		val = Auctioneer_FilterDefaults[type];
+	end
+	return val;
 end
 
 function Auctioneer_GetFilter(filter)
