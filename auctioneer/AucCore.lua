@@ -494,28 +494,6 @@ function Auctioneer_HookAuctionHouse()
 	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer_AuctionFrameFilters_UpdateClasses);
 	Stubby.RegisterFunctionHook("AuctionsRadioButton_OnClick", 200, Auctioneer_OnChangeAuctionDuration);
 
-	Auctioneer_Orig_PickupContainerItem = PickupContainerItem
-	PickupContainerItem = function(...)
-		local bag = arg[1]
-		local item = arg[2]
-		if (not CursorHasItem() and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
-			Auctioneer_Orig_PickupContainerItem(bag, item)
-			if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
-				ClickAuctionSellItemButton()
-				AuctionsFrameAuctions_ValidateAuction()
-				local start = MoneyInputFrame_GetCopper(StartPrice)
-				local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
-				local duration = AuctionFrameAuctions.duration
-				if (AuctionsCreateAuctionButton:IsEnabled()) then
-					StartAuction(start, buy, duration);
-					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
-				end
-			end
-		else
-			Auctioneer_Orig_PickupContainerItem(bag, item)
-		end
-	end
-
 end
 
 function Auctioneer_LockAndLoad()
@@ -548,20 +526,40 @@ function Auctioneer_LockAndLoad()
 			if (link) then
 				if (button == "RightButton") and (IsAltKeyDown()) then
 					AuctionFrameTab_OnClick(1)
-					local itemName = EnhTooltip.NameFromLink(link)
-					if (itemName) then
-						BrowseName:SetText(itemName)
-						BrowseMinLevel:SetText("")
-						BrowseMaxLevel:SetText("")
-						AuctionFrameBrowse.selectedInvtypeIndex = nil
-						AuctionFrameBrowse.selectedClassIndex = nil
-						AuctionFrameBrowse.selectedSubclassIndex = nil
-						IsUsableCheckButton:SetChecked(0)
-						UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-						AuctionFrameBrowse_Search()
+					local itemID = EnhTooltip.BreakLink(link)
+					if (itemID) then
+						local itemName = GetItemInfo(tostring(itemID))
+						if (itemName) then
+							BrowseName:SetText(itemName)
+							BrowseMinLevel:SetText("")
+							BrowseMaxLevel:SetText("")
+							AuctionFrameBrowse.selectedInvtypeIndex = nil
+							AuctionFrameBrowse.selectedClassIndex = nil
+							AuctionFrameBrowse.selectedSubclassIndex = nil
+							IsUsableCheckButton:SetChecked(0)
+							UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+							AuctionFrameBrowse_Search()
+							BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
+						end
 					end
 					return
 				end
+			end
+		end
+		
+		if (not CursorHasItem() and AuctionFrame and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
+			PickupContainerItem(bag, slot)
+			if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
+				ClickAuctionSellItemButton()
+				AuctionsFrameAuctions_ValidateAuction()
+				local start = MoneyInputFrame_GetCopper(StartPrice)
+				local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
+				local duration = AuctionFrameAuctions.duration
+				if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
+					StartAuction(start, buy, duration);
+					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
+				end
+				return
 			end
 		end
 		Auctioneer_Orig_ContainerFrameItemButton_OnClick(unpack(arg))
