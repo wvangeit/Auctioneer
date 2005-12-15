@@ -450,7 +450,30 @@ function Auctioneer_Register_Khaos()
 				disabled = { value = _AUCT('CmdProtectWindow'..Auctioneer_FilterDefaults['protect-window']) };
 				dependencies={enabled={checked=true;}};
 				difficulty=3;
-			};			
+			};
+			{
+				id="finish";
+				type=K_PULLDOWN;
+				setup = {
+					options = {
+						[_AUCT('CmdFinish0')] = 0,
+						[_AUCT('CmdFinish1')] = 1,
+						[_AUCT('CmdFinish2')] = 2 };
+					multiSelect = false;
+				};
+				text=_AUCT('GuiFinish');
+				helptext=_AUCT('HelpFinish');
+				callback=function(state)
+					Auctioneer_CmdProtectWindow(state.value);
+				end;
+				feedback=function(state)
+					return string.format(_AUCT('FrmtFinish'), _AUCT('CmdFinish'..Auctioneer_GetFilterVal('finish')));
+				end;
+				default = { value = _AUCT('CmdFinish'..Auctioneer_FilterDefaults['finish']) };
+				disabled = { value = _AUCT('CmdFinish'..Auctioneer_FilterDefaults['finish']) };
+				dependencies={enabled={checked=true;}};
+				difficulty=3;
+			};
 			{
 				id="show-warning";
 				type=K_TEXT;
@@ -851,34 +874,35 @@ end
 
 function Auctioneer_BuildCommandMap()
 	Auctioneer_CommandMap = {
-			[_AUCT('CmdOn')] = 'on',
-			[_AUCT('CmdOff')] = 'off',
-			[_AUCT('CmdToggle')] = 'toggle',
-			[_AUCT('CmdDisable')] = 'disable',
-			[_AUCT('CmdClear')] = 'clear',
-			[_AUCT('CmdLocale')] = 'locale',
-			[_AUCT('CmdDefault')] = 'default',
-			[_AUCT('CmdPrintin')] = 'print-in',
-			[_AUCT('CmdAlso')] = 'also',
-			[_AUCT('CmdEmbed')] = 'embed',
-			[_AUCT('CmdPercentless')] = 'percentless',
-			[_AUCT('CmdPercentlessShort')] = 'percentless',
-			[_AUCT('CmdCompete')] = 'compete',
-			[_AUCT('CmdScan')] = 'scan',
-			[_AUCT('CmdAutofill')] = 'autofill',
-			[_AUCT('CmdAuctionDuration')] = 'auction-duration',
-			[_AUCT('CmdProtectWindow')] = 'protect-window',
-			[_AUCT('CmdBroker')] = 'broker';
-			[_AUCT('CmdBidbroker')] = 'bidbroker',
-			[_AUCT('CmdBidbrokerShort')] = 'bidbroker',
-			[_AUCT('CmdAuctionClick')] = 'auction-click';
-			[_AUCT('CmdPctBidmarkdown')] = 'pct-bidmarkdown';
-			[_AUCT('CmdPctMarkup')]      = 'pct-markup';
-			[_AUCT('CmdPctMaxless')]     = 'pct-maxless';
-			[_AUCT('CmdPctNocomp')]      = 'pct-nocomp';
-			[_AUCT('CmdPctUnderlow')]    = 'pct-underlow';
-			[_AUCT('CmdPctUndermkt')]    = 'pct-undermkt';
-		}
+		[_AUCT('CmdOn')]				=	'on',
+		[_AUCT('CmdOff')]				=	'off',
+		[_AUCT('CmdToggle')]			=	'toggle',
+		[_AUCT('CmdDisable')]			=	'disable',
+		[_AUCT('CmdClear')]				=	'clear',
+		[_AUCT('CmdLocale')]			=	'locale',
+		[_AUCT('CmdDefault')]			=	'default',
+		[_AUCT('CmdPrintin')]			=	'print-in',
+		[_AUCT('CmdAlso')]				=	'also',
+		[_AUCT('CmdEmbed')]				=	'embed',
+		[_AUCT('CmdPercentless')]		=	'percentless',
+		[_AUCT('CmdPercentlessShort')]	=	'percentless',
+		[_AUCT('CmdCompete')]			=	'compete',
+		[_AUCT('CmdScan')]				=	'scan',
+		[_AUCT('CmdAutofill')]			=	'autofill',
+		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
+		[_AUCT('CmdProtectWindow')]		=	'protect-window',
+		[_AUCT('CmdFinish')]			=	'finish',
+		[_AUCT('CmdBroker')]			=	'broker';
+		[_AUCT('CmdBidbroker')]			=	'bidbroker',
+		[_AUCT('CmdBidbrokerShort')]	=	'bidbroker',
+		[_AUCT('CmdAuctionClick')]		=	'auction-click';
+		[_AUCT('CmdPctBidmarkdown')]	=	'pct-bidmarkdown';
+		[_AUCT('CmdPctMarkup')]			=	'pct-markup';
+		[_AUCT('CmdPctMaxless')]		=	'pct-maxless';
+		[_AUCT('CmdPctNocomp')]			=	'pct-nocomp';
+		[_AUCT('CmdPctUnderlow')]		=	'pct-underlow';
+		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt';
+	}
 
 	Auctioneer_CommandMapRev = {}
 	for k,v in pairs(Auctioneer_CommandMap) do
@@ -891,8 +915,10 @@ function Auctioneer_Command(command, source)
 
 	--To print or not to print, that is the question...
 	local chatprint = nil;
+
 	if (source == "GUI") then
 		chatprint = false;
+
 	else
 		chatprint = true;
 	end;
@@ -901,20 +927,27 @@ function Auctioneer_Command(command, source)
 	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
 
 	if (not cmd) then cmd = command; end
-	if (not cmd) then cmd = "";	end
+	if (not cmd) then cmd = ""; end
 	if (not param) then	param = ""; end
 	cmd = Auctioneer_DelocalizeCommand(cmd);
 
 	--Now for the real Command handling
+
+	--/auctioneer help
 	if ((cmd == "") or (cmd == "help")) then
 		Auctioneer_ChatPrint_Help();
-		return;
+
+	--/auctioneer (on|off|toggle)
 	elseif (cmd == 'on' or cmd == 'off' or cmd == 'toggle') then
 		Auctioneer_OnOff(cmd, chatprint);
+
+	--/auctioneer disable
 	elseif (cmd == 'disable') then
 		Auctioneer_ChatPrint(_AUCT('DisableMsg'));
 		Stubby.SetConfig("Auctioneer", "LoadType", "never");
 		setKhaosSetKeyValue("LoadSettings", "never")
+
+	--/auctioneer load (always|never|auctionhouse)
 	elseif (cmd == 'load') then
 		if (param == "always") or (param == "never") or (param == "auctionhouse") then
 			Stubby.SetConfig("Auctioneer", "LoadType", param);
@@ -923,44 +956,84 @@ function Auctioneer_Command(command, source)
 				setKhaosSetKeyValue("LoadSettings", param)
 			end
 		end
+
+	--/auctioneer clear (all|snapshot|item)
 	elseif (cmd == 'clear') then
 		Auctioneer_Clear(param, chatprint);
+
+	--/auctioneer also ReamName-Faction
 	elseif (cmd == 'also') then
 		Auctioneer_AlsoInclude(param, chatprint);
+
+	--/auctioneer locale
 	elseif (cmd == 'locale') then
 		Auctioneer_SetLocale(param, chatprint);
+
+	--/auctioneer default (all|option)
 	elseif (cmd == 'default') then
 		Auctioneer_Default(param, chatprint);
+
+	--/auctioneer print-in (FrameName|FrameNumber)
 	elseif (cmd == 'print-in') then
 		Auctioneer_SetFrame(param, chatprint)
+
+	--/auctioneer broker
 	elseif (cmd == 'broker') then
 		Auctioneer_DoBroker(param);
+
+	--/auctioneer bidbroker
 	elseif (cmd == 'bidbroker' or cmd == "bb") then
 		Auctioneer_DoBidBroker(param);
+
+	--/auctioneer percentless
 	elseif (cmd == 'percentless' or cmd == "pl") then
 		Auctioneer_DoPercentLess(param);
+
+	--/auctioneer compete
 	elseif (cmd == 'compete') then
 		Auctioneer_DoCompeting(param);
+
+	--/auctioneer scan
 	elseif (cmd == 'scan') then
 		Auctioneer_RequestAuctionScan();
+
+	--/auctioneer protect-window
 	elseif (cmd == 'protect-window') then
 		Auctioneer_CmdProtectWindow(param, chatprint);
+
+	--/auctioneer auction-duration (2h|8h|24h)
 	elseif (cmd == 'auction-duration') then
 		Auctioneer_CmdAuctionDuration(param, chatprint);
+
+	--/auctioneer finish (off|logout|exit)
+	elseif (cmd == 'finish') then
+		Auctioneer_CmdFinish(param, chatprint);
+
+	--/auctioneer low
 	elseif (cmd == 'low') then
 		Auctioneer_DoLow(param);
+
+	--/auctioneer med
 	elseif (cmd == 'med') then
 		Auctioneer_DoMedian(param);
+
+	--/auctioneer hsp
 	elseif (cmd == 'hsp') then
 		Auctioneer_DoHSP(param);
+
+	--/auctioneer (GenVars)
 	elseif (cmd == 'embed' or cmd == 'autofill' or cmd == 'auction-click' or
 			cmd == 'show-verbose' or cmd == 'show-average' or cmd == 'show-link' or
 			cmd == 'show-median' or cmd == 'show-stats' or cmd == 'show-suggest' or
 			cmd == 'show-embed-blankline' or cmd == 'show-warning') then
 		Auctioneer_GenVarSet(cmd, param, chatprint);
+
+	--/auctioneer (PercentVars)
 	elseif (cmd == 'pct-bidmarkdown' or cmd == 'pct-markup' or cmd == "pct-maxless" or
 			cmd == "pct-nocomp" or cmd == "pct-underlow" or cmd == "pct-undermkt") then
 		Auctioneer_PercentVarSet(cmd, param, chatprint);
+
+	--Command not recognized
 	else
 		if (chatprint) then
 			Auctioneer_ChatPrint(string.format(_AUCT('FrmtActUnknown'), cmd));
@@ -973,6 +1046,9 @@ function Auctioneer_ChatPrint_Help()
 
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
 	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
+
+	local frameName;
+	_, frameName = Auctioneer_GetFrameNames(Auctioneer_GetFrameIndex());
 
 	Auctioneer_ChatPrint(_AUCT('TextUsage'));
 	Auctioneer_ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer_GetLocalizedFilterVal("all").."]|r - " .. _AUCT('HelpOnoff'));
@@ -994,6 +1070,8 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionDuration'), _AUCT('OptAuctionDuration'), _AUCT('CmdAuctionDuration'..Auctioneer_GetFilterVal('auction-duration')), _AUCT('HelpAuctionDuration')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdLocale'), _AUCT('OptLocale'), Auctioneer_GetLocalizedFilterVal("locale"), _AUCT('HelpLocale')));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdPrintin'), _AUCT('OptPrintin'), frameName, _AUCT('HelpPrintin')));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdFinish'), _AUCT('OptFinish'), _AUCT('CmdFinish'..Auctioneer_GetFilterVal('finish')), _AUCT('HelpFinish')));
 
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdPctMarkup'), _AUCT('OptPctMarkup'), Auctioneer_GetFilterVal('pct-markup'), _AUCT('HelpPctMarkup')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdPctBidmarkdown'), _AUCT('OptPctBidmarkdown'), Auctioneer_GetFilterVal('pct-bidmarkdown'), _AUCT('HelpPctBidmarkdown')));
@@ -1011,8 +1089,6 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdCompete'), _AUCT('OptCompete'), _AUCT('HelpCompete')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdScan'), _AUCT('OptScan'), _AUCT('HelpScan')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdDefault'), _AUCT('OptDefault'), _AUCT('HelpDefault')));
-	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdPrintin'), _AUCT('OptPrintin'), _AUCT('HelpPrintin')));
-
 end
 
 --The Auctioneer_OnOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
@@ -1362,7 +1438,7 @@ end
 
 function Auctioneer_CmdProtectWindow(param, chatprint)
 	local mode;
-	
+
 	if (param == 'never' or param == 'off' or param == _AUCT('CmdProtectWindow0') or param == _AUCT('CmdOff') or tonumber(param) == 0) then
 		mode = 0;
 
@@ -1373,12 +1449,12 @@ function Auctioneer_CmdProtectWindow(param, chatprint)
 		mode = 2;
 
 	else
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_DelocalizeCommand("protect-window")));
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_LocalizeCommand("protect-window")));
 		return
 	end
-	
+
 	Auctioneer_SetFilter("protect-window", mode);
-	
+
 	if (chatprint) then
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdProtectWindow' .. mode)));
 		setKhaosSetKeyValue("protect-window", mode);
@@ -1387,7 +1463,7 @@ end
 
 function Auctioneer_CmdAuctionDuration(param, chatprint)
 	local mode;
-	
+
 	if (param == 'last' or param == _AUCT('CmdAuctionDuration0') or tonumber(param) == 0) then
 		mode = 0;
 
@@ -1401,7 +1477,7 @@ function Auctioneer_CmdAuctionDuration(param, chatprint)
 		mode = 3;
 
 	else
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_DelocalizeCommand("auction-duration")));
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_LocalizeCommand("auction-duration")));
 		return
 	end
 
@@ -1411,7 +1487,31 @@ function Auctioneer_CmdAuctionDuration(param, chatprint)
 		Auctioneer_ChatPrint(string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdAuctionDuration' .. mode)));
 		setKhaosSetKeyValue("protect-window", mode);
 	end
+end
 
+function Auctioneer_CmdFinish(param, chatprint)
+	local mode;
+
+	if (param == 'off' or param == _AUCT('CmdFinish0') or tonumber(param) == 0) then
+		mode = 0;
+
+	elseif (param == 'logout' or param == _AUCT('CmdFinish1') or tonumber(param) == 1) then
+		mode = 1;
+
+	elseif (param == 'exit' or param == _AUCT('CmdFinish2') or tonumber(param) == 2) then
+		mode = 2;
+
+	else
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer_LocalizeCommand("finish")));
+		return
+	end
+
+	Auctioneer_SetFilter("finish", mode);
+
+	if (chatprint) then
+		Auctioneer_ChatPrint(string.format(_AUCT('FrmtFinish'), _AUCT('CmdFinish' .. mode)));
+		setKhaosSetKeyValue("finish", mode);
+	end
 end
 
 function Auctioneer_GenVarSet(variable, param, chatprint)

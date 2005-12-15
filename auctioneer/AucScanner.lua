@@ -5,7 +5,7 @@
 
 	Auctioneer scanning functions
 	Functions to handle the auction scan procedure
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -146,7 +146,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 							expCount = expCount+1;
 						end
 					end
-						
+
 					if (string.sub(iData, 1,1) == "1") then
 						AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
 						lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
@@ -177,6 +177,17 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 	if (nullSafe(lDiscrepencyCount) > 0) then
 		Auctioneer_ChatPrint(string.format(_AUCT('AuctionDiscrepancies'), Auctioneer_ColorTextWhite(lDiscrepencyCount)));
+	end
+
+--The followng was added by MentalPower to implement the "/auc finish" command
+	local finish;
+	finish = Auctioneer_GetFilterVal('finish');
+
+	if (finish == 1) then
+		Logout();
+
+	elseif (finish == 2) then
+		Quit();
 	end
 end
 
@@ -211,7 +222,7 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 
 	-- Call some interested iteminfo addons
 	Auctioneer_ProcessLink(aiLink);
-	
+
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
 	local hyperlink = string.format("item:%d:%d:%d:%d", aiItemID, aiEnchant, aiRandomProp, aiUniqID);
@@ -219,7 +230,7 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 	-- Get all item data
 	local iName, iLink, iQuality, iLevel, iClass, iSubClass, iCount, iMaxStack = GetItemInfo(hyperlink);
 	local itemCat = Auctioneer_GetCatNumberByName(iClass);
-	
+
 	-- construct the unique auction signature for this aution
 	local lAuctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice), aiUniqID);
 
@@ -238,7 +249,7 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 	-- if this auction is not in the snapshot add it
 	local auctKey = Auctioneer_GetAuctionKey();
 	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, lAuctionSignature);
-	
+
 	-- If we haven't seen this item (it's not in the old snapshot)
 	if (not snap) then 
 		EnhTooltip.DebugPrint("No snap");
@@ -249,7 +260,7 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 
 		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(aiKey, auctKey);
 		if (not auctionPriceItem) then auctionPriceItem = {} end
-		
+
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
 		minCount = minCount + 1;
@@ -386,7 +397,7 @@ function Auctioneer_ConfigureAH()
 		AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
 		AuctionsLongAuctionButton:ClearAllPoints();
 		AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
-		
+
 		-- set UI-texts
 		BrowseScanButton:SetText(_AUCT('TextScan'));
 		BrowseScanButton:SetParent("AuctionFrameBrowse");
@@ -406,7 +417,7 @@ function Auctioneer_ConfigureAH()
 			AuctPriceRememberCheck:SetPoint("TOPLEFT", "AuctionsDepositText", "BOTTOMLEFT", 0, -2)
 			AuctPriceRememberCheck:Show()
 		end
-		
+
 		-- Protect the auction frame from being closed.
 		-- This call is to ensure the window is protected even after you
 		-- manually load Auctioneer while already showing the AuctionFrame
@@ -530,7 +541,7 @@ function Auctioneer_NewAuction()
 		x,x,x,x,lowStackCount,x,currentLowestBuyout = Auctioneer_GetItemSignature(currentLowestBuyout);
 		currentLowestBuyout = currentLowestBuyout / lowStackCount;
 	end 
-	
+
 	local historicalMedian, historicalMedCount = Auctioneer_GetItemHistoricalMedianBuyout(itemKey);
 	local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey);
 
@@ -580,12 +591,12 @@ function Auctioneer_AuctHouseShow()
 	else
 		Auctioneer_SetAuctionDuration(Auctioneer_GetFilterVal('last-auction-duration'))
 	end
-	
+
 	-- Protect the auction frame from being closed if we should
 	if (Auctioneer_GetFilterVal('protect-window') == 2) then
 		Auctioneer_ProtectAuctionFrame(true);
 	end
-	
+
 	-- Start scanning if so requested
 	if Auctioneer_isScanningRequested then
 		Auctioneer_StartAuctionScan();
@@ -597,7 +608,7 @@ function Auctioneer_AuctHouseClose()
 	if Auctioneer_isScanningRequested then
 		Auctioneer_StopAuctionScan();
 	end
-	
+
 	-- Unprotect the auction frame
 	Auctioneer_ProtectAuctionFrame(false);
 end
@@ -658,7 +669,7 @@ function Auctioneer_SetAuctionDuration(duration, persist)
 		EnhTooltip.DebugPrint("Auctioneer_SetAuctionDuration(): invalid duration ", duration)
 		return
 	end
-	
+
 	if (not persist) then ignoreAuctionDurationChange = true; end
 	AuctionsRadioButton_OnClick(durationIndex);
 end

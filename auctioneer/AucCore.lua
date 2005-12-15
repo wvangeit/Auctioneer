@@ -81,8 +81,8 @@ MIN_BID_PERCENT = 10;
 BID_BASED_CATEGORIES = {[1]=true, [2]=true, [8]=true, [10]=true}
 
 --[[ SavedVariables --]]
-AuctionConfig = {};        --Table that stores config settings
-Auction_DoneItems = {};    --Table to keep a record of auction items that have been scanned
+AuctionConfig = {};			--Table that stores config settings
+Auction_DoneItems = {};		--Table to keep a record of auction items that have been scanned
 AuctionBackup = {}			--Table to backup old data which can't be converted at once
 AuctionConfig.version = 30200;
 
@@ -92,41 +92,42 @@ Auctioneer_Lowests = {};
 
 -- Default filter configuration
 Auctioneer_FilterDefaults = {
-		["all"] = "on",
-		["autofill"] = "on",
-		["embed"] = "off",
-		["also"] = "off",
-		["auction-click"] = "on",
-		["protect-window"] = 1,
-		["show-link"] = "off",
-		["show-embed-blankline"] = "off",
-		["show-verbose"] = "on",
-		["show-stats"] = "on",
-		["show-average"] = "on",
-		["show-median"] = "on",
-		["show-suggest"] = "on",
-		["show-warning"] = "on",
-		["scan-class1"]  = "on",
-		["scan-class2"]  = "on",
-		["scan-class3"]  = "on",
-		["scan-class4"]  = "on",
-		["scan-class5"]  = "on",
-		["scan-class6"]  = "on",
-		["scan-class7"]  = "on",
-		["scan-class8"]  = "on",
-		["scan-class9"]  = "on",
-		["scan-class10"] = "on",
-		['printframe'] = 1,
-		['last-auction-duration'] = 1440,
-		['auction-duration'] = 3,
-		['pct-bidmarkdown'] = 20,
-		['pct-markup'] = 300,
-		['pct-maxless'] = 30, 
-		['pct-nocomp'] = 2,
-		['pct-underlow'] = 5,
-		['pct-undermkt'] = 20,
-		['locale'] = 'default',
-	}
+	["all"]						=	"on",
+	["autofill"]				=	"on",
+	["embed"]					=	"off",
+	["also"]					=	"off",
+	["auction-click"]			=	"on",
+	["show-link"]				=	"off",
+	["show-embed-blankline"]	=	"off",
+	["show-verbose"]			=	"on",
+	["show-stats"]				=	"on",
+	["show-average"]			=	"on",
+	["show-median"]				=	"on",
+	["show-suggest"]			=	"on",
+	["show-warning"]			=	"on",
+	["scan-class1"]				=	"on",
+	["scan-class2"]				=	"on",
+	["scan-class3"]				=	"on",
+	["scan-class4"]				=	"on",
+	["scan-class5"]				=	"on",
+	["scan-class6"]				=	"on",
+	["scan-class7"]				=	"on",
+	["scan-class8"]				=	"on",
+	["scan-class9"]				=	"on",
+	["scan-class10"]			=	"on",
+	["printframe"]				=	1,
+	["last-auction-duration"]	=	1440,
+	["auction-duration"]		=	3,
+	["protect-window"]			=	1,
+	["finish"]					=	0,
+	["pct-bidmarkdown"]			=	20,
+	["pct-markup"]				=	300,
+	["pct-maxless"]				=	30,
+	["pct-nocomp"]				=	2,
+	["pct-underlow"]			=	5,
+	["pct-undermkt"]			=	20,
+	["locale"]					=	"default",
+}
 
 function Auctioneer_GetItemData(itemKey)
 	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
