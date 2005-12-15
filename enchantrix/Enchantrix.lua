@@ -26,6 +26,9 @@
 
 ]]
 ENCHANTRIX_VERSION = "<%version%>";
+if (ENCHANTRIX_VERSION == "<".."%version%>") then
+	ENCHANTRIX_VERSION = "3.3.DEV";
+end
 
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix_GUI_Registered = nil;
@@ -99,11 +102,6 @@ local MAX_BUYOUT_PRICE = 800000;
 local MIN_PROFIT_MARGIN = 1000;
 local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
-
-
-if (ENCHANTRIX_VERSION == "<".."%version%>") then
-	ENCHANTRIX_VERSION = "3.1.DEV";
-end
 
 function Enchantrix_CheckTooltipInfo(frame)
 	-- If we've already added our information, no need to do it again

@@ -29,7 +29,7 @@
 AUCTIONEER_VERSION="<%version%>";
 -- If you want to see debug messages, create a window called "Debug" within the client.
 if (AUCTIONEER_VERSION == "<".."%version%>") then
-	AUCTIONEER_VERSION = "3.1.DEV";
+	AUCTIONEER_VERSION = "3.3.DEV";
 end
 
 function Auctioneer_OnLoad()

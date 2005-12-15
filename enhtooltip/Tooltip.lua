@@ -168,7 +168,7 @@
 -- setting version number
 ENHTOOLTIP_VERSION = "<%version%>"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
-	ENHTOOLTIP_VERSION = "3.1.DEV"
+	ENHTOOLTIP_VERSION = "3.3.DEV"
 end
 
 --[[
