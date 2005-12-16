@@ -494,7 +494,28 @@ function Auctioneer_Register_Khaos()
 				disabled={checked=false};
 				dependencies={enabled={checked=true;}};
 				difficulty=1;
-			};			
+			};
+			{
+				id="warn-color";
+				type=K_TEXT;
+				text=_AUCT('GuiWarnColor');
+				helptext=_AUCT('HelpWarnColor');
+				callback=function(state)
+					Auctioneer_GenVarSet("warn-color", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdWarnColor')));
+					else
+						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdWarnColor')));
+					end
+				end;
+				check=true;
+				default={checked=Auctioneer_GetKhaosDefault('warn-color')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=1;
+			};
 			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
@@ -889,6 +910,7 @@ function Auctioneer_BuildCommandMap()
 		[_AUCT('CmdCompete')]			=	'compete',
 		[_AUCT('CmdScan')]				=	'scan',
 		[_AUCT('CmdAutofill')]			=	'autofill',
+		[_AUCT('CmdWarnColor')]			=	'warn-color',
 		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
 		[_AUCT('CmdProtectWindow')]		=	'protect-window',
 		[_AUCT('CmdFinish')]			=	'finish',
@@ -1025,7 +1047,7 @@ function Auctioneer_Command(command, source)
 	elseif (cmd == 'embed' or cmd == 'autofill' or cmd == 'auction-click' or
 			cmd == 'show-verbose' or cmd == 'show-average' or cmd == 'show-link' or
 			cmd == 'show-median' or cmd == 'show-stats' or cmd == 'show-suggest' or
-			cmd == 'show-embed-blankline' or cmd == 'show-warning') then
+			cmd == 'show-embed-blankline' or cmd == 'show-warning' or cmd == 'warn-color') then
 		Auctioneer_GenVarSet(cmd, param, chatprint);
 
 	--/auctioneer (PercentVars)
@@ -1065,6 +1087,7 @@ function Auctioneer_ChatPrint_Help()
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('ShowEmbedBlank'), Auctioneer_GetLocalizedFilterVal('show-embed-blankline'), _AUCT('HelpEmbedBlank')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('ShowRedo'), Auctioneer_GetLocalizedFilterVal('show-warning'), _AUCT('HelpRedo')));
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionClick'), Auctioneer_GetLocalizedFilterVal('auction-click'), _AUCT('HelpAuctionClick')));
+	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdWarnColor'), Auctioneer_GetLocalizedFilterVal('warn-color'), _AUCT('HelpWarnColor')));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer_ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer_GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));

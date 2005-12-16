@@ -169,7 +169,7 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer_GetFilter('show-suggest')) then -- show item's suggested auction price
-				local hsp = Auctioneer_GetHSP(itemKey, auctKey);
+				local hsp, histCount, market, warn, nexthsp, nextwarn = Auctioneer_GetHSP(itemKey, auctKey);
 				if hsp == 0 and buyCount > 0 then
 					hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 				end
@@ -188,6 +188,40 @@ function Auctioneer_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 					-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
 					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSgst'), EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
+				end
+				EnhTooltip.AddLine(warn);
+				if (Auctioneer_GetFilter('warn-color')) then
+					local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
+
+					FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
+					FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
+					FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
+					FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
+					FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
+					FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
+					FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
+					FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+
+					if (string.find(warn, FrmtWarnToolow)) then
+						--Color Red
+						EnhTooltip.LineColor(1.0, 0.0, 0.0);
+
+					elseif (string.find(warn, FrmtWarnUndercut)) then
+						--Color Yellow
+						EnhTooltip.LineColor(1.0, 1.0, 0.0);
+
+					elseif (string.find(warn, FrmtWarnNocomp) or string.find(warn, FrmtWarnAbovemkt)) then
+						--Color Green
+						EnhTooltip.LineColor(0.0, 1.0, 0.0);
+
+					elseif (string.find(warn, FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
+						--Color Gray
+						EnhTooltip.LineColor(0.6, 0.6, 0.6);
+					end
+
+				else
+					--Color Orange
+					EnhTooltip.LineColor(0.9, 0.4, 0.0);
 				end
 			end
 			if (not Auctioneer_GetFilter('show-verbose')) then

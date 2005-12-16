@@ -115,6 +115,7 @@ Auctioneer_FilterDefaults = {
 	["scan-class8"]				=	"on",
 	["scan-class9"]				=	"on",
 	["scan-class10"]			=	"on",
+	["warn-color"]				=	"on",
 	["printframe"]				=	1,
 	["last-auction-duration"]	=	1440,
 	["auction-duration"]		=	3,

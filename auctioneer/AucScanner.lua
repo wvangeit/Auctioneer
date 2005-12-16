@@ -470,7 +470,40 @@ end
 function Auctioneer_Auctions_SetWarn(textStr)
 	if (AuctionInfoWarnText == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
 	AuctionInfoWarnText:SetText(textStr);
-	AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
+
+	if (Auctioneer_GetFilter('warn-color')) then
+		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
+
+		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
+		FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
+		FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
+		FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
+		FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
+		FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
+		FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
+		FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+
+		if (string.find(textStr, FrmtWarnToolow)) then
+			--Color Red
+			AuctionInfoWarnText:SetTextColor(1.0, 0.0, 0.0);
+
+		elseif (string.find(textStr, FrmtWarnUndercut)) then
+			--Color Yellow
+			AuctionInfoWarnText:SetTextColor(1.0, 1.0, 0.0);
+
+		elseif (string.find(textStr, FrmtWarnNocomp) or string.find(textStr, FrmtWarnAbovemkt)) then
+			--Color Green
+			AuctionInfoWarnText:SetTextColor(0.0, 1.0, 0.0);
+
+		elseif (string.find(textStr, FrmtWarnMarkup) or string.find(textStr, FrmtWarnUser) or string.find(textStr, FrmtWarnNodata) or string.find(textStr, FrmtWarnMyprice)) then
+			--Color Gray
+			AuctionInfoWarnText:SetTextColor(0.6, 0.6, 0.6);
+		end
+
+	else
+		--Color Orange
+		AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
+	end
 	AuctionInfoWarnText:Show();
 end
 
