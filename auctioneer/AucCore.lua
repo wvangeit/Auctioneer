@@ -557,9 +557,37 @@ function Auctioneer_LockAndLoad()
 				local start = MoneyInputFrame_GetCopper(StartPrice)
 				local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
 				local duration = AuctionFrameAuctions.duration
+				local warn = AuctionInfoWarnText:GetText()
 				if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
+					if (Auctioneer_GetFilter('warn-color')) then
+						local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
+						FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
+						FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
+						FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
+						FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
+						FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
+						FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
+						FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
+						FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+						if (string.find(warn, FrmtWarnToolow)) then
+							--Color Red
+							warn = ("|cffff0000"..warn.."|r")
+						elseif (string.find(warn, FrmtWarnUndercut)) then
+							--Color Yellow
+							warn = ("|cffffff00"..warn.."|r")
+						elseif (string.find(warn, FrmtWarnNocomp) or string.find(warn, FrmtWarnAbovemkt)) then
+							--Color Green
+							warn = ("|cff00ff00"..warn.."|r")
+						elseif (string.find(warn, FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
+							--Color Gray
+							warn = ("|cff999999"..warn.."|r")
+						end
+					else
+						--Color Orange
+						warn = ("|cffe66600"..warn.."|r")
+					end
 					StartAuction(start, buy, duration);
-					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60));
+					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 				end
 				return
 			end
