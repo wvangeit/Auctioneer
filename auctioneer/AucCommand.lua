@@ -464,7 +464,7 @@ function Auctioneer_Register_Khaos()
 				text=_AUCT('GuiFinish');
 				helptext=_AUCT('HelpFinish');
 				callback=function(state)
-					Auctioneer_CmdProtectWindow(state.value);
+					Auctioneer_CmdFinish(state.value);
 				end;
 				feedback=function(state)
 					return string.format(_AUCT('FrmtFinish'), _AUCT('CmdFinish'..Auctioneer_GetFilterVal('finish')));
