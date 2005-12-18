@@ -518,4 +518,6 @@
 			</OnLoad>
 		</Scripts>
 	</Frame>
+
+	<Button name="AuctionFrameTabSearch" inherits="AuctionTabTemplate" hidden="true" text="Search Auctions"/>
 </Ui>

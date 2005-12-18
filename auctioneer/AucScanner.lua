@@ -20,7 +20,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 
 -- Hook into this function if you want notification when we find a link.
@@ -437,15 +437,24 @@ function Auctioneer_ConfigureAH()
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
-
+		
+		-- Find the index of the first unused AuctionHouse tab
+		local tabIndex = 1;
+		while (getglobal("AuctionFrameTab"..tabIndex) ~= nil) do
+			tabIndex = tabIndex + 1;
+		end
+		
+		-- Setup the Search Auctions tab
 		AuctionFrameSearch:SetParent("AuctionFrame")
 		AuctionFrameSearch:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
 		relevel(AuctionFrameSearch);
-			
-		AuctionFrameTab4:SetParent("AuctionFrame")
-		AuctionFrameTab4:SetPoint("TOPLEFT", "AuctionFrameTab3", "TOPRIGHT", -8, 0)
-		AuctionFrameTab4:Show()
-		PanelTemplates_SetNumTabs(AuctionFrame, 4)
+		setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabSearch);
+		AuctionFrameTabSearch:SetParent("AuctionFrame")
+		AuctionFrameTabSearch:SetPoint("TOPLEFT", "AuctionFrameTab"..(tabIndex - 1), "TOPRIGHT", -8, 0)
+		AuctionFrameTabSearch:SetID(tabIndex);
+		AuctionFrameTabSearch:Show();
+
+		PanelTemplates_SetNumTabs(AuctionFrame, tabIndex)
 
 		if (not AuctionUI_Hooked) then
 			Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClick)

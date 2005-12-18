@@ -46,14 +46,6 @@
 		</Frames>
 	</Frame>
 
-	<Button name="AuctionFrameTab4" inherits="AuctionTabTemplate" id="4" hidden="true" text="Search Auctions">
-		<Scripts>
-			<OnClick>
-				AuctionFrameTab_OnClick();
-			</OnClick>
-		</Scripts>
-	</Button>
-
 	<Frame name="AuctioneerMoneyInputFrameTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="176" y="18"/>
@@ -363,13 +355,5 @@
 			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
 		</CheckedTexture>
 	</CheckButton>
-
-	<Frame name="AuctioneerUI">
-		<Scripts>
-			<OnEvent>
-				AuctioneerUI_OnEvent(event);
-			</OnEvent>
-		</Scripts>
-	</Frame>
 
 </Ui>
