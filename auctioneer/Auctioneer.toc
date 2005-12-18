@@ -4,10 +4,10 @@
 ## Interface: 1800
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Informant, Khaos
+## OptionalDeps: Informant, Khaos, ImprovedErrorFrame
 ## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
@@ -16,9 +16,10 @@
 ..\..\FrameXML\MoneyFrame.xml
 ..\..\FrameXML\MoneyInputFrame.xml
 ..\..\FrameXML\UIDropDownMenu.xml
-..\..\FrameXML\CharacterFrame.xml
+..\..\FrameXML\CharacterFrameTemplates.xml
+..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 ..\EnhTooltip\TinyMoneyFrame.xml
+Auctioneer.xml
 AuctioneerUI.xml
 ListTemplate.xml
 AuctionFrameSearch.xml
-Auctioneer.xml

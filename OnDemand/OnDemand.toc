@@ -1,7 +1,0 @@
-## Interface: 1800
-## Title: OnDemand
-## Version: 0.0.3
-## Notes: Version 0.0.3
-## LoadOnDemand: 1
-## Dependencies: Stubby
-OnDemand.xml

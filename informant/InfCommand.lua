@@ -2,7 +2,7 @@
 	Informant
 	An addon for World of Warcraft that shows pertinent information about
 	an item in a tooltip when you hover over the item in the game.
-	<%version%>
+	<%version%> (<%codename%>)
 	$Id$
 	Command handler. Assumes responsibility for allowing the user to set the
 	options via slash command, Khaos, MyAddon etc.

@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
 ..\..\FrameXML\Fonts.xml

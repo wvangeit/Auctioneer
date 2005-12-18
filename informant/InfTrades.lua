@@ -2,7 +2,7 @@
 	Tradeskill support
 	Gives you quantities based upon your tradeskilling abilities.
 	$Id$
-	Version <%version%>
+	Version <%version%> (<%codename%>)
 	
 	License:
 		This program is free software; you can redistribute it and/or
@@ -63,6 +63,7 @@ function initTrades()
 	Stubby.RegisterFunctionHook("EnhTooltip.TradeHook", 100, tradeHook);
 	Stubby.RegisterFunctionHook("EnhTooltip.BankHook", 100, bankHook);
 	Stubby.RegisterFunctionHook("EnhTooltip.BagHook", 100, bagHook);
+	Informant.InitTrades = function() end
 end
 Informant.InitTrades = initTrades
 

@@ -2,7 +2,7 @@
 
 	Babylonian
 	A sub-addon that manages the locales for other addons.
-	<%version%>
+	<%version%> (<%codename%>)
 	$Id$
 	
 	License:

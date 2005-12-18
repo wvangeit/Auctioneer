@@ -2,7 +2,7 @@
 WARNING: Generated file. To edit, goto http://norganna.org/localizer/
 
   $Id$
-  Version: <%version%>
+  Version: <%version%> (<%codename%>)
 
 License:
   This program is free software; you can redistribute it and/or

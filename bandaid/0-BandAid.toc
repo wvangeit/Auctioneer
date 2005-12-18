@@ -5,7 +5,8 @@
 ## LoadOnDemand: 0
 ## Dependencies: Blizzard_TrainerUI, Blizzard_MacroUI, Blizzard_RaidUI, Blizzard_TradeSkillUI, Blizzard_InspectUI, Blizzard_BattlefieldMinimap, Blizzard_TalentUI, Blizzard_AuctionUI, Blizzard_BindingUI, Blizzard_CraftUI
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
+## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/BandAid
 BandAid.xml
 

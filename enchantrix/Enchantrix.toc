@@ -7,7 +7,7 @@
 ## OptionalDeps: Khaos
 ## SavedVariables: EnchantedLocal, EnchantConfig
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
 ..\..\FrameXML\MoneyFrame.xml

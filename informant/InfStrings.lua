@@ -2,7 +2,7 @@
 WARNING: Generated file. To edit, goto http://norganna.org/localizer/
 
   $Id$
-  Version: <%version%>
+  Version: <%version%> (<%codename%>)
 
 License:
   This program is free software; you can redistribute it and/or
@@ -759,7 +759,7 @@ InformantLocalizations["zhCN"]["InfoQuestHeader"] = "\229\156\168%d\228\187\187\
 InformantLocalizations["csCZ"]["InfoQuestName"] = "%s"
 InformantLocalizations["daDK"]["InfoQuestName"] = "%s"
 InformantLocalizations["deDE"]["InfoQuestName"] = "%s"
-InformantLocalizations["enUS"]["InfoQuestName"] = "  %s"
+InformantLocalizations["enUS"]["InfoQuestName"] = "%s"
 InformantLocalizations["esES"]["InfoQuestName"] = "%s"
 InformantLocalizations["frFR"]["InfoQuestName"] = "%s"
 InformantLocalizations["itIT"]["InfoQuestName"] = "%s"
@@ -777,7 +777,7 @@ InformantLocalizations["zhCN"]["InfoVendorHeader"] = "%d \229?\175\231\148\168\2
 InformantLocalizations["csCZ"]["InfoVendorName"] = "%s"
 InformantLocalizations["daDK"]["InfoVendorName"] = "%s"
 InformantLocalizations["deDE"]["InfoVendorName"] = "%s"
-InformantLocalizations["enUS"]["InfoVendorName"] = "  %s"
+InformantLocalizations["enUS"]["InfoVendorName"] = "%s"
 InformantLocalizations["esES"]["InfoVendorName"] = "%s"
 InformantLocalizations["frFR"]["InfoVendorName"] = "%s"
 InformantLocalizations["itIT"]["InfoVendorName"] = "%s"

@@ -1,6 +1,7 @@
 --[[ 
 	Auctioneer
 	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 	Original version written by Norganna.
 	Contributors: Araband
 

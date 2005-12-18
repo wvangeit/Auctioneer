@@ -1,6 +1,6 @@
 --[[
 	TinyMoneyFrame functions
-	<%version%>
+	<%version%> (<%codename%>)
    
 	$Id$
   

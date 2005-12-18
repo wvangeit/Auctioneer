@@ -46,14 +46,7 @@
 		</Frames>
 	</Frame>
 
-	<Button name="AuctionFrameTab4" inherits="CharacterFrameTabButtonTemplate" id="4" parent="AuctionFrame" text="Search Auctions">
-		<Anchors>
-			<Anchor point="TOPLEFT" relativeTo="AuctionFrameTab3" relativePoint="TOPRIGHT">
-				<Offset>
-					<AbsDimension x="-8" y="0"/>
-				</Offset>
-			</Anchor>
-		</Anchors>
+	<Button name="AuctionFrameTab4" inherits="AuctionTabTemplate" id="4" hidden="true" text="Search Auctions">
 		<Scripts>
 			<OnClick>
 				AuctionFrameTab_OnClick();
@@ -373,9 +366,6 @@
 
 	<Frame name="AuctioneerUI">
 		<Scripts>
-			<OnLoad>
-				AuctioneerUI_OnLoad();
-			</OnLoad>
 			<OnEvent>
 				AuctioneerUI_OnEvent(event);
 			</OnEvent>

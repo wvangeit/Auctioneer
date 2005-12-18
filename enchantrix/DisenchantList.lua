@@ -1,5 +1,5 @@
 --[[
-Enchantrix v<%version%>
+Enchantrix v<%version%> (<%codename%>)
 $Id$
 ]]
 

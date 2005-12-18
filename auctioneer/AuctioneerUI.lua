@@ -22,14 +22,6 @@
 --]]
 
 -------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function AuctioneerUI_OnLoad()
-	-- Add the Auctioneer tabs to the AH frame.
-	PanelTemplates_SetNumTabs(AuctionFrame, 4);
-	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClick);
-end
-
--------------------------------------------------------------------------------
 -- Called after Blizzard's AuctionFrameTab_OnClick() method.
 -------------------------------------------------------------------------------
 function AuctioneerUI_AuctionFrameTab_OnClick(index)

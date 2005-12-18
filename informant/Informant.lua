@@ -2,7 +2,7 @@
 	Informant
 	An addon for World of Warcraft that shows pertinent information about
 	an item in a tooltip when you hover over the item in the game.
-	<%version%>
+	<%version%> (<%codename%>)
 	$Id$
 	
 	License:
@@ -220,6 +220,20 @@ function getItem(itemID)
 			end
 		end
 		dataItem.vendors = vendList
+	end
+
+	dataItem.quests = {}
+	local questItemUse = InformantQuests.usage[itemID]
+	if (questItemUse) then
+		local questData = split(questItemUse, ",")
+		local questID, questCount
+		for pos, questInfo in pairs(questData) do
+			questID, questCount = split(questInfo, ":")
+			dataItem.quests[questID] = {
+				['count'] = questCount,
+				['name'] = Babylonian.FetchString(InformantQuests.names, nil, questID),
+			}
+		end
 	end
 
 	return dataItem
@@ -469,11 +483,10 @@ function showHideInfo()
 				addLine("")
 				addLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
 				addLine(string.format(_INFM('InfoQuestHeader'), questCount), "70ee90")
-				local questName
 				for pos, quest in itemInfo.quests do
-					questName = getQuestName(quest)
-					addLine(string.format(_INFM('InfoQuestName'), quest), "80ee80")
+					addLine(string.format(" ".._INFM('InfoQuestName'), quest.name).." (x "..quest.count..")", "80ee80")
 				end
+				addLine(string.format("Quest data supplied by WoWGuru.com"));
 			end
 		end
 
@@ -483,7 +496,7 @@ function showHideInfo()
 				addLine("")
 				addLine(string.format(_INFM('InfoVendorHeader'), vendorCount), "ddff40")
 				for pos, merchant in itemInfo.vendors do
-					addLine(string.format(_INFM('InfoVendorName'), merchant), "eeee40")
+					addLine(string.format(" ".._INFM('InfoVendorName'), merchant), "eeee40")
 				end
 			end
 		end

@@ -1,6 +1,7 @@
 --[[  Stubby
   
   $Id$
+  Version: <%version%> (<%codename%>)
 
   Stubby is an addon that allows you to register boot code for
   your addon.

@@ -1,6 +1,6 @@
 --[[
 
-	Enchantrix v<%version%>
+	Enchantrix v<%version%> (<%codename%>)
 	$Id$
 
 	By Norganna

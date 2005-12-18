@@ -88,7 +88,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						--MoneyFrame_SetType("AUCTION");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -103,7 +103,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						--MoneyFrame_SetType("AUCTION");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -140,7 +140,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Frame name="AuctionFrameSearch" inherits="AuctionFrameTemplate" parent="AuctionFrame" hidden="true">
+	<Frame name="AuctionFrameSearch" inherits="AuctionFrameTemplate" hidden="true">
 		<Layers>
 			<Layer level="BACKGROUND">
 				<FontString name="$parentTitle" inherits="GameFontNormal" text="Search Auctions">

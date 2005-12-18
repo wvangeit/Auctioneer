@@ -4,7 +4,7 @@
 ## Interface: 1800
 ## SavedVariables: StubbyConfig
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Stubby
 Stubby.xml

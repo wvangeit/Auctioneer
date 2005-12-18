@@ -2,7 +2,7 @@
 	NSIS Install script for Norganna's Auctioneer AddOns
 	Written by MentalPower
 
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	
 	License:

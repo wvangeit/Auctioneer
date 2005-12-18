@@ -1,6 +1,6 @@
 --[[
   AddOn that forces load of Blizzard AddOns for those that cannot support it themselves.
-  <%version%>
+  <%version%> (<%codename%>)
 		
 	License:
 		This program is free software; you can redistribute it and/or

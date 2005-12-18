@@ -1,6 +1,6 @@
 --[[
   Additional function hooks to allow hooks into more tooltips
-  <%version%>
+  <%version%> (<%codename%>)
   $Id$
 
   You should hook into EnhTooltip using Stubby:

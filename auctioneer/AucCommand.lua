@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
 	Auctioneer command functions.

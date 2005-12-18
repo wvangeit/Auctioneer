@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
 	Auctioneer scanning functions
@@ -370,6 +370,15 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 	end
 end
 
+local function relevel(frame)
+	local myLevel = frame:GetFrameLevel() + 1
+	local children = { frame:GetChildren() }
+	for _,child in pairs(children) do
+		child:SetFrameLevel(myLevel)
+		relevel(child)
+	end
+end
+
 local lAHConfigPending = true
 function Auctioneer_ConfigureAH()
 	if (lAHConfigPending and IsAddOnLoaded("Blizzard_AuctionUI")) then
@@ -428,6 +437,20 @@ function Auctioneer_ConfigureAH()
 		Auctioneer_HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
+
+		AuctionFrameSearch:SetParent("AuctionFrame")
+		AuctionFrameSearch:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
+		relevel(AuctionFrameSearch);
+			
+		AuctionFrameTab4:SetParent("AuctionFrame")
+		AuctionFrameTab4:SetPoint("TOPLEFT", "AuctionFrameTab3", "TOPRIGHT", -8, 0)
+		AuctionFrameTab4:Show()
+		PanelTemplates_SetNumTabs(AuctionFrame, 4)
+
+		if (not AuctionUI_Hooked) then
+			Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClick)
+			AuctionUI_Hooked = true
+		end
 	end
 end
 
