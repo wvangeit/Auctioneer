@@ -14,5 +14,11 @@
 ..\..\FrameXML\Fonts.xml
 ..\..\FrameXML\UIPanelTemplates.xml
 ..\..\FrameXML\MoneyFrame.xml
+..\..\FrameXML\MoneyInputFrame.xml
+..\..\FrameXML\UIDropDownMenu.xml
+..\..\FrameXML\CharacterFrame.xml
 ..\EnhTooltip\TinyMoneyFrame.xml
+AuctioneerUI.xml
+ListTemplate.xml
+AuctionFrameSearch.xml
 Auctioneer.xml
