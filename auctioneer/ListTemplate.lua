@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%>
-	Revision: $Id: $
+	Revision: $Id$
 
 	List Frame Template
 	
