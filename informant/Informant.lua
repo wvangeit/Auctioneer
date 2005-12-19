@@ -223,16 +223,24 @@ function getItem(itemID)
 	end
 
 	dataItem.quests = {}
+	dataItem.questCount = 0
 	local questItemUse = InformantQuests.usage[itemID]
 	if (questItemUse) then
 		local questData = split(questItemUse, ",")
-		local questID, questCount
+		local qestInfoSplit, questID, questCount
 		for pos, questInfo in pairs(questData) do
-			questID, questCount = split(questInfo, ":")
-			dataItem.quests[questID] = {
-				['count'] = questCount,
-				['name'] = Babylonian.FetchString(InformantQuests.names, nil, questID),
-			}
+			questInfoSplit = split(questInfo, ":")
+			questID = tonumber(questInfoSplit[1])
+			questCount = tonumber(questInfoSplit[2])
+			if (not dataItem.quests[questID]) then
+				questName = Babylonian.GetString(InformantQuests.names, questID)
+				dataItem.quests[questID] = {
+					['count'] = questCount,
+					['name'] = questName,
+					['level'] = tonumber(InformantQuests.levels[questID])
+				}
+				dataItem.questCount = dataItem.questCount + 1
+			end
 		end
 	end
 
@@ -411,7 +419,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	end
 	if (getFilter('show-quest')) then
 		if (itemInfo.quests) then
-			local questCount = table.getn(itemInfo.quests)
+			local questCount = itemInfo.questCount
 			if (questCount > 0) then
 				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
@@ -478,13 +486,13 @@ function showHideInfo()
 		end
 
 		if (itemInfo.quests) then
-			local questCount = table.getn(itemInfo.quests)
+			local questCount = itemInfo.questCount
 			if (questCount > 0) then
 				addLine("")
 				addLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
 				addLine(string.format(_INFM('InfoQuestHeader'), questCount), "70ee90")
 				for pos, quest in itemInfo.quests do
-					addLine(string.format(" ".._INFM('InfoQuestName'), quest.name).." (x "..quest.count..")", "80ee80")
+					addLine(string.format("  %d for \"%s\" (level %d)", quest.count, quest.name, quest.level), "80ee80")
 				end
 				addLine(string.format("Quest data supplied by WoWGuru.com"));
 			end
@@ -705,7 +713,6 @@ function addLine(text, color, level)
 	if (text == nil) then return end
 	if (not level) then level = 1 end
 	if (level > 100) then
-		p("ABORT at level 100", text, color, level);
 		return
 	end
 
