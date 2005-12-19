@@ -194,11 +194,7 @@ function ListTemplateScrollFrame_Update(frame)
 		local item = getglobal(parent:GetName().."Item"..line);
 		local contentIndex = line + FauxScrollFrame_GetOffset(frame);
 		if contentIndex <= table.getn(content) then
-			for columnIndex in parent.physicalColumns do
-				local physicalColumn = parent.physicalColumns[columnIndex];
-				local logicalColumn = physicalColumn.logicalColumn;
-				local value = logicalColumn.valueFunc(content[contentIndex]);
-
+			for columnIndex = 1, MAX_COLUMNS do
 				-- Get the text control (if any)
 				local text = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex);
 				if (text) then
@@ -211,41 +207,48 @@ function ListTemplateScrollFrame_Update(frame)
 					moneyFrame:Hide();
 				end
 
-				-- Setup the control based on the datatype
-				if (value) then
-					if (text and (logicalColumn.dataType == "Date" or logicalColumn.dataType == "Number" or logicalColumn.dataType == "String")) then
-						text:SetText(value);
-						if (logicalColumn.colorFunc) then
-							local color = logicalColumn.colorFunc(content[contentIndex]);
-							text:SetTextColor(color.r, color.g, color.b);
-						else
-							text:SetTextColor(255, 255, 255);
+				-- If the column exists, update it
+				if (columnIndex <= table.getn(parent.physicalColumns)) then
+					local physicalColumn = parent.physicalColumns[columnIndex];
+					local logicalColumn = physicalColumn.logicalColumn;
+					local value = logicalColumn.valueFunc(content[contentIndex]);
+
+					-- Setup the control based on the datatype
+					if (value) then
+						if (text and (logicalColumn.dataType == "Date" or logicalColumn.dataType == "Number" or logicalColumn.dataType == "String")) then
+							text:SetText(value);
+							if (logicalColumn.colorFunc) then
+								local color = logicalColumn.colorFunc(content[contentIndex]);
+								text:SetTextColor(color.r, color.g, color.b);
+							else
+								text:SetTextColor(255, 255, 255);
+							end
+							if (logicalColumn.alphaFunc) then
+								text:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
+							else
+								text:SetAlpha(1.0);
+							end
+							if (logicalColumn.dataType == "Number") then
+								text:SetJustifyH("RIGHT");
+							else
+								text:SetJustifyH("LEFT");
+							end
+							text:Show();
+						elseif (moneyFrame and logicalColumn.dataType == "Money") then
+							if (value >= 0) then
+								MoneyFrame_Update(moneyFrame:GetName(), value);
+								SetMoneyFrameColor(moneyFrame:GetName(), 255, 255, 255);
+							else
+								MoneyFrame_Update(moneyFrame:GetName(), -value);
+								SetMoneyFrameColor(moneyFrame:GetName(), 255, 0, 0);
+							end
+							if (logicalColumn.alphaFunc) then
+								moneyFrame:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
+							else
+								moneyFrame:SetAlpha(1.0);
+							end
+							moneyFrame:Show();
 						end
-						if (logicalColumn.alphaFunc) then
-							text:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
-						else
-							text:SetAlpha(1.0);
-						end
-						if (logicalColumn.dataType == "Number") then
-							text:SetJustifyH("RIGHT");
-						else
-							text:SetJustifyH("LEFT");
-						end
-						text:Show();
-					elseif (moneyFrame and logicalColumn.dataType == "Money") then
-						if (value >= 0) then
-							MoneyFrame_Update(moneyFrame:GetName(), value);
-							SetMoneyFrameColor(moneyFrame:GetName(), 255, 255, 255);
-						else
-							MoneyFrame_Update(moneyFrame:GetName(), -value);
-							SetMoneyFrameColor(moneyFrame:GetName(), 255, 0, 0);
-						end
-						if (logicalColumn.alphaFunc) then
-							moneyFrame:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
-						else
-							moneyFrame:SetAlpha(1.0);
-						end
-						moneyFrame:Show();
 					end
 				end
 			end

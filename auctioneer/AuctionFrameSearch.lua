@@ -155,13 +155,13 @@ function AuctionFrameSearch_OnLoad()
 			sortAscending = true;
 		},
 		{
-			width = 180;
+			width = 170;
 			logicalColumn = this.logicalColumns.Name;
 			logicalColumns = { this.logicalColumns.Name };
 			sortAscending = true;
 		},
 		{
-			width = 80;
+			width = 90;
 			logicalColumn = this.logicalColumns.TimeLeft;
 			logicalColumns = { this.logicalColumns.TimeLeft };
 			sortAscending = true;
@@ -201,21 +201,15 @@ function AuctionFrameSearch_OnLoad()
 	this.buyoutSearchPhysicalColumns = 
 	{
 		{
-			width = 50;
+			width = 40;
 			logicalColumn = this.logicalColumns.Quantity;
 			logicalColumns = { this.logicalColumns.Quantity };
 			sortAscending = true;
 		},
 		{
-			width = 180;
+			width = 260;
 			logicalColumn = this.logicalColumns.Name;
 			logicalColumns = { this.logicalColumns.Name };
-			sortAscending = true;
-		},
-		{
-			width = 70;
-			logicalColumn = this.logicalColumns.TimeLeft;
-			logicalColumns = { this.logicalColumns.TimeLeft };
 			sortAscending = true;
 		},
 		{
@@ -452,7 +446,7 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, maxT
 	frame:SelectResultByIndex(nil);
 	ListTemplate_Initialize(frame.resultsList, frame.buyoutSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
 	ListTemplate_SetContent(frame.resultsList, frame.results);
-	ListTemplate_Sort(frame.resultsList, 6);
+	ListTemplate_Sort(frame.resultsList, 5);
 end
 
 -------------------------------------------------------------------------------

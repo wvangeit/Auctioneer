@@ -310,36 +310,6 @@
 				</Scripts>
 			</Frame>
 		</Frames>
-		<Scripts>
-			<OnEnter>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
-				AuctionFrameSearch_ListItem_OnEnter(index);
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
-			</OnLeave>
-			<OnClick>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
-				AuctionFrameSearch_ListItem_OnClick(index);
-			</OnClick>
-		</Scripts>
-		<HighlightTexture name="$parentHighlight" file="Interface\HelpFrame\HelpFrameButton-Highlight" alphaMode="ADD">
-			<Anchors>
-				<Anchor point="TOPLEFT">
-					<Offset>
-						<AbsDimension x="0" y="0"/>
-					</Offset>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
-					<Offset>
-						<AbsDimension x="0" y="0"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-			<TexCoords left="0" right="1.0" top="0" bottom="0.578125"/>
-		</HighlightTexture>
 	</Button>
 
 	<Frame name="ListTemplate" virtual="true">
