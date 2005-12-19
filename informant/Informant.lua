@@ -227,7 +227,7 @@ function getItem(itemID)
 	local questItemUse = InformantQuests.usage[itemID]
 	if (questItemUse) then
 		local questData = split(questItemUse, ",")
-		local qestInfoSplit, questID, questCount
+		local questInfoSplit, questID, questCount
 		for pos, questInfo in pairs(questData) do
 			questInfoSplit = split(questInfo, ":")
 			questID = tonumber(questInfoSplit[1])
