@@ -138,7 +138,7 @@ function AuctionFrameSearch_OnLoad()
 		PercentLess =
 		{
 			title = "Pct";
-			dataType = "String";
+			dataType = "Number";
 			valueFunc = (function(record) return record.percentLess end);
 			compareAscendingFunc = (function(record1, record2) return record1.percentLess < record2.percentLess end);
 			compareDescendingFunc = (function(record1, record2) return record1.percentLess > record2.percentLess end);
@@ -149,7 +149,7 @@ function AuctionFrameSearch_OnLoad()
 	this.bidSearchPhysicalColumns = 
 	{
 		{
-			width = 50;
+			width = 40;
 			logicalColumn = this.logicalColumns.Quantity;
 			logicalColumns = { this.logicalColumns.Quantity };
 			sortAscending = true;
@@ -161,7 +161,7 @@ function AuctionFrameSearch_OnLoad()
 			sortAscending = true;
 		},
 		{
-			width = 70;
+			width = 80;
 			logicalColumn = this.logicalColumns.TimeLeft;
 			logicalColumns = { this.logicalColumns.TimeLeft };
 			sortAscending = true;

@@ -89,11 +89,20 @@ end
 -- Initialize the list with the column information
 -------------------------------------------------------------------------------
 function ListTemplate_SetColumnWidth(frame, column, width)
+	-- Resize the header
 	frame.physicalColumns[column].width = width;
 	local button = getglobal(frame:GetName().."Column"..column.."Sort");
 	button:SetWidth(width + 2);
 	local dropdown = getglobal(frame:GetName().."Column"..column.."DropDown");
 	UIDropDownMenu_SetWidth(width - 18, dropdown);
+	
+	-- Resize each cell in the columns
+	for line = 1, frame.lines do
+		local textControl = getglobal(frame:GetName().."Item"..line.."Column"..column);
+		if (textControl) then
+			textControl:SetWidth(width - 20);
+		end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -189,37 +198,59 @@ function ListTemplateScrollFrame_Update(frame)
 				local physicalColumn = parent.physicalColumns[columnIndex];
 				local logicalColumn = physicalColumn.logicalColumn;
 				local value = logicalColumn.valueFunc(content[contentIndex]);
-				local control = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex);
+
+				-- Get the text control (if any)
+				local text = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex);
+				if (text) then
+					text:Hide();
+				end
+
+				-- Get the money frame (if any)
+				local moneyFrame = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex.."MoneyFrame");
+				if (moneyFrame) then
+					moneyFrame:Hide();
+				end
+
+				-- Setup the control based on the datatype
 				if (value) then
-					if (logicalColumn.dataType == "Date" or logicalColumn.dataType == "Number" or logicalColumn.dataType == "String") then
-						control:SetText(value);
+					if (text and (logicalColumn.dataType == "Date" or logicalColumn.dataType == "Number" or logicalColumn.dataType == "String")) then
+						text:SetText(value);
 						if (logicalColumn.colorFunc) then
 							local color = logicalColumn.colorFunc(content[contentIndex]);
-							control:SetTextColor(color.r, color.g, color.b);
+							text:SetTextColor(color.r, color.g, color.b);
 						else
-							control:SetTextColor(255, 255, 255);
+							text:SetTextColor(255, 255, 255);
 						end
-					elseif (logicalColumn.dataType == "Money") then
-						local control = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex);
+						if (logicalColumn.alphaFunc) then
+							text:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
+						else
+							text:SetAlpha(1.0);
+						end
+						if (logicalColumn.dataType == "Number") then
+							text:SetJustifyH("RIGHT");
+						else
+							text:SetJustifyH("LEFT");
+						end
+						text:Show();
+					elseif (moneyFrame and logicalColumn.dataType == "Money") then
 						if (value >= 0) then
-							MoneyFrame_Update(control:GetName(), value);
-							SetMoneyFrameColor(control:GetName(), 255, 255, 255);
+							MoneyFrame_Update(moneyFrame:GetName(), value);
+							SetMoneyFrameColor(moneyFrame:GetName(), 255, 255, 255);
 						else
-							MoneyFrame_Update(control:GetName(), -value);
-							SetMoneyFrameColor(control:GetName(), 255, 0, 0);
+							MoneyFrame_Update(moneyFrame:GetName(), -value);
+							SetMoneyFrameColor(moneyFrame:GetName(), 255, 0, 0);
 						end
+						if (logicalColumn.alphaFunc) then
+							moneyFrame:SetAlpha(logicalColumn.alphaFunc(content[contentIndex]));
+						else
+							moneyFrame:SetAlpha(1.0);
+						end
+						moneyFrame:Show();
 					end
-					control:Show();
-				else
-					control:Hide();
-				end
-				if (logicalColumn.alphaFunc) then
-					local alpha = logicalColumn.alphaFunc(content[contentIndex]);
-					control:SetAlpha(alpha);
-				else
-					control:SetAlpha(1.0);
 				end
 			end
+			
+			-- Update the row highlight
 			if (parent.selectedRow and parent.selectedRow == contentIndex) then
 				item:LockHighlight();
 			else

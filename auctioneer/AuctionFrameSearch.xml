@@ -20,126 +20,6 @@
 -->
 	<Script file="AuctionFrameSearch.lua"/>
 
-	<Button name="SearchListItemTemplate" hidden="false" virtual="true">
-		<Size>
-			<AbsDimension x="605" y="16"/>
-		</Size>
-		<Layers>
-			<Layer level="BORDER">
-				<FontString name="$parentColumn1" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="30" y="16"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="0" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentColumn2" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="180" y="16"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentColumn1" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="20" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentColumn3" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="70" y="16"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentColumn2" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="0" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentColumn6" inherits="GameFontHighlight" wraponspaces="false" justifyH="RIGHT">
-					<Size>
-						<AbsDimension x="30" y="16"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentColumn3" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="260" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Frame name="$parentColumn4" inherits="SmallMoneyFrameTemplate">
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="$parentColumn3" relativePoint="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="130" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						SmallMoneyFrame_OnLoad();
-						--MoneyFrame_SetType("AUCTION");
-					</OnLoad>
-				</Scripts>
-			</Frame>
-			<Frame name="$parentColumn5" inherits="SmallMoneyFrameTemplate">
-				<Anchors>
-					<Anchor point="TOPRIGHT" relativeTo="$parentColumn4" relativePoint="TOPRIGHT">
-						<Offset>
-							<AbsDimension x="130" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						SmallMoneyFrame_OnLoad();
-						--MoneyFrame_SetType("AUCTION");
-					</OnLoad>
-				</Scripts>
-			</Frame>
-		</Frames>
-		<Scripts>
-			<OnEnter>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
-				AuctionFrameSearch_ListItem_OnEnter(index);
-			</OnEnter>
-			<OnLeave>
-				GameTooltip:Hide();
-			</OnLeave>
-			<OnClick>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
-				AuctionFrameSearch_ListItem_OnClick(index);
-			</OnClick>
-		</Scripts>
-		<HighlightTexture name="$parentHighlight" file="Interface\HelpFrame\HelpFrameButton-Highlight" alphaMode="ADD">
-			<Anchors>
-				<Anchor point="TOPLEFT">
-					<Offset>
-						<AbsDimension x="0" y="0"/>
-					</Offset>
-				</Anchor>
-				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
-					<Offset>
-						<AbsDimension x="0" y="0"/>
-					</Offset>
-				</Anchor>
-			</Anchors>
-			<TexCoords left="0" right="1.0" top="0" bottom="0.578125"/>
-		</HighlightTexture>
-	</Button>
-
 	<Frame name="AuctionFrameSearch" inherits="AuctionFrameTemplate" hidden="true">
 		<Layers>
 			<Layer level="BACKGROUND">
@@ -304,7 +184,7 @@
 					<AbsDimension x="610" y="334"/>
 				</Size>
 				<Frames>
-					<Button name="$parentItem1" inherits="SearchListItemTemplate" id="1">
+					<Button name="$parentItem1" inherits="ListItemTemplate" id="1">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentColumn1Sort" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -313,7 +193,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem2" inherits="SearchListItemTemplate" id="2">
+					<Button name="$parentItem2" inherits="ListItemTemplate" id="2">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem1" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -322,7 +202,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem3" inherits="SearchListItemTemplate" id="3">
+					<Button name="$parentItem3" inherits="ListItemTemplate" id="3">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem2" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -331,7 +211,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem4" inherits="SearchListItemTemplate" id="4">
+					<Button name="$parentItem4" inherits="ListItemTemplate" id="4">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem3" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -340,7 +220,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem5" inherits="SearchListItemTemplate" id="5">
+					<Button name="$parentItem5" inherits="ListItemTemplate" id="5">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem4" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -349,7 +229,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem6" inherits="SearchListItemTemplate" id="6">
+					<Button name="$parentItem6" inherits="ListItemTemplate" id="6">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem5" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -358,7 +238,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem7" inherits="SearchListItemTemplate" id="7">
+					<Button name="$parentItem7" inherits="ListItemTemplate" id="7">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem6" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -367,7 +247,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem8" inherits="SearchListItemTemplate" id="8">
+					<Button name="$parentItem8" inherits="ListItemTemplate" id="8">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem7" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -376,7 +256,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem9" inherits="SearchListItemTemplate" id="9">
+					<Button name="$parentItem9" inherits="ListItemTemplate" id="9">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem8" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -385,7 +265,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem10" inherits="SearchListItemTemplate" id="10">
+					<Button name="$parentItem10" inherits="ListItemTemplate" id="10">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem9" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -394,7 +274,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem11" inherits="SearchListItemTemplate" id="11">
+					<Button name="$parentItem11" inherits="ListItemTemplate" id="11">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem10" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -403,7 +283,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem12" inherits="SearchListItemTemplate" id="12">
+					<Button name="$parentItem12" inherits="ListItemTemplate" id="12">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem11" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -412,7 +292,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem13" inherits="SearchListItemTemplate" id="13">
+					<Button name="$parentItem13" inherits="ListItemTemplate" id="13">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem12" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -421,7 +301,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem14" inherits="SearchListItemTemplate" id="14">
+					<Button name="$parentItem14" inherits="ListItemTemplate" id="14">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem13" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -430,7 +310,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem15" inherits="SearchListItemTemplate" id="15">
+					<Button name="$parentItem15" inherits="ListItemTemplate" id="15">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem14" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -439,7 +319,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem16" inherits="SearchListItemTemplate" id="16">
+					<Button name="$parentItem16" inherits="ListItemTemplate" id="16">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem15" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -448,7 +328,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem17" inherits="SearchListItemTemplate" id="17">
+					<Button name="$parentItem17" inherits="ListItemTemplate" id="17">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem16" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -457,7 +337,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem18" inherits="SearchListItemTemplate" id="18">
+					<Button name="$parentItem18" inherits="ListItemTemplate" id="18">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem17" relativePoint="BOTTOMLEFT">
 								<Offset>
@@ -466,7 +346,7 @@
 							</Anchor>
 						</Anchors>
 					</Button>
-					<Button name="$parentItem19" inherits="SearchListItemTemplate" id="19">
+					<Button name="$parentItem19" inherits="ListItemTemplate" id="19">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentItem18" relativePoint="BOTTOMLEFT">
 								<Offset>
