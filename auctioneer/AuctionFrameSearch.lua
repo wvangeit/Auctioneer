@@ -291,7 +291,7 @@ function AuctionFrameSearch_OnLoad()
 
 	-- Initialize the list to show nothing at first.
 	ListTemplate_Initialize(this.resultsList, this.results, this.results);
-	
+	this:SelectResultByIndex(nil);
 end
 
 -------------------------------------------------------------------------------
@@ -351,8 +351,7 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
 	if (result and result.name and result.quantity and result.bid) then
-		DEFAULT_CHAT_FRAME:AddMessage("Bidding not yet implemented");
-		--BidAuction_BidAuction(result.name, result.quantity, nil, result.bid, nil);
+		BidManager.BidAuction(result.name, result.quantity, nil, result.bid, nil);
 	end
 end
 
@@ -363,8 +362,7 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
 	if (result and result.name and result.quantity and result.buyout) then
-		DEFAULT_CHAT_FRAME:AddMessage("Buying not yet implemented");
-		--BidAuction_BuyoutAuction(result.name, result.quantity, nil, nil, result.buyout);
+		BidManager.BuyoutAuction(result.name, result.quantity, nil, nil, result.buyout);
 	end
 end
 
@@ -577,20 +575,25 @@ function AuctionFrameSearch_ListItem_OnClick(row)
 
 	-- Bid or buyout the item if the alt key is down.
 	if (frame.resultsType and IsAltKeyDown()) then
-		--BrowseName:SetText(results[row].name)
-		--BrowseMinLevel:SetText("")
-		--BrowseMaxLevel:SetText("")
-		--AuctionFrameBrowse.selectedInvtypeIndex = nil
-		--AuctionFrameBrowse.selectedClassIndex = nil
-		--AuctionFrameBrowse.selectedSubclassIndex = nil
-		--IsUsableCheckButton:SetChecked(0)
-		--UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-		--AuctionFrameBrowse_Search()
-		--AuctionFrameTab_OnClick(1);
-		if (frame.resultsType == "BidSearch") then
-			AuctionFrameSearch_BidButton_OnClick(frame.bidButton);
-		elseif (frame.resultsType == "BuyoutSearch") then
-			AuctionFrameSearch_BuyoutButton_OnClick(frame.buyoutButton);
+		if (IsShiftKeyDown()) then
+			-- Bid or buyout the item.
+			if (frame.resultsType == "BidSearch") then
+				AuctionFrameSearch_BidButton_OnClick(frame.bidButton);
+			elseif (frame.resultsType == "BuyoutSearch") then
+				AuctionFrameSearch_BuyoutButton_OnClick(frame.buyoutButton);
+			end
+		else
+			-- Search for the item and switch to the Browse tab.
+			BrowseName:SetText(frame.results[row].name)
+			BrowseMinLevel:SetText("")
+			BrowseMaxLevel:SetText("")
+			AuctionFrameBrowse.selectedInvtypeIndex = nil
+			AuctionFrameBrowse.selectedClassIndex = nil
+			AuctionFrameBrowse.selectedSubclassIndex = nil
+			IsUsableCheckButton:SetChecked(0)
+			UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+			AuctionFrameBrowse_Search()
+			AuctionFrameTab_OnClick(1);
 		end
 	end
 end

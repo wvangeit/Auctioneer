@@ -20,6 +20,7 @@
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 ..\EnhTooltip\TinyMoneyFrame.xml
 Auctioneer.xml
+BidManager.xml
 AuctioneerUI.xml
 ListTemplate.xml
 AuctionFrameSearch.xml

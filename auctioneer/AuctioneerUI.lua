@@ -24,7 +24,7 @@
 -------------------------------------------------------------------------------
 -- Called after Blizzard's AuctionFrameTab_OnClick() method.
 -------------------------------------------------------------------------------
-function AuctioneerUI_AuctionFrameTab_OnClick(index)
+function AuctioneerUI_AuctionFrameTab_OnClick(_, _, index)
 	if (not index) then 
 		index = this:GetID();
 	end
