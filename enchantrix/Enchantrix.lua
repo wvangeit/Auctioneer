@@ -126,6 +126,11 @@ function Enchantrix_CheckTooltipInfo(frame)
 end
 
 function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, count)
+	-- nothing to do, if enchantrix is disabled
+	if (not Enchantrix_GetFilter('all')) then
+		return;
+	end;
+
 	local embed = Enchantrix_GetFilter('embed');
 
 	local sig, sigNR = Enchantrix_SigFromLink(link);

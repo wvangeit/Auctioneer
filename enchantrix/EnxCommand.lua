@@ -359,7 +359,7 @@ end
 function Enchantrix_AuctioneerLoaded()
 	if (not Enchantrix_Khaos_Registered) then return; end
 
-	local insertPos = 9;
+	local insertPos = 10;
 
 	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
 		return;

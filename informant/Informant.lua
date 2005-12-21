@@ -317,6 +317,11 @@ function getCatName(catID)
 end
 
 function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
+	-- nothing to do, if informant is disabled
+	if (not getFilter('all')) then
+		return;
+	end;
+
 	local quant = 0
 	local sell = 0
 	local buy = 0

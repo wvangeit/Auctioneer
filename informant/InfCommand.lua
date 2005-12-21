@@ -188,13 +188,10 @@ function onOff(state, chatprint)
 
 
 	elseif ((state == _INFM('CmdToggle')) or (state == "toggle")) then
+		Informant.SetFilter("all", not Informant.GetFilter("all"))
 		state = Informant.GetFilterVal("all")
 
-		if (state == "off") then
-			Informant.SetFilter("all", "on")
-		else
-			Informant.SetFilter("all", "off")
-		end
+
 	end
 
 	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
@@ -203,13 +200,13 @@ function onOff(state, chatprint)
 			chatPrint(_INFM('StatOn'))
 
 			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", "InformantEnable", "checked", true)
+				Khaos.setSetKeyParameter("Informant", "enabled", "checked", true)
 			end
 		else
 			chatPrint(_INFM('StatOff'))
 
 			if (Informant_Khaos_Registered) then
-				Khaos.setSetKeyParameter("Informant", "InformantEnable", "checked", false)
+				Khaos.setSetKeyParameter("Informant", "enabled", "checked", false)
 			end
 		end
 	end
@@ -604,7 +601,7 @@ function registerKhaos()
 				feedback=function()
 					return _INFM('FrmtActDefaultall');
 				end;
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
 			{
@@ -631,7 +628,7 @@ function registerKhaos()
 				disabled = {
 					value = ""
 				},
-				dependencies={InformantEnable={checked=true}},
+				dependencies={enabled={checked=true}},
 				difficulty=4,
 			},
 		}
