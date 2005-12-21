@@ -401,7 +401,7 @@ function processPage()
 	
 	-- Iterate through each item on the page, searching for a match
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
-	--debugPrint("Processing page "..item.currentPage.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
+	debugPrint("Processing page "..request.currentPage.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
 	--debugPrint("Searching for item: "..request.name..", "..request.count..", "..nilSafe(request.owner)..", "..nilSafe(request.bid)..", "..nilSafe(request.buyout));
 	for indexOnPage = 1, lastIndexOnPage do
 		-- Check if this item matches
@@ -458,7 +458,13 @@ function processPage()
 
 	-- If not item as found to bid on...
 	if (not isBidInProgress()) then
-		if (request.currentPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
+		-- When an item is bought out on the page, the item is not replaced
+		-- with an item from a subsequent page. Nor is the item removed from
+		-- the total count. Thus if there were 7 items total before the buyout,
+		-- GetNumAuctionItems() will report 6 items on the page and but still
+		-- 7 total after the buyout.
+		if (lastIndexOnPage == 0 or 
+			request.currentPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
 			-- Reached the end of the line for this item, remove it from the queue
 			removeRequestFromQueue();
 		else
@@ -541,7 +547,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(message)
-	--DEFAULT_CHAT_PRINT:AddMessage(message);
+	--DEFAULT_CHAT_FRAME:AddMessage(message);
 end
 
 -------------------------------------------------------------------------------
