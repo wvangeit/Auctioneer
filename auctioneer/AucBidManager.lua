@@ -55,14 +55,14 @@ local PendingBids = {};
 -- current player). Auctions owned by these players cannot be bid on.
 local PlayersOnAccount = {};
 
--- Responses to bids received either via CHAT_MSG_SYSTEM or UI_ERROR_MESSAGE
--- events
-local AUCTION_CREATED = "Auction created."; -- %localize%
-local BID_ACCEPTED = "Bid accepted."; -- %localize%
-local ITEM_NOT_FOUND = "The item was not found."; -- %localize%
-local NOT_ENOUGH_MONEY = "You don't have enough money." -- %localize%
-local CANNOT_BID_ON_OWN_AUCTION = "You cannot bid on your own auction." -- %localize%
-local ALREADY_HIGHER_BID = "There is already a higher bid on that item." -- %localize%
+-- Result codes for bid requests.
+ACCEPTED_BID = 0;
+REJECTED_ITEM_NOT_FOUND = 1;
+REJECTED_NOT_ENOUGH_MONEY = 2;
+REJECTED_OWN_AUCTION = 3;
+REJECTED_ALREADY_HIGHER_BID = 4;
+REJECTED_ALREADY_HIGH_BIDDER = 5;
+REJECTED_CURRENT_BID_LOWER = 6;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -86,7 +86,6 @@ local boolString;
 local chatPrint;
 local debugPrint;
 local bidAuction;
-local buyoutAuction;
 local dumpState;
 
 -------------------------------------------------------------------------------
@@ -112,19 +111,22 @@ function BidManagerFrame_OnEvent(...)
 		checkQueryComplete();
 		processRequestQueue();
 	elseif (arg[1] == "CHAT_MSG_SYSTEM" and arg[2]) then
-		 if (arg[2] == BID_ACCEPTED) then -- TODO: %localize%
-		 	onBidResponse(true);
+		 if (arg[2] == ERR_AUCTION_BID_PLACED) then -- TODO: %localize%
+		 	onBidResponse(ACCEPTED_BID);
 			processRequestQueue();
 		end
 	elseif (arg[1] == "UI_ERROR_MESSAGE" and arg[2]) then
 		debugPrint("UI_ERROR_MESSAGE - "..arg[2]);
-		if (arg[2] == ITEM_NOT_FOUND or
-			arg[2] == NOT_ENOUGH_MONEY or
-			arg[2] == CANNOT_BID_ON_OWN_AUCTION or
-			arg[2] == ALREADY_HIGHER_BID) then -- TODO: %localize%
-			onBidResponse(false, arg[2]);
-			processRequestQueue();
+		if (arg[2] == ERR_ITEM_NOT_FOUND) then
+			onBidResponse(REJECTED_ITEM_NOT_FOUND);
+		elseif (arg[2] == ERR_NOT_ENOUGH_MONEY) then
+			onBidResponse(REJECTED_NOT_ENOUGH_MONEY);
+		elseif (arg[2] == ERR_AUCTION_BID_OWN) then
+			onBidResponse(REJECTED_OWN_AUCTION);
+		elseif (arg[2] == ERR_AUCTION_HIGHER_BID) then
+			onBidResponse(REJECTED_ALREADY_HIGHER_BID);
 		end
+		processRequestQueue();
     elseif (arg[1] == "AUCTION_HOUSE_CLOSED") then
     	endProcessingRequestQueue();
 	end
@@ -183,33 +185,67 @@ end
 -------------------------------------------------------------------------------
 -- Called whenever a response to a bid is received
 -------------------------------------------------------------------------------
-function onBidResponse(accepted, reason)
+function onBidResponse(result)
 	if (table.getn(PendingBids) > 0) then
 		-- We always assume the bid response is for the next bid in PendingBids.
 		local bid = PendingBids[1];
+
+		-- If there is an associated request, add our result to it.
 		local request = bid.request;
-		if (accepted and request) then
+		if (request) then
+			if (result == ACCEPTED_BID) then
+				table.insert(request.results, result);
+				if (request.bid == request.buyout) then
+					-- %localize%
+					chatPrint("Bought auction: "..request.name.." (x"..request.count..")");
+				else
+					-- %localize%
+					chatPrint("Bid on auction: "..request.name.." (x"..request.count..")");
+				end
+			elseif (result == REJECTED_ITEM_NOT_FOUND) then
+				-- nothing to do
+			elseif (result == REJECTED_NOT_ENOUGH_MONEY) then
+				table.insert(request.results, result);
+				-- %localize%
+				chatPrint("Not enough money to bid on auction: "..request.name.." (x"..request.count..")");
+			elseif (result == REJECTED_OWN_AUCTION) then
+				table.insert(request.results, result);
+				-- %localize%
+				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
+			elseif (result == REJECTED_ALREADY_HIGHER_BID) then
+				table.insert(request.results, result);
+				-- %localize%
+				chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..")");
+			end
+		end
+
+		-- Process the bid result		.
+		if (result == ACCEPTED_BID and request) then
 			-- Check if there is a corresponding request and upate it to
 			-- reflect the successful bid.
 			if (request) then
 				request.bidCount = request.bidCount + 1;
+				-- Remove the request if we've reached the max bids.
 				if (request.bidCount == request.maxBids) then
 					removeRequestFromQueue();
+				-- Increment the request's current index if the auction was not bought out.
+				elseif (request.bid ~= request.buyout) then
+					request.currentIndex = request.currentIndex + 1;
 				end
 			end
-		elseif (not accepted) then
+		elseif (result ~= ACCEPTED_BID) then
 			-- We were expecting the list to update after our bid/buyout, but
 			-- our bid/buyout failed so we won't be getting an update.
 			CurrentSearchParams.complete = true;
 			
-			if (reason == NOT_ENOUGH_MONEY and request) then
+			if (result == REJECTED_NOT_ENOUGH_MONEY and request) then
 				-- We ran out of money so we need to remove the request, lest
 				-- we get stuck in a loop forever.
 				removeRequestFromQueue();
-			elseif (reason == CANNOT_BID_ON_OWN_AUCTION and bid.owner) then
+			elseif (result == REJECTED_OWN_AUCTION and bid.owner) then
 				-- We tried bidding on our own auction! Blizzard doesn't
 				-- allow bids from any player on the account that posted
-				-- the bid. Therefore we keep a dynamic list of all
+				-- the auction. Therefore we keep a dynamic list of all
 				-- of these failures so we can avoid these auctions in the
 				-- future.
 				addPlayerToAccount(bid.owner);
@@ -220,6 +256,7 @@ function onBidResponse(accepted, reason)
 		table.remove(PendingBids, 1);
 	else
 		-- TODO: We got out of sync somehow...
+		-- %localize%
 		chatPrint("Error: Bid queue out of sync!");
 	end
 end
@@ -291,19 +328,15 @@ end
 -------------------------------------------------------------------------------
 -- Adds a request to the queue.
 -------------------------------------------------------------------------------
-function addRequestToQueue(action, name, count, owner, bid, buyout)
-	debugPrint("Adding request to queue: "..action..", "..name..", "..count..", "..nilSafe(owner)..", "..nilSafe(bid)..", "..nilSafe(buyout));
-	local request = {};
-	request.action = action;
-	request.name = name;
-	request.count = count;
-	request.owner = owner;
-	request.bid = bid;
-	request.buyout = buyout;
+function addRequestToQueue(request)
+	-- Add the request state information and then add the request to the queue.
 	request.bidCount = 0;
-	request.maxBids = 1;
+	request.maxBids = 1000;
 	request.currentPage = 0;
+	request.currentIndex = 1;
+	request.results = {};
 	table.insert(RequestQueue, request);
+	debugPrint("Added request to queue: "..request.name..", "..request.count..", "..nilSafe(request.buyout)..", "..nilSafe(request.bid));
 end
 
 -------------------------------------------------------------------------------
@@ -312,15 +345,13 @@ end
 function removeRequestFromQueue()
 	if (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
-		if (request.bidCount == 0) then
+		local callback = request.callback;
+		if (callback and callback.func) then
+			callback.func(callback.param, request);
+		end
+		if (table.getn(request.results) == 0) then
 			-- %localize%
 			chatPrint("No auctions found: "..request.name.." (x"..request.count..")");
-		elseif (request.bidCount == 1) then
-			-- %localize%
-			chatPrint("Bid on "..request.bidCount.." auction: "..request.name.." (x"..request.count..")");
-		else
-			-- %localize%
-			chatPrint("Bid on "..request.bidCount.." auctions: "..request.name.." (x"..request.count..")");
 		end
 		table.remove(RequestQueue, 1);
 	end
@@ -353,6 +384,7 @@ function endProcessingRequestQueue()
 
 		debugPrint("End processing the bid queue");
 		ProcessingRequestQueue = false;
+		BidManagerFrame:Hide();
 	end
 end
 
@@ -380,7 +412,13 @@ function processRequestQueue()
 				CurrentSearchParams.qualityIndex == nil) then
 				processPage();
 			elseif (CanSendAuctionQuery()) then
+				-- Turn off the OnUpdate calls and run our query
+				BidManagerFrame:Hide();
 				QueryAuctionItems(request.name, "", "", nil, nil, nil, request.currentPage, nil, nil);
+			else
+				-- Turn on the OnUpdate calls and wait to be able to send a query.
+				BidManagerFrame:Show();
+				break;
 			end
 		end
 		
@@ -402,41 +440,71 @@ function processPage()
 	-- Iterate through each item on the page, searching for a match
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 	debugPrint("Processing page "..request.currentPage.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
-	--debugPrint("Searching for item: "..request.name..", "..request.count..", "..nilSafe(request.owner)..", "..nilSafe(request.bid)..", "..nilSafe(request.buyout));
-	for indexOnPage = 1, lastIndexOnPage do
+	debugPrint("Searching for item: "..request.id..", "..request.rprop..", "..request.enchant..", "..request.name..", "..request.count..", "..request.min..", "..request.buyout..", "..request.unique..", "..request.bid);
+	for indexOnPage = request.currentIndex, lastIndexOnPage do
 		-- Check if this item matches
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
-		--debugPrint("Comparing item "..indexOnPage);
-		--debugPrint("Processing item: "..name..", "..count..", "..owner..", "..bidAmount..", "..buyoutPrice);
-		if ((request.name == name) and
+		local link = GetAuctionItemLink("list", indexOnPage);
+		local id, rprop, enchant, unique = EnhTooltip.BreakLink(link);
+		debugPrint("Processing item: "..id..", "..rprop..", "..enchant..", "..name..", "..count..", "..minBid..", "..buyoutPrice..", "..unique..", "..bidAmount);
+		if ((request.id == id) and
+			(request.rprop == rprop) and
+			(request.enchant == enchant) and
+			(request.name == name) and
 			(request.count == count) and
-			(request.owner == nil or request.owner == owner) and
-			(request.bid == nil or (bidAmount ~= 0 and request.bid == bidAmount) or (bidAmount == 0 and request.bid == minBid)) and
-			(request.buyout == nil or request.buyout == buyoutPrice) and
-			(not isPlayerOnAccount(owner))) then
-
-			-- We've got a match so figure out what to do.
+			(request.min == minBid) and
+			(request.buyout == buyoutPrice) and
+			(request.unique == unique)) then
+			
 			local bid = nil;
-			if (request.action == BID_AUCTION) then
-				if (not highBidder) then
-					-- Calculate the minimum amount to make us the high bidder.
-					if (bidAmount == 0) then
-						bid = minBid;
-					else
-						bid = bidAmount + minIncrement;
-					end
-				else
-					-- We are already the high bidder.
-					-- %localize%
-					chatPrint("Already high bidder: "..name.." (x"..count..")");
-				end
-			elseif (request.action == BUYOUT_AUCTION) then
-				bid = buyoutPrice;
-			end
 
-			-- Place the bid/buyout!
-			if (bid) then
+			-- Check if the auction is owned by the player.
+			if (isPlayerOnAccount(owner)) then
+				table.insert(request.results, REJECTED_OWN_AUCTION);
 				-- %localize%
+				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
+			-- Check for a buyout request
+			elseif (request.buyout == request.bid) then
+				bid = request.buyout;
+			-- Otherwise it must be a bid request
+			else
+				-- Check if we are already the high bidder
+				if (highBidder) then
+					table.insert(request.results, REJECTED_ALREADY_HIGH_BIDDER);
+					-- %localize%
+					chatPrint("Already the high bidder on auction: "..request.name.." (x"..request.count..")");
+				-- Check if the item has been bid on
+				elseif (bidAmount ~= 0) then
+					-- Check the bid matches what we are looking for
+					if (bidAmount == request.bid) then
+						bid = bidAmount + minIncrement;
+					-- Check if there is already a higher bidder
+					elseif (bidAmount > request.bid) then
+						table.insert(request.results, REJECTED_ALREADY_HIGHER_BID);
+						-- %localize%
+						chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..") at "..bidAmount);
+					-- Otherwise the bid must be lower...
+					else
+						table.insert(request.results, REJECTED_CURRENT_BID_LOWER);
+						-- %localize%
+						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..bidAmount);
+					end
+				-- Otherwise the item hasn't been bid on
+				else
+					-- Check the bid matches what we are looking for
+					if (minBid == request.bid) then
+						bid = minBid;
+					-- Otherwise the min bid is lower...
+					else
+						table.insert(request.results, REJECTED_CURRENT_BID_LOWER);
+						-- %localize%
+						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..minBid);
+					end
+				end
+			end
+			
+			-- If we've settled on a bid, do it now!
+			if (bid) then
 				debugPrint("Placing bid on "..name.. " at "..bid.." (index "..indexOnPage..")");
 				PlaceAuctionBid("list", indexOnPage, bid);
 				
@@ -451,6 +519,9 @@ function processPage()
 				-- back to false. If the bid fails we'll manually flip
 				-- the flag back to true again.
 				CurrentSearchParams.complete = false;
+
+				-- Update the starting point for this page				
+				request.currentIndex = indexOnPage;
 				break;
 			end
 		end
@@ -470,30 +541,32 @@ function processPage()
 		else
 			-- Continue looking for items on the next page.
 			request.currentPage = request.currentPage + 1;
+			request.currentIndex = 1;
 		end
 	end
 end
 
 -------------------------------------------------------------------------------
--- Adds a bid request to the queue.
---
--- The owner and buyout parameters can be nil.
+-- Adds a bid request to the queue. For bids, the bid parameter should be the
+-- current bid (or minimum bid in the case the item isn't bid on). For buyouts,
+-- the bid parameter should be the buyout price.
 -------------------------------------------------------------------------------
-function bidAuction(name, count, owner, bid, buyout)
-	if (name and count and bid) then
-		addRequestToQueue(BID_AUCTION, name, count, owner, bid, buyout);
-		processRequestQueue();
-	end
-end
-
--------------------------------------------------------------------------------
--- Adds a buyout request to the queue.
---
--- The owner and bid parameters can be nil.
--------------------------------------------------------------------------------
-function buyoutAuction(name, count, owner, bid, buyout)
-	if (name and count and buyout) then
-		addRequestToQueue(BUYOUT_AUCTION, name, count, owner, bid, buyout);
+function bidAuction(bid, signature, callbackFunc, callbackParam)
+	debugPrint("BidAuction("..bid..", "..signature..")");
+	local id,rprop,enchant,name,count,min,buyout,unique = Auctioneer_GetItemSignature(signature);
+	if (bid and id and rprop and enchant and name and count and min and buyout and unique) then
+		local request = {};
+		request.id = id;
+		request.rprop = rprop;
+		request.enchant = enchant;
+		request.name = name;
+		request.count = count;
+		request.min = min;
+		request.buyout = buyout;
+		request.unique = unique;
+		request.bid = bid;
+		request.callback = { func = callbackFunc, param = callbackParam };
+		addRequestToQueue(request);
 		processRequestQueue();
 	end
 end
@@ -555,7 +628,7 @@ end
 -------------------------------------------------------------------------------
 BidManager = 
 {
+	-- Exported functions
 	BidAuction = bidAuction;
-	BuyoutAuction = buyoutAuction;
 	DumpState = dumpState;
 };

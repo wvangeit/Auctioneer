@@ -23,11 +23,15 @@
 
 local TIME_LEFT_NAMES = 
 {
-	"Short",
-	"Medium",
-	"Long",
-	"Very Long"
+	AUCTION_TIME_LEFT1, -- Short
+	AUCTION_TIME_LEFT2, -- Medium
+	AUCTION_TIME_LEFT3, -- Long
+	AUCTION_TIME_LEFT4  -- Very Long
 };
+
+local AUCTION_STATUS_UNKNOWN = 1;
+local AUCTION_STATUS_HIGH_BIDDER = 2;
+local AUCTION_STATUS_NOT_FOUND = 3;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -66,9 +70,10 @@ function AuctionFrameSearch_OnLoad()
 		{
 			title = "Qty";
 			dataType = "Number";
-			valueFunc = (function(record) return record.quantity end);
-			compareAscendingFunc = (function(record1, record2) return record1.quantity < record2.quantity end);
-			compareDescendingFunc = (function(record1, record2) return record1.quantity > record2.quantity end);
+			valueFunc = (function(record) return record.count end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.count < record2.count end);
+			compareDescendingFunc = (function(record1, record2) return record1.count > record2.count end);
 		},
 		Name =
 		{
@@ -76,6 +81,7 @@ function AuctionFrameSearch_OnLoad()
 			dataType = "String";
 			valueFunc = (function(record) return record.name end);
 			colorFunc = AuctionFrameSearch_GetItemColor;
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.name < record2.name end);
 			compareDescendingFunc = (function(record1, record2) return record1.name > record2.name end);
 		},
@@ -84,6 +90,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Time Left";
 			dataType = "String";
 			valueFunc = (function(record) return Auctioneer_GetTimeLeftString(record.timeLeft) end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.timeLeft < record2.timeLeft end);
 			compareDescendingFunc = (function(record1, record2) return record1.timeLeft > record2.timeLeft end);
 		},
@@ -92,6 +99,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Bid";
 			dataType = "Money";
 			valueFunc = (function(record) return record.bid end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.bid < record2.bid end);
 			compareDescendingFunc = (function(record1, record2) return record1.bid > record2.bid end);
 		},
@@ -100,6 +108,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Bid Per";
 			dataType = "Money";
 			valueFunc = (function(record) return record.bidPer end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.bidPer < record2.bidPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.bidPer > record2.bidPer end);
 		},
@@ -108,6 +117,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Buyout";
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyout end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.buyout < record2.buyout end);
 			compareDescendingFunc = (function(record1, record2) return record1.buyout > record2.buyout end);
 		},
@@ -116,6 +126,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Buyout Per";
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyoutPer end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.buyoutPer < record2.buyoutPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.buyoutPer > record2.buyoutPer end);
 		},
@@ -124,6 +135,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Profit";
 			dataType = "Money";
 			valueFunc = (function(record) return record.profit end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.profit < record2.profit end);
 			compareDescendingFunc = (function(record1, record2) return record1.profit > record2.profit end);
 		},
@@ -132,6 +144,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Profit Per";
 			dataType = "Money";
 			valueFunc = (function(record) return record.profitPer end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.profitPer < record2.profitPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.profitPer > record2.profitPer end);
 		},
@@ -140,6 +153,7 @@ function AuctionFrameSearch_OnLoad()
 			title = "Pct";
 			dataType = "Number";
 			valueFunc = (function(record) return record.percentLess end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.percentLess < record2.percentLess end);
 			compareDescendingFunc = (function(record1, record2) return record1.percentLess > record2.percentLess end);
 		},
@@ -350,8 +364,9 @@ end
 function AuctionFrameSearch_BidButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
-	if (result and result.name and result.quantity and result.bid) then
-		BidManager.BidAuction(result.name, result.quantity, nil, result.bid, nil);
+	if (result and result.name and result.count and result.bid) then
+		local context = { frame = frame, auction = result };
+		BidManager.BidAuction(result.bid, result.signature, AuctionFrameSearch_OnBidResult, context);
 	end
 end
 
@@ -361,8 +376,9 @@ end
 function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
-	if (result and result.name and result.quantity and result.buyout) then
-		BidManager.BuyoutAuction(result.name, result.quantity, nil, nil, result.buyout);
+	if (result and result.name and result.count and result.buyout) then
+		local context = { frame = frame, auction = result };
+		BidManager.BidAuction(result.buyout, result.signature, AuctionFrameSearch_OnBidResult, context);
 	end
 end
 
@@ -392,10 +408,10 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 				local percentLess = 100 - math.floor(100 * currentBid / (hsp * count));
 				if (percentLess >= minPercentLess) then
 					local auction = {};
-					auction.quantity = count;
 					auction.id = id;
 					auction.link = a.itemLink;
 					auction.name = name;
+					auction.count = count;
 					auction.owner = a.owner;
 					auction.timeLeft = a.timeLeft;
 					auction.bid = currentBid;
@@ -405,6 +421,12 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 					auction.profit = (hsp * count) - currentBid;
 					auction.profitPer = math.floor(auction.profit / count);
 					auction.percentLess = percentLess;
+					auction.signature = a.signature;
+					if (a.highBidder) then
+						auction.status = AUCTION_STATUS_HIGH_BIDDER;
+					else
+						auction.status = AUCTION_STATUS_UNKNOWN;
+					end
 					table.insert(frame.results, auction);
 				end
 			end
@@ -437,10 +459,10 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess)
 				local profit = (hsp * count) - buyout;
 				if (profit >= minProfit) then
 					local auction = {};
-					auction.quantity = count;
 					auction.id = id;
 					auction.link = a.itemLink;
 					auction.name = name;
+					auction.count = count;
 					auction.owner = a.owner;
 					auction.timeLeft = a.timeLeft;
 					auction.buyout = buyout;
@@ -448,6 +470,12 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess)
 					auction.profit = profit;
 					auction.profitPer = math.floor(auction.profit / count);
 					auction.percentLess = 100 - math.floor(100 * buyout / (hsp * count));
+					auction.signature = a.signature;
+					if (a.highBidder) then
+						auction.status = AUCTION_STATUS_HIGH_BIDDER;
+					else
+						auction.status = AUCTION_STATUS_UNKNOWN;
+					end
 					table.insert(frame.results, auction);
 				end
 			end
@@ -495,10 +523,10 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 			local currentBid = Auctioneer_GetCurrentBid(a.signature);
 			
 			local auction = {};
-			auction.quantity = count;
 			auction.id = id;
 			auction.link = a.itemLink;
 			auction.name = name;
+			auction.count = count;
 			auction.owner = a.owner;
 			auction.timeLeft = a.timeLeft;
 			auction.bid = currentBid;
@@ -506,6 +534,12 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 			auction.buyout = buyout;
 			auction.buyoutPer = math.floor(auction.buyout / count);
 			auction.percentLess = math.floor(((myBuyout - auction.buyoutPer) / myBuyout) * 100);
+			auction.signature = a.signature;
+			if (a.highBidder) then
+				auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			else
+				auction.status = AUCTION_STATUS_UNKNOWN;
+			end
 			table.insert(frame.results, auction);
 		end
 	end
@@ -555,7 +589,7 @@ function AuctionFrameSearch_ListItem_OnEnter(row)
 		if (result) then
 			local name = result.name;
 			local _, link, rarity = GetItemInfo(results[row].id);
-			local count = result.quantity;
+			local count = result.count;
 			GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
 			GameTooltip:SetHyperlink(link);
 			GameTooltip:Show();
@@ -657,4 +691,37 @@ function AuctionFrameSearchCompete_SearchButton_OnClick(button)
 	local minUndercut = MoneyInputFrame_GetCopper(undercutMoneyFrame);
 	frame:GetParent():SearchCompetition(minUndercut);
 end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_OnBidResult(context, bidRequest)
+	if (table.getn(bidRequest.results) == 0) then
+		-- No auctions matched.
+		context.auction.status = AUCTION_STATUS_NOT_FOUND;
+	else
+		-- Assume we are now the high bidder on all the matching auctions
+		-- until proven otherwise.
+		context.auction.status = AUCTION_STATUS_HIGH_BIDDER;
+		for _,result in pairs(bidRequest.results) do
+			if (result ~= ACCEPTED_BID and
+				result ~= REJECTED_ALREADY_HIGH_BIDDER and
+				result ~= REJECTED_OWN_AUCTION) then
+				context.auction.status = AUCTION_STATUS_UNKNOWN;
+				break;
+			end
+		end
+	end
+	ListTemplateScrollFrame_Update(getglobal(context.frame.resultsList:GetName().."ScrollFrame"));
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_GetAuctionAlpha(auction)
+	local status = auction.status;
+	if (status and (status == AUCTION_STATUS_NOT_FOUND or status == AUCTION_STATUS_HIGH_BIDDER)) then
+		return 0.3;
+	end
+	return 1.0;
+end
+
 
