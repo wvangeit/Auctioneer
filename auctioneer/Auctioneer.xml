@@ -37,18 +37,25 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AucUtil.lua"/>
 	<Script file="AucStorage.lua"/>
 	<Script file="Auctioneer.lua"/>
+
+	<Script file="AucBidManager.lua"/>
 	<Frame name="Auctioneer" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
 				Auctioneer_OnLoad();
 				this:RegisterEvent("ADDON_LOADED")
+				BidManagerFrame_OnLoad();
 			</OnLoad>
 			<OnEvent>
 				if (event == "ADDON_LOADED" and string.lower(arg1) == "auctioneer") then
 					Auctioneer_AddonLoaded()
 					this:UnregisterEvent("ADDON_LOADED")
 				end
+				BidManagerFrame_OnEvent();
 			</OnEvent>
+			<OnUpdate>
+				BidManagerFrame_OnUpdate();
+			</OnUpdate>
 		</Scripts>
 		<Frames>
 			<Button name="BrowseScanButton" inherits="UIPanelButtonTemplate" hidden="true">
