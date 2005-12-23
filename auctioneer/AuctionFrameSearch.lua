@@ -366,7 +366,7 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.bid) then
 		local context = { frame = frame, auction = result };
-		BidManager.BidAuction(result.bid, result.signature, AuctionFrameSearch_OnBidResult, context);
+		AucBidManager.BidAuction(result.bid, result.signature, AuctionFrameSearch_OnBidResult, context);
 	end
 end
 
@@ -378,7 +378,7 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.buyout) then
 		local context = { frame = frame, auction = result };
-		BidManager.BidAuction(result.buyout, result.signature, AuctionFrameSearch_OnBidResult, context);
+		AucBidManager.BidAuction(result.buyout, result.signature, AuctionFrameSearch_OnBidResult, context);
 	end
 end
 
