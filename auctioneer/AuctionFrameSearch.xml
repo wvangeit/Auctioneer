@@ -69,7 +69,7 @@
 	<Frame name="AuctionFrameSearch" inherits="AuctionFrameTemplate" hidden="true">
 		<Layers>
 			<Layer level="BACKGROUND">
-				<FontString name="$parentTitle" inherits="GameFontNormal" text="Search Auctions">
+				<FontString name="$parentTitle" inherits="GameFontNormal">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset>
@@ -584,10 +584,17 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				getglobal(this:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
 				AuctionFrameSearch_OnLoad();
 			</OnLoad>
 		</Scripts>
 	</Frame>
 
-	<Button name="AuctionFrameTabSearch" inherits="AuctionTabTemplate" hidden="true" text="Search Auctions"/>
+	<Button name="AuctionFrameTabSearch" inherits="AuctionTabTemplate" hidden="true">
+		<Scripts>
+			<OnLoad>
+				this:SetText(_AUCT('UiSearchAuctions'));
+			</OnLoad>
+		</Scripts>
+	</Button>
 </Ui>

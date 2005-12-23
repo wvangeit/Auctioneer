@@ -497,9 +497,9 @@ function showHideInfo()
 				addLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
 				addLine(string.format(_INFM('InfoQuestHeader'), questCount), "70ee90")
 				for pos, quest in itemInfo.quests do
-					addLine(string.format("  %d for \"%s\" (level %d)", quest.count, quest.name, quest.level), "80ee80")
+					addLine(string.format(_INFM('InfoQuestName'), quest.count, quest.name, quest.level), "80ee80")
 				end
-				addLine(string.format("Quest data supplied by WoWGuru.com"));
+				addLine(string.format((_INFM('InfoQuestSource')).." WoWGuru.com"));
 			end
 		end
 

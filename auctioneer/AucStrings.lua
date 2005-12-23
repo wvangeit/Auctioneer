@@ -2703,4 +2703,5 @@ AuctioneerLocalizations["koKR"]["FrmtInfoStacksize"] = "\237?\137\234\183\160 \2
 AuctioneerLocalizations["ptPT"]["FrmtInfoStacksize"] = "Quantidade m\195\169dia: %d items"
 AuctioneerLocalizations["trTR"]["FrmtInfoStacksize"] = "Ortalama grup b\195\188y\195\188kl\195\188\196\159\195\188: %d adet"
 AuctioneerLocalizations["zhCN"]["FrmtInfoStacksize"] = "\229\185\179\229?\135\229\160\134\229?\160\230\149\176\233\135?: %d \228\184\170"
-
+AuctioneerLocalizations["deDE"]["UiSearchAuctions"] = "Auktionssuche"
+AuctioneerLocalizations["enUS"]["UiSearchAuctions"] = "Search Auctions"
