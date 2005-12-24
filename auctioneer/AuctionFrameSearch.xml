@@ -80,7 +80,7 @@
 				</FontString>
 			</Layer>
 			<Layer level="ARTWORK">
-				<FontString name="$parentTabText" inherits="GameFontHighlightSmall" text="Search">
+				<FontString name="$parentTabText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOP" relativePoint="TOPLEFT">
 							<Offset>
@@ -89,7 +89,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentSearchText" inherits="GameFontHighlightSmall" text="Search:">
+				<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT">
 							<Offset>
@@ -121,7 +121,7 @@
 			<Frame name="$parentBid" inherits="SearchParametersTemplate">
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall" text="Minimum Profit:">
+						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -130,7 +130,7 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall" text="Minimum Percent Less:">
+						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
 									<Offset>
@@ -139,7 +139,7 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentTimeLeftText" inherits="GameFontHighlightSmall" text="Maximum Time Left:">
+						<FontString name="$parentTimeLeftText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText">
 									<Offset>
@@ -209,7 +209,7 @@
 							</OnLoad>
 						</Scripts>
 					</Frame>
-					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate" text="Search">
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
 						<Size>
 							<AbsDimension x="120" y="22"/>
 						</Size>
@@ -227,13 +227,21 @@
 						</Scripts>
 					</Button>
 				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(this:GetName().."TimeLeftText"):SetText(_AUCT('UiMaximumTimeLeftLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+					</OnLoad>
+				</Scripts>
 			</Frame>
 
 			<!-- Buyout Search Frame -->
 			<Frame name="$parentBuyout" inherits="SearchParametersTemplate">
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall" text="Minimum Profit:">
+						<FontString name="$parentMinProfitText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -242,7 +250,7 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
-						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall" text="Minimum Percent Less:">
+						<FontString name="$parentMinPercentLessText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
 									<Offset>
@@ -291,7 +299,7 @@
 							</OnEditFocusGained>
 						</Scripts>
 					</EditBox>
-					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate" text="Search">
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
 						<Size>
 							<AbsDimension x="120" y="22"/>
 						</Size>
@@ -309,13 +317,20 @@
 						</Scripts>
 					</Button>
 				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+					</OnLoad>
+				</Scripts>
 			</Frame>
 
 			<!-- Compete Search Frame -->
 			<Frame name="$parentCompete" inherits="SearchParametersTemplate">
 				<Layers>
 					<Layer level="ARTWORK">
-						<FontString name="$parentUndercutText" inherits="GameFontHighlightSmall" text="Minimum Profit:">
+						<FontString name="$parentUndercutText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT">
 									<Offset>
@@ -341,7 +356,7 @@
 							</OnLoad>
 						</Scripts>
 					</Frame>
-					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate" text="Search">
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
 						<Size>
 							<AbsDimension x="120" y="22"/>
 						</Size>
@@ -359,6 +374,12 @@
 						</Scripts>
 					</Button>
 				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."UndercutText"):SetText(_AUCT('UiMinimumUndercutLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+					</OnLoad>
+				</Scripts>
 			</Frame>
 
 			<!-- Results List -->
@@ -547,7 +568,7 @@
 					</Button>
 				</Frames>
 			</Frame>
-			<Button name="$parentBuyoutButton" inherits="UIPanelButtonTemplate" text="BUYOUT">
+			<Button name="$parentBuyoutButton" inherits="UIPanelButtonTemplate">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
@@ -564,7 +585,7 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			<Button name="$parentBidButton" inherits="UIPanelButtonTemplate" text="BID">
+			<Button name="$parentBidButton" inherits="UIPanelButtonTemplate">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
@@ -585,6 +606,10 @@
 		<Scripts>
 			<OnLoad>
 				getglobal(this:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
+				getglobal(this:GetName().."TabText"):SetText(_AUCT('UiSearch'));
+				getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchDropDownLabel'));
+				getglobal(this:GetName().."BidButton"):SetText(_AUCT('UiBid'));
+				getglobal(this:GetName().."BuyoutButton"):SetText(_AUCT('UiBuyout'));
 				AuctionFrameSearch_OnLoad();
 			</OnLoad>
 		</Scripts>

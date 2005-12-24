@@ -68,7 +68,7 @@ function AuctionFrameSearch_OnLoad()
 	{
 		Quantity =
 		{
-			title = "Qty";
+			title = _AUCT("UiQuantityHeader");
 			dataType = "Number";
 			valueFunc = (function(record) return record.count end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -77,7 +77,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		Name =
 		{
-			title = "Name";
+			title = _AUCT("UiNameHeader");
 			dataType = "String";
 			valueFunc = (function(record) return record.name end);
 			colorFunc = AuctionFrameSearch_GetItemColor;
@@ -87,7 +87,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		TimeLeft =
 		{
-			title = "Time Left";
+			title = _AUCT("UiTimeLeftHeader");
 			dataType = "String";
 			valueFunc = (function(record) return Auctioneer_GetTimeLeftString(record.timeLeft) end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -96,7 +96,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		Bid =
 		{
-			title = "Bid";
+			title = _AUCT("UiBidHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.bid end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -105,7 +105,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		BidPer =
 		{
-			title = "Bid Per";
+			title = _AUCT("UiBidPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.bidPer end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -114,7 +114,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		Buyout =
 		{
-			title = "Buyout";
+			title = _AUCT("UiBuyoutHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyout end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -123,7 +123,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		BuyoutPer =
 		{
-			title = "Buyout Per";
+			title = _AUCT("UiBuyoutPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyoutPer end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -132,7 +132,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		Profit =
 		{
-			title = "Profit";
+			title = _AUCT("UiProfitHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.profit end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -141,7 +141,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		ProfitPer =
 		{
-			title = "Profit Per";
+			title = _AUCT("UiProfitPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.profitPer end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -150,7 +150,7 @@ function AuctionFrameSearch_OnLoad()
 		},
 		PercentLess =
 		{
-			title = "Pct";
+			title = _AUCT("UiPercentLessHeader");
 			dataType = "Number";
 			valueFunc = (function(record) return record.percentLess end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
@@ -315,19 +315,19 @@ function AuctionFrameSearch_SearchDropDown_Initialize()
 	local frame = dropdown:GetParent();
 	
 	local bidsInfo = {};
-	bidsInfo.text = "Bids";
+	bidsInfo.text = _AUCT("UiSearchTypeBids");
 	bidsInfo.func = AuctionFrameSearch_SearchDropDownItem_OnClick;
 	bidsInfo.owner = dropdown;
 	UIDropDownMenu_AddButton(bidsInfo);
 	
 	local buyoutsInfo = {};
-	buyoutsInfo.text = "Buyouts";
+	buyoutsInfo.text = _AUCT("UiSearchTypeBuyouts");
 	buyoutsInfo.func = AuctionFrameSearch_SearchDropDownItem_OnClick;
 	buyoutsInfo.owner = dropdown;
 	UIDropDownMenu_AddButton(buyoutsInfo);
 
 	local competeInfo = {};
-	competeInfo.text = "Competition";
+	competeInfo.text = _AUCT("UiSearchTypeCompetition");
 	competeInfo.func = AuctionFrameSearch_SearchDropDownItem_OnClick;
 	competeInfo.owner = dropdown;
 	UIDropDownMenu_AddButton(competeInfo);
