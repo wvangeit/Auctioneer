@@ -649,6 +649,10 @@ function Enchantrix_AddonLoaded()
 	--GUI Registration code added by MentalPower	
 	Enchantrix_Register();
 
+	if (IsAddOnLoaded("Auctioneer")) then
+		Enchantrix_AuctioneerLoaded()
+	end
+
 	if not Babylonian.IsAddOnRegistered("Enchantrix") then 
 		Babylonian.RegisterAddOn("Enchantrix", Enchantrix_SetLocale);
 	end
