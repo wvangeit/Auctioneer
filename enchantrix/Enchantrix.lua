@@ -492,9 +492,9 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 					-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
 					Enchantrix_Disenchants = {};
 					Enchantrix_Disenchanting = false;
-					Enchantrix_WaitingPush = false;					
+					Enchantrix_WaitingPush = false;
 					return;
-				end					
+				end
 				foundItem = data;
 			end
 		end
@@ -502,7 +502,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 			-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
 			Enchantrix_Disenchants = {};
 			Enchantrix_Disenchanting = false;
-			Enchantrix_WaitingPush = false;					
+			Enchantrix_WaitingPush = false;
 			return;
 		end
 		
@@ -549,18 +549,20 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 	end
 end
 
-function Enchantrix_ChatPrint(text, red, green, blue, alpha, holdTime)
+function Enchantrix_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
+	local frameIndex = Enchantrix_GetFrameIndex();
 
 	if (red and green and blue) then
-		if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
-			getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(text, red, green, blue, alpha, holdTime);
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+
 		elseif (DEFAULT_CHAT_FRAME) then 
-			DEFAULT_CHAT_FRAME:AddMessage(text, red, green, blue, alpha, holdTime);
+			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 		end
 
 	else
-		if getglobal("ChatFrame"..Enchantrix_GetFrameIndex()) then
-			getglobal("ChatFrame"..Enchantrix_GetFrameIndex()):AddMessage(text, 1.0, 0.5, 0.25);
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, 1.0, 0.5, 0.25);
 		elseif (DEFAULT_CHAT_FRAME) then 
 			DEFAULT_CHAT_FRAME:AddMessage(text, 1.0, 0.5, 0.25);
 		end
@@ -841,19 +843,19 @@ function Enchantrix_DoBidBroker(minProfit)
 		return;
 	end
 
-    if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN; else minProfit = tonumber(minProfit) * 100; end
+	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN; else minProfit = tonumber(minProfit) * 100; end
 	local output = string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
-    Enchantrix_ChatPrint(output);
-    
+	Enchantrix_ChatPrint(output);
+
 	Enchantrix_PriceCache = {t=time()};
 	Enchantrix_ProfitMargins = {};
-    local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_BidBrokerFilter, minProfit);
-    
-    -- sort by profit based on median
-    table.sort(targetAuctions, Enchantrix_BidBrokerSort);
-    
-    -- output the list of auctions
-    for _,a in targetAuctions do
+	local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_BidBrokerFilter, minProfit);
+
+	-- sort by profit based on median
+	table.sort(targetAuctions, Enchantrix_BidBrokerSort);
+
+	-- output the list of auctions
+	for _,a in targetAuctions do
 		if (a.signature and Enchantrix_ProfitMargins[a.signature]) then
 			local quality = EnhTooltip.QualityFromLink(a.itemLink);
 			if (quality and quality >= 2) then
