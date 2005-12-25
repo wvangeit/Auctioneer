@@ -22,15 +22,27 @@
 --]]
 
 -------------------------------------------------------------------------------
+-- Data members
+-------------------------------------------------------------------------------
+CursorItem = nil;
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AuctioneerUI_OnLoad()
+	Stubby.RegisterFunctionHook("PickupContainerItem", 200, AuctioneerUI_PickupContainerItemHook)
+end
+
+-------------------------------------------------------------------------------
 -- Called after Blizzard's AuctionFrameTab_OnClick() method.
 -------------------------------------------------------------------------------
-function AuctioneerUI_AuctionFrameTab_OnClick(_, _, index)
+function AuctioneerUI_AuctionFrameTab_OnClickHook(_, _, index)
 	if (not index) then 
 		index = this:GetID();
 	end
 	
 	-- Handle the Auctioneer tabs
 	AuctionFrameSearch:Hide();
+	AuctionFramePost:Hide();
 	local tab = getglobal("AuctionFrameTab"..index);
 	if (tab) then
 		if (tab:GetName() == "AuctionFrameTabSearch") then
@@ -41,6 +53,40 @@ function AuctioneerUI_AuctionFrameTab_OnClick(_, _, index)
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
 			AuctionFrameSearch:Show();
+		elseif (tab:GetName() == "AuctionFrameTabPost") then
+			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
+			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
+			AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
+			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
+			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
+			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
+			AuctionFramePost:Show();
 		end
 	end
 end
+
+-------------------------------------------------------------------------------
+-- Called after Blizzard's PickupContainerItem() method in order to capture
+-- which item is on the cursor.
+-------------------------------------------------------------------------------
+function AuctioneerUI_PickupContainerItemHook(_, _, bag, slot)
+	if (CursorHasItem()) then
+		CursorItem = { bag = bag, slot = slot };
+		--EnhTooltip.DebugPrint("Picked up item "..CursorItem.bag..", "..CursorItem.slot);
+	else
+		CursorItem = nil;
+		--EnhTooltip.DebugPrint("Dropped item "..bag..", "..slot);
+	end
+	AuctioneerUI_GetCursorContainerItem();
+end
+
+-------------------------------------------------------------------------------
+-- Gets the bag and slot number of the item on the cursor.
+-------------------------------------------------------------------------------
+function AuctioneerUI_GetCursorContainerItem()
+	if (CursorHasItem() and CursorItem) then
+		return CursorItem;
+	end
+	return nil;
+end
+

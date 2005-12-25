@@ -549,7 +549,7 @@ function Auctioneer_LockAndLoad()
 			end
 		end
 		
-		if (not CursorHasItem() and AuctionFrame and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
+		if (not CursorHasItem() and AuctionFrameAuctions and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
 			PickupContainerItem(bag, slot)
 			if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
 				ClickAuctionSellItemButton()
@@ -592,6 +592,26 @@ function Auctioneer_LockAndLoad()
 				return
 			end
 		end
+		
+		if (not CursorHasItem() and AuctionFramePost and AuctionFramePost:IsVisible() and button == "LeftButton" and IsAltKeyDown()) then
+			local _, count = GetContainerItemInfo(bag, slot);
+			if (count) then
+				if (count > 1 and IsShiftKeyDown()) then
+					this.SplitStack = function(button, split)
+						local link = GetContainerItemLink(bag, slot)
+						local _, _, _, _, name = Auctioneer_BreakLink(link);
+						AuctionFramePost:SetAuctionItem(bag, slot, split);
+					end
+					OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
+				else
+					local link = GetContainerItemLink(bag, slot)
+					local _, _, _, _, name = Auctioneer_BreakLink(link);
+					AuctionFramePost:SetAuctionItem(bag, slot, 1);
+				end
+				return
+			end
+		end
+
 		Auctioneer_Orig_ContainerFrameItemButton_OnClick(unpack(arg))
 	end
 

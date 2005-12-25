@@ -450,14 +450,25 @@ function Auctioneer_ConfigureAH()
 		relevel(AuctionFrameSearch);
 		setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabSearch);
 		AuctionFrameTabSearch:SetParent("AuctionFrame")
-		AuctionFrameTabSearch:SetPoint("TOPLEFT", "AuctionFrameTab"..(tabIndex - 1), "TOPRIGHT", -8, 0)
+		AuctionFrameTabSearch:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
 		AuctionFrameTabSearch:SetID(tabIndex);
 		AuctionFrameTabSearch:Show();
+
+		-- Setup the Post Auctions tab
+		tabIndex = tabIndex + 1;
+		AuctionFramePost:SetParent("AuctionFrame")
+		AuctionFramePost:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
+		relevel(AuctionFramePost);
+		setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabPost);
+		AuctionFrameTabPost:SetParent("AuctionFrame")
+		AuctionFrameTabPost:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
+		AuctionFrameTabPost:SetID(tabIndex);
+		AuctionFrameTabPost:Show();
 
 		PanelTemplates_SetNumTabs(AuctionFrame, tabIndex)
 
 		if (not AuctionUI_Hooked) then
-			Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClick)
+			Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClickHook)
 			AuctionUI_Hooked = true
 		end
 	end

@@ -38,11 +38,14 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AucStorage.lua"/>
 	<Script file="Auctioneer.lua"/>
 
+	<Script file="AuctioneerUI.lua"/>
 	<Script file="AucBidManager.lua"/>
+	<Script file="AucPostManager.lua"/>
 	<Frame name="Auctioneer" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
 				Auctioneer_OnLoad();
+				AuctioneerUI_OnLoad();
 				this:RegisterEvent("ADDON_LOADED")
 			</OnLoad>
 			<OnEvent>
@@ -91,6 +94,18 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnUpdate>
 		</Scripts>
 	</Frame>
+
+	<Frame name="AucPostManagerFrame" hidden="true">
+		<Scripts>
+			<OnLoad>
+				AucPostManagerFrame_OnLoad();
+			</OnLoad>
+			<OnEvent>
+				AucPostManagerFrame_OnEvent(event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+
 
 	<Frame name="AuctionInfo" hidden="true">
 		<Size>
