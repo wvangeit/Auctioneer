@@ -552,7 +552,7 @@ end
 function Enchantrix_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
 	local frameIndex = Enchantrix_GetFrameIndex();
 
-	if (red and green and blue) then
+	if (cRed and cGreen and cBlue) then
 		if getglobal("ChatFrame"..frameIndex) then
 			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 
@@ -805,19 +805,19 @@ function Enchantrix_DoPercentLess(percentLess)
 		return;
 	end
 
-    if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
+	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
 	local output = string.format(_ENCH('FrmtPctlessHeader'), percentLess);
-    Enchantrix_ChatPrint(output);
-    
+	Enchantrix_ChatPrint(output);
+
 	Enchantrix_PriceCache = {t=time()};
 	Enchantrix_ProfitMargins = {};
-    local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_PercentLessFilter, percentLess);
-    
-    -- sort by profit based on median
-    table.sort(targetAuctions, Enchantrix_ProfitComparisonSort);
-    
-    -- output the list of auctions
-    for _,a in targetAuctions do
+	local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_PercentLessFilter, percentLess);
+
+	-- sort by profit based on median
+	table.sort(targetAuctions, Enchantrix_ProfitComparisonSort);
+
+	-- output the list of auctions
+	for _,a in targetAuctions do
 		if (a.signature and Enchantrix_ProfitMargins[a.signature]) then
 			local quality = EnhTooltip.QualityFromLink(a.itemLink);
 			if (quality and quality >= 2) then
@@ -826,12 +826,12 @@ function Enchantrix_DoPercentLess(percentLess)
 				local margin = Enchantrix_ProfitMargins[a.signature].margin;
 				local profit = Enchantrix_ProfitMargins[a.signature].profit;
 				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"));
-				Auctioneer_ChatPrint(output);
+				Enchantrix_ChatPrint(output);
 			end
 		end
-    end
-    
-    Auctioneer_ChatPrint(_ENCH('FrmtPctlessDone'));
+	end
+
+	Enchantrix_ChatPrint(_ENCH('FrmtPctlessDone'));
 end
 
 function Enchantrix_DoBidBroker(minProfit)
