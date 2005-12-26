@@ -1,18 +1,18 @@
 --[[  Stubby
-  
-  $Id$
-  Version: <%version%> (<%codename%>)
 
-  Stubby is an addon that allows you to register boot code for
-  your addon.
+$Id$
+Version: <%version%> (<%codename%>)
 
-  This bootcode will be run whenever your addon does not demand
-  load on startup so that you can setup your own conditions for
-  loading.
+Stubby is an addon that allows you to register boot code for
+your addon.
 
-  A quick example of this is:
-  -------------------------------------------
-  	Stubby.RegisterBootCode("myAddOn", "CommandHandler", [[
+This bootcode will be run whenever your addon does not demand
+load on startup so that you can setup your own conditions for
+loading.
+
+A quick example of this is:
+-------------------------------------------
+	Stubby.RegisterBootCode("myAddOn", "CommandHandler", [[
 		local function cmdHandler(msg)
 			LoadAddOn("myAddOn")
 			MyAddOn_Command(msg)
@@ -20,75 +20,75 @@
 		SLASH_MYADDON1 = "/myaddon"
 		SlashCmdList['MYADDON'] = cmdHandler
 	]]);
-  -------------------------------------------
-  So, what did this just do? It registered some boot code
-  (called "CommandHandler") with Stubby that Stubby will 
-  (in the case you are not demand loaded) execute on your
-  behalf.
+-------------------------------------------
+So, what did this just do? It registered some boot code
+(called "CommandHandler") with Stubby that Stubby will 
+(in the case you are not demand loaded) execute on your
+behalf.
 
-  In the above example, your boot code sets up a command handler
-  which causes your addon to load and process the command.
+In the above example, your boot code sets up a command handler
+which causes your addon to load and process the command.
 
-  Another example:
-  -------------------------------------------
-    Stubby.CreateAddOnLoadBootCode("myAddOn", "Blizzard_AuctionUI")
-  -------------------------------------------
-  Ok, what was that? Well you just setup some boot code
-  for your addon that will register an addon hook when
-  Stubby loads and your addon doesn't. This addon hook
-  will cause your addon to load when the AuctionUI does.
+Another example:
+-------------------------------------------
+Stubby.CreateAddOnLoadBootCode("myAddOn", "Blizzard_AuctionUI")
+-------------------------------------------
+Ok, what was that? Well you just setup some boot code
+for your addon that will register an addon hook when
+Stubby loads and your addon doesn't. This addon hook
+will cause your addon to load when the AuctionUI does.
 
 
-  The primary functions that you will be interested in are:
-    CreateAddOnLoadBootCode(ownerAddOn, triggerAddOn)
+The primary functions that you will be interested in are:
+	CreateAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 	CreateEventLoadBootCode(ownerAddOn, triggerEvent)
 	CreateFunctionLoadBootCode(ownerAddOn, triggerFunction)
-  And the manual, but vastly more powerful:
-    RegisterBootCode(ownerAddOn, bootName, bootCode)
+And the manual, but vastly more powerful:
+	RegisterBootCode(ownerAddOn, bootName, bootCode)
 
 
-  Stubby can also save variables for you if you wish to retain
-  stateful information in your boot code. (maybe you have
-  recieved notification from your user that they wish always
-  to have your addon load for the current toon?)
+Stubby can also save variables for you if you wish to retain
+stateful information in your boot code. (maybe you have
+recieved notification from your user that they wish always
+to have your addon load for the current toon?)
 
-  These are the variable functions:
+These are the variable functions:
 	SetConfig(ownerAddOn, variable, value, isGlobal)
-    GetConfig(ownerAddOn, variable)
+GetConfig(ownerAddOn, variable)
 	ClearConfig(ownerAddOn, variable)
 
-  The SetConfig function sets the configuration variable
-  "variable" for ownerAddOn to value. The variable is
-  per-toon unless isGlobal is set.
+The SetConfig function sets the configuration variable
+"variable" for ownerAddOn to value. The variable is
+per-toon unless isGlobal is set.
 
-  The GetConfig function gets "variable" for ownerAddOn
-  it will return per-toon values before global ones.
+The GetConfig function gets "variable" for ownerAddOn
+it will return per-toon values before global ones.
 
-  The ClearConfig function clears the toon specific and
-  global "variable" for ownerAddOn.
+The ClearConfig function clears the toon specific and
+global "variable" for ownerAddOn.
 
 
-  The following functions are also available for you to use
-  if you need to use some manual boot code and want to
-  hook into some function, addon or event within your boot
-  code:
-    Stubby.RegisterFunctionHook(triggerFunction, position, hookFunction, ...)
-    Stubby.RegisterAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
-    Stubby.RegisterEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
+The following functions are also available for you to use
+if you need to use some manual boot code and want to
+hook into some function, addon or event within your boot
+code:
+	Stubby.RegisterFunctionHook(triggerFunction, position, hookFunction, ...)
+	Stubby.RegisterAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
+	Stubby.RegisterEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 
-  RegisterFunctionHook allows you to hook into a function.
-  * The triggerFunction is a string that names the function you
-    want to hook into. eg: "GameTooltip.SetOwner"
-  * The position is a negative or positive number that defines
-    the actual calling order of the addon. The smaller or more
-    negative the number, the earlier in the call sequence your
-    hookFunction will be called, the larger the number, the
-    later your hook will be called. The actual original (hooked)
-    function is called at position 0, so if your addon is hooked
-    at a negative position, you will not have access to any
-    return values.
-  * You pass (by reference) your function that you wish called
-    as hookFunction. This function will be called with the
+RegisterFunctionHook allows you to hook into a function.
+* The triggerFunction is a string that names the function you
+	want to hook into. eg: "GameTooltip.SetOwner"
+* The position is a negative or positive number that defines
+	the actual calling order of the addon. The smaller or more
+	negative the number, the earlier in the call sequence your
+	hookFunction will be called, the larger the number, the
+	later your hook will be called. The actual original (hooked)
+	function is called at position 0, so if your addon is hooked
+	at a negative position, you will not have access to any
+	return values.
+* You pass (by reference) your function that you wish called
+	as hookFunction. This function will be called with the
 	following parameters:
 		hookFunction(hookParams, returnValue, hook1, hook2 .. hookN)
 	- hookParams is a table containing the additional parameters
@@ -98,57 +98,57 @@
 	- hook1..hookN are the original parameters of the hooked
 	function in the original order.
 
-  RegisterAddOnHook is very much like the register function hook
-  call except that there is no positioning (you may get notified in
-  any order with respect to any other addons which may be hooked)
-  * The triggerAddOn specifies the name of the addon of which you
-    want to be notified of it's loading.
-  * The ownerAddOn is your addon's name (used for removing hooks)
-  * The hookFunction is a function that gets called when the
-    triggerAddOn loads or if it is already loaded straight away.
+RegisterAddOnHook is very much like the register function hook
+call except that there is no positioning (you may get notified in
+any order with respect to any other addons which may be hooked)
+* The triggerAddOn specifies the name of the addon of which you
+	want to be notified of it's loading.
+* The ownerAddOn is your addon's name (used for removing hooks)
+* The hookFunction is a function that gets called when the
+	triggerAddOn loads or if it is already loaded straight away.
 	This function will be called with the following parameters
 		hookFunction(hookParams)
 	- hookParams is a table containing the additional parameters
 	passed to the RegisterAddOnHook function (the "..." params)
 
-  RegisterEventHook allows you to hook an event in much the same
-  way as the above functions.
-  * The triggerEvent is an event which causes your hookFunction to
-    be executed.
-  * The ownerAddOn is your addon's name (used for removing hooks)
-  * The hookFunction is a function that gets called whenever the
-  triggerEvent fires (until canceled with UnregisterEventHook)
-  This function will be called with the following parameters:
-  	hookFunction(hookParams, event, hook1, hook2 .. hookN)
-  - hookParams is a table containing the additional parameters
-  passed to the RegisterEventHook function (the "..." params)
-  - event is the event string that has just been fired
-  - hook1..hookN are the original parameters of the event
-  function in the original order.
+RegisterEventHook allows you to hook an event in much the same
+way as the above functions.
+* The triggerEvent is an event which causes your hookFunction to
+	be executed.
+* The ownerAddOn is your addon's name (used for removing hooks)
+* The hookFunction is a function that gets called whenever the
+	triggerEvent fires (until canceled with UnregisterEventHook)
+	This function will be called with the following parameters:
+		hookFunction(hookParams, event, hook1, hook2 .. hookN)
+- hookParams is a table containing the additional parameters
+passed to the RegisterEventHook function (the "..." params)
+- event is the event string that has just been fired
+- hook1..hookN are the original parameters of the event
+function in the original order.
 
-  Other functions which may be of interest are:
-  	UnregisterFunctionHook(triggerFunction, hookFunc)
+Other functions which may be of interest are:
+	UnregisterFunctionHook(triggerFunction, hookFunc)
 	UnregisterAddOnHook(triggerAddOn, ownerAddOn)
 	UnregisterEventHook(triggerEvent, ownerAddOn)
 	UnregisterBootCode(ownerAddOn, bootName)
 	
-  There is also a single exposed 'constant' allowing you to do
-  some basic version checking for compatibility:
-    Stubby.VERSION                (introduced in revision 507)
-  This constant is Stubby's revision number, a simple positive
-  integer that will increase by an arbitrary amount with each
-  new version of Stubby.
-    Current $Revision$
-  
-  Example:
-  -------------------------------------------
-    if (Stubby.VERSION and Stubby.VERSION >= 507) then
-    	-- Register boot code
-    else
-    	Stubby.Print("You need to update your version of Stubby!")
-    end
-  -------------------------------------------  
-  
+There is also a single exposed 'constant' allowing you to do
+some basic version checking for compatibility:
+Stubby.VERSION                (introduced in revision 507)
+This constant is Stubby's revision number, a simple positive
+integer that will increase by an arbitrary amount with each
+new version of Stubby.
+Current $Revision$
+
+Example:
+-------------------------------------------
+if (Stubby.VERSION and Stubby.VERSION >= 507) then
+	-- Register boot code
+else
+	Stubby.Print("You need to update your version of Stubby!")
+end
+-------------------------------------------  
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -177,37 +177,37 @@ StubbyConfig = {}
 
 
 -- Function prototypes
-local chatPrint                      -- chatPrint(...)
-local checkAddOns                    -- checkAddOns()
-local clearConfig                    -- clearConfig(ownerAddOn, variable)
-local createAddOnLoadBootCode        -- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
-local createEventLoadBootCode        -- createEventLoadBootCode(ownerAddOn, triggerEvent)
-local createFunctionLoadBootCode     -- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
-local eventWatcher                   -- eventWatcher(event)
-local events                         -- events(event, param)
-local getConfig                      -- getConfig(ownerAddOn, variable)
-local getOrigFunc                    -- getOrigFunc(triggerFunction)
-local hookCall                       -- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-local hookInto                       -- hookInto(triggerFunction)
-local inspectAddOn                   -- inspectAddOn(addonName, title, info)
-local loadWatcher                    -- loadWatcher(loadedAddOn)
-local onLoaded                       -- onLoaded()
-local onWorldStart                   -- onWorldStart()
-local rebuildNotifications           -- rebuildNotifications(notifyItems)
-local registerAddOnHook              -- registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
-local registerBootCode               -- registerBootCode(ownerAddOn, bootName, bootCode)
-local registerEventHook              -- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
-local registerFunctionHook           -- registerFunctionHook(triggerFunction, position, hookFunc, ...)
-local runBootCodes                   -- runBootCodes()
-local searchForNewAddOns             -- searchForNewAddOns()
-local cleanUpAddOnData               -- cleanUpAddOnData()
-local cleanUpAddOnConfigs            -- cleanUpAddOnConfigs()
-local setConfig                      -- setConfig(ownerAddOn, variable, value, isGlobal)
-local shouldInspectAddOn             -- shouldInspectAddOn(addonName)
-local unregisterAddOnHook            -- unregisterAddOnHook(triggerAddOn, ownerAddOn)
-local unregisterBootCode             -- unregisterBootCode(ownerAddOn, bootName)
-local unregisterEventHook            -- unregisterEventHook(triggerEvent, ownerAddOn)
-local unregisterFunctionHook         -- unregisterFunctionHook(triggerFunction, hookFunc)
+local chatPrint						-- chatPrint(...)
+local checkAddOns					-- checkAddOns()
+local clearConfig					-- clearConfig(ownerAddOn, variable)
+local createAddOnLoadBootCode		-- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
+local createEventLoadBootCode		-- createEventLoadBootCode(ownerAddOn, triggerEvent)
+local createFunctionLoadBootCode	-- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
+local eventWatcher					-- eventWatcher(event)
+local events						-- events(event, param)
+local getConfig						-- getConfig(ownerAddOn, variable)
+local getOrigFunc					-- getOrigFunc(triggerFunction)
+local hookCall						-- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+local hookInto						-- hookInto(triggerFunction)
+local inspectAddOn					-- inspectAddOn(addonName, title, info)
+local loadWatcher					-- loadWatcher(loadedAddOn)
+local onLoaded						-- onLoaded()
+local onWorldStart					-- onWorldStart()
+local rebuildNotifications			-- rebuildNotifications(notifyItems)
+local registerAddOnHook				-- registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
+local registerBootCode				-- registerBootCode(ownerAddOn, bootName, bootCode)
+local registerEventHook				-- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
+local registerFunctionHook			-- registerFunctionHook(triggerFunction, position, hookFunc, ...)
+local runBootCodes					-- runBootCodes()
+local searchForNewAddOns			-- searchForNewAddOns()
+local cleanUpAddOnData				-- cleanUpAddOnData()
+local cleanUpAddOnConfigs			-- cleanUpAddOnConfigs()
+local setConfig						-- setConfig(ownerAddOn, variable, value, isGlobal)
+local shouldInspectAddOn			-- shouldInspectAddOn(addonName)
+local unregisterAddOnHook			-- unregisterAddOnHook(triggerAddOn, ownerAddOn)
+local unregisterBootCode			-- unregisterBootCode(ownerAddOn, bootName)
+local unregisterEventHook			-- unregisterEventHook(triggerEvent, ownerAddOn)
+local unregisterFunctionHook		-- unregisterFunctionHook(triggerFunction, hookFunc)
 
 
 -- Function definitions
@@ -252,7 +252,7 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 	if config.calls and config.calls.callList and config.calls.callList[funcName] then
 		callees = config.calls.callList[funcName]
 	end
-	
+
 	if (callees) then
 		for _,func in pairs(callees) do
 			if (orig and func.p >= 0) then
@@ -310,7 +310,7 @@ function getOrigFunc(triggerFunction)
 		return config.hooks.origFuncs[triggerFunction]
 	end
 end
-	
+
 
 -- This function causes a given function to be hooked by stubby and
 -- configures the hook function to be called at the given position.
@@ -344,6 +344,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	config.calls.callList = rebuildNotifications(config.calls.functions);
 	hookInto(triggerFunction)
 end
+
 function unregisterFunctionHook(triggerFunction, hookFunc)
 	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then return end
 	for pos, funcObj in config.calls.functions[triggerFunction] do
@@ -369,12 +370,14 @@ function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 		end
 	end
 end
+
 function unregisterAddOnHook(triggerAddOn, ownerAddOn)
 	local addon = string.lower(triggerAddOn)
 	if (config.loads and config.loads[addon] and config.loads[addon][ownerAddOn]) then
 		config.loads[addon][ownerAddOn] = nil
 	end
 end
+
 
 function loadWatcher(loadedAddOn)
 	local addon = string.lower(loadedAddOn)
@@ -503,7 +506,7 @@ end
 -- configurations.
 function cleanUpAddOnData()
 	if (not StubbyConfig.boots) then return; end
-	
+
 	for b in pairs(StubbyConfig.boots) do
 		local _,title = GetAddOnInfo(b)
 		if (not title) then
@@ -515,7 +518,7 @@ function cleanUpAddOnData()
 			end
 		end
 	end
-	
+
 	if (cleanList) then cleanUpAddOnConfigs(); end
 end
 
@@ -532,7 +535,7 @@ function cleanUpAddOnConfigs()
 	else
 		table.remove(cleanList, addonIndex)
 	end
-	
+
 	StaticPopupDialogs["CLEANUP_STUBBY" .. addonIndex] = {
 		text = "The AddOn \"" .. addonName .. "\" is no longer available. Do you wish to delete it's loading preferences?",
 		button1 = "Delete",
