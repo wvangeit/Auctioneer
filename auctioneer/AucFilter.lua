@@ -55,11 +55,17 @@ end
 
 
 -- filters out all auctions except those that have no more than maximumTime remaining and meet profit requirements
-function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime)
+function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, minQuality,itemName)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
 	if (not maximumTime) then maximumTime = 100000 end
+	if (not minQuality) then minQuality = 0 end
+
+	if (itemName) then
+		local i,j = string.find(string.lower(name), string.lower(itemName))
+		if (not i) then return true end
+	end
 	
 	if Auctioneer_GetUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
 		local auctKey = Auctioneer_GetAuctionKey();
@@ -69,31 +75,34 @@ function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime)
 		if (sbuy) then buyoutValues = sbuy.buyoutPrices end
 		local lowest, second = Auctioneer_GetLowest(buyoutValues);
 
-		-- Take a generous stab in the dark at what the HSP will be
-		-- If the current bid falls under that value, only then should
-		-- we go to the effort of calculating actual profit.
-		-- Note: if second == nil, this indicates no competition.
-		if (second == nil or currentBid < second * 1.2 and currentBid <= MAX_BUYOUT_PRICE) then
+--		-- Take a generous stab in the dark at what the HSP will be
+--		-- If the current bid falls under that value, only then should
+--		-- we go to the effort of calculating actual profit.
+--		-- Note: if second == nil, this indicates no competition.
+--		if (second == nil or currentBid < second * 1.2 and currentBid <= MAX_BUYOUT_PRICE) then
 			local itemCat = Auctioneer_GetCatForKey(itemKey);
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 
 			if (snap) then
-				local timeLeft = tonumber(snap.timeLeft);
-				local elapsedTime = time() - tonumber(snap.lastSeenTime);
-				local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+				if (tonumber(snap.quality) >= minQuality) then
+					local timeLeft = tonumber(snap.timeLeft);
+					local elapsedTime = time() - tonumber(snap.lastSeenTime);
+					local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
 
-				if (secondsLeft <= maximumTime and secondsLeft > 0) then
-					-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
-					local hsp, seenCount, x, x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
-					local profit = (hsp * count) - currentBid;
-					local profitPricePercent = math.floor((profit / currentBid) * 100);
+					if (secondsLeft <= maximumTime and secondsLeft > 0) then
+						-- hsp is the HSP with the lowest priced item still in the auction, nshp is the next highest price.
+						local hsp, seenCount, x, x, nhsp = Auctioneer_GetHSP(itemKey, auctKey, buyoutValues);
+						local profit = (hsp * count) - currentBid;
+						local profitPricePercent = math.floor((profit / currentBid) * 100);
 
-					if (profit >= minProfit and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
-						filterAuction = false;
+--						if (profit >= minProfit and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
+						if ((minProfit == 0 or profit >= minProfit) and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
+							filterAuction = false;
+						end
 					end
 				end
 			end
-		end
+--		end
 	end
 
 	return filterAuction;
@@ -159,7 +168,7 @@ end
 
 
 -- generic function for querying the snapshot with a filter function that returns true if an auction should be filtered out of the result set.
-function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
+function Auctioneer_QuerySnapshot(filter, param, e1,e2,e3,e4,e5)
 	local queryResults = {};
 	param = param or "";
 
@@ -169,7 +178,7 @@ function Auctioneer_QuerySnapshot(filter, param, extra1, extra2)
 	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 		for itemCat, iData in pairs(AuctionConfig.snap[auctKey]) do
 			for auctionSignature, data in pairs(iData) do
-				if (not filter(param, auctionSignature, extra1, extra2)) then
+				if (not filter(param, auctionSignature, e1,e2,e3,e4,e5)) then
 					a = Auctioneer_GetSnapshotFromData(data);
 					a.signature = auctionSignature;
 					table.insert(queryResults, a);
