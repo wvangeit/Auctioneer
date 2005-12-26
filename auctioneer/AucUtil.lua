@@ -5,7 +5,7 @@
 
 	Auctioneer utility functions.
 	Functions to maniuplate items keys, signatures etc
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -101,6 +101,66 @@ function Auctioneer_ColorTextWhite(text)
 	return string.format(COLORING_START, WHITE_COLOR, ""..text);
 end
 
+function Auctioneer_GetWarnColor(warn)
+	--Make "warn" a required parameter and verify that its a string
+	if (not warn) or (not type(warn) == "String") then 
+		return nil 
+	end
+
+	local cHex, cRed, cGreen, cRed;
+
+	if (Auctioneer_GetFilter('warn-color')) then
+		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
+
+		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
+		FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
+		FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
+		FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
+		FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
+		FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
+		FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
+		FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+
+		if (string.find(warn, FrmtWarnToolow)) then
+			--Color Red
+			cHex = "ffff0000";
+			cRed = 1.0;
+			cGreen = 0.0;
+			cBlue = 0.0;
+
+		elseif (string.find(warn, FrmtWarnUndercut)) then
+			--Color Yellow
+			cHex = "ffffff00";
+			cRed = 1.0;
+			cGreen = 1.0;
+			cBlue = 0.0;
+
+		elseif (string.find(warn, FrmtWarnNocomp) or string.find(warn, FrmtWarnAbovemkt)) then
+			--Color Green
+			cHex = "ff00ff00";
+			cRed = 0.0;
+			cGreen = 1.0;
+			cBlue = 0.0;
+
+		elseif (string.find(warn, FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
+			--Color Gray
+			cHex = "ff999999";
+			cRed = 0.6;
+			cGreen = 0.6;
+			cBlue = 0.6;
+		end
+
+	else
+		--Color Orange
+		cHex = "ffe66600";
+		cRed = 0.9;
+		cGreen = 0.4;
+		cBlue = 0.0;
+	end
+
+	return cHex, cRed, cGreen, cBlue
+end
+
 -- Used to convert variables that should be numbers but are nil to 0
 function nullSafe(val)
 	if (val == nil) then return 0; end
@@ -138,13 +198,28 @@ function Auctioneer_GetOppositeKey()
 	return serverName.."-"..factionGroup;
 end
 
+-- Returns the current faction's opposing faction's auction signature
+function Auctioneer_GetNeutralKey()
+	local serverName = GetCVar("realmName");
+
+	return serverName.."-Neutral";
+end
+
+-- Returns the current faction's opposing faction's auction signature
+function Auctioneer_GetHomeKey()
+	local serverName = GetCVar("realmName");
+	local factionGroup = UnitFactionGroup("player");
+
+	return serverName.."-"..factionGroup;
+end
+
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
 function Auctioneer_IsValidAlso(also)
 	if (type(also) ~= "string") then
 		return false
 	end
 
-	if (also == 'opposite') or (also == 'off') then
+	if ((also == 'opposite') or (also == 'off') or (also == 'neutral') or (also == 'home')) then
 		return true		-- allow special keywords
 	end
 
@@ -155,8 +230,8 @@ function Auctioneer_IsValidAlso(also)
 	end
 
 	-- check if faction = "Horde" or "Alliance"
-	if (f ~= 'Horde') and (f ~= 'Alliance') and (f ~= 'Neutral') then
-		return false	-- invalid faction
+	if (f == 'Horde') or (f == 'Alliance')or (f == 'Neutral') then
+		return true
 	end
 
 	return true
@@ -310,12 +385,24 @@ function Auctioneer_LoadCategorySubClasses(c, ...)
 	end
 end
 
-function Auctioneer_ChatPrint(str)
-	if getglobal("ChatFrame"..Auctioneer_GetFrameIndex()) then
-		getglobal("ChatFrame"..Auctioneer_GetFrameIndex()):AddMessage(str, 0.0, 1.0, 0.25);
+function Auctioneer_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
+	local frameIndex = Auctioneer_GetFrameIndex();
 
-	elseif (DEFAULT_CHAT_FRAME) then 
-		DEFAULT_CHAT_FRAME:AddMessage(str, 0.0, 1.0, 0.25);
+	if (cRed and cGreen and cBlue) then
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+
+		elseif (DEFAULT_CHAT_FRAME) then 
+			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+		end
+
+	else
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, 0.0, 1.0, 0.25);
+
+		elseif (DEFAULT_CHAT_FRAME) then 
+			DEFAULT_CHAT_FRAME:AddMessage(text, 0.0, 1.0, 0.25);
+		end
 	end
 end
 
@@ -405,9 +492,9 @@ function Auctioneer_Round(x)
 	return y;
 end
 
---------------------------------------
---		Localization functions		--
---------------------------------------
+-------------------------------------------------------------------------------
+-- Localization functions
+-------------------------------------------------------------------------------
 
 Auctioneer_CommandMap = nil;
 Auctioneer_CommandMapRev = nil;
@@ -467,4 +554,107 @@ function Auctioneer_LocalizeCommand(cmd)
 	local result = Auctioneer_CommandMapRev[cmd];
 
 	if (result) then return result; else return cmd; end
+end
+
+-------------------------------------------------------------------------------
+-- Inventory modifying functions
+-------------------------------------------------------------------------------
+
+function Auctioneer_FindEmptySlot()
+	local name, i
+	for bag = 0, 4 do
+		name = GetBagName(bag)
+		i = string.find(name, '(Quiver|Ammo|Bandolier)')
+		if not i then
+			for slot = 1, GetContainerNumSlots(bag),1 do
+				if not (GetContainerItemInfo(bag,slot)) then
+					return bag, slot;
+				end
+			end
+		end
+	end
+end
+
+
+function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, button, ignoreShift)
+	local bag = this:GetParent():GetID()
+	local slot = this:GetID()
+
+	local texture, count, noSplit = GetContainerItemInfo(bag, slot)
+	if (count and count > 1 and not noSplit) then
+		if (button == "RightButton") and (IsControlKeyDown()) then
+			local splitCount = math.floor(count / 2)
+			local emptyBag, emptySlot = Auctioneer_FindEmptySlot()
+			if (emptyBag) then
+				SplitContainerItem(bag, slot, splitCount)
+				PickupContainerItem(emptyBag, emptySlot)
+			else
+				Auctioneer_ChatPrint("Can't split, all bags are full")
+			end
+			return
+		end
+	end
+
+	if (AuctionFrame and AuctionFrame:IsVisible()) then
+		local link = GetContainerItemLink(bag, slot)
+		if (link) then
+			if (button == "RightButton") and (IsAltKeyDown()) then
+				AuctionFrameTab_OnClick(1)
+				local itemID = EnhTooltip.BreakLink(link)
+				if (itemID) then
+					local itemName = GetItemInfo(tostring(itemID))
+					if (itemName) then
+						BrowseName:SetText(itemName)
+						BrowseMinLevel:SetText("")
+						BrowseMaxLevel:SetText("")
+						AuctionFrameBrowse.selectedInvtypeIndex = nil
+						AuctionFrameBrowse.selectedClassIndex = nil
+						AuctionFrameBrowse.selectedSubclassIndex = nil
+						IsUsableCheckButton:SetChecked(0)
+						UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+						AuctionFrameBrowse_Search()
+						BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
+					end
+				end
+				return
+			end
+		end
+	end
+
+	if (not CursorHasItem() and AuctionFrameAuctions and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
+		PickupContainerItem(bag, slot)
+		if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
+			ClickAuctionSellItemButton()
+			AuctionsFrameAuctions_ValidateAuction()
+			local start = MoneyInputFrame_GetCopper(StartPrice)
+			local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
+			local duration = AuctionFrameAuctions.duration
+			local warn = AuctionInfoWarnText:GetText()
+			if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
+				warn = ("|c"..Auctioneer_GetWarnColor(warn)..warn.."|r")
+				StartAuction(start, buy, duration);
+				Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
+			end
+			return
+		end
+	end
+
+	if (not CursorHasItem() and AuctionFramePost and AuctionFramePost:IsVisible() and button == "LeftButton" and IsAltKeyDown()) then
+		local _, count = GetContainerItemInfo(bag, slot);
+		if (count) then
+			if (count > 1 and IsShiftKeyDown()) then
+				this.SplitStack = function(button, split)
+					local link = GetContainerItemLink(bag, slot)
+					local _, _, _, _, name = Auctioneer_BreakLink(link);
+					AuctionFramePost:SetAuctionItem(bag, slot, split);
+				end
+				OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
+			else
+				local link = GetContainerItemLink(bag, slot)
+				local _, _, _, _, name = Auctioneer_BreakLink(link);
+				AuctionFramePost:SetAuctionItem(bag, slot, 1);
+			end
+			return
+		end
+	end
 end

@@ -5,7 +5,7 @@
 
 	Auctioneer core functions and variables.
 	Functions central to the major operation of Auctioneer. 
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -197,7 +197,7 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 
 	if (from ~= nil) then serverFaction = from;
 	else serverFaction = Auctioneer_GetAuctionKey(); end;
-	
+
 	EnhTooltip.DebugPrint("Getting data from/for", serverFaction, itemKey);
 	if (AuctionConfig.data == nil) then AuctionConfig.data = {}; end
 	if (AuctionConfig.info == nil) then AuctionConfig.info = {}; end
@@ -294,7 +294,7 @@ function Auctioneer_IsPlayerMade(itemKey, itemData)
 		local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey)
 		itemData = Informant.GetItem(itemID)
 	end
-	
+
 	local reqSkill = 0
 	local reqLevel = 0
 	if (itemData) then
@@ -445,7 +445,7 @@ function Auctioneer_AddonLoaded()
 		};
 		StaticPopup_Show("CONVERT_AUCTIONEER", "","");
 	end
-	
+
 	-- Auto-convert to per-auctKey fixed prices
 	if (AuctionConfig.version == 30200) then
 		if (AuctionConfig.fixedprice) then
@@ -458,26 +458,9 @@ function Auctioneer_AddonLoaded()
 		end
 		AuctionConfig.version = 30201
 	end
-	
+
 	Auctioneer_LockAndLoad();
 end
-
-function Auctioneer_FindEmptySlot()
-	local name, i
-	for bag = 0, 4 do
-		name = GetBagName(bag)
-		i = string.find(name, '(Quiver|Ammo|Bandolier)')
-		if not i then
-			for slot = 1, GetContainerNumSlots(bag),1 do
-				if not (GetContainerItemInfo(bag,slot)) then
-					return bag, slot;
-				end
-			end
-		end
-	end
-end
-
-
 
 -- This is the old (local) hookAuctionHouse() function
 function Auctioneer_HookAuctionHouse()
@@ -500,120 +483,7 @@ end
 
 function Auctioneer_LockAndLoad()
 	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 200, Auctioneer_ConfigureAH);
-
-	Auctioneer_Orig_ContainerFrameItemButton_OnClick = ContainerFrameItemButton_OnClick 
-	ContainerFrameItemButton_OnClick = function(...)
-		local button = arg[1]
-		local ignoreShift = arg[2]
-		local bag = this:GetParent():GetID()
-		local slot = this:GetID()
-
-		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
-		if (count and count > 1 and not noSplit) then
-			if (button == "RightButton") and (IsControlKeyDown()) then
-				local splitCount = math.floor(count / 2)
-				local emptyBag, emptySlot = Auctioneer_FindEmptySlot()
-				if (emptyBag) then
-					SplitContainerItem(bag, slot, splitCount)
-					PickupContainerItem(emptyBag, emptySlot)
-				else
-					Auctioneer_ChatPrint("Can't split, all bags are full")
-				end
-				return
-			end
-		end
-
-		if (AuctionFrame and AuctionFrame:IsVisible()) then
-			local link = GetContainerItemLink(bag, slot)
-			if (link) then
-				if (button == "RightButton") and (IsAltKeyDown()) then
-					AuctionFrameTab_OnClick(1)
-					local itemID = EnhTooltip.BreakLink(link)
-					if (itemID) then
-						local itemName = GetItemInfo(tostring(itemID))
-						if (itemName) then
-							BrowseName:SetText(itemName)
-							BrowseMinLevel:SetText("")
-							BrowseMaxLevel:SetText("")
-							AuctionFrameBrowse.selectedInvtypeIndex = nil
-							AuctionFrameBrowse.selectedClassIndex = nil
-							AuctionFrameBrowse.selectedSubclassIndex = nil
-							IsUsableCheckButton:SetChecked(0)
-							UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-							AuctionFrameBrowse_Search()
-							BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
-						end
-					end
-					return
-				end
-			end
-		end
-		
-		if (not CursorHasItem() and AuctionFrameAuctions and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
-			PickupContainerItem(bag, slot)
-			if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
-				ClickAuctionSellItemButton()
-				AuctionsFrameAuctions_ValidateAuction()
-				local start = MoneyInputFrame_GetCopper(StartPrice)
-				local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
-				local duration = AuctionFrameAuctions.duration
-				local warn = AuctionInfoWarnText:GetText()
-				if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
-					if (Auctioneer_GetFilter('warn-color')) then
-						local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
-						FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
-						FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
-						FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
-						FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
-						FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
-						FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
-						FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
-						FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
-						if (string.find(warn, FrmtWarnToolow)) then
-							--Color Red
-							warn = ("|cffff0000"..warn.."|r")
-						elseif (string.find(warn, FrmtWarnUndercut)) then
-							--Color Yellow
-							warn = ("|cffffff00"..warn.."|r")
-						elseif (string.find(warn, FrmtWarnNocomp) or string.find(warn, FrmtWarnAbovemkt)) then
-							--Color Green
-							warn = ("|cff00ff00"..warn.."|r")
-						elseif (string.find(warn, FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
-							--Color Gray
-							warn = ("|cff999999"..warn.."|r")
-						end
-					else
-						--Color Orange
-						warn = ("|cffe66600"..warn.."|r")
-					end
-					StartAuction(start, buy, duration);
-					Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
-				end
-				return
-			end
-		end
-		
-		if (not CursorHasItem() and AuctionFramePost and AuctionFramePost:IsVisible() and button == "LeftButton" and IsAltKeyDown()) then
-			local _, count = GetContainerItemInfo(bag, slot);
-			if (count) then
-				if (count > 1 and IsShiftKeyDown()) then
-					this.SplitStack = function(button, split)
-						local link = GetContainerItemLink(bag, slot)
-						local _, _, _, _, name = Auctioneer_BreakLink(link);
-						AuctionFramePost:SetAuctionItem(bag, slot, split);
-					end
-					OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
-				else
-					local link = GetContainerItemLink(bag, slot)
-					local _, _, _, _, name = Auctioneer_BreakLink(link);
-					AuctionFramePost:SetAuctionItem(bag, slot, 1);
-				end
-				return
-			end
-		end
-
-		Auctioneer_Orig_ContainerFrameItemButton_OnClick(unpack(arg))
-	end
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, Auctioneer_ContainerFrameItemButton_OnClick);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
@@ -625,7 +495,7 @@ function Auctioneer_LockAndLoad()
 	-- Rearranges elements in the AH window.
 	Auctioneer_ConfigureAH();
 
-	--GUI Registration code added by MentalPower	
+	--GUI Registration code added by MentalPower
 	Auctioneer_Register();
 
 	if not Babylonian.IsAddOnRegistered("Auctioneer") then 

@@ -158,25 +158,10 @@ end
 -- Sets the price model note (i.e. "Undercutting 5%")
 -------------------------------------------------------------------------------
 function AuctionFramePost_SetNoteText(frame, text)
+	local cHex, cRed, cGreen, cBlue = Auctioneer_GetWarnColor(text);
+
 	getglobal(frame:GetName().."PriceModelNoteText"):SetText(text);
-	
-	local FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
-	local FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
-	local FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
-	local FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
-	if (string.find(text, FrmtWarnToolow)) then
-		--Color Red
-		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(1.0, 0.0, 0.0);
-	elseif (string.find(text, FrmtWarnUndercut)) then
-		--Color Yellow
-		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(1.0, 1.0, 0.0);
-	elseif (string.find(text, FrmtWarnNocomp) or string.find(text, FrmtWarnAbovemkt)) then
-		--Color Green
-		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(0.0, 1.0, 0.0);
-	else
-		--Color Gray
-		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(0.6, 0.6, 0.6);
-	end
+	getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(cRed, cGreen, cBlue);
 end
 
 -------------------------------------------------------------------------------
@@ -185,7 +170,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetSavePrice(frame)
 	local checkbox = getglobal(frame:GetName().."SavePriceCheckBox");
-	return (checkbox:IsVisible() and checkbox:GetChecked());
+	return (checkbox and checkbox:IsVisible() and checkbox:GetChecked());
 end
 
 -------------------------------------------------------------------------------
@@ -233,7 +218,7 @@ end
 function AuctionFramePost_SetStackSize(frame, size)
 	-- Update the stack size.
 	getglobal(frame:GetName().."StackSize"):SetNumber(size);
-	
+
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
 	frame:ValidateAuction();
@@ -318,16 +303,16 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 	if (bag and item) then
 		-- Get the item's information.
 		local itemLink = GetContainerItemLink(bag, item)
-		local itemID, randomProp, enchant, uniqueId, name = Auctioneer_BreakLink(itemLink); -- TODO: Auctioneer Dependency
+		local itemID, randomProp, enchant, uniqueId, name = Auctioneer_BreakLink(itemLink);
 		local itemTexture, itemCount = GetContainerItemInfo(bag, item);
 		if (count == nil) then
 			count = itemCount;
 		end
-		
+
 		-- Save the item's information.	
 		frame.itemName = name;
 		frame.itemID = itemID;
-	
+
 		-- Show the item
 		getglobal(button:GetName().."Name"):SetText(name);
 		getglobal(button:GetName().."Name"):Show();
@@ -339,7 +324,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		--else
 		--	getglobal(button:GetName().."Count"):Hide();
 		--end
-		
+
 		-- Set the defaults.
 		frame:SetDuration(1440);
 		frame:SetStackSize(count);
@@ -349,7 +334,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Clear the item's information.
 		frame.itemName = nil;
 		frame.itemID = nil;
-	
+
 		-- Hide the item
 		getglobal(button:GetName().."Name"):Hide();
 		getglobal(button:GetName().."IconTexture"):Hide();
@@ -360,7 +345,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		frame:SetStackCount(1);
 		AuctionFramePost_UpdatePriceModels(frame, nil, nil);
 	end
-	
+
 	-- Update the deposit cost and validate the auction.
 	frame.updating = false;
 	frame:UpdateDeposit();
@@ -388,7 +373,7 @@ function AuctionFramePost_ValidateAuction(frame)
 		else
 			startErrorText:Hide();
 		end
-	
+
 		-- Check that the starting price is less than or equal to the buyout.
 		local buyoutPrice = frame:GetBuyoutPrice();
 		local buyoutErrorText = getglobal(frame:GetName().."BuyoutPriceInvalidText");
@@ -435,7 +420,7 @@ function AuctionFramePost_ValidateAuction(frame)
 		else
 			button:Disable();
 		end
-		
+
 		-- Update the price model to reflect bid and buyout prices.
 		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
 		local index = UIDropDownMenu_GetSelectedID(dropdown);
@@ -468,7 +453,7 @@ function AuctionFramePost_AuctionItem_OnClick(button)
 	if (item) then
 		PickupContainerItem(item.bag, item.slot);
 	end
-	
+
 	-- Update the current item displayed
 	if (item) then	
 		local itemLink = GetContainerItemLink(item.bag, item.slot)
@@ -567,7 +552,7 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 
 	-- Post the auction.
 	AucPostManager.PostAuction(name, stackSize, stackCount, startPrice, buyoutPrice, duration);
-	
+
 	-- Clear the current auction item.
 	frame:SetAuctionItem(nil, nil, nil);
 end
@@ -616,7 +601,7 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 		if (price.bid) then
 			frame:SetStartPrice(price.bid);
 		end
-		
+
 		if (price.text == "Custom Price") then
 			getglobal(frame:GetName().."SavePriceText"):Show();
 			getglobal(frame:GetName().."SavePriceCheckBox"):Show();
@@ -630,7 +615,7 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 			getglobal(frame:GetName().."SavePriceCheckBox"):Hide();
 			getglobal(frame:GetName().."PriceModelNoteText"):Hide();
 		end
-		
+
 		UIDropDownMenu_SetSelectedID(dropdown, index);
 	else
 		frame:SetNoteText("");
@@ -665,10 +650,9 @@ function AuctionFramePost_CalculateAuctionDeposit(itemID, duration)
 end
 
 -------------------------------------------------------------------------------
--- Calculate the deposit required for the specified item.
---
--- TODO: Figure out how to get the maximum stack size for the item.
+-- Calculate the maximum stack size for an item based on the information returned by GetItemInfo()
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetMaxStackSize(itemID)
-	return 20;
+	local itemName, itemLink, itemRarity, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemInvTexture = GetItemInfo(itemID);
+	return itemStackCount;
 end
