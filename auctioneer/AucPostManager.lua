@@ -129,7 +129,7 @@ end
 -- Executes the request at the head of the queue.
 -------------------------------------------------------------------------------
 function processRequestQueue()
-	if (AuctionFrame:IsVisible() and table.getn(RequestQueue) > 0) then
+	if (AuctionFrame and AuctionFrame:IsVisible() and table.getn(RequestQueue) > 0) then
 		run(RequestQueue[1]);
 	end
 end

@@ -379,7 +379,7 @@ end
 -------------------------------------------------------------------------------
 function beginProcessingRequestQueue()
 	if (not ProcessingRequestQueue and
-		AuctionFrame:IsVisible() and
+		AuctionFrame and AuctionFrame:IsVisible() and
 		table.getn(RequestQueue) > 0 and
 		not Auctioneer_isScanningRequested and
 		not isQueryInProgress() and
