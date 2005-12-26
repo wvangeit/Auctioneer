@@ -1,6 +1,6 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
 <!--
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
 	License:

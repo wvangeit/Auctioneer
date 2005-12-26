@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id $
+	Revision: $Id$
 
 	AucPostManager - manages posting auctions in the AH
 

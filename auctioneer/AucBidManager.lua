@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id $
+	Revision: $Id$
 
 	BidManager - manages bid requests in the AH
 
