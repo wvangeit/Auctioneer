@@ -21,7 +21,6 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --]]
 
-
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFramePost_OnLoad()
@@ -45,12 +44,132 @@ function AuctionFramePost_OnLoad()
 	this.GetDeposit = AuctionFramePost_GetDeposit;
 	this.SetAuctionItem = AuctionFramePost_SetAuctionItem;
 	this.ValidateAuction = AuctionFramePost_ValidateAuction;
+	this.UpdateAuctionList = AuctionFramePost_UpdateAuctionList;
 
 	-- Data Members
 	this.itemID = nil;
 	this.itemName = nil;
 	this.updating = false;
 	this.prices = {};
+
+	-- Controls
+	this.auctionList = getglobal(this:GetName().."List");
+
+	-- Configure the logical columns
+	this.logicalColumns = 
+	{
+		Quantity =
+		{
+			title = _AUCT("UiQuantityHeader");
+			dataType = "Number";
+			valueFunc = (function(record) return record.quantity end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.quantity < record2.quantity end);
+			compareDescendingFunc = (function(record1, record2) return record1.quantity > record2.quantity end);
+		},
+		Name =
+		{
+			title = _AUCT("UiNameHeader");
+			dataType = "String";
+			valueFunc = (function(record) return record.name end);
+			colorFunc = AuctionFramePost_GetItemColor;
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.name < record2.name end);
+			compareDescendingFunc = (function(record1, record2) return record1.name > record2.name end);
+		},
+		TimeLeft =
+		{
+			title = _AUCT("UiTimeLeftHeader");
+			dataType = "String";
+			valueFunc = (function(record) return Auctioneer_GetTimeLeftString(record.timeLeft) end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.timeLeft < record2.timeLeft end);
+			compareDescendingFunc = (function(record1, record2) return record1.timeLeft > record2.timeLeft end);
+		},
+		Bid =
+		{
+			title = _AUCT("UiBidHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.bid end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.bid < record2.bid end);
+			compareDescendingFunc = (function(record1, record2) return record1.bid > record2.bid end);
+		},
+		BidPer =
+		{
+			title = _AUCT("UiBidPerHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.bidPer end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.bidPer < record2.bidPer end);
+			compareDescendingFunc = (function(record1, record2) return record1.bidPer > record2.bidPer end);
+		},
+		Buyout =
+		{
+			title = _AUCT("UiBuyoutHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.buyout end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.buyout < record2.buyout end);
+			compareDescendingFunc = (function(record1, record2) return record1.buyout > record2.buyout end);
+		},
+		BuyoutPer =
+		{
+			title = _AUCT("UiBuyoutPerHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.buyoutPer end);
+			alphaFunc = AuctionFramePost_GetItemAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.buyoutPer < record2.buyoutPer end);
+			compareDescendingFunc = (function(record1, record2) return record1.buyoutPer > record2.buyoutPer end);
+		},
+	};
+
+	-- Configure the physical columns
+	this.physicalColumns = 
+	{
+		{
+			width = 50;
+			logicalColumn = this.logicalColumns.Quantity;
+			logicalColumns = { this.logicalColumns.Quantity };
+			sortAscending = true;
+		},
+		{
+			width = 210;
+			logicalColumn = this.logicalColumns.Name;
+			logicalColumns = { this.logicalColumns.Name };
+			sortAscending = true;
+		},
+		{
+			width = 90;
+			logicalColumn = this.logicalColumns.TimeLeft;
+			logicalColumns = { this.logicalColumns.TimeLeft };
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = this.logicalColumns.Bid;
+			logicalColumns =
+			{
+				this.logicalColumns.Bid,
+				this.logicalColumns.BidPer
+			};
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = this.logicalColumns.Buyout;
+			logicalColumns =
+			{
+				this.logicalColumns.Buyout,
+				this.logicalColumns.BuyoutPer
+			};
+			sortAscending = true;
+		},
+	};
+
+	this.auctions = {};
+	ListTemplate_Initialize(this.auctionList, this.physicalColumns, this.logicalColumns);
+	ListTemplate_SetContent(this.auctionList, this.auctions);
 
 	this:ValidateAuction();
 end
@@ -114,6 +233,35 @@ function AuctionFramePost_UpdatePriceModels(frame, name, count)
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 		this = oldThis;
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Updates the content of the auction list based on the current auction item.
+-------------------------------------------------------------------------------
+function AuctionFramePost_UpdateAuctionList(frame)
+	frame.auctions = {};
+	local itemName = frame:GetItemName();
+	if (itemName) then
+		local auctions = Auctioneer_QuerySnapshot(AuctionFramePost_ItemNameFilter, itemName);
+		if (auctions) then
+			for _,a in pairs(auctions) do
+				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+				local auction = {};
+				auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
+				auction.quantity = count;
+				auction.name = itemName;
+				auction.owner = a.owner;
+				auction.timeLeft = a.timeLeft;
+				auction.bid = Auctioneer_GetCurrentBid(a.signature);
+				auction.bidPer = math.floor(auction.bid / auction.quantity);
+				auction.buyout = buyout;
+				auction.buyoutPer = math.floor(auction.buyout / auction.quantity);
+				table.insert(frame.auctions, auction);
+			end
+		end
+	end
+	ListTemplate_SetContent(frame.auctionList, frame.auctions);
+	ListTemplate_Sort(frame.auctionList, 5);
 end
 
 -------------------------------------------------------------------------------
@@ -349,6 +497,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 	-- Update the deposit cost and validate the auction.
 	frame.updating = false;
 	frame:UpdateDeposit();
+	frame:UpdateAuctionList();
 	frame:ValidateAuction();
 end
 
@@ -655,4 +804,33 @@ end
 function AuctionFramePost_GetMaxStackSize(itemID)
 	local itemName, itemLink, itemRarity, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemInvTexture = GetItemInfo(itemID);
 	return itemStackCount;
+end
+
+-------------------------------------------------------------------------------
+-- Filter for Auctioneer_QuerySnapshot that filters on item name.
+-------------------------------------------------------------------------------
+function AuctionFramePost_ItemNameFilter(item, signature)
+	local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
+	if (item == name) then
+		return false;
+	end
+	return true;
+end
+
+-------------------------------------------------------------------------------
+-- Returns 1.0 for player auctions and 0.4 for competing auctions
+-------------------------------------------------------------------------------
+function AuctionFramePost_GetItemAlpha(record)
+	if (record.owner ~= UnitName("player")) then
+		return 0.4;
+	end
+	return 1.0;
+end
+
+-------------------------------------------------------------------------------
+-- Returns the item color for the specified result
+-------------------------------------------------------------------------------
+function AuctionFramePost_GetItemColor(auction)
+	_, _, rarity = GetItemInfo(auction.item);
+	return ITEM_QUALITY_COLORS[rarity];
 end

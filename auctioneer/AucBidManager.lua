@@ -52,14 +52,14 @@ local CurrentSearchParams =
 local PendingBids = {};
 
 -- Result codes for bid requests.
-local ResultCodes = {}
-ResultCodes["BidAccepted"] = 0;
-ResultCodes["ItemNotFound"] = 1;
-ResultCodes["NotEnoughMoney"] = 2;
-ResultCodes["OwnAuction"] = 3;
-ResultCodes["AlreadyHigherBid"] = 4;
-ResultCodes["AlreadyHighBidder"] = 5;
-ResultCodes["CurrentBidLower"] = 6;
+BidResultCodes = {}
+BidResultCodes["BidAccepted"] = 0;
+BidResultCodes["ItemNotFound"] = 1;
+BidResultCodes["NotEnoughMoney"] = 2;
+BidResultCodes["OwnAuction"] = 3;
+BidResultCodes["AlreadyHigherBid"] = 4;
+BidResultCodes["AlreadyHighBidder"] = 5;
+BidResultCodes["CurrentBidLower"] = 6;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -109,19 +109,19 @@ function AucBidManagerFrame_OnEvent(event)
 		processRequestQueue();
 	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
 		 if (arg1 == ERR_AUCTION_BID_PLACED) then -- TODO: %localize%
-		 	onBidResponse(ResultCodes["BidAccepted"]);
+		 	onBidResponse(BidResultCodes["BidAccepted"]);
 			processRequestQueue();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
 		debugPrint("UI_ERROR_MESSAGE - "..arg1);
 		if (arg1 == ERR_ITEM_NOT_FOUND) then
-			onBidResponse(ResultCodes["ItemNotFound"]);
+			onBidResponse(BidResultCodes["ItemNotFound"]);
 		elseif (arg1 == ERR_NOT_ENOUGH_MONEY) then
-			onBidResponse(ResultCodes["NotEnoughMoney"]);
+			onBidResponse(BidResultCodes["NotEnoughMoney"]);
 		elseif (arg1 == ERR_AUCTION_BID_OWN) then
-			onBidResponse(ResultCodes["OwnAuction"]);
+			onBidResponse(BidResultCodes["OwnAuction"]);
 		elseif (arg1 == ERR_AUCTION_HIGHER_BID) then
-			onBidResponse(ResultCodes["AlreadyHigherBid"]);
+			onBidResponse(BidResultCodes["AlreadyHigherBid"]);
 		end
 		processRequestQueue();
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
@@ -195,7 +195,7 @@ function onBidResponse(result)
 		-- If there is an associated request, add our result to it.
 		local request = bid.request;
 		if (request) then
-			if (result == ResultCodes["BidAccepted"]) then
+			if (result == BidResultCodes["BidAccepted"]) then
 				table.insert(request.results, result);
 
 				if (request.bid == request.buyout) then
@@ -207,20 +207,20 @@ function onBidResponse(result)
 					chatPrint("Bid on auction: "..request.name.." (x"..request.count..")");
 				end
 
-			elseif (result == ResultCodes["ItemNotFound"]) then
+			elseif (result == BidResultCodes["ItemNotFound"]) then
 				-- nothing to do
 
-			elseif (result == ResultCodes["NotEnoughMoney"]) then
+			elseif (result == BidResultCodes["NotEnoughMoney"]) then
 				table.insert(request.results, result);
 				-- %localize%
 				chatPrint("Not enough money to bid on auction: "..request.name.." (x"..request.count..")");
 
-			elseif (result == ResultCodes["OwnAuction"]) then
+			elseif (result == BidResultCodes["OwnAuction"]) then
 				table.insert(request.results, result);
 				-- %localize%
 				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
 
-			elseif (result == ResultCodes["AlreadyHigherBid"]) then
+			elseif (result == BidResultCodes["AlreadyHigherBid"]) then
 				table.insert(request.results, result);
 				-- %localize%
 				chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..")");
@@ -228,7 +228,7 @@ function onBidResponse(result)
 		end
 
 		-- Process the bid result		.
-		if (result == ResultCodes["BidAccepted"] and request) then
+		if (result == BidResultCodes["BidAccepted"] and request) then
 			-- Check if there is a corresponding request and upate it to
 			-- reflect the successful bid.
 			if (request) then
@@ -244,17 +244,17 @@ function onBidResponse(result)
 				end
 			end
 
-		elseif (result ~= ResultCodes["BidAccepted"]) then
+		elseif (result ~= BidResultCodes["BidAccepted"]) then
 			-- We were expecting the list to update after our bid/buyout, but
 			-- our bid/buyout failed so we won't be getting an update.
 			CurrentSearchParams.complete = true;
 
-			if (result == ResultCodes["NotEnoughMoney"] and request) then
+			if (result == BidResultCodes["NotEnoughMoney"] and request) then
 				-- We ran out of money so we need to remove the request, lest
 				-- we get stuck in a loop forever.
 				removeRequestFromQueue();
 
-			elseif (result == ResultCodes["OwnAuction"] and bid.owner) then
+			elseif (result == BidResultCodes["OwnAuction"] and bid.owner) then
 				-- We tried bidding on our own auction! Blizzard doesn't
 				-- allow bids from any player on the account that posted
 				-- the auction. Therefore we keep a dynamic list of all
@@ -483,7 +483,7 @@ function processPage()
 
 			-- Check if the auction is owned by the player.
 			if (isPlayerOnAccount(owner)) then
-				table.insert(request.results, ResultCodes["OwnAuction"]);
+				table.insert(request.results, BidResultCodes["OwnAuction"]);
 				-- %localize%
 				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
 
@@ -495,7 +495,7 @@ function processPage()
 			else
 				-- Check if we are already the high bidder
 				if (highBidder) then
-					table.insert(request.results, ResultCodes["AlreadyHighBidder"]);
+					table.insert(request.results, BidResultCodes["AlreadyHighBidder"]);
 					-- %localize%
 					chatPrint("Already the high bidder on auction: "..request.name.." (x"..request.count..")");
 
@@ -507,13 +507,13 @@ function processPage()
 
 					-- Check if there is already a higher bidder
 					elseif (bidAmount > request.bid) then
-						table.insert(request.results, ResultCodes["AlreadyHigherBid"]);
+						table.insert(request.results, BidResultCodes["AlreadyHigherBid"]);
 						-- %localize%
 						chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..") at "..bidAmount);
 
 					-- Otherwise the bid must be lower...
 					else
-						table.insert(request.results, ResultCodes["CurrentBidLower"]);
+						table.insert(request.results, BidResultCodes["CurrentBidLower"]);
 						-- %localize%
 						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..bidAmount);
 					end
@@ -526,7 +526,7 @@ function processPage()
 
 					-- Otherwise the min bid is lower...
 					else
-						table.insert(request.results, ResultCodes["CurrentBidLower"]);
+						table.insert(request.results, BidResultCodes["CurrentBidLower"]);
 						-- %localize%
 						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..minBid);
 					end

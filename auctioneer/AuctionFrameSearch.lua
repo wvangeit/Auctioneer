@@ -844,9 +844,9 @@ function AuctionFrameSearch_OnBidResult(context, bidRequest)
 		-- until proven otherwise.
 		context.auction.status = AUCTION_STATUS_HIGH_BIDDER;
 		for _,result in pairs(bidRequest.results) do
-			if (result ~= ACCEPTED_BID and
-				result ~= REJECTED_ALREADY_HIGH_BIDDER and
-				result ~= REJECTED_OWN_AUCTION) then
+			if (result ~= BidResultCodes["BidAccepted"] and
+				result ~= BidResultCodes["AlreadyHighBidder"] and
+				result ~= BidResultCodes["OwnAuction"]) then
 				context.auction.status = AUCTION_STATUS_UNKNOWN;
 				break;
 			end
@@ -860,7 +860,7 @@ end
 function AuctionFrameSearch_GetAuctionAlpha(auction)
 	local status = auction.status;
 	if (status and (status == AUCTION_STATUS_NOT_FOUND or status == AUCTION_STATUS_HIGH_BIDDER)) then
-		return 0.3;
+		return 0.4;
 	end
 	return 1.0;
 end
