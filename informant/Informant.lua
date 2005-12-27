@@ -69,6 +69,9 @@ local itemInfo = nil
 
 -- GLOBAL VARIABLES
 
+BINDING_HEADER_INFORMANT_HEADER = _INFM('BindingHeader')
+BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('BindingTitle')
+	
 InformantConfig = {}
 
 -- LOCAL DEFINES
