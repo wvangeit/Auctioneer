@@ -55,11 +55,12 @@ end
 
 
 -- filters out all auctions except those that have no more than maximumTime remaining and meet profit requirements
-function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, minQuality,itemName)
+function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, category, minQuality,itemName)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id..":"..rprop..":"..enchant;
 	if (not maximumTime) then maximumTime = 100000 end
+	if (not category) then category = 0 end
 	if (not minQuality) then minQuality = 0 end
 
 	if (itemName) then
@@ -75,16 +76,13 @@ function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, minQualit
 		if (sbuy) then buyoutValues = sbuy.buyoutPrices end
 		local lowest, second = Auctioneer_GetLowest(buyoutValues);
 
---		-- Take a generous stab in the dark at what the HSP will be
---		-- If the current bid falls under that value, only then should
---		-- we go to the effort of calculating actual profit.
---		-- Note: if second == nil, this indicates no competition.
---		if (second == nil or currentBid < second * 1.2 and currentBid <= MAX_BUYOUT_PRICE) then
-			local itemCat = Auctioneer_GetCatForKey(itemKey);
+		local itemCat = Auctioneer_GetCatForKey(itemKey);
+		if (category == 0 or itemCat == category) then
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 
 			if (snap) then
-				if (tonumber(snap.quality) >= minQuality) then
+				p(snap.quality, minQuality)
+				if (tonumber(snap.quality) >= tonumber(minQuality)) then
 					local timeLeft = tonumber(snap.timeLeft);
 					local elapsedTime = time() - tonumber(snap.lastSeenTime);
 					local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
@@ -95,14 +93,13 @@ function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, minQualit
 						local profit = (hsp * count) - currentBid;
 						local profitPricePercent = math.floor((profit / currentBid) * 100);
 
---						if (profit >= minProfit and profitPricePercent >= MIN_PROFIT_PRICE_PERCENT and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
 						if ((minProfit == 0 or profit >= minProfit) and seenCount >= MIN_BUYOUT_SEEN_COUNT and not Auctioneer_IsBadResaleChoice(signature)) then 
 							filterAuction = false;
 						end
 					end
 				end
 			end
---		end
+		end
 	end
 
 	return filterAuction;
@@ -135,14 +132,21 @@ function Auctioneer_CompetingFilter(minLess, signature, myAuctions)
 	return true;
 end
 
-
 -- filters out all auctions that are not a given percentless than the median for that item.
-function Auctioneer_PercentLessFilter(percentLess, signature)
+function Auctioneer_PercentLessFilter(percentLess, signature, category, minQuality, itemName)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
 	local itemKey = id .. ":" .. rprop..":"..enchant;
 	local auctKey = Auctioneer_GetAuctionKey();
 
+	if (not category) then category = 0 end
+	if (not minQuality) then minQuality = 0 end
+
+	if (itemName) then
+		local i,j = string.find(string.lower(name), string.lower(itemName))
+		if (not i) then return true end
+	end
+	
 	local hsp, seenCount = Auctioneer_GetHSP(itemKey, auctKey)
 
 	if hsp > 0 and seenCount >= MIN_BUYOUT_SEEN_COUNT then
@@ -150,14 +154,63 @@ function Auctioneer_PercentLessFilter(percentLess, signature)
 		--see if this auction should not be filtered
 		if (buyout > 0 and Auctioneer_PercentLessThan(hsp, buyout / count) >= tonumber(percentLess) and profit >= MIN_PROFIT_MARGIN) then
 			local itemCat = Auctioneer_GetCatForKey(itemKey);
+			if (category == 0 or itemCat == category) then
+				local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
+				if (snap) then
+					if (tonumber(snap.quality) >= tonumber(minQuality)) then
+						local timeLeft = tonumber(snap.timeLeft);
+						local elapsedTime = time() - tonumber(snap.lastSeenTime);
+						local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+
+						if (secondsLeft > 0) then
+							filterAuction = false;
+						end
+					end
+				end
+			end
+		end
+	end
+
+	return filterAuction;
+end
+
+-- filters out all auctions that are not below a certain price.
+function Auctioneer_PlainFilter(maxPrice, signature, category, minQuality, itemName)
+	local filterAuction = true;
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
+	local itemKey = id .. ":" .. rprop..":"..enchant;
+	local auctKey = Auctioneer_GetAuctionKey();
+
+	if (not category) then category = 0 end
+	if (not minQuality) then minQuality = 0 end
+
+	if (itemName) then
+		local i,j = string.find(string.lower(name), string.lower(itemName))
+		if (not i) then return true end
+	end
+
+	if (count and count > 1) then maxPrice = maxPrice * count end
+
+	-- check to see if we need to retrieve the current bid before actually getting it
+	local currentBid = min
+	if (min <= maxPrice and (not buyout or buyout == 0 or buyout > maxPrice)) then
+		local bid = Auctioneer_GetCurrentBid(signature);
+		if (bid) then currentBid = bid end
+	end
+		
+	if (currentBid <= maxPrice or (buyout and buyout > 0 and buyout <= maxPrice)) then
+		local itemCat = Auctioneer_GetCatForKey(itemKey);
+		if (category == 0 or itemCat == category) then
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 			if (snap) then
-				local timeLeft = tonumber(snap.timeLeft);
-				local elapsedTime = time() - tonumber(snap.lastSeenTime);
-				local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
+				if (tonumber(snap.quality) >= tonumber(minQuality)) then
+					local timeLeft = tonumber(snap.timeLeft);
+					local elapsedTime = time() - tonumber(snap.lastSeenTime);
+					local secondsLeft = TIME_LEFT_SECONDS[timeLeft] - elapsedTime;
 
-				if (secondsLeft > 0) then
-					filterAuction = false;
+					if (secondsLeft > 0) then
+						filterAuction = false;
+					end
 				end
 			end
 		end

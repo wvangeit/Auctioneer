@@ -40,6 +40,7 @@ function AuctionFrameSearch_OnLoad()
 	this.SearchBids = AuctionFrameSearch_SearchBids;
 	this.SearchBuyouts = AuctionFrameSearch_SearchBuyouts;
 	this.SearchCompetition = AuctionFrameSearch_SearchCompetition;
+	this.SearchPlain = AuctionFrameSearch_SearchPlain;
 	this.SelectResultByIndex = AuctionFrameSearch_SelectResultByIndex;
 
 	-- Controls
@@ -47,6 +48,7 @@ function AuctionFrameSearch_OnLoad()
 	this.bidFrame = getglobal(this:GetName().."Bid");
 	this.buyoutFrame = getglobal(this:GetName().."Buyout");
 	this.competeFrame = getglobal(this:GetName().."Compete");
+	this.plainFrame = getglobal(this:GetName().."Plain");
 	this.resultsList = getglobal(this:GetName().."List");
 	this.bidButton = getglobal(this:GetName().."BidButton");
 	this.buyoutButton = getglobal(this:GetName().."BuyoutButton");
@@ -157,6 +159,15 @@ function AuctionFrameSearch_OnLoad()
 			compareAscendingFunc = (function(record1, record2) return record1.percentLess < record2.percentLess end);
 			compareDescendingFunc = (function(record1, record2) return record1.percentLess > record2.percentLess end);
 		},
+		ItemLevel =
+		{
+			title = _AUCT("UiItemLevelHeader");
+			dataType = "Number";
+			valueFunc = (function(record) return record.level end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.level < record2.level end);
+			compareDescendingFunc = (function(record1, record2) return record1.level > record2.level end);
+		},
 	};
 
 	-- Configure the bid search physical columns
@@ -233,6 +244,8 @@ function AuctionFrameSearch_OnLoad()
 			logicalColumn = this.logicalColumns.Buyout;
 			logicalColumns =
 			{
+				this.logicalColumns.Bid,
+				this.logicalColumns.BidPer,
 				this.logicalColumns.Buyout,
 				this.logicalColumns.BuyoutPer
 			};
@@ -243,6 +256,8 @@ function AuctionFrameSearch_OnLoad()
 			logicalColumn = this.logicalColumns.Profit;
 			logicalColumns =
 			{
+				this.logicalColumns.Bid,
+				this.logicalColumns.BidPer,
 				this.logicalColumns.Profit,
 				this.logicalColumns.ProfitPer
 			};
@@ -305,6 +320,64 @@ function AuctionFrameSearch_OnLoad()
 		},
 	};
 
+	-- Configure the plain search physical columns
+	this.plainSearchPhysicalColumns = 
+	{
+		{
+			width = 40;
+			logicalColumn = this.logicalColumns.Quantity;
+			logicalColumns = { this.logicalColumns.Quantity };
+			sortAscending = true;
+		},
+		{
+			width = 170;
+			logicalColumn = this.logicalColumns.Name;
+			logicalColumns = { this.logicalColumns.Name };
+			sortAscending = true;
+		},
+		{
+			width = 90;
+			logicalColumn = this.logicalColumns.TimeLeft;
+			logicalColumns = { this.logicalColumns.TimeLeft };
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = this.logicalColumns.Bid;
+			logicalColumns =
+			{
+				this.logicalColumns.Bid,
+				this.logicalColumns.BidPer,
+				this.logicalColumns.Buyout,
+				this.logicalColumns.BuyoutPer
+			};
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = this.logicalColumns.Buyout;
+			logicalColumns =
+			{
+				this.logicalColumns.Profit,
+				this.logicalColumns.ProfitPer,
+				this.logicalColumns.Buyout,
+				this.logicalColumns.BuyoutPer
+			};
+			sortAscending = true;
+		},
+		{
+			width = 50;
+			logicalColumn = this.logicalColumns.PercentLess;
+			logicalColumns =
+			{
+				this.logicalColumns.PercentLess,
+				this.logicalColumns.ItemLevel
+			};
+			sortAscending = true;
+		},
+	};
+
+
 	-- Initialize the list to show nothing at first.
 	ListTemplate_Initialize(this.resultsList, this.results, this.results);
 	this:SelectResultByIndex(nil);
@@ -320,8 +393,9 @@ function AuctionFrameSearch_SearchDropDown_Initialize()
 	AUCTIONEER_SEARCH_TYPES[1] = _AUCT("UiSearchTypeBids");
 	AUCTIONEER_SEARCH_TYPES[2] = _AUCT("UiSearchTypeBuyouts");
 	AUCTIONEER_SEARCH_TYPES[3] = _AUCT("UiSearchTypeCompetition");
+	AUCTIONEER_SEARCH_TYPES[4] = _AUCT("UiSearchTypePlain");
 
-	for i=1, 3 do
+	for i=1, 4 do
 		UIDropDownMenu_AddButton({
 			text = AUCTIONEER_SEARCH_TYPES[i],
 			func = AuctionFrameSearch_SearchDropDownItem_OnClick,
@@ -351,10 +425,10 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 	local dropdown = this.owner;
 	local frame = dropdown:GetParent();
 	local frameName = frame:GetName();
+	local text;
 
 	if (index > 1) then
-		local text = this.value
-		Auctioneer_ChatPrint("Loading saved search: "..text);
+		text = this.value
 		local searchData = AuctionConfig.SavedSearches[text];
 		local searchParams = Auctioneer_Split(searchData, "\t");
 		
@@ -371,28 +445,76 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			getglobal(frameName.."BidTimeLeftDropDown").selectedID = timeLeft
 			getglobal(frameName.."BidTimeLeftDropDownText"):SetText(TIME_LEFT_NAMES[timeLeft])
 
-			local quality = tonumber(searchParams[5])
+			local catid = tonumber(searchParams[5])
+			getglobal(frameName.."BidCategoryDropDown").selectedID = catid
+			getglobal(frameName.."BidCategoryDropDownText"):SetText(AuctionConfig.classes[catid-1].name)
+		
+			local quality = tonumber(searchParams[6])
 			getglobal(frameName.."BidMinQualityDropDown").selectedID = quality
 			getglobal(frameName.."BidMinQualityDropDownText"):SetText(getglobal("ITEM_QUALITY"..(quality-1).."_DESC"))
 		
-			getglobal(frameName.."BidSearchEdit"):SetText(searchParams[6])
+			getglobal(frameName.."BidSearchEdit"):SetText(searchParams[7])
 
 			frame.bidFrame:Show();
 			frame.buyoutFrame:Hide();
 			frame.competeFrame:Hide();
+			frame.plainFrame:Hide();
+		elseif (searchType == 2) then
+			-- Buyout search
+			MoneyInputFrame_SetCopper(getglobal(frameName.."BuyoutMinProfit"), tonumber(searchParams[2]))
+			getglobal(frameName.."BuyoutMinPercentLessEdit"):SetText(searchParams[3])
+
+			local catid = tonumber(searchParams[4])
+			getglobal(frameName.."BuyoutCategoryDropDown").selectedID = catid
+			getglobal(frameName.."BuyoutCategoryDropDownText"):SetText(AuctionConfig.classes[catid-1].name)
+
+			local quality = tonumber(searchParams[5])
+			getglobal(frameName.."BuyoutMinQualityDropDown").selectedID = quality
+			getglobal(frameName.."BuyoutMinQualityDropDownText"):SetText(getglobal("ITEM_QUALITY"..(quality-1).."_DESC"))
+		
+			getglobal(frameName.."BuyoutSearchEdit"):SetText(searchParams[6])
+
+			frame.bidFrame:Hide();
+			frame.buyoutFrame:Show();
+			frame.competeFrame:Hide();
+			frame.plainFrame:Hide();
+		elseif (searchType == 3) then
+			-- Compete search
+			MoneyInputFrame_SetCopper(getglobal(frameName.."CompeteUndercut"), tonumber(searchParams[2]))
+
+			frame.bidFrame:Hide();
+			frame.buyoutFrame:Hide();
+			frame.competeFrame:Show();
+			frame.plainFrame:Hide();
+		elseif (searchType == 4) then
+			-- Plain search
+			MoneyInputFrame_SetCopper(getglobal(frameName.."PlainMaxPrice"), tonumber(searchParams[2]))
+
+			local catid = tonumber(searchParams[3])
+			getglobal(frameName.."PlainCategoryDropDown").selectedID = catid
+			getglobal(frameName.."PlainCategoryDropDownText"):SetText(AuctionConfig.classes[catid-1].name)
+
+			local quality = tonumber(searchParams[4])
+			getglobal(frameName.."PlainMinQualityDropDown").selectedID = quality
+			getglobal(frameName.."PlainMinQualityDropDownText"):SetText(getglobal("ITEM_QUALITY"..(quality-1).."_DESC"))
+		
+			getglobal(frameName.."PlainSearchEdit"):SetText(searchParams[5])
+
+			frame.bidFrame:Hide();
+			frame.buyoutFrame:Hide();
+			frame.competeFrame:Hide();
+			frame.plainFrame:Show();
 		end
 	end
+	getglobal(frameName.."SaveSearchEdit"):SetText(text);
 end
 
 function AuctionFrameSearch_SavedSearchDropDown_Initialize()
 	local dropdown = AuctionFrameSearchSavedSearchDropDown
 	local frame = dropdown:GetParent()
 	
-	Auctioneer_ChatPrint("Clearing "..dropdown:GetName())
-	UIDropDownMenu_ClearAll(dropdown)
-	Auctioneer_ChatPrint("Cleared")
+--	UIDropDownMenu_ClearAll(dropdown)
 	if (not AuctionConfig.SavedSearches) then
-		Auctioneer_ChatPrint("Setting empty search")
 		UIDropDownMenu_AddButton({
 			text = "",
 			func = AuctionFrameSearch_SavedSearchDropDownItem_OnClick,
@@ -447,14 +569,28 @@ function AuctionFrameSearch_SearchDropDownItem_SetSelectedID(dropdown, index)
 	frame.bidFrame:Hide();
 	frame.buyoutFrame:Hide();
 	frame.competeFrame:Hide();
+	frame.plainFrame:Hide();
 	if (index == 1) then
 		frame.bidFrame:Show();
 	elseif (index == 2) then
 		frame.buyoutFrame:Show();
 	elseif (index == 3) then
 		frame.competeFrame:Show();
+	elseif (index == 4) then
+		frame.plainFrame:Show();
 	end
 	UIDropDownMenu_SetSelectedID(dropdown, index);
+end
+
+function AuctionFrameSearch_RemoveSearchButton_OnClick(button)
+	local frame = button:GetParent();
+	local frameName = frame:GetName();
+
+	local searchName = getglobal(frameName.."SaveSearchEdit"):GetText()
+	if (AuctionConfig.SavedSearches) then
+		AuctionConfig.SavedSearches[searchName] = nil
+	end
+	getglobal(frameName.."SaveSearchEdit"):SetText("")
 end
 
 function AuctionFrameSearch_SaveSearchButton_OnClick(button)
@@ -466,13 +602,39 @@ function AuctionFrameSearch_SaveSearchButton_OnClick(button)
 	local searchData = nil
 	if (searchType == 1) then
 		-- Bid-based search
-		searchData = string.format("%d\t%d\t%s\t%d\t%d\t%s",
+		searchData = string.format("%d\t%d\t%s\t%d\t%d\t%d\t%s",
 			searchType, 
 			MoneyInputFrame_GetCopper(getglobal(frameName.."BidMinProfit")),
 			getglobal(frameName.."BidMinPercentLessEdit"):GetText(),
 			UIDropDownMenu_GetSelectedID(getglobal(frameName.."BidTimeLeftDropDown")),
+			UIDropDownMenu_GetSelectedID(getglobal(frameName.."BidCategoryDropDown")),
 			UIDropDownMenu_GetSelectedID(getglobal(frameName.."BidMinQualityDropDown")),
 			getglobal(frameName.."BidSearchEdit"):GetText()
+		);
+	elseif (searchType == 2) then
+		-- Buyout-based search
+		searchData = string.format("%d\t%d\t%s\t%d\t%d\t%s",
+			searchType, 
+			MoneyInputFrame_GetCopper(getglobal(frameName.."BuyoutMinProfit")),
+			getglobal(frameName.."BuyoutMinPercentLessEdit"):GetText(),
+			UIDropDownMenu_GetSelectedID(getglobal(frameName.."BuyoutCategoryDropDown")),
+			UIDropDownMenu_GetSelectedID(getglobal(frameName.."BuyoutMinQualityDropDown")),
+			getglobal(frameName.."BuyoutSearchEdit"):GetText()
+		);
+	elseif (searchType == 3) then
+		-- Compete-based search
+		searchData = string.format("%d\t%d",
+			searchType, 
+			MoneyInputFrame_GetCopper(getglobal(frameName.."CompeteUndercut"))
+		);
+	elseif (searchType == 4) then
+		-- Plain-based search
+		searchData = string.format("%d\t%d\t%d\t%d\t%s",
+			searchType, 
+			MoneyInputFrame_GetCopper(getglobal(frameName.."PlainMaxPrice")),
+			UIDropDownMenu_GetSelectedID(getglobal(frameName.."PlainCategoryDropDown")),
+			UIDropDownMenu_GetSelectedID(getglobal(frameName.."PlainMinQualityDropDown")),
+			getglobal(frameName.."PlainSearchEdit"):GetText()
 		);
 	end
 	
@@ -483,10 +645,9 @@ function AuctionFrameSearch_SaveSearchButton_OnClick(button)
 		end
 
 		AuctionConfig.SavedSearches[searchName] = searchData
-		Auctioneer_ChatPrint("Saved search: \""..searchName.."\"");
 	end
 
-	AuctionFrameSearch_SavedSearchDropDown_Initialize()
+--	AuctionFrameSearch_SavedSearchDropDown_Initialize()
 end
 
 	
@@ -526,10 +687,10 @@ end
 -------------------------------------------------------------------------------
 -- Perform a bid search (aka bidBroker)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTimeLeft, minQuality, itemName)
+function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTimeLeft, category, minQuality, itemName)
 	-- Create the content from auctioneer.
 	frame.results = {};
-	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit, maxTimeLeft, minQuality, itemName);
+	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_BidBrokerFilter, minProfit, maxTimeLeft, category, minQuality, itemName);
 	if (bidWorthyAuctions) then
 		local player = UnitName("player");
 		for pos,a in pairs(bidWorthyAuctions) do
@@ -579,10 +740,10 @@ end
 -------------------------------------------------------------------------------
 -- Perform a buyout search (aka percentLess)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess)
+function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, category, minQuality, itemName)
 	-- Create the content from auctioneer.
 	frame.results = {};
-	local buyoutWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_PercentLessFilter, minPercentLess);
+	local buyoutWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_PercentLessFilter, minPercentLess, category, minQuality, itemName);
 	if (buyoutWorthyAuctions) then
 		local player = UnitName("player");
 		for pos,a in pairs(buyoutWorthyAuctions) do
@@ -688,6 +849,62 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 end
 
 -------------------------------------------------------------------------------
+-- Perform a plain search
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, itemName)
+	-- Create the content from auctioneer.
+	frame.results = {};
+	local bidWorthyAuctions = Auctioneer_QuerySnapshot(Auctioneer_PlainFilter, maxPrice, category, minQuality, itemName);
+	if (bidWorthyAuctions) then
+		local player = UnitName("player");
+		for pos,a in pairs(bidWorthyAuctions) do
+			if (a.owner ~= player) then
+				local id,rprop,enchant,name, count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+				local itemKey = id .. ":" .. rprop..":"..enchant;
+				local hsp, seenCount = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+				local currentBid = Auctioneer_GetCurrentBid(a.signature);
+				local percentLess = 100 - math.floor(100 * currentBid / (hsp * count));
+
+				local _,_,_,iLevel = GetItemInfo(id);
+
+				local auction = {};
+				auction.id = id;
+				auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
+				auction.link = a.itemLink;
+				auction.level = iLevel;
+				auction.name = name;
+				auction.count = count;
+				auction.owner = a.owner;
+				auction.timeLeft = a.timeLeft;
+				auction.bid = currentBid;
+				auction.bidPer = math.floor(auction.bid / count);
+				auction.buyout = buyout;
+				auction.buyoutPer = math.floor(auction.buyout / count);
+				auction.profit = (hsp * count) - currentBid;
+				auction.profitPer = math.floor(auction.profit / count);
+				auction.percentLess = percentLess;
+				auction.signature = a.signature;
+				if (a.highBidder) then
+					auction.status = AUCTION_STATUS_HIGH_BIDDER;
+				else
+					auction.status = AUCTION_STATUS_UNKNOWN;
+				end
+				table.insert(frame.results, auction);
+			end
+		end
+	end
+
+	-- Hand the updated results to the list.
+	frame.resultsType = "BidSearch";
+	frame:SelectResultByIndex(nil);
+	ListTemplate_Initialize(frame.resultsList, frame.plainSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
+	ListTemplate_SetContent(frame.resultsList, frame.results);
+	ListTemplate_Sort(frame.resultsList, 2);
+	ListTemplate_Sort(frame.resultsList, 3);
+end
+
+
+-------------------------------------------------------------------------------
 -- Select a search result by index.
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_SelectResultByIndex(frame, index)
@@ -769,6 +986,38 @@ function AuctionFrameSearch_ListItem_OnClick(row)
 end
 
 -------------------------------------------------------------------------------
+-- Initialize the content of a Category dropdown list
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_CategoryDropDown_Initialize()
+	local dropdown = this:GetParent();
+	local frame = dropdown:GetParent();
+	UIDropDownMenu_AddButton({
+		text = "",
+		func = AuctionFrameSearch_CategoryDropDownItem_OnClick,
+		owner = dropdown
+	})
+
+	if (AuctionConfig.classes) then
+		for classid, cdata in AuctionConfig.classes do
+			UIDropDownMenu_AddButton({
+				text = cdata.name,
+				func = AuctionFrameSearch_CategoryDropDownItem_OnClick,
+				owner = dropdown
+			});
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- An item in a CategoryDrownDown has been clicked
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_CategoryDropDownItem_OnClick()
+	local index = this:GetID();
+	local dropdown = this.owner;
+	UIDropDownMenu_SetSelectedID(dropdown, index);
+end
+
+-------------------------------------------------------------------------------
 -- Initialize the content of a TimeLeft dropdown list
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_TimeLeftDropDown_Initialize()
@@ -803,12 +1052,13 @@ function AuctionFrameSearchBid_SearchButton_OnClick(button)
 
 	local minProfit = MoneyInputFrame_GetCopper(profitMoneyFrame);
 	local minPercentLess = percentLessEdit:GetNumber();
+	local catID = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."CategoryDropDown")) or 1) - 1;
 	local minQuality = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."MinQualityDropDown")) or 1) - 1;
 	local itemName = getglobal(frameName.."SearchEdit"):GetText();
 	if (itemName == "") then itemName = nil end
 	
 	local timeLeft = TIME_LEFT_SECONDS[UIDropDownMenu_GetSelectedID(timeLeftDropDown)];
-	frame:GetParent():SearchBids(minProfit, minPercentLess, timeLeft, minQuality, itemName);
+	frame:GetParent():SearchBids(minProfit, minPercentLess, timeLeft, catID, minQuality, itemName);
 end
 
 -------------------------------------------------------------------------------
@@ -820,7 +1070,27 @@ function AuctionFrameSearchBuyout_SearchButton_OnClick(button)
 
 	local minProfit = MoneyInputFrame_GetCopper(profitMoneyFrame);
 	local minPercentLess = percentLessEdit:GetNumber();
-	frame:GetParent():SearchBuyouts(minProfit, minPercentLess);
+	local catID = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."CategoryDropDown")) or 1) - 1
+	local minQuality = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."MinQualityDropDown")) or 1) - 1;
+	local itemName = getglobal(frameName.."SearchEdit"):GetText();
+	if (itemName == "") then itemName = nil end
+	
+	frame:GetParent():SearchBuyouts(minProfit, minPercentLess, catID, minQuality, itemName);
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AuctionFrameSearchPlain_SearchButton_OnClick(button)
+	local frame = button:GetParent();
+	local frameName = frame:GetName();
+
+	local maxPrice = MoneyInputFrame_GetCopper(getglobal(frameName.."MaxPrice")) or 0
+	local catID = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."CategoryDropDown")) or 1) - 1
+	local minQuality = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."MinQualityDropDown")) or 1) - 1;
+	local itemName = getglobal(frameName.."SearchEdit"):GetText();
+	if (itemName == "") then itemName = nil end
+	
+	frame:GetParent():SearchPlain(maxPrice, catID, minQuality, itemName);
 end
 
 -------------------------------------------------------------------------------
