@@ -862,9 +862,13 @@ function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
 				BrowseName:SetText(itemName)
 				BrowseMinLevel:SetText("")
 				BrowseMaxLevel:SetText("")
+				AuctionFrameBrowse.selectedInvtype = nil
 				AuctionFrameBrowse.selectedInvtypeIndex = nil
+				AuctionFrameBrowse.selectedClass = nil
 				AuctionFrameBrowse.selectedClassIndex = nil
+				AuctionFrameBrowse.selectedSubclass = nil
 				AuctionFrameBrowse.selectedSubclassIndex = nil
+				AuctionFrameFilters_Update()
 				IsUsableCheckButton:SetChecked(0)
 				UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
 				AuctionFrameBrowse_Search()
