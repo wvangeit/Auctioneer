@@ -1,0 +1,30 @@
++ = added
+* = changed
+- = removed
+
+3.4:
+====
++ Auctioneer: alt-click a container item at AH's auction frame moves the item to the sell item slot [ftkxde - changeset 621]
++ Auctioneer: added a new command "/auctioneer finish (off|logout|exit)" which will do the selected action once a scan has completed [mentalpower - changeset 624 - ticket 317]
++ Auctioneer: added pricing model in tooltips and color coding of the pricing models [mentalpower - changeset 626 - ticket 326]
++ Auctioneer: added "AuctionInfoWarnText" to the auction autostart message [ftkxde - changeset 628]
++ Auctioneer: added Search Auctions tab [vindicator - changeset 630]
++ Auctioneer: added Post Auctions tab [vindicator - changeset 648]
++ Auctioneer: added "/auc also neutral" and "/auc also home" support [mentalpower - changeset 655]
++ Auctioneer: added another search method for searching just by per-item cost [norganna - changeset 658]
+* Auctioneer: bugfix - when searching for an item, after ALT+rightclicking its name into the BrowseText-box, the search resulted in no matches, for some specific items. This has been fixed by removing the item suffix from the searchtext [ftkxde - changeset 621]
+* Auctioneer: moved auto auction start to shift-alt-click [ftkxde - changeset 621]
+* Auctioneer: improved the searching functions and removed some of their limitations (like negative parameters, etc) [norganna - changeset 652]
+* Auctioneer: setting "/auc also" to the current char's value, no longer results in the data being shown twice (once in the normal tooltip and once in the also tooltip) [mentalpower - changeset 655]
+
+* Enchantrix: bugfix - no longer showing infos when deactivated [ftkxde - changeset 640]
+* Enchantrix: bugfix - Enchantrix printed its output into the auctioneer's chatchannel, under some special circumstances [mentalpower - changeset 650]
+* Enchantrix: bugfix - fixed weird behaviour of Enchantrix, incase Auctioneer was loaded before Enchantrix [ftkxde - changeset 651]
+
++ Informant: add quest information [norganna - changeset 632]
++ Informant: added message strings for Informant's "on|off|toggle" commands [ftkxde - changeset 640]
+* Informant: bugfix - no longer showing infos when deactivated [ftkxde - changeset 640]
+* Informant: bugfix - Informant's "toggle" command now works as intended [ftkxde - changeset 640]
+* Informant: bugfix - Restored the keybinding labels [ftkxde - changeset 659]
+
+* all: a lot of other bugfixes and minor tweaks, you probably won't even notice
