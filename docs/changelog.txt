@@ -10,7 +10,7 @@
 + Auctioneer: added "AuctionInfoWarnText" to the auction autostart message [ftkxde - changeset 628]
 + Auctioneer: added Search Auctions tab [vindicator - changeset 630]
 + Auctioneer: added Post Auctions tab [vindicator - changeset 648]
-+ Auctioneer: added "/auc also neutral" and "/auc also home" support [mentalpower - changeset 655]
++ Auctioneer: added "/auc also neutral" and "/auc also home" support [mentalpower - changeset 655 - ticket 374]
 + Auctioneer: added another search method for searching just by per-item cost [norganna - changeset 658]
 * Auctioneer: bugfix - when searching for an item, after ALT+rightclicking its name into the BrowseText-box, the search resulted in no matches, for some specific items. This has been fixed by removing the item suffix from the searchtext [ftkxde - changeset 621]
 * Auctioneer: moved auto auction start to shift-alt-click [ftkxde - changeset 621]
@@ -28,3 +28,33 @@
 * Informant: bugfix - Restored the keybinding labels [ftkxde - changeset 659]
 
 * all: a lot of other bugfixes and minor tweaks, you probably won't even notice
+
+
+
+? = open
++ = closed
+- = invalid
+e = enhancement (open)
+E = enhancement (closed)
+
+Tickets since 3.2:
+==================
+? 364: TimersBug
+e 365: Informant on equipped bags is annoying
+e 366: JunkItems, Keypress and excluding items
+- 367: All items are displayed as "never seen at auction"
+- 368: Incorrectly reports "Object has not been seen on AH before"
+? 369: Strange bug when used with Titan Stones mod
+e 370: Optimization of BalancedList:SetList
+? 371: Missing "quit" key text and prior auction notice incorrect
+? 372: Bidbroker problems
+e 373: Add a new command like percentless but using current bid
+E 374: Shortcut for Neutral AH
+e 375: Auctioneer sales history in lootlink type format
+e 376: Allow user to increase price when selling less than a stack of an item
+? 377: Tooltip information doubled
+e 378: more accurate statistics (excluding own BOs)
+? 379: EnhTooltip Not Showing Cloth Is Used For Tailoring
+- 380: Different suggested prices for same item
+? 381: Informant Error with Reagent Transmutes in Alchemy Skills window
+? 382: Stubby.lua:256: attempt to call global 'pairs' (a table value)
