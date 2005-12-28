@@ -802,7 +802,7 @@ end
 -- Calculate the maximum stack size for an item based on the information returned by GetItemInfo()
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetMaxStackSize(itemID)
-	local itemName, itemLink, itemRarity, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemInvTexture = GetItemInfo(itemID);
+	local _, _, _, _, _, _, itemStackCount = GetItemInfo(itemID);
 	return itemStackCount;
 end
 
