@@ -1069,6 +1069,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFrameSearchBuyout_SearchButton_OnClick(button)
 	local frame = button:GetParent();
+	local frameName = frame:GetName();
 	local profitMoneyFrame = getglobal(frame:GetName().."MinProfit");
 	local percentLessEdit = getglobal(frame:GetName().."MinPercentLessEdit"); 
 

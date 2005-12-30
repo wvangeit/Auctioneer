@@ -20,7 +20,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 -- Auction time constants
 TIME_LEFT_SHORT = 1;
 TIME_LEFT_MEDIUM = 2;
@@ -591,7 +591,7 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 			else
 				Auctioneer_ChatPrint("Can't split, all bags are full")
 			end
-			return
+			return "abort";
 		end
 	end
 
@@ -620,7 +620,7 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 						BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
 					end
 				end
-				return
+				return "abort";
 			end
 		end
 	end
@@ -639,7 +639,7 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 				StartAuction(start, buy, duration);
 				Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 			end
-			return
+			return "abort";
 		end
 	end
 
@@ -658,7 +658,7 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 				local _, _, _, _, name = Auctioneer_BreakLink(link);
 				AuctionFramePost:SetAuctionItem(bag, slot, 1);
 			end
-			return
+			return "abort";
 		end
 	end
 end

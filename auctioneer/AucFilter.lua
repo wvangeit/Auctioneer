@@ -81,7 +81,6 @@ function Auctioneer_BidBrokerFilter(minProfit, signature, maximumTime, category,
 			local snap = Auctioneer_GetSnapshot(auctKey, itemCat, signature);
 
 			if (snap) then
-				p(snap.quality, minQuality)
 				if (tonumber(snap.quality) >= tonumber(minQuality)) then
 					local timeLeft = tonumber(snap.timeLeft);
 					local elapsedTime = time() - tonumber(snap.lastSeenTime);

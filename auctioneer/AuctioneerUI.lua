@@ -26,6 +26,16 @@
 -------------------------------------------------------------------------------
 CursorItem = nil;
 
+MoneyTypeInfo["AUCTIONEER"] = {
+	UpdateFunc = function()
+		return this.staticMoney;
+	end,
+
+	collapse = 1,
+	fixedWidth = 1,
+	showSmallerCoins = 1
+};
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctioneerUI_OnLoad()

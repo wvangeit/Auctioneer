@@ -260,7 +260,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						MoneyFrame_SetType("AUCTIONEER");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -275,7 +275,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						MoneyFrame_SetType("AUCTIONEER");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -290,7 +290,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						MoneyFrame_SetType("AUCTIONEER");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -305,7 +305,7 @@
 				<Scripts>
 					<OnLoad>
 						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("AUCTION");
+						MoneyFrame_SetType("AUCTIONEER");
 					</OnLoad>
 				</Scripts>
 			</Frame>
