@@ -21,7 +21,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 Auctioneer_isScanningRequested = false;
 local lCurrentAuctionPage;
@@ -263,6 +263,9 @@ function Auctioneer_CanScan()
 		return false;
 	end
 	if (not CanSendAuctionQuery()) then
+		return false;
+	end
+	if (AucBidManager.IsProcessingRequest()) then
 		return false;
 	end
 	return true;

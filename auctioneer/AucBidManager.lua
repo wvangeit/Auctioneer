@@ -51,6 +51,11 @@ local CurrentSearchParams =
 -- Queue of bids submitted to the server, but not yet accepted or rejected
 local PendingBids = {};
 
+-- Function hooks that are used when processing requests
+local Original_CanSendAuctionQuery;
+local Original_AuctionFrameBrowse_OnEvent;
+local Original_AuctionFrameBrowse_Update;
+
 -- Result codes for bid requests.
 BidResultCodes = {}
 BidResultCodes["BidAccepted"] = 0;
@@ -74,6 +79,7 @@ local queryAuctionItemsHook;
 local checkQueryComplete;
 local addRequestToQueue;
 local removeRequestFromQueue;
+local isProcessingRequest;
 local beginProcessingRequestQueue;
 local endProcessingRequestQueue;
 local processRequestQueue;
@@ -104,16 +110,14 @@ function AucBidManagerFrame_OnEvent(event)
 	if (event == "VARIABLES_LOADED") then
 		addPlayerToAccount(UnitName("player"));
 	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
-		debugPrint("AUCTION_ITEM_LIST_UPDATE");
 		checkQueryComplete();
 		processRequestQueue();
 	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
-		 if (arg1 == ERR_AUCTION_BID_PLACED) then -- TODO: %localize%
+		 if (arg1 == ERR_AUCTION_BID_PLACED) then
 		 	onBidResponse(BidResultCodes["BidAccepted"]);
 			processRequestQueue();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		debugPrint("UI_ERROR_MESSAGE - "..arg1);
 		if (arg1 == ERR_ITEM_NOT_FOUND) then
 			onBidResponse(BidResultCodes["ItemNotFound"]);
 		elseif (arg1 == ERR_NOT_ENOUGH_MONEY) then
@@ -136,12 +140,30 @@ function AucBidManagerFrame_OnUpdate()
 end
 
 -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AucBidManager_CanSendAuctionQuery()
+	-- Intentionally empty; don't allow the auction UI to update while we're processing requests
+	return false;
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AucBidManager_AuctionFrameBrowse_OnEvent()
+	-- Intentionally empty; don't allow the auction UI to update while we're processing requests
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AucBidManager_AuctionFrameBrowse_Update()
+	-- Intentionally empty; don't allow the auction UI to update while we're processing requests
+end
+
+-------------------------------------------------------------------------------
 -- Adds a player to the list of players on the current account.
 -------------------------------------------------------------------------------
 function addPlayerToAccount(player)
 	-- List of players on the same account as the current player (including the
 	-- current player). Auctions owned by these players cannot be bid on.
-
 	if (not AuctionConfig.players) then AuctionConfig.players = {}; end
 	table.insert(AuctionConfig.players, player);
 end
@@ -199,12 +221,12 @@ function onBidResponse(result)
 				table.insert(request.results, result);
 
 				if (request.bid == request.buyout) then
-					-- %localize%
-					chatPrint("Bought auction: "..request.name.." (x"..request.count..")");
+					local output = string.format(_AUCT('FrmtBoughtAuction'), request.name, request.count);
+					chatPrint(output);
 
 				else
-					-- %localize%
-					chatPrint("Bid on auction: "..request.name.." (x"..request.count..")");
+					local output = string.format(_AUCT('FrmtBidAuction'), request.name, request.count);
+					chatPrint(output);
 				end
 
 			elseif (result == BidResultCodes["ItemNotFound"]) then
@@ -212,18 +234,18 @@ function onBidResponse(result)
 
 			elseif (result == BidResultCodes["NotEnoughMoney"]) then
 				table.insert(request.results, result);
-				-- %localize%
-				chatPrint("Not enough money to bid on auction: "..request.name.." (x"..request.count..")");
+				local output = string.format(_AUCT('FrmtNotEnoughMoney'), request.name, request.count);
+				chatPrint(output);
 
 			elseif (result == BidResultCodes["OwnAuction"]) then
 				table.insert(request.results, result);
-				-- %localize%
-				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
+				local output = string.format(_AUCT('FrmtSkippedBiddingOnOwnAuction'), request.name, request.count);
+				chatPrint(output);
 
 			elseif (result == BidResultCodes["AlreadyHigherBid"]) then
 				table.insert(request.results, result);
-				-- %localize%
-				chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..")");
+				local output = string.format(_AUCT('FrmtSkippedAuctionWithHigherBid'), request.name, request.count);
+				chatPrint(output);
 			end
 		end
 
@@ -267,9 +289,9 @@ function onBidResponse(result)
 		-- Remove the pending bid.
 		table.remove(PendingBids, 1);
 	else
-		-- TODO: We got out of sync somehow...
-		-- %localize%
-		chatPrint("Error: Bid queue out of sync!");
+		-- We got out of sync somehow... this indicates a bug in how we determine
+		-- the results of bid requests.
+		chatPrint(_AUCT('FrmtBidQueueOutOfSync'));
 	end
 end
 
@@ -281,10 +303,20 @@ function isQueryInProgress()
 end
 
 -------------------------------------------------------------------------------
+-- Wrapper around CanSendAuctionQuery() that always calls the Blizzard version.
+-------------------------------------------------------------------------------
+function canSendAuctionQuery()
+	if (Original_CanSendAuctionQuery) then
+		return Original_CanSendAuctionQuery();
+	end
+	return CanSendAuctionQuery();
+end
+
+-------------------------------------------------------------------------------
 -- Called before QueryAuctionItems()
 -------------------------------------------------------------------------------
 function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (not Auctioneer_isScanningRequested and CanSendAuctionQuery()) then
+	if (not Auctioneer_isScanningRequested and canSendAuctionQuery()) then
 		CurrentSearchParams.name = name;
 		CurrentSearchParams.minLevel = minLevel;
 		CurrentSearchParams.maxLevel = maxLevel;
@@ -367,11 +399,18 @@ function removeRequestFromQueue()
 		end
 
 		if (table.getn(request.results) == 0) then
-			-- %localize%
-			chatPrint("No auctions found: "..request.name.." (x"..request.count..")");
+			local output = string.format(_AUCT('FrmtNoAuctionsFound'), request.name, request.count);
+			chatPrint(output);
 		end
 		table.remove(RequestQueue, 1);
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Checks if the BidManager is currently working on a request.
+-------------------------------------------------------------------------------
+function isProcessingRequest()
+	return ProcessingRequestQueue;
 end
 
 -------------------------------------------------------------------------------
@@ -388,7 +427,32 @@ function beginProcessingRequestQueue()
 		ProcessingRequestQueue = true;
 		debugPrint("Begin processing the bid queue");
 
-		-- TODO: Disable the Browse UI
+		-- Hook the functions to disable the Browse UI
+		if (not Original_CanSendAuctionQuery) then
+			Original_CanSendAuctionQuery = CanSendAuctionQuery;
+			CanSendAuctionQuery = AucBidManager_CanSendAuctionQuery;
+		end
+		if (not Original_AuctionFrameBrowse_OnEvent) then
+			Original_AuctionFrameBrowse_OnEvent = AuctionFrameBrowse_OnEvent;
+			AuctionFrameBrowse_OnEvent = AucBidManager_AuctionFrameBrowse_OnEvent;
+		end
+		if (not Original_AuctionFrameBrowse_Update) then
+			Original_AuctionFrameBrowse_Update = AuctionFrameBrowse_Update;
+			AuctionFrameBrowse_Update = AucBidManager_AuctionFrameBrowse_Update;
+		end
+		
+		-- Hide the UI from any current results, show the no results text so we can use it
+		BrowseNoResultsText:Show();
+		BrowseNoResultsText:SetText(_AUCT('UiProcessingBidRequests'));
+		for iButton = 1, NUM_BROWSE_TO_DISPLAY do
+			button = getglobal("BrowseButton"..iButton);
+			button:Hide();
+		end
+		BrowsePrevPageButton:Hide();
+		BrowseNextPageButton:Hide();
+		BrowseSearchCountText:Hide();
+		BrowseBidButton:Disable();
+		BrowseBuyoutButton:Disable();
 	end
 	return ProcessingRequestQueue;
 end
@@ -398,7 +462,22 @@ end
 -------------------------------------------------------------------------------
 function endProcessingRequestQueue()
 	if (ProcessingRequestQueue) then
-		-- TODO: Enable the Browse UI
+		-- Unhook the functions
+		if( Original_CanSendAuctionQuery ) then
+			CanSendAuctionQuery = Original_CanSendAuctionQuery;
+			Original_CanSendAuctionQuery = nil;
+		end
+		if( Original_AuctionFrameBrowse_OnEvent ) then
+			AuctionFrameBrowse_OnEvent = Original_AuctionFrameBrowse_OnEvent;
+			Original_AuctionFrameBrowse_OnEvent = nil;
+		end
+		if( Original_AuctionFrameBrowse_Update ) then
+			AuctionFrameBrowse_Update = Original_AuctionFrameBrowse_Update;
+			Original_AuctionFrameBrowse_Update = nil;
+		end
+		
+		-- Update the Browse UI.
+		AuctionFrameBrowse_Update();
 
 		debugPrint("End processing the bid queue");
 		ProcessingRequestQueue = false;
@@ -431,7 +510,7 @@ function processRequestQueue()
 				CurrentSearchParams.qualityIndex == nil) then
 				processPage();
 
-			elseif (CanSendAuctionQuery()) then
+			elseif (canSendAuctionQuery()) then
 				-- Turn off the OnUpdate calls and run our query
 				AucBidManagerFrame:Hide();
 				QueryAuctionItems(request.name, "", "", nil, nil, nil, request.currentPage, nil, nil);
@@ -484,8 +563,8 @@ function processPage()
 			-- Check if the auction is owned by the player.
 			if (isPlayerOnAccount(owner)) then
 				table.insert(request.results, BidResultCodes["OwnAuction"]);
-				-- %localize%
-				chatPrint("Skipped bidding on own auction: "..request.name.." (x"..request.count..")");
+				local output = string.format(_AUCT('FrmtSkippedBiddingOnOwnAuction'), request.name, request.count);
+				chatPrint(output);
 
 			-- Check for a buyout request
 			elseif (request.buyout == request.bid) then
@@ -496,8 +575,8 @@ function processPage()
 				-- Check if we are already the high bidder
 				if (highBidder) then
 					table.insert(request.results, BidResultCodes["AlreadyHighBidder"]);
-					-- %localize%
-					chatPrint("Already the high bidder on auction: "..request.name.." (x"..request.count..")");
+					local output = string.format(_AUCT('FrmtAlreadyHighBidder'), request.name, request.count);
+					chatPrint(output);
 
 				-- Check if the item has been bid on
 				elseif (bidAmount ~= 0) then
@@ -508,14 +587,14 @@ function processPage()
 					-- Check if there is already a higher bidder
 					elseif (bidAmount > request.bid) then
 						table.insert(request.results, BidResultCodes["AlreadyHigherBid"]);
-						-- %localize%
-						chatPrint("Skipped auction with higher bid: "..request.name.." (x"..request.count..") at "..bidAmount);
+						local output = string.format(_AUCT('FrmtSkippedAuctionWithHigherBid'), request.name, request.count);
+						chatPrint(output);
 
 					-- Otherwise the bid must be lower...
 					else
 						table.insert(request.results, BidResultCodes["CurrentBidLower"]);
-						-- %localize%
-						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..bidAmount);
+						local output = string.format(_AUCT('FrmtSkippedAuctionWithLowerBid'), request.name, request.count);
+						chatPrint(output);
 					end
 
 				-- Otherwise the item hasn't been bid on
@@ -527,8 +606,8 @@ function processPage()
 					-- Otherwise the min bid is lower...
 					else
 						table.insert(request.results, BidResultCodes["CurrentBidLower"]);
-						-- %localize%
-						chatPrint("Skipped auction with lower bid: "..request.name.." (x"..request.count..") at "..minBid);
+						local output = string.format(_AUCT('FrmtSkippedAuctionWithLowerBid'), request.name, request.count);
+						chatPrint(output);
 					end
 				end
 			end
@@ -659,5 +738,6 @@ AucBidManager =
 {
 	-- Exported functions
 	BidAuction = bidAuction;
+	IsProcessingRequest = isProcessingRequest;
 	DumpState = dumpState;
 };

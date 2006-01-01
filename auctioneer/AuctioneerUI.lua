@@ -100,3 +100,24 @@ function AuctioneerUI_GetCursorContainerItem()
 	return nil;
 end
 
+-------------------------------------------------------------------------------
+-- Wrapper for UIDropDownMenu_SetSeletedID() that sets 'this' before calling
+-- UIDropDownMenu_SetSelectedID().
+-------------------------------------------------------------------------------
+function AuctioneerDropDownMenu_SetSelectedID(dropdown, index)
+	local oldThis = this;
+	this = dropdown;
+	UIDropDownMenu_SetSelectedID(dropdown, index);
+	this = oldThis;
+end
+
+-------------------------------------------------------------------------------
+-- Wrapper for UIDropDownMenu_Initialize() that sets 'this' before calling
+-- UIDropDownMenu_Initialize().
+-------------------------------------------------------------------------------
+function AuctioneerDropDownMenu_Initialize(dropdown, func)
+	local oldThis = this;
+	this = getglobal(dropdown:GetName().."Button");
+	UIDropDownMenu_Initialize(dropdown, func);
+	this = oldThis;
+end

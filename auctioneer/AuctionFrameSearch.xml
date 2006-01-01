@@ -103,16 +103,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT">
 							<Offset>
-								<AbsDimension x="75" y="-55"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentSaveSearchText" inherits="GameFontHighlightSmall">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentSavedSearchText" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="60" y="0"/>
+								<AbsDimension x="190" y="-52"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -120,30 +111,14 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Frame name="$parentSavedSearchDropDown" inherits="UIDropDownMenuTemplate">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentSavedSearchText" relativePoint="RIGHT">
-						<Offset>
-							<AbsDimension x="2" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						UIDropDownMenu_SetWidth(16);
-						getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-						UIDropDownMenu_Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
-					</OnLoad>
-				</Scripts>
-			</Frame>
 			<EditBox name="$parentSaveSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
 				<Size>
 					<AbsDimension x="150" y="16"/>
 				</Size>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentSaveSearchText" relativePoint="RIGHT">
+					<Anchor point="LEFT" relativeTo="$parentSavedSearchText" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="20" y="0"/>
+							<AbsDimension x="10" y="-1"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -156,6 +131,26 @@
 					</OnEnterPressed>
 				</Scripts>
 			</EditBox>
+			<Frame name="$parentSavedSearchDropDown" inherits="UIDropDownMenuTemplate">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentSaveSearchEdit" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-22" y="-3"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(this:GetName().."Left"):Hide();
+						getglobal(this:GetName().."Middle"):Hide();
+						getglobal(this:GetName().."Right"):Hide();
+						getglobal(this:GetName().."Text"):Hide();
+						UIDropDownMenu_SetWidth(getglobal(this:GetParent():GetName().."SaveSearchEdit"):GetWidth());
+						AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
+						AuctioneerDropDownMenu_SetSelectedID(this, 1);
+					</OnLoad>
+				</Scripts>
+			</Frame>
 			<Button name="$parentSaveSearchButton" inherits="UIPanelButtonTemplate">
 				<Size>
 					<AbsDimension x="80" y="22"/>
@@ -163,7 +158,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentSaveSearchEdit" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="2" y="0"/>
+							<AbsDimension x="15" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -317,12 +312,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-
-								local dropdown = this;
-								this = getglobal(this:GetName().."Button");
-								UIDropDownMenu_Initialize(dropdown, AuctionFrameSearch_TimeLeftDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(dropdown, 2);
-								this = dropdown;
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_TimeLeftDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 2);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -338,8 +329,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -355,8 +346,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -512,8 +503,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -529,8 +520,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -709,8 +700,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -726,8 +717,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								UIDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								UIDropDownMenu_SetSelectedID(this, 1);
+								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								AuctioneerDropDownMenu_SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -1009,7 +1000,6 @@
 				getglobal(this:GetName().."BidButton"):SetText(_AUCT('UiBid'));
 				getglobal(this:GetName().."BuyoutButton"):SetText(_AUCT('UiBuyout'));
 				getglobal(this:GetName().."SavedSearchText"):SetText(_AUCT('UiSavedSearchLabel'));
-				getglobal(this:GetName().."SaveSearchText"):SetText(_AUCT('UiSaveSearchLabel'));
 				getglobal(this:GetName().."SaveSearchButton"):SetText(_AUCT('UiSaveSearchButton'));
 				getglobal(this:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
 				AuctionFrameSearch_OnLoad();
