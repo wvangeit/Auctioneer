@@ -1,7 +1,7 @@
 ## Title: EnhTooltip
 ## Notes: Used to display enhanced tooltips under the original tooltip or in the original tooltip, contains hooking functions for almost all major in game item tooltips [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 1800
+## Interface: 10900
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
 ##

@@ -1,7 +1,7 @@
 ## Title: BandAid
 ## Notes: This AddOn causes the Blizzard "official" AddOns to load so that any AddOns that use them and haven't yet upgraded their code to be compliant with the new way of doing things, will continue to work. [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 1800
+## Interface: 10900
 ## LoadOnDemand: 0
 ## Dependencies: Blizzard_TrainerUI, Blizzard_MacroUI, Blizzard_RaidUI, Blizzard_TradeSkillUI, Blizzard_InspectUI, Blizzard_BattlefieldMinimap, Blizzard_TalentUI, Blizzard_AuctionUI, Blizzard_BindingUI, Blizzard_CraftUI
 ##
