@@ -168,7 +168,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="ListItemTemplate" hidden="false" virtual="true">
+	<Button name="ListItemTemplate" hidden="true" virtual="true">
 		<Size>
 			<AbsDimension x="605" y="16"/>
 		</Size>
@@ -515,14 +515,14 @@
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture name="$parentTop" file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
+						<Texture file="Interface\PaperDollInfoFrame\UI-Character-ScrollBar">
 							<Size>
 								<AbsDimension x="31" y="256"/>
 							</Size>
 							<Anchors>
-								<Anchor point="TOP" relativeTo="$parentScrollBarScrollUpButton">
+								<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
 									<Offset>
-										<AbsDimension x="0" y="5"/>
+										<AbsDimension x="-2" y="5"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -533,9 +533,9 @@
 								<AbsDimension x="31" y="106"/>
 							</Size>
 							<Anchors>
-								<Anchor point="BOTTOM" relativeTo="$parentScrollBarScrollDownButton">
+								<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
 									<Offset>
-										<AbsDimension x="0" y="-2"/>
+										<AbsDimension x="-2" y="-2"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
