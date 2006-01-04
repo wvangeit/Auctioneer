@@ -429,7 +429,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		if (itemInfo.quests) then
 			local questCount = itemInfo.questCount
 			if (questCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
+				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
 			end
 		end
