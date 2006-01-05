@@ -110,14 +110,19 @@ function AucBidManagerFrame_OnEvent(event)
 	if (event == "VARIABLES_LOADED") then
 		addPlayerToAccount(UnitName("player"));
 	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
+		debugPrint(event);
 		checkQueryComplete();
 		processRequestQueue();
 	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
+		debugPrint(event);
+		if (arg1) then debugPrint("    "..arg1) end;
 		 if (arg1 == ERR_AUCTION_BID_PLACED) then
 		 	onBidResponse(BidResultCodes["BidAccepted"]);
 			processRequestQueue();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
+		debugPrint(event);
+		if (arg1) then debugPrint("    "..arg1) end;
 		if (arg1 == ERR_ITEM_NOT_FOUND) then
 			onBidResponse(BidResultCodes["ItemNotFound"]);
 		elseif (arg1 == ERR_NOT_ENOUGH_MONEY) then
@@ -260,9 +265,16 @@ function onBidResponse(result)
 				if (request.bidCount == request.maxBids) then
 					removeRequestFromQueue();
 
+				-- Safety check for debugging. Prevents stack overflows so we can
+				-- see what the hell went wrong.
+				elseif (request.bidAttempts > 10) then
+					debugPrint("Reached max bid attempts!");
+					removeRequestFromQueue();
+					
 				-- Increment the request's current index if the auction was not bought out.
 				elseif (request.bid ~= request.buyout) then
 					request.currentIndex = request.currentIndex + 1;
+
 				end
 			end
 
@@ -270,13 +282,11 @@ function onBidResponse(result)
 			-- We were expecting the list to update after our bid/buyout, but
 			-- our bid/buyout failed so we won't be getting an update.
 			CurrentSearchParams.complete = true;
+			
+			-- Skip over the auction we failed to bid on.
+			request.currentIndex = request.currentIndex + 1;
 
-			if (result == BidResultCodes["NotEnoughMoney"] and request) then
-				-- We ran out of money so we need to remove the request, lest
-				-- we get stuck in a loop forever.
-				removeRequestFromQueue();
-
-			elseif (result == BidResultCodes["OwnAuction"] and bid.owner) then
+			if (result == BidResultCodes["OwnAuction"] and bid.owner) then
 				-- We tried bidding on our own auction! Blizzard doesn't
 				-- allow bids from any player on the account that posted
 				-- the auction. Therefore we keep a dynamic list of all
@@ -354,6 +364,8 @@ function checkQueryComplete()
 		-- Assume true until otherwise proven false.
 		CurrentSearchParams.complete = true;
 		local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
+		debugPrint("LastIndexOnPage = "..lastIndexOnPage);
+		debugPrint("TotalAuctions = "..totalAuctions);
 
 		for indexOnPage = 1, lastIndexOnPage do
 			local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
@@ -377,6 +389,7 @@ end
 -------------------------------------------------------------------------------
 function addRequestToQueue(request)
 	-- Add the request state information and then add the request to the queue.
+	request.bidAttempts = 0;
 	request.bidCount = 0;
 	request.maxBids = 1000;
 	request.currentPage = 0;
@@ -547,7 +560,7 @@ function processPage()
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
 		local link = GetAuctionItemLink("list", indexOnPage);
 		local id, rprop, enchant, unique = EnhTooltip.BreakLink(link);
-		debugPrint("Processing item: "..id..", "..rprop..", "..enchant..", "..name..", "..count..", "..minBid..", "..buyoutPrice..", "..unique..", "..bidAmount);
+		debugPrint("Processing item "..indexOnPage..": "..id..", "..rprop..", "..enchant..", "..name..", "..count..", "..minBid..", "..buyoutPrice..", "..unique..", "..bidAmount);
 
 		if ((request.id == id) and
 			(request.rprop == rprop) and
@@ -631,6 +644,7 @@ function processPage()
 
 				-- Update the starting point for this page				
 				request.currentIndex = indexOnPage;
+				request.bidAttempts = request.bidAttempts + 1;
 				break;
 			end
 		end
