@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	Auctioneer core functions and variables.
-	Functions central to the major operation of Auctioneer. 
+	Functions central to the major operation of Auctioneer.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -18,54 +18,79 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
+--Local function prototypes
+local getItemData, getItemDataByID, storeMedianList, loadMedianList, getAuctionPriceItem, saveAuctionPriceItem, getAuctionBuyoutHistory, getAuctionPrices, getItemSignature, getItemCategory, isPlayerMade, getInfo, getSnapshot, getSnapshotFromData, getSnapshotInfo, getSnapshotInfoFromData, saveSnapshot, saveSnapshotInfo, addonLoaded, hookAuctionHouse, lockAndLoad;
 
-MAX_ALLOWED_FORMAT_INT = 2000000000; -- numbers much greater than this overflow when using format("%d")
-
--- If non-nil, check for appearance of GameTooltip for adding information
-lAuctioneerCheckTooltip = nil;
-
--- Timer for frequency of tooltip checks
-lAuctioneerCheckTimer = 0;
-
--- Current Tooltip frame
-lAuctioneerTooltip = nil;
+--Local variables
 
 -- Counter to count the total number of auctions scanned
-lTotalAuctionsScannedCount = 0;
-lNewAuctionsCount = 0;
-lOldAuctionsCount = 0;
-lDefunctAuctionsCount = 0;
+local totalAuctionsScannedCount = 0;
+local newAuctionsCount = 0;
+local oldAuctionsCount = 0;
+local defunctAuctionsCount = 0;
 
 -- Temp table that is copied into AHSnapshotItemPrices only when a scan fully completes
-lSnapshotItemPrices = {};
+local snapshotItemPrices = {};
 
--- The maximum number of elements we store in our buyout prices history table 
-lMaxBuyoutHistorySize = 35;
+--Local constants
+local maxAllowedFormatInt = 2000000000; --local maxAllowedFormatInt = 2000000000; -- numbers much greater than this overflow when using format("%d") --MAX_ALLOWED_FORMAT_INT
+
+-- Auction time constants
+--Auctioneer.Core.Constants.TimeLeft.
+local timeLeft = {
+	Short = 1;		--TIME_LEFT_SHORT
+	Medium = 2;		--TIME_LEFT_MEDIUM
+	Long = 3;		--TIME_LEFT_LONG
+	VeryLong = 4;	--TIME_LEFT_VERY_LONG
+
+	Seconds = {		--TIME_LEFT_SECONDS
+		[0] = 0,		-- Could expire any second... the current bid is relatively accurate.
+		[1] = 1800,		-- If it disappears within 30 mins of last seing it, it was BO'd
+		[2] = 7200,		-- Ditto but for 2 hours.
+		[3] = 28800,	-- 8 hours.
+		[4] = 86400,	-- 24 hours.
+	}
+}
+
+-- Item quality constants
+--Auctioneer.Core.Constants.Quality
+local quality = {
+	Legendary	=	5;	--QUALITY_LEGENDARY
+	Epic		=	4;	--QUALITY_EPIC
+	Rare		=	3;	--QUALITY_RARE
+	Uncommon	=	2;	--QUALITY_UNCOMMON
+	Common		=	1;	--QUALITY_COMMON
+	Poor		=	0;	--QUALITY_POOR
+}
+
+
+-- The maximum number of elements we store in our buyout prices history table
+local maxBuyoutHistorySize = 35;
 
 -- Min median buyout price for an item to show up in the list of items below median
-MIN_PROFIT_MARGIN = 5000;
+local minProfitMargin = 5000; --MIN_PROFIT_MARGIN
 
 -- Min median buyout price for an item to show up in the list of items below median
-DEFAULT_COMPETE_LESS = 5;
+local defaultCompeteLess = 5; --DEFAULT_COMPETE_LESS
 
 -- Min times an item must be seen before it can show up in the list of items below median
-MIN_BUYOUT_SEEN_COUNT = 5;
+local minBuyoutSeenCount = 5; --MIN_BUYOUT_SEEN_COUNT
 
 -- Max buyout price for an auction to display as a good deal item
-MAX_BUYOUT_PRICE = 800000;
+local maxBuyoutPrice = 800000; --MAX_BUYOUT_PRICE
 
 -- The default percent less, only find auctions that are at a minimum this percent less than the median
-MIN_PERCENT_LESS_THAN_HSP = 60; -- 60% default
+local minPercentLessThanHSP = 60; -- 60% default --MIN_PERCENT_LESS_THAN_HSP
 
 -- The minimum profit/price percent that an auction needs to be displayed as a resellable auction
-MIN_PROFIT_PRICE_PERCENT = 30; -- 30% default
+local minProfitPricePercent = 30; -- 30% default --MIN_PROFIT_PRICE_PERCENT
 
 -- The minimum percent of bids placed on an item to be considered an "in-demand" enough item to be traded, this is only applied to Weapons and Armor and Recipies
-MIN_BID_PERCENT = 10;
+local minBidPercent = 10; --MIN_BID_PERCENT
 
 -- categories that the brokers and HSP look at the bid data for
 --  1 = weapon
@@ -78,7 +103,7 @@ MIN_BID_PERCENT = 10;
 --  8 = recipe
 --  9 = reagence
 -- 10 = miscellaneous
-BID_BASED_CATEGORIES = {[1]=true, [2]=true, [8]=true, [10]=true}
+local bidBasedCategories = {[1]=true, [2]=true, [8]=true, [10]=true} --BID_BASED_CATEGORIES
 
 --[[ SavedVariables --]]
 AuctionConfig = {};			--Table that stores config settings
@@ -91,7 +116,7 @@ Auctioneer_HSPCache = {};
 Auctioneer_Lowests = {};
 
 -- Default filter configuration
-Auctioneer_FilterDefaults = {
+local filterDefaults = { --Auctioneer_FilterDefaults
 	["all"]						=	"on",
 	["autofill"]				=	"on",
 	["embed"]					=	"off",
@@ -130,22 +155,22 @@ Auctioneer_FilterDefaults = {
 	["locale"]					=	"default",
 }
 
-function Auctioneer_GetItemData(itemKey)
-	local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey);
+function getItemData(itemKey)
+	local itemID, itemRand, enchant = Auctioneer.Util.BreakItemKey(itemKey);
 	if (Informant) then
 		return Informant.GetItem(itemID);
 	end
-	return nil; 
+	return nil;
 end
 
-function Auctioneer_GetItemDataByID(itemID)
+function getItemDataByID(itemID)
 	if (Informant) then
 		return Informant.GetItem(itemID);
 	end
-	return nil; 
+	return nil;
 end
 
-function Auctioneer_StoreMedianList(list)
+function storeMedianList(list)
 	local hist = "";
 	local function GrowList(last, n)
 		if (n == 1) then
@@ -172,7 +197,7 @@ function Auctioneer_StoreMedianList(list)
 	return hist;
 end
 
-function Auctioneer_LoadMedianList(str)
+function loadMedianList(str)
 	local splut = {};
 	if (str) then
 		for x,c in string.gfind(str, '([^%:]*)(%:?)') do
@@ -191,12 +216,12 @@ function Auctioneer_LoadMedianList(str)
 end
 
 -- Returns an AuctionConfig.data item from the table based on an item name
-function Auctioneer_GetAuctionPriceItem(itemKey, from)
+function getAuctionPriceItem(itemKey, from)
 	local serverFaction;
 	local auctionPriceItem, data,info;
 
 	if (from ~= nil) then serverFaction = from;
-	else serverFaction = Auctioneer_GetAuctionKey(); end;
+	else serverFaction = Auctioneer.Util.GetAuctionKey(); end;
 
 	EnhTooltip.DebugPrint("Getting data from/for", serverFaction, itemKey);
 	if (AuctionConfig.data == nil) then AuctionConfig.data = {}; end
@@ -211,17 +236,17 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 
 	auctionPriceItem = {};
 	if (data) then
-		local dataItem = Auctioneer_Split(data, "|");
+		local dataItem = Auctioneer.Util.Split(data, "|");
 		auctionPriceItem.data = dataItem[1];
-		auctionPriceItem.buyoutPricesHistoryList = Auctioneer_LoadMedianList(dataItem[2]);
+		auctionPriceItem.buyoutPricesHistoryList = loadMedianList(dataItem[2]);
 	end
 	if (info) then
-		local infoItem = Auctioneer_Split(info, "|");
+		local infoItem = Auctioneer.Util.Split(info, "|");
 		auctionPriceItem.category = infoItem[1];
 		auctionPriceItem.name = infoItem[2];
 	end
 
-	local playerMade, reqSkill, reqLevel = Auctioneer_IsPlayerMade(itemKey);
+	local playerMade, reqSkill, reqLevel = Auctioneer.Core.IsPlayerMade(itemKey);
 	auctionPriceItem.playerMade = playerMade;
 	auctionPriceItem.reqSkill = reqSkill;
 	auctionPriceItem.reqLevel = reqLevel;
@@ -229,7 +254,7 @@ function Auctioneer_GetAuctionPriceItem(itemKey, from)
 	return auctionPriceItem;
 end
 
-function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
+function saveAuctionPriceItem(auctKey, itemKey, iData)
 	if (not auctKey) then return end
 	if (not itemKey) then return end
 	if (not iData) then return end
@@ -238,7 +263,7 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (not AuctionConfig.data) then AuctionConfig.data = {}; end
 	if (not AuctionConfig.data[auctKey]) then AuctionConfig.data[auctKey] = {}; end
 
-	local hist = Auctioneer_StoreMedianList(iData.buyoutPricesHistoryList);
+	local hist = storeMedianList(iData.buyoutPricesHistoryList);
 
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
 	AuctionConfig.info[itemKey] = string.format("%s|%s", iData.category, iData.name);
@@ -248,28 +273,28 @@ function Auctioneer_SaveAuctionPriceItem(auctKey, itemKey, iData)
 	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 
 	-- save median to the savedvariablesfile
-	Auctioneer_SetHistMed(auctKey, itemKey, Auctioneer_GetMedian(iData.buyoutPricesHistoryList))
+	Auctioneer.Storage.SetHistMed(auctKey, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPricesHistoryList))
 end
 
 -- Returns the auction buyout history for this item
-function Auctioneer_GetAuctionBuyoutHistory(itemKey, auctKey)
-	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey, auctKey);
+function getAuctionBuyoutHistory(itemKey, auctKey)
+	local auctionItem = getAuctionPriceItem(itemKey, auctKey);
 	local buyoutHistory = {};
-	if (auctionItem) then 
+	if (auctionItem) then
 		buyoutHistory = auctionItem.buyoutPricesHistoryList;
 	end
 	return buyoutHistory;
 end
 
 -- Returns the parsed auction price data
-function Auctioneer_GetAuctionPrices(priceData)
+function getAuctionPrices(priceData)
 	if (not priceData) then return 0,0,0,0,0,0,0 end
 	local i,j, count,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = string.find(priceData, "^(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)");
-	return nullSafe(count),nullSafe(minCount),nullSafe(minPrice),nullSafe(bidCount),nullSafe(bidPrice),nullSafe(buyCount),nullSafe(buyPrice);
+	return Auctioneer.Util.NullSafe(count),Auctioneer.Util.NullSafe(minCount),Auctioneer.Util.NullSafe(minPrice),Auctioneer.Util.NullSafe(bidCount),Auctioneer.Util.NullSafe(bidPrice),Auctioneer.Util.NullSafe(buyCount),Auctioneer.Util.NullSafe(buyPrice);
 end
 
 -- Parse the data from the auction signature
-function Auctioneer_GetItemSignature(sigData)
+function getItemSignature(sigData)
 	if (not sigData) then return nil end
 	for id,rprop,enchant,name,count,min,buyout,uniq in string.gfind(sigData, "(%d+):(%d+):(%d+):(.-):(%d+):(.-):(%d+):(.+)") do
 		if (name == nil) then name = ""; end
@@ -279,19 +304,19 @@ function Auctioneer_GetItemSignature(sigData)
 end
 
 -- Returns the category i.e. 1, 2 for an item
-function Auctioneer_GetItemCategory(itemKey)
+function getItemCategory(itemKey)
 	local category;
-	local auctionItem = Auctioneer_GetAuctionPriceItem(itemKey);
-	if auctionItem then 
+	local auctionItem = getAuctionPriceItem(itemKey);
+	if auctionItem then
 		category = auctionItem.category;
 	end
 
 	return category;
 end
 
-function Auctioneer_IsPlayerMade(itemKey, itemData)
+function isPlayerMade(itemKey, itemData)
 	if (not itemData) and (Informant) then
-		local itemID, itemRand, enchant = Auctioneer_BreakItemKey(itemKey)
+		local itemID, itemRand, enchant = Auctioneer.Util.BreakItemKey(itemKey)
 		itemData = Informant.GetItem(itemID)
 	end
 
@@ -304,10 +329,10 @@ function Auctioneer_IsPlayerMade(itemKey, itemData)
 	return (reqSkill ~= 0), reqSkill, reqLevel
 end
 
-function Auctioneer_GetInfo(itemKey)
+function getInfo(itemKey)
 	if (not AuctionConfig.info[itemKey]) then return {}; end
 	local info = AuctionConfig.info[itemKey];
-	local infosplit = Auctioneer_Split(info, "|");
+	local infosplit = Auctioneer.Util.Split(info, "|");
 	local cat = tonumber(infosplit[1]);
 	local name = infosplit[2];
 	return {
@@ -316,7 +341,7 @@ function Auctioneer_GetInfo(itemKey)
 	};
 end
 
-function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
+function getSnapshot(auctKey, catID, auctSig)
 	if (not catID) then catID = 0 end
 
 	if (not AuctionConfig.snap[auctKey]) then
@@ -330,10 +355,10 @@ function Auctioneer_GetSnapshot(auctKey, catID, auctSig)
 	end
 
 	local snap = AuctionConfig.snap[auctKey][catID][auctSig];
-	return Auctioneer_GetSnapshotFromData(snap);
+	return getSnapshotFromData(snap);
 end
 
-function Auctioneer_GetSnapshotFromData(snap)
+function getSnapshotFromData(snap)
 	if (not snap) then return nil end
 
 	for dirty,bid,level,quality,left,fseen,last,link,owner in string.gfind(snap, "(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);(%d+);([^;]+);(.+)") do
@@ -353,23 +378,23 @@ function Auctioneer_GetSnapshotFromData(snap)
 	return nil;
 end
 
-function Auctioneer_GetSnapshotInfo(auctKey, itemKey)
+function getSnapshotInfo(auctKey, itemKey)
 	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
 	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
 	if (not AuctionConfig.sbuy[auctKey][itemKey]) then return nil; end
 
 	local buy = AuctionConfig.sbuy[auctKey][itemKey];
-	return Auctioneer_GetSnapshotInfoFromData(buy);
+	return getSnapshotInfoFromData(buy);
 end
 
-function Auctioneer_GetSnapshotInfoFromData(buy)
-	local buysplit = Auctioneer_LoadMedianList(buy);
+function getSnapshotInfoFromData(buy)
+	local buysplit = loadMedianList(buy);
 	return {
 		buyoutPrices = buysplit,
 	};
 end
 
-function Auctioneer_SaveSnapshot(server, cat, sig, iData)
+function saveSnapshot(server, cat, sig, iData)
 	local bid = iData.bidamount;
 	local owner = iData.owner;
 	local dirty = iData.dirty;
@@ -388,28 +413,28 @@ function Auctioneer_SaveSnapshot(server, cat, sig, iData)
 	if (not AuctionConfig.snap[server][cat]) then
 		AuctionConfig.snap[server][cat] = {};
 	end
-	if (dirty~=nil and bid~=nil and level~=nil and qual~=nil and left~=nil and fseen~=nil and last~=nil and link~=nil and owner~=nil) then 
-		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner); 
-		EnhTooltip.DebugPrint("Saving", server, cat, sig, "as", saveData); 
+	if (dirty~=nil and bid~=nil and level~=nil and qual~=nil and left~=nil and fseen~=nil and last~=nil and link~=nil and owner~=nil) then
+		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner);
+		EnhTooltip.DebugPrint("Saving", server, cat, sig, "as", saveData);
 		AuctionConfig.snap[server][cat][sig] = saveData;
-		local itemKey = Auctioneer_GetKeyFromSig(sig);
+		local itemKey = Auctioneer.Util.GetKeyFromSig(sig);
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	else
-		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner); 
+		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner);
 	end
 end
 
-function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
-	AuctionConfig.sbuy[server][itemKey] = Auctioneer_StoreMedianList(iData.buyoutPrices);
+function saveSnapshotInfo(server, itemKey, iData)
+	AuctionConfig.sbuy[server][itemKey] = storeMedianList(iData.buyoutPrices);
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
 	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
-	local median, seenCount = Auctioneer_GetMedian(iData.buyoutPrices);
-	local low, second = Auctioneer_GetLowest(iData.buyoutPrices);
+	local median, seenCount = Auctioneer.Statistic.GetMedian(iData.buyoutPrices);
+	local low, second = Auctioneer.Statistic.GetLowest(iData.buyoutPrices);
 
 	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
 	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
@@ -421,11 +446,11 @@ function Auctioneer_SaveSnapshotInfo(server, itemKey, iData)
 end
 
 
-function Auctioneer_AddonLoaded()
+function addonLoaded()
 	-- Load the category and subcategory id's
-	Auctioneer_LoadCategories();
+	Auctioneer.Util.LoadCategories();
 
-	Auctioneer_SetFilterDefaults();
+	Auctioneer.Util.SetFilterDefaults();
 
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
@@ -434,10 +459,10 @@ function Auctioneer_AddonLoaded()
 			button1 = _AUCT('MesgConvertYes'),
 			button2 = _AUCT('MesgConvertNo'),
 			OnAccept = function()
-				Auctioneer_Convert();
+				Auctioneer.Convert.Convert();
 			end,
 			OnCancel = function()
-				Auctioneer_ChatPrint(_AUCT('MesgNotconverting'));
+				Auctioneer.Util.ChatPrint(_AUCT('MesgNotconverting'));
 			end,
 			timeout = 0,
 			whileDead = 1,
@@ -459,50 +484,98 @@ function Auctioneer_AddonLoaded()
 		AuctionConfig.version = 30201
 	end
 
-	Auctioneer_LockAndLoad();
+	lockAndLoad();
 end
 
 -- This is the old (local) hookAuctionHouse() function
-function Auctioneer_HookAuctionHouse()
-	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer_NewAuction);
-	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, Auctioneer_AuctHouseShow);
-	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer_AuctHouseClose);
-	Stubby.RegisterEventHook("AUCTION_ITEM_LIST_UPDATE", "Auctioneer", Auctioneer_AuctHouseUpdate);
+function hookAuctionHouse()
+	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer.Scanner.NewAuction);
+	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, Auctioneer.Scanner.AuctHouseShow);
+	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer.Scanner.AuctHouseClose);
+	Stubby.RegisterEventHook("AUCTION_ITEM_LIST_UPDATE", "Auctioneer", Auctioneer.Scanner.AuctHouseUpdate);
 
-	Stubby.RegisterFunctionHook("Auctioneer_Event_StartAuctionScan", 200, Auctioneer_AuctionStart_Hook);
-	Stubby.RegisterFunctionHook("Auctioneer_Event_ScanAuction", 200, Auctioneer_AuctionEntry_Hook);
-	Stubby.RegisterFunctionHook("Auctioneer_Event_FinishedAuctionScan", 200, Auctioneer_FinishedAuctionScan_Hook);
+	Stubby.RegisterFunctionHook("Auctioneer.Event.StartAuctionScan", 200, Auctioneer.Scanner.AuctionStartHook);
+	Stubby.RegisterFunctionHook("Auctioneer.Event.ScanAuction", 200, Auctioneer.Scanner.AuctionEntryHook);
+	Stubby.RegisterFunctionHook("Auctioneer.Event.FinishedAuctionScan", 200, Auctioneer.Scanner.FinishedAuctionScanHook);
 
-	Stubby.RegisterFunctionHook("StartAuction", 200, Auctioneer_StartAuction)
-	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer_PlaceAuctionBid)
-	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer_FilterButton_SetType);
-	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer_AuctionFrameFilters_UpdateClasses);
-	Stubby.RegisterFunctionHook("AuctionsRadioButton_OnClick", 200, Auctioneer_OnChangeAuctionDuration);
+	Stubby.RegisterFunctionHook("StartAuction", 200, Auctioneer.Scanner.StartAuction)
+	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer.Scanner.PlaceAuctionBid)
+	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer.Scanner.FilterButtonSetType);
+	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer.Scanner.AuctionFrameFiltersUpdateClasses);
+	Stubby.RegisterFunctionHook("AuctionsRadioButton_OnClick", 200, Auctioneer.Scanner.OnChangeAuctionDuration);
 
 end
 
-function Auctioneer_LockAndLoad()
-	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 200, Auctioneer_ConfigureAH);
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, Auctioneer_ContainerFrameItemButton_OnClick);
+function lockAndLoad()
+	Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 200, Auctioneer.Scanner.ConfigureAH);
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, Auctioneer.Util.ContainerFrameItemButtonOnClick);
 
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
 	SLASH_AUCTIONEER3 = "/auc";
 	SlashCmdList["AUCTIONEER"] = function(msg)
-		Auctioneer_Command(msg, nil);
+		Auctioneer.Command.MainHandler(msg);
 	end
 
 	-- Rearranges elements in the AH window.
-	Auctioneer_ConfigureAH();
+	Auctioneer.Scanner.ConfigureAH();
 
 	--GUI Registration code added by MentalPower
-	Auctioneer_Register();
+	Auctioneer.Command.Register();
 
-	if not Babylonian.IsAddOnRegistered("Auctioneer") then 
-		Babylonian.RegisterAddOn("Auctioneer", Auctioneer_SetLocale);
+	if not Babylonian.IsAddOnRegistered("Auctioneer") then
+		Babylonian.RegisterAddOn("Auctioneer", Auctioneer.Command.SetLocale);
 	end
 
-	Auctioneer_ChatPrint(string.format(_AUCT('FrmtWelcome'), AUCTIONEER_VERSION), 0.8, 0.8, 0.2);
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
 end
 
+Auctioneer.Core = {
+	Variables = {},
+	Constants = {},
+	GetItemData = getItemData,
+	GetItemDataByID = getItemDataByID,
+	StoreMedianList = storeMedianList,
+	LoadMedianList = loadMedianList,
+	GetAuctionPriceItem = getAuctionPriceItem,
+	SaveAuctionPriceItem = saveAuctionPriceItem,
+	GetAuctionBuyoutHistory = getAuctionBuyoutHistory,
+	GetAuctionPrices = getAuctionPrices,
+	GetItemSignature = getItemSignature,
+	GetItemCategory = getItemCategory,
+	IsPlayerMade = isPlayerMade,
+	GetInfo = getInfo,
+	GetSnapshot = getSnapshot,
+	GetSnapshotFromData = getSnapshotFromData,
+	GetSnapshotInfo = getSnapshotInfo,
+	GetSnapshotInfoFromData = getSnapshotInfoFromData,
+	SaveSnapshot = saveSnapshot,
+	SaveSnapshotInfo = saveSnapshotInfo,
+	AddonLoaded = addonLoaded,
+	HookAuctionHouse = hookAuctionHouse,
+	LockAndLoad = lockAndLoad,
+}
 
+Auctioneer.Core.Variables = {
+	TotalAuctionsScannedCount = totalAuctionsScannedCount,
+	NewAuctionsCount = newAuctionsCount,
+	OldAuctionsCount = oldAuctionsCount,
+	DefunctAuctionsCount = defunctAuctionsCount,
+	SnapshotItemPrices = snapshotItemPrices,
+}
+
+Auctioneer.Core.Constants = {
+	MaxAllowedFormatInt = maxAllowedFormatInt,
+	TimeLeft = timeLeft,
+	Quality = quality,
+	MaxBuyoutHistorySize = maxBuyoutHistorySize,
+	MinProfitMargin = minProfitMargin,
+	DefaultCompeteLess = defaultCompeteLess,
+	MinBuyoutSeenCount = minBuyoutSeenCount,
+	MaxBuyoutPrice = maxBuyoutPrice,
+	MinPercentLessThanHSP = minPercentLessThanHSP,
+	MinProfitPricePercent = minProfitPricePercent,
+	MinBidPercent = minBidPercent,
+	BidBasedCategories = bidBasedCategories,
+	FilterDefaults = filterDefaults,
+}

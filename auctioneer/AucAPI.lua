@@ -10,7 +10,7 @@
 	If you do not see the function you want here, please ask for it to be added.
 	This is the only place that we guarantee the function prototypes will not change.
 	If you use any of the internal functions, one day your addon will stop working :)
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -23,10 +23,12 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
+--Local function prototypes
+local getVendorBuyPrice, getVendorSellPrice;
 
 -- Auctioneer_GetVendorBuyPrice(itemId)
 --
@@ -35,7 +37,7 @@
 --
 -- @param itemId The ID portion of the item link (the first of the four numbers).
 -- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
-function Auctioneer_GetVendorBuyPrice(itemId)
+function getVendorBuyPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.buy end
@@ -50,10 +52,15 @@ end
 --
 -- @param itemId The ID portion of the item link (the first of the four numbers).
 -- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
-function Auctioneer_GetVendorSellPrice(itemId)
+function getVendorSellPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.sell end
 	end
 	return nil;
 end
+
+Auctioneer.API = {
+GetVendorBuyPrice = getVendorBuyPrice,
+GetVendorSellPrice = getVendorSellPrice,
+}

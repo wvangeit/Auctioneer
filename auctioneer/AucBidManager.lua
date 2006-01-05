@@ -17,9 +17,9 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -34,7 +34,7 @@ local BID_AUCTION = "bid";
 local BUYOUT_AUCTION = "buyout";
 
 -- Parameters of QueryAuctionItems() last time it was called.
-local CurrentSearchParams = 
+local CurrentSearchParams =
 {
 	name = nil;
 	minLevel = nil;
@@ -270,7 +270,7 @@ function onBidResponse(result)
 				elseif (request.bidAttempts > 10) then
 					debugPrint("Reached max bid attempts!");
 					removeRequestFromQueue();
-					
+
 				-- Increment the request's current index if the auction was not bought out.
 				elseif (request.bid ~= request.buyout) then
 					request.currentIndex = request.currentIndex + 1;
@@ -282,7 +282,7 @@ function onBidResponse(result)
 			-- We were expecting the list to update after our bid/buyout, but
 			-- our bid/buyout failed so we won't be getting an update.
 			CurrentSearchParams.complete = true;
-			
+
 			-- Skip over the auction we failed to bid on.
 			request.currentIndex = request.currentIndex + 1;
 
@@ -295,7 +295,7 @@ function onBidResponse(result)
 				addPlayerToAccount(bid.owner);
 			end
 		end
-		
+
 		-- Remove the pending bid.
 		table.remove(PendingBids, 1);
 	else
@@ -326,7 +326,7 @@ end
 -- Called before QueryAuctionItems()
 -------------------------------------------------------------------------------
 function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (not Auctioneer_isScanningRequested and canSendAuctionQuery()) then
+	if (not Auctioneer.Scanning.IsScanningRequested and canSendAuctionQuery()) then
 		CurrentSearchParams.name = name;
 		CurrentSearchParams.minLevel = minLevel;
 		CurrentSearchParams.maxLevel = maxLevel;
@@ -433,7 +433,7 @@ function beginProcessingRequestQueue()
 	if (not ProcessingRequestQueue and
 		AuctionFrame and AuctionFrame:IsVisible() and
 		table.getn(RequestQueue) > 0 and
-		not Auctioneer_isScanningRequested and
+		not Auctioneer.Scanning.IsScanningRequested and
 		not isQueryInProgress() and
 		not isBidInProgress()) then
 
@@ -453,7 +453,7 @@ function beginProcessingRequestQueue()
 			Original_AuctionFrameBrowse_Update = AuctionFrameBrowse_Update;
 			AuctionFrameBrowse_Update = AucBidManager_AuctionFrameBrowse_Update;
 		end
-		
+
 		-- Hide the UI from any current results, show the no results text so we can use it
 		BrowseNoResultsText:Show();
 		BrowseNoResultsText:SetText(_AUCT('UiProcessingBidRequests'));
@@ -488,7 +488,7 @@ function endProcessingRequestQueue()
 			AuctionFrameBrowse_Update = Original_AuctionFrameBrowse_Update;
 			Original_AuctionFrameBrowse_Update = nil;
 		end
-		
+
 		-- Update the Browse UI.
 		AuctionFrameBrowse_Update();
 
@@ -642,7 +642,7 @@ function processPage()
 				-- the flag back to true again.
 				CurrentSearchParams.complete = false;
 
-				-- Update the starting point for this page				
+				-- Update the starting point for this page
 				request.currentIndex = indexOnPage;
 				request.bidAttempts = request.bidAttempts + 1;
 				break;
@@ -658,7 +658,7 @@ function processPage()
 		-- GetNumAuctionItems() will report 6 items on the page and but still
 		-- 7 total after the buyout.
 
-		if (lastIndexOnPage == 0 or 
+		if (lastIndexOnPage == 0 or
 			request.currentPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
 			-- Reached the end of the line for this item, remove it from the queue
 			removeRequestFromQueue();
@@ -678,7 +678,7 @@ end
 -------------------------------------------------------------------------------
 function bidAuction(bid, signature, callbackFunc, callbackParam)
 	debugPrint("BidAuction("..bid..", "..signature..")");
-	local id,rprop,enchant,name,count,min,buyout,unique = Auctioneer_GetItemSignature(signature);
+	local id,rprop,enchant,name,count,min,buyout,unique = Auctioneer.Core.GetItemSignature(signature);
 
 	if (bid and id and rprop and enchant and name and count and min and buyout and unique) then
 		local request = {};
@@ -739,7 +739,7 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-chatPrint = Auctioneer_ChatPrint;
+chatPrint = Auctioneer.Util.ChatPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -748,7 +748,7 @@ debugPrint = EnhTooltip.DebugPrint;
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-AucBidManager = 
+AucBidManager =
 {
 	-- Exported functions
 	BidAuction = bidAuction;

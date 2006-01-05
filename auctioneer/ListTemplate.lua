@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	List Frame Template
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -17,9 +17,9 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 local MAX_COLUMNS = 6;
 
@@ -95,7 +95,7 @@ function ListTemplate_SetColumnWidth(frame, column, width)
 	button:SetWidth(width + 2);
 	local dropdown = getglobal(frame:GetName().."Column"..column.."DropDown");
 	UIDropDownMenu_SetWidth(width - 18, dropdown);
-	
+
 	-- Resize each cell in the columns
 	for line = 1, frame.lines do
 		local textControl = getglobal(frame:GetName().."Item"..line.."Column"..column);
@@ -134,11 +134,11 @@ function ListTemplate_SelectRow(frame, row)
 			local item = getglobal(frame:GetName().."Item"..line);
 			item:UnlockHighlight();
 		end
-	
+
 		-- Update the selected item
 		frame.selectedRow = row;
 
-		-- Select the new row		
+		-- Select the new row
 		if (frame.selectedRow and firstVisibleRow <= frame.selectedRow and frame.selectedRow <= lastVisibleRow) then
 			local line = frame.selectedRow - firstVisibleRow + 1;
 			local item = getglobal(frame:GetName().."Item"..line);
@@ -166,7 +166,7 @@ function ListTemplate_Sort(frame, columnIndex)
 		frame.sortOrder[1].sortAscending = true;
 		getglobal(frame:GetName().."Column"..frame.sortOrder[1].columnIndex.."SortArrow"):Show();
 	end
-	
+
 	-- Perform the sort.
 	CurrentListFrame = frame;
 	table.sort(frame.content, ListTemplate_CompareRows);
@@ -178,7 +178,7 @@ function ListTemplate_Sort(frame, columnIndex)
 	else
 		getglobal(frame:GetName().."Column"..frame.sortOrder[1].columnIndex.."SortArrow"):SetTexCoord(0, 0.5625, 1.0, 0);
 	end
-	
+
 	-- Update the scroll pane.
 	ListTemplateScrollFrame_Update(getglobal(frame:GetName().."ScrollFrame"));
 end
@@ -252,7 +252,7 @@ function ListTemplateScrollFrame_Update(frame)
 					end
 				end
 			end
-			
+
 			-- Update the row highlight
 			if (parent.selectedRow and parent.selectedRow == contentIndex) then
 				item:LockHighlight();

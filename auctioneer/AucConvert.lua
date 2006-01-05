@@ -5,7 +5,7 @@
 
 	Auctioneer intra-version conversion.
 	Functions that allow auctioneer to upgrade the data formats when necessary.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -18,12 +18,15 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
+--Local Function Prototypes
+local backup, convert
+
 -- helperfunction to backup data, which can't be converted atm
-local function Auctioneer_Backup(server, sig, data)
+function backup(server, sig, data) --Local
 	if AuctionBackup[server] == nil then
 		AuctionBackup[server] = {}
 	end
@@ -31,7 +34,7 @@ local function Auctioneer_Backup(server, sig, data)
 	AuctionBackup[server][sig] = data
 end
 
-function Auctioneer_Convert()
+function convert()
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
 	if (AuctionConfig.version < 30200) then
 		AuctionConfig.data = {};
@@ -47,15 +50,15 @@ function Auctioneer_Convert()
 						AuctionConfig.snap[server] = {};
 					end
 					for sig, iData in pairs(sData) do
-						local catName = Auctioneer_GetCatName(tonumber(iData.category));
-						if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
+						local catName = Auctioneer.Util.GetCatName(tonumber(iData.category));
+						if (not catName) then iData.category = Auctioneer.Util.GetCatNumberByName(iData.category) end
 						local cat = iData.category;
-						Auctioneer_SaveSnapshot(server, cat, sig, iData);
+						Auctioneer.Core.SaveSnapshot(server, cat, sig, iData);
 					end
 				end
 			end
 		end
-		
+
 		if (AHSnapshotItemPrices) then
 			for server, sData in pairs(AHSnapshotItemPrices) do
 				local colon = string.find(server, ":");
@@ -65,7 +68,7 @@ function Auctioneer_Convert()
 						AuctionConfig.sbuy[server] = {};
 					end
 					for itemKey, iData in pairs(sData) do
-						Auctioneer_SaveSnapshotInfo(server, itemKey, iData);
+						Auctioneer.Core.SaveSnapshotInfo(server, itemKey, iData);
 					end
 				end
 			end
@@ -85,7 +88,7 @@ function Auctioneer_Convert()
 						local hist = ""
 						local newsig = sig
 						if type(iData) == "string" then
-							-- 2.x -> 3.1							
+							-- 2.x -> 3.1
 							local oldData = iData
 							local s1, s2, s3, s4, s5, s6, s7, sname
 
@@ -95,9 +98,9 @@ function Auctioneer_Convert()
 								-- !!!item not seen since serverrestart!!!
 								cat = 0 -- mark as unknown
 							else
-								cat = Auctioneer_GetCatNumberByName(catName)
+								cat = Auctioneer.Util.GetCatNumberByName(catName)
 							end
-							
+
 							-- signatue
 							newsig = newsig..':0:0'
 
@@ -113,7 +116,7 @@ function Auctioneer_Convert()
 								name = nil
 
 								-- backing it up so we might convert it later
-								Auctioneer_Backup(server, sig, iData)
+								backup(server, sig, iData)
 							else
 								if (name == nil) or (name == '') then
 									name = sname
@@ -125,7 +128,7 @@ function Auctioneer_Convert()
 									name = nil
 
 									-- backing it up so we might convert it later
-									Auctioneer_Backup(server, sig, iData)
+									backup(server, sig, iData)
 								else
 									-- only set the data, if the name has successfully been identified
 									data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
@@ -135,11 +138,11 @@ function Auctioneer_Convert()
 							-- unknown dataformat
 							-- ouch ! strange dataformat, can't convert atm since there is no way to get the itemid right now
 							-- backing it up so we might convert it later
-							Auctioneer_Backup(server, sig, iData)
+							backup(server, sig, iData)
 						else
 							-- 3.0 -> 3.1
-							catName = Auctioneer_GetCatName(tonumber(iData.category));
-							if (not catName) then iData.category = Auctioneer_GetCatNumberByName(iData.category) end 
+							catName = Auctioneer.Util.GetCatName(tonumber(iData.category));
+							if (not catName) then iData.category = Auctioneer.Util.GetCatNumberByName(iData.category) end
 							cat = iData.category;
 							data = iData.data;
 							name = iData.name;
@@ -176,7 +179,7 @@ function Auctioneer_Convert()
 				end
 			end
 		end
-		
+
 		AuctionConfig.bids = {};
 		if (AuctionBids) then
 			for player, pData in pairs(AuctionBids) do
@@ -196,7 +199,7 @@ function Auctioneer_Convert()
 			end
 		end
 	end
-	
+
 	-- Now the conversion is complete, wipe out the old data
 	AHSnapshot = nil;
 	AHSnapshotItemPrices = nil;
@@ -205,4 +208,6 @@ function Auctioneer_Convert()
 	AuctionConfig.version = 30201;
 end
 
-
+Auctioneer.Convert = {
+Convert = convert,
+}

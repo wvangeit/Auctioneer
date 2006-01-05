@@ -1,7 +1,7 @@
 --[[
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -14,7 +14,7 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 -----------------------------------------------------------------------------
@@ -22,11 +22,11 @@
 -- values in the correct direction to keep the list balanced and median values
 -- in the center
 -----------------------------------------------------------------------------
-function newBalancedList(paramSize)
+local function newBalancedList(paramSize)
 	local self = {maxSize = paramSize, list = {}};
 
 	-- Does an ordered insert and pushes the an end value off if maxsize
-	-- is exceeded. The end value that is pushed of depends on the location in 
+	-- is exceeded. The end value that is pushed of depends on the location in
 	-- the list that the value was inserted. If it is inserted on the left half
 	-- of the list then the right end value will be pushed off and vise versa.
 	-- This is what keeps the list balanced. For example if your list is {1,2,3,4}
@@ -75,7 +75,7 @@ function newBalancedList(paramSize)
 	local clear = function()
 		self.list = {};
 	end
-    
+
 	-- set the list from a list, if the size exeeds maxSize it it truncated
 	local setList = function(externalList)
 		clear();
@@ -85,17 +85,17 @@ function newBalancedList(paramSize)
 			end
 		end
 	end
-    
+
 	-- returns the median value of the list
 	local getMedian = function()
 		return getMedian(self.list);
 	end
-    
+
 	-- returns the current size of the list
 	local size = function()
         return table.getn(self.list);
     end
-    
+
     -- retrieves the value in the list at this position
     local get = function(pos)
 		return tonumber(self.list[pos]);
@@ -104,11 +104,11 @@ function newBalancedList(paramSize)
 	local getMaxSize = function()
 		return self.maxSize;
 	end
-    
+
 	local getList = function ()
 		return self.list;
 	end
-    
+
 	return {
 		['insert']     = insert,
 		['getMedian']  = getMedian,
@@ -120,3 +120,8 @@ function newBalancedList(paramSize)
 		['getList']    = getList
 	}
 end
+
+
+Auctioneer.BalancedList = {
+NewBalancedList = newBalancedList,
+}

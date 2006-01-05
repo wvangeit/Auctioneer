@@ -4,7 +4,7 @@
 	A sub-addon that manages the locales for other addons.
 	<%version%> (<%codename%>)
 	$Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 ]]
@@ -101,7 +101,7 @@ function isAddOnRegistered(AddOn)
 	if ((not AddOn) or (not type(AddOn) == "string")) then
 		return nil;
 	end
-	
+
 	return (self.update[AddOn] ~= nil);
 end
 

@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	Auctioneer Post Auctions tab
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -17,9 +17,9 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -56,7 +56,7 @@ function AuctionFramePost_OnLoad()
 	this.auctionList = getglobal(this:GetName().."List");
 
 	-- Configure the logical columns
-	this.logicalColumns = 
+	this.logicalColumns =
 	{
 		Quantity =
 		{
@@ -81,7 +81,7 @@ function AuctionFramePost_OnLoad()
 		{
 			title = _AUCT("UiTimeLeftHeader");
 			dataType = "String";
-			valueFunc = (function(record) return Auctioneer_GetTimeLeftString(record.timeLeft) end);
+			valueFunc = (function(record) return Auctioneer.Util.GetTimeLeftString(record.timeLeft) end);
 			alphaFunc = AuctionFramePost_GetItemAlpha;
 			compareAscendingFunc = (function(record1, record2) return record1.timeLeft < record2.timeLeft end);
 			compareDescendingFunc = (function(record1, record2) return record1.timeLeft > record2.timeLeft end);
@@ -125,7 +125,7 @@ function AuctionFramePost_OnLoad()
 	};
 
 	-- Configure the physical columns
-	this.physicalColumns = 
+	this.physicalColumns =
 	{
 		{
 			width = 50;
@@ -180,13 +180,13 @@ function AuctionFramePost_UpdatePriceModels(frame, name, count)
 	frame.prices = {};
 
 	if (name and count) then
-		local bag, slot, id, rprop, enchant, uniq = Auctioneer_FindItemInBags(name);
+		local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
 		local itemKey = id..":"..rprop..":"..enchant;
-		local hsp, histCount, market, warn, nexthsp, nextwarn = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+		local hsp, histCount, market, warn, nexthsp, nextwarn = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 
 		-- Get the fixed price
-		if (Auctioneer_GetFixedPrice(itemKey)) then
-			local startPrice, buyPrice = Auctioneer_GetFixedPrice(itemKey, count);
+		if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
+			local startPrice, buyPrice = Auctioneer.Storage.GetFixedPrice(itemKey, count);
 			local fixedPrice = {};
 			fixedPrice.text = "Fixed Price";
 			fixedPrice.note = "";
@@ -197,16 +197,16 @@ function AuctionFramePost_UpdatePriceModels(frame, name, count)
 
 		-- Calculate auctioneer's suggested resale price.
 		if (hsp == 0) then
-			local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey, Auctioneer_GetAuctionKey());
-			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
+			local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, Auctioneer.Util.GetAuctionKey());
+			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
 			hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
 		end
-		local discountBidPercent = tonumber(Auctioneer_GetFilterVal('pct-bidmarkdown'));
+		local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
 		local auctioneerPrice = {};
 		auctioneerPrice.text = "Auctioneer Price";
 		auctioneerPrice.note = warn;
-		auctioneerPrice.buyout = Auctioneer_RoundDownTo95(nullSafe(hsp) * count);
-		auctioneerPrice.bid = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(auctioneerPrice.buyout, discountBidPercent));
+		auctioneerPrice.buyout = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * count);
+		auctioneerPrice.bid = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(auctioneerPrice.buyout, discountBidPercent));
 		table.insert(frame.prices, auctioneerPrice);
 
 		-- Add the fallback custom price
@@ -242,17 +242,17 @@ function AuctionFramePost_UpdateAuctionList(frame)
 	frame.auctions = {};
 	local itemName = frame:GetItemName();
 	if (itemName) then
-		local auctions = Auctioneer_QuerySnapshot(AuctionFramePost_ItemNameFilter, itemName);
+		local auctions = Auctioneer.Filter.QuerySnapshot(AuctionFramePost_ItemNameFilter, itemName);
 		if (auctions) then
 			for _,a in pairs(auctions) do
-				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer_GetItemSignature(a.signature);
+				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
 				local auction = {};
 				auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
 				auction.quantity = count;
 				auction.name = itemName;
 				auction.owner = a.owner;
 				auction.timeLeft = a.timeLeft;
-				auction.bid = Auctioneer_GetCurrentBid(a.signature);
+				auction.bid = Auctioneer.Statistic.GetCurrentBid(a.signature);
 				auction.bidPer = math.floor(auction.bid / auction.quantity);
 				auction.buyout = buyout;
 				auction.buyoutPer = math.floor(auction.buyout / auction.quantity);
@@ -306,7 +306,7 @@ end
 -- Sets the price model note (i.e. "Undercutting 5%")
 -------------------------------------------------------------------------------
 function AuctionFramePost_SetNoteText(frame, text)
-	local cHex, cRed, cGreen, cBlue = Auctioneer_GetWarnColor(text);
+	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(text);
 
 	getglobal(frame:GetName().."PriceModelNoteText"):SetText(text);
 	getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(cRed, cGreen, cBlue);
@@ -426,7 +426,7 @@ function AuctionFramePost_SetDuration(frame, duration)
 		mediumRadio:SetChecked(nil);
 		longRadio:SetChecked(1);
 	end
-	
+
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
 	frame:ValidateAuction();
@@ -446,18 +446,18 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 	-- Prevent validation while updating.
 	frame.updating = true;
 
-	-- Update the controls with the item.	
+	-- Update the controls with the item.
 	local button = getglobal(frame:GetName().."AuctionItem");
 	if (bag and item) then
 		-- Get the item's information.
 		local itemLink = GetContainerItemLink(bag, item)
-		local itemID, randomProp, enchant, uniqueId, name = Auctioneer_BreakLink(itemLink);
+		local itemID, randomProp, enchant, uniqueId, name = EnhTooltip.BreakLink(itemLink);
 		local itemTexture, itemCount = GetContainerItemInfo(bag, item);
 		if (count == nil) then
 			count = itemCount;
 		end
 
-		-- Save the item's information.	
+		-- Save the item's information.
 		frame.itemName = name;
 		frame.itemID = itemID;
 
@@ -604,9 +604,9 @@ function AuctionFramePost_AuctionItem_OnClick(button)
 	end
 
 	-- Update the current item displayed
-	if (item) then	
+	if (item) then
 		local itemLink = GetContainerItemLink(item.bag, item.slot)
-		local _, _, _, _, itemName = Auctioneer_BreakLink(itemLink);
+		local _, _, _, _, itemName = EnhTooltip.BreakLink(itemLink);
 		local _, count = GetContainerItemInfo(item.bag, item.slot);
 		frame:SetAuctionItem(item.bag, item.slot, count);
 	else
@@ -643,8 +643,8 @@ function AuctionFramePost_BuyoutPrice_OnChanged()
 	local frame = this:GetParent():GetParent();
 	if (not frame.ignoreBuyoutPriceChange and not frame.updating) then
 		frame.updating = true;
-		local discountBidPercent = tonumber(Auctioneer_GetFilterVal('pct-bidmarkdown'));
-		local bidPrice = Auctioneer_SubtractPercent(frame:GetBuyoutPrice(), discountBidPercent);
+		local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
+		local bidPrice = Auctioneer.Statistic.SubtractPercent(frame:GetBuyoutPrice(), discountBidPercent);
 		frame:SetStartPrice(bidPrice);
 		frame.updating = false;
 		frame:ValidateAuction();
@@ -694,9 +694,9 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 
 	-- Check if we should save the pricing information.
 	if (frame:GetSavePrice()) then
-		local bag, slot, id, rprop, enchant, uniq = Auctioneer_FindItemInBags(name);
+		local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
 		local itemKey = id..":"..rprop..":"..enchant;
-		Auctioneer_SetFixedPrice(itemKey, startPrice, buyoutPrice, duration, stackSize, Auctioneer_GetAuctionKey());
+		Auctioneer.Storage.SetFixedPrice(itemKey, startPrice, buyoutPrice, duration, stackSize, Auctioneer.Util.GetAuctionKey());
 	end
 
 	-- Post the auction.
@@ -807,10 +807,10 @@ function AuctionFramePost_GetMaxStackSize(itemID)
 end
 
 -------------------------------------------------------------------------------
--- Filter for Auctioneer_QuerySnapshot that filters on item name.
+-- Filter for Auctioneer.Filter.QuerySnapshot that filters on item name.
 -------------------------------------------------------------------------------
 function AuctionFramePost_ItemNameFilter(item, signature)
-	local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
+	local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
 	if (item == name) then
 		return false;
 	end

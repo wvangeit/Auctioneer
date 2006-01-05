@@ -17,9 +17,9 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -74,7 +74,7 @@ function AucPostManagerFrame_OnEvent(event)
 		while (table.getn(RequestQueue) > 0) do
 			removeRequestFromQueue();
 		end
-	
+
 	-- Hand off the event to the current request
 	elseif (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
@@ -161,7 +161,7 @@ end
 function removeRequestFromQueue()
 	if (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
-		
+
 		-- Make absolutely sure we are back in the READY_STATE so that we
 		-- correctly unregister for events.
 		setState(request, READY_STATE);
@@ -175,7 +175,7 @@ function removeRequestFromQueue()
 		-- %localize%
 		chatPrint("Posted "..request.stackPostCount.. " auction(s) of "..request.name.." (x"..request.stackSize..")");
 		table.remove(RequestQueue, 1);
-		
+
 		-- If this was the last request, end processing the queue.
 		if (table.getn(RequestQueue) == 0) then
 			endProcessingRequestQueue()
@@ -253,7 +253,7 @@ function run(request)
 		else
 			-- Find the first stack.
 			stack1 = findStackByName(request.name);
-			
+
 			-- Now look for a stack of the exact size to use instead.
 			if (stack1) then
 				local stack2 = { bag = stack1.bag, slot = stack1.slot };
@@ -339,7 +339,7 @@ end
 -------------------------------------------------------------------------------
 function onEvent(request, event)
 	debugPrint("Received event "..event.. " in state "..request.state);
-	
+
 	-- Process the event.
 	if (event == "ITEM_LOCK_CHANGED") then
 		-- Check if we are waiting for a stack to be complete.
@@ -357,7 +357,7 @@ function onEvent(request, event)
 		if (request.state == AUCTIONING_STACK_STATE and GetContainerItemInfo(request.stack.bag, request.stack.slot) == nil) then
 			-- Ready to move onto the next step.
 			setState(request, READY_STATE);
-			
+
 			-- Decrement the auction target count.
 			request.stackPostCount = request.stackPostCount + 1;
 			if (request.stackPostCount == request.stackCount) then
@@ -373,7 +373,7 @@ end
 function setState(request, newState)
 	if (request.state ~= newState) then
 		debugPrint("Entered state: "..newState);
-		
+
 		-- Unregister for events needed in the old state.
 		if (request.state == SPLITTING_STACK_STATE or
 			request.state == COMBINING_STACK_STATE or
@@ -385,10 +385,10 @@ function setState(request, newState)
 			AucPostManagerFrame:UnregisterEvent("BAG_UPDATE");
 		end
 
-		-- Update the request's state.		
+		-- Update the request's state.
 		request.state = newState;
 		request.lockEventsInCurrentState = 0;
-		
+
 		-- Register for events needed in the new state.
 		if (request.state == SPLITTING_STACK_STATE or
 			request.state == COMBINING_STACK_STATE or
@@ -455,7 +455,7 @@ end
 function getItemName(bag, slot)
 	local link = GetContainerItemLink(bag, slot);
 	if (link) then
-		local _, _, _, _, name = Auctioneer_BreakLink(link);
+		local _, _, _, _, name = EnhTooltip.BreakLink(link);
 		return name;
 	end
 end
@@ -531,7 +531,7 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-chatPrint = Auctioneer_ChatPrint;
+chatPrint = Auctioneer.Util.ChatPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -540,7 +540,7 @@ debugPrint = EnhTooltip.DebugPrint;
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-AucPostManager = 
+AucPostManager =
 {
 	-- Exported functions
 	PostAuction = postAuction;

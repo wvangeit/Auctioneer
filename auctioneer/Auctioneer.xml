@@ -17,14 +17,17 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
+	<Script file="AucObjects.lua"/>
+
 	<Script file="Babylonian.lua"/>
 	<Script file="AucStrings.lua"/>
 	<Script file="AucLocale.lua"/>
 
 	<Script file="BalancedList.lua"/>
+	<Script file="AucEvent.lua"/>
 	<Script file="AHScanning.lua"/>
 	<Script file="AucAPI.lua"/>
 	<Script file="AucCommand.lua"/>
@@ -41,16 +44,16 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AuctioneerUI.lua"/>
 	<Script file="AucBidManager.lua"/>
 	<Script file="AucPostManager.lua"/>
-	<Frame name="Auctioneer" parent="UIParent" hidden="true">
+	<Frame name="AuctioneerFrame" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
-				Auctioneer_OnLoad();
+				Auctioneer.OnLoad();
 				AuctioneerUI_OnLoad();
 				this:RegisterEvent("ADDON_LOADED")
 			</OnLoad>
 			<OnEvent>
 				if (event == "ADDON_LOADED" and string.lower(arg1) == "auctioneer") then
-					Auctioneer_AddonLoaded()
+					Auctioneer.Core.AddonLoaded()
 					this:UnregisterEvent("ADDON_LOADED")
 				end
 			</OnEvent>
@@ -62,10 +65,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Size>
 				<Scripts>
 					<OnClick>
-						Auctioneer_RequestAuctionScan();
+						Auctioneer.Scanning.RequestAuctionScan();
 					</OnClick>
 					<OnUpdate>
-						if (Auctioneer_CanScan()) then
+						if (Auctioneer.Scanning.CanScan()) then
 							this:Enable();
 						else
 							this:Disable();
@@ -263,7 +266,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 		<Scripts>
 			<OnClick>
-				Auctioneer_RememberPrice()
+				Auctioneer.Scanner.RememberPrice()
 			</OnClick>
 		</Scripts>
 	</CheckButton>
@@ -280,9 +283,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnClick>
 				if (this.filterVal) then
 					if (this:GetChecked()) then
-						Auctioneer_SetFilter(this.filterVal, "on");
+						Auctioneer.Command.SetFilter(this.filterVal, "on");
 					else
-						Auctioneer_SetFilter(this.filterVal, "off");
+						Auctioneer.Command.SetFilter(this.filterVal, "off");
 					end
 				end
 			</OnClick>

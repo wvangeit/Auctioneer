@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	Auctioneer UI manager
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -17,9 +17,9 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Data members
@@ -46,10 +46,10 @@ end
 -- Called after Blizzard's AuctionFrameTab_OnClick() method.
 -------------------------------------------------------------------------------
 function AuctioneerUI_AuctionFrameTab_OnClickHook(_, _, index)
-	if (not index) then 
+	if (not index) then
 		index = this:GetID();
 	end
-	
+
 	-- Handle the Auctioneer tabs
 	AuctionFrameSearch:Hide();
 	AuctionFramePost:Hide();

@@ -18,71 +18,53 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
--- Auction time constants
-TIME_LEFT_SHORT = 1;
-TIME_LEFT_MEDIUM = 2;
-TIME_LEFT_LONG = 3;
-TIME_LEFT_VERY_LONG = 4;
+]]
 
-TIME_LEFT_SECONDS = {
-	[0] = 0,		-- Could expire any second... the current bid is relatively accurate.
-	[1] = 1800,		-- If it disappears within 30 mins of last seing it, it was BO'd
-	[2] = 7200,		-- Ditto but for 2 hours.
-	[3] = 28800,	-- 8 hours.
-	[4] = 86400,	-- 24 hours.
-}
-
--- Item quality constants
-QUALITY_LEGENDARY	=	5;
-QUALITY_EPIC		=	4;
-QUALITY_RARE		=	3;
-QUALITY_UNCOMMON	=	2;
-QUALITY_COMMON		=	1;
-QUALITY_POOR		=	0;
+--Local function prototypes
+local getTimeLeftString, getSecondsLeftString, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, breakItemKey, split, findClass, getCatName, getCatNumberByName, getCatForKey, getKeyFromSig, getCatForSig, getItemLinks, getItems, getItemHyperlinks, loadCategories, loadCategoryClasses, loadCategorySubClasses, chatPrint, setFilterDefaults, protectAuctionFrame, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot, containerFrameItemButtonOnClick
 
 -- return the string representation of the given timeLeft constant
-function Auctioneer_GetTimeLeftString(timeLeft)
+function getTimeLeftString(timeLeft)
 	local timeLeftString = "";
 
-	if timeLeft == TIME_LEFT_SHORT then
+	if timeLeft == Auctioneer.Core.Constants.TimeLeft.Short then
 		timeLeftString = _AUCT('TimeShort');
 
-	elseif timeLeft == TIME_LEFT_MEDIUM then
+	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.Medium then
 		timeLeftString = _AUCT('TimeMed');
 
-	elseif timeLeft == TIME_LEFT_LONG then
+	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.Long then
 		timeLeftString = _AUCT('TimeLong');
 
-	elseif timeLeft == TIME_LEFT_VERY_LONG then
+	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.VeryLong then
 		timeLeftString = _AUCT('TimeVlong');
 	end
 
 	return timeLeftString;
 end
 
-function Auctioneer_GetSecondsLeftString(secondsLeft)
+function getSecondsLeftString(secondsLeft)
 	local timeLeft = nil;
 
-	for i = table.getn(TIME_LEFT_SECONDS), 1, -1 do
+	for i = table.getn(Auctioneer.Core.Constants.TimeLeft.Seconds), 1, -1 do
 
-		if (secondsLeft >= TIME_LEFT_SECONDS[i]) then
+		if (secondsLeft >= Auctioneer.Core.Constants.TimeLeft.Seconds[i]) then
 			timeLeft = i;
 			break
 		end
 	end
 
-	return Auctioneer_GetTimeLeftString(timeLeft);
+	return getTimeLeftString(timeLeft);
 end
 
-function Auctioneer_GetGSC(money)
+function getGSC(money)
 	local g,s,c = EnhTooltip.GetGSC(money);
 	return g,s,c;
 end
 
-function Auctioneer_GetTextGSC(money)
+function getTextGSC(money)
 	return EnhTooltip.GetGSC(money);
 end
 
@@ -92,7 +74,7 @@ function nilSafeString(str)
 	return str;
 end
 
-function Auctioneer_ColorTextWhite(text)
+function colorTextWhite(text)
 	if (not text) then text = ""; end
 
 	local COLORING_START = "|cff%s%s|r";
@@ -101,15 +83,15 @@ function Auctioneer_ColorTextWhite(text)
 	return string.format(COLORING_START, WHITE_COLOR, ""..text);
 end
 
-function Auctioneer_GetWarnColor(warn)
+function getWarnColor(warn)
 	--Make "warn" a required parameter and verify that its a string
-	if (not warn) or (not type(warn) == "String") then 
-		return nil 
+	if (not warn) or (not type(warn) == "String") then
+		return nil
 	end
 
 	local cHex, cRed, cGreen, cRed;
 
-	if (Auctioneer_GetFilter('warn-color')) then
+	if (Auctioneer.Command.GetFilter('warn-color')) then
 		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
 
 		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
@@ -168,13 +150,8 @@ function nullSafe(val)
 	return 0;
 end
 
--- We don't use this function anymore but other code may.
-function Auctioneer_SanifyAHSnapshot()
-	return Auctioneer_GetAuctionKey();
-end
-
--- Returns the current faction's auction signature
-function Auctioneer_GetAuctionKey()
+-- Returns the current faction's auction signature, depending on location
+function getAuctionKey()
 	local serverName = GetCVar("realmName");
 	local currentZone = GetMinimapZoneText();
 	local factionGroup;
@@ -183,14 +160,14 @@ function Auctioneer_GetAuctionKey()
 	if ((currentZone == "Gadgetzan") or (currentZone == "Everlook") or (currentZone == "Booty Bay")) then
 		factionGroup = "Neutral"
 
-	else 
+	else
 		factionGroup = UnitFactionGroup("player");
 	end
 	return serverName.."-"..factionGroup;
 end
 
 -- Returns the current faction's opposing faction's auction signature
-function Auctioneer_GetOppositeKey()
+function getOppositeKey()
 	local serverName = GetCVar("realmName");
 	local factionGroup = UnitFactionGroup("player");
 
@@ -198,15 +175,15 @@ function Auctioneer_GetOppositeKey()
 	return serverName.."-"..factionGroup;
 end
 
--- Returns the current faction's opposing faction's auction signature
-function Auctioneer_GetNeutralKey()
+-- Returns the current server's neutral auction signature
+function getNeutralKey()
 	local serverName = GetCVar("realmName");
 
 	return serverName.."-Neutral";
 end
 
--- Returns the current faction's opposing faction's auction signature
-function Auctioneer_GetHomeKey()
+-- Returns the current faction's auction signature
+function getHomeKey()
 	local serverName = GetCVar("realmName");
 	local factionGroup = UnitFactionGroup("player");
 
@@ -214,7 +191,7 @@ function Auctioneer_GetHomeKey()
 end
 
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
-function Auctioneer_IsValidAlso(also)
+function isValidAlso(also)
 	if (type(also) ~= "string") then
 		return false
 	end
@@ -237,18 +214,13 @@ function Auctioneer_IsValidAlso(also)
 	return true
 end
 
-Auctioneer_BreakLink = EnhTooltip.BreakLink;
-Auctioneer_FindItemInBags = EnhTooltip.FindItemInBags;
-
-
 -- Given an item key, breaks it into it's itemID, randomProperty and enchantProperty
-function Auctioneer_BreakItemKey(itemKey)
+function breakItemKey(itemKey)
 	local i,j, itemID, randomProp, enchant = string.find(itemKey, "(%d+):(%d+):(%d+)");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0);
 end
 
-
-function Auctioneer_Split(str, at)
+function split(str, at)
 	local splut = {};
 
 	if (type(str) ~= "string") then return nil end
@@ -267,9 +239,9 @@ function Auctioneer_Split(str, at)
 	return splut;
 end
 
-function Auctioneer_FindClass(cName, sName)
+function findClass(cName, sName)
 
-	if (AuctionConfig and AuctionConfig.classes) then 
+	if (AuctionConfig and AuctionConfig.classes) then
 
 		for class, cData in pairs(AuctionConfig.classes) do
 
@@ -288,7 +260,7 @@ function Auctioneer_FindClass(cName, sName)
 	return 0,0;
 end
 
-function Auctioneer_GetCatName(number)
+function getCatName(number)
 	if (number == 0) then return "" end;
 
 	if (AuctionConfig.classes[number]) then
@@ -297,9 +269,9 @@ function Auctioneer_GetCatName(number)
 	return nil;
 end
 
-function Auctioneer_GetCatNumberByName(name)
+function getCatNumberByName(name)
 	if (not name) then return 0 end
-	if (AuctionConfig and AuctionConfig.classes) then 
+	if (AuctionConfig and AuctionConfig.classes) then
 
 		for cat, class in pairs(AuctionConfig.classes) do
 			if (name == class.name) then
@@ -310,23 +282,23 @@ function Auctioneer_GetCatNumberByName(name)
 	return 0;
 end
 
-function Auctioneer_GetCatForKey(itemKey)
-	local info = Auctioneer_GetInfo(itemKey);
+function getCatForKey(itemKey)
+	local info = Auctioneer.Core.GetInfo(itemKey);
 	return info.category;
 end
 
-function Auctioneer_GetKeyFromSig(auctSig)
-	local id, rprop, enchant = Auctioneer_GetItemSignature(auctSig);
+function getKeyFromSig(auctSig)
+	local id, rprop, enchant = Auctioneer.Core.GetItemSignature(auctSig);
 	return id..":"..rprop..":"..enchant;
 end
 
-function Auctioneer_GetCatForSig(auctSig)
-	local itemKey = Auctioneer_GetKeyFromSig(auctSig);
-	return Auctioneer_GetCatForKey(itemKey);
+function getCatForSig(auctSig)
+	local itemKey = getKeyFromSig(auctSig);
+	return getCatForKey(itemKey);
 end
 
 
-function Auctioneer_GetItemLinks(str)
+function getItemLinks(str)
 	if (not str) then return nil end
 	local itemList = {};
 	local listSize = 0;
@@ -339,7 +311,7 @@ function Auctioneer_GetItemLinks(str)
 end
 
 
-function Auctioneer_GetItems(str)
+function getItems(str)
 	if (not str) then return nil end
 	local itemList = {};
 	local listSize = 0;
@@ -354,7 +326,7 @@ function Auctioneer_GetItems(str)
 end
 
 --Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
-function Auctioneer_GetItemHyperlinks(str)
+function getItemHyperlinks(str)
 	if (not str) then return nil end
 	local itemList = {};
 	local listSize = 0;
@@ -366,33 +338,33 @@ function Auctioneer_GetItemHyperlinks(str)
 	return itemList;
 end
 
-function Auctioneer_LoadCategories()
+function loadCategories()
 	if (not AuctionConfig.classes) then AuctionConfig.classes = {} end
-	Auctioneer_LoadCategoryClasses(GetAuctionItemClasses());
+	loadCategoryClasses(GetAuctionItemClasses());
 end
 
-function Auctioneer_LoadCategoryClasses(...)
+function loadCategoryClasses(...)
 	for c=1, arg.n, 1 do
 		AuctionConfig.classes[c] = {};
 		AuctionConfig.classes[c].name = arg[c];
-		Auctioneer_LoadCategorySubClasses(c, GetAuctionItemSubClasses(c));
+		loadCategorySubClasses(c, GetAuctionItemSubClasses(c));
 	end
 end
 
-function Auctioneer_LoadCategorySubClasses(c, ...)
+function loadCategorySubClasses(c, ...)
 	for s=1, arg.n, 1 do
 		AuctionConfig.classes[c][s] = arg[s];
 	end
 end
 
-function Auctioneer_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
-	local frameIndex = Auctioneer_GetFrameIndex();
+function chatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
+	local frameIndex = Auctioneer.Command.GetFrameIndex();
 
 	if (cRed and cGreen and cBlue) then
 		if getglobal("ChatFrame"..frameIndex) then
 			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 
-		elseif (DEFAULT_CHAT_FRAME) then 
+		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 		end
 
@@ -400,18 +372,18 @@ function Auctioneer_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
 		if getglobal("ChatFrame"..frameIndex) then
 			getglobal("ChatFrame"..frameIndex):AddMessage(text, 0.0, 1.0, 0.25);
 
-		elseif (DEFAULT_CHAT_FRAME) then 
+		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, 0.0, 1.0, 0.25);
 		end
 	end
 end
 
-function Auctioneer_SetFilterDefaults()
+function setFilterDefaults()
 	if (not AuctionConfig.filters) then
 		AuctionConfig.filters = {};
 	end
 
-	for k,v in ipairs(Auctioneer_FilterDefaults) do
+	for k,v in ipairs(Auctioneer.Core.Constants.FilterDefaults) do
 		if (AuctionConfig.filters[k] == nil) then
 			AuctionConfig.filters[k] = v;
 		end
@@ -419,7 +391,7 @@ function Auctioneer_SetFilterDefaults()
 end
 
 -- Pass true to protect the Auction Frame from being undesireably closed, not true to disable this
-function Auctioneer_ProtectAuctionFrame(enable)
+function protectAuctionFrame(enable)
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
 		--Handle enabling of protection
@@ -483,7 +455,7 @@ function Auctioneer_ProtectAuctionFrame(enable)
 	end
 end
 
-function Auctioneer_Round(x)
+function round(x)
 	local y = math.floor(x);
 
 	if (x - y >= 0.5) then
@@ -496,10 +468,10 @@ end
 -- Localization functions
 -------------------------------------------------------------------------------
 
-Auctioneer_CommandMap = nil;
-Auctioneer_CommandMapRev = nil;
+Auctioneer.Command.CommandMap = nil;
+Auctioneer.Command.CommandMapRev = nil;
 
-function Auctioneer_DelocalizeFilterVal(value)
+function delocalizeFilterVal(value)
 	if (value == _AUCT('CmdOn')) then
 		return 'on';
 
@@ -514,10 +486,10 @@ function Auctioneer_DelocalizeFilterVal(value)
 
 	else
 		return value;
-	end	
+	end
 end
 
-function Auctioneer_LocalizeFilterVal(value)
+function localizeFilterVal(value)
 	local result
 
 	if (value == 'on') then
@@ -536,22 +508,22 @@ function Auctioneer_LocalizeFilterVal(value)
 	if (result) then return result; else return value; end
 end
 
-function Auctioneer_GetLocalizedFilterVal(key)
-	return Auctioneer_LocalizeFilterVal(Auctioneer_GetFilterVal(key))
+function getLocalizedFilterVal(key)
+	return localizeFilterVal(Auctioneer.Command.GetFilterVal(key))
 end
 
 -- Turns a localized slash command into the generic English version of the command
-function Auctioneer_DelocalizeCommand(cmd)
-	if (not Auctioneer_CommandMap) then Auctioneer_BuildCommandMap();end
-	local result = Auctioneer_CommandMap[cmd];
+function delocalizeCommand(cmd)
+	if (not Auctioneer.Command.CommandMap) then Auctioneer.Command.BuildCommandMap();end
+	local result = Auctioneer.Command.CommandMap[cmd];
 
 	if (result) then return result; else return cmd; end
 end
 
 -- Translate a generic English slash command to the localized version, if available
-function Auctioneer_LocalizeCommand(cmd)
-	if (not Auctioneer_CommandMapRev) then Auctioneer_BuildCommandMap(); end
-	local result = Auctioneer_CommandMapRev[cmd];
+function localizeCommand(cmd)
+	if (not Auctioneer.Command.CommandMapRev) then Auctioneer.Command.BuildCommandMap(); end
+	local result = Auctioneer.Command.CommandMapRev[cmd];
 
 	if (result) then return result; else return cmd; end
 end
@@ -560,7 +532,7 @@ end
 -- Inventory modifying functions
 -------------------------------------------------------------------------------
 
-function Auctioneer_FindEmptySlot()
+function findEmptySlot()
 	local name, i
 	for bag = 0, 4 do
 		name = GetBagName(bag)
@@ -576,7 +548,7 @@ function Auctioneer_FindEmptySlot()
 end
 
 
-function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, button, ignoreShift)
+function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignoreShift) --Auctioneer_ContainerFrameItemButton_OnClick
 	local bag = this:GetParent():GetID()
 	local slot = this:GetID()
 
@@ -584,12 +556,12 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 	if (count and count > 1 and not noSplit) then
 		if (button == "RightButton") and (IsControlKeyDown()) then
 			local splitCount = math.floor(count / 2)
-			local emptyBag, emptySlot = Auctioneer_FindEmptySlot()
+			local emptyBag, emptySlot = findEmptySlot()
 			if (emptyBag) then
 				SplitContainerItem(bag, slot, splitCount)
 				PickupContainerItem(emptyBag, emptySlot)
 			else
-				Auctioneer_ChatPrint("Can't split, all bags are full")
+				chatPrint("Can't split, all bags are full")
 			end
 			return "abort";
 		end
@@ -627,7 +599,7 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 
 	if (not CursorHasItem() and AuctionFrameAuctions and AuctionFrameAuctions:IsVisible() and IsAltKeyDown()) then
 		PickupContainerItem(bag, slot)
-		if (CursorHasItem() and Auctioneer_GetFilter('auction-click')) then
+		if (CursorHasItem() and Auctioneer.Command.GetFilter('auction-click')) then
 			ClickAuctionSellItemButton()
 			AuctionsFrameAuctions_ValidateAuction()
 			local start = MoneyInputFrame_GetCopper(StartPrice)
@@ -635,9 +607,9 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 			local duration = AuctionFrameAuctions.duration
 			local warn = AuctionInfoWarnText:GetText()
 			if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
-				warn = ("|c"..Auctioneer_GetWarnColor(warn)..warn.."|r")
+				warn = ("|c"..getWarnColor(warn)..warn.."|r")
 				StartAuction(start, buy, duration);
-				Auctioneer_ChatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
+				chatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 			end
 			return "abort";
 		end
@@ -649,16 +621,58 @@ function Auctioneer_ContainerFrameItemButton_OnClick(hookParams, returnValue, bu
 			if (count > 1 and IsShiftKeyDown()) then
 				this.SplitStack = function(button, split)
 					local link = GetContainerItemLink(bag, slot)
-					local _, _, _, _, name = Auctioneer_BreakLink(link);
+					local _, _, _, _, name = EnhTooltip.BreakLink(link);
 					AuctionFramePost:SetAuctionItem(bag, slot, split);
 				end
 				OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
 			else
 				local link = GetContainerItemLink(bag, slot)
-				local _, _, _, _, name = Auctioneer_BreakLink(link);
+				local _, _, _, _, name = EnhTooltip.BreakLink(link);
 				AuctionFramePost:SetAuctionItem(bag, slot, 1);
 			end
 			return "abort";
 		end
 	end
 end
+
+Auctioneer.Util = {
+	GetTimeLeftString = getTimeLeftString,
+	GetSecondsLeftString = getSecondsLeftString,
+	GetGSC = getGSC,
+	GetTextGSC = getTextGSC,
+	NilSafeString = nilSafeString,
+	ColorTextWhite = colorTextWhite,
+	GetWarnColor = getWarnColor,
+	NullSafe = nullSafe,
+	SanifyAHSnapshot = sanifyAHSnapshot,
+	GetAuctionKey = getAuctionKey,
+	GetOppositeKey = getOppositeKey,
+	GetNeutralKey = getNeutralKey,
+	GetHomeKey = getHomeKey,
+	IsValidAlso = isValidAlso,
+	BreakItemKey = breakItemKey,
+	Split = split,
+	FindClass = findClass,
+	GetCatName = getCatName,
+	GetCatNumberByName = getCatNumberByName,
+	GetCatForKey = getCatForKey,
+	GetKeyFromSig = getKeyFromSig,
+	GetCatForSig = getCatForSig,
+	GetItemLinks = getItemLinks,
+	GetItems = getItems,
+	GetItemHyperlinks = getItemHyperlinks,
+	LoadCategories = loadCategories,
+	LoadCategoryClasses = loadCategoryClasses,
+	LoadCategorySubClasses = loadCategorySubClasses,
+	ChatPrint = chatPrint,
+	SetFilterDefaults = setFilterDefaults,
+	ProtectAuctionFrame = protectAuctionFrame,
+	Round = round,
+	DelocalizeFilterVal = delocalizeFilterVal,
+	LocalizeFilterVal = localizeFilterVal,
+	GetLocalizedFilterVal = getLocalizedFilterVal,
+	DelocalizeCommand = delocalizeCommand,
+	LocalizeCommand = localizeCommand,
+	FindEmptySlot = findEmptySlot,
+	ContainerFrameItemButtonOnClick = containerFrameItemButtonOnClick,
+}

@@ -1,4 +1,4 @@
---[[ 
+--[[
 	Auctioneer
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
@@ -9,7 +9,7 @@
 	when the auction is scanned, so that you can easily determine what price
 	you will be able to sell an item for at auction or at a vendor whenever you
 	mouse-over an item in the game
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -22,18 +22,18 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]--
+]]
 
 
-AUCTIONEER_VERSION="<%version%>";
+Auctioneer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "Debug" within the client.
-if (AUCTIONEER_VERSION == "<".."%version%>") then
-	AUCTIONEER_VERSION = "3.3.DEV";
+if (Auctioneer.Version == "<".."%version%>") then
+	Auctioneer.Version = "3.3.DEV";
 end
 
-function Auctioneer_OnLoad()
+function onLoad()
 	-- Unhook some boot triggers if necessary.
 	-- These might not exist on initial loading or if an addon depends on Auctioneer
 	if (Auctioneer_CheckLoad) then
@@ -44,14 +44,14 @@ function Auctioneer_OnLoad()
 	end
 
 	-- Hook in new tooltip code
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, Auctioneer_HookTooltip);
+	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, Auctioneer.Tooltip.HookTooltip);
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Auctioneer", "CommandHandler", [[
 		local function cmdHandler(msg)
 			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end 
-			if (not cmd) then cmd = "" end 
+			if (not cmd) then cmd = string.lower(msg) end
+			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end
 			if (cmd == "load") then
 				if (param == "") then
@@ -59,7 +59,7 @@ function Auctioneer_OnLoad()
 					LoadAddOn("Auctioneer")
 				elseif (param == "auctionhouse") then
 					Stubby.Print("Setting Auctioneer to load when this character visits the auction house")
-					Stubby.SetConfig("Auctioneer", "LoadType", param) 
+					Stubby.SetConfig("Auctioneer", "LoadType", param)
 				elseif (param == "always") then
 					Stubby.Print("Setting Auctioneer to always load for this character")
 					Stubby.SetConfig("Auctioneer", "LoadType", param)
@@ -111,4 +111,5 @@ function Auctioneer_OnLoad()
 	]]);
 end
 
+Auctioneer.OnLoad = onLoad;
 

@@ -18,13 +18,15 @@
 		GNU General Public License for more details.
 
 		You should have received a copy of the GNU General Public License
-		along with this program(see GLP.txt); if not, write to the Free Software
+		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
+--Local function prototypes
+local processLink, invalidateAHSnapshot, auctionStartHook, finishedAuctionScanHook, auctionEntryHook, startAuction, placeAuctionBid, relevel, configureAH, auctionFrameFiltersUpdateClasses, rememberPrice, auctionsClear, auctionsSetWarn, auctionsSetLine, newAuction, auctHouseShow, auctHouseClose, auctHouseUpdate, filterButtonSetType, onChangeAuctionDuration, setAuctionDuration
 
 -- Hook into this function if you want notification when we find a link.
-function Auctioneer_ProcessLink(link)
+function processLink(link)
 	if (ItemsMatrix_ProcessLinks ~= nil) then
 		ItemsMatrix_ProcessLinks(	link, -- itemlink
 											nil,  -- not used atm
@@ -42,9 +44,9 @@ end
 
 -- This function sets the dirty flag to true for all the auctions in the snapshot
 -- This is done to indicate that the snapshot is out of date.
-function Auctioneer_InvalidateAHSnapshot()
+function invalidateAHSnapshot()
 	-- Invalidate the snapshot
-	local auctKey = Auctioneer_GetAuctionKey();
+	local auctKey = Auctioneer.Util.GetAuctionKey();
 	if (not AuctionConfig.snap) then
 		AuctionConfig.snap = {};
 	end
@@ -53,7 +55,7 @@ function Auctioneer_InvalidateAHSnapshot()
 	end
 	for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 		-- Only invalidate the class group if we will be scanning it.
-		if (Auctioneer_GetFilter("scan-class"..cat)) then
+		if (Auctioneer.Command.GetFilter("scan-class"..cat)) then
 			for iKey, iData in pairs(cData) do
 				-- The first char is the dirty flag (purposely)
 				AuctionConfig.snap[auctKey][cat][iKey] = "1" .. string.sub(iData,2);
@@ -63,37 +65,37 @@ function Auctioneer_InvalidateAHSnapshot()
 end
 
 -- Called when the auction scan starts
-function Auctioneer_AuctionStart_Hook()
+function auctionStartHook() --Auctioneer_AuctionStart_Hook
 	Auction_DoneItems = {};
-	lSnapshotItemPrices = {};
-	Auctioneer_InvalidateAHSnapshot();
+	Auctioneer.Core.Variables.SnapshotItemPrices = {};
+	invalidateAHSnapshot();
 
 	-- Make sure AuctionConfig.data is initialized
-	local serverFaction = Auctioneer_GetAuctionKey();
+	local serverFaction = Auctioneer.Util.GetAuctionKey();
 	if (AuctionConfig.data == nil) then AuctionConfig.data = {}; end
 	if (AuctionConfig.data[serverFaction] == nil) then
 		AuctionConfig.data[serverFaction] = {};
 	end
 
 	-- Reset scan audit counters
-	lTotalAuctionsScannedCount = 0;
-	lNewAuctionsCount = 0;
-	lOldAuctionsCount = 0;
-	lDefunctAuctionsCount = 0;
-	
+	Auctioneer.Core.Variables.TotalAuctionsScannedCount = 0;
+	Auctioneer.Core.Variables.NewAuctionsCount = 0;
+	Auctioneer.Core.Variables.OldAuctionsCount = 0;
+	Auctioneer.Core.Variables.DefunctAuctionsCount = 0;
+
 	-- Protect AuctionFrame if we should
-	if (Auctioneer_GetFilterVal('protect-window') == 1) then
-		Auctioneer_ProtectAuctionFrame(true);
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
+		Auctioneer.Util.ProtectAuctionFrame(true);
 	end
 end
 
 -- This is called when an auction scan finishes and is used for clean up
-function Auctioneer_FinishedAuctionScan_Hook()
+function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 	-- Only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
-	local auctKey = Auctioneer_GetAuctionKey();
+	local auctKey = Auctioneer.Util.GetAuctionKey();
 
 	local endTime = time();
-	if lTotalAuctionsScannedCount >= 50 then 
+	if Auctioneer.Core.Variables.TotalAuctionsScannedCount >= 50 then
 		local dropCount, buyCount, bidCount, expCount;
 		dropCount = 0;
 		buyCount = 0;
@@ -103,7 +105,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 				for iKey, iData in pairs(cData) do
-					snap = Auctioneer_GetSnapshotFromData(iData);
+					snap = Auctioneer.Core.GetSnapshotFromData(iData);
 					if (snap.dirty == "1") then
 						-- This item should have been seen, but wasn't.
 						-- We need to work out if it expired before or after it's time
@@ -113,28 +115,28 @@ function Auctioneer_FinishedAuctionScan_Hook()
 							bidCount = bidCount+1;
 							-- This one expired at the final time interval, so it's likely
 							-- that this is the best bid value we'll get for it.
-							itemKey = Auctioneer_GetKeyFromSig(iKey);
+							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
 							if (not AuctionConfig.success) then AuctionConfig.success = {} end
 							if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
 							if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
-							bidList = newBalancedList(lMaxBuyoutHistorySize);
-							bidList.setList(Auctioneer_LoadMedianList(AuctionConfig.success.bid[auctKey][itemKey]));
+							bidList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
+							bidList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.bid[auctKey][itemKey]));
 							bidList.insert(snap.bidamount);
-							AuctionConfig.success.bid[auctKey][itemKey] = Auctioneer_StoreMedianList (bidList.getList());
-						elseif (expiredSeconds < TIME_LEFT_SECONDS[snap.timeLeft]) then
+							AuctionConfig.success.bid[auctKey][itemKey] = Auctioneer.Core.StoreMedianList (bidList.getList());
+						elseif (expiredSeconds < Auctioneer.Core.Constants.TimeLeft.Seconds[snap.timeLeft]) then
 							-- Whoa! This item was bought out.
-							itemKey = Auctioneer_GetKeyFromSig(iKey);
+							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
 							if (not AuctionConfig.success) then AuctionConfig.success = {} end
 
-							x,x,x,x,x,x,buyout = Auctioneer_GetItemSignature(iKey);
+							x,x,x,x,x,x,buyout = Auctioneer.Core.GetItemSignature(iKey);
 							if (buyout > 0) then
 								buyCount = buyCount+1;
 								if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
 								if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
-								buyList = newBalancedList(lMaxBuyoutHistorySize);
-								buyList.setList(Auctioneer_LoadMedianList(AuctionConfig.success.buy[auctKey][itemKey]));
+								buyList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
+								buyList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.buy[auctKey][itemKey]));
 								buyList.insert(buyout);
-								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer_StoreMedianList (buyList.getList());
+								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer.Core.StoreMedianList (buyList.getList());
 							else
 								if (not AuctionConfig.success.drop) then AuctionConfig.success.drop = {} end
 								if (not AuctionConfig.success.drop[auctKey]) then AuctionConfig.success.drop[auctKey] = {} end
@@ -149,7 +151,7 @@ function Auctioneer_FinishedAuctionScan_Hook()
 
 					if (string.sub(iData, 1,1) == "1") then
 						AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
-						lDefunctAuctionsCount = lDefunctAuctionsCount + 1;
+						Auctioneer.Core.Variables.DefunctAuctionsCount = Auctioneer.Core.Variables.DefunctAuctionsCount + 1;
 					end
 				end
 			end
@@ -161,27 +163,26 @@ function Auctioneer_FinishedAuctionScan_Hook()
 	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
 
 	-- Copy the item prices into the Saved item prices table
-	if (lSnapshotItemPrices) then
-		for sig, iData in pairs(lSnapshotItemPrices) do
-			AuctionConfig.sbuy[auctKey][sig] = Auctioneer_StoreMedianList(iData.buyoutPrices);
-			lSnapshotItemPrices[sig] = nil;
+	if (Auctioneer.Core.Variables.SnapshotItemPrices) then
+		for sig, iData in pairs(Auctioneer.Core.Variables.SnapshotItemPrices) do
+			AuctionConfig.sbuy[auctKey][sig] = Auctioneer.Core.StoreMedianList(iData.buyoutPrices);
+			Auctioneer.Core.Variables.SnapshotItemPrices[sig] = nil;
 		end
 	end
 
-	local lDiscrepencyCount = lTotalAuctionsScannedCount - (lNewAuctionsCount + lOldAuctionsCount);
+	local lDiscrepencyCount = Auctioneer.Core.Variables.TotalAuctionsScannedCount - (Auctioneer.Core.Variables.NewAuctionsCount + Auctioneer.Core.Variables.OldAuctionsCount);
 
-	Auctioneer_ChatPrint(string.format(_AUCT('AuctionTotalAucts'), Auctioneer_ColorTextWhite(lTotalAuctionsScannedCount)));
-	Auctioneer_ChatPrint(string.format(_AUCT('AuctionNewAucts'), Auctioneer_ColorTextWhite(lNewAuctionsCount)));
-	Auctioneer_ChatPrint(string.format(_AUCT('AuctionOldAucts'), Auctioneer_ColorTextWhite(lOldAuctionsCount)));
-	Auctioneer_ChatPrint(string.format(_AUCT('AuctionDefunctAucts'), Auctioneer_ColorTextWhite(lDefunctAuctionsCount)));
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionTotalAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.TotalAuctionsScannedCount)));
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionNewAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.NewAuctionsCount)));
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionOldAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.OldAuctionsCount)));
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionDefunctAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.DefunctAuctionsCount)));
 
-	if (nullSafe(lDiscrepencyCount) > 0) then
-		Auctioneer_ChatPrint(string.format(_AUCT('AuctionDiscrepancies'), Auctioneer_ColorTextWhite(lDiscrepencyCount)));
+	if (Auctioneer.Util.NullSafe(lDiscrepencyCount) > 0) then
+		Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionDiscrepancies'), Auctioneer.Util.ColorTextWhite(lDiscrepencyCount)));
 	end
 
 --The followng was added by MentalPower to implement the "/auc finish" command
-	local finish;
-	finish = Auctioneer_GetFilterVal('finish');
+	local finish = Auctioneer.Command.GetFilterVal('finish');
 
 	if (finish == 1) then
 		Logout();
@@ -193,7 +194,7 @@ end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
-function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
+function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_AuctionEntry_Hook
 	EnhTooltip.DebugPrint("Processing page", page, "item", index);
 	local auctionDoneKey;
 	if (not page or not index or not category) then
@@ -207,13 +208,13 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 		return;
 	end
 
-	lTotalAuctionsScannedCount = lTotalAuctionsScannedCount + 1;
+	Auctioneer.Core.Variables.TotalAuctionsScannedCount = Auctioneer.Core.Variables.TotalAuctionsScannedCount + 1;
 
 	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo("list", index);
 	if (aiOwner == nil) then aiOwner = "unknown"; end
 
 	-- do some validation of the auction data that was returned
-	if (aiName == nil or tonumber(aiBuyoutPrice) > MAX_ALLOWED_FORMAT_INT or tonumber(aiMinBid) > MAX_ALLOWED_FORMAT_INT) then return; end
+	if (aiName == nil or tonumber(aiBuyoutPrice) > Auctioneer.Core.Constants.MaxAllowedFormatInt or tonumber(aiMinBid) > Auctioneer.Core.Constants.MaxAllowedFormatInt) then return; end
 	if (aiCount < 1) then aiCount = 1; end
 
 	-- get other auctiondata
@@ -221,7 +222,7 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 	local aiLink = GetAuctionItemLink("list", index);
 
 	-- Call some interested iteminfo addons
-	Auctioneer_ProcessLink(aiLink);
+	processLink(aiLink);
 
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
@@ -229,49 +230,49 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 
 	-- Get all item data
 	local iName, iLink, iQuality, iLevel, iClass, iSubClass, iCount, iMaxStack = GetItemInfo(hyperlink);
-	local itemCat = Auctioneer_GetCatNumberByName(iClass);
+	local itemCat = Auctioneer.Util.GetCatNumberByName(iClass);
 
 	-- construct the unique auction signature for this aution
-	local lAuctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyoutPrice), aiUniqID);
+	local lAuctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, Auctioneer.Util.NilSafeString(aiName), Auctioneer.Util.NullSafe(aiCount), Auctioneer.Util.NullSafe(aiMinBid), Auctioneer.Util.NullSafe(aiBuyoutPrice), aiUniqID);
 
 	-- add this item's buyout price to the buyout price history for this item in the snapshot
 	if aiBuyoutPrice > 0 then
 		local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
-		if (not lSnapshotItemPrices[aiKey]) then
-			lSnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
+		if (not Auctioneer.Core.Variables.SnapshotItemPrices[aiKey]) then
+			Auctioneer.Core.Variables.SnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
 		else
-			table.insert(lSnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
-			table.sort(lSnapshotItemPrices[aiKey].buyoutPrices);
+			table.insert(Auctioneer.Core.Variables.SnapshotItemPrices[aiKey].buyoutPrices, buyoutPriceForOne);
+			table.sort(Auctioneer.Core.Variables.SnapshotItemPrices[aiKey].buyoutPrices);
 		end
 	end
 
 
 	-- if this auction is not in the snapshot add it
-	local auctKey = Auctioneer_GetAuctionKey();
-	local snap = Auctioneer_GetSnapshot(auctKey, itemCat, lAuctionSignature);
+	local auctKey = Auctioneer.Util.GetAuctionKey();
+	local snap = Auctioneer.Core.GetSnapshot(auctKey, itemCat, lAuctionSignature);
 
 	-- If we haven't seen this item (it's not in the old snapshot)
-	if (not snap) then 
+	if (not snap) then
 		EnhTooltip.DebugPrint("No snap");
-		lNewAuctionsCount = lNewAuctionsCount + 1;
+		Auctioneer.Core.Variables.NewAuctionsCount = Auctioneer.Core.Variables.NewAuctionsCount + 1;
 
 		-- now build the list of buyout prices seen for this auction to use to get the median
-		local newBuyoutPricesList = newBalancedList(lMaxBuyoutHistorySize);
+		local newBuyoutPricesList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
 
-		local auctionPriceItem = Auctioneer_GetAuctionPriceItem(aiKey, auctKey);
+		local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(aiKey, auctKey);
 		if (not auctionPriceItem) then auctionPriceItem = {} end
 
-		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
+		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
 		minCount = minCount + 1;
-		minPrice = minPrice + math.ceil(nullSafe(aiMinBid) / aiCount);
-		if (nullSafe(aiBidAmount) > 0) then
+		minPrice = minPrice + math.ceil(Auctioneer.Util.NullSafe(aiMinBid) / aiCount);
+		if (Auctioneer.Util.NullSafe(aiBidAmount) > 0) then
 			bidCount = bidCount + 1;
-			bidPrice = bidPrice + math.ceil(nullSafe(aiBidAmount) / aiCount);
+			bidPrice = bidPrice + math.ceil(Auctioneer.Util.NullSafe(aiBidAmount) / aiCount);
 		end
-		if (nullSafe(aiBuyoutPrice) > 0) then
+		if (Auctioneer.Util.NullSafe(aiBuyoutPrice) > 0) then
 			buyCount = buyCount + 1;
-			buyPrice = buyPrice + math.ceil(nullSafe(aiBuyoutPrice) / aiCount);
+			buyPrice = buyPrice + math.ceil(Auctioneer.Util.NullSafe(aiBuyoutPrice) / aiCount);
 		end
 		auctionPriceItem.data = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
 
@@ -279,52 +280,52 @@ function Auctioneer_AuctionEntry_Hook(funcVars, retVal, page, index, category)
 		if (bph and table.getn(bph) > 0) then
 			newBuyoutPricesList.setList(bph);
 		end
-		if (nullSafe(aiBuyoutPrice) > 0) then
+		if (Auctioneer.Util.NullSafe(aiBuyoutPrice) > 0) then
 			newBuyoutPricesList.insert(math.ceil(aiBuyoutPrice / aiCount));
 		end
 
 		auctionPriceItem.buyoutPricesHistoryList = newBuyoutPricesList.getList();
 		auctionPriceItem.name = aiName;
 		auctionPriceItem.category = itemCat;
-		Auctioneer_SaveAuctionPriceItem(auctKey, aiKey, auctionPriceItem);
+		Auctioneer.Core.SaveAuctionPriceItem(auctKey, aiKey, auctionPriceItem);
 
 		-- finaly add the auction to the snapshot
 		if (aiOwner == nil) then aiOwner = "unknown"; end
 		local initialTimeSeen = time();
 
 		snap = {
-			initialSeenTime=initialTimeSeen, 
-			lastSeenTime=initialTimeSeen, 
-			itemLink=aiLink, 
-			quality=nullSafe(aiQuality), 
-			level=nullSafe(aiLevel), 
-			bidamount=nullSafe(aiBidAmount), 
-			highBidder=aiHighBidder, 
-			owner=aiOwner, 
-			timeLeft=nullSafe(aiTimeLeft), 
-			category=itemCat, 
+			initialSeenTime=initialTimeSeen,
+			lastSeenTime=initialTimeSeen,
+			itemLink=aiLink,
+			quality=Auctioneer.Util.NullSafe(aiQuality),
+			level=Auctioneer.Util.NullSafe(aiLevel),
+			bidamount=Auctioneer.Util.NullSafe(aiBidAmount),
+			highBidder=aiHighBidder,
+			owner=aiOwner,
+			timeLeft=Auctioneer.Util.NullSafe(aiTimeLeft),
+			category=itemCat,
 			dirty=0
 		};
 
 	else
 		EnhTooltip.DebugPrint("Snap!");
-		lOldAuctionsCount = lOldAuctionsCount + 1;
+		Auctioneer.Core.Variables.OldAuctionsCount = Auctioneer.Core.Variables.OldAuctionsCount + 1;
 		--this is an auction that was already in the snapshot from a previous scan and is still in the auction house
-		snap.dirty = 0;                         --set its dirty flag to false so we know to keep it in the snapshot
-		snap.lastSeenTime = time();             --set the time we saw it last
-		snap.timeLeft = nullSafe(aiTimeLeft);   --update the time left
-		snap.bidamount = nullSafe(aiBidAmount); --update the current bid amount
-		snap.highBidder = aiHighBidder;         --update the high bidder
+		snap.dirty = 0;											--set its dirty flag to false so we know to keep it in the snapshot
+		snap.lastSeenTime = time();								--set the time we saw it last
+		snap.timeLeft = Auctioneer.Util.NullSafe(aiTimeLeft);	--update the time left
+		snap.bidamount = Auctioneer.Util.NullSafe(aiBidAmount);	--update the current bid amount
+		snap.highBidder = aiHighBidder;							--update the high bidder
 	end
 
 	-- Commit the snapshot back to the table.
-	Auctioneer_SaveSnapshot(auctKey, itemCat, lAuctionSignature, snap);
+	Auctioneer.Core.SaveSnapshot(auctKey, itemCat, lAuctionSignature, snap);
 end
 
 -- hook into the auction starting process
-function Auctioneer_StartAuction(funcArgs, retVal, start, buy, duration)
+function startAuction(funcArgs, retVal, start, buy, duration)
 	if (AuctPriceRememberCheck:GetChecked()) then
-		Auctioneer_SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, duration, Auctioneer_CurAuctionCount)
+		Auctioneer.Storage.SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, duration, Auctioneer_CurAuctionCount)
 	end
 	Auctioneer_CurAuctionItem = nil
 	Auctioneer_CurAuctionCount = nil
@@ -332,7 +333,7 @@ function Auctioneer_StartAuction(funcArgs, retVal, start, buy, duration)
 end
 
 -- hook to capture data about an auction that was boughtout
-function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
+function placeAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	-- get the info for this auction
 	local aiLink = GetAuctionItemLink(itemtype, itemindex);
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
@@ -341,7 +342,7 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 		aiBuyout, aiBidAmount, aiHighBidder, aiOwner =
 		GetAuctionItemInfo(itemtype, itemindex);
 
-	local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, nilSafeString(aiName), nullSafe(aiCount), nullSafe(aiMinBid), nullSafe(aiBuyout), aiUniqID);
+	local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, Auctioneer.Util.NilSafeString(aiName), Auctioneer.Util.NullSafe(aiCount), Auctioneer.Util.NullSafe(aiMinBid), Auctioneer.Util.NullSafe(aiBuyout), aiUniqID);
 
 	local playerName = UnitName("player");
 	local eventTime = "e"..time();
@@ -354,9 +355,9 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 
 	if bidamount == aiBuyout then -- only capture buyouts
 		-- remove from snapshot
-		Auctioneer_ChatPrint(string.format(_AUCT('FrmtActRemove'), auctionSignature));
-		local auctKey = Auctioneer_GetAuctionKey();
-		local itemCat = Auctioneer_GetCatForKey(aiKey);
+		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActRemove'), auctionSignature));
+		local auctKey = Auctioneer.Util.GetAuctionKey();
+		local itemCat = Auctioneer.Util.GetCatForKey(aiKey);
 		if (itemCat and AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey] and AuctionConfig.snap[auctKey][itemCat]) then
 			AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
 		end
@@ -370,7 +371,7 @@ function Auctioneer_PlaceAuctionBid(funcVars, retVal, itemtype, itemindex, bidam
 	end
 end
 
-local function relevel(frame)
+function relevel(frame) --Local
 	local myLevel = frame:GetFrameLevel() + 1
 	local children = { frame:GetChildren() }
 	for _,child in pairs(children) do
@@ -380,7 +381,7 @@ local function relevel(frame)
 end
 
 local lAHConfigPending = true
-function Auctioneer_ConfigureAH()
+function configureAH()
 	if (lAHConfigPending and IsAddOnLoaded("Blizzard_AuctionUI")) then
 		EnhTooltip.DebugPrint("Configuring AuctionUI");
 		AuctionsPriceText:ClearAllPoints();
@@ -430,20 +431,20 @@ function Auctioneer_ConfigureAH()
 		-- Protect the auction frame from being closed.
 		-- This call is to ensure the window is protected even after you
 		-- manually load Auctioneer while already showing the AuctionFrame
-		if (Auctioneer_GetFilterVal('protect-window') == 2) then
-			Auctioneer_ProtectAuctionFrame(true);  
+		if (Auctioneer.Command.GetFilterVal('protect-window') == 2) then
+			Auctioneer.Util.ProtectAuctionFrame(true);
 		end
 
-		Auctioneer_HookAuctionHouse()
+		Auctioneer.Core.HookAuctionHouse()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
-		
+
 		-- Find the index of the first unused AuctionHouse tab
 		local tabIndex = 1;
 		while (getglobal("AuctionFrameTab"..tabIndex) ~= nil) do
 			tabIndex = tabIndex + 1;
 		end
-		
+
 		-- Setup the Search Auctions tab
 		AuctionFrameSearch:SetParent("AuctionFrame")
 		AuctionFrameSearch:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
@@ -474,7 +475,7 @@ function Auctioneer_ConfigureAH()
 	end
 end
 
-function Auctioneer_AuctionFrameFilters_UpdateClasses()
+function auctionFrameFiltersUpdateClasses() --Auctioneer_AuctionFrameFilters_UpdateClasses
 	local obj
 	for i=1, 15 do
 		obj = getglobal("AuctionFilterButton"..i.."Checkbox")
@@ -485,24 +486,24 @@ function Auctioneer_AuctionFrameFilters_UpdateClasses()
 	end
 end
 
-function Auctioneer_RememberPrice()
+function rememberPrice()
 	if (not Auctioneer_CurAuctionItem) then
 		AuctPriceRememberCheck:SetChecked(false)
 		return
 	end
 
 	if (not AuctPriceRememberCheck:GetChecked()) then
-		Auctioneer_DeleteFixedPrice(Auctioneer_CurAuctionItem)
+		Auctioneer.Storage.DeleteFixedPrice(Auctioneer_CurAuctionItem)
 	else
 		local count = Auctioneer_CurAuctionCount
 		local start = MoneyInputFrame_GetCopper(StartPrice)
 		local buy = MoneyInputFrame_GetCopper(BuyoutPrice)
 		local dur = AuctionFrameAuctions.duration
-		Auctioneer_SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, dur, count)
+		Auctioneer.Storage.SetFixedPrice(Auctioneer_CurAuctionItem, start, buy, dur, count)
 	end
 end
 
-function Auctioneer_Auctions_Clear()
+function auctionsClear() --Auctioneer_Auctions_Clear
 	for i = 1, 5 do
 		getglobal("AuctionInfoText"..i):Hide();
 		getglobal("AuctionInfoMoney"..i):Hide();
@@ -510,47 +511,15 @@ function Auctioneer_Auctions_Clear()
 	AuctionInfoWarnText:Hide();
 end
 
-function Auctioneer_Auctions_SetWarn(textStr)
+function auctionsSetWarn(textStr) --Auctioneer_Auctions_SetWarn
 	if (AuctionInfoWarnText == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
 	AuctionInfoWarnText:SetText(textStr);
-
-	if (Auctioneer_GetFilter('warn-color')) then
-		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
-
-		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
-		FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
-		FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
-		FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
-		FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
-		FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
-		FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
-		FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
-
-		if (string.find(textStr, FrmtWarnToolow)) then
-			--Color Red
-			AuctionInfoWarnText:SetTextColor(1.0, 0.0, 0.0);
-
-		elseif (string.find(textStr, FrmtWarnUndercut)) then
-			--Color Yellow
-			AuctionInfoWarnText:SetTextColor(1.0, 1.0, 0.0);
-
-		elseif (string.find(textStr, FrmtWarnNocomp) or string.find(textStr, FrmtWarnAbovemkt)) then
-			--Color Green
-			AuctionInfoWarnText:SetTextColor(0.0, 1.0, 0.0);
-
-		elseif (string.find(textStr, FrmtWarnMarkup) or string.find(textStr, FrmtWarnUser) or string.find(textStr, FrmtWarnNodata) or string.find(textStr, FrmtWarnMyprice)) then
-			--Color Gray
-			AuctionInfoWarnText:SetTextColor(0.6, 0.6, 0.6);
-		end
-
-	else
-		--Color Orange
-		AuctionInfoWarnText:SetTextColor(0.9, 0.4, 0.0);
-	end
+	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor()
+	AuctionInfoWarnText:SetTextColor(cRed, cGreen, cBlue);
 	AuctionInfoWarnText:Show();
 end
 
-function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
+function auctionsSetLine(line, textStr, moneyAmount) --Auctioneer_Auctions_SetLine
 	local text = getglobal("AuctionInfoText"..line);
 	local money = getglobal("AuctionInfoMoney"..line);
 	if (text == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
@@ -558,7 +527,7 @@ function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
 	text:SetText(textStr);
 	text:Show();
 	if (money ~= nil) then
-		MoneyFrame_Update("AuctionInfoMoney"..line, math.ceil(nullSafe(moneyAmount)));
+		MoneyFrame_Update("AuctionInfoMoney"..line, math.ceil(Auctioneer.Util.NullSafe(moneyAmount)));
 		getglobal("AuctionInfoMoney"..line.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
 		getglobal("AuctionInfoMoney"..line.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
 		money:Show();
@@ -568,7 +537,7 @@ function Auctioneer_Auctions_SetLine(line, textStr, moneyAmount)
 end
 
 
-function Auctioneer_NewAuction()
+function newAuction()
 	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
 	local countFix = count
 	if countFix == 0 then
@@ -602,100 +571,100 @@ function Auctioneer_NewAuction()
 	local itemKey = id..":"..rprop..":"..enchant;
 	Auctioneer_CurAuctionItem = itemKey;
 	Auctioneer_CurAuctionCount = countFix;
-	local auctionPriceItem = Auctioneer_GetAuctionPriceItem(itemKey);
-	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer_GetAuctionPrices(auctionPriceItem.data);
+	local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey);
+	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
 
-	if (Auctioneer_GetFixedPrice(itemKey)) then
+	if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
 		AuctPriceRememberCheck:SetChecked(true)
 	else
 		AuctPriceRememberCheck:SetChecked(false)
 	end
 
 	-- Find the current lowest buyout for 1 of these in the current snapshot
-	local currentLowestBuyout = Auctioneer_FindLowestAuctions(itemKey);
+	local currentLowestBuyout = Auctioneer.Statistic.FindLowestAuctions(itemKey);
 	if currentLowestBuyout then
-		x,x,x,x,lowStackCount,x,currentLowestBuyout = Auctioneer_GetItemSignature(currentLowestBuyout);
+		x,x,x,x,lowStackCount,x,currentLowestBuyout = Auctioneer.Core.GetItemSignature(currentLowestBuyout);
 		currentLowestBuyout = currentLowestBuyout / lowStackCount;
-	end 
+	end
 
-	local historicalMedian, historicalMedCount = Auctioneer_GetItemHistoricalMedianBuyout(itemKey);
-	local snapshotMedian, snapshotMedCount = Auctioneer_GetItemSnapshotMedianBuyout(itemKey);
+	local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey);
+	local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey);
 
-	Auctioneer_Auctions_Clear();
-	Auctioneer_Auctions_SetLine(1, string.format(_AUCT('FrmtAuctinfoHist'), historicalMedCount), historicalMedian * count); 
-	Auctioneer_Auctions_SetLine(2, string.format(_AUCT('FrmtAuctinfoSnap'), snapshotMedCount), snapshotMedian * count); 
+	auctionsClear();
+	Auctioneer.Scanner.AuctionsSetLine(1, string.format(_AUCT('FrmtAuctinfoHist'), historicalMedCount), historicalMedian * count);
+	Auctioneer.Scanner.AuctionsSetLine(2, string.format(_AUCT('FrmtAuctinfoSnap'), snapshotMedCount), snapshotMedian * count);
 	if (snapshotMedCount and snapshotMedCount > 0 and currentLowestBuyout) then
-		Auctioneer_Auctions_SetLine(3, _AUCT('FrmtAuctinfoLow'), currentLowestBuyout * count);
+		Auctioneer.Scanner.AuctionsSetLine(3, _AUCT('FrmtAuctinfoLow'), currentLowestBuyout * count);
 	else
-		Auctioneer_Auctions_SetLine(3, _AUCT('FrmtAuctinfoNolow'));
+		Auctioneer.Scanner.AuctionsSetLine(3, _AUCT('FrmtAuctinfoNolow'));
 	end
 	local blizPrice = MoneyInputFrame_GetCopper(StartPrice);
 
-	local hsp, hspCount, mktPrice, warn = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+	local hsp, hspCount, mktPrice, warn = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 	if hsp == 0 and buyCount > 0 then
 		hsp = math.ceil(buyPrice / buyCount); -- use mean buyout if median not available
 	end
-	local discountBidPercent = tonumber(Auctioneer_GetFilterVal('pct-bidmarkdown'));
-	local buyPrice = Auctioneer_RoundDownTo95(nullSafe(hsp) * countFix);
-	local bidPrice = Auctioneer_RoundDownTo95(Auctioneer_SubtractPercent(buyPrice, discountBidPercent));
+	local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
+	local buyPrice = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * countFix);
+	local bidPrice = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(buyPrice, discountBidPercent));
 
-	if (Auctioneer_GetFixedPrice(itemKey)) then
-		local start, buy, dur = Auctioneer_GetFixedPrice(itemKey, countFix)
-		Auctioneer_Auctions_SetLine(4, _AUCT('FrmtAuctinfoSugbid'), bidPrice);
-		Auctioneer_Auctions_SetLine(5, _AUCT('FrmtAuctinfoSugbuy'), buyPrice);
-		Auctioneer_Auctions_SetWarn(_AUCT('FrmtWarnUser'));
+	if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
+		local start, buy, dur = Auctioneer.Storage.GetFixedPrice(itemKey, countFix)
+		Auctioneer.Scanner.AuctionsSetLine(4, _AUCT('FrmtAuctinfoSugbid'), bidPrice);
+		Auctioneer.Scanner.AuctionsSetLine(5, _AUCT('FrmtAuctinfoSugbuy'), buyPrice);
+		auctionsSetWarn(_AUCT('FrmtWarnUser'));
 		MoneyInputFrame_SetCopper(StartPrice, start);
 		MoneyInputFrame_SetCopper(BuyoutPrice, buy);
-		Auctioneer_SetAuctionDuration(tonumber(dur));
-	elseif (Auctioneer_GetFilter('autofill')) then
-		Auctioneer_Auctions_SetLine(4, _AUCT('FrmtAuctinfoMktprice'), nullSafe(mktPrice)*countFix);
-		Auctioneer_Auctions_SetLine(5, _AUCT('FrmtAuctinfoOrig'), blizPrice);
-		Auctioneer_Auctions_SetWarn(warn);
+		setAuctionDuration(tonumber(dur));
+	elseif (Auctioneer.Command.GetFilter('autofill')) then
+		Auctioneer.Scanner.AuctionsSetLine(4, _AUCT('FrmtAuctinfoMktprice'), Auctioneer.Util.NullSafe(mktPrice)*countFix);
+		Auctioneer.Scanner.AuctionsSetLine(5, _AUCT('FrmtAuctinfoOrig'), blizPrice);
+		auctionsSetWarn(warn);
 		MoneyInputFrame_SetCopper(StartPrice, bidPrice);
 		MoneyInputFrame_SetCopper(BuyoutPrice, buyPrice);
 	else
-		Auctioneer_Auctions_SetLine(4, _AUCT('FrmtAuctinfoSugbid'), bidPrice);
-		Auctioneer_Auctions_SetLine(5, _AUCT('FrmtAuctinfoSugbuy'), buyPrice);
-		Auctioneer_Auctions_SetWarn(warn);
+		Auctioneer.Scanner.AuctionsSetLine(4, _AUCT('FrmtAuctinfoSugbid'), bidPrice);
+		Auctioneer.Scanner.AuctionsSetLine(5, _AUCT('FrmtAuctinfoSugbuy'), buyPrice);
+		auctionsSetWarn(warn);
 	end
 end
 
-function Auctioneer_AuctHouseShow()
+function auctHouseShow()
 	-- Set the default auction duration
-	if (Auctioneer_GetFilterVal('auction-duration') > 0) then
-		Auctioneer_SetAuctionDuration(Auctioneer_GetFilterVal('auction-duration'))
+	if (Auctioneer.Command.GetFilterVal('auction-duration') > 0) then
+		setAuctionDuration(Auctioneer.Command.GetFilterVal('auction-duration'))
 	else
-		Auctioneer_SetAuctionDuration(Auctioneer_GetFilterVal('last-auction-duration'))
+		setAuctionDuration(Auctioneer.Command.GetFilterVal('last-auction-duration'))
 	end
 
 	-- Protect the auction frame from being closed if we should
-	if (Auctioneer_GetFilterVal('protect-window') == 2) then
-		Auctioneer_ProtectAuctionFrame(true);
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 2) then
+		Auctioneer.Util.ProtectAuctionFrame(true);
 	end
 
 	-- Start scanning if so requested
-	if Auctioneer_isScanningRequested then
-		Auctioneer_StartAuctionScan();
+	if Auctioneer.Scanning.IsScanningRequested then
+		Auctioneer.Scanning.StartAuctionScan();
 	end
 end
 
 
-function Auctioneer_AuctHouseClose()
-	if Auctioneer_isScanningRequested then
-		Auctioneer_StopAuctionScan();
+function auctHouseClose()
+	if Auctioneer.Scanning.IsScanningRequested then
+		Auctioneer.Scanning.StopAuctionScan();
 	end
 
 	-- Unprotect the auction frame
-	Auctioneer_ProtectAuctionFrame(false);
+	Auctioneer.Util.ProtectAuctionFrame(false);
 end
 
-function Auctioneer_AuctHouseUpdate()
-	if (Auctioneer_isScanningRequested and Auctioneer_CheckCompleteScan()) then
-		Auctioneer_ScanAuction();
+function auctHouseUpdate()
+	if (Auctioneer.Scanning.IsScanningRequested and Auctioneer.Scanning.CheckCompleteScan()) then
+		Auctioneer.Scanning.ScanAuction();
 	end
 end
 
-function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, isLast)
+function filterButtonSetType(funcVars, retVal, button, type, text, isLast) --Auctioneer_FilterButton_SetType
 	EnhTooltip.DebugPrint("Setting button", button:GetName(), type, text, isLast);
 
 	local buttonName = button:GetName();
@@ -705,9 +674,9 @@ function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, i
 	local checkbox = getglobal(button:GetName().."Checkbox");
 	if checkbox then
 		if (type == "class") then
-			local classid, maxid = Auctioneer_FindFilterClass(text);
+			local classid, maxid = Auctioneer.Command.FindFilterClass(text);
 			if (classid > 0) then
-				AuctFilter_SetFilter(checkbox, "scan-class"..classid);
+				Auctioneer.Command.FilterSetFilter(checkbox, "scan-class"..classid);
 				if (classid == maxid) and (buttonID < 15) then
 					for i=buttonID+1, 15 do
 						getglobal("AuctionFilterButton"..i):Hide();
@@ -723,15 +692,15 @@ function Auctioneer_FilterButton_SetType(funcVars, retVal, button, type, text, i
 end
 
 local ignoreAuctionDurationChange = nil
-function Auctioneer_OnChangeAuctionDuration()
+function onChangeAuctionDuration()
 	if (ignoreAuctionDurationChange) then
 		ignoreAuctionDurationChange = nil;
 		return
 	end
-	Auctioneer_SetFilter('last-auction-duration', AuctionFrameAuctions.duration)
+	Auctioneer.Command.SetFilter('last-auction-duration', AuctionFrameAuctions.duration)
 end
 
-function Auctioneer_SetAuctionDuration(duration, persist)
+function setAuctionDuration(duration, persist)
 	local durationIndex
 	if (duration >= 1 and duration <= 3) then
 		durationIndex = duration
@@ -742,7 +711,7 @@ function Auctioneer_SetAuctionDuration(duration, persist)
 	elseif (duration == 1440) then
 		durationIndex = 3
 	else
-		EnhTooltip.DebugPrint("Auctioneer_SetAuctionDuration(): invalid duration ", duration)
+		EnhTooltip.DebugPrint("Auctioneer.Scanner.SetAuctionDuration(): invalid duration ", duration)
 		return
 	end
 
@@ -750,3 +719,25 @@ function Auctioneer_SetAuctionDuration(duration, persist)
 	AuctionsRadioButton_OnClick(durationIndex);
 end
 
+Auctioneer.Scanner = {
+	ProcessLink = processLink,
+	InvalidateAHSnapshot = invalidateAHSnapshot,
+	AuctionStartHook = auctionStartHook,
+	FinishedAuctionScanHook = finishedAuctionScanHook,
+	AuctionEntryHook = auctionEntryHook,
+	StartAuction = startAuction,
+	PlaceAuctionBid = placeAuctionBid,
+	ConfigureAH = configureAH,
+	AuctionFrameFiltersUpdateClasses = auctionFrameFiltersUpdateClasses,
+	RememberPrice = rememberPrice,
+	AuctionsClear = auctionsClear,
+	AuctionsSetWarn = auctionsSetWarn,
+	AuctionsSetLine = auctionsSetLine,
+	NewAuction = newAuction,
+	AuctHouseShow = auctHouseShow,
+	AuctHouseClose = auctHouseClose,
+	AuctHouseUpdate = auctHouseUpdate,
+	FilterButtonSetType = filterButtonSetType,
+	OnChangeAuctionDuration = onChangeAuctionDuration,
+	SetAuctionDuration = setAuctionDuration,
+}
