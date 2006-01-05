@@ -37,6 +37,12 @@ local SPLITTING_AND_COMBINING_STACK_STATE = "SplittingAndCombiningStacks";
 local AUCTIONING_STACK_STATE = "AuctioningStack";
 
 -------------------------------------------------------------------------------
+-- Function hooks that are used when processing requests
+-------------------------------------------------------------------------------
+local Original_PickupContainerItem;
+local Original_SplitContainerItem;
+
+-------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
 local postAuction;
@@ -57,19 +63,62 @@ local printBag;
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AucPostManagerFrame_OnLoad()
-	this:RegisterEvent("ITEM_LOCK_CHANGED");
-	this:RegisterEvent("BAG_UPDATE"); 
+	this:RegisterEvent("AUCTION_HOUSE_CLOSED");
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AucPostManagerFrame_OnEvent(event)
-	if (table.getn(RequestQueue) > 0) then
-		-- Hand the event off to the request.
+	-- Toss all the pending requests when the AH closes.
+	if (event == "AUCTION_HOUSE_CLOSED") then
+		while (table.getn(RequestQueue) > 0) do
+			removeRequestFromQueue();
+		end
+	
+	-- Hand off the event to the current request
+	elseif (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
-		onEvent(request, event);
-		processRequestQueue();
+		if (request.state ~= READY_STATE) then
+			onEvent(request, event);
+			processRequestQueue();
+		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AucPostManager_PickupContainerItem(bag, slot)
+	-- Intentionally empty; don't allow items to be picked up while posting
+	-- auctions.
+	debugPrint("Prevented call to PickupContainerItem()");
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AucPostManager_SplitContainerItem(bag, slot, count)
+	-- Intentionally empty; don't allow items to be picked up while posting
+	-- auctions.
+	debugPrint("Prevented call to SplitContainerItem()");
+end
+
+-------------------------------------------------------------------------------
+-- Wrapper around PickupContainerItem() that always calls the Blizzard version.
+-------------------------------------------------------------------------------
+function pickupContainerItem(bag, slot)
+	if (Original_PickupContainerItem) then
+		return Original_PickupContainerItem(bag, slot);
+	end
+	return PickupContainerItem(bag, slot);
+end
+
+-------------------------------------------------------------------------------
+-- Wrapper around SplitContainerItem() that always calls the Blizzard version.
+-------------------------------------------------------------------------------
+function splitContainerItem(bag, slot, count)
+	if (Original_SplitContainerItem) then
+		return Original_SplitContainerItem(bag, slot, count);
+	end
+	return SplitContainerItem(bag, slot, count);
 end
 
 -------------------------------------------------------------------------------
@@ -112,6 +161,10 @@ end
 function removeRequestFromQueue()
 	if (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
+		
+		-- Make absolutely sure we are back in the READY_STATE so that we
+		-- correctly unregister for events.
+		setState(request, READY_STATE);
 
 		-- Perform the callback
 		local callback = request.callback;
@@ -122,6 +175,11 @@ function removeRequestFromQueue()
 		-- %localize%
 		chatPrint("Posted "..request.stackPostCount.. " auction(s) of "..request.name.." (x"..request.stackSize..")");
 		table.remove(RequestQueue, 1);
+		
+		-- If this was the last request, end processing the queue.
+		if (table.getn(RequestQueue) == 0) then
+			endProcessingRequestQueue()
+		end
 	end
 end
 
@@ -129,8 +187,53 @@ end
 -- Executes the request at the head of the queue.
 -------------------------------------------------------------------------------
 function processRequestQueue()
-	if (AuctionFrame and AuctionFrame:IsVisible() and table.getn(RequestQueue) > 0) then
+	if (beginProcessingRequestQueue()) then
 		run(RequestQueue[1]);
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Starts processing the request queue if possible. Returns true if started.
+-------------------------------------------------------------------------------
+function beginProcessingRequestQueue()
+	if (not ProcessingRequestQueue and
+		AuctionFrame and AuctionFrame:IsVisible() and
+		table.getn(RequestQueue) > 0) then
+
+		ProcessingRequestQueue = true;
+		debugPrint("Begin processing the post queue");
+
+		-- Hook the functions to disable picking up items. This prevents
+		-- spurious ITEM_LOCK_CHANGED events from confusing us.
+		if (not Original_PickupContainerItem) then
+			Original_PickupContainerItem = PickupContainerItem;
+			PickupContainerItem = AucPostManager_PickupContainerItem;
+		end
+		if (not Original_SplitContainerItem) then
+			Original_SplitContainerItem = SplitContainerItem;
+			SplitContainerItem = AucPostManager_SplitContainerItem;
+		end
+	end
+	return ProcessingRequestQueue;
+end
+
+-------------------------------------------------------------------------------
+-- Ends processing the request queue
+-------------------------------------------------------------------------------
+function endProcessingRequestQueue()
+	if (ProcessingRequestQueue) then
+		-- Unhook the functions.
+		if (Original_PickupContainerItem) then
+			PickupContainerItem = Original_PickupContainerItem;
+			Original_PickupContainerItem = nil;
+		end
+		if (Original_SplitContainerItem) then
+			SplitContainerItem = Original_SplitContainerItem;
+			Original_SplitContainerItem = nil;
+		end
+
+		debugPrint("End processing the post queue");
+		ProcessingRequestQueue = false;
 	end
 end
 
@@ -174,7 +277,7 @@ function run(request)
 				-- We've done it! Now move the stack to the auction house.
 				request.stack = stack1;
 				setState(request, AUCTIONING_STACK_STATE);
-				PickupContainerItem(stack1.bag, stack1.slot);
+				pickupContainerItem(stack1.bag, stack1.slot);
 				ClickAuctionSellItemButton();
 
 				-- Start the auction if requested.
@@ -191,14 +294,14 @@ function run(request)
 					if (stack1Size + stack2Size <= request.stackSize) then
 						-- Combine all of stack2 with stack1.
 						setState(request, COMBINING_STACK_STATE);
-						PickupContainerItem(stack2.bag, stack2.slot);
-						PickupContainerItem(stack1.bag, stack1.slot);
+						pickupContainerItem(stack2.bag, stack2.slot);
+						pickupContainerItem(stack1.bag, stack1.slot);
 						request.stack = stack1;
 					else
 						-- Combine part of stack2 with stack1.
 						setState(request, SPLITTING_AND_COMBINING_STACK_STATE);
-						SplitContainerItem(stack2.bag, stack2.slot, request.stackSize - stack1Size);
-						PickupContainerItem(stack1.bag, stack1.slot);
+						splitContainerItem(stack2.bag, stack2.slot, request.stackSize - stack1Size);
+						pickupContainerItem(stack1.bag, stack1.slot);
 						request.stack = stack1;
 					end
 				else
@@ -212,8 +315,8 @@ function run(request)
 				local stack2 = findEmptySlot();
 				if (stack2) then
 					setState(request, SPLITTING_STACK_STATE);
-					SplitContainerItem(stack1.bag, stack1.slot, request.stackSize);
-					PickupContainerItem(stack2.bag, stack2.slot);
+					splitContainerItem(stack1.bag, stack1.slot, request.stackSize);
+					pickupContainerItem(stack2.bag, stack2.slot);
 					request.stack = stack2;
 				else
 					-- No empty slots!
@@ -252,14 +355,14 @@ function onEvent(request, event)
 		-- Check if we are waiting for StartAuction() to complete. If so, check
 		-- if the stack we are trying to auction is now gone.
 		if (request.state == AUCTIONING_STACK_STATE and GetContainerItemInfo(request.stack.bag, request.stack.slot) == nil) then
+			-- Ready to move onto the next step.
+			setState(request, READY_STATE);
+			
 			-- Decrement the auction target count.
 			request.stackPostCount = request.stackPostCount + 1;
 			if (request.stackPostCount == request.stackCount) then
 				removeRequestFromQueue();
 			end
-
-			-- Ready to move onto the next step.
-			setState(request, READY_STATE);
 		end
 	end
 end
@@ -270,8 +373,32 @@ end
 function setState(request, newState)
 	if (request.state ~= newState) then
 		debugPrint("Entered state: "..newState);
+		
+		-- Unregister for events needed in the old state.
+		if (request.state == SPLITTING_STACK_STATE or
+			request.state == COMBINING_STACK_STATE or
+			request.state == SPLITTING_AND_COMBINING_STACK_STATE) then
+			debugPrint("Unregistering for ITEM_LOCK_CHANGED");
+			AucPostManagerFrame:UnregisterEvent("ITEM_LOCK_CHANGED");
+		elseif (request.state == AUCTIONING_STACK_STATE) then
+			debugPrint("Unregistering for BAG_UPDATE");
+			AucPostManagerFrame:UnregisterEvent("BAG_UPDATE");
+		end
+
+		-- Update the request's state.		
 		request.state = newState;
 		request.lockEventsInCurrentState = 0;
+		
+		-- Register for events needed in the new state.
+		if (request.state == SPLITTING_STACK_STATE or
+			request.state == COMBINING_STACK_STATE or
+			request.state == SPLITTING_AND_COMBINING_STACK_STATE) then
+			debugPrint("Registering for ITEM_LOCK_CHANGED");
+			AucPostManagerFrame:RegisterEvent("ITEM_LOCK_CHANGED");
+		elseif (request.state == AUCTIONING_STACK_STATE) then
+			debugPrint("Registering for BAG_UPDATE");
+			AucPostManagerFrame:RegisterEvent("BAG_UPDATE");
+		end
 	end
 end
 
@@ -341,7 +468,7 @@ function clearAuctionItem()
 	local bag, item = findAuctionItem();
 	if (bag and item) then
 		ClickAuctionSellItemButton();
-		PickupContainerItem(bag, item);
+		pickupContainerItem(bag, item);
 	end
 end
 
