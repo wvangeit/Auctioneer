@@ -786,7 +786,7 @@ end
 -- some items its wrong.
 -------------------------------------------------------------------------------
 function AuctionFramePost_CalculateAuctionDeposit(itemID, duration)
-	local price = Auctioneer_GetVendorSellPrice(itemID);
+	local price = Auctioneer.API.GetVendorSellPrice(itemID);
 	if (price) then
 		if (duration == 120) then
 			return math.floor(price * 0.05);

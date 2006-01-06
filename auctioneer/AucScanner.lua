@@ -545,7 +545,7 @@ function newAuction()
 	end
 
 	if (not name) then
-		Auctioneer_Auctions_Clear()
+		Auctioneer.Scanner.AuctionsClear()
 		return
 	end
 
@@ -563,7 +563,7 @@ function newAuction()
 
 	-- still no corresponding item found?
 	if id == nil then
-		Auctioneer_Auctions_Clear()
+		Auctioneer.Scanner.AuctionsClear()
 		return
 	end
 
