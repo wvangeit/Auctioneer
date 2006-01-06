@@ -1,153 +1,153 @@
 --[[
-  Additional function hooks to allow hooks into more tooltips
-  <%version%> (<%codename%>)
-  $Id$
+Additional function hooks to allow hooks into more tooltips
+<%version%> (<%codename%>)
+$Id$
 
-  You should hook into EnhTooltip using Stubby:
-  	Stubby.RegisterFunctionHook("EnhTooltip.HOOK", 200, myHookingFunction)
+You should hook into EnhTooltip using Stubby:
+	Stubby.RegisterFunctionHook("EnhTooltip.HOOK", 200, myHookingFunction)
 	Where myHooking function is one of your functions (see calling parameters below)
 	And HOOK is one of:
-      addTooltip
-	  checkPopup
-	  merchantHook
-	  tradeHook
-	  bankHook
-	  bagHook
+		addTooltip
+		checkPopup
+		merchantHook
+		tradeHook
+		bankHook
+		bagHook
 	The number 200 is a number that determines calling order
-	  A lower number will make your tooltip information display earlier (higher)
-	  A higher number will call your tooltip later (lower)
-	  Auctioneer (if installed) gets called at position 100.
-	  Informant  (if installed) gets called at position 300.
-	  Enchantrix (if installed) gets called at position 400.
+		A lower number will make your tooltip information display earlier (higher)
+		A higher number will call your tooltip later (lower)
+		Auctioneer (if installed) gets called at position 100.
+		Informant  (if installed) gets called at position 300.
+		Enchantrix (if installed) gets called at position 400.
 
 	The appropriate function calls are, respectively:
-	  tooltip - A tooltip is being displayed, hookFunc will be called as:
-	    addTooltipHook(frame, name, link, quality, count, price)
-	  popup - A tooltip may be displayed, unless you want to popup something:
-	    popped = checkPopupHook(name, link, quality, count, price, hyperlink)
-	    -- If your function returns true, then we won't present a tooltip
-	  merchant - Get called for each of a merchant's items.
-	    merchantHook(frame, name, link, quality, count, price)
-	  trade - Get called when a tradeskill window is displayed / item selected
-	    tradeHook(type, selid)
-	    -- valid types: 'trade', 'craft'
-	    -- selID will be nil when the window is first displayed
-	  bank - You are at the bank and are able to scan it's containers
-	    bankHook()
-	  bag - One or more of the items in your bags has updated.
-	    bagHook()
+		tooltip - A tooltip is being displayed, hookFunc will be called as:
+		addTooltipHook(frame, name, link, quality, count, price)
+		popup - A tooltip may be displayed, unless you want to popup something:
+		popped = checkPopupHook(name, link, quality, count, price, hyperlink)
+			If your function returns true, then we won't present a tooltip
+		merchant - Get called for each of a merchant's items.
+		merchantHook(frame, name, link, quality, count, price)
+		trade - Get called when a tradeskill window is displayed / item selected
+		tradeHook(type, selid)
+			valid types: 'trade', 'craft'
+			selID will be nil when the window is first displayed
+		bank - You are at the bank and are able to scan it's containers
+			bankHook()
+		bag - One or more of the items in your bags has updated.
+			bagHook()
 
 
-  You may use the following methods of the EnhTooltip class:
-  
-    EnhTooltip.HideTooltip()
-	  - Causes the enhanced tooltip to vanish.
-	  
-    EnhTooltip.ClearTooltip()
-	  - Clears the current tooltip of contents and hides it.
-	  
-    EnhTooltip.GetGSC(money)
-	  - Returns the given money (in copper) amount in gold, silver and copper.
-	  
-    EnhTooltip.GetTextGSC(money, exact)
-	  - Returns the money (in copper) amount as colored text, suitable for display.
-	    If exact evaluates to true, then the text will be exact, otherwise rounded.
-		
-    EnhTooltip.AddLine(lineText, moneyAmount, embed)
-	  - Adds the lineText to the tooltip.
-	    If moneyAmount is supplied, the line has a money amount right-aligned after it.
+You may use the following methods of the EnhTooltip class:
+
+	EnhTooltip.HideTooltip()
+		Causes the enhanced tooltip to vanish.
+
+	EnhTooltip.ClearTooltip()
+		Clears the current tooltip of contents and hides it.
+
+	EnhTooltip.GetGSC(money)
+		Returns the given money (in copper) amount in gold, silver and copper.
+
+	EnhTooltip.GetTextGSC(money, exact)
+		Returns the money (in copper) amount as colored text, suitable for display.
+		If exact evaluates to true, then the text will be exact, otherwise rounded.
+
+	EnhTooltip.AddLine(lineText, moneyAmount, embed)
+		Adds the lineText to the tooltip.
+		If moneyAmount is supplied, the line has a money amount right-aligned after it.
 		It embed evaluates to true, then the line is placed at the end of the game tooltip
-		  and the money amount is converted to a textual form.
+		and the money amount is converted to a textual form.
 
 	EnhTooltip.AddSeparator()
-	  - Adds an empty line to the tooltip.
+		Adds an empty line to the tooltip.
 
-    EnhTooltip.LineColor(r, g, b)
-	  - Changes the color of the most recently added line to the given R,G,B value.
-	    The R,G,B values are floating point values from 0.0 (dark) to 1.0 (bright)
+	EnhTooltip.LineColor(r, g, b)
+		Changes the color of the most recently added line to the given R,G,B value.
+		The R,G,B values are floating point values from 0.0 (dark) to 1.0 (bright)
 
-    EnhTooltip.LineSize_Large()
-      - Changes the size of the font string to 12
-      
-    EnhTooltip.LineSize_Small()
-      - Changes the size of the font string to 10
-		
-    EnhTooltip.LineQuality(quality)
-	  - Changes the color of the most recently added line to the quality color of the
-	      item that is supplied in the quality parameter.
-		  
-    EnhTooltip.SetIcon(iconPath)
-	  - Adds an icon to the current tooltip, where the texture path is set to that of
-	      the iconPath parameter.
-		  
-    EnhTooltip.NameFromLink(link)
-	  - Given a link, returns the embedded item name.
-	  
-    EnhTooltip.HyperlinkFromLink(link)
-	  - Given a link, returns the blizzard hyperlink (eg: "item:12345:0:321:0")
-	  
-    EnhTooltip.BaselinkFromLink(link)
-	  - Given a link, returns the first 3 numbers from the item link (eg: "12345:0:321")
-	  
-    EnhTooltip.QualityFromLink(link)
-	  - Given a link, returns the numerical quality value (0=Poor/Gray ... 4=Epic/Purple)
-	  
-    EnhTooltip.FakeLink(hyperlink, quality, name)
-	  - Given a hyperlink, a numerical quality and an item name, does it's best to fabricate
-	      as authentic a link as it can. This link may not be suitable for messaging however.
-		  
-    EnhTooltip.AddHook(hookType, hookFunc, position)
-	  - Allows dependant addons to register a function for inclusion at key moments.
-	    Where:
-		  hookType = The type of event to be notified of. One of:
-            tooltip - A tooltip is being displayed, hookFunc will be called as:
-			  addTooltipHook(frame, name, link, quality, count, price)
-			popup - A tooltip may be displayed, unless you want to popup something:
-			  popped = checkPopupHook(name, link, quality, count, price, hyperlink)
-			  -- If your function returns true, then we won't present a tooltip
-			merchant - Get called for each of a merchant's items.
-			  merchantHook(frame, name, link, quality, count, price)
-			trade - Get called when a tradeskill window is displayed / item selected
-			  tradeHook(type, selid)
-			  -- valid types: 'trade', 'craft'
-			  -- selID will be nil when the window is first displayed
-			bank - You are at the bank and are able to scan it's containers
-			  bankHook()
-			bag - One or more of the items in your bags has updated.
-			  bagHook()
-		  hookFunction = Your function (prototyped as above) that we will call.
-		  position = A number that determines calling order
-		    The default position if not supplied is 100.
-			A lower number will make your tooltip information display earlier (higher)
-			A higher number will call your tooltip later (lower)
-			Auctioneer (if installed) gets called at position 50.
-			Enchantrix (if installed) gets called at position 150.
-			
-    EnhTooltip.BreakLink(link)
-	  - Given an item link, splits it into it's component parts as follows:
-		  itemID, randomProperty, enchantment, uniqueID, itemName = EnhTooltip.BreakLink(link)
-	    Note that the return order is not the same as the order of the items in the link
-		  (ie: randomProp and enchant are reversed from their link order)
-		  
-    EnhTooltip.FindItemInBags(findName)
-	  - Searches through your bags to find an item with the given name (exact match)
-	    It returns the following information about the item:
-		  bag, slot, itemID, randomProp, enchant, uniqID = EnhTooltip.FindItemInBags(itemName)
-		  
-    EnhTooltip.SetElapsed(elapsed)
-	  - If a value is given, adds the elapsed interval to our own internal timer.
-	    Checks to see if it is time to hide the tooltip.
-	    Returns the total elapsed time that the tooltip has been displayed since startup.
-		
+	EnhTooltip.LineSize_Large()
+		Changes the size of the font string to 12
+
+	EnhTooltip.LineSize_Small()
+		Changes the size of the font string to 10
+
+	EnhTooltip.LineQuality(quality)
+		Changes the color of the most recently added line to the quality color of the
+		item that is supplied in the quality parameter.
+
+	EnhTooltip.SetIcon(iconPath)
+		Adds an icon to the current tooltip, where the texture path is set to that of
+		the iconPath parameter.
+
+	EnhTooltip.NameFromLink(link)
+		Given a link, returns the embedded item name.
+
+	EnhTooltip.HyperlinkFromLink(link)
+		Given a link, returns the blizzard hyperlink (eg: "item:12345:0:321:0")
+
+	EnhTooltip.BaselinkFromLink(link)
+		Given a link, returns the first 3 numbers from the item link (eg: "12345:0:321")
+
+	EnhTooltip.QualityFromLink(link)
+		Given a link, returns the numerical quality value (0=Poor/Gray ... 4=Epic/Purple)
+
+	EnhTooltip.FakeLink(hyperlink, quality, name)
+		Given a hyperlink, a numerical quality and an item name, does it's best to fabricate
+		as authentic a link as it can. This link may not be suitable for messaging however.
+
+	EnhTooltip.AddHook(hookType, hookFunc, position)
+		Allows dependant addons to register a function for inclusion at key moments.
+		Where:
+			hookType = The type of event to be notified of. One of:
+				tooltip - A tooltip is being displayed, hookFunc will be called as:
+				addTooltipHook(frame, name, link, quality, count, price)
+				popup - A tooltip may be displayed, unless you want to popup something:
+				popped = checkPopupHook(name, link, quality, count, price, hyperlink)
+					If your function returns true, then we won't present a tooltip
+				merchant - Get called for each of a merchant's items.
+				merchantHook(frame, name, link, quality, count, price)
+				trade - Get called when a tradeskill window is displayed / item selected
+				tradeHook(type, selid)
+					valid types: 'trade', 'craft'
+					selID will be nil when the window is first displayed
+				bank - You are at the bank and are able to scan it's containers
+				bankHook()
+				bag - One or more of the items in your bags has updated.
+					bagHook()
+			hookFunction = Your function (prototyped as above) that we will call.
+			position = A number that determines calling order
+				The default position if not supplied is 100.
+				A lower number will make your tooltip information display earlier (higher)
+				A higher number will call your tooltip later (lower)
+				Auctioneer (if installed) gets called at position 50.
+				Enchantrix (if installed) gets called at position 150.
+
+	EnhTooltip.BreakLink(link)
+		Given an item link, splits it into it's component parts as follows:
+			itemID, randomProperty, enchantment, uniqueID, itemName = EnhTooltip.BreakLink(link)
+			Note that the return order is not the same as the order of the items in the link
+			(ie: randomProp and enchant are reversed from their link order)
+
+	EnhTooltip.FindItemInBags(findName)
+		Searches through your bags to find an item with the given name (exact match)
+		It returns the following information about the item:
+			bag, slot, itemID, randomProp, enchant, uniqID = EnhTooltip.FindItemInBags(itemName)
+
+	EnhTooltip.SetElapsed(elapsed)
+		If a value is given, adds the elapsed interval to our own internal timer.
+			Checks to see if it is time to hide the tooltip.
+		Returns the total elapsed time that the tooltip has been displayed since startup.
+
 	EnhTooltip.SetMoneySpacing(spacing)
-	  - Sets the amount of padding (if provided) that money should be given in the tooltips.
-	    Returns the current spacing.
-		
+		Sets the amount of padding (if provided) that money should be given in the tooltips.
+		Returns the current spacing.
+
 	EnhTooltip.SetPopupKey(key)
-	  - Sets a key (if provided), which if pressed while a tooltip is being displayed, checks
-	      for hooked functions that may wish to provide popups.
-	    Returns the current key.
-		
+		Sets a key (if provided), which if pressed while a tooltip is being displayed, checks
+			for hooked functions that may wish to provide popups.
+		Returns the current key.
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -192,65 +192,66 @@ local self = {
 -- =============== LOCAL FUNCTIONS =============== --
 
 -- prototypes for all local functions
-local addLine                   -- AddLine(lineText,moneyAmount,embed)
-local addSeparator              -- AddSeparator(embed)
-local addTooltip                -- AddTooltip(frame,name,link,quality,count,price)
-local afHookOnEnter             -- AfHookOnEnter(type,index)
-local bagHook                   -- BagHook()
-local bankHook                  -- BankHook()
-local baselinkFromLink          -- BaselinkFromLink(link)
-local breakLink                 -- BreakLink(link)
-local callBagHook               -- CallBagHook(event,bagNumber)
-local callBankHook              -- CallBankHook()
-local callCheckPopup            -- CallCheckPopup(name,link,quality,count,price,hyperlink)
-local callTradeHook             -- CallTradeHook(type,event,selID)
-local cfHookUpdate              -- CfHookUpdate(frame)
-local chatHookOnHyperlinkShow   -- ChatHookOnHyperlinkShow(reference,link,button,...)
-local checkHide                 -- CheckHide()
-local checkPopup                -- CheckPopup(name,link,quality,count,price,hyperlink)
-local clearTooltip              -- ClearTooltip()
-local debugPrint                -- DebugPrint(...)
-local doHyperlink               -- DoHyperlink(reference,link,button)
-local embedRender               -- EmbedRender()
-local fakeLink                  -- FakeLink(hyperlink,quality,name)
-local findItemInBags            -- FindItemInBags(findName)
-local getGSC                    -- GetGSC(money)
-local getLootLinkLink           -- GetLootLinkLink(name)
-local getLootLinkServer         -- GetLootLinkServer()
-local getRect                   -- GetRect(object,curRect)
-local getTextGSC                -- GetTextGSC(money,exact)
-local gtHookOnHide              -- GtHookOnHide()
-local gtHookSetAuctionSellItem  -- GtHookSetAuctionSellItem(frame)
-local gtHookSetBagItem          -- GtHookSetBagItem(frame,frameID,buttonID,retVal)
-local gtHookSetCraftItem        -- GtHookSetCraftItem(frame,skill,slot)
-local gtHookSetInventoryItem    -- GtHookSetInventoryItem(frame,unit,slot,retVal)
-local gtHookSetLootItem         -- GtHookSetLootItem(frame,slot)
-local gtHookSetMerchantItem     -- GtHookSetMerchantItem(frame,slot)
-local gtHookSetOwner            -- GtHookSetOwner(frame,owner,anchor)
-local gtHookSetQuestItem        -- GtHookSetQuestItem(frame,qtype,slot)
-local gtHookSetQuestLogItem     -- GtHookSetQuestLogItem(frame,qtype,slot)
-local gtHookSetTradeSkillItem   -- GtHookSetTradeSkillItem(frame,skill,slot)
-local hideTooltip               -- HideTooltip()
-local hyperlinkFromLink         -- HyperlinkFromLink(link)
-local imHookOnEnter             -- ImHookOnEnter()
-local imiHookOnEnter            -- ImiHookOnEnter()
-local lineColor                 -- LineColor(r,g,b)
-local lineQuality               -- LineQuality(quality)
-local lineSize_Large            -- LineSize_Large()
-local lineSize_Small            -- LineSize_Small()
-local llHookOnEnter             -- LlHookOnEnter()
-local merchantHook              -- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
-local merchantScanner           -- MerchantScanner()
-local nameFromLink              -- NameFromLink(link)
-local qualityFromLink           -- QualityFromLink(link)
-local setElapsed                -- SetElapsed(elapsed)
-local setIcon                   -- SetIcon(iconPath)
-local setMoneySpacing           -- SetMoneySpacing(spacing)
-local setPopupKey               -- SetPopupKey(key)
-local showTooltip               -- ShowTooltip(currentTooltip)
-local tooltipCall               -- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
-local tradeHook                 -- TradeHook(type,selID)
-local ttInitialize              -- TtInitialize()
+local addLine					-- AddLine(lineText,moneyAmount,embed)
+local addSeparator				-- AddSeparator(embed)
+local addTooltip				-- AddTooltip(frame,name,link,quality,count,price)
+local afHookOnEnter				-- AfHookOnEnter(type,index)
+local bagHook					-- BagHook()
+local bankHook					-- BankHook()
+local baselinkFromLink			-- BaselinkFromLink(link)
+local breakLink					-- BreakLink(link)
+local callBagHook				-- CallBagHook(event,bagNumber)
+local callBankHook				-- CallBankHook()
+local callCheckPopup			-- CallCheckPopup(name,link,quality,count,price,hyperlink)
+local callTradeHook				-- CallTradeHook(type,event,selID)
+local cfHookUpdate				-- CfHookUpdate(frame)
+local chatHookOnHyperlinkShow	-- ChatHookOnHyperlinkShow(reference,link,button,...)
+local checkHide					-- CheckHide()
+local checkPopup				-- CheckPopup(name,link,quality,count,price,hyperlink)
+local clearTooltip				-- ClearTooltip()
+local debugPrint				-- DebugPrint(...)
+local doHyperlink				-- DoHyperlink(reference,link,button)
+local embedRender				-- EmbedRender()
+local fakeLink					-- FakeLink(hyperlink,quality,name)
+local findItemInBags			-- FindItemInBags(findName)
+local getGSC					-- GetGSC(money)
+local getLootLinkLink			-- GetLootLinkLink(name)
+local getLootLinkServer			-- GetLootLinkServer()
+local getRect					-- GetRect(object,curRect)
+local getTextGSC				-- GetTextGSC(money,exact)
+local gtHookOnHide				-- GtHookOnHide()
+local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
+local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
+local gtHookSetCraftItem		-- GtHookSetCraftItem(frame,skill,slot)
+local gtHookSetInventoryItem	-- GtHookSetInventoryItem(frame,unit,slot,retVal)
+local gtHookSetLootItem			-- GtHookSetLootItem(frame,slot)
+local gtHookSetMerchantItem		-- GtHookSetMerchantItem(frame,slot)
+local gtHookSetOwner			-- GtHookSetOwner(frame,owner,anchor)
+local gtPreHookSetOwner			-- GtPreHookSetOwner(frame,owner,anchor)
+local gtHookSetQuestItem		-- GtHookSetQuestItem(frame,qtype,slot)
+local gtHookSetQuestLogItem		-- GtHookSetQuestLogItem(frame,qtype,slot)
+local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
+local hideTooltip				-- HideTooltip()
+local hyperlinkFromLink			-- HyperlinkFromLink(link)
+local imHookOnEnter				-- ImHookOnEnter()
+local imiHookOnEnter			-- ImiHookOnEnter()
+local lineColor					-- LineColor(r,g,b)
+local lineQuality				-- LineQuality(quality)
+local lineSize_Large			-- LineSize_Large()
+local lineSize_Small			-- LineSize_Small()
+local llHookOnEnter				-- LlHookOnEnter()
+local merchantHook				-- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
+local merchantScanner			-- MerchantScanner()
+local nameFromLink				-- NameFromLink(link)
+local qualityFromLink			-- QualityFromLink(link)
+local setElapsed				-- SetElapsed(elapsed)
+local setIcon					-- SetIcon(iconPath)
+local setMoneySpacing			-- SetMoneySpacing(spacing)
+local setPopupKey				-- SetPopupKey(key)
+local showTooltip				-- ShowTooltip(currentTooltip)
+local tooltipCall				-- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
+local tradeHook					-- TradeHook(type,selID)
+local ttInitialize				-- TtInitialize()
 
 
 ------------------------
@@ -286,8 +287,6 @@ function tradeHook(type,selID)
 	--   type is one of: "trade", or "craft"
 	--   selID can be nil when first opened, or the id of the selected item.
 end
-
-
 
 ------------------------
 -- Function definitions
@@ -356,9 +355,9 @@ function showTooltip(currentTooltip)
 	local width = EnhancedTooltip.minWidth
 	local lineCount = EnhancedTooltip.lineCount
 	if (lineCount == 0) then
-		if (not EnhancedTooltip.hasEmbed) then 
+		if (not EnhancedTooltip.hasEmbed) then
 			hideTooltip()
-			return 
+			return
 		end
 	end
 
@@ -434,8 +433,7 @@ function showTooltip(currentTooltip)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
 		end
 	end
-		
-		
+
 	local cWidth = currentTooltip:GetWidth()
 	if (cWidth < width) then
 		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
@@ -443,11 +441,11 @@ function showTooltip(currentTooltip)
 	elseif (cWidth > width) then
 		width = cWidth
 	end
-		
+
 	EnhancedTooltip:SetHeight(height)
 	EnhancedTooltip:SetWidth(width)
 	EnhancedTooltip:Show()
-	
+
 	for i = 1, 20 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
 		if (ttMoney.myLine ~= nil) then
@@ -471,11 +469,11 @@ end
 -- formats money text by color for gold, silver, copper
 function getTextGSC(money, exact)
 	if not exact then
-	   exact = false
+		exact = false
 	end
 
 	local TEXT_NONE = "0"
-	
+
 	local GSC_GOLD="ffd100"
 	local GSC_SILVER="e6e6e6"
 	local GSC_COPPER="c8602c"
@@ -492,7 +490,7 @@ function getTextGSC(money, exact)
 			gsc = gsc..string.format(GSC_PART, GSC_SILVER, s)
 		end
 		if exact then
-		   gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
+			gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
 		end
 	elseif (s > 0) then
 		gsc = string.format(GSC_START, GSC_SILVER, s)
@@ -570,7 +568,7 @@ function addSeparator(embed)
 	EnhancedTooltip.hasData = true
 	EnhancedTooltip.curEmbed = false
 
-    local curLine = EnhancedTooltip.lineCount +1;
+	local curLine = EnhancedTooltip.lineCount +1;
 	local line = getglobal("EnhancedTooltipText"..curLine)
 	line:SetText(" ");
 	line:SetTextColor(1.0, 1.0, 1.0);
@@ -594,18 +592,18 @@ end
 
 function lineSize_Large()
 	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then return end
-    local curLine = EnhancedTooltip.lineCount
-    if (curLine == 0) then return end
-    local line = getglobal("EnhancedTooltipText"..curLine)
-    line:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	local curLine = EnhancedTooltip.lineCount
+	if (curLine == 0) then return end
+	local line = getglobal("EnhancedTooltipText"..curLine)
+	line:SetFont("Fonts\\FRIZQT__.TTF", 12)
 end
 
 function lineSize_Small()
 	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then return end
-    local curLine = EnhancedTooltip.lineCount
-    if (curLine == 0) then return end
-    local line = getglobal("EnhancedTooltipText"..curLine)
-    line:SetFont("Fonts\\FRIZQT__.TTF", 10)
+	local curLine = EnhancedTooltip.lineCount
+	if (curLine == 0) then return end
+	local line = getglobal("EnhancedTooltipText"..curLine)
+	line:SetFont("Fonts\\FRIZQT__.TTF", 10)
 end
 
 function lineQuality(quality)
@@ -652,7 +650,7 @@ function doHyperlink(reference, link, button)
 				testPopup = true
 			end
 			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
-			if (callRes == true) then 
+			if (callRes == true) then
 				self.oldChatItem = {['reference']=reference, ['link']=link, ['button']=button, ['embed']=EnhancedTooltip.hasEmbed}
 			elseif (callRes == false) then
 				return false;
@@ -685,9 +683,9 @@ function nameFromLink(link)
 		return nil
 	end
 	_, _, name = string.find(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
- 	if (name) then
+	if (name) then
 		return name;
- 	end
+	end
 	return nil
 end
 
@@ -696,9 +694,9 @@ function hyperlinkFromLink(link)
 				return nil
 		end
 		_, _, hyperlink = string.find(link, "|H([^|]+)|h");
-	 	if (hyperlink) then
+		if (hyperlink) then
 			return hyperlink;
-	 	end
+		end
 		return nil
 end
 
@@ -753,7 +751,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	if (link) then itemSig = itemSig..link end
 	if (count) then itemSig = itemSig..count end
 	if (price) then itemSig = itemSig..price end
-	
+
 	if (self.currentItem and self.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
 		showTooltip(self.currentGametip)
@@ -761,7 +759,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	end
 
 	self.currentItem = itemSig
-	
+
 	if (quality==nil or quality==-1) then
 		local linkQuality = qualityFromLink(link)
 		if (linkQuality and linkQuality > -1) then
@@ -780,14 +778,14 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 		(self.forcePopupKey == "alt" and IsAltKeyDown()) or
 		(self.forcePopupKey == "shift" and IsShiftKeyDown())
 	)
-		
+
 	if ((forcePopup == true) or ((forcePopup == nil) and (popupKeyPressed))) then
 		local popupTest = checkPopup(name, link, quality, count, price, hyperlink)
 		if (popupTest) then
 			showTip = false
 		end
 	end
-		
+
 	if (showTip) then
 		clearTooltip()
 		self.showIgnore = true
@@ -813,7 +811,7 @@ function callCheckPopup(name, link, quality, count, price, hyperlink)
 	if (EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink)) then
 		return true;
 	end
-	return false 
+	return false
 end
 
 function merchantScanner()
@@ -903,7 +901,7 @@ function cfHookUpdate(funcArgs, retVal, frame)
 			local buttonID = button:GetID()
 			local link = GetContainerItemLink(frameID, buttonID)
 			local name = nameFromLink(link)
-				
+
 			if (name) then
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
 				if (quality == nil) then quality = qualityFromLink(link) end
@@ -1124,6 +1122,15 @@ function gtHookSetOwner(funcArgs, retVal, frame, owner, anchor)
 	frame.anchor = anchor
 end
 
+--Thanks a ton to Nephyrin and Gravix for their invaluable help in creating this function.
+function gtPreHookSetOwner(funcArgs, retVal, frame, owner, anchor, xOffset, yOffset)
+	if (EnhancedTooltip:IsShown()) then
+		anchor = "ANCHOR_NONE"
+	end
+
+	params = {frame, owner, anchor, xOffset, yOffset}
+	return "setparams", params
+end
 
 ------------------------
 -- Operation functions
@@ -1220,10 +1227,10 @@ end
 -- Load and initialization functions
 ------------------------
 
--- The new blizzard addons are called:
---   Blizzard_TrainerUI,  Blizzard_MacroUI,    Blizzard_RaidUI,  Blizzard_TradeSkillUI,
---   Blizzard_InspectUI,  Blizzard_BattlefieldMinimap,           Blizzard_TalentUI,
---   Blizzard_AuctionUI,  Blizzard_BindingUI,  Blizzard_CraftUI
+--The new blizzard addons are called:
+--	Blizzard_TrainerUI,		Blizzard_MacroUI,		Blizzard_RaidUI,		Blizzard_TradeSkillUI,
+--	Blizzard_InspectUI,		Blizzard_BattlefieldMinimap,	Blizzard_TalentUI,
+--	Blizzard_AuctionUI,		Blizzard_BindingUI,		Blizzard_CraftUI
 
 
 -- Hook in alternative Auctionhouse tooltip code
@@ -1255,9 +1262,7 @@ local function hookCraft()
 end
 
 function ttInitialize()
-	--[[
 	----  Establish hooks to all the game tooltips.
-	--]]
 
 	-- Hook in alternative Chat/Hyperlinking code
 	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", 200, chatHookOnHyperlinkShow)
@@ -1275,6 +1280,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
+	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", -200, gtPreHookSetOwner);
 	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner);
 	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide);
 
@@ -1313,42 +1319,42 @@ end
 
 -- Global object
 EnhTooltip = {
-	['AddTooltip']        = addTooltip,
-	['CheckPopup']        = checkPopup,
-	['MerchantHook']      = merchantHook,
-	['TradeHook']         = tradeHook,
-	['BankHook']          = bankHook,
-	['BagHook']           = bagHook,
+	AddTooltip			= addTooltip,
+	CheckPopup			= checkPopup,
+	MerchantHook		= merchantHook,
+	TradeHook			= tradeHook,
+	BankHook			= bankHook,
+	BagHook				= bagHook,
 
-	['AddLine']           = addLine,
-	['AddSeparator']      = addSeparator,
-	['LineColor']         = lineColor,
-	['LineQuality']       = lineQuality,
-	['LineSize_Large']    = lineSize_Large,
-	['LineSize_Small']    = lineSize_Small,
-	['SetIcon']           = setIcon,
+	AddLine				= addLine,
+	AddSeparator		= addSeparator,
+	LineColor			= lineColor,
+	LineQuality			= lineQuality,
+	LineSize_Large		= lineSize_Large,
+	LineSize_Small		= lineSize_Small,
+	SetIcon				= setIcon,
 
-	['ClearTooltip']      = clearTooltip,
-	['HideTooltip']       = hideTooltip,
-	['ShowTooltip']       = showTooltip,
+	ClearTooltip		= clearTooltip,
+	HideTooltip			= hideTooltip,
+	ShowTooltip			= showTooltip,
 
-	['GetGSC']            = getGSC,
-	['GetTextGSC']        = getTextGSC,
-	['BaselinkFromLink']  = baselinkFromLink,
-	['BreakLink']         = breakLink,
-	['FindItemInBags']    = findItemInBags,
+	GetGSC				= getGSC,
+	GetTextGSC			= getTextGSC,
+	BaselinkFromLink	= baselinkFromLink,
+	BreakLink			= breakLink,
+	FindItemInBags		= findItemInBags,
 
-	['FakeLink']          = fakeLink,
-	['HyperlinkFromLink'] = hyperlinkFromLink,
-	['NameFromLink']      = nameFromLink,
-	['QualityFromLink']   = qualityFromLink,
+	FakeLink			= fakeLink,
+	HyperlinkFromLink	= hyperlinkFromLink,
+	NameFromLink		= nameFromLink,
+	QualityFromLink		= qualityFromLink,
 
-	['SetMoneySpacing']   = setMoneySpacing,
-	['SetPopupKey']       = setPopupKey,
-	['TooltipCall']       = tooltipCall,
+	SetMoneySpacing		= setMoneySpacing,
+	SetPopupKey			= setPopupKey,
+	TooltipCall			= tooltipCall,
 
-	['SetElapsed']        = setElapsed,
-	['DebugPrint']        = debugPrint,
+	SetElapsed			= setElapsed,
+	DebugPrint			= debugPrint,
 }
 
 
@@ -1357,23 +1363,23 @@ EnhTooltip = {
 -- This will go away eventually, so upgrade now!
 function TT_AddTooltip() end
 Stubby.RegisterFunctionHook("EnhTooltip.AddTooltipHook", 100, TT_AddTooltip)
-TT_HideTooltip       = hideTooltip
-TT_ClearTooltip      = clearTooltip
-TT_GetGSC            = getGSC
-TT_GetTextGSC        = getTextGSC
-TT_AddLine           = addLine
-TT_LineColor         = lineColor
-TT_LineQuality       = lineQuality
-TT_SetIcon           = setIcon
-TT_NameFromLink      = nameFromLink
-TT_HyperlinkFromLink = hyperlinkFromLink
-TT_QualityFromLink   = qualityFromLink
-TT_FakeLink          = fakeLink
-TT_BreakLink         = breakLink
-TT_FindItemInBags    = findItemInBags
-TT_SetElapsed        = setElapsed
-TT_SetMoneySpacing   = setMoneySpacing
-TT_SetPopupKey       = setPopupKey
+TT_HideTooltip			= hideTooltip
+TT_ClearTooltip			= clearTooltip
+TT_GetGSC				= getGSC
+TT_GetTextGSC			= getTextGSC
+TT_AddLine				= addLine
+TT_LineColor			= lineColor
+TT_LineQuality			= lineQuality
+TT_SetIcon				= setIcon
+TT_NameFromLink			= nameFromLink
+TT_HyperlinkFromLink	= hyperlinkFromLink
+TT_QualityFromLink		= qualityFromLink
+TT_FakeLink				= fakeLink
+TT_BreakLink			= breakLink
+TT_FindItemInBags		= findItemInBags
+TT_SetElapsed			= setElapsed
+TT_SetMoneySpacing		= setMoneySpacing
+TT_SetPopupKey			= setPopupKey
 -- DO NOT USE THESE FUNCTIONS IN NEW ADDONS --
 -- Use the EnhTooltip object instead --
 
