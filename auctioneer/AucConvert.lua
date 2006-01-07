@@ -166,7 +166,7 @@ function convert()
 										iData.buyoutPricesHistoryList[pos] = nil;
 									end
 								end
-								hist = Auctioneer_StoreMedianList(iData.buyoutPricesHistoryList);
+								hist = Auctioneer.Core.StoreMedianList(iData.buyoutPricesHistoryList);
 							end
 						end
 						if (name) then
