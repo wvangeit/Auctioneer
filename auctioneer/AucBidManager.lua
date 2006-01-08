@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -112,13 +112,11 @@ function AucBidManagerFrame_OnEvent(event)
 	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
 		debugPrint(event);
 		checkQueryComplete();
-		processRequestQueue();
 	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
 		debugPrint(event);
 		if (arg1) then debugPrint("    "..arg1) end;
-		 if (arg1 == ERR_AUCTION_BID_PLACED) then
+		if (arg1 == ERR_AUCTION_BID_PLACED) then
 		 	onBidResponse(BidResultCodes["BidAccepted"]);
-			processRequestQueue();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
 		debugPrint(event);
@@ -132,7 +130,6 @@ function AucBidManagerFrame_OnEvent(event)
 		elseif (arg1 == ERR_AUCTION_HIGHER_BID) then
 			onBidResponse(BidResultCodes["AlreadyHigherBid"]);
 		end
-		processRequestQueue();
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		endProcessingRequestQueue();
 	end
@@ -186,7 +183,6 @@ function isPlayerOnAccount(player)
 	return false;
 end
 
-
 -------------------------------------------------------------------------------
 -- Returns true if a bid request is in flight to the server
 -------------------------------------------------------------------------------
@@ -197,17 +193,24 @@ end
 -------------------------------------------------------------------------------
 -- Called before PlaceAuctionBid()
 -------------------------------------------------------------------------------
-function placeAuctionBidHook(_, _, listType, index, bid)
-	debugPrint("placeAuctionBidHook()");
+function placeAuctionBidHook(_, _, listType, index, bid, request)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
 	if (name and count and bid) then
+		debugPrint("PlaceAuctionBid() - Adding pending bid");
 		local pendingBid = {};
 		pendingBid.name = name;
 		pendingBid.count = count;
 		pendingBid.bid = bid;
 		pendingBid.owner = owner;
-		pendingBid.request = nil;
+		pendingBid.request = request;
 		table.insert(PendingBids, pendingBid);
+		if (request) then
+			debugPrint("PlaceAuctionBid() - Associated request with pending bid "..table.getn(PendingBids));
+		end
+		return "setparams", {listType, index, bid};
+	else
+		debugPrint("PlaceAuctionBid() - Ignoring bid");
+		return "abort";
 	end
 end
 
@@ -222,9 +225,9 @@ function onBidResponse(result)
 		-- If there is an associated request, add our result to it.
 		local request = bid.request;
 		if (request) then
+			debugPrint("Found request associated with bid");
 			if (result == BidResultCodes["BidAccepted"]) then
 				table.insert(request.results, result);
-
 				if (request.bid == request.buyout) then
 					local output = string.format(_AUCT('FrmtBoughtAuction'), request.name, request.count);
 					chatPrint(output);
@@ -248,10 +251,16 @@ function onBidResponse(result)
 				chatPrint(output);
 
 			elseif (result == BidResultCodes["AlreadyHigherBid"]) then
-				table.insert(request.results, result);
-				local output = string.format(_AUCT('FrmtSkippedAuctionWithHigherBid'), request.name, request.count);
-				chatPrint(output);
+				if (request.bid ~= request.buyout) then
+					table.insert(request.results, result);
+					local output = string.format(_AUCT('FrmtSkippedAuctionWithHigherBid'), request.name, request.count);
+					chatPrint(output);
+				else
+					debugPrint("Attempted to buyout the same auction");
+				end
 			end
+		else
+			debugPrint("Did not find request associated with bid");
 		end
 
 		-- Process the bid result		.
@@ -261,19 +270,10 @@ function onBidResponse(result)
 			if (request) then
 				request.bidCount = request.bidCount + 1;
 
-				-- Remove the request if we've reached the max bids.
-				if (request.bidCount == request.maxBids) then
-					removeRequestFromQueue();
-
-				-- Safety check for debugging. Prevents stack overflows so we can
-				-- see what the hell went wrong.
-				elseif (request.bidAttempts > 10) then
-					debugPrint("Reached max bid attempts!");
-					removeRequestFromQueue();
-
 				-- Increment the request's current index if the auction was not bought out.
-				elseif (request.bid ~= request.buyout) then
+				if (request.bid ~= request.buyout) then
 					request.currentIndex = request.currentIndex + 1;
+					debugPrint("Incrementing the request's currentIndex to "..request.currentIndex);
 
 				end
 			end
@@ -284,7 +284,10 @@ function onBidResponse(result)
 			CurrentSearchParams.complete = true;
 
 			-- Skip over the auction we failed to bid on.
-			request.currentIndex = request.currentIndex + 1;
+			if (request) then
+				request.currentIndex = request.currentIndex + 1;
+				debugPrint("Incrementing the request's currentIndex to "..request.currentIndex);
+			end
 
 			if (result == BidResultCodes["OwnAuction"] and bid.owner) then
 				-- We tried bidding on our own auction! Blizzard doesn't
@@ -293,6 +296,24 @@ function onBidResponse(result)
 				-- of these failures so we can avoid these auctions in the
 				-- future.
 				addPlayerToAccount(bid.owner);
+			end
+		end
+		
+		-- Check if we are now complete with this request.
+		if (request) then
+			debugPrint("Current request: bidCount="..request.bidCount.."; bidAttempts="..request.bidAttempts);
+		
+			-- Remove the request if we've reached the max bids.
+			if (request.bidCount == request.maxBids) then
+				debugPrint("Reached max bids!");
+				removeRequestFromQueue();
+
+			-- Safety check for debugging. Prevents stack overflows so we can
+			-- see what the hell went wrong.
+			elseif (request.bidAttempts > 10) then
+				debugPrint("Reached max bid attempts!");
+				removeRequestFromQueue();
+
 			end
 		end
 
@@ -350,7 +371,7 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.isUsable = nil;
 		CurrentSearchParams.qualityIndex = nil;
 		CurrentSearchParams.complete = true;
-		debugPrint("queryAuctionItemsHook() (ignoring)");
+		debugPrint("queryAuctionItemsHook() - ignoring");
 	end
 end
 
@@ -438,6 +459,7 @@ function beginProcessingRequestQueue()
 		not isBidInProgress()) then
 
 		ProcessingRequestQueue = true;
+		AucBidManagerFrame:Show();
 		debugPrint("Begin processing the bid queue");
 
 		-- Hook the functions to disable the Browse UI
@@ -524,14 +546,12 @@ function processRequestQueue()
 				processPage();
 
 			elseif (canSendAuctionQuery()) then
-				-- Turn off the OnUpdate calls and run our query
-				AucBidManagerFrame:Hide();
 				QueryAuctionItems(request.name, "", "", nil, nil, nil, request.currentPage, nil, nil);
 
 			else
-				-- Turn on the OnUpdate calls and wait to be able to send a query.
-				AucBidManagerFrame:Show();
+				-- We gotta wait to be able to send a query.
 				break;
+
 			end
 		end
 
@@ -552,9 +572,10 @@ function processPage()
 
 	-- Iterate through each item on the page, searching for a match
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
-	debugPrint("Processing page "..request.currentPage.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
+	debugPrint("Processing page "..request.currentPage.." starting at index "..request.currentIndex.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
 	debugPrint("Searching for item: "..request.id..", "..request.rprop..", "..request.enchant..", "..request.name..", "..request.count..", "..request.min..", "..request.buyout..", "..request.unique..", "..request.bid);
 
+	local bidOnAuction = false;
 	for indexOnPage = request.currentIndex, lastIndexOnPage do
 		-- Check if this item matches
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
@@ -627,14 +648,6 @@ function processPage()
 
 			-- If we've settled on a bid, do it now!
 			if (bid) then
-				debugPrint("Placing bid on "..name.. " at "..bid.." (index "..indexOnPage..")");
-				PlaceAuctionBid("list", indexOnPage, bid);
-
-				-- PlaceAuctionBid is hooked to append an item to the
-				-- PendingBids table. Associate our request with the
-				-- pending bid.
-				PendingBids[table.getn(PendingBids)].request = request;
-
 				-- Successful bid/buyouts result in the query results being
 				-- updated. To prevent additional queries from being sent
 				-- until the list is updated, we flip the complete flag
@@ -645,19 +658,24 @@ function processPage()
 				-- Update the starting point for this page
 				request.currentIndex = indexOnPage;
 				request.bidAttempts = request.bidAttempts + 1;
+
+				-- Place the bid! This MUST be done last since the response
+				-- can be received during the call to PlaceAuctionBid.
+				bidOnAuction = true;
+				debugPrint("Placing bid on "..name.. " at "..bid.." (index "..indexOnPage..")");
+				PlaceAuctionBid("list", indexOnPage, bid, request);
 				break;
 			end
 		end
 	end
 
-	-- If not item as found to bid on...
-	if (not isBidInProgress()) then
+	-- If an item was not found to bid on...
+	if (not bidOnAuction) then
 		-- When an item is bought out on the page, the item is not replaced
 		-- with an item from a subsequent page. Nor is the item removed from
 		-- the total count. Thus if there were 7 items total before the buyout,
 		-- GetNumAuctionItems() will report 6 items on the page and but still
 		-- 7 total after the buyout.
-
 		if (lastIndexOnPage == 0 or
 			request.currentPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
 			-- Reached the end of the line for this item, remove it from the queue
@@ -679,7 +697,6 @@ end
 function bidAuction(bid, signature, callbackFunc, callbackParam)
 	debugPrint("BidAuction("..bid..", "..signature..")");
 	local id,rprop,enchant,name,count,min,buyout,unique = Auctioneer.Core.GetItemSignature(signature);
-
 	if (bid and id and rprop and enchant and name and count and min and buyout and unique) then
 		local request = {};
 		request.id = id;
