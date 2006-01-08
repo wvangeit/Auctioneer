@@ -33,7 +33,7 @@ if (Auctioneer.Version == "<".."%version%>") then
 	Auctioneer.Version = "3.3.DEV";
 end
 
-function onLoad()
+local function onLoad()
 	-- Unhook some boot triggers if necessary.
 	-- These might not exist on initial loading or if an addon depends on Auctioneer
 	if (Auctioneer_CheckLoad) then
