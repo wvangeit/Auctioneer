@@ -230,6 +230,8 @@ local gtHookSetOwner			-- GtHookSetOwner(frame,owner,anchor)
 local gtHookSetQuestItem		-- GtHookSetQuestItem(frame,qtype,slot)
 local gtHookSetQuestLogItem		-- GtHookSetQuestLogItem(frame,qtype,slot)
 local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
+local gtHookAppendText			-- GtHookAppendText(funcArgs, retVal, frame)
+local gtHookShow				-- GtHookShow(funcArgs, retVal, frame)
 local hideTooltip				-- HideTooltip()
 local hyperlinkFromLink			-- HyperlinkFromLink(link)
 local imHookOnEnter				-- ImHookOnEnter()
@@ -1072,6 +1074,17 @@ function gtHookAppendText(funcArgs, retVal, frame)
 	end
 end
 
+function gtHookShow(funcArgs, retVal, frame)
+	if (self.hookRecursion) then
+		return;
+	end
+	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
+		self.hookRecursion = true;
+		showTooltip(self.currentGametip)
+		self.hookRecursion = nil;
+	end
+end
+
 function imiHookOnEnter()
 	if(not IM_InvList) then return end
 	local id = this:GetID()
@@ -1277,6 +1290,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText);
 	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner);
+	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, gtHookShow);
 	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide);
 
 	-- Establish hooks for us to use.
