@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 local TIME_LEFT_NAMES =
 {
@@ -655,6 +655,7 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 	if (result and result.name and result.count and result.bid) then
 		local context = { frame = frame, auction = result };
 		AucBidManager.BidAuction(result.bid, result.signature, AuctionFrameSearch_OnBidResult, context);
+		button:Disable();
 	end
 end
 
@@ -667,6 +668,7 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	if (result and result.name and result.count and result.buyout) then
 		local context = { frame = frame, auction = result };
 		AucBidManager.BidAuction(result.buyout, result.signature, AuctionFrameSearch_OnBidResult, context);
+		button:Disable();
 	end
 end
 

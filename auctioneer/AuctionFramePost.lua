@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -45,6 +45,7 @@ function AuctionFramePost_OnLoad()
 	this.SetAuctionItem = AuctionFramePost_SetAuctionItem;
 	this.ValidateAuction = AuctionFramePost_ValidateAuction;
 	this.UpdateAuctionList = AuctionFramePost_UpdateAuctionList;
+	this.UpdatePriceModels = AuctionFramePost_UpdatePriceModels;
 
 	-- Data Members
 	this.itemID = nil;
@@ -54,6 +55,16 @@ function AuctionFramePost_OnLoad()
 
 	-- Controls
 	this.auctionList = getglobal(this:GetName().."List");
+	this.bidMoneyInputFrame = getglobal(this:GetName().."StartPrice");
+	this.buyoutMoneyInputFrame = getglobal(this:GetName().."BuyoutPrice");
+	this.stackSizeEdit = getglobal(this:GetName().."StackSize");
+	this.stackSizeCount = getglobal(this:GetName().."StackCount");
+
+	-- Setup the tab order for the money input frames.
+	MoneyInputFrame_SetPreviousFocus(this.bidMoneyInputFrame, this.stackSizeCount);
+	MoneyInputFrame_SetNextFocus(this.bidMoneyInputFrame, getglobal(this.buyoutMoneyInputFrame:GetName().."Gold"));
+	MoneyInputFrame_SetPreviousFocus(this.buyoutMoneyInputFrame, getglobal(this.bidMoneyInputFrame:GetName().."Copper"));
+	MoneyInputFrame_SetNextFocus(this.buyoutMoneyInputFrame, this.stackSizeEdit);
 
 	-- Configure the logical columns
 	this.logicalColumns =
@@ -176,62 +187,62 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_UpdatePriceModels(frame, name, count)
-	frame.prices = {};
+function AuctionFramePost_UpdatePriceModels(frame)
+	if (not frame.updating) then
+		frame.prices = {};
 
-	if (name and count) then
-		local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
-		local itemKey = id..":"..rprop..":"..enchant;
-		local hsp, histCount, market, warn, nexthsp, nextwarn = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
+		local name = frame:GetItemName();
+		local count = frame:GetStackSize();
+		if (name and count) then
+			local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
+			local itemKey = id..":"..rprop..":"..enchant;
+			local hsp, histCount, market, warn, nexthsp, nextwarn = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 
-		-- Get the fixed price
-		if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
-			local startPrice, buyPrice = Auctioneer.Storage.GetFixedPrice(itemKey, count);
-			local fixedPrice = {};
-			fixedPrice.text = "Fixed Price";
-			fixedPrice.note = "";
-			fixedPrice.bid = startPrice;
-			fixedPrice.buyout = buyPrice;
-			table.insert(frame.prices, fixedPrice);
+			-- Get the fixed price
+			if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
+				local startPrice, buyPrice = Auctioneer.Storage.GetFixedPrice(itemKey, count);
+				local fixedPrice = {};
+				fixedPrice.text = "Fixed Price";
+				fixedPrice.note = "";
+				fixedPrice.bid = startPrice;
+				fixedPrice.buyout = buyPrice;
+				table.insert(frame.prices, fixedPrice);
+			end
+
+			-- Calculate auctioneer's suggested resale price.
+			if (hsp == 0) then
+				local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, Auctioneer.Util.GetAuctionKey());
+				local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
+				hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
+			end
+			local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
+			local auctioneerPrice = {};
+			auctioneerPrice.text = "Auctioneer Price";
+			auctioneerPrice.note = warn;
+			auctioneerPrice.buyout = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * count);
+			auctioneerPrice.bid = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(auctioneerPrice.buyout, discountBidPercent));
+			table.insert(frame.prices, auctioneerPrice);
+
+			-- Add the fallback custom price
+			local customPrice = {}
+			customPrice.text = "Custom Price"
+			customPrice.note = "";
+			customPrice.bid = nil;
+			customPrice.buyout = nil;
+			table.insert(frame.prices, customPrice);
+
+			-- Update the price model combo.
+			local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
+			local index = UIDropDownMenu_GetSelectedID(dropdown);
+			if (index == nil) then
+				index = 1;
+			end
+			AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index);
+		else
+			-- Update the price model combo.
+			local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
+			AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 		end
-
-		-- Calculate auctioneer's suggested resale price.
-		if (hsp == 0) then
-			local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, Auctioneer.Util.GetAuctionKey());
-			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
-			hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
-		end
-		local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
-		local auctioneerPrice = {};
-		auctioneerPrice.text = "Auctioneer Price";
-		auctioneerPrice.note = warn;
-		auctioneerPrice.buyout = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * count);
-		auctioneerPrice.bid = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(auctioneerPrice.buyout, discountBidPercent));
-		table.insert(frame.prices, auctioneerPrice);
-
-		-- Add the fallback custom price
-		local customPrice = {}
-		customPrice.text = "Custom Price"
-		customPrice.note = "";
-		customPrice.bid = nil;
-		customPrice.buyout = nil;
-		table.insert(frame.prices, customPrice);
-
-		-- Update the price model combo.
-		local oldThis = this;
-		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
-		this = getglobal(frame:GetName().."PriceModelDropDownButton");
-		UIDropDownMenu_Initialize(dropdown, AuctionFramePost_PriceModelDropDown_Initialize);
-		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, 1);
-		this = oldThis;
-	else
-		-- Update the price model combo.
-		local oldThis = this;
-		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
-		this = getglobal(frame:GetName().."PriceModelDropDownButton");
-		UIDropDownMenu_Initialize(dropdown, AuctionFramePost_PriceModelDropDown_Initialize);
-		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
-		this = oldThis;
 	end
 end
 
@@ -369,6 +380,7 @@ function AuctionFramePost_SetStackSize(frame, size)
 
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
+	frame:UpdatePriceModels();
 	frame:ValidateAuction();
 end
 
@@ -466,18 +478,15 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		getglobal(button:GetName().."Name"):Show();
 		getglobal(button:GetName().."IconTexture"):SetTexture(itemTexture);
 		getglobal(button:GetName().."IconTexture"):Show();
-		--if ( count > 1 ) then
-		--	getglobal(button:GetName().."Count"):SetText(count);
-		--	getglobal(button:GetName().."Count"):Show();
-		--else
-		--	getglobal(button:GetName().."Count"):Hide();
-		--end
 
 		-- Set the defaults.
 		frame:SetDuration(1440);
 		frame:SetStackSize(count);
 		frame:SetStackCount(1);
-		AuctionFramePost_UpdatePriceModels(frame, name, count);
+
+		-- Clear the current pricing model so that the default one gets selected.
+		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
+		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 	else
 		-- Clear the item's information.
 		frame.itemName = nil;
@@ -486,17 +495,16 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Hide the item
 		getglobal(button:GetName().."Name"):Hide();
 		getglobal(button:GetName().."IconTexture"):Hide();
-		--getglobal(button:GetName().."Count"):Hide();
 
 		-- Clear the defaults.
 		frame:SetStackSize(1);
 		frame:SetStackCount(1);
-		AuctionFramePost_UpdatePriceModels(frame, nil, nil);
 	end
 
 	-- Update the deposit cost and validate the auction.
 	frame.updating = false;
 	frame:UpdateDeposit();
+	frame:UpdatePriceModels();
 	frame:UpdateAuctionList();
 	frame:ValidateAuction();
 end
@@ -537,25 +545,26 @@ function AuctionFramePost_ValidateAuction(frame)
 		-- has enough of the item.
 		local stackSize = frame:GetStackSize();
 		local stackCount = frame:GetStackCount();
-		local stackErrorText = getglobal(frame:GetName().."StackInvalidText");
 		local quantityErrorText = getglobal(frame:GetName().."QuantityInvalidText");
 		if (frame.itemID and frame.itemName) then
 			local quantity = AucPostManager.GetItemQuantity(frame.itemName);
 			local maxStackSize = AuctionFramePost_GetMaxStackSize(frame.itemID);
-			if (stackSize > 1 and (maxStackSize == nil or stackSize > maxStackSize)) then
+			if (stackSize == 0) then
 				valid = false;
-				stackErrorText:Show();
-				quantityErrorText:Hide();
+				quantityErrorText:SetText("(Stack Too Small)");
+				quantityErrorText:Show();
+			elseif (stackSize > 1 and (maxStackSize == nil or stackSize > maxStackSize)) then
+				valid = false;
+				quantityErrorText:SetText("(Stack Too Big)");
+				quantityErrorText:Show();
 			elseif (quantity < (stackSize * stackCount)) then
 				valid = false;
-				stackErrorText:Hide();
+				quantityErrorText:SetText("(Not Enough)");
 				quantityErrorText:Show();
 			else
-				stackErrorText:Hide();
 				quantityErrorText:Hide();
 			end
 		else
-			stackErrorText:Hide();
 			quantityErrorText:Hide();
 		end
 
@@ -669,6 +678,7 @@ function AuctionFramePost_StackSize_OnTextChanged()
 
 	-- Update the deposit and validate the auction.
 	frame:UpdateDeposit();
+	frame:UpdatePriceModels();
 	frame:ValidateAuction();
 end
 
@@ -765,7 +775,8 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 			getglobal(frame:GetName().."PriceModelNoteText"):Hide();
 		end
 
-		UIDropDownMenu_SetSelectedID(dropdown, index);
+		AuctioneerDropDownMenu_Initialize(dropdown, AuctionFramePost_PriceModelDropDown_Initialize);
+		AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
 	else
 		frame:SetNoteText("");
 		frame:SetStartPrice(0);

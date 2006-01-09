@@ -124,15 +124,6 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentStackInvalidText" inherits="GameFontRedSmall" text="(Stack Too Big)" hidden="true">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="10" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
 				<FontString name="$parentStackSizeText" inherits="GameFontHighlightSmall" text="Count">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText">
@@ -252,8 +243,15 @@
 					</OnClick>
 					<OnEnter>
 						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						if (this.item and this.bag) then
-							GameTooltip:SetBagItem(this.bag, this.item)
+						local parent = this:GetParent()
+						local name = parent:GetItemName();
+						if (name) then
+							local bag, slot, id = EnhTooltip.FindItemInBags(name);
+							local _, link, rarity = GetItemInfo(id);
+							GameTooltip:SetHyperlink(link);
+							GameTooltip:Show();
+							local hyperlink = GetContainerItemLink(bag, slot);
+							EnhTooltip.TooltipCall(GameTooltip, parent:GetItemName(), hyperlink, rarity, parent:GetStackSize());
 						else
 							GameTooltip:SetText(AUCTION_ITEM_TEXT, 1.0, 1.0, 1.0);
 						end
@@ -339,6 +337,13 @@
 					<OnTextChanged>
 						AuctionFramePost_StackSize_OnTextChanged();
 					</OnTextChanged>
+					<OnTabPressed>
+						if (IsShiftKeyDown()) then
+							getglobal(this:GetParent():GetName().."BuyoutPriceCopper"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName().."StackCount"):SetFocus();
+						end
+					</OnTabPressed>
 					<OnEditFocusLost>
 						this:HighlightText(0, 0);
 					</OnEditFocusLost>
@@ -362,6 +367,13 @@
 					<OnTextChanged>
 						AuctionFramePost_StackCount_OnTextChanged();
 					</OnTextChanged>
+					<OnTabPressed>
+						if (IsShiftKeyDown()) then
+							getglobal(this:GetParent():GetName().."StackSize"):SetFocus();
+						else
+							getglobal(this:GetParent():GetName().."StartPriceGold"):SetFocus();
+						end
+					</OnTabPressed>
 					<OnEditFocusLost>
 						this:HighlightText(0, 0);
 					</OnEditFocusLost>

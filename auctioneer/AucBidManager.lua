@@ -46,6 +46,7 @@ local CurrentSearchParams =
 	isUsable = nil;
 	qualityIndex = nil;
 	complete = true; -- Flag indicates if the entire response has been received
+	targetCountForPage = nil; -- Number of items expected on the page (nil for unknown)
 };
 
 -- Queue of bids submitted to the server, but not yet accepted or rejected
@@ -72,6 +73,8 @@ BidResultCodes["CurrentBidLower"] = 6;
 local addPlayerToAccount;
 local isPlayerOnAccount;
 local isBidInProgress;
+local addPendingBid;
+local removePendingBid;
 local placeAuctionBidHook;
 local onBidResponse;
 local isQueryInProgress;
@@ -96,8 +99,6 @@ local dumpState;
 function AucBidManagerFrame_OnLoad()
 	this:RegisterEvent("VARIABLES_LOADED");
 	this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE");
-	this:RegisterEvent("CHAT_MSG_SYSTEM");
-	this:RegisterEvent("UI_ERROR_MESSAGE");
 	this:RegisterEvent("AUCTION_HOUSE_CLOSED");
 
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", -50, placeAuctionBidHook)
@@ -191,22 +192,61 @@ function isBidInProgress()
 end
 
 -------------------------------------------------------------------------------
+-- Adds a pending bid to the queue.
+-------------------------------------------------------------------------------
+function addPendingBid(name, count, bid, owner, request)
+	-- Add a pending bid to the queue.
+	local pendingBid = {};
+	pendingBid.name = name;
+	pendingBid.count = count;
+	pendingBid.bid = bid;
+	pendingBid.owner = owner;
+	pendingBid.request = request;
+	table.insert(PendingBids, pendingBid);
+	debugPrint("addPendingBid() - Added pending bid");
+	if (request) then
+		debugPrint("addPendingBid() - Associated request with pending bid "..table.getn(PendingBids));
+	end
+	
+	-- Register for the response events if this is the first pending bid.
+	if (table.getn(PendingBids) == 1) then
+		debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+		AucBidManagerFrame:RegisterEvent("CHAT_MSG_SYSTEM");
+		AucBidManagerFrame:RegisterEvent("UI_ERROR_MESSAGE");
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Removes the pending bid from the queue.
+-------------------------------------------------------------------------------
+function removePendingBid()
+	if (table.getn(PendingBids) > 0) then
+		-- Remove the first pending bid.
+		local bid = PendingBids[1];
+		table.remove(PendingBids, 1);
+		debugPrint("removePendingBid() - Removed pending bid");
+
+		-- Unregister for the response events if this is the last pending bid.
+		if (table.getn(PendingBids) == 0) then
+			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+			AucBidManagerFrame:UnregisterEvent("CHAT_MSG_SYSTEM");
+			AucBidManagerFrame:UnregisterEvent("UI_ERROR_MESSAGE");
+		end
+
+		return bid;
+	end
+	
+	-- No pending bid to remove!
+	return nil;
+end
+
+-------------------------------------------------------------------------------
 -- Called before PlaceAuctionBid()
 -------------------------------------------------------------------------------
 function placeAuctionBidHook(_, _, listType, index, bid, request)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
 	if (name and count and bid) then
-		debugPrint("PlaceAuctionBid() - Adding pending bid");
-		local pendingBid = {};
-		pendingBid.name = name;
-		pendingBid.count = count;
-		pendingBid.bid = bid;
-		pendingBid.owner = owner;
-		pendingBid.request = request;
-		table.insert(PendingBids, pendingBid);
-		if (request) then
-			debugPrint("PlaceAuctionBid() - Associated request with pending bid "..table.getn(PendingBids));
-		end
+		addPendingBid(name, count, bid, owner, request);
 		return "setparams", {listType, index, bid};
 	else
 		debugPrint("PlaceAuctionBid() - Ignoring bid");
@@ -220,7 +260,7 @@ end
 function onBidResponse(result)
 	if (table.getn(PendingBids) > 0) then
 		-- We always assume the bid response is for the next bid in PendingBids.
-		local bid = PendingBids[1];
+		local bid = removePendingBid();
 
 		-- If there is an associated request, add our result to it.
 		local request = bid.request;
@@ -282,6 +322,7 @@ function onBidResponse(result)
 			-- We were expecting the list to update after our bid/buyout, but
 			-- our bid/buyout failed so we won't be getting an update.
 			CurrentSearchParams.complete = true;
+			CurrentSearchParams.targetCountForPage = nil;
 
 			-- Skip over the auction we failed to bid on.
 			if (request) then
@@ -316,9 +357,6 @@ function onBidResponse(result)
 
 			end
 		end
-
-		-- Remove the pending bid.
-		table.remove(PendingBids, 1);
 	else
 		-- We got out of sync somehow... this indicates a bug in how we determine
 		-- the results of bid requests.
@@ -358,6 +396,7 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.isUsable = isUsable;
 		CurrentSearchParams.qualityIndex = qualityIndex;
 		CurrentSearchParams.complete = false;
+		CurrentSearchParams.targetCountForPage = nil;
 		debugPrint("queryAuctionItemsHook()");
 
 	else
@@ -371,6 +410,7 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.isUsable = nil;
 		CurrentSearchParams.qualityIndex = nil;
 		CurrentSearchParams.complete = true;
+		CurrentSearchParams.targetCountForPage = nil;
 		debugPrint("queryAuctionItemsHook() - ignoring");
 	end
 end
@@ -382,25 +422,29 @@ end
 -------------------------------------------------------------------------------
 function checkQueryComplete()
 	if (not CurrentSearchParams.complete) then
-		-- Assume true until otherwise proven false.
-		CurrentSearchParams.complete = true;
+		-- Get the number of auctions on the page.
 		local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 		debugPrint("LastIndexOnPage = "..lastIndexOnPage);
 		debugPrint("TotalAuctions = "..totalAuctions);
 
-		for indexOnPage = 1, lastIndexOnPage do
-			local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
-			if (owner == nil) then
-				-- No dice... there are more updates coming...
-				CurrentSearchParams.complete = false;
-				break;
+		if (CurrentSearchParams.targetCountForPage == nil or CurrentSearchParams.targetCountForPage == lastIndexOnPage) then
+			-- Assume true until otherwise proven false.
+			CurrentSearchParams.complete = true;
+			for indexOnPage = 1, lastIndexOnPage do
+				local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
+				if (owner == nil) then
+					-- No dice... there are more updates coming...
+					CurrentSearchParams.complete = false;
+					break;
+				end
 			end
-		end
-
-		if (CurrentSearchParams.complete) then
-			debugPrint("checkQueryComplete() - true");
+			if (CurrentSearchParams.complete) then
+				debugPrint("checkQueryComplete() - true");
+			else
+				debugPrint("checkQueryComplete() - false (waiting for owner information on auctions)");
+			end
 		else
-			debugPrint("checkQueryComplete() - false");
+			debugPrint("checkQueryComplete() - false (waiting for "..CurrentSearchParams.targetCountForPage.." auctions on page)");
 		end
 	end
 end
@@ -497,6 +541,10 @@ end
 -------------------------------------------------------------------------------
 function endProcessingRequestQueue()
 	if (ProcessingRequestQueue) then
+		ProcessingRequestQueue = false;
+		AucBidManagerFrame:Hide();
+		debugPrint("End processing the bid queue");
+
 		-- Unhook the functions
 		if( Original_CanSendAuctionQuery ) then
 			CanSendAuctionQuery = Original_CanSendAuctionQuery;
@@ -512,11 +560,9 @@ function endProcessingRequestQueue()
 		end
 
 		-- Update the Browse UI.
+		BrowseNoResultsText:Hide();
+		BrowseNoResultsText:SetText("");
 		AuctionFrameBrowse_Update();
-
-		debugPrint("End processing the bid queue");
-		ProcessingRequestQueue = false;
-		AucBidManagerFrame:Hide();
 	end
 end
 
@@ -654,6 +700,9 @@ function processPage()
 				-- back to false. If the bid fails we'll manually flip
 				-- the flag back to true again.
 				CurrentSearchParams.complete = false;
+				if (bid == buyoutPrice) then
+					CurrentSearchParams.targetCountForPage = lastIndexOnPage - 1;
+				end
 
 				-- Update the starting point for this page
 				request.currentIndex = indexOnPage;
@@ -734,6 +783,7 @@ function dumpState()
 	chatPrint("        isUsable: "..boolString(CurrentSearchParams.isUsable));
 	chatPrint("        qualityIndex: "..nilSafe(CurrentSearchParams.qualityIndex));
 	chatPrint("        complete: "..boolString(CurrentSearchParams.complete));
+	chatPrint("        targetCountForPage: "..nilSafe(CurrentSearchParams.targetCountForPage));
 end
 
 -------------------------------------------------------------------------------
