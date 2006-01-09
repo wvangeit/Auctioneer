@@ -227,7 +227,6 @@ local gtHookSetInventoryItem	-- GtHookSetInventoryItem(frame,unit,slot,retVal)
 local gtHookSetLootItem			-- GtHookSetLootItem(frame,slot)
 local gtHookSetMerchantItem		-- GtHookSetMerchantItem(frame,slot)
 local gtHookSetOwner			-- GtHookSetOwner(frame,owner,anchor)
-local gtPreHookSetOwner			-- GtPreHookSetOwner(frame,owner,anchor)
 local gtHookSetQuestItem		-- GtHookSetQuestItem(frame,qtype,slot)
 local gtHookSetQuestLogItem		-- GtHookSetQuestLogItem(frame,qtype,slot)
 local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
@@ -374,6 +373,14 @@ function showTooltip(currentTooltip)
 	local sWidth = GetScreenWidth()
 	local sHeight = GetScreenHeight()
 
+	local cWidth = currentTooltip:GetWidth()
+	if (cWidth < width) then
+		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
+		currentTooltip:Show()
+	elseif (cWidth > width) then
+		width = cWidth
+	end
+
 	local parentObject = currentTooltip.owner
 	if (parentObject) then
 		local align = currentTooltip.anchor
@@ -432,14 +439,6 @@ function showTooltip(currentTooltip)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
 		end
-	end
-
-	local cWidth = currentTooltip:GetWidth()
-	if (cWidth < width) then
-		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
-		currentTooltip:Show()
-	elseif (cWidth > width) then
-		width = cWidth
 	end
 
 	EnhancedTooltip:SetHeight(height)
@@ -1067,6 +1066,12 @@ function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	end
 end
 
+function gtHookAppendText(funcArgs, retVal, frame)
+	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
+		showTooltip(self.currentGametip)
+	end
+end
+
 function imiHookOnEnter()
 	if(not IM_InvList) then return end
 	local id = this:GetID()
@@ -1120,16 +1125,6 @@ end
 function gtHookSetOwner(funcArgs, retVal, frame, owner, anchor)
 	frame.owner = owner
 	frame.anchor = anchor
-end
-
---Thanks a ton to Nephyrin and Gravix for their invaluable help in creating this function.
-function gtPreHookSetOwner(funcArgs, retVal, frame, owner, anchor, xOffset, yOffset)
-	if (EnhancedTooltip:IsShown()) then
-		anchor = "ANCHOR_NONE"
-	end
-
-	params = {frame, owner, anchor, xOffset, yOffset}
-	return "setparams", params
 end
 
 ------------------------
@@ -1280,7 +1275,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", -200, gtPreHookSetOwner);
+	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText);
 	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner);
 	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide);
 
