@@ -124,20 +124,11 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentStackSizeText" inherits="GameFontHighlightSmall" text="Count">
+				<FontString name="$parentMultiplyText" inherits="GameFontHighlightSmall" text="x">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText">
 							<Offset>
-								<AbsDimension x="25" y="-18"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				<FontString name="$parentMultiplyText" inherits="GameFontHighlightSmall" text="x">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentStackSizeText" relativePoint="TOPRIGHT">
-							<Offset>
-								<AbsDimension x="10" y="0"/>
+								<AbsDimension x="40" y="-18"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -322,9 +313,9 @@
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<EditBox name="$parentStackSize" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+			<EditBox name="$parentStackSize" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
 				<Size>
-					<AbsDimension x="30" y="16"/>
+					<AbsDimension x="40" y="16"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentQuantityText" relativePoint="BOTTOMLEFT">
@@ -359,7 +350,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentStackSize" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="60" y="0"/>
+							<AbsDimension x="17" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
