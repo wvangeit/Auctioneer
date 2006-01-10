@@ -207,7 +207,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		end -- (aCount > 0)
 
 		local also = Auctioneer.Command.GetFilterVal("also");
-		if (Auctioneer.Util.IsValidAlso(also)) and (also ~= "off") and (also ~= auctKey) then
+		if (Auctioneer.Util.IsValidAlso(also)) and (also ~= "off") then
 
 			if (also == "opposite") then
 				also = Auctioneer.Util.GetOppositeKey();
@@ -220,6 +220,8 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 			if (also == "home") then
 				also = Auctioneer.Util.GetHomeKey();
 			end
+
+			if (also == auctKey) then return end;
 
 			local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, also);
 			local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
