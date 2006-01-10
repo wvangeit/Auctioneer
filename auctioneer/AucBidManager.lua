@@ -45,6 +45,7 @@ local CurrentSearchParams =
 	page = nil;
 	isUsable = nil;
 	qualityIndex = nil;
+	queryTime = nil; -- Time that the query was made
 	complete = true; -- Flag indicates if the entire response has been received
 	targetCountForPage = nil; -- Number of items expected on the page (nil for unknown)
 };
@@ -395,6 +396,7 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.page = page;
 		CurrentSearchParams.isUsable = isUsable;
 		CurrentSearchParams.qualityIndex = qualityIndex;
+		CurrentSearchParams.queryTime = time();
 		CurrentSearchParams.complete = false;
 		CurrentSearchParams.targetCountForPage = nil;
 		debugPrint("queryAuctionItemsHook()");
@@ -409,6 +411,7 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.page = nil;
 		CurrentSearchParams.isUsable = nil;
 		CurrentSearchParams.qualityIndex = nil;
+		CurrentSearchParams.queryTime = time();
 		CurrentSearchParams.complete = true;
 		CurrentSearchParams.targetCountForPage = nil;
 		debugPrint("queryAuctionItemsHook() - ignoring");
@@ -571,6 +574,29 @@ end
 -- method performs the next action needed to process the queue.
 -------------------------------------------------------------------------------
 function processRequestQueue()
+	-- Check if we should toss the results of the last query. Sometimes
+	-- Blizzard never updates all the owner information. We give it 20
+	-- seconds, then give up and try again.
+	if (CurrentSearchParams.complete == false and
+		CurrentSearchParams.queryTime and
+		time() - CurrentSearchParams.queryTime >= 20) then
+		-- Discard the results of the search and try again.
+		CurrentSearchParams.name = nil;
+		CurrentSearchParams.minLevel = nil;
+		CurrentSearchParams.maxLevel = nil;
+		CurrentSearchParams.invTypeIndex = nil;
+		CurrentSearchParams.classIndex = nil;
+		CurrentSearchParams.subclassIndex = nil;
+		CurrentSearchParams.page = nil;
+		CurrentSearchParams.isUsable = nil;
+		CurrentSearchParams.qualityIndex = nil;
+		CurrentSearchParams.queryTime = nil;
+		CurrentSearchParams.complete = true;
+		CurrentSearchParams.targetCountForPage = nil;
+		Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionScanRedo'), 20));
+	end
+
+	-- Process the bid queue!
 	if (beginProcessingRequestQueue()) then
 		while (table.getn(RequestQueue) > 0 and not isQueryInProgress() and not isBidInProgress()) do
 			local request = RequestQueue[1];
@@ -699,6 +725,7 @@ function processPage()
 				-- until the list is updated, we flip the complete flag
 				-- back to false. If the bid fails we'll manually flip
 				-- the flag back to true again.
+				CurrentSearchParams.queryTime = time();
 				CurrentSearchParams.complete = false;
 				if (bid == buyoutPrice) then
 					CurrentSearchParams.targetCountForPage = lastIndexOnPage - 1;
