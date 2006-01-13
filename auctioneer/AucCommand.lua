@@ -1010,7 +1010,7 @@ function mainHandler(command, source)
 
 	--/auctioneer auction-duration (2h|8h|24h)
 	elseif (cmd == 'auction-duration') then
-		suctionDuration(param, chatprint);
+		auctionDuration(param, chatprint);
 
 	--/auctioneer finish (off|logout|exit)
 	elseif (cmd == 'finish') then
@@ -1490,8 +1490,8 @@ function auctionDuration(param, chatprint)
 	setFilter("auction-duration", mode);
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdAuctionDuration' .. mode)));
-		setKhaosSetKeyValue("protect-window", mode);
+		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtAuctionDuration'), _AUCT('CmdAuctionDuration' .. mode)));
+		setKhaosSetKeyValue("auction-duration", mode);
 	end
 end
 

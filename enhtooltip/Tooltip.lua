@@ -852,7 +852,7 @@ end
 ------------------------
 
 function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
-	if (IsAltKeyDown()) and (AuctionFrame:IsVisible()) then
+	if (IsAltKeyDown()) and AuctionFrame and (AuctionFrame:IsVisible()) then
 		AuctionFrameTab_OnClick(1)
 		local itemID = breakLink(link)
 		if (itemID) then
