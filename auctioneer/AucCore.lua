@@ -246,7 +246,7 @@ function getAuctionPriceItem(itemKey, from)
 		auctionPriceItem.name = infoItem[2];
 	end
 
-	local playerMade, reqSkill, reqLevel = Auctioneer.Core.IsPlayerMade(itemKey);
+	local playerMade, reqSkill, reqLevel = isPlayerMade(itemKey);
 	auctionPriceItem.playerMade = playerMade;
 	auctionPriceItem.reqSkill = reqSkill;
 	auctionPriceItem.reqLevel = reqLevel;
