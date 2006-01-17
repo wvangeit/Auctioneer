@@ -23,7 +23,7 @@
 	<Frame name="AuctionFramePost" inherits="AuctionFrameTemplate" hidden="true">
 		<Layers>
 			<Layer level="BACKGROUND">
-				<FontString name="$parentTitle" inherits="GameFontNormal" text="Post Auctions">
+				<FontString name="$parentTitle" inherits="GameFontNormal">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset>
@@ -34,7 +34,7 @@
 				</FontString>
 			</Layer>
 			<Layer level="ARTWORK">
-				<FontString name="$parentTabText" inherits="GameFontHighlightSmall" text="Post Auctions">
+				<FontString name="$parentTabText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOP" relativePoint="TOPLEFT">
 							<Offset>
@@ -43,7 +43,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentPriceModelText" inherits="GameFontHighlightSmall" text="Price Based On:">
+				<FontString name="$parentPriceModelText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT">
 							<Offset>
@@ -61,7 +61,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentSavePriceText" inherits="GameFontNormalSmall" hidden="true" text="Make fixed price">
+				<FontString name="$parentSavePriceText" inherits="GameFontNormalSmall" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentPriceModelText">
 							<Offset>
@@ -70,7 +70,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentStartPriceText" inherits="GameFontHighlightSmall" text="Starting Price:">
+				<FontString name="$parentStartPriceText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentPriceModelNoteText">
 							<Offset>
@@ -79,7 +79,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentStartPriceInvalidText" inherits="GameFontRedSmall" text="(Required)" hidden="true">
+				<FontString name="$parentStartPriceInvalidText" inherits="GameFontRedSmall" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentStartPriceText" relativePoint="TOPRIGHT">
 							<Offset>
@@ -88,7 +88,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentBuyoutPriceText" inherits="GameFontHighlightSmall" text="Buyout Price:">
+				<FontString name="$parentBuyoutPriceText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentStartPriceText">
 							<Offset>
@@ -97,7 +97,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentBuyoutPriceInvalidText" inherits="GameFontRedSmall" text="(Too Low)" hidden="true">
+				<FontString name="$parentBuyoutPriceInvalidText" inherits="GameFontRedSmall" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentBuyoutPriceText" relativePoint="TOPRIGHT">
 							<Offset>
@@ -106,7 +106,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentQuantityText" inherits="GameFontHighlightSmall" text="Quantity:">
+				<FontString name="$parentQuantityText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentBuyoutPriceText">
 							<Offset>
@@ -115,7 +115,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentQuantityInvalidText" inherits="GameFontRedSmall" text="(Too Many)" hidden="true">
+				<FontString name="$parentQuantityInvalidText" inherits="GameFontRedSmall" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText" relativePoint="TOPRIGHT">
 							<Offset>
@@ -133,7 +133,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentStackCountText" inherits="GameFontHighlightSmall" text="Stacks">
+				<FontString name="$parentStackCountText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentMultiplyText" relativePoint="TOPRIGHT">
 							<Offset>
@@ -142,7 +142,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentDurationText" inherits="GameFontHighlightSmall" text="Duration:">
+				<FontString name="$parentDurationText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText">
 							<Offset>
@@ -151,7 +151,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentDepositText" inherits="GameFontHighlightSmall" text="Depost:">
+				<FontString name="$parentDepositText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentDurationText">
 							<Offset>
@@ -428,7 +428,7 @@
 					</OnLoad>
 				</Scripts>
 			</Frame>
-			<Button name="$parentCreateAuctionButton" inherits="UIPanelButtonTemplate" text="Post Auctions">
+			<Button name="$parentCreateAuctionButton" inherits="UIPanelButtonTemplate">
 				<Size>
 					<AbsDimension x="120" y="22"/>
 				</Size>
@@ -440,6 +440,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
+					<OnLoad>
+						this:SetText(_AUCT('UiPostAuctions'));
+					</OnLoad>
 					<OnClick>
 						AuctionFramePost_CreateAuctionButton_OnClick(this);
 					</OnClick>
@@ -635,6 +638,18 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				getglobal(this:GetName().."Title"):SetText(_AUCT('UiPostAuctions'));
+				getglobal(this:GetName().."TabText"):SetText(_AUCT('UiPost'));
+				getglobal(this:GetName().."PriceModelText"):SetText(_AUCT('UiPriceBasedOnLabel'));
+				getglobal(this:GetName().."SavePriceText"):SetText(_AUCT('UiMakeFixedPriceLabel'));
+				getglobal(this:GetName().."StartPriceText"):SetText(_AUCT('UiStartingPriceLabel'));
+				getglobal(this:GetName().."StartPriceInvalidText"):SetText(_AUCT('UiStartingPriceRequiredError'));
+				getglobal(this:GetName().."BuyoutPriceText"):SetText(_AUCT('UiBuyoutPriceLabel'));
+				getglobal(this:GetName().."BuyoutPriceInvalidText"):SetText(_AUCT('UiBuyoutPriceTooLowError'));
+				getglobal(this:GetName().."QuantityText"):SetText(_AUCT('UiQuantityLabel'));
+				getglobal(this:GetName().."StackCountText"):SetText(_AUCT('UiStacksLabel'));
+				getglobal(this:GetName().."DurationText"):SetText(_AUCT('UiDurationLabel'));
+				getglobal(this:GetName().."DepositText"):SetText(_AUCT('UiDepositLabel'));
 				AuctionFramePost_OnLoad();
 			</OnLoad>
 		</Scripts>
@@ -643,7 +658,7 @@
 	<Button name="AuctionFrameTabPost" inherits="AuctionTabTemplate" hidden="true">
 		<Scripts>
 			<OnLoad>
-				this:SetText("Post Auctions");
+				this:SetText(_AUCT('UiPostAuctions'));
 			</OnLoad>
 		</Scripts>
 	</Button>

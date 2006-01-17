@@ -202,7 +202,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 			if (Auctioneer.Storage.GetFixedPrice(itemKey)) then
 				local startPrice, buyPrice = Auctioneer.Storage.GetFixedPrice(itemKey, count);
 				local fixedPrice = {};
-				fixedPrice.text = "Fixed Price";
+				fixedPrice.text = _AUCT('UiPriceModelFixed');
 				fixedPrice.note = "";
 				fixedPrice.bid = startPrice;
 				fixedPrice.buyout = buyPrice;
@@ -217,7 +217,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 			end
 			local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
 			local auctioneerPrice = {};
-			auctioneerPrice.text = "Auctioneer Price";
+			auctioneerPrice.text = _AUCT('UiPriceModelAuctioneer');
 			auctioneerPrice.note = warn;
 			auctioneerPrice.buyout = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * count);
 			auctioneerPrice.bid = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(auctioneerPrice.buyout, discountBidPercent));
@@ -225,7 +225,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 
 			-- Add the fallback custom price
 			local customPrice = {}
-			customPrice.text = "Custom Price"
+			customPrice.text = _AUCT('UiPriceModelCustom');
 			customPrice.note = "";
 			customPrice.bid = nil;
 			customPrice.buyout = nil;
@@ -551,15 +551,15 @@ function AuctionFramePost_ValidateAuction(frame)
 			local maxStackSize = AuctionFramePost_GetMaxStackSize(frame.itemID);
 			if (stackSize == 0) then
 				valid = false;
-				quantityErrorText:SetText("(Stack Too Small)");
+				quantityErrorText:SetText(_AUCT('UiStackTooSmallError'));
 				quantityErrorText:Show();
 			elseif (stackSize > 1 and (maxStackSize == nil or stackSize > maxStackSize)) then
 				valid = false;
-				quantityErrorText:SetText("(Stack Too Big)");
+				quantityErrorText:SetText(_AUCT('UiStackTooBigError'));
 				quantityErrorText:Show();
 			elseif (quantity < (stackSize * stackCount)) then
 				valid = false;
-				quantityErrorText:SetText("(Not Enough)");
+				quantityErrorText:SetText(_AUCT('UiNotEnoughError'));
 				quantityErrorText:Show();
 			else
 				quantityErrorText:Hide();
@@ -761,11 +761,11 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 			frame:SetStartPrice(price.bid);
 		end
 
-		if (price.text == "Custom Price") then
+		if (price.text == _AUCT('UiPriceModelCustom')) then
 			getglobal(frame:GetName().."SavePriceText"):Show();
 			getglobal(frame:GetName().."SavePriceCheckBox"):Show();
 			getglobal(frame:GetName().."PriceModelNoteText"):Hide();
-		elseif (price.text == "Auctioneer Price") then
+		elseif (price.text == _AUCT('UiPriceModelAuctioneer')) then
 			getglobal(frame:GetName().."SavePriceText"):Hide();
 			getglobal(frame:GetName().."SavePriceCheckBox"):Hide();
 			getglobal(frame:GetName().."PriceModelNoteText"):Show();
@@ -843,5 +843,8 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetItemColor(auction)
 	_, _, rarity = GetItemInfo(auction.item);
-	return ITEM_QUALITY_COLORS[rarity];
+	if (rarity) then
+		return ITEM_QUALITY_COLORS[rarity];
+	end
+	return { r = 1.0, g = 1.0, b = 1.0 };
 end

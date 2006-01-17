@@ -107,7 +107,13 @@ end
 function AuctioneerDropDownMenu_SetSelectedID(dropdown, index)
 	local oldThis = this;
 	this = dropdown;
+	local newThis = this;
 	UIDropDownMenu_SetSelectedID(dropdown, index);
+	-- Double check that the value of 'this' didn't change... this can screw us
+	-- up and prevent the reason for this method!
+	if (newThis ~= this) then
+		EnhTooltip.DebugPrint("WARNING: The value of this changed during AuctioneerDropDownMenu_SetSelectedID()");
+	end
 	this = oldThis;
 end
 
@@ -116,8 +122,30 @@ end
 -- UIDropDownMenu_Initialize().
 -------------------------------------------------------------------------------
 function AuctioneerDropDownMenu_Initialize(dropdown, func)
+	-- Hide all the buttons to prevent any calls to Hide() inside
+	-- UIDropDownMenu_Initialize() which will screw up the value of this.
+	local button, dropDownList;
+	for i = 1, UIDROPDOWNMENU_MAXLEVELS, 1 do
+		dropDownList = getglobal("DropDownList"..i);
+		if ( i >= UIDROPDOWNMENU_MENU_LEVEL or frame:GetName() ~= UIDROPDOWNMENU_OPEN_MENU ) then
+			dropDownList.numButtons = 0;
+			dropDownList.maxWidth = 0;
+			for j=1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
+				button = getglobal("DropDownList"..i.."Button"..j);
+				button:Hide();
+			end
+		end
+	end
+
+	-- Call the UIDropDownMenu_Initialize() after swapping in a value for 'this'.
 	local oldThis = this;
 	this = getglobal(dropdown:GetName().."Button");
+	local newThis = this;
 	UIDropDownMenu_Initialize(dropdown, func);
+	-- Double check that the value of 'this' didn't change... this can screw us
+	-- up and prevent the reason for this method!
+	if (newThis ~= this) then
+		EnhTooltip.DebugPrint("WARNING: The value of this changed during UIDropDownMenu_Initialize()");
+	end
 	this = oldThis;
 end

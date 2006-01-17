@@ -677,7 +677,10 @@ end
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_GetItemColor(result)
 	_, _, rarity = GetItemInfo(result.item);
-	return ITEM_QUALITY_COLORS[rarity];
+	if (rarity) then
+		return ITEM_QUALITY_COLORS[rarity];
+	end
+	return { r = 1.0, g = 1.0, b = 1.0 };
 end
 
 -------------------------------------------------------------------------------
