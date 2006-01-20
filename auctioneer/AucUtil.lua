@@ -95,13 +95,14 @@ function getWarnColor(warn)
 		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
 
 		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
-		FrmtWarnUndercut = string.sub(_AUCT('FrmtWarnUndercut'), 1, -5);
 		FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
 		FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
-		FrmtWarnMarkup = string.sub(_AUCT('FrmtWarnMarkup'), 1, -5);
 		FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
 		FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
 		FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+
+		FrmtWarnUndercut = string.format(_AUCT('FrmtWarnUndercut'), tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')));
+		FrmtWarnMarkup = string.format(_AUCT('FrmtWarnMarkup'), tonumber(Auctioneer.Command.GetFilterVal('pct-markup')));
 
 		if (string.find(warn, FrmtWarnToolow)) then
 			--Color Red
@@ -110,7 +111,7 @@ function getWarnColor(warn)
 			cGreen = 0.0;
 			cBlue = 0.0;
 
-		elseif (string.find(warn, FrmtWarnUndercut)) then
+		elseif (warn == FrmtWarnUndercut) then
 			--Color Yellow
 			cHex = "ffffff00";
 			cRed = 1.0;
@@ -124,7 +125,7 @@ function getWarnColor(warn)
 			cGreen = 1.0;
 			cBlue = 0.0;
 
-		elseif (string.find(warn, FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
+		elseif ((warn == FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
 			--Color Gray
 			cHex = "ff999999";
 			cRed = 0.6;

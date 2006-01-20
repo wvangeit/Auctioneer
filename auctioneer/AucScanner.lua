@@ -513,8 +513,8 @@ end
 
 function auctionsSetWarn(textStr) --Auctioneer_Auctions_SetWarn
 	if (AuctionInfoWarnText == nil) then EnhTooltip.DebugPrint("Error, no text for AuctionInfo line "..line); end
+	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(textStr)
 	AuctionInfoWarnText:SetText(textStr);
-	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor()
 	AuctionInfoWarnText:SetTextColor(cRed, cGreen, cBlue);
 	AuctionInfoWarnText:Show();
 end
