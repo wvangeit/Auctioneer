@@ -1076,7 +1076,7 @@ end
 
 function gtHookAppendText(funcArgs, retVal, frame)
 	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
-		showTooltip(self.currentGametip)
+		showTooltip(self.currentGametip, true)
 	end
 end
 
