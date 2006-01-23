@@ -1081,7 +1081,7 @@ function gtHookAppendText(funcArgs, retVal, frame)
 end
 
 function gtHookShow(funcArgs, retVal, frame)
-	if (self.hookRecursion) then
+	if (self.hookRecursion or EnhancedTooltip.hasEmbed) then
 		return;
 	end
 	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
