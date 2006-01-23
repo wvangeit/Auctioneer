@@ -1128,21 +1128,28 @@ end
 
 --The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function clear(param, chatprint)
+	local aKey = Auctioneer.Util.GetAuctionKey();
 
 	if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
 
-		AuctionConfig.data = {};
 		AuctionConfig.info = {};
-		AuctionConfig.snap = {};
-		AuctionConfig.sbuy = {};
+		AuctionConfig.data[aKey] = {};
+		AuctionConfig.snap[aKey] = {};
+		AuctionConfig.sbuy[aKey] = {};
+		AuctionConfig.stats["snapmed"][aKey] = {};
+		AuctionConfig.stats["histmed"][aKey] = {};
+		AuctionConfig.stats["histcount"][aKey] = {};
+		AuctionConfig.stats["snapcount"][aKey] = {};
+		Auctioneer_HSPCache[aKey] = {};
 	elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 
-		AuctionConfig.snap = {};
-		AuctionConfig.sbuy = {};
+		AuctionConfig.snap[aKey] = {};
+		AuctionConfig.sbuy[aKey] = {};
+		AuctionConfig.stats["snapmed"][aKey] = {};
+		AuctionConfig.stats["snapcount"][aKey] = {};
 		Auctioneer.Core.Variables.SnapshotItemPrices = {};
 	else
 
-		local aKey = Auctioneer.Util.GetAuctionKey();
 		local items = Auctioneer.Util.GetItems(param);
 		local itemLinks = Auctioneer.Util.GetItemHyperlinks(param);
 
@@ -1185,8 +1192,7 @@ function clear(param, chatprint)
 						Auctioneer_HSPCache[aKey][itemKey] = nil;
 					end
 
-					--These are not included in the print statement below because there could be the possiblity
-					--that an item's data was cleared but another's was not
+					--These are not included in the print statement below because there could be the possiblity that an item's data was cleared but another's was not
 					if (chatprint) then
 						Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
 					end
