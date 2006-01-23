@@ -249,7 +249,7 @@ local setElapsed				-- SetElapsed(elapsed)
 local setIcon					-- SetIcon(iconPath)
 local setMoneySpacing			-- SetMoneySpacing(spacing)
 local setPopupKey				-- SetPopupKey(key)
-local showTooltip				-- ShowTooltip(currentTooltip)
+local showTooltip				-- ShowTooltip(currentTooltip,skipEmbedRender)
 local tooltipCall				-- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
 local tradeHook					-- TradeHook(type,selID)
 local ttInitialize				-- TtInitialize()
@@ -342,9 +342,9 @@ function getRect(object, curRect)
 	return rect
 end
 
-function showTooltip(currentTooltip)
+function showTooltip(currentTooltip, skipEmbedRender)
 	if (self.showIgnore == true) then return end
-	if (EnhancedTooltip.hasEmbed) then
+	if (EnhancedTooltip.hasEmbed and not skipEmbedRender) then
 		embedRender()
 		self.showIgnore=true;
 		currentTooltip:Show()
@@ -1081,12 +1081,12 @@ function gtHookAppendText(funcArgs, retVal, frame)
 end
 
 function gtHookShow(funcArgs, retVal, frame)
-	if (self.hookRecursion or EnhancedTooltip.hasEmbed) then
+	if (self.hookRecursion) then
 		return;
 	end
 	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
 		self.hookRecursion = true;
-		showTooltip(self.currentGametip)
+		showTooltip(self.currentGametip, true)
 		self.hookRecursion = nil;
 	end
 end
