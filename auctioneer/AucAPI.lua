@@ -29,14 +29,15 @@
 
 --Local function prototypes
 local getVendorBuyPrice, getVendorSellPrice;
+--[[
+	Auctioneer.API.GetVendorBuyPrice(itemId)
 
--- Auctioneer_GetVendorBuyPrice(itemId)
---
--- This function gets the buy price (how much it costs for the player to buy) from
--- Auctioneer's database of item prices.
---
--- @param itemId The ID portion of the item link (the first of the four numbers).
--- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
+	This function gets the buy price (how much it costs for the player to buy) from
+	Auctioneer's database of item prices.
+
+	@param itemId The ID portion of the item link (the first of the four numbers).
+	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
+]]
 function getVendorBuyPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
@@ -44,14 +45,15 @@ function getVendorBuyPrice(itemId)
 	end
 	return nil;
 end
+--[[
+	Auctioneer.API.GetVendorSellPrice(itemId)
 
--- Auctioneer_GetVendorSellPrice(itemId)
---
--- This function gets the sell price (how much it the player will get if they sell it)
--- from Auctioneer's database of item prices.
---
--- @param itemId The ID portion of the item link (the first of the four numbers).
--- @returns A price if known (may be 0 if known to have no price) or nil if unknown.
+	This function gets the sell price (how much it the player will get if they sell it)
+	from Auctioneer's database of item prices.
+
+	@param itemId The ID portion of the item link (the first of the four numbers).
+	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
+]]
 function getVendorSellPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
@@ -64,3 +66,7 @@ Auctioneer.API = {
 GetVendorBuyPrice = getVendorBuyPrice,
 GetVendorSellPrice = getVendorSellPrice,
 }
+
+--Backwards compatiblity, please use the new prototypes whenever possible.
+Auctioneer_GetVendorBuyPrice = getVendorBuyPrice;
+Auctioneer_GetVendorSellPrice = getVendorSellPrice;
