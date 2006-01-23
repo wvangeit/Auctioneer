@@ -346,7 +346,9 @@ function showTooltip(currentTooltip)
 	if (self.showIgnore == true) then return end
 	if (EnhancedTooltip.hasEmbed) then
 		embedRender()
+		self.showIgnore=true;
 		currentTooltip:Show()
+		self.showIgnore=false;
 	end
 	if (not EnhancedTooltip.hasData) then
 		return
@@ -378,7 +380,9 @@ function showTooltip(currentTooltip)
 	local cWidth = currentTooltip:GetWidth()
 	if (cWidth < width) then
 		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
+		self.showIgnore=true;
 		currentTooltip:Show()
+		self.showIgnore=false;
 	elseif (cWidth > width) then
 		width = cWidth
 	end
@@ -428,7 +432,9 @@ function showTooltip(currentTooltip)
 	else
 		-- No parent
 		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
+		self.showIgnore=true;
 		currentTooltip:Show()
+		self.showIgnore=false;
 		enhTooltipTipRect = getRect(currentTooltip, enhTooltipTipRect)
 
 		if (enhTooltipTipRect.b - height < 60) then
