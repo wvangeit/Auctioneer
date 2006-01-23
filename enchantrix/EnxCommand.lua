@@ -585,7 +585,7 @@ Enchantrix_ChatPrint(_ENCH('FrmtUsage'));
 		-- Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowRate'), Enchantrix_GetLocalizedFilterVal('rates'), _ENCH('HelpRate')));
 		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowEmbed'), Enchantrix_GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowValue'), Enchantrix_GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
-		if (AUCTIONEER_VERSION) then
+		if (Auctioneer) then
 			Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerHsp'), Enchantrix_GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
 			Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerMed'), Enchantrix_GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
 		else

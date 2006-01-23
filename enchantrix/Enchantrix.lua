@@ -6,9 +6,9 @@
 	By Norganna
 	http://enchantrix.org/
 
-	This is an addon for World of Warcraft that add a list of what an item 
+	This is an addon for World of Warcraft that add a list of what an item
 	disenchants into to the items that you mouse-over in the game.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -122,7 +122,7 @@ function Enchantrix_CheckTooltipInfo(frame)
 			end
 		end
 	end
-	
+
 	return 1;
 end
 
@@ -148,7 +148,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			EnchantedLocal[sigNR] = { z = true; };
 		end
 	else
-		-- We can't get definative proof that this item is not disenchant quality, 
+		-- We can't get definative proof that this item is not disenchant quality,
 		-- but the tooltip says it's not good enough quality though so don't display it.
 		if (quality) and (quality > -1) and (quality < 2) then return; end
 	end
@@ -293,7 +293,7 @@ function Enchantrix_TakeInventory()
 
 	for slotid = 0, 19, 1 do
 		inventory["inv"][slotid] = {};
-		
+
 		local link = GetInventoryItemLink("player", slotid);
 		if( link ) then
 			local name = Enchantrix_NameFromLink(link);
@@ -402,7 +402,7 @@ function Enchantrix_OnUpdate(elapsed)
 			-- Store the item value
 			ItemEssences[essence] = iName;
 		end
-		
+
 		-- Cause the next loop to succeed
 		hackEssencePos = 1000;
 	end
@@ -447,9 +447,9 @@ function Enchantrix_OnUpdate(elapsed)
 		GameTooltip:Hide();
 	end
 end
-	
+
 function Enchantrix_OnEvent(funcVars, event, argument)
-	
+
 	if ((event == "SPELLCAST_START") and (argument == _ENCH('ArgSpellname'))) then
 		Enchantrix_Disenchanting = true;
 		Enchantrix_WaitingPush = false;
@@ -479,7 +479,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 		return;
 	end
 	if ((event == "BAG_UPDATE") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
-		
+
 		-- /script inv = Enchantrix_TakeInventory()
 		-- /script p(Enchantrix_FullDiff(inv, Enchantrix_TakeInventory()))
 		-- /script p(Enchantrix_FullDiff(Enchantrix_StartInv, Enchantrix_TakeInventory()))
@@ -506,7 +506,7 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 			Enchantrix_WaitingPush = false;
 			return;
 		end
-		
+
 		local gainedItem = {};
 		for sig, data in invDiff do
 			if (data.d > 0) and (Enchantrix_Disenchants[data.t]) then
@@ -514,13 +514,13 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 			end
 		end
 		if (next(gainedItem) == nil) then return; end
-		
+
 		if (EnchantedLocal[foundItem.n]) then
 			EnchantedLocal[foundItem.s] = { o = ""..EnchantedLocal[foundItem.n] };
 		end
 
 		local itemData = Enchantrix_GetLocal(foundItem.s);
-		
+
 		Enchantrix_ChatPrint(string.format(_ENCH('FrmtFound'), foundItem.l), 0.8, 0.8, 0.2);
 		for sig, data in gainedItem do
 			local i,j, strItemID = string.find(sig, "^(%d+):");
@@ -539,13 +539,13 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 				Enchantrix_ChatPrint("  " .. data.n .. " x" .. data.d, 0.6, 0.6, 0.1);
 			end
 		end
-		
+
 		Enchantrix_SaveLocal(foundItem.s, itemData);
 
 		Enchantrix_Disenchants = {};
 		Enchantrix_Disenchanting = false;
 		Enchantrix_WaitingPush = false;
-		
+
 		return
 	end
 end
@@ -557,14 +557,14 @@ function Enchantrix_ChatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
 		if getglobal("ChatFrame"..frameIndex) then
 			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 
-		elseif (DEFAULT_CHAT_FRAME) then 
+		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
 		end
 
 	else
 		if getglobal("ChatFrame"..frameIndex) then
 			getglobal("ChatFrame"..frameIndex):AddMessage(text, 1.0, 0.5, 0.25);
-		elseif (DEFAULT_CHAT_FRAME) then 
+		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, 1.0, 0.5, 0.25);
 		end
 	end
@@ -587,8 +587,8 @@ function Enchantrix_OnLoad()
 	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
 		local function cmdHandler(msg)
 			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end 
-			if (not cmd) then cmd = "" end 
+			if (not cmd) then cmd = string.lower(msg) end
+			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end
 			if (cmd == "load") then
 				if (param == "") then
@@ -647,14 +647,14 @@ function Enchantrix_AddonLoaded()
 	Enchantrix_ConvertFilters();		-- Convert old localized settings
 	Enchantrix_SetFilterDefaults();		-- Apply defaults
 
-	--GUI Registration code added by MentalPower	
+	--GUI Registration code added by MentalPower
 	Enchantrix_Register();
 
 	if (IsAddOnLoaded("Auctioneer")) then
 		Enchantrix_AuctioneerLoaded()
 	end
 
-	if not Babylonian.IsAddOnRegistered("Enchantrix") then 
+	if not Babylonian.IsAddOnRegistered("Enchantrix") then
 		Babylonian.RegisterAddOn("Enchantrix", Enchantrix_SetLocale);
 	end
 
@@ -666,7 +666,7 @@ end
 function Enchantrix_SetFilter(key, value)
 	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
 	if (type(value) == "boolean") then
-		if (value) then 
+		if (value) then
 			EnchantConfig.filters[key] = 'on';
 		else
 			EnchantConfig.filters[key] = 'off';
@@ -708,7 +708,7 @@ end
 
 function Enchantrix_PercentLessFilter(percentLess, signature)
     local filterAuction = true;
-    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
+    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
 	local disenchantsTo = Enchantrix_GetAuctionItemDisenchants(signature, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
@@ -718,7 +718,7 @@ function Enchantrix_PercentLessFilter(percentLess, signature)
 	local confidence = disenchantsTo.totals.conf or 0;
 
 	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
-	local margin = Auctioneer_PercentLessThan(myValue, buyout/count);
+	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
 	local profit = (myValue * count) - buyout;
 
 	local results = {
@@ -739,8 +739,8 @@ end
 
 function Enchantrix_BidBrokerFilter(minProfit, signature)
     local filterAuction = true;
-    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(signature);
-    local currentBid = Auctioneer_GetCurrentBid(signature);
+    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
+    local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
 	local disenchantsTo = Enchantrix_GetAuctionItemDisenchants(signature, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
@@ -750,7 +750,7 @@ function Enchantrix_BidBrokerFilter(minProfit, signature)
 	local confidence = disenchantsTo.totals.conf or 0;
 
 	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
-	local margin = Auctioneer_PercentLessThan(myValue, currentBid/count);
+	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
 	local profit = (myValue * count) - currentBid;
     local profitPricePercent = math.floor((profit / currentBid) * 100);
 
@@ -802,11 +802,11 @@ function Enchantrix_BidBrokerSort(a, b)
 end
 
 function Enchantrix_DoPercentLess(percentLess)
-	if (not AUCTIONEER_VERSION) then
-		Enchantrix_ChatPrint("You do not have auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+	if (not Auctioneer) then
+		Enchantrix_ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
 		return;
-	elseif (not Auctioneer_QuerySnapshot) then
-		Enchantrix_ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.0.8 or later");
+	elseif (not Auctioneer.Filter.QuerySnapshot) then
+		Enchantrix_ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
 		return;
 	end
 
@@ -816,7 +816,7 @@ function Enchantrix_DoPercentLess(percentLess)
 
 	Enchantrix_PriceCache = {t=time()};
 	Enchantrix_ProfitMargins = {};
-	local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_PercentLessFilter, percentLess);
+	local targetAuctions = Auctioneer.Filter.QuerySnapshot(Enchantrix_PercentLessFilter, percentLess);
 
 	-- sort by profit based on median
 	table.sort(targetAuctions, Enchantrix_ProfitComparisonSort);
@@ -826,11 +826,11 @@ function Enchantrix_DoPercentLess(percentLess)
 		if (a.signature and Enchantrix_ProfitMargins[a.signature]) then
 			local quality = EnhTooltip.QualityFromLink(a.itemLink);
 			if (quality and quality >= 2) then
-				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer_GetItemSignature(a.signature);
+				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
 				local value = Enchantrix_ProfitMargins[a.signature].value;
 				local margin = Enchantrix_ProfitMargins[a.signature].margin;
 				local profit = Enchantrix_ProfitMargins[a.signature].profit;
-				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"));
+				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"));
 				Enchantrix_ChatPrint(output);
 			end
 		end
@@ -840,11 +840,11 @@ function Enchantrix_DoPercentLess(percentLess)
 end
 
 function Enchantrix_DoBidBroker(minProfit)
-	if (not AUCTIONEER_VERSION) then
-		Enchantrix_ChatPrint("You do not have auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+	if (not Auctioneer) then
+		Enchantrix_ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
 		return;
-	elseif (not Auctioneer_QuerySnapshot) then
-		Enchantrix_ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.0.8 or later");
+	elseif (not Auctioneer.Filter.QuerySnapshot) then
+		Enchantrix_ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
 		return;
 	end
 
@@ -854,7 +854,7 @@ function Enchantrix_DoBidBroker(minProfit)
 
 	Enchantrix_PriceCache = {t=time()};
 	Enchantrix_ProfitMargins = {};
-	local targetAuctions = Auctioneer_QuerySnapshot(Enchantrix_BidBrokerFilter, minProfit);
+	local targetAuctions = Auctioneer.Filter.QuerySnapshot(Enchantrix_BidBrokerFilter, minProfit);
 
 	-- sort by profit based on median
 	table.sort(targetAuctions, Enchantrix_BidBrokerSort);
@@ -864,8 +864,8 @@ function Enchantrix_DoBidBroker(minProfit)
 		if (a.signature and Enchantrix_ProfitMargins[a.signature]) then
 			local quality = EnhTooltip.QualityFromLink(a.itemLink);
 			if (quality and quality >= 2) then
-				local id,rprop,enchant, name, count, min, buyout,_ = Auctioneer_GetItemSignature(a.signature);
-				local currentBid = Auctioneer_GetCurrentBid(a.signature);
+				local id,rprop,enchant, name, count, min, buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
+				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
 				local value = Enchantrix_ProfitMargins[a.signature].value;
 				local margin = Enchantrix_ProfitMargins[a.signature].margin;
 				local profit = Enchantrix_ProfitMargins[a.signature].profit;
@@ -873,7 +873,7 @@ function Enchantrix_DoBidBroker(minProfit)
 				if (currentBid == min) then
 					bidText = _ENCH('FrmtBidbrokerMinbid');
 				end
-				local output = string.format(_ENCH('FrmtBidbrokerLine'), Auctioneer_ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer_ColorTextWhite(margin.."%"), Auctioneer_ColorTextWhite(Auctioneer_GetTimeLeftString(a.timeLeft)));
+				local output = string.format(_ENCH('FrmtBidbrokerLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"), Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft)));
 				Enchantrix_ChatPrint(output);
 			end
 		end
@@ -883,7 +883,7 @@ function Enchantrix_DoBidBroker(minProfit)
 end
 
 function Enchantrix_GetAuctionItemDisenchants(auctionSignature, useCache)
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer_GetItemSignature(auctionSignature);
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(auctionSignature);
 	local sig = string.format("%d:%d:%d", id, enchant, rprop);
 	local sigNR = string.format("%d:%d:%d", id, 0, 0);
 	return Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache);
@@ -978,14 +978,14 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 		local exactMatch = true;
 
 		local baseDisenchant = DisenchantList[sig];
-		
+
 		if (not baseDisenchant) and (sigNR) then
 			baseDisenchant = DisenchantList[sigNR];
 			if (baseDisenchant) then
 				exactMatch = false;
 			end
 		end
-		
+
 		if (baseDisenchant) then
 			-- Base Disenchantments are now serialized
 			local baseResults = Enchantrix_Split(baseDisenchant, ";");
@@ -995,7 +995,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				local biCount = tonumber(baseBreak[2]) or 0;
 				local bdCount = tonumber(baseBreak[3]) or 0;
 				local bCount = tonumber(baseBreak[4]) or 0;
-				
+
 				if (dSig > 0) and (bCount+biCount > 0) then
 					disenchantsTo[dSig] = {};
 					disenchantsTo[dSig].bCount = bCount;
@@ -1022,12 +1022,12 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 					if (data.o) then oCount = tonumber(data.o); end
 					if (data.d) then dCount = tonumber(data.d); end
 					if (data.i) then iCount = tonumber(data.i); end
-						
+
 					if (not disenchantsTo[dSig]) then
 						disenchantsTo[dSig] = {};
 						disenchantsTo[dSig].bCount = 0;
 					end
-					if (data.z) then 
+					if (data.z) then
 						local bCount = disenchantsTo[dSig].bCount;
 						disenchantsTo[dSig].bCount = 0;
 						bTotal = bTotal - bCount;
@@ -1071,14 +1071,14 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				disenchantsTo[dSig].rate = count;
 				local mkt = Enchantrix_StaticPrices[itemID];
 
-				-- Work out what version if any of auctioneer is installed
-				local auctVerStr = AUCTIONEER_VERSION or "0.0.0";
+				-- Work out what version if any of Auctioneer is installed
+				local auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
 				local auctVer = Enchantrix_Split(auctVerStr, ".");
 				local major = tonumber(auctVer[1]) or 0;
 				local minor = tonumber(auctVer[2]) or 0;
 				local rev = tonumber(auctVer[3]) or 0;
 				if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
-					
+
 				local itemKey = string.format("%s:0:0", itemID);
 				if (useCache and not Enchantrix_PriceCache[itemKey]) then
 					Enchantrix_PriceCache[itemKey] = {};
@@ -1100,8 +1100,10 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 								hsp = getHighestSellablePriceForOne(itemKey, false);
 							end
 						end
-					elseif (major > 3 or minor > 0 or rev > 11) then
+					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675) then
 						hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+					elseif (major > 3 and minor >= 3 and rev >= 675) then
+						hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 					end
 				end
 				if hsp == nil then hsp = mkt * 0.98; end
@@ -1111,8 +1113,10 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 					median = Enchantrix_PriceCache[itemKey].median;
 				end
 
-				if ((not median or median < 1) and (major >= 3)) then
+				if ((not median or median < 1) and (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675))) then
 					median = Auctioneer_GetUsableMedian(itemKey);
+				elseif ((not median or median < 1) and (major > 3 and minor >= 3 and rev >= 675)) then
+					median = Auctioneer.Statistic.GetUsableMedian(itemKey, Auctioneer.Util.GetAuctionKey());
 				end
 				if median == nil then median = mkt * 0.95; end
 				if (useCache) then Enchantrix_PriceCache[itemKey].median = median; end
