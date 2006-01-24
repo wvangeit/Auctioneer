@@ -894,7 +894,7 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, i
 	end
 
 	-- Hand the updated results to the list.
-	frame.resultsType = "BidSearch";
+	frame.resultsType = "PlainSearch";
 	frame:SelectResultByIndex(nil);
 	ListTemplate_Initialize(frame.resultsList, frame.plainSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
 	ListTemplate_SetContent(frame.resultsList, frame.results);
@@ -920,6 +920,15 @@ function AuctionFrameSearch_SelectResultByIndex(frame, index)
 		elseif (frame.resultsType == "BuyoutSearch") then
 			frame.bidButton:Disable();
 			frame.buyoutButton:Enable();
+		elseif (frame.resultsType == "CompeteSearch") then
+			frame.bidButton:Enable();
+			frame.buyoutButton:Enable();
+		elseif (frame.resultsType == "PlainSearch") then
+			frame.bidButton:Enable();
+			frame.buyoutButton:Enable();
+		else
+			frame.bidButton:Disable();
+			frame.buyoutButton:Disable();
 		end
 	else
 		-- Clear the selection

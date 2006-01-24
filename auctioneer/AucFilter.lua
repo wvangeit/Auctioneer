@@ -184,6 +184,7 @@ function plainFilter(maxPrice, signature, category, minQuality, itemName)
 
 	if (not category) then category = 0 end
 	if (not minQuality) then minQuality = 0 end
+	if (not maxPrice or maxPrice == 0) then maxPrice = 100000000 end
 
 	if (itemName) then
 		local i,j = string.find(string.lower(name), string.lower(itemName))
