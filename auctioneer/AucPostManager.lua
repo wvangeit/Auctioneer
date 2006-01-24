@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -172,8 +172,14 @@ function removeRequestFromQueue()
 			callback.func(callback.param, request);
 		end
 
-		-- %localize%
-		chatPrint("Posted "..request.stackPostCount.. " auction(s) of "..request.name.." (x"..request.stackSize..")");
+		-- Report the auctions posted
+		if (request.stackPostCount == 1) then
+			local output = string.format(_AUCT('FrmtPostedAuction'), request.name, request.stackSize);
+			chatPrint(output);
+		else
+			local output = string.format(_AUCT('FrmtPostedAuctions'), request.stackPostCount, request.name, request.stackSize);
+			chatPrint(output);
+		end
 		table.remove(RequestQueue, 1);
 
 		-- If this was the last request, end processing the queue.
@@ -306,8 +312,7 @@ function run(request)
 					end
 				else
 					-- Not enough of the item found!
-					-- %localize%
-					chatPrint("No empty slot found to create auction!");
+					chatPrint(_AUCT('FrmtNoEmptyPackSpace'));
 					removeRequestFromQueue();
 				end
 			else
@@ -319,16 +324,16 @@ function run(request)
 					pickupContainerItem(stack2.bag, stack2.slot);
 					request.stack = stack2;
 				else
-					-- No empty slots!
-					-- %localize%
-					chatPrint("Not enough "..request.name.." found to create auction!");
+					-- Not enough of the item!
+					local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
+					chatPrint(output);
 					removeRequestFromQueue();
 				end
 			end
 		else
-			-- TODO: No empty slots!
-			-- %localize%
-			chatPrint(request.name.." not found!");
+			-- Item not found!
+			local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
+			chatPrint(output);
 			removeRequestFromQueue();
 		end
 	end
