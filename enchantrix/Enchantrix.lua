@@ -1100,7 +1100,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 								hsp = getHighestSellablePriceForOne(itemKey, false);
 							end
 						end
-					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675) then
+					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
 						hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
 					elseif (major > 3 and minor >= 3 and rev >= 675) then
 						hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
