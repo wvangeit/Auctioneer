@@ -1072,7 +1072,12 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				local mkt = Enchantrix_StaticPrices[itemID];
 
 				-- Work out what version if any of Auctioneer is installed
-				local auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
+				local auctVerStr;
+				if (not Auctioneer) then
+					auctVerStr = AUCTIONEER_VERSION or "0.0.0";
+				else
+					auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
+				end
 				local auctVer = Enchantrix_Split(auctVerStr, ".");
 				local major = tonumber(auctVer[1]) or 0;
 				local minor = tonumber(auctVer[2]) or 0;
