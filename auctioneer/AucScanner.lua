@@ -189,6 +189,13 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 
 	elseif (finish == 2) then
 		Quit();
+
+	elseif (finish == 3) then
+		if(ReloadUI) then
+			ReloadUIHandler("10");
+		else
+			ReloadUI();
+		end
 	end
 end
 
