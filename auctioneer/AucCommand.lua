@@ -1051,11 +1051,12 @@ end
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function chatPrintHelp()
 
+	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
+
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
 	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
-	local frameName;
-	_, frameName = getFrameNames(getFrameIndex());
+	local _, frameName = getFrameNames(getFrameIndex());
 
 	Auctioneer.Util.ChatPrint(_AUCT('TextUsage'));
 	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer.Util.GetLocalizedFilterVal("all").."]|r - " .. _AUCT('HelpOnoff'));
@@ -1098,13 +1099,13 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdScan'), _AUCT('OptScan'), _AUCT('HelpScan')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdDefault'), _AUCT('OptDefault'), _AUCT('HelpDefault')));
 end
+--[[
+	The onOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
+	If "on" or "off" is specified in the " state" variable then Auctioneer's state is changed to that value,
+	If "toggle" is specified then it will toggle Auctioneer's state (if currently on then it will be turned off and vice-versa)
 
---The onOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
---If "on" or "off" is specified in the " state" variable then Auctioneer's state is changed to that value,
---If "toggle" is specified then it will toggle Auctioneer's state (if currently on then it will be turned off and vice-versa)
---
---If chatprint is "true" then the state will also be printed to the user.
-
+	If chatprint is "true" then the state will also be printed to the user.
+]]
 function onOff(state, chatprint)
 	if (state == 'on' or state == 'off') then
 		setFilter('all', state);
