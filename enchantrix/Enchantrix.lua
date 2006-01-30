@@ -1107,7 +1107,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 						end
 					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
 						hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-					elseif (major > 3 and minor >= 3 and rev >= 675) then
+					elseif (major > 3 and minor >= 3 and (rev >= 675 or rev == 0)) then
 						hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 					end
 				end
@@ -1120,7 +1120,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 
 				if ((not median or median < 1) and (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675))) then
 					median = Auctioneer_GetUsableMedian(itemKey);
-				elseif ((not median or median < 1) and (major > 3 and minor >= 3 and rev >= 675)) then
+				elseif ((not median or median < 1) and (major > 3 and minor >= 3 and (rev >= 675 or rev == 0))) then
 					median = Auctioneer.Statistic.GetUsableMedian(itemKey, Auctioneer.Util.GetAuctionKey());
 				end
 				if median == nil then median = mkt * 0.95; end
