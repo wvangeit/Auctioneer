@@ -457,7 +457,8 @@ function registerKhaos()
 					options = {
 						[_AUCT('CmdFinish0')] = 0,
 						[_AUCT('CmdFinish1')] = 1,
-						[_AUCT('CmdFinish2')] = 2 };
+						[_AUCT('CmdFinish2')] = 2,
+						[_AUCT('CmdFinish3')] = 3};
 					multiSelect = false;
 				};
 				text=_AUCT('GuiFinish');
