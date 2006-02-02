@@ -1137,17 +1137,17 @@ function clear(param, chatprint)
 		AuctionConfig.data[aKey] = {};
 		AuctionConfig.snap[aKey] = {};
 		AuctionConfig.sbuy[aKey] = {};
-		AuctionConfig.stats["snapmed"][aKey] = {};
-		AuctionConfig.stats["histmed"][aKey] = {};
-		AuctionConfig.stats["histcount"][aKey] = {};
-		AuctionConfig.stats["snapcount"][aKey] = {};
+		AuctionConfig.stats.snapmed[aKey] = {};
+		AuctionConfig.stats.histmed[aKey] = {};
+		AuctionConfig.stats.histcount[aKey] = {};
+		AuctionConfig.stats.snapcount[aKey] = {};
 		Auctioneer_HSPCache[aKey] = {};
 	elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 
 		AuctionConfig.snap[aKey] = {};
 		AuctionConfig.sbuy[aKey] = {};
-		AuctionConfig.stats["snapmed"][aKey] = {};
-		AuctionConfig.stats["snapcount"][aKey] = {};
+		AuctionConfig.stats.snapmed[aKey] = {};
+		AuctionConfig.stats.snapcount[aKey] = {};
 		Auctioneer.Core.Variables.SnapshotItemPrices = {};
 	else
 
@@ -1160,20 +1160,20 @@ function clear(param, chatprint)
 				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
 					AuctionConfig.data[aKey][itemKey] = nil;
 
-					if (AuctionConfig.stats["snapmed"][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats["snapmed"][aKey][itemKey] = nil;
+					if (AuctionConfig.stats.snapmed[aKey][itemKey] ~= nil) then
+						AuctionConfig.stats.snapmed[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats["histmed"][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats["histmed"][aKey][itemKey] = nil;
+					if (AuctionConfig.stats.histmed[aKey][itemKey] ~= nil) then
+						AuctionConfig.stats.histmed[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats["histcount"][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats["histcount"][aKey][itemKey] = nil;
+					if (AuctionConfig.stats.histcount[aKey][itemKey] ~= nil) then
+						AuctionConfig.stats.histcount[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats["snapcount"][aKey][itemKey] ~= nil) then
-						AuctionConfig.stats["snapcount"][aKey][itemKey] = nil;
+					if (AuctionConfig.stats.snapcount[aKey][itemKey] ~= nil) then
+						AuctionConfig.stats.snapcount[aKey][itemKey] = nil;
 					end
 
 					if (AuctionConfig.sbuy[aKey][itemKey] ~= nil) then
