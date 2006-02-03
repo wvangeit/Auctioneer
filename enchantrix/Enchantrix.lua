@@ -36,6 +36,7 @@ Enchantrix_Khaos_Registered = nil;
 
 EnchantedLocal = {};
 EnchantConfig = {};
+EnchantedBaseItems = {}
 
 -- These are market norm prices.
 Enchantrix_StaticPrices = {
@@ -103,6 +104,184 @@ local MAX_BUYOUT_PRICE = 800000;
 local MIN_PROFIT_MARGIN = 1000;
 local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
+
+local EnchantedItemTypes = {}
+local N_DISENCHANTS = 1
+local N_REAGENTS = 2
+
+local function gcd(a, b)
+	-- Greatest Common Divisor, Euclidean algorithm
+	local m, n = tonumber(a), tonumber(b)
+	while (n ~= 0) do
+		m, n = n, math.mod(m, n)
+	end
+	return m
+end
+
+local function roundup(m, n)
+	-- Round up m to nearest multiple of n
+	return math.floor((m + n - 1) / n) * n
+end
+
+local function Unserialize(str)
+	-- Break up a disenchant string to a table for easy manipulation
+	local tbl = {}
+	if (str) then
+		for _, de in ipairs(Enchantrix_Split(str, ";")) do
+			local splt = Enchantrix_Split(de, ":")
+			local id, d, r = tonumber(splt[1]), tonumber(splt[2]), tonumber(splt[3])
+			if (id and d > 0 and r > 0) then
+				tbl[id] = {[N_DISENCHANTS] = d, [N_REAGENTS] = r}
+			end
+		end
+	end
+	return tbl
+end
+
+local function Serialize(tbl)
+	-- Serialize a table into a string
+	if (tbl) then
+		local str
+		for id in tbl do
+			if (type(id) == "number" and tbl[id][N_DISENCHANTS] > 0 and tbl[id][N_REAGENTS] > 0) then
+				if (str) then
+					str = str..";"..string.format("%d:%d:%d:0", id, tbl[id][N_DISENCHANTS], tbl[id][N_REAGENTS])
+				else
+					str = string.format("%d:%d:%d:0", id, tbl[id][N_DISENCHANTS], tbl[id][N_REAGENTS])
+				end
+			end
+		end
+		return str
+	end
+	return nil
+end
+
+local function MergeDisenchant(str1, str2)
+	-- Merge two disenchant strings into a single string
+	local tbl1, tbl2 = Unserialize(str1), Unserialize(str2)
+	for id in tbl2 do
+		if (not tbl1[id]) then
+			tbl1[id] = tbl2[id]
+		else
+			tbl1[id][N_DISENCHANTS] = tbl1[id][N_DISENCHANTS] + tbl2[id][N_DISENCHANTS]
+			tbl1[id][N_REAGENTS] = tbl1[id][N_REAGENTS] + tbl2[id][N_REAGENTS]
+		end
+	end
+	return Serialize(tbl1)
+end
+
+local function NormalizeDisenchant(str)
+	-- Divide all counts in disenchant string by gcd
+	local div = 0
+	local tbl = Unserialize(str)
+	for id in tbl do
+		div = gcd(div, tbl[id][N_DISENCHANTS])
+		div = gcd(div, tbl[id][N_REAGENTS])
+	end
+	for id in tbl do
+		tbl[id][N_DISENCHANTS] = tbl[id][N_DISENCHANTS] / div
+		tbl[id][N_REAGENTS] = tbl[id][N_REAGENTS] / div
+	end
+	return Serialize(tbl)
+end
+
+local function DisenchantTotal(str)
+	-- Return total number of disenchants
+	local tot = 0
+	local tbl = Unserialize(str)
+	for id in tbl do
+		tot = tot + tbl[id][N_DISENCHANTS]
+	end
+	return tot
+end
+
+local function ItemID(key)
+	-- Return item id and item suffix as integers
+	if (type(key) == "string") then
+		local splt = Enchantrix_Split(key, ":")
+		return tonumber(splt[1]), tonumber(splt[3])
+	end
+	return nil
+end
+
+local function IsDisenchantable(id)
+	-- Return false if item id can't be disenchanted
+	local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
+	if (not name) then
+		-- GetItemInfo() failed, item might be disenchantable
+		return true
+	end
+	if (quality and quality < 2) then
+		-- Low quality
+		return false
+	end
+	if (count and count > 1) then
+		-- Stackable item
+		return false
+	end
+	return true
+end
+
+local function ItemType(id)
+	-- Return item level and type as string, e.g. "20 Armor"
+	-- High quality items have predictable disenchants so we're only interested in green
+	-- items (quality == 2)
+	if (id) then
+		local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
+		if (name and quality == 2 and level > 0) then
+			return string.format("%d %s", level, type)
+		end
+	end
+	return nil
+end
+
+local function DisenchantListHash()
+	-- Generate a hash for DisenchantList
+	local hash = 1
+	for key in DisenchantList do
+		local item, suffix = ItemID(key)
+		hash = math.mod(3 * hash + 2 * item + suffix, 16777216)
+	end
+	return hash
+end
+
+local function MergeDisenchantLists()
+	-- Merge DisenchantList by base item, i.e. all "Foobar of <x>" are merged into "Foobar"
+	-- This can be rather time consuming so we store this in a saved variable and use a hash
+	-- signature to determine if we need to update the table
+	local hash = DisenchantListHash()
+	if (not EnchantedBaseItems.hash) then
+		EnchantedBaseItems.hash = -hash
+	end
+	if (EnchantedBaseItems.hash ~= hash) then
+		-- Hash has changed, update EnchantedBaseItems
+		EnchantedBaseItems = {}
+		for key in DisenchantList do
+			local item, suffix = ItemID(key)
+			if (IsDisenchantable(item)) then
+				EnchantedBaseItems[item] = MergeDisenchant(EnchantedBaseItems[item],
+					NormalizeDisenchant(DisenchantList[key]))
+			end
+		end
+		EnchantedBaseItems.hash = hash
+	end
+
+	-- Merge items from EnchantedLocal
+	for key in EnchantedLocal do
+		local item, suffix = ItemID(key)
+		if (IsDisenchantable(item)) then
+			EnchantedBaseItems[item] = MergeDisenchant(EnchantedBaseItems[item], EnchantedLocal[key])
+		end
+	end
+
+	-- Merge by item type
+	for id in EnchantedBaseItems do
+		local type = ItemType(id)
+		if (type) then
+			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], EnchantedBaseItems[id])
+		end
+	end
+end
 
 function Enchantrix_CheckTooltipInfo(frame)
 	-- If we've already added our information, no need to do it again
@@ -660,6 +839,8 @@ function Enchantrix_AddonLoaded()
 
 	Enchantrix_ChatPrint(string.format(_ENCH('FrmtWelcome'), ENCHANTRIX_VERSION), 0.8, 0.8, 0.2);
 	Enchantrix_ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1);
+
+	MergeDisenchantLists()
 end
 
 
@@ -966,8 +1147,14 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 		Enchantrix_SaveLocal(sig, iData);
 	end
 
+	local item = ItemID(sig)
+	if (not IsDisenchantable(item)) then
+		-- Item is not disenchantable
+		return disenchantsTo
+	end
+
 	-- If there is data, then work out the disenchant data
-	if ((DisenchantList[sig]) or (sigNR and DisenchantList[sigNR]) or (EnchantedLocal[sig])) then
+	if ((item and EnchantedBaseItems[item]) or (DisenchantList[sig]) or (sigNR and DisenchantList[sigNR]) or (EnchantedLocal[sig])) then
 		local bTotal = 0;
 		local biTotal = 0;
 		local bdTotal = 0;
@@ -983,6 +1170,17 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 			baseDisenchant = DisenchantList[sigNR];
 			if (baseDisenchant) then
 				exactMatch = false;
+			end
+		end
+
+		if (item and EnchantedBaseItems[item]) then
+			baseDisenchant = EnchantedBaseItems[item]
+		end
+
+		local type = ItemType(item)
+		if (type and EnchantedItemTypes[type]) then
+			if (DisenchantTotal(EnchantedItemTypes[type]) > DisenchantTotal(baseDisenchant)) then
+				baseDisenchant = EnchantedItemTypes[type]
 			end
 		end
 
