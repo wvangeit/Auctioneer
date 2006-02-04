@@ -206,20 +206,23 @@ end
 
 local function IsDisenchantable(id)
 	-- Return false if item id can't be disenchanted
-	local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
-	if (not name) then
-		-- GetItemInfo() failed, item might be disenchantable
+	if (id) then
+		local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
+		if (not name) then
+			-- GetItemInfo() failed, item might be disenchantable
+			return true
+		end
+		if (quality and quality < 2) then
+			-- Low quality
+			return false
+		end
+		if (count and count > 1) then
+			-- Stackable item
+			return false
+		end
 		return true
 	end
-	if (quality and quality < 2) then
-		-- Low quality
-		return false
-	end
-	if (count and count > 1) then
-		-- Stackable item
-		return false
-	end
-	return true
+	return false
 end
 
 local function ItemType(id)
