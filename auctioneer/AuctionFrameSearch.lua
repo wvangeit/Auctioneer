@@ -446,15 +446,17 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 
 			getglobal(frameName.."BidMinPercentLessEdit"):SetText(searchParams[3])
 
-			local timeLeft = tonumber(searchParams[4])
+			local timeLeft = tonumber(searchParams[4]) or 2
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidTimeLeftDropDown"), AuctionFrameSearch_TimeLeftDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidTimeLeftDropDown"), timeLeft);
 
-			local catid = tonumber(searchParams[5])
+			local catid = tonumber(searchParams[5]) or 1
+			local catName = ""
+			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidCategoryDropDown"), catid);
 
-			local quality = tonumber(searchParams[6])
+			local quality = tonumber(searchParams[6]) or 1
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidMinQualityDropDown"), quality);
 
@@ -467,11 +469,13 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 
 			getglobal(frameName.."BuyoutMinPercentLessEdit"):SetText(searchParams[3])
 
-			local catid = tonumber(searchParams[4])
+			local catid = tonumber(searchParams[4]) or 1
+			local catName = ""
+			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BuyoutCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BuyoutCategoryDropDown"), catid);
 
-			local quality = tonumber(searchParams[5])
+			local quality = tonumber(searchParams[5]) or 1
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BuyoutMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BuyoutMinQualityDropDown"), quality);
 
@@ -487,11 +491,13 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			-- Plain search
 			MoneyInputFrame_SetCopper(getglobal(frameName.."PlainMaxPrice"), tonumber(searchParams[2]))
 
-			local catid = tonumber(searchParams[3])
+			local catid = tonumber(searchParams[3]) or 1
+			local catName = ""
+			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainCategoryDropDownText"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainCategoryDropDownText"), catid);
 
-			local quality = tonumber(searchParams[4])
+			local quality = tonumber(searchParams[4]) or 1
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
 			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainMinQualityDropDown"), quality);
 
@@ -689,7 +695,8 @@ end
 function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTimeLeft, category, minQuality, itemName)
 	-- Create the content from auctioneer.
 	frame.results = {};
-	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.BidBrokerFilter, minProfit, maxTimeLeft, category, minQuality, itemName);
+	local itemNames = Auctioneer.Util.Split(itemName, "|");
+	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.BidBrokerFilter, minProfit, maxTimeLeft, category, minQuality, itemNames);
 	if (bidWorthyAuctions) then
 		local player = UnitName("player");
 		for pos,a in pairs(bidWorthyAuctions) do
@@ -742,7 +749,8 @@ end
 function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, category, minQuality, itemName)
 	-- Create the content from auctioneer.
 	frame.results = {};
-	local buyoutWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PercentLessFilter, minPercentLess, category, minQuality, itemName);
+	local itemNames = Auctioneer.Util.Split(itemName, "|");
+	local buyoutWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PercentLessFilter, minPercentLess, category, minQuality, itemNames);
 	if (buyoutWorthyAuctions) then
 		local player = UnitName("player");
 		for pos,a in pairs(buyoutWorthyAuctions) do
@@ -853,7 +861,8 @@ end
 function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, itemName)
 	-- Create the content from auctioneer.
 	frame.results = {};
-	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PlainFilter, maxPrice, category, minQuality, itemName);
+	local itemNames = Auctioneer.Util.Split(itemName, "|");
+	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PlainFilter, maxPrice, category, minQuality, itemNames);
 	if (bidWorthyAuctions) then
 		local player = UnitName("player");
 		for pos,a in pairs(bidWorthyAuctions) do

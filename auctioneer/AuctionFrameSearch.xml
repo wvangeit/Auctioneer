@@ -277,7 +277,7 @@
 							</OnLoad>
 						</Scripts>
 					</Frame>
-					<EditBox name="$parentMinPercentLessEdit" letters="3" autoFocus="false" inherits="InputBoxTemplate">
+					<EditBox name="$parentMinPercentLessEdit" letters="5" autoFocus="false" inherits="InputBoxTemplate">
 						<Size>
 							<AbsDimension x="50" y="16"/>
 						</Size>
@@ -468,7 +468,7 @@
 							</OnLoad>
 						</Scripts>
 					</Frame>
-					<EditBox name="$parentMinPercentLessEdit" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
+					<EditBox name="$parentMinPercentLessEdit" letters="5" autoFocus="false" inherits="InputBoxTemplate">
 						<Size>
 							<AbsDimension x="50" y="16"/>
 						</Size>

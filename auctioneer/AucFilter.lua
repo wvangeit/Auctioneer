@@ -66,8 +66,18 @@ function bidBrokerFilter(minProfit, signature, maximumTime, category, minQuality
 	if (not minQuality) then minQuality = 0 end
 
 	if (itemName) then
-		local i,j = string.find(string.lower(name), string.lower(itemName))
-		if (not i) then return true end
+		local iName
+		local oName = string.lower(name)
+		local iCount = table.getn(itemName)
+		local match = false
+		for iPos=1, iCount do
+			iName = itemName[iPos]
+			if (iName and iName ~= "") then
+				local i,j = string.find(oName, string.lower(iName))
+				if (i) then match = true end
+			end
+		end
+		if (not match) then return true end
 	end
 
 	if Auctioneer.Statistic.GetUsableMedian(itemKey) then  -- only add if we have seen it enough times to have a usable median
@@ -144,8 +154,18 @@ function percentLessFilter(percentLess, signature, category, minQuality, itemNam
 	if (not minQuality) then minQuality = 0 end
 
 	if (itemName) then
-		local i,j = string.find(string.lower(name), string.lower(itemName))
-		if (not i) then return true end
+		local iName
+		local oName = string.lower(name)
+		local iCount = table.getn(itemName)
+		local match = false
+		for iPos=1, iCount do
+			iName = itemName[iPos]
+			if (iName and iName ~= "") then
+				local i,j = string.find(oName, string.lower(iName))
+				if (i) then match = true end
+			end
+		end
+		if (not match) then return true end
 	end
 
 	local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, auctKey)
@@ -187,8 +207,18 @@ function plainFilter(maxPrice, signature, category, minQuality, itemName)
 	if (not maxPrice or maxPrice == 0) then maxPrice = 100000000 end
 
 	if (itemName) then
-		local i,j = string.find(string.lower(name), string.lower(itemName))
-		if (not i) then return true end
+		local iName
+		local oName = string.lower(name)
+		local iCount = table.getn(itemName)
+		local match = false
+		for iPos=1, iCount do
+			iName = itemName[iPos]
+			if (iName and iName ~= "") then
+				local i,j = string.find(oName, string.lower(iName))
+				if (i) then match = true end
+			end
+		end
+		if (not match) then return true end
 	end
 
 	if (count and count > 1) then maxPrice = maxPrice * count end
