@@ -35,9 +35,9 @@ local function newBalancedList(paramSize)
 	if (not value) then return; end
 		local val = tonumber(value) or 0;
 
-		local insertPos = 0
-		local left      = 1
-		local right     = table.getn(self.list)
+		local insertPos	= 0
+		local left		= 1
+		local right		= table.getn(self.list)
 		local middleVal
 		local middle
 		-- insert in sorted order
@@ -93,11 +93,11 @@ local function newBalancedList(paramSize)
 
 	-- returns the current size of the list
 	local size = function()
-        return table.getn(self.list);
-    end
+		return table.getn(self.list);
+	end
 
-    -- retrieves the value in the list at this position
-    local get = function(pos)
+	-- retrieves the value in the list at this position
+	local get = function(pos)
 		return tonumber(self.list[pos]);
 	end
 
@@ -110,18 +110,18 @@ local function newBalancedList(paramSize)
 	end
 
 	return {
-		['insert']     = insert,
-		['getMedian']  = getMedian,
-		['size']       = size,
-		['get']        = get,
-		['clear']      = clear,
-		['getMaxSize'] = getMaxSize,
-		['setList']    = setList,
-		['getList']    = getList
+		['insert']		= insert,
+		['getMedian']	= getMedian,
+		['size']		= size,
+		['get']			= get,
+		['clear']		= clear,
+		['getMaxSize']	= getMaxSize,
+		['setList']		= setList,
+		['getList']		= getList
 	}
 end
 
 
 Auctioneer.BalancedList = {
-NewBalancedList = newBalancedList,
+	NewBalancedList = newBalancedList,
 }
