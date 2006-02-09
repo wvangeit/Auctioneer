@@ -4,7 +4,7 @@
 	an item in a tooltip when you hover over the item in the game.
 	<%version%> (<%codename%>)
 	$Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -71,7 +71,7 @@ local itemInfo = nil
 
 BINDING_HEADER_INFORMANT_HEADER = _INFM('BindingHeader')
 BINDING_NAME_INFORMANT_POPUPDOWN = _INFM('BindingTitle')
-	
+
 InformantConfig = {}
 
 -- LOCAL DEFINES
@@ -335,7 +335,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		itemInfo = getItem(itemID)
 	end
 	if (not itemInfo) then return end
-	
+
 	itemInfo.itemName = name
 	itemInfo.itemLink = link
 	itemInfo.itemCount = count
@@ -533,10 +533,10 @@ end
 
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
-	
+
 	if (not InformantConfig) then
 		InformantConfig = {}
-		setFilterDefaults()	
+		setFilterDefaults()
 	end
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
@@ -557,8 +557,8 @@ local function frameLoaded()
 	Stubby.RegisterBootCode("Informant", "CommandHandler", [[
 		local function cmdHandler(msg)
 			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end 
-			if (not cmd) then cmd = "" end 
+			if (not cmd) then cmd = string.lower(msg) end
+			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end
 			if (cmd == "load") then
 				if (param == "") then
@@ -600,7 +600,7 @@ end
 
 function onVariablesLoaded()
 	setFilterDefaults()
-	
+
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 	if (InformantConfig.position) then
@@ -613,7 +613,7 @@ function onVariablesLoaded()
 		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
-	
+
 	-- Restore key bindings
 	-- This workaround is required for LoadOnDemand addons since their saved
 	-- bindings are deleted upon login.
@@ -623,16 +623,16 @@ function onVariablesLoaded()
 		if (InformantConfig.bindings[profile]) then
 			for _,key in ipairs(InformantConfig.bindings[profile]) do
 				SetBinding(key, 'INFORMANT_POPUPDOWN')
-			end		
+			end
 		end
 	end
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
-	
+
 	Informant.InitCommands()
 
-	if not Babylonian.IsAddOnRegistered("Informant") then  
-		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);  
-	end 
+	if not Babylonian.IsAddOnRegistered("Informant") then
+		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
+	end
 end
 
 function onEvent(event)
@@ -643,10 +643,10 @@ function onEvent(event)
 		-- Store key bindings for Informant
 		local key1, key2 = GetBindingKey('INFORMANT_POPUPDOWN');
 		local profile = getKeyBindProfile();
-		
+
 		if (not InformantConfig.bindings) then InformantConfig.bindings = {}; end
 		if (not InformantConfig.bindings[profile]) then InformantConfig.bindings[profile] = {}; end
-		
+
 		InformantConfig.bindings[profile][1] = key1;
 		InformantConfig.bindings[profile][2] = key2;
 	end

@@ -222,7 +222,7 @@ end
 	if (param == Informant_LocaleLastSet) then
 		return
 	end
-	
+
 	if (param == Informant.GetFilterVal('locale')) then
 		validLocale = true;
 	elseif (setLocale(param)) then
@@ -230,7 +230,7 @@ end
 	end
 
 	Informant_LocaleLastSet = param;
-	
+
 	if (chatprint) then
 		if (validLocale) then
 			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), localizeFilterVal(param)));
@@ -248,7 +248,7 @@ end]]
 function restoreDefault(param, chatprint)
 	local oldLocale = InformantConfig.filters['locale']
 	local paramLocalized
-	
+
 	if ( (param == nil) or (param == "") ) then
 		return
 	elseif ((param == _INFM('CmdClearAll')) or (param == "all")) then
@@ -259,11 +259,11 @@ function restoreDefault(param, chatprint)
 		param = delocalizeCommand(param)
 		Informant.SetFilter(param, nil);
 	end
-	
+
 	-- Apply defaults for settings that went missing
-	Informant.SetFilterDefaults();		
-	
-	-- Apply new locale if needed 
+	Informant.SetFilterDefaults();
+
+	-- Apply new locale if needed
 	if (oldLocale ~= InformantConfig.filters['locale']) then setLocale(InformantConfig.filters['locale']); end
 
 	if (chatprint) then
@@ -367,7 +367,7 @@ function registerKhaos()
 				};
 				dependencies={enabled={checked=true;}};
 				difficulty=2;
-			};			
+			};
 			{
 				id="ReloadUI",
 				type=K_BUTTON,
@@ -565,7 +565,7 @@ function registerKhaos()
 				text=_INFM('GuiEmbed'),
 				helptext=_INFM('HelpEmbed'),
 				callback=function(state)
-					genVarSet("embed", state.checked)				
+					genVarSet("embed", state.checked)
 				end,
 				feedback=function(state)
 					if (state.checked) then
@@ -643,10 +643,10 @@ end
 
 local function resetKhaos()
 	if (Informant_Khaos_Registered) then
-		
+
 		Khaos.unregisterOptionSet("Informant");
 		Informant_Khaos_Registered = false;
-		
+
 		registerKhaos();
 	end
 end
@@ -667,16 +667,16 @@ end
 
 function setLocale(param, chatprint, updateKhaos)
 	param = delocalizeFilterVal(param);
-	if not Informant_LocaleLastSet then 
-		Informant_LocaleLastSet = ""; 
+	if not Informant_LocaleLastSet then
+		Informant_LocaleLastSet = "";
 	end
 
-	if not Babylonian.IsAddOnRegistered("Informant") then 
+	if not Babylonian.IsAddOnRegistered("Informant") then
 		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
 	end
 
 	local validLocale = nil;
-	
+
 	if (param == Informant_LocaleLastSet) then
 		validLocale = true;
 
@@ -721,7 +721,7 @@ function setLocale(param, chatprint, updateKhaos)
 		end
 	end
 
-	if (param) then 
+	if (param) then
 		Informant_LocaleLastSet = param;
 	end
 
@@ -742,7 +742,7 @@ function isValidLocale(param)
 end
 
 function chatPrint(msg)
-	if (DEFAULT_CHAT_FRAME) then 
+	if (DEFAULT_CHAT_FRAME) then
 		DEFAULT_CHAT_FRAME:AddMessage(msg, 0.25, 0.55, 1.0);
 	end
 end
@@ -762,7 +762,7 @@ function delocalizeFilterVal(value)
 		return 'toggle';
 	else
 		return value;
-	end	
+	end
 end
 
 function localizeFilterVal(value)

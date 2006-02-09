@@ -3,7 +3,7 @@
 	Gives you quantities based upon your tradeskilling abilities.
 	$Id$
 	Version <%version%> (<%codename%>)
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ function tradeHook(type, selID)
 		for i=1, TRADE_SKILLS_DISPLAYED, 1 do
 			local button = getglobal("TradeSkillSkill"..i)
 			local skillIndex = button:GetID()
-			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(skillIndex);	
+			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(skillIndex);
 			button:SetText(tradeSkillText(skillIndex, skillName))
 			scanTradeskillID(i, false)
 		end
@@ -176,7 +176,7 @@ function getCounts(itemID)
 	local otherTotal = 0
 	if (InformantItems and InformatItems[curRealm]) then
 		for player, pData in Informant_Items[curRealm] do
-			local i,j, invCount, bankCount = string.find(pData, "(%d):(%d)"); 
+			local i,j, invCount, bankCount = string.find(pData, "(%d):(%d)");
 			if (player == curPlayer) then
 				invTotal = tonumber(invCount)
 				bankTotal = tonumber(bankCount)
