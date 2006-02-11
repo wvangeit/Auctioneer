@@ -35,31 +35,33 @@ local getItem--(itemID);     itemID is the first value in a blizzard hyperlink i
 
 
 -- LOCAL FUNCTION PROTOTYPES:
-local addLine            -- addLine(text, color)
-local clear              -- clear()
-local frameActive        -- frameActive(isActive)
-local frameLoaded        -- frameLoaded()
-local getCatName         -- getCatName(catID)
-local getFilter          -- getFilter(filter)
-local getFilterVal       -- getFilterVal(type)
-local getItem            -- getItem(itemID)
-local getRowCount        -- getRowCount()
-local onEvent            -- onEvent(event)
-local onLoad             -- onLoad()
-local onVariablesLoaded  -- onVariablesLoaded()
-local onQuit             -- onQuit()
-local scrollUpdate       -- scrollUpdate(offset)
-local setDatabase        -- setDatabase(database)
-local setFilter          -- setFilter(key, value)
-local setFilterDefaults  -- setFilterDefaults()
-local setRequirements    -- setRequirements(requirements)
-local setSkills          -- setSkills(skills)
-local setVendors         -- setVendors(vendors)
-local showHideInfo       -- showHideInfo()
-local skillToName        -- skillToName(userSkill)
-local split              -- split(str, at)
-local tooltipHandler     -- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
-local getKeyBindProfile  -- getKeyBindProfile()
+local addLine				-- addLine(text, color)
+local clear					-- clear()
+local frameActive			-- frameActive(isActive)
+local frameLoaded			-- frameLoaded()
+local getCatName			-- getCatName(catID)
+local getFilter				-- getFilter(filter)
+local getFilterVal			-- getFilterVal(type)
+local getItem				-- getItem(itemID)
+local getRowCount			-- getRowCount()
+local nilSafeString			-- nilSafeString(String)
+local onEvent				-- onEvent(event)
+local onLoad				-- onLoad()
+local onVariablesLoaded		-- onVariablesLoaded()
+local onQuit				-- onQuit()
+local scrollUpdate			-- scrollUpdate(offset)
+local setDatabase			-- setDatabase(database)
+local setFilter				-- setFilter(key, value)
+local setFilterDefaults		-- setFilterDefaults()
+local setRequirements		-- setRequirements(requirements)
+local setSkills				-- setSkills(skills)
+local setVendors			-- setVendors(vendors)
+local showHideInfo			-- showHideInfo()
+local skillToName			-- skillToName(userSkill)
+local split					-- split(str, at)
+local tooltipHandler		-- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
+local getKeyBindProfile		-- getKeyBindProfile()
+local whitespace			-- whitespace(length)
 
 -- LOCAL VARIABLES
 
@@ -419,10 +421,30 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
-		if (itemInfo.usageText) then
-			reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
-			EnhTooltip.AddLine(reagentInfo, nil, embedded)
-			EnhTooltip.LineColor(0.6, 0.4, 0.8)
+		if (itemInfo.usedList and itemInfo.usageText) then
+			if (table.getn(itemInfo.usedList) > 2) then
+
+				local currentUseLine = nilSafeString(itemInfo.usedList[1])..", "..nilSafeString(itemInfo.usedList[2])..","
+				reagentInfo = string.format(_INFM('FrmtInfoUse'), currentUseLine)
+				EnhTooltip.AddLine(reagentInfo, nil, embedded)
+				EnhTooltip.LineColor(0.6, 0.4, 0.8)
+
+				for index = 3, table.getn(itemInfo.usedList), 2 do
+					if (itemInfo.usedList[index+1]) then
+						reagentInfo = whitespace(string.len(_INFM('FrmtInfoUse')) + 3)..nilSafeString(itemInfo.usedList[index])..", "..nilSafeString(itemInfo.usedList[index+1])..","
+						EnhTooltip.AddLine(reagentInfo, nil, embedded)
+						EnhTooltip.LineColor(0.6, 0.4, 0.8)
+					else
+						reagentInfo = whitespace(string.len(_INFM('FrmtInfoUse')) + 3)..nilSafeString(itemInfo.usedList[index])
+						EnhTooltip.AddLine(reagentInfo, nil, embedded)
+						EnhTooltip.LineColor(0.6, 0.4, 0.8)
+					end
+				end
+			else
+				reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
+				EnhTooltip.AddLine(reagentInfo, nil, embedded)
+				EnhTooltip.LineColor(0.6, 0.4, 0.8)
+			end
 		end
 	end
 	if (getFilter('show-quest')) then
@@ -434,6 +456,20 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 			end
 		end
 	end
+end
+
+function nilSafeString(str)
+	if (not str) then str = "" end
+	return str;
+end
+
+function whitespace(length)
+	local spaces = ""
+	while length ~= 0 do
+		spaces = spaces.." "
+		length = length - 1
+	end
+	return spaces
 end
 
 function showHideInfo()
