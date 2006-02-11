@@ -211,13 +211,11 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 			if (also == "opposite") then
 				also = Auctioneer.Util.GetOppositeKey();
-			end
 
-			if (also == "neutral") then
+			elseif (also == "neutral") then
 				also = Auctioneer.Util.GetNeutralKey();
-			end
 
-			if (also == "home") then
+			elseif (also == "home") then
 				also = Auctioneer.Util.GetHomeKey();
 			end
 
