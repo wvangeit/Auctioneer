@@ -304,6 +304,7 @@ function clearTooltip()
 	EnhancedTooltip.hasEmbed = false
 	EnhancedTooltip.curEmbed = false
 	EnhancedTooltip.hasData = false
+	EnhancedTooltip.hasIcon = false
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
 	for i = 1, 30 do
@@ -356,6 +357,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 	local height = 20
 	local width = EnhancedTooltip.minWidth
+	if (EnhancedTooltip.hasIcon) then
+		width = width + EnhancedTooltipIcon:GetWidth()
+	end
 	local lineCount = EnhancedTooltip.lineCount
 	if (lineCount == 0) then
 		if (not EnhancedTooltip.hasEmbed) then
@@ -370,8 +374,11 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		local currentLine = getglobal("EnhancedTooltipText"..i)
 		trackHeight = trackHeight + currentLine:GetHeight() + 1
 	end
+	local iconHeight = EnhancedTooltipIcon:GetHeight()
+	if ((trackHeight < iconHeight) and (lineCount < 3)) then
+		trackHeight = iconHeight - 6
+	end
 	height = 20 + trackHeight
-
 	local minWidth = width
 
 	local sWidth = GetScreenWidth()
@@ -459,7 +466,11 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			ttMoneyWidth = ttMoney:GetWidth()
 			ttMoneyLineWidth = getglobal(ttMoney.myLine):GetWidth()
 			ttMoney:ClearAllPoints()
-			ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
+			if ((ttMoney.myLineNumber < 4) and (EnhancedTooltip.hasIcon)) then
+				ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2 - 34, 0)
+			else
+				ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
+			end
 		end
 	end
 end
@@ -552,6 +563,7 @@ function addLine(lineText, moneyAmount, embed)
 		money:SetPoint("LEFT", line:GetName(), "RIGHT", self.moneySpacing, 0)
 		TinyMoneyFrame_Update(money:GetName(), math.floor(moneyAmount))
 		money.myLine = line:GetName()
+		money.myLineNumber = curLine
 		money:Show()
 		local moneyWidth = money:GetWidth()
 		lineWidth = lineWidth + moneyWidth + self.moneySpacing
@@ -625,15 +637,7 @@ end
 function setIcon(iconPath)
 	EnhancedTooltipIcon:SetTexture(iconPath)
 	EnhancedTooltipIcon:Show()
-	local width = EnhancedTooltipIcon:GetWidth()
-	local tWid = EnhancedTooltipText1:GetWidth() + width + 20
-	if (tWid > EnhancedTooltip.minWidth) then
-		EnhancedTooltip.minWidth = tWid
-	end
-	tWid = EnhancedTooltipText2:GetWidth() + width + 20
-	if (tWid > EnhancedTooltip.minWidth) then
-		EnhancedTooltip.minWidth = tWid
-	end
+	EnhancedTooltip.hasIcon = true
 end
 
 function gtHookOnHide()

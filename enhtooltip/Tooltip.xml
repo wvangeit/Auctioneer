@@ -43,7 +43,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					<Anchors>
 						<Anchor point="TOPRIGHT">
 							<Offset>
-								<AbsDimension x="10" y="10"/>
+								<AbsDimension x="-7" y="-7"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
