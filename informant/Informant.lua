@@ -102,6 +102,7 @@ local filterDefaults = {
 		['show-stack'] = 'on',
 		['show-merchant'] = 'on',
 		['show-quest'] = 'on',
+		['show-icon'] = 'on',
 	}
 
 -- FUNCTION DEFINITIONS
@@ -137,7 +138,11 @@ end
 
 function getItem(itemID)
 	local baseData = self.database[itemID]
-	if (not baseData) then return nil end
+	if (not baseData) then 
+		return getItemBasic(itemID)
+	end
+
+	local _, _, _, iLevel, sType, _, _, _, sTexture = GetItemInfo(itemID)
 
 	local baseSplit = split(baseData, ":")
 	local buy = tonumber(baseSplit[1])
@@ -163,6 +168,8 @@ function getItem(itemID)
 		['usedby'] = usedby,
 		['quantity'] = quantity,
 		['limited'] = limited,
+		['texture'] = sTexture,
+		['fullData'] = true,
 	}
 
 	local addition = ""
@@ -171,7 +178,11 @@ function getItem(itemID)
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
-		dataItem.classText = "Unknown"..addition
+		if (sType) then
+			dataItem.classText = sType..addition
+		else
+			dataItem.classText = "Unknown"..addition
+		end
 	else
 		dataItem.classText = catName..addition
 	end
@@ -210,7 +221,7 @@ function getItem(itemID)
 	dataItem.isPlayerMade = (reqSkill ~= 0)
 	dataItem.reqSkill = reqSkill
 	dataItem.reqSkillName = skillName
-	dataItem.reqLevel = reqLevel
+	dataItem.reqLevel = iLevel or reqLevel
 
 	if (merchantlist ~= '') then
 		local merchList = split(merchantlist, ",")
@@ -252,6 +263,22 @@ function getItem(itemID)
 	return dataItem
 end
 
+function getItemBasic(itemID)
+	if (not itemID) then return end
+	local sName, sLink, iQuality, iLevel, sType, sSubType, iCount, sEquipLoc, sTexture = GetItemInfo(tonumber(itemID))
+
+	if (sName) then
+		local dataItem = {
+			['classText'] = sType,
+			['quality'] = iQuality,
+			['stack'] = iCount,
+			['texture'] = sTexture,
+			['reqLevel'] = iLevel,
+			['fullData'] = false,
+		}
+	return dataItem
+	end
+end
 
 function setSkills(skills)
 	self.skills = skills
@@ -370,6 +397,12 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	itemInfo.itemQuant = quant
 
 	local embedded = getFilter('embed')
+
+	if (getFilter('show-icon')) then
+		if (itemInfo.texture) then
+			EnhTooltip.SetIcon(itemInfo.texture)
+		end
+	end
 
 	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then

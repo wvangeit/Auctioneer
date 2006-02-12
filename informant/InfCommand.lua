@@ -82,6 +82,7 @@ function buildCommandMap()
 			[_INFM('CmdLocale')] = 'locale',
 			[_INFM('CmdDefault')] = 'default',
 			[_INFM('CmdEmbed')] = 'embed',
+			[_INFM('ShowIcon')] = 'show-icon',
 			[_INFM('ShowStack')] = 'show-stack',
 			[_INFM('ShowUsage')] = 'show-usage',
 			[_INFM('ShowQuest')] = 'show-quest',
@@ -131,7 +132,7 @@ function commandHandler(command, source)
 		restoreDefault(param, chatprint)
 	elseif (cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
 			cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
-			cmd == "show-vendor-buy" or cmd == "show-vendor-sell") then
+			cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon") then
 		genVarSet(cmd, param, chatprint)
 	else
 		if (chatprint) then
@@ -157,6 +158,7 @@ function cmdHelp()
 	chatPrint(string.format(lineFormat, _INFM('ShowUsage'), getLocalizedFilterVal('show-usage'), _INFM('HelpUsage')))
 	chatPrint(string.format(lineFormat, _INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
 	chatPrint(string.format(lineFormat, _INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
+	chatPrint(string.format(lineFormat, _INFM('ShowIcon'), getLocalizedFilterVal('show-icon'), _INFM('HelpIcon')))
 	chatPrint(string.format(lineFormat, _INFM('CmdEmbed'), getLocalizedFilterVal('embed'), _INFM('HelpEmbed')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
@@ -396,6 +398,27 @@ function registerKhaos()
 				difficulty=1,
 			},
 			{
+				id="show-icon",
+				type=K_TEXT,
+				text=_INFM('GuiInfoIcon'),
+				helptext=_INFM('HelpIcon'),
+				callback=function(state)
+					genVarSet("show-icon", state.checked)
+				end,
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowIcon')))
+					else
+						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowIcon')))
+					end
+				end,
+				check=true,
+				default={checked=true},
+				disabled={checked=false},
+				dependencies={enabled={checked=true}},
+				difficulty=1,
+			},
+			{
 				id="show-stack",
 				type=K_TEXT,
 				text=_INFM('GuiInfoStack'),
@@ -437,7 +460,6 @@ function registerKhaos()
 				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
-			--[[
 			{
 				id="show-quest",
 				type=K_TEXT,
@@ -459,7 +481,6 @@ function registerKhaos()
 				dependencies={enabled={checked=true}},
 				difficulty=1,
 			},
-			]]
 			{
 				id="show-merchant",
 				type=K_TEXT,
