@@ -63,22 +63,168 @@ Enchantrix_StaticPrices = {
 	[11083] =   800, -- Soul Dust
 	[10940] =   600, -- Strange Dust
 	[11137] =  1600, -- Vision Dust
-	[20725] = 2000000, -- Nexus Crystal
+	[20725] = 650000, -- Nexus Crystal
+}
+
+ENX_DUST = 1
+ENX_ESSENCE_LESSER = 2
+ENX_ESSENCE_GREATER = 3
+ENX_SHARD_SMALL = 4
+ENX_SHARD_LARGE = 5
+ENX_CRYSTAL = 6
+ENX_WEAPON = "Weapon"
+ENX_ARMOR = "Armor"
+Enchantrix_InvTypes = {
+	["INVTYPE_2HWEAPON"] = ENX_WEAPON,
+	["INVTYPE_WEAPON"] = ENX_WEAPON,
+	["INVTYPE_WEAPONMAINHAND"] = ENX_WEAPON,
+	["INVTYPE_WEAPONOFFHAND"] = ENX_WEAPON,
+	["INVTYPE_RANGED"] = ENX_WEAPON,
+	["INVTYPE_BODY"] = ENX_ARMOR,
+	["INVTYPE_CHEST"] = ENX_ARMOR,
+	["INVTYPE_CLOAK"] = ENX_ARMOR,
+	["INVTYPE_FEET"] = ENX_ARMOR,
+	["INVTYPE_FINGER"] = ENX_ARMOR,
+	["INVTYPE_HAND"] = ENX_ARMOR,
+	["INVTYPE_HEAD"] = ENX_ARMOR,
+	["INVTYPE_HOLDABLE"] = ENX_ARMOR,
+	["INVTYPE_LEGS"] = ENX_ARMOR,
+	["INVTYPE_NECK"] = ENX_ARMOR,
+	["INVTYPE_RANGED"] = ENX_ARMOR,
+	["INVTYPE_ROBE"] = ENX_ARMOR,
+	["INVTYPE_SHIELD"] = ENX_ARMOR,
+	["INVTYPE_SHOULDER"] = ENX_ARMOR,
+	["INVTYPE_TABARD"] = ENX_ARMOR,
+	["INVTYPE_TRINKET"] = ENX_ARMOR,
+	["INVTYPE_WAIST"] = ENX_ARMOR,
+	["INVTYPE_WRIST"] = ENX_ARMOR,
 }
 
 Enchantrix_LevelRules = {
-	[5] = { 10940, 10938, 10978 },
-	[10] = { 10940, 10938, 10978 },
-	[15] = { 10940, 10939, 10978 },
-	[20] = { 10940, 10998, 10978 },
-	[25] = { 11083, 11082, 11084 },
-	[30] = { 11083, 11134, 11138 },
-	[35] = { 11137, 11135, 11139 },
-	[40] = { 11137, 11174, 11177 },
-	[45] = { 11176, 11175, 11178 },
-	[50] = { 11176, 16202, 14343 },
-	[55] = { 16204, 16203, 14344 },
-	[60] = { 16204, 16203, 14344, 20725 },
+	[ENX_WEAPON] = {
+		[5] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10938] = ENX_ESSENCE_LESSER, -- Lesser Magic Essence
+		},
+		[10] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10938] = ENX_ESSENCE_LESSER, -- Lesser Magic Essence
+		},
+		[15] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10939] = ENX_ESSENCE_GREATER, -- Greater Magic Essence
+			[10978] = ENX_SHARD_SMALL, -- Small Glimmering Shard
+		},
+		[20] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10939] = ENX_ESSENCE_GREATER, -- Greater Magic Essence
+			[10978] = ENX_SHARD_SMALL, -- Small Glimmering Shard
+		},
+		[25] = {
+			[11083] = ENX_DUST, -- Soul Dust
+			[10939] = ENX_ESSENCE_GREATER, -- Greater Magic Essence
+			[11084] = ENX_SHARD_LARGE, -- Large Glimmering Shard
+		},
+		[30] = {
+			[11083] = ENX_DUST, -- Soul Dust
+			[11134] = ENX_ESSENCE_LESSER, -- Lesser Mystic Essence
+			[11138] = ENX_SHARD_SMALL, -- Small Glowing Shard
+		},
+		[35] = {
+			[11137] = ENX_DUST, -- Vision Dust
+			[11135] = ENX_ESSENCE_GREATER, -- Greater Mystic Essence
+			[11139] = ENX_SHARD_LARGE, -- Large Glowing Shard
+		},
+		[40] = {
+			[11137] = ENX_DUST, -- Vision Dust
+			[11174] = ENX_ESSENCE_LESSER, -- Lesser Nether Essence
+			[11177] = ENX_SHARD_SMALL, -- Small Radiant Shard
+		},
+		[45] = {
+			[11176] = ENX_DUST, -- Dream Dust
+			[11175] = ENX_ESSENCE_GREATER, -- Greater Nether Essence
+			[11178] = ENX_SHARD_LARGE, -- Large Radiant Shard
+		},
+		[50] = {
+			[11176] = ENX_DUST, -- Dream Dust
+			[16202] = ENX_ESSENCE_LESSER, -- Lesser Eternal Essence
+			[14343] = ENX_SHARD_SMALL, -- Small Brilliant Shard
+		},
+		[55] = {
+			[16204] = ENX_DUST, -- Illusion Dust
+			[16203] = ENX_ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = ENX_SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = ENX_CRYSTAL, -- Nexus Crystal
+		},
+		[60] = {
+			[16204] = ENX_DUST, -- Illusion Dust
+			[16203] = ENX_ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = ENX_SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = ENX_CRYSTAL, -- Nexus Crystal
+		},
+	},
+	[ENX_ARMOR] = {
+		[5] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10938] = ENX_ESSENCE_LESSER, -- Lesser Magic Essence
+		},
+		[10] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10938] = ENX_ESSENCE_LESSER, -- Lesser Magic Essence
+		},
+		[15] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10939] = ENX_ESSENCE_GREATER, -- Greater Magic Essence
+			[10978] = ENX_SHARD_SMALL, -- Small Glimmering Shard
+		},
+		[20] = {
+			[10940] = ENX_DUST, -- Strange Dust
+			[10998] = ENX_ESSENCE_LESSER, -- Lesser Astral Essence
+			[10978] = ENX_SHARD_SMALL, -- Small Glimmering Shard
+		},
+		[25] = {
+			[11083] = ENX_DUST, -- Soul Dust
+			[11082] = ENX_ESSENCE_GREATER, -- Greater Astral Essence
+			[11084] = ENX_SHARD_LARGE, -- Large Glimmering Shard
+		},
+		[30] = {
+			[11083] = ENX_DUST, -- Soul Dust
+			[11134] = ENX_ESSENCE_LESSER, -- Lesser Mystic Essence
+			[11138] = ENX_SHARD_SMALL, -- Small Glowing Shard
+		},
+		[35] = {
+			[11137] = ENX_DUST, -- Vision Dust
+			[11135] = ENX_ESSENCE_GREATER, -- Greater Mystic Essence
+			[11139] = ENX_SHARD_LARGE, -- Large Glowing Shard
+		},
+		[40] = {
+			[11137] = ENX_DUST, -- Vision Dust
+			[11174] = ENX_ESSENCE_LESSER, -- Lesser Nether Essence
+			[11177] = ENX_SHARD_SMALL, -- Small Radiant Shard
+		},
+		[45] = {
+			[11176] = ENX_DUST, -- Dream Dust
+			[11175] = ENX_ESSENCE_GREATER, -- Greater Nether Essence
+			[11178] = ENX_SHARD_LARGE, -- Large Radiant Shard
+		},
+		[50] = {
+			[11176] = ENX_DUST, -- Dream Dust
+			[16202] = ENX_ESSENCE_LESSER, -- Lesser Eternal Essence
+			[14343] = ENX_SHARD_SMALL, -- Small Brilliant Shard
+		},
+		[55] = {
+			[16204] = ENX_DUST, -- Illusion Dust
+			[16203] = ENX_ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = ENX_SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = ENX_CRYSTAL, -- Nexus Crystal
+		},
+		[60] = {
+			[16204] = ENX_DUST, -- Illusion Dust
+			[16203] = ENX_ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = ENX_SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = ENX_CRYSTAL, -- Nexus Crystal
+		},
+	},
 }
 
 -- Default filter configuration
@@ -185,6 +331,36 @@ local function NormalizeDisenchant(str)
 	return Serialize(tbl)
 end
 
+local function CleanupDisenchant(str, id)
+	-- Remove reagents that don't appear in level rules table
+	if (str and id) then
+		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
+		if (quality and Enchantrix_InvTypes[equip] and level > 0) then
+			local tbl = Unserialize(str)
+			local clean = {}
+			local type = Enchantrix_InvTypes[equip]
+			level = roundup(level, 5)
+			for id in tbl do
+				if (Enchantrix_LevelRules[type][level][id]) then
+					if (quality == 2) then
+						-- Uncommon item, remove nexus crystal
+						if (Enchantrix_LevelRules[type][level][id] < ENX_CRYSTAL) then
+							clean[id] = tbl[id]
+						end
+					else
+						-- Rare or epic item, remove dusts and essences
+						if (Enchantrix_LevelRules[type][level][id] > ENX_ESSENCE_GREATER) then
+							clean[id] = tbl[id]
+						end
+					end
+				end
+			end
+			return Serialize(clean)
+		end
+	end
+	return str
+end
+
 local function DisenchantTotal(str)
 	-- Return total number of disenchants
 	local tot = 0
@@ -207,10 +383,14 @@ end
 local function IsDisenchantable(id)
 	-- Return false if item id can't be disenchanted
 	if (id) then
-		local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
-		if (not name) then
+		local _, _, quality, _, _, _, count, equip = GetItemInfo(id)
+		if (not quality) then
 			-- GetItemInfo() failed, item might be disenchantable
 			return true
+		end
+		if (not Enchantrix_InvTypes[equip]) then
+			-- Neither weapon nor armor
+			return false
 		end
 		if (quality and quality < 2) then
 			-- Low quality
@@ -226,13 +406,13 @@ local function IsDisenchantable(id)
 end
 
 local function ItemType(id)
-	-- Return item level and type as string, e.g. "20 Armor"
+	-- Return item level (rounded up to nearest 5 levels) and type as string, e.g. "20 Armor"
 	-- High quality items have predictable disenchants so we're only interested in green
 	-- items (quality == 2)
 	if (id) then
-		local name, link, quality, level, type, subtype, count, equip = GetItemInfo(id)
-		if (name and quality == 2 and level > 0) then
-			return string.format("%d %s", level, type)
+		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
+		if (quality and quality == 2 and level > 0 and Enchantrix_InvTypes[equip]) then
+			return string.format("%d %s", roundup(level, 5), Enchantrix_InvTypes[equip])
 		end
 	end
 	return nil
@@ -1185,6 +1365,10 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 			if (DisenchantTotal(EnchantedItemTypes[type]) > DisenchantTotal(baseDisenchant)) then
 				baseDisenchant = EnchantedItemTypes[type]
 			end
+		end
+
+		if (item) then
+			baseDisenchant = CleanupDisenchant(baseDisenchant, item)
 		end
 
 		if (baseDisenchant) then
