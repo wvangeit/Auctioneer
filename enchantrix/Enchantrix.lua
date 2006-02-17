@@ -34,47 +34,52 @@ end
 Enchantrix_GUI_Registered = nil;
 Enchantrix_Khaos_Registered = nil;
 
-EnchantedLocal = {};
 EnchantConfig = {};
-EnchantedBaseItems = {}
+
+-- Disenchant data
+EnchantedLocal = {} -- Disenchants performed by user (saved variable)
+EnchantedBaseItems = {} -- DisenchantList merged by item id (saved variable)
+local LocalBaseItems = {} -- EnchantedLocal merged by item id
+local EnchantedItemTypes = {} -- LocalBaseItems and EnchantedBaseItems merged by type
 
 -- These are market norm prices.
+-- Median prices from Allakhazam.com, Feb 16, 2006
 Enchantrix_StaticPrices = {
-	[11082] =  7500, -- Greater Astral Essence
-	[16203] = 35000, -- Greater Eternal Essence
-	[10939] =  3500, -- Greater Magic Essence
-	[11135] =  8500, -- Greater Mystic Essence
-	[11175] = 30000, -- Greater Nether Essence
-	[10998] =  3500, -- Lesser Astral Essence
-	[16202] = 10000, -- Lesser Eternal Essence
-	[10938] =  1000, -- Lesser Magic Essence
-	[11134] =  4000, -- Lesser Mystic Essence
-	[11174] = 12000, -- Lesser Nether Essence
-	[14344] = 50000, -- Large Brilliant Shard
-	[11084] = 10000, -- Large Glimmering Shard
-	[11139] = 24500, -- Large Glowing Shard
-	[11178] = 70000, -- Large Radiant Shard
-	[14343] = 43500, -- Small Brilliant Shard
-	[10978] =  3500, -- Small Glimmering Shard
-	[11138] =  9000, -- Small Glowing Shard
-	[11177] = 32500, -- Small Radiant Shard
-	[11176] =  5000, -- Dream Dust
-	[16204] = 12500, -- Illusion Dust
-	[11083] =   800, -- Soul Dust
-	[10940] =   600, -- Strange Dust
-	[11137] =  1600, -- Vision Dust
-	[20725] = 650000, -- Nexus Crystal
+	[20725] = 550000, -- Nexus Crystal
+	[14344] =  70000, -- Large Brilliant Shard
+	[11178] =  50000, -- Large Radiant Shard
+	[11139] =  18000, -- Large Glowing Shard
+	[11084] =  10000, -- Large Glimmering Shard
+	[14343] =  38000, -- Small Brilliant Shard
+	[11177] =  30000, -- Small Radiant Shard
+	[11138] =   6000, -- Small Glowing Shard
+	[10978] =   3000, -- Small Glimmering Shard
+	[16203] =  50000, -- Greater Eternal Essence
+	[11175] =  35000, -- Greater Nether Essence
+	[11135] =  10000, -- Greater Mystic Essence
+	[11082] =  10000, -- Greater Astral Essence
+	[10939] =   3500, -- Greater Magic Essence
+	[16202] =  18500, -- Lesser Eternal Essence
+	[11174] =  15000, -- Lesser Nether Essence
+	[11134] =   4800, -- Lesser Mystic Essence
+	[10998] =   5000, -- Lesser Astral Essence
+	[10938] =   1850, -- Lesser Magic Essence
+	[16204] =  10000, -- Illusion Dust
+	[11176] =   5000, -- Dream Dust
+	[11137] =   2100, -- Vision Dust
+	[11083] =   1200, -- Soul Dust
+	[10940] =    750, -- Strange Dust
 }
 
-ENX_DUST = 1
-ENX_ESSENCE_LESSER = 2
-ENX_ESSENCE_GREATER = 3
-ENX_SHARD_SMALL = 4
-ENX_SHARD_LARGE = 5
-ENX_CRYSTAL = 6
-ENX_WEAPON = "Weapon"
-ENX_ARMOR = "Armor"
-Enchantrix_InvTypes = {
+local ENX_DUST = 1
+local ENX_ESSENCE_LESSER = 2
+local ENX_ESSENCE_GREATER = 3
+local ENX_SHARD_SMALL = 4
+local ENX_SHARD_LARGE = 5
+local ENX_CRYSTAL = 6
+local ENX_WEAPON = "Weapon"
+local ENX_ARMOR = "Armor"
+local InventoryTypes = {
 	["INVTYPE_2HWEAPON"] = ENX_WEAPON,
 	["INVTYPE_WEAPON"] = ENX_WEAPON,
 	["INVTYPE_WEAPONMAINHAND"] = ENX_WEAPON,
@@ -100,7 +105,7 @@ Enchantrix_InvTypes = {
 	["INVTYPE_WRIST"] = ENX_ARMOR,
 }
 
-Enchantrix_LevelRules = {
+local LevelRules = {
 	[ENX_WEAPON] = {
 		[5] = {
 			[10940] = ENX_DUST, -- Strange Dust
@@ -242,8 +247,7 @@ Enchantrix_FilterDefaults = {
 		['printframe'] = 1,
 	}
 
-local ItemEssences = {};
-
+local DisenchantEvent = {}
 
 local MAX_BUYOUT_PRICE = 800000;
 
@@ -251,7 +255,6 @@ local MIN_PROFIT_MARGIN = 1000;
 local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
 
-local EnchantedItemTypes = {}
 local N_DISENCHANTS = 1
 local N_REAGENTS = 2
 
@@ -266,7 +269,7 @@ end
 
 local function roundup(m, n)
 	-- Round up m to nearest multiple of n
-	return math.floor((m + n - 1) / n) * n
+	return math.ceil(m / n) * n
 end
 
 local function Unserialize(str)
@@ -335,21 +338,21 @@ local function CleanupDisenchant(str, id)
 	-- Remove reagents that don't appear in level rules table
 	if (str and id) then
 		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
-		if (quality and Enchantrix_InvTypes[equip] and level > 0) then
+		local type = InventoryTypes[equip]
+		if (quality and type and level > 0) then
 			local tbl = Unserialize(str)
 			local clean = {}
-			local type = Enchantrix_InvTypes[equip]
 			level = roundup(level, 5)
 			for id in tbl do
-				if (Enchantrix_LevelRules[type][level][id]) then
+				if (LevelRules[type][level][id]) then
 					if (quality == 2) then
 						-- Uncommon item, remove nexus crystal
-						if (Enchantrix_LevelRules[type][level][id] < ENX_CRYSTAL) then
+						if (LevelRules[type][level][id] < ENX_CRYSTAL) then
 							clean[id] = tbl[id]
 						end
 					else
 						-- Rare or epic item, remove dusts and essences
-						if (Enchantrix_LevelRules[type][level][id] > ENX_ESSENCE_GREATER) then
+						if (LevelRules[type][level][id] > ENX_ESSENCE_GREATER) then
 							clean[id] = tbl[id]
 						end
 					end
@@ -371,10 +374,10 @@ local function DisenchantTotal(str)
 	return tot
 end
 
-local function ItemID(key)
+local function ItemID(sig)
 	-- Return item id and item suffix as integers
-	if (type(key) == "string") then
-		local splt = Enchantrix_Split(key, ":")
+	if (type(sig) == "string") then
+		local splt = Enchantrix_Split(sig, ":")
 		return tonumber(splt[1]), tonumber(splt[3])
 	end
 	return nil
@@ -388,7 +391,7 @@ local function IsDisenchantable(id)
 			-- GetItemInfo() failed, item might be disenchantable
 			return true
 		end
-		if (not Enchantrix_InvTypes[equip]) then
+		if (not InventoryTypes[equip]) then
 			-- Neither weapon nor armor
 			return false
 		end
@@ -406,13 +409,12 @@ local function IsDisenchantable(id)
 end
 
 local function ItemType(id)
-	-- Return item level (rounded up to nearest 5 levels) and type as string, e.g. "20 Armor"
-	-- High quality items have predictable disenchants so we're only interested in green
-	-- items (quality == 2)
+	-- Return item level (rounded up to nearest 5 levels), quality and type as string,
+	-- e.g. "20:2:Armor" for uncommon level 20 armor
 	if (id) then
 		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
-		if (quality and quality == 2 and level > 0 and Enchantrix_InvTypes[equip]) then
-			return string.format("%d %s", roundup(level, 5), Enchantrix_InvTypes[equip])
+		if (quality and quality >= 2 and level > 0 and InventoryTypes[equip]) then
+			return string.format("%d:%d:%s", roundup(level, 5), quality, InventoryTypes[equip])
 		end
 	end
 	return nil
@@ -421,9 +423,9 @@ end
 local function DisenchantListHash()
 	-- Generate a hash for DisenchantList
 	local hash = 1
-	for key in DisenchantList do
-		local item, suffix = ItemID(key)
-		hash = math.mod(3 * hash + 2 * item + suffix, 16777216)
+	for sig in DisenchantList do
+		local item, suffix = ItemID(sig)
+		hash = math.mod(3 * hash + 2 * (item or 0) +(suffix or 0), 16777216)
 	end
 	return hash
 end
@@ -439,31 +441,48 @@ local function MergeDisenchantLists()
 	if (EnchantedBaseItems.hash ~= hash) then
 		-- Hash has changed, update EnchantedBaseItems
 		EnchantedBaseItems = {}
-		for key in DisenchantList do
-			local item, suffix = ItemID(key)
+		for sig, disenchant in pairs(DisenchantList) do
+			local item, suffix = ItemID(sig)
 			if (IsDisenchantable(item)) then
 				EnchantedBaseItems[item] = MergeDisenchant(EnchantedBaseItems[item],
-					NormalizeDisenchant(DisenchantList[key]))
+					NormalizeDisenchant(disenchant))
 			end
 		end
 		EnchantedBaseItems.hash = hash
 	end
 
 	-- Merge items from EnchantedLocal
-	for key in EnchantedLocal do
-		local item, suffix = ItemID(key)
+	for sig, disenchant in pairs(EnchantedLocal) do
+		local item, suffix = ItemID(sig)
 		if (IsDisenchantable(item)) then
-			EnchantedBaseItems[item] = MergeDisenchant(EnchantedBaseItems[item], EnchantedLocal[key])
+			LocalBaseItems[item] = MergeDisenchant(LocalBaseItems[item], disenchant)
 		end
 	end
 
 	-- Merge by item type
-	for id in EnchantedBaseItems do
+	for id, disenchant in pairs(EnchantedBaseItems) do
 		local type = ItemType(id)
 		if (type) then
-			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], EnchantedBaseItems[id])
+			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
 		end
 	end
+	for id, disenchant in pairs(LocalBaseItems) do
+		local type = ItemType(id)
+		if (type) then
+			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
+		end
+	end
+end
+
+local function SaveDisenchant(sig, reagentID, count)
+	assert(type(sig) == "string"); assert(tonumber(reagentID)); assert(tonumber(count))
+
+	local id = ItemID(sig)
+	local type = ItemType(id)
+	local disenchant = string.format("%d:1:%d:0", reagentID, count)
+	EnchantedLocal[sig] = MergeDisenchant(EnchantedLocal[sig], disenchant)
+	LocalBaseItems[id] = MergeDisenchant(LocalBaseItems[id], disenchant)
+	EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
 end
 
 function Enchantrix_CheckTooltipInfo(frame)
@@ -496,29 +515,20 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 
 	local embed = Enchantrix_GetFilter('embed');
 
-	local sig, sigNR = Enchantrix_SigFromLink(link);
+	local sig = Enchantrix_SigFromLink(link);
 
-	local _,_,data = Enchantrix_FindSigInBags(sig);
-	if (not data) then _,_,data = Enchantrix_FindSigInBags(sigNR); end
-
-
-	-- Check for correct item quality
-	if (data) then
-		if (data.quality > -1) and (data.quality < 2) then
-			-- The item data says the quality is not right, zero it out.
-			EnchantedLocal[sig] = { z = true; };
-			EnchantedLocal[sigNR] = { z = true; };
-		end
-	else
-		-- We can't get definative proof that this item is not disenchant quality,
-		-- but the tooltip says it's not good enough quality though so don't display it.
-		if (quality) and (quality > -1) and (quality < 2) then return; end
+	-- Check for disenchantable target
+	local itemID = Enchantrix_BreakLink(link)
+	if (itemID == 0 or not IsDisenchantable(itemID)) then
+		return
 	end
 
-	local disenchantsTo = Enchantrix_GetItemDisenchants(sig, sigNR, name, true);
+	-- Remember this link if user is targeting a spell
+	if SpellIsTargeting() then
+		DisenchantEvent.spellTarget = link
+	end
 
-	local itemID = Enchantrix_BreakLink(link);
-	if (Enchantrix_StaticPrices[itemID]) then return end
+	local disenchantsTo = Enchantrix_GetItemDisenchants(sig, name, true);
 
 	-- Process the results
 	local totals = disenchantsTo.totals;
@@ -526,11 +536,10 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 	if (totals and totals.total > 0) then
 
 		-- If it looks quirky, and we haven't disenchanted it, then ignore it...
-		if (totals.bCount < 10) and (totals.iCount + totals.biCount < 1) then return; end
+		if (totals.iCount + totals.biCount < 1) then return; end
 
 		local total = totals.total;
 		local note = "";
-		if (not totals.exact) then note = "*"; end
 
 		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..note, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
@@ -543,7 +552,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			EnhTooltip.LineColor(0.6,0.6,0.1);
 
 			if (Enchantrix_GetFilter('counts')) then
-				EnhTooltip.AddLine(string.format(_ENCH('FrmtCounts'), counts.bCount, counts.oCount, counts.dCount), nil, embed);
+				EnhTooltip.AddLine(string.format(_ENCH('FrmtCounts'), counts.biCount, 0, counts.iCount), nil, embed);
 				EnhTooltip.LineColor(0.5,0.5,0.0);
 			end
 		end
@@ -591,146 +600,8 @@ function Enchantrix_SigFromLink(link)
 	return nil;
 end
 
-function Enchantrix_TakeInventory()
-	local bagid, slotid, size;
-	local inventory = {};
-
-	for bagid = 0, 10, 1 do -- Changed from 4 to 10 by FtKxDE to include bank bags as well
-		inventory[bagid] = {};
-
-		size = GetContainerNumSlots(bagid);
-		if( size ) then
-			for slotid = size, 1, -1 do
-				inventory[bagid][slotid] = {};
-
-				local link = GetContainerItemLink(bagid, slotid);
-				if( link ) then
-					local name = Enchantrix_NameFromLink(link);
-					local sig = Enchantrix_SigFromLink(link);
-					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bagid, slotid);
-					if ((not itemCount) or (itemCount < 1)) then
-						itemCount = 1;
-					end
-					if (name) then
-						inventory[bagid][slotid].name = name;
-						inventory[bagid][slotid].tx = texture;
-						inventory[bagid][slotid].sig = sig;
-						inventory[bagid][slotid].link = link;
-						inventory[bagid][slotid].count = itemCount;
-					end
-				end
-			end
-		end
-	end
-
-	-- Added by FtKxDE to include bank slots
-	inventory["bank"] = {};
-
-	size = GetContainerNumSlots(BANK_CONTAINER);
-	if( size ) then
-		for slotid = size, 1, -1 do
-			inventory["bank"][slotid] = {};
-
-			local link = GetContainerItemLink(BANK_CONTAINER, slotid);
-			if( link ) then
-				local name = Enchantrix_NameFromLink(link);
-				local sig = Enchantrix_SigFromLink(link);
-				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(BANK_CONTAINER, slotid);
-				if ((not itemCount) or (itemCount < 1)) then
-					itemCount = 1;
-				end
-				if (name) then
-					inventory["bank"][slotid].name = name;
-					inventory["bank"][slotid].tx = texture;
-					inventory["bank"][slotid].sig = sig;
-					inventory["bank"][slotid].link = link;
-					inventory["bank"][slotid].count = itemCount;
-				end
-			end
-		end
-	end
-
-	-- Added by FtKxDE to include player's inventory
-	inventory["inv"] = {};
-
-	for slotid = 0, 19, 1 do
-		inventory["inv"][slotid] = {};
-
-		local link = GetInventoryItemLink("player", slotid);
-		if( link ) then
-			local name = Enchantrix_NameFromLink(link);
-			local sig = Enchantrix_SigFromLink(link);
-			local texture = GetInventoryItemTexture("player", slotid);
-			local itemCount = GetInventoryItemCount("player", slotid);
-			if ((not itemCount) or (itemCount < 1)) then
-				itemCount = 1;
-			end
-			if (name) then
-				inventory["inv"][slotid].name = name;
-				inventory["inv"][slotid].tx = texture;
-				inventory["inv"][slotid].sig = sig;
-				inventory["inv"][slotid].link = link;
-				inventory["inv"][slotid].count = itemCount;
-			end
-		end
-	end
-	return inventory;
-end
-
-function Enchantrix_FullDiff(invA, invB)
-	local bagid, slotid, size;
-	local diffData = {};
-	local aStuff = {};
-	local bStuff = {};
-
-	for bag, bagStuff in invA do
-		for slot, slotStuff in bagStuff do
-			if (slotStuff.sig) then
-				if (not aStuff[slotStuff.sig]) then
-					aStuff[slotStuff.sig] = { c=slotStuff.count, n=slotStuff.name, t=slotStuff.tx, l=slotStuff.link };
-				else
-					aStuff[slotStuff.sig].c = aStuff[slotStuff.sig].c + slotStuff.count;
-				end
-			end
-		end
-	end
-	for bag, bagStuff in invB do
-		for slot, slotStuff in bagStuff do
-			if (slotStuff.sig) then
-				if (not bStuff[slotStuff.sig]) then
-					bStuff[slotStuff.sig] = { c=slotStuff.count, n=slotStuff.name, t=slotStuff.tx, l=slotStuff.link };
-				else
-					bStuff[slotStuff.sig].c = bStuff[slotStuff.sig].c + slotStuff.count;
-				end
-			end
-		end
-	end
-
-	for sig, slotStuff in aStuff do
-		local count = slotStuff.c;
-		local bCount;
-		if (bStuff[sig]) then bCount = bStuff[sig].c; end
-		if (bCount == nil) then bCount = 0; end
-		if (bCount < count) then
-			local diffCount = bCount - count;
-			diffData[sig] = { s=sig, d=diffCount, n=slotStuff.n, t=slotStuff.t, l=slotStuff.l };
-		end
-	end
-	for sig, slotStuff in bStuff do
-		local count = slotStuff.c;
-		local aCount;
-		if (aStuff[sig]) then aCount = aStuff[sig].c; end
-		if (aCount == nil) then aCount = 0; end
-		if (aCount < count) then
-			local diffCount = count - aCount;
-			diffData[sig] = { s=sig, d=diffCount, n=slotStuff.n, t=slotStuff.t, l=slotStuff.l };
-		end
-	end
-	return diffData;
-end
-
-ItemEssences = {};
-EssenceItemIDs = {};
+local ItemEssences = {};
+local EssenceItemIDs = {};
 local essences = {
 	11082, 16203, 10939, 11135, 11175, 10998, 16202, 10938,
 	11134, 11174, 14344, 11084, 11139, 11178, 14343, 10978,
@@ -813,101 +684,37 @@ end
 function Enchantrix_OnEvent(funcVars, event, argument)
 
 	if ((event == "SPELLCAST_START") and (argument == _ENCH('ArgSpellname'))) then
-		Enchantrix_Disenchanting = true;
-		Enchantrix_WaitingPush = false;
-		Enchantrix_StartInv = Enchantrix_TakeInventory();
-		Enchantrix_Disenchants = {};
-
-		return;
+		DisenchantEvent.started = DisenchantEvent.spellTarget
+		DisenchantEvent.finished = nil
+		return
 	end
 	if ((event == "SPELLCAST_FAILED") or (event == "SPELLCAST_INTERRUPTED")) then
-		Enchantrix_Disenchanting = false;
-		Enchantrix_WaitingPush = false;
-		return;
+		DisenchantEvent.started = nil
+		DisenchantEvent.finished = nil
+		return
 	end
-	if ((event == "SPELLCAST_STOP") and (Enchantrix_Disenchanting)) then
-		Enchantrix_Disenchanting = false;
-		Enchantrix_WaitingPush = true;
-		return;
+	if ((event == "SPELLCAST_STOP") and DisenchantEvent.started) then
+		DisenchantEvent.finished = DisenchantEvent.started
+		DisenchantEvent.started = nil
+		return
 	end
-	if ((event == "ITEM_PUSH") and (Enchantrix_WaitingPush)) then
-		local textureType = strsub(arg2, 1, 28);
-		local receivedItem = strsub(arg2, 29);
-		if (not receivedItem) then return; end
-		if (textureType == "Interface\\Icons\\INV_Enchant_") then
-			Enchantrix_Disenchants[arg2] = receivedItem;
-			Enchantrix_Disenchants.exists = true;
-		end
-		return;
-	end
-	if ((event == "BAG_UPDATE") and (Enchantrix_Disenchants and Enchantrix_Disenchants.exists)) then
-
-		-- /script inv = Enchantrix_TakeInventory()
-		-- /script p(Enchantrix_FullDiff(inv, Enchantrix_TakeInventory()))
-		-- /script p(Enchantrix_FullDiff(Enchantrix_StartInv, Enchantrix_TakeInventory()))
-		local nowInv = Enchantrix_TakeInventory();
-		local invDiff = Enchantrix_FullDiff(Enchantrix_StartInv, nowInv);
-
-		local foundItem = "";
-		for sig, data in invDiff do
-			if (data.d == -1) then
-				if (foundItem ~= "") then
-					-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
-					Enchantrix_Disenchants = {};
-					Enchantrix_Disenchanting = false;
-					Enchantrix_WaitingPush = false;
-					return;
+	if (event == "LOOT_OPENED") then
+		if DisenchantEvent.finished then
+			Enchantrix_ChatPrint(string.format(_ENCH("FrmtFound"), DisenchantEvent.finished))
+			local sig = Enchantrix_SigFromLink(DisenchantEvent.finished)
+			for i = 1, GetNumLootItems(), 1 do
+				if LootSlotIsItem(i) then
+					local icon, name, quantity, rarity = GetLootSlotInfo(i)
+					local link = GetLootSlotLink(i)
+					Enchantrix_ChatPrint(string.format("  %s x%d", link, quantity))
+					-- Save result
+					local reagentID = Enchantrix_BreakLink(link)
+					SaveDisenchant(sig, reagentID, quantity)
 				end
-				foundItem = data;
 			end
 		end
-		if (foundItem == "") then
-			-- Unable to determine which item was disenchanted, ignore DE to avoid incorrect data
-			Enchantrix_Disenchants = {};
-			Enchantrix_Disenchanting = false;
-			Enchantrix_WaitingPush = false;
-			return;
-		end
-
-		local gainedItem = {};
-		for sig, data in invDiff do
-			if (data.d > 0) and (Enchantrix_Disenchants[data.t]) then
-				gainedItem[sig] = data;
-			end
-		end
-		if (next(gainedItem) == nil) then return; end
-
-		if (EnchantedLocal[foundItem.n]) then
-			EnchantedLocal[foundItem.s] = { o = ""..EnchantedLocal[foundItem.n] };
-		end
-
-		local itemData = Enchantrix_GetLocal(foundItem.s);
-
-		Enchantrix_ChatPrint(string.format(_ENCH('FrmtFound'), foundItem.l), 0.8, 0.8, 0.2);
-		for sig, data in gainedItem do
-			local i,j, strItemID = string.find(sig, "^(%d+):");
-			local itemID = 0;
-			if (strItemID) then itemID = tonumber(strItemID); end
-			if (itemID > 0) and (ItemEssences[itemID]) then
-				-- We are interested cause this is an essence that was gained since last snaphot
-				local iCount = 0; local dCount = 0;
-				local curData = itemData[itemID];
-				if (curData == nil) then curData = {}; end
-				if (curData.i) then iCount = tonumber(curData.i); end
-				if (curData.d) then dCount = tonumber(curData.d); end
-				curData.i = ""..(iCount + 1);
-				curData.d = ""..(dCount + data.d);
-				itemData[itemID] = curData;
-				Enchantrix_ChatPrint("  " .. data.n .. " x" .. data.d, 0.6, 0.6, 0.1);
-			end
-		end
-
-		Enchantrix_SaveLocal(foundItem.s, itemData);
-
-		Enchantrix_Disenchants = {};
-		Enchantrix_Disenchanting = false;
-		Enchantrix_WaitingPush = false;
-
+		DisenchantEvent.started = nil
+		DisenchantEvent.finished = nil
 		return
 	end
 end
@@ -942,8 +749,7 @@ function Enchantrix_OnLoad()
 	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("SPELLCAST_START", "Enchantrix", Enchantrix_OnEvent);
 	Stubby.RegisterEventHook("SPELLCAST_STOP", "Enchantrix", Enchantrix_OnEvent);
-	Stubby.RegisterEventHook("ITEM_PUSH", "Enchantrix", Enchantrix_OnEvent);
-	Stubby.RegisterEventHook("BAG_UPDATE", "Enchantrix", Enchantrix_OnEvent);
+	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", Enchantrix_OnEvent);
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
@@ -987,11 +793,6 @@ function Enchantrix_OnLoad()
 			Stubby.Print("]].._ENCH('MesgNotloaded')..[[")
 		end
 	]]);
-
-	Enchantrix_DisenchantCount = 0;
-	Enchantrix_DisenchantResult = {};
-	Enchantrix_Disenchanting = false;
-	Enchantrix_WaitingPush = false;
 
 	SLASH_ENCHANTRIX1 = "/enchantrix";
 	SLASH_ENCHANTRIX2 = "/enchant";
@@ -1058,17 +859,6 @@ function Enchantrix_GetFilter(filter)
 		return value;
 	end
 end
-
-function Enchantrix_GetSigs(str)
-	local itemList = {};
-	local listSize = 0;
-	for sig, item in string.gfind(str, "|Hitem:(%d+:%d+:%d+):%d+|h[[]([^]]+)[]]|h") do
-		listSize = listSize+1;
-		itemList[listSize] = { s=sig, n=item };
-	end
-	return itemList;
-end
-
 
 function Enchantrix_PercentLessFilter(percentLess, signature)
     local filterAuction = true;
@@ -1249,8 +1039,7 @@ end
 function Enchantrix_GetAuctionItemDisenchants(auctionSignature, useCache)
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(auctionSignature);
 	local sig = string.format("%d:%d:%d", id, enchant, rprop);
-	local sigNR = string.format("%d:%d:%d", id, 0, 0);
-	return Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache);
+	return Enchantrix_GetItemDisenchants(sig, name, useCache);
 end
 
 function Enchantrix_Split(str, at)
@@ -1307,7 +1096,7 @@ function Enchantrix_GetLocal(sig)
 	return enchantItem;
 end
 
-function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
+function Enchantrix_GetItemDisenchants(sig, name, useCache)
 	local disenchantsTo = {};
 
 	if (not Enchantrix_PriceCache) or (time()-Enchantrix_PriceCache.t > 300) then
@@ -1330,104 +1119,64 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 		Enchantrix_SaveLocal(sig, iData);
 	end
 
-	local item = ItemID(sig)
-	if (not IsDisenchantable(item)) then
+	local itemID = ItemID(sig)
+	if (not (itemID and IsDisenchantable(itemID))) then
 		-- Item is not disenchantable
-		return disenchantsTo
+		return {}
 	end
 
 	-- If there is data, then work out the disenchant data
-	if ((item and EnchantedBaseItems[item]) or (DisenchantList[sig]) or (sigNR and DisenchantList[sigNR]) or (EnchantedLocal[sig])) then
-		local bTotal = 0;
+	if (EnchantedBaseItems[itemID] or LocalBaseItems[itemID]) then
 		local biTotal = 0;
 		local bdTotal = 0;
-		local oTotal = 0;
 		local iTotal = 0;
 		local dTotal = 0;
 
-		local exactMatch = true;
+		local baseDisenchant = EnchantedBaseItems[itemID]
 
-		local baseDisenchant = DisenchantList[sig];
-
-		if (not baseDisenchant) and (sigNR) then
-			baseDisenchant = DisenchantList[sigNR];
-			if (baseDisenchant) then
-				exactMatch = false;
-			end
-		end
-
-		if (item and EnchantedBaseItems[item]) then
-			baseDisenchant = EnchantedBaseItems[item]
-		end
-
-		local type = ItemType(item)
+		local type = ItemType(itemID)
 		if (type and EnchantedItemTypes[type]) then
 			if (DisenchantTotal(EnchantedItemTypes[type]) > DisenchantTotal(baseDisenchant)) then
 				baseDisenchant = EnchantedItemTypes[type]
 			end
 		end
 
-		if (item) then
-			baseDisenchant = CleanupDisenchant(baseDisenchant, item)
-		end
+		baseDisenchant = CleanupDisenchant(baseDisenchant, itemID)
 
 		if (baseDisenchant) then
 			-- Base Disenchantments are now serialized
-			local baseResults = Enchantrix_Split(baseDisenchant, ";");
-			for pos, baseResult in baseResults do
-				local baseBreak = Enchantrix_Split(baseResult, ":");
-				local dSig = tonumber(baseBreak[1]) or 0;
-				local biCount = tonumber(baseBreak[2]) or 0;
-				local bdCount = tonumber(baseBreak[3]) or 0;
-				local bCount = tonumber(baseBreak[4]) or 0;
-
-				if (dSig > 0) and (bCount+biCount > 0) then
-					disenchantsTo[dSig] = {};
-					disenchantsTo[dSig].bCount = bCount;
-					disenchantsTo[dSig].biCount = biCount;
-					disenchantsTo[dSig].bdCount = bdCount;
-					disenchantsTo[dSig].oCount = 0;
-					disenchantsTo[dSig].iCount = 0;
-					disenchantsTo[dSig].dCount = 0;
-					bTotal = bTotal + bCount;
-					biTotal = biTotal + biCount;
-					bdTotal = bdTotal + bdCount;
+			local baseResults = Unserialize(baseDisenchant)
+			for dSig, counts in pairs(baseResults) do
+				if (dSig > 0) then
+					disenchantsTo[dSig] = {
+						biCount = counts[N_DISENCHANTS],
+						bdCount = counts[N_REAGENTS],
+						iCount = 0,
+						dCount = 0,
+					}
+					biTotal = biTotal + counts[N_DISENCHANTS]
+					bdTotal = bdTotal + counts[N_REAGENTS]
 				end
 			end
 		end
 
-		local enchantedLocal = Enchantrix_GetLocal(sig);
-		if (enchantedLocal) then
-			for dSigStr, data in enchantedLocal do
-				local dSig = tonumber(dSigStr);
+		if (LocalBaseItems[itemID]) then
+			local enchantedLocal = Unserialize(LocalBaseItems[itemID])
+			for dSig, counts in pairs(enchantedLocal) do
 				if (dSig and dSig > 0) then
-					local oCount = 0;
-					local dCount = 0;
-					local iCount = 0;
-					if (data.o) then oCount = tonumber(data.o); end
-					if (data.d) then dCount = tonumber(data.d); end
-					if (data.i) then iCount = tonumber(data.i); end
-
 					if (not disenchantsTo[dSig]) then
-						disenchantsTo[dSig] = {};
-						disenchantsTo[dSig].bCount = 0;
+						disenchantsTo[dSig] = {biCount = 0, bdCount = 0, iCount = 0, dCount = 0}
 					end
-					if (data.z) then
-						local bCount = disenchantsTo[dSig].bCount;
-						disenchantsTo[dSig].bCount = 0;
-						bTotal = bTotal - bCount;
-					end
-					disenchantsTo[dSig].oCount = oCount;
-					disenchantsTo[dSig].dCount = dCount;
-					disenchantsTo[dSig].iCount = iCount;
-					oTotal = oTotal + oCount;
-					dTotal = dTotal + dCount;
-					iTotal = iTotal + iCount;
+					disenchantsTo[dSig].dCount = counts[N_REAGENTS]
+					disenchantsTo[dSig].iCount = counts[N_DISENCHANTS]
+
+					dTotal = dTotal + counts[N_REAGENTS]
+					iTotal = iTotal + counts[N_DISENCHANTS]
 				end
 			end
 		end
 
-		local total = bTotal + biTotal + oTotal + iTotal;
+		local total = biTotal + iTotal;
 
 		local hspGuess = 0;
 		local medianGuess = 0;
@@ -1438,8 +1187,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				if (dSig) then itemID = tonumber(dSig); end
 				local dName = ItemEssences[itemID];
 				if (not dName) then dName = "Item "..dSig; end
-				local oldCount, itemCount, disenchantCount;
-				local count = (counts.bCount or 0) + (counts.biCount or 0) + (counts.oCount or 0) + (counts.iCount or 0);
+				local count = (counts.biCount or 0) + (counts.iCount or 0);
 				local countI = (counts.biCount or 0) + (counts.iCount or 0);
 				local countD = (counts.bdCount or 0) + (counts.dCount or 0);
 				local pct = tonumber(string.format("%0.1f", count / total * 100));
@@ -1469,7 +1217,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				local rev = tonumber(auctVer[3]) or 0;
 				if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
 
-				local itemKey = string.format("%s:0:0", itemID);
+				local itemKey = string.format("%d:0:0", itemID);
 				if (useCache and not Enchantrix_PriceCache[itemKey]) then
 					Enchantrix_PriceCache[itemKey] = {};
 				end
@@ -1481,6 +1229,7 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 
 				if ((not hsp or hsp < 1) and (major >= 3)) then
 					if (major == 3 and minor == 0 and rev <= 11) then
+						-- 3.0.0 <= ver <= 3.0.11
 						if (rev == 11) then
 							hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
 						else
@@ -1491,8 +1240,10 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 							end
 						end
 					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
+						-- 3.1.11 < ver < 3.3.675
 						hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-					elseif (major > 3 and minor >= 3 and (rev >= 675 or rev == 0)) then
+					elseif (major >= 3 and minor >= 3 and (rev >= 675 or rev == 0)) then
+						-- 3.3.675 <= ver
 						hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 					end
 				end
@@ -1504,8 +1255,10 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 				end
 
 				if ((not median or median < 1) and (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675))) then
+					-- 3.1.11 < ver < 3.3.675
 					median = Auctioneer_GetUsableMedian(itemKey);
-				elseif ((not median or median < 1) and (major > 3 and minor >= 3 and (rev >= 675 or rev == 0))) then
+				elseif ((not median or median < 1) and (major >= 3 and minor >= 3 and (rev >= 675 or rev == 0))) then
+					-- 3.3.675 <= ver
 					median = Auctioneer.Statistic.GetUsableMedian(itemKey, Auctioneer.Util.GetAuctionKey());
 				end
 				if median == nil then median = mkt * 0.95; end
@@ -1527,14 +1280,11 @@ function Enchantrix_GetItemDisenchants(sig, sigNR, name, useCache)
 		local confidence = math.log(math.min(total, 19)+1)/3;
 
 		disenchantsTo.totals = {};
-		disenchantsTo.totals.exact = exactMatch;
 		disenchantsTo.totals.hspValue = hspGuess or 0;
 		disenchantsTo.totals.medValue = medianGuess or 0;
 		disenchantsTo.totals.mktValue = marketGuess or 0;
-		disenchantsTo.totals.bCount = bTotal or 0;
 		disenchantsTo.totals.biCount = biTotal or 0;
 		disenchantsTo.totals.bdCount = bdTotal or 0;
-		disenchantsTo.totals.oCount = oTotal or 0;
 		disenchantsTo.totals.dCount = dTotal or 0;
 		disenchantsTo.totals.iCount = iTotal or 0;
 		disenchantsTo.totals.total = total or 0;
@@ -1547,30 +1297,4 @@ end
 function Enchantrix_BreakLink(link)
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name;
-end
-
-
-function Enchantrix_FindSigInBags(sig)
-	for bag = 0, 4, 1 do
-		size = GetContainerNumSlots(bag);
-		if (size) then
-			for slot = size, 1, -1 do
-				local link = GetContainerItemLink(bag, slot);
-				if (link) then
-					local itemID, randomProp, enchant, uniqID, itemName = Enchantrix_BreakLink(link);
-					if (itemName == findName) then
-						local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID);
-						local data = {
-							name = itemName, link = link,
-							sig = string.format("%d:%d:%d", itemID, enchant, randomProp),
-							id = itemID, rand = randomProp, ench = enchant, uniq = uniqID,
-							quality = quality
-						}
-
-						return bag, slot, data;
-					end
-				end
-			end
-		end
-	end
 end
