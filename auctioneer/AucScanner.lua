@@ -345,9 +345,7 @@ function placeAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	local aiLink = GetAuctionItemLink(itemtype, itemindex);
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
-	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement,
-		aiBuyout, aiBidAmount, aiHighBidder, aiOwner =
-		GetAuctionItemInfo(itemtype, itemindex);
+	local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyout, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(itemtype, itemindex);
 
 	local auctionSignature = string.format("%d:%d:%d:%s:%d:%d:%d:%d", aiItemID, aiRandomProp, aiEnchant, Auctioneer.Util.NilSafeString(aiName), Auctioneer.Util.NullSafe(aiCount), Auctioneer.Util.NullSafe(aiMinBid), Auctioneer.Util.NullSafe(aiBuyout), aiUniqID);
 
