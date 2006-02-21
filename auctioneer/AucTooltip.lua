@@ -54,7 +54,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	if (Auctioneer.Command.GetFilter('show-link')) then
 		-- OUTPUT: show item link
-		EnhTooltip.AddLine("Link: " .. itemKey .. ":" .. uniqID, nil, embedded);
+		EnhTooltip.AddLine("Link: " .. itemID .. ":" .. enchant .. ":" .. randomProp .. ":" .. uniqID, nil, embedded);
 		EnhTooltip.LineQuality(quality);
 	end
 
