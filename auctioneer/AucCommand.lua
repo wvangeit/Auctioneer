@@ -1130,19 +1130,20 @@ end
 
 --The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function clear(param, chatprint)
+	if (not param) or (not type(param) == "string") then
+		return
+	end
+
 	local aKey = Auctioneer.Util.GetAuctionKey();
 
 	if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
 
 		AuctionConfig.info = {};
 		AuctionConfig.data[aKey] = {};
-		AuctionConfig.snap[aKey] = {};
-		AuctionConfig.sbuy[aKey] = {};
-		AuctionConfig.stats.snapmed[aKey] = {};
+		Auctioneer_HSPCache[aKey] = {};
 		AuctionConfig.stats.histmed[aKey] = {};
 		AuctionConfig.stats.histcount[aKey] = {};
-		AuctionConfig.stats.snapcount[aKey] = {};
-		Auctioneer_HSPCache[aKey] = {};
+		clear("snapshot");
 	elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 
 		AuctionConfig.snap[aKey] = {};
@@ -1158,39 +1159,39 @@ function clear(param, chatprint)
 		if (items) then
 			for pos,itemKey in pairs(items) do
 
-				if (AuctionConfig.data[aKey][itemKey] ~= nil) then
+				if (AuctionConfig.data[aKey][itemKey]) then
 					AuctionConfig.data[aKey][itemKey] = nil;
 
-					if (AuctionConfig.stats.snapmed[aKey][itemKey] ~= nil) then
+					if (AuctionConfig.stats.snapmed[aKey][itemKey]) then
 						AuctionConfig.stats.snapmed[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats.histmed[aKey][itemKey] ~= nil) then
+					if (AuctionConfig.stats.histmed[aKey][itemKey]) then
 						AuctionConfig.stats.histmed[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats.histcount[aKey][itemKey] ~= nil) then
+					if (AuctionConfig.stats.histcount[aKey][itemKey]) then
 						AuctionConfig.stats.histcount[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.stats.snapcount[aKey][itemKey] ~= nil) then
+					if (AuctionConfig.stats.snapcount[aKey][itemKey]) then
 						AuctionConfig.stats.snapcount[aKey][itemKey] = nil;
 					end
 
-					if (AuctionConfig.sbuy[aKey][itemKey] ~= nil) then
+					if (AuctionConfig.sbuy[aKey][itemKey]) then
 						AuctionConfig.sbuy[aKey][itemKey] = nil;
 					end
 
 					local count = 0;
-					while (AuctionConfig.snap[aKey][count] ~= nil) do
+					while (AuctionConfig.snap[aKey][count]) do
 
-						if (AuctionConfig.snap[aKey][count][itemKey] ~= nil) then
+						if (AuctionConfig.snap[aKey][count][itemKey]) then
 							AuctionConfig.snap[aKey][count][itemKey] =nil;
 						end
 						count = count+1;
 					end
 
-					if (Auctioneer_HSPCache[aKey][itemKey] ~= nil) then
+					if (Auctioneer_HSPCache[aKey][itemKey]) then
 						Auctioneer_HSPCache[aKey][itemKey] = nil;
 					end
 
