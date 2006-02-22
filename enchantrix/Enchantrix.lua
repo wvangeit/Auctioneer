@@ -453,8 +453,8 @@ local function MergeDisenchantLists()
 
 	-- Merge items from EnchantedLocal
 	for sig, disenchant in pairs(EnchantedLocal) do
-		local item, suffix = ItemID(sig)
-		if (IsDisenchantable(item)) then
+		local item = ItemID(sig)
+		if (item and IsDisenchantable(item)) then
 			LocalBaseItems[item] = MergeDisenchant(LocalBaseItems[item], disenchant)
 		end
 	end
@@ -475,6 +475,7 @@ local function MergeDisenchantLists()
 end
 
 local function SaveDisenchant(sig, reagentID, count)
+	-- Update tables after a disenchant has been detected
 	assert(type(sig) == "string"); assert(tonumber(reagentID)); assert(tonumber(count))
 
 	local id = ItemID(sig)
@@ -482,7 +483,9 @@ local function SaveDisenchant(sig, reagentID, count)
 	local disenchant = string.format("%d:1:%d:0", reagentID, count)
 	EnchantedLocal[sig] = MergeDisenchant(EnchantedLocal[sig], disenchant)
 	LocalBaseItems[id] = MergeDisenchant(LocalBaseItems[id], disenchant)
-	EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
+	if type then
+		EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
+	end
 end
 
 function Enchantrix_CheckTooltipInfo(frame)
@@ -681,10 +684,12 @@ function Enchantrix_OnUpdate(elapsed)
 	end
 end
 
-function Enchantrix_OnEvent(funcVars, event, argument)
+function Enchantrix_OnEvent(funcVars, event, arg1, arg2)
 
-	if ((event == "SPELLCAST_START") and (argument == _ENCH('ArgSpellname'))) then
+	if ((event == "SPELLCAST_START") and (arg1 == _ENCH('ArgSpellname'))) then
 		DisenchantEvent.started = DisenchantEvent.spellTarget
+		DisenchantEvent.startTime = GetTime()
+		DisenchantEvent.spellDuration = arg2 / 1000  -- Convert ms to s
 		DisenchantEvent.finished = nil
 		return
 	end
@@ -700,16 +705,21 @@ function Enchantrix_OnEvent(funcVars, event, argument)
 	end
 	if (event == "LOOT_OPENED") then
 		if DisenchantEvent.finished then
-			Enchantrix_ChatPrint(string.format(_ENCH("FrmtFound"), DisenchantEvent.finished))
-			local sig = Enchantrix_SigFromLink(DisenchantEvent.finished)
-			for i = 1, GetNumLootItems(), 1 do
-				if LootSlotIsItem(i) then
-					local icon, name, quantity, rarity = GetLootSlotInfo(i)
-					local link = GetLootSlotLink(i)
-					Enchantrix_ChatPrint(string.format("  %s x%d", link, quantity))
-					-- Save result
-					local reagentID = Enchantrix_BreakLink(link)
-					SaveDisenchant(sig, reagentID, quantity)
+			-- Make sure loot windows opens within a few seconds from expected spell completion time
+			-- Normal range of lootLatency appears to be around -0.1 - 0.7s
+			local lootLatency = GetTime() - (DisenchantEvent.startTime + DisenchantEvent.spellDuration)
+			if (lootLatency > -1) and (lootLatency < 2) then
+				Enchantrix_ChatPrint(string.format(_ENCH("FrmtFound"), DisenchantEvent.finished))
+				local sig = Enchantrix_SigFromLink(DisenchantEvent.finished)
+				for i = 1, GetNumLootItems(), 1 do
+					if LootSlotIsItem(i) then
+						local icon, name, quantity, rarity = GetLootSlotInfo(i)
+						local link = GetLootSlotLink(i)
+						Enchantrix_ChatPrint(string.format("  %s x%d", link, quantity))
+						-- Save result
+						local reagentID = Enchantrix_BreakLink(link)
+						SaveDisenchant(sig, reagentID, quantity)
+					end
 				end
 			end
 		end
