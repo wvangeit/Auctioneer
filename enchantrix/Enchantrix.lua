@@ -379,6 +379,8 @@ local function ItemID(sig)
 	if (type(sig) == "string") then
 		local splt = Enchantrix_Split(sig, ":")
 		return tonumber(splt[1]), tonumber(splt[3])
+	elseif (type(sig) == "number") then
+		return sig, 0
 	end
 	return nil
 end
@@ -442,7 +444,7 @@ local function MergeDisenchantLists()
 		-- Hash has changed, update EnchantedBaseItems
 		EnchantedBaseItems = {}
 		for sig, disenchant in pairs(DisenchantList) do
-			local item, suffix = ItemID(sig)
+			local item = ItemID(sig)
 			if (IsDisenchantable(item)) then
 				EnchantedBaseItems[item] = MergeDisenchant(EnchantedBaseItems[item],
 					NormalizeDisenchant(disenchant))
@@ -1212,7 +1214,7 @@ function Enchantrix_GetItemDisenchants(sig, name, useCache)
 				disenchantsTo[dSig].name = dName;
 				disenchantsTo[dSig].pct = pct;
 				disenchantsTo[dSig].rate = count;
-				local mkt = Enchantrix_StaticPrices[itemID];
+				local mkt = Enchantrix_StaticPrices[itemID] or 0
 
 				-- Work out what version if any of Auctioneer is installed
 				local auctVerStr;
