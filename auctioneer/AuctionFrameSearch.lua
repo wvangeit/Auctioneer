@@ -983,9 +983,11 @@ function AuctionFrameSearch_ListItem_OnClick(row)
 			-- Bid or buyout the item.
 			if (frame.resultsType == "BidSearch") then
 				AuctionFrameSearch_BidButton_OnClick(frame.bidButton);
+
 			elseif (frame.resultsType == "BuyoutSearch") then
 				AuctionFrameSearch_BuyoutButton_OnClick(frame.buyoutButton);
 			end
+
 		else
 			-- Search for the item and switch to the Browse tab.
 			BrowseName:SetText(frame.results[row].name)
@@ -1003,6 +1005,14 @@ function AuctionFrameSearch_ListItem_OnClick(row)
 			AuctionFrameBrowse_Search()
 			AuctionFrameTab_OnClick(1);
 		end
+
+	--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for the following codeblocks.
+	elseif (IsControlKeyDown()) then
+		DressUpItemLink(frame.results[row].item);
+
+	elseif (IsShiftKeyDown() and ChatFrameEditBox:IsVisible()) then
+		-- Trim leading whitespace
+		ChatFrameEditBox:Insert(string.gsub(frame.results[row].link, " *(.*)", "%1"));
 	end
 end
 
