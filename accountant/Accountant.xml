@@ -1,0 +1,43 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+<!--
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+-->
+	<Script file="Accountant.lua"/>
+	<Script file="PurchasesDB.lua"/>
+
+	<Frame name="AccountantFrame" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Accountant_OnLoad();
+				this:RegisterEvent("ADDON_LOADED");
+			</OnLoad>
+			<OnEvent>
+				if (event == "ADDON_LOADED" and string.lower(arg1) == "accountant") then
+					Accountant_AddOnLoaded();
+					this:UnregisterEvent("ADDON_LOADED");
+				else
+					Accountant_OnEvent(event);
+				end
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>
+

@@ -50,9 +50,12 @@ function AuctioneerUI_AuctionFrameTab_OnClickHook(_, _, index)
 		index = this:GetID();
 	end
 
-	-- Handle the Auctioneer tabs
+	-- Hide the Auctioneer tabs
 	AuctionFrameSearch:Hide();
 	AuctionFramePost:Hide();
+	AuctionFrameAccountant:Hide();
+	
+	-- Show an Auctioneer tab if its the one clicked
 	local tab = getglobal("AuctionFrameTab"..index);
 	if (tab) then
 		if (tab:GetName() == "AuctionFrameTabSearch") then
@@ -71,6 +74,14 @@ function AuctioneerUI_AuctionFrameTab_OnClickHook(_, _, index)
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
 			AuctionFramePost:Show();
+		elseif (tab:GetName() == "AuctionFrameTabAccountant") then
+			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
+			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
+			AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
+			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
+			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
+			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
+			AuctionFrameAccountant:Show();
 		end
 	end
 end

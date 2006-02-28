@@ -471,6 +471,19 @@ function configureAH()
 		AuctionFrameTabPost:SetID(tabIndex);
 		AuctionFrameTabPost:Show();
 
+		-- Setup the Accountant tab (optional)
+		if (IsAddOnLoaded("Accountant")) then
+			tabIndex = tabIndex + 1;
+			AuctionFrameAccountant:SetParent("AuctionFrame")
+			AuctionFrameAccountant:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
+			relevel(AuctionFrameAccountant);
+			setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabAccountant);
+			AuctionFrameTabAccountant:SetParent("AuctionFrame")
+			AuctionFrameTabAccountant:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
+			AuctionFrameTabAccountant:SetID(tabIndex);
+			AuctionFrameTabAccountant:Show();
+		end
+
 		PanelTemplates_SetNumTabs(AuctionFrame, tabIndex)
 
 		if (not AuctionUI_Hooked) then
