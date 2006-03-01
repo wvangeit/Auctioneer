@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
-	Version: <%version%> (<%codename%>)
+	Version: 3.3.0.0715 (Platypus)
 	Revision: $Id$
 
 	Auctioneer statistical functions.
@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getMeans, getItemSnapshotMedianBuyout, getSnapMedian, getItemHistoricalMedianBuyout, getHistMedian, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
+local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getMed, getMeans, getItemSnapshotMedianBuyout, getSnapMedian, getItemHistoricalMedianBuyout, getHistMedian, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
 
 -- Subtracts/Adds given percentage from/to a value
 
@@ -65,6 +65,59 @@ end
 
 -- Returns the median value of a given table one-dimentional table
 function getMedian(valuesTable)
+
+--  Original getMedian function moved to getMed   getMedian now uses IQR calculations
+--  by Karavirs
+	if (valuesTable == nil) or (type(valuesTable) ~= "table") then
+		return nil   -- make valuesTable a required table argument
+	end
+	if table.getn(valuesTable) == 0 then
+		return 0, 0; -- if there is an empty table, returns median = 0, count = 0
+	end
+
+	local tableSize = table.getn(valuesTable);
+
+	if (tableSize == 1) then
+		return tonumber(valuesTable[1]), 1;
+	end
+
+--  REWORK by Karavirs to use IQR*1.5 to ignore outliers	
+	local median; -- value to return
+	local workTable = {};
+	local workTablelow = {};
+	local workTablehigh ={};
+	local iq1,iq2,iq3, iqr,iqlow,iqhigh; -- iq1 is median 1st quartile iq2 is median of set iq3 is median of 3rd quartile iqr is iq3 - iq1
+	iq2 = getMed(valuesTable);
+
+	-- Get the median of lower half=iq1 and upper half=iq3 of the valuesTable
+	if (math.mod(tableSize, 2) == 0) then --even table size
+		local middleindex = tableSize / 2;
+		for i = 1, middleindex do table.insert(workTablelow,valuesTable[i]) end;
+		iq1=getMed(workTablelow);
+		for i = middleindex + 1 , tableSize do table.insert(workTablehigh,valuesTable[i]) end;
+		iq3=getMed(workTablehigh);
+	else --odd table size
+		local middleIndex = (tableSize + 1) /2;
+		for i = 1 , middleIndex - 1 do table.insert(workTablelow,valuesTable[i]) end;
+		iq1 = getMed(workTablelow);
+		for i = middleIndex + 1 , tableSize do table.insert(workTablehigh,valuesTable[i]) end;
+		iq3 = getMed(workTablehigh);
+	end
+	iqr = (iq3 - iq1) * 1.5
+	iqlow = iq1 - iqr
+	iqhigh = iq3 + iqr
+	-- Now evaluate the values in the table to determine if they are outliers if so drop from table for true median
+	for i = 1 , tableSize do
+		if tonumber(valuesTable[i])>iqlow and tonumber(valuesTable[i])<iqhigh then table.insert(workTable,valuesTable[i]) end;
+	end
+
+	median = getMed(workTable)
+	
+	return tonumber(median), tableSize or 0;
+end
+
+-- Returns the median value of a given table one-dimentional table
+function getMed(valuesTable)
 	if (valuesTable == nil) or (type(valuesTable) ~= "table") then
 		return nil   -- make valuesTable a required table argument
 	end
@@ -95,6 +148,7 @@ function getMedian(valuesTable)
 
 	return tonumber(median), tableSize or 0;
 end
+
 
 -- Return all of the averages for an item
 -- Returns: avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,aCount
