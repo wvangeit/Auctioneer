@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
-	Version: 3.3.0.0715 (Platypus)
+	Version: <%version%> (<%codename%>) 
 	Revision: $Id$
 
 	Auctioneer statistical functions.
