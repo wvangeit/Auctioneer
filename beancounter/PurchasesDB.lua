@@ -764,6 +764,7 @@ function stringFromNilSafeString(nilSafeString)
 	return nilSafeString;
 end
 
+--[[
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function testme()
@@ -824,11 +825,12 @@ function testme2()
 	printCompletedBids();
 	printPurchases();
 end
+--]]
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Accountant.Purchases = 
+BeanCounter.Purchases = 
 {
 	AddPendingBid = addPendingBid;
 	AddSuccessfulBid = addSuccessfulBid;

@@ -18,9 +18,9 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="AuctionFrameAccountant.lua"/>
+	<Script file="AuctionFrameTransactions.lua"/>
 
-	<Frame name="AccountantSearchTemplate" virtual="true">
+	<Frame name="TransactionsSearchTemplate" virtual="true">
 		<Anchors>
 			<Anchor point="TOPLEFT">
 				<Offset>
@@ -33,7 +33,7 @@
 		</Size>
 	</Frame>
 
-	<Frame name="AuctionFrameAccountant" inherits="AuctionFrameTemplate" hidden="true">
+	<Frame name="AuctionFrameTransactions" inherits="AuctionFrameTemplate" hidden="true">
 		<Layers>
 			<Layer level="BACKGROUND">
 				<FontString name="$parentTitle" inherits="GameFontNormal">
@@ -60,7 +60,7 @@
 		</Layers>
 		<Frames>
 			<!-- Transaction Search Frame -->
-			<Frame name="$parentTransactions" inherits="AccountantSearchTemplate">
+			<Frame name="$parentTransactions" inherits="TransactionsSearchTemplate">
 				<Layers>
 					<Layer level="ARTWORK">
 						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
@@ -114,8 +114,8 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
-						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(this:GetName().."SearchText"):SetText(_BC('UiSearchForLabel'));
+						getglobal(this:GetName().."SearchButton"):SetText(_BC('UiSearch'));
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -309,17 +309,17 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				getglobal(this:GetName().."Title"):SetText(_AUCT('UiAccountant'));
-				getglobal(this:GetName().."TabText"):SetText(_AUCT('UiSearch'));
-				AuctionFrameAccountant_OnLoad();
+				getglobal(this:GetName().."Title"):SetText(_BC('UiTransactions'));
+				getglobal(this:GetName().."TabText"):SetText(_BC('UiSearch'));
+				AuctionFrameTransactions_OnLoad();
 			</OnLoad>
 		</Scripts>
 	</Frame>
 
-	<Button name="AuctionFrameTabAccountant" inherits="AuctionTabTemplate" hidden="true">
+	<Button name="AuctionFrameTabTransactions" inherits="AuctionTabTemplate" hidden="true">
 		<Scripts>
 			<OnLoad>
-				this:SetText(_AUCT('UiAccountant'));
+				this:SetText(_BC('UiTransactions'));
 			</OnLoad>
 		</Scripts>
 	</Button>

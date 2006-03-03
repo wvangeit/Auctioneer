@@ -4,7 +4,7 @@
 ## Interface: 10900
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Informant, Accountant, Khaos, ImprovedErrorFrame
+## OptionalDeps: Informant, Khaos, ImprovedErrorFrame
 ## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
 ##
 ## Version: <%version%> (<%codename%>)
@@ -24,4 +24,3 @@ AuctioneerUI.xml
 ListTemplate.xml
 AuctionFrameSearch.xml
 AuctionFramePost.xml
-AuctionFrameAccountant.xml

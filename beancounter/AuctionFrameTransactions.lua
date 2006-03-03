@@ -1,5 +1,5 @@
 --[[
-	Auctioneer Addon for World of Warcraft(tm).
+	BeanCounter Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
@@ -23,9 +23,9 @@
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFrameAccountant_OnLoad()
+function AuctionFrameTransactions_OnLoad()
 	-- Methods
-	this.SearchTransactions = AuctionFrameAccountant_SearchTransactions;
+	this.SearchTransactions = AuctionFrameTransactions_SearchTransactions;
 
 	-- Controls
 	this.resultsList = getglobal(this:GetName().."List");
@@ -38,15 +38,23 @@ function AuctionFrameAccountant_OnLoad()
 	{
 		Date =
 		{
-			title = _AUCT("UiDate");
+			title = _BC("UiDate");
 			dataType = "String";
-			valueFunc = (function(record) return date("%c", record.date) end);
+			valueFunc = (function(record) return date("%x", record.date) end);
 			compareAscendingFunc = (function(record1, record2) return record1.date < record2.date end);
 			compareDescendingFunc = (function(record1, record2) return record1.date > record2.date end);
 		},
+		Type =
+		{
+			title = _BC("UiTypeHeader");
+			dataType = "String";
+			valueFunc = (function(record) return record.transaction end);
+			compareAscendingFunc = (function(record1, record2) return record1.transaction < record2.transaction end);
+			compareDescendingFunc = (function(record1, record2) return record1.transaction > record2.transaction end);
+		},
 		Quantity =
 		{
-			title = _AUCT("UiQuantityHeader");
+			title = _BC("UiQuantityHeader");
 			dataType = "Number";
 			valueFunc = (function(record) return record.count end);
 			compareAscendingFunc = (function(record1, record2) return record1.count < record2.count end);
@@ -54,16 +62,16 @@ function AuctionFrameAccountant_OnLoad()
 		},
 		Name =
 		{
-			title = _AUCT("UiNameHeader");
+			title = _BC("UiNameHeader");
 			dataType = "String";
 			valueFunc = (function(record) return record.name end);
-			colorFunc = AuctionFrameAccountant_GetItemColor;
+			colorFunc = AuctionFrameTransactions_GetItemColor;
 			compareAscendingFunc = (function(record1, record2) return record1.name < record2.name end);
 			compareDescendingFunc = (function(record1, record2) return record1.name > record2.name end);
 		},
 		Net =
 		{
-			title = _AUCT("UiNetHeader");
+			title = _BC("UiNetHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.net end);
 			compareAscendingFunc = (function(record1, record2) return record1.net < record2.net end);
@@ -71,7 +79,7 @@ function AuctionFrameAccountant_OnLoad()
 		},
 		NetPer =
 		{
-			title = _AUCT("UiNetPerHeader");
+			title = _BC("UiNetPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.netPer end);
 			compareAscendingFunc = (function(record1, record2) return record1.netPer < record2.netPer end);
@@ -79,7 +87,7 @@ function AuctionFrameAccountant_OnLoad()
 		},
 		Price =
 		{
-			title = _AUCT("UiPriceHeader");
+			title = _BC("UiPriceHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.price end);
 			compareAscendingFunc = (function(record1, record2) return record1.price < record2.price end);
@@ -87,7 +95,7 @@ function AuctionFrameAccountant_OnLoad()
 		},
 		PricePer =
 		{
-			title = _AUCT("UiPricePerHeader");
+			title = _BC("UiPricePerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.pricePer end);
 			compareAscendingFunc = (function(record1, record2) return record1.pricePer < record2.pricePer end);
@@ -95,7 +103,7 @@ function AuctionFrameAccountant_OnLoad()
 		},
 		BuyerSeller =
 		{
-			title = _AUCT("UiBuyerSellerHeader");
+			title = _BC("UiBuyerSellerHeader");
 			dataType = "String";
 			valueFunc = (function(record) return record.player end);
 			compareAscendingFunc = (function(record1, record2) return record1.player < record2.player end);
@@ -107,9 +115,15 @@ function AuctionFrameAccountant_OnLoad()
 	this.transactionSearchPhysicalColumns =
 	{
 		{
-			width = 140;
+			width = 80;
 			logicalColumn = this.logicalColumns.Date;
 			logicalColumns = { this.logicalColumns.Date };
+			sortAscending = true;
+		},
+		{
+			width = 60;
+			logicalColumn = this.logicalColumns.Type;
+			logicalColumns = { this.logicalColumns.Type };
 			sortAscending = true;
 		},
 		{
@@ -151,15 +165,16 @@ end
 -------------------------------------------------------------------------------
 -- Perform a transaction search
 -------------------------------------------------------------------------------
-function AuctionFrameAccountant_SearchTransactions(frame, itemName)
+function AuctionFrameTransactions_SearchTransactions(frame, itemName)
 	-- Create the content from purhcases database.
 	frame.results = {};
 	if (itemName) then
-		local purchases = Accountant.Purchases.GetPurchasesForItem(itemName);
+		local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemName);
 		if (purchases) then
 			for purchaseIndex in purchases do
 				local purchase = {};
 				purchase.date = purchases[purchaseIndex].time;
+				purchase.transaction = "Buy"; --_BC('UiBuyTransaction');
 				purchase.count = purchases[purchaseIndex].quantity;
 				purchase.name = itemName;
 				purchase.price = purchases[purchaseIndex].cost;
@@ -171,11 +186,12 @@ function AuctionFrameAccountant_SearchTransactions(frame, itemName)
 			end
 		end
 	else
-		local itemNames = Accountant.Purchases.GetPurchasedItems();
+		local itemNames = BeanCounter.Purchases.GetPurchasedItems();
 		for itemNameIndex in itemNames do
-			local purchases = Accountant.Purchases.GetPurchasesForItem(itemNames[itemNameIndex]);
+			local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemNames[itemNameIndex]);
 			for purchaseIndex in purchases do
 				local purchase = {};
+				purchase.transaction = "Buy"; --_BC('UiBuyTransaction');
 				purchase.date = purchases[purchaseIndex].time;
 				purchase.count = purchases[purchaseIndex].quantity;
 				purchase.name = itemNames[itemNameIndex];

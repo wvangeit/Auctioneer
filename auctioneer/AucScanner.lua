@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local processLink, invalidateAHSnapshot, auctionStartHook, finishedAuctionScanHook, auctionEntryHook, startAuction, placeAuctionBid, relevel, configureAH, auctionFrameFiltersUpdateClasses, rememberPrice, auctionsClear, auctionsSetWarn, auctionsSetLine, newAuction, auctHouseShow, auctHouseClose, auctHouseUpdate, filterButtonSetType, onChangeAuctionDuration, setAuctionDuration
+local processLink, invalidateAHSnapshot, auctionStartHook, finishedAuctionScanHook, auctionEntryHook, startAuction, placeAuctionBid, relevel, configureAH, insertAHTab, auctionFrameFiltersUpdateClasses, rememberPrice, auctionsClear, auctionsSetWarn, auctionsSetLine, newAuction, auctHouseShow, auctHouseClose, auctHouseUpdate, filterButtonSetType, onChangeAuctionDuration, setAuctionDuration
 
 -- Hook into this function if you want notification when we find a link.
 function processLink(link)
@@ -444,53 +444,69 @@ function configureAH()
 		AuctionFrameFilters_UpdateClasses()
 		lAHConfigPending = nil
 
-		-- Find the index of the first unused AuctionHouse tab
+		-- Count the number of auction house tabs
+		local tabCount = 0;
+		while (getglobal("AuctionFrameTab"..(tabCount + 1)) ~= nil) do
+			tabCount = tabCount + 1;
+		end
+		
+		-- Find the correct location to insert our Search Auctions and Post Auctions
+		-- tabs. We want to insert them at the end or before BeanCounter's
+		-- Transactions tab.
 		local tabIndex = 1;
-		while (getglobal("AuctionFrameTab"..tabIndex) ~= nil) do
+		while (getglobal("AuctionFrameTab"..(tabIndex)) ~= nil and 
+			   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
 			tabIndex = tabIndex + 1;
 		end
-
-		-- Setup the Search Auctions tab
-		AuctionFrameSearch:SetParent("AuctionFrame")
-		AuctionFrameSearch:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
-		relevel(AuctionFrameSearch);
-		setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabSearch);
-		AuctionFrameTabSearch:SetParent("AuctionFrame")
-		AuctionFrameTabSearch:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
-		AuctionFrameTabSearch:SetID(tabIndex);
-		AuctionFrameTabSearch:Show();
-
-		-- Setup the Post Auctions tab
-		tabIndex = tabIndex + 1;
-		AuctionFramePost:SetParent("AuctionFrame")
-		AuctionFramePost:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
-		relevel(AuctionFramePost);
-		setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabPost);
-		AuctionFrameTabPost:SetParent("AuctionFrame")
-		AuctionFrameTabPost:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
-		AuctionFrameTabPost:SetID(tabIndex);
-		AuctionFrameTabPost:Show();
-
-		-- Setup the Accountant tab (optional)
-		if (IsAddOnLoaded("Accountant")) then
-			tabIndex = tabIndex + 1;
-			AuctionFrameAccountant:SetParent("AuctionFrame")
-			AuctionFrameAccountant:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
-			relevel(AuctionFrameAccountant);
-			setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabAccountant);
-			AuctionFrameTabAccountant:SetParent("AuctionFrame")
-			AuctionFrameTabAccountant:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
-			AuctionFrameTabAccountant:SetID(tabIndex);
-			AuctionFrameTabAccountant:Show();
-		end
-
-		PanelTemplates_SetNumTabs(AuctionFrame, tabIndex)
+		insertAHTab(tabIndex, AuctionFrameTabSearch, AuctionFrameSearch);
+		insertAHTab(tabIndex + 1, AuctionFrameTabPost, AuctionFramePost);
 
 		if (not AuctionUI_Hooked) then
 			Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, AuctioneerUI_AuctionFrameTab_OnClickHook)
 			AuctionUI_Hooked = true
 		end
 	end
+end
+
+function insertAHTab(tabIndex, tabButton, tabFrame)
+	-- Count the number of auction house tabs (including the tab we are going
+	-- to insert).
+	local tabCount = 1;
+	while (getglobal("AuctionFrameTab"..(tabCount)) ~= nil) do
+		tabCount = tabCount + 1;
+	end
+	
+	-- Adjust the tabIndex to fit within the current tab count.
+	if (tabIndex < 1 or tabIndex > tabCount) then
+		tabIndex = tabCount;
+	end
+	
+	-- Make room for the tab, if needed.
+	for index = tabCount, tabIndex + 1, -1  do
+		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
+		getglobal("AuctionFrameTab"..(index)):SetID(index);
+	end
+	
+	-- Configure the frame.
+	tabFrame:SetParent("AuctionFrame");
+	tabFrame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0);
+	relevel(tabFrame);
+
+	-- Configure the tab button.	
+	setglobal("AuctionFrameTab"..tabIndex, tabButton);
+	tabButton:SetParent("AuctionFrame");
+	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
+	tabButton:SetID(tabIndex);
+	tabButton:Show();
+
+	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
+	if (tabIndex < tabCount) then
+		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
+		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
+	end
+	
+	-- Update the tab count.
+	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end
 
 function auctionFrameFiltersUpdateClasses() --Auctioneer_AuctionFrameFilters_UpdateClasses
