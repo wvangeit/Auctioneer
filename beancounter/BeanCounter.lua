@@ -142,6 +142,7 @@ function BeanCounter_AddOnLoaded()
 	
 	-- Initialize our various modules.
 	MailMonitor_OnLoad();
+	BidMonitor_OnLoad();
 	
 	-- Hello world!
 	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));

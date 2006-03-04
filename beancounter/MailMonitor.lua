@@ -25,7 +25,6 @@
 -- Function Imports
 -------------------------------------------------------------------------------
 local nilSafe = BeanCounter.NilSafe;
-local debugPrint = BeanCounter.DebugPrint;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -39,6 +38,7 @@ local isSubjectAuctionWon;
 local isSubjectAuctionSuccessful;
 local isSubjectOutbidOn;
 local getItemNameFromSubject;
+local debugPrint;
 
 local InboxTask_OnEvent;
 local InboxTask_Execute;
@@ -386,6 +386,12 @@ function getItemNameFromSubject(subject)
 		itemName = strsub(subject, strfind(subject, OUTBID_ON) + strlen(OUTBID_ON));
 	end
 	return itemName;
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function debugPrint(message)
+	BeanCounter.DebugPrint("[BeanCounter.MailMonitor] "..message);
 end
 
 -------------------------------------------------------------------------------

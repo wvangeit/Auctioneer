@@ -24,7 +24,6 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
-local debugPrint = EnhTooltip.DebugPrint;
 local chatPrint = BeanCounter.ChatPrint;
 
 -------------------------------------------------------------------------------
@@ -67,6 +66,7 @@ local stringFromNumber;
 local numberFromString;
 local nilSafeStringFromString;
 local stringFromNilSafeString;
+local debugPrint;
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -84,11 +84,6 @@ local NIL_VALUE = "<nil>";
 -------------------------------------------------------------------------------
 function addPendingBid(item, quantity, bid, seller, isBuyout)
 	if (item and quantity and bid) then
-		-- If its a buyout, record a purchase now.
-		if (isBuyout) then
-			addPurchase(time(), item, quantity, bid, seller, isBuyout, true);
-		end
-
 		-- Create a packed record.
 		local pendingBid = {};
 		pendingBid.time = time();
@@ -103,7 +98,7 @@ function addPendingBid(item, quantity, bid, seller, isBuyout)
 		table.insert(pendingBidsTable, packedPendingBid);
 
 		-- Debugging noise.
-		debugPrint("[Purchases] Added pending bid: "..date("%c", pendingBid.time)..", "..item..", "..pendingBid.quantity..", "..pendingBid.bid..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout));
+		debugPrint("Added pending bid: "..date("%c", pendingBid.time)..", "..item..", "..pendingBid.quantity..", "..pendingBid.bid..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout));
 	else
 		debugPrint("Invalid call to addPendingBid()");
 	end
@@ -232,7 +227,7 @@ function addCompletedBid(item, quantity, bid, seller, isBuyout, isSuccessful)
 			-- Add the completed bid to the table.
 			local completedBids = getCompletedBidsTableForItem(item);
 			table.insert(completedBids, packedCompletedBid);
-			debugPrint("[Purchases] Added completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..nilSafeStringFromString(completedBid.seller)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isSuccessful)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
+			debugPrint("Added completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..nilSafeStringFromString(completedBid.seller)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isSuccessful)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
 
 			-- Attmept to reconcile bids for this item.
 			reconcileBids(item);
@@ -328,7 +323,7 @@ function addPurchase(time, item, quantity, cost, seller, isBuyout)
 		table.insert(purchasesTable, packedPurchase);
 
 		-- Debugging noise.
-		debugPrint("[Purchases] Added purchase: "..date("%c", purchase.time)..", "..item..", "..purchase.quantity..", "..purchase.cost..", "..nilSafeStringFromString(purchase.seller)..", "..stringFromBoolean(purchase.isBuyout));
+		debugPrint("Added purchase: "..date("%c", purchase.time)..", "..item..", "..purchase.quantity..", "..purchase.cost..", "..nilSafeStringFromString(purchase.seller)..", "..stringFromBoolean(purchase.isBuyout));
 	else
 		debugPrint("Invalid call to addPurchase()");
 	end
@@ -432,7 +427,7 @@ end
 -- Attempts to match completed bids with pending bids
 -------------------------------------------------------------------------------
 function reconcileBids(item)
-	debugPrint("[Purchases] -- Begin reconciling bids for "..item.."--");
+	debugPrint("-- Begin reconciling bids for "..item.."--");
 
 	-- Now attempt to reconcile bids by either quantity or bid.
 	local index = 1;
@@ -462,14 +457,14 @@ function reconcileBids(item)
 		end
 	end
 
-	debugPrint("[Purchases] -- End reconciling bids for "..item.." --");
+	debugPrint("-- End reconciling bids for "..item.." --");
 end
 
 -------------------------------------------------------------------------------
 -- Attempts to reconcile bids by quantity
 -------------------------------------------------------------------------------
 function reconcileBidsByQuantity(item, quantity)
-	debugPrint("[Purchases] reconcileBidsByQuantity("..item..", "..quantity..")");
+	debugPrint("reconcileBidsByQuantity("..item..", "..quantity..")");
 	local reconciled = false;
 
 	-- Get all the pending bids matching the quantity
@@ -481,7 +476,7 @@ function reconcileBidsByQuantity(item, quantity)
 			table.insert(pendingBidIndicies, index);
 		end
 	end
-	debugPrint("[Purchases] "..table.getn(pendingBidIndicies).." matching pending bids");
+	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
 	
 	-- Get all the completed bids matching the quantity
 	local completedBidIndicies = {};
@@ -492,7 +487,7 @@ function reconcileBidsByQuantity(item, quantity)
 			table.insert(completedBidIndicies, index);
 		end
 	end
-	debugPrint("[Purchases] "..table.getn(completedBidIndicies).." matching completed bids");
+	debugPrint(table.getn(completedBidIndicies).." matching completed bids");
 	
 	-- We can reconcile all the bids if the number of bids match. Otherwise
 	-- we can reconcile some of the bids if all of the pending bids match.
@@ -531,7 +526,7 @@ end
 -- Attempts to reconcile bids by bid
 -------------------------------------------------------------------------------
 function reconcileBidsByBid(item, bid)
-	debugPrint("[Purchases] reconcileBidsByBid("..item..", "..bid..")");
+	debugPrint("reconcileBidsByBid("..item..", "..bid..")");
 	local reconciled = false;
 
 	-- Get all the pending bids matching the bid
@@ -543,7 +538,7 @@ function reconcileBidsByBid(item, bid)
 			table.insert(pendingBidIndicies, index);
 		end
 	end
-	debugPrint("[Purchases] "..table.getn(pendingBidIndicies).." matching pending bids");
+	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
 	
 	-- Get all the completed bids matching the bid
 	local completedBidIndicies = {};
@@ -554,7 +549,7 @@ function reconcileBidsByBid(item, bid)
 			table.insert(completedBidIndicies, index);
 		end
 	end
-	debugPrint("[Purchases] "..table.getn(pendingBidIndicies).." matching completed bids");
+	debugPrint(table.getn(pendingBidIndicies).." matching completed bids");
 	
 	-- We can reconcile all the bids if the number of bids match
 	if (table.getn(pendingBidIndicies) == table.getn(completedBidIndicies)) then
@@ -617,7 +612,7 @@ function reconcileMatchingBidList(item, pendingBidsTable, pendingBidIndicies, co
 		table.remove(completedBids, 1);
 		local completedBidTablesIndex = completedBid.index;
 		table.remove(completedBidsTable, completedBidTablesIndex);
-		debugPrint("[Purchases] Removed completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
+		debugPrint("Removed completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
 
 		-- Update the remaining completed bid indicies.
 		for index in completedBids do
@@ -650,7 +645,7 @@ function reconcileMatchingBidList(item, pendingBidsTable, pendingBidIndicies, co
 			table.remove(pendingBids, pendingBidIndex);
 			local pendingBidsTableIndex = pendingBid.index;
 			table.remove(pendingBidsTable, pendingBidsTableIndex);
-			debugPrint("[Purchases] Removed pending bid: "..date("%c", pendingBid.time)..", "..item..", "..stringFromNumber(pendingBid.quantity)..", "..stringFromNumber(pendingBid.bid)..", "..stringFromBoolean(pendingBid.isBuyout));
+			debugPrint("Removed pending bid: "..date("%c", pendingBid.time)..", "..item..", "..stringFromNumber(pendingBid.quantity)..", "..stringFromNumber(pendingBid.bid)..", "..stringFromBoolean(pendingBid.isBuyout));
 
 			-- Update the remaining pending bid indicies.
 			for index in pendingBids do
@@ -679,7 +674,7 @@ function resetDatabase()
 	AHPurchases.PendingBids = {};
 	AHPurchases.CompletedBids = {};
 	AHPurchases.Purchases = {};
-	debugPrint("[Purchases] Reset Database");
+	debugPrint("Reset Database");
 end
 
 -------------------------------------------------------------------------------
@@ -768,6 +763,12 @@ function stringFromNilSafeString(nilSafeString)
 		return nil;
 	end
 	return nilSafeString;
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function debugPrint(message)
+	BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..message);
 end
 
 --[[
