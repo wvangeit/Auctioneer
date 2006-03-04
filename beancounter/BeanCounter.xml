@@ -23,6 +23,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="BeanCounterLocale.lua"/>
 
 	<Script file="BeanCounter.lua"/>
+	<Script file="MailMonitor.lua"/>
 	<Script file="PurchasesDB.lua"/>
 
 	<Frame name="BeanCounterFrame" hidden="true">
@@ -35,5 +36,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnEvent>
 		</Scripts>
 	</Frame>
+
 </Ui>
 

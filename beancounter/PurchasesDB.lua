@@ -22,11 +22,10 @@
 --]]
 
 -------------------------------------------------------------------------------
--- Data Members
+-- Function Imports
 -------------------------------------------------------------------------------
-AHPurchases = {};
-
-local NIL_VALUE = "<nil>";
+local debugPrint = EnhTooltip.DebugPrint;
+local chatPrint = BeanCounter.ChatPrint;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -68,6 +67,13 @@ local stringFromNumber;
 local numberFromString;
 local nilSafeStringFromString;
 local stringFromNilSafeString;
+
+-------------------------------------------------------------------------------
+-- Data Members
+-------------------------------------------------------------------------------
+AHPurchases = {};
+
+local NIL_VALUE = "<nil>";
 
 --=============================================================================
 -- Pending Bids functions
