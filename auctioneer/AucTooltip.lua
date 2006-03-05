@@ -35,6 +35,8 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		return;
 	end;
 
+	if EnhTooltip.LinkType(link) ~= "item" then return end
+
 	local auctKey = Auctioneer.Util.GetAuctionKey();
 
 	-- initialize local variables

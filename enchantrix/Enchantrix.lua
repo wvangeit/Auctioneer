@@ -272,6 +272,17 @@ local function roundup(m, n)
 	return math.ceil(m / n) * n
 end
 
+local function digits(m, n)
+	-- Round m to n digits
+	if m == 0 then
+		return 0
+	elseif m < 0 then
+		return -digits(-m, n)
+	end
+	local d = 10^(n - math.floor(math.log10(m)) - 1)
+	return math.floor(m * d + 0.5) / d
+end
+
 local function Unserialize(str)
 	-- Break up a disenchant string to a table for easy manipulation
 	local tbl = {}
@@ -322,16 +333,22 @@ end
 local function NormalizeDisenchant(str)
 	-- Divide all counts in disenchant string by gcd
 	local div = 0
+	local count = 0
 	local tbl = Unserialize(str)
 	for id in tbl do
 		div = gcd(div, tbl[id][N_DISENCHANTS])
 		div = gcd(div, tbl[id][N_REAGENTS])
+		count = count + 1
 	end
-	for id in tbl do
-		tbl[id][N_DISENCHANTS] = tbl[id][N_DISENCHANTS] / div
-		tbl[id][N_REAGENTS] = tbl[id][N_REAGENTS] / div
+	-- Only normalize if there's more than one kind of reagent
+	if count > 1 then
+		for id in tbl do
+			tbl[id][N_DISENCHANTS] = tbl[id][N_DISENCHANTS] / div
+			tbl[id][N_REAGENTS] = tbl[id][N_REAGENTS] / div
+		end
+		return Serialize(tbl)
 	end
-	return Serialize(tbl)
+	return str
 end
 
 local function CleanupDisenchant(str, id)
@@ -518,6 +535,8 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		return;
 	end;
 
+	if EnhTooltip.LinkType(link) ~= "item" then return end
+
 	local embed = Enchantrix_GetFilter('embed');
 
 	local sig = Enchantrix_SigFromLink(link);
@@ -566,15 +585,15 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			local confidence = totals.conf;
 
 			if (Enchantrix_GetFilter('valuate-hsp') and totals.hspValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totals.hspValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), digits(totals.hspValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix_GetFilter('valuate-median') and totals.medValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totals.medValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), digits(totals.medValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix_GetFilter('valuate-baseline') and totals.mktValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totals.mktValue * confidence, embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), digits(totals.mktValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 		end

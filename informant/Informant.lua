@@ -354,6 +354,8 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		return;
 	end;
 
+	if EnhTooltip.LinkType(link) ~= "item" then return end
+
 	local quant = 0
 	local sell = 0
 	local buy = 0

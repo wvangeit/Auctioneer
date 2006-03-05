@@ -96,6 +96,9 @@ You may use the following methods of the EnhTooltip class:
 		Given a hyperlink, a numerical quality and an item name, does it's best to fabricate
 		as authentic a link as it can. This link may not be suitable for messaging however.
 
+	EnhTooltip.LinkType(link)
+		Given a link, returns the type of link (eg: "item", "enchant")
+
 	EnhTooltip.AddHook(hookType, hookFunc, position)
 		Allows dependant addons to register a function for inclusion at key moments.
 		Where:
@@ -627,8 +630,8 @@ end
 
 function lineQuality(quality)
 	if ( quality ) then
-		local color = ITEM_QUALITY_COLORS[quality]
-		lineColor(color.r, color.g, color.b)
+		local r, g, b = GetItemQualityColor(quality)
+		lineColor(r, g, b)
 	else
 		lineColor(1.0, 1.0, 1.0)
 	end
@@ -688,6 +691,14 @@ function checkHide()
 	end
 end
 
+function linkType(link)
+	if type(link) ~= "string" then
+		return nil
+	end
+	local _, _, linktype = string.find(link, "|H(%a+):")
+	return linktype
+end
+
 function nameFromLink(link)
 	local name
 	if( not link ) then
@@ -723,16 +734,15 @@ function baselinkFromLink(link)
 end
 
 function qualityFromLink(link)
-	local color
 	if (not link) then return nil end
-	_, _, color = string.find(link, "|c(%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
-	if (color) then
-		if (color == "ffff8000") then return 5;--[[ Legendary ]] end
-		if (color == "ffa335ee") then return 4;--[[ Epic ]] end
-		if (color == "ff0070dd") then return 3;--[[ Rare ]] end
-		if (color == "ff1eff00") then return 2;--[[ Uncommon ]] end
-		if (color == "ffffffff") then return 1;--[[ Common ]] end
-		if (color == "ff9d9d9d") then return 0;--[[ Poor ]] end
+	local _, _, color = string.find(link, "(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
+	if color then
+		for i = 0, 5, 1 do
+			local _, _, _, hex = GetItemQualityColor(i)
+			if color == hex then
+				return q
+			end
+		end
 	end
 	return -1
 end
@@ -742,16 +752,11 @@ function fakeLink(hyperlink, quality, name)
 	if not hyperlink then
 		return nil
 	end
-	if (quality == nil) then quality = -1 end
-	if (name == nil) then name = "unknown" end
-	local color = "ffffff"
-	if (quality == 5) then color = "ff8000"
-	elseif (quality == 4) then color = "a335ee"
-	elseif (quality == 3) then color = "0070dd"
-	elseif (quality == 2) then color = "1eff00"
-	elseif (quality == 0) then color = "9d9d9d"
-	end
-	return "|cff"..color.. "|H"..hyperlink.."|h["..name.."]|h|r"
+	local sName, sLink, iQuality = GetItemInfo(hyperlink)
+	if (quality == nil) then quality = iQuality or -1 end
+	if (name == nil) then name = sName or "unknown" end
+	local _, _, _, color = GetItemQualityColor(quality)
+	return color.. "|H"..hyperlink.."|h["..name.."]|h|r"
 end
 
 function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
@@ -1367,6 +1372,7 @@ EnhTooltip = {
 	HyperlinkFromLink	= hyperlinkFromLink,
 	NameFromLink		= nameFromLink,
 	QualityFromLink		= qualityFromLink,
+	LinkType			= linkType,
 
 	SetMoneySpacing		= setMoneySpacing,
 	SetPopupKey			= setPopupKey,
