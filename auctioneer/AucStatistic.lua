@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
-	Version: <%version%> (<%codename%>) 
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
 	Auctioneer statistical functions.
@@ -81,7 +81,7 @@ function getMedian(valuesTable)
 		return tonumber(valuesTable[1]), 1;
 	end
 
---  REWORK by Karavirs to use IQR*1.5 to ignore outliers	
+--  REWORK by Karavirs to use IQR*1.5 to ignore outliers
 	local median; -- value to return
 	local workTable = {};
 	local workTablelow = {};
@@ -112,7 +112,7 @@ function getMedian(valuesTable)
 	end
 
 	median = getMed(workTable)
-	
+
 	return tonumber(median), tableSize or 0;
 end
 
