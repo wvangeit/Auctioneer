@@ -737,10 +737,10 @@ function qualityFromLink(link)
 	if (not link) then return nil end
 	local _, _, color = string.find(link, "(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
 	if color then
-		for i = 0, 5, 1 do
+		for i = 0, 6 do
 			local _, _, _, hex = GetItemQualityColor(i)
 			if color == hex then
-				return q
+				return i
 			end
 		end
 	end
