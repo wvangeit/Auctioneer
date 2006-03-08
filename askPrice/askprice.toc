@@ -1,0 +1,11 @@
+## Interface: 1800
+## Title: askPrice
+## Title-enGB: askPrice
+## Author: Moktark
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## Notes: Mok's askPrice
+## SavedVariables: AP_ShowVendor, AP_guild, AP_party, AP_smartWords, AP_ad
+localization.lua
+askprice.lua
+askprice.xml

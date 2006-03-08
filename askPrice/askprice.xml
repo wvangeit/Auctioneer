@@ -1,0 +1,18 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+<Frame name="askPrice" toplevel="false" hidden="true" parent="UIParent">
+ 
+    <Scripts>
+
+		<OnLoad>
+			<!-- DEFAULT_CHAT_FRAME:AddMessage("STAAAARRT"); -->
+
+			askPrice_onLoad();
+		</OnLoad>
+		<OnEvent>
+			askPrice_onEvent();
+		</OnEvent>
+    </Scripts>
+</Frame>
+ 
+</Ui>
