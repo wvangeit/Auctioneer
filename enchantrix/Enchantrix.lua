@@ -543,7 +543,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 
 	-- Check for disenchantable target
 	local itemID = Enchantrix_BreakLink(link)
-	if (itemID == 0 or not IsDisenchantable(itemID)) then
+	if (not itemID or itemID == 0 or not IsDisenchantable(itemID)) then
 		return
 	end
 
@@ -739,7 +739,9 @@ function Enchantrix_OnEvent(funcVars, event, arg1, arg2)
 						Enchantrix_ChatPrint(string.format("  %s x%d", link, quantity))
 						-- Save result
 						local reagentID = Enchantrix_BreakLink(link)
-						SaveDisenchant(sig, reagentID, quantity)
+						if reagentID then
+							SaveDisenchant(sig, reagentID, quantity)
+						end
 					end
 				end
 			end
@@ -1326,6 +1328,9 @@ function Enchantrix_GetItemDisenchants(sig, name, useCache)
 end
 
 function Enchantrix_BreakLink(link)
+	if type(link) ~= "string" then
+		return nil
+	end
 	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name;
 end
