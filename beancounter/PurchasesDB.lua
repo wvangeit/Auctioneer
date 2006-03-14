@@ -33,6 +33,8 @@ local addPendingBid;
 local packPendingBid;
 local unpackPendingBid;
 local getPendingBidsTableForItem;
+local getPendingBidItems;
+local getPendingBidsForItem;
 local isPendingBid;
 local printPendingBids;
 
@@ -94,7 +96,7 @@ function addPendingBid(item, quantity, bid, seller, isBuyout)
 		local packedPendingBid = packPendingBid(pendingBid);
 
 		-- Add the pending bid to the table.
-		local pendingBidsTable = getPendingBidsTableForItem(item);
+		local pendingBidsTable = getPendingBidsTableForItem(item, true);
 		table.insert(pendingBidsTable, packedPendingBid);
 
 		-- Debugging noise.
@@ -133,18 +135,54 @@ end
 -- Gets the pending bids table for the specified item. The table contains
 -- packed records.
 -------------------------------------------------------------------------------
-function getPendingBidsTableForItem(item)
+function getPendingBidsTableForItem(item, create)
 	local pendingBidsTable = AHPurchases.PendingBids;
 	if (pendingBidsTable == nil) then
 		pendingBidsTable = {};
 		AHPurchases.PendingBids = pendingBidsTable;
 	end
+
+	-- Get the table for the item. Create or delete if appropriate.
 	local pendingBidsForItemTable = pendingBidsTable[item];
-	if (pendingBidsForItemTable == nil) then
+	if (pendingBidsForItemTable == nil and create) then
 		pendingBidsForItemTable = {};
 		pendingBidsTable[item] = pendingBidsForItemTable;
+	elseif (pendingBidsForItemTable and table.getn(pendingBidsForItemTable) == 0 and not create) then
+		pendingBidsTable[item] = nil;
 	end
+
 	return pendingBidsForItemTable;
+end
+
+-------------------------------------------------------------------------------
+-- Gets the list of pending bid items.
+-------------------------------------------------------------------------------
+function getPendingBidItems(item)
+	local items = {};
+	if (AHPurchases.PendingBids) then
+		for item in AHPurchases.PendingBids do
+			local pendingBidsTable = getPendingBidsTableForItem(item);
+			if (pendingBidsTable and table.getn(pendingBidsTable) > 0) then
+				table.insert(items, item);
+			end
+		end
+	end
+	return items;
+end
+
+-------------------------------------------------------------------------------
+-- Gets the pending bids (unpacked) for the specified item
+-------------------------------------------------------------------------------
+function getPendingBidsForItem(item)
+	local pendingBids = {};
+	local pendingBidsTable = getPendingBidsTableForItem(item);
+	if (pendingBidsTable) then
+		for index in pendingBidsTable do
+			local pendingBid = unpackPendingBid(pendingBidsTable[index]);
+			table.insert(pendingBids, pendingBid);
+		end
+	end
+	return pendingBids;
 end
 
 -------------------------------------------------------------------------------
@@ -168,14 +206,16 @@ end
 -------------------------------------------------------------------------------
 function isPendingBid(item, quantity, bid, seller, isBuyout, isSuccessful)
 	local pendingBids = getPendingBidsTableForItem(item);
-	for index = 1, table.getn(pendingBids) do
-		local pendingBid = unpackPendingBid(pendingBids[index]);
-		if ((quantity == nil or pendingBid.quantity == nil or quantity == pendingBid.quantity) and
-			(bid == nil or pendingBid.bid == nil or bid == pendingBid.bid) and
-			(seller == nil or pendingBid.seller == nil or seller == pendingBid.seller) and
-			(isBuyout == nil or pendingBid.isBuyout == nil or isBuyout == pendingBid.isBuyout) and
-			(isSuccessful == nil or pendingBid.isSuccessful == nil or isSuccessful == pendingBid.isSuccessful)) then
-			return true;
+	if (pendingBids) then
+		for index = 1, table.getn(pendingBids) do
+			local pendingBid = unpackPendingBid(pendingBids[index]);
+			if ((quantity == nil or pendingBid.quantity == nil or quantity == pendingBid.quantity) and
+				(bid == nil or pendingBid.bid == nil or bid == pendingBid.bid) and
+				(seller == nil or pendingBid.seller == nil or seller == pendingBid.seller) and
+				(isBuyout == nil or pendingBid.isBuyout == nil or isBuyout == pendingBid.isBuyout) and
+				(isSuccessful == nil or pendingBid.isSuccessful == nil or isSuccessful == pendingBid.isSuccessful)) then
+				return true;
+			end
 		end
 	end
 	return false;
@@ -225,7 +265,7 @@ function addCompletedBid(item, quantity, bid, seller, isBuyout, isSuccessful)
 			local packedCompletedBid = packCompletedBid(completedBid);
 
 			-- Add the completed bid to the table.
-			local completedBids = getCompletedBidsTableForItem(item);
+			local completedBids = getCompletedBidsTableForItem(item, true);
 			table.insert(completedBids, packedCompletedBid);
 			debugPrint("Added completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..nilSafeStringFromString(completedBid.seller)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isSuccessful)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
 
@@ -270,17 +310,22 @@ end
 -- Gets the completed bids table for the specified item. The table contains
 -- packed records.
 -------------------------------------------------------------------------------
-function getCompletedBidsTableForItem(item)
+function getCompletedBidsTableForItem(item, create)
 	local completedBidsTable = AHPurchases.CompletedBids;
 	if (completedBidsTable == nil) then
 		completedBidsTable = {};
 		AHPurchases.CompletedBids = completedBidsTable;
 	end
+
+	-- Get the table for the item. Create or delete if appropriate.
 	local completedBidsForItemTable = completedBidsTable[item];
-	if (completedBidsForItemTable == nil) then
+	if (completedBidsForItemTable == nil and create) then
 		completedBidsForItemTable = {};
 		completedBidsTable[item] = completedBidsForItemTable;
+	elseif (completedBidsForItemTable and table.getn(completedBidsForItemTable) == 0 and not create) then
+		completedBidsTable[item] = nil;
 	end
+
 	return completedBidsForItemTable;
 end
 
@@ -364,11 +409,16 @@ function getPurchasesTableForItem(item, create)
 		purchasesTable = {};
 		AHPurchases.Purchases = purchasesTable;
 	end
+	
+	-- Get the table for the item. Create or delete if appropriate.
 	local purchasesForItemTable = purchasesTable[item];
 	if (purchasesForItemTable == nil and create) then
 		purchasesForItemTable = {};
 		purchasesTable[item] = purchasesForItemTable;
+	elseif (purchasesForItemTable and table.getn(purchasesForItemTable) == 0 and not create) then
+		purchasesTable[item] = nil;
 	end
+
 	return purchasesForItemTable;
 end
 
@@ -434,28 +484,35 @@ function reconcileBids(item)
 	local quantitiesAttempted = {};
 	local bidsAttempted = {};
 	local completedBids = getCompletedBidsTableForItem(item);
-	while (index <= table.getn(completedBids)) do
-		local completedBid = unpackCompletedBid(completedBids[index]);
-		if (completedBid.quantity and not quantitiesAttempted[completedBid.quantity]) then
-			quantitiesAttempted[completedBid.quantity] = true;
-			if (reconcileBidsByQuantity(item, completedBid.quantity)) then
-				index = 1;
-				bidsAttempted = {};
+	if (completedBids) then
+		while (index <= table.getn(completedBids)) do
+			local completedBid = unpackCompletedBid(completedBids[index]);
+			if (completedBid.quantity and not quantitiesAttempted[completedBid.quantity]) then
+				quantitiesAttempted[completedBid.quantity] = true;
+				if (reconcileBidsByQuantity(item, completedBid.quantity)) then
+					index = 1;
+					bidsAttempted = {};
+				else
+					index = index + 1;
+				end
+			elseif (completedBid.bid and not bidsAttempted[completedBid.bid]) then
+				bidsAttempted[completedBid.bid] = true;
+				if (reconcileBidsByBid(item, completedBid.bid)) then
+					index = 1;
+					quantitiesAttempted = {};
+				else
+					index = index + 1;
+				end
 			else
 				index = index + 1;
 			end
-		elseif (completedBid.bid and not bidsAttempted[completedBid.bid]) then
-			bidsAttempted[completedBid.bid] = true;
-			if (reconcileBidsByBid(item, completedBid.bid)) then
-				index = 1;
-				quantitiesAttempted = {};
-			else
-				index = index + 1;
-			end
-		else
-			index = index + 1;
 		end
 	end
+
+	-- Remove the item's table if empty. This happens automatically when
+	-- getting it via the built-in method.
+	getPendingBidsTableForItem(item);
+	getCompletedBidsTableForItem(item);
 
 	debugPrint("-- End reconciling bids for "..item.." --");
 end
@@ -470,10 +527,12 @@ function reconcileBidsByQuantity(item, quantity)
 	-- Get all the pending bids matching the quantity
 	local pendingBidIndicies = {};
 	local pendingBids = getPendingBidsTableForItem(item);
-	for index = 1, table.getn(pendingBids) do
-		local pendingBid = unpackPendingBid(pendingBids[index]);
-		if (pendingBid.quantity == quantity) then
-			table.insert(pendingBidIndicies, index);
+	if (pendingBids) then
+		for index = 1, table.getn(pendingBids) do
+			local pendingBid = unpackPendingBid(pendingBids[index]);
+			if (pendingBid.quantity == quantity) then
+				table.insert(pendingBidIndicies, index);
+			end
 		end
 	end
 	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
@@ -481,10 +540,12 @@ function reconcileBidsByQuantity(item, quantity)
 	-- Get all the completed bids matching the quantity
 	local completedBidIndicies = {};
 	local completedBids = getCompletedBidsTableForItem(item);
-	for index = 1, table.getn(completedBids) do
-		local completedBid = unpackCompletedBid(completedBids[index]);
-		if (completedBid.quantity == quantity) then
-			table.insert(completedBidIndicies, index);
+	if (completedBids) then
+		for index = 1, table.getn(completedBids) do
+			local completedBid = unpackCompletedBid(completedBids[index]);
+			if (completedBid.quantity == quantity) then
+				table.insert(completedBidIndicies, index);
+			end
 		end
 	end
 	debugPrint(table.getn(completedBidIndicies).." matching completed bids");
@@ -532,10 +593,12 @@ function reconcileBidsByBid(item, bid)
 	-- Get all the pending bids matching the bid
 	local pendingBidIndicies = {};
 	local pendingBids = getPendingBidsTableForItem(item);
-	for index = 1, table.getn(pendingBids) do
-		local pendingBid = unpackPendingBid(pendingBids[index]);
-		if (pendingBid.bid == bid) then
-			table.insert(pendingBidIndicies, index);
+	if (pendingBids) then
+		for index = 1, table.getn(pendingBids) do
+			local pendingBid = unpackPendingBid(pendingBids[index]);
+			if (pendingBid.bid == bid) then
+				table.insert(pendingBidIndicies, index);
+			end
 		end
 	end
 	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
@@ -543,10 +606,12 @@ function reconcileBidsByBid(item, bid)
 	-- Get all the completed bids matching the bid
 	local completedBidIndicies = {};
 	local completedBids = getCompletedBidsTableForItem(item);
-	for index = 1, table.getn(completedBids) do
-		local completedBid = unpackCompletedBid(completedBids[index]);
-		if (completedBid.bid == bid) then
-			table.insert(completedBidIndicies, index);
+	if (completedBids) then
+		for index = 1, table.getn(completedBids) do
+			local completedBid = unpackCompletedBid(completedBids[index]);
+			if (completedBid.bid == bid) then
+				table.insert(completedBidIndicies, index);
+			end
 		end
 	end
 	debugPrint(table.getn(pendingBidIndicies).." matching completed bids");
@@ -840,6 +905,8 @@ end
 BeanCounter.Purchases = 
 {
 	AddPendingBid = addPendingBid;
+	GetPendingBidItems = getPendingBidItems;
+	GetPendingBidsForItem = getPendingBidsForItem;
 	AddSuccessfulBid = addSuccessfulBid;
 	AddFailedBid = addFailedBid;
 	GetPurchasedItems = getPurchasedItems;

@@ -22,6 +22,11 @@
 --]]
 
 -------------------------------------------------------------------------------
+-- Function Prototypes
+-------------------------------------------------------------------------------
+local doesNameMatch;
+
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFrameTransactions_OnLoad()
 	-- Methods
@@ -165,42 +170,54 @@ end
 -------------------------------------------------------------------------------
 -- Perform a transaction search
 -------------------------------------------------------------------------------
-function AuctionFrameTransactions_SearchTransactions(frame, itemName)
+function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameExact, transactions)
 	-- Create the content from purhcases database.
 	frame.results = {};
-	if (itemName) then
-		local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemName);
-		if (purchases) then
-			for purchaseIndex in purchases do
-				local purchase = {};
-				purchase.date = purchases[purchaseIndex].time;
-				purchase.transaction = "Buy"; --_BC('UiBuyTransaction');
-				purchase.count = purchases[purchaseIndex].quantity;
-				purchase.name = itemName;
-				purchase.price = purchases[purchaseIndex].cost;
-				purchase.pricePer = math.floor(purchases[purchaseIndex].cost / purchases[purchaseIndex].quantity);
-				purchase.net = -purchase.price;
-				purchase.netPer = -purchase.pricePer;
-				purchase.player = purchases[purchaseIndex].seller;
-				table.insert(frame.results, purchase);
-			end
-		end
-	else
+	
+	-- Add the purchases
+	if (transactions == nil or transactions.purchases) then
 		local itemNames = BeanCounter.Purchases.GetPurchasedItems();
 		for itemNameIndex in itemNames do
-			local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemNames[itemNameIndex]);
-			for purchaseIndex in purchases do
-				local purchase = {};
-				purchase.transaction = "Buy"; --_BC('UiBuyTransaction');
-				purchase.date = purchases[purchaseIndex].time;
-				purchase.count = purchases[purchaseIndex].quantity;
-				purchase.name = itemNames[itemNameIndex];
-				purchase.price = purchases[purchaseIndex].cost;
-				purchase.pricePer = math.floor(purchases[purchaseIndex].cost / purchases[purchaseIndex].quantity);
-				purchase.net = -purchase.price;
-				purchase.netPer = -purchase.pricePer;
-				purchase.player = purchases[purchaseIndex].seller;
-				table.insert(frame.results, purchase);
+			-- Check if this item matches the search criteria
+			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
+				local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemNames[itemNameIndex]);
+				for purchaseIndex in purchases do
+					local transaction = {};
+					transaction.transaction = "Buy"; --_BC('UiBuyTransaction');
+					transaction.date = purchases[purchaseIndex].time;
+					transaction.count = purchases[purchaseIndex].quantity;
+					transaction.name = itemNames[itemNameIndex];
+					transaction.price = purchases[purchaseIndex].cost;
+					transaction.pricePer = math.floor(purchases[purchaseIndex].cost / purchases[purchaseIndex].quantity);
+					transaction.net = -transaction.price;
+					transaction.netPer = -transaction.pricePer;
+					transaction.player = purchases[purchaseIndex].seller;
+					table.insert(frame.results, transaction);
+				end
+			end
+		end
+	end
+	
+	-- Add the bids
+	if (transactions == nil or transactions.bids) then
+		local itemNames = BeanCounter.Purchases.GetPendingBidItems();
+		for itemNameIndex in itemNames do
+			-- Check if this item matches the search criteria
+			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
+				local pendingBids = BeanCounter.Purchases.GetPendingBidsForItem(itemNames[itemNameIndex]);
+				for pendingBidIndex in pendingBids do
+					local transaction = {};
+					transaction.transaction = "Bid"; --_BC('UiBidTransaction');
+					transaction.date = pendingBids[pendingBidIndex].time;
+					transaction.count = pendingBids[pendingBidIndex].quantity;
+					transaction.name = itemNames[itemNameIndex];
+					transaction.price = pendingBids[pendingBidIndex].bid;
+					transaction.pricePer = math.floor(pendingBids[pendingBidIndex].bid / pendingBids[pendingBidIndex].quantity);
+					transaction.net = -transaction.price;
+					transaction.netPer = -transaction.pricePer;
+					transaction.player = pendingBids[pendingBidIndex].seller;
+					table.insert(frame.results, transaction);
+				end
 			end
 		end
 	end
@@ -219,7 +236,24 @@ function AuctionFrameSearchTransactions_SearchButton_OnClick(button)
 
 	local itemName = getglobal(frameName.."SearchEdit"):GetText();
 	if (itemName == "") then itemName = nil end
+	local exactNameSearch = getglobal(frame:GetName().."ExactSearchCheckBox"):GetChecked();
+	local transactions = {};
+	transactions.bids = getglobal(frame:GetName().."BidCheckBox"):GetChecked();
+	transactions.purchases = getglobal(frame:GetName().."BuyCheckBox"):GetChecked();
 
-	frame:GetParent():SearchTransactions(itemName);
+	frame:GetParent():SearchTransactions(itemName, exactNameSearch, transactions);
 end
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function doesNameMatch(name1, name2, exact)
+	local match = true;
+	if (name1 ~= nil and name2 ~= nil) then
+		if (exact) then
+			match = (string.lower(name1) == string.lower(name2));
+		else
+			match = (string.find(string.lower(name1), string.lower(name2), 1, true) ~= nil);
+		end
+	end
+	return match;
+end

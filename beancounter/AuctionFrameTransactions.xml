@@ -72,6 +72,42 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="$parentExactSearchText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentSearchText">
+									<Offset>
+										<AbsDimension x="25" y="-34"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentTransactionsText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentSearchText">
+									<Offset>
+										<AbsDimension x="0" y="-55"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentBidText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentTransactionsText">
+									<Offset>
+										<AbsDimension x="20" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentBuyText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentBidText">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 					</Layer>
 				</Layers>
 				<Frames>
@@ -94,6 +130,57 @@
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>
+					<CheckButton name="$parentExactSearchCheckBox">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentExactSearchText" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
+					<CheckButton name="$parentBidCheckBox" checked="true">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentBidText" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
+					<CheckButton name="$parentBuyCheckBox" checked="true">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentBuyText" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
 					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
 						<Size>
 							<AbsDimension x="120" y="22"/>
@@ -115,6 +202,10 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(this:GetName().."SearchText"):SetText(_BC('UiSearchForLabel'));
+						getglobal(this:GetName().."ExactSearchText"):SetText(_BC('UiExactNameSearch'));
+						getglobal(this:GetName().."TransactionsText"):SetText(_BC('UiTransactionsLabel'));
+						getglobal(this:GetName().."BidText"):SetText(_BC('UiBids'));
+						getglobal(this:GetName().."BuyText"):SetText(_BC('UiPurchases'));
 						getglobal(this:GetName().."SearchButton"):SetText(_BC('UiSearch'));
 					</OnLoad>
 				</Scripts>
