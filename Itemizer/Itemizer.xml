@@ -46,7 +46,7 @@
 	<GameTooltip name="ItemizerTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
 	<GameTooltip name="ItemizerHidden" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
 
-	<!-- This frame is used to get the item's tooltip information and also to scan the user's ItemCache for new items -->
+	<!-- This frame is used to incrementally parse the items in the scan stack without causing a massive hang when many items are added to the stack (Like when the ItemCache is scanned) -->
 	<Frame name="ItemizerScanFrame" parent="UIParent">
 		<Scripts>
 			<OnUpdate>
