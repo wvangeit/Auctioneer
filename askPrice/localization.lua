@@ -21,8 +21,8 @@ if (LOCALE_deDE) then
 	ASKPRICE_HELP_AD = " ad: Anzeige neuer Funktionen ein/aus ";
 
 	ASKPRICE_AUCT_NOT_LOADED = "Auctioneer ist nicht geladen, sry.";
-	ASKPRICE_ON = "|c00ff00ein|cffffff";
-	ASKPRICE_OFF = "|cff0000aus|cffffff";
+	ASKPRICE_ON = "|c00ff00|rein|cffffff|r";
+	ASKPRICE_OFF = "|cff0000|raus|cffffff|r";
 
 	ASKPRICE_PARTY = "Abfrage in Gruppenchat: ";
 	ASKPRICE_GUILD = "Abfrage in Gildenchat: ";
@@ -52,8 +52,8 @@ elseif (LOCALE_enGB or LOCALE_enUS) then
 	ASKPRICE_HELP_AD = " ad: Toggles new features Ad ";
 
 	ASKPRICE_AUCT_NOT_LOADED = "Auctioneer not loaded, sry.";
-	ASKPRICE_ON = "|c00ff00on|cffffff";
-	ASKPRICE_OFF = "|cff0000off|cffffff";
+	ASKPRICE_ON = "|c00ff00|ron|cffffff|r";
+	ASKPRICE_OFF = "|cff0000|roff|cffffff|r";
 
 	ASKPRICE_PARTY = "Query in party chat: ";
 	ASKPRICE_GUILD = "Query in guild chat: ";

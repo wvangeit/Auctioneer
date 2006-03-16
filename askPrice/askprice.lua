@@ -199,15 +199,21 @@ function auctioneerFO(itemLink, player)
 
 end
 
-function askPrice_getVendorPrice(itemLink)
+function askPrice_getVendorPrice(itemLink, count, player)
 
   -- Thanks Tarog for "decrypting" informant :)
 	local itemID = EnhTooltip.BreakLink(itemLink);
 	local itemInfo = Informant.GetItem(itemID);
-	vendorSell = 0;
+	local vendorSell = 0;
 	if (itemInfo) then
-		local vendorSell = tonumber(itemInfo.sell) or 0
+		vendorSell = tonumber(itemInfo.sell) or 0
 	end
+	local eachstring = "";
+  if (count ~= 1) then
+		eachstring = " \(" .. getGSC(vendorSell) .. ASKPRICE_EACH .. "\)";
+  end
+
+	SendChatMessage("" .. ASKPRICE_VENDORPRICE .. getGSC(vendorSell * count) .. eachstring, "WHISPER", ASKPRICE_WHISPERLANGUAGE, player);
 
 	return vendorSell;
 
@@ -270,26 +276,15 @@ if ((event == "CHAT_MSG_WHISPER") or ((event== "CHAT_MSG_GUILD") and AP_guild) o
   	eachstring = "";
   end
   
-  if (aCount) then
+  if (aCount and aCount ~= 0) then
 		SendChatMessage(aCount .. ASKPRICE_TIMES_SEEN, "WHISPER", ASKPRICE_WHISPERLANGUAGE, player);
 		SendChatMessage("  " .. ASKPRICE_BUYOUT_MEDIAN_HISTORICAL .. getGSC(historicalMedian*askedCount) .. eachstring,  "WHISPER", ASKPRICE_WHISPERLANGUAGE, player);
 		SendChatMessage("  " .. ASKPRICE_BUYOUT_LASTSCAN .. getGSC(snapshotMedian*askedCount) .. eachstring, "WHISPER", ASKPRICE_WHISPERLANGUAGE, player);
 	end
 
 	if (AP_ShowVendor) then
-		
-		local ap_vs = askPrice_getVendorPrice(itemLink);
-		
-		if (ap_vs) then
-		  if (askedCount ~= 1) then
-				eachstring = " \(" .. getGSC(ap_vs) .. ASKPRICE_EACH .. "\)";
-  		else
-  			eachstring = "";
-  		end;
-
-			SendChatMessage("" .. ASKPRICE_VENDORPRICE .. getGSC(ap_vs * askedCount) .. eachstring, "WHISPER", ASKPRICE_WHISPERLANGUAGE, player);
-		end;
-	end;
+		askPrice_getVendorPrice(itemLink, askedCount, player);
+	end	
 
 	if ((askedCount == 1) and (AP_ad)) then
 		SendChatMessage(ASKPRICE_AD, ASKPRICE_WHISPERLANGUAGE, player)
