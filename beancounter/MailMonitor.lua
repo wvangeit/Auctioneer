@@ -123,7 +123,7 @@ function MailMonitor_OnEventHook(_, event, arg1)
 	if (table.getn(InboxTasks) > 0) then
 		local task = InboxTasks[1];
 		table.remove(InboxTasks, 1);
-		if (task:OnEvent(event)) then
+		if (task:OnEvent(event, arg1)) then
 			debugPrint("Satisfied event task: "..task.name);
 		else
 			table.insert(InboxTasks, 1, task);
