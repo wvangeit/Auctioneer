@@ -75,6 +75,24 @@ AUCTION_WON = "Auction won: ";
 AUCTION_SUCCESSFUL = "Auction successful: ";
 OUTBID_ON = "Outbid on ";
 
+
+--  german localization for testing on german client
+if (locale_deDE) then
+
+-- Auction houses (TODO: Make these localized strings)
+ALLIANCE_AUCTION_HOUSE = "Auktionshaus der Allianz";
+HORDE_AUCTION_HOUSE = "Auktionshaus der Horde";
+
+-- Auction house subjects (TODO: Make these localized strings)
+AUCTION_EXPIRED = "Auktion abgelaufen: ";
+AUCTION_CANCELLED = "Auktion abgebrochen: ";
+AUCTION_WON = "Auktion gewonnen: ";
+AUCTION_SUCCESSFUL = "Auktion erfolgreich: ";
+OUTBID_ON = "H\195\182heres Gebot f195\188r ";
+
+end
+
+
 -------------------------------------------------------------------------------
 -- Local variables
 -------------------------------------------------------------------------------
