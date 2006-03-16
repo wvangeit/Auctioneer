@@ -21,17 +21,12 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 BeanCounter_CustomLocalizations = {
-	['TextGeneral'] = GetLocale(),
-	['TextCombat'] = GetLocale(),
 }
 
 function _BC(stringKey, locale)
-	-- TODO: Implement localization
-	return stringKey;
-	--[[
 	if (locale) then
 		if (type(locale) == "string") then
 			return Babylonian.FetchString(BeanCounterLocalizations, locale, stringKey);
@@ -45,6 +40,5 @@ function _BC(stringKey, locale)
 		if (not str) then return stringKey end
 		return str
 	end
-	--]]
 end
 

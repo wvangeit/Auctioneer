@@ -20,6 +20,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
+	<Script file="Babylonian.lua"/>
+	<Script file="BeanCounterStrings.lua"/>
 	<Script file="BeanCounterLocale.lua"/>
 
 	<Script file="BeanCounter.lua"/>
