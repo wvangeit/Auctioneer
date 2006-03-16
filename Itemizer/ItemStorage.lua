@@ -40,7 +40,6 @@ function getItemData(itemID, randomProp)
 	if (randomProp) then --We're looking for an "of the X" item
 		if ((haveItemID) and (haveRandomProp)) then --Found!
 			currentItem = ItemizerLinks[itemInfo.itemID][itemInfo.randomProp]
-			currentItem
 		else --Item Not found
 			
 		end
