@@ -233,10 +233,11 @@ if ((event == "CHAT_MSG_WHISPER") or ((event== "CHAT_MSG_GUILD") and AP_guild) o
     -- check for marker (? or "smart" words)
 	  -- if activatet, check for "smart" words
   	-- alter ASKPRICE_SMARTWORD1, ASKPRICE_SMARTWORD2 in localization.lua to your needs
+  	-- be sure to use lowercase there.
 
     if (string.sub(text, 1, 1) ~= "?") then
       if (AP_smartWords) then
-          if (not (string.find(text, ASKPRICE_SMARTWORD1) and string.find(text, ASKPRICE_SMARTWORD2))) then
+          if (not (string.find(string.lower(text), ASKPRICE_SMARTWORD1) and string.find(string.lower(text), ASKPRICE_SMARTWORD2))) then
             return;
           end
       end
