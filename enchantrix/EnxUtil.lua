@@ -149,3 +149,73 @@ function Enchantrix_LocalizeCommand(cmd)
 	local result = Enchantrix_CommandMapRev[cmd];
 	if (result) then return result; else return cmd; end
 end
+
+---------------------
+-- Debug functions --
+---------------------
+
+-- profiler:Start()
+-- Record start time and memory, set state to running
+local function _profilerStart(this)
+	this.t = GetTime()
+	this.m = gcinfo()
+	this.r = true
+end
+
+-- profiler:Stop()
+-- Record time and memory change, set state to stopped
+local function _profilerStop(this)
+	this.m = (gcinfo()) - this.m
+	this.t = GetTime() - this.t
+	this.r = false
+end
+
+-- profiler:DebugPrint()
+local function _profilerDebugPrint(this)
+	if this.n then
+		EnhTooltip.DebugPrint("Profiler ["..this.n.."]")
+	else
+		EnhTooltip.DebugPrint("Profiler")
+	end
+	if this.r == nil then
+		EnhTooltip.DebugPrint("  Not started")
+	else
+		EnhTooltip.DebugPrint(string.format("  Time: %0.3f s", this:Time()))
+		EnhTooltip.DebugPrint(string.format("  Mem: %0.0f KiB", this:Mem()))
+		if this.r then
+			EnhTooltip.DebugPrint("  Running...")
+		end
+	end
+end
+
+-- time = profiler:Time()
+-- Return time (in seconds) from Start() [until Stop(), if stopped]
+local function _profilerTime(this)
+	if this.r == false then
+		return this.t
+	elseif this.r == true then
+		return GetTime() - this.t
+	end
+end
+
+-- mem = profiler:Mem()
+-- Return memory change (in kilobytes) from Start() [until Stop(), if stopped]
+local function _profilerMem(this)
+	if this.r == false then
+		return this.m
+	elseif this.r == true then
+		return (gcinfo()) - this.m
+	end
+end
+
+-- profiler = Enchantrix_CreateProfiler("foobar")
+function Enchantrix_CreateProfiler(name)
+	return {
+		Start = _profilerStart,
+		Stop = _profilerStop,
+		DebugPrint = _profilerDebugPrint,
+		Time = _profilerTime,
+		Mem = _profilerMem,
+		n = name,
+	}
+end

@@ -43,32 +43,32 @@ local LocalBaseItems = {} -- EnchantedLocal merged by item id
 local EnchantedItemTypes = {} -- LocalBaseItems and EnchantedBaseItems merged by type
 
 -- These are market norm prices.
--- Median prices from Allakhazam.com, Feb 16, 2006
+-- Median prices from Allakhazam.com, Mar 16, 2006
 Enchantrix_StaticPrices = {
-	[20725] = 550000, -- Nexus Crystal
-	[14344] =  70000, -- Large Brilliant Shard
+	[20725] = 500000, -- Nexus Crystal
+	[14344] =  60000, -- Large Brilliant Shard
 	[11178] =  50000, -- Large Radiant Shard
-	[11139] =  18000, -- Large Glowing Shard
+	[11139] =  16500, -- Large Glowing Shard
 	[11084] =  10000, -- Large Glimmering Shard
-	[14343] =  38000, -- Small Brilliant Shard
-	[11177] =  30000, -- Small Radiant Shard
+	[14343] =  30000, -- Small Brilliant Shard
+	[11177] =  27500, -- Small Radiant Shard
 	[11138] =   6000, -- Small Glowing Shard
 	[10978] =   3000, -- Small Glimmering Shard
-	[16203] =  50000, -- Greater Eternal Essence
-	[11175] =  35000, -- Greater Nether Essence
+	[16203] =  49500, -- Greater Eternal Essence
+	[11175] =  35500, -- Greater Nether Essence
 	[11135] =  10000, -- Greater Mystic Essence
 	[11082] =  10000, -- Greater Astral Essence
-	[10939] =   3500, -- Greater Magic Essence
+	[10939] =   3350, -- Greater Magic Essence
 	[16202] =  18500, -- Lesser Eternal Essence
 	[11174] =  15000, -- Lesser Nether Essence
-	[11134] =   4800, -- Lesser Mystic Essence
+	[11134] =   5000, -- Lesser Mystic Essence
 	[10998] =   5000, -- Lesser Astral Essence
-	[10938] =   1850, -- Lesser Magic Essence
+	[10938] =   1900, -- Lesser Magic Essence
 	[16204] =  10000, -- Illusion Dust
-	[11176] =   5000, -- Dream Dust
-	[11137] =   2100, -- Vision Dust
-	[11083] =   1200, -- Soul Dust
-	[10940] =    750, -- Strange Dust
+	[11176] =   6000, -- Dream Dust
+	[11137] =   2500, -- Vision Dust
+	[11083] =   1500, -- Soul Dust
+	[10940] =    800, -- Strange Dust
 }
 
 local ENX_DUST = 1
@@ -247,6 +247,82 @@ Enchantrix_FilterDefaults = {
 		['printframe'] = 1,
 	}
 
+local tooltipFormat = {
+	currentFormat = "fancy",
+	format = {
+		["fancy"] = {
+			-- counts = off
+			['off'] = "  $conf% |q$name|r $rate",
+			-- counts = on
+			['on'] = "  $conf% |e($counts)|r |q$name|r $rate",
+		},
+		["default"] = {
+			['off'] = "  $name: $prob% $rate",
+			['on'] = "  $name: $prob% $rate |e($counts)|r",
+		},
+	},
+	patterns = {
+		-- Strings
+		["$prob"]	= "",			-- Probability: "75"
+		["$conf"]	= "",			-- Confidence interval: "72-78"
+		["$counts"]	= "",			-- Counts: "51"
+		["$name"]	= "",			-- Name: "Lesser Magic Essence"
+		["$rate"]	= "",			-- Avg droprate: "x1.5"
+		-- Colors
+		["|q"]		= "",			-- Quality color
+		["|E"]		= "|cffcccc33",	-- Yellow ("Enchantrix" color)
+		["|e"]		= "|cff7f7f00",	-- Dark yellow
+		["|r"]		= "|r",			-- Reset color
+	},
+	SelectFormat = function(this, fmt)
+		if this.format[fmt] then
+			this.currentFormat = fmt
+		else
+			this.currentFormat = "default"
+		end
+	end,
+	SetFormat = function(this, fmt, val, counts)
+		if counts == nil then
+			counts = Enchantrix_GetFilter('counts')
+		end
+		if counts then
+			this.format[fmt]['on'] = val
+		else
+			this.format[fmt]['off'] = val
+		end
+	end,
+	GetFormat = function(this, fmt, counts)
+		if not this.format[fmt] then return end
+		if counts == nil then
+			counts = Enchantrix_GetFilter('counts')
+		end
+		if counts then
+			return this.format[fmt]['on']
+		else
+			return this.format[fmt]['off']
+		end
+	end,
+	GetString = function(this, counts)
+		local line
+		if counts == nil then
+			counts = Enchantrix_GetFilter('counts')
+		end
+		if counts then
+			line = this.format[this.currentFormat]['on']
+		else
+			line = this.format[this.currentFormat]['off']
+		end
+		-- Replace patterns
+		for pat, repl in pairs(this.patterns) do
+			line = string.gsub(line, pat, repl)
+		end
+		return line
+	end,
+	SetPattern = function(this, pat, repl)
+		this.patterns[pat] = repl
+	end,
+}
+
 local DisenchantEvent = {}
 
 local MAX_BUYOUT_PRICE = 800000;
@@ -281,6 +357,32 @@ local function digits(m, n)
 	end
 	local d = 10^(n - math.floor(math.log10(m)) - 1)
 	return math.floor(m * d + 0.5) / d
+end
+
+local function confidenceInterval(p, n, z)
+	-- Returns confidence interval for binomial distribution given observed
+	-- probability p, sample size n, and z-value
+	if not z then
+		--[[
+		z		conf
+		1.282	80%
+		1.645	90%
+		1.960	95%
+		2.326	98%
+		2.576	99%
+		3.090	99.8%
+		3.291	99.9%
+		]]
+		z = 1.645
+	end
+	assert(p >= 0 and p <= 1)
+	assert(n > 0)
+
+	local a = p + z^2 / (2 * n)
+	local b = z * math.sqrt(p * (1 - p) / n + z^2 / (4 * n^2))
+	local c = 1 + z^2 / n
+
+	return (a - b) / c, (a + b) / c
 end
 
 local function Unserialize(str)
@@ -453,6 +555,9 @@ local function MergeDisenchantLists()
 	-- Merge DisenchantList by base item, i.e. all "Foobar of <x>" are merged into "Foobar"
 	-- This can be rather time consuming so we store this in a saved variable and use a hash
 	-- signature to determine if we need to update the table
+	local profiler = Enchantrix_CreateProfiler("MergeDisenchantLists")
+	profiler:Start()
+
 	local hash = DisenchantListHash()
 	if (not EnchantedBaseItems.hash) then
 		EnchantedBaseItems.hash = -hash
@@ -469,6 +574,10 @@ local function MergeDisenchantLists()
 		end
 		EnchantedBaseItems.hash = hash
 	end
+	-- We don't need DisenchantList anymore
+	DisenchantList = nil
+
+	profiler:DebugPrint()
 
 	-- Merge items from EnchantedLocal
 	for sig, disenchant in pairs(EnchantedLocal) do
@@ -491,6 +600,9 @@ local function MergeDisenchantLists()
 			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
 		end
 	end
+
+	profiler:Stop()
+	profiler:DebugPrint()
 end
 
 local function SaveDisenchant(sig, reagentID, count)
@@ -539,8 +651,6 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 
 	local embed = Enchantrix_GetFilter('embed');
 
-	local sig = Enchantrix_SigFromLink(link);
-
 	-- Check for disenchantable target
 	local itemID = Enchantrix_BreakLink(link)
 	if (not itemID or itemID == 0 or not IsDisenchantable(itemID)) then
@@ -552,7 +662,7 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		DisenchantEvent.spellTarget = link
 	end
 
-	local disenchantsTo = Enchantrix_GetItemDisenchants(sig, name, true);
+	local disenchantsTo = Enchantrix_GetItemDisenchants(Enchantrix_SigFromLink(link), name, true);
 
 	-- Process the results
 	local totals = disenchantsTo.totals;
@@ -562,23 +672,60 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		-- If it looks quirky, and we haven't disenchanted it, then ignore it...
 		if (totals.iCount + totals.biCount < 1) then return; end
 
-		local total = totals.total;
-		local note = "";
-
-		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..note, nil, embed);
+		-- Header
+		local total = ""
+		if (Enchantrix_GetFilter('counts')) then
+			total = string.format(" |cff7f7f00(%d)|r", totals.total)
+		end
+		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..total, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
-		for dSig, counts in disenchantsTo do
-			if (counts.rate > 1) then
-				EnhTooltip.AddLine(string.format("  %s: %0.1f%% x%0.1f", counts.name, counts.pct, counts.rate), nil, embed);
-			else
-				EnhTooltip.AddLine(string.format("  %s: %0.1f%%", counts.name, counts.pct), nil, embed);
-			end
-			EnhTooltip.LineColor(0.6,0.6,0.1);
 
-			if (Enchantrix_GetFilter('counts')) then
-				EnhTooltip.AddLine(string.format(_ENCH('FrmtCounts'), counts.biCount, 0, counts.iCount), nil, embed);
-				EnhTooltip.LineColor(0.5,0.5,0.0);
+		local lines = {}
+		for dSig, counts in pairs(disenchantsTo) do
+			local p = (counts.biCount + counts.iCount) / totals.total
+			local pmin, pmax = confidenceInterval(p, totals.total)
+
+			-- Probabilities
+			tooltipFormat:SetPattern("$prob", string.format("%0.0f", p * 100))
+			if pmax < 0.01 then
+				tooltipFormat:SetPattern("$conf", "<1")
+			elseif pmin > 0.99 then
+				tooltipFormat:SetPattern("$conf", ">99")
+			else
+				local pminstr, pmaxstr = string.format("%0.0f", pmin * 100), string.format("%0.0f", pmax * 100)
+				if pminstr ~= pmaxstr then
+					tooltipFormat:SetPattern("$conf", pminstr.."-"..pmaxstr)
+				else
+					tooltipFormat:SetPattern("$conf", pminstr)
+				end
 			end
+
+			-- Counts
+			tooltipFormat:SetPattern("$counts", tostring(counts.biCount + counts.iCount))
+
+			-- Name and quality
+			local name, _, quality = GetItemInfo(dSig)
+			local _, _, _, color = GetItemQualityColor(quality or 0)
+			tooltipFormat:SetPattern("|q", color or "|cffcccc33")
+			tooltipFormat:SetPattern("$name", name or counts.name)
+
+			-- Rate
+			if counts.rate ~= 1 then
+				tooltipFormat:SetPattern("$rate", string.format("x%0.1f", counts.rate))
+			else
+				tooltipFormat:SetPattern("$rate", "")
+			end
+
+			-- Store this line and sort key
+			local line = tooltipFormat:GetString(Enchantrix_GetFilter('counts'))
+			table.insert(lines,  {str = line, sort = pmin})
+		end
+
+		-- Sort in order of decreasing probability before adding to tooltip
+		table.sort(lines, function(a, b) return a.sort > b.sort end)
+		for n, line in ipairs(lines) do
+			EnhTooltip.AddLine(line.str, nil, embed)
+			EnhTooltip.LineColor(0.8, 0.8, 0.2);
 		end
 
 		if (Enchantrix_GetFilter('valuate')) then
