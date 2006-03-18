@@ -98,7 +98,7 @@ local dumpState;
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AucBidManagerFrame_OnLoad()
-	this:RegisterEvent("VARIABLES_LOADED");
+	this:RegisterEvent("ADDON_LOADED");
 	this:RegisterEvent("AUCTION_ITEM_LIST_UPDATE");
 	this:RegisterEvent("AUCTION_HOUSE_CLOSED");
 
@@ -109,8 +109,9 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AucBidManagerFrame_OnEvent(event)
-	if (event == "VARIABLES_LOADED") then
+	if (event == "ADDON_LOADED" and string.lower(arg1) == "auctioneer") then
 		addPlayerToAccount(UnitName("player"));
+		this:UnregisterEvent("ADDON_LOADED");
 	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
 		debugPrint(event);
 		checkQueryComplete();
