@@ -1224,15 +1224,20 @@ end
 
 function Enchantrix_Split(str, at)
 	local splut = {};
-	local pos = 1;
 
-	local match, mend = string.find(str, at, pos, true);
-	while match do
-		table.insert(splut, string.sub(str, pos, match-1));
-		pos = mend+1;
-		match, mend = string.find(str, at, pos, true);
+	if (type(str) ~= "string") then return nil end
+	if (not str) then str = "" end
+
+	if (not at)
+		then table.insert(splut, str)
+
+	else
+		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+			table.insert(splut, n);
+
+			if (c == '') then break end
+		end
 	end
-	table.insert(splut, string.sub(str, pos));
 	return splut;
 end
 
