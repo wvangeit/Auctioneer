@@ -84,45 +84,6 @@ local short_attributes = {
     'DEF'
 };
 
-
-local overall_category_priority = {
-    item = {    
-        factor = 0.4, 
-        priorities = {
-            AnyWeapon = 100,
-            TwoHanded = 90,
-            Bracer = 70,
-            Gloves = 70,
-            Boots = 70,
-            Chest = 70, 
-            Cloak = 70,
-            Shield = 70 
-        } 
-    },
-    stat = {
-        factor = 0.4, 
-        priorities = {
-            INT = 90,
-            DMG = 90,
-            DEF = 60,
-            STA = 70,
-            AGI = 70,
-            STR = 70,
-            ["all stats"] = 75,
-            ["all res"] = 55,
-            armour = 65,
-            SPI = 45,
-            ["fire res"] = 85,
-            mana = 35,
-            health = 40,
-            DEF = 40,
-            other = 70
-        } 
-    },
-    price = {factor = 0.2, priorities = nil },
-    train = {factor = 0.1, priorities = nil } 
-};
-
 -- UI code
 
 
@@ -139,7 +100,6 @@ function EnchantrixBarker_OnEvent()
         Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
         Enchantrix_BarkerOptionsButton:Show();
         Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.';
-        UpdateItemPriorities();
     elseif( event == "CRAFT_CLOSE" )then
         Enchantrix_BarkerButton:Hide();
         Enchantrix_BarkerOptionsButton:Hide();
@@ -171,15 +131,14 @@ function EnchantrixBarker_OnLoad()
     end    
     --EnchantConfig.barker = EnchantConfig.barker;
     if( not EnchantConfig.barker.profit_margin ) then
-        EnchantConfig.barker.profit_margin = 0.1;
+        EnchantConfig.barker.profit_margin = 10;
     end    
     if( not EnchantConfig.barker.randomise ) then
-        EnchantConfig.barker.randomise = 0.1;
+        EnchantConfig.barker.randomise = 10;
     end    
     if( not EnchantConfig.barker.lowest_price ) then
         EnchantConfig.barker.lowest_price = 100;
     end    
-    UpdateItemPriorities();
 
 end
     
@@ -189,18 +148,34 @@ local config_defaults = {
     lowest_price = 5000,
     sweet_price = 50000,
     high_price = 500000,
-    profit_margin = 0.1,
+    profit_margin = 10,
     highest_profit = 100000,
-    randomise = 0.1,
-    item_anyweapon = 100,
-    item_twohander = 90,
-    item_bracer = 70,
-    item_gloves = 70,
-    item_boots = 70,
-    item_chest = 70, 
-    item_cloak = 70,
-    item_shield = 70 
-    
+    randomise = 10,
+    AnyWeapon = 100,
+    TwoHanded = 90,
+    Bracer = 70,
+    Gloves = 70,
+    Boots = 70,
+    Chest = 70, 
+    Cloak = 70,
+    Shield = 70,
+    INT = 90,
+    STA = 70,
+    AGI = 70,
+    STR = 70,
+    SPI = 45,
+    ["all stats"] = 75,
+    ["all res"] = 55,
+    armour = 65,
+    ["fire res"] = 85,
+    mana = 35,
+    health = 40,
+    DMG = 90,
+    DEF = 60,
+    other = 70,
+    factor_price = 20,
+    factor_item = 40,
+    factor_stat = 40
 };
 
 function Enchantrix_BarkerGetConfig( key )
@@ -238,139 +213,27 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 end
 
 
-function Enchantrix_BarkerOptions_ProfitSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("profit_margin")*100;
-end
-function Enchantrix_BarkerOptions_ProfitSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("profit_margin", this:GetValue()/100);
-end
-
-function Enchantrix_BarkerOptions_HighestProfitSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("highest_profit");
-end
-function Enchantrix_BarkerOptions_HighestProfitSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("highest_profit", this:GetValue() );
+function Enchantrix_BarkerOptions_Factors_Slider_GetValue(...)
+    id = arg[1];
+    if id == nil then
+        id = this:GetID();
+    end
+    return Enchantrix_BarkerGetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key);
 end
 
-function Enchantrix_BarkerOptions_RandomFactorSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("randomise")*100;
-end
-function Enchantrix_BarkerOptions_RandomFactorSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("randomise", this:GetValue()/100);
-end
-
-function Enchantrix_BarkerOptions_LowestPriceSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("lowest_price");
+function Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged(...)
+    id = arg[1];
+    if id == nil then
+        id = this:GetID();
+    end
+    Enchantrix_BarkerSetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key, this:GetValue());
 end
 
-function Enchantrix_BarkerOptions_LowestPriceSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("lowest_price", this:GetValue());
-end
+Enchantrix_BarkerOptions_ActiveTab = -1;
 
-function Enchantrix_BarkerOptions_PriceFactorSweetSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("sweet_price");
-end
-
-function Enchantrix_BarkerOptions_PriceFactorSweetSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("sweet_price", this:GetValue());
-end
-
-function Enchantrix_BarkerOptions_PriceFactorHighSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("high_price");
-end
-
-function Enchantrix_BarkerOptions_PriceFactorHighSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("high_price", this:GetValue());
-end
-
-function UpdateItemPriorities()
-    overall_category_priority.item.priorities['TwoHander'] = Enchantrix_BarkerGetConfig("item_twohander");
-    overall_category_priority.item.priorities['AnyWeapon'] = Enchantrix_BarkerGetConfig("item_anyweapon");
-    overall_category_priority.item.priorities['Gloves'] = Enchantrix_BarkerGetConfig("item_gloves");
-    overall_category_priority.item.priorities['Boots'] = Enchantrix_BarkerGetConfig("item_boots");
-    overall_category_priority.item.priorities['Bracer'] = Enchantrix_BarkerGetConfig("item_bracer");
-    overall_category_priority.item.priorities['Chest'] = Enchantrix_BarkerGetConfig("item_chest");
-    overall_category_priority.item.priorities['Shield'] = Enchantrix_BarkerGetConfig("item_shield");
-    overall_category_priority.item.priorities['Cloak'] = Enchantrix_BarkerGetConfig("item_cloak");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_TwoHandedSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_twohander");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_TwoHandedSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_twohander", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_AnyWeaponSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_anyweapon");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_AnyWeaponSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_anyweapon", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_BracerSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_bracer");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_BracerSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_bracer", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_GlovesSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_gloves");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_GlovesSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_gloves", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_BootsSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_boots");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_BootsSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_boots", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_ChestSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_chest");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_ChestSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_chest", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_ShieldSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_shield");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_ShieldSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_shield", this:GetValue());
-    UpdateItemPriorities();
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_CloakSlider_GetValue()
-    return Enchantrix_BarkerGetConfig("item_cloak");
-end
-
-function Enchantrix_BarkerOptions_ItemFactors_CloakSlider_OnValueChanged()
-    Enchantrix_BarkerSetConfig("item_cloak", this:GetValue());
-    UpdateItemPriorities();
-end
-
-
-
-local tabframes = { 
+Enchantrix_BarkerOptions_TabFrames = { 
     { 
-        title = 'Profit and Price Priotities',
+        title = 'Profit and Price Priorities',
         options = {
             {
                 name = 'Profit Margin',
@@ -379,18 +242,20 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ProfitSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ProfitSlider_OnValueChanged
+                key = 'profit_margin',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
-                name = 'Highest Profit',
+                name = 'highest_profit',
                 tooltip = 'The highest total cash profit to make on an enchant.',
                 units = 'money',
                 min = 0,
                 max = 250000,
                 step = 500,
-                getvalue = Enchantrix_BarkerOptions_HighestProfitSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_HighestProfitSlider_OnValueChanged
+                key = 'highest_profit',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Random Factor',
@@ -399,8 +264,20 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_RandomFactorSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_RandomFactorSlider_OnValueChanged
+                key = 'randomise',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },            
+            {
+                name = 'Overall Price Priority',
+                tooltip = 'This sets how important pricing is to the overall priority for advertising.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'factor_price',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Lowest Price',
@@ -409,8 +286,9 @@ local tabframes = {
                 min = 0,
                 max = 50000,
                 step = 500,
-                getvalue = Enchantrix_BarkerOptions_LowestPriceSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_LowestPriceSlider_OnValueChanged
+                key = 'lowest_price',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'PriceFactor SweetSpot',
@@ -419,8 +297,9 @@ local tabframes = {
                 min = 0,
                 max = 500000,
                 step = 5000,
-                getvalue = Enchantrix_BarkerOptions_PriceFactorSweetSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_PriceFactorSweetSlider_OnValueChanged
+                key = 'sweet_price',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'PriceFactor Highest',
@@ -429,8 +308,9 @@ local tabframes = {
                 min = 0,
                 max = 1000000,
                 step = 50000,
-                getvalue = Enchantrix_BarkerOptions_PriceFactorHighSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_PriceFactorHighSlider_OnValueChanged
+                key = 'high_price',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
         }
     },
@@ -438,14 +318,26 @@ local tabframes = {
         title = 'Item Priorities',
         options = {
             {
+                name = 'Overall Items Priority',
+                tooltip = 'This sets how important the item is to the overall priority for advertising.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'factor_item',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
                 name = '2H Weapon',
                 tooltip = 'The priority score for 2H weapon enchants.',
                 units = 'percentage',
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_TwoHandedSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_TwoHandedSlider_OnValueChanged
+                key = 'TwoHanded',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Any Weapon',
@@ -454,8 +346,9 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_AnyWeaponSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_AnyWeaponSlider_OnValueChanged
+                key = 'AnyWeapon',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Bracer',
@@ -464,8 +357,9 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_BracerSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_BracerSlider_OnValueChanged
+                key = 'Bracer',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Gloves',
@@ -474,8 +368,9 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_GlovesSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_GlovesSlider_OnValueChanged
+                key = 'Gloves',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Boots',
@@ -484,8 +379,9 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_BootsSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_BootsSlider_OnValueChanged
+                key = 'Boots',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Chest',
@@ -494,8 +390,9 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_ChestSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_ChestSlider_OnValueChanged
+                key = 'Chest',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
                 name = 'Cloak',
@@ -504,25 +401,201 @@ local tabframes = {
                 min = 0,
                 max = 100,
                 step = 1,
-                getvalue = Enchantrix_BarkerOptions_ItemFactors_CloakSlider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_ItemFactors_CloakSlider_OnValueChanged
+                key = 'Cloak',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             }
+        }
+    },
+    { 
+        title = 'Stats 1',
+        options = {
+            {
+                name = 'Overall Stats Priority',
+                tooltip = 'This sets how important the stat is to the overall priority for advertising.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'factor_stat',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Intellect',
+                tooltip = 'The priority score for Intellect enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'INT',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Strength',
+                tooltip = 'The priority score for Strength enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'STR',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Agility',
+                tooltip = 'The priority score for Agility enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'AGI',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Stamina',
+                tooltip = 'The priority score for Stamina enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'STA',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Spirit',
+                tooltip = 'The priority score for Spirit enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'SPI',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'All Stats',
+                tooltip = 'The priority score for enchants that increase all stats.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'all stats',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            }
+        }
+    },
+    { 
+        title = 'Stats 2',
+        options = {
+            {
+                name = 'All Resistances',
+                tooltip = 'The priority score for enchants that boost all resistances.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'all res',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Armour',
+                tooltip = 'The priority score for Armour enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'armour',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Fire Resistance',
+                tooltip = 'The priority score for Fire Resistance enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'INT',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Mana',
+                tooltip = 'The priority score for Mana enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'mana',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Health',
+                tooltip = 'The priority score for Health enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'health',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Damage',
+                tooltip = 'The priority score for Damage enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'DMG',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Defense',
+                tooltip = 'The priority score for Defense enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'DEF',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Other',
+                tooltip = 'The priority score for enchants such as skinning, mining, riding etc.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'other',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
         }
     }
 };
 
-local active_tab = -1;
+
 
 function EnchantrixBarker_OptionsSlider_OnValueChanged()
-    if active_tab ~= -1 then
-        --Enchantrix_ChatPrint( "Tab - Slider changed: "..active_tab..' - '..this:GetID() );
-        tabframes[active_tab].options[this:GetID()].valuechanged();
+    if Enchantrix_BarkerOptions_ActiveTab ~= -1 then
+        --Enchantrix_ChatPrint( "Tab - Slider changed: "..Enchantrix_BarkerOptions_ActiveTab..' - '..this:GetID() );
+        Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].valuechanged();
         value = this:GetValue();
-        --tabframes[active_tab].options[this:GetID()].getvalue();
+        --Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].getvalue();
         
-        valuestr = EnchantrixBarker_OptionsSlider_GetTextFromValue( value, tabframes[active_tab].options[this:GetID()].units );
+        valuestr = EnchantrixBarker_OptionsSlider_GetTextFromValue( value, Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].units );
         
-        getglobal(this:GetName().."Text"):SetText(tabframes[active_tab].options[this:GetID()].name.." - "..valuestr );
+        getglobal(this:GetName().."Text"):SetText(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[this:GetID()].name.." - "..valuestr );
     end
 end
 
@@ -553,8 +626,8 @@ function Enchantrix_BarkerOptions_Tab_OnClick()
 end
 
 function Enchantrix_BarkerOptions_ShowFrame( frame_index )
-    active_tab = -1
-    for index, frame in tabframes do
+    Enchantrix_BarkerOptions_ActiveTab = -1
+    for index, frame in Enchantrix_BarkerOptions_TabFrames do
         if ( index == frame_index ) then
             --Enchantrix_ChatPrint( "Showing Frame: "..index );
             for i = 1,10 do
@@ -572,11 +645,11 @@ function Enchantrix_BarkerOptions_ShowFrame( frame_index )
                 getglobal(slidername.."Low"):SetText();
                 slider:Show();
             end
-            active_tab = index
+            Enchantrix_BarkerOptions_ActiveTab = index
             for i, opt in frame.options do
                 slidername = 'EnchantrixBarker_OptionsSlider_'..i
                 slider = getglobal(slidername);
-                slider:SetValue(opt.getvalue());
+                slider:SetValue(opt.getvalue(i));
                 getglobal(slidername.."Text"):SetText(opt.name..' - '..EnchantrixBarker_OptionsSlider_GetTextFromValue(slider:GetValue(),opt.units));
             end
         end
@@ -626,7 +699,7 @@ function Enchantrix_CreateBarker()
                         cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
                     end
                     
-                    local profit = cost * Enchantrix_BarkerGetConfig("profit_margin");
+                    local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
                     if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
                         profit = Enchantrix_BarkerGetConfig("highest_profit");
                     end
@@ -680,21 +753,20 @@ function Enchantrix_ScoreEnchantPriority( enchant )
 
     local score_item = 0;
     
-    if( overall_category_priority.item.priorities[Enchantrix_GetItemCategoryKey(enchant.index)] ) then
-        score_item = overall_category_priority.item.priorities[Enchantrix_GetItemCategoryKey(enchant.index)];
-        score_item = score_item * overall_category_priority.item.factor;
+    if Enchantrix_BarkerGetConfig( Enchantrix_GetItemCategoryKey(enchant.index) ) then
+        score_item = Enchantrix_BarkerGetConfig( Enchantrix_GetItemCategoryKey(enchant.index) );
+        score_item = score_item * Enchantrix_BarkerGetConfig( 'factor_item' )*0.01;
     end
 
---Enchantrix_ChatPrint( "Item Key: "..Enchantrix_GetItemCategoryKey(enchant.index)..", Score: "..score_item);    
     local score_stat = 0;
     
-    if( overall_category_priority.stat.priorities[Enchantrix_GetEnchantStat(enchant)] ) then
-        score_stat = overall_category_priority.stat.priorities[Enchantrix_GetEnchantStat(enchant)];
+    if Enchantrix_BarkerGetConfig( Enchantrix_GetEnchantStat(enchant) ) then
+        score_stat = Enchantrix_BarkerGetConfig( Enchantrix_GetEnchantStat(enchant));
     else
-        score_stat = overall_category_priority.stat.priorities.other;
+        score_stat = Enchantrix_BarkerGetConfig( 'other' );        
     end
-        
-    score_stat = score_stat * overall_category_priority.stat.factor;
+    
+    score_stat = score_stat * Enchantrix_BarkerGetConfig( 'factor_stat' )*0.01;
         
     local score_price = 0;
     local price_score_floor = Enchantrix_BarkerGetConfig("sweet_price");
@@ -707,10 +779,10 @@ function Enchantrix_ScoreEnchantPriority( enchant )
         score_price = (range - (enchant.price - price_score_floor))/range * 100;
     end
     
-    score_price = score_price * overall_category_priority.price.factor;
+    score_price = score_price * Enchantrix_BarkerGetConfig( 'factor_price' )*0.01;
     score_total = (score_item + score_stat + score_price);
     
-    return score_total * (1 - Enchantrix_BarkerGetConfig("randomise")) + math.random(300) * Enchantrix_BarkerGetConfig("randomise");
+    return score_total * (1 - Enchantrix_BarkerGetConfig("randomise")*0.01) + math.random(300) * Enchantrix_BarkerGetConfig("randomise")*0.01;
 end
 
 function Enchantrix_ResetPriorityList()
