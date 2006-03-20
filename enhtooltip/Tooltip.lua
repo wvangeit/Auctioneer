@@ -502,6 +502,10 @@ function getTextGSC(money, exact)
 	local GSC_PART=".|cff%s%02d|r"
 	local GSC_NONE="|cffa0a0a0"..TEXT_NONE.."|r"
 
+	if (not exact) and (money >= 10000) then
+		-- Round to nearest silver
+		money = math.floor(money / 100 + 0.5) * 100
+	end
 	local g, s, c = getGSC(money)
 
 	local gsc = ""
@@ -510,7 +514,7 @@ function getTextGSC(money, exact)
 		if (s > 0) then
 			gsc = gsc..string.format(GSC_PART, GSC_SILVER, s)
 		end
-		if exact then
+		if (c > 0) then
 			gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
 		end
 	elseif (s > 0) then
@@ -523,7 +527,7 @@ function getTextGSC(money, exact)
 	else
 		gsc = GSC_NONE
 	end
-		return gsc
+	return gsc
 end
 
 function embedRender()
