@@ -107,6 +107,32 @@ function addPendingBid(item, quantity, bid, seller, isBuyout)
 end
 
 -------------------------------------------------------------------------------
+-- Deletes a pending bid from the database
+-------------------------------------------------------------------------------
+function deletePendingBid(item, quantity, bid, seller, isBuyout)
+	if (item and quantity and bid and seller) then
+		local pendingBidsTable = getPendingBidsTableForItem(item, true);
+		for index = 1, table.getn(pendingBidsTable) do
+			local pendingBid = unpackPendingBid(pendingBidsTable[index]);
+			if (pendingBid.quantity == quantity and
+				pendingBid.bid == bid and
+				pendingBid.seller == seller and
+				pendingBid.isBuyout == isBuyout) then
+				-- Found it! Delete the pending bid
+				table.remove(pendingBidsTable, index);
+				debugPrint("Deleted pending bid: "..date("%c", pendingBid.time)..", "..item..", "..pendingBid.quantity..", "..pendingBid.bid..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout));
+				-- Remove the item's table if empty. This happens automatically
+				-- when getting it via the built-in method.
+				getPendingBidsTableForItem(item);
+				return true;
+			end
+		end
+	end
+	debugPrint("No pending bid found to delete: "..item..", "..quantity..", "..bid..", "..nilSafeStringFromString(seller)..", "..stringFromBoolean(isBuyout));
+	return false;
+end
+
+-------------------------------------------------------------------------------
 -- Converts a pending bid into a ';' delimited string.
 -------------------------------------------------------------------------------
 function packPendingBid(pendingBid)
@@ -905,6 +931,7 @@ end
 BeanCounter.Purchases = 
 {
 	AddPendingBid = addPendingBid;
+	DeletePendingBid = deletePendingBid;
 	GetPendingBidItems = getPendingBidItems;
 	GetPendingBidsForItem = getPendingBidsForItem;
 	AddSuccessfulBid = addSuccessfulBid;

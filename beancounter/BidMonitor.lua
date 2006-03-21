@@ -54,14 +54,14 @@ end
 function postPlaceAuctionBidHook(_, _, listType, index, bid)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
 	if (name and count and bid) then
-		addPendingBid(name, count, bid, owner, (bid == buyoutPrice));
+		addPendingBid(name, count, bid, owner, (bid == buyoutPrice), highBidder);
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Adds a pending bid to the queue.
 -------------------------------------------------------------------------------
-function addPendingBid(name, count, bid, owner, isBuyout)
+function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder)
 	-- Add a pending bid to the queue.
 	local pendingBid = {};
 	pendingBid.name = name;
@@ -69,6 +69,7 @@ function addPendingBid(name, count, bid, owner, isBuyout)
 	pendingBid.bid = bid;
 	pendingBid.owner = owner;
 	pendingBid.isBuyout = isBuyout;
+	pendingBid.isHighBidder = isHighBidder;
 	table.insert(PendingBids, pendingBid);
 	debugPrint("addPendingBid() - Added pending bid");
 	
@@ -132,6 +133,11 @@ end
 function onBidAccepted()
 	local bid = removePendingBid();
 	if (bid) then
+		-- If the player is buying out an auction they already bid on, we
+		-- need to remove the pending bid since an outbid e-mail is not sent.
+		if (bid.isBuyout and bid.isHighBidder) then
+			BeanCounter.Purchases.DeletePendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
+		end
 		BeanCounter.Purchases.AddPendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
 	end
 end
