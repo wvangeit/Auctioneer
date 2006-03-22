@@ -465,6 +465,10 @@ end
 
 function Enchantrix_BuildCommandMap()
 	Enchantrix_CommandMap = {
+			[_ENCH('CmdOn')] = 'on',
+			[_ENCH('CmdOff')] = 'off',
+			[_ENCH('CmdHelp')] = 'help',
+			[_ENCH('CmdToggle')] = 'toggle',
 			[_ENCH('CmdDisable')] = 'disable',
 			[_ENCH('CmdClear')] = 'clear',
 			[_ENCH('CmdLocale')] = 'locale',
@@ -515,7 +519,7 @@ function Enchantrix_Command(command, source)
 		Enchantrix_ChatPrint_Help();
 		return;
 
-	elseif (((cmd == _ENCH('CmdOn')) or (cmd == "on")) or ((cmd == _ENCH('CmdOff')) or (cmd == "off")) or ((cmd == _ENCH('CmdToggle')) or (cmd == "toggle"))) then
+	elseif ((cmd == "on") or (cmd == "off") or (cmd == "toggle")) then
 		-- /enchantrix on|off|toggle
 		Enchantrix_OnOff(cmd, chatprint);
 

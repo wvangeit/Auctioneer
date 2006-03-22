@@ -75,22 +75,23 @@ end
 
 function buildCommandMap()
 	commandMap = {
-			[_INFM('CmdOn')] = 'on',
-			[_INFM('CmdOff')] = 'off',
-			[_INFM('CmdToggle')] = 'toggle',
-			[_INFM('CmdDisable')] = 'disable',
-			[_INFM('CmdLocale')] = 'locale',
-			[_INFM('CmdDefault')] = 'default',
-			[_INFM('CmdEmbed')] = 'embed',
-			[_INFM('ShowIcon')] = 'show-icon',
-			[_INFM('ShowStack')] = 'show-stack',
-			[_INFM('ShowUsage')] = 'show-usage',
-			[_INFM('ShowQuest')] = 'show-quest',
-			[_INFM('ShowMerchant')] = 'show-merchant',
-			[_INFM('ShowVendor')] = 'show-vendor',
-			[_INFM('ShowVendorBuy')] = 'show-vendor-buy',
-			[_INFM('ShowVendorSell')] = 'show-vendor-sell',
-		}
+		[_INFM('CmdOn')]			=	'on',
+		[_INFM('CmdOff')]			=	'off',
+		[_INFM('CmdHelp')]			=	'help',
+		[_INFM('CmdToggle')]		=	'toggle',
+		[_INFM('CmdDisable')]		=	'disable',
+		[_INFM('CmdLocale')]		=	'locale',
+		[_INFM('CmdDefault')]		=	'default',
+		[_INFM('CmdEmbed')]			=	'embed',
+		[_INFM('ShowIcon')]			=	'show-icon',
+		[_INFM('ShowStack')]		=	'show-stack',
+		[_INFM('ShowUsage')]		=	'show-usage',
+		[_INFM('ShowQuest')]		=	'show-quest',
+		[_INFM('ShowMerchant')]		=	'show-merchant',
+		[_INFM('ShowVendor')]		=	'show-vendor',
+		[_INFM('ShowVendorBuy')]	=	'show-vendor-buy',
+		[_INFM('ShowVendorSell')]	=	'show-vendor-sell',
+	}
 
 	commandMapRev = {}
 	for k,v in pairs(commandMap) do
