@@ -247,35 +247,13 @@ Enchantrix_BarkerOptions_TabFrames = {
                 valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
             {
-                name = 'highest_profit',
+                name = 'Highest Profit',
                 tooltip = 'The highest total cash profit to make on an enchant.',
                 units = 'money',
                 min = 0,
                 max = 250000,
                 step = 500,
                 key = 'highest_profit',
-                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-            },
-            {
-                name = 'Random Factor',
-                tooltip = 'The amount of randomness in the enchants chosen for the trade shout.',
-                units = 'percentage',
-                min = 0,
-                max = 100,
-                step = 1,
-                key = 'randomise',
-                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
-                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-            },            
-            {
-                name = 'Overall Price Priority',
-                tooltip = 'This sets how important pricing is to the overall priority for advertising.',
-                units = 'percentage',
-                min = 0,
-                max = 100,
-                step = 1,
-                key = 'factor_price',
                 getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
                 valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
@@ -287,6 +265,17 @@ Enchantrix_BarkerOptions_TabFrames = {
                 max = 50000,
                 step = 500,
                 key = 'lowest_price',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Overall Price Priority',
+                tooltip = 'This sets how important pricing is to the overall priority for advertising.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'factor_price',
                 getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
                 valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
@@ -312,6 +301,17 @@ Enchantrix_BarkerOptions_TabFrames = {
                 getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
                 valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             },
+            {
+                name = 'Random Factor',
+                tooltip = 'The amount of randomness in the enchants chosen for the trade shout.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'randomise',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            }
         }
     },
     { 
@@ -1012,7 +1012,7 @@ function Enchantrix_GetShortDescriptor( index )
             return "+"..statvalue..' '..short_attributes[index];
         end
     end
-    local enchant = Enchantrix_Split(GetCraftInfo(index), " - ");
+    local enchant = Enchantrix_Split(GetCraftInfo(index), "-");
 		
     return enchant[table.getn(enchant)];
 end
@@ -1026,7 +1026,7 @@ function Enchantrix_GetEnchantStat( enchant )
             return short_attributes[index];
         end
     end
-    local enchant = Enchantrix_Split(GetCraftInfo(index), " - ");
-		
+    local enchant = Enchantrix_Split(GetCraftInfo(index), "-");
+    
     return enchant[table.getn(enchant)];
 end
