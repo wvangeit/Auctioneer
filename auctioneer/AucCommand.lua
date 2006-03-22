@@ -617,7 +617,7 @@ function registerKhaos()
 				id="pct-bidmarkdown";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiBidmarkdown');
 				helptext=_AUCT('HelpPctBidmarkdown');
@@ -636,7 +636,7 @@ function registerKhaos()
 				id="pct-markup";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiMarkup');
 				helptext=_AUCT('HelpPctMarkup');
@@ -655,7 +655,7 @@ function registerKhaos()
 				id="pct-maxless";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiMaxless');
 				helptext=_AUCT('HelpPctMaxless');
@@ -674,7 +674,7 @@ function registerKhaos()
 				id="pct-nocomp";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiNocomp');
 				helptext=_AUCT('HelpPctNocomp');
@@ -693,7 +693,7 @@ function registerKhaos()
 				id="pct-underlow";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiUnderlow');
 				helptext=_AUCT('HelpPctUnderlow');
@@ -712,7 +712,7 @@ function registerKhaos()
 				id="pct-undermkt";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiUndermkt');
 				helptext=_AUCT('HelpPctUndermkt');
@@ -728,6 +728,162 @@ function registerKhaos()
 				difficulty=4;
 			};
 			{
+				id="AuctioneerAskPriceHeader";
+				type=K_HEADER;
+				text=_AUCT('GuiAskPriceHeader');
+				helptext=_AUCT('GuiAskPriceHeaderHelp');
+				difficulty=2;
+			};
+			{
+				id="askprice";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPrice');
+				helptext=_AUCT('HelpAskPrice');
+				callback=function(state)
+					if (state.checked) then
+						Auctioneer.AskPrice.OnOff("on");
+					else
+						Auctioneer.AskPrice.OnOff("off");
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (_AUCT('StatAskPriceOn'))
+					else
+						return (_AUCT('StatAskPriceOff'))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="askprice-trigger";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"all"};
+				};
+				text=_AUCT('GuiAskPriceTrigger');
+				helptext=_AUCT('HelpAskPriceTrigger');
+				callback = function(state)
+					Auctioneer.AskPrice.SetTrigger(state.value)
+				end;
+				feedback = function (state)
+					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceTrigger'), state.value);
+				end;
+				default = { value = getKhaosDefault('askprice-trigger') };
+				disabled = { value = getKhaosDefault('askprice-trigger') };
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=3;
+			};
+			{
+				id="askprice-vendor";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPriceVendor');
+				helptext=_AUCT('HelpAskPriceVendor');
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("vendor", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceVendor')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceVendor')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-vendor')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="askprice-party";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPriceParty');
+				helptext=_AUCT('HelpAskPriceParty');
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("party", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceParty')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceParty')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-party')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="askprice-guild";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPriceGuild');
+				helptext=_AUCT('HelpAskPriceGuild');
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("guild", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceGuild')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceGuild')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-guild')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="askprice-smart";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPriceSmart');
+				helptext=_AUCT('HelpAskPriceSmart');
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("smart", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceSmart')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceSmart')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-smart')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
+				id="askprice-ad";
+				type=K_TEXT;
+				text=_AUCT('GuiAskPriceAd');
+				helptext=_AUCT('HelpAskPriceAd');
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("ad", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceAd')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceAd')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-ad')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
 				id="AuctioneerOtherHeader";
 				type=K_HEADER;
 				text=_AUCT('GuiOtherHeader');
@@ -738,7 +894,7 @@ function registerKhaos()
 				id="also";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiAlso');
 				helptext=_AUCT('HelpAlso');
@@ -824,7 +980,7 @@ function registerKhaos()
 				id="DefaultOption";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"all"};
 				};
 				text=_AUCT('GuiDefaultOption');
 				helptext=_AUCT('HelpDefault');
@@ -880,6 +1036,7 @@ function buildCommandMap()
 	commandMap = {
 		[_AUCT('CmdOn')]				=	'on',
 		[_AUCT('CmdOff')]				=	'off',
+		[_AUCT('CmdHelp')]				=	'help',
 		[_AUCT('CmdToggle')]			=	'toggle',
 		[_AUCT('CmdDisable')]			=	'disable',
 		[_AUCT('CmdClear')]				=	'clear',
@@ -897,16 +1054,24 @@ function buildCommandMap()
 		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
 		[_AUCT('CmdProtectWindow')]		=	'protect-window',
 		[_AUCT('CmdFinish')]			=	'finish',
-		[_AUCT('CmdBroker')]			=	'broker';
+		[_AUCT('CmdBroker')]			=	'broker',
 		[_AUCT('CmdBidbroker')]			=	'bidbroker',
 		[_AUCT('CmdBidbrokerShort')]	=	'bidbroker',
-		[_AUCT('CmdAuctionClick')]		=	'auction-click';
-		[_AUCT('CmdPctBidmarkdown')]	=	'pct-bidmarkdown';
-		[_AUCT('CmdPctMarkup')]			=	'pct-markup';
-		[_AUCT('CmdPctMaxless')]		=	'pct-maxless';
-		[_AUCT('CmdPctNocomp')]			=	'pct-nocomp';
-		[_AUCT('CmdPctUnderlow')]		=	'pct-underlow';
-		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt';
+		[_AUCT('CmdAuctionClick')]		=	'auction-click',
+		[_AUCT('CmdPctBidmarkdown')]	=	'pct-bidmarkdown',
+		[_AUCT('CmdPctMarkup')]			=	'pct-markup',
+		[_AUCT('CmdPctMaxless')]		=	'pct-maxless',
+		[_AUCT('CmdPctNocomp')]			=	'pct-nocomp',
+		[_AUCT('CmdPctUnderlow')]		=	'pct-underlow',
+		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt',
+
+		--AskPrice related commands
+		[_AUCT('CmdAskPriceVendor')]	=	'vendor',
+		[_AUCT('CmdAskPriceGuild')]		=	'guild',
+		[_AUCT('CmdAskPriceParty')]		=	'party',
+		[_AUCT('CmdAskPriceSmart')]		=	'smart',
+		[_AUCT('CmdAskPriceAd')]		=	'ap',
+
 	}
 
 	commandMapRev = {}
@@ -1029,6 +1194,10 @@ function mainHandler(command, source)
 	elseif (cmd == 'hsp') then
 		Auctioneer.Statistic.DoHSP(param);
 
+	--/auctioneer askprice (vendor|guild|party|smart|trigger|ad)
+	elseif (cmd == 'askprice') then
+		Auctioneer.AskPrice.CommandHandler(param, source);
+
 	--/auctioneer (GenVars)
 	elseif (cmd == 'embed' or cmd == 'autofill' or cmd == 'auction-click' or
 			cmd == 'show-verbose' or cmd == 'show-average' or cmd == 'show-link' or
@@ -1051,7 +1220,6 @@ end
 
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function chatPrintHelp()
-
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
 
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
@@ -1078,7 +1246,10 @@ function chatPrintHelp()
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));
+--[[
+	--this line is causing hangs, disabled for now pending further investigation.
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionDuration'), _AUCT('OptAuctionDuration'), _AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')), _AUCT('HelpAuctionDuration')));
+]]
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdLocale'), _AUCT('OptLocale'), Auctioneer.Util.GetLocalizedFilterVal("locale"), _AUCT('HelpLocale')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPrintin'), _AUCT('OptPrintin'), frameName, _AUCT('HelpPrintin')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdFinish'), _AUCT('OptFinish'), _AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')), _AUCT('HelpFinish')));
@@ -1089,6 +1260,8 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUnderlow'), _AUCT('OptPctUnderlow'), Auctioneer.Command.GetFilterVal('pct-underlow'), _AUCT('HelpPctUnderlow')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUndermkt'), _AUCT('OptPctUndermkt'), Auctioneer.Command.GetFilterVal('pct-undermkt'), _AUCT('HelpPctUndermkt')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctMaxless'), _AUCT('OptPctMaxless'), Auctioneer.Command.GetFilterVal('pct-maxless'), _AUCT('HelpPctMaxless')));
+
+	Auctioneer.AskPrice.ChatPrintHelp()
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdClear'), _AUCT('OptClear'), _AUCT('HelpClear')));

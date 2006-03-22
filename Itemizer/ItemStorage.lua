@@ -25,7 +25,8 @@
 local getItemData, storeItemData, haveItemData
 local splitString = Itemizer.Util.Split
 
-function getItemData(itemID, randomProp)
+function getItemData(itemID, randomProp) --This function is not finished
+--[[
 	itemID = tonumber(itemID)
 	randomProp = tonumber(randomProp)
 
@@ -50,6 +51,7 @@ function getItemData(itemID, randomProp)
 			
 		end
 	end
+]]
 end
 
 function storeItemData(itemInfo)

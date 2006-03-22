@@ -39,6 +39,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="AucTooltip.lua"/>
 	<Script file="AucUtil.lua"/>
 	<Script file="AucStorage.lua"/>
+	<Script file="AucAskPrice.lua"/>
 	<Script file="Auctioneer.lua"/>
 
 	<Script file="AuctioneerUI.lua"/>

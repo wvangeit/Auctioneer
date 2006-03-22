@@ -24,9 +24,9 @@
 ]]
 
 Auctioneer = {
-	Scanning = {};
-
 	API = {};
+
+	AskPrice = {};
 
 	Command = {};
 
@@ -37,6 +37,8 @@ Auctioneer = {
 	Filter = {};
 
 	Scanner = {};
+
+	Scanning = {};
 
 	Statistic = {};
 

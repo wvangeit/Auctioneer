@@ -37,7 +37,7 @@ local defunctAuctionsCount = 0;
 local snapshotItemPrices = {};
 
 --Local constants
-local maxAllowedFormatInt = 2000000000; --local maxAllowedFormatInt = 2000000000; -- numbers much greater than this overflow when using format("%d") --MAX_ALLOWED_FORMAT_INT
+local maxAllowedFormatInt = 2000000000; -- numbers much greater than this overflow when using format("%d") --MAX_ALLOWED_FORMAT_INT
 
 -- Auction time constants
 --Auctioneer.Core.Constants.TimeLeft.
@@ -153,6 +153,15 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["pct-underlow"]			=	5,
 	["pct-undermkt"]			=	20,
 	["locale"]					=	"default",
+
+	--AskPrice related commands
+	["askprice"]				=	"on",
+	["askprice-vendor"]			=	"off",
+	["askprice-guild"]			=	"off",
+	["askprice-party"]			=	"off",
+	["askprice-smart"]			=	"off",
+	["askprice-trigger"]		=	"?",
+	["askprice-ad"]				=	"on",
 }
 
 function getItemData(itemKey)
@@ -523,6 +532,10 @@ function lockAndLoad()
 	--GUI Registration code added by MentalPower
 	Auctioneer.Command.Register();
 
+	--Init AskPrice
+	Auctioneer.AskPrice.Init();
+
+	--Register Auctioneer with Babylonian
 	if not Babylonian.IsAddOnRegistered("Auctioneer") then
 		Babylonian.RegisterAddOn("Auctioneer", Auctioneer.Command.SetLocale);
 	end

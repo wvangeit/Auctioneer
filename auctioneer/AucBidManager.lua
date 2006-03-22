@@ -170,7 +170,9 @@ function addPlayerToAccount(player)
 	-- List of players on the same account as the current player (including the
 	-- current player). Auctions owned by these players cannot be bid on.
 	if (not AuctionConfig.players) then AuctionConfig.players = {}; end
-	table.insert(AuctionConfig.players, player);
+	if (not isPlayerOnAccount(player)) then
+		table.insert(AuctionConfig.players, player);
+	end
 end
 
 -------------------------------------------------------------------------------
