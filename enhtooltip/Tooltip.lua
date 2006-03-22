@@ -488,11 +488,7 @@ function getGSC(money)
 end
 
 -- formats money text by color for gold, silver, copper
-function getTextGSC(money, exact)
-	if not exact then
-		exact = false
-	end
-
+function getTextGSC(money, exact, dontUseColorCodes)
 	local TEXT_NONE = "0"
 
 	local GSC_GOLD="ffd100"
@@ -509,23 +505,36 @@ function getTextGSC(money, exact)
 	local g, s, c = getGSC(money)
 
 	local gsc = ""
-	if (g > 0) then
-		gsc = string.format(GSC_START, GSC_GOLD, g)
-		if (s > 0) then
-			gsc = gsc..string.format(GSC_PART, GSC_SILVER, s)
+	if (not dontUseColorCodes) then
+		if (g > 0) then
+			gsc = string.format(GSC_START, GSC_GOLD, g)
+			if (s > 0) then
+				gsc = gsc..string.format(GSC_PART, GSC_SILVER, s)
+			end
+			if (c > 0) then
+				gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
+			end
+		elseif (s > 0) then
+			gsc = string.format(GSC_START, GSC_SILVER, s)
+			if (c > 0) then
+				gsc = gsc..string.format(GSC_PART, GSC_COPPER, c)
+			end
+		elseif (c > 0) then
+			gsc = gsc..string.format(GSC_START, GSC_COPPER, c)
+		else
+			gsc = GSC_NONE
 		end
-		if (c > 0) then
-			gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
-		end
-	elseif (s > 0) then
-		gsc = string.format(GSC_START, GSC_SILVER, s)
-		if (c > 0) then
-			gsc = gsc..string.format(GSC_PART, GSC_COPPER, c)
-		end
-	elseif (c > 0) then
-		gsc = gsc..string.format(GSC_START, GSC_COPPER, c)
+
 	else
-		gsc = GSC_NONE
+		if (g > 0) then
+			gsc = gsc .. g .. "g ";
+		end;
+		if (s > 0) then
+			gsc = gsc .. s .. "s ";
+		end;
+		if (c > 0) then
+			gsc = gsc .. c .. "c ";
+		end;
 	end
 	return gsc
 end
