@@ -3,7 +3,7 @@
 ##
 ## Interface: 10900
 ## LoadOnDemand: 1
-## Dependencies: Stubby
+## Dependencies: Stubby, EnhTooltip
 ## SavedVariablesPerCharacter: AHPurchases
 ##
 ## Version: <%version%> (<%codename%>)
