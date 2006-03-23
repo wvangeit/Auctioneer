@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getMed, getMeans, getItemSnapshotMedianBuyout, getSnapMedian, getItemHistoricalMedianBuyout, getHistMedian, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
+local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getPercentile, getMeans, getItemSnapshotMedianBuyout, getSnapMedian, getItemHistoricalMedianBuyout, getHistMedian, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
 
 -- Subtracts/Adds given percentage from/to a value
 
@@ -65,88 +65,66 @@ end
 
 -- Returns the median value of a given table one-dimentional table
 function getMedian(valuesTable)
-
---  Original getMedian function moved to getMed   getMedian now uses IQR calculations
---  by Karavirs
-	if (valuesTable == nil) or (type(valuesTable) ~= "table") then
-		return nil   -- make valuesTable a required table argument
-	end
-	if table.getn(valuesTable) == 0 then
-		return 0, 0; -- if there is an empty table, returns median = 0, count = 0
-	end
-
-	local tableSize = table.getn(valuesTable);
-
-	if (tableSize == 1) then
-		return tonumber(valuesTable[1]), 1;
-	end
-
---  REWORK by Karavirs to use IQR*1.5 to ignore outliers
-	local median; -- value to return
-	local workTable = {};
-	local workTablelow = {};
-	local workTablehigh ={};
-	local iq1,iq2,iq3, iqr,iqlow,iqhigh; -- iq1 is median 1st quartile iq2 is median of set iq3 is median of 3rd quartile iqr is iq3 - iq1
-	iq2 = getMed(valuesTable);
-
-	-- Get the median of lower half=iq1 and upper half=iq3 of the valuesTable
-	if (math.mod(tableSize, 2) == 0) then --even table size
-		local middleindex = tableSize / 2;
-		for i = 1, middleindex do table.insert(workTablelow,valuesTable[i]) end;
-		iq1=getMed(workTablelow);
-		for i = middleindex + 1 , tableSize do table.insert(workTablehigh,valuesTable[i]) end;
-		iq3=getMed(workTablehigh);
-	else --odd table size
-		local middleIndex = (tableSize + 1) /2;
-		for i = 1 , middleIndex - 1 do table.insert(workTablelow,valuesTable[i]) end;
-		iq1 = getMed(workTablelow);
-		for i = middleIndex + 1 , tableSize do table.insert(workTablehigh,valuesTable[i]) end;
-		iq3 = getMed(workTablehigh);
-	end
-	iqr = (iq3 - iq1) * 1.5
-	iqlow = iq1 - iqr
-	iqhigh = iq3 + iqr
-	-- Now evaluate the values in the table to determine if they are outliers if so drop from table for true median
-	for i = 1 , tableSize do
-		if tonumber(valuesTable[i])>iqlow and tonumber(valuesTable[i])<iqhigh then table.insert(workTable,valuesTable[i]) end;
-	end
-
-	median = getMed(workTable)
-
-	return tonumber(median), tableSize or 0;
+	return getPercentile(valuesTable, 0.5)
 end
 
--- Returns the median value of a given table one-dimentional table
-function getMed(valuesTable)
-	if (valuesTable == nil) or (type(valuesTable) ~= "table") then
+-- Return weighted average percentile such that returned value
+-- is larger than or equal to (100*pct)% of the table values
+-- 0 <= pct <= 1
+function getPercentile(valuesTable, pct)
+	if (type(valuesTable) ~= "table") or (not tonumber(pct)) then
 		return nil   -- make valuesTable a required table argument
 	end
-	if table.getn(valuesTable) == 0 then
+	pct = math.min(math.max(pct, 0), 1) -- Make sure 0 <= pct <= 1
+
+	local _percentile = function(sortedTable, p, first, last)
+		local f = (last - first) * p + first
+		local i1, i2 = math.floor(f), math.ceil(f)
+		f = f - i1
+
+		return sortedTable[i1] * (1 - f) + sortedTable[i2] * f
+	end
+
+	local tableSize = table.getn(valuesTable) or 0
+
+	if (tableSize == 0) then
 		return 0, 0; -- if there is an empty table, returns median = 0, count = 0
+	elseif (tableSize == 1) then
+		return tonumber(valuesTable[1]), 1
 	end
 
-	local tableSize = table.getn(valuesTable);
+	-- The following calculations require a sorted table
+	table.sort(valuesTable)
 
-	if (tableSize == 1) then
-		return tonumber(valuesTable[1]), 1;
+	-- Skip IQR calculations if table is too small to have outliers
+	if tableSize <= 4 then
+		return _percentile(valuesTable, pct, 1, tableSize), tableSize
 	end
 
-	local median; -- value to return
+	--  REWORK by Karavirs to use IQR*1.5 to ignore outliers
+	-- q1 is median 1st quartile q2 is median of set q3 is median of 3rd quartile iqr is q3 - q1
+	local q1 = _percentile(valuesTable, 0.25, 1, tableSize)
+	local q3 = _percentile(valuesTable, 0.75, 1, tableSize)
+	assert(q3 >= q1)
 
-	table.sort(valuesTable);
+	local iqr = (q3 - q1) * 1.5
+	local iqlow, iqhigh = q1 - iqr, q3 + iqr
 
-	if (math.mod(tableSize, 2) == 0) then --first handle the case of even table size
-		local middleIndex1 = tableSize / 2;
-		local middleIndex2 = middleIndex1 + 1;
-		local middleValue1 = valuesTable[middleIndex1];
-		local middleValue2 = valuesTable[middleIndex2];
-		median = (middleValue1 + middleValue2) / 2; --average the two middle values
-	else -- the table size is odd
-		local trueMiddleIndex = (tableSize + 1) / 2; -- calculate the middle index
-		median = valuesTable[trueMiddleIndex];
+	-- Find first and last index to include in median calculation
+	local first, last = 1, tableSize
+
+	-- Skip low outliers
+	while valuesTable[first] < iqlow do
+		first = first + 1
 	end
 
-	return tonumber(median), tableSize or 0;
+	-- Skip high outliers
+	while valuesTable[last] > iqhigh do
+		last = last - 1
+	end
+	assert(last >= first)
+
+	return _percentile(valuesTable, pct, first, last), last - first + 1
 end
 
 
@@ -653,6 +631,7 @@ Auctioneer.Statistic = {
 	PercentLessThan = percentLessThan,
 	GetLowest = getLowest,
 	GetMedian = getMedian,
+	GetPercentile = getPercentile,
 	GetMeans = getMeans,
 	GetItemSnapshotMedianBuyout = getItemSnapshotMedianBuyout,
 	GetSnapMedian = getSnapMedian,

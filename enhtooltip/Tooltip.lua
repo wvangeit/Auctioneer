@@ -483,7 +483,7 @@ function getGSC(money)
 	if (money == nil) then money = 0 end
 	local g = math.floor(money / 10000)
 	local s = math.floor((money - (g*10000)) / 100)
-	local c = math.floor(money - (g*10000) - (s*100))
+	local c = math.ceil(money - (g*10000) - (s*100))
 	return g,s,c
 end
 
@@ -506,25 +506,21 @@ function getTextGSC(money, exact, dontUseColorCodes)
 
 	local gsc = ""
 	if (not dontUseColorCodes) then
+		local fmt = GSC_START
 		if (g > 0) then
-			gsc = string.format(GSC_START, GSC_GOLD, g)
-			if (s > 0) then
-				gsc = gsc..string.format(GSC_PART, GSC_SILVER, s)
-			end
-			if (c > 0) then
-				gsc = gsc..string.format(GSC_PART,GSC_COPPER, c)
-			end
-		elseif (s > 0) then
-			gsc = string.format(GSC_START, GSC_SILVER, s)
-			if (c > 0) then
-				gsc = gsc..string.format(GSC_PART, GSC_COPPER, c)
-			end
-		elseif (c > 0) then
-			gsc = gsc..string.format(GSC_START, GSC_COPPER, c)
-		else
+			gsc = gsc..string.format(fmt, GSC_GOLD, g)
+			fmt = GSC_PART
+		end
+		if (s > 0) or (c > 0) then
+			gsc = gsc..string.format(fmt, GSC_SILVER, s)
+			fmt = GSC_PART
+		end
+		if (c > 0) then
+			gsc = gsc..string.format(fmt, GSC_COPPER, c)
+		end
+		if (gsc == "") then
 			gsc = GSC_NONE
 		end
-
 	else
 		if (g > 0) then
 			gsc = gsc .. g .. "g ";
@@ -535,6 +531,9 @@ function getTextGSC(money, exact, dontUseColorCodes)
 		if (c > 0) then
 			gsc = gsc .. c .. "c ";
 		end;
+		if (gsc == "") then
+			gsc = TEXT_NONE
+		end
 	end
 	return gsc
 end
@@ -1008,6 +1007,10 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
 		if (quality == nil) then quality = qualityFromLink(link) end
 
 		tooltipCall(GameTooltip, name, link, quality, quantity)
+	else
+		-- This hack explicitely closes tooltip on empty inventory slots.
+		-- TODO: Solve the problem instead of the symptom :)
+		hideTooltip()
 	end
 end
 

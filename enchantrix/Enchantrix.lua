@@ -254,20 +254,22 @@ local tooltipFormat = {
 			-- counts = off
 			['off'] = "  $conf% |q$name|r $rate",
 			-- counts = on
-			['on'] = "  $conf% |e($counts)|r |q$name|r $rate",
+			['on'] = "  $conf% |q$name|r $rate |e(B=$bcount L=$lcount)|r",
 		},
 		["default"] = {
 			['off'] = "  $name: $prob% $rate",
-			['on'] = "  $name: $prob% $rate |e($counts)|r",
+			['on'] = "  $name: $prob% $rate |e(B=$bcount L=$lcount)|r",
 		},
 	},
 	patterns = {
 		-- Strings
 		["$prob"]	= "",			-- Probability: "75"
-		["$conf"]	= "",			-- Confidence interval: "72-78"
-		["$counts"]	= "",			-- Counts: "51"
+		["$conf"]	= "",			-- Confidence interval: "<1", "72-78", ">99"
+		["$count"]	= "",			-- Local + base counts: "51"
+		["$lcount"] = "",			-- Local count: "13"
+		["$bcount"] = "",			-- Base count: "38"
 		["$name"]	= "",			-- Name: "Lesser Magic Essence"
-		["$rate"]	= "",			-- Avg droprate: "x1.5"
+		["$rate"]	= "",			-- Avg drop amount: "x1.5"
 		-- Colors
 		["|q"]		= "",			-- Quality color
 		["|E"]		= "|cffcccc33",	-- Yellow ("Enchantrix" color)
@@ -314,7 +316,7 @@ local tooltipFormat = {
 		end
 		-- Replace patterns
 		for pat, repl in pairs(this.patterns) do
-			line = string.gsub(line, pat, repl)
+			line = string.gsub(line, pat, repl or "")
 		end
 		return line
 	end,
@@ -686,22 +688,24 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 			local pmin, pmax = confidenceInterval(p, totals.total)
 
 			-- Probabilities
-			tooltipFormat:SetPattern("$prob", string.format("%0.0f", p * 100))
-			if pmax < 0.01 then
-				tooltipFormat:SetPattern("$conf", "<1")
-			elseif pmin > 0.99 then
-				tooltipFormat:SetPattern("$conf", ">99")
+			p, pmin, pmax = math.floor(p * 100 + 0.5), math.floor(pmin * 100 + 0.5), math.floor(pmax * 100 + 0.5)
+			tooltipFormat:SetPattern("$prob", tostring(p))
+			if pmin == 0 then
+				tooltipFormat:SetPattern("$conf", "<"..max(pmax, 1))
+			elseif pmax == 100 then
+				tooltipFormat:SetPattern("$conf", ">"..min(pmin, 99))
 			else
-				local pminstr, pmaxstr = string.format("%0.0f", pmin * 100), string.format("%0.0f", pmax * 100)
-				if pminstr ~= pmaxstr then
-					tooltipFormat:SetPattern("$conf", pminstr.."-"..pmaxstr)
+				if pmin ~= pmax then
+					tooltipFormat:SetPattern("$conf", pmin.."-"..pmax)
 				else
-					tooltipFormat:SetPattern("$conf", pminstr)
+					tooltipFormat:SetPattern("$conf", tostring(p))
 				end
 			end
 
 			-- Counts
-			tooltipFormat:SetPattern("$counts", tostring(counts.biCount + counts.iCount))
+			tooltipFormat:SetPattern("$count", tostring(counts.biCount + counts.iCount))
+			tooltipFormat:SetPattern("$lcount", tostring(counts.iCount))
+			tooltipFormat:SetPattern("$bcount", tostring(counts.biCount))
 
 			-- Name and quality
 			local name, _, quality = GetItemInfo(dSig)
