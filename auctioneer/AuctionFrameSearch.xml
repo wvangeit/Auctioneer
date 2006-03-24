@@ -35,19 +35,34 @@
 
 	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" virtual="true">
 		<Scripts>
+			--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for adding cursor support.
+			local scrollFrame = nil
+			local index = nil;
 			<OnEnter>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
+				scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
+				index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
 				AuctionFrameSearch_ListItem_OnEnter(index);
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide();
+				ResetCursor();
+				scrollFrame = nil;
+				index = nil;
 			</OnLeave>
 			<OnClick>
-				local scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				local index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
 				AuctionFrameSearch_ListItem_OnClick(index);
 			</OnClick>
+			<OnUpdate>
+				if (index) then
+					if (IsControlKeyDown()) then
+						ShowInspectCursor()
+					elseif (IsShiftKeyDown() and IsAltKeyDown()) then
+						SetCursor("BUY_CURSOR")
+					else
+						ResetCursor()
+					end
+				end
+			</OnUpdate>
 		</Scripts>
 		<HighlightTexture name="$parentHighlight" file="Interface\HelpFrame\HelpFrameButton-Highlight" alphaMode="ADD">
 			<Anchors>
