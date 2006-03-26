@@ -226,6 +226,7 @@ local gtHookOnHide				-- GtHookOnHide()
 local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
 local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
 local gtHookSetCraftItem		-- GtHookSetCraftItem(frame,skill,slot)
+local gtHookSetCraftSpell		-- GtHookSetCraftSpell(frame,skill,slot)
 local gtHookSetInventoryItem	-- GtHookSetInventoryItem(frame,unit,slot,retVal)
 local gtHookSetLootItem			-- GtHookSetLootItem(frame,slot)
 local gtHookSetMerchantItem		-- GtHookSetMerchantItem(frame,slot)
@@ -1042,6 +1043,14 @@ function gtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 	end
 end
 
+function gtHookSetCraftSpell(funcArgs, retVal, frame, slot)
+	local name = GetCraftInfo(slot)
+	local link = GetCraftItemLink(slot)
+	if name and link then
+		tooltipCall(GameTooltip, name, link)
+	end
+end
+
 function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 	local link
 	if (slot) then
@@ -1317,6 +1326,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem);
+	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, gtHookSetCraftSpell);
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText);

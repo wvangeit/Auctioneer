@@ -329,6 +329,8 @@ local DisenchantEvent = {}
 
 local MAX_BUYOUT_PRICE = 800000;
 
+local MAX_ITEM_ID = 20000
+
 local MIN_PROFIT_MARGIN = 1000;
 local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
@@ -391,7 +393,7 @@ local function Unserialize(str)
 	-- Break up a disenchant string to a table for easy manipulation
 	local tbl = {}
 	if (str) then
-		for _, de in ipairs(Enchantrix_Split(str, ";")) do
+		for de in Enchantrix_Spliterator(str, ";") do
 			local splt = Enchantrix_Split(de, ":")
 			local id, d, r = tonumber(splt[1]), tonumber(splt[2]), tonumber(splt[3])
 			if (id and d > 0 and r > 0) then
@@ -548,6 +550,7 @@ local function DisenchantListHash()
 	local hash = 1
 	for sig in DisenchantList do
 		local item, suffix = ItemID(sig)
+		MAX_ITEM_ID = math.max(MAX_ITEM_ID, item)
 		hash = math.mod(3 * hash + 2 * (item or 0) +(suffix or 0), 16777216)
 	end
 	return hash
@@ -584,7 +587,12 @@ local function MergeDisenchantLists()
 	-- Merge items from EnchantedLocal
 	for sig, disenchant in pairs(EnchantedLocal) do
 		local item = ItemID(sig)
-		if (item and IsDisenchantable(item)) then
+		MAX_ITEM_ID = math.max(MAX_ITEM_ID, item)
+		if type(disenchant) == "table" then
+			Enchantrix_SaveLocal(sig, disenchant)
+			disenchant = EnchantedLocal[sig]
+		end
+		if IsDisenchantable(item) and (type(disenchant) == "string") then
 			LocalBaseItems[item] = MergeDisenchant(LocalBaseItems[item], disenchant)
 		end
 	end
@@ -621,6 +629,76 @@ local function SaveDisenchant(sig, reagentID, count)
 	end
 end
 
+function Enchantrix_GetLinkFromName(name)
+	if type(name) ~= "string" then return nil end
+
+	if not EnchantConfig.cache then
+		EnchantConfig.cache = {}
+	end
+	if not EnchantConfig.cache.names then
+		EnchantConfig.cache.names = {}
+	end
+
+	local link = EnchantConfig.cache.names[name]
+	if link then
+		local n = GetItemInfo(link)
+		if n ~= name then
+			EnchantConfig.cache.names[name] = nil
+		end
+	end
+	if not EnchantConfig.cache.names[name] then
+		for i = 1, MAX_ITEM_ID + 4000 do
+			local n, link = GetItemInfo(i)
+			if n == name then
+				EnchantConfig.cache.names[name] = link
+				break
+			end
+		end
+	end
+	return EnchantConfig.cache.names[name]
+end
+
+function Enchantrix_GetReagentPrice(reagentID)
+	-- reagentID ::= number | hyperlink
+	if type(reagentID) == "string" then
+		local _, _, i = string.find(reagentID, "item:(%d+):")
+		reagentID = i
+	end
+	reagentID = tonumber(reagentID)
+	if not reagentID then return nil end
+
+	local hsp, median, market
+
+	market = Enchantrix_StaticPrices[reagentID]
+
+	if Auctioneer then
+		local itemKey = string.format("%d:0:0", reagentID);
+		local realm
+		if Auctioneer.Util then
+			realm = Auctioneer.Util.GetAuctionKey()
+		end
+		if realm then
+			hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
+			median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
+		end
+	end
+
+	if not EnchantConfig.cache then EnchantConfig.cache = {} end
+	if not EnchantConfig.cache.prices then EnchantConfig.cache.prices = {} end
+	if not EnchantConfig.cache.prices[reagentID] then EnchantConfig.cache.prices[reagentID] = {} end
+	local cache = EnchantConfig.cache.prices[reagentID]
+	if cache.timestamp and time() - cache.timestamp > 172800 then
+		cache = {}
+	end
+
+	cache.hsp = hsp or cache.hsp
+	cache.median = median or cache.median
+	cache.market = market or cache.market
+	cache.timestamp = time()
+
+	return cache.hsp, cache.median, cache.market
+end
+
 function Enchantrix_CheckTooltipInfo(frame)
 	-- If we've already added our information, no need to do it again
 	if ( not frame or frame.eDone ) then
@@ -649,8 +727,15 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 		return;
 	end;
 
-	if EnhTooltip.LinkType(link) ~= "item" then return end
+	local type = EnhTooltip.LinkType(link)
+	if type == "item" then
+		Enchantrix_ItemTooltip(funcVars, retVal, frame, name, link, quality, count)
+	elseif type == "enchant" then
+		Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
+	end
+end
 
+function Enchantrix_ItemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local embed = Enchantrix_GetFilter('embed');
 
 	-- Check for disenchantable target
@@ -748,6 +833,139 @@ function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, co
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 		end
+	end
+end
+
+function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
+	local embed = Enchantrix_GetFilter('embed');
+
+	local auctioneerLoaded = false
+	if Auctioneer and Auctioneer.Statistic then
+		auctioneerLoaded = true
+	end
+
+	local frameName = frame:GetName()
+	local nLines = frame:NumLines()
+	local reagents
+	for i = 1, nLines do
+		local obj = getglobal(frameName.."TextLeft"..i)
+		local text = obj:GetText()
+		-- TODO: Localization
+		local _, _, r = string.find(text, "Reagents: (.+)")
+		if r then
+			reagents = r
+			break
+		end
+	end
+	local price = 0
+	local unknownPrices = false
+	local markup = 0.15
+	local reagentInfo = {}
+	for reagent in Enchantrix_Spliterator(reagents, ",") do
+		-- Chomp whitespace
+		reagent = string.gsub(reagent, "^%s*", "")
+		reagent = string.gsub(reagent, "%s*$", "")
+		-- ...and color codes
+		reagent = string.gsub(reagent, "^%|c%x%x%x%x%x%x%x%x", "")
+		reagent = string.gsub(reagent, "%|r$", "")
+
+		local _, _, count = string.find(reagent, "%((%d+)%)$")
+		if count then
+			reagent = string.gsub(reagent, "%s*%(%d+%)$", "")
+			count = tonumber(count)
+		else
+			count = 1
+		end
+
+		local link = Enchantrix_GetLinkFromName(reagent)
+		if link then
+			local name, quality, color
+			name, _, quality = GetItemInfo(link)
+			if quality then
+				_, _, _, color = GetItemQualityColor(quality)
+			end
+			local hsp, median, market = Enchantrix_GetReagentPrice(link)
+			table.insert(reagentInfo, {
+				["name"] = reagent,
+				["count"] = count,
+				["price"] = hsp,
+				["quality"] = quality,
+				["color"] = color,
+			})
+			if hsp then
+				price = price + count * hsp
+			else
+				unknownPrices = true
+			end
+		else
+			table.insert(reagentInfo, {
+				["name"] = reagent,
+				["count"] = count,
+			})
+			unknownPrices = true
+		end
+	end
+	table.sort(reagentInfo, function(a,b)
+		return ((a.quality or -1) < (b.quality or -1)) or ((a.price or 0) < (b.price or 0))
+	end)
+
+	-- No reagents
+	if table.getn(reagentInfo) < 1 then
+		return
+	end
+
+	if not embed then
+		EnhTooltip.SetIcon("Interface\\Icons\\Spell_Holy_GreaterHeal")
+		EnhTooltip.AddLine(name)
+		EnhTooltip.AddLine(EnhTooltip.HyperlinkFromLink(link))
+	end
+	-- TODO: Localization
+	EnhTooltip.AddLine("Suggested price:", nil, embed)
+	EnhTooltip.LineColor(0.8,0.8,0.2)
+
+	for _, reagent in pairs(reagentInfo) do
+		local line = "  "
+		
+		if reagent.color then
+			line = line..reagent.color
+		end
+		line = line..reagent.name
+		if reagent.color then
+			line = line.."|r"
+		end
+		line = line.." x"..reagent.count
+		if reagent.count > 1 and reagent.price then
+			line = line..string.format(" (%s ea)", EnhTooltip.GetTextGSC(digits(reagent.price, 3)))
+			EnhTooltip.AddLine(line, digits(reagent.price * reagent.count, 3), embed)
+		elseif reagent.price then
+			EnhTooltip.AddLine(line, digits(reagent.price, 3), embed)
+		else
+			EnhTooltip.AddLine(line, nil, embed)
+		end
+		EnhTooltip.LineColor(0.7,0.7,0.1)
+	end
+
+	if price > 0 then
+		-- TODO: Localization
+		EnhTooltip.AddLine("Total", digits(price, 3), embed)
+		EnhTooltip.LineColor(0.8,0.8,0.2)
+		-- TODO: Localization
+		EnhTooltip.AddLine(string.format("Total + %d%% markup", math.floor(markup * 100)), digits((1 + markup) * price, 3), embed)
+		EnhTooltip.LineColor(0.8,0.8,0.2)
+		if not auctioneerLoaded then
+			-- TODO: Localization
+			EnhTooltip.AddLine("[Auctioneer not loaded, using cached prices]")
+			EnhTooltip.LineColor(0.6,0.6,0.1)
+		end
+		if unknownPrices then
+			-- TODO: Localization
+			EnhTooltip.AddLine("[Some prices unavailable]")
+			EnhTooltip.LineColor(0.6,0.6,0.1)
+		end
+	else
+		-- TODO: Localization
+		EnhTooltip.AddLine("[No prices available]")
+		EnhTooltip.LineColor(0.6,0.6,0.1)
 	end
 end
 
@@ -1245,6 +1463,22 @@ function Enchantrix_Split(str, at)
 	return splut;
 end
 
+function Enchantrix_Spliterator(str, at)
+	local start
+	local found = 0
+	local done = (type(str) ~= "string")
+	return function()
+		if done then return nil end
+		start = found + 1
+		found = string.find(str, at, start, true)
+		if not found then
+			found = 0
+			done = true
+		end
+		return string.sub(str, start, found - 1)
+	end
+end
+
 function Enchantrix_SaveLocal(sig, lData)
 	local str = "";
 	for eResult, eData in lData do
@@ -1270,9 +1504,7 @@ function Enchantrix_GetLocal(sig)
 		end
 
 		-- Get the string and break it apart
-		local enchantSerial = EnchantedLocal[sig];
-		local enchantResults = Enchantrix_Split(enchantSerial, ";");
-		for pos, enchantResult in enchantResults do
+		for enchantResult in Enchantrix_Spliterator(EnchantedLocal[sig]) do
 			local enchantBreak = Enchantrix_Split(enchantResult, ":");
 			local rSig = tonumber(enchantBreak[1]) or 0;
 			local iCount = tonumber(enchantBreak[2]) or 0;
