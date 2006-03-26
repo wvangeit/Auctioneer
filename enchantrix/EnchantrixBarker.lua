@@ -56,6 +56,7 @@ local attributes = {
     'additional armor',
     'additional points of armor',
     'increase armor',
+    'increase its armor',
     'absorption',
     'damage to beasts',
     'points? of damage',
@@ -74,6 +75,7 @@ local short_attributes = {
     'all stats',
     'mana',
     'health',
+    'armour',
     'armour',
     'armour',
     'armour',
@@ -402,6 +404,17 @@ Enchantrix_BarkerOptions_TabFrames = {
                 max = 100,
                 step = 1,
                 key = 'Cloak',
+                getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+                valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+            },
+            {
+                name = 'Shield',
+                tooltip = 'The priority score for shield enchants.',
+                units = 'percentage',
+                min = 0,
+                max = 100,
+                step = 1,
+                key = 'Shield',
                 getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
                 valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
             }
