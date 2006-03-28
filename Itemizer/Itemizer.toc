@@ -1,7 +1,7 @@
 ﻿## Title: Itemizer
 ## Notes: Stores items and their corresponding links. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 10900
+## Interface: 11000
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos, ImprovedErrorFrame
