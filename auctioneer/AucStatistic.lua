@@ -506,7 +506,10 @@ function getHSP(itemKey, realm, buyoutValues, itemCat)
 	local warn = _AUCT('FrmtWarnNodata');
 	EnhTooltip.DebugPrint("Getting HSP, calling GetMarketPrice", itemKey, realm);
 	if (not buyoutValues) then
-		buyoutValues = Auctioneer.Core.GetSnapshotInfo(realm, itemKey);
+		local sbuy = Auctioneer.Core.GetSnapshotInfo(realm, itemKey);
+		if sbuy then
+			buyoutValues = sbuy.buyoutPrices;
+		end
 	end
 
 	local marketPrice = getMarketPrice(itemKey, realm, buyoutValues);

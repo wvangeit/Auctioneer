@@ -392,7 +392,7 @@ end
 local function Unserialize(str)
 	-- Break up a disenchant string to a table for easy manipulation
 	local tbl = {}
-	if (str) then
+	if type(str) == "string" then
 		for de in Enchantrix_Spliterator(str, ";") do
 			local splt = Enchantrix_Split(de, ":")
 			local id, d, r = tonumber(splt[1]), tonumber(splt[2]), tonumber(splt[3])
@@ -406,7 +406,7 @@ end
 
 local function Serialize(tbl)
 	-- Serialize a table into a string
-	if (tbl) then
+	if type(tbl) == "table" then
 		local str
 		for id in tbl do
 			if (type(id) == "number" and tbl[id][N_DISENCHANTS] > 0 and tbl[id][N_REAGENTS] > 0) then
@@ -459,7 +459,7 @@ end
 
 local function CleanupDisenchant(str, id)
 	-- Remove reagents that don't appear in level rules table
-	if (str and id) then
+	if (type(str) == "string") and (id ~= nil) then
 		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
 		local type = InventoryTypes[equip]
 		if (quality and type and level > 0) then
@@ -560,9 +560,6 @@ local function MergeDisenchantLists()
 	-- Merge DisenchantList by base item, i.e. all "Foobar of <x>" are merged into "Foobar"
 	-- This can be rather time consuming so we store this in a saved variable and use a hash
 	-- signature to determine if we need to update the table
-	local profiler = Enchantrix_CreateProfiler("MergeDisenchantLists")
-	profiler:Start()
-
 	local hash = DisenchantListHash()
 	if (not EnchantedBaseItems.hash) then
 		EnchantedBaseItems.hash = -hash
@@ -581,8 +578,6 @@ local function MergeDisenchantLists()
 	end
 	-- We don't need DisenchantList anymore
 	DisenchantList = nil
-
-	profiler:DebugPrint()
 
 	-- Merge items from EnchantedLocal
 	for sig, disenchant in pairs(EnchantedLocal) do
@@ -610,9 +605,6 @@ local function MergeDisenchantLists()
 			EnchantedItemTypes[type] = MergeDisenchant(EnchantedItemTypes[type], disenchant)
 		end
 	end
-
-	profiler:Stop()
-	profiler:DebugPrint()
 end
 
 local function SaveDisenchant(sig, reagentID, count)
@@ -721,6 +713,22 @@ function Enchantrix_CheckTooltipInfo(frame)
 	return 1;
 end
 
+local function PickupInventoryItemHook(funcArgs, retVal, slot)
+	-- Remember last activated item
+	if slot then
+		DisenchantEvent.spellTarget = GetInventoryItemLink("player", slot)
+		EnhTooltip.DebugPrint("PickupInventoryItemHook: "..(DisenchantEvent.spellTarget or "nil"))
+	end
+end
+
+local function PickupContainerItemHook(funcArgs, retVal, bag, slot)
+	-- Remember last activated item
+	if bag and slot then
+		DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
+		EnhTooltip.DebugPrint("PickupContainerItemHook: "..(DisenchantEvent.spellTarget or "nil"))
+	end
+end
+
 function Enchantrix_HookTooltip(funcVars, retVal, frame, name, link, quality, count)
 	-- nothing to do, if enchantrix is disabled
 	if (not Enchantrix_GetFilter('all')) then
@@ -742,11 +750,6 @@ function Enchantrix_ItemTooltip(funcVars, retVal, frame, name, link, quality, co
 	local itemID = Enchantrix_BreakLink(link)
 	if (not itemID or itemID == 0 or not IsDisenchantable(itemID)) then
 		return
-	end
-
-	-- Remember this link if user is targeting a spell
-	if SpellIsTargeting() then
-		DisenchantEvent.spellTarget = link
 	end
 
 	local disenchantsTo = Enchantrix_GetItemDisenchants(Enchantrix_SigFromLink(link), name, true);
@@ -815,6 +818,7 @@ function Enchantrix_ItemTooltip(funcVars, retVal, frame, name, link, quality, co
 		for n, line in ipairs(lines) do
 			EnhTooltip.AddLine(line.str, nil, embed)
 			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			if n >= 5 then break end -- Don't add more than 5 lines
 		end
 
 		if (Enchantrix_GetFilter('valuate')) then
@@ -849,7 +853,10 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 	local reagents
 	for i = 1, nLines do
 		local obj = getglobal(frameName.."TextLeft"..i)
-		local text = obj:GetText()
+		local text = ""
+		if obj and obj.GetText then
+			text = obj:GetText()
+		end
 		-- TODO: Localization
 		local _, _, r = string.find(text, "Reagents: (.+)")
 		if r then
@@ -859,7 +866,6 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 	end
 	local price = 0
 	local unknownPrices = false
-	local markup = 0.15
 	local reagentInfo = {}
 	for reagent in Enchantrix_Spliterator(reagents, ",") do
 		-- Chomp whitespace
@@ -906,7 +912,7 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 		end
 	end
 	table.sort(reagentInfo, function(a,b)
-		return ((a.quality or -1) < (b.quality or -1)) or ((a.price or 0) < (b.price or 0))
+		return ((b.quality or -1) < (a.quality or -1)) or ((b.price or 0) < (a.price or 0))
 	end)
 
 	-- No reagents
@@ -948,9 +954,6 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 	if price > 0 then
 		-- TODO: Localization
 		EnhTooltip.AddLine("Total", digits(price, 3), embed)
-		EnhTooltip.LineColor(0.8,0.8,0.2)
-		-- TODO: Localization
-		EnhTooltip.AddLine(string.format("Total + %d%% markup", math.floor(markup * 100)), digits((1 + markup) * price, 3), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
 		if not auctioneerLoaded then
 			-- TODO: Localization
@@ -1144,6 +1147,8 @@ end
 function Enchantrix_OnLoad()
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, Enchantrix_HookTooltip)
+	Stubby.RegisterFunctionHook("PickupContainerItem", 200, PickupContainerItemHook)
+	Stubby.RegisterFunctionHook("PickupInventoryItem", 200, PickupInventoryItemHook)
 
 	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix_AuctioneerLoaded);
 

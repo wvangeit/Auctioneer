@@ -819,6 +819,7 @@ end
 
 function Enchantrix_RoundPrice( price )
 
+	local round
     
     if( price < 5000 ) then
         round = 1000;
