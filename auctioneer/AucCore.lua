@@ -152,6 +152,7 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["pct-nocomp"]				=	2,
 	["pct-underlow"]			=	5,
 	["pct-undermkt"]			=	20,
+	["bid-limit"]				=	1,
 	["locale"]					=	"default",
 
 	--AskPrice related commands

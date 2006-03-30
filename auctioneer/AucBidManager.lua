@@ -26,6 +26,7 @@
 -------------------------------------------------------------------------------
 
 -- Queue of bid requests to be worked on
+local LastRequest;
 local RequestQueue = {};
 local ProcessingRequestQueue = false;
 
@@ -67,6 +68,7 @@ BidResultCodes["OwnAuction"] = 3;
 BidResultCodes["AlreadyHigherBid"] = 4;
 BidResultCodes["AlreadyHighBidder"] = 5;
 BidResultCodes["CurrentBidLower"] = 6;
+BidResultCodes["MaxBidsReached"] = 7;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -344,23 +346,6 @@ function onBidResponse(result)
 			end
 		end
 		
-		-- Check if we are now complete with this request.
-		if (request) then
-			debugPrint("Current request: bidCount="..request.bidCount.."; bidAttempts="..request.bidAttempts);
-		
-			-- Remove the request if we've reached the max bids.
-			if (request.bidCount == request.maxBids) then
-				debugPrint("Reached max bids!");
-				removeRequestFromQueue();
-
-			-- Safety check for debugging. Prevents stack overflows so we can
-			-- see what the hell went wrong.
-			elseif (request.bidAttempts > 10) then
-				debugPrint("Reached max bid attempts!");
-				removeRequestFromQueue();
-
-			end
-		end
 	else
 		-- We got out of sync somehow... this indicates a bug in how we determine
 		-- the results of bid requests.
@@ -419,6 +404,9 @@ function queryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, cla
 		CurrentSearchParams.targetCountForPage = nil;
 		debugPrint("queryAuctionItemsHook() - ignoring");
 	end
+
+	-- Toss the information about the last request processed.
+	LastRequest = nil;
 end
 
 -------------------------------------------------------------------------------
@@ -459,13 +447,33 @@ end
 -- Adds a request to the queue.
 -------------------------------------------------------------------------------
 function addRequestToQueue(request)
-	-- Add the request state information and then add the request to the queue.
+	-- Add the request state information
 	request.bidAttempts = 0;
 	request.bidCount = 0;
-	request.maxBids = 1000;
 	request.currentPage = 0;
 	request.currentIndex = 1;
+	request.continuation = false;
 	request.results = {};
+	
+	-- Check if the previous request is the same as this request. If so we
+	-- want to pickup where the last request left off.
+	if (table.getn(RequestQueue) == 0 and
+		LastRequest ~= nil and
+		LastRequest.id == request.id and
+		LastRequest.rprop == request.rprop and
+		LastRequest.enchant == request.enchant and
+		LastRequest.name == request.name and
+		LastRequest.count == request.count and
+		LastRequest.min == request.min and
+		LastRequest.buyout == request.buyout and
+		LastRequest.unique == request.unique and
+		LastRequest.bid == request.bid) then
+		request.currentPage = LastRequest.currentPage;
+		request.currentIndex = LastRequest.currentIndex;
+		request.continuation = true;
+	end
+
+	-- Add the request to the queue.
 	table.insert(RequestQueue, request);
 	debugPrint("Added request to queue: "..request.name..", "..request.count..", "..nilSafe(request.buyout)..", "..nilSafe(request.bid));
 end
@@ -476,17 +484,46 @@ end
 function removeRequestFromQueue()
 	if (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
-		local callback = request.callback;
 
+		-- Make the callback, if requested.
+		local callback = request.callback;
 		if (callback and callback.func) then
 			callback.func(callback.param, request);
 		end
 
+		-- Inform the user if no auctions were found.
 		if (table.getn(request.results) == 0) then
-			local output = string.format(_AUCT('FrmtNoAuctionsFound'), request.name, request.count);
-			chatPrint(output);
+			if (request.continuation) then
+				local output = string.format(_AUCT('FrmtNoMoreAuctionsFound'), request.name, request.count);
+				chatPrint(output);
+			else
+				local output = string.format(_AUCT('FrmtNoAuctionsFound'), request.name, request.count);
+				chatPrint(output);
+			end
 		end
+		
+		-- Remove the request from the queue.
 		table.remove(RequestQueue, 1);
+		debugPrint("Removed request from queue: "..request.name..", "..request.count..", "..nilSafe(request.buyout)..", "..nilSafe(request.bid));
+		
+		-- Check if the next request is the same as the previous. If so we
+		-- want to pickup where the last request left off.
+		if (LastRequest ~= nil and table.getn(RequestQueue) > 0) then
+			local nextRequest = RequestQueue[1];
+			if (LastRequest.id == nextRequest.id and
+				LastRequest.rprop == nextRequest.rprop and
+				LastRequest.enchant == nextRequest.enchant and
+				LastRequest.name == nextRequest.name and
+				LastRequest.count == nextRequest.count and
+				LastRequest.min == nextRequest.min and
+				LastRequest.buyout == nextRequest.buyout and
+				LastRequest.unique == nextRequest.unique and
+				LastRequest.bid == nextRequest.bid) then
+				nextRequest.currentPage = LastRequest.currentPage;
+				nextRequest.currentIndex = LastRequest.currentIndex;
+				nextRequest.continuation = true;
+			end
+		end
 	end
 end
 
@@ -650,7 +687,7 @@ function processPage()
 	debugPrint("Processing page "..request.currentPage.." starting at index "..request.currentIndex.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
 	debugPrint("Searching for item: "..request.id..", "..request.rprop..", "..request.enchant..", "..request.name..", "..request.count..", "..request.min..", "..request.buyout..", "..request.unique..", "..request.bid);
 
-	local bidOnAuction = false;
+	local foundMatchingAuction = false;
 	for indexOnPage = request.currentIndex, lastIndexOnPage do
 		-- Check if this item matches
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
@@ -723,33 +760,56 @@ function processPage()
 
 			-- If we've settled on a bid, do it now!
 			if (bid) then
-				-- Successful bid/buyouts result in the query results being
-				-- updated. To prevent additional queries from being sent
-				-- until the list is updated, we flip the complete flag
-				-- back to false. If the bid fails we'll manually flip
-				-- the flag back to true again.
-				CurrentSearchParams.queryTime = time();
-				CurrentSearchParams.complete = false;
-				if (bid == buyoutPrice) then
-					CurrentSearchParams.targetCountForPage = lastIndexOnPage - 1;
+				foundMatchingAuction = true;
+				
+				-- Check if we've reached the bid limit on this request.
+				if (request.bidCount == request.maxBids) then
+					-- Report that the maximum number of bids has been reached.
+					local output = string.format(_AUCT('FrmtMaxBidsReached'), request.name, request.count, request.maxBids);
+					chatPrint(output);
+					debugPrint("Reached max bids!");
+					
+					-- Add the bid result to the request.
+					table.insert(request.results, BidResultCodes["MaxBidsReached"]);
+
+					-- Since this request didn't fully completed due to bid
+					-- limits, update the currentIndex and save it as the
+					-- last request. If the next request is for the same item,
+					-- it will pickup where this request left off.
+					LastRequest = request;
+					request.currentIndex = indexOnPage;
+					removeRequestFromQueue();
+
+				else
+					-- Successful bid/buyouts result in the query results being
+					-- updated. To prevent additional queries from being sent
+					-- until the list is updated, we flip the complete flag
+					-- back to false. If the bid fails we'll manually flip
+					-- the flag back to true again.
+					CurrentSearchParams.queryTime = time();
+					CurrentSearchParams.complete = false;
+					if (bid == buyoutPrice) then
+						CurrentSearchParams.targetCountForPage = lastIndexOnPage - 1;
+					end
+
+					-- Update the starting point for this page
+					request.currentIndex = indexOnPage;
+					request.bidAttempts = request.bidAttempts + 1;
+
+					-- Place the bid! This MUST be done last since the response
+					-- can be received during the call to PlaceAuctionBid.
+					debugPrint("Placing bid on "..name.. " at "..bid.." (index "..indexOnPage..")");
+					PlaceAuctionBid("list", indexOnPage, bid, request);
+
 				end
 
-				-- Update the starting point for this page
-				request.currentIndex = indexOnPage;
-				request.bidAttempts = request.bidAttempts + 1;
-
-				-- Place the bid! This MUST be done last since the response
-				-- can be received during the call to PlaceAuctionBid.
-				bidOnAuction = true;
-				debugPrint("Placing bid on "..name.. " at "..bid.." (index "..indexOnPage..")");
-				PlaceAuctionBid("list", indexOnPage, bid, request);
 				break;
 			end
 		end
 	end
 
 	-- If an item was not found to bid on...
-	if (not bidOnAuction) then
+	if (not foundMatchingAuction) then
 		-- When an item is bought out on the page, the item is not replaced
 		-- with an item from a subsequent page. Nor is the item removed from
 		-- the total count. Thus if there were 7 items total before the buyout,
@@ -758,6 +818,7 @@ function processPage()
 		if (lastIndexOnPage == 0 or
 			request.currentPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
 			-- Reached the end of the line for this item, remove it from the queue
+			request.currentIndex = lastIndexOnPage + 1;
 			removeRequestFromQueue();
 
 		else
@@ -773,10 +834,16 @@ end
 -- current bid (or minimum bid in the case the item isn't bid on). For buyouts,
 -- the bid parameter should be the buyout price.
 -------------------------------------------------------------------------------
-function bidAuction(bid, signature, callbackFunc, callbackParam)
+function bidAuction(bid, signature, maxBids, callbackFunc, callbackParam)
 	debugPrint("BidAuction("..bid..", "..signature..")");
 	local id,rprop,enchant,name,count,min,buyout,unique = Auctioneer.Core.GetItemSignature(signature);
 	if (bid and id and rprop and enchant and name and count and min and buyout and unique) then
+		-- Make sure we have a valid maxBids
+		if (maxBids == nil or maxBids < 1) then
+			maxBids = 25;
+		end
+	
+		-- Create a bid request.
 		local request = {};
 		request.id = id;
 		request.rprop = rprop;
@@ -787,7 +854,10 @@ function bidAuction(bid, signature, callbackFunc, callbackParam)
 		request.buyout = buyout;
 		request.unique = unique;
 		request.bid = bid;
+		request.maxBids = maxBids;
 		request.callback = { func = callbackFunc, param = callbackParam };
+		
+		-- Queue the bid request and kick off request processing!
 		addRequestToQueue(request);
 		processRequestQueue();
 	end

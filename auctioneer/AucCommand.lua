@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, registerKhaos, resetKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
+local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, registerKhaos, resetKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
 
 -- GUI Init Variables (Added by MentalPower)
 local khaosRegistered
@@ -1072,6 +1072,8 @@ function buildCommandMap()
 		[_AUCT('CmdAskPriceSmart')]		=	'smart',
 		[_AUCT('CmdAskPriceAd')]		=	'ap',
 
+		-- Post/Search Tab related commands
+		[_AUCT('CmdBidLimit')]			=	'bid-limit',
 	}
 
 	commandMapRev = {}
@@ -1210,6 +1212,10 @@ function mainHandler(command, source)
 			cmd == "pct-nocomp" or cmd == "pct-underlow" or cmd == "pct-undermkt") then
 		percentVarSet(cmd, param, chatprint);
 
+	--/auctioneer (NumVars)
+	elseif (cmd == 'bid-limit') then
+		numVarSet(cmd, param, chatprint);
+
 	--Command not recognized
 	else
 		if (chatprint) then
@@ -1260,6 +1266,7 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUnderlow'), _AUCT('OptPctUnderlow'), Auctioneer.Command.GetFilterVal('pct-underlow'), _AUCT('HelpPctUnderlow')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUndermkt'), _AUCT('OptPctUndermkt'), Auctioneer.Command.GetFilterVal('pct-undermkt'), _AUCT('HelpPctUndermkt')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctMaxless'), _AUCT('OptPctMaxless'), Auctioneer.Command.GetFilterVal('pct-maxless'), _AUCT('HelpPctMaxless')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdBidLimit'), _AUCT('OptBidLimit'), Auctioneer.Command.GetFilterVal('bid-limit'), _AUCT('HelpBidLimit')));
 
 	Auctioneer.AskPrice.ChatPrintHelp()
 
@@ -1747,6 +1754,25 @@ function percentVarSet(variable, param, chatprint)
 	end
 end
 
+function numVarSet(variable, param, chatprint)
+	local paramVal = tonumber(param);
+	if paramVal == nil then
+		-- failed to convert the param to a number
+
+		if chatprint then
+			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, variable));
+		end
+		return -- invalid argument, don't do anything
+	end
+	-- param is a valid number, save it
+	setFilter(variable, paramVal);
+
+	if (chatprint) then
+		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), variable, paramVal));
+		setKhaosSetKeyValue(variable, paramVal);
+	end
+end
+
 --This marks the end of the New Command processing code.
 
 
@@ -1837,6 +1863,7 @@ Auctioneer.Command = {
 	Finish = finish,
 	GenVarSet = genVarSet,
 	PercentVarSet = percentVarSet,
+	NumVarSet = numVarSet,
 	SetFilter = setFilter,
 	GetFilterVal = getFilterVal,
 	GetFilter = getFilter,

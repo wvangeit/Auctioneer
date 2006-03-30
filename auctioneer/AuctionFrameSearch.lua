@@ -32,6 +32,7 @@ local TIME_LEFT_NAMES =
 local AUCTION_STATUS_UNKNOWN = 1;
 local AUCTION_STATUS_HIGH_BIDDER = 2;
 local AUCTION_STATUS_NOT_FOUND = 3;
+local AUCTION_STATUS_BIDDING = 4;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -659,9 +660,13 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.bid) then
+		result.status = AUCTION_STATUS_BIDDING;
+		result.pendingBidCount = result.pendingBidCount + 1;
+		local bidLimit = Auctioneer.Command.GetFilterVal('bid-limit');
 		local context = { frame = frame, auction = result };
-		AucBidManager.BidAuction(result.bid, result.signature, AuctionFrameSearch_OnBidResult, context);
-		button:Disable();
+		AucBidManager.BidAuction(result.bid, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
+		AuctionFrameSearch_UpdateButtons(frame);
+		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
 	end
 end
 
@@ -672,9 +677,13 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.buyout) then
+		result.status = AUCTION_STATUS_BIDDING;
+		result.pendingBidCount = result.pendingBidCount + 1;
+		local bidLimit = Auctioneer.Command.GetFilterVal('bid-limit');
 		local context = { frame = frame, auction = result };
-		AucBidManager.BidAuction(result.buyout, result.signature, AuctionFrameSearch_OnBidResult, context);
-		button:Disable();
+		AucBidManager.BidAuction(result.buyout, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
+		AuctionFrameSearch_UpdateButtons(frame);
+		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
 	end
 end
 
@@ -728,6 +737,7 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 					else
 						auction.status = AUCTION_STATUS_UNKNOWN;
 					end
+					auction.pendingBidCount = 0;
 					table.insert(frame.results, auction);
 				end
 			end
@@ -918,31 +928,44 @@ end
 function AuctionFrameSearch_SelectResultByIndex(frame, index)
 	if (index and index <= table.getn(frame.results) and frame.resultsType) then
 		-- Select the item
-		local result = frame.results[index];
-		frame.selectedResult = result;
+		frame.selectedResult = frame.results[index];
 		ListTemplate_SelectRow(frame.resultsList, index);
+	else
+		-- Clear the selection
+		frame.selectedResult = nil;
+		ListTemplate_SelectRow(frame.resultsList, nil);
+	end
 
-		-- Update the bid button
-		if (frame.resultsType == "BidSearch") then
-			frame.bidButton:Enable();
-			frame.buyoutButton:Disable();
-		elseif (frame.resultsType == "BuyoutSearch") then
-			frame.bidButton:Disable();
-			frame.buyoutButton:Enable();
-		elseif (frame.resultsType == "CompeteSearch") then
-			frame.bidButton:Enable();
-			frame.buyoutButton:Enable();
-		elseif (frame.resultsType == "PlainSearch") then
-			frame.bidButton:Enable();
-			frame.buyoutButton:Enable();
+	AuctionFrameSearch_UpdateButtons(frame);
+end
+
+-------------------------------------------------------------------------------
+-- Update the enabled/disabled state of the Bid and Buyout buttons
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_UpdateButtons(frame)
+	if (frame.selectedResult) then
+		if (frame.selectedResult.status == AUCTION_STATUS_UNKNOWN) then
+			if (frame.resultsType == "BidSearch") then
+				frame.bidButton:Enable();
+				frame.buyoutButton:Disable();
+			elseif (frame.resultsType == "BuyoutSearch") then
+				frame.bidButton:Disable();
+				frame.buyoutButton:Enable();
+			elseif (frame.resultsType == "CompeteSearch") then
+				frame.bidButton:Enable();
+				frame.buyoutButton:Enable();
+			elseif (frame.resultsType == "PlainSearch") then
+				frame.bidButton:Enable();
+				frame.buyoutButton:Enable();
+			else
+				frame.bidButton:Disable();
+				frame.buyoutButton:Disable();
+			end
 		else
 			frame.bidButton:Disable();
 			frame.buyoutButton:Disable();
 		end
 	else
-		-- Clear the selection
-		frame.selectedResult = nil;
-		ListTemplate_SelectRow(frame.resultsList, nil);
 		frame.bidButton:Disable();
 		frame.buyoutButton:Disable();
 	end
@@ -1138,23 +1161,27 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_OnBidResult(context, bidRequest)
-	if (table.getn(bidRequest.results) == 0) then
-		-- No auctions matched.
-		context.auction.status = AUCTION_STATUS_NOT_FOUND;
-	else
-		-- Assume we are now the high bidder on all the matching auctions
-		-- until proven otherwise.
-		context.auction.status = AUCTION_STATUS_HIGH_BIDDER;
-		for _,result in pairs(bidRequest.results) do
-			if (result ~= BidResultCodes["BidAccepted"] and
-				result ~= BidResultCodes["AlreadyHighBidder"] and
-				result ~= BidResultCodes["OwnAuction"]) then
-				context.auction.status = AUCTION_STATUS_UNKNOWN;
-				break;
+	context.auction.pendingBidCount = context.auction.pendingBidCount - 1;
+	if (context.auction.pendingBidCount == 0) then
+		if (table.getn(bidRequest.results) == 0) then
+			-- No auctions matched.
+			context.auction.status = AUCTION_STATUS_NOT_FOUND;
+		else
+			-- Assume we are now the high bidder on all the matching auctions
+			-- until proven otherwise.
+			context.auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			for _,result in pairs(bidRequest.results) do
+				if (result ~= BidResultCodes["BidAccepted"] and
+					result ~= BidResultCodes["AlreadyHighBidder"] and
+					result ~= BidResultCodes["OwnAuction"]) then
+					context.auction.status = AUCTION_STATUS_UNKNOWN;
+					break;
+				end
 			end
 		end
+		AuctionFrameSearch_UpdateButtons(context.frame);
+		ListTemplateScrollFrame_Update(getglobal(context.frame.resultsList:GetName().."ScrollFrame"));
 	end
-	ListTemplateScrollFrame_Update(getglobal(context.frame.resultsList:GetName().."ScrollFrame"));
 end
 
 -------------------------------------------------------------------------------
