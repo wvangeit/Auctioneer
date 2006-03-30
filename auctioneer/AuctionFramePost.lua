@@ -552,17 +552,23 @@ function AuctionFramePost_ValidateAuction(frame)
 			if (stackSize == 0) then
 				valid = false;
 				quantityErrorText:SetText(_AUCT('UiStackTooSmallError'));
+				quantityErrorText:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
 				quantityErrorText:Show();
 			elseif (stackSize > 1 and (maxStackSize == nil or stackSize > maxStackSize)) then
 				valid = false;
 				quantityErrorText:SetText(_AUCT('UiStackTooBigError'));
+				quantityErrorText:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
 				quantityErrorText:Show();
 			elseif (quantity < (stackSize * stackCount)) then
 				valid = false;
 				quantityErrorText:SetText(_AUCT('UiNotEnoughError'));
+				quantityErrorText:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
 				quantityErrorText:Show();
 			else
-				quantityErrorText:Hide();
+				local msg = string.format(_AUCT('UiMaxError'), quantity);
+				quantityErrorText:SetText(msg);
+				quantityErrorText:SetTextColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b);
+				quantityErrorText:Show();
 			end
 		else
 			quantityErrorText:Hide();
