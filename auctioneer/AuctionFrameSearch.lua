@@ -1004,13 +1004,15 @@ function AuctionFrameSearch_ListItem_OnEnter(row)
 	if (results and row <= table.getn(results)) then
 		local result = results[row];
 		if (result) then
-			local name = result.name;
-			local _, link, rarity = GetItemInfo(results[row].item);
-			local count = result.count;
-			GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-			GameTooltip:SetHyperlink(link);
-			GameTooltip:Show();
-			EnhTooltip.TooltipCall(GameTooltip, name, result.link, rarity, count);
+			local _, link, rarity = GetItemInfo(result.item);
+			if (link) then
+				local name = result.name;
+				local count = result.count;
+				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+				GameTooltip:SetHyperlink(link);
+				GameTooltip:Show();
+				EnhTooltip.TooltipCall(GameTooltip, name, result.link, rarity, count);
+			end
 		end
 	end
 end
