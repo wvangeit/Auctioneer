@@ -1147,8 +1147,8 @@ end
 function Enchantrix_OnLoad()
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, Enchantrix_HookTooltip)
-	Stubby.RegisterFunctionHook("PickupContainerItem", 200, PickupContainerItemHook)
-	Stubby.RegisterFunctionHook("PickupInventoryItem", 200, PickupInventoryItemHook)
+	Stubby.RegisterFunctionHook("PickupContainerItem", 400, PickupContainerItemHook)
+	Stubby.RegisterFunctionHook("PickupInventoryItem", 400, PickupInventoryItemHook)
 
 	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix_AuctioneerLoaded);
 
