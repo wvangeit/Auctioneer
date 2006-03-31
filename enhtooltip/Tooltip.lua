@@ -433,21 +433,32 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			xOffset = -(enhTooltipParentRect.l - width - 5);
 		end
 
+		-- Handle the situation where there isn't enough room on the top or bottom of
+		-- the parent to display the tooltip. In that case we'll just shift tooltip
+		-- enough up or down so that it doesn't hang off the screen.
+		local yOffset = 0;
+		local totalHeight = height + currentTooltip:GetHeight();
+		if (yAnchor == "TOP" and enhTooltipParentRect.t + totalHeight > sHeight) then
+			yOffset = -(enhTooltipParentRect.t + totalHeight - sHeight + 5);
+		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.b - totalHeight < 0) then
+			yOffset = -(enhTooltipParentRect.b - totalHeight - 5);
+		end
+
 		currentTooltip:ClearAllPoints()
 		EnhancedTooltip:ClearAllPoints()
 		local anchor = yAnchor..xAnchor
 
 		if (anchor == "TOPLEFT") then
-			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5 + xOffset,5)
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5+xOffset,5+yOffset)
 			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,0)
 		elseif (anchor == "TOPRIGHT") then
-			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5 + xOffset,5)
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5+xOffset,5+yOffset)
 			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0)
 		elseif (anchor == "BOTTOMLEFT") then
-			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5 + xOffset,-5)
+			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5+xOffset,-5+yOffset)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
 		else -- BOTTOMRIGHT
-			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5 + xOffset,-5)
+			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5+xOffset,-5+yOffset)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
 		end
 
