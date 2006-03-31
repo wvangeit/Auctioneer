@@ -657,11 +657,14 @@ end
 function AuctionFramePost_BuyoutPrice_OnChanged()
 	local frame = this:GetParent():GetParent();
 	if (not frame.ignoreBuyoutPriceChange and not frame.updating) then
-		frame.updating = true;
-		local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
-		local bidPrice = Auctioneer.Statistic.SubtractPercent(frame:GetBuyoutPrice(), discountBidPercent);
-		frame:SetStartPrice(bidPrice);
-		frame.updating = false;
+		local updatePrice = Auctioneer.Command.GetFilter('update-price');
+		if (updatePrice) then
+			frame.updating = true;
+			local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
+			local bidPrice = Auctioneer.Statistic.SubtractPercent(frame:GetBuyoutPrice(), discountBidPercent);
+			frame:SetStartPrice(bidPrice);
+			frame.updating = false;
+		end
 		frame:ValidateAuction();
 	end
 	frame.ignoreBuyoutPriceChange = false;

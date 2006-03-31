@@ -1074,6 +1074,7 @@ function buildCommandMap()
 
 		-- Post/Search Tab related commands
 		[_AUCT('CmdBidLimit')]			=	'bid-limit',
+		[_AUCT('CmdUpdatePrice')]		=	'update-price',
 	}
 
 	commandMapRev = {}
@@ -1204,7 +1205,8 @@ function mainHandler(command, source)
 	elseif (cmd == 'embed' or cmd == 'autofill' or cmd == 'auction-click' or
 			cmd == 'show-verbose' or cmd == 'show-average' or cmd == 'show-link' or
 			cmd == 'show-median' or cmd == 'show-stats' or cmd == 'show-suggest' or
-			cmd == 'show-embed-blankline' or cmd == 'show-warning' or cmd == 'warn-color') then
+			cmd == 'show-embed-blankline' or cmd == 'show-warning' or cmd == 'warn-color' or
+			cmd == 'update-price') then
 		genVarSet(cmd, param, chatprint);
 
 	--/auctioneer (PercentVars)
@@ -1249,6 +1251,7 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowRedo'), Auctioneer.Util.GetLocalizedFilterVal('show-warning'), _AUCT('HelpRedo')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionClick'), Auctioneer.Util.GetLocalizedFilterVal('auction-click'), _AUCT('HelpAuctionClick')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdWarnColor'), Auctioneer.Util.GetLocalizedFilterVal('warn-color'), _AUCT('HelpWarnColor')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdUpdatePrice'), Auctioneer.Util.GetLocalizedFilterVal('update-price'), _AUCT('HelpUpdatePrice')));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));

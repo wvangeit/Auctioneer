@@ -54,6 +54,7 @@ function AuctionFrameSearch_OnLoad()
 	this.resultsList = getglobal(this:GetName().."List");
 	this.bidButton = getglobal(this:GetName().."BidButton");
 	this.buyoutButton = getglobal(this:GetName().."BuyoutButton");
+	this.pendingBidStatusText = getglobal(this:GetName().."PendingBidStatusText");
 
 	-- Data members
 	this.results = {};
@@ -384,6 +385,12 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+function AuctionFrameSearch_OnShow()
+	AuctionFrameSearch_UpdatePendingBidStatus(this);
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 AUCTIONEER_SEARCH_TYPES = {}
 function AuctionFrameSearch_SearchDropDown_Initialize()
 	local dropdown = this:GetParent();
@@ -666,6 +673,7 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 		local context = { frame = frame, auction = result };
 		AucBidManager.BidAuction(result.bid, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
 		AuctionFrameSearch_UpdateButtons(frame);
+		AuctionFrameSearch_UpdatePendingBidStatus(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
 	end
 end
@@ -683,7 +691,23 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 		local context = { frame = frame, auction = result };
 		AucBidManager.BidAuction(result.buyout, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
 		AuctionFrameSearch_UpdateButtons(frame);
+		AuctionFrameSearch_UpdatePendingBidStatus(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Updates the pending bid status text
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_UpdatePendingBidStatus(frame)
+	local count = AucBidManager.GetRequestCount();
+	if (count == 1) then
+		frame.pendingBidStatusText:SetText(_AUCT('UiPendingBidInProgress'));
+	elseif (count > 1) then
+		local output = string.format(_AUCT('UiPendingBidsInProgress'), count);
+		frame.pendingBidStatusText:SetText(output);
+	elseif (frame.pendingBidStatusText:GetText() ~= "") then
+		frame.pendingBidStatusText:SetText(_AUCT('UiNoPendingBids'));
 	end
 end
 
@@ -1182,6 +1206,7 @@ function AuctionFrameSearch_OnBidResult(context, bidRequest)
 		AuctionFrameSearch_UpdateButtons(context.frame);
 		ListTemplateScrollFrame_Update(getglobal(context.frame.resultsList:GetName().."ScrollFrame"));
 	end
+	AuctionFrameSearch_UpdatePendingBidStatus(context.frame);
 end
 
 -------------------------------------------------------------------------------

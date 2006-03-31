@@ -152,7 +152,6 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["pct-nocomp"]				=	2,
 	["pct-underlow"]			=	5,
 	["pct-undermkt"]			=	20,
-	["bid-limit"]				=	1,
 	["locale"]					=	"default",
 
 	--AskPrice related commands
@@ -163,6 +162,10 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["askprice-smart"]			=	"off",
 	["askprice-trigger"]		=	"?",
 	["askprice-ad"]				=	"on",
+
+	-- Auction House tab UI
+	["bid-limit"]				=	1,
+	["update-price"]			=	"off",
 }
 
 function getItemData(itemKey)

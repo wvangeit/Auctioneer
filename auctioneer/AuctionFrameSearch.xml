@@ -123,6 +123,17 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+
+				<FontString name="$parentPendingBidStatusText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="200" y="22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
 			</Layer>
 		</Layers>
 		<Frames>
@@ -1019,6 +1030,9 @@
 				getglobal(this:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
 				AuctionFrameSearch_OnLoad();
 			</OnLoad>
+			<OnShow>
+				AuctionFrameSearch_OnShow();
+			</OnShow>
 		</Scripts>
 	</Frame>
 
