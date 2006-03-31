@@ -813,6 +813,7 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, cate
 					else
 						auction.status = AUCTION_STATUS_UNKNOWN;
 					end
+					auction.pendingBidCount = 0;
 					table.insert(frame.results, auction);
 				end
 			end
@@ -878,6 +879,7 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 			else
 				auction.status = AUCTION_STATUS_UNKNOWN;
 			end
+			auction.pendingBidCount = 0;
 			table.insert(frame.results, auction);
 		end
 	end
@@ -931,6 +933,7 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, i
 				else
 					auction.status = AUCTION_STATUS_UNKNOWN;
 				end
+				auction.pendingBidCount = 0;
 				table.insert(frame.results, auction);
 			end
 		end
