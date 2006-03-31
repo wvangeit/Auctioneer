@@ -422,22 +422,32 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		else
 			yAnchor = "BOTTOM"
 		end
+		
+		-- Handle the situation where there isn't enough room on the choosen side of
+		-- the parent to display the tooltip. In that case we'll just shift tooltip
+		-- enough to the left or right so that it doesn't hang off the screen.
+		local xOffset = 0;
+		if (xAnchor == "RIGHT" and enhTooltipParentRect.r + width > sWidth) then
+			xOffset = -(enhTooltipParentRect.r + width - sWidth + 5);
+		elseif (xAnchor == "LEFT" and enhTooltipParentRect.l - width < 0) then
+			xOffset = -(enhTooltipParentRect.l - width - 5);
+		end
 
 		currentTooltip:ClearAllPoints()
 		EnhancedTooltip:ClearAllPoints()
 		local anchor = yAnchor..xAnchor
 
 		if (anchor == "TOPLEFT") then
-			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5,5)
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5 + xOffset,5)
 			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,0)
 		elseif (anchor == "TOPRIGHT") then
-			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5,5)
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5 + xOffset,5)
 			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0)
 		elseif (anchor == "BOTTOMLEFT") then
-			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5,-5)
+			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5 + xOffset,-5)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
 		else -- BOTTOMRIGHT
-			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5,-5)
+			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5 + xOffset,-5)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
 		end
 
