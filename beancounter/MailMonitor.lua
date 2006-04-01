@@ -148,10 +148,10 @@ end
 -- Hooks taking items from messages.
 -------------------------------------------------------------------------------
 function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
-	debugPrint("MailMonitor_PreTakeInboxItemHook("..index..") called");
+	debugPrint("MailMonitor_PreTakeInboxItemHook("..nilSafe(index)..") called");
 
 	-- Allow this method call if there is no pending tasks.
-	if (index > 0 and table.getn(InboxTasks) == 0) then
+	if (index ~= nil and index > 0 and table.getn(InboxTasks) == 0) then
 		-- Read the message, before allowing the TakeInboxItem() call.
 		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 		if (not wasRead and isSenderAuctionHouse(sender)) then
@@ -181,10 +181,10 @@ end
 -- Hooks taking money from messages.
 -------------------------------------------------------------------------------
 function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
-	debugPrint("MailMonitor_PreTakeInboxMoneyHook("..index..") called");
+	debugPrint("MailMonitor_PreTakeInboxMoneyHook("..nilSafe(index)..") called");
 
 	-- Allow this method call if there is no pending action.
-	if (index > 0 and table.getn(InboxTasks) == 0) then
+	if (index ~= nil and index > 0 and table.getn(InboxTasks) == 0) then
 		-- Read the message, before allowing the TakeInboxMoney() call.
 		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 		if (not wasRead and isSenderAuctionHouse(sender)) then
@@ -216,7 +216,7 @@ end
 local getInboxTextRecursionLevel = 0;
 local messageWasRead = true;
 function MailMonitor_PreGetInboxTextHook(funcArgs, retVal, index)
-	debugPrint("MailMonitor_PreGetInboxTextHook("..index..") called");
+	debugPrint("MailMonitor_PreGetInboxTextHook("..nilSafe(index)..") called");
 
 	-- The GetInboxText is called re-entrantly in some cases. We only care
 	-- about the first (outermost) call.
@@ -239,11 +239,11 @@ end
 -- Hooks after reading a message.
 -------------------------------------------------------------------------------
 function MailMonitor_PostGetInboxTextHook(funcArgs, retVal, index)
-	debugPrint("MailMonitor_PostGetInboxTextHook("..index..") called");
+	debugPrint("MailMonitor_PostGetInboxTextHook("..nilSafe(index)..") called");
 
 	-- We are only interested in unread messages.
 	getInboxTextRecursionLevel = getInboxTextRecursionLevel - 1;
-	if (index > 0 and index <= GetInboxNumItems() and getInboxTextRecursionLevel == 0 and not messageWasRead) then
+	if (index ~= nil and index > 0 and index <= GetInboxNumItems() and getInboxTextRecursionLevel == 0 and not messageWasRead) then
 		local isInvoice = retVal[4];
 
 		-- If this task has an invoice, get it.
@@ -271,7 +271,7 @@ end
 -- Hooks deleting a message.
 -------------------------------------------------------------------------------
 function MailMonitor_DeleteInboxItemHook(funcArgs, retVal, index)
-	debugPrint("MailMonitor_DeleteInboxItemHook("..index..") called");
+	debugPrint("MailMonitor_DeleteInboxItemHook("..nilSafe(index)..") called");
 end
 
 -------------------------------------------------------------------------------
