@@ -128,7 +128,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText">
 							<Offset>
-								<AbsDimension x="40" y="-18"/>
+								<AbsDimension x="35" y="-18"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -137,7 +137,7 @@
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentMultiplyText" relativePoint="TOPRIGHT">
 							<Offset>
-								<AbsDimension x="39" y="0"/>
+								<AbsDimension x="31" y="0"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
@@ -315,7 +315,7 @@
 			</Frame>
 			<EditBox name="$parentStackSize" letters="3" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
 				<Size>
-					<AbsDimension x="40" y="16"/>
+					<AbsDimension x="30" y="16"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentQuantityText" relativePoint="BOTTOMLEFT">
@@ -345,7 +345,7 @@
 			</EditBox>
 			<EditBox name="$parentStackCount" letters="2" numeric="true" autoFocus="false" inherits="InputBoxTemplate">
 				<Size>
-					<AbsDimension x="30" y="16"/>
+					<AbsDimension x="22" y="16"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="$parentStackSize" relativePoint="TOPRIGHT">
