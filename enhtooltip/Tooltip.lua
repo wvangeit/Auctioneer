@@ -449,16 +449,16 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		local anchor = yAnchor..xAnchor
 
 		if (anchor == "TOPLEFT") then
-			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5+xOffset,5+yOffset)
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5 + xOffset, 5 + yOffset)
 			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,0)
 		elseif (anchor == "TOPRIGHT") then
-			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5+xOffset,5+yOffset)
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5 + xOffset, 5 + yOffset)
 			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0)
 		elseif (anchor == "BOTTOMLEFT") then
-			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5+xOffset,-5+yOffset)
+			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
 		else -- BOTTOMRIGHT
-			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5+xOffset,-5+yOffset)
+			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
 		end
 
@@ -486,7 +486,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	EnhancedTooltip:SetWidth(width)
 	EnhancedTooltip:Show()
 
-	for i = 1, 20 do
+	for i = 1, 30 do
 		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
 		if (ttMoney.myLine ~= nil) then
 			ttMoneyWidth = ttMoney:GetWidth()
