@@ -84,8 +84,8 @@
 	!insertmacro MUI_LANGUAGE "Italian"
 	!insertmacro MUI_LANGUAGE "Turkish"
 	!insertmacro MUI_LANGUAGE "Czech"
+	!insertmacro MUI_LANGUAGE "Russian"
 	!insertmacro MUI_LANGUAGE "Portuguese"
-	!insertmacro MUI_LANGUAGE "PortugueseBR"
 
 ;--------------------------------
 ;License Language String
@@ -101,8 +101,8 @@
 	LicenseLangString MUILicense ${LANG_ITALIAN} "Licenses\Italian GPL.txt"
 	LicenseLangString MUILicense ${LANG_TURKISH} "Licenses\Turkish GPL.txt"
 	LicenseLangString MUILicense ${LANG_CZECH} "Licenses\Czech GPL.txt"
+	LicenseLangString MUILicense ${LANG_RUSSIAN} "Licenses\Russian GPL.txt"
 	LicenseLangString MUILicense ${LANG_PORTUGUESE} "Licenses\Portuguese GPL.txt"
-	LicenseLangString MUILicense ${LANG_PORTUGUESEBR} "Licenses\PortugueseBR GPL.txt"
 
 ;--------------------------------
 ;Reserve Files
