@@ -329,7 +329,7 @@ local DisenchantEvent = {}
 
 local MAX_BUYOUT_PRICE = 800000;
 
-local MAX_ITEM_ID = 20000
+local MAX_ITEM_ID = 26000
 
 local MIN_PROFIT_MARGIN = 1000;
 local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
@@ -550,7 +550,7 @@ local function DisenchantListHash()
 	local hash = 1
 	for sig in DisenchantList do
 		local item, suffix = ItemID(sig)
-		MAX_ITEM_ID = math.max(MAX_ITEM_ID, item)
+		MAX_ITEM_ID = math.max(MAX_ITEM_ID, item or 0)
 		hash = math.mod(3 * hash + 2 * (item or 0) +(suffix or 0), 16777216)
 	end
 	return hash
@@ -582,7 +582,6 @@ local function MergeDisenchantLists()
 	-- Merge items from EnchantedLocal
 	for sig, disenchant in pairs(EnchantedLocal) do
 		local item = ItemID(sig)
-		MAX_ITEM_ID = math.max(MAX_ITEM_ID, item)
 		if type(disenchant) == "table" then
 			Enchantrix_SaveLocal(sig, disenchant)
 			disenchant = EnchantedLocal[sig]
