@@ -131,7 +131,6 @@ Section "!Libraries" Libraries
 	File "..\EnhTooltip\*.xml"
 	File "..\EnhTooltip\*.lua"
 	File "GPL.txt"
-	File "nopatch"
 
 	;Stubby
 
@@ -140,7 +139,6 @@ Section "!Libraries" Libraries
 	File "..\Stubby\*.xml"
 	File "..\Stubby\*.lua"
 	File "GPL.txt"
-	File "nopatch"
 
 SectionEnd
 
@@ -179,7 +177,6 @@ Section "Auctioneer" Auctioneer
 	File "..\Auctioneer\*.lua"
 	File "..\Auctioneer\Readme.txt"
 	File "GPL.txt"
-	File "nopatch"
 
 SectionEnd
 
@@ -193,7 +190,6 @@ Section "Enchantrix" Enchantrix
 	File "..\Enchantrix\*.lua"
 	File "..\Enchantrix\Readme.txt"
 	File "GPL.txt"
-	File "nopatch"
 
 SectionEnd
 
@@ -206,7 +202,6 @@ Section "Informant" Informant
 	File "..\Informant\*.xml"
 	File "..\Informant\*.lua"
 	File "GPL.txt"
-	File "nopatch"
 
 SectionEnd
 
