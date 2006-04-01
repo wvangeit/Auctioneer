@@ -124,7 +124,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
-				<FontString name="$parentMultiplyText" inherits="GameFontHighlightSmall" text="x">
+				<FontString name="$parentMultiplyText" inherits="GameFontHighlightSmall">
 					<Anchors>
 						<Anchor point="TOPLEFT" relativeTo="$parentQuantityText">
 							<Offset>
@@ -647,6 +647,7 @@
 				getglobal(this:GetName().."BuyoutPriceText"):SetText(_AUCT('UiBuyoutPriceLabel'));
 				getglobal(this:GetName().."BuyoutPriceInvalidText"):SetText(_AUCT('UiBuyoutPriceTooLowError'));
 				getglobal(this:GetName().."QuantityText"):SetText(_AUCT('UiQuantityLabel'));
+				getglobal(this:GetName().."MultiplyText"):SetText("x");
 				getglobal(this:GetName().."StackCountText"):SetText(_AUCT('UiStacksLabel'));
 				getglobal(this:GetName().."DurationText"):SetText(_AUCT('UiDurationLabel'));
 				getglobal(this:GetName().."DepositText"):SetText(_AUCT('UiDepositLabel'));
