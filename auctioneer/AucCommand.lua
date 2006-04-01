@@ -1751,6 +1751,9 @@ function percentVarSet(variable, param, chatprint)
 	-- param is a valid number, save it
 	setFilter(variable, paramVal);
 
+	--Clear the HSP Cache since the profitability numbers have been updated.
+	Auctioneer_HSPCache = {};
+
 	if (chatprint) then
 		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), variable, paramVal.."%"));
 		setKhaosSetKeyValue(variable, paramVal);
