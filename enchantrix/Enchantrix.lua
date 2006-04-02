@@ -856,8 +856,7 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 		if obj and obj.GetText then
 			text = obj:GetText()
 		end
-		-- TODO: Localization
-		local _, _, r = string.find(text, "Reagents: (.+)")
+		local _, _, r = string.find(text, _ENCH('PatReagents'))
 		if r then
 			reagents = r
 			break
@@ -924,8 +923,7 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 		EnhTooltip.AddLine(name)
 		EnhTooltip.AddLine(EnhTooltip.HyperlinkFromLink(link))
 	end
-	-- TODO: Localization
-	EnhTooltip.AddLine("Suggested price:", nil, embed)
+	EnhTooltip.AddLine(_ENCH('FrmtSuggestedPrice'), nil, embed)
 	EnhTooltip.LineColor(0.8,0.8,0.2)
 
 	for _, reagent in pairs(reagentInfo) do
@@ -940,7 +938,7 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 		end
 		line = line.." x"..reagent.count
 		if reagent.count > 1 and reagent.price then
-			line = line..string.format(" (%s ea)", EnhTooltip.GetTextGSC(digits(reagent.price, 3)))
+			line = line..string.format(" ".._ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(digits(reagent.price, 3)))
 			EnhTooltip.AddLine(line, digits(reagent.price * reagent.count, 3), embed)
 		elseif reagent.price then
 			EnhTooltip.AddLine(line, digits(reagent.price, 3), embed)
@@ -951,22 +949,18 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 	end
 
 	if price > 0 then
-		-- TODO: Localization
-		EnhTooltip.AddLine("Total", digits(price, 3), embed)
+		EnhTooltip.AddLine(_ENCH('FrmtTotal'), digits(price, 3), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
 		if not auctioneerLoaded then
-			-- TODO: Localization
-			EnhTooltip.AddLine("[Auctioneer not loaded, using cached prices]")
+			EnhTooltip.AddLine(_ENCH('FrmtWarnAuctNotLoaded'))
 			EnhTooltip.LineColor(0.6,0.6,0.1)
 		end
 		if unknownPrices then
-			-- TODO: Localization
-			EnhTooltip.AddLine("[Some prices unavailable]")
+			EnhTooltip.AddLine(_ENCH('FrmtWarnPriceUnavail'))
 			EnhTooltip.LineColor(0.6,0.6,0.1)
 		end
 	else
-		-- TODO: Localization
-		EnhTooltip.AddLine("[No prices available]")
+		EnhTooltip.AddLine(_ENCH('FrmtWarnNoPrices'))
 		EnhTooltip.LineColor(0.6,0.6,0.1)
 	end
 end
