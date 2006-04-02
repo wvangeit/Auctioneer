@@ -160,6 +160,15 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+				<FontString name="$parentUnknownDepositText" inherits="GameFontRedSmall" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentDepositText" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 
@@ -651,6 +660,7 @@
 				getglobal(this:GetName().."StackCountText"):SetText(_AUCT('UiStacksLabel'));
 				getglobal(this:GetName().."DurationText"):SetText(_AUCT('UiDurationLabel'));
 				getglobal(this:GetName().."DepositText"):SetText(_AUCT('UiDepositLabel'));
+				getglobal(this:GetName().."UnknownDepositText"):SetText(_AUCT('UiUnknownError'));
 				AuctionFramePost_OnLoad();
 			</OnLoad>
 		</Scripts>

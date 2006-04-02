@@ -59,6 +59,8 @@ function AuctionFramePost_OnLoad()
 	this.buyoutMoneyInputFrame = getglobal(this:GetName().."BuyoutPrice");
 	this.stackSizeEdit = getglobal(this:GetName().."StackSize");
 	this.stackSizeCount = getglobal(this:GetName().."StackCount");
+	this.depositMoneyFrame = getglobal(this:GetName().."DepositMoneyFrame");
+	this.depositErrorLabel = getglobal(this:GetName().."UnknownDepositText");
 
 	-- Setup the tab order for the money input frames.
 	MoneyInputFrame_SetPreviousFocus(this.bidMoneyInputFrame, this.stackSizeCount);
@@ -284,17 +286,21 @@ function AuctionFramePost_UpdateDeposit(frame)
 		local duration = frame:GetDuration();
 		local stackSize = frame:GetStackSize();
 		local stackCount = frame:GetStackCount();
-		local depositFrameName = frame:GetName().."DepositMoneyFrame";
 		if (itemID) then
-			local deposit = AuctionFramePost_CalculateAuctionDeposit(itemID, duration);
+			local deposit = AuctionFramePost_CalculateAuctionDeposit(itemID, stackSize, duration);
 			if (deposit) then
-				MoneyFrame_Update(depositFrameName, deposit * stackSize * stackCount);
+				MoneyFrame_Update(frame.depositMoneyFrame:GetName(), deposit * stackCount);
+				frame.depositMoneyFrame:Show();
+				frame.depositErrorLabel:Hide();
 			else
-				-- TODO: Figure out what to do when we don't know the deposit.
-				MoneyFrame_Update(depositFrameName, 0);
+				MoneyFrame_Update(frame.depositMoneyFrame:GetName(), 0);
+				frame.depositMoneyFrame:Hide();
+				frame.depositErrorLabel:Show();
 			end
 		else
-			MoneyFrame_Update(depositFrameName, 0);
+			MoneyFrame_Update(frame.depositMoneyFrame:GetName(), 0);
+			frame.depositMoneyFrame:Hide();
+			frame.depositErrorLabel:Hide();
 		end
 	end
 end
@@ -462,7 +468,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 	local button = getglobal(frame:GetName().."AuctionItem");
 	if (bag and item) then
 		-- Get the item's information.
-		local itemLink = GetContainerItemLink(bag, item)
+		local itemLink = GetContainerItemLink(bag, item);
 		local itemID, randomProp, enchant, uniqueId, name = EnhTooltip.BreakLink(itemLink);
 		local itemTexture, itemCount = GetContainerItemInfo(bag, item);
 		if (count == nil) then
@@ -801,19 +807,17 @@ end
 
 -------------------------------------------------------------------------------
 -- Calculate the deposit required for the specified item.
---
--- TODO: This method of calculating the deposit works for most items, but for
--- some items its wrong.
 -------------------------------------------------------------------------------
-function AuctionFramePost_CalculateAuctionDeposit(itemID, duration)
+function AuctionFramePost_CalculateAuctionDeposit(itemID, count, duration)
 	local price = Auctioneer.API.GetVendorSellPrice(itemID);
 	if (price) then
+		local base = math.floor(count * price * 0.05);
 		if (duration == 120) then
-			return math.floor(price * 0.05);
+			return base;
 		elseif (duration == 480) then
-			return math.floor(price * .20);
+			return (base * 4);
 		else
-			return math.floor(price * .60);
+			return (base * 12);
 		end
 	end
 end
