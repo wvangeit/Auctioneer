@@ -25,6 +25,7 @@ Enchantrix_CustomLocalizations = {
 	['TextGeneral'] = GetLocale(),
 	['TextCombat'] = GetLocale(),
 	['ArgSpellname'] = GetLocale(),
+	['PatReagents'] = GetLocale(),
 }
 
 function _ENCH(stringKey, locale)
