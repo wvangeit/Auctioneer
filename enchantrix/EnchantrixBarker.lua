@@ -1019,11 +1019,7 @@ function Enchantrix_GetItemCategoryKey( index )
 end
 
 function EnchantrixBarker_GetCraftDescription( index )
-    if( GetCraftDescription(index) ~= nil ) then
-        return GetCraftDescription(index);
-    else
-        return "";
-    end
+    return GetCraftDescription(index) or "";
 end
 
 function Enchantrix_GetShortDescriptor( index )
