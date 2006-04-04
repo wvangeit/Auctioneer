@@ -49,6 +49,7 @@ local attributes = {
     'strength',
     'agility',
     'fire resistance',
+    'resistance to fire',
     'resistance',
     'all stats',
     'mana',
@@ -70,6 +71,7 @@ local short_attributes = {
     'SPI',
     'STR',
     'AGI',
+    'fire res',
     'fire res',
     'all res',
     'all stats',
@@ -1016,8 +1018,16 @@ function Enchantrix_GetItemCategoryKey( index )
     
 end
 
+function EnchantrixBarker_GetCraftDescription( index )
+    if( GetCraftDescription(index) ~= nil ) then
+        return GetCraftDescription(index);
+    else
+        return "";
+    end
+end
+
 function Enchantrix_GetShortDescriptor( index )
-    local long_str = string.lower(GetCraftDescription(index))
+    local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
     
     for index,attribute in attributes do
         if( string.find( long_str, attribute ) ~= nil ) then
@@ -1033,7 +1043,7 @@ end
 
 function Enchantrix_GetEnchantStat( enchant )
     local index = enchant.index;
-    local long_str = string.lower(GetCraftDescription(index))
+    local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
     
     for index,attribute in attributes do
         if( string.find( long_str, attribute ) ~= nil ) then
