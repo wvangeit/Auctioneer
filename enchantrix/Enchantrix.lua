@@ -910,6 +910,7 @@ function Enchantrix_EnchantTooltip(funcVars, retVal, frame, name, link)
 		end
 	end
 	table.sort(reagentInfo, function(a,b)
+		if (not b) or (not a) then return end
 		return ((b.quality or -1) < (a.quality or -1)) or ((b.price or 0) < (a.price or 0))
 	end)
 
