@@ -233,10 +233,10 @@ function getUsableMedian(itemKey, realm, buyoutPrices)
 	--get history median
 	local historyMedian, histCount = getHistMedian(itemKey, realm);
 
-	if snapshotMedian>0 and (historyMedian==0 or snapshotMedian<(historyMedian * 1.2)) then
+	if (snapCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) and ((histCount < Auctioneer.Core.Constants.MinBuyoutSeenCount) or (snapshotMedian < 1.2 * historyMedian)) then
 		usableMedian = snapshotMedian;
 		count = snapCount;
-	elseif (historyMedian) then
+	elseif (histCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) then
 		usableMedian = historyMedian;
 		count = histCount;
 	end
