@@ -212,16 +212,14 @@ function eventHandler(hookParams, event, text, player)
 
 		if (link[2] > 1) then
 			eachstring = string.format(_AUCT('FrmtAskPriceEach'), EnhTooltip.GetTextGSC(historicalMedian, nil, true));
-			askedCount = link[2];
 		else
 			eachstring = "";
-			askedCount = 1
 		end
 
 		if (aCount > 0) then
 			SendChatMessage(link[1]..": "..string.format(_AUCT('FrmtInfoSeen'), aCount), "WHISPER", Auctioneer.AskPrice.Language, player);
-			SendChatMessage(string.format(_AUCT('FrmtAskPriceBuyoutMedianHistorical'), "    ", EnhTooltip.GetTextGSC(historicalMedian*askedCount, nil, true), eachstring), "WHISPER", Auctioneer.AskPrice.Language, player);
-			SendChatMessage(string.format(_AUCT('FrmtAskPriceBuyoutMedianSnapshot'), "    ", EnhTooltip.GetTextGSC(snapshotMedian*askedCount, nil, true), eachstring), "WHISPER", Auctioneer.AskPrice.Language, player);
+			SendChatMessage(string.format(_AUCT('FrmtAskPriceBuyoutMedianHistorical'), "    ", EnhTooltip.GetTextGSC(historicalMedian*link[2], nil, true), eachstring), "WHISPER", Auctioneer.AskPrice.Language, player);
+			SendChatMessage(string.format(_AUCT('FrmtAskPriceBuyoutMedianSnapshot'), "    ", EnhTooltip.GetTextGSC(snapshotMedian*link[2], nil, true), eachstring), "WHISPER", Auctioneer.AskPrice.Language, player);
 		else
 			SendChatMessage(link[1]..": "..string.format(_AUCT('FrmtInfoNever'), Auctioneer.Util.GetAuctionKey()), "WHISPER", Auctioneer.AskPrice.Language, player);
 		end
