@@ -488,7 +488,7 @@ function checkAddOns()
 	for i=1, addonCount do
 		name, title, notes = GetAddOnInfo(i)
 		if (StubbyConfig.inspected and StubbyConfig.inspected[name]) then
-			local infoCompare = title.."|"..notes
+			local infoCompare = title.."|"..(notes or "")
 			if (infoCompare == StubbyConfig.addinfo[name]) then
 				goodList[name] = true
 			end
@@ -561,7 +561,7 @@ end
 function inspectAddOn(addonName, title, info)
 	LoadAddOn(addonName)
 	StubbyConfig.inspected[addonName] = true
-	StubbyConfig.addinfo[addonName] = title.."|"..info
+	StubbyConfig.addinfo[addonName] = title.."|"..(info or "")
 end
 
 function searchForNewAddOns()
