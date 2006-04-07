@@ -103,6 +103,7 @@ local InventoryTypes = {
 	["INVTYPE_TRINKET"] = ENX_ARMOR,
 	["INVTYPE_WAIST"] = ENX_ARMOR,
 	["INVTYPE_WRIST"] = ENX_ARMOR,
+	["INVTYPE_RELIC"] = ENX_ARMOR,
 }
 
 local LevelRules = {
