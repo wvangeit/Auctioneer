@@ -12,4 +12,3 @@
 ## URL: http://enchantrix.org
 ..\..\FrameXML\MoneyFrame.xml
 Enchantrix.xml
-EnchantrixBarker.xml
