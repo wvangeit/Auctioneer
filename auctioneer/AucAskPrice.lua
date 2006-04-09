@@ -141,11 +141,11 @@ function genVarSet(variable, param, chatprint)
 		Auctioneer.Command.SetFilter(var, param);
 
 	elseif (param == "toggle" or param == nil or param == "") then
-		param = Auctioneer.Command.SetFilter(var, not Auctioneer.Command.GetFilter(variable));
+		param = Auctioneer.Command.SetFilter(var, not Auctioneer.Command.GetFilter(var));
 	end
 
 	if (chatprint) then
-		if (Auctioneer.Command.GetFilter(variable)) then
+		if (Auctioneer.Command.GetFilter(var)) then
 			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtAskPriceEnable'), Auctioneer.Util.LocalizeCommand(variable)));
 			setKhaosSetKeyValue(var, true)
 		else
