@@ -1321,7 +1321,7 @@ end
 
 -- Hook tradeskill functions
 local function hookTradeskill()
-	Stubby.RegisterFunctionHook("TradeSkillFrame_OnUpdate", 200, callTradeHook, "trade", "")
+	Stubby.RegisterFunctionHook("TradeSkillFrame_Update", 200, callTradeHook, "trade", "")
 	Stubby.RegisterFunctionHook("TradeSkillFrame_SetSelection", 200, callTradeHook, "trade", "")
 end
 
@@ -1435,7 +1435,7 @@ EnhTooltip = {
 --- Temporary backwards compatibility ---
 -- This will go away eventually, so upgrade now!
 function TT_AddTooltip() end
-Stubby.RegisterFunctionHook("EnhTooltip.AddTooltipHook", 100, TT_AddTooltip)
+Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, TT_AddTooltip)
 TT_HideTooltip			= hideTooltip
 TT_ClearTooltip			= clearTooltip
 TT_GetGSC				= getGSC
