@@ -390,12 +390,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local sHeight = GetScreenHeight()
 
 	local cWidth = currentTooltip:GetWidth()
-	if (cWidth < width) then
-		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
-		self.showIgnore=true;
-		currentTooltip:Show()
-		self.showIgnore=false;
-	elseif (cWidth > width) then
+	if (cWidth > width) then
 		width = cWidth
 	end
 
@@ -427,9 +422,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
 		local xOffset = 0;
-		if (xAnchor == "RIGHT" and enhTooltipParentRect.r + width > sWidth) then
+		if (xAnchor == "RIGHT" and enhTooltipParentRect.r + width > sWidth - 5) then
 			xOffset = -(enhTooltipParentRect.r + width - sWidth + 5);
-		elseif (xAnchor == "LEFT" and enhTooltipParentRect.l - width < 0) then
+		elseif (xAnchor == "LEFT" and enhTooltipParentRect.l - width < 5) then
 			xOffset = -(enhTooltipParentRect.l - width - 5);
 		end
 
@@ -438,9 +433,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0;
 		local totalHeight = height + currentTooltip:GetHeight();
-		if (yAnchor == "TOP" and enhTooltipParentRect.t + totalHeight > sHeight) then
+		if (yAnchor == "TOP" and enhTooltipParentRect.t + totalHeight > sHeight - 5) then
 			yOffset = -(enhTooltipParentRect.t + totalHeight - sHeight + 5);
-		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.b - totalHeight < 0) then
+		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.b - totalHeight < 5) then
 			yOffset = -(enhTooltipParentRect.b - totalHeight - 5);
 		end
 
@@ -484,6 +479,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 	EnhancedTooltip:SetHeight(height)
 	EnhancedTooltip:SetWidth(width)
+	currentTooltip:SetWidth(width)
 	EnhancedTooltip:Show()
 
 	for i = 1, 30 do
