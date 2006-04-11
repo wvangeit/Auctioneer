@@ -1504,7 +1504,7 @@ function Enchantrix_GetLocal(sig)
 		end
 
 		-- Get the string and break it apart
-		for enchantResult in Enchantrix_Spliterator(EnchantedLocal[sig]) do
+		for enchantResult in Enchantrix_Spliterator(EnchantedLocal[sig], ";") do
 			local enchantBreak = Enchantrix_Split(enchantResult, ":");
 			local rSig = tonumber(enchantBreak[1]) or 0;
 			local iCount = tonumber(enchantBreak[2]) or 0;
