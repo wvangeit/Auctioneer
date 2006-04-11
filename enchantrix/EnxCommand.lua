@@ -647,14 +647,12 @@ function Enchantrix_Clear(param, chatprint)
 			Enchantrix_ChatPrint(_ENCH('FrmtActClearall'));
 		end
 	else
-		local items = Enchantrix_GetSigs(param);
-		for _,itemKey in items do
-			local aKey = itemKey.s;
-			local aName = itemKey.n;
-			EnchantedLocal[aKey] = { z=true };
+		for link in string.gfind(param, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%b[]|h|r") do
+			local sig = Enchantrix_SigFromLink(link)
+			EnchantedLocal[sig] = nil
 
 			if (chatprint) then
-				Enchantrix_ChatPrint(string.format(_ENCH('FrmtActClearOk'), aName));
+				Enchantrix_ChatPrint(string.format(_ENCH('FrmtActClearOk'), link))
 			end
 		end
 	end
