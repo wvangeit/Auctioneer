@@ -390,7 +390,12 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local sHeight = GetScreenHeight()
 
 	local cWidth = currentTooltip:GetWidth()
-	if (cWidth > width) then
+	if (cWidth < width) then
+		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
+		self.showIgnore=true;
+		currentTooltip:Show()
+		self.showIgnore=false;
+	elseif (cWidth > width) then
 		width = cWidth
 	end
 
@@ -479,7 +484,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 	EnhancedTooltip:SetHeight(height)
 	EnhancedTooltip:SetWidth(width)
-	currentTooltip:SetWidth(width)
 	EnhancedTooltip:Show()
 
 	for i = 1, 30 do
