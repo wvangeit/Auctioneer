@@ -389,11 +389,15 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local sWidth = GetScreenWidth()
 	local sHeight = GetScreenHeight()
 
-	width = math.max(width, currentTooltip:GetWidth())
-	getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
-	self.showIgnore=true;
-	currentTooltip:Show()
-	self.showIgnore=false;
+	local cWidth = currentTooltip:GetWidth()
+	if (cWidth < width) then
+		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
+		self.showIgnore=true;
+		currentTooltip:Show()
+		self.showIgnore=false;
+	else
+		width = cWidth
+	end
 
 	local parentObject = currentTooltip.owner
 	if (parentObject) then
