@@ -84,11 +84,11 @@ local NIL_VALUE = "<nil>";
 -------------------------------------------------------------------------------
 -- Adds a pending bid to the database
 -------------------------------------------------------------------------------
-function addPendingBid(item, quantity, bid, seller, isBuyout)
+function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout)
 	if (item and quantity and bid) then
 		-- Create a packed record.
 		local pendingBid = {};
-		pendingBid.time = time();
+		pendingBid.time = timestamp;
 		pendingBid.quantity = quantity;
 		pendingBid.bid = bid;
 		pendingBid.seller = seller;
@@ -149,7 +149,8 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingBid(packedPendingBid)
 	local pendingBid = {};
-	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout = string.find(packedPendingBid, "(%d+);(%d+);(%d+);(.+);(.+)");
+	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+)");
+	pendingBid.time = numberFromString(pendingBid.time);
 	pendingBid.quantity = numberFromString(pendingBid.quantity);
 	pendingBid.bid = numberFromString(pendingBid.bid);
 	pendingBid.seller = stringFromNilSafeString(pendingBid.seller);
@@ -254,26 +255,26 @@ end
 -------------------------------------------------------------------------------
 -- Adds a successful bid to the database
 -------------------------------------------------------------------------------
-function addSuccessfulBid(item, quantity, bid, seller, isBuyout)
-	addCompletedBid(item, quantity, bid, seller, isBuyout, true);
+function addSuccessfulBid(timestamp, item, quantity, bid, seller, isBuyout)
+	addCompletedBid(timestamp, item, quantity, bid, seller, isBuyout, true);
 end
 
 -------------------------------------------------------------------------------
 -- Adds a successful bid to the database
 -------------------------------------------------------------------------------
-function addFailedBid(item, bid)
-	addCompletedBid(item, nil, bid, nil, nil, false);
+function addFailedBid(timestamp, item, bid)
+	addCompletedBid(timestamp, item, nil, bid, nil, nil, false);
 end
 
 -------------------------------------------------------------------------------
 -- Adds a completed bid to the database
 -------------------------------------------------------------------------------
-function addCompletedBid(item, quantity, bid, seller, isBuyout, isSuccessful)
+function addCompletedBid(timestamp, item, quantity, bid, seller, isBuyout, isSuccessful)
 	if (item and (quantity or bid)) then
 		-- Check if we have enough information to add the purchase now.
 		local isPurchaseRecorded = false;
 		if (quantity and bid and seller and isBuyout ~= nil and isSuccessful) then
-			addPurchase(time(), item, quantity, bid, seller, isBuyout, true);
+			addPurchase(timestamp, item, quantity, bid, seller, isBuyout, true);
 			isPurchaseRecorded = true;
 		end
 
@@ -281,7 +282,7 @@ function addCompletedBid(item, quantity, bid, seller, isBuyout, isSuccessful)
 		if (isPendingBid(item, quantity, bid, seller, isBuyout, isSuccessful)) then
 			-- Create a packed record.
 			local completedBid = {};
-			completedBid.time = time();
+			completedBid.time = timestamp;
 			completedBid.quantity = quantity;
 			completedBid.bid = bid;
 			completedBid.seller = seller;
@@ -322,7 +323,8 @@ end
 -------------------------------------------------------------------------------
 function unpackCompletedBid(packedCompletedBid)
 	local completedBid = {};
-	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded = string.find(packedCompletedBid, "(%d+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded = string.find(packedCompletedBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	completedBid.time = numberFromString(completedBid.time);
 	completedBid.quantity = numberFromString(completedBid.quantity);
 	completedBid.bid = numberFromString(completedBid.bid);
 	completedBid.seller = stringFromNilSafeString(completedBid.seller);
@@ -378,11 +380,11 @@ end
 -------------------------------------------------------------------------------
 -- Adds a purchase to the database.
 -------------------------------------------------------------------------------
-function addPurchase(time, item, quantity, cost, seller, isBuyout)
+function addPurchase(timestamp, item, quantity, cost, seller, isBuyout)
 	if (item and quantity and cost) then
 		-- Create a packed record.
 		local purchase = {};
-		purchase.time = time;
+		purchase.time = timestamp;
 		purchase.quantity = quantity;
 		purchase.cost = cost;
 		purchase.seller = seller;
@@ -417,8 +419,9 @@ end
 -------------------------------------------------------------------------------
 function unpackPurchase(packedPurchase)
 	local purchase = {};
-	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout = string.find(packedPurchase, "(%d+);(%d+);(%d+);(.+);(.+)");
-	purchase.quantity = stringFromNilSafeString(purchase.quantity);
+	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout = string.find(packedPurchase, "(.+);(.+);(.+);(.+);(.+)");
+	purchase.time = numberFromString(purchase.time);
+	purchase.quantity = numberFromString(purchase.quantity);
 	purchase.cost = numberFromString(purchase.cost);
 	purchase.seller = stringFromNilSafeString(purchase.seller);
 	purchase.isBuyout = booleanFromString(purchase.isBuyout);
@@ -533,12 +536,12 @@ function reconcileBids(item)
 				index = index + 1;
 			end
 		end
-	end
 
-	-- Remove the item's table if empty. This happens automatically when
-	-- getting it via the built-in method.
-	getPendingBidsTableForItem(item);
-	getCompletedBidsTableForItem(item);
+		-- Remove the item's table if empty. This happens automatically when
+		-- getting it via the built-in method.
+		getPendingBidsTableForItem(item);
+		getCompletedBidsTableForItem(item);
+	end
 
 	debugPrint("-- End reconciling bids for "..item.." --");
 end
@@ -748,7 +751,7 @@ function reconcileMatchingBidList(item, pendingBidsTable, pendingBidIndicies, co
 			
 			-- Add a purchase (if it was a successful bid and not already recorded)
 			if (completedBid.isSuccessful and not pendingBid.isBuyout and not completedBid.isPurchaseRecorded) then
-				addPurchase(pendingBid.time, item, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout);
+				addPurchase(completedBid.time, item, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout);
 			end
 		end
 	end
@@ -942,4 +945,14 @@ BeanCounter.Purchases =
 	PrintCompletedBids = printCompletedBids;
 	PrintPurchases = printPurchases;
 	ResetDatabase = resetDatabase;
+};
+
+BeanCounter.DBUtil = 
+{
+	StringFromBoolean = stringFromBoolean;
+	BooleanFromString = booleanFromString;
+	StringFromNumber = stringFromNumber;
+	NumberFromString = numberFromString;
+	NilSafeStringFromString = nilSafeStringFromString;
+	StringFromNilSafeString = stringFromNilSafeString;
 };

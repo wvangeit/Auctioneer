@@ -33,13 +33,15 @@ function ListTemplate_CompareRows(row1, row2)
 		local column = frame.sortOrder[index];
 		local physicalColumn = frame.physicalColumns[column.columnIndex];
 		local logicalColumn = physicalColumn.logicalColumn;
-		local value1 = logicalColumn.valueFunc(row1);
-		local value2 = logicalColumn.valueFunc(row2);
-		if (value1 ~= value2) then
-			if (column.sortAscending and logicalColumn.compareAscendingFunc) then
-				return logicalColumn.compareAscendingFunc(row1, row2);
-			elseif (not column.sortAscending and logicalColumn.compareDescendingFunc) then
-				return logicalColumn.compareDescendingFunc(row1, row2);
+		if (logicalColumn.compareAscendingFunc and logicalColumn.compareDescendingFunc) then
+			local ascending = logicalColumn.compareAscendingFunc(row1, row2);
+			local descending = logicalColumn.compareDescendingFunc(row1, row2);
+			if (ascending or descending) then
+				if (column.sortAscending) then
+					return ascending;
+				else
+					return descending;
+				end
 			end
 		end
 	end

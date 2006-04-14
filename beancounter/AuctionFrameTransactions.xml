@@ -108,12 +108,30 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="$parentAuctionText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentBuyText">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSellText" inherits="GameFontNormalSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentAuctionText">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 					</Layer>
 				</Layers>
 				<Frames>
 					<EditBox name="$parentSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
 						<Size>
-							<AbsDimension x="150" y="16"/>
+							<AbsDimension x="140" y="16"/>
 						</Size>
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
@@ -181,6 +199,40 @@
 						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
 						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
 					</CheckButton>
+					<CheckButton name="$parentAuctionCheckBox" checked="true">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentAuctionText" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
+					<CheckButton name="$parentSellCheckBox" checked="true">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parentSellText" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
 					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
 						<Size>
 							<AbsDimension x="120" y="22"/>
@@ -206,6 +258,8 @@
 						getglobal(this:GetName().."TransactionsText"):SetText(_BC('UiTransactionsLabel'));
 						getglobal(this:GetName().."BidText"):SetText(_BC('UiBids'));
 						getglobal(this:GetName().."BuyText"):SetText(_BC('UiPurchases'));
+						getglobal(this:GetName().."AuctionText"):SetText(_BC('UiAuctions'));
+						getglobal(this:GetName().."SellText"):SetText(_BC('UiSales'));
 						getglobal(this:GetName().."SearchButton"):SetText(_BC('UiSearch'));
 					</OnLoad>
 				</Scripts>

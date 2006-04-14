@@ -27,7 +27,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="BeanCounter.lua"/>
 	<Script file="MailMonitor.lua"/>
 	<Script file="BidMonitor.lua"/>
+	<Script file="PostMonitor.lua"/>
 	<Script file="PurchasesDB.lua"/>
+	<Script file="SalesDB.lua"/>
 
 	<Frame name="BeanCounterFrame" hidden="true">
 		<Scripts>

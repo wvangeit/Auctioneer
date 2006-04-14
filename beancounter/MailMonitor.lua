@@ -24,6 +24,7 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
+local chatPrint = BeanCounter.ChatPrint;
 local nilSafe = BeanCounter.NilSafe;
 
 -------------------------------------------------------------------------------
@@ -38,6 +39,7 @@ local isSubjectAuctionWon;
 local isSubjectAuctionSuccessful;
 local isSubjectOutbidOn;
 local getItemNameFromSubject;
+local reconcileDatabases;
 local debugPrint;
 
 local InboxTask_OnEvent;
@@ -64,39 +66,21 @@ local TakeInboxItemTask_Execute;
 -------------------------------------------------------------------------------
 -- Constants
 -------------------------------------------------------------------------------
--- Auction houses (TODO: Make these localized strings)
-ALLIANCE_AUCTION_HOUSE = "Alliance Auction House";
-HORDE_AUCTION_HOUSE = "Horde Auction House";
-
--- Auction house subjects (TODO: Make these localized strings)
-AUCTION_EXPIRED = "Auction expired: ";
-AUCTION_CANCELLED = "Auction cancelled: ";
-AUCTION_WON = "Auction won: ";
-AUCTION_SUCCESSFUL = "Auction successful: ";
-OUTBID_ON = "Outbid on ";
-
-
---  german localization for testing on german client
-if (locale_deDE) then
-
--- Auction houses (TODO: Make these localized strings)
-ALLIANCE_AUCTION_HOUSE = "Auktionshaus der Allianz";
-HORDE_AUCTION_HOUSE = "Auktionshaus der Horde";
-
--- Auction house subjects (TODO: Make these localized strings)
-AUCTION_EXPIRED = "Auktion abgelaufen: ";
-AUCTION_CANCELLED = "Auktion abgebrochen: ";
-AUCTION_WON = "Auktion gewonnen: ";
-AUCTION_SUCCESSFUL = "Auktion erfolgreich: ";
-OUTBID_ON = "H\195\182heres Gebot f195\188r ";
-
-end
-
+local MAX_DAYS_LEFT = 30; -- Maximum number of days left for an unread message
 
 -------------------------------------------------------------------------------
 -- Local variables
 -------------------------------------------------------------------------------
 local InboxTasks = {};
+local LastMailCount = 0;
+local MailDownloaded = false;
+local MailDownloadTime = nil;
+local MailBacklog = false;
+
+-------------------------------------------------------------------------------
+-- Constants
+-------------------------------------------------------------------------------
+local MAX_INBOX_MESSAGES = 50;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -110,8 +94,9 @@ function MailMonitor_OnLoad()
 	
 	-- Register for the events we need!
 	Stubby.RegisterEventHook("MAIL_INBOX_UPDATE", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
-	Stubby.RegisterEventHook("BAG_UPDATE", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
 	Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
+	Stubby.RegisterEventHook("MAIL_SHOW", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
+	Stubby.RegisterEventHook("MAIL_CLOSED", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
 end
 
 -------------------------------------------------------------------------------
@@ -141,6 +126,32 @@ function MailMonitor_OnEventHook(_, event, arg1)
 		else
 			table.insert(InboxTasks, 1, task);
 		end
+	end
+
+	-- Reconcilation management.
+	if (event == "MAIL_SHOW") then
+		LastMailCount = GetInboxNumItems();
+		MailDownloaded = false;
+		MailDownloadTime = nil;
+	elseif (event == "MAIL_INBOX_UPDATE") then
+		local count = GetInboxNumItems();
+		if (count > LastMailCount) then
+			MailDownloaded = true;
+			MailDownloadTime = time();
+			MailBacklog = (count == MAX_INBOX_MESSAGES);
+			if (MailBacklog) then
+				debugPrint("Mail downloaded from server at "..date("%c", MailDownloadTime).." ("..count.." messages - backlog)");
+			else
+				debugPrint("Mail downloaded from server at "..date("%c", MailDownloadTime).." ("..count.." messages)");
+			end			
+		end
+		LastMailCount = count;
+	elseif (event == "MAIL_CLOSED") then
+		if (MailDownloaded and MailDownloadTime ~= nil and not MailBacklog) then
+			reconcileDatabases(MailDownloadTime);
+		end
+		MailDownloaded = false;
+		MailDownloadTime = nil;
 	end
 end
 
@@ -215,6 +226,7 @@ end
 -------------------------------------------------------------------------------
 local getInboxTextRecursionLevel = 0;
 local messageWasRead = true;
+local messageDaysLeft = 0;
 function MailMonitor_PreGetInboxTextHook(funcArgs, retVal, index)
 	debugPrint("MailMonitor_PreGetInboxTextHook("..nilSafe(index)..") called");
 
@@ -227,6 +239,7 @@ function MailMonitor_PreGetInboxTextHook(funcArgs, retVal, index)
 		-- the message to read.
 		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 		messageWasRead = wasRead;
+		messageDaysLeft = daysLeft;
 		if (not messageWasRead) then
 			-- Queue a task for marking the message as read. We add this to the
 			-- front of the queue since its a client side operation.
@@ -256,10 +269,11 @@ function MailMonitor_PostGetInboxTextHook(funcArgs, retVal, index)
 		end
 
 		-- Process the message.
+		local messageAgeInSeconds = math.floor((MAX_DAYS_LEFT - messageDaysLeft) * 24 * 60 * 60);
 		if (table.getn(InboxTasks) > 0) then
-			addTask(createProcessMessageTask(index));
+			addTask(createProcessMessageTask(index, messageAgeInSeconds));
 		else
-			processMailMessage(index);
+			processMailMessage(index, messageAgeInSeconds);
 		end
 
 		-- Consider the message read now.
@@ -290,12 +304,13 @@ end
 -------------------------------------------------------------------------------
 -- Hooks reading a message.
 -------------------------------------------------------------------------------
-function processMailMessage(index)
+function processMailMessage(index, messageAgeInSeconds)
 	if (index > 0) then
 		debugPrint("Processing message "..index);
 		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 		if (sender and isSenderAuctionHouse(sender)) then
-			debugPrint("Message "..index.." was from an auction house");
+			local timestamp = (time() - messageAgeInSeconds);
+			debugPrint("Message "..index.." was from an auction house (delivered at "..date("%c", timestamp)..")");
 			if (isSubjectAuctionSuccessful(subject) and money) then
 				local itemName = getItemNameFromSubject(subject);
 				debugPrint("Message "..index.." is an auction successful message: "..nilSafe(itemName));
@@ -307,20 +322,34 @@ function processMailMessage(index)
 					if (bid ~= nil and buyout ~= nil) then
 						isBuyout = (bid == buyout);
 					end
-					debugPrint("Auction Successful: "..itemName..", <nil>, "..nilSafe(invoiceType)..", "..nilSafe(playerName)..", "..nilSafe(bid)..", "..nilSafe(buyout)..", "..nilSafe(deposit)..", "..nilSafe(consignment));
-					-- TODO: Add to sales database
+					debugPrint("Auction Successful: "..
+						itemName..", "..
+						nilSafe(nil)..", "..
+						nilSafe(invoiceType)..", "..
+						nilSafe(playerName)..", "..
+						nilSafe(bid)..", "..
+						nilSafe(buyout)..", "..
+						nilSafe(deposit)..", "..
+						nilSafe(consignment));
+					BeanCounter.Sales.AddSuccessfulAuction(timestamp, itemName, money, bid, (bid == buyout), deposit, consignment, playerName);
 				end
 			elseif (isSubjectAuctionExpired(subject) and hasItem) then
 				local itemName, _, itemCount = GetInboxItem(index);
 				debugPrint("Message "..index.." is an auction expired message: "..nilSafe(itemName).. ", "..nilSafe(itemCount));
 				if (itemName and itemCount) then
-					-- TODO: Add to sales database
+					debugPrint("Auction Expired: "..
+						itemName..", "..
+						nilSafe(itemCount));
+					BeanCounter.Sales.AddExpiredAuction(timestamp, itemName, itemCount);
 				end
 			elseif (isSubjectAuctionCancelled(subject) and hasItem) then
 				local itemName, _, itemCount = GetInboxItem(index);
-				debugPrint("Message "..index.." is an auction expired message: "..nilSafe(itemName).. ", "..nilSafe(itemCount));
+				debugPrint("Message "..index.." is an auction cancelled message: "..nilSafe(itemName).. ", "..nilSafe(itemCount));
 				if (itemName and itemCount) then
-					-- TODO: Add to sales database
+					debugPrint("Auction Cancelled: "..
+						itemName..", "..
+						nilSafe(itemCount));
+					BeanCounter.Sales.AddExpiredAuction(timestamp, itemName, itemCount);
 				end
 			elseif (isSubjectAuctionWon(subject) and hasItem) then
 				local itemName, _, itemCount = GetInboxItem(index);
@@ -333,20 +362,34 @@ function processMailMessage(index)
 					if (bid ~= nil and buyout ~= nil) then
 						isBuyout = (bid == buyout);
 					end
-					debugPrint("Auction Won: "..itemName..", "..itemCount..", "..nilSafe(invoiceType)..", "..nilSafe(playerName)..", "..nilSafe(bid)..", "..nilSafe(buyout)..", "..nilSafe(deposit)..", "..nilSafe(consignment));
-					BeanCounter.Purchases.AddSuccessfulBid(itemName, itemCount, bid, playerName, isBuyout);
+					debugPrint("Auction Won: "..
+						itemName..", "..
+						itemCount..", "..
+						nilSafe(invoiceType)..", "..
+						nilSafe(playerName)..", "..
+						nilSafe(bid)..", "..
+						nilSafe(buyout)..", "..
+						nilSafe(deposit)..", "..
+						nilSafe(consignment));
+					BeanCounter.Purchases.AddSuccessfulBid(timestamp, itemName, itemCount, bid, playerName, isBuyout);
 				end
 			elseif (isSubjectOutbidOn(subject) and money) then
 				local itemName = getItemNameFromSubject(subject);
 				debugPrint("Message "..index.." is an auction lost message: "..nilSafe(itemName).. ", "..money);
 				if (itemName and money) then
-					BeanCounter.Purchases.AddFailedBid(itemName, money);
+					debugPrint("Out bid on: "..
+						itemName..", "..
+						nilSafe(money));
+					BeanCounter.Purchases.AddFailedBid(timestamp, itemName, money);
 				end
 			elseif (isSubjectAuctionCancelled(subject) and money) then
 				local itemName = getItemNameFromSubject(subject);
 				debugPrint("Message "..index.." is an auction canceled message: "..nilSafe(itemName).. ", "..money);
 				if (itemName and money) then
-					BeanCounter.Purchases.AddFailedBid(itemName, money);
+					debugPrint("Auction Cancelled: "..
+						itemName..", "..
+						nilSafe(money));
+					BeanCounter.Purchases.AddFailedBid(timestamp, itemName, money);
 				end
 			else
 				debugPrint("Unknown subject: "..subject);
@@ -361,30 +404,30 @@ end
 -- Checks if the sender is the auction house
 -------------------------------------------------------------------------------
 function isSenderAuctionHouse(sender)
-	return (sender and (sender == ALLIANCE_AUCTION_HOUSE or sender == HORDE_AUCTION_HOUSE));
+	return (sender and (sender == _BC('MailAllianceAuctionHouse') or sender == _BC('MailHordeAuctionHouse')));
 end
 
 -------------------------------------------------------------------------------
 -- Functions that check the subject
 -------------------------------------------------------------------------------
 function isSubjectAuctionExpired(subject)
-	return (strfind(subject, AUCTION_EXPIRED));
+	return (string.find(subject, "^".._BC('MailAuctionExpiredSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionCancelled(subject)
-	return (strfind(subject, AUCTION_CANCELLED));
+	return (string.find(subject, "^".._BC('MailAuctionCancelledSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionWon(subject)
-	return (strfind(subject, AUCTION_WON));
+	return (string.find(subject, "^".._BC('MailAuctionWonSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionSuccessful(subject)
-	return (strfind(subject, AUCTION_SUCCESSFUL));
+	return (string.find(subject, "^".._BC('MailAuctionSuccessfulSubject')..": .*") ~= nil);
 end
 
 function isSubjectOutbidOn(subject)
-	return (strfind(subject, OUTBID_ON));
+	return (string.find(subject, "^".._BC('MailOutbidOnSubject')..": .*") ~= nil);
 end
 
 -------------------------------------------------------------------------------
@@ -392,18 +435,64 @@ end
 -------------------------------------------------------------------------------
 function getItemNameFromSubject(subject)
 	local itemName = nil;
-	if (strfind(subject, AUCTION_EXPIRED)) then
-		itemName = strsub(subject, strfind(subject, AUCTION_EXPIRED) + strlen(AUCTION_EXPIRED));
-	elseif (strfind(subject, AUCTION_CANCELLED)) then
-		itemName = strsub(subject, strfind(subject, AUCTION_CANCELLED) + strlen(AUCTION_CANCELLED));
-	elseif (strfind(subject, AUCTION_WON)) then
-		itemName = strsub(subject, strfind(subject, AUCTION_WON) + strlen(AUCTION_WON));
-	elseif (strfind(subject, AUCTION_SUCCESSFUL)) then
-		itemName = strsub(subject, strfind(subject, AUCTION_SUCCESSFUL) + strlen(AUCTION_SUCCESSFUL));
-	elseif (strfind(subject, OUTBID_ON)) then
-		itemName = strsub(subject, strfind(subject, OUTBID_ON) + strlen(OUTBID_ON));
+	if (isSubjectAuctionExpired(subject)) then
+		_, _, itemName = string.find(subject, "^".._BC('MailAuctionExpiredSubject')..": (.*)");
+	elseif (isSubjectAuctionCancelled(subject)) then
+		_, _, itemName = string.find(subject, "^".._BC('MailAuctionCancelledSubject')..": (.*)");
+	elseif (isSubjectAuctionWon(subject)) then
+		_, _, itemName = string.find(subject, "^".._BC('MailAuctionWonSubject')..": (.*)");
+	elseif (isSubjectAuctionSuccessful(subject)) then
+		_, _, itemName = string.find(subject, "^".._BC('MailAuctionSuccessfulSubject')..": (.*)");
+	elseif (isSubjectOutbidOn(subject)) then
+		_, _, itemName = string.find(subject, "^".._BC('MailOutbidOnSubject')..": (.*)");
 	end
 	return itemName;
+end
+
+-------------------------------------------------------------------------------
+-- Reconcile the purchase and sale databases. This should only be called when
+-- we know that all pending mail is currently in the inbox. In otherwords there
+-- is no server backlog of messages nor any pending messages yet to arrive in
+-- the inbox.
+-------------------------------------------------------------------------------
+function reconcileDatabases(reconcileTime)
+	debugPrint("reconcileDatabases("..date("%c", reconcileTime)..") called");
+
+	-- Tally up the number of pending e-mails in the inbox for each item. We
+	-- only care about unread messages since the read messages have already
+	-- been processed.
+	local pendingBidsForItem = {};
+	local pendingSalesForItem = {};
+	for index = 1, GetInboxNumItems() do
+		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+		if (not wasRead and sender and isSenderAuctionHouse(sender)) then
+			if (isSubjectAuctionSuccessful(subject) and money) then
+				local itemName = getItemNameFromSubject(subject);
+				pendingSalesForItem[itemName] = true;
+			elseif (isSubjectAuctionExpired(subject) and hasItem) then
+				local itemName = GetInboxItem(index);
+				pendingSalesForItem[itemName] = true;
+			elseif (isSubjectAuctionCancelled(subject) and hasItem) then
+				local itemName = GetInboxItem(index);
+				pendingSalesForItem[itemName] = true;
+			elseif (isSubjectAuctionWon(subject) and hasItem) then
+				local itemName = GetInboxItem(index);
+				pendingBidsForItem[itemName] = true;
+			elseif (isSubjectOutbidOn(subject) and money) then
+				local itemName = getItemNameFromSubject(subject);
+				pendingBidsForItem[itemName] = true;
+			elseif (isSubjectAuctionCancelled(subject) and money) then
+				local itemName = getItemNameFromSubject(subject);
+				pendingBidsForItem[itemName] = true;
+			end
+		end
+	end
+
+	-- Perform the sales database reconcilation.
+	local reconciled, pendingDiscarded, completedDiscarded = BeanCounter.Sales.ReconcileAuctions(reconcileTime, pendingSalesForItem);
+	if (reconciled > 0 or pendingDiscarded > 0) then
+		chatPrint("Reconciled "..reconciled.." auctions ("..pendingDiscarded.. " discrepencies)");
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -593,9 +682,10 @@ end
 -------------------------------------------------------------------------------
 -- ProcessMessageTask constructor
 -------------------------------------------------------------------------------
-function createProcessMessageTask(index)
+function createProcessMessageTask(index, messageAgeInSeconds)
 	local task = {};
 	task.index = index;
+	task.messageAgeInSeconds = messageAgeInSeconds;
 	task.name = "ProcessMessageTask";
 	task.OnEvent = InboxTask_OnEvent;
 	task.Execute = ProcessMessageTask_Execute;
@@ -606,7 +696,7 @@ end
 -- ProcessMessageTask::Execute
 -------------------------------------------------------------------------------
 function ProcessMessageTask_Execute(this)
-	processMailMessage(this.index);
+	processMailMessage(this.index, this.messageAgeInSeconds);
 	return true;
 end
 

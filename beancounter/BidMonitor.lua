@@ -138,7 +138,7 @@ function onBidAccepted()
 		if (bid.isBuyout and bid.isHighBidder) then
 			BeanCounter.Purchases.DeletePendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
 		end
-		BeanCounter.Purchases.AddPendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
+		BeanCounter.Purchases.AddPendingBid(time(), bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
 	end
 end
 

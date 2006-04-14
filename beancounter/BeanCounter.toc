@@ -4,7 +4,7 @@
 ## Interface: 11000
 ## LoadOnDemand: 1
 ## Dependencies: Stubby, EnhTooltip
-## SavedVariablesPerCharacter: AHPurchases
+## SavedVariablesPerCharacter: AHPurchases, AHSales
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id: $

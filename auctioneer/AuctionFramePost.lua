@@ -493,6 +493,11 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Clear the current pricing model so that the default one gets selected.
 		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
+		
+		-- Update the Transactions tab if BeanCounter is loaded.
+		if (AuctionFrameTransactions) then
+			AuctionFrameTransactions:SearchTransactions(name, true, nil);
+		end
 	else
 		-- Clear the item's information.
 		frame.itemName = nil;
