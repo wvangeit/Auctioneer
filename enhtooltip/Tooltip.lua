@@ -572,13 +572,25 @@ function embedRender()
 	end
 end
 
-function addLine(lineText, moneyAmount, embed)
+[[
+   @param bExact (boolean) - optional parameter
+                             if moneyAmount is not nil
+	                           true, if the cupper value of the given moneyAmount
+	                                 should be always printed out
+	                           false (default), if the cupper value of the given
+	                                            moneyAmount should not be print
+	                                            out, if the moneyAmount is to
+	                                            high (see getTextGSC for the
+	                                            exact limit)
+	                         has no meaning, if moneyAmount is nil
+]]
+function addLine(lineText, moneyAmount, embed, bExact)
 	if (embed) and (self.currentGametip) then
 		EnhancedTooltip.hasEmbed = true
 		EnhancedTooltip.curEmbed = true
 		local line = ""
 		if (moneyAmount) then
-			line = lineText .. ": " .. getTextGSC(moneyAmount)
+			line = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
 		else
 			line = lineText
 		end
