@@ -408,27 +408,25 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 
 	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy)
-			local sgsc = EnhTooltip.GetTextGSC(sell)
+			local bgsc = EnhTooltip.GetTextGSC(buy, true)
+			local sgsc = EnhTooltip.GetTextGSC(sell, true)
 
 			if (count and (count > 1)) then
-				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
-				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc), buy*count, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc), buy*count, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc), sell*count, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc), sell*count, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			else
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuy')), buy, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuy')), buy, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSell')), sell, embedded)
+					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSell')), sell, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			end
@@ -532,12 +530,12 @@ function showHideInfo()
 		local count = itemInfo.itemCount or 1
 
 		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy)
-			local sgsc = EnhTooltip.GetTextGSC(sell)
+			local bgsc = EnhTooltip.GetTextGSC(buy, true)
+			local sgsc = EnhTooltip.GetTextGSC(sell, true)
 
 			if (count and (count > 1)) then
-				local bqgsc = EnhTooltip.GetTextGSC(buy*count)
-				local sqgsc = EnhTooltip.GetTextGSC(sell*count)
+				local bqgsc = EnhTooltip.GetTextGSC(buy*count, true)
+				local sqgsc = EnhTooltip.GetTextGSC(sell*count, true)
 				addLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc)..": "..bqgsc, "ee8822")
 				addLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc)..": "..sqgsc, "ee8822")
 			else
