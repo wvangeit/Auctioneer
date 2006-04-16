@@ -39,6 +39,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnEvent>
 				BeanCounter_OnEvent(event, arg1);
 			</OnEvent>
+			<OnUpdate>
+				BeanCounter_OnUpdate();
+			</OnUpdate>
 		</Scripts>
 	</Frame>
 

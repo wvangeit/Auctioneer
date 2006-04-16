@@ -147,14 +147,6 @@ function BeanCounter_AddOnLoaded()
 	
 	-- Hello world!
 	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
-	
-	-- Fixes to work around CT_MailMod problems
-	if (CT_MMForward_oldTakeInboxItem ~= nil) then
-		CT_MMForward_oldTakeInboxItem = TakeInboxItem;
-	end
-	if (CT_MMForward_oldTakeInboxMoney ~= nil) then
-		CT_MMForward_oldTakeInboxMoney = TakeInboxMoney;
-	end
 end
 
 -------------------------------------------------------------------------------
@@ -203,6 +195,13 @@ function BeanCounter_OnEvent(event, arg1)
 			BeanCounter_AuctionHouseLoaded();
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- OnUpdate handler for BeanCounterFrame.
+-------------------------------------------------------------------------------
+function BeanCounter_OnUpdate()
+	MailMonitor_OnUpdate();
 end
 
 -------------------------------------------------------------------------------

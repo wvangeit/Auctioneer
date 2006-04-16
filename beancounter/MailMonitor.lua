@@ -43,6 +43,7 @@ local reconcileDatabases;
 local debugPrint;
 
 local InboxTask_OnEvent;
+local InboxTask_OnUpdate;
 local InboxTask_Execute;
 local createWaitForInboxUpdateTask;
 local WaitForInboxUpdate_OnEvent;
@@ -54,6 +55,7 @@ local createWaitForDeleteInboxItem;
 local WaitForDeleteInboxItem_OnEvent;
 local createWaitForInvoiceTask;
 local WaitForInvoiceTask_OnEvent;
+local WaitForInvoiceTask_OnUpdate;
 local createWaitForReadMessage;
 local WaitForReadMessage_OnEvent;
 local createProcessMessageTask;
@@ -97,6 +99,34 @@ function MailMonitor_OnLoad()
 	Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
 	Stubby.RegisterEventHook("MAIL_SHOW", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
 	Stubby.RegisterEventHook("MAIL_CLOSED", "BeanCounter_MailMonitor", MailMonitor_OnEventHook);
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function MailMonitor_OnUpdate()
+	-- Check if we satisfied an event task.
+	if (table.getn(InboxTasks) > 0) then
+		local task = InboxTasks[1];
+		table.remove(InboxTasks, 1);
+		if (task:OnUpdate()) then
+			debugPrint("Timed out event task: "..task.name);
+		else
+			table.insert(InboxTasks, 1, task);
+		end
+	end
+
+	-- Check if we've got function tasks to perform.
+	local executed = true;
+	while (table.getn(InboxTasks) > 0 and executed) do
+		local task = InboxTasks[1];
+		table.remove(InboxTasks, 1);
+		executed = task:Execute();
+		if (executed) then
+			debugPrint("Executed task: "..task.name);
+		else
+			table.insert(InboxTasks, 1, task);
+		end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -162,25 +192,27 @@ function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 	debugPrint("MailMonitor_PreTakeInboxItemHook("..nilSafe(index)..") called");
 
 	-- Allow this method call if there is no pending tasks.
-	if (index ~= nil and index > 0 and table.getn(InboxTasks) == 0) then
-		-- Read the message, before allowing the TakeInboxItem() call.
-		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
-		if (not wasRead and isSenderAuctionHouse(sender)) then
-			GetInboxText(index);
-		end
+	if (table.getn(InboxTasks) == 0) then
+		if (index ~= nil and index > 0) then
+			-- Read the message, before allowing the TakeInboxItem() call.
+			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+			if (not wasRead and isSenderAuctionHouse(sender)) then
+				GetInboxText(index);
+			end
 
-		-- If there are pending tasks, we must delay the execution of
-		-- TakeInboxItem().
-		if (table.getn(InboxTasks) > 0) then
-			-- Queue a task for taking the inbox item.
-			addTask(createTakeInboxItemTask(index));
+			-- If there are pending tasks, we must delay the execution of
+			-- TakeInboxItem().
+			if (table.getn(InboxTasks) > 0) then
+				-- Queue a task for taking the inbox item.
+				addTask(createTakeInboxItemTask(index));
 
-			-- Abort the execution of TakeInboxItem() for now...
-			debugPrint("Delaying TakeInboxItem() call");
-			return "abort";
-		else
-			-- Wait for the item to be taken.
-			addTask(createWaitForTakeInboxItem(index));
+				-- Abort the execution of TakeInboxItem() for now...
+				debugPrint("Delaying TakeInboxItem() call");
+				return "abort";
+			else
+				-- Wait for the item to be taken.
+				addTask(createWaitForTakeInboxItem(index));
+			end
 		end
 	else
 		debugPrint("Ignoring TakeInboxItem() call");
@@ -195,25 +227,27 @@ function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 	debugPrint("MailMonitor_PreTakeInboxMoneyHook("..nilSafe(index)..") called");
 
 	-- Allow this method call if there is no pending action.
-	if (index ~= nil and index > 0 and table.getn(InboxTasks) == 0) then
-		-- Read the message, before allowing the TakeInboxMoney() call.
-		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
-		if (not wasRead and isSenderAuctionHouse(sender)) then
-			GetInboxText(index);
-		end
-			
-		-- If there are pending tasks, we must delay the execution of
-		-- TakeInboxMoney().
-		if (table.getn(InboxTasks) > 0) then
-			-- Queue a task for taking the inbox money.
-			addTask(createTakeInboxMoneyTask(index));
+	if (table.getn(InboxTasks) == 0) then
+		if (index ~= nil and index > 0) then
+			-- Read the message, before allowing the TakeInboxMoney() call.
+			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+			if (not wasRead and isSenderAuctionHouse(sender)) then
+				GetInboxText(index);
+			end
 
-			-- Abort the execution of TakeInboxMoney() for now...
-			debugPrint("Delaying TakeInboxMoney() call");
-			return "abort";
-		else
-			-- Wait for the money to be taken.
-			addTask(createWaitForTakeInboxMoney(index));
+			-- If there are pending tasks, we must delay the execution of
+			-- TakeInboxMoney().
+			if (table.getn(InboxTasks) > 0) then
+				-- Queue a task for taking the inbox money.
+				addTask(createTakeInboxMoneyTask(index));
+
+				-- Abort the execution of TakeInboxMoney() for now...
+				debugPrint("Delaying TakeInboxMoney() call");
+				return "abort";
+			else
+				-- Wait for the money to be taken.
+				addTask(createWaitForTakeInboxMoney(index));
+			end
 		end
 	else
 		debugPrint("Ignoring TakeInboxMoney() call");
@@ -427,7 +461,7 @@ function isSubjectAuctionSuccessful(subject)
 end
 
 function isSubjectOutbidOn(subject)
-	return (string.find(subject, "^".._BC('MailOutbidOnSubject')..": .*") ~= nil);
+	return (string.find(subject, "^".._BC('MailOutbidOnSubject').." .*") ~= nil);
 end
 
 -------------------------------------------------------------------------------
@@ -444,7 +478,7 @@ function getItemNameFromSubject(subject)
 	elseif (isSubjectAuctionSuccessful(subject)) then
 		_, _, itemName = string.find(subject, "^".._BC('MailAuctionSuccessfulSubject')..": (.*)");
 	elseif (isSubjectOutbidOn(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailOutbidOnSubject')..": (.*)");
+		_, _, itemName = string.find(subject, "^".._BC('MailOutbidOnSubject').." (.*)");
 	end
 	return itemName;
 end
@@ -509,6 +543,13 @@ function InboxTask_OnEvent(this, event)
 end
 
 -------------------------------------------------------------------------------
+-- InboxTask::OnUpdate
+-------------------------------------------------------------------------------
+function InboxTask_OnUpdate(this)
+	return false;
+end
+
+-------------------------------------------------------------------------------
 -- InboxTask::Execute
 -------------------------------------------------------------------------------
 function InboxTask_Execute(this)
@@ -522,6 +563,7 @@ function createWaitForInboxUpdateTask()
 	local task = {};
 	task.name = "WaitForInboxUpdate";
 	task.OnEvent = WaitForInboxUpdate_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -547,6 +589,7 @@ function createWaitForTakeInboxItem(index)
 	task.isSenderAH = isSenderAuctionHouse(sender);
 	task.name = "WaitForTakeInboxItem";
 	task.OnEvent = WaitForTakeInboxItem_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -582,6 +625,7 @@ function createWaitForTakeInboxMoney(index)
 	task.isSenderAH = isSenderAuctionHouse(sender);
 	task.name = "WaitForTakeInboxMoney";
 	task.OnEvent = WaitForTakeInboxMoney_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -611,6 +655,7 @@ function createWaitForDeleteInboxItem(index)
 	task.targetMessageCount = GetInboxNumItems() - 1;
 	task.name = "WaitForDeleteInboxItem";
 	task.OnEvent = WaitForDeleteInboxItem_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -634,7 +679,9 @@ function createWaitForInvoiceTask(index)
 	local task = {};
 	task.index = index;
 	task.name = "WaitForInvoiceTask";
+	task.start = time();
 	task.OnEvent = WaitForInvoiceTask_OnEvent;
+	task.OnUpdate = WaitForInvoiceTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -654,6 +701,17 @@ function WaitForInvoiceTask_OnEvent(this, event)
 end
 
 -------------------------------------------------------------------------------
+-- WaitForInvoiceTask:OnUpdate
+-------------------------------------------------------------------------------
+function WaitForInvoiceTask_OnUpdate(this)
+	local satisfied = false;
+	if (this.start + 30 > time()) then
+		statisfied = true;
+	end
+	return satisfied;
+end
+
+-------------------------------------------------------------------------------
 -- WaitForReadMessage constructor
 -------------------------------------------------------------------------------
 function createWaitForReadMessage(index)
@@ -661,6 +719,7 @@ function createWaitForReadMessage(index)
 	task.index = index;
 	task.name = "WaitForReadMessage";
 	task.OnEvent = WaitForReadMessage_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = InboxTask_Execute;
 	return task;
 end
@@ -688,6 +747,7 @@ function createProcessMessageTask(index, messageAgeInSeconds)
 	task.messageAgeInSeconds = messageAgeInSeconds;
 	task.name = "ProcessMessageTask";
 	task.OnEvent = InboxTask_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = ProcessMessageTask_Execute;
 	return task;
 end
@@ -708,6 +768,7 @@ function createTakeInboxMoneyTask(index)
 	task.index = index;
 	task.name = "TakeInboxMoneyTask";
 	task.OnEvent = InboxTask_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = TakeInboxMoneyTask_Execute;
 	return task;
 end
@@ -728,6 +789,7 @@ function createTakeInboxItemTask(index)
 	task.index = index;
 	task.name = "TakeInboxItemTask";
 	task.OnEvent = InboxTask_OnEvent;
+	task.OnUpdate = InboxTask_OnUpdate;
 	task.Execute = TakeInboxItemTask_Execute;
 	return task;
 end
