@@ -39,22 +39,25 @@ E = enhancement (closed)
 
 Tickets since 3.2:
 ==================
-? 364: TimersBug
-e 365: Informant on equipped bags is annoying
-e 366: JunkItems, Keypress and excluding items
+E 374: Shortcut for Neutral AH
+
 - 367: All items are displayed as "never seen at auction"
 - 368: Incorrectly reports "Object has not been seen on AH before"
+- 380: Different suggested prices for same item
+
+? 364: TimersBug
 ? 369: Strange bug when used with Titan Stones mod
-e 370: Optimization of BalancedList:SetList
 ? 371: Missing "quit" key text and prior auction notice incorrect
 ? 372: Bidbroker problems
-e 373: Add a new command like percentless but using current bid
-E 374: Shortcut for Neutral AH
-e 375: Auctioneer sales history in lootlink type format
-e 376: Allow user to increase price when selling less than a stack of an item
 ? 377: Tooltip information doubled
-e 378: more accurate statistics (excluding own BOs)
 ? 379: EnhTooltip Not Showing Cloth Is Used For Tailoring
-- 380: Different suggested prices for same item
 ? 381: Informant Error with Reagent Transmutes in Alchemy Skills window
 ? 382: Stubby.lua:256: attempt to call global 'pairs' (a table value)
+
+e 365: Informant on equipped bags is annoying
+e 366: JunkItems, Keypress and excluding items
+e 370: Optimization of BalancedList:SetList
+e 373: Add a new command like percentless but using current bid
+e 375: Auctioneer sales history in lootlink type format
+e 376: Allow user to increase price when selling less than a stack of an item
+e 378: more accurate statistics (excluding own BOs)
