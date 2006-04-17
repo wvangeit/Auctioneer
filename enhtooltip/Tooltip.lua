@@ -422,7 +422,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		else
 			yAnchor = "BOTTOM"
 		end
-		
+
 		-- Handle the situation where there isn't enough room on the choosen side of
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
@@ -572,17 +572,11 @@ function embedRender()
 	end
 end
 
-[[
-   @param bExact (boolean) - optional parameter
-                             if moneyAmount is not nil
-	                           true, if the cupper value of the given moneyAmount
-	                                 should be always printed out
-	                           false (default), if the cupper value of the given
-	                                            moneyAmount should not be print
-	                                            out, if the moneyAmount is to
-	                                            high (see getTextGSC for the
-	                                            exact limit)
-	                         has no meaning, if moneyAmount is nil
+--[[
+	@param bExact (boolean) - optional parameter
+		if true, then the copper value of the given moneyAmount will should be always printed out
+		if false (default), then the cupper value of the given moneyAmount should not be printed out, if the moneyAmount is too high (see getTextGSC for the exact limit)
+		bExact has no meaning, if moneyAmount is nil.
 ]]
 function addLine(lineText, moneyAmount, embed, bExact)
 	if (embed) and (self.currentGametip) then
