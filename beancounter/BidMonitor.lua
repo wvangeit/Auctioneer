@@ -53,15 +53,16 @@ end
 -------------------------------------------------------------------------------
 function postPlaceAuctionBidHook(_, _, listType, index, bid)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
+	local timeLeft = GetAuctionItemTimeLeft(listType, index);
 	if (name and count and bid) then
-		addPendingBid(name, count, bid, owner, (bid == buyoutPrice), highBidder);
+		addPendingBid(name, count, bid, owner, (bid == buyoutPrice), highBidder, timeLeft);
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Adds a pending bid to the queue.
 -------------------------------------------------------------------------------
-function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder)
+function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, timeLeft)
 	-- Add a pending bid to the queue.
 	local pendingBid = {};
 	pendingBid.name = name;
@@ -70,6 +71,7 @@ function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder)
 	pendingBid.owner = owner;
 	pendingBid.isBuyout = isBuyout;
 	pendingBid.isHighBidder = isHighBidder;
+	pendingBid.timeLeft = timeLeft;
 	table.insert(PendingBids, pendingBid);
 	debugPrint("addPendingBid() - Added pending bid");
 	
@@ -136,9 +138,9 @@ function onBidAccepted()
 		-- If the player is buying out an auction they already bid on, we
 		-- need to remove the pending bid since an outbid e-mail is not sent.
 		if (bid.isBuyout and bid.isHighBidder) then
-			BeanCounter.Purchases.DeletePendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
+			BeanCounter.Purchases.DeletePendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft);
 		end
-		BeanCounter.Purchases.AddPendingBid(time(), bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout);
+		BeanCounter.Purchases.AddPendingBid(time(), bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft);
 	end
 end
 

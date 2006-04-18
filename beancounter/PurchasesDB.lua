@@ -30,6 +30,8 @@ local chatPrint = BeanCounter.ChatPrint;
 -- Function Prototypes
 -------------------------------------------------------------------------------
 local addPendingBid;
+local deletePendingBidBySignature;
+local deletePendingBidByIndex;
 local packPendingBid;
 local unpackPendingBid;
 local getPendingBidsTableForItem;
@@ -37,14 +39,18 @@ local getPendingBidItems;
 local getPendingBidsForItem;
 local isPendingBid;
 local printPendingBids;
+local printPendingBid;
 
 local addSuccessfulBid;
 local addFailedBid;
 local addCompletedBid;
+local deleteCompletedBidByIndex;
 local packCompletedBid;
 local unpackCompletedBid;
 local getCompletedBidsTableForItem;
+local getCompletedBidsForItem;
 local printCompletedBids;
+local printCompletedBid;
 
 local addPurchase;
 local packPurchase;
@@ -53,11 +59,19 @@ local getPurchasesTableForItem;
 local getPurchasedItems;
 local getPurchasesForItem;
 local printPurchases;
+local printPurchase;
 
 local reconcileBids;
+local reconcileBidsByTime;
+local reconcileBidsByQuantityOrBids;
 local reconcileBidsByQuantity;
 local reconcileBidsByBid;
-local reconcileMatchingBidList;
+local reconcileBidList;
+local reconcileMatchingBids;
+local doesPendingBidListMatch;
+local doesPendingBidMatchCompletedBid;
+local compareMatchCount;
+local compareTime;
 
 local resetDatabase;
 local getBidNonNilFieldCount;
@@ -75,7 +89,58 @@ local debugPrint;
 -------------------------------------------------------------------------------
 AHPurchases = {};
 
+-------------------------------------------------------------------------------
+-- Constants
+-------------------------------------------------------------------------------
 local NIL_VALUE = "<nil>";
+local AUCTION_OVERRUN_LIMIT = (2 * 60 * 60); -- 2 hours
+local AUCTION_DURATION_LIMIT = (24 * 60 * 60) + AUCTION_OVERRUN_LIMIT;
+local MAXIMUM_TIME_LEFT =
+{
+	[1] = 60 * 30,		-- Short
+	[2] = 60 * 60 * 2,	-- Medium
+	[3] = 60 * 60 * 8,	-- Long
+	[4] = 60 * 60 * 24,	-- Very Long
+};	
+local MINIMUM_TIME_LEFT =
+{
+	[1] = 0,			-- Short
+	[2] = 60 * 30,		-- Medium
+	[3] = 60 * 60 * 2,	-- Long
+	[4] = 60 * 60 * 8,	-- Very Long
+};	
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function PurchasesDB_OnLoad()
+	-- Create a database version if one doesn't already exist.
+	if (not AHPurchases.version) then AHPurchases.version = 30001; end
+	
+	-- Perform any needed upgrades.
+	if (AHPurchases.version == 30000) then
+		upgradeAHPurchasesTo30001();
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Upgrades the database from version 30000 to 30001. This upgrade added a
+-- timeLeft field to the pending bids.
+-------------------------------------------------------------------------------
+function upgradeAHPurchasesTo30001()
+	if (AHPurchases.version == 30000) then
+		if (AHPurchases.PendingBids) then
+			for item in AHPurchases.PendingBids do
+				local pendingBidsTable = AHPurchases.PendingBids[item];
+				for index in pendingBidsTable do
+					pendingBidsTable[index] = pendingBidsTable[index]..";1"
+					debugPrint("Upgraded AHPurchases.PendingBids["..item.."]["..index.."] = "..pendingBidsTable[index]);
+				end
+			end
+		end
+		AHPurchases.version = 30001;
+		debugPrint("AHPurchases upgraded to 30001");
+	end
+end
 
 --=============================================================================
 -- Pending Bids functions
@@ -84,8 +149,8 @@ local NIL_VALUE = "<nil>";
 -------------------------------------------------------------------------------
 -- Adds a pending bid to the database
 -------------------------------------------------------------------------------
-function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout)
-	if (item and quantity and bid) then
+function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout, timeLeft)
+	if (item and quantity and bid and seller and timeLeft) then
 		-- Create a packed record.
 		local pendingBid = {};
 		pendingBid.time = timestamp;
@@ -93,6 +158,7 @@ function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout)
 		pendingBid.bid = bid;
 		pendingBid.seller = seller;
 		pendingBid.isBuyout = isBuyout;
+		pendingBid.timeLeft = timeLeft;
 		local packedPendingBid = packPendingBid(pendingBid);
 
 		-- Add the pending bid to the table.
@@ -100,7 +166,7 @@ function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout)
 		table.insert(pendingBidsTable, packedPendingBid);
 
 		-- Debugging noise.
-		debugPrint("Added pending bid: "..date("%c", pendingBid.time)..", "..item..", "..pendingBid.quantity..", "..pendingBid.bid..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout));
+		printPendingBid(debugPrint, "Added pending bid: ", item, pendingBid);
 	else
 		debugPrint("Invalid call to addPendingBid()");
 	end
@@ -109,7 +175,7 @@ end
 -------------------------------------------------------------------------------
 -- Deletes a pending bid from the database
 -------------------------------------------------------------------------------
-function deletePendingBid(item, quantity, bid, seller, isBuyout)
+function deletePendingBidBySignature(item, quantity, bid, seller, isBuyout, timeLeft)
 	if (item and quantity and bid and seller) then
 		local pendingBidsTable = getPendingBidsTableForItem(item, true);
 		for index = 1, table.getn(pendingBidsTable) do
@@ -120,7 +186,7 @@ function deletePendingBid(item, quantity, bid, seller, isBuyout)
 				pendingBid.isBuyout == isBuyout) then
 				-- Found it! Delete the pending bid
 				table.remove(pendingBidsTable, index);
-				debugPrint("Deleted pending bid: "..date("%c", pendingBid.time)..", "..item..", "..pendingBid.quantity..", "..pendingBid.bid..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout));
+				printPendingBid(debugPrint, "Deleted pending bid (request): ", item, pendingBid);
 				-- Remove the item's table if empty. This happens automatically
 				-- when getting it via the built-in method.
 				getPendingBidsTableForItem(item);
@@ -133,6 +199,46 @@ function deletePendingBid(item, quantity, bid, seller, isBuyout)
 end
 
 -------------------------------------------------------------------------------
+-- Deletes a pending bid from the database.
+-------------------------------------------------------------------------------
+function deletePendingBidByIndex(item, index, reason, pendingBids)
+	-- Update the unpacked pending bid list, if provided
+	local pendingBid = nil;
+	if (pendingBids) then
+		for pendingIndex = 1, table.getn(pendingBids) do
+			local bid = pendingBids[pendingIndex];
+			if (index == bid.index) then
+				pendingBid = bid;
+			elseif (index < bid.index) then
+				bid.index = bid.index - 1;
+			end
+		end
+	end
+
+	-- Grab the pending bids table for the item.
+	local pendingBidsTable = getPendingBidsTableForItem(item);
+	if (pendingBidsTable) then
+		-- Get the pending bid if we don't already have it.
+		if (pendingBid == nil) then
+			pendingBid = unpackPendingBid(pendingBidsTable[index]);
+		end
+		
+		-- Remove the pending bid from the table.
+		table.remove(pendingBidsTable, index);
+		if (table.getn(pendingBidsTable)) then
+			getPendingBidsTableForItem(item); -- Deletes the table
+		end
+		
+		-- Debug noise.
+		printPendingBid(
+			debugPrint,
+			"Deleted pending bid ("..nilSafeStringFromString(reason).."): ",
+			item,
+			pendingBid);
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Converts a pending bid into a ';' delimited string.
 -------------------------------------------------------------------------------
 function packPendingBid(pendingBid)
@@ -141,7 +247,8 @@ function packPendingBid(pendingBid)
 		stringFromNumber(pendingBid.quantity)..";"..
 		stringFromNumber(pendingBid.bid)..";"..
 		nilSafeStringFromString(pendingBid.seller)..";"..
-		stringFromBoolean(pendingBid.isBuyout);
+		stringFromBoolean(pendingBid.isBuyout)..";"..
+		stringFromNumber(pendingBid.timeLeft);
 end
 
 -------------------------------------------------------------------------------
@@ -149,12 +256,13 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingBid(packedPendingBid)
 	local pendingBid = {};
-	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+)");
+	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout, pendingBid.timeLeft = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+);(.+)");
 	pendingBid.time = numberFromString(pendingBid.time);
 	pendingBid.quantity = numberFromString(pendingBid.quantity);
 	pendingBid.bid = numberFromString(pendingBid.bid);
 	pendingBid.seller = stringFromNilSafeString(pendingBid.seller);
 	pendingBid.isBuyout = booleanFromString(pendingBid.isBuyout);
+	pendingBid.timeLeft = numberFromString(pendingBid.timeLeft);
 	return pendingBid;
 end
 
@@ -200,13 +308,16 @@ end
 -------------------------------------------------------------------------------
 -- Gets the pending bids (unpacked) for the specified item
 -------------------------------------------------------------------------------
-function getPendingBidsForItem(item)
+function getPendingBidsForItem(item, filterFunc)
 	local pendingBids = {};
 	local pendingBidsTable = getPendingBidsTableForItem(item);
 	if (pendingBidsTable) then
 		for index in pendingBidsTable do
 			local pendingBid = unpackPendingBid(pendingBidsTable[index]);
-			table.insert(pendingBids, pendingBid);
+			pendingBid.index = index;
+			if (filterFunc == nil or filterFunc(pendingBid)) then
+				table.insert(pendingBids, pendingBid);
+			end
 		end
 	end
 	return pendingBids;
@@ -222,10 +333,28 @@ function printPendingBids()
 			local pendingBidsTable = AHPurchases.PendingBids[item];
 			for index = 1, table.getn(pendingBidsTable) do
 				local pendingBid = unpackPendingBid(pendingBidsTable[index]);
-				chatPrint(date("%c", pendingBid.time)..", "..item..", "..stringFromNumber(pendingBid.quantity)..", "..stringFromNumber(pendingBid.bid)..", "..nilSafeStringFromString(pendingBid.seller)..", "..stringFromBoolean(pendingBid.isBuyout)..", "..stringFromBoolean(pendingBid.isSuccessful));
+				printPendingBid(chatPrint, nil, item, pendingBid);
 			end
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Calls the specified print function for the pending bid.
+-------------------------------------------------------------------------------
+function printPendingBid(printFunc, prefix, item, pendingBid)
+	if (prefix == nil) then
+		prefix = "";
+	end
+	printFunc(
+		prefix..
+		date("%c", pendingBid.time)..", "..
+		item..", "..
+		pendingBid.quantity..", "..
+		pendingBid.bid..", "..
+		nilSafeStringFromString(pendingBid.seller)..", "..
+		stringFromNumber(pendingBid.timeLeft)..", "..
+		stringFromBoolean(pendingBid.isBuyout));
 end
 
 -------------------------------------------------------------------------------
@@ -294,13 +423,53 @@ function addCompletedBid(timestamp, item, quantity, bid, seller, isBuyout, isSuc
 			-- Add the completed bid to the table.
 			local completedBids = getCompletedBidsTableForItem(item, true);
 			table.insert(completedBids, packedCompletedBid);
-			debugPrint("Added completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..nilSafeStringFromString(completedBid.seller)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isSuccessful)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
+			printCompletedBid(debugPrint, "Added completed bid: ", item, completedBid);
 
 			-- Attmept to reconcile bids for this item.
-			reconcileBids(item);
+			reconcileBidsByQuantityOrBids(item, quantity, bid);
 		end
 	else
 		debugPrint("Invalid call to addCompletedBid()");
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Deletes a completed bid from the database.
+-------------------------------------------------------------------------------
+function deleteCompletedBidByIndex(item, index, reason, completedBids)
+	-- Update the unpacked completed bid list, if provided
+	local completedBid = nil;
+	if (completedBids) then
+		for completedIndex = 1, table.getn(completedBids) do
+			local bid = completedBids[completedIndex];
+			if (index == bid.index) then
+				completedBid = bid;
+			elseif (index < bid.index) then
+				bid.index = bid.index - 1;
+			end
+		end
+	end
+
+	-- Grab the completed bids table for the item.
+	local completedBidsTable = getCompletedBidsTableForItem(item);
+	if (completedBidsTable) then
+		-- Get the completed bid if we don't already have it.
+		if (completedBid == nil) then
+			completedBid = unpackCompletedBid(completedBidsTable[index]);
+		end
+		
+		-- Remove the completed bid from the table.
+		table.remove(completedBidsTable, index);
+		if (table.getn(completedBidsTable)) then
+			getCompletedBidsTableForItem(item); -- Deletes the table
+		end
+		
+		-- Debug noise.
+		printCompletedBid(
+			debugPrint,
+			"Deleted completed bid ("..nilSafeStringFromString(reason).."): ",
+			item,
+			completedBid);
 	end
 end
 
@@ -358,6 +527,24 @@ function getCompletedBidsTableForItem(item, create)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the completed bids (unpacked) for the specified item
+-------------------------------------------------------------------------------
+function getCompletedBidsForItem(item, filterFunc)
+	local completedBids = {};
+	local completedBidsTable = getCompletedBidsTableForItem(item);
+	if (completedBidsTable) then
+		for index in completedBidsTable do
+			local completedBid = unpackCompletedBid(completedBidsTable[index]);
+			completedBid.index = index;
+			if (filterFunc == nil or filterFunc(completedBid)) then
+				table.insert(completedBids, completedBid);
+			end
+		end
+	end
+	return completedBids;
+end
+
+-------------------------------------------------------------------------------
 -- Prints the completed bids.
 -------------------------------------------------------------------------------
 function printCompletedBids()
@@ -367,10 +554,29 @@ function printCompletedBids()
 			local completedBidsTable = AHPurchases.CompletedBids[item];
 			for index = 1, table.getn(completedBidsTable) do
 				local completedBid = unpackCompletedBid(completedBidsTable[index]);
-				chatPrint(date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..nilSafeStringFromString(completedBid.seller)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isSuccessful));
+				printCompletedBid(chatPrint, nil, item, completedBid);
 			end
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Calls the specified print function for the completed bid.
+-------------------------------------------------------------------------------
+function printCompletedBid(printFunc, prefix, item, completedBid)
+	if (prefix == nil) then
+		prefix = "";
+	end
+	printFunc(
+		prefix..
+		date("%c", completedBid.time)..", "..
+		item..", "..
+		stringFromNumber(completedBid.quantity)..", "..
+		stringFromNumber(completedBid.bid)..", "..
+		nilSafeStringFromString(completedBid.seller)..", "..
+		stringFromBoolean(completedBid.isBuyout)..", "..
+		stringFromBoolean(completedBid.isSuccessful)..", "..
+		stringFromBoolean(completedBid.isPurchaseRecorded));
 end
 
 --=============================================================================
@@ -396,7 +602,7 @@ function addPurchase(timestamp, item, quantity, cost, seller, isBuyout)
 		table.insert(purchasesTable, packedPurchase);
 
 		-- Debugging noise.
-		debugPrint("Added purchase: "..date("%c", purchase.time)..", "..item..", "..purchase.quantity..", "..purchase.cost..", "..nilSafeStringFromString(purchase.seller)..", "..stringFromBoolean(purchase.isBuyout));
+		printPurchase(debugPrint, "Added purchase: ", item, purchase);
 	else
 		debugPrint("Invalid call to addPurchase()");
 	end
@@ -492,10 +698,27 @@ function printPurchases()
 			local purchasesTable = AHPurchases.Purchases[item];
 			for index = 1, table.getn(purchasesTable) do
 				local purchase = unpackPurchase(purchasesTable[index]);
-				chatPrint(date("%c", purchase.time)..", "..item..", "..purchase.quantity..", "..purchase.cost..", "..nilSafeStringFromString(purchase.seller)..", "..stringFromBoolean(purchase.isBuyout));
+				printPurchase(chatPrint, nil, item, purchase);
 			end
 		end
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Calls the specified print function for the completed bid.
+-------------------------------------------------------------------------------
+function printPurchase(printFunc, prefix, item, purchase)
+	if (prefix == nil) then
+		prefix = "";
+	end
+	printFunc(
+		prefix..
+		date("%c", purchase.time)..", "..
+		item..", "..
+		purchase.quantity..", "..
+		purchase.cost..", "..
+		nilSafeStringFromString(purchase.seller)..", "..
+		stringFromBoolean(purchase.isBuyout));
 end
 
 --=============================================================================
@@ -503,47 +726,113 @@ end
 --=============================================================================
 
 -------------------------------------------------------------------------------
--- Attempts to match completed bids with pending bids
+-- Reconcile all bids that should be completed by the specified time.
 -------------------------------------------------------------------------------
-function reconcileBids(item)
-	debugPrint("-- Begin reconciling bids for "..item.."--");
-
-	-- Now attempt to reconcile bids by either quantity or bid.
-	local index = 1;
-	local quantitiesAttempted = {};
-	local bidsAttempted = {};
-	local completedBids = getCompletedBidsTableForItem(item);
-	if (completedBids) then
-		while (index <= table.getn(completedBids)) do
-			local completedBid = unpackCompletedBid(completedBids[index]);
-			if (completedBid.quantity and not quantitiesAttempted[completedBid.quantity]) then
-				quantitiesAttempted[completedBid.quantity] = true;
-				if (reconcileBidsByQuantity(item, completedBid.quantity)) then
-					index = 1;
-					bidsAttempted = {};
-				else
-					index = index + 1;
-				end
-			elseif (completedBid.bid and not bidsAttempted[completedBid.bid]) then
-				bidsAttempted[completedBid.bid] = true;
-				if (reconcileBidsByBid(item, completedBid.bid)) then
-					index = 1;
-					quantitiesAttempted = {};
-				else
-					index = index + 1;
-				end
-			else
-				index = index + 1;
-			end
+function reconcileBids(reconcileTime, excludeItems)
+	local totalReconciled = 0;
+	local totalDiscarded = 0;
+	local items = getPendingBidItems();
+	for index in items do
+		local item = items[index];
+		if (excludeItems == nil or excludeItems[item] == nil) then
+			local reconciled, discarded = reconcileBidsByTime(item, reconcileTime);
+			totalReconciled = totalReconciled + reconciled;
+			totalDiscarded = totalDiscarded + discarded;
 		end
+	end
+	return totalReconciled, totalDiscarded;
+end
 
-		-- Remove the item's table if empty. This happens automatically when
-		-- getting it via the built-in method.
-		getPendingBidsTableForItem(item);
-		getCompletedBidsTableForItem(item);
+-------------------------------------------------------------------------------
+-- Reconcile bids for the item that should be completed by the specified
+-- time.
+-------------------------------------------------------------------------------
+function reconcileBidsByTime(item, reconcileTime)
+	debugPrint("reconcileBidsByTime("..item..", "..date("%c", reconcileTime)..")");
+
+	-- Get the list of pending bids that should have completed before the
+	-- specified time.
+	local pendingBids = getPendingBidsForItem(
+		item, 
+		function(pendingBid)
+			return (pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_OVERRUN_LIMIT < reconcileTime);
+		end);
+	debugPrint(table.getn(pendingBids).." matching pending bids");
+
+	-- Get the list of completed bids that completed before the specified
+	-- time.
+	local completedBids = getCompletedBidsForItem(
+		item,
+		function(completedBid)
+			return (completedBid.time < reconcileTime);
+		end);
+	debugPrint(table.getn(completedBids).." matching completed bids");
+
+	-- Reconcile the lists.
+	local reconciledBids = reconcileBidList(item, pendingBids, completedBids, true);
+
+	-- Cleanup the unmatch pending bids that are too old to match any
+	-- completed bids.
+	local discardedPendingBids = 0;
+	for index = table.getn(pendingBids), 1, -1 do
+		local pendingBid = pendingBids[index];
+		deletePendingBidByIndex(item, pendingBid.index, "no match", pendingBids);
+		discardedPendingBids = discardedPendingBids + 1;
 	end
 
-	debugPrint("-- End reconciling bids for "..item.." --");
+	-- Cleanup the unmatched completed bids that are too old to match any
+	-- pending bids.
+	local discardedCompletedBids = 0;
+	for index = table.getn(completedBids), 1, -1 do
+		local completedBid = completedBids[index];
+		if (completedBid.time + AUCTION_DURATION_LIMIT < reconcileTime) then
+			deleteCompletedBidByIndex(item, completedBid.index, "no match", completedBids);
+			discardedCompletedBids = discardedCompletedBids + 1;
+		end
+	end
+			
+	return reconciledBids, discardedPendingBids, discardedCompletedBids;
+end
+
+-------------------------------------------------------------------------------
+-- Attempts to reconcile bids by either quantity or bid amount.
+-------------------------------------------------------------------------------
+function reconcileBidsByQuantityOrBids(item, quantityHint, bidHint)
+	-- If a hint is supplied, try them first. If no hints are supplied or the
+	-- hints cause bids to be reconciled, then widen the reconcilation
+	-- hunt.
+	if ((bidHint == nil and quantityHint == nil) or
+		(bidHint ~= nil and reconcileBidsByBid(item, bidHint) > 0) or
+		(quantityHint ~= nil and reconcileBidsByQuantity(item, quantityHint) > 0)) then
+		local index = 1;
+		local quantitiesAttempted = {};
+		local bidsAttempted = {};
+		local completedBids = getCompletedBidsTableForItem(item);
+		if (completedBids) then
+			while (index <= table.getn(completedBids)) do
+				local completedBid = unpackCompletedBid(completedBids[index]);
+				if (completedBid.quantity and not quantitiesAttempted[completedBid.quantity]) then
+					quantitiesAttempted[completedBid.quantity] = true;
+					if (reconcileBidsByQuantity(item, completedBid.quantity) > 0) then
+						index = 1;
+						bidsAttempted = {};
+					else
+						index = index + 1;
+					end
+				elseif (completedBid.bid and not bidsAttempted[completedBid.bid]) then
+					bidsAttempted[completedBid.bid] = true;
+					if (reconcileBidsByBid(item, completedBid.bid) > 0) then
+						index = 1;
+						quantitiesAttempted = {};
+					else
+						index = index + 1;
+					end
+				else
+					index = index + 1;
+				end
+			end
+		end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -551,65 +840,33 @@ end
 -------------------------------------------------------------------------------
 function reconcileBidsByQuantity(item, quantity)
 	debugPrint("reconcileBidsByQuantity("..item..", "..quantity..")");
-	local reconciled = false;
 
 	-- Get all the pending bids matching the quantity
-	local pendingBidIndicies = {};
-	local pendingBids = getPendingBidsTableForItem(item);
-	if (pendingBids) then
-		for index = 1, table.getn(pendingBids) do
-			local pendingBid = unpackPendingBid(pendingBids[index]);
-			if (pendingBid.quantity == quantity) then
-				table.insert(pendingBidIndicies, index);
-			end
-		end
-	end
-	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
+	local pendingBids = getPendingBidsForItem(
+		item, 
+		function(pendingBid)
+			return (pendingBid.quantity == quantity);
+		end);
+	debugPrint(table.getn(pendingBids).." matching pending bids");
 	
 	-- Get all the completed bids matching the quantity
-	local completedBidIndicies = {};
-	local completedBids = getCompletedBidsTableForItem(item);
-	if (completedBids) then
-		for index = 1, table.getn(completedBids) do
-			local completedBid = unpackCompletedBid(completedBids[index]);
-			if (completedBid.quantity == quantity) then
-				table.insert(completedBidIndicies, index);
-			end
-		end
-	end
-	debugPrint(table.getn(completedBidIndicies).." matching completed bids");
+	local completedBids = getCompletedBidsForItem(
+		item, 
+		function(completedBid)
+			return (completedBid.quantity == quantity);
+		end);
+	debugPrint(table.getn(completedBids).." matching completed bids");
 	
-	-- We can reconcile all the bids if the number of bids match. Otherwise
-	-- we can reconcile some of the bids if all of the pending bids match.
-	if (table.getn(pendingBidIndicies) == table.getn(completedBidIndicies)) then
-		-- The number of pending and completed bids match, so reconcile them all!
-		reconcileMatchingBidList(item, pendingBids, pendingBidIndicies, completedBids, completedBidIndicies);
-		reconciled = true;
-	elseif (table.getn(pendingBidIndicies) > 0 and table.getn(completedBidIndicies) > 0) then
-		-- The number of pending and completed bids don't match, but we can still
-		-- reconcile some of them if all of the pending bids match.
-		reconciled = true;
-		local pendingBid = unpackPendingBid(pendingBids[pendingBidIndicies[1]]);
-		local bid = pendingBid.bid;
-		local seller = pendingBid.seller;
-		local isBuyout = pendingBid.isBuyout;
-		for index = 2, table.getn(pendingBidIndicies) do
-			local pendingBid = unpackPendingBid(pendingBids[pendingBidIndicies[index]]);
-			if (bid ~= pendingBid.bid or
-				seller ~= pendingBid.seller or
-				isBuyout ~= pendingBid.isBuyout) then
-				reconciled = false;
-				break;
-			end
-		end
-		
-		-- If all of the pending bids match we can reconcile the completed bids.
-		if (reconciled) then
-			reconcileMatchingBidList(item, pendingBids, pendingBidIndicies, completedBids, completedBidIndicies);
-		end
+	-- Attempt to reconcile the lists.
+	if (table.getn(pendingBids) == table.getn(completedBids)) then
+		return reconcileBidList(item, pendingBids, completedBids, false);
+	elseif (doesPendingBidListMatch(pendingBids)) then
+		return reconcileBidList(item, pendingBids, completedBids, false);
+	else
+		debugPrint("Cannot reconcile by quantity");
 	end
-	
-	return reconciled;
+
+	return 0;
 end
 
 -------------------------------------------------------------------------------
@@ -617,144 +874,230 @@ end
 -------------------------------------------------------------------------------
 function reconcileBidsByBid(item, bid)
 	debugPrint("reconcileBidsByBid("..item..", "..bid..")");
-	local reconciled = false;
 
-	-- Get all the pending bids matching the bid
-	local pendingBidIndicies = {};
-	local pendingBids = getPendingBidsTableForItem(item);
-	if (pendingBids) then
-		for index = 1, table.getn(pendingBids) do
-			local pendingBid = unpackPendingBid(pendingBids[index]);
-			if (pendingBid.bid == bid) then
-				table.insert(pendingBidIndicies, index);
-			end
-		end
-	end
-	debugPrint(table.getn(pendingBidIndicies).." matching pending bids");
+	-- Get all the pending bids matching the quantity
+	local pendingBids = getPendingBidsForItem(
+		item, 
+		function(pendingBid)
+			return (pendingBid.bid == bid);
+		end);
+	debugPrint(table.getn(pendingBids).." matching pending bids");
 	
-	-- Get all the completed bids matching the bid
-	local completedBidIndicies = {};
-	local completedBids = getCompletedBidsTableForItem(item);
-	if (completedBids) then
-		for index = 1, table.getn(completedBids) do
-			local completedBid = unpackCompletedBid(completedBids[index]);
-			if (completedBid.bid == bid) then
-				table.insert(completedBidIndicies, index);
-			end
-		end
-	end
-	debugPrint(table.getn(pendingBidIndicies).." matching completed bids");
+	-- Get all the completed bids matching the quantity
+	local completedBids = getCompletedBidsForItem(
+		item, 
+		function(completedBid)
+			return (completedBid.bid == bid);
+		end);
+	debugPrint(table.getn(completedBids).." matching completed bids");
 	
-	-- We can reconcile all the bids if the number of bids match
-	if (table.getn(pendingBidIndicies) == table.getn(completedBidIndicies)) then
-		reconcileMatchingBidList(item, pendingBids, pendingBidIndicies, completedBids, completedBidIndicies);
-		reconciled = true;
-	elseif (table.getn(pendingBidIndicies) > 0 and table.getn(completedBidIndicies) > 0) then
-		-- The number of pending and completed bids don't match, but we can still
-		-- reconcile some of them if all of the pending bids match.
-		reconciled = true;
-		local pendingBid = unpackPendingBid(pendingBids[pendingBidIndicies[1]]);
-		local quantity = pendingBid.quantity;
-		local seller = pendingBid.seller;
-		local isBuyout = pendingBid.isBuyout;
-		for index = 2, table.getn(pendingBidIndicies) do
-			local pendingBid = unpackPendingBid(pendingBids[pendingBidIndicies[index]]);
-			if (quantity ~= pendingBid.quantity or
-				seller ~= pendingBid.seller or
-				isBuyout ~= pendingBid.isBuyout) then
-				reconciled = false;
-				break;
-			end
-		end
-		
-		-- If all of the pending bids match we can reconcile the completed bids.
-		if (reconciled) then
-			reconcileMatchingBidList(item, pendingBids, pendingBidIndicies, completedBids, completedBidIndicies);
-		end
+	-- Attempt to reconcile the lists.
+	if (table.getn(pendingBids) == table.getn(completedBids)) then
+		return reconcileBidList(item, pendingBids, completedBids, false);
+	elseif (doesPendingBidListMatch(pendingBids)) then
+		return reconcileBidList(item, pendingBids, completedBids, false);
+	else
+		debugPrint("Cannot reconcile by quantity");
 	end
-	
-	return reconciled;
+
+	return 0;
 end
 
 -------------------------------------------------------------------------------
--- Reconciles the list of completed bid indicies against the pending bid list.
+-- Takes lists of pending and completed items and attempts to reconcile them.
+-- A purchase is added for each pending and completed bid match. If
+-- discrepencies are not allowed and there are discrepencies, then no bids
+-- are reconciled.
 -------------------------------------------------------------------------------
-function reconcileMatchingBidList(item, pendingBidsTable, pendingBidIndicies, completedBidsTable, completedBidIndicies)
-	-- Construct an unpacked list of pending bids.
-	local pendingBids = {};
-	for index in pendingBidIndicies do
-		local pendingBid = unpackPendingBid(pendingBidsTable[pendingBidIndicies[index]]);
-		pendingBid.index = pendingBidIndicies[index];
-		table.insert(pendingBids, pendingBid);
-	end
-	table.sort(pendingBids, compareBidsByNonNilFieldCount);
-
-	-- Construct an unpacked list of completed bids.
-	local completedBids = {};
-	for index in completedBidIndicies do
-		local completedBid = unpackCompletedBid(completedBidsTable[completedBidIndicies[index]]);
-		completedBid.index = completedBidIndicies[index];
-		table.insert(completedBids, completedBid);
-	end
-	table.sort(completedBids, compareBidsByNonNilFieldCount);
-
-	-- Now match up each completed bid with a pending bid.
-	while (table.getn(pendingBids) > 0 and table.getn(completedBids) > 0) do
-		local completedBid = completedBids[1];
-
-		-- Remove the completed bid.
-		table.remove(completedBids, 1);
-		local completedBidTablesIndex = completedBid.index;
-		table.remove(completedBidsTable, completedBidTablesIndex);
-		debugPrint("Removed completed bid: "..date("%c", completedBid.time)..", "..item..", "..stringFromNumber(completedBid.quantity)..", "..stringFromNumber(completedBid.bid)..", "..stringFromBoolean(completedBid.isBuyout)..", "..stringFromBoolean(completedBid.isPurchaseRecorded));
-
-		-- Update the remaining completed bid indicies.
-		for index in completedBids do
-			local bid = completedBids[index];
-			if (bid.index > completedBidTablesIndex) then
-				bid.index = bid.index - 1;
-			end
-		end
-		
-		-- Look for a matching pending bid.
-		local index = 1;
-		local pendingBid = nil;
-		local pendingBidIndex = nil;
-		for index in pendingBids do
-			local thisPendingBid = pendingBids[index];
-			if ((completedBid.quantity == nil or thisPendingBid.quantity == nil or completedBid.quantity == thisPendingBid.quantity) and
-				(completedBid.bid == nil or thisPendingBid.bid == nil or completedBid.bid == thisPendingBid.bid) and
-				(completedBid.seller == nil or thisPendingBid.seller == nil or completedBid.seller == thisPendingBid.seller) and
-				(completedBid.isBuyout == nil or thisPendingBid.isBuyout == nil or completedBid.isBuyout == thisPendingBid.isBuyout) and
-				(completedBid.isSuccessful or not thisPendingBid.isBuyout)) then
-				pendingBid = thisPendingBid;
-				pendingBidIndex = index;
-				break;
-			end
-		end
-		
-		-- Check if we found matching pending bid.
-		if (pendingBid) then
-			-- Remove the pending bid.
-			table.remove(pendingBids, pendingBidIndex);
-			local pendingBidsTableIndex = pendingBid.index;
-			table.remove(pendingBidsTable, pendingBidsTableIndex);
-			debugPrint("Removed pending bid: "..date("%c", pendingBid.time)..", "..item..", "..stringFromNumber(pendingBid.quantity)..", "..stringFromNumber(pendingBid.bid)..", "..stringFromBoolean(pendingBid.isBuyout));
-
-			-- Update the remaining pending bid indicies.
-			for index in pendingBids do
-				local bid = pendingBids[index];
-				if (bid.index > pendingBidsTableIndex) then
-					bid.index = bid.index - 1;
+function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed)
+	-- If we have some bids, reconcile them!
+	local bidsReconciled = 0;
+	if (table.getn(pendingBids) > 0 or table.getn(completedBids) > 0) then
+		-- For each pending bid, get the list of potential completed bids.
+		-- Afterwards, sort the pending bid list by match count.
+		for pendingIndex = 1, table.getn(pendingBids) do
+			local pendingBid = pendingBids[pendingIndex];
+			pendingBid.matches = {};
+			for completedIndex = 1, table.getn(completedBids) do
+				local completedBid = completedBids[completedIndex];
+				if (doesPendingBidMatchCompletedBid(pendingBid, completedBid)) then
+					table.insert(pendingBid.matches, completedBid);
 				end
 			end
-			
-			-- Add a purchase (if it was a successful bid and not already recorded)
-			if (completedBid.isSuccessful and not pendingBid.isBuyout and not completedBid.isPurchaseRecorded) then
-				addPurchase(completedBid.time, item, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout);
+			table.sort(pendingBid.matches, compareTime);
+		end
+		table.sort(pendingBids, compareMatchCount);
+
+		-- For each pending bid, pick a suitable completed bid match.
+		-- This algorithm could be much better, but it works for most sane
+		-- cases.
+		for pendingIndex = 1, table.getn(pendingBids) do
+			local pendingBid = pendingBids[pendingIndex];
+			if (pendingBid.match == nil) then
+				for completedIndex = 1, table.getn(completedBids) do
+					local completedBid = completedBids[completedIndex];
+					if (completedBid.match == nil) then
+						completedBid.match = pendingBid;
+						pendingBid.match = completedBid;
+						break;
+					end
+				end
 			end
 		end
+
+		-- Check for unmatched pending bids.
+		local unmatchedPendingBidCount = 0;
+		for pendingIndex = 1, table.getn(pendingBids) do
+			local pendingBid = pendingBids[pendingIndex];
+			if (pendingBid.match == nil) then
+				unmatchedPendingBidCount = unmatchedPendingBidCount + 1;
+			end
+		end
+
+		-- Check for unmatched completed bids.
+		local unmatchedCompletedBidCount = 0;
+		for completedIndex = 1, table.getn(completedBids) do
+			local completedBid = completedBids[completedIndex];
+			if (completedBid.match == nil) then
+				unmatchedCompletedBidCount = unmatchedCompletedBidCount + 1;
+			end
+		end
+
+		-- Reconcile the lists if all bids match or discrepencies are
+		-- allowed!
+		if (discrepencesAllowed or unmatchedPendingBidCount == 0 or unmatchedCompletedBidCount == 0) then
+			-- Time to log some purchases!
+			debugPrint("Begin reconciling bid list for "..item);
+			for pendingIndex = 1, table.getn(pendingBids) do
+				local pendingBid = pendingBids[pendingIndex];
+				if (pendingBid.match ~= nil) then
+					-- Reconcile the matching bids.
+					reconcileMatchingBids(item, pendingBids, pendingBid, completedBids, pendingBid.match);
+					bidsReconciled = bidsReconciled + 1;
+				end
+			end
+			debugPrint("End reconciling bid list for "..item.." ("..bidsReconciled.." reconciled)");
+		else
+			debugPrint("Not reconciling bids for "..item.." due to discrepencies");
+		end
+	else
+		debugPrint("No reconcilable bids for "..item);
 	end
+
+	return bidsReconciled;
+end
+
+-------------------------------------------------------------------------------
+-- Performs bid reconcilation by removing the pending and completed bids
+-- and adding a purchase.
+-------------------------------------------------------------------------------
+function reconcileMatchingBids(item, pendingBids, pendingBid, completedBids, completedBid)
+	-- Remove the pending and completed bids
+	deletePendingBidByIndex(item, pendingBid.index, "reconciled", pendingBids);
+	deleteCompletedBidByIndex(item, completedBid.index, "reconciled", completedBids);
+
+	-- Add a sale (success or failure).
+	if (not completedBid.isSuccessful) then
+		debugPrint("Bid not successful");
+	elseif (pendingBid.isBuyout or completedBid.isPurchaseRecorded) then
+		debugPrint("Purchase already recorded");
+	else
+		addPurchase(completedBid.time, item, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout);
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Checks if all pending bids in the list match each other. All pending
+-- bids must be within a 5 minute period of time to be considered matches.
+-------------------------------------------------------------------------------
+function doesPendingBidListMatch(pendingBids)
+	local match = (table.getn(pendingBids) > 0);
+	if (match) then
+		local pendingBid = pendingBids[1];
+		local firstBidTime = pendingBid.time;
+		local lastBidTime = pendingBid.time;
+		local quantity = pendingBid.quantity;
+		local bid = pendingBid.bid;
+		local buyout = pendingBid.buyout;
+		local deposit = pendingBid.deposit;
+		for index = 2, table.getn(pendingBids) do
+			local pendingBid = pendingBids[index];
+			if (quantity ~= pendingBid.quantity or
+				bid ~= pendingBid.bid or
+				isBuyout ~= pendingBid.isBuyout) then
+				match = false;
+				break;
+			elseif (pendingBid.time < firstBidTime) then
+				firstBidTime = pendingBid.time;
+			elseif (pendingBid.time > lastBidTime) then
+				lastBidTime = pendingBid.time;
+			end
+		end
+		if (match) then
+			local bidTimeSpread = lastBidTime - firstBidTime;
+			match = (bidTimeSpread < (5 * 60));
+		end
+	end
+	return match;	
+end
+
+-------------------------------------------------------------------------------
+-- Checks if the completed bid could be the pending bid.
+-------------------------------------------------------------------------------
+function doesPendingBidMatchCompletedBid(pendingBid, completedBid)
+	-- Fudge time that we add to the duration of auctions. This accounts for
+	-- mail delivery lag and additional auction duration due to bidding.
+	local AUCTION_DURATION_CUSHION = (12 * 60 * 60); -- 12 hours
+
+	-- Check if auction completed in a time frame that makes sense for the
+	-- the time left.
+	if (pendingBid.time + MINIMUM_TIME_LEFT[pendingBid.timeLeft] > completedBid.time or 
+		pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_DURATION_CUSHION < completedBid.time) then
+		return false;
+	end
+	
+	-- Check if the quantities match.
+	if (pendingBid.quantity ~= nil and 
+		completedBid.quantity ~= nil and
+		completedBid.quantity ~= pendingBid.quantity) then
+		return false;
+	end
+
+	-- Check if the sellers match.
+	if (pendingBid.seller ~= nil and 
+		completedBid.seller ~= nil and
+		completedBid.seller ~= pendingBid.seller) then
+		return false;
+	end
+
+	-- Check if the buyout flags match.
+	if (pendingBid.isBuyout ~= nil and 
+		completedBid.isBuyout ~= nil and
+		completedBid.isBuyout ~= pendingBid.isBuyout) then
+		return false;
+	end
+
+	-- If we made it this far, its a possible match!
+	return true;
+end
+
+-------------------------------------------------------------------------------
+-- Compare two auctions based on match count.
+-------------------------------------------------------------------------------
+function compareMatchCount(auction1, auction2)
+	local count1 = table.getn(auction1.matches);
+	local count2 = table.getn(auction2.matches);
+	if (count1 == count2) then
+		return (auction1.time > auction2.time);
+	end
+	return (count1 > count2);
+end
+
+-------------------------------------------------------------------------------
+-- Compares two auctions based on time.
+-------------------------------------------------------------------------------
+function compareTime(auction1, auction2)
+	return (auction1.time > auction2.time);
 end
 
 --=============================================================================
@@ -862,7 +1205,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(message)
-	BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..message);
+	BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..stringFromNilSafeString(message));
 end
 
 --[[
@@ -934,13 +1277,14 @@ end
 BeanCounter.Purchases = 
 {
 	AddPendingBid = addPendingBid;
-	DeletePendingBid = deletePendingBid;
+	DeletePendingBid = deletePendingBidBySignature;
 	GetPendingBidItems = getPendingBidItems;
 	GetPendingBidsForItem = getPendingBidsForItem;
 	AddSuccessfulBid = addSuccessfulBid;
 	AddFailedBid = addFailedBid;
 	GetPurchasedItems = getPurchasedItems;
 	GetPurchasesForItem = getPurchasesForItem;
+	ReconcileBids = reconcileBids;
 	PrintPendingBids = printPendingBids;
 	PrintCompletedBids = printCompletedBids;
 	PrintPurchases = printPurchases;

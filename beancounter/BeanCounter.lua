@@ -132,19 +132,18 @@ end
 function BeanCounter_AddOnLoaded()
 	debugPrint("BeanCounter_AddOnLoaded() called");
 
-	-- Create a database version if one doesn't already exist.
-	if (not AHPurchases.version) then AHPurchases.version = 30000; end
-	
 	-- Blizzard's auction UI may or may not have been loaded yet.
 	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
 		BeanCounter_AuctionHouseLoaded();
 	end
-	
+
 	-- Initialize our various modules.
+	PurchasesDB_OnLoad();
+	SalesDB_OnLoad();	
 	MailMonitor_OnLoad();
 	BidMonitor_OnLoad();
 	PostMonitor_OnLoad();
-	
+
 	-- Hello world!
 	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
 end

@@ -88,8 +88,6 @@ local debugPrint;
 -------------------------------------------------------------------------------
 AHSales = {};
 
-local NIL_VALUE = "<nil>";
-
 -- Auction result constants
 local AUCTION_SOLD = 0;
 local AUCTION_EXPIRED = 1;
@@ -98,6 +96,13 @@ local AUCTION_CANCELED = 2;
 -- Constants
 local AUCTION_OVERRUN_LIMIT = (2 * 60 * 60); -- 2 hours
 local AUCTION_DURATION_LIMIT = (24 * 60 * 60) + AUCTION_OVERRUN_LIMIT;
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function SalesDB_OnLoad()
+	-- Create a database version if one doesn't already exist.
+	if (not AHSales.version) then AHSales.version = 30000; end
+end
 
 --=============================================================================
 -- Pending Auctions functions
@@ -691,6 +696,8 @@ end
 -- time.
 -------------------------------------------------------------------------------
 function reconcileAuctionsByTime(item, reconcileTime)
+	debugPrint("reconcileBidsByTime("..item..", "..date("%c", reconcileTime)..")");
+
 	-- Get the list of pending auctions that should have completed before the
 	-- specified time.
 	local pendingAuctions = getPendingAuctionsForItem(
@@ -698,6 +705,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 		function(pendingAuction)
 			return (pendingAuction.time + (pendingAuction.runTime * 60) + AUCTION_OVERRUN_LIMIT < reconcileTime);
 		end);
+	debugPrint(table.getn(pendingAuctions).." matching pending bids");
 
 	-- Get the list of completed auctions that completed before the specified
 	-- time.
@@ -706,6 +714,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 		function(completedAuction)
 			return (completedAuction.time < reconcileTime);
 		end);
+	debugPrint(table.getn(completedAuctions).." matching completed bids");
 
 	-- Reconcile the lists.
 	local reconciledAuctions = reconcileAuctionList(item, pendingAuctions, completedAuctions, true);
@@ -854,7 +863,6 @@ end
 function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepenciesAllowed)
 	-- If we have some auctions, reconcile them!
 	local auctionsReconciled = 0;
-	local pendingAuctionsDiscarded = 0;
 	if (table.getn(pendingAuctions) > 0 or table.getn(completedAuctions) > 0) then
 		-- For each pending auction, get the list of potential completed auctions.
 		-- Afterwards, sort the pending auction list by match count.

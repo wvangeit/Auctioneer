@@ -522,10 +522,16 @@ function reconcileDatabases(reconcileTime)
 		end
 	end
 
+	-- Perform the purchases database reconcilation.
+	local reconciledBids, pendingBidsDiscarded, completedBidsDiscarded = BeanCounter.Purchases.ReconcileBids(reconcileTime, pendingBidsForItem);
+	if (reconciledBids > 0 or pendingBidsDiscarded > 0) then
+		chatPrint("Reconciled "..reconciledBids.." auctions ("..pendingBidsDiscarded.. " discrepencies)");
+	end
+
 	-- Perform the sales database reconcilation.
-	local reconciled, pendingDiscarded, completedDiscarded = BeanCounter.Sales.ReconcileAuctions(reconcileTime, pendingSalesForItem);
-	if (reconciled > 0 or pendingDiscarded > 0) then
-		chatPrint("Reconciled "..reconciled.." auctions ("..pendingDiscarded.. " discrepencies)");
+	local reconciledAuctions, pendingAuctionsDiscarded, completedAuctionsDiscarded = BeanCounter.Sales.ReconcileAuctions(reconcileTime, pendingSalesForItem);
+	if (reconciledAuctions > 0 or pendingAuctionsDiscarded > 0) then
+		chatPrint("Reconciled "..reconciledAuctions.." auctions ("..pendingAuctionsDiscarded.. " discrepencies)");
 	end
 end
 
