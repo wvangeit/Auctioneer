@@ -575,7 +575,7 @@ end
 --[[
 	@param bExact (boolean) - optional parameter
 		if true, then the copper value of the given moneyAmount will always be printed out
-		if false (default), then the cupper value of the given moneyAmount will not be printed out, if the moneyAmount is too high (see getTextGSC for the exact limit)
+		if false (default), then the copper value of the given moneyAmount will not be printed out, if the moneyAmount is too high (see getTextGSC for the exact limit)
 		bExact has no meaning, if moneyAmount is nil.
 ]]
 function addLine(lineText, moneyAmount, embed, bExact)
