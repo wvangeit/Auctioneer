@@ -138,11 +138,12 @@ function BeanCounter_AddOnLoaded()
 	end
 
 	-- Initialize our various modules.
-	PurchasesDB_OnLoad();
-	SalesDB_OnLoad();	
 	MailMonitor_OnLoad();
 	BidMonitor_OnLoad();
 	PostMonitor_OnLoad();
+	
+	-- Load the realm's database.
+	BeanCounter.Database.Load(GetRealmName());
 
 	-- Hello world!
 	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));

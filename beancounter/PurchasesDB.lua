@@ -25,6 +25,14 @@
 -- Function Imports
 -------------------------------------------------------------------------------
 local chatPrint = BeanCounter.ChatPrint;
+local getPlayerName = BeanCounter.Database.GetPlayerName;
+local getCurrentPlayerId = BeanCounter.Database.GetCurrentPlayerId;
+local stringFromBoolean = BeanCounter.Database.StringFromBoolean;
+local booleanFromString = BeanCounter.Database.BooleanFromString;
+local stringFromNumber = BeanCounter.Database.StringFromNumber;
+local numberFromString = BeanCounter.Database.NumberFromString;
+local nilSafeStringFromString = BeanCounter.Database.NilSafeStringFromString;
+local stringFromNilSafeString = BeanCounter.Database.StringFromNilSafeString;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -73,21 +81,9 @@ local doesPendingBidMatchCompletedBid;
 local compareMatchCount;
 local compareTime;
 
-local resetDatabase;
 local getBidNonNilFieldCount;
 local compareBidsByNonNilFieldCount;
-local stringFromBoolean;
-local booleanFromString;
-local stringFromNumber;
-local numberFromString;
-local nilSafeStringFromString;
-local stringFromNilSafeString;
 local debugPrint;
-
--------------------------------------------------------------------------------
--- Data Members
--------------------------------------------------------------------------------
-AHPurchases = {};
 
 -------------------------------------------------------------------------------
 -- Constants
@@ -101,46 +97,14 @@ local MAXIMUM_TIME_LEFT =
 	[2] = 60 * 60 * 2,	-- Medium
 	[3] = 60 * 60 * 8,	-- Long
 	[4] = 60 * 60 * 24,	-- Very Long
-};	
+};
 local MINIMUM_TIME_LEFT =
 {
 	[1] = 0,			-- Short
 	[2] = 60 * 30,		-- Medium
 	[3] = 60 * 60 * 2,	-- Long
 	[4] = 60 * 60 * 8,	-- Very Long
-};	
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function PurchasesDB_OnLoad()
-	-- Create a database version if one doesn't already exist.
-	if (not AHPurchases.version) then AHPurchases.version = 30001; end
-	
-	-- Perform any needed upgrades.
-	if (AHPurchases.version == 30000) then
-		upgradeAHPurchasesTo30001();
-	end
-end
-
--------------------------------------------------------------------------------
--- Upgrades the database from version 30000 to 30001. This upgrade added a
--- timeLeft field to the pending bids.
--------------------------------------------------------------------------------
-function upgradeAHPurchasesTo30001()
-	if (AHPurchases.version == 30000) then
-		if (AHPurchases.PendingBids) then
-			for item in AHPurchases.PendingBids do
-				local pendingBidsTable = AHPurchases.PendingBids[item];
-				for index in pendingBidsTable do
-					pendingBidsTable[index] = pendingBidsTable[index]..";1"
-					debugPrint("Upgraded AHPurchases.PendingBids["..item.."]["..index.."] = "..pendingBidsTable[index]);
-				end
-			end
-		end
-		AHPurchases.version = 30001;
-		debugPrint("AHPurchases upgraded to 30001");
-	end
-end
+};
 
 --=============================================================================
 -- Pending Bids functions
@@ -159,6 +123,7 @@ function addPendingBid(timestamp, item, quantity, bid, seller, isBuyout, timeLef
 		pendingBid.seller = seller;
 		pendingBid.isBuyout = isBuyout;
 		pendingBid.timeLeft = timeLeft;
+		pendingBid.buyerId = getCurrentPlayerId();
 		local packedPendingBid = packPendingBid(pendingBid);
 
 		-- Add the pending bid to the table.
@@ -248,7 +213,8 @@ function packPendingBid(pendingBid)
 		stringFromNumber(pendingBid.bid)..";"..
 		nilSafeStringFromString(pendingBid.seller)..";"..
 		stringFromBoolean(pendingBid.isBuyout)..";"..
-		stringFromNumber(pendingBid.timeLeft);
+		stringFromNumber(pendingBid.timeLeft)..";"..
+		stringFromNumber(pendingBid.buyerId);
 end
 
 -------------------------------------------------------------------------------
@@ -256,13 +222,14 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingBid(packedPendingBid)
 	local pendingBid = {};
-	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout, pendingBid.timeLeft = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout, pendingBid.timeLeft, pendingBid.buyerId = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	pendingBid.time = numberFromString(pendingBid.time);
 	pendingBid.quantity = numberFromString(pendingBid.quantity);
 	pendingBid.bid = numberFromString(pendingBid.bid);
 	pendingBid.seller = stringFromNilSafeString(pendingBid.seller);
 	pendingBid.isBuyout = booleanFromString(pendingBid.isBuyout);
 	pendingBid.timeLeft = numberFromString(pendingBid.timeLeft);
+	pendingBid.buyerId = numberFromString(pendingBid.buyerId);
 	return pendingBid;
 end
 
@@ -271,10 +238,10 @@ end
 -- packed records.
 -------------------------------------------------------------------------------
 function getPendingBidsTableForItem(item, create)
-	local pendingBidsTable = AHPurchases.PendingBids;
+	local pendingBidsTable = BeanCounterRealmDB.pendingBids;
 	if (pendingBidsTable == nil) then
 		pendingBidsTable = {};
-		AHPurchases.PendingBids = pendingBidsTable;
+		BeanCounterRealmDB.pendingBids = pendingBidsTable;
 	end
 
 	-- Get the table for the item. Create or delete if appropriate.
@@ -294,8 +261,8 @@ end
 -------------------------------------------------------------------------------
 function getPendingBidItems(item)
 	local items = {};
-	if (AHPurchases.PendingBids) then
-		for item in AHPurchases.PendingBids do
+	if (BeanCounterRealmDB.pendingBids) then
+		for item in BeanCounterRealmDB.pendingBids do
 			local pendingBidsTable = getPendingBidsTableForItem(item);
 			if (pendingBidsTable and table.getn(pendingBidsTable) > 0) then
 				table.insert(items, item);
@@ -328,9 +295,9 @@ end
 -------------------------------------------------------------------------------
 function printPendingBids()
 	chatPrint("Pending Bids:");
-	if (AHPurchases.PendingBids) then
-		for item in AHPurchases.PendingBids do
-			local pendingBidsTable = AHPurchases.PendingBids[item];
+	if (BeanCounterRealmDB.pendingBids) then
+		for item in BeanCounterRealmDB.pendingBids do
+			local pendingBidsTable = BeanCounterRealmDB.pendingBids[item];
 			for index = 1, table.getn(pendingBidsTable) do
 				local pendingBid = unpackPendingBid(pendingBidsTable[index]);
 				printPendingBid(chatPrint, nil, item, pendingBid);
@@ -354,7 +321,8 @@ function printPendingBid(printFunc, prefix, item, pendingBid)
 		pendingBid.bid..", "..
 		nilSafeStringFromString(pendingBid.seller)..", "..
 		stringFromNumber(pendingBid.timeLeft)..", "..
-		stringFromBoolean(pendingBid.isBuyout));
+		stringFromBoolean(pendingBid.isBuyout)..", "..
+		nilSafeStringFromString(getPlayerName(pendingBid.buyerId)));
 end
 
 -------------------------------------------------------------------------------
@@ -418,6 +386,7 @@ function addCompletedBid(timestamp, item, quantity, bid, seller, isBuyout, isSuc
 			completedBid.isBuyout = isBuyout;
 			completedBid.isSuccessful = isSuccessful;
 			completedBid.isPurchaseRecorded = isPurchaseRecorded;
+			completedBid.buyerId = getCurrentPlayerId();
 			local packedCompletedBid = packCompletedBid(completedBid);
 
 			-- Add the completed bid to the table.
@@ -484,7 +453,8 @@ function packCompletedBid(completedBid)
 		nilSafeStringFromString(completedBid.seller)..";"..
 		stringFromBoolean(completedBid.isBuyout)..";"..
 		stringFromBoolean(completedBid.isSuccessful)..";"..
-		stringFromBoolean(completedBid.isPurchaseRecorded);
+		stringFromBoolean(completedBid.isPurchaseRecorded)..";"..
+		stringFromNumber(completedBid.buyerId);
 end
 
 -------------------------------------------------------------------------------
@@ -492,7 +462,7 @@ end
 -------------------------------------------------------------------------------
 function unpackCompletedBid(packedCompletedBid)
 	local completedBid = {};
-	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded = string.find(packedCompletedBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded, completedBid.buyerId = string.find(packedCompletedBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	completedBid.time = numberFromString(completedBid.time);
 	completedBid.quantity = numberFromString(completedBid.quantity);
 	completedBid.bid = numberFromString(completedBid.bid);
@@ -500,6 +470,7 @@ function unpackCompletedBid(packedCompletedBid)
 	completedBid.isBuyout = booleanFromString(completedBid.isBuyout);
 	completedBid.isSuccessful = booleanFromString(completedBid.isSuccessful);
 	completedBid.isPurchaseRecorded = booleanFromString(completedBid.isPurchaseRecorded);
+	completedBid.buyerId = numberFromString(completedBid.buyerId);
 	return completedBid;
 end
 
@@ -508,10 +479,10 @@ end
 -- packed records.
 -------------------------------------------------------------------------------
 function getCompletedBidsTableForItem(item, create)
-	local completedBidsTable = AHPurchases.CompletedBids;
+	local completedBidsTable = BeanCounterRealmDB.completedBids;
 	if (completedBidsTable == nil) then
 		completedBidsTable = {};
-		AHPurchases.CompletedBids = completedBidsTable;
+		BeanCounterRealmDB.completedBids = completedBidsTable;
 	end
 
 	-- Get the table for the item. Create or delete if appropriate.
@@ -549,9 +520,9 @@ end
 -------------------------------------------------------------------------------
 function printCompletedBids()
 	chatPrint("Completed Bids:");
-	if (AHPurchases.CompletedBids) then
-		for item in AHPurchases.CompletedBids do
-			local completedBidsTable = AHPurchases.CompletedBids[item];
+	if (BeanCounterRealmDB.completedBids) then
+		for item in BeanCounterRealmDB.completedBids do
+			local completedBidsTable = BeanCounterRealmDB.completedBids[item];
 			for index = 1, table.getn(completedBidsTable) do
 				local completedBid = unpackCompletedBid(completedBidsTable[index]);
 				printCompletedBid(chatPrint, nil, item, completedBid);
@@ -576,7 +547,8 @@ function printCompletedBid(printFunc, prefix, item, completedBid)
 		nilSafeStringFromString(completedBid.seller)..", "..
 		stringFromBoolean(completedBid.isBuyout)..", "..
 		stringFromBoolean(completedBid.isSuccessful)..", "..
-		stringFromBoolean(completedBid.isPurchaseRecorded));
+		stringFromBoolean(completedBid.isPurchaseRecorded)..", "..
+		nilSafeStringFromString(getPlayerName(completedBid.buyerId)));
 end
 
 --=============================================================================
@@ -595,6 +567,7 @@ function addPurchase(timestamp, item, quantity, cost, seller, isBuyout)
 		purchase.cost = cost;
 		purchase.seller = seller;
 		purchase.isBuyout = isBuyout;
+		purchase.buyerId = getCurrentPlayerId();
 		local packedPurchase = packPurchase(purchase);
 
 		-- Add the purchase to the table.
@@ -617,7 +590,8 @@ function packPurchase(purchase)
 		stringFromNumber(purchase.quantity)..";"..
 		stringFromNumber(purchase.cost)..";"..
 		nilSafeStringFromString(purchase.seller)..";"..
-		stringFromBoolean(purchase.isBuyout);
+		stringFromBoolean(purchase.isBuyout)..";"..
+		stringFromNumber(purchase.buyerId);
 end
 
 -------------------------------------------------------------------------------
@@ -625,12 +599,13 @@ end
 -------------------------------------------------------------------------------
 function unpackPurchase(packedPurchase)
 	local purchase = {};
-	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout = string.find(packedPurchase, "(.+);(.+);(.+);(.+);(.+)");
+	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout, purchase.buyerId = string.find(packedPurchase, "(.+);(.+);(.+);(.+);(.+);(.+)");
 	purchase.time = numberFromString(purchase.time);
 	purchase.quantity = numberFromString(purchase.quantity);
 	purchase.cost = numberFromString(purchase.cost);
 	purchase.seller = stringFromNilSafeString(purchase.seller);
 	purchase.isBuyout = booleanFromString(purchase.isBuyout);
+	purchase.buyerId = numberFromString(purchase.buyerId);
 	return purchase;
 end
 
@@ -639,10 +614,10 @@ end
 -- records.
 -------------------------------------------------------------------------------
 function getPurchasesTableForItem(item, create)
-	local purchasesTable = AHPurchases.Purchases;
+	local purchasesTable = BeanCounterRealmDB.purchases;
 	if (purchasesTable == nil) then
 		purchasesTable = {};
-		AHPurchases.Purchases = purchasesTable;
+		BeanCounterRealmDB.purchases = purchasesTable;
 	end
 	
 	-- Get the table for the item. Create or delete if appropriate.
@@ -662,8 +637,8 @@ end
 -------------------------------------------------------------------------------
 function getPurchasedItems(item)
 	local items = {};
-	if (AHPurchases.Purchases) then
-		for item in AHPurchases.Purchases do
+	if (BeanCounterRealmDB.purchases) then
+		for item in BeanCounterRealmDB.purchases do
 			local purchasesTable = getPurchasesTableForItem(item);
 			if (purchasesTable and table.getn(purchasesTable) > 0) then
 				table.insert(items, item);
@@ -676,13 +651,16 @@ end
 -------------------------------------------------------------------------------
 -- Gets the purchases (unpacked) for the specified item
 -------------------------------------------------------------------------------
-function getPurchasesForItem(item)
+function getPurchasesForItem(item, filterFunc)
 	local purchases = {};
 	local purchasesTable = getPurchasesTableForItem(item);
 	if (purchasesTable) then
 		for index in purchasesTable do
 			local purchase = unpackPurchase(purchasesTable[index]);
-			table.insert(purchases, purchase);
+			purchase.index = index;
+			if (filterFunc == nil or filterFunc(purchase)) then
+				table.insert(purchases, purchase);
+			end
 		end
 	end
 	return purchases;
@@ -693,9 +671,9 @@ end
 -------------------------------------------------------------------------------
 function printPurchases()
 	chatPrint("Purchases:");
-	if (AHPurchases.Purchases) then
-		for item in AHPurchases.Purchases do
-			local purchasesTable = AHPurchases.Purchases[item];
+	if (BeanCounterRealmDB.purchases) then
+		for item in BeanCounterRealmDB.purchases do
+			local purchasesTable = BeanCounterRealmDB.purchases[item];
 			for index = 1, table.getn(purchasesTable) do
 				local purchase = unpackPurchase(purchasesTable[index]);
 				printPurchase(chatPrint, nil, item, purchase);
@@ -718,7 +696,8 @@ function printPurchase(printFunc, prefix, item, purchase)
 		purchase.quantity..", "..
 		purchase.cost..", "..
 		nilSafeStringFromString(purchase.seller)..", "..
-		stringFromBoolean(purchase.isBuyout));
+		stringFromBoolean(purchase.isBuyout)..", "..
+		nilSafeStringFromString(getPlayerName(purchase.buyerId)));
 end
 
 --=============================================================================
@@ -755,7 +734,8 @@ function reconcileBidsByTime(item, reconcileTime)
 	local pendingBids = getPendingBidsForItem(
 		item, 
 		function(pendingBid)
-			return (pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_OVERRUN_LIMIT < reconcileTime);
+			return (pendingBid.buyerId == getCurrentPlayerId() and
+					pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_OVERRUN_LIMIT < reconcileTime);
 		end);
 	debugPrint(table.getn(pendingBids).." matching pending bids");
 
@@ -764,7 +744,8 @@ function reconcileBidsByTime(item, reconcileTime)
 	local completedBids = getCompletedBidsForItem(
 		item,
 		function(completedBid)
-			return (completedBid.time < reconcileTime);
+			return (completedBid.buyerId == getCurrentPlayerId() and
+					completedBid.time < reconcileTime);
 		end);
 	debugPrint(table.getn(completedBids).." matching completed bids");
 
@@ -845,7 +826,8 @@ function reconcileBidsByQuantity(item, quantity)
 	local pendingBids = getPendingBidsForItem(
 		item, 
 		function(pendingBid)
-			return (pendingBid.quantity == quantity);
+			return (pendingBid.buyerId == getCurrentPlayerId() and
+					pendingBid.quantity == quantity);
 		end);
 	debugPrint(table.getn(pendingBids).." matching pending bids");
 	
@@ -853,7 +835,8 @@ function reconcileBidsByQuantity(item, quantity)
 	local completedBids = getCompletedBidsForItem(
 		item, 
 		function(completedBid)
-			return (completedBid.quantity == quantity);
+			return (completedBid.buyerId == getCurrentPlayerId() and 
+					completedBid.quantity == quantity);
 		end);
 	debugPrint(table.getn(completedBids).." matching completed bids");
 	
@@ -879,7 +862,8 @@ function reconcileBidsByBid(item, bid)
 	local pendingBids = getPendingBidsForItem(
 		item, 
 		function(pendingBid)
-			return (pendingBid.bid == bid);
+			return (pendingBid.buyerId == getCurrentPlayerId() and
+					pendingBid.bid == bid);
 		end);
 	debugPrint(table.getn(pendingBids).." matching pending bids");
 	
@@ -887,7 +871,8 @@ function reconcileBidsByBid(item, bid)
 	local completedBids = getCompletedBidsForItem(
 		item, 
 		function(completedBid)
-			return (completedBid.bid == bid);
+			return (completedBid.buyerId == getCurrentPlayerId() and 
+					completedBid.bid == bid);
 		end);
 	debugPrint(table.getn(completedBids).." matching completed bids");
 	
@@ -1020,11 +1005,13 @@ function doesPendingBidListMatch(pendingBids)
 		local bid = pendingBid.bid;
 		local buyout = pendingBid.buyout;
 		local deposit = pendingBid.deposit;
+		local buyerId = pendingBid.buyerId;
 		for index = 2, table.getn(pendingBids) do
 			local pendingBid = pendingBids[index];
 			if (quantity ~= pendingBid.quantity or
 				bid ~= pendingBid.bid or
-				isBuyout ~= pendingBid.isBuyout) then
+				isBuyout ~= pendingBid.isBuyout or
+				buyerId ~= pendingBid.buyerId) then
 				match = false;
 				break;
 			elseif (pendingBid.time < firstBidTime) then
@@ -1048,6 +1035,13 @@ function doesPendingBidMatchCompletedBid(pendingBid, completedBid)
 	-- Fudge time that we add to the duration of auctions. This accounts for
 	-- mail delivery lag and additional auction duration due to bidding.
 	local AUCTION_DURATION_CUSHION = (12 * 60 * 60); -- 12 hours
+
+	-- Check if buyer ids match.
+	if (pendingBid.buyerId ~= nil and 
+		completedBid.buyerId ~= nil and
+		completedBid.buyerId ~= pendingBid.buyerId) then
+		return false;
+	end
 
 	-- Check if auction completed in a time frame that makes sense for the
 	-- the time left.
@@ -1105,16 +1099,6 @@ end
 --=============================================================================
 
 -------------------------------------------------------------------------------
--- Clears the purchases database
--------------------------------------------------------------------------------
-function resetDatabase()
-	AHPurchases.PendingBids = {};
-	AHPurchases.CompletedBids = {};
-	AHPurchases.Purchases = {};
-	debugPrint("Reset Database");
-end
-
--------------------------------------------------------------------------------
 -- Gets the number of non-nil fields in a bid.
 -------------------------------------------------------------------------------
 function getBidNonNilFieldCount(bid)
@@ -1136,70 +1120,6 @@ function compareBidsByNonNilFieldCount(bid1, bid2)
 		return true;
 	end
 	return false;
-end
-
--------------------------------------------------------------------------------
--- Converts boolean into a numeric string.
--------------------------------------------------------------------------------
-function stringFromBoolean(boolean)
-	if (boolean == nil) then
-		return NIL_VALUE;
-	elseif (boolean) then
-		return "1";
-	end
-	return "0";
-end
-
--------------------------------------------------------------------------------
--- Converts a numeric string into a boolean.
--------------------------------------------------------------------------------
-function booleanFromString(string)
-	if (string == NIL_VALUE) then
-		return nil;
-	elseif (string == "0") then
-		return false;
-	end
-	return true;
-end
-
--------------------------------------------------------------------------------
--- Converts number into a numeric string.
--------------------------------------------------------------------------------
-function stringFromNumber(number)
-	if (number == nil) then
-		return NIL_VALUE;
-	end
-	return tostring(number);
-end
-
--------------------------------------------------------------------------------
--- Converts numeric string into a number.
--------------------------------------------------------------------------------
-function numberFromString(number)
-	if (number == NIL_VALUE) then
-		return nil;
-	end
-	return tonumber(number);
-end
-
--------------------------------------------------------------------------------
--- Converts a string into a nil safe string (nil -> "<nil>")
--------------------------------------------------------------------------------
-function nilSafeStringFromString(string)
-	if (string == nil) then
-		return NIL_VALUE;
-	end
-	return string;
-end
-
--------------------------------------------------------------------------------
--- Converts a nil safe string into a string ("<nil>" -> nil)
--------------------------------------------------------------------------------
-function stringFromNilSafeString(nilSafeString)
-	if (nilSafeString == NIL_VALUE) then
-		return nil;
-	end
-	return nilSafeString;
 end
 
 -------------------------------------------------------------------------------
@@ -1288,15 +1208,4 @@ BeanCounter.Purchases =
 	PrintPendingBids = printPendingBids;
 	PrintCompletedBids = printCompletedBids;
 	PrintPurchases = printPurchases;
-	ResetDatabase = resetDatabase;
-};
-
-BeanCounter.DBUtil = 
-{
-	StringFromBoolean = stringFromBoolean;
-	BooleanFromString = booleanFromString;
-	StringFromNumber = stringFromNumber;
-	NumberFromString = numberFromString;
-	NilSafeStringFromString = nilSafeStringFromString;
-	StringFromNilSafeString = stringFromNilSafeString;
 };

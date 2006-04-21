@@ -25,12 +25,14 @@
 -- Function Imports
 -------------------------------------------------------------------------------
 local chatPrint = BeanCounter.ChatPrint;
-local stringFromBoolean = BeanCounter.DBUtil.StringFromBoolean
-local booleanFromString = BeanCounter.DBUtil.BooleanFromString;
-local stringFromNumber = BeanCounter.DBUtil.StringFromNumber;
-local numberFromString = BeanCounter.DBUtil.NumberFromString;
-local nilSafeStringFromString = BeanCounter.DBUtil.NilSafeStringFromString;
-local stringFromNilSafeString = BeanCounter.DBUtil.StringFromNilSafeString;
+local getPlayerName = BeanCounter.Database.GetPlayerName;
+local getCurrentPlayerId = BeanCounter.Database.GetCurrentPlayerId;
+local stringFromBoolean = BeanCounter.Database.StringFromBoolean;
+local booleanFromString = BeanCounter.Database.BooleanFromString;
+local stringFromNumber = BeanCounter.Database.StringFromNumber;
+local numberFromString = BeanCounter.Database.NumberFromString;
+local nilSafeStringFromString = BeanCounter.Database.NilSafeStringFromString;
+local stringFromNilSafeString = BeanCounter.Database.StringFromNilSafeString;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -80,13 +82,11 @@ local doesPendingAuctionListMatch;
 local getPendingAuctionMatchCount;
 local reconcileMatchingAuctions;
 
-local resetDatabase;
 local debugPrint;
 
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
-AHSales = {};
 
 -- Auction result constants
 local AUCTION_SOLD = 0;
@@ -96,13 +96,6 @@ local AUCTION_CANCELED = 2;
 -- Constants
 local AUCTION_OVERRUN_LIMIT = (2 * 60 * 60); -- 2 hours
 local AUCTION_DURATION_LIMIT = (24 * 60 * 60) + AUCTION_OVERRUN_LIMIT;
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function SalesDB_OnLoad()
-	-- Create a database version if one doesn't already exist.
-	if (not AHSales.version) then AHSales.version = 30000; end
-end
 
 --=============================================================================
 -- Pending Auctions functions
@@ -122,6 +115,7 @@ function addPendingAuction(timestamp, item, quantity, bid, buyout, runTime, depo
 		pendingAuction.runTime = runTime;
 		pendingAuction.deposit = deposit;
 		pendingAuction.consignmentPercent = consignmentPercent;
+		pendingAuction.sellerId = getCurrentPlayerId();
 		local packedPendingAuction = packPendingAuction(pendingAuction);
 
 		-- Add to the pending auctions table.
@@ -186,7 +180,8 @@ function packPendingAuction(pendingAuction)
 		stringFromNumber(pendingAuction.buyout)..";"..
 		stringFromNumber(pendingAuction.runTime)..";"..
 		stringFromNumber(pendingAuction.deposit)..";"..
-		stringFromNumber(pendingAuction.consignmentPercent);
+		stringFromNumber(pendingAuction.consignmentPercent)..";"..
+		stringFromNumber(pendingAuction.sellerId);
 end
 
 -------------------------------------------------------------------------------
@@ -194,7 +189,7 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingAuction(packedPendingAuction)
 	local pendingAuction = {};
-	_, _, pendingAuction.time, pendingAuction.quantity, pendingAuction.bid, pendingAuction.buyout, pendingAuction.runTime, pendingAuction.deposit, pendingAuction.consignmentPercent = string.find(packedPendingAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, pendingAuction.time, pendingAuction.quantity, pendingAuction.bid, pendingAuction.buyout, pendingAuction.runTime, pendingAuction.deposit, pendingAuction.consignmentPercent, pendingAuction.sellerId = string.find(packedPendingAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	pendingAuction.time = numberFromString(pendingAuction.time);
 	pendingAuction.quantity = numberFromString(pendingAuction.quantity);
 	pendingAuction.bid = numberFromString(pendingAuction.bid);
@@ -202,6 +197,7 @@ function unpackPendingAuction(packedPendingAuction)
 	pendingAuction.runTime = numberFromString(pendingAuction.runTime);
 	pendingAuction.deposit = numberFromString(pendingAuction.deposit);
 	pendingAuction.consignmentPercent = numberFromString(pendingAuction.consignmentPercent);
+	pendingAuction.sellerId = numberFromString(pendingAuction.sellerId);
 	return pendingAuction;
 end
 
@@ -210,10 +206,10 @@ end
 -- packed records.
 -------------------------------------------------------------------------------
 function getPendingAuctionsTableForItem(item, create)
-	local pendingAuctionsTable = AHSales.PendingAuctions;
+	local pendingAuctionsTable = BeanCounterRealmDB.pendingAuctions;
 	if (pendingAuctionsTable == nil) then
 		pendingAuctionsTable = {};
-		AHSales.PendingAuctions = pendingAuctionsTable;
+		BeanCounterRealmDB.pendingAuctions = pendingAuctionsTable;
 	end
 
 	-- Get the table for the item. Create or delete if appropriate.
@@ -233,8 +229,8 @@ end
 -------------------------------------------------------------------------------
 function getPendingAuctionItems()
 	local items = {};
-	if (AHSales.PendingAuctions) then
-		for item in AHSales.PendingAuctions do
+	if (BeanCounterRealmDB.pendingAuctions) then
+		for item in BeanCounterRealmDB.pendingAuctions do
 			local pendingAuctionsTable = getPendingAuctionsTableForItem(item);
 			if (pendingAuctionsTable and table.getn(pendingAuctionsTable) > 0) then
 				table.insert(items, item);
@@ -267,9 +263,9 @@ end
 -------------------------------------------------------------------------------
 function printPendingAuctions()
 	chatPrint("Pending Auctions:");
-	if (AHSales.PendingAuctions) then
-		for item in AHSales.PendingAuctions do
-			local pendingAuctionsTable = AHSales.PendingAuctions[item];
+	if (BeanCounterRealmDB.pendingAuctions) then
+		for item in BeanCounterRealmDB.pendingAuctions do
+			local pendingAuctionsTable = BeanCounterRealmDB.pendingAuctions[item];
 			for index = 1, table.getn(pendingAuctionsTable) do
 				local pendingAuction = unpackPendingAuction(pendingAuctionsTable[index]);
 				printPendingAuction(chatPrint, nil, pendingAuction);
@@ -294,7 +290,8 @@ function printPendingAuction(printFunc, prefix, item, pendingAuction)
 		stringFromNumber(pendingAuction.buyout)..", "..
 		stringFromNumber(pendingAuction.runTime)..", "..
 		stringFromNumber(pendingAuction.deposit)..", "..
-		stringFromNumber(pendingAuction.consignmentPercent));
+		stringFromNumber(pendingAuction.consignmentPercent)..", "..
+		nilSafeStringFromString(getPlayerName(pendingAuction.sellerId)));
 end
 
 --=============================================================================
@@ -338,6 +335,7 @@ function addCompletedAuction(timestamp, item, result, quantity, proceeds, price,
 		completedAuction.deposit = deposit;
 		completedAuction.consignment = consignment;
 		completedAuction.buyer = buyer;
+		completedAuction.sellerId = getCurrentPlayerId();
 		local packedCompletedAuction = packCompletedAuction(completedAuction);
 		
 		-- Only add the completed auction to the database if there is a
@@ -413,7 +411,8 @@ function packCompletedAuction(completedAuction)
 		stringFromBoolean(completedAuction.isBuyout)..";"..
 		stringFromNumber(completedAuction.deposit)..";"..
 		stringFromNumber(completedAuction.consignment)..";"..
-		nilSafeStringFromString(completedAuction.buyer);
+		nilSafeStringFromString(completedAuction.buyer)..";"..
+		stringFromNumber(completedAuction.sellerId);
 end
 
 -------------------------------------------------------------------------------
@@ -421,7 +420,7 @@ end
 -------------------------------------------------------------------------------
 function unpackCompletedAuction(packedCompletedAuction)
 	local completedAuction = {};
-	_, _, completedAuction.time, completedAuction.result, completedAuction.quantity, completedAuction.proceeds, completedAuction.price, completedAuction.isBuyout, completedAuction.deposit, completedAuction.consignment, completedAuction.buyer = string.find(packedCompletedAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, completedAuction.time, completedAuction.result, completedAuction.quantity, completedAuction.proceeds, completedAuction.price, completedAuction.isBuyout, completedAuction.deposit, completedAuction.consignment, completedAuction.buyer, completedAuction.sellerId = string.find(packedCompletedAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	completedAuction.time = numberFromString(completedAuction.time);
 	completedAuction.result = numberFromString(completedAuction.result);
 	completedAuction.quantity = numberFromString(completedAuction.quantity);
@@ -431,6 +430,7 @@ function unpackCompletedAuction(packedCompletedAuction)
 	completedAuction.deposit = numberFromString(completedAuction.deposit);
 	completedAuction.consignment = numberFromString(completedAuction.consignment);
 	completedAuction.buyer = stringFromNilSafeString(completedAuction.buyer);
+	completedAuction.sellerId = numberFromString(completedAuction.sellerId);
 	return completedAuction;
 end
 
@@ -439,10 +439,10 @@ end
 -- packed records.
 -------------------------------------------------------------------------------
 function getCompletedAuctionsTableForItem(item, create)
-	local completedAuctionsTable = AHSales.CompletedAuctions;
+	local completedAuctionsTable = BeanCounterRealmDB.completedAuctions;
 	if (completedAuctionsTable == nil) then
 		completedAuctionsTable = {};
-		AHSales.CompletedAuctions = completedAuctionsTable;
+		BeanCounterRealmDB.completedAuctions = completedAuctionsTable;
 	end
 
 	-- Get the table for the item. Create or delete if appropriate.
@@ -480,9 +480,9 @@ end
 -------------------------------------------------------------------------------
 function printCompletedAuctions()
 	chatPrint("Completed Auctions:");
-	if (AHSales.CompletedAuctions) then
-		for item in AHSales.CompletedAuctions do
-			local completedAuctionsTable = AHSales.CompletedAuctions[item];
+	if (BeanCounterRealmDB.completedAuctions) then
+		for item in BeanCounterRealmDB.completedAuctions do
+			local completedAuctionsTable = BeanCounterRealmDB.completedAuctions[item];
 			for index = 1, table.getn(completedAuctionsTable) do
 				local completedAuction = unpackCompletedAuction(completedAuctionsTable[index]);
 				printCompletedAuction(chatPrint, nil, item, completedAuction);
@@ -508,7 +508,8 @@ function printCompletedAuction(printFunc, prefix, item, completedAuction)
 		stringFromBoolean(completedAuction.isBuyout)..", "..
 		stringFromNumber(completedAuction.deposit)..", "..
 		stringFromNumber(completedAuction.consignment)..", "..
-		nilSafeStringFromString(completedAuction.buyer));
+		nilSafeStringFromString(completedAuction.buyer)..", "..
+		nilSafeStringFromString(getPlayerName(completedAuction.sellerId)));
 end
 
 --=============================================================================
@@ -531,6 +532,7 @@ function addSale(timestamp, result, item, quantity, bid, buyout, net, price, isB
 		sale.price = price;
 		sale.isBuyout = isBuyout;
 		sale.buyer = buyer;
+		sale.sellerId = getCurrentPlayerId();
 		local packedSale = packSale(sale);
 
 		-- Add the sale to the table.
@@ -557,7 +559,8 @@ function packSale(sale)
 		stringFromNumber(sale.net)..";"..
 		stringFromNumber(sale.price)..";"..
 		stringFromBoolean(sale.isBuyout)..";"..
-		nilSafeStringFromString(sale.buyer);
+		nilSafeStringFromString(sale.buyer)..";"..
+		stringFromNumber(sale.sellerId);
 end
 
 -------------------------------------------------------------------------------
@@ -565,7 +568,7 @@ end
 -------------------------------------------------------------------------------
 function unpackSale(packedSale)
 	local sale = {};
-	_, _, sale.time, sale.result, sale.quantity, sale.bid, sale.buyout, sale.net, sale.price, sale.isBuyout, sale.buyer = string.find(packedSale, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, sale.time, sale.result, sale.quantity, sale.bid, sale.buyout, sale.net, sale.price, sale.isBuyout, sale.buyer, sale.sellerId = string.find(packedSale, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	sale.time = numberFromString(sale.time);
 	sale.result = numberFromString(sale.result);
 	sale.quantity = numberFromString(sale.quantity);
@@ -575,6 +578,7 @@ function unpackSale(packedSale)
 	sale.price = numberFromString(sale.price);
 	sale.isBuyout = booleanFromString(sale.isBuyout);
 	sale.buyer = stringFromNilSafeString(sale.buyer);
+	sale.sellerId = numberFromString(sale.sellerId);
 	return sale;
 end
 
@@ -583,10 +587,10 @@ end
 -- records.
 -------------------------------------------------------------------------------
 function getSalesTableForItem(item, create)
-	local salesTable = AHSales.Sales;
+	local salesTable = BeanCounterRealmDB.sales;
 	if (salesTable == nil) then
 		salesTable = {};
-		AHSales.Sales = salesTable;
+		BeanCounterRealmDB.sales = salesTable;
 	end
 	
 	-- Get the table for the item. Create or delete if appropriate.
@@ -606,8 +610,8 @@ end
 -------------------------------------------------------------------------------
 function getSoldItems(item)
 	local items = {};
-	if (AHSales.Sales) then
-		for item in AHSales.Sales do
+	if (BeanCounterRealmDB.sales) then
+		for item in BeanCounterRealmDB.sales do
 			local salesTable = getSalesTableForItem(item);
 			if (salesTable and table.getn(salesTable) > 0) then
 				table.insert(items, item);
@@ -637,9 +641,9 @@ end
 -------------------------------------------------------------------------------
 function printSales()
 	chatPrint("Sales:");
-	if (AHSales.Sales) then
-		for item in AHSales.Sales do
-			local salesTable = AHSales.Sales[item];
+	if (BeanCounterRealmDB.sales) then
+		for item in BeanCounterRealmDB.sales do
+			local salesTable = BeanCounterRealmDB.sales[item];
 			for index = 1, table.getn(salesTable) do
 				local sale = unpackSale(salesTable[index]);
 				printSale(chatPrint, nil, item, sale);
@@ -666,7 +670,8 @@ function printSale(printFunc, prefix, item, sale)
 		stringFromNumber(sale.net)..", "..
 		stringFromNumber(sale.price)..", "..
 		stringFromBoolean(sale.isBuyout)..", "..
-		nilSafeStringFromString(sale.buyer));
+		nilSafeStringFromString(sale.buyer)..", "..
+		nilSafeStringFromString(getPlayerName(sale.sellerId)));
 end
 
 --=============================================================================
@@ -703,18 +708,20 @@ function reconcileAuctionsByTime(item, reconcileTime)
 	local pendingAuctions = getPendingAuctionsForItem(
 		item, 
 		function(pendingAuction)
-			return (pendingAuction.time + (pendingAuction.runTime * 60) + AUCTION_OVERRUN_LIMIT < reconcileTime);
+			return (pendingAuction.sellerId == getCurrentPlayerId() and
+					pendingAuction.time + (pendingAuction.runTime * 60) + AUCTION_OVERRUN_LIMIT < reconcileTime);
 		end);
-	debugPrint(table.getn(pendingAuctions).." matching pending bids");
+	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
 
 	-- Get the list of completed auctions that completed before the specified
 	-- time.
 	local completedAuctions = getCompletedAuctionsForItem(
 		item,
 		function(completedAuction)
-			return (completedAuction.time < reconcileTime);
+			return (completedAuction.sellerId == getCurrentPlayerId() and
+					completedAuction.time < reconcileTime);
 		end);
-	debugPrint(table.getn(completedAuctions).." matching completed bids");
+	debugPrint(table.getn(completedAuctions).." matching completed auctions");
 
 	-- Reconcile the lists.
 	local reconciledAuctions = reconcileAuctionList(item, pendingAuctions, completedAuctions, true);
@@ -794,7 +801,8 @@ function reconcileAuctionsByQuantity(item, quantity)
 	local pendingAuctions = getPendingAuctionsForItem(
 		item, 
 		function(pendingAuction)
-			return (pendingAuction.quantity == quantity);
+			return (pendingAuction.sellerId == getCurrentPlayerId() and
+					pendingAuction.quantity == quantity);
 		end);
 	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
 
@@ -802,7 +810,8 @@ function reconcileAuctionsByQuantity(item, quantity)
 	local completedAuctions = getCompletedAuctionsForItem(
 		item,
 		function(completedAuction)
-			return (completedAuction.quantity == quantity);
+			return (completedAuction.sellerId == getCurrentPlayerId() and
+					completedAuction.quantity == quantity);
 		end);
 	debugPrint(table.getn(completedAuctions).." matching completed auctions");
 
@@ -830,7 +839,8 @@ function reconcileAuctionsByProceeds(item, proceeds)
 		function(pendingAuction)
 			local minProceeds = math.floor(pendingAuction.bid * (1 - pendingAuction.consignmentPercent)) + pendingAuction.deposit;
 			local maxProceeds = math.floor(pendingAuction.buyout * (1 - pendingAuction.consignmentPercent)) + pendingAuction.deposit;
-			return (minProceeds <= proceeds and proceeds <= maxProceeds);
+			return (pendingAuction.sellerId == getCurrentPlayerId() and
+					minProceeds <= proceeds and proceeds <= maxProceeds);
 		end);
 	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
 
@@ -838,7 +848,8 @@ function reconcileAuctionsByProceeds(item, proceeds)
 	local completedAuctions = getCompletedAuctionsForItem(
 		item,
 		function(completedAuction)
-			return (completedAuction.proceeds == proceeds);
+			return (completedAuction.sellerId == getCurrentPlayerId() and
+					completedAuction.proceeds == proceeds);
 		end);
 	debugPrint(table.getn(completedAuctions).." matching completed auctions");
 
@@ -1002,6 +1013,13 @@ function doesPendingAuctionMatchCompletedAuction(pendingAuction, completedAuctio
 	-- mail delivery lag and additional auction duration due to bidding.
 	local AUCTION_DURATION_CUSHION = (12 * 60 * 60); -- 12 hours
 
+	-- Check if seller ids match.
+	if (pendingAuction.sellerId ~= nil and 
+		completedAuction.sellerId ~= nil and
+		completedAuction.sellerId ~= pendingAuction.sellerId) then
+		return false;
+	end
+
 	-- Check if auction completed in a time frame that makes sense for the
 	-- the post time.
 	if (pendingAuction.time > completedAuction.time or 
@@ -1087,12 +1105,14 @@ function doesPendingAuctionListMatch(pendingAuctions)
 		local bid = pendingAuction.bid;
 		local buyout = pendingAuction.buyout;
 		local deposit = pendingAuction.deposit;
+		local sellerId = pendingAuction.sellerId;
 		for index = 2, table.getn(pendingAuctions) do
 			local pendingAuction = pendingAuctions[index];
 			if (quantity ~= pendingAuction.quantity or
 				bid ~= pendingAuction.bid or
 				buyout ~= pendingAuction.buyout or
-				deposit ~= pendingAuction.deposit) then
+				deposit ~= pendingAuction.deposit or
+				sellerId ~= pendingAuction.sellerId) then
 				match = false;
 				break;
 			elseif (pendingAuction.time < firstAuctionTime) then
@@ -1124,16 +1144,6 @@ end
 --=============================================================================
 -- Utility functions
 --=============================================================================
-
--------------------------------------------------------------------------------
--- Clears the sales database
--------------------------------------------------------------------------------
-function resetDatabase()
-	AHSales.PendingAuctions = {};
-	AHSales.CompletedAuctions = {};
-	AHSales.Sales = {};
-	debugPrint("Reset Database");
-end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
