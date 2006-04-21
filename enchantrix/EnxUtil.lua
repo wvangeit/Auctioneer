@@ -3,8 +3,8 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
-	General utility functions and localization helper functions
-	
+	General utility functions
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -21,133 +21,323 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --]]
 
--- Convert a single key in a table of configuration settings
-local function convertConfig(t, key, values, ...)
-	local v = nil;
-	
-	for i,localizedKey in ipairs(arg) do
-		if (t[localizedKey] ~= nil) then
-			v = t[localizedKey];
-			t[localizedKey] = nil;
+-- Global functions
+local isDisenchantable
+local getReagentInfo
+local getLinkFromName
+local getReagentPrice
+local getItemType
+local getItemIdFromSig
+local getItemIdFromLink
+local getSigFromLink
+
+local getRevision
+local split
+local spliterator
+local chatPrint
+
+local gcd
+local roundUp
+local digits
+local confidenceInterval
+
+local createProfiler
+
+------------------------
+--   Item functions   --
+------------------------
+
+function isDisenchantable(id)
+	-- Return false if item id can't be disenchanted
+	if (id) then
+		local _, _, quality, _, _, _, count, equip = GetItemInfo(id)
+		if (not quality) then
+			-- GetItemInfo() failed, item might be disenchantable
+			return true
+		end
+		if (not Enchantrix.Constants.InventoryTypes[equip]) then
+			-- Neither weapon nor armor
+			return false
+		end
+		if (quality and quality < 2) then
+			-- Low quality
+			return false
+		end
+		if (count and count > 1) then
+			-- Stackable item
+			return false
+		end
+		return true
+	end
+	return false
+end
+
+function getReagentInfo(id)
+	local cache = EnchantConfig.cache.reagentinfo
+
+	if type(id) == "string" then
+		local _, _, i = string.find(id, "item:(%d+):")
+		id = i
+	end
+	id = tonumber(id)
+
+	local sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture =
+		GetItemInfo(id)
+	if id and Enchantrix.Constants.StaticPrices[id] then
+		if sName then
+			cache[id] = sName.."|"..iQuality.."|"..sTexture
+			cache["t"] = sType
+		elseif type(cache[id]) == "string" then
+			local cdata = split(cache[id], "|")
+
+			sName = cdata[1]
+			iQuality = tonumber(cdata[2])
+			iLevel = 0
+			sType = cache["t"]
+			sSubtype = cache["t"]
+			iStack = 10
+			sEquip = ""
+			sTexture = cdata[3]
+			sLink = "item:"..id..":0:0:0"
 		end
 	end
-	if (t[key] ~= nil) then v = t[key]; end
-	
-	if (v ~= nil) then
-		if (values[v] ~= nil) then
-			t[key] = values[v];
-		else
-			t[key] = v;
+
+	if sName and id then
+		-- Might as well save this name while we have the data
+		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0"
+	end
+
+	return sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture
+end
+
+function getLinkFromName(name)
+	assert(type(name) == "string")
+
+	if not EnchantConfig.cache then
+		EnchantConfig.cache = {}
+	end
+	if not EnchantConfig.cache.names then
+		EnchantConfig.cache.names = {}
+	end
+
+	local link = EnchantConfig.cache.names[name]
+	if link then
+		local n = GetItemInfo(link)
+		if n ~= name then
+			EnchantConfig.cache.names[name] = nil
+		end
+	end
+	if not EnchantConfig.cache.names[name] then
+		for i = 1, Enchantrix.State.MAX_ITEM_ID + 4000 do
+			local n, link = GetItemInfo(i)
+			if n then
+				if n == name then
+					EnchantConfig.cache.names[name] = link
+					break
+				end
+				Enchantrix.State.MAX_ITEM_ID = math.max(Enchantrix.State.MAX_ITEM_ID, i)
+			end
+		end
+	end
+	return EnchantConfig.cache.names[name]
+end
+
+function getReagentPrice(reagentID)
+	-- reagentID ::= number | hyperlink
+	if type(reagentID) == "string" then
+		local _, _, i = string.find(reagentID, "item:(%d+):")
+		reagentID = i
+	end
+	reagentID = tonumber(reagentID)
+	if not reagentID then return nil end
+
+	local hsp, median, market
+
+	market = Enchantrix.Constants.StaticPrices[reagentID]
+
+	if Auctioneer then
+		local itemKey = string.format("%d:0:0", reagentID);
+		local realm
+		if Auctioneer.Util then
+			realm = Auctioneer.Util.GetAuctionKey()
+		end
+		if realm then
+			hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
+			median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
+		end
+	end
+
+	if not EnchantConfig.cache then EnchantConfig.cache = {} end
+	if not EnchantConfig.cache.prices then EnchantConfig.cache.prices = {} end
+	if not EnchantConfig.cache.prices[reagentID] then EnchantConfig.cache.prices[reagentID] = {} end
+	local cache = EnchantConfig.cache.prices[reagentID]
+	if cache.timestamp and time() - cache.timestamp > 172800 then
+		cache = {}
+	end
+
+	cache.hsp = hsp or cache.hsp
+	cache.median = median or cache.median
+	cache.market = market or cache.market
+	cache.timestamp = time()
+
+	return cache.hsp, cache.median, cache.market
+end
+
+function getItemType(id)
+	-- Return item level (rounded up to nearest 5 levels), quality and type as string,
+	-- e.g. "20:2:Armor" for uncommon level 20 armor
+	if (id) then
+		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
+		if (quality and quality >= 2 and level > 0 and Enchantrix.Constants.InventoryTypes[equip]) then
+			return string.format("%d:%d:%s", Enchantrix.Util.RoundUp(level, 5), quality, Enchantrix.Constants.InventoryTypes[equip])
 		end
 	end
 end
 
--- Convert Enchantrix filters to standardized keys and values
-function Enchantrix_ConvertFilters()
-	-- Abort if there's nothing to convert
-	if (not EnchantConfig or not EnchantConfig.filters) then return; end
-
-	-- Array that maps localized versions of strings to standardized
-	local convertOnOff = {	['apagado'] = 'off',	-- esES
-							['prendido'] = 'on',	-- esES
-							}
-	
-	local localeConvMap = { ['apagado'] = 'default',
-							['prendido'] = 'default',
-							['off'] = 'default',
-							['on'] = 'default',
-							}
-	
-	-- Format: standardizedKey,		valueMap,		esES,					deDE (old)			...
-	local conversions = {
-			{ 'all',				convertOnOff },
-			{ 'embed',				convertOnOff,	'integrar',				'zeige-eingebunden' },
-			{ 'header',				convertOnOff,	'titulo',				'zeige-kopf'},
-			{ 'counts',				convertOnOff,	'conteo',				'zeige-anzahl' },
-			{ 'rates',				convertOnOff,	'razones',				'zeige-kurs' },
-			{ 'valuate',			convertOnOff,	'valorizar',			'zeige-wert' },
-			{ 'valuate-hsp',		convertOnOff,	'valorizar-pmv',		'valuate-hvp' },
-			{ 'valuate-median',		convertOnOff,	'valorizar-mediano' },
-			{ 'valuate-baseline',	convertOnOff,	'valorizar-referencia', 'valuate-grundpreis' },
-			{ 'locale',				localeConvMap },
-		}
-		
-	-- Run the defined conversions
-	for i,c in ipairs(conversions) do
-		table.insert(c, 1, EnchantConfig.filters)
-		convertConfig(unpack(c))
+function getItemIdFromSig(sig)
+	-- Return item id and item suffix as integers
+	if (type(sig) == "string") then
+		local splt = Enchantrix.Util.Split(sig, ":")
+		return tonumber(splt[1]), tonumber(splt[3])
+	elseif (type(sig) == "number") then
+		return sig, 0
 	end
 end
 
-function Enchantrix_SetFilterDefaults()
-	if (not EnchantConfig) then EnchantConfig = {}; end
-	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
-	
-	for k,v in pairs(Enchantrix_FilterDefaults) do
-		if (EnchantConfig.filters[k] == nil) then
-			EnchantConfig.filters[k] = v;
-		end
+function getItemIdFromLink(link)
+	return (EnhTooltip.BreakLink(link))
+end
+
+function getSigFromLink(link)
+	assert(type(link) == "string")
+
+	local _, _, id, rand = string.find(link, "item:(%d+):%d+:(%d+):%d+")
+	if id and rand then
+		return id..":0:"..rand
 	end
 end
 
---------------------------------------
---		Localization functions		--
---------------------------------------
+-----------------------------------
+--   General Utility Functions   --
+-----------------------------------
 
-Enchantrix_CommandMap = nil;
-Enchantrix_CommandMapRev = nil;
-
-function Enchantrix_GetLocale()
-	local locale = Enchantrix_GetFilterVal('locale');
-	if (locale ~= 'default') then
-		return locale;
-	end
-	return GetLocale();
+-- Extract the revision number from SVN keyword string
+function getRevision(str)
+	if not str then return 0 end
+	local _, _, rev = string.find(str, "Revision: (%d+)")
+	return tonumber(rev) or 0
 end
 
-function Enchantrix_GetLocalizedCmdString(value)
-	return _ENCH('Cmd'..string.upper(string.sub(value,1,1))..string.sub(value,2))
-end
+function split(str, at)
+	local splut = {};
 
-function Enchantrix_DelocalizeFilterVal(value)
-	if (value == _ENCH('CmdOn')) then
-		return 'on';
-	elseif (value == _ENCH('CmdOff')) then
-		return 'off';
-	elseif (value == _ENCH('CmdDefault')) then
-		return 'default';
-	elseif (value == _ENCH('CmdToggle')) then
-		return 'toggle';
+	if (type(str) ~= "string") then return nil end
+	if (not str) then str = "" end
+
+	if (not at)
+		then table.insert(splut, str)
+
 	else
-		return value;
-	end	
+		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+			table.insert(splut, n);
+
+			if (c == '') then break end
+		end
+	end
+	return splut;
 end
 
-function Enchantrix_LocalizeFilterVal(value)
-	if (value == 'on' or value == 'off' or value == 'default') then
-		return Enchantrix_GetLocalizedCmdString(value)
-	else
-		return value;
+function spliterator(str, at)
+	local start
+	local found = 0
+	local done = (type(str) ~= "string")
+	return function()
+		if done then return nil end
+		start = found + 1
+		found = string.find(str, at, start, true)
+		if not found then
+			found = 0
+			done = true
+		end
+		return string.sub(str, start, found - 1)
 	end
 end
 
-function Enchantrix_GetLocalizedFilterVal(key)
-	return Enchantrix_LocalizeFilterVal(Enchantrix_GetFilterVal(key))
+function chatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
+	local frameIndex = Enchantrix.Config.GetFrameIndex();
+
+	if (cRed and cGreen and cBlue) then
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+
+		elseif (DEFAULT_CHAT_FRAME) then
+			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+		end
+
+	else
+		if getglobal("ChatFrame"..frameIndex) then
+			getglobal("ChatFrame"..frameIndex):AddMessage(text, 1.0, 0.5, 0.25);
+		elseif (DEFAULT_CHAT_FRAME) then
+			DEFAULT_CHAT_FRAME:AddMessage(text, 1.0, 0.5, 0.25);
+		end
+	end
 end
 
 
--- Turns a localized slash command into the generic English version of the command
-function Enchantrix_DelocalizeCommand(cmd)
-	if (not Enchantrix_CommandMap) then Enchantrix_BuildCommandMap();end
-	local result = Enchantrix_CommandMap[cmd];
-	if (result) then return result; else return cmd; end
+------------------------
+--   Math Functions   --
+------------------------
+
+function gcd(a, b)
+	-- Greatest Common Divisor, Euclidean algorithm
+	local m, n = tonumber(a), tonumber(b) or 0
+	while (n ~= 0) do
+		m, n = n, math.mod(m, n)
+	end
+	return m
 end
 
--- Translate a generic English slash command to the localized version, if available
-function Enchantrix_LocalizeCommand(cmd)
-	if (not Enchantrix_CommandMap) then	Enchantrix_BuildCommandMap(); end
-	local result = Enchantrix_CommandMapRev[cmd];
-	if (result) then return result; else return cmd; end
+function roundUp(m, n)
+	-- Round up m to nearest multiple of n
+	return math.ceil(m / n) * n
+end
+
+function digits(m, n, base)
+	-- Round m to n digits in given base
+	base = base or 10
+	if m == 0 then
+		return 0
+	elseif m < 0 then
+		return -digits(-m, n, base)
+	end
+	local d = base^(n - math.floor(math.log(m) / math.log(base)) - 1)
+	return math.floor(m * d + 0.5) / d
+end
+
+function confidenceInterval(p, n, z)
+	-- Returns confidence interval for binomial distribution given observed
+	-- probability p, sample size n, and z-value
+	if not z then
+		--[[
+		z		conf
+		1.282	80%
+		1.645	90%
+		1.960	95%
+		2.326	98%
+		2.576	99%
+		3.090	99.8%
+		3.291	99.9%
+		]]
+		z = 1.645
+	end
+	assert(p >= 0 and p <= 1)
+	assert(n > 0)
+
+	local a = p + z^2 / (2 * n)
+	local b = z * math.sqrt(p * (1 - p) / n + z^2 / (4 * n^2))
+	local c = 1 + z^2 / n
+
+	return (a - b) / c, (a + b) / c
 end
 
 ---------------------
@@ -208,8 +398,8 @@ local function _profilerMem(this)
 	end
 end
 
--- profiler = Enchantrix_CreateProfiler("foobar")
-function Enchantrix_CreateProfiler(name)
+-- profiler = Enchantrix.Util.CreateProfiler("foobar")
+function createProfiler(name)
 	return {
 		Start = _profilerStart,
 		Stop = _profilerStop,
@@ -219,3 +409,29 @@ function Enchantrix_CreateProfiler(name)
 		n = name,
 	}
 end
+
+Enchantrix.Util = {
+	REVISION			= "$Revision$",
+
+	IsDisenchantable	= isDisenchantable,
+	GetReagentInfo		= getReagentInfo,
+	GetLinkFromName		= getLinkFromName,
+	GetReagentPrice		= getReagentPrice,
+	GetItemType			= getItemType,
+	GetItemIdFromSig	= getItemIdFromSig,
+	GetItemIdFromLink	= getItemIdFromLink,
+	GetSigFromLink		= getSigFromLink,
+	SigFromLink			= sigFromLink,
+
+	GetRevision			= getRevision,
+	Split				= split,
+	Spliterator			= spliterator,
+	ChatPrint			= chatPrint,
+
+	GCD					= gcd,
+	RoundUp				= roundUp,
+	Digits				= digits,
+	ConfidenceInterval	= confidenceInterval,
+
+	CreateProfiler		= createProfiler,
+}

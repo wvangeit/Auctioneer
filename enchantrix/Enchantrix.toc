@@ -10,5 +10,15 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
-..\..\FrameXML\MoneyFrame.xml
-Enchantrix.xml
+Babylonian.lua
+DisenchantList.lua
+EnxObjects.lua
+EnxCommand.lua
+EnxConfig.lua
+EnxConstants.lua
+EnxLocale.lua
+EnxStorage.lua
+EnxStrings.lua
+EnxTooltip.lua
+EnxUtil.lua
+Enchantrix.lua

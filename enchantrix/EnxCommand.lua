@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	Slash command and GUI functions.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -21,17 +21,57 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --]]
 
-function Enchantrix_GetKhaosDefault(filter)
-	if (Enchantrix_FilterDefaults[filter] == 'on') then
-		return true;
-	elseif (Enchantrix_FilterDefaults[filter] == 'off') then
-		return false;
-	else
-		return Enchantrix_FilterDefaults[filter];
-	end
+-- Global functions
+local addonLoaded				-- Enchantrix.Command.AddonLoaded()
+local auctioneerLoaded			-- Enchantrix.Command.AuctioneerLoaded()
+local handleCommand				-- Enchantrix.Command.HandleCommand()
+local register					-- Enchantrix.Command.Register()
+local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
+local setKhaosSetKeyParameter	-- Enchantrix.Command.SetKhaosSetKeyParameter()
+local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
+
+-- Local functions
+local getKhaosLocaleList
+local registerKhaos
+local registerAuctioneerOptions
+local resetKhaos
+local chatPrintHelp
+local onOff
+local clear
+local default
+local genVarSet
+local percentLessFilter
+local bidBrokerFilter
+local profitComparisonSort
+local bidBrokerSort
+local doBidBroker
+local doPercentLess
+local getAuctionItemDisenchants
+
+-- Function references
+local _ENCH
+
+-- GUI Init Variables (Added by MentalPower)
+Enchantrix.State.GUI_Registered = nil
+Enchantrix.State.Khaos_Registered = nil
+
+-- Local variables
+local optionSet
+local profitMargins
+
+-- Local constants
+local MAX_BUYOUT_PRICE = 800000;
+local MIN_PROFIT_MARGIN = 1000;
+local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
+local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
+
+function addonLoaded()
+	_ENCH = Enchantrix.Locale.Localize
+
+	register()
 end
 
-local function getKhaosLocaleList()
+function getKhaosLocaleList()
 	local options = { [_ENCH('CmdDefault')] = 'default' };
 	for locale, data in EnchantrixLocalizations do
 		options[locale] = locale;
@@ -39,8 +79,8 @@ local function getKhaosLocaleList()
 	return options
 end
 
-function Enchantrix_Register_Khaos()
-	Enchantrix_optionSet = {
+function registerKhaos()
+	optionSet = {
 		id="Enchantrix";
 		text="Enchantrix";
 		helptext=_ENCH('GuiMainHelp');
@@ -61,9 +101,9 @@ function Enchantrix_Register_Khaos()
 				helptext=_ENCH('HelpOnoff');
 				callback=function(state)
 					if (state.checked) then
-						Enchantrix_OnOff('on');
+						onOff('on');
 					else
-						Enchantrix_OnOff('off');
+						onOff('off');
 					end
 				end;
 				feedback=function(state)
@@ -74,7 +114,7 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('all')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('all')};
 				disabled={checked=false};
 				difficulty=1;
 			};
@@ -90,14 +130,14 @@ function Enchantrix_Register_Khaos()
 				callback = function(state)
 				end;
 				feedback = function (state)
-					Enchantrix_SetLocale(state.value);
+					Enchantrix.Config.SetLocale(state.value);
 					return string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), state.value);
 				end;
 				default = {
-					value = Enchantrix_GetLocale();
+					value = Enchantrix.Config.GetLocale();
 				};
 				disabled = {
-					value = Enchantrix_GetLocale();
+					value = Enchantrix.Config.GetLocale();
 				};
 				dependencies={all={checked=true;}};
 				difficulty=2;
@@ -115,7 +155,7 @@ function Enchantrix_Register_Khaos()
 				helptext=_ENCH('HelpLoad');
 				callback=function(state) end;
 				feedback=function(state)
-					Enchantrix_Command("load " .. state.value, "GUI");
+					handleCommand("load " .. state.value, "GUI");
 				end;
 				default={value = 'always'};
 				disabled={value = 'never'};
@@ -147,7 +187,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiEmbed');
 				helptext=_ENCH('HelpEmbed');
 				callback=function(state)
-					Enchantrix_GenVarSet('embed', state.checked);
+					genVarSet('embed', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -157,7 +197,7 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('embed')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('embed')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
@@ -168,7 +208,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiCount');
 				helptext=_ENCH('HelpCount');
 				callback=function(state)
-					Enchantrix_GenVarSet('counts', state.checked);
+					genVarSet('counts', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -178,18 +218,18 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('counts')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('counts')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
-			};			
+			};
 			--[[{
 				id="rates";
 				type=K_TEXT;
 				text=_ENCH('GuiRate');
 				helptext=_ENCH('HelpRate');
 				callback=function(state)
-					Enchantrix_GenVarSet('rates', state.checked);
+					genVarSet('rates', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -199,7 +239,7 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('rates')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('rates')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
@@ -217,7 +257,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiValuateEnable');
 				helptext=_ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer');
 				callback=function(state)
-					Enchantrix_GenVarSet('valuate', state.checked);
+					genVarSet('valuate', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -227,7 +267,7 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('valuate')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('valuate')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
@@ -238,7 +278,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiValuateBaseline');
 				helptext=_ENCH('HelpGuessBaseline');
 				callback=function(state)
-					Enchantrix_GenVarSet('valuate-baseline', state.checked);
+					genVarSet('valuate-baseline', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -248,7 +288,7 @@ function Enchantrix_Register_Khaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix_GetKhaosDefault('valuate-baseline')};
+				default={checked=Enchantrix.Config.GetFilterDefaults('valuate-baseline')};
 				disabled={checked=false};
 				dependencies={valuate={checked=true;}, all={checked=true;}};
 				difficulty=2;
@@ -269,7 +309,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiClearall');
 				helptext=_ENCH('GuiClearallHelp');
 				callback=function()
-					Enchantrix_Clear(_ENCH('CmdClearAll'));
+					clear(_ENCH('CmdClearAll'));
 				end;
 				feedback=function()
 					return string.format(_ENCH('FrmtActClearall'),  _ENCH('GuiClearallNote'));
@@ -285,8 +325,8 @@ function Enchantrix_Register_Khaos()
 				};
 				text=_ENCH('GuiDefaultAll');
 				helptext=_ENCH('GuiDefaultAllHelp');
-				callback=function() 
-					Enchantrix_Default(_ENCH('CmdClearAll'));
+				callback=function()
+					default(_ENCH('CmdClearAll'));
 				end;
 				feedback=function()
 					return _ENCH('FrmtActDefaultAll');
@@ -298,23 +338,23 @@ function Enchantrix_Register_Khaos()
 				id="printframe";
 				type=K_PULLDOWN;
 				setup = {
-					options = Enchantrix_GetFrameNames();
+					options = Enchantrix.Config.GetFrameNames();
 					multiSelect = false;
 				};
 				text=_ENCH('GuiPrintin');
 				helptext=_ENCH('HelpPrintin');
 				callback=function(state)
-					Enchantrix_SetFrame(state.value);
+					Enchantrix.Config.SetFrame(state.value);
 				end;
 				feedback=function(state)
-					local _, frameName = Enchantrix_GetFrameNames(state.value)
+					local _, frameName = Enchantrix.Config.GetFrameNames(state.value)
 					return string.format(_ENCH('FrmtPrintin'), frameName);
 				end;
 				default = {
-					value=Enchantrix_GetFrameIndex();
+					value=Enchantrix.Config.GetFrameIndex();
 				};
 				disabled = {
-					value=Enchantrix_GetFrameIndex();
+					value=Enchantrix.Config.GetFrameIndex();
 				};
 				dependencies={all={checked=true;}};
 				difficulty=3;
@@ -328,7 +368,7 @@ function Enchantrix_Register_Khaos()
 				text=_ENCH('GuiDefaultOption');
 				helptext=_ENCH('HelpDefault');
 				callback = function(state)
-					Enchantrix_Default(state.value);
+					default(state.value);
 				end;
 				feedback = function (state)
 					if (state.value == _ENCH('CmdClearAll')) then
@@ -349,19 +389,18 @@ function Enchantrix_Register_Khaos()
 		};
 	};
 
-	Khaos.registerOptionSet("tooltip",Enchantrix_optionSet);
-	Enchantrix_Khaos_Registered = true;
+	Khaos.registerOptionSet("tooltip",optionSet);
+	Enchantrix.State.Khaos_Registered = true;
 	Khaos.refresh();
-	
+
 	return true;
 end
 
-function Enchantrix_AuctioneerLoaded()
-	if (not Enchantrix_Khaos_Registered) then return; end
+function registerAuctioneerOptions()
+	local insertPos = table.foreachi(optionSet.options, function(i, v) if v.id == "valuate" then return i + 1 end end)
+	assert(insertPos)
 
-	local insertPos = 10;
-
-	if (Enchantrix_optionSet.options[insertPos].id == 'valuate-hsp') then
+	if (optionSet.options[insertPos].id == 'valuate-hsp') then
 		return;
 	end
 
@@ -372,7 +411,7 @@ function Enchantrix_AuctioneerLoaded()
 			text=_ENCH('GuiValuateAverages');
 			helptext=_ENCH('HelpGuessAuctioneerHsp');
 			callback=function(state)
-				Enchantrix_GenVarSet('valuate-hsp', state.checked);
+				genVarSet('valuate-hsp', state.checked);
 			end;
 			feedback=function(state)
 				if (state.checked) then
@@ -382,7 +421,7 @@ function Enchantrix_AuctioneerLoaded()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix_GetKhaosDefault('valuate-hsp')};
+			default={checked = Enchantrix.Config.GetFilterDefaults('valuate-hsp')};
 			disabled={checked = false};
 			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
@@ -393,7 +432,7 @@ function Enchantrix_AuctioneerLoaded()
 			text=_ENCH('GuiValuateMedian');
 			helptext=_ENCH('HelpGuessAuctioneerMedian');
 			callback=function(state)
-				Enchantrix_GenVarSet('valuate-median', state.checked);
+				genVarSet('valuate-median', state.checked);
 			end;
 			feedback=function(state)
 				if (state.checked) then
@@ -403,27 +442,40 @@ function Enchantrix_AuctioneerLoaded()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix_GetKhaosDefault('valuate-median')};
+			default={checked = Enchantrix.Config.GetFilterDefaults('valuate-median')};
 			disabled={checked = false};
 			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
 		};
 	};
 
-	Khaos.unregisterOptionSet("Enchantrix");
+	optionSet.options[insertPos - 1].helptext = _ENCH('HelpValue');
 
-	Enchantrix_optionSet.options[insertPos - 1].helptext = _ENCH('HelpValue');
-	
 	for i, opt in ipairs(AuctioneerOptions) do
-		tinsert(Enchantrix_optionSet.options, insertPos + i - 1, opt);
+		tinsert(optionSet.options, insertPos + i - 1, opt);
 	end
-	
-	Khaos.registerOptionSet("tooltip", Enchantrix_optionSet);
+
+	Khaos.unregisterOptionSet("Enchantrix");
+	Khaos.registerOptionSet("tooltip", optionSet);
 	Khaos.refresh();
 end
 
-local function setKhaosSetKeyParameter(key, parameter, value)
-	if (Enchantrix_Khaos_Registered) then
+function auctioneerLoaded(hookParam)
+	if hookParam and hookParam[1] == true then
+		Stubby.UnregisterAddOnHook("Auctioneer", "Enchantrix")
+	end
+
+	-- TODO: Check Auctioneer version
+
+	Enchantrix.State.Auctioneer_Loaded = true
+
+	if Enchantrix.State.Khaos_Registered then
+		registerAuctioneerOptions()
+	end
+end
+
+function setKhaosSetKeyParameter(key, parameter, value)
+	if (Enchantrix.State.Khaos_Registered) then
 		if (Khaos.getSetKey("Enchantrix", key)) then
 			Khaos.setSetKeyParameter("Enchantrix", key, parameter, value)
 		else
@@ -432,8 +484,8 @@ local function setKhaosSetKeyParameter(key, parameter, value)
 	end
 end
 
-local function setKhaosSetKeyValue(key, value)
-	if (Enchantrix_Khaos_Registered) then
+function setKhaosSetKeyValue(key, value)
+	if (Enchantrix.State.Khaos_Registered) then
 		local kKey = Khaos.getSetKey("Enchantrix", key)
 
 		if (not kKey) then
@@ -449,60 +501,28 @@ local function setKhaosSetKeyValue(key, value)
 	end
 end
 
-local function resetKhaos()
-	if (Enchantrix_Khaos_Registered) then
+function resetKhaos()
+	if Enchantrix.State.Khaos_Registered then
 
 		Khaos.unregisterOptionSet("Enchantrix");
-		Enchantrix_Khaos_Registered = false;
+		Enchantrix.State.Khaos_Registered = false;
 
-		Enchantrix_Register_Khaos();
+		registerKhaos();
 
-		if(Auctioneer) then
-			Enchantrix_AuctioneerLoaded();
+		if Enchantrix.State.Auctioneer_Loaded then
+			registerAuctioneerOptions()
 		end
 	end
 end
 
-function Enchantrix_BuildCommandMap()
-	Enchantrix_CommandMap = {
-			[_ENCH('CmdOn')] = 'on',
-			[_ENCH('CmdOff')] = 'off',
-			[_ENCH('CmdHelp')] = 'help',
-			[_ENCH('CmdToggle')] = 'toggle',
-			[_ENCH('CmdDisable')] = 'disable',
-			[_ENCH('CmdClear')] = 'clear',
-			[_ENCH('CmdLocale')] = 'locale',
-			[_ENCH('CmdDefault')] = 'default',
-			[_ENCH('CmdPrintin')] = 'print-in',
-			[_ENCH('CmdFindBidauct')] = 'bidbroker',
-			[_ENCH('CmdFindBidauctShort')] = 'bidbroker',
-			[_ENCH('CmdFindBuyauct')] = 'percentless',
-			[_ENCH('CmdFindBuyauctShort')] = 'percentless',
-			[_ENCH('ShowEmbed')] = 'embed',
-			[_ENCH('ShowCount')] = 'counts',
-			-- [_ENCH('ShowRate')] = 'rates',
-			-- [_ENCH('ShowHeader')] = 'header',
-			[_ENCH('ShowValue')] = 'valuate',
-			[_ENCH('ShowGuessAuctioneerHsp')] = 'valuate-hsp',
-			[_ENCH('ShowGuessAuctioneerMed')] = 'valuate-median',
-			[_ENCH('ShowGuessBaseline')] = 'valuate-baseline',
-		}
-
-	Enchantrix_CommandMapRev = {}
-	for k,v in pairs(Enchantrix_CommandMap) do
-		Enchantrix_CommandMapRev[v] = k;
-	end
-end
-
-
 -- Cleaner Command Handling Functions (added by MentalPower)
-function Enchantrix_Command(command, source)
+function handleCommand(command, source)
 
 	-- To print or not to print, that is the question...
 	local chatprint = nil;
-	if (source == "GUI") then 
+	if (source == "GUI") then
 		chatprint = false;
-	else 
+	else
 		chatprint = true;
 	end;
 
@@ -511,21 +531,21 @@ function Enchantrix_Command(command, source)
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
 	if (not param) then param = "" end
-	cmd = Enchantrix_DelocalizeCommand(cmd)
+	cmd = Enchantrix.Locale.DelocalizeCommand(cmd)
 
 
 	if ((cmd == "") or (cmd == "help")) then
 		-- /enchantrix help
-		Enchantrix_ChatPrint_Help();
+		chatPrintHelp();
 		return;
 
 	elseif ((cmd == "on") or (cmd == "off") or (cmd == "toggle")) then
 		-- /enchantrix on|off|toggle
-		Enchantrix_OnOff(cmd, chatprint);
+		onOff(cmd, chatprint);
 
 	elseif (cmd == 'disable') then
 		-- /enchantrix disable
-		Enchantrix_ChatPrint(_ENCH('MesgDisable'));
+		Enchantrix.Util.ChatPrint(_ENCH('MesgDisable'));
 		Stubby.SetConfig("Enchantrix", "LoadType", "never");
 
 	elseif (cmd == 'load') then
@@ -533,105 +553,105 @@ function Enchantrix_Command(command, source)
 		if (param == "always") or (param == "never") then
 			Stubby.SetConfig("Enchantrix", "LoadType", param);
 			if (chatprint) then
-				Enchantrix_ChatPrint("Setting Enchantrix to "..param.." load for this toon");
+				Enchantrix.Util.ChatPrint("Setting Enchantrix to "..param.." load for this toon");
 				setKhaosSetKeyValue("LoadSettings", param)
 			end
 		end
 
 	elseif (cmd == 'clear') then
 		-- /enchantrix clear
-		Enchantrix_Clear(param, chatprint);
+		clear(param, chatprint);
 
 	elseif (cmd == 'locale') then
 		-- /enchantrix locale
-		Enchantrix_SetLocale(param, chatprint);
+		Enchantrix.Locale.SetLocale(param, chatprint);
 
 	elseif (cmd == 'default') then
 		-- /enchantrix default
-		Enchantrix_Default(param, chatprint);
+		default(param, chatprint);
 
 	elseif (cmd == 'print-in') then
 		-- /enchantrix print-in
-		Enchantrix_SetFrame(param, chatprint)
+		Enchantrix.Config.SetFrame(param, chatprint)
 
 	elseif (cmd == 'bidbroker' or cmd == 'bb') then
 		-- /enchantrix bidbroker
-		Enchantrix_DoBidBroker(param);
+		doBidBroker(param);
 
 	elseif (cmd == 'percentless' or cmd == 'pl') then
-		Enchantrix_DoPercentLess(param);
+		doPercentLess(param);
 
 	-- elseif (cmd == _ENCH('ShowHeader') or cmd == 'header') then
-	--	Enchantrix_GenVarSet('header', param, chatprint);
+	--	genVarSet('header', param, chatprint);
 
 	elseif (cmd=='embed' or cmd=='valuate' or cmd=='counts' or
 			-- cmd=='rates' or
 			cmd=='valuate-hsp' or cmd=='valuate-median' or cmd=='valuate-baseline') then
-		Enchantrix_GenVarSet(cmd, param, chatprint);
+		genVarSet(cmd, param, chatprint);
 
 	elseif (chatprint) then
-		Enchantrix_ChatPrint(string.format(_ENCH('FrmtActUnknown'), cmd));
+		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActUnknown'), cmd));
 	end
 end
 
 -- Help ME!! (The Handler) (Another shameless copy from the original function)
-function Enchantrix_ChatPrint_Help()
-Enchantrix_ChatPrint(_ENCH('FrmtUsage'));
-		local onOffToggle = " (".._ENCH('CmdOn').."|".._ENCH('CmdOff').."|".._ENCH('CmdToggle')..")";
-		local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
+function chatPrintHelp()
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtUsage'));
+	local onOffToggle = " (".._ENCH('CmdOn').."|".._ENCH('CmdOff').."|".._ENCH('CmdToggle')..")";
+	local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
-		Enchantrix_ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix_GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
-		
-		Enchantrix_ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
+	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix.Locale.GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
 
-		-- Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowHeader'), Enchantrix_GetLocalizedFilterVal('header'), _ENCH('HelpHeader')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowCount'), Enchantrix_GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
-		-- Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowRate'), Enchantrix_GetLocalizedFilterVal('rates'), _ENCH('HelpRate')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowEmbed'), Enchantrix_GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowValue'), Enchantrix_GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
-		if (Auctioneer) then
-			Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerHsp'), Enchantrix_GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
-			Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerMed'), Enchantrix_GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
-		else
-			Enchantrix_ChatPrint(_ENCH('HelpGuessNoauctioneer'));
-		end
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('ShowGuessBaseline'), Enchantrix_GetLocalizedFilterVal('valuate-baseline'), _ENCH('HelpGuessBaseline')));
+	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
 
-		lineFormat = "  |cffffffff/enchantrix %s %s|r - %s";
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdLocale'), _ENCH('OptLocale'), _ENCH('HelpLocale')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdClear'), _ENCH('OptClear'), _ENCH('HelpClear')));
+	-- Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowHeader'), Enchantrix.Locale.GetLocalizedFilterVal('header'), _ENCH('HelpHeader')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
+	-- Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowRate'), Enchantrix.Locale.GetLocalizedFilterVal('rates'), _ENCH('HelpRate')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
+	if Enchantrix.State.Auctioneer_Loaded then
+		Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
+		Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerMed'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
+	else
+		Enchantrix.Util.ChatPrint(_ENCH('HelpGuessNoauctioneer'));
+	end
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessBaseline'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-baseline'), _ENCH('HelpGuessBaseline')));
 
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdFindBidauct'), _ENCH('OptFindBidauct'), _ENCH('HelpFindBidauct')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdFindBuyauct'), _ENCH('OptFindBuyauct'), _ENCH('HelpFindBuyauct')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
-		Enchantrix_ChatPrint(string.format(lineFormat, _ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
+	lineFormat = "  |cffffffff/enchantrix %s %s|r - %s";
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdLocale'), _ENCH('OptLocale'), _ENCH('HelpLocale')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdClear'), _ENCH('OptClear'), _ENCH('HelpClear')));
+
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdFindBidauct'), _ENCH('OptFindBidauct'), _ENCH('HelpFindBidauct')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdFindBuyauct'), _ENCH('OptFindBuyauct'), _ENCH('HelpFindBuyauct')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
 end
 
--- The Enchantrix_OnOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
+-- The onOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
 -- If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
 -- If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
 -- If no keyword is specified then the function will simply return the current state
 --
 -- If chatprint is "true" then the state will also be printed to the user.
 
-function Enchantrix_OnOff(state, chatprint)
-	state = Enchantrix_DelocalizeFilterVal(state)
+function onOff(state, chatprint)
+	state = Enchantrix.Locale.DelocalizeFilterVal(state)
 
-	if ((state == nil) or (state == "")) then
-		state = Enchantrix_GetFilterVal("all");
-	elseif (state == 'on' or state == 'off') then
-		Enchantrix_SetFilter('all', state);
+	if (state == nil) or (state == "") then
+		state = Enchantrix.Config.GetFilter("all");
+	elseif (state == 'on') or (state == 'off') then
+		Enchantrix.Config.SetFilter('all', state);
 	elseif (state == "toggle") then
-		Enchantrix_SetFilter('all', not Enchantrix_GetFilter('all'))
+		Enchantrix.Config.SetFilter('all', not Enchantrix.Config.GetFilter('all'))
 	end
 
 	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
-	if (chatprint == true) then
-		if (Enchantrix_GetFilter('all')) then
-			Enchantrix_ChatPrint(_ENCH('StatOn'));
+	if chatprint then
+		if Enchantrix.Config.GetFilter('all') then
+			Enchantrix.Util.ChatPrint(_ENCH('StatOn'));
 			setKhaosSetKeyParameter('all', "checked", true);
 		else
-			Enchantrix_ChatPrint(_ENCH('StatOff'));
+			Enchantrix.Util.ChatPrint(_ENCH('StatOff'));
 			setKhaosSetKeyParameter('all', "checked", false);
 		end
 	end
@@ -640,284 +660,285 @@ function Enchantrix_OnOff(state, chatprint)
 end
 
 -- The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
-function Enchantrix_Clear(param, chatprint)
-	if ((param == _ENCH('CmdClearAll')) or (param == "all")) then		
-		EnchantedLocal = {};
+function clear(param, chatprint)
+	if (param == _ENCH('CmdClearAll')) or (param == "all") then
+		EnchantedLocal = {}
 		if (chatprint) then
-			Enchantrix_ChatPrint(_ENCH('FrmtActClearall'));
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActClearall'));
 		end
 	else
 		for link in string.gfind(param, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%b[]|h|r") do
-			local sig = Enchantrix_SigFromLink(link)
+			local sig = Enchantrix.Util.GetSigFromLink(link)
 			EnchantedLocal[sig] = nil
 
 			if (chatprint) then
-				Enchantrix_ChatPrint(string.format(_ENCH('FrmtActClearOk'), link))
+				Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActClearOk'), link))
 			end
 		end
 	end
-end
-
-local function isValidLocale(param)
-
-	--EnhTooltip.DebugPrint("Enchantrix.isValidlocale("..param..")");
-
-	if((EnchantrixLocalizations) and (EnchantrixLocalizations[param])) then
-		return true;
-
-	else
-		return false;
-	end
-end
-
-function Enchantrix_SetLocale(param, chatprint, updateKhaos)
-	param = Enchantrix_DelocalizeFilterVal(param)
-
-	if not Enchantrix_LocaleLastSet then 
-		Enchantrix_LocaleLastSet = ""; 
-	end
-
-	if not Babylonian.IsAddOnRegistered("Enchantrix") then 
-		Babylonian.RegisterAddOn("Enchantrix", Enchantrix_SetLocale);
-	end
-
-	local validLocale = nil;
-
-	if (param == Enchantrix_LocaleLastSet) then
-		validLocale = true;
-
-	elseif (param == 'default') or (param == 'off') then
-		Babylonian.SetOrder('');
-		validLocale = true;
-
-	elseif (isValidLocale(param)) then
-		Babylonian.SetOrder(param);
-		validLocale = true;
-
-	else
-		validLocale = false;
-	end
-
-
-	if (chatprint) then
-		if (validLocale) then
-			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param));
-			if not (param == Enchantrix_LocaleLastSet) then
-				setKhaosSetKeyValue('locale', param);
-			end
-
-		else
-			Enchantrix_ChatPrint(string.format(_ENCH("FrmtActUnknownLocale"), param));
-			local locales = "    ";
-			for locale, data in pairs(EnchantrixLocalizations) do
-				locales = locales .. " '" .. locale .. "' ";
-			end
-			Enchantrix_ChatPrint(locales);
-		end
-	end
-
-	if (Khaos and Enchantrix_Khaos_Registered) then
-		if not ((param == Enchantrix_LocaleLastSet)) or (updateKhaos) then
-			if (updateKhaos) then
-				EnhTooltip.DebugPrint("Enchantrix: Babylonian.GetOrder() = "..Babylonian.GetOrder());
-				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
-			end
-			resetKhaos();
-		end
-	end
-
-	if (param) then 
-		Enchantrix_LocaleLastSet = param;
-	end
-
-	Enchantrix_CommandMap = nil;
-	Enchantrix_CommandMapRev = nil;
 end
 
 -- This function was added by MentalPower to implement the /enx default command
-function Enchantrix_Default(param, chatprint)
+function default(param, chatprint)
 	local paramLocalized
 
-	if ( (param == nil) or (param == "") ) then
+	if (param == nil) or (param == "") then
 		return
-
-	elseif ((param == _ENCH('CmdClearAll')) or (param == "all")) then
+	elseif (param == _ENCH('CmdClearAll')) or (param == "all") then
 		param = "all"
-		EnchantConfig.filters = {};
-
+		EnchantConfig.filters = {}
 	else
 		paramLocalized = param
-		param = Enchantrix_DelocalizeCommand(param)
-		Enchantrix_SetFilter(param, nil);
+		param = Enchantrix.Locale.DelocalizeCommand(param)
+		Enchantrix.Config.SetFilter(param, nil)
 	end
 
-	Enchantrix_SetFilterDefaults();		-- Apply defaults for settings that went missing 
-
 	if (chatprint) then
-
 		if (param == "all") then
-			Enchantrix_ChatPrint(_ENCH('FrmtActDefaultAll'));
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefaultAll'));
 
 			for k,v in pairs(EnchantConfig.filters) do
-				setKhaosSetKeyValue(k, Enchantrix_GetFilter(k));
+				setKhaosSetKeyValue(k, Enchantrix.Config.GetFilter(k));
 			end
 
 		else
-			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActDefault'), paramLocalized));
-			setKhaosSetKeyValue(param, Enchantrix_GetFilter(param));
+			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActDefault'), paramLocalized));
+			setKhaosSetKeyValue(param, Enchantrix.Config.GetFilter(param));
 		end
 	end
 end
 
+function genVarSet(variable, param, chatprint)
 
+	param = Enchantrix.Locale.DelocalizeFilterVal(param);
 
--- The following three functions were added by MentalPower to implement the /enx print-in command
-function Enchantrix_GetFrameNames(index)
-
-	local frames = {};
-	local frameName = "";
-
-	for i=1,10 do 
-		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i);
-
-		if ( name == "" ) then 
-
-			if (i == 1) then
-				frames[_ENCH('TextGeneral')] = 1;
-
-			elseif (i == 2) then
-				frames[_ENCH('TextCombat')] = 2;
-			end
-
-		else 
-			frames[name] = i;
-		end
-	end
-
-	if (index) then
-		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(index);
-		if ( name == "" ) then 
-
-			if (index == 1) then
-				frameName = _ENCH('TextGeneral');
-
-			elseif (index == 2) then
-				frameName = _ENCH('TextCombat');
-			end
-
-		else 
-			frameName = name;
-		end
-	end
-
-	return frames, frameName;
-end
-
-
-function Enchantrix_GetFrameIndex()
-
-	if (not EnchantConfig.filters) then EnchantConfig.filters = {}; end
-	local value = EnchantConfig.filters['printframe'];
-
-	if (not value) then
-		return 1;
-	end
-
-	return value;
-end
-
-
-function Enchantrix_SetFrame(frame, chatprint)
-
-	local frameNumber
-	local frameVal
-	frameVal = tonumber(frame)
-
-	-- If no arguments are passed, then set it to the default frame.
-	if not (frame) then 
-		frameNumber = 1;
-
-	-- If the frame argument is a number then set our chatframe to that number.
-	elseif ((frameVal) ~= nil) then 
-		frameNumber = frameVal;
-
-	-- If the frame argument is a string, find out if there's a chatframe with that name, and set our chatframe to that index. If not set it to the default frame.
-	elseif (type(frame) == "string") then
-		allFrames = Enchantrix_GetFrameNames();
-
-		if (allFrames[frame]) then
-			frameNumber = allFrames[frame];
-
-		else
-			frameNumber = 1;
-		end
-
-	-- If the argument is something else, set our chatframe to it's default value.
-	else
-		frameNumber = 1;
-	end
-
-	local _, frameName
-
-	if (chatprint == true) then
-		_, frameName = Enchantrix_GetFrameNames(frameNumber);
-
-		if (Enchantrix_GetFrameIndex() ~= frameNumber) then
-			Enchantrix_ChatPrint(string.format(_ENCH('FrmtPrintin'), frameName));
-		end
-	end
-
-	Enchantrix_SetFilter("printframe", frameNumber);
-
-	if (chatprint == true) then
-		Enchantrix_ChatPrint(string.format(_ENCH('FrmtPrintin'), frameName));
-		setKhaosSetKeyValue("printframe", frameNumber);
-	end
-end
-
-
-
-function Enchantrix_GenVarSet(variable, param, chatprint)
-
-	if (type(param) == "boolean") then
-		if (param) then param = 'on'; else param = 'off'; end
-
-	else
-		param = Enchantrix_DelocalizeFilterVal(param);	
-	end
-
-	if (param == 'on' or param == 'off') then
-		Enchantrix_SetFilter(variable, param);
+	if (param == true or param == false) then
+		Enchantrix.Config.SetFilter(variable, param);
 
 	elseif (param == 'toggle' or param == nil or param == "") then
-		Enchantrix_SetFilter(variable, not Enchantrix_GetFilter(variable))
+		Enchantrix.Config.SetFilter(variable, not Enchantrix.Config.GetFilter(variable))
 	end
 
 	if (chatprint) then
-		if (Enchantrix_GetFilter(variable)) then
-			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActEnable'), Enchantrix_LocalizeCommand(variable)));
+		if (Enchantrix.Config.GetFilter(variable)) then
+			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActEnable'), Enchantrix.Locale.LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", true);
 
 		else
-			Enchantrix_ChatPrint(string.format(_ENCH('FrmtActDisable'), Enchantrix_LocalizeCommand(variable)));
+			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActDisable'), Enchantrix.Locale.LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", false);
 		end
 	end
 end
 
-function Enchantrix_Register()
+function register()
 
 	if (Khaos) then
-		if (not Enchantrix_Khaos_Registered) then
-			Enchantrix_GUI_Registered = Enchantrix_Register_Khaos();
+		if (not Enchantrix.State.Khaos_Registered) then
+			Enchantrix.State.GUI_Registered = registerKhaos();
 		end
 	end
 
 	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
-	if (Enchantrix_GUI_Registered == true) then
-		return true;
-
-	else 
-		return false;
-	end
+	return (Enchantrix.State.GUI_Registered == true)
 end
+
+---------------------------------------
+--   Auctioneer dependant commands   --
+---------------------------------------
+
+function percentLessFilter(percentLess, signature)
+    local filterAuction = true;
+    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
+	local disenchantsTo = getAuctionItemDisenchants(signature, true);
+	if not disenchantsTo.totals then return filterAuction; end
+
+	local hspValue = disenchantsTo.totals.hspValue or 0;
+	local medValue = disenchantsTo.totals.medValue or 0;
+	local mktValue = disenchantsTo.totals.mktValue or 0;
+	local confidence = disenchantsTo.totals.conf or 0;
+
+	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
+	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
+	local profit = (myValue * count) - buyout;
+
+	local results = {
+		buyout = buyout,
+		count = count,
+		value = myValue,
+		margin = margin,
+		profit = profit,
+		conf = confidence
+	};
+	if (buyout > 0) and (margin >= tonumber(percentLess)) and (profit >= MIN_PROFIT_MARGIN) then
+		filterAuction = false;
+		profitMargins[signature] = results;
+	end
+
+	return filterAuction;
+end
+
+function bidBrokerFilter(minProfit, signature)
+    local filterAuction = true;
+    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
+    local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
+	local disenchantsTo = getAuctionItemDisenchants(signature, true);
+	if not disenchantsTo.totals then return filterAuction; end
+
+	local hspValue = disenchantsTo.totals.hspValue or 0;
+	local medValue = disenchantsTo.totals.medValue or 0;
+	local mktValue = disenchantsTo.totals.mktValue or 0;
+	local confidence = disenchantsTo.totals.conf or 0;
+
+	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
+	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
+	local profit = (myValue * count) - currentBid;
+    local profitPricePercent = math.floor((profit / currentBid) * 100);
+
+	local results = {
+		buyout = buyout,
+		count = count,
+		value = myValue,
+		margin = margin,
+		profit = profit,
+		conf = confidence
+	};
+	if (currentBid <= MAX_BUYOUT_PRICE) and (profit >= tonumber(minProfit)) and (profit >= MIN_PROFIT_MARGIN) and (profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+		filterAuction = false;
+		profitMargins[signature] = results;
+	end
+	return filterAuction;
+end
+
+function profitComparisonSort(a, b)
+	if (not a) or (not b) then return false; end
+	local aSig = a.signature;
+	local bSig = b.signature;
+	if (not aSig) or (not bSig) then return false; end
+	local aEpm = profitMargins[aSig];
+	local bEpm = profitMargins[bSig];
+	if (not aEpm) and (not bEpm) then return false; end
+	local aProfit = aEpm.profit or 0;
+	local bProfit = bEpm.profit or 0;
+	local aMargin = aEpm.margin or 0;
+	local bMargin = bEpm.margin or 0;
+	local aValue  = aEpm.value or 0;
+	local bValue  = bEpm.value or 0;
+	if (aProfit > bProfit) then return true; end
+	if (aProfit < bProfit) then return false; end
+	if (aMargin > bMargin) then return true; end
+	if (aMargin < bMargin) then return false; end
+	if (aValue > bValue) then return true; end
+	if (aValue < bValue) then return false; end
+	return false;
+end
+
+function bidBrokerSort(a, b)
+	if (not a) or (not b) then return false; end
+	local aTime = a.timeLeft or 0;
+	local bTime = b.timeLeft or 0;
+	if (aTime > bTime) then return true; end
+	if (aTime < bTime) then return false; end
+	return profitComparisonSort(a, b);
+end
+
+function doPercentLess(percentLess)
+	if not Auctioneer then
+		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+		return;
+	elseif not (Auctioneer.Filter and Auctioneer.Filter.QuerySnapshot) then
+		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
+		return;
+	end
+
+	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
+	local output = string.format(_ENCH('FrmtPctlessHeader'), percentLess);
+	Enchantrix.Util.ChatPrint(output);
+
+	Enchantrix.Storage.Price_Cache = {t=time()};
+	profitMargins = {};
+	local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess);
+
+	-- sort by profit based on median
+	table.sort(targetAuctions, profitComparisonSort);
+
+	-- output the list of auctions
+	for _,a in targetAuctions do
+		if (a.signature and profitMargins[a.signature]) then
+			local quality = EnhTooltip.QualityFromLink(a.itemLink);
+			if (quality and quality >= 2) then
+				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
+				local value = profitMargins[a.signature].value;
+				local margin = profitMargins[a.signature].margin;
+				local profit = profitMargins[a.signature].profit;
+				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"));
+				Enchantrix.Util.ChatPrint(output);
+			end
+		end
+	end
+
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessDone'));
+end
+
+function doBidBroker(minProfit)
+	if not Auctioneer then
+		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+		return;
+	elseif not (Auctioneer.Filter and Auctioneer.Filter.QuerySnapshot) then
+		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
+		return;
+	end
+
+	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN; else minProfit = tonumber(minProfit) * 100; end
+	local output = string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
+	Enchantrix.Util.ChatPrint(output);
+
+	Enchantrix.Storage.Price_Cache = {t=time()};
+	profitMargins = {};
+	local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
+
+	-- sort by profit based on median
+	table.sort(targetAuctions, bidBrokerSort);
+
+	-- output the list of auctions
+	for _,a in targetAuctions do
+		if (a.signature and profitMargins[a.signature]) then
+			local quality = EnhTooltip.QualityFromLink(a.itemLink);
+			if (quality and quality >= 2) then
+				local id,rprop,enchant, name, count, min, buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
+				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
+				local value = profitMargins[a.signature].value;
+				local margin = profitMargins[a.signature].margin;
+				local profit = profitMargins[a.signature].profit;
+				local bidText = _ENCH('FrmtBidbrokerCurbid');
+				if (currentBid == min) then
+					bidText = _ENCH('FrmtBidbrokerMinbid');
+				end
+				local output = string.format(_ENCH('FrmtBidbrokerLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"), Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft)));
+				Enchantrix.Util.ChatPrint(output);
+			end
+		end
+	end
+
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
+end
+
+function getAuctionItemDisenchants(auctionSignature, useCache)
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(auctionSignature);
+	local sig = string.format("%d:%d:%d", id, enchant, rprop);
+	return Enchantrix.Storage.GetItemDisenchants(sig, name, useCache);
+end
+
+Enchantrix.Command = {
+	REVISION				= "$Revision$",
+
+	AddonLoaded				= addonLoaded,
+	AuctioneerLoaded		= auctioneerLoaded,
+
+	HandleCommand			= handleCommand,
+
+	Register				= register,
+	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
+	SetKhaosSetKeyParameter	= setKhaosSetKeyParameter,
+	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
+}
