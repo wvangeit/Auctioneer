@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -- Global functions
 local addonLoaded				-- Enchantrix.Command.AddonLoaded()
@@ -48,9 +48,6 @@ local doBidBroker
 local doPercentLess
 local getAuctionItemDisenchants
 
--- Function references
-local _ENCH
-
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix.State.GUI_Registered = nil
 Enchantrix.State.Khaos_Registered = nil
@@ -66,8 +63,6 @@ local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
 
 function addonLoaded()
-	_ENCH = Enchantrix.Locale.Localize
-
 	register()
 end
 

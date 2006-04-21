@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -- Global functions
 local addonLoaded		-- Enchantrix.Config.AddonLoaded()
@@ -37,9 +37,6 @@ local convertConfig
 local convertFilters
 local isValidLocale
 
--- Function references
-local _ENCH -- = Enchantrix.Locale.Localize
-
 -- Default filter configuration
 local filterDefaults = {
 		['all'] = true,
@@ -56,8 +53,6 @@ local filterDefaults = {
 	}
 
 function addonLoaded()
-	_ENCH = Enchantrix.Locale.Localize
-
 	-- Convert old localized settings
 	if EnchantConfig and EnchantConfig.filters then
 		convertFilters()

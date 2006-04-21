@@ -19,7 +19,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 -- Global functions
 local addonLoaded	-- Enchantrix.Tooltip.AddonLoaded()
@@ -30,12 +30,7 @@ local itemTooltip
 local enchantTooltip
 local hookTooltip
 
--- Local function references
-local _ENCH -- = Enchantrix.Locale.Localize
-
 function addonLoaded()
-	_ENCH = Enchantrix.Locale.Localize
-
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, hookTooltip)
 end
 

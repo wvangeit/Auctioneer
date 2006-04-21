@@ -23,7 +23,6 @@
 
 -- Global functions
 local addonLoaded			-- Enchantrix.Locale.AddonLoaded()
-local _ENCH					-- Enchantrix.Locale.Localize()
 local delocalizeFilterVal	-- Enchantrix.Locale.DelocalizeFilterVal()
 local localizeFilterVal		-- Enchantrix.Locale.LocalizeFilterVal()
 local getLocalizedFilterVal	-- Enchantrix.Locale.GetLocalizedFilterVal()
@@ -153,7 +152,6 @@ Enchantrix.Locale = {
 
 	AddonLoaded				= addonLoaded,
 
-	Localize				= _ENCH,
 	DelocalizeFilterVal		= delocalizeFilterVal,
 	LocalizeFilterVal		= localizeFilterVal,
 	GetLocalizedFilterVal	= getLocalizedFilterVal,

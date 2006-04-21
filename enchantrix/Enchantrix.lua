@@ -40,8 +40,6 @@ end
 
 local DisenchantEvent = {}
 
-local _ENCH = Enchantrix.Locale.Localize
-
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
 function addonLoaded(hookArgs, event, addOnName)
