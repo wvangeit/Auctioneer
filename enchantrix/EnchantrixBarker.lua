@@ -1,7 +1,7 @@
 --[[
 
 	Enchantrix v<%version%> (<%codename%>)
-	$Id:  $
+	$Id$
 
 	By Norganna
 	http://enchantrix.org/

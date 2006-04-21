@@ -1,7 +1,7 @@
 --[[
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EnxCommand.lua 817 2006-04-11 15:50:14Z aradan $
+	Revision: $Id$
 
 	Configuration functions.
 

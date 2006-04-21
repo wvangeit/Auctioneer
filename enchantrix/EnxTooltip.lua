@@ -1,7 +1,7 @@
 --[[
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EnxUtil.lua 756 2006-03-18 23:09:49Z aradan $
+	Revision: $Id$
 
 	Tooltip functions.
 
