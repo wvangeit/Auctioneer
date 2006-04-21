@@ -44,8 +44,8 @@ local _ENCH = Enchantrix.Locale.Localize
 
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
-function addonLoaded(hookArgs, event, ...)
-	if (event ~= "ADDON_LOADED") or (arg[1] ~= "Enchantrix") then
+function addonLoaded(hookArgs, event, addOnName)
+	if (event ~= "ADDON_LOADED") or (addOnName ~= "Enchantrix") then
 		return
 	end
 	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
@@ -152,13 +152,13 @@ function pickupContainerItemHook(funcArgs, retVal, bag, slot)
 	end
 end
 
-function onEvent(funcVars, event, ...)
+function onEvent(funcVars, event, spellName, spellDuration)
 	if event == "SPELLCAST_START" then
-		if arg[1] == _ENCH('ArgSpellname') then
+		if spellName == _ENCH('ArgSpellname') then
 			DisenchantEvent.started = DisenchantEvent.spellTarget
 			DisenchantEvent.finished = nil
 			DisenchantEvent.startTime = GetTime()
-			DisenchantEvent.spellDuration = arg[2] / 1000  -- Convert ms to s
+			DisenchantEvent.spellDuration = spellDuration / 1000  -- Convert ms to s
 		else
 			DisenchantEvent.started = nil
 			DisenchantEvent.finished = nil

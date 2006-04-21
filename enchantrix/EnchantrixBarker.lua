@@ -217,17 +217,15 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 end
 
 
-function Enchantrix_BarkerOptions_Factors_Slider_GetValue(...)
-	id = arg[1];
-	if id == nil then
+function Enchantrix_BarkerOptions_Factors_Slider_GetValue(id)
+	if (not id) then
 		id = this:GetID();
 	end
 	return Enchantrix_BarkerGetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key);
 end
 
-function Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged(...)
-	id = arg[1];
-	if id == nil then
+function Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged(id)
+	if (not id) then
 		id = this:GetID();
 	end
 	Enchantrix_BarkerSetConfig(Enchantrix_BarkerOptions_TabFrames[Enchantrix_BarkerOptions_ActiveTab].options[id].key, this:GetValue());
