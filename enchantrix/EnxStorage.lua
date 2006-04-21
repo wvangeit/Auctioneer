@@ -509,7 +509,7 @@ function getItemDisenchants(sig, name, useCache)
 end
 
 Enchantrix.Storage = {
-	REVISION			= "$Revision$",
+	Revision			= "$Revision$",
 	AddonLoaded			= addonLoaded,
 
 	GetItemDisenchants	= getItemDisenchants,

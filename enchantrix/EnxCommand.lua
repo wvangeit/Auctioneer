@@ -930,7 +930,7 @@ function getAuctionItemDisenchants(auctionSignature, useCache)
 end
 
 Enchantrix.Command = {
-	REVISION				= "$Revision$",
+	Revision				= "$Revision$",
 
 	AddonLoaded				= addonLoaded,
 	AuctioneerLoaded		= auctioneerLoaded,

@@ -41,7 +41,8 @@ local customLocalizations = {
 	['PatReagents'] = GetLocale(),
 }
 
-local commandMap, commandMapRev
+Enchantrix.State.Locale_Changed = true --This needs to be initialy set to true so that the following tables get built at startup.
+local commandMap, commandMapRev;
 
 function addonLoaded()
 	Stubby.Print("EnxLocale: addonLoaded()")
@@ -63,6 +64,9 @@ function _ENCH(stringKey, locale)
 end
 
 function buildCommandMap()
+	commandMap = {}
+	commandMapRev = {}
+
 	commandMap = {
 		[_ENCH('CmdOn')] = 'on',
 		[_ENCH('CmdOff')] = 'off',
@@ -87,7 +91,6 @@ function buildCommandMap()
 		[_ENCH('ShowGuessBaseline')] = 'valuate-baseline',
 	}
 
-	commandMapRev = {}
 	for k, v in pairs(commandMap) do
 		commandMapRev[v] = k
 	end
@@ -146,7 +149,7 @@ function localizeCommand(cmd)
 end
 
 Enchantrix.Locale = {
-	REVISION = "$Revision$",
+	Revision = "$Revision$",
 
 	AddonLoaded				= addonLoaded,
 

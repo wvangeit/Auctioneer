@@ -411,7 +411,7 @@ function createProfiler(name)
 end
 
 Enchantrix.Util = {
-	REVISION			= "$Revision$",
+	Revision			= "$Revision$",
 
 	IsDisenchantable	= isDisenchantable,
 	GetReagentInfo		= getReagentInfo,

@@ -300,7 +300,7 @@ function getLocale()
 end
 
 Enchantrix.Config = {
-	REVISION			= "$Revision$",
+	Revision			= "$Revision$",
 	AddonLoaded			= addonLoaded,
 
 	GetFilterDefaults	= getFilterDefaults,

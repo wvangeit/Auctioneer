@@ -356,7 +356,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 end
 
 Enchantrix.Tooltip = {
-	REVISION		= "$Revision$",
+	Revision		= "$Revision$",
 
 	AddonLoaded		= addonLoaded,
 	Format			= tooltipFormat,
