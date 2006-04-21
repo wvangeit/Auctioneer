@@ -44,7 +44,6 @@ Enchantrix.State.Locale_Changed = true --This needs to be initialy set to true s
 local commandMap, commandMapRev;
 
 function addonLoaded()
-	Stubby.Print("EnxLocale: addonLoaded()")
 	buildCommandMap()
 end
 

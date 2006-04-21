@@ -56,7 +56,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Enchantrix.Revision = Enchantrix.Util.GetRevision("$Revision$")
 	for _, obj in pairs(Enchantrix) do
 		if type(obj) == "table" then
-			if obj.AddonLoaded then
+			if type(obj.AddonLoaded) == "function" then
 				obj.AddonLoaded()
 			end
 			Enchantrix.Revision = math.max(Enchantrix.Revision, Enchantrix.Util.GetRevision(obj.Revision))
@@ -79,7 +79,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
 
-	local vstr = string.format("%s-%d", Enchantrix.Version, Enchantrix.Version)
+	local vstr = string.format("%s-%d", Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtWelcome'), vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
 end
