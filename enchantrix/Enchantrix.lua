@@ -33,9 +33,9 @@ local pickupInventoryItemHook
 local pickupContainerItemHook
 local onEvent
 
-Enchantrix.VERSION = "<%version%>"
-if (Enchantrix.VERSION == "<".."%version%>") then
-	Enchantrix.VERSION = "3.5.DEV"
+Enchantrix.Version = "<%version%>"
+if (Enchantrix.Version == "<".."%version%>") then
+	Enchantrix.Version = "3.5.DEV"
 end
 
 local DisenchantEvent = {}
@@ -55,13 +55,13 @@ function addonLoaded(hookArgs, event, addOnName)
 	end
 
 	-- Call AddonLoaded for each object in our namespace
-	Enchantrix.REVISION = Enchantrix.Util.GetRevision("$Revision$")
+	Enchantrix.Revision = Enchantrix.Util.GetRevision("$Revision$")
 	for _, obj in pairs(Enchantrix) do
 		if type(obj) == "table" then
 			if obj.AddonLoaded then
 				obj.AddonLoaded()
 			end
-			Enchantrix.REVISION = math.max(Enchantrix.REVISION, Enchantrix.Util.GetRevision(obj.REVISION))
+			Enchantrix.Revision = math.max(Enchantrix.Revision, Enchantrix.Util.GetRevision(obj.Revision))
 		end
 	end
 
@@ -81,7 +81,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
 
-	local vstr = string.format("%s-%d", Enchantrix.VERSION, Enchantrix.REVISION)
+	local vstr = string.format("%s-%d", Enchantrix.Version, Enchantrix.Version)
 	Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtWelcome'), vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
 end
