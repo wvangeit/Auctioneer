@@ -42,7 +42,10 @@ local DisenchantEvent = {}
 
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
-function addonLoaded()
+function addonLoaded(hookArgs, event, addOnName)
+	if (event ~= "ADDON_LOADED") or (string.lower(addOnName) ~= "enchantrix") then
+		return
+	end
 	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
 
 	if not Babylonian.IsAddOnRegistered("Enchantrix") then
@@ -130,7 +133,7 @@ function onLoad()
 	SLASH_ENCHANTRIX3 = "/enx";
 	SlashCmdList["ENCHANTRIX"] = function(msg) Enchantrix.Command.HandleCommand(msg) end
 
-	Stubby.RegisterAddOnHook("Enchantrix", "Enchantrix", addonLoaded)
+	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
 end
 
 function pickupInventoryItemHook(funcArgs, retVal, slot)
