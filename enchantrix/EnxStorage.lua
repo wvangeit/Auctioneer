@@ -63,6 +63,9 @@ function addonLoaded()
 	if not EnchantConfig.cache.reagentinfo then
 		EnchantConfig.cache.reagentinfo = {}
 	end
+	if not EnchantConfig.cache.names then
+		EnchantConfig.cache.names = {}
+	end
 	if not EnchantedLocal then
 		EnchantedLocal = {}
 	end
