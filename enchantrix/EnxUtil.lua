@@ -81,8 +81,7 @@ function getReagentInfo(id)
 	end
 	id = tonumber(id)
 
-	local sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture =
-		GetItemInfo(id)
+	local sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
 	if id and Enchantrix.Constants.StaticPrices[id] then
 		if sName then
 			cache[id] = sName.."|"..iQuality.."|"..sTexture
