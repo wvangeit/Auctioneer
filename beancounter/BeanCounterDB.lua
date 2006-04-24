@@ -99,7 +99,7 @@ function loadDatabase(realm)
 	upgradeDatabase(BeanCounterRealmDB);
 
 	-- Cache the current player id.
-	currentPlayerId = getPlayerId(UnitName("player"));
+	currentPlayerId = getPlayerId(UnitName("player"), true);
 end
 
 -------------------------------------------------------------------------------
@@ -280,6 +280,7 @@ function getPlayerId(name, create)
 			end
 		end
 		if (create) then
+			debugPrint("Adding player "..name.." to the database");
 			table.insert(BeanCounterRealmDB.players, name);
 			return table.getn(BeanCounterRealmDB.players);
 		end
