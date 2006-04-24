@@ -23,6 +23,7 @@
 
 -- Enchantrix namespace
 Enchantrix = {
+	Barker = {},
 	Command = {},
 	Config = {},
 	Constants = {},

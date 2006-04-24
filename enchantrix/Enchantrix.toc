@@ -10,10 +10,10 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
-
 Babylonian.lua
 DisenchantList.lua
 EnxObjects.lua
+EnchantrixBarker.xml
 EnxCommand.lua
 EnxConfig.lua
 EnxConstants.lua

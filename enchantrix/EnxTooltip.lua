@@ -194,15 +194,15 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 			local confidence = totals.conf;
 
 			if (Enchantrix.Config.GetFilter('valuate-hsp') and totals.hspValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Digits(totals.hspValue * confidence, 3), embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Round(totals.hspValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix.Config.GetFilter('valuate-median') and totals.medValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Digits(totals.medValue * confidence, 3), embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			if (Enchantrix.Config.GetFilter('valuate-baseline') and totals.mktValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Digits(totals.mktValue * confidence, 3), embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * confidence, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 		end
@@ -212,29 +212,27 @@ end
 function enchantTooltip(funcVars, retVal, frame, name, link)
 	local embed = Enchantrix.Config.GetFilter('embed');
 
-	local auctioneerLoaded = false
-	if Auctioneer and Auctioneer.Statistic then
-		auctioneerLoaded = true
-	end
-
 	local frameName = frame:GetName()
 	local nLines = frame:NumLines()
 	local reagents
+	-- Find reagents line ("Reagents: ...")
 	for i = 1, nLines do
-		local obj = getglobal(frameName.."TextLeft"..i)
-		local text = ""
-		if obj and obj.GetText then
-			text = obj:GetText()
-		end
+		local text = getglobal(frameName.."TextLeft"..i):GetText()
+
+		-- string.find(text, "Reagents: (.+)")
 		local _, _, r = string.find(text, _ENCH('PatReagents'))
 		if r then
 			reagents = r
 			break
 		end
 	end
+	if not reagents then return end
+
 	local price = 0
 	local unknownPrices = false
 	local reagentInfo = {}
+	local name, quality, color, hlink
+	-- Process reagents separated by ","
 	for reagent in Enchantrix.Util.Spliterator(reagents, ",") do
 		-- Chomp whitespace
 		reagent = string.gsub(reagent, "^%s*", "")
@@ -243,6 +241,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		reagent = string.gsub(reagent, "^%|c%x%x%x%x%x%x%x%x", "")
 		reagent = string.gsub(reagent, "%|r$", "")
 
+		-- Get and chomp counts, e.g "Strange Dust (2)"
 		local _, _, count = string.find(reagent, "%((%d+)%)$")
 		if count then
 			reagent = string.gsub(reagent, "%s*%(%d+%)$", "")
@@ -251,14 +250,15 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 			count = 1
 		end
 
-		local link = Enchantrix.Util.GetLinkFromName(reagent)
-		if link then
-			local name, quality, color
-			name, _, quality = GetItemInfo(link)
+		hlink = Enchantrix.Util.GetLinkFromName(reagent)
+		if hlink then
+			name, _, quality = GetItemInfo(hlink)
 			if quality then
 				_, _, _, color = GetItemQualityColor(quality)
 			end
-			local hsp, median, market = Enchantrix.Util.GetReagentPrice(link)
+
+			local hsp, median, market = Enchantrix.Util.GetReagentPrice(hlink)
+
 			table.insert(reagentInfo, {
 				["name"] = reagent,
 				["count"] = count,
@@ -266,6 +266,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 				["quality"] = quality,
 				["color"] = color,
 			})
+
 			if hsp then
 				price = price + count * hsp
 			else
@@ -279,15 +280,14 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 			unknownPrices = true
 		end
 	end
+
+	if table.getn(reagentInfo) < 1 then	return end
+
+	-- Sort by rarity and price
 	table.sort(reagentInfo, function(a,b)
 		if (not b) or (not a) then return end
 		return ((b.quality or -1) < (a.quality or -1)) or ((b.price or 0) < (a.price or 0))
 	end)
-
-	-- No reagents
-	if table.getn(reagentInfo) < 1 then
-		return
-	end
 
 	if not embed then
 		EnhTooltip.SetIcon("Interface\\Icons\\Spell_Holy_GreaterHeal")
@@ -297,6 +297,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	EnhTooltip.AddLine(_ENCH('FrmtSuggestedPrice'), nil, embed)
 	EnhTooltip.LineColor(0.8,0.8,0.2)
 
+	-- Add reagent list to tooltip
 	for _, reagent in pairs(reagentInfo) do
 		local line = "  "
 
@@ -309,23 +310,26 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		end
 		line = line.." x"..reagent.count
 		if reagent.count > 1 and reagent.price then
-			line = line..string.format(" ".._ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(Enchantrix.Util.Digits(reagent.price, 3)))
-			EnhTooltip.AddLine(line, Enchantrix.Util.Digits(reagent.price * reagent.count, 3), embed)
+			line = line..string.format(" ".._ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent.price, 3)))
+			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent.price * reagent.count, 3), embed)
 		elseif reagent.price then
-			EnhTooltip.AddLine(line, Enchantrix.Util.Digits(reagent.price, 3), embed)
+			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent.price, 3), embed)
 		else
 			EnhTooltip.AddLine(line, nil, embed)
 		end
 		EnhTooltip.LineColor(0.7,0.7,0.1)
 	end
 
+	-- Totals
 	if price > 0 then
-		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Digits(price, 3), embed)
+		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
-		if not auctioneerLoaded then
+
+		if not Enchantrix.State.Auctioneer_Loaded then
 			EnhTooltip.AddLine(_ENCH('FrmtWarnAuctNotLoaded'))
 			EnhTooltip.LineColor(0.6,0.6,0.1)
 		end
+
 		if unknownPrices then
 			EnhTooltip.AddLine(_ENCH('FrmtWarnPriceUnavail'))
 			EnhTooltip.LineColor(0.6,0.6,0.1)

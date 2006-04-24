@@ -127,8 +127,7 @@ function Enchantrix_BarkerOnClick()
 	end
 end
 
-
-function EnchantrixBarker_OnLoad()
+function Enchantrix.Barker.AddonLoaded()
 	Enchantrix.Util.ChatPrint("Barker Loaded...");
 	if( not EnchantConfig.barker ) then
 		EnchantConfig.barker = {};
@@ -143,6 +142,9 @@ function EnchantrixBarker_OnLoad()
 	if( not EnchantConfig.barker.lowest_price ) then
 		EnchantConfig.barker.lowest_price = 100;
 	end
+end
+
+function EnchantrixBarker_OnLoad()
 
 end
 

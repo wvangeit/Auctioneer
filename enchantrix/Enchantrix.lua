@@ -52,22 +52,22 @@ function addonLoaded(hookArgs, event, addOnName)
 		Babylonian.RegisterAddOn("Enchantrix", Enchantrix.Config.SetLocale);
 	end
 
-	-- Call AddonLoaded for each object in our namespace
+	-- Call AddonLoaded for other objects
+	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
+	Enchantrix.Barker.AddonLoaded()
+	Enchantrix.Command.AddonLoaded()
+	Enchantrix.Config.AddonLoaded()
+	Enchantrix.Locale.AddonLoaded()
+	Enchantrix.Tooltip.AddonLoaded()
+
 	Enchantrix.Revision = Enchantrix.Util.GetRevision("$Revision$")
 	for name, obj in pairs(Enchantrix) do
 		if type(obj) == "table" then
-			if type(obj.AddonLoaded) == "function" then
-				obj.AddonLoaded()
-			end
 			Enchantrix.Revision = math.max(Enchantrix.Revision, Enchantrix.Util.GetRevision(obj.Revision))
 		end
 	end
 
-	if IsAddOnLoaded("Auctioneer") then
-		Enchantrix.Command.AuctioneerLoaded()
-	else
-		Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded, true);
-	end
+	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded);
 
 	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("PickupContainerItem", 400, pickupContainerItemHook)

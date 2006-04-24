@@ -399,7 +399,7 @@ function getItemDisenchants(sig, name, useCache)
 		local medianGuess = 0;
 		local marketGuess = 0;
 		if (total > 0) then
-			for dSig, counts in disenchantsTo do
+			for dSig, counts in pairs(disenchantsTo) do
 				local item = 0;
 				if (dSig) then item = tonumber(dSig); end
 				local dName = Enchantrix.Util.GetReagentInfo(item);
@@ -408,10 +408,9 @@ function getItemDisenchants(sig, name, useCache)
 				local countI = (counts.biCount or 0) + (counts.iCount or 0);
 				local countD = (counts.bdCount or 0) + (counts.dCount or 0);
 				local pct = tonumber(string.format("%0.1f", count / total * 100));
-				local rate = 0;
+				local rate
 				if (countI > 0) then
-					rate = tonumber(string.format("%0.1f", countD / countI));
-					if (not rate) then rate = 0; end
+					rate = countD / countI
 				end
 
 				local count = 1;
@@ -419,77 +418,19 @@ function getItemDisenchants(sig, name, useCache)
 				disenchantsTo[dSig].name = dName;
 				disenchantsTo[dSig].pct = pct;
 				disenchantsTo[dSig].rate = count;
-				local mkt = const.StaticPrices[item] or 0
 
-				-- Work out what version if any of Auctioneer is installed
-				local auctVerStr;
-				if (not Auctioneer) then
-					auctVerStr = AUCTIONEER_VERSION or "0.0.0";
-				else
-					auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
-				end
-				local auctVer = Enchantrix.Util.Split(auctVerStr, ".");
-				local major = tonumber(auctVer[1]) or 0;
-				local minor = tonumber(auctVer[2]) or 0;
-				local rev = tonumber(auctVer[3]) or 0;
-				if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
+				local hsp, med, mkt = Enchantrix.Util.GetReagentPrice(item)
 
-				local itemKey = string.format("%d:0:0", item);
-				if (useCache and not Enchantrix.Storage.Price_Cache[itemKey]) then
-					Enchantrix.Storage.Price_Cache[itemKey] = {};
-				end
+				local hspValue = (hsp or 0) * pct * count / 100
+				local medValue = (med or 0) * pct * count / 100
+				local mktValue = (mkt or 0) * pct * count / 100
 
-				local hsp, median;
-				if (useCache and Enchantrix.Storage.Price_Cache[itemKey].hsp) then
-					hsp = Enchantrix.Storage.Price_Cache[itemKey].hsp;
-				end
-
-				if ((not hsp or hsp < 1) and (major >= 3)) then
-					if (major == 3 and minor == 0 and rev <= 11) then
-						-- 3.0.0 <= ver <= 3.0.11
-						if (rev == 11) then
-							hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
-						else
-							if (Auctioneer_GetHighestSellablePriceForOne) then
-								hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false);
-							elseif (getHighestSellablePriceForOne) then
-								hsp = getHighestSellablePriceForOne(itemKey, false);
-							end
-						end
-					elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
-						-- 3.1.11 < ver < 3.3.675
-						hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-					elseif (major >= 3 and minor >= 3 and (rev >= 675 or rev == 0)) then
-						-- 3.3.675 <= ver
-						hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-					end
-				end
-				if hsp == nil then hsp = mkt * 0.98; end
-				if (useCache) then Enchantrix.Storage.Price_Cache[itemKey].hsp = hsp; end
-
-				if (useCache and Enchantrix.Storage.Price_Cache[itemKey].median) then
-					median = Enchantrix.Storage.Price_Cache[itemKey].median;
-				end
-
-				if ((not median or median < 1) and (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675))) then
-					-- 3.1.11 < ver < 3.3.675
-					median = Auctioneer_GetUsableMedian(itemKey);
-				elseif ((not median or median < 1) and (major >= 3 and minor >= 3 and (rev >= 675 or rev == 0))) then
-					-- 3.3.675 <= ver
-					median = Auctioneer.Statistic.GetUsableMedian(itemKey, Auctioneer.Util.GetAuctionKey());
-				end
-				if median == nil then median = mkt * 0.95; end
-				if (useCache) then Enchantrix.Storage.Price_Cache[itemKey].median = median; end
-
-				local hspValue = (hsp * pct * count / 100);
-				local medianValue = (median * pct * count / 100);
 				disenchantsTo[dSig].hspValue = hspValue;
 				disenchantsTo[dSig].medValue = medValue;
-				hspGuess = hspGuess + hspValue;
-				medianGuess = medianGuess + medianValue;
-
-				local mktValue = (mkt * pct * count / 100);
 				disenchantsTo[dSig].mktValue = mktValue;
+
+				hspGuess = hspGuess + hspValue;
+				medianGuess = medianGuess + medValue;
 				marketGuess = marketGuess + mktValue;
 			end
 		end

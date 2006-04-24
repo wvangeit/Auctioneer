@@ -38,7 +38,7 @@ local chatPrint
 
 local gcd
 local roundUp
-local digits
+local round
 local confidenceInterval
 
 local createProfiler
@@ -47,8 +47,8 @@ local createProfiler
 --   Item functions   --
 ------------------------
 
+-- Return false if item id can't be disenchanted
 function isDisenchantable(id)
-	-- Return false if item id can't be disenchanted
 	if (id) then
 		local _, _, quality, _, _, _, count, equip = GetItemInfo(id)
 		if (not quality) then
@@ -72,6 +72,8 @@ function isDisenchantable(id)
 	return false
 end
 
+-- Frontend to GetItemInfo()
+-- Information for disenchant reagents are kept in a saved variable cache
 function getReagentInfo(id)
 	local cache = EnchantConfig.cache.reagentinfo
 
@@ -141,6 +143,8 @@ function getLinkFromName(name)
 	return EnchantConfig.cache.names[name]
 end
 
+-- Returns HSP, median and static price for reagent
+-- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
 function getReagentPrice(reagentID)
 	-- reagentID ::= number | hyperlink
 	if type(reagentID) == "string" then
@@ -154,16 +158,11 @@ function getReagentPrice(reagentID)
 
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
-	if Auctioneer then
+	if Enchantrix.State.Auctioneer_Loaded then
 		local itemKey = string.format("%d:0:0", reagentID);
-		local realm
-		if Auctioneer.Util then
-			realm = Auctioneer.Util.GetAuctionKey()
-		end
-		if realm then
-			hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
-			median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
-		end
+		local realm = Auctioneer.Util.GetAuctionKey()
+		hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
+		median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
 	end
 
 	if not EnchantConfig.cache then EnchantConfig.cache = {} end
@@ -182,9 +181,9 @@ function getReagentPrice(reagentID)
 	return cache.hsp, cache.median, cache.market
 end
 
+-- Return item level (rounded up to nearest 5 levels), quality and type as string,
+-- e.g. "20:2:Armor" for uncommon level 20 armor
 function getItemType(id)
-	-- Return item level (rounded up to nearest 5 levels), quality and type as string,
-	-- e.g. "20:2:Armor" for uncommon level 20 armor
 	if (id) then
 		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
 		if (quality and quality >= 2 and level > 0 and Enchantrix.Constants.InventoryTypes[equip]) then
@@ -193,13 +192,13 @@ function getItemType(id)
 	end
 end
 
+-- Return item id as integer
 function getItemIdFromSig(sig)
-	-- Return item id and item suffix as integers
 	if (type(sig) == "string") then
 		local splt = Enchantrix.Util.Split(sig, ":")
-		return tonumber(splt[1]), tonumber(splt[3])
+		return tonumber(splt[1])
 	elseif (type(sig) == "number") then
-		return sig, 0
+		return sig
 	end
 end
 
@@ -246,6 +245,11 @@ function split(str, at)
 	return splut;
 end
 
+-- Iterator version of split()
+--   for i in spliterator(a, b) do
+-- is equivalent to
+--   for _, i in ipairs(split(a, b)) do
+-- but puts less strain on the garbage collector
 function spliterator(str, at)
 	local start
 	local found = 0
@@ -296,26 +300,52 @@ function gcd(a, b)
 	return m
 end
 
+-- Round up m to nearest multiple of n
 function roundUp(m, n)
-	-- Round up m to nearest multiple of n
 	return math.ceil(m / n) * n
 end
 
-function digits(m, n, base)
-	-- Round m to n digits in given base
-	base = base or 10
+-- Round m to n digits in given base
+function round(m, n, base, offset)
+	base = base or 10 -- Default to base 10
+	offset = offset or 0.5
+
+	if (n or 0) == 0 then
+		return math.floor(m + offset)
+	end
+
 	if m == 0 then
 		return 0
 	elseif m < 0 then
-		return -digits(-m, n, base)
+		return -round(-m, n, base, offset)
 	end
-	local d = base^(n - math.floor(math.log(m) / math.log(base)) - 1)
-	return math.floor(m * d + 0.5) / d
+
+	-- Get integer and fractional part of n
+	local f = math.floor(n)
+	n, f = f, n - f
+
+	-- Pre-rounding multiplier is 1 / f
+	local mul = 1
+	if f > 0.1 then
+		mul = math.floor(1 / f + 0.5)
+	end
+
+	local d
+	if n > 0 then
+		d = base^(n - math.floor(math.log(m) / math.log(base)) - 1)
+	else
+		d = 1
+	end
+	if offset >= 1 then
+		return math.ceil(m * d * mul) / (d * mul)
+	else
+		return math.floor(m * d * mul + offset) / (d * mul)
+	end
 end
 
+-- Returns confidence interval for binomial distribution given observed
+-- probability p, sample size n, and z-value
 function confidenceInterval(p, n, z)
-	-- Returns confidence interval for binomial distribution given observed
-	-- probability p, sample size n, and z-value
 	if not z then
 		--[[
 		z		conf
@@ -429,7 +459,7 @@ Enchantrix.Util = {
 
 	GCD					= gcd,
 	RoundUp				= roundUp,
-	Digits				= digits,
+	Round				= round,
 	ConfidenceInterval	= confidenceInterval,
 
 	CreateProfiler		= createProfiler,

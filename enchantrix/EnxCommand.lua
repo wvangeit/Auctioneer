@@ -26,6 +26,7 @@ local addonLoaded				-- Enchantrix.Command.AddonLoaded()
 local auctioneerLoaded			-- Enchantrix.Command.AuctioneerLoaded()
 local handleCommand				-- Enchantrix.Command.HandleCommand()
 local register					-- Enchantrix.Command.Register()
+local resetKhaos				-- Enchantrix.Command.ResetKhaos()
 local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
 local setKhaosSetKeyParameter	-- Enchantrix.Command.SetKhaosSetKeyParameter()
 local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
@@ -34,7 +35,6 @@ local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
 local getKhaosLocaleList
 local registerKhaos
 local registerAuctioneerOptions
-local resetKhaos
 local chatPrintHelp
 local onOff
 local clear
@@ -455,14 +455,34 @@ function registerAuctioneerOptions()
 	Khaos.refresh();
 end
 
-function auctioneerLoaded(hookParam)
-	if hookParam and hookParam[1] == true then
-		Stubby.UnregisterAddOnHook("Auctioneer", "Enchantrix")
+function auctioneerLoaded()
+	Stubby.UnregisterAddOnHook("Auctioneer", "Enchantrix")
+
+	-- Make sure we have a usable version of Auctioneer loaded (3.4 or higher)
+	if Auctioneer and Auctioneer.Version then
+		local ver = Enchantrix.Util.Split(Auctioneer.Version, ".")
+		local major = tonumber(ver[1]) or 0
+		local minor = tonumber(ver[2]) or 0
+
+		if major > 3 or (major >= 3 and minor >= 4) then
+			Enchantrix.State.Auctioneer_Loaded = true
+		end
 	end
 
-	-- TODO: Check Auctioneer version
-
-	Enchantrix.State.Auctioneer_Loaded = true
+	if not Enchantrix.State.Auctioneer_Loaded then
+		-- Old version of Auctioneer
+		-- TODO: Localization
+		local msg = "Enchantrix requires Auctioneer version 3.4 or higher. Some features will be unavailable until you update your Auctioneer installation."
+		if not EnchantConfig.displayedAuctioneerWarning then
+			-- Yell at the user, but only once
+			message(msg)
+			EnchantConfig.displayedAuctioneerWarning = true
+		else
+			Enchantrix.Util.ChatPrint(msg)
+		end
+		return
+	end
+	EnchantConfig.displayedAuctioneerWarning = nil
 
 	if Enchantrix.State.Khaos_Registered then
 		registerAuctioneerOptions()
@@ -933,6 +953,7 @@ Enchantrix.Command = {
 	HandleCommand			= handleCommand,
 
 	Register				= register,
+	ResetKhaos				= resetKhaos,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
 	SetKhaosSetKeyParameter	= setKhaosSetKeyParameter,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,

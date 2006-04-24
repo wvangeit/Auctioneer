@@ -48,7 +48,7 @@ local filterDefaults = {
 		['valuate-hsp'] = true,
 		['valuate-median'] = true,
 		['valuate-baseline'] = true,
-		['locale'] = GetLocale(),
+		['locale'] = 'default',
 		['printframe'] = 1,
 	}
 
@@ -257,7 +257,7 @@ function setLocale(param, chatprint, updateKhaos)
 		if validLocale then
 			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param))
 			if param ~= _localeLastSet then
-				setKhaosSetKeyValue('locale', param)
+				Enchantrix.Command.SetKhaosSetKeyValue('locale', param)
 			end
 		else
 			Enchantrix.Util.ChatPrint(string.format(_ENCH("FrmtActUnknownLocale"), param))
@@ -273,9 +273,9 @@ function setLocale(param, chatprint, updateKhaos)
 		if (param ~= _localeLastSet) or updateKhaos then
 			if (updateKhaos) then
 				EnhTooltip.DebugPrint("Enchantrix: Babylonian.GetOrder() = "..Babylonian.GetOrder())
-				setKhaosSetKeyValue('locale', Babylonian.GetOrder())
+				Enchantrix.Command.SetKhaosSetKeyValue('locale', Babylonian.GetOrder())
 			end
-			resetKhaos()
+			Enchantrix.Command.ResetKhaos()
 		end
 	end
 
