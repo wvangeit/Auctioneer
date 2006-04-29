@@ -30,7 +30,7 @@
 Auctioneer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "Debug" within the client.
 if (Auctioneer.Version == "<".."%version%>") then
-	Auctioneer.Version = "3.3.DEV";
+	Auctioneer.Version = "3.5.DEV";
 end
 
 local function onLoad()

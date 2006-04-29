@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	Itemizer
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
@@ -27,7 +27,7 @@
 Itemizer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "Debug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
-	Itemizer.Version = "3.3.DEV";
+	Itemizer.Version = "3.5.DEV";
 end
 
 --Saved Variables

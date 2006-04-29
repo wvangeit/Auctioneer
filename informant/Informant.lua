@@ -23,7 +23,7 @@
 
 INFORMANT_VERSION = "<%version%>"
 if (INFORMANT_VERSION == "<".."%version%>") then
-	INFORMANT_VERSION = "3.3.DEV"
+	INFORMANT_VERSION = "3.5.DEV"
 end
 
 -- GLOBAL FUNCTION PROTOTYPES:

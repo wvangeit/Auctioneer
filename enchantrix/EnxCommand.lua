@@ -463,6 +463,7 @@ function auctioneerLoaded()
 		local ver = Enchantrix.Util.Split(Auctioneer.Version, ".")
 		local major = tonumber(ver[1]) or 0
 		local minor = tonumber(ver[2]) or 0
+		if ver[3] == "DEV" then minor = minor + 1 end
 
 		if major > 3 or (major >= 3 and minor >= 4) then
 			Enchantrix.State.Auctioneer_Loaded = true
