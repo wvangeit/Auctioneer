@@ -208,7 +208,7 @@ local callBankHook				-- CallBankHook()
 local callCheckPopup			-- CallCheckPopup(name,link,quality,count,price,hyperlink)
 local callTradeHook				-- CallTradeHook(type,event,selID)
 local cfHookUpdate				-- CfHookUpdate(frame)
-local chatHookOnHyperlinkShow	-- ChatHookOnHyperlinkShow(reference,link,button,...)
+local chatHookOnHyperlinkShow	-- ChatHookOnHyperlinkShow(reference,link,button)
 local checkHide					-- CheckHide()
 local checkPopup				-- CheckPopup(name,link,quality,count,price,hyperlink)
 local clearTooltip				-- ClearTooltip()
@@ -908,7 +908,7 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button, ...)
+function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button)
 	if (IsAltKeyDown()) and AuctionFrame and (AuctionFrame:IsVisible()) then
 		AuctionFrameTab_OnClick(1)
 		local itemID = breakLink(link)
@@ -1000,9 +1000,6 @@ function gtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
 end
 
 function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
-	-- local hasCooldown = retVal[1]
-	-- local repairCost = retVal[2]
-
 	local link = GetContainerItemLink(frameID, buttonID)
 	local name = nameFromLink(link)
 
@@ -1014,11 +1011,7 @@ function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 	end
 end
 
-function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot, ...)
-	-- local hasItem = retVal[1]
-	-- local hasCooldown = retVal[2]
-	-- local repairCost = retVal[3]
-
+function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
 		local name = nameFromLink(link)
@@ -1436,32 +1429,3 @@ EnhTooltip = {
 	SetElapsed			= setElapsed,
 	DebugPrint			= debugPrint,
 }
-
-
-
---- Temporary backwards compatibility ---
--- This will go away eventually, so upgrade now!
-function TT_AddTooltip() end
-Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 100, TT_AddTooltip)
-TT_HideTooltip			= hideTooltip
-TT_ClearTooltip			= clearTooltip
-TT_GetGSC				= getGSC
-TT_GetTextGSC			= getTextGSC
-TT_AddLine				= addLine
-TT_LineColor			= lineColor
-TT_LineQuality			= lineQuality
-TT_SetIcon				= setIcon
-TT_NameFromLink			= nameFromLink
-TT_HyperlinkFromLink	= hyperlinkFromLink
-TT_QualityFromLink		= qualityFromLink
-TT_FakeLink				= fakeLink
-TT_BreakLink			= breakLink
-TT_FindItemInBags		= findItemInBags
-TT_SetElapsed			= setElapsed
-TT_SetMoneySpacing		= setMoneySpacing
-TT_SetPopupKey			= setPopupKey
--- DO NOT USE THESE FUNCTIONS IN NEW ADDONS --
--- Use the EnhTooltip object instead --
-
-
-

@@ -4,7 +4,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 <!--
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -750,9 +750,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			<OnLoad>
 				TT_OnLoad();
 			</OnLoad>
-			<OnEvent>
-				TT_OnEvent(event);
-			</OnEvent>
 		</Scripts>
 	</Frame>
 
