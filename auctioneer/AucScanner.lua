@@ -94,6 +94,9 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 	-- Only remove defunct auctions from snapshot if there was a good amount of auctions scanned.
 	local auctKey = Auctioneer.Util.GetAuctionKey();
 
+	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
+	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
+
 	local endTime = time();
 	if Auctioneer.Core.Variables.TotalAuctionsScannedCount >= 50 then
 		local dropCount, buyCount, bidCount, expCount;
@@ -102,11 +105,15 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 		bidCount = 0;
 		expCount = 0;
 		local snap,lastSeen,expiredSeconds,itemKey,buyList,listStr,listSplit,buyout,hist;
+		local id, rprop, enchant, name, count, min, buyout, sig;
+
 		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 				for iKey, iData in pairs(cData) do
 					snap = Auctioneer.Core.GetSnapshotFromData(iData);
 					if (snap.dirty == "1") then
+						id, rprop, enchant, name, count, min, buyout = Auctioneer.Core.GetItemSignature(iKey);
+
 						-- This item should have been seen, but wasn't.
 						-- We need to work out if it expired before or after it's time
 						lastSeen = snap.lastSeenTime;
@@ -121,22 +128,21 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 							if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
 							bidList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
 							bidList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.bid[auctKey][itemKey]));
-							bidList.insert(snap.bidamount);
+							bidList.insert(Auctioneer.Util.PriceForOne(snap.bidamount, count));
 							AuctionConfig.success.bid[auctKey][itemKey] = Auctioneer.Core.StoreMedianList (bidList.getList());
 						elseif (expiredSeconds < Auctioneer.Core.Constants.TimeLeft.Seconds[snap.timeLeft]) then
 							-- Whoa! This item was bought out.
 							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
 							if (not AuctionConfig.success) then AuctionConfig.success = {} end
 
-							x,x,x,x,x,x,buyout = Auctioneer.Core.GetItemSignature(iKey);
 							if (buyout > 0) then
 								buyCount = buyCount+1;
 								if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
 								if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
 								buyList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
 								buyList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.buy[auctKey][itemKey]));
-								buyList.insert(buyout);
-								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer.Core.StoreMedianList (buyList.getList());
+								buyList.insert(Auctioneer.Util.PriceForOne(buyout, count));
+								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer.Core.StoreMedianList(buyList.getList());
 							else
 								if (not AuctionConfig.success.drop) then AuctionConfig.success.drop = {} end
 								if (not AuctionConfig.success.drop[auctKey]) then AuctionConfig.success.drop[auctKey] = {} end
@@ -147,10 +153,14 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 						else
 							expCount = expCount+1;
 						end
-					end
 
-					if (string.sub(iData, 1,1) == "1") then
-						AuctionConfig.snap[auctKey][cat][iKey] = nil; --clear defunct auctions
+						-- Clear defunct auctions
+						if (id and rprop and enchant) then
+							sig = id..":"..rprop..":"..enchant;
+							AuctionConfig.sbuy[auctKey][sig] = nil;
+							Auctioneer.Storage.SetSnapMed(auctKey, sig, nil);
+						end
+						AuctionConfig.snap[auctKey][cat][iKey] = nil;
 						Auctioneer.Core.Variables.DefunctAuctionsCount = Auctioneer.Core.Variables.DefunctAuctionsCount + 1;
 					end
 				end
@@ -159,13 +169,11 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 		EnhTooltip.DebugPrint("Final counts", dropCount, buyCount, bidCount, expCount);
 	end
 
-	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
-	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
-
 	-- Copy the item prices into the Saved item prices table
 	if (Auctioneer.Core.Variables.SnapshotItemPrices) then
 		for sig, iData in pairs(Auctioneer.Core.Variables.SnapshotItemPrices) do
 			AuctionConfig.sbuy[auctKey][sig] = Auctioneer.Core.StoreMedianList(iData.buyoutPrices);
+			Auctioneer.Storage.SetSnapMed(auctKey, sig, Auctioneer.Statistic.GetMedian(iData.buyoutPrices));
 			Auctioneer.Core.Variables.SnapshotItemPrices[sig] = nil;
 		end
 	end
@@ -244,7 +252,7 @@ function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_
 
 	-- add this item's buyout price to the buyout price history for this item in the snapshot
 	if aiBuyoutPrice > 0 then
-		local buyoutPriceForOne = (aiBuyoutPrice / aiCount);
+		local buyoutPriceForOne = Auctioneer.Util.PriceForOne(aiBuyoutPrice, aiCount);
 		if (not Auctioneer.Core.Variables.SnapshotItemPrices[aiKey]) then
 			Auctioneer.Core.Variables.SnapshotItemPrices[aiKey] = {buyoutPrices={buyoutPriceForOne}, name=aiName};
 		else
@@ -272,14 +280,14 @@ function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_
 		local seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
 		seenCount = seenCount + 1;
 		minCount = minCount + 1;
-		minPrice = minPrice + math.ceil(Auctioneer.Util.NullSafe(aiMinBid) / aiCount);
+		minPrice = minPrice + Auctioneer.Util.PriceForOne(aiMinBid, aiCount);
 		if (Auctioneer.Util.NullSafe(aiBidAmount) > 0) then
 			bidCount = bidCount + 1;
-			bidPrice = bidPrice + math.ceil(Auctioneer.Util.NullSafe(aiBidAmount) / aiCount);
+			bidPrice = bidPrice + Auctioneer.Util.PriceForOne(aiBidAmount, aiCount);
 		end
 		if (Auctioneer.Util.NullSafe(aiBuyoutPrice) > 0) then
 			buyCount = buyCount + 1;
-			buyPrice = buyPrice + math.ceil(Auctioneer.Util.NullSafe(aiBuyoutPrice) / aiCount);
+			buyPrice = buyPrice + Auctioneer.Util.PriceForOne(aiBuyoutPrice, aiCount);
 		end
 		auctionPriceItem.data = string.format("%d:%d:%d:%d:%d:%d:%d", seenCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice);
 
@@ -288,7 +296,7 @@ function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_
 			newBuyoutPricesList.setList(bph);
 		end
 		if (Auctioneer.Util.NullSafe(aiBuyoutPrice) > 0) then
-			newBuyoutPricesList.insert(math.ceil(aiBuyoutPrice / aiCount));
+			newBuyoutPricesList.insert(Auctioneer.Util.PriceForOne(aiBuyoutPrice, aiCount));
 		end
 
 		auctionPriceItem.buyoutPricesHistoryList = newBuyoutPricesList.getList();
@@ -359,20 +367,40 @@ function placeAuctionBid(funcVars, retVal, itemtype, itemindex, bidamount)
 	AuctionConfig.bids[playerName][eventTime] = string.format("%s|%s|%s|%s|%s", auctionSignature, bidamount, 0, aiOwner, aiHighBidder or "unknown");
 
 	if bidamount == aiBuyout then -- only capture buyouts
+		local foundInSnapshot = false
+
 		-- remove from snapshot
 		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActRemove'), auctionSignature));
 		local auctKey = Auctioneer.Util.GetAuctionKey();
 		local itemCat = Auctioneer.Util.GetCatForKey(aiKey);
 		if (itemCat and AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey] and AuctionConfig.snap[auctKey][itemCat]) then
-			AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
+			if (AuctionConfig.snap[auctKey][itemCat][auctionSignature]) then
+				foundInSnapshot = true;
+				AuctionConfig.snap[auctKey][itemCat][auctionSignature] = nil;
+			end
 		end
 		if (not AuctionConfig.bids) then AuctionConfig.bids = {} end
 		if (not AuctionConfig.bids[playerName]) then AuctionConfig.bids[playerName] = {} end
 		AuctionConfig.bids[playerName][eventTime] = string.format("%s|%s|%s|%s|%s", auctionSignature, bidamount, 1, aiOwner, aiHighBidder or "unknown");
-		if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
-			Auctioneer_HSPCache[auctKey][aiKey] = nil;
+
+		if (foundInSnapshot) then
+			if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
+				Auctioneer_HSPCache[auctKey][aiKey] = nil;
+			end
+			Auctioneer_Lowests = nil;
+
+			-- Remove from snapshot buyout list
+			local sbuy = Auctioneer.Core.GetSnapshotInfo(auctKey, aiKey)
+			if sbuy then
+				local price = Auctioneer.Util.PriceForOne(aiBuyout, aiCount);
+				-- Find price in buyout list
+				local found = table.foreachi(sbuy.buyoutPrices, function(k, v) if tonumber(v) == price then return k end end)
+				if found then
+					table.remove(sbuy.buyoutPrices, found)
+					Auctioneer.Core.SaveSnapshotInfo(auctKey, aiKey, sbuy)
+				end
+			end
 		end
-		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
 	end
 end
 

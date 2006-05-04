@@ -32,12 +32,19 @@ function setHistMed(auctKey, itemKey, median, count)
 	if (not AuctionConfig.stats.histcount)			then AuctionConfig.stats.histcount = {}				end
 	if (not AuctionConfig.stats.histcount[auctKey])	then AuctionConfig.stats.histcount[auctKey] = {}	end
 
-	if (count > 0) then
+	if (not median) or (not count) then
+		AuctionConfig.stats.histmed[auctKey][itemKey]   = nil
+		AuctionConfig.stats.histcount[auctKey][itemKey] = nil
+	elseif (count > 0) and (median > 0) then
 		AuctionConfig.stats.histmed[auctKey][itemKey]   = median
 		AuctionConfig.stats.histcount[auctKey][itemKey] = count
 	else
 		AuctionConfig.stats.histmed[auctKey][itemKey]   = 0
 		AuctionConfig.stats.histcount[auctKey][itemKey] = 0
+	end
+	-- Clear HSP cache when median changes
+	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
+		Auctioneer_HSPCache[auctKey][itemKey] = nil
 	end
 end
 
@@ -48,12 +55,19 @@ function setSnapMed(auctKey, itemKey, median, count)
 	if (not AuctionConfig.stats.snapcount)			then AuctionConfig.stats.snapcount = {}				end
 	if (not AuctionConfig.stats.snapcount[auctKey])	then AuctionConfig.stats.snapcount[auctKey] = {}	end
 
-	if (count > 0) then
+	if (not median) or (not count) then
+		AuctionConfig.stats.snapmed[auctKey][itemKey]   = nil
+		AuctionConfig.stats.snapcount[auctKey][itemKey] = nil
+	elseif (count > 0) and (median > 0) then
 		AuctionConfig.stats.snapmed[auctKey][itemKey]   = median
 		AuctionConfig.stats.snapcount[auctKey][itemKey] = count
 	else
 		AuctionConfig.stats.snapmed[auctKey][itemKey]   = 0
 		AuctionConfig.stats.snapcount[auctKey][itemKey] = 0
+	end
+	-- Clear HSP cache when median changes
+	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
+		Auctioneer_HSPCache[auctKey][itemKey] = nil
 	end
 end
 

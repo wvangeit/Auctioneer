@@ -435,6 +435,7 @@ function saveSnapshot(server, cat, sig, iData)
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
 		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
+		Auctioneer.Storage.SetSnapMed(server, itemKey, nil)
 	else
 		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner);
 	end
@@ -445,17 +446,9 @@ function saveSnapshotInfo(server, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
 		Auctioneer_HSPCache[server][itemKey] = nil;
 	end
-	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
-	local median, seenCount = Auctioneer.Statistic.GetMedian(iData.buyoutPrices);
-	local low, second = Auctioneer.Statistic.GetLowest(iData.buyoutPrices);
+	Auctioneer_Lowests = nil;
 
-	if (not AuctionConfig.stats) then AuctionConfig.stats = {} end
-	if (not AuctionConfig.stats.snapmed) then AuctionConfig.stats.snapmed = {} end
-	if (not AuctionConfig.stats.snapmed[server]) then AuctionConfig.stats.snapmed[server] = {} end
-	if (not AuctionConfig.stats.snapcount) then AuctionConfig.stats.snapcount = {} end
-	if (not AuctionConfig.stats.snapcount[server]) then AuctionConfig.stats.snapcount[server] = {} end
-	AuctionConfig.stats.snapmed[server][itemKey] = median;
-	AuctionConfig.stats.snapcount[server][itemKey] = seenCount;
+	Auctioneer.Storage.SetSnapMed(server, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPrices))
 end
 
 

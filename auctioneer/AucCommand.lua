@@ -1323,7 +1323,6 @@ function clear(param, chatprint)
 
 		AuctionConfig.info = {};
 		AuctionConfig.data[aKey] = {};
-		Auctioneer_HSPCache[aKey] = {};
 		AuctionConfig.stats.histmed[aKey] = {};
 		AuctionConfig.stats.histcount[aKey] = {};
 		clear("snapshot");
@@ -1331,6 +1330,7 @@ function clear(param, chatprint)
 
 		AuctionConfig.snap[aKey] = {};
 		AuctionConfig.sbuy[aKey] = {};
+		Auctioneer_HSPCache[aKey] = {};
 		AuctionConfig.stats.snapmed[aKey] = {};
 		AuctionConfig.stats.snapcount[aKey] = {};
 		Auctioneer.Core.Variables.SnapshotItemPrices = {};

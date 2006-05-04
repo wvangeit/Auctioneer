@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getPercentile, getMeans, getItemSnapshotMedianBuyout, getSnapMedian, getItemHistoricalMedianBuyout, getHistMedian, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
+local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getPercentile, getMeans, getItemSnapshotMedianBuyout, getItemHistoricalMedianBuyout, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
 
 -- Subtracts/Adds given percentage from/to a value
 
@@ -160,87 +160,89 @@ end
 -- Returns the current snapshot median for an item
 function getItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices)
 	if (not auctKey) then auctKey = Auctioneer.Util.GetAuctionKey() end
-	if (not buyoutPrices) then
-		local sbuy = Auctioneer.Core.GetSnapshotInfo(auctKey, itemKey);
-		if (not sbuy) then
-			return 0, 0;
-		end
-		buyoutPrices = sbuy.buyoutPrices;
-	end
 
-	local snapMedian, snapSeenCount = getMedian(buyoutPrices);
+	local stat, count;
 
-	-- save median to the savedvariablesfile
-	Auctioneer.Storage.SetSnapMed(auctKey, itemKey, snapMedian, snapSeenCount)
-
-	return tonumber(snapMedian) or 0, snapSeenCount or 0;
-end
-
-function getSnapMedian(itemKey, auctKey, buyoutPrices)
-	if (not auctKey) then auctKey = Auctioneer.Util.GetAuctionKey() end
-	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.snapmed and AuctionConfig.stats.snapmed[auctKey]) then
 		stat = AuctionConfig.stats.snapmed[auctKey][itemKey];
 		count = AuctionConfig.stats.snapcount[auctKey][itemKey];
 	end
-	if (not stat) then
-		stat, count = getItemSnapshotMedianBuyout(itemKey, auctKey, buyoutPrices);
+
+	if (not stat) or (not count) then
+		if (not buyoutPrices) then
+			local sbuy = Auctioneer.Core.GetSnapshotInfo(auctKey, itemKey);
+			if (sbuy) then
+				buyoutPrices = sbuy.buyoutPrices;
+			end
+		end
+
+		if (buyoutPrices) then
+			stat, count = getMedian(buyoutPrices);
+		else
+			stat, count = 0, 0;
+		end
+
+		-- save median to the savedvariablesfile
+		Auctioneer.Storage.SetSnapMed(auctKey, itemKey, stat, count)
 	end
-	return stat or 0, count or 0;
+
+	return stat, count;
 end
 
+-- Returns the historical median for an item
 function getItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistoryTable)
-	local historyMedian = 0;
-	local historySeenCount = 0;
 	if (not auctKey) then auctKey = Auctioneer.Util.GetAuctionKey() end
-	if (not buyoutHistoryTable) then
-		buyoutHistoryTable = Auctioneer.Core.GetAuctionBuyoutHistory(itemKey, auctKey);
-	end
-	if (buyoutHistoryTable) then
-		historyMedian, historySeenCount = getMedian(buyoutHistoryTable);
-	end
 
-	-- save median to the savedvariablesfile
-	Auctioneer.Storage.SetHistMed(auctKey, itemKey, historyMedian, historySeenCount);
+	local stat, count;
 
-	return tonumber(historyMedian) or 0, tonumber(historySeenCount) or 0;
-end
-
-function getHistMedian(itemKey, auctKey, buyoutHistoryTable)
-	if (not auctKey) then auctKey = Auctioneer.Util.GetAuctionKey() end
-	local stat = nil; local count = nil;
 	if (AuctionConfig.stats and AuctionConfig.stats.histmed and AuctionConfig.stats.histmed[auctKey]) then
 		stat = AuctionConfig.stats.histmed[auctKey][itemKey];
 		count = AuctionConfig.stats.histcount[auctKey][itemKey];
 	end
-	if (not stat) then
-		stat, count = getItemHistoricalMedianBuyout(itemKey, auctKey, buyoutHistoryTable);
+
+	if (not stat) or (not count) then
+		if (not buyoutHistoryTable) then
+			buyoutHistoryTable = Auctioneer.Core.GetAuctionBuyoutHistory(itemKey, auctKey);
+		end
+
+		if (buyoutHistoryTable) then
+			stat, count = getMedian(buyoutHistoryTable);
+		else
+			stat, count = 0, 0;
+		end
+
+		-- save median to the savedvariablesfile
+		Auctioneer.Storage.SetHistMed(auctKey, itemKey, stat, count);
 	end
-	return stat or 0, count or 0;
+
+	return stat, count;
 end
 
 -- this function returns the most accurate median possible,
 -- if an accurate median cannot be obtained based on min seen counts then nil is returned
 function getUsableMedian(itemKey, realm, buyoutPrices)
-	local usableMedian = nil;
-	local count = nil;
 	if not realm then
 		realm = Auctioneer.Util.GetAuctionKey();
 	end
 
 	--get snapshot median
-	local snapshotMedian, snapCount = getSnapMedian(itemKey, realm, buyoutPrices)
+	local snapshotMedian, snapCount = getItemSnapshotMedianBuyout(itemKey, realm, buyoutPrices)
 	--get history median
-	local historyMedian, histCount = getHistMedian(itemKey, realm);
+	local historyMedian, histCount = getItemHistoricalMedianBuyout(itemKey, realm);
 
-	if (snapCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) and ((histCount < Auctioneer.Core.Constants.MinBuyoutSeenCount) or (snapshotMedian < 1.2 * historyMedian)) then
-		usableMedian = snapshotMedian;
-		count = snapCount;
-	elseif (histCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) then
-		usableMedian = historyMedian;
-		count = histCount;
+	local median, count
+	if (histCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) then
+		median, count = historyMedian, histCount;
 	end
-	return usableMedian, count;
+	if (snapCount >= Auctioneer.Core.Constants.MinBuyoutSeenCount) then
+		if (histCount < snapCount) then
+			-- History median isn't shown in tooltip if histCount < snapCount so use snap median in this case
+			median, count = snapshotMedian, snapCount;
+		elseif (snapshotMedian < 1.2 * historyMedian) then
+			median, count = snapshotMedian, snapCount;
+		end
+	end
+	return median, count;
 end
 
 -- Returns the current bid on an auction
@@ -346,23 +348,26 @@ function buildLowestCache(auctKey)
 	if (Auctioneer_Lowests == nil) then Auctioneer_Lowests = {}; end
 	Auctioneer_Lowests[auctKey] = {}
 
-	local id, rprop, enchant, name, count, min, buyout, uniq, lowKey, priceForOne, curSig, curLowest;
+	local id, rprop, enchant, name, count, min, buyout, uniq, lowKey, priceForOne, lowests;
 	if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 		for itemCat, cData in pairs(AuctionConfig.snap[auctKey]) do
 			for sig, sData in pairs(cData) do
 				id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(sig);
+
 				lowKey = id..":"..rprop;
-				if (not Auctioneer_Lowests[auctKey][lowKey]) then Auctioneer_Lowests[auctKey][lowKey] = {} end
+				if (not Auctioneer_Lowests[auctKey][lowKey]) then Auctioneer_Lowests[auctKey][lowKey] = {cat = itemCat} end
+				lowests = Auctioneer_Lowests[auctKey][lowKey]
 
-				priceForOne = buyout;
-				if (count and count > 0) then priceForOne = (buyout / count); end
+				if (Auctioneer.Util.NullSafe(buyout) > 0) then
+					priceForOne = Auctioneer.Util.PriceForOne(buyout, count)
 
-				curSig = Auctioneer_Lowests[auctKey][lowKey].lowSig;
-				curLowest = Auctioneer_Lowests[auctKey][lowKey].lowestPrice or 0;
-				if (buyout > 0 and (curLowest == 0 or priceForOne < curLowest)) then
-					Auctioneer_Lowests[auctKey][lowKey] = {
-						nextSig = curSig, nextLowest = curLowest, lowSig = sig, lowestPrice = priceForOne, cat = itemCat
-					};
+					if (lowests.lowestPrice == nil) or (priceForOne < lowests.lowestPrice) then
+						lowests.lowestPrice, lowests.nextLowest = priceForOne, lowests.lowestPrice
+						lowests.lowSig, lowests.nextSig = sig, lowests.lowSig
+					elseif (lowests.nextLowest == nil) or (priceForOne < lowests.nextLowest) then
+						lowests.nextLowest = priceForOne
+						lowests.nextSig = sig
+					end
 				end
 			end
 		end
@@ -637,9 +642,9 @@ Auctioneer.Statistic = {
 	GetPercentile = getPercentile,
 	GetMeans = getMeans,
 	GetItemSnapshotMedianBuyout = getItemSnapshotMedianBuyout,
-	GetSnapMedian = getSnapMedian,
+	GetSnapMedian = getItemSnapshotMedianBuyout,
 	GetItemHistoricalMedianBuyout = getItemHistoricalMedianBuyout,
-	GetHistMedian = getHistMedian,
+	GetHistMedian = getItemHistoricalMedianBuyout,
 	GetUsableMedian = getUsableMedian,
 	GetCurrentBid = getCurrentBid,
 	IsBadResaleChoice = isBadResaleChoice,

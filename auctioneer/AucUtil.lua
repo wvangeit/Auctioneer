@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local getTimeLeftString, getSecondsLeftString, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, breakItemKey, split, findClass, getCatName, getCatNumberByName, getCatForKey, getKeyFromSig, getCatForSig, getItemLinks, getItems, getItemHyperlinks, loadCategories, loadCategoryClasses, loadCategorySubClasses, chatPrint, setFilterDefaults, protectAuctionFrame, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot, containerFrameItemButtonOnClick
+local getTimeLeftString, getSecondsLeftString, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, breakItemKey, split, findClass, getCatName, getCatNumberByName, getCatForKey, getKeyFromSig, getCatForSig, getItemLinks, getItems, getItemHyperlinks, loadCategories, loadCategoryClasses, loadCategorySubClasses, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot, containerFrameItemButtonOnClick
 
 -- return the string representation of the given timeLeft constant
 function getTimeLeftString(timeLeft)
@@ -456,6 +456,12 @@ function protectAuctionFrame(enable)
 	end
 end
 
+function priceForOne(price, count)
+	price = nullSafe(price)
+	count = math.max(nullSafe(count), 1)
+	return math.ceil(price / count)
+end
+
 function round(x)
 	local y = math.floor(x);
 
@@ -668,6 +674,7 @@ Auctioneer.Util = {
 	ChatPrint = chatPrint,
 	SetFilterDefaults = setFilterDefaults,
 	ProtectAuctionFrame = protectAuctionFrame,
+	PriceForOne = priceForOne,
 	Round = round,
 	DelocalizeFilterVal = delocalizeFilterVal,
 	LocalizeFilterVal = localizeFilterVal,
