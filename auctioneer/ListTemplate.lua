@@ -272,7 +272,7 @@ end
 -------------------------------------------------------------------------------
 function ListTemplate_DropDown_OnLoad()
 	getglobal(this:GetName().."Text"):Hide();
-	UIDropDownMenu_Initialize(this, ListTemplate_DropDown_Initialize);
+	this.initialize = ListTemplate_DropDown_Initialize;
 	UIDropDownMenu_SetSelectedID(this, 1);
 end
 
