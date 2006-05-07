@@ -1137,9 +1137,11 @@ function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	end
 end
 
-function gtHookSetText(funcArgs, retval, frame, text, r, g, b, a, newbieTip)
+function gtHookSetText(funcArgs, retval, frame, text, r, g, b, a, textWrap)
 	-- Nothing to do for plain text
-	clearTooltip()
+	if (self.currentGametip == frame) then
+		clearTooltip()
+	end
 end
 
 function gtHookAppendText(funcArgs, retVal, frame)
