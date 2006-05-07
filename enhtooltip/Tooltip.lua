@@ -217,6 +217,7 @@ local doHyperlink				-- DoHyperlink(reference,link,button)
 local embedRender				-- EmbedRender()
 local fakeLink					-- FakeLink(hyperlink,quality,name)
 local findItemInBags			-- FindItemInBags(findName)
+local getglobalIterator			-- GetglobalIterator(format,first,last)
 local getGSC					-- GetGSC(money)
 local getLootLinkLink			-- GetLootLinkLink(name)
 local getLootLinkServer			-- GetLootLinkServer()
@@ -234,6 +235,7 @@ local gtHookSetOwner			-- GtHookSetOwner(frame,owner,anchor)
 local gtHookSetQuestItem		-- GtHookSetQuestItem(frame,qtype,slot)
 local gtHookSetQuestLogItem		-- GtHookSetQuestLogItem(frame,qtype,slot)
 local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
+local gtHookSetText				-- GtHookSetText(funcArgs, retval, frame, text, r, g, b, unknown1, unknown2)
 local gtHookAppendText			-- GtHookAppendText(funcArgs, retVal, frame)
 local gtHookShow				-- GtHookShow(funcArgs, retVal, frame)
 local hideTooltip				-- HideTooltip()
@@ -304,6 +306,19 @@ function hideTooltip()
 	self.hideTime = 0
 end
 
+-- Iterate over numbered global objects
+function getglobalIterator(fmt, first, last)
+	local i = tonumber(first) or 1
+	return function()
+		if last and (i > last) then
+			return nil
+		end
+		local obj = getglobal(string.format(fmt, i))
+		i = i + 1
+		return obj
+	end
+end
+
 function clearTooltip()
 	hideTooltip()
 	EnhancedTooltip.hasEmbed = false
@@ -312,17 +327,18 @@ function clearTooltip()
 	EnhancedTooltip.hasIcon = false
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
-	for i = 1, 30 do
-		local ttText = getglobal("EnhancedTooltipText"..i)
+
+	for ttText in getglobalIterator("EnhancedTooltipText%d") do
 		ttText:Hide()
 		ttText:SetTextColor(1.0,1.0,1.0)
 		ttText:SetFont("Fonts\\FRIZQT__.TTF", 10);
 	end
-	for i = 1, 20 do
-		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
+
+	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
 		ttMoney.myLine = nil
 		ttMoney:Hide()
 	end
+
 	EnhancedTooltip.lineCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
@@ -360,7 +376,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		return
 	end
 
-	local height = 20
 	local width = EnhancedTooltip.minWidth
 	if (EnhancedTooltip.hasIcon) then
 		width = width + EnhancedTooltipIcon:GetWidth()
@@ -373,18 +388,14 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		end
 	end
 
-	local firstLine = EnhancedTooltipText1
-	local trackHeight = firstLine:GetHeight()
-	for i = 2, lineCount do
-		local currentLine = getglobal("EnhancedTooltipText"..i)
-		trackHeight = trackHeight + currentLine:GetHeight() + 1
+	local height = 0
+	for currentLine in getglobalIterator("EnhancedTooltipText%d", 1, lineCount) do
+		height = height + currentLine:GetHeight() + 1
 	end
-	local iconHeight = EnhancedTooltipIcon:GetHeight()
-	if ((trackHeight < iconHeight) and (lineCount < 3)) then
-		trackHeight = iconHeight - 6
+	if EnhancedTooltip.hasIcon then
+		height = math.max(height, EnhancedTooltipIcon:GetHeight() - 6)
 	end
-	height = 20 + trackHeight
-	local minWidth = width
+	height = height + 20
 
 	local sWidth = GetScreenWidth()
 	local sHeight = GetScreenHeight()
@@ -449,17 +460,17 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		local anchor = yAnchor..xAnchor
 
 		if (anchor == "TOPLEFT") then
-			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject:GetName(), "TOPLEFT", -5 + xOffset, 5 + yOffset)
-			currentTooltip:SetPoint("BOTTOMRIGHT", "EnhancedTooltip", "TOPRIGHT", 0,0)
+			EnhancedTooltip:SetPoint("BOTTOMRIGHT", parentObject, "TOPLEFT", -5 + xOffset, 5 + yOffset)
+			currentTooltip:SetPoint("BOTTOMRIGHT", EnhancedTooltip, "TOPRIGHT", 0,0)
 		elseif (anchor == "TOPRIGHT") then
-			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject:GetName(), "TOPRIGHT", 5 + xOffset, 5 + yOffset)
-			currentTooltip:SetPoint("BOTTOMLEFT", "EnhancedTooltip", "TOPLEFT", 0,0)
+			EnhancedTooltip:SetPoint("BOTTOMLEFT", parentObject, "TOPRIGHT", 5 + xOffset, 5 + yOffset)
+			currentTooltip:SetPoint("BOTTOMLEFT", EnhancedTooltip, "TOPLEFT", 0,0)
 		elseif (anchor == "BOTTOMLEFT") then
-			currentTooltip:SetPoint("TOPRIGHT", parentObject:GetName(), "BOTTOMLEFT", -5 + xOffset, -5 + yOffset)
-			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
+			currentTooltip:SetPoint("TOPRIGHT", parentObject, "BOTTOMLEFT", -5 + xOffset, -5 + yOffset)
+			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
 		else -- BOTTOMRIGHT
-			currentTooltip:SetPoint("TOPLEFT", parentObject:GetName(), "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
-			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
+			currentTooltip:SetPoint("TOPLEFT", parentObject, "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
+			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		end
 
 	else
@@ -472,13 +483,13 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 		if (enhTooltipTipRect.b - height < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", "UIParent", "BOTTOMLEFT", enhTooltipTipRect.l, height+60)
+			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", enhTooltipTipRect.l, height+60)
 		end
 		EnhancedTooltip:ClearAllPoints()
 		if (enhTooltipTipRect.cx < 6*sWidth/10) then
-			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip:GetName(), "BOTTOMLEFT", 0,0)
+			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		else
-			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip:GetName(), "BOTTOMRIGHT", 0,0)
+			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
 		end
 	end
 
@@ -487,16 +498,16 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	currentTooltip:SetWidth(width)
 	EnhancedTooltip:Show()
 
-	for i = 1, 30 do
-		local ttMoney = getglobal("EnhancedTooltipMoney"..i)
+	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
 		if (ttMoney.myLine ~= nil) then
-			ttMoneyWidth = ttMoney:GetWidth()
-			ttMoneyLineWidth = getglobal(ttMoney.myLine):GetWidth()
+			local myLine = getglobal(ttMoney.myLine)
+			local ttMoneyWidth = ttMoney:GetWidth()
+			local ttMoneyLineWidth = myLine:GetWidth()
 			ttMoney:ClearAllPoints()
 			if ((ttMoney.myLineNumber < 4) and (EnhancedTooltip.hasIcon)) then
-				ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2 - 34, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2 - 34, 0)
 			else
-				ttMoney:SetPoint("LEFT", ttMoney.myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
 			end
 		end
 	end
@@ -605,7 +616,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 	if (moneyAmount ~= nil) and (moneyAmount > 0) then
 		local curMoney = EnhancedTooltip.moneyCount + 1
 		local money = getglobal("EnhancedTooltipMoney"..curMoney)
-		money:SetPoint("LEFT", line:GetName(), "RIGHT", self.moneySpacing, 0)
+		money:SetPoint("LEFT", line, "RIGHT", self.moneySpacing, 0)
 		TinyMoneyFrame_Update(money:GetName(), math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money.myLineNumber = curLine
@@ -1030,10 +1041,6 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 		if (quality == nil) then quality = qualityFromLink(link) end
 
 		tooltipCall(GameTooltip, name, link, quality, quantity)
-	else
-		-- This hack explicitely closes tooltip on empty inventory slots.
-		-- TODO: Solve the problem instead of the symptom :)
-		hideTooltip()
 	end
 end
 
@@ -1128,6 +1135,11 @@ function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 			end
 		end
 	end
+end
+
+function gtHookSetText(funcArgs, retval, frame, text, r, g, b, a, newbieTip)
+	-- Nothing to do for plain text
+	clearTooltip()
 end
 
 function gtHookAppendText(funcArgs, retVal, frame)
@@ -1351,6 +1363,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, gtHookSetCraftSpell);
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
+	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, gtHookSetText);
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText);
 	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner);
 	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, gtHookShow);
@@ -1410,6 +1423,7 @@ EnhTooltip = {
 	HideTooltip			= hideTooltip,
 	ShowTooltip			= showTooltip,
 
+	GetglobalIterator	= getglobalIterator,
 	GetGSC				= getGSC,
 	GetTextGSC			= getTextGSC,
 	BaselinkFromLink	= baselinkFromLink,
