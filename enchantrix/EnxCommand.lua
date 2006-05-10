@@ -29,10 +29,10 @@ local register					-- Enchantrix.Command.Register()
 local resetKhaos				-- Enchantrix.Command.ResetKhaos()
 local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
 local setKhaosSetKeyParameter	-- Enchantrix.Command.SetKhaosSetKeyParameter()
-local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
 
 -- Local functions
 local getKhaosLocaleList
+local getKhaosLoadList
 local registerKhaos
 local registerAuctioneerOptions
 local chatPrintHelp
@@ -63,7 +63,7 @@ local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
 
 function addonLoaded()
-	register()
+	registerKhaos()
 end
 
 function getKhaosLocaleList()
@@ -74,26 +74,41 @@ function getKhaosLocaleList()
 	return options
 end
 
+function getKhaosLoadList()
+	return {
+		[_ENCH('GuiLoad_Always')] = 'always',
+		[_ENCH('GuiLoad_Never')] = 'never',
+	}
+end
+
 function registerKhaos()
 	optionSet = {
 		id="Enchantrix";
 		text="Enchantrix";
-		helptext=_ENCH('GuiMainHelp');
+		helptext=function() 
+			return _ENCH('GuiMainHelp');
+		end;
 		difficulty=1;
 		default={checked=true};
 		options={
 			{
 				id="Header";
 				text="Enchantrix";
-				helptext=_ENCH('GuiMainHelp');
+				helptext=function() 
+					return _ENCH('GuiMainHelp')
+				end;
 				type=K_HEADER;
 				difficulty=1;
 			};
 			{
 				id="all";
 				type=K_TEXT;
-				text=_ENCH('GuiMainEnable');
-				helptext=_ENCH('HelpOnoff');
+				text=function() 
+					return _ENCH('GuiMainEnable')
+				end;
+				helptext=function() 
+					return _ENCH('HelpOnoff')
+				end;
 				callback=function(state)
 					if (state.checked) then
 						onOff('on');
@@ -117,11 +132,15 @@ function registerKhaos()
 				id="locale";
 				type=K_PULLDOWN;
 				setup = {
-					options = getKhaosLocaleList();
+					options = getKhaosLocaleList;
 					multiSelect = false;
 				};
-				text=_ENCH('GuiLocale');
-				helptext=_ENCH('HelpLocale');
+				text=function() 
+					return _ENCH('GuiLocale')
+				end;
+				helptext=function() 
+					return _ENCH('HelpLocale')
+				end;
 				callback = function(state)
 				end;
 				feedback = function (state)
@@ -141,13 +160,15 @@ function registerKhaos()
 				id="LoadSettings";
 				type=K_PULLDOWN;
 				setup = {
-					options = {
-						[_ENCH('GuiLoad_Always')] = 'always',
-						[_ENCH('GuiLoad_Never')] = 'never',};
+					options = getKhaosLoadList;
 					multiSelect = false;
 				};
-				text=_ENCH('GuiLoad');
-				helptext=_ENCH('HelpLoad');
+				text=function() 
+					return _ENCH('GuiLoad')
+				end;
+				helptext=function() 
+					return _ENCH('HelpLoad')
+				end;
 				callback=function(state) end;
 				feedback=function(state)
 					handleCommand("load " .. state.value, "GUI");
@@ -157,30 +178,14 @@ function registerKhaos()
 				difficulty=1;
 			};
 			{
-				id="ReloadUI";
-				type=K_BUTTON;
-				setup={
-					buttonText = _ENCH('GuiReloaduiButton');
-				};
-				text=_ENCH('GuiReloadui');
-				helptext=_ENCH('GuiReloaduiHelp');
-				callback=function()
-					if(ReloadUI) then
-						ReloadUIHandler("5");
-					else
-						ReloadUI();
-					end
-				end;
-				feedback=function()
-					return _ENCH('GuiReloaduiFeedback');
-				end;
-				difficulty=4;
-			};
-			{
 				id="embed";
 				type=K_TEXT;
-				text=_ENCH('GuiEmbed');
-				helptext=_ENCH('HelpEmbed');
+				text=function() 
+					return _ENCH('GuiEmbed')
+				end;
+				helptext=function() 
+					return _ENCH('HelpEmbed')
+				end;
 				callback=function(state)
 					genVarSet('embed', state.checked);
 				end;
@@ -200,8 +205,12 @@ function registerKhaos()
 			{
 				id="counts";
 				type=K_TEXT;
-				text=_ENCH('GuiCount');
-				helptext=_ENCH('HelpCount');
+				text=function() 
+					return _ENCH('GuiCount')
+				end;
+				helptext=function() 
+					return _ENCH('HelpCount')
+				end;
 				callback=function(state)
 					genVarSet('counts', state.checked);
 				end;
@@ -221,8 +230,12 @@ function registerKhaos()
 			--[[{
 				id="rates";
 				type=K_TEXT;
-				text=_ENCH('GuiRate');
-				helptext=_ENCH('HelpRate');
+				text=function() 
+					return _ENCH('GuiRate')
+				end;
+				helptext=function() 
+					return _ENCH('HelpRate')
+				end;
 				callback=function(state)
 					genVarSet('rates', state.checked);
 				end;
@@ -242,15 +255,23 @@ function registerKhaos()
 			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
-				text=_ENCH('GuiValuateHeader');
-				helptext=_ENCH('HelpValue');
+				text=function() 
+					return _ENCH('GuiValuateHeader')
+				end;
+				helptext=function() 
+					return _ENCH('HelpValue')
+				end;
 				difficulty=2;
 			};
 			{
 				id="valuate";
 				type=K_TEXT;
-				text=_ENCH('GuiValuateEnable');
-				helptext=_ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer');
+				text=function() 
+					return _ENCH('GuiValuateEnable')
+				end;
+				helptext=function() 
+					return _ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer')
+				end;
 				callback=function(state)
 					genVarSet('valuate', state.checked);
 				end;
@@ -270,8 +291,12 @@ function registerKhaos()
 			{
 				id="valuate-baseline";
 				type=K_TEXT;
-				text=_ENCH('GuiValuateBaseline');
-				helptext=_ENCH('HelpGuessBaseline');
+				text=function() 
+					return _ENCH('GuiValuateBaseline')
+				end;
+				helptext=function() 
+					return _ENCH('HelpGuessBaseline')
+				end;
 				callback=function(state)
 					genVarSet('valuate-baseline', state.checked);
 				end;
@@ -291,18 +316,28 @@ function registerKhaos()
 			{
 				id="EnchantrixOtherHeader";
 				type=K_HEADER;
-				text=_ENCH('GuiOtherHeader');
-				helptext=_ENCH('GuiOtherHelp');
+				text=function() 
+					return _ENCH('GuiOtherHeader')
+				end;
+				helptext=function() 
+					return _ENCH('GuiOtherHelp')
+				end;
 				difficulty=1;
 			};
 			{
 				id="EnchantrixClearAll";
 				type=K_BUTTON;
 				setup={
-					buttonText = _ENCH('GuiClearallButton');
+					buttonText = function() 
+						return _ENCH('GuiClearallButton')
+					end;
 				};
-				text=_ENCH('GuiClearall');
-				helptext=_ENCH('GuiClearallHelp');
+				text=function() 
+					return _ENCH('GuiClearall')
+				end;
+				helptext=function() 
+					return _ENCH('GuiClearallHelp')
+				end;
 				callback=function()
 					clear(_ENCH('CmdClearAll'));
 				end;
@@ -316,10 +351,16 @@ function registerKhaos()
 				id="DefaultAll";
 				type=K_BUTTON;
 				setup={
-					buttonText = _ENCH('GuiDefaultAllButton');
+					buttonText = function() 
+						return _ENCH('GuiDefaultAllButton')
+					end;
 				};
-				text=_ENCH('GuiDefaultAll');
-				helptext=_ENCH('GuiDefaultAllHelp');
+				text=function() 
+					return _ENCH('GuiDefaultAll')
+				end;
+				helptext=function() 
+					return _ENCH('GuiDefaultAllHelp')
+				end;
 				callback=function()
 					default(_ENCH('CmdClearAll'));
 				end;
@@ -333,11 +374,15 @@ function registerKhaos()
 				id="printframe";
 				type=K_PULLDOWN;
 				setup = {
-					options = Enchantrix.Config.GetFrameNames();
+					options = Enchantrix.Config.GetFrameNames;
 					multiSelect = false;
 				};
-				text=_ENCH('GuiPrintin');
-				helptext=_ENCH('HelpPrintin');
+				text=function() 
+					return _ENCH('GuiPrintin')
+				end;
+				helptext=function() 
+					return _ENCH('HelpPrintin')
+				end;
 				callback=function(state)
 					Enchantrix.Config.SetFrame(state.value);
 				end;
@@ -358,10 +403,14 @@ function registerKhaos()
 				id="DefaultOption";
 				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"};
+					callOn = {"tab", "escape", "enter"};
 				};
-				text=_ENCH('GuiDefaultOption');
-				helptext=_ENCH('HelpDefault');
+				text=function() 
+					return _ENCH('GuiDefaultOption')
+				end;
+				helptext=function() 
+					return _ENCH('HelpDefault')
+				end;
 				callback = function(state)
 					default(state.value);
 				end;
@@ -392,19 +441,27 @@ function registerKhaos()
 end
 
 function registerAuctioneerOptions()
-	local insertPos = table.foreachi(optionSet.options, function(i, v) if v.id == "valuate" then return i + 1 end end)
-	assert(insertPos)
+	local insertPos 
+	for key, value in ipairs(optionSet.options) do
+		if value.id == "valuate" then
+			insertPos = key + 1
+		end
+	end
 
 	if (optionSet.options[insertPos].id == 'valuate-hsp') then
-		return;
+		return
 	end
 
 	local AuctioneerOptions = {
 		{
 			id="valuate-hsp";
 			type=K_TEXT;
-			text=_ENCH('GuiValuateAverages');
-			helptext=_ENCH('HelpGuessAuctioneerHsp');
+			text=function() 
+				return _ENCH('GuiValuateAverages')
+			end;
+			helptext=function() 
+				return _ENCH('HelpGuessAuctioneerHsp')
+			end;
 			callback=function(state)
 				genVarSet('valuate-hsp', state.checked);
 			end;
@@ -424,8 +481,12 @@ function registerAuctioneerOptions()
 		{
 			id="valuate-median";
 			type=K_TEXT;
-			text=_ENCH('GuiValuateMedian');
-			helptext=_ENCH('HelpGuessAuctioneerMedian');
+			text=function() 
+				return _ENCH('GuiValuateMedian')
+			end;
+			helptext=function() 
+				return _ENCH('HelpGuessAuctioneerMedian')
+			end;
 			callback=function(state)
 				genVarSet('valuate-median', state.checked);
 			end;
@@ -444,7 +505,7 @@ function registerAuctioneerOptions()
 		};
 	};
 
-	optionSet.options[insertPos - 1].helptext = _ENCH('HelpValue');
+	optionSet.options[insertPos - 1].helptext = function() return _ENCH('HelpValue') end;
 
 	for i, opt in ipairs(AuctioneerOptions) do
 		tinsert(optionSet.options, insertPos + i - 1, opt);
@@ -516,7 +577,7 @@ function setKhaosSetKeyValue(key, value)
 		end
 	end
 end
-
+--[[
 function resetKhaos()
 	if Enchantrix.State.Khaos_Registered then
 
@@ -530,7 +591,7 @@ function resetKhaos()
 		end
 	end
 end
-
+]]
 -- Cleaner Command Handling Functions (added by MentalPower)
 function handleCommand(command, source)
 
@@ -580,7 +641,7 @@ function handleCommand(command, source)
 
 	elseif (cmd == 'locale') then
 		-- /enchantrix locale
-		Enchantrix.Locale.SetLocale(param, chatprint);
+		Enchantrix.Config.SetLocale(param, chatprint);
 
 	elseif (cmd == 'default') then
 		-- /enchantrix default
@@ -745,18 +806,6 @@ function genVarSet(variable, param, chatprint)
 			setKhaosSetKeyParameter(variable, "checked", false);
 		end
 	end
-end
-
-function register()
-
-	if (Khaos) then
-		if (not Enchantrix.State.Khaos_Registered) then
-			Enchantrix.State.GUI_Registered = registerKhaos();
-		end
-	end
-
-	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
-	return (Enchantrix.State.GUI_Registered == true)
 end
 
 ---------------------------------------
@@ -954,7 +1003,7 @@ Enchantrix.Command = {
 	HandleCommand			= handleCommand,
 
 	Register				= register,
-	ResetKhaos				= resetKhaos,
+	--ResetKhaos				= resetKhaos,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
 	SetKhaosSetKeyParameter	= setKhaosSetKeyParameter,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,

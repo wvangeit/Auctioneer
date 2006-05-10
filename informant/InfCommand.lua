@@ -33,8 +33,6 @@ local delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeC
 local commandMap = nil;
 local commandMapRev = nil;
 
-Informant_Slash_Registered = nil
-Informant_GUI_Registered = nil
 Informant_Khaos_Registered = nil
 
 Informant.InitCommands = function()
@@ -49,10 +47,7 @@ Informant.InitCommands = function()
 	chatPrint(string.format(_INFM('FrmtWelcome'), INFORMANT_VERSION))
 
 	if (Khaos) then
-		if (not Informant_Khaos_Registered) then
-			Informant_GUI_Registered = registerKhaos()
-			if (Informant_GUI_Registered == true) then return true end
-		end
+		registerKhaos()
 	end
 end
 
@@ -217,37 +212,6 @@ function onOff(state, chatprint)
 	return state
 end
 
---Function decomisioned untill further notice
---[[function cmdLocale(param, chatprint)
-	param = delocalizeFilterVal(param);
-	local validLocale = nil;
-
-	if (param == Informant_LocaleLastSet) then
-		return
-	end
-
-	if (param == Informant.GetFilterVal('locale')) then
-		validLocale = true;
-	elseif (setLocale(param)) then
-		validLocale = true;
-	end
-
-	Informant_LocaleLastSet = param;
-
-	if (chatprint) then
-		if (validLocale) then
-			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), localizeFilterVal(param)));
-		else
-			chatPrint(string.format(_INFM('FrmtUnknownLocale'), param));
-			if (INFORMANT_VALID_LOCALES) then
-				for locale, x in pairs(INFORMANT_VALID_LOCALES) do
-					chatPrint("  "..locale);
-				end
-			end
-		end
-	end
-end]]
-
 function restoreDefault(param, chatprint)
 	local oldLocale = InformantConfig.filters['locale']
 	local paramLocalized
@@ -314,48 +278,60 @@ end
 
 function registerKhaos()
 	local optionSet = {
-		id="Informant",
-		text="Informant",
-		helptext=_INFM('GuiMainHelp'),
-		difficulty=1,
-		default={checked=true},
+		id="Informant";
+		text="Informant";
+		helptext=function() 
+			return _INFM('GuiMainHelp')
+		end;
+		difficulty=1;
+		default={checked=true};
 		options={
 			{
-				id="Header",
-				text="Informant",
-				helptext=_INFM('GuiMainHelp'),
-				type=K_HEADER,
-				difficulty=1,
-			},
+				id="Header";
+				text="Informant";
+				helptext=function() 
+					return _INFM('GuiMainHelp')
+				end;
+				type=K_HEADER;
+				difficulty=1;
+			};
 			{
-				id="enabled",
-				type=K_TEXT,
-				text=_INFM('GuiMainEnable'),
-				helptext=_INFM('HelpOnoff'),
+				id="enabled";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiMainEnable')
+				end;
+				helptext=function() 
+					return _INFM('HelpOnoff')
+				end;
 				callback=function(state)
 					onOff(state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return _INFM('StatOn')
 					else
 						return _INFM('StatOff')
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				difficulty=1;
+			};
 			{
 				id="locale";
 				type=K_PULLDOWN;
 				setup = {
-					options = getKhaosLocaleList();
+					options = getKhaosLocaleList;
 					multiSelect = false;
 				};
-				text=_INFM('GuiLocale');
-				helptext=_INFM('HelpLocale');
+				text=function() 
+					return _INFM('GuiLocale')
+				end;
+				helptext=function() 
+					return _INFM('HelpLocale')
+				end;
 				callback = function(state)
 				end;
 				feedback = function (state)
@@ -372,289 +348,331 @@ function registerKhaos()
 				difficulty=2;
 			};
 			{
-				id="ReloadUI",
-				type=K_BUTTON,
-				setup={
-					buttonText = _INFM('GuiReloaduiButton')
-				},
-				text=_INFM('GuiReloadui'),
-				helptext=_INFM('GuiReloaduiHelp'),
-				callback=function()
-					if(ReloadUI) then
-						ReloadUIHandler("5");
-					else
-						ReloadUI();
-					end
-				end,
-				feedback=function()
-					return _INFM('GuiReloaduiFeedback');
+				id="InformantInfoHeader";
+				type=K_HEADER;
+				text=function() 
+					return _INFM('GuiInfoHeader')
 				end;
-				difficulty=3,
-			},
+				helptext=function() 
+					return _INFM('GuiInfoHelp')
+				end;
+				difficulty=1;
+			};
 			{
-				id="InformantInfoHeader",
-				type=K_HEADER,
-				text=_INFM('GuiInfoHeader'),
-				helptext=_INFM('GuiInfoHelp'),
-				difficulty=1,
-			},
-			{
-				id="show-icon",
-				type=K_TEXT,
-				text=_INFM('GuiInfoIcon'),
-				helptext=_INFM('HelpIcon'),
+				id="show-icon";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiInfoIcon')
+				end;
+				helptext=function() 
+					return _INFM('HelpIcon')
+				end;
 				callback=function(state)
 					genVarSet("show-icon", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowIcon')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowIcon')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="show-stack",
-				type=K_TEXT,
-				text=_INFM('GuiInfoStack'),
-				helptext=_INFM('HelpStack'),
+				id="show-stack";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiInfoStack')
+				end;
+				helptext=function() 
+					return _INFM('HelpStack')
+				end;
 				callback=function(state)
 					genVarSet("show-stack", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowStack')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowStack')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="show-usage",
-				type=K_TEXT,
-				text=_INFM('GuiInfoUsage'),
-				helptext=_INFM('HelpUsage'),
+				id="show-usage";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiInfoUsage')
+				end;
+				helptext=function() 
+					return _INFM('HelpUsage')
+				end;
 				callback=function(state)
 					genVarSet("show-usage", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowUsage')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowUsage')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="show-quest",
-				type=K_TEXT,
-				text=_INFM('GuiInfoQuest'),
-				helptext=_INFM('HelpQuest'),
+				id="show-quest";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiInfoQuest')
+				end;
+				helptext=function() 
+					return _INFM('HelpQuest')
+				end;
 				callback=function(state)
 					genVarSet("show-quest", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowQuest')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowQuest')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="show-merchant",
-				type=K_TEXT,
-				text=_INFM('GuiInfoMerchant'),
-				helptext=_INFM('HelpMerchant'),
+				id="show-merchant";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiInfoMerchant')
+				end;
+				helptext=function() 
+					return _INFM('HelpMerchant')
+				end;
 				callback=function(state)
 					genVarSet("show-merchant", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'),  _INFM('ShowMerchant')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowMerchant')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="InformantVendorHeader",
-				type=K_HEADER,
-				text=_INFM('GuiVendorHeader'),
-				helptext=_INFM('GuiVendorHelp'),
-				difficulty=1,
-			},
+				id="InformantVendorHeader";
+				type=K_HEADER;
+				text=function() 
+					return _INFM('GuiVendorHeader')
+				end;
+				helptext=function() 
+					return _INFM('GuiVendorHelp')
+				end;
+				difficulty=1;
+			};
 			{
-				id="show-vendor",
-				type=K_TEXT,
-				text=_INFM('GuiVendor'),
-				helptext=_INFM('HelpVendor'),
+				id="show-vendor";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiVendor')
+				end;
+				helptext=function() 
+					return _INFM('HelpVendor')
+				end;
 				callback=function(state)
 					genVarSet("show-vendor", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendor')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendor')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="show-vendor-buy",
-				type=K_TEXT,
-				text=_INFM('GuiVendorBuy'),
-				helptext=_INFM('HelpVendorBuy'),
+				id="show-vendor-buy";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiVendorBuy')
+				end;
+				helptext=function() 
+					return _INFM('HelpVendorBuy')
+				end;
 				callback=function(state)
 					genVarSet("show-vendor-buy", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendorBuy')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendorBuy')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={["show-vendor"]={checked=true}, enabled={checked=true}},
-				difficulty=2,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={["show-vendor"]={checked=true}; enabled={checked=true}};
+				difficulty=2;
+			};
 			{
-				id="show-vendor-sell",
-				type=K_TEXT,
-				text=_INFM('GuiVendorSell'),
-				helptext=_INFM('HelpVendorSell'),
+				id="show-vendor-sell";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiVendorSell')
+				end;
+				helptext=function() 
+					return _INFM('HelpVendorSell')
+				end;
 				callback=function(state)
 					genVarSet("show-vendor-sell", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'), _INFM('ShowVendorSell')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('ShowVendorSell')))
 					end
-				end,
-				check=true,
-				default={checked=true},
-				disabled={checked=false},
-				dependencies={["show-vendor"]={checked=true}, enabled={checked=true}},
-				difficulty=2,
-			},
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={["show-vendor"]={checked=true}; enabled={checked=true}};
+				difficulty=2;
+			};
 
 			{
-				id="InformantEmbedHeader",
-				type=K_HEADER,
-				text=_INFM('GuiEmbedHeader'),
-				helptext=_INFM('HelpEmbed'),
-				difficulty=1,
-			},
+				id="InformantEmbedHeader";
+				type=K_HEADER;
+				text=function() 
+					return _INFM('GuiEmbedHeader')
+				end;
+				helptext=function() 
+					return _INFM('HelpEmbed')
+				end;
+				difficulty=1;
+			};
 			{
-				id="embed",
-				type=K_TEXT,
-				text=_INFM('GuiEmbed'),
-				helptext=_INFM('HelpEmbed'),
+				id="embed";
+				type=K_TEXT;
+				text=function() 
+					return _INFM('GuiEmbed')
+				end;
+				helptext=function() 
+					return _INFM('HelpEmbed')
+				end;
 				callback=function(state)
 					genVarSet("embed", state.checked)
-				end,
+				end;
 				feedback=function(state)
 					if (state.checked) then
 						return (string.format(_INFM('FrmtActEnable'), _INFM('CmdEmbed')))
 					else
 						return (string.format(_INFM('FrmtActDisable'), _INFM('CmdEmbed')))
 					end
-				end,
-				check=true,
-				default={checked=false},
-				disabled={checked=false},
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				end;
+				check=true;
+				default={checked=false};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="InformantOtherHeader",
-				type=K_HEADER,
-				text=_INFM('GuiOtherHeader'),
-				helptext=_INFM('GuiOtherHelp'),
-				difficulty=1,
-			},
+				id="InformantOtherHeader";
+				type=K_HEADER;
+				text=function() 
+					return _INFM('GuiOtherHeader')
+				end;
+				helptext=function() 
+					return _INFM('GuiOtherHelp')
+				end;
+				difficulty=1;
+			};
 			{
-				id="DefaultAll",
-				type=K_BUTTON,
+				id="DefaultAll";
+				type=K_BUTTON;
 				setup={
-					buttonText = _INFM('GuiDefaultAllButton')
-				},
-				text=_INFM('GuiDefaultAll'),
-				helptext=_INFM('GuiDefaultAllHelp'),
+					buttonText = function() 
+						return _INFM('GuiDefaultAllButton')
+					end;
+				};
+				text=function() 
+					return _INFM('GuiDefaultAll')
+				end;
+				helptext=function() 
+					return _INFM('GuiDefaultAllHelp')
+				end;
 				callback=function()
 					restoreDefault(_INFM('CmdClearAll'))
-				end,
+				end;
 				feedback=function()
 					return _INFM('FrmtActDefaultall');
 				end;
-				dependencies={enabled={checked=true}},
-				difficulty=1,
-			},
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
 			{
-				id="DefaultOption",
-				type=K_EDITBOX,
+				id="DefaultOption";
+				type=K_EDITBOX;
 				setup = {
-					callOn = {"enter", "tab"}
-				},
-				text=_INFM('GuiDefaultOption'),
-				helptext=_INFM('HelpDefault'),
+					callOn = {"tab", "escape", "enter"};
+				};
+				text=function() 
+					return _INFM('GuiDefaultOption')
+				end;
+				helptext=function() 
+					return _INFM('HelpDefault')
+				end;
 				callback = function(state)
 					restoreDefault(state.value)
-				end,
+				end;
 				feedback = function (state)
 					if (state.value == _INFM('CmdClearAll')) then
 						return _INFM('FrmtActDefaultall')
 					else
 						return string.format(_INFM('FrmtActDefault'), state.value)
 					end
-				end,
+				end;
 				default = {
 					value = ""
-				},
+				};
 				disabled = {
 					value = ""
-				},
-				dependencies={enabled={checked=true}},
-				difficulty=4,
-			},
-		}
-	}
+				};
+				dependencies={enabled={checked=true}};
+				difficulty=4;
+			};
+		};
+	};
 
 	Khaos.registerOptionSet("tooltip",optionSet)
 	Informant_Khaos_Registered = true
@@ -663,46 +681,15 @@ function registerKhaos()
 	return true
 end
 
-local function resetKhaos()
-	if (Informant_Khaos_Registered) then
-
-		Khaos.unregisterOptionSet("Informant");
-		Informant_Khaos_Registered = false;
-
-		registerKhaos();
-	end
+function isValidLocale(param)
+	return (InformantLocalizations and InformantLocalizations[param])
 end
 
-Informant.Register = function()
-	if (Khaos) then
-		if (not Informant_Khaos_Registered) then
-			Informant_GUI_Registered = registerKhaos()
-		end
-	end
-	-- The following check is to accomodate other GUI libraries other than Khaos relatively easily.
-	if (Informant_GUI_Registered == true) then
-		return true
-	else
-		return false
-	end
-end
-
-function setLocale(param, chatprint, updateKhaos)
+function setLocale(param, chatprint)
 	param = delocalizeFilterVal(param);
-	if not Informant_LocaleLastSet then
-		Informant_LocaleLastSet = "";
-	end
-
-	if not Babylonian.IsAddOnRegistered("Informant") then
-		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
-	end
-
 	local validLocale = nil;
 
-	if (param == Informant_LocaleLastSet) then
-		validLocale = true;
-
-	elseif (param == 'default') or (param == 'off') then
+	if (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
 		validLocale = true;
 
@@ -720,9 +707,7 @@ function setLocale(param, chatprint, updateKhaos)
 	if (chatprint) then
 		if (validLocale) then
 			chatPrint(string.format(_INFM('FrmtActSet'), _INFM('CmdLocale'), param));
-			if not (param == Informant_LocaleLastSet) then
-				setKhaosSetKeyValue('locale', param);
-			end
+			setKhaosSetKeyValue('locale', param);
 
 		else
 			chatPrint(string.format(_INFM("FrmtUnknownLocale"), param));
@@ -734,33 +719,8 @@ function setLocale(param, chatprint, updateKhaos)
 		end
 	end
 
-	if (Khaos and Informant_Khaos_Registered) then
-		if (not (param == Informant_LocaleLastSet)) or (updateKhaos) then
-			if (updateKhaos) then
-				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
-			end
-			resetKhaos();
-		end
-	end
-
-	if (param) then
-		Informant_LocaleLastSet = param;
-	end
-
 	commandMap = nil;
 	commandMapRev = nil;
-
-	return true;
-end
-
-function isValidLocale(param)
-
-	if((InformantLocalizations) and (InformantLocalizations[param])) then
-		return true;
-
-	else
-		return false;
-	end
 end
 
 function chatPrint(msg)

@@ -48,10 +48,6 @@ function addonLoaded(hookArgs, event, addOnName)
 	end
 	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
 
-	if not Babylonian.IsAddOnRegistered("Enchantrix") then
-		Babylonian.RegisterAddOn("Enchantrix", Enchantrix.Config.SetLocale);
-	end
-
 	-- Call AddonLoaded for other objects
 	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
 	Enchantrix.Barker.AddonLoaded()

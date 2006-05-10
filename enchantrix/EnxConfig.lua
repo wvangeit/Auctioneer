@@ -226,24 +226,13 @@ function setFrame(frame, chatprint)
 end
 
 function isValidLocale(param)
-	--EnhTooltip.DebugPrint("Enchantrix.isValidlocale("..param..")");
-
 	return (EnchantrixLocalizations and EnchantrixLocalizations[param])
 end
 
-local _localeLastSet = ""
-function setLocale(param, chatprint, updateKhaos)
+function setLocale(param, chatprint)
 	param = Enchantrix.Locale.DelocalizeFilterVal(param)
 
-	if not Babylonian.IsAddOnRegistered("Enchantrix") then
-		Babylonian.RegisterAddOn("Enchantrix", setLocale)
-	end
-
-	local validLocale = false
-
-	if (param == _localeLastSet) then
-		validLocale = true
-	elseif (param == 'default') or (param == 'off') then
+	if (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('')
 		validLocale = true
 	elseif (isValidLocale(param)) then
@@ -256,9 +245,7 @@ function setLocale(param, chatprint, updateKhaos)
 	if chatprint then
 		if validLocale then
 			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), param))
-			if param ~= _localeLastSet then
-				Enchantrix.Command.SetKhaosSetKeyValue('locale', param)
-			end
+			Enchantrix.Command.SetKhaosSetKeyValue('locale', param)
 		else
 			Enchantrix.Util.ChatPrint(string.format(_ENCH("FrmtActUnknownLocale"), param))
 			local locales = "    "
@@ -269,18 +256,8 @@ function setLocale(param, chatprint, updateKhaos)
 		end
 	end
 
-	if (Khaos and Enchantrix.State.Khaos_Registered) then
-		if (param ~= _localeLastSet) or updateKhaos then
-			if (updateKhaos) then
-				EnhTooltip.DebugPrint("Enchantrix: Babylonian.GetOrder() = "..Babylonian.GetOrder())
-				Enchantrix.Command.SetKhaosSetKeyValue('locale', Babylonian.GetOrder())
-			end
-			Enchantrix.Command.ResetKhaos()
-		end
-	end
-
-	if param then
-		_localeLastSet = param
+	if (Enchantrix.State.Khaos_Registered) then
+		Khaos.refresh(nil, nil, true)
 	end
 
 	Enchantrix.State.Locale_Changed = true

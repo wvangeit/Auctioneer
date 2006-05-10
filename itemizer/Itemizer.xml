@@ -44,7 +44,13 @@
 
 	<!-- These are our two tooltips, the first is the one we use to show tooltips on our searchframe, and the second one is the one we use to gather data.  -->
 	<GameTooltip name="ItemizerTooltip" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
-	<GameTooltip name="ItemizerHidden" inherits="GameTooltipTemplate" parent="UIParent" hidden="true"/>
+	<GameTooltip name="ItemizerHidden" inherits="GameTooltipTemplate" parent="UIParent" hidden="false">
+		<Scripts>
+			<OnLoad>
+				this:SetOwner(this, "ANCHOR_NONE");
+			</OnLoad>
+		</Scripts>
+	</GameTooltip>
 
 	<!-- This frame is used to incrementally parse the items in the scan stack without causing a massive hang when many items are added to the stack (Like when the ItemCache is scanned) -->
 	<Frame name="ItemizerScanFrame" parent="UIParent">

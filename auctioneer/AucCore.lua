@@ -531,12 +531,12 @@ function lockAndLoad()
 
 	--Init AskPrice
 	Auctioneer.AskPrice.Init();
-
+--[[
 	--Register Auctioneer with Babylonian
 	if not Babylonian.IsAddOnRegistered("Auctioneer") then
 		Babylonian.RegisterAddOn("Auctioneer", Auctioneer.Command.SetLocale);
 	end
-
+]]
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
 end
 

@@ -698,10 +698,6 @@ function onVariablesLoaded()
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
 
 	Informant.InitCommands()
-
-	if not Babylonian.IsAddOnRegistered("Informant") then
-		Babylonian.RegisterAddOn("Informant", Informant.SetLocale);
-	end
 end
 
 function onEvent(event)
@@ -859,7 +855,6 @@ Informant = {
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
-	SetLocale = setLocale,
 	GetLocale = getLocale,
 	OnEvent = onEvent,
 	SetFilter = setFilter,
