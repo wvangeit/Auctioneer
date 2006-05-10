@@ -180,16 +180,26 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 
 	local lDiscrepencyCount = Auctioneer.Core.Variables.TotalAuctionsScannedCount - (Auctioneer.Core.Variables.NewAuctionsCount + Auctioneer.Core.Variables.OldAuctionsCount);
 
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionTotalAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.TotalAuctionsScannedCount)));
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionNewAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.NewAuctionsCount)));
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionOldAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.OldAuctionsCount)));
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionDefunctAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.DefunctAuctionsCount)));
+	local totalAuctionsMessage = string.format(_AUCT('AuctionTotalAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.TotalAuctionsScannedCount))
+	local newAuctionsMessage = string.format(_AUCT('AuctionNewAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.NewAuctionsCount))
+	local oldAuctionsMessage = string.format(_AUCT('AuctionOldAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.OldAuctionsCount))
+	local defunctAuctionsMessage = string.format(_AUCT('AuctionDefunctAucts'), Auctioneer.Util.ColorTextWhite(Auctioneer.Core.Variables.DefunctAuctionsCount))
+	local discrepanciesMessage
+
+	Auctioneer.Util.ChatPrint(totalAuctionsMessage);
+	Auctioneer.Util.ChatPrint(newAuctionsMessage);
+	Auctioneer.Util.ChatPrint(oldAuctionsMessage);
+	Auctioneer.Util.ChatPrint(defunctAuctionsMessage);
 
 	if (Auctioneer.Util.NullSafe(lDiscrepencyCount) > 0) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionDiscrepancies'), Auctioneer.Util.ColorTextWhite(lDiscrepencyCount)));
+		discrepanciesMessage = string.format(_AUCT('AuctionDiscrepancies'), Auctioneer.Util.ColorTextWhite(lDiscrepencyCount))
+		Auctioneer.Util.ChatPrint(discrepanciesMessage);
 	end
+	
+	--Add the preceding information to the AH frame too
+	BrowseNoResultsText:SetText(totalAuctionsMessage.."\n"..newAuctionsMessage.."\n"..oldAuctionsMessage.."\n"..defunctAuctionsMessage.."\n"..(discrepanciesMessage or ""))
 
---The followng was added by MentalPower to implement the "/auc finish" command
+	--The followng was added by MentalPower to implement the "/auc finish" command
 	local finish = Auctioneer.Command.GetFilterVal('finish');
 
 	if (finish == 1) then
