@@ -311,7 +311,7 @@ function getglobalIterator(fmt, first, last)
 	local i = tonumber(first) or 1
 	return function()
 		if last and (i > last) then
-			return nil
+			return
 		end
 		local obj = getglobal(string.format(fmt, i))
 		i = i + 1
@@ -746,7 +746,7 @@ end
 
 function linkType(link)
 	if type(link) ~= "string" then
-		return nil
+		return
 	end
 	local _, _, linktype = string.find(link, "|H(%a+):")
 	return linktype
@@ -755,39 +755,37 @@ end
 function nameFromLink(link)
 	local name
 	if( not link ) then
-		return nil
+		return
 	end
 	_, _, name = string.find(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
 	if (name) then
 		return name;
 	end
-	return nil
+	return
 end
 
 function hyperlinkFromLink(link)
-		if( not link ) then
-				return nil
-		end
-		_, _, hyperlink = string.find(link, "|H([^|]+)|h");
-		if (hyperlink) then
-			return hyperlink;
-		end
-		return nil
+	if( not link ) then
+		return
+	end
+	_, _, hyperlink = string.find(link, "|H([^|]+)|h");
+	if (hyperlink) then
+		return hyperlink;
+	end
 end
 
 function baselinkFromLink(link)
-		if( not link ) then
-				return nil
-		end
-		_, _, baselink = string.find(link, "|Hitem:(%d+:%d+:%d+):%d+|h");
-	 	if (baselink) then
-			return baselink;
-	 	end
-		return nil
+	if( not link ) then
+		return
+	end
+	_, _, baselink = string.find(link, "|Hitem:(%d+:%d+:%d+):%d+|h");
+	if (baselink) then
+		return baselink;
+	end
 end
 
 function qualityFromLink(link)
-	if (not link) then return nil end
+	if (not link) then return end
 	local _, _, color = string.find(link, "(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
 	if color then
 		for i = 0, 6 do
@@ -803,7 +801,7 @@ end
 function fakeLink(hyperlink, quality, name)
 	-- make this function nilSafe, as it's a global one and might be used by external addons
 	if not hyperlink then
-		return nil
+		return
 	end
 	local sName, sLink, iQuality = GetItemInfo(hyperlink)
 	if (quality == nil) then quality = iQuality or -1 end
@@ -1199,7 +1197,7 @@ function getLootLinkLink(name)
 		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r"
 		return link
 	end
-	return nil
+	return
 end
 
 function llHookOnEnter()
