@@ -228,6 +228,7 @@ local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
 local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
 local gtHookSetCraftItem		-- GtHookSetCraftItem(frame,skill,slot)
 local gtHookSetCraftSpell		-- GtHookSetCraftSpell(frame,skill,slot)
+local gtHookSetInboxItem		-- GtHookSetinboxItem(frame,index)
 local gtHookSetInventoryItem	-- GtHookSetInventoryItem(frame,unit,slot,retVal)
 local gtHookSetLootItem			-- GtHookSetLootItem(frame,slot)
 local gtHookSetMerchantItem		-- GtHookSetMerchantItem(frame,slot)
@@ -1020,6 +1021,22 @@ function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 	end
 end
 
+function gtHookSetInboxItem(funcArgs, retVal, frame, index)
+	local inboxItemName, itemTexture, inboxItemCount, inboxItemQuality = GetInboxItem(index)
+	local itemName, hyperLink, itemQuality, itemLink
+
+	for itemID = 1, 30000 do
+		itemName, hyperLink, itemQuality = GetItemInfo(itemID)
+		if (itemName and itemName == inboxItemName) then
+			local _, _, _, hex = GetItemQualityColor(tonumber(itemQuality))
+			itemLink = hex.. "|H"..hyperLink.."|h["..itemName.."]|h|r"
+			tooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
+			break
+		end
+	end
+	
+end
+
 function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
@@ -1356,6 +1373,7 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, gtHookSetQuestItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, gtHookSetQuestLogItem);
+	Stubby.RegisterFunctionHook("GameTooltip.SetInboxItem", 200, gtHookSetInboxItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, gtHookSetInventoryItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem);
 	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem);
