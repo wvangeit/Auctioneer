@@ -63,7 +63,9 @@ local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
 local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
 
 function addonLoaded()
-	registerKhaos()
+	if IsAddOnLoaded("Khaos") then
+		registerKhaos()
+	end
 end
 
 function getKhaosLocaleList()

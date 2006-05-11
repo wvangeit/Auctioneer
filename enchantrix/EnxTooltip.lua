@@ -31,6 +31,7 @@ local enchantTooltip
 local hookTooltip
 
 function addonLoaded()
+	-- Hook in new tooltip code
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 400, hookTooltip)
 end
 
@@ -209,9 +210,21 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 end
 
-function enchantTooltip(funcVars, retVal, frame, name, link)
-	local embed = Enchantrix.Config.GetFilter('embed');
+local function getReagentsFromCraftFrame(craftIndex)
+	local reagentList = {}
 
+	local numReagents = GetCraftNumReagents(craftIndex)
+	for i = 1, numReagents do
+		local link = GetCraftReagentItemLink(craftIndex, i)
+		local hlink = EnhTooltip.HyperlinkFromLink(link)
+		local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(craftIndex, i)
+		table.insert(reagentList, {hlink, reagentCount})
+	end
+
+	return reagentList
+end
+
+local function getReagentsFromTooltip(frame)
 	local frameName = frame:GetName()
 	local nLines = frame:NumLines()
 	local reagents
@@ -228,9 +241,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	end
 	if not reagents then return end
 
-	local price = 0
-	local unknownPrices = false
-	local reagentInfo = {}
+	local reagentList = {}
 	local name, quality, color, hlink
 	-- Process reagents separated by ","
 	for reagent in Enchantrix.Util.Spliterator(reagents, ",") do
@@ -252,77 +263,114 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 
 		hlink = Enchantrix.Util.GetLinkFromName(reagent)
 		if hlink then
-			name, _, quality = GetItemInfo(hlink)
-			if quality then
-				_, _, _, color = GetItemQualityColor(quality)
-			end
-
-			local hsp, median, market = Enchantrix.Util.GetReagentPrice(hlink)
-
-			table.insert(reagentInfo, {
-				["name"] = reagent,
-				["count"] = count,
-				["price"] = hsp,
-				["quality"] = quality,
-				["color"] = color,
-			})
-
-			if hsp then
-				price = price + count * hsp
-			else
-				unknownPrices = true
-			end
+			table.insert(reagentList, {hlink, count})
 		else
-			table.insert(reagentInfo, {
-				["name"] = reagent,
-				["count"] = count,
-			})
-			unknownPrices = true
+			return
 		end
 	end
 
-	if table.getn(reagentInfo) < 1 then	return end
+	return reagentList
+end
+
+function enchantTooltip(funcVars, retVal, frame, name, link)
+	local embed = Enchantrix.Config.GetFilter('embed');
+
+	local craftIndex
+	for i = 1, GetNumCrafts() do
+		local craftName = GetCraftInfo(i)
+		if name == craftName then
+			craftIndex = i
+			break
+		end
+	end
+
+	-- Get reagent list
+	local reagentList
+	if craftIndex then
+		reagentList = getReagentsFromCraftFrame(craftIndex)
+	else
+		reagentList = getReagentsFromTooltip(frame)
+	end
+
+	if not reagentList or table.getn(reagentList) < 1 then
+		return
+	end
+
+	-- Append additional reagent info
+	for _, reagent in ipairs(reagentList) do
+		local name, link, quality = GetItemInfo(reagent[1])
+		local hsp, median, market = Enchantrix.Util.GetReagentPrice(reagent[1])
+		local _, _, _, color = GetItemQualityColor(quality)
+
+		reagent[1] = name
+		table.insert(reagent, quality)
+		table.insert(reagent, color)
+		table.insert(reagent, hsp)
+	end
+
+	local NAME, COUNT, QUALITY, COLOR, PRICE = 1, 2, 3, 4, 5
 
 	-- Sort by rarity and price
-	table.sort(reagentInfo, function(a,b)
+	table.sort(reagentList, function(a,b)
 		if (not b) or (not a) then return end
-		return ((b.quality or -1) < (a.quality or -1)) or ((b.price or 0) < (a.price or 0))
+		return ((b[QUALITY] or -1) < (a[QUALITY] or -1)) or ((b[PRICE] or 0) < (a[PRICE] or 0))
 	end)
 
+	-- Header
 	if not embed then
-		EnhTooltip.SetIcon("Interface\\Icons\\Spell_Holy_GreaterHeal")
+		local icon
+		if craftIndex then
+			icon = GetCraftIcon(craftIndex)
+		else
+			icon = "Interface\\Icons\\Spell_Holy_GreaterHeal"
+		end
+		EnhTooltip.SetIcon(icon)
 		EnhTooltip.AddLine(name)
 		EnhTooltip.AddLine(EnhTooltip.HyperlinkFromLink(link))
 	end
 	EnhTooltip.AddLine(_ENCH('FrmtSuggestedPrice'), nil, embed)
 	EnhTooltip.LineColor(0.8,0.8,0.2)
 
-	-- Add reagent list to tooltip
-	for _, reagent in pairs(reagentInfo) do
+	local price = 0
+	local unknownPrices
+	-- Add reagent list to tooltip and sum reagent prices
+	for _, reagent in pairs(reagentList) do
 		local line = "  "
 
-		if reagent.color then
-			line = line..reagent.color
+		if reagent[COLOR] then
+			line = line..reagent[COLOR]
 		end
-		line = line..reagent.name
-		if reagent.color then
+		line = line..reagent[NAME]
+		if reagent[COLOR] then
 			line = line.."|r"
 		end
-		line = line.." x"..reagent.count
-		if reagent.count > 1 and reagent.price then
-			line = line..string.format(" ".._ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent.price, 3)))
-			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent.price * reagent.count, 3), embed)
-		elseif reagent.price then
-			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent.price, 3), embed)
+		line = line.." x"..reagent[COUNT]
+		if reagent[COUNT] > 1 and reagent[PRICE] then
+			line = line.." "..string.format(_ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent[PRICE], 3)))
+			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent[PRICE] * reagent[COUNT], 3), embed)
+			price = price + reagent[PRICE] * reagent[COUNT]
+		elseif reagent[PRICE] then
+			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent[PRICE], 3), embed)
+			price = price + reagent[PRICE]
 		else
 			EnhTooltip.AddLine(line, nil, embed)
+			unknownPrices = true
 		end
 		EnhTooltip.LineColor(0.7,0.7,0.1)
 	end
 
+	-- Barker price
+	local margin = Enchantrix_BarkerGetConfig("profit_margin")
+	local profit = price * margin * 0.01
+	profit = math.min(profit, Enchantrix_BarkerGetConfig("highest_profit"))
+	local barkerPrice = Enchantrix_RoundPrice(price + profit)
+
 	-- Totals
 	if price > 0 then
 		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
+		EnhTooltip.LineColor(0.8,0.8,0.2)
+		-- TODO: Localization
+		EnhTooltip.AddLine(string.format("Barker Price (%0.0f%% margin)", margin), barkerPrice, embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
 
 		if not Enchantrix.State.Auctioneer_Loaded then

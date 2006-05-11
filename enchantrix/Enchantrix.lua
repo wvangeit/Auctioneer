@@ -65,7 +65,7 @@ function addonLoaded(hookArgs, event, addOnName)
 
 	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded);
 
-	-- Hook in new tooltip code
+	-- Register disenchant detection hooks
 	Stubby.RegisterFunctionHook("PickupContainerItem", 400, pickupContainerItemHook)
 	Stubby.RegisterFunctionHook("PickupInventoryItem", 400, pickupInventoryItemHook)
 
