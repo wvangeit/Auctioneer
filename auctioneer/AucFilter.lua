@@ -252,7 +252,17 @@ function plainFilter(maxPrice, signature, category, minQuality, itemName)
 end
 
 
--- generic function for querying the snapshot with a filter function that returns true if an auction should be filtered out of the result set.
+--[[
+	generic function for querying the snapshot with a filter function that returns true if an auction should be filtered out of the result set.
+
+	@return (array)
+		all items in the current snapshot which are not filtered out by the given filter.
+		Each entry of the array contains:
+		   {snapshotdata, (see Auctioneer.Core.GetSnapshotFromData for details)
+		    [signature]   (snapshot signature)
+		   }
+		If there are no matching entries in the snapshot, the function returns an empty array.
+]]
 function querySnapshot(filter, param, e1,e2,e3,e4,e5)
 	local queryResults = {};
 	param = param or "";
