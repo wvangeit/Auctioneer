@@ -738,7 +738,9 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 				local itemKey = id .. ":" .. rprop..":"..enchant;
 				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-				local percentLess = 100 - math.floor(100 * currentBid / (hsp * count));
+				-- rounding down the hsp, to get a better selling price
+				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
+				local percentLess = 100 - math.floor(100 * currentBid / (hspBuyout));
 				if (percentLess >= minPercentLess) then
 					local auction = {};
 					auction.id = id;
@@ -752,7 +754,7 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 					auction.bidPer = math.floor(auction.bid / count);
 					auction.buyout = buyout;
 					auction.buyoutPer = math.floor(auction.buyout / count);
-					auction.profit = (hsp * count) - currentBid;
+					auction.profit = hspBuyout - currentBid;
 					auction.profitPer = math.floor(auction.profit / count);
 					auction.percentLess = percentLess;
 					auction.signature = a.signature;
@@ -792,7 +794,9 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, cate
 				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
 				local itemKey = id .. ":" .. rprop..":"..enchant;
 				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-				local profit = (hsp * count) - buyout;
+				-- rounding down the hsp, to get a better selling price
+				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
+				local profit = hspBuyout - buyout;
 				if (profit >= minProfit) then
 					local auction = {};
 					auction.id = id;
@@ -806,7 +810,7 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, cate
 					auction.buyoutPer = math.floor(auction.buyout / count);
 					auction.profit = profit;
 					auction.profitPer = math.floor(auction.profit / count);
-					auction.percentLess = 100 - math.floor(100 * buyout / (hsp * count));
+					auction.percentLess = 100 - math.floor(100 * buyout / hspBuyout);
 					auction.signature = a.signature;
 					if (a.highBidder) then
 						auction.status = AUCTION_STATUS_HIGH_BIDDER;
@@ -907,7 +911,9 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, i
 				local itemKey = id .. ":" .. rprop..":"..enchant;
 				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-				local percentLess = 100 - math.floor(100 * currentBid / (hsp * count));
+				-- rounding down the hsp, to get a better selling price
+				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
+				local percentLess = 100 - math.floor(100 * currentBid / hspBuyout);
 
 				local _,_,_,iLevel = GetItemInfo(id);
 
@@ -924,7 +930,7 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, i
 				auction.bidPer = math.floor(auction.bid / count);
 				auction.buyout = buyout;
 				auction.buyoutPer = math.floor(auction.buyout / count);
-				auction.profit = (hsp * count) - currentBid;
+				auction.profit = hspBuyout - currentBid;
 				auction.profitPer = math.floor(auction.profit / count);
 				auction.percentLess = percentLess;
 				auction.signature = a.signature;
