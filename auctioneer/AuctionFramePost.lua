@@ -816,14 +816,8 @@ end
 function AuctionFramePost_CalculateAuctionDeposit(itemID, count, duration)
 	local price = Auctioneer.API.GetVendorSellPrice(itemID);
 	if (price) then
-		local base = math.floor(count * price * 0.05);
-		if (duration == 120) then
-			return base;
-		elseif (duration == 480) then
-			return (base * 4);
-		else
-			return (base * 12);
-		end
+		local base = math.floor(count * price * GetAuctionHouseDepositRate() / 100);
+		return base * duration / 120;
 	end
 end
 
