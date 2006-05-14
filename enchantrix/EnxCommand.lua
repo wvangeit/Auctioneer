@@ -131,6 +131,34 @@ function registerKhaos()
 				difficulty=1;
 			};
 			{
+				id="barker";
+				type=K_TEXT;
+				text=function() 
+					return _ENCH('GuiMainEnable')
+				end;
+				helptext=function() 
+					return _ENCH('HelpOnoff')
+				end;
+				callback=function(state)
+					if (state.checked) then
+						barkerOnOff('on');
+					else
+						barkerOnOff('off');
+					end
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _ENCH('StatOn');
+					else
+						return _ENCH('StatOff');
+					end
+				end;
+				check=true;
+				default={checked=Enchantrix.Config.GetFilterDefaults('barker')};
+				disabled={checked=false};
+				difficulty=1;
+			};
+			{
 				id="locale";
 				type=K_PULLDOWN;
 				setup = {
@@ -622,6 +650,10 @@ function handleCommand(command, source)
 		-- /enchantrix on|off|toggle
 		onOff(cmd, chatprint);
 
+    elseif ((cmd == "barkeron") or (cmd == "barkeroff") or (cmd == "barkertoggle")) then
+		-- /enchantrix on|off|toggle
+		barkerOnOff(cmd, chatprint);
+
 	elseif (cmd == 'disable') then
 		-- /enchantrix disable
 		Enchantrix.Util.ChatPrint(_ENCH('MesgDisable'));
@@ -732,6 +764,33 @@ function onOff(state, chatprint)
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('StatOff'));
 			setKhaosSetKeyParameter('all', "checked", false);
+		end
+	end
+
+	return state;
+end
+
+function barkerOnOff(state, chatprint)
+	state = Enchantrix.Locale.DelocalizeFilterVal(state)
+
+	if (state == nil) or (state == "") then
+		state = Enchantrix.Config.GetFilter("barker");
+	elseif (state == 'barkeron') then
+		Enchantrix.Config.SetFilter('barker', 'on' );
+    elseif (state == 'barkeroff') then
+		Enchantrix.Config.SetFilter('barker', 'off' );
+	elseif (state == "barkertoggle") then
+		Enchantrix.Config.SetFilter('barker', not Enchantrix.Config.GetFilter('barker'))
+	end
+
+	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
+	if chatprint then
+		if Enchantrix.Config.GetFilter('barker') then
+			Enchantrix.Util.ChatPrint(_ENCH('BarkerOn'));
+			setKhaosSetKeyParameter('barker', "checked", true);
+		else
+			Enchantrix.Util.ChatPrint(_ENCH('BarkerOff'));
+			setKhaosSetKeyParameter('barker', "checked", false);
 		end
 	end
 

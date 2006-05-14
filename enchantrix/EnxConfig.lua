@@ -40,6 +40,7 @@ local isValidLocale
 -- Default filter configuration
 local filterDefaults = {
 		['all'] = true,
+		['barker'] = true,
 		['embed'] = false,
 		['counts'] = false,
 		['header'] = true,
@@ -104,6 +105,7 @@ function convertFilters()
 	-- Format: standardizedKey,		valueMap,		esES,					deDE (old)			...
 	local conversions = {
 			{ 'all',				convertOnOff },
+			{ 'barker',				convertOnOff },
 			{ 'embed',				convertOnOff,	'integrar',				'zeige-eingebunden' },
 			{ 'header',				convertOnOff,	'titulo',				'zeige-kopf'},
 			{ 'counts',				convertOnOff,	'conteo',				'zeige-anzahl' },

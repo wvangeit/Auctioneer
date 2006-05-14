@@ -98,21 +98,28 @@ function EnchantrixBarker_OnEvent()
 	local craftName, rank, maxRank = GetCraftDisplaySkillLine()
 
 	if craftName then
+        --Enchantrix.Util.ChatPrint("Barker config is "..tostring(Enchantrix.Config.GetFilter('barker')) );
 		if( event == "CRAFT_SHOW" ) then
-			Enchantrix_BarkerButton:SetParent(CraftFrame);
-			Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
-			Enchantrix_BarkerButton:Show();
-			Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.';
+            if( Enchantrix.Config.GetFilter('barker') ) then
+                Enchantrix_BarkerButton:SetParent(CraftFrame);
+                Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
+                Enchantrix_BarkerButton:Show();
+                Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.';
 
-			Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
-			Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
-			Enchantrix_BarkerOptionsButton:Show();
-			Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.';
+                Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
+                Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
+                Enchantrix_BarkerOptionsButton:Show();
+                Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.';
+            else
+                Enchantrix_BarkerButton:Hide();
+                Enchantrix_BarkerOptionsButton:Hide();
+                Enchantrix_BarkerOptions_Frame:Hide();
+            end
 		elseif( event == "CRAFT_CLOSE" )then
 			Enchantrix_BarkerButton:Hide();
 			Enchantrix_BarkerOptionsButton:Hide();
 			Enchantrix_BarkerOptions_Frame:Hide();
-		end
+        end
 	end
 end
 
