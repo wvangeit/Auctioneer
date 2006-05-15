@@ -28,7 +28,7 @@
 
 local priorityList = {};
 
-local categories = {
+local categories = { --TODO: Localize
 	Bracer = {search = "Bracer", print = "Bracer" },
 	Gloves = {search = "Gloves", print = "Gloves" },
 	Boots = {search = "Boots", print = "Boots" },
@@ -40,9 +40,9 @@ local categories = {
 };
 
 
-local print_order = { 'Bracer', 'Gloves', 'Boots', 'Chest', 'Cloak', 'Shield', 'TwoHanded', 'AnyWeapon' };
+local print_order = { 'Bracer', 'Gloves', 'Boots', 'Chest', 'Cloak', 'Shield', 'TwoHanded', 'AnyWeapon' }; --TODO: Localize
 
-local attributes = {
+local attributes = { --TODO: Localize
 	'intellect',
 	'stamina',
 	'spirit',
@@ -65,7 +65,7 @@ local attributes = {
 	'defense'
 };
 
-local short_attributes = {
+local short_attributes = { --TODO: Localize
 	'INT',
 	'STA',
 	'SPI',
@@ -104,12 +104,12 @@ function EnchantrixBarker_OnEvent()
                 Enchantrix_BarkerButton:SetParent(CraftFrame);
                 Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
                 Enchantrix_BarkerButton:Show();
-                Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.';
+                Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
 
                 Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
                 Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
                 Enchantrix_BarkerOptionsButton:Show();
-                Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.';
+                Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.'; --TODO: Localize
             else
                 Enchantrix_BarkerButton:Hide();
                 Enchantrix_BarkerOptionsButton:Hide();
@@ -134,7 +134,7 @@ function Enchantrix_BarkerOnClick()
 	if barker ~= nil then
 		SendChatMessage(barker,"CHANNEL", this.language,"2");
 	else
-		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available.");
+		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available."); --TODO: Localize
 	end
 end
 
@@ -225,7 +225,7 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 	if barker ~= nil then
 		Enchantrix.Util.ChatPrint(barker);
 	else
-		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available.");
+		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available."); --TODO: Localize
 	end
 end
 
@@ -246,7 +246,7 @@ end
 
 Enchantrix_BarkerOptions_ActiveTab = -1;
 
-Enchantrix_BarkerOptions_TabFrames = {
+Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 	{
 		title = 'Profit and Price Priorities',
 		options = {
@@ -766,7 +766,7 @@ function Enchantrix_CreateBarker()
 			return Enchantrix_GetBarkerString();
 
 		else
-			Enchantrix.Util.ChatPrint("Enchant Window not open");
+			Enchantrix.Util.ChatPrint("Enchant Window not open"); --TODO: Localize
 		end
 	end
 
@@ -905,7 +905,7 @@ local barkerString = '';
 local barkerCategories = {};
 
 function Enchantrix_ResetBarkerString()
-	barkerString = "("..Enchantrix_BarkerGetZoneText()..") Selling Enchants:";
+	barkerString = "("..Enchantrix_BarkerGetZoneText()..") Selling Enchants:"; --TODO: Localize
 	barkerCategories = {};
 end
 

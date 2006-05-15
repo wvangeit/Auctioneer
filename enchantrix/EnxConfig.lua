@@ -87,6 +87,7 @@ function convertConfig(t, key, values, ...)
 end
 
 -- Convert Enchantrix filters to standardized keys and values
+--NOTE: Do NOT add new settings to this conversion matrix as it is not necessary
 function convertFilters()
 	-- Abort if there's nothing to convert
 	if (not EnchantConfig or not EnchantConfig.filters) then return; end
@@ -105,7 +106,6 @@ function convertFilters()
 	-- Format: standardizedKey,		valueMap,		esES,					deDE (old)			...
 	local conversions = {
 			{ 'all',				convertOnOff },
-			{ 'barker',				convertOnOff },
 			{ 'embed',				convertOnOff,	'integrar',				'zeige-eingebunden' },
 			{ 'header',				convertOnOff,	'titulo',				'zeige-kopf'},
 			{ 'counts',				convertOnOff,	'conteo',				'zeige-anzahl' },

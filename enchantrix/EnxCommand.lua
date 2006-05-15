@@ -607,21 +607,7 @@ function setKhaosSetKeyValue(key, value)
 		end
 	end
 end
---[[
-function resetKhaos()
-	if Enchantrix.State.Khaos_Registered then
 
-		Khaos.unregisterOptionSet("Enchantrix");
-		Enchantrix.State.Khaos_Registered = false;
-
-		registerKhaos();
-
-		if Enchantrix.State.Auctioneer_Loaded then
-			registerAuctioneerOptions()
-		end
-	end
-end
-]]
 -- Cleaner Command Handling Functions (added by MentalPower)
 function handleCommand(command, source)
 
@@ -649,10 +635,6 @@ function handleCommand(command, source)
 	elseif ((cmd == "on") or (cmd == "off") or (cmd == "toggle")) then
 		-- /enchantrix on|off|toggle
 		onOff(cmd, chatprint);
-
-    elseif ((cmd == "barkeron") or (cmd == "barkeroff") or (cmd == "barkertoggle")) then
-		-- /enchantrix on|off|toggle
-		barkerOnOff(cmd, chatprint);
 
 	elseif (cmd == 'disable') then
 		-- /enchantrix disable
@@ -695,9 +677,9 @@ function handleCommand(command, source)
 	-- elseif (cmd == _ENCH('ShowHeader') or cmd == 'header') then
 	--	genVarSet('header', param, chatprint);
 
-	elseif (cmd=='embed' or cmd=='valuate' or cmd=='counts' or
-			-- cmd=='rates' or
-			cmd=='valuate-hsp' or cmd=='valuate-median' or cmd=='valuate-baseline') then
+	elseif (cmd == 'embed' or cmd == 'valuate' or cmd == 'counts' or
+			--[[cmd == 'rates' or]] cmd == 'valuate-hsp' or cmd == 'valuate-median' or 
+			cmd == 'valuate-baseline' or cmd == "barker") then
 		genVarSet(cmd, param, chatprint);
 
 	elseif (chatprint) then
@@ -764,33 +746,6 @@ function onOff(state, chatprint)
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('StatOff'));
 			setKhaosSetKeyParameter('all', "checked", false);
-		end
-	end
-
-	return state;
-end
-
-function barkerOnOff(state, chatprint)
-	state = Enchantrix.Locale.DelocalizeFilterVal(state)
-
-	if (state == nil) or (state == "") then
-		state = Enchantrix.Config.GetFilter("barker");
-	elseif (state == 'barkeron') then
-		Enchantrix.Config.SetFilter('barker', 'on' );
-    elseif (state == 'barkeroff') then
-		Enchantrix.Config.SetFilter('barker', 'off' );
-	elseif (state == "barkertoggle") then
-		Enchantrix.Config.SetFilter('barker', not Enchantrix.Config.GetFilter('barker'))
-	end
-
-	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
-	if chatprint then
-		if Enchantrix.Config.GetFilter('barker') then
-			Enchantrix.Util.ChatPrint(_ENCH('BarkerOn'));
-			setKhaosSetKeyParameter('barker', "checked", true);
-		else
-			Enchantrix.Util.ChatPrint(_ENCH('BarkerOff'));
-			setKhaosSetKeyParameter('barker', "checked", false);
 		end
 	end
 
@@ -874,8 +829,8 @@ end
 ---------------------------------------
 
 function percentLessFilter(percentLess, signature)
-    local filterAuction = true;
-    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
+	local filterAuction = true;
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
 	local disenchantsTo = getAuctionItemDisenchants(signature, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
@@ -905,9 +860,9 @@ function percentLessFilter(percentLess, signature)
 end
 
 function bidBrokerFilter(minProfit, signature)
-    local filterAuction = true;
-    local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
-    local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
+	local filterAuction = true;
+	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
+	local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
 	local disenchantsTo = getAuctionItemDisenchants(signature, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
@@ -919,7 +874,7 @@ function bidBrokerFilter(minProfit, signature)
 	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
 	local profit = (myValue * count) - currentBid;
-    local profitPricePercent = math.floor((profit / currentBid) * 100);
+	local profitPricePercent = math.floor((profit / currentBid) * 100);
 
 	local results = {
 		buyout = buyout,
