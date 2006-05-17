@@ -369,9 +369,11 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	if price > 0 then
 		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
-		-- TODO: Localization
-		EnhTooltip.AddLine(string.format("Barker Price (%0.0f%% margin)", margin), barkerPrice, embed)
-		EnhTooltip.LineColor(0.8,0.8,0.2)
+		if Enchantrix.Config.GetFilter('barker') then
+			-- "Barker Price (%d%% margin)"
+			EnhTooltip.AddLine(string.format(_ENCH('FrmtBarkerPrice'), Enchantrix.Util.Round(margin)), barkerPrice, embed)
+			EnhTooltip.LineColor(0.8,0.8,0.2)
+		end
 
 		if not Enchantrix.State.Auctioneer_Loaded then
 			EnhTooltip.AddLine(_ENCH('FrmtWarnAuctNotLoaded'))

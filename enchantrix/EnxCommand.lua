@@ -133,24 +133,20 @@ function registerKhaos()
 			{
 				id="barker";
 				type=K_TEXT;
-				text=function() 
-					return _ENCH('GuiMainEnable')
+				text=function()
+					return _ENCH('GuiBarker') -- "Enable Barker"
 				end;
-				helptext=function() 
-					return _ENCH('HelpOnoff')
+				helptext=function()
+					return _ENCH('HelpBarker') -- "Turn Enchantrix Barker on or off"
 				end;
 				callback=function(state)
-					if (state.checked) then
-						barkerOnOff('on');
-					else
-						barkerOnOff('off');
-					end
+					genVarSet('barker', state.checked)
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return _ENCH('StatOn');
+						return _ENCH('BarkerOn')
 					else
-						return _ENCH('StatOff');
+						return _ENCH('BarkerOff')
 					end
 				end;
 				check=true;
@@ -689,6 +685,7 @@ end
 
 -- Help ME!! (The Handler) (Another shameless copy from the original function)
 function chatPrintHelp()
+	-- TODO: Add help for 'barker' command
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtUsage'));
 	local onOffToggle = " (".._ENCH('CmdOn').."|".._ENCH('CmdOff').."|".._ENCH('CmdToggle')..")";
 	local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
