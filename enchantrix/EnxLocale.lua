@@ -68,6 +68,7 @@ function buildCommandMap()
 	commandMap = {
 		[_ENCH('CmdOn')] = 'on',
 		[_ENCH('CmdOff')] = 'off',
+		[_ENCH('CmdBarker')] = 'barker',
 		[_ENCH('CmdHelp')] = 'help',
 		[_ENCH('CmdToggle')] = 'toggle',
 		[_ENCH('CmdDisable')] = 'disable',

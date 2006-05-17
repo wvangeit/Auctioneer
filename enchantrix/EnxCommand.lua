@@ -559,14 +559,12 @@ function auctioneerLoaded()
 
 	if not Enchantrix.State.Auctioneer_Loaded then
 		-- Old version of Auctioneer
-		-- TODO: Localization
-		local msg = "Enchantrix requires Auctioneer version 3.4 or higher. Some features will be unavailable until you update your Auctioneer installation."
 		if not EnchantConfig.displayedAuctioneerWarning then
 			-- Yell at the user, but only once
-			message(msg)
+			message(_ENCH('MesgAuctVersion'))
 			EnchantConfig.displayedAuctioneerWarning = true
 		else
-			Enchantrix.Util.ChatPrint(msg)
+			Enchantrix.Util.ChatPrint(_ENCH('MesgAuctVersion'))
 		end
 		return
 	end
@@ -685,7 +683,6 @@ end
 
 -- Help ME!! (The Handler) (Another shameless copy from the original function)
 function chatPrintHelp()
-	-- TODO: Add help for 'barker' command
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtUsage'));
 	local onOffToggle = " (".._ENCH('CmdOn').."|".._ENCH('CmdOff').."|".._ENCH('CmdToggle')..")";
 	local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
@@ -693,6 +690,8 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix.Locale.GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
 
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
+
+	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdBarker'), Enchantrix.Locale.GetLocalizedFilterVal('barker'), _ENCH('HelpBarker')));
 
 	-- Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowHeader'), Enchantrix.Locale.GetLocalizedFilterVal('header'), _ENCH('HelpHeader')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
