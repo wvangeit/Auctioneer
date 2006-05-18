@@ -332,7 +332,7 @@ function clearTooltip()
 	for ttText in getglobalIterator("EnhancedTooltipText%d") do
 		ttText:Hide()
 		ttText:SetTextColor(1.0,1.0,1.0)
-		ttText:SetFont("Fonts\\FRIZQT__.TTF", 10);
+		ttText:SetFont(STANDARD_TEXT_FONT, 10);
 	end
 
 	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
@@ -671,7 +671,7 @@ function lineSize_Large()
 	local curLine = EnhancedTooltip.lineCount
 	if (curLine == 0) then return end
 	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetFont("Fonts\\FRIZQT__.TTF", 12)
+	line:SetFont(STANDARD_TEXT_FONT, 12)
 end
 
 function lineSize_Small()
@@ -679,7 +679,7 @@ function lineSize_Small()
 	local curLine = EnhancedTooltip.lineCount
 	if (curLine == 0) then return end
 	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetFont("Fonts\\FRIZQT__.TTF", 10)
+	line:SetFont(STANDARD_TEXT_FONT, 10)
 end
 
 function lineQuality(quality)
