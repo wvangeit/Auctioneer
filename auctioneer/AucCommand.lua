@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, getKhaosDurationsList, getKhaosProtectionList, getKhaosFinishList, registerKhaos, --[[resetKhaos,]] buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
+local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, getKhaosDurationsList, getKhaosProtectionList, getKhaosFinishList, registerKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
 
 
 function register()
@@ -1256,7 +1256,7 @@ function buildCommandMap()
 		[_AUCT('CmdAskPriceGuild')]		=	'guild',
 		[_AUCT('CmdAskPriceParty')]		=	'party',
 		[_AUCT('CmdAskPriceSmart')]		=	'smart',
-		[_AUCT('CmdAskPriceAd')]		=	'ap',
+		[_AUCT('CmdAskPriceAd')]		=	'ad',
 
 		-- Post/Search Tab related commands
 		[_AUCT('CmdBidLimit')]			=	'bid-limit',
@@ -1625,19 +1625,8 @@ end
 function setLocale(param, chatprint)
 	param = Auctioneer.Util.DelocalizeFilterVal(param);
 	local validLocale;
---[[
-	if not Auctioneer_LocaleLastSet then
-		Auctioneer_LocaleLastSet = "";
-	end
 
-	if not Babylonian.IsAddOnRegistered("Auctioneer") then
-		Babylonian.RegisterAddOn("Auctioneer", Auctioneer.Command.SetLocale);
-	end
-
-	if (param == Auctioneer_LocaleLastSet) then
-		validLocale = true;
-
-	else]]if (param == 'default') or (param == 'off') then
+	if (param == 'default') or (param == 'off') then
 		Babylonian.SetOrder('');
 		validLocale = true;
 
@@ -1664,20 +1653,7 @@ function setLocale(param, chatprint)
 			Auctioneer.Util.ChatPrint(locales);
 		end
 	end
---[[
-	if (Khaos and Auctioneer_Khaos_Registered) then
-		if (not (param == Auctioneer_LocaleLastSet)) or (updateKhaos) then
-			resetKhaos();
-			if (updateKhaos) then
-				setKhaosSetKeyValue('locale', Babylonian.GetOrder());
-			end
-		end
-	end
 
-	if (param) then
-		Auctioneer_LocaleLastSet = param;
-	end
-]]
 	if (Auctioneer_Khaos_Registered) then
 		Khaos.refresh(nil, nil, true)
 	end
@@ -1725,7 +1701,7 @@ function getFrameNames(index)
 	local frames = {};
 	local frameName = "";
 
-	for i=1,10 do
+	for i=1, 10 do
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(i);
 
 		if ( name == "" ) then
@@ -1740,7 +1716,7 @@ function getFrameNames(index)
 			frames[name] = i;
 		end
 	end
-EnhTooltip.DebugPrint(index, type(index))
+
 	if (type(index) == "number") then
 		local name, fontSize, r, g, b, a, shown, locked, docked = GetChatWindowInfo(index);
 
@@ -1794,7 +1770,7 @@ function setFrame(frame, chatprint)
 			frameNumber = 1;
 		end
 
-	--If the argument is something else, set our chatframe to it's default value.
+	--If the argument is something else, set our chatframe to its default value.
 	else
 		frameNumber = 1;
 	end
@@ -2030,7 +2006,6 @@ Auctioneer.Command = {
 	ConvertKhaos = convertKhaos,
 	GetKhaosDefault = getKhaosDefault,
 	RegisterKhaos = registerKhaos,
-	--ResetKhaos = resetKhaos,
 	BuildCommandMap = buildCommandMap,
 	CommandMap = commandMap,
 	CommandMapRev = commandMapRev,
