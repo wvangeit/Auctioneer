@@ -486,7 +486,20 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		getglobal(button:GetName().."IconTexture"):Show();
 
 		-- Set the defaults.
-		frame:SetDuration(1440);
+		local duration = Auctioneer.Command.GetFilterVal('auction-duration')
+		if duration == 1 then
+			-- 2h
+			frame:SetDuration(120)
+		elseif duration == 2 then
+			-- 8h
+			frame:SetDuration(480)
+		elseif duration == 3 then
+			-- 24h
+			frame:SetDuration(1440)
+		else
+			-- last
+			frame:SetDuration(Auctioneer.Command.GetFilterVal('last-auction-duration'))
+		end
 		frame:SetStackSize(count);
 		frame:SetStackCount(1);
 
@@ -645,10 +658,13 @@ end
 function AuctionFramePost_DurationRadioButton_OnClick(button, index)
 	local frame = button:GetParent();
 	if (index == 1) then
+		Auctioneer.Command.SetFilter('last-auction-duration', 120)
 		frame:SetDuration(120);
 	elseif (index == 2) then
+		Auctioneer.Command.SetFilter('last-auction-duration', 480)
 		frame:SetDuration(480);
 	else
+		Auctioneer.Command.SetFilter('last-auction-duration', 1440)
 		frame:SetDuration(1440);
 	end
 end
