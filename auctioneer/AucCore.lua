@@ -280,9 +280,6 @@ function saveAuctionPriceItem(auctKey, itemKey, iData)
 
 	AuctionConfig.data[auctKey][itemKey] = string.format("%s|%s", iData.data, hist);
 	AuctionConfig.info[itemKey] = string.format("%s|%s", iData.category, iData.name);
-	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
-		Auctioneer_HSPCache[auctKey][itemKey] = nil;
-	end
 	Auctioneer_Lowests = nil;
 
 	-- save median to the savedvariablesfile
