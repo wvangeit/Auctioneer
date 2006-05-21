@@ -283,7 +283,7 @@ function saveAuctionPriceItem(auctKey, itemKey, iData)
 	if (Auctioneer_HSPCache and Auctioneer_HSPCache[auctKey]) then
 		Auctioneer_HSPCache[auctKey][itemKey] = nil;
 	end
-	if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
+	Auctioneer_Lowests = nil;
 
 	-- save median to the savedvariablesfile
 	Auctioneer.Storage.SetHistMed(auctKey, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPricesHistoryList))
@@ -434,7 +434,7 @@ function saveSnapshot(server, cat, sig, iData)
 		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
 			Auctioneer_HSPCache[server][itemKey] = nil;
 		end
-		if (Auctioneer_Lowests) then Auctioneer_Lowests = nil; end
+		Auctioneer_Lowests = nil;
 		Auctioneer.Storage.SetSnapMed(server, itemKey, nil)
 	else
 		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner);
