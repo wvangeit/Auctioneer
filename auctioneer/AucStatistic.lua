@@ -322,7 +322,7 @@ function findLowestAuctions(itemKey, auctKey)
 	if (not auctKey) then
 		auctKey = Auctioneer.Util.GetAuctionKey();
 	end
-	if not (Auctioneer_Lowests and Auctioneer_Lowests[auctKey] and Auctioneer_Lowests[auctKey].built) then buildLowestCache(auctKey) end
+	if not (Auctioneer_Lowests and Auctioneer_Lowests[auctKey]) then buildLowestCache(auctKey) end
 
 	local lowKey = itemID..":"..itemRand;
 
@@ -372,7 +372,6 @@ function buildLowestCache(auctKey)
 			end
 		end
 	end
-	Auctioneer_Lowests[auctKey].built = true;
 end
 
 -- execute the '/auctioneer low <itemName>' that returns the auction for an item with the lowest buyout
