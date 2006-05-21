@@ -431,9 +431,6 @@ function saveSnapshot(server, cat, sig, iData)
 		EnhTooltip.DebugPrint("Saving", server, cat, sig, "as", saveData);
 		AuctionConfig.snap[server][cat][sig] = saveData;
 		local itemKey = Auctioneer.Util.GetKeyFromSig(sig);
-		if(Auctioneer_HSPCache) and (Auctioneer_HSPCache[server]) then
-			Auctioneer_HSPCache[server][itemKey] = nil;
-		end
 		Auctioneer_Lowests = nil;
 		Auctioneer.Storage.SetSnapMed(server, itemKey, nil)
 	else
@@ -443,9 +440,6 @@ end
 
 function saveSnapshotInfo(server, itemKey, iData)
 	AuctionConfig.sbuy[server][itemKey] = storeMedianList(iData.buyoutPrices);
-	if (Auctioneer_HSPCache and Auctioneer_HSPCache[server]) then
-		Auctioneer_HSPCache[server][itemKey] = nil;
-	end
 	Auctioneer_Lowests = nil;
 
 	Auctioneer.Storage.SetSnapMed(server, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPrices))
