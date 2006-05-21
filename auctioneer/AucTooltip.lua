@@ -250,28 +250,11 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 					EnhTooltip.LineColor(0.5,0.8,0.1);
 					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoAverage'), EnhTooltip.GetTextGSC(avgMin), EnhTooltip.GetTextGSC(avgBuy), EnhTooltip.GetTextGSC(avgBid)), nil, embedded);
 					EnhTooltip.LineColor(0.1,0.8,0.5);
-					if (Auctioneer.Command.GetFilter('show-suggest')) then
-						local hsp = Auctioneer.Statistic.GetHSP(itemKey, also);
-						if hsp == 0 and buyCount > 0 then
-							hsp = math.floor(buyPrice / buyCount); -- use mean buyout if median not available
-						end
-						local discountBidPercent = tonumber(Auctioneer.Command.GetFilterVal('pct-bidmarkdown'));
-						local countFix = count
-						if countFix == 0 then
-							countFix = 1
-						end
-						local buyPrice = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Util.NullSafe(hsp) * countFix);
-						local bidPrice = Auctioneer.Statistic.RoundDownTo95(Auctioneer.Statistic.SubtractPercent(buyPrice, discountBidPercent));
-						if (count > 1) then
-							-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-							EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoSgststx'), count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
-							EnhTooltip.LineColor(0.5,0.5,0.8);
-						else -- count = 0 | 1
-							-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-							EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoSgst'), EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
-							EnhTooltip.LineColor(0.5,0.5,0.8);
-						end
-					end
+				end
+
+				if (Auctioneer.Command.GetFilter('show-stats')) then
+					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoBidrate'), bidPct, buyPct), nil, embedded);
+					EnhTooltip.LineColor(0.1,0.5,0.8);
 				end
 
 				-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
@@ -299,11 +282,6 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 					EnhTooltip.AddLine(">> "..warn, nil, embedded);
 					local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(warn);
 					EnhTooltip.LineColor(cRed, cGreen, cBlue);
-				end
-
-				if (Auctioneer.Command.GetFilter('show-stats')) then
-					EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoBidrate'), bidPct, buyPct), nil, embedded);
-					EnhTooltip.LineColor(0.1,0.5,0.8);
 				end
 			end
 		end
