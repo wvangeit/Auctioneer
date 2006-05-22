@@ -277,6 +277,10 @@ end
 function saveLocal(sig, lData)
 	local str = "";
 	for eResult, eData in lData do
+		eResult = tonumber(eResult)
+		if not eResult then
+			return
+		end
 		if (eData and type(eData) == "table") then
 			local iCount = tonumber(eData.i) or 0;
 			local dCount = tonumber(eData.d) or 0;
