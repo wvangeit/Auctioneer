@@ -278,31 +278,6 @@ function registerKhaos()
 				dependencies={all={checked=true;}};
 				difficulty=3;
 			};
-			--[[{
-				id="rates";
-				type=K_TEXT;
-				text=function() 
-					return _ENCH('GuiRate')
-				end;
-				helptext=function() 
-					return _ENCH('HelpRate')
-				end;
-				callback=function(state)
-					genVarSet('rates', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowCount')));
-					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowCount')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('rates')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};]]--
 			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
@@ -693,9 +668,6 @@ function handleCommand(command, source)
 	elseif (cmd == 'percentless' or cmd == 'pl') then
 		doPercentLess(param);
 
-	-- elseif (cmd == _ENCH('ShowHeader') or cmd == 'header') then
-	--	genVarSet('header', param, chatprint);
-
 	elseif (Enchantrix.Config.GetFilterDefaults(cmd) ~= nil) then
 		genVarSet(cmd, param, chatprint);
 
@@ -716,10 +688,8 @@ function chatPrintHelp()
 
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdBarker'), Enchantrix.Locale.GetLocalizedFilterVal('barker'), _ENCH('HelpBarker')));
 
-	-- Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowHeader'), Enchantrix.Locale.GetLocalizedFilterVal('header'), _ENCH('HelpHeader')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
-	-- Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowRate'), Enchantrix.Locale.GetLocalizedFilterVal('rates'), _ENCH('HelpRate')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
 	if Enchantrix.State.Auctioneer_Loaded then
