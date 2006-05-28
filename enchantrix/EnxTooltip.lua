@@ -135,10 +135,10 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Round(totals.hspValue * totals.conf, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			elseif Enchantrix.Config.GetFilter('valuate-median') and totals.medValue > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * confidence, 3), embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * totals.conf, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			elseif Enchantrix.Config.GetFilter('valuate-baseline') and totals.mktValue > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * confidence, 3), embed);
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * totals.conf, 3), embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
 			return
