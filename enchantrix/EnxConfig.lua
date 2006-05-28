@@ -33,8 +33,6 @@ local setLocale			-- Enchantrix.Config.SetLocale()
 local getLocale			-- Enchantrix.Config.GetLocale()
 
 -- Local functions
-local convertConfig
-local convertFilters
 local isValidLocale
 
 -- Default filter configuration
@@ -54,73 +52,13 @@ local filterDefaults = {
 	}
 
 function addonLoaded()
-	-- Convert old localized settings
-	if EnchantConfig and EnchantConfig.filters then
-		convertFilters()
-
-		-- Convert 'on', 'off' and 'default' to true, false and nil
-		for key in EnchantConfig.filters do
+	-- Remove unused/unknown filter values
+	for key in EnchantConfig.filters do
+		if getFilterDefaults(key) == nil then
+			setFilter(key, nil)
+		else
 			setFilter(key, getFilter(key))
 		end
-	end
-end
-
--- Convert a single key in a table of configuration settings
-function convertConfig(t, key, values, ...)
-	local v = nil;
-
-	for i,localizedKey in ipairs(arg) do
-		if (t[localizedKey] ~= nil) then
-			v = t[localizedKey];
-			t[localizedKey] = nil;
-		end
-	end
-	if (t[key] ~= nil) then v = t[key]; end
-
-	if (v ~= nil) then
-		if (values[v] ~= nil) then
-			t[key] = values[v];
-		else
-			t[key] = v;
-		end
-	end
-end
-
--- Convert Enchantrix filters to standardized keys and values
---NOTE: Do NOT add new settings to this conversion matrix as it is not necessary
-function convertFilters()
-	-- Abort if there's nothing to convert
-	if (not EnchantConfig or not EnchantConfig.filters) then return; end
-
-	-- Array that maps localized versions of strings to standardized
-	local convertOnOff = {	['apagado'] = 'off',	-- esES
-							['prendido'] = 'on',	-- esES
-							}
-
-	local localeConvMap = { ['apagado'] = 'default',
-							['prendido'] = 'default',
-							['off'] = 'default',
-							['on'] = 'default',
-							}
-
-	-- Format: standardizedKey,		valueMap,		esES,					deDE (old)			...
-	local conversions = {
-			{ 'all',				convertOnOff },
-			{ 'embed',				convertOnOff,	'integrar',				'zeige-eingebunden' },
-			{ 'header',				convertOnOff,	'titulo',				'zeige-kopf'},
-			{ 'counts',				convertOnOff,	'conteo',				'zeige-anzahl' },
-			{ 'rates',				convertOnOff,	'razones',				'zeige-kurs' },
-			{ 'valuate',			convertOnOff,	'valorizar',			'zeige-wert' },
-			{ 'valuate-hsp',		convertOnOff,	'valorizar-pmv',		'valuate-hvp' },
-			{ 'valuate-median',		convertOnOff,	'valorizar-mediano' },
-			{ 'valuate-baseline',	convertOnOff,	'valorizar-referencia', 'valuate-grundpreis' },
-			{ 'locale',				localeConvMap },
-		}
-
-	-- Run the defined conversions
-	for i,c in ipairs(conversions) do
-		table.insert(c, 1, EnchantConfig.filters)
-		convertConfig(unpack(c))
 	end
 end
 
