@@ -194,12 +194,10 @@ end
 
 -- Return item id as integer
 function getItemIdFromSig(sig)
-	if (type(sig) == "string") then
-		local splt = Enchantrix.Util.Split(sig, ":")
-		return tonumber(splt[1])
-	elseif (type(sig) == "number") then
-		return sig
+	if type(sig) == "string" then
+		_, _, sig = string.find(sig, "(%d+)")
 	end
+	return tonumber(sig)
 end
 
 function getItemIdFromLink(link)

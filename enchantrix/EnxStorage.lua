@@ -78,7 +78,7 @@ function addonLoaded()
 		for id in Enchantrix.Constants.StaticPrices do
 			if not (Enchantrix.Util.GetReagentInfo(id)) then
 				EnchantConfig.zomgBlizzardAreMeanies = true
-				GameTooltip:SetHyperlink("item:"..id..":0:0:0")
+				GameTooltip:SetHyperlink(string.format("item:%d:0:0:0", id))
 				GameTooltip:Hide()
 				EnchantConfig.zomgBlizzardAreMeanies = nil
 			end
@@ -96,8 +96,8 @@ function unserialize(str)
 	local tbl = {}
 	if type(str) == "string" then
 		for de in Enchantrix.Util.Spliterator(str, ";") do
-			local splt = Enchantrix.Util.Split(de, ":")
-			local id, d, r = tonumber(splt[1]), tonumber(splt[2]), tonumber(splt[3])
+			local _, _, id, d, r = string.find(de, "(%d+):(%d+):(%d+)")
+			id, d, r = tonumber(id), tonumber(d), tonumber(r)
 			if (id and d > 0 and r > 0) then
 				tbl[id] = {[N_DISENCHANTS] = d, [N_REAGENTS] = r}
 			end
@@ -110,12 +110,12 @@ function serialize(tbl)
 	-- Serialize a table into a string
 	if type(tbl) == "table" then
 		local str
-		for id in tbl do
-			if (type(id) == "number" and tbl[id][N_DISENCHANTS] > 0 and tbl[id][N_REAGENTS] > 0) then
+		for id, counts in pairs(tbl) do
+			if (type(id) == "number" and counts[N_DISENCHANTS] > 0 and counts[N_REAGENTS] > 0) then
 				if (str) then
-					str = str..";"..string.format("%d:%d:%d:0", id, tbl[id][N_DISENCHANTS], tbl[id][N_REAGENTS])
+					str = string.format("%s;%d:%d:%d:0", str, id, counts[N_DISENCHANTS], counts[N_REAGENTS])
 				else
-					str = string.format("%d:%d:%d:0", id, tbl[id][N_DISENCHANTS], tbl[id][N_REAGENTS])
+					str = string.format("%d:%d:%d:0", id, counts[N_DISENCHANTS], counts[N_REAGENTS])
 				end
 			end
 		end
@@ -126,12 +126,12 @@ end
 function mergeDisenchant(str1, str2)
 	-- Merge two disenchant strings into a single string
 	local tbl1, tbl2 = unserialize(str1), unserialize(str2)
-	for id in tbl2 do
+	for id, counts in pairs(tbl2) do
 		if (not tbl1[id]) then
-			tbl1[id] = tbl2[id]
+			tbl1[id] = counts
 		else
-			tbl1[id][N_DISENCHANTS] = tbl1[id][N_DISENCHANTS] + tbl2[id][N_DISENCHANTS]
-			tbl1[id][N_REAGENTS] = tbl1[id][N_REAGENTS] + tbl2[id][N_REAGENTS]
+			tbl1[id][N_DISENCHANTS] = tbl1[id][N_DISENCHANTS] + counts[N_DISENCHANTS]
+			tbl1[id][N_REAGENTS] = tbl1[id][N_REAGENTS] + counts[N_REAGENTS]
 		end
 	end
 	return serialize(tbl1)
@@ -142,16 +142,16 @@ function normalizeDisenchant(str)
 	local div = 0
 	local count = 0
 	local tbl = unserialize(str)
-	for id in tbl do
-		div = Enchantrix.Util.GCD(div, tbl[id][N_DISENCHANTS])
-		div = Enchantrix.Util.GCD(div, tbl[id][N_REAGENTS])
+	for id, counts in pairs(tbl) do
+		div = Enchantrix.Util.GCD(div, counts[N_DISENCHANTS])
+		div = Enchantrix.Util.GCD(div, counts[N_REAGENTS])
 		count = count + 1
 	end
 	-- Only normalize if there's more than one kind of reagent
 	if count > 1 then
-		for id in tbl do
-			tbl[id][N_DISENCHANTS] = tbl[id][N_DISENCHANTS] / div
-			tbl[id][N_REAGENTS] = tbl[id][N_REAGENTS] / div
+		for id, counts in pairs(tbl) do
+			counts[N_DISENCHANTS] = counts[N_DISENCHANTS] / div
+			counts[N_REAGENTS] = counts[N_REAGENTS] / div
 		end
 		return serialize(tbl)
 	end
@@ -167,17 +167,17 @@ function cleanupDisenchant(str, id)
 			local tbl = unserialize(str)
 			local clean = {}
 			level = Enchantrix.Util.RoundUp(level, 5)
-			for id in tbl do
+			for id, counts in pairs(tbl) do
 				if const.LevelRules[itype][level][id] then
 					if quality == 2 then
 						-- Uncommon item, remove nexus crystal
 						if (const.LevelRules[itype][level][id] < const.CRYSTAL) then
-							clean[id] = tbl[id]
+							clean[id] = counts
 						end
 					else
 						-- Rare or epic item, remove dusts and essences
 						if (const.LevelRules[itype][level][id] > const.ESSENCE_GREATER) then
-							clean[id] = tbl[id]
+							clean[id] = counts
 						end
 					end
 				end
@@ -230,6 +230,7 @@ function mergeDisenchantLists()
 		end
 		EnchantedBaseItems.hash = hash
 	end
+
 	-- We don't need DisenchantList anymore
 	DisenchantList = nil
 
