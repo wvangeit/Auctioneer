@@ -41,6 +41,7 @@ local filterDefaults = {
 		['barker'] = true,
 		['embed'] = false,
 		['counts'] = false,
+		['terse'] = false,
 		['header'] = true,
 		['rates'] = true,
 		['valuate'] = true,
@@ -55,6 +56,7 @@ local filterDefaults = {
 local perCharacterFilter = {
 		['embed'] = true,
 		['counts'] = true,
+		['terse'] = true,
 		['printframe'] = true,
 	}
 

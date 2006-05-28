@@ -129,6 +129,21 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	disenchantsTo.totals = nil;
 	if (totals and totals.total > 0) then
 
+		-- Terse mode
+		if Enchantrix.Config.GetFilter('terse') and not IsControlKeyDown() then
+			if Enchantrix.Config.GetFilter('valuate-hsp') and totals.hspValue > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Round(totals.hspValue * totals.conf, 3), embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			elseif Enchantrix.Config.GetFilter('valuate-median') and totals.medValue > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * confidence, 3), embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			elseif Enchantrix.Config.GetFilter('valuate-baseline') and totals.mktValue > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * confidence, 3), embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
+			return
+		end
+
 		-- If it looks quirky, and we haven't disenchanted it, then ignore it...
 		if (totals.iCount + totals.biCount < 1) then return; end
 
