@@ -6,6 +6,7 @@
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
 ## SavedVariables: EnchantedLocal, EnchantConfig, EnchantedBaseItems
+## SavedVariablesPerCharacter: EnchantConfigChar
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

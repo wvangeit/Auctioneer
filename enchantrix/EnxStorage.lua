@@ -51,27 +51,17 @@ local const = Enchantrix.Constants
 
 function addonLoaded()
 	-- Create and setup saved variables
-	if not EnchantConfig then
-		EnchantConfig = {}
-	end
-	if not EnchantConfig.filters then
-		EnchantConfig.filters = {}
-	end
-	if not EnchantConfig.cache then
-		EnchantConfig.cache = {}
-	end
-	if not EnchantConfig.cache.reagentinfo then
-		EnchantConfig.cache.reagentinfo = {}
-	end
-	if not EnchantConfig.cache.names then
-		EnchantConfig.cache.names = {}
-	end
-	if not EnchantedLocal then
-		EnchantedLocal = {}
-	end
-	if not EnchantedBaseItems then
-		EnchantedBaseItems = {}
-	end
+	if not EnchantConfig then EnchantConfig = {} end
+	if not EnchantConfig.filters then EnchantConfig.filters = {} end
+	if not EnchantConfigChar then EnchantConfigChar = {} end
+	if not EnchantConfigChar.filters then EnchantConfigChar.filters = {} end
+
+	if not EnchantConfig.cache then EnchantConfig.cache = {} end
+	if not EnchantConfig.cache.reagentinfo then EnchantConfig.cache.reagentinfo = {} end
+	if not EnchantConfig.cache.names then EnchantConfig.cache.names = {} end
+
+	if not EnchantedLocal then EnchantedLocal = {} end
+	if not EnchantedBaseItems then EnchantedBaseItems = {} end
 
 	if not EnchantConfig.zomgBlizzardAreMeanies then
 		-- Push disenchant reagents into cache if needed

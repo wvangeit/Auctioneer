@@ -51,6 +51,13 @@ local filterDefaults = {
 		['printframe'] = 1,
 	}
 
+-- True if this filter value should be saved per character
+local perCharacterFilter = {
+		['embed'] = true,
+		['counts'] = true,
+		['printframe'] = true,
+	}
+
 function addonLoaded()
 	-- Remove unused/unknown filter values
 	for key in EnchantConfig.filters do
@@ -67,7 +74,10 @@ function getFilterDefaults(key)
 end
 
 function getFilter(filter)
-	local val = EnchantConfig.filters[filter]
+	local val = EnchantConfigChar.filters[filter]
+	if val == nil then
+		val = EnchantConfig.filters[filter]
+	end
 	if val == nil then
 		val = getFilterDefaults(filter)
 	end
@@ -82,6 +92,11 @@ function setFilter(key, value)
 		value = true
 	elseif value == 'off' then
 		value = false
+	end
+	if perCharacterFilter[key] then
+		EnchantConfigChar.filters[key] = value
+	else
+		EnchantConfigChar.filters[key] = nil
 	end
 	EnchantConfig.filters[key] = value
 end
