@@ -438,7 +438,7 @@ function findStackByName(name, startingBag, startingSlot)
 		startingBag = 0;
 	end
 	if (startingSlot == nil) then
-		startingSlot = 0;
+		startingSlot = 1;
 	end
 	for bag = startingBag, 4, 1 do
 		if (GetBagName(bag)) then
