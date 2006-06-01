@@ -571,7 +571,7 @@ function AuctionFramePost_ValidateAuction(frame)
 		local stackCount = frame:GetStackCount();
 		local quantityErrorText = getglobal(frame:GetName().."QuantityInvalidText");
 		if (frame.itemID and frame.itemName) then
-			local quantity = AucPostManager.GetItemQuantity(frame.itemName);
+			local quantity = AucPostManager.GetItemQuantity(frame.itemID);
 			local maxStackSize = AuctionFramePost_GetMaxStackSize(frame.itemID);
 			if (stackSize == 0) then
 				valid = false;
@@ -730,6 +730,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	local frame = button:GetParent();
+	local id = frame:GetItemID();
 	local name = frame:GetItemName();
 	local startPrice = frame:GetStartPrice();
 	local buyoutPrice = frame:GetBuyoutPrice();
@@ -746,7 +747,7 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	end
 
 	-- Post the auction.
-	AucPostManager.PostAuction(name, stackSize, stackCount, startPrice, buyoutPrice, duration);
+	AucPostManager.PostAuction(id, stackSize, stackCount, startPrice, buyoutPrice, duration);
 
 	-- Clear the current auction item.
 	frame:SetAuctionItem(nil, nil, nil);

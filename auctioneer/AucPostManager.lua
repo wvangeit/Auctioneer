@@ -54,7 +54,9 @@ local onEvent;
 local setState;
 local findEmptySlot;
 local findStackByName;
+local findStackById;
 local getItemName;
+local getItemId;
 local clearAuctionItem;
 local findAuctionItem;
 local getItemQuantity;
@@ -124,7 +126,7 @@ end
 -------------------------------------------------------------------------------
 -- Start an auction.
 -------------------------------------------------------------------------------
-function postAuction(name, stackSize, stackCount, bid, buyout, duration, callbackFunc, callbackParam)
+function postAuction(id, stackSize, stackCount, bid, buyout, duration, callbackFunc, callbackParam)
 	-- Problems can occur if the Auctions tab hasn't been shown at least once.
 	if (not AuctionFrameAuctions:IsVisible()) then
 		AuctionFrameAuctions:Show();
@@ -133,7 +135,8 @@ function postAuction(name, stackSize, stackCount, bid, buyout, duration, callbac
 
 	-- Add the request to the queue.
 	local request = {};
-	request.name = name;
+	request.id = id;
+	request.name = GetItemInfo(id);
 	request.stackSize = stackSize;
 	request.stackCount = stackCount;
 	request.bid = bid;
@@ -253,19 +256,19 @@ function run(request)
 		-- for a stack of the exact size. Failing that, we'll start with the
 		-- first stack we find.
 		local stack1 = nil;
-		if (request.stack and request.name == getItemName(request.stack.bag, request.stack.slot)) then
+		if (request.stack and request.id == getItemId(request.stack.bag, request.stack.slot)) then
 			-- Use the stack hint.
 			stack1 = request.stack;
 		else
 			-- Find the first stack.
-			stack1 = findStackByName(request.name);
+			stack1 = findStackById(request.id);
 
 			-- Now look for a stack of the exact size to use instead.
 			if (stack1) then
 				local stack2 = { bag = stack1.bag, slot = stack1.slot };
 				local _, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 				while (stack2 and stack2Size ~= request.stackSize) do
-					stack2 = findStackByName(request.name, stack2.bag, stack2.slot + 1);
+					stack2 = findStackById(request.id, stack2.bag, stack2.slot + 1);
 					if (stack2) then
 						_, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 					end
@@ -294,7 +297,7 @@ function run(request)
 				end
 			elseif (stack1Size < request.stackSize) then
 				-- The stack we have is less than needed. Locate more of the item.
-				local stack2 = findStackByName(request.name, stack1.bag, stack1.slot + 1);
+				local stack2 = findStackById(request.id, stack1.bag, stack1.slot + 1);
 				if (stack2) then
 					local _, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 					if (stack1Size + stack2Size <= request.stackSize) then
@@ -455,6 +458,36 @@ function findStackByName(name, startingBag, startingSlot)
 end
 
 -------------------------------------------------------------------------------
+-- Finds the specified item by id
+--
+-- TODO: Correctly handle containers like ammo packs
+-------------------------------------------------------------------------------
+function findStackById(id, startingBag, startingSlot)
+	if (startingBag == nil) then
+		startingBag = 0;
+	end
+	if (startingSlot == nil) then
+		startingSlot = 1;
+	end
+	for bag = startingBag, 4, 1 do
+		if (GetBagName(bag)) then
+			local numItems = GetContainerNumSlots(bag);
+			if (startingSlot <= numItems) then
+				for slot = startingSlot, GetContainerNumSlots(bag), 1 do
+					local itemId = getItemId(bag, slot);
+					if (id == itemId) then
+						return { bag=bag, slot=slot };
+					end
+				end
+			end
+			startingSlot = 1;
+		end
+	end
+	return nil;
+end
+
+
+-------------------------------------------------------------------------------
 -- Gets the name of the specified
 -------------------------------------------------------------------------------
 function getItemName(bag, slot)
@@ -465,6 +498,16 @@ function getItemName(bag, slot)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- Gets the id of the specified
+-------------------------------------------------------------------------------
+function getItemId(bag, slot)
+	local link = GetContainerItemLink(bag, slot);
+	if (link) then
+		local id = EnhTooltip.BreakLink(link);
+		return id;
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Clears the current auction item, if any.
@@ -509,13 +552,13 @@ end
 --
 -- TODO: Correctly handle containers like ammo packs
 -------------------------------------------------------------------------------
-function getItemQuantity(name)
+function getItemQuantity(id)
 	local quantity = 0;
 	for bag = 0, 4, 1 do
 		if (GetBagName(bag)) then
 			for item = GetContainerNumSlots(bag), 1, -1 do
-				local itemName = getItemName(bag, item);
-				if (name == itemName) then
+				local itemId = getItemId(bag, item);
+				if (id == itemId) then
 					local _, itemCount = GetContainerItemInfo(bag, item);
 					quantity = quantity + itemCount;
 				end
