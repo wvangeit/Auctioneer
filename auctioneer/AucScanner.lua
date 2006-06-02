@@ -84,7 +84,7 @@ function auctionStartHook() --Auctioneer_AuctionStart_Hook
 	Auctioneer.Core.Variables.DefunctAuctionsCount = 0;
 
 	-- Record the auction start time
-	Auctioneer.Core.Variables.AuctionScanStart = os.time()
+	Auctioneer.Core.Variables.AuctionScanStart = time()
 
 	-- Protect AuctionFrame if we should
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
