@@ -83,6 +83,9 @@ function auctionStartHook() --Auctioneer_AuctionStart_Hook
 	Auctioneer.Core.Variables.OldAuctionsCount = 0;
 	Auctioneer.Core.Variables.DefunctAuctionsCount = 0;
 
+	-- Record the auction start time
+	Auctioneer.Core.Variables.AuctionScanStart = os.time()
+
 	-- Protect AuctionFrame if we should
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
 		Auctioneer.Util.ProtectAuctionFrame(true);
@@ -115,12 +118,12 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 						id, rprop, enchant, name, count, min, buyout = Auctioneer.Core.GetItemSignature(iKey);
 
 						-- This item should have been seen, but wasn't.
-						-- We need to work out if it expired before or after it's time
+						-- We need to work out if it expired before or after its time
 						lastSeen = snap.lastSeenTime;
 						expiredSeconds = endTime - lastSeen;
 						if (snap.timeLeft == 1) and (snap.bidamount > 0) then
 							bidCount = bidCount+1;
-							-- This one expired at the final time interval, so it's likely
+							-- This one expired at the final time interval, so its likely
 							-- that this is the best bid value we'll get for it.
 							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
 							if (not AuctionConfig.success) then AuctionConfig.success = {} end
@@ -195,7 +198,7 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 		discrepanciesMessage = string.format(_AUCT('AuctionDiscrepancies'), Auctioneer.Util.ColorTextWhite(lDiscrepencyCount))
 		Auctioneer.Util.ChatPrint(discrepanciesMessage);
 	end
-	
+
 	--Add the preceding information to the AH frame too
 	BrowseNoResultsText:SetText(totalAuctionsMessage.."\n"..newAuctionsMessage.."\n"..oldAuctionsMessage.."\n"..defunctAuctionsMessage.."\n"..(discrepanciesMessage or ""))
 
@@ -215,6 +218,9 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 			ReloadUI();
 		end
 	end
+
+	--Cleaning up after oneself is always a good idea.
+	collectgarbage()
 end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
@@ -276,7 +282,7 @@ function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_
 	local auctKey = Auctioneer.Util.GetAuctionKey();
 	local snap = Auctioneer.Core.GetSnapshot(auctKey, itemCat, lAuctionSignature);
 
-	-- If we haven't seen this item (it's not in the old snapshot)
+	-- If we haven't seen this item (its not in the old snapshot)
 	if (not snap) then
 		EnhTooltip.DebugPrint("No snap");
 		Auctioneer.Core.Variables.NewAuctionsCount = Auctioneer.Core.Variables.NewAuctionsCount + 1;
@@ -487,12 +493,12 @@ function configureAH()
 		while (getglobal("AuctionFrameTab"..(tabCount + 1)) ~= nil) do
 			tabCount = tabCount + 1;
 		end
-		
+
 		-- Find the correct location to insert our Search Auctions and Post Auctions
 		-- tabs. We want to insert them at the end or before BeanCounter's
 		-- Transactions tab.
 		local tabIndex = 1;
-		while (getglobal("AuctionFrameTab"..(tabIndex)) ~= nil and 
+		while (getglobal("AuctionFrameTab"..(tabIndex)) ~= nil and
 			   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
 			tabIndex = tabIndex + 1;
 		end
@@ -513,24 +519,24 @@ function insertAHTab(tabIndex, tabButton, tabFrame)
 	while (getglobal("AuctionFrameTab"..(tabCount)) ~= nil) do
 		tabCount = tabCount + 1;
 	end
-	
+
 	-- Adjust the tabIndex to fit within the current tab count.
 	if (tabIndex < 1 or tabIndex > tabCount) then
 		tabIndex = tabCount;
 	end
-	
+
 	-- Make room for the tab, if needed.
 	for index = tabCount, tabIndex + 1, -1  do
 		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
 		getglobal("AuctionFrameTab"..(index)):SetID(index);
 	end
-	
+
 	-- Configure the frame.
 	tabFrame:SetParent("AuctionFrame");
 	tabFrame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0);
 	relevel(tabFrame);
 
-	-- Configure the tab button.	
+	-- Configure the tab button.
 	setglobal("AuctionFrameTab"..tabIndex, tabButton);
 	tabButton:SetParent("AuctionFrame");
 	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
@@ -542,7 +548,7 @@ function insertAHTab(tabIndex, tabButton, tabFrame)
 		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
 		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
 	end
-	
+
 	-- Update the tab count.
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end

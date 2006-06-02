@@ -15,7 +15,7 @@
 	LangString DESC_Enchantrix ${LANG_DANISH} "Dette vil installere Enchantrix. $\r$\n$\r$\nDette AddOn forsoeger at forudsige hvilke komponenter et given item/genstand vil disenchante til."
 	LangString DESC_Enchantrix ${LANG_GERMAN} "Installiert Enchantrix.$\r$\n$\r$\nDieses AddOn versucht zu bestimmen, welche Materialien beim Entzaubern eines Gegenstands entstehen."
 	LangString DESC_Enchantrix ${LANG_ENGLISH} "This will install Enchantrix.$\r$\n$\r$\nThis AddOn attempts to predict what components an item will disenchant into."
-	LangString DESC_Enchantrix ${LANG_SPANISH} "Esto instalará Enchantrix.$\r$\n$\r$\nEste AddOn trata de predecir el resultado de desencantar artículos."
+	LangString DESC_Enchantrix ${LANG_SPANISH} "Esto instalará Enchantrix.$\r$\n$\r$\nEste AddOn trata de predecir el resultado de desencantar artí­culos."
 	LangString DESC_Enchantrix ${LANG_FRENCH} "Ce programme va installer Enchantrix.$\r$\n$\r$\nCet AddOn tente de prédire quels composants seront obtenus lors du désenchantement d\'un objet."
 	LangString DESC_Enchantrix ${LANG_ITALIAN} "Questo programma installerà  Enchatrix.$\r$\n$\r$\nQuesto AddOn prova a predire i componenti nei quali un articolo sarà  disincantato."
 	LangString DESC_Enchantrix ${LANG_KOREAN} "Enchantrix를 설치합니다.$\r$\n$\r$\n마력 추출시 나오는 마법부여 재료를 예측해줍니다."

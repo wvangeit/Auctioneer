@@ -33,6 +33,9 @@ local newAuctionsCount = 0;
 local oldAuctionsCount = 0;
 local defunctAuctionsCount = 0;
 
+-- Auction scan start time counter
+local auctionScanStart = 0;
+
 -- Temp table that is copied into AHSnapshotItemPrices only when a scan fully completes
 local snapshotItemPrices = {};
 
@@ -562,6 +565,7 @@ Auctioneer.Core.Variables = {
 	NewAuctionsCount = newAuctionsCount,
 	OldAuctionsCount = oldAuctionsCount,
 	DefunctAuctionsCount = defunctAuctionsCount,
+	AuctionScanStart = auctionScanStart,
 	SnapshotItemPrices = snapshotItemPrices,
 }
 

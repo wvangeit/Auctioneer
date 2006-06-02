@@ -1,15 +1,26 @@
 ﻿## Title: Itemizer
 ## Notes: Stores items and their corresponding links. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 11000
+## Interface: 11100
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos, ImprovedErrorFrame
 ## SavedVariables: ItemizerLinks, ItemizerConfig
 ##
-## Version: <%version%> (<%codename%>)
-## Revision: $Id$
-## URL: http://auctioneeraddon.com/
+## X-Version: <%version%> (<%codename%>)
+## X-Revision: $Id$
+## X-URL: http://auctioneeraddon.com/
 ##
-..\..\FrameXML\GameTooltipTemplate.xml
-Itemizer.xml
+
+ItemObjects.lua
+
+Babylonian.lua
+ItemStrings.lua
+ItemLocale.lua
+
+ItemCore.lua
+ItemUtil.lua
+ItemStorage.lua
+ItemScanner.lua
+
+Itemizer.lua

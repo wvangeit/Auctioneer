@@ -202,7 +202,7 @@ function eventHandler(hookParams, event, text, player)
 	end
 
 	items = getItems(text)
-	for key, link in pairs(items) do
+	for key, link in ipairs(items) do
 		aCount, historicalMedian, snapshotMedian, vendorSell = getData(link[1]);
 		local askedCount
 
@@ -293,11 +293,9 @@ end
 function getItems(str)
 	if (not str) then return nil end
 	local itemList = {};
-	local listSize = 0;
 
 	for number, color, item, name in string.gfind(str, "(%d*)|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
-		listSize = listSize+1;
-		itemList[listSize] = {"|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", tonumber(number) or 1}
+		table.insert(itemList, {"|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", tonumber(number) or 1})
 	end
 	return itemList;
 end

@@ -215,7 +215,7 @@ function isValidAlso(also)
 	return true
 end
 
--- Given an item key, breaks it into it's itemID, randomProperty and enchantProperty
+-- Given an item key, breaks it into its itemID, randomProperty and enchantProperty
 function breakItemKey(itemKey)
 	local i,j, itemID, randomProp, enchant = string.find(itemKey, "(%d+):(%d+):(%d+)");
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0);
@@ -560,6 +560,7 @@ function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignore
 	local slot = this:GetID()
 
 	local texture, count, noSplit = GetContainerItemInfo(bag, slot)
+	local link = GetContainerItemLink(bag, slot)
 	if (count and count > 1 and not noSplit) then
 		if (button == "RightButton") and (IsControlKeyDown()) then
 			local splitCount = math.floor(count / 2)
@@ -575,7 +576,6 @@ function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignore
 	end
 
 	if (AuctionFrame and AuctionFrame:IsVisible()) then
-		local link = GetContainerItemLink(bag, slot)
 		if (link) then
 			if (button == "RightButton") and (IsAltKeyDown()) then
 				AuctionFrameTab_OnClick(1)
@@ -616,7 +616,7 @@ function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignore
 			if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
 				warn = ("|c"..getWarnColor(warn)..warn.."|r")
 				StartAuction(start, buy, duration);
-				chatPrint(string.format(_AUCT('FrmtAutostart'), EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
+				chatPrint(string.format(_AUCT('FrmtAutostart'), link, EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 			end
 			return "abort";
 		end
@@ -627,13 +627,11 @@ function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignore
 		if (count) then
 			if (count > 1 and IsShiftKeyDown()) then
 				this.SplitStack = function(button, split)
-					local link = GetContainerItemLink(bag, slot)
 					local _, _, _, _, name = EnhTooltip.BreakLink(link);
 					AuctionFramePost:SetAuctionItem(bag, slot, split);
 				end
 				OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
 			else
-				local link = GetContainerItemLink(bag, slot)
 				local _, _, _, _, name = EnhTooltip.BreakLink(link);
 				AuctionFramePost:SetAuctionItem(bag, slot, 1);
 			end
