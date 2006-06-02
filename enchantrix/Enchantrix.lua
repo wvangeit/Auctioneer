@@ -35,7 +35,7 @@ local onEvent
 
 Enchantrix.Version = "<%version%>"
 if (Enchantrix.Version == "<".."%version%>") then
-	Enchantrix.Version = "3.5.DEV"
+	Enchantrix.Version = "3.7.DEV"
 end
 
 local DisenchantEvent = {}

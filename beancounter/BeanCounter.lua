@@ -39,7 +39,7 @@ local nilSafe;
 BeanCounter = {};
 BeanCounter.Version="<%version%>";
 if (BeanCounter.Version == "<".."%version%>") then
-	BeanCounter.Version = "3.5.DEV";
+	BeanCounter.Version = "3.7.DEV";
 end
 
 -------------------------------------------------------------------------------

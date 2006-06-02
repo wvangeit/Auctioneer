@@ -171,7 +171,7 @@ You may use the following methods of the EnhTooltip class:
 -- setting version number
 ENHTOOLTIP_VERSION = "<%version%>"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
-	ENHTOOLTIP_VERSION = "3.5.DEV"
+	ENHTOOLTIP_VERSION = "3.7.DEV"
 end
 
 --[[
