@@ -25,3 +25,4 @@ function BandAid_OnLoad()
 	end
 end
 
+BandAid_OnLoad()
