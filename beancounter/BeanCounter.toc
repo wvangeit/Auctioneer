@@ -10,15 +10,6 @@
 ## Revision: $Id: $
 ## URL: http://auctioneeraddon.com/
 ##
-..\..\FrameXML\Fonts.xml
-..\..\FrameXML\UIPanelTemplates.xml
-..\..\FrameXML\MoneyFrame.xml
-..\..\FrameXML\MoneyInputFrame.xml
-..\..\FrameXML\UIDropDownMenu.xml
-..\..\FrameXML\CharacterFrameTemplates.xml
-..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
-..\EnhTooltip\TinyMoneyFrame.xml
-..\Auctioneer\AuctioneerUI.xml
-..\Auctioneer\ListTemplate.xml
+
 BeanCounter.xml
 AuctionFrameTransactions.xml
