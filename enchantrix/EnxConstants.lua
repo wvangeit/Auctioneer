@@ -24,32 +24,32 @@
 local const = Enchantrix.Constants
 
 -- These are market norm prices.
--- Median prices from Allakhazam.com, Mar 16, 2006
+-- Median prices from Allakhazam.com, June 6, 2006
 const.StaticPrices = {
 	[20725] = 500000, -- Nexus Crystal
-	[14344] =  60000, -- Large Brilliant Shard
-	[11178] =  50000, -- Large Radiant Shard
-	[11139] =  16500, -- Large Glowing Shard
-	[11084] =  10000, -- Large Glimmering Shard
-	[14343] =  30000, -- Small Brilliant Shard
-	[11177] =  27500, -- Small Radiant Shard
-	[11138] =   6000, -- Small Glowing Shard
+	[14344] =  62500, -- Large Brilliant Shard
+	[11178] =  55000, -- Large Radiant Shard
+	[11139] =  15000, -- Large Glowing Shard
+	[11084] =   9500, -- Large Glimmering Shard
+	[14343] =  25000, -- Small Brilliant Shard
+	[11177] =  37500, -- Small Radiant Shard
+	[11138] =   5750, -- Small Glowing Shard
 	[10978] =   3000, -- Small Glimmering Shard
-	[16203] =  49500, -- Greater Eternal Essence
-	[11175] =  35500, -- Greater Nether Essence
+	[16203] =  65000, -- Greater Eternal Essence
+	[11175] =  37500, -- Greater Nether Essence
 	[11135] =  10000, -- Greater Mystic Essence
-	[11082] =  10000, -- Greater Astral Essence
-	[10939] =   3350, -- Greater Magic Essence
-	[16202] =  18500, -- Lesser Eternal Essence
+	[11082] =  12500, -- Greater Astral Essence
+	[10939] =   3250, -- Greater Magic Essence
+	[16202] =  25000, -- Lesser Eternal Essence
 	[11174] =  15000, -- Lesser Nether Essence
-	[11134] =   5000, -- Lesser Mystic Essence
-	[10998] =   5000, -- Lesser Astral Essence
-	[10938] =   1900, -- Lesser Magic Essence
+	[11134] =   4750, -- Lesser Mystic Essence
+	[10998] =   5250, -- Lesser Astral Essence
+	[10938] =   1750, -- Lesser Magic Essence
 	[16204] =  10000, -- Illusion Dust
-	[11176] =   6000, -- Dream Dust
-	[11137] =   2500, -- Vision Dust
-	[11083] =   1500, -- Soul Dust
-	[10940] =    800, -- Strange Dust
+	[11176] =   5250, -- Dream Dust
+	[11137] =   2250, -- Vision Dust
+	[11083] =   1750, -- Soul Dust
+	[10940] =    825, -- Strange Dust
 }
 
 const.DUST = 1

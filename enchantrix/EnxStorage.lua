@@ -249,6 +249,9 @@ function mergeDisenchantLists()
 			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 		end
 	end
+
+	-- Take out the trash
+	collectgarbage()
 end
 
 function saveDisenchant(sig, reagentID, count)
