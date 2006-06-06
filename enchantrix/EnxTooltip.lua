@@ -231,9 +231,11 @@ local function getReagentsFromCraftFrame(craftIndex)
 	local numReagents = GetCraftNumReagents(craftIndex)
 	for i = 1, numReagents do
 		local link = GetCraftReagentItemLink(craftIndex, i)
-		local hlink = EnhTooltip.HyperlinkFromLink(link)
-		local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(craftIndex, i)
-		table.insert(reagentList, {hlink, reagentCount})
+		if link then
+			local hlink = EnhTooltip.HyperlinkFromLink(link)
+			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(craftIndex, i)
+			table.insert(reagentList, {hlink, reagentCount})
+		end
 	end
 
 	return reagentList
