@@ -101,13 +101,9 @@ function EnchantrixBarker_OnEvent()
 		--Enchantrix.Util.ChatPrint("Barker config is "..tostring(Enchantrix.Config.GetFilter('barker')) );
 		if( event == "CRAFT_SHOW" ) then
 			if( Enchantrix.Config.GetFilter('barker') ) then
-				Enchantrix_BarkerButton:SetParent(CraftFrame);
-				Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
 				Enchantrix_BarkerButton:Show();
 				Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
 
-				Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
-				Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
 				Enchantrix_BarkerOptionsButton:Show();
 				Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.'; --TODO: Localize
 			else
@@ -155,8 +151,31 @@ function Enchantrix.Barker.AddonLoaded()
 	end
 end
 
-function EnchantrixBarker_OnLoad()
+local function relevel(frame)
+	local myLevel = frame:GetFrameLevel() + 1
+	local children = { frame:GetChildren() }
+	for _,child in pairs(children) do
+		child:SetFrameLevel(myLevel)
+		relevel(child)
+	end
+end
 
+local function craftUILoaded()
+	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
+
+	Enchantrix_BarkerButton:SetParent(CraftFrame);
+	Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
+
+	Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
+	Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
+
+	Enchantrix_BarkerOptions_Frame:SetParent(CraftFrame);
+	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", CraftFrame, "TOPRIGHT");
+	relevel(Enchantrix_BarkerOptions_Frame)
+end
+
+function EnchantrixBarker_OnLoad()
+	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "Enchantrix", craftUILoaded)
 end
 
 
@@ -663,7 +682,6 @@ function Enchantrix_BarkerOptions_ShowFrame( frame_index )
 			for i, opt in pairs(frame.options) do
 				local slidername = 'EnchantrixBarker_OptionsSlider_'..i
 				local slider = getglobal(slidername);
-				slider:SetFrameLevel(Enchantrix_BarkerOptions_Frame:GetFrameLevel()+4);
 				slider:SetMinMaxValues(opt.min, opt.max);
 				slider:SetValueStep(opt.step);
 				slider.tooltipText = opt.tooltip;
@@ -684,8 +702,6 @@ end
 
 function Enchantrix_BarkerOptions_OnClick()
 	--Enchantrix.Util.ChatPrint("You pressed the options button." );
-	Enchantrix_BarkerOptions_Frame:SetParent(Enchantrix_BarkerOptionsButton);
-	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", CraftFrame, "TOPRIGHT");
 	Enchantrix_BarkerOptions_Frame:Show();
 	--ShowUIPanel(Enchantrix_BarkerOptions_Frame);
 end

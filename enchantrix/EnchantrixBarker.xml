@@ -197,9 +197,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					<OnClick>
 						Enchantrix_BarkerOptions_TestButton_OnClick();
 					</OnClick>
-					<OnLoad>
-						this:SetFrameLevel(this:GetFrameLevel() + 4);
-					</OnLoad>
 				</Scripts>
 			</Button>
 
@@ -248,11 +245,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 						</Offset>
 					</Anchor>
 				</Anchors>
-				<Scripts>
-					<OnLoad>
-						this:SetFrameLevel(this:GetFrameLevel() + 4);
-					</OnLoad>
-				</Scripts>
 			</Button>
 			<Slider name="EnchantrixBarker_OptionsSlider_1" id="1" inherits="EnchantrixBarker_OptionsSliderTemplate">
 				<Anchors>
