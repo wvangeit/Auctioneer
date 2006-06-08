@@ -98,28 +98,28 @@ function EnchantrixBarker_OnEvent()
 	local craftName, rank, maxRank = GetCraftDisplaySkillLine()
 
 	if craftName then
-        --Enchantrix.Util.ChatPrint("Barker config is "..tostring(Enchantrix.Config.GetFilter('barker')) );
+		--Enchantrix.Util.ChatPrint("Barker config is "..tostring(Enchantrix.Config.GetFilter('barker')) );
 		if( event == "CRAFT_SHOW" ) then
-            if( Enchantrix.Config.GetFilter('barker') ) then
-                Enchantrix_BarkerButton:SetParent(CraftFrame);
-                Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
-                Enchantrix_BarkerButton:Show();
-                Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
+			if( Enchantrix.Config.GetFilter('barker') ) then
+				Enchantrix_BarkerButton:SetParent(CraftFrame);
+				Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
+				Enchantrix_BarkerButton:Show();
+				Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
 
-                Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
-                Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
-                Enchantrix_BarkerOptionsButton:Show();
-                Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.'; --TODO: Localize
-            else
-                Enchantrix_BarkerButton:Hide();
-                Enchantrix_BarkerOptionsButton:Hide();
-                Enchantrix_BarkerOptions_Frame:Hide();
-            end
+				Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
+				Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
+				Enchantrix_BarkerOptionsButton:Show();
+				Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.'; --TODO: Localize
+			else
+				Enchantrix_BarkerButton:Hide();
+				Enchantrix_BarkerOptionsButton:Hide();
+				Enchantrix_BarkerOptions_Frame:Hide();
+			end
 		elseif( event == "CRAFT_CLOSE" )then
 			Enchantrix_BarkerButton:Hide();
 			Enchantrix_BarkerOptionsButton:Hide();
 			Enchantrix_BarkerOptions_Frame:Hide();
-        end
+		end
 	end
 end
 
@@ -129,7 +129,7 @@ end
 
 function Enchantrix_BarkerOnClick()
 	--Enchantrix.Util.ChatPrint(Enchantrix_CreateBarker());
-	barker = Enchantrix_CreateBarker();
+	local barker = Enchantrix_CreateBarker();
 
 	if barker ~= nil then
 		SendChatMessage(barker,"CHANNEL", this.language,"2");
@@ -199,7 +199,7 @@ function Enchantrix_BarkerGetConfig( key )
 	if( not EnchantConfig.barker ) then
 		EnchantConfig.barker = {};
 	end
-	config = EnchantConfig.barker;
+	local config = EnchantConfig.barker;
 
 	if( not config[key] ) then
 		config[key] = config_defaults[key];
@@ -214,13 +214,13 @@ function Enchantrix_BarkerSetConfig( key, value )
 	if( not EnchantConfig.barker ) then
 		EnchantConfig.barker = {};
 	end
-	config = EnchantConfig.barker;
+	local config = EnchantConfig.barker;
 
 	config[key] = value;
 end
 
 function Enchantrix_BarkerOptions_TestButton_OnClick()
-	barker = Enchantrix_CreateBarker();
+	local barker = Enchantrix_CreateBarker();
 
 	if barker ~= nil then
 		Enchantrix.Util.ChatPrint(barker);
@@ -627,7 +627,7 @@ end
 
 function EnchantrixBarker_OptionsSlider_GetTextFromValue( value, units )
 
-	valuestr = ''
+	local valuestr = ''
 
 	if units == 'percentage' then
 		valuestr = value..'%'
@@ -653,16 +653,16 @@ end
 
 function Enchantrix_BarkerOptions_ShowFrame( frame_index )
 	Enchantrix_BarkerOptions_ActiveTab = -1
-	for index, frame in Enchantrix_BarkerOptions_TabFrames do
+	for index, frame in pairs(Enchantrix_BarkerOptions_TabFrames) do
 		if ( index == frame_index ) then
 			--Enchantrix.Util.ChatPrint( "Showing Frame: "..index );
 			for i = 1,10 do
-				slider = getglobal('EnchantrixBarker_OptionsSlider_'..i);
+				local slider = getglobal('EnchantrixBarker_OptionsSlider_'..i);
 				slider:Hide();
 			end
-			for i, opt in frame.options do
-				slidername = 'EnchantrixBarker_OptionsSlider_'..i
-				slider = getglobal(slidername);
+			for i, opt in pairs(frame.options) do
+				local slidername = 'EnchantrixBarker_OptionsSlider_'..i
+				local slider = getglobal(slidername);
 				slider:SetFrameLevel(Enchantrix_BarkerOptions_Frame:GetFrameLevel()+4);
 				slider:SetMinMaxValues(opt.min, opt.max);
 				slider:SetValueStep(opt.step);
@@ -672,9 +672,9 @@ function Enchantrix_BarkerOptions_ShowFrame( frame_index )
 				slider:Show();
 			end
 			Enchantrix_BarkerOptions_ActiveTab = index
-			for i, opt in frame.options do
-				slidername = 'EnchantrixBarker_OptionsSlider_'..i
-				slider = getglobal(slidername);
+			for i, opt in pairs(frame.options) do
+				local slidername = 'EnchantrixBarker_OptionsSlider_'..i
+				local slider = getglobal(slidername);
 				slider:SetValue(opt.getvalue(i));
 				getglobal(slidername.."Text"):SetText(opt.name..' - '..EnchantrixBarker_OptionsSlider_GetTextFromValue(slider:GetValue(),opt.units));
 			end
@@ -713,7 +713,7 @@ function Enchantrix_CreateBarker()
 		Enchantrix_ResetPriorityList();
 		if (temp) then
 			for i=1, GetNumCrafts(),1 do
-				craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(i);
+				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(i);
 				if( ( numEnchantsAvailable > 0 ) and ( string.find( craftName, "Enchant" ) ~= nil ) ) then --have reagents and it is an enchant
 					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
 					local cost = 0;
@@ -758,7 +758,7 @@ function Enchantrix_CreateBarker()
 				return nil
 			end
 
-			for i,element in priorityList do
+			for i,element in ipairs(priorityList) do
 				--Enchantrix.Util.ChatPrint(""..element.enchant.name, 0.8, 0.8, 0.2);
 				Enchantrix_AddEnchantToBarker( element.enchant );
 			end
@@ -817,9 +817,9 @@ end
 
 function Enchantrix_AddEnchantToPriorityList(enchant)
 
-	enchant_score = Enchantrix_ScoreEnchantPriority( enchant );
+	local enchant_score = Enchantrix_ScoreEnchantPriority( enchant );
 
-	for i,priorityentry in priorityList do
+	for i,priorityentry in ipairs(priorityList) do
 		if( priorityentry.score < enchant_score ) then
 			table.insert( priorityList, i, {score = enchant_score, enchant = enchant} );
 			return;
@@ -925,13 +925,13 @@ end
 
 function Enchantrix_AddEnchantToBarker( enchant )
 
-	currBarker = Enchantrix_GetBarkerString();
+	local currBarker = Enchantrix_GetBarkerString();
 
-	category_key = Enchantrix_GetItemCategoryKey( enchant.index )
-	category_string = "";
-	test_category = {};
+	local category_key = Enchantrix_GetItemCategoryKey( enchant.index )
+	local category_string = "";
+	local test_category = {};
 	if barkerCategories[ category_key ] then
-		for i,element in barkerCategories[category_key] do
+		for i,element in ipairs(barkerCategories[category_key]) do
 			--Enchantrix.Util.ChatPrint("Inserting: "..i..", elem: "..element.index );
 			table.insert(test_category, element);
 		end
@@ -959,7 +959,7 @@ end
 function Enchantrix_GetBarkerString()
 	local barker = ""..barkerString;
 
-	for index, key in print_order do
+	for index, key in ipairs(print_order) do
 		if( barkerCategories[key] ) then
 			barker = barker..Enchantrix_GetBarkerCategoryString( barkerCategories[key] )
 		end
@@ -969,9 +969,9 @@ function Enchantrix_GetBarkerString()
 end
 
 function Enchantrix_GetBarkerCategoryString( barkerCategory )
-	barkercat = ""
+	local barkercat = ""
 	barkercat = barkercat.." ["..Enchantrix_GetItemCategoryString(barkerCategory[1].index)..": ";
-	for j,enchant in barkerCategory do
+	for j,enchant in ipairs(barkerCategory) do
 		if( j > 1) then
 			barkercat = barkercat..", "
 		end
@@ -1003,7 +1003,7 @@ function Enchantrix_GetItemCategoryString( index )
 
 	local enchant = GetCraftInfo( index );
 
-	for key,category in categories do
+	for key,category in pairs(categories) do
 		--Enchantrix.Util.ChatPrint( "cat key: "..key);
 		if( string.find( enchant, category.search ) ~= nil ) then
 			--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category.print..", enchant: "..enchant );
@@ -1018,7 +1018,7 @@ function Enchantrix_GetItemCategoryKey( index )
 
 	local enchant = GetCraftInfo( index );
 
-	for key,category in categories do
+	for key,category in pairs(categories) do
 		--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category );
 		if( string.find( enchant, category.search ) ~= nil ) then
 			return key;
@@ -1036,7 +1036,7 @@ end
 function Enchantrix_GetShortDescriptor( index )
 	local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
 
-	for index,attribute in attributes do
+	for index,attribute in ipairs(attributes) do
 		if( string.find( long_str, attribute ) ~= nil ) then
 			statvalue = string.sub(long_str ,string.find(long_str,'[0-9]+[^%%]'));
 			statvalue = string.sub(statvalue ,string.find(statvalue,'[0-9]+'));
@@ -1052,7 +1052,7 @@ function Enchantrix_GetEnchantStat( enchant )
 	local index = enchant.index;
 	local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
 
-	for index,attribute in attributes do
+	for index,attribute in ipairs(attributes) do
 		if( string.find( long_str, attribute ) ~= nil ) then
 			return short_attributes[index];
 		end
