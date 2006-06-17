@@ -89,22 +89,22 @@ function getWarnColor(warn)
 		return nil
 	end
 
-	local cHex, cRed, cGreen, cRed;
+	local cHex, cRed, cGreen, cBlue;
 
 	if (Auctioneer.Command.GetFilter('warn-color')) then
 		local FrmtWarnAbovemkt, FrmtWarnUndercut, FrmtWarnNocomp, FrmtWarnAbovemkt, FrmtWarnMarkup, FrmtWarnUser, FrmtWarnNodata, FrmtWarnMyprice
 
-		FrmtWarnToolow = string.sub(_AUCT('FrmtWarnToolow'), 1, -5);
-		FrmtWarnNocomp = string.sub(_AUCT('FrmtWarnNocomp'), 1, -5);
-		FrmtWarnAbovemkt = string.sub(_AUCT('FrmtWarnAbovemkt'), 1, -5);
-		FrmtWarnUser = string.sub(_AUCT('FrmtWarnUser'), 1, -5);
-		FrmtWarnNodata = string.sub(_AUCT('FrmtWarnNodata'), 1, -5);
-		FrmtWarnMyprice = string.sub(_AUCT('FrmtWarnMyprice'), 1, -5);
+		FrmtWarnToolow = _AUCT('FrmtWarnToolow');
+		FrmtWarnNocomp = _AUCT('FrmtWarnNocomp');
+		FrmtWarnAbovemkt = _AUCT('FrmtWarnAbovemkt');
+		FrmtWarnUser = _AUCT('FrmtWarnUser');
+		FrmtWarnNodata = _AUCT('FrmtWarnNodata');
+		FrmtWarnMyprice = _AUCT('FrmtWarnMyprice');
 
 		FrmtWarnUndercut = string.format(_AUCT('FrmtWarnUndercut'), tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')));
 		FrmtWarnMarkup = string.format(_AUCT('FrmtWarnMarkup'), tonumber(Auctioneer.Command.GetFilterVal('pct-markup')));
 
-		if (string.find(warn, FrmtWarnToolow)) then
+		if (warn == FrmtWarnToolow) then
 			--Color Red
 			cHex = "ffff0000";
 			cRed = 1.0;
@@ -118,14 +118,14 @@ function getWarnColor(warn)
 			cGreen = 1.0;
 			cBlue = 0.0;
 
-		elseif (string.find(warn, FrmtWarnNocomp) or string.find(warn, FrmtWarnAbovemkt)) then
+		elseif ((warn == FrmtWarnNocomp) or (warn == FrmtWarnAbovemkt)) then
 			--Color Green
 			cHex = "ff00ff00";
 			cRed = 0.0;
 			cGreen = 1.0;
 			cBlue = 0.0;
 
-		elseif ((warn == FrmtWarnMarkup) or string.find(warn, FrmtWarnUser) or string.find(warn, FrmtWarnNodata) or string.find(warn, FrmtWarnMyprice)) then
+		elseif ((warn == FrmtWarnMarkup) or (warn == FrmtWarnUser) or (warn == FrmtWarnNodata) or (warn == FrmtWarnMyprice)) then
 			--Color Gray
 			cHex = "ff999999";
 			cRed = 0.6;
@@ -614,7 +614,8 @@ function containerFrameItemButtonOnClick(hookParams, returnValue, button, ignore
 			local duration = AuctionFrameAuctions.duration
 			local warn = AuctionInfoWarnText:GetText()
 			if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
-				warn = ("|c"..getWarnColor(warn)..warn.."|r")
+				local cHex, cRed, cGreen, cBlue = getWarnColor(warn)
+				warn = ("|c"..cHex..warn.."|r")
 				StartAuction(start, buy, duration);
 				chatPrint(string.format(_AUCT('FrmtAutostart'), link, EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 			end
