@@ -107,15 +107,14 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 		buyCount = 0;
 		bidCount = 0;
 		expCount = 0;
-		local snap,lastSeen,expiredSeconds,itemKey,buyList,listStr,listSplit,buyout,hist;
-		local id, rprop, enchant, name, count, min, buyout, sig;
+		local snap, lastSeen, expiredSeconds, itemKey, buyList, buyout, id, rprop, enchant, count, min, sig;
 
 		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 				for iKey, iData in pairs(cData) do
 					snap = Auctioneer.Core.GetSnapshotFromData(iData);
 					if (snap.dirty == "1") then
-						id, rprop, enchant, name, count, min, buyout = Auctioneer.Core.GetItemSignature(iKey);
+						id, rprop, enchant, _, count, min, buyout = Auctioneer.Core.GetItemSignature(iKey);
 
 						-- This item should have been seen, but wasn't.
 						-- We need to work out if it expired before or after its time
