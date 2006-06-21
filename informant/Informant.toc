@@ -10,5 +10,6 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Informant
-
+..\..\FrameXML\Fonts.xml
+..\..\FrameXML\UIPanelTemplates.xml
 Informant.xml
