@@ -18,6 +18,7 @@
 Babylonian.lua
 DisenchantList.lua
 EnxObjects.lua
+EnchantrixBarker.lua
 EnchantrixBarker.xml
 EnxCommand.lua
 EnxConfig.lua

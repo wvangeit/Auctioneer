@@ -20,21 +20,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="EnchantrixBarker.lua"></Script>
-	<Frame name="EnchantrixBarker" parent="UIParent" hidden="true">
-		<Scripts>
-			<OnLoad>
-				EnchantrixBarker_OnLoad();
-				this:RegisterEvent("CRAFT_SHOW")
-				this:RegisterEvent("CRAFT_CLOSE")
-			</OnLoad>
-			<OnEvent>
-				EnchantrixBarker_OnEvent();
-			</OnEvent>
-		</Scripts>
-	</Frame>
-
-
 	<Button name="Enchantrix_BarkerButton" inherits="UIPanelButtonTemplate" hidden="true" text="Trade Barker">
 		<Size>
 			<AbsDimension x="105" y="22"/>
@@ -345,6 +330,19 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				Enchantrix_BarkerOptions_Frame.selectedTab=1;
 				PanelTemplates_UpdateTabs(Enchantrix_BarkerOptions_Frame);
 			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="EnchantrixBarker" parent="UIParent" hidden="true">
+		<Scripts>
+			<OnLoad>
+				EnchantrixBarker_OnLoad();
+				this:RegisterEvent("CRAFT_SHOW")
+				this:RegisterEvent("CRAFT_CLOSE")
+			</OnLoad>
+			<OnEvent>
+				EnchantrixBarker_OnEvent();
+			</OnEvent>
 		</Scripts>
 	</Frame>
 </Ui>
