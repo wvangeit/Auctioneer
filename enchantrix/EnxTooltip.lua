@@ -181,7 +181,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 			tooltipFormat:SetPattern("$bcount", tostring(counts.biCount))
 
 			-- Name and quality
-			local name, _, quality = GetItemInfo(dSig)
+			local name, _, quality = Enchantrix.Util.GetReagentInfo(dSig)
 			local _, _, _, color = GetItemQualityColor(quality or 0)
 			tooltipFormat:SetPattern("|q", color or "|cffcccc33")
 			tooltipFormat:SetPattern("$name", name or counts.name)
@@ -315,7 +315,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 
 	-- Append additional reagent info
 	for _, reagent in ipairs(reagentList) do
-		local name, link, quality = GetItemInfo(reagent[1])
+		local name, link, quality = Enchantrix.Util.GetReagentInfo(reagent[1])
 		local hsp, median, market = Enchantrix.Util.GetReagentPrice(reagent[1])
 		local _, _, _, color = GetItemQualityColor(quality)
 
