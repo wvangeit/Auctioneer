@@ -142,14 +142,14 @@ function getItem(itemID)
 		return getItemBasic(itemID)
 	end
 
-	local _, _, _, iLevel, sType, _, _, _, sTexture = GetItemInfo(itemID)
+	local _, _, _, iLevel, sType, _, iCount, _, sTexture = GetItemInfo(itemID)
 
 	local baseSplit = split(baseData, ":")
 	local buy = tonumber(baseSplit[1])
 	local sell = tonumber(baseSplit[2])
 	local class = tonumber(baseSplit[3])
 	local quality = tonumber(baseSplit[4])
-	local stack = tonumber(baseSplit[5])
+	local stack = tonumber(iCount) or tonumber(baseSplit[5])
 	local additional = baseSplit[6]
 	local usedby = baseSplit[7]
 	local quantity = baseSplit[8]
