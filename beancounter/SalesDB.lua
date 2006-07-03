@@ -80,7 +80,6 @@ local compareTime;
 local doesPendingAuctionMatchCompletedAuction;
 local doesPendingAuctionListMatch;
 local getPendingAuctionMatchCount;
-local reconcileMatchingAuctions;
 
 local debugPrint;
 
@@ -131,15 +130,20 @@ end
 
 -------------------------------------------------------------------------------
 -- Deletes a pending auction from the database.
+--
+-- If pendingAuctions is provided, the pending auction will be removed from it.
 -------------------------------------------------------------------------------
 function deletePendingAuction(item, index, reason, pendingAuctions)
 	-- Update the unpacked pending auction list, if provided
 	local pendingAuction = nil;
 	if (pendingAuctions) then
-		for pendingIndex = 1, table.getn(pendingAuctions) do
+		-- Iterate in reverse since we will be removing the pending auction
+		-- from the list when we find it.
+		for pendingIndex = table.getn(pendingAuctions), 1, -1 do
 			local auction = pendingAuctions[pendingIndex];
 			if (index == auction.index) then
 				pendingAuction = auction;
+				table.remove(pendingAuctions, pendingIndex);
 			elseif (index < auction.index) then
 				auction.index = auction.index - 1;
 			end
@@ -360,15 +364,21 @@ end
 
 -------------------------------------------------------------------------------
 -- Deletes a completed auction from the database.
+--
+-- If completedAuctions is provided, the completed auction will be removed
+-- from it.
 -------------------------------------------------------------------------------
 function deleteCompletedAuction(item, index, reason, completedAuctions)
 	-- Update the unpacked completed auction list, if provided
 	local completedAuction = nil;
 	if (completedAuctions) then
-		for completedIndex = 1, table.getn(completedAuctions) do
+		-- Iterate in reverse since we will be removing the completed auction
+		-- from the list when we find it.
+		for completedIndex = table.getn(completedAuctions), 1, -1 do
 			local auction = completedAuctions[completedIndex];
 			if (index == auction.index) then
 				completedAuction = auction;
+				table.remove(completedAuctions, completedIndex);
 			elseif (index < auction.index) then
 				auction.index = auction.index - 1;
 			end
@@ -945,9 +955,11 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 		-- Reconcile the lists if all auctions match or discrepencies are
 		-- allowed!
 		if (discrepencesAllowed or unmatchedPendingAuctionCount == 0 or unmatchedCompletedAuctionCount == 0) then
-			-- Time to log some sales!
+			-- Time to log some sales! We iterate through the pending
+			-- list in reverse since we will be deleting items from
+			-- it.
 			debugPrint("Begin reconciling auction list for "..item);
-			for pendingIndex = 1, table.getn(pendingAuctions) do
+			for pendingIndex = table.getn(pendingAuctions), 1, -1 do
 				local pendingAuction = pendingAuctions[pendingIndex];
 				if (pendingAuction.match ~= nil) then
 					-- Reconcile the matching auctions.
@@ -969,6 +981,9 @@ end
 -------------------------------------------------------------------------------
 -- Performs auction reconcilation by removing the pending and complete auctions
 -- and adding a sale.
+--
+-- WARNING: The pendingAuction and completedAuction will be removed from
+-- their lists.
 -------------------------------------------------------------------------------
 function reconcileMatchingAuctions(item, pendingAuctions, pendingAuction, completedAuctions, completedAuction)
 	-- Remove the pending and completed auctions

@@ -165,15 +165,20 @@ end
 
 -------------------------------------------------------------------------------
 -- Deletes a pending bid from the database.
+--
+-- If pendingBids is provided, the pending bid will be removed from it.
 -------------------------------------------------------------------------------
 function deletePendingBidByIndex(item, index, reason, pendingBids)
 	-- Update the unpacked pending bid list, if provided
 	local pendingBid = nil;
 	if (pendingBids) then
-		for pendingIndex = 1, table.getn(pendingBids) do
+		-- Iterate in reverse since we will be removing the pending bid
+		-- from the list when we find it.
+		for pendingIndex = table.getn(pendingBids), 1, -1 do
 			local bid = pendingBids[pendingIndex];
 			if (index == bid.index) then
 				pendingBid = bid;
+				table.remove(pendingBids, pendingIndex);
 			elseif (index < bid.index) then
 				bid.index = bid.index - 1;
 			end
@@ -404,15 +409,20 @@ end
 
 -------------------------------------------------------------------------------
 -- Deletes a completed bid from the database.
+--
+-- If completedBids is provided, the completed bid will be removed from it.
 -------------------------------------------------------------------------------
 function deleteCompletedBidByIndex(item, index, reason, completedBids)
 	-- Update the unpacked completed bid list, if provided
 	local completedBid = nil;
 	if (completedBids) then
-		for completedIndex = 1, table.getn(completedBids) do
+		-- Iterate in reverse since we will be removing the completed bid
+		-- from the list when we find it.
+		for completedIndex = table.getn(completedBids), 1, -1 do
 			local bid = completedBids[completedIndex];
 			if (index == bid.index) then
 				completedBid = bid;
+				table.remove(completedBids, completedIndex);
 			elseif (index < bid.index) then
 				bid.index = bid.index - 1;
 			end
@@ -951,9 +961,11 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 		-- Reconcile the lists if all bids match or discrepencies are
 		-- allowed!
 		if (discrepencesAllowed or unmatchedPendingBidCount == 0 or unmatchedCompletedBidCount == 0) then
-			-- Time to log some purchases!
+			-- Time to log some purchases! We iterate through the pending
+			-- list in reverse since we will be deleting items from
+			-- it.
 			debugPrint("Begin reconciling bid list for "..item);
-			for pendingIndex = 1, table.getn(pendingBids) do
+			for pendingIndex = table.getn(pendingBids), 1, -1 do
 				local pendingBid = pendingBids[pendingIndex];
 				if (pendingBid.match ~= nil) then
 					-- Reconcile the matching bids.
@@ -975,6 +987,8 @@ end
 -------------------------------------------------------------------------------
 -- Performs bid reconcilation by removing the pending and completed bids
 -- and adding a purchase.
+--
+-- WARNING: The pendingBid and completedBid will be removed from their lists.
 -------------------------------------------------------------------------------
 function reconcileMatchingBids(item, pendingBids, pendingBid, completedBids, completedBid)
 	-- Remove the pending and completed bids
