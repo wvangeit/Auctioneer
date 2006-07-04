@@ -238,11 +238,7 @@ function registerKhaos()
 					return _AUCT('HelpOnoff')
 				end;
 				callback=function(state)
-					if (state.checked) then
-						Auctioneer.Command.OnOff(_AUCT('CmdOn'));
-					else
-						Auctioneer.Command.OnOff(_AUCT('CmdOff'));
-					end
+					Auctioneer.Command.OnOff(state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -1471,12 +1467,32 @@ function chatPrintHelp()
 end
 --[[
 	The onOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
-	If "on" or "off" is specified in the " state" variable then Auctioneer's state is changed to that value,
+	If "on" or "off" is specified in the first argument then Auctioneer's state is changed to that value,
 	If "toggle" is specified then it will toggle Auctioneer's state (if currently on then it will be turned off and vice-versa)
+	
+	If a boolean (or nil) value is passed as the first argument the conversion is as follows:
+	"true" is the same as "on"
+	"false" is the same as "off"
+	"nil" is the same as "toggle"
 
 	If chatprint is "true" then the state will also be printed to the user.
 ]]
 function onOff(state, chatprint)
+	if (type(state) == "string") then
+		state = Auctioneer.Util.DelocalizeFilterVal(state);
+	
+	elseif (state == true) then
+		state = 'on'
+
+	elseif (state == false) then
+		state = 'off'
+
+	elseif (state == nil) then
+		state = 'toggle'
+	end
+
+	
+	
 	if (state == 'on' or state == 'off') then
 		setFilter('all', state);
 	elseif (state == 'toggle') then
