@@ -126,9 +126,11 @@ end
 function Enchantrix_BarkerOnClick()
 	--Enchantrix.Util.ChatPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
+	local id = GetChannelName("Trade") --TODO: Localize
+	EnhTooltip.DebugPrint("EnxBarker: Attempting to send barker", barker, "Trade Channel ID", id)
 
-	if barker ~= nil then
-		SendChatMessage(barker,"CHANNEL", this.language,"2");
+	if (barker and id and (not id == 0)) then
+		SendChatMessage(barker,"CHANNEL", GetDefaultLanguage("player"), id);
 	else
 		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available."); --TODO: Localize
 	end
