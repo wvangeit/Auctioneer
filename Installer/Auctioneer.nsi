@@ -4,7 +4,7 @@
 
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -72,11 +72,13 @@
 
 ;--------------------------------
 ;Languages
- 
+
 	!insertmacro MUI_LANGUAGE "English"
 	!insertmacro MUI_LANGUAGE "German"
 	!insertmacro MUI_LANGUAGE "French"
 	!insertmacro MUI_LANGUAGE "Korean"
+	!insertmacro MUI_LANGUAGE "Dutch"
+	!insertmacro MUI_LANGUAGE "Greek"
 	!insertmacro MUI_LANGUAGE "SimpChinese"
 	!insertmacro MUI_LANGUAGE "TradChinese"
 	!insertmacro MUI_LANGUAGE "Spanish"
@@ -94,6 +96,8 @@
 	LicenseLangString MUILicense ${LANG_GERMAN} "Licenses\German GPL.txt"
 	LicenseLangString MUILicense ${LANG_FRENCH} "Licenses\French GPL.txt"
 	LicenseLangString MUILicense ${LANG_KOREAN} "Licenses\Korean GPL.txt"
+	LicenseLangString MUILicense ${LANG_DUTCH} "Licenses\Dutch GPL.txt"
+	LicenseLangString MUILicense ${LANG_GREEK} "Licenses\Greek GPL.txt"
 	LicenseLangString MUILicense ${LANG_SIMPCHINESE} "Licenses\Chinese Simplified GPL.txt"
 	LicenseLangString MUILicense ${LANG_TRADCHINESE} "Licenses\Chinese Traditional GPL.txt"
 	LicenseLangString MUILicense ${LANG_SPANISH} "Licenses\Spanish GPL.txt"
@@ -180,6 +184,17 @@ Section "Auctioneer" Auctioneer
 
 SectionEnd
 
+Section "BeanCounter" BeanCounter
+	SectionIn 1
+
+	SetOutPath "$INSTDIR\Interface\AddOns\BeanCounter"
+	File "..\BeanCounter\BeanCounter.toc"
+	File "..\BeanCounter\*.xml"
+	File "..\BeanCounter\*.lua"
+	File "GPL.txt"
+
+SectionEnd
+
 Section "Enchantrix" Enchantrix
 
 	SectionIn 1
@@ -249,6 +264,8 @@ FunctionEnd
 		!insertmacro MUI_DESCRIPTION_TEXT ${UnInstaller} $(DESC_UnInstaller)
 
 		!insertmacro MUI_DESCRIPTION_TEXT ${Auctioneer} $(DESC_Auctioneer)
+
+		!insertmacro MUI_DESCRIPTION_TEXT ${BeanCounter} $(DESC_BeanCounter)
 
 		!insertmacro MUI_DESCRIPTION_TEXT ${Enchantrix} $(DESC_Enchantrix)
 
