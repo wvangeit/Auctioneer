@@ -453,7 +453,7 @@ function addonLoaded()
 	Auctioneer.Util.SetFilterDefaults();
 
 	if (not AuctionConfig.version) then AuctionConfig.version = 30000; end
-	if (AuctionConfig.version < 30200) then
+	if (AuctionConfig.version < 30600) then
 		StaticPopupDialogs["CONVERT_AUCTIONEER"] = {
 			text = _AUCT('MesgConvert'),
 			button1 = _AUCT('MesgConvertYes'),

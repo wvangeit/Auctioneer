@@ -100,61 +100,15 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 	if (not AuctionConfig.sbuy) then AuctionConfig.sbuy = {}; end
 	if (not AuctionConfig.sbuy[auctKey]) then AuctionConfig.sbuy[auctKey] = {}; end
 
-	local endTime = time();
 	if Auctioneer.Core.Variables.TotalAuctionsScannedCount >= 50 then
-		local dropCount, buyCount, bidCount, expCount;
-		dropCount = 0;
-		buyCount = 0;
-		bidCount = 0;
-		expCount = 0;
-		local snap, lastSeen, expiredSeconds, itemKey, buyList, buyout, id, rprop, enchant, count, min, sig;
+		local snap, id, rprop, enchant, sig;
 
 		if (AuctionConfig and AuctionConfig.snap and AuctionConfig.snap[auctKey]) then
 			for cat,cData in pairs(AuctionConfig.snap[auctKey]) do
 				for iKey, iData in pairs(cData) do
 					snap = Auctioneer.Core.GetSnapshotFromData(iData);
 					if (snap.dirty == "1") then
-						id, rprop, enchant, _, count, min, buyout = Auctioneer.Core.GetItemSignature(iKey);
-
-						-- This item should have been seen, but wasn't.
-						-- We need to work out if it expired before or after its time
-						lastSeen = snap.lastSeenTime;
-						expiredSeconds = endTime - lastSeen;
-						if (snap.timeLeft == 1) and (snap.bidamount > 0) then
-							bidCount = bidCount+1;
-							-- This one expired at the final time interval, so its likely
-							-- that this is the best bid value we'll get for it.
-							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
-							if (not AuctionConfig.success) then AuctionConfig.success = {} end
-							if (not AuctionConfig.success.bid) then AuctionConfig.success.bid = {} end
-							if (not AuctionConfig.success.bid[auctKey]) then AuctionConfig.success.bid[auctKey] = {} end
-							bidList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
-							bidList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.bid[auctKey][itemKey]));
-							bidList.insert(Auctioneer.Util.PriceForOne(snap.bidamount, count));
-							AuctionConfig.success.bid[auctKey][itemKey] = Auctioneer.Core.StoreMedianList (bidList.getList());
-						elseif (expiredSeconds < Auctioneer.Core.Constants.TimeLeft.Seconds[snap.timeLeft]) then
-							-- Whoa! This item was bought out.
-							itemKey = Auctioneer.Util.GetKeyFromSig(iKey);
-							if (not AuctionConfig.success) then AuctionConfig.success = {} end
-
-							if (buyout > 0) then
-								buyCount = buyCount+1;
-								if (not AuctionConfig.success.buy) then AuctionConfig.success.buy = {} end
-								if (not AuctionConfig.success.buy[auctKey]) then AuctionConfig.success.buy[auctKey] = {} end
-								buyList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
-								buyList.setList(Auctioneer.Core.LoadMedianList(AuctionConfig.success.buy[auctKey][itemKey]));
-								buyList.insert(Auctioneer.Util.PriceForOne(buyout, count));
-								AuctionConfig.success.buy[auctKey][itemKey] = Auctioneer.Core.StoreMedianList(buyList.getList());
-							else
-								if (not AuctionConfig.success.drop) then AuctionConfig.success.drop = {} end
-								if (not AuctionConfig.success.drop[auctKey]) then AuctionConfig.success.drop[auctKey] = {} end
-								local cancelCount = tonumber(AuctionConfig.success.drop[auctKey][itemKey]) or 0
-								AuctionConfig.success.drop[auctKey][itemKey] = cancelCount + 1;
-								dropCount = dropCount + 1;
-							end
-						else
-							expCount = expCount+1;
-						end
+						id, rprop, enchant = Auctioneer.Core.GetItemSignature(iKey);
 
 						-- Clear defunct auctions
 						if (id and rprop and enchant) then
@@ -168,7 +122,6 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 				end
 			end
 		end
-		EnhTooltip.DebugPrint("Final counts", dropCount, buyCount, bidCount, expCount);
 	end
 
 	-- Copy the item prices into the Saved item prices table

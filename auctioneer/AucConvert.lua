@@ -198,6 +198,14 @@ function convert()
 				end
 			end
 		end
+		
+		AuctionConfig.version = 30200
+	end
+	
+	if AuctionConfig.version < 30600 then
+	   AuctionConfig.success = nil
+
+	   AuctionConfig.version = 30600
 	end
 
 	-- Now the conversion is complete, wipe out the old data
@@ -205,7 +213,6 @@ function convert()
 	AHSnapshotItemPrices = nil;
 	AuctionPrices = nil;
 	AuctionBids = nil;
-	AuctionConfig.version = 30201;
 end
 
 Auctioneer.Convert = {
