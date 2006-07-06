@@ -28,6 +28,7 @@ function AuctionFramePost_OnLoad()
 	this.CalculateAuctionDeposit = AuctionFramePost_CalculateAuctionDeposit;
 	this.UpdateDeposit = AuctionFramePost_UpdateDeposit;
 	this.GetItemID = AuctionFramePost_GetItemID;
+	this.GetItemSignature = AuctionFramePost_GetItemSignature;
 	this.GetItemName = AuctionFramePost_GetItemName;
 	this.SetNoteText = AuctionFramePost_SetNoteText;
 	this.GetSavePrice = AuctionFramePost_GetSavePrice;
@@ -49,6 +50,7 @@ function AuctionFramePost_OnLoad()
 
 	-- Data Members
 	this.itemID = nil;
+	this.itemSignature = nil;
 	this.itemName = nil;
 	this.updating = false;
 	this.prices = {};
@@ -253,16 +255,16 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_UpdateAuctionList(frame)
 	frame.auctions = {};
-	local itemName = frame:GetItemName();
-	if (itemName) then
-		local auctions = Auctioneer.Filter.QuerySnapshot(AuctionFramePost_ItemNameFilter, itemName);
+	local itemSignature = frame:GetItemSignature();
+	if (itemSignature) then
+		local auctions = Auctioneer.Filter.QuerySnapshot(AuctionFramePost_ItemSignatureFilter, itemSignature);
 		if (auctions) then
 			for _,a in pairs(auctions) do
 				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
 				local auction = {};
 				auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
 				auction.quantity = count;
-				auction.name = itemName;
+				auction.name = name;
 				auction.owner = a.owner;
 				auction.timeLeft = a.timeLeft;
 				auction.bid = Auctioneer.Statistic.GetCurrentBid(a.signature);
@@ -310,6 +312,13 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetItemID(frame)
 	return frame.itemID;
+end
+
+-------------------------------------------------------------------------------
+-- Gets the item signature.
+-------------------------------------------------------------------------------
+function AuctionFramePost_GetItemSignature(frame)
+	return frame.itemSignature;
 end
 
 -------------------------------------------------------------------------------
@@ -476,8 +485,9 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		end
 
 		-- Save the item's information.
-		frame.itemName = name;
 		frame.itemID = itemID;
+		frame.itemSignature = AucPostManager.CreateItemSignature(itemID, randomProp, enchant);
+		frame.itemName = name;
 
 		-- Show the item
 		getglobal(button:GetName().."Name"):SetText(name);
@@ -513,8 +523,9 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		end
 	else
 		-- Clear the item's information.
-		frame.itemName = nil;
 		frame.itemID = nil;
+		frame.itemSignature = nil;
+		frame.itemName = nil;
 
 		-- Hide the item
 		getglobal(button:GetName().."Name"):Hide();
@@ -570,8 +581,8 @@ function AuctionFramePost_ValidateAuction(frame)
 		local stackSize = frame:GetStackSize();
 		local stackCount = frame:GetStackCount();
 		local quantityErrorText = getglobal(frame:GetName().."QuantityInvalidText");
-		if (frame.itemID and frame.itemName) then
-			local quantity = AucPostManager.GetItemQuantity(frame.itemID);
+		if (frame.itemID and frame.itemSignature) then
+			local quantity = AucPostManager.GetItemQuantityBySignature(frame.itemSignature);
 			local maxStackSize = AuctionFramePost_GetMaxStackSize(frame.itemID);
 			if (stackSize == 0) then
 				valid = false;
@@ -730,7 +741,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	local frame = button:GetParent();
-	local id = frame:GetItemID();
+	local itemSignature = frame:GetItemSignature();
 	local name = frame:GetItemName();
 	local startPrice = frame:GetStartPrice();
 	local buyoutPrice = frame:GetBuyoutPrice();
@@ -747,7 +758,7 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	end
 
 	-- Post the auction.
-	AucPostManager.PostAuction(id, stackSize, stackCount, startPrice, buyoutPrice, duration);
+	AucPostManager.PostAuction(itemSignature, stackSize, stackCount, startPrice, buyoutPrice, duration);
 
 	-- Clear the current auction item.
 	frame:SetAuctionItem(nil, nil, nil);
@@ -849,9 +860,9 @@ end
 -------------------------------------------------------------------------------
 -- Filter for Auctioneer.Filter.QuerySnapshot that filters on item name.
 -------------------------------------------------------------------------------
-function AuctionFramePost_ItemNameFilter(item, signature)
+function AuctionFramePost_ItemSignatureFilter(item, signature)
 	local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
-	if (item == name) then
+	if (item == AucPostManager.CreateItemSignature(id, rprop, enchant)) then
 		return false;
 	end
 	return true;
