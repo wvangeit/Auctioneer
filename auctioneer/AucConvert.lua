@@ -202,6 +202,20 @@ function convert()
 		AuctionConfig.version = 30200
 	end
 	
+	if AuctionConfig.version < 30201 then
+		-- Auto-convert to per-auctKey fixed prices
+		if (AuctionConfig.fixedprice) then
+			local fixedPrices = AuctionConfig.fixedprice;
+			for k, v in fixedPrices do
+				local i,j, start,buy,dur = string.find(v, "(%d+):(%d+):(%d+)");
+				fixedPrices[k] = string.format("%s:%s:%d:%s", start, buy, 1, dur)
+			end
+			AuctionConfig.fixedprice = { ["global"] = fixedPrices };
+		end
+
+		AuctionConfig.version = 30201
+   end
+	
 	if AuctionConfig.version < 30600 then
 	   AuctionConfig.success = nil
 
