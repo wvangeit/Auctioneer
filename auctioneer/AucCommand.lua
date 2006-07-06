@@ -1547,38 +1547,19 @@ function clear(param, chatprint)
 				if (AuctionConfig.data[aKey][itemKey]) then
 					AuctionConfig.data[aKey][itemKey] = nil;
 
-					if (AuctionConfig.stats.snapmed[aKey][itemKey]) then
-						AuctionConfig.stats.snapmed[aKey][itemKey] = nil;
-					end
-
-					if (AuctionConfig.stats.histmed[aKey][itemKey]) then
-						AuctionConfig.stats.histmed[aKey][itemKey] = nil;
-					end
-
-					if (AuctionConfig.stats.histcount[aKey][itemKey]) then
-						AuctionConfig.stats.histcount[aKey][itemKey] = nil;
-					end
-
-					if (AuctionConfig.stats.snapcount[aKey][itemKey]) then
-						AuctionConfig.stats.snapcount[aKey][itemKey] = nil;
-					end
-
-					if (AuctionConfig.sbuy[aKey][itemKey]) then
-						AuctionConfig.sbuy[aKey][itemKey] = nil;
-					end
+					AuctionConfig.stats.snapmed[aKey][itemKey] = nil;
+					AuctionConfig.stats.histmed[aKey][itemKey] = nil;
+					AuctionConfig.stats.histcount[aKey][itemKey] = nil;
+					AuctionConfig.stats.snapcount[aKey][itemKey] = nil;
+					AuctionConfig.sbuy[aKey][itemKey] = nil;
 
 					local count = 0;
 					while (AuctionConfig.snap[aKey][count]) do
-
-						if (AuctionConfig.snap[aKey][count][itemKey]) then
-							AuctionConfig.snap[aKey][count][itemKey] =nil;
-						end
+						AuctionConfig.snap[aKey][count][itemKey] = nil;
 						count = count+1;
 					end
 
-					if (Auctioneer_HSPCache[aKey][itemKey]) then
-						Auctioneer_HSPCache[aKey][itemKey] = nil;
-					end
+					Auctioneer_HSPCache[aKey][itemKey] = nil;
 
 					--These are not included in the print statement below because there could be the possiblity that an item's data was cleared but another's was not
 					if (chatprint) then
