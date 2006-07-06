@@ -407,7 +407,7 @@ function getSnapshotInfoFromData(buy)
 	};
 end
 
-function saveSnapshot(server, cat, sig, iData)
+function saveSnapshot(auctKey, cat, sig, iData)
 	local bid = iData.bidamount;
 	local owner = iData.owner;
 	local dirty = iData.dirty;
@@ -420,29 +420,29 @@ function saveSnapshot(server, cat, sig, iData)
 
 	if (not cat) then cat = 0 end
 
-	if (not AuctionConfig.snap[server]) then
-		AuctionConfig.snap[server] = {};
+	if (not AuctionConfig.snap[auctKey]) then
+		AuctionConfig.snap[auctKey] = {};
 	end
-	if (not AuctionConfig.snap[server][cat]) then
-		AuctionConfig.snap[server][cat] = {};
+	if (not AuctionConfig.snap[auctKey][cat]) then
+		AuctionConfig.snap[auctKey][cat] = {};
 	end
 	if (dirty~=nil and bid~=nil and level~=nil and qual~=nil and left~=nil and fseen~=nil and last~=nil and link~=nil and owner~=nil) then
 		local saveData = string.format("%d;%d;%d;%d;%d;%d;%d;%s;%s", dirty, bid, level, qual, left, fseen, last, link, owner);
-		EnhTooltip.DebugPrint("Saving", server, cat, sig, "as", saveData);
-		AuctionConfig.snap[server][cat][sig] = saveData;
+		EnhTooltip.DebugPrint("Saving", auctKey, cat, sig, "as", saveData);
+		AuctionConfig.snap[auctKey][cat][sig] = saveData;
 		local itemKey = Auctioneer.Util.GetKeyFromSig(sig);
 		Auctioneer_Lowests = nil;
-		Auctioneer.Storage.SetSnapMed(server, itemKey, nil)
+		Auctioneer.Storage.SetSnapMed(auctKey, itemKey, nil)
 	else
-		EnhTooltip.DebugPrint("Not saving", server, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner);
+		EnhTooltip.DebugPrint("Not saving", auctKey, cat, sig, "because", dirty, bid, level, qual, left, fseen, last, link, owner);
 	end
 end
 
-function saveSnapshotInfo(server, itemKey, iData)
-	AuctionConfig.sbuy[server][itemKey] = storeMedianList(iData.buyoutPrices);
+function saveSnapshotInfo(auctKey, itemKey, iData)
+	AuctionConfig.sbuy[auctKey][itemKey] = storeMedianList(iData.buyoutPrices);
 	Auctioneer_Lowests = nil;
 
-	Auctioneer.Storage.SetSnapMed(server, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPrices))
+	Auctioneer.Storage.SetSnapMed(auctKey, itemKey, Auctioneer.Statistic.GetMedian(iData.buyoutPrices))
 end
 
 

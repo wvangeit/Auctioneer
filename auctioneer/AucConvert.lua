@@ -26,12 +26,12 @@
 local backup, convert
 
 -- helperfunction to backup data, which can't be converted atm
-function backup(server, sig, data) --Local
-	if AuctionBackup[server] == nil then
-		AuctionBackup[server] = {}
+function backup(auctKey, sig, data) --Local
+	if AuctionBackup[auctKey] == nil then
+		AuctionBackup[auctKey] = {}
 	end
 
-	AuctionBackup[server][sig] = data
+	AuctionBackup[auctKey][sig] = data
 end
 
 function convert()
@@ -42,44 +42,44 @@ function convert()
 		AuctionConfig.snap = {};
 		AuctionConfig.sbuy = {};
 		if (AHSnapshot) then
-			for server, sData in pairs(AHSnapshot) do
-				local colon = string.find(server, ":");
-				local hyphen = string.find(server, "-");
+			for auctKey, sData in pairs(AHSnapshot) do
+				local colon = string.find(auctKey, ":");
+				local hyphen = string.find(auctKey, "-");
 				if (hyphen and not colon) then
-					if (not AuctionConfig.snap[server]) then
-						AuctionConfig.snap[server] = {};
+					if (not AuctionConfig.snap[auctKey]) then
+						AuctionConfig.snap[auctKey] = {};
 					end
 					for sig, iData in pairs(sData) do
 						local catName = Auctioneer.Util.GetCatName(tonumber(iData.category));
 						if (not catName) then iData.category = Auctioneer.Util.GetCatNumberByName(iData.category) end
 						local cat = iData.category;
-						Auctioneer.Core.SaveSnapshot(server, cat, sig, iData);
+						Auctioneer.Core.SaveSnapshot(auctKey, cat, sig, iData);
 					end
 				end
 			end
 		end
 
 		if (AHSnapshotItemPrices) then
-			for server, sData in pairs(AHSnapshotItemPrices) do
-				local colon = string.find(server, ":");
-				local hyphen = string.find(server, "-");
+			for auctKey, sData in pairs(AHSnapshotItemPrices) do
+				local colon = string.find(auctKey, ":");
+				local hyphen = string.find(auctKey, "-");
 				if (hyphen and not colon) and (sData.buyoutPrices == nil) then
-					if (not AuctionConfig.sbuy[server]) then
-						AuctionConfig.sbuy[server] = {};
+					if (not AuctionConfig.sbuy[auctKey]) then
+						AuctionConfig.sbuy[auctKey] = {};
 					end
 					for itemKey, iData in pairs(sData) do
-						Auctioneer.Core.SaveSnapshotInfo(server, itemKey, iData);
+						Auctioneer.Core.SaveSnapshotInfo(auctKey, itemKey, iData);
 					end
 				end
 			end
 		end
 
 		if (AuctionPrices) then
-			for server, sData in pairs(AuctionPrices) do
-				local colon = string.find(server, ":");
-				local hyphen = string.find(server, "-");
+			for auctKey, sData in pairs(AuctionPrices) do
+				local colon = string.find(auctKey, ":");
+				local hyphen = string.find(auctKey, "-");
 				if (hyphen and not colon) then
-					AuctionConfig.data[server] = {};
+					AuctionConfig.data[auctKey] = {};
 					for sig, iData in pairs(sData) do
 						local catName
 						local cat
@@ -116,7 +116,7 @@ function convert()
 								name = nil
 
 								-- backing it up so we might convert it later
-								backup(server, sig, iData)
+								backup(auctKey, sig, iData)
 							else
 								if (name == nil) or (name == '') then
 									name = sname
@@ -128,7 +128,7 @@ function convert()
 									name = nil
 
 									-- backing it up so we might convert it later
-									backup(server, sig, iData)
+									backup(auctKey, sig, iData)
 								else
 									-- only set the data, if the name has successfully been identified
 									data = s1..":"..s2..":"..s3..":"..s4..":"..s5..":"..s6..":"..s7
@@ -138,7 +138,7 @@ function convert()
 							-- unknown dataformat
 							-- ouch ! strange dataformat, can't convert atm since there is no way to get the itemid right now
 							-- backing it up so we might convert it later
-							backup(server, sig, iData)
+							backup(auctKey, sig, iData)
 						else
 							-- 3.0 -> 3.1
 							catName = Auctioneer.Util.GetCatName(tonumber(iData.category));
@@ -172,7 +172,7 @@ function convert()
 						if (name) then
 							local newData = string.format("%s|%s", data, hist);
 							local newInfo = string.format("%s|%s", cat, name);
-							AuctionConfig.data[server][newsig] = newData;
+							AuctionConfig.data[auctKey][newsig] = newData;
 							AuctionConfig.info[newsig] = newInfo;
 						end
 					end
