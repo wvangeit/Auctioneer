@@ -432,7 +432,7 @@ function checkQueryComplete()
 			CurrentSearchParams.queryResponse = true;
 			CurrentSearchParams.queryComplete = true;
 			for indexOnPage = 1, lastIndexOnPage do
-				local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo("list", indexOnPage);
+				local _,_,_,_,_,_,_,_,_,_,_, owner = GetAuctionItemInfo("list", indexOnPage);
 				if (owner == nil) then
 					-- No dice... there are more updates coming...
 					CurrentSearchParams.queryComplete = false;
