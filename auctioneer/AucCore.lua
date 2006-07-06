@@ -476,20 +476,21 @@ end
 
 -- This is the old (local) hookAuctionHouse() function
 function hookAuctionHouse()
-	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer.Scanner.NewAuction);
 	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, Auctioneer.Scanner.AuctHouseShow);
+	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer", Auctioneer.Scanner.NewAuction);
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer", Auctioneer.Scanner.AuctHouseClose);
 	Stubby.RegisterEventHook("AUCTION_ITEM_LIST_UPDATE", "Auctioneer", Auctioneer.Scanner.AuctHouseUpdate);
 
-	Stubby.RegisterFunctionHook("Auctioneer.Event.StartAuctionScan", 200, Auctioneer.Scanner.AuctionStartHook);
 	Stubby.RegisterFunctionHook("Auctioneer.Event.ScanAuction", 200, Auctioneer.Scanner.AuctionEntryHook);
+	Stubby.RegisterFunctionHook("Auctioneer.Event.StartAuctionScan", 200, Auctioneer.Scanner.AuctionStartHook);
 	Stubby.RegisterFunctionHook("Auctioneer.Event.FinishedAuctionScan", 200, Auctioneer.Scanner.FinishedAuctionScanHook);
 
 	Stubby.RegisterFunctionHook("StartAuction", 200, Auctioneer.Scanner.StartAuction)
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 200, Auctioneer.Scanner.PlaceAuctionBid)
-	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer.Scanner.FilterButtonSetType);
-	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer.Scanner.AuctionFrameFiltersUpdateClasses);
+	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, Auctioneer.Scanner.FilterButtonSetType)
+	Stubby.RegisterFunctionHook("QueryAuctionItems", 200, Auctioneer.Scanning.QueryAuctionItemsHook)
 	Stubby.RegisterFunctionHook("AuctionsRadioButton_OnClick", 200, Auctioneer.Scanner.OnChangeAuctionDuration);
+	Stubby.RegisterFunctionHook("AuctionFrameFilters_UpdateClasses", 200, Auctioneer.Scanner.AuctionFrameFiltersUpdateClasses);
 
 end
 

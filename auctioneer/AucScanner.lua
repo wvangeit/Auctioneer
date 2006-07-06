@@ -162,13 +162,6 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 
 	elseif (finish == 2) then
 		Quit();
-
-	elseif (finish == 3) then
-		if(ReloadUIHandler) then
-			ReloadUIHandler("10");
-		else
-			ReloadUI();
-		end
 	end
 
 	--Cleaning up after oneself is always a good idea.
@@ -177,18 +170,20 @@ end
 
 -- Called by scanning hook when an auction item is scanned from the Auction house
 -- we save the aution item to our tables, increment our counts etc
-function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_AuctionEntry_Hook
+function auctionEntryHook(funcVars, retVal, page, index, category, nonScan) --Auctioneer_AuctionEntry_Hook
 	EnhTooltip.DebugPrint("Processing page", page, "item", index);
-	local auctionDoneKey;
-	if (not page or not index or not category) then
-		return;
-	else
-		auctionDoneKey = category.."-"..page.."-"..index;
-	end
-	if (not Auction_DoneItems[auctionDoneKey]) then
-		Auction_DoneItems[auctionDoneKey] = true;
-	else
-		return;
+	if (not nonScan) then
+		local auctionDoneKey;
+		if (not page or not index or not category) then
+			return;
+		else
+			auctionDoneKey = category.."-"..page.."-"..index;
+		end
+		if (not Auction_DoneItems[auctionDoneKey]) then
+			Auction_DoneItems[auctionDoneKey] = true;
+		else
+			return;
+		end
 	end
 
 	Auctioneer.Core.Variables.TotalAuctionsScannedCount = Auctioneer.Core.Variables.TotalAuctionsScannedCount + 1;
@@ -205,7 +200,7 @@ function auctionEntryHook(funcVars, retVal, page, index, category) --Auctioneer_
 	local aiLink = GetAuctionItemLink("list", index);
 
 	-- Call some interested iteminfo addons
-	processLink(aiLink);
+	Auctioneer.Scanner.ProcessLink(aiLink);
 
 	local aiItemID, aiRandomProp, aiEnchant, aiUniqID = EnhTooltip.BreakLink(aiLink);
 	local aiKey = aiItemID..":"..aiRandomProp..":"..aiEnchant;
@@ -689,8 +684,15 @@ function auctHouseClose()
 end
 
 function auctHouseUpdate()
-	if (Auctioneer.Scanning.IsScanningRequested and Auctioneer.Scanning.CheckCompleteScan()) then
+	local completeScan = Auctioneer.Scanning.CheckCompleteScan()
+	local isScanningRequested = Auctioneer.Scanning.IsScanningRequested
+	EnhTooltip.DebugPrint("AuctionHouseUpdate()", "Is Scanning Requested", isScanningRequested, "Complete Scan", completeScan)
+
+	if (isScanningRequested and completeScan) then
 		Auctioneer.Scanning.ScanAuction();
+
+	elseif (completeScan) then
+		Auctioneer.Scanning.ScanAuction(true);
 	end
 end
 

@@ -24,7 +24,7 @@
 ]]
 
 --Local function Prototypes
-local nextIndex, stopAuctionScan, auctionSubmitQuery, auctionNextQuery, checkCompleteScan, scanAuction, canSendAuctionQuery, startAuctionScan, canScan, requestAuctionScan;
+local nextIndex, stopAuctionScan, auctionSubmitQuery, auctionNextQuery, checkCompleteScan, queryAuctionItemsHook, scanAuction, canSendAuctionQuery, startAuctionScan, canScan, requestAuctionScan;
 
 -- local variables
 local isScanningRequested = false;
@@ -79,6 +79,7 @@ function stopAuctionScan()
 	lScanInProgress = false;
 	lCurrentCategoryIndex = 0;
 	lPageStartedAt = nil;
+	lCurrentAuctionPage = nil;
 
 	-- Unprotect AuctionFrame if we should
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
@@ -106,6 +107,7 @@ function auctionSubmitQuery() --Local
 	Auctioneer.Event.AuctionQuery(lCurrentAuctionPage);
 end
 
+local lCheckPage = nil;
 function auctionNextQuery() --Local
 	lCheckPage = nil;
 	if lCurrentAuctionPage then
@@ -147,48 +149,52 @@ function auctionNextQuery() --Local
 end
 
 local lCheckStartTime = nil;
-local lCheckPage = nil;
-local lCheckSize = nil;
-local lCheckPos = nil;
 function checkCompleteScan()
-	if (lCheckPage ~= lCurrentAuctionPage) or (not lCheckSize) or (not lCheckPos) then
-		lCheckSize = GetNumAuctionItems("list");
-		lCheckPage = lCurrentAuctionPage;
-		lCheckPos = 1;
-		lCheckStartTime = time()
+	lCheckStartTime = lCheckStartTime or time()
+	if (time() - lCheckStartTime > 10) then
+		-- Sometimes they never return an owner.
+		return true
 	end
 
-	if lCheckPage and lCheckSize > 0 then
-		if (time() - lCheckStartTime > 10) then
-			-- Sometimes they never return an owner.
-			return true
-		end
-		for auctionid = lCheckPos, lCheckSize do
-			lCheckPos = auctionid;
-			local _,_,_,_,_,_,_,_,_,_,_, owner = GetAuctionItemInfo("list", auctionid);
-			if (owner == nil) then return false end
+	for index = 1, GetNumAuctionItems("list") do
+		local _,_,_,_,_,_,_,_,_,_,_, owner = GetAuctionItemInfo("list", index);
+		if (not owner) then
+			return false
 		end
 	end
-	return true;
+
+	return true
 end
 
-function scanAuction()
+function queryAuctionItemsHook()
+	lCheckStartTime = nil;
+end
+
+function scanAuction(nonScanUpdate)
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local auctionid;
 
 	if( numBatchAuctions > 0 ) then
-		for auctionid = 1, numBatchAuctions do
-			Auctioneer.Event.ScanAuction(lCurrentAuctionPage, auctionid, lCurrentCategoryIndex);
+		if (nonScanUpdate) then
+			for auctionid = 1, numBatchAuctions do
+				Auctioneer.Event.ScanAuction(nil, auctionid, nil, true);
+			end
+		else
+			for auctionid = 1, numBatchAuctions do
+				Auctioneer.Event.ScanAuction(lCurrentAuctionPage, auctionid, lCurrentCategoryIndex);
+			end
 		end
 	end
 
 	lIsPageScanned = true;
 end
 
+local retryCount = 0
 function canSendAuctionQuery() --Local
 	local value = lOriginal_CanSendAuctionQuery();
-	if (value and lIsPageScanned) then
+	if (value and lIsPageScanned) or (retryCount >= 3) then
 		auctionNextQuery();
+		retryCount = 0
 		return nil;
 	end
 	if (lPageStartedAt) then
@@ -198,11 +204,13 @@ function canSendAuctionQuery() --Local
 				Auctioneer.Util.ChatPrint(string.format(_AUCT('AuctionScanRedo'), 20));
 			end
 			auctionSubmitQuery();
+			retryCount = retryCount  + 1;
 			return nil;
 		end
 		return false;
 	end
 end
+
 Auctioneer.AuctionFrameBrowse = {
 	OnEvent = function()
 		-- Intentionally empty; don't allow the auction UI to update while we're scanning
@@ -211,9 +219,6 @@ Auctioneer.AuctionFrameBrowse = {
 		-- Intentionally empty; don't allow the auction UI to update while we're scanning
 	end
 };
-
-
-
 
 function startAuctionScan()
 	lMajorAuctionCategories = {GetAuctionItemClasses()};
@@ -302,6 +307,7 @@ Auctioneer.Scanning = {
 	IsScanningRequested = isScanningRequested,
 	StopAuctionScan = stopAuctionScan,
 	CheckCompleteScan = checkCompleteScan,
+	QueryAuctionItemsHook = queryAuctionItemsHook,
 	ScanAuction = scanAuction,
 	StartAuctionScan = startAuctionScan,
 	CanScan = canScan,

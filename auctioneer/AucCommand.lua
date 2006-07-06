@@ -1853,9 +1853,6 @@ function finish(param, chatprint)
 	elseif (param == 'exit' or param == _AUCT('CmdFinish2') or tonumber(param) == 2) then
 		mode = 2;
 
-	elseif (param == 'reloadui' or param == _AUCT('CmdFinish3') or tonumber(param) == 3) then
-		mode = 3;
-
 	else
 		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer.Util.LocalizeCommand("finish")));
 		return
