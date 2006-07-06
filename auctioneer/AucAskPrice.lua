@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: AucAskPrice.lua 689 2006-01-14 00:38:53Z mentalpower $
+	Revision: $Id$
 
 	Auctioneer AskPrice created by Mikezter and merged into Auctioneer by MentalPower.
 	Functions responsible for AskPrice's operation..
@@ -23,12 +23,18 @@
 ]]
 
 --Local function prototypes
-local init, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setKhaosSetKeyValue, eventHandler
+local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setKhaosSetKeyValue, eventHandler
 
 function init()
-	Stubby.RegisterEventHook("CHAT_MSG_WHISPER", "Auctioneer", Auctioneer.AskPrice.EventHandler);
-	Stubby.RegisterEventHook("CHAT_MSG_PARTY", "Auctioneer", Auctioneer.AskPrice.EventHandler);
-	Stubby.RegisterEventHook("CHAT_MSG_GUILD", "Auctioneer", Auctioneer.AskPrice.EventHandler);
+	askPriceFrame = CreateFrame("Frame")
+
+	askPriceFrame:RegisterEvent("CHAT_MSG_WHISPER")
+	askPriceFrame:RegisterEvent("CHAT_MSG_OFFICER")
+	askPriceFrame:RegisterEvent("CHAT_MSG_PARTY")
+	askPriceFrame:RegisterEvent("CHAT_MSG_GUILD")
+	askPriceFrame:RegisterEvent("CHAT_MSG_RAID")
+
+	askPriceFrame:SetScript("OnEvent", function () Auctioneer.AskPrice.EventHandler(event, arg1, arg2) end)
 
 	Auctioneer.AskPrice.Language = GetDefaultLanguage("player");
 end
@@ -172,14 +178,16 @@ function setKhaosSetKeyValue(key, value)
 	end
 end
 
-function eventHandler(hookParams, event, text, player)
+function eventHandler(event, text, player)
 
 	--Nothing to do if askprice is disabled
 	if (not Auctioneer.Command.GetFilter('askprice')) then
 		return
 	end
 
-	if (not ((event == "CHAT_MSG_WHISPER") or ((event == "CHAT_MSG_GUILD") and Auctioneer.Command.GetFilter('askprice-guild')) or ((event == "CHAT_MSG_PARTY") and Auctioneer.Command.GetFilter('askprice-party')))) then
+	if (not ((event == "CHAT_MSG_WHISPER")
+		or (((event == "CHAT_MSG_GUILD") or (event == "CHAT_MSG_OFFICER")) and Auctioneer.Command.GetFilter('askprice-guild'))
+		or (((event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID")) and Auctioneer.Command.GetFilter('askprice-party')))) then
 		return
 	end
 
