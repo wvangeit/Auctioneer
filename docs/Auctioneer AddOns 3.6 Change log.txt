@@ -41,12 +41,13 @@
 [list]
 	[*]Changes in the interface:
 	[list]
-		[*]Enchantrix now uses an Object Oriented approach to function calls. All functions have been moved into the Enchantrix table. Any AddOns that require Enchantrix will need to be re-written to accommodate this change. (Aradan)	[/list]
+		[*]Enchantrix now uses an Object Oriented approach to function calls. All functions have been moved into the Enchantrix table. Any AddOns that require Enchantrix will need to be re-written to accommodate this change. (Aradan)
 		[*]The enchanting tooltip will now provide the price after markup. This markup can be changed in the Enchantrix Barker window. (Aradan)
 		[*]The code that handled the conversion of localized configuration settings has been removed. Users upgrading from older versions of Enchantrix may find their settings reset to default values. (Aradan)
 		[*]Added per character settings. Currently this affects the “/enchantrix embed”, “/enchantrix print-in” and “/enchantrix counts” commands. All other options are still saved per account. (Aradan)
 		[*]The built-in prices of disenchant results has been updated. (Aradan)
 		[*]The disenchant database now uses ItemID’s instead of signatures. This reduces size and increases processing speed. (Aradan)
+	[/list]
 	[*]New Features:
 	[list]
 		[*]Enchantrix Barker. This feature found inside the Enchanting window, allows you to easily create messages to be sent over the trade channels to advertize your available enchants. Currently you need to have the mats for the reagents you want to sell in your inventory. You also need to be in a zone that has a trade channel. NOTE: Due to time constraints this feature has not been localized and is ONLY available in the en-US and en-GB locales (mwtb and Aradan)
