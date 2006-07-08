@@ -213,6 +213,21 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				table.insert(frame.prices, fixedPrice);
 			end
 
+			-- Get the last sale price if BeanCounter is loaded.
+			if (IsAddOnLoaded("BeanCounter")) then
+				-- TODO: Support should be added to BeanCounter for looking
+				-- up itemKey (itemId:suffixId:enchantID) instead of by name.
+				local lastSale = BeanCounter.Sales.GetLastSaleForItem(name);
+				if (lastSale and lastSale.bid and lastSale.buyout) then
+					local lastPrice = {};
+					lastPrice.text = _AUCT('UiPriceModelLastSold');
+					lastPrice.note = string.format(_AUCT('FrmtLastSoldOn'), date("%x", lastSale.time));
+					lastPrice.bid = (lastSale.bid / lastSale.quantity) * count;
+					lastPrice.buyout = (lastSale.buyout / lastSale.quantity) * count;
+					table.insert(frame.prices, lastPrice);
+				end
+			end
+
 			-- Calculate auctioneer's suggested resale price.
 			if (hsp == 0) then
 				local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, Auctioneer.Util.GetAuctionKey());
@@ -331,11 +346,14 @@ end
 -------------------------------------------------------------------------------
 -- Sets the price model note (i.e. "Undercutting 5%")
 -------------------------------------------------------------------------------
-function AuctionFramePost_SetNoteText(frame, text)
-	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(text);
-
+function AuctionFramePost_SetNoteText(frame, text, colorize)
 	getglobal(frame:GetName().."PriceModelNoteText"):SetText(text);
-	getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(cRed, cGreen, cBlue);
+	if (colorize) then
+		local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(text);
+		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(cRed, cGreen, cBlue);
+	else
+		getglobal(frame:GetName().."PriceModelNoteText"):SetTextColor(1.0, 1.0, 1.0);
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -800,7 +818,7 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 	if (index) then
 		local price = frame.prices[index]
 		if (price.note) then
-			frame:SetNoteText(price.note);
+			frame:SetNoteText(price.note, (price.text == _AUCT('UiPriceModelAuctioneer')));
 		end
 		if (price.buyout) then
 			frame:SetBuyoutPrice(price.buyout);
@@ -814,6 +832,10 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 			getglobal(frame:GetName().."SavePriceCheckBox"):Show();
 			getglobal(frame:GetName().."PriceModelNoteText"):Hide();
 		elseif (price.text == _AUCT('UiPriceModelAuctioneer')) then
+			getglobal(frame:GetName().."SavePriceText"):Hide();
+			getglobal(frame:GetName().."SavePriceCheckBox"):Hide();
+			getglobal(frame:GetName().."PriceModelNoteText"):Show();
+		elseif (price.text == _AUCT('UiPriceModelLastSold')) then
 			getglobal(frame:GetName().."SavePriceText"):Hide();
 			getglobal(frame:GetName().."SavePriceCheckBox"):Hide();
 			getglobal(frame:GetName().."PriceModelNoteText"):Show();

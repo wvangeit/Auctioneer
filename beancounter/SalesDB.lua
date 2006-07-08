@@ -65,6 +65,7 @@ local unpackSale;
 local getSalesTableForItem;
 local getSoldItems;
 local getSalesForItem;
+local getLastSaleForItem;
 local printSales;
 local printSale;
 
@@ -647,6 +648,24 @@ function getSalesForItem(item)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the most recent salle (unpacked) for the specified item. Returns nil
+-- if none.
+-------------------------------------------------------------------------------
+function getLastSaleForItem(item)
+	local lastSale = nil;
+	local salesTable = getSalesTableForItem(item);
+	if (salesTable) then
+		for index in salesTable do
+			local sale = unpackSale(salesTable[index]);
+			if (sale.result == AUCTION_SOLD and (lastSale == nil or lastSale.time < sale.time)) then
+				lastSale = sale;
+			end
+		end
+	end
+	return lastSale;
+end
+
+-------------------------------------------------------------------------------
 -- Prints the sales.
 -------------------------------------------------------------------------------
 function printSales()
@@ -1209,6 +1228,7 @@ BeanCounter.Sales =
 	AddCanceledAuction = addCanceledAuction;
 	GetSoldItems = getSoldItems;
 	GetSalesForItem = getSalesForItem;
+	GetLastSaleForItem = getLastSaleForItem;
 	ReconcileAuctions = reconcileAuctions;
 	PrintPendingAuctions = printPendingAuctions;
 	PrintCompletedAuctions = printCompletedAuctions;
