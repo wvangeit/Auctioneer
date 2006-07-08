@@ -177,11 +177,17 @@ function MailMonitor_OnEventHook(_, event, arg1)
 		end
 		LastMailCount = count;
 	elseif (event == "MAIL_CLOSED") then
+		-- Reconcile if we can.
 		if (MailDownloaded and MailDownloadTime ~= nil and not MailBacklog) then
 			reconcileDatabases(MailDownloadTime);
 		end
 		MailDownloaded = false;
 		MailDownloadTime = nil;
+		-- Toss the existing task queue.
+		if (table.getn(InboxTasks) > 0) then
+			debugPrint("Clearing the task queue");
+			InboxTasks = {};
+		end
 	end
 end
 
@@ -191,13 +197,23 @@ end
 function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 	debugPrint("MailMonitor_PreTakeInboxItemHook("..nilSafe(index)..") called");
 
-	-- Allow this method call if there is no pending tasks.
-	if (table.getn(InboxTasks) == 0) then
-		if (index ~= nil and index > 0) then
+	if (index ~= nil and index > 0) then
+		-- Allow this method call if there are no pending tasks or if the current
+		-- pending task is to wait for the invoice and process the message.
+		local isWaitingForInvoice = (
+			table.getn(InboxTasks) == 2 and 
+			InboxTasks[1].index == index and
+			InboxTasks[1].name == "WaitForInvoiceTask" and
+			InboxTasks[2].index == index and
+			InboxTasks[2].name == "ProcessMessageTask");
+		if (table.getn(InboxTasks) == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxItem() call.
 			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
-			if (not wasRead and isSenderAuctionHouse(sender)) then
+			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
+				debugPrint("Calling GetInboxText() on the message");
 				GetInboxText(index);
+			else
+				debugPrint("Already called GetInboxText() on the message");
 			end
 
 			-- If there are pending tasks, we must delay the execution of
@@ -213,10 +229,10 @@ function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 				-- Wait for the item to be taken.
 				addTask(createWaitForTakeInboxItem(index));
 			end
+		else
+			debugPrint("Ignoring TakeInboxItem() call");
+			return "abort";
 		end
-	else
-		debugPrint("Ignoring TakeInboxItem() call");
-		return "abort";
 	end
 end
 
@@ -226,13 +242,23 @@ end
 function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 	debugPrint("MailMonitor_PreTakeInboxMoneyHook("..nilSafe(index)..") called");
 
-	-- Allow this method call if there is no pending action.
-	if (table.getn(InboxTasks) == 0) then
-		if (index ~= nil and index > 0) then
+	if (index ~= nil and index > 0) then
+		-- Allow this method call if there are no pending tasks or if the current
+		-- pending task is to wait for the invoice and process the message.
+		local isWaitingForInvoice = (
+			table.getn(InboxTasks) == 2 and 
+			InboxTasks[1].index == index and
+			InboxTasks[1].name == "WaitForInvoiceTask" and
+			InboxTasks[2].index == index and
+			InboxTasks[2].name == "ProcessMessageTask");
+		if (table.getn(InboxTasks) == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxMoney() call.
 			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
-			if (not wasRead and isSenderAuctionHouse(sender)) then
+			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
+				debugPrint("Calling GetInboxText() on the message");
 				GetInboxText(index);
+			else
+				debugPrint("Already called GetInboxText() on the message");
 			end
 
 			-- If there are pending tasks, we must delay the execution of
@@ -248,10 +274,10 @@ function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 				-- Wait for the money to be taken.
 				addTask(createWaitForTakeInboxMoney(index));
 			end
+		else
+			debugPrint("Ignoring TakeInboxMoney() call");
+			return "abort";
 		end
-	else
-		debugPrint("Ignoring TakeInboxMoney() call");
-		return "abort";
 	end
 end
 
