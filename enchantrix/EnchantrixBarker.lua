@@ -124,15 +124,17 @@ function Enchantrix_BarkerOptions_OnShow()
 end
 
 function Enchantrix_BarkerOnClick()
-	--Enchantrix.Util.ChatPrint(Enchantrix_CreateBarker());
+	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
-	local id = GetChannelName("Trade") --TODO: Localize
+	local id = GetChannelName("Trade - City") --TODO: Localize
 	EnhTooltip.DebugPrint("EnxBarker: Attempting to send barker", barker, "Trade Channel ID", id)
 
-	if (barker and id and (not id == 0)) then
-		SendChatMessage(barker,"CHANNEL", GetDefaultLanguage("player"), id);
+	if (id and (not(id == 0))) then
+		if (barker) then
+			SendChatMessage(barker,"CHANNEL", GetDefaultLanguage("player"), id);
+		end
 	else
-		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available."); --TODO: Localize
+		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
 	end
 end
 
@@ -241,12 +243,17 @@ function Enchantrix_BarkerSetConfig( key, value )
 end
 
 function Enchantrix_BarkerOptions_TestButton_OnClick()
+	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
+	local id = GetChannelName("Trade - City") --TODO: Localize
+	EnhTooltip.DebugPrint("EnxBarker: Attempting to send test barker", barker, "Trade Channel ID", id)
 
-	if barker ~= nil then
-		Enchantrix.Util.ChatPrint(barker);
+	if (id and (not(id == 0))) then
+		if (barker) then
+			Enchantrix.Util.ChatPrint(barker);
+		end
 	else
-		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone or you have no enchants available."); --TODO: Localize
+		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
 	end
 end
 
@@ -726,20 +733,22 @@ function Enchantrix_CreateBarker()
 	local availableEnchants = {};
 	local numAvailable = 0;
 	local temp = GetCraftSkillLine(1);
-	if Enchantrix_BarkerGetZoneText() ~= nil then
+	if Enchantrix_BarkerGetZoneText() then
 		Enchantrix_ResetBarkerString();
 		Enchantrix_ResetPriorityList();
 		if (temp) then
-			for i=1, GetNumCrafts(),1 do
-				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(i);
-				if( ( numEnchantsAvailable > 0 ) and ( string.find( craftName, "Enchant" ) ~= nil ) ) then --have reagents and it is an enchant
+			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
+			for index=1, GetNumCrafts() do
+				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
+				--EnhTooltip.DebugPrint(GetCraftInfo(index))
+				if((numEnchantsAvailable > 0) and (string.find(craftName, "Enchant"))) then --have reagents and it is an enchant
 					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
 					local cost = 0;
-					for j=1,GetCraftNumReagents(i),1 do
-						local a,b,c = GetCraftReagentInfo(i,j);
-						reagent = GetCraftReagentItemLink(i,j);
+					for j=1,GetCraftNumReagents(index),1 do
+						local a,b,c = GetCraftReagentInfo(index,j);
+						reagent = GetCraftReagentItemLink(index,j);
 
-						--Enchantrix.Util.ChatPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
+						--EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
 						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
 					end
 
@@ -750,7 +759,7 @@ function Enchantrix_CreateBarker()
 					local price = Enchantrix_RoundPrice(cost + profit);
 
 					local enchant = {
-						index = i,
+						index = index,
 						name = craftName,
 						type = craftType,
 						available = numEnchantsAvailable,
@@ -761,30 +770,31 @@ function Enchantrix_CreateBarker()
 					};
 					availableEnchants[ numAvailable] = enchant;
 
-					--Enchantrix.Util.ChatPrint(GetCraftDescription(i));
-					--local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-					--local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-					--Enchantrix.Util.ChatPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
+					EnhTooltip.DebugPrint(GetCraftDescription(index));
+					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
 
 					Enchantrix_AddEnchantToPriorityList( enchant )
-					--Enchantrix.Util.ChatPrint( "numReagents: "..GetCraftNumReagents(i) );
+					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
 					numAvailable = numAvailable + 1;
 				end
 			end
 
 			if numAvailable == 0 then
+				Enchantrix.Util.ChatPrint("Enchantrix: You either don't have any enchants or don't have the reagents to make them."); --TODO: Localize
 				return nil
 			end
 
 			for i,element in ipairs(priorityList) do
-				--Enchantrix.Util.ChatPrint(""..element.enchant.name, 0.8, 0.8, 0.2);
+				EnhTooltip.DebugPrint(element.enchant.name);
 				Enchantrix_AddEnchantToBarker( element.enchant );
 			end
 
 			return Enchantrix_GetBarkerString();
 
 		else
-			Enchantrix.Util.ChatPrint("Enchant Window not open"); --TODO: Localize
+			Enchantrix.Util.ChatPrint("Enchantrix: Enchant Window not open."); --TODO: Localize
 		end
 	end
 
