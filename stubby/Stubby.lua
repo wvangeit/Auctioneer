@@ -22,7 +22,7 @@ A quick example of this is:
 	]]);
 -------------------------------------------
 So, what did this just do? It registered some boot code
-(called "CommandHandler") with Stubby that Stubby will 
+(called "CommandHandler") with Stubby that Stubby will
 (in the case you are not demand loaded) execute on your
 behalf.
 
@@ -131,7 +131,7 @@ Other functions which may be of interest are:
 	UnregisterAddOnHook(triggerAddOn, ownerAddOn)
 	UnregisterEventHook(triggerEvent, ownerAddOn)
 	UnregisterBootCode(ownerAddOn, bootName)
-	
+
 There is also a single exposed 'constant' allowing you to do
 some basic version checking for compatibility:
 Stubby.VERSION                (introduced in revision 507)
@@ -147,7 +147,7 @@ if (Stubby.VERSION and Stubby.VERSION >= 507) then
 else
 	Stubby.Print("You need to update your version of Stubby!")
 end
--------------------------------------------  
+-------------------------------------------
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -240,7 +240,7 @@ end
 -- functions in order and the original call at just before
 -- position 0.
 function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-	local r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
+	local result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
 
@@ -254,35 +254,47 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 	end
 
 	if (callees) then
-		for _,func in pairs(callees) do
+		for _,func in ipairs(callees) do
 			if (orig and func.p >= 0) then
-				r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
-					= orig(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-				if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
-					retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
-					returns = true
+				result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
+					= pcall(orig, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+				if (result) then
+					if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
+						retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
+						returns = true
+					end
+				else
+					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
 				end
 				orig = nil
 			end
-			local res, addit = func.f(func.a, retVal, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20);
-			if (type(res) == 'string') then
-				if (res == 'abort') then return end
-				if (res == 'killorig') then orig = nil end
-				if (res == 'setreturn') then
-					retVal = addit
-					returns = true
+			local result, res, addit = pcall(func.f, func.a, retVal, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20);
+			if (result) then
+				if (type(res) == 'string') then
+					if (res == 'abort') then return end
+					if (res == 'killorig') then orig = nil end
+					if (res == 'setreturn') then
+						retVal = addit
+						returns = true
+					end
+					if (res == 'setparams') then
+						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 = unpack(addit)
+					end
 				end
-				if (res == 'setparams') then
-					a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 = unpack(addit)
-				end
+			else
+				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
 			end
 		end
 	end
 	if (orig) then
-		r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
-			= orig(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-		if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
-			returns = true
+		result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
+			= pcall(orig, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+		if (result) then
+			if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
+				returns = true
+			end
+		else
+			Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
 		end
 	end
 	if (returns) then
@@ -393,7 +405,7 @@ end
 -- event is fired (this can be used to activate an addon upon receipt
 -- of a given event etc)
 function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
-	if (not config.events[triggerEvent]) then 
+	if (not config.events[triggerEvent]) then
 		config.events[triggerEvent] = {}
 		StubbyFrame:RegisterEvent(triggerEvent)
 	end
@@ -511,7 +523,7 @@ function cleanUpAddOnData()
 		local _,title = GetAddOnInfo(b)
 		if (not title) then
 			StubbyConfig.boots[b] = nil
-			
+
 			if (StubbyConfig.configs) then
 				if (cleanList == nil) then cleanList = {}; end
 				table.insert(cleanList, b)
@@ -609,7 +621,7 @@ function onWorldStart()
 
 	-- The search for new life and new civilizations... or just addons maybe.
 	searchForNewAddOns()
-	
+
 	-- Delete data for removed addons
 	cleanUpAddOnData()
 end
@@ -631,7 +643,7 @@ function events(event, param)
 end
 
 function chatPrint(...)
-	if ( DEFAULT_CHAT_FRAME ) then 
+	if ( DEFAULT_CHAT_FRAME ) then
 		local msg = ""
 		for i=1, table.getn(arg) do
 			if i==1 then msg = arg[i]
