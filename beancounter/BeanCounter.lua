@@ -32,6 +32,7 @@ local debugPrint = EnhTooltip.DebugPrint;
 local relevel;
 local chatPrint;
 local nilSafe;
+local commandHandler;
 
 -------------------------------------------------------------------------------
 -- Version
@@ -147,8 +148,40 @@ function BeanCounter_AddOnLoaded()
 
 	-- Hello world!
 	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
+	
+	SLASH_BEANCOUNTER1 = "/beancounter"
+	SLASH_BEANCOUNTER2 = "/bean"
+	SLASH_BEANCOUNTER3 = "/bc"
+	SlashCmdList["BEANCOUNTER"] = commandHandler
 end
 
+function commandHandler(msg)
+	local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
+	if (not cmd) then cmd = string.lower(msg) end
+	if (not cmd) then cmd = "" end
+	if (not param) then param = "" end
+
+	if (cmd == "load") then
+		if (param == "auctionhouse") then
+			chatPrint("Setting BeanCounter to load when this character visits the auction house or mailbox")
+			Stubby.SetConfig("BeanCounter", "LoadType", param)
+		elseif (param == "always") then
+			chatPrint("Setting BeanCounter to always load for this character")
+			Stubby.SetConfig("BeanCounter", "LoadType", param)
+		elseif (param == "never") then
+			chatPrint("Setting BeanCounter to never load automatically for this character (you may still load manually)")
+			Stubby.SetConfig("BeanCounter", "LoadType", param)
+		else
+			chatPrint("Your command was not understood")
+		end
+	else
+		chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
+		chatPrint("  You may set your loading preferences for this character by using the following commands:")
+		chatPrint("  |cffffffff/BeanCounter load auctionhouse|r - BeanCounter will load when you visit the auction house or mailbox")
+		chatPrint("  |cffffffff/BeanCounter load always|r - BeanCounter will always load for this character")
+		chatPrint("  |cffffffff/BeanCounter load never|r - BeanCounter will never load automatically for this character (you may still load it manually)")
+	end
+end
 -------------------------------------------------------------------------------
 -- Called when the Blizzard_AuctionUI has completed loading.
 -------------------------------------------------------------------------------
