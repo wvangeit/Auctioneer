@@ -213,7 +213,7 @@ function registerKhaos()
 	local optionSet = {
 		id="Auctioneer";
 		text="Auctioneer";
-		helptext=function() 
+		helptext=function()
 			return _AUCT('GuiMainHelp')
 		end;
 		difficulty=1;
@@ -222,7 +222,7 @@ function registerKhaos()
 			{
 				id="Header";
 				text="Auctioneer";
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiMainHelp')
 				end;
 				type=K_HEADER;
@@ -231,10 +231,10 @@ function registerKhaos()
 			{
 				id="enabled";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiMainEnable')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpOnoff')
 				end;
 				callback=function(state)
@@ -259,10 +259,10 @@ function registerKhaos()
 					options = getKhaosLoadList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiLoad')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpLoad')
 				end;
 				callback=function(state) end;
@@ -280,10 +280,10 @@ function registerKhaos()
 					options = getKhaosLocaleList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiLocale')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpLocale')
 				end;
 				callback = function(state)
@@ -304,10 +304,10 @@ function registerKhaos()
 			{
 				id="AuctioneerStatsHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiStatsHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiStatsHelp')
 				end;
 				difficulty=2;
@@ -315,10 +315,10 @@ function registerKhaos()
 			{
 				id="show-stats";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiStatsEnable')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpStats')
 				end;
 				callback=function(state)
@@ -340,10 +340,10 @@ function registerKhaos()
 			{
 				id="show-average";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAverages')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAverage')
 				end;
 				callback=function(state)
@@ -365,10 +365,10 @@ function registerKhaos()
 			{
 				id="show-median";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiMedian')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpMedian')
 				end;
 				callback=function(state)
@@ -390,10 +390,10 @@ function registerKhaos()
 			{
 				id="show-suggest";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiSuggest')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpSuggest')
 				end;
 				callback=function(state)
@@ -415,10 +415,10 @@ function registerKhaos()
 			{
 				id="show-verbose";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiVerbose')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpVerbose')
 				end;
 				callback=function(state)
@@ -440,10 +440,10 @@ function registerKhaos()
 			{
 				id="AuctioneerAuctionHouseHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAuctionHouseHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiAuctionHouseHeaderHelp')
 				end;
 				difficulty=1;
@@ -451,10 +451,10 @@ function registerKhaos()
 			{
 				id="autofill";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAutofill')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAutofill')
 				end;
 				callback=function(state)
@@ -480,10 +480,10 @@ function registerKhaos()
 					options = getKhaosDurationsList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiAuctionDuration')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAuctionDuration')
 				end;
 				callback=function(state)
@@ -504,10 +504,10 @@ function registerKhaos()
 					options = getKhaosProtectionList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiProtectWindow')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpProtectWindow')
 				end;
 				callback=function(state)
@@ -528,10 +528,10 @@ function registerKhaos()
 					options = getKhaosFinishList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiFinish')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpFinish')
 				end;
 				callback=function(state)
@@ -548,10 +548,10 @@ function registerKhaos()
 			{
 				id="show-warning";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiRedo')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpRedo')
 				end;
 				callback=function(state)
@@ -573,10 +573,10 @@ function registerKhaos()
 			{
 				id="warn-color";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiWarnColor')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpWarnColor')
 				end;
 				callback=function(state)
@@ -598,10 +598,10 @@ function registerKhaos()
 			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiEmbedHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpEmbed')
 				end;
 				difficulty=1;
@@ -609,10 +609,10 @@ function registerKhaos()
 			{
 				id="embed";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiEmbed')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpEmbed')
 				end;
 				callback=function(state)
@@ -634,10 +634,10 @@ function registerKhaos()
 			{
 				id="show-embed-blankline";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiEmbedBlankline')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpEmbedBlank')
 				end;
 				callback=function(state)
@@ -659,10 +659,10 @@ function registerKhaos()
 			{
 				id="AuctioneerClearHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiClearHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiClearHelp')
 				end;
 				difficulty=3;
@@ -671,14 +671,14 @@ function registerKhaos()
 				id="AuctioneerClearAll";
 				type=K_BUTTON;
 				setup={
-					buttonText=function() 
+					buttonText=function()
 						return _AUCT('GuiClearallButton')
 					end;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiClearall')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiClearallHelp')
 				end;
 				callback=function()
@@ -694,14 +694,14 @@ function registerKhaos()
 				id="AuctioneerClearSnapshot";
 				type=K_BUTTON;
 				setup={
-					buttonText=function() 
+					buttonText=function()
 						return _AUCT('GuiClearsnapButton')
 					end;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiClearsnap')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiClearsnapHelp')
 				end;
 				callback=function()
@@ -716,10 +716,10 @@ function registerKhaos()
 			{
 				id="AuctioneerPercentsHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiPercentsHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiPercentsHelp')
 				end;
 				difficulty=4;
@@ -730,10 +730,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiBidmarkdown')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctBidmarkdown')
 				end;
 				callback = function(state)
@@ -753,10 +753,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiMarkup')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctMarkup')
 				end;
 				callback = function(state)
@@ -776,10 +776,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiMaxless')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctMaxless')
 				end;
 				callback = function(state)
@@ -799,10 +799,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiNocomp')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctNocomp')
 				end;
 				callback = function(state)
@@ -822,10 +822,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiUnderlow')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctUnderlow')
 				end;
 				callback = function(state)
@@ -845,10 +845,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiUndermkt')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPctUndermkt')
 				end;
 				callback = function(state)
@@ -865,10 +865,10 @@ function registerKhaos()
 			{
 				id="AuctioneerAskPriceHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiAskPriceHeaderHelp')
 				end;
 				difficulty=2;
@@ -876,10 +876,10 @@ function registerKhaos()
 			{
 				id="askprice";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPrice')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPrice')
 				end;
 				callback=function(state)
@@ -908,10 +908,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceTrigger')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceTrigger')
 				end;
 				callback = function(state)
@@ -928,10 +928,10 @@ function registerKhaos()
 			{
 				id="askprice-vendor";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceVendor')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceVendor')
 				end;
 				callback=function(state)
@@ -953,10 +953,10 @@ function registerKhaos()
 			{
 				id="askprice-party";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceParty')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceParty')
 				end;
 				callback=function(state)
@@ -978,10 +978,10 @@ function registerKhaos()
 			{
 				id="askprice-guild";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceGuild')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceGuild')
 				end;
 				callback=function(state)
@@ -1003,10 +1003,10 @@ function registerKhaos()
 			{
 				id="askprice-smart";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceSmart')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceSmart')
 				end;
 				callback=function(state)
@@ -1028,10 +1028,10 @@ function registerKhaos()
 			{
 				id="askprice-ad";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiAskPriceAd')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAskPriceAd')
 				end;
 				callback=function(state)
@@ -1053,10 +1053,10 @@ function registerKhaos()
 			{
 				id="AuctioneerOtherHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _AUCT('GuiOtherHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiOtherHelp')
 				end;
 				difficulty=1;
@@ -1067,10 +1067,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiAlso')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpAlso')
 				end;
 				callback = function(state)
@@ -1099,10 +1099,10 @@ function registerKhaos()
 					options = Auctioneer.Command.GetFrameNames;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiPrintin')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpPrintin')
 				end;
 				callback=function(state)
@@ -1120,10 +1120,10 @@ function registerKhaos()
 			{
 				id="show-link";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _AUCT('GuiLink')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpLink')
 				end;
 				callback=function(state)
@@ -1146,14 +1146,14 @@ function registerKhaos()
 				id="DefaultAll";
 				type=K_BUTTON;
 				setup={
-					buttonText = function() 
+					buttonText = function()
 						return _AUCT('GuiDefaultAllButton')
 					end;
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiDefaultAll')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('GuiDefaultAllHelp')
 				end;
 				callback=function()
@@ -1171,10 +1171,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _AUCT('GuiDefaultOption')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _AUCT('HelpDefault')
 				end;
 				callback = function(state)
@@ -1226,29 +1226,29 @@ function buildCommandMap()
 		[_AUCT('CmdDefault')]			=	'default',
 		[_AUCT('CmdPrintin')]			=	'print-in',
 		[_AUCT('CmdAlso')]				=	'also',
-		[_AUCT('CmdEmbed')]				=	'embed',
+		[_AUCT('CmdEmbed')]			=	'embed',
 		[_AUCT('CmdPercentless')]		=	'percentless',
 		[_AUCT('CmdPercentlessShort')]	=	'percentless',
 		[_AUCT('CmdCompete')]			=	'compete',
 		[_AUCT('CmdScan')]				=	'scan',
 		[_AUCT('CmdAutofill')]			=	'autofill',
 		[_AUCT('CmdWarnColor')]			=	'warn-color',
-		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
+		[_AUCT('CmdAuctionDuration')]		=	'auction-duration',
 		[_AUCT('CmdProtectWindow')]		=	'protect-window',
 		[_AUCT('CmdFinish')]			=	'finish',
 		[_AUCT('CmdBroker')]			=	'broker',
 		[_AUCT('CmdBidbroker')]			=	'bidbroker',
-		[_AUCT('CmdBidbrokerShort')]	=	'bidbroker',
+		[_AUCT('CmdBidbrokerShort')]		=	'bidbroker',
 		[_AUCT('CmdAuctionClick')]		=	'auction-click',
 		[_AUCT('CmdPctBidmarkdown')]	=	'pct-bidmarkdown',
 		[_AUCT('CmdPctMarkup')]			=	'pct-markup',
 		[_AUCT('CmdPctMaxless')]		=	'pct-maxless',
-		[_AUCT('CmdPctNocomp')]			=	'pct-nocomp',
+		[_AUCT('CmdPctNocomp')]		=	'pct-nocomp',
 		[_AUCT('CmdPctUnderlow')]		=	'pct-underlow',
 		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt',
 
 		--AskPrice related commands
-		[_AUCT('CmdAskPriceVendor')]	=	'vendor',
+		[_AUCT('CmdAskPriceVendor')]		=	'vendor',
 		[_AUCT('CmdAskPriceGuild')]		=	'guild',
 		[_AUCT('CmdAskPriceParty')]		=	'party',
 		[_AUCT('CmdAskPriceSmart')]		=	'smart',
@@ -1469,7 +1469,7 @@ end
 	The onOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
 	If "on" or "off" is specified in the first argument then Auctioneer's state is changed to that value,
 	If "toggle" is specified then it will toggle Auctioneer's state (if currently on then it will be turned off and vice-versa)
-	
+
 	If a boolean (or nil) value is passed as the first argument the conversion is as follows:
 	"true" is the same as "on"
 	"false" is the same as "off"
@@ -1480,7 +1480,7 @@ end
 function onOff(state, chatprint)
 	if (type(state) == "string") then
 		state = Auctioneer.Util.DelocalizeFilterVal(state);
-	
+
 	elseif (state == true) then
 		state = 'on'
 
@@ -1491,10 +1491,9 @@ function onOff(state, chatprint)
 		state = 'toggle'
 	end
 
-	
-	
 	if (state == 'on' or state == 'off') then
 		setFilter('all', state);
+
 	elseif (state == 'toggle') then
 		setFilter('all', not getFilter('all'));
 	end
@@ -1654,7 +1653,7 @@ function setLocale(param, chatprint)
 	if (Auctioneer_Khaos_Registered) then
 		Khaos.refresh(nil, nil, true)
 	end
-	
+
 	commandMap = nil;
 	commandMapRev = nil;
 end
