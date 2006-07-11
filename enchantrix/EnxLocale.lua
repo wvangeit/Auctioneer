@@ -100,9 +100,9 @@ end
 
 function delocalizeFilterVal(value)
 	if value == _ENCH('CmdOn') then
-		return true
+		return 'on'
 	elseif value == _ENCH('CmdOff') then
-		return false
+		return 'off'
 	elseif value == _ENCH('CmdDefault') then
 		return 'default'
 	elseif value == _ENCH('CmdToggle') then

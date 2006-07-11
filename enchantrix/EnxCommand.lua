@@ -87,7 +87,7 @@ function registerKhaos()
 	optionSet = {
 		id="Enchantrix";
 		text="Enchantrix";
-		helptext=function() 
+		helptext=function()
 			return _ENCH('GuiMainHelp');
 		end;
 		difficulty=1;
@@ -96,7 +96,7 @@ function registerKhaos()
 			{
 				id="Header";
 				text="Enchantrix";
-				helptext=function() 
+				helptext=function()
 					return _ENCH('GuiMainHelp')
 				end;
 				type=K_HEADER;
@@ -105,10 +105,10 @@ function registerKhaos()
 			{
 				id="all";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiMainEnable')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpOnoff')
 				end;
 				callback=function(state)
@@ -161,10 +161,10 @@ function registerKhaos()
 					options = getKhaosLocaleList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiLocale')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpLocale')
 				end;
 				callback = function(state)
@@ -189,10 +189,10 @@ function registerKhaos()
 					options = getKhaosLoadList;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiLoad')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpLoad')
 				end;
 				callback=function(state) end;
@@ -206,10 +206,10 @@ function registerKhaos()
 			{
 				id="embed";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiEmbed')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpEmbed')
 				end;
 				callback=function(state)
@@ -231,10 +231,10 @@ function registerKhaos()
 			{
 				id="terse";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiTerse')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpTerse')
 				end;
 				callback=function(state)
@@ -256,10 +256,10 @@ function registerKhaos()
 			{
 				id="counts";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiCount')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpCount')
 				end;
 				callback=function(state)
@@ -281,10 +281,10 @@ function registerKhaos()
 			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _ENCH('GuiValuateHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpValue')
 				end;
 				difficulty=2;
@@ -292,10 +292,10 @@ function registerKhaos()
 			{
 				id="valuate";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiValuateEnable')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer')
 				end;
 				callback=function(state)
@@ -317,10 +317,10 @@ function registerKhaos()
 			{
 				id="valuate-baseline";
 				type=K_TEXT;
-				text=function() 
+				text=function()
 					return _ENCH('GuiValuateBaseline')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpGuessBaseline')
 				end;
 				callback=function(state)
@@ -342,10 +342,10 @@ function registerKhaos()
 			{
 				id="EnchantrixOtherHeader";
 				type=K_HEADER;
-				text=function() 
+				text=function()
 					return _ENCH('GuiOtherHeader')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('GuiOtherHelp')
 				end;
 				difficulty=1;
@@ -354,14 +354,14 @@ function registerKhaos()
 				id="EnchantrixClearAll";
 				type=K_BUTTON;
 				setup={
-					buttonText = function() 
+					buttonText = function()
 						return _ENCH('GuiClearallButton')
 					end;
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiClearall')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('GuiClearallHelp')
 				end;
 				callback=function()
@@ -377,14 +377,14 @@ function registerKhaos()
 				id="DefaultAll";
 				type=K_BUTTON;
 				setup={
-					buttonText = function() 
+					buttonText = function()
 						return _ENCH('GuiDefaultAllButton')
 					end;
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiDefaultAll')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('GuiDefaultAllHelp')
 				end;
 				callback=function()
@@ -403,10 +403,10 @@ function registerKhaos()
 					options = Enchantrix.Config.GetFrameNames;
 					multiSelect = false;
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiPrintin')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpPrintin')
 				end;
 				callback=function(state)
@@ -431,10 +431,10 @@ function registerKhaos()
 				setup = {
 					callOn = {"tab", "escape", "enter"};
 				};
-				text=function() 
+				text=function()
 					return _ENCH('GuiDefaultOption')
 				end;
-				helptext=function() 
+				helptext=function()
 					return _ENCH('HelpDefault')
 				end;
 				callback = function(state)
@@ -467,7 +467,7 @@ function registerKhaos()
 end
 
 function registerAuctioneerOptions()
-	local insertPos 
+	local insertPos
 	for key, value in ipairs(optionSet.options) do
 		if value.id == "valuate" then
 			insertPos = key + 1
@@ -482,10 +482,10 @@ function registerAuctioneerOptions()
 		{
 			id="valuate-hsp";
 			type=K_TEXT;
-			text=function() 
+			text=function()
 				return _ENCH('GuiValuateAverages')
 			end;
-			helptext=function() 
+			helptext=function()
 				return _ENCH('HelpGuessAuctioneerHsp')
 			end;
 			callback=function(state)
@@ -507,10 +507,10 @@ function registerAuctioneerOptions()
 		{
 			id="valuate-median";
 			type=K_TEXT;
-			text=function() 
+			text=function()
 				return _ENCH('GuiValuateMedian')
 			end;
-			helptext=function() 
+			helptext=function()
 				return _ENCH('HelpGuessAuctioneerMedian')
 			end;
 			callback=function(state)
@@ -620,7 +620,6 @@ function handleCommand(command, source)
 	if (not param) then param = "" end
 	cmd = Enchantrix.Locale.DelocalizeCommand(cmd)
 
-
 	if ((cmd == "") or (cmd == "help")) then
 		-- /enchantrix help
 		chatPrintHelp();
@@ -709,33 +708,48 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
 	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
 end
+--[[
+	The onOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
+	If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
+	If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
 
--- The onOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
--- If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
--- If "toggle" is specified then it will toggle Enchantrix's state (if currently on then it will be turned off and vice-versa)
--- If no keyword is specified then the function will simply return the current state
---
--- If chatprint is "true" then the state will also be printed to the user.
+	If a boolean (or nil) value is passed as the first argument the conversion is as follows:
+	"true" is the same as "on"
+	"false" is the same as "off"
+	"nil" is the same as "toggle"
 
+	If chatprint is "true" then the state will also be printed to the user.
+]]
 function onOff(state, chatprint)
-	state = Enchantrix.Locale.DelocalizeFilterVal(state)
+	if (type(state) == "string") then
+		state = Enchantrix.Locale.DelocalizeFilterVal(state)
 
-	if (state == nil) or (state == "") then
-		state = Enchantrix.Config.GetFilter("all");
-	elseif (state == 'on') or (state == 'off') then
+	elseif (state == true) then
+		state = 'on'
+
+	elseif (state == false) then
+		state = 'off'
+
+	elseif (state == nil) then
+		state = 'toggle'
+	end
+
+	if (state == 'on') or (state == 'off') then
 		Enchantrix.Config.SetFilter('all', state);
 	elseif (state == "toggle") then
 		Enchantrix.Config.SetFilter('all', not Enchantrix.Config.GetFilter('all'))
 	end
 
 	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
-	if chatprint then
-		if Enchantrix.Config.GetFilter('all') then
+	if (chatprint) then
+		state = Enchantrix.Config.GetFilter('all')
+		setKhaosSetKeyParameter('all', "checked", state);
+
+		if (state) then
 			Enchantrix.Util.ChatPrint(_ENCH('StatOn'));
-			setKhaosSetKeyParameter('all', "checked", true);
+
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('StatOff'));
-			setKhaosSetKeyParameter('all', "checked", false);
 		end
 	end
 
@@ -795,7 +809,7 @@ function genVarSet(variable, param, chatprint)
 
 	param = Enchantrix.Locale.DelocalizeFilterVal(param);
 
-	if (param == true or param == false) then
+	if (param == 'on' or param == 'off' or param == true or param == false) then
 		Enchantrix.Config.SetFilter(variable, param);
 
 	elseif (param == 'toggle' or param == nil or param == "") then
@@ -917,7 +931,7 @@ function doPercentLess(percentLess)
 	if not Auctioneer then
 		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
 		return;
-	elseif not (Auctioneer.Filter and Auctioneer.Filter.QuerySnapshot) then
+	elseif not (Auctioneer.Filter or Auctioneer.Filter.QuerySnapshot) then
 		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
 		return;
 	end
@@ -1001,15 +1015,14 @@ function getAuctionItemDisenchants(auctionSignature, useCache)
 end
 
 Enchantrix.Command = {
-	Revision				= "$Revision$",
+	Revision					= "$Revision$",
 
 	AddonLoaded				= addonLoaded,
-	AuctioneerLoaded		= auctioneerLoaded,
+	AuctioneerLoaded			= auctioneerLoaded,
 
 	HandleCommand			= handleCommand,
 
-	Register				= register,
-	--ResetKhaos				= resetKhaos,
+	Register					= register,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
 	SetKhaosSetKeyParameter	= setKhaosSetKeyParameter,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
