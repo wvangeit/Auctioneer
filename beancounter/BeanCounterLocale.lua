@@ -24,6 +24,13 @@
 --]]
 
 BeanCounter_CustomLocalizations = {
+	['MailAllianceAuctionHouse'] = GetLocale(),
+	['MailAuctionCancelledSubject'] = GetLocale(),
+	['MailAuctionExpiredSubject'] = GetLocale(),
+	['MailAuctionSuccessfulSubject'] = GetLocale(),
+	['MailAuctionWonSubject'] = GetLocale(),
+	['MailHordeAuctionHouse'] = GetLocale(),
+	['MailOutbidOnSubject'] = GetLocale(),
 }
 
 function _BC(stringKey, locale)
