@@ -83,11 +83,13 @@ end
 
 Watcher.trackNeededQuestItems = function()
 	local now = Watcher.timeslice()
+	local start = time()
 	Watcher.debug("Tracking quest needed items")
 	if (Watcher.questsUpdated and Watcher.timer <= Watcher.questsUpdated + 1) then
 		Watcher.timers[Watcher.timer + 1] = "Watcher.trackNeededQuestItems()"
 		return
 	end
+	Watcher.questsUpdated = Watcher.timer
 	local player = Watcher.getPlayerDes()
 	local numItems = GetNumQuestLogEntries()
 	local expanded
@@ -102,7 +104,7 @@ Watcher.trackNeededQuestItems = function()
 		dirty[questItem] = true
 	end
 
-	local j,k, itemDes, questItem
+	local k,l, itemDes, questItem
 	local numLdr, desc, itemname, count, total, ltype, done
 	local title, level, tag, header, collapsed, complete
 	for i = 1, numItems do
@@ -119,7 +121,7 @@ Watcher.trackNeededQuestItems = function()
 			for j = 1, numLdr do
 				desc, ltype, done = GetQuestLogLeaderBoard(j, i)
 				if (ltype == "item") then
-					j,k, itemname, count, total = string.find(desc, "^(.+): (%d+)/(%d+)")
+					k,l, itemname, count, total = string.find(desc, "^(.+): (%d+)/(%d+)")
 					if (count) then
 						count = tonumber(count)
 						total = tonumber(total)

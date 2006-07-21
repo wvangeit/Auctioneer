@@ -44,12 +44,15 @@ Watcher.findInBags = function(findName, findCount)
 				link = GetContainerItemLink(bag, slot)
 				if (link) then
 					itemDes, _,_,_,_, itemName = Watcher.getItemDes(link)
-					local texture, count = GetContainerItemInfo(frameID, buttonID)
+					local texture, count = GetContainerItemInfo(bag,slot)
 					if (itemName == findName) then
-						c = Watcher.bagSearch[itemID] or 0
+						c = 0
+						if (bagSearch and link and bagSearch[link]) then
+							c = Watcher.bagSearch[link]
+						end
 						if (c >= findCount) then return itemDes end
 						if (not bagSearch) then bagSearch = {} end
-						bagSearch[itemID] = c + count
+						bagSearch[link] = c + count
 					end
 				end
 			end
