@@ -22,8 +22,12 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-local getItemData, storeItemData, haveItemData
+local getItemData
+local storeItemData
+local haveItemData
+local encodeItemData
 local splitString = Itemizer.Util.Split
+local nilSafeTable = Itemizer.Util.NilSafeTable
 
 function getItemData(itemID, randomProp) --This function is not finished
 --[[
@@ -56,22 +60,26 @@ end
 
 function storeItemData(itemInfo)
 	--Make itemInfo a required parameter, and make sure its a table
-	if ((not itemInfo) or (not type(itemInfo) == "table")) then
+	if (not type(itemInfo) == "table") then
 		return
 	end
 
 	local oldBaseInfo, baseInfo, leftTooltip, rightTooltip, baseData, basicStats, resists, requirements, equipBonuses, currentItem
 
 	if (itemInfo.randomProp) then --We need to treat these separately.
-		local haveItemID, haveRandomProp = haveItemData(itemInfo.itemID, itemInfo.randomProp)
+		local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemInfo.itemID, itemInfo.randomProp)
+		EnhTooltip.DebugPrint(haveItemID, haveRandomProp, randomPropInItem, itemInfo.itemID, itemInfo.randomProp)
+		if (not haveRandomProp) then
+			EnhTooltip.DebugPrint("Itemizer does not have this randomProp in its cache tables:", itemInfo.randomProp, "Please update your copy of Itemizer.")
+			return
+		end
 
-		if (haveItemID and haveRandomProp) then --Refresh data.
+		if (haveItemID and randomPropInItem) then --Refresh data.
 			baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses = encodeItemData(itemInfo, itemInfo.randomProp)
 
-			ItemizerLinks[itemInfo.itemID][itemInfo.randomProp] = {}
-			currentItem = ItemizerLinks[itemInfo.itemID][itemInfo.randomProp]
+			currentItem = ItemizerLinks[itemInfo.itemID]
 
-			currentItem[1] = baseInfo;
+			--We don't want to reset the randomProp posibilities, so the basicData field is left alone.
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
 			currentItem[4] = basicStats;
@@ -81,9 +89,10 @@ function storeItemData(itemInfo)
 
 		elseif (haveItemID) then --Add new randomProp to existing itemID table.
 			--Start by adding the new randomProp to the baseInfo line
-			oldBaseInfo = splitString(ItemizerLinks[itemInfo.itemID][-1], "§")
+			oldBaseInfo = splitString(ItemizerLinks[itemInfo.itemID][1], "§")
 			local formatString = "%s"
-			oldBaseInfo[2] = tonumber(oldBaseInfo[2]) + 1
+			oldBaseInfo[1] = itemInfo.itemBaseName
+			oldBaseInfo[2] = (tonumber(oldBaseInfo[2]) or 0) + 1
 			table.insert(oldBaseInfo, itemInfo.randomProp)
 			for key, value in ipairs(oldBaseInfo) do
 				if (key > 1) then
@@ -94,15 +103,11 @@ function storeItemData(itemInfo)
 			--Now actually encode the information and store it.
 			baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses = encodeItemData(itemInfo, itemInfo.randomProp)
 
-			oldBaseInfo[1] = itemInfo.itemBaseName
 			infoLine = string.format(formatString, unpack(oldBaseInfo))
-			ItemizerLinks[itemInfo.itemID][-1] = infoLine
+			ItemizerLinks[itemInfo.itemID] = {}
+			currentItem = ItemizerLinks[itemInfo.itemID]
+			currentItem[1] = infoLine
 
-			ItemizerLinks[itemInfo.itemID][itemInfo.randomProp] = {}
-
-			currentItem = ItemizerLinks[itemInfo.itemID][itemInfo.randomProp]
-
-			currentItem[1] = baseInfo;
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
 			currentItem[4] = basicStats;
@@ -112,14 +117,11 @@ function storeItemData(itemInfo)
 
 		else -- Completely new item
 			ItemizerLinks[itemInfo.itemID] = {}
-			ItemizerLinks[itemInfo.itemID][-1] = itemInfo.itemBaseName.."§1§"..itemInfo.randomProp
+			currentItem = ItemizerLinks[itemInfo.itemID]
+			currentItem[1] = itemInfo.itemBaseName.."§1§"..itemInfo.randomProp
 
 			baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses = encodeItemData(itemInfo, itemInfo.randomProp)
 
-			ItemizerLinks[itemInfo.itemID][itemInfo.randomProp] = {}
-			currentItem = ItemizerLinks[itemInfo.itemID][itemInfo.randomProp]
-
-			currentItem[1] = baseInfo;
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
 			currentItem[4] = basicStats;
@@ -128,19 +130,19 @@ function storeItemData(itemInfo)
 			currentItem[7] = equipBonuses;
 		end
 
-	else
+	else --Item with no current randomProp
 		ItemizerLinks[itemInfo.itemID] = {}
-
-		baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses = encodeItemData(itemInfo, itemInfo.randomProp)
 		currentItem = ItemizerLinks[itemInfo.itemID]
 
-		currentItem[-1] = baseInfo;
-		currentItem[-2] = tooltip;
-		currentItem[-3] = baseData;
-		currentItem[-4] = basicStats;
-		currentItem[-5] = resists;
-		currentItem[-6] = requirements;
-		currentItem[-7] = equipBonuses;
+		baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses = encodeItemData(itemInfo, itemInfo.randomProp)
+
+		currentItem[1] = baseInfo
+		currentItem[2] = tooltip;
+		currentItem[3] = baseData;
+		currentItem[4] = basicStats;
+		currentItem[5] = resists;
+		currentItem[6] = requirements;
+		currentItem[7] = equipBonuses;
 	end
 end
 
@@ -160,11 +162,20 @@ function haveItemData(itemID, randomProp)
 	if (itemID) then
 		--Two parameters, two returns
 		if (randomProp) then
-			if ((ItemizerLinks[itemID]) and (ItemizerLinks[itemID][randomProp])) then
-				return true, true
+			if ((ItemizerLinks[itemID]) and (ItemizerRandomProps[randomProp])) then
+				
+				-- Must find out if the data for this itemID randomProp combination is already stored.
+				local itemBaseInfo = splitString(ItemizerLinks[itemID][1], "§")
+				for key, value in ipairs(itemBaseInfo) do
+					value = tonumber(value)
+					if (value and (value == randomProp)) then
+						return true, true, true
+					end
+				end
+				return true, true, false
 
-			elseif (ItemizerLinks[itemID]) then
-				return true, false
+			elseif (ItemizerRandomProps[randomProp]) then
+				return false, true
 
 			else
 				return false, false
@@ -176,12 +187,14 @@ function haveItemData(itemID, randomProp)
 		else
 			return false
 		end
+	else
+		return false
 	end
 end
 
 function encodeItemData(itemInfo, randomProp)
 	--Make itemInfo a required parameter, and make sure its a table
-	if ((not itemInfo) or (not type(itemInfo) == "table")) then
+	if (not type(itemInfo) == "table") then
 		return
 	end
 
@@ -193,12 +206,7 @@ function encodeItemData(itemInfo, randomProp)
 	local resistsTable = itemInfo.attributes.resists;
 	local bonusesTable = itemInfo.attributes.equipBonuses;
 
-	if (randomProp) then
-		baseInfo = string.sub(itemInfo.itemName, string.len(itemInfo.itemBaseName) + 1);
-	else
-		baseInfo = itemInfo.itemBaseName
-	end
-
+	baseInfo = itemInfo.itemBaseName
 
 	--Build tooltips
 	local first = true
@@ -246,42 +254,49 @@ function encodeItemData(itemInfo, randomProp)
 	baseData = string.sub(itemInfo.itemEquipLocation, 9); --Trim the reduntant "INVTYPE_" from the equip location.
 	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.itemLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType)
 
-	--Store binds data
+	--Store unique status
 	if (itemInfo.isUnique) then
 		baseData = baseData.."§1";
 	else
 		baseData = baseData.."§";
 	end
 
-	--Store unique status
+	--Store binds data
 	baseData = baseData.."§"..nilSafeString(itemInfo.binds);
 
-	if (baseData == "WEAPONMAINHAND" or baseData == "WEAPONOFFHAND" or baseData == "2HWEAPON") then --Store Weapon stats
+	-- Store type specific information
+	local equipLoc = string.sub(itemInfo.itemEquipLocation, 9); --Trim the reduntant "INVTYPE_" from the equip location.
+	if (equipLoc == "WEAPONMAINHAND" 
+	or equipLoc == "WEAPONOFFHAND" 
+	or equipLoc == "RANGEDRIGHT" 
+	or equipLoc == "2HWEAPON" 
+	or equipLoc == "THROWN"
+	or equipLoc == "RANGED") then --Store Weapon stats
 		--Min and max damage
-		baseData = baseData.."§"..attribs.itemMinDamage.."§"..attribs.itemMaxDamage;
+		baseData = baseData.."§"..nilSafeNumber(attribs.itemMinDamage).."§"..nilSafeNumber(attribs.itemMaxDamage);
 		--Speed and DPS
-		baseData = baseData.."§"..attribs.itemSpeed.."§"..attribs.itemDPS;
+		baseData = baseData.."§"..nilSafeNumber(attribs.itemSpeed).."§"..nilSafeNumber(attribs.itemDPS);
 
 		--Armor and block values (if available)
 		if (attribs.itemArmor) then
-			baseData = baseData.."§"..attribs.itemArmor;
+			baseData = baseData.."§"..nilSafeNumber(attribs.itemArmor);
 
 			if (attribs.itemBlock) then
-				baseData = baseData.."§"..attribs.itemBlock;
+				baseData = baseData.."§"..nilSafeNumber(attribs.itemBlock);
 			end
 		end
 
-	elseif (baseData == "BAG") then --Store BagSize
-		baseData = baseData.."§"..attribs.bagSize;
+	elseif (equipLoc == "BAG") then --Store BagSize
+		baseData = baseData.."§"..nilSafeNumber(attribs.bagSize);
 
 	else --Store Armor stats
 
 		--Armor and block values (if available)
 		if (attribs.itemArmor) then
-			baseData = baseData.."§"..attribs.itemArmor;
+			baseData = baseData.."§"..nilSafeNumber(attribs.itemArmor);
 
 			if (attribs.itemBlock) then
-				baseData = baseData.."§"..attribs.itemBlock;
+				baseData = baseData.."§"..nilSafeNumber(attribs.itemBlock);
 			end
 		end
 	end
@@ -366,16 +381,16 @@ function decodeItemData(itemID, randomProp) --%Todo% Finish this
 end
 
 function nilSafeString(str)
-	if (not str) then
-		return ""
-	else
-		return str
-	end
+	return str or ""
+end
+
+function nilSafeNumber(number)
+	return number or 0
 end
 
 Itemizer.Storage = {
 	GetItemData = getItemData,
-	StoreItemData = storeItemData,
 	HaveItemData = haveItemData,
+	StoreItemData = storeItemData,
 	EncodeItemData = encodeItemData,
 }

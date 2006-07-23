@@ -22,7 +22,13 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-local getItemHyperLinks, getItemLinks, buildLink, split, pruneTable
+local split
+local buildLink
+local pruneTable
+local nilSafeTable
+local getItemLinks
+local itemCacheSize
+local getItemHyperLinks
 
 function getItemHyperLinks(str, basicLink)
 	if (not str or (not type(str) == "string")) then return end
@@ -30,7 +36,7 @@ function getItemHyperLinks(str, basicLink)
 
 	for itemID, enchant, randomProp, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
 		if (basicLink) then
-			table.insert(itemList, "item:"..itemID..":0:"..randomProp..":0")
+			table.insert(itemList, "item:"..itemID..":0:0:0")
 		else
 			table.insert(itemList, "item:"..itemID..":"..enchant..":"..randomProp..":"..uniqID)
 		end
@@ -50,21 +56,21 @@ function getItemLinks(str)
 end
 
 function buildLink(hyperlink, quality, name)
-	-- make this function nilSafe, as it's a global one and might be used by external addons
-	if (not hyperlink) then
-		return
-	end
 
 	if (type(hyperlink) == "number") then
 		_, hyperlink = GetItemInfo(hyperlink)
 	end
 
-	if (not quality) then 
-		_,_, quality = GetItemInfo(hyperlink);
+	if (not hyperlink) then
+		return
+	end
+
+	if (not quality) then
+		_, _, quality = GetItemInfo(hyperlink);
 		quality = quality or 1
 	end
 
-	if (not name) then 
+	if (not name) then
 		name = GetItemInfo(hyperlink) or "unknown";
 	end
 
@@ -73,23 +79,59 @@ function buildLink(hyperlink, quality, name)
 	return hex.. "|H"..hyperlink.."|h["..name.."]|h|r"
 end
 
+--Thanks to Esamynn for his help in modifying this function to work for "at" bigger than a single character.
 function split(str, at)
 	local splut = {};
 
-	if (type(str) ~= "string") then return nil end
-	if (not str) then str = "" end
+	if (not type(str) == "string") then return end
 
 	if (not at)
 		then table.insert(splut, str)
 
 	else
-		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+		str = str..at;
+		at = string.gsub(at, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1");
+		for n in string.gfind(str, '([^'..at..']*)'..at) do
 			table.insert(splut, n);
-
-			if (c == '') then break end
 		end
 	end
 	return splut;
+end
+-- /dump Itemizer.Util.Split("Some§Random§String§to§split", "§")
+-- /dump Itemizer.Util.Split("Some%Random%String%to%split", "%")
+
+function itemCacheSize()
+	debugprofilestart()
+
+	local link
+	local itemsFound = 0
+
+	for index = 1, Itemizer.Core.Constants.ItemCacheScanCeiling do
+		link = buildLink(index)
+		if (link) then
+			itemsFound = itemsFound + 1
+		end
+	end
+
+	local totalTimeTaken = debugprofilestop()
+	EnhTooltip.DebugPrint(
+		"Itemizer: ItemCache entries scanned", Itemizer.Core.Constants.ItemCacheScanCeiling,
+		"Number of Items found", itemsFound,
+		"Time taken", totalTimeTaken,
+		"Average time per found item", totalTimeTaken/itemsFound,
+		"Average time per attempt", totalTimeTaken/Itemizer.Core.Constants.ItemCacheScanCeiling
+	)
+
+	return itemsFound
+end
+
+function nilSafeTable(tableToModify)
+	for index = 1, table.getn(tableToModify) do
+		if (tableToModify[index] == nil) then
+			tableToModify[index] = 0
+		end
+	end
+	return tableToModify
 end
 
 --Note: This function calls itself recursively until done.
@@ -112,9 +154,11 @@ function pruneTable(tableToPrune)
 end
 
 Itemizer.Util = {
-	GetItemHyperLinks = getItemHyperLinks,
-	GetItemLinks = getItemLinks,
-	BuildLink = buildLink,
 	Split = split,
+	BuildLink = buildLink,
 	PruneTable = pruneTable,
+	NilSafeTable = nilSafeTable,
+	GetItemLinks = getItemLinks,
+	ItemCacheSize = itemCacheSize,
+	GetItemHyperLinks = getItemHyperLinks,
 }

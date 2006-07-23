@@ -27,7 +27,7 @@
 Itemizer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "Debug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
-	Itemizer.Version = "3.5.DEV";
+	Itemizer.Version = "3.7.DEV";
 end
 
 --Saved Variables
@@ -38,8 +38,15 @@ ItemizerConfig = {}
 ItemizerProcessStack = {}
 ItemizerRunningStack = {}
 
+--Global Frame Names
+ItemizerFrame = nil;
+ItemizerTooltip = nil;
+ItemizerHidden = nil;
+ItemizerScanFrame = nil;
+
 local function onLoad()
 
+	Itemizer.Core.CreateFrames();
 	Itemizer.Core.RegisterEvents();
 
 	-- Setup the default for stubby to always load (people can override this on a per toon basis)
@@ -66,6 +73,15 @@ local function onLoad()
 				else
 					Stubby.Print("Your command was not understood")
 				end
+			elseif (cmd == "clear") then
+				--Saved Variables
+				ItemizerLinks = {}
+				ItemizerConfig = {}
+
+				--Global Variables
+				ItemizerProcessStack = {}
+				ItemizerRunningStack = {}
+				Stubby.Print("Itemizer Variables cleared")
 			else
 				Stubby.Print("Itemizer is currently not loaded.")
 				Stubby.Print("  You may load it now by typing |cffffffff/itemizer load|r")
@@ -91,3 +107,4 @@ end
 
 Itemizer.OnLoad = onLoad;
 
+Itemizer.OnLoad()

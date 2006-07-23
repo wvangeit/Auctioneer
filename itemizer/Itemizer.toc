@@ -10,7 +10,6 @@
 ## X-Version: <%version%> (<%codename%>)
 ## X-Revision: $Id$
 ## X-URL: http://auctioneeraddon.com/
-##
 
 ItemObjects.lua
 
@@ -18,8 +17,9 @@ Babylonian.lua
 ItemStrings.lua
 ItemLocale.lua
 
-ItemCore.lua
 ItemUtil.lua
+ItemCore.lua
+ItemTables.lua
 ItemStorage.lua
 ItemScanner.lua
 

@@ -21,20 +21,21 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-local onUpdate, elapsedTime, entriesToProcess, frequencyOfUpdates, scanItemCache, stringFind, toNumber, storeItemData, tableRemove, tablePairs
+local onUpdate
+local buildItemData
+local getNumLines
 
-elapsedTime = 0; --Running time to compare with frequencyOfUpdates
-entriesToProcess = 50; --Items per OnUpdate call
-frequencyOfUpdates = 0.2; --Seconds to wait between OnUpdate calls.
-itemCacheScanCeiling = 30000; --At the time of writing, the item with the highest ItemID is "Undercity Pledge Collection" with an ItemID of 22300 (thanks to zeeg for the info [http://www.wowguru.com/db/items/id22300/]), so a ceiling of 30,000 is more than reasonable IMHO.
+local elapsedTime = 0; --Running time to compare with frequencyOfUpdates
+local entriesToProcess = 25; --Items per OnUpdate call
+local frequencyOfUpdates = 0.2; --Seconds to wait between OnUpdate calls.
 
 --Making a local copy of these extensively used functions will make their calling faster.
-toNumber = tonumber;
-tablePairs = ipairs;
-stringFind = string.find;
-tableRemove = table.remove;
-storeItemData = Itemizer.Storage.StoreItemData;
-pruneTable = Itemizer.Util.PruneTable
+local pairs = pairs;
+local strfind = strfind;
+local tremove = tremove;
+local tonumber = tonumber;
+local pruneTable = Itemizer.Util.PruneTable;
+local storeItemData = Itemizer.Storage.StoreItemData;
 
 
 function onUpdate(timePassed)
@@ -45,14 +46,24 @@ function onUpdate(timePassed)
 
 	local numItems = 0;
 
-	for index, link in tablePairs(ItemizerProcessStack) do
-		numItems = numItems + 1;
-		storeItemData(buildItemData(link))
+	for link, info in pairs(ItemizerProcessStack) do
+		if (info.lines < getNumLines(link)) then
+			--numItems = numItems + 0.2
+			info.lines = getNumLines(link)
+			info.timer = GetTime()
+		
+		elseif ((GetTime() - info.timer) > 5) then
+			if (info.lines > 0) then
+				numItems = numItems + 1;
+				storeItemData(buildItemData(link))
+				ItemizerProcessStack[link] = nil;
+		
+			else
+				info.timer = GetTime()
+			end
 
-		local removedLink = table.remove(ItemizerProcessStack, index)
-
-		if (not removedLink == link) then
-			EnhTooltip.DebugPrint("Itemizer: WARNING: table.remove removed the wrong link! Expected", link, "Removed", removedLink);
+		else
+			--numItems = numItems + 0.1
 		end
 
 		if (numItems >= entriesToProcess) then
@@ -63,9 +74,24 @@ function onUpdate(timePassed)
 	elapsedTime = 0;
 end
 
+function getNumLines(link)
+	if (not type(link) == "string") then
+		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", link)
+		return
+	end
+	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
+
+	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
+	ItemizerHidden:SetHyperlink(hyperLink[1]);
+	return ItemizerHidden:NumLines()
+end
+
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
 function buildItemData(link)
-	if (not link or (not type(link) == "string")) then return end
+	if (not type(link) == "string") then
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", link)
+		return
+	end
 	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(link, true)
 	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
 	local curLine, textLeft, textRight, switch, keepGoing, matched, matchedRight
@@ -87,9 +113,11 @@ function buildItemData(link)
 		itemInfo.randomProp = nil;
 	end
 
+	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
 	ItemizerHidden:SetHyperlink(hyperLink[1]);
+	EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", link, hyperLink[1], "NumLines", ItemizerHidden:NumLines())
 
-	for index = 1, 30 do
+	for index = 1, ItemizerHidden:NumLines() do
 
 		curLine = getglobal("ItemizerHiddenTextLeft"..index);
 		if (curLine and curLine:IsShown()) then
@@ -130,15 +158,15 @@ function buildItemData(link)
 
 			--Scan for binding status
 			elseif (switch == 2) then
-				local _, _, binds = stringFind(textLeft, "Binds when (.+)"); --%Localize%
+				local _, _, binds = strfind(textLeft, "Binds when (.+)"); --%Localize%
 				if (binds) then
-					if (binds == "equipped") then --%Localize%
+					if (string.lower(binds) == "equipped") then --%Localize%
 						itemInfo.binds = 1
 
-					elseif (binds == "picked up") then --%Localize%
+					elseif (string.lower(binds) == "picked up") then --%Localize%
 						itemInfo.binds = 2
 
-					elseif (binds == "used") then --%Localize%
+					elseif (string.lower(binds) == "used") then --%Localize%
 						itemInfo.binds = 3
 					end
 					keepGoing = false;
@@ -151,7 +179,7 @@ function buildItemData(link)
 
 			--Scan for unique status
 			elseif (switch == 3) then
-				if (stringFind(textLeft, "Unique")) then --%Localize%
+				if (strfind(textLeft, "Unique")) then --%Localize%
 					itemInfo.isUnique = true
 					keepGoing = false;
 					matched = true;
@@ -163,7 +191,12 @@ function buildItemData(link)
 
 			--Redirect the loop according to item type.
 			elseif (switch == 4) then
-				if (itemInfo.itemEquipLocation == "INVTYPE_WEAPONMAINHAND" or itemInfo.itemEquipLocation == "INVTYPE_WEAPONOFFHAND" or itemInfo.itemEquipLocation == "INVTYPE_2HWEAPON") then
+				if (itemInfo.itemEquipLocation == "INVTYPE_WEAPONMAINHAND"
+				or itemInfo.itemEquipLocation == "INVTYPE_WEAPONOFFHAND"
+				or itemInfo.itemEquipLocation == "INVTYPE_RANGEDRIGHT"
+				or itemInfo.itemEquipLocation == "INVTYPE_2HWEAPON"
+				or itemInfo.itemEquipLocation == "INVTYPE_THROWN"
+				or itemInfo.itemEquipLocation == "INVTYPE_RANGED") then
 					switch = 5;
 					keepGoing = false;
 					matchedRight = true;
@@ -181,16 +214,16 @@ function buildItemData(link)
 
 			--Scan for weapon damage and speed.
 			elseif (switch == 5) then
-				local _, _, minDamage, maxDamage = stringFind(textLeft, "(%d+) %- (%d+) Damage"); --%Localize%
+				local _, _, minDamage, maxDamage, damageType = strfind(textLeft, "(%d+) %- (%d+)%s*(%w*) Damage"); --%Localize%
 				if (minDamage and maxDamage) then
-					itemInfo.attributes.itemMinDamage = toNumber(minDamage);
-					itemInfo.attributes.itemMaxDamage = toNumber(maxDamage);
+					itemInfo.attributes.itemMinDamage = tonumber(minDamage);
+					itemInfo.attributes.itemMaxDamage = tonumber(maxDamage);
 					matched = true;
 				end
 
-				local_, _, itemSpeed = stringFind(textRight, "Speed (.+)");
+				local_, _, itemSpeed = strfind(textRight, "Speed (.+)");
 				if (itemSpeed) then
-					itemInfo.attributes.itemSpeed = toNumber(itemSpeed);
+					itemInfo.attributes.itemSpeed = tonumber(itemSpeed);
 					matchedRight = true;
 				end
 				keepGoing = false;
@@ -198,9 +231,9 @@ function buildItemData(link)
 
 			--Scan for weapon DPS
 			elseif (switch == 6) then
-				local _, _, itemDPS = stringFind(textLeft, "%((.+) damage per second%)"); --%Localize%
+				local _, _, itemDPS = strfind(textLeft, "%((.+) damage per second%)"); --%Localize%
 				if (itemDPS) then
-					itemInfo.attributes.itemDPS = toNumber(itemDPS);
+					itemInfo.attributes.itemDPS = tonumber(itemDPS);
 					keepGoing = false;
 					matched = true;
 				end
@@ -208,9 +241,9 @@ function buildItemData(link)
 
 			--Scan for item armor values.
 			elseif (switch == 7) then
-				local _, _, itemArmor = stringFind(textLeft, "(%d+) Armor"); --%Localize%
+				local _, _, itemArmor = strfind(textLeft, "(%d+) Armor"); --%Localize%
 				if (itemArmor) then
-					itemInfo.attributes.itemArmor = toNumber(itemArmor);
+					itemInfo.attributes.itemArmor = tonumber(itemArmor);
 					keepGoing = false;
 					matched = true;
 				end
@@ -222,9 +255,9 @@ function buildItemData(link)
 
 			--Scan for shield base block values.
 			elseif (switch == 8) then
-				local _, _, itemBlock = stringFind(textLeft, "(%d+) Block"); --%Localize%
+				local _, _, itemBlock = strfind(textLeft, "(%d+) Block"); --%Localize%
 				if (itemBlock) then
-					itemInfo.attributes.itemBlock = toNumber(itemBlock);
+					itemInfo.attributes.itemBlock = tonumber(itemBlock);
 					keepGoing = false;
 					matched = true;
 				end
@@ -232,9 +265,9 @@ function buildItemData(link)
 
 			--Scan for bag size.
 			elseif (switch == 9) then
-				local _, _, bagSize = stringFind(textLeft, "(%d+) Slot Bag"); --%Localize%
+				local _, _, bagSize = strfind(textLeft, "(%d+) Slot Bag"); --%Localize%
 				if (bagSize) then
-					itemInfo.attributes.bagSize = toNumber(bagSize);
+					itemInfo.attributes.bagSize = tonumber(bagSize);
 					keepGoing = false;
 					matched = true;
 				end
@@ -244,52 +277,52 @@ function buildItemData(link)
 			elseif (switch == 10) then
 				local found, plusOrMinus, quantity
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Agility"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Agility"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.agility = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.agility = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Health"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Health"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.health = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.health = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Intellect"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Intellect"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.intellect = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.intellect = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Mana"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Mana"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.mana = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.mana = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Spirit"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Spirit"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.spirit = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.spirit = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Stamina"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Stamina"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.stamina = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.stamina = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Strength"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Strength"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.strength = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.strength = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Defense"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Defense"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.basicStats.defense = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.basicStats.defense = tonumber(plusOrMinus..quantity);
 				end
 
 				if (not found) then
@@ -303,34 +336,34 @@ function buildItemData(link)
 			elseif (switch == 11) then
 				local found, plusOrMinus, quantity
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Fire Resistance"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Fire Resistance"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.resists.fire = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.resists.fire = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Frost Resistance"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Frost Resistance"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.resists.frost = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.resists.frost = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Arcane Resistance"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Arcane Resistance"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.resists.arcane = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.resists.arcane = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Shadow Resistance"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Shadow Resistance"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.resists.shadow = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.resists.shadow = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "(%p)(%d+) Nature Resistance"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "(%p)(%d+) Nature Resistance"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.resists.nature = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.resists.nature = tonumber(plusOrMinus..quantity);
 				end
 
 				if (not found) then
@@ -342,10 +375,10 @@ function buildItemData(link)
 
 			--Scan for class requirements
 			elseif (switch == 12) then
-				local _, _, itemClasses = stringFind(textLeft, "Classes: (.+)"); --%Localize%
+				local _, _, itemClasses = strfind(textLeft, "Classes: (.+)"); --%Localize%
 				if (itemClasses) then
 
-					if (stringFind(itemClasses, ", ")) then
+					if (strfind(itemClasses, ", ")) then
 						itemInfo.attributes.classes = Itemizer.Util.Split(itemClasses, ", ");
 
 					else
@@ -358,14 +391,22 @@ function buildItemData(link)
 					switch = 13;
 				end
 
-			--Scan for profession or skill requirements.
+			--Scan for profession, skill, level or honor requirements.
 			elseif (switch == 13) then
-				local _, _, requires = stringFind(textLeft, "Requires (.+)"); --%Localize%
+				local _, _, requires = strfind(textLeft, "Requires (.+)"); --%Localize%
 				if (requires) then
-					local _, _, skill, skillLevel = stringFind(textLeft, "(.+) %((%d+)%)");
+					local _, _, skill, skillLevel = strfind(requires, "(.+) %((%d+)%)");
+					local _, _, level = strfind(requires, "Level (%d+)");
 
 					if (skillLevel) then
-						itemInfo.attributes.skills[skill] = toNumber(skillLevel);
+						itemInfo.attributes.skills[skill] = tonumber(skillLevel);
+
+					elseif (level) then
+						assert(tonumber(itemInfo.itemLevel) == tonumber(level));
+						itemInfo.itemLevel = level;
+
+					else
+						itemInfo.attributes.skills.honor = requires;
 					end
 					keepGoing = false;
 					matched = true;
@@ -378,128 +419,128 @@ function buildItemData(link)
 			elseif (switch == 14) then
 				local found, damageOrHealing, schoolType, quantity, increaseType
 
-				if (not stringFind(textLeft, "Equip: ")) then --%Localize%
+				if (not strfind(textLeft, "Equip: ")) then --%Localize%
 					keepGoing = false;
 					break;
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by fire spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by fire spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.fire = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.fire = tonumber(quantity);
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by frost spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by frost spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.frost = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.frost = tonumber(quantity);
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by holy spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by holy spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.holy = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.holy = tonumber(quantity);
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by shadow spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by shadow spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.shadow = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.shadow = tonumber(quantity);
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by arcane spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by arcane spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.arcane = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.arcane = tonumber(quantity);
 				end
 
-				_, _, schoolType, quantity = stringFind(textLeft, "Equip: Increases damage done by nature spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage done by nature spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.nature = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.nature = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Increases healing done by spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases healing done by spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.healing = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.healing = tonumber(quantity);
 				end
-				_, _, quantity = stringFind(textLeft, "Equip: Increases damage and healing done by magical spells and effects by up to (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases damage and healing done by magical spells and effects by up to (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.damageAndHealing = toNumber(quantity);
-				end
-
-				_, _, quantity = stringFind(textLeft, "Equip: Restores (%d+) health per 5 sec"); --%Localize%
-				if (quantity) then
-					found = true;
-					itemInfo.attributes.equipBonuses.healthPerFive = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.damageAndHealing = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Restores (%d+) mana per 5 sec"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Restores (%d+) health per 5 sec"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.manaPerFive = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.healthPerFive = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Improves your chance to get a critical strike with spells by (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Restores (%d+) mana per 5 sec"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.spellCrit = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.manaPerFive = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Improves your chance to get a critical strike by (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Improves your chance to get a critical strike with spells by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.meleeCrit = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.spellCrit = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Improves your chance to hit with spells by (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Improves your chance to get a critical strike by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.spellHit = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.meleeCrit = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Improves your chance to hit by (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Improves your chance to hit with spells by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.meleeHit = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.spellHit = tonumber(quantity);
 				end
 
-				_, _, plusOrMinus, quantity = stringFind(textLeft, "Equip: (%p)(%d+) Attack Power"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Improves your chance to hit by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.attackPower = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.equipBonuses.meleeHit = tonumber(quantity);
 				end
 
-				_, _, increaseType, plusOrMinus, quantity = stringFind(textLeft, "Equip: Increased (.+) (%p)(%d+)"); --%Localize%
+				_, _, plusOrMinus, quantity = strfind(textLeft, "Equip: (%p)(%d+) Attack Power"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses[string.lower(increaseType)] = toNumber(plusOrMinus..quantity);
+					itemInfo.attributes.equipBonuses.attackPower = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Increases the block value of your shield by (%d+)"); --%Localize%
+				_, _, increaseType, plusOrMinus, quantity = strfind(textLeft, "Equip: Increased (.+) (%p)(%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.blockValue = toNumber(quantity);
+					itemInfo.attributes.equipBonuses[string.lower(increaseType)] = tonumber(plusOrMinus..quantity);
 				end
 
-				_, _, increaseType, quantity = stringFind(textLeft, "Equip: Increases your chance to dodge an attack by (%d+)"); --%Localize%
+				_, _, quantity = strfind(textLeft, "Equip: Increases the block value of your shield by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.dodgeAttack = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.blockValue = tonumber(quantity);
 				end
 
-				_, _, increaseType, quantity = stringFind(textLeft, "Equip: Increases your chance to parry an attack by (%d+)"); --%Localize%
+				_, _, increaseType, quantity = strfind(textLeft, "Equip: Increases your chance to dodge an attack by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.parryAttack = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.dodgeAttack = tonumber(quantity);
 				end
 
-				_, _, quantity = stringFind(textLeft, "Equip: Increases your chance to block attacks with a shield by (%d+)"); --%Localize%
+				_, _, increaseType, quantity = strfind(textLeft, "Equip: Increases your chance to parry an attack by (%d+)"); --%Localize%
 				if (quantity) then
 					found = true;
-					itemInfo.attributes.equipBonuses.blockAttack = toNumber(quantity);
+					itemInfo.attributes.equipBonuses.parryAttack = tonumber(quantity);
+				end
+
+				_, _, quantity = strfind(textLeft, "Equip: Increases your chance to block attacks with a shield by (%d+)"); --%Localize%
+				if (quantity) then
+					found = true;
+					itemInfo.attributes.equipBonuses.blockAttack = tonumber(quantity);
 				end
 				keepGoing = false;
 				if (found) then
@@ -518,25 +559,10 @@ function buildItemData(link)
 	end
 	return pruneTable(itemInfo);
 end
-
-function scanItemCache()
-	debugprofilestart()
-	local itemName, hyperLink, itemQuality, totalTimeTaken
-	local itemsFound = 0;
-	for itemID = 1, itemCacheScanCeiling do
-		itemName, hyperLink, itemQuality = GetItemInfo(itemID)
-		if (itemName) then
-			Itemizer.Core.ProcessLinks(Itemizer.Util.BuildLink(hyperLink, itemQuality, itemName), true)
-			itemsFound = itemsFound + 1;
-		end
-	end
-	totalTimeTaken = debugprofilestop();
-	EnhTooltip.DebugPrint("Itemizer: ItemCache entries scanned", itemCacheScanCeiling, "Number of Items found", itemsFound, "Time taken", totalTimeTaken, "Average time per found item", totalTimeTaken/itemsFound, "Average time per attempt", totalTimeTaken/itemCacheScanCeiling);
-end
 -- /script Itemizer.Scanner.ScanItemCache()
 -- /eval ItemizerProcessStack
 -- /script a,b,c,d,e,f,g,h,i = GetItemInfo(16921) ChatFrame2:AddMessage(a.."§ "..b.."§ "..c.."§ "..d.."§"..e.."§"..f.."§"..g.."§"..h.."§"..i)
--- /script start, stop, plusOrMinus, quantity, resistType = stringFind("-30 Nature Resistance", "(%p)(%d+) (.+) Resistance"); EnhTooltip.DebugPrint(start, stop, plusOrMinus, quantity, resistType)
+-- /script start, stop, plusOrMinus, quantity, resistType = strfind("-30 Nature Resistance", "(%p)(%d+) (.+) Resistance"); EnhTooltip.DebugPrint(start, stop, plusOrMinus, quantity, resistType)
 
 -- /script GameTooltip_SetDefaultAnchor(ItemizerHiddenTooltip, UIParent); ItemizerHiddenTooltip:SetHyperlink("item:16921:0:0:0")
 -- /script GameTooltip_SetDefaultAnchor(ItemizerHiddenTooltip, UIParent); ItemizerHiddenTooltip:SetText("item:4500:0:0:0")
@@ -549,12 +575,12 @@ end
 -- /script DATA = {Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))} Fire_Debugger_LoadString("DATA")
 -- /dump Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))
 -- /dump Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))
--- /dump Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921))
+-- /dump Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(7722))
 -- /dump Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink("item:6587:0:851", 3, "Scouting Trousers of the Eagle"))
+-- /dump ItemizerHidden:SetHyperlink('item:7722') Itemizer:NumLines()
 
 -- /script Blah = "hello" Blah2 = "world" Blah3 = Blah.."§"..Blah2 ChatFrame2:AddMessage(Blah3)
 Itemizer.Scanner = {
 	OnUpdate = onUpdate,
 	BuildItemData = buildItemData,
-	ScanItemCache = scanItemCache,
 }
