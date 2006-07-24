@@ -916,7 +916,7 @@ function Enchantrix_GetReagentHSP( itemLink )
 	elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
 		--Enchantrix.Util.ChatPrint("Calling GetHSP");
 		hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-	elseif (major >= 3 and minor >= 3 and (rev >= 675 or rev == 0)) then
+	elseif (major >= 3 and minor >= 3 and (rev >= 675 or (rev >= 0 and rev <=5))) then
 		--Enchantrix.Util.ChatPrint("Calling Statistic.GetHSP");
 		hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 	else
