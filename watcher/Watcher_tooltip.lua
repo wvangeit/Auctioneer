@@ -14,7 +14,7 @@ Watcher.getTooltip = function(ttype, linenum, p1,p2,p3,p4,p5,p6,p7,p8)
 	WatcherTooltip:SetOwner(WorldFrame,"ANCHOR_NONE");	
 	WatcherTooltip[ttype](WatcherTooltip, p1,p2,p3,p4,p5,p6,p7,p8)
 	local line
-	for i=1, 20 do
+	for i=1, WatcherTooltip:NumLines() do
 		if (not linenum or linenum == i) then
 			line = getglobal("WatcherTooltipTextLeft"..i)
 			if line then
