@@ -7,5 +7,6 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Stubby
-Stubby.xml
 
+Stubby.lua
+Stubby.xml
