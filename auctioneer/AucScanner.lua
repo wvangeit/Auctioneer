@@ -28,15 +28,20 @@ local processLink, invalidateAHSnapshot, auctionStartHook, finishedAuctionScanHo
 -- Hook into this function if you want notification when we find a link.
 function processLink(link)
 	if (ItemsMatrix_ProcessLinks ~= nil) then
-		ItemsMatrix_ProcessLinks(	link, -- itemlink
+		ItemsMatrix_ProcessLinks(	link, -- itemLink
 											nil,  -- not used atm
 											nil,  -- vendorprice - TODO: not calculatable in AH?
 											nil	-- event - TODO: donno, maybe only for chatevents?
 										)
 	end
 	if (LootLink_ProcessLinks ~= nil) then
-		LootLink_ProcessLinks(	link, -- itemlink
+		LootLink_ProcessLinks(	link, -- itemLink
 										true  -- TODO: uncertain? - ah is a trustable source?
+									);
+	end
+	if (Itemizer and Itemizer.ProcessLinks) then
+		Itemizer.ProcessLinks(	link, -- itemLink
+										true -- The Link comes from the API, which means it doesn't have to be split up
 									);
 	end
 end
