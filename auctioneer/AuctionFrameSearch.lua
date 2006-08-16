@@ -544,7 +544,7 @@ function AuctionFrameSearch_SavedSearchDropDown_Initialize()
 		func = AuctionFrameSearch_SavedSearchDropDownItem_OnClick,
 		owner = dropdown
 	});
-	for pos, name in savedSearchDropDownElements do
+	for pos, name in pairs(savedSearchDropDownElements) do
 		UIDropDownMenu_AddButton({
 			text = name,
 			func = AuctionFrameSearch_SavedSearchDropDownItem_OnClick,
@@ -1087,7 +1087,7 @@ function AuctionFrameSearch_CategoryDropDown_Initialize()
 	})
 
 	if (AuctionConfig.classes) then
-		for classid, cdata in AuctionConfig.classes do
+		for classid, cdata in pairs(AuctionConfig.classes) do
 			UIDropDownMenu_AddButton({
 				text = cdata.name,
 				func = AuctionFrameSearch_CategoryDropDownItem_OnClick,
@@ -1112,9 +1112,9 @@ end
 function AuctionFrameSearch_TimeLeftDropDown_Initialize()
 	local dropdown = this:GetParent();
 	local frame = dropdown:GetParent();
-	for index in TIME_LEFT_NAMES do
+	for index, value in pairs(TIME_LEFT_NAMES) do
 		local info = {};
-		info.text = TIME_LEFT_NAMES[index];
+		info.text = value;
 		info.func = AuctionFrameSearch_TimeLeftDropDownItem_OnClick;
 		info.owner = dropdown;
 		UIDropDownMenu_AddButton(info);

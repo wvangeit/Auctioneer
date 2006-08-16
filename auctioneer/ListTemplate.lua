@@ -29,8 +29,8 @@ local MAX_COLUMNS = 6;
 local CurrentListFrame = nil;
 function ListTemplate_CompareRows(row1, row2)
 	frame = CurrentListFrame;
-	for index in frame.sortOrder do
-		local column = frame.sortOrder[index];
+	for index, value in ipairs(frame.sortOrder) do
+		local column = value;
 		local physicalColumn = frame.physicalColumns[column.columnIndex];
 		local logicalColumn = physicalColumn.logicalColumn;
 		if (logicalColumn.compareAscendingFunc and logicalColumn.compareDescendingFunc) then
@@ -157,9 +157,9 @@ function ListTemplate_Sort(frame, columnIndex)
 		frame.sortOrder[1].sortAscending = not frame.sortOrder[1].sortAscending;
 	else
 		getglobal(frame:GetName().."Column"..frame.sortOrder[1].columnIndex.."SortArrow"):Hide();
-		for index in frame.sortOrder do
-			if (frame.sortOrder[index].columnIndex == columnIndex) then
-				local temp = frame.sortOrder[index];
+		for index, value in ipairs(frame.sortOrder) do
+			if (value.columnIndex == columnIndex) then
+				local temp = value;
 				table.remove(frame.sortOrder, index);
 				table.insert(frame.sortOrder, 1, temp);
 				break;
@@ -284,8 +284,8 @@ function ListTemplate_DropDown_Initialize()
 	if (frame.physicalColumns) then
 		local physicalColumnIndex = dropdown:GetID();
 		local physicalColumn = frame.physicalColumns[physicalColumnIndex];
-		for index in physicalColumn.logicalColumns do
-			local logicalColumn = physicalColumn.logicalColumns[index];
+		for index, value in pairs(physicalColumn.logicalColumns) do
+			local logicalColumn = value;
 			local info = {};
 			info.text = logicalColumn.title;
 			info.func = ListTemplate_DropDownItem_OnClick;

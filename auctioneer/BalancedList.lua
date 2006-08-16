@@ -80,7 +80,7 @@ local function newBalancedList(paramSize)
 	local setList = function(externalList)
 		clear();
 		if (externalList ~= nil) then
-			for i,v in externalList do
+			for i,v in pairs(externalList) do
 				insert(v);
 			end
 		end

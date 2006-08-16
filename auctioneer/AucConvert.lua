@@ -206,7 +206,7 @@ function convert()
 		-- Auto-convert to per-auctKey fixed prices
 		if (AuctionConfig.fixedprice) then
 			local fixedPrices = AuctionConfig.fixedprice;
-			for k, v in fixedPrices do
+			for k, v in pairs(fixedPrices) do
 				local i,j, start,buy,dur = string.find(v, "(%d+):(%d+):(%d+)");
 				fixedPrices[k] = string.format("%s:%s:%d:%s", start, buy, 1, dur)
 			end

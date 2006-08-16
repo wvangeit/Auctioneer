@@ -788,8 +788,8 @@ function AuctionFramePost_PriceModelDropDown_Initialize()
 	local dropdown = this:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.prices) then
-		for index in frame.prices do
-			local price = frame.prices[index];
+		for index, value in pairs(frame.prices) do
+			local price = value;
 			local info = {};
 			info.text = price.text;
 			info.func = AuctionFramePost_PriceModelDropDownItem_OnClick;

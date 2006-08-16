@@ -167,7 +167,7 @@ end
 
 function getKhaosLocaleList() --Local
 	local options = { [_AUCT('CmdDefault')] = 'default' };
-	for locale, data in AuctioneerLocalizations do
+	for locale, data in pairs(AuctioneerLocalizations) do
 		options[locale] = locale;
 	end
 	return options
@@ -1226,29 +1226,29 @@ function buildCommandMap()
 		[_AUCT('CmdDefault')]			=	'default',
 		[_AUCT('CmdPrintin')]			=	'print-in',
 		[_AUCT('CmdAlso')]				=	'also',
-		[_AUCT('CmdEmbed')]			=	'embed',
+		[_AUCT('CmdEmbed')]				=	'embed',
 		[_AUCT('CmdPercentless')]		=	'percentless',
 		[_AUCT('CmdPercentlessShort')]	=	'percentless',
 		[_AUCT('CmdCompete')]			=	'compete',
 		[_AUCT('CmdScan')]				=	'scan',
 		[_AUCT('CmdAutofill')]			=	'autofill',
 		[_AUCT('CmdWarnColor')]			=	'warn-color',
-		[_AUCT('CmdAuctionDuration')]		=	'auction-duration',
+		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
 		[_AUCT('CmdProtectWindow')]		=	'protect-window',
 		[_AUCT('CmdFinish')]			=	'finish',
 		[_AUCT('CmdBroker')]			=	'broker',
 		[_AUCT('CmdBidbroker')]			=	'bidbroker',
-		[_AUCT('CmdBidbrokerShort')]		=	'bidbroker',
+		[_AUCT('CmdBidbrokerShort')]	=	'bidbroker',
 		[_AUCT('CmdAuctionClick')]		=	'auction-click',
 		[_AUCT('CmdPctBidmarkdown')]	=	'pct-bidmarkdown',
 		[_AUCT('CmdPctMarkup')]			=	'pct-markup',
 		[_AUCT('CmdPctMaxless')]		=	'pct-maxless',
-		[_AUCT('CmdPctNocomp')]		=	'pct-nocomp',
+		[_AUCT('CmdPctNocomp')]			=	'pct-nocomp',
 		[_AUCT('CmdPctUnderlow')]		=	'pct-underlow',
 		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt',
 
 		--AskPrice related commands
-		[_AUCT('CmdAskPriceVendor')]		=	'vendor',
+		[_AUCT('CmdAskPriceVendor')]	=	'vendor',
 		[_AUCT('CmdAskPriceGuild')]		=	'guild',
 		[_AUCT('CmdAskPriceParty')]		=	'party',
 		[_AUCT('CmdAskPriceSmart')]		=	'smart',
@@ -1541,7 +1541,7 @@ function clear(param, chatprint)
 		local itemLinks = Auctioneer.Util.GetItemHyperlinks(param);
 
 		if (items) then
-			for pos,itemKey in pairs(items) do
+			for pos,itemKey in ipairs(items) do
 
 				if (AuctionConfig.data[aKey][itemKey]) then
 					AuctionConfig.data[aKey][itemKey] = nil;
