@@ -300,41 +300,40 @@ end
 
 
 function getItemLinks(str)
-	if (not str) then return nil end
+	if (not (type(str) == "string")) then 
+		return
+	end
 	local itemList = {};
-	local listSize = 0;
 
 	for link, item in string.gfind(str, "|Hitem:([^|]+)|h[[]([^]]+)[]]|h") do
-		listSize = listSize+1;
-		itemList[listSize] = item.." = "..link;
+		table.insert(itemList, item.." = "..link)
 	end
 	return itemList;
 end
 
-
 function getItems(str)
-	if (not str) then return nil end
+	if (not (type(str) == "string")) then 
+		return
+	end
 	local itemList = {};
-	local listSize = 0;
 	local itemKey;
 
 	for itemID, randomProp, enchant, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
 		itemKey = itemID..":"..randomProp..":"..enchant;
-		listSize = listSize+1;
-		itemList[listSize] = itemKey;
+		table.insert(itemList, itemKey)
 	end
 	return itemList;
 end
 
 --Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
 function getItemHyperlinks(str)
-	if (not str) then return nil end
+	if (not (type(str) == "string")) then 
+		return
+	end
 	local itemList = {};
-	local listSize = 0;
 
 	for color, item, name in string.gfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
-		listSize = listSize+1;
-		itemList[listSize] = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r"
+		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
 	end
 	return itemList;
 end
