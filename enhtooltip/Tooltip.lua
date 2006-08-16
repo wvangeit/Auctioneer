@@ -403,7 +403,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 	local cWidth = currentTooltip:GetWidth()
 	if (cWidth < width) then
-		getglobal(currentTooltip:GetName().."TextLeft1"):SetWidth(width - 20)
+		currentTooltip:SetWidth(width - 20)
 		self.showIgnore=true;
 		currentTooltip:Show()
 		self.showIgnore=false;
