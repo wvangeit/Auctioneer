@@ -760,16 +760,27 @@ end
 function clear(param, chatprint)
 	if (param == _ENCH('CmdClearAll')) or (param == "all") then
 		EnchantedLocal = {}
+		EnchantedBaseItems = {}
+		Enchantrix.Storage.AddonLoaded()
+
 		if (chatprint) then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActClearall'));
 		end
-	else
-		for link in string.gfind(param, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%b[]|h|r") do
-			local sig = Enchantrix.Util.GetSigFromLink(link)
-			EnchantedLocal[sig] = nil
 
-			if (chatprint) then
-				Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActClearOk'), link))
+	else
+		local items = Enchantrix.Util.GetItemHyperlinks(param);
+
+		if (items) then
+			for pos, itemKey in ipairs(items) do
+				EnhTooltip.DebugPrint(pos, itemKey, sig)
+				local sig = Enchantrix.Util.GetSigFromLink(itemKey)
+				local itemID = Enchantrix.Util.GetItemIdFromSig(sig)
+				EnchantedLocal[sig] = nil
+				EnchantedBaseItems[itemID] = nil
+
+				if (chatprint) then
+					Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActClearOk'), itemKey))
+				end
 			end
 		end
 	end

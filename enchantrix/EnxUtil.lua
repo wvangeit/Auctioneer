@@ -22,23 +22,25 @@
 ]]
 
 -- Global functions
-local isDisenchantable
-local getReagentInfo
-local getLinkFromName
-local getReagentPrice
+local getItems
 local getItemType
-local getItemIdFromSig
-local getItemIdFromLink
+local getReagentInfo
 local getSigFromLink
+local getReagentPrice
+local getLinkFromName
+local isDisenchantable
+local getItemIdFromSig
+local getItemHyperlinks
+local getItemIdFromLink
 
-local getRevision
 local split
-local spliterator
 local chatPrint
+local getRevision
+local spliterator
 
 local gcd
-local roundUp
 local round
+local roundUp
 local confidenceInterval
 
 local createProfiler
@@ -213,6 +215,28 @@ function getSigFromLink(link)
 	end
 end
 
+function getItems(str)
+	if (not str) then return end
+	local itemList = {};
+	local itemKey;
+
+	for itemID, randomProp, enchant, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
+		itemKey = itemID..":"..randomProp..":"..enchant;
+		table.insert(itemList, itemKey)
+	end
+	return itemList;
+end
+
+--Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
+function getItemHyperlinks(str)
+	if (not str) then return nil end
+	local itemList = {};
+
+	for color, item, name in string.gfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
+		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
+	end
+	return itemList;
+end
 -----------------------------------
 --   General Utility Functions   --
 -----------------------------------
@@ -440,24 +464,26 @@ end
 Enchantrix.Util = {
 	Revision			= "$Revision$",
 
-	IsDisenchantable	= isDisenchantable,
+	GetItems			= getItems,
+	GetItemType			= getItemType,
+	SigFromLink			= sigFromLink,
 	GetReagentInfo		= getReagentInfo,
+	GetSigFromLink		= getSigFromLink,
 	GetLinkFromName		= getLinkFromName,
 	GetReagentPrice		= getReagentPrice,
-	GetItemType			= getItemType,
 	GetItemIdFromSig	= getItemIdFromSig,
+	IsDisenchantable	= isDisenchantable,
 	GetItemIdFromLink	= getItemIdFromLink,
-	GetSigFromLink		= getSigFromLink,
-	SigFromLink			= sigFromLink,
+	GetItemHyperlinks	= getItemHyperlinks,
 
-	GetRevision			= getRevision,
 	Split				= split,
-	Spliterator			= spliterator,
 	ChatPrint			= chatPrint,
+	Spliterator			= spliterator,
+	GetRevision			= getRevision,
 
 	GCD					= gcd,
-	RoundUp				= roundUp,
 	Round				= round,
+	RoundUp				= roundUp,
 	ConfidenceInterval	= confidenceInterval,
 
 	CreateProfiler		= createProfiler,
