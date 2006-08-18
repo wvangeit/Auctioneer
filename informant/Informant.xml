@@ -20,15 +20,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="Babylonian.lua"/>
-	<Script file="InfStrings.lua"/>
-	<Script file="InfLocale.lua"/>
-
-	<Script file="Informant.lua"/>
-	<Script file="InfCommand.lua"/>
-	<Script file="InfTrades.lua"/>
-	<Script file="InfQuests.lua"/>
-	<Script file="InfData.lua"/>
 	<Frame name="InformantFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true" moveable="true">
 		<Size><AbsDimension x="380" y="380"/></Size>
 		<Anchors><Anchor point="CENTER"/></Anchors>

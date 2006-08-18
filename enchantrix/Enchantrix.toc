@@ -15,7 +15,7 @@
 ..\..\FrameXML\UIPanelTemplates.xml
 ..\..\FrameXML\CharacterFrameTemplates.xml
 ..\..\FrameXML\OptionsFrameTemplates.xml
-Babylonian.lua
+Babylonian\Babylonian.lua
 DisenchantList.lua
 EnxObjects.lua
 EnchantrixBarker.lua

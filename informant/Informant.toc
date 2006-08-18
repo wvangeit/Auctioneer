@@ -12,4 +12,15 @@
 ## URL: http://auctioneeraddon.com/dl/Informant
 ..\..\FrameXML\Fonts.xml
 ..\..\FrameXML\UIPanelTemplates.xml
+
+Babylonian\Babylonian.lua
+InfStrings.lua
+InfLocale.lua
+
+Informant.lua
+InfCommand.lua
+InfTrades.lua
+InfQuests.lua
+InfData.lua
+
 Informant.xml
