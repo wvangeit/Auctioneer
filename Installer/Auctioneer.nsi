@@ -177,10 +177,13 @@ Section "Auctioneer" Auctioneer
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer"
 	File "..\Auctioneer\Auctioneer.toc"
+	File "..\Auctioneer\Readme.txt"
 	File "..\Auctioneer\*.xml"
 	File "..\Auctioneer\*.lua"
-	File "..\Auctioneer\Readme.txt"
 	File "GPL.txt"
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\Babylonian"
+	File "..\Babylonian\*.lua"
 
 SectionEnd
 
@@ -193,6 +196,9 @@ Section "BeanCounter" BeanCounter
 	File "..\BeanCounter\*.lua"
 	File "GPL.txt"
 
+	SetOutPath "$INSTDIR\Interface\AddOns\BeanCounter\Babylonian"
+	File "..\Babylonian\*.lua"
+
 SectionEnd
 
 Section "Enchantrix" Enchantrix
@@ -201,10 +207,13 @@ Section "Enchantrix" Enchantrix
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix"
 	File "..\Enchantrix\Enchantrix.toc"
+	File "..\Enchantrix\Readme.txt"
 	File "..\Enchantrix\*.xml"
 	File "..\Enchantrix\*.lua"
-	File "..\Enchantrix\Readme.txt"
 	File "GPL.txt"
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix\Babylonian"
+	File "..\Babylonian\*.lua"
 
 SectionEnd
 
@@ -217,6 +226,9 @@ Section "Informant" Informant
 	File "..\Informant\*.xml"
 	File "..\Informant\*.lua"
 	File "GPL.txt"
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Informant\Babylonian"
+	File "..\Babylonian\*.lua"
 
 SectionEnd
 
