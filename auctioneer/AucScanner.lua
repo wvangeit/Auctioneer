@@ -30,8 +30,8 @@ function processLink(link)
 	if (ItemsMatrix_ProcessLinks ~= nil) then
 		ItemsMatrix_ProcessLinks(	link, -- itemLink
 											nil,  -- not used atm
-											nil,  -- vendorprice - TODO: not calculatable in AH?
-											nil	-- event - TODO: donno, maybe only for chatevents?
+											nil,  -- vendorprice - not calculatable in AH
+											nil	-- event - TODO: dunno, maybe only for chatevents?
 										)
 	end
 	if (LootLink_ProcessLinks ~= nil) then
@@ -158,6 +158,13 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 
 	--Add the preceding information to the AH frame too
 	BrowseNoResultsText:SetText(totalAuctionsMessage.."\n"..newAuctionsMessage.."\n"..oldAuctionsMessage.."\n"..defunctAuctionsMessage.."\n"..(discrepanciesMessage or ""))
+
+	--Record the auction stop time
+	Auctioneer.Core.Variables.AuctionScanStop = time()
+
+	--Populate our scan statistics
+	Auctioneer.Statistic.SetScanLength(Auctioneer.Core.Variables.AuctionScanStart, Auctioneer.Core.Variables.AuctionScanStop)
+	Auctioneer.Statistic.SetScanAge(Auctioneer.Core.Variables.AuctionScanStop)
 
 	--The followng was added by MentalPower to implement the "/auc finish" command
 	local finish = Auctioneer.Command.GetFilterVal('finish');

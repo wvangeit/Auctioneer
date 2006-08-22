@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local getTimeLeftString, getSecondsLeftString, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, breakItemKey, split, findClass, getCatName, getCatNumberByName, getCatForKey, getKeyFromSig, getCatForSig, getItemLinks, getItems, getItemHyperlinks, loadCategories, loadCategoryClasses, loadCategorySubClasses, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot, containerFrameItemButtonOnClick
+local getTimeLeftString, getSecondsLeftString, unpackSeconds, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, breakItemKey, split, findClass, getCatName, getCatNumberByName, getCatForKey, getKeyFromSig, getCatForSig, getItemLinks, getItems, getItemHyperlinks, loadCategories, loadCategoryClasses, loadCategorySubClasses, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot, containerFrameItemButtonOnClick
 
 -- return the string representation of the given timeLeft constant
 function getTimeLeftString(timeLeft)
@@ -57,6 +57,39 @@ function getSecondsLeftString(secondsLeft)
 	end
 
 	return getTimeLeftString(timeLeft);
+end
+
+function unpackSeconds(seconds)
+	seconds = tonumber(seconds)
+	if (not seconds) then
+		return
+	end
+
+	local weeks
+	local days
+	local hours
+	local minutes
+
+	seconds = math.floor(seconds)
+
+	if (seconds > 604800) then
+		weeks = math.floor(seconds / 604800)
+		seconds = math.floor(seconds - (weeks * 604800))
+	end
+	if (seconds > 86400) then
+		days = math.floor(seconds / 86400)
+		seconds = math.floor(seconds - (days * 86400))
+	end
+	if (seconds > 3600) then
+		hours = math.floor(seconds / 3600)
+		seconds = math.floor(seconds - (hours * 3600))
+	end
+	if (seconds >= 60) then
+		minutes = math.floor(seconds / 60)
+		seconds = math.floor(seconds - (minutes * 60))
+	end
+
+	return (weeks or 0), (days or 0), (hours or 0), (minutes or 0), (seconds or 0)
 end
 
 function getGSC(money)
@@ -297,7 +330,7 @@ end
 
 
 function getItemLinks(str)
-	if (not (type(str) == "string")) then 
+	if (not (type(str) == "string")) then
 		return
 	end
 	local itemList = {};
@@ -309,7 +342,7 @@ function getItemLinks(str)
 end
 
 function getItems(str)
-	if (not (type(str) == "string")) then 
+	if (not (type(str) == "string")) then
 		return
 	end
 	local itemList = {};
@@ -324,7 +357,7 @@ end
 
 --Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
 function getItemHyperlinks(str)
-	if (not (type(str) == "string")) then 
+	if (not (type(str) == "string")) then
 		return
 	end
 	local itemList = {};
@@ -640,6 +673,7 @@ end
 Auctioneer.Util = {
 	GetTimeLeftString = getTimeLeftString,
 	GetSecondsLeftString = getSecondsLeftString,
+	UnpackSeconds = unpackSeconds,
 	GetGSC = getGSC,
 	GetTextGSC = getTextGSC,
 	NilSafeString = nilSafeString,

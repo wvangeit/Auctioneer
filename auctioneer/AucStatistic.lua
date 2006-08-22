@@ -23,7 +23,7 @@
 ]]
 
 --Local function prototypes
-local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getPercentile, getMeans, getItemSnapshotMedianBuyout, getItemHistoricalMedianBuyout, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice
+local subtractPercent, addPercent, percentLessThan, getLowest, getMedian, getPercentile, getMeans, getItemSnapshotMedianBuyout, getItemHistoricalMedianBuyout, getUsableMedian, getCurrentBid, isBadResaleChoice, profitComparisonSort, roundDownTo95, findLowestAuctions, buildLowestCache, doLow, doMedian, doHSP, getBidBasedSellablePrice, getMarketPrice, getHSP, determinePrice, setScanLength, setScanAge, getScanLength, getScanAge
 
 -- Subtracts/Adds given percentage from/to a value
 
@@ -632,6 +632,52 @@ function determinePrice(id, realm, marketPrice, currentLowestBuyout, currentLowe
 	return highestSellablePrice, marketPrice, warn;
 end
 
+
+-------------------------------------------------------------------------------
+-- Scan Statistic Functions
+-------------------------------------------------------------------------------
+function setScanLength(startTime, endTime)
+	--Make both parameters required ones and make sure they're numbers
+	if (not (tonumber(startTime) and tonumber(endTime))) then
+		return
+	end
+
+	--Initialize our data structure
+	if (not AuctionConfig.scanStats) then
+		AuctionConfig.scanStats = {}
+	end
+
+	AuctionConfig.scanStats.lastScanLenght = (endTime - startTime)
+end
+
+function setScanAge(endTime)
+	--Make our parameter a required one and make sure its a number
+	endTime = tonumber(endTime)
+	if (not endTime) then
+		return
+	end
+
+	--Initialize our data structure
+	if (not AuctionConfig.scanStats) then
+		AuctionConfig.scanStats = {}
+	end
+
+	AuctionConfig.scanStats.lastScanAge = endTime
+end
+
+function getScanLength()
+	if (AuctionConfig and AuctionConfig.scanStats) then
+		return AuctionConfig.scanStats.lastScanLenght
+	end
+end
+
+function getScanAge()
+	if (AuctionConfig and AuctionConfig.scanStats and tonumber(AuctionConfig.scanStats.lastScanAge)) then
+		return time() - AuctionConfig.scanStats.lastScanAge
+	end
+end
+
+
 Auctioneer.Statistic = {
 	SubtractPercent = subtractPercent,
 	AddPercent = addPercent,
@@ -658,4 +704,8 @@ Auctioneer.Statistic = {
 	GetMarketPrice = getMarketPrice,
 	GetHSP = getHSP,
 	DeterminePrice = determinePrice,
+	SetScanLength = setScanLength,
+	SetScanAge = setScanAge,
+	GetScanLenght = getScanLength,
+	GetScanAge = getScanAge,
 }

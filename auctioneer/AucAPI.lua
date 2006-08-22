@@ -28,7 +28,8 @@
 ]]
 
 --Local function prototypes
-local getVendorBuyPrice, getVendorSellPrice;
+local getVendorBuyPrice, getVendorSellPrice
+local setScanLength, setScanAge, getScanLenght, getScanAge = Auctioneer.Statistic.SetScanLength, Auctioneer.Statistic.SetScanAge, Auctioneer.Statistic.GetScanLength, Auctioneer.Statistic.GetScanAge;
 --[[
 	Auctioneer.API.GetVendorBuyPrice(itemId)
 
@@ -43,7 +44,6 @@ function getVendorBuyPrice(itemId)
 		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.buy end
 	end
-	return nil;
 end
 --[[
 	Auctioneer.API.GetVendorSellPrice(itemId)
@@ -59,12 +59,17 @@ function getVendorSellPrice(itemId)
 		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.sell end
 	end
-	return nil;
 end
 
 Auctioneer.API = {
-GetVendorBuyPrice = getVendorBuyPrice,
-GetVendorSellPrice = getVendorSellPrice,
+	GetVendorBuyPrice = getVendorBuyPrice,
+	GetVendorSellPrice = getVendorSellPrice,
+	
+	--Linked from other files. PLEASE copy over the old versions when the function's prototype changes to maintain backwards compatibility.
+	SetScanLength = setScanLength,
+	SetScanAge = setScanAge,
+	GetScanLenght = getScanLength,
+	GetScanAge = getScanAge,
 }
 
 --Backwards compatiblity, please use the new prototypes whenever possible.
