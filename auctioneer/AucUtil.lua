@@ -70,8 +70,7 @@ end
 
 -- return an empty string if str is nil
 function nilSafeString(str)
-	if (not str) then str = "" end
-	return str;
+	return str or "";
 end
 
 function colorTextWhite(text)
@@ -146,9 +145,7 @@ end
 
 -- Used to convert variables that should be numbers but are nil to 0
 function nullSafe(val)
-	if (val == nil) then return 0; end
-	if (0 + val > 0) then return 0 + val; end
-	return 0;
+	return tonumber(val) or 0;
 end
 
 -- Returns the current faction's auction signature, depending on location
