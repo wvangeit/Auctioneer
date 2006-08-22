@@ -8,7 +8,7 @@
 ## 
 ## Notes: Provides the ability to contribute data to the Norganna's AddOns Item Database [<%version%>]
 ##
-## Interface: 11000
+## Interface: 11200
 ## SavedVariables: Watcher_Config
 ##
 ## Version: <%version%>

@@ -1,7 +1,7 @@
 ## Title: BeanCounter
 ## Notes: An Auctioneer addon that maintains an auction house transaction database. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 11100
+## Interface: 11200
 ## LoadOnDemand: 1
 ## Dependencies: Stubby, EnhTooltip
 ## SavedVariables: BeanCounterAccountDB
