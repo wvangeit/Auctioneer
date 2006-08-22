@@ -281,7 +281,7 @@ function canScan()
 	return true;
 end
 
-function requestAuctionScan()
+function requestAuctionScan(chatPrint)
 	Auctioneer.Scanning.IsScanningRequested = true;
 	if (AuctionFrame and AuctionFrame:IsVisible()) then
 		local iButton;
@@ -299,7 +299,9 @@ function requestAuctionScan()
 
 		startAuctionScan();
 	else
-		Auctioneer.Util.ChatPrint(_AUCT('AuctionScanNexttime'));
+		if (chatPrint) then
+			Auctioneer.Util.ChatPrint(_AUCT('AuctionScanNexttime'));
+		end
 	end
 end
 

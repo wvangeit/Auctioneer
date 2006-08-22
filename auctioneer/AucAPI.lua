@@ -29,7 +29,8 @@
 
 --Local function prototypes
 local getVendorBuyPrice, getVendorSellPrice
-local setScanLength, setScanAge, getScanLenght, getScanAge = Auctioneer.Statistic.SetScanLength, Auctioneer.Statistic.SetScanAge, Auctioneer.Statistic.GetScanLength, Auctioneer.Statistic.GetScanAge;
+local setScanLength, setScanAge, getScanLenght, getScanAge = Auctioneer.Statistic.SetScanLength, Auctioneer.Statistic.SetScanAge, Auctioneer.Statistic.GetScanLength, Auctioneer.Statistic.GetScanAge
+local requestAuctionScan = Auctioneer.Scanning.RequestAuctionScan
 --[[
 	Auctioneer.API.GetVendorBuyPrice(itemId)
 
@@ -66,10 +67,14 @@ Auctioneer.API = {
 	GetVendorSellPrice = getVendorSellPrice,
 	
 	--Linked from other files. PLEASE copy over the old versions when the function's prototype changes to maintain backwards compatibility.
+	--Auctioneer.Statistic
 	SetScanLength = setScanLength,
 	SetScanAge = setScanAge,
 	GetScanLenght = getScanLength,
 	GetScanAge = getScanAge,
+	
+	--Auctioneer.Scanning
+	RequestAuctionScan = requestAuctionScan
 }
 
 --Backwards compatiblity, please use the new prototypes whenever possible.

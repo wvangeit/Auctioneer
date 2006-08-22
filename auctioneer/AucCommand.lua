@@ -1353,7 +1353,7 @@ function mainHandler(command, source)
 
 	--/auctioneer scan
 	elseif (cmd == 'scan') then
-		Auctioneer.Scanning.RequestAuctionScan();
+		Auctioneer.Scanning.RequestAuctionScan(chatPrint);
 
 	--/auctioneer protect-window
 	elseif (cmd == 'protect-window') then
