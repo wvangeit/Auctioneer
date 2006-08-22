@@ -647,7 +647,7 @@ function setScanLength(startTime, endTime)
 		AuctionConfig.scanStats = {}
 	end
 
-	AuctionConfig.scanStats.lastScanLenght = (endTime - startTime)
+	AuctionConfig.scanStats.lastScanLength = (endTime - startTime)
 end
 
 function setScanAge(endTime)
@@ -667,7 +667,7 @@ end
 
 function getScanLength()
 	if (AuctionConfig and AuctionConfig.scanStats) then
-		return AuctionConfig.scanStats.lastScanLenght
+		return AuctionConfig.scanStats.lastScanLength
 	end
 end
 
@@ -706,6 +706,6 @@ Auctioneer.Statistic = {
 	DeterminePrice = determinePrice,
 	SetScanLength = setScanLength,
 	SetScanAge = setScanAge,
-	GetScanLenght = getScanLength,
+	GetScanLength = getScanLength,
 	GetScanAge = getScanAge,
 }
