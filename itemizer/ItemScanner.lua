@@ -21,9 +21,10 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
+local itemInfo
 local onUpdate
-local buildItemData
 local getNumLines
+local buildItemData
 
 local elapsedTime = 0; --Running time to compare with frequencyOfUpdates
 local entriesToProcess = 25; --Items per OnUpdate call
@@ -31,12 +32,17 @@ local frequencyOfUpdates = 0.2; --Seconds to wait between OnUpdate calls.
 
 --Making a local copy of these extensively used functions will make their calling faster.
 local pairs = pairs;
-local strfind = strfind;
-local tremove = tremove;
+local strfind = string.find;
+local tremove = table.remove;
+local strlower = string.lower;
 local tonumber = tonumber;
+
+local clearTable = Itemizer.Util.ClearTable;
 local pruneTable = Itemizer.Util.PruneTable;
 local storeItemData = Itemizer.Storage.StoreItemData;
 
+--Just one table to be re-used
+local itemInfo = {}
 
 function onUpdate(timePassed)
 	if (elapsedTime < frequencyOfUpdates) then
@@ -51,13 +57,13 @@ function onUpdate(timePassed)
 			--numItems = numItems + 0.2
 			info.lines = getNumLines(link)
 			info.timer = GetTime()
-		
+
 		elseif ((GetTime() - info.timer) > 5) then
 			if (info.lines > 0) then
 				numItems = numItems + 1;
-				storeItemData(buildItemData(link))
+				storeItemData(buildItemData(link, itemInfo))
 				ItemizerProcessStack[link] = nil;
-		
+
 			else
 				info.timer = GetTime()
 			end
@@ -74,8 +80,9 @@ function onUpdate(timePassed)
 	elapsedTime = 0;
 end
 
+--Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
 function getNumLines(link)
-	if (not type(link) == "string") then
+	if (not (type(link) == "string")) then
 		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", link)
 		return
 	end
@@ -87,24 +94,48 @@ function getNumLines(link)
 end
 
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
-function buildItemData(link)
-	if (not type(link) == "string") then
-		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", link)
+function buildItemData(link, itemInfo)
+	if (not (type(link) == "string")) then
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "Link type", type(link), link)
 		return
 	end
+
+	itemInfo = clearTable(itemInfo)
+	if (not (type(itemInfo) == "table")) then
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "itemInfo type", type(itemInfo), link)
+		itemInfo = {}
+	end
+
+	local _
 	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(link, true)
-	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
+	--local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
 	local curLine, textLeft, textRight, switch, keepGoing, matched, matchedRight
 
-	itemInfo = {}
-	itemInfo.tooltip = {}
-	itemInfo.tooltip.leftText = {}
-	itemInfo.tooltip.rightText = {}
-	itemInfo.attributes = {}
-	itemInfo.attributes.skills = {}
-	itemInfo.attributes.resists = {}
-	itemInfo.attributes.basicStats = {}
-	itemInfo.attributes.equipBonuses = {}
+
+	if (not itemInfo.tooltip) then
+		itemInfo.tooltip = {}
+	end
+	if (not itemInfo.tooltip.leftText) then
+		itemInfo.tooltip.leftText = {}
+	end
+	if (not itemInfo.tooltip.rightText) then
+		itemInfo.tooltip.rightText = {}
+	end
+	if (not itemInfo.attributes) then
+		itemInfo.attributes = {}
+	end
+	if (not itemInfo.attributes.skills) then
+		itemInfo.attributes.skills = {}
+	end
+	if (not itemInfo.attributes.resists) then
+		itemInfo.attributes.resists = {}
+	end
+	if (not itemInfo.attributes.basicStats) then
+		itemInfo.attributes.basicStats = {}
+	end
+	if (not itemInfo.attributes.equipBonuses) then
+		itemInfo.attributes.equipBonuses = {}
+	end
 
 	itemInfo.itemID, itemInfo.randomProp = EnhTooltip.BreakLink(link)
 	itemInfo.itemBaseName, _, itemInfo.itemQuality, itemInfo.itemLevel, itemInfo.itemType, itemInfo.itemSubType, _, itemInfo.itemEquipLocation = GetItemInfo(baseHyperLink[1])
@@ -114,8 +145,8 @@ function buildItemData(link)
 	end
 
 	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
-	ItemizerHidden:SetHyperlink(hyperLink[1]);
-	EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", link, hyperLink[1], "NumLines", ItemizerHidden:NumLines())
+	ItemizerHidden:SetHyperlink(baseHyperLink[1]);
+	--EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", link, baseHyperLink[1], "NumLines", ItemizerHidden:NumLines())
 
 	for index = 1, ItemizerHidden:NumLines() do
 
@@ -160,13 +191,13 @@ function buildItemData(link)
 			elseif (switch == 2) then
 				local _, _, binds = strfind(textLeft, "Binds when (.+)"); --%Localize%
 				if (binds) then
-					if (string.lower(binds) == "equipped") then --%Localize%
+					if (strlower(binds) == "equipped") then --%Localize%
 						itemInfo.binds = 1
 
-					elseif (string.lower(binds) == "picked up") then --%Localize%
+					elseif (strlower(binds) == "picked up") then --%Localize%
 						itemInfo.binds = 2
 
-					elseif (string.lower(binds) == "used") then --%Localize%
+					elseif (strlower(binds) == "used") then --%Localize%
 						itemInfo.binds = 3
 					end
 					keepGoing = false;
@@ -415,12 +446,20 @@ function buildItemData(link)
 					switch = 14;
 				end
 
-			--Scan for equip bonuses.
+			--Scan for equip bonuses and itemSet name.
 			elseif (switch == 14) then
-				local found, damageOrHealing, schoolType, quantity, increaseType
+				local found, damageOrHealing, schoolType, quantity, increaseType, itemSetName
 
 				if (not strfind(textLeft, "Equip: ")) then --%Localize%
 					keepGoing = false;
+
+					--Detect set item info here because its the last think we'll see
+					_, _, itemSetName = strfind(textLeft, "(.+) %(%d/%d%)");
+					if (itemSetName) then
+						found = true;
+						itemInfo.setName = itemSetName;
+					end
+
 					break;
 				end
 
@@ -542,6 +581,7 @@ function buildItemData(link)
 					found = true;
 					itemInfo.attributes.equipBonuses.blockAttack = tonumber(quantity);
 				end
+
 				keepGoing = false;
 				if (found) then
 					matched = true;
@@ -559,27 +599,7 @@ function buildItemData(link)
 	end
 	return pruneTable(itemInfo);
 end
--- /script Itemizer.Scanner.ScanItemCache()
--- /eval ItemizerProcessStack
--- /script a,b,c,d,e,f,g,h,i = GetItemInfo(16921) ChatFrame2:AddMessage(a.."§ "..b.."§ "..c.."§ "..d.."§"..e.."§"..f.."§"..g.."§"..h.."§"..i)
--- /script start, stop, plusOrMinus, quantity, resistType = strfind("-30 Nature Resistance", "(%p)(%d+) (.+) Resistance"); EnhTooltip.DebugPrint(start, stop, plusOrMinus, quantity, resistType)
 
--- /script GameTooltip_SetDefaultAnchor(ItemizerHiddenTooltip, UIParent); ItemizerHiddenTooltip:SetHyperlink("item:16921:0:0:0")
--- /script GameTooltip_SetDefaultAnchor(ItemizerHiddenTooltip, UIParent); ItemizerHiddenTooltip:SetText("item:4500:0:0:0")
--- /script GameTooltip_SetDefaultAnchor(GameTooltip, UIParent); GameTooltip:SetHyperlink("item:4500:0:0:0")
--- /script GameTooltip_SetDefaultAnchor(GameTooltip, UIParent); GameTooltip:SetText("item:4500:0:0:0")
--- /script GameTooltip_SetDefaultAnchor(Gobblidy, UIParent); Gobblidy:SetHyperlink("item:4500:0:0:0")
--- /script GameTooltip_SetDefaultAnchor(Gobblidy, UIParent); Gobblidy:SetText("item:4500:0:0:0")
-
--- /script DATA = Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16696)) Fire_Debugger_LoadString("DATA")
--- /script DATA = {Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))} Fire_Debugger_LoadString("DATA")
--- /dump Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))
--- /dump Itemizer.Storage.EncodeItemData(Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(16921)))
--- /dump Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink(7722))
--- /dump Itemizer.Scanner.BuildItemData(Itemizer.Util.BuildLink("item:6587:0:851", 3, "Scouting Trousers of the Eagle"))
--- /dump ItemizerHidden:SetHyperlink('item:7722') Itemizer:NumLines()
-
--- /script Blah = "hello" Blah2 = "world" Blah3 = Blah.."§"..Blah2 ChatFrame2:AddMessage(Blah3)
 Itemizer.Scanner = {
 	OnUpdate = onUpdate,
 	BuildItemData = buildItemData,

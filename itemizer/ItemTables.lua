@@ -25,6 +25,12 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
+--[[
+	This is the RandomProps table.
+	This table holds a string that contains two, three or four numbers separated by a colon ":".
+	The first number is the key to the suffix of the randomProp found in the Suffixes table (duh!).
+	The other one, two or three numbers are the keys to the enchants that the randomProp is comprised of.
+ ]]
 ItemizerRandomProps = {
 	[5] = "1:79",
 	[6] = "2:68",
@@ -2039,6 +2045,11 @@ ItemizerRandomProps = {
 	[2163] = "44:367:363:371",
 }
 
+--[[
+	This is the Suffixes table.
+	This table contains the string of the randomProp's suffix ("of the Owl").
+	This table is indexed by a number generated at random for that specific suffix.
+ ]]
 ItemizerSuffixes = {
 	[1] = "of Intellect",
 	[2] = "of Strength",
@@ -2086,6 +2097,13 @@ ItemizerSuffixes = {
 	[44] = "of Striking",
 }
 
+--[[
+	This is the Enchants table.
+	This table holds the quantity of the modifier and a key to the modifier type.
+	The key is comprised of two strings united by a dash character "-".
+	The left side of the dash is a two letter string that encodes the class of modifier (Per five, Stat, Weapon Skill, etc).
+	The right part of the dash is a three letter string that encodes the type of modification (Fire, Sword, Health, Intellect).
+ ]]
 ItemizerEnchants = {
 	[67] = {1, "Ba-Dam",},	--"+1 Damage"
 	[68] = {1, "Ba-Str",},	--"+1 Strength"
@@ -2143,69 +2161,69 @@ ItemizerEnchants = {
 	[121] = {20, "Ba-Arm",},	--"+20 Armor"
 	[122] = {24, "Ba-Arm",},	--"+24 Armor"
 	[123] = {28, "Ba-Arm",},	--"+28 Armor"
-	[125] = {1, "OH-Sw",},	--"Sword Skill +1"
-	[126] = {2, "OH-Sw",},	--"Sword Skill +2"
-	[127] = {3, "OH-Sw",},	--"Sword Skill +3"
-	[128] = {4, "OH-Sw",},	--"Sword Skill +4"
-	[129] = {5, "OH-Sw",},	--"Sword Skill +5"
-	[130] = {6, "OH-Sw",},	--"Sword Skill +6"
-	[131] = {7, "OH-Sw",},	--"Sword Skill +7"
-	[132] = {1, "TH-Sw",},	--"Two-Handed Sword Skill +1"
-	[133] = {2, "TH-Sw",},	--"Two-Handed Sword Skill +2"
-	[134] = {3, "TH-Sw",},	--"Two-Handed Sword Skill +3"
-	[135] = {4, "TH-Sw",},	--"Two-Handed Sword Skill +4"
-	[136] = {5, "TH-Sw",},	--"Two-Handed Sword Skill +5"
-	[137] = {6, "TH-Sw",},	--"Two-Handed Sword Skill +6"
-	[138] = {7, "TH-Sw",},	--"Two-Handed Sword Skill +7"
-	[139] = {1, "OH-Ma",},	--"Mace Skill +1"
-	[140] = {2, "OH-Ma",},	--"Mace Skill +2"
-	[141] = {3, "OH-Ma",},	--"Mace Skill +3"
-	[142] = {4, "OH-Ma",},	--"Mace Skill +4"
-	[143] = {5, "OH-Ma",},	--"Mace Skill +5"
-	[144] = {6, "OH-Ma",},	--"Mace Skill +6"
-	[145] = {7, "OH-Ma",},	--"Mace Skill +7"
-	[146] = {1, "TH-Ma",},	--"Two-Handed Mace Skill +1"
-	[147] = {2, "TH-Ma",},	--"Two-Handed Mace Skill +2"
-	[148] = {3, "TH-Ma",},	--"Two-Handed Mace Skill +3"
-	[149] = {4, "TH-Ma",},	--"Two-Handed Mace Skill +4"
-	[150] = {5, "TH-Ma",},	--"Two-Handed Mace Skill +5"
-	[151] = {6, "TH-Ma",},	--"Two-Handed Mace Skill +6"
-	[152] = {7, "TH-Ma",},	--"Two-Handed Mace Skill +7"
-	[153] = {1, "OH-Ax",},	--"Axe Skill +1"
-	[154] = {2, "OH-Ax",},	--"Axe Skill +2"
-	[155] = {3, "OH-Ax",},	--"Axe Skill +3"
-	[156] = {4, "OH-Ax",},	--"Axe Skill +4"
-	[157] = {5, "OH-Ax",},	--"Axe Skill +5"
-	[158] = {6, "OH-Ase",},	--"Ase Skill +6"
-	[159] = {7, "OH-Ax",},	--"Axe Skill +7"
-	[160] = {1, "TH-Ax",},	--"Two-Handed Axe Skill +1"
-	[161] = {2, "TH-Ax",},	--"Two-Handed Axe Skill +2"
-	[162] = {3, "TH-Ax",},	--"Two-Handed Axe Skill +3"
-	[163] = {4, "TH-Ax",},	--"Two-Handed Axe Skill +4"
-	[164] = {5, "TH-Ax",},	--"Two-Handed Axe Skill +5"
-	[165] = {6, "TH-Ax",},	--"Two-Handed Axe Skill +6"
-	[166] = {7, "TH-Ax",},	--"Two-Handed Axe Skill +7"
-	[167] = {1, "OH-Da",},	--"Dagger Skill +1"
-	[168] = {2, "OH-Da",},	--"Dagger Skill +2"
-	[169] = {3, "OH-Da",},	--"Dagger Skill +3"
-	[170] = {4, "OH-Da",},	--"Dagger Skill +4"
-	[171] = {5, "OH-Da",},	--"Dagger Skill +5"
-	[172] = {6, "OH-Da",},	--"Dagger Skill +6"
-	[173] = {7, "OH-Da",},	--"Dagger Skill +7"
-	[174] = {1, "OH-Gu",},	--"Gun Skill +1"
-	[175] = {2, "OH-Gu",},	--"Gun Skill +2"
-	[176] = {3, "OH-Gu",},	--"Gun Skill +3"
-	[177] = {4, "OH-Gu",},	--"Gun Skill +4"
-	[178] = {5, "OH-Gu",},	--"Gun Skill +5"
-	[179] = {6, "OH-Gu",},	--"Gun Skill +6"
-	[180] = {7, "OH-Gu",},	--"Gun Skill +7"
-	[181] = {1, "OH-Bo",},	--"Bow Skill +1"
-	[182] = {2, "OH-Bo",},	--"Bow Skill +2"
-	[183] = {3, "OH-Bo",},	--"Bow Skill +3"
-	[184] = {4, "OH-Bo",},	--"Bow Skill +4"
-	[185] = {5, "OH-Bo",},	--"Bow Skill +5"
-	[186] = {6, "OH-Bo",},	--"Bow Skill +6"
-	[187] = {7, "OH-Bo",},	--"Bow Skill +7"
+	[125] = {1, "OH-Swo",},	--"Sword Skill +1"
+	[126] = {2, "OH-Swo",},	--"Sword Skill +2"
+	[127] = {3, "OH-Swo",},	--"Sword Skill +3"
+	[128] = {4, "OH-Swo",},	--"Sword Skill +4"
+	[129] = {5, "OH-Swo",},	--"Sword Skill +5"
+	[130] = {6, "OH-Swo",},	--"Sword Skill +6"
+	[131] = {7, "OH-Swo",},	--"Sword Skill +7"
+	[132] = {1, "TH-Swo",},	--"Two-Handed Sword Skill +1"
+	[133] = {2, "TH-Swo",},	--"Two-Handed Sword Skill +2"
+	[134] = {3, "TH-Swo",},	--"Two-Handed Sword Skill +3"
+	[135] = {4, "TH-Swo",},	--"Two-Handed Sword Skill +4"
+	[136] = {5, "TH-Swo",},	--"Two-Handed Sword Skill +5"
+	[137] = {6, "TH-Swo",},	--"Two-Handed Sword Skill +6"
+	[138] = {7, "TH-Swo",},	--"Two-Handed Sword Skill +7"
+	[139] = {1, "OH-Mac",},	--"Mace Skill +1"
+	[140] = {2, "OH-Mac",},	--"Mace Skill +2"
+	[141] = {3, "OH-Mac",},	--"Mace Skill +3"
+	[142] = {4, "OH-Mac",},	--"Mace Skill +4"
+	[143] = {5, "OH-Mac",},	--"Mace Skill +5"
+	[144] = {6, "OH-Mac",},	--"Mace Skill +6"
+	[145] = {7, "OH-Mac",},	--"Mace Skill +7"
+	[146] = {1, "TH-Mac",},	--"Two-Handed Mace Skill +1"
+	[147] = {2, "TH-Mac",},	--"Two-Handed Mace Skill +2"
+	[148] = {3, "TH-Mac",},	--"Two-Handed Mace Skill +3"
+	[149] = {4, "TH-Mac",},	--"Two-Handed Mace Skill +4"
+	[150] = {5, "TH-Mac",},	--"Two-Handed Mace Skill +5"
+	[151] = {6, "TH-Mac",},	--"Two-Handed Mace Skill +6"
+	[152] = {7, "TH-Mac",},	--"Two-Handed Mace Skill +7"
+	[153] = {1, "OH-Axe",},	--"Axe Skill +1"
+	[154] = {2, "OH-Axe",},	--"Axe Skill +2"
+	[155] = {3, "OH-Axe",},	--"Axe Skill +3"
+	[156] = {4, "OH-Axe",},	--"Axe Skill +4"
+	[157] = {5, "OH-Axe",},	--"Axe Skill +5"
+	[158] = {6, "OH-Axe",},	--"Ase Skill +6"
+	[159] = {7, "OH-Axe",},	--"Axe Skill +7"
+	[160] = {1, "TH-Axe",},	--"Two-Handed Axe Skill +1"
+	[161] = {2, "TH-Axe",},	--"Two-Handed Axe Skill +2"
+	[162] = {3, "TH-Axe",},	--"Two-Handed Axe Skill +3"
+	[163] = {4, "TH-Axe",},	--"Two-Handed Axe Skill +4"
+	[164] = {5, "TH-Axe",},	--"Two-Handed Axe Skill +5"
+	[165] = {6, "TH-Axe",},	--"Two-Handed Axe Skill +6"
+	[166] = {7, "TH-Axe",},	--"Two-Handed Axe Skill +7"
+	[167] = {1, "OH-Dag",},	--"Dagger Skill +1"
+	[168] = {2, "OH-Dag",},	--"Dagger Skill +2"
+	[169] = {3, "OH-Dag",},	--"Dagger Skill +3"
+	[170] = {4, "OH-Dag",},	--"Dagger Skill +4"
+	[171] = {5, "OH-Dag",},	--"Dagger Skill +5"
+	[172] = {6, "OH-Dag",},	--"Dagger Skill +6"
+	[173] = {7, "OH-Dag",},	--"Dagger Skill +7"
+	[174] = {1, "OH-Gun",},	--"Gun Skill +1"
+	[175] = {2, "OH-Gun",},	--"Gun Skill +2"
+	[176] = {3, "OH-Gun",},	--"Gun Skill +3"
+	[177] = {4, "OH-Gun",},	--"Gun Skill +4"
+	[178] = {5, "OH-Gun",},	--"Gun Skill +5"
+	[179] = {6, "OH-Gun",},	--"Gun Skill +6"
+	[180] = {7, "OH-Gun",},	--"Gun Skill +7"
+	[181] = {1, "OH-Bow",},	--"Bow Skill +1"
+	[182] = {2, "OH-Bow",},	--"Bow Skill +2"
+	[183] = {3, "OH-Bow",},	--"Bow Skill +3"
+	[184] = {4, "OH-Bow",},	--"Bow Skill +4"
+	[185] = {5, "OH-Bow",},	--"Bow Skill +5"
+	[186] = {6, "OH-Bow",},	--"Bow Skill +6"
+	[187] = {7, "OH-Bow",},	--"Bow Skill +7"
 	[188] = {2, "Sl-Bea",},	--"+2 Beast Slaying"
 	[189] = {4, "Sl-Bea",},	--"+4 Beast Slaying"
 	[190] = {6, "Sl-Bea",},	--"+6 Beast Slaying"
@@ -3064,57 +3082,60 @@ ItemizerEnchants = {
 	[2398] = {14, "P5-Man",},	--"+14 mana every 5 sec."
 	[2399] = {15, "P5-Man",},	--"+15 mana every 5 sec."
 	[2400] = {15, "P5-Man",},	--"+15 mana every 5 sec."
-	[2401] = {1, "P5-Hea",},	--"+1 health every 5 sec."
-	[2402] = {1, "P5-Hea",},	--"+1 health every 5 sec."
-	[2403] = {1, "P5-Hea",},	--"+1 health every 5 sec."
-	[2404] = {1, "P5-Hea",},	--"+1 health every 5 sec."
-	[2405] = {1, "P5-Hea",},	--"+1 health every 5 sec."
-	[2406] = {2, "P5-Hea",},	--"+2 health every 5 sec."
-	[2407] = {2, "P5-Hea",},	--"+2 health every 5 sec."
-	[2408] = {2, "P5-Hea",},	--"+2 health every 5 sec."
-	[2409] = {2, "P5-Hea",},	--"+2 health every 5 sec."
-	[2410] = {3, "P5-Hea",},	--"+3 health every 5 sec."
-	[2411] = {3, "P5-Hea",},	--"+3 health every 5 sec."
-	[2412] = {3, "P5-Hea",},	--"+3 health every 5 sec."
-	[2413] = {3, "P5-Hea",},	--"+3 health every 5 sec."
-	[2414] = {4, "P5-Hea",},	--"+4 health every 5 sec."
-	[2415] = {4, "P5-Hea",},	--"+4 health every 5 sec."
-	[2416] = {4, "P5-Hea",},	--"+4 health every 5 sec."
-	[2417] = {4, "P5-Hea",},	--"+4 health every 5 sec."
-	[2418] = {5, "P5-Hea",},	--"+5 health every 5 sec."
-	[2419] = {5, "P5-Hea",},	--"+5 health every 5 sec."
-	[2420] = {5, "P5-Hea",},	--"+5 health every 5 sec."
-	[2421] = {5, "P5-Hea",},	--"+5 health every 5 sec."
-	[2422] = {6, "P5-Hea",},	--"+6 health every 5 sec."
-	[2423] = {6, "P5-Hea",},	--"+6 health every 5 sec."
-	[2424] = {6, "P5-Hea",},	--"+6 health every 5 sec."
-	[2425] = {6, "P5-Hea",},	--"+6 health every 5 sec."
-	[2426] = {7, "P5-Hea",},	--"+7 health every 5 sec."
-	[2427] = {7, "P5-Hea",},	--"+7 health every 5 sec."
-	[2428] = {7, "P5-Hea",},	--"+7 health every 5 sec."
-	[2429] = {7, "P5-Hea",},	--"+7 health every 5 sec."
-	[2430] = {8, "P5-Hea",},	--"+8 health every 5 sec."
-	[2431] = {8, "P5-Hea",},	--"+8 health every 5 sec."
-	[2432] = {8, "P5-Hea",},	--"+8 health every 5 sec."
-	[2433] = {8, "P5-Hea",},	--"+8 health every 5 sec."
-	[2434] = {9, "P5-Hea",},	--"+9 health every 5 sec."
-	[2435] = {9, "P5-Hea",},	--"+9 health every 5 sec."
-	[2436] = {9, "P5-Hea",},	--"+9 health every 5 sec."
-	[2437] = {9, "P5-Hea",},	--"+9 health every 5 sec."
-	[2438] = {10, "P5-Hea",},	--"+10 health every 5 sec."
-	[2607] = {12, "Sp-Dam",},	--"+12 Damage and Healing Spells"
-	[2608] = {13, "Sp-Dam",},	--"+13 Damage and Healing Spells"
-	[2609] = {15, "Sp-Dam",},	--"+15 Damage and Healing Spells"
-	[2610] = {14, "Sp-Dam",},	--"+14 Damage and Healing Spells"
-	[2612] = {18, "Sp-Dam",},	--"+18 Damage and Healing Spells"
+	[2401] = {1, "P5-Het",},	--"+1 health every 5 sec."
+	[2402] = {1, "P5-Het",},	--"+1 health every 5 sec."
+	[2403] = {1, "P5-Het",},	--"+1 health every 5 sec."
+	[2404] = {1, "P5-Het",},	--"+1 health every 5 sec."
+	[2405] = {1, "P5-Het",},	--"+1 health every 5 sec."
+	[2406] = {2, "P5-Het",},	--"+2 health every 5 sec."
+	[2407] = {2, "P5-Het",},	--"+2 health every 5 sec."
+	[2408] = {2, "P5-Het",},	--"+2 health every 5 sec."
+	[2409] = {2, "P5-Het",},	--"+2 health every 5 sec."
+	[2410] = {3, "P5-Het",},	--"+3 health every 5 sec."
+	[2411] = {3, "P5-Het",},	--"+3 health every 5 sec."
+	[2412] = {3, "P5-Het",},	--"+3 health every 5 sec."
+	[2413] = {3, "P5-Het",},	--"+3 health every 5 sec."
+	[2414] = {4, "P5-Het",},	--"+4 health every 5 sec."
+	[2415] = {4, "P5-Het",},	--"+4 health every 5 sec."
+	[2416] = {4, "P5-Het",},	--"+4 health every 5 sec."
+	[2417] = {4, "P5-Het",},	--"+4 health every 5 sec."
+	[2418] = {5, "P5-Het",},	--"+5 health every 5 sec."
+	[2419] = {5, "P5-Het",},	--"+5 health every 5 sec."
+	[2420] = {5, "P5-Het",},	--"+5 health every 5 sec."
+	[2421] = {5, "P5-Het",},	--"+5 health every 5 sec."
+	[2422] = {6, "P5-Het",},	--"+6 health every 5 sec."
+	[2423] = {6, "P5-Het",},	--"+6 health every 5 sec."
+	[2424] = {6, "P5-Het",},	--"+6 health every 5 sec."
+	[2425] = {6, "P5-Het",},	--"+6 health every 5 sec."
+	[2426] = {7, "P5-Het",},	--"+7 health every 5 sec."
+	[2427] = {7, "P5-Het",},	--"+7 health every 5 sec."
+	[2428] = {7, "P5-Het",},	--"+7 health every 5 sec."
+	[2429] = {7, "P5-Het",},	--"+7 health every 5 sec."
+	[2430] = {8, "P5-Het",},	--"+8 health every 5 sec."
+	[2431] = {8, "P5-Het",},	--"+8 health every 5 sec."
+	[2432] = {8, "P5-Het",},	--"+8 health every 5 sec."
+	[2433] = {8, "P5-Het",},	--"+8 health every 5 sec."
+	[2434] = {9, "P5-Het",},	--"+9 health every 5 sec."
+	[2435] = {9, "P5-Het",},	--"+9 health every 5 sec."
+	[2436] = {9, "P5-Het",},	--"+9 health every 5 sec."
+	[2437] = {9, "P5-Het",},	--"+9 health every 5 sec."
+	[2438] = {10, "P5-Het",},	--"+10 health every 5 sec."
+	[2607] = {12, "Sp-D&H",},	--"+12 Damage and Healing Spells"
+	[2608] = {13, "Sp-D&H",},	--"+13 Damage and Healing Spells"
+	[2609] = {15, "Sp-D&H",},	--"+15 Damage and Healing Spells"
+	[2610] = {14, "Sp-D&H",},	--"+14 Damage and Healing Spells"
+	[2612] = {18, "Sp-D&H",},	--"+18 Damage and Healing Spells"
 }
 
 --[[
+	This section is the debugging info, it shows the final tallies for the enchants and randomProps.
 
-	Number of enchants: 1035
+	Number of randomProps: 2012
 
 	Number of item suffixes: 44
 
-	Number of unique enchant keys: 36
+	Number of enchants: 1035
+
+	Number of unique enchant keys: 35
 
 ]]

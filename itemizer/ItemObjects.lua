@@ -3,6 +3,10 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
+	Itemizer Objects
+	Initialization of Itemizer method tables.
+	Thanks to the Sea coders for their invaluable input
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -23,6 +27,10 @@ Itemizer = {
 	Command = {};
 
 	Core = {};
+
+	Frames = {};
+
+	GUI = {};
 
 	Scanner = {};
 

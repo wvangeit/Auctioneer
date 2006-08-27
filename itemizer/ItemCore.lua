@@ -27,15 +27,22 @@ local onEvent
 local scanBank
 local getItemLinks
 local processLinks
-local createFrames
-local scanInventory
 local scanMerchant
-local registerEvents
 local scanItemCache
+local scanInventory
+local registerEvents
 local variablesLoaded
 local addLinkToProcessStack
+local itemCacheScanInProgress
+
+--Making a local copy of these extensively used functions will make their calling faster.
+local getItemVersion
+local strfind = string.find
 
 local inspectTargets = {};
+
+local _, gameBuildNumber = GetBuildInfo()
+gameBuildNumber = tonumber(gameBuildNumber)
 
 local itemCacheScanCeiling = 30000; --At the time of writing, the item with the highest ItemID is "Undercity Pledge Collection" with an ItemID of 22300 (thanks to zeeg for the info [http://www.wowguru.com/db/items/id22300/]), so a ceiling of 30,000 is more than reasonable IMHO.
 
@@ -66,25 +73,6 @@ local bankSlots = {
 	BANK_CONTAINER, 5, 6, 7, 8, 9, 10
 }
 
-function createFrames()
-	if (ItemizerFrame) then
-		return;
-	end
-
-	ItemizerFrame = CreateFrame("Frame", "ItemizerFrame", UIParent);
-	ItemizerFrame:SetScript("OnEvent", Itemizer.Core.OnEvent);
-
-	ItemizerTooltip = CreateFrame("GameTooltip", "ItemizerTooltip", nil, "GameTooltipTemplate");
-	ItemizerHidden = CreateFrame("GameTooltip", "ItemizerHidden", nil, "GameTooltipTemplate");
-	ItemizerHidden:Show();
-	ItemizerHidden:SetOwner(this,"ANCHOR_NONE");
-	ItemizerHidden:Show();
-
-	ItemizerScanFrame = CreateFrame("Frame", "ItemizerScanFrame", UIParent);
-	ItemizerScanFrame:SetScript("OnUpdate", function() Itemizer.Scanner.OnUpdate(arg1) end);
-	ItemizerScanFrame:Show();
-end
-
 function registerEvents()
 	for index, event in pairs(eventsToRegister) do
 		ItemizerFrame:RegisterEvent(event)
@@ -110,7 +98,7 @@ function onEvent()
 			end
 		end
 
-	elseif (string.find(event, "CHAT_MSG")) then
+	elseif (strfind(event, "CHAT_MSG")) then
 		debugprofilestart()
 		processLinks(arg1);
 
@@ -146,10 +134,32 @@ function processLinks(str, fromAPI)
 
 	if (items) then
 		for index, link in pairs(items) do
+			--Only add items to the processing stack that have not been previously parsed on this version of the game.
+			local itemID, randomProp = EnhTooltip.BreakLink(link)
 
-			--This debug call increases inspect time 20 fold, if the debugging frame is visible.
-			--EnhTooltip.DebugPrint("Itemizer: Found Item", link);
-			addLinkToProcessStack(link)
+			if (itemID == 0) then
+				itemID = nil
+			end
+			if (randomProp == 0) then
+				randomProp = nil
+			end
+
+			local itemBuildNumber, itemIsCurrent, randomPropInItem = getItemVersion(itemID, randomProp)
+			local randomPropOK
+
+			if (not randomProp) then
+				randomPropOK = true
+			else
+				randomPropOK = randomPropInItem
+			end
+
+			if (not (itemBuildNumber and itemIsCurrent and randomPropOK)) then
+	
+				if (not itemCacheScanInProgress) then
+					EnhTooltip.DebugPrint("Itemizer: New link:", link, itemBuildNumber, itemIsCurrent, randomPropInItem)
+				end
+				addLinkToProcessStack(link)
+			end
 		end
 	end
 end
@@ -175,8 +185,11 @@ function inspect(unit)
 end
 
 function variablesLoaded()
+	getItemVersion = Itemizer.Storage.GetItemVersion
 	EnhTooltip.DebugPrint("Itemizer: ItemCache Size", Itemizer.Util.ItemCacheSize())
-	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
+
+	Itemizer.GUI.OnLoad()
+	Itemizer.GUI.BuildItemList()
 end
 
 function scanMerchant()
@@ -193,14 +206,20 @@ function scanItemCache()
 	local link
 	local itemsFound = 0
 	local buildLink = Itemizer.Util.BuildLink
+	
 
 	for index = 1, Itemizer.Core.Constants.ItemCacheScanCeiling do
 		link = buildLink(index)
 		if (link) then
+			if (itemsFound > 20) then
+				itemCacheScanInProgress = true
+			end
 			processLinks(link, true)
 			itemsFound = itemsFound + 1
 		end
 	end
+
+	itemCacheScanInProgress = false
 
 	local totalTimeTaken = debugprofilestop()
 	EnhTooltip.DebugPrint(
@@ -248,7 +267,6 @@ Itemizer.Core = {
 	OnEvent = onEvent,
 	ScanBank = scanBank,
 	ProcessLinks = processLinks,
-	CreateFrames = createFrames,
 	ScanInventory = scanInventory,
 	ScanMerchant = scanMerchant,
 	RegisterEvents = registerEvents,
@@ -259,6 +277,7 @@ Itemizer.Core = {
 
 Itemizer.Core.Constants = {
 	BankSlots = bankSlots,
+	GameBuildNumber = gameBuildNumber,
 	EventsToRegister = eventsToRegister,
 	PlayerFaction = UnitFactionGroup("player"),
 	ItemCacheScanCeiling = itemCacheScanCeiling,

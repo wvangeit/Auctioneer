@@ -1,4 +1,4 @@
-#	Itemizer Addon for World of Warcraft(tm).
+﻿#	Itemizer Addon for World of Warcraft(tm).
 #	Version: <%version%> (<%codename%>)
 #	Revision: $Id$
 #
@@ -28,9 +28,13 @@ print "\n\nStarting to generate Itemizer's cache tables.\n";
 
 # Scalar Variable Declarations
 my $count = 1;
+my $keyCount;
 my $ItemTables;
 my $EnchantDBC;
 my $RandomPropDBC;
+my $numberOfRandomProps = 1;
+
+# Hash Variable Declarations
 my %itemSuffixes;
 my %enchantKeys;
 my %interestedEnchants;
@@ -38,12 +42,12 @@ my %interestedEnchants;
 # File Handle Declarations
 open($ItemTables, ">", "ItemTables.lua");
 open($EnchantDBC, "SpellItemEnchantment.dbc.csv")
-	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"SpellItemEnchantment.dbc.csv\" file missing.\n";
+	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"SpellItemEnchantment.dbc.csv\" file missing.\n\n";
 open($RandomPropDBC, "ItemRandomProperties.dbc.csv")
-	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"ItemRandomProperties.dbc.csv\" file missing.\n";
+	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"ItemRandomProperties.dbc.csv\" file missing.\n\n";
 
 if(not($EnchantDBC and $RandomPropDBC)){
-	die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"SpellItemEnchantment.dbc.csv\" or \"ItemRandomProperties.dbc.csv\" file missing.\n";
+	die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"SpellItemEnchantment.dbc.csv\" or \"ItemRandomProperties.dbc.csv\" file missing.\n\n";
 }
 
 # Print the warning and licence boilerplate first
@@ -77,6 +81,12 @@ print $ItemTables "--[[
 
 # First up is the RandomProps table
 print "Generating the RandomProps table.\n";
+print $ItemTables "--[[
+	This is the RandomProps table.
+	This table holds a string that contains two, three or four numbers separated by a colon \":\".
+	The first number is the key to the suffix of the randomProp found in the Suffixes table (duh!).
+	The other one, two or three numbers are the keys to the enchants that the randomProp is comprised of.
+ ]]\n";
 print $ItemTables "ItemizerRandomProps = {\n";
 while(<$RandomPropDBC>){
 	chomp;
@@ -84,6 +94,7 @@ while(<$RandomPropDBC>){
 
 	my $curLine;
 	if ($line[2]){
+		$numberOfRandomProps++;
 		if($itemSuffixes{$line[7]}){
 			$line[7] = $itemSuffixes{$line[7]};
 
@@ -116,6 +127,11 @@ print $ItemTables "}\n\n";
 
 # Next up is the item suffixes table
 print "Generating the Suffixes table.\n";
+print $ItemTables "--[[
+	This is the Suffixes table.
+	This table contains the string of the randomProp's suffix (\"of the Owl\").
+	This table is indexed by a number generated at random for that specific suffix.
+ ]]\n";
 print $ItemTables "ItemizerSuffixes = {\n";
 my $key;
 foreach $key (sort { $itemSuffixes{$a} <=> $itemSuffixes{$b} } keys %itemSuffixes) {
@@ -125,6 +141,13 @@ print $ItemTables "}\n\n";
 
 # Last is the Enchants table
 print "Generating the Enchants table.\n";
+print $ItemTables "--[[
+	This is the Enchants table.
+	This table holds the quantity of the modifier and a key to the modifier type.
+	The key is comprised of two strings united by a dash character \"-\".
+	The left side of the dash is a two letter string that encodes the class of modifier (Per five, Stat, Weapon Skill, etc).
+	The right part of the dash is a three letter string that encodes the type of modification (Fire, Sword, Health, Intellect).
+ ]]\n";
 print $ItemTables "ItemizerEnchants = {\n";
 while(<$EnchantDBC>){
 	chomp;
@@ -143,14 +166,14 @@ while(<$EnchantDBC>){
 			$word2 = $3;
 			$word1 = $2;
 			$ammount = $1;
-			if(($word2 eq "Resistance") or ($word1 eq "Resist")){
+			if(($word2 eq "Resistance") or ($word1 eq "Resist")){ # Got to account for a Blizzard typo here
 				$word2 = "Re";
 
 				$word1 =~ s/Fire/Fir/i;
 				$word1 =~ s/Holy/Hol/i;
 				$word1 =~ s/Frost/Fro/i;
 				$word1 =~ s/Nature/Nat/i;
-				$word1 =~ s/Resist/Sha/i;
+				$word1 =~ s/Resist/Sha/i;# Typo here
 				$word1 =~ s/Arcane/Arc/i;
 				$word1 =~ s/Shadow/Sha/i;
 
@@ -169,7 +192,7 @@ while(<$EnchantDBC>){
 				$word2 = "P5";
 
 				$word1 =~ s/Mana/Man/i;
-				$word1 =~ s/Health/Hea/i;
+				$word1 =~ s/Health/Het/i;
 
 			}elsif($word2 eq "Slaying"){
 				$word2 = "Sl";
@@ -181,7 +204,7 @@ while(<$EnchantDBC>){
 
 			}elsif($word2 eq "and"){
 				$word2 = "Sp";
-				$word1 = "Dam";
+				$word1 = "D&H";
 
 			}elsif($word2 eq "Attack"){
 				$word2 = "Atk";
@@ -195,7 +218,7 @@ while(<$EnchantDBC>){
 		}elsif ($curLine =~ m/\+(\d+)\s(\w*)/i){
 			$word1 = $2;
 			$ammount = $1;
-			
+
 			$word1 =~ s/Spirit/Spi/i;
 			$word1 =~ s/Agility/Agi/i;
 			$word1 =~ s/Armor/Arm/i;
@@ -212,13 +235,13 @@ while(<$EnchantDBC>){
 		}elsif($curLine =~ m/Two-Handed\s(\w*)\sSkill\s\+(\d*)/i){
 			$word1 = $1;
 			$ammount = $2;
-			
-			$word1 =~ s/Axe/Ax/i;
-			$word1 =~ s/Bow/Bo/i;
-			$word1 =~ s/Gun/Gu/i;
-			$word1 =~ s/Mace/Ma/i;
-			$word1 =~ s/Sword/Sw/i;
-			$word1 =~ s/Dagger/Da/i;
+
+			$word1 =~ s/Axe/Axe/i;
+			$word1 =~ s/Bow/Bow/i;
+			$word1 =~ s/Gun/Gun/i;
+			$word1 =~ s/Mace/Mac/i;
+			$word1 =~ s/Sword/Swo/i;
+			$word1 =~ s/Dagger/Dag/i;
 			print $ItemTables "\t";
 			print $ItemTables "[$line[0]] = {$ammount, \"TH-$word1\",},\t--$curLine";
 			print $ItemTables "\n";
@@ -227,13 +250,14 @@ while(<$EnchantDBC>){
 		}elsif($curLine =~ m/(\w*)\sSkill\s\+(\d*)/i){
 			$word1 = $1;
 			$ammount = $2;
-			
-			$word1 =~ s/Axe/Ax/i;
-			$word1 =~ s/Bow/Bo/i;
-			$word1 =~ s/Gun/Gu/i;
-			$word1 =~ s/Mace/Ma/i;
-			$word1 =~ s/Sword/Sw/i;
-			$word1 =~ s/Dagger/Da/i;
+
+			$word1 =~ s/Axe/Axe/i;
+			$word1 =~ s/Ase/Axe/i; # Yet another blizzard typo
+			$word1 =~ s/Bow/Bow/i;
+			$word1 =~ s/Gun/Gun/i;
+			$word1 =~ s/Mace/Mac/i;
+			$word1 =~ s/Sword/Swo/i;
+			$word1 =~ s/Dagger/Dag/i;
 			print $ItemTables "\t";
 			print $ItemTables "[$line[0]] = {$ammount, \"OH-$word1\",},\t--$curLine";
 			print $ItemTables "\n";
@@ -246,10 +270,13 @@ print $ItemTables "}\n\n";
 
 # Just for debugging
 print "Printing debugging info.\n";
-my $var2;
-print $ItemTables "--[[\n\n\t", "Number of enchants: ", $var2 = keys(%interestedEnchants), "\n";
-print $ItemTables "\n\t", "Number of item suffixes: ", $var2 = keys(%itemSuffixes), "\n";
-print $ItemTables "\n\t", "Number of unique enchant keys: ", $var2 = keys(%enchantKeys), "\n\n";
+print $ItemTables "--[[
+	This section is the debugging info, it shows the final tallies for the enchants and randomProps.";
+
+print $ItemTables "\n\n\t", "Number of randomProps: ", $numberOfRandomProps, "\n";
+print $ItemTables "\n\t", "Number of item suffixes: ", $keyCount = keys(%itemSuffixes), "\n";
+print $ItemTables "\n\t", "Number of enchants: ", $keyCount = keys(%interestedEnchants), "\n";
+print $ItemTables "\n\t", "Number of unique enchant keys: ", $keyCount = keys(%enchantKeys), "\n\n";
 print $ItemTables "]]\n";
 
 # Close our file handles

@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Itemizer
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
@@ -25,12 +25,13 @@
 
 
 Itemizer.Version="<%version%>";
--- If you want to see debug messages, create a window called "Debug" within the client.
+-- If you want to see debug messages, create a window called "ETTDebug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
 	Itemizer.Version = "3.7.DEV";
 end
 
 --Saved Variables
+ItemizerSets = {}
 ItemizerLinks = {}
 ItemizerConfig = {}
 
@@ -38,15 +39,9 @@ ItemizerConfig = {}
 ItemizerProcessStack = {}
 ItemizerRunningStack = {}
 
---Global Frame Names
-ItemizerFrame = nil;
-ItemizerTooltip = nil;
-ItemizerHidden = nil;
-ItemizerScanFrame = nil;
-
 local function onLoad()
 
-	Itemizer.Core.CreateFrames();
+	Itemizer.Frames.CreateFrames();
 	Itemizer.Core.RegisterEvents();
 
 	-- Setup the default for stubby to always load (people can override this on a per toon basis)
@@ -75,6 +70,7 @@ local function onLoad()
 				end
 			elseif (cmd == "clear") then
 				--Saved Variables
+				ItemizerSets = {}
 				ItemizerLinks = {}
 				ItemizerConfig = {}
 
@@ -82,6 +78,7 @@ local function onLoad()
 				ItemizerProcessStack = {}
 				ItemizerRunningStack = {}
 				Stubby.Print("Itemizer Variables cleared")
+				EnhTooltip.DebugPrint("Itemizer Variables cleared")
 			else
 				Stubby.Print("Itemizer is currently not loaded.")
 				Stubby.Print("  You may load it now by typing |cffffffff/itemizer load|r")
