@@ -199,7 +199,7 @@ end
 
 function getKhaosFinishList() --Local
 	local list = {}
-	for i = 0, 3 do
+	for i = 0, 2 do
 		list[_AUCT('CmdFinish'..i)] = i
 	end
 	return list
@@ -1252,6 +1252,7 @@ function buildCommandMap()
 		[_AUCT('CmdAskPriceGuild')]		=	'guild',
 		[_AUCT('CmdAskPriceParty')]		=	'party',
 		[_AUCT('CmdAskPriceSmart')]		=	'smart',
+		[_AUCT('CmdAskPriceWord')]		=	'word',
 		[_AUCT('CmdAskPriceAd')]		=	'ad',
 
 		-- Post/Search Tab related commands
@@ -1413,13 +1414,13 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
 
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
-	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
+	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r\n          %s\n\n";
 
 	local _, frameName = getFrameNames(getFrameIndex());
 
 	Auctioneer.Util.ChatPrint(_AUCT('TextUsage'));
-	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer.Util.GetLocalizedFilterVal("all").."]|r - " .. _AUCT('HelpOnoff'));
-	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer ".._AUCT('CmdDisable').."|r - " .. _AUCT('HelpDisable'));
+	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer.Util.GetLocalizedFilterVal("all").."]|r\n          " .. _AUCT('HelpOnoff') .. "\n\n");
+	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer ".._AUCT('CmdDisable').."|r\n          " .. _AUCT('HelpDisable') .. "\n\n");
 
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowVerbose'), Auctioneer.Util.GetLocalizedFilterVal('show-verbose'), _AUCT('HelpVerbose')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowAverage'), Auctioneer.Util.GetLocalizedFilterVal('show-average'), _AUCT('HelpAverage')));
@@ -1435,12 +1436,11 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdWarnColor'), Auctioneer.Util.GetLocalizedFilterVal('warn-color'), _AUCT('HelpWarnColor')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdUpdatePrice'), Auctioneer.Util.GetLocalizedFilterVal('update-price'), _AUCT('HelpUpdatePrice')));
 
-	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r - %s";
+	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r\n          %s\n\n";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));
---[[
-	--this line is causing hangs, disabled for now pending further investigation.
+
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionDuration'), _AUCT('OptAuctionDuration'), _AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')), _AUCT('HelpAuctionDuration')));
-]]
+
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdLocale'), _AUCT('OptLocale'), Auctioneer.Util.GetLocalizedFilterVal("locale"), _AUCT('HelpLocale')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPrintin'), _AUCT('OptPrintin'), frameName, _AUCT('HelpPrintin')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdFinish'), _AUCT('OptFinish'), _AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')), _AUCT('HelpFinish')));
@@ -1455,7 +1455,7 @@ function chatPrintHelp()
 
 	Auctioneer.AskPrice.ChatPrintHelp()
 
-	lineFormat = "  |cffffffff/auctioneer %s %s|r - %s";
+	lineFormat = "  |cffffffff/auctioneer %s %s|r\n          %s\n\n";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdClear'), _AUCT('OptClear'), _AUCT('HelpClear')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAlso'), _AUCT('OptAlso'), _AUCT('HelpAlso')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdBroker'), _AUCT('OptBroker'), _AUCT('HelpBroker')));
@@ -1514,7 +1514,7 @@ end
 
 --The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function clear(param, chatprint)
-	if (not param) or (not type(param) == "string") then
+	if (not (type(param) == "string")) then
 		return
 	end
 
@@ -1966,8 +1966,6 @@ function getFilter(filter)
 	elseif ((value == _AUCT('CmdOff')) or (value == "off")) then return false; end
 	return true;
 end
-
-
 
 function findFilterClass(text)
 	local totalFilters = getn(CLASS_FILTERS);
