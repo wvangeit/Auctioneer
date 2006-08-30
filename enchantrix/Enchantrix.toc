@@ -11,10 +11,7 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
-..\..\FrameXML\Fonts.xml
-..\..\FrameXML\UIPanelTemplates.xml
-..\..\FrameXML\CharacterFrameTemplates.xml
-..\..\FrameXML\OptionsFrameTemplates.xml
+
 Babylonian\Babylonian.lua
 DisenchantList.lua
 EnxObjects.lua

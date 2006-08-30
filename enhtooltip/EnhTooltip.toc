@@ -8,8 +8,6 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
-..\..\FrameXML\Fonts.xml
-..\..\FrameXML\UIPanelTemplates.xml
-..\..\FrameXML\MoneyFrame.xml
+
 TinyMoneyFrame.xml
 Tooltip.xml
