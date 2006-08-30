@@ -165,6 +165,7 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["askprice-smart"]			=	"off",
 	["askprice-trigger"]		=	"?",
 	["askprice-ad"]				=	"on",
+	["askprice-whisper"]		=	"on",
 
 	-- Auction House tab UI
 	["bid-limit"]				=	1,
@@ -501,9 +502,7 @@ function lockAndLoad()
 	SLASH_AUCTIONEER1 = "/auctioneer";
 	SLASH_AUCTIONEER2 = "/auction";
 	SLASH_AUCTIONEER3 = "/auc";
-	SlashCmdList["AUCTIONEER"] = function(msg)
-		Auctioneer.Command.MainHandler(msg);
-	end
+	SlashCmdList["AUCTIONEER"] = Auctioneer.Command.MainHandler;
 
 	-- Rearranges elements in the AH window.
 	Auctioneer.Scanner.ConfigureAH();
@@ -513,13 +512,10 @@ function lockAndLoad()
 
 	--Init AskPrice
 	Auctioneer.AskPrice.Init();
---[[
-	--Register Auctioneer with Babylonian
-	if not Babylonian.IsAddOnRegistered("Auctioneer") then
-		Babylonian.RegisterAddOn("Auctioneer", Auctioneer.Command.SetLocale);
-	end
-]]
+
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
+	
+	collectgarbage() --Cleanup after that massive mem spike
 end
 
 Auctioneer.Core = {
