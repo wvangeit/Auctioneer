@@ -24,10 +24,10 @@
 ]]
 
 EnchantrixLocalizations = {};
+EnchantrixLocalizations["enUS"] = {};
 EnchantrixLocalizations["csCZ"] = {};
 EnchantrixLocalizations["daDK"] = {};
 EnchantrixLocalizations["deDE"] = {};
-EnchantrixLocalizations["enUS"] = {};
 EnchantrixLocalizations["esES"] = {};
 EnchantrixLocalizations["frFR"] = {};
 EnchantrixLocalizations["itIT"] = {};
@@ -41,6 +41,8 @@ EnchantrixLocalizations["zhTW"] = {};
 
 
 -- Section: Command Messages
+EnchantrixLocalizations["enUS"]["BarkerEnxWindowNotOpen"] = "Enchantrix: The enchant window is not open. The enchanting window must be open in order to use the barker."
+EnchantrixLocalizations["enUS"]["BarkerNoEnchantsAvail"] = "Enchantrix: You either don't have any enchants or don't have the reagents to make them."
 EnchantrixLocalizations["csCZ"]["FrmtActClearall"] = "Mazu vsechna Enchant data"
 EnchantrixLocalizations["daDK"]["FrmtActClearall"] = "Nulstiller al Enchant data"
 EnchantrixLocalizations["deDE"]["FrmtActClearall"] = "L\195\182sche alle Entzauberungsdaten"
@@ -704,6 +706,12 @@ EnchantrixLocalizations["ptPT"]["ArgSpellname"] = "Desencantar"
 EnchantrixLocalizations["ruRU"]["ArgSpellname"] = "\208\148\208\184\208\183\208\181\208\189\209\135\208\176\208\189\209\130"
 EnchantrixLocalizations["zhCN"]["ArgSpellname"] = "\229\136\134\232\167\163"
 EnchantrixLocalizations["zhTW"]["ArgSpellname"] = "Disenchant"
+EnchantrixLocalizations["enUS"]["BarkerOpening"] = "Selling Enchants:"
+EnchantrixLocalizations["enUS"]["Darnassus"] = "Darnassus"
+EnchantrixLocalizations["enUS"]["Ironforge"] = "City of IronForge"
+EnchantrixLocalizations["enUS"]["OneLetterGold"] = "g"
+EnchantrixLocalizations["enUS"]["OneLetterSilver"] = "s"
+EnchantrixLocalizations["enUS"]["Orgrimmar"] = "Orgrimmar"
 EnchantrixLocalizations["csCZ"]["PatReagents"] = "regenty: (.+)"
 EnchantrixLocalizations["daDK"]["PatReagents"] = "Ingredienser: (.+)"
 EnchantrixLocalizations["deDE"]["PatReagents"] = "Reagenzien: (.+)"
@@ -717,6 +725,13 @@ EnchantrixLocalizations["ptPT"]["PatReagents"] = "Reagentes: (.+)"
 EnchantrixLocalizations["ruRU"]["PatReagents"] = "\208\160\208\181\208\176\208\179\208\181\208\189\209\130\209\139: (.+) "
 EnchantrixLocalizations["zhCN"]["PatReagents"] = "\230\157\144\230\150\153\239\188\154(.+)"
 EnchantrixLocalizations["zhTW"]["PatReagents"] = "Reagents: (.+) "
+EnchantrixLocalizations["enUS"]["ShortDarnassus"] = "Dar"
+EnchantrixLocalizations["enUS"]["ShortIronForge"] = "IF"
+EnchantrixLocalizations["enUS"]["ShortOrgrimmar"] = "Org"
+EnchantrixLocalizations["enUS"]["ShortStormwind"] = "SW"
+EnchantrixLocalizations["enUS"]["ShortThunderBluff"] = "TB"
+EnchantrixLocalizations["enUS"]["ShortUndercity"] = "UC"
+EnchantrixLocalizations["enUS"]["StormwindCity"] = "Stormwind City"
 EnchantrixLocalizations["csCZ"]["TextCombat"] = "Boj"
 EnchantrixLocalizations["daDK"]["TextCombat"] = "Kamp"
 EnchantrixLocalizations["deDE"]["TextCombat"] = "Kampflog"
@@ -742,6 +757,8 @@ EnchantrixLocalizations["ptPT"]["TextGeneral"] = "Geral"
 EnchantrixLocalizations["ruRU"]["TextGeneral"] = "\208\158\209\129\208\189\208\190\208\178\208\189\208\190\208\185"
 EnchantrixLocalizations["zhCN"]["TextGeneral"] = "\230\153\174\233\128\154"
 EnchantrixLocalizations["zhTW"]["TextGeneral"] = "General"
+EnchantrixLocalizations["enUS"]["ThunderBluff"] = "Thunder Bluff"
+EnchantrixLocalizations["enUS"]["Undercity"] = "Undercity"
 
 
 -- Section: Generic Messages
@@ -1602,3 +1619,21 @@ EnchantrixLocalizations["ptPT"]["FrmtWarnPriceUnavail"] = "[Alguns pre\195\167os
 EnchantrixLocalizations["ruRU"]["FrmtWarnPriceUnavail"] = "[\208\157\208\181\208\186\208\190\209\130\208\190\209\128\209\139\208\181 \209\134\208\181\208\189\209\139 \208\189\208\181\208\184\208\183\208\178\208\181\209\129\209\130\208\189\209\139]"
 EnchantrixLocalizations["zhCN"]["FrmtWarnPriceUnavail"] = "[\230\159\144\228\186\155\228\187\183\230\160\188\228\184\141\229\143\175\231\148\168]"
 EnchantrixLocalizations["zhTW"]["FrmtWarnPriceUnavail"] = "[\233\131\168\229\136\134\229\131\185\230\160\188\231\132\161\230\149\136]"
+
+
+-- Section: User Interface
+EnchantrixLocalizations["enUS"]["BarkerOptionsHighestPriceForFactorTitle"] = "PriceFactor Highest"
+EnchantrixLocalizations["enUS"]["BarkerOptionsHighestPriceForFactorTooltip"] = "Enchants receive a score of zero for price priority at or above this value."
+EnchantrixLocalizations["enUS"]["BarkerOptionsHighestProfitTitle"] = "Highest Profit"
+EnchantrixLocalizations["enUS"]["BarkerOptionsHighestProfitTooltip"] = "The highest total cash profit to make on an enchant."
+EnchantrixLocalizations["enUS"]["BarkerOptionsLowestPriceTitle"] = "Lowest Price"
+EnchantrixLocalizations["enUS"]["BarkerOptionsLowestPriceTooltip"] = "The lowest cash price to quote for an enchant."
+EnchantrixLocalizations["enUS"]["BarkerOptionsPricePriorityTitle"] = "Overall Price Priority"
+EnchantrixLocalizations["enUS"]["BarkerOptionsPricePriorityTooltip"] = "This sets how important pricing is to the overall priority for advertising."
+EnchantrixLocalizations["enUS"]["BarkerOptionsPriceSweetspotTitle"] = "PriceFactor SweetSpot"
+EnchantrixLocalizations["enUS"]["BarkerOptionsPriceSweetspotTooltip"] = "This is used to prioritise enchants near this price for advertising."
+EnchantrixLocalizations["enUS"]["BarkerOptionsProfitMarginTitle"] = "Profit Margin"
+EnchantrixLocalizations["enUS"]["BarkerOptionsProfitMarginTooltip"] = "The percentage profit to add to the base mats cost."
+EnchantrixLocalizations["enUS"]["BarkerOptionsRandomFactorTitle"] = "Random Factor"
+EnchantrixLocalizations["enUS"]["BarkerOptionsRandomFactorTooltip"] = "The amount of randomness in the enchants chosen for the trade shout."
+EnchantrixLocalizations["enUS"]["BarkerOptionsTab1Title"] = "Profit and Price Priorities"
