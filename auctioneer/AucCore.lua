@@ -144,6 +144,7 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["scan-class9"]				=	"on",
 	["scan-class10"]			=	"on",
 	["warn-color"]				=	"on",
+	["finish-sound"]			=	"on",
 	["printframe"]				=	1,
 	["last-auction-duration"]	=	1440,
 	["auction-duration"]		=	3,
@@ -165,7 +166,9 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["askprice-smart"]			=	"off",
 	["askprice-trigger"]		=	"?",
 	["askprice-ad"]				=	"on",
-	["askprice-whisper"]		=	"on",
+	["askprice-whispers"]		=	"on",
+	["askprice-word1"]			=	_AUCT('CmdAskPriceSmartWord1', "enUS"), --Initially set these two filters to match the stock english custom words
+	["askprice-word2"]			=	_AUCT('CmdAskPriceSmartWord2', "enUS"),
 
 	-- Auction House tab UI
 	["bid-limit"]				=	1,
@@ -514,7 +517,7 @@ function lockAndLoad()
 	Auctioneer.AskPrice.Init();
 
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
-	
+
 	collectgarbage() --Cleanup after that massive mem spike
 end
 

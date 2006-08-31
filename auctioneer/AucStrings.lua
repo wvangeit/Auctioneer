@@ -1,25 +1,26 @@
 --[[
-WARNING: This is a generated file.
-If you wish to perform localizations, please go to the localization site at:
-http://norganna.org/localizer/index.php
+	WARNING: This is a generated file.
+	If you wish to perform or update localizations, please go to our Localizer website at:
+	http://norganna.org/localizer/index.php
 
-  $Id$
-  Version: <%version%>
+	AddOn: Auctioneer
+	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
-License:
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program(see GLP.txt); if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
 AuctioneerLocalizations = {};
@@ -39,6 +40,8 @@ AuctioneerLocalizations["zhTW"] = {};
 AuctioneerLocalizations["elGR"] = {};
 AuctioneerLocalizations["trTR"] = {};
 
+
+-- Section: AskPrice Messages
 AuctioneerLocalizations["csCZ"]["AskPriceAd"] = "Zjisti cenu sady/stacku %sx[ItemLink] (x = velikost sady) "
 AuctioneerLocalizations["daDK"]["AskPriceAd"] = "Hent stak priser for %sx[ItemLink] (x = stacksize) "
 AuctioneerLocalizations["deDE"]["AskPriceAd"] = "Stapelpreis mit %sx[ItemLink] (x = Stapelgr\195\182\195\159e)"
@@ -130,6 +133,9 @@ AuctioneerLocalizations["ptPT"]["FrmtAskPriceVendorPrice"] = "%sVenda para forne
 AuctioneerLocalizations["ruRU"]["FrmtAskPriceVendorPrice"] = "%s \208\159\209\128\208\190\208\180\208\176\208\182\208\176 \208\178 \208\188\208\176\208\179\208\176\208\183\208\184\208\189: %s%s\n"
 AuctioneerLocalizations["zhCN"]["FrmtAskPriceVendorPrice"] = "%s\229\148\174\228\186\142\229\149\134\232\180\169\239\188\154%s%s"
 AuctioneerLocalizations["zhTW"]["FrmtAskPriceVendorPrice"] = "%sNPC\229\155\158\230\148\182\229\131\185: %s%s"
+
+
+-- Section: Auction Messages
 AuctioneerLocalizations["csCZ"]["FrmtActRemove"] = "Predmet byl odstranen z aukce %s ."
 AuctioneerLocalizations["daDK"]["FrmtActRemove"] = "Fjerner auktion %s fra nuv\195\166rende Auktionshus snapshot."
 AuctioneerLocalizations["deDE"]["FrmtActRemove"] = "Entferne Auktion %s vom derzeitigen AH-Abbild."
@@ -383,6 +389,9 @@ AuctioneerLocalizations["ruRU"]["FrmtWarnUser"] = "\208\166\208\181\208\189\208\
 AuctioneerLocalizations["trTR"]["FrmtWarnUser"] = "Kullan\195\132\194\177c\195\132\194\177 fiyatland\195\132\194\177rmas\195\132\194\177 kullan\195\132\194\177l\195\132\194\177yor"
 AuctioneerLocalizations["zhCN"]["FrmtWarnUser"] = "\228\189\191\231\148\168\232\135\170\229\174\154\228\187\183"
 AuctioneerLocalizations["zhTW"]["FrmtWarnUser"] = "\230\142\161\231\148\168\232\135\170\232\168\130\229\131\185\230\160\188"
+
+
+-- Section: Bid Messages
 AuctioneerLocalizations["csCZ"]["FrmtAlreadyHighBidder"] = "Momentalne jste vedouci v teto aukci: %s (x%d)"
 AuctioneerLocalizations["daDK"]["FrmtAlreadyHighBidder"] = "Allerede den h\195\184jestbydende p\195\165 auktion: %s (x%d)"
 AuctioneerLocalizations["deDE"]["FrmtAlreadyHighBidder"] = "Bereits H\195\182chstbietender f\195\188r Auktion: %s (x%d)"
@@ -540,6 +549,9 @@ AuctioneerLocalizations["ptPT"]["UiProcessingBidRequests"] = "Processando pedido
 AuctioneerLocalizations["ruRU"]["UiProcessingBidRequests"] = "\208\158\208\177\209\128\208\176\208\177\208\190\209\130\208\186\208\176 \208\183\208\176\208\191\209\128\208\190\209\129\208\190\208\178 \208\189\208\176 \209\129\209\130\208\176\208\178\208\186\208\184...\n"
 AuctioneerLocalizations["zhCN"]["UiProcessingBidRequests"] = "\229\135\186\228\187\183\232\175\183\230\177\130\229\164\132\231\144\134\228\184\173..."
 AuctioneerLocalizations["zhTW"]["UiProcessingBidRequests"] = "\233\128\178\232\161\140\228\184\139\230\168\153\232\166\129\230\177\130\228\184\173\239\188\142\239\188\142\239\188\142"
+
+
+-- Section: Command Messages
 AuctioneerLocalizations["csCZ"]["FrmtActClearall"] = "Mazu vsechna aukcni data k %s"
 AuctioneerLocalizations["daDK"]["FrmtActClearall"] = "Fjerner alle data for auktionen %s"
 AuctioneerLocalizations["deDE"]["FrmtActClearall"] = "L\195\182sche alle Auktionsdaten f\195\188r %s"
@@ -791,6 +803,9 @@ AuctioneerLocalizations["ruRU"]["FrmtUnknownRf"] = "\208\157\208\181\208\178\208
 AuctioneerLocalizations["trTR"]["FrmtUnknownRf"] = "Ge\195\131\194\167ersiz komut ('%s').  Komut \195\133\197\184u \195\133\197\184ekilde formatlanmal\195\132\194\177: [sunucu]-[taraf]. \195\131\226\128\147rnek: Al'Akir-Horde"
 AuctioneerLocalizations["zhCN"]["FrmtUnknownRf"] = "\233\148\153\232\175\175\231\154\132\230\149\176\230\141\174('%s')\239\188\154\230\173\163\231\161\174\231\154\132\230\160\188\229\188\143\228\184\186\239\188\154[\230\156\141\229\138\161\229\153\168\229\144\141]-[\233\152\181\232\144\165]\239\188\140\229\133\182\228\184\173\233\152\181\232\144\165\228\184\186\232\139\177\230\150\135(\232\129\148\231\155\159-Alliance\239\188\140\233\131\168\232\144\189-Horde)\227\128\130\228\190\139\229\166\130\239\188\154\230\179\176\229\133\176\229\190\183-Alliance\227\128\130"
 AuctioneerLocalizations["zhTW"]["FrmtUnknownRf"] = "\233\140\175\232\170\164\231\154\132\230\149\184\230\147\154 ('%s').\230\173\163\231\162\186\231\154\132\230\160\188\229\188\143\231\130\186\239\188\154[\228\188\186\230\156\141\229\153\168]-[\233\153\163\231\135\159]\239\188\140\228\190\139\229\166\130\239\188\154\229\184\131\232\152\173\229\141\161\229\190\183-\232\129\175\231\155\159."
+
+
+-- Section: Command Options
 AuctioneerLocalizations["csCZ"]["OptAlso"] = "(server-frakce|protivnik)"
 AuctioneerLocalizations["daDK"]["OptAlso"] = "(realm-faction|modsat|hjemme|neutral)"
 AuctioneerLocalizations["deDE"]["OptAlso"] = "([Realm]-[Fraktion]|opposite|home|neutral)"
@@ -1077,11 +1092,14 @@ AuctioneerLocalizations["ruRU"]["OptScan"] = "<> "
 AuctioneerLocalizations["trTR"]["OptScan"] = "<Tarama parametresi> "
 AuctioneerLocalizations["zhCN"]["OptScan"] = "<>"
 AuctioneerLocalizations["zhTW"]["OptScan"] = "<>"
+
+
+-- Section: Commands
 AuctioneerLocalizations["csCZ"]["CmdAlso"] = "take"
 AuctioneerLocalizations["daDK"]["CmdAlso"] = "ogs\195\165"
 AuctioneerLocalizations["deDE"]["CmdAlso"] = "also"
 AuctioneerLocalizations["enUS"]["CmdAlso"] = "also"
-AuctioneerLocalizations["esES"]["CmdAlso"] = "tambi\195\169n"
+AuctioneerLocalizations["esES"]["CmdAlso"] = "tambien"
 AuctioneerLocalizations["frFR"]["CmdAlso"] = "aussi"
 AuctioneerLocalizations["itIT"]["CmdAlso"] = "anche"
 AuctioneerLocalizations["koKR"]["CmdAlso"] = "also"
@@ -1212,6 +1230,10 @@ AuctioneerLocalizations["ptPT"]["CmdAskPriceVendor"] = "vendor"
 AuctioneerLocalizations["ruRU"]["CmdAskPriceVendor"] = "\208\191\209\128\208\190\208\180\208\176\208\178\208\181\209\134"
 AuctioneerLocalizations["zhCN"]["CmdAskPriceVendor"] = "vendor\229\149\134\232\180\169"
 AuctioneerLocalizations["zhTW"]["CmdAskPriceVendor"] = "vendor"
+AuctioneerLocalizations["enUS"]["CmdAskPriceWhispers"] = "whispers"
+AuctioneerLocalizations["esES"]["CmdAskPriceWhispers"] = "susurros"
+AuctioneerLocalizations["enUS"]["CmdAskPriceWord"] = "word"
+AuctioneerLocalizations["esES"]["CmdAskPriceWord"] = "palabra"
 AuctioneerLocalizations["csCZ"]["CmdAuctionClick"] = "aukcni-klik"
 AuctioneerLocalizations["daDK"]["CmdAuctionClick"] = "auktion-klik"
 AuctioneerLocalizations["deDE"]["CmdAuctionClick"] = "auction-click"
@@ -1518,6 +1540,8 @@ AuctioneerLocalizations["ptPT"]["CmdFinish3"] = "reloadui"
 AuctioneerLocalizations["ruRU"]["CmdFinish3"] = "\208\191\208\181\209\128\208\181\208\179\209\128\209\131\208\183\208\184\209\130\209\140 \208\184\208\189\209\130\208\181\209\128\209\132\208\181\208\185\209\129"
 AuctioneerLocalizations["zhCN"]["CmdFinish3"] = "reloadui\233\135\141\230\150\176\229\138\160\232\189\189\231\148\168\230\136\183\231\149\140\233\157\162"
 AuctioneerLocalizations["zhTW"]["CmdFinish3"] = "reloadui"
+AuctioneerLocalizations["enUS"]["CmdFinishSound"] = "finish-sound"
+AuctioneerLocalizations["esES"]["CmdFinishSound"] = "sonido-terminar"
 AuctioneerLocalizations["csCZ"]["CmdHelp"] = "pomoc"
 AuctioneerLocalizations["daDK"]["CmdHelp"] = "hj\195\166lp"
 AuctioneerLocalizations["deDE"]["CmdHelp"] = "help"
@@ -1905,6 +1929,9 @@ AuctioneerLocalizations["ruRU"]["ShowVerbose"] = "\208\191\208\190\208\186\208\1
 AuctioneerLocalizations["trTR"]["ShowVerbose"] = "goster-detayli"
 AuctioneerLocalizations["zhCN"]["ShowVerbose"] = "show-verbose\230\152\190\231\164\186\231\187\134\232\138\130"
 AuctioneerLocalizations["zhTW"]["ShowVerbose"] = "show-verbose"
+
+
+-- Section: Config Text
 AuctioneerLocalizations["csCZ"]["GuiAlso"] = "Take zobraz data o"
 AuctioneerLocalizations["daDK"]["GuiAlso"] = "Vis ogs\195\165 data for"
 AuctioneerLocalizations["deDE"]["GuiAlso"] = "Zeige zus\195\164tzlich Daten von"
@@ -2078,6 +2105,10 @@ AuctioneerLocalizations["ptPT"]["GuiAskPriceVendor"] = "Emita o vendor info "
 AuctioneerLocalizations["ruRU"]["GuiAskPriceVendor"] = "\208\159\208\190\209\129\209\139\208\187\208\176\209\130\209\140 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\142 \208\191\209\128\208\190\208\180\208\176\208\178\209\134\208\176"
 AuctioneerLocalizations["zhCN"]["GuiAskPriceVendor"] = "\229\143\145\233\128\129\229\149\134\232\180\169\228\191\161\230\129\175"
 AuctioneerLocalizations["zhTW"]["GuiAskPriceVendor"] = "\233\128\129\228\190\155\232\144\165\229\149\134\228\191\161\230\129\175\n"
+AuctioneerLocalizations["enUS"]["GuiAskPriceWhispers"] = "Show outgoing whispers"
+AuctioneerLocalizations["esES"]["GuiAskPriceWhispers"] = "Ver susurros salientes"
+AuctioneerLocalizations["enUS"]["GuiAskPriceWord"] = "Custom SmartWord %d"
+AuctioneerLocalizations["esES"]["GuiAskPriceWord"] = "Palabra inteligente particular %d"
 AuctioneerLocalizations["csCZ"]["GuiAuctionDuration"] = "Zakladni trvani aukce"
 AuctioneerLocalizations["daDK"]["GuiAuctionDuration"] = "Normal auktions varighed"
 AuctioneerLocalizations["deDE"]["GuiAuctionDuration"] = "Auktionsstandarddauer"
@@ -2399,6 +2430,8 @@ AuctioneerLocalizations["ptPT"]["GuiFinish"] = "Depois da pesquisa acabar"
 AuctioneerLocalizations["ruRU"]["GuiFinish"] = "\208\159\208\190\209\129\208\187\208\181 \208\190\208\186\208\190\208\189\209\135\208\176\208\189\208\184\209\143 \209\129\208\186\208\176\208\189\208\184\209\128\208\190\208\178\208\176\208\189\208\184\209\143"
 AuctioneerLocalizations["zhCN"]["GuiFinish"] = "\229\189\147\230\137\171\230\143\143\229\174\140\230\136\144\229\144\142"
 AuctioneerLocalizations["zhTW"]["GuiFinish"] = "\229\156\168\230\142\131\231\158\132\229\174\140\230\136\144\228\185\139\229\190\140"
+AuctioneerLocalizations["enUS"]["GuiFinishSound"] = "Play sound on scan finish"
+AuctioneerLocalizations["esES"]["GuiFinishSound"] = "Tocar sonido al completar exploraci\195\179n"
 AuctioneerLocalizations["csCZ"]["GuiLink"] = "Zobraz cislo linku"
 AuctioneerLocalizations["daDK"]["GuiLink"] = "Viser LinkID"
 AuctioneerLocalizations["deDE"]["GuiLink"] = "Zeige LinkID an"
@@ -2857,6 +2890,9 @@ AuctioneerLocalizations["ptPT"]["GuiWarnColor"] = "Modelo de colora\195\167\195\
 AuctioneerLocalizations["ruRU"]["GuiWarnColor"] = "\208\166\208\178\208\181\209\130\208\190\208\178\208\176\209\143 \208\191\208\190\208\180\209\129\208\178\208\181\209\130\208\186\208\176 \209\134\208\181\208\189"
 AuctioneerLocalizations["zhCN"]["GuiWarnColor"] = "\229\189\169\232\137\178\230\160\135\228\187\183\230\168\161\229\188\143"
 AuctioneerLocalizations["zhTW"]["GuiWarnColor"] = "\229\189\169\232\137\178\230\168\153\229\131\185\230\168\161\229\188\143"
+
+
+-- Section: Conversion Messages
 AuctioneerLocalizations["csCZ"]["MesgConvert"] = "Prevod Auctioneer databaze. Nejdriv si prosim zalohujte soubor SavedVariables\Auctioneer.lua first.%s%s"
 AuctioneerLocalizations["daDK"]["MesgConvert"] = "Konverterer Auctioneer Databasen. Tag venligst en backup af SavedVariables\\Auctioneer.lua inden.%s%s"
 AuctioneerLocalizations["deDE"]["MesgConvert"] = "Auctioneer Datenbankkonvertierung. Bitte zuerst eine Sicherung von SavedVariables\\Auctioneer.lua anlegen!%s%s"
@@ -2913,6 +2949,9 @@ AuctioneerLocalizations["ruRU"]["MesgNotconverting"] = "\208\144\209\131\208\186
 AuctioneerLocalizations["trTR"]["MesgNotconverting"] = "Auctioneer veritaban\195\132\194\177n\195\132\194\177z\195\132\194\177 d\195\131\194\182n\195\131\194\188\195\133\197\184t\195\131\194\188rm\195\131\194\188yor, fakat bu i\195\133\197\184lemi yapmad\195\132\194\177\195\132\197\184\195\132\194\177n\195\132\194\177z s\195\131\194\188rece de \195\131\194\167al\195\132\194\177\195\133\197\184mayacakt\195\132\194\177r."
 AuctioneerLocalizations["zhCN"]["MesgNotconverting"] = "\230\139\141\229\141\150\229\138\169\230\137\139\230\156\170\232\189\172\230\141\162\228\189\160\231\154\132\230\149\176\230\141\174\229\186\147\239\188\140\228\189\134\229\174\140\230\136\144\228\185\139\229\137\141\229\176\134\229\129\156\230\173\162\229\183\165\228\189\156\227\128\130"
 AuctioneerLocalizations["zhTW"]["MesgNotconverting"] = "\230\130\168\231\154\132\232\179\135\230\150\153\229\186\171\229\176\154\230\156\170\231\182\147\233\129\142\232\189\137\230\143\155\230\155\180\230\150\176\239\188\140\230\130\168\229\191\133\233\160\136\232\189\137\230\143\155\232\179\135\230\150\153\229\186\171\230\137\141\232\131\189\228\189\191\231\148\168\230\139\141\232\179\163\229\138\169\230\137\139\227\128\130"
+
+
+-- Section: Game Constants
 AuctioneerLocalizations["csCZ"]["TimeLong"] = "Dlouze"
 AuctioneerLocalizations["daDK"]["TimeLong"] = "Lang"
 AuctioneerLocalizations["deDE"]["TimeLong"] = "Lang"
@@ -2973,6 +3012,9 @@ AuctioneerLocalizations["ruRU"]["TimeVlong"] = "\208\158\209\135\208\181\208\189
 AuctioneerLocalizations["trTR"]["TimeVlong"] = "\195\131\226\128\161ok Uzun"
 AuctioneerLocalizations["zhCN"]["TimeVlong"] = "\233\157\158\229\184\184\233\149\191"
 AuctioneerLocalizations["zhTW"]["TimeVlong"] = "\233\157\158\229\184\184\233\149\183"
+
+
+-- Section: Generic Messages
 AuctioneerLocalizations["csCZ"]["DisableMsg"] = "Deaktivuji automaticke zapinani Auctioneeru"
 AuctioneerLocalizations["daDK"]["DisableMsg"] = "Stopper automatisk indlaesning af Auctioneer"
 AuctioneerLocalizations["deDE"]["DisableMsg"] = "Das automatische Laden von Auctioneer wird deaktiviert"
@@ -3069,6 +3111,9 @@ AuctioneerLocalizations["ruRU"]["StatOn"] = "\208\159\208\190\208\186\208\176\20
 AuctioneerLocalizations["trTR"]["StatOn"] = "Tan\195\132\194\177mlanm\195\132\194\177\195\133\197\184 a\195\131\194\167\195\132\194\177k artt\195\132\194\177rma verileri g\195\131\194\182r\195\131\194\188nt\195\131\194\188leniyor."
 AuctioneerLocalizations["zhCN"]["StatOn"] = "\230\152\190\231\164\186\232\174\190\229\174\154\231\154\132\230\139\141\229\141\150\230\149\176\230\141\174\227\128\130"
 AuctioneerLocalizations["zhTW"]["StatOn"] = "\233\161\175\231\164\186\232\168\173\229\174\154\229\165\189\231\154\132\230\139\141\232\179\163\232\179\135\230\150\153"
+
+
+-- Section: Generic Strings
 AuctioneerLocalizations["csCZ"]["TextAuction"] = "Aukce"
 AuctioneerLocalizations["daDK"]["TextAuction"] = "auktion"
 AuctioneerLocalizations["deDE"]["TextAuction"] = "Auktion"
@@ -3153,6 +3198,9 @@ AuctioneerLocalizations["ruRU"]["TextUsage"] = "\208\152\209\129\208\191\208\190
 AuctioneerLocalizations["trTR"]["TextUsage"] = "Kullan\195\132\194\177m\195\132\194\177:"
 AuctioneerLocalizations["zhCN"]["TextUsage"] = "\231\148\168\233\128\148\239\188\154"
 AuctioneerLocalizations["zhTW"]["TextUsage"] = "\228\189\191\231\148\168\239\188\154"
+
+
+-- Section: Help Text
 AuctioneerLocalizations["csCZ"]["HelpAlso"] = "Prikaz Also zobrazi do popisku statistiky platne pro JINY server. Server a frakci zvolite zadanim nazvu nebo slovem \"protistrana\". Pouziti: /auctioneer also Shadow Moon-Horde."
 AuctioneerLocalizations["daDK"]["HelpAlso"] = "Viser ogsaa en anden servers priser i tooltipet. For realm, indsaet realmnavnet og faction navnet. Som eksempel: \"/auctioneer also Al'Akir-Horde\". Det speciale noegleord \"opposite\" betyder den modstridne fraktion, \"off\" stopper denne funktion."
 AuctioneerLocalizations["deDE"]["HelpAlso"] = "Zeigt ebenfalls die Werte anderer Server im Tooltip an. Setze den Namen des Realms f\195\188r Realm und den Namen der Fraktion f\195\188r Fraktion ein. Zum Beispiel: \"/auctioneer auch Kil'Jaeden-Alliance\". Das spezielle Schl\195\188sselwort \"Gegenseite\" bezeichnet die gegnerische Fraktion, \"aus\" deaktiviert die Funktionalit\195\164t."
@@ -3255,6 +3303,10 @@ AuctioneerLocalizations["ptPT"]["HelpAskPriceVendor"] = "Permita ou incapacite a
 AuctioneerLocalizations["ruRU"]["HelpAskPriceVendor"] = "\208\146\208\186\208\187\209\142\209\135\208\184\209\130\209\140 \208\184\208\187\208\184 \208\178\209\139\208\186\208\187\209\142\209\135\208\184\209\130\209\140 \208\190\209\130\209\129\209\139\208\187\208\186\209\131 \209\134\208\181\208\189 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176."
 AuctioneerLocalizations["zhCN"]["HelpAskPriceVendor"] = "\229\144\175\231\148\168\230\136\150\231\166\129\231\148\168\229\143\145\233\128\129\229\149\134\232\180\169\229\174\154\228\187\183\230\149\176\230\141\174\227\128\130"
 AuctioneerLocalizations["zhTW"]["HelpAskPriceVendor"] = "\229\133\129\232\168\177\230\136\150\233\151\156\233\150\137\229\149\134\229\186\151\229\131\185\230\160\188\232\179\135\230\150\153\231\153\188\233\128\129\227\128\130\n"
+AuctioneerLocalizations["enUS"]["HelpAskPriceWhispers"] = "Enable or disable the hiding of all AskPrice outgoing whispers."
+AuctioneerLocalizations["esES"]["HelpAskPriceWhispers"] = "Encender o apagar el oculto de los susurros salientes de AskPrice."
+AuctioneerLocalizations["enUS"]["HelpAskPriceWord"] = "Add or modify AskPrice's custom SmartWords."
+AuctioneerLocalizations["esES"]["HelpAskPriceWord"] = "A\195\177adir o modificar las palabras inteligentes particulares de AskPrice."
 AuctioneerLocalizations["csCZ"]["HelpAuctionClick"] = "Umoznuje automaticky vlozit objekt z inventare do aukce pomoci Alt-Kliku."
 AuctioneerLocalizations["daDK"]["HelpAuctionClick"] = "Giver dig mulighed for at Alt-klikke paa et objekt i dine tasker for automatisk at starte en auktion for det"
 AuctioneerLocalizations["deDE"]["HelpAuctionClick"] = "Mittels Alt-Klick auf einen Gegenstand in einer Tasche wird automatisch eine Auktion daf\195\188r erstellt."
@@ -3429,6 +3481,8 @@ AuctioneerLocalizations["nlNL"]["HelpFinish"] = "Geef aan of World of Warcraft a
 AuctioneerLocalizations["ptPT"]["HelpFinish"] = "Selecciona se sai ou se termina ap\195\179s o fim de uma pesquisa na casa de leil\195\131\194\181es"
 AuctioneerLocalizations["zhCN"]["HelpFinish"] = "\232\174\190\231\189\174\230\139\141\229\141\150\232\161\140\230\137\171\230\143\143\229\174\140\230\136\144\229\144\142\230\152\175\229\144\166\232\135\170\229\138\168\230\179\168\233\148\128\230\136\150\233\128\128\229\135\186\230\184\184\230\136\143\227\128\130"
 AuctioneerLocalizations["zhTW"]["HelpFinish"] = "\232\168\173\231\189\174\231\149\182\230\142\131\230\143\143\229\174\140\231\149\162\229\190\140\239\188\140\230\152\175\229\144\166\232\135\170\229\139\149\231\153\187\229\135\186\230\136\150\233\128\128\229\135\186\233\129\138\230\136\178"
+AuctioneerLocalizations["enUS"]["HelpFinishSound"] = "Set whether to play a sound at the end of an Auction House scan."
+AuctioneerLocalizations["esES"]["HelpFinishSound"] = "Selecciona si tocamos un sonido al finalizar una exploraci\195\179n de la casa de subastas"
 AuctioneerLocalizations["csCZ"]["HelpLink"] = "Nastavi zda se ma zobrazovat ID/cislo linku objektu do popisku"
 AuctioneerLocalizations["daDK"]["HelpLink"] = "V\195\166lger om der skal vises link id i tooltippet."
 AuctioneerLocalizations["deDE"]["HelpLink"] = "Schaltet die Anzeige der Link-ID im Tooltip ein/aus."
@@ -3669,6 +3723,9 @@ AuctioneerLocalizations["koKR"]["HelpWarnColor"] = "\237\152\132\236\158\172 AH 
 AuctioneerLocalizations["ptPT"]["HelpWarnColor"] = "Selecione se mostrar o atual AH fixando o pre\195\167o do modelo (que undercutting por...) em cores intuitive."
 AuctioneerLocalizations["zhCN"]["HelpWarnColor"] = "\233\128\137\230\139\169\230\152\175\229\144\166\231\148\168\231\155\180\232\167\130\231\154\132\233\162\156\232\137\178\232\161\168\231\164\186\230\139\141\229\141\150\232\161\140\230\160\135\228\187\183\230\168\161\229\188\143\227\128\130"
 AuctioneerLocalizations["zhTW"]["HelpWarnColor"] = "\233\129\184\230\147\135\230\152\175\229\144\166\231\148\168\228\184\141\229\144\140\233\161\143\232\137\178\228\190\134\230\168\153\231\164\186\231\137\185\230\174\138\230\131\133\230\179\129\231\154\132\229\131\185\230\160\188(\228\190\139\229\166\130\239\188\154\232\179\164\229\131\185\229\135\186\229\148\174)"
+
+
+-- Section: Post Messages
 AuctioneerLocalizations["csCZ"]["FrmtNoEmptyPackSpace"] = "Zadne volne pack misto pro vytvoreni aukce!"
 AuctioneerLocalizations["daDK"]["FrmtNoEmptyPackSpace"] = "Ingen tomme pack rum fundet til at lave auktionen!"
 AuctioneerLocalizations["deDE"]["FrmtNoEmptyPackSpace"] = "Keinen leeren Taschenplatz gefunden, um die Auktion zu erstellen!"
@@ -3721,6 +3778,9 @@ AuctioneerLocalizations["ptPT"]["FrmtPostedAuctions"] = "Afixado %d auctions de 
 AuctioneerLocalizations["ruRU"]["FrmtPostedAuctions"] = "\208\161\208\190\208\183\208\180\208\176\208\189\208\190 %d \208\176\209\131\208\186\209\134\208\184\208\190\208\189\208\190\208\178 \208\184\208\183 %s (x%d)"
 AuctioneerLocalizations["zhCN"]["FrmtPostedAuctions"] = "\229\183\178\229\143\145\229\184\131%d\228\187\182\230\139\141\229\141\150\239\188\154%s (x%d)\227\128\130"
 AuctioneerLocalizations["zhTW"]["FrmtPostedAuctions"] = "\229\183\178\231\182\147\230\136\144\229\138\159\233\128\178\232\161\140\230\139\141\232\179\163 %d \228\187\182 %s (x%d) "
+
+
+-- Section: Report Messages
 AuctioneerLocalizations["csCZ"]["FrmtBidbrokerCurbid"] = "tedNabidka"
 AuctioneerLocalizations["daDK"]["FrmtBidbrokerCurbid"] = "Nuvaerende bud"
 AuctioneerLocalizations["deDE"]["FrmtBidbrokerCurbid"] = "aktGebot"
@@ -3937,6 +3997,9 @@ AuctioneerLocalizations["nlNL"]["FrmtPctlessLine"] = "%s, Laatste %d gezien, HVP
 AuctioneerLocalizations["ptPT"]["FrmtPctlessLine"] = "%s, \195\186ltimo %d visto, HSP:  %s, BO:  %s, prof:  %s, menos %s"
 AuctioneerLocalizations["zhCN"]["FrmtPctlessLine"] = "%s\239\188\140\230\156\128\232\191\145\229\135\186\231\142\176%d\230\172\161\239\188\140\230\156\128\233\171\152\230\155\190\229\148\174\228\187\183\239\188\154%s\239\188\140\228\184\128\229\143\163\228\187\183\239\188\154%s\239\188\140\229\136\169\230\182\166\239\188\154%s\239\188\140\229\183\174\233\162\157%s"
 AuctioneerLocalizations["zhTW"]["FrmtPctlessLine"] = "%s, \229\135\186\231\143\190\233\129\142 %d \230\172\161, \230\156\128\233\171\152\229\131\185\239\188\154%s, \231\155\180\232\179\188\229\131\185\239\188\154%s, \229\136\169\230\189\164\239\188\154%s, \228\189\142\230\150\188 %s"
+
+
+-- Section: Scanning Messages
 AuctioneerLocalizations["csCZ"]["AuctionDefunctAucts"] = "Neplatnych aukci odstraneno: %s"
 AuctioneerLocalizations["daDK"]["AuctionDefunctAucts"] = "Afsluttede auktioner fjernet: %s"
 AuctioneerLocalizations["deDE"]["AuctionDefunctAucts"] = "Abgelaufene Auktionen: %s"
@@ -4086,6 +4149,9 @@ AuctioneerLocalizations["ruRU"]["AuctionTotalAucts"] = "\208\146\209\129\208\181
 AuctioneerLocalizations["trTR"]["AuctionTotalAucts"] = "Taranan toplam a\195\131\194\167\195\132\194\177k art\195\132\194\177rma: %s "
 AuctioneerLocalizations["zhCN"]["AuctionTotalAucts"] = "\229\183\178\230\137\171\230\143\143\229\133\168\233\131\168\230\139\141\229\141\150\239\188\154%s\233\161\185"
 AuctioneerLocalizations["zhTW"]["AuctionTotalAucts"] = "\230\142\131\230\143\143\229\136\176\231\154\132\230\139\141\232\179\163\230\149\184\233\135\143\239\188\154%s"
+
+
+-- Section: Tooltip Messages
 AuctioneerLocalizations["csCZ"]["FrmtInfoAlsoseen"] = "Videno %d -krat na %s"
 AuctioneerLocalizations["daDK"]["FrmtInfoAlsoseen"] = "Set %d gange paa %s"
 AuctioneerLocalizations["deDE"]["FrmtInfoAlsoseen"] = "%d mal f\195\188r %s gesehen"
@@ -4366,6 +4432,9 @@ AuctioneerLocalizations["ruRU"]["FrmtInfoStacksize"] = "\208\161\209\128\208\181
 AuctioneerLocalizations["trTR"]["FrmtInfoStacksize"] = "Ortalama grup b\195\131\194\188y\195\131\194\188kl\195\131\194\188\195\132\197\184\195\131\194\188: %d adet"
 AuctioneerLocalizations["zhCN"]["FrmtInfoStacksize"] = "\229\185\179\229\157\135\229\160\134\229\143\160\230\149\176\233\135\143:%d\228\187\182"
 AuctioneerLocalizations["zhTW"]["FrmtInfoStacksize"] = "\229\185\179\229\157\135\229\160\134\231\150\138\230\149\184\233\135\143\239\188\154%d\229\128\139"
+
+
+-- Section: User Interface
 AuctioneerLocalizations["deDE"]["FrmtLastSoldOn"] = "Zuletzt verkauft f\195\188r %s"
 AuctioneerLocalizations["enUS"]["FrmtLastSoldOn"] = "Last Sold on %s"
 AuctioneerLocalizations["esES"]["FrmtLastSoldOn"] = "\195\154ltima venta en %s"
@@ -4795,6 +4864,7 @@ AuctioneerLocalizations["zhCN"]["UiPriceModelFixed"] = "\229\155\186\229\174\154
 AuctioneerLocalizations["zhTW"]["UiPriceModelFixed"] = "\229\155\186\229\174\154\229\131\185\230\160\188"
 AuctioneerLocalizations["deDE"]["UiPriceModelLastSold"] = "Zuletzt verkauft f\195\188r"
 AuctioneerLocalizations["enUS"]["UiPriceModelLastSold"] = "Last Price Sold"
+AuctioneerLocalizations["esES"]["UiPriceModelLastSold"] = "\195\154ltimo Precio Vendido"
 AuctioneerLocalizations["frFR"]["UiPriceModelLastSold"] = "Dernier prix de vente"
 AuctioneerLocalizations["itIT"]["UiPriceModelLastSold"] = "Ultimo Prezzo di Vendita"
 AuctioneerLocalizations["koKR"]["UiPriceModelLastSold"] = "\236\181\156\234\183\188 \237\140\144\235\167\164\234\176\128"
@@ -5102,4 +5172,3 @@ AuctioneerLocalizations["ptPT"]["UiUnknownError"] = "(Desconhecido)"
 AuctioneerLocalizations["ruRU"]["UiUnknownError"] = "(\208\157\208\181\208\184\208\183\208\178\208\181\209\129\209\130\208\189\209\139\208\185)"
 AuctioneerLocalizations["zhCN"]["UiUnknownError"] = "(\230\156\170\231\159\165)"
 AuctioneerLocalizations["zhTW"]["UiUnknownError"] = "(\230\156\170\231\159\165)"
-

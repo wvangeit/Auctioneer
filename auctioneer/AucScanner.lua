@@ -166,6 +166,11 @@ function finishedAuctionScanHook() --Auctioneer_FinishedAuctionScan_Hook
 	Auctioneer.Statistic.SetScanLength(Auctioneer.Core.Variables.AuctionScanStart, Auctioneer.Core.Variables.AuctionScanStop)
 	Auctioneer.Statistic.SetScanAge(Auctioneer.Core.Variables.AuctionScanStop)
 
+	--The followng was added by MentalPower to implement the "/auc finish-sound" command
+	if (Auctioneer.Command.GetFilter("finish-sound")) then
+		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.ogg")
+	end
+
 	--The followng was added by MentalPower to implement the "/auc finish" command
 	local finish = Auctioneer.Command.GetFilterVal('finish');
 

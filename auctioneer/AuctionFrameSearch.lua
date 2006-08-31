@@ -502,8 +502,8 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			local catid = tonumber(searchParams[3]) or 1
 			local catName = ""
 			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainCategoryDropDownText"), AuctionFrameSearch_CategoryDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainCategoryDropDownText"), catid);
+			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
+			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainCategoryDropDown"), catid);
 
 			local quality = tonumber(searchParams[4]) or 1
 			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);

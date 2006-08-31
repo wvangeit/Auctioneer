@@ -117,7 +117,7 @@ end
 
 function getWarnColor(warn)
 	--Make "warn" a required parameter and verify that its a string
-	if (not warn) or (not type(warn) == "String") then
+	if (not (type(warn) == "string")) then
 		return nil
 	end
 

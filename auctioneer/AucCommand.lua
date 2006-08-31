@@ -596,6 +596,31 @@ function registerKhaos()
 				difficulty=1;
 			};
 			{
+				id="finish-sound";
+				type=K_TEXT;
+				text=function()
+					return _AUCT('GuiFinishSound')
+				end;
+				helptext=function()
+					return _AUCT('HelpFinishSound')
+				end;
+				callback=function(state)
+					Auctioneer.Command.GenVarSet("finish-sound", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdFinishSound')));
+					else
+						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdFinishSound')));
+					end
+				end;
+				check=true;
+				default={checked=getKhaosDefault('warn-color')};
+				disabled={checked=false};
+				dependencies={enabled={checked=true;}};
+				difficulty=1;
+			};
+			{
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
 				text=function()
@@ -926,6 +951,31 @@ function registerKhaos()
 				difficulty=3;
 			};
 			{
+				id="askprice-whispers";
+				type=K_TEXT;
+				text=function()
+					return _AUCT('GuiAskPriceWhispers')
+				end;
+				helptext=function()
+					return _AUCT('HelpAskPriceWhispers')
+				end;
+				callback=function(state)
+					Auctioneer.AskPrice.GenVarSet("whisper", state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceWhispers')))
+					else
+						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceWhispers')))
+					end
+				end;
+				check=true;
+				default={getKhaosDefault('askprice-whispers')};
+				disabled={checked=false};
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=2;
+			};
+			{
 				id="askprice-vendor";
 				type=K_TEXT;
 				text=function()
@@ -1024,6 +1074,52 @@ function registerKhaos()
 				disabled={checked=false};
 				dependencies={askprice={checked=true}, enabled={checked=true;}};
 				difficulty=2;
+			};
+			{
+				id="askprice-word1";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"tab", "escape", "enter"};
+				};
+				text=function()
+					return string.format(_AUCT('GuiAskPriceWord'), 1)
+				end;
+				helptext=function()
+					return _AUCT('HelpAskPriceWord')
+				end;
+				callback = function(state)
+					Auctioneer.AskPrice.SetCustomSmartWords(nil, 1, state.value)
+				end;
+				feedback = function (state)
+					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceWord').." 1", Auctioneer.Command.GetFilterVal('askprice-word1'))
+				end;
+				default = { value = getKhaosDefault('askprice-word1') };
+				disabled = { value = getKhaosDefault('askprice-word1') };
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=3;
+			};
+			{
+				id="askprice-word2";
+				type=K_EDITBOX;
+				setup = {
+					callOn = {"tab", "escape", "enter"};
+				};
+				text=function()
+					return string.format(_AUCT('GuiAskPriceWord'), 2)
+				end;
+				helptext=function()
+					return _AUCT('HelpAskPriceWord')
+				end;
+				callback = function(state)
+					Auctioneer.AskPrice.SetCustomSmartWords(nil, 2, state.value)
+				end;
+				feedback = function (state)
+					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceWord').." 2", Auctioneer.Command.GetFilterVal('askprice-word2'))
+				end;
+				default = { value = getKhaosDefault('askprice-word2') };
+				disabled = { value = getKhaosDefault('askprice-word2') };
+				dependencies={askprice={checked=true}, enabled={checked=true;}};
+				difficulty=3;
 			};
 			{
 				id="askprice-ad";
@@ -1233,6 +1329,7 @@ function buildCommandMap()
 		[_AUCT('CmdScan')]				=	'scan',
 		[_AUCT('CmdAutofill')]			=	'autofill',
 		[_AUCT('CmdWarnColor')]			=	'warn-color',
+		[_AUCT('CmdFinishSound')]		=	'finish-sound',
 		[_AUCT('CmdAuctionDuration')]	=	'auction-duration',
 		[_AUCT('CmdProtectWindow')]		=	'protect-window',
 		[_AUCT('CmdFinish')]			=	'finish',
@@ -1248,6 +1345,7 @@ function buildCommandMap()
 		[_AUCT('CmdPctUndermkt')]		=	'pct-undermkt',
 
 		--AskPrice related commands
+		[_AUCT('CmdAskPriceWhispers')]	=	'whispers',
 		[_AUCT('CmdAskPriceVendor')]	=	'vendor',
 		[_AUCT('CmdAskPriceGuild')]		=	'guild',
 		[_AUCT('CmdAskPriceParty')]		=	'party',
@@ -1414,7 +1512,6 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
 
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
-	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r\n          %s\n\n";
 
 	local _, frameName = getFrameNames(getFrameIndex());
 
@@ -1422,6 +1519,7 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer "..onOffToggle.."|r |cff2040ff["..Auctioneer.Util.GetLocalizedFilterVal("all").."]|r\n          " .. _AUCT('HelpOnoff') .. "\n\n");
 	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer ".._AUCT('CmdDisable').."|r\n          " .. _AUCT('HelpDisable') .. "\n\n");
 
+	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r\n          %s\n\n";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowVerbose'), Auctioneer.Util.GetLocalizedFilterVal('show-verbose'), _AUCT('HelpVerbose')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowAverage'), Auctioneer.Util.GetLocalizedFilterVal('show-average'), _AUCT('HelpAverage')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowMedian'), Auctioneer.Util.GetLocalizedFilterVal('show-median'), _AUCT('HelpMedian')));
@@ -1435,10 +1533,10 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionClick'), Auctioneer.Util.GetLocalizedFilterVal('auction-click'), _AUCT('HelpAuctionClick')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdWarnColor'), Auctioneer.Util.GetLocalizedFilterVal('warn-color'), _AUCT('HelpWarnColor')));
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdUpdatePrice'), Auctioneer.Util.GetLocalizedFilterVal('update-price'), _AUCT('HelpUpdatePrice')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdFinishSound'), Auctioneer.Util.GetLocalizedFilterVal('finish-sound'), _AUCT('HelpFinishSound')));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r\n          %s\n\n";
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'), _AUCT('OptProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')), _AUCT('HelpProtectWindow')));
-
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionDuration'), _AUCT('OptAuctionDuration'), _AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')), _AUCT('HelpAuctionDuration')));
 
 	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdLocale'), _AUCT('OptLocale'), Auctioneer.Util.GetLocalizedFilterVal("locale"), _AUCT('HelpLocale')));
