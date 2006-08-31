@@ -52,6 +52,7 @@ local attributes = { --TODO: Localize
 	'resistance to fire',
 	'frost resistance',
 	'nature resistance',
+	'resistance to shadow',
 	'resistance',
 	'all stats',
 	'mana',
@@ -77,6 +78,7 @@ local short_attributes = { --TODO: Localize
 	'fire res',
 	'frost res',
 	'nature res',
+	'shadow res',
 	'all res',
 	'all stats',
 	'mana',
@@ -90,6 +92,15 @@ local short_attributes = { --TODO: Localize
 	'DMG',
 	'DMG',
 	'DEF'
+};
+
+local short_location = {
+	[_ENCH('Orgrimmar')] = _ENCH('ShortOrgrimmar'),
+	[_ENCH('ThunderBluff')] = _ENCH('ShortThunderBluff'), 
+	[_ENCH('Undercity')] = _ENCH('ShortUndercity'),
+	[_ENCH('StormwindCity')] = _ENCH('ShortStormwind'),
+	[_ENCH('Darnassus')] = _ENCH('ShortDarnassus'),
+	[_ENCH('Ironforge')] = _ENCH('ShortIronForge')
 };
 
 -- UI code
@@ -214,6 +225,7 @@ local config_defaults = {
 	["fire res"] = 85,
 	["frost res"] = 85,
 	["nature res"] = 85,
+	["shadow res"] = 85,
 	mana = 35,
 	health = 40,
 	DMG = 90,
@@ -282,11 +294,11 @@ Enchantrix_BarkerOptions_ActiveTab = -1;
 
 Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 	{
-		title = 'Profit and Price Priorities',
+		title = _ENCH('BarkerOptionsTab1Title'),
 		options = {
 			{
-				name = 'Profit Margin',
-				tooltip = 'The percentage profit to add to the base mats cost.',
+				name = _ENCH('BarkerOptionsProfitMarginTitle'),
+				tooltip = _ENCH('BarkerOptionsProfitMarginTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -296,8 +308,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Highest Profit',
-				tooltip = 'The highest total cash profit to make on an enchant.',
+				name = _ENCH('BarkerOptionsHighestProfitTitle'),
+				tooltip = _ENCH('BarkerOptionsHighestProfitTooltip'),
 				units = 'money',
 				min = 0,
 				max = 250000,
@@ -307,8 +319,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Lowest Price',
-				tooltip = 'The lowest cash price to quote for an enchant.',
+				name = _ENCH('BarkerOptionsLowestPriceTitle'),
+				tooltip = _ENCH('BarkerOptionsLowestPriceTooltip'),
 				units = 'money',
 				min = 0,
 				max = 50000,
@@ -318,8 +330,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Overall Price Priority',
-				tooltip = 'This sets how important pricing is to the overall priority for advertising.',
+				name = _ENCH('BarkerOptionsPricePriorityTitle'),
+				tooltip = _ENCH('BarkerOptionsPricePriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -329,8 +341,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'PriceFactor SweetSpot',
-				tooltip = 'This is used to prioritise enchants near this price for advertising.',
+				name = _ENCH('BarkerOptionsPriceSweetspotTitle'),
+				tooltip = _ENCH('BarkerOptionsPriceSweetspotTooltip'),
 				units = 'money',
 				min = 0,
 				max = 500000,
@@ -340,8 +352,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'PriceFactor Highest',
-				tooltip = 'Enchants receive a score of zero for price priority at or above this value.',
+				name = _ENCH('BarkerOptionsHighestPriceForFactorTitle'),
+				tooltip = _ENCH('BarkerOptionsHighestPriceForFactorTooltip'),
 				units = 'money',
 				min = 0,
 				max = 1000000,
@@ -351,8 +363,8 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Random Factor',
-				tooltip = 'The amount of randomness in the enchants chosen for the trade shout.',
+				name = _ENCH('BarkerOptionsRandomFactorTitle'),
+				tooltip = _ENCH('BarkerOptionsRandomFactorTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -537,6 +549,17 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
+				name = 'Armour',
+				tooltip = 'The priority score for Armour enchants.',
+				units = 'percentage',
+				min = 0,
+				max = 100,
+				step = 1,
+				key = 'armour',
+				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+			},
+			{
 				name = 'All Stats',
 				tooltip = 'The priority score for enchants that increase all stats.',
 				units = 'percentage',
@@ -560,17 +583,6 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				max = 100,
 				step = 1,
 				key = 'all res',
-				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
-				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-			},
-			{
-				name = 'Armour',
-				tooltip = 'The priority score for Armour enchants.',
-				units = 'percentage',
-				min = 0,
-				max = 100,
-				step = 1,
-				key = 'armour',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -604,6 +616,17 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				max = 100,
 				step = 1,
 				key = 'nature res',
+				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+			},
+			{
+				name = 'Shadow Resistance',
+				tooltip = 'The priority score for Shadow Resistance enchants.',
+				units = 'percentage',
+				min = 0,
+				max = 100,
+				step = 1,
+				key = 'shadow res',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -757,13 +780,15 @@ end
 -- end UI code
 
 
+
+
 function Enchantrix_CreateBarker()
 	local availableEnchants = {};
 	local numAvailable = 0;
 	local temp = GetCraftSkillLine(1);
-	if Enchantrix_BarkerGetZoneText() then
-		Enchantrix_ResetBarkerString();
-		Enchantrix_ResetPriorityList();
+	if EnchantrixBarker_BarkerGetZoneText() then
+		EnchantrixBarker_ResetBarkerString();
+		EnchantrixBarker_ResetPriorityList();
 		if (temp) then
 			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
 			for index=1, GetNumCrafts() do
@@ -784,7 +809,7 @@ function Enchantrix_CreateBarker()
 					if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
 						profit = Enchantrix_BarkerGetConfig("highest_profit");
 					end
-					local price = Enchantrix_RoundPrice(cost + profit);
+					local price = EnchantrixBarker_RoundPrice(cost + profit);
 
 					local enchant = {
 						index = index,
@@ -803,26 +828,26 @@ function Enchantrix_CreateBarker()
 					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
 					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
 
-					Enchantrix_AddEnchantToPriorityList( enchant )
+					EnchantrixBarker_AddEnchantToPriorityList( enchant )
 					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
 					numAvailable = numAvailable + 1;
 				end
 			end
 
 			if numAvailable == 0 then
-				Enchantrix.Util.ChatPrint("Enchantrix: You either don't have any enchants or don't have the reagents to make them."); --TODO: Localize
+				Enchantrix.Util.ChatPrint(_ENCH('BarkerNoEnchantsAvail'));
 				return nil
 			end
 
 			for i,element in ipairs(priorityList) do
 				EnhTooltip.DebugPrint(element.enchant.name);
-				Enchantrix_AddEnchantToBarker( element.enchant );
+				EnchantrixBarker_AddEnchantToBarker( element.enchant );
 			end
 
-			return Enchantrix_GetBarkerString();
+			return EnchantrixBarker_GetBarkerString();
 
 		else
-			Enchantrix.Util.ChatPrint("Enchantrix: Enchant Window not open."); --TODO: Localize
+			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
 		end
 	end
 
@@ -830,20 +855,19 @@ function Enchantrix_CreateBarker()
 end
 
 
-
-function Enchantrix_ScoreEnchantPriority( enchant )
+function EnchantrixBarker_ScoreEnchantPriority( enchant )
 
 	local score_item = 0;
 
-	if Enchantrix_BarkerGetConfig( Enchantrix_GetItemCategoryKey(enchant.index) ) then
-		score_item = Enchantrix_BarkerGetConfig( Enchantrix_GetItemCategoryKey(enchant.index) );
+	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) ) then
+		score_item = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) );
 		score_item = score_item * Enchantrix_BarkerGetConfig( 'factor_item' )*0.01;
 	end
 
 	local score_stat = 0;
 
-	if Enchantrix_BarkerGetConfig( Enchantrix_GetEnchantStat(enchant) ) then
-		score_stat = Enchantrix_BarkerGetConfig( Enchantrix_GetEnchantStat(enchant));
+	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) ) then
+		score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant));
 	else
 		score_stat = Enchantrix_BarkerGetConfig( 'other' );
 	end
@@ -867,13 +891,13 @@ function Enchantrix_ScoreEnchantPriority( enchant )
 	return score_total * (1 - Enchantrix_BarkerGetConfig("randomise")*0.01) + math.random(300) * Enchantrix_BarkerGetConfig("randomise")*0.01;
 end
 
-function Enchantrix_ResetPriorityList()
+function EnchantrixBarker_ResetPriorityList()
 	priorityList = {};
 end
 
-function Enchantrix_AddEnchantToPriorityList(enchant)
+function EnchantrixBarker_AddEnchantToPriorityList(enchant)
 
-	local enchant_score = Enchantrix_ScoreEnchantPriority( enchant );
+	local enchant_score = EnchantrixBarker_ScoreEnchantPriority( enchant );
 
 	for i,priorityentry in ipairs(priorityList) do
 		if( priorityentry.score < enchant_score ) then
@@ -886,7 +910,7 @@ function Enchantrix_AddEnchantToPriorityList(enchant)
 end
 
 
-function Enchantrix_RoundPrice( price )
+function EnchantrixBarker_RoundPrice( price )
 
 	local round
 
@@ -908,6 +932,7 @@ function Enchantrix_RoundPrice( price )
 
 	return price
 end
+
 
 function Enchantrix_GetReagentHSP( itemLink )
 
@@ -960,30 +985,22 @@ end
 local barkerString = '';
 local barkerCategories = {};
 
-function Enchantrix_ResetBarkerString()
-	barkerString = "("..Enchantrix_BarkerGetZoneText()..") Selling Enchants:"; --TODO: Localize
+function EnchantrixBarker_ResetBarkerString()
+	barkerString = "("..EnchantrixBarker_BarkerGetZoneText()..") ".._ENCH('BarkerOpening');
 	barkerCategories = {};
 end
 
-local short_location = {
-	Orgrimmar = 'Org',
-	['Thunder Bluff'] = 'TB',
-	Undercity = 'UC',
-	['Stormwind City'] = 'SW',
-	Darnassus = 'Dar',
-	['City of Ironforge'] = 'IF'
-};
-
-function Enchantrix_BarkerGetZoneText()
+function EnchantrixBarker_BarkerGetZoneText()
 	--Enchantrix.Util.ChatPrint(GetZoneText());
 	return short_location[GetZoneText()];
 end
 
-function Enchantrix_AddEnchantToBarker( enchant )
 
-	local currBarker = Enchantrix_GetBarkerString();
+function EnchantrixBarker_AddEnchantToBarker( enchant )
 
-	local category_key = Enchantrix_GetItemCategoryKey( enchant.index )
+	local currBarker = EnchantrixBarker_GetBarkerString();
+
+	local category_key = EnchantrixBarker_GetItemCategoryKey( enchant.index )
 	local category_string = "";
 	local test_category = {};
 	if barkerCategories[ category_key ] then
@@ -995,7 +1012,7 @@ function Enchantrix_AddEnchantToBarker( enchant )
 
 	table.insert(test_category, enchant);
 
-	category_string = Enchantrix_GetBarkerCategoryString( test_category );
+	category_string = EnchantrixBarker_GetBarkerCategoryString( test_category );
 
 
 	if string.len(currBarker) + string.len(category_string) > 255 then
@@ -1012,41 +1029,42 @@ function Enchantrix_AddEnchantToBarker( enchant )
 end
 
 
-function Enchantrix_GetBarkerString()
+function EnchantrixBarker_GetBarkerString()
 	local barker = ""..barkerString;
 
 	for index, key in ipairs(print_order) do
 		if( barkerCategories[key] ) then
-			barker = barker..Enchantrix_GetBarkerCategoryString( barkerCategories[key] )
+			barker = barker..EnchantrixBarker_GetBarkerCategoryString( barkerCategories[key] )
 		end
 	end
 
 	return barker;
 end
 
-function Enchantrix_GetBarkerCategoryString( barkerCategory )
+function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
 	local barkercat = ""
-	barkercat = barkercat.." ["..Enchantrix_GetItemCategoryString(barkerCategory[1].index)..": ";
+	barkercat = barkercat.." ["..EnchantrixBarker_GetItemCategoryString(barkerCategory[1].index)..": ";
 	for j,enchant in ipairs(barkerCategory) do
 		if( j > 1) then
 			barkercat = barkercat..", "
 		end
-		barkercat = barkercat..Enchantrix_GetBarkerEnchantString(enchant);
+		barkercat = barkercat..EnchantrixBarker_GetBarkerEnchantString(enchant);
 	end
 	barkercat = barkercat.."]"
 
 	return barkercat
 end
 
-function Enchantrix_GetBarkerEnchantString( enchant )
+
+function EnchantrixBarker_GetBarkerEnchantString( enchant )
 	local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
 
 	enchant_barker = Enchantrix_GetShortDescriptor(enchant.index).." - ";
 	if( p_gold > 0 ) then
-		enchant_barker = enchant_barker..p_gold.."g";
+		enchant_barker = enchant_barker..p_gold.._ENCH('OneLetterGold');
 	end
 	if( p_silver > 0 ) then
-		enchant_barker = enchant_barker..p_silver.."s";
+		enchant_barker = enchant_barker..p_silver.._ENCH('OneLetterSilver');
 	end
 	--enchant_barker = enchant_barker..", ";
 	return enchant_barker
@@ -1055,7 +1073,7 @@ end
 
 
 
-function Enchantrix_GetItemCategoryString( index )
+function EnchantrixBarker_GetItemCategoryString( index )
 
 	local enchant = GetCraftInfo( index );
 
@@ -1070,7 +1088,7 @@ function Enchantrix_GetItemCategoryString( index )
 	return 'Unknown';
 end
 
-function Enchantrix_GetItemCategoryKey( index )
+function EnchantrixBarker_GetItemCategoryKey( index )
 
 	local enchant = GetCraftInfo( index );
 
@@ -1104,7 +1122,7 @@ function Enchantrix_GetShortDescriptor( index )
 	return enchant[table.getn(enchant)];
 end
 
-function Enchantrix_GetEnchantStat( enchant )
+function EnchantrixBarker_GetEnchantStat( enchant )
 	local index = enchant.index;
 	local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
 
