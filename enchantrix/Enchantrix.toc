@@ -12,17 +12,21 @@
 ## Revision: $Id$
 ## URL: http://enchantrix.org
 
-Babylonian\Babylonian.lua
-DisenchantList.lua
 EnxObjects.lua
+
+Babylonian\Babylonian.lua
+EnxStrings.lua
+EnxLocale.lua
+
+DisenchantList.lua
+
 EnchantrixBarker.lua
 EnchantrixBarker.xml
+
 EnxCommand.lua
 EnxConfig.lua
 EnxConstants.lua
-EnxLocale.lua
 EnxStorage.lua
-EnxStrings.lua
 EnxTooltip.lua
 EnxUtil.lua
 Enchantrix.lua
