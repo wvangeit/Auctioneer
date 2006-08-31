@@ -1,25 +1,26 @@
 --[[
-WARNING: This is a generated file.
-If you wish to perform localizations, please go to the localization site at:
-http://norganna.org/localizer/index.php
+	WARNING: This is a generated file.
+	If you wish to perform or update localizations, please go to our Localizer website at:
+	http://norganna.org/localizer/index.php
 
-  $Id$
-  Version: <%version%>
+	AddOn: Enchantrix
+	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
-License:
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program(see GLP.txt); if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
 EnchantrixLocalizations = {};
@@ -38,6 +39,8 @@ EnchantrixLocalizations["trTR"] = {};
 EnchantrixLocalizations["zhCN"] = {};
 EnchantrixLocalizations["zhTW"] = {};
 
+
+-- Section: Command Messages
 EnchantrixLocalizations["csCZ"]["FrmtActClearall"] = "Mazu vsechna Enchant data"
 EnchantrixLocalizations["daDK"]["FrmtActClearall"] = "Nulstiller al Enchant data"
 EnchantrixLocalizations["deDE"]["FrmtActClearall"] = "L\195\182sche alle Entzauberungsdaten"
@@ -243,6 +246,9 @@ EnchantrixLocalizations["ptPT"]["MesgNotloaded"] = "Enchantrix n\195\163o est\19
 EnchantrixLocalizations["ruRU"]["MesgNotloaded"] = "Enchantrix \208\189\208\181 \208\189\208\176\208\179\209\128\209\131\208\182\208\181\208\189\208\190. \208\157\208\176\208\191\208\181\209\135\208\176\209\130\208\176\208\185\209\130\208\181 /enchantrix \208\189\208\176 \208\188\208\176\209\136\208\184\208\189\208\186\208\181 \208\180\208\187\209\143 \208\177\208\190\208\187\209\140\209\136\208\181 info.\n"
 EnchantrixLocalizations["zhCN"]["MesgNotloaded"] = "\233\153\132\233\173\148\229\138\169\230\137\139\230\178\161\230\156\137\229\138\160\232\189\189\227\128\130\233\148\174\229\133\165/enchantrix\228\187\165\232\142\183\229\143\150\230\155\180\229\164\154\228\191\161\230\129\175\227\128\130"
 EnchantrixLocalizations["zhTW"]["MesgNotloaded"] = "Enchantrix\230\156\170\232\188\137\229\133\165,\232\188\184\229\133\165 /enchantrix \229\143\150\229\190\151\232\170\170\230\152\142"
+
+
+-- Section: Command Options
 EnchantrixLocalizations["csCZ"]["CmdClearAll"] = "vse"
 EnchantrixLocalizations["daDK"]["CmdClearAll"] = "alt"
 EnchantrixLocalizations["deDE"]["CmdClearAll"] = "all"
@@ -331,6 +337,9 @@ EnchantrixLocalizations["ptPT"]["OptPrintin"] = "(<frameIndex>[N\195\186mero]<fr
 EnchantrixLocalizations["ruRU"]["OptPrintin"] = "(<frameIndex>[Number]|<frameName>[String]) "
 EnchantrixLocalizations["zhCN"]["OptPrintin"] = "(<\231\170\151\229\143\163\230\160\135\231\173\190>[\230\149\176\229\173\151]|<\231\170\151\229\143\163\229\144\141\231\167\176>[\229\173\151\231\172\166\228\184\178])"
 EnchantrixLocalizations["zhTW"]["OptPrintin"] = "(<frameIndex>[Number]|<frameName>[String])"
+
+
+-- Section: Commands
 EnchantrixLocalizations["daDK"]["BarkerOff"] = "Funzione Imbonitore disabilitata."
 EnchantrixLocalizations["deDE"]["BarkerOff"] = "Barker ausgeschaltet."
 EnchantrixLocalizations["enUS"]["BarkerOff"] = "Barker function disabled."
@@ -637,6 +646,9 @@ EnchantrixLocalizations["nlNL"]["StatOn"] = "De geconfigureerde enchant gegevens
 EnchantrixLocalizations["ptPT"]["StatOn"] = "Est\195\161 a ser mostrada a informa\195\167\195\163o configurada do enchant"
 EnchantrixLocalizations["zhCN"]["StatOn"] = "Displaying configured enchant data\230\152\190\231\164\186\232\174\190\229\174\154\231\154\132\229\136\134\232\167\163\230\149\176\230\141\174"
 EnchantrixLocalizations["zhTW"]["StatOn"] = "\233\161\175\231\164\186\229\183\178\232\168\173\229\174\154\233\153\132\233\173\148\232\179\135\230\150\153\228\184\173"
+
+
+-- Section: Config Text
 EnchantrixLocalizations["csCZ"]["GuiLoad"] = "Spustit Enchantrix"
 EnchantrixLocalizations["daDK"]["GuiLoad"] = "Load Auctioneer"
 EnchantrixLocalizations["deDE"]["GuiLoad"] = "Enchantrix laden"
@@ -676,6 +688,9 @@ EnchantrixLocalizations["ptPT"]["GuiLoad_Never"] = "nunca"
 EnchantrixLocalizations["ruRU"]["GuiLoad_Never"] = "\208\189\208\184\208\186\208\190\208\179\208\180\208\176"
 EnchantrixLocalizations["zhCN"]["GuiLoad_Never"] = "\228\187\142\228\184\141"
 EnchantrixLocalizations["zhTW"]["GuiLoad_Never"] = "never"
+
+
+-- Section: Game Constants
 EnchantrixLocalizations["csCZ"]["ArgSpellname"] = "Rozcarovani"
 EnchantrixLocalizations["daDK"]["ArgSpellname"] = "Disenchant"
 EnchantrixLocalizations["deDE"]["ArgSpellname"] = "Entzaubern"
@@ -727,6 +742,9 @@ EnchantrixLocalizations["ptPT"]["TextGeneral"] = "Geral"
 EnchantrixLocalizations["ruRU"]["TextGeneral"] = "\208\158\209\129\208\189\208\190\208\178\208\189\208\190\208\185"
 EnchantrixLocalizations["zhCN"]["TextGeneral"] = "\230\153\174\233\128\154"
 EnchantrixLocalizations["zhTW"]["TextGeneral"] = "General"
+
+
+-- Section: Generic Messages
 EnchantrixLocalizations["csCZ"]["FrmtCredit"] = "(navstiv http://enchantrix.org/ a podel se o sva data)"
 EnchantrixLocalizations["daDK"]["FrmtCredit"] = "G\195\165 til http://enchantrix.org/ for at dele dine data"
 EnchantrixLocalizations["deDE"]["FrmtCredit"] = "(besuche http://enchantrix.org/ um deine Entzauberdaten mit anderen zu teilen)"
@@ -763,6 +781,9 @@ EnchantrixLocalizations["nlNL"]["MesgAuctVersion"] = "Enchantrix heeft Auctionee
 EnchantrixLocalizations["ptPT"]["MesgAuctVersion"] = "Enchantrix requer a vers\195\163o 3.4 do Auctioneer ou mais elevado. Algumas caracter\195\173sticas ser\195\163o desligadas at\195\169 que voc\195\170 actualize sua instala\195\167\195\163o do Auctioneer. "
 EnchantrixLocalizations["zhCN"]["MesgAuctVersion"] = "Enchantrix\233\156\128\232\166\129Auctioneer\231\137\136\230\156\1723.4\230\136\150\230\155\180\233\171\152\227\128\130\230\159\144\228\186\155\231\137\185\230\128\167\228\188\154\229\164\177\230\149\136\232\175\183\229\141\135\231\186\167\228\189\160\231\154\132Auctioneer"
 EnchantrixLocalizations["zhTW"]["MesgAuctVersion"] = "Enchantrix\233\156\128\232\166\129Auctioneer3.4\230\136\150\230\155\180\230\150\176\231\137\136\230\156\172\227\128\130\230\159\144\228\186\155\229\138\159\232\131\189\229\156\168\230\130\168\230\156\170\230\155\180\230\150\176\230\130\168\231\154\132Auctioneer\229\137\141\231\132\161\230\179\149\228\189\191\231\148\168\227\128\130"
+
+
+-- Section: Help Text
 EnchantrixLocalizations["daDK"]["GuiBarker"] = "Aktiver Udr\195\165ber"
 EnchantrixLocalizations["deDE"]["GuiBarker"] = "Barker aktivieren"
 EnchantrixLocalizations["enUS"]["GuiBarker"] = "Enable Barker"
@@ -1319,6 +1340,9 @@ EnchantrixLocalizations["koKR"]["HelpValue"] = "\234\176\128\235\138\165\237\149
 EnchantrixLocalizations["ptPT"]["HelpValue"] = "Seleccionar se quer ver os valores estimados baseados em propor\195\167\195\181es possiveis dos desencantos."
 EnchantrixLocalizations["zhCN"]["HelpValue"] = "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\231\137\169\229\147\129\229\159\186\228\186\142\229\143\175\232\131\189\229\136\134\232\167\163\229\135\160\231\142\135\231\154\132\233\162\132\232\174\161\228\187\183\229\128\188\227\128\130"
 EnchantrixLocalizations["zhTW"]["HelpValue"] = "Select whether to show item's estimated values based on the proportions of possible disenchants"
+
+
+-- Section: Report Messages
 EnchantrixLocalizations["csCZ"]["FrmtBidbrokerCurbid"] = "soucBid"
 EnchantrixLocalizations["daDK"]["FrmtBidbrokerCurbid"] = "BudNu"
 EnchantrixLocalizations["deDE"]["FrmtBidbrokerCurbid"] = "aktGeb"
@@ -1415,6 +1439,9 @@ EnchantrixLocalizations["nlNL"]["FrmtPctlessLine"] = "%s, Geschat op %s, BO: %s,
 EnchantrixLocalizations["ptPT"]["FrmtPctlessLine"] = "%s, Avaliado em: %s, BO: %s, Excepto: %s, Menos %s "
 EnchantrixLocalizations["zhCN"]["FrmtPctlessLine"] = "%s\239\188\140\228\188\176\228\187\183\239\188\154%s\239\188\140\228\184\128\229\143\163\228\187\183\239\188\154%s\239\188\140\232\138\130\231\156\129\239\188\154%s\239\188\140\229\183\174\233\162\157%s"
 EnchantrixLocalizations["zhTW"]["FrmtPctlessLine"] = "%s, Valued at: %s, BO: %s, Save: %s, Less %s"
+
+
+-- Section: Tooltip Messages
 EnchantrixLocalizations["daDK"]["FrmtBarkerPrice"] = "Udr\195\165bspris (%d%% margen)"
 EnchantrixLocalizations["deDE"]["FrmtBarkerPrice"] = "Barker Preis (%d%% Gewinn)"
 EnchantrixLocalizations["enUS"]["FrmtBarkerPrice"] = "Barker Price (%d%% margin)"
@@ -1575,4 +1602,3 @@ EnchantrixLocalizations["ptPT"]["FrmtWarnPriceUnavail"] = "[Alguns pre\195\167os
 EnchantrixLocalizations["ruRU"]["FrmtWarnPriceUnavail"] = "[\208\157\208\181\208\186\208\190\209\130\208\190\209\128\209\139\208\181 \209\134\208\181\208\189\209\139 \208\189\208\181\208\184\208\183\208\178\208\181\209\129\209\130\208\189\209\139]"
 EnchantrixLocalizations["zhCN"]["FrmtWarnPriceUnavail"] = "[\230\159\144\228\186\155\228\187\183\230\160\188\228\184\141\229\143\175\231\148\168]"
 EnchantrixLocalizations["zhTW"]["FrmtWarnPriceUnavail"] = "[\233\131\168\229\136\134\229\131\185\230\160\188\231\132\161\230\149\136]"
-

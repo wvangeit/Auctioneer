@@ -1,25 +1,26 @@
 --[[
-WARNING: This is a generated file.
-If you wish to perform localizations, please go to the localization site at:
-http://norganna.org/localizer/index.php
+	WARNING: This is a generated file.
+	If you wish to perform or update localizations, please go to our Localizer website at:
+	http://norganna.org/localizer/index.php
 
-  $Id$
-  Version: <%version%>
+	AddOn: BeanCounter
+	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
-License:
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program(see GLP.txt); if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
 BeanCounterLocalizations = {};
@@ -27,6 +28,7 @@ BeanCounterLocalizations["csCZ"] = {};
 BeanCounterLocalizations["daDK"] = {};
 BeanCounterLocalizations["deDE"] = {};
 BeanCounterLocalizations["enUS"] = {};
+BeanCounterLocalizations["esES"] = {};
 BeanCounterLocalizations["frFR"] = {};
 BeanCounterLocalizations["itIT"] = {};
 BeanCounterLocalizations["koKR"] = {};
@@ -36,10 +38,13 @@ BeanCounterLocalizations["zhCN"] = {};
 BeanCounterLocalizations["zhTW"] = {};
 BeanCounterLocalizations["ruRU"] = {};
 
+
+-- Section: Mail
 BeanCounterLocalizations["csCZ"]["MailAllianceAuctionHouse"] = "Aliancni aukce"
 BeanCounterLocalizations["daDK"]["MailAllianceAuctionHouse"] = "Alliance Auktions Hus"
 BeanCounterLocalizations["deDE"]["MailAllianceAuctionHouse"] = "Auktionshaus der Allianz"
 BeanCounterLocalizations["enUS"]["MailAllianceAuctionHouse"] = "Alliance Auction House"
+BeanCounterLocalizations["esES"]["MailAllianceAuctionHouse"] = "Casa de Subastas de la Alianza"
 BeanCounterLocalizations["frFR"]["MailAllianceAuctionHouse"] = "Hotel des Ventes de l'Alliance"
 BeanCounterLocalizations["itIT"]["MailAllianceAuctionHouse"] = "Casa d'aste dell'Alleanza"
 BeanCounterLocalizations["koKR"]["MailAllianceAuctionHouse"] = "\236\150\188\235\157\188\236\157\180\236\150\184\236\138\164 \234\178\189\235\167\164\236\158\165"
@@ -51,6 +56,7 @@ BeanCounterLocalizations["csCZ"]["MailAuctionCancelledSubject"] = "Aukce zrusena
 BeanCounterLocalizations["daDK"]["MailAuctionCancelledSubject"] = "Auktion afbrudt"
 BeanCounterLocalizations["deDE"]["MailAuctionCancelledSubject"] = "Auktion abgebrochen"
 BeanCounterLocalizations["enUS"]["MailAuctionCancelledSubject"] = "Auction cancelled"
+BeanCounterLocalizations["esES"]["MailAuctionCancelledSubject"] = "Subasta cancellada"
 BeanCounterLocalizations["frFR"]["MailAuctionCancelledSubject"] = "Ench\195\168re annul\195\169e"
 BeanCounterLocalizations["itIT"]["MailAuctionCancelledSubject"] = "Asta annullata"
 BeanCounterLocalizations["koKR"]["MailAuctionCancelledSubject"] = "\234\178\189\235\167\164 \236\183\168\236\134\140"
@@ -62,6 +68,7 @@ BeanCounterLocalizations["csCZ"]["MailAuctionExpiredSubject"] = "Platnost aukce 
 BeanCounterLocalizations["daDK"]["MailAuctionExpiredSubject"] = "Auktion udl\195\184bet"
 BeanCounterLocalizations["deDE"]["MailAuctionExpiredSubject"] = "Auktion abgelaufen"
 BeanCounterLocalizations["enUS"]["MailAuctionExpiredSubject"] = "Auction expired"
+BeanCounterLocalizations["esES"]["MailAuctionExpiredSubject"] = "Subasta expirada"
 BeanCounterLocalizations["frFR"]["MailAuctionExpiredSubject"] = "Ench\195\168re expir\195\169e"
 BeanCounterLocalizations["itIT"]["MailAuctionExpiredSubject"] = "Asta espirata"
 BeanCounterLocalizations["koKR"]["MailAuctionExpiredSubject"] = "\234\178\189\235\167\164 \235\167\140\235\163\140"
@@ -73,6 +80,7 @@ BeanCounterLocalizations["csCZ"]["MailAuctionSuccessfulSubject"] = "Aukce probeh
 BeanCounterLocalizations["daDK"]["MailAuctionSuccessfulSubject"] = "Auktion succesfuld"
 BeanCounterLocalizations["deDE"]["MailAuctionSuccessfulSubject"] = "Auktion erfolgreich"
 BeanCounterLocalizations["enUS"]["MailAuctionSuccessfulSubject"] = "Auction successful"
+BeanCounterLocalizations["esES"]["MailAuctionSuccessfulSubject"] = "Subasta acertada"
 BeanCounterLocalizations["frFR"]["MailAuctionSuccessfulSubject"] = "Ench\195\168re r\195\169ussie"
 BeanCounterLocalizations["itIT"]["MailAuctionSuccessfulSubject"] = "Asta riuscita"
 BeanCounterLocalizations["koKR"]["MailAuctionSuccessfulSubject"] = "\234\178\189\235\167\164 \236\153\132\235\163\140"
@@ -84,6 +92,7 @@ BeanCounterLocalizations["csCZ"]["MailAuctionWonSubject"] = "Vyhral/a jste aukci
 BeanCounterLocalizations["daDK"]["MailAuctionWonSubject"] = "Auktion vundet"
 BeanCounterLocalizations["deDE"]["MailAuctionWonSubject"] = "Auktion gewonnen"
 BeanCounterLocalizations["enUS"]["MailAuctionWonSubject"] = "Auction won"
+BeanCounterLocalizations["esES"]["MailAuctionWonSubject"] = "Subasta ganada"
 BeanCounterLocalizations["frFR"]["MailAuctionWonSubject"] = "Ench\195\168re gagn\195\169e"
 BeanCounterLocalizations["itIT"]["MailAuctionWonSubject"] = "Asta vinta"
 BeanCounterLocalizations["koKR"]["MailAuctionWonSubject"] = "\234\178\189\235\167\164\237\146\136 \235\130\153\236\176\176"
@@ -95,6 +104,7 @@ BeanCounterLocalizations["csCZ"]["MailHordeAuctionHouse"] = "Hordacka aukce"
 BeanCounterLocalizations["daDK"]["MailHordeAuctionHouse"] = "Horde Auktions Hus"
 BeanCounterLocalizations["deDE"]["MailHordeAuctionHouse"] = "Auktionshaus der Horde"
 BeanCounterLocalizations["enUS"]["MailHordeAuctionHouse"] = "Horde Auction House"
+BeanCounterLocalizations["esES"]["MailHordeAuctionHouse"] = "Casa de Subastas de la Horda"
 BeanCounterLocalizations["frFR"]["MailHordeAuctionHouse"] = "Hotel des Ventes de la Horde"
 BeanCounterLocalizations["itIT"]["MailHordeAuctionHouse"] = "Casa d'aste dell'Orda"
 BeanCounterLocalizations["koKR"]["MailHordeAuctionHouse"] = "\237\152\184\235\147\156 \234\178\189\235\167\164\236\158\165"
@@ -107,6 +117,7 @@ BeanCounterLocalizations["csCZ"]["MailOutbidOnSubject"] = "Prehozen/a na"
 BeanCounterLocalizations["daDK"]["MailOutbidOnSubject"] = "Overbudt p\195\165"
 BeanCounterLocalizations["deDE"]["MailOutbidOnSubject"] = "H\195\182heres Gebot f\195\188r"
 BeanCounterLocalizations["enUS"]["MailOutbidOnSubject"] = "Outbid on"
+BeanCounterLocalizations["esES"]["MailOutbidOnSubject"] = "Oferta mejorada para"
 BeanCounterLocalizations["frFR"]["MailOutbidOnSubject"] = "Surench\195\170re"
 BeanCounterLocalizations["itIT"]["MailOutbidOnSubject"] = "Battuto su"
 BeanCounterLocalizations["koKR"]["MailOutbidOnSubject"] = "\235\179\180\235\139\164 \235\134\146\236\157\128 \234\176\128\234\178\169\236\157\180 \236\160\156\236\139\156\235\144\168"
@@ -114,10 +125,14 @@ BeanCounterLocalizations["nlNL"]["MailOutbidOnSubject"] = "Outbid on"
 BeanCounterLocalizations["ptPT"]["MailOutbidOnSubject"] = "Sobrebidado em"
 BeanCounterLocalizations["zhCN"]["MailOutbidOnSubject"] = "\229\135\186\228\187\183\232\162\171\229\142\139\232\191\135"
 BeanCounterLocalizations["zhTW"]["MailOutbidOnSubject"] = "\229\135\186\229\131\185\229\164\177\230\149\151"
+
+
+-- Section: User Interface
 BeanCounterLocalizations["csCZ"]["UiAuctions"] = "Aukce"
 BeanCounterLocalizations["daDK"]["UiAuctions"] = "Auktioner"
 BeanCounterLocalizations["deDE"]["UiAuctions"] = "Auktionen"
 BeanCounterLocalizations["enUS"]["UiAuctions"] = "Auctions"
+BeanCounterLocalizations["esES"]["UiAuctions"] = "Subastas"
 BeanCounterLocalizations["frFR"]["UiAuctions"] = "Ench\195\168res"
 BeanCounterLocalizations["itIT"]["UiAuctions"] = "Aste"
 BeanCounterLocalizations["koKR"]["UiAuctions"] = "\234\178\189\235\167\164\237\146\136"
@@ -129,6 +144,7 @@ BeanCounterLocalizations["csCZ"]["UiAuctionTransaction"] = "Aukce"
 BeanCounterLocalizations["daDK"]["UiAuctionTransaction"] = "Auktion"
 BeanCounterLocalizations["deDE"]["UiAuctionTransaction"] = "Auktion"
 BeanCounterLocalizations["enUS"]["UiAuctionTransaction"] = "Auction"
+BeanCounterLocalizations["esES"]["UiAuctionTransaction"] = "Subasta"
 BeanCounterLocalizations["frFR"]["UiAuctionTransaction"] = "Ench\195\168re"
 BeanCounterLocalizations["itIT"]["UiAuctionTransaction"] = "Asta"
 BeanCounterLocalizations["koKR"]["UiAuctionTransaction"] = "\234\178\189\235\167\164"
@@ -140,6 +156,7 @@ BeanCounterLocalizations["csCZ"]["UiBids"] = "Bidy"
 BeanCounterLocalizations["daDK"]["UiBids"] = "Bud"
 BeanCounterLocalizations["deDE"]["UiBids"] = "Gebote"
 BeanCounterLocalizations["enUS"]["UiBids"] = "Bids"
+BeanCounterLocalizations["esES"]["UiBids"] = "Ofertas"
 BeanCounterLocalizations["frFR"]["UiBids"] = "Offres"
 BeanCounterLocalizations["itIT"]["UiBids"] = "Offerte"
 BeanCounterLocalizations["koKR"]["UiBids"] = "\236\158\133\236\176\176\237\146\136"
@@ -151,6 +168,7 @@ BeanCounterLocalizations["csCZ"]["UiBidTransaction"] = "Bid"
 BeanCounterLocalizations["daDK"]["UiBidTransaction"] = "Byd"
 BeanCounterLocalizations["deDE"]["UiBidTransaction"] = "Gebot"
 BeanCounterLocalizations["enUS"]["UiBidTransaction"] = "Bid"
+BeanCounterLocalizations["esES"]["UiBidTransaction"] = "Oferta"
 BeanCounterLocalizations["frFR"]["UiBidTransaction"] = "Offre"
 BeanCounterLocalizations["itIT"]["UiBidTransaction"] = "Offerta"
 BeanCounterLocalizations["koKR"]["UiBidTransaction"] = "\236\158\133\236\176\176"
@@ -162,6 +180,7 @@ BeanCounterLocalizations["csCZ"]["UiBuyerSellerHeader"] = "Zakaznik/prodavajici"
 BeanCounterLocalizations["daDK"]["UiBuyerSellerHeader"] = "K\195\184ber/S\195\166lger"
 BeanCounterLocalizations["deDE"]["UiBuyerSellerHeader"] = "K\195\164ufer/Verk\195\164ufer"
 BeanCounterLocalizations["enUS"]["UiBuyerSellerHeader"] = "Buyer/Seller"
+BeanCounterLocalizations["esES"]["UiBuyerSellerHeader"] = "Comrador/Vendedor"
 BeanCounterLocalizations["frFR"]["UiBuyerSellerHeader"] = "Acheteur/Vendeur"
 BeanCounterLocalizations["itIT"]["UiBuyerSellerHeader"] = "Compratore/Venditore"
 BeanCounterLocalizations["koKR"]["UiBuyerSellerHeader"] = "\234\181\172\235\167\164\236\158\144/\237\140\144\235\167\164\236\158\144"
@@ -173,6 +192,7 @@ BeanCounterLocalizations["csCZ"]["UiBuyTransaction"] = "Kup"
 BeanCounterLocalizations["daDK"]["UiBuyTransaction"] = "K\195\184b"
 BeanCounterLocalizations["deDE"]["UiBuyTransaction"] = "Kaufen"
 BeanCounterLocalizations["enUS"]["UiBuyTransaction"] = "Buy"
+BeanCounterLocalizations["esES"]["UiBuyTransaction"] = "Compra"
 BeanCounterLocalizations["frFR"]["UiBuyTransaction"] = "Acheter"
 BeanCounterLocalizations["itIT"]["UiBuyTransaction"] = "Compra"
 BeanCounterLocalizations["koKR"]["UiBuyTransaction"] = "\234\181\172\236\158\133"
@@ -184,6 +204,7 @@ BeanCounterLocalizations["csCZ"]["UiDateHeader"] = "Datum"
 BeanCounterLocalizations["daDK"]["UiDateHeader"] = "Dato"
 BeanCounterLocalizations["deDE"]["UiDateHeader"] = "Datum"
 BeanCounterLocalizations["enUS"]["UiDateHeader"] = "Date"
+BeanCounterLocalizations["esES"]["UiDateHeader"] = "D\195\173a"
 BeanCounterLocalizations["frFR"]["UiDateHeader"] = "Date"
 BeanCounterLocalizations["itIT"]["UiDateHeader"] = "Data"
 BeanCounterLocalizations["koKR"]["UiDateHeader"] = "\235\130\160\236\167\156"
@@ -195,6 +216,7 @@ BeanCounterLocalizations["csCZ"]["UiDepositTransaction"] = "Sklad"
 BeanCounterLocalizations["daDK"]["UiDepositTransaction"] = "Indskud"
 BeanCounterLocalizations["deDE"]["UiDepositTransaction"] = "Anzahlung"
 BeanCounterLocalizations["enUS"]["UiDepositTransaction"] = "Deposit"
+BeanCounterLocalizations["esES"]["UiDepositTransaction"] = "Dep\195\179sito"
 BeanCounterLocalizations["frFR"]["UiDepositTransaction"] = "D\195\169p\195\180t"
 BeanCounterLocalizations["itIT"]["UiDepositTransaction"] = "Deposito"
 BeanCounterLocalizations["koKR"]["UiDepositTransaction"] = "\235\179\180\236\166\157\234\184\136"
@@ -206,6 +228,7 @@ BeanCounterLocalizations["csCZ"]["UiExactNameSearch"] = "Presny nazev"
 BeanCounterLocalizations["daDK"]["UiExactNameSearch"] = "Eksakt navne-s\195\184gning"
 BeanCounterLocalizations["deDE"]["UiExactNameSearch"] = "Genaue Namenssuche"
 BeanCounterLocalizations["enUS"]["UiExactNameSearch"] = "Exact name search"
+BeanCounterLocalizations["esES"]["UiExactNameSearch"] = "B\195\186squeda de nombre exacto"
 BeanCounterLocalizations["frFR"]["UiExactNameSearch"] = "Nom exact"
 BeanCounterLocalizations["itIT"]["UiExactNameSearch"] = "Ricerca nome esatto"
 BeanCounterLocalizations["koKR"]["UiExactNameSearch"] = "\236\160\149\237\153\149\237\149\156 \236\157\180\235\166\132 \236\176\190\234\184\176"
@@ -217,6 +240,7 @@ BeanCounterLocalizations["csCZ"]["UiNameHeader"] = "Vec"
 BeanCounterLocalizations["daDK"]["UiNameHeader"] = "Item"
 BeanCounterLocalizations["deDE"]["UiNameHeader"] = "Gegenstand"
 BeanCounterLocalizations["enUS"]["UiNameHeader"] = "Item"
+BeanCounterLocalizations["esES"]["UiNameHeader"] = "Art\195\173culo"
 BeanCounterLocalizations["frFR"]["UiNameHeader"] = "Objet"
 BeanCounterLocalizations["itIT"]["UiNameHeader"] = "Oggetto"
 BeanCounterLocalizations["koKR"]["UiNameHeader"] = "\236\149\132\236\157\180\237\133\156"
@@ -228,6 +252,7 @@ BeanCounterLocalizations["csCZ"]["UiNetHeader"] = "Sit"
 BeanCounterLocalizations["daDK"]["UiNetHeader"] = "Net"
 BeanCounterLocalizations["deDE"]["UiNetHeader"] = "Netz"
 BeanCounterLocalizations["enUS"]["UiNetHeader"] = "Net"
+BeanCounterLocalizations["esES"]["UiNetHeader"] = "Neto"
 BeanCounterLocalizations["frFR"]["UiNetHeader"] = "Net"
 BeanCounterLocalizations["itIT"]["UiNetHeader"] = "Netto"
 BeanCounterLocalizations["koKR"]["UiNetHeader"] = "\237\149\173\235\170\169"
@@ -239,6 +264,7 @@ BeanCounterLocalizations["csCZ"]["UiNetPerHeader"] = "Sit per"
 BeanCounterLocalizations["daDK"]["UiNetPerHeader"] = "Net Per"
 BeanCounterLocalizations["deDE"]["UiNetPerHeader"] = "Netz pro"
 BeanCounterLocalizations["enUS"]["UiNetPerHeader"] = "Net Per"
+BeanCounterLocalizations["esES"]["UiNetPerHeader"] = "Neto c/u"
 BeanCounterLocalizations["frFR"]["UiNetPerHeader"] = "Net unit."
 BeanCounterLocalizations["itIT"]["UiNetPerHeader"] = "Netto per"
 BeanCounterLocalizations["koKR"]["UiNetPerHeader"] = "\237\149\173\235\170\169\235\130\180\236\154\169"
@@ -250,6 +276,7 @@ BeanCounterLocalizations["csCZ"]["UiPriceHeader"] = "Cena"
 BeanCounterLocalizations["daDK"]["UiPriceHeader"] = "Pris"
 BeanCounterLocalizations["deDE"]["UiPriceHeader"] = "Preis"
 BeanCounterLocalizations["enUS"]["UiPriceHeader"] = "Price"
+BeanCounterLocalizations["esES"]["UiPriceHeader"] = "Precio"
 BeanCounterLocalizations["frFR"]["UiPriceHeader"] = "Prix"
 BeanCounterLocalizations["itIT"]["UiPriceHeader"] = "Prezzo"
 BeanCounterLocalizations["koKR"]["UiPriceHeader"] = "\234\176\128\234\178\169"
@@ -261,6 +288,7 @@ BeanCounterLocalizations["csCZ"]["UiPricePerHeader"] = "Cenova hlava"
 BeanCounterLocalizations["daDK"]["UiPricePerHeader"] = "Styk Pris"
 BeanCounterLocalizations["deDE"]["UiPricePerHeader"] = "Preis\195\188berschrift"
 BeanCounterLocalizations["enUS"]["UiPricePerHeader"] = "Price Header"
+BeanCounterLocalizations["esES"]["UiPricePerHeader"] = "Precio c/u"
 BeanCounterLocalizations["frFR"]["UiPricePerHeader"] = "Prix unit."
 BeanCounterLocalizations["itIT"]["UiPricePerHeader"] = "Prezzo per"
 BeanCounterLocalizations["koKR"]["UiPricePerHeader"] = "\234\176\128\234\178\169 \237\149\173\235\170\169"
@@ -272,6 +300,7 @@ BeanCounterLocalizations["csCZ"]["UiPurchases"] = "Nakupy"
 BeanCounterLocalizations["daDK"]["UiPurchases"] = "K\195\184b"
 BeanCounterLocalizations["deDE"]["UiPurchases"] = "Eink\195\164ufe"
 BeanCounterLocalizations["enUS"]["UiPurchases"] = "Purchases"
+BeanCounterLocalizations["esES"]["UiPurchases"] = "Compras"
 BeanCounterLocalizations["frFR"]["UiPurchases"] = "Achats"
 BeanCounterLocalizations["itIT"]["UiPurchases"] = "Compere"
 BeanCounterLocalizations["koKR"]["UiPurchases"] = "\234\181\172\236\158\133"
@@ -283,6 +312,7 @@ BeanCounterLocalizations["csCZ"]["UiQuantityHeader"] = "Mnozstvi"
 BeanCounterLocalizations["daDK"]["UiQuantityHeader"] = "Stk"
 BeanCounterLocalizations["deDE"]["UiQuantityHeader"] = "Anz"
 BeanCounterLocalizations["enUS"]["UiQuantityHeader"] = "Qty"
+BeanCounterLocalizations["esES"]["UiQuantityHeader"] = "Cta."
 BeanCounterLocalizations["frFR"]["UiQuantityHeader"] = "Qte"
 BeanCounterLocalizations["itIT"]["UiQuantityHeader"] = "Q.t\195\160"
 BeanCounterLocalizations["koKR"]["UiQuantityHeader"] = "\236\136\152\235\159\137"
@@ -294,6 +324,7 @@ BeanCounterLocalizations["csCZ"]["UiSales"] = "Prodeje"
 BeanCounterLocalizations["daDK"]["UiSales"] = "Salg"
 BeanCounterLocalizations["deDE"]["UiSales"] = "Verk\195\164ufe"
 BeanCounterLocalizations["enUS"]["UiSales"] = "Sales"
+BeanCounterLocalizations["esES"]["UiSales"] = "Ventas"
 BeanCounterLocalizations["frFR"]["UiSales"] = "Ventes"
 BeanCounterLocalizations["itIT"]["UiSales"] = "Vendite"
 BeanCounterLocalizations["koKR"]["UiSales"] = "\237\140\144\235\167\164"
@@ -305,6 +336,7 @@ BeanCounterLocalizations["csCZ"]["UiSearch"] = "Hledat"
 BeanCounterLocalizations["daDK"]["UiSearch"] = "S\195\184g"
 BeanCounterLocalizations["deDE"]["UiSearch"] = "Suche"
 BeanCounterLocalizations["enUS"]["UiSearch"] = "Search"
+BeanCounterLocalizations["esES"]["UiSearch"] = "B\195\186squedas"
 BeanCounterLocalizations["frFR"]["UiSearch"] = "Recherche"
 BeanCounterLocalizations["itIT"]["UiSearch"] = "Ricerca"
 BeanCounterLocalizations["koKR"]["UiSearch"] = "\234\178\128\236\131\137"
@@ -316,6 +348,7 @@ BeanCounterLocalizations["csCZ"]["UiSearchForLabel"] = "Hledej"
 BeanCounterLocalizations["daDK"]["UiSearchForLabel"] = "S\195\184g efter:"
 BeanCounterLocalizations["deDE"]["UiSearchForLabel"] = "Suche nach:"
 BeanCounterLocalizations["enUS"]["UiSearchForLabel"] = "Search for:"
+BeanCounterLocalizations["esES"]["UiSearchForLabel"] = "Buscar por:"
 BeanCounterLocalizations["frFR"]["UiSearchForLabel"] = "Rechercher :"
 BeanCounterLocalizations["itIT"]["UiSearchForLabel"] = "Cerca per:"
 BeanCounterLocalizations["koKR"]["UiSearchForLabel"] = "\234\178\128\236\131\137:"
@@ -327,6 +360,7 @@ BeanCounterLocalizations["csCZ"]["UiSellTransaction"] = "Prodej"
 BeanCounterLocalizations["daDK"]["UiSellTransaction"] = "S\195\166lg"
 BeanCounterLocalizations["deDE"]["UiSellTransaction"] = "Verkaufen"
 BeanCounterLocalizations["enUS"]["UiSellTransaction"] = "Sell"
+BeanCounterLocalizations["esES"]["UiSellTransaction"] = "Vender"
 BeanCounterLocalizations["frFR"]["UiSellTransaction"] = "Vendre"
 BeanCounterLocalizations["itIT"]["UiSellTransaction"] = "Vendi"
 BeanCounterLocalizations["koKR"]["UiSellTransaction"] = "\237\140\144\235\167\164"
@@ -338,6 +372,7 @@ BeanCounterLocalizations["csCZ"]["UiTransactions"] = "Transakce"
 BeanCounterLocalizations["daDK"]["UiTransactions"] = "Transaktioner"
 BeanCounterLocalizations["deDE"]["UiTransactions"] = "Transaktionen"
 BeanCounterLocalizations["enUS"]["UiTransactions"] = "Transactions"
+BeanCounterLocalizations["esES"]["UiTransactions"] = "Transacci\195\179nes"
 BeanCounterLocalizations["frFR"]["UiTransactions"] = "Transactions"
 BeanCounterLocalizations["itIT"]["UiTransactions"] = "Transazioni"
 BeanCounterLocalizations["koKR"]["UiTransactions"] = "\234\177\176\235\158\152"
@@ -349,6 +384,7 @@ BeanCounterLocalizations["csCZ"]["UiTransactionsLabel"] = "Transakce"
 BeanCounterLocalizations["daDK"]["UiTransactionsLabel"] = "Transaktioner:"
 BeanCounterLocalizations["deDE"]["UiTransactionsLabel"] = "Transaktionen:"
 BeanCounterLocalizations["enUS"]["UiTransactionsLabel"] = "Transactions:"
+BeanCounterLocalizations["esES"]["UiTransactionsLabel"] = "Transacci\195\179nes:"
 BeanCounterLocalizations["frFR"]["UiTransactionsLabel"] = "Transactions:"
 BeanCounterLocalizations["itIT"]["UiTransactionsLabel"] = "Transazioni:"
 BeanCounterLocalizations["koKR"]["UiTransactionsLabel"] = "\234\177\176\235\158\152:"
@@ -360,6 +396,7 @@ BeanCounterLocalizations["csCZ"]["UiTransactionTypeHeader"] = "Typ"
 BeanCounterLocalizations["daDK"]["UiTransactionTypeHeader"] = "Type"
 BeanCounterLocalizations["deDE"]["UiTransactionTypeHeader"] = "Typ"
 BeanCounterLocalizations["enUS"]["UiTransactionTypeHeader"] = "Type"
+BeanCounterLocalizations["esES"]["UiTransactionTypeHeader"] = "Tipo"
 BeanCounterLocalizations["frFR"]["UiTransactionTypeHeader"] = "Type"
 BeanCounterLocalizations["itIT"]["UiTransactionTypeHeader"] = "Tipo"
 BeanCounterLocalizations["koKR"]["UiTransactionTypeHeader"] = "\237\152\149\236\139\157"
@@ -367,4 +404,3 @@ BeanCounterLocalizations["nlNL"]["UiTransactionTypeHeader"] = "Type"
 BeanCounterLocalizations["ptPT"]["UiTransactionTypeHeader"] = "Tipo"
 BeanCounterLocalizations["zhCN"]["UiTransactionTypeHeader"] = "\231\177\187\229\158\139"
 BeanCounterLocalizations["zhTW"]["UiTransactionTypeHeader"] = "\233\161\158\229\136\165"
-

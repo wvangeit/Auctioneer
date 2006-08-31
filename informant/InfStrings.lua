@@ -1,25 +1,26 @@
 --[[
-WARNING: This is a generated file.
-If you wish to perform localizations, please go to the localization site at:
-http://norganna.org/localizer/index.php
+	WARNING: This is a generated file.
+	If you wish to perform or update localizations, please go to our Localizer website at:
+	http://norganna.org/localizer/index.php
 
-  $Id$
-  Version: <%version%>
+	AddOn: Informant
+	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
-License:
-  This program is free software; you can redistribute it and/or
-  modify it under the terms of the GNU General Public License
-  as published by the Free Software Foundation; either version 2
-  of the License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program(see GLP.txt); if not, write to the Free Software
-  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
 InformantLocalizations = {};
@@ -38,6 +39,8 @@ InformantLocalizations["zhCN"] = {};
 InformantLocalizations["zhTW"] = {};
 InformantLocalizations["nlNL"] = {};
 
+
+-- Section: Commands
 InformantLocalizations["csCZ"]["CmdClearAll"] = "vse"
 InformantLocalizations["daDK"]["CmdClearAll"] = "alle"
 InformantLocalizations["deDE"]["CmdClearAll"] = "all"
@@ -270,6 +273,9 @@ InformantLocalizations["ruRU"]["ShowVendorSell"] = "show-vendor-sell"
 InformantLocalizations["trTR"]["ShowVendorSell"] = "goster-satici-satis"
 InformantLocalizations["zhCN"]["ShowVendorSell"] = "show-vendor-sell\230\152\190\231\164\186\229\149\134\232\180\169\229\135\186\229\148\174"
 InformantLocalizations["zhTW"]["ShowVendorSell"] = "show-vendor-sell"
+
+
+-- Section: Generic Messages
 InformantLocalizations["csCZ"]["MesgNotLoaded"] = "Informant neni nahran. zadej /informant pro vice infromaci."
 InformantLocalizations["daDK"]["MesgNotLoaded"] = "Informant er ikke indl\195\166st. Skriv /informant for mere info."
 InformantLocalizations["deDE"]["MesgNotLoaded"] = "Informant ist nicht geladen. Geben Sie /informant ein um mehr Informationen zu erhalten."
@@ -324,6 +330,9 @@ InformantLocalizations["ruRU"]["Welcome"] = "|c40ff50ff\208\148\208\177\209\128\
 InformantLocalizations["trTR"]["Welcome"] = "|c40ff50ffInformant'a ho\195\133\197\184geldiniz|r Informant'\195\132\194\177 bu ilk kullan\195\132\194\177\195\133\197\184\195\132\194\177n\195\132\194\177z oldu\195\132\197\184u i\195\131\194\167in, bu mesaj bu pencereyi g\195\131\194\182sterecek tu\195\133\197\184u |cffffffffGame Menu|r s\195\131\194\188n\195\131\194\188n |cffffffffKeybindings|r b\195\131\194\182lum\195\131\194\188nden se\195\131\194\167meniz gerekti\195\132\197\184ini bildirmek i\195\131\194\167in g\195\131\194\182z\195\131\194\188kmekte. Bunu tamamlaman\195\132\194\177zdan sonra \195\131\194\167antan\195\132\194\177zdaki cisimler hakk\195\132\194\177nda detayl\195\132\194\177 bilgi g\195\131\194\182rmek i\195\131\194\167in farenizi istedi\195\132\197\184iniz cismin \195\131\194\188zerine getirin ve belirlediginiz tu\195\133\197\184a bas\195\132\194\177n, o zaman bilgileri i\195\131\194\167eren bu pencere belirecek. O anda tu\195\133\197\184a tekrar bas\195\132\194\177n ya da \195\131\194\167er\195\131\194\167evenin kapa d\195\131\194\188\195\132\197\184mesine t\195\132\194\177klay\195\132\194\177n. Devam etmek i\195\131\194\167in \195\133\197\184imdi kapa d\195\131\194\188\195\132\197\184mesine t\195\132\194\177klay\195\132\194\177n\195\132\194\177z. "
 InformantLocalizations["zhCN"]["Welcome"] = "|c40ff50ff\230\172\162\232\191\142\228\189\191\231\148\168Informant|r \229\155\160\228\184\186\232\191\153\230\152\175\230\130\168\231\172\172\228\184\128\230\172\161\228\189\191\231\148\168Informant\239\188\140\232\191\153\228\184\170\228\191\161\230\129\175\232\174\169\230\130\168\231\159\165\233\129\147\229\191\133\233\161\187\229\156\168|cffffffff\230\184\184\230\136\143\232\143\156\229\141\149|r\231\154\132|cffffffff\230\140\137\233\148\174\232\174\190\231\189\174|r\229\140\186\229\159\159\232\174\190\231\189\174\228\184\128\228\184\170\229\191\171\230\141\183\233\148\174\230\157\165\230\152\190\231\164\186\232\191\153\228\184\170\231\170\151\229\143\163\239\188\140\231\132\182\229\144\142\230\130\168\229\176\177\232\131\189\233\128\154\232\191\135\231\167\187\229\138\168\233\188\160\230\160\135\229\136\176\231\137\169\229\147\129\228\184\138\230\157\165\230\159\165\231\156\139\231\137\169\229\147\129\231\154\132\233\171\152\231\186\167\228\191\161\230\129\175\239\188\140\230\140\137\230\130\168\232\174\190\231\189\174\231\154\132\229\191\171\230\141\183\233\148\174\239\188\140\232\191\153\228\184\170\231\170\151\229\143\163\229\176\134\228\188\154\230\152\190\231\164\186\231\137\169\229\147\129\228\191\161\230\129\175\227\128\130\229\134\141\230\140\137\228\184\128\230\172\161\229\191\171\230\141\183\233\148\174\230\136\150\230\140\137\229\133\179\233\151\173\230\140\137\233\146\174\229\176\134\228\188\154\229\133\179\233\151\173\232\191\153\228\184\170\231\170\151\229\143\163\227\128\130\230\140\137\229\133\179\233\151\173\230\140\137\233\146\174\231\187\167\231\187\173\227\128\130"
 InformantLocalizations["zhTW"]["Welcome"] = "|c40ff50ff\230\173\161\232\191\142\228\189\191\231\148\168Informant|r \233\128\153\230\152\175\228\189\160\231\172\172\228\184\128\230\172\161\228\189\191\231\148\168Informant\239\188\140\228\189\160\229\191\133\233\160\136\229\156\168|cffffffff\233\129\138\230\136\178\233\129\184\233\160\133|r \228\184\173\231\154\132|cffffffff\230\140\137\233\141\181\232\168\173\229\174\154|r\232\163\161\232\168\173\229\174\154\228\184\128\229\128\139\231\134\177\233\141\181\230\137\141\232\131\189\229\134\141\230\172\161\233\161\175\231\164\186\230\156\172\232\168\173\229\174\154\232\166\150\231\170\151\227\128\130 \231\143\190\229\156\168\233\150\139\229\167\139\239\188\140Informant\230\156\131\229\156\168\228\189\160\230\138\138\230\187\145\233\188\160\230\140\135\229\136\176\228\187\187\228\189\149\228\184\128\229\128\139\231\137\169\229\147\129\228\184\138\230\153\130\239\188\140\230\138\138\232\169\178\231\137\169\229\147\129\231\154\132\233\128\178\233\154\142\232\179\135\232\168\138\233\161\175\231\164\186\229\135\186\228\190\134\227\128\130 \232\139\165\228\189\160\230\131\179\232\166\129\232\169\179\231\180\176\230\170\162\232\166\150\232\169\178\231\137\169\229\147\129\231\154\132\230\137\128\230\156\137\233\128\178\233\154\142\232\179\135\232\168\138\239\188\140\229\143\170\232\166\129\229\144\140\230\153\130\230\140\137\228\184\139\228\189\160\229\156\168|cffffffff\230\140\137\233\141\181\232\168\173\229\174\154|r\232\163\161\232\168\173\229\174\154\231\154\132\231\134\177\233\141\181\229\141\179\229\143\175\227\128\130 \233\187\158\230\147\138\227\128\140\233\151\156\233\150\137\227\128\141\228\187\165\233\151\156\233\150\137\230\156\172\232\166\150\231\170\151\228\184\166\231\185\188\231\186\140\233\129\138\230\136\178\227\128\130"
+
+
+-- Section: Help Text
 InformantLocalizations["csCZ"]["GuiDefaultAll"] = "Obnov vsechna vychozi Informant nastaveni"
 InformantLocalizations["daDK"]["GuiDefaultAll"] = "Nulstil alle Informant valg"
 InformantLocalizations["deDE"]["GuiDefaultAll"] = "Alle Einstellungen zur\195\188cksetzen"
@@ -834,6 +843,9 @@ InformantLocalizations["ptPT"]["HelpVendorSell"] = "Seleccionar se quer ver o pr
 InformantLocalizations["ruRU"]["HelpVendorSell"] = "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \209\134\208\181\208\189\209\131 \208\191\209\128\208\190\208\180\208\176\208\182\208\184 \208\180\208\176\208\189\208\189\208\190\208\179\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176. \208\157\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\176 show-vendor \208\191\209\128\208\184 \209\141\209\130\208\190\208\188 \208\180\208\190\208\187\208\182\208\189\208\176 \208\177\209\139\209\130\209\140 \209\130\208\190\208\182\208\181 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\187\208\181\208\189\208\176 \208\178 on.\n"
 InformantLocalizations["zhCN"]["HelpVendorSell"] = "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\149\134\232\180\169\233\148\128\229\148\174\228\187\183\230\160\188(\233\156\128\232\166\129show-vendor=on)\227\128\130"
 InformantLocalizations["zhTW"]["HelpVendorSell"] = "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\231\137\169\229\147\129\229\156\168\229\149\134\229\186\151\230\148\182\232\179\188\231\154\132\229\131\185\230\160\188 (\233\156\128\232\166\129\233\150\139\229\149\159\233\161\175\231\164\186\231\137\169\229\147\129\229\131\185\230\160\188)"
+
+
+-- Section: Keybinding Text
 InformantLocalizations["csCZ"]["BindingHeader"] = "Informant"
 InformantLocalizations["daDK"]["BindingHeader"] = "Informant"
 InformantLocalizations["deDE"]["BindingHeader"] = "Informant"
@@ -860,6 +872,9 @@ InformantLocalizations["ptPT"]["BindingTitle"] = "Mostrar Janela de Informa\195\
 InformantLocalizations["ruRU"]["BindingTitle"] = "\208\159\208\190\208\186\208\176\208\183\208\176\209\130\209\140/\209\129\208\186\209\128\209\139\209\130\209\140 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\208\190\208\189\208\189\208\190\208\181 \208\190\208\186\208\189\208\190.\n"
 InformantLocalizations["zhCN"]["BindingTitle"] = "\229\188\128\229\133\179\232\189\172\230\141\162\228\191\161\230\129\175\231\170\151\229\143\163"
 InformantLocalizations["zhTW"]["BindingTitle"] = "\232\168\173\231\189\174\228\191\161\230\129\175\231\170\151\229\143\163\233\161\175\231\164\186\231\134\177\233\141\181"
+
+
+-- Section: Tooltip Messages
 InformantLocalizations["csCZ"]["FrameTitle"] = "Informace veci "
 InformantLocalizations["daDK"]["FrameTitle"] = "Informant information"
 InformantLocalizations["deDE"]["FrameTitle"] = "Informant-Informationen zum Gegenstand"
@@ -1212,6 +1227,9 @@ InformantLocalizations["ptPT"]["InfoVendorName"] = "%s"
 InformantLocalizations["ruRU"]["InfoVendorName"] = "%s"
 InformantLocalizations["zhCN"]["InfoVendorName"] = "%s"
 InformantLocalizations["zhTW"]["InfoVendorName"] = "%s"
+
+
+-- Section: Type Messages
 InformantLocalizations["csCZ"]["AdditAlcohol"] = "Alkohol"
 InformantLocalizations["daDK"]["AdditAlcohol"] = "Alkohol"
 InformantLocalizations["deDE"]["AdditAlcohol"] = "Alkohol"
@@ -1563,4 +1581,3 @@ InformantLocalizations["ptPT"]["SkillWarlock"] = "Feiti\195\167os de Warlock"
 InformantLocalizations["ruRU"]["SkillWarlock"] = "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\154\208\190\208\187\208\180\209\131\208\189\208\176(Warlock)"
 InformantLocalizations["zhCN"]["SkillWarlock"] = "\230\156\175\229\163\171\233\173\148\230\179\149"
 InformantLocalizations["zhTW"]["SkillWarlock"] = "\232\161\147\229\163\171\230\179\149\232\161\147"
-
