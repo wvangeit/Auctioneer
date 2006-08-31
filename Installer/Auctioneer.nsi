@@ -182,6 +182,9 @@ Section "Auctioneer" Auctioneer
 	File "..\Auctioneer\*.lua"
 	File "GPL.txt"
 
+	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\Sounds"
+	File "..\Auctioneer\Sounds\ScanComplete.ogg"
+
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\Babylonian"
 	File "..\Babylonian\*.lua"
 
