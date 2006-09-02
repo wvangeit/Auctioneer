@@ -1054,8 +1054,11 @@ function doBidBroker(minProfit, percentLess)
 				local bidText;
 
 				if (margin >= percentLess) then
-					if (currentBid == min) then	bidText = _ENCH('FrmtBidbrokerMinbid')
-					else                        bidText = _ENCH('FrmtBidbrokerCurbid') end
+					if (currentBid == min) then
+						bidText = _ENCH('FrmtBidbrokerMinbid');
+					else
+						bidText = _ENCH('FrmtBidbrokerCurbid');
+					end
 
 					local output = string.format(
 						_ENCH('FrmtBidbrokerLine'),
@@ -1070,9 +1073,9 @@ function doBidBroker(minProfit, percentLess)
 					Enchantrix.Util.ChatPrint(output);
 				else
 					if (currentBid == min) then
-						bidText = _ENCH('FrmtBidbrokerMinbid')
+						bidText = _ENCH('FrmtBidbrokerMinbid');
 					else
-						bidText = _ENCH('FrmtBidbrokerCurbid')
+						bidText = _ENCH('FrmtBidbrokerCurbid');
 					end
 
 					skipped_auctions = skipped_auctions + 1;
