@@ -1206,7 +1206,6 @@ EnchantrixLocalizations["koKR"]["HelpEmbed"] = "\235\130\180\236\154\169\236\157
 EnchantrixLocalizations["ptPT"]["HelpEmbed"] = "Encaixar o texto no tooltip original do jogo (nota: determinadas caracter\195\173sticas s\195\163o desligadas quando esta op\195\167\195\163o \195\169 selecionada)"
 EnchantrixLocalizations["zhCN"]["HelpEmbed"] = "\229\181\140\229\133\165\230\150\135\229\173\151\229\136\176\229\142\159\230\184\184\230\136\143\230\143\144\231\164\186\228\184\173(\230\143\144\231\164\186\239\188\154\230\159\144\228\186\155\231\137\185\230\128\167\229\156\168\232\175\165\230\168\161\229\188\143\228\184\139\231\166\129\231\148\168)\227\128\130"
 EnchantrixLocalizations["zhTW"]["HelpEmbed"] = "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)"
---TODO: update localizations for new option
 EnchantrixLocalizations["csCZ"]["HelpFindBidauct"] = "Najde aukce u nichz je cena mozneho produktu odcarovanio urcenou sumu stribra nizsi nez momentalni naBIDka"
 EnchantrixLocalizations["daDK"]["HelpFindBidauct"] = "Find auktioner hvis potentielle disenchant v\195\166rdi er et vist s\195\184lvbel\195\184b mindre end bud prisen."
 EnchantrixLocalizations["deDE"]["HelpFindBidauct"] = "Suche Auktionen deren Entzauberungswert einen bestimmten Betrag (in Silber) unter dem Gebotspreis liegt"
@@ -1218,7 +1217,6 @@ EnchantrixLocalizations["koKR"]["HelpFindBidauct"] = "\234\176\128\235\138\165\2
 EnchantrixLocalizations["ptPT"]["HelpFindBidauct"] = "Encontrar os leil\195\181es cujo poss\195\173vel valor do desencanto \195\169 uma determinada quantidade de prata menos do que o pre\195\167o de oferta"
 EnchantrixLocalizations["zhCN"]["HelpFindBidauct"] = "\230\137\190\229\136\176\230\139\141\229\141\150\229\147\129\229\133\182\229\143\175\232\131\189\229\136\134\232\167\163\228\187\183\229\128\188\228\189\142\228\186\142\231\171\158\230\139\141\228\187\183\228\184\128\229\174\154\233\147\182\229\184\129\233\162\157\227\128\130"
 EnchantrixLocalizations["zhTW"]["HelpFindBidauct"] = "Find auctions whose current bid is a certain silver amount less than the possible disenchant value (and optionally, a ceratin percent below the bid price)"
---TODO: update localizations for new option
 EnchantrixLocalizations["csCZ"]["HelpFindBuyauct"] = "Najde aukce u nichz je cena mozneho produktu odcarovani o urcenou sumu stribra nizsi nez Vykupni cena"
 EnchantrixLocalizations["daDK"]["HelpFindBuyauct"] = "Find auktioner hvis potentielle disenchant v\195\166rdi er vis procent v\195\166rdi mindre end bud prisen."
 EnchantrixLocalizations["deDE"]["HelpFindBuyauct"] = "Suche Auktionen deren Entzauberungswert einen bestimmten Prozentsatz unter dem Sofortkaufpreis liegt"
@@ -1386,7 +1384,6 @@ EnchantrixLocalizations["nlNL"]["FrmtBidbrokerDone"] = "Een regelend bod gedaan"
 EnchantrixLocalizations["ptPT"]["FrmtBidbrokerDone"] = "Oferta do corrector feita"
 EnchantrixLocalizations["zhCN"]["FrmtBidbrokerDone"] = "\228\186\164\230\152\147\228\187\183\228\187\163\231\144\134\229\174\140\230\136\144"
 EnchantrixLocalizations["zhTW"]["FrmtBidbrokerDone"] = "Bid brokering done"
---TODO: localize new parameter
 EnchantrixLocalizations["csCZ"]["FrmtBidbrokerHeader"] = "Nabidky usetri %s stribra na prumerne hodnote odcarovani (min %% less = %d):"
 EnchantrixLocalizations["daDK"]["FrmtBidbrokerHeader"] = "Auktioner som har %s s\195\131\194\184lv besparelse baseret p\195\165 gennemsnitlig disenchant v\195\166rdi (min %% less = %d)."
 EnchantrixLocalizations["deDE"]["FrmtBidbrokerHeader"] = "Auktionen mit %s Silber Einsparung auf den durchschnittlichen Entzauberungswert (min %%less = %d):"
@@ -1423,7 +1420,6 @@ EnchantrixLocalizations["nlNL"]["FrmtBidbrokerMinbid"] = "MinimaleBod"
 EnchantrixLocalizations["ptPT"]["FrmtBidbrokerMinbid"] = "Ofmin"
 EnchantrixLocalizations["zhCN"]["FrmtBidbrokerMinbid"] = "\230\156\128\228\189\142\229\135\186\228\187\183"
 EnchantrixLocalizations["zhTW"]["FrmtBidbrokerMinbid"] = "minBid"
---TODO: needs to be localized
 EnchantrixLocalizations["enUS"]["FrmtBidbrokerSkipped"] = "Skipped %d auctions due to profit margin cutoff (%d%%)"
 EnchantrixLocalizations["csCZ"]["FrmtPctlessDone"] = "Procentuelni snizeni hotovo."
 EnchantrixLocalizations["daDK"]["FrmtPctlessDone"] = "Bud under gennemf\195\131\194\184rt."
@@ -1437,7 +1433,6 @@ EnchantrixLocalizations["nlNL"]["FrmtPctlessDone"] = "Percentage minder gedaan."
 EnchantrixLocalizations["ptPT"]["FrmtPctlessDone"] = "Percentagem menos feito"
 EnchantrixLocalizations["zhCN"]["FrmtPctlessDone"] = "\230\175\148\231\142\135\229\183\174\233\162\157\229\174\140\230\136\144\227\128\130"
 EnchantrixLocalizations["zhTW"]["FrmtPctlessDone"] = "Percent less done."
---TODO: These localizations should be updated (probably usable, but 'min' isn't universal)
 EnchantrixLocalizations["csCZ"]["FrmtPctlessHeader"] = "Vykupy usetri %d%% oproti prumerne hodnote odcarovani:"
 EnchantrixLocalizations["daDK"]["FrmtPctlessHeader"] = "Buyouts som har %d%% besparelse i forhold til gennemsnitlige disenchantv\195\166rdi (min = %s):"
 EnchantrixLocalizations["deDE"]["FrmtPctlessHeader"] = "Sofortkauf-Auktionen mit %d%% Einsparung auf durchschnittlichen Entzauberungswert (min = %s):"
@@ -1462,7 +1457,6 @@ EnchantrixLocalizations["nlNL"]["FrmtPctlessLine"] = "%s, Geschat op %s, BO: %s,
 EnchantrixLocalizations["ptPT"]["FrmtPctlessLine"] = "%s, Avaliado em: %s, BO: %s, Excepto: %s, Menos %s "
 EnchantrixLocalizations["zhCN"]["FrmtPctlessLine"] = "%s\239\188\140\228\188\176\228\187\183\239\188\154%s\239\188\140\228\184\128\229\143\163\228\187\183\239\188\154%s\239\188\140\232\138\130\231\156\129\239\188\154%s\239\188\140\229\183\174\233\162\157%s"
 EnchantrixLocalizations["zhTW"]["FrmtPctlessLine"] = "%s, Valued at: %s, BO: %s, Save: %s, Less %s"
---TODO: this string should be localized for other languages
 EnchantrixLocalizations["enUS"]["FrmtPctlessSkipped"] = "Skipped %d auctions due to profitability cutoff (%s)"
 -- Section: Tooltip Messages
 EnchantrixLocalizations["daDK"]["FrmtBarkerPrice"] = "Udr\195\165bspris (%d%% margen)"
