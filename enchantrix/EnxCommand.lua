@@ -58,9 +58,12 @@ local profitMargins
 
 -- Local constants
 local MAX_BUYOUT_PRICE = 800000;
-local MIN_PROFIT_MARGIN = 1000;
-local MIN_PERCENT_LESS_THAN_HSP = 20; -- 20% default
-local MIN_PROFIT_PRICE_PERCENT = 10; -- 10% default
+local DEFAULT_PROFIT_MARGIN = 1000; -- default profit margin = 10s (1000c)
+local MIN_PROFIT_MARGIN = 100; -- min allowed profit margin = 1s (100c)
+local DEFAULT_PERCENT_LESS_THAN_HSP = 20; -- default for percentless scan = 20% under HSP
+local MIN_PERCENT_LESS_THAN_HSP = 5; -- min for percentless scan = 5% under HSP
+local DEFAULT_PROFIT_PRICE_PERCENT = 10; --default for bidbroker scan = 10% under HSP
+local MIN_PROFIT_PRICE_PERCENT = 5; --minimum percent under for bidbroker scan = 5% under HSP
 
 function addonLoaded()
 	if IsAddOnLoaded("Khaos") then
@@ -614,12 +617,23 @@ function handleCommand(command, source)
 	end;
 
 	-- Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$")
+	local i,j, cmd, param, param2;
+	
+	--(Matthias) Rewrote the match string here to not totally suck... should now work right and be localized better.
+	--  old: "^([^ ]+) (.+)$" -- breaks with multi params, has issues with multiple spaces and garbage/foreign chars
+	--  new: "^(%a+)%s*(%w*)%s*(%w*).*" -- works with 0/1/2 parms, eats extra input and extra spaces between parms
+	--TODO: other string regexps in Auctioneer/Enchantrix should also be looked at.  
+	--      Hardcoding ' 's and using '.' instead of %a/%d/%w/%s (or their inverses) is not really great coding practice.
+	i, j, cmd, param, param2 = string.find(command, "^(%a+)%s*(%w*)%s*(%w*).*");
+	
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
 	if (not param) then param = "" end
-	cmd = Enchantrix.Locale.DelocalizeCommand(cmd)
-
+	if (not param2) then param2 = "" end
+	
+	--delocalize the command so we can work on it in English in here
+	cmd = Enchantrix.Locale.DelocalizeCommand(cmd);
+		
 	if ((cmd == "") or (cmd == "help")) then
 		-- /enchantrix help
 		chatPrintHelp();
@@ -662,10 +676,10 @@ function handleCommand(command, source)
 
 	elseif (cmd == 'bidbroker' or cmd == 'bb') then
 		-- /enchantrix bidbroker
-		doBidBroker(param);
+		doBidBroker(param, param2);
 
 	elseif (cmd == 'percentless' or cmd == 'pl') then
-		doPercentLess(param);
+		doPercentLess(param, param2);
 
 	elseif (Enchantrix.Config.GetFilterDefaults(cmd) ~= nil) then
 		genVarSet(cmd, param, chatprint);
@@ -947,8 +961,27 @@ function doPercentLess(percentLess)
 		return;
 	end
 
-	if not percentLess or percentLess == "" then percentLess = MIN_PERCENT_LESS_THAN_HSP end
-	local output = string.format(_ENCH('FrmtPctlessHeader'), percentLess);
+	--if the strings passed in are (nil) or empty, use the defaults.  Otherwise, try to convert from string to number.
+	--if string->number conversion fails, use defaults
+	if not percentLess or percentLess == "" then percentLess = DEFAULT_PERCENT_LESS_THAN_HSP
+	else 
+		percentLess = tonumber(percentLess);
+		if (not percentLess) then percentLess = DEFAULT_PERCENT_LESS_THAN_HSP end
+	end
+	
+	if not min_profit_value or min_profit_value == "" then min_profit_value = DEFAULT_PROFIT_MARGIN 
+	else
+		min_profit_value = tonumber(min_profit_value);
+		--if conversion successful
+		if (min_profit_value) then min_profit_value = min_profit_value * 100
+		--else if conversion failed
+		else min_profit_value = DEFAULT_PROFIT_MARGIN end
+	end
+			
+	if (percentLess < MIN_PERCENT_LESS_THAN_HSP) then percentLess = MIN_PERCENT_LESS_THAN_HSP end
+	if (min_profit_value < MIN_PROFIT_MARGIN) then min_profit_value = MIN_PROFIT_MARGIN end
+	
+	local output = string.format(_ENCH('FrmtPctlessHeader'), percentLess, EnhTooltip.GetTextGSC(min_profit_value));
 	Enchantrix.Util.ChatPrint(output);
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
@@ -957,6 +990,8 @@ function doPercentLess(percentLess)
 
 	-- sort by profit based on median
 	table.sort(targetAuctions, profitComparisonSort);
+
+	local skipped_auctions = 0;
 
 	-- output the list of auctions
 	for _,a in targetAuctions do
@@ -967,10 +1002,26 @@ function doPercentLess(percentLess)
 				local value = profitMargins[a.signature].value;
 				local margin = profitMargins[a.signature].margin;
 				local profit = profitMargins[a.signature].profit;
-				local output = string.format(_ENCH('FrmtPctlessLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), EnhTooltip.GetTextGSC(buyout), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"));
-				Enchantrix.Util.ChatPrint(output);
+				if ((profit * count) >= min_profit_value) then
+					local output = string.format(_ENCH('FrmtPctlessLine'),
+																			 Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink,
+					                             EnhTooltip.GetTextGSC(value * count), 
+					                             EnhTooltip.GetTextGSC(buyout), 
+					                             EnhTooltip.GetTextGSC(profit * count), 
+					                             Auctioneer.Util.ColorTextWhite(margin.."%"));
+					Enchantrix.Util.ChatPrint(output);
+				else
+					skipped_auctions = skipped_auctions + 1;
+				end
 			end
 		end
+	end
+
+	--TODO: needs to be localized
+	if (skipped_auctions > 0) then
+		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtPctlessSkipped'), 
+																						skipped_auctions, 
+																						EnhTooltip.GetTextGSC(min_profit_value)));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessDone'));
@@ -985,8 +1036,23 @@ function doBidBroker(minProfit)
 		return;
 	end
 
-	if not minProfit or minProfit == "" then minProfit = MIN_PROFIT_MARGIN; else minProfit = tonumber(minProfit) * 100; end
-	local output = string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit));
+	if not minProfit or minProfit == "" then minProfit = DEFAULT_PROFIT_MARGIN
+	else 
+		minProfit = tonumber(minProfit);
+		if (minProfit) then minProfit = minProfit * 100;
+		else minProfit = DEFAULT_PROFIT_MARGIN end
+	end
+	
+	if not percentLess or percentLess == "" then percentLess = DEFAULT_PERCENT_LESS_THAN_HSP
+	else
+		percentLess = tonumber(percentLess);
+		if (not percentLess) then percentLess = DEFAULT_PERCENT_LESS_THAN_HSP end
+	end
+	
+	if (percentLess < MIN_PERCENT_LESS_THAN_HSP) then percentLess = MIN_PERCENT_LESS_THAN_HSP end
+	if (minProfit < MIN_PROFIT_MARGIN) then minProfit = MIN_PROFIT_MARGIN end
+	
+	local output = string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit), percentLess);
 	Enchantrix.Util.ChatPrint(output);
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
@@ -996,6 +1062,8 @@ function doBidBroker(minProfit)
 	-- sort by profit based on median
 	table.sort(targetAuctions, bidBrokerSort);
 
+	local skipped_auctions = 0;
+	
 	-- output the list of auctions
 	for _,a in targetAuctions do
 		if (a.signature and profitMargins[a.signature]) then
@@ -1006,16 +1074,38 @@ function doBidBroker(minProfit)
 				local value = profitMargins[a.signature].value;
 				local margin = profitMargins[a.signature].margin;
 				local profit = profitMargins[a.signature].profit;
-				local bidText = _ENCH('FrmtBidbrokerCurbid');
-				if (currentBid == min) then
-					bidText = _ENCH('FrmtBidbrokerMinbid');
+				local bidText;
+				
+				if (margin >= percentLess) then
+					if (currentBid == min) then	bidText = _ENCH('FrmtBidbrokerMinbid')
+					else                        bidText = _ENCH('FrmtBidbrokerCurbid') end
+				
+					local output = string.format(_ENCH('FrmtBidbrokerLine'), 
+																			 Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, 
+																			 EnhTooltip.GetTextGSC(value * count), 
+																			 bidText, 
+																			 EnhTooltip.GetTextGSC(currentBid), 
+																				 EnhTooltip.GetTextGSC(profit * count), 
+																			 Auctioneer.Util.ColorTextWhite(margin.."%"),
+																			 Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft)));
+					Enchantrix.Util.ChatPrint(output);
+				else
+					if (currentBid == min) then	bidText = _ENCH('FrmtBidbrokerMinbid')
+					else                        bidText = _ENCH('FrmtBidbrokerCurbid') end
+					
+					skipped_auctions = skipped_auctions + 1;
 				end
-				local output = string.format(_ENCH('FrmtBidbrokerLine'), Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink, EnhTooltip.GetTextGSC(value * count), bidText, EnhTooltip.GetTextGSC(currentBid), EnhTooltip.GetTextGSC(profit * count), Auctioneer.Util.ColorTextWhite(margin.."%"), Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft)));
-				Enchantrix.Util.ChatPrint(output);
 			end
 		end
 	end
 
+	--TODO: needs to be localized
+	if (skipped_auctions > 0) then
+		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtBidbrokerSkipped'), 
+																						skipped_auctions, 
+																						percentLess));
+	end
+		
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end
 
