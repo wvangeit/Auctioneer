@@ -380,7 +380,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	local margin = Enchantrix_BarkerGetConfig("profit_margin")
 	local profit = price * margin * 0.01
 	profit = math.min(profit, Enchantrix_BarkerGetConfig("highest_profit"))
-	local barkerPrice = Enchantrix_RoundPrice(price + profit)
+	local barkerPrice = EnchantrixBarker_RoundPrice(price + profit)
 
 	-- Totals
 	if price > 0 then
