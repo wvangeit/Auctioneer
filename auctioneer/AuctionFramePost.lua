@@ -191,6 +191,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+AuctionFramePost_AdditionalPricingModels = {
+}
 function AuctionFramePost_UpdatePriceModels(frame)
 	if (not frame.updating) then
 		frame.prices = {};
@@ -211,6 +213,14 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				fixedPrice.bid = startPrice;
 				fixedPrice.buyout = buyPrice;
 				table.insert(frame.prices, fixedPrice);
+			end
+
+			-- Add any pricing models from external addons
+			for pos, priceFunc in AuctionFramePost_AdditionalPricingModels do
+				local priceModel = priceFunc(id, rprop, enchant, name, count)
+				if (type(priceModel) == "table") then
+					table.insert(frame.prices, priceModel)
+				end
 			end
 
 			-- Get the last sale price if BeanCounter is loaded.
