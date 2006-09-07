@@ -78,8 +78,11 @@ function commandHandler(command, source)
 	elseif (cmd == 'trigger') then
 		setTrigger(param, chatprint)
 
-	--/auctioneer askprice (party|guild|smart|ad)
-	elseif (cmd == 'vendor' or cmd == 'party' or cmd == 'guild' or cmd == 'smart' or cmd == 'ad') then
+	--/auctioneer askprice (party|guild|smart|ad|whispers) (on|off|toggle)
+	elseif (
+		cmd == 'vendor'	or cmd == 'party'	or cmd == 'guild' or
+		cmd == 'smart'	or cmd == 'ad'		or cmd == 'whispers'
+	) then
 		genVarSet(cmd, param, chatprint);
 
 	--/auctioneer askprice word # (customSmartWord)
@@ -100,19 +103,19 @@ function chatPrintHelp()
 
 	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer askprice"..onOffToggle.."|r |cff2040ff["..Auctioneer.Util.GetLocalizedFilterVal('askprice').."]|r\n          " .. _AUCT('HelpAskPrice') .. "\n\n");
 
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWhispers'), Auctioneer.Util.GetLocalizedFilterVal('askprice-whispers'), _AUCT('HelpAskPriceWhispers')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceVendor'), Auctioneer.Util.GetLocalizedFilterVal('askprice-vendor'), _AUCT('HelpAskPriceVendor')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceParty'), Auctioneer.Util.GetLocalizedFilterVal('askprice-party'), _AUCT('HelpAskPriceParty')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceGuild'), Auctioneer.Util.GetLocalizedFilterVal('askprice-guild'), _AUCT('HelpAskPriceGuild')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceSmart'), Auctioneer.Util.GetLocalizedFilterVal('askprice-smart'), _AUCT('HelpAskPriceSmart')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceAd'), Auctioneer.Util.GetLocalizedFilterVal('askprice-ad'), _AUCT('HelpAskPriceAd')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWhispers'),	Auctioneer.Util.GetLocalizedFilterVal('askprice-whispers'),	_AUCT('HelpAskPriceWhispers')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceVendor'),		Auctioneer.Util.GetLocalizedFilterVal('askprice-vendor'),	_AUCT('HelpAskPriceVendor')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceParty'),		Auctioneer.Util.GetLocalizedFilterVal('askprice-party'),	_AUCT('HelpAskPriceParty')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceGuild'),		Auctioneer.Util.GetLocalizedFilterVal('askprice-guild'),	_AUCT('HelpAskPriceGuild')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceSmart'),		Auctioneer.Util.GetLocalizedFilterVal('askprice-smart'),	_AUCT('HelpAskPriceSmart')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceAd'),			Auctioneer.Util.GetLocalizedFilterVal('askprice-ad'),		_AUCT('HelpAskPriceAd')));
 
 	lineFormat = "  |cffffffff/auctioneer askprice %s|r |cff2040ff[%s]|r\n          %s\n\n";
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceTrigger'), Auctioneer.Command.GetFilterVal('askprice-trigger'), _AUCT('HelpAskPriceTrigger')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceTrigger'),	Auctioneer.Command.GetFilterVal('askprice-trigger'),		_AUCT('HelpAskPriceTrigger')));
 
 	lineFormat = "  |cffffffff/auctioneer askprice %s %d|r |cff2040ff[%s]|r\n          %s\n\n";
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWord'), 1, Auctioneer.Command.GetFilterVal('askprice-word1'), _AUCT('HelpAskPriceWord')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWord'), 2, Auctioneer.Command.GetFilterVal('askprice-word2'), _AUCT('HelpAskPriceWord')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWord'), 1,	Auctioneer.Command.GetFilterVal('askprice-word1'),			_AUCT('HelpAskPriceWord')));
+	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAskPriceWord'), 2,	Auctioneer.Command.GetFilterVal('askprice-word2'),			_AUCT('HelpAskPriceWord')));
 end
 
 --[[
