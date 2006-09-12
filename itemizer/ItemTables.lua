@@ -3137,5 +3137,4 @@ ItemizerEnchants = {
 	Number of enchants: 1035
 
 	Number of unique enchant keys: 35
-
 ]]

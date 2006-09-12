@@ -276,7 +276,7 @@ print $ItemTables "--[[
 print $ItemTables "\n\n\t", "Number of randomProps: ", $numberOfRandomProps, "\n";
 print $ItemTables "\n\t", "Number of item suffixes: ", $keyCount = keys(%itemSuffixes), "\n";
 print $ItemTables "\n\t", "Number of enchants: ", $keyCount = keys(%interestedEnchants), "\n";
-print $ItemTables "\n\t", "Number of unique enchant keys: ", $keyCount = keys(%enchantKeys), "\n\n";
+print $ItemTables "\n\t", "Number of unique enchant keys: ", $keyCount = keys(%enchantKeys), "\n";
 print $ItemTables "]]\n";
 
 # Close our file handles
