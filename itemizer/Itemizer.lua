@@ -27,7 +27,7 @@
 Itemizer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "ETTDebug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
-	Itemizer.Version = "3.7.DEV";
+	Itemizer.Version = "3.9.DEV";
 end
 
 --Saved Variables
@@ -37,7 +37,6 @@ ItemizerConfig = {}
 
 --Global Variables
 ItemizerProcessStack = {}
-ItemizerRunningStack = {}
 
 local function onLoad()
 
@@ -76,7 +75,6 @@ local function onLoad()
 
 				--Global Variables
 				ItemizerProcessStack = {}
-				ItemizerRunningStack = {}
 				Stubby.Print("Itemizer Variables cleared")
 				EnhTooltip.DebugPrint("Itemizer Variables cleared")
 			else

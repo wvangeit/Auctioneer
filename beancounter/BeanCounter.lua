@@ -40,7 +40,7 @@ local commandHandler;
 BeanCounter = {};
 BeanCounter.Version="<%version%>";
 if (BeanCounter.Version == "<".."%version%>") then
-	BeanCounter.Version = "3.7.DEV";
+	BeanCounter.Version = "3.9.DEV";
 end
 
 -------------------------------------------------------------------------------
