@@ -1,0 +1,57 @@
+﻿=Auctioneer AddOns Change log for 3.6.1 - 3.8=
+
+==Auctioneer:==
+
+===Changes in the interface:===
+*Auctioneer will now call Itemizer’s Itemizer.Core.ProcessLinks() function, if its available during Auctioneer’s scan process.
+*Auctioneer no longer uses the deprecated "for k, v in someTable do stuff end" construct, instead it now uses the "for k, v in {i}pairs(someTable) do stuff end" construct.
+*Auctioneer now uses table.insert() whenever possible instead of inserting values manually.
+*The "/auctioneer help" command is now formatted more cleanly at the expense of real estate on the Chat Frame.
+*Uncommented the "/auctioneer auction-duration" help line from the "/auctioneer help" output as the bug that pertained to this line has apparently been fixed.
+
+===New Features:===
+*Added API functions to query the scan age, and the amount of time the last scan took. Both of these functions return values in seconds.
+*A helper function has been added to Auctioneer to simplify the translation of values in seconds to its component weeks, days, hours, minutes and seconds.
+*Added an API function to request an AH scan by Auctioneer.
+*New "/auctioneer finish-sound (on|off|toggle)" command that when enabled will play a sound at the completion of the current Auction House scan. Note: This feature is default on. Also note that the sound used was created by Blizzard and not by the Auctioneer AddOns team.
+*AskPrice now supports queries made by the raid leader.
+*New "/auctioneer askprice whispers (on|off|toggle)" that when enabled will hide all outgoing AskPrice generated whispers.
+*New "/auctioneer askprice word # (customSmartWord)" that enables custom SmartWords to be defined for AskPrice. Note that these custom SmartWords work alongside the built-in ones and do not replace them.
+*A new Auctioneer.AskPrice.SendWhisper(text, player) function has been added that will send a whispered text to the specified player in the standard language for your faction (Common or Orcish). This function also adds the message to the list outgoing whispers to hide from if the user has that feature enabled.
+
+===Bug Fixes:===
+*The Khaos selection box for the "/auctioneer finish" command will no longer show a fourth empty and invalid option.
+*The long standing bug that prevented the use of the saved searches feature for item name searches has been fixed.
+
+
+
+==Enchantrix:==
+
+===Bug Fixes:===
+*Enchantrix’s Barker feature should now correctly detect all current Auctioneer versions.
+*Enchantrix’s Barker feature should now supports frost and nature resist cloak enchants.
+*Enchantrix’s "/enchantrix clear (all|itemLink)" function now works correctly.
+
+
+
+==EnhTooltip:==
+
+===Changes in the interface:===
+*EnhTooltip now resizes the tooltip directly instead of modifying the width of the first line.
+
+
+
+==All AddOns:==
+
+===Changes in the interface:===
+*The TOC files for all AddOns have been cleaned so that they produce less spam on the FrameXML.log file.
+*All of the strings files show the section of the Localizer website a specific set of translations can be found.
+===Numerous other bug fixes and enhancements that you probably won’t even notice.===
+
+
+
+I would also like to point out that while the Auctioneer AddOns package is available for download from all four of the major UI mod websites, support is only given thru our official website, forums and IRC channel. Their addresses follow:
+*http://auctioneeraddon.com
+*http://enchantrix.org/
+*http://norganna.org/bb/
+*http://norganna.org/irc
