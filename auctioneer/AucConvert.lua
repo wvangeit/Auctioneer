@@ -27,7 +27,7 @@ local backup, convert
 
 -- helperfunction to backup data, which can't be converted atm
 function backup(auctKey, sig, data) --Local
-	if AuctionBackup[auctKey] == nil then
+	if (not AuctionBackup[auctKey]) then
 		AuctionBackup[auctKey] = {}
 	end
 
@@ -147,19 +147,21 @@ function convert()
 							data = iData.data;
 							name = iData.name;
 							if (iData.buyoutPricesHistoryList) then
-								-- Check history list for corrupted data that several people seem to have.
-								-- Looks like some other item's "data" string. Example:
-								--	["9778:1182:0"] = {
-								--		["playerMade"] = false,
-								--		["name"] = "Bandit Buckler of the Bear",
-								--		["category"] = 2,
-								--		["data"] = "4:4:8230:0:0:3:11500",
-								--		["buyoutPricesHistoryList"] = {
-								--			[1] = 2500,
-								--			[2] = 3000,
-								--			[3] = "16:16:12756:0:0:9:23888",
-								--		},
-								--	},
+								--[[
+								Check history list for corrupted data that several people seem to have.
+								Looks like some other item's "data" string. Example:
+									["9778:1182:0"] = {
+										["playerMade"] = false,
+										["name"] = "Bandit Buckler of the Bear",
+										["category"] = 2,
+										["data"] = "4:4:8230:0:0:3:11500",
+										["buyoutPricesHistoryList"] = {
+											[1] = 2500,
+											[2] = 3000,
+											[3] = "16:16:12756:0:0:9:23888",
+										},
+									},
+								]]
 								for pos, hPrice in pairs(iData.buyoutPricesHistoryList) do
 									if (type(hPrice) ~= "number") then
 										-- unrecognized entry in the history list, nuke it :(
@@ -198,10 +200,10 @@ function convert()
 				end
 			end
 		end
-		
+
 		AuctionConfig.version = 30200
 	end
-	
+
 	if AuctionConfig.version < 30201 then
 		-- Auto-convert to per-auctKey fixed prices
 		if (AuctionConfig.fixedprice) then
@@ -214,8 +216,8 @@ function convert()
 		end
 
 		AuctionConfig.version = 30201
-   end
-	
+	end
+
 	if AuctionConfig.version < 30600 then
 	   AuctionConfig.success = nil
 
@@ -230,5 +232,5 @@ function convert()
 end
 
 Auctioneer.Convert = {
-Convert = convert,
+	Convert = convert,
 }
