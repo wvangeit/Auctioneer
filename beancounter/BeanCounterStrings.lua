@@ -23,384 +23,493 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-BeanCounterLocalizations = {};
-BeanCounterLocalizations["csCZ"] = {};
-BeanCounterLocalizations["daDK"] = {};
-BeanCounterLocalizations["deDE"] = {};
-BeanCounterLocalizations["enUS"] = {};
-BeanCounterLocalizations["esES"] = {};
-BeanCounterLocalizations["frFR"] = {};
-BeanCounterLocalizations["itIT"] = {};
-BeanCounterLocalizations["koKR"] = {};
-BeanCounterLocalizations["nlNL"] = {};
-BeanCounterLocalizations["ptPT"] = {};
-BeanCounterLocalizations["zhCN"] = {};
-BeanCounterLocalizations["zhTW"] = {};
-BeanCounterLocalizations["ruRU"] = {};
+BeanCounterLocalizations = {
+
+	csCZ = {
 
 
--- Section: Mail
-BeanCounterLocalizations["csCZ"]["MailAllianceAuctionHouse"] = "Aliancni aukce"
-BeanCounterLocalizations["daDK"]["MailAllianceAuctionHouse"] = "Alliance Auktions Hus"
-BeanCounterLocalizations["deDE"]["MailAllianceAuctionHouse"] = "Auktionshaus der Allianz"
-BeanCounterLocalizations["enUS"]["MailAllianceAuctionHouse"] = "Alliance Auction House"
-BeanCounterLocalizations["esES"]["MailAllianceAuctionHouse"] = "Casa de Subastas de la Alianza"
-BeanCounterLocalizations["frFR"]["MailAllianceAuctionHouse"] = "Hotel des Ventes de l'Alliance"
-BeanCounterLocalizations["itIT"]["MailAllianceAuctionHouse"] = "Casa d'aste dell'Alleanza"
-BeanCounterLocalizations["koKR"]["MailAllianceAuctionHouse"] = "\236\150\188\235\157\188\236\157\180\236\150\184\236\138\164 \234\178\189\235\167\164\236\158\165"
-BeanCounterLocalizations["nlNL"]["MailAllianceAuctionHouse"] = "Alliance Auction House"
-BeanCounterLocalizations["ptPT"]["MailAllianceAuctionHouse"] = "Leil\195\163o da Alliance"
-BeanCounterLocalizations["zhCN"]["MailAllianceAuctionHouse"] = "\232\129\148\231\155\159\230\139\141\229\141\150\232\161\140"
-BeanCounterLocalizations["zhTW"]["MailAllianceAuctionHouse"] = "\232\129\175\231\155\159\230\139\141\232\179\163\229\160\180"
-BeanCounterLocalizations["csCZ"]["MailAuctionCancelledSubject"] = "Aukce zrusena"
-BeanCounterLocalizations["daDK"]["MailAuctionCancelledSubject"] = "Auktion afbrudt"
-BeanCounterLocalizations["deDE"]["MailAuctionCancelledSubject"] = "Auktion abgebrochen"
-BeanCounterLocalizations["enUS"]["MailAuctionCancelledSubject"] = "Auction cancelled"
-BeanCounterLocalizations["esES"]["MailAuctionCancelledSubject"] = "Subasta cancellada"
-BeanCounterLocalizations["frFR"]["MailAuctionCancelledSubject"] = "Ench\195\168re annul\195\169e"
-BeanCounterLocalizations["itIT"]["MailAuctionCancelledSubject"] = "Asta annullata"
-BeanCounterLocalizations["koKR"]["MailAuctionCancelledSubject"] = "\234\178\189\235\167\164 \236\183\168\236\134\140"
-BeanCounterLocalizations["nlNL"]["MailAuctionCancelledSubject"] = "Auction cancelled"
-BeanCounterLocalizations["ptPT"]["MailAuctionCancelledSubject"] = "Leil\195\163o Cancelado"
-BeanCounterLocalizations["zhCN"]["MailAuctionCancelledSubject"] = "\230\139\141\229\141\150\229\143\150\230\182\136"
-BeanCounterLocalizations["zhTW"]["MailAuctionCancelledSubject"] = "\230\139\141\232\179\163\229\183\178\229\143\150\230\182\136"
-BeanCounterLocalizations["csCZ"]["MailAuctionExpiredSubject"] = "Platnost aukce vyprsela"
-BeanCounterLocalizations["daDK"]["MailAuctionExpiredSubject"] = "Auktion udl\195\184bet"
-BeanCounterLocalizations["deDE"]["MailAuctionExpiredSubject"] = "Auktion abgelaufen"
-BeanCounterLocalizations["enUS"]["MailAuctionExpiredSubject"] = "Auction expired"
-BeanCounterLocalizations["esES"]["MailAuctionExpiredSubject"] = "Subasta expirada"
-BeanCounterLocalizations["frFR"]["MailAuctionExpiredSubject"] = "Ench\195\168re expir\195\169e"
-BeanCounterLocalizations["itIT"]["MailAuctionExpiredSubject"] = "Asta espirata"
-BeanCounterLocalizations["koKR"]["MailAuctionExpiredSubject"] = "\234\178\189\235\167\164 \235\167\140\235\163\140"
-BeanCounterLocalizations["nlNL"]["MailAuctionExpiredSubject"] = "Auction expired"
-BeanCounterLocalizations["ptPT"]["MailAuctionExpiredSubject"] = "Leil\195\163o Expirou"
-BeanCounterLocalizations["zhCN"]["MailAuctionExpiredSubject"] = "\230\139\141\229\141\150\229\183\178\229\136\176\230\156\159"
-BeanCounterLocalizations["zhTW"]["MailAuctionExpiredSubject"] = "\230\139\141\232\179\163\233\129\142\230\156\159"
-BeanCounterLocalizations["csCZ"]["MailAuctionSuccessfulSubject"] = "Aukce probehla uspesne"
-BeanCounterLocalizations["daDK"]["MailAuctionSuccessfulSubject"] = "Auktion succesfuld"
-BeanCounterLocalizations["deDE"]["MailAuctionSuccessfulSubject"] = "Auktion erfolgreich"
-BeanCounterLocalizations["enUS"]["MailAuctionSuccessfulSubject"] = "Auction successful"
-BeanCounterLocalizations["esES"]["MailAuctionSuccessfulSubject"] = "Subasta acertada"
-BeanCounterLocalizations["frFR"]["MailAuctionSuccessfulSubject"] = "Ench\195\168re r\195\169ussie"
-BeanCounterLocalizations["itIT"]["MailAuctionSuccessfulSubject"] = "Asta riuscita"
-BeanCounterLocalizations["koKR"]["MailAuctionSuccessfulSubject"] = "\234\178\189\235\167\164 \236\153\132\235\163\140"
-BeanCounterLocalizations["nlNL"]["MailAuctionSuccessfulSubject"] = "Auction successful"
-BeanCounterLocalizations["ptPT"]["MailAuctionSuccessfulSubject"] = "Leil\195\163o Bem Sucedido"
-BeanCounterLocalizations["zhCN"]["MailAuctionSuccessfulSubject"] = "\230\139\141\229\141\150\230\136\144\229\138\159"
-BeanCounterLocalizations["zhTW"]["MailAuctionSuccessfulSubject"] = "\230\139\141\232\179\163\230\136\144\229\138\159"
-BeanCounterLocalizations["csCZ"]["MailAuctionWonSubject"] = "Vyhral/a jste aukci"
-BeanCounterLocalizations["daDK"]["MailAuctionWonSubject"] = "Auktion vundet"
-BeanCounterLocalizations["deDE"]["MailAuctionWonSubject"] = "Auktion gewonnen"
-BeanCounterLocalizations["enUS"]["MailAuctionWonSubject"] = "Auction won"
-BeanCounterLocalizations["esES"]["MailAuctionWonSubject"] = "Subasta ganada"
-BeanCounterLocalizations["frFR"]["MailAuctionWonSubject"] = "Ench\195\168re gagn\195\169e"
-BeanCounterLocalizations["itIT"]["MailAuctionWonSubject"] = "Asta vinta"
-BeanCounterLocalizations["koKR"]["MailAuctionWonSubject"] = "\234\178\189\235\167\164\237\146\136 \235\130\153\236\176\176"
-BeanCounterLocalizations["nlNL"]["MailAuctionWonSubject"] = "Auction won"
-BeanCounterLocalizations["ptPT"]["MailAuctionWonSubject"] = "Leil\195\163o Ganho"
-BeanCounterLocalizations["zhCN"]["MailAuctionWonSubject"] = "\231\171\158\230\139\141\232\142\183\232\131\156"
-BeanCounterLocalizations["zhTW"]["MailAuctionWonSubject"] = "\229\190\151\230\168\153"
-BeanCounterLocalizations["csCZ"]["MailHordeAuctionHouse"] = "Hordacka aukce"
-BeanCounterLocalizations["daDK"]["MailHordeAuctionHouse"] = "Horde Auktions Hus"
-BeanCounterLocalizations["deDE"]["MailHordeAuctionHouse"] = "Auktionshaus der Horde"
-BeanCounterLocalizations["enUS"]["MailHordeAuctionHouse"] = "Horde Auction House"
-BeanCounterLocalizations["esES"]["MailHordeAuctionHouse"] = "Casa de Subastas de la Horda"
-BeanCounterLocalizations["frFR"]["MailHordeAuctionHouse"] = "Hotel des Ventes de la Horde"
-BeanCounterLocalizations["itIT"]["MailHordeAuctionHouse"] = "Casa d'aste dell'Orda"
-BeanCounterLocalizations["koKR"]["MailHordeAuctionHouse"] = "\237\152\184\235\147\156 \234\178\189\235\167\164\236\158\165"
-BeanCounterLocalizations["nlNL"]["MailHordeAuctionHouse"] = "Horde Auction House"
-BeanCounterLocalizations["ptPT"]["MailHordeAuctionHouse"] = "Leil\195\163o da Horde"
-BeanCounterLocalizations["ruRU"]["MailHordeAuctionHouse"] = "\208\144\209\131\208\186\209\134\208\184\208\190\208\189 \208\158\209\128\208\180\209\139"
-BeanCounterLocalizations["zhCN"]["MailHordeAuctionHouse"] = "\233\131\168\232\144\189\230\139\141\229\141\150\232\161\140"
-BeanCounterLocalizations["zhTW"]["MailHordeAuctionHouse"] = "\233\131\168\232\144\189\230\139\141\232\179\163\229\160\180"
-BeanCounterLocalizations["csCZ"]["MailOutbidOnSubject"] = "Prehozen/a na"
-BeanCounterLocalizations["daDK"]["MailOutbidOnSubject"] = "Overbudt p\195\165"
-BeanCounterLocalizations["deDE"]["MailOutbidOnSubject"] = "H\195\182heres Gebot f\195\188r"
-BeanCounterLocalizations["enUS"]["MailOutbidOnSubject"] = "Outbid on"
-BeanCounterLocalizations["esES"]["MailOutbidOnSubject"] = "Oferta mejorada para"
-BeanCounterLocalizations["frFR"]["MailOutbidOnSubject"] = "Surench\195\170re"
-BeanCounterLocalizations["itIT"]["MailOutbidOnSubject"] = "Battuto su"
-BeanCounterLocalizations["koKR"]["MailOutbidOnSubject"] = "\235\179\180\235\139\164 \235\134\146\236\157\128 \234\176\128\234\178\169\236\157\180 \236\160\156\236\139\156\235\144\168"
-BeanCounterLocalizations["nlNL"]["MailOutbidOnSubject"] = "Outbid on"
-BeanCounterLocalizations["ptPT"]["MailOutbidOnSubject"] = "Sobrebidado em"
-BeanCounterLocalizations["zhCN"]["MailOutbidOnSubject"] = "\229\135\186\228\187\183\232\162\171\229\142\139\232\191\135"
-BeanCounterLocalizations["zhTW"]["MailOutbidOnSubject"] = "\229\135\186\229\131\185\229\164\177\230\149\151"
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Aliancni aukce";
+		MailAuctionCancelledSubject	= "Aukce zrusena";
+		MailAuctionExpiredSubject	= "Platnost aukce vyprsela";
+		MailAuctionSuccessfulSubject	= "Aukce probehla uspesne";
+		MailAuctionWonSubject	= "Vyhral/a jste aukci";
+		MailHordeAuctionHouse	= "Hordacka aukce";
+		MailOutbidOnSubject	= "Prehozen/a na";
 
 
--- Section: User Interface
-BeanCounterLocalizations["csCZ"]["UiAuctions"] = "Aukce"
-BeanCounterLocalizations["daDK"]["UiAuctions"] = "Auktioner"
-BeanCounterLocalizations["deDE"]["UiAuctions"] = "Auktionen"
-BeanCounterLocalizations["enUS"]["UiAuctions"] = "Auctions"
-BeanCounterLocalizations["esES"]["UiAuctions"] = "Subastas"
-BeanCounterLocalizations["frFR"]["UiAuctions"] = "Ench\195\168res"
-BeanCounterLocalizations["itIT"]["UiAuctions"] = "Aste"
-BeanCounterLocalizations["koKR"]["UiAuctions"] = "\234\178\189\235\167\164\237\146\136"
-BeanCounterLocalizations["nlNL"]["UiAuctions"] = "Veilingen"
-BeanCounterLocalizations["ptPT"]["UiAuctions"] = "Leil\195\181es"
-BeanCounterLocalizations["zhCN"]["UiAuctions"] = "\230\139\141\229\141\150"
-BeanCounterLocalizations["zhTW"]["UiAuctions"] = "\230\139\141\232\179\163\229\160\180"
-BeanCounterLocalizations["csCZ"]["UiAuctionTransaction"] = "Aukce"
-BeanCounterLocalizations["daDK"]["UiAuctionTransaction"] = "Auktion"
-BeanCounterLocalizations["deDE"]["UiAuctionTransaction"] = "Auktion"
-BeanCounterLocalizations["enUS"]["UiAuctionTransaction"] = "Auction"
-BeanCounterLocalizations["esES"]["UiAuctionTransaction"] = "Subasta"
-BeanCounterLocalizations["frFR"]["UiAuctionTransaction"] = "Ench\195\168re"
-BeanCounterLocalizations["itIT"]["UiAuctionTransaction"] = "Asta"
-BeanCounterLocalizations["koKR"]["UiAuctionTransaction"] = "\234\178\189\235\167\164"
-BeanCounterLocalizations["nlNL"]["UiAuctionTransaction"] = "Veiling"
-BeanCounterLocalizations["ptPT"]["UiAuctionTransaction"] = "Leil\195\163o"
-BeanCounterLocalizations["zhCN"]["UiAuctionTransaction"] = "\230\139\141\229\141\150"
-BeanCounterLocalizations["zhTW"]["UiAuctionTransaction"] = "\230\139\141\232\179\163"
-BeanCounterLocalizations["csCZ"]["UiBids"] = "Bidy"
-BeanCounterLocalizations["daDK"]["UiBids"] = "Bud"
-BeanCounterLocalizations["deDE"]["UiBids"] = "Gebote"
-BeanCounterLocalizations["enUS"]["UiBids"] = "Bids"
-BeanCounterLocalizations["esES"]["UiBids"] = "Ofertas"
-BeanCounterLocalizations["frFR"]["UiBids"] = "Offres"
-BeanCounterLocalizations["itIT"]["UiBids"] = "Offerte"
-BeanCounterLocalizations["koKR"]["UiBids"] = "\236\158\133\236\176\176\237\146\136"
-BeanCounterLocalizations["nlNL"]["UiBids"] = "Biedingen"
-BeanCounterLocalizations["ptPT"]["UiBids"] = "Ofertas"
-BeanCounterLocalizations["zhCN"]["UiBids"] = "\229\135\186\228\187\183"
-BeanCounterLocalizations["zhTW"]["UiBids"] = "\229\135\186\229\131\185"
-BeanCounterLocalizations["csCZ"]["UiBidTransaction"] = "Bid"
-BeanCounterLocalizations["daDK"]["UiBidTransaction"] = "Byd"
-BeanCounterLocalizations["deDE"]["UiBidTransaction"] = "Gebot"
-BeanCounterLocalizations["enUS"]["UiBidTransaction"] = "Bid"
-BeanCounterLocalizations["esES"]["UiBidTransaction"] = "Oferta"
-BeanCounterLocalizations["frFR"]["UiBidTransaction"] = "Offre"
-BeanCounterLocalizations["itIT"]["UiBidTransaction"] = "Offerta"
-BeanCounterLocalizations["koKR"]["UiBidTransaction"] = "\236\158\133\236\176\176"
-BeanCounterLocalizations["nlNL"]["UiBidTransaction"] = "Bod"
-BeanCounterLocalizations["ptPT"]["UiBidTransaction"] = "Oferta"
-BeanCounterLocalizations["zhCN"]["UiBidTransaction"] = "\231\171\158\230\160\135"
-BeanCounterLocalizations["zhTW"]["UiBidTransaction"] = "\229\135\186\229\131\185"
-BeanCounterLocalizations["csCZ"]["UiBuyerSellerHeader"] = "Zakaznik/prodavajici"
-BeanCounterLocalizations["daDK"]["UiBuyerSellerHeader"] = "K\195\184ber/S\195\166lger"
-BeanCounterLocalizations["deDE"]["UiBuyerSellerHeader"] = "K\195\164ufer/Verk\195\164ufer"
-BeanCounterLocalizations["enUS"]["UiBuyerSellerHeader"] = "Buyer/Seller"
-BeanCounterLocalizations["esES"]["UiBuyerSellerHeader"] = "Comrador/Vendedor"
-BeanCounterLocalizations["frFR"]["UiBuyerSellerHeader"] = "Acheteur/Vendeur"
-BeanCounterLocalizations["itIT"]["UiBuyerSellerHeader"] = "Compratore/Venditore"
-BeanCounterLocalizations["koKR"]["UiBuyerSellerHeader"] = "\234\181\172\235\167\164\236\158\144/\237\140\144\235\167\164\236\158\144"
-BeanCounterLocalizations["nlNL"]["UiBuyerSellerHeader"] = "Koper/Verkoper"
-BeanCounterLocalizations["ptPT"]["UiBuyerSellerHeader"] = "Comprador/Vendedor"
-BeanCounterLocalizations["zhCN"]["UiBuyerSellerHeader"] = "\228\185\176\228\184\187/\229\141\150\228\184\187"
-BeanCounterLocalizations["zhTW"]["UiBuyerSellerHeader"] = "\232\178\183\230\150\185/\232\179\163\230\150\185"
-BeanCounterLocalizations["csCZ"]["UiBuyTransaction"] = "Kup"
-BeanCounterLocalizations["daDK"]["UiBuyTransaction"] = "K\195\184b"
-BeanCounterLocalizations["deDE"]["UiBuyTransaction"] = "Kaufen"
-BeanCounterLocalizations["enUS"]["UiBuyTransaction"] = "Buy"
-BeanCounterLocalizations["esES"]["UiBuyTransaction"] = "Compra"
-BeanCounterLocalizations["frFR"]["UiBuyTransaction"] = "Acheter"
-BeanCounterLocalizations["itIT"]["UiBuyTransaction"] = "Compra"
-BeanCounterLocalizations["koKR"]["UiBuyTransaction"] = "\234\181\172\236\158\133"
-BeanCounterLocalizations["nlNL"]["UiBuyTransaction"] = "Koop"
-BeanCounterLocalizations["ptPT"]["UiBuyTransaction"] = "Compra"
-BeanCounterLocalizations["zhCN"]["UiBuyTransaction"] = "\232\180\173\228\185\176"
-BeanCounterLocalizations["zhTW"]["UiBuyTransaction"] = "\232\178\183"
-BeanCounterLocalizations["csCZ"]["UiDateHeader"] = "Datum"
-BeanCounterLocalizations["daDK"]["UiDateHeader"] = "Dato"
-BeanCounterLocalizations["deDE"]["UiDateHeader"] = "Datum"
-BeanCounterLocalizations["enUS"]["UiDateHeader"] = "Date"
-BeanCounterLocalizations["esES"]["UiDateHeader"] = "D\195\173a"
-BeanCounterLocalizations["frFR"]["UiDateHeader"] = "Date"
-BeanCounterLocalizations["itIT"]["UiDateHeader"] = "Data"
-BeanCounterLocalizations["koKR"]["UiDateHeader"] = "\235\130\160\236\167\156"
-BeanCounterLocalizations["nlNL"]["UiDateHeader"] = "Datum"
-BeanCounterLocalizations["ptPT"]["UiDateHeader"] = "Data"
-BeanCounterLocalizations["zhCN"]["UiDateHeader"] = "\230\151\165\230\156\159"
-BeanCounterLocalizations["zhTW"]["UiDateHeader"] = "\230\151\165\230\156\159"
-BeanCounterLocalizations["csCZ"]["UiDepositTransaction"] = "Sklad"
-BeanCounterLocalizations["daDK"]["UiDepositTransaction"] = "Indskud"
-BeanCounterLocalizations["deDE"]["UiDepositTransaction"] = "Anzahlung"
-BeanCounterLocalizations["enUS"]["UiDepositTransaction"] = "Deposit"
-BeanCounterLocalizations["esES"]["UiDepositTransaction"] = "Dep\195\179sito"
-BeanCounterLocalizations["frFR"]["UiDepositTransaction"] = "D\195\169p\195\180t"
-BeanCounterLocalizations["itIT"]["UiDepositTransaction"] = "Deposito"
-BeanCounterLocalizations["koKR"]["UiDepositTransaction"] = "\235\179\180\236\166\157\234\184\136"
-BeanCounterLocalizations["nlNL"]["UiDepositTransaction"] = "Storting"
-BeanCounterLocalizations["ptPT"]["UiDepositTransaction"] = "Dep\195\179sito"
-BeanCounterLocalizations["zhCN"]["UiDepositTransaction"] = "\228\191\157\231\174\161\232\180\185"
-BeanCounterLocalizations["zhTW"]["UiDepositTransaction"] = "\228\191\157\231\174\161\232\178\187"
-BeanCounterLocalizations["csCZ"]["UiExactNameSearch"] = "Presny nazev"
-BeanCounterLocalizations["daDK"]["UiExactNameSearch"] = "Eksakt navne-s\195\184gning"
-BeanCounterLocalizations["deDE"]["UiExactNameSearch"] = "Genaue Namenssuche"
-BeanCounterLocalizations["enUS"]["UiExactNameSearch"] = "Exact name search"
-BeanCounterLocalizations["esES"]["UiExactNameSearch"] = "B\195\186squeda de nombre exacto"
-BeanCounterLocalizations["frFR"]["UiExactNameSearch"] = "Nom exact"
-BeanCounterLocalizations["itIT"]["UiExactNameSearch"] = "Ricerca nome esatto"
-BeanCounterLocalizations["koKR"]["UiExactNameSearch"] = "\236\160\149\237\153\149\237\149\156 \236\157\180\235\166\132 \236\176\190\234\184\176"
-BeanCounterLocalizations["nlNL"]["UiExactNameSearch"] = "Zoek op exacte naam"
-BeanCounterLocalizations["ptPT"]["UiExactNameSearch"] = "Procura por nome exacto"
-BeanCounterLocalizations["zhCN"]["UiExactNameSearch"] = "\231\161\174\229\136\135\229\144\141\229\173\151\230\144\156\231\180\162"
-BeanCounterLocalizations["zhTW"]["UiExactNameSearch"] = "\229\174\140\230\149\180\229\144\141\231\168\177\230\175\148\229\176\141"
-BeanCounterLocalizations["csCZ"]["UiNameHeader"] = "Vec"
-BeanCounterLocalizations["daDK"]["UiNameHeader"] = "Item"
-BeanCounterLocalizations["deDE"]["UiNameHeader"] = "Gegenstand"
-BeanCounterLocalizations["enUS"]["UiNameHeader"] = "Item"
-BeanCounterLocalizations["esES"]["UiNameHeader"] = "Art\195\173culo"
-BeanCounterLocalizations["frFR"]["UiNameHeader"] = "Objet"
-BeanCounterLocalizations["itIT"]["UiNameHeader"] = "Oggetto"
-BeanCounterLocalizations["koKR"]["UiNameHeader"] = "\236\149\132\236\157\180\237\133\156"
-BeanCounterLocalizations["nlNL"]["UiNameHeader"] = "Item"
-BeanCounterLocalizations["ptPT"]["UiNameHeader"] = "Objecto"
-BeanCounterLocalizations["zhCN"]["UiNameHeader"] = "\231\137\169\229\147\129"
-BeanCounterLocalizations["zhTW"]["UiNameHeader"] = "\231\137\169\229\147\129"
-BeanCounterLocalizations["csCZ"]["UiNetHeader"] = "Sit"
-BeanCounterLocalizations["daDK"]["UiNetHeader"] = "Net"
-BeanCounterLocalizations["deDE"]["UiNetHeader"] = "Netz"
-BeanCounterLocalizations["enUS"]["UiNetHeader"] = "Net"
-BeanCounterLocalizations["esES"]["UiNetHeader"] = "Neto"
-BeanCounterLocalizations["frFR"]["UiNetHeader"] = "Net"
-BeanCounterLocalizations["itIT"]["UiNetHeader"] = "Netto"
-BeanCounterLocalizations["koKR"]["UiNetHeader"] = "\237\149\173\235\170\169"
-BeanCounterLocalizations["nlNL"]["UiNetHeader"] = "Net"
-BeanCounterLocalizations["ptPT"]["UiNetHeader"] = "Rede"
-BeanCounterLocalizations["zhCN"]["UiNetHeader"] = "\229\135\128\229\136\169"
-BeanCounterLocalizations["zhTW"]["UiNetHeader"] = "\230\183\168\229\136\169"
-BeanCounterLocalizations["csCZ"]["UiNetPerHeader"] = "Sit per"
-BeanCounterLocalizations["daDK"]["UiNetPerHeader"] = "Net Per"
-BeanCounterLocalizations["deDE"]["UiNetPerHeader"] = "Netz pro"
-BeanCounterLocalizations["enUS"]["UiNetPerHeader"] = "Net Per"
-BeanCounterLocalizations["esES"]["UiNetPerHeader"] = "Neto c/u"
-BeanCounterLocalizations["frFR"]["UiNetPerHeader"] = "Net unit."
-BeanCounterLocalizations["itIT"]["UiNetPerHeader"] = "Netto per"
-BeanCounterLocalizations["koKR"]["UiNetPerHeader"] = "\237\149\173\235\170\169\235\130\180\236\154\169"
-BeanCounterLocalizations["nlNL"]["UiNetPerHeader"] = "Net Per"
-BeanCounterLocalizations["ptPT"]["UiNetPerHeader"] = "Rede por"
-BeanCounterLocalizations["zhCN"]["UiNetPerHeader"] = "\229\141\149\228\187\182\229\135\128\229\136\169"
-BeanCounterLocalizations["zhTW"]["UiNetPerHeader"] = "\229\150\174\228\187\182\230\183\168\229\136\169"
-BeanCounterLocalizations["csCZ"]["UiPriceHeader"] = "Cena"
-BeanCounterLocalizations["daDK"]["UiPriceHeader"] = "Pris"
-BeanCounterLocalizations["deDE"]["UiPriceHeader"] = "Preis"
-BeanCounterLocalizations["enUS"]["UiPriceHeader"] = "Price"
-BeanCounterLocalizations["esES"]["UiPriceHeader"] = "Precio"
-BeanCounterLocalizations["frFR"]["UiPriceHeader"] = "Prix"
-BeanCounterLocalizations["itIT"]["UiPriceHeader"] = "Prezzo"
-BeanCounterLocalizations["koKR"]["UiPriceHeader"] = "\234\176\128\234\178\169"
-BeanCounterLocalizations["nlNL"]["UiPriceHeader"] = "Prijs"
-BeanCounterLocalizations["ptPT"]["UiPriceHeader"] = "Pre\195\167o"
-BeanCounterLocalizations["zhCN"]["UiPriceHeader"] = "\228\187\183\230\160\188"
-BeanCounterLocalizations["zhTW"]["UiPriceHeader"] = "\229\131\185\230\160\188"
-BeanCounterLocalizations["csCZ"]["UiPricePerHeader"] = "Cenova hlava"
-BeanCounterLocalizations["daDK"]["UiPricePerHeader"] = "Styk Pris"
-BeanCounterLocalizations["deDE"]["UiPricePerHeader"] = "Preis\195\188berschrift"
-BeanCounterLocalizations["enUS"]["UiPricePerHeader"] = "Price Header"
-BeanCounterLocalizations["esES"]["UiPricePerHeader"] = "Precio c/u"
-BeanCounterLocalizations["frFR"]["UiPricePerHeader"] = "Prix unit."
-BeanCounterLocalizations["itIT"]["UiPricePerHeader"] = "Prezzo per"
-BeanCounterLocalizations["koKR"]["UiPricePerHeader"] = "\234\176\128\234\178\169 \237\149\173\235\170\169"
-BeanCounterLocalizations["nlNL"]["UiPricePerHeader"] = "Stuksprijs"
-BeanCounterLocalizations["ptPT"]["UiPricePerHeader"] = "Cabe\195\167alho de Pre\195\167o"
-BeanCounterLocalizations["zhCN"]["UiPricePerHeader"] = "\229\141\149\228\187\182\228\187\183\230\160\188"
-BeanCounterLocalizations["zhTW"]["UiPricePerHeader"] = "\229\131\185\230\160\188\230\168\153\233\161\140"
-BeanCounterLocalizations["csCZ"]["UiPurchases"] = "Nakupy"
-BeanCounterLocalizations["daDK"]["UiPurchases"] = "K\195\184b"
-BeanCounterLocalizations["deDE"]["UiPurchases"] = "Eink\195\164ufe"
-BeanCounterLocalizations["enUS"]["UiPurchases"] = "Purchases"
-BeanCounterLocalizations["esES"]["UiPurchases"] = "Compras"
-BeanCounterLocalizations["frFR"]["UiPurchases"] = "Achats"
-BeanCounterLocalizations["itIT"]["UiPurchases"] = "Compere"
-BeanCounterLocalizations["koKR"]["UiPurchases"] = "\234\181\172\236\158\133"
-BeanCounterLocalizations["nlNL"]["UiPurchases"] = "Aankopen"
-BeanCounterLocalizations["ptPT"]["UiPurchases"] = "Compras"
-BeanCounterLocalizations["zhCN"]["UiPurchases"] = "\232\180\173\228\185\176"
-BeanCounterLocalizations["zhTW"]["UiPurchases"] = "\232\179\188\232\178\183"
-BeanCounterLocalizations["csCZ"]["UiQuantityHeader"] = "Mnozstvi"
-BeanCounterLocalizations["daDK"]["UiQuantityHeader"] = "Stk"
-BeanCounterLocalizations["deDE"]["UiQuantityHeader"] = "Anz"
-BeanCounterLocalizations["enUS"]["UiQuantityHeader"] = "Qty"
-BeanCounterLocalizations["esES"]["UiQuantityHeader"] = "Cta."
-BeanCounterLocalizations["frFR"]["UiQuantityHeader"] = "Qte"
-BeanCounterLocalizations["itIT"]["UiQuantityHeader"] = "Q.t\195\160"
-BeanCounterLocalizations["koKR"]["UiQuantityHeader"] = "\236\136\152\235\159\137"
-BeanCounterLocalizations["nlNL"]["UiQuantityHeader"] = "Hoev."
-BeanCounterLocalizations["ptPT"]["UiQuantityHeader"] = "Qtn"
-BeanCounterLocalizations["zhCN"]["UiQuantityHeader"] = "\230\149\176\233\135\143"
-BeanCounterLocalizations["zhTW"]["UiQuantityHeader"] = "\230\149\184\233\135\143"
-BeanCounterLocalizations["csCZ"]["UiSales"] = "Prodeje"
-BeanCounterLocalizations["daDK"]["UiSales"] = "Salg"
-BeanCounterLocalizations["deDE"]["UiSales"] = "Verk\195\164ufe"
-BeanCounterLocalizations["enUS"]["UiSales"] = "Sales"
-BeanCounterLocalizations["esES"]["UiSales"] = "Ventas"
-BeanCounterLocalizations["frFR"]["UiSales"] = "Ventes"
-BeanCounterLocalizations["itIT"]["UiSales"] = "Vendite"
-BeanCounterLocalizations["koKR"]["UiSales"] = "\237\140\144\235\167\164"
-BeanCounterLocalizations["nlNL"]["UiSales"] = "Verkopen"
-BeanCounterLocalizations["ptPT"]["UiSales"] = "Vendas"
-BeanCounterLocalizations["zhCN"]["UiSales"] = "\233\148\128\229\148\174"
-BeanCounterLocalizations["zhTW"]["UiSales"] = "\233\138\183\229\148\174"
-BeanCounterLocalizations["csCZ"]["UiSearch"] = "Hledat"
-BeanCounterLocalizations["daDK"]["UiSearch"] = "S\195\184g"
-BeanCounterLocalizations["deDE"]["UiSearch"] = "Suche"
-BeanCounterLocalizations["enUS"]["UiSearch"] = "Search"
-BeanCounterLocalizations["esES"]["UiSearch"] = "B\195\186squedas"
-BeanCounterLocalizations["frFR"]["UiSearch"] = "Recherche"
-BeanCounterLocalizations["itIT"]["UiSearch"] = "Ricerca"
-BeanCounterLocalizations["koKR"]["UiSearch"] = "\234\178\128\236\131\137"
-BeanCounterLocalizations["nlNL"]["UiSearch"] = "Zoek"
-BeanCounterLocalizations["ptPT"]["UiSearch"] = "Procura"
-BeanCounterLocalizations["zhCN"]["UiSearch"] = "\230\144\156\231\180\162"
-BeanCounterLocalizations["zhTW"]["UiSearch"] = "\230\144\156\229\176\139"
-BeanCounterLocalizations["csCZ"]["UiSearchForLabel"] = "Hledej"
-BeanCounterLocalizations["daDK"]["UiSearchForLabel"] = "S\195\184g efter:"
-BeanCounterLocalizations["deDE"]["UiSearchForLabel"] = "Suche nach:"
-BeanCounterLocalizations["enUS"]["UiSearchForLabel"] = "Search for:"
-BeanCounterLocalizations["esES"]["UiSearchForLabel"] = "Buscar por:"
-BeanCounterLocalizations["frFR"]["UiSearchForLabel"] = "Rechercher :"
-BeanCounterLocalizations["itIT"]["UiSearchForLabel"] = "Cerca per:"
-BeanCounterLocalizations["koKR"]["UiSearchForLabel"] = "\234\178\128\236\131\137:"
-BeanCounterLocalizations["nlNL"]["UiSearchForLabel"] = "Zoek naar:"
-BeanCounterLocalizations["ptPT"]["UiSearchForLabel"] = "Procurar por:"
-BeanCounterLocalizations["zhCN"]["UiSearchForLabel"] = "\230\144\156\231\180\162"
-BeanCounterLocalizations["zhTW"]["UiSearchForLabel"] = "\230\144\156\229\176\139"
-BeanCounterLocalizations["csCZ"]["UiSellTransaction"] = "Prodej"
-BeanCounterLocalizations["daDK"]["UiSellTransaction"] = "S\195\166lg"
-BeanCounterLocalizations["deDE"]["UiSellTransaction"] = "Verkaufen"
-BeanCounterLocalizations["enUS"]["UiSellTransaction"] = "Sell"
-BeanCounterLocalizations["esES"]["UiSellTransaction"] = "Vender"
-BeanCounterLocalizations["frFR"]["UiSellTransaction"] = "Vendre"
-BeanCounterLocalizations["itIT"]["UiSellTransaction"] = "Vendi"
-BeanCounterLocalizations["koKR"]["UiSellTransaction"] = "\237\140\144\235\167\164"
-BeanCounterLocalizations["nlNL"]["UiSellTransaction"] = "Verkoop"
-BeanCounterLocalizations["ptPT"]["UiSellTransaction"] = "Vender"
-BeanCounterLocalizations["zhCN"]["UiSellTransaction"] = "\229\135\186\229\148\174"
-BeanCounterLocalizations["zhTW"]["UiSellTransaction"] = "\229\135\186\229\148\174"
-BeanCounterLocalizations["csCZ"]["UiTransactions"] = "Transakce"
-BeanCounterLocalizations["daDK"]["UiTransactions"] = "Transaktioner"
-BeanCounterLocalizations["deDE"]["UiTransactions"] = "Transaktionen"
-BeanCounterLocalizations["enUS"]["UiTransactions"] = "Transactions"
-BeanCounterLocalizations["esES"]["UiTransactions"] = "Transacci\195\179nes"
-BeanCounterLocalizations["frFR"]["UiTransactions"] = "Transactions"
-BeanCounterLocalizations["itIT"]["UiTransactions"] = "Transazioni"
-BeanCounterLocalizations["koKR"]["UiTransactions"] = "\234\177\176\235\158\152"
-BeanCounterLocalizations["nlNL"]["UiTransactions"] = "Transacties"
-BeanCounterLocalizations["ptPT"]["UiTransactions"] = "Transac\195\167\195\181es"
-BeanCounterLocalizations["zhCN"]["UiTransactions"] = "\228\186\164\230\152\147"
-BeanCounterLocalizations["zhTW"]["UiTransactions"] = "\228\186\164\230\152\147"
-BeanCounterLocalizations["csCZ"]["UiTransactionsLabel"] = "Transakce"
-BeanCounterLocalizations["daDK"]["UiTransactionsLabel"] = "Transaktioner:"
-BeanCounterLocalizations["deDE"]["UiTransactionsLabel"] = "Transaktionen:"
-BeanCounterLocalizations["enUS"]["UiTransactionsLabel"] = "Transactions:"
-BeanCounterLocalizations["esES"]["UiTransactionsLabel"] = "Transacci\195\179nes:"
-BeanCounterLocalizations["frFR"]["UiTransactionsLabel"] = "Transactions:"
-BeanCounterLocalizations["itIT"]["UiTransactionsLabel"] = "Transazioni:"
-BeanCounterLocalizations["koKR"]["UiTransactionsLabel"] = "\234\177\176\235\158\152:"
-BeanCounterLocalizations["nlNL"]["UiTransactionsLabel"] = "Transacties:"
-BeanCounterLocalizations["ptPT"]["UiTransactionsLabel"] = "Transac\195\167\195\181es"
-BeanCounterLocalizations["zhCN"]["UiTransactionsLabel"] = "\228\186\164\230\152\147"
-BeanCounterLocalizations["zhTW"]["UiTransactionsLabel"] = "\228\186\164\230\152\147"
-BeanCounterLocalizations["csCZ"]["UiTransactionTypeHeader"] = "Typ"
-BeanCounterLocalizations["daDK"]["UiTransactionTypeHeader"] = "Type"
-BeanCounterLocalizations["deDE"]["UiTransactionTypeHeader"] = "Typ"
-BeanCounterLocalizations["enUS"]["UiTransactionTypeHeader"] = "Type"
-BeanCounterLocalizations["esES"]["UiTransactionTypeHeader"] = "Tipo"
-BeanCounterLocalizations["frFR"]["UiTransactionTypeHeader"] = "Type"
-BeanCounterLocalizations["itIT"]["UiTransactionTypeHeader"] = "Tipo"
-BeanCounterLocalizations["koKR"]["UiTransactionTypeHeader"] = "\237\152\149\236\139\157"
-BeanCounterLocalizations["nlNL"]["UiTransactionTypeHeader"] = "Type"
-BeanCounterLocalizations["ptPT"]["UiTransactionTypeHeader"] = "Tipo"
-BeanCounterLocalizations["zhCN"]["UiTransactionTypeHeader"] = "\231\177\187\229\158\139"
-BeanCounterLocalizations["zhTW"]["UiTransactionTypeHeader"] = "\233\161\158\229\136\165"
+		-- Section: User Interface
+		UiAuctions	= "Aukce";
+		UiAuctionTransaction	= "Aukce";
+		UiBids	= "Bidy";
+		UiBidTransaction	= "Bid";
+		UiBuyerSellerHeader	= "Zakaznik/prodavajici";
+		UiBuyTransaction	= "Kup";
+		UiDateHeader	= "Datum";
+		UiDepositTransaction	= "Sklad";
+		UiExactNameSearch	= "Presny nazev";
+		UiNameHeader	= "Vec";
+		UiNetHeader	= "Sit";
+		UiNetPerHeader	= "Sit per";
+		UiPriceHeader	= "Cena";
+		UiPricePerHeader	= "Cenova hlava";
+		UiPurchases	= "Nakupy";
+		UiQuantityHeader	= "Mnozstvi";
+		UiSales	= "Prodeje";
+		UiSearch	= "Hledat";
+		UiSearchForLabel	= "Hledej";
+		UiSellTransaction	= "Prodej";
+		UiTransactions	= "Transakce";
+		UiTransactionsLabel	= "Transakce";
+		UiTransactionTypeHeader	= "Typ";
+
+	};
+
+	daDK = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Alliance Auktions Hus";
+		MailAuctionCancelledSubject	= "Auktion afbrudt";
+		MailAuctionExpiredSubject	= "Auktion udl\195\184bet";
+		MailAuctionSuccessfulSubject	= "Auktion succesfuld";
+		MailAuctionWonSubject	= "Auktion vundet";
+		MailHordeAuctionHouse	= "Horde Auktions Hus";
+		MailOutbidOnSubject	= "Overbudt p\195\165";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Auktioner";
+		UiAuctionTransaction	= "Auktion";
+		UiBids	= "Bud";
+		UiBidTransaction	= "Byd";
+		UiBuyerSellerHeader	= "K\195\184ber/S\195\166lger";
+		UiBuyTransaction	= "K\195\184b";
+		UiDateHeader	= "Dato";
+		UiDepositTransaction	= "Indskud";
+		UiExactNameSearch	= "Eksakt navne-s\195\184gning";
+		UiNameHeader	= "Item";
+		UiNetHeader	= "Net";
+		UiNetPerHeader	= "Net Per";
+		UiPriceHeader	= "Pris";
+		UiPricePerHeader	= "Styk Pris";
+		UiPurchases	= "K\195\184b";
+		UiQuantityHeader	= "Stk";
+		UiSales	= "Salg";
+		UiSearch	= "S\195\184g";
+		UiSearchForLabel	= "S\195\184g efter:";
+		UiSellTransaction	= "S\195\166lg";
+		UiTransactions	= "Transaktioner";
+		UiTransactionsLabel	= "Transaktioner:";
+		UiTransactionTypeHeader	= "Type";
+
+	};
+
+	deDE = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Auktionshaus der Allianz";
+		MailAuctionCancelledSubject	= "Auktion abgebrochen";
+		MailAuctionExpiredSubject	= "Auktion abgelaufen";
+		MailAuctionSuccessfulSubject	= "Auktion erfolgreich";
+		MailAuctionWonSubject	= "Auktion gewonnen";
+		MailHordeAuctionHouse	= "Auktionshaus der Horde";
+		MailOutbidOnSubject	= "H\195\182heres Gebot f\195\188r";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Auktionen";
+		UiAuctionTransaction	= "Auktion";
+		UiBids	= "Gebote";
+		UiBidTransaction	= "Gebot";
+		UiBuyerSellerHeader	= "K\195\164ufer/Verk\195\164ufer";
+		UiBuyTransaction	= "Kaufen";
+		UiDateHeader	= "Datum";
+		UiDepositTransaction	= "Anzahlung";
+		UiExactNameSearch	= "Genaue Namenssuche";
+		UiNameHeader	= "Gegenstand";
+		UiNetHeader	= "Netz";
+		UiNetPerHeader	= "Netz pro";
+		UiPriceHeader	= "Preis";
+		UiPricePerHeader	= "Preis\195\188berschrift";
+		UiPurchases	= "Eink\195\164ufe";
+		UiQuantityHeader	= "Anz";
+		UiSales	= "Verk\195\164ufe";
+		UiSearch	= "Suche";
+		UiSearchForLabel	= "Suche nach:";
+		UiSellTransaction	= "Verkaufen";
+		UiTransactions	= "Transaktionen";
+		UiTransactionsLabel	= "Transaktionen:";
+		UiTransactionTypeHeader	= "Typ";
+
+	};
+
+	enUS = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Alliance Auction House";
+		MailAuctionCancelledSubject	= "Auction cancelled";
+		MailAuctionExpiredSubject	= "Auction expired";
+		MailAuctionSuccessfulSubject	= "Auction successful";
+		MailAuctionWonSubject	= "Auction won";
+		MailHordeAuctionHouse	= "Horde Auction House";
+		MailOutbidOnSubject	= "Outbid on";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Auctions";
+		UiAuctionTransaction	= "Auction";
+		UiBids	= "Bids";
+		UiBidTransaction	= "Bid";
+		UiBuyerSellerHeader	= "Buyer/Seller";
+		UiBuyTransaction	= "Buy";
+		UiDateHeader	= "Date";
+		UiDepositTransaction	= "Deposit";
+		UiExactNameSearch	= "Exact name search";
+		UiNameHeader	= "Item";
+		UiNetHeader	= "Net";
+		UiNetPerHeader	= "Net Per";
+		UiPriceHeader	= "Price";
+		UiPricePerHeader	= "Price Header";
+		UiPurchases	= "Purchases";
+		UiQuantityHeader	= "Qty";
+		UiSales	= "Sales";
+		UiSearch	= "Search";
+		UiSearchForLabel	= "Search for:";
+		UiSellTransaction	= "Sell";
+		UiTransactions	= "Transactions";
+		UiTransactionsLabel	= "Transactions:";
+		UiTransactionTypeHeader	= "Type";
+
+	};
+
+	esES = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Casa de Subastas de la Alianza";
+		MailAuctionCancelledSubject	= "Subasta cancelada";
+		MailAuctionExpiredSubject	= "Subasta caducada";
+		MailAuctionSuccessfulSubject	= "Subasta acertada";
+		MailAuctionWonSubject	= "Subasta ganada";
+		MailHordeAuctionHouse	= "Casa de Subastas de la Horda";
+		MailOutbidOnSubject	= "Oferta mejorada para";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Subastas";
+		UiAuctionTransaction	= "Subasta";
+		UiBids	= "Ofertas";
+		UiBidTransaction	= "Oferta";
+		UiBuyerSellerHeader	= "Comrador/Vendedor";
+		UiBuyTransaction	= "Compra";
+		UiDateHeader	= "D\195\173a";
+		UiDepositTransaction	= "Dep\195\179sito";
+		UiExactNameSearch	= "B\195\186squeda de nombre exacto";
+		UiNameHeader	= "Art\195\173culo";
+		UiNetHeader	= "Neto";
+		UiNetPerHeader	= "Neto c/u";
+		UiPriceHeader	= "Precio";
+		UiPricePerHeader	= "Precio c/u";
+		UiPurchases	= "Compras";
+		UiQuantityHeader	= "Cta.";
+		UiSales	= "Ventas";
+		UiSearch	= "B\195\186squedas";
+		UiSearchForLabel	= "Buscar por:";
+		UiSellTransaction	= "Vender";
+		UiTransactions	= "Transacci\195\179nes";
+		UiTransactionsLabel	= "Transacci\195\179nes:";
+		UiTransactionTypeHeader	= "Tipo";
+
+	};
+
+	frFR = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "H\195\180tel des ventes de l'Alliance";
+		MailAuctionCancelledSubject	= "Vente annul\195\169e ";
+		MailAuctionExpiredSubject	= "Vente aux ench\195\168res termin\195\169e ";
+		MailAuctionSuccessfulSubject	= "Vente aux ench\195\168res r\195\169ussie ";
+		MailAuctionWonSubject	= "Vente gagn\195\169e ";
+		MailHordeAuctionHouse	= "H\195\180tel des ventes de la Horde";
+		MailOutbidOnSubject	= "Augmenter l'offre pour";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Ench\195\168res";
+		UiAuctionTransaction	= "Ench\195\168re";
+		UiBids	= "Offres";
+		UiBidTransaction	= "Offre";
+		UiBuyerSellerHeader	= "Acheteur/Vendeur";
+		UiBuyTransaction	= "Acheter";
+		UiDateHeader	= "Date";
+		UiDepositTransaction	= "D\195\169p\195\180t";
+		UiExactNameSearch	= "Nom exact";
+		UiNameHeader	= "Objet";
+		UiNetHeader	= "Net";
+		UiNetPerHeader	= "Net unit.";
+		UiPriceHeader	= "Prix";
+		UiPricePerHeader	= "Prix unit.";
+		UiPurchases	= "Achats";
+		UiQuantityHeader	= "Qte";
+		UiSales	= "Ventes";
+		UiSearch	= "Recherche";
+		UiSearchForLabel	= "Rechercher :";
+		UiSellTransaction	= "Vendre";
+		UiTransactions	= "Transactions";
+		UiTransactionsLabel	= "Transactions:";
+		UiTransactionTypeHeader	= "Type";
+
+	};
+
+	itIT = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Casa d'aste dell'Alleanza";
+		MailAuctionCancelledSubject	= "Asta annullata";
+		MailAuctionExpiredSubject	= "Asta espirata";
+		MailAuctionSuccessfulSubject	= "Asta riuscita";
+		MailAuctionWonSubject	= "Asta vinta";
+		MailHordeAuctionHouse	= "Casa d'aste dell'Orda";
+		MailOutbidOnSubject	= "Battuto su";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Aste";
+		UiAuctionTransaction	= "Asta";
+		UiBids	= "Offerte";
+		UiBidTransaction	= "Offerta";
+		UiBuyerSellerHeader	= "Compratore/Venditore";
+		UiBuyTransaction	= "Compra";
+		UiDateHeader	= "Data";
+		UiDepositTransaction	= "Deposito";
+		UiExactNameSearch	= "Ricerca nome esatto";
+		UiNameHeader	= "Oggetto";
+		UiNetHeader	= "Netto";
+		UiNetPerHeader	= "Netto per";
+		UiPriceHeader	= "Prezzo";
+		UiPricePerHeader	= "Prezzo per";
+		UiPurchases	= "Compere";
+		UiQuantityHeader	= "Q.t\195\160";
+		UiSales	= "Vendite";
+		UiSearch	= "Ricerca";
+		UiSearchForLabel	= "Cerca per:";
+		UiSellTransaction	= "Vendi";
+		UiTransactions	= "Transazioni";
+		UiTransactionsLabel	= "Transazioni:";
+		UiTransactionTypeHeader	= "Tipo";
+
+	};
+
+	koKR = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "\236\150\188\235\157\188\236\157\180\236\150\184\236\138\164 \234\178\189\235\167\164\236\158\165";
+		MailAuctionCancelledSubject	= "\234\178\189\235\167\164 \236\183\168\236\134\140";
+		MailAuctionExpiredSubject	= "\234\178\189\235\167\164 \235\167\140\235\163\140";
+		MailAuctionSuccessfulSubject	= "\234\178\189\235\167\164 \236\153\132\235\163\140";
+		MailAuctionWonSubject	= "\234\178\189\235\167\164\237\146\136 \235\130\153\236\176\176";
+		MailHordeAuctionHouse	= "\237\152\184\235\147\156 \234\178\189\235\167\164\236\158\165";
+		MailOutbidOnSubject	= "\235\179\180\235\139\164 \235\134\146\236\157\128 \234\176\128\234\178\169\236\157\180 \236\160\156\236\139\156\235\144\168";
+
+
+		-- Section: User Interface
+		UiAuctions	= "\234\178\189\235\167\164\237\146\136";
+		UiAuctionTransaction	= "\234\178\189\235\167\164";
+		UiBids	= "\236\158\133\236\176\176\237\146\136";
+		UiBidTransaction	= "\236\158\133\236\176\176";
+		UiBuyerSellerHeader	= "\234\181\172\235\167\164\236\158\144/\237\140\144\235\167\164\236\158\144";
+		UiBuyTransaction	= "\234\181\172\236\158\133";
+		UiDateHeader	= "\235\130\160\236\167\156";
+		UiDepositTransaction	= "\235\179\180\236\166\157\234\184\136";
+		UiExactNameSearch	= "\236\160\149\237\153\149\237\149\156 \236\157\180\235\166\132 \236\176\190\234\184\176";
+		UiNameHeader	= "\236\149\132\236\157\180\237\133\156";
+		UiNetHeader	= "\237\149\173\235\170\169";
+		UiNetPerHeader	= "\237\149\173\235\170\169\235\130\180\236\154\169";
+		UiPriceHeader	= "\234\176\128\234\178\169";
+		UiPricePerHeader	= "\234\176\128\234\178\169 \237\149\173\235\170\169";
+		UiPurchases	= "\234\181\172\236\158\133";
+		UiQuantityHeader	= "\236\136\152\235\159\137";
+		UiSales	= "\237\140\144\235\167\164";
+		UiSearch	= "\234\178\128\236\131\137";
+		UiSearchForLabel	= "\234\178\128\236\131\137:";
+		UiSellTransaction	= "\237\140\144\235\167\164";
+		UiTransactions	= "\234\177\176\235\158\152";
+		UiTransactionsLabel	= "\234\177\176\235\158\152:";
+		UiTransactionTypeHeader	= "\237\152\149\236\139\157";
+
+	};
+
+	nlNL = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Alliance Auction House";
+		MailAuctionCancelledSubject	= "Auction cancelled";
+		MailAuctionExpiredSubject	= "Auction expired";
+		MailAuctionSuccessfulSubject	= "Auction successful";
+		MailAuctionWonSubject	= "Auction won";
+		MailHordeAuctionHouse	= "Horde Auction House";
+		MailOutbidOnSubject	= "Outbid on";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Veilingen";
+		UiAuctionTransaction	= "Veiling";
+		UiBids	= "Biedingen";
+		UiBidTransaction	= "Bod";
+		UiBuyerSellerHeader	= "Koper/Verkoper";
+		UiBuyTransaction	= "Koop";
+		UiDateHeader	= "Datum";
+		UiDepositTransaction	= "Storting";
+		UiExactNameSearch	= "Zoek op exacte naam";
+		UiNameHeader	= "Item";
+		UiNetHeader	= "Net";
+		UiNetPerHeader	= "Net Per";
+		UiPriceHeader	= "Prijs";
+		UiPricePerHeader	= "Stuksprijs";
+		UiPurchases	= "Aankopen";
+		UiQuantityHeader	= "Hoev.";
+		UiSales	= "Verkopen";
+		UiSearch	= "Zoek";
+		UiSearchForLabel	= "Zoek naar:";
+		UiSellTransaction	= "Verkoop";
+		UiTransactions	= "Transacties";
+		UiTransactionsLabel	= "Transacties:";
+		UiTransactionTypeHeader	= "Type";
+
+	};
+
+	ptPT = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "Leil\195\163o da Alliance";
+		MailAuctionCancelledSubject	= "Leil\195\163o Cancelado";
+		MailAuctionExpiredSubject	= "Leil\195\163o Expirou";
+		MailAuctionSuccessfulSubject	= "Leil\195\163o Bem Sucedido";
+		MailAuctionWonSubject	= "Leil\195\163o Ganho";
+		MailHordeAuctionHouse	= "Leil\195\163o da Horde";
+		MailOutbidOnSubject	= "Sobrebidado em";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Leil\195\181es";
+		UiAuctionTransaction	= "Leil\195\163o";
+		UiBids	= "Ofertas";
+		UiBidTransaction	= "Oferta";
+		UiBuyerSellerHeader	= "Comprador/Vendedor";
+		UiBuyTransaction	= "Compra";
+		UiDateHeader	= "Data";
+		UiDepositTransaction	= "Dep\195\179sito";
+		UiExactNameSearch	= "Procura por nome exacto";
+		UiNameHeader	= "Objecto";
+		UiNetHeader	= "Rede";
+		UiNetPerHeader	= "Rede por";
+		UiPriceHeader	= "Pre\195\167o";
+		UiPricePerHeader	= "Cabe\195\167alho de Pre\195\167o";
+		UiPurchases	= "Compras";
+		UiQuantityHeader	= "Qtn";
+		UiSales	= "Vendas";
+		UiSearch	= "Procura";
+		UiSearchForLabel	= "Procurar por:";
+		UiSellTransaction	= "Vender";
+		UiTransactions	= "Transac\195\167\195\181es";
+		UiTransactionsLabel	= "Transac\195\167\195\181es";
+		UiTransactionTypeHeader	= "Tipo";
+
+	};
+
+	zhCN = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "\232\129\148\231\155\159\230\139\141\229\141\150\232\161\140";
+		MailAuctionCancelledSubject	= "\230\139\141\229\141\150\229\143\150\230\182\136";
+		MailAuctionExpiredSubject	= "\230\139\141\229\141\150\229\183\178\229\136\176\230\156\159";
+		MailAuctionSuccessfulSubject	= "\230\139\141\229\141\150\230\136\144\229\138\159";
+		MailAuctionWonSubject	= "\231\171\158\230\139\141\232\142\183\232\131\156";
+		MailHordeAuctionHouse	= "\233\131\168\232\144\189\230\139\141\229\141\150\232\161\140";
+		MailOutbidOnSubject	= "\229\135\186\228\187\183\232\162\171\229\142\139\232\191\135";
+
+
+		-- Section: User Interface
+		UiAuctions	= "\230\139\141\229\141\150";
+		UiAuctionTransaction	= "\230\139\141\229\141\150";
+		UiBids	= "\229\135\186\228\187\183";
+		UiBidTransaction	= "\231\171\158\230\160\135";
+		UiBuyerSellerHeader	= "\228\185\176\228\184\187/\229\141\150\228\184\187";
+		UiBuyTransaction	= "\232\180\173\228\185\176";
+		UiDateHeader	= "\230\151\165\230\156\159";
+		UiDepositTransaction	= "\228\191\157\231\174\161\232\180\185";
+		UiExactNameSearch	= "\231\161\174\229\136\135\229\144\141\229\173\151\230\144\156\231\180\162";
+		UiNameHeader	= "\231\137\169\229\147\129";
+		UiNetHeader	= "\229\135\128\229\136\169";
+		UiNetPerHeader	= "\229\141\149\228\187\182\229\135\128\229\136\169";
+		UiPriceHeader	= "\228\187\183\230\160\188";
+		UiPricePerHeader	= "\229\141\149\228\187\182\228\187\183\230\160\188";
+		UiPurchases	= "\232\180\173\228\185\176";
+		UiQuantityHeader	= "\230\149\176\233\135\143";
+		UiSales	= "\233\148\128\229\148\174";
+		UiSearch	= "\230\144\156\231\180\162";
+		UiSearchForLabel	= "\230\144\156\231\180\162";
+		UiSellTransaction	= "\229\135\186\229\148\174";
+		UiTransactions	= "\228\186\164\230\152\147";
+		UiTransactionsLabel	= "\228\186\164\230\152\147";
+		UiTransactionTypeHeader	= "\231\177\187\229\158\139";
+
+	};
+
+	zhTW = {
+
+
+		-- Section: Mail
+		MailAllianceAuctionHouse	= "\232\129\175\231\155\159\230\139\141\232\179\163\229\160\180";
+		MailAuctionCancelledSubject	= "\230\139\141\232\179\163\229\183\178\229\143\150\230\182\136";
+		MailAuctionExpiredSubject	= "\230\139\141\232\179\163\233\129\142\230\156\159";
+		MailAuctionSuccessfulSubject	= "\230\139\141\232\179\163\230\136\144\229\138\159";
+		MailAuctionWonSubject	= "\229\190\151\230\168\153";
+		MailHordeAuctionHouse	= "\233\131\168\232\144\189\230\139\141\232\179\163\229\160\180";
+		MailOutbidOnSubject	= "\229\135\186\229\131\185\229\164\177\230\149\151";
+
+
+		-- Section: User Interface
+		UiAuctions	= "\230\139\141\232\179\163\229\160\180";
+		UiAuctionTransaction	= "\230\139\141\232\179\163";
+		UiBids	= "\229\135\186\229\131\185";
+		UiBidTransaction	= "\229\135\186\229\131\185";
+		UiBuyerSellerHeader	= "\232\178\183\230\150\185/\232\179\163\230\150\185";
+		UiBuyTransaction	= "\232\178\183";
+		UiDateHeader	= "\230\151\165\230\156\159";
+		UiDepositTransaction	= "\228\191\157\231\174\161\232\178\187";
+		UiExactNameSearch	= "\229\174\140\230\149\180\229\144\141\231\168\177\230\175\148\229\176\141";
+		UiNameHeader	= "\231\137\169\229\147\129";
+		UiNetHeader	= "\230\183\168\229\136\169";
+		UiNetPerHeader	= "\229\150\174\228\187\182\230\183\168\229\136\169";
+		UiPriceHeader	= "\229\131\185\230\160\188";
+		UiPricePerHeader	= "\229\131\185\230\160\188\230\168\153\233\161\140";
+		UiPurchases	= "\232\179\188\232\178\183";
+		UiQuantityHeader	= "\230\149\184\233\135\143";
+		UiSales	= "\233\138\183\229\148\174";
+		UiSearch	= "\230\144\156\229\176\139";
+		UiSearchForLabel	= "\230\144\156\229\176\139";
+		UiSellTransaction	= "\229\135\186\229\148\174";
+		UiTransactions	= "\228\186\164\230\152\147";
+		UiTransactionsLabel	= "\228\186\164\230\152\147";
+		UiTransactionTypeHeader	= "\233\161\158\229\136\165";
+
+	};
+
+	ruRU = {
+
+
+		-- Section: Mail
+		MailHordeAuctionHouse	= "\208\144\209\131\208\186\209\134\208\184\208\190\208\189 \208\158\209\128\208\180\209\139";
+
+	};
+}
