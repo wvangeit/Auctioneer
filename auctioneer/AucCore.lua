@@ -112,7 +112,7 @@ local bidBasedCategories = {[1]=true, [2]=true, [8]=true, [10]=true} --BID_BASED
 AuctionConfig = {};			--Table that stores config settings
 Auction_DoneItems = {};		--Table to keep a record of auction items that have been scanned
 AuctionBackup = {}			--Table to backup old data which can't be converted at once
-AuctionConfig.version = 30200;
+AuctionConfig.version = 30600;
 
 -- Table to store our cached HSP values (since they're expensive to calculate)
 Auctioneer_HSPCache = {};
@@ -361,6 +361,9 @@ end
 function getSnapshot(auctKey, catID, auctSig)
 	if (not catID) then catID = 0 end
 
+	if (not AuctionConfig.snap) then
+		AuctionConfig.snap = {};
+	end
 	if (not AuctionConfig.snap[auctKey]) then
 		AuctionConfig.snap[auctKey] = {};
 	end
@@ -424,6 +427,9 @@ function saveSnapshot(auctKey, cat, sig, iData)
 
 	if (not cat) then cat = 0 end
 
+	if (not AuctionConfig.snap) then
+		AuctionConfig.snap = {};
+	end
 	if (not AuctionConfig.snap[auctKey]) then
 		AuctionConfig.snap[auctKey] = {};
 	end
