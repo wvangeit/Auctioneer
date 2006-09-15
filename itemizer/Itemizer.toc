@@ -17,12 +17,13 @@ Babylonian\Babylonian.lua
 ItemStrings.lua
 ItemLocale.lua
 
-ItemGUI.lua
 ItemUtil.lua
 ItemCore.lua
 ItemFrames.lua
 ItemTables.lua
 ItemStorage.lua
 ItemScanner.lua
+
+ItemGUI.lua
 
 Itemizer.lua

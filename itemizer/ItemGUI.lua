@@ -48,14 +48,24 @@ local sortButtonOnClick
 local closeButtonOnLoad
 local searchButtonOnLoad
 
-local currentItem = {}
-Itemizer_ItemList = {}
+--Making a local copy of these extensively used functions will make their lookup faster.
+local getItemData = Itemizer.Storage.GetItemData;
+local getItemRandomProps = Itemizer.Storage.GetItemRandomProps;
+
+local itemList = {}
 
 local sortList = {
-	name = "Name",
-	link = "Link",
-	level = "Level",
-	quality = "Quality",
+	itemID = "ItemID",
+	itemName = "Name",
+	itemLink = "Link",
+	itemType = "Type",
+	binds = "Binds on",
+	isUnique = "Unique",
+	itemLevel = "Level",
+	itemQuality = "Quality",
+	itemSubType = "Sub-Type",
+	randomProp = "RandomProp",
+	itemEquipLocation = "Equip Location",
 }
 
 -- Etch-A-Sketch On-Demand GUI building stub. Written by Mikk.
@@ -264,27 +274,27 @@ worker = {
 
 
 function onLoad()
-	local result1, errors1 = Itemizer.GUI.Worker:Init(Itemizer.Frames.MainBaseTemplate)
-	--local result2, errors2 = Itemizer.GUI.Worker:Init(Itemizer.Frames.SortBaseTemplate)
-	local result2, errors2 = Itemizer.Frames.CreateSortFrame()
-	Stubby.RegisterFunctionHook("ItemizerBaseGUI.Show", 500, Itemizer.GUI.BuildItemList)
+	local result1, errors1 = Itemizer.GUI.Worker:Init(Itemizer.Frames.MainBaseTemplate);
+	local result2, errors2 = Itemizer.GUI.Worker:Init(Itemizer.Frames.SortBaseTemplate);
+	--local result2, errors2 = Itemizer.Frames.CreateSortFrame()
+	Stubby.RegisterFunctionHook("ItemizerBaseGUI.Show", 500, Itemizer.GUI.BuildItemList);
 
 	if (EAS_EditDesign) then
 		EAS_EditDesign("Itemizer Item Browsing Window");
 	end
 
 	if (result1 and result2) then
-		EnhTooltip.DebugPrint("Itemizer: Building of GUI completed successfully")
-		ItemizerBaseGUI_Title:SetText("Itemizer v."..Itemizer.Version)
+		EnhTooltip.DebugPrint("Itemizer: Building of GUI completed successfully");
+		ItemizerBaseGUI_Title:SetText("Itemizer v."..Itemizer.Version);
 	else
-		EnhTooltip.DebugPrint("Itemizer: |cffffffff¡¡¡Building of GUI FAILED!!!|r")
+		EnhTooltip.DebugPrint("Itemizer: |cffffffff¡¡¡Building of GUI FAILED!!!|r");
 		if (errors1) then
 			for index, errorMessage in ipairs(errors1) do
-				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r")
+				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r");
 			end
 		else
 			for index, errorMessage in ipairs(errors2) do
-				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r")
+				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r");
 			end
 		end
 	end
@@ -292,265 +302,250 @@ end
 
 function paint()
 	local offset = ItemizerBaseGUI_List_Slider:GetValue()
-	if (table.getn(Itemizer_ItemList)>0) then
+	if (table.getn(itemList)>0) then
 		for line, index in Itemizer.Util.GetglobalIterator("ItemizerBaseGUI_List_%d") do
-			local item = Itemizer_ItemList[offset + index]
-			if (item) then
-				local red, green, blue = GetItemQualityColor(item.quality)
-				line:SetText("["..item.name.."]")
-				line:SetTextColor(red, green, blue)
-				line:SetID(offset+index)
-				line.info = item
-				line:Show()
+			local itemInfo = itemList[offset + index];
+			if (itemInfo) then
+				line:SetText(itemInfo.itemLink);
+				line:SetID(offset+index);
+				line.info = itemInfo;
+				line:Show();
 			else
-				line:SetTextColor(1, 1, 1)
-				line:SetID(index)
-				line:SetText("")
-				line.info = nil
-				line:Hide()
+				line:SetTextColor(1, 1, 1);
+				line:SetID(index);
+				line:SetText("");
+				line.info = nil;
+				line:Hide();
 			end
 		end
 	end
 end
 
 function buildItemList()
-	Itemizer_ItemList = Itemizer.Util.ClearTable(Itemizer_ItemList)
+	itemList = Itemizer.Util.ClearTable(itemList)
 	if (not (type(itemList) == "table")) then
-		Itemizer_ItemList = {}
+		itemList = {};
 	end
 
-	for key, value in pairs(ItemizerLinks) do
-		for key, item in ipairs(decodeInfo(value, key, currentItem)) do
-			table.insert(Itemizer_ItemList, item)
+	for itemID in pairs(ItemizerLinks) do
+		local randomPropsTable = getItemRandomProps(itemID);
+		if (randomPropsTable) then
+			for randomProp in ipairs(randomPropsTable) do
+				table.insert(itemList, getItemData(itemID, randomProp, true));
+			end
+		else
+			table.insert(itemList, getItemData(itemID, nil, true));
 		end
 	end
 
-	table.sort(Itemizer_ItemList, sortTable)
+	table.sort(itemList, sortTable);
 
-	if (table.getn(Itemizer_ItemList) >= 25) then
-		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, table.getn(Itemizer_ItemList) - 25)
+	if (table.getn(itemList) >= 25) then
+		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, table.getn(itemList) - 25);
 	else
-		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, 0)
+		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, 0);
 	end
 
-	ItemizerBaseGUI_List_Slider:SetValue(0)
-	ItemizerBaseGUI_NumItems:SetText(Itemizer.Util.DelimitText(table.getn(Itemizer_ItemList), ",", 3).." Items") --%Localize%
+	ItemizerBaseGUI_List_Slider:SetValue(0);
+	ItemizerBaseGUI_NumItems:SetText(Itemizer.Util.DelimitText(table.getn(itemList), ",", 3).." Items"); --%Localize%
 
-	paint()
+	paint();
 end
 
 function sortTable(a, b)
 	if (a and b) then
-		if (a.quality == b.quality) then
-			return a.name < b.name
+		if (a.itemQuality == b.itemQuality) then
+			return a.itemName < b.itemName;
 		else
-			return a.quality > b.quality
+			return a.itemQuality > b.itemQuality;
 		end
 	end
-end
-
-function decodeInfo(item, itemID, itemData)
-	--itemData = Itemizer.Util.ClearTable(itemData)
-	itemData = {}
-	--if (not (type(itemData) == "table")) then
-	--end
-	local itemNameData = Itemizer.Util.Split(item[1] or "", "§")
-	local itemBaseData = Itemizer.Util.Split(item[3] or "", "§")
-	if (table.getn(itemNameData) > 1) then
-		for key, value in ipairs(itemNameData) do
-			if (key > 1) then
-				table.insert(itemData, { name = (itemNameData[1] or "").." "..(Itemizer.Storage.TranslateRandomProp(value) or ""), quality = (tonumber(itemBaseData[2]) or -1), level = (tonumber(itemBaseData[3]) or 0), link = "item:"..(itemID or 0)..":"..(value or 0)..":0:0" })
-			end
-		end
-	else
-		table.insert(itemData, { name = (itemNameData[1] or ""), quality = (tonumber(itemBaseData[2]) or -1), level = (tonumber(itemBaseData[3]) or 0), link = "item:"..(itemID or 0)..":0:0:0" })
-	end
-	EnhTooltip.DebugPrint(itemData)
-	EnhTooltip.DebugPrint("\n\n")
-	return itemData
 end
 
 function listOnEnter()
 	GameTooltip:SetOwner(this, 'ANCHOR_BOTTOMRIGHT', ItemizerBaseGUI_List_Slider:GetWidth() + 2, this:GetHeight())
-	if (((this) and (this.info) and (this.info.link)) and (GetItemInfo(this.info.link))) then
-		GameTooltip:SetHyperlink(this.info.link)
-		EnhTooltip.TooltipCall(GameTooltip, this.info.name, this.info.link, this.info.quality, 1)
-	elseif (this and this.info and this.info.link) then
-		GameTooltip:SetText("Test Tooltip #"..this:GetID().."\n\nGetItemInfo() returned nil\n\""..this.info.link.."\"\ndoes not exist in the ItemCache")
+
+	if (((this) and (this.info) and (this.info.itemHyperLink)) and (GetItemInfo(this.info.itemHyperLink))) then
+		GameTooltip:SetHyperlink(this.info.itemHyperLink);
+		EnhTooltip.TooltipCall(GameTooltip, this.info.itemName, this.info.itemHyperLink, this.info.itemQuality, 1);
+
+	elseif (this and this.info and this.info.itemHyperLink) then
+		GameTooltip:SetText("Test Tooltip #"..this:GetID().."\n\nGetItemInfo() returned nil\n\""..this.info.itemHyperLink.."\"\ndoes not exist in the ItemCache");
+
 	else
-		GameTooltip:SetText("Test Tooltip #"..this:GetID())
+		GameTooltip:SetText("Test Tooltip #"..this:GetID());
 	end
 end
 
 function listOnClick()
-	EnhTooltip.DebugPrint("Itemizer OnClick called", this:GetName(), this:GetID(), arg1, this:GetText())
+	EnhTooltip.DebugPrint("Itemizer OnClick called", this:GetName(), this:GetID(), arg1, this:GetText());
 	if (IsShiftKeyDown()) then
 		if (ChatFrameEditBox:IsVisible()) then
-			ChatFrameEditBox:Insert(Itemizer.Util.BuildLink(this.info.link))
+			ChatFrameEditBox:Insert(this.info.itemLink);
 		end
 
 	elseif (IsControlKeyDown()) then
-		DressUpItemLink(this.info.link)
+		DressUpItemLink(this.info.itemHyperLink);
 
 	elseif (IsAltKeyDown()) then
 		if (ChatFrameEditBox:IsVisible()) then
-			ChatFrameEditBox:Insert("\""..this.info.link.."\"")
+			ChatFrameEditBox:Insert("\""..this.info.itemHyperLink.."\"");
 		end
 	end
 end
 
 function onValueChanged()
-	Itemizer.GUI.Paint()
+	Itemizer.GUI.Paint();
 end
 
 function upOnLoad()
-	local pushedTexture = this:GetPushedTexture()
-	local highlightTexture = this:GetHighlightTexture()
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	pushedTexture:ClearAllPoints()
-	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1)
-	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1)
+	pushedTexture:ClearAllPoints();
+	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1);
+	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1);
 
-	highlightTexture:ClearAllPoints()
-	highlightTexture:SetVertexColor(1, 1, 1, 0.1)
-	highlightTexture:SetAllPoints(ItemizerBaseGUI_List_UpCorner)
+	highlightTexture:ClearAllPoints();
+	highlightTexture:SetVertexColor(1, 1, 1, 0.1);
+	highlightTexture:SetAllPoints(ItemizerBaseGUI_List_UpCorner);
 end
 
 function upOnClick()
-	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue()-1)
+	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue()-1);
 end
 
 function upOnUpdate()
 	if (this:GetButtonState() == "PUSHED") then
-		Itemizer.GUI.UpOnClick()
+		Itemizer.GUI.UpOnClick();
 	end
 end
 
 function downOnLoad()
-	local normalTexture = this:GetNormalTexture()
-	local pushedTexture = this:GetPushedTexture()
-	local highlightTexture = this:GetHighlightTexture()
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	rotateTexture(normalTexture, 180)
-	rotateTexture(pushedTexture, 180)
-	highlightTexture:SetTexCoord(0, 1, 0, 0, 1, 1, 1, 0)
+	rotateTexture(normalTexture, 180);
+	rotateTexture(pushedTexture, 180);
+	highlightTexture:SetTexCoord(0, 1, 0, 0, 1, 1, 1, 0);
 
-	pushedTexture:ClearAllPoints()
-	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1)
-	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1)
+	pushedTexture:ClearAllPoints();
+	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1);
+	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1);
 
-	highlightTexture:ClearAllPoints()
-	highlightTexture:SetVertexColor(1, 1, 1, 0.1)
-	highlightTexture:SetAllPoints(ItemizerBaseGUI_List_DownCorner)
+	highlightTexture:ClearAllPoints();
+	highlightTexture:SetVertexColor(1, 1, 1, 0.1);
+	highlightTexture:SetAllPoints(ItemizerBaseGUI_List_DownCorner);
 end
 
 function downOnClick()
-	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue()+1)
+	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue()+1);
 end
 
 function downOnUpdate()
 	if (this:GetButtonState() == "PUSHED") then
-		Itemizer.GUI.DownOnClick()
+		Itemizer.GUI.DownOnClick();
 	end
 end
 
 function onMouseWheel()
-	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue() - 5 * arg1)
+	ItemizerBaseGUI_List_Slider:SetValue(ItemizerBaseGUI_List_Slider:GetValue() - 5 * arg1);
 end
 
 function closeButtonOnLoad()
-	local normalTexture = this:GetNormalTexture()
-	local pushedTexture = this:GetPushedTexture()
-	local highlightTexture = this:GetHighlightTexture()
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	normalTexture:SetVertexColor(1,0,0)
-	pushedTexture:SetVertexColor(1,0,0)
+	normalTexture:SetVertexColor(1,0,0);
+	pushedTexture:SetVertexColor(1,0,0);
 
-	pushedTexture:ClearAllPoints()
-	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 2, -2)
-	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 2, -2)
+	pushedTexture:ClearAllPoints();
+	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 2, -2);
+	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 2, -2);
 
-	highlightTexture:ClearAllPoints()
-	highlightTexture:SetPoint("TOPRIGHT", this:GetParent(), "TOPRIGHT")
-	highlightTexture:SetPoint("BOTTOMLEFT", this:GetParent(), "TOPRIGHT", -32, -32)
+	highlightTexture:ClearAllPoints();
+	highlightTexture:SetPoint("TOPRIGHT", this:GetParent(), "TOPRIGHT");
+	highlightTexture:SetPoint("BOTTOMLEFT", this:GetParent(), "TOPRIGHT", -32, -32);
 end
 
 function sortButtonOnLoad()
-	local fontString = this:GetFontString()
-	local normalTexture = this:GetNormalTexture()
-	local pushedTexture = this:GetPushedTexture()
-	local highlightTexture = this:GetHighlightTexture()
+	local fontString = this:GetFontString();
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	fontString:ClearAllPoints()
-	fontString:SetPoint("LEFT", this, "LEFT", 10, 0)
+	fontString:ClearAllPoints();
+	fontString:SetPoint("LEFT", this, "LEFT", 10, 0);
 
-	rotateTexture(normalTexture, 180)
-	rotateTexture(pushedTexture, 180)
-	rotateTexture(highlightTexture, 180)
+	rotateTexture(normalTexture, 180);
+	rotateTexture(pushedTexture, 180);
+	rotateTexture(highlightTexture, 180);
 
-	normalTexture:SetVertexColor(0, 0, 0.5, 0.75)
-	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75)
-	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1)
+	normalTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1);
 
-	this:SetPushedTextOffset(2, -2)
+	this:SetPushedTextOffset(2, -2);
 end
 
 function sortButtonOnClick()
 	if (not ItemizerBaseGUI_Sort:IsVisible()) then
-		ItemizerBaseGUI_Sort:Show()
+		ItemizerBaseGUI_Sort:Show();
 	else
-		ItemizerBaseGUI_Sort:Hide()
+		ItemizerBaseGUI_Sort:Hide();
 	end
 end
 
 function searchButtonOnLoad()
-	local fontString = this:GetFontString()
-	local normalTexture = this:GetNormalTexture()
-	local pushedTexture = this:GetPushedTexture()
-	local highlightTexture = this:GetHighlightTexture()
+	local fontString = this:GetFontString();
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	fontString:ClearAllPoints()
-	fontString:SetPoint("RIGHT", this, "RIGHT", -6, 0)
+	fontString:ClearAllPoints();
+	fontString:SetPoint("RIGHT", this, "RIGHT", -6, 0);
 
-	normalTexture:SetVertexColor(0, 0, 0.5, 0.75)
-	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75)
-	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1)
+	normalTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1);
 
-	this:SetPushedTextOffset(2, -2)
+	this:SetPushedTextOffset(2, -2);
 end
 
 function sortOnLoad()
-	this.List = {}
+	this.List = {};
 	for key, value in pairs(sortList) do
-		table.insert(this.List, { Key = key, Value = value })
+		table.insert(this.List, { Key = key, Value = value });
 	end
 
 	for line, index in Itemizer.Util.GetglobalIterator(this:GetName().."_FontString_%d") do
 		if (this.List[index]) then
-			line:SetText(this.List[index]["Value"])
+			line:SetText(this.List[index]["Value"]);
 		else
-			line:SetTextColor(1, 1, 1, 1)
-			line:SetText(nil)
-			line:Hide()
+			line:SetTextColor(1, 1, 1, 1);
+			line:SetText(nil);
+			line:Hide();
 		end
 	end
-	this:Hide()
+	this:Hide();
 end
 
 function sortDownOnLoad()
 	if (this:GetID() == 13) then
-		this:Hide()
+		this:Hide();
 	end
 
-	local normalTexture = this:GetNormalTexture()
-	local pushedTexture = this:GetPushedTexture()
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
 
-	pushedTexture:ClearAllPoints()
-	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1)
-	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1)
+	pushedTexture:ClearAllPoints();
+	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1);
+	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1);
 
-	rotateTexture(normalTexture, 180)
-	rotateTexture(pushedTexture, 180)
+	rotateTexture(normalTexture, 180);
+	rotateTexture(pushedTexture, 180);
 end
 
 function sortDownOnClick()
@@ -559,13 +554,13 @@ end
 
 function sortUpOnLoad()
 	if (this:GetID() == 1) then
-		this:Hide()
+		this:Hide();
 	end
 
-	local pushedTexture = this:GetPushedTexture()
+	local pushedTexture = this:GetPushedTexture();
 
-	pushedTexture:ClearAllPoints()
-	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1)
+	pushedTexture:ClearAllPoints();
+	pushedTexture:SetPoint("TOPLEFT", this, "TOPLEFT", 1, -1);
 	pushedTexture:SetPoint("BOTTOMRIGHT", this, "BOTTOMRIGHT", 1, -1)
 
 end

@@ -30,7 +30,7 @@ local elapsedTime = 0; --Running time to compare with frequencyOfUpdates
 local entriesToProcess = 25; --Items per OnUpdate call
 local frequencyOfUpdates = 0.2; --Seconds to wait between OnUpdate calls.
 
---Making a local copy of these extensively used functions will make their calling faster.
+--Making a local copy of these extensively used functions will make their lookup faster.
 local pairs = pairs;
 local strfind = string.find;
 local tremove = table.remove;
@@ -54,22 +54,18 @@ function onUpdate(timePassed)
 
 	for link, info in pairs(ItemizerProcessStack) do
 		if (info.lines < getNumLines(link)) then
-			--numItems = numItems + 0.2
-			info.lines = getNumLines(link)
-			info.timer = GetTime()
+			info.lines = getNumLines(link);
+			info.timer = GetTime();
 
 		elseif ((GetTime() - info.timer) > 5) then
 			if (info.lines > 0) then
 				numItems = numItems + 1;
-				storeItemData(buildItemData(link, itemInfo))
+				storeItemData(buildItemData(link, itemInfo));
 				ItemizerProcessStack[link] = nil;
 
 			else
-				info.timer = GetTime()
+				info.timer = GetTime();
 			end
-
-		else
-			--numItems = numItems + 0.1
 		end
 
 		if (numItems >= entriesToProcess) then
@@ -83,68 +79,71 @@ end
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
 function getNumLines(link)
 	if (not (type(link) == "string")) then
-		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", link)
+		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", link);
 		return
 	end
-	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
+	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false);
 
-	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
+	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE");
 	ItemizerHidden:SetHyperlink(hyperLink[1]);
-	return ItemizerHidden:NumLines()
+	return ItemizerHidden:NumLines();
 end
 
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
 function buildItemData(link, itemInfo)
 	if (not (type(link) == "string")) then
-		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "Link type", type(link), link)
-		return
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "Link type", type(link), link);
+		return;
 	end
 
 	itemInfo = clearTable(itemInfo)
 	if (not (type(itemInfo) == "table")) then
-		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "itemInfo type", type(itemInfo), link)
-		itemInfo = {}
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "itemInfo type", type(itemInfo), link);
+		itemInfo = {};
 	end
 
 	local _
-	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(link, true)
-	--local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false)
+	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false);
+	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(link, true);
 	local curLine, textLeft, textRight, switch, keepGoing, matched, matchedRight
 
 
 	if (not itemInfo.tooltip) then
-		itemInfo.tooltip = {}
+		itemInfo.tooltip = {};
 	end
 	if (not itemInfo.tooltip.leftText) then
-		itemInfo.tooltip.leftText = {}
+		itemInfo.tooltip.leftText = {};
 	end
 	if (not itemInfo.tooltip.rightText) then
-		itemInfo.tooltip.rightText = {}
+		itemInfo.tooltip.rightText = {};
 	end
 	if (not itemInfo.attributes) then
-		itemInfo.attributes = {}
+		itemInfo.attributes = {};
 	end
 	if (not itemInfo.attributes.skills) then
-		itemInfo.attributes.skills = {}
+		itemInfo.attributes.skills = {};
 	end
 	if (not itemInfo.attributes.resists) then
-		itemInfo.attributes.resists = {}
+		itemInfo.attributes.resists = {};
 	end
 	if (not itemInfo.attributes.basicStats) then
-		itemInfo.attributes.basicStats = {}
+		itemInfo.attributes.basicStats = {};
 	end
 	if (not itemInfo.attributes.equipBonuses) then
-		itemInfo.attributes.equipBonuses = {}
+		itemInfo.attributes.equipBonuses = {};
 	end
 
-	itemInfo.itemID, itemInfo.randomProp = EnhTooltip.BreakLink(link)
-	itemInfo.itemBaseName, _, itemInfo.itemQuality, itemInfo.itemLevel, itemInfo.itemType, itemInfo.itemSubType, _, itemInfo.itemEquipLocation = GetItemInfo(baseHyperLink[1])
+	itemInfo.itemLink = link;
+	itemInfo.itemHyperLink = hyperLink[1];
+	itemInfo.itemName = GetItemInfo(hyperLink[1]);
+	itemInfo.itemID, itemInfo.randomProp = EnhTooltip.BreakLink(link);
+	itemInfo.itemBaseName, _, itemInfo.itemQuality, itemInfo.itemLevel, itemInfo.itemType, itemInfo.itemSubType, _, itemInfo.itemEquipLocation = GetItemInfo(baseHyperLink[1]);
 
 	if (itemInfo.randomProp == 0) then
 		itemInfo.randomProp = nil;
 	end
 
-	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE")
+	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE");
 	ItemizerHidden:SetHyperlink(baseHyperLink[1]);
 	--EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", link, baseHyperLink[1], "NumLines", ItemizerHidden:NumLines())
 
@@ -154,14 +153,14 @@ function buildItemData(link, itemInfo)
 		if (curLine and curLine:IsShown()) then
 			textLeft = curLine:GetText();
 		else
-			textLeft = nil
+			textLeft = nil;
 		end
 
 		curLine = getglobal("ItemizerHiddenTextRight"..index);
 		if (curLine and curLine:IsShown()) then
 			textRight = curLine:GetText();
 		else
-			textRight = nil
+			textRight = nil;
 		end
 
 		itemInfo.tooltip.leftText[index] = textLeft;
@@ -180,10 +179,9 @@ function buildItemData(link, itemInfo)
 				textRight = "";
 			end
 
-			--Re-Verify the item name according to the tooltip.
+			--First line is the item's name, nothing to do here..
 			if (not switch) then
 				switch = 2;
-				itemInfo.itemName = textLeft;
 				keepGoing = false;
 				matched = true;
 
@@ -192,31 +190,31 @@ function buildItemData(link, itemInfo)
 				local _, _, binds = strfind(textLeft, "Binds when (.+)"); --%Localize%
 				if (binds) then
 					if (strlower(binds) == "equipped") then --%Localize%
-						itemInfo.binds = 1
+						itemInfo.binds = 1;
 
 					elseif (strlower(binds) == "picked up") then --%Localize%
-						itemInfo.binds = 2
+						itemInfo.binds = 2;
 
 					elseif (strlower(binds) == "used") then --%Localize%
-						itemInfo.binds = 3
+						itemInfo.binds = 3;
 					end
 					keepGoing = false;
 					matched = true;
 
 				else
-					itemInfo.binds = false
+					itemInfo.binds = false;
 				end
 				switch = 3;
 
 			--Scan for unique status
 			elseif (switch == 3) then
 				if (strfind(textLeft, "Unique")) then --%Localize%
-					itemInfo.isUnique = true
+					itemInfo.isUnique = true;
 					keepGoing = false;
 					matched = true;
 
 				else
-					itemInfo.isUnique = false
+					itemInfo.isUnique = false;
 				end
 				switch = 4;
 
@@ -453,7 +451,7 @@ function buildItemData(link, itemInfo)
 				if (not strfind(textLeft, "Equip: ")) then --%Localize%
 					keepGoing = false;
 
-					--Detect set item info here because its the last think we'll see
+					--Detect set item info here because its the last thing we'll see
 					_, _, itemSetName = strfind(textLeft, "(.+) %(%d/%d%)");
 					if (itemSetName) then
 						found = true;
@@ -550,6 +548,12 @@ function buildItemData(link, itemInfo)
 				if (quantity) then
 					found = true;
 					itemInfo.attributes.equipBonuses.attackPower = tonumber(plusOrMinus..quantity);
+				end
+
+				_, _, plusOrMinus, quantity = strfind(textLeft, "Equip: (%p)(%d+) ranged Attack Power"); --%Localize%
+				if (quantity) then
+					found = true;
+					itemInfo.attributes.equipBonuses.rangedAttackPower = tonumber(plusOrMinus..quantity);
 				end
 
 				_, _, increaseType, plusOrMinus, quantity = strfind(textLeft, "Equip: Increased (.+) (%p)(%d+)"); --%Localize%

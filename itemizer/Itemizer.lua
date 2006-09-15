@@ -31,12 +31,12 @@ if (Itemizer.Version == "<".."%version%>") then
 end
 
 --Saved Variables
-ItemizerSets = {}
-ItemizerLinks = {}
-ItemizerConfig = {}
+ItemizerSets = {};
+ItemizerLinks = {};
+ItemizerConfig = {};
 
 --Global Variables
-ItemizerProcessStack = {}
+ItemizerProcessStack = {};
 
 local function onLoad()
 
@@ -44,7 +44,7 @@ local function onLoad()
 	Itemizer.Core.RegisterEvents();
 
 	-- Setup the default for stubby to always load (people can override this on a per toon basis)
-	Stubby.SetConfig("Itemizer", "LoadType", "always", true)
+	Stubby.SetConfig("Itemizer", "LoadType", "always", true);
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Itemizer", "CommandHandler", [[
@@ -77,6 +77,18 @@ local function onLoad()
 				ItemizerProcessStack = {}
 				Stubby.Print("Itemizer Variables cleared")
 				EnhTooltip.DebugPrint("Itemizer Variables cleared")
+			elseif (cmd == "show") then
+				if (Itemizer and Itemizer.GUI) then
+					if (not ItemizerBaseGUI) then
+						Itemizer.GUI.OnLoad()
+					end
+					if (ItemizerBaseGUI:IsVisible()) then
+						ItemizerBaseGUI:Hide()
+					else
+						Itemizer.GUI.BuildItemList()
+						ItemizerBaseGUI:Show()
+					end
+				end
 			else
 				Stubby.Print("Itemizer is currently not loaded.")
 				Stubby.Print("  You may load it now by typing |cffffffff/itemizer load|r")
@@ -102,4 +114,4 @@ end
 
 Itemizer.OnLoad = onLoad;
 
-Itemizer.OnLoad()
+Itemizer.OnLoad();

@@ -35,14 +35,14 @@ local variablesLoaded
 local addLinkToProcessStack
 local itemCacheScanInProgress
 
---Making a local copy of these extensively used functions will make their calling faster.
+--Making a local copy of these extensively used functions will make their lookup faster.
 local getItemVersion
 local strfind = string.find
 
 local inspectTargets = {};
 
-local _, gameBuildNumber = GetBuildInfo()
-gameBuildNumber = tonumber(gameBuildNumber)
+local _, gameBuildNumberString = GetBuildInfo()
+gameBuildNumber = tonumber(gameBuildNumberString)
 
 local itemCacheScanCeiling = 30000; --At the time of writing, the item with the highest ItemID is "Undercity Pledge Collection" with an ItemID of 22300 (thanks to zeeg for the info [http://www.wowguru.com/db/items/id22300/]), so a ceiling of 30,000 is more than reasonable IMHO.
 
@@ -51,9 +51,9 @@ local eventsToRegister = {
 	"ADDON_LOADED",
 	"MERCHANT_SHOW",
 	"BANKFRAME_OPENED",
+	"PLAYER_TARGET_CHANGED",
 	"UPDATE_MOUSEOVER_UNIT",
 	"UNIT_INVENTORY_CHANGED",
-	"PLAYER_TARGET_CHANGED",
 
 	--Chat Events
 	"CHAT_MSG_SAY",
@@ -75,17 +75,15 @@ local bankSlots = {
 
 function registerEvents()
 	for index, event in pairs(eventsToRegister) do
-		ItemizerFrame:RegisterEvent(event)
+		Itemizer.Frames.MainFrame:RegisterEvent(event);
 	end
 end
 
 function onEvent()
-	EnhTooltip.DebugPrint("Itemizer: OnEvent called", event);
-
+	debugprofilestart();
 	if (event == "UPDATE_MOUSEOVER_UNIT") then
 		if (UnitIsPlayer("mouseover") and (UnitFactionGroup("mouseover") == Itemizer.Core.Constants.PlayerFaction)) then
-			if CheckInteractDistance("mouseover", 1) then
-				debugprofilestart()
+			if (CheckInteractDistance("mouseover", 1)) then
 				inspect("mouseover");
 			end
 		end
@@ -93,25 +91,26 @@ function onEvent()
 	elseif (event == "PLAYER_TARGET_CHANGED") then
 		if (UnitIsPlayer("target") and (not UnitIsUnit("target", "player"))) then
 			if CheckInteractDistance("target", 1) then
-				debugprofilestart()
 				inspect("target");
 			end
 		end
 
 	elseif (strfind(event, "CHAT_MSG")) then
-		debugprofilestart()
 		processLinks(arg1);
 
-	elseif (event == "UNIT_INVENTORY_CHANGED" and arg1 == "player") then
-		debugprofilestart()
-		scanInventory(arg1);
-		inspect(arg1);
+	elseif (event == "UNIT_INVENTORY_CHANGED") then
+		if (arg1 == "player") then
+			scanInventory(arg1);
+			inspect(arg1);
+
+		else
+			inspect(arg1);
+		end
 
 	elseif (event == "BANKFRAME_OPENED") then
 		scanBank();
 
 	elseif (event == "MERCHANT_SHOW") then
-		debugprofilestart()
 		scanMerchant();
 
 	elseif (event == "ADDON_LOADED" and string.lower(arg1) == "itemizer") then
@@ -128,106 +127,113 @@ function processLinks(str, fromAPI)
 	else
 		items = Itemizer.Util.GetItemLinks(str);
 		if (table.getn(items) > 0) then
-			EnhTooltip.DebugPrint("Itemizer: Found Item(s) in chat, number of items", table.getn(items), "Time taken", debugprofilestop());
+			EnhTooltip.DebugPrint(
+				"Itemizer: Found Item(s) in chat, number of items", table.getn(items),
+				"Time taken", string.format("%.3fms", debugprofilestop())
+			);
 		end
 	end
 
 	if (items) then
 		for index, link in pairs(items) do
 			--Only add items to the processing stack that have not been previously parsed on this version of the game.
-			local itemID, randomProp = EnhTooltip.BreakLink(link)
+			local itemID, randomProp = EnhTooltip.BreakLink(link);
 
 			if (itemID == 0) then
-				itemID = nil
+				itemID = nil;
 			end
 			if (randomProp == 0) then
-				randomProp = nil
+				randomProp = nil;
 			end
 
-			local itemBuildNumber, itemIsCurrent, randomPropInItem = getItemVersion(itemID, randomProp)
+			local itemBuildNumber, itemIsCurrent, randomPropInItem = getItemVersion(itemID, randomProp);
 			local randomPropOK
 
 			if (not randomProp) then
-				randomPropOK = true
+				randomPropOK = true;
 			else
-				randomPropOK = randomPropInItem
+				randomPropOK = randomPropInItem;
 			end
 
 			if (not (itemBuildNumber and itemIsCurrent and randomPropOK)) then
-	
-				if (not itemCacheScanInProgress) then
-					EnhTooltip.DebugPrint("Itemizer: New link:", link, itemBuildNumber, itemIsCurrent, randomPropInItem)
-				end
-				addLinkToProcessStack(link)
+				addLinkToProcessStack(link);
 			end
 		end
 	end
 end
 
 function inspect(unit)
-	local name = UnitName(unit)
-	local curTime = time()
+	local name = UnitName(unit);
+	local curTime = time();
+
 	if ((not inspectTargets[name]) or (curTime - inspectTargets[name] > 30)) then
 		EnhTooltip.DebugPrint("Itemizer: Inspecting Player", name);
-		inspectTargets[name] = curTime
-		local currentItem
-		local numItems = 0
+		inspectTargets[name] = curTime;
+		local currentItem;
+		local numItems = 0;
 
 		for slot = 0, 19 do
-			currentItem = GetInventoryItemLink(unit, slot)
+			currentItem = GetInventoryItemLink(unit, slot);
+
 			if (currentItem) then
-				numItems = numItems + 1
-				processLinks(currentItem, true)
+				numItems = numItems + 1;
+				processLinks(currentItem, true);
 			end
 		end
-	EnhTooltip.DebugPrint("Itemizer: Finished inspecting player", name, "Number of Items", numItems, "Time taken", debugprofilestop());
+
+	EnhTooltip.DebugPrint(
+		"Itemizer: Finished inspecting player", name,
+		"Number of Items", numItems,
+		"Time taken", string.format("%.3f", debugprofilestop())
+	);
 	end
 end
 
 function variablesLoaded()
-	getItemVersion = Itemizer.Storage.GetItemVersion
-	EnhTooltip.DebugPrint("Itemizer: ItemCache Size", Itemizer.Util.ItemCacheSize())
-
-	Itemizer.GUI.OnLoad()
-	Itemizer.GUI.BuildItemList()
+	getItemVersion = Itemizer.Storage.GetItemVersion;
+	EnhTooltip.DebugPrint("Itemizer: ItemCache Size", Itemizer.Util.ItemCacheSize());
 end
 
 function scanMerchant()
 	for index = 1, GetMerchantNumItems() do
-		processLinks(GetMerchantItemLink(index), true)
+		processLinks(GetMerchantItemLink(index), true);
 	end
 
-	EnhTooltip.DebugPrint("Itemizer: Finished scanning merchant", "Number of Items", GetMerchantNumItems(), "Time taken", debugprofilestop());
+	EnhTooltip.DebugPrint(
+		"Itemizer: Finished scanning merchant",
+		"Number of Items", GetMerchantNumItems(),
+		"Time taken", string.format("%.3fms", debugprofilestop())
+	);
 end
 
 function scanItemCache()
-	debugprofilestart()
+	debugprofilestart();
 
-	local link
-	local itemsFound = 0
-	local buildLink = Itemizer.Util.BuildLink
-	
+	local link;
+	local itemsFound = 0;
+	local buildLink = Itemizer.Util.BuildLink;
 
 	for index = 1, Itemizer.Core.Constants.ItemCacheScanCeiling do
-		link = buildLink(index)
+		link = buildLink(index);
+
 		if (link) then
 			if (itemsFound > 20) then
-				itemCacheScanInProgress = true
+				itemCacheScanInProgress = true;
 			end
-			processLinks(link, true)
-			itemsFound = itemsFound + 1
+			processLinks(link, true);
+			itemsFound = itemsFound + 1;
 		end
 	end
 
-	itemCacheScanInProgress = false
+	itemCacheScanInProgress = false;
 
-	local totalTimeTaken = debugprofilestop()
+	local totalTimeTaken = debugprofilestop();
 	EnhTooltip.DebugPrint(
-		"Itemizer: ScanitemCache() ItemCache entries scanned", Itemizer.Core.Constants.ItemCacheScanCeiling,
+		"Itemizer: ScanItemCache() ItemCache entries scanned", Itemizer.Core.Constants.ItemCacheScanCeiling,
 		"Number of Items found", itemsFound,
-		"Time taken", totalTimeTaken,
-		"Average time per found item", totalTimeTaken/itemsFound,
-		"Average time per attempt", totalTimeTaken/Itemizer.Core.Constants.ItemCacheScanCeiling
+		"Time taken", string.format("%.3fms", totalTimeTaken),
+		"Average time per found item", string.format("%.3fms", totalTimeTaken/itemsFound),
+		"Average time per attempt", string.format("%.3fms", totalTimeTaken/Itemizer.Core.Constants.ItemCacheScanCeiling)
 	)
 end
 
@@ -235,9 +241,9 @@ function scanInventory()
 	local currentItem
 	for bag = 0, 4 do
 		for slot = 1, GetContainerNumSlots(bag) do
-			currentItem = GetContainerItemLink(bag, slot)
+			currentItem = GetContainerItemLink(bag, slot);
 			if (currentItem) then
-				processLinks(currentItem, true)
+				processLinks(currentItem, true);
 			end
 		end
 	end
@@ -247,9 +253,9 @@ function scanBank()
 	local currentItem
 	for index, bag in pairs(bankSlots) do
 		for slot = 1, GetContainerNumSlots(bag) do
-			currentItem = GetContainerItemLink(bag, slot)
+			currentItem = GetContainerItemLink(bag, slot);
 			if (currentItem) then
-				processLinks(currentItem, true)
+				processLinks(currentItem, true);
 			end
 		end
 	end
@@ -257,7 +263,11 @@ end
 
 function addLinkToProcessStack(link)
 	if (not ItemizerProcessStack[link]) then
-		ItemizerProcessStack[link] = { timer = GetTime(), lines = 0 }
+		if (not itemCacheScanInProgress) then
+			EnhTooltip.DebugPrint("Itemizer: New link:", link);
+		end
+
+		ItemizerProcessStack[link] = { timer = GetTime(), lines = 0 };
 	end
 end
 
@@ -281,4 +291,5 @@ Itemizer.Core.Constants = {
 	EventsToRegister = eventsToRegister,
 	PlayerFaction = UnitFactionGroup("player"),
 	ItemCacheScanCeiling = itemCacheScanCeiling,
+	GameBuildNumberString = gameBuildNumberString,
 }

@@ -23,42 +23,28 @@
 ]]
 
 local createFrames
-local createSortFrame
 local mainBaseTemplate
 local sortBaseTemplate
 
 --Global Frame Names
-ItemizerFrame = nil;
 ItemizerTooltip = nil;
 ItemizerHidden = nil;
-ItemizerScanFrame = nil;
 
 function createFrames()
-	if (ItemizerFrame) then
+	if (Itemizer.Frames.MainFrame) then
 		return
 	end
 
-	ItemizerFrame = CreateFrame("Frame", "ItemizerFrame", UIParent);
-	ItemizerFrame:SetScript("OnEvent", Itemizer.Core.OnEvent);
+	Itemizer.Frames.MainFrame = CreateFrame("Frame");
+	Itemizer.Frames.MainFrame:SetScript("OnEvent", Itemizer.Core.OnEvent);
+	Itemizer.Frames.MainFrame:SetScript("OnUpdate", function() return Itemizer.Scanner.OnUpdate(arg1) end);
+	Itemizer.Frames.MainFrame:Show();
 
 	ItemizerTooltip = CreateFrame("GameTooltip", "ItemizerTooltip", UIParent, "GameTooltipTemplate");
 	ItemizerHidden = CreateFrame("GameTooltip", "ItemizerHidden", UIParent, "GameTooltipTemplate");
 	ItemizerHidden:Show();
-	ItemizerHidden:SetOwner(this,"ANCHOR_NONE");
+	ItemizerHidden:SetOwner(this, "ANCHOR_NONE");
 	ItemizerHidden:Show();
-
-	ItemizerScanFrame = CreateFrame("Frame", "ItemizerScanFrame");
-	ItemizerScanFrame:SetScript("OnUpdate", function() return Itemizer.Scanner.OnUpdate(arg1) end);
-	ItemizerScanFrame:Show();
-end
-
-function createSortFrame()
-	if (ItemizerBaseGUI_Sort) then
-		return false
-	end
-
-	ItemizerBaseGUI_Sort = CreateFrame("GameTooltip", "ItemizerBaseGUI_Sort", ItemizerBaseGUI, "GameTooltipTemplate");
-	return true
 end
 
 mainBaseTemplate = {
@@ -72,6 +58,7 @@ mainBaseTemplate = {
 		parent="UIParent",
 		inherits=nil,
 		methods = {
+			{ f="Hide" },
 			{ f="SetToplevel", true },
 			{ f="SetSize", 384, 512 },
 			{ f="SetFrameStrata", "MEDIUM" },
@@ -478,7 +465,6 @@ sortBaseTemplate = {
 
 Itemizer.Frames = {
 	CreateFrames = createFrames,
-	CreateSortFrame = createSortFrame,
 	MainBaseTemplate = mainBaseTemplate,
 	SortBaseTemplate = sortBaseTemplate,
 }

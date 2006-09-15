@@ -33,11 +33,10 @@ function _ITEM(stringKey, locale)
 			return Babylonian.FetchString(ItemizerLocalizations, GetLocale(), stringKey);
 		end
 	elseif (Itemizer_CustomLocalizations[stringKey]) then
-		return Babylonian.FetchString(ItemizerLocalizations, Itemizer_CustomLocalizations[stringKey], stringKey)
+		return Babylonian.FetchString(ItemizerLocalizations, Itemizer_CustomLocalizations[stringKey], stringKey);
 	else
-		local str = Babylonian.GetString(ItemizerLocalizations, stringKey)
-		if (not str) then return stringKey end
-		return str
+		local str = Babylonian.GetString(ItemizerLocalizations, stringKey);
+		return str or stringKey;
 	end
 end
 

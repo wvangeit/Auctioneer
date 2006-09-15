@@ -29,83 +29,122 @@ local getItemVersion
 local encodeItemData
 local decodeItemData
 local translateEnchant
+local getItemRandomProps
 local translateRandomProp
+local getEnchantComponents
+local getRandomPropComponents
+local addRandomPropStatsToTable
 
---Making a local copy of these extensively used functions will make their calling faster.
-local type = type
-local pairs = pairs
-local ipairs = ipairs
-local unpack = unpack
-local tonumber = tonumber
-local tostring = tostring
-local strsub = string.sub
-local strfind = string.find
-local format = string.format
+--Making a local copy of these extensively used functions will make their lookup faster.
+local type = type;
+local pairs = pairs;
+local ipairs = ipairs;
+local unpack = unpack;
+local tonumber = tonumber;
+local tostring = tostring;
+local strsub = string.sub;
+local strfind = string.find;
+local format = string.format;
+local tinsert = table.insert;
 
-local splitString = Itemizer.Util.Split
-local stringToTable = Itemizer.Util.StringToTable
-local nilSafeNumber = Itemizer.Util.NilSafeNumber
-local nilSafeString = Itemizer.Util.NilSafeString
-local gameBuildNumber = Itemizer.Core.Constants.GameBuildNumber
-local gameBuildNumberString = tostring(Itemizer.Core.Constants.GameBuildNumber)
+local hashText = Itemizer.Util.HashText;
+local splitString = Itemizer.Util.Split;
+local nilTable = Itemizer.Util.NilTable;
+local buildLink = Itemizer.Util.BuildLink;
+local clearTable = Itemizer.Util.ClearTable;
+local pruneTable = Itemizer.Util.PruneTable;
+local stringToTable = Itemizer.Util.StringToTable;
+local nilSafeNumber = Itemizer.Util.NilSafeNumber;
+local nilSafeString = Itemizer.Util.NilSafeString;
+local nilEmptyString = Itemizer.Util.NilEmptyString;
+local gameBuildNumber = Itemizer.Core.Constants.GameBuildNumber;
+local gameBuildNumberString = Itemizer.Core.Constants.GameBuildNumberString;
 
 --Just one table to be re-used
-local itemInfo = {}
+local randomPropsTable = {}
 
 
-function getItemData(itemID, randomProp)
-	itemID = tonumber(itemID)
-	randomProp = tonumber(randomProp)
+function getItemData(itemID, randomProp, internalCall)
+	itemID = tonumber(itemID);
+	randomProp = tonumber(randomProp);
 
 	if (not itemID) then
-		return
+		return;
 	end
 
-	local currentItem
+	local currentItem = ItemizerLinks[itemID];
+
+	if (internalCall) then
+		return decodeItemData(currentItem, itemID, randomProp);
+	end
+
 	local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemID, randomProp)
 	if (not randomPropInItem) then
-		EnhTooltip.DebugPrint("Itemizer: WARNING randomProp not found in item", itemID, randomProp)
+		EnhTooltip.DebugPrint("Itemizer: WARNING randomProp not found in item", itemID, randomProp);
 	end
 
 	if (randomProp) then --We're looking for an "of the X" item
 		if ((haveItemID) and (haveRandomProp)) then --Found!
-			currentItem = ItemizerLinks[itemID]
-			return decodeItemData(currentItem, randomProp)
+			return decodeItemData(currentItem, itemID, randomProp);
 		else --Item Not found
-			return
+			return;
 		end
 	else --We're looking for a standard item
 		if (haveItemID) then --Found!
-			currentItem = ItemizerLinks[itemID]
-			return decodeItemData(currentItem, randomProp)
+			return decodeItemData(currentItem, itemID, randomProp);
 		else --Item not found
-			return
+			return;
 		end
+	end
+end
+
+function getItemRandomProps(itemID)
+	itemID = tonumber(itemID);
+
+	if (not itemID) then
+		return;
+	end
+
+	randomPropsTable = clearTable(randomPropsTable)
+	if (not (type(randomPropsTable) == "table")) then
+		EnhTooltip.DebugPrint("Itemizer: getItemRandomProps() error", "itemInfo type", type(randomPropsTable), itemID);
+		randomPropsTable = {};
+	end
+
+	local itemBaseInfo = splitString(ItemizerLinks[itemID][1], "§");
+	for key, value in ipairs(itemBaseInfo) do
+		tinsert(randomPropsTable, tonumber(value))
+	end
+
+	--Only return the table if it has something in it.
+	if (next(randomPropsTable)) then
+		return randomPropsTable;
+	else
+		return;
 	end
 end
 
 function storeItemData(itemInfo)
 	--Make itemInfo a required parameter, and make sure its a table
 	if (not (type(itemInfo) == "table")) then
-		return
+		return;
 	end
 
 	local oldBaseInfo, currentItem
-	local baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses, metaData = encodeItemData(itemInfo)
+	local baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses, metaData = encodeItemData(itemInfo);
 
 	if (itemInfo.randomProp) then --We need to treat these separately.
-		local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemInfo.itemID, itemInfo.randomProp)
-		EnhTooltip.DebugPrint("Itemizer: haveItemID", haveItemID, "haveRandomProp", haveRandomProp, "randomPropInItem", randomPropInItem, "ItemID", itemInfo.itemID, "randomProp", itemInfo.randomProp)
+		local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemInfo.itemID, itemInfo.randomProp);
 		if (not haveRandomProp) then
-			Itemizer.Util.ChatPrint("Itemizer does not have this randomProp in its cache tables:", itemInfo.randomProp, "Please update your copy of Itemizer.") --%Localize%
-			return
+			Itemizer.Util.ChatPrint("Itemizer does not have this randomProp in its cache tables:", itemInfo.randomProp, "Please update your copy of Itemizer."); --%Localize%
+			return;
 		end
 
 		if (haveItemID and randomPropInItem) then --Refresh data.
 
-			currentItem = ItemizerLinks[itemInfo.itemID]
+			currentItem = ItemizerLinks[itemInfo.itemID];
 
-			--We don't want to reset the randomProp posibilities, so the basicData field is left alone.
+			--We don't want to reset the randomProp posibilities, so the baseData field is left alone.
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
 			currentItem[4] = basicStats;
@@ -116,22 +155,22 @@ function storeItemData(itemInfo)
 
 		elseif (haveItemID) then --Add new randomProp to existing itemID table.
 			--Start by adding the new randomProp to the baseInfo line
-			oldBaseInfo = splitString(ItemizerLinks[itemInfo.itemID][1], "§")
-			local formatString = "%s"
-			oldBaseInfo[1] = itemInfo.itemBaseName
-			oldBaseInfo[2] = (tonumber(oldBaseInfo[2]) or 0) + 1
+			oldBaseInfo = splitString(ItemizerLinks[itemInfo.itemID][1], "§");
+			local formatString = "%s";
+			oldBaseInfo[1] = itemInfo.itemBaseName;
+			oldBaseInfo[2] = (tonumber(oldBaseInfo[2]) or 0) + 1;
 
-			table.insert(oldBaseInfo, itemInfo.randomProp)
+			table.insert(oldBaseInfo, itemInfo.randomProp);
 			for key, value in ipairs(oldBaseInfo) do
 				if (key > 1) then
-					formatString = formatString.."§%d"
+					formatString = formatString.."§%d";
 				end
 			end
 
-			infoLine = format(formatString, unpack(oldBaseInfo))
-			ItemizerLinks[itemInfo.itemID] = {}
-			currentItem = ItemizerLinks[itemInfo.itemID]
-			currentItem[1] = infoLine
+			local infoLine = format(formatString, unpack(oldBaseInfo));
+			ItemizerLinks[itemInfo.itemID] = {};
+			currentItem = ItemizerLinks[itemInfo.itemID];
+			currentItem[1] = infoLine;
 
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
@@ -142,9 +181,9 @@ function storeItemData(itemInfo)
 			currentItem[8] = metaData;
 
 		else -- Completely new item
-			ItemizerLinks[itemInfo.itemID] = {}
-			currentItem = ItemizerLinks[itemInfo.itemID]
-			currentItem[1] = itemInfo.itemBaseName.."§1§"..itemInfo.randomProp
+			ItemizerLinks[itemInfo.itemID] = {};
+			currentItem = ItemizerLinks[itemInfo.itemID];
+			currentItem[1] = itemInfo.itemBaseName.."§1§"..itemInfo.randomProp;
 
 			currentItem[2] = tooltip;
 			currentItem[3] = baseData;
@@ -156,8 +195,8 @@ function storeItemData(itemInfo)
 		end
 
 	else --Item with no current randomProp
-		ItemizerLinks[itemInfo.itemID] = {}
-		currentItem = ItemizerLinks[itemInfo.itemID]
+		ItemizerLinks[itemInfo.itemID] = {};
+		currentItem = ItemizerLinks[itemInfo.itemID];
 
 		currentItem[1] = baseInfo
 		currentItem[2] = tooltip;
@@ -174,7 +213,7 @@ end
 function haveItemData(itemID, randomProp)
 	--No parameters, no returns
 	if (not itemID) then
-		return
+		return;
 	end
 
 	itemID = tonumber(itemID);
@@ -186,60 +225,60 @@ function haveItemData(itemID, randomProp)
 			if ((ItemizerLinks[itemID]) and (ItemizerRandomProps[randomProp])) then
 
 				-- Must find out if the data for this itemID randomProp combination is already stored.
-				local itemBaseInfo = splitString(ItemizerLinks[itemID][1], "§")
+				local itemBaseInfo = splitString(ItemizerLinks[itemID][1], "§");
 				for key, value in ipairs(itemBaseInfo) do
-					value = tonumber(value)
+					value = tonumber(value);
 					if (value and (value == randomProp)) then
-						return true, true, true
+						return true, true, true;
 					end
 				end
-				return true, true, false
+				return true, true, false;
 
 			elseif (ItemizerRandomProps[randomProp]) then
-				return false, true
+				return false, true;
 
 			else
-				return false, false
+				return false, false;
 			end
 
 		--One parameter, one return
 		elseif (ItemizerLinks[itemID]) then
-			return true
+			return true;
 		else
-			return false
+			return false;
 		end
 	else
-		return false
+		return false;
 	end
 end
 
 function getItemVersion(itemID, randomProp)
 	itemID = tonumber(itemID)
 	if (not itemID) then
-		return
+		return;
 	end
 
-	local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemID, randomProp)
+	local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemID, randomProp);
 
 	if (not haveItemID) then
-		return
+		return;
 	end
 
 	local itemData = ItemizerLinks[itemID]
 	if (not (itemData and itemData[8])) then
-		return
+		return;
 	end
 
-	local itemMetaData = Itemizer.Util.Split(itemData[8], "§")
+	local itemMetaData = Itemizer.Util.Split(itemData[8], "§");
+	local itemBuildNumber = tonumber(itemMetaData[1]);
 
-
-	return tonumber(itemMetaData[1]), (tonumber(itemMetaData[1]) == gameBuildNumber), randomPropInItem
+	return itemBuildNumber, (itemBuildNumber == gameBuildNumber), randomPropInItem;
 end
 
 function encodeItemData(itemInfo)
 	--Make itemInfo a required parameter, and make sure its a table
 	if (not (type(itemInfo) == "table")) then
-		return
+		return;
 	end
 
 	local baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses, metaData
@@ -250,12 +289,10 @@ function encodeItemData(itemInfo)
 	local basicTable = attribs.basicStats;
 	local bonusesTable = attribs.equipBonuses;
 
-	baseInfo = itemInfo.itemBaseName
+	baseInfo = itemInfo.itemBaseName;
 
 	--Build tooltips
 	local first = true
-	local itemIsSetitem = false
-	local possibleSetItem = false
 	if (itemInfo.tooltip.leftText) then
 		for key, value in ipairs(itemInfo.tooltip.leftText) do
 
@@ -264,7 +301,7 @@ function encodeItemData(itemInfo)
 
 				--Stop the encoding process if we reach a newline character that means that set or crafted item info is next.
 				if (strfind(value, "\n")) then
-					break
+					break;
 				end
 
 				if (first) then
@@ -298,7 +335,7 @@ function encodeItemData(itemInfo)
 
 	--Store info from GetItemInfo()
 	baseData = strsub(itemInfo.itemEquipLocation, 9); --Trim the reduntant "INVTYPE_" from the equip location.
-	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.itemLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType)
+	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.itemLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType);
 
 	--Store unique status
 	if (itemInfo.isUnique) then
@@ -417,260 +454,462 @@ function encodeItemData(itemInfo)
 	end
 
 	--And finally encode the item's metadata
-	metaData = gameBuildNumberString
+	metaData = gameBuildNumberString;
 
 	local setName = itemInfo.setName
 	if (setName) then
-		local setNameHash = Itemizer.Util.HashText(setName)
+		local setNameHash = hashText(setName);
 
-		metaData = metaData.."§"..setNameHash
-		ItemizerSets[setNameHash] = setName
+		metaData = metaData.."§"..setNameHash;
+		addItemSetName(setName, setNameHash);
 	end
 
-	return baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses, metaData
+	return baseInfo, tooltip, baseData, basicStats, resists, requirements, equipBonuses, metaData;
 end
 
-function decodeItemData(item, randomProp) --%Todo% Finish this
+function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 	--Make itemID a required parameter, and make sure its a table
 	if (not (type(item) == "table")) then
-		EnhTooltip.DebugPrint("Itemizer: error in decodeItemData()", itemID, randomProp)
-		return
-	end
-	
-	itemInfo = clearTable(itemInfo)
-	if (not (type(itemInfo) == "table")) then
-		EnhTooltip.DebugPrint("Itemizer: decodeItemData() error", "itemInfo type", type(itemInfo), link)
-		itemInfo = {}
+		EnhTooltip.DebugPrint("Itemizer: error in decodeItemData()", itemID, randomProp);
+		return;
 	end
 
-	if (not itemInfo.tooltip) then
-		itemInfo.tooltip = {}
-	end
-	if (not itemInfo.tooltip.leftText) then
-		itemInfo.tooltip.leftText = {}
-	end
-	if (not itemInfo.tooltip.rightText) then
-		itemInfo.tooltip.rightText = {}
-	end
-	if (not itemInfo.attributes) then
-		itemInfo.attributes = {}
-	end
-	if (not itemInfo.attributes.skills) then
-		itemInfo.attributes.skills = {}
-	end
-	if (not itemInfo.attributes.resists) then
-		itemInfo.attributes.resists = {}
-	end
-	if (not itemInfo.attributes.basicStats) then
-		itemInfo.attributes.basicStats = {}
-	end
-	if (not itemInfo.attributes.equipBonuses) then
-		itemInfo.attributes.equipBonuses = {}
-	end
+	--Unfourtunatelly we can't reuse tables here.
+	local itemInfo = {};
+	itemInfo.tooltip = {};
+	itemInfo.tooltip.leftText = {};
+	itemInfo.tooltip.rightText = {};
+	itemInfo.attributes = {};
+	itemInfo.attributes.skills = {};
+	itemInfo.attributes.resists = {};
+	itemInfo.attributes.basicStats = {};
+	itemInfo.attributes.equipBonuses = {};
 
-	randomProp = tonumber(randomProp)
+	randomProp = tonumber(randomProp);
 
-	local metaData = item[8]
-	local equipBonuses = item[7]
-	local requirements = item[6]
-	local resists = item[5]
-	local basicStats = item[4]
-	local baseData = item[3]
-	local tooltip = item[2]
-	local baseInfo = item[1]
+	local metaData = item[8];
+	local equipBonuses = item[7];
+	local requirements = item[6];
+	local resists = item[5];
+	local basicStats = item[4];
+	local baseData = item[3];
+	local tooltip = item[2];
+	local baseInfo = item[1];
 
 	--We will decode backwards from how we encoded
-	
-	--metaData first
+
+	--MetaData first
 	if (strfind(metaData, "§")) then
-		local splitMeta = splitString(metaData, "§")
-		itemInfo.setName = ItemizerSets[splitMeta[2]]
+		local splitMeta = splitString(metaData, "§");
+		itemInfo.setName = ItemizerSets[splitMeta[2]];
+		itemInfo.itemBuildNumberString = splitMeta[1];
+	else
+		itemInfo.buildNumber = tonumber(metaData);
 	end
 
 	--Equip Bonuses are next
 	if (equipBonuses) then
-		itemInfo.attributes.equipBonuses = stringToTable(equipBonuses, "§", "¶")
+		itemInfo.attributes.equipBonuses = stringToTable(equipBonuses, "§", "¶");
 	end
 
 	--Required stuff (Classes, Professions, etc)
 	if (requirements) then
-		local splitReqs = splitString(requirements, "®")
+		local splitReqs = splitString(requirements, "®");
 		if (splitReqs[2]) then
-			itemInfo.attributes.skills = stringToTable(splitReqs[2], "§", "¶")
+			itemInfo.attributes.skills = stringToTable(splitReqs[2], "§", "¶");
 		end
 
-		itemInfo.attributes.skills = stringToTable(splitReqs[1], "¶")
+		itemInfo.attributes.skills = stringToTable(splitReqs[1], "¶");
 	end
-	
+
 	--Resists are next
 	if (resists) then
-		local splitResists = splitString(resists, "§")
+		local splitResists = splitString(resists, "§");
 
-		itemInfo.attributes.resists.fire = splitResists[1]
-		itemInfo.attributes.resists.frost = splitResists[2]
-		itemInfo.attributes.resists.arcane = splitResists[3]
-		itemInfo.attributes.resists.shadow = splitResists[4]
-		itemInfo.attributes.resists.nature = splitResists[5]
+		itemInfo.attributes.resists.fire = tonumber(splitResists[1]);
+		itemInfo.attributes.resists.frost = tonumber(splitResists[2]);
+		itemInfo.attributes.resists.arcane = tonumber(splitResists[3]);
+		itemInfo.attributes.resists.shadow = tonumber(splitResists[4]);
+		itemInfo.attributes.resists.nature = tonumber(splitResists[5]);
 	end
-	
+
 	--Now for the basic item stats (Agility, Stam, etc)
 	if (basicStats) then
-		local splitBasic = splitString(basicStats, "§")
+		local splitBasic = splitString(basicStats, "§");
 
-		itemInfo.attributes.basicStats.agility = splitBasic[1]
-		itemInfo.attributes.basicStats.health = splitBasic[1]
-		itemInfo.attributes.basicStats.intellect = splitBasic[1]
-		itemInfo.attributes.basicStats.mana = splitBasic[1]
-		itemInfo.attributes.basicStats.spirit = splitBasic[1]
-		itemInfo.attributes.basicStats.stamina = splitBasic[1]
-		itemInfo.attributes.basicStats.strength = splitBasic[1]
-		itemInfo.attributes.basicStats.defense = splitBasic[1]
+		itemInfo.attributes.basicStats.agility = tonumber(splitBasic[1]);
+		itemInfo.attributes.basicStats.health = tonumber(splitBasic[2]);
+		itemInfo.attributes.basicStats.intellect = tonumber(splitBasic[3]);
+		itemInfo.attributes.basicStats.mana = tonumber(splitBasic[4]);
+		itemInfo.attributes.basicStats.spirit = tonumber(splitBasic[5]);
+		itemInfo.attributes.basicStats.stamina = tonumber(splitBasic[6]);
+		itemInfo.attributes.basicStats.strength = tonumber(splitBasic[7]);
+		itemInfo.attributes.basicStats.defense = tonumber(splitBasic[8]);
 	end
 
-	return itemInfo
+	-- Base data is next
+	if (baseData) then
+		local splitBase = splitString(baseData, "§");
+
+		--Reintegrate the reduntant "INVTYPE_" to the equip location only if the item has an equipLocation.
+		local equipLoc = splitBase[1];
+		if (not (equipLoc == "")) then
+			itemInfo.itemEquipLocation = "INVTYPE_"..equipLoc;
+		end
+
+		--Retrieve info from GetItemInfo()
+		itemInfo.itemQuality = splitBase[2];
+		itemInfo.itemLevel = splitBase[3];
+		itemInfo.itemType = splitBase[4];
+		itemInfo.itemSubType = splitBase[5];
+
+		--Retrieve unique status
+		if (splitBase[6] == "1") then
+			itemInfo.isUnique = true;
+		else
+			itemInfo.isUnique = false;
+		end
+
+		--Store binds data
+		if (splitBase[7] == "") then
+			itemInfo.binds = false;
+		else
+			itemInfo.binds = splitBase[7];
+		end
+
+		-- Retrieve type specific information
+		if (equipLoc == "WEAPONMAINHAND"
+		or equipLoc == "WEAPONOFFHAND"
+		or equipLoc == "RANGEDRIGHT"
+		or equipLoc == "2HWEAPON"
+		or equipLoc == "THROWN"
+		or equipLoc == "RANGED") then --Retrieve Weapon stats
+			--Min and max damage
+			itemInfo.attributes.itemMinDamage = nilEmptyString(splitBase[8]);
+			itemInfo.attributes.itemMaxDamage = nilEmptyString(splitBase[9]);
+
+			--Speed and DPS
+			itemInfo.attributes.itemSpeed = nilEmptyString(splitBase[10]);
+			itemInfo.attributes.itemDPS = nilEmptyString(splitBase[11]);
+
+			--Armor and block values (if available)
+			itemInfo.attributes.itemArmor = nilEmptyString(splitBase[12]);
+			itemInfo.attributes.itemBlock = nilEmptyString(splitBase[13]);
+
+		elseif (equipLoc == "BAG") then --Retrieve BagSize
+			itemInfo.attributes.bagSize = nilEmptyString(splitBase[8]);
+
+		else --Retrieve Armor stats
+
+			--Armor and block values (if available)
+			itemInfo.attributes.itemArmor = nilEmptyString(splitBase[8]);
+			itemInfo.attributes.itemBlock = nilEmptyString(splitBase[9]);
+		end
+	end
+
+
+	--Decode the item's base name
+	itemInfo.itemBaseName = splitString(baseInfo, "§")[1]
+
+	-- Add the stats from the randomProp to our item's info table
+	if (randomProp) then
+		itemInfo = addRandomPropStatsToTable(iteminfo, randomProp);
+	else
+		itemInfo.itemName = itemInfo.itemBaseName;
+	end
+
+	--Retrieve the original itemLink and hyperLink
+	local hyperLink = "item:"..itemID..":0:"..nilSafeNumber(randomProp)..":0";
+	itemInfo.itemLink = buildLink(hyperLink, itemInfo.itemQuality, itemInfo.itemName);
+	itemInfo.itemHyperLink = hyperLink;
+
+	--%Todo% Write the Tooltip line reconstruction code.
+
+	return pruneTable(itemInfo);
+end
+
+function addItemSetName(setName, setNameHash)
+	setName = tostring(setName);
+	setNameHash = tostring(setNameHash);
+
+	ItemizerSets[setNameHash] = setName;
+end
+
+function getRandomPropComponents(randomProp)
+	randomProp = tonumber(randomProp);
+	if (not randomProp) then
+		return;
+	end
+
+	local properties = ItemizerRandomProps[randomProp];
+	if (not properties) then
+		return;
+	end
+
+	local nameNumber, enchant1, enchant2, enchant3 = unpack(Itemizer.Util.Split(properties, ":"));
+
+	return tonumber(nameNumber), tonumber(enchant1), tonumber(enchant2), tonumber(enchant3);
 end
 
 function translateRandomProp(randomProp)
-	randomProp = tonumber(randomProp)
-	if (not randomProp) then
-		return
-	end
+	local nameNumber, enchant1, enchant2, enchant3 = getRandomPropComponents(randomProp);
 
-	local properties = ItemizerRandomProps[randomProp]
-	if (not properties) then
-		return
-	end
-
-	local propsTable = Itemizer.Util.Split(properties, ":")
-	local name, enchant1, enchant2, enchant3 = unpack(propsTable)
-	name = ItemizerSuffixes[tonumber(name)]
-	enchant1 = tonumber(enchant1)
-	enchant2 = tonumber(enchant2)
-	enchant3 = tonumber(enchant3)
-
-	local enchant1Table = ItemizerEnchants[enchant1]
-	local enchant2Table = ItemizerEnchants[enchant2]
-	local enchant3Table = ItemizerEnchants[enchant3]
-
-
-	return name, (translateEnchant(enchant1Table)), (translateEnchant(enchant2Table)), (translateEnchant(enchant3Table))
+	return ItemizerSuffixes[nameNumber], translateEnchant(getEnchantComponents(ItemizerEnchants[enchant1])), translateEnchant(getEnchantComponents(ItemizerEnchants[enchant2])), translateEnchant(getEnchantComponents(ItemizerEnchants[enchant3]));
 end
 
-function translateEnchant(enchantTable)
+function getEnchantComponents(enchantTable)
 	if (not (type(enchantTable) == "table")) then
-		return
+		return;
 	end
 
-	local enchantIdentifiers = Itemizer.Util.Split(enchantTable[2], "-")
-	local quantity = enchantTable[1]
+	local _, _, enchantType, enchantModifier = strfind(enchantTable[2], "(.+)-(.+)");
+	local quantity = enchantTable[1];
+
+	return enchantType, enchantModifier, quantity;
+end
+
+function translateEnchant(enchantType, enchantModifier, quantity)
+	if (not (enchantType and enchantModifier and quantity)) then
+		return;
+	end
+
 	local modifierType
 	local formatString
 	local tooltipLine
 	local inverted
 
 	--First translate the class of modifier (Spell Damage, Stats, etc)
-	if (enchantIdentifiers[1] == "Ba") then
-		formatString = "+%d %s" --%Localize%
-	elseif  (enchantIdentifiers[1] == "OH") then
-		formatString = "%s Skill +%d" --%Localize%
-		inverted= true
-	elseif  (enchantIdentifiers[1] == "TH") then
-		formatString = "Two-Handed %s Skill +%d" --%Localize%
-		inverted= true
-	elseif  (enchantIdentifiers[1] == "Sl") then
-		formatString = "+%d %s Slaying" --%Localize%
-	elseif  (enchantIdentifiers[1] == "Re") then
-		formatString = "+%d %s Resistance" --%Localize%
-	elseif  (enchantIdentifiers[1] == "Atk") then
-		formatString = "+%d %sAttack Power" --%Localize%
-	elseif  (enchantIdentifiers[1] == "Sp") then -- These are a bit complicated
-		if (enchantIdentifiers[2] == "Hea" or enchantIdentifiers[2] == "D&H") then
-			formatString = "+%d %s Spells" --%Localize%
+	if (enchantType == "Ba") then
+		formatString = "+%d %s"; --%Localize%
+	elseif  (enchantType == "OH") then
+		formatString = "%s Skill +%d"; --%Localize%
+		inverted= true;
+	elseif  (enchantType == "TH") then
+		formatString = "Two-Handed %s Skill +%d"; --%Localize%
+		inverted= true;
+	elseif  (enchantType == "Sl") then
+		formatString = "+%d %s Slaying"; --%Localize%
+	elseif  (enchantType == "Re") then
+		formatString = "+%d %s Resistance"; --%Localize%
+	elseif  (enchantType == "Atk") then
+		formatString = "+%d %sAttack Power"; --%Localize%
+	elseif  (enchantType == "Sp") then -- These are a bit complicated
+		if (enchantModifier == "Hea" or enchantModifier == "D&H") then
+			formatString = "+%d %s Spells"; --%Localize%
 		else
-			formatString = "+%d %s Spell Damage" --%Localize%
+			formatString = "+%d %s Spell Damage"; --%Localize%
 		end
-	elseif  (enchantIdentifiers[1] == "P5") then
-		formatString = "+%d %s every 5 sec." --%Localize%
+	elseif  (enchantType == "P5") then
+		formatString = "+%d %s every 5 sec."; --%Localize%
 	end
 
 	--Then translate the type of modifier (Fire, Spirit, etc.)
 
 	--Stats
-	if (enchantIdentifiers[2] == "Dam") then
-		modifierType = "Damage" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Str") then
-		modifierType = "Strength" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Sta") then
-		modifierType = "Stamina" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Agi") then
-		modifierType = "Agility" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Int") then
-		modifierType = "Intellect" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Arm") then
-		modifierType = "Armor" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Spi") then
-		modifierType = "Spirit" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Def") then
-		modifierType = "Defense" --%Localize%
+	if (enchantModifier == "Dam") then
+		modifierType = "Damage"; --%Localize%
+	elseif  (enchantModifier == "Str") then
+		modifierType = "Strength"; --%Localize%
+	elseif  (enchantModifier == "Sta") then
+		modifierType = "Stamina"; --%Localize%
+	elseif  (enchantModifier == "Agi") then
+		modifierType = "Agility"; --%Localize%
+	elseif  (enchantModifier == "Int") then
+		modifierType = "Intellect"; --%Localize%
+	elseif  (enchantModifier == "Arm") then
+		modifierType = "Armor"; --%Localize%
+	elseif  (enchantModifier == "Spi") then
+		modifierType = "Spirit"; --%Localize%
+	elseif  (enchantModifier == "Def") then
+		modifierType = "Defense"; --%Localize%
 
 	--Weapons
-	elseif  (enchantIdentifiers[2] == "Swo") then
-		modifierType = "Sword" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Mac") then
-		modifierType = "Mace" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Axe") then
-		modifierType = "Axe" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Dag") then
-		modifierType = "Dagger" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Gun") then
-		modifierType = "Gun" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Bow") then
-		modifierType = "Bow" --%Localize%
+	elseif  (enchantModifier == "Swo") then
+		modifierType = "Sword"; --%Localize%
+	elseif  (enchantModifier == "Mac") then
+		modifierType = "Mace"; --%Localize%
+	elseif  (enchantModifier == "Axe") then
+		modifierType = "Axe"; --%Localize%
+	elseif  (enchantModifier == "Dag") then
+		modifierType = "Dagger"; --%Localize%
+	elseif  (enchantModifier == "Gun") then
+		modifierType = "Gun"; --%Localize%
+	elseif  (enchantModifier == "Bow") then
+		modifierType = "Bow"; --%Localize%
 
 	--Mob types
-	elseif  (enchantIdentifiers[2] == "Bea") then
-		modifierType = "Beast" --%Localize%
+	elseif  (enchantModifier == "Bea") then
+		modifierType = "Beast"; --%Localize%
 
 	--Magic Types
-	elseif  (enchantIdentifiers[2] == "Arc") then
-		modifierType = "Arcane" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Fro") then
-		modifierType = "Frost" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Fir") then
-		modifierType = "Fire" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Nat") then
-		modifierType = "Nature" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Sha") then
-		modifierType = "Shadow" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Hol") then
-		modifierType = "Holy" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Hea") then
-		modifierType = "Healing" --%Localize%
-	elseif  (enchantIdentifiers[2] == "D&H") then
-		modifierType = "Damage and Healing" --%Localize%
+	elseif  (enchantModifier == "Arc") then
+		modifierType = "Arcane"; --%Localize%
+	elseif  (enchantModifier == "Fro") then
+		modifierType = "Frost"; --%Localize%
+	elseif  (enchantModifier == "Fir") then
+		modifierType = "Fire"; --%Localize%
+	elseif  (enchantModifier == "Nat") then
+		modifierType = "Nature"; --%Localize%
+	elseif  (enchantModifier == "Sha") then
+		modifierType = "Shadow"; --%Localize%
+	elseif  (enchantModifier == "Hol") then
+		modifierType = "Holy"; --%Localize%
+	elseif  (enchantModifier == "Hea") then
+		modifierType = "Healing"; --%Localize%
+	elseif  (enchantModifier == "D&H") then
+		modifierType = "Damage and Healing"; --%Localize%
 
 	--Attack Types
-	elseif  (enchantIdentifiers[2] == "Mel") then
-		modifierType = "" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Ran") then
-		modifierType = "Ranged " --%Localize%
+	elseif  (enchantModifier == "Mel") then
+		modifierType = ""; --%Localize%
+	elseif  (enchantModifier == "Ran") then
+		modifierType = "Ranged "; --%Localize%
 
 	--Health and Mana
-	elseif  (enchantIdentifiers[2] == "Het") then
-		modifierType = "health" --%Localize%
-	elseif  (enchantIdentifiers[2] == "Man") then
-		modifierType = "mana" --%Localize%
+	elseif  (enchantModifier == "Het") then
+		modifierType = "health"; --%Localize%
+	elseif  (enchantModifier == "Man") then
+		modifierType = "mana"; --%Localize%
 	end
 
 	--Now build the string
 	if (inverted) then
-		tooltipLine = format(formatString, modifierType, quantity)
+		tooltipLine = format(formatString, modifierType, quantity);
 	else
-		tooltipLine = format(formatString, quantity, modifierType)
+		tooltipLine = format(formatString, quantity, modifierType);
 	end
 
 	--We're Done!
-	return tooltipLine, quantity
+	return tooltipLine;
+end
+
+function addRandomPropStatsToTable(itemInfo, randomProp)
+	if (not (type(itemInfo) == "table")) then
+		return itemInfo;
+	end
+	local nameNumber, enchant1, enchant2, enchant3 = getRandomPropComponents(tonumber(randomProp));
+
+	if (not nameNumber) then
+		return itemInfo;
+	end
+
+	itemInfo.itemName = itemInfo.itemBaseName.." "..ItemizerSuffixes[nameNumber]
+	itemInfo = addEnchantStatsToTable(itemInfo, getEnchantComponents(ItemizerEnchants[enchant1]));
+	itemInfo = addEnchantStatsToTable(itemInfo, getEnchantComponents(ItemizerEnchants[enchant2]));
+	itemInfo = addEnchantStatsToTable(itemInfo, getEnchantComponents(ItemizerEnchants[enchant3]));
+
+	return itemInfo;
+end
+
+-- Note: This function will only add info about certain enchants to the itemInfo table, some enchants are excluded (such as the weapon proficiency ones)
+function addEnchantStatsToTable(itemInfo, enchantType, enchantModifier, enchantQuantity)
+	if (not ((type(itemInfo) == "table") and (enchantType and enchantModifier and enchantQuantity))) then
+		return itemInfo;
+	end
+
+	local tableEntry = convertEnchantModifierToTableKey(enchantModifier)
+
+	if (enchantType == "Ba") then --Base Stats
+		if (enchantModifier == "Arm") then --Armor value is in a higler order table
+			itemInfo.attributes.itemArmor = nilSafeNumber(itemInfo.attributes.itemArmor) + enchantQuantity;
+		else
+			itemInfo.attributes.basicStats[tableEntry] = nilSafeNumber(itemInfo.attributes.basicStats[tableEntry]) + enchantQuantity;
+		end
+
+	elseif  (enchantType == "Re") then --Resists
+		itemInfo.attributes.resists[tableEntry] = nilSafeNumber(itemInfo.attributes.resists[tableEntry]) + enchantQuantity;
+
+	elseif  (enchantType == "Atk") then --Attack Power
+		itemInfo.attributes.equipBonuses[tableEntry] = nilSafeNumber(itemInfo.attributes.equipBonuses[tableEntry]) + enchantQuantity;
+
+	elseif  (enchantType == "Sp") then --Spell Power
+		itemInfo.attributes.equipBonuses[tableEntry] = nilSafeNumber(itemInfo.attributes.equipBonuses[tableEntry]) + enchantQuantity;
+
+	elseif  (enchantType == "P5") then --Foo per 5
+		itemInfo.attributes.equipBonuses[tableEntry] = nilSafeNumber(itemInfo.attributes.equipBonuses[tableEntry]) + enchantQuantity;
+	end
+
+	return itemInfo
+end
+
+-- Note: This function will only convert certain enchants, some enchants are excluded (such as the weapon proficiency ones)
+function convertEnchantModifierToTableKey(enchantModifier)
+	if (not (type(itemInfo) == "string")) then
+		return
+	end
+
+	local tableKey
+
+	--Stats
+	if (enchantModifier == "Dam") then
+		tableKey = "damage";
+	elseif  (enchantModifier == "Str") then
+		tableKey = "strength";
+	elseif  (enchantModifier == "Sta") then
+		tableKey = "stamina";
+	elseif  (enchantModifier == "Agi") then
+		tableKey = "agility";
+	elseif  (enchantModifier == "Int") then
+		tableKey = "intellect";
+	elseif  (enchantModifier == "Arm") then
+		tableKey = "armor";
+	elseif  (enchantModifier == "Spi") then
+		tableKey = "spirit";
+	elseif  (enchantModifier == "Def") then
+		tableKey = "defense";
+
+	--[[
+	--Weapons
+	elseif  (enchantModifier == "Swo") then
+		tableKey = "sword"
+	elseif  (enchantModifier == "Mac") then
+		tableKey = "mace"
+	elseif  (enchantModifier == "Axe") then
+		tableKey = "axe"
+	elseif  (enchantModifier == "Dag") then
+		tableKey = "dagger"
+	elseif  (enchantModifier == "Gun") then
+		tableKey = "gun"
+	elseif  (enchantModifier == "Bow") then
+		tableKey = "bow"
+
+	--Mob types
+	elseif  (enchantModifier == "Bea") then
+		tableKey = "beast"
+	]]
+
+	--Magic Types
+	elseif  (enchantModifier == "Arc") then
+		tableKey = "arcane";
+	elseif  (enchantModifier == "Fro") then
+		tableKey = "frost";
+	elseif  (enchantModifier == "Fir") then
+		tableKey = "fire";
+	elseif  (enchantModifier == "Nat") then
+		tableKey = "nature";
+	elseif  (enchantModifier == "Sha") then
+		tableKey = "shadow";
+	elseif  (enchantModifier == "Hol") then
+		tableKey = "holy";
+	elseif  (enchantModifier == "Hea") then
+		tableKey = "healing";
+	elseif  (enchantModifier == "D&H") then
+		tableKey = "damageAndHealing";
+
+	--Attack Types
+	elseif  (enchantModifier == "Mel") then
+		tableKey = "attackPower";
+	elseif  (enchantModifier == "Ran") then
+		tableKey = "rangedAttackPower";
+
+	--Health and Mana
+	elseif  (enchantModifier == "Het") then
+		tableKey = "healthPerFive";
+	elseif  (enchantModifier == "Man") then
+		tableKey = "manaPerFive";
+	end
+
+	return tableKey;
 end
 
 Itemizer.Storage = {
@@ -681,5 +920,9 @@ Itemizer.Storage = {
 	EncodeItemData = encodeItemData,
 	DecodeItemData = decodeItemData,
 	TranslateEnchant = translateEnchant,
+	GetItemRandomProps = getItemRandomProps,
 	TranslateRandomProp = translateRandomProp,
+	GetEnchantComponents = getEnchantComponents,
+	GetRandomPropComponents = getRandomPropComponents,
+	AddRandomPropStatsToTable = addRandomPropStatsToTable,
 }
