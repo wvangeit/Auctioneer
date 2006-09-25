@@ -53,15 +53,14 @@ local run;
 local onEvent;
 local setState;
 local findEmptySlot;
-local findStackBySignature;
+local findStackByItemKey;
 local getContainerItemName;
-local getContainerItemSignature;
+local getContainerItemKey;
 local clearAuctionItem;
 local findAuctionItem;
-local getItemQuantityBySignature;
-local createItemSignature;
-local breakItemSignature;
+local getItemQuantityByItemKey;
 local printBag;
+local debugPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -127,21 +126,17 @@ end
 -------------------------------------------------------------------------------
 -- Start an auction.
 -------------------------------------------------------------------------------
-function postAuction(itemSignature, stackSize, stackCount, bid, buyout, duration, callbackFunc, callbackParam)
+function postAuction(itemKey, stackSize, stackCount, bid, buyout, duration, callbackFunc, callbackParam)
 	-- Problems can occur if the Auctions tab hasn't been shown at least once.
 	if (not AuctionFrameAuctions:IsVisible()) then
 		AuctionFrameAuctions:Show();
 		AuctionFrameAuctions:Hide();
 	end
 
-	-- Get the item id and name
-	local itemId = breakItemSignature(itemSignature);
-	local itemName = GetItemInfo(itemId);
-
 	-- Add the request to the queue.
 	local request = {};
-	request.itemSignature = itemSignature;
-	request.name = itemName;
+	request.itemKey = itemKey;
+	request.name = Auctioneer.ItemDB.GetItemName(itemKey);
 	request.stackSize = stackSize;
 	request.stackCount = stackCount;
 	request.bid = bid;
@@ -261,19 +256,19 @@ function run(request)
 		-- for a stack of the exact size. Failing that, we'll start with the
 		-- first stack we find.
 		local stack1 = nil;
-		if (request.stack and request.itemSignature == getContainerItemSignature(request.stack.bag, request.stack.slot)) then
+		if (request.stack and request.itemKey == getContainerItemKey(request.stack.bag, request.stack.slot)) then
 			-- Use the stack hint.
 			stack1 = request.stack;
 		else
 			-- Find the first stack.
-			stack1 = findStackBySignature(request.itemSignature);
+			stack1 = findStackByItemKey(request.itemKey);
 
 			-- Now look for a stack of the exact size to use instead.
 			if (stack1) then
 				local stack2 = { bag = stack1.bag, slot = stack1.slot };
 				local _, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 				while (stack2 and stack2Size ~= request.stackSize) do
-					stack2 = findStackBySignature(request.itemSignature, stack2.bag, stack2.slot + 1);
+					stack2 = findStackByItemKey(request.itemKey, stack2.bag, stack2.slot + 1);
 					if (stack2) then
 						_, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 					end
@@ -302,7 +297,7 @@ function run(request)
 				end
 			elseif (stack1Size < request.stackSize) then
 				-- The stack we have is less than needed. Locate more of the item.
-				local stack2 = findStackBySignature(request.itemSignature, stack1.bag, stack1.slot + 1);
+				local stack2 = findStackByItemKey(request.itemKey, stack1.bag, stack1.slot + 1);
 				if (stack2) then
 					local _, stack2Size = GetContainerItemInfo(stack2.bag, stack2.slot);
 					if (stack1Size + stack2Size <= request.stackSize) then
@@ -438,7 +433,7 @@ end
 --
 -- TODO: Correctly handle containers like ammo packs
 -------------------------------------------------------------------------------
-function findStackBySignature(itemSignature, startingBag, startingSlot)
+function findStackByItemKey(itemKey, startingBag, startingSlot)
 	if (startingBag == nil) then
 		startingBag = 0;
 	end
@@ -450,8 +445,8 @@ function findStackBySignature(itemSignature, startingBag, startingSlot)
 			local numItems = GetContainerNumSlots(bag);
 			if (startingSlot <= numItems) then
 				for slot = startingSlot, GetContainerNumSlots(bag), 1 do
-					local thisItemSignature = getContainerItemSignature(bag, slot);
-					if (itemSignature == thisItemSignature) then
+					local thisItemKey = getContainerItemKey(bag, slot);
+					if (itemKey == thisItemKey) then
 						return { bag=bag, slot=slot };
 					end
 				end
@@ -475,13 +470,12 @@ function getContainerItemName(bag, slot)
 end
 
 -------------------------------------------------------------------------------
--- Gets the signature of the specified item (itemId:suffixId:enchantId)
+-- Gets the item key of the specified item (itemId:suffixId:enchantId)
 -------------------------------------------------------------------------------
-function getContainerItemSignature(bag, slot)
+function getContainerItemKey(bag, slot)
 	local link = GetContainerItemLink(bag, slot);
 	if (link) then
-		local itemId, suffixId, enchantId = EnhTooltip.BreakLink(link);
-		return createItemSignature(itemId, suffixId, enchantId);
+		return Auctioneer.ItemDB.CreateItemKeyFromLink(link);
 	end
 end
 
@@ -524,35 +518,17 @@ function findAuctionItem()
 end
 
 -------------------------------------------------------------------------------
--- Creates an item signature (itemId:suffixId:enchantId)
--------------------------------------------------------------------------------
-function createItemSignature(itemId, suffixId, enchantId)
-	return itemId..":"..suffixId..":"..enchantId;
-end
-
--------------------------------------------------------------------------------
--- Breaks an item signature (itemId:suffixId:enchantId)
--------------------------------------------------------------------------------
-function breakItemSignature(itemSignature)
-	_, _, itemId, suffixId, enchantId = string.find(itemSignature, "(.+):(.+):(.+)");
-	itemId = tonumber(itemId);
-	suffixId = tonumber(suffixId);
-	enchantId = tonumber(enchantId);
-	return itemId, suffixId, enchantId;
-end
-
--------------------------------------------------------------------------------
 -- Gets the quanity of the specified item
 --
 -- TODO: Correctly handle containers like ammo packs
 -------------------------------------------------------------------------------
-function getItemQuantityBySignature(itemSignature)
+function getItemQuantityByItemKey(itemKey)
 	local quantity = 0;
 	for bag = 0, 4, 1 do
 		if (GetBagName(bag)) then
 			for item = GetContainerNumSlots(bag), 1, -1 do
-				local thisItemSignature = getContainerItemSignature(bag, item);
-				if (itemSignature == thisItemSignature) then
+				local thisItemKey = getContainerItemKey(bag, item);
+				if (itemKey == thisItemKey) then
 					local _, itemCount = GetContainerItemInfo(bag, item);
 					quantity = quantity + itemCount;
 				end
@@ -577,7 +553,9 @@ chatPrint = Auctioneer.Util.ChatPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-debugPrint = EnhTooltip.DebugPrint;
+function debugPrint(message)
+	EnhTooltip.DebugPrint("[Auc.PostManager] "..message);
+end
 
 -------------------------------------------------------------------------------
 -- Public API
@@ -586,7 +564,5 @@ AucPostManager =
 {
 	-- Exported functions
 	PostAuction = postAuction;
-	CreateItemSignature = createItemSignature;
-	BreakItemSignature = breakItemSignature;
-	GetItemQuantityBySignature = getItemQuantityBySignature;
+	GetItemQuantityByItemKey = getItemQuantityByItemKey;
 };

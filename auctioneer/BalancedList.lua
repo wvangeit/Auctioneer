@@ -32,7 +32,7 @@ local function newBalancedList(paramSize)
 	-- This is what keeps the list balanced. For example if your list is {1,2,3,4}
 	-- and you insert(2) then your list would become {1,2,2,3}.
 	local insert =  function (value)
-	if (not value) then return; end
+		if (not value) then return; end
 		local val = tonumber(value) or 0;
 
 		local insertPos	= 0

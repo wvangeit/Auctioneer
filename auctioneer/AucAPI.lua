@@ -25,36 +25,41 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
---Local function prototypes
-local getVendorBuyPrice, getVendorSellPrice
-local setScanLength, setScanAge, getScanLength, getScanAge = Auctioneer.Statistic.SetScanLength, Auctioneer.Statistic.SetScanAge, Auctioneer.Statistic.GetScanLength, Auctioneer.Statistic.GetScanAge
-local requestAuctionScan = Auctioneer.Scanning.RequestAuctionScan
---[[
-	Auctioneer.API.GetVendorBuyPrice(itemId)
+-------------------------------------------------------------------------------
+-- Function Prototypes
+-------------------------------------------------------------------------------
+local getVendorBuyPrice;
+local getVendorSellPrice;
+local getScanAge;
+local requestAuctionScan;
 
-	This function gets the buy price (how much it costs for the player to buy) from
-	Auctioneer's database of item prices.
-
-	@param itemId The ID portion of the item link (the first of the four numbers).
-	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
-]]
+-------------------------------------------------------------------------------
+--	Auctioneer.API.GetVendorBuyPrice(itemId)
+--
+--	This function gets the buy price (how much it costs for the player to buy) from
+--	Auctioneer's database of item prices.
+--
+--	@param itemId The ID portion of the item link (the first of the four numbers).
+--	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
+-------------------------------------------------------------------------------
 function getVendorBuyPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
 		if (ret) then return ret.buy end
 	end
 end
---[[
-	Auctioneer.API.GetVendorSellPrice(itemId)
 
-	This function gets the sell price (how much it the player will get if they sell it)
-	from Auctioneer's database of item prices.
-
-	@param itemId The ID portion of the item link (the first of the four numbers).
-	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
-]]
+-------------------------------------------------------------------------------
+--	Auctioneer.API.GetVendorSellPrice(itemId)
+--
+--	This function gets the sell price (how much it the player will get if they sell it)
+--	from Auctioneer's database of item prices.
+--
+--	@param itemId The ID portion of the item link (the first of the four numbers).
+--	@returns A price if known (may be 0 if known to have no price) or nil if unknown.
+-------------------------------------------------------------------------------
 function getVendorSellPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
@@ -62,21 +67,34 @@ function getVendorSellPrice(itemId)
 	end
 end
 
-Auctioneer.API = {
+-------------------------------------------------------------------------------
+--	Auctioneer.API.GetScanAge()
+-------------------------------------------------------------------------------
+function getScanAge()
+	return (GetTime() - Auctioneer.SnapshotDB.GetLastUpdate());
+end
+
+-------------------------------------------------------------------------------
+--	Auctioneer.API.RequestAuctionScan()
+-------------------------------------------------------------------------------
+function requestAuctionScan()
+	return Auctioneer.ScanManager.Scan();
+end
+
+-------------------------------------------------------------------------------
+-- Public API
+-------------------------------------------------------------------------------
+Auctioneer.API =
+{
 	GetVendorBuyPrice = getVendorBuyPrice,
 	GetVendorSellPrice = getVendorSellPrice,
-	
-	--Linked from other files. PLEASE copy over the old versions when the function's prototype changes to maintain backwards compatibility.
-	--Auctioneer.Statistic
-	SetScanLength = setScanLength,
-	SetScanAge = setScanAge,
-	GetScanLength = getScanLength,
+
 	GetScanAge = getScanAge,
-	
-	--Auctioneer.Scanning
-	RequestAuctionScan = requestAuctionScan
+	RequestAuctionScan = requestAuctionScan;
 }
 
+-------------------------------------------------------------------------------
 --Backwards compatiblity, please use the new prototypes whenever possible.
-Auctioneer_GetVendorBuyPrice = getVendorBuyPrice;
-Auctioneer_GetVendorSellPrice = getVendorSellPrice;
+-------------------------------------------------------------------------------
+Auctioneer_GetVendorBuyPrice = Auctioneer.API.GetVendorBuyPrice;
+Auctioneer_GetVendorSellPrice = Auctioneer.API.GetVendorSellPrice;

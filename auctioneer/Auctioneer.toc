@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Informant, Khaos, ImprovedErrorFrame
-## SavedVariables: AuctionConfig, AuctionPrices, AuctionBids, AHSnapshot, AHSnapshotItemPrices
+## SavedVariables: AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
@@ -20,28 +20,33 @@ Babylonian\Babylonian.lua
 AucStrings.lua
 AucLocale.lua
 
+AucUtil.lua
+AucEventManager.lua
+db\AucDatabase.lua
+db\AucItemDB.lua
+db\AucSnapshotDB.lua
+db\AucHistoryDB.lua
+db\AucFixedPriceDB.lua
+
 BalancedList.lua
-AucEvent.lua
-AHScanning.lua
 AucAPI.lua
 AucCommand.lua
-AucConvert.lua
 AucCore.lua
 AucFilter.lua
-AucScanner.lua
 AucStatistic.lua
 AucTooltip.lua
-AucUtil.lua
-AucStorage.lua
 AucAskPrice.lua
 Auctioneer.lua
-
-AuctioneerUI.lua
-AucBidManager.lua
 AucPostManager.lua
+AucQueryManager.lua
+AucScanManager.lua
+AucBidManager.lua
+AucBidScanner.lua
 
 Auctioneer.xml
-AuctioneerUI.xml
-ListTemplate.xml
-AuctionFrameSearch.xml
-AuctionFramePost.xml
+ui\AuctioneerUI.xml
+ui\ListTemplate.xml
+ui\AuctionFrameBrowse.xml
+ui\AuctionFrameAuctions.xml
+ui\AuctionFrameSearch.xml
+ui\AuctionFramePost.xml

@@ -20,7 +20,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 --Local function prototypes
 local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, getKhaosDurationsList, getKhaosProtectionList, getKhaosFinishList, registerKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
@@ -1452,7 +1452,9 @@ function mainHandler(command, source)
 
 	--/auctioneer scan
 	elseif (cmd == 'scan') then
-		Auctioneer.Scanning.RequestAuctionScan(chatPrint);
+		if (not Auctioneer.ScanManager.Scan()) then
+			Auctioneer.Util.ChatPrint(_AUCT('AuctionScanNexttime'));
+		end
 
 	--/auctioneer protect-window
 	elseif (cmd == 'protect-window') then
@@ -1578,7 +1580,7 @@ end
 	"nil" is the same as "toggle"
 
 	If chatprint is "true" then the state will also be printed to the user.
-]]
+--]]
 function onOff(state, chatprint)
 	if (type(state) == "string") then
 		state = Auctioneer.Util.DelocalizeFilterVal(state);
@@ -1620,56 +1622,26 @@ function clear(param, chatprint)
 		return
 	end
 
-	local aKey = Auctioneer.Util.GetAuctionKey();
+	local ahKey = Auctioneer.Util.GetAuctionKey();
 
 	if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
+		Auctioneer.Statistic.ClearCache(ahKey);
+		Auctioneer.SnapshotDB.Clear(ahKey);
+		Auctioneer.HistoryDB.Clear(ahKey);
 
-		AuctionConfig.info = {};
-		AuctionConfig.data[aKey] = {};
-		AuctionConfig.stats.histmed[aKey] = {};
-		AuctionConfig.stats.histcount[aKey] = {};
-		clear("snapshot");
 	elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
+		Auctioneer.SnapshotDB.Clear(ahKey);
 
-		AuctionConfig.snap[aKey] = {};
-		AuctionConfig.sbuy[aKey] = {};
-		Auctioneer_HSPCache[aKey] = {};
-		AuctionConfig.stats.snapmed[aKey] = {};
-		AuctionConfig.stats.snapcount[aKey] = {};
-		Auctioneer.Core.Variables.SnapshotItemPrices = {};
 	else
-
 		local items = Auctioneer.Util.GetItems(param);
-		local itemLinks = Auctioneer.Util.GetItemHyperlinks(param);
-
 		if (items) then
-			for pos,itemKey in ipairs(items) do
-
-				if (AuctionConfig.data[aKey][itemKey]) then
-					AuctionConfig.data[aKey][itemKey] = nil;
-
-					AuctionConfig.stats.snapmed[aKey][itemKey] = nil;
-					AuctionConfig.stats.histmed[aKey][itemKey] = nil;
-					AuctionConfig.stats.histcount[aKey][itemKey] = nil;
-					AuctionConfig.stats.snapcount[aKey][itemKey] = nil;
-					AuctionConfig.sbuy[aKey][itemKey] = nil;
-
-					local count = 0;
-					while (AuctionConfig.snap[aKey][count]) do
-						AuctionConfig.snap[aKey][count][itemKey] = nil;
-						count = count+1;
-					end
-
-					Auctioneer_HSPCache[aKey][itemKey] = nil;
-
-					--These are not included in the print statement below because there could be the possiblity that an item's data was cleared but another's was not
-					if (chatprint) then
-						Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
-					end
-				else
-					if (chatprint) then
-						Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearFail'), itemLinks[pos]));
-					end
+			local itemLinks = Auctioneer.Util.GetItemHyperlinks(param);
+			for pos, itemKey in ipairs(items) do
+				Auctioneer.Statistic.ClearCache(ahKey, itemKey);
+				Auctioneer.SnapshotDB.Clear(ahKey, itemKey);
+				Auctioneer.HistoryDB.Clear(ahKey, itemKey);
+				if (chatprint) then
+					Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
 				end
 			end
 		end
@@ -1677,7 +1649,7 @@ function clear(param, chatprint)
 
 	if (chatprint) then
 		if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearall'), aKey));
+			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearall'), ahKey));
 
 		elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 			Auctioneer.Util.ChatPrint(_AUCT('FrmtActClearsnap'));

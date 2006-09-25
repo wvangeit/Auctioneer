@@ -23,32 +23,6 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-Auctioneer = {
-	API = {};
-
-	AskPrice = {};
-
-	Command = {};
-
-	Convert = {};
-
-	Core = {};
-
-	Filter = {};
-
-	Scanner = {};
-
-	Scanning = {};
-
-	Statistic = {};
-
-	Storage = {};
-
-	Tooltip = {};
-
-	Util = {};
-
-	BalancedList = {};
-
-	Event = {};
+Auctioneer =
+{
 };

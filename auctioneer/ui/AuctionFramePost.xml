@@ -169,6 +169,16 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+
+				<FontString name="$parentStatusText" inherits="GameFontHighlightSmall">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="280" y="22"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 
@@ -644,6 +654,35 @@
 					</Button>
 				</Frames>
 			</Frame>
+
+			<Button name="$parentScanButton" inherits="UIPanelButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="187" y="14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Scripts>
+					<OnClick>
+						local itemKey = this:GetParent():GetItemKey();
+						if (itemKey) then
+							Auctioneer.ScanManager.ScanQuery(Auctioneer.ItemDB.GetItemName(itemKey));
+						end
+					</OnClick>
+					<OnUpdate>
+						local itemKey = this:GetParent():GetItemKey();
+						if (itemKey and not Auctioneer.ScanManager.IsScanning()) then
+							this:Enable();
+						else
+							this:Disable();
+						end
+					</OnUpdate>
+				</Scripts>
+			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>
@@ -661,7 +700,7 @@
 				getglobal(this:GetName().."DurationText"):SetText(_AUCT('UiDurationLabel'));
 				getglobal(this:GetName().."DepositText"):SetText(_AUCT('UiDepositLabel'));
 				getglobal(this:GetName().."UnknownDepositText"):SetText(_AUCT('UiUnknownError'));
-				AuctionFramePost_OnLoad();
+				getglobal(this:GetName().."ScanButton"):SetText(_AUCT('UiRefresh'));
 			</OnLoad>
 		</Scripts>
 	</Frame>

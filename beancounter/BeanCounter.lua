@@ -200,8 +200,6 @@ function BeanCounter_AuctionHouseLoaded()
 	relevel(AuctionFrameTransactions);
 	setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabTransactions);
 	AuctionFrameTabTransactions:SetParent("AuctionFrame")
-	debugPrint("AuctionFrameTab"..(tabIndex - 1));
-	debugPrint(getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName());
 
 	AuctionFrameTabTransactions:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
 	AuctionFrameTabTransactions:SetID(tabIndex);
@@ -218,10 +216,7 @@ end
 -- OnEvent handler for BeanCounterFrame.
 -------------------------------------------------------------------------------
 function BeanCounter_OnEvent(event, arg1)
-	debugPrint(event);
-	
 	if (event == "ADDON_LOADED") then
-		debugPrint(arg1);
 		if (string.lower(arg1) == "beancounter") then
 			BeanCounter_AddOnLoaded();
 		elseif (string.lower(arg1) == "blizzard_auctionui") then

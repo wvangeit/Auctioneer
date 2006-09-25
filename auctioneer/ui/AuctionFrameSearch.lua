@@ -29,44 +29,62 @@ local TIME_LEFT_NAMES =
 	AUCTION_TIME_LEFT4  -- Very Long
 };
 
-local AUCTION_STATUS_UNKNOWN = 1;
+local AUCTION_STATUS_NORMAL = 1;
 local AUCTION_STATUS_HIGH_BIDDER = 2;
 local AUCTION_STATUS_NOT_FOUND = 3;
 local AUCTION_STATUS_BIDDING = 4;
 
 -------------------------------------------------------------------------------
+-- Function Prototypes
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_OnLoad()
+local load;
+local postAuctionFrameTab_OnClickHook;
+local onAuctionUpdated;
+local onAuctionRemoved;
+local bidRequestComplete;
+local debugPrint;
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function load()
+	debugPrint("Loading");
+	local frame = AuctionFrameSearch;
+
 	-- Methods
-	this.SearchBids = AuctionFrameSearch_SearchBids;
-	this.SearchBuyouts = AuctionFrameSearch_SearchBuyouts;
-	this.SearchCompetition = AuctionFrameSearch_SearchCompetition;
-	this.SearchPlain = AuctionFrameSearch_SearchPlain;
-	this.SelectResultByIndex = AuctionFrameSearch_SelectResultByIndex;
+	frame.SearchBids = AuctionFrameSearch_SearchBids;
+	frame.SearchBuyouts = AuctionFrameSearch_SearchBuyouts;
+	frame.SearchCompetition = AuctionFrameSearch_SearchCompetition;
+	frame.SearchPlain = AuctionFrameSearch_SearchPlain;
+	frame.SelectResultByIndex = AuctionFrameSearch_SelectResultByIndex;
+	frame.UpdateAuction = AuctionFrameSearch_UpdateAuction;
+	frame.RemoveAuction = AuctionFrameSearch_RemoveAuction;
+	frame.UpdateStatusWithPendingBids = AuctionFrameSearch_UpdateStatusWithPendingBids;
+	frame.UpdateStatusWithQueryAge = AuctionFrameSearch_UpdateStatusWithQueryAge;
 
 	-- Controls
-	this.savedSearchDropDown = getglobal(this:GetName().."SavedSearchDropDown");
-	this.searchDropDown = getglobal(this:GetName().."SearchDropDown");
-	this.bidFrame = getglobal(this:GetName().."Bid");
-	this.buyoutFrame = getglobal(this:GetName().."Buyout");
-	this.competeFrame = getglobal(this:GetName().."Compete");
-	this.plainFrame = getglobal(this:GetName().."Plain");
-	this.resultsList = getglobal(this:GetName().."List");
-	this.bidButton = getglobal(this:GetName().."BidButton");
-	this.buyoutButton = getglobal(this:GetName().."BuyoutButton");
-	this.pendingBidStatusText = getglobal(this:GetName().."PendingBidStatusText");
+	frame.savedSearchDropDown = getglobal(frame:GetName().."SavedSearchDropDown");
+	frame.searchDropDown = getglobal(frame:GetName().."SearchDropDown");
+	frame.bidFrame = getglobal(frame:GetName().."Bid");
+	frame.buyoutFrame = getglobal(frame:GetName().."Buyout");
+	frame.competeFrame = getglobal(frame:GetName().."Compete");
+	frame.plainFrame = getglobal(frame:GetName().."Plain");
+	frame.resultsList = getglobal(frame:GetName().."List");
+	frame.bidButton = getglobal(frame:GetName().."BidButton");
+	frame.buyoutButton = getglobal(frame:GetName().."BuyoutButton");
+	frame.pendingBidStatusText = getglobal(frame:GetName().."PendingBidStatusText");
 
 	-- Data members
-	this.results = {};
-	this.resultsType = nil;
-	this.selectedResult = nil;
+	frame.results = {};
+	frame.resultsByAuctionId = {};
+	frame.resultsType = nil;
+	frame.selectedResult = nil;
 
 	-- Initialize the Search drop down
-	AuctioneerDropDownMenu_Initialize(this.searchDropDown, AuctionFrameSearch_SearchDropDown_Initialize);
-	AuctionFrameSearch_SearchDropDownItem_SetSelectedID(this.searchDropDown, 1);
+	Auctioneer.UI.DropDownMenu.Initialize(frame.searchDropDown, AuctionFrameSearch_SearchDropDown_Initialize);
+	AuctionFrameSearch_SearchDropDownItem_SetSelectedID(frame.searchDropDown, 1);
 
 	-- Configure the logical columns
-	this.logicalColumns =
+	frame.logicalColumns =
 	{
 		Quantity =
 		{
@@ -114,6 +132,33 @@ function AuctionFrameSearch_OnLoad()
 			compareAscendingFunc = (function(record1, record2) return record1.bidPer < record2.bidPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.bidPer > record2.bidPer end);
 		},
+		BidProfit =
+		{
+			title = _AUCT("UiProfitHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.bidProfit end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.bidProfit < record2.bidProfit end);
+			compareDescendingFunc = (function(record1, record2) return record1.bidProfit > record2.bidProfit end);
+		},
+		BidProfitPer =
+		{
+			title = _AUCT("UiProfitPerHeader");
+			dataType = "Money";
+			valueFunc = (function(record) return record.bidProfitPer end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.bidProfitPer < record2.bidProfitPer end);
+			compareDescendingFunc = (function(record1, record2) return record1.bidProfitPer > record2.bidProfitPer end);
+		},
+		BidPercentLess =
+		{
+			title = _AUCT("UiPercentLessHeader");
+			dataType = "Number";
+			valueFunc = (function(record) return record.bidPercentLess end);
+			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
+			compareAscendingFunc = (function(record1, record2) return record1.bidPercentLess < record2.bidPercentLess end);
+			compareDescendingFunc = (function(record1, record2) return record1.bidPercentLess > record2.bidPercentLess end);
+		},
 		Buyout =
 		{
 			title = _AUCT("UiBuyoutHeader");
@@ -132,32 +177,32 @@ function AuctionFrameSearch_OnLoad()
 			compareAscendingFunc = (function(record1, record2) return record1.buyoutPer < record2.buyoutPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.buyoutPer > record2.buyoutPer end);
 		},
-		Profit =
+		BuyoutProfit =
 		{
 			title = _AUCT("UiProfitHeader");
 			dataType = "Money";
-			valueFunc = (function(record) return record.profit end);
+			valueFunc = (function(record) return record.buyoutProfit end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
-			compareAscendingFunc = (function(record1, record2) return record1.profit < record2.profit end);
-			compareDescendingFunc = (function(record1, record2) return record1.profit > record2.profit end);
+			compareAscendingFunc = (function(record1, record2) return record1.buyoutProfit < record2.buyoutProfit end);
+			compareDescendingFunc = (function(record1, record2) return record1.buyoutProfit > record2.buyoutProfit end);
 		},
-		ProfitPer =
+		BuyoutProfitPer =
 		{
 			title = _AUCT("UiProfitPerHeader");
 			dataType = "Money";
-			valueFunc = (function(record) return record.profitPer end);
+			valueFunc = (function(record) return record.buyoutProfitPer end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
-			compareAscendingFunc = (function(record1, record2) return record1.profitPer < record2.profitPer end);
-			compareDescendingFunc = (function(record1, record2) return record1.profitPer > record2.profitPer end);
+			compareAscendingFunc = (function(record1, record2) return record1.buyoutProfitPer < record2.buyoutProfitPer end);
+			compareDescendingFunc = (function(record1, record2) return record1.buyoutProfitPer > record2.buyoutProfitPer end);
 		},
-		PercentLess =
+		BuyoutPercentLess =
 		{
 			title = _AUCT("UiPercentLessHeader");
 			dataType = "Number";
-			valueFunc = (function(record) return record.percentLess end);
+			valueFunc = (function(record) return record.buyoutPercentLess end);
 			alphaFunc = AuctionFrameSearch_GetAuctionAlpha;
-			compareAscendingFunc = (function(record1, record2) return record1.percentLess < record2.percentLess end);
-			compareDescendingFunc = (function(record1, record2) return record1.percentLess > record2.percentLess end);
+			compareAscendingFunc = (function(record1, record2) return record1.buyoutPercentLess < record2.buyoutPercentLess end);
+			compareDescendingFunc = (function(record1, record2) return record1.buyoutPercentLess > record2.buyoutPercentLess end);
 		},
 		ItemLevel =
 		{
@@ -171,207 +216,207 @@ function AuctionFrameSearch_OnLoad()
 	};
 
 	-- Configure the bid search physical columns
-	this.bidSearchPhysicalColumns =
+	frame.bidSearchPhysicalColumns =
 	{
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.Quantity;
-			logicalColumns = { this.logicalColumns.Quantity };
+			logicalColumn = frame.logicalColumns.Quantity;
+			logicalColumns = { frame.logicalColumns.Quantity };
 			sortAscending = true;
 		},
 		{
 			width = 160;
-			logicalColumn = this.logicalColumns.Name;
-			logicalColumns = { this.logicalColumns.Name };
+			logicalColumn = frame.logicalColumns.Name;
+			logicalColumns = { frame.logicalColumns.Name };
 			sortAscending = true;
 		},
 		{
 			width = 90;
-			logicalColumn = this.logicalColumns.TimeLeft;
-			logicalColumns = { this.logicalColumns.TimeLeft };
+			logicalColumn = frame.logicalColumns.TimeLeft;
+			logicalColumns = { frame.logicalColumns.TimeLeft };
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Bid;
+			logicalColumn = frame.logicalColumns.Bid;
 			logicalColumns =
 			{
-				this.logicalColumns.Bid,
-				this.logicalColumns.BidPer
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Profit;
+			logicalColumn = frame.logicalColumns.BidProfit;
 			logicalColumns =
 			{
-				this.logicalColumns.Profit,
-				this.logicalColumns.ProfitPer,
-				this.logicalColumns.Buyout,
-				this.logicalColumns.BuyoutPer
+				frame.logicalColumns.BidProfit,
+				frame.logicalColumns.BidProfitPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.PercentLess;
+			logicalColumn = frame.logicalColumns.BidPercentLess;
 			logicalColumns =
 			{
-				this.logicalColumns.PercentLess
+				frame.logicalColumns.BidPercentLess
 			};
 			sortAscending = true;
 		},
 	};
 
 	-- Configure the buyout search physical columns
-	this.buyoutSearchPhysicalColumns =
+	frame.buyoutSearchPhysicalColumns =
 	{
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.Quantity;
-			logicalColumns = { this.logicalColumns.Quantity };
+			logicalColumn = frame.logicalColumns.Quantity;
+			logicalColumns = { frame.logicalColumns.Quantity };
 			sortAscending = true;
 		},
 		{
 			width = 250;
-			logicalColumn = this.logicalColumns.Name;
-			logicalColumns = { this.logicalColumns.Name };
+			logicalColumn = frame.logicalColumns.Name;
+			logicalColumns = { frame.logicalColumns.Name };
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Buyout;
+			logicalColumn = frame.logicalColumns.Buyout;
 			logicalColumns =
 			{
-				this.logicalColumns.Bid,
-				this.logicalColumns.BidPer,
-				this.logicalColumns.Buyout,
-				this.logicalColumns.BuyoutPer
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Profit;
+			logicalColumn = frame.logicalColumns.BuyoutProfit;
 			logicalColumns =
 			{
-				this.logicalColumns.Bid,
-				this.logicalColumns.BidPer,
-				this.logicalColumns.Profit,
-				this.logicalColumns.ProfitPer
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer,
+				frame.logicalColumns.BuyoutProfit,
+				frame.logicalColumns.BuyoutProfitPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.PercentLess;
+			logicalColumn = frame.logicalColumns.BuyoutPercentLess;
 			logicalColumns =
 			{
-				this.logicalColumns.PercentLess
+				frame.logicalColumns.BuyoutPercentLess
 			};
 			sortAscending = true;
 		},
 	};
 
 	-- Configure the compete search physical columns
-	this.competeSearchPhysicalColumns =
+	frame.competeSearchPhysicalColumns =
 	{
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.Quantity;
-			logicalColumns = { this.logicalColumns.Quantity };
+			logicalColumn = frame.logicalColumns.Quantity;
+			logicalColumns = { frame.logicalColumns.Quantity };
 			sortAscending = true;
 		},
 		{
 			width = 250;
-			logicalColumn = this.logicalColumns.Name;
-			logicalColumns = { this.logicalColumns.Name };
+			logicalColumn = frame.logicalColumns.Name;
+			logicalColumns = { frame.logicalColumns.Name };
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Bid;
+			logicalColumn = frame.logicalColumns.Bid;
 			logicalColumns =
 			{
-				this.logicalColumns.Bid,
-				this.logicalColumns.BidPer
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Buyout;
+			logicalColumn = frame.logicalColumns.Buyout;
 			logicalColumns =
 			{
-				this.logicalColumns.Buyout,
-				this.logicalColumns.BuyoutPer
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.PercentLess;
+			logicalColumn = frame.logicalColumns.PercentLess;
 			logicalColumns =
 			{
-				this.logicalColumns.PercentLess
+				frame.logicalColumns.PercentLess
 			};
 			sortAscending = true;
 		},
 	};
 
 	-- Configure the plain search physical columns
-	this.plainSearchPhysicalColumns =
+	frame.plainSearchPhysicalColumns =
 	{
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.Quantity;
-			logicalColumns = { this.logicalColumns.Quantity };
+			logicalColumn = frame.logicalColumns.Quantity;
+			logicalColumns = { frame.logicalColumns.Quantity };
 			sortAscending = true;
 		},
 		{
 			width = 160;
-			logicalColumn = this.logicalColumns.Name;
-			logicalColumns = { this.logicalColumns.Name };
+			logicalColumn = frame.logicalColumns.Name;
+			logicalColumns = { frame.logicalColumns.Name };
 			sortAscending = true;
 		},
 		{
 			width = 90;
-			logicalColumn = this.logicalColumns.TimeLeft;
-			logicalColumns = { this.logicalColumns.TimeLeft };
+			logicalColumn = frame.logicalColumns.TimeLeft;
+			logicalColumns = { frame.logicalColumns.TimeLeft };
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Bid;
+			logicalColumn = frame.logicalColumns.Bid;
 			logicalColumns =
 			{
-				this.logicalColumns.Bid,
-				this.logicalColumns.BidPer,
-				this.logicalColumns.Buyout,
-				this.logicalColumns.BuyoutPer
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 130;
-			logicalColumn = this.logicalColumns.Buyout;
+			logicalColumn = frame.logicalColumns.Buyout;
 			logicalColumns =
 			{
-				this.logicalColumns.Profit,
-				this.logicalColumns.ProfitPer,
-				this.logicalColumns.Buyout,
-				this.logicalColumns.BuyoutPer
+				frame.logicalColumns.BuyoutProfit,
+				frame.logicalColumns.BuyoutProfitPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
 			};
 			sortAscending = true;
 		},
 		{
 			width = 50;
-			logicalColumn = this.logicalColumns.PercentLess;
+			logicalColumn = frame.logicalColumns.BuyoutPercentLess;
 			logicalColumns =
 			{
-				this.logicalColumns.PercentLess,
-				this.logicalColumns.ItemLevel
+				frame.logicalColumns.BuyoutPercentLess,
+				frame.logicalColumns.ItemLevel
 			};
 			sortAscending = true;
 		},
@@ -379,14 +424,42 @@ function AuctionFrameSearch_OnLoad()
 
 
 	-- Initialize the list to show nothing at first.
-	ListTemplate_Initialize(this.resultsList, this.results, this.results);
-	this:SelectResultByIndex(nil);
+	ListTemplate_Initialize(frame.resultsList, frame.results, frame.results);
+	frame:SelectResultByIndex(nil);
+
+	-- Register for auction update notifications.	
+	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
+	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
+	
+	-- Insert the tab
+	Auctioneer.UI.InsertAHTab(AuctionFrameTabSearch, AuctionFrameSearch);
+	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, postAuctionFrameTab_OnClickHook)
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function postAuctionFrameTab_OnClickHook(_, _, index)
+	if (not index) then
+		index = this:GetID();
+	end
+
+	local tab = getglobal("AuctionFrameTab"..index);
+	if (tab and tab:GetName() == "AuctionFrameTabSearch") then
+		AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
+		AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
+		AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
+		AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
+		AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
+		AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
+		AuctionFrameSearch:Show();
+	else
+		AuctionFrameSearch:Hide();
+	end
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_OnShow()
-	AuctionFrameSearch_UpdatePendingBidStatus(this);
 end
 
 -------------------------------------------------------------------------------
@@ -455,18 +528,18 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			getglobal(frameName.."BidMinPercentLessEdit"):SetText(searchParams[3])
 
 			local timeLeft = tonumber(searchParams[4]) or 2
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidTimeLeftDropDown"), AuctionFrameSearch_TimeLeftDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidTimeLeftDropDown"), timeLeft);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BidTimeLeftDropDown"), AuctionFrameSearch_TimeLeftDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BidTimeLeftDropDown"), timeLeft);
 
 			local catid = tonumber(searchParams[5]) or 1
 			local catName = ""
 			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidCategoryDropDown"), catid);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BidCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BidCategoryDropDown"), catid);
 
 			local quality = tonumber(searchParams[6]) or 1
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BidMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BidMinQualityDropDown"), quality);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BidMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BidMinQualityDropDown"), quality);
 
 			getglobal(frameName.."BidSearchEdit"):SetText(searchParams[7])
 
@@ -480,12 +553,12 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			local catid = tonumber(searchParams[4]) or 1
 			local catName = ""
 			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BuyoutCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BuyoutCategoryDropDown"), catid);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BuyoutCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BuyoutCategoryDropDown"), catid);
 
 			local quality = tonumber(searchParams[5]) or 1
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."BuyoutMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."BuyoutMinQualityDropDown"), quality);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BuyoutMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BuyoutMinQualityDropDown"), quality);
 
 			getglobal(frameName.."BuyoutSearchEdit"):SetText(searchParams[6])
 
@@ -502,12 +575,12 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			local catid = tonumber(searchParams[3]) or 1
 			local catName = ""
 			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainCategoryDropDown"), catid);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."PlainCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."PlainCategoryDropDown"), catid);
 
 			local quality = tonumber(searchParams[4]) or 1
-			AuctioneerDropDownMenu_Initialize(getglobal(frameName.."PlainMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
-			AuctioneerDropDownMenu_SetSelectedID(getglobal(frameName.."PlainMinQualityDropDown"), quality);
+			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."PlainMinQualityDropDown"), AuctionFrameSearch_MinQualityDropDown_Initialize);
+			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."PlainMinQualityDropDown"), quality);
 
 			getglobal(frameName.."PlainSearchEdit"):SetText(searchParams[5])
 
@@ -515,7 +588,7 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 		end
 	end
 	getglobal(frameName.."SaveSearchEdit"):SetText(text);
-	AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
+	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
 -------------------------------------------------------------------------------
@@ -559,7 +632,7 @@ end
 function AuctionFrameSearch_MinQualityDropDownItem_OnClick()
 	local index = this:GetID();
 	local dropdown = this.owner;
-	AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
+	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
 -------------------------------------------------------------------------------
@@ -587,7 +660,7 @@ function AuctionFrameSearch_SearchDropDownItem_SetSelectedID(dropdown, index)
 	elseif (index == 4) then
 		frame.plainFrame:Show();
 	end
-	AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
+	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
 -------------------------------------------------------------------------------
@@ -666,14 +739,11 @@ end
 function AuctionFrameSearch_BidButton_OnClick(button)
 	local frame = button:GetParent();
 	local result = frame.selectedResult;
-	if (result and result.name and result.count and result.bid) then
+	if (result and result.auctionId and result.bid) then
 		result.status = AUCTION_STATUS_BIDDING;
-		result.pendingBidCount = result.pendingBidCount + 1;
-		local bidLimit = Auctioneer.Command.GetFilterVal('bid-limit');
-		local context = { frame = frame, auction = result };
-		AucBidManager.BidAuction(result.bid, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
+		Auctioneer.BidScanner.BidByAuctionId(result.auctionId, bidRequestComplete);
 		AuctionFrameSearch_UpdateButtons(frame);
-		AuctionFrameSearch_UpdatePendingBidStatus(frame);
+		AuctionFrameSearch_UpdateStatusWithPendingBids(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
 	end
 end
@@ -686,12 +756,9 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.buyout) then
 		result.status = AUCTION_STATUS_BIDDING;
-		result.pendingBidCount = result.pendingBidCount + 1;
-		local bidLimit = Auctioneer.Command.GetFilterVal('bid-limit');
-		local context = { frame = frame, auction = result };
-		AucBidManager.BidAuction(result.buyout, result.signature, bidLimit, AuctionFrameSearch_OnBidResult, context);
+		Auctioneer.BidScanner.BuyoutByAuctionId(result.auctionId, bidRequestComplete);
 		AuctionFrameSearch_UpdateButtons(frame);
-		AuctionFrameSearch_UpdatePendingBidStatus(frame);
+		AuctionFrameSearch_UpdateStatusWithPendingBids(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
 	end
 end
@@ -699,8 +766,8 @@ end
 -------------------------------------------------------------------------------
 -- Updates the pending bid status text
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_UpdatePendingBidStatus(frame)
-	local count = AucBidManager.GetRequestCount();
+function AuctionFrameSearch_UpdateStatusWithPendingBids(frame)
+	local count = Auctioneer.BidScanner.GetBidRequestCount();
 	if (count == 1) then
 		frame.pendingBidStatusText:SetText(_AUCT('UiPendingBidInProgress'));
 	elseif (count > 1) then
@@ -712,12 +779,46 @@ function AuctionFrameSearch_UpdatePendingBidStatus(frame)
 end
 
 -------------------------------------------------------------------------------
+-- Sets the status text to the age of the snapshot.
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_UpdateStatusWithQueryAge(frame, itemNames, categoryIndex, minQuality)
+	-- Construct the query that matches the search results.
+	local query = {};
+	query.classIndex = categoryIndex;
+	query.qualityIndex = minQuality;
+
+	-- Get the last update time from the snapshot.
+	local lastUpdate = 0;
+	if (itemNames) then
+		for _, itemName in pairs(itemNames) do
+			query.name = itemName;
+			local lastUpdateForItem = Auctioneer.SnapshotDB.GetLastUpdate(nil, query);
+			if (lastUpdate == 0 or lastUpdateForItem < lastUpdate) then
+				lastUpdate = lastUpdateForItem;
+			end
+		end
+	else
+		lastUpdate = Auctioneer.SnapshotDB.GetLastUpdate(nil, query);
+	end
+
+	-- Update the status text with the last update.	
+	local now = GetTime();
+	local age = GetTime() - lastUpdate;
+	if (age >= 0 and age < (24 * 60 * 60)) then
+		local output = string.format("Results are %d minute(s) old", math.floor(age / 60)); -- %todo: localize
+		frame.pendingBidStatusText:SetText(output);
+	else
+		frame.pendingBidStatusText:SetText("Results are more than 24 hours out of date!"); -- %todo: localize
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Returns the item color for the specified result
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_GetItemColor(result)
-	_, _, rarity = GetItemInfo(result.item);
-	if (rarity) then
-		return ITEM_QUALITY_COLORS[rarity];
+	local quality = Auctioneer.ItemDB.GetItemQuality(result.itemKey);
+	if (quality) then
+		return ITEM_QUALITY_COLORS[quality];
 	end
 	return { r = 1.0, g = 1.0, b = 1.0 };
 end
@@ -725,48 +826,58 @@ end
 -------------------------------------------------------------------------------
 -- Perform a bid search (aka bidBroker)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTimeLeft, category, minQuality, itemName)
-	-- Create the content from auctioneer.
+function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxSecondsLeft, categoryIndex, minQuality, itemName)
+	-- Clear the old results.
 	frame.results = {};
-	local itemNames = Auctioneer.Util.Split(itemName, "|");
-	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.BidBrokerFilter, minProfit, maxTimeLeft, category, minQuality, itemNames);
-	if (bidWorthyAuctions) then
-		local player = UnitName("player");
-		for pos,a in pairs(bidWorthyAuctions) do
-			if (a.owner ~= player) then
-				local id,rprop,enchant,name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
-				local itemKey = id .. ":" .. rprop..":"..enchant;
-				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-				-- rounding down the hsp, to get a better selling price
-				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
-				local percentLess = 100 - math.floor(100 * currentBid / (hspBuyout));
-				if (percentLess >= minPercentLess) then
-					local auction = {};
-					auction.id = id;
-					auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
-					auction.link = a.itemLink;
-					auction.name = name;
-					auction.count = count;
-					auction.owner = a.owner;
-					auction.timeLeft = a.timeLeft;
-					auction.bid = currentBid;
-					auction.bidPer = math.floor(auction.bid / count);
-					auction.buyout = buyout;
-					auction.buyoutPer = math.floor(auction.buyout / count);
-					auction.profit = hspBuyout - currentBid;
-					auction.profitPer = math.floor(auction.profit / count);
-					auction.percentLess = percentLess;
-					auction.signature = a.signature;
-					if (a.highBidder) then
-						auction.status = AUCTION_STATUS_HIGH_BIDDER;
-					else
-						auction.status = AUCTION_STATUS_UNKNOWN;
-					end
-					auction.pendingBidCount = 0;
-					table.insert(frame.results, auction);
-				end
+	frame.resultsByAuctionId = {};
+
+	-- Query the snapshot.	
+	local profitFilterArgs = {};
+	profitFilterArgs.minBidProfit = minProfit;
+	profitFilterArgs.minBidPercentLess = minPercentLess;
+	profitFilterArgs.maxSecondsLeft = maxSecondsLeft;
+	profitFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
+	profitFilterArgs.minQuality = minQuality;
+	profitFilterArgs.itemNames = Auctioneer.Util.Split(itemName, "|");
+	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.ProfitFilter, profitFilterArgs);
+
+	-- Compile the results of the query.
+	local player = UnitName("player");
+	for _, snapshotAuction in pairs(snapshotAuctions) do
+		if (snapshotAuction.owner ~= player) then
+			local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+			local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBidProfit(snapshotAuction);
+		
+			local auction = {};
+			auction.auctionId = snapshotAuction.auctionId;
+			auction.itemKey = itemKey;
+			auction.hsp = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
+			
+			auction.name = itemInfo.name;
+			auction.count = snapshotAuction.count;
+			auction.owner = snapshotAuction.owner;
+			auction.timeLeft = snapshotAuction.timeLeft;
+			
+			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+			auction.bidPer = math.floor(auction.bid / auction.count);
+			
+			auction.buyout = snapshotAuction.buyoutPrice;
+			auction.buyoutPer = math.floor(auction.buyout / auction.count);
+			
+			auction.bidProfit = profit;
+			auction.bidProfitPer = math.floor(auction.bidProfit / auction.count);
+			auction.bidPercentLess = percentLess;
+
+			if (snapshotAuction.highBidder) then
+				auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			else
+				auction.status = AUCTION_STATUS_NORMAL;
 			end
+			auction.pendingBidCount = 0;
+
+			table.insert(frame.results, auction);
+			frame.resultsByAuctionId[auction.auctionId] = auction;
 		end
 	end
 
@@ -777,50 +888,65 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxTime
 	ListTemplate_SetContent(frame.resultsList, frame.results);
 	ListTemplate_Sort(frame.resultsList, 2);
 	ListTemplate_Sort(frame.resultsList, 3);
+
+	-- Update the status line with the age of the data.
+	frame:UpdateStatusWithQueryAge(profitFilterArgs.itemNames, categoryIndex, minQuality);
 end
 
 -------------------------------------------------------------------------------
 -- Perform a buyout search (aka percentLess)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, category, minQuality, itemName)
-	-- Create the content from auctioneer.
+function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, categoryIndex, minQuality, itemNames)
+	-- Clear the old results.
 	frame.results = {};
-	local itemNames = Auctioneer.Util.Split(itemName, "|");
-	local buyoutWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PercentLessFilter, minPercentLess, category, minQuality, itemNames);
-	if (buyoutWorthyAuctions) then
-		local player = UnitName("player");
-		for pos,a in pairs(buyoutWorthyAuctions) do
-			if (a.owner ~= player) then
-				local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
-				local itemKey = id .. ":" .. rprop..":"..enchant;
-				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-				-- rounding down the hsp, to get a better selling price
-				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
-				local profit = hspBuyout - buyout;
-				if (profit >= minProfit) then
-					local auction = {};
-					auction.id = id;
-					auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
-					auction.link = a.itemLink;
-					auction.name = name;
-					auction.count = count;
-					auction.owner = a.owner;
-					auction.timeLeft = a.timeLeft;
-					auction.buyout = buyout;
-					auction.buyoutPer = math.floor(auction.buyout / count);
-					auction.profit = profit;
-					auction.profitPer = math.floor(auction.profit / count);
-					auction.percentLess = 100 - math.floor(100 * buyout / hspBuyout);
-					auction.signature = a.signature;
-					if (a.highBidder) then
-						auction.status = AUCTION_STATUS_HIGH_BIDDER;
-					else
-						auction.status = AUCTION_STATUS_UNKNOWN;
-					end
-					auction.pendingBidCount = 0;
-					table.insert(frame.results, auction);
-				end
+	frame.resultsByAuctionId = {};
+
+	-- Query the snapshot.	
+	local profitFilterArgs = {};
+	profitFilterArgs.minBuyoutProfit = minProfit;
+	profitFilterArgs.minBuyoutPercentLess = minPercentLess;
+	profitFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
+	profitFilterArgs.minQuality = minQuality;
+	profitFilterArgs.itemNames = Auctioneer.Util.Split(itemNames, "|");
+	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.ProfitFilter, profitFilterArgs);
+
+	-- Compile the results of the query.
+	local player = UnitName("player");
+	for _, snapshotAuction in pairs(snapshotAuctions) do
+		if (snapshotAuction.owner ~= player) then
+			local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+			local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBuyoutProfit(snapshotAuction);
+		
+			local auction = {};
+			auction.auctionId = snapshotAuction.auctionId;
+			auction.itemKey = itemKey;
+			auction.hsp = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
+			
+			auction.name = itemInfo.name;
+			auction.count = snapshotAuction.count;
+			auction.owner = snapshotAuction.owner;
+			auction.timeLeft = snapshotAuction.timeLeft;
+			
+			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+			auction.bidPer = math.floor(auction.bid / auction.count);
+			
+			auction.buyout = snapshotAuction.buyoutPrice;
+			auction.buyoutPer = math.floor(auction.buyout / auction.count);
+			
+			auction.buyoutProfit = profit;
+			auction.buyoutProfitPer = math.floor(auction.buyoutProfit / auction.count);
+			auction.buyoutPercentLess = percentLess;
+
+			if (snapshotAuction.highBidder) then
+				auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			else
+				auction.status = AUCTION_STATUS_NORMAL;
 			end
+			auction.pendingBidCount = 0;
+
+			table.insert(frame.results, auction);
+			frame.resultsByAuctionId[auction.auctionId] = auction;
 		end
 	end
 
@@ -830,62 +956,57 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, cate
 	ListTemplate_Initialize(frame.resultsList, frame.buyoutSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
 	ListTemplate_SetContent(frame.resultsList, frame.results);
 	ListTemplate_Sort(frame.resultsList, 5);
+
+	-- Update the status line with the age of the data.
+	frame:UpdateStatusWithQueryAge(profitFilterArgs.itemNames, categoryIndex, minQuality);
 end
 
 -------------------------------------------------------------------------------
 -- Perform a competition search (aka compete)
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
-	-- Create the content from auctioneer.
+	-- Clear the old results.
 	frame.results = {};
+	frame.resultsByAuctionId = {};
 
-	-- Get the highest prices for my auctions.
-	local myAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.AuctionOwnerFilter, UnitName("player"));
-	local myHighestPrices = {}
-	local id,rprop,enchant,name,count,min,buyout,uniq,itemKey,competingAuctions,currentBid,buyoutForOne,bidForOne,bidPrice,myBuyout,buyPrice,myPrice,priceLess,lessPrice,output;
-	if (myAuctions) then
-		for pos,a in pairs(myAuctions) do
-			id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
-			if (count > 1) then buyout = buyout/count; end
-			itemKey = id .. ":" .. rprop..":"..enchant;
-			if (not myHighestPrices[itemKey]) or (myHighestPrices[itemKey] < buyout) then
-				myHighestPrices[itemKey] = buyout;
-			end
+	-- Query the snapshot.	
+	local competitionFilterArgs = {};
+	competitionFilterArgs.minLess = minUndercut;
+	competitionFilterArgs.myHighestBuyouts = Auctioneer.Filter.GetMyHighestBuyouts();
+	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.CompetitionFilter, competitionFilterArgs);
+
+	-- Compile the results of the query.
+	for _, snapshotAuction in pairs(snapshotAuctions) do
+		local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+		local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+		local myBuyoutPer = filterArgs.myHighestBuyouts[itemKey];
+
+		local auction = {};
+		auction.auctionId = snapshotAuction.auctionId;
+		auction.itemKey = itemKey;
+		auction.hsp = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
+
+		auction.name = itemInfo.name;
+		auction.count = snapshotAuction.count;
+		auction.owner = snapshotAuction.owner;
+		auction.timeLeft = snapshotAuction.timeLeft;
+
+		auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+		auction.bidPer = math.floor(auction.bid / auction.count);
+
+		auction.buyout = snapshotAuction.buyoutPrice;
+		auction.buyoutPer = math.floor(auction.buyout / auction.count);
+		auction.buyoutPercentLess = math.floor(((myBuyoutPer - auction.buyoutPer) / myBuyoutPer) * 100);
+
+		if (snapshotAuction.highBidder) then
+			auction.status = AUCTION_STATUS_HIGH_BIDDER;
+		else
+			auction.status = AUCTION_STATUS_NORMAL;
 		end
-	end
+		auction.pendingBidCount = 0;
 
-	-- Search for competing auctions less than mine.
-	competingAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.CompetingFilter, minUndercut, myHighestPrices);
-	if (competingAuctions) then
-		table.sort(competingAuctions, Auctioneer.Statistic.ProfitComparisonSort);
-		for pos,a in pairs(competingAuctions) do
-			local id,rprop,enchant,name,count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
-			local itemKey = id .. ":" .. rprop..":"..enchant;
-			local myBuyout = myHighestPrices[itemKey];
-			local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-
-			local auction = {};
-			auction.id = id;
-			auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
-			auction.link = a.itemLink;
-			auction.name = name;
-			auction.count = count;
-			auction.owner = a.owner;
-			auction.timeLeft = a.timeLeft;
-			auction.bid = currentBid;
-			auction.bidPer = math.floor(auction.bid / count);
-			auction.buyout = buyout;
-			auction.buyoutPer = math.floor(auction.buyout / count);
-			auction.percentLess = math.floor(((myBuyout - auction.buyoutPer) / myBuyout) * 100);
-			auction.signature = a.signature;
-			if (a.highBidder) then
-				auction.status = AUCTION_STATUS_HIGH_BIDDER;
-			else
-				auction.status = AUCTION_STATUS_UNKNOWN;
-			end
-			auction.pendingBidCount = 0;
-			table.insert(frame.results, auction);
-		end
+		table.insert(frame.results, auction);
+		frame.resultsByAuctionId[auction.auctionId] = auction;
 	end
 
 	-- Hand the updated content to the list.
@@ -893,55 +1014,64 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 	frame:SelectResultByIndex(nil);
 	ListTemplate_Initialize(frame.resultsList, frame.competeSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
 	ListTemplate_SetContent(frame.resultsList, frame.results);
+
+	-- Update the status line with the age of the data.
+	frame:UpdateStatusWithQueryAge();
 end
 
 -------------------------------------------------------------------------------
 -- Perform a plain search
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, itemName)
-	-- Create the content from auctioneer.
+function AuctionFrameSearch_SearchPlain(frame, maxPrice, categoryIndex, minQuality, itemNames)
+	-- Clear the old results.
 	frame.results = {};
-	local itemNames = Auctioneer.Util.Split(itemName, "|");
-	local bidWorthyAuctions = Auctioneer.Filter.QuerySnapshot(Auctioneer.Filter.PlainFilter, maxPrice, category, minQuality, itemNames);
-	if (bidWorthyAuctions) then
-		local player = UnitName("player");
-		for pos,a in pairs(bidWorthyAuctions) do
-			if (a.owner ~= player) then
-				local id,rprop,enchant,name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(a.signature);
-				local itemKey = id .. ":" .. rprop..":"..enchant;
-				local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-				-- rounding down the hsp, to get a better selling price
-				local hspBuyout = Auctioneer.Statistic.RoundDownTo95(hsp * count);
-				local percentLess = 100 - math.floor(100 * currentBid / hspBuyout);
+	frame.resultsByAuctionId = {};
 
-				local _,_,_,iLevel = GetItemInfo(id);
+	-- Query the snapshot.	
+	local itemFilterArgs = {};
+	itemFilterArgs.maxBuyout = maxPrice;
+	itemFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
+	itemFilterArgs.minQuality = minQuality;
+	itemFilterArgs.itemNames = Auctioneer.Util.Split(itemNames, "|");
+	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.ItemFilter, itemFilterArgs);
 
-				local auction = {};
-				auction.id = id;
-				auction.item = string.format("item:%s:%s:%s:0", id, enchant, rprop);
-				auction.link = a.itemLink;
-				auction.level = iLevel;
-				auction.name = name;
-				auction.count = count;
-				auction.owner = a.owner;
-				auction.timeLeft = a.timeLeft;
-				auction.bid = currentBid;
-				auction.bidPer = math.floor(auction.bid / count);
-				auction.buyout = buyout;
-				auction.buyoutPer = math.floor(auction.buyout / count);
-				auction.profit = hspBuyout - currentBid;
-				auction.profitPer = math.floor(auction.profit / count);
-				auction.percentLess = percentLess;
-				auction.signature = a.signature;
-				if (a.highBidder) then
-					auction.status = AUCTION_STATUS_HIGH_BIDDER;
-				else
-					auction.status = AUCTION_STATUS_UNKNOWN;
-				end
-				auction.pendingBidCount = 0;
-				table.insert(frame.results, auction);
+	-- Compile the results of the query.
+	local player = UnitName("player");
+	for _, snapshotAuction in pairs(snapshotAuctions) do
+		if (snapshotAuction.owner ~= player) then
+			local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+			local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBuyoutProfit(snapshotAuction);
+		
+			local auction = {};
+			auction.auctionId = snapshotAuction.auctionId;
+			auction.itemKey = itemKey;
+			auction.hsp = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
+			
+			auction.name = itemInfo.name;
+			auction.count = snapshotAuction.count;
+			auction.owner = snapshotAuction.owner;
+			auction.timeLeft = snapshotAuction.timeLeft;
+			
+			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+			auction.bidPer = math.floor(auction.bid / auction.count);
+			
+			auction.buyout = snapshotAuction.buyoutPrice;
+			auction.buyoutPer = math.floor(auction.buyout / auction.count);
+			
+			auction.buyoutProfit = profit;
+			auction.buyoutProfitPer = math.floor(auction.buyoutProfit / auction.count);
+			auction.buyoutPercentLess = percentLess;
+
+			if (snapshotAuction.highBidder) then
+				auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			else
+				auction.status = AUCTION_STATUS_NORMAL;
 			end
+			auction.pendingBidCount = 0;
+
+			table.insert(frame.results, auction);
+			frame.resultsByAuctionId[auction.auctionId] = auction;
 		end
 	end
 
@@ -952,8 +1082,73 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, category, minQuality, i
 	ListTemplate_SetContent(frame.resultsList, frame.results);
 	ListTemplate_Sort(frame.resultsList, 2);
 	ListTemplate_Sort(frame.resultsList, 3);
+
+	-- Update the status line with the age of the data.
+	frame:UpdateStatusWithQueryAge(itemFilterArgs.itemNames, categoryIndex, minQuality);
 end
 
+-------------------------------------------------------------------------------
+-- Called when an auction is updated in the snapshot.
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_UpdateAuction(frame, snapshotAuction)
+	-- Check if this auction is in the search results.
+	local auction = frame.resultsByAuctionId[snapshotAuction.auctionId];
+	if (auction) then
+		debugPrint("Updating auction "..auction.auctionId);
+	
+		-- Update the time left.
+		auction.timeLeft = snapshotAuction.timeLeft;
+	
+		-- Update the bid numbers.
+		if (auction.bid) then
+			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+			auction.bidPer = math.floor(auction.bid / auction.count);
+		end
+
+		-- Update the bid profit numbers.
+		if (auction.bidProfit) then
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBidProfit(snapshotAuction, auction.hsp);
+			auction.bidProfit = profit;
+			auction.bidProfitPer = math.floor(auction.bidProfit / auction.count);
+			auction.bidPercentLess = percentLess;
+		end
+
+		-- Update the buyout profit numbers.
+		if (auction.buyoutProfit) then
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBuyoutProfit(snapshotAuction, auction.hsp);
+			auction.buyoutProfit = profit;
+			auction.buyoutProfitPer = math.floor(auction.buyoutProfit / auction.count);
+			auction.buyoutPercentLess = percentLess;
+		end
+
+		-- Update the status.
+		if (snapshotAuction.highBidder) then
+			auction.status = AUCTION_STATUS_HIGH_BIDDER;
+		else
+			auction.status = AUCTION_STATUS_NORMAL;
+		end
+
+		-- Force a list update.
+		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Called when an auction is removed from the snapshot.
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_RemoveAuction(frame, snapshotAuction)
+	-- Check if this auction is in the search results.
+	local auction = frame.resultsByAuctionId[snapshotAuction.auctionId];
+	if (auction) then
+		debugPrint("Updating auction "..auction.auctionId);
+
+		-- Update the auction status.
+		auction.status = AUCTION_STATUS_NOT_FOUND;
+
+		-- Force a list update.
+		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
+	end
+end
 
 -------------------------------------------------------------------------------
 -- Select a search result by index.
@@ -977,7 +1172,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_UpdateButtons(frame)
 	if (frame.selectedResult) then
-		if (frame.selectedResult.status == AUCTION_STATUS_UNKNOWN) then
+		if (frame.selectedResult.status == AUCTION_STATUS_NORMAL) then
 			if (frame.resultsType == "BidSearch") then
 				frame.bidButton:Enable();
 				frame.buyoutButton:Disable();
@@ -996,7 +1191,7 @@ function AuctionFrameSearch_UpdateButtons(frame)
 			end
 		else
 			frame.bidButton:Disable();
-			frame.buyoutButton:Disable();
+			frame.buyoutButton:Enable();
 		end
 	else
 		frame.bidButton:Disable();
@@ -1013,14 +1208,17 @@ function AuctionFrameSearch_ListItem_OnEnter(row)
 	if (results and row <= table.getn(results)) then
 		local result = results[row];
 		if (result) then
-			local _, link, rarity = GetItemInfo(result.item);
-			if (link) then
-				local name = result.name;
-				local count = result.count;
+			local itemLink = Auctioneer.ItemDB.GetItemLink(result.itemKey);
+			if (itemLink) then
 				GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-				GameTooltip:SetHyperlink(link);
+				GameTooltip:SetHyperlink(Auctioneer.ItemDB.GetItemString(result.itemKey));
 				GameTooltip:Show();
-				EnhTooltip.TooltipCall(GameTooltip, name, result.link, rarity, count);
+				EnhTooltip.TooltipCall(
+					GameTooltip,
+					result.name,
+					itemLink,
+					Auctioneer.ItemDB.GetItemQuality(result.itemKey),
+					result.count);
 			end
 		end
 	end
@@ -1066,11 +1264,12 @@ function AuctionFrameSearch_ListItem_OnClick(row)
 
 	--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for the following codeblocks.
 	elseif (IsControlKeyDown()) then
-		DressUpItemLink(frame.results[row].item);
+		local itemString = Auctioneer.ItemDB.GetItemString(frame.results[row].itemKey);
+		DressUpItemLink(itemString);
 
 	elseif (IsShiftKeyDown() and ChatFrameEditBox:IsVisible()) then
-		-- Trim leading whitespace
-		ChatFrameEditBox:Insert(string.gsub(frame.results[row].link, " *(.*)", "%1"));
+		local itemLink = Auctioneer.ItemDB.GetItemLink(frame.results[row].itemKey);
+		ChatFrameEditBox:Insert(itemLink);
 	end
 end
 
@@ -1086,14 +1285,13 @@ function AuctionFrameSearch_CategoryDropDown_Initialize()
 		owner = dropdown
 	})
 
-	if (AuctionConfig.classes) then
-		for classid, cdata in pairs(AuctionConfig.classes) do
-			UIDropDownMenu_AddButton({
-				text = cdata.name,
-				func = AuctionFrameSearch_CategoryDropDownItem_OnClick,
-				owner = dropdown
-			});
-		end
+	local classes = {GetAuctionItemClasses()};
+	for classId, className in pairs(classes) do
+		UIDropDownMenu_AddButton({
+			text = className,
+			func = AuctionFrameSearch_CategoryDropDownItem_OnClick,
+			owner = dropdown
+		});
 	end
 end
 
@@ -1103,7 +1301,7 @@ end
 function AuctionFrameSearch_CategoryDropDownItem_OnClick()
 	local index = this:GetID();
 	local dropdown = this.owner;
-	AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
+	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
 -------------------------------------------------------------------------------
@@ -1127,7 +1325,7 @@ end
 function AuctionFrameSearch_TimeLeftDropDownItem_OnClick()
 	local index = this:GetID();
 	local dropdown = this.owner;
-	AuctioneerDropDownMenu_SetSelectedID(dropdown, index);
+	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
 -------------------------------------------------------------------------------
@@ -1195,39 +1393,53 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_OnBidResult(context, bidRequest)
-	context.auction.pendingBidCount = context.auction.pendingBidCount - 1;
-	if (context.auction.pendingBidCount == 0) then
-		if (table.getn(bidRequest.results) == 0) then
-			-- No auctions matched.
-			context.auction.status = AUCTION_STATUS_NOT_FOUND;
-		else
-			-- Assume we are now the high bidder on all the matching auctions
-			-- until proven otherwise.
-			context.auction.status = AUCTION_STATUS_HIGH_BIDDER;
-			for _,result in pairs(bidRequest.results) do
-				if (result ~= BidResultCodes["BidAccepted"] and
-					result ~= BidResultCodes["AlreadyHighBidder"] and
-					result ~= BidResultCodes["OwnAuction"]) then
-					context.auction.status = AUCTION_STATUS_UNKNOWN;
-					break;
-				end
-			end
-		end
-		AuctionFrameSearch_UpdateButtons(context.frame);
-		ListTemplateScrollFrame_Update(getglobal(context.frame.resultsList:GetName().."ScrollFrame"));
+function AuctionFrameSearch_GetAuctionAlpha(auction)
+	local status = auction.status;
+	if (not status or status == AUCTION_STATUS_NORMAL) then
+		return 1.0;
 	end
-	AuctionFrameSearch_UpdatePendingBidStatus(context.frame);
+	return 0.4;
+end
+
+-------------------------------------------------------------------------------
+-- Called when an auction is updated in the snapshot.
+-------------------------------------------------------------------------------
+function onAuctionUpdated(event, newAuction, oldAuction)
+	AuctionFrameSearch:UpdateAuction(newAuction);
+end
+
+-------------------------------------------------------------------------------
+-- Called when an auction is removed in the snapshot.
+-------------------------------------------------------------------------------
+function onAuctionRemoved(event, auction)
+	AuctionFrameSearch:RemoveAuction(auction);
+end
+
+-------------------------------------------------------------------------------
+-- Called when one of our bid requests completes.
+-------------------------------------------------------------------------------
+function bidRequestComplete()
+	AuctionFrameSearch:UpdateStatusWithPendingBids();
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_GetAuctionAlpha(auction)
-	local status = auction.status;
-	if (status and (status == AUCTION_STATUS_NOT_FOUND or status == AUCTION_STATUS_HIGH_BIDDER)) then
-		return 0.4;
-	end
-	return 1.0;
+function debugPrint(message)
+	EnhTooltip.DebugPrint("[Auc.SearchTab] "..message);
 end
+
+--=============================================================================
+-- Initialization
+--=============================================================================
+if (Auctioneer.UI.SearchTab ~= nil) then return end;
+debugPrint("AuctioneerFrameSearch.lua loaded");
+
+-------------------------------------------------------------------------------
+-- Public API
+-------------------------------------------------------------------------------
+Auctioneer.UI.SearchTab = 
+{
+	Load = load;
+};
 
 

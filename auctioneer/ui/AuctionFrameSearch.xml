@@ -172,8 +172,8 @@
 						getglobal(this:GetName().."Right"):Hide();
 						getglobal(this:GetName().."Text"):Hide();
 						UIDropDownMenu_SetWidth(getglobal(this:GetParent():GetName().."SaveSearchEdit"):GetWidth());
-						AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
-						AuctioneerDropDownMenu_SetSelectedID(this, 1);
+						Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
+						Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -338,8 +338,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_TimeLeftDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 2);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_TimeLeftDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 2);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -355,8 +355,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -372,8 +372,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -529,8 +529,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -546,8 +546,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -726,8 +726,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -743,8 +743,8 @@
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
 								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								AuctioneerDropDownMenu_Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								AuctioneerDropDownMenu_SetSelectedID(this, 1);
+								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -1028,7 +1028,6 @@
 				getglobal(this:GetName().."SavedSearchText"):SetText(_AUCT('UiSavedSearchLabel'));
 				getglobal(this:GetName().."SaveSearchButton"):SetText(_AUCT('UiSaveSearchButton'));
 				getglobal(this:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
-				AuctionFrameSearch_OnLoad();
 			</OnLoad>
 			<OnShow>
 				AuctionFrameSearch_OnShow();

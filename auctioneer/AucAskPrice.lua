@@ -20,7 +20,7 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-]]
+--]]
 
 --Local function prototypes
 local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, eventHandler, sendWhisper, onEventHook
@@ -353,34 +353,33 @@ function getData(itemLink)
 	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(itemLink);
 
 	local auctKey = Auctioneer.Util.GetAuctionKey();
-	local itemKey = itemID..":"..randomProp..":"..enchant;
+	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(link);
 
-	local auctionPriceItem = Auctioneer.Core.GetAuctionPriceItem(itemKey, auctKey);
-	local aCount,minCount,minPrice,bidCount,bidPrice,buyCount,buyPrice = Auctioneer.Core.GetAuctionPrices(auctionPriceItem.data);
+	local itemTotals = Auctioneer.HistoryDB.GetItemTotals();
 	local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, auctKey);
 	local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey, auctKey);
 	local median, medCount = Auctioneer.Statistic.GetUsableMedian(itemKey, auctKey);
 	local vendorSell = Auctioneer.API.GetVendorSellPrice(itemID)
 
-	if (aCount > 0) then
+	if (itemTotals and itemTotals.seenCount > 0) then
 		-- calculate auction values
 
-		local avgMin = math.floor(minPrice / minCount);
+		local avgMin = math.floor(itemTotals.minPrice / itemTotals.minCount);
 
-		local bidPct = math.floor(bidCount / minCount * 100);
+		local bidPct = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
 		local avgBid = 0;
-		if (bidCount > 0) then
-			avgBid = math.floor(bidPrice / bidCount);
+		if (itemTotals.bidCount > 0) then
+			avgBid = math.floor(itemTotals.bidPrice / itemTotals.bidCount);
 		end
 
-		local buyPct = math.floor(buyCount / minCount * 100);
+		local buyPct = math.floor(itemTotals.buyoutCount / itemTotals.minCount * 100);
 		local avgBuy = 0;
-		if (buyCount > 0) then
-			avgBuy = math.floor(buyPrice / buyCount);
+		if (itemTotals.buyoutCount > 0) then
+			avgBuy = math.floor(itemTotals.buyoutPrice / itemTotals.buyoutCount);
 		end
 	end
 
-	return aCount or 0, historicalMedian or 0, snapshotMedian or 0, vendorSell or 0;
+	return itemTotals.seenCount or 0, historicalMedian or 0, snapshotMedian or 0, vendorSell or 0;
 end
 
 --Many thanks to the guys at irc://chat.freenode.net/wowi-lounge for their help in creating this function
