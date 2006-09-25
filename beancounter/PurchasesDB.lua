@@ -929,8 +929,8 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 		for pendingIndex = 1, table.getn(pendingBids) do
 			local pendingBid = pendingBids[pendingIndex];
 			if (pendingBid.match == nil) then
-				for completedIndex = 1, table.getn(completedBids) do
-					local completedBid = completedBids[completedIndex];
+				for completedIndex = 1, table.getn(pendingBid.matches) do
+					local completedBid = pendingBid.matches[completedIndex];
 					if (completedBid.match == nil) then
 						completedBid.match = pendingBid;
 						pendingBid.match = completedBid;

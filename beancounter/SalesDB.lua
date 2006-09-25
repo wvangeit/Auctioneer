@@ -927,8 +927,8 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 
 			-- First check if this auction likely expired. We consider it likely
 			-- if a matching auction expired within 1 minute of the run length.
-			for completedIndex = 1, table.getn(completedAuctions) do
-				local completedAuction = completedAuctions[completedIndex];
+			for completedIndex = 1, table.getn(pendingAuction.matches) do
+				local completedAuction = pendingAuction.matches[completedIndex];
 				if (completedAuction.match == nil and completedAuction.result == AUCTION_EXPIRED) then
 					local expectedExpiredTime = pendingAuction.time + (pendingAuction.runTime * 60);
 					if (expectedExpiredTime < completedAuction.time and completedAuction.time < expectedExpiredTime + 60) then
@@ -942,8 +942,8 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 			-- If we didn't find a likely expired auction, then choose the
 			-- oldest unmatched auction.
 			if (pendingAuction.match == nil) then
-				for completedIndex = 1, table.getn(completedAuctions) do
-					local completedAuction = completedAuctions[completedIndex];
+				for completedIndex = 1, table.getn(pendingAuction.matches) do
+					local completedAuction = pendingAuction.matches[completedIndex];
 					if (completedAuction.match == nil) then
 						completedAuction.match = pendingAuction;
 						pendingAuction.match = completedAuction;
