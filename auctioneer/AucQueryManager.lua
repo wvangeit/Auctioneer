@@ -127,6 +127,16 @@ local PendingBidInfo = {};
 
 local CurrentPage = nil;
 
+-- True if CanSendAuctionQuery calls should be hooked. This is always the case
+-- unless Auctioneer wants to call it. Setting this to false effectively
+-- unhooks the method.
+local hookCanSendAuctionQuery;
+
+-- True if QueryAuctionItems calls should be hooked. This is always the case
+-- unless Auctioneer wants to call it. Setting this to false effectively
+-- unhooks the method.
+local hookQueryAuctionItems;
+
 -------------------------------------------------------------------------------
 -- Public Data
 -------------------------------------------------------------------------------
@@ -248,7 +258,7 @@ end
 -------------------------------------------------------------------------------
 function postCanSendAuctionQuery(_, returnValue)
 	-- If Blizzard will allow the query, check if should allow it.
-	if (returnValue) then
+	if (hookCanSendAuctionQuery and returnValue) then
 		if (isQueryInProgress()) then
 			return "setreturn", { false };
 		elseif (isBidInProgress()) then
@@ -269,10 +279,13 @@ end
 -- 3. There is a bid in progress.
 -------------------------------------------------------------------------------
 function canSendAuctionQuery()
-	return (
-		Stubby.GetOrigFunc("CanSendAuctionQuery") and
+	hookCanSendAuctionQuery = false;
+	local result = 
+		CanSendAuctionQuery() and
 		not isQueryInProgress() and
-		not isBidInProgress());
+		not isBidInProgress();
+	hookCanSendAuctionQuery = true;
+	return result;
 end
 
 -------------------------------------------------------------------------------
@@ -319,34 +332,36 @@ end
 -- its assumed that the query went through and we start the waiting game.
 -------------------------------------------------------------------------------
 function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	debugPrint("Blizzard's QueryAuctionItems() called");
-	
-	-- Construct a table for the QueryAuctionItem parameters.
-	local parameters = {};
-	parameters.name = name;
-	parameters.minLevel = normalizeNumericQueryParam(minLevel);
-	parameters.maxLevel = normalizeNumericQueryParam(maxLevel);
-	parameters.invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
-	parameters.classIndex = normalizeNumericQueryParam(classIndex);
-	parameters.subclassIndex = normalizeNumericQueryParam(subclassIndex);
-	parameters.page = page;
-	parameters.isUsable = isUsable;
-	parameters.qualityIndex = normalizeNumericQueryParam(qualityIndex);
+	if (hookQueryAuctionItems) then
+		debugPrint("Blizzard's QueryAuctionItems() called");
 
-	-- Construct the request and add it to the front of the queue.
-	local request = {};
-	request.parameters = parameters;
-	request.maxSilence = 5; -- 5 seconds
-	request.maxRetries = 0;
-	request.callbackFunc = nil;
-	request.querySent = true;
-	request.receivedQueryResponse = false;
-	request.lastQueryResponseTime = GetTime();
+		-- Construct a table for the QueryAuctionItem parameters.
+		local parameters = {};
+		parameters.name = name;
+		parameters.minLevel = normalizeNumericQueryParam(minLevel);
+		parameters.maxLevel = normalizeNumericQueryParam(maxLevel);
+		parameters.invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
+		parameters.classIndex = normalizeNumericQueryParam(classIndex);
+		parameters.subclassIndex = normalizeNumericQueryParam(subclassIndex);
+		parameters.page = page;
+		parameters.isUsable = isUsable;
+		parameters.qualityIndex = normalizeNumericQueryParam(qualityIndex);
 
-	-- Add the request to the queue. We are guaranteed to be the only ones
-	-- in the queue.
-	addRequestToQueue(request, true);
-	Auctioneer.EventManager.FireEvent("AUCTIONEER_QUERY_SENT", request.parameters);
+		-- Construct the request and add it to the front of the queue.
+		local request = {};
+		request.parameters = parameters;
+		request.maxSilence = 5; -- 5 seconds
+		request.maxRetries = 0;
+		request.callbackFunc = nil;
+		request.querySent = true;
+		request.receivedQueryResponse = false;
+		request.lastQueryResponseTime = GetTime();
+
+		-- Add the request to the queue. We are guaranteed to be the only ones
+		-- in the queue.
+		addRequestToQueue(request, true);
+		Auctioneer.EventManager.FireEvent("AUCTIONEER_QUERY_SENT", request.parameters);
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -456,7 +471,8 @@ function sendQuery(request)
 
 	-- Send the query.
 	local parameters = request.parameters;
-	Stubby.GetOrigFunc("QueryAuctionItems")(
+	hookQueryAuctionItems = false;
+	QueryAuctionItems(
 		parameters.name,
 		parameters.minLevel,
 		parameters.maxLevel,
@@ -466,6 +482,7 @@ function sendQuery(request)
 		parameters.page,
 		parameters.isUsable,
 		parameters.qualityIndex);
+	hookQueryAuctionItems = true;
 end
 
 -------------------------------------------------------------------------------

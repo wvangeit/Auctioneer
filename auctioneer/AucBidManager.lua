@@ -47,6 +47,11 @@ local debugPrint;
 -- Queue of bids submitted to the server, but not yet accepted or rejected
 local PendingBids = {};
 
+-- True if PlaceAuctionBid calls should be hooked. This is always the case
+-- unless Auctioneer wants to call it. Setting this to false effectively
+-- unhooks the method.
+local hookPlaceAuctionBid = true;
+
 -------------------------------------------------------------------------------
 -- Constants
 -------------------------------------------------------------------------------
@@ -97,12 +102,14 @@ end
 -- Called before Blizzard's PlaceAuctionBid()
 -------------------------------------------------------------------------------
 function prePlaceAuctionBidHook(_, _, listType, index, bid)
-	if (isBidAllowed(listType, index)) then
-		-- Add the pending bid to the list.
-		addPendingBid(listType, index, bid, nil);
-	else
-		debugPrint("prePlaceAuctionBidHook() - Bid not allowed");
-		return "abort";
+	if (hookPlaceAuctionBid) then
+		if (isBidAllowed(listType, index)) then
+			-- Add the pending bid to the list.
+			addPendingBid(listType, index, bid, nil);
+		else
+			debugPrint("prePlaceAuctionBidHook() - Bid not allowed");
+			return "abort";
+		end
 	end
 end
 
@@ -114,7 +121,9 @@ function placeAuctionBid(listType, index, bid, callbackFunc)
 	if (isBidAllowed(listType, index)) then
 		-- Add the pending bid to the list and fire off the bid request.
 		addPendingBid(listType, index, bid, callbackFunc);
-		Stubby.GetOrigFunc("PlaceAuctionBid")(listType, index, bid);
+		hookPlaceAuctionBid = false;
+		PlaceAuctionBid(listType, index, bid);
+		hookPlaceAuctionBid = true;
 	else
 		debugPrint("placeAuctionBid() - Bid not allowed");
 	end
