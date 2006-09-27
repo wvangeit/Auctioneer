@@ -304,7 +304,7 @@ function dropDownMenuInitialize(dropdown, func)
 	local button, dropDownList;
 	for i = 1, UIDROPDOWNMENU_MAXLEVELS, 1 do
 		dropDownList = getglobal("DropDownList"..i);
-		if ( i >= UIDROPDOWNMENU_MENU_LEVEL or frame:GetName() ~= UIDROPDOWNMENU_OPEN_MENU ) then
+		if ( i >= UIDROPDOWNMENU_MENU_LEVEL or dropdown:GetName() ~= UIDROPDOWNMENU_OPEN_MENU ) then
 			dropDownList.numButtons = 0;
 			dropDownList.maxWidth = 0;
 			for j=1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
@@ -322,7 +322,7 @@ function dropDownMenuInitialize(dropdown, func)
 	-- Double check that the value of 'this' didn't change... this can screw us
 	-- up and prevent the reason for this method!
 	if (newThis ~= this) then
-		debugPrint("WARNING: The value of this changed during UIDropDownMenu_Initialize()");
+		debugPrint("WARNING: The value of this changed during dropDownMenuInitialize()");
 	end
 	this = oldThis;
 end
@@ -339,7 +339,7 @@ function dropDownMenuSetSelectedID(dropdown, index)
 	-- Double check that the value of 'this' didn't change... this can screw us
 	-- up and prevent the reason for this method!
 	if (newThis ~= this) then
-		debugPrint("WARNING: The value of this changed during AuctioneerDropDownMenu_SetSelectedID()");
+		debugPrint("WARNING: The value of this changed during dropDownMenuSetSelectedID()");
 	end
 	this = oldThis;
 end
