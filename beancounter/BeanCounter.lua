@@ -183,6 +183,7 @@ function commandHandler(msg)
 		chatPrint("  |cffffffff/BeanCounter load never|r - BeanCounter will never load automatically for this character (you may still load it manually)")
 	end
 end
+
 -------------------------------------------------------------------------------
 -- Called when the Blizzard_AuctionUI has completed loading.
 -------------------------------------------------------------------------------
@@ -212,6 +213,7 @@ function BeanCounter_AuctionHouseLoaded()
 	-- Hook the tab click method so we know when to show our tab.
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BeanCounter_AuctionFrameTab_OnClickHook)
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, preContainerFrameItemButtonOnClickHook);
+	Stubby.RegisterFunctionHook("SetSelectedAuctionItem", -200, preSetSelectedAuctionItemHook);
 end
 
 -------------------------------------------------------------------------------
@@ -277,6 +279,17 @@ function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button,
 			AuctionFrameTransactions:SearchTransactions(name, true, nil);			
 			return "abort";
 		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Called before Blizzard's SetSelectedAuctionItem()
+-------------------------------------------------------------------------------
+function preSetSelectedAuctionItemHook(hookParams, returnValue, list, index)
+	-- Do a transaction search.
+	local name = GetAuctionItemInfo(list, index);
+	if (name) then
+		AuctionFrameTransactions:SearchTransactions(name, true, nil);			
 	end
 end
 
