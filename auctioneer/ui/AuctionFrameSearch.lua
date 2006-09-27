@@ -60,6 +60,7 @@ function load()
 	frame.RemoveAuction = AuctionFrameSearch_RemoveAuction;
 	frame.UpdateStatusWithPendingBids = AuctionFrameSearch_UpdateStatusWithPendingBids;
 	frame.UpdateStatusWithQueryAge = AuctionFrameSearch_UpdateStatusWithQueryAge;
+	frame.GetSelectedItemKey = AuctionFrameSearch_GetSelectedItemKey;
 
 	-- Controls
 	frame.savedSearchDropDown = getglobal(frame:GetName().."SavedSearchDropDown");
@@ -1151,6 +1152,16 @@ function AuctionFrameSearch_RemoveAuction(frame, snapshotAuction)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the itemKey of the selected result
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_GetSelectedItemKey(frame)
+	local result = frame.selectedResult;
+	if (result) then
+		return result.itemKey;
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Select a search result by index.
 -------------------------------------------------------------------------------
 function AuctionFrameSearch_SelectResultByIndex(frame, index)
@@ -1158,6 +1169,12 @@ function AuctionFrameSearch_SelectResultByIndex(frame, index)
 		-- Select the item
 		frame.selectedResult = frame.results[index];
 		ListTemplate_SelectRow(frame.resultsList, index);
+		
+		-- If BeanCounter is loaded, do a transaction search.
+		-- Update the Transactions tab if BeanCounter is loaded.
+		if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
+			AuctionFrameTransactions:SearchTransactions(frame.selectedResult.name, true, nil);
+		end
 	else
 		-- Clear the selection
 		frame.selectedResult = nil;

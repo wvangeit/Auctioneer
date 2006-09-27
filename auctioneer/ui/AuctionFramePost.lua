@@ -683,7 +683,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 		
 		-- Update the Transactions tab if BeanCounter is loaded.
-		if (AuctionFrameTransactions) then
+		if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
 			AuctionFrameTransactions:SearchTransactions(name, true, nil);
 		end
 	else
