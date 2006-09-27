@@ -60,7 +60,7 @@
 		</Layers>
 		<Frames>
 			<!-- Transaction Search Frame -->
-			<Frame name="$parentTransactions" inherits="TransactionsSearchTemplate">
+			<Frame name="$parentSearch" inherits="TransactionsSearchTemplate">
 				<Layers>
 					<Layer level="ARTWORK">
 						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">

@@ -35,6 +35,13 @@ function AuctionFrameTransactions_OnLoad()
 	this.SearchTransactions = AuctionFrameTransactions_SearchTransactions;
 
 	-- Controls
+	this.searchFrame = getglobal(this:GetName().."Search");
+	this.searchFrame.searchEdit = getglobal(this.searchFrame:GetName().."SearchEdit");
+	this.searchFrame.exactCheck = getglobal(this.searchFrame:GetName().."ExactSearchCheckBox");
+	this.searchFrame.bidCheck = getglobal(this.searchFrame:GetName().."BidCheckBox");
+	this.searchFrame.buyCheck = getglobal(this.searchFrame:GetName().."BuyCheckBox");
+	this.searchFrame.auctionCheck = getglobal(this.searchFrame:GetName().."AuctionCheckBox");
+	this.searchFrame.sellCheck = getglobal(this.searchFrame:GetName().."SellCheckBox");
 	this.resultsList = getglobal(this:GetName().."List");
 
 	-- Data members
@@ -122,7 +129,7 @@ function AuctionFrameTransactions_OnLoad()
 	this.transactionSearchPhysicalColumns =
 	{
 		{
-			width = 80;
+			width = 90;
 			logicalColumn = this.logicalColumns.Date;
 			logicalColumns = { this.logicalColumns.Date };
 			sortAscending = true;
@@ -146,7 +153,7 @@ function AuctionFrameTransactions_OnLoad()
 			sortAscending = true;
 		},
 		{
-			width = 110;
+			width = 100;
 			logicalColumn = this.logicalColumns.Net;
 			logicalColumns =
 			{
@@ -176,8 +183,14 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	-- Create the content from purhcases database.
 	frame.results = {};
 	
+	-- Update the UI with the item name.
+	frame.searchFrame.searchEdit:SetText(itemName);
+	frame.searchFrame.exactCheck:SetChecked(itemNameExact);
+	
 	-- Add the purchases
+	frame.searchFrame.buyCheck:SetChecked(transactions == nil or transactions.purchases);
 	if (transactions == nil or transactions.purchases) then
+
 		local itemNames = BeanCounter.Purchases.GetPurchasedItems();
 		for itemNameIndex in itemNames do
 			-- Check if this item matches the search criteria
@@ -201,6 +214,7 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	end
 	
 	-- Add the bids
+	frame.searchFrame.bidCheck:SetChecked(transactions == nil or transactions.bids);
 	if (transactions == nil or transactions.bids) then
 		local itemNames = BeanCounter.Purchases.GetPendingBidItems();
 		for itemNameIndex in itemNames do
@@ -225,6 +239,7 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	end
 
 	-- Add the sales
+	frame.searchFrame.sellCheck:SetChecked(transactions == nil or transactions.sales);
 	if (transactions == nil or transactions.sales) then
 		local itemNames = BeanCounter.Sales.GetSoldItems();
 		for itemNameIndex in itemNames do
@@ -256,6 +271,7 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	end
 
 	-- Add the auctions
+	frame.searchFrame.auctionCheck:SetChecked(transactions == nil or transactions.auctions);
 	if (transactions == nil or transactions.auctions) then
 		local itemNames = BeanCounter.Sales.GetPendingAuctionItems();
 		for itemNameIndex in itemNames do
@@ -289,16 +305,15 @@ end
 -------------------------------------------------------------------------------
 function AuctionFrameSearchTransactions_SearchButton_OnClick(button)
 	local frame = button:GetParent();
-	local frameName = frame:GetName();
 
-	local itemName = getglobal(frameName.."SearchEdit"):GetText();
+	local itemName = frame.searchEdit:GetText();
 	if (itemName == "") then itemName = nil end
-	local exactNameSearch = getglobal(frame:GetName().."ExactSearchCheckBox"):GetChecked();
+	local exactNameSearch = frame.exactCheck:GetChecked();
 	local transactions = {};
-	transactions.bids = getglobal(frame:GetName().."BidCheckBox"):GetChecked();
-	transactions.purchases = getglobal(frame:GetName().."BuyCheckBox"):GetChecked();
-	transactions.auctions = getglobal(frame:GetName().."AuctionCheckBox"):GetChecked();
-	transactions.sales = getglobal(frame:GetName().."SellCheckBox"):GetChecked();
+	transactions.bids = frame.bidCheck:GetChecked();
+	transactions.purchases = frame.buyCheck:GetChecked();
+	transactions.auctions = frame.auctionCheck:GetChecked();
+	transactions.sales = frame.sellCheck:GetChecked();
 
 	frame:GetParent():SearchTransactions(itemName, exactNameSearch, transactions);
 end

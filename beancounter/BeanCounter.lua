@@ -29,6 +29,7 @@ local debugPrint = EnhTooltip.DebugPrint;
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
+local preContainerFrameItemButtonOnClickHook;
 local relevel;
 local chatPrint;
 local nilSafe;
@@ -210,6 +211,7 @@ function BeanCounter_AuctionHouseLoaded()
 
 	-- Hook the tab click method so we know when to show our tab.
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BeanCounter_AuctionFrameTab_OnClickHook)
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, preContainerFrameItemButtonOnClickHook);
 end
 
 -------------------------------------------------------------------------------
@@ -254,6 +256,26 @@ function BeanCounter_AuctionFrameTab_OnClickHook(_, _, index)
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
 			AuctionFrameTransactions:Show();
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Called before Blizzard's ContainerFrameItemButton_OnClick()
+-------------------------------------------------------------------------------
+function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button, ignoreShift)
+	local bag = this:GetParent():GetID()
+	local slot = this:GetID()
+
+	-- If the transactions tab is visible, alt-left click runs a transaction
+	-- search.
+	if (not CursorHasItem() and AuctionFrameTransactions and AuctionFrameTransactions:IsVisible() and IsAltKeyDown()) then
+		local _, count = GetContainerItemInfo(bag, slot);
+		if (count) then
+			local link = GetContainerItemLink(bag, slot)
+			local _, _, _, _, name = EnhTooltip.BreakLink(link);
+			AuctionFrameTransactions:SearchTransactions(name, true, nil);			
+			return "abort";
 		end
 	end
 end
