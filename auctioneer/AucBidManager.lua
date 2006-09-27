@@ -58,7 +58,7 @@ BidResultCodes =
 	OwnAuction = "OwnAuction";
 	AlreadyHigherBid = "AlreadyHigherBid";
 	AlreadyHighBidder = "AlreadyHighBidder";
-	
+	MaxItemCount = "MaxItemCount";
 }
 
 -------------------------------------------------------------------------------
@@ -87,6 +87,8 @@ function onEventHook(_, event)
 			removePendingBid(BidResultCodes.OwnAuction);
 		elseif (arg1 == ERR_AUCTION_HIGHER_BID) then
 			removePendingBid(BidResultCodes.AlreadyHigherBid);
+		elseif (arg1 == ERR_ITEM_MAX_COUNT) then
+			removePendingBid(BidResultCodes.MaxItemCount);
 		end
 	end
 end

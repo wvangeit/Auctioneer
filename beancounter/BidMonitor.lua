@@ -123,7 +123,8 @@ function onEventHook(_, event, arg1)
 		if (arg1 == ERR_ITEM_NOT_FOUND or
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
-			arg1 == ERR_AUCTION_HIGHER_BID) then
+			arg1 == ERR_AUCTION_HIGHER_BID or 
+			arg1 == ERR_ITEM_MAX_COUNT) then
 			onBidFailed();
 		end
 	end
