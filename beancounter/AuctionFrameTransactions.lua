@@ -180,6 +180,9 @@ end
 -- Perform a transaction search
 -------------------------------------------------------------------------------
 function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameExact, transactions)
+	-- Normalize the arguments.
+	if (itemName == nil) then itemName = "" end;
+
 	-- Create the content from purhcases database.
 	frame.results = {};
 	
