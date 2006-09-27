@@ -254,6 +254,37 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				local ahKey = Auctioneer.Util.GetAuctionKey();
 				local itemKey = Auctioneer.ItemDB.CreateItemKey(id, rprop, enchant);
 
+				-- Get player's current lowest starting bid and buyout in the snapshot.
+				local myAuctions = Auctioneer.SnapshotDB.QueryWithItemKey(
+					ahKey,
+					itemKey,
+					function (auction)
+						return (auction.buyoutPrice and auction.buyoutPrice > 0 and auction.owner == UnitName("player"));
+					end);
+				if (table.getn(myAuctions) > 0) then
+					-- Calculate the lowest bid and buyout for one.
+					local lowestStartBidForOne = 0;
+					local lowestBuyoutForOne = 0;
+					for _, auction in pairs(myAuctions) do
+						local startBidForOne = auction.minBid / auction.count;
+						if (lowestStartBidForOne == 0 or startBidForOne < lowestStartBidForOne) then
+							lowestStartBidForOne = startBidForOne;
+						end
+						local buyoutForOne = auction.buyoutPrice / auction.count;
+						if (buyoutForOne > 0 and (lowestBuyoutForOne == 0 or  buyoutForOne < lowestBuyoutForOne)) then
+							lowestBuyoutForOne = buyoutForOne;
+						end
+					end
+
+					-- Add a current price to the list.
+					local currentPrice = {};
+					currentPrice.text = 'My Current Price'; -- %todo: localization
+					currentPrice.note = "";
+					currentPrice.bid = lowestStartBidForOne * count;
+					currentPrice.buyout = lowestBuyoutForOne * count;
+					table.insert(frame.prices, currentPrice);
+				end
+
 				-- Get the fixed price
 				local fixed = Auctioneer.FixedPriceDB.GetFixedPrice(nil, itemKey);
 				if (fixed) then
@@ -748,7 +779,7 @@ function AuctionFramePost_ValidateAuction(frame)
 		local stackCount = frame:GetStackCount();
 		local quantityErrorText = getglobal(frame:GetName().."QuantityInvalidText");
 		if (frame.itemId and frame.itemKey) then
-			local quantity = AucPostManager.GetItemQuantityByItemKey(frame.itemKey);
+			local quantity = Auctioneer.PostManager.GetItemQuantityByItemKey(frame.itemKey);
 			local maxStackSize = AuctionFramePost_GetMaxStackSize(frame.itemId);
 			if (stackSize == 0) then
 				valid = false;
@@ -929,7 +960,7 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	end
 
 	-- Post the auction.
-	AucPostManager.PostAuction(itemKey, stackSize, stackCount, startPrice, buyoutPrice, duration);
+	Auctioneer.PostManager.PostAuction(itemKey, stackSize, stackCount, startPrice, buyoutPrice, duration);
 
 	-- Clear the current auction item.
 	frame:SetAuctionItem(nil, nil, nil);
