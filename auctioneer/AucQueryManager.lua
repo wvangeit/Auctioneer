@@ -130,12 +130,12 @@ local CurrentPage = nil;
 -- True if CanSendAuctionQuery calls should be hooked. This is always the case
 -- unless Auctioneer wants to call it. Setting this to false effectively
 -- unhooks the method.
-local hookCanSendAuctionQuery;
+local hookCanSendAuctionQuery = true;
 
 -- True if QueryAuctionItems calls should be hooked. This is always the case
 -- unless Auctioneer wants to call it. Setting this to false effectively
 -- unhooks the method.
-local hookQueryAuctionItems;
+local hookQueryAuctionItems = true;
 
 -------------------------------------------------------------------------------
 -- Public Data

@@ -27,6 +27,10 @@
 local RequestQueue = {};
 local ProcessingRequestQueue = false;
 
+-- Queue of pending auctions. In otherwords StartAuction() had been called but
+-- we haven't received confirmation from the server of the start.
+local PendingAuctions = {};
+
 -------------------------------------------------------------------------------
 -- State machine states for a request.
 -------------------------------------------------------------------------------
@@ -45,6 +49,10 @@ local Original_SplitContainerItem;
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
+local load;
+local onEventHook;
+local pickupContainerItem;
+local splitContainerItem;
 local postAuction;
 local addRequestToQueue;
 local removeRequestFromQueue;
@@ -60,24 +68,41 @@ local clearAuctionItem;
 local findAuctionItem;
 local getItemQuantityByItemKey;
 local printBag;
+local getTimeLeftFromDuration;
+local preStartAuctionHook;
+local addPendingAuction;
+local removePendingAuction;
 local debugPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AucPostManagerFrame_OnLoad()
-	this:RegisterEvent("AUCTION_HOUSE_CLOSED");
+function load()
+	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer_PostManager", onEventHook);
+	Stubby.RegisterFunctionHook("StartAuction", -200, preStartAuctionHook)
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AucPostManagerFrame_OnEvent(event)
+function onEventHook(_, event)
 	-- Toss all the pending requests when the AH closes.
 	if (event == "AUCTION_HOUSE_CLOSED") then
 		while (table.getn(RequestQueue) > 0) do
 			removeRequestFromQueue();
 		end
 
-	-- Hand off the event to the current request
+	-- Check for an auction created message.
+	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
+		if (arg1 == ERR_AUCTION_STARTED) then
+		 	removePendingAuction(true);
+		end
+
+	-- Check for an auction failure message.
+	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
+		if (arg1 == ERR_NOT_ENOUGH_MONEY) then
+			removePendingAuction(false);
+		end
+
+	-- Otherwise hand off the event to the current request.
 	elseif (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
 		if (request.state ~= READY_STATE) then
@@ -387,10 +412,10 @@ function setState(request, newState)
 			request.state == COMBINING_STACK_STATE or
 			request.state == SPLITTING_AND_COMBINING_STACK_STATE) then
 			debugPrint("Unregistering for ITEM_LOCK_CHANGED");
-			AucPostManagerFrame:UnregisterEvent("ITEM_LOCK_CHANGED");
+			Stubby.UnregisterEventHook("ITEM_LOCK_CHANGED", "Auctioneer_PostManager");
 		elseif (request.state == AUCTIONING_STACK_STATE) then
 			debugPrint("Unregistering for BAG_UPDATE");
-			AucPostManagerFrame:UnregisterEvent("BAG_UPDATE");
+			Stubby.UnregisterEventHook("BAG_UPDATE", "Auctioneer_PostManager");
 		end
 
 		-- Update the request's state.
@@ -402,10 +427,10 @@ function setState(request, newState)
 			request.state == COMBINING_STACK_STATE or
 			request.state == SPLITTING_AND_COMBINING_STACK_STATE) then
 			debugPrint("Registering for ITEM_LOCK_CHANGED");
-			AucPostManagerFrame:RegisterEvent("ITEM_LOCK_CHANGED");
+			Stubby.RegisterEventHook("ITEM_LOCK_CHANGED", "Auctioneer_PostManager", onEventHook);
 		elseif (request.state == AUCTIONING_STACK_STATE) then
 			debugPrint("Registering for BAG_UPDATE");
-			AucPostManagerFrame:RegisterEvent("BAG_UPDATE");
+			Stubby.RegisterEventHook("BAG_UPDATE", "Auctioneer_PostManager", onEventHook);
 		end
 	end
 end
@@ -538,6 +563,109 @@ function getItemQuantityByItemKey(itemKey)
 	return quantity;
 end
 
+
+-------------------------------------------------------------------------------
+-- Converts from duration (in minutes) to time left (1 thru 4 representing
+-- short to very long). Returns nil if the duration is invalid.
+-------------------------------------------------------------------------------
+function getTimeLeftFromDuration(duration)
+	if (duration) then
+		if (duration == 2*60) then
+			return 2;
+		elseif (duration == 8*60) then
+			return 3;
+		elseif (duration == 24*60) then
+			return 4;
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Called before Blizzard's StartAuctionHook().
+-------------------------------------------------------------------------------
+function preStartAuctionHook(_, _, bid, buyout, duration)
+	debugPrint("Blizzard's StartAuction("..nilSafe(bid)..", "..nilSafe(buyout)..", "..nilSafe(duration)..") called");
+	if (bid ~= nil and bid > 0 and getTimeLeftFromDuration(duration)) then
+		local bag, item = findAuctionItem();
+		if (bag and item) then
+			-- Get the item's information.
+			local itemTexture, itemCount = GetContainerItemInfo(bag, item);
+			local itemLink = GetContainerItemLink(bag, item);
+			local itemId, suffixId, enchantId, uniqueId, name = EnhTooltip.BreakLink(itemLink);
+
+			-- Create the auction and add it to the pending list.
+			local auction = {};
+			auction.ahKey = Auctioneer.Util.GetAuctionKey();
+			auction.itemId = itemId;
+			auction.suffixId = suffixId;
+			auction.enchantId = enchantId;
+			auction.uniqueId = uniqueId
+			auction.count = itemCount;
+			auction.minBid = bid;
+			auction.buyoutPrice = buyout;
+			auction.owner = UnitName("player");
+			auction.bidAmount = 0;
+			auction.highBidder = false;
+			auction.timeLeft = getTimeLeftFromDuration(duration);
+			auction.lastSeen = time();
+			addPendingAuction(auction);
+		else
+			debugPrint("Aborting StartAuction() because item cannot be found in bags");
+			return "abort";
+		end
+	else
+		debugPrint("Aborting StartAuction() due to invalid arguments");
+		return "abort";
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Adds a pending auction to the queue.
+-------------------------------------------------------------------------------
+function addPendingAuction(auction)
+	table.insert(PendingAuctions, auction);
+	debugPrint("Added pending auction");
+
+	-- Register for the response events if this is the first pending auction.
+	if (table.getn(PendingAuctions) == 1) then
+		debugPrint("addPendingAuction() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_PostManager", onEventHook);
+		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_PostManager", onEventHook);
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Removes the pending auction from the queue.
+-------------------------------------------------------------------------------
+function removePendingAuction(result)
+	if (table.getn(PendingAuctions) > 0) then
+		-- Remove the first pending auction.
+		local pendingAuction = PendingAuctions[1];
+		table.remove(PendingAuctions, 1);
+		if (result) then
+			debugPrint("Removed pending auction with result: true");
+		else
+			debugPrint("Removed pending auction with result: false");
+		end
+		
+		-- Unregister for the response events if this is the last pending auction.
+		if (table.getn(PendingAuctions) == 0) then
+			debugPrint("removePendingAuction() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_PostManager");
+			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_PostManager");
+		end
+
+		-- If successful, then add it to the snapshot.
+		if (result) then
+			Auctioneer.SnapshotDB.AddAuction(pendingAuction);
+		end
+	else
+		-- We got out of sync somehow... this indicates a bug in how we determine
+		-- the results of auction requests.
+		chatPrint("Post auction queue out of sync!"); -- %todo: localize
+	end
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function nilSafe(string)
@@ -560,9 +688,9 @@ end
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-AucPostManager =
+Auctioneer.PostManager =
 {
-	-- Exported functions
+	Load = load;
 	PostAuction = postAuction;
 	GetItemQuantityByItemKey = getItemQuantityByItemKey;
 };

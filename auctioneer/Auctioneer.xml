@@ -47,17 +47,5 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnEvent>
 		</Scripts>
 	</Frame>
-
-	<Frame name="AucPostManagerFrame" hidden="true">
-		<Scripts>
-			<OnLoad>
-				AucPostManagerFrame_OnLoad();
-			</OnLoad>
-			<OnEvent>
-				AucPostManagerFrame_OnEvent(event);
-			</OnEvent>
-		</Scripts>
-	</Frame>
-
 </Ui>
 

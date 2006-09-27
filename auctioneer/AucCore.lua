@@ -173,6 +173,7 @@ function addonLoaded()
 	Auctioneer.QueryManager.Load();
 	Auctioneer.ScanManager.Load();
 	Auctioneer.Statistic.Load();
+	Auctioneer.PostManager.Load();
 	Auctioneer.BidManager.Load();
 	Auctioneer.BidScanner.Load();
 	Auctioneer.AskPrice.Init();

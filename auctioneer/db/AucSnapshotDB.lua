@@ -48,6 +48,7 @@ local clear;
 local updateForQuery;
 local updateForSignature;
 local updateAuction;
+local addAuction;
 local removeAuction;
 local query;
 local queryWithItemKey;
@@ -541,16 +542,32 @@ function updateAuction(auction)
 			debugPrint("WARNING: Auction "..nilSafe(auction.auctionId).." not in snapshot");
 		end
 	else
-		debugPrint("WARNING: Auction "..nilSafe(auction.auctionId).." not in snapshot");
+		debugPrint("WARNING: Auction "..nilSafe(auction.auctionId).." is not valid");
 	end
 end
+
+-------------------------------------------------------------------------------
+-- Adds the auction to the snapshot.
+-------------------------------------------------------------------------------
+function addAuction(auction)
+	-- Use the default auction house for the zone if none was provided.
+	local ah = getAHDatabase(auction.ahKey, true);
+	debugPrint("Adding auction to snapshot "..auction.ahKey);
+
+	-- Add the auction to the database if its valid.	
+	if (Auctioneer.QueryManager.IsAuctionValid(auction)) then
+		addAuctionToSnapshot(ah, auction);
+	else
+		debugPrint("WARNING: Auction to add is not valid");
+	end
+end
+
 
 -------------------------------------------------------------------------------
 -- Removes the auction from the snapshot.
 -------------------------------------------------------------------------------
 function removeAuction(auction)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
 	local ah = getAHDatabase(auction.ahKey, true);
 	debugPrint("Updating snapshot "..auction.ahKey.." for auction: "..auction.auctionId);
 
@@ -1158,6 +1175,7 @@ Auctioneer.SnapshotDB =
 	UpdateForQuery = updateForQuery;
 	UpdateForSignature = updateForSignature;
 	UpdateAuction = updateAuction;
+	AddAuction = addAuction;
 	RemoveAuction = removeAuction;
 	Query = query;
 	QueryWithItemKey = queryWithItemKey;
