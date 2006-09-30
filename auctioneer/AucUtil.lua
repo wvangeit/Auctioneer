@@ -194,7 +194,7 @@ function getAuctionKey()
 	else
 		factionGroup = UnitFactionGroup("player");
 	end
-	return string.lower(serverName).."-"..string.lower(factionGroup);
+	return string.lower(serverName).."-"..string.lower(tostring(factionGroup));
 end
 
 -- Returns the current faction's opposing faction's auction signature
@@ -218,7 +218,7 @@ function getHomeKey()
 	local serverName = GetCVar("realmName");
 	local factionGroup = UnitFactionGroup("player");
 
-	return string.lower(serverName).."-"..string.lower(factionGroup);
+	return string.lower(serverName).."-"..string.lower(tostring(factionGroup));
 end
 
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
