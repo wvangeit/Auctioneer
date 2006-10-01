@@ -803,8 +803,8 @@ function AuctionFrameSearch_UpdateStatusWithQueryAge(frame, itemNames, categoryI
 	end
 
 	-- Update the status text with the last update.	
-	local now = GetTime();
-	local age = GetTime() - lastUpdate;
+	local now = time();
+	local age = time() - lastUpdate;
 	if (age >= 0 and age < (24 * 60 * 60)) then
 		local output = string.format("Results are %d minute(s) old", math.floor(age / 60)); -- %todo: localize
 		frame.pendingBidStatusText:SetText(output);

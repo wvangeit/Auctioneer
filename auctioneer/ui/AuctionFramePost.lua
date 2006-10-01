@@ -459,8 +459,8 @@ function AuctionFramePost_UpdateStatusText(frame)
 		local lastUpdate = Auctioneer.SnapshotDB.GetLastUpdate(nil, query);
 
 		-- Update the status text with the last update.	
-		local now = GetTime();
-		local age = GetTime() - lastUpdate;
+		local now = time();
+		local age = time() - lastUpdate;
 		if (age >= 0 and age < (24 * 60 * 60)) then
 			local output = string.format("Results are %d minute(s) old", math.floor(age / 60)); -- %todo: localize
 			frame.statusText:SetText(output);

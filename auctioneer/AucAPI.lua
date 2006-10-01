@@ -71,7 +71,7 @@ end
 --	Auctioneer.API.GetScanAge()
 -------------------------------------------------------------------------------
 function getScanAge()
-	return (GetTime() - Auctioneer.SnapshotDB.GetLastUpdate());
+	return (time() - Auctioneer.SnapshotDB.GetLastUpdate());
 end
 
 -------------------------------------------------------------------------------

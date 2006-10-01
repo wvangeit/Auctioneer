@@ -1027,7 +1027,7 @@ function addUpdate(ah, query)
 
 	-- Add the new update to the end of the table.
 	local update = createUpdateFromQuery(query);
-	update.date = GetTime();
+	update.date = time();
 	table.insert(ah.updates, packUpdate(update));
 	debugPrint("Added update at index "..table.getn(ah.updates));
 end
@@ -1040,8 +1040,9 @@ function removeSubsetUpdates(ah, query)
 	local update = createUpdateFromQuery(query);
 	for index = table.getn(ah.updates), 1, -1 do
 		local updateAtIndex = unpackUpdate(ah.updates[index]);
-		if (updateAtIndex.date + (24 * 60 * 60) < GetTime()) then
+		if (updateAtIndex.date + (24 * 60 * 60) < time()) then
 			debugPrint("Removed update at index "..index.." (age)");
+			table.remove(ah.updates, index);
 		elseif (isUpdateSubsetOfUpdate(updateAtIndex, update)) then
 			debugPrint("Removed update at index "..index.." (subset)");
 			table.remove(ah.updates, index);
