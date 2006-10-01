@@ -350,10 +350,9 @@ function eventHandler(event, text, player)
 end
 
 function getData(itemLink)
-	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(itemLink);
-
 	local auctKey = Auctioneer.Util.GetAuctionKey();
-	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(link);
+	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(itemLink);
+	local itemID = Auctioneer.ItemDB.BreakItemKey(itemKey);
 
 	local itemTotals = Auctioneer.HistoryDB.GetItemTotals();
 	local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, auctKey);
