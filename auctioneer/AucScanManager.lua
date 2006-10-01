@@ -362,6 +362,7 @@ function scanStarted()
 
 	-- Scanning has begun!
 	Scanning = true;
+	Auctioneer.Scanning.IsScanningRequested = true;
 	debugPrint("Scan started");
 end
 
@@ -371,6 +372,7 @@ end
 function scanEnded()
 	-- Scanning has ended!
 	Scanning = false;
+	Auctioneer.Scanning.IsScanningRequested = false;
 	debugPrint("Scan ended with result: "..LastRequestResult);
 
 	-- Unregister for snapshot events.
@@ -506,4 +508,13 @@ Auctioneer.ScanManager =
 	ScanCategories = scanCategories;
 	ScanQuery = scanQuery;
 	IsScanning = isScanning;
+	
 }
+
+-- This is the variable Auctioneer use to use to indicate scanning. Keep it for
+-- compatbility with addons such as AuctionFilterPlus.
+Auctioneer.Scanning =
+{
+	IsScanningRequested = false;
+}
+

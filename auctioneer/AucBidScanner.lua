@@ -409,6 +409,7 @@ function scanStarted()
 
 	-- Bid scanning has begun!
 	Scanning = true;
+	Auctioneer.Scanning.IsScanningRequested = true;
 end
 
 -------------------------------------------------------------------------------
@@ -417,6 +418,7 @@ end
 function scanEnded()
 	-- Bid scanning has ended!
 	Scanning = false;
+	Auctioneer.Scanning.IsScanningRequested = false;
 
 	-- We can allow AuctionFramBrowse updates once again.
 	if( Original_AuctionFrameBrowse_OnEvent ) then
