@@ -366,6 +366,11 @@ function updateItemTotals(ahKey, itemKey, itemTotals)
 	local packedItemTotals = packItemTotals(itemTotals);
 	local ah = getAHDatabase(ahKey, true);
 	ah.totals[itemKey] = packedItemTotals;
+
+	-- Cache the totals.
+	cachedItemTotalsAhKey = ahKey;
+	cachedItemTotalsItemKey = itemKey;
+	cachedItemTotals = itemTotals;
 end
 
 -------------------------------------------------------------------------------
