@@ -533,8 +533,6 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BidTimeLeftDropDown"), timeLeft);
 
 			local catid = tonumber(searchParams[5]) or 1
-			local catName = ""
-			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BidCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BidCategoryDropDown"), catid);
 
@@ -552,8 +550,6 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			getglobal(frameName.."BuyoutMinPercentLessEdit"):SetText(searchParams[3])
 
 			local catid = tonumber(searchParams[4]) or 1
-			local catName = ""
-			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."BuyoutCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."BuyoutCategoryDropDown"), catid);
 
@@ -574,8 +570,6 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			MoneyInputFrame_SetCopper(getglobal(frameName.."PlainMaxPrice"), tonumber(searchParams[2]))
 
 			local catid = tonumber(searchParams[3]) or 1
-			local catName = ""
-			if (AuctionConfig.classes[catid-1]) then catName = AuctionConfig.classes[catid-1].name end
 			Auctioneer.UI.DropDownMenu.Initialize(getglobal(frameName.."PlainCategoryDropDown"), AuctionFrameSearch_CategoryDropDown_Initialize);
 			Auctioneer.UI.DropDownMenu.SetSelectedID(getglobal(frameName.."PlainCategoryDropDown"), catid);
 
