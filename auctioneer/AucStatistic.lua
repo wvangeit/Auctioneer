@@ -242,7 +242,7 @@ function getItemHistoricalMedianBuyout(itemKey, ahKey)
 	-- Try to get the value from the cache first.
 	local unpacked;
 	local cache = getCacheForAHKey(ahKey, true);
-	local packed = cache.snapshotMedians[itemKey];
+	local packed = cache.historicalMedians[itemKey];
 	if (packed) then
 		-- Use the cached value.
 		--debugPrint("getItemHistoricalMedianBuyout: Cache hit - "..itemKey);
@@ -261,7 +261,7 @@ function getItemHistoricalMedianBuyout(itemKey, ahKey)
 		end
 		
 		-- Cache the calculated values.
-		cache.snapshotMedians[itemKey] = Auctioneer.Database.PackRecord(unpacked, MedianMetaData);
+		cache.historicalMedians[itemKey] = Auctioneer.Database.PackRecord(unpacked, MedianMetaData);
 	end
 
 	return unpacked.median, unpacked.count;
