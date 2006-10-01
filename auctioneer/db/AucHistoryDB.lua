@@ -437,6 +437,11 @@ function updateMedianBuyoutPriceList(ahKey, itemKey, medianBuyoutPriceList)
 	-- Update the list.
 	local packedBuyoutPrices = packPriceList(medianBuyoutPriceList);
 	ah.buyoutPrices[itemKey] = packedBuyoutPrices;
+
+	-- Cache the list.
+	cachedMedianBuyoutPriceListAhKey = ahKey;
+	cachedMedianBuyoutPriceListItemKey = itemKey;
+	cachedMedianBuyoutPriceList = medianBuyoutPriceList;
 end
 
 -------------------------------------------------------------------------------
@@ -476,6 +481,7 @@ function onAuctionAdded(event, auction)
 
 	-- Update the median buyout price list if there is a buyout.
 	if (buyoutPriceForOne) then
+		--debugPrint("Updating median buyout price list");
 		local medianBuyoutPriceList = getMedianBuyoutPriceList(auction.ahKey, itemKey, true);
 		local medianBuyoutPriceBalancedList = Auctioneer.BalancedList.NewBalancedList(30); -- TODO: Constant
 		medianBuyoutPriceBalancedList.setList(medianBuyoutPriceList);
@@ -485,7 +491,7 @@ function onAuctionAdded(event, auction)
 	end
 
 	-- Update the item totals.
-	debugPrint("Updating item totals");
+	--debugPrint("Updating item totals");
 	local itemTotals = getItemTotals(auction.ahKey, itemKey, true);
 	itemTotals.seenCount = itemTotals.seenCount + 1;
 	itemTotals.minCount = itemTotals.minCount + 1;
