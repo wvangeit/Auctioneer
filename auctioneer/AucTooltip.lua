@@ -154,22 +154,22 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 						end
 					end
 				end
-
-				if median and Auctioneer.Command.GetFilter('show-median') then -- show item's median buyout price
-					local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, ahKey);
-					local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey, ahKey);
-					if historicalMedian and historicalMedCount > Auctioneer.Util.NullSafe(snapshotMedCount)  then
-						-- OUTPUT: "Last [historicalMedCount], median BO (ea)"
-						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoHistmed'), historicalMedCount), historicalMedian, embedded)
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					end
-					if snapshotMedian then
-						-- OUTPUT: "Scanned [snapshotMedCount], median BO (ea)"
-						EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSnapmed'), snapshotMedCount), snapshotMedian, embedded)
-						EnhTooltip.LineColor(0.1,0.8,0.5);
-					end
-				end
 			end -- if(Auctioneer.Command.GetFilter('show-average')) - show item's average auction price
+
+			if median and Auctioneer.Command.GetFilter('show-median') then -- show item's median buyout price
+				local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, ahKey);
+				local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey, ahKey);
+				if historicalMedian and historicalMedCount > Auctioneer.Util.NullSafe(snapshotMedCount)  then
+					-- OUTPUT: "Last [historicalMedCount], median BO (ea)"
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoHistmed'), historicalMedCount), historicalMedian, embedded)
+					EnhTooltip.LineColor(0.1,0.8,0.5);
+				end
+				if snapshotMedian then
+					-- OUTPUT: "Scanned [snapshotMedCount], median BO (ea)"
+					EnhTooltip.AddLine(string.format(_AUCT('FrmtInfoSnapmed'), snapshotMedCount), snapshotMedian, embedded)
+					EnhTooltip.LineColor(0.1,0.8,0.5);
+				end
+			end
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer.Command.GetFilter('show-suggest')) then -- show item's suggested auction price
