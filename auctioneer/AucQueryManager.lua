@@ -185,7 +185,7 @@ function AucQueryManager_OnUpdate()
 				end
 			end
 		-- Otherwise check if we can send the query now.
-		elseif (CanSendAuctionQuery()) then
+		elseif (canSendAuctionQuery()) then
 			sendQuery(request);
 		end
 	end
@@ -256,16 +256,20 @@ end
 -- 4. The scan manager is performing a scan.
 -- 5. The bid scanner is performing a scan.
 -------------------------------------------------------------------------------
-function postCanSendAuctionQuery(_, returnValue)
+function postCanSendAuctionQuery(_, returnValues)
 	-- If Blizzard will allow the query, check if should allow it.
-	if (hookCanSendAuctionQuery and returnValue) then
+	if (returnValues and returnValues[1]) then
 		if (isQueryInProgress()) then
+			--debugPrint("Overriding CanSendAuctionQuery() due to query being in progress");
 			return "setreturn", { false };
 		elseif (isBidInProgress()) then
+			--debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress");
 			return "setreturn", { false };
-		elseif (Auctioneer.ScanManager.IsScanning()) then
+		elseif (hookCanSendAuctionQuery and Auctioneer.ScanManager.IsScanning()) then
+			--debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress");
 			return "setreturn", { false };
-		elseif (Auctioneer.BidScanner.IsScanning()) then
+		elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
+			--debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
 			return "setreturn", { false };
 		end
 	end
@@ -280,10 +284,7 @@ end
 -------------------------------------------------------------------------------
 function canSendAuctionQuery()
 	hookCanSendAuctionQuery = false;
-	local result = 
-		CanSendAuctionQuery() and
-		not isQueryInProgress() and
-		not isBidInProgress();
+	local result = CanSendAuctionQuery();
 	hookCanSendAuctionQuery = true;
 	return result;
 end
@@ -318,12 +319,14 @@ end
 -- it cannot be called at this time.
 -------------------------------------------------------------------------------
 function preQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (not CanSendAuctionQuery()) then
-		debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false");
-		return "abort";
-	elseif (page == nil) then
-		debugPrint("Aborting QueryAuctionItems() - Invalid page number");
-		return "abort";
+	if (hookQueryAuctionItems) then
+		if (not CanSendAuctionQuery()) then
+			debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false");
+			return "abort";
+		elseif (page == nil) then
+			debugPrint("Aborting QueryAuctionItems() - Invalid page number");
+			return "abort";
+		end
 	end
 end
 

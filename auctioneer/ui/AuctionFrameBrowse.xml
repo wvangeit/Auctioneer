@@ -31,10 +31,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				BrowseScanButton_OnClick();
 			</OnClick>
 			<OnUpdate>
-				if (Auctioneer.ScanManager.IsScanning()) then
-					this:Disable();
-				else
+				if (CanSendAuctionQuery()) then
 					this:Enable();
+				else
+					this:Disable();
 				end
 			</OnUpdate>
 		</Scripts>
