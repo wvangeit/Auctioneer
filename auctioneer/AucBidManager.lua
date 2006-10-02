@@ -69,7 +69,7 @@ BidResultCodes =
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function load()
-	Stubby.RegisterFunctionHook("PlaceAuctionBid", -50, prePlaceAuctionBidHook)
+	Stubby.RegisterFunctionHook("PlaceAuctionBid", -200, prePlaceAuctionBidHook)
 end
 
 -------------------------------------------------------------------------------
