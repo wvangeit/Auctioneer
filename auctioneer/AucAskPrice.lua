@@ -354,31 +354,17 @@ function getData(itemLink)
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(itemLink);
 	local itemID = Auctioneer.ItemDB.BreakItemKey(itemKey);
 
-	local itemTotals = Auctioneer.HistoryDB.GetItemTotals();
+	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(auctKey, itemKey);
 	local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, auctKey);
 	local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey, auctKey);
-	local median, medCount = Auctioneer.Statistic.GetUsableMedian(itemKey, auctKey);
 	local vendorSell = Auctioneer.API.GetVendorSellPrice(itemID)
-
-	if (itemTotals and itemTotals.seenCount > 0) then
-		-- calculate auction values
-
-		local avgMin = math.floor(itemTotals.minPrice / itemTotals.minCount);
-
-		local bidPct = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
-		local avgBid = 0;
-		if (itemTotals.bidCount > 0) then
-			avgBid = math.floor(itemTotals.bidPrice / itemTotals.bidCount);
-		end
-
-		local buyPct = math.floor(itemTotals.buyoutCount / itemTotals.minCount * 100);
-		local avgBuy = 0;
-		if (itemTotals.buyoutCount > 0) then
-			avgBuy = math.floor(itemTotals.buyoutPrice / itemTotals.buyoutCount);
-		end
+	
+	local seenCount
+	if (itemTotals) then
+		seenCount = itemTotals.seenCount
 	end
 
-	return itemTotals.seenCount or 0, historicalMedian or 0, snapshotMedian or 0, vendorSell or 0;
+	return seenCount or 0, historicalMedian or 0, snapshotMedian or 0, vendorSell or 0;
 end
 
 --Many thanks to the guys at irc://chat.freenode.net/wowi-lounge for their help in creating this function
