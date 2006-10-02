@@ -23,7 +23,11 @@
 --]]
 
 --Local function prototypes
-local getTimeLeftString, getSecondsLeftString, unpackSeconds, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, split, getItemLinks, getItems, getItemHyperlinks, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot
+local storePlayerFaction, getTimeLeftString, getSecondsLeftString, unpackSeconds, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, split, getItemLinks, getItems, getItemHyperlinks, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot
+
+function storePlayerFaction()
+	Auctioneer.Core.Constants.PlayerFaction = (UnitFactionGroup("player") or "Alliance");
+end
 
 -- return the string representation of the given timeLeft constant
 function getTimeLeftString(timeLeft)
@@ -192,17 +196,17 @@ function getAuctionKey()
 		factionGroup = "Neutral"
 
 	else
-		factionGroup = UnitFactionGroup("player");
+		factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 	end
-	return string.lower(serverName).."-"..string.lower(tostring(factionGroup));
+	return string.lower(serverName).."-"..string.lower(factionGroup);
 end
 
 -- Returns the current faction's opposing faction's auction signature
 function getOppositeKey()
 	local serverName = GetCVar("realmName");
-	local factionGroup = UnitFactionGroup("player");
+	local factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 
-	if (factionGroup == "alliance") then factionGroup="horde"; else factionGroup="alliance"; end
+	if (factionGroup == "Alliance") then factionGroup="Horde"; else factionGroup="Alliance"; end
 	return string.lower(serverName).."-"..string.lower(factionGroup);
 end
 
@@ -216,9 +220,9 @@ end
 -- Returns the current faction's auction signature
 function getHomeKey()
 	local serverName = GetCVar("realmName");
-	local factionGroup = UnitFactionGroup("player");
+	local factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 
-	return string.lower(serverName).."-"..string.lower(tostring(factionGroup));
+	return string.lower(serverName).."-"..string.lower(factionGroup);
 end
 
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
@@ -513,6 +517,7 @@ debugPrint("AucUtil.lua loaded");
 
 Auctioneer.Util =
 {
+	StorePlayerFaction = storePlayerFaction,
 	GetTimeLeftString = getTimeLeftString,
 	GetSecondsLeftString = getSecondsLeftString,
 	UnpackSeconds = unpackSeconds,

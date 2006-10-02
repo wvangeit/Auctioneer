@@ -168,7 +168,7 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 function addonLoaded()
 	-- Initialize the database.
 	Auctioneer.Database.Load();
-	
+
 	-- Initialize modules.
 	Auctioneer.QueryManager.Load();
 	Auctioneer.ScanManager.Load();
@@ -190,6 +190,9 @@ function addonLoaded()
 
 	--Init AskPrice
 	Auctioneer.AskPrice.Init();
+
+	--Register for the PLAYER_LOGIN event so that we can get the player's faction
+	Stubby.RegisterEventHook("PLAYER_LOGIN", "Auctioneer", Auctioneer.Util.StorePlayerFaction)
 
 	-- Ready to rock and roll!
 	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
