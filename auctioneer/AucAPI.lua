@@ -69,6 +69,12 @@ end
 
 -------------------------------------------------------------------------------
 --	Auctioneer.API.GetScanAge()
+--
+--	This function gets the time (in seconds) since the last scan was completed.
+--	The function will return the time since the last "update" scan, 
+--	not the time since the last full scan was done.
+--
+--	This function has no parameters
 -------------------------------------------------------------------------------
 function getScanAge()
 	return (time() - Auctioneer.SnapshotDB.GetLastUpdate());
@@ -76,6 +82,11 @@ end
 
 -------------------------------------------------------------------------------
 --	Auctioneer.API.RequestAuctionScan()
+--
+--	This function sends a request so that Auctioneer will do a full Auction House scan
+--	the next time the AH window is opened, or inmediately if its already open.
+--
+--	This function has no parameters
 -------------------------------------------------------------------------------
 function requestAuctionScan()
 	return Auctioneer.ScanManager.Scan();
