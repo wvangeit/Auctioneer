@@ -252,18 +252,21 @@
 						AuctionFramePost_AuctionItem_OnClick(this);
 					</OnClick>
 					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
 						local parent = this:GetParent()
-						local name = parent:GetItemName();
-						if (name) then
-							local bag, slot, id = EnhTooltip.FindItemInBags(name);
-							local _, link, rarity = GetItemInfo(id);
-							GameTooltip:SetHyperlink(link);
-							GameTooltip:Show();
-							local hyperlink = GetContainerItemLink(bag, slot);
-							EnhTooltip.TooltipCall(GameTooltip, parent:GetItemName(), hyperlink, rarity, parent:GetStackSize());
-						else
-							GameTooltip:SetText(AUCTION_ITEM_TEXT, 1.0, 1.0, 1.0);
+						local itemKey = parent:GetItemKey();
+						if (itemKey) then
+							local itemLink = Auctioneer.ItemDB.GetItemLink(itemKey);
+							if (itemLink) then
+								GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
+								GameTooltip:SetHyperlink(Auctioneer.ItemDB.GetItemString(itemKey));
+								GameTooltip:Show();
+								EnhTooltip.TooltipCall(
+									GameTooltip,
+									parent:GetItemName(),
+									itemLink,
+									Auctioneer.ItemDB.GetItemQuality(itemKey),
+									parent:GetStackSize());
+							end
 						end
 					</OnEnter>
 					<OnLeave>
