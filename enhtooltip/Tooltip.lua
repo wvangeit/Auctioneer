@@ -1034,7 +1034,6 @@ function gtHookSetInboxItem(funcArgs, retVal, frame, index)
 			break
 		end
 	end
-	
 end
 
 function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
