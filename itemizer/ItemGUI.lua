@@ -27,45 +27,60 @@ local paint
 local worker
 local onLoad
 local upOnLoad
-local sortTable
 local upOnClick
 local upOnUpdate
 local downOnLoad
-local sortOnLoad
 local listOnEnter
 local listOnClick
 local downOnClick
+local showItemList
 local onMouseWheel
 local downOnUpdate
+local sortItemList
 local sortUpOnLoad
 local buildItemList
+local sortListPaint
 local sortUpOnClick
 local rotateTexture
 local onValueChanged
 local sortDownOnLoad
 local sortButtonOnLoad
 local sortButtonOnClick
+local clearButtonOnLoad
 local closeButtonOnLoad
 local searchButtonOnLoad
+local searchButtonOnClick
+local sortItemListFunction
+local searchItemsButtonOnLoad
 
 --Making a local copy of these extensively used functions will make their lookup faster.
+local type = type;
+local pairs = pairs;
+local ipairs = ipairs;
+local sort = table.sort;
+local getn = table.getn;
+local tinsert = table.insert;
+
+local itemCore = Itemizer.Core
 local getItemData = Itemizer.Storage.GetItemData;
+local rotateTexture = Itemizer.Util.RotateTexture;
 local getItemRandomProps = Itemizer.Storage.GetItemRandomProps;
 
 local itemList = {}
 
 local sortList = {
-	itemID = "ItemID",
-	itemName = "Name",
-	itemLink = "Link",
-	itemType = "Type",
-	binds = "Binds on",
-	isUnique = "Unique",
-	itemLevel = "Level",
-	itemQuality = "Quality",
-	itemSubType = "Sub-Type",
-	randomProp = "RandomProp",
-	itemEquipLocation = "Equip Location",
+	{ Key = "itemQuality",			Name = "Quality",			Reverse = false	},
+	{ Key = "itemName",				Name = "Name",				Reverse = true	},
+	{ Key = "isUnique",				Name = "Unique",			Reverse = false	},
+	{ Key = "minLevel",				Name = "Required Level",	Reverse = true	},
+	{ Key = "itemID",				Name = "ItemID",			Reverse = false	},
+	{ Key = "binds",				Name = "Binds on",			Reverse = false	},
+	{ Key = "itemLink",				Name = "Link",				Reverse = false	},
+	{ Key = "itemType",				Name = "Type",				Reverse = false	},
+	{ Key = "randomProp",			Name = "RandomProp",		Reverse = false	},
+	{ Key = "itemSubType",			Name = "Sub-Type",			Reverse = false	},
+	{ Key = "itemRevision",			Name = "Revision",			Reverse = true	},
+	{ Key = "itemEquipLocation",	Name = "Equip Location",	Reverse = true	},
 }
 
 -- Etch-A-Sketch On-Demand GUI building stub. Written by Mikk.
@@ -74,9 +89,11 @@ worker = {
 	ScriptHandlers = "OnLoad OnSizeChanged OnEvent OnUpdate OnShow OnHide OnEnter OnLeave OnMouseDown OnMouseUp OnMouseWheel OnDragStart OnDragStop OnReceiveDrag OnClick OnDoubleClick OnValueChanged OnUpdateModel OnAnimFinished OnEnterPressed OnEscapePressed OnSpacePressed OnTabPressed OnTextChanged OnTextSet OnCursorChanged OnInputLanguageChanged OnEditFocusGained OnEditFocusLost OnHorizontalScroll OnVerticalScroll OnScrollRangeChanged OnChar OnKeyDown OnKeyUp OnColorSelect OnHyperlinkEnter OnHyperlinkLeave OnHyperlinkClick OnMessageScrollChanged OnMovieFinished OnMovieShowSubtitle OnMovieHideSubtitle OnTooltipSetDefaultAnchor OnTooltipCleared OnTooltipAddMoney";
 	SaveArgSubsts = function(self)
 		local ret = {}
-		for tname,t in self.ArgSubsts do
+		for tname,t in pairs(self.ArgSubsts) do
 			ret[tname] = {}
-			for k,v in t do  ret[tname][k]=v;  end
+			for k,v in pairs(t) do
+				ret[tname][k] = v;
+			end
 		end
 		return ret;
 	end,
@@ -153,7 +170,7 @@ worker = {
 	ClearTmp = function(self) for k,_ in pairs(self.tmp) do self.tmp[k]=nil; end end,
 	FixArgs = function(self, args)
 		self:ClearTmp();
-		for k=1,getn(args) do
+		for k=1, getn(args) do
 			self.tmp[k]=self:DoSubsts(args[k]);
 		end
 		table.setn(self.tmp, table.getn(args));
@@ -161,10 +178,10 @@ worker = {
 	end,
 	DoSubsts = function(self, str)
 		if(type(str)~="string") then return str; end
-		for from,to in pairs(self.ArgSubsts.substr) do
+		for from, to in pairs(self.ArgSubsts.substr) do
 			str = gsub(str, from, to);
 		end
-		for from,to in pairs(self.ArgSubsts.whole) do
+		for from, to in pairs(self.ArgSubsts.whole) do
 			if(str==from) then
 				return to;
 			end
@@ -172,13 +189,13 @@ worker = {
 		return str;
 	end,
 	Worker = function(self, collection, root, parent, lastname, WidgetTree)
-		local G = getfenv();
+		local _G = getfenv();
 		local prevparent = self.ArgSubsts.whole["&parent"];
-		for i=1,getn(collection) do
+		for i=1, getn(collection) do
 			while(type(collection[i])=="string") do i=i+1; end
 			if(i>getn(collection)) then break; end
 			local obj = collection[i];
-			for count=1,(obj.count or 1) do
+			for count=1, (obj.count or 1) do
 				self.ArgSubsts.whole["&parent"] = parent;
 				self.ArgSubsts.substr["%$parent"] = lastname;
 				self.ArgSubsts.substr["%$count"] = count;
@@ -207,7 +224,7 @@ worker = {
 					end
 					widget.children = {};
 				widget:ClearAllPoints();
-				for k,call in ipairs(obj.methods) do
+				for k, call in ipairs(obj.methods) do
 					local func = (self.Extenders[obj.type] and self.Extenders[obj.type][call.f]) or
 						(self.Extenders.Region and self.Extenders.Region[call.f]) or
 					 	widget[call.f];
@@ -225,9 +242,9 @@ worker = {
 					for scriptname in string.gfind(self.ScriptHandlers, "%w+") do
 						if(obj.scripts and obj.scripts[scriptname]) then
 							local script = self:DoSubsts(obj.scripts[scriptname]);
-							if(type(G[script])=="function") then
-								if(scriptname=="OnLoad") then onload = G[script]; end
-								self:Pcall(obj, "SetScript", widget.SetScript, widget, scriptname, G[script]);
+							if(type(_G[script])=="function") then
+								if(scriptname=="OnLoad") then onload = _G[script]; end
+								self:Pcall(obj, "SetScript", widget.SetScript, widget, scriptname, _G[script]);
 							else
 								local chunkname = obj.type.." "..(widgetname or "(unnamed)").." <"..scriptname..">: " .. script;
 								local chunk,msg = loadstring(script, chunkname);
@@ -238,9 +255,9 @@ worker = {
 									self:Pcall(obj, "SetScript", widget.SetScript, widget, scriptname, chunk);
 								end
 							end
-						elseif(widgetname and type(G[widgetname.."_"..scriptname])=="function" and widget:HasScript(scriptname)) then
-							if(scriptname=="OnLoad") then onload = G[widgetname.."_"..scriptname]; end
-							self:Pcall(obj, "SetScript", widget.SetScript, widget, scriptname, G[widgetname.."_"..scriptname]);
+						elseif(widgetname and type(_G[widgetname.."_"..scriptname])=="function" and widget:HasScript(scriptname)) then
+							if(scriptname=="OnLoad") then onload = _G[widgetname.."_"..scriptname]; end
+							self:Pcall(obj, "SetScript", widget.SetScript, widget, scriptname, _G[widgetname.."_"..scriptname]);
 						end
 					end
 					if(onload) then
@@ -272,17 +289,17 @@ worker = {
 	end
 }
 
-
 function onLoad()
 	local result1, errors1 = Itemizer.GUI.Worker:Init(Itemizer.Frames.MainBaseTemplate);
-	local result2, errors2 = Itemizer.GUI.Worker:Init(Itemizer.Frames.SortBaseTemplate);
-	--local result2, errors2 = Itemizer.Frames.CreateSortFrame()
-	Stubby.RegisterFunctionHook("ItemizerBaseGUI.Show", 500, Itemizer.GUI.BuildItemList);
-
+	local result2, errors2 = Itemizer.GUI.Worker:Init(Itemizer.Frames.MainSeachTemplate);
+	Stubby.RegisterFunctionHook("ItemizerBaseGUI.Show", 500, Itemizer.GUI.ShowItemList);
+	Stubby.RegisterFunctionHook("ItemizerBaseGUI_Sort.Show", 500, Itemizer.GUI.SortListPaint);
+	Stubby.RegisterFunctionHook("ItemizerBaseGUI.Hide", 500, function() return ItemizerSearchGUI:Hide() end);
+--[[
 	if (EAS_EditDesign) then
 		EAS_EditDesign("Itemizer Item Browsing Window");
 	end
-
+ ]]
 	if (result1 and result2) then
 		EnhTooltip.DebugPrint("Itemizer: Building of GUI completed successfully");
 		ItemizerBaseGUI_Title:SetText("Itemizer v."..Itemizer.Version);
@@ -292,7 +309,8 @@ function onLoad()
 			for index, errorMessage in ipairs(errors1) do
 				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r");
 			end
-		else
+		end
+		if (errors2) then
 			for index, errorMessage in ipairs(errors2) do
 				EnhTooltip.DebugPrint("|cffffffff"..errorMessage.."|r");
 			end
@@ -300,9 +318,20 @@ function onLoad()
 	end
 end
 
+function showItemList()
+	if (itemCore.IsItemCacheScanInProgress) then
+		buildItemList();
+		itemCore.IsItemCacheScanInProgress = false;
+	end
+
+	sortItemList();
+	updateItemListCounts();
+	paint();
+end
+
 function paint()
 	local offset = ItemizerBaseGUI_List_Slider:GetValue()
-	if (table.getn(itemList)>0) then
+	if (getn(itemList) > 0) then
 		for line, index in Itemizer.Util.GetglobalIterator("ItemizerBaseGUI_List_%d") do
 			local itemInfo = itemList[offset + index];
 			if (itemInfo) then
@@ -331,49 +360,75 @@ function buildItemList()
 		local randomPropsTable = getItemRandomProps(itemID);
 		if (randomPropsTable) then
 			for randomProp in ipairs(randomPropsTable) do
-				table.insert(itemList, getItemData(itemID, randomProp, true));
+				tinsert(itemList, getItemData(itemID, randomProp, true));
 			end
 		else
-			table.insert(itemList, getItemData(itemID, nil, true));
+			tinsert(itemList, getItemData(itemID, nil, true));
 		end
 	end
+end
 
-	table.sort(itemList, sortTable);
+function addItemToItemList(itemID, randomProp)
+	if (not itemCore.IsItemCacheScanInProgress) then
+		Itemizer.Util.BinaryTableInsert(itemList, getItemData(itemID, randomProp, true), sortItemListFunction);
+		updateItemListCounts();
+		paint();
+	end
+end
 
-	if (table.getn(itemList) >= 25) then
-		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, table.getn(itemList) - 25);
+function sortItemList()
+	sort(itemList, sortItemListFunction);
+end
+
+function updateItemListCounts()
+	local itemListGetN = getn(itemList);
+
+	if (itemListGetN >= 25) then
+		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, itemListGetN - 25);
 	else
 		ItemizerBaseGUI_List_Slider:SetMinMaxValues(0, 0);
 	end
 
 	ItemizerBaseGUI_List_Slider:SetValue(0);
-	ItemizerBaseGUI_NumItems:SetText(Itemizer.Util.DelimitText(table.getn(itemList), ",", 3).." Items"); --%Localize%
-
-	paint();
+	ItemizerBaseGUI_NumItems:SetText(Itemizer.Util.DelimitText(itemListGetN, ",", 3).." Items"); --%Localize%
 end
 
-function sortTable(a, b)
+function sortItemListFunction(a, b)
 	if (a and b) then
-		if (a.itemQuality == b.itemQuality) then
-			return a.itemName < b.itemName;
-		else
-			return a.itemQuality > b.itemQuality;
+		local sortKey;
+		for index, sortInfo in ipairs(sortList) do
+			sortKey = sortInfo.Key
+			if (not (a[sortKey] == b[sortKey])) then
+				if (sortInfo.Reverse) then
+					return a[sortKey] < b[sortKey];
+				else
+					return a[sortKey] > b[sortKey];
+				end
+			end
 		end
 	end
 end
 
 function listOnEnter()
-	GameTooltip:SetOwner(this, 'ANCHOR_BOTTOMRIGHT', ItemizerBaseGUI_List_Slider:GetWidth() + 2, this:GetHeight())
+	GameTooltip:SetOwner(this, "ANCHOR_BOTTOMRIGHT", ItemizerBaseGUI_List_Slider:GetWidth() + 2, this:GetHeight());
 
-	if (((this) and (this.info) and (this.info.itemHyperLink)) and (GetItemInfo(this.info.itemHyperLink))) then
-		GameTooltip:SetHyperlink(this.info.itemHyperLink);
-		EnhTooltip.TooltipCall(GameTooltip, this.info.itemName, this.info.itemHyperLink, this.info.itemQuality, 1);
-
-	elseif (this and this.info and this.info.itemHyperLink) then
-		GameTooltip:SetText("Test Tooltip #"..this:GetID().."\n\nGetItemInfo() returned nil\n\""..this.info.itemHyperLink.."\"\ndoes not exist in the ItemCache");
-
+	if (IsAltKeyDown()) then
+		local tooltipString = "";
+		for key, value in pairs(this.info) do
+			tooltipString = tooltipString.."|cffffffff"..key.."|r = \""..tostring(value).."\"\n"
+		end
+		GameTooltip:SetText(tooltipString)
 	else
-		GameTooltip:SetText("Test Tooltip #"..this:GetID());
+		if (((this) and (this.info) and (this.info.itemHyperLink)) and (GetItemInfo(this.info.itemHyperLink))) then
+			GameTooltip:SetHyperlink(this.info.itemHyperLink);
+			EnhTooltip.TooltipCall(GameTooltip, this.info.itemName, this.info.itemHyperLink, this.info.itemQuality, 1);
+
+		elseif (this and this.info and this.info.itemHyperLink) then
+			GameTooltip:SetText("Test Tooltip #"..this:GetID().."\n\nGetItemInfo() returned nil\n\""..this.info.itemHyperLink.."\"\ndoes not exist in the ItemCache");
+
+		else
+			GameTooltip:SetText("Test Tooltip #"..this:GetID());
+		end
 	end
 end
 
@@ -514,26 +569,28 @@ function searchButtonOnLoad()
 	this:SetPushedTextOffset(2, -2);
 end
 
-function sortOnLoad()
-	this.List = {};
-	for key, value in pairs(sortList) do
-		table.insert(this.List, { Key = key, Value = value });
+function searchButtonOnClick()
+	if (not ItemizerSearchGUI:IsVisible()) then
+		ItemizerSearchGUI:Show();
+	else
+		ItemizerSearchGUI:Hide();
 	end
+end
 
-	for line, index in Itemizer.Util.GetglobalIterator(this:GetName().."_FontString_%d") do
-		if (this.List[index]) then
-			line:SetText(this.List[index]["Value"]);
+function sortListPaint()
+	for line, index in Itemizer.Util.GetglobalIterator("ItemizerBaseGUI_Sort_FontString_%d") do
+		if (sortList[index]) then
+			line:SetText(sortList[index].Name);
 		else
 			line:SetTextColor(1, 1, 1, 1);
 			line:SetText(nil);
 			line:Hide();
 		end
 	end
-	this:Hide();
 end
 
 function sortDownOnLoad()
-	if (this:GetID() == 13) then
+	if (this:GetID() == 12) then
 		this:Hide();
 	end
 
@@ -549,7 +606,17 @@ function sortDownOnLoad()
 end
 
 function sortDownOnClick()
+	local buttonID = this:GetID()
 
+	if (sortList[buttonID] and sortList[buttonID + 1]) then
+		sortList.temp = sortList[buttonID];
+		sortList[buttonID] = sortList[buttonID + 1];
+		sortList[buttonID + 1] = sortList.temp;
+		sortList.temp = nil;
+		sortListPaint();
+		sortItemList();
+		paint();
+	end
 end
 
 function sortUpOnLoad()
@@ -566,38 +633,92 @@ function sortUpOnLoad()
 end
 
 function sortUpOnClick()
+	local buttonID = this:GetID()
 
+	if (sortList[buttonID] and sortList[buttonID - 1]) then
+		sortList.temp = sortList[buttonID];
+		sortList[buttonID] = sortList[buttonID - 1];
+		sortList[buttonID - 1] = sortList.temp;
+		sortList.temp = nil;
+		sortListPaint();
+		sortItemList();
+		paint();
+	end
 end
 
-function rotateTexture(texture, degrees)
-	local angle = math.rad(degrees);
-	local cos, sin = math.cos(angle), math.sin(angle);
+function clearButtonOnLoad()
+	local fontString = this:GetFontString();
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
 
-	texture:SetTexCoord((sin - cos) , -(cos + sin), -cos, -sin, sin, -cos, 0, 0);
+	fontString:ClearAllPoints();
+	fontString:SetPoint("LEFT", this, "LEFT", 10, 0);
+
+	rotateTexture(normalTexture, 180);
+	rotateTexture(pushedTexture, 180);
+	rotateTexture(highlightTexture, 180);
+
+	normalTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1);
+
+	this:SetPushedTextOffset(2, -2);
+end
+
+function searchItemsButtonOnLoad()
+	local fontString = this:GetFontString();
+	local normalTexture = this:GetNormalTexture();
+	local pushedTexture = this:GetPushedTexture();
+	local highlightTexture = this:GetHighlightTexture();
+
+	fontString:ClearAllPoints();
+	fontString:SetPoint("RIGHT", this, "RIGHT", -6, 0);
+
+	normalTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	pushedTexture:SetVertexColor(0, 0, 0.5, 0.75);
+	highlightTexture:SetVertexColor(0.6, 0.6, 0.6, 0.1);
+
+	this:SetPushedTextOffset(2, -2);
 end
 
 Itemizer.GUI = {
+	--Main functions
 	Paint = paint,
 	Worker = worker,
 	OnLoad = onLoad,
-	UpOnLoad = upOnLoad,
-	UpOnClick = upOnClick,
-	UpOnUpdate = upOnUpdate,
-	DownOnLoad = downOnLoad,
-	SortOnLoad = sortOnLoad,
-	ListOnEnter = listOnEnter,
-	ListOnClick = listOnClick,
-	DownOnClick = downOnClick,
-	SortUpOnLoad = sortUpOnLoad,
-	OnMouseWheel = onMouseWheel,
-	DownOnUpdate = downOnUpdate,
-	SortUpOnClick = sortUpOnClick,
+	ShowItemList = showItemList,
+	SortItemList = sortItemList,
 	BuildItemList = buildItemList,
+	SortListPaint = sortListPaint,
 	OnValueChanged = onValueChanged,
+	AddItemToItemList = addItemToItemList,
+
+	--Frame OnLoad functions
+	UpOnLoad = upOnLoad,
+	DownOnLoad = downOnLoad,
+	SortUpOnLoad = sortUpOnLoad,
 	SortDownOnLoad = sortDownOnLoad,
-	SortDownOnClick = sortDownOnClick,
 	SortButtonOnLoad = sortButtonOnLoad,
-	SortButtonOnClick = sortButtonOnClick,
+	ClearButtonOnLoad = clearButtonOnLoad,
 	CloseButtonOnLoad = closeButtonOnLoad,
 	SearchButtonOnLoad = searchButtonOnLoad,
+	SearchItemsButtonOnLoad = searchItemsButtonOnLoad,
+
+	--Main frame button OnClick and OnUpdate functions
+	UpOnClick = upOnClick,
+	UpOnUpdate = upOnUpdate,
+	ListOnClick = listOnClick,
+	ListOnEnter = listOnEnter,
+	DownOnClick = downOnClick,
+	DownOnUpdate = downOnUpdate,
+	OnMouseWheel = onMouseWheel,
+
+	--Sort frame OnClick functions
+	SortUpOnClick = sortUpOnClick,
+	SortDownOnClick = sortDownOnClick,
+	SortButtonOnClick = sortButtonOnClick,
+
+	--Search frame OnClick functions
+	SearchButtonOnClick = searchButtonOnClick,
 }

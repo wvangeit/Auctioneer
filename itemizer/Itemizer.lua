@@ -23,20 +23,11 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-
 Itemizer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "ETTDebug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
 	Itemizer.Version = "3.9.DEV";
 end
-
---Saved Variables
-ItemizerSets = {};
-ItemizerLinks = {};
-ItemizerConfig = {};
-
---Global Variables
-ItemizerProcessStack = {};
 
 local function onLoad()
 

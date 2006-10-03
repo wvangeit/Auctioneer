@@ -32,17 +32,22 @@ local frequencyOfUpdates = 0.2; --Seconds to wait between OnUpdate calls.
 
 --Making a local copy of these extensively used functions will make their lookup faster.
 local pairs = pairs;
+local tonumber = tonumber;
 local strfind = string.find;
 local tremove = table.remove;
 local strlower = string.lower;
-local tonumber = tonumber;
 
+local GetTime = GetTime;
+
+local processStack = ItemizerProcessStack;
 local clearTable = Itemizer.Util.ClearTable;
 local pruneTable = Itemizer.Util.PruneTable;
 local storeItemData = Itemizer.Storage.StoreItemData;
+local gameBuildNumber = Itemizer.Core.Constants.GameBuildNumber;
+local gameBuildNumberString = Itemizer.Core.Constants.GameBuildNumberString;
 
 --Just one table to be re-used
-local itemInfo = {}
+local itemInfo = {};
 
 function onUpdate(timePassed)
 	if (elapsedTime < frequencyOfUpdates) then
@@ -51,17 +56,19 @@ function onUpdate(timePassed)
 	end
 
 	local numItems = 0;
+	local numLines = 0;
 
-	for link, info in pairs(ItemizerProcessStack) do
-		if (info.lines < getNumLines(link)) then
-			info.lines = getNumLines(link);
+	for itemLink, info in pairs(processStack) do
+		numLines = getNumLines(itemLink);
+		if (info.lines < numLines) then
+			info.lines = numLines;
 			info.timer = GetTime();
 
 		elseif ((GetTime() - info.timer) > 5) then
 			if (info.lines > 0) then
 				numItems = numItems + 1;
-				storeItemData(buildItemData(link, itemInfo));
-				ItemizerProcessStack[link] = nil;
+				storeItemData(buildItemData(itemLink, itemInfo));
+				processStack[itemLink] = nil;
 
 			else
 				info.timer = GetTime();
@@ -77,37 +84,37 @@ function onUpdate(timePassed)
 end
 
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
-function getNumLines(link)
-	if (not (type(link) == "string")) then
-		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", link);
+function getNumLines(itemLink)
+	if (not (type(itemLink) == "string")) then
+		EnhTooltip.DebugPrint("Itemizer: getNumLines() error", itemLink);
 		return
 	end
-	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false);
+	local hyperLink = Itemizer.Util.GetItemHyperLinks(itemLink, false, true);
 
 	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE");
-	ItemizerHidden:SetHyperlink(hyperLink[1]);
+	ItemizerHidden:SetHyperlink(hyperLink);
 	return ItemizerHidden:NumLines();
 end
 
 --Be VERY careful with what you send to this function, it will DC the user if the item is invalid.
-function buildItemData(link, itemInfo)
-	if (not (type(link) == "string")) then
-		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "Link type", type(link), link);
+function buildItemData(itemLink, itemInfo)
+	if (not (type(itemLink) == "string")) then
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "Link type", type(itemLink), itemLink);
 		return;
 	end
 
 	itemInfo = clearTable(itemInfo)
 	if (not (type(itemInfo) == "table")) then
-		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "itemInfo type", type(itemInfo), link);
+		EnhTooltip.DebugPrint("Itemizer: buildItemData() error", "itemInfo type", type(itemInfo), itemLink);
 		itemInfo = {};
 	end
 
 	local _
-	local hyperLink = Itemizer.Util.GetItemHyperLinks(link, false);
-	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(link, true);
+	local hyperLink = Itemizer.Util.GetItemHyperLinks(itemLink, false, true);
+	local baseHyperLink = Itemizer.Util.GetItemHyperLinks(itemLink, true, true);
 	local curLine, textLeft, textRight, switch, keepGoing, matched, matchedRight
 
-
+	--Reconstruct the table
 	if (not itemInfo.tooltip) then
 		itemInfo.tooltip = {};
 	end
@@ -133,19 +140,16 @@ function buildItemData(link, itemInfo)
 		itemInfo.attributes.equipBonuses = {};
 	end
 
-	itemInfo.itemLink = link;
-	itemInfo.itemHyperLink = hyperLink[1];
-	itemInfo.itemName = GetItemInfo(hyperLink[1]);
-	itemInfo.itemID, itemInfo.randomProp = EnhTooltip.BreakLink(link);
-	itemInfo.itemBaseName, _, itemInfo.itemQuality, itemInfo.itemLevel, itemInfo.itemType, itemInfo.itemSubType, _, itemInfo.itemEquipLocation = GetItemInfo(baseHyperLink[1]);
-
-	if (itemInfo.randomProp == 0) then
-		itemInfo.randomProp = nil;
-	end
+	itemInfo.itemLink = itemLink;
+	itemInfo.itemHyperLink = hyperLink;
+	itemInfo.itemRevision = gameBuildNumber;
+	itemInfo.itemName = GetItemInfo(hyperLink);
+	itemInfo.itemID, itemInfo.randomProp = Itemizer.Util.BreakLink(itemLink);
+	itemInfo.itemBaseName, _, itemInfo.itemQuality, itemInfo.minLevel, itemInfo.itemType, itemInfo.itemSubType, _, itemInfo.itemEquipLocation = GetItemInfo(baseHyperLink);
 
 	ItemizerHidden:SetOwner(ItemizerHidden, "ANCHOR_NONE");
-	ItemizerHidden:SetHyperlink(baseHyperLink[1]);
-	--EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", link, baseHyperLink[1], "NumLines", ItemizerHidden:NumLines())
+	ItemizerHidden:SetHyperlink(baseHyperLink);
+	--EnhTooltip.DebugPrint("Itemizer: Set Hyperlink to", itemLink, baseHyperLink, "NumLines", ItemizerHidden:NumLines())
 
 	for index = 1, ItemizerHidden:NumLines() do
 
@@ -179,7 +183,7 @@ function buildItemData(link, itemInfo)
 				textRight = "";
 			end
 
-			--First line is the item's name, nothing to do here..
+			--First line is the item's name, nothing to do here.
 			if (not switch) then
 				switch = 2;
 				keepGoing = false;
@@ -202,19 +206,19 @@ function buildItemData(link, itemInfo)
 					matched = true;
 
 				else
-					itemInfo.binds = false;
+					itemInfo.binds = 0;
 				end
 				switch = 3;
 
 			--Scan for unique status
 			elseif (switch == 3) then
 				if (strfind(textLeft, "Unique")) then --%Localize%
-					itemInfo.isUnique = true;
+					itemInfo.isUnique = 1;
 					keepGoing = false;
 					matched = true;
 
 				else
-					itemInfo.isUnique = false;
+					itemInfo.isUnique = 0;
 				end
 				switch = 4;
 
@@ -431,8 +435,8 @@ function buildItemData(link, itemInfo)
 						itemInfo.attributes.skills[skill] = tonumber(skillLevel);
 
 					elseif (level) then
-						assert(tonumber(itemInfo.itemLevel) == tonumber(level));
-						itemInfo.itemLevel = level;
+						assert(tonumber(itemInfo.minLevel) == tonumber(level));
+						itemInfo.minLevel = level;
 
 					else
 						itemInfo.attributes.skills.honor = requires;

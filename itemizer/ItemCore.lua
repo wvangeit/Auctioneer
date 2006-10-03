@@ -33,7 +33,14 @@ local scanInventory
 local registerEvents
 local variablesLoaded
 local addLinkToProcessStack
-local itemCacheScanInProgress
+
+--Saved Variables
+ItemizerSets = {};
+ItemizerLinks = {};
+ItemizerConfig = {};
+
+--Global Variables
+ItemizerProcessStack = {};
 
 --Making a local copy of these extensively used functions will make their lookup faster.
 local getItemVersion
@@ -44,6 +51,7 @@ local inspectTargets = {};
 local _, gameBuildNumberString = GetBuildInfo()
 gameBuildNumber = tonumber(gameBuildNumberString)
 
+local announceNewItems = true; --We want to know about newly discovered items.
 local itemCacheScanCeiling = 30000; --At the time of writing, the item with the highest ItemID is "Undercity Pledge Collection" with an ItemID of 22300 (thanks to zeeg for the info [http://www.wowguru.com/db/items/id22300/]), so a ceiling of 30,000 is more than reasonable IMHO.
 
 local eventsToRegister = {
@@ -67,6 +75,7 @@ local eventsToRegister = {
 	"CHAT_MSG_WHISPER",
 	"CHAT_MSG_CHANNEL",
 	"CHAT_MSG_TEXT_EMOTE",
+	"CHAT_MSG_RAID_LEADER",
 }
 
 local bankSlots = {
@@ -135,16 +144,9 @@ function processLinks(str, fromAPI)
 	end
 
 	if (items) then
-		for index, link in pairs(items) do
+		for index, itemLink in pairs(items) do
 			--Only add items to the processing stack that have not been previously parsed on this version of the game.
-			local itemID, randomProp = EnhTooltip.BreakLink(link);
-
-			if (itemID == 0) then
-				itemID = nil;
-			end
-			if (randomProp == 0) then
-				randomProp = nil;
-			end
+			local itemID, randomProp = Itemizer.Util.BreakLink(itemLink);
 
 			local itemBuildNumber, itemIsCurrent, randomPropInItem = getItemVersion(itemID, randomProp);
 			local randomPropOK
@@ -156,7 +158,7 @@ function processLinks(str, fromAPI)
 			end
 
 			if (not (itemBuildNumber and itemIsCurrent and randomPropOK)) then
-				addLinkToProcessStack(link);
+				addLinkToProcessStack(itemLink);
 			end
 		end
 	end
@@ -209,23 +211,24 @@ end
 function scanItemCache()
 	debugprofilestart();
 
-	local link;
+	local itemLink;
 	local itemsFound = 0;
 	local buildLink = Itemizer.Util.BuildLink;
+	Itemizer.Core.IsItemCacheScanInProgress = true;
 
 	for index = 1, Itemizer.Core.Constants.ItemCacheScanCeiling do
-		link = buildLink(index);
+		itemLink = buildLink(index);
 
-		if (link) then
+		if (itemLink) then
 			if (itemsFound > 20) then
-				itemCacheScanInProgress = true;
+				announceNewItems = false;
 			end
-			processLinks(link, true);
+			processLinks(itemLink, true);
 			itemsFound = itemsFound + 1;
 		end
 	end
 
-	itemCacheScanInProgress = false;
+	announceNewItems = true;
 
 	local totalTimeTaken = debugprofilestop();
 	EnhTooltip.DebugPrint(
@@ -261,13 +264,13 @@ function scanBank()
 	end
 end
 
-function addLinkToProcessStack(link)
-	if (not ItemizerProcessStack[link]) then
-		if (not itemCacheScanInProgress) then
-			EnhTooltip.DebugPrint("Itemizer: New link:", link);
+function addLinkToProcessStack(itemLink)
+	if (not ItemizerProcessStack[itemLink]) then
+		if (announceNewItems) then
+			EnhTooltip.DebugPrint("Itemizer: New itemLink!", itemLink);
 		end
 
-		ItemizerProcessStack[link] = { timer = GetTime(), lines = 0 };
+		ItemizerProcessStack[itemLink] = { timer = GetTime(), lines = 0 };
 	end
 end
 
@@ -283,6 +286,7 @@ Itemizer.Core = {
 	ScanItemCache = scanItemCache,
 	VariablesLoaded = variablesLoaded,
 	AddLinkToProcessStack = addLinkToProcessStack,
+	IsItemCacheScanInProgress = true, --Initially set to true so that we force a full rebuild of the GUI's itemList on first show.
 }
 
 Itemizer.Core.Constants = {

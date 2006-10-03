@@ -4,7 +4,7 @@
 	Revision: $Id$
 
 	Itemizer utility functions.
-	Functions to maniuplate items links, strings, tables etc
+	Functions to maniuplate itemLinks, strings, tables etc
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -24,9 +24,11 @@
 
 local split
 local nilTable
+local nilZeros
 local hashText
 local chatPrint
 local buildLink
+local breakLink
 local clearTable
 local pruneTable
 local nilSafeTable
@@ -35,6 +37,7 @@ local stringToTable
 local nilSafeString
 local nilSafeNumber
 local itemCacheSize
+local rotateTexture
 local nilEmptyString
 local binaryTableInsert
 local getglobalIterator
@@ -59,18 +62,43 @@ local format = string.format;
 local tinsert = table.insert;
 local strgfind = string.gfind;
 
-function getItemHyperLinks(str, basicLink)
+function getItemHyperLinks(str, basicLink, noTable)
 	if (not str or (not (type(str) == "string"))) then return end
-	local itemList = {};
 
-	for itemID, enchant, randomProp, uniqID in strgfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
-		if (basicLink) then
-			tinsert(itemList, "item:"..itemID..":0:0:0");
-		else
-			tinsert(itemList, "item:"..itemID..":"..enchant..":"..randomProp..":"..uniqID);
+	if (noTable) then
+		for itemID, enchant, randomProp, uniqID in strgfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
+
+			if (basicLink) then
+				return "item:"..itemID..":0:0:0";
+
+			else
+				return "item:"..itemID..":"..enchant..":"..randomProp..":"..uniqID;
+			end
 		end
+		--[[
+		local _, _, itemID, enchant, randomProp, uniqID strfind(str, "Hitem:(%d+):(%d+):(%d+):(%d+)") --Bug here in the runtime.
+
+		if (basicLink) then
+			return "item:"..itemID..":0:0:0";
+
+		else
+			return "item:"..itemID..":"..enchant..":"..randomProp..":"..uniqID;
+		end
+		]]
+	else
+		local itemList = {};
+
+		for itemID, enchant, randomProp, uniqID in strgfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
+
+			if (basicLink) then
+				tinsert(itemList, "item:"..itemID..":0:0:0");
+
+			else
+				tinsert(itemList, "item:"..itemID..":"..enchant..":"..randomProp..":"..uniqID);
+			end
+		end
+		return itemList;
 	end
-	return itemList;
 end
 
 --Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
@@ -78,36 +106,47 @@ function getItemLinks(str)
 	if (not str or (not (type(str) == "string"))) then return end
 	local itemList = {};
 
-	for color, itemLink, name in strgfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
-		tinsert(itemList, "|c"..color.."|Hitem:"..itemLink.."|h["..name.."]|h|r");
+	for color, itemHyperLink, name in strgfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
+		tinsert(itemList, "|c"..color.."|Hitem:"..itemHyperLink.."|h["..name.."]|h|r");
 	end
 	return itemList;
 end
 
-function buildLink(hyperlink, quality, name)
+function buildLink(hyperLink, quality, name)
 	local _, hex
 
-	if (type(hyperlink) == "number") then
-		_, hyperlink = GetItemInfo(hyperlink);
+	if (type(hyperLink) == "number") then
+		_, hyperLink = GetItemInfo(hyperLink);
 	end
 
-	if (not hyperlink) then
+	if (not hyperLink) then
 		return;
 	end
 
 	if (not quality) then
-		_, _, quality = GetItemInfo(hyperlink);
+		_, _, quality = GetItemInfo(hyperLink);
 		quality = quality or -1;
 	end
 
 	if (not name) then
-		name = GetItemInfo(hyperlink) or "unknown";
+		name = GetItemInfo(hyperLink) or "unknown";
 	end
 
 	_, _, _, hex = GetItemQualityColor(tonumber(quality));
 
-	return hex.. "|H"..hyperlink.."|h["..name.."]|h|r";
+	return hex.. "|H"..hyperLink.."|h["..name.."]|h|r";
 end
+
+-- Given a Blizzard itemLink, it breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name. Note that this function does not return the numbers in order.
+function breakLink(itemLink)
+	if (not (type(itemLink) == "string")) then
+		return
+	end
+
+	local _, _, itemID, enchant, randomProp, uniqID, name = string.find(itemLink, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
+	return nilZeros(tonumber(itemID)), nilZeros(tonumber(randomProp)), nilZeros(tonumber(enchant)), nilZeros(tonumber(uniqID)), name
+end
+
 --[[
 -- Thanks to Esamynn for his help in modifying this function to work for "at" bigger than a single character.
 -- This function fails with the following text case, so it was replaced with the one below.
@@ -164,12 +203,12 @@ end
 function itemCacheSize()
 	debugprofilestart();
 
-	local link
+	local itemLink
 	local itemsFound = 0;
 
 	for index = 1, Itemizer.Core.Constants.ItemCacheScanCeiling do
-		link = buildLink(index)
-		if (link) then
+		itemLink = buildLink(index)
+		if (itemLink) then
 			itemsFound = itemsFound + 1;
 		end
 	end
@@ -195,6 +234,14 @@ function nilEmptyString(str)
 		return nil;
 	else
 		return str;
+	end
+end
+
+function nilZeros(number)
+	if (number == 0) then
+		return nil;
+	else
+		return number;
 	end
 end
 
@@ -279,34 +326,75 @@ end
 
 	This code was tested, and it is faster than a normal insert and a sort, but it is slower than inserting 1000 items at a time and then sort them afterwards.
 ]]
-function binaryTableInsert(tableToModify, value, compFunction)
+--[[
+function binaryTableInsert(tableToModify, value, compareFunction)
 	if (not (type(tableToModify) == "table")) then
 		return;
 	end
+	EnhTooltip.DebugPrint("Itemizer: binaryTableInsert called");
+	local startTime = GetTime()
 
 	-- Initialise Compare function
-	compFunction = compFunction or function(a,b) return a < b end;
+	compareFunction = compareFunction or function(a,b) return a < b end;
 
 	--  Initialise Numbers
-	local iStart, iEnd, iMid, iState =  1, getn(tableToModify), 1, 0;
+	local startIndex, endIndex, middleIndex, insertSide =  1, getn(tableToModify), 1, 0;
+
+	-- Get Insertposition
+	while startIndex <= endIndex do
+
+		-- calculate middle
+		iMid = floor((startIndex + endIndex) / 2);
+
+		-- compare
+		if compareFunction(value, tableToModify[middleIndex]) then
+			endIndex = middleIndex - 1;
+			insertSide = 0;
+		else
+			startIndex = middleIndex + 1;
+			insertSide = 1;
+		end
+
+		if ((GetTime() - startTime) > 5) then
+			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too ling to complete|r");
+			return
+		end
+	end
+
+	return tinsert(tableToModify, ( middleIndex + insertSide ), value);
+end
+ ]]
+function binaryTableInsert( t, value, fcomp )
+	EnhTooltip.DebugPrint("Itemizer: binaryTableInsert called");
+	local startTime = GetTime()
+	-- Initialise Compare function
+	fcomp = fcomp or function( a, b ) return a < b end
+
+	--  Initialise Numbers
+	local iStart, iEnd, iMid, iState =  1, table.getn( t ), 1, 0
 
 	-- Get Insertposition
 	while iStart <= iEnd do
 
 		-- calculate middle
-		iMid = floor((iStart + iEnd) /2);
+		iMid = math.floor( ( iStart + iEnd )/2 )
 
 		-- compare
-		if compFunction(value, tableToModify[iMid]) then
-			iEnd = iMid - 1;
-			iState = 0;
+		if fcomp( value , t[iMid] ) then
+			iEnd = iMid - 1
+			iState = 0
 		else
-			iStart = iMid + 1;
-			iState = 1;
+			iStart = iMid + 1
+			iState = 1
+		end
+
+		if ((GetTime() - startTime) > 5) then
+			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too ling to complete|r");
+			return
 		end
 	end
 
-	tinsert(tableToModify, ( iMid+iState ), value);
+	table.insert( t, ( iMid+iState ), value )
 end
 
 -- Iterate over numbered global objects
@@ -424,12 +512,21 @@ function hashText(str)
 	return format("%08x", mod(counter, (2^32 - 5))); -- 2^32 - 5 (4,294,967,291): Prime! (and different from the prime in the loop)
 end
 
+function rotateTexture(texture, degrees)
+	local angle = math.rad(degrees);
+	local cos, sin = math.cos(angle), math.sin(angle);
+
+	texture:SetTexCoord((sin - cos) , -(cos + sin), -cos, -sin, sin, -cos, 0, 0);
+end
+
 Itemizer.Util = {
 	Split = split,
 	NilTable = nilTable,
+	NilZeros = nilZeros,
 	HashText = hashText,
-	chatPrint = chatPrint,
+	ChatPrint = chatPrint,
 	BuildLink = buildLink,
+	BreakLink = breakLink,
 	ClearTable = clearTable,
 	PruneTable = pruneTable,
 	DelimitText = delimitText,
@@ -439,7 +536,9 @@ Itemizer.Util = {
 	NilSafeString = nilSafeString,
 	NilSafeNumber = nilSafeNumber,
 	ItemCacheSize = itemCacheSize,
+	RotateTexture = rotateTexture,
 	NilEmptyString = nilEmptyString,
 	GetglobalIterator = getglobalIterator,
+	BinaryTableInsert = binaryTableInsert,
 	GetItemHyperLinks = getItemHyperLinks,
 }

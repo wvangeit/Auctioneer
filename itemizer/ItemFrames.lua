@@ -56,7 +56,6 @@ mainBaseTemplate = {
 		type="Frame",
 		name="$parent",
 		parent="UIParent",
-		inherits=nil,
 		methods = {
 			{ f="Hide" },
 			{ f="SetToplevel", true },
@@ -163,6 +162,7 @@ mainBaseTemplate = {
 				name="$parent_SearchButton",
 				scripts = {
 					OnLoad = "return Itemizer.GUI.SearchButtonOnLoad()",
+					OnClick = "return Itemizer.GUI.SearchButtonOnClick()",
 				},
 				methods = {
 					{ f="SetSize", 80, 32 },
@@ -342,6 +342,103 @@ mainBaseTemplate = {
 		},
 	},
 
+	"Itemizer Sort Frame",
+	{
+		type="Frame",
+		name="$parent_Sort",
+		parent="ItemizerBaseGUI",
+		methods = {
+			{ f="SetToplevel", true },
+			{ f="SetSize", 192, 256 },
+			{ f="EnableMouse", true },
+			{ f="SetFrameStrata", "HIGH" },
+			{ f="SetPoint", "TOPLEFT", "ItemizerBaseGUI_SortButton", "BOTTOMRIGHT", -5, 5 },
+			--[[
+			{ f="SetBackdrop",
+				{
+					tile = true,
+					tileSize = 64,
+					edgeSize = 64,
+					edgeFile = "Interface\\AddOns\\Itemizer\\Art\\ItemizerTooltipBorder",
+					bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+					insets = {
+						top = 8,
+						left = 8,
+						right = 8,
+						bottom = 8,
+					},
+				},
+			},
+			{ f="SetBackdropColor", 0.1, 0.1, 0.5, 0.75 },
+			]]
+			{ f="Hide" },
+		},
+		children = {
+			{
+				type="Texture",
+				methods = {
+					{ f="SetAllPoints", "&parent" },
+					{ f="SetTexture", 0.1, 0.1, 0.5, 0.75 },
+				},
+			},
+			{
+				type="Frame",
+				name="$parent_Anchor",
+				methods = {
+					{ f="SetHeight", 3 },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 10, -12 },
+					{ f="SetPoint", "TOPRIGHT", "$parent", "TOPRIGHT", -10, -12 },
+				},
+			},
+			{
+				type="FontString",
+				name="$parent_FontString_$count",
+				count=12,
+				methods = {
+					{ f="SetHeight", 19 },
+					{ f="SetFontObject", "GameTooltipHeaderText" },
+					{ f="SetPoint", "TOPLEFT", "&prev", "BOTTOMLEFT", 0, 0 },
+					{ f="SetPoint", "RIGHT", "$parent_Anchor", "RIGHT", 0, 0 },
+					{ f="SetText", "FontString #$count" },
+				},
+			},
+			{
+				type="Button",
+				name="$parent_UpButton_$count",
+				count=12,
+				scripts = {
+					OnLoad = "return Itemizer.GUI.SortUpOnLoad()",
+					OnClick = "return Itemizer.GUI.SortUpOnClick()",
+				},
+				methods = {
+					{ f="SetSize", 16, 16 },
+					{ f="SetID", "$count" },
+					{ f="SetPoint", "RIGHT", "$parent_FontString_$count", "RIGHT", -16, 0 },
+					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
+					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
+					{ f="SetHighlightTextureEx", 0.4,0.4,0.5,0.5 },
+				},
+			},
+			{
+				type="Button",
+				name="$parent_DownButton_$count",
+				count=12,
+				scripts = {
+					OnLoad = "return Itemizer.GUI.SortDownOnLoad()",
+					OnClick = "return Itemizer.GUI.SortDownOnClick()",
+				},
+				methods = {
+					{ f="SetSize", 16, 16 },
+					{ f="SetID", "$count" },
+					{ f="SetPoint", "RIGHT", "$parent_FontString_$count", "RIGHT", 0, 0 },
+					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
+					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
+					{ f="SetHighlightTextureEx", 0.4,0.4,0.5,0.5 },
+				},
+			},
+		},
+	},
+
 --[[
 	"Itemizer Test Art Frame",
 	{
@@ -367,96 +464,184 @@ mainBaseTemplate = {
 ]]
 }
 
-sortBaseTemplate = {
-	BaseName = "ItemizerBaseGUI_Sort",
-	Description = "Itemizer Item Sorting Window",
+mainSeachTemplate = {
+	BaseName = "ItemizerSearchGUI",
+	Description = "Itemizer Item Browsing Window",
 
-	"Itemizer Sort Frame",
+	"Itemizer Search Frame",
 	{
 		type="Frame",
 		name="$parent",
-		parent="ItemizerBaseGUI",
-		scripts = {
-			OnLoad = "return Itemizer.GUI.SortOnLoad()",
-		},
+		parent="UIParent",
 		methods = {
-			{ f="SetToplevel", true },
-			{ f="SetSize", 192, 256 },
-			{ f="EnableMouse", true },
-			{ f="SetFrameStrata", "HIGH" },
-			{ f="SetPoint", "TOPLEFT", "ItemizerBaseGUI_SortButton", "BOTTOMRIGHT", -5, 5 },
-			{ f="SetBackdrop",
-				{
-					tile = true,
-					tileSize = 32,
-					edgeSize = 32,
-					edgeFile = "Interface\\Minimap\\TooltipBackdrop",
-					bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
-					insets = {
-						top = 8,
-						left = 8,
-						right = 8,
-						bottom = 8,
-					},
-				},
-			},
-			{ f="SetBackdropColor", 0.1, 0.1, 0.5, 0.75 },
 			{ f="Hide" },
+			{ f="SetToplevel", true },
+			{ f="SetSize", 384, 512 },
+			{ f="SetFrameStrata", "MEDIUM" },
+			{ f="SetPoint", "TOPLEFT", "ItemizerBaseGUI", "TOPLEFT", 400, 0 },
 		},
 		children = {
 			{
-				type="Frame",
-				name="$parent_Anchor",
+				type="Texture", --Main Texture (Dark Blue)
 				methods = {
-					{ f="SetHeight", 4 },
-					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 10, -12 },
-					{ f="SetPoint", "TOPRIGHT", "$parent", "TOPRIGHT", -10, -12 },
-				},
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetTexture", 0, 0, 0.5, 0.75 },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, -67 },
+					{ f="SetPoint", "BOTTOMRIGHT", "&parent", "BOTTOMRIGHT", -32, 0 },
+				}
+			},
+			{
+				type="Texture", --TopLeft corner texture (70% Gray Round Corner)
+				methods = {
+					{ f="SetWidth", 32 },
+					{ f="SetHeight", 32 },
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetVertexColor", 0.7, 0.7, 0.7, 0.8 },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, 0 },
+					{ f="SetTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundCorner" },
+				}
+			},
+			{
+				type="Texture", --Header Texture (70% Gray)
+				methods = {
+					{ f="SetHeight", 35 },
+					{ f="SetTexture", 0.7, 0.7, 0.7, 0.8 },
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 32, 0 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, 0 },
+				}
+			},
+			{
+				type="Texture", --Secondary Header Texture (70% Gray)
+				methods = {
+					{ f="SetHeight", 32 },
+					{ f="SetTexture", 0.7, 0.7, 0.7, 0.8 },
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, -35 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, -35 },
+				}
+			},
+			{
+				type="Texture", --Separator (Black)
+				methods = {
+					{ f="SetHeight", 3 },
+					{ f="SetTexture", 0, 0, 0, 0.8 },
+					{ f="SetDrawLayer", "ARTWORK" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, -32 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, -32 },
+				}
+			},
+			{
+				type="Texture", --Right Texture (Dark Blue)
+				methods = {
+					{ f="SetWidth", 32 },
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetTexture", 0, 0, 0.5, 0.75 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, -64 },
+					{ f="SetPoint", "BOTTOMRIGHT", "&parent", "BOTTOMRIGHT", 0, 32 },
+				}
+			},
+			{
+				type="Texture", --BottomRight corner texture (Dark Blue)
+				methods = {
+					{ f="SetWidth", 32 },
+					{ f="SetHeight", 32 },
+					{ f="RotateTexture", 180 },
+					{ f="SetDrawLayer", "BACKGROUND" },
+					{ f="SetVertexColor", 0, 0, 0.5, 0.75 },
+					{ f="SetPoint", "BOTTOMRIGHT", "&parent", "BOTTOMRIGHT", 0, 0 },
+					{ f="SetTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundCorner" },
+				}
 			},
 			{
 				type="FontString",
-				name="$parent_FontString_$count",
-				count=13,
+				name="$parent_Title",
+				inherits="GameFontNormalHuge",
 				methods = {
-					{ f="SetHeight", 17 },
-					{ f="SetFontObject", "GameTooltipHeaderText" },
-					{ f="SetPoint", "TOPLEFT", "&prev", "BOTTOMLEFT", 0, 0 },
-					{ f="SetPoint", "RIGHT", "$parent_Anchor", "RIGHT", 0, 0 },
-					{ f="SetText", "FontString #$count" },
+					{ f="SetHeight", 30 },
+					{ f="SetJustifyV", "CENTER" },
+					{ f="SetJustifyH", "CENTER" },
+					{ f="SetText", "Itemizer Search" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, 0 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, 0 },
+				}
+			},
+			{
+				type="FontString",
+				name="$parent_NumItems",
+				inherits="GameFontNormalLarge",
+				methods = {
+					{ f="SetHeight", 30 },
+					{ f="SetJustifyV", "CENTER" },
+					{ f="SetJustifyH", "CENTER" },
+					{ f="SetText", "# of Items" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 0, -32 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, -32 },
+				}
+			},
+			{
+				type="Button",
+				name="$parent_ClearButton",
+				scripts = {
+					OnLoad = "return Itemizer.GUI.ClearButtonOnLoad()",
+					OnClick = "return Itemizer.GUI.ClearButtonOnClick()",
+				},
+				methods = {
+					{ f="SetText", "Clear" },
+					{ f="SetSize", 64, 32 },
+					{ f="SetTextFontObject", "GameFontNormalLarge" },
+					{ f="SetPoint", "TOPLEFT", "&parent", "TOPLEFT", 64, -35 },
+					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
+					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
+					{ f="SetHighlightTextureEx", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
 				},
 			},
 			{
 				type="Button",
-				name="$parent_UpButton_$count",
-				count=13,
+				name="$parent_ClearButton2",
 				scripts = {
-					OnLoad = "return Itemizer.GUI.SortUpOnLoad()",
-					OnClick = "return Itemizer.GUI.SortUpOnClick()",
+					--OnLoad = "return Itemizer.GUI.ClearButtonOnLoad()",
+					OnClick = "return Itemizer.GUI.ClearButtonOnClick()",
 				},
 				methods = {
-					{ f="SetSize", 16, 16 },
-					{ f="SetID", "$count" },
-					{ f="SetPoint", "RIGHT", "$parent_FontString_$count", "RIGHT", -16, 0 },
-					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
-					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
-					{ f="SetHighlightTextureEx", 0.4,0.4,0.5,0.5 },
+					{ f="SetText", "Clear" },
+					{ f="SetSize", 64, 32 },
+					{ f="SetTextFontObject", "GameFontNormalLarge" },
+					{ f="SetPoint", "RIGHT", "&prev", "LEFT", 0, 0 },
+					{ f="SetNormalTextureEx", 0, 0, 0.5, 0.75 },
+					{ f="SetPushedTextureEx", 0, 0, 0.5, 0.75 },
+					{ f="SetHighlightTextureEx", 0.6, 0.6, 0.6, 0.1 },
 				},
 			},
 			{
 				type="Button",
-				name="$parent_DownButton_$count",
-				count=13,
+				name="$parent_SearchButton",
 				scripts = {
-					OnLoad = "return Itemizer.GUI.SortDownOnLoad()",
-					OnClick = "return Itemizer.GUI.SortDownOnClick()",
+					OnLoad = "return Itemizer.GUI.SearchItemsButtonOnLoad()",
 				},
 				methods = {
-					{ f="SetSize", 16, 16 },
-					{ f="SetID", "$count" },
-					{ f="SetPoint", "RIGHT", "$parent_FontString_$count", "RIGHT", 0, 0 },
-					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
-					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\UpDownButton" },
+					{ f="SetSize", 80, 32 },
+					{ f="SetText", "Search" },
+					{ f="SetTextFontObject", "GameFontNormalLarge" },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", 0, -35 },
+					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
+					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
+					{ f="SetHighlightTextureEx", "Interface\\AddOns\\Itemizer\\Art\\RoundedButton" },
+				},
+			},
+			{
+				type="Button",
+				name="$parent_CloseButton",
+				scripts = {
+					OnClick = "return this:GetParent():Hide()",
+					OnLoad = "return Itemizer.GUI.CloseButtonOnLoad()",
+				},
+				methods = {
+					{ f="SetSize", 20, 20 },
 					{ f="SetHighlightTextureEx", 0.4,0.4,0.5,0.5 },
+					{ f="SetPoint", "TOPRIGHT", "&parent", "TOPRIGHT", -5, -5 },
+					{ f="SetNormalTexture", "Interface\\AddOns\\Itemizer\\Art\\CloseButton" },
+					{ f="SetPushedTexture", "Interface\\AddOns\\Itemizer\\Art\\CloseButton" },
 				},
 			},
 		},
@@ -466,5 +651,5 @@ sortBaseTemplate = {
 Itemizer.Frames = {
 	CreateFrames = createFrames,
 	MainBaseTemplate = mainBaseTemplate,
-	SortBaseTemplate = sortBaseTemplate,
+	MainSeachTemplate = mainSeachTemplate,
 }

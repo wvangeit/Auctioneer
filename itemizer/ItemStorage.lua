@@ -136,7 +136,7 @@ function storeItemData(itemInfo)
 	if (itemInfo.randomProp) then --We need to treat these separately.
 		local haveItemID, haveRandomProp, randomPropInItem = haveItemData(itemInfo.itemID, itemInfo.randomProp);
 		if (not haveRandomProp) then
-			Itemizer.Util.ChatPrint("Itemizer does not have this randomProp in its cache tables:", itemInfo.randomProp, "Please update your copy of Itemizer."); --%Localize%
+			Itemizer.Util.ChatPrint("Itemizer does not have this randomProp in its cache tables: \""..tostring(itemInfo.randomProp).."\" (From "..itemInfo.itemLink..").\n    Please update your copy of Itemizer."); --%Localize%
 			return;
 		end
 
@@ -207,6 +207,8 @@ function storeItemData(itemInfo)
 		currentItem[7] = equipBonuses;
 		currentItem[8] = metaData;
 	end
+	
+	Itemizer.GUI.AddItemToItemList(itemInfo.itemID, itemInfo.randomProp);
 end
 
 --Use this function to query if we have info for a certain item or not.
@@ -335,13 +337,13 @@ function encodeItemData(itemInfo)
 
 	--Store info from GetItemInfo()
 	baseData = strsub(itemInfo.itemEquipLocation, 9); --Trim the reduntant "INVTYPE_" from the equip location.
-	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.itemLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType);
+	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.minLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType);
 
 	--Store unique status
 	if (itemInfo.isUnique) then
 		baseData = baseData.."§1";
 	else
-		baseData = baseData.."§";
+		baseData = baseData.."§0";
 	end
 
 	--Store binds data
@@ -454,7 +456,7 @@ function encodeItemData(itemInfo)
 	end
 
 	--And finally encode the item's metadata
-	metaData = gameBuildNumberString;
+	metaData = itemInfo.itemRevision;
 
 	local setName = itemInfo.setName
 	if (setName) then
@@ -474,7 +476,7 @@ function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 		return;
 	end
 
-	--Unfourtunatelly we can't reuse tables here.
+	--Unfortunately we can't reuse tables here.
 	local itemInfo = {};
 	itemInfo.tooltip = {};
 	itemInfo.tooltip.leftText = {};
@@ -502,9 +504,9 @@ function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 	if (strfind(metaData, "§")) then
 		local splitMeta = splitString(metaData, "§");
 		itemInfo.setName = ItemizerSets[splitMeta[2]];
-		itemInfo.itemBuildNumberString = splitMeta[1];
+		itemInfo.itemRevision = tonumber(splitMeta[1]);
 	else
-		itemInfo.buildNumber = tonumber(metaData);
+		itemInfo.itemRevision = tonumber(metaData);
 	end
 
 	--Equip Bonuses are next
@@ -553,29 +555,23 @@ function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 
 		--Reintegrate the reduntant "INVTYPE_" to the equip location only if the item has an equipLocation.
 		local equipLoc = splitBase[1];
-		if (not (equipLoc == "")) then
+		if (equipLoc == "") then
+			itemInfo.itemEquipLocation = equipLoc;
+		else
 			itemInfo.itemEquipLocation = "INVTYPE_"..equipLoc;
 		end
 
 		--Retrieve info from GetItemInfo()
 		itemInfo.itemQuality = splitBase[2];
-		itemInfo.itemLevel = splitBase[3];
+		itemInfo.minLevel = splitBase[3];
 		itemInfo.itemType = splitBase[4];
 		itemInfo.itemSubType = splitBase[5];
 
 		--Retrieve unique status
-		if (splitBase[6] == "1") then
-			itemInfo.isUnique = true;
-		else
-			itemInfo.isUnique = false;
-		end
+		itemInfo.isUnique = tonumber(splitBase[6]);
 
-		--Store binds data
-		if (splitBase[7] == "") then
-			itemInfo.binds = false;
-		else
-			itemInfo.binds = splitBase[7];
-		end
+		--Retrieve binds data
+		itemInfo.binds = tonumber(splitBase[7]);
 
 		-- Retrieve type specific information
 		if (equipLoc == "WEAPONMAINHAND"
