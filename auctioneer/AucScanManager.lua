@@ -107,7 +107,6 @@ end
 -- OnEvent handler.
 -------------------------------------------------------------------------------
 function onEventHook(_, event)
-	debugPrint(event);
 	if (event == "AUCTION_HOUSE_CLOSED") then
 		cancelScan();
 	end
@@ -128,7 +127,6 @@ function scan()
 	categories = {};
 	local allCategories = {GetAuctionItemClasses()};
 	for category, name in pairs(allCategories) do
-		debugPrint("Checking category: "..category);
 		if (tostring(Auctioneer.Command.GetFilterVal("scan-class"..category)) == "on") then
 			table.insert(categories, category);
 		end
@@ -221,6 +219,8 @@ end
 -- Adds a request to the back of the queue.
 -------------------------------------------------------------------------------
 function addRequestToQueue(request)
+	request.pages = 0;
+	request.totalAuctions = 0;
 	request.nextPage = 0;
 	request.auctionsScanned = 0;
 	request.state = RequestState.WaitingToQuery;
@@ -250,14 +250,14 @@ end
 -- Sends the next query
 -------------------------------------------------------------------------------
 function sendQuery(request)
-	-- Check if this is the start of the scan.
-	if (request.nextPage == 0) then
-		request.startTime = GetTime();
+	-- If this is the first query of the request, update the UI to say so.
+	if (request.totalAuctions == 0) then
+		BrowseNoResultsText:SetText(string.format(_AUCT('AuctionScanStart'), request.description));
 	end
-	request.state = RequestState.WaitingForQueryResult;
 
 	-- Send the query!
 	debugPrint("Requesting page "..request.nextPage);
+	request.state = RequestState.WaitingForQueryResult;
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
 		request.minLevel,
@@ -271,9 +271,6 @@ function sendQuery(request)
 		10,
 		3,
 		queryCompleteCallback);
-
-	-- Update the progress UI.
-	updateScanProgressUI();
 end
 
 -------------------------------------------------------------------------------
@@ -286,33 +283,54 @@ function queryCompleteCallback(query, result)
 		local request = RequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
 			-- Query succeeded so update the request.
+			debugPrint("Scanned page "..request.nextPage);
 			local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
-			request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
-			if (lastIndexOnPage == 0) then
-				-- Request is complete!
-				debugPrint("Reached page with no auctions");
-				request.state = RequestState.Done;
-				removeRequestFromQueue();
-			elseif (request.nextPage * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
-				-- Request is complete!
-				debugPrint("Reached total number of auctions");
-				request.state = RequestState.Done;
-				removeRequestFromQueue();
-			else
-				-- More pages to go...
-				request.nextPage = request.nextPage + 1;
+			
+			-- Is this the first query?
+			if (request.totalAuctions == 0) then
+				-- This was the first query to get the total number of auctions.
 				request.totalAuctions = totalAuctions;
-				request.totalPages = math.floor((totalAuctions - 1) / NUM_AUCTION_ITEMS_PER_PAGE) + 1;
-				request.state = RequestState.WaitingToQuery;
-
+				request.pages = math.floor((totalAuctions - 1) / NUM_AUCTION_ITEMS_PER_PAGE) + 1;
+				if (request.pages == 1) then
+					-- There's one and only one page. Tally the auctions
+					-- scanned and we are done!
+					request.nextPage = -1;
+					request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
+				else
+					-- More then one page so we'll scan in reverse so as to
+					-- not miss any auctions.
+					request.startTime = GetTime();
+					request.nextPage = request.pages - 1;
+					Auctioneer.QueryManager.ClearPageCache();
+				end
+				debugPrint("Found "..request.totalAuctions.." auctions ("..request.pages.." pages)");
+			else
 				-- Tweak the start time if it happened in less than 5 seconds.
 				local currentTime = GetTime();
 				local timeElapsed = currentTime - request.startTime;
-				local minTimeElapsed = 5.0 * (request.nextPage);
+				local pagesScanned = request.pages - request.nextPage;
+				local minTimeElapsed = 5.0 * (pagesScanned);
+				debugPrint(pagesScanned.." pages scanned thus far in "..timeElapsed);
 				if (timeElapsed < minTimeElapsed) then
 					debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 					request.startTime = currentTime - minTimeElapsed;
 				end
+				updateScanProgressUI();
+
+				-- This was a subsequent query.
+				request.nextPage = request.nextPage - 1;
+				request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
+			end
+			
+			-- Check if the scan is complete.
+			if (request.nextPage < 0) then
+				-- Request is complete!
+				debugPrint("Reached the first page");
+				request.state = RequestState.Done;
+				removeRequestFromQueue();
+			else
+				-- More pages to go...
+				request.state = RequestState.WaitingToQuery;
 			end
 		else
 			-- Query failed!
@@ -448,12 +466,12 @@ function updateScanProgressUI()
 	if (table.getn(RequestQueue) > 0) then
 		local request = RequestQueue[1];
 		
-		-- Check if we've completed two pages worth yet...
-		if (request.nextPage > 0) then
-			-- Calculate the scanning statistics. We ignore the first page in
-			-- our calculations since that skews the numbers.
-			local auctionsScanned = (request.nextPage * NUM_AUCTION_ITEMS_PER_PAGE);
-			local auctionsLeftToScan = (request.totalAuctions - auctionsScanned);
+		-- Check if we've completed a page yet...
+		local pagesScanned = request.pages - request.nextPage;
+		if (pagesScanned > 0) then
+			local auctionsScanned = pagesScanned * NUM_AUCTION_ITEMS_PER_PAGE;
+			local pagesLeftToScan = request.pages - pagesScanned;
+			local auctionsLeftToScan = pagesLeftToScan * NUM_AUCTION_ITEMS_PER_PAGE;
 			local secondsElapsed = (GetTime() - request.startTime);
 			local auctionsScannedPerSecond = math.floor((auctionsScanned * 100) / secondsElapsed) / 100;
 			local secondsLeft = auctionsLeftToScan / auctionsScannedPerSecond;
@@ -462,13 +480,10 @@ function updateScanProgressUI()
 			BrowseNoResultsText:SetText(
 				string.format(_AUCT('AuctionPageN'),
 					request.description,
-					request.nextPage + 1,
-					request.totalPages,
+					request.pages - request.nextPage,
+					request.pages,
 					tostring(auctionsScannedPerSecond),
 					SecondsToTime((secondsLeft))));
-		else
-			-- Not enough information on this request yet to estimate.
-			BrowseNoResultsText:SetText(string.format(_AUCT('AuctionScanStart'), request.description));
 		end
 	end
 end

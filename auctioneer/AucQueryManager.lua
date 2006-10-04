@@ -768,14 +768,6 @@ function addPageToCache(page, updateSnapshot)
 		PageCacheQuery = page.query;
 	end
 
-	-- Toss all pages at or beyond the page being added.
-	for pageNum, cachedPage in pairs(PageCache) do
-		if (cachedPage.pageNum >= page.pageNum) then
-			debugPrint("Removing page "..cachedPage.pageNum.." from the page cache");
-			PageCache[pageNum] = nil;
-		end
-	end
-	
 	-- Add the page to the cache.
 	PageCache[page.pageNum] = page;
 	for _, auction in pairs(page.auctions) do
@@ -1011,4 +1003,5 @@ Auctioneer.QueryManager =
 	IsAuctionValid = isAuctionValid;
 	IsQueryInProgress = isQueryInProgress;
 	CanSendAuctionQuery = canSendAuctionQuery;
+	ClearPageCache = clearPageCache;
 }
