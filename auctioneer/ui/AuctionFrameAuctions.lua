@@ -112,7 +112,7 @@ function onNewAuctionUpdate()
 
 		-- Set the lowest buyout found in the snapshot.
 		local currentLowestBuyout;
-		local auctionWithLowestBuyout = Auctioneer.Statistic.GetAuctionWithLowestBuyout(ahKey, itemKey);
+		local auctionWithLowestBuyout = Auctioneer.Statistic.GetAuctionWithLowestBuyout(itemKey, ahKey);
 		if (auctionWithLowestBuyout) then
 			currentLowestBuyout = Auctioneer.Util.PriceForOne(auctionWithLowestBuyout.buyoutPrice, auctionWithLowestBuyout.count);
 		end
@@ -124,7 +124,7 @@ function onNewAuctionUpdate()
 
 		-- Set the remaining lines.
 		local blizzardPrice = MoneyInputFrame_GetCopper(StartPrice);
-		local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(ahKey, itemKey, count);
+		local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count);
 		debugPrint("Got suggested price for "..itemKey..": bidPrice="..bidPrice.."; buyPrice="..buyPrice.."; marketPrice="..marketPrice.."; warn="..warn);
 
 		local fixedPrice = Auctioneer.FixedPriceDB.GetFixedPrice(itemKey, ahKey);

@@ -487,17 +487,17 @@ function onAuctionAdded(event, auction)
 	-- Update the median buyout price list if there is a buyout.
 	if (buyoutPriceForOne) then
 		--debugPrint("Updating median buyout price list");
-		local medianBuyoutPriceList = getMedianBuyoutPriceList(auction.ahKey, itemKey, true);
+		local medianBuyoutPriceList = getMedianBuyoutPriceList(itemKey, auction.ahKey, true);
 		local medianBuyoutPriceBalancedList = Auctioneer.BalancedList.NewBalancedList(30); -- TODO: Constant
 		medianBuyoutPriceBalancedList.setList(medianBuyoutPriceList);
 		medianBuyoutPriceBalancedList.insert(buyoutPriceForOne);
 		medianBuyoutPriceList = medianBuyoutPriceBalancedList.getList();
-		updateMedianBuyoutPriceList(auction.ahKey, itemKey, medianBuyoutPriceList);
+		updateMedianBuyoutPriceList(itemKey, auction.ahKey, medianBuyoutPriceList);
 	end
 
 	-- Update the item totals.
 	--debugPrint("Updating item totals");
-	local itemTotals = getItemTotals(auction.ahKey, itemKey, true);
+	local itemTotals = getItemTotals(itemKey, auction.ahKey, true);
 	itemTotals.seenCount = itemTotals.seenCount + 1;
 	itemTotals.minCount = itemTotals.minCount + 1;
 	itemTotals.minPrice = itemTotals.minPrice + minPriceForOne;
@@ -509,7 +509,7 @@ function onAuctionAdded(event, auction)
 		itemTotals.buyoutCount = itemTotals.buyoutCount + 1;
 		itemTotals.buyoutPrice = itemTotals.buyoutPrice + buyoutPriceForOne;
 	end
-	updateItemTotals(auction.ahKey, itemKey, itemTotals);
+	updateItemTotals(itemKey, auction.ahKey, itemTotals);
 end
 
 -------------------------------------------------------------------------------
@@ -520,7 +520,7 @@ function onAuctionUpdated(event, newAuction, oldAuction)
 
 	-- If there's a bid on the auction, update the item totals.
 	if (newAuction.bidAmount and newAuction.bidAmount > 0) then
-		local itemTotals = getItemTotals(newAuction.ahKey, itemKey, true);
+		local itemTotals = getItemTotals(itemKey, newAuction.ahKey, true);
 		local newBidPriceForOne = math.floor(newAuction.bidAmount / newAuction.count);
 		if (oldAuction.bidAmount and oldAuction.bidAmount > 0) then
 			local oldBidPriceForOne = math.floor(oldAuction.bidAmount / oldAuction.count);
@@ -529,7 +529,7 @@ function onAuctionUpdated(event, newAuction, oldAuction)
 			itemTotals.bidCount = itemTotals.bidCount + 1;
 			itemTotals.bidPrice = itemTotals.bidPrice + newBidPriceForOne;
 		end
-		updateItemTotals(newAuction.ahKey, itemKey, itemTotals);
+		updateItemTotals(itemKey, newAuction.ahKey, itemTotals);
 	end
 end
 

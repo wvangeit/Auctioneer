@@ -320,7 +320,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Calculate auctioneer's suggested resale price.
-				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(ahKey, itemKey, count);
+				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count);
 				local auctioneerPrice = {};
 				auctioneerPrice.text = _AUCT('UiPriceModelAuctioneer');
 				auctioneerPrice.note = warn;

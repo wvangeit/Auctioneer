@@ -152,7 +152,7 @@ end
 -- Clears the cache for the specified item. If itemKey is nil then the entire
 -- cache for that AH is cleared.
 -------------------------------------------------------------------------------
-function clearCache(ahKey, itemKey)
+function clearCache(itemKey, ahKey)
 	local cache = getCacheForAHKey(ahKey);
 	if (cache) then
 		if (itemKey) then
@@ -178,7 +178,7 @@ function onAuctionAdded(event, auction)
 	local cache = getCacheForAHKey(auction.ahKey, false);
 	if (cache) then
 		local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
-		clearCache(auction.ahKey, itemKey);
+		clearCache(itemKey, auction.ahKey);
 	end
 end
 
@@ -462,7 +462,7 @@ end
 -------------------------------------------------------------------------------
 -- Returns the auction in the snapshot with the lowest buyout price.
 -------------------------------------------------------------------------------
-function getAuctionWithLowestBuyout(ahKey, itemKey)
+function getAuctionWithLowestBuyout(itemKey, ahKey)
 	if (not ahKey) then ahKey = Auctioneer.Util.GetAuctionKey() end
 
 	-- Try to get the list from the cache first.
@@ -477,8 +477,8 @@ function getAuctionWithLowestBuyout(ahKey, itemKey)
 		-- Query the snapshot for all auctions of this item with a buyout.
 		--debugPrint("getAuctionWithLowestBuyout: Cache miss - "..itemKey);
 		local auctions = Auctioneer.SnapshotDB.QueryWithItemKey(
-			ahKey,
 			itemKey,
+			ahKey,
 			function (auction)
 				return (auction.buyoutPrice and auction.buyoutPrice > 0);
 			end);
@@ -517,7 +517,7 @@ function doLow(link)
 
 	if (items) then
 		for pos,itemKey in pairs(items) do
-			local auction = getAuctionWithLowestBuyout(ahKey, itemKey);
+			local auction = getAuctionWithLowestBuyout(itemKey, ahKey);
 			if (not auction) then
 				Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtNoauct'), itemLinks[pos]));
 			else
@@ -646,9 +646,9 @@ function getHSP(itemKey, ahKey)
 	local _, seenCount = getUsableMedian(itemKey, ahKey);
 	seenCount = Auctioneer.Util.NullSafe(seenCount);
 	local hsp, market, warn = determinePrice(
-		ahKey,
 		itemKey,
-		getAuctionWithLowestBuyout(ahKey, itemKey),
+		ahKey,
+		getAuctionWithLowestBuyout(itemKey, ahKey),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-maxless')),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-undermkt')),
@@ -672,7 +672,7 @@ end
 -------------------------------------------------------------------------------
 -- Calcultes the HSP, market price and HSP description for an item.
 -------------------------------------------------------------------------------
-function determinePrice(ahKey, itemKey, auctionWithLowestBuyout, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent)
+function determinePrice(itemKey, ahKey, auctionWithLowestBuyout, lowestAllowedPercentBelowMarket, discountLowPercent, discountMarketPercent, discountNoCompetitionPercent, vendorSellMarkupPercent)
 	local highestSellablePrice = 0;
 	local marketPrice = getMarketPrice(itemKey, ahKey);
 	local warn = _AUCT('FrmtWarnNodata');
@@ -779,7 +779,7 @@ end
 -- which to base a suggestion, this method returns zero for bid, buyout and
 -- market prices.
 -------------------------------------------------------------------------------
-function getSuggestedResale(ahKey, itemKey, count)
+function getSuggestedResale(itemKey, ahKey, count)
 	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
 	local hsp, hspCount, marketPrice, warn = Auctioneer.Statistic.GetHSP(itemKey, ahKey);
 	if (hsp == 0) then
