@@ -31,7 +31,6 @@ local isPlayerOnAccount;
 local stringFromBoolean;
 local booleanFromString;
 local stringFromNumber;
-local numberFromString;
 local nilSafeStringFromString;
 local stringFromNilSafeString;
 local packRecord;
@@ -338,7 +337,6 @@ Auctioneer.Database = {
 	StringFromBoolean = stringFromBoolean;
 	BooleanFromString = booleanFromString;
 	StringFromNumber = stringFromNumber;
-	NumberFromString = numberFromString;
 	NilSafeStringFromString = nilSafeStringFromString;
 	StringFromNilSafeString = stringFromNilSafeString;
 	PackRecord = packRecord;

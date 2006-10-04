@@ -28,7 +28,6 @@
 local stringFromBoolean = Auctioneer.Database.StringFromBoolean;
 local booleanFromString = Auctioneer.Database.BooleanFromString;
 local stringFromNumber = Auctioneer.Database.StringFromNumber;
-local numberFromString = Auctioneer.Database.NumberFromString;
 local nilSafeStringFromString = Auctioneer.Database.NilSafeStringFromString;
 local stringFromNilSafeString = Auctioneer.Database.StringFromNilSafeString;
 
@@ -69,12 +68,12 @@ local MedianMetaData =
 {
 	[1] = {
 		fieldName = "median";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 	[2] = {
 		fieldName = "count";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 };
@@ -83,17 +82,17 @@ local HSPInfoMetaData =
 {
 	[1] = {
 		fieldName = "hsp";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 	[2] = {
 		fieldName = "count";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 	[3] = {
 		fieldName = "market";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 	[4] = {
