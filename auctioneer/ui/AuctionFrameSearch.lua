@@ -1202,7 +1202,7 @@ function AuctionFrameSearch_UpdateButtons(frame)
 			end
 		else
 			frame.bidButton:Disable();
-			frame.buyoutButton:Enable();
+			frame.buyoutButton:Disable();
 		end
 	else
 		frame.bidButton:Disable();
