@@ -26,7 +26,7 @@
 local storePlayerFaction, getTimeLeftString, getSecondsLeftString, unpackSeconds, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, split, getItemLinks, getItems, getItemHyperlinks, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot
 
 function storePlayerFaction()
-	Auctioneer.Core.Constants.PlayerFaction = (UnitFactionGroup("player") or "Alliance");
+	Auctioneer.Core.Constants.PlayerFaction = (Auctioneer.Core.Constants.PlayerFaction or UnitFactionGroup("player") or "Alliance");
 end
 
 -- return the string representation of the given timeLeft constant
