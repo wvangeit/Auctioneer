@@ -440,7 +440,7 @@ end
 -- Creates an item key (itemId:suffixId:enchantId)
 -------------------------------------------------------------------------------
 function createItemKeyFromLink(link)
-	local itemId, suffixId, enchantId = breakItemKey(link);
+	local itemId, suffixId, enchantId = EnhTooltip.BreakLink(link);
 	return createItemKey(itemId, suffixId, enchantId);
 end
 
