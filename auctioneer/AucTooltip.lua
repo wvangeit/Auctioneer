@@ -64,7 +64,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		frame.eDone = 1;
 		local ahKey = Auctioneer.Util.GetAuctionKey();
 		local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(link);
-		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(ahKey, itemKey);
+		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, ahKey);
 
 		-- show auction info
 		if (itemTotals == nil or itemTotals.seenCount == 0) then
@@ -211,7 +211,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 			if (also == ahKey) then return end;
 
-			local itemTotals = Auctioneer.HistoryDB.GetItemTotals(ahKey, itemKey);
+			local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, ahKey);
 
 			if (itemTotals == nil or itemTotals.seenCount == 0) then
 				EnhTooltip.AddLine(string.format(">> ".._AUCT('FrmtInfoNever'), also), nil, embedded);

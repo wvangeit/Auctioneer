@@ -256,8 +256,8 @@ function AuctionFramePost_UpdatePriceModels(frame)
 
 				-- Get player's current lowest starting bid and buyout in the snapshot.
 				local myAuctions = Auctioneer.SnapshotDB.QueryWithItemKey(
-					ahKey,
 					itemKey,
+					ahKey,
 					function (auction)
 						return (auction.buyoutPrice and auction.buyoutPrice > 0 and auction.owner == UnitName("player"));
 					end);
@@ -286,7 +286,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Get the fixed price
-				local fixed = Auctioneer.FixedPriceDB.GetFixedPrice(nil, itemKey);
+				local fixed = Auctioneer.FixedPriceDB.GetFixedPrice(itemKey);
 				if (fixed) then
 					local fixedPrice = {};
 					fixedPrice.text = _AUCT('UiPriceModelFixed');
@@ -359,7 +359,7 @@ function AuctionFramePost_UpdateAuctionList(frame)
 	frame.auctions = {};
 	local itemKey = frame:GetItemKey();
 	if (itemKey) then
-		local snapshotAuctions = Auctioneer.SnapshotDB.QueryWithItemKey(nil, itemKey);
+		local snapshotAuctions = Auctioneer.SnapshotDB.QueryWithItemKey(itemKey);
 		if (snapshotAuctions) then
 			for _, snapshotAuction in pairs(snapshotAuctions) do
 				local auction = frame:AuctionFromSnapshotAuction(snapshotAuction);
@@ -956,7 +956,7 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 		fixedPrice.buyout = buyoutPrice;
 		fixedPrice.count = stackSize;
 		fixedPrice.duration = duration;
-		Auctioneer.FixedPriceDB.SetFixedPrice(nil, itemKey, fixedPrice);
+		Auctioneer.FixedPriceDB.SetFixedPrice(itemKey, nil, fixedPrice);
 	end
 
 	-- Post the auction.

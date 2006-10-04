@@ -1625,21 +1625,21 @@ function clear(param, chatprint)
 	local ahKey = Auctioneer.Util.GetAuctionKey();
 
 	if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
-		Auctioneer.Statistic.ClearCache(ahKey);
-		Auctioneer.SnapshotDB.Clear(ahKey);
-		Auctioneer.HistoryDB.Clear(ahKey);
+		Auctioneer.Statistic.ClearCache(nil, ahKey);
+		Auctioneer.SnapshotDB.Clear(nil, ahKey);
+		Auctioneer.HistoryDB.Clear(nil, ahKey);
 
 	elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
-		Auctioneer.SnapshotDB.Clear(ahKey);
+		Auctioneer.SnapshotDB.Clear(nil, ahKey);
 
 	else
 		local items = Auctioneer.Util.GetItems(param);
 		if (items) then
 			local itemLinks = Auctioneer.Util.GetItemHyperlinks(param);
 			for pos, itemKey in ipairs(items) do
-				Auctioneer.Statistic.ClearCache(ahKey, itemKey);
-				Auctioneer.SnapshotDB.Clear(ahKey, itemKey);
-				Auctioneer.HistoryDB.Clear(ahKey, itemKey);
+				Auctioneer.Statistic.ClearCache(itemKey, ahKey);
+				Auctioneer.SnapshotDB.Clear(itemKey, ahKey);
+				Auctioneer.HistoryDB.Clear(itemKey, ahKey);
 				if (chatprint) then
 					Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
 				end

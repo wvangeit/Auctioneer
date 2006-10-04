@@ -24,12 +24,13 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
+local tonumber = tonumber;
+
 local chatPrint = Auctioneer.Util.ChatPrint;
 local nilSafe = Auctioneer.Database.NilSafeStringFromString;
 local stringFromBoolean = Auctioneer.Database.StringFromBoolean;
 local booleanFromString = Auctioneer.Database.BooleanFromString;
 local stringFromNumber = Auctioneer.Database.StringFromNumber;
-local numberFromString = Auctioneer.Database.NumberFromString;
 local nilSafeStringFromString = Auctioneer.Database.NilSafeStringFromString;
 local stringFromNilSafeString = Auctioneer.Database.StringFromNilSafeString;
 
@@ -105,8 +106,7 @@ local LoadedSnapshotDB;
 local CURRENT_SNAPSHOTDB_VERSION = 1; -- Auctioneer 4.0
 
 -- Map of time left index to time left seconds.
-local TimeLeftInSeconds =
-{
+local TimeLeftInSeconds = {
 	[0] = 0,
 	[1] = 1800,		-- 30 minutes
 	[2] = 7200,		-- 2 hours
@@ -115,116 +115,114 @@ local TimeLeftInSeconds =
 }
 
 -- Schema for records in the auctions table of the snapshot database.
-local AuctionMetaData =
-{
-	[1] = {
+local AuctionMetaData = {
+	{
 		fieldName = "itemId";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "suffixId";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[3] = {
+	{
 		fieldName = "enchantId";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "uniqueId";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[5] = {
+	{
 		fieldName = "count";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[6] = {
+	{
 		fieldName = "minBid";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[7] = {
+	{
 		fieldName = "buyoutPrice";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[8] = {
+	{
 		fieldName = "owner";
 		fromStringFunc = stringFromNilSafeString;
 		toStringFunc = nilSafeStringFromString;
 	},
-	[9] = {
+	{
 		fieldName = "bidAmount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[10] = {
+	{
 		fieldName = "highBidder";
 		fromStringFunc = booleanFromString;
 		toStringFunc = stringFromBoolean;
 	},
-	[11] = {
+	{
 		fieldName = "timeLeft";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[12] = {
+	{
 		fieldName = "lastSeen";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[13] = {
+	{
 		fieldName = "expiration";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 };
 
 -- Schema for records in the update history table of the snapshot database.
-local UpdateMetaData =
-{
-	[1] = {
+local UpdateMetaData = {
+	{
 		fieldName = "date";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "name";
 		fromStringFunc = stringFromNilSafeString;
 		toStringFunc = nilSafeStringFromString;
 	},
-	[3] = {
+	{
 		fieldName = "minLevel";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "maxLevel";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[5] = {
+	{
 		fieldName = "invTypeIndex";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[6] = {
+	{
 		fieldName = "classIndex";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[7] = {
+	{
 		fieldName = "subclassIndex";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[8] = {
+	{
 		fieldName = "qualityIndex";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 };
@@ -255,11 +253,11 @@ end
 -------------------------------------------------------------------------------
 function loadDatabase()
 	-- Create the root AuctioneerSnapshotDB table, if needed.
-	if (AuctioneerSnapshotDB == nil) then
+	if (not AuctioneerSnapshotDB) then
 		AuctioneerSnapshotDB = createDatabase();
 		debugPrint("Created AuctioneerSnapshotDB database");
 	end
-	
+
 	-- Upgrade each realm-faction database, if needed.
 	for ahKey in pairs(AuctioneerSnapshotDB) do
 		if (not upgradeAHDatabase(AuctioneerSnapshotDB[ahKey])) then
@@ -283,14 +281,14 @@ end
 -- Create a brand new database for an auction house key (relam-faction).
 -------------------------------------------------------------------------------
 function createAHDatabase(ahKey)
-	local ah = {};
-	ah.version = CURRENT_SNAPSHOTDB_VERSION;
-	ah.ahKey = ahKey;
-	ah.nextAuctionId = 1;
-	ah.auctions = {};
-	ah.auctionIdsByItemKey = {};
-	ah.updates = {};
-	return ah;
+	return {
+		version = CURRENT_SNAPSHOTDB_VERSION;
+		ahKey = ahKey;
+		nextAuctionId = 1;
+		auctions = {};
+		auctionIdsByItemKey = {};
+		updates = {};
+	}
 end
 
 -------------------------------------------------------------------------------
@@ -299,7 +297,7 @@ end
 -------------------------------------------------------------------------------
 function upgradeAHDatabase(ah)
 	-- Check that we have a valid database.
-	if (ah.version == nil or ah.ahKey == nil) then
+	if (not (ah.version and ah.ahKey)) then
 		return false
 	end
 
@@ -307,7 +305,7 @@ function upgradeAHDatabase(ah)
 	if (ah.version == CURRENT_SNAPSHOTDB_VERSION) then
 		return true;
 	end
-	
+
 	-- Future DB upgrade code goes here...
 	debugPrint("Upgrading snapshot database for "..ah.ahKey);
 
@@ -321,7 +319,7 @@ end
 function getAHDatabase(ahKey, create)
 	-- If no auction house key was provided use the default key for the
 	-- current zone.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = LoadedSnapshotDB[ahKey];
 	if (ah == nil and create) then
 		ah = createAHDatabase(ahKey);
@@ -335,7 +333,7 @@ end
 -- Removes the specified item from the snapshot. Removes all items if itemKey
 -- is nil.
 -------------------------------------------------------------------------------
-function clear(ahKey, itemKey)
+function clear(itemKey, ahKey)
 	local ah = getAHDatabase(ahKey, false);
 	if (ah) then
 		if (itemKey) then
@@ -367,17 +365,17 @@ end
 -------------------------------------------------------------------------------
 function updateForQuery(ahKey, query, auctions, partial)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = getAHDatabase(ahKey, true);
 
 	debugPrint("Updating snapshot "..ahKey.." for query: ");
-	debugPrint("    name="..nilSafeStringFromString(query.name));
-	debugPrint("    minLevel="..stringFromNumber(query.minLevel));
-	debugPrint("    maxLevel="..stringFromNumber(query.maxLevel));
-	debugPrint("    invTypeIndex="..stringFromNumber(query.invTypeIndex));
-	debugPrint("    classIndex="..stringFromNumber(query.classIndex));
-	debugPrint("    subclassIndex="..stringFromNumber(query.subclassIndex));
-	debugPrint("    qualityIndex="..stringFromNumber(query.qualityIndex));
+	debugPrint("    name", query.name);
+	debugPrint("    minLevel", query.minLevel);
+	debugPrint("    maxLevel", query.maxLevel);
+	debugPrint("    invTypeIndex", query.invTypeIndex);
+	debugPrint("    classIndex", query.classIndex);
+	debugPrint("    subclassIndex", query.subclassIndex);
+	debugPrint("    qualityIndex", query.qualityIndex);
 
 	-- Convert the pages into a list of auctions. Auctions get filed first under
 	-- itemKey, then under auctionSignature. We do this so all auctions of the same
@@ -397,12 +395,12 @@ function updateForQuery(ahKey, query, auctions, partial)
 			local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 			local auctionSignature = createAuctionSignatureFromAuction(auction);
 			local auctionsInUpdateBySignature = auctionsInUpdateByItemKey[itemKey];
-			if (auctionsInUpdateBySignature == nil) then
+			if (not auctionsInUpdateBySignature) then
 				auctionsInUpdateBySignature = {};
 				auctionsInUpdateByItemKey[itemKey] = auctionsInUpdateBySignature;
 			end
 			local auctionsInUpdate = auctionsInUpdateBySignature[auctionSignature];
-			if (auctionsInUpdate == nil) then
+			if (not auctionsInUpdate) then
 				auctionsInUpdate = {};
 				auctionsInUpdateBySignature[auctionSignature] = auctionsInUpdate;
 			end
@@ -423,7 +421,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 	-- }
 	local auctionsInSnapshotByItemKey = {};
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
-		if (query == nil or doesItemKeyMatchQuery(itemKey, query)) then
+		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
 			local auctionsInSnapshotBySignature = {};
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
 			for _, auctionId in pairs(auctionIdsForItemKey) do
@@ -432,7 +430,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
 					local auctionSignature = createAuctionSignatureFromAuction(auction);
 					local auctionsInSnapshot = auctionsInSnapshotBySignature[auctionSignature];
-					if (auctionsInSnapshot == nil) then
+					if (not auctionsInSnapshot) then
 						auctionsInSnapshot = {};
 						auctionsInSnapshotBySignature[auctionSignature] = auctionsInSnapshot;
 					end
@@ -443,7 +441,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 			end
 		end
 	end
-	
+
 	-- Now for each signature in the update list, reconcile it against
 	-- the snapshot list for the same signature.
 	for itemKey, auctionsInUpdateBySignature in pairs(auctionsInUpdateByItemKey) do
@@ -454,7 +452,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 			if (auctionsInSnapshotBySignature ~= nil) then
 				auctionsInSnapshot = auctionsInSnapshotBySignature[auctionSignature];
 			end
-			if (auctionsInSnapshot ~= nil) then
+			if (auctionsInSnapshot) then
 				-- Reconcile the auctions in the update against the auctions
 				-- in the snapshot.
 				reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, auctionsInSnapshot, partial);
@@ -471,7 +469,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 		end
 	end
 
-	-- If this isn't a partial update, remove any auctions that didn't match.	
+	-- If this isn't a partial update, remove any auctions that didn't match.
 	if (not partial) then
 		for itemKey, auctionsInSnapshotBySignature in pairs(auctionsInSnapshotByItemKey) do
 			for auctionSignature, auctionsInSnapshot in pairs(auctionsInSnapshotBySignature) do
@@ -479,14 +477,14 @@ function updateForQuery(ahKey, query, auctions, partial)
 				-- If it doesn't exist then we need to remove all auctions in the
 				-- snapshot for the signature.
 				local auctionsInUpdateBySignature = auctionsInUpdateByItemKey[itemKey];
-				if (auctionsInUpdateBySignature == nil or auctionsInUpdateBySignature[auctionSignature] == nil) then
+				if (not (auctionsInUpdateBySignature and auctionsInUpdateBySignature[auctionSignature])) then
 					for _, auction in pairs(auctionsInSnapshot) do
 						removeAuctionFromSnapshot(ah, auction);
 					end
 				end
 			end
 		end
-		
+
 		-- Note the update in the database.
 		addUpdate(ah, query);
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_SNAPSHOT_UPDATE", query);
@@ -498,7 +496,7 @@ end
 -------------------------------------------------------------------------------
 function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = getAHDatabase(ahKey, true);
 	debugPrint("Updating snapshot "..ahKey.." for signature: "..auctionSignature);
 
@@ -519,7 +517,7 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 			end
 		end
 	end
-	
+
 	-- Reconcile the auctions in the update against the auctions
 	-- in the snapshot.
 	reconcileAuctionsForSignature(ah, auctionSignature, auctions, auctionsInSnapshot, partial);
@@ -533,7 +531,7 @@ function updateAuction(auction)
 	local ah = getAHDatabase(auction.ahKey, true);
 	debugPrint("Updating snapshot "..auction.ahKey.." for auction: "..auction.auctionId);
 
-	-- Update the auction in the database if its valid.	
+	-- Update the auction in the database if its valid.
 	if (Auctioneer.QueryManager.IsAuctionValid(auction)) then
 		local auctionInSnapshot = getAuctionById(auction.ahKey, auction.auctionId);
 		if (auctionInSnapshot) then
@@ -554,7 +552,7 @@ function addAuction(auction)
 	local ah = getAHDatabase(auction.ahKey, true);
 	debugPrint("Adding auction to snapshot "..auction.ahKey);
 
-	-- Add the auction to the database if its valid.	
+	-- Add the auction to the database if its valid.
 	if (Auctioneer.QueryManager.IsAuctionValid(auction)) then
 		addAuctionToSnapshot(ah, auction);
 	else
@@ -571,7 +569,7 @@ function removeAuction(auction)
 	local ah = getAHDatabase(auction.ahKey, true);
 	debugPrint("Updating snapshot "..auction.ahKey.." for auction: "..auction.auctionId);
 
-	-- Update the auction in the database.	
+	-- Update the auction in the database.
 	local auctionInSnapshot = getAuctionById(auction.ahKey, auction.auctionId);
 	if (auctionInSnapshot) then
 		removeAuctionFromSnapshot(ah, auctionInSnapshot);
@@ -584,18 +582,18 @@ end
 -------------------------------------------------------------------------------
 function query(ahKey, query, filterFunc, filterArg)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 
 	-- Iterate over the list of auctions and find the matching ones.
 	local matchingAuctions = {};
 	local ah = getAHDatabase(ahKey, true);
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
-		if (query == nil or doesItemKeyMatchQuery(itemKey, query)) then
+		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
 			for _, auctionId in pairs(auctionIdsForItemKey) do
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
-					if (filterFunc == nil or filterFunc(auction, filterArg)) then
+					if ((not filterFunc) or filterFunc(auction, filterArg)) then
 						table.insert(matchingAuctions, auction);
 					end
 				else
@@ -609,9 +607,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function queryWithItemKey(ahKey, itemKey, filterFunc, filterArg)
+function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 
 	-- Iterate over the list of auctions and find the matching ones.
 	local matchingAuctions = {};
@@ -622,7 +620,7 @@ function queryWithItemKey(ahKey, itemKey, filterFunc, filterArg)
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
-				if (filterFunc == nil or filterFunc(auction, filterArg)) then
+				if ((not filterFunc) or filterFunc(auction, filterArg)) then
 					table.insert(matchingAuctions, auction);
 				end
 			else
@@ -636,8 +634,8 @@ end
 -------------------------------------------------------------------------------
 -- Gets a list of auction ids for auctions of the specified item.
 -------------------------------------------------------------------------------
-function getAuctionsForItem(ahKey, itemKey)
-	return queryWithItemKey(ahKey, itemKey);
+function getAuctionsForItem(itemKey, ahKey)
+	return queryWithItemKey(itemKey, ahKey);
 end
 
 -------------------------------------------------------------------------------
@@ -645,7 +643,7 @@ end
 -------------------------------------------------------------------------------
 function getAuctionById(ahKey, auctionId)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = getAHDatabase(ahKey, true);
 
 	-- Lookup the auction for the corresponding id.
@@ -673,23 +671,23 @@ end
 function doesItemKeyMatchQuery(itemKey, query)
 	-- Get the information about the item.
 	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
-	if (itemInfo == nil) then
+	if (not itemInfo) then
 		debugPrint("WARNING: Unable to get item info for itemKey "..itemKey);
 		return false;
 	end
 
 	-- Check if the item info matches the query constraints.
-	if (query.name ~= nil and not Auctioneer.Database.DoesNameMatch(itemInfo.name, query.name, false)) then return false end;
-	if (query.minLevel ~= nil and itemInfo.level < query.minLevel) then return false end;
-	if (query.maxLevel ~= nil and itemInfo.level > query.maxLevel) then return false end;
-	if (query.qualityIndex ~= nil and itemInfo.quality < query.qualityIndex) then return false end;
+	if (query.name and not Auctioneer.Database.DoesNameMatch(itemInfo.name, query.name, false)) then return false end;
+	if (query.minLevel and itemInfo.level < query.minLevel) then return false end;
+	if (query.maxLevel and itemInfo.level > query.maxLevel) then return false end;
+	if (query.qualityIndex and itemInfo.quality < query.qualityIndex) then return false end;
 
 	-- Check the inventory type, sub class and class.
-	if (query.classIndex ~= nil and
+	if (query.classIndex and
 		itemInfo.categoryName ~= Auctioneer.ItemDB.GetCategoryName(query.classIndex)) then return false end;
-	if (query.subclassIndex ~= nil and
+	if (query.subclassIndex and
 		itemInfo.subCategoryName ~= Auctioneer.ItemDB.GetSubCategoryName(query.classIndex, query.subclassIndex)) then return false end;
-	if (query.invTypeIndex ~= nil and
+	if (query.invTypeIndex and
 		itemInfo.inventoryTypeName ~= Auctioneer.ItemDB.GetInventoryTypeName(query.classIndex, query.subclassIndex, query.invTypeIndex)) then return false end;
 
 	-- %todo: Check if its usable...
@@ -712,7 +710,7 @@ function reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, a
 			end
 			return (a.timeLeft < b.timeLeft);
 		end);
-	
+
 	-- Sort the auctions in the snapshot by expiration time and bid amount.
 	table.sort(
 		auctionsInSnapshot,
@@ -732,7 +730,7 @@ function reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, a
 			debugPrint("reconcileAuctionsForSignature() - ignoring invalid auction");
 		end
 	end
-	
+
 	-- Remove any auctions that remain in the snapshot list.
 	if (not partial) then
 		for _, auctionInSnapshot in pairs(auctionsInSnapshot) do
@@ -762,24 +760,24 @@ function reconcileAuction(ah, auctionInUpdate, auctionsInSnapshot)
 			local minTimeLeft = getTimeLeft(TimeLeftInSeconds[auctionInSnapshot.timeLeft - 1] - timeElapsed);
 			local timeUntilExpiration = auctionInSnapshot.expiration - auctionInSnapshot.lastSeen;
 			local maxTimeLeft = getTimeLeft(timeUntilExpiration - timeElapsed + (300 * maxBids));
-			debugPrint("timeUntilExpiration="..timeUntilExpiration.."; timeElapsed="..timeElapsed.."; minTimeLeft="..minTimeLeft.."; timeLeft="..auctionInUpdate.timeLeft.."; maxTimeLeft="..maxTimeLeft);
+			debugPrint("timeUntilExpiration", timeUntilExpiration, "timeElapsed", timeElapsed, "minTimeLeft", minTimeLeft, "timeLeft", auctionInUpdate.timeLeft, "maxTimeLeft", maxTimeLeft);
 
 			-- Check if we have a possible match based on time left.
 			if (minTimeLeft <= auctionInUpdate.timeLeft and auctionInUpdate.timeLeft <= maxTimeLeft) then
 				-- Yep, check for an exact match. We always prefer exact matches
 				-- inexact matches.
-				if (auctionInUpdate.auctionId ~= nil and auctionInUpdate.auctionId == auctionInSnapshot.auctionId) then
+				if (auctionInUpdate.auctionId and auctionInUpdate.auctionId == auctionInSnapshot.auctionId) then
 					bestSnapshotMatchIndex = auctionInSnapshotIndex;
 					debugPrint("Found an exact match (AuctionId)!");
 					break;
-				elseif (auctionInUpdate.auctionId == nil and auctionInUpdate.bidAmount == auctionInSnapshot.bidAmount) then
+				elseif ((not auctionInUpdate.auctionId) and auctionInUpdate.bidAmount == auctionInSnapshot.bidAmount) then
 					bestSnapshotMatchIndex = auctionInSnapshotIndex;
 					debugPrint("Found an exact match (BidAmount)!");
 					break;
 				end
 
 				-- No exact match, but is it a better match than what we have already?
-				if (bestSnapshotMatchIndex == nil) then
+				if (not bestSnapshotMatchIndex) then
 					debugPrint("Found inexact match!");
 					bestSnapshotMatchIndex = auctionInSnapshotIndex
 				else
@@ -813,7 +811,7 @@ end
 -------------------------------------------------------------------------------
 function getTimeLeft(seconds)
 	for timeLeft = 0, 3 do
-		if (seconds < TimeLeftInSeconds[timeLeft]) then
+		if (seconds <= TimeLeftInSeconds[timeLeft]) then
 			return timeLeft;
 		end
 	end
@@ -855,7 +853,7 @@ end
 -------------------------------------------------------------------------------
 function getAuctionIdsForItemKey(ah, itemKey, create)
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
-	if (auctionIdsForItemKey == nil and create) then
+	if ((not auctionIdsForItemKey) and create) then
 		debugPrint("Creating auctionIdsForItemKey["..itemKey.."]");
 		auctionIdsForItemKey = {};
 		ah.auctionIdsByItemKey[itemKey] = auctionIdsForItemKey;
@@ -872,12 +870,12 @@ function addAuctionToSnapshot(ah, auction)
 	auction.expiration = auction.lastSeen + TimeLeftInSeconds[auction.timeLeft];
 	local packedAuction = packAuction(auction);
 	ah.auctions[auction.auctionId] = packedAuction;
-	
+
 	-- Add the auction id to the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, true);
 	table.insert(auctionIdsForItemKey, auction.auctionId);
-	
+
 	-- Fire the auction added event.
 	debugPrint("Added auction "..auction.auctionId.. ": "..packedAuction);
 	Auctioneer.EventManager.FireEvent("AUCTIONEER_AUCTION_ADDED", auction);
@@ -935,7 +933,7 @@ function removeAuctionFromSnapshot(ah, auction)
 			end
 		end
 	end
-	
+
 	-- Fire the auction removed event.
 	debugPrint("Removed auction "..auction.auctionId.. ": "..packAuction(auction));
 	Auctioneer.EventManager.FireEvent("AUCTIONEER_AUCTION_REMOVED", auction);
@@ -963,32 +961,21 @@ end
 -- Checks if an auction is valid.
 -------------------------------------------------------------------------------
 function isValidAuction(auction)
-	if (auction.itemId == nil or
-		auction.suffixId == nil or
-		auction.enchantId == nil or
-		auction.uniqueId == nil or
-		auction.count == nil or
-		auction.minBid == nil or
-		auction.owner == nil or
-		auction.timeLeft == nil) then
-		return false;
-	end
-	return true;
+	return (
+		auction.itemId and auction.suffixId and	auction.enchantId and
+		auction.uniqueId and auction.count and auction.minBid and
+		auction.owner and auction.timeLeft
+	)
 end
 
 -------------------------------------------------------------------------------
 -- Creates an auction signature (itemId:suffixId:enchantId:uniqueId:count:minBid:buyoutPrice:owner)
 -------------------------------------------------------------------------------
 function createAuctionSignatureFromAuction(auction)
-	return 
-		auction.itemId..":"..
-		auction.suffixId..":"..
-		auction.enchantId..":"..
-		auction.uniqueId..":"..
-		auction.count..":"..
-		auction.minBid..":"..
-		auction.buyoutPrice..":"..
-		auction.owner;
+	return
+		auction.itemId..":"..auction.suffixId..":"..auction.enchantId..":"..
+		auction.uniqueId..":"..auction.count..":"..auction.minBid..":"..
+		auction.buyoutPrice..":"..auction.owner;
 end
 
 -------------------------------------------------------------------------------
@@ -996,14 +983,7 @@ end
 -------------------------------------------------------------------------------
 function breakAuctionSignature(auctionSignature)
 	_, _, itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner = string.find(auctionSignature, "(.+):(.+):(.+):(.+):(.+):(.+):(.+):(.+)");
-	itemId = tonumber(itemId);
-	suffixId = tonumber(suffixId);
-	enchantId = tonumber(enchantId);
-	uniqueId = tonumber(uniqueId);
-	count = tonumber(count);
-	minBid = tonumber(minBid);
-	buyoutPrice = tonumber(buyoutPrice);
-	return itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner;
+	return tonumber(itemId), tonumber(suffixId), tonumber(enchantId), tonumber(uniqueId), tonumber(count), tonumber(minBid), tonumber(buyoutPrice), owner;
 end
 
 -------------------------------------------------------------------------------
@@ -1055,7 +1035,7 @@ end
 -------------------------------------------------------------------------------
 function getLastUpdate(ahKey, query)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = getAHDatabase(ahKey, true);
 
 	-- Look for the last update for which the query is a subset.
@@ -1066,7 +1046,7 @@ function getLastUpdate(ahKey, query)
 			return updateAtIndex.date;
 		end
 	end
-	
+
 	return 0;
 end
 
@@ -1108,7 +1088,7 @@ function isUpdateSubsetOfUpdate(subset, set)
 	if (set.qualityIndex ~= 0 and set.qualityIndex > subset.qualityIndex) then
 		return false;
 	end
-	
+
 	-- If we make it this far then it subset really is a subset.
 	return true;
 end
@@ -1118,25 +1098,15 @@ end
 -------------------------------------------------------------------------------
 function createUpdateFromQuery(query)
 	-- Create the new update.
-	local update = {};
-	update.name = query.name;
-	update.minLevel = query.minLevel;
-	update.maxLevel = query.maxLevel;
-	update.invTypeIndex = query.invTypeIndex;
-	update.classIndex = query.classIndex;
-	update.subclassIndex = query.subclassIndex;
-	update.qualityIndex = query.qualityIndex;
-	
-	-- Normalize the update.
-	if (update.name == nil) then update.name = "" end;
-	if (update.minLevel == nil) then update.minLevel = 0 end;
-	if (update.maxLevel == nil) then update.maxLevel = 0 end;
-	if (update.invTypeIndex == nil) then update.invTypeIndex = 0 end;
-	if (update.classIndex == nil) then update.classIndex = 0 end;
-	if (update.subclassIndex == nil) then update.subclassIndex = 0 end;
-	if (update.qualityIndex == nil) then update.qualityIndex = 0 end;
-	
-	return update;
+	return {
+		name = query.name or "";
+		minLevel = query.minLevel or 0;
+		maxLevel = query.maxLevel or 0;;
+		invTypeIndex = query.invTypeIndex or 0;
+		classIndex = query.classIndex or 0;
+		subclassIndex = query.subclassIndex or 0;
+		qualityIndex = query.qualityIndex or 0;
+	};
 end
 
 -------------------------------------------------------------------------------
@@ -1156,21 +1126,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.SnapshotDB] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.SnapshotDB]", unpack(arg));
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.SnapshotDB ~= nil) then return end;
+if (Auctioneer.SnapshotDB) then return end;
 debugPrint("AucSnapshotDB.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.SnapshotDB =
-{
+Auctioneer.SnapshotDB = {
 	Load = load;
 	Clear = clear;
 	UpdateForQuery = updateForQuery;

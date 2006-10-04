@@ -24,11 +24,12 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
+local tonumber = tonumber;
+
 local chatPrint = Auctioneer.Util.ChatPrint;
 local stringFromBoolean = Auctioneer.Database.StringFromBoolean;
 local booleanFromString = Auctioneer.Database.BooleanFromString;
 local stringFromNumber = Auctioneer.Database.StringFromNumber;
-local numberFromString = Auctioneer.Database.NumberFromString;
 local nilSafeStringFromString = Auctioneer.Database.NilSafeStringFromString;
 local stringFromNilSafeString = Auctioneer.Database.StringFromNilSafeString;
 
@@ -102,41 +103,40 @@ local BASE_HISTORYDB_VERSION = 1;
 local CURRENT_HISTORYDB_VERSION = 1;
 
 -- Schema for records in the totals table of the history database.
-local ItemTotalsMetaData =
-{
-	[1] = {
+local ItemTotalsMetaData = {
+	{
 		fieldName = "seenCount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "minCount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[3] = {
+	{
 		fieldName = "minPrice";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "bidCount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[5] = {
+	{
 		fieldName = "bidPrice";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[6] = {
+	{
 		fieldName = "buyoutCount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[7] = {
+	{
 		fieldName = "buyoutPrice";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	}
 };
@@ -177,7 +177,7 @@ function loadDatabase()
 	end
 
 	-- Ensure that AuctioneerHistoryDB exists.
-	if (AuctioneerHistoryDB == nil) then
+	if (not AuctioneerHistoryDB) then
 		debugPrint("Creating new AuctioneerHistoryDB database");
 		AuctioneerHistoryDB = createDatabase();
 	end
@@ -189,7 +189,7 @@ function loadDatabase()
 			AuctioneerHistoryDB[ahKey] = createAHDatabase(ahKey);
 		end
 	end
-	
+
 	-- Make AuctioneerHistoryDB the loaded database!
 	LoadedHistoryDB = AuctioneerHistoryDB;
 end
@@ -226,7 +226,7 @@ end
 -------------------------------------------------------------------------------
 function createAHDatabase(ahKey, version)
 	-- If no version was specified, assume the current version.
-	if (version == nil) then version = CURRENT_HISTORYDB_VERSION end;
+	version = version or CURRENT_HISTORYDB_VERSION;
 
 	-- Create the original version of the database.
 	local ah = {};
@@ -239,7 +239,7 @@ function createAHDatabase(ahKey, version)
 	if (ah.version ~= version) then
 		upgradeAHDatabase(ah, version);
 	end
-	
+
 	return ah;
 end
 
@@ -249,7 +249,7 @@ end
 -------------------------------------------------------------------------------
 function upgradeAHDatabase(ah, version)
 	-- Check that we have a valid database.
-	if (ah.version == nil or ah.ahKey == nil) then
+	if (not (ah.version and ah.ahKey)) then
 		return false
 	end
 
@@ -257,7 +257,7 @@ function upgradeAHDatabase(ah, version)
 	if (ah.version == version) then
 		return true;
 	end
-	
+
 	-- Future DB upgrade code goes here...
 	debugPrint("Upgrading history database for "..ah.ahKey.. " to version "..version);
 
@@ -271,9 +271,9 @@ end
 function getAHDatabase(ahKey, create)
 	-- If no auction house key was provided use the default key for the
 	-- current zone.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = LoadedHistoryDB[ahKey];
-	if (ah == nil and create) then
+	if ((not ah) and (create)) then
 		ah = createAHDatabase(ahKey);
 		LoadedHistoryDB[ahKey] = ah;
 		debugPrint("Created AuctioneerHistoryDB["..ahKey.."]");
@@ -285,7 +285,7 @@ end
 -- Removes the specified item from the database. Removes all items if itemKey
 -- is nil.
 -------------------------------------------------------------------------------
-function clear(ahKey, itemKey)
+function clear(itemKey, ahKey)
 	local ah = getAHDatabase(ahKey, false);
 	if (ah) then
 		if (itemKey) then
@@ -298,7 +298,7 @@ function clear(ahKey, itemKey)
 			LoadedHistoryDB[ah.ahKey] = createAHDatabase(ah.ahKey);
 			debugPrint("Cleared history database for "..ah.ahKey);
 		end
-		
+
 		-- Clear any cached values.
 		cachedItemTotals = nil;
 		cachedItemTotalsItemKey = nil;
@@ -316,11 +316,11 @@ end
 -------------------------------------------------------------------------------
 -- Gets the totals for an item.
 -------------------------------------------------------------------------------
-function getItemTotals(ahKey, itemKey, create)
+function getItemTotals(itemKey, ahKey, create)
 	--debugPrint("Getting item history for: "..ahKey.."-"..itemKey);
 
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 
 	-- Check if we've cached the totals for this item.
 	if (ahKey == cachedItemTotalsAhKey and itemKey == cachedItemTotalsItemKey) then
@@ -348,21 +348,21 @@ function getItemTotals(ahKey, itemKey, create)
 			itemTotals.buyoutPrice = 0;
 		end
 	end
-	
+
 	-- Cache the totals
 	if (itemTotals) then
 		cachedItemTotalsAhKey = ahKey;
 		cachedItemTotalsItemKey = itemKey;
 		cachedItemTotals = itemTotals;
 	end
-	
+
 	return itemTotals;
 end
 
 -------------------------------------------------------------------------------
 -- Updates the totals for an item.
 -------------------------------------------------------------------------------
-function updateItemTotals(ahKey, itemKey, itemTotals)
+function updateItemTotals(itemKey, ahKey, itemTotals)
 	local packedItemTotals = packItemTotals(itemTotals);
 	local ah = getAHDatabase(ahKey, true);
 	ah.totals[itemKey] = packedItemTotals;
@@ -395,9 +395,9 @@ end
 -------------------------------------------------------------------------------
 -- Gets the list of median buyout prices for the item.
 -------------------------------------------------------------------------------
-function getMedianBuyoutPriceList(ahKey, itemKey, create)
+function getMedianBuyoutPriceList(itemKey, ahKey, create)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 
 	-- Check if we've cached the list.
 	if (ahKey == cachedMedianBuyoutPriceListAhKey and itemKey == cachedMedianBuyoutPriceListItemKey) then
@@ -420,7 +420,7 @@ function getMedianBuyoutPriceList(ahKey, itemKey, create)
 			list = buyoutPrices;
 		end
 	end
-	
+
 	-- Cache the list.
 	if (list) then
 		cachedMedianBuyoutPriceListAhKey = ahKey;
@@ -434,9 +434,9 @@ end
 -------------------------------------------------------------------------------
 -- Updates the list of median buyout prices for the item.
 -------------------------------------------------------------------------------
-function updateMedianBuyoutPriceList(ahKey, itemKey, medianBuyoutPriceList)
+function updateMedianBuyoutPriceList(itemKey, ahKey, medianBuyoutPriceList)
 	-- Use the default auction house for the zone if none was provided.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = getAHDatabase(ahKey, true);
 
 	-- Update the list.
@@ -478,7 +478,7 @@ function onAuctionAdded(event, auction)
 	local bidPriceForOne;
 	if (auction.bidAmount and auction.bidAmount > 0) then
 		bidPriceForOne = math.floor(auction.bidAmount / auction.count);
-	end	
+	end
 	local buyoutPriceForOne;
 	if (auction.buyoutPrice and auction.buyoutPrice > 0) then
 		buyoutPriceForOne = math.floor(auction.buyoutPrice / auction.count);
@@ -541,21 +541,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.HistoryDB] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.HistoryDB]", unpack(arg));
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.HistoryDB ~= nil) then return end;
+if (Auctioneer.HistoryDB) then return end;
 debugPrint("AucHistoryDB.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.HistoryDB = 
-{
+Auctioneer.HistoryDB = {
 	Load = load;
 	GetItemTotals = getItemTotals;
 	GetMedianBuyoutPriceList = getMedianBuyoutPriceList;

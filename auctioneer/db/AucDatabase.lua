@@ -51,7 +51,7 @@ local CURRENT_DATABASE_VERSION = 40000;
 -------------------------------------------------------------------------------
 -- Data members
 -------------------------------------------------------------------------------
-AuctionConfig = {};			--Table that stores config settings
+AuctionConfig = {}; --Table that stores config settings
 AuctionConfig.version = CURRENT_DATABASE_VERSION;
 
 -------------------------------------------------------------------------------
@@ -60,7 +60,10 @@ AuctionConfig.version = CURRENT_DATABASE_VERSION;
 -------------------------------------------------------------------------------
 function load()
 	-- Load/Upgrade AuctionConfig.
-	if (AuctionConfig.version == nil) then
+	if (not AuctionConfig) then
+		AuctionConfig = {};
+	end
+	if (not AuctionConfig.version) then
 		AuctionConfig.version = 30000;
 	end
 	Auctioneer.Util.SetFilterDefaults();
@@ -149,8 +152,8 @@ end
 -------------------------------------------------------------------------------
 function isPlayerOnAccount(player)
 	if (not AuctionConfig.players) then AuctionConfig.players = {}; end
-	for _, p in pairs(AuctionConfig.players) do
-		if (p == player) then
+	for _, storedPlayer in pairs(AuctionConfig.players) do
+		if (storedPlayer == player) then
 			return true;
 		end
 	end
@@ -165,8 +168,9 @@ function stringFromBoolean(boolean)
 		return NIL_VALUE;
 	elseif (boolean) then
 		return "1";
+	else
+		return "0";
 	end
-	return "0";
 end
 
 -------------------------------------------------------------------------------
@@ -177,38 +181,27 @@ function booleanFromString(string)
 		return nil;
 	elseif (string == "0") then
 		return false;
+	else
+		return true;
 	end
-	return true;
 end
 
 -------------------------------------------------------------------------------
 -- Converts number into a numeric string.
 -------------------------------------------------------------------------------
 function stringFromNumber(number)
-	if (number == nil) then
+	if (not number) then
 		return NIL_VALUE;
+	else
+		return tostring(number);
 	end
-	return tostring(number);
-end
-
--------------------------------------------------------------------------------
--- Converts numeric string into a number.
--------------------------------------------------------------------------------
-function numberFromString(number)
-	if (number == NIL_VALUE) then
-		return nil;
-	end
-	return tonumber(number);
 end
 
 -------------------------------------------------------------------------------
 -- Converts a string into a nil safe string (nil -> "<nil>")
 -------------------------------------------------------------------------------
 function nilSafeStringFromString(string)
-	if (string == nil) then
-		return NIL_VALUE;
-	end
-	return string;
+	return string or NIL_VALUE;
 end
 
 -------------------------------------------------------------------------------
@@ -217,8 +210,9 @@ end
 function stringFromNilSafeString(nilSafeString)
 	if (nilSafeString == NIL_VALUE) then
 		return nil;
+	else
+		return nilSafeString;
 	end
-	return nilSafeString;
 end
 
 -------------------------------------------------------------------------------
@@ -226,9 +220,9 @@ end
 -------------------------------------------------------------------------------
 function packRecord(record, recordMetaData)
 	local packedRecord;
-	for index, metadata in pairs(recordMetaData) do
+	for index, metadata in ipairs(recordMetaData) do
 		local value = metadata.toStringFunc(record[metadata.fieldName]);
-		if (packedRecord == nil) then
+		if (not packedRecord) then
 			packedRecord = value;
 		else
 			packedRecord = packedRecord..";"..value;
@@ -243,10 +237,10 @@ end
 function unpackRecord(packedRecord, recordMetaData)
 	local record = {};
 	local startOffset = 1;
-	for index, metadata in pairs(recordMetaData) do
+	for index, metadata in ipairs(recordMetaData) do
 		local value;
 		local endOffset = string.find(packedRecord, ";", startOffset, true);
-		if (endOffset == nil) then
+		if (not endOffset) then
 			value = string.sub(packedRecord, startOffset);
 		else
 			value = string.sub(packedRecord, startOffset, endOffset - 1);
@@ -312,7 +306,7 @@ end
 -------------------------------------------------------------------------------
 function doesNameMatch(name1, name2, exact)
 	local match = true;
-	if (name1 ~= nil and name2 ~= nil) then
+	if (name1 and name2) then
 		if (exact) then
 			match = (string.lower(name1) == string.lower(name2));
 		else
@@ -324,21 +318,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.Database] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.Database]", unpack(arg));
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.Database ~= nil) then return end;
+if (Auctioneer.Database) then return end;
 debugPrint("AucDatabase.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.Database = 
-{
+Auctioneer.Database = {
 	Load = load;
 	AddPlayerToAccount = addPlayerToAccount;
 	IsPlayerOnAccount = isPlayerOnAccount;

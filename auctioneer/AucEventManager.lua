@@ -100,8 +100,7 @@ end
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.EventManager =
-{
+Auctioneer.EventManager = {
 	RegisterEvent = registerEvent;
 	UnregisterEvent = unregisterEvent;
 	FireEvent = fireEvent;

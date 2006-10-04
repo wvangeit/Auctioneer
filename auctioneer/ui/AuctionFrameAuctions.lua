@@ -127,7 +127,7 @@ function onNewAuctionUpdate()
 		local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(ahKey, itemKey, count);
 		debugPrint("Got suggested price for "..itemKey..": bidPrice="..bidPrice.."; buyPrice="..buyPrice.."; marketPrice="..marketPrice.."; warn="..warn);
 
-		local fixedPrice = Auctioneer.FixedPriceDB.GetFixedPrice(ahKey, itemKey);
+		local fixedPrice = Auctioneer.FixedPriceDB.GetFixedPrice(itemKey, ahKey);
 		if (fixedPrice) then
 			auctionsSetLine(4, _AUCT('FrmtAuctinfoSugbid'), bidPrice);
 			auctionsSetLine(5, _AUCT('FrmtAuctinfoSugbuy'), buyPrice);
@@ -247,14 +247,14 @@ function AuctPriceRememberCheck_OnClick()
 	end
 
 	if (not AuctPriceRememberCheck:GetChecked()) then
-		Auctioneer.FixedPriceDB.RemoveFixedPrice(nil, currentAuctionItemKey)
+		Auctioneer.FixedPriceDB.RemoveFixedPrice(currentAuctionItemKey)
 	else
 		local fixedPrice = {};
 		fixedPrice.bid = MoneyInputFrame_GetCopper(StartPrice);
 		fixedPrice.buyout = MoneyInputFrame_GetCopper(BuyoutPrice);
 		fixedPrice.count = currentAuctionCount;
 		fixedPrice.duration = AuctionFrameAuctions.duration;
-		Auctioneer.FixedPriceDB.SetFixedPrice(nil, currentAuctionItemKey, fixedPrice);
+		Auctioneer.FixedPriceDB.SetFixedPrice(currentAuctionItemKey, nil, fixedPrice);
 	end
 end
 

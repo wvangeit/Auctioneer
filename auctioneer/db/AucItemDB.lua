@@ -24,11 +24,12 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
+local tonumber = tonumber;
+
 local chatPrint = Auctioneer.Util.ChatPrint;
 local stringFromBoolean = Auctioneer.Database.StringFromBoolean;
 local booleanFromString = Auctioneer.Database.BooleanFromString;
 local stringFromNumber = Auctioneer.Database.StringFromNumber;
-local numberFromString = Auctioneer.Database.NumberFromString;
 local nilSafeStringFromString = Auctioneer.Database.NilSafeStringFromString;
 local stringFromNilSafeString = Auctioneer.Database.StringFromNilSafeString;
 
@@ -95,44 +96,43 @@ local cachedItemInfo;
 local CURRENT_ITEMDB_VERSION = 1; -- Auctioneer 4.0
 
 -- Schema for records in the items table of the item database.
-local ItemInfoMetaData =
-{
-	[1] = {
+local ItemInfoMetaData = {
+	{
 		fieldName = "name";
 		fromStringFunc = stringFromNilSafeString;
 		toStringFunc = stringFromNilSafeString;
 	},
-	[2] = {
+	{
 		fieldName = "quality";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[3] = {
-		fieldName = "level";
-		fromStringFunc = numberFromString;
+	{
+		fieldName = "useLevel";
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "categoryName";
 		fromStringFunc = function(index) return getString(getDatabase().auctionItemClasses, tonumber(index)) end;
 		toStringFunc = function(name) return tostring(getIndex(getDatabase().auctionItemClasses, name, true)) end;
 	},
-	[5] = {
+	{
 		fieldName = "subCategoryName";
 		fromStringFunc = function(index) return getString(getDatabase().auctionItemSubClasses, tonumber(index)) end;
 		toStringFunc = function(name) return tostring(getIndex(getDatabase().auctionItemSubClasses, name, true)) end;
 	},
-	[6] = {
+	{
 		fieldName = "stackCount";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[7] = {
+	{
 		fieldName = "equipLocName";
 		fromStringFunc = function(index) return getString(getDatabase().inventoryTypes, tonumber(index)) end;
 		toStringFunc = function(name) return tostring(getIndex(getDatabase().inventoryTypes, name, true)) end;
 	},
-	[8] = {
+	{
 		fieldName = "textureName";
 		fromStringFunc = function(index) return getString(getDatabase().textures, tonumber(index)) end;
 		toStringFunc = function(name) return tostring(getIndex(getDatabase().textures, name, true)) end;
@@ -182,7 +182,7 @@ end
 -------------------------------------------------------------------------------
 function loadDatabase()
 	-- Create the AuctioneerItemDB table, if needed.
-	if (AuctioneerItemDB == nil) then
+	if (not AuctioneerItemDB) then
 		debugPrint("Creating new AuctioneerItemDB database");
 		AuctioneerItemDB = createDatabase();
 	end
@@ -201,14 +201,14 @@ end
 -- Create a brand new item database.
 -------------------------------------------------------------------------------
 function createDatabase()
-	local db = {};
-	db.version = CURRENT_ITEMDB_VERSION;
-	db.items = {};
-	db.auctionItemClasses = {};
-	db.auctionItemSubClasses = {};
-	db.inventoryTypes = {};
-	db.textures = {};
-	return db;
+	return {
+		version = CURRENT_ITEMDB_VERSION;
+		items = {};
+		auctionItemClasses = {};
+		auctionItemSubClasses = {};
+		inventoryTypes = {};
+		textures = {};
+	};
 end
 
 -------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ end
 -------------------------------------------------------------------------------
 function upgradeDatabase(db)
 	-- Check that we have a valid database.
-	if (db.version == nil) then
+	if (not db.version) then
 		return false
 	end
 
@@ -225,7 +225,7 @@ function upgradeDatabase(db)
 	if (db.version == CURRENT_ITEMDB_VERSION) then
 		return true;
 	end
-	
+
 	-- Future DB upgrade code goes here.
 	debugPrint("Upgrading item database");
 
@@ -251,7 +251,7 @@ end
 -------------------------------------------------------------------------------
 function getItemInfo(itemKey)
 	--debugPrint("Getting item info for: "..itemKey);
-	
+
 	-- Check if we've cached the item info.
 	if (cachedItemInfoKey == itemKey) then
 		--debugPrint("getItemInfo: Cache hit");
@@ -259,12 +259,9 @@ function getItemInfo(itemKey)
 	else
 		--debugPrint("getItemInfo: Cache miss - "..itemKey);
 	end
-	
+
 	-- Nope, gotta get it from the database.
-	local itemInfo = getItemInfoFromBlizzard(itemKey);
-	if (not itemInfo) then
-		itemInfo = getItemInfoFromDatabase(itemKey);
-	end
+	local itemInfo = getItemInfoFromBlizzard(itemKey) or getItemInfoFromDatabase(itemKey);
 	if (itemInfo) then
 		cachedItemInfo = itemInfo;
 		cachedItemInfoKey = itemKey;
@@ -290,16 +287,16 @@ function getItemInfoFromBlizzard(itemKey)
 	local itemString = getItemString(itemKey);
 	local itemName, itemString, itemQuality, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemString);
 	if (itemName) then
-		local itemInfo = {};
-		itemInfo.name = itemName;
-		itemInfo.quality = itemQuality;
-		itemInfo.level = itemMinLevel;
-		itemInfo.categoryName = itemType;
-		itemInfo.subCategoryName = itemSubType;
-		itemInfo.stackCount = itemStackCount;
-		itemInfo.equipLocName = itemEquipLoc;
-		itemInfo.textureName = itemTexture;
-		return itemInfo;
+		return {
+			name = itemName;
+			quality = itemQuality;
+			minLevel = itemMinLevel;
+			categoryName = itemType;
+			subCategoryName = itemSubType;
+			stackCount = itemStackCount;
+			equipLocName = itemEquipLoc;
+			textureName = itemTexture;
+		};
 	end
 end
 
@@ -321,10 +318,9 @@ end
 function getItemLink(itemKey)
 	local itemInfo = getItemInfo(itemKey);
 	if (itemInfo) then
-		local _, _, _, color = GetItemQualityColor(itemInfo.quality);
+		local _, _, _, hexColor = GetItemQualityColor(itemInfo.quality);
 		local itemId, suffixId, enchantId = breakItemKey(itemKey);
-		local name = itemInfo.name;
-		return string.format("%s|Hitem:%s:%s:%s:0|h[%s]|h|r", color, itemId, enchantId, suffixId, name);
+		return string.format("%s|Hitem:%s:%s:%s:0|h[%s]|h|r", hexColor, itemId, enchantId, suffixId, itemInfo.name);
 	end
 end
 
@@ -363,8 +359,7 @@ end
 function isPlayerMade(itemKey)
 	local itemData;
 	if (Informant) then
-		local itemID, itemRand, enchant = Auctioneer.ItemDB.BreakItemKey(itemKey)
-		itemData = Informant.GetItem(itemID)
+		itemData = Informant.GetItem(breakItemKey(itemKey))
 	end
 
 	local reqSkill = 0
@@ -402,25 +397,26 @@ function onAuctionSeen(event, auction)
 		local db = getDatabase();
 		db.items[itemKey] = packItemInfo(itemInfo);
 	end
-	
+
+	local itemLink = getItemLink(itemKey)
 	-- Notify other interested addons that we saw an item link.
-	if (ItemsMatrix_ProcessLinks ~= nil) then
+	if (ItemsMatrix_ProcessLinks) then
 		ItemsMatrix_ProcessLinks(
-				link, -- itemlink
+				itemLink, -- itemlink
 				nil,  -- not used atm
 				nil,  -- vendorprice - TODO: not calculatable in AH?
 				nil	-- event - TODO: donno, maybe only for chatevents?
 		);
 	end
-	if (LootLink_ProcessLinks ~= nil) then
+	if (LootLink_ProcessLinks) then
 		LootLink_ProcessLinks(
-				link, -- itemlink
+				itemLink, -- itemlink
 				true  -- TODO: uncertain? - ah is a trustable source?
 		);
 	end
 	if (Itemizer and Itemizer.ProcessLinks) then
 		Itemizer.ProcessLinks(
-				link, -- itemLink
+				itemLink, -- itemLink
 				true -- The Link comes from the API, which means it doesn't have to be split up
 		);
 	end
@@ -444,7 +440,7 @@ end
 -- Creates an item key (itemId:suffixId:enchantId)
 -------------------------------------------------------------------------------
 function createItemKeyFromLink(link)
-	local itemId, suffixId, enchantId = EnhTooltip.BreakLink(link);
+	local itemId, suffixId, enchantId = breakItemKey(link);
 	return createItemKey(itemId, suffixId, enchantId);
 end
 
@@ -520,21 +516,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.ItemDB] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.ItemDB]", unpack(arg));
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.ItemDB ~= nil) then return end;
+if (Auctioneer.ItemDB) then return end;
 debugPrint("AucItemDB.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.ItemDB = 
-{
+Auctioneer.ItemDB = {
 	Load = load;
 	GetItemInfo = getItemInfo;
 	GetItemName = getItemName;

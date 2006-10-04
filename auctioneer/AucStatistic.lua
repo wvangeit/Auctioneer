@@ -218,7 +218,7 @@ function getItemSnapshotMedianBuyout(itemKey, ahKey)
 
 		-- Query the snapshot and calculate the median.
 		local buyoutPrices = {};
-		local auctions = Auctioneer.SnapshotDB.GetAuctionsForItem(ahKey, itemKey);
+		local auctions = Auctioneer.SnapshotDB.GetAuctionsForItem(itemKey, ahKey);
 		for _, auction in pairs(auctions) do
 			if (auction.buyoutPrice and auction.buyoutPrice > 0) then
 				table.insert(buyoutPrices, auction.buyoutPrice / auction.count);
@@ -253,7 +253,7 @@ function getItemHistoricalMedianBuyout(itemKey, ahKey)
 		unpacked = {};
 
 		-- Get the historical median price list and calculate the median.
-		local medianBuyoutPriceList = Auctioneer.HistoryDB.GetMedianBuyoutPriceList(ahKey, itemKey);
+		local medianBuyoutPriceList = Auctioneer.HistoryDB.GetMedianBuyoutPriceList(itemKey, ahKey);
 		if (medianBuyoutPriceList) then
 			unpacked.median, unpacked.count = getMedian(medianBuyoutPriceList);
 		else
@@ -367,7 +367,7 @@ end
 -------------------------------------------------------------------------------
 function getMeans(itemKey, from)
 	local avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount;
-	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(from, itemKey);
+	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, from);
 	if (itemTotals and itemTotals.seenCount > 0) then
 		avgQty = math.floor(itemTotals.minCount / itemTotals.seenCount);
 		avgMin = math.floor(itemTotals.minPrice / itemTotals.minCount);
@@ -427,7 +427,7 @@ function isBadResaleChoice(auction)
 	-- Get the item info and item historical totals.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
-	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(auction.ahKey, itemKey);
+	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auction.ahKey);
 
 	-- Determine if its a bad choice.
 	if (itemInfo and itemTotals) then
@@ -654,7 +654,8 @@ function getHSP(itemKey, ahKey)
 		tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-undermkt')),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-nocomp')),
-		tonumber(Auctioneer.Command.GetFilterVal('pct-markup')));
+		tonumber(Auctioneer.Command.GetFilterVal('pct-markup'))
+	);
 	
 	-- Cache our calculations
 	local info = {};
@@ -783,7 +784,7 @@ function getSuggestedResale(ahKey, itemKey, count)
 	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
 	local hsp, hspCount, marketPrice, warn = Auctioneer.Statistic.GetHSP(itemKey, ahKey);
 	if (hsp == 0) then
-		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(ahKey, itemKey);
+		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, ahKey);
 		if (itemTotals and itemTotals.buyoutCount > 0) then
 			hsp = math.ceil(itemTotals.buyoutPrice / itemTotals.buyoutCount); -- use mean buyout if median not available
 		end
@@ -803,8 +804,7 @@ end
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.Statistic =
-{
+Auctioneer.Statistic = {
 	Load = load;
 	SubtractPercent = subtractPercent;
 	AddPercent = addPercent;

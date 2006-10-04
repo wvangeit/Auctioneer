@@ -24,8 +24,9 @@
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
+local tonumber = tonumber;
+
 local stringFromNumber = Auctioneer.Database.StringFromNumber;
-local numberFromString = Auctioneer.Database.NumberFromString;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -73,26 +74,25 @@ local BASE_FIXEDPRICEDB_VERSION = 1;
 local CURRENT_FIXEDPRICEDB_VERSION = 1;
 
 -- Schema for records in the fixedPrices table of the price database.
-local FixedPriceMetaData =
-{
-	[1] = {
+local FixedPriceMetaData = {
+	{
 		fieldName = "bid";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "buyout";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[3] = {
+	{
 		fieldName = "count";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "duration";
-		fromStringFunc = numberFromString;
+		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
 };
@@ -128,7 +128,7 @@ function loadDatabase()
 	end
 
 	-- Ensure that AuctioneerFixedPriceDB exists.
-	if (AuctioneerFixedPriceDB == nil) then
+	if (not AuctioneerFixedPriceDB) then
 		debugPrint("Creating new AuctioneerFixedPriceDB database");
 		AuctioneerFixedPriceDB = createDatabase();
 	end
@@ -140,7 +140,7 @@ function loadDatabase()
 			AuctioneerFixedPriceDB[ahKey] = createAHDatabase(ahKey);
 		end
 	end
-	
+
 	-- Make AuctioneerFixedPriceDB the loaded database!
 	LoadedFixedPriceDB = AuctioneerFixedPriceDB;
 end
@@ -175,7 +175,7 @@ end
 -------------------------------------------------------------------------------
 function createAHDatabase(ahKey, version)
 	-- If no version was specified, assume the current version.
-	if (version == nil) then version = CURRENT_FIXEDPRICEDB_VERSION end;
+	version = version or CURRENT_FIXEDPRICEDB_VERSION;
 
 	-- Create the original version of the database.
 	local ah = {};
@@ -187,7 +187,7 @@ function createAHDatabase(ahKey, version)
 	if (ah.version ~= version) then
 		upgradeAHDatabase(ah, version);
 	end
-	
+
 	return ah;
 end
 
@@ -197,7 +197,7 @@ end
 -------------------------------------------------------------------------------
 function upgradeAHDatabase(ah, version)
 	-- Check that we have a valid database.
-	if (ah.version == nil or ah.ahKey == nil) then
+	if (not (ah.version and ah.ahKey)) then
 		return false
 	end
 
@@ -205,7 +205,7 @@ function upgradeAHDatabase(ah, version)
 	if (ah.version == version) then
 		return true;
 	end
-	
+
 	-- Future DB upgrade code goes here...
 	debugPrint("Upgrading price database for "..ah.ahKey.. " to version "..version);
 
@@ -219,9 +219,9 @@ end
 function getAHDatabase(ahKey, create)
 	-- If no auction house key was provided use the default key for the
 	-- current zone.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 	local ah = LoadedFixedPriceDB[ahKey];
-	if (ah == nil and create) then
+	if ((not ah) and (create)) then
 		ah = createAHDatabase(ahKey);
 		LoadedFixedPriceDB[ahKey] = ah;
 		debugPrint("Created AuctioneerFixedPriceDB["..ahKey.."]");
@@ -236,7 +236,7 @@ end
 -------------------------------------------------------------------------------
 -- Gets the fixed price for an item.
 -------------------------------------------------------------------------------
-function getFixedPrice(ahKey, itemKey, create)
+function getFixedPrice(itemKey, ahKey, create)
 	local fixedPrice;
 	local ah = getAHDatabase(ahKey, create);
 	if (ah) then
@@ -257,7 +257,7 @@ end
 -------------------------------------------------------------------------------
 -- Sets the fixed price for an item.
 -------------------------------------------------------------------------------
-function setFixedPrice(ahKey, itemKey, fixedPrice)
+function setFixedPrice(itemKey, ahKey, fixedPrice)
 	local ah = getAHDatabase(ahKey, true);
 	ah.fixedPrices[itemKey] = Auctioneer.Database.PackRecord(fixedPrice, FixedPriceMetaData);
 	debugPrint("Set fixed price for "..itemKey.." to "..fixedPrice.buyout);
@@ -266,7 +266,7 @@ end
 -------------------------------------------------------------------------------
 -- Removes the fixed price.
 -------------------------------------------------------------------------------
-function removeFixedPrice(ahKey, itemKey)
+function removeFixedPrice(itemKey, ahKey)
 	local ah = getAHDatabase(ahKey, true);
 	ah.fixedPrices[itemKey] = nil;
 	debugPrint("Removed fixed price for "..itemKey);
@@ -274,21 +274,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.FixedPriceDB] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.FixedPriceDB]", unpack(arg));
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.FixedPriceDB ~= nil) then return end;
+if (Auctioneer.FixedPriceDB) then return end;
 debugPrint("AucFixedPriceDB.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.FixedPriceDB = 
-{
+Auctioneer.FixedPriceDB = {
 	Load = load;
 	GetFixedPrice = getFixedPrice;
 	SetFixedPrice = setFixedPrice;

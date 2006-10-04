@@ -354,7 +354,7 @@ function getData(itemLink)
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(itemLink);
 	local itemID = Auctioneer.ItemDB.BreakItemKey(itemKey);
 
-	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(auctKey, itemKey);
+	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auctKey);
 	local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey, auctKey);
 	local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey, auctKey);
 	local vendorSell = Auctioneer.API.GetVendorSellPrice(itemID)
