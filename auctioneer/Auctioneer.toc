@@ -22,11 +22,11 @@ AucLocale.lua
 
 AucUtil.lua
 AucEventManager.lua
-db\AucDatabase.lua
-db\AucItemDB.lua
-db\AucSnapshotDB.lua
-db\AucHistoryDB.lua
-db\AucFixedPriceDB.lua
+Database\AucDatabase.lua
+Database\AucItemDatabase.lua
+Database\AucSnapshotDatabase.lua
+Database\AucHistoryDatabase.lua
+Database\AucFixedPriceDatabase.lua
 
 BalancedList.lua
 AucAPI.lua
@@ -44,9 +44,9 @@ AucBidManager.lua
 AucBidScanner.lua
 
 Auctioneer.xml
-ui\AuctioneerUI.xml
-ui\ListTemplate.xml
-ui\AuctionFrameBrowse.xml
-ui\AuctionFrameAuctions.xml
-ui\AuctionFrameSearch.xml
-ui\AuctionFramePost.xml
+UserInterface\AuctioneerUserInterface.xml
+UserInterface\ListTemplate.xml
+UserInterface\AuctionFrameBrowse.xml
+UserInterface\AuctionFrameAuctions.xml
+UserInterface\AuctionFrameSearch.xml
+UserInterface\AuctionFramePost.xml
