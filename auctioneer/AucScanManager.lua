@@ -381,6 +381,7 @@ function scanStarted()
 	-- Scanning has begun!
 	Scanning = true;
 	Auctioneer.Scanning.IsScanningRequested = true;
+	Auctioneer.QueryManager.ClearPageCache();
 	debugPrint("Scan started");
 end
 
