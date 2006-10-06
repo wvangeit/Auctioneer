@@ -290,7 +290,7 @@ function getItemInfoFromBlizzard(itemKey)
 		return {
 			name = itemName;
 			quality = itemQuality;
-			minLevel = itemMinLevel;
+			useLevel = itemMinLevel;
 			categoryName = itemType;
 			subCategoryName = itemSubType;
 			stackCount = itemStackCount;
