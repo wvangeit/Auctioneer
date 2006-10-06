@@ -678,8 +678,8 @@ function doesItemKeyMatchQuery(itemKey, query)
 
 	-- Check if the item info matches the query constraints.
 	if (query.name and not Auctioneer.Database.DoesNameMatch(itemInfo.name, query.name, false)) then return false end;
-	if (query.minLevel and itemInfo.level < query.minLevel) then return false end;
-	if (query.maxLevel and itemInfo.level > query.maxLevel) then return false end;
+	if (query.minLevel and itemInfo.useLevel < query.minLevel) then return false end;
+	if (query.maxLevel and itemInfo.useLevel > query.maxLevel) then return false end;
 	if (query.qualityIndex and itemInfo.quality < query.qualityIndex) then return false end;
 
 	-- Check the inventory type, sub class and class.

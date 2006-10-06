@@ -433,7 +433,7 @@ function isBadResaleChoice(auction)
 		local bidPercent = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
 		if Auctioneer.Core.Constants.BidBasedCategories[itemInfo.categoryName] and bidPercent < Auctioneer.Core.Constants.MinBidPercent then
 			isBadChoice = true; -- bidbased items should have a minimum bid percent
-		elseif (itemInfo.level >= 50 and itemInfo.quality == Auctioneer.Core.Constants.Quality.Uncommon and bidPercent < Auctioneer.Core.Constants.MinBidPercent) then
+		elseif (itemInfo.useLevel >= 50 and itemInfo.quality == Auctioneer.Core.Constants.Quality.Uncommon and bidPercent < Auctioneer.Core.Constants.MinBidPercent) then
 			isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well
 		elseif auction.owner == UnitName("player") then
 			isBadChoice = true; -- don't display auctions that we own
