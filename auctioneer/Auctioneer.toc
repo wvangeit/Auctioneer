@@ -22,7 +22,7 @@ AucLocale.lua
 
 AucUtil.lua
 AucEventManager.lua
-Database\AucDB.lua
+Database\AucDatabase.lua
 Database\AucItemDB.lua
 Database\AucSnapshotDB.lua
 Database\AucHistoryDB.lua
