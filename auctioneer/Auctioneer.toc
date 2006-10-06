@@ -22,11 +22,11 @@ AucLocale.lua
 
 AucUtil.lua
 AucEventManager.lua
-Database\AucDatabase.lua
-Database\AucItemDatabase.lua
-Database\AucSnapshotDatabase.lua
-Database\AucHistoryDatabase.lua
-Database\AucFixedPriceDatabase.lua
+Database\AucDB.lua
+Database\AucItemDB.lua
+Database\AucSnapshotDB.lua
+Database\AucHistoryDB.lua
+Database\AucFixedPriceDB.lua
 
 BalancedList.lua
 AucAPI.lua
