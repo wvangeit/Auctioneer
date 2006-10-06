@@ -339,8 +339,9 @@ function run(request)
 						request.stack = stack1;
 					end
 				else
-					-- Not enough of the item found!
-					chatPrint(_AUCT('FrmtNoEmptyPackSpace'));
+					-- Not enough of the item!
+					local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
+					chatPrint(output);
 					removeRequestFromQueue();
 				end
 			else
@@ -352,9 +353,8 @@ function run(request)
 					pickupContainerItem(stack2.bag, stack2.slot);
 					request.stack = stack2;
 				else
-					-- Not enough of the item!
-					local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
-					chatPrint(output);
+					-- Not enough of the item found!
+					chatPrint(_AUCT('FrmtNoEmptyPackSpace'));
 					removeRequestFromQueue();
 				end
 			end
