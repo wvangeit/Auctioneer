@@ -27,6 +27,7 @@
 local load;
 local postFilterButtonSetTypeHook;
 local postAuctionFrameFiltersUpdateClassesHook;
+local queryForItemByName;
 local debugPrint;
 
 -------------------------------------------------------------------------------
@@ -96,6 +97,28 @@ function BrowseScanButton_OnClick()
 end
 
 -------------------------------------------------------------------------------
+-- Queries the auction house for the specified item name.
+-------------------------------------------------------------------------------
+function queryForItemByName(itemName)
+	if (CanSendAuctionQuery()) then
+		-- Search for the item and switch to the Browse tab.
+		BrowseName:SetText(itemName)
+		BrowseMinLevel:SetText("")
+		BrowseMaxLevel:SetText("")
+		AuctionFrameBrowse.selectedInvtype = nil
+		AuctionFrameBrowse.selectedInvtypeIndex = nil
+		AuctionFrameBrowse.selectedClass = nil
+		AuctionFrameBrowse.selectedClassIndex = nil
+		AuctionFrameBrowse.selectedSubclass = nil
+		AuctionFrameBrowse.selectedSubclassIndex = nil
+		AuctionFrameFilters_Update()
+		IsUsableCheckButton:SetChecked(0)
+		UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+		AuctionFrameBrowse_Search()
+	end
+end
+
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(message)
 	EnhTooltip.DebugPrint("[Auc.BrowseTab] "..message);
@@ -113,4 +136,5 @@ debugPrint("AuctioneerFrameBrowse.lua loaded");
 Auctioneer.UI.BrowseTab = 
 {
 	Load = load;
+	QueryForItemByName = queryForItemByName;
 };

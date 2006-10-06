@@ -41,7 +41,8 @@ local load;
 local postAuctionFrameTab_OnClickHook;
 local onAuctionUpdated;
 local onAuctionRemoved;
-local bidRequestComplete;
+local onBidScanQueued;
+local onBidScanComplete;
 local debugPrint;
 
 -------------------------------------------------------------------------------
@@ -431,6 +432,8 @@ function load()
 	-- Register for auction update notifications.	
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
+	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_BID_SCAN_QUEUED", onBidScanQueued);
+	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_BID_SCAN_COMPLETE", onBidScanComplete);
 	
 	-- Insert the tab
 	Auctioneer.UI.InsertAHTab(AuctionFrameTabSearch, AuctionFrameSearch);
@@ -736,7 +739,7 @@ function AuctionFrameSearch_BidButton_OnClick(button)
 	local result = frame.selectedResult;
 	if (result and result.auctionId and result.bid) then
 		result.status = AUCTION_STATUS_BIDDING;
-		Auctioneer.BidScanner.BidByAuctionId(result.auctionId, bidRequestComplete);
+		Auctioneer.BidScanner.BidByAuctionId(result.auctionId);
 		AuctionFrameSearch_UpdateButtons(frame);
 		AuctionFrameSearch_UpdateStatusWithPendingBids(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
@@ -751,7 +754,7 @@ function AuctionFrameSearch_BuyoutButton_OnClick(button)
 	local result = frame.selectedResult;
 	if (result and result.name and result.count and result.buyout) then
 		result.status = AUCTION_STATUS_BIDDING;
-		Auctioneer.BidScanner.BuyoutByAuctionId(result.auctionId, bidRequestComplete);
+		Auctioneer.BidScanner.BuyoutByAuctionId(result.auctionId);
 		AuctionFrameSearch_UpdateButtons(frame);
 		AuctionFrameSearch_UpdateStatusWithPendingBids(frame);
 		ListTemplateScrollFrame_Update(getglobal(frame.resultsList:GetName().."ScrollFrame"));
@@ -1238,49 +1241,43 @@ end
 -------------------------------------------------------------------------------
 -- An item in the list is clicked.
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_ListItem_OnClick(row)
+function AuctionFrameSearch_ListItem_OnClick(row, button)
 	local frame = this:GetParent():GetParent();
 
 	-- Select the item clicked.
 	frame:SelectResultByIndex(row);
 
-	-- Bid or buyout the item if the alt key is down.
-	if (frame.resultsType and IsAltKeyDown()) then
-		if (IsShiftKeyDown()) then
-			-- Bid or buyout the item.
-			if (frame.resultsType == "BidSearch") then
-				AuctionFrameSearch_BidButton_OnClick(frame.bidButton);
+	if (button == "LeftButton") then
+		-- Bid or buyout the item if the alt key is down.
+		if (frame.resultsType and IsAltKeyDown()) then
+			if (IsShiftKeyDown()) then
+				-- Bid or buyout the item.
+				if (frame.resultsType == "BidSearch") then
+					AuctionFrameSearch_BidButton_OnClick(frame.bidButton);
 
-			elseif (frame.resultsType == "BuyoutSearch") then
-				AuctionFrameSearch_BuyoutButton_OnClick(frame.buyoutButton);
+				elseif (frame.resultsType == "BuyoutSearch") then
+					AuctionFrameSearch_BuyoutButton_OnClick(frame.buyoutButton);
+				end
+
+			elseif (CanSendAuctionQuery()) then
+				-- Search for the item and switch to the Browse tab.
+				Auctioneer.UI.BrowseTab.QueryForItemByName(frame.results[row].name);
+				AuctionFrameTab_OnClick(1);
 			end
 
-		else
-			-- Search for the item and switch to the Browse tab.
-			BrowseName:SetText(frame.results[row].name)
-			BrowseMinLevel:SetText("")
-			BrowseMaxLevel:SetText("")
-			AuctionFrameBrowse.selectedInvtype = nil
-			AuctionFrameBrowse.selectedInvtypeIndex = nil
-			AuctionFrameBrowse.selectedClass = nil
-			AuctionFrameBrowse.selectedClassIndex = nil
-			AuctionFrameBrowse.selectedSubclass = nil
-			AuctionFrameBrowse.selectedSubclassIndex = nil
-			AuctionFrameFilters_Update()
-			IsUsableCheckButton:SetChecked(0)
-			UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-			AuctionFrameBrowse_Search()
-			AuctionFrameTab_OnClick(1);
+		--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for the following codeblocks.
+		elseif (IsControlKeyDown()) then
+			local itemString = Auctioneer.ItemDB.GetItemString(frame.results[row].itemKey);
+			DressUpItemLink(itemString);
+
+		elseif (IsShiftKeyDown() and ChatFrameEditBox:IsVisible()) then
+			local itemLink = Auctioneer.ItemDB.GetItemLink(frame.results[row].itemKey);
+			ChatFrameEditBox:Insert(itemLink);
 		end
-
-	--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for the following codeblocks.
-	elseif (IsControlKeyDown()) then
-		local itemString = Auctioneer.ItemDB.GetItemString(frame.results[row].itemKey);
-		DressUpItemLink(itemString);
-
-	elseif (IsShiftKeyDown() and ChatFrameEditBox:IsVisible()) then
-		local itemLink = Auctioneer.ItemDB.GetItemLink(frame.results[row].itemKey);
-		ChatFrameEditBox:Insert(itemLink);
+	elseif (button == "RightButton") then
+		if (frame.selectedResult) then
+			Auctioneer.UI.AuctionDropDownMenu.Show(frame.selectedResult.auctionId);
+		end
 	end
 end
 
@@ -1427,9 +1424,16 @@ function onAuctionRemoved(event, auction)
 end
 
 -------------------------------------------------------------------------------
--- Called when one of our bid requests completes.
+-- Called when a bid scan is queued.
 -------------------------------------------------------------------------------
-function bidRequestComplete()
+function onBidScanQueued()
+	AuctionFrameSearch:UpdateStatusWithPendingBids();
+end
+
+-------------------------------------------------------------------------------
+-- Called when a bid scan is complete.
+-------------------------------------------------------------------------------
+function onBidScanComplete()
 	AuctionFrameSearch:UpdateStatusWithPendingBids();
 end
 

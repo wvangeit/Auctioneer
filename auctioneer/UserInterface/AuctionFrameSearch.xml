@@ -38,6 +38,9 @@
 			--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for adding cursor support.
 			local scrollFrame = nil
 			local index = nil;
+			<OnLoad>
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
 			<OnEnter>
 				scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
 				index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
@@ -50,7 +53,7 @@
 				index = nil;
 			</OnLeave>
 			<OnClick>
-				AuctionFrameSearch_ListItem_OnClick(index);
+				AuctionFrameSearch_ListItem_OnClick(index, arg1);
 			</OnClick>
 			<OnUpdate>
 				if (index) then

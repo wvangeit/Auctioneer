@@ -1045,6 +1045,19 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 end
 
 -------------------------------------------------------------------------------
+-- An item in the list is clicked.
+-------------------------------------------------------------------------------
+function AuctionFramePost_ListItem_OnClick(row, button)
+	local frame = this:GetParent():GetParent();
+	debugPrint(frame:GetName());
+	if (row and row <= table.getn(frame.auctions)) then
+		if (button == "RightButton") then
+			Auctioneer.UI.AuctionDropDownMenu.Show(frame.auctions[row].auctionId);
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Calculate the deposit required for the specified item.
 -------------------------------------------------------------------------------
 function AuctionFramePost_CalculateAuctionDeposit(itemId, count, duration)

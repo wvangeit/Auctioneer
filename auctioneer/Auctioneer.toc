@@ -50,3 +50,4 @@ UserInterface\AuctionFrameBrowse.xml
 UserInterface\AuctionFrameAuctions.xml
 UserInterface\AuctionFrameSearch.xml
 UserInterface\AuctionFramePost.xml
+UserInterface\AuctionDropDownMenu.xml

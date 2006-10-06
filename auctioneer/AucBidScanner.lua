@@ -214,6 +214,7 @@ function addRequestToQueue(request)
 	request.currentIndex = 1;
 	request.isBuyout = false;
 	table.insert(BidRequestQueue, request);
+	Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SCAN_QUEUED", request);
 	debugPrint("Added request to back of queue");
 end
 
@@ -225,6 +226,7 @@ function removeRequestFromQueue()
 		-- Remove the request from the queue.
 		local request = BidRequestQueue[1];
 		table.remove(BidRequestQueue, 1);
+		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SCAN_COMPLETE", request);
 		debugPrint("Removed request from queue");
 
 		-- Inform the user if no auctions were found.
