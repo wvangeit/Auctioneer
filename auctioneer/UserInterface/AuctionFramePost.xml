@@ -678,7 +678,7 @@
 					</OnClick>
 					<OnUpdate>
 						local itemKey = this:GetParent():GetItemKey();
-						if (itemKey and not Auctioneer.ScanManager.IsScanning()) then
+						if (itemKey and CanSendAuctionQuery()) then
 							this:Enable();
 						else
 							this:Disable();
