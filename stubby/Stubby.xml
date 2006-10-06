@@ -24,9 +24,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="StubbyFrame" parent="UIParent" hidden="true">
 		<Scripts>
 			<OnLoad>
-				this:RegisterEvent("ADDON_LOADED")
-				this:RegisterEvent("VARIABLES_LOADED");
-				this:RegisterEvent("PLAYER_LOGIN");
+				this:RegisterEvent("ADDON_LOADED");
 			</OnLoad>
 			<OnEvent>
 				Stubby.Events(event, arg1)
