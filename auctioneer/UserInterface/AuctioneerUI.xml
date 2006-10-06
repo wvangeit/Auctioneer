@@ -18,8 +18,6 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="AuctioneerUI.lua"/>
-
 	<Frame name="AuctionFrameTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="758" y="447"/>

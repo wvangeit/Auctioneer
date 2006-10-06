@@ -20,8 +20,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Script file="AuctionFrameAuctions.lua"/>
-
 	<Frame name="AuctionInfo" hidden="true">
 		<Size>
 			<AbsDimension x="160" y="80"/>
