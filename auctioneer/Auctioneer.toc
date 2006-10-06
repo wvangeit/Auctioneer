@@ -44,7 +44,7 @@ AucBidManager.lua
 AucBidScanner.lua
 
 Auctioneer.xml
-UserInterface\AuctioneerUserInterface.xml
+UserInterface\AuctioneerUI.xml
 UserInterface\ListTemplate.xml
 UserInterface\AuctionFrameBrowse.xml
 UserInterface\AuctionFrameAuctions.xml
