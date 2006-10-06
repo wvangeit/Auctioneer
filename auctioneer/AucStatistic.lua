@@ -713,7 +713,7 @@ function determinePrice(itemKey, ahKey, auctionWithLowestBuyout, lowestAllowedPe
 		if (auctionWithLowestBuyout) then
 			-- set highest price to "Discount low"
 			debugPrint("Discount low case 2");
-			highestSellablePrice = subtractPercent(auctionWithLowestBuyout.buyout, discountLowPercent);
+			highestSellablePrice = subtractPercent(auctionWithLowestBuyout.buyoutPrice, discountLowPercent);
 			warn = string.format(_AUCT('FrmtWarnUndercut'), discountLowPercent);
 		else
 			-- Use vendor price markup.
