@@ -183,7 +183,7 @@ function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button,
 			local duration = AuctionFrameAuctions.duration
 			local warn = AuctionInfoWarnText:GetText()
 			if (AuctionsCreateAuctionButton:IsEnabled() and IsShiftKeyDown()) then
-				local cHex, cRed, cGreen, cBlue = getWarnColor(warn)
+				local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(warn)
 				warn = ("|c"..cHex..warn.."|r")
 				StartAuction(start, buy, duration);
 				chatPrint(string.format(_AUCT('FrmtAutostart'), link, EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
