@@ -12,8 +12,8 @@
 ##
 
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
-..\Auctioneer\ui\AuctioneerUI.xml
-..\Auctioneer\ui\ListTemplate.xml
+..\Auctioneer\UserInterface\AuctioneerUI.xml
+..\Auctioneer\UserInterface\ListTemplate.xml
 
 Babylonian\Babylonian.lua
 BeanCounterStrings.lua
