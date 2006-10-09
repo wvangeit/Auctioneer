@@ -186,7 +186,6 @@ Section "Auctioneer" Auctioneer
 	File "..\Auctioneer\Sounds\ScanComplete.ogg"
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\Database"
-	File "..\Auctioneer\Database\*.xml"
 	File "..\Auctioneer\Database\*.lua"
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\UserInterface"
