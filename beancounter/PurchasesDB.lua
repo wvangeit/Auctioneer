@@ -892,7 +892,7 @@ function reconcileBidsByBid(item, bid)
 	elseif (doesPendingBidListMatch(pendingBids)) then
 		return reconcileBidList(item, pendingBids, completedBids, false);
 	else
-		debugPrint("Cannot reconcile by quantity");
+		debugPrint("Cannot reconcile by bid");
 	end
 
 	return 0;
@@ -1054,20 +1054,15 @@ function doesPendingBidMatchCompletedBid(pendingBid, completedBid)
 	if (pendingBid.buyerId ~= nil and 
 		completedBid.buyerId ~= nil and
 		completedBid.buyerId ~= pendingBid.buyerId) then
+		--debugPrint("doesPendingBidMatchCompletedBid() - false due to buyer id");
 		return false;
 	end
 
-	-- Check if auction completed in a time frame that makes sense for the
-	-- the time left.
-	if (pendingBid.time + MINIMUM_TIME_LEFT[pendingBid.timeLeft] > completedBid.time or 
-		pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_DURATION_CUSHION < completedBid.time) then
-		return false;
-	end
-	
 	-- Check if the quantities match.
 	if (pendingBid.quantity ~= nil and 
 		completedBid.quantity ~= nil and
 		completedBid.quantity ~= pendingBid.quantity) then
+		--debugPrint("doesPendingBidMatchCompletedBid() - false due to quantity mismatch");
 		return false;
 	end
 
@@ -1075,6 +1070,7 @@ function doesPendingBidMatchCompletedBid(pendingBid, completedBid)
 	if (pendingBid.seller ~= nil and 
 		completedBid.seller ~= nil and
 		completedBid.seller ~= pendingBid.seller) then
+		--debugPrint("doesPendingBidMatchCompletedBid() - false due to seller mismatch");
 		return false;
 	end
 
@@ -1082,9 +1078,25 @@ function doesPendingBidMatchCompletedBid(pendingBid, completedBid)
 	if (pendingBid.isBuyout ~= nil and 
 		completedBid.isBuyout ~= nil and
 		completedBid.isBuyout ~= pendingBid.isBuyout) then
+		--debugPrint("doesPendingBidMatchCompletedBid() - false due to buyout mismatch");
 		return false;
 	end
 
+	-- Check if completed bid was received before the auction should have expired.
+	if (pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_DURATION_CUSHION < completedBid.time) then
+		--debugPrint("doesPendingBidMatchCompletedBid() - false due to max time left");
+		return false;
+	end
+
+	-- If the completed bid was not a buyout, check if the completed bid was
+	-- received after the auction should have expired.
+	if (pendingBid.isBuyout ~= nil and pendingBid.isBuyout == false) then
+		if (pendingBid.time + MINIMUM_TIME_LEFT[pendingBid.timeLeft] > completedBid.time) then
+			--debugPrint("doesPendingBidMatchCompletedBid() - false due to min time left");
+			return false;
+		end
+	end
+	
 	-- If we made it this far, its a possible match!
 	return true;
 end
@@ -1141,69 +1153,6 @@ end
 function debugPrint(message)
 	BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..stringFromNilSafeString(message));
 end
-
---[[
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function testme()
-	addPurchase(time(), "Silver Bar", 10, 1000, "Stupid", false);
-	printPurchases();
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function testme1()
-	resetDatabase();
-
-	addPendingBid("Silver Bar", 1, 3500, "Sucker1", false);
-	addPendingBid("Silver Bar", 1, 3000, "Sucker1", true);
-	addPendingBid("Silver Bar", 1, 4000, "Sucker1", false);
-	addPendingBid("Silver Bar", 2, 3500, "Sucker2", false);
-	addPendingBid("Silver Bar", 2, 3000, "Sucker2", false);
-	addPendingBid("Silver Bar", 2, 4000, "Sucker2", false);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-
-	addSuccessfulBid("Silver Bar", 1, 4000, "Sucker1", false);
-	addSuccessfulBid("Silver Bar", 1);
-	addSuccessfulBid("Silver Bar", 1);
-	addFailedBid("Silver Bar", 4000);
-	addFailedBid("Silver Bar", 3000);
-	addFailedBid("Silver Bar", 3500);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function testme2()
-	resetDatabase();
-
-	addPendingBid("Silver Bar", 1, 3500, "Sucker", false);
-	addPendingBid("Silver Bar", 1, 3500, "Sucker", false);
-	addPendingBid("Silver Bar", 1, 3500, "Sucker", false);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-
-	addSuccessfulBid("Silver Bar", 1);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-
-	addFailedBid("Silver Bar", 3500);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-
-	addSuccessfulBid("Silver Bar", 1);
-	printPendingBids();
-	printCompletedBids();
-	printPurchases();
-end
---]]
 
 -------------------------------------------------------------------------------
 -- Public API
