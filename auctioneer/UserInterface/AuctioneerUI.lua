@@ -43,8 +43,7 @@ local debugPrint;
 -------------------------------------------------------------------------------
 AuctioneerCursorItem = nil;
 
-MoneyTypeInfo["AUCTIONEER"] =
-{
+MoneyTypeInfo["AUCTIONEER"] = {
 	UpdateFunc = function()
 		return this.staticMoney;
 	end,
@@ -58,7 +57,7 @@ MoneyTypeInfo["AUCTIONEER"] =
 function load()
 	-- Register for functions and methods we need locally.
 	Stubby.RegisterFunctionHook("PickupContainerItem", 200, postPickupContainerItemHook);
-	
+
 	-- Blizzard's auction UI may or may not have been loaded yet.
 	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
 		onAuctionUILoaded();
@@ -78,7 +77,7 @@ end
 
 -------------------------------------------------------------------------------
 -- Called when Auctioneer is loaded if Blizzard_AuctionUI is loaded. Otherwise
--- this method is called when we receive the ADDON_LOADED event for 
+-- this method is called when we receive the ADDON_LOADED event for
 -- Blizzard_AuctionUI.
 -------------------------------------------------------------------------------
 function onAuctionUILoaded()
@@ -353,7 +352,8 @@ end
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer and Auctioneer.UI) then return end;
+if (not Auctioneer) then return end;
+if (Auctioneer.UI) then return end;
 debugPrint("AuctioneerUI.lua loaded");
 
 -------------------------------------------------------------------------------
