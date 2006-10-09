@@ -18,7 +18,7 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Frame name="AuctionFrameTemplate" virtual="true">
+	<Frame name="AuctionFrameTemplate" hidden="true" virtual="true">
 		<Size>
 			<AbsDimension x="758" y="447"/>
 		</Size>
@@ -44,7 +44,7 @@
 		</Frames>
 	</Frame>
 
-	<Frame name="AuctioneerMoneyInputFrameTemplate" virtual="true">
+	<Frame name="AuctioneerMoneyInputFrameTemplate" hidden="true" virtual="true">
 		<Size>
 			<AbsDimension x="176" y="18"/>
 		</Size>
@@ -326,7 +326,7 @@
 		</Frames>
 	</Frame>
 
-	<CheckButton name="AuctioneerRadioButtonTemplate" virtual="true">
+	<CheckButton name="AuctioneerRadioButtonTemplate" hidden="true" virtual="true">
 		<Size>
 			<AbsDimension x="16" y="16"/>
 		</Size>
@@ -353,5 +353,4 @@
 			<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
 		</CheckedTexture>
 	</CheckButton>
-
 </Ui>

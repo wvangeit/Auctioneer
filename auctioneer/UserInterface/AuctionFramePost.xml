@@ -18,7 +18,7 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Button name="PostListItemTemplate" inherits="ListItemTemplate" virtual="true">
+	<Button name="PostListItemTemplate" inherits="ListItemTemplate" hidden="true" virtual="true">
 		<Scripts>
 			<OnLoad>
 				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");

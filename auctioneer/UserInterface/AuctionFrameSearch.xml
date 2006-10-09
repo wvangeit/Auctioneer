@@ -18,7 +18,7 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Frame name="SearchParametersTemplate" virtual="true">
+	<Frame name="SearchParametersTemplate" hidden="true" virtual="true">
 		<Anchors>
 			<Anchor point="TOPLEFT">
 				<Offset>
@@ -31,7 +31,7 @@
 		</Size>
 	</Frame>
 
-	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" virtual="true">
+	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" hidden="true" virtual="true">
 		<Scripts>
 			--Thanks to Miravlix (from irc://irc.datavertex.com/cosmostesters) for adding cursor support.
 			local scrollFrame = nil
