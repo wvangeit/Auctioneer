@@ -353,14 +353,13 @@ end
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.UI ~= nil) then return end;
+if (Auctioneer and Auctioneer.UI) then return end;
 debugPrint("AuctioneerUI.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.UI = 
-{
+Auctioneer.UI = {
 	Load = load;
 	InsertAHTab = insertAHTab;
 	GetCursorContainerItem = getCursorContainerItem;

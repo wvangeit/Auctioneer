@@ -317,5 +317,3 @@ function  ListTemplate_DropDownItem_OnClick()
 		ListTemplateScrollFrame_Update(getglobal(frame:GetName().."ScrollFrame"));
 	end
 end
-
-
