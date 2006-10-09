@@ -340,7 +340,7 @@ function clear(itemKey, ahKey)
 			-- Remove the specified item from the database.
 			local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 			if (auctionIdsForItemKey) then
-				for _, auctionId in pairs(auctionIdsForItemKey) do
+				for _, auctionId in ipairs(auctionIdsForItemKey) do
 					ah.auctions[auctionId] = nil;
 				end
 			end
@@ -388,7 +388,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 	--     ...
 	-- }
 	local auctionsInUpdateByItemKey = {};
-	for _, auction in pairs(auctions) do
+	for _, auction in ipairs(auctions) do
 		if (isValidAuction(auction)) then
 			-- Get the list of auctions in the update for this signature and
 			-- add this auction to the list.
@@ -424,7 +424,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
 			local auctionsInSnapshotBySignature = {};
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
-			for _, auctionId in pairs(auctionIdsForItemKey) do
+			for _, auctionId in ipairs(auctionIdsForItemKey) do
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -462,7 +462,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 			else
 				-- No auctions for this item in the snapshot. Just add
 				-- all the auctions from the update.
-				for index, auction in pairs(auctionsInUpdate) do
+				for index, auction in ipairs(auctionsInUpdate) do
 					addAuctionToSnapshot(ah, auction);
 				end
 			end
@@ -478,7 +478,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 				-- snapshot for the signature.
 				local auctionsInUpdateBySignature = auctionsInUpdateByItemKey[itemKey];
 				if (not (auctionsInUpdateBySignature and auctionsInUpdateBySignature[auctionSignature])) then
-					for _, auction in pairs(auctionsInSnapshot) do
+					for _, auction in ipairs(auctionsInSnapshot) do
 						removeAuctionFromSnapshot(ah, auction);
 					end
 				end
@@ -505,7 +505,7 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	local itemKey = createItemKeyFromAuctionSignature(auctionSignature);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		for _, auctionId in pairs(auctionIdsForItemKey) do
+		for _, auctionId in ipairs(auctionIdsForItemKey) do
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -589,7 +589,7 @@ function query(ahKey, query, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
-			for _, auctionId in pairs(auctionIdsForItemKey) do
+			for _, auctionId in ipairs(auctionIdsForItemKey) do
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -616,7 +616,7 @@ function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, false);
 	if (auctionIdsForItemKey) then
-		for _, auctionId in pairs(auctionIdsForItemKey) do
+		for _, auctionId in ipairs(auctionIdsForItemKey) do
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -705,10 +705,13 @@ function reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, a
 	table.sort(
 		auctionsInUpdate,
 		function(a, b)
-			if (a.timeLeft == b.timeLeft) then
-				return (a.bidAmount < b.bidAmount);
+			if (a.dup == b.dup) then
+				if (a.timeLeft == b.timeLeft) then
+					return (a.bidAmount < b.bidAmount);
+				end
+				return (a.timeLeft < b.timeLeft);
 			end
-			return (a.timeLeft < b.timeLeft);
+			return (not a.dup)
 		end);
 
 	-- Sort the auctions in the snapshot by expiration time and bid amount.
@@ -722,7 +725,7 @@ function reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, a
 		end);
 
 	-- Reconcile each auction in the update against the auctions in the snapshot.
-	for _, auctionInUpdate in pairs(auctionsInUpdate) do
+	for _, auctionInUpdate in ipairs(auctionsInUpdate) do
 		-- Ignore invalid auctions so we can keep the database clean.
 		if (Auctioneer.QueryManager.IsAuctionValid(auctionInUpdate)) then
 			reconcileAuction(ah, auctionInUpdate, auctionsInSnapshot);
@@ -733,7 +736,7 @@ function reconcileAuctionsForSignature(ah, auctionSignature, auctionsInUpdate, a
 
 	-- Remove any auctions that remain in the snapshot list.
 	if (not partial) then
-		for _, auctionInSnapshot in pairs(auctionsInSnapshot) do
+		for _, auctionInSnapshot in ipairs(auctionsInSnapshot) do
 			removeAuctionFromSnapshot(ah, auctionInSnapshot);
 		end
 		auctionInSnapshot = {};
@@ -747,7 +750,7 @@ end
 -------------------------------------------------------------------------------
 function reconcileAuction(ah, auctionInUpdate, auctionsInSnapshot)
 	local bestSnapshotMatchIndex;
-	for auctionInSnapshotIndex, auctionInSnapshot in pairs(auctionsInSnapshot) do
+	for auctionInSnapshotIndex, auctionInSnapshot in ipairs(auctionsInSnapshot) do
 		-- The bid amount of the updated auction must be greater than or equal to the bid
 		-- amount of the snapshot auction in order to match.
 		if (auctionInUpdate.bidAmount >= auctionInSnapshot.bidAmount) then
@@ -801,8 +804,10 @@ function reconcileAuction(ah, auctionInUpdate, auctionsInSnapshot)
 	if (bestSnapshotMatchIndex) then
 		updateAuctionInSnapshot(ah, auctionsInSnapshot[bestSnapshotMatchIndex], auctionInUpdate);
 		table.remove(auctionsInSnapshot, bestSnapshotMatchIndex);
-	else
+	elseif (not auctionInUpdate.dup) then
 		addAuctionToSnapshot(ah, auctionInUpdate);
+	else
+		debugPrint("Omitting auction from snapshot because it might be a dup");
 	end
 end
 
@@ -835,7 +840,7 @@ function getMaxBids(auctionInSnapshot, auctionInUpdate)
 			maxBids = maxBids + 1;
 		end
 	end
-	debugPrint("Calculated maxBids to be "..maxBids);
+	--debugPrint("Calculated maxBids to be "..maxBids);
 	return maxBids;
 end
 
@@ -888,11 +893,10 @@ function updateAuctionInSnapshot(ah, oldAuction, newAuction)
 	-- Update the auction.
 	newAuction.auctionId = oldAuction.auctionId;
 	if (newAuction.timeLeft == oldAuction.timeLeft and newAuction.bidAmount == oldAuction.bidAmount) then
-		-- It still has the same bid and time left, so subtract the differnce
-		-- in timeSeen from the estimated expiration.
+		-- Add 5 minutes to the expiration for each possible bid.
 		local maxAddedTime = getMaxBids(oldAuction, newAuction) * 300;
-		newAuction.expiration = oldAuction.expiration - (newAuction.lastSeen - oldAuction.lastSeen) + maxAddedTime;
-		-- Check that we didn't add to much added time.
+		newAuction.expiration = oldAuction.expiration + maxAddedTime;
+		-- Check that we didn't add too much time.
 		if (TimeLeftInSeconds[newAuction.timeLeft] < (newAuction.expiration - newAuction.lastSeen)) then
 			newAuction.expiration = newAuction.lastSeen + TimeLeftInSeconds[newAuction.timeLeft];
 		end
@@ -926,7 +930,7 @@ function removeAuctionFromSnapshot(ah, auction)
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, false);
 	if (auctionIdsForItemKey) then
-		for index, auctionId in pairs(auctionIdsForItemKey) do
+		for index, auctionId in ipairs(auctionIdsForItemKey) do
 			if (auctionId == auction.auctionId) then
 				table.remove(auctionIdsForItemKey, index);
 				break;
