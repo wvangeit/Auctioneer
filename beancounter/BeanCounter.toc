@@ -9,10 +9,11 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id: $
 ## URL: http://auctioneeraddon.com/
-##
 
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
+..\Auctioneer\UserInterface\AuctioneerUI.lua
 ..\Auctioneer\UserInterface\AuctioneerUI.xml
+..\Auctioneer\UserInterface\ListTemplate.lua
 ..\Auctioneer\UserInterface\ListTemplate.xml
 
 Babylonian\Babylonian.lua
