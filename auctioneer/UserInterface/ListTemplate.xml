@@ -18,7 +18,7 @@
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
-	<Button name="ListSortButtonTemplate" hidden="true" virtual="true">
+	<Button name="ListSortButtonTemplate" virtual="true">
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
@@ -92,7 +92,7 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="ListSortDropDownTemplate" hidden="true" virtual="true">
+	<Button name="ListSortDropDownTemplate" virtual="true">
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentLeft" file="Interface\FriendsFrame\WhoFrame-ColumnTabs">
@@ -310,7 +310,7 @@
 		</Frames>
 	</Button>
 
-	<Frame name="ListTemplate" hidden="true" virtual="true">
+	<Frame name="ListTemplate" virtual="true">
 		<Frames>
 			<Button name="$parentColumn1Sort" inherits="ListSortButtonTemplate">
 				<Size>
