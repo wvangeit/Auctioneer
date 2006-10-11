@@ -53,6 +53,8 @@ local doQueriesMatch;
 local doAuctionsMatchQuery;
 local reconcileAuctionLists;
 local addPageToCache;
+local getAuctionsInCache;
+local checkForDups;
 local clearPageCache;
 local getAuctionId;
 local isAuctionValid;
@@ -92,6 +94,7 @@ local PageCacheQuery = {};
 --     query					-- query parameters
 --     pageNum;					-- page number
 --     isLastPage;				-- true if this is the last page for the search
+--     lastSeen					-- time the page was seen
 --     auctions[IndexOnPage]	-- list of auctions on the page.
 --     {
 --         auctionId;			-- nil unless the snapshot has been updated
@@ -517,6 +520,7 @@ function onAuctionItemListUpdate()
 		CurrentPage = {};
 		CurrentPage.query = request.parameters;
 		CurrentPage.pageNum = request.parameters.page;
+		CurrentPage.lastSeen = time();
 		CurrentPage.auctions = updatedAuctions;
 		CurrentPage.isLastPage = false;
 		if (lastIndexOnPage == 0) then
@@ -785,18 +789,65 @@ function addPageToCache(page, updateSnapshot)
 				break;
 			elseif (page.isLastPage) then
 				debugPrint("Seen all "..(pageNum + 1).." page(s), updating snapshot");
-				local auctions = {};
-				for pageNum, page in pairs(PageCache) do
-					local auctionsOnPage = page.auctions;
-					for indexOnPage, auctionOnPage in pairs(auctionsOnPage) do
-						table.insert(auctions, auctionOnPage);
-					end
-				end
-				Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, false);
+				local auctions, scannedInReverse = getAuctionsInCache();
+				Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, (not scannedInReverse));
 				clearPageCache();
 				break;
 			end
 			pageNum = pageNum + 1;
+		end
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Gets the list of auctions in the cache.
+-------------------------------------------------------------------------------
+function getAuctionsInCache()
+	local auctions = {};
+	local scannedInReverse = true;
+	for pageNum, page in pairs(PageCache) do
+		-- Get the auctions on this page.
+		local auctionsOnPage = page.auctions;
+
+		-- Get the previous page, if any.
+		local prevPage = PageCache[pageNum + 1];
+		if (prevPage) then
+			-- Check if the previous page was seen before this page.
+			if (prevPage.lastSeen < page.lastSeen) then
+				-- Yep, check for dups on the previous page.
+				local auctionsOnPrevPage = prevPage.auctions;
+				checkForDups(auctionsOnPage, auctionsOnPrevPage);
+			else
+				debugPrint("Scan was not done in reverse!");
+				scannedInReverse = false;
+			end
+		end
+
+		-- Add the auctions on this page the list.		
+		for indexOnPage, auctionOnPage in pairs(auctionsOnPage) do
+			table.insert(auctions, auctionOnPage);
+		end
+	end
+	return auctions, scannedInReverse;
+end
+
+-------------------------------------------------------------------------------
+-- Compares the auction against the previous page. If the auction matches an
+-- auction on the previous page, the auction on the previous page is flagged
+-- as a dup.
+-------------------------------------------------------------------------------
+function checkForDups(auctions, auctionsOnPrevPage)
+	for _, auction in pairs(auctions) do
+		local signature = Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auction);
+		for _, auctionOnPrevPage in pairs(auctionsOnPrevPage) do
+			if (not auctionOnPrevPage.dup and 
+				signature == Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auctionOnPrevPage) and
+				auction.bidAmount == auctionOnPrevPage.bidAmount and
+				auction.timeLeft == auctionOnPrevPage.timeLeft) then
+				debugPrint("Marking auction as potential dup");
+				auctionOnPrevPage.dup = true;
+				return;
+			end
 		end
 	end
 end
