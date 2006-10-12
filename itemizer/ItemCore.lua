@@ -83,7 +83,7 @@ local bankSlots = {
 }
 
 function registerEvents()
-	for index, event in pairs(eventsToRegister) do
+	for index, event in ipairs(eventsToRegister) do
 		Itemizer.Frames.MainFrame:RegisterEvent(event);
 	end
 end
@@ -91,17 +91,22 @@ end
 function onEvent()
 	debugprofilestart();
 	if (event == "UPDATE_MOUSEOVER_UNIT") then
-		if (UnitIsPlayer("mouseover") and (UnitFactionGroup("mouseover") == Itemizer.Core.Constants.PlayerFaction)) then
-			if (CheckInteractDistance("mouseover", 1)) then
-				inspect("mouseover");
-			end
+		if (
+			(UnitIsPlayer("mouseover")) and
+			(UnitFactionGroup("mouseover") == Itemizer.Core.Constants.PlayerFaction) and
+			(CheckInteractDistance("mouseover", 1))
+		) then
+			inspect("mouseover");
 		end
 
 	elseif (event == "PLAYER_TARGET_CHANGED") then
-		if (UnitIsPlayer("target") and (not UnitIsUnit("target", "player"))) then
-			if CheckInteractDistance("target", 1) then
-				inspect("target");
-			end
+		if (
+			(UnitIsPlayer("target")) and
+			(not UnitIsUnit("target", "player")) and
+			(UnitFactionGroup("target") == Itemizer.Core.Constants.PlayerFaction) and
+			(CheckInteractDistance("target", 1))
+		) then
+			inspect("target");
 		end
 
 	elseif (strfind(event, "CHAT_MSG")) then

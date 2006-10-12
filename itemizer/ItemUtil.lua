@@ -389,7 +389,7 @@ function binaryTableInsert( t, value, fcomp )
 		end
 
 		if ((GetTime() - startTime) > 5) then
-			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too ling to complete|r");
+			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too ling to complete|r", value);
 			return
 		end
 	end
@@ -445,17 +445,17 @@ function delimitText(text, delimiter, spacing)
 end
 
 function stringToTable(stringToConvert, fieldsDelimiter, keyValueDelimiter) --%TODO% This function uses tables rather extensively, prime candidate for optimization.
+	local builtTable = {};
+
 	if (not (type(stringToConvert) == "string")) then
-		return;
+		return builtTable;
 	end
 
 	fieldsDelimiter = tostring(fieldsDelimiter);
 
 	if (not (strfind(stringToConvert, fieldsDelimiter))) then
-		return;
+		return builtTable;
 	end
-
-	local builtTable = {};
 
 	for mainKey, mainValue in ipairs(split(stringToConvert, fieldsDelimiter)) do
 		local splitTable = split(mainValue, keyValueDelimiter);

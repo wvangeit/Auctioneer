@@ -135,7 +135,7 @@ print $ItemTables "--[[
 print $ItemTables "ItemizerSuffixes = {\n";
 my $key;
 foreach $key (sort { $itemSuffixes{$a} <=> $itemSuffixes{$b} } keys %itemSuffixes) {
-	print $ItemTables "\t[", $itemSuffixes{$key}, "] = \"", $key, "\",\n";
+	print $ItemTables "\t[", $itemSuffixes{$key}, "] = ", $key, ",\n";
 }
 print $ItemTables "}\n\n";
 
@@ -161,7 +161,7 @@ while(<$EnchantDBC>){
 		$curLine = $line[13];
 	}
 
-	if ($curLine){
+		if ($curLine){
 		if($curLine =~ m/\+(\d+)\s(\w*)\s(\w*)/i){
 			$word2 = $3;
 			$word1 = $2;
@@ -187,7 +187,6 @@ while(<$EnchantDBC>){
 				$word1 =~ s/Arcane/Arc/i;
 				$word1 =~ s/Healing/Hea/i;
 				$word1 =~ s/Shadow/Sha/i;
-
 			}elsif($word2 eq "every"){
 				$word2 = "P5";
 
@@ -199,7 +198,7 @@ while(<$EnchantDBC>){
 				$word1 = "Bea";
 
 			}elsif($word2 eq "Power"){
-				$word2 = "Atk";
+				$word2 = "Ak";
 				$word1 = "Mel";
 
 			}elsif($word2 eq "and"){
@@ -207,7 +206,7 @@ while(<$EnchantDBC>){
 				$word1 = "D&H";
 
 			}elsif($word2 eq "Attack"){
-				$word2 = "Atk";
+				$word2 = "Ak";
 				$word1 = "Ran";
 			}
 			print $ItemTables "\t";
@@ -263,6 +262,41 @@ while(<$EnchantDBC>){
 			print $ItemTables "\n";
 
 			$enchantKeys{"OH-$word1"} = 1;
+		}elsif($curLine =~ m/\+(\d*)%\s(\w*)/i){
+			$word1 = $2;
+			$ammount = $1;
+
+			$word1 =~ s/Block/Blo/i;
+			$word1 =~ s/Dodge/Dod/i;
+			$word1 =~ s/Parry/Par/i;
+
+			print $ItemTables "\t";
+			print $ItemTables "[$line[0]] = {$ammount, \"Ra-$word1\",},\t--$curLine";
+			print $ItemTables "\n";
+
+			$enchantKeys{"Ra-$word1"} = 1;
+		}elsif($curLine =~ m/Critical\sHit\s\+(\d*)%/i){
+			$ammount = $1;
+
+			print $ItemTables "\t";
+			print $ItemTables "[$line[0]] = {$ammount, \"Ra-Cri\",},\t--$curLine";
+			print $ItemTables "\n";
+
+			$enchantKeys{"Ra-Cri"} = 1;
+		}elsif($curLine =~ m/10%\sOn\sGet\sHit:\sShadow Bolt\s\((\d*)\sDamage\)/i){
+			$ammount = $1;
+
+			print $ItemTables "\t";
+			print $ItemTables "[$line[0]] = {$ammount, \"Bo-Sha\",},\t--$curLine";
+			print $ItemTables "\n";
+
+			$enchantKeys{"Bo-Sha"} = 1;
+		}else{
+			print $ItemTables "\t";
+			print $ItemTables "--[$line[0]] = {\"ERROR!!!\"},\t--$curLine";
+			print $ItemTables "\n";
+
+			$enchantKeys{"$curLine"} = 1;
 		}
 	}
 }

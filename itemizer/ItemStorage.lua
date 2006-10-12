@@ -113,7 +113,9 @@ function getItemRandomProps(itemID)
 
 	local itemBaseInfo = splitString(ItemizerLinks[itemID][1], "§");
 	for key, value in ipairs(itemBaseInfo) do
-		tinsert(randomPropsTable, tonumber(value))
+		if (key > 2) then --Only parse after the ItemName and the RandomProp Count.
+			tinsert(randomPropsTable, tonumber(value))
+		end
 	end
 
 	--Only return the table if it has something in it.
@@ -207,7 +209,7 @@ function storeItemData(itemInfo)
 		currentItem[7] = equipBonuses;
 		currentItem[8] = metaData;
 	end
-	
+
 	Itemizer.GUI.AddItemToItemList(itemInfo.itemID, itemInfo.randomProp);
 end
 
@@ -340,14 +342,10 @@ function encodeItemData(itemInfo)
 	baseData = baseData.."§"..nilSafeString(itemInfo.itemQuality).."§"..nilSafeString(itemInfo.minLevel).."§"..nilSafeString(itemInfo.itemType).."§"..nilSafeString(itemInfo.itemSubType);
 
 	--Store unique status
-	if (itemInfo.isUnique) then
-		baseData = baseData.."§1";
-	else
-		baseData = baseData.."§0";
-	end
+	baseData = baseData.."§"..nilSafeNumber(itemInfo.isUnique);
 
 	--Store binds data
-	baseData = baseData.."§"..nilSafeString(itemInfo.binds);
+	baseData = baseData.."§"..nilSafeNumber(itemInfo.binds);
 
 	-- Store type specific information
 	local equipLoc = strsub(itemInfo.itemEquipLocation, 9); --Trim the reduntant "INVTYPE_" from the equip location.
@@ -562,8 +560,8 @@ function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 		end
 
 		--Retrieve info from GetItemInfo()
-		itemInfo.itemQuality = splitBase[2];
-		itemInfo.minLevel = splitBase[3];
+		itemInfo.itemQuality = tonumber(splitBase[2]);
+		itemInfo.minLevel = tonumber(splitBase[3]);
 		itemInfo.itemType = splitBase[4];
 		itemInfo.itemSubType = splitBase[5];
 
@@ -609,15 +607,25 @@ function decodeItemData(item, itemID, randomProp) --%Todo% Finish this
 
 	-- Add the stats from the randomProp to our item's info table
 	if (randomProp) then
-		itemInfo = addRandomPropStatsToTable(iteminfo, randomProp);
+		itemInfo = addRandomPropStatsToTable(itemInfo, randomProp);
 	else
 		itemInfo.itemName = itemInfo.itemBaseName;
 	end
 
+	if (not itemInfo) then
+		error("Itemizer: Decoding Error > "..tostring(itemID).." >> "..tostring(randomProp))
+	end
 	--Retrieve the original itemLink and hyperLink
 	local hyperLink = "item:"..itemID..":0:"..nilSafeNumber(randomProp)..":0";
-	itemInfo.itemLink = buildLink(hyperLink, itemInfo.itemQuality, itemInfo.itemName);
+	itemInfo.itemLink = buildLink(
+		hyperLink,
+		itemInfo.itemQuality,
+		itemInfo.itemName
+	);
 	itemInfo.itemHyperLink = hyperLink;
+
+	itemInfo.itemID = itemID;
+	itemInfo.randomProp = nilSafeNumber(randomProp);
 
 	--%Todo% Write the Tooltip line reconstruction code.
 
@@ -677,26 +685,34 @@ function translateEnchant(enchantType, enchantModifier, quantity)
 	--First translate the class of modifier (Spell Damage, Stats, etc)
 	if (enchantType == "Ba") then
 		formatString = "+%d %s"; --%Localize%
-	elseif  (enchantType == "OH") then
+
 		formatString = "%s Skill +%d"; --%Localize%
-		inverted= true;
-	elseif  (enchantType == "TH") then
+		inverted = true;
+
 		formatString = "Two-Handed %s Skill +%d"; --%Localize%
-		inverted= true;
-	elseif  (enchantType == "Sl") then
+		inverted = true;
+
 		formatString = "+%d %s Slaying"; --%Localize%
-	elseif  (enchantType == "Re") then
+
 		formatString = "+%d %s Resistance"; --%Localize%
-	elseif  (enchantType == "Atk") then
+
+	elseif (enchantType == "Ak") then
 		formatString = "+%d %sAttack Power"; --%Localize%
-	elseif  (enchantType == "Sp") then -- These are a bit complicated
+
 		if (enchantModifier == "Hea" or enchantModifier == "D&H") then
 			formatString = "+%d %s Spells"; --%Localize%
 		else
 			formatString = "+%d %s Spell Damage"; --%Localize%
 		end
-	elseif  (enchantType == "P5") then
+
 		formatString = "+%d %s every 5 sec."; --%Localize%
+
+	elseif (enchantType == "Ra") then
+		formatString = "+%d%% %s"; --%Localize%
+
+	elseif (enchantType == "Bo") then
+		formatString = "10% On Get Hit: %s Bolt (%d Damage)"; --%Localize%
+		inverted = true
 	end
 
 	--Then translate the type of modifier (Fire, Spirit, etc.)
@@ -704,68 +720,52 @@ function translateEnchant(enchantType, enchantModifier, quantity)
 	--Stats
 	if (enchantModifier == "Dam") then
 		modifierType = "Damage"; --%Localize%
-	elseif  (enchantModifier == "Str") then
 		modifierType = "Strength"; --%Localize%
-	elseif  (enchantModifier == "Sta") then
 		modifierType = "Stamina"; --%Localize%
-	elseif  (enchantModifier == "Agi") then
 		modifierType = "Agility"; --%Localize%
-	elseif  (enchantModifier == "Int") then
 		modifierType = "Intellect"; --%Localize%
-	elseif  (enchantModifier == "Arm") then
 		modifierType = "Armor"; --%Localize%
-	elseif  (enchantModifier == "Spi") then
 		modifierType = "Spirit"; --%Localize%
-	elseif  (enchantModifier == "Def") then
 		modifierType = "Defense"; --%Localize%
 
 	--Weapons
-	elseif  (enchantModifier == "Swo") then
 		modifierType = "Sword"; --%Localize%
-	elseif  (enchantModifier == "Mac") then
 		modifierType = "Mace"; --%Localize%
-	elseif  (enchantModifier == "Axe") then
 		modifierType = "Axe"; --%Localize%
-	elseif  (enchantModifier == "Dag") then
 		modifierType = "Dagger"; --%Localize%
-	elseif  (enchantModifier == "Gun") then
 		modifierType = "Gun"; --%Localize%
-	elseif  (enchantModifier == "Bow") then
 		modifierType = "Bow"; --%Localize%
 
 	--Mob types
-	elseif  (enchantModifier == "Bea") then
 		modifierType = "Beast"; --%Localize%
 
 	--Magic Types
-	elseif  (enchantModifier == "Arc") then
 		modifierType = "Arcane"; --%Localize%
-	elseif  (enchantModifier == "Fro") then
 		modifierType = "Frost"; --%Localize%
-	elseif  (enchantModifier == "Fir") then
 		modifierType = "Fire"; --%Localize%
-	elseif  (enchantModifier == "Nat") then
 		modifierType = "Nature"; --%Localize%
-	elseif  (enchantModifier == "Sha") then
 		modifierType = "Shadow"; --%Localize%
-	elseif  (enchantModifier == "Hol") then
 		modifierType = "Holy"; --%Localize%
-	elseif  (enchantModifier == "Hea") then
 		modifierType = "Healing"; --%Localize%
-	elseif  (enchantModifier == "D&H") then
 		modifierType = "Damage and Healing"; --%Localize%
 
 	--Attack Types
-	elseif  (enchantModifier == "Mel") then
 		modifierType = ""; --%Localize%
-	elseif  (enchantModifier == "Ran") then
 		modifierType = "Ranged "; --%Localize%
 
 	--Health and Mana
-	elseif  (enchantModifier == "Het") then
 		modifierType = "health"; --%Localize%
-	elseif  (enchantModifier == "Man") then
 		modifierType = "mana"; --%Localize%
+
+	--Melee Types
+	elseif (enchantModifier == "Blo") then
+		modifierType = "Block"; --%Localize%
+	elseif (enchantModifier == "Dod") then
+		modifierType = "Dodge"; --%Localize%
+	elseif (enchantModifier == "Par") then
+		modifierType = "Parry"; --%Localize%
+	elseif (enchantModifier == "Cri") then
+		modifierType = "Critial Hit"; --%Localize%
 	end
 
 	--Now build the string
@@ -815,7 +815,7 @@ function addEnchantStatsToTable(itemInfo, enchantType, enchantModifier, enchantQ
 	elseif  (enchantType == "Re") then --Resists
 		itemInfo.attributes.resists[tableEntry] = nilSafeNumber(itemInfo.attributes.resists[tableEntry]) + enchantQuantity;
 
-	elseif  (enchantType == "Atk") then --Attack Power
+	elseif  (enchantType == "Ak") then --Attack Power
 		itemInfo.attributes.equipBonuses[tableEntry] = nilSafeNumber(itemInfo.attributes.equipBonuses[tableEntry]) + enchantQuantity;
 
 	elseif  (enchantType == "Sp") then --Spell Power
@@ -830,7 +830,7 @@ end
 
 -- Note: This function will only convert certain enchants, some enchants are excluded (such as the weapon proficiency ones)
 function convertEnchantModifierToTableKey(enchantModifier)
-	if (not (type(itemInfo) == "string")) then
+	if (not (type(enchantModifier) == "string")) then
 		return
 	end
 
@@ -839,69 +839,43 @@ function convertEnchantModifierToTableKey(enchantModifier)
 	--Stats
 	if (enchantModifier == "Dam") then
 		tableKey = "damage";
-	elseif  (enchantModifier == "Str") then
 		tableKey = "strength";
-	elseif  (enchantModifier == "Sta") then
 		tableKey = "stamina";
-	elseif  (enchantModifier == "Agi") then
 		tableKey = "agility";
-	elseif  (enchantModifier == "Int") then
 		tableKey = "intellect";
-	elseif  (enchantModifier == "Arm") then
 		tableKey = "armor";
-	elseif  (enchantModifier == "Spi") then
 		tableKey = "spirit";
-	elseif  (enchantModifier == "Def") then
 		tableKey = "defense";
 
 	--[[
 	--Weapons
-	elseif  (enchantModifier == "Swo") then
 		tableKey = "sword"
-	elseif  (enchantModifier == "Mac") then
 		tableKey = "mace"
-	elseif  (enchantModifier == "Axe") then
 		tableKey = "axe"
-	elseif  (enchantModifier == "Dag") then
 		tableKey = "dagger"
-	elseif  (enchantModifier == "Gun") then
 		tableKey = "gun"
-	elseif  (enchantModifier == "Bow") then
 		tableKey = "bow"
 
 	--Mob types
-	elseif  (enchantModifier == "Bea") then
 		tableKey = "beast"
 	]]
 
 	--Magic Types
-	elseif  (enchantModifier == "Arc") then
 		tableKey = "arcane";
-	elseif  (enchantModifier == "Fro") then
 		tableKey = "frost";
-	elseif  (enchantModifier == "Fir") then
 		tableKey = "fire";
-	elseif  (enchantModifier == "Nat") then
 		tableKey = "nature";
-	elseif  (enchantModifier == "Sha") then
 		tableKey = "shadow";
-	elseif  (enchantModifier == "Hol") then
 		tableKey = "holy";
-	elseif  (enchantModifier == "Hea") then
 		tableKey = "healing";
-	elseif  (enchantModifier == "D&H") then
 		tableKey = "damageAndHealing";
 
 	--Attack Types
-	elseif  (enchantModifier == "Mel") then
 		tableKey = "attackPower";
-	elseif  (enchantModifier == "Ran") then
 		tableKey = "rangedAttackPower";
 
 	--Health and Mana
-	elseif  (enchantModifier == "Het") then
 		tableKey = "healthPerFive";
-	elseif  (enchantModifier == "Man") then
 		tableKey = "manaPerFive";
 	end
 

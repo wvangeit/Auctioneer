@@ -69,17 +69,17 @@ local getItemRandomProps = Itemizer.Storage.GetItemRandomProps;
 local itemList = {}
 
 local sortList = {
-	{ Key = "itemQuality",			Name = "Quality",			Reverse = false	},
-	{ Key = "itemName",				Name = "Name",				Reverse = true	},
-	{ Key = "isUnique",				Name = "Unique",			Reverse = false	},
-	{ Key = "minLevel",				Name = "Required Level",	Reverse = true	},
+	{ Key = "itemQuality",			Name = "Quality",			Reverse = true	},
+	{ Key = "itemName",				Name = "Name",				Reverse = false	},
+	{ Key = "isUnique",				Name = "Unique",			Reverse = true	},
+	{ Key = "minLevel",				Name = "Required Level",	Reverse = false	},
 	{ Key = "itemID",				Name = "ItemID",			Reverse = false	},
-	{ Key = "binds",				Name = "Binds on",			Reverse = false	},
-	{ Key = "itemLink",				Name = "Link",				Reverse = false	},
+	{ Key = "binds",				Name = "Binds on",			Reverse = true	},
+	{ Key = "itemLink",				Name = "Link",				Reverse = true	},
 	{ Key = "itemType",				Name = "Type",				Reverse = false	},
-	{ Key = "randomProp",			Name = "RandomProp",		Reverse = false	},
+	{ Key = "randomProp",			Name = "RandomProp",		Reverse = true	},
 	{ Key = "itemSubType",			Name = "Sub-Type",			Reverse = false	},
-	{ Key = "itemRevision",			Name = "Revision",			Reverse = true	},
+	{ Key = "itemRevision",			Name = "Revision",			Reverse = false	},
 	{ Key = "itemEquipLocation",	Name = "Equip Location",	Reverse = true	},
 }
 
@@ -359,7 +359,7 @@ function buildItemList()
 	for itemID in pairs(ItemizerLinks) do
 		local randomPropsTable = getItemRandomProps(itemID);
 		if (randomPropsTable) then
-			for randomProp in ipairs(randomPropsTable) do
+			for index, randomProp in ipairs(randomPropsTable) do
 				tinsert(itemList, getItemData(itemID, randomProp, true));
 			end
 		else
@@ -400,9 +400,9 @@ function sortItemListFunction(a, b)
 			sortKey = sortInfo.Key
 			if (not (a[sortKey] == b[sortKey])) then
 				if (sortInfo.Reverse) then
-					return a[sortKey] < b[sortKey];
-				else
 					return a[sortKey] > b[sortKey];
+				else
+					return a[sortKey] < b[sortKey];
 				end
 			end
 		end
