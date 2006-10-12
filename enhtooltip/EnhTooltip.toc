@@ -9,5 +9,7 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/EnhTooltip
 
+TinyMoneyFrame.lua
 TinyMoneyFrame.xml
+Tooltip.lua
 Tooltip.xml
