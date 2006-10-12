@@ -726,17 +726,6 @@ BtmFeed.Command = function (msg)
 	if (not i) then cmd = msg param = nil oparam = nil end
 	if (oparam == "") then param = nil oparam = nil end
 
-	if (not BtmFeedData.unlocked) then
-		if (cmd == "agree") then
-			BtmFeedData.unlocked = true
-			BtmFeed.Print(tr("BottomFeeder is now unlocked."))
-		else
-			BtmFeed.Print(tr("BottomFeeder is subject to a Limited Licence."))
-			BtmFeed.Print(tr("Please see Licence.txt to unlock this addon."))
-		end
-		return
-	end
-
 	-- Make sure the current zone is loaded and has defaults
 	BtmFeed.GetZoneConfig("command")
 
