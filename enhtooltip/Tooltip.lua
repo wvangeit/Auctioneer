@@ -314,7 +314,7 @@ function getglobalIterator(fmt, first, last)
 		if last and (i > last) then
 			return
 		end
-		local obj = getglobal(string.format(fmt, i))
+		local obj = getglobal(fmt:format(i))
 		i = i + 1
 		return obj
 	end
@@ -343,10 +343,9 @@ function clearTooltip()
 	EnhancedTooltip.lineCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
-	for curLine in self.embedLines do
+	for curLine in pairs(self.embedLines) do
 		self.embedLines[curLine] = nil;
 	end
-	table.setn(self.embedLines, 0);
 end
 
 function getRect(object, curRect)
@@ -544,15 +543,15 @@ function getTextGSC(money, exact, dontUseColorCodes)
 	if (not dontUseColorCodes) then
 		local fmt = GSC_START
 		if (g > 0) then
-			gsc = gsc..string.format(fmt, GSC_GOLD, g)
+			gsc = gsc..fmt:format(GSC_GOLD, g)
 			fmt = GSC_PART
 		end
 		if (s > 0) or (c > 0) then
-			gsc = gsc..string.format(fmt, GSC_SILVER, s)
+			gsc = gsc..fmt:format(GSC_SILVER, s)
 			fmt = GSC_PART
 		end
 		if (c > 0) then
-			gsc = gsc..string.format(fmt, GSC_COPPER, c)
+			gsc = gsc..fmt:format(GSC_COPPER, c)
 		end
 		if (gsc == "") then
 			gsc = GSC_NONE
@@ -575,7 +574,7 @@ function getTextGSC(money, exact, dontUseColorCodes)
 end
 
 function embedRender()
-	for pos, lData in self.embedLines do
+	for pos, lData in pairs(self.embedLines) do
 		self.currentGametip:AddLine(lData.line)
 		if (lData.r) then
 			local lastLine = getglobal(self.currentGametip:GetName().."TextLeft"..self.currentGametip:NumLines())
@@ -654,7 +653,7 @@ end
 
 function lineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then
-		local n = table.getn(self.embedLines)
+		local n = #self.embedLines
 		self.embedLines[n].r = r
 		self.embedLines[n].g = g
 		self.embedLines[n].b = b
@@ -749,8 +748,7 @@ function linkType(link)
 	if type(link) ~= "string" then
 		return
 	end
-	local _, _, linktype = string.find(link, "|H(%a+):")
-	return linktype
+	return link:match("|H(%a+):")
 end
 
 function nameFromLink(link)
@@ -758,37 +756,27 @@ function nameFromLink(link)
 	if( not link ) then
 		return
 	end
-	_, _, name = string.find(link, "|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
-	if (name) then
-		return name;
-	end
-	return
+	return link:match("|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
 end
 
 function hyperlinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	_, _, hyperlink = string.find(link, "|H([^|]+)|h");
-	if (hyperlink) then
-		return hyperlink;
-	end
+	return link:match("|H([^|]+)|h");
 end
 
 function baselinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	_, _, baselink = string.find(link, "|Hitem:(%d+:%d+:%d+):%d+|h");
-	if (baselink) then
-		return baselink;
-	end
+	return link:match("|Hitem:(%d+:%d+:%d+):%d+|h");
 end
 
 function qualityFromLink(link)
 	if (not link) then return end
-	local _, _, color = string.find(link, "(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
-	if color then
+	local color link:match("(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
+	if (color) then
 		for i = 0, 6 do
 			local _, _, _, hex = GetItemQualityColor(i)
 			if color == hex then
@@ -1034,6 +1022,7 @@ function gtHookSetInboxItem(funcArgs, retVal, frame, index)
 			break
 		end
 	end
+
 end
 
 function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
@@ -1116,7 +1105,7 @@ end
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
 function breakLink(link)
 	if (type(link) ~= 'string') then return end
-	local i,j, itemID, enchant, randomProp, uniqID, name = string.find(link, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
+	local itemID, enchant, randomProp, uniqID, name = link:match("|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
 	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name
 end
 
@@ -1209,7 +1198,7 @@ end
 function getLootLinkLink(name)
 	local itemLink = ItemLinks[name]
 	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
-		local item = string.gsub(itemLink.i, "(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
+		local item = itemLink.i:gsub("(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
 		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r"
 		return link
 	end
@@ -1259,8 +1248,9 @@ end
 
 local function dump(...)
 	local out = "";
-	for i = 1, arg.n, 1 do
-		local d = arg[i];
+	local numVarArgs = select("#", ...);
+	for i = 1, numVarArgs do
+		local d = select(i, ...);
 		local t = type(d);
 		if (t == "table") then
 			out = out .. "{";
@@ -1288,33 +1278,37 @@ local function dump(...)
 				out = out .. "false";
 			end
 		else
-			out = out .. string.upper(t) .. "??";
+			out = out .. t:upper() .. "??";
 		end
 
-		if (i < arg.n) then out = out .. ", "; end
+		if (i < numVarArgs) then out = out .. ", "; end
 	end
 	return out;
 end
 
 function debugPrint(...)
-	local debugWin = 0;
-	local name, shown;
+	local debugWin;
 	for i=1, NUM_CHAT_WINDOWS do
-		name,_,_,_,_,_,shown = GetChatWindowInfo(i);
-		if (string.lower(name) == "ettdebug") then debugWin = i; break; end
+		if (GetChatWindowInfo(i):lower() == "ettdebug") then
+			debugWin = i;
+			break;
+		end
 	end
-	if (debugWin == 0) then return end
+	if (not debugWin) then
+		return
+	end
 
 	local out = "";
-	for i = 1, arg.n, 1 do
+	for i = 1, select("#", ...) do
 		if (i > 1) then out = out .. ", "; end
-		local t = type(arg[i]);
-		if (t == "string") then
-			out = out .. '"'..arg[i]..'"';
-		elseif (t == "number") then
-			out = out .. arg[i];
+		local currentArg, argType = select(i, ...)
+		argType = type(currentArg);
+		if (argType == "string") then
+			out = out .. '"'..currentArg..'"';
+		elseif (argType == "number") then
+			out = out .. currentArg;
 		else
-			out = out .. dump(arg[i]);
+			out = out .. dump(currentArg);
 		end
 	end
 	getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3);
@@ -1459,6 +1453,6 @@ EnhTooltip = {
 
 	SetElapsed			= setElapsed,
 	DebugPrint			= debugPrint,
-	
+
 	Version				= ENHTOOLTIP_VERSION,
 }

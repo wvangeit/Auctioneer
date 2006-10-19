@@ -12,14 +12,14 @@ loading.
 
 A quick example of this is:
 -------------------------------------------
-	Stubby.RegisterBootCode("myAddOn", "CommandHandler", [[
+	Stubby.RegisterBootCode("myAddOn", "CommandHandler", [=[
 		local function cmdHandler(msg)
 			LoadAddOn("myAddOn")
 			MyAddOn_Command(msg)
 		end
 		SLASH_MYADDON1 = "/myaddon"
 		SlashCmdList['MYADDON'] = cmdHandler
-	]]);
+	]=]);
 -------------------------------------------
 So, what did this just do? It registered some boot code
 (called "CommandHandler") with Stubby that Stubby will
@@ -163,7 +163,7 @@ end
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
---]]
+]]
 
 local cleanList
 local config = {
@@ -216,19 +216,19 @@ local unregisterFunctionHook		-- unregisterFunctionHook(triggerFunction, hookFun
 -- and assigns an actual ordering to them.
 function rebuildNotifications(notifyItems)
 	local notifyFuncs = {}
-	for hookType, hData in notifyItems do
+	for hookType, hData in pairs(notifyItems) do
 		notifyFuncs[hookType] = {}
 
 		-- Sort all hooks for this type in ascending numerical order.
 		local sortedPositions = {}
-		for requestedPos,_ in hData do
+		for requestedPos in ipairs(hData) do
 			table.insert(sortedPositions, requestedPos)
 		end
 		table.sort(sortedPositions)
 
 		-- Process the sorted request list and insert in correct
 		-- order into the call list.
-		for _,requestedPos in sortedPositions do
+		for _,requestedPos in ipairs(sortedPositions) do
 			local func = hData[requestedPos]
 			table.insert(notifyFuncs[hookType], func)
 		end
@@ -342,8 +342,19 @@ end
 -- in between your hook and the original.
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	local insertPos = tonumber(position) or 200
-	local funcObj = { f=hookFunc, a=arg, p=position }
-	if (table.getn(arg) == 0) then funcObj.a = nil; end
+	local funcObj
+	if (select("#", ...) == 0) then
+		funcObj = {
+			f = hookFunc,
+			p = position,
+		}
+	else
+		funcObj = {
+			f = hookFunc,
+			a = {select(1, ...)},
+			p = position
+		}
+	end
 
 	if (not config.calls) then config.calls = {} end
 	if (not config.calls.functions) then config.calls.functions = {} end
@@ -366,7 +377,7 @@ end
 
 function unregisterFunctionHook(triggerFunction, hookFunc)
 	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then return end
-	for pos, funcObj in config.calls.functions[triggerFunction] do
+	for pos, funcObj in ipairs(config.calls.functions[triggerFunction]) do
 		if (funcObj and funcObj.f == hookFunc) then
 			config.calls.functions[triggerFunction][pos] = nil
 		end
@@ -379,19 +390,28 @@ end
 -- but not before)
 function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 	if (IsAddOnLoaded(triggerAddOn)) then
-		hookFunction(unpack(arg))
+		hookFunction(...)
 	else
-		local addon = string.lower(triggerAddOn)
+		local addon = triggerAddOn:lower()
 		if (not config.loads[addon]) then config.loads[addon] = {} end
 		config.loads[addon][ownerAddOn] = nil
 		if (hookFunction) then
-			config.loads[addon][ownerAddOn] = { f=hookFunction, a=arg }
+			if (select("#", ...) == 0) then
+				config.loads[addon][ownerAddOn] = {
+					f = hookFunction,
+				}
+			else
+				config.loads[addon][ownerAddOn] = {
+					f = hookFunction,
+					a = {select(1, ...)},
+				}
+			end
 		end
 	end
 end
 
 function unregisterAddOnHook(triggerAddOn, ownerAddOn)
-	local addon = string.lower(triggerAddOn)
+	local addon = triggerAddOn:lower()
 	if (config.loads and config.loads[addon] and config.loads[addon][ownerAddOn]) then
 		config.loads[addon][ownerAddOn] = nil
 	end
@@ -399,10 +419,10 @@ end
 
 
 function loadWatcher(loadedAddOn)
-	local addon = string.lower(loadedAddOn)
+	local addon = loadedAddOn:lower()
 	if (config.loads[addon]) then
 		local ownerAddOn, hookDetail
-		for ownerAddOn, hookDetail in config.loads[addon] do
+		for ownerAddOn, hookDetail in pairs(config.loads[addon]) do
 			hookDetail.f(hookDetail.a)
 		end
 	end
@@ -418,7 +438,16 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 	end
 	config.events[triggerEvent][ownerAddOn] = nil
 	if (hookFunction) then
-		config.events[triggerEvent][ownerAddOn] = { f=hookFunction, a=arg }
+		if (select("#", ...) == 0) then
+			config.events[triggerEvent][ownerAddOn] = {
+				f = hookFunction,
+			}
+		else
+			config.events[triggerEvent][ownerAddOn] = {
+				f = hookFunction,
+				a = {select(1, ...)},
+			}
+		end
 	end
 end
 
@@ -431,7 +460,7 @@ end
 function eventWatcher(event)
 	if (config.events[event]) then
 		local ownerAddOn, hookDetail
-		for ownerAddOn, hookDetail in config.events[event] do
+		for ownerAddOn, hookDetail in pairs(config.events[event]) do
 			hookDetail.f(hookDetail.a, event, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20);
 		end
 	end
@@ -444,8 +473,8 @@ end
 -- command handler, hook into functions, load your addon etc.
 -- Leaving bootCode nil will remove your boot.
 function registerBootCode(ownerAddOn, bootName, bootCode)
-	local ownerIndex = string.lower(ownerAddOn)
-	local bootIndex = string.lower(bootName)
+	local ownerIndex = ownerAddOn:lower()
+	local bootIndex = bootName:lower()
 	if (not StubbyConfig.boots) then StubbyConfig.boots = {} end
 	if (not StubbyConfig.boots[ownerIndex]) then StubbyConfig.boots[ownerIndex] = {} end
 	StubbyConfig.boots[ownerIndex][bootIndex] = nil
@@ -455,8 +484,8 @@ function registerBootCode(ownerAddOn, bootName, bootCode)
 end
 
 function unregisterBootCode(ownerAddOn, bootName)
-	local ownerIndex = string.lower(ownerAddOn)
-	local bootIndex = string.lower(bootName)
+	local ownerIndex = ownerAddOn:lower()
+	local bootIndex = bootName:lower()
 	if not (StubbyConfig.boots) then return end
 	if not (ownerIndex and StubbyConfig.boots[ownerIndex]) then return end
 	if (bootIndex == nil) then
@@ -513,7 +542,7 @@ function checkAddOns()
 			end
 		end
 	end
-	for name,_ in StubbyConfig.inspected do
+	for name in pairs(StubbyConfig.inspected) do
 		if (not goodList[name]) then
 			StubbyConfig.inspected[name] = nil
 			StubbyConfig.addinfo[name] = nil
@@ -546,7 +575,7 @@ end
 function cleanUpAddOnConfigs()
 	if (not cleanList) then return; end
 
-	local addonIndex = table.getn(cleanList)
+	local addonIndex = #cleanList
 	local addonName = cleanList[addonIndex]
 
 	if (addonIndex == 1) then
@@ -592,7 +621,7 @@ function searchForNewAddOns()
 		if (IsAddOnLoadOnDemand(i) and shouldInspectAddOn(name) and loadable) then
 			local addonDeps = { GetAddOnDependencies(i) }
 			for _, dependancy in pairs(addonDeps) do
-				if (string.lower(dependancy) == "stubby") then
+				if (dependancy:lower() == "stubby") then
 					requiresLoad = true
 				end
 			end
@@ -606,7 +635,7 @@ end
 -- related addon is not loaded yet, runs the boot script.
 function runBootCodes()
 	if (not StubbyConfig.boots) then return end
-	for addon, boots in StubbyConfig.boots do
+	for addon, boots in pairs(StubbyConfig.boots) do
 		if (not IsAddOnLoaded(addon) and IsAddOnLoadOnDemand(addon)) then
 			local _, _, _, _, loadable = GetAddOnInfo(addon)
 			if (loadable) then
@@ -634,8 +663,15 @@ function onWorldStart()
 end
 
 function onLoaded()
-	if not StubbyConfig.inspected then StubbyConfig.inspected = {} end
-	if not StubbyConfig.addinfo then StubbyConfig.addinfo = {} end
+	if (not (type(StubbyConfig) == "table")) then
+		StubbyConfig = {};
+	end
+	if (not StubbyConfig.inspected) then
+		StubbyConfig.inspected = {};
+	end
+	if (not StubbyConfig.addinfo) then
+		StubbyConfig.addinfo = {};
+	end
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Stubby", onWorldStart)
 end
 
@@ -643,7 +679,7 @@ function events(event, param)
 	if (not event) then event = "" end
 	if (not param) then param = "" end
 	if (event == "ADDON_LOADED") then
-		if (string.lower(param) == "stubby") then onLoaded() end
+		if (param:lower() == "stubby") then onLoaded() end
 		Stubby.LoadWatcher(param)
 	end
 	Stubby.EventWatcher(event)
@@ -652,9 +688,11 @@ end
 function chatPrint(...)
 	if ( DEFAULT_CHAT_FRAME ) then
 		local msg = ""
-		for i=1, table.getn(arg) do
-			if i==1 then msg = arg[i]
-			else msg = msg.." "..arg[i]
+		for i = 1, select("#", ...) do
+			if (i == 1) then
+				msg = select(i, ...)
+			else
+				msg = msg.." "..select(i, ...)
 			end
 		end
 		DEFAULT_CHAT_FRAME:AddMessage(msg, 1.0, 0.35, 0.15)
@@ -664,10 +702,10 @@ end
 -- This function allows boot code to store a configuration variable
 -- by default the variable is per character unless isGlobal is set.
 function setConfig(ownerAddOn, variable, value, isGlobal)
-	local ownerIndex = string.lower(ownerAddOn)
-	local varIndex = string.lower(variable)
+	local ownerIndex = ownerAddOn:lower()
+	local varIndex = variable:lower()
 	if (not isGlobal) then
-		varIndex = string.lower(UnitName("player")) .. ":" .. varIndex
+		varIndex = UnitName("player"):lower() .. ":" .. varIndex
 	end
 
 	if (not StubbyConfig.configs) then StubbyConfig.configs = {} end
@@ -679,9 +717,9 @@ end
 -- it will prefer a player specific variable over a global with the
 -- same name
 function getConfig(ownerAddOn, variable)
-	local ownerIndex = string.lower(ownerAddOn)
-	local globalIndex = string.lower(variable)
-	local playerIndex = string.lower(UnitName("player")) .. ":" .. globalIndex
+	local ownerIndex = ownerAddOn:lower()
+	local globalIndex = variable:lower()
+	local playerIndex = UnitName("player"):lower() .. ":" .. globalIndex
 
 	if (not StubbyConfig.configs) then return end
 	if (not StubbyConfig.configs[ownerIndex]) then return end
@@ -696,12 +734,12 @@ end
 -- global and player specific) or all config variables for the
 -- ownerAddOn if no variable is specified
 function clearConfig(ownerAddOn, variable)
-	local ownerIndex = string.lower(ownerAddOn)
+	local ownerIndex = ownerAddOn:lower()
 	if (not StubbyConfig.configs) then return end
 	if (not StubbyConfig.configs[ownerIndex]) then return end
 	if (variable) then
-		local globalIndex = string.lower(variable)
-		local playerIndex = string.lower(UnitName("player")) .. ":" .. globalIndex
+		local globalIndex = variable:lower()
+		local playerIndex = UnitName("player"):lower() .. ":" .. globalIndex
 		StubbyConfig.configs[ownerIndex][globalIndex] = nil
 		StubbyConfig.configs[ownerIndex][playerIndex] = nil
 	else
@@ -711,9 +749,7 @@ end
 
 -- Extract the revision number from SVN keyword string
 local function getRevision()
-	local found, _, rev = string.find("$Revision$", "(%d+)")
-	if (found ~= nil) then return tonumber(rev); end
-	return nil
+	return tonumber(("$Revision$"):match("(%d+)"))
 end
 
 -- Setup our Stubby global object. All interaction is done
