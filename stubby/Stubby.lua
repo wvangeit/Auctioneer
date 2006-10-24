@@ -173,6 +173,7 @@ local config = {
 	events = {},
 }
 
+
 StubbyConfig = {}
 
 
@@ -221,7 +222,7 @@ function rebuildNotifications(notifyItems)
 
 		-- Sort all hooks for this type in ascending numerical order.
 		local sortedPositions = {}
-		for requestedPos in ipairs(hData) do
+		for requestedPos in pairs(hData) do
 			table.insert(sortedPositions, requestedPos)
 		end
 		table.sort(sortedPositions)
@@ -239,7 +240,7 @@ end
 -- This function's purpose is to execute all the attached
 -- functions in order and the original call at just before
 -- position 0.
-function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+function hookCall(funcName, ...)
 	local result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
@@ -254,10 +255,9 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 	end
 
 	if (callees) then
-		for _,func in ipairs(callees) do
+		for _, func in ipairs(callees) do
 			if (orig and func.p >= 0) then
-				result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
-					= pcall(orig, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+				result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 = pcall(orig, ...)
 				if (result) then
 					if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
 						retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
@@ -268,7 +268,7 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 				end
 				orig = nil
 			end
-			local result, res, addit = pcall(func.f, func.a, retVal, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20);
+			local result, res, addit = pcall(func.f, func.a, retVal, ...);
 			if (result) then
 				if (type(res) == 'string') then
 					if (res == 'abort') then return end
@@ -277,12 +277,12 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 						retVal = addit
 						returns = true
 					end
-					if (res == 'setparams') then
+					--[[ if (res == 'setparams') then
 						-- Don't use unpack() since that doesn't correctly
 						-- handle nil values in the middle of the arg list.
-						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 = 
+						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
 							addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
-					end
+					end ]]
 				end
 			else
 				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
@@ -290,8 +290,7 @@ function hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a
 		end
 	end
 	if (orig) then
-		result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
-			= pcall(orig, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
+		result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 = pcall(orig, ...)
 		if (result) then
 			if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
 				retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
@@ -314,10 +313,19 @@ end
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
 function hookInto(triggerFunction)
-	if (config.hooks.origFuncs[triggerFunction]) then return end
-	RunScript("Stubby_OldFunction = "..triggerFunction)
-	RunScript("Stubby_NewFunction = function(a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) return Stubby.HookCall('"..triggerFunction.."', a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20) end")
-	RunScript(triggerFunction.." = Stubby_NewFunction")
+	if ((not triggerFunction) or config.hooks.origFuncs[triggerFunction]) then return end
+	local stringToLoad = [[
+		Stubby_OldFunction = ]]..triggerFunction..[[;
+		Stubby_NewFunction = function(...)
+			return Stubby.HookCall(']]..triggerFunction..[[', ...);
+		end;
+		]]..triggerFunction..[[ = Stubby_NewFunction;]];
+	assert(
+		loadstring(
+			stringToLoad, "StubbyHookingFunction"
+		),
+		"Stubby failed to hook function \""..triggerFunction.."\""
+	)();
 	config.hooks.functions[triggerFunction] = Stubby_NewFunction;
 	config.hooks.origFuncs[triggerFunction] = Stubby_OldFunction;
 	Stubby_NewFunction = nil
@@ -341,6 +349,9 @@ end
 -- leave space for other people who may need to position their hooks
 -- in between your hook and the original.
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
+	if (not (triggerFunction and hookFunc)) then
+		return
+	end
 	local insertPos = tonumber(position) or 200
 	local funcObj
 	if (select("#", ...) == 0) then
@@ -372,7 +383,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 		config.calls.functions[triggerFunction][insertPos] = funcObj
 	end
 	config.calls.callList = rebuildNotifications(config.calls.functions);
-	hookInto(triggerFunction)
+	return hookInto(triggerFunction)
 end
 
 function unregisterFunctionHook(triggerFunction, hookFunc)
@@ -421,7 +432,6 @@ end
 function loadWatcher(loadedAddOn)
 	local addon = loadedAddOn:lower()
 	if (config.loads[addon]) then
-		local ownerAddOn, hookDetail
 		for ownerAddOn, hookDetail in pairs(config.loads[addon]) do
 			hookDetail.f(hookDetail.a)
 		end
@@ -457,11 +467,10 @@ function unregisterEventHook(triggerEvent, ownerAddOn)
 	end
 end
 
-function eventWatcher(event)
+function eventWatcher(event, ...)
 	if (config.events[event]) then
-		local ownerAddOn, hookDetail
 		for ownerAddOn, hookDetail in pairs(config.events[event]) do
-			hookDetail.f(hookDetail.a, event, arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14,arg15,arg16,arg17,arg18,arg19,arg20);
+			hookDetail.f(hookDetail.a, event, ...);
 		end
 	end
 end
@@ -675,14 +684,16 @@ function onLoaded()
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Stubby", onWorldStart)
 end
 
-function events(event, param)
+function events(event, ...)
 	if (not event) then event = "" end
-	if (not param) then param = "" end
+	local firstArg = select(1, ...)
 	if (event == "ADDON_LOADED") then
-		if (param:lower() == "stubby") then onLoaded() end
-		Stubby.LoadWatcher(param)
+		if (firstArg and (firstArg:lower() == "stubby")) then
+			onLoaded()
+		end
+		Stubby.LoadWatcher(...)
 	end
-	Stubby.EventWatcher(event)
+	Stubby.EventWatcher(event, ...)
 end
 
 function chatPrint(...)

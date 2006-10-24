@@ -252,6 +252,7 @@ local llHookOnEnter				-- LlHookOnEnter()
 local merchantHook				-- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
 local merchantScanner			-- MerchantScanner()
 local nameFromLink				-- NameFromLink(link)
+local onLoad					-- OnLoad
 local qualityFromLink			-- QualityFromLink(link)
 local setElapsed				-- SetElapsed(elapsed)
 local setIcon					-- SetIcon(iconPath)
@@ -744,6 +745,10 @@ function checkHide()
 	end
 end
 
+------------------------
+-- ItemLink functions
+------------------------
+
 function linkType(link)
 	if type(link) ~= "string" then
 		return
@@ -756,7 +761,7 @@ function nameFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|c%x+|Hitem:%d+:%d+:%d+:%d+|h%[(.-)%]|h|r");
+	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r");
 end
 
 function hyperlinkFromLink(link)
@@ -770,12 +775,12 @@ function baselinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|Hitem:(%d+:%d+:%d+):%d+|h");
+	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h");
 end
 
 function qualityFromLink(link)
 	if (not link) then return end
-	local color link:match("(|c%x+)|Hitem:%d+:%d+:%d+:%d+|h%[.-%]|h|r");
+	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r");
 	if (color) then
 		for i = 0, 6 do
 			local _, _, _, hex = GetItemQualityColor(i)
@@ -789,15 +794,35 @@ end
 
 function fakeLink(hyperlink, quality, name)
 	-- make this function nilSafe, as it's a global one and might be used by external addons
-	if not hyperlink then
+	if (not hyperlink) then
 		return
 	end
 	local sName, sLink, iQuality = GetItemInfo(hyperlink)
-	if (quality == nil) then quality = iQuality or -1 end
-	if (name == nil) then name = sName or "unknown" end
-	local _, _, _, color = GetItemQualityColor(quality)
-	return color.. "|H"..hyperlink.."|h["..name.."]|h|r"
+
+	if (sLink) then
+		return sLink
+	else
+		if (not quality) then
+			quality = iQuality or -1
+		end
+		if (not name) then
+			name = sName or "unknown"
+		end
+		local _, _, _, color = GetItemQualityColor(quality)
+		return color.. "|H"..hyperlink.."|h["..name.."]|h|r"
+	end
 end
+
+-- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
+function breakLink(link)
+	if (type(link) ~= 'string') then return end
+	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlot4, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h[[]([^]]+)[]]|h")
+	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemSlot4) or 0
+end
+
+------------------------
+-- Tooltip generating function
+------------------------
 
 function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	self.currentGametip = frame
@@ -857,8 +882,6 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	end
 end
 
-
-
 ------------------------
 -- Hook calling functions
 ------------------------
@@ -909,30 +932,26 @@ end
 function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button)
 	if (IsAltKeyDown()) and AuctionFrame and (AuctionFrame:IsVisible()) then
 		AuctionFrameTab_OnClick(1)
-		local itemID = breakLink(link)
-		if (itemID) then
-			local itemName = GetItemInfo(tostring(itemID))
-			if (itemName) then
-				BrowseName:SetText(itemName)
-				BrowseMinLevel:SetText("")
-				BrowseMaxLevel:SetText("")
-				AuctionFrameBrowse.selectedInvtype = nil
-				AuctionFrameBrowse.selectedInvtypeIndex = nil
-				AuctionFrameBrowse.selectedClass = nil
-				AuctionFrameBrowse.selectedClassIndex = nil
-				AuctionFrameBrowse.selectedSubclass = nil
-				AuctionFrameBrowse.selectedSubclassIndex = nil
-				AuctionFrameFilters_Update()
-				IsUsableCheckButton:SetChecked(0)
-				UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-				AuctionFrameBrowse_Search()
-				BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
-				ItemRefTooltip:Hide()
-			end
+		local itemName = GetItemInfo(tostring(link))
+		if (itemName) then
+			BrowseName:SetText(itemName)
+			BrowseMinLevel:SetText("")
+			BrowseMaxLevel:SetText("")
+			AuctionFrameBrowse.selectedInvtype = nil
+			AuctionFrameBrowse.selectedInvtypeIndex = nil
+			AuctionFrameBrowse.selectedClass = nil
+			AuctionFrameBrowse.selectedClassIndex = nil
+			AuctionFrameBrowse.selectedSubclass = nil
+			AuctionFrameBrowse.selectedSubclassIndex = nil
+			AuctionFrameFilters_Update()
+			IsUsableCheckButton:SetChecked(0)
+			UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+			AuctionFrameBrowse_Search()
+			BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
+			ItemRefTooltip:Hide()
 		end
 		return
 	end
-
 	doHyperlink(reference, link, button)
 end
 
@@ -1011,18 +1030,15 @@ end
 
 function gtHookSetInboxItem(funcArgs, retVal, frame, index)
 	local inboxItemName, itemTexture, inboxItemCount, inboxItemQuality = GetInboxItem(index)
-	local itemName, hyperLink, itemQuality, itemLink
+	local itemName, itemLink, itemQuality, itemLink
 
 	for itemID = 1, 30000 do
-		itemName, hyperLink, itemQuality = GetItemInfo(itemID)
+		itemName, itemLink, itemQuality = GetItemInfo(itemID)
 		if (itemName and itemName == inboxItemName) then
-			local _, _, _, hex = GetItemQualityColor(tonumber(itemQuality))
-			itemLink = hex.. "|H"..hyperLink.."|h["..itemName.."]|h|r"
 			tooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
 			break
 		end
 	end
-
 end
 
 function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
@@ -1102,14 +1118,6 @@ function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 	end
 end
 
--- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
-function breakLink(link)
-	if (type(link) ~= 'string') then return end
-	local itemID, enchant, randomProp, uniqID, name = link:match("|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h")
-	return tonumber(itemID or 0), tonumber(randomProp or 0), tonumber(enchant or 0), tonumber(uniqID or 0), name
-end
-
-
 function findItemInBags(findName)
 	for bag = 0, 4, 1 do
 		size = GetContainerNumSlots(bag)
@@ -1166,10 +1174,10 @@ end
 
 function imiHookOnEnter()
 	if(not IM_InvList) then return end
-	local id = this:GetID()
+	local id = self:GetID()
 
 	if(id == 0) then
-		id = this:GetParent():GetID()
+		id = self:GetParent():GetID()
 	end
 	local offset = FauxScrollFrame_GetOffset(ItemsMatrix_IC_ScrollFrame)
 	local item = IM_InvList[id + offset]
@@ -1183,9 +1191,9 @@ function imiHookOnEnter()
 end
 
 function imHookOnEnter()
-	local imlink = ItemsMatrix_GetHyperlink(this:GetText())
+	local imlink = ItemsMatrix_GetHyperlink(self:GetText())
 	if (imlink) then
-		local name = this:GetText()
+		local name = self:GetText()
 		local link = fakeLink(imlink, -1, name)
 		tooltipCall(GameTooltip, name, link, -1, 1, 0)
 	end
@@ -1206,7 +1214,7 @@ function getLootLinkLink(name)
 end
 
 function llHookOnEnter()
-	local name = this:GetText()
+	local name = self:GetText()
 	local link = getLootLinkLink(name)
 	if (link) then
 		local quality = qualityFromLink(link)
@@ -1232,12 +1240,12 @@ function setElapsed(elapsed)
 end
 
 function setMoneySpacing(spacing)
-	if (spacing ~= nil) then self.moneySpacing = spacing end
+	self.moneySpacing = spacing or self.moneySpacing
 	return self.moneySpacing
 end
 
 function setPopupKey(key)
-	if (key ~= nil) then self.forcePopupKey = key end
+	self.forcePopupKey = key or self.forcePopupKey
 	return self.forcePopupKey
 end
 
@@ -1301,8 +1309,8 @@ function debugPrint(...)
 	local out = "";
 	for i = 1, select("#", ...) do
 		if (i > 1) then out = out .. ", "; end
-		local currentArg, argType = select(i, ...)
-		argType = type(currentArg);
+		local currentArg = select(i, ...)
+		local argType = type(currentArg);
 		if (argType == "string") then
 			out = out .. '"'..currentArg..'"';
 		elseif (argType == "number") then
@@ -1401,14 +1409,10 @@ end
 
 -- =============== EVENT HANDLERS =============== --
 
-function TT_OnLoad()
+function onLoad()
 	EnhancedTooltip:SetBackdropColor(0,0,0)
 	clearTooltip()
 	ttInitialize()
-end
-
-function TT_OnUpdate(elapsed)
-	setElapsed(elapsed)
 end
 
 -- =============== DEFINE ACCESS OBJECT =============== --
@@ -1453,6 +1457,7 @@ EnhTooltip = {
 
 	SetElapsed			= setElapsed,
 	DebugPrint			= debugPrint,
+	OnLoad				= onLoad,
 
 	Version				= ENHTOOLTIP_VERSION,
 }

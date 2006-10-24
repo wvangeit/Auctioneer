@@ -743,20 +743,17 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Frames>
 	</Frame>
 
-	<Frame name="EnhancedTooltip" inherits="EnhancedTooltipTemplate" parent="UIParent" hidden="true">
-		<Scripts>
-			<OnLoad>
-				TT_OnLoad();
-			</OnLoad>
-		</Scripts>
-	</Frame>
+	<Frame name="EnhancedTooltip" inherits="EnhancedTooltipTemplate" parent="UIParent" hidden="true"/>
+	<!-- ToDo: Change this to be dinamically populated -->
 
 	<Frame name="EnhancedUpdate" parent="UIParent" hidden="false">
 		<Scripts>
+			<OnLoad>
+				EnhTooltip.OnLoad()
+			</OnLoad>
 			<OnUpdate>
-				TT_OnUpdate(arg1);
+				EnhTooltip.SetElapsed(elapsed);
 			</OnUpdate>
 		</Scripts>
 	</Frame>
-
 </Ui>
