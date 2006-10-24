@@ -1174,10 +1174,10 @@ end
 
 function imiHookOnEnter()
 	if(not IM_InvList) then return end
-	local id = self:GetID()
+	local id = this:GetID()
 
 	if(id == 0) then
-		id = self:GetParent():GetID()
+		id = this:GetParent():GetID()
 	end
 	local offset = FauxScrollFrame_GetOffset(ItemsMatrix_IC_ScrollFrame)
 	local item = IM_InvList[id + offset]
@@ -1191,9 +1191,9 @@ function imiHookOnEnter()
 end
 
 function imHookOnEnter()
-	local imlink = ItemsMatrix_GetHyperlink(self:GetText())
+	local imlink = ItemsMatrix_GetHyperlink(this:GetText())
 	if (imlink) then
-		local name = self:GetText()
+		local name = this:GetText()
 		local link = fakeLink(imlink, -1, name)
 		tooltipCall(GameTooltip, name, link, -1, 1, 0)
 	end
@@ -1214,7 +1214,7 @@ function getLootLinkLink(name)
 end
 
 function llHookOnEnter()
-	local name = self:GetText()
+	local name = this:GetText()
 	local link = getLootLinkLink(name)
 	if (link) then
 		local quality = qualityFromLink(link)
