@@ -29,7 +29,6 @@ local split, setOrder, getOrder, fetchString, getString, registerAddOn
 local tinsert = table.insert
 
 function split(str, at)
-	local splut = {}
 	if (not (type(str) == "string")) then
 		return
 	end
@@ -39,15 +38,11 @@ function split(str, at)
 	end
 
 	if (not at) then
-		tinsert(splut, str)
+		return {str}
 
 	else
-		for n, c in str:gmatch('([^%'..at..']*)(%'..at..'?)') do
-			tinsert(splut, n); if (c == '') then break end
-		end
+		return {strsplit(at, str)};
 	end
-
-	return splut
 end
 
 function setOrder(order)
