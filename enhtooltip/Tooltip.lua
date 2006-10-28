@@ -1030,7 +1030,7 @@ end
 
 function gtHookSetInboxItem(funcArgs, retVal, frame, index)
 	local inboxItemName, itemTexture, inboxItemCount, inboxItemQuality = GetInboxItem(index)
-	local itemName, itemLink, itemQuality, itemLink
+	local itemName, itemLink, itemQuality
 
 	for itemID = 1, 30000 do
 		itemName, itemLink, itemQuality = GetItemInfo(itemID)
@@ -1265,7 +1265,7 @@ local function dump(...)
 			local first = true;
 			if (d) then
 				for k, v in pairs(d) do
-					if (not first) then out = out .. ", "; end
+					if (not first) then out = out .. ", \n"; end
 					first = false;
 					out = out .. dump(k);
 					out = out .. " = ";

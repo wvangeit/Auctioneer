@@ -1,5 +1,4 @@
 --[[
-
 	Babylonian
 	A sub-addon that manages the locales for other addons.
 	<%version%> (<%codename%>)
@@ -19,34 +18,49 @@
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 ]]
 
 local self = {}
-if (not self.update) then self.update = {}; end
+self.update = {}
 --Local function prototypes
 local split, setOrder, getOrder, fetchString, getString, registerAddOn
 
+--Function Imports
+local tinsert = table.insert
+
 function split(str, at)
 	local splut = {}
-	if (type(str) ~= "string") then return nil end
-	if (not str) then str = "" end
-	if (not at) then table.insert(splut, str)
-	else for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-		table.insert(splut, n); if (c == '') then break end
-	end end
+	if (not (type(str) == "string")) then
+		return
+	end
+
+	if (not str) then
+		str = ""
+	end
+
+	if (not at) then
+		tinsert(splut, str)
+
+	else
+		for n, c in str:gmatch('([^%'..at..']*)(%'..at..'?)') do
+			tinsert(splut, n); if (c == '') then break end
+		end
+	end
+
 	return splut
 end
 
 function setOrder(order)
-	if (not order) then self.order = {}
-	else self.order = split(order, ",") end
-	table.insert(self.order, GetLocale())
-	table.insert(self.order, "enUS")
-	if not(self.order[1] == getOrder()) then
-		SetCVar("BabylonianOrder", order)
+	if (not order) then
+		self.order = {}
+	else
+		self.order = split(order, ",")
 	end
-	SetCVar("BabylonianOrder", order)
+
+	tinsert(self.order, GetLocale())
+	tinsert(self.order, "enUS")
+
+	return SetCVar("BabylonianOrder", order)
 end
 
 function getOrder()
@@ -54,26 +68,28 @@ function getOrder()
 end
 
 function fetchString(stringTable, locale, stringKey)
-	if (type(stringTable)=="table" and type(stringTable[locale])=="table" and stringTable[locale][stringKey]) then
+	if ((type(stringTable) == "table") and (type(stringTable[locale]) == "table") and (stringTable[locale][stringKey])) then
 		return stringTable[locale][stringKey]
 	end
 end
 
 function getString(stringTable, stringKey, default)
 	local val
-	for i=1, table.getn(self.order) do
+	for i = 1, #self.order do
 		val = fetchString(stringTable, self.order[i], stringKey)
-		if (val) then return val end
+		if (val) then
+			return val
+		end
 	end
 	return default
 end
 
 if (not Babylonian) then
 	Babylonian = {
-		['SetOrder'] = setOrder,
-		['GetOrder'] = getOrder,
-		['GetString'] = getString,
-		['FetchString'] = fetchString,
+		SetOrder = setOrder,
+		GetOrder = getOrder,
+		GetString = getString,
+		FetchString = fetchString,
 	}
 	RegisterCVar("BabylonianOrder", "")
 	setOrder(getOrder())
