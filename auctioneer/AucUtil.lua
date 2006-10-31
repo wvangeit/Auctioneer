@@ -23,7 +23,37 @@
 --]]
 
 --Local function prototypes
-local storePlayerFaction, getTimeLeftString, getSecondsLeftString, unpackSeconds, getGSC, getTextGSC, nilSafeString, colorTextWhite, getWarnColor, nullSafe, sanifyAHSnapshot, getAuctionKey, getOppositeKey, getNeutralKey, getHomeKey, isValidAlso, split, getItemLinks, getItems, getItemHyperlinks, chatPrint, setFilterDefaults, protectAuctionFrame, priceForOne, round, delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, findEmptySlot
+local storePlayerFaction
+local getTimeLeftString
+local getSecondsLeftString
+local unpackSeconds
+local getGSC
+local getTextGSC
+local nilSafeString
+local colorTextWhite
+local getWarnColor
+local nullSafe
+local sanifyAHSnapshot
+local getAuctionKey
+local getOppositeKey
+local getNeutralKey
+local getHomeKey
+local isValidAlso
+local split
+local getItemLinks
+local getItems
+local getItemHyperlinks
+local chatPrint
+local setFilterDefaults
+local protectAuctionFrame
+local priceForOne
+local round
+local delocalizeFilterVal
+local localizeFilterVal
+local getLocalizedFilterVal
+local delocalizeCommand
+local localizeCommand
+local findEmptySlot
 
 function storePlayerFaction()
 	Auctioneer.Core.Constants.PlayerFaction = (Auctioneer.Core.Constants.PlayerFaction or UnitFactionGroup("player") or "Alliance");
@@ -116,7 +146,7 @@ function colorTextWhite(text)
 	local COLORING_START = "|cff%s%s|r";
 	local WHITE_COLOR = "e6e6e6";
 
-	return string.format(COLORING_START, WHITE_COLOR, ""..text);
+	return COLORING_START:format(WHITE_COLOR, ""..text);
 end
 
 function getWarnColor(warn)
@@ -137,8 +167,8 @@ function getWarnColor(warn)
 		FrmtWarnNodata = _AUCT('FrmtWarnNodata');
 		FrmtWarnMyprice = _AUCT('FrmtWarnMyprice');
 
-		FrmtWarnUndercut = string.format(_AUCT('FrmtWarnUndercut'), tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')));
-		FrmtWarnMarkup = string.format(_AUCT('FrmtWarnMarkup'), tonumber(Auctioneer.Command.GetFilterVal('pct-markup')));
+		FrmtWarnUndercut = _AUCT('FrmtWarnUndercut'):format(tonumber(Auctioneer.Command.GetFilterVal('pct-underlow')));
+		FrmtWarnMarkup = _AUCT('FrmtWarnMarkup'):format(tonumber(Auctioneer.Command.GetFilterVal('pct-markup')));
 
 		if (warn == FrmtWarnToolow) then
 			--Color Red
@@ -198,7 +228,7 @@ function getAuctionKey()
 	else
 		factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 	end
-	return string.lower(serverName).."-"..string.lower(factionGroup);
+	return serverName:lower().."-"..factionGroup:lower();
 end
 
 -- Returns the current faction's opposing faction's auction signature
@@ -207,14 +237,14 @@ function getOppositeKey()
 	local factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 
 	if (factionGroup == "Alliance") then factionGroup="Horde"; else factionGroup="Alliance"; end
-	return string.lower(serverName).."-"..string.lower(factionGroup);
+	return serverName:lower().."-"..factionGroup:lower();
 end
 
 -- Returns the current server's neutral auction signature
 function getNeutralKey()
 	local serverName = GetCVar("realmName");
 
-	return string.lower(serverName).."-neutral";
+	return serverName:lower().."-neutral";
 end
 
 -- Returns the current faction's auction signature
@@ -222,7 +252,7 @@ function getHomeKey()
 	local serverName = GetCVar("realmName");
 	local factionGroup = Auctioneer.Core.Constants.PlayerFaction;
 
-	return string.lower(serverName).."-"..string.lower(factionGroup);
+	return serverName:lower().."-"..factionGroup:lower();
 end
 
 -- function returns true, if the given parameter is a valid option for the also command, false otherwise
@@ -236,13 +266,13 @@ function isValidAlso(also)
 	end
 
 	-- check if string matches: "[realm]-[faction]"
-	local s, e, r, f = string.find(also, "^(.+)-(.+)$")
-	if (s == nil) then
+	local realm, faction = also:match("^(.+)-(.+)$")
+	if (not realm) then
 		return false	-- invalid string
 	end
 
-	-- check if faction = "Horde" or "Alliance"
-	if (f == 'horde') or (f == 'alliance')or (f == 'neutral') then
+	-- check if faction = "horde" or "alliance"
+	if (faction == 'horde') or (faction == 'alliance') or (faction == 'neutral') then
 		return true
 	end
 
@@ -250,22 +280,20 @@ function isValidAlso(also)
 end
 
 function split(str, at)
-	local splut = {};
+	if (not (type(str) == "string")) then
+		return
+	end
 
-	if (type(str) ~= "string") then return nil end
-	if (not str) then str = "" end
+	if (not str) then
+		str = ""
+	end
 
-	if (not at)
-		then table.insert(splut, str)
+	if (not at) then
+		return {str}
 
 	else
-		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-			table.insert(splut, n);
-
-			if (c == '') then break end
-		end
+		return {strsplit(at, str)};
 	end
-	return splut;
 end
 
 function getItemLinks(str)
@@ -274,7 +302,7 @@ function getItemLinks(str)
 	end
 	local itemList = {};
 
-	for link, item in string.gfind(str, "|Hitem:([^|]+)|h[[]([^]]+)[]]|h") do
+	for link, item in str:gmatch("|Hitem:([^|]+)|h%[(.-)%]|h") do
 		table.insert(itemList, item.." = "..link)
 	end
 	return itemList;
@@ -285,11 +313,9 @@ function getItems(str)
 		return
 	end
 	local itemList = {};
-	local itemKey;
 
-	for itemID, randomProp, enchant, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
-		itemKey = itemID..":"..randomProp..":"..enchant;
-		table.insert(itemList, itemKey)
+	for itemID, enchant, randomProp in link:match("|Hitem:(%p?%d+):(%p?%d+):%p?%d+:%p?%d+:%p?%d+:%p?%d+:(%p?%d+):%p?%d+|h%[(.-)%]|h") do
+		table.insert(itemList, strjoin(":", itemID, randomProp, enchant))
 	end
 	return itemList;
 end
@@ -301,8 +327,8 @@ function getItemHyperlinks(str)
 	end
 	local itemList = {};
 
-	for color, item, name in string.gfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
-		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
+	for color, item, name in str:gmatch("|c(%x+)|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+)|h%[(.-)%]|h|r") do
+		table.insert(itemList, strconcat("|c", color, "|Hitem:", item, "|h[", name, "]|h|r"))
 	end
 	return itemList;
 end
@@ -333,7 +359,7 @@ function setFilterDefaults()
 		AuctionConfig.filters = {};
 	end
 
-	for k,v in ipairs(Auctioneer.Core.Constants.FilterDefaults) do
+	for k, v in ipairs(Auctioneer.Core.Constants.FilterDefaults) do
 		if (AuctionConfig.filters[k] == nil) then
 			AuctionConfig.filters[k] = v;
 		end
@@ -341,21 +367,23 @@ function setFilterDefaults()
 end
 
 -- Pass true to protect the Auction Frame from being undesireably closed, not true to disable this
+local ahFrameProtected
+local originalToggleWorldMap
 function protectAuctionFrame(enable)
 	--Make sure we have an AuctionFrame before doing anything
 	if (AuctionFrame) then
 		--Handle enabling of protection
 
-		if (enable and not Auctioneer_ProtectionEnabled and AuctionFrame:IsShown()) then
+		if (enable and not ahFrameProtected and AuctionFrame:IsShown()) then
 			--Remember that we are now protecting the frame
-			Auctioneer_ProtectionEnabled = true;
+			ahFrameProtected = true;
 			--If the frame is the current doublewide frame, then clear the doublewide
 
 			if ( GetDoublewideFrame() == AuctionFrame ) then
 				SetDoublewideFrame(nil)
 			end
 			--Remove the frame from the UI frame handling system
-			UIPanelWindows["AuctionFrame"] = nil
+			UIPanelWindows.AuctionFrame = nil
 			--If mobile frames is around, then remove AuctionFrame from Mobile Frames handling system
 
 			if (MobileFrames_UIPanelWindowBackup) then
@@ -368,25 +396,25 @@ function protectAuctionFrame(enable)
 			--Hook the function to show the WorldMap, WorldMap has internal code that forces all these frames to close
 			--so for it, we have to prevent it from showing at all
 
-			if (not Auctioneer_ToggleWorldMap) then
-				Auctioneer_ToggleWorldMap = ToggleWorldMap;
+			if (not originalToggleWorldMap) then
+				originalToggleWorldMap = ToggleWorldMap;
 			end
-			ToggleWorldMap = function ()
+			function ToggleWorldMap()
 
-				if ( ( not Auctioneer_ProtectionEnabled ) or ( not ( AuctionFrame and AuctionFrame:IsVisible() ) ) ) then
-					Auctioneer_ToggleWorldMap();
+				if ( ( not ahFrameProtected ) or ( not ( AuctionFrame and AuctionFrame:IsVisible() ) ) ) then
+					originalToggleWorldMap();
 
 				else
 					UIErrorsFrame:AddMessage(_AUCT('GuiNoWorldMap'), 0, 1, 0, 1.0, UIERRORS_HOLD_TIME)
 				end
 			end
 
-		elseif (Auctioneer_ProtectionEnabled) then
+		elseif (ahFrameProtected) then
 			--Handle disabling of protection
-			Auctioneer_ProtectionEnabled = nil;
+			ahFrameProtected = nil;
 			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
 
-			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList["AuctionFrame"] ) then
+			if ( MobileFrames_UIPanelWindowBackup and MobileFrames_MasterEnableList and MobileFrames_MasterEnableList.AuctionFrame ) then
 				MobileFrames_UIPanelWindowBackup.AuctionFrame = { area = "doublewide", pushable = 0 };
 
 				if ( MobileFrames_UIPanelsVisible and AuctionFrame:IsVisible() ) then
@@ -395,7 +423,7 @@ function protectAuctionFrame(enable)
 
 			else
 				--Put the frame back into the UI frame handling system
-				UIPanelWindows["AuctionFrame"] = { area = "doublewide", pushable = 0 };
+				UIPanelWindows.AuctionFrame = { area = "doublewide", pushable = 0 };
 
 				if ( AuctionFrame:IsVisible() ) then
 					SetDoublewideFrame(AuctionFrame)
@@ -412,20 +440,12 @@ function priceForOne(price, count)
 end
 
 function round(x)
-	local y = math.floor(x);
-
-	if (x - y >= 0.5) then
-		return y + 1;
-	end
-	return y;
+	return math.ceil(x - 0.5);
 end
 
 -------------------------------------------------------------------------------
 -- Localization functions
 -------------------------------------------------------------------------------
-
---Auctioneer.Command.CommandMap = nil;
---Auctioneer.Command.CommandMapRev = nil;
 
 function delocalizeFilterVal(value)
 	if (value == _AUCT('CmdOn')) then
@@ -471,17 +491,15 @@ end
 -- Turns a localized slash command into the generic English version of the command
 function delocalizeCommand(cmd)
 	if (not Auctioneer.Command.CommandMap) then Auctioneer.Command.BuildCommandMap();end
-	local result = Auctioneer.Command.CommandMap[cmd];
 
-	if (result) then return result; else return cmd; end
+	return Auctioneer.Command.CommandMap[cmd] or cmd;
 end
 
 -- Translate a generic English slash command to the localized version, if available
 function localizeCommand(cmd)
 	if (not Auctioneer.Command.CommandMapRev) then Auctioneer.Command.BuildCommandMap(); end
-	local result = Auctioneer.Command.CommandMapRev[cmd];
 
-	if (result) then return result; else return cmd; end
+	return Auctioneer.Command.CommandMapRev[cmd] or cmd;
 end
 
 -------------------------------------------------------------------------------
@@ -489,12 +507,9 @@ end
 -------------------------------------------------------------------------------
 
 function findEmptySlot()
-	local name, i
 	for bag = 0, 4 do
-		name = GetBagName(bag)
-		i = string.find(name, '(Quiver|Ammo|Bandolier)')
-		if not i then
-			for slot = 1, GetContainerNumSlots(bag),1 do
+		if (not GetBagName(bag):find('(Quiver|Ammo|Bandolier)')) then
+			for slot = 1, GetContainerNumSlots(bag) do
 				if not (GetContainerItemInfo(bag,slot)) then
 					return bag, slot;
 				end
@@ -505,18 +520,17 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.Util] "..message);
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.Util]", ...);
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.Util ~= nil) then return end;
+if (Auctioneer.Util) then return end;
 debugPrint("AucUtil.lua loaded");
 
-Auctioneer.Util =
-{
+Auctioneer.Util = {
 	StorePlayerFaction = storePlayerFaction,
 	GetTimeLeftString = getTimeLeftString,
 	GetSecondsLeftString = getSecondsLeftString,

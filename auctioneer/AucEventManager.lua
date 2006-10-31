@@ -43,23 +43,22 @@ local EventListeners = {};
 -- Registers for an auctioneer event.
 -------------------------------------------------------------------------------
 function registerEvent(eventName, callbackFunc)
-	local listeners = getListeners(eventName, true);
-	table.insert(listeners, callbackFunc);
+	return table.insert(getListeners(eventName, true), callbackFunc);
 end
 
 -------------------------------------------------------------------------------
 -- Unregisters for an auctioneer event.
 -------------------------------------------------------------------------------
 function unregisterEvent(eventName, callbackFunc)
-	local listeners = getListeners(eventName, false);
-	if (listeners ~= nil) then
-		for index, thisCallbackFunc in pairs(listeners) do
+	local listeners = getListeners(eventName);
+	if (listeners) then
+		for index, thisCallbackFunc in ipairs(listeners) do
 			if (thisCallbackFunc == callbackFunc) then
 				table.remove(listeners, index);
-				if (table.getn(listeners) == 0) then
+				if (#listeners == 0) then
 					EventListeners[eventName] = nil;
 				end
-				break;
+				return;
 			end
 		end
 	end
@@ -68,14 +67,14 @@ end
 -------------------------------------------------------------------------------
 -- Unregisters for an auctioneer event.
 -------------------------------------------------------------------------------
-function fireEvent(eventName, arg1, arg2, arg3, arg4, arg5)
-	local listeners = getListeners(eventName, false);
-	if (listeners ~= nil) then
-		--debugPrint("Begin firing event: "..eventName);
-		for index, callbackFunc in pairs(listeners) do
-			callbackFunc(eventName, arg1, arg2, arg3, arg4, arg5);
+function fireEvent(eventName, ...)
+	local listeners = getListeners(eventName);
+	if (listeners) then
+		--debugPrint("Begin firing event:", eventName);
+		for index, callbackFunc in ipairs(listeners) do
+			callbackFunc(eventName, ...);
 		end
-		--debugPrint("End firing event: "..eventName);
+		--debugPrint("End firing event:", eventName);
 	end
 end
 
@@ -84,7 +83,7 @@ end
 -------------------------------------------------------------------------------
 function getListeners(eventName, create)
 	local listeners = EventListeners[eventName];
-	if (listeners == nil and create) then
+	if (not listeners and create) then
 		listeners = {};
 		EventListeners[eventName] = listeners;
 	end
@@ -93,8 +92,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.EventManager] "..message);
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.EventManager]", ...);
 end
 
 -------------------------------------------------------------------------------

@@ -66,12 +66,12 @@ local debugPrint;
 -------------------------------------------------------------------------------
 local MedianMetaData =
 {
-	[1] = {
+	{
 		fieldName = "median";
 		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "count";
 		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
@@ -80,22 +80,22 @@ local MedianMetaData =
 
 local HSPInfoMetaData =
 {
-	[1] = {
+	{
 		fieldName = "hsp";
 		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[2] = {
+	{
 		fieldName = "count";
 		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[3] = {
+	{
 		fieldName = "market";
 		fromStringFunc = tonumber;
 		toStringFunc = stringFromNumber;
 	},
-	[4] = {
+	{
 		fieldName = "warn";
 		fromStringFunc = stringFromNilSafeString;
 		toStringFunc = nilSafeStringFromString;
@@ -120,14 +120,14 @@ end
 function getCacheForAHKey(ahKey, create)
 	-- If no auction house key was provided use the default key for the
 	-- current zone.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
+	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
 
 	-- Get or create the cache.
-	if (AuctioneerCache == nil) then
+	if (not AuctioneerCache) then
 		AuctioneerCache = {};
 	end
 	local cache = AuctioneerCache[ahKey];
-	if (cache == nil and create) then
+	if ((not cache) and (create)) then
 		cache = createCacheForAHKey(ahKey);
 		AuctioneerCache[ahKey] = cache;
 		debugPrint("Created AuctioneerCache["..ahKey.."]");
@@ -139,13 +139,13 @@ end
 -- Creates a cache table for the specified AH key.
 -------------------------------------------------------------------------------
 function createCacheForAHKey(ahKey)
-	local cache = {};
-	cache.ahKey = ahKey;
-	cache.snapshotMedians = {};
-	cache.historicalMedians = {};
-	cache.lowestBuyoutAuctionId = {};
-	cache.hspInfo = {};
-	return cache;
+	return {
+		ahKey = ahKey;
+		snapshotMedians = {};
+		historicalMedians = {};
+		lowestBuyoutAuctionId = {};
+		hspInfo = {};
+	}
 end
 
 -------------------------------------------------------------------------------
@@ -161,11 +161,11 @@ function clearCache(itemKey, ahKey)
 			cache.historicalMedians[itemKey] = nil;
 			cache.lowestBuyoutAuctionId[itemKey] = nil;
 			cache.hspInfo[itemKey] = nil;
-			debugPrint("Removed "..itemKey.." from cache "..cache.ahKey);
+			debugPrint("Removed", itemKey, "from cache", cache.ahKey);
 		else
 			-- Toss the entire cache by recreating it.
 			AuctioneerCache[cache.ahKey] = createCacheForAHKey(cache.ahKey);
-			debugPrint("Cleared cache database for "..cache.ahKey);
+			debugPrint("Cleared cache database for", cache.ahKey);
 		end
 	end
 end
@@ -224,7 +224,7 @@ function getItemSnapshotMedianBuyout(itemKey, ahKey)
 			end
 		end
 		unpacked.median, unpacked.count = getMedian(buyoutPrices);
-		
+
 		-- Cache the calculated values.
 		cache.snapshotMedians[itemKey] = Auctioneer.Database.PackRecord(unpacked, MedianMetaData);
 	end
@@ -258,7 +258,7 @@ function getItemHistoricalMedianBuyout(itemKey, ahKey)
 		else
 			unpacked.median, unpacked.count = 0, 0;
 		end
-		
+
 		-- Cache the calculated values.
 		cache.historicalMedians[itemKey] = Auctioneer.Database.PackRecord(unpacked, MedianMetaData);
 	end
@@ -318,7 +318,7 @@ function getPercentile(valuesTable, pct)
 		return sortedTable[i1] * (1 - f) + sortedTable[i2] * f
 	end
 
-	local tableSize = table.getn(valuesTable) or 0
+	local tableSize = #valuesTable or 0
 
 	if (tableSize == 0) then
 		return 0, 0; -- if there is an empty table, returns median = 0, count = 0
@@ -382,7 +382,7 @@ function getMeans(itemKey, from)
 		if (itemTotals.buyoutCount > 0) then
 			avgBuy = math.floor(itemTotals.buyoutPrice / itemTotals.buyoutCount);
 		end
-		
+
 		seenCount = itemTotals.seenCount;
 	end
 	return avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount;
@@ -484,7 +484,7 @@ function getAuctionWithLowestBuyout(itemKey, ahKey)
 			end);
 
 		-- If we found any auctions, get the lowest buyout price.
-		if (table.getn(auctions) > 0) then
+		if (#auctions > 0) then
 			-- Sort the list of auctions by buyoutPrice.
 			table.sort(
 				auctions,
@@ -494,7 +494,7 @@ function getAuctionWithLowestBuyout(itemKey, ahKey)
 
 			-- Cache the lowest auction id.
 			cache.lowestBuyoutAuctionId[itemKey] = auctions[1].auctionId;
-			
+
 			-- Return the lowest we found.
 			auctionWithLowestBuyout = auctions[1];
 		else
@@ -502,8 +502,8 @@ function getAuctionWithLowestBuyout(itemKey, ahKey)
 			cache.lowestBuyoutAuctionId[itemKey] = 0;
 		end
 	end
-	
-	
+
+
 	return auctionWithLowestBuyout;
 end
 
@@ -519,9 +519,9 @@ function doLow(link)
 		for pos,itemKey in pairs(items) do
 			local auction = getAuctionWithLowestBuyout(itemKey, ahKey);
 			if (not auction) then
-				Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtNoauct'), itemLinks[pos]));
+				Auctioneer.Util.ChatPrint(_AUCT('FrmtNoauct'):format(itemLinks[pos]));
 			else
-				Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtLowLine'), Auctioneer.Util.ColorTextWhite(count.."x")..itemLinks[pos], EnhTooltip.GetTextGSC(auction.buyoutPrice), Auctioneer.Util.ColorTextWhite(auction.owner), EnhTooltip.GetTextGSC(auction.buyout / auction.count), Auctioneer.Util.ColorTextWhite(percentLessThan(getUsableMedian(itemKey), auction.buyout / auction.count).."%")));
+				Auctioneer.Util.ChatPrint(_AUCT('FrmtLowLine'):format(Auctioneer.Util.ColorTextWhite(count.."x")..itemLinks[pos], EnhTooltip.GetTextGSC(auction.buyoutPrice), Auctioneer.Util.ColorTextWhite(auction.owner), EnhTooltip.GetTextGSC(auction.buyout / auction.count), Auctioneer.Util.ColorTextWhite(percentLessThan(getUsableMedian(itemKey), auction.buyout / auction.count).."%")));
 			end
 		end
 	end
@@ -537,10 +537,10 @@ function doMedian(link)
 		for pos,itemKey in pairs(items) do
 			local median, count = getUsableMedian(itemKey);
 			if (not median) then
-				Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtMedianNoauct'), Auctioneer.Util.ColorTextWhite(itemName)));
+				Auctioneer.Util.ChatPrint(_AUCT('FrmtMedianNoauct'):format(Auctioneer.Util.ColorTextWhite(itemName)));
 			else
 				if (not count) then count = 0 end
-				Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtMedianLine'), count, Auctioneer.Util.ColorTextWhite(itemName), EnhTooltip.GetTextGSC(median)));
+				Auctioneer.Util.ChatPrint(_AUCT('FrmtMedianLine'):format(count, Auctioneer.Util.ColorTextWhite(itemName), EnhTooltip.GetTextGSC(median)));
 			end
 		end
 	end
@@ -555,7 +555,7 @@ function doHSP(link)
 	if (items) then
 		for pos,itemKey in pairs(items) do
 			local highestSellablePrice = getHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtHspLine'), itemLinks[pos], EnhTooltip.GetTextGSC(Auctioneer.Util.NilSafeString(highestSellablePrice))));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtHspLine'):format(itemLinks[pos], EnhTooltip.GetTextGSC(Auctioneer.Util.NilSafeString(highestSellablePrice))));
 		end
 	end
 end
@@ -564,7 +564,7 @@ end
 -------------------------------------------------------------------------------
 function getBidBasedSellablePrice(itemKey, ahKey, avgMin, avgBuy, avgBid, bidPct, buyPct, avgQty, seenCount)
 	-- We can pass these values along if we have them.
-	if (seenCount == nil) then
+	if (not seenCount) then
 		avgMin,avgBuy,avgBid,bidPct,buyPct,avgQty,seenCount = getMeans(itemKey, ahKey);
 	end
 	local bidBasedSellPrice = 0;
@@ -624,8 +624,8 @@ end
 -------------------------------------------------------------------------------
 function getHSP(itemKey, ahKey)
 	-- Normalize the arguments.
-	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end
-	if (itemKey == nil) then
+	if (not ahKey) then ahKey = Auctioneer.Util.GetAuctionKey() end
+	if (not itemKey) then
 		debugPrint("ERROR: Calling Auctioneer.Statistic.GetHSP(itemKey, ahKey) - Function requires valid itemKey.");
 		return nil;
 	end
@@ -639,7 +639,7 @@ function getHSP(itemKey, ahKey)
 		info = Auctioneer.Database.UnpackRecord(packedInfo, HSPInfoMetaData);
 		return info.hsp, info.count, info.market, info.warn;
 	end
-	
+
 	-- Its not in the cache, so calculate it.
 	--debugprofilestart();
 	--debugPrint("getHSP: Cache miss - "..itemKey);
@@ -655,7 +655,7 @@ function getHSP(itemKey, ahKey)
 		tonumber(Auctioneer.Command.GetFilterVal('pct-nocomp')),
 		tonumber(Auctioneer.Command.GetFilterVal('pct-markup'))
 	);
-	
+
 	-- Cache our calculations
 	local info = {};
 	info.hsp = hsp;
@@ -664,8 +664,8 @@ function getHSP(itemKey, ahKey)
 	info.warn = warn;
 	cache.hspInfo[itemKey] = Auctioneer.Database.PackRecord(info, HSPInfoMetaData);
 	--Auctioneer.Util.ChatPrint("HSP calculation took "..debugprofilestop());
-	
-	debugPrint("Calculated HSP for "..itemKey..": hsp="..info.hsp.."; count="..info.count.."; market="..info.market.."; warn="..info.warn);
+
+	debugPrint("Calculated HSP for", itemKey, ": hsp=", info.hsp, "; count=", info.count, "; market=", info.market, "; warn=", info.warn);
 	return info.hsp, info.count, info.market, info.warn;
 end
 
@@ -701,7 +701,7 @@ function determinePrice(itemKey, ahKey, auctionWithLowestBuyout, lowestAllowedPe
 				if (lowestBuyout <= marketPrice or highestSellablePrice >= lowestBuyout) then
 					-- set highest price to "Discount low"
 					highestSellablePrice = subtractPercent(lowestBuyout, discountLowPercent);
-					warn = string.format(_AUCT('FrmtWarnUndercut'), discountLowPercent);
+					warn = _AUCT('FrmtWarnUndercut'):format(discountLowPercent);
 				end
 			end
 		else -- no low buyout, use discount no competition
@@ -714,7 +714,7 @@ function determinePrice(itemKey, ahKey, auctionWithLowestBuyout, lowestAllowedPe
 			-- set highest price to "Discount low"
 			debugPrint("Discount low case 2");
 			highestSellablePrice = subtractPercent(auctionWithLowestBuyout.buyoutPrice, discountLowPercent);
-			warn = string.format(_AUCT('FrmtWarnUndercut'), discountLowPercent);
+			warn = _AUCT('FrmtWarnUndercut'):format(discountLowPercent);
 		else
 			-- Use vendor price markup.
 			local baseData;
@@ -724,7 +724,7 @@ function determinePrice(itemKey, ahKey, auctionWithLowestBuyout, lowestAllowedPe
 				-- use vendor prices if no auction data available
 				local vendorSell = Auctioneer.Util.NullSafe(baseData.sell); -- use vendor prices
 				highestSellablePrice = addPercent(vendorSell, vendorSellMarkupPercent);
-				warn = string.format(_AUCT('FrmtWarnMarkup'), vendorSellMarkupPercent);
+				warn = _AUCT('FrmtWarnMarkup'):format(vendorSellMarkupPercent);
 			end
 		end
 	end
@@ -796,8 +796,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.Statistic] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.Statistic]", ...);
 end
 
 -------------------------------------------------------------------------------

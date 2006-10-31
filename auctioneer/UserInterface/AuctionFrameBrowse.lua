@@ -53,10 +53,10 @@ function postFilterButtonSetTypeHook(_, _, button, type, text, isLast)
 	--debugPrint("Setting button", button:GetName(), type, text, isLast);
 
 	local buttonName = button:GetName();
-	local i,j, buttonID = string.find(buttonName, "(%d+)$");
+	local buttonID = buttonName:match("(%d+)$");
 	buttonID = tonumber(buttonID);
 
-	local checkbox = getglobal(button:GetName().."Checkbox");
+	local checkbox = getglobal(buttonName.."Checkbox");
 	if checkbox then
 		if (type == "class") then
 			local classid, maxid = Auctioneer.Command.FindFilterClass(text);
@@ -120,21 +120,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.BrowseTab] "..message);
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.BrowseTab]", ...);
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.UI.BrowseTab ~= nil) then return end;
+if (Auctioneer.UI.BrowseTab) then return end;
 debugPrint("AuctioneerFrameBrowse.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.UI.BrowseTab = 
-{
+Auctioneer.UI.BrowseTab = {
 	Load = load;
 	QueryForItemByName = queryForItemByName;
 };

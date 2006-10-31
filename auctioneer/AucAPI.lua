@@ -47,7 +47,9 @@ local requestAuctionScan;
 function getVendorBuyPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
-		if (ret) then return ret.buy end
+		if (ret) then
+			return ret.buy
+		end
 	end
 end
 
@@ -63,7 +65,9 @@ end
 function getVendorSellPrice(itemId)
 	if (Informant) then
 		local ret = Informant.GetItem(itemId)
-		if (ret) then return ret.sell end
+		if (ret) then
+			return ret.sell
+		end
 	end
 end
 
@@ -71,7 +75,7 @@ end
 --	Auctioneer.API.GetScanAge()
 --
 --	This function gets the time (in seconds) since the last scan was completed.
---	The function will return the time since the last "update" scan, 
+--	The function will return the time since the last "update" scan,
 --	not the time since the last full scan was done.
 --
 --	This function has no parameters
@@ -95,8 +99,7 @@ end
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.API =
-{
+Auctioneer.API = {
 	GetVendorBuyPrice = getVendorBuyPrice,
 	GetVendorSellPrice = getVendorSellPrice,
 

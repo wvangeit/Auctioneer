@@ -108,7 +108,7 @@ function initialize()
 					Auctioneer.Statistic.ClearCache(itemKey);
 					Auctioneer.SnapshotDB.Clear(itemKey);
 					Auctioneer.HistoryDB.Clear(itemKey);
-					Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLink));
+					Auctioneer.Util.ChatPrint(_AUCT('FrmtActClearOk'):format(itemLink));
 				end
 			UIDropDownMenu_AddButton(clearMenuItem);
 			
@@ -116,7 +116,7 @@ function initialize()
 			if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
 				-- Locate the AuctionFrameTransactions tab
 				local tabIndex = 1;
-				while (getglobal("AuctionFrameTab"..(tabIndex)) ~= nil and
+				while (getglobal("AuctionFrameTab"..(tabIndex)) and
 					   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
 					tabIndex = tabIndex + 1;
 				end
@@ -144,13 +144,12 @@ end
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.UI.AuctionDropDownMenu ~= nil) then return end;
+if (Auctioneer.UI.AuctionDropDownMenu) then return end;
 debugPrint("AuctionDropDownMenu.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.UI.AuctionDropDownMenu = 
-{
+Auctioneer.UI.AuctionDropDownMenu = {
 	Show = show;
 };

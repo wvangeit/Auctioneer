@@ -62,7 +62,7 @@ function ListTemplate_Initialize(frame, physicalColumns, logicalColumns)
 	for physicalColumnIndex = 1, MAX_COLUMNS do
 		local button = getglobal(frame:GetName().."Column"..physicalColumnIndex.."Sort");
 		local dropdown = getglobal(frame:GetName().."Column"..physicalColumnIndex.."DropDown");
-		if (physicalColumnIndex <= table.getn(physicalColumns)) then
+		if (physicalColumnIndex <= #physicalColumns) then
 			local physicalColumn = physicalColumns[physicalColumnIndex];
 			local logicalColumn = physicalColumn.logicalColumn
 			local column = {};
@@ -72,7 +72,7 @@ function ListTemplate_Initialize(frame, physicalColumns, logicalColumns)
 			getglobal(button:GetName().."Arrow"):Hide();
 			getglobal(button:GetName().."Text"):SetText(logicalColumn.title);
 			button:Show();
-			if (table.getn(physicalColumn.logicalColumns) > 1) then
+			if (#physicalColumn.logicalColumns > 1) then
 				dropdown:Show();
 			else
 				dropdown:Hide();
@@ -188,14 +188,14 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function ListTemplateScrollFrame_Update(frame)
-	if (not frame) then frame = this end;
+	frame = frame or this;
 	local parent = frame:GetParent();
 	local content = parent.content;
-	FauxScrollFrame_Update(frame, table.getn(content), parent.lines, parent.lineHeight);
+	FauxScrollFrame_Update(frame, #content, parent.lines, parent.lineHeight);
 	for line = 1, parent.lines do
 		local item = getglobal(parent:GetName().."Item"..line);
 		local contentIndex = line + FauxScrollFrame_GetOffset(frame);
-		if contentIndex <= table.getn(content) then
+		if contentIndex <= #content then
 			for columnIndex = 1, MAX_COLUMNS do
 				-- Get the text control (if any)
 				local text = getglobal(parent:GetName().."Item"..line.."Column"..columnIndex);
@@ -210,7 +210,7 @@ function ListTemplateScrollFrame_Update(frame)
 				end
 
 				-- If the column exists, update it
-				if (columnIndex <= table.getn(parent.physicalColumns)) then
+				if (columnIndex <= #parent.physicalColumns) then
 					local physicalColumn = parent.physicalColumns[columnIndex];
 					local logicalColumn = physicalColumn.logicalColumn;
 					local value = logicalColumn.valueFunc(content[contentIndex]);
@@ -270,16 +270,16 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function ListTemplate_DropDown_OnLoad()
-	getglobal(this:GetName().."Text"):Hide();
-	this.initialize = ListTemplate_DropDown_Initialize;
-	UIDropDownMenu_SetSelectedID(this, 1);
+function ListTemplate_DropDown_OnLoad(self)
+	getglobal(self:GetName().."Text"):Hide();
+	self.initialize = ListTemplate_DropDown_Initialize;
+	UIDropDownMenu_SetSelectedID(self, 1);
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function ListTemplate_DropDown_Initialize()
-	local dropdown = this:GetParent();
+function ListTemplate_DropDown_Initialize(self)
+	local dropdown = self:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.physicalColumns) then
 		local physicalColumnIndex = dropdown:GetID();
@@ -297,10 +297,10 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function  ListTemplate_DropDownItem_OnClick()
-	local logicalColumnIndex = this:GetID();
-	local physicalColumnIndex = this.owner:GetID();
-	local dropdown = this.owner;
+function  ListTemplate_DropDownItem_OnClick(self)
+	local logicalColumnIndex = self:GetID();
+	local physicalColumnIndex = self.owner:GetID();
+	local dropdown = self.owner;
 	local frame = dropdown:GetParent();
 	if (frame.physicalColumns[physicalColumnIndex].logicalColumn ~= frame.physicalColumns[physicalColumnIndex].logicalColumns[logicalColumnIndex]) then
 		-- Change the physical column's logical column

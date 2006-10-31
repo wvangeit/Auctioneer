@@ -1,7 +1,7 @@
 ## Title: Auctioneer
 ## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 11200
+## Interface: 20000
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Informant, Khaos, ImprovedErrorFrame
@@ -20,6 +20,7 @@ Babylonian\Babylonian.lua
 AucStrings.lua
 AucLocale.lua
 
+AucCore.lua
 AucUtil.lua
 AucEventManager.lua
 Database\AucDatabase.lua
@@ -31,7 +32,6 @@ Database\AucFixedPriceDB.lua
 BalancedList.lua
 AucAPI.lua
 AucCommand.lua
-AucCore.lua
 AucFilter.lua
 AucStatistic.lua
 AucTooltip.lua

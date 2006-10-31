@@ -57,7 +57,7 @@ function load()
 	AuctionsDurationText:SetPoint("TOPLEFT", "AuctionsBuyoutErrorText", "TOPLEFT", 0, -7);
 	AuctionsDepositText:ClearAllPoints();
 	AuctionsDepositText:SetPoint("TOPLEFT", "AuctionsDurationText", "TOPLEFT", 0, -31);
-	if (AuctionInfo ~= nil) then
+	if (AuctionInfo) then
 		AuctionInfo:ClearAllPoints();
 		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -33);
 	end
@@ -104,11 +104,11 @@ function onNewAuctionUpdate()
 	if (ahKey and itemKey and count) then
 		-- Set the historical median information.
 		local historicalMedian, historicalMedCount = Auctioneer.Statistic.GetItemHistoricalMedianBuyout(itemKey);
-		auctionsSetLine(1, string.format(_AUCT('FrmtAuctinfoHist'), historicalMedCount), historicalMedian * count);
+		auctionsSetLine(1, _AUCT('FrmtAuctinfoHist'):format(historicalMedCount), historicalMedian * count);
 
 		-- Set the snapshot median information.
 		local snapshotMedian, snapshotMedCount = Auctioneer.Statistic.GetItemSnapshotMedianBuyout(itemKey);
-		auctionsSetLine(2, string.format(_AUCT('FrmtAuctinfoSnap'), snapshotMedCount), snapshotMedian * count);
+		auctionsSetLine(2, _AUCT('FrmtAuctinfoSnap'):format(snapshotMedCount), snapshotMedian * count);
 
 		-- Set the lowest buyout found in the snapshot.
 		local currentLowestBuyout;
@@ -151,7 +151,7 @@ function onNewAuctionUpdate()
 			auctionsSetWarn(warn);
 		end
 
-		-- Check the set fixed price check box if we have a fixed price.	
+		-- Check the set fixed price check box if we have a fixed price.
 		if (fixedPrice) then
 			AuctPriceRememberCheck:SetChecked(true)
 		else
@@ -181,11 +181,11 @@ end
 function auctionsSetLine(line, textStr, moneyAmount)
 	local text = getglobal("AuctionInfoText"..line);
 	local money = getglobal("AuctionInfoMoney"..line);
-	if (text == nil) then debugPrint("Error, no text for AuctionInfo line "..line); end
-	if (money == nil) then debugPrint("Error, no money for AuctionInfo line "..line); end
+	if (not text) then debugPrint("Error, no text for AuctionInfo line "..line); end
+	if (not money) then debugPrint("Error, no money for AuctionInfo line "..line); end
 	text:SetText(textStr);
 	text:Show();
-	if (money ~= nil) then
+	if (money) then
 		MoneyFrame_Update("AuctionInfoMoney"..line, math.ceil(Auctioneer.Util.NullSafe(moneyAmount)));
 		getglobal("AuctionInfoMoney"..line.."SilverButtonText"):SetTextColor(1.0,1.0,1.0);
 		getglobal("AuctionInfoMoney"..line.."CopperButtonText"):SetTextColor(0.86,0.42,0.19);
@@ -199,7 +199,7 @@ end
 -- Sets the warning text.
 -------------------------------------------------------------------------------
 function auctionsSetWarn(textStr)
-	if (AuctionInfoWarnText == nil) then debugPrint("Error, no text for AuctionInfo line "..line); end
+	if (not AuctionInfoWarnText) then debugPrint("Error, no text for AuctionInfo line "..line); end
 	local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(textStr)
 	AuctionInfoWarnText:SetText(textStr);
 	AuctionInfoWarnText:SetTextColor(cRed, cGreen, cBlue);
@@ -249,11 +249,12 @@ function AuctPriceRememberCheck_OnClick()
 	if (not AuctPriceRememberCheck:GetChecked()) then
 		Auctioneer.FixedPriceDB.RemoveFixedPrice(currentAuctionItemKey)
 	else
-		local fixedPrice = {};
-		fixedPrice.bid = MoneyInputFrame_GetCopper(StartPrice);
-		fixedPrice.buyout = MoneyInputFrame_GetCopper(BuyoutPrice);
-		fixedPrice.count = currentAuctionCount;
-		fixedPrice.duration = AuctionFrameAuctions.duration;
+		local fixedPrice = {
+			bid = MoneyInputFrame_GetCopper(StartPrice);
+			buyout = MoneyInputFrame_GetCopper(BuyoutPrice);
+			count = currentAuctionCount;
+			duration = AuctionFrameAuctions.duration;
+		}
 		Auctioneer.FixedPriceDB.SetFixedPrice(currentAuctionItemKey, nil, fixedPrice);
 	end
 end
@@ -280,9 +281,9 @@ function getCurrentAuctionItemKeyAndCount()
 		local bag, slot, id, rprop, enchant, uniq = EnhTooltip.FindItemInBags(name);
 
 		-- If it wasn't in one of the bags, check if it was a bag.
-		if (bag == nil) then
+		if (not bag) then
 			local i
-			for i = 0, 4, 1 do
+			for i = 0, 4 do
 				if name == GetBagName(i) then
 					id, rprop, enchant, uniq = EnhTooltip.BreakLink(GetInventoryItemLink("player", ContainerIDToInventoryID(i)))
 					break
@@ -291,7 +292,7 @@ function getCurrentAuctionItemKeyAndCount()
 		end
 
 		if (id and rprop and enchant) then
-			itemKey = id..":"..rprop..":"..enchant;
+			itemKey = strjoin(":", id, rprop, enchant);
 		end
 	end
 	return itemKey, count;
@@ -299,21 +300,20 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.AuctionsTab] "..message);
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.AuctionsTab]", ...);
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (Auctioneer.UI.AuctionsTab ~= nil) then return end;
+if (Auctioneer.UI.AuctionsTab) then return end;
 debugPrint("AuctioneerFrameAuctions.lua loaded");
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.UI.AuctionsTab = 
-{
+Auctioneer.UI.AuctionsTab = {
 	Load = load;
 	RememberPrice = rememberPrice;
 };

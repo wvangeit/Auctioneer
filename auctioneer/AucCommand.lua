@@ -23,7 +23,7 @@
 --]]
 
 --Local function prototypes
-local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, getKhaosDurationsList, getKhaosProtectionList, getKhaosFinishList, registerKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale
+local register, convertKhaos, getKhaosDefault, setKhaosSetKeyParameter, setKhaosSetKeyValue, getKhaosLocaleList, getKhaosDurationsList, getKhaosProtectionList, getKhaosFinishList, registerKhaos, buildCommandMap, commandMap, commandMapRev, command, chatPrintHelp, onOff, clear, alsoInclude, isValidLocale, setLocale, default, getFrameNames, getFrameIndex, setFrame, protectWindow, auctionDuration, finish, genVarSet, percentVarSet, numVarSet, setFilter, getFilterVal, getFilter, findFilterClass, setFilter, getLocale, debugPrint
 
 
 function register()
@@ -37,19 +37,20 @@ end
 -- Convert a single key in a table of configuration settings
 function convertConfig(t, key, values, ...) --Local
 	local modified = false;
-	local v = nil;
+	local v;
 
-	for i,localizedKey in ipairs(arg) do
-		if (t[localizedKey] ~= nil) then
+	for i = 1, select("#", ...) do
+		local localizedKey = select(i, ...)
+		if (t[localizedKey]) then
 			v = t[localizedKey];
 			t[localizedKey] = nil;
 			modified = true;
 		end
 	end
-	if (t[key] ~= nil) then v = t[key]; end
+	if (t[key]) then v = t[key]; end
 
-	if (v ~= nil) then
-		if (values[v] ~= nil) then
+	if (v) then
+		if (values[v]) then
 			t[key] = values[v];
 			modified = true;
 		else
@@ -143,7 +144,7 @@ function setKhaosSetKeyParameter(key, parameter, value) --Local
 		if (Khaos.getSetKey("Auctioneer", key)) then
 			Khaos.setSetKeyParameter("Auctioneer", key, parameter, value)
 		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+			debugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
 		end
 	end
 end
@@ -153,14 +154,14 @@ function setKhaosSetKeyValue(key, value) --Local
 		local kKey = Khaos.getSetKey("Auctioneer", key)
 
 		if (not kKey) then
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+			debugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
 		elseif (kKey.checked ~= nil) then
 			if (type(value) == "string") then value = (value == "on"); end
 			Khaos.setSetKeyParameter("Auctioneer", key, "checked", value)
 		elseif (kKey.value ~= nil) then
 			Khaos.setSetKeyParameter("Auctioneer", key, "value", value)
 		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
+			debugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
 		end
 	end
 end
@@ -214,7 +215,7 @@ function registerKhaos()
 		id="Auctioneer";
 		text="Auctioneer";
 		helptext=function()
-			return _AUCT('GuiMainHelp')
+			return _AUCT('GuiMainHelp');
 		end;
 		difficulty=1;
 		default={checked=true};
@@ -223,7 +224,7 @@ function registerKhaos()
 				id="Header";
 				text="Auctioneer";
 				helptext=function()
-					return _AUCT('GuiMainHelp')
+					return _AUCT('GuiMainHelp');
 				end;
 				type=K_HEADER;
 				difficulty=1;
@@ -232,10 +233,10 @@ function registerKhaos()
 				id="enabled";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiMainEnable')
+					return _AUCT('GuiMainEnable');
 				end;
 				helptext=function()
-					return _AUCT('HelpOnoff')
+					return _AUCT('HelpOnoff');
 				end;
 				callback=function(state)
 					Auctioneer.Command.OnOff(state.checked);
@@ -260,10 +261,10 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiLoad')
+					return _AUCT('GuiLoad');
 				end;
 				helptext=function()
-					return _AUCT('HelpLoad')
+					return _AUCT('HelpLoad');
 				end;
 				callback=function(state) end;
 				feedback=function(state)
@@ -281,16 +282,16 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiLocale')
+					return _AUCT('GuiLocale');
 				end;
 				helptext=function()
-					return _AUCT('HelpLocale')
+					return _AUCT('HelpLocale');
 				end;
 				callback = function(state)
 				end;
 				feedback = function (state)
 					Auctioneer.Command.SetLocale(state.value);
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), state.value);
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdLocale'), state.value);
 				end;
 				default = {
 					value = Auctioneer.Command.GetLocale();
@@ -305,10 +306,10 @@ function registerKhaos()
 				id="AuctioneerStatsHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiStatsHeader')
+					return _AUCT('GuiStatsHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiStatsHelp')
+					return _AUCT('GuiStatsHelp');
 				end;
 				difficulty=2;
 			};
@@ -316,19 +317,19 @@ function registerKhaos()
 				id="show-stats";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiStatsEnable')
+					return _AUCT('GuiStatsEnable');
 				end;
 				helptext=function()
-					return _AUCT('HelpStats')
+					return _AUCT('HelpStats');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-stats", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowStats')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowStats'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowStats')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowStats'));
 					end
 				end;
 				check=true;
@@ -341,19 +342,19 @@ function registerKhaos()
 				id="show-average";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAverages')
+					return _AUCT('GuiAverages');
 				end;
 				helptext=function()
-					return _AUCT('HelpAverage')
+					return _AUCT('HelpAverage');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-average", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowAverage')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowAverage'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowAverage')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowAverage'));
 					end
 				end;
 				check=true;
@@ -366,19 +367,19 @@ function registerKhaos()
 				id="show-median";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiMedian')
+					return _AUCT('GuiMedian');
 				end;
 				helptext=function()
-					return _AUCT('HelpMedian')
+					return _AUCT('HelpMedian');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-median", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowMedian')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowMedian'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowMedian')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowMedian'));
 					end
 				end;
 				check=true;
@@ -391,19 +392,19 @@ function registerKhaos()
 				id="show-suggest";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiSuggest')
+					return _AUCT('GuiSuggest');
 				end;
 				helptext=function()
-					return _AUCT('HelpSuggest')
+					return _AUCT('HelpSuggest');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-suggest", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowSuggest')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowSuggest'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowSuggest')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowSuggest'));
 					end
 				end;
 				check=true;
@@ -416,19 +417,19 @@ function registerKhaos()
 				id="show-verbose";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiVerbose')
+					return _AUCT('GuiVerbose');
 				end;
 				helptext=function()
-					return _AUCT('HelpVerbose')
+					return _AUCT('HelpVerbose');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-verbose", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowVerbose')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowVerbose'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowVerbose')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowVerbose'));
 					end
 				end;
 				check=true;
@@ -441,10 +442,10 @@ function registerKhaos()
 				id="AuctioneerAuctionHouseHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiAuctionHouseHeader')
+					return _AUCT('GuiAuctionHouseHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiAuctionHouseHeaderHelp')
+					return _AUCT('GuiAuctionHouseHeaderHelp');
 				end;
 				difficulty=1;
 			};
@@ -452,19 +453,19 @@ function registerKhaos()
 				id="autofill";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAutofill')
+					return _AUCT('GuiAutofill');
 				end;
 				helptext=function()
-					return _AUCT('HelpAutofill')
+					return _AUCT('HelpAutofill');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("autofill", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdAutofill')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('CmdAutofill'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdAutofill')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('CmdAutofill'));
 					end
 				end;
 				check=true;
@@ -481,16 +482,16 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiAuctionDuration')
+					return _AUCT('GuiAuctionDuration');
 				end;
 				helptext=function()
-					return _AUCT('HelpAuctionDuration')
+					return _AUCT('HelpAuctionDuration');
 				end;
 				callback=function(state)
 					Auctioneer.Command.AuctionDuration(state.value);
 				end;
 				feedback=function(state)
-					return string.format(_AUCT('FrmtAuctionDuration'), _AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')));
+					return _AUCT('FrmtAuctionDuration'):format(_AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')));
 				end;
 				default = { value = _AUCT('CmdAuctionDuration'..Auctioneer.Core.Constants.FilterDefaults['auction-duration']) };
 				disabled = { value = _AUCT('CmdAuctionDuration'..Auctioneer.Core.Constants.FilterDefaults['auction-duration']) };
@@ -505,16 +506,16 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiProtectWindow')
+					return _AUCT('GuiProtectWindow');
 				end;
 				helptext=function()
-					return _AUCT('HelpProtectWindow')
+					return _AUCT('HelpProtectWindow');
 				end;
 				callback=function(state)
 					Auctioneer.Command.ProtectWindow(state.value);
 				end;
 				feedback=function(state)
-					return string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')));
+					return _AUCT('FrmtProtectWindow'):format(_AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')));
 				end;
 				default = { value = _AUCT('CmdProtectWindow'..Auctioneer.Core.Constants.FilterDefaults['protect-window']) };
 				disabled = { value = _AUCT('CmdProtectWindow'..Auctioneer.Core.Constants.FilterDefaults['protect-window']) };
@@ -529,16 +530,16 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiFinish')
+					return _AUCT('GuiFinish');
 				end;
 				helptext=function()
-					return _AUCT('HelpFinish')
+					return _AUCT('HelpFinish');
 				end;
 				callback=function(state)
 					Auctioneer.Command.Finish(state.value);
 				end;
 				feedback=function(state)
-					return string.format(_AUCT('FrmtFinish'), _AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')));
+					return _AUCT('FrmtFinish'):format(_AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')));
 				end;
 				default = { value = _AUCT('CmdFinish'..Auctioneer.Core.Constants.FilterDefaults['finish']) };
 				disabled = { value = _AUCT('CmdFinish'..Auctioneer.Core.Constants.FilterDefaults['finish']) };
@@ -549,19 +550,19 @@ function registerKhaos()
 				id="show-warning";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiRedo')
+					return _AUCT('GuiRedo');
 				end;
 				helptext=function()
-					return _AUCT('HelpRedo')
+					return _AUCT('HelpRedo');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-warning", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowRedo')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowRedo'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowRedo')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowRedo'));
 					end
 				end;
 				check=true;
@@ -574,19 +575,19 @@ function registerKhaos()
 				id="warn-color";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiWarnColor')
+					return _AUCT('GuiWarnColor');
 				end;
 				helptext=function()
-					return _AUCT('HelpWarnColor')
+					return _AUCT('HelpWarnColor');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("warn-color", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdWarnColor')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('CmdWarnColor'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdWarnColor')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('CmdWarnColor'));
 					end
 				end;
 				check=true;
@@ -599,19 +600,19 @@ function registerKhaos()
 				id="finish-sound";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiFinishSound')
+					return _AUCT('GuiFinishSound');
 				end;
 				helptext=function()
-					return _AUCT('HelpFinishSound')
+					return _AUCT('HelpFinishSound');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("finish-sound", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdFinishSound')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('CmdFinishSound'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdFinishSound')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('CmdFinishSound'));
 					end
 				end;
 				check=true;
@@ -624,10 +625,10 @@ function registerKhaos()
 				id="AuctioneerEmbedHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiEmbedHeader')
+					return _AUCT('GuiEmbedHeader');
 				end;
 				helptext=function()
-					return _AUCT('HelpEmbed')
+					return _AUCT('HelpEmbed');
 				end;
 				difficulty=1;
 			};
@@ -635,19 +636,19 @@ function registerKhaos()
 				id="embed";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiEmbed')
+					return _AUCT('GuiEmbed');
 				end;
 				helptext=function()
-					return _AUCT('HelpEmbed')
+					return _AUCT('HelpEmbed');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("embed", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('CmdEmbed')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('CmdEmbed'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('CmdEmbed')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('CmdEmbed'));
 					end
 				end;
 				check=true;
@@ -660,19 +661,19 @@ function registerKhaos()
 				id="show-embed-blankline";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiEmbedBlankline')
+					return _AUCT('GuiEmbedBlankline');
 				end;
 				helptext=function()
-					return _AUCT('HelpEmbedBlank')
+					return _AUCT('HelpEmbedBlank');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-embed-blankline", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowEmbedBlank')));
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowEmbedBlank'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowEmbedBlank')));
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowEmbedBlank'));
 					end
 				end;
 				check=true;
@@ -685,10 +686,10 @@ function registerKhaos()
 				id="AuctioneerClearHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiClearHeader')
+					return _AUCT('GuiClearHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiClearHelp')
+					return _AUCT('GuiClearHelp');
 				end;
 				difficulty=3;
 			};
@@ -697,20 +698,20 @@ function registerKhaos()
 				type=K_BUTTON;
 				setup={
 					buttonText=function()
-						return _AUCT('GuiClearallButton')
+						return _AUCT('GuiClearallButton');
 					end;
 				};
 				text=function()
-					return _AUCT('GuiClearall')
+					return _AUCT('GuiClearall');
 				end;
 				helptext=function()
-					return _AUCT('GuiClearallHelp')
+					return _AUCT('GuiClearallHelp');
 				end;
 				callback=function()
 					Auctioneer.Command.Clear("all");
 				end;
 				feedback=function()
-					return string.format(_AUCT('FrmtActClearall'),  _AUCT('GuiClearallNote'));
+					return _AUCT('FrmtActClearall'):format(_AUCT('GuiClearallNote'));
 				end;
 				dependencies={enabled={checked=true;}};
 				difficulty=3;
@@ -720,14 +721,14 @@ function registerKhaos()
 				type=K_BUTTON;
 				setup={
 					buttonText=function()
-						return _AUCT('GuiClearsnapButton')
+						return _AUCT('GuiClearsnapButton');
 					end;
 				};
 				text=function()
-					return _AUCT('GuiClearsnap')
+					return _AUCT('GuiClearsnap');
 				end;
 				helptext=function()
-					return _AUCT('GuiClearsnapHelp')
+					return _AUCT('GuiClearsnapHelp');
 				end;
 				callback=function()
 					Auctioneer.Command.Clear(_AUCT('CmdClearSnapshot'));
@@ -742,10 +743,10 @@ function registerKhaos()
 				id="AuctioneerPercentsHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiPercentsHeader')
+					return _AUCT('GuiPercentsHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiPercentsHelp')
+					return _AUCT('GuiPercentsHelp');
 				end;
 				difficulty=4;
 			};
@@ -756,16 +757,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiBidmarkdown')
+					return _AUCT('GuiBidmarkdown');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctBidmarkdown')
+					return _AUCT('HelpPctBidmarkdown');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-bidmarkdown", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctBidmarkdown'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctBidmarkdown'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-bidmarkdown') };
 				disabled = { value = getKhaosDefault('pct-bidmarkdown') };
@@ -779,16 +780,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiMarkup')
+					return _AUCT('GuiMarkup');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctMarkup')
+					return _AUCT('HelpPctMarkup');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-markup", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctMarkup'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctMarkup'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-markup') };
 				disabled = { value = getKhaosDefault('pct-markup') };
@@ -802,16 +803,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiMaxless')
+					return _AUCT('GuiMaxless');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctMaxless')
+					return _AUCT('HelpPctMaxless');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-maxless", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctMaxless'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctMaxless'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-maxless') };
 				disabled = { value = getKhaosDefault('pct-maxless') };
@@ -825,16 +826,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiNocomp')
+					return _AUCT('GuiNocomp');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctNocomp')
+					return _AUCT('HelpPctNocomp');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-nocomp", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctNocomp'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctNocomp'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-nocomp') };
 				disabled = { value = getKhaosDefault('pct-nocomp') };
@@ -848,16 +849,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiUnderlow')
+					return _AUCT('GuiUnderlow');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctUnderlow')
+					return _AUCT('HelpPctUnderlow');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-underlow", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctUnderlow'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctUnderlow'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-underlow') };
 				disabled = { value = getKhaosDefault('pct-underlow') };
@@ -871,16 +872,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiUndermkt')
+					return _AUCT('GuiUndermkt');
 				end;
 				helptext=function()
-					return _AUCT('HelpPctUndermkt')
+					return _AUCT('HelpPctUndermkt');
 				end;
 				callback = function(state)
 					Auctioneer.Command.PercentVarSet("pct-undermkt", state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), _AUCT('CmdPctUndermkt'), state.value.."%");
+					return _AUCT('FrmtActSet'):format(_AUCT('CmdPctUndermkt'), state.value.."%");
 				end;
 				default = {	value = getKhaosDefault('pct-undermkt') };
 				disabled = { value = getKhaosDefault('pct-undermkt') };
@@ -891,10 +892,10 @@ function registerKhaos()
 				id="AuctioneerAskPriceHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiAskPriceHeader')
+					return _AUCT('GuiAskPriceHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiAskPriceHeaderHelp')
+					return _AUCT('GuiAskPriceHeaderHelp');
 				end;
 				difficulty=2;
 			};
@@ -902,10 +903,10 @@ function registerKhaos()
 				id="askprice";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPrice')
+					return _AUCT('GuiAskPrice');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPrice')
+					return _AUCT('HelpAskPrice');
 				end;
 				callback=function(state)
 					if (state.checked) then
@@ -916,9 +917,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (_AUCT('StatAskPriceOn'))
+						return (_AUCT('StatAskPriceOn'));
 					else
-						return (_AUCT('StatAskPriceOff'))
+						return (_AUCT('StatAskPriceOff'));
 					end
 				end;
 				check=true;
@@ -934,16 +935,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiAskPriceTrigger')
+					return _AUCT('GuiAskPriceTrigger');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceTrigger')
+					return _AUCT('HelpAskPriceTrigger');
 				end;
 				callback = function(state)
-					Auctioneer.AskPrice.SetTrigger(state.value)
+					Auctioneer.AskPrice.SetTrigger(state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceTrigger'), state.value);
+					return _AUCT('FrmtActSet'):format("askprice ".._AUCT('CmdAskPriceTrigger'), state.value);
 				end;
 				default = { value = getKhaosDefault('askprice-trigger') };
 				disabled = { value = getKhaosDefault('askprice-trigger') };
@@ -954,19 +955,19 @@ function registerKhaos()
 				id="askprice-whispers";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceWhispers')
+					return _AUCT('GuiAskPriceWhispers');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceWhispers')
+					return _AUCT('HelpAskPriceWhispers');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("whispers", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceWhispers')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceWhispers'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceWhispers')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceWhispers'));
 					end
 				end;
 				check=true;
@@ -979,19 +980,19 @@ function registerKhaos()
 				id="askprice-vendor";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceVendor')
+					return _AUCT('GuiAskPriceVendor');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceVendor')
+					return _AUCT('HelpAskPriceVendor');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("vendor", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceVendor')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceVendor'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceVendor')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceVendor'));
 					end
 				end;
 				check=true;
@@ -1004,19 +1005,19 @@ function registerKhaos()
 				id="askprice-party";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceParty')
+					return _AUCT('GuiAskPriceParty');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceParty')
+					return _AUCT('HelpAskPriceParty');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("party", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceParty')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceParty'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceParty')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceParty'));
 					end
 				end;
 				check=true;
@@ -1029,19 +1030,19 @@ function registerKhaos()
 				id="askprice-guild";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceGuild')
+					return _AUCT('GuiAskPriceGuild');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceGuild')
+					return _AUCT('HelpAskPriceGuild');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("guild", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceGuild')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceGuild'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceGuild')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceGuild'));
 					end
 				end;
 				check=true;
@@ -1054,19 +1055,19 @@ function registerKhaos()
 				id="askprice-smart";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceSmart')
+					return _AUCT('GuiAskPriceSmart');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceSmart')
+					return _AUCT('HelpAskPriceSmart');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("smart", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceSmart')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceSmart'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceSmart')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceSmart'));
 					end
 				end;
 				check=true;
@@ -1082,16 +1083,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return string.format(_AUCT('GuiAskPriceWord'), 1)
+					return _AUCT('GuiAskPriceWord'):format(1);
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceWord')
+					return _AUCT('HelpAskPriceWord');
 				end;
 				callback = function(state)
 					Auctioneer.AskPrice.SetCustomSmartWords(nil, 1, state.value)
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceWord').." 1", Auctioneer.Command.GetFilterVal('askprice-word1'))
+					return _AUCT('FrmtActSet'):format("askprice ".._AUCT('CmdAskPriceWord').." 1", Auctioneer.Command.GetFilterVal('askprice-word1'));
 				end;
 				default = { value = getKhaosDefault('askprice-word1') };
 				disabled = { value = getKhaosDefault('askprice-word1') };
@@ -1105,16 +1106,16 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return string.format(_AUCT('GuiAskPriceWord'), 2)
+					return _AUCT('GuiAskPriceWord'):format(2)
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceWord')
+					return _AUCT('HelpAskPriceWord');
 				end;
 				callback = function(state)
-					Auctioneer.AskPrice.SetCustomSmartWords(nil, 2, state.value)
+					Auctioneer.AskPrice.SetCustomSmartWords(nil, 2, state.value);
 				end;
 				feedback = function (state)
-					return string.format(_AUCT('FrmtActSet'), "askprice ".._AUCT('CmdAskPriceWord').." 2", Auctioneer.Command.GetFilterVal('askprice-word2'))
+					return _AUCT('FrmtActSet'):format("askprice ".._AUCT('CmdAskPriceWord').." 2", Auctioneer.Command.GetFilterVal('askprice-word2'));
 				end;
 				default = { value = getKhaosDefault('askprice-word2') };
 				disabled = { value = getKhaosDefault('askprice-word2') };
@@ -1125,19 +1126,19 @@ function registerKhaos()
 				id="askprice-ad";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiAskPriceAd')
+					return _AUCT('GuiAskPriceAd');
 				end;
 				helptext=function()
-					return _AUCT('HelpAskPriceAd')
+					return _AUCT('HelpAskPriceAd');
 				end;
 				callback=function(state)
 					Auctioneer.AskPrice.GenVarSet("ad", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtAskPriceEnable'), "askprice ".._AUCT('CmdAskPriceAd')))
+						return _AUCT('FrmtAskPriceEnable'):format("askprice ".._AUCT('CmdAskPriceAd'));
 					else
-						return (string.format(_AUCT('FrmtAskPriceDisable'), "askprice ".._AUCT('CmdAskPriceAd')))
+						return _AUCT('FrmtAskPriceDisable'):format("askprice ".._AUCT('CmdAskPriceAd'));
 					end
 				end;
 				check=true;
@@ -1150,10 +1151,10 @@ function registerKhaos()
 				id="AuctioneerOtherHeader";
 				type=K_HEADER;
 				text=function()
-					return _AUCT('GuiOtherHeader')
+					return _AUCT('GuiOtherHeader');
 				end;
 				helptext=function()
-					return _AUCT('GuiOtherHelp')
+					return _AUCT('GuiOtherHelp');
 				end;
 				difficulty=1;
 			};
@@ -1164,10 +1165,10 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiAlso')
+					return _AUCT('GuiAlso');
 				end;
 				helptext=function()
-					return _AUCT('HelpAlso')
+					return _AUCT('HelpAlso');
 				end;
 				callback = function(state)
 					Auctioneer.Command.AlsoInclude(state.value);
@@ -1178,9 +1179,9 @@ function registerKhaos()
 					elseif ((state.value == _AUCT('CmdAlsoOpposite')) or (state.value == "opposite")) then
 						return _AUCT('GuiAlsoOpposite');
 					elseif (not Auctioneer.Util.IsValidAlso(state.value)) then
-						return string.format(_AUCT('FrmtUnknownArg'), state.value, _AUCT('CmdAlso'))
+						return _AUCT('FrmtUnknownArg'):format(state.value, _AUCT('CmdAlso'));
 					else
-						return string.format(_AUCT('GuiAlsoDisplay'), state.value);
+						return _AUCT('GuiAlsoDisplay'):format(state.value);
 					end
 				end;
 				default = { value = getKhaosDefault('also') };
@@ -1196,17 +1197,17 @@ function registerKhaos()
 					multiSelect = false;
 				};
 				text=function()
-					return _AUCT('GuiPrintin')
+					return _AUCT('GuiPrintin');
 				end;
 				helptext=function()
-					return _AUCT('HelpPrintin')
+					return _AUCT('HelpPrintin');
 				end;
 				callback=function(state)
 					Auctioneer.Command.SetFrame(state.value);
 				end;
 				feedback=function(state)
 					local _, frameName = Auctioneer.Command.GetFrameNames(state.value)
-					return string.format(_AUCT('FrmtPrintin'), frameName);
+					return _AUCT('FrmtPrintin'):format(frameName);
 				end;
 				default = { value = getKhaosDefault('printframe') };
 				disabled = { value = getKhaosDefault('printframe') };
@@ -1217,19 +1218,19 @@ function registerKhaos()
 				id="show-link";
 				type=K_TEXT;
 				text=function()
-					return _AUCT('GuiLink')
+					return _AUCT('GuiLink');
 				end;
 				helptext=function()
-					return _AUCT('HelpLink')
+					return _AUCT('HelpLink');
 				end;
 				callback=function(state)
 					Auctioneer.Command.GenVarSet("show-link", state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_AUCT('FrmtActEnable'), _AUCT('ShowLink')))
+						return _AUCT('FrmtActEnable'):format(_AUCT('ShowLink'));
 					else
-						return (string.format(_AUCT('FrmtActDisable'), _AUCT('ShowLink')))
+						return _AUCT('FrmtActDisable'):format(_AUCT('ShowLink'));
 					end
 				end;
 				check=true;
@@ -1243,14 +1244,14 @@ function registerKhaos()
 				type=K_BUTTON;
 				setup={
 					buttonText = function()
-						return _AUCT('GuiDefaultAllButton')
+						return _AUCT('GuiDefaultAllButton');
 					end;
 				};
 				text=function()
-					return _AUCT('GuiDefaultAll')
+					return _AUCT('GuiDefaultAll');
 				end;
 				helptext=function()
-					return _AUCT('GuiDefaultAllHelp')
+					return _AUCT('GuiDefaultAllHelp');
 				end;
 				callback=function()
 					Auctioneer.Command.Default(_AUCT('CmdClearAll'));
@@ -1268,10 +1269,10 @@ function registerKhaos()
 					callOn = {"tab", "escape", "enter"};
 				};
 				text=function()
-					return _AUCT('GuiDefaultOption')
+					return _AUCT('GuiDefaultOption');
 				end;
 				helptext=function()
-					return _AUCT('HelpDefault')
+					return _AUCT('HelpDefault');
 				end;
 				callback = function(state)
 					Auctioneer.Command.Default(state.value);
@@ -1301,9 +1302,7 @@ function registerKhaos()
 
 	-- This setting is not actually stored in the Khaos option set and
 	-- requires special treatment to be updated
-	local loadType = Stubby.GetConfig("Auctioneer", "LoadType")
-	if (not loadType) then loadType = "auctionhouse"; end
-	setKhaosSetKeyValue("LoadSettings", loadType)
+	return setKhaosSetKeyValue("LoadSettings", Stubby.GetConfig("Auctioneer", "LoadType") or "auctionhouse")
 end
 
 
@@ -1381,7 +1380,7 @@ function mainHandler(command, source)
 	end;
 
 	--Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local i,j, cmd, param = string.find(command, "^([^ ]+) (.+)$");
+	local cmd, param = command:match("^([^ ]+) (.+)$");
 
 	if (not cmd) then cmd = command; end
 	if (not cmd) then cmd = ""; end
@@ -1508,14 +1507,14 @@ function mainHandler(command, source)
 	--Command not recognized
 	else
 		if (chatprint) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActUnknown'), cmd));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActUnknown'):format(cmd));
 		end
 	end
 end
 
 --Help ME!! (The Handler) (Another shameless copy from the original function)
 function chatPrintHelp()
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
+	Auctioneer.Util.ChatPrint(_AUCT('FrmtWelcome'):format(Auctioneer.Version), 0.8, 0.8, 0.2);
 
 	local onOffToggle = " (".._AUCT('CmdOn').."|".._AUCT('CmdOff').."|".._AUCT('CmdToggle')..")";
 
@@ -1526,48 +1525,48 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint("  |cffffffff/auctioneer ".._AUCT('CmdDisable').."|r\n          " .. _AUCT('HelpDisable') .. "\n\n");
 
 	local lineFormat = "  |cffffffff/auctioneer %s "..onOffToggle.."|r |cff2040ff[%s]|r\n          %s\n\n";
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowVerbose'),		Auctioneer.Util.GetLocalizedFilterVal('show-verbose'),			_AUCT('HelpVerbose')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowAverage'),		Auctioneer.Util.GetLocalizedFilterVal('show-average'),			_AUCT('HelpAverage')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowMedian'),		Auctioneer.Util.GetLocalizedFilterVal('show-median'),			_AUCT('HelpMedian')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowSuggest'),		Auctioneer.Util.GetLocalizedFilterVal('show-suggest'),			_AUCT('HelpSuggest')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowStats'),			Auctioneer.Util.GetLocalizedFilterVal('show-stats'),			_AUCT('HelpStats')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowLink'),			Auctioneer.Util.GetLocalizedFilterVal('show-link'),				_AUCT('HelpLink')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAutofill'),		Auctioneer.Util.GetLocalizedFilterVal('autofill'),				_AUCT('HelpAutofill')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdEmbed'),			Auctioneer.Util.GetLocalizedFilterVal('embed'),					_AUCT('HelpEmbed')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowEmbedBlank'),	Auctioneer.Util.GetLocalizedFilterVal('show-embed-blankline'),	_AUCT('HelpEmbedBlank')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('ShowRedo'),			Auctioneer.Util.GetLocalizedFilterVal('show-warning'),			_AUCT('HelpRedo')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionClick'),	Auctioneer.Util.GetLocalizedFilterVal('auction-click'),			_AUCT('HelpAuctionClick')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdWarnColor'),		Auctioneer.Util.GetLocalizedFilterVal('warn-color'),			_AUCT('HelpWarnColor')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdUpdatePrice'),	Auctioneer.Util.GetLocalizedFilterVal('update-price'),			_AUCT('HelpUpdatePrice')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdFinishSound'),	Auctioneer.Util.GetLocalizedFilterVal('finish-sound'),			_AUCT('HelpFinishSound')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowVerbose'),		Auctioneer.Util.GetLocalizedFilterVal('show-verbose'),			_AUCT('HelpVerbose')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowAverage'),		Auctioneer.Util.GetLocalizedFilterVal('show-average'),			_AUCT('HelpAverage')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowMedian'),		Auctioneer.Util.GetLocalizedFilterVal('show-median'),			_AUCT('HelpMedian')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowSuggest'),		Auctioneer.Util.GetLocalizedFilterVal('show-suggest'),			_AUCT('HelpSuggest')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowStats'),			Auctioneer.Util.GetLocalizedFilterVal('show-stats'),			_AUCT('HelpStats')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowLink'),			Auctioneer.Util.GetLocalizedFilterVal('show-link'),				_AUCT('HelpLink')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAutofill'),		Auctioneer.Util.GetLocalizedFilterVal('autofill'),				_AUCT('HelpAutofill')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdEmbed'),			Auctioneer.Util.GetLocalizedFilterVal('embed'),					_AUCT('HelpEmbed')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowEmbedBlank'),	Auctioneer.Util.GetLocalizedFilterVal('show-embed-blankline'),	_AUCT('HelpEmbedBlank')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowRedo'),			Auctioneer.Util.GetLocalizedFilterVal('show-warning'),			_AUCT('HelpRedo')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAuctionClick'),	Auctioneer.Util.GetLocalizedFilterVal('auction-click'),			_AUCT('HelpAuctionClick')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdWarnColor'),		Auctioneer.Util.GetLocalizedFilterVal('warn-color'),			_AUCT('HelpWarnColor')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdUpdatePrice'),	Auctioneer.Util.GetLocalizedFilterVal('update-price'),			_AUCT('HelpUpdatePrice')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdFinishSound'),	Auctioneer.Util.GetLocalizedFilterVal('finish-sound'),			_AUCT('HelpFinishSound')));
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r |cff2040ff[%s]|r\n          %s\n\n";
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdProtectWindow'),		_AUCT('OptProtectWindow'), 		_AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')),		_AUCT('HelpProtectWindow')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAuctionDuration'),	_AUCT('OptAuctionDuration'),	_AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')),	_AUCT('HelpAuctionDuration')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdProtectWindow'),		_AUCT('OptProtectWindow'), 		_AUCT('CmdProtectWindow'..Auctioneer.Command.GetFilterVal('protect-window')),		_AUCT('HelpProtectWindow')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAuctionDuration'),	_AUCT('OptAuctionDuration'),	_AUCT('CmdAuctionDuration'..Auctioneer.Command.GetFilterVal('auction-duration')),	_AUCT('HelpAuctionDuration')));
 
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdLocale'),				_AUCT('OptLocale'),				Auctioneer.Util.GetLocalizedFilterVal("locale"),									_AUCT('HelpLocale')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPrintin'),			_AUCT('OptPrintin'),			frameName, _AUCT('HelpPrintin')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdFinish'),				_AUCT('OptFinish'),				_AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')),						_AUCT('HelpFinish')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdLocale'),				_AUCT('OptLocale'),				Auctioneer.Util.GetLocalizedFilterVal("locale"),									_AUCT('HelpLocale')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPrintin'),			_AUCT('OptPrintin'),			frameName, _AUCT('HelpPrintin')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdFinish'),				_AUCT('OptFinish'),				_AUCT('CmdFinish'..Auctioneer.Command.GetFilterVal('finish')),						_AUCT('HelpFinish')));
 
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctMarkup'),			_AUCT('OptPctMarkup'),			Auctioneer.Command.GetFilterVal('pct-markup'),										_AUCT('HelpPctMarkup')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctBidmarkdown'),		_AUCT('OptPctBidmarkdown'),		Auctioneer.Command.GetFilterVal('pct-bidmarkdown'),									_AUCT('HelpPctBidmarkdown')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctNocomp'),			_AUCT('OptPctNocomp'),			Auctioneer.Command.GetFilterVal('pct-nocomp'),										_AUCT('HelpPctNocomp')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUnderlow'),		_AUCT('OptPctUnderlow'),		Auctioneer.Command.GetFilterVal('pct-underlow'),									_AUCT('HelpPctUnderlow')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctUndermkt'),		_AUCT('OptPctUndermkt'),		Auctioneer.Command.GetFilterVal('pct-undermkt'),									_AUCT('HelpPctUndermkt')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPctMaxless'),			_AUCT('OptPctMaxless'),			Auctioneer.Command.GetFilterVal('pct-maxless'),										_AUCT('HelpPctMaxless')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdBidLimit'),			_AUCT('OptBidLimit'),			Auctioneer.Command.GetFilterVal('bid-limit'),										_AUCT('HelpBidLimit')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctMarkup'),			_AUCT('OptPctMarkup'),			Auctioneer.Command.GetFilterVal('pct-markup'),										_AUCT('HelpPctMarkup')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctBidmarkdown'),		_AUCT('OptPctBidmarkdown'),		Auctioneer.Command.GetFilterVal('pct-bidmarkdown'),									_AUCT('HelpPctBidmarkdown')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctNocomp'),			_AUCT('OptPctNocomp'),			Auctioneer.Command.GetFilterVal('pct-nocomp'),										_AUCT('HelpPctNocomp')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctUnderlow'),		_AUCT('OptPctUnderlow'),		Auctioneer.Command.GetFilterVal('pct-underlow'),									_AUCT('HelpPctUnderlow')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctUndermkt'),		_AUCT('OptPctUndermkt'),		Auctioneer.Command.GetFilterVal('pct-undermkt'),									_AUCT('HelpPctUndermkt')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPctMaxless'),			_AUCT('OptPctMaxless'),			Auctioneer.Command.GetFilterVal('pct-maxless'),										_AUCT('HelpPctMaxless')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdBidLimit'),			_AUCT('OptBidLimit'),			Auctioneer.Command.GetFilterVal('bid-limit'),										_AUCT('HelpBidLimit')));
 
 	Auctioneer.AskPrice.ChatPrintHelp()
 
 	lineFormat = "  |cffffffff/auctioneer %s %s|r\n          %s\n\n";
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdClear'),			_AUCT('OptClear'),			_AUCT('HelpClear')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdAlso'),			_AUCT('OptAlso'),			_AUCT('HelpAlso')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdBroker'),			_AUCT('OptBroker'),			_AUCT('HelpBroker')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdBidbroker'),		_AUCT('OptBidbroker'),		_AUCT('HelpBidbroker')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdPercentless'),	_AUCT('OptPercentless'),	_AUCT('HelpPercentless')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdCompete'),		_AUCT('OptCompete'),		_AUCT('HelpCompete')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdScan'),			_AUCT('OptScan'),			_AUCT('HelpScan')));
-	Auctioneer.Util.ChatPrint(string.format(lineFormat, _AUCT('CmdDefault'),		_AUCT('OptDefault'),		_AUCT('HelpDefault')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdClear'),			_AUCT('OptClear'),			_AUCT('HelpClear')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAlso'),			_AUCT('OptAlso'),			_AUCT('HelpAlso')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdBroker'),			_AUCT('OptBroker'),			_AUCT('HelpBroker')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdBidbroker'),		_AUCT('OptBidbroker'),		_AUCT('HelpBidbroker')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdPercentless'),	_AUCT('OptPercentless'),	_AUCT('HelpPercentless')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdCompete'),		_AUCT('OptCompete'),		_AUCT('HelpCompete')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdScan'),			_AUCT('OptScan'),			_AUCT('HelpScan')));
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdDefault'),		_AUCT('OptDefault'),		_AUCT('HelpDefault')));
 end
 --[[
 	The onOff(state, chatprint) function handles the state of the Auctioneer AddOn (whether it is currently on or off)
@@ -1641,7 +1640,7 @@ function clear(param, chatprint)
 				Auctioneer.SnapshotDB.Clear(itemKey, ahKey);
 				Auctioneer.HistoryDB.Clear(itemKey, ahKey);
 				if (chatprint) then
-					Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearOk'), itemLinks[pos]));
+					Auctioneer.Util.ChatPrint(_AUCT('FrmtActClearOk'):format(itemLinks[pos]));
 				end
 			end
 		end
@@ -1649,7 +1648,7 @@ function clear(param, chatprint)
 
 	if (chatprint) then
 		if ((param == _AUCT('CmdClearAll')) or (param == "all")) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActClearall'), ahKey));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActClearall'):format(ahKey));
 
 		elseif ((param == _AUCT('CmdClearSnapshot')) or (param == "snapshot")) then
 			Auctioneer.Util.ChatPrint(_AUCT('FrmtActClearsnap'));
@@ -1667,7 +1666,7 @@ function alsoInclude(param, chatprint)
 
 	if (not Auctioneer.Util.IsValidAlso(param)) then
 		if (chatprint) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownRf'), param));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownRf'):format(param));
 		end
 		return
 	end
@@ -1678,10 +1677,10 @@ function alsoInclude(param, chatprint)
 		setKhaosSetKeyValue('also', param);
 
 		if (param == "off") then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActDisable'), _AUCT('CmdAlso')));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActDisable'):format(_AUCT('CmdAlso')));
 
 		else
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdAlso'), localizedParam));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format(_AUCT('CmdAlso'), localizedParam));
 		end
 	end
 end
@@ -1711,11 +1710,11 @@ function setLocale(param, chatprint)
 
 	if (chatprint) then
 		if (validLocale) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), _AUCT('CmdLocale'), param));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format(_AUCT('CmdLocale'), param));
 			setKhaosSetKeyValue('locale', Babylonian.GetOrder());
 
 		else
-			Auctioneer.Util.ChatPrint(string.format(_AUCT("FrmtUnknownLocale"), param));
+			Auctioneer.Util.ChatPrint(_AUCT("FrmtUnknownLocale"):format(param));
 			local locales = "    ";
 			for locale, data in pairs(AuctioneerLocalizations) do
 				locales = locales .. " '" .. locale .. "' ";
@@ -1759,7 +1758,7 @@ function default(param, chatprint)
 			end
 
 		else
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActDefault'), paramLocalized));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActDefault'):format(paramLocalized));
 			setKhaosSetKeyValue(param, Auctioneer.Command.GetFilterVal(param));
 		end
 	end
@@ -1849,14 +1848,14 @@ function setFrame(frame, chatprint)
 	if (chatprint == true) then
 		_, frameName = getFrameNames(frameNumber);
 		if (getFrameIndex() ~= frameNumber) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtPrintin'), frameName));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtPrintin'):format(frameName));
 		end
 	end
 
 	setFilter("printframe", frameNumber);
 
 	if (chatprint == true) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtPrintin'), frameName));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtPrintin'):format(frameName));
 		setKhaosSetKeyValue("printframe", frameNumber);
 	end
 end
@@ -1874,14 +1873,14 @@ function protectWindow(param, chatprint)
 		mode = 2;
 
 	else
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer.Util.LocalizeCommand("protect-window")));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, Auctioneer.Util.LocalizeCommand("protect-window")));
 		return
 	end
 
 	setFilter("protect-window", mode);
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtProtectWindow'), _AUCT('CmdProtectWindow' .. mode)));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtProtectWindow'):format(_AUCT('CmdProtectWindow' .. mode)));
 		setKhaosSetKeyValue("protect-window", mode);
 	end
 end
@@ -1902,14 +1901,14 @@ function auctionDuration(param, chatprint)
 		mode = 3;
 
 	else
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer.Util.LocalizeCommand("auction-duration")));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, Auctioneer.Util.LocalizeCommand("auction-duration")));
 		return
 	end
 
 	setFilter("auction-duration", mode);
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtAuctionDuration'), _AUCT('CmdAuctionDuration' .. mode)));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtAuctionDuration'):format(_AUCT('CmdAuctionDuration' .. mode)));
 		setKhaosSetKeyValue("auction-duration", mode);
 	end
 end
@@ -1927,14 +1926,14 @@ function finish(param, chatprint)
 		mode = 2;
 
 	else
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, Auctioneer.Util.LocalizeCommand("finish")));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, Auctioneer.Util.LocalizeCommand("finish")));
 		return
 	end
 
 	setFilter("finish", mode);
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtFinish'), _AUCT('CmdFinish' .. mode)));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtFinish'):format(_AUCT('CmdFinish' .. mode)));
 		setKhaosSetKeyValue("finish", mode);
 	end
 end
@@ -1952,10 +1951,10 @@ function genVarSet(variable, param, chatprint)
 
 	if (chatprint) then
 		if (getFilter(variable)) then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActEnable'), Auctioneer.Util.LocalizeCommand(variable)));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActEnable'):format(Auctioneer.Util.LocalizeCommand(variable)));
 			setKhaosSetKeyValue(variable, true)
 		else
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActDisable'), Auctioneer.Util.LocalizeCommand(variable)));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtActDisable'):format(Auctioneer.Util.LocalizeCommand(variable)));
 			setKhaosSetKeyValue(variable, false)
 		end
 	end
@@ -1968,7 +1967,7 @@ function percentVarSet(variable, param, chatprint)
 		-- failed to convert the param to a number
 
 		if chatprint then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, variable));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, variable));
 		end
 		return -- invalid argument, don't do anything
 	end
@@ -1979,18 +1978,18 @@ function percentVarSet(variable, param, chatprint)
 	Auctioneer_HSPCache = {};
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), variable, paramVal.."%"));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format(variable, paramVal.."%"));
 		setKhaosSetKeyValue(variable, paramVal);
 	end
 end
 
 function numVarSet(variable, param, chatprint)
 	local paramVal = tonumber(param);
-	if paramVal == nil then
+	if (not paramVal) then
 		-- failed to convert the param to a number
 
 		if chatprint then
-			Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtUnknownArg'), param, variable));
+			Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, variable));
 		end
 		return -- invalid argument, don't do anything
 	end
@@ -1998,7 +1997,7 @@ function numVarSet(variable, param, chatprint)
 	setFilter(variable, paramVal);
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtActSet'), variable, paramVal));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format(variable, paramVal));
 		setKhaosSetKeyValue(variable, paramVal);
 	end
 end
@@ -2027,7 +2026,7 @@ function getFilterVal(type)
 		Auctioneer.Util.SetFilterDefaults();
 	end
 	local val = AuctionConfig.filters[type];
-	if (val == nil) then
+	if (not val) then
 		val = Auctioneer.Core.Constants.FilterDefaults[type];
 	end
 	return val;
@@ -2035,9 +2034,12 @@ end
 
 function getFilter(filter)
 	value = getFilterVal(filter);
-	if ((value == _AUCT('CmdOn')) or (value == "on")) then return true;
+	if ((value == _AUCT('CmdOn')) or (value == "on")) then
+		return true;
 
-	elseif ((value == _AUCT('CmdOff')) or (value == "off")) then return false; end
+	elseif ((value == _AUCT('CmdOff')) or (value == "off")) then
+		return false;
+	end
 	return true;
 end
 
@@ -2065,6 +2067,17 @@ function getLocale()
 	return locale;
 end
 
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.Command]", ...);
+end
+
+--=============================================================================
+-- Initialization
+--=============================================================================
+if (Auctioneer.Command) then return end;
+debugPrint("AucCommand.lua loaded");
 
 Auctioneer.Command = {
 	Register = register,

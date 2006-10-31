@@ -189,11 +189,7 @@ end
 -- Converts number into a numeric string.
 -------------------------------------------------------------------------------
 function stringFromNumber(number)
-	if (not number) then
-		return NIL_VALUE;
-	else
-		return tostring(number);
-	end
+	return tostring(number) or NIL_VALUE;
 end
 
 -------------------------------------------------------------------------------
@@ -222,9 +218,9 @@ function packRecord(record, recordMetaData)
 	for index, metadata in ipairs(recordMetaData) do
 		local value = metadata.toStringFunc(record[metadata.fieldName]);
 		if (not packedRecord) then
-			packedRecord = value;
+			packedRecord = value
 		else
-			packedRecord = packedRecord..";"..value;
+			packedRecord = strjoin(";", packedRecord, value);
 		end
 	end
 	return packedRecord;
@@ -234,18 +230,10 @@ end
 -- Converts a ';' delimited string into a record.
 -------------------------------------------------------------------------------
 function unpackRecord(packedRecord, recordMetaData)
-	local record = {};
-	local startOffset = 1;
+	local record = {strsplit(";", packedRecord)};
 	for index, metadata in ipairs(recordMetaData) do
-		local value;
-		local endOffset = string.find(packedRecord, ";", startOffset, true);
-		if (not endOffset) then
-			value = string.sub(packedRecord, startOffset);
-		else
-			value = string.sub(packedRecord, startOffset, endOffset - 1);
-			startOffset = endOffset + 1;
-		end
-		record[metadata.fieldName] = metadata.fromStringFunc(value);
+		record[metadata.fieldName] = metadata.fromStringFunc(record[index]);
+		record[index] = nil;
 	end
 	return record;
 end
@@ -257,10 +245,10 @@ function packNumericList(list)
 	local function GrowList(last, n)
 		if (n == 1) then
 			if (hist == "") then hist = tostring(last);
-			else hist = string.format("%s:%d", hist, last); end
+			else hist = ("%s:%d"):format(hist, last); end
 		elseif (n ~= 0) then
 			if (hist == "") then hist = string.format("%dx%d", last, n);
-			else hist = string.format("%s:%dx%d", hist, last, n); end
+			else hist = ("%s:%dx%d"):format(hist, last, n); end
 		end
 	end
 	local n = 0;
@@ -284,12 +272,12 @@ end
 function unpackNumericList(str)
 	local splut = {};
 	if (str) then
-		for x,c in string.gfind(str, '([^%:]*)(%:?)') do
-			local _,_,y,n = string.find(x, '(%d*)x(%d*)')
-			if (y == nil) then
+		for x,c in str:gmatch('([^%:]*)(%:?)') do
+			local y,n = x:match('(%d*)x(%d*)')
+			if (not y) then
 				table.insert(splut, tonumber(x));
 			else
-				for i = 1,n do
+				for i = 1, n do
 					table.insert(splut, tonumber(y));
 				end
 			end
@@ -307,18 +295,17 @@ function doesNameMatch(name1, name2, exact)
 	local match = true;
 	if (name1 and name2) then
 		if (exact) then
-			match = (string.lower(name1) == string.lower(name2));
+			return (name1:lower() == name2:lower());
 		else
-			match = (string.find(string.lower(name1), string.lower(name2), 1, true) ~= nil);
+			return (name1:lower():find(name2:lower(), 1, true));
 		end
 	end
-	return match;
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.Database]", unpack(arg));
+	return EnhTooltip.DebugPrint("[Auc.Database]", ...);
 end
 
 --=============================================================================

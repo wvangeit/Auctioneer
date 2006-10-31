@@ -68,9 +68,12 @@ function load()
 	frame.UpdatePriceModels = AuctionFramePost_UpdatePriceModels;
 
 	-- Data Members
+	--[[
+	--These won't make it to the frame
 	frame.itemId = nil;
 	frame.itemKey = nil;
 	frame.itemName = nil;
+	 ]]
 	frame.updating = false;
 	frame.registeredForSnapshotUpdates = false;
 	frame.prices = {};
@@ -94,8 +97,7 @@ function load()
 	-- Configure the logical columns
 	frame.logicalColumns =
 	{
-		Quantity =
-		{
+		Quantity = {
 			title = _AUCT("UiQuantityHeader");
 			dataType = "Number";
 			valueFunc = (function(record) return record.count end);
@@ -103,8 +105,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.count < record2.count end);
 			compareDescendingFunc = (function(record1, record2) return record1.count > record2.count end);
 		},
-		Name =
-		{
+		Name = {
 			title = _AUCT("UiNameHeader");
 			dataType = "String";
 			valueFunc = (function(record) return record.name end);
@@ -113,8 +114,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.name < record2.name end);
 			compareDescendingFunc = (function(record1, record2) return record1.name > record2.name end);
 		},
-		TimeLeft =
-		{
+		TimeLeft = {
 			title = _AUCT("UiTimeLeftHeader");
 			dataType = "String";
 			valueFunc = (function(record) return Auctioneer.Util.GetTimeLeftString(record.timeLeft) end);
@@ -122,8 +122,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.timeLeft < record2.timeLeft end);
 			compareDescendingFunc = (function(record1, record2) return record1.timeLeft > record2.timeLeft end);
 		},
-		Bid =
-		{
+		Bid = {
 			title = _AUCT("UiBidHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.bid end);
@@ -131,8 +130,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.bid < record2.bid end);
 			compareDescendingFunc = (function(record1, record2) return record1.bid > record2.bid end);
 		},
-		BidPer =
-		{
+		BidPer = {
 			title = _AUCT("UiBidPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.bidPer end);
@@ -140,8 +138,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.bidPer < record2.bidPer end);
 			compareDescendingFunc = (function(record1, record2) return record1.bidPer > record2.bidPer end);
 		},
-		Buyout =
-		{
+		Buyout = {
 			title = _AUCT("UiBuyoutHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyout end);
@@ -149,8 +146,7 @@ function load()
 			compareAscendingFunc = (function(record1, record2) return record1.buyout < record2.buyout end);
 			compareDescendingFunc = (function(record1, record2) return record1.buyout > record2.buyout end);
 		},
-		BuyoutPer =
-		{
+		BuyoutPer = {
 			title = _AUCT("UiBuyoutPerHeader");
 			dataType = "Money";
 			valueFunc = (function(record) return record.buyoutPer end);
@@ -261,7 +257,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 					function (auction)
 						return (auction.buyoutPrice and auction.buyoutPrice > 0 and auction.owner == UnitName("player"));
 					end);
-				if (table.getn(myAuctions) > 0) then
+				if (#myAuctions > 0) then
 					-- Calculate the lowest bid and buyout for one.
 					local lowestStartBidForOne = 0;
 					local lowestBuyoutForOne = 0;
@@ -312,7 +308,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 					if (lastSale and lastSale.bid and lastSale.buyout) then
 						local lastPrice = {};
 						lastPrice.text = _AUCT('UiPriceModelLastSold');
-						lastPrice.note = string.format(_AUCT('FrmtLastSoldOn'), date("%x", lastSale.time));
+						lastPrice.note = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale.time));
 						lastPrice.bid = (lastSale.bid / lastSale.quantity) * count;
 						lastPrice.buyout = (lastSale.buyout / lastSale.quantity) * count;
 						table.insert(frame.prices, lastPrice);
@@ -371,14 +367,14 @@ function AuctionFramePost_UpdateAuctionList(frame)
 	ListTemplate_Sort(frame.auctionList, 5);
 
 	-- Register or unregister for snapshot updates.
-	if (frame.itemKey ~= nil and not frame.registeredForSnapshotUpdates) then
+	if (frame.itemKey and not frame.registeredForSnapshotUpdates) then
 		debugPrint("Registering for snapshot updates");
 		Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
 		Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
 		Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
 		Auctioneer.EventManager.RegisterEvent("AUCTIONEER_SNAPSHOT_UPDATE", onSnapshotUpdate);
 		frame.registeredForSnapshotUpdates = true;
-	elseif (frame.itemKey == nil and frame.registeredForSnapshotUpdates) then
+	elseif ((not frame.itemKey) and (frame.registeredForSnapshotUpdates)) then
 		debugPrint("Unregistering for snapshot updates");
 		Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
 		Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
@@ -391,18 +387,18 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFramePost_AuctionFromSnapshotAuction(frame, snapshotAuction)
-	local auction = {};
-	auction.auctionId = snapshotAuction.auctionId;
-	auction.itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
-	auction.count = snapshotAuction.count;
-	auction.name = Auctioneer.ItemDB.GetItemName(auction.itemKey);
-	auction.owner = snapshotAuction.owner;
-	auction.timeLeft = snapshotAuction.timeLeft;
-	auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
-	auction.bidPer = math.floor(auction.bid / auction.count);
-	auction.buyout = snapshotAuction.buyoutPrice;
-	auction.buyoutPer = math.floor(auction.buyout / auction.count);
-	return auction;
+	return {
+		auctionId = snapshotAuction.auctionId;
+		itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+		count = snapshotAuction.count;
+		name = Auctioneer.ItemDB.GetItemName(auction.itemKey);
+		owner = snapshotAuction.owner;
+		timeLeft = snapshotAuction.timeLeft;
+		bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+		bidPer = math.floor(auction.bid / auction.count);
+		buyout = snapshotAuction.buyoutPrice;
+		buyoutPer = math.floor(auction.buyout / auction.count);
+	};
 end
 
 -------------------------------------------------------------------------------
@@ -411,7 +407,7 @@ end
 function AuctionFramePost_AddAuction(frame, snapshotAuction)
 	local auction = frame:AuctionFromSnapshotAuction(snapshotAuction);
 	table.insert(frame.auctions, auction);
-	debugPrint("Added auction at index "..table.getn(frame.auctions));
+	debugPrint("Added auction at index", #frame.auctions);
 	ListTemplate_SetContent(frame.auctionList, frame.auctions);
 end
 
@@ -420,7 +416,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_UpdateAuction(frame, snapshotAuction)
 	local auctions = frame.auctions;
-	for index = 1, table.getn(auctions) do
+	for index = 1, #auctions do
 		local auction = frame.auctions[index];
 		if (auction.auctionId == snapshotAuction.auctionId) then
 			debugPrint("Found auction to update at index "..index);
@@ -436,7 +432,7 @@ end
 -------------------------------------------------------------------------------
 function AuctionFramePost_RemoveAuction(frame, snapshotAuction)
 	local auctions = frame.auctions;
-	for index = 1, table.getn(auctions) do
+	for index = 1, #auctions do
 		local auction = frame.auctions[index];
 		if (auction.auctionId == snapshotAuction.auctionId) then
 			debugPrint("Found auction to remove at index "..index);
@@ -458,11 +454,11 @@ function AuctionFramePost_UpdateStatusText(frame)
 		query.name = Auctioneer.ItemDB.GetItemName(itemKey);
 		local lastUpdate = Auctioneer.SnapshotDB.GetLastUpdate(nil, query);
 
-		-- Update the status text with the last update.	
+		-- Update the status text with the last update.
 		local now = time();
 		local age = time() - lastUpdate;
 		if (age >= 0 and age < (24 * 60 * 60)) then
-			local output = string.format("Results are %d minute(s) old", math.floor(age / 60)); -- %todo: localize
+			local output = ("Results are %d minute(s) old"):format(math.floor(age / 60)); -- %todo: localize
 			frame.statusText:SetText(output);
 		else
 			frame.statusText:SetText("Results are more than 24 hours out of date!"); -- %todo: localize
@@ -556,7 +552,7 @@ end
 function AuctionFramePost_SetStartPrice(frame, price)
 	frame.ignoreStartPriceChange = true;
 	MoneyInputFrame_SetCopper(getglobal(frame:GetName().."StartPrice"), price);
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -572,7 +568,7 @@ end
 function AuctionFramePost_SetBuyoutPrice(frame, price)
 	frame.ignoreBuyoutPriceChange = true;
 	MoneyInputFrame_SetCopper(getglobal(frame:GetName().."BuyoutPrice"), price);
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -592,7 +588,7 @@ function AuctionFramePost_SetStackSize(frame, size)
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
 	frame:UpdatePriceModels();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -611,7 +607,7 @@ function AuctionFramePost_SetStackCount(frame, count)
 
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -652,7 +648,7 @@ function AuctionFramePost_SetDuration(frame, duration)
 
 	-- Update the deposit cost.
 	frame:UpdateDeposit();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -712,7 +708,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Clear the current pricing model so that the default one gets selected.
 		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
-		
+
 		-- Update the Transactions tab if BeanCounter is loaded.
 		if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
 			AuctionFrameTransactions:SearchTransactions(name, true, nil);
@@ -738,7 +734,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 	frame:UpdatePriceModels();
 	frame:UpdateAuctionList();
 	frame:UpdateStatusText();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
@@ -797,7 +793,7 @@ function AuctionFramePost_ValidateAuction(frame)
 				quantityErrorText:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b);
 				quantityErrorText:Show();
 			else
-				local msg = string.format(_AUCT('UiMaxError'), quantity);
+				local msg = _AUCT('UiMaxError'):format(quantity);
 				quantityErrorText:SetText(msg);
 				quantityErrorText:SetTextColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b);
 				quantityErrorText:Show();
@@ -820,7 +816,7 @@ function AuctionFramePost_ValidateAuction(frame)
 		-- Update the price model to reflect bid and buyout prices.
 		local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
 		local index = UIDropDownMenu_GetSelectedID(dropdown);
-		if (index and frame.prices and index <= table.getn(frame.prices)) then
+		if (index and frame.prices and index <= #frame.prices) then
 			-- Check if the current selection matches
 			local currentPrice = frame.prices[index];
 			if ((currentPrice.bid and currentPrice.bid ~= startPrice) or
@@ -855,9 +851,9 @@ function AuctionFramePost_AuctionItem_OnClick(button)
 		local itemLink = GetContainerItemLink(item.bag, item.slot)
 		local _, _, _, _, itemName = EnhTooltip.BreakLink(itemLink);
 		local _, count = GetContainerItemInfo(item.bag, item.slot);
-		frame:SetAuctionItem(item.bag, item.slot, count);
+		return frame:SetAuctionItem(item.bag, item.slot, count);
 	else
-		frame:SetAuctionItem(nil, nil, nil);
+		return frame:SetAuctionItem(nil, nil, nil);
 	end
 end
 
@@ -867,20 +863,20 @@ function AuctionFramePost_DurationRadioButton_OnClick(button, index)
 	local frame = button:GetParent();
 	if (index == 1) then
 		Auctioneer.Command.SetFilter('last-auction-duration', 120)
-		frame:SetDuration(120);
+		return frame:SetDuration(120);
 	elseif (index == 2) then
 		Auctioneer.Command.SetFilter('last-auction-duration', 480)
-		frame:SetDuration(480);
+		return frame:SetDuration(480);
 	else
 		Auctioneer.Command.SetFilter('last-auction-duration', 1440)
-		frame:SetDuration(1440);
+		return frame:SetDuration(1440);
 	end
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_StartPrice_OnChanged()
-	local frame = this:GetParent():GetParent();
+function AuctionFramePost_StartPrice_OnChanged(self)
+	local frame = self:GetParent():GetParent();
 	if (not frame.ignoreStartPriceChange and not updating) then
 		frame:ValidateAuction();
 	end
@@ -889,8 +885,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_BuyoutPrice_OnChanged()
-	local frame = this:GetParent():GetParent();
+function AuctionFramePost_BuyoutPrice_OnChanged(self)
+	local frame = self:GetParent():GetParent();
 	if (not frame.ignoreBuyoutPriceChange and not frame.updating) then
 		local updatePrice = Auctioneer.Command.GetFilter('update-price');
 		if (updatePrice) then
@@ -907,8 +903,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_StackSize_OnTextChanged()
-	local frame = this:GetParent();
+function AuctionFramePost_StackSize_OnTextChanged(self)
+	local frame = self:GetParent();
 
 	-- Update the stack size displayed on the graphic.
 	local itemId = frame:GetItemID();
@@ -923,21 +919,22 @@ function AuctionFramePost_StackSize_OnTextChanged()
 	-- Update the deposit and validate the auction.
 	frame:UpdateDeposit();
 	frame:UpdatePriceModels();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_StackCount_OnTextChanged()
-	local frame = this:GetParent();
+function AuctionFramePost_StackCount_OnTextChanged(self)
+	local frame = self:GetParent();
 	frame:UpdateDeposit();
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	local frame = button:GetParent();
+
 	local itemKey = frame:GetItemKey();
 	local name = frame:GetItemName();
 	local startPrice = frame:GetStartPrice();
@@ -963,13 +960,13 @@ function AuctionFramePost_CreateAuctionButton_OnClick(button)
 	Auctioneer.PostManager.PostAuction(itemKey, stackSize, stackCount, startPrice, buyoutPrice, duration);
 
 	-- Clear the current auction item.
-	frame:SetAuctionItem(nil, nil, nil);
+	return frame:SetAuctionItem(nil, nil, nil);
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_PriceModelDropDown_Initialize()
-	local dropdown = this:GetParent();
+function AuctionFramePost_PriceModelDropDown_Initialize(self)
+	local dropdown = self:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.prices) then
 		for index, value in pairs(frame.prices) do
@@ -978,19 +975,19 @@ function AuctionFramePost_PriceModelDropDown_Initialize()
 			info.text = price.text;
 			info.func = AuctionFramePost_PriceModelDropDownItem_OnClick;
 			info.owner = dropdown;
-			UIDropDownMenu_AddButton(info);
+			return UIDropDownMenu_AddButton(info);
 		end
 	end
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_PriceModelDropDownItem_OnClick()
-	local index = this:GetID();
+function AuctionFramePost_PriceModelDropDownItem_OnClick(self)
+	local index = self:GetID();
 	local dropdown = this.owner;
 	local frame = dropdown:GetParent();
 	if (frame.prices) then
-		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index);
+		return AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index);
 	end
 end
 
@@ -1041,18 +1038,18 @@ function AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, index)
 		UIDropDownMenu_ClearAll(dropdown);
 	end
 	frame.updating = false;
-	frame:ValidateAuction();
+	return frame:ValidateAuction();
 end
 
 -------------------------------------------------------------------------------
--- An item in the list is clicked.
+-- An item in the list is clicked.v
 -------------------------------------------------------------------------------
-function AuctionFramePost_ListItem_OnClick(row, button)
-	local frame = this:GetParent():GetParent();
+function AuctionFramePost_ListItem_OnClick(self, row, button)
+	local frame = self:GetParent():GetParent();
 	debugPrint(frame:GetName());
-	if (row and row <= table.getn(frame.auctions)) then
+	if (row and row <= #frame.auctions) then
 		if (button == "RightButton") then
-			Auctioneer.UI.AuctionDropDownMenu.Show(frame.auctions[row].auctionId);
+			return Auctioneer.UI.AuctionDropDownMenu.Show(frame.auctions[row].auctionId);
 		end
 	end
 end
@@ -1072,7 +1069,7 @@ end
 -- Calculate the maximum stack size for an item based on the information returned by GetItemInfo()
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetMaxStackSize(itemId)
-	local _, _, _, _, _, _, itemStackCount = GetItemInfo(itemId);
+	local _, _, _, _, _, _, _, itemStackCount = GetItemInfo(itemId);
 	return itemStackCount;
 end
 
@@ -1102,7 +1099,7 @@ end
 -------------------------------------------------------------------------------
 function onAuctionAdded(event, auction)
 	if (AuctionFramePost:GetItemKey() == Auctioneer.ItemDB.CreateItemKeyFromAuction(auction)) then
-		AuctionFramePost:AddAuction(auction);
+		return AuctionFramePost:AddAuction(auction);
 	end
 end
 
@@ -1111,7 +1108,7 @@ end
 -------------------------------------------------------------------------------
 function onAuctionUpdated(event, newAuction, oldAuction)
 	if (AuctionFramePost:GetItemKey() == Auctioneer.ItemDB.CreateItemKeyFromAuction(newAuction)) then
-		AuctionFramePost:UpdateAuction(newAuction);
+		return AuctionFramePost:UpdateAuction(newAuction);
 	end
 end
 
@@ -1120,7 +1117,7 @@ end
 -------------------------------------------------------------------------------
 function onAuctionRemoved(event, auction)
 	if (AuctionFramePost:GetItemKey() == Auctioneer.ItemDB.CreateItemKeyFromAuction(auction)) then
-		AuctionFramePost:RemoveAuction(auction);
+		return AuctionFramePost:RemoveAuction(auction);
 	end
 end
 
@@ -1128,13 +1125,13 @@ end
 -- Called when query based snapshot update completes.
 -------------------------------------------------------------------------------
 function onSnapshotUpdate(event, query)
-	AuctionFramePost:UpdateStatusText();
+	return AuctionFramePost:UpdateStatusText();
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.PostTab] "..message);
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.PostTab]", ...);
 end
 
 --=============================================================================
@@ -1146,7 +1143,7 @@ debugPrint("AuctioneerFramePost.lua loaded");
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.UI.PostTab = 
+Auctioneer.UI.PostTab =
 {
 	Load = load;
 };

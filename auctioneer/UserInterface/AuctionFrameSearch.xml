@@ -37,11 +37,11 @@
 			local scrollFrame = nil
 			local index = nil;
 			<OnLoad>
-				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+				self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
 			</OnLoad>
 			<OnEnter>
-				scrollFrame = getglobal(this:GetParent():GetName().."ScrollFrame");
-				index = this:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
+				scrollFrame = getglobal(self:GetParent():GetName().."ScrollFrame");
+				index = self:GetID() + FauxScrollFrame_GetOffset(scrollFrame);
 				AuctionFrameSearch_ListItem_OnEnter(index);
 			</OnEnter>
 			<OnLeave>
@@ -51,7 +51,7 @@
 				index = nil;
 			</OnLeave>
 			<OnClick>
-				AuctionFrameSearch_ListItem_OnClick(index, arg1);
+				AuctionFrameSearch_ListItem_OnClick(self, index, button);
 			</OnClick>
 			<OnUpdate>
 				if (index) then
@@ -151,10 +151,10 @@
 				</Anchors>
 				<Scripts>
 					<OnTabPressed>
-						getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+						getglobal(self:GetParent():GetName().."BidMinProfitGold"):SetFocus();
 					</OnTabPressed>
 					<OnEnterPressed>
-						AuctionFrameSearch_SaveSearchButton_OnClick(this);
+						AuctionFrameSearch_SaveSearchButton_OnClick(self);
 					</OnEnterPressed>
 				</Scripts>
 			</EditBox>
@@ -168,13 +168,13 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."Left"):Hide();
-						getglobal(this:GetName().."Middle"):Hide();
-						getglobal(this:GetName().."Right"):Hide();
-						getglobal(this:GetName().."Text"):Hide();
-						UIDropDownMenu_SetWidth(getglobal(this:GetParent():GetName().."SaveSearchEdit"):GetWidth());
-						Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_SavedSearchDropDown_Initialize);
-						Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+						getglobal(self:GetName().."Left"):Hide();
+						getglobal(self:GetName().."Middle"):Hide();
+						getglobal(self:GetName().."Right"):Hide();
+						getglobal(self:GetName().."Text"):Hide();
+						UIDropDownMenu_SetWidth(getglobal(self:GetParent():GetName().."SaveSearchEdit"):GetWidth());
+						Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_SavedSearchDropDown_Initialize);
+						Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -191,7 +191,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						AuctionFrameSearch_SaveSearchButton_OnClick(this);
+						AuctionFrameSearch_SaveSearchButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -208,7 +208,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						AuctionFrameSearch_RemoveSearchButton_OnClick(this);
+						AuctionFrameSearch_RemoveSearchButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -224,7 +224,7 @@
 				<Scripts>
 					<OnLoad>
 						UIDropDownMenu_SetWidth(130);
-						getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
+						getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -300,7 +300,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								MoneyInputFrame_SetCopper(this, 5000);
+								MoneyInputFrame_SetCopper(self, 5000);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -317,13 +317,13 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this:SetNumber(30);
+								self:SetNumber(30);
 							</OnLoad>
 							<OnEditFocusLost>
-								this:HighlightText(0, 0);
+								self:HighlightText(0, 0);
 							</OnEditFocusLost>
 							<OnEditFocusGained>
-								this:HighlightText();
+								self:HighlightText();
 							</OnEditFocusGained>
 						</Scripts>
 					</EditBox>
@@ -338,9 +338,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_TimeLeftDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 2);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_TimeLeftDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 2);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -355,9 +355,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -372,9 +372,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -391,10 +391,10 @@
 						</Anchors>
 						<Scripts>
 							<OnTabPressed>
-								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+								getglobal(self:GetParent():GetName().."BidMinProfitGold"):SetFocus();
 							</OnTabPressed>
 							<OnEnterPressed>
-								AuctionFrameSearchBid_SearchButton_OnClick(this);
+								AuctionFrameSearchBid_SearchButton_OnClick(self);
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>
@@ -411,20 +411,20 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchBid_SearchButton_OnClick(this);
+								AuctionFrameSearchBid_SearchButton_OnClick(self);
 							</OnClick>
 						</Scripts>
 					</Button>
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
-						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
-						getglobal(this:GetName().."TimeLeftText"):SetText(_AUCT('UiMaximumTimeLeftLabel'));
-						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
-						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
-						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
-						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(self:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(self:GetName().."TimeLeftText"):SetText(_AUCT('UiMaximumTimeLeftLabel'));
+						getglobal(self:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(self:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -491,7 +491,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								MoneyInputFrame_SetCopper(this, 5000);
+								MoneyInputFrame_SetCopper(self, 5000);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -508,13 +508,13 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this:SetNumber(30);
+								self:SetNumber(30);
 							</OnLoad>
 							<OnEditFocusLost>
-								this:HighlightText(0, 0);
+								self:HighlightText(0, 0);
 							</OnEditFocusLost>
 							<OnEditFocusGained>
-								this:HighlightText();
+								self:HighlightText();
 							</OnEditFocusGained>
 						</Scripts>
 					</EditBox>
@@ -529,9 +529,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -546,9 +546,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -565,10 +565,10 @@
 						</Anchors>
 						<Scripts>
 							<OnTabPressed>
-								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+								getglobal(self:GetParent():GetName().."BidMinProfitGold"):SetFocus();
 							</OnTabPressed>
 							<OnEnterPressed>
-								AuctionFrameSearchBuyout_SearchButton_OnClick(this);
+								AuctionFrameSearchBuyout_SearchButton_OnClick(self);
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>
@@ -585,19 +585,19 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchBuyout_SearchButton_OnClick(this);
+								AuctionFrameSearchBuyout_SearchButton_OnClick(self);
 							</OnClick>
 						</Scripts>
 					</Button>
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
-						getglobal(this:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
-						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
-						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
-						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
-						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+						getglobal(self:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
+						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(self:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(self:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -628,7 +628,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								MoneyInputFrame_SetCopper(this, 500);
+								MoneyInputFrame_SetCopper(self, 500);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -645,15 +645,15 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchCompete_SearchButton_OnClick(this);
+								AuctionFrameSearchCompete_SearchButton_OnClick(self);
 							</OnClick>
 						</Scripts>
 					</Button>
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."UndercutText"):SetText(_AUCT('UiMinimumUndercutLabel'));
-						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(self:GetName().."UndercutText"):SetText(_AUCT('UiMinimumUndercutLabel'));
+						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -711,7 +711,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								MoneyInputFrame_SetCopper(this, 0);
+								MoneyInputFrame_SetCopper(self, 0);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -726,9 +726,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_CategoryDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_CategoryDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -743,9 +743,9 @@
 						<Scripts>
 							<OnLoad>
 								UIDropDownMenu_SetWidth(130);
-								getglobal(this:GetName().."Text"):SetJustifyH("LEFT");
-								Auctioneer.UI.DropDownMenu.Initialize(this, AuctionFrameSearch_MinQualityDropDown_Initialize);
-								Auctioneer.UI.DropDownMenu.SetSelectedID(this, 1);
+								getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+								Auctioneer.UI.DropDownMenu.Initialize(self, AuctionFrameSearch_MinQualityDropDown_Initialize);
+								Auctioneer.UI.DropDownMenu.SetSelectedID(self, 1);
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -762,10 +762,10 @@
 						</Anchors>
 						<Scripts>
 							<OnTabPressed>
-								getglobal(this:GetParent():GetName().."BidMinProfitGold"):SetFocus();
+								getglobal(self:GetParent():GetName().."BidMinProfitGold"):SetFocus();
 							</OnTabPressed>
 							<OnEnterPressed>
-								AuctionFrameSearchPlain_SearchButton_OnClick(this);
+								AuctionFrameSearchPlain_SearchButton_OnClick(self);
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>
@@ -782,18 +782,18 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchPlain_SearchButton_OnClick(this);
+								AuctionFrameSearchPlain_SearchButton_OnClick(self);
 							</OnClick>
 						</Scripts>
 					</Button>
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						getglobal(this:GetName().."MaxPriceText"):SetText(_AUCT('UiMaximumPriceLabel'));
-						getglobal(this:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
-						getglobal(this:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
-						getglobal(this:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
-						getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
+						getglobal(self:GetName().."MaxPriceText"):SetText(_AUCT('UiMaximumPriceLabel'));
+						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(self:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
+						getglobal(self:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
+						getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchForLabel'));
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -997,7 +997,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						AuctionFrameSearch_BuyoutButton_OnClick(this);
+						AuctionFrameSearch_BuyoutButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -1014,21 +1014,21 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						AuctionFrameSearch_BidButton_OnClick(this);
+						AuctionFrameSearch_BidButton_OnClick(self);
 					</OnClick>
 				</Scripts>
 			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				getglobal(this:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
-				getglobal(this:GetName().."TabText"):SetText(_AUCT('UiSearch'));
-				getglobal(this:GetName().."SearchText"):SetText(_AUCT('UiSearchDropDownLabel'));
-				getglobal(this:GetName().."BidButton"):SetText(_AUCT('UiBid'));
-				getglobal(this:GetName().."BuyoutButton"):SetText(_AUCT('UiBuyout'));
-				getglobal(this:GetName().."SavedSearchText"):SetText(_AUCT('UiSavedSearchLabel'));
-				getglobal(this:GetName().."SaveSearchButton"):SetText(_AUCT('UiSaveSearchButton'));
-				getglobal(this:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
+				getglobal(self:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
+				getglobal(self:GetName().."TabText"):SetText(_AUCT('UiSearch'));
+				getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchDropDownLabel'));
+				getglobal(self:GetName().."BidButton"):SetText(_AUCT('UiBid'));
+				getglobal(self:GetName().."BuyoutButton"):SetText(_AUCT('UiBuyout'));
+				getglobal(self:GetName().."SavedSearchText"):SetText(_AUCT('UiSavedSearchLabel'));
+				getglobal(self:GetName().."SaveSearchButton"):SetText(_AUCT('UiSaveSearchButton'));
+				getglobal(self:GetName().."RemoveSearchButton"):SetText(_AUCT('UiRemoveSearchButton'));
 			</OnLoad>
 			<OnShow>
 				AuctionFrameSearch_OnShow();
@@ -1039,7 +1039,7 @@
 	<Button name="AuctionFrameTabSearch" inherits="AuctionTabTemplate" hidden="true">
 		<Scripts>
 			<OnLoad>
-				this:SetText(_AUCT('UiSearchAuctions'));
+				self:SetText(_AUCT('UiSearchAuctions'));
 			</OnLoad>
 		</Scripts>
 	</Button>

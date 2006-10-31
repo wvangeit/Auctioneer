@@ -37,7 +37,7 @@ local function newBalancedList(paramSize)
 
 		local insertPos	= 0
 		local left		= 1
-		local right		= table.getn(self.list)
+		local right		= #self.list
 		local middleVal
 		local middle
 		-- insert in sorted order
@@ -63,7 +63,7 @@ local function newBalancedList(paramSize)
 		table.insert(self.list, insertPos, val);
 
 		-- see if we need to balance the list
-		if (self.maxSize ~= nil and table.getn(self.list) > self.maxSize) then
+		if (self.maxSize ~= nil and #self.list > self.maxSize) then
 			if (insertPos <= math.floor(self.maxSize / 2) + 1) then
 				table.remove(self.list); -- remove from the right side
 			else
@@ -93,7 +93,7 @@ local function newBalancedList(paramSize)
 
 	-- returns the current size of the list
 	local size = function()
-		return table.getn(self.list);
+		return #self.list;
 	end
 
 	-- retrieves the value in the list at this position
@@ -110,14 +110,14 @@ local function newBalancedList(paramSize)
 	end
 
 	return {
-		['insert']		= insert,
-		['getMedian']	= getMedian,
-		['size']		= size,
-		['get']			= get,
-		['clear']		= clear,
-		['getMaxSize']	= getMaxSize,
-		['setList']		= setList,
-		['getList']		= getList
+		insert		= insert,
+		getMedian	= getMedian,
+		size		= size,
+		get			= get,
+		clear		= clear,
+		getMaxSize	= getMaxSize,
+		setList		= setList,
+		getList		= getList
 	}
 end
 

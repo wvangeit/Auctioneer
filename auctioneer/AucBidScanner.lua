@@ -40,6 +40,7 @@ local sendQuery;
 local queryCompleteCallback;
 local placeBid;
 local bidCompleteCallback;
+local emptyHookFunction;
 local scanStarted;
 local scanEnded;
 local isScanning;
@@ -48,8 +49,7 @@ local debugPrint;
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
-local RequestState = 
-{
+local RequestState = {
 	WaitingToQuery = "WaitingToQuery";
 	WaitingForQueryResult = "WaitingForQueryResult";
 	WaitingToBid = "WaitingToBid";
@@ -58,8 +58,7 @@ local RequestState =
 	Done = "Done";
 };
 
-local FilterResult = 
-{
+local FilterResult = {
 	Bid = "Bid";
 	Skip = "Skip";
 	Done = "Done";
@@ -103,7 +102,7 @@ end
 -- Gets the number of pending bid requests.
 -------------------------------------------------------------------------------
 function getBidRequestCount()
-	return table.getn(BidRequestQueue);
+	return #BidRequestQueue;
 end
 
 -------------------------------------------------------------------------------
@@ -146,7 +145,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 
 		-- Construct a filter function that will only match the auction in
 		-- question.
-		local filterFunc = 
+		local filterFunc =
 			function (request, auction)
 				-- Check if this is the auction we are looking for.
 				if (auction.auctionId ~= auctionInSnapshot.auctionId) then
@@ -156,12 +155,11 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 
 				-- If we are bidding, perform checks to see if we should still
 				-- bid on it.
-				if (bidAmount ~= nil or bidAmount ~= auction.buyoutPrice) then
+				if (bidAmount or bidAmount ~= auction.buyoutPrice) then
 					-- Check that the current bid is the same.
 					if (request.currentBid ~= Auctioneer.SnapshotDB.GetCurrentBid(auction)) then
-						-- %todo: localize
-						chatPrint("Already a higher bid");
-						debugPrint("Already a higher bid");
+						chatPrint(ERR_AUCTION_HIGHER_BID);
+						debugPrint(ERR_AUCTION_HIGHER_BID);
 						return FilterResult.Abort;
 					end
 
@@ -183,7 +181,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 					bid = auction.minBid; -- first bid
 				else
 					bid = auction.bidAmount + auction.minIncrement;
-				end							
+				end
 				debugPrint("Bidding on auction: "..bid);
 				return FilterResult.Bid, bid;
 			end
@@ -222,7 +220,7 @@ end
 -- Removes the search request at the head of the queue.
 -------------------------------------------------------------------------------
 function removeRequestFromQueue()
-	if (table.getn(BidRequestQueue) > 0) then
+	if (#BidRequestQueue > 0) then
 		-- Remove the request from the queue.
 		local request = BidRequestQueue[1];
 		table.remove(BidRequestQueue, 1);
@@ -231,10 +229,10 @@ function removeRequestFromQueue()
 
 		-- Inform the user if no auctions were found.
 		if (request.state == RequestState.Done and request.bidCount == 0) then
-			local output = string.format(_AUCT('FrmtNoAuctionsFound'), request.name, request.count);
+			local output = _AUCT('FrmtNoAuctionsFound'):format(request.name, request.count);
 			chatPrint(output);
 		end
-		
+
 		-- If a callback function was provided, call it!
 		if (request.callbackFunc) then
 			request.callbackFunc(request.auctionId);
@@ -260,7 +258,8 @@ function sendQuery(request)
 		query.qualityIndex,
 		10,
 		3,
-		queryCompleteCallback);
+		queryCompleteCallback
+	);
 end
 
 -------------------------------------------------------------------------------
@@ -283,12 +282,12 @@ end
 function placeBid(request)
 	-- Iterate through each item on the page, searching for a match
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
-	debugPrint("Processing page "..request.currentPage.." starting at index "..request.currentIndex.." ("..lastIndexOnPage.." on page; "..totalAuctions.." in total)");
+	debugPrint("Processing page", request.currentPage, "starting at index", request.currentIndex, "(", lastIndexOnPage, "on page;", totalAuctions, "in total)");
 	for indexOnPage = request.currentIndex, lastIndexOnPage do
 		local auction = Auctioneer.QueryManager.GetAuctionByIndex("list", indexOnPage);
 		if (Auctioneer.QueryManager.IsAuctionValid(auction)) then
 			auction.auctionId = Auctioneer.QueryManager.GetAuctionId("list", indexOnPage);
-			if (auction.auctionId ~= nil) then
+			if (auction.auctionId) then
 				local result, bidAmount = request.filterFunc(request, auction);
 				if (result == FilterResult.Bid) then
 					-- Update the starting point for this page.
@@ -303,7 +302,7 @@ function placeBid(request)
 					-- can be received during the call to PlaceAuctionBid.
 					local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 					local name = Auctioneer.ItemDB.GetItemName(itemKey);
-					debugPrint("Placing bid on "..name.. " at "..bidAmount.." (index "..indexOnPage..")");
+					debugPrint("Placing bid on", name, "at", bidAmount, "(index ", indexOnPage, ")");
 					Auctioneer.BidManager.PlaceAuctionBid("list", indexOnPage, bidAmount, bidCompleteCallback);
 
 				elseif (result == FilterResult.Abort) then
@@ -312,7 +311,7 @@ function placeBid(request)
 					removeRequestFromQueue();
 				end
 			else
-				debugPrint("Skipping auction due to no auction id (index "..indexOnPage..")");
+				debugPrint("Skipping auction due to no auction id (index", indexOnPage, ")");
 			end
 		end
 	end
@@ -353,23 +352,23 @@ function bidCompleteCallback(auction, result)
 
 			-- Report the completed bid.
 			if (request.isBuyout) then
-				local output = string.format(_AUCT('FrmtBoughtAuction'), request.name, request.count);
+				local output = _AUCT('FrmtBoughtAuction'):format(request.name, request.count);
 				chatPrint(output);
 
 			else
-				local output = string.format(_AUCT('FrmtBidAuction'), request.name, request.count);
+				local output = _AUCT('FrmtBidAuction'):format(request.name, request.count);
 				chatPrint(output);
 			end
 
 			-- Increment the request's current index if the auction was not bought.
 			if (not request.isBuyout) then
 				request.currentIndex = request.currentIndex + 1;
-				debugPrint("Incrementing the request's currentIndex to "..request.currentIndex);
+				debugPrint("Incrementing the request's currentIndex to", request.currentIndex);
 			end
 		else
 			-- Skip over the auction we failed to bid on.
 			request.currentIndex = request.currentIndex + 1;
-			debugPrint("Incrementing the request's currentIndex to "..request.currentIndex);
+			debugPrint("Incrementing the request's currentIndex to", request.currentIndex);
 		end
 
 		-- Get ready to send the next bid if we haven't reached the limit.
@@ -389,6 +388,10 @@ end
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
+function emptyHookFunction()
+	return "killorig";
+end
+
 function scanStarted()
 	-- Hide the results UI
 	BrowseNoResultsText:Show();
@@ -403,11 +406,9 @@ function scanStarted()
 	BrowseBidButton:Disable();
 	BrowseBuyoutButton:Disable();
 
-	-- Don't allow AuctionFramBrowse updates during a scan.
-	Original_AuctionFrameBrowse_OnEvent = AuctionFrameBrowse_OnEvent;
-	AuctionFrameBrowse_OnEvent = function() end;
-	Original_AuctionFrameBrowse_Update = AuctionFrameBrowse_Update;
-	AuctionFrameBrowse_Update = function() end;
+	-- Don't allow AuctionFrameBrowse updates during a scan.
+	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_Update", -200, emptyHookFunction)
 
 	-- Bid scanning has begun!
 	Scanning = true;
@@ -422,15 +423,9 @@ function scanEnded()
 	Scanning = false;
 	Auctioneer.Scanning.IsScanningRequested = false;
 
-	-- We can allow AuctionFramBrowse updates once again.
-	if( Original_AuctionFrameBrowse_OnEvent ) then
-		AuctionFrameBrowse_OnEvent = Original_AuctionFrameBrowse_OnEvent;
-		Original_AuctionFrameBrowse_OnEvent = nil;
-	end
-	if( Original_AuctionFrameBrowse_Update ) then
-		AuctionFrameBrowse_Update = Original_AuctionFrameBrowse_Update;
-		Original_AuctionFrameBrowse_Update = nil;
-	end
+	-- We can allow AuctionFrameBrowse updates once again.
+	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", emptyHookFunction)
+	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_Update", emptyHookFunction)
 
 	-- Update the Browse UI.
 	BrowseNoResultsText:Hide();
@@ -447,8 +442,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.BidScanner] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.BidScanner]", ...);
 end
 
 -------------------------------------------------------------------------------

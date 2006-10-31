@@ -185,7 +185,7 @@ function loadDatabase()
 	-- Upgrade each realm-faction database (if needed).
 	for ahKey in pairs(AuctioneerHistoryDB) do
 		if (not upgradeAHDatabase(AuctioneerHistoryDB[ahKey], CURRENT_HISTORYDB_VERSION)) then
-			debugPrint("WARNING: History database corrupted for "..ahKey.."! Creating new database.");
+			debugPrint("WARNING: History database corrupted for", ahKey, "! Creating new database.");
 			AuctioneerHistoryDB[ahKey] = createAHDatabase(ahKey);
 		end
 	end
@@ -208,13 +208,13 @@ function createDatabaseFrom3x()
 	local db = {};
 	if (AuctionConfig.data) then
 		for ahKey, ahData in pairs(AuctionConfig.data) do
-			local newAhKey = string.lower(ahKey);
-			local ah = createAHDatabase(string.lower(newAhKey), BASE_HISTORYDB_VERSION);
+			local newAhKey = ahKey:lower();
+			local ah = createAHDatabase(newAhKey:lower(), BASE_HISTORYDB_VERSION);
 			db[newAhKey] = ah;
 			for itemKey, itemData in pairs(ahData) do
-				local itemDataList = Auctioneer.Util.Split(itemData, "|");
-				ah.totals[itemKey] = string.gsub (itemDataList[1], ":", ";");
-				ah.buyoutPrices[itemKey] = itemDataList[2];
+				local totals, buyoutPrices = strsplit("|", itemData);
+				ah.totals[itemKey] = totals:gsub(":", ";");
+				ah.buyoutPrices[itemKey] = buyoutPrices;
 			end
 		end
 	end
@@ -259,7 +259,7 @@ function upgradeAHDatabase(ah, version)
 	end
 
 	-- Future DB upgrade code goes here...
-	debugPrint("Upgrading history database for "..ah.ahKey.. " to version "..version);
+	debugPrint("Upgrading history database for", ah.ahKey, "to version", version);
 
 	-- Return the result of the upgrade!
 	return (ah.version == version);
@@ -292,11 +292,11 @@ function clear(itemKey, ahKey)
 			-- Remove the specified item from the database.
 			ah.totals[itemKey] = nil;
 			ah.buyoutPrices[itemKey] = nil;
-			debugPrint("Removed "..itemKey.." from history database "..ah.ahKey);
+			debugPrint("Removed", itemKey, "from history database", ah.ahKey);
 		else
 			-- Toss the entire database by recreating it.
 			LoadedHistoryDB[ah.ahKey] = createAHDatabase(ah.ahKey);
-			debugPrint("Cleared history database for "..ah.ahKey);
+			debugPrint("Cleared history database for", ah.ahKey);
 		end
 
 		-- Clear any cached values.
@@ -317,7 +317,7 @@ end
 -- Gets the totals for an item.
 -------------------------------------------------------------------------------
 function getItemTotals(itemKey, ahKey, create)
-	--debugPrint("Getting item history for: "..ahKey.."-"..itemKey);
+	--debugPrint("Getting item history for:", ahKey, "-", itemKey);
 
 	-- Use the default auction house for the zone if none was provided.
 	ahKey = ahKey or Auctioneer.Util.GetAuctionKey();
@@ -327,7 +327,7 @@ function getItemTotals(itemKey, ahKey, create)
 		--debugPrint("getItemTotals: Cache hit");
 		return cachedItemTotals;
 	else
-		--debugPrint("getItemTotals: Cache miss - "..itemKey);
+		--debugPrint("getItemTotals: Cache miss", itemKey);
 	end
 
 	-- Get or create a new item totals.
@@ -488,7 +488,7 @@ function onAuctionAdded(event, auction)
 	if (buyoutPriceForOne) then
 		--debugPrint("Updating median buyout price list");
 		local medianBuyoutPriceList = getMedianBuyoutPriceList(itemKey, auction.ahKey, true);
-		local medianBuyoutPriceBalancedList = Auctioneer.BalancedList.NewBalancedList(30); -- TODO: Constant
+		local medianBuyoutPriceBalancedList = Auctioneer.BalancedList.NewBalancedList(Auctioneer.Core.Constants.MaxBuyoutHistorySize);
 		medianBuyoutPriceBalancedList.setList(medianBuyoutPriceList);
 		medianBuyoutPriceBalancedList.insert(buyoutPriceForOne);
 		medianBuyoutPriceList = medianBuyoutPriceBalancedList.getList();
@@ -542,7 +542,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.HistoryDB]", unpack(arg));
+	return EnhTooltip.DebugPrint("[Auc.HistoryDB]", ...);
 end
 
 --=============================================================================

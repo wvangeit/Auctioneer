@@ -30,9 +30,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnClick>
 			<OnUpdate>
 				if (CanSendAuctionQuery()) then
-					this:Enable();
+					self:Enable();
 				else
-					this:Disable();
+					self:Disable();
 				end
 			</OnUpdate>
 		</Scripts>
@@ -50,7 +50,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		<Scripts>
 			<OnClick>
 				if (this.filterVal) then
-					if (this:GetChecked()) then
+					if (self:GetChecked()) then
 						Auctioneer.Command.SetFilter(this.filterVal, "on");
 					else
 						Auctioneer.Command.SetFilter(this.filterVal, "off");

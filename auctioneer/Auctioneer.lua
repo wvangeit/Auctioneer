@@ -49,7 +49,7 @@ local function onLoad()
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Auctioneer", "CommandHandler", [[
 		local function cmdHandler(msg)
-			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
+			local i,j, cmd, param = msg:lower():match("^([^ ]+) (.+)$")
 			if (not cmd) then cmd = string.lower(msg) end
 			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end

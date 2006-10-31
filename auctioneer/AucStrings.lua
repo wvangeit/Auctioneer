@@ -935,7 +935,7 @@ AuctioneerLocalizations = {
 		FrmtBidAuction	= "Gebot f\195\188r Auktion: %s (x%d) ";
 		FrmtBidQueueOutOfSync	= "Fehler: Gebotsliste nicht synchron!";
 		FrmtBoughtAuction	= "Direktkauf der Auktion: %s (x%d) ";
-		FrmtMaxBidsReached	= "Mehr Auktionen von %s (x%d)gefunden, aber Gebot Begrenzung erreicht (%d) ";
+		FrmtMaxBidsReached	= "Mehr Auktionen von %s (x%d)gefunden, aber Gebotsbegrenzung erreicht (%d) ";
 		FrmtNoAuctionsFound	= "Keine Auktionen gefunden: %s (x%d) ";
 		FrmtNoMoreAuctionsFound	= "Keine weiteren Auktionen gefunden: %s (x%d) ";
 		FrmtNotEnoughMoney	= "Nicht genug Geld f\195\188r Gebot auf Auktion: %s (x%d) ";
@@ -1140,7 +1140,7 @@ AuctioneerLocalizations = {
 		MesgConvert	= "Auctioneer Datenbankkonvertierung. Bitte zuerst eine Sicherung von SavedVariables\\Auctioneer.lua anlegen!%s%s";
 		MesgConvertNo	= "Deaktivieren";
 		MesgConvertYes	= "Konvertieren";
-		MesgNotconverting	= "Auctioneer konvertiert die Datenbank nicht, bleibt aber au\195\159er Funktion, bis dies erfolgte.";
+		MesgNotconverting	= "Auctioneer konvertiert die Datenbank nicht, bleibt aber au\195\159er Funktion, bis dies erfolgt.";
 
 
 		-- Section: Game Constants
@@ -1151,8 +1151,8 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
-		DisableMsg	= "Das automatische Laden von Auctioneer wird deaktiviert";
-		FrmtWelcome	= "Auctioneer v%s geladen";
+		DisableMsg	= "Das automatische Laden von Auctioneer wird deaktiviert.";
+		FrmtWelcome	= "Auctioneer v%s geladen.";
 		MesgNotLoaded	= "Auctioneer ist nicht geladen. Gib /auctioneer f\195\188r mehr Informationen ein.";
 		StatAskPriceOff	= "Preisnachfrage deaktiviert.";
 		StatAskPriceOn	= "Preisnachfrage aktiviert.";
@@ -1177,7 +1177,7 @@ AuctioneerLocalizations = {
 		HelpAskPriceParty	= "Auf Gruppenchat-Anfragen reagieren.";
 		HelpAskPriceSmart	= "Schlagwortcheck ein-/ausschalten.";
 		HelpAskPriceTrigger	= "\195\132ndere AskPrice Ausl\195\182ser.";
-		HelpAskPriceVendor	= "Anzeige von H\195\164ndler Informationen ein-/ausschalten.";
+		HelpAskPriceVendor	= "Anzeige von H\195\164ndlerinformationen ein-/ausschalten.";
 		HelpAskPriceWhispers	= "Aktiviere oder deaktiviere das Verbergen von allen von AskPrice abgehenden gefl\195\188sterten Meldungen.";
 		HelpAskPriceWord	= "Hinzuf\195\188gen bzw. modifizieren von eigenen AskPrice SmartWords.";
 		HelpAuctionClick	= "Mittels Alt-Klick auf einen Gegenstand in einer Tasche wird automatisch eine Auktion daf\195\188r erstellt.";
@@ -1221,8 +1221,8 @@ AuctioneerLocalizations = {
 		-- Section: Post Messages
 		FrmtNoEmptyPackSpace	= "Keinen leeren Taschenplatz gefunden, um die Auktion zu erstellen!";
 		FrmtNotEnoughOfItem	= "Nicht genug %s gefunden, um die Auktion zu erstellen!";
-		FrmtPostedAuction	= "Es wurde 1 Auktion mit %s (x%d) erstellt";
-		FrmtPostedAuctions	= "Es wurden %d Auktionen mit %s (x%d) erstellt";
+		FrmtPostedAuction	= "Es wurde 1 Auktion mit %s (x%d) erstellt.";
+		FrmtPostedAuctions	= "Es wurden %d Auktionen mit %s (x%d) erstellt.";
 
 
 		-- Section: Report Messages
@@ -1251,10 +1251,10 @@ AuctioneerLocalizations = {
 		AuctionDiscrepancies	= "Unstimmigkeiten: %s";
 		AuctionNewAucts	= "Davon neu: %s";
 		AuctionOldAucts	= "Schon bekannt: %s";
-		AuctionPageN	= "Auctioneer: Erfasse %s Seite %d von %d\nAuktionen pro Sekunde: %s\nGesch\195\164tzte Restzeit: %s";
-		AuctionScanDone	= "Auctioneer: Scannen abgeschlossen";
+		AuctionPageN	= "Auctioneer: Erfasse \"%s\", Seite %d von %d\nAuktionen pro Sekunde: %s\nGesch\195\164tzte Restzeit: %s";
+		AuctionScanDone	= "Auctioneer: Scan abgeschlossen";
 		AuctionScanNexttime	= "Auctioneer wird einen vollst\195\164ndigen Auktionsscan durchf\195\188hren, wenn das n\195\164chste Mal ein Auktionator angesprochen wird.";
-		AuctionScanNocat	= "Zum Scannen muss zumindest eine Kategorie ausgew\195\164hlt sein.";
+		AuctionScanNocat	= "Zum Scannen muss mindestens eine Kategorie ausgew\195\164hlt sein.";
 		AuctionScanRedo	= "Das Erfassen der aktuelle Seite ben\195\182tigte mehr als %d Sekunden, erneuter Versuch.";
 		AuctionScanStart	= "Auctioneer: Scanne %s Seite 1...";
 		AuctionTotalAucts	= "Insgesamt gescannte Auktionen: %s";
@@ -1272,7 +1272,7 @@ AuctioneerLocalizations = {
 		FrmtInfoForone	= "Pro St\195\188ck: %s min/%s Sofortkauf (%s geboten) [in %d]";
 		FrmtInfoHeadMulti	= "Durchschnitt f\195\188r %d St\195\188ck:";
 		FrmtInfoHeadOne	= "Durchschnitt f\195\188r dieses Objekt:";
-		FrmtInfoHistmed	= "Sofortkaufmeadian (pro St\195\188ck) der %d letzten Auktionen:";
+		FrmtInfoHistmed	= "Sofortkaufmedian (pro St\195\188ck) der %d letzten Auktionen:";
 		FrmtInfoMinMulti	= "Startgebot (%s pro St\195\188ck)";
 		FrmtInfoMinOne	= "Startgebot";
 		FrmtInfoNever	= "Noch nie in %s gesehen";
@@ -1414,15 +1414,15 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Options
-		OptAlso	= "(realm-faction|opposite|home|neutral)";
-		OptAuctionDuration	= "(last|2h|8h|24h)";
+		OptAlso	= "(realm-faction||opposite||home||neutral)";
+		OptAuctionDuration	= "(last||2h||8h||24h)";
 		OptBidbroker	= "<silver_profit>";
 		OptBidLimit	= "<number>";
 		OptBroker	= "<silver_profit>";
-		OptClear	= "([Item]|all|snapshot)";
+		OptClear	= "([Item]||all||snapshot)";
 		OptCompete	= "<silver_less>";
-		OptDefault	= "(<option>|all)";
-		OptFinish	= "(off|logout|exit|reloadui)";
+		OptDefault	= "(<option>||all)";
+		OptFinish	= "(off||logout||exit||reloadui)";
 		OptLocale	= "<locale>";
 		OptPctBidmarkdown	= "<percent>";
 		OptPctMarkup	= "<percent>";
@@ -1431,8 +1431,8 @@ AuctioneerLocalizations = {
 		OptPctUnderlow	= "<percent>";
 		OptPctUndermkt	= "<percent>";
 		OptPercentless	= "<percent>";
-		OptPrintin	= "(<frameIndex>[Number]|<frameName>[String])";
-		OptProtectWindow	= "(never|scan|always)";
+		OptPrintin	= "(<frameIndex>[Number]||<frameName>[String])";
+		OptProtectWindow	= "(never||scan||always)";
 		OptScale	= "<scale_factor>";
 		OptScan	= "<>";
 
@@ -1796,24 +1796,24 @@ AuctioneerLocalizations = {
 
 		-- Section: AskPrice Messages
 		AskPriceAd	= "Recibe precios para paquetes con %sx[Enlace de Art\195\173culo] (x = tama\195\177o del paquete)";
-		FrmtAskPriceBuyoutMedianHistorical	= "%sMediano historico: %s%s";
-		FrmtAskPriceBuyoutMedianSnapshot	= "%sMediano \195\186ltima busqueda: %s%s";
-		FrmtAskPriceDisable	= "Desabilitando la opci\195\179n %s de PreguntaPrecios";
+		FrmtAskPriceBuyoutMedianHistorical	= "%sMedia hist\195\179rica: %s%s";
+		FrmtAskPriceBuyoutMedianSnapshot	= "%sMedia \195\186ltima b\195\186squeda: %s%s";
+		FrmtAskPriceDisable	= "Deshabilitando la opci\195\179n %s de PreguntaPrecios";
 		FrmtAskPriceEach	= "(%s c/u)";
-		FrmtAskPriceEnable	= "Encendiendo la opci\195\179n %s de PreguntaPrecios";
+		FrmtAskPriceEnable	= "Activando la opci\195\179n %s de PreguntaPrecios";
 		FrmtAskPriceVendorPrice	= "%sVender a vendedores por: %s%s";
 
 
 		-- Section: Auction Messages
-		FrmtActRemove	= "Quitando %s de la casa de subastas.";
+		FrmtActRemove	= "Quitando subasta %s de los datos actuales de la casa de subastas.";
 		FrmtAuctinfoHist	= "%d Hist\195\179rico";
-		FrmtAuctinfoLow	= "Precio mas bajo";
-		FrmtAuctinfoMktprice	= "Precio del mercado";
-		FrmtAuctinfoNolow	= "Objeto no ha sido visto antes en la Casa de Subastas";
+		FrmtAuctinfoLow	= "Precio m\195\161s bajo";
+		FrmtAuctinfoMktprice	= "Precio de mercado";
+		FrmtAuctinfoNolow	= "El objeto no ha sido visto antes en la Casa de Subastas";
 		FrmtAuctinfoOrig	= "Oferta Original";
 		FrmtAuctinfoSnap	= "%d en la \195\186ltima exploraci\195\179n";
 		FrmtAuctinfoSugbid	= "Oferta inicial";
-		FrmtAuctinfoSugbuy	= "Opci\195\179n a compra sugerida";
+		FrmtAuctinfoSugbuy	= "Precio de opci\195\179n a compra sugerido";
 		FrmtWarnAbovemkt	= "Competencia sobre mercado";
 		FrmtWarnMarkup	= "Superando vendedor por %s%%";
 		FrmtWarnMyprice	= "Usando mi precio actual";
@@ -1825,13 +1825,13 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Bid Messages
-		FrmtAlreadyHighBidder	= "Ya eres el licitador mas alto en la subasta: %s (x%d)";
+		FrmtAlreadyHighBidder	= "Ya eres el licitador m\195\161s alto en la subasta: %s (x%d)";
 		FrmtBidAuction	= "Oferta en la subasta: %s (x%d)";
 		FrmtBidQueueOutOfSync	= "Error: \194\161Lista de ofertas fuera de sinc.!";
 		FrmtBoughtAuction	= "Se compr\195\179 subasta: %s (x%d)";
 		FrmtMaxBidsReached	= "Mas subastas de %s (x%d) encontradas, pero se lleg\195\179 al limite de peticiones (%d)";
-		FrmtNoAuctionsFound	= "No se encontro subasta: %s (x%d)";
-		FrmtNoMoreAuctionsFound	= "No se encontraron mas subastas: %s (x%d)";
+		FrmtNoAuctionsFound	= "No se ha encontrado la subasta: %s (x%d)";
+		FrmtNoMoreAuctionsFound	= "No se encontraron m\195\161s subastas: %s (x%d)";
 		FrmtNotEnoughMoney	= "No tienes suficiente dinero para pujar en la subasta: %s (x%d)";
 		FrmtSkippedAuctionWithHigherBid	= "Saltando subasta con petici\195\179n mayor: %s (x%d)";
 		FrmtSkippedAuctionWithLowerBid	= "Saltando subasta con petici\195\179n menor: %s (x%d)";
@@ -1843,21 +1843,21 @@ AuctioneerLocalizations = {
 		FrmtActClearall	= "Eliminando toda la informaci\195\179n de subastas para %s";
 		FrmtActClearFail	= "Imposible encontrar art\195\173\194\173culo: %s";
 		FrmtActClearOk	= "Informaci\195\179n eliminada para el art\195\173\194\173culo: %s";
-		FrmtActClearsnap	= "Removiendo informacion de la casa de subastas.";
-		FrmtActDefault	= "La opci\195\179n %s de Auctioneer ha sido cambiada a su modo original";
-		FrmtActDefaultall	= "Todas las opciones de Auctioneer han sido cambiadas a su modo original";
-		FrmtActDisable	= "Ocultando informacion de: %s ";
+		FrmtActClearsnap	= "Eliminando informaci\195\179n actual de la casa de subastas.";
+		FrmtActDefault	= "La configuraci\195\179n %s de Auctioneer ha sido restaurada a su estado original";
+		FrmtActDefaultall	= "Todas las opciones de Auctioneer han sido cambiadas a su estado original";
+		FrmtActDisable	= "Ocultando informaci\195\179n de: %s ";
 		FrmtActEnable	= "Mostrando informacion de: %s ";
 		FrmtActSet	= "%s ajustado(a) a '%s'";
 		FrmtActUnknown	= "Palabra clave desconocida: '%s'";
 		FrmtAuctionDuration	= "Duraci\195\179n de las subastas fijado a: %s";
-		FrmtAutostart	= "Comenzando subasta automaticamente para %s: %s m\195\173\194\173nimo, %s opci\195\179n a compra (%dh)\n%s";
-		FrmtFinish	= "Despues de una exploraci\195\179n ha terminado, nosotros %s";
+		FrmtAutostart	= "Comenzando subasta autom\195\161ticamente para %s: %s m\195\173\194\173nimo, %s opci\195\179n a compra (%dh)\n%s";
+		FrmtFinish	= "Despu\195\169s de que una exploraci\195\179n haya terminado, nosotros %s";
 		FrmtPrintin	= "Los mensajes de Auctioneer se imprimir\195\161n en la ventana de comunicaci\195\179n \"%s\"";
 		FrmtProtectWindow	= "Protecci\195\179n de la ventana de la Casa de Subastas fijado a: %s";
-		FrmtUnknownArg	= "'%s' no es un argumento valido de '%s'";
-		FrmtUnknownLocale	= "La localizaci\195\179n que usted especifico ('%s') no es valida. Locales v\195\161lidos son:";
-		FrmtUnknownRf	= "Parametro inv\195\161lido ('%s'). El par\195\161metro debe de estar en la forma de: [reino]-[facci\195\179n]. Por ejemplo: Al'Akir-Horde";
+		FrmtUnknownArg	= "'%s' no es un argumento v\195\161lido para '%s'";
+		FrmtUnknownLocale	= "La localizaci\195\179n que ha especif\195\173cado ('%s') no es v\195\161lida. Las localizaciones v\195\161lidas son:";
+		FrmtUnknownRf	= "Par\195\161metro inv\195\161lido ('%s'). El par\195\161metro debe de estar en la forma de: [reino]-[facci\195\179n]. Por ejemplo: Al'Akir-Horda";
 
 
 		-- Section: Command Options
@@ -1870,7 +1870,7 @@ AuctioneerLocalizations = {
 		OptCompete	= "<plata_menos>";
 		OptDefault	= "(<opci\195\179n>|todo)";
 		OptFinish	= "(apagado|de-registrarse|salir)";
-		OptLocale	= "<localidad>";
+		OptLocale	= "<localizaci\195\179n>";
 		OptPctBidmarkdown	= "<porciento>";
 		OptPctMarkup	= "<porciento>";
 		OptPctMaxless	= "<porciento>";
@@ -2046,10 +2046,10 @@ AuctioneerLocalizations = {
 
 		-- Section: Generic Messages
 		DisableMsg	= "Deshabilitando la auto-carga de Auctioneer";
-		FrmtWelcome	= "Auctioneer versi\195\179n %s cargado";
+		FrmtWelcome	= "Auctioneer versi\195\179n %s cargada";
 		MesgNotLoaded	= "Auctioneer no esta cargado. Escriba /auctioneer para mas informaci\195\179n.";
 		StatAskPriceOff	= "AskPrice ha sido deshabilitado";
-		StatAskPriceOn	= "AskPrice ha sido encendido";
+		StatAskPriceOn	= "AskPrice ha sido habilitado";
 		StatOff	= "Ocultando toda informaci\195\179n de subastas";
 		StatOn	= "Mostrando la configuraci\195\179n corriente para la informacion de subastas";
 
@@ -2589,7 +2589,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Scanning Messages
 		AuctionDefunctAucts	= "Ventes termin\195\169es retir\195\169es : %s";
-		AuctionDiscrepancies	= "Ecarts :";
+		AuctionDiscrepancies	= "Ecarts : %s";
 		AuctionNewAucts	= "Nouvelles ench\195\168res analys\195\169es : %s";
 		AuctionOldAucts	= "Analys\195\169es pr\195\169c\195\169demment : %s";
 		AuctionPageN	= "Auctioneer : analyse en cours, cat\195\169gorie '%s', \npage %d sur %d,\n%s ench\195\168res/s. \nTemps restant estim\195\169 : %s";
@@ -2621,7 +2621,7 @@ AuctioneerLocalizations = {
 		FrmtInfoSgst	= "Prix sugg\195\169r\195\169 : %s min/%s AI";
 		FrmtInfoSgststx	= "Prix sugg\195\169r\195\169 pour votre pile de %d : %s min/%s AI";
 		FrmtInfoSnapmed	= "Vu %d fois \195\160 la derni\195\168re analyse, AI moyen (pce) :";
-		FrmtInfoStacksize	= "Nombre d'objets moyens par pile : %s";
+		FrmtInfoStacksize	= "Nombre moyen d'objets par pile : %d";
 
 
 		-- Section: User Interface
@@ -2723,7 +2723,7 @@ AuctioneerLocalizations = {
 		FrmtBidAuction	= "Offerta all'asta: %s (x%d)";
 		FrmtBidQueueOutOfSync	= "Errore: La coda delle offerte e' fuori sincrono!";
 		FrmtBoughtAuction	= "Comprato di Buyout: %s (x%d)";
-		FrmtMaxBidsReached	= "Altre aste per %d (x%d) sono state trovate, ma il limite di offerta e' stato raggiunto (%d) ";
+		FrmtMaxBidsReached	= "Altre aste per %s (x%d) sono state trovate, ma il limite di offerta e' stato raggiunto (%d) ";
 		FrmtNoAuctionsFound	= "Nessuna asta trovata: %s (x%d)";
 		FrmtNoMoreAuctionsFound	= "Nessun'altra asta trovata: %s (x%d)";
 		FrmtNotEnoughMoney	= "Denaro insufficiente per fare un offerta: %s (x%d)";
@@ -3970,7 +3970,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Auction Messages
 		FrmtActRemove	= "Removendo %s da image corrente da AH";
-		FrmtAuctinfoHist	= "%s historial";
+		FrmtAuctinfoHist	= "%d historial";
 		FrmtAuctinfoLow	= "Pre\195\167o mais baixo";
 		FrmtAuctinfoMktprice	= "Pre\195\167o de mercado";
 		FrmtAuctinfoNolow	= "Objecto n\195\163o visto no \195\186ltimo leil\195\163o";
@@ -4327,7 +4327,7 @@ AuctioneerLocalizations = {
 		FrmtInfoBuymedian	= "Compra Directa valor m\195\131\194\169dio";
 		FrmtInfoBuyMulti	= "Compra Directa (%s%s)";
 		FrmtInfoBuyOne	= "Compra Directa %s";
-		FrmtInfoForone	= "Por 1: %s min/%s BO (%s oferta) [em %s]";
+		FrmtInfoForone	= "Por 1: %s min/%s BO (%s oferta) [em %d]";
 		FrmtInfoHeadMulti	= "Medias por %d unidades:";
 		FrmtInfoHeadOne	= "M\195\131\194\169dias para esta unidade:";
 		FrmtInfoHistmed	= "Ultima vez visto a %d, pre\195\131\194\167o m\195\131\194\169dio (ea)";

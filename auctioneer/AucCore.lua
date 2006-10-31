@@ -26,7 +26,6 @@
 -- Function Prototypes
 -------------------------------------------------------------------------------
 local addonLoaded;
-local lockAndLoad;
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -99,10 +98,8 @@ local minBidPercent = 10; --MIN_BID_PERCENT
 --  8 = recipe
 --  9 = reagence
 -- 10 = miscellaneous
-local function pack(...)
-	return arg;
-end
-local classes = pack(GetAuctionItemClasses());
+
+local classes = {GetAuctionItemClasses()};
 local bidBasedCategories = {[classes[1]]=true, [classes[2]]=true, [classes[8]]=true, [classes[10]]=true} --BID_BASED_CATEGORIES
 
 -- Default filter configuration
@@ -192,14 +189,13 @@ function addonLoaded()
 	Auctioneer.AskPrice.Init();
 
 	--Register for the PLAYER_LOGIN event so that we can get the player's faction
-	Auctioneer.Util.StorePlayerFaction();
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Auctioneer", Auctioneer.Util.StorePlayerFaction);
 
 	-- Ready to rock and roll!
-	Auctioneer.Util.ChatPrint(string.format(_AUCT('FrmtWelcome'), Auctioneer.Version), 0.8, 0.8, 0.2);
+	Auctioneer.Util.ChatPrint(_AUCT('FrmtWelcome'):format(Auctioneer.Version), 0.8, 0.8, 0.2);
 
  	-- Cleanup after that massive mem spike.
-	collectgarbage();
+	collectgarbage("collect");
 end
 
 Auctioneer.Core = {

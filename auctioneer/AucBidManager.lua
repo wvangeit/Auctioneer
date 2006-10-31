@@ -55,8 +55,7 @@ local hookPlaceAuctionBid = true;
 -------------------------------------------------------------------------------
 -- Constants
 -------------------------------------------------------------------------------
-BidResultCodes =
-{
+BidResultCodes = {
 	BidAccepted = "BidAccepted";
 	ItemNotFound = "ItemNotFound";
 	NotEnoughMoney = "NotEnoughMoney";
@@ -74,25 +73,25 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function onEventHook(_, event)
-	if (event == "CHAT_MSG_SYSTEM" and arg1) then
+function onEventHook(_, event, message)
+	if (event == "CHAT_MSG_SYSTEM" and message) then
 		--debugPrint(event);
-		--if (arg1) then debugPrint("    "..arg1) end;
-		if (arg1 == ERR_AUCTION_BID_PLACED) then
+		--if (message) then debugPrint("    "..message) end;
+		if (message == ERR_AUCTION_BID_PLACED) then
 		 	removePendingBid(BidResultCodes.BidAccepted);
 		end
-	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
+	elseif (event == "UI_ERROR_MESSAGE" and message) then
 		--debugPrint(event);
-		--if (arg1) then debugPrint("    "..arg1) end;
-		if (arg1 == ERR_ITEM_NOT_FOUND) then
+		--if (message) then debugPrint("    "..message) end;
+		if (message == ERR_ITEM_NOT_FOUND) then
 			removePendingBid(BidResultCodes.ItemNotFound);
-		elseif (arg1 == ERR_NOT_ENOUGH_MONEY) then
+		elseif (message == ERR_NOT_ENOUGH_MONEY) then
 			removePendingBid(BidResultCodes.NotEnoughMoney);
-		elseif (arg1 == ERR_AUCTION_BID_OWN) then
+		elseif (message == ERR_AUCTION_BID_OWN) then
 			removePendingBid(BidResultCodes.OwnAuction);
-		elseif (arg1 == ERR_AUCTION_HIGHER_BID) then
+		elseif (message == ERR_AUCTION_HIGHER_BID) then
 			removePendingBid(BidResultCodes.AlreadyHigherBid);
-		elseif (arg1 == ERR_ITEM_MAX_COUNT) then
+		elseif (message == ERR_ITEM_MAX_COUNT) then
 			removePendingBid(BidResultCodes.MaxItemCount);
 		end
 	end
@@ -138,7 +137,7 @@ function isBidAllowed(listType, index)
 	if (not Auctioneer.QueryManager.IsAuctionValid(auction)) then
 		return false;
 	end
-	
+
 	-- Must not have a query in progress.
 	if (Auctioneer.QueryManager.IsQueryInProgress()) then
 		return false;
@@ -157,7 +156,7 @@ end
 -- Returns true if a bid request is in flight to the server
 -------------------------------------------------------------------------------
 function isBidInProgress()
-	return (table.getn(PendingBids) > 0);
+	return (#PendingBids > 0);
 end
 
 -------------------------------------------------------------------------------
@@ -169,16 +168,16 @@ function addPendingBid(listType, index, bid, callbackFunc)
 	-- get it from the query manager.
 	local auction;
 	local auctionId = Auctioneer.QueryManager.GetAuctionId(listType, index);
-	if (auctionId ~= nil) then
+	if (auctionId) then
 		auction = Auctioneer.SnapshotDB.GetAuctionById(nil, auctionId);
 	end
-	if (auction ~= nil and auction.auctionId ~= nil) then
-		debugPrint("Found in snapshot: "..auction.auctionId);
+	if (auction and auction.auctionId) then
+		debugPrint("Found in snapshot:", auction.auctionId);
 	else
 		debugPrint("Did not find auction in snapshot");
 		auction = Auctioneer.QueryManager.GetAuctionByIndex(listType, index);
 	end
-	
+
 	-- We had better have an auction by now...
 	if (auction) then
 		-- Add a pending bid to the queue.
@@ -190,7 +189,7 @@ function addPendingBid(listType, index, bid, callbackFunc)
 		debugPrint("Added pending bid");
 
 		-- Register for the response events if this is the first pending bid.
-		if (table.getn(PendingBids) == 1) then
+		if (#PendingBids == 1) then
 			debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_BidManager", onEventHook);
 			Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_BidManager", onEventHook);
@@ -205,14 +204,14 @@ end
 -- Removes the pending bid from the queue.
 -------------------------------------------------------------------------------
 function removePendingBid(result)
-	if (table.getn(PendingBids) > 0) then
+	if (#PendingBids > 0) then
 		-- Remove the first pending bid.
 		local pendingBid = PendingBids[1];
 		table.remove(PendingBids, 1);
 		debugPrint("Removed pending bid with result "..result);
-		
+
 		-- Unregister for the response events if this is the last pending bid.
-		if (table.getn(PendingBids) == 0) then
+		if (#PendingBids == 0) then
 			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_BidManager");
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_BidManager");
@@ -220,7 +219,7 @@ function removePendingBid(result)
 
 		-- Fire the AUCTIONEER_BID_COMPLETE event.
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_COMPLETE", pendingBid.auction, pendingBid.bid, result);
-		
+
 		-- If a callback function was provided, call it.
 		if (pendingBid.callbackFunc) then
 			pendingBid.callbackFunc(pendingBid.auction, pendingBid.bid, result);
@@ -246,15 +245,14 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.BidManager] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.BidManager]", ...);
 end
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.BidManager =
-{
+Auctioneer.BidManager = {
 	Load = load;
 	IsBidInProgress = isBidInProgress;
 	IsBidAllowed = isBidAllowed;

@@ -71,7 +71,7 @@ local debugPrint;
 -- QueryRequestQueue[Index] =
 -- {
 --     parameters;				-- query parameters
---     maxSilence;				
+--     maxSilence;
 --     maxRetries;
 --     callbackFunc;			-- callback function called when the query is complete.
 --     querySent;				-- true if the query has been sent to the server.
@@ -143,8 +143,7 @@ local hookQueryAuctionItems = true;
 -------------------------------------------------------------------------------
 -- Public Data
 -------------------------------------------------------------------------------
-QueryAuctionItemsResultCodes =
-{
+QueryAuctionItemsResultCodes = {
 	Complete = "Complete";
 	PartialComplete = "PartialComplete";
 	Canceled = "Canceled";
@@ -182,7 +181,7 @@ function AucQueryManager_OnUpdate()
 						request.maxRetries = request.maxRetries - 1;
 						sendQuery(request);
 					else
-						debugPrint("Query response not received in the last "..silence.." seconds (maxSilence="..request.maxSilence..")");
+						debugPrint("Query response not received in the last", silence, "seconds (maxSilence=", request.maxSilence, ")");
 						removeRequestFromQueue(QueryAuctionItemsResultCodes.PartialComplete);
 					end
 				end
@@ -217,7 +216,7 @@ function onBidSent(event, auction, bid)
 		bidInfo.receivedBidComplete = false;
 		bidInfo.receivedAuctionItemListUpdate = false;
 		PendingBidInfo[auction.auctionId] = bidInfo;
-		debugPrint("Added pending bid for auction "..auction.auctionId);
+		debugPrint("Added pending bid for auction", auction.auctionId);
 	else
 		debugPrint("Ignoring bid sent due to no auction id");
 	end
@@ -236,13 +235,13 @@ function onBidComplete(event, auction, bid, result)
 			-- received the AUCTION_ITEM_LIST_UPDATE event.
 			if (result ~= BidResultCodes.BidAccepted or bidInfo.receivedAuctionItemListUpdate) then
 				PendingBidInfo[auction.auctionId] = nil;
-				debugPrint("Removed pending bid for auction "..auction.auctionId);
+				debugPrint("Removed pending bid for auction", auction.auctionId);
 			else
 				bidInfo.receivedBidComplete = true;
-				debugPrint("Deferring removal of pending bid for auction "..auction.auctionId);
+				debugPrint("Deferring removal of pending bid for auction", auction.auctionId);
 			end
 		else
-			debugPrint("WARNING: No pending bid for auction "..auction.auctionId);
+			debugPrint("WARNING: No pending bid for auction", auction.auctionId);
 		end
 	else
 		debugPrint("Ignoring bid complete due to no auction id");
@@ -378,30 +377,31 @@ function queryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	debugPrint("Auctioneer's QueryAuctionItems() called");
 
 	-- Validate the parameters.
-	if (maxSilence == nil) then maxSilence = 5 end;
-	if (maxRetries == nil) then maxRetries = 3 end;
+	maxSilence = maxSilence or 5;
+	maxRetries = maxRetries or 3;
 
 	-- Construct a table for the QueryAuctionItem parameters.
-	local parameters = {};
-	parameters.name = name;
-	parameters.minLevel = normalizeNumericQueryParam(minLevel);
-	parameters.maxLevel = normalizeNumericQueryParam(maxLevel);
-	parameters.invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
-	parameters.classIndex = normalizeNumericQueryParam(classIndex);
-	parameters.subclassIndex = normalizeNumericQueryParam(subclassIndex);
-	parameters.page = page;
-	parameters.isUsable = isUsable;
-	parameters.qualityIndex = normalizeNumericQueryParam(qualityIndex);
 
 	-- Construct the request and add it to the queue.
-	local request = {};
-	request.parameters = parameters;
-	request.maxSilence = maxSilence;
-	request.maxRetries = maxRetries;
-	request.callbackFunc = callbackFunc;
-	request.querySent = false;
-	request.receivedQueryResponse =  false;
-	request.lastQueryResponseTime = nil;
+	local request = {
+		parameters = {
+			name = name;
+			minLevel = normalizeNumericQueryParam(minLevel);
+			maxLevel = normalizeNumericQueryParam(maxLevel);
+			invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
+			classIndex = normalizeNumericQueryParam(classIndex);
+			subclassIndex = normalizeNumericQueryParam(subclassIndex);
+			page = page;
+			isUsable = isUsable;
+			qualityIndex = normalizeNumericQueryParam(qualityIndex);
+		};
+		maxSilence = maxSilence;
+		maxRetries = maxRetries;
+		callbackFunc = callbackFunc;
+		querySent = false;
+		receivedQueryResponse =  false;
+		lastQueryResponseTime = nil;
+	}
 
 	-- Add the request to the queue.
 	addRequestToQueue(request);
@@ -424,7 +424,7 @@ end
 -- Removes the request at the head of the queue.
 -------------------------------------------------------------------------------
 function removeRequestFromQueue(result)
-	if (table.getn(QueryRequestQueue) > 0) then
+	if (#QueryRequestQueue > 0) then
 		-- Remove the request from the queue.
 		local request = QueryRequestQueue[1];
 		table.remove(QueryRequestQueue, 1);
@@ -558,14 +558,14 @@ function onAuctionItemListUpdate()
 			debugPrint("onAuctionItemListUpdate() - query incomplete (missing owner)");
 		end
 
-		-- All done with update!		
+		-- All done with update!
 		return;
 	end
 
 	-- Check if this is a refresh of the current page. A refresh would be
 	-- caused by a bid or an outbid.
 	if (CurrentPage and
-		doAuctionsMatchQuery(updatedAuctions, CurrentPage.query) and 
+		doAuctionsMatchQuery(updatedAuctions, CurrentPage.query) and
 		reconcileAuctionLists(CurrentPage.auctions, updatedAuctions)) then
 		debugPrint("onAuctionItemListUpdate() - query refresh");
 		return;
@@ -581,7 +581,7 @@ end
 -- Checks if we are awaiting the results of a query.
 -------------------------------------------------------------------------------
 function isQueryInProgress()
-	return (table.getn(QueryRequestQueue) > 0 and QueryRequestQueue[1].querySent);
+	return (#QueryRequestQueue > 0 and QueryRequestQueue[1].querySent);
 end
 
 -------------------------------------------------------------------------------
@@ -590,7 +590,7 @@ end
 -- the auction list to update as a result of a bid.
 -------------------------------------------------------------------------------
 function isBidInProgress()
-	return (table.getn(PendingBidInfo) > 0);
+	return (#PendingBidInfo > 0);
 end
 
 -------------------------------------------------------------------------------
@@ -611,17 +611,16 @@ end
 -- Checks if two queries are the same (except for page number).
 -------------------------------------------------------------------------------
 function doQueriesMatch(query1, query2)
-	if (query1.name == query2.name and
+	return(
+		query1.name == query2.name and
 		query1.minLevel == query2.minLevel and
 		query1.maxLevel == query2.maxLevel and
 		query1.invTypeIndex == query2.invTypeIndex and
 		query1.classIndex == query2.classIndex and
 		query1.subclassIndex == query2.subclassIndex and
 		query1.isUsable == query2.isUsable and
-		query1.qualityIndex == query2.qualityIndex) then
-		return true;
-	end
-	return false;
+		query1.qualityIndex == query2.qualityIndex
+	)
 end
 
 -------------------------------------------------------------------------------
@@ -645,7 +644,7 @@ function reconcileAuctionLists(oldList, newList)
 	-- auctions that are removed because of buyouts.
 	local oldIndex = 1;
 	local newIndex = 1;
-	while (oldIndex < table.getn(oldList) and newIndex < table.getn(newList)) do
+	while (oldIndex < #oldList and newIndex < #newList) do
 		local oldAuction = oldList[oldIndex];
 		local oldSignature = Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(oldAuction);
 		local newAuction = newList[newIndex];
@@ -677,17 +676,17 @@ function reconcileAuctionLists(oldList, newList)
 		end
 		oldIndex = oldIndex + 1;
 	end
-	
+
 	-- Check if we matched up all the auctions in both lists.
-	if (oldIndex ~= table.getn(oldList) and newIndex ~= table.getn(newList)) then
+	if (oldIndex ~= #oldList and newIndex ~= #newList) then
 		return false;
 	end
 
-	-- Now that we know the lists match we need to update the cache and 
+	-- Now that we know the lists match we need to update the cache and
 	-- snapshot.
 	local oldIndex = 1;
 	local newIndex = 1;
-	while (oldIndex < table.getn(oldList) and newIndex < table.getn(newList)) do
+	while (oldIndex < #oldList and newIndex < #newList) do
 		-- Get the auctions and their signatures.
 		local oldAuction = oldList[oldIndex];
 		local oldSignature = Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(oldAuction);
@@ -697,7 +696,7 @@ function reconcileAuctionLists(oldList, newList)
 		-- Check if the signatures match.
 		if (oldSignature == newSignature) then
 			-- Check if the auction bid has changed.
-			if (oldAuction.bidAmount ~= newAuction.bidAmount or 
+			if (oldAuction.bidAmount ~= newAuction.bidAmount or
 				oldAuction.highBidder ~= newAuction.highBidder) then
 				-- Update the old auction with the new auction.
 				oldAuction.bidAmount = newAuction.bidAmount;
@@ -756,7 +755,7 @@ function reconcileAuctionLists(oldList, newList)
 			end
 		end
 	end
-	
+
 	return true;
 end
 
@@ -778,7 +777,7 @@ function addPageToCache(page, updateSnapshot)
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_AUCTION_SEEN", auction);
 	end
 	debugPrint("Added page "..page.pageNum.." to the cache");
-	
+
 	-- Check if we have all the pages (numbering starts at 0).
 	if (updateSnapshot) then
 		local pageNum = 0;
@@ -823,7 +822,7 @@ function getAuctionsInCache()
 			end
 		end
 
-		-- Add the auctions on this page the list.		
+		-- Add the auctions on this page the list.
 		for indexOnPage, auctionOnPage in pairs(auctionsOnPage) do
 			table.insert(auctions, auctionOnPage);
 		end
@@ -840,7 +839,7 @@ function checkForDups(auctions, auctionsOnPrevPage)
 	for _, auction in pairs(auctions) do
 		local signature = Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auction);
 		for _, auctionOnPrevPage in pairs(auctionsOnPrevPage) do
-			if (not auctionOnPrevPage.dup and 
+			if (not auctionOnPrevPage.dup and
 				signature == Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auctionOnPrevPage) and
 				auction.bidAmount == auctionOnPrevPage.bidAmount and
 				auction.timeLeft == auctionOnPrevPage.timeLeft) then
@@ -886,7 +885,7 @@ function getAuctionByIndex(listType, index)
 			auction.enchantId = 0;
 			auction.uniqueId = 0;
 		end
-		
+
 		-- Get the auction information.
 		local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
 		auction.name = nilSafeString(name);
@@ -901,7 +900,7 @@ function getAuctionByIndex(listType, index)
 		auction.bidAmount = nilSafeNumber(bidAmount);
 		auction.highBidder = (highBidder ~= nil);
 		auction.owner = nilSafeString(owner);
-	
+
 		-- Get the time left.
 		local timeLeft = GetAuctionItemTimeLeft(listType, index);
 		auction.timeLeft = timeLeft or 0;
@@ -941,7 +940,7 @@ function getAuctionId(listType, index)
 				debugPrint("Updating snapshot with partial results for "..signature);
 				Auctioneer.SnapshotDB.UpdateForSignature(nil, signature, auctions, true);
 			end
-			
+
 			-- Return the auction id of the auction.
 			return auction.auctionId;
 		else
@@ -959,11 +958,11 @@ end
 -------------------------------------------------------------------------------
 function isAuctionValid(auction)
 	-- Must have an auction. Duh!
-	if (auction == nil) then
+	if (not auction) then
 		debugPrint("isAuctionValid() - false (no auction)");
 		return false;
 	end
-	
+
 	-- Must have a name.
 	if (auction.name == "") then
 		debugPrint("isAuctionValid() - false (bad name)");
@@ -981,7 +980,7 @@ function isAuctionValid(auction)
 		debugPrint("isAuctionValid() - false (bad minBid)");
 		return false;
 	end
-	
+
 	-- Must have a valid buyout.
 	if (auction.buyoutPrice < 0 or auction.buyoutPrice > Auctioneer.Core.Constants.MaxAllowedFormatInt) then
 		debugPrint("isAuctionValid() - false (bad buyoutPrice)");
@@ -1006,31 +1005,23 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function nilSafeString(string)
-	if (string == nil) then
-		return "";
-	end
-	return string;
+	return string or "";
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function nilSafeNumber(number)
-	if (number == nil) then
-		return 0;
-	end
-	return number;
+	return number or 0;
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function normalizeNumericQueryParam(param)
-	if (param ~= nil) then
-		if (type(param) == "string") then
-			if (param == "") then
-				param = nil;
-			else
-				param = tonumber(param);
-			end
+	if (type(param) == "string") then
+		if (param == "") then
+			param = nil;
+		else
+			param = tonumber(param);
 		end
 	end
 	return param;
@@ -1038,15 +1029,14 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.QueryManager] "..date("%X")..": "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ": ", ...);
 end
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.QueryManager =
-{
+Auctioneer.QueryManager = {
 	Load = load;
 	QueryAuctionItems = queryAuctionItems;
 	GetAuctionId = getAuctionId;

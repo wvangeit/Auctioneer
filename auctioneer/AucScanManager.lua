@@ -41,6 +41,7 @@ local addRequestToQueue;
 local removeRequestFromQueue;
 local sendQuery;
 local queryCompleteCallback;
+local emptyHookFunction
 local scanStarted;
 local scanEnded;
 local updateScanProgressUI;
@@ -52,8 +53,7 @@ local debugPrint;
 -------------------------------------------------------------------------------
 -- Public Data
 -------------------------------------------------------------------------------
-local RequestState = 
-{
+local RequestState = {
 	WaitingToQuery = "WaitingToQuery";
 	WaitingForQueryResult = "WaitingForQueryResult";
 	Done = "Done";
@@ -75,11 +75,6 @@ local AuctionsAdded = 0;
 local AuctionsUpdated = 0;
 local AuctionsRemoved = 0;
 local LastRequestResult = RequestState.Done;
-
--- The original OnEvent and Update methods for AuctionFrameBrowse. These are
--- overridden when a scan is in progress so that the UI doesn't update.
-local Original_AuctionFrameBrowse_OnEvent = nil;
-local Original_AuctionFrameBrowse_Update = nil;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -131,13 +126,13 @@ function scan()
 			table.insert(categories, category);
 		end
 	end
-	
+
 	-- Scan everything or only selected categories?
-	if (table.getn(allCategories) == table.getn(categories)) then
+	if (#allCategories == #categories) then
 		debugPrint("Scanning all categories");
 		return scanAll();
 	else
-		debugPrint("Scanning "..table.getn(categories).." categories");
+		debugPrint("Scanning", #categories, "categories");
 		return scanCategories(categories);
 	end
 end
@@ -146,7 +141,7 @@ end
 -- Starts an AH scan of all auctions.
 -------------------------------------------------------------------------------
 function scanAll()
-	if (table.getn(RequestQueue) == 0) then
+	if (#RequestQueue == 0) then
 		-- Construct a scan all request.
 		local request = {};
 		request.description = _AUCT('TextAuction');
@@ -162,7 +157,7 @@ end
 -- Starts an AH scan of the specified categories.
 -------------------------------------------------------------------------------
 function scanCategories(categories)
-	if (table.getn(RequestQueue) == 0) then
+	if (#RequestQueue == 0) then
 		-- Construct a scan request for each category requested.
 		for index, category in pairs(categories) do
 			local request = {};
@@ -181,19 +176,20 @@ end
 -- Starts an AH scan base on a query.
 -------------------------------------------------------------------------------
 function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (table.getn(RequestQueue) == 0) then
+	if (#RequestQueue == 0) then
 		-- Construct the scan request.
-		local request = {};
-		request.description = _AUCT('TextAuction');
-		request.name = name;
-		request.minLevel = minLevel;
-		request.maxLevel = maxLevel;
-		request.invTypeIndex = invTypeIndex;
-		request.classIndex = classIndex;
-		request.subclassIndex = subclassIndex;
-		request.page = page;
-		request.isUsable = isUsable;
-		request.qualityIndex = qualityIndex;
+		local request = {
+			description = _AUCT('TextAuction');
+			name = name;
+			minLevel = minLevel;
+			maxLevel = maxLevel;
+			invTypeIndex = invTypeIndex;
+			classIndex = classIndex;
+			subclassIndex = subclassIndex;
+			page = page;
+			isUsable = isUsable;
+			qualityIndex = qualityIndex;
+		};
 		addRequestToQueue(request);
 		return true;
 	else
@@ -208,9 +204,8 @@ end
 function cancelScan()
 	-- %todo: We should probaby wait for the result of any query that is in
 	-- progress.
-	while (table.getn(RequestQueue) > 0) do
-		local request = RequestQueue[1];
-		request.state = RequestState.Canceled;
+	while (#RequestQueue > 0) do
+		RequestQueue[1].state = RequestState.Canceled;
 		removeRequestFromQueue();
 	end
 end
@@ -232,11 +227,11 @@ end
 -- Removes the request at the head of the queue.
 -------------------------------------------------------------------------------
 function removeRequestFromQueue()
-	if (table.getn(RequestQueue) > 0) then
+	if (#RequestQueue > 0) then
 		-- Remove the request from the queue.
 		local request = RequestQueue[1];
 		table.remove(RequestQueue, 1);
-		debugPrint("Removed request from queue with result: "..request.state);
+		debugPrint("Removed request from queue with result:", request.state);
 
 		-- If the request succeeded, add the auctions scanned to the total.
 		LastRequestResult = request.state;
@@ -252,11 +247,11 @@ end
 function sendQuery(request)
 	-- If this is the first query of the request, update the UI to say so.
 	if (request.totalAuctions == 0) then
-		BrowseNoResultsText:SetText(string.format(_AUCT('AuctionScanStart'), request.description));
+		BrowseNoResultsText:SetText(_AUCT('AuctionScanStart'):format(request.description));
 	end
 
 	-- Send the query!
-	debugPrint("Requesting page "..request.nextPage);
+	debugPrint("Requesting page", request.nextPage);
 	request.state = RequestState.WaitingForQueryResult;
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
@@ -270,7 +265,8 @@ function sendQuery(request)
 		request.qualityIndex,
 		10,
 		3,
-		queryCompleteCallback);
+		queryCompleteCallback
+	);
 end
 
 -------------------------------------------------------------------------------
@@ -283,9 +279,9 @@ function queryCompleteCallback(query, result)
 		local request = RequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
 			-- Query succeeded so update the request.
-			debugPrint("Scanned page "..request.nextPage);
+			debugPrint("Scanned page", request.nextPage);
 			local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
-			
+
 			-- Is this the first query?
 			if (request.totalAuctions == 0) then
 				-- This was the first query to get the total number of auctions.
@@ -303,14 +299,14 @@ function queryCompleteCallback(query, result)
 					request.nextPage = request.pages - 1;
 					Auctioneer.QueryManager.ClearPageCache();
 				end
-				debugPrint("Found "..request.totalAuctions.." auctions ("..request.pages.." pages)");
+				debugPrint("Found", request.totalAuctions, "auctions (", request.pages, "pages)");
 			else
 				-- Tweak the start time if it happened in less than 5 seconds.
 				local currentTime = GetTime();
 				local timeElapsed = currentTime - request.startTime;
 				local pagesScanned = request.pages - request.nextPage;
 				local minTimeElapsed = 5.0 * (pagesScanned);
-				debugPrint(pagesScanned.." pages scanned thus far in "..timeElapsed);
+				debugPrint(pagesScanned, "pages scanned thus far in", timeElapsed);
 				if (timeElapsed < minTimeElapsed) then
 					debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 					request.startTime = currentTime - minTimeElapsed;
@@ -321,7 +317,7 @@ function queryCompleteCallback(query, result)
 				request.nextPage = request.nextPage - 1;
 				request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
 			end
-			
+
 			-- Check if the scan is complete.
 			if (request.nextPage < 0) then
 				-- Request is complete!
@@ -346,12 +342,14 @@ end
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
+function emptyHookFunction()
+	return "killorig";
+end
+
 function scanStarted()
-	-- Don't allow AuctionFramBrowse updates during a scan.
-	Original_AuctionFrameBrowse_OnEvent = AuctionFrameBrowse_OnEvent;
-	AuctionFrameBrowse_OnEvent = function() end;
-	Original_AuctionFrameBrowse_Update = AuctionFrameBrowse_Update;
-	AuctionFrameBrowse_Update = function() end;
+	-- Don't allow AuctionFrameBrowse updates during a scan.
+	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_Update", -200, emptyHookFunction)
 
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
@@ -392,7 +390,7 @@ function scanEnded()
 	-- Scanning has ended!
 	Scanning = false;
 	Auctioneer.Scanning.IsScanningRequested = false;
-	debugPrint("Scan ended with result: "..LastRequestResult);
+	debugPrint("Scan ended with result:", LastRequestResult);
 
 	-- Unregister for snapshot events.
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
@@ -412,10 +410,10 @@ function scanEnded()
 		chatResultText = "Scan failed"; -- %todo: Localize
 		uiResultText = "Auctioneer: auction scanning failed"; -- %todo: Localize
 	end
-	local auctionsScannedMessage = AuctionsScanned.." auctions scanned"; -- %todo: Localize
-	local auctionsAddedMessage = AuctionsAdded.." auctions added"; -- %todo: Localize
-	local auctionsRemovedMessage = AuctionsRemoved.." auctions removed"; -- %todo: Localize
-	local auctionsUpdatedMessage = AuctionsUpdated.." auctions updated"; -- %todo: Localize
+	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScanned);
+	local auctionsAddedMessage = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
+	local auctionsRemovedMessage = _AUCT('AuctionDefunctAucts'):format(AuctionsRemoved);
+	local auctionsUpdatedMessage = _AUCT('AuctionOldAucts'):format(AuctionsUpdated);
 
 	-- Report the result to the chat window.
 	chatPrint(chatResultText..":");
@@ -425,13 +423,12 @@ function scanEnded()
 	chatPrint(auctionsUpdatedMessage);
 
 	-- Report the result to the UI.
-	local text = uiResultText.."\n"..auctionsScannedMessage.."\n"..auctionsAddedMessage.."\n"..auctionsRemovedMessage.."\n"..auctionsUpdatedMessage.."\n";
-	BrowseNoResultsText:SetText(text);
+	BrowseNoResultsText:SetText(strjoin("\n", uiResultText, auctionsScannedMessage, auctionsAddedMessage, auctionsRemovedMessage, auctionsUpdatedMessage));
 
-	--The followng was added by MentalPower to implement the "/auc finish-sound" command 
-	if (Auctioneer.Command.GetFilter("finish-sound")) then 
-		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.ogg") 
-	end 
+	--The followng was added by MentalPower to implement the "/auc finish-sound" command
+	if (Auctioneer.Command.GetFilter("finish-sound")) then
+		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.ogg")
+	end
 
 	--The followng was added by MentalPower to implement the "/auc finish" command
 	local finish = Auctioneer.Command.GetFilterVal('finish');
@@ -439,23 +436,11 @@ function scanEnded()
 		Logout();
 	elseif (finish == 2) then
 		Quit();
-	elseif (finish == 3) then
-		if(ReloadUIHandler) then
-			ReloadUIHandler("10");
-		else
-			ReloadUI();
-		end
 	end
 
-	-- We can allow AuctionFramBrowse updates once again.
-	if( Original_AuctionFrameBrowse_OnEvent ) then
-		AuctionFrameBrowse_OnEvent = Original_AuctionFrameBrowse_OnEvent;
-		Original_AuctionFrameBrowse_OnEvent = nil;
-	end
-	if( Original_AuctionFrameBrowse_Update ) then
-		AuctionFrameBrowse_Update = Original_AuctionFrameBrowse_Update;
-		Original_AuctionFrameBrowse_Update = nil;
-	end
+	-- We can allow AuctionFrameBrowse updates once again.
+	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", emptyHookFunction)
+	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_Update", emptyHookFunction)
 
 	--Cleaning up after oneself is always a good idea.
 	collectgarbage();
@@ -464,9 +449,9 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function updateScanProgressUI()
-	if (table.getn(RequestQueue) > 0) then
+	if (#RequestQueue > 0) then
 		local request = RequestQueue[1];
-		
+
 		-- Check if we've completed a page yet...
 		local pagesScanned = request.pages - request.nextPage;
 		if (pagesScanned > 0) then
@@ -479,12 +464,14 @@ function updateScanProgressUI()
 
 			-- Update the progress of this request in the UI.
 			BrowseNoResultsText:SetText(
-				string.format(_AUCT('AuctionPageN'),
+				_AUCT('AuctionPageN'):format(
 					request.description,
 					request.pages - request.nextPage,
 					request.pages,
 					tostring(auctionsScannedPerSecond),
-					SecondsToTime((secondsLeft))));
+					SecondsToTime((secondsLeft))
+				)
+			);
 		end
 	end
 end
@@ -509,28 +496,25 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.ScanManager] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.ScanManager]", ...);
 end
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.ScanManager =
-{
+Auctioneer.ScanManager = {
 	Load = load;
 	Scan = scan;
 	ScanAll = scanAll;
 	ScanCategories = scanCategories;
 	ScanQuery = scanQuery;
 	IsScanning = isScanning;
-	
 }
 
 -- This is the variable Auctioneer use to use to indicate scanning. Keep it for
 -- compatbility with addons such as AuctionFilterPlus.
-Auctioneer.Scanning =
-{
+Auctioneer.Scanning = {
 	IsScanningRequested = false;
 }
 

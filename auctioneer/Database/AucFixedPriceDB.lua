@@ -136,7 +136,7 @@ function loadDatabase()
 	-- Upgrade each realm-faction database (if needed).
 	for ahKey in pairs(AuctioneerFixedPriceDB) do
 		if (not upgradeAHDatabase(AuctioneerFixedPriceDB[ahKey], CURRENT_FIXEDPRICEDB_VERSION)) then
-			debugPrint("WARNING: Price database corrupted for "..ahKey.."! Creating new database.");
+			debugPrint("WARNING: Price database corrupted for", ahKey, "! Creating new database.");
 			AuctioneerFixedPriceDB[ahKey] = createAHDatabase(ahKey);
 		end
 	end
@@ -159,11 +159,11 @@ function createDatabaseFrom3x()
 	local db = {};
 	if (AuctionConfig.fixedprice) then
 		for ahKey, ahData in pairs(AuctionConfig.fixedprice) do
-			local newAhKey = string.lower(ahKey);
+			local newAhKey = ahKey:lower();
 			local ah = createAHDatabase(newAhKey, BASE_FIXEDPRICEDB_VERSION);
 			db[newAhKey] = ah;
 			for itemKey, itemData in pairs(ahData) do
-				ah.fixedPrices[itemKey] = string.gsub (itemData, ":", ";");
+				ah.fixedPrices[itemKey] = itemData:gsub(":", ";");
 			end
 		end
 	end
@@ -207,7 +207,7 @@ function upgradeAHDatabase(ah, version)
 	end
 
 	-- Future DB upgrade code goes here...
-	debugPrint("Upgrading price database for "..ah.ahKey.. " to version "..version);
+	debugPrint("Upgrading price database for", ah.ahKey, "to version", version);
 
 	-- Return the result of the upgrade!
 	return (ah.version == version);
@@ -260,7 +260,7 @@ end
 function setFixedPrice(itemKey, ahKey, fixedPrice)
 	local ah = getAHDatabase(ahKey, true);
 	ah.fixedPrices[itemKey] = Auctioneer.Database.PackRecord(fixedPrice, FixedPriceMetaData);
-	debugPrint("Set fixed price for "..itemKey.." to "..fixedPrice.buyout);
+	debugPrint("Set fixed price for", itemKey, "to", fixedPrice.buyout);
 end
 
 -------------------------------------------------------------------------------
@@ -269,13 +269,13 @@ end
 function removeFixedPrice(itemKey, ahKey)
 	local ah = getAHDatabase(ahKey, true);
 	ah.fixedPrices[itemKey] = nil;
-	debugPrint("Removed fixed price for "..itemKey);
+	debugPrint("Removed fixed price for", itemKey);
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.FixedPriceDB]", unpack(arg));
+	EnhTooltip.DebugPrint("[Auc.FixedPriceDB]", ...);
 end
 
 --=============================================================================

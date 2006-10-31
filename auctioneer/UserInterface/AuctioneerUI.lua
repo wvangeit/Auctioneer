@@ -33,6 +33,7 @@ local preContainerFrameItemButtonOnClickHook;
 local postPickupContainerItemHook;
 local getCursorContainerItem;
 local relevelFrame;
+local relevelFrames;
 local insertAHTab;
 local dropDownMenuInitialize;
 local dropDownMenuSetSelectedID;
@@ -43,7 +44,7 @@ local debugPrint;
 -------------------------------------------------------------------------------
 AuctioneerCursorItem = nil;
 
-MoneyTypeInfo["AUCTIONEER"] = {
+MoneyTypeInfo.AUCTIONEER = {
 	UpdateFunc = function()
 		return this.staticMoney;
 	end,
@@ -70,7 +71,7 @@ end
 -- Called on the ADDON_LOADED event.
 -------------------------------------------------------------------------------
 function onAddonLoaded(event, addon)
-	if (string.lower(arg1) == "blizzard_auctionui") then
+	if (arg1:lower() == "blizzard_auctionui") then
 		onAuctionUILoaded();
 	end
 end
@@ -185,7 +186,7 @@ function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button,
 				local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(warn)
 				warn = ("|c"..cHex..warn.."|r")
 				StartAuction(start, buy, duration);
-				chatPrint(string.format(_AUCT('FrmtAutostart'), link, EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
+				chatPrint(_AUCT('FrmtAutostart'):format(link, EnhTooltip.GetTextGSC(start), EnhTooltip.GetTextGSC(buy), duration/60, warn));
 			end
 			return "abort";
 		end
@@ -196,12 +197,10 @@ function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button,
 		if (count) then
 			if (count > 1 and IsShiftKeyDown()) then
 				this.SplitStack = function(button, split)
-					local _, _, _, _, name = EnhTooltip.BreakLink(link);
 					AuctionFramePost:SetAuctionItem(bag, slot, split);
 				end
 				OpenStackSplitFrame(count, this, "BOTTOMRIGHT", "TOPRIGHT");
 			else
-				local _, _, _, _, name = EnhTooltip.BreakLink(link);
 				AuctionFramePost:SetAuctionItem(bag, slot, 1);
 			end
 			return "abort";
@@ -237,9 +236,12 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function relevelFrame(frame)
-	local myLevel = frame:GetFrameLevel() + 1
-	local children = { frame:GetChildren() }
-	for _,child in pairs(children) do
+	return relevelFrames(frame:GetFrameLevel() + 1, frame:GetChildren())
+end
+
+function relevelFrames(myLevel, ...)
+	for i = 1, select("#", ...) do
+		local child = select(i, ...)
 		child:SetFrameLevel(myLevel)
 		relevelFrame(child)
 	end
@@ -252,7 +254,7 @@ function insertAHTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs (including the tab we are going
 	-- to insert).
 	local tabCount = 1;
-	while (getglobal("AuctionFrameTab"..(tabCount)) ~= nil) do
+	while (getglobal("AuctionFrameTab"..(tabCount))) do
 		tabCount = tabCount + 1;
 	end
 
@@ -260,7 +262,7 @@ function insertAHTab(tabButton, tabFrame)
 	-- tabs. We want to insert them at the end or before BeanCounter's
 	-- Transactions tab.
 	local tabIndex = 1;
-	while (getglobal("AuctionFrameTab"..(tabIndex)) ~= nil and
+	while (getglobal("AuctionFrameTab"..(tabIndex)) and
 		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
 		tabIndex = tabIndex + 1;
 	end
@@ -346,13 +348,12 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.UI] "..message);
+	return EnhTooltip.DebugPrint("[Auc.UI]", message);
 end
 
 --=============================================================================
 -- Initialization
 --=============================================================================
-if (not Auctioneer) then return end;
 if (Auctioneer.UI) then return end;
 debugPrint("AuctioneerUI.lua loaded");
 

@@ -250,14 +250,14 @@ end
 -- returns nil.
 -------------------------------------------------------------------------------
 function getItemInfo(itemKey)
-	--debugPrint("Getting item info for: "..itemKey);
+	--debugPrint("Getting item info for:", itemKey);
 
 	-- Check if we've cached the item info.
 	if (cachedItemInfoKey == itemKey) then
 		--debugPrint("getItemInfo: Cache hit");
 		return cachedItemInfo;
 	else
-		--debugPrint("getItemInfo: Cache miss - "..itemKey);
+		--debugPrint("getItemInfo: Cache miss -", itemKey);
 	end
 
 	-- Nope, gotta get it from the database.
@@ -285,7 +285,7 @@ end
 -------------------------------------------------------------------------------
 function getItemInfoFromBlizzard(itemKey)
 	local itemString = getItemString(itemKey);
-	local itemName, itemString, itemQuality, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemString);
+	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemString);
 	if (itemName) then
 		return {
 			name = itemName;
@@ -320,7 +320,7 @@ function getItemLink(itemKey)
 	if (itemInfo) then
 		local _, _, _, hexColor = GetItemQualityColor(itemInfo.quality);
 		local itemId, suffixId, enchantId = breakItemKey(itemKey);
-		return string.format("%s|Hitem:%s:%s:%s:0|h[%s]|h|r", hexColor, itemId, enchantId, suffixId, itemInfo.name);
+		return ("%s|Hitem:%s:%s:0:0:0:0:%s:0|h[%s]|h|r"):format(hexColor, itemId, enchantId, suffixId, itemInfo.name);
 	end
 end
 
@@ -330,7 +330,7 @@ end
 -------------------------------------------------------------------------------
 function getItemString(itemKey)
 	local itemId, suffixId, enchantId = breakItemKey(itemKey);
-	return string.format("item:%s:%s:%s:0", itemId, enchantId, suffixId);
+	return ("item:%s:%s:0:0:0:0:%s:0"):format(itemId, enchantId, suffixId);
 end
 
 -------------------------------------------------------------------------------
@@ -398,8 +398,8 @@ function onAuctionSeen(event, auction)
 		db.items[itemKey] = packItemInfo(itemInfo);
 	end
 
-	local itemLink = getItemLink(itemKey)
 	-- Notify other interested addons that we saw an item link.
+	local itemLink = getItemLink(itemKey)
 	if (ItemsMatrix_ProcessLinks) then
 		ItemsMatrix_ProcessLinks(
 				itemLink, -- itemlink
@@ -426,7 +426,7 @@ end
 -- Creates an item key (itemId:suffixId:enchantId)
 -------------------------------------------------------------------------------
 function createItemKey(itemId, suffixId, enchantId)
-	return itemId..":"..suffixId..":"..enchantId;
+	return strjoin(":", itemId, suffixId, enchantId);
 end
 
 -------------------------------------------------------------------------------
@@ -448,11 +448,8 @@ end
 -- Breaks an item key (itemId;suffixId;enchantId)
 -------------------------------------------------------------------------------
 function breakItemKey(itemKey)
-	_, _, itemId, suffixId, enchantId = string.find(itemKey, "(.+):(.+):(.+)");
-	itemId = tonumber(itemId or 0);
-	suffixId = tonumber(suffixId or 0);
-	enchantId = tonumber(enchantId or 0);
-	return itemId, suffixId, enchantId;
+	local itemId, suffixId, enchantId = strsplit(":", itemKey);
+	return tonumber(itemId) or 0, tonumber(suffixId) or 0, tonumber(enchantId) or 0;
 end
 
 -------------------------------------------------------------------------------
@@ -473,7 +470,7 @@ function getIndex(list, string, create)
 	if (create) then
 		table.insert(list, string);
 		--debugPrint("Created list["..table.getn(list).."] = "..string);
-		return table.getn(list);
+		return #list;
 	end
 end
 
@@ -517,7 +514,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.ItemDB]", unpack(arg));
+	EnhTooltip.DebugPrint("[Auc.ItemDB]", ...);
 end
 
 --=============================================================================

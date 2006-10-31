@@ -325,7 +325,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 1)
+						ListTemplate_Sort(self:GetParent(), 1)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -339,7 +339,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -356,7 +356,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 2)
+						ListTemplate_Sort(self:GetParent(), 2)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -370,7 +370,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -387,7 +387,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 3)
+						ListTemplate_Sort(self:GetParent(), 3)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -401,7 +401,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -418,7 +418,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 4)
+						ListTemplate_Sort(self:GetParent(), 4)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -432,7 +432,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -449,7 +449,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 5)
+						ListTemplate_Sort(self:GetParent(), 5)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -463,7 +463,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>
@@ -480,7 +480,7 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						ListTemplate_Sort(this:GetParent(), 6)
+						ListTemplate_Sort(self:GetParent(), 6)
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -494,7 +494,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						ListTemplate_DropDown_OnLoad();
+						ListTemplate_DropDown_OnLoad(self);
 					</OnLoad>
 				</Scripts>
 			</Frame>

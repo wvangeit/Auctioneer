@@ -83,30 +83,30 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function onEventHook(_, event)
+function onEventHook(_, event, message, ...)
 	-- Toss all the pending requests when the AH closes.
 	if (event == "AUCTION_HOUSE_CLOSED") then
-		while (table.getn(RequestQueue) > 0) do
+		while (#RequestQueue > 0) do
 			removeRequestFromQueue();
 		end
 
 	-- Check for an auction created message.
-	elseif (event == "CHAT_MSG_SYSTEM" and arg1) then
-		if (arg1 == ERR_AUCTION_STARTED) then
+	elseif (event == "CHAT_MSG_SYSTEM" and message) then
+		if (message == ERR_AUCTION_STARTED) then
 		 	removePendingAuction(true);
 		end
 
 	-- Check for an auction failure message.
-	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		if (arg1 == ERR_NOT_ENOUGH_MONEY) then
+	elseif (event == "UI_ERROR_MESSAGE" and message) then
+		if (message == ERR_NOT_ENOUGH_MONEY) then
 			removePendingAuction(false);
 		end
 
 	-- Otherwise hand off the event to the current request.
-	elseif (table.getn(RequestQueue) > 0) then
+	elseif (#RequestQueue > 0) then
 		local request = RequestQueue[1];
 		if (request.state ~= READY_STATE) then
-			onEvent(request, event);
+			onEvent(request, event, message, ...);
 			processRequestQueue();
 		end
 	end
@@ -187,7 +187,7 @@ end
 -- Removes a request at the head of the queue.
 -------------------------------------------------------------------------------
 function removeRequestFromQueue()
-	if (table.getn(RequestQueue) > 0) then
+	if (#RequestQueue > 0) then
 		local request = RequestQueue[1];
 
 		-- Make absolutely sure we are back in the READY_STATE so that we
@@ -202,16 +202,14 @@ function removeRequestFromQueue()
 
 		-- Report the auctions posted
 		if (request.stackPostCount == 1) then
-			local output = string.format(_AUCT('FrmtPostedAuction'), request.name, request.stackSize);
-			chatPrint(output);
+			chatPrint(_AUCT('FrmtPostedAuction'):format(request.name, request.stackSize));
 		else
-			local output = string.format(_AUCT('FrmtPostedAuctions'), request.stackPostCount, request.name, request.stackSize);
-			chatPrint(output);
+			chatPrint(_AUCT('FrmtPostedAuctions'):format(request.stackPostCount, request.name, request.stackSize));
 		end
 		table.remove(RequestQueue, 1);
 
 		-- If this was the last request, end processing the queue.
-		if (table.getn(RequestQueue) == 0) then
+		if (#RequestQueue == 0) then
 			endProcessingRequestQueue()
 		end
 	end
@@ -232,7 +230,7 @@ end
 function beginProcessingRequestQueue()
 	if (not ProcessingRequestQueue and
 		AuctionFrame and AuctionFrame:IsVisible() and
-		table.getn(RequestQueue) > 0) then
+		#RequestQueue > 0) then
 
 		ProcessingRequestQueue = true;
 		debugPrint("Begin processing the post queue");
@@ -340,8 +338,7 @@ function run(request)
 					end
 				else
 					-- Not enough of the item!
-					local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
-					chatPrint(output);
+					chatPrint(_AUCT('FrmtNotEnoughOfItem'):format(request.name));
 					removeRequestFromQueue();
 				end
 			else
@@ -360,8 +357,7 @@ function run(request)
 			end
 		else
 			-- Item not found!
-			local output = string.format(_AUCT('FrmtNotEnoughOfItem'), request.name);
-			chatPrint(output);
+			chatPrint(_AUCT('FrmtNotEnoughOfItem'):format(request.name));
 			removeRequestFromQueue();
 		end
 	end
@@ -441,16 +437,8 @@ end
 -- TODO: Correctly handle containers like ammo packs
 -------------------------------------------------------------------------------
 function findEmptySlot()
-	for bag = 0, 4, 1 do
-		if (GetBagName(bag)) then
-			for item = GetContainerNumSlots(bag), 1, -1 do
-				if (not GetContainerItemInfo(bag, item)) then
-					return { bag=bag, slot=item };
-				end
-			end
-		end
-	end
-	return nil;
+	bag, slot = Auctioneer.Util.FindEmptySlot()
+	return { bag=bag, slot=slot };
 end
 
 -------------------------------------------------------------------------------
@@ -627,7 +615,7 @@ function addPendingAuction(auction)
 	debugPrint("Added pending auction");
 
 	-- Register for the response events if this is the first pending auction.
-	if (table.getn(PendingAuctions) == 1) then
+	if (#PendingAuctions == 1) then
 		debugPrint("addPendingAuction() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_PostManager", onEventHook);
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_PostManager", onEventHook);
@@ -638,7 +626,7 @@ end
 -- Removes the pending auction from the queue.
 -------------------------------------------------------------------------------
 function removePendingAuction(result)
-	if (table.getn(PendingAuctions) > 0) then
+	if (#PendingAuctions > 0) then
 		-- Remove the first pending auction.
 		local pendingAuction = PendingAuctions[1];
 		table.remove(PendingAuctions, 1);
@@ -647,9 +635,9 @@ function removePendingAuction(result)
 		else
 			debugPrint("Removed pending auction with result: false");
 		end
-		
+
 		-- Unregister for the response events if this is the last pending auction.
-		if (table.getn(PendingAuctions) == 0) then
+		if (#PendingAuctions == 0) then
 			debugPrint("removePendingAuction() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_PostManager");
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_PostManager");
@@ -669,10 +657,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function nilSafe(string)
-	if (string) then
-		return string;
-	end
-	return "<nil>";
+	return string or "<nil>";
 end
 
 -------------------------------------------------------------------------------
@@ -681,15 +666,14 @@ chatPrint = Auctioneer.Util.ChatPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function debugPrint(message)
-	EnhTooltip.DebugPrint("[Auc.PostManager] "..message);
+function debugPrint(...)
+	EnhTooltip.DebugPrint("[Auc.PostManager]", message);
 end
 
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
-Auctioneer.PostManager =
-{
+Auctioneer.PostManager = {
 	Load = load;
 	PostAuction = postAuction;
 	GetItemQuantityByItemKey = getItemQuantityByItemKey;
