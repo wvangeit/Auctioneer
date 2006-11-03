@@ -70,7 +70,7 @@ function ListTemplate_Initialize(frame, physicalColumns, logicalColumns)
 			column.sortAscending = true;
 			table.insert(frame.sortOrder, column);
 			getglobal(button:GetName().."Arrow"):Hide();
-			getglobal(button:GetName().."Text"):SetText(logicalColumn.title);
+			button:SetText(logicalColumn.title);
 			button:Show();
 			if (#physicalColumn.logicalColumns > 1) then
 				dropdown:Show();
@@ -278,8 +278,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function ListTemplate_DropDown_Initialize(self)
-	local dropdown = self:GetParent();
+function ListTemplate_DropDown_Initialize()
+	local dropdown = this:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.physicalColumns) then
 		local physicalColumnIndex = dropdown:GetID();

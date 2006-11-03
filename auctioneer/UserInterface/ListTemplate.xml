@@ -51,7 +51,7 @@
 				</Texture>
 			</Layer>
 		</Layers>
-		<NormalText name="$parentText" inherits="GameFontHighlightSmall">
+		<ButtonText name="$parentText" inherits="GameFontHighlightSmall">
 			<Anchors>
 				<Anchor point="LEFT">
 					<Offset>
@@ -59,7 +59,8 @@
 					</Offset>
 				</Anchor>
 			</Anchors>
-		</NormalText>
+		</ButtonText>
+		<NormalFont inherits="GameFontHighlightSmall"/> 
 		<NormalTexture name="$parentArrow" hidden="true" file="Interface\Buttons\UI-SortArrow">
 			<Size>
 				<AbsDimension x="9" y="8"/>
@@ -125,7 +126,7 @@
 				</Texture>
 			</Layer>
 		</Layers>
-		<NormalText name="$parentText" inherits="GameFontHighlightSmall">
+		<ButtonText name="$parentText" inherits="GameFontHighlightSmall">
 			<Anchors>
 				<Anchor point="LEFT">
 					<Offset>
@@ -133,7 +134,8 @@
 					</Offset>
 				</Anchor>
 			</Anchors>
-		</NormalText>
+		</ButtonText>
+		<NormalFont inherits="GameFontHighlightSmall"/> 
 		<NormalTexture name="$parentArrow" hidden="true" file="Interface\Buttons\UI-SortArrow">
 			<Size>
 				<AbsDimension x="9" y="8"/>

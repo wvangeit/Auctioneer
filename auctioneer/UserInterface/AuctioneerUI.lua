@@ -70,8 +70,8 @@ end
 -------------------------------------------------------------------------------
 -- Called on the ADDON_LOADED event.
 -------------------------------------------------------------------------------
-function onAddonLoaded(event, addon)
-	if (arg1:lower() == "blizzard_auctionui") then
+function onAddonLoaded(hookParams, event, addon)
+	if (addon:lower() == "blizzard_auctionui") then
 		onAuctionUILoaded();
 	end
 end

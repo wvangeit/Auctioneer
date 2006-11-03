@@ -55,8 +55,9 @@ local delocalizeCommand
 local localizeCommand
 local findEmptySlot
 
-function storePlayerFaction()
+function storePlayerFaction(hookParams, event, arg1)
 	Auctioneer.Core.Constants.PlayerFaction = (Auctioneer.Core.Constants.PlayerFaction or UnitFactionGroup("player") or "Alliance");
+	return EnhTooltip.DebugPrint(Auctioneer.Core.Constants.PlayerFaction, event, arg1)
 end
 
 -- return the string representation of the given timeLeft constant

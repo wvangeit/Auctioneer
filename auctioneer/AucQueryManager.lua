@@ -340,27 +340,28 @@ function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex,
 	if (hookQueryAuctionItems) then
 		debugPrint("Blizzard's QueryAuctionItems() called");
 
-		-- Construct a table for the QueryAuctionItem parameters.
-		local parameters = {};
-		parameters.name = name;
-		parameters.minLevel = normalizeNumericQueryParam(minLevel);
-		parameters.maxLevel = normalizeNumericQueryParam(maxLevel);
-		parameters.invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
-		parameters.classIndex = normalizeNumericQueryParam(classIndex);
-		parameters.subclassIndex = normalizeNumericQueryParam(subclassIndex);
-		parameters.page = page;
-		parameters.isUsable = isUsable;
-		parameters.qualityIndex = normalizeNumericQueryParam(qualityIndex);
 
 		-- Construct the request and add it to the front of the queue.
-		local request = {};
-		request.parameters = parameters;
-		request.maxSilence = 5; -- 5 seconds
-		request.maxRetries = 0;
-		request.callbackFunc = nil;
-		request.querySent = true;
-		request.receivedQueryResponse = false;
-		request.lastQueryResponseTime = GetTime();
+		local request = {
+			-- Construct a table for the QueryAuctionItem parameters.
+			parameters = {
+				name = name;
+				minLevel = normalizeNumericQueryParam(minLevel);
+				maxLevel = normalizeNumericQueryParam(maxLevel);
+				invTypeIndex = normalizeNumericQueryParam(invTypeIndex);
+				classIndex = normalizeNumericQueryParam(classIndex);
+				subclassIndex = normalizeNumericQueryParam(subclassIndex);
+				page = page;
+				isUsable = isUsable;
+				qualityIndex = normalizeNumericQueryParam(qualityIndex);
+			};
+			maxSilence = 5; -- 5 seconds
+			maxRetries = 0;
+			callbackFunc = nil;
+			querySent = true;
+			receivedQueryResponse = false;
+			lastQueryResponseTime = GetTime();
+		};
 
 		-- Add the request to the queue. We are guaranteed to be the only ones
 		-- in the queue.

@@ -25,6 +25,7 @@
 -- Function Imports
 -------------------------------------------------------------------------------
 local chatPrint = Auctioneer.Util.ChatPrint;
+local emptyHookFunction = Auctioneer.ScanManager.EmptyHookFunction;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -187,14 +188,15 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 			end
 
 		-- Create the request and add it to the queue.
-		local request = {};
-		request.query = query;
-		request.name = itemInfo.name;
-		request.count = auctionInSnapshot.count;
-		request.currentBid = Auctioneer.SnapshotDB.GetCurrentBid(auctionInSnapshot);
-		request.filterFunc = filterFunc;
-		request.callbackFunc = callbackFunc;
-		request.maxBidAttempts = 1;
+		local request = {
+			query = query;
+			name = itemInfo.name;
+			count = auctionInSnapshot.count;
+			currentBid = Auctioneer.SnapshotDB.GetCurrentBid(auctionInSnapshot);
+			filterFunc = filterFunc;
+			callbackFunc = callbackFunc;
+			maxBidAttempts = 1;
+		};
 		addRequestToQueue(request);
 	else
 		debugPrint("placeBidByAuction() - No information for item "..itemKey);
@@ -388,9 +390,6 @@ end
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
-function emptyHookFunction()
-	return "killorig";
-end
 
 function scanStarted()
 	-- Hide the results UI
@@ -407,8 +406,8 @@ function scanStarted()
 	BrowseBuyoutButton:Disable();
 
 	-- Don't allow AuctionFrameBrowse updates during a scan.
-	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
-	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_Update", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, emptyHookFunction)
 
 	-- Bid scanning has begun!
 	Scanning = true;

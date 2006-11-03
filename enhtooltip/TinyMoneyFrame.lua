@@ -20,8 +20,13 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
-function TinyMoneyFrame_Update(frameName, money)
-	local frame = getglobal(frameName);
+function TinyMoneyFrame_Update(frame, money)
+	local frameName = frame:GetName();
+
+	local goldButton = getglobal(frameName.."GoldButton");
+	local silverButton = getglobal(frameName.."SilverButton");
+	local copperButton = getglobal(frameName.."CopperButton");
+
 	local info = frame.info;
 	if ( not info ) then
 		message("Error moneyType not set");
@@ -31,10 +36,6 @@ function TinyMoneyFrame_Update(frameName, money)
 	local gold = floor(money / (COPPER_PER_SILVER * SILVER_PER_GOLD));
 	local silver = floor((money - (gold * COPPER_PER_SILVER * SILVER_PER_GOLD)) / COPPER_PER_SILVER);
 	local copper = mod(money, COPPER_PER_SILVER);
-
-	local goldButton = getglobal(frameName.."GoldButton");
-	local silverButton = getglobal(frameName.."SilverButton");
-	local copperButton = getglobal(frameName.."CopperButton");
 
 	local iconWidth = MONEY_ICON_WIDTH;
 	local spacing = MONEY_BUTTON_SPACING;
@@ -49,7 +50,7 @@ function TinyMoneyFrame_Update(frameName, money)
 	goldButton:Show();
 	
 	if (gold > 0) then
-		silverButton:SetText(string.format("%."..math.log10(SILVER_PER_GOLD).."d", silver));
+		silverButton:SetText(("%."..math.log10(SILVER_PER_GOLD).."d"):format(silver));
 	else
 		silverButton:SetText(silver);
 	end
@@ -57,7 +58,7 @@ function TinyMoneyFrame_Update(frameName, money)
 	silverButton:Show();
 	
 	if (gold > 0 or silver > 0) then
-		copperButton:SetText(string.format("%."..math.log10(COPPER_PER_SILVER).."d", copper));
+		copperButton:SetText(("%."..math.log10(COPPER_PER_SILVER).."d"):format(copper));
 	else
 		copperButton:SetText(copper);
 	end
@@ -92,7 +93,7 @@ function TinyMoneyFrame_Update(frameName, money)
 		end
 		
 		width = width + silverButton:GetWidth();
-		goldButton:SetPoint("RIGHT", frameName.."SilverButton", "LEFT", spacing, 0);
+		goldButton:SetPoint("RIGHT", silverButton, "LEFT", spacing, 0);
 		if ( goldButton:IsVisible() ) then
 			width = width - spacing;
 		end
@@ -101,7 +102,7 @@ function TinyMoneyFrame_Update(frameName, money)
 		end
 	else
 		silverButton:Hide();
-		goldButton:SetPoint("RIGHT", frameName.."SilverButton",	"RIGHT", 0, 0);
+		goldButton:SetPoint("RIGHT", silverButton,	"RIGHT", 0, 0);
 	end
 
 	-- Used if we're not showing lower denominations
@@ -111,23 +112,23 @@ function TinyMoneyFrame_Update(frameName, money)
 		end
 		
 		width = width + copperButton:GetWidth();
-		silverButton:SetPoint("RIGHT", frameName.."CopperButton", "LEFT", spacing, 0);
+		silverButton:SetPoint("RIGHT", copperButton, "LEFT", spacing, 0);
 		if ( silverButton:IsVisible() ) then
 			width = width - spacing;
 		end
 	else
 		copperButton:Hide();
-		silverButton:SetPoint("RIGHT", frameName.."CopperButton", "RIGHT", 0, 0);
+		silverButton:SetPoint("RIGHT", copperButton, "RIGHT", 0, 0);
 	end
 
 	frame:SetWidth(width);
 end
 
-function TinyMoneyFrame_UpdateMoney()
-	if ( this.info ) then
-		local money = this.info.UpdateFunc();
-		TinyMoneyFrame_Update(this:GetName(), money);
-		if ( this.hasPickup == 1 ) then
+function TinyMoneyFrame_UpdateMoney(self)
+	if ( self.info ) then
+		local money = self.info.UpdateFunc();
+		TinyMoneyFrame_Update(self, money);
+		if ( self.hasPickup == 1 ) then
 			UpdateCoinPickupFrame(money);
 		end
 	else

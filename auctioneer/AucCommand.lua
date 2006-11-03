@@ -1380,11 +1380,10 @@ function mainHandler(command, source)
 	end;
 
 	--Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local cmd, param = command:match("^([^ ]+) (.+)$");
+	local cmd, param = command:match("^(%w+)%s*(.*)$");
 
-	if (not cmd) then cmd = command; end
-	if (not cmd) then cmd = ""; end
-	if (not param) then	param = ""; end
+	cmd = cmd or command or "";
+	param = param or "";
 	cmd = Auctioneer.Util.DelocalizeCommand(cmd);
 
 	--Now for the real Command handling

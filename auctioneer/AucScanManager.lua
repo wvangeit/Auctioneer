@@ -348,8 +348,8 @@ end
 
 function scanStarted()
 	-- Don't allow AuctionFrameBrowse updates during a scan.
-	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
-	Stubby.RegisterFunctionHook("Original_AuctionFrameBrowse_Update", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, emptyHookFunction)
 
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
@@ -443,7 +443,7 @@ function scanEnded()
 	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_Update", emptyHookFunction)
 
 	--Cleaning up after oneself is always a good idea.
-	collectgarbage();
+	collectgarbage("collect");
 end
 
 -------------------------------------------------------------------------------
@@ -510,6 +510,7 @@ Auctioneer.ScanManager = {
 	ScanCategories = scanCategories;
 	ScanQuery = scanQuery;
 	IsScanning = isScanning;
+	EmptyHookFunction = emptyHookFunction;
 }
 
 -- This is the variable Auctioneer use to use to indicate scanning. Keep it for

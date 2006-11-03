@@ -25,7 +25,7 @@
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
-local addonLoaded;
+local addOnLoaded;
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -162,7 +162,8 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 -------------------------------------------------------------------------------
 -- Called when we receive the ADDON_LOADED event for Auctioneer.
 -------------------------------------------------------------------------------
-function addonLoaded()
+function addOnLoaded()
+	EnhTooltip.DebugPrint("Auctioneer.Core.AddOnLoaded Called");
 	-- Initialize the database.
 	Auctioneer.Database.Load();
 
@@ -189,6 +190,7 @@ function addonLoaded()
 	Auctioneer.AskPrice.Init();
 
 	--Register for the PLAYER_LOGIN event so that we can get the player's faction
+	Auctioneer.Util.StorePlayerFaction(); --We need to call it first manually, just in case we were loaded after PLAYER_LOGIN fired.
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Auctioneer", Auctioneer.Util.StorePlayerFaction);
 
 	-- Ready to rock and roll!
@@ -200,7 +202,7 @@ end
 
 Auctioneer.Core = {
 	Constants = {},
-	AddonLoaded = addonLoaded,
+	AddOnLoaded = addOnLoaded,
 }
 
 Auctioneer.Core.Constants = {

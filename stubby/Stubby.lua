@@ -277,12 +277,14 @@ function hookCall(funcName, ...)
 						retVal = addit
 						returns = true
 					end
-					--[[ if (res == 'setparams') then
-						-- Don't use unpack() since that doesn't correctly
-						-- handle nil values in the middle of the arg list.
+					--[[
+					--This option has been disabled permanently, since there is no way to do this via the current ... construct implementation.
+					if (res == 'setparams') then
+						-- Don't use unpack() since that doesn't correctly handle nil values in the middle of the arg list.
 						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
 							addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
-					end ]]
+					end
+					]]
 				end
 			else
 				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
@@ -338,16 +340,13 @@ function getOrigFunc(triggerFunction)
 	end
 end
 
-
--- This function causes a given function to be hooked by stubby and
--- configures the hook function to be called at the given position.
--- The original function gets executed a position 0. Use a negative
--- number to get called before the original function, and positive
--- number to get called after the original function. Default position
--- is 200. If someone else is already using your number, you will get
--- automatically moved up for after or down for before. Please also
--- leave space for other people who may need to position their hooks
--- in between your hook and the original.
+--[[
+	This function causes a given function to be hooked by stubby and configures the hook function to be called at the given position.
+	The original function gets executed a position 0. Use a negative number to get called before the original function, and positive
+	number to get called after the original function. Default position is 200. If someone else is already using your number, you will get
+	automatically moved up for after or down for before. Please also leave space for other people who may need to position their hooks
+	in between your hook and the original.
+ ]]
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	if (not (triggerFunction and hookFunc)) then
 		return
@@ -395,13 +394,17 @@ function unregisterFunctionHook(triggerFunction, hookFunc)
 	end
 end
 
--- This function registers a given function to be called when a given
--- addon is loaded, or immediatly if it is already loaded (this can be
--- used to setup a hooking function to execute when an addon is loaded
--- but not before)
+--[[ 
+	This function registers a given function to be called when a given addon is loaded, or immediatly if it is already loaded (this can be
+	used to setup a hooking function to execute when an addon is loaded but not before)
+ ]]
 function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 	if (IsAddOnLoaded(triggerAddOn)) then
-		hookFunction(...)
+		if (select("#", ...) == 0) then
+			hookFunction()
+		else
+			hookFunction({select(1, ...)})
+		end
 	else
 		local addon = triggerAddOn:lower()
 		if (not config.loads[addon]) then config.loads[addon] = {} end
@@ -427,7 +430,6 @@ function unregisterAddOnHook(triggerAddOn, ownerAddOn)
 		config.loads[addon][ownerAddOn] = nil
 	end
 end
-
 
 function loadWatcher(loadedAddOn)
 	local addon = loadedAddOn:lower()

@@ -293,7 +293,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Add any pricing models from external addons
-				for pos, priceFunc in AuctionFramePost_AdditionalPricingModels do
+				for pos, priceFunc in pairs(AuctionFramePost_AdditionalPricingModels) do
 					local priceModel = priceFunc(id, rprop, enchant, name, count)
 					if (type(priceModel) == "table") then
 						table.insert(frame.prices, priceModel)
@@ -875,8 +875,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_StartPrice_OnChanged(self)
-	local frame = self:GetParent():GetParent();
+function AuctionFramePost_StartPrice_OnChanged()
+	local frame = this:GetParent():GetParent();
 	if (not frame.ignoreStartPriceChange and not updating) then
 		frame:ValidateAuction();
 	end
@@ -885,8 +885,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_BuyoutPrice_OnChanged(self)
-	local frame = self:GetParent():GetParent();
+function AuctionFramePost_BuyoutPrice_OnChanged()
+	local frame = this:GetParent():GetParent();
 	if (not frame.ignoreBuyoutPriceChange and not frame.updating) then
 		local updatePrice = Auctioneer.Command.GetFilter('update-price');
 		if (updatePrice) then
@@ -965,8 +965,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_PriceModelDropDown_Initialize(self)
-	local dropdown = self:GetParent();
+function AuctionFramePost_PriceModelDropDown_Initialize()
+	local dropdown = this:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.prices) then
 		for index, value in pairs(frame.prices) do
@@ -982,8 +982,8 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFramePost_PriceModelDropDownItem_OnClick(self)
-	local index = self:GetID();
+function AuctionFramePost_PriceModelDropDownItem_OnClick()
+	local index = this:GetID();
 	local dropdown = this.owner;
 	local frame = dropdown:GetParent();
 	if (frame.prices) then

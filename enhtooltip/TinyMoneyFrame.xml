@@ -38,7 +38,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(1, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -52,7 +52,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchors>
 					<TexCoords left="0.5" right="0.75" top="0" bottom="1"/>
 				</NormalTexture>
-				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT">
+				<ButtonText name="$parentText">
 					<Anchors>
 						<Anchor point="RIGHT">
 							<Offset>
@@ -60,7 +60,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 							</Offset>
 						</Anchor>
 					</Anchors>
-				</NormalText>
+				</ButtonText>
+				<NormalFont inherits="GameFontNormalSmall" justifyH="RIGHT"/> 
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>
@@ -78,7 +79,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_SILVER, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -92,7 +93,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchors>
 					<TexCoords left="0.25" right="0.5" top="0" bottom="1"/>
 				</NormalTexture>
-				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT">
+				<ButtonText name="$parentText">
 					<Anchors>
 						<Anchor point="RIGHT">
 							<Offset>
@@ -100,7 +101,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 							</Offset>
 						</Anchor>
 					</Anchors>
-				</NormalText>
+				</ButtonText>
+				<NormalFont inherits="GameFontNormalSmall" justifyH="RIGHT"/> 
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>
@@ -118,7 +120,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						local parent = this:GetParent();
+						local parent = self:GetParent();
 						OpenCoinPickupFrame(COPPER_PER_GOLD, MoneyTypeInfo[parent.moneyType].UpdateFunc(), parent);
 						parent.hasPickup = 1;
 					</OnClick>
@@ -132,11 +134,12 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchors>
 					<TexCoords left="0" right="0.25" top="0" bottom="1"/>
 				</NormalTexture>
-				<NormalText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT">
+				<ButtonText name="$parentText">
 					<Anchors>
 						<Anchor point="LEFT"/>
 					</Anchors>
-				</NormalText>
+				</ButtonText>
+				<NormalFont inherits="GameFontNormalSmall" justifyH="LEFT"/> 
 				<PushedTextOffset>
 					<AbsDimension x="0" y="0"/>
 				</PushedTextOffset>
@@ -144,18 +147,18 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				SmallMoneyFrame_OnLoad();
+				SmallMoneyFrame_OnLoad(self);
 			</OnLoad>
 			<OnEvent>
-				MoneyFrame_OnEvent();
+				MoneyFrame_OnEvent(self, event, ...);
 			</OnEvent>
 			<OnShow>
-				TinyMoneyFrame_UpdateMoney();
+				TinyMoneyFrame_UpdateMoney(self);
 			</OnShow>
 			<OnHide>
-				if ( this.hasPickup == 1 ) then
+				if ( self.hasPickup == 1 ) then
 					CoinPickupFrame:Hide();
-					this.hasPickup = 0;
+					self.hasPickup = 0;
 				end
 			</OnHide>
 		</Scripts>

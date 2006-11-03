@@ -516,7 +516,7 @@ end
 
 -- calculate the gold, silver, and copper values based the amount of copper
 function getGSC(money)
-	if (money == nil) then money = 0 end
+	if (not money) then money = 0 end
 	local g = math.floor(money / 10000)
 	local s = math.floor((money - (g*10000)) / 100)
 	local c = math.ceil(money - (g*10000) - (s*100))
@@ -618,7 +618,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 		local curMoney = EnhancedTooltip.moneyCount + 1
 		local money = getglobal("EnhancedTooltipMoney"..curMoney)
 		money:SetPoint("LEFT", line, "RIGHT", self.moneySpacing, 0)
-		TinyMoneyFrame_Update(money:GetName(), math.floor(moneyAmount))
+		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money.myLineNumber = curLine
 		money:Show()
@@ -684,10 +684,9 @@ end
 
 function lineQuality(quality)
 	if ( quality ) then
-		local r, g, b = GetItemQualityColor(quality)
-		lineColor(r, g, b)
+		return lineColor(GetItemQualityColor(quality))
 	else
-		lineColor(1.0, 1.0, 1.0)
+		return lineColor(1.0, 1.0, 1.0)
 	end
 end
 
@@ -719,7 +718,7 @@ function doHyperlink(reference, link, button)
 			end
 			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
 			if (callRes == true) then
-				self.oldChatItem = {['reference']=reference, ['link']=link, ['button']=button, ['embed']=EnhancedTooltip.hasEmbed}
+				self.oldChatItem = {reference = reference, link = link, button = button, embed = EnhancedTooltip.hasEmbed}
 			elseif (callRes == false) then
 				return false;
 			end
@@ -757,8 +756,7 @@ function linkType(link)
 end
 
 function nameFromLink(link)
-	local name
-	if( not link ) then
+	if (not link) then
 		return
 	end
 	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r");
@@ -816,7 +814,7 @@ end
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
 function breakLink(link)
 	if (type(link) ~= 'string') then return end
-	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlot4, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h[[]([^]]+)[]]|h")
+	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlot4, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h%[(.-)%]|h")
 	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemSlot4) or 0
 end
 
@@ -841,17 +839,10 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	self.currentItem = itemSig
 
-	if (quality==nil or quality==-1) then
-		local linkQuality = qualityFromLink(link)
-		if (linkQuality and linkQuality > -1) then
-			quality = linkQuality
-		else
-			quality = -1
-		end
-	end
-	if (hyperlink == nil) then hyperlink = link end
+	quality = quality or qualityFromLink(link)
+	hyperlink = hyperlink or link
 	local extract = hyperlinkFromLink(hyperlink)
-	if (extract) then hyperlink = extract end
+	hyperlink = extract or hyperlink
 
 	local showTip = true
 	local popupKeyPressed = (
@@ -901,26 +892,26 @@ function merchantScanner()
 		link = GetMerchantItemLink(i)
 		quality = qualityFromLink(link)
 		name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
-		EnhTooltip.MerchantHook(npcName, i, name, link, quality, quantity, price, numAvailable)
+		return EnhTooltip.MerchantHook(npcName, i, name, link, quality, quantity, price, numAvailable)
 	end
 end
 
 function callBankHook()
 	if not (BankFrame and BankFrame:IsVisible()) then return end
-	EnhTooltip.BankHook(0)
+	return EnhTooltip.BankHook(0)
 end
 
 function callBagHook(funcVars, event, bagNumber)
 	if (bagNumber >= 5) and (bagNumber < 10) then
 		if not (BankFrame and BankFrame:IsVisible()) then return end
-		EnhTooltip.BankHook(bagNumber)
+		return EnhTooltip.BankHook(bagNumber)
 	else
-		EnhTooltip.BagHook(bagNumber)
+		return EnhTooltip.BagHook(bagNumber)
 	end
 end
 
 function callTradeHook(funcVars, event, selID)
-	EnhTooltip.TradeHook(funcVars[1], selID)
+	return EnhTooltip.TradeHook(funcVars[1], selID)
 end
 
 
@@ -952,7 +943,7 @@ function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button)
 		end
 		return
 	end
-	doHyperlink(reference, link, button)
+	return doHyperlink(reference, link, button)
 end
 
 function afHookOnEnter(funcArgs, retVal, type, index)
@@ -961,7 +952,7 @@ function afHookOnEnter(funcArgs, retVal, type, index)
 		local name = nameFromLink(link)
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index)
-			tooltipCall(GameTooltip, name, link, aiQuality, aiCount)
+			return tooltipCall(GameTooltip, name, link, aiQuality, aiCount)
 		end
 	end
 end
@@ -979,9 +970,9 @@ function cfHookUpdate(funcArgs, retVal, frame)
 
 			if (name) then
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
-				if (quality == nil) then quality = qualityFromLink(link) end
+				quality = quality or qualityFromLink(link)
 
-				tooltipCall(GameTooltip, name, link, quality, itemCount)
+				return tooltipCall(GameTooltip, name, link, quality, itemCount)
 			end
 		end
 	end
@@ -992,8 +983,8 @@ function gtHookSetLootItem(funcArgs, retVal, frame, slot)
 	local name = nameFromLink(link)
 	if (name) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot)
-		if (quality == nil) then quality = qualityFromLink(link) end
-		tooltipCall(GameTooltip, name, link, quality, quantity)
+		quality = quality or qualityFromLink(link)
+		return tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
@@ -1001,7 +992,7 @@ function gtHookSetQuestItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot)
-		tooltipCall(GameTooltip, name, link, quality, quantity)
+		return tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
@@ -1009,10 +1000,10 @@ function gtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot)
-		if (name == nil) then name = nameFromLink(link) end
+		name = name or nameFromLink(link)
 		quality = qualityFromLink(link) -- I don't trust the quality returned from the above function.
 
-		tooltipCall(GameTooltip, name, link, quality, quantity)
+		return tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
@@ -1022,9 +1013,9 @@ function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 
 	if (name) then
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
-		if (quality==nil or quality==-1) then quality = qualityFromLink(link) end
+		quality = (quality ~= -1 and quality) or qualityFromLink(link)
 
-		tooltipCall(GameTooltip, name, link, quality, itemCount)
+		return tooltipCall(GameTooltip, name, link, quality, itemCount)
 	end
 end
 
@@ -1035,8 +1026,7 @@ function gtHookSetInboxItem(funcArgs, retVal, frame, index)
 	for itemID = 1, 30000 do
 		itemName, itemLink, itemQuality = GetItemInfo(itemID)
 		if (itemName and itemName == inboxItemName) then
-			tooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
-			break
+			return tooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
 		end
 	end
 end
@@ -1057,9 +1047,9 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 			quantity = GetInventoryItemCount(unit, slot)
 		end
 		local quality = GetInventoryItemQuality(unit, slot)
-		if (quality == nil) then quality = qualityFromLink(link) end
+		quality = quality or qualityFromLink(link)
 
-		tooltipCall(GameTooltip, name, link, quality, quantity)
+		return tooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
@@ -1068,7 +1058,7 @@ function gtHookSetMerchantItem(funcArgs, retVal, frame, slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot)
 		local quality = qualityFromLink(link)
-		tooltipCall(GameTooltip, name, link, quality, quantity, price)
+		return tooltipCall(GameTooltip, name, link, quality, quantity, price)
 	end
 end
 
@@ -1079,14 +1069,14 @@ function gtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot)
 			local quality = qualityFromLink(link)
-			tooltipCall(GameTooltip, name, link, quality, quantity, 0)
+			return tooltipCall(GameTooltip, name, link, quality, quantity, 0)
 		end
 	else
 		link = GetCraftItemLink(skill)
 		if (link) then
 			local name = nameFromLink(link)
 			local quality = qualityFromLink(link)
-			tooltipCall(GameTooltip, name, link, quality, 1, 0)
+			return tooltipCall(GameTooltip, name, link, quality, 1, 0)
 		end
 	end
 end
@@ -1095,7 +1085,7 @@ function gtHookSetCraftSpell(funcArgs, retVal, frame, slot)
 	local name = GetCraftInfo(slot)
 	local link = GetCraftItemLink(slot)
 	if name and link then
-		tooltipCall(GameTooltip, name, link)
+		return tooltipCall(GameTooltip, name, link)
 	end
 end
 
@@ -1106,14 +1096,14 @@ function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot)
 			local quality = qualityFromLink(link)
-			tooltipCall(GameTooltip, name, link, quality, quantity, 0)
+			return tooltipCall(GameTooltip, name, link, quality, quantity, 0)
 		end
 	else
 		link = GetTradeSkillItemLink(skill)
 		if (link) then
 			local name = nameFromLink(link)
 			local quality = qualityFromLink(link)
-			tooltipCall(GameTooltip, name, link, quality, 1, 0)
+			return tooltipCall(GameTooltip, name, link, quality, 1, 0)
 		end
 	end
 end
@@ -1142,7 +1132,7 @@ function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 		if (bag) then
 			local link = GetContainerItemLink(bag, slot)
 			if (link) then
-				tooltipCall(GameTooltip, name, link, quality, quantity, price)
+				return tooltipCall(GameTooltip, name, link, quality, quantity, price)
 			end
 		end
 	end
@@ -1151,13 +1141,13 @@ end
 function gtHookSetText(funcArgs, retval, frame, text, r, g, b, a, textWrap)
 	-- Nothing to do for plain text
 	if (self.currentGametip == frame) then
-		clearTooltip()
+		return clearTooltip()
 	end
 end
 
 function gtHookAppendText(funcArgs, retVal, frame)
 	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
-		showTooltip(self.currentGametip, true)
+		return showTooltip(self.currentGametip, true)
 	end
 end
 
@@ -1186,7 +1176,7 @@ function imiHookOnEnter()
 	local imlink = ItemsMatrix_GetHyperlink(item.name)
 	local link = fakeLink(imlink, item.quality, item.name)
 	if (link) then
-		tooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0)
+		return tooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0)
 	end
 end
 
@@ -1195,7 +1185,7 @@ function imHookOnEnter()
 	if (imlink) then
 		local name = this:GetText()
 		local link = fakeLink(imlink, -1, name)
-		tooltipCall(GameTooltip, name, link, -1, 1, 0)
+		return tooltipCall(GameTooltip, name, link, -1, 1, 0)
 	end
 end
 
@@ -1218,7 +1208,7 @@ function llHookOnEnter()
 	local link = getLootLinkLink(name)
 	if (link) then
 		local quality = qualityFromLink(link)
-		tooltipCall(LootLinkTooltip, name, link, quality, 1, 0)
+		return tooltipCall(LootLinkTooltip, name, link, quality, 1, 0)
 	end
 end
 

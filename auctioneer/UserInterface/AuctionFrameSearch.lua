@@ -621,9 +621,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchDropDownItem_OnClick(self)
-	local index = self:GetID();
-	local dropdown = self.owner;
+function AuctionFrameSearch_SearchDropDownItem_OnClick()
+	local index = this:GetID();
+	local dropdown = this.owner;
 	return AuctionFrameSearch_SearchDropDownItem_SetSelectedID(dropdown, index);
 end
 
