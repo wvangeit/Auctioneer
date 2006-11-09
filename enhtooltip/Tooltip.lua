@@ -7,12 +7,12 @@ You should hook into EnhTooltip using Stubby:
 	Stubby.RegisterFunctionHook("EnhTooltip.HOOK", 200, myHookingFunction)
 	Where myHooking function is one of your functions (see calling parameters below)
 	And HOOK is one of:
-		addTooltip
-		checkPopup
-		merchantHook
-		tradeHook
-		bankHook
-		bagHook
+		AddTooltip
+		CheckPopup
+		MerchantHook
+		TradeHook
+		BankHook
+		BagHook
 	The number 200 is a number that determines calling order
 		A lower number will make your tooltip information display earlier (higher)
 		A higher number will call your tooltip later (lower)
@@ -66,11 +66,8 @@ You may use the following methods of the EnhTooltip class:
 		Changes the color of the most recently added line to the given R,G,B value.
 		The R,G,B values are floating point values from 0.0 (dark) to 1.0 (bright)
 
-	EnhTooltip.LineSize_Large()
-		Changes the size of the font string to 12
-
-	EnhTooltip.LineSize_Small()
-		Changes the size of the font string to 10
+	EnhTooltip.LineSize(fontSize)
+		Changes the size of the FontString associated with the most recently added line to the given fontSize value.
 
 	EnhTooltip.LineQuality(quality)
 		Changes the color of the most recently added line to the quality color of the
@@ -128,7 +125,8 @@ You may use the following methods of the EnhTooltip class:
 
 	EnhTooltip.BreakLink(link)
 		Given an item link, splits it into it's component parts as follows:
-			itemID, randomProperty, enchantment, uniqueID, itemName = EnhTooltip.BreakLink(link)
+			itemID, randomProperty, enchantment, uniqueID, itemName,
+				gemSlot1, gemSlot2, gemSlot3, gemSlotBonus = EnhTooltip.BreakLink(link)
 			Note that the return order is not the same as the order of the items in the link
 			(ie: randomProp and enchant are reversed from their link order)
 
@@ -165,7 +163,6 @@ You may use the following methods of the EnhTooltip class:
 		You should have received a copy of the GNU General Public License
 		along with this program(see GLP.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 ]]
 
 -- setting version number
@@ -240,6 +237,7 @@ local imHookOnEnter				-- ImHookOnEnter()
 local imiHookOnEnter			-- ImiHookOnEnter()
 local lineColor					-- LineColor(r,g,b)
 local lineQuality				-- LineQuality(quality)
+local lineSize					-- LineSize(fontSize)
 local lineSize_Large			-- LineSize_Large()
 local lineSize_Small			-- LineSize_Small()
 local linkType					-- LinkType()
@@ -328,7 +326,7 @@ function clearTooltip()
 	for ttText in getglobalIterator("EnhancedTooltipText%d") do
 		ttText:Hide()
 		ttText:SetTextColor(1.0,1.0,1.0)
-		ttText:SetFont(STANDARD_TEXT_FONT, 10);
+		ttText:SetFont(STANDARD_TEXT_FONT, 10)
 	end
 
 	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
@@ -340,7 +338,7 @@ function clearTooltip()
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
 	for curLine in pairs(self.embedLines) do
-		self.embedLines[curLine] = nil;
+		self.embedLines[curLine] = nil
 	end
 end
 
@@ -364,9 +362,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	if (self.showIgnore == true) then return end
 	if (EnhancedTooltip.hasEmbed and not skipEmbedRender) then
 		embedRender()
-		self.showIgnore=true;
+		self.showIgnore=true
 		currentTooltip:Show()
-		self.showIgnore=false;
+		self.showIgnore=false
 	end
 	if (not EnhancedTooltip.hasData) then
 		return
@@ -399,9 +397,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local cWidth = currentTooltip:GetWidth()
 	if (cWidth < width) then
 		currentTooltip:SetWidth(width - 20)
-		self.showIgnore=true;
+		self.showIgnore=true
 		currentTooltip:Show()
-		self.showIgnore=false;
+		self.showIgnore=false
 	else
 		width = cWidth
 	end
@@ -433,22 +431,22 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- Handle the situation where there isn't enough room on the choosen side of
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
-		local xOffset = 0;
+		local xOffset = 0
 		if (xAnchor == "RIGHT" and enhTooltipParentRect.r + width > sWidth - 5) then
-			xOffset = -(enhTooltipParentRect.r + width - sWidth + 5);
+			xOffset = -(enhTooltipParentRect.r + width - sWidth + 5)
 		elseif (xAnchor == "LEFT" and enhTooltipParentRect.l - width < 5) then
-			xOffset = -(enhTooltipParentRect.l - width - 5);
+			xOffset = -(enhTooltipParentRect.l - width - 5)
 		end
 
 		-- Handle the situation where there isn't enough room on the top or bottom of
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough up or down so that it doesn't hang off the screen.
-		local yOffset = 0;
-		local totalHeight = height + currentTooltip:GetHeight();
+		local yOffset = 0
+		local totalHeight = height + currentTooltip:GetHeight()
 		if (yAnchor == "TOP" and enhTooltipParentRect.t + totalHeight > sHeight - 5) then
-			yOffset = -(enhTooltipParentRect.t + totalHeight - sHeight + 5);
+			yOffset = -(enhTooltipParentRect.t + totalHeight - sHeight + 5)
 		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.b - totalHeight < 5) then
-			yOffset = -(enhTooltipParentRect.b - totalHeight - 5);
+			yOffset = -(enhTooltipParentRect.b - totalHeight - 5)
 		end
 
 		currentTooltip:ClearAllPoints()
@@ -472,9 +470,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	else
 		-- No parent
 		-- The only option is to tack the object underneath / shuffle it up if there aint enuff room
-		self.showIgnore=true;
+		self.showIgnore=true
 		currentTooltip:Show()
-		self.showIgnore=false;
+		self.showIgnore=false
 		enhTooltipTipRect = getRect(currentTooltip, enhTooltipTipRect)
 
 		if (enhTooltipTipRect.b - height < 60) then
@@ -554,14 +552,14 @@ function getTextGSC(money, exact, dontUseColorCodes)
 		end
 	else
 		if (g > 0) then
-			gsc = gsc .. g .. "g ";
-		end;
+			gsc = gsc .. g .. "g "
+		end
 		if (s > 0) then
-			gsc = gsc .. s .. "s ";
-		end;
+			gsc = gsc .. s .. "s "
+		end
 		if (c > 0) then
-			gsc = gsc .. c .. "c ";
-		end;
+			gsc = gsc .. c .. "c "
+		end
 		if (gsc == "") then
 			gsc = TEXT_NONE
 		end
@@ -639,11 +637,11 @@ function addSeparator(embed)
 	EnhancedTooltip.hasData = true
 	EnhancedTooltip.curEmbed = false
 
-	local curLine = EnhancedTooltip.lineCount +1;
+	local curLine = EnhancedTooltip.lineCount +1
 	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetText(" ");
-	line:SetTextColor(1.0, 1.0, 1.0);
-	line:Show();
+	line:SetText(" ")
+	line:SetTextColor(1.0, 1.0, 1.0)
+	line:Show()
 	EnhancedTooltip.lineCount = curLine
 end
 
@@ -658,23 +656,31 @@ function lineColor(r, g, b)
 	local curLine = EnhancedTooltip.lineCount
 	if (curLine == 0) then return end
 	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetTextColor(r, g, b)
+	return line:SetTextColor(r, g, b)
+end
+
+function lineSize(fontSize)
+	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then
+		return
+	end
+
+	local curLine = EnhancedTooltip.lineCount
+	if (curLine == 0) then
+		return
+	end
+
+	local line = getglobal("EnhancedTooltipText"..curLine)
+	return line:SetFont(STANDARD_TEXT_FONT, fontSize)
 end
 
 function lineSize_Large()
-	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then return end
-	local curLine = EnhancedTooltip.lineCount
-	if (curLine == 0) then return end
-	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetFont(STANDARD_TEXT_FONT, 12)
+	debugPrint("lineSize_Large() Called. This function is DEPRECATED. Use lineSize(12) instead.")
+	return lineSize(12)
 end
 
 function lineSize_Small()
-	if (EnhancedTooltip.curEmbed) and (self.currentGametip) then return end
-	local curLine = EnhancedTooltip.lineCount
-	if (curLine == 0) then return end
-	local line = getglobal("EnhancedTooltipText"..curLine)
-	line:SetFont(STANDARD_TEXT_FONT, 10)
+	debugPrint("lineSize_Large() Called. This function is DEPRECATED. Use lineSize(11) instead.")
+	return lineSize(10)
 end
 
 function lineQuality(quality)
@@ -715,7 +721,7 @@ function doHyperlink(reference, link, button)
 			if (callRes == true) then
 				self.oldChatItem = {reference = reference, link = link, button = button, embed = EnhancedTooltip.hasEmbed}
 			elseif (callRes == false) then
-				return false;
+				return false
 			end
 		end
 	end
@@ -754,26 +760,26 @@ function nameFromLink(link)
 	if (not link) then
 		return
 	end
-	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r");
+	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r")
 end
 
 function hyperlinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|H([^|]+)|h");
+	return link:match("|H([^|]+)|h")
 end
 
 function baselinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h");
+	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h")
 end
 
 function qualityFromLink(link)
 	if (not link) then return end
-	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r");
+	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
 	if (color) then
 		for i = 0, 6 do
 			local _, _, _, hex = GetItemQualityColor(i)
@@ -874,7 +880,7 @@ end
 
 function callCheckPopup(name, link, quality, count, price, hyperlink)
 	if (EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink)) then
-		return true;
+		return true
 	end
 	return false
 end
@@ -1148,12 +1154,12 @@ end
 
 function gtHookShow(funcArgs, retVal, frame)
 	if (self.hookRecursion) then
-		return;
+		return
 	end
 	if (self.currentGametip and self.currentItem and self.currentItem ~= "") then
-		self.hookRecursion = true;
+		self.hookRecursion = true
 		showTooltip(self.currentGametip, true)
-		self.hookRecursion = nil;
+		self.hookRecursion = nil
 	end
 end
 
@@ -1240,71 +1246,71 @@ end
 ------------------------
 
 local function dump(...)
-	local out = "";
-	local numVarArgs = select("#", ...);
+	local out = ""
+	local numVarArgs = select("#", ...)
 	for i = 1, numVarArgs do
-		local d = select(i, ...);
-		local t = type(d);
+		local d = select(i, ...)
+		local t = type(d)
 		if (t == "table") then
-			out = out .. "{";
-			local first = true;
+			out = out .. "{"
+			local first = true
 			if (d) then
 				for k, v in pairs(d) do
-					if (not first) then out = out .. ", \n"; end
-					first = false;
-					out = out .. dump(k);
-					out = out .. " = ";
-					out = out .. dump(v);
+					if (not first) then out = out .. ", \n" end
+					first = false
+					out = out .. dump(k)
+					out = out .. " = "
+					out = out .. dump(v)
 				end
 			end
-			out = out .. "}";
+			out = out .. "}"
 		elseif (t == "nil") then
-			out = out .. "NIL";
+			out = out .. "NIL"
 		elseif (t == "number") then
-			out = out .. d;
+			out = out .. d
 		elseif (t == "string") then
-			out = out .. "\"" .. d .. "\"";
+			out = out .. "\"" .. d .. "\""
 		elseif (t == "boolean") then
 			if (d) then
-				out = out .. "true";
+				out = out .. "true"
 			else
-				out = out .. "false";
+				out = out .. "false"
 			end
 		else
-			out = out .. t:upper() .. "??";
+			out = out .. t:upper() .. "??"
 		end
 
-		if (i < numVarArgs) then out = out .. ", "; end
+		if (i < numVarArgs) then out = out .. ", " end
 	end
-	return out;
+	return out
 end
 
 function debugPrint(...)
-	local debugWin;
+	local debugWin
 	for i=1, NUM_CHAT_WINDOWS do
 		if (GetChatWindowInfo(i):lower() == "ettdebug") then
-			debugWin = i;
-			break;
+			debugWin = i
+			break
 		end
 	end
 	if (not debugWin) then
 		return
 	end
 
-	local out = "";
+	local out = ""
 	for i = 1, select("#", ...) do
-		if (i > 1) then out = out .. ", "; end
+		if (i > 1) then out = out .. ", " end
 		local currentArg = select(i, ...)
-		local argType = type(currentArg);
+		local argType = type(currentArg)
 		if (argType == "string") then
-			out = out .. '"'..currentArg..'"';
+			out = out .. '"'..currentArg..'"'
 		elseif (argType == "number") then
-			out = out .. currentArg;
+			out = out .. currentArg
 		else
-			out = out .. dump(currentArg);
+			out = out .. dump(currentArg)
 		end
 	end
-	getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3);
+	getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3)
 end
 
 
@@ -1342,8 +1348,8 @@ end
 
 -- Hook craft functions
 local function hookCraft()
-	Stubby.RegisterFunctionHook("CraftFrame_Update", 200, callTradeHook, "craft", "");
-	Stubby.RegisterFunctionHook("CraftFrame_SetSelection", 200, callTradeHook, "craft", "");
+	Stubby.RegisterFunctionHook("CraftFrame_Update", 200, callTradeHook, "craft", "")
+	Stubby.RegisterFunctionHook("CraftFrame_SetSelection", 200, callTradeHook, "craft", "")
 end
 
 function ttInitialize()
@@ -1356,22 +1362,22 @@ function ttInitialize()
 	Stubby.RegisterFunctionHook("ContainerFrame_Update", 200, cfHookUpdate)
 
 	-- Game tooltips
-	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, gtHookSetQuestItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, gtHookSetQuestLogItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetInboxItem", 200, gtHookSetInboxItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, gtHookSetInventoryItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, gtHookSetCraftSpell);
-	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem);
-	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, gtHookSetText);
-	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText);
-	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner);
-	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, gtHookShow);
-	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide);
+	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, gtHookSetQuestItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, gtHookSetQuestLogItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetInboxItem", 200, gtHookSetInboxItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, gtHookSetInventoryItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, gtHookSetCraftSpell)
+	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, gtHookSetText)
+	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText)
+	Stubby.RegisterFunctionHook("GameTooltip.SetOwner", 200, gtHookSetOwner)
+	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, gtHookShow)
+	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide)
 
 	-- Establish hooks for us to use.
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "EnhTooltip", hookAuctionHouse)
@@ -1381,14 +1387,14 @@ function ttInitialize()
 	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", hookCraft)
 
 	-- Register event notification
-	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", merchantScanner);
-	Stubby.RegisterEventHook("TRADE_SKILL_SHOW", "EnhTooltip", callTradeHook, 'trade');
-	Stubby.RegisterEventHook("TRADE_SKILL_CLOSE", "EnhTooltip", callTradeHook, 'trade');
-	Stubby.RegisterEventHook("CRAFT_SHOW", "EnhTooltip", callTradeHook, 'craft');
-	Stubby.RegisterEventHook("CRAFT_CLOSE", "EnhTooltip", callTradeHook, 'craft');
-	Stubby.RegisterEventHook("BANKFRAME_OPENED", "EnhTooltip", callBankHook);
-	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "EnhTooltip", callBankHook);
-	Stubby.RegisterEventHook("BAG_UPDATE", "EnhTooltip", callBagHook);
+	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", merchantScanner)
+	Stubby.RegisterEventHook("TRADE_SKILL_SHOW", "EnhTooltip", callTradeHook, 'trade')
+	Stubby.RegisterEventHook("TRADE_SKILL_CLOSE", "EnhTooltip", callTradeHook, 'trade')
+	Stubby.RegisterEventHook("CRAFT_SHOW", "EnhTooltip", callTradeHook, 'craft')
+	Stubby.RegisterEventHook("CRAFT_CLOSE", "EnhTooltip", callTradeHook, 'craft')
+	Stubby.RegisterEventHook("BANKFRAME_OPENED", "EnhTooltip", callBankHook)
+	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "EnhTooltip", callBankHook)
+	Stubby.RegisterEventHook("BAG_UPDATE", "EnhTooltip", callBagHook)
 end
 
 
@@ -1415,8 +1421,9 @@ EnhTooltip = {
 	AddSeparator		= addSeparator,
 	LineColor			= lineColor,
 	LineQuality			= lineQuality,
-	LineSize_Large		= lineSize_Large,
-	LineSize_Small		= lineSize_Small,
+	LineSize			= lineSize,
+	LineSize_Large		= lineSize_Large, --Deprecated, use EnhTooltip.LineSize instead
+	LineSize_Small		= lineSize_Small, --Deprecated, use EnhTooltip.LineSize instead
 	SetIcon				= setIcon,
 
 	ClearTooltip		= clearTooltip,
