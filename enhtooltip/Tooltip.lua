@@ -811,11 +811,11 @@ function fakeLink(hyperlink, quality, name)
 	end
 end
 
--- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness and name
+-- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness, name and the four gemSlots.
 function breakLink(link)
 	if (type(link) ~= 'string') then return end
-	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlot4, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h%[(.-)%]|h")
-	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemSlot4) or 0
+	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSocketBonus, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h%[(.-)%]|h")
+	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemSocketBonus) or 0
 end
 
 ------------------------
