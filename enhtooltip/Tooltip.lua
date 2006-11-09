@@ -174,9 +174,7 @@ if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 	ENHTOOLTIP_VERSION = "3.9.DEV"
 end
 
---[[
----- Initialize a storage space that all our functions can see
---]]
+-- Initialize a storage space that all our functions can see
 local self = {
 	showIgnore = false,
 	moneySpacing = 4,
@@ -187,9 +185,6 @@ local self = {
 	currentItem = nil,
 	forcePopupKey = "alt",
 	oldChatItem = nil,
-	hooks = {},
-	notify = { tooltip = {}, popup = {}, merchant = {}, bank = {}, bag = {}, trade = {} },
-	notifyFuncs = {},
 }
 
 -- =============== LOCAL FUNCTIONS =============== --
