@@ -19,10 +19,6 @@
 
 ]]
 
-function BandAid_OnLoad()
-	if (DEFAULT_CHAT_FRAME) then
-		DEFAULT_CHAT_FRAME:AddMessage("BandAid fix loaded. Your Blizzard addons are loaded.", 1, 0.9, 0.2, 1);
-	end
+if (DEFAULT_CHAT_FRAME) then
+	DEFAULT_CHAT_FRAME:AddMessage("BandAid fix loaded. Your Blizzard addons are loaded.", 1, 0.9, 0.2, 1);
 end
-
-BandAid_OnLoad()
