@@ -347,14 +347,22 @@ function getRect(object, curRect)
 	if (not rect) then
 		rect = {}
 	end
-	rect.t = object:GetTop() or 0
-	rect.l = object:GetLeft() or 0
-	rect.b = object:GetBottom() or 0
-	rect.r = object:GetRight() or 0
-	rect.w = object:GetWidth() or 0
-	rect.h = object:GetHeight() or 0
-	rect.cx = rect.l + (rect.w / 2)
-	rect.cy = rect.t - (rect.h / 2)
+
+	local left, bottom, width, height = object:GetRect()
+	left = left or 0
+	bottom = bottom or 0
+	width = width or 0
+	height = height or 0
+
+	rect.top = bottom + height
+	rect.left = left
+	rect.bottom = bottom
+	rect.right = left + width
+	rect.width = width
+	rect.height = height
+	rect.xCenter = left + (width / 2)
+	rect.yCenter = bottom + (height / 2)
+
 	return rect
 end
 
@@ -411,9 +419,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		enhTooltipParentRect = getRect(currentTooltip.owner, enhTooltipParentRect)
 
 		local xAnchor, yAnchor
-		if (enhTooltipParentRect.l - width < sWidth * 0.2) then
+		if (enhTooltipParentRect.left - width < sWidth * 0.2) then
 			xAnchor = "RIGHT"
-		elseif (enhTooltipParentRect.r + width > sWidth * 0.8) then
+		elseif (enhTooltipParentRect.right + width > sWidth * 0.8) then
 			xAnchor = "LEFT"
 		elseif (align == "ANCHOR_RIGHT") then
 			xAnchor = "RIGHT"
@@ -422,7 +430,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		else
 			xAnchor = "RIGHT"
 		end
-		if (enhTooltipParentRect.cy < sHeight/2) then
+		if (enhTooltipParentRect.yCenter < sHeight/2) then
 			yAnchor = "TOP"
 		else
 			yAnchor = "BOTTOM"
@@ -432,10 +440,10 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
 		local xOffset = 0
-		if (xAnchor == "RIGHT" and enhTooltipParentRect.r + width > sWidth - 5) then
-			xOffset = -(enhTooltipParentRect.r + width - sWidth + 5)
-		elseif (xAnchor == "LEFT" and enhTooltipParentRect.l - width < 5) then
-			xOffset = -(enhTooltipParentRect.l - width - 5)
+		if (xAnchor == "RIGHT" and enhTooltipParentRect.right + width > sWidth - 5) then
+			xOffset = -(enhTooltipParentRect.right + width - sWidth + 5)
+		elseif (xAnchor == "LEFT" and enhTooltipParentRect.left - width < 5) then
+			xOffset = -(enhTooltipParentRect.left - width - 5)
 		end
 
 		-- Handle the situation where there isn't enough room on the top or bottom of
@@ -443,10 +451,10 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0
 		local totalHeight = height + currentTooltip:GetHeight()
-		if (yAnchor == "TOP" and enhTooltipParentRect.t + totalHeight > sHeight - 5) then
-			yOffset = -(enhTooltipParentRect.t + totalHeight - sHeight + 5)
-		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.b - totalHeight < 5) then
-			yOffset = -(enhTooltipParentRect.b - totalHeight - 5)
+		if (yAnchor == "TOP" and enhTooltipParentRect.top + totalHeight > sHeight - 5) then
+			yOffset = -(enhTooltipParentRect.top + totalHeight - sHeight + 5)
+		elseif (yAnchor == "BOTTOM" and enhTooltipParentRect.bottom - totalHeight < 5) then
+			yOffset = -(enhTooltipParentRect.bottom - totalHeight - 5)
 		end
 
 		currentTooltip:ClearAllPoints()
@@ -475,12 +483,12 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		self.showIgnore=false
 		enhTooltipTipRect = getRect(currentTooltip, enhTooltipTipRect)
 
-		if (enhTooltipTipRect.b - height < 60) then
+		if (enhTooltipTipRect.bottom - height < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", enhTooltipTipRect.l, height+60)
+			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", enhTooltipTipRect.left, height+60)
 		end
 		EnhancedTooltip:ClearAllPoints()
-		if (enhTooltipTipRect.cx < 6*sWidth/10) then
+		if (enhTooltipTipRect.xCenter < 6*sWidth/10) then
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
@@ -1431,6 +1439,7 @@ EnhTooltip = {
 	ShowTooltip			= showTooltip,
 
 	GetglobalIterator	= getglobalIterator,
+	GetRect				= getRect,
 	GetGSC				= getGSC,
 	GetTextGSC			= getTextGSC,
 	BaselinkFromLink	= baselinkFromLink,
