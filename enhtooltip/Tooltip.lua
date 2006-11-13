@@ -182,6 +182,8 @@ local self = {
 	currentItem = nil,
 	forcePopupKey = "alt",
 	oldChatItem = nil,
+	lastFontStringIndex = 1,
+	lastMoneyObjectIndex = 0,
 }
 
 -- =============== LOCAL FUNCTIONS =============== --
@@ -314,6 +316,28 @@ function getglobalIterator(fmt, first, last)
 	end
 end
 
+--Create a new fontstring
+function createNewFontString(tooltip)
+	local tooltipName = tooltip:GetName()
+	local currentFontStringIndex = lastFontStringIndex
+	self.lastFontStringIndex = self.lastFontStringIndex + 1
+
+	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..self.lastFontStringIndex, "INFO", "GameFontNormal")
+	newFontString:SetPoint("TOPLEFT", tooltipName.."Text"..currentFontStringIndex, "BOTTOMLEFT", 0, -1)
+	newFontString:Hide()
+	return newFontString
+end
+
+--Create a new money object
+function createNewMoneyObject(tooltip)
+	self.lastMoneyObjectIndex = self.lastMoneyObjectIndex + 1
+
+	local newMoneyObject = CreateFrame("Frame", tooltip:GetName().."Money"..self.lastMoneyObjectIndex, tooltip, "EnhancedTooltipMoneyTemplate")
+	newMoneyObject:SetPoint("LEFT", tooltipName.."Text1", "LEFT")
+	newMoneyObject:Hide()
+	return newMoneyObject
+end
+
 function clearTooltip()
 	hideTooltip()
 	EnhancedTooltip.hasEmbed = false
@@ -367,8 +391,8 @@ function getRect(object, curRect)
 end
 
 function showTooltip(currentTooltip, skipEmbedRender)
-	if (self.showIgnore == true) then return end
-	if (EnhancedTooltip.hasEmbed and not skipEmbedRender) then
+	if (self.showIgnore) then return end
+	if (EnhancedTooltip.hasEmbed and (not skipEmbedRender)) then
 		embedRender()
 		self.showIgnore=true
 		currentTooltip:Show()
@@ -394,13 +418,12 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	for currentLine in getglobalIterator("EnhancedTooltipText%d", 1, lineCount) do
 		height = height + currentLine:GetHeight() + 1
 	end
-	if EnhancedTooltip.hasIcon then
+	if (EnhancedTooltip.hasIcon) then
 		height = math.max(height, EnhancedTooltipIcon:GetHeight() - 6)
 	end
 	height = height + 20
 
-	local sWidth = GetScreenWidth()
-	local sHeight = GetScreenHeight()
+	local sWidth, sHeight = GetScreenWidth(), GetScreenHeight()
 
 	local cWidth = currentTooltip:GetWidth()
 	if (cWidth < width) then
@@ -470,7 +493,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		elseif (anchor == "BOTTOMLEFT") then
 			currentTooltip:SetPoint("TOPRIGHT", parentObject, "BOTTOMLEFT", -5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
-		else -- BOTTOMRIGHT
+		else--if (anchor == "BOTTOMRIGHT") then
 			currentTooltip:SetPoint("TOPLEFT", parentObject, "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		end
@@ -501,7 +524,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	EnhancedTooltip:Show()
 
 	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
-		if (ttMoney.myLine ~= nil) then
+		if (ttMoney.myLine) then
 			local myLine = getglobal(ttMoney.myLine)
 			local ttMoneyWidth = ttMoney:GetWidth()
 			local ttMoneyLineWidth = myLine:GetWidth()
@@ -608,16 +631,30 @@ function addLine(lineText, moneyAmount, embed, bExact)
 	EnhancedTooltip.curEmbed = false
 
 	local curLine = EnhancedTooltip.lineCount + 1
-	local line = getglobal("EnhancedTooltipText"..curLine)
+
+	local line
+	if (curLine > self.lastFontStringIndex) then
+		line = createNewFontString(EnhancedTooltip)
+	else
+		line = getglobal("EnhancedTooltipText"..curLine)
+	end
+
 	line:SetText(lineText)
 	line:SetTextColor(1.0, 1.0, 1.0)
 	line:Show()
 	local lineWidth = line:GetWidth()
 
 	EnhancedTooltip.lineCount = curLine
-	if (moneyAmount ~= nil) and (moneyAmount > 0) then
+	if (moneyAmount and moneyAmount > 0) then
 		local curMoney = EnhancedTooltip.moneyCount + 1
-		local money = getglobal("EnhancedTooltipMoney"..curMoney)
+
+		local money
+		if (curMoney > self.lastMoneyObjectIndex) then
+			money = createNewMoneyObject(EnhancedTooltip)
+		else
+			money = getglobal("EnhancedTooltipMoney"..curMoney)
+		end
+
 		money:SetPoint("LEFT", line, "RIGHT", self.moneySpacing, 0)
 		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
 		money.myLine = line:GetName()
@@ -645,7 +682,7 @@ function addSeparator(embed)
 	EnhancedTooltip.hasData = true
 	EnhancedTooltip.curEmbed = false
 
-	local curLine = EnhancedTooltip.lineCount +1
+	local curLine = EnhancedTooltip.lineCount + 1
 	local line = getglobal("EnhancedTooltipText"..curLine)
 	line:SetText(" ")
 	line:SetTextColor(1.0, 1.0, 1.0)
