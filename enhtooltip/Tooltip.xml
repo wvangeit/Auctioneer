@@ -19,17 +19,13 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 
-	<Frame name="EnhancedTooltipMoneyTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
-		<Frames>
-			<Frame name="$parent" inherits="TinyMoneyFrameTemplate" hidden="true">
-				<Scripts>
-					<OnLoad>
-						SmallMoneyFrame_OnLoad();
-						MoneyFrame_SetType("STATIC");
-					</OnLoad>
-				</Scripts>
-			</Frame>
-		</Frames>
+	<Frame name="EnhancedTooltipMoneyTemplate" inherits="TinyMoneyFrameTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
+		<Scripts>
+			<OnLoad>
+				SmallMoneyFrame_OnLoad()
+				MoneyFrame_SetType("STATIC")
+			</OnLoad>
+		</Scripts>
 	</Frame>
 
 	<Frame name="EnhancedTooltipTemplate" frameStrata="TOOLTIP" hidden="true" virtual="true">
@@ -48,7 +44,7 @@
 			<Layer level="INFO">
 				<Texture name="$parentIcon" file="Interface\Buttons\UI-Quickslot2" hidden="true">
 					<Size>
-					  <AbsDimension x="32" y="32"/>
+						<AbsDimension x="32" y="32"/>
 					</Size>
 					<Anchors>
 						<Anchor point="TOPRIGHT">
@@ -73,7 +69,6 @@
 	</Frame>
 
 	<Frame name="EnhancedTooltip" inherits="EnhancedTooltipTemplate" parent="UIParent" hidden="true"/>
-	<!-- ToDo: Change this to be dinamically populated -->
 
 	<Frame name="EnhancedUpdate" parent="UIParent" hidden="false">
 		<Scripts>

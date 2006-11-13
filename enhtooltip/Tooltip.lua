@@ -319,12 +319,14 @@ end
 --Create a new fontstring
 function createNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
-	local currentFontStringIndex = lastFontStringIndex
+	local currentFontStringIndex = self.lastFontStringIndex
 	self.lastFontStringIndex = self.lastFontStringIndex + 1
 
 	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..self.lastFontStringIndex, "INFO", "GameFontNormal")
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Text"..currentFontStringIndex, "BOTTOMLEFT", 0, -1)
 	newFontString:Hide()
+	newFontString:SetTextColor(1.0,1.0,1.0)
+	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
 	return newFontString
 end
 
@@ -333,7 +335,7 @@ function createNewMoneyObject(tooltip)
 	self.lastMoneyObjectIndex = self.lastMoneyObjectIndex + 1
 
 	local newMoneyObject = CreateFrame("Frame", tooltip:GetName().."Money"..self.lastMoneyObjectIndex, tooltip, "EnhancedTooltipMoneyTemplate")
-	newMoneyObject:SetPoint("LEFT", tooltipName.."Text1", "LEFT")
+	newMoneyObject:SetPoint("LEFT", tooltip:GetName().."Text1", "LEFT")
 	newMoneyObject:Hide()
 	return newMoneyObject
 end
