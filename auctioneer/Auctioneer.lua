@@ -49,7 +49,7 @@ local function onLoad()
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Auctioneer", "CommandHandler", [[
 		local function cmdHandler(msg)
-			local i,j, cmd, param = msg:lower():match("^(%w+)%s*(.*)$")
+			local cmd, param = msg:lower():match("^(%w+)%s*(.*)$")
 			cmd = cmd or msg:lower() or "";
 			param = param or "";
 			if (cmd == "load") then
