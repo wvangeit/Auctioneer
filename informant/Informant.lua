@@ -60,14 +60,14 @@ local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
 local tooltipHandler		-- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
-local getKeyBindProfile		-- getKeyBindProfile()
+-- local getKeyBindProfile			-- getKeyBindProfile()
 local whitespace			-- whitespace(length)
 
 -- LOCAL VARIABLES
 
 local self = {}
 local lines = {}
-local itemInfo = nil
+local itemInfo
 
 -- GLOBAL VARIABLES
 
@@ -92,84 +92,78 @@ CLASS_TO_CATEGORY_MAP = {
 }
 
 local filterDefaults = {
-		['all'] = 'on',
-		['embed'] = 'off',
-		['locale'] = 'default',
-		['show-vendor'] = 'on',
-		['show-vendor-buy'] = 'on',
-		['show-vendor-sell'] = 'on',
-		['show-usage'] = 'on',
-		['show-stack'] = 'on',
-		['show-merchant'] = 'on',
-		['show-quest'] = 'on',
-		['show-icon'] = 'on',
-	}
+	['all'] = 'on',
+	['embed'] = 'off',
+	['locale'] = 'default',
+	['show-vendor'] = 'on',
+	['show-vendor-buy'] = 'on',
+	['show-vendor-sell'] = 'on',
+	['show-usage'] = 'on',
+	['show-stack'] = 'on',
+	['show-merchant'] = 'on',
+	['show-quest'] = 'on',
+	['show-icon'] = 'on',
+	['show-ilevel'] = 'on',
+};
 
 -- FUNCTION DEFINITIONS
 
 function split(str, at)
-	local splut = {}
-
-	if (type(str) ~= "string") then return nil end
-	if (not str) then str = "" end
-	if (not at)
-		then table.insert(splut, str)
-	else
-		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-			table.insert(splut, n)
-			if (c == '') then break end
-		end
+	if (not (type(str) == "string")) then
+		return
 	end
-	return splut
+
+	if (not str) then
+		str = ""
+	end
+
+	if (not at) then
+		return {str}
+
+	else
+		return {strsplit(at, str)};
+	end
 end
 
 function skillToName(userSkill)
 	local skillName = self.skills[tonumber(userSkill)]
 	local localized = "Unknown"
 	if (skillName) then
-		if (_INFM("Skill"..skillName)) then
-			localized = _INFM("Skill"..skillName)
-		else
-			localized = "Unknown:"..skillName
-		end
+		localized = _INFM("Skill"..skillName) or "Unknown:"..skillName
 	end
 	return localized, skillName
 end
 
 function getItem(itemID)
 	local baseData = self.database[itemID]
-	if (not baseData) then 
+	if (not baseData) then
 		return getItemBasic(itemID)
 	end
 
-	local _, _, _, iLevel, sType, _, iCount, _, sTexture = GetItemInfo(itemID)
+	local _, _, _, itemLevel, itemUseLevel, itemType, _, itemStackSize, _, itemTexture = GetItemInfo(tonumber(itemID))
 
-	local baseSplit = split(baseData, ":")
-	local buy = tonumber(baseSplit[1])
-	local sell = tonumber(baseSplit[2])
-	local class = tonumber(baseSplit[3])
-	local quality = tonumber(baseSplit[4])
-	local stack = tonumber(iCount) or tonumber(baseSplit[5])
-	local additional = baseSplit[6]
-	local usedby = baseSplit[7]
-	local quantity = baseSplit[8]
-	local limited = baseSplit[9]
-	local merchantlist = baseSplit[10]
+	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist  = strsplit(":", baseData)
+	buy = tonumber(buy)
+	sell = tonumber(sell)
+	class = tonumber(class)
+	quality = tonumber(quality)
+	stack = tonumber(itemStackSize) or tonumber(baseSplit[5])
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
 	local dataItem = {
-		['buy'] = buy,
-		['sell'] = sell,
-		['class'] = class,
-		['cat'] = cat,
-		['quality'] = quality,
-		['stack'] = stack,
-		['additional'] = additional,
-		['usedby'] = usedby,
-		['quantity'] = quantity,
-		['limited'] = limited,
-		['texture'] = sTexture,
-		['fullData'] = true,
+		buy = buy,
+		sell = sell,
+		class = class,
+		cat = cat,
+		quality = quality,
+		stack = stack,
+		additional = additional,
+		usedby = usedby,
+		quantity = quantity,
+		limited = limited,
+		texture = itemTexture,
+		itemLevel = itemLevel,
+		fullData = true,
 	}
 
 	local addition = ""
@@ -178,8 +172,8 @@ function getItem(itemID)
 	end
 	local catName = getCatName(cat)
 	if (not catName) then
-		if (sType) then
-			dataItem.classText = sType..addition
+		if (itemType) then
+			dataItem.classText = itemType..addition
 		else
 			dataItem.classText = "Unknown"..addition
 		end
@@ -212,16 +206,14 @@ function getItem(itemID)
 
 	local skillsRequired = self.requirements[itemID]
 	if (skillsRequired) then
-		local skillSplit = split(skillsRequired, ":")
-		reqSkill = skillSplit[1]
-		reqLevel = skillSplit[2]
+		reqSkill, reqLevel = strsplit(":", skillsRequired)
 		skillName = skillToName(reqSkill)
 	end
 
 	dataItem.isPlayerMade = (reqSkill ~= 0)
 	dataItem.reqSkill = reqSkill
 	dataItem.reqSkillName = skillName
-	dataItem.reqLevel = iLevel or reqLevel
+	dataItem.reqLevel = itemUseLevel or reqLevel
 
 	if (merchantlist ~= '') then
 		local merchList = split(merchantlist, ",")
@@ -259,24 +251,24 @@ function getItem(itemID)
 			end
 		end
 	end
-
 	return dataItem
 end
 
 function getItemBasic(itemID)
 	if (not itemID) then return end
-	local sName, sLink, iQuality, iLevel, sType, sSubType, iCount, sEquipLoc, sTexture = GetItemInfo(tonumber(itemID))
+	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
 
 	if (sName) then
 		local dataItem = {
-			['classText'] = sType,
-			['quality'] = iQuality,
-			['stack'] = iCount,
-			['texture'] = sTexture,
-			['reqLevel'] = iLevel,
-			['fullData'] = false,
+			classText = itemType,
+			quality = itemQuality,
+			stack = itemStackSize,
+			texture = itemTexture,
+			reqLevel = itemUseLevel,
+			itemLevel = itemLevel,
+			fullData = false,
 		}
-	return dataItem
+		return dataItem
 	end
 end
 
@@ -340,13 +332,15 @@ function getLocale()
 	return GetLocale();
 end
 
-local categories
+local categories = {GetAuctionItemClasses()};
 function getCatName(catID)
-	if (not categories) then categories = {GetAuctionItemClasses()} end
-	for cat, name in categories do
-		if (cat == catID) then return name end
+	for cat, name in ipairs(categories) do
+		if (cat == catID) then
+			return name
+		end
 	end
 end
+
 
 function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 	-- nothing to do, if informant is disabled
@@ -361,7 +355,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	local buy = 0
 	local stacks = 1
 
-	local itemID, randomProp, enchant, uniqID, lame = EnhTooltip.BreakLink(link)
+	local itemID, randomProp, enchant, uniqID, name = EnhTooltip.BreakLink(link)
 	if (itemID and itemID > 0) and (Informant) then
 		itemInfo = getItem(itemID)
 	end
@@ -406,6 +400,13 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		end
 	end
 
+	if (getFilter('show-ilevel')) then
+		if (itemInfo.itemLevel) then
+			EnhTooltip.AddLine(_INFM('FrmtInfoItemLevel'):format(itemInfo.itemLevel), nil, embedded)
+			EnhTooltip.LineColor(0.8, 0.5, 0.1)
+		end
+	end
+
 	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then
 			local bgsc = EnhTooltip.GetTextGSC(buy, true)
@@ -413,20 +414,20 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 
 			if (count and (count > 1)) then
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc), buy*count, embedded, true)
+					EnhTooltip.AddLine(_INFM('FrmtInfoBuymult'):format(count, bgsc), buy*count, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc), sell*count, embedded, true)
+					EnhTooltip.AddLine(_INFM('FrmtInfoSellmult'):format(count, sgsc), sell*count, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			else
 				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoBuy')), buy, embedded, true)
+					EnhTooltip.AddLine(_INFM('FrmtInfoBuy'):format(), buy, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(string.format(_INFM('FrmtInfoSell')), sell, embedded, true)
+					EnhTooltip.AddLine(_INFM('FrmtInfoSell'):format(), sell, embedded, true)
 					EnhTooltip.LineColor(0.8, 0.5, 0.1)
 				end
 			end
@@ -435,14 +436,14 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 
 	if (getFilter('show-stack')) then
 		if (stacks > 1) then
-			EnhTooltip.AddLine(string.format(_INFM('FrmtInfoStx'), stacks), nil, embedded)
+			EnhTooltip.AddLine(_INFM('FrmtInfoStx'):format(stacks), nil, embedded)
 		end
 	end
 	if (getFilter('show-merchant')) then
 		if (itemInfo.vendors) then
-			local merchantCount = table.getn(itemInfo.vendors)
+			local merchantCount = #itemInfo.vendors
 			if (merchantCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoMerchants'), merchantCount), nil, embedded)
+				EnhTooltip.AddLine(_INFM('FrmtInfoMerchants'):format(merchantCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
 			end
 		end
@@ -450,31 +451,31 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 	if (getFilter('show-usage')) then
 		local reagentInfo = ""
 		if (itemInfo.classText) then
-			reagentInfo = string.format(_INFM('FrmtInfoClass'), itemInfo.classText)
+			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
 			EnhTooltip.AddLine(reagentInfo, nil, embedded)
 			EnhTooltip.LineColor(0.6, 0.4, 0.8)
 		end
 		if (itemInfo.usedList and itemInfo.usageText) then
-			if (table.getn(itemInfo.usedList) > 2) then
+			if (#itemInfo.usedList > 2) then
 
 				local currentUseLine = nilSafeString(itemInfo.usedList[1])..", "..nilSafeString(itemInfo.usedList[2])..","
-				reagentInfo = string.format(_INFM('FrmtInfoUse'), currentUseLine)
+				reagentInfo = _INFM('FrmtInfoUse'):format(currentUseLine)
 				EnhTooltip.AddLine(reagentInfo, nil, embedded)
 				EnhTooltip.LineColor(0.6, 0.4, 0.8)
 
-				for index = 3, table.getn(itemInfo.usedList), 2 do
+				for index = 3, #itemInfo.usedList, 2 do
 					if (itemInfo.usedList[index+1]) then
-						reagentInfo = whitespace(string.len(_INFM('FrmtInfoUse')) + 3)..nilSafeString(itemInfo.usedList[index])..", "..nilSafeString(itemInfo.usedList[index+1])..","
+						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])..", "..nilSafeString(itemInfo.usedList[index+1])..","
 						EnhTooltip.AddLine(reagentInfo, nil, embedded)
 						EnhTooltip.LineColor(0.6, 0.4, 0.8)
 					else
-						reagentInfo = whitespace(string.len(_INFM('FrmtInfoUse')) + 3)..nilSafeString(itemInfo.usedList[index])
+						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])
 						EnhTooltip.AddLine(reagentInfo, nil, embedded)
 						EnhTooltip.LineColor(0.6, 0.4, 0.8)
 					end
 				end
 			else
-				reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
+				reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
 				EnhTooltip.AddLine(reagentInfo, nil, embedded)
 				EnhTooltip.LineColor(0.6, 0.4, 0.8)
 			end
@@ -484,7 +485,7 @@ function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, pri
 		if (itemInfo.quests) then
 			local questCount = itemInfo.questCount
 			if (questCount > 0) then
-				EnhTooltip.AddLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embedded)
+				EnhTooltip.AddLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.5, 0.8)
 			end
 		end
@@ -498,9 +499,8 @@ end
 
 function whitespace(length)
 	local spaces = ""
-	while length ~= 0 do
+	for index = length, 0, -1 do
 		spaces = spaces.." "
-		length = length - 1
 	end
 	return spaces
 end
@@ -522,7 +522,7 @@ function showHideInfo()
 		end
 
 		clear()
-		addLine(string.format(_INFM('InfoHeader'), color, itemInfo.itemName))
+		addLine(_INFM('InfoHeader'):format(color, itemInfo.itemName))
 
 		local buy = itemInfo.itemBuy or itemInfo.buy or 0
 		local sell = itemInfo.itemSell or itemInfo.sell or 0
@@ -536,52 +536,52 @@ function showHideInfo()
 			if (count and (count > 1)) then
 				local bqgsc = EnhTooltip.GetTextGSC(buy*count, true)
 				local sqgsc = EnhTooltip.GetTextGSC(sell*count, true)
-				addLine(string.format(_INFM('FrmtInfoBuymult'), count, bgsc)..": "..bqgsc, "ee8822")
-				addLine(string.format(_INFM('FrmtInfoSellmult'), count, sgsc)..": "..sqgsc, "ee8822")
+				addLine(_INFM('FrmtInfoBuymult'):format(count, bgsc)..": "..bqgsc, "ee8822")
+				addLine(_INFM('FrmtInfoSellmult'):format(count, sgsc)..": "..sqgsc, "ee8822")
 			else
-				addLine(string.format(_INFM('FrmtInfoBuy'))..": "..bgsc, "ee8822")
-				addLine(string.format(_INFM('FrmtInfoSell'))..": "..sgsc, "ee8822")
+				addLine(_INFM('FrmtInfoBuy'):format()..": "..bgsc, "ee8822")
+				addLine(_INFM('FrmtInfoSell'):format()..": "..sgsc, "ee8822")
 			end
 		end
 
 		if (itemInfo.stack > 1) then
-			addLine(string.format(_INFM('FrmtInfoStx'), itemInfo.stack))
+			addLine(_INFM('FrmtInfoStx'):format(itemInfo.stack))
 		end
 
 		local reagentInfo = ""
 		if (itemInfo.classText) then
-			reagentInfo = string.format(_INFM('FrmtInfoClass'), itemInfo.classText)
+			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
 		if (itemInfo.usageText) then
-			reagentInfo = string.format(_INFM('FrmtInfoUse'), itemInfo.usageText)
+			reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
 
 		if (itemInfo.isPlayerMade) then
-			addLine(string.format(_INFM('InfoPlayerMade'), itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
+			addLine(_INFM('InfoPlayerMade'):format(itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
 		end
 
 		if (itemInfo.quests) then
 			local questCount = itemInfo.questCount
 			if (questCount > 0) then
 				addLine("")
-				addLine(string.format(_INFM('FrmtInfoQuest'), questCount), nil, embed)
-				addLine(string.format(_INFM('InfoQuestHeader'), questCount), "70ee90")
-				for pos, quest in itemInfo.quests do
-					addLine(string.format(_INFM('InfoQuestName'), quest.count, quest.name, quest.level), "80ee80")
+				addLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embed)
+				addLine(_INFM('InfoQuestHeader'):format(questCount), "70ee90")
+				for pos, quest in pairs(itemInfo.quests) do
+					addLine(_INFM('InfoQuestName'):format(quest.count, quest.name, quest.level), "80ee80")
 				end
-				addLine(string.format((_INFM('InfoQuestSource')).." WoWGuru.com"));
+				addLine(_INFM('InfoQuestSource'):format().." WoWGuru.com");
 			end
 		end
 
 		if (itemInfo.vendors) then
-			local vendorCount = table.getn(itemInfo.vendors)
+			local vendorCount = #itemInfo.vendors
 			if (vendorCount > 0) then
 				addLine("")
-				addLine(string.format(_INFM('InfoVendorHeader'), vendorCount), "ddff40")
-				for pos, merchant in itemInfo.vendors do
-					addLine(string.format(" ".._INFM('InfoVendorName'), merchant), "eeee40")
+				addLine(_INFM('InfoVendorHeader'):format(vendorCount), "ddff40")
+				for pos, merchant in pairs(itemInfo.vendors) do
+					addLine(" ".._INFM('InfoVendorName'):format(merchant), "eeee40")
 				end
 			end
 		end
@@ -625,10 +625,9 @@ local function frameLoaded()
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("Informant", "CommandHandler", [[
 		local function cmdHandler(msg)
-			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end
-			if (not cmd) then cmd = "" end
-			if (not param) then param = "" end
+			local cmd, param = msg:lower():match("^(%w+)%s*(.*)$")
+			cmd = cmd or msg:lower() or "";
+			param = param or "";
 			if (cmd == "load") then
 				if (param == "") then
 					Stubby.Print("Manually loading Informant...")
@@ -682,7 +681,8 @@ function onVariablesLoaded()
 		addLine(_INFM('Welcome'))
 		InformantConfig.welcomed = true
 	end
-
+--[[
+	-- This code should no longer be needed
 	-- Restore key bindings
 	-- This workaround is required for LoadOnDemand addons since their saved
 	-- bindings are deleted upon login.
@@ -696,14 +696,16 @@ function onVariablesLoaded()
 		end
 	end
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
-
+ ]]
 	Informant.InitCommands()
 end
 
-function onEvent(event)
-	if (event == "ADDON_LOADED" and string.lower(arg1) == "informant") then
+function onEvent(event, addon)
+	if (event == "ADDON_LOADED" and addon:lower() == "informant") then
 		onVariablesLoaded()
 		this:UnregisterEvent("ADDON_LOADED")
+	--[[
+	-- This code should no longer be needed
 	elseif (event == "UPDATE_BINDINGS") then
 		-- Store key bindings for Informant
 		local key1, key2 = GetBindingKey('INFORMANT_POPUPDOWN');
@@ -714,6 +716,7 @@ function onEvent(event)
 
 		InformantConfig.bindings[profile][1] = key1;
 		InformantConfig.bindings[profile][2] = key2;
+	 ]]
 	end
 end
 
@@ -724,7 +727,7 @@ function frameActive(isActive)
 end
 
 function getRowCount()
-	return table.getn(lines)
+	return #lines
 end
 
 function scrollUpdate(offset)
@@ -767,30 +770,30 @@ function testWrap(text)
 	local pos, test, best, rest
 	best = text
 	rest = nil
-	pos = string.find(text, " ")
+	pos = text:find("%s")
 	while (pos) do
-		test = string.sub(text, 1, pos-1)
+		test = text:sub(1, pos-1)
 		InformantFrameTextTest:SetText(test)
 		if (InformantFrameTextTest:GetWidth() < InformantFrame:GetWidth() - 20) or (not rest) then
 			best = test
-			rest = string.sub(test, pos+1)
+			rest = test:sub(pos+1)
 		else
 			break
 		end
-		pos = string.find(text, " ", pos+1)
+		pos = text:find("%s", pos+1)
 	end
 	return best, rest
 end
 
 function addLine(text, color, level)
-	if (text == nil) then return end
+	if (not text) then return end
 	if (not level) then level = 1 end
 	if (level > 100) then
 		return
 	end
 
 	if (type(text) == "table") then
-		for pos, line in text do
+		for pos, line in pairs(text) do
 			addLine(line, color, level)
 		end
 		return
@@ -801,7 +804,7 @@ function addLine(text, color, level)
 	else
 		local best, rest = testWrap(text)
 		if (color) then
-			table.insert(lines, string.format("|cff%s%s|r", color, best))
+			table.insert(lines, ("|cff%s%s|r"):format(color, best))
 		else
 			table.insert(lines, best)
 		end
@@ -825,7 +828,8 @@ function setFilterDefaults()
 		end
 	end
 end
-
+--[[
+--This code should no longer be needed
 -- Key binding helper functions
 
 function getKeyBindProfile()
@@ -834,7 +838,7 @@ function getKeyBindProfile()
 	end
 	return 'global'
 end
-
+ ]]
 -- GLOBAL OBJECT
 
 Informant = {

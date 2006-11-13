@@ -20,7 +20,10 @@
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 --]]
 
-local p = EnhancedTooltip.DebugPrint;
+--[[ 
+--This file is commented out until a benevolent soul decides to complete its functions and functionallity.
+
+local p = EnhTooltip.DebugPrint;
 
 local tsfHookOnUpdate, tsfHookSetSelection, scanTradeskillLink, tradeSkillText
 local readFormula, getCounts, scanBank, scanBags, scanContainer, getPlayerName
@@ -30,17 +33,17 @@ local initTrades
 
 function tradeHook(type, selID)
 	p("Processing trade", trade, selID);
-	if (selID == nil) then
+	if (not selID) then
 		-- We are hooked into the tradeskill frame and it has been updated
-		for i=1, TRADE_SKILLS_DISPLAYED, 1 do
+		for i=1, TRADE_SKILLS_DISPLAYED do
 			local button = getglobal("TradeSkillSkill"..i)
 			local skillIndex = button:GetID()
 			local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(skillIndex);
 			button:SetText(tradeSkillText(skillIndex, skillName))
-			scanTradeskillID(i, false)
+			return scanTradeskillID(i, false)
 		end
 	else
-		scanTradeskillLink(selID, true)
+		return scanTradeskillLink(selID, true)
 	end
 end
 
@@ -73,7 +76,7 @@ function scanTradeskillLink(id, setStrings)
 	-- We are hooked into the tradeskill frame and it has been updated
 	local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(id)
 	local skillLink = GetTradeSkillItemLink(id)
-	local skillID = EnhancedTooltip.baselinkFromLink(skillLink)
+	local skillID = EnhTooltip.BaselinkFromLink(skillLink)
 
 	if (setStrings) then
 		local totalSkillItems = getTotalCount(skillID)
@@ -90,7 +93,7 @@ function scanTradeskillLink(id, setStrings)
 	for i=1, numReagents, 1 do
 		local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(id, i)
 		local reagentLink = GetTradeSkillReagentLink(id, i);
-		local reagentID = EnhancedTooltip.baselinkFromLink(reagentLink);
+		local reagentID = EnhTooltip.BaselinkFromLink(reagentLink);
 		local totalReagents = getTotalCount(reagentName)
 		formula = formula..":"..reagentID.."x"..reagentCount
 		if (setStrings) then
@@ -126,7 +129,7 @@ end
 local playerRealm = nil
 local playerName = nil
 function getPlayerName()
-	if (playerName == nil) then
+	if (not playerName) then
 		playerRealm = GetCVar("realmName")
 		playerName = UnitName("player")
 	end
@@ -138,8 +141,8 @@ function readFormula(itemKey)
 	local formula = Informant_Formulae[itemKey]
 	local bag, bank, other, make, vend, all
 	local tBag, tBank, tOther, tMake, tVend, tAll
-	for reagKey, reagCount in string.gfind(formula, ":(%d+)x(%d+)") do
-		local _,_, reagID = string.find(reagKey, "(\d+):");
+	for reagKey, reagCount in formula:gmatch(":(%d+)x(%d+)") do
+		local reagID = reagKey:match("(\d+):");
 		bag, bank, other = getCounts(reagKey)
 		if (InformantFormula[reagKey]) then
 			local subMake = readFormula(reagKey)
@@ -176,7 +179,7 @@ function getCounts(itemID)
 	local otherTotal = 0
 	if (InformantItems and InformatItems[curRealm]) then
 		for player, pData in Informant_Items[curRealm] do
-			local i,j, invCount, bankCount = string.find(pData, "(%d):(%d)");
+			local invCount, bankCount = pData:match("(%d):(%d)");
 			if (player == curPlayer) then
 				invTotal = tonumber(invCount)
 				bankTotal = tonumber(bankCount)
@@ -188,3 +191,4 @@ function getCounts(itemID)
 	return invTotal, bankTotal, otherTotal;
 end
 
+ ]]

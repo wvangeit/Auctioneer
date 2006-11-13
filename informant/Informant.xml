@@ -1,6 +1,4 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 <!--
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -21,8 +19,12 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 -->
 	<Frame name="InformantFrame" toplevel="true" parent="UIParent" frameStrata="DIALOG" hidden="true" enableMouse="true" moveable="true">
-		<Size><AbsDimension x="380" y="380"/></Size>
-		<Anchors><Anchor point="CENTER"/></Anchors>
+		<Size>
+			<AbsDimension x="380" y="380"/>
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
 		<TitleRegion setAllPoints="true"/>
 		<Scripts>
 			<OnLoad>
@@ -35,15 +37,19 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				Informant.FrameActive(false);
 			</OnHide>
 			<OnEvent>
-				Informant.OnEvent(event);
+				Informant.OnEvent(event, ...);
 			</OnEvent>
 		</Scripts>
 		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\TutorialFrame\TutorialFrameBorder" tile="true">
 			<BackgroundInsets>
 				<AbsInset left="4" right="4" top="4" bottom="4"/>
 			</BackgroundInsets>
-			<TileSize><AbsValue val="32"/></TileSize>
-			<EdgeSize><AbsValue val="32"/></EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
 		</Backdrop>
 		<Layers>
 			<Layer level="OVERLAY">

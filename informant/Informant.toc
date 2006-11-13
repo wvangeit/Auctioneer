@@ -1,7 +1,7 @@
 ## Title: Informant
 ## Notes: Displays detailed item information in tooltips, and can produce item reports by binding an information window to a keypress [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 11200
+## Interface: 20000
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
@@ -17,7 +17,7 @@ InfLocale.lua
 
 Informant.lua
 InfCommand.lua
-InfTrades.lua
+## InfTrades.lua
 InfQuests.lua
 InfData.lua
 

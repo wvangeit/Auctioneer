@@ -542,6 +542,7 @@ InformantLocalizations = {
 		FrmtInfoSellmult	= "Sell %d (%s each)";
 		FrmtInfoStx	= "Stacks in lots of %d";
 		FrmtInfoUse	= "Used for: %s";
+		FrmtInfoItemLevel	= "Item Level: %d";
 		FrmtUnknownLocale	= "The locale you specified ('%s') is unknown. Valid locales are:";
 		FrmtWelcome	= "Informant v%s loaded";
 		InfoHeader	= "Information on |cff%s%s|r";
