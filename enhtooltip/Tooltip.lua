@@ -184,12 +184,15 @@ local self = {
 	oldChatItem = nil,
 	lastFontStringIndex = 1,
 	lastMoneyObjectIndex = 0,
+	lastHeaderFontStringIndex = 1,
+	numberHeaderLines = 0,
 }
 
 -- =============== LOCAL FUNCTIONS =============== --
 
 -- prototypes for all local functions
 local addLine					-- AddLine(lineText,moneyAmount,embed)
+local addHeader					-- AddLine(lineText,moneyAmount,embed)
 local addSeparator				-- AddSeparator(embed)
 local addTooltip				-- AddTooltip(frame,name,link,quality,count,price)
 local afHookOnEnter				-- AfHookOnEnter(type,index)
@@ -217,6 +220,8 @@ local getLootLinkLink			-- GetLootLinkLink(name)
 local getLootLinkServer			-- GetLootLinkServer()
 local getRect					-- GetRect(object,curRect)
 local getTextGSC				-- GetTextGSC(money,exact)
+local getTooltipHeight			-- GetTooltipHeight(enhTooltip, currentTooltip)
+local getTooltipWidth			-- GetTooltipWidth(enhTooltip, currentTooltip)
 local gtHookOnHide				-- GtHookOnHide()
 local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
 local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
@@ -233,6 +238,9 @@ local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
 local gtHookSetText				-- GtHookSetText(funcArgs, retval, frame, text, r, g, b, unknown1, unknown2)
 local gtHookAppendText			-- GtHookAppendText(funcArgs, retVal, frame)
 local gtHookShow				-- GtHookShow(funcArgs, retVal, frame)
+local headerColor				-- HeaderColor(r, g, b)
+local headerQuality				-- HeaderQuality(quality)
+local headerSize				-- HeaderSize(fontSize)
 local hideTooltip				-- HideTooltip()
 local hyperlinkFromLink			-- HyperlinkFromLink(link)
 local imHookOnEnter				-- ImHookOnEnter()
@@ -312,7 +320,7 @@ function getglobalIterator(fmt, first, last)
 		end
 		local obj = getglobal(fmt:format(i))
 		i = i + 1
-		return obj
+		return obj, i - 1
 	end
 end
 
@@ -320,7 +328,7 @@ end
 function createNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentFontStringIndex = self.lastFontStringIndex
-	self.lastFontStringIndex = self.lastFontStringIndex + 1
+	self.lastFontStringIndex = currentFontStringIndex + 1
 
 	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..self.lastFontStringIndex, "INFO", "GameFontNormal")
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Text"..currentFontStringIndex, "BOTTOMLEFT", 0, -1)
@@ -340,19 +348,42 @@ function createNewMoneyObject(tooltip)
 	return newMoneyObject
 end
 
+--Create a new header fontstring
+function createNewHeaderFontString(tooltip)
+	local tooltipName = tooltip:GetName()
+	local currentHeaderFontStringIndex = self.lastHeaderFontStringIndex
+	self.lastHeaderFontStringIndex = currentHeaderFontStringIndex + 1
+
+	local newFontString = tooltip:CreateFontString(tooltipName.."Header"..self.lastHeaderFontStringIndex, "INFO", "GameFontNormal")
+	newFontString:SetPoint("TOPLEFT", tooltipName.."Header"..currentHeaderFontStringIndex, "BOTTOMLEFT", 0, -1)
+	newFontString:Hide()
+	newFontString:SetTextColor(1.0,1.0,1.0)
+	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
+	return newFontString
+end
+
 function clearTooltip()
 	hideTooltip()
 	EnhancedTooltip.hasEmbed = false
 	EnhancedTooltip.curEmbed = false
 	EnhancedTooltip.hasData = false
 	EnhancedTooltip.hasIcon = false
+	EnhancedTooltip.curHeaderEmbed = false
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
 
 	for ttText in getglobalIterator("EnhancedTooltipText%d") do
 		ttText:Hide()
+		ttText.myMoney = nil
 		ttText:SetTextColor(1.0,1.0,1.0)
 		ttText:SetFont(STANDARD_TEXT_FONT, 10)
+	end
+
+	for ttHeader in getglobalIterator("EnhancedTooltipHeader%d") do
+		ttHeader:Hide()
+		ttHeader.myMoney = nil
+		ttHeader:SetTextColor(1.0,1.0,1.0)
+		ttHeader:SetFont(STANDARD_TEXT_FONT, 10)
 	end
 
 	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
@@ -360,7 +391,10 @@ function clearTooltip()
 		ttMoney:Hide()
 	end
 
+	EnhancedTooltipText1:SetPoint("TOPLEFT", EnhancedTooltip, "TOPLEFT", 10, -10)
+
 	EnhancedTooltip.lineCount = 0
+	EnhancedTooltip.headerCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
 	for curLine in pairs(self.embedLines) do
@@ -404,27 +438,22 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		return
 	end
 
-	local width = EnhancedTooltip.minWidth
-	if (EnhancedTooltip.hasIcon) then
-		width = width + EnhancedTooltipIcon:GetWidth()
-	end
 	local lineCount = EnhancedTooltip.lineCount
-	if (lineCount == 0) then
+	local headerCount = EnhancedTooltip.headerCount
+	if ((lineCount == 0) and (headerCount == 0)) then
 		if (not EnhancedTooltip.hasEmbed) then
 			hideTooltip()
 			return
 		end
 	end
 
-	local height = 0
-	for currentLine in getglobalIterator("EnhancedTooltipText%d", 1, lineCount) do
-		height = height + currentLine:GetHeight() + 1
+	if (headerCount > 0) then
+		EnhancedTooltipText1:SetPoint("TOPLEFT", "EnhancedTooltipHeader"..EnhancedTooltip.headerCount, "BOTTOMLEFT", 0, -1)
+	--else
+	--	EnhancedTooltipText1:SetPoint("TOPLEFT", EnhancedTooltip, "TOPLEFT", 10, -10)
 	end
-	if (EnhancedTooltip.hasIcon) then
-		height = math.max(height, EnhancedTooltipIcon:GetHeight() - 6)
-	end
-	height = height + 20
 
+	local width, height = getTooltipWidth(EnhancedTooltip, currentTooltip), getTooltipHeight(EnhancedTooltip, currentTooltip)
 	local sWidth, sHeight = GetScreenWidth(), GetScreenHeight()
 
 	local cWidth = currentTooltip:GetWidth()
@@ -531,13 +560,71 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			local ttMoneyWidth = ttMoney:GetWidth()
 			local ttMoneyLineWidth = myLine:GetWidth()
 			ttMoney:ClearAllPoints()
-			if ((ttMoney.myLineNumber < 4) and (EnhancedTooltip.hasIcon)) then
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2 - 34, 0)
+			if ((EnhancedTooltip.hasIcon) and (ttMoney.myLineNumber + headerCount < 4)) then
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing * 2 - 34, 0)
 			else
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing*2, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", width - ttMoneyLineWidth - ttMoneyWidth - self.moneySpacing * 2, 0)
 			end
 		end
 	end
+end
+
+function getTooltipWidth(enhTooltip, currentTooltip)
+	local width = 0
+	local headerCount = enhTooltip.headerCount
+	for headerLine, index in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
+		if (headerLine.myMoney) then
+			if ((enhTooltip.hasIcon) and (index < 4)) then
+				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + self.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
+			else
+				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + self.moneySpacing + 20)
+			end
+		else
+			if ((enhTooltip.hasIcon) and (index < 4)) then
+				width = math.max(width, headerLine:GetWidth() + 20 + enhTooltip.hasIcon:GetWidth())
+			else
+				width = math.max(width, headerLine:GetWidth() + 20)
+			end
+		end
+	end
+
+	for currentLine, index in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
+		if (currentLine.myMoney) then
+			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
+				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + self.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
+			else
+				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + self.moneySpacing + 20)
+			end
+		else
+			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
+				width = math.max(width, currentLine:GetWidth() + 20 + enhTooltip.hasIcon:GetWidth())
+			else
+				width = math.max(width, currentLine:GetWidth() + 20)
+			end
+		end
+	end
+	return width
+end
+
+function getTooltipHeight(enhTooltip, currentTooltip)
+	local height = 0
+	local lineCount = enhTooltip.lineCount
+	local headerCount = enhTooltip.headerCount
+
+	for headerLine in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
+		height = height + headerLine:GetHeight() + 1
+	end
+
+	for currentLine in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
+		height = height + currentLine:GetHeight() + 1
+	end
+
+	if (enhTooltip.hasIcon) then
+		height = math.max(height, enhTooltip.hasIcon:GetHeight() - 6)
+	end
+	height = height + 20
+
+	return height
 end
 
 -- calculate the gold, silver, and copper values based the amount of copper
@@ -661,16 +748,70 @@ function addLine(lineText, moneyAmount, embed, bExact)
 		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money.myLineNumber = curLine
+		line.myMoney = money
 		money:Show()
-		local moneyWidth = money:GetWidth()
-		lineWidth = lineWidth + moneyWidth + self.moneySpacing
 		getglobal("EnhancedTooltipMoney"..curMoney.."SilverButtonText"):SetTextColor(1.0,1.0,1.0)
 		getglobal("EnhancedTooltipMoney"..curMoney.."CopperButtonText"):SetTextColor(0.86,0.42,0.19)
 		EnhancedTooltip.moneyCount = curMoney
 	end
-	lineWidth = lineWidth + 20
-	if (lineWidth > EnhancedTooltip.minWidth) then
-		EnhancedTooltip.minWidth = lineWidth
+end
+
+function addHeaderLine(lineText, moneyAmount, embed, bExact)
+	moneyAmount = nil
+	if (not lineText) then
+		return
+	end
+	local curHeader = EnhancedTooltip.headerCount + 1
+	EnhancedTooltip.headerCount = curHeader
+
+	if (embed) and (self.currentGametip) then
+		EnhancedTooltip.hasEmbed = true
+		EnhancedTooltip.curHeaderEmbed = true
+		local line = ""
+		if (moneyAmount) then
+			line = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
+		else
+			line = lineText
+		end
+		table.insert(self.embedLines, curHeader, {line = line})
+		return
+	end
+	EnhancedTooltip.hasData = true
+	EnhancedTooltip.curHeaderEmbed = false
+
+
+	local line
+	if (curHeader > self.lastHeaderFontStringIndex) then
+		line = createNewHeaderFontString(EnhancedTooltip)
+	else
+		line = getglobal("EnhancedTooltipHeader"..curHeader)
+	end
+
+	line:SetText(lineText)
+	line:SetTextColor(1.0, 1.0, 1.0)
+	line:Show()
+	local lineWidth = line:GetWidth()
+
+
+	if (moneyAmount and moneyAmount > 0) then
+		local curMoney = EnhancedTooltip.moneyCount + 1
+
+		local money
+		if (curMoney > self.lastMoneyObjectIndex) then
+			money = createNewMoneyObject(EnhancedTooltip)
+		else
+			money = getglobal("EnhancedTooltipMoney"..curMoney)
+		end
+
+		money:SetPoint("LEFT", line, "RIGHT", self.moneySpacing, 0)
+		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
+		money.myLine = line:GetName()
+		money.myLineNumber = curHeader
+		line.myMoney = money
+		money:Show()
+		getglobal("EnhancedTooltipMoney"..curMoney.."SilverButtonText"):SetTextColor(1.0,1.0,1.0)
+		getglobal("EnhancedTooltipMoney"..curMoney.."CopperButtonText"):SetTextColor(0.86,0.42,0.19)
+		EnhancedTooltip.moneyCount = curMoney
 	end
 end
 
@@ -720,6 +861,41 @@ function lineSize(fontSize)
 	return line:SetFont(STANDARD_TEXT_FONT, fontSize)
 end
 
+function headerColor(r, g, b)
+	local curLine = EnhancedTooltip.headerCount
+	if (EnhancedTooltip.curHeaderEmbed) and (self.currentGametip) then
+		self.embedLines[curLine].r = r
+		self.embedLines[curLine].g = g
+		self.embedLines[curLine].b = b
+		return
+	end
+	if (curLine == 0) then return end
+	local line = getglobal("EnhancedTooltipHeader"..curLine)
+	return line:SetTextColor(r, g, b)
+end
+
+function headerSize(fontSize)
+	if (EnhancedTooltip.curHeaderEmbed) and (self.currentGametip) then
+		return
+	end
+
+	local curLine = EnhancedTooltip.headerCount
+	if (curLine == 0) then
+		return
+	end
+
+	local line = getglobal("EnhancedTooltipHeader"..curLine)
+	return line:SetFont(STANDARD_TEXT_FONT, fontSize)
+end
+
+function headerQuality(quality)
+	if ( quality ) then
+		return headerColor(GetItemQualityColor(quality))
+	else
+		return headerColor(1.0, 1.0, 1.0)
+	end
+end
+
 function lineSize_Large()
 	debugPrint("lineSize_Large() Called. This function is DEPRECATED. Use lineSize(12) instead.")
 	return lineSize(12)
@@ -741,7 +917,7 @@ end
 function setIcon(iconPath)
 	EnhancedTooltipIcon:SetTexture(iconPath)
 	EnhancedTooltipIcon:Show()
-	EnhancedTooltip.hasIcon = true
+	EnhancedTooltip.hasIcon = EnhancedTooltipIcon
 end
 
 function gtHookOnHide()
@@ -1472,6 +1648,11 @@ EnhTooltip = {
 	LineSize_Large		= lineSize_Large, --Deprecated, use EnhTooltip.LineSize instead
 	LineSize_Small		= lineSize_Small, --Deprecated, use EnhTooltip.LineSize instead
 	SetIcon				= setIcon,
+
+	AddHeaderLine		= addHeaderLine,
+	HeaderColor			= headerColor,
+	HeaderQuality		= headerQuality,
+	HeaderSize			= headerSize,
 
 	ClearTooltip		= clearTooltip,
 	HideTooltip			= hideTooltip,

@@ -40,8 +40,10 @@
 				<AbsInset left="5" right="5" top="5" bottom="5"/>
 			</BackgroundInsets>
 		</Backdrop>
+		
 		<Layers>
 			<Layer level="INFO">
+
 				<Texture name="$parentIcon" file="Interface\Buttons\UI-Quickslot2" hidden="true">
 					<Size>
 						<AbsDimension x="32" y="32"/>
@@ -55,6 +57,16 @@
 					</Anchors>
 				</Texture>
 
+				<FontString name="$parentHeader1" inherits="GameFontNormal" hidden="true">
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="10" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+
 				<FontString name="$parentText1" inherits="GameFontNormal" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT">
@@ -64,6 +76,7 @@
 						</Anchor>
 					</Anchors>
 				</FontString>
+
 			</Layer>
 		</Layers>
 	</Frame>
