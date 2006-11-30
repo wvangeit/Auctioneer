@@ -456,8 +456,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 
 	if (headerCount > 0) then
 		EnhancedTooltipText1:SetPoint("TOPLEFT", "EnhancedTooltipHeader"..EnhancedTooltip.headerCount, "BOTTOMLEFT", 0, -1)
-	--else
-	--	EnhancedTooltipText1:SetPoint("TOPLEFT", EnhancedTooltip, "TOPLEFT", 10, -10)
 	end
 
 	local width, height = getTooltipWidth(EnhancedTooltip, currentTooltip), getTooltipHeight(EnhancedTooltip, currentTooltip)
