@@ -248,13 +248,11 @@ end
 -- functions in order and the original call at just before
 -- position 0.
 function hookCall(funcName, ...)
-	local result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20
 	local orig = Stubby.GetOrigFunc(funcName)
 	if (not orig) then return end
 
-	local res;
-	local retVal = nil
-	local returns = false
+	local res
+	local retVal
 
 	local callees
 	if config.calls and config.calls.callList and config.calls.callList[funcName] then
@@ -264,54 +262,46 @@ function hookCall(funcName, ...)
 	if (callees) then
 		for _, func in ipairs(callees) do
 			if (orig and func.p >= 0) then
-				result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 = pcall(orig, ...)
-				if (result) then
-					if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
-						retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
-						returns = true
-					end
-				else
+				retVal = {pcall(orig, ...)}
+				if (not table.remove(retVal, 1)) then
 					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
 				end
 				orig = nil
 			end
+
 			local result, res, addit = pcall(func.f, func.a, retVal, ...);
 			if (result) then
-				if (type(res) == 'string') then
-					if (res == 'abort') then return end
-					if (res == 'killorig') then orig = nil end
-					if (res == 'setreturn') then
-						retVal = addit
-						returns = true
-					end
-					--[[
-					--This option has been disabled permanently, since there is no way to do this via the current ... construct implementation.
-					if (res == 'setparams') then
-						-- Don't use unpack() since that doesn't correctly handle nil values in the middle of the arg list.
-						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
-							addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
-					end
-					--]]
+				if (res == 'abort') then
+					return
+				elseif (res == 'killorig') then
+					orig = nil
+				elseif (res == 'setreturn') then
+					retVal = addit
+					returns = true
 				end
+				--[[
+				--This option has been disabled permanently, since there is no way to do this via the current varArg (...) construct implementation.
+				if (res == 'setparams') then
+					-- Don't use unpack() since that doesn't correctly handle nil values in the middle of the arg list.
+					a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
+						addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
+				end
+				--]]
+
 			else
 				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
 			end
 		end
 	end
+
 	if (orig) then
-		result, r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 = pcall(orig, ...)
-		if (result) then
-			if r1 or r2 or r3 or r4 or r5 or r6 or r7 or r8 or r9 or r10 or r11 or r12 or r13 or r14 or r15 or r16 or r17 or r18 or r19 or r20 then
-				retVal = { r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17,r18,r19,r20 }
-				returns = true
-			end
-		else
+		retVal = {pcall(orig, ...)}
+		if (not table.remove(retVal, 1)) then
 			Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
 		end
 	end
-	if (returns) then
-		return unpack(retVal, 1, table.maxn(retVal));
-	end
+
+	return unpack(retVal, 1, table.maxn(retVal))
 end
 
 -- This function automatically hooks Stubby in place of the
@@ -398,7 +388,7 @@ function unregisterFunctionHook(triggerFunction, hookFunc)
 	end
 end
 
---[[ 
+--[[
 	This function registers a given function to be called when a given addon is loaded, or immediatly if it is already loaded (this can be
 	used to setup a hooking function to execute when an addon is loaded but not before)
  ]]
