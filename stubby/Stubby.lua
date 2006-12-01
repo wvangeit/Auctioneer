@@ -19,7 +19,7 @@ A quick example of this is:
 		end
 		SLASH_MYADDON1 = "/myaddon"
 		SlashCmdList['MYADDON'] = cmdHandler
-	]=]);
+	]=])
 -------------------------------------------
 So, what did this just do? It registered some boot code
 (called "CommandHandler") with Stubby that Stubby will
@@ -269,7 +269,7 @@ function hookCall(funcName, ...)
 				orig = nil
 			end
 
-			local result, res, addit = pcall(func.f, func.a, retVal, ...);
+			local result, res, addit = pcall(func.f, func.a, retVal, ...)
 			if (result) then
 				if (res == 'abort') then
 					return
@@ -284,7 +284,7 @@ function hookCall(funcName, ...)
 				if (res == 'setparams') then
 					-- Don't use unpack() since that doesn't correctly handle nil values in the middle of the arg list.
 					a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
-						addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
+						addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20]
 				end
 				--]]
 
@@ -312,18 +312,27 @@ function hookInto(triggerFunction)
 	if ((not triggerFunction) or config.hooks.origFuncs[triggerFunction]) then return end
 	local stringToLoad = [[
 		Stubby_OldFunction = ]]..triggerFunction..[[;
+		local functionString = ']]..triggerFunction..[[';
+
+		if (not (type(Stubby_OldFunction) == "function")) then
+			return Stubby.Print('Error occured while compiling hook, "'..functionString..'" is not a valid function')
+		end
+
 		Stubby_NewFunction = function(...)
-			return Stubby.HookCall(']]..triggerFunction..[[', ...);
+			return Stubby.HookCall(functionString, ...);
 		end;
-		]]..triggerFunction..[[ = Stubby_NewFunction;]];
+		]]..triggerFunction..[[ = Stubby_NewFunction
+	]];
 	assert(
 		loadstring(
 			stringToLoad, "StubbyHookingFunction"
 		),
-		"Stubby failed to hook function \""..triggerFunction.."\""
-	)();
-	config.hooks.functions[triggerFunction] = Stubby_NewFunction;
-	config.hooks.origFuncs[triggerFunction] = Stubby_OldFunction;
+		'Stubby failed to hook function "'..triggerFunction..'"'
+	)()
+
+	config.hooks.functions[triggerFunction] = Stubby_NewFunction
+	config.hooks.origFuncs[triggerFunction] = Stubby_OldFunction
+
 	Stubby_NewFunction = nil
 	Stubby_OldFunction = nil
 end
@@ -375,7 +384,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 		config.calls.functions[triggerFunction] = {}
 		config.calls.functions[triggerFunction][insertPos] = funcObj
 	end
-	config.calls.callList = rebuildNotifications(config.calls.functions);
+	config.calls.callList = rebuildNotifications(config.calls.functions)
 	return hookInto(triggerFunction)
 end
 
@@ -466,7 +475,7 @@ end
 function eventWatcher(event, ...)
 	if (config.events[event]) then
 		for ownerAddOn, hookDetail in pairs(config.events[event]) do
-			hookDetail.f(hookDetail.a, event, ...);
+			hookDetail.f(hookDetail.a, event, ...)
 		end
 	end
 end
@@ -507,7 +516,7 @@ function createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 			'Stubby.UnregisterAddOnHook("'..triggerAddOn..'", "'..ownerAddOn..'") '..
 		'end '..
 		'Stubby.RegisterAddOnHook("'..triggerAddOn..'", "'..ownerAddOn..'", hookFunction)'
-	);
+	)
 end
 
 function createFunctionLoadBootCode(ownerAddOn, triggerFunction)
@@ -517,7 +526,7 @@ function createFunctionLoadBootCode(ownerAddOn, triggerFunction)
 			'Stubby.UnregisterFunctionHook("'..triggerFunction..'", hookFunction) '..
 		'end '..
 		'Stubby.RegisterFunctionHook("'..triggerFunction..'", 200, hookFunction)'
-	);
+	)
 end
 
 function createEventLoadBootCode(ownerAddOn, triggerEvent)
@@ -527,7 +536,7 @@ function createEventLoadBootCode(ownerAddOn, triggerEvent)
 			'Stubby.UnregisterEventHook("'..triggerEvent..'", "'..ownerAddOn..'") '..
 		'end '..
 		'Stubby.RegisterEventHook("'..triggerEvent..'", "'..ownerAddOn..'", hookFunction)'
-	);
+	)
 end
 
 -- Functions to check through all addons for dependants.
@@ -558,7 +567,7 @@ end
 -- Cleans up boot codes for removed addons and prompts for deletion of their
 -- configurations.
 function cleanUpAddOnData()
-	if (not StubbyConfig.boots) then return; end
+	if (not StubbyConfig.boots) then return end
 
 	for b in pairs(StubbyConfig.boots) do
 		local _,title = GetAddOnInfo(b)
@@ -566,19 +575,19 @@ function cleanUpAddOnData()
 			StubbyConfig.boots[b] = nil
 
 			if (StubbyConfig.configs) then
-				if (cleanList == nil) then cleanList = {}; end
+				if (cleanList == nil) then cleanList = {} end
 				table.insert(cleanList, b)
 			end
 		end
 	end
 
-	if (cleanList) then cleanUpAddOnConfigs(); end
+	if (cleanList) then cleanUpAddOnConfigs() end
 end
 
 -- Shows confirmation dialogs to clean configuration for addons that have
 -- just been removed. Warning: Calls itself recursively until done.
 function cleanUpAddOnConfigs()
-	if (not cleanList) then return; end
+	if (not cleanList) then return end
 
 	local addonIndex = #cleanList
 	local addonName = cleanList[addonIndex]
@@ -595,15 +604,15 @@ function cleanUpAddOnConfigs()
 		button2 = "Keep",
 		OnAccept = function()
 			StubbyConfig.configs[addonName] = nil
-			cleanUpAddOnConfigs();
+			cleanUpAddOnConfigs()
 		end,
 		OnCancel = function()
-			cleanUpAddOnConfigs();
+			cleanUpAddOnConfigs()
 		end,
 		timeout = 0,
 		whileDead = 1,
-	};
-	StaticPopup_Show("CLEANUP_STUBBY" .. addonIndex, "","");
+	}
+	StaticPopup_Show("CLEANUP_STUBBY" .. addonIndex, "","")
 end
 
 function shouldInspectAddOn(addonName)
@@ -669,13 +678,13 @@ end
 
 function onLoaded()
 	if (not (type(StubbyConfig) == "table")) then
-		StubbyConfig = {};
+		StubbyConfig = {}
 	end
 	if (not StubbyConfig.inspected) then
-		StubbyConfig.inspected = {};
+		StubbyConfig.inspected = {}
 	end
 	if (not StubbyConfig.addinfo) then
-		StubbyConfig.addinfo = {};
+		StubbyConfig.addinfo = {}
 	end
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Stubby", onWorldStart)
 end
