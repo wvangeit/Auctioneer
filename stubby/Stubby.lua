@@ -291,7 +291,7 @@ function hookCall(funcName, ...)
 						a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
 							addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20];
 					end
-					]]
+					--]]
 				end
 			else
 				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
@@ -310,10 +310,7 @@ function hookCall(funcName, ...)
 		end
 	end
 	if (returns) then
-		-- unpack() stops at the first nil value. That causes a problem for
-		-- hooking methods such as GetInboxText() where the first value is
-		-- often nil, but others following it are not.
-		return retVal[1], retVal[2], retVal[3], retVal[4], retVal[5], retVal[6], retVal[7], retVal[8], retVal[9], retVal[10], retVal[11], retVal[12], retVal[13], retVal[14], retVal[15], retVal[16], retVal[17], retVal[18], retVal[19], retVal[20];
+		return unpack(retVal, 1, table.maxn(retVal));
 	end
 end
 
