@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 INFORMANT_VERSION = "<%version%>"
 if (INFORMANT_VERSION == "<".."%version%>") then
@@ -51,7 +51,6 @@ local getFilter				-- getFilter(filter)
 local getFilterVal			-- getFilterVal(type)
 local getItem				-- getItem(itemID)
 local getRowCount			-- getRowCount()
-local nilSafeString			-- nilSafeString(String)
 local onEvent				-- onEvent(event)
 local onLoad				-- onLoad()
 local onVariablesLoaded		-- onVariablesLoaded()
@@ -66,9 +65,7 @@ local setVendors			-- setVendors(vendors)
 local showHideInfo			-- showHideInfo()
 local skillToName			-- skillToName(userSkill)
 local split					-- split(str, at)
-local tooltipHandler		-- tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 -- local getKeyBindProfile			-- getKeyBindProfile()
-local whitespace			-- whitespace(length)
 
 -- LOCAL VARIABLES
 
@@ -111,6 +108,7 @@ local filterDefaults = {
 	['show-quest'] = 'on',
 	['show-icon'] = 'on',
 	['show-ilevel'] = 'on',
+	['show-link'] = 'on',
 };
 
 -- FUNCTION DEFINITIONS
@@ -250,9 +248,9 @@ function getItem(itemID)
 			if (not dataItem.quests[questID]) then
 				questName = Babylonian.GetString(InformantQuests.names, questID)
 				dataItem.quests[questID] = {
-					['count'] = questCount,
-					['name'] = questName,
-					['level'] = tonumber(InformantQuests.levels[questID])
+					count = questCount,
+					name = questName,
+					level = tonumber(InformantQuests.levels[questID])
 				}
 				dataItem.questCount = dataItem.questCount + 1
 			end
@@ -265,8 +263,8 @@ function getItemBasic(itemID)
 	if (not itemID) then return end
 	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
 
-	if (sName) then
-		local dataItem = {
+	if (itemName) then
+		return {
 			classText = itemType,
 			quality = itemQuality,
 			stack = itemStackSize,
@@ -275,7 +273,6 @@ function getItemBasic(itemID)
 			itemLevel = itemLevel,
 			fullData = false,
 		}
-		return dataItem
 	end
 end
 
@@ -346,170 +343,6 @@ function getCatName(catID)
 			return name
 		end
 	end
-end
-
-
-function tooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
-	-- nothing to do, if informant is disabled
-	if (not getFilter('all')) then
-		return;
-	end;
-
-	if EnhTooltip.LinkType(link) ~= "item" then return end
-
-	local quant = 0
-	local sell = 0
-	local buy = 0
-	local stacks = 1
-
-	local itemID, randomProp, enchant, uniqID, name = EnhTooltip.BreakLink(link)
-	if (itemID and itemID > 0) and (Informant) then
-		itemInfo = getItem(itemID)
-	end
-	if (not itemInfo) then return end
-
-	itemInfo.itemName = name
-	itemInfo.itemLink = link
-	itemInfo.itemCount = count
-	itemInfo.itemQuality = quality
-
-	stacks = itemInfo.stack
-	if (not stacks) then stacks = 1 end
-
-	buy = tonumber(itemInfo.buy) or 0
-	sell = tonumber(itemInfo.sell) or 0
-	quant = tonumber(itemInfo.quantity) or 0
-
-	if (quant == 0) and (sell > 0) then
-		local ratio = buy / sell
-		if ((ratio > 3) and (ratio < 6)) then
-			quant = 1
-		else
-			ratio = buy / (sell * 5)
-			if ((ratio > 3) and (ratio < 6)) then
-				quant = 5
-			end
-		end
-	end
-	if (quant == 0) then quant = 1 end
-
-	buy = buy/quant
-
-	itemInfo.itemBuy = buy
-	itemInfo.itemSell = sell
-	itemInfo.itemQuant = quant
-
-	local embedded = getFilter('embed')
-
-	if (getFilter('show-icon')) then
-		if (itemInfo.texture) then
-			EnhTooltip.SetIcon(itemInfo.texture)
-		end
-	end
-
-	if (getFilter('show-ilevel')) then
-		if (itemInfo.itemLevel) then
-			EnhTooltip.AddLine(_INFM('FrmtInfoItemLevel'):format(itemInfo.itemLevel), nil, embedded)
-			EnhTooltip.LineColor(0.8, 0.5, 0.1)
-		end
-	end
-
-	if (getFilter('show-vendor')) then
-		if ((buy > 0) or (sell > 0)) then
-			local bgsc = EnhTooltip.GetTextGSC(buy, true)
-			local sgsc = EnhTooltip.GetTextGSC(sell, true)
-
-			if (count and (count > 1)) then
-				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoBuymult'):format(count, bgsc), buy*count, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
-				end
-				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoSellmult'):format(count, sgsc), sell*count, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
-				end
-			else
-				if (getFilter('show-vendor-buy')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoBuy'):format(), buy, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
-				end
-				if (getFilter('show-vendor-sell')) then
-					EnhTooltip.AddLine(_INFM('FrmtInfoSell'):format(), sell, embedded, true)
-					EnhTooltip.LineColor(0.8, 0.5, 0.1)
-				end
-			end
-		end
-	end
-
-	if (getFilter('show-stack')) then
-		if (stacks > 1) then
-			EnhTooltip.AddLine(_INFM('FrmtInfoStx'):format(stacks), nil, embedded)
-		end
-	end
-	if (getFilter('show-merchant')) then
-		if (itemInfo.vendors) then
-			local merchantCount = #itemInfo.vendors
-			if (merchantCount > 0) then
-				EnhTooltip.AddLine(_INFM('FrmtInfoMerchants'):format(merchantCount), nil, embedded)
-				EnhTooltip.LineColor(0.5, 0.8, 0.5)
-			end
-		end
-	end
-	if (getFilter('show-usage')) then
-		local reagentInfo = ""
-		if (itemInfo.classText) then
-			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
-			EnhTooltip.AddLine(reagentInfo, nil, embedded)
-			EnhTooltip.LineColor(0.6, 0.4, 0.8)
-		end
-		if (itemInfo.usedList and itemInfo.usageText) then
-			if (#itemInfo.usedList > 2) then
-
-				local currentUseLine = nilSafeString(itemInfo.usedList[1])..", "..nilSafeString(itemInfo.usedList[2])..","
-				reagentInfo = _INFM('FrmtInfoUse'):format(currentUseLine)
-				EnhTooltip.AddLine(reagentInfo, nil, embedded)
-				EnhTooltip.LineColor(0.6, 0.4, 0.8)
-
-				for index = 3, #itemInfo.usedList, 2 do
-					if (itemInfo.usedList[index+1]) then
-						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])..", "..nilSafeString(itemInfo.usedList[index+1])..","
-						EnhTooltip.AddLine(reagentInfo, nil, embedded)
-						EnhTooltip.LineColor(0.6, 0.4, 0.8)
-					else
-						reagentInfo = whitespace(#_INFM('FrmtInfoUse') + 3)..nilSafeString(itemInfo.usedList[index])
-						EnhTooltip.AddLine(reagentInfo, nil, embedded)
-						EnhTooltip.LineColor(0.6, 0.4, 0.8)
-					end
-				end
-			else
-				reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
-				EnhTooltip.AddLine(reagentInfo, nil, embedded)
-				EnhTooltip.LineColor(0.6, 0.4, 0.8)
-			end
-		end
-	end
-	if (getFilter('show-quest')) then
-		if (itemInfo.quests) then
-			local questCount = itemInfo.questCount
-			if (questCount > 0) then
-				EnhTooltip.AddLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embedded)
-				EnhTooltip.LineColor(0.5, 0.5, 0.8)
-			end
-		end
-	end
-end
-
-function nilSafeString(str)
-	if (not str) then str = "" end
-	return str;
-end
-
-function whitespace(length)
-	local spaces = ""
-	for index = length, 0, -1 do
-		spaces = spaces.." "
-	end
-	return spaces
 end
 
 function showHideInfo()
@@ -610,18 +443,13 @@ end
 function onLoad()
 	this:RegisterEvent("ADDON_LOADED")
 
-	if (not InformantConfig) then
-		InformantConfig = {}
-		setFilterDefaults()
-	end
-
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
 --	Informant.InitTrades();
 end
 
 local function frameLoaded()
 	Stubby.RegisterEventHook("PLAYER_LEAVING_WORLD", "Informant", onQuit)
-	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, tooltipHandler)
+	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 300, Informant.TooltipHandler)
 
 	onLoad()
 
@@ -674,6 +502,9 @@ local function frameLoaded()
 end
 
 function onVariablesLoaded()
+	if (not InformantConfig) then
+		InformantConfig = {}
+	end
 	setFilterDefaults()
 
 	InformantFrameTitle:SetText(_INFM('FrameTitle'))
@@ -703,7 +534,7 @@ function onVariablesLoaded()
 		end
 	end
 	this:RegisterEvent("UPDATE_BINDINGS")	-- Monitor changes to bindings
- ]]
+--]]
 	Informant.InitCommands()
 end
 
@@ -723,7 +554,7 @@ function onEvent(event, addon)
 
 		InformantConfig.bindings[profile][1] = key1;
 		InformantConfig.bindings[profile][2] = key2;
-	 ]]
+	--]]
 	end
 end
 
@@ -845,7 +676,7 @@ function getKeyBindProfile()
 	end
 	return 'global'
 end
- ]]
+--]]
 -- GLOBAL OBJECT
 
 Informant = {

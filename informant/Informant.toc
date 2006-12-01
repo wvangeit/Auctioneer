@@ -17,6 +17,7 @@ InfLocale.lua
 
 Informant.lua
 InfCommand.lua
+InfTooltip.lua
 ## InfTrades.lua
 InfQuests.lua
 InfData.lua

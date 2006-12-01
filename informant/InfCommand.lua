@@ -28,7 +28,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -- function prototypes
 local commandHandler, cmdHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, cmdLocale, setLocale, isValidLocale
@@ -84,6 +84,8 @@ function buildCommandMap()
 		[_INFM('CmdDefault')]		=	'default',
 		[_INFM('CmdEmbed')]			=	'embed',
 		[_INFM('ShowIcon')]			=	'show-icon',
+		[_INFM('ShowILevel')]		=	'show-ilevel',
+		[_INFM('ShowLink')]			=	'show-link',
 		[_INFM('ShowStack')]		=	'show-stack',
 		[_INFM('ShowUsage')]		=	'show-usage',
 		[_INFM('ShowQuest')]		=	'show-quest',
@@ -110,7 +112,7 @@ function commandHandler(command, source)
 	end
 
 	--Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local cmd, param = command:match("^(%w+)%s*(.*)$")
+	local cmd, param = command:match("^([%w%-]+)%s*(.*)$")
 
 	cmd = cmd or command or ""
 	param = param or ""
@@ -134,9 +136,12 @@ function commandHandler(command, source)
 		setLocale(param, chatprint)
 	elseif (cmd == "default") then
 		restoreDefault(param, chatprint)
-	elseif (cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
-			cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
-			cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon") then
+	elseif (
+		cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
+		cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
+		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon" or
+		cmd == "show-ilevel" or cmd == "show-link"
+	) then
 		genVarSet(cmd, param, chatprint)
 	else
 		if (chatprint) then
@@ -163,6 +168,8 @@ function cmdHelp()
 	chatPrint(lineFormat:format(_INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
 	chatPrint(lineFormat:format(_INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
 	chatPrint(lineFormat:format(_INFM('ShowIcon'), getLocalizedFilterVal('show-icon'), _INFM('HelpIcon')))
+	chatPrint(lineFormat:format(_INFM('ShowILevel'), getLocalizedFilterVal('show-ilevel'), _INFM('HelpILevel')))
+	chatPrint(lineFormat:format(_INFM('ShowLink'), getLocalizedFilterVal('show-link'), _INFM('HelpLink')))
 	chatPrint(lineFormat:format(_INFM('CmdEmbed'), getLocalizedFilterVal('embed'), _INFM('HelpEmbed')))
 
 	lineFormat = "  |cffffffff/informant %s %s|r |cffff4020[%s]|r - %s"
@@ -377,6 +384,56 @@ function registerKhaos()
 						return _INFM('FrmtActEnable'):format(_INFM('ShowIcon'))
 					else
 						return _INFM('FrmtActDisable'):format(_INFM('ShowIcon'))
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
+			{
+				id="show-ilevel";
+				type=K_TEXT;
+				text=function()
+					return _INFM('GuiInfoILevel')
+				end;
+				helptext=function()
+					return _INFM('HelpILevel')
+				end;
+				callback=function(state)
+					genVarSet("show-icon", state.checked)
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _INFM('FrmtActEnable'):format(_INFM('ShowILevel'))
+					else
+						return _INFM('FrmtActDisable'):format(_INFM('ShowILevel'))
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
+			{
+				id="show-link";
+				type=K_TEXT;
+				text=function()
+					return _INFM('GuiInfoLink')
+				end;
+				helptext=function()
+					return _INFM('HelpLink')
+				end;
+				callback=function(state)
+					genVarSet("show-icon", state.checked)
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _INFM('FrmtActEnable'):format(_INFM('ShowLink'))
+					else
+						return _INFM('FrmtActDisable'):format(_INFM('ShowLink'))
 					end
 				end;
 				check=true;

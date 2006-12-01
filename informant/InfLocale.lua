@@ -44,7 +44,6 @@ function _INFM(stringKey, locale)
 	elseif (Informant_CustomLocalizations[stringKey]) then
 		return Babylonian.FetchString(InformantLocalizations, Informant_CustomLocalizations[stringKey])
 	else
-		return Babylonian.GetString(InformantLocalizations, stringKey)
+		return Babylonian.GetString(InformantLocalizations, stringKey) or stringKey
 	end
 end
-
