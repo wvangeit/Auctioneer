@@ -402,7 +402,7 @@ function registerKhaos()
 					return _INFM('HelpILevel')
 				end;
 				callback=function(state)
-					genVarSet("show-icon", state.checked)
+					genVarSet("show-ilevel", state.checked)
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -427,7 +427,7 @@ function registerKhaos()
 					return _INFM('HelpLink')
 				end;
 				callback=function(state)
-					genVarSet("show-icon", state.checked)
+					genVarSet("show-link", state.checked)
 				end;
 				feedback=function(state)
 					if (state.checked) then

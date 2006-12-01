@@ -101,7 +101,7 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 	end
 
 	if (getFilter('show-link')) then
-		EnhTooltip.AddHeaderLine(_INFM('FrmtInfoItemLink'):format((":"):join(itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus, randomProp, uniqID), nil, embedded)
+		EnhTooltip.AddHeaderLine(_INFM('FrmtInfoItemLink'):format((":"):join(itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus, randomProp, uniqID), nil, embedded))
 		EnhTooltip.HeaderQuality(itemInfo.itemQuality)
 	end
 
