@@ -40,6 +40,9 @@ local load;
 local onEventHook;
 local prePlaceAuctionBidHook;
 local placeAuctionBid;
+local showingConfirmation;
+local bidConfirmed;
+local getBidAmmount
 local isBidAllowed;
 local isBidInProgress;
 local addPendingBid;
@@ -59,6 +62,13 @@ local PendingBids = {};
 -- unhooks the method.
 local hookPlaceAuctionBid = true;
 
+-- True if the confirmation popup is showing, false otherwise
+local showingConfirmationFlag = false;
+
+-- The following variables are used to temporarily store the information
+-- of the bid/buyout awaiting confirmation
+local currentListType, currentIndex, currentBid, currentCallbackFunc
+
 -------------------------------------------------------------------------------
 -- Constants
 -------------------------------------------------------------------------------
@@ -72,6 +82,32 @@ BidResultCodes = {
 	MaxItemCount = "MaxItemCount";
 	BidSent = "BidSent";
 }
+
+StaticPopupDialogs["AUCTIONEER_BIDORBUYOUT_AUCTION"] = {
+	text = BUYOUT_AUCTION_CONFIRMATION,
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	OnAccept = function()
+		--Bid was confirmed
+		Auctioneer.BidManager.BidConfirmed()
+	end,
+	OnShow = function()
+		--Modify CanSendAuctionQuery() return value
+		Auctioneer.BidManager.ShowingConfirmation(true)
+
+		--Update money field
+		MoneyFrame_Update(this:GetName().."MoneyFrame", Auctioneer.BidManager.GetBidAmmount());
+	end,
+	OnHide = function()
+		--Restore CanSendAuctionQuery()'s return value
+		Auctioneer.BidManager.ShowingConfirmation(false)
+	end,
+	hasMoneyFrame = 1,
+	showAlert = 1,
+	timeout = 0,
+	exclusive = 1,
+	hideOnEscape = 1
+};
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -113,6 +149,7 @@ function prePlaceAuctionBidHook(_, _, listType, index, bid)
 		if (isBidAllowed(listType, index)) then
 			-- Add the pending bid to the list.
 			addPendingBid(listType, index, bid, nil);
+			currentListType, currentIndex, currentBid, currentCallbackFunc = listType, index, bid, nil;
 		else
 			debugPrint("prePlaceAuctionBidHook() - Bid not allowed");
 			return "abort";
@@ -126,14 +163,46 @@ end
 -------------------------------------------------------------------------------
 function placeAuctionBid(listType, index, bid, callbackFunc)
 	if (isBidAllowed(listType, index)) then
-		-- Add the pending bid to the list and fire off the bid request.
-		addPendingBid(listType, index, bid, callbackFunc);
-		hookPlaceAuctionBid = false;
-		PlaceAuctionBid(listType, index, bid);
-		hookPlaceAuctionBid = true;
+		-- Store the pending bid's info and show the confirmation dialog.
+		currentListType, currentIndex, currentBid, currentCallbackFunc = listType, index, bid, callbackFunc;
+
+		local itemLink = GetAuctionItemLink(listType, index)
+		local _, _, count, _, _, _, _, _, buyoutPrice = GetAuctionItemInfo(listType, index);
+		local action
+
+		if (bid and (bid >= buyoutPrice)) then
+			action = BUYOUT:lower()
+		else
+			action = BID:lower()
+		end
+
+		StaticPopupDialogs.AUCTIONEER_BIDORBUYOUT_AUCTION.text = _AUCT("ConfirmBidBuyout"):format(action, count, itemLink)
+		StaticPopup_Show("AUCTIONEER_BIDORBUYOUT_AUCTION");
 	else
 		debugPrint("placeAuctionBid() - Bid not allowed");
 	end
+end
+
+-------------------------------------------------------------------------------
+-- Helper functions to the staticPopup
+-------------------------------------------------------------------------------
+function showingConfirmation(state)
+	if (state == nil) then
+		return showingConfirmationFlag;
+	else
+		showingConfirmationFlag = state;
+	end
+end
+
+function bidConfirmed()
+	addPendingBid(currentListType, currentIndex, currentBid, currentCallbackFunc);
+	hookPlaceAuctionBid = false;
+	PlaceAuctionBid(currentListType, currentIndex, currentBid);
+	hookPlaceAuctionBid = true;
+end
+
+function getBidAmmount()
+	return currentBid
 end
 
 -------------------------------------------------------------------------------
@@ -266,5 +335,9 @@ Auctioneer.BidManager = {
 	IsBidInProgress = isBidInProgress;
 	IsBidAllowed = isBidAllowed;
 	PlaceAuctionBid = placeAuctionBid;
+	BidConfirmed = bidConfirmed;
+	ShowingConfirmation = showingConfirmation;
+	GetBidAmmount = getBidAmmount;
+	AddPendingBid = addPendingBid;
 }
 

@@ -1605,6 +1605,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Are you sure you want to %s\n%dx%s for:";
 		DisableMsg	= "Disabling automatic loading of Auctioneer";
 		FrmtWelcome	= "Auctioneer v%s loaded";
 		MesgNotLoaded	= "Auctioneer is not loaded. Type /auctioneer for more info.";
@@ -2052,6 +2053,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Estas seguro de que quieres %s\n%dx%s por:";
 		DisableMsg	= "Deshabilitando la auto-carga de Auctioneer";
 		FrmtWelcome	= "Auctioneer versión %s cargada";
 		MesgNotLoaded	= "Auctioneer no esta cargado. Escriba /auctioneer para mas información.";

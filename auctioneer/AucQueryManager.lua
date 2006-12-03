@@ -218,10 +218,11 @@ end
 function onBidSent(event, auction, bid)
 	-- Only pay attention to bids with auction ids.
 	if (auction.auctionId) then
-		local bidInfo = {};
-		bidInfo.bid = bid;
-		bidInfo.receivedBidComplete = false;
-		bidInfo.receivedAuctionItemListUpdate = false;
+		local bidInfo = {
+			bid = bid;
+			receivedBidComplete = false;
+			receivedAuctionItemListUpdate = false;
+		};
 		PendingBidInfo[auction.auctionId] = bidInfo;
 		debugPrint("Added pending bid for auction", auction.auctionId);
 	else
@@ -264,6 +265,7 @@ end
 -- 3. There is a bid in progress.
 -- 4. The scan manager is performing a scan.
 -- 5. The bid scanner is performing a scan.
+-- 6. The bid manager is showing the confirmation window.
 -------------------------------------------------------------------------------
 function postCanSendAuctionQuery(_, returnValues)
 	-- If Blizzard will allow the query, check if should allow it.
@@ -279,6 +281,9 @@ function postCanSendAuctionQuery(_, returnValues)
 			return "setreturn", { false };
 		elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
 			--debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
+			return "setreturn", { false };
+		elseif (hookCanSendAuctionQuery and Auctioneer.BidManager.ShowingConfirmation()) then
+			--debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown");
 			return "setreturn", { false };
 		end
 	end
@@ -525,12 +530,13 @@ function onAuctionItemListUpdate()
 		local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 
 		-- Update the current page.
-		CurrentPage = {};
-		CurrentPage.query = request.parameters;
-		CurrentPage.pageNum = request.parameters.page;
-		CurrentPage.lastSeen = time();
-		CurrentPage.auctions = updatedAuctions;
-		CurrentPage.isLastPage = false;
+		CurrentPage = {
+			query = request.parameters;
+			pageNum = request.parameters.page;
+			lastSeen = time();
+			auctions = updatedAuctions;
+			isLastPage = false;
+		};
 		if (lastIndexOnPage == 0) then
 			CurrentPage.isLastPage = true;
 		elseif (CurrentPage.pageNum * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
@@ -876,8 +882,9 @@ function getAuctionByIndex(listType, index)
 	local auction;
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 	if (index >= 0 and index <= lastIndexOnPage) then
-		auction = {};
-		auction.ahKey = Auctioneer.Util.GetAuctionKey();
+		auction = {
+			ahKey = Auctioneer.Util.GetAuctionKey();
+		};
 
 		-- Get the item link and decompose it.
 		local itemLink = GetAuctionItemLink(listType, index);

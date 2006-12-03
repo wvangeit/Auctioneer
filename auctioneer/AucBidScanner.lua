@@ -147,9 +147,10 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
 	if (itemInfo) then
 		-- Construct a query that will find this item.
-		local query = {};
-		query.name = itemInfo.name;
-		query.page = 0;
+		local query = {
+			name = itemInfo.name;
+			page = 0;
+		};
 
 		-- Construct a filter function that will only match the auction in
 		-- question.
