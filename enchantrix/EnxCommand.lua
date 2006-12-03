@@ -80,7 +80,7 @@ end
 
 function getKhaosLocaleList()
 	local options = { [_ENCH('CmdDefault')] = 'default' };
-	for locale, data in EnchantrixLocalizations do
+	for locale, data in pairs(EnchantrixLocalizations) do
 		options[locale] = locale;
 	end
 	return options

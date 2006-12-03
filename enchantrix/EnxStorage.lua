@@ -72,7 +72,7 @@ function addonLoaded()
 
 	if not EnchantConfig.zomgBlizzardAreMeanies then
 		-- Push disenchant reagents into cache if needed
-		for id in Enchantrix.Constants.StaticPrices do
+		for id in pairs(Enchantrix.Constants.StaticPrices) do
 			if not (Enchantrix.Util.GetReagentInfo(id)) then
 				EnchantConfig.zomgBlizzardAreMeanies = true
 				GameTooltip:SetHyperlink(string.format("item:%d:0:0:0", id))
@@ -158,7 +158,7 @@ end
 function cleanupDisenchant(str, id)
 	-- Remove reagents that don't appear in level rules table
 	if (type(str) == "string") and (id ~= nil) then
-		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
+		local _, _, quality, _, level, _, _, _, equip = GetItemInfo(id)
 		local itype = const.InventoryTypes[equip]
 		if quality and itype then
 			local tbl = unserialize(str)
@@ -189,7 +189,7 @@ function disenchantTotal(str)
 	-- Return total number of disenchants
 	local tot = 0
 	local tbl = unserialize(str)
-	for id in tbl do
+	for id in pairs(tbl) do
 		tot = tot + tbl[id][N_DISENCHANTS]
 	end
 	return tot
@@ -202,7 +202,7 @@ function disenchantListHash()
 	for sig, val in pairs(DisenchantList) do
 		id = Enchantrix.Util.GetItemIdFromSig(sig)
 		Enchantrix.State.MAX_ITEM_ID = math.max(Enchantrix.State.MAX_ITEM_ID, id or 0)
-		hash = math.mod(3 * hash + 2 * (id or 0) + string.len(val), 16777216)
+		hash = math.fmod(3 * hash + 2 * (id or 0) + #val, 16777216)
 	end
 	return hash
 end
@@ -277,7 +277,7 @@ end
 
 function saveLocal(sig, lData)
 	local str = "";
-	for eResult, eData in lData do
+	for eResult, eData in pairs(lData) do
 		eResult = tonumber(eResult)
 		if not eResult then
 			return
@@ -327,7 +327,7 @@ function getItemDisenchants(sig, name, useCache)
 	-- Automatically convert any named EnchantedLocal items to new items
 	if (name and EnchantedLocal[name]) then
 		local iData = getLocal(name)
-		for dName, count in iData do
+		for dName, count in pairs(iData) do
 			local link = Enchantrix.Util.GetLinkFromName(dName);
 			local dSig = Enchantrix.Util.GetItemIdFromLink(link)
 			if (dSig ~= nil) then

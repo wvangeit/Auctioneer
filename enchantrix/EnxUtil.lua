@@ -59,7 +59,7 @@ local createProfiler
 -- Return false if item id can't be disenchanted
 function isDisenchantable(id)
 	if (id) then
-		local _, _, quality, _, _, _, count, equip = GetItemInfo(id)
+		local _, _, quality, _, _, _, _, count, equip = GetItemInfo(id)
 		if (not quality) then
 			-- GetItemInfo() failed, item might be disenchantable
 			return true
@@ -92,7 +92,7 @@ function getReagentInfo(id)
 	end
 	id = tonumber(id)
 
-	local sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
+	local sName, sLink, iQuality, _, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
 	if id and Enchantrix.Constants.StaticPrices[id] then
 		if sName then
 			cache[id] = sName.."|"..iQuality.."|"..sTexture
@@ -194,7 +194,7 @@ end
 -- e.g. "20:2:Armor" for uncommon level 20 armor
 function getItemType(id)
 	if (id) then
-		local _, _, quality, level, _, _, _, equip = GetItemInfo(id)
+		local _, _, quality, _, level, _, _, _, equip = GetItemInfo(id)
 		if (quality and quality >= 2 and level > 0 and Enchantrix.Constants.InventoryTypes[equip]) then
 			return string.format("%d:%d:%s", Enchantrix.Util.RoundUp(level, 5), quality, Enchantrix.Constants.InventoryTypes[equip])
 		end
@@ -227,7 +227,7 @@ function getItems(str)
 	local itemList = {};
 	local itemKey;
 
-	for itemID, randomProp, enchant, uniqID in string.gfind(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
+	for itemID, randomProp, enchant, uniqID in string.gmatch(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
 		itemKey = itemID..":"..randomProp..":"..enchant;
 		table.insert(itemList, itemKey)
 	end
@@ -239,7 +239,7 @@ function getItemHyperlinks(str)
 	if (not str) then return nil end
 	local itemList = {};
 
-	for color, item, name in string.gfind(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
+	for color, item, name in string.gmatch(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
 		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
 	end
 	return itemList;
@@ -265,7 +265,7 @@ function split(str, at)
 		then table.insert(splut, str)
 
 	else
-		for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
+		for n, c in string.gmatch(str, '([^%'..at..']*)(%'..at..'?)') do
 			table.insert(splut, n);
 
 			if (c == '') then break end
@@ -324,7 +324,7 @@ function gcd(a, b)
 	-- Greatest Common Divisor, Euclidean algorithm
 	local m, n = tonumber(a), tonumber(b) or 0
 	while (n ~= 0) do
-		m, n = n, math.mod(m, n)
+		m, n = n, math.fmod(m, n)
 	end
 	return m
 end

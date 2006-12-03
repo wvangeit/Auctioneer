@@ -929,7 +929,7 @@ function EnchantrixBarker_RoundPrice( price )
 		round = 5000;
 	end
 
-	odd = math.mod(price,round);
+	odd = math.fmod(price,round);
 
 	price = price + (round - odd);
 
@@ -1022,7 +1022,7 @@ function EnchantrixBarker_AddEnchantToBarker( enchant )
 	category_string = EnchantrixBarker_GetBarkerCategoryString( test_category );
 
 
-	if string.len(currBarker) + string.len(category_string) > 255 then
+	if #currBarker + #category_string > 255 then
 		return false;
 	end
 
@@ -1126,7 +1126,7 @@ function Enchantrix_GetShortDescriptor( index )
 	end
 	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
 
-	return enchant[table.getn(enchant)];
+	return enchant[#enchant];
 end
 
 function EnchantrixBarker_GetEnchantStat( enchant )
@@ -1140,5 +1140,5 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 	end
 	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
 
-	return enchant[table.getn(enchant)];
+	return enchant[#enchant];
 end

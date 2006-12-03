@@ -316,7 +316,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		reagentList = getReagentsFromTooltip(frame)
 	end
 
-	if not reagentList or table.getn(reagentList) < 1 then
+	if not reagentList or (#reagentList < 1) then
 		return
 	end
 

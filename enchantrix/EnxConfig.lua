@@ -67,7 +67,7 @@ local perCharacterFilter = {
 
 function addonLoaded()
 	-- Remove unused/unknown filter values
-	for key in EnchantConfig.filters do
+	for key in pairs(EnchantConfig.filters) do
 		if getFilterDefaults(key) == nil then
 			setFilter(key, nil)
 		else
