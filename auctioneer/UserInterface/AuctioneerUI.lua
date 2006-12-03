@@ -36,7 +36,7 @@ local onEvent;
 local onAuctionUILoaded;
 local onAuctionHouseShow;
 local onAuctionHouseClose;
-local preContainerFrameItemButtonOnClickHook;
+local preContainerFrameItemButtonOnModifiedClickHook;
 local postPickupContainerItemHook;
 local getCursorContainerItem;
 local relevelFrame;
@@ -94,7 +94,7 @@ function onAuctionUILoaded()
 	-- Hook auction related functions and events we need locally.
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer_UI", onAuctionHouseClose);
 	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, onAuctionHouseShow);
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, preContainerFrameItemButtonOnClickHook);
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, preContainerFrameItemButtonOnModifiedClickHook);
 
 	-- Load Auctioneer's tabs.
 	Auctioneer.UI.BrowseTab.Load();
@@ -131,7 +131,7 @@ end
 -------------------------------------------------------------------------------
 -- Called before Blizzard's ContainerFrameItemButton_OnClick()
 -------------------------------------------------------------------------------
-function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button, ignoreShift)
+function preContainerFrameItemButtonOnModifiedClickHook(hookParams, returnValue, button, ignoreShift)
 	local bag = this:GetParent():GetID()
 	local slot = this:GetID()
 
