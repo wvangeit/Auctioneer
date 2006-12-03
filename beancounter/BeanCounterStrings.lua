@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://norganna.org/localizer/index.php
@@ -78,11 +78,11 @@ BeanCounterLocalizations = {
 		-- Section: Mail
 		MailAllianceAuctionHouse	= "Alliance Auktions Hus";
 		MailAuctionCancelledSubject	= "Auktion afbrudt";
-		MailAuctionExpiredSubject	= "Auktion udl\195\184bet";
+		MailAuctionExpiredSubject	= "Auktion udløbet";
 		MailAuctionSuccessfulSubject	= "Auktion succesfuld";
 		MailAuctionWonSubject	= "Auktion vundet";
 		MailHordeAuctionHouse	= "Horde Auktions Hus";
-		MailOutbidOnSubject	= "Overbudt p\195\165";
+		MailOutbidOnSubject	= "Overbudt på";
 
 
 		-- Section: User Interface
@@ -90,22 +90,22 @@ BeanCounterLocalizations = {
 		UiAuctionTransaction	= "Auktion";
 		UiBids	= "Bud";
 		UiBidTransaction	= "Byd";
-		UiBuyerSellerHeader	= "K\195\184ber/S\195\166lger";
-		UiBuyTransaction	= "K\195\184b";
+		UiBuyerSellerHeader	= "Køber/Sælger";
+		UiBuyTransaction	= "Køb";
 		UiDateHeader	= "Dato";
 		UiDepositTransaction	= "Indskud";
-		UiExactNameSearch	= "Eksakt navne-s\195\184gning";
+		UiExactNameSearch	= "Eksakt navne-søgning";
 		UiNameHeader	= "Item";
 		UiNetHeader	= "Net";
 		UiNetPerHeader	= "Net Per";
 		UiPriceHeader	= "Pris";
 		UiPricePerHeader	= "Styk Pris";
-		UiPurchases	= "K\195\184b";
+		UiPurchases	= "Køb";
 		UiQuantityHeader	= "Stk";
 		UiSales	= "Salg";
-		UiSearch	= "S\195\184g";
-		UiSearchForLabel	= "S\195\184g efter:";
-		UiSellTransaction	= "S\195\166lg";
+		UiSearch	= "Søg";
+		UiSearchForLabel	= "Søg efter:";
+		UiSellTransaction	= "Sælg";
 		UiTransactions	= "Transaktioner";
 		UiTransactionsLabel	= "Transaktioner:";
 		UiTransactionTypeHeader	= "Type";
@@ -122,7 +122,7 @@ BeanCounterLocalizations = {
 		MailAuctionSuccessfulSubject	= "Auktion erfolgreich";
 		MailAuctionWonSubject	= "Auktion gewonnen";
 		MailHordeAuctionHouse	= "Auktionshaus der Horde";
-		MailOutbidOnSubject	= "H\195\182heres Gebot f\195\188r";
+		MailOutbidOnSubject	= "Höheres Gebot für";
 
 
 		-- Section: User Interface
@@ -130,7 +130,7 @@ BeanCounterLocalizations = {
 		UiAuctionTransaction	= "Auktion";
 		UiBids	= "Gebote";
 		UiBidTransaction	= "Gebot";
-		UiBuyerSellerHeader	= "K\195\164ufer/Verk\195\164ufer";
+		UiBuyerSellerHeader	= "Käufer/Verkäufer";
 		UiBuyTransaction	= "Kaufen";
 		UiDateHeader	= "Datum";
 		UiDepositTransaction	= "Anzahlung";
@@ -139,10 +139,10 @@ BeanCounterLocalizations = {
 		UiNetHeader	= "Netz";
 		UiNetPerHeader	= "Netz pro";
 		UiPriceHeader	= "Preis";
-		UiPricePerHeader	= "Preis\195\188berschrift";
-		UiPurchases	= "Eink\195\164ufe";
+		UiPricePerHeader	= "Preisüberschrift";
+		UiPurchases	= "Einkäufe";
 		UiQuantityHeader	= "Anz";
-		UiSales	= "Verk\195\164ufe";
+		UiSales	= "Verkäufe";
 		UiSearch	= "Suche";
 		UiSearchForLabel	= "Suche nach:";
 		UiSellTransaction	= "Verkaufen";
@@ -212,10 +212,10 @@ BeanCounterLocalizations = {
 		UiBidTransaction	= "Oferta";
 		UiBuyerSellerHeader	= "Comrador/Vendedor";
 		UiBuyTransaction	= "Compra";
-		UiDateHeader	= "D\195\173a";
-		UiDepositTransaction	= "Dep\195\179sito";
-		UiExactNameSearch	= "B\195\186squeda de nombre exacto";
-		UiNameHeader	= "Art\195\173culo";
+		UiDateHeader	= "Día";
+		UiDepositTransaction	= "Depósito";
+		UiExactNameSearch	= "Búsqueda de nombre exacto";
+		UiNameHeader	= "Artículo";
 		UiNetHeader	= "Neto";
 		UiNetPerHeader	= "Neto c/u";
 		UiPriceHeader	= "Precio";
@@ -223,11 +223,11 @@ BeanCounterLocalizations = {
 		UiPurchases	= "Compras";
 		UiQuantityHeader	= "Cta.";
 		UiSales	= "Ventas";
-		UiSearch	= "B\195\186squedas";
+		UiSearch	= "Búsquedas";
 		UiSearchForLabel	= "Buscar por:";
 		UiSellTransaction	= "Vender";
-		UiTransactions	= "Transacci\195\179nes";
-		UiTransactionsLabel	= "Transacci\195\179nes:";
+		UiTransactions	= "Transacciónes";
+		UiTransactionsLabel	= "Transacciónes:";
 		UiTransactionTypeHeader	= "Tipo";
 
 	};
@@ -236,24 +236,24 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "H\195\180tel des ventes de l'Alliance";
-		MailAuctionCancelledSubject	= "Vente annul\195\169e ";
-		MailAuctionExpiredSubject	= "Vente aux ench\195\168res termin\195\169e ";
-		MailAuctionSuccessfulSubject	= "Vente aux ench\195\168res r\195\169ussie ";
-		MailAuctionWonSubject	= "Vente gagn\195\169e ";
-		MailHordeAuctionHouse	= "H\195\180tel des ventes de la Horde";
+		MailAllianceAuctionHouse	= "Hôtel des ventes de l'Alliance";
+		MailAuctionCancelledSubject	= "Vente annulée ";
+		MailAuctionExpiredSubject	= "Vente aux enchères terminée ";
+		MailAuctionSuccessfulSubject	= "Vente aux enchères réussie ";
+		MailAuctionWonSubject	= "Vente gagnée ";
+		MailHordeAuctionHouse	= "Hôtel des ventes de la Horde";
 		MailOutbidOnSubject	= "Augmenter l'offre pour";
 
 
 		-- Section: User Interface
-		UiAuctions	= "Ench\195\168res";
-		UiAuctionTransaction	= "Ench\195\168re";
+		UiAuctions	= "Enchères";
+		UiAuctionTransaction	= "Enchère";
 		UiBids	= "Offres";
 		UiBidTransaction	= "Offre";
 		UiBuyerSellerHeader	= "Acheteur/Vendeur";
 		UiBuyTransaction	= "Acheter";
 		UiDateHeader	= "Date";
-		UiDepositTransaction	= "D\195\169p\195\180t";
+		UiDepositTransaction	= "Dépôt";
 		UiExactNameSearch	= "Nom exact";
 		UiNameHeader	= "Objet";
 		UiNetHeader	= "Net";
@@ -301,7 +301,7 @@ BeanCounterLocalizations = {
 		UiPriceHeader	= "Prezzo";
 		UiPricePerHeader	= "Prezzo per";
 		UiPurchases	= "Compere";
-		UiQuantityHeader	= "Q.t\195\160";
+		UiQuantityHeader	= "Q.tà";
 		UiSales	= "Vendite";
 		UiSearch	= "Ricerca";
 		UiSearchForLabel	= "Cerca per:";
@@ -316,39 +316,39 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "\236\150\188\235\157\188\236\157\180\236\150\184\236\138\164 \234\178\189\235\167\164\236\158\165";
-		MailAuctionCancelledSubject	= "\234\178\189\235\167\164 \236\183\168\236\134\140";
-		MailAuctionExpiredSubject	= "\234\178\189\235\167\164 \235\167\140\235\163\140";
-		MailAuctionSuccessfulSubject	= "\234\178\189\235\167\164 \236\153\132\235\163\140";
-		MailAuctionWonSubject	= "\234\178\189\235\167\164\237\146\136 \235\130\153\236\176\176";
-		MailHordeAuctionHouse	= "\237\152\184\235\147\156 \234\178\189\235\167\164\236\158\165";
-		MailOutbidOnSubject	= "\235\179\180\235\139\164 \235\134\146\236\157\128 \234\176\128\234\178\169\236\157\180 \236\160\156\236\139\156\235\144\168";
+		MailAllianceAuctionHouse	= "얼라이언스 경매장";
+		MailAuctionCancelledSubject	= "경매 취소";
+		MailAuctionExpiredSubject	= "경매 만료";
+		MailAuctionSuccessfulSubject	= "경매 완료";
+		MailAuctionWonSubject	= "경매 낙찰";
+		MailHordeAuctionHouse	= "호드 경매장";
+		MailOutbidOnSubject	= "보다 높은 가격이 제시됨";
 
 
 		-- Section: User Interface
-		UiAuctions	= "\234\178\189\235\167\164\237\146\136";
-		UiAuctionTransaction	= "\234\178\189\235\167\164";
-		UiBids	= "\236\158\133\236\176\176\237\146\136";
-		UiBidTransaction	= "\236\158\133\236\176\176";
-		UiBuyerSellerHeader	= "\234\181\172\235\167\164\236\158\144/\237\140\144\235\167\164\236\158\144";
-		UiBuyTransaction	= "\234\181\172\236\158\133";
-		UiDateHeader	= "\235\130\160\236\167\156";
-		UiDepositTransaction	= "\235\179\180\236\166\157\234\184\136";
-		UiExactNameSearch	= "\236\160\149\237\153\149\237\149\156 \236\157\180\235\166\132 \236\176\190\234\184\176";
-		UiNameHeader	= "\236\149\132\236\157\180\237\133\156";
-		UiNetHeader	= "\237\149\173\235\170\169";
-		UiNetPerHeader	= "\237\149\173\235\170\169\235\130\180\236\154\169";
-		UiPriceHeader	= "\234\176\128\234\178\169";
-		UiPricePerHeader	= "\234\176\128\234\178\169 \237\149\173\235\170\169";
-		UiPurchases	= "\234\181\172\236\158\133";
-		UiQuantityHeader	= "\236\136\152\235\159\137";
-		UiSales	= "\237\140\144\235\167\164";
-		UiSearch	= "\234\178\128\236\131\137";
-		UiSearchForLabel	= "\234\178\128\236\131\137:";
-		UiSellTransaction	= "\237\140\144\235\167\164";
-		UiTransactions	= "\234\177\176\235\158\152";
-		UiTransactionsLabel	= "\234\177\176\235\158\152:";
-		UiTransactionTypeHeader	= "\237\152\149\236\139\157";
+		UiAuctions	= "경매품";
+		UiAuctionTransaction	= "경매";
+		UiBids	= "입찰품";
+		UiBidTransaction	= "입찰";
+		UiBuyerSellerHeader	= "구매자/판매자";
+		UiBuyTransaction	= "구입";
+		UiDateHeader	= "날짜";
+		UiDepositTransaction	= "보증금";
+		UiExactNameSearch	= "정확한 이름 찾기";
+		UiNameHeader	= "아이템";
+		UiNetHeader	= "항목";
+		UiNetPerHeader	= "항목내용";
+		UiPriceHeader	= "가격";
+		UiPricePerHeader	= "가격 항목";
+		UiPurchases	= "구입";
+		UiQuantityHeader	= "수량";
+		UiSales	= "판매";
+		UiSearch	= "검색";
+		UiSearchForLabel	= "검색:";
+		UiSellTransaction	= "판매";
+		UiTransactions	= "거래";
+		UiTransactionsLabel	= "거래:";
+		UiTransactionTypeHeader	= "형식";
 
 	};
 
@@ -396,38 +396,38 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "Leil\195\163o da Alliance";
-		MailAuctionCancelledSubject	= "Leil\195\163o Cancelado";
-		MailAuctionExpiredSubject	= "Leil\195\163o Expirou";
-		MailAuctionSuccessfulSubject	= "Leil\195\163o Bem Sucedido";
-		MailAuctionWonSubject	= "Leil\195\163o Ganho";
-		MailHordeAuctionHouse	= "Leil\195\163o da Horde";
+		MailAllianceAuctionHouse	= "Leilão da Alliance";
+		MailAuctionCancelledSubject	= "Leilão Cancelado";
+		MailAuctionExpiredSubject	= "Leilão Expirou";
+		MailAuctionSuccessfulSubject	= "Leilão Bem Sucedido";
+		MailAuctionWonSubject	= "Leilão Ganho";
+		MailHordeAuctionHouse	= "Leilão da Horde";
 		MailOutbidOnSubject	= "Sobrebidado em";
 
 
 		-- Section: User Interface
-		UiAuctions	= "Leil\195\181es";
-		UiAuctionTransaction	= "Leil\195\163o";
+		UiAuctions	= "Leilões";
+		UiAuctionTransaction	= "Leilão";
 		UiBids	= "Ofertas";
 		UiBidTransaction	= "Oferta";
 		UiBuyerSellerHeader	= "Comprador/Vendedor";
 		UiBuyTransaction	= "Compra";
 		UiDateHeader	= "Data";
-		UiDepositTransaction	= "Dep\195\179sito";
+		UiDepositTransaction	= "Depósito";
 		UiExactNameSearch	= "Procura por nome exacto";
 		UiNameHeader	= "Objecto";
 		UiNetHeader	= "Rede";
 		UiNetPerHeader	= "Rede por";
-		UiPriceHeader	= "Pre\195\167o";
-		UiPricePerHeader	= "Cabe\195\167alho de Pre\195\167o";
+		UiPriceHeader	= "Preço";
+		UiPricePerHeader	= "Cabeçalho de Preço";
 		UiPurchases	= "Compras";
 		UiQuantityHeader	= "Qtn";
 		UiSales	= "Vendas";
 		UiSearch	= "Procura";
 		UiSearchForLabel	= "Procurar por:";
 		UiSellTransaction	= "Vender";
-		UiTransactions	= "Transac\195\167\195\181es";
-		UiTransactionsLabel	= "Transac\195\167\195\181es";
+		UiTransactions	= "Transacções";
+		UiTransactionsLabel	= "Transacções";
 		UiTransactionTypeHeader	= "Tipo";
 
 	};
@@ -436,39 +436,39 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "\232\129\148\231\155\159\230\139\141\229\141\150\232\161\140";
-		MailAuctionCancelledSubject	= "\230\139\141\229\141\150\229\143\150\230\182\136";
-		MailAuctionExpiredSubject	= "\230\139\141\229\141\150\229\183\178\229\136\176\230\156\159";
-		MailAuctionSuccessfulSubject	= "\230\139\141\229\141\150\230\136\144\229\138\159";
-		MailAuctionWonSubject	= "\231\171\158\230\139\141\232\142\183\232\131\156";
-		MailHordeAuctionHouse	= "\233\131\168\232\144\189\230\139\141\229\141\150\232\161\140";
-		MailOutbidOnSubject	= "\229\135\186\228\187\183\232\162\171\229\142\139\232\191\135";
+		MailAllianceAuctionHouse	= "联盟拍卖行";
+		MailAuctionCancelledSubject	= "拍卖取消";
+		MailAuctionExpiredSubject	= "拍卖已到期";
+		MailAuctionSuccessfulSubject	= "拍卖成功";
+		MailAuctionWonSubject	= "竞拍获胜";
+		MailHordeAuctionHouse	= "部落拍卖行";
+		MailOutbidOnSubject	= "出价被压过";
 
 
 		-- Section: User Interface
-		UiAuctions	= "\230\139\141\229\141\150";
-		UiAuctionTransaction	= "\230\139\141\229\141\150";
-		UiBids	= "\229\135\186\228\187\183";
-		UiBidTransaction	= "\231\171\158\230\160\135";
-		UiBuyerSellerHeader	= "\228\185\176\228\184\187/\229\141\150\228\184\187";
-		UiBuyTransaction	= "\232\180\173\228\185\176";
-		UiDateHeader	= "\230\151\165\230\156\159";
-		UiDepositTransaction	= "\228\191\157\231\174\161\232\180\185";
-		UiExactNameSearch	= "\231\161\174\229\136\135\229\144\141\229\173\151\230\144\156\231\180\162";
-		UiNameHeader	= "\231\137\169\229\147\129";
-		UiNetHeader	= "\229\135\128\229\136\169";
-		UiNetPerHeader	= "\229\141\149\228\187\182\229\135\128\229\136\169";
-		UiPriceHeader	= "\228\187\183\230\160\188";
-		UiPricePerHeader	= "\229\141\149\228\187\182\228\187\183\230\160\188";
-		UiPurchases	= "\232\180\173\228\185\176";
-		UiQuantityHeader	= "\230\149\176\233\135\143";
-		UiSales	= "\233\148\128\229\148\174";
-		UiSearch	= "\230\144\156\231\180\162";
-		UiSearchForLabel	= "\230\144\156\231\180\162";
-		UiSellTransaction	= "\229\135\186\229\148\174";
-		UiTransactions	= "\228\186\164\230\152\147";
-		UiTransactionsLabel	= "\228\186\164\230\152\147";
-		UiTransactionTypeHeader	= "\231\177\187\229\158\139";
+		UiAuctions	= "拍卖";
+		UiAuctionTransaction	= "拍卖";
+		UiBids	= "出价";
+		UiBidTransaction	= "竞标";
+		UiBuyerSellerHeader	= "买主/卖主";
+		UiBuyTransaction	= "购买";
+		UiDateHeader	= "日期";
+		UiDepositTransaction	= "保管费";
+		UiExactNameSearch	= "确切名字搜索";
+		UiNameHeader	= "物品";
+		UiNetHeader	= "净利";
+		UiNetPerHeader	= "单件净利";
+		UiPriceHeader	= "价格";
+		UiPricePerHeader	= "单件价格";
+		UiPurchases	= "购买";
+		UiQuantityHeader	= "数量";
+		UiSales	= "销售";
+		UiSearch	= "搜索";
+		UiSearchForLabel	= "搜索";
+		UiSellTransaction	= "出售";
+		UiTransactions	= "交易";
+		UiTransactionsLabel	= "交易";
+		UiTransactionTypeHeader	= "类型";
 
 	};
 
@@ -476,39 +476,39 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "\232\129\175\231\155\159\230\139\141\232\179\163\229\160\180";
-		MailAuctionCancelledSubject	= "\230\139\141\232\179\163\229\183\178\229\143\150\230\182\136";
-		MailAuctionExpiredSubject	= "\230\139\141\232\179\163\233\129\142\230\156\159";
-		MailAuctionSuccessfulSubject	= "\230\139\141\232\179\163\230\136\144\229\138\159";
-		MailAuctionWonSubject	= "\229\190\151\230\168\153";
-		MailHordeAuctionHouse	= "\233\131\168\232\144\189\230\139\141\232\179\163\229\160\180";
-		MailOutbidOnSubject	= "\229\135\186\229\131\185\229\164\177\230\149\151";
+		MailAllianceAuctionHouse	= "聯盟拍賣場";
+		MailAuctionCancelledSubject	= "拍賣已取消";
+		MailAuctionExpiredSubject	= "拍賣過期";
+		MailAuctionSuccessfulSubject	= "拍賣成功";
+		MailAuctionWonSubject	= "得標";
+		MailHordeAuctionHouse	= "部落拍賣場";
+		MailOutbidOnSubject	= "出價失敗";
 
 
 		-- Section: User Interface
-		UiAuctions	= "\230\139\141\232\179\163\229\160\180";
-		UiAuctionTransaction	= "\230\139\141\232\179\163";
-		UiBids	= "\229\135\186\229\131\185";
-		UiBidTransaction	= "\229\135\186\229\131\185";
-		UiBuyerSellerHeader	= "\232\178\183\230\150\185/\232\179\163\230\150\185";
-		UiBuyTransaction	= "\232\178\183";
-		UiDateHeader	= "\230\151\165\230\156\159";
-		UiDepositTransaction	= "\228\191\157\231\174\161\232\178\187";
-		UiExactNameSearch	= "\229\174\140\230\149\180\229\144\141\231\168\177\230\175\148\229\176\141";
-		UiNameHeader	= "\231\137\169\229\147\129";
-		UiNetHeader	= "\230\183\168\229\136\169";
-		UiNetPerHeader	= "\229\150\174\228\187\182\230\183\168\229\136\169";
-		UiPriceHeader	= "\229\131\185\230\160\188";
-		UiPricePerHeader	= "\229\131\185\230\160\188\230\168\153\233\161\140";
-		UiPurchases	= "\232\179\188\232\178\183";
-		UiQuantityHeader	= "\230\149\184\233\135\143";
-		UiSales	= "\233\138\183\229\148\174";
-		UiSearch	= "\230\144\156\229\176\139";
-		UiSearchForLabel	= "\230\144\156\229\176\139";
-		UiSellTransaction	= "\229\135\186\229\148\174";
-		UiTransactions	= "\228\186\164\230\152\147";
-		UiTransactionsLabel	= "\228\186\164\230\152\147";
-		UiTransactionTypeHeader	= "\233\161\158\229\136\165";
+		UiAuctions	= "拍賣場";
+		UiAuctionTransaction	= "拍賣";
+		UiBids	= "出價";
+		UiBidTransaction	= "出價";
+		UiBuyerSellerHeader	= "買方/賣方";
+		UiBuyTransaction	= "買";
+		UiDateHeader	= "日期";
+		UiDepositTransaction	= "保管費";
+		UiExactNameSearch	= "完整名稱比對";
+		UiNameHeader	= "物品";
+		UiNetHeader	= "淨利";
+		UiNetPerHeader	= "單件淨利";
+		UiPriceHeader	= "價格";
+		UiPricePerHeader	= "價格標題";
+		UiPurchases	= "購買";
+		UiQuantityHeader	= "數量";
+		UiSales	= "銷售";
+		UiSearch	= "搜尋";
+		UiSearchForLabel	= "搜尋";
+		UiSellTransaction	= "出售";
+		UiTransactions	= "交易";
+		UiTransactionsLabel	= "交易";
+		UiTransactionTypeHeader	= "類別";
 
 	};
 
@@ -516,7 +516,7 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailHordeAuctionHouse	= "\208\144\209\131\208\186\209\134\208\184\208\190\208\189 \208\158\209\128\208\180\209\139";
+		MailHordeAuctionHouse	= "Аукцион Орды";
 
 	};
 }

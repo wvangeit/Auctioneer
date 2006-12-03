@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://norganna.org/localizer/index.php
@@ -32,6 +32,14 @@
 
 ItemizerLocalizations = {
 
+	deDE = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer ist nicht geladen. Für mehr Info´s tippe /itemizer";
+
+	};
+
 	enUS = {
 
 
@@ -44,7 +52,63 @@ ItemizerLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Itemizer no esta cargado. Escriba /itemizer para mas informaci\195\179n.";
+		MesgNotLoaded	= "Itemizer no esta cargado. Escriba /itemizer para mas información.";
+
+	};
+
+	frFR = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer n'est pas chargé. Tapez /itemizer pour plus d'informations.";
+
+	};
+
+	itIT = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer non è stato caricato. Digita /itemizer per avere informazioni.";
+
+	};
+
+	koKR = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer가 로드되지않았습니다. 자세한 정보는 /itemizer를 입력하십시오.";
+
+	};
+
+	nlNL = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer is niet geladen. Type /itemizer voor meer informatie.";
+
+	};
+
+	ruRU = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itimizer не загружен. Введите /itemizer для справки.";
+
+	};
+
+	zhCN = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "详细说明没有载入.键入 /itemizer 观看更多信息.";
+
+	};
+
+	zhTW = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer未載入,請輸入 /itemizer 以得到更多訊息.";
 
 	};
 }

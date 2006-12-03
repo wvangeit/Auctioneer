@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://norganna.org/localizer/index.php
@@ -134,10 +134,10 @@ InformantLocalizations = {
 		InfoHeader	= "Informace na |cff%s%s|r";
 		InfoNoItem	= "Nejprve prejedte mzsi pres item, pak stisknete aktivacni klavesu";
 		InfoPlayerMade	= "Udelano levelem %d %s";
-		InfoQuestHeader	= "Vyu\195\133\194\190ito v %d questech:";
+		InfoQuestHeader	= "VyuÅ¾ito v %d questech:";
 		InfoQuestName	= "  %d for \"%s\" (level %d)";
 		InfoQuestSource	= "Quest data dodana od";
-		InfoVendorHeader	= "Dostupn\195\131\194\169 od %d obchodn\195\131\194\173k\195\133\194\175:";
+		InfoVendorHeader	= "DostupnÃ© od %d obchodnÃ­kÅ¯:";
 		InfoVendorName	= "%s";
 
 
@@ -180,7 +180,7 @@ InformantLocalizations = {
 		CmdDefault	= "Standard";
 		CmdDisable	= "deaktiver";
 		CmdEmbed	= "indkapsle";
-		CmdHelp	= "hj\195\166lp";
+		CmdHelp	= "hjælp";
 		CmdLocale	= "sprog";
 		CmdOff	= "fra";
 		CmdOn	= "til";
@@ -197,10 +197,10 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant er ikke indl\195\166st. Skriv /informant for mere info.";
+		MesgNotLoaded	= "Informant er ikke indlæst. Skriv /informant for mere info.";
 		StatOff	= "Viser ikke item informationer";
 		StatOn	= "Viser konfigurerede informationer om items";
-		Welcome	= "|c40ff50ffVelkommen til Informant|r Da det er f\195\184rste gang du bruger Informant, f\195\165r du denne besked for at fort\195\166lle at du b\195\184r lave en tastaturgenvej i |cffffffffKeybindings|r sektionen i |cffffffffGame Menu|rFra det \195\184jeblik kan du vise udvidet information om dine ting, ved at pege musen p\195\165 tingen og derefter trykke p\195\165 den valgte tast. S\195\165 vil dette vindue komme frem med alle mulige informationer som er v\195\166rd at vide. For at fjerne vinduet trykker du p\195\165 tasten igen eller klikker p\195\165 Close knappen.";
+		Welcome	= "|c40ff50ffVelkommen til Informant|r Da det er første gang du bruger Informant, får du denne besked for at fortælle at du bør lave en tastaturgenvej i |cffffffffKeybindings|r sektionen i |cffffffffGame Menu|rFra det øjeblik kan du vise udvidet information om dine ting, ved at pege musen på tingen og derefter trykke på den valgte tast. Så vil dette vindue komme frem med alle mulige informationer som er værd at vide. For at fjerne vinduet trykker du på tasten igen eller klikker på Close knappen.";
 
 
 		-- Section: Help Text
@@ -234,7 +234,7 @@ InformantLocalizations = {
 		HelpDefault	= "Saet et Informant valg til dets standard vaerdi. Du kan ogsaa angive alt for at saette alle Informant valg til deres standard vaerdi.";
 		HelpDisable	= "Goer at Informant ikke indlaeses automatisk naeste gang du logger ind";
 		HelpEmbed	= "Integrerer teksten i spillets egen tooltip (Bemaerk: Visse valg er umulige naar dette er aktiveret).";
-		HelpIcon	= "V\195\166lg at vise objektets ikon";
+		HelpIcon	= "Vælg at vise objektets ikon";
 		HelpLocale	= "Aendrer sproget som bruges til at visse Informant beskeder.";
 		HelpMerchant	= "Vaelg om det skal vises hvilke handlende som saelger tingen.";
 		HelpOnoff	= "Vaelg om Informant viser data eller ej.";
@@ -338,52 +338,52 @@ InformantLocalizations = {
 
 		-- Section: Generic Messages
 		MesgNotLoaded	= "Informant ist nicht geladen. Geben Sie /informant ein um mehr Informationen zu erhalten.";
-		StatOff	= "Informationen zu Gegenst\195\164nden werden nicht angezeigt";
-		StatOn	= "Informationen zu Gegenst\195\164nden werden angezeigt";
-		Welcome	= "|c40ff50ffWillkommen bei Informant|r Da Sie Informant das erste Mal nutzen erscheint diese Nachricht, um Ihnen mitzuteilen, dass sie eine Taste belegen m\195\188ssen, um dieses Fenster innerhalb der |cffffffffTastaturbelegung|r Sektion des |cffffffffHauptmen\195\188|r anzeigen zu lassen. Um erweiterte Informationen \195\188ber Gegenst\195\164nde in ihrem Inventar zu erhalten, m\195\188ssen sie die Maus \195\188ber den gew\195\188nschten Gegenstand bewegen und die von Ihnen gew\195\164hlte Taste dr\195\188cken und es erscheint ein Fenster mit Informationen \195\188ber diesen Gegenstand. Zum Schliessen des Fensters bet\195\164tigen sie die Taste erneut oder sie dr\195\188cken den Schliessen Button dieses Fensters. Zum Fortfahren dr\195\188cken sie bitte den Schliessen-Button.";
+		StatOff	= "Informationen zu Gegenständen werden nicht angezeigt";
+		StatOn	= "Informationen zu Gegenständen werden angezeigt";
+		Welcome	= "|c40ff50ffWillkommen bei Informant|r Da Sie Informant das erste Mal nutzen erscheint diese Nachricht, um Ihnen mitzuteilen, dass sie eine Taste belegen müssen, um dieses Fenster innerhalb der |cffffffffTastaturbelegung|r Sektion des |cffffffffHauptmenü|r anzeigen zu lassen. Um erweiterte Informationen über Gegenstände in ihrem Inventar zu erhalten, müssen sie die Maus über den gewünschten Gegenstand bewegen und die von Ihnen gewählte Taste drücken und es erscheint ein Fenster mit Informationen über diesen Gegenstand. Zum Schliessen des Fensters betätigen sie die Taste erneut oder sie drücken den Schliessen Button dieses Fensters. Zum Fortfahren drücken sie bitte den Schliessen-Button.";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "Alle Einstellungen zur\195\188cksetzen";
-		GuiDefaultAllButton	= "Alles zur\195\188cksetzen";
-		GuiDefaultAllHelp	= "Hier klicken um alle Informant-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT r\195\188ckg\195\164ngig gemacht werden.";
-		GuiDefaultOption	= "Diese Einstellung zur\195\188cksetzen";
+		GuiDefaultAll	= "Alle Einstellungen zurücksetzen";
+		GuiDefaultAllButton	= "Alles zurücksetzen";
+		GuiDefaultAllHelp	= "Hier klicken um alle Informant-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT rückgängig gemacht werden.";
+		GuiDefaultOption	= "Diese Einstellung zurücksetzen";
 		GuiEmbed	= "In-Game Tooltip zur Anzeige verwenden";
 		GuiEmbedHeader	= "Art der Anzeige";
-		GuiInfoHeader	= "Zus\195\164tzliche Informationen";
-		GuiInfoHelp	= "Steuert welche zus\195\164tzlichen Informationen angezeigt werden";
+		GuiInfoHeader	= "Zusätzliche Informationen";
+		GuiInfoHelp	= "Steuert welche zusätzlichen Informationen angezeigt werden";
 		GuiInfoIcon	= "Zeige Symbol an";
-		GuiInfoMerchant	= "Zeige H\195\164ndler";
+		GuiInfoMerchant	= "Zeige Händler";
 		GuiInfoQuest	= "Zeige die Verwendung bei Quests an";
-		GuiInfoStack	= "Zeige die Stapelgr\195\182\195\159e an";
+		GuiInfoStack	= "Zeige die Stapelgröße an";
 		GuiInfoUsage	= "Zeige den Verwendungszweck an";
 		GuiLocale	= "Setze das Gebietsschema auf";
 		GuiMainEnable	= "Informant aktivieren";
-		GuiMainHelp	= "Einstellungen f\195\188r Informant, einem AddOn das detaillierte Informationen \195\188ber einen Gegenstand (H\195\164ndlerpreise, Verwendungszweck etc.) anzeigt.";
+		GuiMainHelp	= "Einstellungen für Informant, einem AddOn das detaillierte Informationen über einen Gegenstand (Händlerpreise, Verwendungszweck etc.) anzeigt.";
 		GuiOtherHeader	= "Sonstige Optionen";
 		GuiOtherHelp	= "Sonstige Informant-Optionen";
-		GuiReloadui	= "Benutzeroberfl\195\164che neu laden";
+		GuiReloadui	= "Benutzeroberfläche neu laden";
 		GuiReloaduiButton	= "Neu laden";
-		GuiReloaduiFeedback	= "WoW-Benutzeroberfl\195\164che wird neu geladen";
-		GuiReloaduiHelp	= "Hier klicken um die WoW-Benutzeroberfl\195\164che nach einer \n\195\132nderung des Gebietsschemas neu zu laden, so dass die Sprache des Konfigurationsmen\195\188s diesem entspricht. Hinweis: Dieser Vorgang kann einige Minuten dauern.";
-		GuiVendor	= "Zeige H\195\164ndlerpreise";
-		GuiVendorBuy	= "Zeige H\195\164ndler-Einkaufspreise";
-		GuiVendorHeader	= "H\195\164ndlerpreise";
+		GuiReloaduiFeedback	= "WoW-Benutzeroberfläche wird neu geladen";
+		GuiReloaduiHelp	= "Hier klicken um die WoW-Benutzeroberfläche nach einer \nÄnderung des Gebietsschemas neu zu laden, so dass die Sprache des Konfigurationsmenüs diesem entspricht. Hinweis: Dieser Vorgang kann einige Minuten dauern.";
+		GuiVendor	= "Zeige Händlerpreise";
+		GuiVendorBuy	= "Zeige Händler-Einkaufspreise";
+		GuiVendorHeader	= "Händlerpreise";
 		GuiVendorHelp	= "Einstellungen im Zusammenhang mit Verkaufs-/Einkaufspreisen von NPCs.";
-		GuiVendorSell	= "Zeige H\195\164ndler-Verkaufspreise";
-		HelpDefault	= "Setzt die angegebene Informant-Option auf ihren Standardwert zur\195\188ck. Mit dem Schl\195\188sselwort \"all\" werden alle Informant-Optionen zur\195\188ckgesetzt.";
+		GuiVendorSell	= "Zeige Händler-Verkaufspreise";
+		HelpDefault	= "Setzt die angegebene Informant-Option auf ihren Standardwert zurück. Mit dem Schlüsselwort \"all\" werden alle Informant-Optionen zurückgesetzt.";
 		HelpDisable	= "Verhindert das automatische Laden von Informant beim Login";
-		HelpEmbed	= "Zeigt den Text im In-Game Tooltip \n(Hinweis: Einige Funktionen stehen dann nicht zur Verf\195\188gung).";
+		HelpEmbed	= "Zeigt den Text im In-Game Tooltip \n(Hinweis: Einige Funktionen stehen dann nicht zur Verfügung).";
 		HelpIcon	= "Schaltet die Anzeige des Inventarsymbols eines Gegenstands ein/aus.";
-		HelpLocale	= "\195\132ndert das Gebietsschema das zur Anzeige von Informant-Meldungen verwendet wird.";
-		HelpMerchant	= "Schaltet die Anzeige von H\195\164ndlern die den Gegenstand anbieten ein/aus.";
+		HelpLocale	= "Ändert das Gebietsschema das zur Anzeige von Informant-Meldungen verwendet wird.";
+		HelpMerchant	= "Schaltet die Anzeige von Händlern die den Gegenstand anbieten ein/aus.";
 		HelpOnoff	= "Schaltet die Anzeige der Auktions-Informationen ein/aus.";
-		HelpQuest	= "Schaltet die Anzeige des Verwendungszwecks f\195\188r Quests ein/aus.";
-		HelpStack	= "Schaltet die Anzeige der Stapelgr\195\182\195\159e ein/aus.";
-		HelpUsage	= "Schaltet die Anzeige des Verwendungszwecks f\195\188r Handwerkswaren ein/aus.";
-		HelpVendor	= "Schaltet die Anzeige der H\195\164ndlerpreise ein/aus.";
-		HelpVendorBuy	= "Schaltet die Anzeige der H\195\164ndlereinkaufspreise ein/aus (show-vendor muss eingeschaltet sein).";
-		HelpVendorSell	= "Schaltet die Anzeige der H\195\164ndlerverkaufspreise ein/aus (show-vendor muss eingeschaltet sein).";
+		HelpQuest	= "Schaltet die Anzeige des Verwendungszwecks für Quests ein/aus.";
+		HelpStack	= "Schaltet die Anzeige der Stapelgröße ein/aus.";
+		HelpUsage	= "Schaltet die Anzeige des Verwendungszwecks für Handwerkswaren ein/aus.";
+		HelpVendor	= "Schaltet die Anzeige der Händlerpreise ein/aus.";
+		HelpVendorBuy	= "Schaltet die Anzeige der Händlereinkaufspreise ein/aus (show-vendor muss eingeschaltet sein).";
+		HelpVendorSell	= "Schaltet die Anzeige der Händlerverkaufspreise ein/aus (show-vendor muss eingeschaltet sein).";
 
 
 		-- Section: Keybinding Text
@@ -393,45 +393,45 @@ InformantLocalizations = {
 
 		-- Section: Tooltip Messages
 		FrameTitle	= "Informant-Informationen zum Gegenstand";
-		FrmtActDefault	= "Die Informant-Option %s wurde auf den Standardwert zur\195\188ckgesetzt.";
-		FrmtActDefaultall	= "Alle Informant-Optionen wurden auf Standardwerte zur\195\188ckgesetzt.";
+		FrmtActDefault	= "Die Informant-Option %s wurde auf den Standardwert zurückgesetzt.";
+		FrmtActDefaultall	= "Alle Informant-Optionen wurden auf Standardwerte zurückgesetzt.";
 		FrmtActDisable	= "%s wird nicht angezeigt";
 		FrmtActEnable	= "%s wird angezeigt";
 		FrmtActEnabledOn	= "Zeige %s auf %s";
 		FrmtActSet	= "Setze %s auf '%s'";
 		FrmtActUnknown	= "Unbekannter Befehl: '%s'";
-		FrmtInfoBuy	= "Einkauf beim H\195\164ndler";
-		FrmtInfoBuymult	= "Einkauf f\195\188r %d (%s pro St\195\188ck)";
+		FrmtInfoBuy	= "Einkauf beim Händler";
+		FrmtInfoBuymult	= "Einkauf für %d (%s pro Stück)";
 		FrmtInfoClass	= "Klasse: %s";
-		FrmtInfoMerchants	= "Wird von %d H\195\164ndler(n) verkauft";
+		FrmtInfoMerchants	= "Wird von %d Händler(n) verkauft";
 		FrmtInfoQuest	= "Questgegenstand von %d Quest(s)";
-		FrmtInfoSell	= "Verkauf beim H\195\164ndler";
-		FrmtInfoSellmult	= "Verkauf f\195\188r %d (%s pro St\195\188ck)";
+		FrmtInfoSell	= "Verkauf beim Händler";
+		FrmtInfoSellmult	= "Verkauf für %d (%s pro Stück)";
 		FrmtInfoStx	= "%d pro Stapel";
-		FrmtInfoUse	= "Benutzt f\195\188r: %s";
-		FrmtUnknownLocale	= "Das angegebene Gebietsschema ('%s') ist unbekannt. G\195\188ltige Gebietsschemen sind:";
+		FrmtInfoUse	= "Benutzt für: %s";
+		FrmtUnknownLocale	= "Das angegebene Gebietsschema ('%s') ist unbekannt. Gültige Gebietsschemen sind:";
 		FrmtWelcome	= "Informant v%s geladen";
-		InfoHeader	= "Informationen \195\188ber |cff%s%s|r";
-		InfoNoItem	= "Bevor die Aktivierungstaste gedr\195\188ckt wird, mu\195\159 die Maus \195\188ber einen Gegenstand bewegt werden";
+		InfoHeader	= "Informationen über |cff%s%s|r";
+		InfoNoItem	= "Bevor die Aktivierungstaste gedrückt wird, muß die Maus über einen Gegenstand bewegt werden";
 		InfoPlayerMade	= "Herstellbar mit Level %d %s";
-		InfoQuestHeader	= "Ben\195\182tigt f\195\188r %d Quest(s):";
-		InfoQuestName	= "%d f\195\188r \"%s\" (Level %d)";
+		InfoQuestHeader	= "Benötigt für %d Quest(s):";
+		InfoQuestName	= "%d für \"%s\" (Level %d)";
 		InfoQuestSource	= "Questdaten bezogen von";
-		InfoVendorHeader	= "Erh\195\164ltlich bei %d H\195\164ndler(n):";
+		InfoVendorHeader	= "Erhältlich bei %d Händler(n):";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
 		AdditAlcohol	= "Alkohol";
 		AdditBuff	= "Buff";
-		AdditDrink	= "Getr\195\164nk";
+		AdditDrink	= "Getränk";
 		AdditFirework	= "Feuerwerk";
 		AdditFood	= "Nahrung";
 		AdditGiftwrap	= "Geschenkpapier";
-		AdditLure	= "K\195\182der";
+		AdditLure	= "Köder";
 		AdditPoison	= "Gift";
 		AdditPotion	= "Trank";
-		AdditRestorative	= "St\195\164rkungstrank";
+		AdditRestorative	= "Stärkungstrank";
 		AdditScroll	= "Zauberspruchrolle";
 		SkillAlchemy	= "Alchemie";
 		SkillBlacksmithing	= "Schmieden";
@@ -618,7 +618,7 @@ InformantLocalizations = {
 		ShowILevel	= "ver-nivel";
 		ShowLink	= "ver-enlace";
 		ShowMerchant	= "ver-mercader";
-		ShowQuest	= "ver-b\195\186squeda";
+		ShowQuest	= "ver-búsqueda";
 		ShowStack	= "ver-paquete";
 		ShowUsage	= "ver-uso";
 		ShowVendor	= "ver-vendedor";
@@ -627,123 +627,123 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant no esta cargado. Escriba /informant para mas informaci\195\179n.";
-		StatOff	= "Ocultando informaci\195\179n para art\195\173\194\173culos";
-		StatOn	= "Mostrando informaci\195\179n configurada para art\195\173\194\173culos";
-		Welcome	= "|c40ff50ffBienvenido a Informant|r\n\nYa que esta es la primera vez que usted usa\n\nInformant, este mansaje aparece para dejarle saber que usted debe de designar una tecla desde dentro de la secci\195\179n de \"|cffffffffKeybindings|r\" del \"|cffffffffGame Menu|r\" del juego para hacer aparecer esta ventana.\n\nDesde ese punto en adelante, para ver informaci\195\179n avanzada de los art\195\173\194\173culos en su inventario, simplememnte mueva su mouse sobre el art\195\173\194\173culo del cual quiera ver la informaci\195\179n y oprima la tecla que usted escogio, y esta ventana aparecer\195\161, llena con informaci\195\179n sobre ese art\195\173\194\173culo.\n\nCuando quiera cerrar la ventana, simplemente oprime la tecla de nuevo o presione el bot\195\179n de \"Close\" para cerrarla.\n\nPresione el bot\195\179n de \"Close\" para continuar.";
+		MesgNotLoaded	= "Informant no esta cargado. Escriba /informant para mas información.";
+		StatOff	= "Ocultando información para artí­culos";
+		StatOn	= "Mostrando información configurada para artí­culos";
+		Welcome	= "|c40ff50ffBienvenido a Informant|r\n\nYa que esta es la primera vez que usted usa\n\nInformant, este mansaje aparece para dejarle saber que usted debe de designar una tecla desde dentro de la sección de \"|cffffffffKeybindings|r\" del \"|cffffffffGame Menu|r\" del juego para hacer aparecer esta ventana.\n\nDesde ese punto en adelante, para ver información avanzada de los artí­culos en su inventario, simplememnte mueva su mouse sobre el artí­culo del cual quiera ver la información y oprima la tecla que usted escogio, y esta ventana aparecerá, llena con información sobre ese artí­culo.\n\nCuando quiera cerrar la ventana, simplemente oprime la tecla de nuevo o presione el botón de \"Close\" para cerrarla.\n\nPresione el botón de \"Close\" para continuar.";
 
 
 		-- Section: Help Text
 		GuiDefaultAll	= "Revertir todas las opciones de Auctioneer";
 		GuiDefaultAllButton	= "Revertir Todo";
-		GuiDefaultAllHelp	= "Seleccione aqui para revertir todas las opciones de Informant a sus configuraciones de f\195\161brica.\nADVERTENCIA: Esta acci\195\179n NO es reversible.";
-		GuiDefaultOption	= "Revertir esta opci\195\179n";
-		GuiEmbed	= "Integrar informaci\195\179n en la caja de ayuda";
-		GuiEmbedHeader	= "Integraci\195\179n";
-		GuiInfoHeader	= "Informaci\195\179n Adicional";
-		GuiInfoHelp	= "Controla que informaci\195\179n Intormant muestra en las cajas de ayuda";
-		GuiInfoIcon	= "Ver \195\173cono de inventario";
-		GuiInfoILevel	= "Ver nivel del art\195\173culo";
+		GuiDefaultAllHelp	= "Seleccione aqui para revertir todas las opciones de Informant a sus configuraciones de fábrica.\nADVERTENCIA: Esta acción NO es reversible.";
+		GuiDefaultOption	= "Revertir esta opción";
+		GuiEmbed	= "Integrar información en la caja de ayuda";
+		GuiEmbedHeader	= "Integración";
+		GuiInfoHeader	= "Información Adicional";
+		GuiInfoHelp	= "Controla que información Intormant muestra en las cajas de ayuda";
+		GuiInfoIcon	= "Ver ícono de inventario";
+		GuiInfoILevel	= "Ver nivel del artículo";
 		GuiInfoLink	= "Ver enlace";
 		GuiInfoMerchant	= "Ver mercaderes";
-		GuiInfoQuest	= "Ver informaci\195\179n de busquedas";
-		GuiInfoStack	= "Ver tama\195\177o de paquete";
-		GuiInfoUsage	= "Ver informaci\195\179n de uso";
+		GuiInfoQuest	= "Ver información de busquedas";
+		GuiInfoStack	= "Ver tamaño de paquete";
+		GuiInfoUsage	= "Ver información de uso";
 		GuiLocale	= "Ajustar localidad a";
 		GuiMainEnable	= "Encender Informant";
-		GuiMainHelp	= "Contiene ajustes para Informant \nun aditamento que muestra informaci\195\179n detallada de los art\195\173\194\173culos";
+		GuiMainHelp	= "Contiene ajustes para Informant \nun aditamento que muestra información detallada de los artí­culos";
 		GuiOtherHeader	= "Otras Opciones";
-		GuiOtherHelp	= "Opciones miscel\195\161neas de Informant";
-		GuiReloadui	= "Recargar Interf\195\161z";
+		GuiOtherHelp	= "Opciones misceláneas de Informant";
+		GuiReloadui	= "Recargar Interfáz";
 		GuiReloaduiButton	= "Recargar";
-		GuiReloaduiFeedback	= "Recargando el Interf\195\161z de WoW";
-		GuiReloaduiHelp	= "Presione aqui para recargar el interf\195\161z de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuraci\195\179n sea el mismo que el de Auctioneer.\nNota: Esta operaci\195\179n puede tomar unos minutos.";
+		GuiReloaduiFeedback	= "Recargando el Interfáz de WoW";
+		GuiReloaduiHelp	= "Presione aqui para recargar el interfáz de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuración sea el mismo que el de Auctioneer.\nNota: Esta operación puede tomar unos minutos.";
 		GuiVendor	= "Mostrar Precios a Vendedores";
 		GuiVendorBuy	= "Mostrar precios de compra a vendedores";
 		GuiVendorHeader	= "Precio del Vendedor";
 		GuiVendorHelp	= "Opciones relacionadas con los precios de compraventa de personajes no-jugadores.";
 		GuiVendorSell	= "Mostrar precios de venta a vendedores";
-		HelpDefault	= "Revertir una opci\195\179n de Auctioneer a su configuraci\195\179n de f\195\161brica. Tambi\195\169n puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de f\195\161brica.";
+		HelpDefault	= "Revertir una opción de Auctioneer a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Auctioneer a sus configuraciones de fábrica.";
 		HelpDisable	= "Impide que Informant se carge automaticamente la proxima vez que usted entre al juego";
-		HelpEmbed	= "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opci\195\179n es seleccionada)";
-		HelpIcon	= "Selecciona para mostrar el \195\173cono de inventario del art\195\173culo";
-		HelpILevel	= "Selecciona para mostrar el nivel del art\195\173culo";
-		HelpLink	= "Selecciona para mostrar el enlace del art\195\173culo";
+		HelpEmbed	= "Insertar el texto en la caja de ayuda original del juego (nota: Algunas funciones se desabilitan cuando esta opción es seleccionada)";
+		HelpIcon	= "Selecciona para mostrar el ícono de inventario del artículo";
+		HelpILevel	= "Selecciona para mostrar el nivel del artículo";
+		HelpLink	= "Selecciona para mostrar el enlace del artículo";
 		HelpLocale	= "Cambiar la localidad que Informant usa para sus mensajes";
-		HelpMerchant	= "Selecciona para mostrar los mercaderes que venden el art\195\173\194\173culo";
-		HelpOnoff	= "Enciande o apaga la informacion sobre los art\195\173\194\173culos";
-		HelpQuest	= "Selecciona para mostrar informaci\195\179n sobre art\195\173\194\173culos de b\195\186squedas";
-		HelpStack	= "Selecciona para mostrar tama\195\177o maximo del paquete";
-		HelpUsage	= "Selecciona para mostrar uso del art\195\173\194\173culo en profesiones";
-		HelpVendor	= "Selecciona para mostrar precios de vendedor para el art\195\173\194\173culo";
+		HelpMerchant	= "Selecciona para mostrar los mercaderes que venden el artí­culo";
+		HelpOnoff	= "Enciande o apaga la informacion sobre los artí­culos";
+		HelpQuest	= "Selecciona para mostrar información sobre artí­culos de búsquedas";
+		HelpStack	= "Selecciona para mostrar tamaño maximo del paquete";
+		HelpUsage	= "Selecciona para mostrar uso del artí­culo en profesiones";
+		HelpVendor	= "Selecciona para mostrar precios de vendedor para el artí­culo";
 		HelpVendorBuy	= "Selecciona para mostrar precio de compra del vendedor (requiere ver-vendedor prendido)";
 		HelpVendorSell	= "Selecciona para mostrar precio de venta del vendedor (requiere ver-vendedor prendido)";
 
 
 		-- Section: Keybinding Text
 		BindingHeader	= "Informant";
-		BindingTitle	= "Invert\195\173\194\173r la ventana de Informant";
+		BindingTitle	= "Invertí­r la ventana de Informant";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "Informaci\195\179n de Informant del Art\195\173\194\173culo.";
-		FrmtActDefault	= "La opci\195\179n %s de Informant ha sido revertida a su configuraci\195\179n de f\195\161brica.";
-		FrmtActDefaultall	= "Todas las opciones de Informant han sido revertidas a sus configuraciones de f\195\161brica.";
-		FrmtActDisable	= "Ocultando informaci\195\179n de art\195\173\194\173culo: %s ";
-		FrmtActEnable	= "Mostrando informaci\195\179n del art\195\173\194\173culo: %s ";
-		FrmtActEnabledOn	= "Mostrando %s de los art\195\173\194\173culos usando %s";
+		FrameTitle	= "Información de Informant del Artí­culo.";
+		FrmtActDefault	= "La opción %s de Informant ha sido revertida a su configuración de fábrica.";
+		FrmtActDefaultall	= "Todas las opciones de Informant han sido revertidas a sus configuraciones de fábrica.";
+		FrmtActDisable	= "Ocultando información de artí­culo: %s ";
+		FrmtActEnable	= "Mostrando información del artí­culo: %s ";
+		FrmtActEnabledOn	= "Mostrando %s de los artí­culos usando %s";
 		FrmtActSet	= "%s ajustado(a) a '%s'";
 		FrmtActUnknown	= "Comando o palabra clave desconocida: '%s'";
 		FrmtInfoBuy	= "Compra del vendedor";
 		FrmtInfoBuymult	= "Compra %d (%s c/u)";
 		FrmtInfoClass	= "Clase: %s";
-		FrmtInfoItemLevel	= "Nivel del Art\195\173culo: %d";
+		FrmtInfoItemLevel	= "Nivel del Artículo: %d";
 		FrmtInfoItemLink	= "Enlace: %s";
 		FrmtInfoMerchants	= "Vendido por %d mercaderes";
-		FrmtInfoQuest	= "Art\195\173\194\173culo usado en %d busquedas";
+		FrmtInfoQuest	= "Artí­culo usado en %d busquedas";
 		FrmtInfoSell	= "Vende al vendedor";
 		FrmtInfoSellmult	= "Vende %d (%s c/u)";
-		FrmtInfoStx	= "Amontonable en lotes de %d art\195\173\194\173culos por paquete";
+		FrmtInfoStx	= "Amontonable en lotes de %d artí­culos por paquete";
 		FrmtInfoUse	= "Usado para: %s";
-		FrmtUnknownLocale	= "La localizaci\195\179n que usted especific\195\179 ('%s') no es valida. Locales v\195\161lidos son:";
-		FrmtWelcome	= "Informant versi\195\179n %s cargado";
-		InfoHeader	= "Informaci\195\179n en |cff%s%s|r";
-		InfoNoItem	= "Debe de pasar por encima de un art\195\173\194\173culo, y luego apretar la tecla de activaci\195\179n";
+		FrmtUnknownLocale	= "La localización que usted especificó ('%s') no es valida. Locales válidos son:";
+		FrmtWelcome	= "Informant versión %s cargado";
+		InfoHeader	= "Información en |cff%s%s|r";
+		InfoNoItem	= "Debe de pasar por encima de un artí­culo, y luego apretar la tecla de activación";
 		InfoPlayerMade	= "Hecho por %s nivel %d";
-		InfoQuestHeader	= "Art\195\173\194\173culo usado en %d busquedas";
+		InfoQuestHeader	= "Artí­culo usado en %d busquedas";
 		InfoQuestName	= "  %d for \"%s\" (level %d)";
-		InfoQuestSource	= "Informaci\195\179n de b\195\186squedas suministrada por";
-		InfoVendorHeader	= "Disponible a trav\195\169z de %d mercaderes:";
+		InfoQuestSource	= "Información de búsquedas suministrada por";
+		InfoVendorHeader	= "Disponible a travéz de %d mercaderes:";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
-		AdditAlcohol	= "Alcoh\195\179l";
+		AdditAlcohol	= "Alcohól";
 		AdditBuff	= "Mejora";
 		AdditDrink	= "Bebida";
 		AdditFirework	= "Fuegos Artificiales";
 		AdditFood	= "Comida";
 		AdditGiftwrap	= "Envoltura";
-		AdditLure	= "Se\195\177uelo";
+		AdditLure	= "Señuelo";
 		AdditPoison	= "Veneno";
-		AdditPotion	= "Poci\195\179n";
+		AdditPotion	= "Poción";
 		AdditRestorative	= "Restaurativo";
 		AdditScroll	= "Voluta";
-		SkillAlchemy	= "Alqu\195\173\194\173mia";
-		SkillBlacksmithing	= "Herrer\195\173\194\173a";
+		SkillAlchemy	= "Alquí­mia";
+		SkillBlacksmithing	= "Herrerí­a";
 		SkillCooking	= "Cocinar";
 		SkillDruid	= "Magias de Druidas";
 		SkillEnchanting	= "Encantar";
-		SkillEngineering	= "Ingenier\195\173\194\173a";
+		SkillEngineering	= "Ingenierí­a";
 		SkillFirstAid	= "Primeros Auxilios";
-		SkillLeatherworking	= "Peleter\195\173\194\173a";
+		SkillLeatherworking	= "Peleterí­a";
 		SkillMage	= "Magias de Magos";
-		SkillMining	= "Miner\195\173\194\173a";
+		SkillMining	= "Minerí­a";
 		SkillPaladin	= "Magias de Paladines";
 		SkillPriest	= "Magias de Sacerdotes";
-		SkillRogue	= "Habilidades de P\195\173\194\173caros";
+		SkillRogue	= "Habilidades de Pí­caros";
 		SkillShaman	= "Magias de Chamanes";
-		SkillTailoring	= "Sastrer\195\173\194\173a";
+		SkillTailoring	= "Sastrerí­a";
 		SkillWarlock	= "Magias de Brujos";
 
 	};
@@ -753,12 +753,12 @@ InformantLocalizations = {
 
 		-- Section: Commands
 		CmdClearAll	= "tout";
-		CmdDefault	= "par d\195\169faut";
+		CmdDefault	= "par défaut";
 		CmdDisable	= "desactive";
 		CmdEmbed	= "integrer";
 		CmdHelp	= "aide";
 		CmdLocale	= "langue";
-		CmdOff	= "arr\195\170t";
+		CmdOff	= "arrêt";
 		CmdOn	= "marche";
 		CmdToggle	= "changer";
 		OptLocale	= "<langue>";
@@ -773,93 +773,93 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant n'est pas charg\195\169. Tapez /informant pour plus d'informations.";
+		MesgNotLoaded	= "Informant n'est pas chargé. Tapez /informant pour plus d'informations.";
 		StatOff	= "Ne montrer aucune information d'objet";
-		StatOn	= "Montrer les informations configur\195\169es";
-		Welcome	= "|c40ff50ffBienvenue dans Informant|r Comme c'est la premi\195\168re fois que vous utilisez Informant, ce message appara\195\174t pour vous faire savoir qu'il est n\195\169cessaire d'attribuer une touche pour afficher cette fen\195\170tre. Ceci se fait dans le menu |cffffffffRaccourcis|r du |cffffffffMenu g\195\169n\195\169ral|r. Ceci fait, pour voir les informations d\195\169taill\195\169es des objets de votre inventaire, il suffit de placer votre curseur souris sur un objet qui vous int\195\169resse et d'appuyer sur la touche que vous avez attribu\195\169e, cette fen\195\170tre appara\195\174tra alors avec les informations souhait\195\169es. Pour fermer la fen\195\170tre, appuyer sur la touche de nouveau, ou cliquer sur le bouton de fermeture de la fen\195\170tre. Cliquer sur le bouton de fermeture maintenant pour continuer.";
+		StatOn	= "Montrer les informations configurées";
+		Welcome	= "|c40ff50ffBienvenue dans Informant|r Comme c'est la première fois que vous utilisez Informant, ce message apparaît pour vous faire savoir qu'il est nécessaire d'attribuer une touche pour afficher cette fenêtre. Ceci se fait dans le menu |cffffffffRaccourcis|r du |cffffffffMenu général|r. Ceci fait, pour voir les informations détaillées des objets de votre inventaire, il suffit de placer votre curseur souris sur un objet qui vous intéresse et d'appuyer sur la touche que vous avez attribuée, cette fenêtre apparaîtra alors avec les informations souhaitées. Pour fermer la fenêtre, appuyer sur la touche de nouveau, ou cliquer sur le bouton de fermeture de la fenêtre. Cliquer sur le bouton de fermeture maintenant pour continuer.";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "R\195\169initialiser toutes les options d'Informant";
-		GuiDefaultAllButton	= "Tout r\195\169initialiser";
-		GuiDefaultAllHelp	= "Cliquer ici pour r\195\169initialiser toutes les options d'Informant \195\160 leurs valeurs par d\195\169faut. ATTENTION : cette op\195\169ration est irr\195\169versible.";
-		GuiDefaultOption	= "R\195\169initialiser cette configuration";
-		GuiEmbed	= "Int\195\169grer les informations dans les infobulles originales";
-		GuiEmbedHeader	= "Int\195\169gr\195\169";
-		GuiInfoHeader	= "Informations compl\195\169mentaires";
-		GuiInfoHelp	= "Contr\195\180le quelles informations seront affich\195\169es dans les infobulles";
-		GuiInfoIcon	= "Afficher l'ic\195\180ne d'inventaire";
+		GuiDefaultAll	= "Réinitialiser toutes les options d'Informant";
+		GuiDefaultAllButton	= "Tout réinitialiser";
+		GuiDefaultAllHelp	= "Cliquer ici pour réinitialiser toutes les options d'Informant à leurs valeurs par défaut. ATTENTION : cette opération est irréversible.";
+		GuiDefaultOption	= "Réinitialiser cette configuration";
+		GuiEmbed	= "Intégrer les informations dans les infobulles originales";
+		GuiEmbedHeader	= "Intégré";
+		GuiInfoHeader	= "Informations complémentaires";
+		GuiInfoHelp	= "Contrôle quelles informations seront affichées dans les infobulles";
+		GuiInfoIcon	= "Afficher l'icône d'inventaire";
 		GuiInfoMerchant	= "Afficher les marchands";
-		GuiInfoQuest	= "Afficher les informations de qu\195\170te";
+		GuiInfoQuest	= "Afficher les informations de quête";
 		GuiInfoStack	= "Afficher la taille des piles";
 		GuiInfoUsage	= "Afficher le mode d'emploi";
 		GuiLocale	= "Changer la langue active pour ";
 		GuiMainEnable	= "Activer Informant";
-		GuiMainHelp	= "Contient les r\195\169glages d'Informant, un AddOn permettant d'afficher des informations d\195\169taill\195\169es sur les objets.";
+		GuiMainHelp	= "Contient les réglages d'Informant, un AddOn permettant d'afficher des informations détaillées sur les objets.";
 		GuiOtherHeader	= "Autres options";
 		GuiOtherHelp	= "Options diverses d'Informant";
 		GuiReloadui	= "Recharger l'Interface Utilisateur";
 		GuiReloaduiButton	= "RechargerIU";
 		GuiReloaduiFeedback	= "Rechargement de l'IU de WoW";
-		GuiReloaduiHelp	= "Cliquez ici pour recharger l'UI apr\195\168s avoir chang\195\169 la langue pour que les informations affich\195\169es refl\195\168tent votre choix. Note: Cette op\195\169ration peut prendre quelques minutes.";
+		GuiReloaduiHelp	= "Cliquez ici pour recharger l'UI après avoir changé la langue pour que les informations affichées reflètent votre choix. Note: Cette opération peut prendre quelques minutes.";
 		GuiVendor	= "Afficher les prix des marchands";
 		GuiVendorBuy	= "Afficher les prix d'achat des marchands";
 		GuiVendorHeader	= "Prix des marchands";
 		GuiVendorHelp	= "Options relatives au prix d'achat/vente des NPCs";
 		GuiVendorSell	= "Afficher les prix de vente des marchands";
-		HelpDefault	= "R\195\169initialiser une option d'Informant. Vous pouvez \195\169galement sp\195\169cifier le mot-clef \"tout\" afin de r\195\169initialiser toutes les options d'Informant.";
-		HelpDisable	= "Emp\195\170cher le chargement d'Informant lors de votre prochaine connexion";
-		HelpEmbed	= "Ins\195\168re le texte dans la tooltip originale (note: certaines fonctions ne seront pas fonctionnelles si activ\195\169)";
-		HelpIcon	= "Selectionner si l'ic\195\180ne d'inventaire de l'article s'affiche";
-		HelpLocale	= "Changer la langue utilis\195\169e par les messages d'Informant";
-		HelpMerchant	= "Choisir si l'affichage des marchands qui vendent ces objets doit \195\170tre activ\195\169";
-		HelpOnoff	= "Active/d\195\169sactive l'affichage des informations";
-		HelpQuest	= "Choisir d'afficher si l'objet est un objet de qu\195\170te";
-		HelpStack	= "Choisir si l'affichage du nombre maximum par pile d'objet doit \195\170tre activ\195\169";
-		HelpUsage	= "Choisir d'afficher les utilisations de l'objet dans les m\195\169tiers";
+		HelpDefault	= "Réinitialiser une option d'Informant. Vous pouvez également spécifier le mot-clef \"tout\" afin de réinitialiser toutes les options d'Informant.";
+		HelpDisable	= "Empêcher le chargement d'Informant lors de votre prochaine connexion";
+		HelpEmbed	= "Insère le texte dans la tooltip originale (note: certaines fonctions ne seront pas fonctionnelles si activé)";
+		HelpIcon	= "Selectionner si l'icône d'inventaire de l'article s'affiche";
+		HelpLocale	= "Changer la langue utilisée par les messages d'Informant";
+		HelpMerchant	= "Choisir si l'affichage des marchands qui vendent ces objets doit être activé";
+		HelpOnoff	= "Active/désactive l'affichage des informations";
+		HelpQuest	= "Choisir d'afficher si l'objet est un objet de quête";
+		HelpStack	= "Choisir si l'affichage du nombre maximum par pile d'objet doit être activé";
+		HelpUsage	= "Choisir d'afficher les utilisations de l'objet dans les métiers";
 		HelpVendor	= "Choisir d'afficher les prix de l'objet des PNJ";
-		HelpVendorBuy	= "Choisir si l'affichage du prix d'achat par les marchands doit \195\170tre activ\195\169 (requiert voir-vendeur=marche)";
-		HelpVendorSell	= "Choisir si l'affichage du prix de vente par les marchands doit \195\170tre activ\195\169 (requiert voir-vendeur=marche)";
+		HelpVendorBuy	= "Choisir si l'affichage du prix d'achat par les marchands doit être activé (requiert voir-vendeur=marche)";
+		HelpVendorSell	= "Choisir si l'affichage du prix de vente par les marchands doit être activé (requiert voir-vendeur=marche)";
 
 
 		-- Section: Keybinding Text
 		BindingHeader	= "Informant";
-		BindingTitle	= "Afficher/Masquer la fen\195\170tre d'information";
+		BindingTitle	= "Afficher/Masquer la fenêtre d'information";
 
 
 		-- Section: Tooltip Messages
 		FrameTitle	= "Informations sur l'objet d'Informant";
-		FrmtActDefault	= "L'option %s d'Informant a \195\169t\195\169 r\195\169initialis\195\169e \195\160 sa valeur par d\195\169faut";
-		FrmtActDefaultall	= "Toutes les options d'Informant ont \195\169t\195\169 r\195\169initialis\195\169es \195\160 leurs valeurs par d\195\169faut";
-		FrmtActDisable	= "N'affiche pas les donn\195\169es de l'objet %s";
-		FrmtActEnable	= "Affiche les donn\195\169es de l'objet %s";
+		FrmtActDefault	= "L'option %s d'Informant a été réinitialisée à sa valeur par défaut";
+		FrmtActDefaultall	= "Toutes les options d'Informant ont été réinitialisées à leurs valeurs par défaut";
+		FrmtActDisable	= "N'affiche pas les données de l'objet %s";
+		FrmtActEnable	= "Affiche les données de l'objet %s";
 		FrmtActEnabledOn	= "Affiche l'objet %s sur %s";
-		FrmtActSet	= "%s r\195\169gl\195\169 \195\160 '%s'";
+		FrmtActSet	= "%s réglé à '%s'";
 		FrmtActUnknown	= "Mot-clef de commande inconnu : '%s'";
 		FrmtInfoBuy	= "Achat au marchand";
-		FrmtInfoBuymult	= "Achat des %d (%s l'unit\195\169)";
+		FrmtInfoBuymult	= "Achat des %d (%s l'unité)";
 		FrmtInfoClass	= "Classe : %s";
 		FrmtInfoMerchants	= "Vendu par %d marchand(s)";
-		FrmtInfoQuest	= "Objet de qu\195\170te intervenant dans %d qu\195\170te(s)";
+		FrmtInfoQuest	= "Objet de quête intervenant dans %d quête(s)";
 		FrmtInfoSell	= "Vente au marchand";
-		FrmtInfoSellmult	= "Vente des %d (%s l'unit\195\169)";
+		FrmtInfoSellmult	= "Vente des %d (%s l'unité)";
 		FrmtInfoStx	= "S'empile en lot de %d";
-		FrmtInfoUse	= "Utilis\195\169 pour : %s";
-		FrmtUnknownLocale	= "La langue que vous avez sp\195\169cifi\195\169e ('%s') est inconnue. Les langues valides sont :";
-		FrmtWelcome	= "Informant v%s charg\195\169";
+		FrmtInfoUse	= "Utilisé pour : %s";
+		FrmtUnknownLocale	= "La langue que vous avez spécifiée ('%s') est inconnue. Les langues valides sont :";
+		FrmtWelcome	= "Informant v%s chargé";
 		InfoHeader	= "Information sur |cff%s%s|r";
 		InfoNoItem	= "Vous devez d'abord placer votre curseur sur l'objet, puis appuyer sur la touche d'activation.";
-		InfoPlayerMade	= "Cr\195\169\195\169 avec %d en %s";
-		InfoQuestHeader	= "Utilis\195\169 dans %d qu\195\170tes :";
+		InfoPlayerMade	= "Créé avec %d en %s";
+		InfoQuestHeader	= "Utilisé dans %d quêtes :";
 		InfoQuestName	= "  %d for \"%s\" (level %d)";
-		InfoQuestSource	= "Donn\195\169es de qu\195\170te fournies par";
-		InfoVendorHeader	= "Disponible aupr\195\168s de %d marchand(s) :";
+		InfoQuestSource	= "Données de quête fournies par";
+		InfoVendorHeader	= "Disponible auprès de %d marchand(s) :";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
 		AdditAlcohol	= "Alcool";
-		AdditBuff	= "Am\195\169lioration";
+		AdditBuff	= "Amélioration";
 		AdditDrink	= "Boisson";
 		AdditFirework	= "Feu d'artifice";
 		AdditFood	= "Nourriture";
@@ -874,17 +874,17 @@ InformantLocalizations = {
 		SkillCooking	= "Cuisine";
 		SkillDruid	= "Sorts de Druide";
 		SkillEnchanting	= "Enchantement";
-		SkillEngineering	= "Ing\195\169nierie";
+		SkillEngineering	= "Ingénierie";
 		SkillFirstAid	= "Premiers Soins";
 		SkillLeatherworking	= "Travail du Cuir";
 		SkillMage	= "Sorts de Mage";
 		SkillMining	= "Minage";
 		SkillPaladin	= "Sorts de Paladin";
-		SkillPriest	= "Sorts de Pr\195\170tre";
-		SkillRogue	= "Comp\195\169tences de Voleur";
+		SkillPriest	= "Sorts de Prêtre";
+		SkillRogue	= "Compétences de Voleur";
 		SkillShaman	= "Sorts de Chaman";
 		SkillTailoring	= "Couture";
-		SkillWarlock	= "Sorts de D\195\169moniste";
+		SkillWarlock	= "Sorts de Démoniste";
 
 	};
 
@@ -1032,139 +1032,139 @@ InformantLocalizations = {
 
 
 		-- Section: Commands
-		CmdClearAll	= "\235\170\168\235\145\144";
-		CmdDefault	= "\236\180\136\234\184\176\237\153\148";
-		CmdDisable	= "\235\185\132\237\153\156\236\132\177\237\153\148";
-		CmdEmbed	= "\235\130\180\236\158\165";
-		CmdHelp	= "\235\143\132\236\155\128\235\167\144";
-		CmdLocale	= "\236\167\128\236\151\173";
-		CmdOff	= "\235\129\148";
-		CmdOn	= "\236\188\172";
-		CmdToggle	= "\236\160\132\237\153\152";
-		OptLocale	= "<\236\167\128\236\151\173>";
-		ShowIcon	= "\236\149\132\236\157\180\236\189\152 \235\179\180\234\184\176";
-		ShowMerchant	= "\237\140\144\235\167\164\236\131\129\236\157\184";
-		ShowQuest	= "\237\128\152\236\138\164\237\138\184";
-		ShowStack	= "\234\178\185\236\185\168";
-		ShowUsage	= "\236\130\172\236\154\169";
-		ShowVendor	= "\236\131\129\236\160\144\234\176\128";
-		ShowVendorBuy	= "\236\131\129\236\160\144\237\140\144\235\167\164\234\176\128";
-		ShowVendorSell	= "\236\131\129\236\160\144\235\167\164\236\158\133\234\176\128";
+		CmdClearAll	= "모두";
+		CmdDefault	= "초기화";
+		CmdDisable	= "비활성화";
+		CmdEmbed	= "내장";
+		CmdHelp	= "도움말";
+		CmdLocale	= "지역";
+		CmdOff	= "끔";
+		CmdOn	= "켬";
+		CmdToggle	= "전환";
+		OptLocale	= "<지역>";
+		ShowIcon	= "아이콘 보기";
+		ShowMerchant	= "판매상인";
+		ShowQuest	= "퀘스트";
+		ShowStack	= "겹침";
+		ShowUsage	= "사용";
+		ShowVendor	= "상점가";
+		ShowVendorBuy	= "상점판매가";
+		ShowVendorSell	= "상점매입가";
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant\234\176\128 \235\161\156\235\147\156\235\144\152\236\167\128 \236\149\138\236\149\152\236\138\181\235\139\136\235\139\164. \"/informant\" \235\165\188 \236\158\133\235\160\165\237\149\152\236\151\172 \235\141\148 \235\167\142\236\157\128 \236\160\149\235\179\180\235\165\188 \236\150\187\236\157\132 \236\136\152 \236\158\136\236\138\181\235\139\136\235\139\164.";
-		StatOff	= "\236\149\132\236\157\180\237\133\156 \236\160\149\235\179\180\235\165\188 \237\145\156\236\139\156\237\149\152\236\167\128 \236\149\138\236\138\181\235\139\136\235\139\164.";
-		StatOn	= "\236\132\164\236\160\149\235\144\156 \236\149\132\236\157\180\237\133\156 \236\160\149\235\179\180\235\165\188 \237\145\156\236\139\156\237\149\169\235\139\136\235\139\164.";
-		Welcome	= "|c40ff50ff\237\153\152\236\152\129\237\149\169\235\139\136\235\139\164!|r\n\n\236\150\180\235\160\164\235\182\132\236\157\180 Informant\235\165\188 \236\178\152\236\157\140 \236\130\172\236\154\169\237\149\152\234\178\140\235\144\152\235\169\180, \236\157\180 \235\169\148\236\132\184\236\167\128\234\176\128 |cffffffff\234\178\140\236\158\132 \235\169\148\235\137\180|r\236\157\152 |cffffffff\235\139\168\236\182\149\237\130\164 \236\132\164\236\160\149|r\236\151\144\236\132\156 \236\157\180 \236\176\189\236\157\132 \235\179\180\234\184\176\236\156\132\237\149\180 \237\130\164\235\165\188 \236\132\164\236\160\149\237\149\180\236\149\188\237\149\156\235\139\164\235\138\148 \234\178\131\236\157\132 \236\149\140\235\160\164\236\164\141\235\139\136\235\139\164.\n\n\236\151\172\235\159\172\235\182\132\236\157\152 \236\134\140\236\167\128\237\146\136\236\151\144\236\132\156 \236\149\132\236\157\180\237\133\156\236\151\144 \234\180\128\237\149\156 \236\158\144\236\132\184\237\149\156 \236\160\149\235\179\180\235\165\188 \236\149\140\234\179\160\236\139\182\235\139\164\235\169\180, \235\139\168\236\136\156\237\158\136 \236\149\132\236\157\180\237\133\156 \236\156\132\236\151\144 \235\167\136\236\154\176\236\138\164\235\165\188 \234\176\128\236\160\184\234\176\132 \237\155\132 \236\132\164\236\160\149\235\144\156 \235\139\168\236\182\149\237\130\164\235\165\188 \235\136\132\235\165\180\235\169\180, \236\149\132\236\157\180\237\133\156\236\151\144 \234\180\128\237\149\156 \236\160\149\235\179\180\234\176\128 \236\177\132\236\155\140\236\167\132 \236\157\180 \236\176\189\236\157\180 \237\140\157\236\151\133\235\144\160 \234\178\131\236\158\133\235\139\136\235\139\164.\n\n\235\139\168\236\182\149\237\130\164\235\165\188 \235\139\164\236\139\156 \235\136\132\235\165\180\234\177\176\235\130\152 \236\157\180 \236\176\189\236\157\152 \235\139\171\234\184\176 \235\178\132\237\138\188\236\157\132 \235\136\132\235\165\180\235\169\180 \236\176\189\236\157\180 \235\139\171\237\158\153\235\139\136\235\139\164.\n\n\234\179\132\236\134\141\237\149\152\236\139\156\235\160\164\235\169\180 \235\139\171\234\184\176 \235\178\132\237\138\188\236\157\132 \235\136\132\235\165\180\236\139\173\236\139\156\236\152\164.";
+		MesgNotLoaded	= "Informant가 로드되지 않았습니다. \"/informant\" 를 입력하여 더 많은 정보를 얻을 수 있습니다.";
+		StatOff	= "아이템 정보를 표시하지 않습니다.";
+		StatOn	= "설정된 아이템 정보를 표시합니다.";
+		Welcome	= "|c40ff50ff환영합니다!|r\n\n어려분이 Informant를 처음 사용하게되면, 이 메세지가 |cffffffff게임 메뉴|r의 |cffffffff단축키 설정|r에서 이 창을 보기위해 키를 설정해야한다는 것을 알려줍니다.\n\n여러분의 소지품에서 아이템에 관한 자세한 정보를 알고싶다면, 단순히 아이템 위에 마우스를 가져간 후 설정된 단축키를 누르면, 아이템에 관한 정보가 채워진 이 창이 팝업될 것입니다.\n\n단축키를 다시 누르거나 이 창의 닫기 버튼을 누르면 창이 닫힙니다.\n\n계속하시려면 닫기 버튼을 누르십시오.";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "\235\170\168\235\147\160 Informant \236\132\164\236\160\149 \236\180\136\234\184\176\237\153\148";
-		GuiDefaultAllButton	= "\235\170\168\235\145\144 \236\180\136\234\184\176\237\153\148";
-		GuiDefaultAllHelp	= "\235\170\168\235\147\160 Informant \236\132\164\236\160\149\236\157\132 \236\180\136\234\184\176\237\153\148\237\149\152\234\184\176\236\156\132\237\149\180 \236\157\180\234\179\179\236\157\132 \237\129\180\235\166\173\237\149\152\236\139\156\236\152\164.\n\236\163\188\236\157\152: \235\144\152\235\143\140\235\166\180\236\136\152 \236\151\134\236\157\140";
-		GuiDefaultOption	= "\236\157\180 \236\132\164\236\160\149\236\157\132 \236\180\136\234\184\176\237\153\148";
-		GuiEmbed	= "\234\178\140\236\158\132 \237\136\180\237\140\129\236\151\144 \236\160\149\235\179\180 \237\143\172\237\149\168";
-		GuiEmbedHeader	= "\237\143\172\237\149\168";
-		GuiInfoHeader	= "\236\182\148\234\176\128 \236\160\149\235\179\180";
-		GuiInfoHelp	= "\237\136\180\237\140\129\236\151\144 \236\182\148\234\176\128 \236\160\149\235\179\180 \237\145\156\236\139\156 \236\132\164\236\160\149";
-		GuiInfoIcon	= "\234\176\128\235\176\169 \236\149\132\236\157\180\236\189\152 \237\145\156\236\139\156";
-		GuiInfoMerchant	= "\237\140\144\235\167\164\236\131\129\236\157\184 \237\145\156\236\139\156";
-		GuiInfoQuest	= "\237\128\152\236\138\164\237\138\184 \236\160\149\235\179\180 \237\145\156\236\139\156";
-		GuiInfoStack	= "\234\178\185\236\179\144\235\134\147\236\157\132 \236\136\152 \236\158\136\235\138\148 \236\181\156\235\140\128 \234\176\156\236\136\152 \237\145\156\236\139\156";
-		GuiInfoUsage	= "\236\130\172\236\154\169 \236\160\149\235\179\180 \237\145\156\236\139\156";
-		GuiLocale	= "\236\167\128\236\151\173 \236\132\164\236\160\149:";
-		GuiMainEnable	= "Informant \237\153\156\236\132\177\237\153\148";
-		GuiMainHelp	= "\236\158\144\236\132\184\237\149\156 \236\149\132\236\157\180\237\133\156 \236\160\149\235\179\180\235\165\188 \237\145\156\236\139\156\237\149\160\234\178\131\236\157\132 Informant \236\132\164\236\160\149\236\151\144 \237\143\172\237\149\168\237\149\169\235\139\136\235\139\164.";
-		GuiOtherHeader	= "\234\184\176\237\131\128 \236\132\164\236\160\149";
-		GuiOtherHelp	= "\234\184\176\237\131\128 \236\160\149\235\179\180 \236\132\164\236\160\149";
-		GuiReloadui	= "\236\156\160\236\160\128 \236\157\184\237\132\176\237\142\152\236\157\180\236\138\164 \235\166\172\235\161\156\235\147\156";
-		GuiReloaduiButton	= "UI \235\166\172\235\161\156\235\147\156";
-		GuiReloaduiFeedback	= "WoW UI\235\165\188 \235\166\172\235\161\156\235\148\169\237\149\169\235\139\136\235\139\164.";
-		GuiReloaduiHelp	= "\234\181\173\234\176\128 \236\132\164\236\160\149\236\157\132 \235\179\128\234\178\189\237\149\152\236\151\172 \236\157\180 \237\153\152\234\178\176\236\132\177\236\160\149 \236\176\189\234\179\188 \236\157\188\236\185\152\236\139\156\237\130\164\234\184\176 \236\156\132\237\149\180 WOW UI\235\165\188 \236\158\172\236\139\156\236\158\145 \237\149\152\235\160\164\235\169\180 \237\129\180\235\166\173\237\149\152\236\132\184\236\154\148.(\236\157\180 \236\158\145\236\151\133\236\157\128 \235\170\135\235\182\132 \236\160\149\235\143\132 \234\177\184\235\166\189\235\139\136\235\139\164.)";
-		GuiVendor	= "\236\131\129\236\160\144\234\176\128 \237\145\156\236\139\156";
-		GuiVendorBuy	= "\236\131\129\236\160\144\237\140\144\235\167\164\234\176\128 \237\145\156\236\139\156";
-		GuiVendorHeader	= "\236\131\129\236\160\144\234\176\128";
-		GuiVendorHelp	= "NPC \234\181\172\236\158\133/\237\140\144\235\167\164 \234\176\128\234\178\169\236\151\144 \234\180\128\235\160\168\235\144\156 \236\132\164\236\160\149.";
-		GuiVendorSell	= "\236\131\129\236\160\144\235\167\164\236\158\133\234\176\128 \237\145\156\236\139\156";
-		HelpDefault	= "Informant\236\157\152 \236\132\164\236\160\149\236\157\132 \236\180\136\234\184\176\234\176\146\236\156\188\235\161\156 \235\144\152\235\143\140\235\166\189\235\139\136\235\139\164. \"\235\170\168\235\145\144\" \235\157\188\235\138\148 \236\157\184\236\136\152\235\165\188 \236\163\188\235\169\180 Informant\236\157\152 \235\170\168\235\147\160 \236\132\164\236\160\149\236\157\132 \236\180\136\234\184\176\237\153\148 \237\149\169\235\139\136\235\139\164.";
-		HelpDisable	= "\235\139\164\236\157\140 \235\161\156\234\183\184\236\157\184 \235\182\128\237\132\176\235\138\148 Informant\235\165\188 \236\158\144\235\143\153 \235\161\156\235\148\169 \237\149\152\236\167\128 \236\149\138\236\138\181\235\139\136\235\139\164.";
-		HelpEmbed	= "\237\133\141\236\138\164\237\138\184\235\165\188 \234\184\176\235\179\184 \234\178\140\236\158\132 \237\136\180\237\140\129\236\151\144 \237\143\172\237\149\168 (\236\157\180 \236\132\164\236\160\149\236\157\180 \236\132\164\237\131\157\235\144\152\235\169\180 \236\157\188\235\182\128 \234\184\176\235\138\165\236\157\180 \236\130\172\236\154\169\235\182\136\234\176\128\235\138\165 \237\149\169\235\139\136\235\139\164.)";
-		HelpIcon	= "\236\149\132\236\157\180\237\133\156\236\157\152 \236\149\132\236\157\180\236\189\152\236\157\132 \237\145\156\236\139\156\236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149";
-		HelpLocale	= "Informant \235\169\148\236\132\184\236\167\128\236\157\152 \236\150\184\236\150\180\235\165\188 \235\179\128\234\178\189\237\149\169\235\139\136\235\139\164.";
-		HelpMerchant	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\132 \237\140\144\235\167\164\237\149\152\235\138\148 \236\131\129\236\157\184 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpOnoff	= "Informant\236\157\152 \235\141\176\236\157\180\237\132\176 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpQuest	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\152 \237\128\152\236\138\164\237\138\184 \236\130\172\236\154\169 \236\160\149\235\179\180 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpStack	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\152 \234\178\185\236\179\144 \235\134\147\236\157\132 \236\136\152 \236\158\136\235\138\148 \234\176\156\236\136\152 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpUsage	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\180 \236\130\172\236\154\169\235\144\152\235\138\148 \236\160\132\235\172\184 \234\184\176\236\136\160 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpVendor	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\152 \236\131\129\236\160\144\234\176\128 \237\145\156\236\139\156 \236\151\172\235\182\128\235\165\188 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		HelpVendorBuy	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\152 \236\131\129\236\160\144 \237\140\144\235\167\164\234\176\128\235\165\188 \237\145\156\236\139\156\237\149\169\235\139\136\235\139\164. (\236\131\129\236\160\144\234\176\128 \237\145\156\236\139\156 \236\132\164\236\160\149\236\157\180 \236\188\156\236\160\184\236\158\136\236\150\180\236\149\188 \237\149\169\235\139\136\235\139\164.)";
-		HelpVendorSell	= "\236\132\160\237\131\157\235\144\156 \236\149\132\236\157\180\237\133\156\236\157\152 \236\131\129\236\160\144 \235\167\164\236\158\133\234\176\128\235\165\188 \237\145\156\236\139\156\237\149\169\235\139\136\235\139\164. (\236\131\129\236\160\144\234\176\128 \237\145\156\236\139\156 \236\132\164\236\160\149\236\157\180 \236\188\156\236\160\184\236\158\136\236\150\180\236\149\188 \237\149\169\235\139\136\235\139\164.)";
+		GuiDefaultAll	= "모든 Informant 설정 초기화";
+		GuiDefaultAllButton	= "모두 초기화";
+		GuiDefaultAllHelp	= "모든 Informant 설정을 초기화하기위해 이곳을 클릭하시오.\n주의: 되돌릴수 없음";
+		GuiDefaultOption	= "이 설정을 초기화";
+		GuiEmbed	= "게임 툴팁에 정보 포함";
+		GuiEmbedHeader	= "포함";
+		GuiInfoHeader	= "추가 정보";
+		GuiInfoHelp	= "툴팁에 추가 정보 표시 설정";
+		GuiInfoIcon	= "가방 아이콘 표시";
+		GuiInfoMerchant	= "판매상인 표시";
+		GuiInfoQuest	= "퀘스트 정보 표시";
+		GuiInfoStack	= "겹쳐놓을 수 있는 최대 개수 표시";
+		GuiInfoUsage	= "사용 정보 표시";
+		GuiLocale	= "지역 설정:";
+		GuiMainEnable	= "Informant 활성화";
+		GuiMainHelp	= "자세한 아이템 정보를 표시할것을 Informant 설정에 포함합니다.";
+		GuiOtherHeader	= "기타 설정";
+		GuiOtherHelp	= "기타 정보 설정";
+		GuiReloadui	= "유저 인터페이스 리로드";
+		GuiReloaduiButton	= "UI 리로드";
+		GuiReloaduiFeedback	= "WoW UI를 리로딩합니다.";
+		GuiReloaduiHelp	= "국가 설정을 변경하여 이 환결성정 창과 일치시키기 위해 WOW UI를 재시작 하려면 클릭하세요.(이 작업은 몇분 정도 걸립니다.)";
+		GuiVendor	= "상점가 표시";
+		GuiVendorBuy	= "상점판매가 표시";
+		GuiVendorHeader	= "상점가";
+		GuiVendorHelp	= "NPC 구입/판매 가격에 관련된 설정.";
+		GuiVendorSell	= "상점매입가 표시";
+		HelpDefault	= "Informant의 설정을 초기값으로 되돌립니다. \"모두\" 라는 인수를 주면 Informant의 모든 설정을 초기화 합니다.";
+		HelpDisable	= "다음 로그인 부터는 Informant를 자동 로딩 하지 않습니다.";
+		HelpEmbed	= "텍스트를 기본 게임 툴팁에 포함 (이 설정이 설택되면 일부 기능이 사용불가능 합니다.)";
+		HelpIcon	= "아이템의 아이콘을 표시여부를 설정";
+		HelpLocale	= "Informant 메세지의 언어를 변경합니다.";
+		HelpMerchant	= "선택된 아이템을 판매하는 상인 표시 여부를 설정합니다.";
+		HelpOnoff	= "Informant의 데이터 표시 여부를 설정합니다.";
+		HelpQuest	= "선택된 아이템의 퀘스트 사용 정보 표시 여부를 설정합니다.";
+		HelpStack	= "선택된 아이템의 겹쳐 놓을 수 있는 개수 표시 여부를 설정합니다.";
+		HelpUsage	= "선택된 아이템이 사용되는 전문 기술 표시 여부를 설정합니다.";
+		HelpVendor	= "선택된 아이템의 상점가 표시 여부를 설정합니다.";
+		HelpVendorBuy	= "선택된 아이템의 상점 판매가를 표시합니다. (상점가 표시 설정이 켜져있어야 합니다.)";
+		HelpVendorSell	= "선택된 아이템의 상점 매입가를 표시합니다. (상점가 표시 설정이 켜져있어야 합니다.)";
 
 
 		-- Section: Keybinding Text
 		BindingHeader	= "Informant";
-		BindingTitle	= "\236\160\149\235\179\180 \236\176\189 \236\151\180\234\184\176/\235\139\171\234\184\176";
+		BindingTitle	= "정보 창 열기/닫기";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "Informant \236\149\132\236\157\180\237\133\156 \236\160\149\235\179\180";
-		FrmtActDefault	= "Informant\236\157\152 %s \236\132\164\236\160\149\236\157\180 \236\180\136\234\184\176\237\153\148 \235\144\152\236\151\136\236\138\181\235\139\136\235\139\164.";
-		FrmtActDefaultall	= "\235\170\168\235\147\160 Informant \236\132\164\236\160\149\236\157\180 \236\180\136\234\184\176\237\153\148 \235\144\152\236\151\136\236\138\181\235\139\136\235\139\164.";
-		FrmtActDisable	= "\236\149\132\236\157\180\237\133\156\236\157\152 %s \235\141\176\236\157\180\237\132\176\235\165\188 \237\145\156\236\139\156\237\149\152\236\167\128 \236\149\138\236\138\181\235\139\136\235\139\164.";
-		FrmtActEnable	= "\236\149\132\236\157\180\237\133\156\236\157\152 %s \235\141\176\236\157\180\237\132\176\235\165\188 \237\145\156\236\139\156\237\149\169\235\139\136\235\139\164.";
-		FrmtActEnabledOn	= "\236\149\132\236\157\180\237\133\156\236\157\152 %s|1\236\157\132;\235\165\188; %s\236\151\144 \237\145\156\236\139\156\237\149\169\235\139\136\235\139\164.";
-		FrmtActSet	= "%s|1\236\157\132;\235\165\188; '%s'|1;\236\156\188\235\161\156;\235\161\156 \236\132\164\236\160\149\237\149\169\235\139\136\235\139\164.";
-		FrmtActUnknown	= "\236\149\140 \236\136\152 \236\151\134\235\138\148 \235\170\133\235\160\185\236\150\180: '%s'";
-		FrmtInfoBuy	= "\236\131\129\236\160\144 \237\140\144\235\167\164\234\176\128";
-		FrmtInfoBuymult	= "\236\131\129\236\160\144 \237\140\144\235\167\164\234\176\128 %d (\234\176\156\235\139\185 %s)";
-		FrmtInfoClass	= "\235\182\132\235\165\152: %s";
-		FrmtInfoMerchants	= "%d\235\170\133\236\157\152 \236\131\129\236\157\184\236\157\180 \237\140\144\235\167\164\236\164\145";
-		FrmtInfoQuest	= "%d\234\176\156 \237\128\152\236\138\164\237\138\184\236\157\152 \237\128\152\236\138\164\237\138\184 \236\149\132\236\157\180\237\133\156";
-		FrmtInfoSell	= "\236\131\129\236\160\144 \235\167\164\236\158\133\234\176\128";
-		FrmtInfoSellmult	= "\236\131\129\236\160\144 \235\167\164\236\158\133\234\176\128 %d (\234\176\156\235\139\185 %s)";
-		FrmtInfoStx	= "\236\181\156\235\140\128 %d\234\176\156 \234\185\140\236\167\128 \234\178\185\236\179\144\236\167\144";
-		FrmtInfoUse	= "\236\130\172\236\154\169: %s";
-		FrmtUnknownLocale	= "('%s') \236\157\128 \236\149\140 \236\136\152 \236\151\134\236\138\181\235\139\136\235\139\164. \236\152\172\235\176\148\235\165\184 \236\167\128\236\151\173 \236\132\164\236\160\149\236\157\128 \235\139\164\236\157\140\234\179\188 \234\176\153\236\138\181\235\139\136\235\139\164.:";
-		FrmtWelcome	= "Informant v%s \235\161\156\235\147\156\235\144\168.";
+		FrameTitle	= "Informant 아이템 정보";
+		FrmtActDefault	= "Informant의 %s 설정이 초기화 되었습니다.";
+		FrmtActDefaultall	= "모든 Informant 설정이 초기화 되었습니다.";
+		FrmtActDisable	= "아이템의 %s 데이터를 표시하지 않습니다.";
+		FrmtActEnable	= "아이템의 %s 데이터를 표시합니다.";
+		FrmtActEnabledOn	= "아이템의 %s|1을;를; %s에 표시합니다.";
+		FrmtActSet	= "%s|1을;를; '%s'|1;으로;로 설정합니다.";
+		FrmtActUnknown	= "알 수 없는 명령어: '%s'";
+		FrmtInfoBuy	= "상점 판매가";
+		FrmtInfoBuymult	= "상점 판매가 %d (개당 %s)";
+		FrmtInfoClass	= "분류: %s";
+		FrmtInfoMerchants	= "%d명의 상인이 판매중";
+		FrmtInfoQuest	= "%d개 퀘스트의 퀘스트 아이템";
+		FrmtInfoSell	= "상점 매입가";
+		FrmtInfoSellmult	= "상점 매입가 %d (개당 %s)";
+		FrmtInfoStx	= "최대 %d개 까지 겹쳐짐";
+		FrmtInfoUse	= "사용: %s";
+		FrmtUnknownLocale	= "('%s') 은 알 수 없습니다. 올바른 지역 설정은 다음과 같습니다.:";
+		FrmtWelcome	= "Informant v%s 로드됨.";
 		InfoHeader	= "Information on |cff%s%s|r";
-		InfoNoItem	= "\235\168\188\236\160\128 \236\149\132\236\157\180\237\133\156\236\151\144 \235\167\136\236\154\176\236\138\164 \236\187\164\236\132\156\235\165\188 \236\152\172\235\166\176 \237\155\132 \237\130\164\235\165\188 \235\136\132\235\165\180\236\132\184\236\154\148.";
-		InfoPlayerMade	= "%d %s\235\160\136\235\178\168 \236\151\144\236\132\156 \235\167\140\235\147\164\236\150\180\236\167\145\235\139\136\235\139\164.";
-		InfoQuestHeader	= "%d \234\176\156\236\157\152 \237\128\152\236\138\164\237\138\184\236\151\144 \236\130\172\236\154\169\235\144\168:";
-		InfoQuestName	= "\"%s\"\236\157\152 %d (\235\160\136\235\178\168 %d)";
-		InfoQuestSource	= "\237\128\152\236\138\164\237\138\184 \236\158\144\235\163\140\234\176\128 \236\160\156\234\179\181\235\144\152\235\138\148 \234\179\179:";
-		InfoVendorHeader	= "%d\235\170\133\236\157\152 \234\176\128\235\138\165\237\149\156 \236\131\129\236\157\184:";
+		InfoNoItem	= "먼저 아이템에 마우스 커서를 올린 후 키를 누르세요.";
+		InfoPlayerMade	= "%d %s레벨 에서 만들어집니다.";
+		InfoQuestHeader	= "%d 개의 퀘스트에 사용됨:";
+		InfoQuestName	= "\"%s\"의 %d (레벨 %d)";
+		InfoQuestSource	= "퀘스트 자료가 제공되는 곳:";
+		InfoVendorHeader	= "%d명의 가능한 상인:";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
-		AdditAlcohol	= "\236\136\160";
-		AdditBuff	= "\235\178\132\237\148\132";
-		AdditDrink	= "\236\157\140\235\163\140\236\136\152";
-		AdditFirework	= "\235\182\136\234\189\131";
-		AdditFood	= "\236\157\140\236\139\157";
-		AdditGiftwrap	= "\237\143\172\236\158\165\236\167\128";
-		AdditLure	= "\237\152\132\237\152\185";
-		AdditPoison	= "\235\143\133";
-		AdditPotion	= "\235\172\188\236\149\189";
-		AdditRestorative	= "\237\154\140\235\179\181";
-		AdditScroll	= "\235\145\144\235\163\168\235\167\136\235\166\172";
-		SkillAlchemy	= "\236\151\176\234\184\136\236\136\160";
-		SkillBlacksmithing	= "\235\140\128\236\158\165\234\184\176\236\136\160";
-		SkillCooking	= "\236\154\148\235\166\172";
-		SkillDruid	= "\235\147\156\235\163\168\236\157\180\235\147\156 \235\167\136\235\178\149";
-		SkillEnchanting	= "\235\167\136\235\178\149\235\182\128\236\151\172";
-		SkillEngineering	= "\234\184\176\234\179\132 \234\179\181\237\149\153";
-		SkillFirstAid	= "\236\157\145\234\184\137\236\185\152\235\163\140";
-		SkillLeatherworking	= "\234\176\128\236\163\189\236\132\184\234\179\181";
-		SkillMage	= "\235\167\136\235\178\149\236\130\172 \235\167\136\235\178\149";
-		SkillMining	= "\236\177\132\234\180\145";
-		SkillPaladin	= "\236\132\177\234\184\176\236\130\172 \235\167\136\235\178\149";
-		SkillPriest	= "\236\130\172\236\160\156 \235\167\136\235\178\149";
-		SkillRogue	= "\235\143\132\236\160\129 \236\138\164\237\130\172";
-		SkillShaman	= "\236\163\188\236\136\160\236\130\172 \235\167\136\235\178\149";
-		SkillTailoring	= "\236\158\172\235\180\137\236\136\160";
-		SkillWarlock	= "\237\157\145\235\167\136\235\178\149\236\130\172 \235\167\136\235\178\149";
+		AdditAlcohol	= "술";
+		AdditBuff	= "버프";
+		AdditDrink	= "음료수";
+		AdditFirework	= "불꽃";
+		AdditFood	= "음식";
+		AdditGiftwrap	= "포장지";
+		AdditLure	= "현혹";
+		AdditPoison	= "독";
+		AdditPotion	= "물약";
+		AdditRestorative	= "회복";
+		AdditScroll	= "두루마리";
+		SkillAlchemy	= "연금술";
+		SkillBlacksmithing	= "대장기술";
+		SkillCooking	= "요리";
+		SkillDruid	= "드루이드 마법";
+		SkillEnchanting	= "마법부여";
+		SkillEngineering	= "기계 공학";
+		SkillFirstAid	= "응급치료";
+		SkillLeatherworking	= "가죽세공";
+		SkillMage	= "마법사 마법";
+		SkillMining	= "채광";
+		SkillPaladin	= "성기사 마법";
+		SkillPriest	= "사제 마법";
+		SkillRogue	= "도적 스킬";
+		SkillShaman	= "주술사 마법";
+		SkillTailoring	= "재봉술";
+		SkillWarlock	= "흑마법사 마법";
 
 	};
 
@@ -1182,7 +1182,7 @@ InformantLocalizations = {
 		CmdOn	= "ligado";
 		CmdToggle	= "mudar";
 		OptLocale	= "<local>";
-		ShowIcon	= "mostrar-\195\173cone";
+		ShowIcon	= "mostrar-ícone";
 		ShowMerchant	= "mostrar-comerciante";
 		ShowQuest	= "mostrar-aventura";
 		ShowStack	= "mostra-pilha";
@@ -1193,65 +1193,65 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "O Informant n\195\163o est\195\161 carregado. Escreva /informant para mais info. ";
-		StatOff	= "N\195\163o exibindo qualquer informa\195\167\195\181es de item";
-		StatOn	= "Exibindo informa\195\167\195\181es configuradas de item";
-		Welcome	= "|C40ff50ffBemvindo ao Informant|r Dado que \195\169 a primeira vez que est\195\161 a usar o Informant, esta mensagem aparece para deix\195\161-lo saber que deve p\195\180r uma para tecla mostrar esta janela na sec\195\167\195\163o de |cffffffffkeybindings |r do |cffffffffGameMenu|r. A partir da\195\173, para ver informa\195\167\195\181es avan\195\167adas no seu invent\195\161rio, simplesmente mova o seu cursor por cima do item sobre o qual quer ver informa\195\167\195\163o e pressione a tecla que configurou, e esta janela vai aparecer com a informa\195\167\195\163o sobre esse item. Nesse ponto, simplesmente pressione a tecla outra vez, ou clique o bot\195\163o de fechar esta janela. Clique o bot\195\163o de fechar agora para continuar. ";
+		MesgNotLoaded	= "O Informant não está carregado. Escreva /informant para mais info. ";
+		StatOff	= "Não exibindo qualquer informações de item";
+		StatOn	= "Exibindo informações configuradas de item";
+		Welcome	= "|C40ff50ffBemvindo ao Informant|r Dado que é a primeira vez que está a usar o Informant, esta mensagem aparece para deixá-lo saber que deve pôr uma para tecla mostrar esta janela na secção de |cffffffffkeybindings |r do |cffffffffGameMenu|r. A partir daí, para ver informações avançadas no seu inventário, simplesmente mova o seu cursor por cima do item sobre o qual quer ver informação e pressione a tecla que configurou, e esta janela vai aparecer com a informação sobre esse item. Nesse ponto, simplesmente pressione a tecla outra vez, ou clique o botão de fechar esta janela. Clique o botão de fechar agora para continuar. ";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "Restaurar todas as op\195\167\195\181es do Informant aos valores padr\195\163o";
+		GuiDefaultAll	= "Restaurar todas as opções do Informant aos valores padrão";
 		GuiDefaultAllButton	= "Restaurar todas";
-		GuiDefaultAllHelp	= "Clique aqui para p\195\180r todas as op\195\167\195\181es do Informant nos seus valores padr\195\163o. AVISO: Esta ac\195\167\195\163o N\195\131O \195\169 revers\195\173vel. ";
+		GuiDefaultAllHelp	= "Clique aqui para pôr todas as opções do Informant nos seus valores padrão. AVISO: Esta acção NÃO é reversível. ";
 		GuiDefaultOption	= "Restaurar este valor";
-		GuiEmbed	= "Integrar a informa\195\167\195\163o na tooltip do jogo";
+		GuiEmbed	= "Integrar a informação na tooltip do jogo";
 		GuiEmbedHeader	= "Integrar";
-		GuiInfoHeader	= "Informa\195\167\195\163o adicional";
-		GuiInfoHelp	= "Controla que informa\195\167\195\163o adicional \195\169 mostrada nos tooltips";
-		GuiInfoIcon	= "Mostrar \195\173cones do invent\195\161rio";
+		GuiInfoHeader	= "Informação adicional";
+		GuiInfoHelp	= "Controla que informação adicional é mostrada nos tooltips";
+		GuiInfoIcon	= "Mostrar ícones do inventário";
 		GuiInfoMerchant	= "Mostrar comerciantes";
-		GuiInfoQuest	= "Mostrar informa\195\167\195\163o de miss\195\163o";
+		GuiInfoQuest	= "Mostrar informação de missão";
 		GuiInfoStack	= "Mostrar tamanhos de pilha";
-		GuiInfoUsage	= "Mostrar informa\195\167\195\163o de uso";
-		GuiLocale	= "Fixar localiza\195\167\195\163o para";
+		GuiInfoUsage	= "Mostrar informação de uso";
+		GuiLocale	= "Fixar localização para";
 		GuiMainEnable	= "Ligar Informant";
-		GuiMainHelp	= "Cont\195\170m op\195\167\195\181es para o Informant um AddOn que mostra informa\195\167\195\163o detalhada dos objectos";
-		GuiOtherHeader	= "Outras Op\195\167\195\181es";
-		GuiOtherHelp	= "Op\195\167\195\181es Alheias do Informant";
+		GuiMainHelp	= "Contêm opções para o Informant um AddOn que mostra informação detalhada dos objectos";
+		GuiOtherHeader	= "Outras Opções";
+		GuiOtherHelp	= "Opções Alheias do Informant";
 		GuiReloadui	= "Recarregar Interface de Utilizador";
 		GuiReloaduiButton	= "RecarregarUI";
 		GuiReloaduiFeedback	= "Agora a Recarregar UI do WoW";
-		GuiReloaduiHelp	= "Carregar aqui para recarregar a Interface de Utilizador do WoW depois de mudar a localiza\195\167\195\163o para que a linguagem neste ecr\195\163 de configura\195\167ao coincida com o que seleccionou.\nNota: esta opera\195\167\195\163o poder\195\161 demorar alguns minutos.";
-		GuiVendor	= "Mostrar Pre\195\167os de Vendedor";
-		GuiVendorBuy	= "Mostrar Pre\195\167os de Comprador";
-		GuiVendorHeader	= "Pre\195\167os de Vendedor";
-		GuiVendorHelp	= "Op\195\167\195\181es relaccionadas com os pre\195\167os de compra/venda dos NPCs.";
-		GuiVendorSell	= "Mostrar Pre\195\167os de Venda dos Vendedores";
-		HelpDefault	= "Ajustar o Informant para a sua op\195\167\195\163o de defeito. Voc\195\170 pode tamb\195\169m especificar o keyword especial \226\128\156tudo\226\128\157 para ajustar todas as op\195\167\195\181es do Informant a seus valores de defeito.";
-		HelpDisable	= "Proibe o Informant de se ligar autom\195\161ticamente da pr\195\179xima vez que entrar";
-		HelpEmbed	= "Encaixar o texto no tooltip original do jogo (nota: determinadas caracter\195\173sticas s\195\163o desligadas quando esta for selecionada)";
-		HelpIcon	= "Selecionar se ir\195\161 mostrar o \195\173cone do objecto no invent\195\161rio";
-		HelpLocale	= "Muda a localiza\195\167\195\163o que \195\169 usada para mostrar as mensagens do Informant";
+		GuiReloaduiHelp	= "Carregar aqui para recarregar a Interface de Utilizador do WoW depois de mudar a localização para que a linguagem neste ecrã de configuraçao coincida com o que seleccionou.\nNota: esta operação poderá demorar alguns minutos.";
+		GuiVendor	= "Mostrar Preços de Vendedor";
+		GuiVendorBuy	= "Mostrar Preços de Comprador";
+		GuiVendorHeader	= "Preços de Vendedor";
+		GuiVendorHelp	= "Opções relaccionadas com os preços de compra/venda dos NPCs.";
+		GuiVendorSell	= "Mostrar Preços de Venda dos Vendedores";
+		HelpDefault	= "Ajustar o Informant para a sua opção de defeito. Você pode também especificar o keyword especial “tudo” para ajustar todas as opções do Informant a seus valores de defeito.";
+		HelpDisable	= "Proibe o Informant de se ligar automáticamente da próxima vez que entrar";
+		HelpEmbed	= "Encaixar o texto no tooltip original do jogo (nota: determinadas características são desligadas quando esta for selecionada)";
+		HelpIcon	= "Selecionar se irá mostrar o ícone do objecto no inventário";
+		HelpLocale	= "Muda a localização que é usada para mostrar as mensagens do Informant";
 		HelpMerchant	= "Seleccionar se quer ver vendedores que fornecem objectos";
-		HelpOnoff	= "Liga e Desliga a exibi\195\167\195\163o da informa\195\167\195\163o";
+		HelpOnoff	= "Liga e Desliga a exibição da informação";
 		HelpQuest	= "Seleccionar se quer ver em quantas quests se usam os objectos";
-		HelpStack	= "Seleccionar se quer ver o tamanha m\195\161ximo da pilha do objecto";
-		HelpUsage	= "Sleccionar se quer ver em que profis\195\181es se usam o objecto";
-		HelpVendor	= "Seleccionar se quer ver o pre\195\167o de venda dos items no vendedor";
-		HelpVendorBuy	= "Seleccionar se quer ver o pre\195\167o de compra do vendedor (req mostrar-vendedor=ligado)";
-		HelpVendorSell	= "Seleccionar se quer ver o pre\195\167o de venda do vendedor (req mostrar-vendedor=ligado)";
+		HelpStack	= "Seleccionar se quer ver o tamanha máximo da pilha do objecto";
+		HelpUsage	= "Sleccionar se quer ver em que profisões se usam o objecto";
+		HelpVendor	= "Seleccionar se quer ver o preço de venda dos items no vendedor";
+		HelpVendorBuy	= "Seleccionar se quer ver o preço de compra do vendedor (req mostrar-vendedor=ligado)";
+		HelpVendorSell	= "Seleccionar se quer ver o preço de venda do vendedor (req mostrar-vendedor=ligado)";
 
 
 		-- Section: Keybinding Text
 		BindingHeader	= "Informant";
-		BindingTitle	= "Mostrar Janela de Informa\195\167\195\163o";
+		BindingTitle	= "Mostrar Janela de Informação";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "Informa\195\167\195\163o do objecto do Informant";
-		FrmtActDefault	= "%s op\195\167\195\163o do Informant for mudada para Padr\195\163o";
-		FrmtActDefaultall	= "Todas as informa\195\167\195\181es do Informant voltaram a Padr\195\163o.";
-		FrmtActDisable	= "N\195\163o mostrando a %s de data do objecto";
+		FrameTitle	= "Informação do objecto do Informant";
+		FrmtActDefault	= "%s opção do Informant for mudada para Padrão";
+		FrmtActDefaultall	= "Todas as informações do Informant voltaram a Padrão.";
+		FrmtActDisable	= "Não mostrando a %s de data do objecto";
 		FrmtActEnable	= "Mostrando a %s data do objecto";
 		FrmtActEnabledOn	= "Mostrando objecto %s no %s";
 		FrmtActSet	= "Aplicar %s para '%s'";
@@ -1265,15 +1265,15 @@ InformantLocalizations = {
 		FrmtInfoSellmult	= "Vender %d (%s cada)";
 		FrmtInfoStx	= "Mete-se em Pilhas de %d";
 		FrmtInfoUse	= "Usado para: %s";
-		FrmtUnknownLocale	= "A Localiza\195\167\195\163o que especif\195\173cou ('%s') \195\169 desconhecida. Localiza\195\167\195\181es v\195\161lidas s\195\163o:";
+		FrmtUnknownLocale	= "A Localização que especifícou ('%s') é desconhecida. Localizações válidas são:";
 		FrmtWelcome	= "Informant v%s carregado";
 		InfoHeader	= "Informant Ligado |cff%s%s|r";
-		InfoNoItem	= "Primeiro tem de mover sobre um item e s\195\179 depois carregar na tecla de activa\195\167\195\163o";
-		InfoPlayerMade	= "Feito por n\195\173vel %d %s";
+		InfoNoItem	= "Primeiro tem de mover sobre um item e só depois carregar na tecla de activação";
+		InfoPlayerMade	= "Feito por nível %d %s";
 		InfoQuestHeader	= "Usado em %d Quests";
-		InfoQuestName	= "%d for \"%s\" (N\195\173vel %d)";
+		InfoQuestName	= "%d for \"%s\" (Nível %d)";
 		InfoQuestSource	= "Data de Quest fornecida por";
-		InfoVendorHeader	= "Dispon\195\173vel de %d vendedores";
+		InfoVendorHeader	= "Disponível de %d vendedores";
 		InfoVendorName	= "%s";
 
 
@@ -1286,25 +1286,25 @@ InformantLocalizations = {
 		AdditGiftwrap	= "Papel de Embrulho";
 		AdditLure	= "Isco";
 		AdditPoison	= "Veneno";
-		AdditPotion	= "Po\195\167\195\163o";
+		AdditPotion	= "Poção";
 		AdditRestorative	= "Restorativo";
-		AdditScroll	= "C\195\179dice";
+		AdditScroll	= "Códice";
 		SkillAlchemy	= "Alchimia";
 		SkillBlacksmithing	= "Smeltar";
 		SkillCooking	= "Cozinhar";
-		SkillDruid	= "Feiti\195\167os de Druid";
+		SkillDruid	= "Feitiços de Druid";
 		SkillEnchanting	= "Encantos";
 		SkillEngineering	= "Engenharia";
 		SkillFirstAid	= "Primeiros Socorros";
 		SkillLeatherworking	= "Trabalhos em Pele";
-		SkillMage	= "Feiti\195\167os de Mage";
+		SkillMage	= "Feitiços de Mage";
 		SkillMining	= "Minar";
-		SkillPaladin	= "Feiti\195\167os de Paladin";
-		SkillPriest	= "Feiti\195\167os de Priest";
+		SkillPaladin	= "Feitiços de Paladin";
+		SkillPriest	= "Feitiços de Priest";
 		SkillRogue	= "Habilidades de Rogue";
-		SkillShaman	= "Feiti\195\167os de Shaman";
+		SkillShaman	= "Feitiços de Shaman";
 		SkillTailoring	= "Alfaiate";
-		SkillWarlock	= "Feiti\195\167os de Warlock";
+		SkillWarlock	= "Feitiços de Warlock";
 
 	};
 
@@ -1333,118 +1333,118 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "\208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130 \208\189\208\181 \208\183\208\176\208\179\209\128\209\131\208\182\208\181\208\189. \208\146\208\178\208\181\208\180\208\184\209\130\208\181 /informant \208\180\208\187\209\143 \208\191\208\190\208\180\209\128\208\190\208\177\208\189\208\190\208\185 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\208\184.";
-		StatOff	= "\208\152\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\143 \208\191\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176\208\188 \208\189\208\181 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130\209\129\209\143";
-		StatOn	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130\209\129\209\143 \208\183\208\176\208\180\208\176\208\189\208\189\208\176\209\143 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\143 \208\191\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176\208\188";
-		Welcome	= "|c40ff50ff\208\148\208\177\209\128\208\190 \208\191\208\190\208\182\208\176\208\187\208\190\208\178\208\176\209\130\209\140 \208\178 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130|r \208\173\209\130\208\190 \209\129\208\190\208\190\208\177\209\137\208\181\208\189\208\184\208\181 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130\209\129\209\143 \208\191\208\190\209\130\208\190\208\188\209\131 \209\135\209\130\208\190 \208\146\209\139 \208\183\208\176\208\191\209\131\209\129\209\130\208\184\208\187\208\184 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130 \208\178 \208\191\208\181\209\128\208\178\209\139\208\185 \209\128\208\176\208\183. \208\167\209\130\208\190 \208\177\209\139 \208\178\209\139\208\183\208\178\208\176\209\130\209\140 \209\141\209\130\208\190 \208\190\208\186\208\189\208\190 \208\178 \208\180\208\176\208\187\209\140\208\189\208\181\208\185\209\136\208\181\208\188, \208\146\209\139 \208\180\208\190\208\187\208\182\208\189\209\139 \208\191\209\128\208\184\208\178\209\143\208\183\208\176\209\130\209\140 \208\186 \208\189\208\181\208\188\209\131 \208\186\208\187\208\176\208\178\208\184\209\136\209\131 \208\178 |cffffffffGame Menu|r, \208\178 \209\128\208\176\208\183\208\180\208\181\208\187\208\181 |cffffffffKeybindings|r. \208\159\208\190\209\129\208\187\208\181 \209\141\209\130\208\190\208\179\208\190, \209\135\209\130\208\190 \208\177\209\139 \209\131\208\178\208\184\208\180\208\181\209\130\209\140 \209\128\208\176\209\129\209\136\208\184\209\128\208\181\208\189\208\189\209\131\209\142 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\142 \208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\181 \208\184\208\183 \208\190\208\180\208\189\208\190\208\179\208\190 \208\184\208\183 \208\188\208\181\209\136\208\186\208\190\208\178, \208\191\209\128\208\190\209\129\209\130\208\190 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\184\209\130\208\181 \208\186\209\131\209\128\209\129\208\190\209\128 \208\188\209\139\209\136\208\186\208\184 \208\189\208\176\208\180 \208\184\208\189\209\130\208\181\209\128\208\181\209\129\209\131\209\142\209\137\208\184\208\188 \208\146\208\176\209\129 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\190\208\188 \208\184 \208\189\208\176\208\182\208\188\208\184\209\130\208\181 \208\186\208\187\208\176\208\178\208\184\209\136\209\131, \208\186\208\190\209\130\208\190\209\128\209\131\209\142 \208\146\209\139 \208\191\209\128\208\184\208\178\209\143\208\183\208\176\208\187\208\184. \208\161\208\181\208\185\209\135\208\176\209\129 \208\146\209\139 \208\188\208\190\208\182\208\181\209\130\208\181 \208\183\208\176\208\186\209\128\209\139\209\130\209\140 \209\141\209\130\208\190 \208\190\208\186\208\189\208\190.";
+		MesgNotLoaded	= "Информант не загружен. Введите /informant для подробной информации.";
+		StatOff	= "Информация по предметам не показывается";
+		StatOn	= "Показывается заданная информация по предметам";
+		Welcome	= "|c40ff50ffДбро пожаловать в Информант|r Это сообщение показывается потому что Вы запустили Информант в первый раз. Что бы вызвать это окно в дальнейшем, Вы должны привязать к нему клавишу в |cffffffffGame Menu|r, в разделе |cffffffffKeybindings|r. После этого, что бы увидеть расширенную информацию о предмете из одного из мешков, просто установите курсор мышки над интересующим Вас предметом и нажмите клавишу, которую Вы привязали. Сейчас Вы можете закрыть это окно.";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "\208\161\208\177\209\128\208\190\209\129\208\184\209\130\209\140 \208\178\209\129\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176";
-		GuiDefaultAllButton	= "\208\161\208\177\209\128\208\190\209\129\208\184\209\130\209\140 \208\178\209\129\209\145";
-		GuiDefaultAllHelp	= "\208\169\208\181\208\187\208\186\208\189\208\184\209\130\208\181 \209\130\209\131\209\130 \208\180\208\187\209\143 \209\130\208\190\208\179\208\190 \209\135\209\130\208\190\208\177\209\139 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\184\209\130\209\140 \208\178\209\129\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176 \208\186 \208\184\209\133 \208\183\208\189\208\176\209\135\208\181\208\189\208\184\209\143\208\188 \208\191\208\190 \209\131\208\188\208\190\208\187\209\135\208\176\208\189\208\184\209\142. \208\146\208\157\208\152\208\156\208\144\208\157\208\152\208\149: \208\173\209\130\208\190 \208\180\208\181\208\185\209\129\209\130\208\178\208\184\208\181 \208\189\208\181\208\187\209\140\208\183\209\143 \208\190\209\130\208\188\208\181\208\189\208\184\209\130\209\140, \208\181\209\129\208\187\208\184 \208\146\209\139 \208\191\208\181\209\128\208\181\208\180\209\131\208\188\208\176\208\181\209\130\208\181.";
-		GuiDefaultOption	= "\208\161\208\177\209\128\208\190\209\129\208\184\209\130\209\140 \209\141\209\130\208\190 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\209\131";
-		GuiEmbed	= "\208\146\209\129\209\130\208\176\208\178\208\187\209\143\209\130\209\140 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\142 \208\178 \209\129\209\130\208\176\208\189\208\180\208\176\209\128\209\130\208\189\209\131\209\142 \208\178\209\129\208\191\208\187\209\139\208\178\208\176\209\142\209\137\209\131\209\142 \208\191\208\190\208\180\209\129\208\186\208\176\208\183\208\186\209\131";
-		GuiEmbedHeader	= "\208\146\209\129\209\130\208\176\208\178\208\187\209\143\209\130\209\140";
-		GuiInfoHeader	= "\208\148\208\190\208\191\208\190\208\187\208\189\208\184\209\130\208\181\208\187\209\140\208\189\208\176\209\143\208\176 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\143\n";
-		GuiInfoHelp	= "\208\158\208\191\209\128\208\181\208\180\208\181\208\187\209\143\208\181\209\130 \208\186\208\176\208\186\209\131\209\142 \208\180\208\190\208\191\208\190\208\187\208\189\208\184\209\130\208\181\208\187\209\140\208\189\209\131\209\142 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\142 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\178\208\190 \208\178\209\129\208\191\208\187\209\139\208\178\208\176\209\142\209\137\208\184\209\133 \208\191\208\190\208\180\209\129\208\186\208\176\208\183\208\186\208\176\209\133";
-		GuiInfoIcon	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\183\208\189\208\176\209\135\208\190\208\186 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176 \208\178\208\190 \208\178\209\129\208\191\208\187\209\139\208\178\208\176\209\142\209\137\208\181\208\185 \208\191\208\190\208\180\209\129\208\186\208\176\208\183\208\186\208\181";
-		GuiInfoMerchant	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\191\209\128\208\190\208\180\208\176\208\178\209\134\208\190\208\178";
-		GuiInfoQuest	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\142 \208\190 \208\183\208\176\208\180\208\176\208\189\208\184\209\143\209\133";
-		GuiInfoStack	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \209\129\208\186\208\190\208\187\209\140\208\186\208\190 \209\130\208\176\208\186\208\184\209\133 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\190\208\178 \208\191\208\190\208\188\208\181\209\137\208\176\209\142\209\130\209\129\209\143 \208\189\208\176 \208\190\208\180\208\189\208\190 \208\188\208\181\209\129\209\130\208\190";
-		GuiInfoUsage	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\179\208\180\208\181 \209\130\208\176\208\186\208\184\208\181 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\209\139 \208\184\209\129\208\191\208\190\208\187\209\140\208\183\209\131\209\142\209\130\209\129\209\143";
-		GuiLocale	= "\208\159\208\190\208\188\208\181\208\189\209\143\209\130\209\140 \209\143\208\183\209\139\208\186 \208\189\208\176\n";
-		GuiMainEnable	= "\208\146\208\186\208\187\209\142\209\135\208\184\209\130\209\140 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130";
-		GuiMainHelp	= "\208\161\208\190\208\180\208\181\209\128\208\182\208\184\209\130 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\180\208\187\209\143 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176 - AddOn'a, \208\186\208\190\209\130\208\190\209\128\209\139\208\185 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130 \209\128\208\176\209\129\209\136\208\184\209\128\208\181\208\189\208\189\209\139\208\181 \208\180\208\176\208\189\208\189\209\139\208\181 \208\191\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176\208\188\n";
-		GuiOtherHeader	= "\208\148\209\128\209\131\208\179\208\184\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184\n";
-		GuiOtherHelp	= "\208\158\209\129\209\130\208\176\208\187\209\140\208\189\209\139\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176";
-		GuiReloadui	= "\208\159\208\181\209\128\208\181\208\183\208\176\208\179\209\128\209\131\208\183\208\184\209\130\209\140 \208\191\208\190\208\187\209\140\208\183\208\190\208\178\208\176\209\130\208\181\208\187\209\140\209\129\208\186\208\184\208\185 \208\184\208\189\209\130\208\181\209\128\209\132\208\181\208\185\209\129";
+		GuiDefaultAll	= "Сбросить все настройки Информанта";
+		GuiDefaultAllButton	= "Сбросить всё";
+		GuiDefaultAllHelp	= "Щелкните тут для того чтобы установить все настройки Информанта к их значениям по умолчанию. ВНИМАНИЕ: Это действие нельзя отменить, если Вы передумаете.";
+		GuiDefaultOption	= "Сбросить это настройку";
+		GuiEmbed	= "Вставлять информацию в стандартную всплывающую подсказку";
+		GuiEmbedHeader	= "Вставлять";
+		GuiInfoHeader	= "Дополнительнаяа информация\n";
+		GuiInfoHelp	= "Определяет какую дополнительную информацию показывать во всплывающих подсказках";
+		GuiInfoIcon	= "Показывать значок предмета во всплывающей подсказке";
+		GuiInfoMerchant	= "Показывать продавцов";
+		GuiInfoQuest	= "Показывать информацию о заданиях";
+		GuiInfoStack	= "Показывать сколько таких предметов помещаются на одно место";
+		GuiInfoUsage	= "Показывать где такие предметы используются";
+		GuiLocale	= "Поменять язык на\n";
+		GuiMainEnable	= "Включить Информант";
+		GuiMainHelp	= "Содержит настройки для Информанта - AddOn'a, который показывает расширенные данные по предметам\n";
+		GuiOtherHeader	= "Другие настройки\n";
+		GuiOtherHelp	= "Остальные настройки Информанта";
+		GuiReloadui	= "Перезагрузить пользовательский интерфейс";
 		GuiReloaduiButton	= "ReloadUI";
-		GuiReloaduiFeedback	= "\208\159\208\190\208\187\209\140\208\183\208\190\208\178\208\176\209\130\208\181\208\187\209\140\209\129\208\186\208\184\208\185 \208\184\208\189\209\130\208\181\209\128\209\132\208\181\208\185\209\129 WoW \208\191\208\181\209\128\208\181\208\183\208\176\208\179\209\128\209\131\208\182\208\176\208\181\209\130\209\129\209\143\n";
-		GuiReloaduiHelp	= "\208\169\209\145\208\187\208\186\208\189\208\184\209\130\208\181 \209\130\209\131\209\130, \209\135\209\130\208\190 \208\177\209\139 \208\191\208\181\209\128\208\181\208\183\208\176\208\179\209\128\209\131\208\183\208\184\209\130\209\140 \208\191\208\190\208\187\209\140\208\183\208\190\208\178\208\176\209\130\208\181\208\187\209\140\209\129\208\186\208\184\208\185 \208\184\208\189\209\130\208\181\209\128\209\132\208\181\208\185\209\129 WoW, \209\141\209\130\208\190 \208\189\208\181\208\190\208\177\209\133\208\190\208\180\208\184\208\188\208\190 \208\180\208\187\209\143 \209\130\208\190\208\179\208\190 \209\135\209\130\208\190 \208\177\209\139 \208\183\208\176\208\179\209\128\209\131\208\183\208\184\209\130\209\140 \208\178\209\139\208\177\209\128\208\176\208\189\208\189\209\139\208\185 \209\143\208\183\209\139\208\186. \208\159\209\128\208\184\208\188\208\181\209\135\208\176\208\189\208\184\208\181: \208\173\209\130\208\176 \208\190\208\191\208\181\209\128\208\176\209\134\208\184\209\143 \208\188\208\190\208\182\208\181\209\130 \208\183\208\176\208\189\209\143\209\130\209\140 \208\189\208\181\209\129\208\186\208\190\208\187\209\140\208\186\208\190 \208\188\208\184\208\189\209\131\209\130.";
-		GuiVendor	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \209\134\208\181\208\189\209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178\n";
-		GuiVendorBuy	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \209\134\208\181\208\189\209\131 \208\191\208\190\208\186\209\131\208\191\208\186\208\184 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178";
-		GuiVendorHeader	= "\208\166\208\181\208\189\209\139 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178\n";
-		GuiVendorHelp	= "\208\157\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\190\209\130\208\189\208\190\209\129\209\143\209\137\208\184\208\181\209\129\209\143 \208\186 \209\134\208\181\208\189\208\176\208\188 \208\191\208\190\208\186\209\131\208\191\208\186\208\184/\208\191\209\128\208\190\208\180\208\176\208\182\208\184 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178.";
-		GuiVendorSell	= "\208\159\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \209\134\208\181\208\189\209\139 \208\191\209\128\208\190\208\180\208\176\208\182\208\184 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178";
-		HelpDefault	= "\208\163\209\129\209\130\208\176\208\189\208\190\208\178\208\184\209\130\209\140 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\209\131 \208\186 \208\181\209\145 \208\183\208\189\208\176\209\135\208\181\208\189\208\184\209\142 \208\191\208\190 \209\131\208\188\208\190\208\187\209\135\208\176\208\189\208\184\209\142. \208\146\209\139 \208\188\208\190\208\182\208\181\209\130\208\181 \209\131\208\186\208\176\208\183\208\176\209\130\209\140 'all' \209\135\209\130\208\190 \208\177\209\139 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\184\209\130\209\140 \208\178\209\129\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\186 \208\184\209\133 \208\183\208\189\208\176\209\135\208\181\208\189\208\184\209\142 \208\191\208\190 \209\131\208\188\208\190\208\187\209\135\208\176\208\189\208\184\209\142.\n";
-		HelpDisable	= "\208\157\208\181 \208\183\208\176\208\179\209\128\209\131\208\182\208\176\209\130\209\140 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130 \208\176\208\178\209\130\208\190\208\188\208\176\209\130\208\184\209\135\208\181\209\129\208\186\208\184 \209\129\208\187\208\181\208\180\209\131\209\142\209\137\208\184\208\185 \209\128\208\176\208\183 \208\191\209\128\208\184 \208\183\208\176\208\179\209\128\209\131\208\183\208\186\208\181 \208\184\208\179\209\128\209\139";
-		HelpEmbed	= "\208\146\209\129\209\130\208\176\208\178\208\187\209\143\209\130\209\140 \209\130\208\181\208\186\209\129\209\130 \208\178 \209\129\209\130\208\176\208\189\208\180\208\176\209\128\209\130\209\131\209\142 \208\178\209\129\208\191\208\187\209\139\208\178\208\176\209\142\209\137\209\131\209\142 \208\191\208\190\208\180\209\129\208\186\208\176\208\183\208\186\209\131 \208\184\208\179\209\128\209\139. (\208\159\209\128\208\184\208\188\208\181\209\135\208\176\208\189\208\184\208\181: \208\189\208\181\208\186\208\190\209\130\208\190\209\128\209\139\208\181 \208\178\208\190\208\183\208\188\208\190\208\182\208\189\208\190\209\129\209\130\208\184 \208\189\208\181\208\180\208\190\209\129\209\130\209\131\208\191\208\189\209\139, \208\186\208\190\208\179\208\180\208\176 \209\141\209\130\208\190\209\130 \209\128\208\181\208\182\208\184\208\188 \209\128\208\176\208\183\209\128\208\181\209\136\209\145\208\189)";
-		HelpIcon	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \208\183\208\189\208\176\209\135\209\145\208\186 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176 \208\178\208\190 \208\178\209\129\208\191\208\187\209\139\208\178\208\176\209\142\209\137\208\181\208\185 \208\191\208\190\208\180\209\129\208\186\208\176\208\183\208\186\208\181";
-		HelpLocale	= "\208\159\208\190\208\188\208\181\208\189\209\143\209\130\209\140 \209\143\208\183\209\139\208\186 \209\129\208\190\208\190\208\177\209\137\208\181\208\189\208\184\208\185 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176";
-		HelpMerchant	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\178 \208\186\208\190\209\130\208\190\209\128\209\139\208\181 \208\191\209\128\208\190\208\180\208\176\209\142\209\130 \208\180\208\176\208\189\208\189\209\139\208\185 \208\191\209\128\208\181\208\180\208\188\208\181\209\130";
-		HelpOnoff	= "\208\146\208\186\208\187\209\142\209\135\208\184\209\130\209\140/\208\190\209\130\208\186\208\187\209\142\209\135\208\184\209\130\209\140 \208\190\209\130\208\190\208\177\209\128\208\176\208\182\208\181\208\189\208\184\208\181 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\208\190\208\189\208\189\209\139\209\133 \208\180\208\176\208\189\208\189\209\139\209\133";
-		HelpQuest	= "\208\146\209\139\208\177\208\181\209\128\208\184\209\130\208\181 \208\187\208\184 \208\191\208\190\208\186\208\176\208\183\208\176\209\130\209\140 \208\184\209\129\208\191\208\190\208\187\209\140\208\183\208\190\208\178\208\176\208\189\208\184\208\181 \208\180\208\181\209\130\208\176\208\187\208\181\208\185 quests\n";
-		HelpStack	= "\208\146\209\139\208\177\208\181\209\128\208\184\209\130\208\181 \208\187\208\184 \208\191\208\190\208\186\208\176\208\183\208\176\209\130\209\140 \209\128\208\176\208\183\208\188\208\181\209\128 \208\180\208\181\209\130\208\176\208\187\209\143 stackable\n";
-		HelpUsage	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \208\178 \208\186\208\176\208\186\208\184\209\133 \209\128\208\181\208\188\209\145\209\129\208\187\208\176\209\133 \208\184\209\129\208\191\208\190\208\187\209\140\208\183\209\131\208\181\209\130\209\129\209\143 \208\180\208\176\208\189\208\189\209\139\208\185 \208\191\209\128\208\181\208\180\208\188\208\181\209\130";
-		HelpVendor	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140\209\129\209\143 \208\187\208\184 \209\129\208\186\208\190\208\187\209\140\208\186\208\190 \209\129\209\130\208\190\208\184\209\130 \208\180\208\176\208\189\208\189\209\139\208\185 \208\191\209\128\208\181\208\180\208\188\208\181\209\130 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176";
-		HelpVendorBuy	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \209\134\208\181\208\189\209\131 \208\191\208\190\208\186\209\131\208\191\208\186\208\184 \208\180\208\176\208\189\208\189\208\190\208\179\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176. \208\157\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\176 show-vendor \208\191\209\128\208\184 \209\141\209\130\208\190\208\188 \208\180\208\190\208\187\208\182\208\189\208\176 \208\177\209\139\209\130\209\140 \209\130\208\190\208\182\208\181 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\187\208\181\208\189\208\176 \208\178 on.\n";
-		HelpVendorSell	= "\208\146\209\139\208\177\209\128\208\176\209\130\209\140 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\209\130\209\140 \208\187\208\184 \209\134\208\181\208\189\209\131 \208\191\209\128\208\190\208\180\208\176\208\182\208\184 \208\180\208\176\208\189\208\189\208\190\208\179\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\208\176 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176. \208\157\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\176 show-vendor \208\191\209\128\208\184 \209\141\209\130\208\190\208\188 \208\180\208\190\208\187\208\182\208\189\208\176 \208\177\209\139\209\130\209\140 \209\130\208\190\208\182\208\181 \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\187\208\181\208\189\208\176 \208\178 on.\n";
+		GuiReloaduiFeedback	= "Пользовательский интерфейс WoW перезагружается\n";
+		GuiReloaduiHelp	= "Щёлкните тут, что бы перезагрузить пользовательский интерфейс WoW, это необходимо для того что бы загрузить выбранный язык. Примечание: Эта операция может занять несколько минут.";
+		GuiVendor	= "Показывать цену торговцев\n";
+		GuiVendorBuy	= "Показывать цену покупки у торговцев";
+		GuiVendorHeader	= "Цены торговцев\n";
+		GuiVendorHelp	= "Настройки относящиеся к ценам покупки/продажи у торговцев.";
+		GuiVendorSell	= "Показывать цены продажи у торговцев";
+		HelpDefault	= "Установить настройку к её значению по умолчанию. Вы можете указать 'all' что бы установить все настройки к их значению по умолчанию.\n";
+		HelpDisable	= "Не загружать Информант автоматически следующий раз при загрузке игры";
+		HelpEmbed	= "Вставлять текст в стандартую всплывающую подсказку игры. (Примечание: некоторые возможности недоступны, когда этот режим разрешён)";
+		HelpIcon	= "Выбрать показывать ли значёк предмета во всплывающей подсказке";
+		HelpLocale	= "Поменять язык сообщений Информанта";
+		HelpMerchant	= "Выбрать показывать ли торговцев которые продают данный предмет";
+		HelpOnoff	= "Включить/отключить отображение информационных данных";
+		HelpQuest	= "Выберите ли показать использование деталей quests\n";
+		HelpStack	= "Выберите ли показать размер деталя stackable\n";
+		HelpUsage	= "Выбрать показывать ли в каких ремёслах используется данный предмет";
+		HelpVendor	= "Выбрать показываться ли сколько стоит данный предмет у торговца";
+		HelpVendorBuy	= "Выбрать показывать ли цену покупки данного предмета у торговца. Настройка show-vendor при этом должна быть тоже установлена в on.\n";
+		HelpVendorSell	= "Выбрать показывать ли цену продажи данного предмета у торговца. Настройка show-vendor при этом должна быть тоже установлена в on.\n";
 
 
 		-- Section: Keybinding Text
-		BindingHeader	= "\208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130";
-		BindingTitle	= "\208\159\208\190\208\186\208\176\208\183\208\176\209\130\209\140/\209\129\208\186\209\128\209\139\209\130\209\140 \208\184\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\208\190\208\189\208\189\208\190\208\181 \208\190\208\186\208\189\208\190.\n";
+		BindingHeader	= "Информант";
+		BindingTitle	= "Показать/скрыть информационное окно.\n";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "\208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130: \208\148\208\176\208\189\208\189\209\139\208\181 \208\191\208\190 \208\191\209\128\208\181\208\180\208\188\208\181\209\130\209\131";
-		FrmtActDefault	= "\208\157\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\176 %s \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176 \208\177\209\139\208\187\208\176 \209\129\208\177\209\128\208\190\209\136\208\181\208\189\208\176 \208\186 \208\183\208\189\208\176\209\135\208\181\208\189\208\184\209\142 \208\191\208\190 \209\131\208\188\208\190\208\187\209\135\208\176\208\189\208\184\209\142\n";
-		FrmtActDefaultall	= "\208\146\209\129\208\181 \208\189\208\176\209\129\209\130\209\128\208\190\208\185\208\186\208\184 \208\152\208\189\209\132\208\190\209\128\208\188\208\176\208\189\209\130\208\176 \208\177\209\139\208\187\208\184 \209\129\208\177\209\128\208\190\209\136\208\181\208\189\209\139 \208\186 \208\183\208\189\208\176\209\135\208\181\208\189\208\184\209\143\208\188 \208\191\208\190 \209\131\208\188\208\190\208\187\209\135\208\176\208\189\208\184\209\142\n";
-		FrmtActDisable	= "%s \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130\209\129\209\143";
-		FrmtActEnable	= "%s \208\189\208\181 \208\191\208\190\208\186\208\176\208\183\209\139\208\178\208\176\208\181\209\130\209\129\209\143";
+		FrameTitle	= "Информант: Данные по предмету";
+		FrmtActDefault	= "Настройка %s Информанта была сброшена к значению по умолчанию\n";
+		FrmtActDefaultall	= "Все настройки Информанта были сброшены к значениям по умолчанию\n";
+		FrmtActDisable	= "%s показывается";
+		FrmtActEnable	= "%s не показывается";
 		FrmtActEnabledOn	= "Displaying item's %s on %s\n";
-		FrmtActSet	= "%s \209\131\209\129\209\130\208\176\208\189\208\190\208\178\208\187\208\181\208\189\208\190 \208\178 '%s'";
-		FrmtActUnknown	= "\208\157\208\181\208\183\208\178\208\181\209\129\209\130\208\189\208\190\208\181 \208\186\208\187\209\142\209\135\208\181\208\178\208\190\208\181 \209\129\208\187\208\190\208\178\208\190: '%s'  ";
-		FrmtInfoBuy	= "\208\154\209\131\208\191\208\184\209\130\209\140 \209\131 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\176";
-		FrmtInfoBuymult	= "\208\154\209\131\208\191\208\184\209\130\209\140 %d (%s \208\186\208\176\208\182\208\180\208\190\208\181)\n";
-		FrmtInfoClass	= "\208\154\208\187\208\176\209\129\209\129: %s";
-		FrmtInfoMerchants	= "\208\159\209\128\208\190\208\180\208\176\209\145\209\130\209\129\209\143 %d \209\130\208\190\208\179\208\190\208\178\209\134\208\181\208\188(\208\176\208\188\208\184)\n";
-		FrmtInfoQuest	= "\208\148\208\181\209\130\208\176\208\187\209\140 quest \208\178 quests %d\n";
-		FrmtInfoSell	= "\208\159\209\128\208\190\208\180\208\176\209\130\209\140 \209\130\208\190\209\128\208\179\208\190\208\178\209\134\209\131";
-		FrmtInfoSellmult	= "\208\159\209\128\208\190\208\180\208\176\209\130\209\140 %d (%s \208\186\208\176\208\182\208\180\208\190\208\181)\n";
-		FrmtInfoStx	= "\208\165\209\128\208\176\208\189\208\184\209\130\209\129\209\143 \208\178 \208\191\208\176\209\135\208\186\208\176\209\133 \208\191\208\190 %d\n";
-		FrmtInfoUse	= "\208\152\209\129\208\191\208\190\208\187\209\140\208\183\209\131\208\181\209\130\209\129\209\143 \208\180\208\187\209\143: %s";
-		FrmtUnknownLocale	= "\208\175\208\183\209\139\208\186, \208\186\208\190\209\130\208\190\209\128\209\139\208\185 \208\146\209\139 \208\183\208\176\208\180\208\176\208\187\208\184 (' %s') \208\189\208\181\208\184\208\183\208\178\208\181\209\129\209\130\208\181\208\189. \208\152\208\183\208\178\208\181\209\129\209\130\208\189\209\139 \209\129\208\187\208\181\208\180\209\131\209\142\209\137\208\184\208\181 \209\143\208\183\209\139\208\186\208\184:\n";
-		FrmtWelcome	= "Informant v%s \208\183\208\176\208\179\209\128\209\131\208\182\208\181\208\189";
-		InfoHeader	= "\208\152\208\189\209\132\208\190\209\128\208\188\208\176\209\134\208\184\209\143 \208\189\208\176 |cff%s%s|r\n";
-		InfoNoItem	= "\208\161\208\189\208\176\209\135\208\176\208\187\208\176 \208\189\208\176\208\178\208\181\208\180\208\184\209\130\208\181 \208\186\209\131\209\128\209\129\208\190\209\128 \208\188\209\139\209\136\208\186\208\184 \208\189\208\176 \208\191\209\128\208\181\208\180\208\188\208\181\209\130, \208\191\208\190\209\130\208\190\208\188 \208\189\208\176\208\182\208\188\208\184\209\130\208\181 \208\186\208\187\208\176\208\178\208\184\209\136\209\131 \208\176\208\186\209\130\208\184\208\178\208\176\209\134\208\184\208\184";
-		InfoPlayerMade	= "\208\148\208\187\209\143 \208\184\208\183\208\179\208\190\209\130\208\190\208\178\208\187\208\181\208\189\208\184\208\181 \209\130\209\128\208\181\208\177\209\131\208\181\209\130\209\129\209\143 %s \209\131\209\128\208\190\208\178\208\181\208\189\209\140 %d\n";
-		InfoQuestHeader	= "\208\152\209\129\208\191\208\190\208\187\209\140\208\183\209\131\208\181\209\130\209\129\209\143 \208\178 %d \208\183\208\176\208\180\208\176\208\189\208\184\209\143\209\133:";
-		InfoQuestName	= "%d \208\180\208\187\209\143 \"%s\" (\209\131\209\128\208\190\208\178\208\181\208\189\209\140 %d)";
-		InfoQuestSource	= "\208\148\208\176\208\189\208\189\209\139\208\181 \208\191\208\190 \208\183\208\176\208\180\208\176\208\189\208\184\209\142 \208\191\209\128\208\181\208\180\208\190\209\129\209\130\208\176\208\178\208\187\208\181\208\189\209\139:";
-		InfoVendorHeader	= "\208\159\209\128\208\190\208\180\208\176\209\145\209\130\209\129\209\143 %d \209\130\208\190\209\128\208\179\208\190\208\178\209\134\208\181\208\188(\208\176\208\188\208\184):\n";
+		FrmtActSet	= "%s установлено в '%s'";
+		FrmtActUnknown	= "Незвестное ключевое слово: '%s'  ";
+		FrmtInfoBuy	= "Купить у торговца";
+		FrmtInfoBuymult	= "Купить %d (%s каждое)\n";
+		FrmtInfoClass	= "Класс: %s";
+		FrmtInfoMerchants	= "Продаётся %d тоговцем(ами)\n";
+		FrmtInfoQuest	= "Деталь quest в quests %d\n";
+		FrmtInfoSell	= "Продать торговцу";
+		FrmtInfoSellmult	= "Продать %d (%s каждое)\n";
+		FrmtInfoStx	= "Хранится в пачках по %d\n";
+		FrmtInfoUse	= "Используется для: %s";
+		FrmtUnknownLocale	= "Язык, который Вы задали (' %s') неизвестен. Известны следующие языки:\n";
+		FrmtWelcome	= "Informant v%s загружен";
+		InfoHeader	= "Информация на |cff%s%s|r\n";
+		InfoNoItem	= "Сначала наведите курсор мышки на предмет, потом нажмите клавишу активации";
+		InfoPlayerMade	= "Для изготовление требуется %s уровень %d\n";
+		InfoQuestHeader	= "Используется в %d заданиях:";
+		InfoQuestName	= "%d для \"%s\" (уровень %d)";
+		InfoQuestSource	= "Данные по заданию предоставлены:";
+		InfoVendorHeader	= "Продаётся %d торговцем(ами):\n";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
-		AdditAlcohol	= "\208\144\208\187\208\186\208\190\208\179\208\190\208\187\209\140";
+		AdditAlcohol	= "Алкоголь";
 		AdditBuff	= "Buff ";
-		AdditDrink	= "\208\159\208\184\209\130\209\140\208\181\n";
-		AdditFirework	= "\208\164\208\181\208\185\208\181\209\128\208\178\208\181\209\128\208\186\n";
-		AdditFood	= "\208\149\208\180\208\176";
-		AdditGiftwrap	= "\208\159\208\190\208\180\208\176\209\128\208\190\209\135\208\189\208\176\209\143 \209\131\208\191\208\176\208\186\208\190\208\178\208\186\208\176\n";
-		AdditLure	= "\208\159\209\128\208\184\208\188\208\176\208\189\208\186\208\176";
-		AdditPoison	= "\208\175\208\180";
-		AdditPotion	= "\208\151\208\181\208\187\209\140\208\181\n";
-		AdditRestorative	= "\208\146\208\190\209\129\209\129\209\130\208\176\208\189\208\176\208\178\208\187\208\184\208\178\208\176\209\142\209\137\208\181\208\181\n";
-		AdditScroll	= "\208\161\208\178\208\184\209\130\208\190\208\186\n";
-		SkillAlchemy	= "\208\144\208\187\209\133\208\184\208\188\208\184\209\143";
-		SkillBlacksmithing	= "\208\154\209\131\208\183\208\189\208\181\209\135\208\189\208\190\208\181 \208\180\208\181\208\187\208\190";
-		SkillCooking	= "\208\159\208\190\208\178\208\176\209\128\209\129\208\186\208\190\208\181 \208\180\208\181\208\187\208\190";
-		SkillDruid	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\148\209\128\209\131\208\184\208\180\208\176(Druid)";
-		SkillEnchanting	= "\208\151\208\176\209\135\208\176\209\128\208\190\208\178\208\176\208\189\208\184\208\181";
-		SkillEngineering	= "\208\152\208\189\208\182\208\181\208\189\208\181\209\128\208\189\208\190\208\181 \208\180\208\181\208\187\208\190";
-		SkillFirstAid	= "\208\159\208\181\209\128\208\178\208\176\209\143 \208\191\208\190\208\188\208\190\209\137\209\140";
-		SkillLeatherworking	= "\208\146\209\139\208\180\208\181\208\187\208\186\208\176 \208\186\208\190\208\182\208\184";
-		SkillMage	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\156\208\176\208\179\208\176(Mage)";
-		SkillMining	= "\208\147\208\190\209\128\208\189\208\190\208\181 \208\180\208\181\208\187\208\190";
-		SkillPaladin	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\159\208\176\208\187\208\176\208\180\208\184\208\189\208\176(Paladin)";
-		SkillPriest	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\150\209\128\208\181\209\134\208\176(Priest)";
-		SkillRogue	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\160\208\176\208\183\208\177\208\190\208\185\208\189\208\184\208\186\208\176(Rogue)";
-		SkillShaman	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\168\208\176\208\188\208\176\208\189\208\176(Shaman)";
-		SkillTailoring	= "\208\168\208\184\209\130\209\140\209\145";
-		SkillWarlock	= "\208\151\208\176\208\186\208\187\208\184\208\189\208\176\208\189\208\184\209\143 \208\154\208\190\208\187\208\180\209\131\208\189\208\176(Warlock)";
+		AdditDrink	= "Питье\n";
+		AdditFirework	= "Фейерверк\n";
+		AdditFood	= "Еда";
+		AdditGiftwrap	= "Подарочная упаковка\n";
+		AdditLure	= "Приманка";
+		AdditPoison	= "Яд";
+		AdditPotion	= "Зелье\n";
+		AdditRestorative	= "Восстанавливающее\n";
+		AdditScroll	= "Свиток\n";
+		SkillAlchemy	= "Алхимия";
+		SkillBlacksmithing	= "Кузнечное дело";
+		SkillCooking	= "Поварское дело";
+		SkillDruid	= "Заклинания Друида(Druid)";
+		SkillEnchanting	= "Зачарование";
+		SkillEngineering	= "Инженерное дело";
+		SkillFirstAid	= "Первая помощь";
+		SkillLeatherworking	= "Выделка кожи";
+		SkillMage	= "Заклинания Мага(Mage)";
+		SkillMining	= "Горное дело";
+		SkillPaladin	= "Заклинания Паладина(Paladin)";
+		SkillPriest	= "Заклинания Жреца(Priest)";
+		SkillRogue	= "Заклинания Разбойника(Rogue)";
+		SkillShaman	= "Заклинания Шамана(Shaman)";
+		SkillTailoring	= "Шитьё";
+		SkillWarlock	= "Заклинания Колдуна(Warlock)";
 
 	};
 
@@ -1470,8 +1470,8 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant y\195\131\194\188kl\195\131\194\188 de\195\132\197\184il. Daha fazla bilgi i\195\131\194\167in /informant yaz\195\132\194\177n\195\132\194\177z\195\131\194\167";
-		Welcome	= "|c40ff50ffInformant'a ho\195\133\197\184geldiniz|r Informant'\195\132\194\177 bu ilk kullan\195\132\194\177\195\133\197\184\195\132\194\177n\195\132\194\177z oldu\195\132\197\184u i\195\131\194\167in, bu mesaj bu pencereyi g\195\131\194\182sterecek tu\195\133\197\184u |cffffffffGame Menu|r s\195\131\194\188n\195\131\194\188n |cffffffffKeybindings|r b\195\131\194\182lum\195\131\194\188nden se\195\131\194\167meniz gerekti\195\132\197\184ini bildirmek i\195\131\194\167in g\195\131\194\182z\195\131\194\188kmekte. Bunu tamamlaman\195\132\194\177zdan sonra \195\131\194\167antan\195\132\194\177zdaki cisimler hakk\195\132\194\177nda detayl\195\132\194\177 bilgi g\195\131\194\182rmek i\195\131\194\167in farenizi istedi\195\132\197\184iniz cismin \195\131\194\188zerine getirin ve belirlediginiz tu\195\133\197\184a bas\195\132\194\177n, o zaman bilgileri i\195\131\194\167eren bu pencere belirecek. O anda tu\195\133\197\184a tekrar bas\195\132\194\177n ya da \195\131\194\167er\195\131\194\167evenin kapa d\195\131\194\188\195\132\197\184mesine t\195\132\194\177klay\195\132\194\177n. Devam etmek i\195\131\194\167in \195\133\197\184imdi kapa d\195\131\194\188\195\132\197\184mesine t\195\132\194\177klay\195\132\194\177n\195\132\194\177z. ";
+		MesgNotLoaded	= "Informant yÃ¼klÃ¼ deÄŸil. Daha fazla bilgi iÃ§in /informant yazÄ±nÄ±zÃ§";
+		Welcome	= "|c40ff50ffInformant'a hoÅŸgeldiniz|r Informant'Ä± bu ilk kullanÄ±ÅŸÄ±nÄ±z olduÄŸu iÃ§in, bu mesaj bu pencereyi gÃ¶sterecek tuÅŸu |cffffffffGame Menu|r sÃ¼nÃ¼n |cffffffffKeybindings|r bÃ¶lumÃ¼nden seÃ§meniz gerektiÄŸini bildirmek iÃ§in gÃ¶zÃ¼kmekte. Bunu tamamlamanÄ±zdan sonra Ã§antanÄ±zdaki cisimler hakkÄ±nda detaylÄ± bilgi gÃ¶rmek iÃ§in farenizi istediÄŸiniz cismin Ã¼zerine getirin ve belirlediginiz tuÅŸa basÄ±n, o zaman bilgileri iÃ§eren bu pencere belirecek. O anda tuÅŸa tekrar basÄ±n ya da Ã§erÃ§evenin kapa dÃ¼ÄŸmesine tÄ±klayÄ±n. Devam etmek iÃ§in ÅŸimdi kapa dÃ¼ÄŸmesine tÄ±klayÄ±nÄ±z. ";
 
 
 		-- Section: Tooltip Messages
@@ -1483,139 +1483,139 @@ InformantLocalizations = {
 
 
 		-- Section: Commands
-		CmdClearAll	= "all\229\133\168\233\131\168";
-		CmdDefault	= "default\233\187\152\232\174\164";
-		CmdDisable	= "disable\231\166\129\231\148\168";
-		CmdEmbed	= "embed\229\181\140\229\133\165";
-		CmdHelp	= "help\229\184\174\229\138\169";
-		CmdLocale	= "locale\229\156\176\229\159\159\228\187\163\231\160\129";
-		CmdOff	= "off\229\133\179";
-		CmdOn	= "on\229\188\128";
-		CmdToggle	= "toggle\229\188\128\229\133\179\232\189\172\230\141\162";
-		OptLocale	= "<\229\156\176\229\159\159\228\187\163\231\160\129>";
-		ShowIcon	= "show-icon\230\152\190\231\164\186\229\155\190\230\160\135";
-		ShowMerchant	= "show-merchant\230\152\190\231\164\186\232\180\167\229\149\134";
-		ShowQuest	= "show-quest\230\152\190\231\164\186\228\187\187\229\138\161";
-		ShowStack	= "show-stack\230\152\190\231\164\186\229\160\134\229\143\160";
-		ShowUsage	= "show-usage\230\152\190\231\164\186\231\148\168\233\128\148";
-		ShowVendor	= "show-vendor\230\152\190\231\164\186\229\149\134\232\180\169";
-		ShowVendorBuy	= "show-vendor-buy\230\152\190\231\164\186\229\149\134\232\180\169\230\148\182\232\180\173";
-		ShowVendorSell	= "show-vendor-sell\230\152\190\231\164\186\229\149\134\232\180\169\229\135\186\229\148\174";
+		CmdClearAll	= "all全部";
+		CmdDefault	= "default默认";
+		CmdDisable	= "disable禁用";
+		CmdEmbed	= "embed嵌入";
+		CmdHelp	= "help帮助";
+		CmdLocale	= "locale地域代码";
+		CmdOff	= "off关";
+		CmdOn	= "on开";
+		CmdToggle	= "toggle开关转换";
+		OptLocale	= "<地域代码>";
+		ShowIcon	= "show-icon显示图标";
+		ShowMerchant	= "show-merchant显示货商";
+		ShowQuest	= "show-quest显示任务";
+		ShowStack	= "show-stack显示堆叠";
+		ShowUsage	= "show-usage显示用途";
+		ShowVendor	= "show-vendor显示商贩";
+		ShowVendorBuy	= "show-vendor-buy显示商贩收购";
+		ShowVendorSell	= "show-vendor-sell显示商贩出售";
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant\230\156\170\229\138\160\232\189\189\227\128\130\233\148\174\229\133\165/informant\230\156\137\230\155\180\229\164\154\228\191\161\230\129\175\227\128\130";
-		StatOff	= "\228\184\141\230\152\190\231\164\186\228\187\187\228\189\149\231\137\169\229\147\129\228\191\161\230\129\175\227\128\130";
-		StatOn	= "\230\152\190\231\164\186\232\174\190\229\174\154\231\154\132\231\137\169\229\147\129\228\191\161\230\129\175\227\128\130";
-		Welcome	= "|c40ff50ff\230\172\162\232\191\142\228\189\191\231\148\168Informant|r \229\155\160\228\184\186\232\191\153\230\152\175\230\130\168\231\172\172\228\184\128\230\172\161\228\189\191\231\148\168Informant\239\188\140\232\191\153\228\184\170\228\191\161\230\129\175\232\174\169\230\130\168\231\159\165\233\129\147\229\191\133\233\161\187\229\156\168|cffffffff\230\184\184\230\136\143\232\143\156\229\141\149|r\231\154\132|cffffffff\230\140\137\233\148\174\232\174\190\231\189\174|r\229\140\186\229\159\159\232\174\190\231\189\174\228\184\128\228\184\170\229\191\171\230\141\183\233\148\174\230\157\165\230\152\190\231\164\186\232\191\153\228\184\170\231\170\151\229\143\163\239\188\140\231\132\182\229\144\142\230\130\168\229\176\177\232\131\189\233\128\154\232\191\135\231\167\187\229\138\168\233\188\160\230\160\135\229\136\176\231\137\169\229\147\129\228\184\138\230\157\165\230\159\165\231\156\139\231\137\169\229\147\129\231\154\132\233\171\152\231\186\167\228\191\161\230\129\175\239\188\140\230\140\137\230\130\168\232\174\190\231\189\174\231\154\132\229\191\171\230\141\183\233\148\174\239\188\140\232\191\153\228\184\170\231\170\151\229\143\163\229\176\134\228\188\154\230\152\190\231\164\186\231\137\169\229\147\129\228\191\161\230\129\175\227\128\130\229\134\141\230\140\137\228\184\128\230\172\161\229\191\171\230\141\183\233\148\174\230\136\150\230\140\137\229\133\179\233\151\173\230\140\137\233\146\174\229\176\134\228\188\154\229\133\179\233\151\173\232\191\153\228\184\170\231\170\151\229\143\163\227\128\130\230\140\137\229\133\179\233\151\173\230\140\137\233\146\174\231\187\167\231\187\173\227\128\130";
+		MesgNotLoaded	= "Informant未加载。键入/informant有更多信息。";
+		StatOff	= "不显示任何物品信息。";
+		StatOn	= "显示设定的物品信息。";
+		Welcome	= "|c40ff50ff欢迎使用Informant|r 因为这是您第一次使用Informant，这个信息让您知道必须在|cffffffff游戏菜单|r的|cffffffff按键设置|r区域设置一个快捷键来显示这个窗口，然后您就能通过移动鼠标到物品上来查看物品的高级信息，按您设置的快捷键，这个窗口将会显示物品信息。再按一次快捷键或按关闭按钮将会关闭这个窗口。按关闭按钮继续。";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "\233\135\141\231\189\174\229\133\168\233\131\168Informant\233\128\137\233\161\185\227\128\130";
-		GuiDefaultAllButton	= "\233\135\141\231\189\174\229\133\168\233\131\168";
-		GuiDefaultAllHelp	= "\231\130\185\230\173\164\233\135\141\231\189\174\229\133\168\233\131\168Informant\233\128\137\233\161\185\229\136\176\229\133\182\233\187\152\232\174\164\229\128\188\227\128\130\232\173\166\229\145\138\239\188\154\230\173\164\230\147\141\228\189\156\228\184\141\229\143\175\230\129\162\229\164\141\227\128\130";
-		GuiDefaultOption	= "\233\135\141\231\189\174\230\173\164\232\174\190\231\189\174\227\128\130";
-		GuiEmbed	= "\229\181\140\229\133\165\228\191\161\230\129\175\229\136\176\230\184\184\230\136\143\229\134\133\230\143\144\231\164\186\228\184\173\227\128\130";
-		GuiEmbedHeader	= "\229\181\140\229\133\165";
-		GuiInfoHeader	= "\232\161\165\229\133\133\228\191\161\230\129\175";
-		GuiInfoHelp	= "\230\142\167\229\136\182\228\189\149\231\167\141\232\161\165\229\133\133\228\191\161\230\129\175\230\152\190\231\164\186\229\156\168\230\143\144\231\164\186\228\184\173\227\128\130";
-		GuiInfoIcon	= "\230\152\190\231\164\186\232\180\162\231\155\174\229\155\190\230\160\135\227\128\130";
-		GuiInfoMerchant	= "\230\152\190\231\164\186\232\180\167\229\149\134\227\128\130";
-		GuiInfoQuest	= "\230\152\190\231\164\186\228\187\187\229\138\161\228\191\161\230\129\175\227\128\130";
-		GuiInfoStack	= "\230\152\190\231\164\186\229\160\134\229\143\160\230\149\176\233\135\143\227\128\130";
-		GuiInfoUsage	= "\230\152\190\231\164\186\231\148\168\233\128\148\228\191\161\230\129\175\227\128\130";
-		GuiLocale	= "\232\174\190\231\189\174\229\156\176\229\159\159\228\187\163\231\160\129\228\184\186";
-		GuiMainEnable	= "\229\144\175\231\148\168Informant\227\128\130";
-		GuiMainHelp	= "\229\140\133\229\144\171\230\143\146\228\187\182 - Informant\231\154\132\232\174\190\231\189\174\227\128\130\229\174\131\231\148\168\228\186\142\230\152\190\231\164\186\232\175\166\231\187\134\231\137\169\229\147\129\228\191\161\230\129\175\227\128\130";
-		GuiOtherHeader	= "\229\133\182\228\187\150\233\128\137\233\161\185";
-		GuiOtherHelp	= "Informant\230\157\130\233\161\185";
-		GuiReloadui	= "\233\135\141\230\150\176\229\138\160\232\189\189\231\148\168\230\136\183\231\149\140\233\157\162\227\128\130";
-		GuiReloaduiButton	= "\233\135\141\232\189\189UI";
-		GuiReloaduiFeedback	= "\231\142\176\229\156\168\230\173\163\233\135\141\230\150\176\229\138\160\232\189\189\233\173\148\229\133\189\231\148\168\230\136\183\231\149\140\233\157\162\227\128\130";
-		GuiReloaduiHelp	= "\229\156\168\230\148\185\229\143\152\229\156\176\229\159\159\228\187\163\231\160\129\229\144\142\231\130\185\230\173\164\233\135\141\230\150\176\229\138\160\232\189\189\233\173\148\229\133\189\231\148\168\230\136\183\231\149\140\233\157\162\228\189\191\230\173\164\233\133\141\231\189\174\229\177\143\229\185\149\228\184\173\231\154\132\232\175\173\232\168\128\229\140\185\233\133\141\233\128\137\230\139\169\227\128\130\230\179\168\230\132\143\239\188\154\230\173\164\230\147\141\228\189\156\229\143\175\232\131\189\232\128\151\230\151\182\229\135\160\229\136\134\233\146\159\227\128\130";
-		GuiVendor	= "\230\152\190\231\164\186\229\149\134\232\180\169\228\187\183\230\160\188\227\128\130";
-		GuiVendorBuy	= "\230\152\190\231\164\186\229\149\134\232\180\169\230\148\182\232\180\173\228\187\183\227\128\130";
-		GuiVendorHeader	= "\229\149\134\232\180\169\228\187\183\230\160\188\227\128\130";
-		GuiVendorHelp	= "\229\133\179\228\186\142\233\157\158\231\142\169\229\174\182\232\167\146\232\137\178\228\185\176\229\141\150\228\187\183\230\160\188\231\154\132\233\128\137\233\161\185\227\128\130";
-		GuiVendorSell	= "\230\152\190\231\164\186\229\149\134\232\180\169\229\135\186\229\148\174\228\187\183\227\128\130";
-		HelpDefault	= "\233\135\141\231\189\174\228\184\128\228\184\170Informant\233\128\137\233\161\185\228\184\186\229\133\182\233\187\152\232\174\164\229\128\188\239\188\140\228\189\160\228\185\159\229\143\175\228\187\165\228\189\191\231\148\168\"all\"\230\157\165\233\135\141\231\189\174\230\137\128\230\156\137\233\128\137\233\161\185\228\184\186\229\133\182\233\187\152\232\174\164\229\128\188\227\128\130";
-		HelpDisable	= "\233\152\187\230\173\162Informant\229\156\168\228\184\139\230\172\161\231\153\187\229\189\149\230\151\182\232\135\170\229\138\168\229\138\160\232\189\189\227\128\130";
-		HelpEmbed	= "\229\181\140\229\133\165\230\150\135\229\173\151\232\135\179\229\142\159\229\167\139\230\184\184\230\136\143\230\143\144\231\164\186(\230\179\168\230\132\143\239\188\154\230\173\164\233\161\185\233\128\137\230\139\169\230\151\182\230\159\144\228\186\155\229\138\159\232\131\189\232\162\171\231\166\129\231\148\168)\227\128\130";
-		HelpIcon	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\231\137\169\229\147\129\231\154\132\232\180\162\231\155\174\229\155\190\230\160\135\227\128\130";
-		HelpLocale	= "\230\148\185\229\143\152\231\148\168\228\186\142\230\152\190\231\164\186Informant\232\174\175\230\129\175\231\154\132\229\156\176\229\159\159\228\187\163\231\160\129\227\128\130";
-		HelpMerchant	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\228\190\155\229\186\148\231\137\169\229\147\129\231\154\132\232\180\167\229\149\134\227\128\130";
-		HelpOnoff	= "\230\137\147\229\188\128/\229\133\179\233\151\173\228\191\161\230\129\175\230\149\176\230\141\174\230\152\190\231\164\186\227\128\130";
-		HelpQuest	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\228\187\187\229\138\161\231\137\169\229\147\129\231\154\132\231\148\168\233\128\148\227\128\130";
-		HelpStack	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\143\175\229\160\134\229\143\160\230\149\176\233\135\143\227\128\130";
-		HelpUsage	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\149\134\228\184\154\230\138\128\232\131\189\231\137\169\229\147\129\231\154\132\231\148\168\233\128\148\227\128\130";
-		HelpVendor	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\149\134\232\180\169\228\187\183\230\160\188\227\128\130";
-		HelpVendorBuy	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\149\134\232\180\169\230\148\182\232\180\173\228\187\183\230\160\188(\233\156\128\232\166\129show-vendor=on)\227\128\130";
-		HelpVendorSell	= "\233\128\137\230\139\169\230\152\175\229\144\166\230\152\190\231\164\186\229\149\134\232\180\169\233\148\128\229\148\174\228\187\183\230\160\188(\233\156\128\232\166\129show-vendor=on)\227\128\130";
+		GuiDefaultAll	= "重置全部Informant选项。";
+		GuiDefaultAllButton	= "重置全部";
+		GuiDefaultAllHelp	= "点此重置全部Informant选项到其默认值。警告：此操作不可恢复。";
+		GuiDefaultOption	= "重置此设置。";
+		GuiEmbed	= "嵌入信息到游戏内提示中。";
+		GuiEmbedHeader	= "嵌入";
+		GuiInfoHeader	= "补充信息";
+		GuiInfoHelp	= "控制何种补充信息显示在提示中。";
+		GuiInfoIcon	= "显示财目图标。";
+		GuiInfoMerchant	= "显示货商。";
+		GuiInfoQuest	= "显示任务信息。";
+		GuiInfoStack	= "显示堆叠数量。";
+		GuiInfoUsage	= "显示用途信息。";
+		GuiLocale	= "设置地域代码为";
+		GuiMainEnable	= "启用Informant。";
+		GuiMainHelp	= "包含插件 - Informant的设置。它用于显示详细物品信息。";
+		GuiOtherHeader	= "其他选项";
+		GuiOtherHelp	= "Informant杂项";
+		GuiReloadui	= "重新加载用户界面。";
+		GuiReloaduiButton	= "重载UI";
+		GuiReloaduiFeedback	= "现在正重新加载魔兽用户界面。";
+		GuiReloaduiHelp	= "在改变地域代码后点此重新加载魔兽用户界面使此配置屏幕中的语言匹配选择。注意：此操作可能耗时几分钟。";
+		GuiVendor	= "显示商贩价格。";
+		GuiVendorBuy	= "显示商贩收购价。";
+		GuiVendorHeader	= "商贩价格。";
+		GuiVendorHelp	= "关于非玩家角色买卖价格的选项。";
+		GuiVendorSell	= "显示商贩出售价。";
+		HelpDefault	= "重置一个Informant选项为其默认值，你也可以使用\"all\"来重置所有选项为其默认值。";
+		HelpDisable	= "阻止Informant在下次登录时自动加载。";
+		HelpEmbed	= "嵌入文字至原始游戏提示(注意：此项选择时某些功能被禁用)。";
+		HelpIcon	= "选择是否显示物品的财目图标。";
+		HelpLocale	= "改变用于显示Informant讯息的地域代码。";
+		HelpMerchant	= "选择是否显示供应物品的货商。";
+		HelpOnoff	= "打开/关闭信息数据显示。";
+		HelpQuest	= "选择是否显示任务物品的用途。";
+		HelpStack	= "选择是否显示可堆叠数量。";
+		HelpUsage	= "选择是否显示商业技能物品的用途。";
+		HelpVendor	= "选择是否显示商贩价格。";
+		HelpVendorBuy	= "选择是否显示商贩收购价格(需要show-vendor=on)。";
+		HelpVendorSell	= "选择是否显示商贩销售价格(需要show-vendor=on)。";
 
 
 		-- Section: Keybinding Text
 		BindingHeader	= "Informant";
-		BindingTitle	= "\229\188\128\229\133\179\232\189\172\230\141\162\228\191\161\230\129\175\231\170\151\229\143\163";
+		BindingTitle	= "开关转换信息窗口";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "Informant\231\137\169\229\147\129\228\191\161\230\129\175";
-		FrmtActDefault	= "Informant\231\154\132%s\233\128\137\233\161\185\232\162\171\233\135\141\231\189\174\228\184\186\229\133\182\233\187\152\232\174\164\229\128\188\227\128\130";
-		FrmtActDefaultall	= "\230\137\128\230\156\137Informant\233\128\137\233\161\185\232\162\171\233\135\141\231\189\174\228\184\186\233\187\152\232\174\164\229\128\188\227\128\130";
-		FrmtActDisable	= "\228\184\141\230\152\190\231\164\186\231\137\169\229\147\129\231\154\132%s\230\149\176\230\141\174\227\128\130";
-		FrmtActEnable	= "\230\152\190\231\164\186\231\137\169\229\147\129\231\154\132%s\230\149\176\230\141\174\227\128\130";
-		FrmtActEnabledOn	= "\230\152\190\231\164\186\231\137\169\229\147\129\231\154\132%s\228\186\142%s\227\128\130";
-		FrmtActSet	= "\232\174\190\231\189\174%s\228\184\186'%s'\227\128\130";
-		FrmtActUnknown	= "\230\156\170\231\159\165\229\145\189\228\187\164\239\188\154'%s'\227\128\130";
-		FrmtInfoBuy	= "\232\180\173\228\186\142\229\149\134\232\180\169";
-		FrmtInfoBuymult	= "\228\185\176\229\133\165%d\228\187\182(\230\175\143\228\187\182%s)";
-		FrmtInfoClass	= "\231\177\187\229\158\139:%s";
-		FrmtInfoMerchants	= "\230\156\137%d\228\184\170\232\180\167\229\149\134\229\135\186\229\148\174";
-		FrmtInfoQuest	= "%d\228\184\170\228\187\187\229\138\161\228\189\191\231\148\168\231\154\132\228\187\187\229\138\161\231\137\169\229\147\129";
-		FrmtInfoSell	= "\229\148\174\228\186\142\229\149\134\232\180\169";
-		FrmtInfoSellmult	= "\229\141\150\229\135\186%d\228\187\182(\230\175\143\228\187\182%s)";
-		FrmtInfoStx	= "\230\175\143\231\187\132\229\160\134\229\143\160%d";
-		FrmtInfoUse	= "\231\148\168\233\128\148:%s";
-		FrmtUnknownLocale	= "\230\140\135\229\174\154\229\156\176\229\159\159\228\187\163\231\160\129('%s')\230\156\170\231\159\165\227\128\130\230\156\137\230\149\136\231\154\132\229\156\176\229\159\159\228\187\163\231\160\129\228\184\186\239\188\154";
-		FrmtWelcome	= "Informant v%s \229\183\178\229\138\160\232\189\189\239\188\129";
-		InfoHeader	= "|cff%s%s|r\231\154\132\228\191\161\230\129\175";
-		InfoNoItem	= "\229\191\133\233\161\187\229\133\136\231\167\187\229\136\176\228\184\128\228\184\170\231\137\169\229\147\129\228\184\138\239\188\140\231\132\182\229\144\142\230\140\137\230\191\128\230\180\187\233\148\174\227\128\130";
-		InfoPlayerMade	= "\231\148\177\231\173\137\231\186\167%d\231\154\132%s\229\136\182\228\189\156\227\128\130";
-		InfoQuestHeader	= "\229\156\168%d\228\184\170\228\187\187\229\138\161\228\184\173\228\189\191\231\148\168\239\188\154";
-		InfoQuestName	= "%d\228\184\186\"%s\"(\231\173\137\231\186\167%d)";
-		InfoQuestSource	= "\228\187\187\229\138\161\230\149\176\230\141\174\230\143\144\228\190\155\232\128\133\230\152\175";
-		InfoVendorHeader	= "%d\228\184\170\232\180\167\229\149\134\229\135\186\229\148\174\239\188\154";
+		FrameTitle	= "Informant物品信息";
+		FrmtActDefault	= "Informant的%s选项被重置为其默认值。";
+		FrmtActDefaultall	= "所有Informant选项被重置为默认值。";
+		FrmtActDisable	= "不显示物品的%s数据。";
+		FrmtActEnable	= "显示物品的%s数据。";
+		FrmtActEnabledOn	= "显示物品的%s于%s。";
+		FrmtActSet	= "设置%s为'%s'。";
+		FrmtActUnknown	= "未知命令：'%s'。";
+		FrmtInfoBuy	= "购于商贩";
+		FrmtInfoBuymult	= "买入%d件(每件%s)";
+		FrmtInfoClass	= "类型:%s";
+		FrmtInfoMerchants	= "有%d个货商出售";
+		FrmtInfoQuest	= "%d个任务使用的任务物品";
+		FrmtInfoSell	= "售于商贩";
+		FrmtInfoSellmult	= "卖出%d件(每件%s)";
+		FrmtInfoStx	= "每组堆叠%d";
+		FrmtInfoUse	= "用途:%s";
+		FrmtUnknownLocale	= "指定地域代码('%s')未知。有效的地域代码为：";
+		FrmtWelcome	= "Informant v%s 已加载！";
+		InfoHeader	= "|cff%s%s|r的信息";
+		InfoNoItem	= "必须先移到一个物品上，然后按激活键。";
+		InfoPlayerMade	= "由等级%d的%s制作。";
+		InfoQuestHeader	= "在%d个任务中使用：";
+		InfoQuestName	= "%d为\"%s\"(等级%d)";
+		InfoQuestSource	= "任务数据提供者是";
+		InfoVendorHeader	= "%d个货商出售：";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
-		AdditAlcohol	= "\233\133\146\231\178\190\233\165\174\230\150\153";
-		AdditBuff	= "\229\162\158\231\155\138";
-		AdditDrink	= "\233\165\174\230\150\153";
-		AdditFirework	= "\231\132\176\231\129\171";
-		AdditFood	= "\233\163\159\231\137\169";
-		AdditGiftwrap	= "\231\164\188\229\147\129\229\140\133\232\163\133\231\186\184";
-		AdditLure	= "\232\175\177\233\165\181";
-		AdditPoison	= "\230\175\146\232\141\175";
-		AdditPotion	= "\232\141\175\230\176\180";
-		AdditRestorative	= "\230\187\139\232\161\165\229\137\130";
-		AdditScroll	= "\229\141\183\232\189\180";
-		SkillAlchemy	= "\231\130\188\233\135\145\230\156\175";
-		SkillBlacksmithing	= "\233\148\187\233\128\160";
-		SkillCooking	= "\231\131\185\233\165\170";
-		SkillDruid	= "\229\190\183\233\178\129\228\188\138\233\173\148\230\179\149";
-		SkillEnchanting	= "\233\153\132\233\173\148";
-		SkillEngineering	= "\229\183\165\231\168\139\229\173\166";
-		SkillFirstAid	= "\230\128\165\230\149\145";
-		SkillLeatherworking	= "\229\136\182\231\154\174";
-		SkillMage	= "\230\179\149\229\184\136\233\173\148\230\179\149";
-		SkillMining	= "\233\135\135\231\159\191";
-		SkillPaladin	= "\229\156\163\233\170\145\229\163\171\233\173\148\230\179\149";
-		SkillPriest	= "\231\137\167\229\184\136\233\173\148\230\179\149";
-		SkillRogue	= "\231\155\151\232\180\188\230\138\128\232\131\189";
-		SkillShaman	= "\232\144\168\230\187\161\231\165\173\229\143\184\233\173\148\230\179\149";
-		SkillTailoring	= "\232\163\129\231\188\157";
-		SkillWarlock	= "\230\156\175\229\163\171\233\173\148\230\179\149";
+		AdditAlcohol	= "酒精饮料";
+		AdditBuff	= "增益";
+		AdditDrink	= "饮料";
+		AdditFirework	= "焰火";
+		AdditFood	= "食物";
+		AdditGiftwrap	= "礼品包装纸";
+		AdditLure	= "诱饵";
+		AdditPoison	= "毒药";
+		AdditPotion	= "药水";
+		AdditRestorative	= "滋补剂";
+		AdditScroll	= "卷轴";
+		SkillAlchemy	= "炼金术";
+		SkillBlacksmithing	= "锻造";
+		SkillCooking	= "烹饪";
+		SkillDruid	= "德鲁伊魔法";
+		SkillEnchanting	= "附魔";
+		SkillEngineering	= "工程学";
+		SkillFirstAid	= "急救";
+		SkillLeatherworking	= "制皮";
+		SkillMage	= "法师魔法";
+		SkillMining	= "采矿";
+		SkillPaladin	= "圣骑士魔法";
+		SkillPriest	= "牧师魔法";
+		SkillRogue	= "盗贼技能";
+		SkillShaman	= "萨满祭司魔法";
+		SkillTailoring	= "裁缝";
+		SkillWarlock	= "术士魔法";
 
 	};
 
@@ -1632,7 +1632,7 @@ InformantLocalizations = {
 		CmdOff	= "off";
 		CmdOn	= "on";
 		CmdToggle	= "toggle";
-		OptLocale	= "<\232\170\158\232\168\128>";
+		OptLocale	= "<語言>";
 		ShowIcon	= "show-icon";
 		ShowMerchant	= "show-merchant";
 		ShowQuest	= "show-quest";
@@ -1644,118 +1644,118 @@ InformantLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Informant \229\176\154\230\156\170\232\188\137\229\133\165\227\128\130\232\171\139\232\188\184\229\133\165 /informant \229\143\150\229\190\151\232\170\170\230\152\142\227\128\130";
-		StatOff	= "\228\184\141\233\161\175\231\164\186\228\187\187\228\189\149\231\137\169\229\147\129\232\179\135\232\168\138";
-		StatOn	= "\233\161\175\231\164\186\232\168\173\229\174\154\229\165\189\231\154\132\231\137\169\229\147\129\232\179\135\232\168\138";
-		Welcome	= "|c40ff50ff\230\173\161\232\191\142\228\189\191\231\148\168Informant|r \233\128\153\230\152\175\228\189\160\231\172\172\228\184\128\230\172\161\228\189\191\231\148\168Informant\239\188\140\228\189\160\229\191\133\233\160\136\229\156\168|cffffffff\233\129\138\230\136\178\233\129\184\233\160\133|r \228\184\173\231\154\132|cffffffff\230\140\137\233\141\181\232\168\173\229\174\154|r\232\163\161\232\168\173\229\174\154\228\184\128\229\128\139\231\134\177\233\141\181\230\137\141\232\131\189\229\134\141\230\172\161\233\161\175\231\164\186\230\156\172\232\168\173\229\174\154\232\166\150\231\170\151\227\128\130 \231\143\190\229\156\168\233\150\139\229\167\139\239\188\140Informant\230\156\131\229\156\168\228\189\160\230\138\138\230\187\145\233\188\160\230\140\135\229\136\176\228\187\187\228\189\149\228\184\128\229\128\139\231\137\169\229\147\129\228\184\138\230\153\130\239\188\140\230\138\138\232\169\178\231\137\169\229\147\129\231\154\132\233\128\178\233\154\142\232\179\135\232\168\138\233\161\175\231\164\186\229\135\186\228\190\134\227\128\130 \232\139\165\228\189\160\230\131\179\232\166\129\232\169\179\231\180\176\230\170\162\232\166\150\232\169\178\231\137\169\229\147\129\231\154\132\230\137\128\230\156\137\233\128\178\233\154\142\232\179\135\232\168\138\239\188\140\229\143\170\232\166\129\229\144\140\230\153\130\230\140\137\228\184\139\228\189\160\229\156\168|cffffffff\230\140\137\233\141\181\232\168\173\229\174\154|r\232\163\161\232\168\173\229\174\154\231\154\132\231\134\177\233\141\181\229\141\179\229\143\175\227\128\130 \233\187\158\230\147\138\227\128\140\233\151\156\233\150\137\227\128\141\228\187\165\233\151\156\233\150\137\230\156\172\232\166\150\231\170\151\228\184\166\231\185\188\231\186\140\233\129\138\230\136\178\227\128\130";
+		MesgNotLoaded	= "Informant 尚未載入。請輸入 /informant 取得說明。";
+		StatOff	= "不顯示任何物品資訊";
+		StatOn	= "顯示設定好的物品資訊";
+		Welcome	= "|c40ff50ff歡迎使用Informant|r 這是你第一次使用Informant，你必須在|cffffffff遊戲選項|r 中的|cffffffff按鍵設定|r裡設定一個熱鍵才能再次顯示本設定視窗。 現在開始，Informant會在你把滑鼠指到任何一個物品上時，把該物品的進階資訊顯示出來。 若你想要詳細檢視該物品的所有進階資訊，只要同時按下你在|cffffffff按鍵設定|r裡設定的熱鍵即可。 點擊「關閉」以關閉本視窗並繼續遊戲。";
 
 
 		-- Section: Help Text
-		GuiDefaultAll	= "\233\135\141\232\168\173\230\137\128\230\156\137Informant\233\129\184\233\160\133";
-		GuiDefaultAllButton	= "\233\135\141\232\168\173\229\133\168\233\131\168";
-		GuiDefaultAllHelp	= "\233\187\158\233\128\153\232\163\161\230\138\138\230\137\128\230\156\137informant\233\129\184\233\160\133\230\148\185\229\155\158\233\160\144\232\168\173\229\128\188\227\128\130\232\173\166\229\145\138: \230\173\164\230\147\141\228\189\156\228\184\141\232\131\189\229\190\169\229\142\159\239\188\129";
-		GuiDefaultOption	= "\233\135\141\232\168\173\233\128\153\229\128\139\232\168\173\229\174\154";
-		GuiEmbed	= "\230\138\138\232\179\135\230\150\153\229\181\140\229\133\165\233\129\138\230\136\178\229\133\167\231\154\132\232\179\135\232\168\138\231\170\151";
-		GuiEmbedHeader	= "\229\181\140\229\133\165";
-		GuiInfoHeader	= "\233\161\141\229\164\150\232\179\135\232\168\138";
-		GuiInfoHelp	= "\230\142\167\229\136\182\229\147\170\229\128\139\233\161\141\229\164\150\231\154\132\232\179\135\232\168\138\232\166\129\233\161\175\231\164\186\229\156\168\230\143\144\231\164\186\232\168\138\230\129\175\228\184\138";
-		GuiInfoIcon	= "\233\161\175\231\164\186\229\173\152\232\178\168\229\131\143 ";
-		GuiInfoMerchant	= "\233\161\175\231\164\186\229\149\134\228\186\186";
-		GuiInfoQuest	= "\233\161\175\231\164\186\228\187\187\229\139\153\232\179\135\232\168\138";
-		GuiInfoStack	= "\233\161\175\231\164\186\229\150\174\230\160\188\229\174\185\231\180\141\230\149\184\233\135\143";
-		GuiInfoUsage	= "\233\161\175\231\164\186\228\189\191\231\148\168\232\179\135\232\168\138";
-		GuiLocale	= "\232\168\173\229\174\154\232\170\158\232\168\128\231\130\186";
-		GuiMainEnable	= "\229\149\159\231\148\168Informant";
-		GuiMainHelp	= "\229\140\133\230\139\172Informant\231\154\132\232\168\173\229\174\154\239\188\140Informant\230\152\175\228\184\128\229\128\139\229\143\175\228\187\165\233\161\175\231\164\186\231\137\169\229\147\129\233\128\178\233\154\142\232\179\135\232\168\138\231\154\132AddOn\227\128\130";
-		GuiOtherHeader	= "\229\133\182\228\187\150\233\129\184\233\160\133";
-		GuiOtherHelp	= "Informant\233\155\156\233\160\133";
-		GuiReloadui	= "\233\135\141\230\150\176\232\188\137\229\133\165\231\148\168\230\136\182\231\149\140\233\157\162";
-		GuiReloaduiButton	= "\233\135\141\230\150\176\232\188\137\229\133\165\230\143\146\228\187\182";
-		GuiReloaduiFeedback	= "\230\173\163\229\156\168\232\188\137\229\133\165WoW UI";
-		GuiReloaduiHelp	= "\228\189\160\229\143\175\228\187\165\229\156\168\230\148\185\232\174\138\232\170\158\231\179\187\229\190\140\233\187\158\230\147\138\233\128\153\232\163\161\239\188\140\233\135\141\230\150\176\232\188\137\229\133\165WOW UI\227\128\130\233\128\153\229\143\175\232\131\189\230\156\131\232\166\129\229\164\154\232\138\177\228\184\128\233\187\158\230\153\130\233\150\147\227\128\130";
-		GuiVendor	= "\233\161\175\231\164\186\229\149\134\229\186\151\229\131\185\230\160\188";
-		GuiVendorBuy	= "\233\161\175\231\164\186\229\149\134\229\186\151\232\179\188\232\178\183\229\131\185";
-		GuiVendorHeader	= "\229\149\134\229\186\151\229\131\185\230\160\188";
-		GuiVendorHelp	= "\229\149\134\229\186\151\232\179\188\232\178\183/\229\148\174\229\135\186\231\154\132\229\131\185\230\160\188\233\129\184\233\160\133\227\128\130";
-		GuiVendorSell	= "\233\161\175\231\164\186\229\149\134\229\186\151\232\179\163\229\135\186\229\131\185";
-		HelpDefault	= "\232\168\173\229\174\154\230\159\144\229\128\139informant\233\129\184\233\160\133\229\155\158\233\160\144\232\168\173\229\128\188\227\128\130\231\148\168\"all\"\228\190\134\233\135\141\231\189\174\229\133\168\233\131\168\233\129\184\233\160\133\227\128\130";
-		HelpDisable	= "\228\189\191informant\228\184\141\229\134\141\232\135\170\229\139\149\230\150\188\231\153\187\229\133\165\230\153\130\232\188\137\229\133\165";
-		HelpEmbed	= "\229\176\135\230\150\135\229\173\151\229\181\140\229\133\165\229\156\168\233\129\138\230\136\178\229\159\186\230\156\172\230\143\144\231\164\186\230\161\134\228\184\173(\230\179\168\230\132\143\239\188\154\233\128\153\230\156\131\228\189\191\230\159\144\228\186\155\229\138\159\232\131\189\231\132\161\230\179\149\228\189\191\231\148\168)";
-		HelpIcon	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\233\160\133\231\155\174\231\154\132\229\173\152\232\178\168\229\131\143\n";
-		HelpLocale	= "\230\148\185\232\174\138\233\161\175\231\164\186Informant\232\168\138\230\129\175\231\154\132\232\170\158\231\179\187";
-		HelpMerchant	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\232\179\163\233\128\153\233\160\133\231\137\169\229\147\129\231\154\132\229\149\134\228\186\186";
-		HelpOnoff	= "\233\161\175\231\164\186\233\128\153\229\128\139\232\179\135\232\168\138on/off";
-		HelpQuest	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\228\187\187\229\139\153\231\137\169\229\147\129";
-		HelpStack	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\230\173\164\231\137\169\229\147\129\230\156\128\229\164\167\229\174\185\231\180\141\230\149\184\233\135\143";
-		HelpUsage	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\228\186\164\230\152\147\230\138\128\232\131\189\231\154\132\231\137\169\229\147\129";
-		HelpVendor	= "\233\129\184\230\147\135\230\152\175\229\144\166\232\166\129\233\161\175\231\164\186\231\137\169\229\147\129\229\131\185\230\160\188";
-		HelpVendorBuy	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\231\137\169\229\147\129\229\156\168\229\149\134\229\186\151\229\148\174\229\135\186\231\154\132\229\131\185\230\160\188 (\233\156\128\232\166\129\233\150\139\229\149\159\233\161\175\231\164\186\231\137\169\229\147\129\229\131\185\230\160\188) ";
-		HelpVendorSell	= "\233\129\184\230\147\135\230\152\175\229\144\166\233\161\175\231\164\186\231\137\169\229\147\129\229\156\168\229\149\134\229\186\151\230\148\182\232\179\188\231\154\132\229\131\185\230\160\188 (\233\156\128\232\166\129\233\150\139\229\149\159\233\161\175\231\164\186\231\137\169\229\147\129\229\131\185\230\160\188)";
+		GuiDefaultAll	= "重設所有Informant選項";
+		GuiDefaultAllButton	= "重設全部";
+		GuiDefaultAllHelp	= "點這裡把所有informant選項改回預設值。警告: 此操作不能復原！";
+		GuiDefaultOption	= "重設這個設定";
+		GuiEmbed	= "把資料嵌入遊戲內的資訊窗";
+		GuiEmbedHeader	= "嵌入";
+		GuiInfoHeader	= "額外資訊";
+		GuiInfoHelp	= "控制哪個額外的資訊要顯示在提示訊息上";
+		GuiInfoIcon	= "顯示存貨像 ";
+		GuiInfoMerchant	= "顯示商人";
+		GuiInfoQuest	= "顯示任務資訊";
+		GuiInfoStack	= "顯示單格容納數量";
+		GuiInfoUsage	= "顯示使用資訊";
+		GuiLocale	= "設定語言為";
+		GuiMainEnable	= "啟用Informant";
+		GuiMainHelp	= "包括Informant的設定，Informant是一個可以顯示物品進階資訊的AddOn。";
+		GuiOtherHeader	= "其他選項";
+		GuiOtherHelp	= "Informant雜項";
+		GuiReloadui	= "重新載入用戶界面";
+		GuiReloaduiButton	= "重新載入插件";
+		GuiReloaduiFeedback	= "正在載入WoW UI";
+		GuiReloaduiHelp	= "你可以在改變語系後點擊這裡，重新載入WOW UI。這可能會要多花一點時間。";
+		GuiVendor	= "顯示商店價格";
+		GuiVendorBuy	= "顯示商店購買價";
+		GuiVendorHeader	= "商店價格";
+		GuiVendorHelp	= "商店購買/售出的價格選項。";
+		GuiVendorSell	= "顯示商店賣出價";
+		HelpDefault	= "設定某個informant選項回預設值。用\"all\"來重置全部選項。";
+		HelpDisable	= "使informant不再自動於登入時載入";
+		HelpEmbed	= "將文字嵌入在遊戲基本提示框中(注意：這會使某些功能無法使用)";
+		HelpIcon	= "選擇是否顯示項目的存貨像\n";
+		HelpLocale	= "改變顯示Informant訊息的語系";
+		HelpMerchant	= "選擇是否顯示賣這項物品的商人";
+		HelpOnoff	= "顯示這個資訊on/off";
+		HelpQuest	= "選擇是否顯示任務物品";
+		HelpStack	= "選擇是否顯示此物品最大容納數量";
+		HelpUsage	= "選擇是否顯示交易技能的物品";
+		HelpVendor	= "選擇是否要顯示物品價格";
+		HelpVendorBuy	= "選擇是否顯示物品在商店售出的價格 (需要開啟顯示物品價格) ";
+		HelpVendorSell	= "選擇是否顯示物品在商店收購的價格 (需要開啟顯示物品價格)";
 
 
 		-- Section: Keybinding Text
-		BindingHeader	= "\231\137\169\229\147\129\229\138\169\230\137\139";
-		BindingTitle	= "\232\168\173\231\189\174\228\191\161\230\129\175\231\170\151\229\143\163\233\161\175\231\164\186\231\134\177\233\141\181";
+		BindingHeader	= "物品助手";
+		BindingTitle	= "設置信息窗口顯示熱鍵";
 
 
 		-- Section: Tooltip Messages
-		FrameTitle	= "Informant \231\137\169\229\147\129\232\179\135\230\150\153";
-		FrmtActDefault	= "%s \233\160\133\232\168\173\231\189\174\232\162\171\229\155\158\232\166\134\230\136\144\233\160\144\232\168\173\229\128\188";
-		FrmtActDefaultall	= "\230\137\128\230\156\137informant\233\129\184\233\160\133\229\183\178\229\155\158\232\166\134\230\136\144\233\160\144\232\168\173\229\128\188";
-		FrmtActDisable	= "\228\184\141\229\134\141\233\161\175\231\164\186\231\137\169\229\147\129\231\154\132%s\232\179\135\232\168\138";
-		FrmtActEnable	= "\233\161\175\231\164\186\231\137\169\229\147\129\231\154\132%s\232\179\135\232\168\138";
-		FrmtActEnabledOn	= "\233\161\175\231\164\186\231\137\169\229\147\129\231\154\132%s on %s";
-		FrmtActSet	= "\232\168\173\231\189\174 %s \231\130\186 '%s'";
-		FrmtActUnknown	= "\230\156\170\231\159\165\231\154\132\230\140\135\228\187\164: '%s'";
-		FrmtInfoBuy	= "\229\149\134\229\186\151\229\148\174\229\135\186\229\131\185";
-		FrmtInfoBuymult	= "\232\178\183\229\133\165 %d (\229\150\174\229\131\185 %s)";
-		FrmtInfoClass	= "\233\161\158\229\136\165: %s";
-		FrmtInfoMerchants	= "\230\173\164\231\137\169\229\147\129\229\156\168 %d \229\128\139\229\149\134\229\186\151\233\138\183\229\148\174";
-		FrmtInfoQuest	= "%d \228\187\187\229\139\153\231\154\132\228\187\187\229\139\153\231\137\169\229\147\129";
-		FrmtInfoSell	= "\229\149\134\229\186\151\230\148\182\232\179\188\229\131\185";
-		FrmtInfoSellmult	= "\232\179\163\229\135\186 %d (\229\150\174\229\131\185 %s)";
-		FrmtInfoStx	= "\229\150\174\230\160\188\229\174\185\231\180\141%d\229\128\139";
-		FrmtInfoUse	= "\231\148\168\230\150\188: %s";
-		FrmtUnknownLocale	= "\228\189\160\230\140\135\229\174\154\231\154\132\232\170\158\231\179\187 ('%s') \231\132\161\230\149\136. \229\143\175\231\148\168\231\154\132\232\170\158\231\179\187\231\130\186:";
-		FrmtWelcome	= "Informant v%s \229\183\178\232\188\137\229\133\165";
-		InfoHeader	= "|cff%s%s|r \231\154\132\232\169\179\231\180\176\228\191\161\230\129\175";
-		InfoNoItem	= "\228\189\160\229\191\133\233\160\136\229\133\136\230\138\138\230\184\184\230\168\153\231\167\187\229\136\176\230\159\144\229\128\139\231\137\169\229\147\129\228\184\138\233\157\162\239\188\140\231\132\182\229\190\140\228\189\191\231\148\168\232\169\178\233\160\133\231\137\169\229\147\129";
-		InfoPlayerMade	= "\231\148\177\231\173\137\231\180\154%d\231\154\132%s\232\163\189\233\128\160";
-		InfoQuestHeader	= "%d\233\160\133\228\187\187\229\139\153\228\184\173\228\189\191\231\148\168:";
+		FrameTitle	= "Informant 物品資料";
+		FrmtActDefault	= "%s 項設置被回覆成預設值";
+		FrmtActDefaultall	= "所有informant選項已回覆成預設值";
+		FrmtActDisable	= "不再顯示物品的%s資訊";
+		FrmtActEnable	= "顯示物品的%s資訊";
+		FrmtActEnabledOn	= "顯示物品的%s on %s";
+		FrmtActSet	= "設置 %s 為 '%s'";
+		FrmtActUnknown	= "未知的指令: '%s'";
+		FrmtInfoBuy	= "商店售出價";
+		FrmtInfoBuymult	= "買入 %d (單價 %s)";
+		FrmtInfoClass	= "類別: %s";
+		FrmtInfoMerchants	= "此物品在 %d 個商店銷售";
+		FrmtInfoQuest	= "%d 任務的任務物品";
+		FrmtInfoSell	= "商店收購價";
+		FrmtInfoSellmult	= "賣出 %d (單價 %s)";
+		FrmtInfoStx	= "單格容納%d個";
+		FrmtInfoUse	= "用於: %s";
+		FrmtUnknownLocale	= "你指定的語系 ('%s') 無效. 可用的語系為:";
+		FrmtWelcome	= "Informant v%s 已載入";
+		InfoHeader	= "|cff%s%s|r 的詳細信息";
+		InfoNoItem	= "你必須先把游標移到某個物品上面，然後使用該項物品";
+		InfoPlayerMade	= "由等級%d的%s製造";
+		InfoQuestHeader	= "%d項任務中使用:";
 		InfoQuestName	= "  %d for \"%s\" (level %d)";
-		InfoQuestSource	= "\228\187\187\229\139\153\232\179\135\230\150\153\230\143\144\228\190\155\232\128\133";
-		InfoVendorHeader	= "\230\156\137%d\229\128\139\229\149\134\228\186\186\232\178\169\229\148\174:";
+		InfoQuestSource	= "任務資料提供者";
+		InfoVendorHeader	= "有%d個商人販售:";
 		InfoVendorName	= "%s";
 
 
 		-- Section: Type Messages
-		AdditAlcohol	= "\233\133\146";
-		AdditBuff	= "\229\162\158\231\155\138";
-		AdditDrink	= "\233\163\178\230\150\153";
-		AdditFirework	= "\231\133\153\231\129\171";
-		AdditFood	= "\233\163\159\231\137\169";
-		AdditGiftwrap	= "\231\166\174\229\147\129\229\140\133\232\163\157\231\180\153";
-		AdditLure	= "\233\173\154\233\164\140";
-		AdditPoison	= "\230\175\146\232\151\165";
-		AdditPotion	= "\232\151\165\230\176\180";
-		AdditRestorative	= "\230\187\139\232\163\156\229\138\145";
-		AdditScroll	= "\230\141\178\232\187\184";
-		SkillAlchemy	= "\231\133\137\233\135\145";
-		SkillBlacksmithing	= "\233\141\155\233\128\160";
-		SkillCooking	= "\231\131\185\233\163\170";
-		SkillDruid	= "\229\190\183\233\173\175\228\188\138\230\179\149\232\161\147";
-		SkillEnchanting	= "\233\153\132\233\173\148";
-		SkillEngineering	= "\229\183\165\231\168\139\229\173\184";
-		SkillFirstAid	= "\230\128\165\230\149\145";
-		SkillLeatherworking	= "\232\163\189\231\154\174";
-		SkillMage	= "\230\179\149\229\184\171\230\179\149\232\161\147";
-		SkillMining	= "\230\142\161\231\164\166";
-		SkillPaladin	= "\232\129\150\233\168\142\230\179\149\232\161\147";
-		SkillPriest	= "\231\137\167\229\184\171\230\179\149\232\161\147";
-		SkillRogue	= "\231\155\156\232\179\138\230\138\128\232\131\189";
-		SkillShaman	= "\232\150\169\230\187\191\230\179\149\232\161\147";
-		SkillTailoring	= "\232\163\129\231\184\171";
-		SkillWarlock	= "\232\161\147\229\163\171\230\179\149\232\161\147";
+		AdditAlcohol	= "酒";
+		AdditBuff	= "增益";
+		AdditDrink	= "飲料";
+		AdditFirework	= "煙火";
+		AdditFood	= "食物";
+		AdditGiftwrap	= "禮品包裝紙";
+		AdditLure	= "魚餌";
+		AdditPoison	= "毒藥";
+		AdditPotion	= "藥水";
+		AdditRestorative	= "滋補劑";
+		AdditScroll	= "捲軸";
+		SkillAlchemy	= "煉金";
+		SkillBlacksmithing	= "鍛造";
+		SkillCooking	= "烹飪";
+		SkillDruid	= "德魯伊法術";
+		SkillEnchanting	= "附魔";
+		SkillEngineering	= "工程學";
+		SkillFirstAid	= "急救";
+		SkillLeatherworking	= "製皮";
+		SkillMage	= "法師法術";
+		SkillMining	= "採礦";
+		SkillPaladin	= "聖騎法術";
+		SkillPriest	= "牧師法術";
+		SkillRogue	= "盜賊技能";
+		SkillShaman	= "薩滿法術";
+		SkillTailoring	= "裁縫";
+		SkillWarlock	= "術士法術";
 
 	};
 
@@ -1859,7 +1859,7 @@ InformantLocalizations = {
 		SkillAlchemy	= "Alchemie";
 		SkillBlacksmithing	= "Smeden";
 		SkillCooking	= "Koken";
-		SkillDruid	= "Dru\195\175de spreuken";
+		SkillDruid	= "Druïde spreuken";
 		SkillEnchanting	= "Betoveren";
 		SkillEngineering	= "Produceren";
 		SkillFirstAid	= "Eerste Hulp";
