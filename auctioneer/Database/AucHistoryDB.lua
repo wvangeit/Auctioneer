@@ -216,7 +216,7 @@ function createDatabaseFrom3x()
 	if (AuctionConfig.data) then
 		for ahKey, ahData in pairs(AuctionConfig.data) do
 			local newAhKey = ahKey:lower();
-			local ah = createAHDatabase(newAhKey:lower(), BASE_HISTORYDB_VERSION);
+			local ah = createAHDatabase(newAhKey, BASE_HISTORYDB_VERSION);
 			db[newAhKey] = ah;
 			for itemKey, itemData in pairs(ahData) do
 				local totals, buyoutPrices = strsplit("|", itemData);
@@ -236,11 +236,12 @@ function createAHDatabase(ahKey, version)
 	version = version or CURRENT_HISTORYDB_VERSION;
 
 	-- Create the original version of the database.
-	local ah = {};
-	ah.version = BASE_HISTORYDB_VERSION;
-	ah.ahKey = ahKey;
-	ah.totals = {};
-	ah.buyoutPrices = {};
+	local ah = {
+		version = BASE_HISTORYDB_VERSION;
+		ahKey = ahKey;
+		totals = {};
+		buyoutPrices = {};
+	};
 
 	-- Upgrade the table to the requested version of auctioneer.
 	if (ah.version ~= version) then
@@ -345,14 +346,15 @@ function getItemTotals(itemKey, ahKey, create)
 		if (packedItemTotals) then
 			itemTotals = unpackItemTotals(packedItemTotals);
 		elseif (create) then
-			itemTotals = {};
-			itemTotals.seenCount = 0;
-			itemTotals.minCount = 0;
-			itemTotals.minPrice = 0;
-			itemTotals.bidCount = 0;
-			itemTotals.bidPrice = 0;
-			itemTotals.buyoutCount = 0;
-			itemTotals.buyoutPrice = 0;
+			itemTotals = {
+				seenCount = 0;
+				minCount = 0;
+				minPrice = 0;
+				bidCount = 0;
+				bidPrice = 0;
+				buyoutCount = 0;
+				buyoutPrice = 0;
+			};
 		end
 	end
 

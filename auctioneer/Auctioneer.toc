@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Informant, Khaos, ImprovedErrorFrame
-## SavedVariables: AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB
+## SavedVariables: AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB, AuctioneerTransactionDB
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
@@ -28,6 +28,7 @@ Database\AucItemDB.lua
 Database\AucSnapshotDB.lua
 Database\AucHistoryDB.lua
 Database\AucFixedPriceDB.lua
+Database\AuctioneerTransactionDB.lua
 
 BalancedList.lua
 AucAPI.lua

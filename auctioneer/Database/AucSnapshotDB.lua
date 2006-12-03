@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Function Imports
@@ -279,7 +279,7 @@ function createDatabase()
 end
 
 -------------------------------------------------------------------------------
--- Create a brand new database for an auction house key (relam-faction).
+-- Create a brand new database for an auction house key (realm-faction).
 -------------------------------------------------------------------------------
 function createAHDatabase(ahKey)
 	return {
@@ -979,8 +979,8 @@ end
 -------------------------------------------------------------------------------
 function createAuctionSignatureFromAuction(auction)
 	return strjoin(
-		":", auction.itemId, auction.suffixId, auction.enchantId, 
-		auction.uniqueId, auction.count, auction.minBid, 
+		":", auction.itemId, auction.suffixId, auction.enchantId,
+		auction.uniqueId, auction.count, auction.minBid,
 		auction.buyoutPrice, auction.owner
 	);
 end

@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
@@ -117,6 +117,7 @@ function loadDatabases(upgrade)
 	Auctioneer.SnapshotDB.Load(upgrade);
 	Auctioneer.HistoryDB.Load(upgrade);
 	Auctioneer.FixedPriceDB.Load(upgrade);
+	Auctioneer.TransactionDB.Load(upgrade);
 
 	-- If we are upgrading from pre-4.0, toss the pre-4.0 tables.
 	if (upgrade and AuctionConfig.version < DATABASE_VERSION_40) then
@@ -254,7 +255,7 @@ function packNumericList(list)
 			if (hist == "") then hist = tostring(last);
 			else hist = ("%s:%d"):format(hist, last); end
 		elseif (n ~= 0) then
-			if (hist == "") then hist = string.format("%dx%d", last, n);
+			if (hist == "") then hist = ("%dx%d"):format(last, n);
 			else hist = ("%s:%dx%d"):format(hist, last, n); end
 		end
 	end
@@ -299,7 +300,6 @@ end
 -- appears within name1.
 -------------------------------------------------------------------------------
 function doesNameMatch(name1, name2, exact)
-	local match = true;
 	if (name1 and name2) then
 		if (exact) then
 			return (name1:lower() == name2:lower());

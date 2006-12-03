@@ -70,6 +70,7 @@ BidResultCodes = {
 	AlreadyHigherBid = "AlreadyHigherBid";
 	AlreadyHighBidder = "AlreadyHighBidder";
 	MaxItemCount = "MaxItemCount";
+	BidSent = "BidSent";
 }
 
 -------------------------------------------------------------------------------
@@ -152,7 +153,7 @@ function isBidAllowed(listType, index)
 
 	-- Must not be a pending bid on the same auction.
 	local auctionId = Auctioneer.QueryManager.GetAuctionId(listType, index);
-	if (auctionId ~= nil and isPendingBidForAuction(auctionId)) then
+	if (auctionId and isPendingBidForAuction(auctionId)) then
 		return false;
 	end
 
@@ -188,10 +189,11 @@ function addPendingBid(listType, index, bid, callbackFunc)
 	-- We had better have an auction by now...
 	if (auction) then
 		-- Add a pending bid to the queue.
-		local pendingBid = {};
-		pendingBid.auction = auction;
-		pendingBid.bid = bid;
-		pendingBid.callbackFunc = callbackFunc;
+		local pendingBid = {
+			auction = auction;
+			bid = bid;
+			callbackFunc = callbackFunc;
+		};
 		table.insert(PendingBids, pendingBid);
 		debugPrint("Added pending bid");
 
@@ -203,7 +205,7 @@ function addPendingBid(listType, index, bid, callbackFunc)
 		end
 
 		-- Fire the AUCTIONEER_BID_SENT event.
-		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SENT", pendingBid.auction, pendingBid.bid);
+		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SENT", pendingBid.auction, pendingBid.bid, BidResultCodes.BidSent);
 	end
 end
 

@@ -455,8 +455,8 @@ end
 -- Breaks an item key (itemId;suffixId;enchantId)
 -------------------------------------------------------------------------------
 function breakItemKey(itemKey)
-	local itemId, suffixId, enchantId = strsplit(":", itemKey);
-	return tonumber(itemId) or 0, tonumber(suffixId) or 0, tonumber(enchantId) or 0;
+	local itemId, suffixId, enchantId, uniqueId = strsplit(":", itemKey);
+	return tonumber(itemId) or 0, tonumber(suffixId) or 0, tonumber(enchantId) or 0, tonumber(uniqueId) or 0;
 end
 
 -------------------------------------------------------------------------------
