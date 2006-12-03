@@ -264,7 +264,7 @@ function hookCall(funcName, ...)
 			if (orig and func.p >= 0) then
 				retVal = {pcall(orig, ...)}
 				if (not table.remove(retVal, 1)) then
-					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
+					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
 				end
 				orig = nil
 			end
@@ -297,11 +297,13 @@ function hookCall(funcName, ...)
 	if (orig) then
 		retVal = {pcall(orig, ...)}
 		if (not table.remove(retVal, 1)) then
-			Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", r1, "\nCall Chain:\n", debugstack(2, 3, 6))
+			Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
 		end
 	end
 
-	return unpack(retVal, 1, table.maxn(retVal))
+	if (retVal) then
+		return unpack(retVal, 1, table.maxn(retVal))
+	end
 end
 
 -- This function automatically hooks Stubby in place of the
@@ -315,7 +317,7 @@ function hookInto(triggerFunction)
 		local functionString = ']]..triggerFunction..[[';
 
 		if (not (type(Stubby_OldFunction) == "function")) then
-			return Stubby.Print('Error occured while compiling hook, "'..functionString..'" is not a valid function')
+			return Stubby.Print("Error occured while compiling hook: ", tostring(functionString), "is not a valid function \nCall Chain:\n", debugstack(2, 3, 6))
 		end
 
 		Stubby_NewFunction = function(...)
@@ -323,12 +325,16 @@ function hookInto(triggerFunction)
 		end;
 		]]..triggerFunction..[[ = Stubby_NewFunction
 	]];
-	assert(
-		loadstring(
-			stringToLoad, "StubbyHookingFunction"
-		),
-		'Stubby failed to hook function "'..triggerFunction..'"'
-	)()
+	local loadedFunction, errorMessage = loadstring(stringToLoad, "StubbyHookingFunction")
+
+	if (loadedFunction) then
+		loadedFunction()
+	else
+		Stubby_NewFunction = nil
+		Stubby_OldFunction = nil
+
+		return Stubby.Print("Error occured while compiling hook: ", tostring(triggerFunction), "\n", errorMessage, "\nCall Chain:\n", debugstack(2, 3, 6))
+	end
 
 	config.hooks.functions[triggerFunction] = Stubby_NewFunction
 	config.hooks.origFuncs[triggerFunction] = Stubby_OldFunction
