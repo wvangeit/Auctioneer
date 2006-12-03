@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 local TIME_LEFT_NAMES = {
 	AUCTION_TIME_LEFT1, -- Short
@@ -620,9 +620,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_MinQualityDropDownItem_OnClick(self)
-	local index = self:GetID();
-	local dropdown = self.owner;
+function AuctionFrameSearch_MinQualityDropDownItem_OnClick()
+	local index = this:GetID();
+	local dropdown = this.owner;
 	return Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
 
