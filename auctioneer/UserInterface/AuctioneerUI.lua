@@ -243,7 +243,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function relevelFrame(frame)
-	return relevelFrames(frame:GetFrameLevel() + 1, frame:GetChildren())
+	return relevelFrames(frame:GetFrameLevel() + 2, frame:GetChildren())
 end
 
 function relevelFrames(myLevel, ...)
