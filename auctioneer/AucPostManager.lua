@@ -166,15 +166,16 @@ function postAuction(itemKey, stackSize, stackCount, bid, buyout, duration, call
 	end
 
 	-- Add the request to the queue.
-	local request = {};
-	request.itemKey = itemKey;
-	request.name = Auctioneer.ItemDB.GetItemName(itemKey);
-	request.stackSize = stackSize;
-	request.stackCount = stackCount;
-	request.bid = bid;
-	request.buyout = buyout;
-	request.duration = duration;
-	request.callback = { func = callbackFunc, param = callbackParam };
+	local request = {
+		itemKey = itemKey;
+		name = Auctioneer.ItemDB.GetItemName(itemKey);
+		stackSize = stackSize;
+		stackCount = stackCount;
+		bid = bid;
+		buyout = buyout;
+		duration = duration;
+		callback = { func = callbackFunc, param = callbackParam };
+	};
 	addRequestToQueue(request);
 	processRequestQueue();
 end

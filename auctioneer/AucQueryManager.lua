@@ -73,17 +73,16 @@ local debugPrint;
 -------------------------------------------------------------------------------
 -- Private Data
 -------------------------------------------------------------------------------
--- Queue of query requests.
+--Queue of query requests.
 --
--- QueryRequestQueue[Index] =
--- {
---     parameters;				-- query parameters
---     maxSilence;
---     maxRetries;
---     callbackFunc;			-- callback function called when the query is complete.
---     querySent;				-- true if the query has been sent to the server.
---     receivedQueryResponse;	-- true if the initial response has been received.
---     lastQueryResponseTime	-- time of the last query response.
+--QueryRequestQueue[Index] = {
+--	parameters;				-- query parameters
+--	maxSilence;
+--	maxRetries;
+--	callbackFunc;			-- callback function called when the query is complete.
+--	querySent;				-- true if the query has been sent to the server.
+--	receivedQueryResponse;	-- true if the initial response has been received.
+--	lastQueryResponseTime		-- time of the last query response.
 -- }
 local QueryRequestQueue = {};
 
@@ -96,42 +95,40 @@ local PageCacheQuery = {};
 -- Table containing all the pages seen for the PageCacheQuery. The table has the
 -- following structure:
 --
--- PageCache[PageNum]
--- {
---     query					-- query parameters
---     pageNum;					-- page number
---     isLastPage;				-- true if this is the last page for the search
---     lastSeen					-- time the page was seen
---     auctions[IndexOnPage]	-- list of auctions on the page.
---     {
---         auctionId;			-- nil unless the snapshot has been updated
---         itemId;
---         suffixId;
---         enchantId;
---         uniqueId;
---         name;
---         texture;
---         count;
---         quality;
---         canUse;
---         level;
---         minBid;
---         minIncrement;
---         buyoutPrice;
---         bidAmount;
---         highBidder;
---         owner;
---     }
--- }
+--PageCache[PageNum] = {
+--	query					-- query parameters
+--	pageNum;				-- page number
+--	isLastPage;				-- true if this is the last page for the search
+--	lastSeen				-- time the page was seen
+--	auctions[IndexOnPage] = {	-- list of auctions on the page.
+--		auctionId;			-- nil unless the snapshot has been updated
+--		itemId;
+--		suffixId;
+--		enchantId;
+--		uniqueId;
+--		name;
+--		texture;
+--		count;
+--		quality;
+--		canUse;
+--		level;
+--		minBid;
+--		minIncrement;
+--		buyoutPrice;
+--		bidAmount;
+--		highBidder;
+--		owner;
+--	}
+--}
 local PageCache = {};
 
 -- Table of pending bids listed by auction id.
 --
 -- PendingBidInfo[AuctionId]
 -- {
---    bid;								-- the bid sent to the server
---    receivedBidComplete;				-- true if onBidComplete() has been called
---    receivedAuctionItemListUpdate;	-- true if onAuctionItemListUpdate() has been called
+--	bid;						-- the bid sent to the server
+--	receivedBidComplete;			-- true if onBidComplete() has been called
+--	receivedAuctionItemListUpdate;	-- true if onAuctionItemListUpdate() has been called
 -- }
 local PendingBidInfo = {};
 
@@ -578,9 +575,11 @@ function onAuctionItemListUpdate()
 
 	-- Check if this is a refresh of the current page. A refresh would be
 	-- caused by a bid or an outbid.
-	if (CurrentPage and
+	if (
+		CurrentPage and
 		doAuctionsMatchQuery(updatedAuctions, CurrentPage.query) and
-		reconcileAuctionLists(CurrentPage.auctions, updatedAuctions)) then
+		reconcileAuctionLists(CurrentPage.auctions, updatedAuctions)
+	) then
 		debugPrint("onAuctionItemListUpdate() - query refresh");
 		return;
 	end
@@ -641,7 +640,7 @@ end
 -- Checks if the auctions all match the specified query.
 -------------------------------------------------------------------------------
 function doAuctionsMatchQuery(auctions, query)
-	for _, auction in pairs(auctions) do
+	for _, auction in ipairs(auctions) do
 		local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 		if (not Auctioneer.SnapshotDB.DoesItemKeyMatchQuery(itemKey, query)) then
 			return false;
@@ -1032,20 +1031,13 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function normalizeNumericQueryParam(param)
-	if (type(param) == "string") then
-		if (param == "") then
-			param = nil;
-		else
-			param = tonumber(param);
-		end
-	end
-	return param;
+	return tonumber(param) or param;
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ": ", ...);
+	EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ...);
 end
 
 -------------------------------------------------------------------------------
