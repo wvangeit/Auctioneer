@@ -83,7 +83,7 @@ function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, timeLeft
 	debugPrint("addPendingBid() - Added pending bid");
 	
 	-- Register for the response events if this is the first pending bid.
-	if (table.getn(PendingBids) == 1) then
+	if (#PendingBids == 1) then
 		debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", onEventHook);
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", onEventHook);
@@ -94,14 +94,14 @@ end
 -- Removes the pending bid from the queue.
 -------------------------------------------------------------------------------
 function removePendingBid()
-	if (table.getn(PendingBids) > 0) then
+	if (#PendingBids > 0) then
 		-- Remove the first pending bid.
 		local bid = PendingBids[1];
 		table.remove(PendingBids, 1);
 		debugPrint("removePendingBid() - Removed pending bid");
 
 		-- Unregister for the response events if this is the last pending bid.
-		if (table.getn(PendingBids) == 0) then
+		if (#PendingBids == 0) then
 			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", onEventHook);
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", onEventHook);

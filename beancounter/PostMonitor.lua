@@ -82,7 +82,7 @@ function addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
 	debugPrint("addPendingPost() - Added pending post");
 	
 	-- Register for the response events if this is the first pending post.
-	if (table.getn(PendingPosts) == 1) then
+	if (#PendingPosts == 1) then
 		debugPrint("addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", onEventHook);
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", onEventHook);
@@ -93,14 +93,14 @@ end
 -- Removes the pending post from the queue.
 -------------------------------------------------------------------------------
 function removePendingPost()
-	if (table.getn(PendingPosts) > 0) then
+	if (#PendingPosts > 0) then
 		-- Remove the first pending post.
 		local post = PendingPosts[1];
 		table.remove(PendingPosts, 1);
 		debugPrint("removePendingPost() - Removed pending post");
 
 		-- Unregister for the response events if this is the last pending post.
-		if (table.getn(PendingPosts) == 0) then
+		if (#PendingPosts == 0) then
 			debugPrint("removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", onEventHook);
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", onEventHook);

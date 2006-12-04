@@ -70,8 +70,8 @@ function BeanCounter_OnLoad()
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("BeanCounter", "CommandHandler", [[
 		local function cmdHandler(msg)
-			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end
+			local i,j, cmd, param = msg:lower():find("^([^ ]+) (.+)$")
+			if (not cmd) then cmd = msg:lower() end
 			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end
 			if (cmd == "load") then
@@ -155,7 +155,7 @@ function BeanCounter_AddOnLoaded()
 	BeanCounter.Database.Load(GetRealmName());
 
 	-- Hello world!
-	chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
+	chatPrint(("BeanCounter v%s loaded"):format(BeanCounter.Version));
 	
 	SLASH_BEANCOUNTER1 = "/beancounter"
 	SLASH_BEANCOUNTER2 = "/bean"
@@ -164,8 +164,8 @@ function BeanCounter_AddOnLoaded()
 end
 
 function commandHandler(msg)
-	local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-	if (not cmd) then cmd = string.lower(msg) end
+	local i,j, cmd, param = msg:lower():find("^([^ ]+) (.+)$")
+	if (not cmd) then cmd = msg:lower() end
 	if (not cmd) then cmd = "" end
 	if (not param) then param = "" end
 
@@ -183,7 +183,7 @@ function commandHandler(msg)
 			chatPrint("Your command was not understood")
 		end
 	else
-		chatPrint(string.format("BeanCounter v%s loaded", BeanCounter.Version));
+		chatPrint(("BeanCounter v%s loaded"):format(BeanCounter.Version));
 		chatPrint("  You may set your loading preferences for this character by using the following commands:")
 		chatPrint("  |cffffffff/BeanCounter load auctionhouse|r - BeanCounter will load when you visit the auction house or mailbox")
 		chatPrint("  |cffffffff/BeanCounter load always|r - BeanCounter will always load for this character")
@@ -228,9 +228,9 @@ end
 -------------------------------------------------------------------------------
 function BeanCounter_OnEvent(event, arg1)
 	if (event == "ADDON_LOADED") then
-		if (string.lower(arg1) == "beancounter") then
+		if (arg1:lower() == "beancounter") then
 			BeanCounter_AddOnLoaded();
-		elseif (string.lower(arg1) == "blizzard_auctionui") then
+		elseif (arg1:lower() == "blizzard_auctionui") then
 			BeanCounter_AuctionHouseLoaded();
 		end
 	end
@@ -324,13 +324,7 @@ end
 -------------------------------------------------------------------------------
 function chatPrint(...)
 	if (DEFAULT_CHAT_FRAME) then 
-		local msg = ""
-		for i=1, table.getn(arg) do
-			if i==1 then msg = arg[i]
-			else msg = msg.." "..arg[i]
-			end
-		end
-		DEFAULT_CHAT_FRAME:AddMessage(msg, 1.0, 0.35, 0.15)
+		DEFAULT_CHAT_FRAME:AddMessage(strjoin(" ", ...), 1.0, 0.35, 0.15)
 	end
 end
 

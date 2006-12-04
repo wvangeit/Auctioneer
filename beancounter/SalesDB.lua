@@ -147,7 +147,7 @@ function deletePendingAuction(item, index, reason, pendingAuctions)
 	if (pendingAuctions) then
 		-- Iterate in reverse since we will be removing the pending auction
 		-- from the list when we find it.
-		for pendingIndex = table.getn(pendingAuctions), 1, -1 do
+		for pendingIndex = #pendingAuctions, 1, -1 do
 			local auction = pendingAuctions[pendingIndex];
 			if (index == auction.index) then
 				pendingAuction = auction;
@@ -168,7 +168,7 @@ function deletePendingAuction(item, index, reason, pendingAuctions)
 		
 		-- Remove the pending auction from the table.
 		table.remove(pendingAuctionsTable, index);
-		if (table.getn(pendingAuctionsTable)) then
+		if (#pendingAuctionsTable) then
 			getPendingAuctionsTableForItem(item); -- Deletes the table
 		end
 		
@@ -201,7 +201,7 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingAuction(packedPendingAuction)
 	local pendingAuction = {};
-	_, _, pendingAuction.time, pendingAuction.quantity, pendingAuction.bid, pendingAuction.buyout, pendingAuction.runTime, pendingAuction.deposit, pendingAuction.consignmentPercent, pendingAuction.sellerId = string.find(packedPendingAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, pendingAuction.time, pendingAuction.quantity, pendingAuction.bid, pendingAuction.buyout, pendingAuction.runTime, pendingAuction.deposit, pendingAuction.consignmentPercent, pendingAuction.sellerId = packedPendingAuction:find("(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	pendingAuction.time = numberFromString(pendingAuction.time);
 	pendingAuction.quantity = numberFromString(pendingAuction.quantity);
 	pendingAuction.bid = numberFromString(pendingAuction.bid);
@@ -229,7 +229,7 @@ function getPendingAuctionsTableForItem(item, create)
 	if (pendingAuctionsForItemTable == nil and create) then
 		pendingAuctionsForItemTable = {};
 		pendingAuctionsTable[item] = pendingAuctionsForItemTable;
-	elseif (pendingAuctionsForItemTable and table.getn(pendingAuctionsForItemTable) == 0 and not create) then
+	elseif (pendingAuctionsForItemTable and #pendingAuctionsForItemTable == 0 and not create) then
 		pendingAuctionsTable[item] = nil;
 	end
 
@@ -242,9 +242,9 @@ end
 function getPendingAuctionItems()
 	local items = {};
 	if (BeanCounterRealmDB.pendingAuctions) then
-		for item in BeanCounterRealmDB.pendingAuctions do
+		for item in pairs(BeanCounterRealmDB.pendingAuctions) do
 			local pendingAuctionsTable = getPendingAuctionsTableForItem(item);
-			if (pendingAuctionsTable and table.getn(pendingAuctionsTable) > 0) then
+			if (pendingAuctionsTable and #pendingAuctionsTable > 0) then
 				table.insert(items, item);
 			end
 		end
@@ -259,7 +259,7 @@ function getPendingAuctionsForItem(item, filterFunc)
 	local pendingAuctions = {};
 	local pendingAuctionsTable = getPendingAuctionsTableForItem(item);
 	if (pendingAuctionsTable) then
-		for index in pendingAuctionsTable do
+		for index in pairs(pendingAuctionsTable) do
 			local pendingAuction = unpackPendingAuction(pendingAuctionsTable[index]);
 			pendingAuction.index = index;
 			if (filterFunc == nil or filterFunc(pendingAuction)) then
@@ -276,9 +276,9 @@ end
 function printPendingAuctions()
 	chatPrint("Pending Auctions:");
 	if (BeanCounterRealmDB.pendingAuctions) then
-		for item in BeanCounterRealmDB.pendingAuctions do
+		for item in pairs(BeanCounterRealmDB.pendingAuctions) do
 			local pendingAuctionsTable = BeanCounterRealmDB.pendingAuctions[item];
-			for index = 1, table.getn(pendingAuctionsTable) do
+			for index = 1, #pendingAuctionsTable do
 				local pendingAuction = unpackPendingAuction(pendingAuctionsTable[index]);
 				printPendingAuction(chatPrint, nil, pendingAuction);
 			end
@@ -382,7 +382,7 @@ function deleteCompletedAuction(item, index, reason, completedAuctions)
 	if (completedAuctions) then
 		-- Iterate in reverse since we will be removing the completed auction
 		-- from the list when we find it.
-		for completedIndex = table.getn(completedAuctions), 1, -1 do
+		for completedIndex = #completedAuctions, 1, -1 do
 			local auction = completedAuctions[completedIndex];
 			if (index == auction.index) then
 				completedAuction = auction;
@@ -403,7 +403,7 @@ function deleteCompletedAuction(item, index, reason, completedAuctions)
 		
 		-- Remove the completed auction from the table.
 		table.remove(completedAuctionsTable, index);
-		if (table.getn(completedAuctionsTable)) then
+		if (#completedAuctionsTable) then
 			getCompletedAuctionsTableForItem(item); -- Deletes the table
 		end
 
@@ -438,7 +438,7 @@ end
 -------------------------------------------------------------------------------
 function unpackCompletedAuction(packedCompletedAuction)
 	local completedAuction = {};
-	_, _, completedAuction.time, completedAuction.result, completedAuction.quantity, completedAuction.proceeds, completedAuction.price, completedAuction.isBuyout, completedAuction.deposit, completedAuction.consignment, completedAuction.buyer, completedAuction.sellerId = string.find(packedCompletedAuction, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, completedAuction.time, completedAuction.result, completedAuction.quantity, completedAuction.proceeds, completedAuction.price, completedAuction.isBuyout, completedAuction.deposit, completedAuction.consignment, completedAuction.buyer, completedAuction.sellerId = packedCompletedAuction:find("(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	completedAuction.time = numberFromString(completedAuction.time);
 	completedAuction.result = numberFromString(completedAuction.result);
 	completedAuction.quantity = numberFromString(completedAuction.quantity);
@@ -468,7 +468,7 @@ function getCompletedAuctionsTableForItem(item, create)
 	if (completedAuctionsForItemTable == nil and create) then
 		completedAuctionsForItemTable = {};
 		completedAuctionsTable[item] = completedAuctionsForItemTable;
-	elseif (completedAuctionsForItemTable and table.getn(completedAuctionsForItemTable) == 0 and not create) then
+	elseif (completedAuctionsForItemTable and #completedAuctionsForItemTable == 0 and not create) then
 		completedAuctionsTable[item] = nil;
 	end
 
@@ -482,7 +482,7 @@ function getCompletedAuctionsForItem(item, filterFunc)
 	local completedAuctions = {};
 	local completedAuctionsTable = getCompletedAuctionsTableForItem(item);
 	if (completedAuctionsTable) then
-		for index in completedAuctionsTable do
+		for index in pairs(completedAuctionsTable) do
 			local completedAuction = unpackCompletedAuction(completedAuctionsTable[index]);
 			completedAuction.index = index;
 			if (filterFunc == nil or filterFunc(completedAuction)) then
@@ -499,9 +499,9 @@ end
 function printCompletedAuctions()
 	chatPrint("Completed Auctions:");
 	if (BeanCounterRealmDB.completedAuctions) then
-		for item in BeanCounterRealmDB.completedAuctions do
+		for item in pairs(BeanCounterRealmDB.completedAuctions) do
 			local completedAuctionsTable = BeanCounterRealmDB.completedAuctions[item];
-			for index = 1, table.getn(completedAuctionsTable) do
+			for index = 1, #completedAuctionsTable do
 				local completedAuction = unpackCompletedAuction(completedAuctionsTable[index]);
 				printCompletedAuction(chatPrint, nil, item, completedAuction);
 			end
@@ -586,7 +586,7 @@ end
 -------------------------------------------------------------------------------
 function unpackSale(packedSale)
 	local sale = {};
-	_, _, sale.time, sale.result, sale.quantity, sale.bid, sale.buyout, sale.net, sale.price, sale.isBuyout, sale.buyer, sale.sellerId = string.find(packedSale, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, sale.time, sale.result, sale.quantity, sale.bid, sale.buyout, sale.net, sale.price, sale.isBuyout, sale.buyer, sale.sellerId = packedSale:find("(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	sale.time = numberFromString(sale.time);
 	sale.result = numberFromString(sale.result);
 	sale.quantity = numberFromString(sale.quantity);
@@ -616,7 +616,7 @@ function getSalesTableForItem(item, create)
 	if (salesForItemTable == nil and create) then
 		salesForItemTable = {};
 		salesTable[item] = salesForItemTable;
-	elseif (salesForItemTable and table.getn(salesForItemTable) == 0 and not create) then
+	elseif (salesForItemTable and #salesForItemTable == 0 and not create) then
 		salesTable[item] = nil;
 	end
 
@@ -629,9 +629,9 @@ end
 function getSoldItems(item)
 	local items = {};
 	if (BeanCounterRealmDB.sales) then
-		for item in BeanCounterRealmDB.sales do
+		for item in pairs(BeanCounterRealmDB.sales) do
 			local salesTable = getSalesTableForItem(item);
-			if (salesTable and table.getn(salesTable) > 0) then
+			if (salesTable and #salesTable > 0) then
 				table.insert(items, item);
 			end
 		end
@@ -646,7 +646,7 @@ function getSalesForItem(item)
 	local sales = {};
 	local salesTable = getSalesTableForItem(item);
 	if (salesTable) then
-		for index in salesTable do
+		for index in pairs(salesTable) do
 			local sale = unpackSale(salesTable[index]);
 			table.insert(sales, sale);
 		end
@@ -662,7 +662,7 @@ function getLastSaleForItem(item)
 	local lastSale = nil;
 	local salesTable = getSalesTableForItem(item);
 	if (salesTable) then
-		for index in salesTable do
+		for index in pairs(salesTable) do
 			local sale = unpackSale(salesTable[index]);
 			if (sale.result == AUCTION_SOLD and (lastSale == nil or lastSale.time < sale.time)) then
 				lastSale = sale;
@@ -678,9 +678,9 @@ end
 function printSales()
 	chatPrint("Sales:");
 	if (BeanCounterRealmDB.sales) then
-		for item in BeanCounterRealmDB.sales do
+		for item in pairs(BeanCounterRealmDB.sales) do
 			local salesTable = BeanCounterRealmDB.sales[item];
-			for index = 1, table.getn(salesTable) do
+			for index = 1, #salesTable do
 				local sale = unpackSale(salesTable[index]);
 				printSale(chatPrint, nil, item, sale);
 			end
@@ -721,7 +721,7 @@ function reconcileAuctions(reconcileTime, excludeItems)
 	local totalReconciled = 0;
 	local totalDiscarded = 0;
 	local items = getPendingAuctionItems();
-	for index in items do
+	for index in pairs(items) do
 		local item = items[index];
 		if (excludeItems == nil or excludeItems[item] == nil) then
 			local reconciled, discarded = reconcileAuctionsByTime(item, reconcileTime);
@@ -747,7 +747,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 			return (pendingAuction.sellerId == getCurrentPlayerId() and
 					pendingAuction.time + (pendingAuction.runTime * 60) + AUCTION_OVERRUN_LIMIT < reconcileTime);
 		end);
-	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
+	debugPrint((#pendingAuctions).." matching pending auctions");
 
 	-- Get the list of completed auctions that completed before the specified
 	-- time.
@@ -757,7 +757,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 			return (completedAuction.sellerId == getCurrentPlayerId() and
 					completedAuction.time < reconcileTime);
 		end);
-	debugPrint(table.getn(completedAuctions).." matching completed auctions");
+	debugPrint((#completedAuctions).." matching completed auctions");
 
 	-- Reconcile the lists.
 	local reconciledAuctions = reconcileAuctionList(item, pendingAuctions, completedAuctions, true);
@@ -765,7 +765,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 	-- Cleanup the unmatch pending auctions that are too old to match any
 	-- completed auctions.
 	local discardedPendingAuctions = 0;
-	for index = table.getn(pendingAuctions), 1, -1 do
+	for index = #pendingAuctions, 1, -1 do
 		local pendingAuction = pendingAuctions[index];
 		deletePendingAuction(item, pendingAuction.index, "no match", pendingAuctions);
 		discardedPendingAuctions = discardedPendingAuctions + 1;
@@ -774,7 +774,7 @@ function reconcileAuctionsByTime(item, reconcileTime)
 	-- Cleanup the unmatched completed auctions that are too old to match any
 	-- pending auctions.
 	local discardedCompletedAuctions = 0;
-	for index = table.getn(completedAuctions), 1, -1 do
+	for index = #completedAuctions, 1, -1 do
 		local completedAuction = completedAuctions[index];
 		if (completedAuction.time + AUCTION_DURATION_LIMIT < reconcileTime) then
 			deleteCompletedAuction(item, completedAuction.index, "no match", completedAuctions);
@@ -800,7 +800,7 @@ function reconcileAuctionsByQuantityOrProceeds(item, quantityHint, proceedsHint)
 		local proceedsAttempted = {};
 		local completedAuctions = getCompletedAuctionsTableForItem(item);
 		if (completedAuctions) then
-			while (index <= table.getn(completedAuctions)) do
+			while (index <= #completedAuctions) do
 				local completedAuction = unpackCompletedAuction(completedAuctions[index]);
 				if (completedAuction.quantity and not quantitiesAttempted[completedAuction.quantity]) then
 					quantitiesAttempted[completedAuction.quantity] = true;
@@ -840,7 +840,7 @@ function reconcileAuctionsByQuantity(item, quantity)
 			return (pendingAuction.sellerId == getCurrentPlayerId() and
 					pendingAuction.quantity == quantity);
 		end);
-	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
+	debugPrint((#pendingAuctions).." matching pending auctions");
 
 	-- Get all the completed auctions matching the quantity.
 	local completedAuctions = getCompletedAuctionsForItem(
@@ -849,10 +849,10 @@ function reconcileAuctionsByQuantity(item, quantity)
 			return (completedAuction.sellerId == getCurrentPlayerId() and
 					completedAuction.quantity == quantity);
 		end);
-	debugPrint(table.getn(completedAuctions).." matching completed auctions");
+	debugPrint((#completedAuctions).." matching completed auctions");
 
 	-- Attempt to reconcile the lists.
-	if (table.getn(pendingAuctions) == table.getn(completedAuctions)) then
+	if (#pendingAuctions == #completedAuctions) then
 		return reconcileAuctionList(item, pendingAuctions, completedAuctions, false);
 	elseif (doesPendingAuctionListMatch(pendingAuctions)) then
 		return reconcileAuctionList(item, pendingAuctions, completedAuctions, false);
@@ -878,7 +878,7 @@ function reconcileAuctionsByProceeds(item, proceeds)
 			return (pendingAuction.sellerId == getCurrentPlayerId() and
 					minProceeds <= proceeds and proceeds <= maxProceeds);
 		end);
-	debugPrint(table.getn(pendingAuctions).." matching pending auctions");
+	debugPrint((#pendingAuctions).." matching pending auctions");
 
 	-- Get all the completed auctions matching the quantity.
 	local completedAuctions = getCompletedAuctionsForItem(
@@ -887,10 +887,10 @@ function reconcileAuctionsByProceeds(item, proceeds)
 			return (completedAuction.sellerId == getCurrentPlayerId() and
 					completedAuction.proceeds == proceeds);
 		end);
-	debugPrint(table.getn(completedAuctions).." matching completed auctions");
+	debugPrint((#completedAuctions).." matching completed auctions");
 
 	-- Attempt to reconcile the lists.
-	if (table.getn(pendingAuctions) == table.getn(completedAuctions)) then
+	if (#pendingAuctions == #completedAuctions) then
 		return reconcileAuctionList(item, pendingAuctions, completedAuctions, false);
 	elseif (doesPendingAuctionListMatch(pendingAuctions)) then
 		return reconcileAuctionList(item, pendingAuctions, completedAuctions, false);
@@ -910,13 +910,13 @@ end
 function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepenciesAllowed)
 	-- If we have some auctions, reconcile them!
 	local auctionsReconciled = 0;
-	if (table.getn(pendingAuctions) > 0 or table.getn(completedAuctions) > 0) then
+	if (#pendingAuctions > 0 or #completedAuctions > 0) then
 		-- For each pending auction, get the list of potential completed auctions.
 		-- Afterwards, sort the pending auction list by match count.
-		for pendingIndex = 1, table.getn(pendingAuctions) do
+		for pendingIndex = 1, #pendingAuctions do
 			local pendingAuction = pendingAuctions[pendingIndex];
 			pendingAuction.matches = {};
-			for completedIndex = 1, table.getn(completedAuctions) do
+			for completedIndex = 1, #completedAuctions do
 				local completedAuction = completedAuctions[completedIndex];
 				if (doesPendingAuctionMatchCompletedAuction(pendingAuction, completedAuction)) then
 					table.insert(pendingAuction.matches, completedAuction);
@@ -929,12 +929,12 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 		-- For each pending auction, pick a suitable completed auction match.
 		-- This algorithm could be much better, but it works for most sane
 		-- cases.
-		for pendingIndex = 1, table.getn(pendingAuctions) do
+		for pendingIndex = 1, #pendingAuctions do
 			local pendingAuction = pendingAuctions[pendingIndex];
 
 			-- First check if this auction likely expired. We consider it likely
 			-- if a matching auction expired within 1 minute of the run length.
-			for completedIndex = 1, table.getn(pendingAuction.matches) do
+			for completedIndex = 1, #(pendingAuction.matches) do
 				local completedAuction = pendingAuction.matches[completedIndex];
 				if (completedAuction.match == nil and completedAuction.result == AUCTION_EXPIRED) then
 					local expectedExpiredTime = pendingAuction.time + (pendingAuction.runTime * 60);
@@ -949,7 +949,7 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 			-- If we didn't find a likely expired auction, then choose the
 			-- oldest unmatched auction.
 			if (pendingAuction.match == nil) then
-				for completedIndex = 1, table.getn(pendingAuction.matches) do
+				for completedIndex = 1, #(pendingAuction.matches) do
 					local completedAuction = pendingAuction.matches[completedIndex];
 					if (completedAuction.match == nil) then
 						completedAuction.match = pendingAuction;
@@ -962,7 +962,7 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 
 		-- Check for unmatched pending auctions.
 		local unmatchedPendingAuctionCount = 0;
-		for pendingIndex = 1, table.getn(pendingAuctions) do
+		for pendingIndex = 1, #pendingAuctions do
 			local pendingAuction = pendingAuctions[pendingIndex];
 			if (pendingAuction.match == nil) then
 				unmatchedPendingAuctionCount = unmatchedPendingAuctionCount + 1;
@@ -971,7 +971,7 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 
 		-- Check for unmatched completed auctions.
 		local unmatchedCompletedAuctionCount = 0;
-		for completedIndex = 1, table.getn(completedAuctions) do
+		for completedIndex = 1, #completedAuctions do
 			local completedAuction = completedAuctions[completedIndex];
 			if (completedAuction.match == nil) then
 				unmatchedCompletedAuctionCount = unmatchedCompletedAuctionCount + 1;
@@ -985,7 +985,7 @@ function reconcileAuctionList(item, pendingAuctions, completedAuctions, discrepe
 			-- list in reverse since we will be deleting items from
 			-- it.
 			debugPrint("Begin reconciling auction list for "..item);
-			for pendingIndex = table.getn(pendingAuctions), 1, -1 do
+			for pendingIndex = #pendingAuctions, 1, -1 do
 				local pendingAuction = pendingAuctions[pendingIndex];
 				if (pendingAuction.match ~= nil) then
 					-- Reconcile the matching auctions.
@@ -1031,8 +1031,8 @@ end
 -- Compare two auctions based on match count.
 -------------------------------------------------------------------------------
 function compareMatchCount(auction1, auction2)
-	local count1 = table.getn(auction1.matches);
-	local count2 = table.getn(auction2.matches);
+	local count1 = #(auction1.matches);
+	local count2 = #(auction2.matches);
 	if (count1 == count2) then
 		return (auction1.time > auction2.time);
 	end
@@ -1137,7 +1137,7 @@ end
 -- considered matches.
 -------------------------------------------------------------------------------
 function doesPendingAuctionListMatch(pendingAuctions)
-	local match = (table.getn(pendingAuctions) > 0);
+	local match = (#pendingAuctions > 0);
 	if (match) then
 		local pendingAuction = pendingAuctions[1];
 		local firstAuctionTime = pendingAuction.time;
@@ -1147,7 +1147,7 @@ function doesPendingAuctionListMatch(pendingAuctions)
 		local buyout = pendingAuction.buyout;
 		local deposit = pendingAuction.deposit;
 		local sellerId = pendingAuction.sellerId;
-		for index = 2, table.getn(pendingAuctions) do
+		for index = 2, #pendingAuctions do
 			local pendingAuction = pendingAuctions[index];
 			if (quantity ~= pendingAuction.quantity or
 				bid ~= pendingAuction.bid or
@@ -1179,7 +1179,7 @@ function getPendingAuctionMatchCount(item, completedAuction)
 		function(pendingAuction)
 			return doesPendingAuctionMatchCompletedAuction(pendingAuction, completedAuction);
 		end);
-	return table.getn(pendingAuctions);
+	return #pendingAuctions;
 end
 
 --=============================================================================

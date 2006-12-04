@@ -202,11 +202,11 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	if (transactions == nil or transactions.purchases) then
 
 		local itemNames = BeanCounter.Purchases.GetPurchasedItems();
-		for itemNameIndex in itemNames do
+		for itemNameIndex in pairs(itemNames) do
 			-- Check if this item matches the search criteria
 			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
 				local purchases = BeanCounter.Purchases.GetPurchasesForItem(itemNames[itemNameIndex]);
-				for purchaseIndex in purchases do
+				for purchaseIndex in pairs(purchases) do
 					local transaction = {};
 					transaction.transaction = "Buy"; --_BC('UiBuyTransaction');
 					transaction.date = purchases[purchaseIndex].time;
@@ -227,11 +227,11 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	frame.searchFrame.bidCheck:SetChecked(transactions == nil or transactions.bids);
 	if (transactions == nil or transactions.bids) then
 		local itemNames = BeanCounter.Purchases.GetPendingBidItems();
-		for itemNameIndex in itemNames do
+		for itemNameIndex in pairs(itemNames) do
 			-- Check if this item matches the search criteria
 			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
 				local pendingBids = BeanCounter.Purchases.GetPendingBidsForItem(itemNames[itemNameIndex]);
-				for pendingBidIndex in pendingBids do
+				for pendingBidIndex in pairs(pendingBids) do
 					local transaction = {};
 					transaction.transaction = "Bid"; --_BC('UiBidTransaction');
 					transaction.date = pendingBids[pendingBidIndex].time;
@@ -252,11 +252,11 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	frame.searchFrame.sellCheck:SetChecked(transactions == nil or transactions.sales);
 	if (transactions == nil or transactions.sales) then
 		local itemNames = BeanCounter.Sales.GetSoldItems();
-		for itemNameIndex in itemNames do
+		for itemNameIndex in pairs(itemNames) do
 			-- Check if this item matches the search criteria
 			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
 				local sales = BeanCounter.Sales.GetSalesForItem(itemNames[itemNameIndex]);
-				for saleIndex in sales do
+				for saleIndex in pairs(sales) do
 					local transaction = {};
 					transaction.date = sales[saleIndex].time;
 					transaction.name = itemNames[itemNameIndex];
@@ -284,11 +284,11 @@ function AuctionFrameTransactions_SearchTransactions(frame, itemName, itemNameEx
 	frame.searchFrame.auctionCheck:SetChecked(transactions == nil or transactions.auctions);
 	if (transactions == nil or transactions.auctions) then
 		local itemNames = BeanCounter.Sales.GetPendingAuctionItems();
-		for itemNameIndex in itemNames do
+		for itemNameIndex in pairs(itemNames) do
 			-- Check if this item matches the search criteria
 			if (doesNameMatch(itemNames[itemNameIndex], itemName, itemNameExact)) then
 				local auctions = BeanCounter.Sales.GetPendingAuctionsForItem(itemNames[itemNameIndex]);
-				for auctionIndex in auctions do
+				for auctionIndex in pairs(auctions) do
 					local transaction = {};
 					transaction.transaction = "Auction"; --_BC('UiAuctionTransaction');
 					transaction.date = auctions[auctionIndex].time;
@@ -334,9 +334,9 @@ function doesNameMatch(name1, name2, exact)
 	local match = true;
 	if (name1 ~= nil and name2 ~= nil) then
 		if (exact) then
-			match = (string.lower(name1) == string.lower(name2));
+			match = (name1:lower() == name2:lower());
 		else
-			match = (string.find(string.lower(name1), string.lower(name2), 1, true) ~= nil);
+			match = (name1:lower():find(name2:lower(), 1, true) ~= nil);
 		end
 	end
 	return match;

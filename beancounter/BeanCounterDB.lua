@@ -122,9 +122,9 @@ end
 function upgradePurchases30000To30001(purchases)
 	if (purchases.version == 30000) then
 		if (purchases.PendingBids) then
-			for item in purchases.PendingBids do
+			for item in pairs(purchases.PendingBids) do
 				local pendingBidsTable = purchases.PendingBids[item];
-				for index in pendingBidsTable do
+				for index in pairs(pendingBidsTable) do
 					pendingBidsTable[index] = pendingBidsTable[index]..";1"
 					debugPrint("Upgraded AHPurchases.PendingBids["..item.."]["..index.."] = "..pendingBidsTable[index]);
 				end
@@ -144,7 +144,7 @@ function upgradePurchases30001To30002(database, players)
 		-- Get or create a player id
 		local playerId = nil;
 		local playerName = UnitName("player");
-		for id in players do
+		for id in pairs(players) do
 			if (players[id] == playerName) then
 				playerId = id;
 				break;
@@ -152,14 +152,14 @@ function upgradePurchases30001To30002(database, players)
 		end
 		if (playerId == nil) then
 			table.insert(players, playerName);
-			playerId = table.getn(players);
+			playerId = #players;
 		end
 		
 		-- Add the player id to each pending bid.
 		if (database.PendingBids) then
-			for item in database.PendingBids do
+			for item in pairs(database.PendingBids) do
 				local pendingBidsTable = database.PendingBids[item];
-				for index in pendingBidsTable do
+				for index in pairs(pendingBidsTable) do
 					pendingBidsTable[index] = pendingBidsTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded pendingBids["..item.."]["..index.."] = "..pendingBidsTable[index]);
 				end
@@ -168,9 +168,9 @@ function upgradePurchases30001To30002(database, players)
 
 		-- Add the player id to each completed bid.
 		if (database.CompletedBids) then
-			for item in database.CompletedBids do
+			for item in pairs(database.CompletedBids) do
 				local completedBidsTable = database.CompletedBids[item];
-				for index in completedBidsTable do
+				for index in pairs(completedBidsTable) do
 					completedBidsTable[index] = completedBidsTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded completedBids["..item.."]["..index.."] = "..completedBidsTable[index]);
 				end
@@ -179,9 +179,9 @@ function upgradePurchases30001To30002(database, players)
 
 		-- Add the player id to each purchase.
 		if (database.Purchases) then
-			for item in database.Purchases do
+			for item in pairs(database.Purchases) do
 				local purchasesTable = database.Purchases[item];
-				for index in purchasesTable do
+				for index in pairs(purchasesTable) do
 					purchasesTable[index] = purchasesTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded purchases["..item.."]["..index.."] = "..purchasesTable[index]);
 				end
@@ -202,7 +202,7 @@ function upgradeSales30000To30002(database, players)
 		-- Get or create a player id
 		local playerId = nil;
 		local playerName = UnitName("player");
-		for id in players do
+		for id in pairs(players) do
 			if (players[id] == playerName) then
 				playerId = id;
 				break;
@@ -210,14 +210,14 @@ function upgradeSales30000To30002(database, players)
 		end
 		if (playerId == nil) then
 			table.insert(players, playerName);
-			playerId = table.getn(players);
+			playerId = #players;
 		end
 		
 		-- Add the player id to each pending auction.
 		if (database.PendingAuctions) then
-			for item in database.PendingAuctions do
+			for item in pairs(database.PendingAuctions) do
 				local pendingAuctionsTable = database.PendingAuctions[item];
-				for index in pendingAuctionsTable do
+				for index in pairs(pendingAuctionsTable) do
 					pendingAuctionsTable[index] = pendingAuctionsTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded pendingAuctions["..item.."]["..index.."] = "..pendingAuctionsTable[index]);
 				end
@@ -226,9 +226,9 @@ function upgradeSales30000To30002(database, players)
 
 		-- Add the player id to each completed auction.
 		if (database.CompletedAuctions) then
-			for item in database.CompletedAuctions do
+			for item in pairs(database.CompletedAuctions) do
 				local completedAuctionsTable = database.CompletedAuctions[item];
-				for index in completedAuctionsTable do
+				for index in pairs(completedAuctionsTable) do
 					completedAuctionsTable[index] = completedAuctionsTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded completedAuctions["..item.."]["..index.."] = "..completedAuctionsTable[index]);
 				end
@@ -237,9 +237,9 @@ function upgradeSales30000To30002(database, players)
 
 		-- Add the player id to each sale.
 		if (database.Sales) then
-			for item in database.Sales do
+			for item in pairs(database.Sales) do
 				local salesTable = database.Sales[item];
-				for index in salesTable do
+				for index in pairs(salesTable) do
 					salesTable[index] = salesTable[index]..";"..stringFromNumber(playerId);
 					debugPrint("Upgraded sales["..item.."]["..index.."] = "..salesTable[index]);
 				end
@@ -270,7 +270,7 @@ end
 -- Gets a player's name
 -------------------------------------------------------------------------------
 function getPlayerName(id)
-	if (id ~= nil and id <= table.getn(BeanCounterRealmDB.players)) then
+	if (id ~= nil and id <= #(BeanCounterRealmDB.players)) then
 		return BeanCounterRealmDB.players[id];
 	end
 	return "Unknown Player";
@@ -281,7 +281,7 @@ end
 -------------------------------------------------------------------------------
 function getPlayerId(name, create)
 	if (name ~= nil) then
-		for id in BeanCounterRealmDB.players do
+		for id in pairs(BeanCounterRealmDB.players) do
 			if (BeanCounterRealmDB.players[id] == name) then
 				return id;
 			end
@@ -289,7 +289,7 @@ function getPlayerId(name, create)
 		if (create) then
 			debugPrint("Adding player "..name.." to the database");
 			table.insert(BeanCounterRealmDB.players, name);
-			return table.getn(BeanCounterRealmDB.players);
+			return #(BeanCounterRealmDB.players);
 		end
 	end
 	return nil;
@@ -307,10 +307,10 @@ end
 -------------------------------------------------------------------------------
 function copyItemRecords(source, destination)
 	if (source and destination) then
-		for item in source do
+		for item in pairs(source) do
 			-- Get the source item table.
 			sourceItems = source[item];
-			if (table.getn(sourceItems) > 0) then
+			if (#sourceItems > 0) then
 				-- Get or create the destination item table.
 				destinationItems = destination[item];
 				if (destinationItems == nil) then
@@ -319,7 +319,7 @@ function copyItemRecords(source, destination)
 				end
 
 				-- Copy from the source to the destination table.			
-				for index in sourceItems do
+				for index in pairs(sourceItems) do
 					table.insert(destinationItems, sourceItems[index]);
 				end
 			end

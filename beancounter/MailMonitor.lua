@@ -112,7 +112,7 @@ end
 -------------------------------------------------------------------------------
 function MailMonitor_OnUpdate()
 	-- Check if we satisfied an event task.
-	if (table.getn(InboxTasks) > 0) then
+	if (#InboxTasks > 0) then
 		local task = InboxTasks[1];
 		table.remove(InboxTasks, 1);
 		if (task:OnUpdate()) then
@@ -124,7 +124,7 @@ function MailMonitor_OnUpdate()
 
 	-- Check if we've got function tasks to perform.
 	local executed = true;
-	while (table.getn(InboxTasks) > 0 and executed) do
+	while (#InboxTasks > 0 and executed) do
 		local task = InboxTasks[1];
 		table.remove(InboxTasks, 1);
 		executed = task:Execute();
@@ -142,7 +142,7 @@ function MailMonitor_OnEventHook(_, event, arg1)
 	debugPrint(event);
 	
 	-- Check if we satisfied an event task.
-	if (table.getn(InboxTasks) > 0) then
+	if (#InboxTasks > 0) then
 		local task = InboxTasks[1];
 		table.remove(InboxTasks, 1);
 		if (task:OnEvent(event, arg1)) then
@@ -154,7 +154,7 @@ function MailMonitor_OnEventHook(_, event, arg1)
 
 	-- Check if we've got function tasks to perform.
 	local executed = true;
-	while (table.getn(InboxTasks) > 0 and executed) do
+	while (#InboxTasks > 0 and executed) do
 		local task = InboxTasks[1];
 		table.remove(InboxTasks, 1);
 		executed = task:Execute();
@@ -191,7 +191,7 @@ function MailMonitor_OnEventHook(_, event, arg1)
 		MailDownloaded = false;
 		MailDownloadTime = nil;
 		-- Toss the existing task queue.
-		if (table.getn(InboxTasks) > 0) then
+		if (#InboxTasks > 0) then
 			debugPrint("Clearing the task queue");
 			InboxTasks = {};
 		end
@@ -208,12 +208,12 @@ function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 		-- Allow this method call if there are no pending tasks or if the current
 		-- pending task is to wait for the invoice and process the message.
 		local isWaitingForInvoice = (
-			table.getn(InboxTasks) == 2 and 
+			#InboxTasks == 2 and 
 			InboxTasks[1].index == index and
 			InboxTasks[1].name == "WaitForInvoiceTask" and
 			InboxTasks[2].index == index and
 			InboxTasks[2].name == "ProcessMessageTask");
-		if (table.getn(InboxTasks) == 0 or isWaitingForInvoice) then
+		if (#InboxTasks == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxItem() call.
 			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
@@ -225,7 +225,7 @@ function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 
 			-- If there are pending tasks, we must delay the execution of
 			-- TakeInboxItem().
-			if (table.getn(InboxTasks) > 0) then
+			if (#InboxTasks > 0) then
 				-- Queue a task for taking the inbox item.
 				addTask(createTakeInboxItemTask(index));
 
@@ -253,12 +253,12 @@ function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 		-- Allow this method call if there are no pending tasks or if the current
 		-- pending task is to wait for the invoice and process the message.
 		local isWaitingForInvoice = (
-			table.getn(InboxTasks) == 2 and 
+			#InboxTasks == 2 and 
 			InboxTasks[1].index == index and
 			InboxTasks[1].name == "WaitForInvoiceTask" and
 			InboxTasks[2].index == index and
 			InboxTasks[2].name == "ProcessMessageTask");
-		if (table.getn(InboxTasks) == 0 or isWaitingForInvoice) then
+		if (#InboxTasks == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxMoney() call.
 			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
 			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
@@ -270,7 +270,7 @@ function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 
 			-- If there are pending tasks, we must delay the execution of
 			-- TakeInboxMoney().
-			if (table.getn(InboxTasks) > 0) then
+			if (#InboxTasks > 0) then
 				-- Queue a task for taking the inbox money.
 				addTask(createTakeInboxMoneyTask(index));
 
@@ -337,7 +337,7 @@ function MailMonitor_PostGetInboxTextHook(funcArgs, retVal, index)
 
 		-- Process the message.
 		local messageAgeInSeconds = math.floor((MAX_DAYS_LEFT - messageDaysLeft) * 24 * 60 * 60);
-		if (table.getn(InboxTasks) > 0) then
+		if (#InboxTasks > 0) then
 			addTask(createProcessMessageTask(index, messageAgeInSeconds));
 		else
 			processMailMessage(index, messageAgeInSeconds);
@@ -478,23 +478,23 @@ end
 -- Functions that check the subject
 -------------------------------------------------------------------------------
 function isSubjectAuctionExpired(subject)
-	return (string.find(subject, "^".._BC('MailAuctionExpiredSubject')..": .*") ~= nil);
+	return (subject:find("^".._BC('MailAuctionExpiredSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionCancelled(subject)
-	return (string.find(subject, "^".._BC('MailAuctionCancelledSubject')..": .*") ~= nil);
+	return (subject:find("^".._BC('MailAuctionCancelledSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionWon(subject)
-	return (string.find(subject, "^".._BC('MailAuctionWonSubject')..": .*") ~= nil);
+	return (subject:find("^".._BC('MailAuctionWonSubject')..": .*") ~= nil);
 end
 
 function isSubjectAuctionSuccessful(subject)
-	return (string.find(subject, "^".._BC('MailAuctionSuccessfulSubject')..": .*") ~= nil);
+	return (subject:find("^".._BC('MailAuctionSuccessfulSubject')..": .*") ~= nil);
 end
 
 function isSubjectOutbidOn(subject)
-	return (string.find(subject, "^".._BC('MailOutbidOnSubject').." .*") ~= nil);
+	return (subject:find("^".._BC('MailOutbidOnSubject').." .*") ~= nil);
 end
 
 -------------------------------------------------------------------------------
@@ -503,15 +503,15 @@ end
 function getItemNameFromSubject(subject)
 	local itemName = nil;
 	if (isSubjectAuctionExpired(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailAuctionExpiredSubject')..": (.*)");
+		_, _, itemName = subject:find("^".._BC('MailAuctionExpiredSubject')..": (.*)");
 	elseif (isSubjectAuctionCancelled(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailAuctionCancelledSubject')..": (.*)");
+		_, _, itemName = subject:find("^".._BC('MailAuctionCancelledSubject')..": (.*)");
 	elseif (isSubjectAuctionWon(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailAuctionWonSubject')..": (.*)");
+		_, _, itemName = subject:find("^".._BC('MailAuctionWonSubject')..": (.*)");
 	elseif (isSubjectAuctionSuccessful(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailAuctionSuccessfulSubject')..": (.*)");
+		_, _, itemName = subject:find("^".._BC('MailAuctionSuccessfulSubject')..": (.*)");
 	elseif (isSubjectOutbidOn(subject)) then
-		_, _, itemName = string.find(subject, "^".._BC('MailOutbidOnSubject').." (.*)");
+		_, _, itemName = subject:find("^".._BC('MailOutbidOnSubject').." (.*)");
 	end
 	return itemName;
 end

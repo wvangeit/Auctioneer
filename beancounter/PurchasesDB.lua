@@ -150,7 +150,7 @@ end
 function deletePendingBidBySignature(item, quantity, bid, seller, isBuyout, timeLeft)
 	if (item and quantity and bid and seller) then
 		local pendingBidsTable = getPendingBidsTableForItem(item, true);
-		for index = 1, table.getn(pendingBidsTable) do
+		for index = 1, #pendingBidsTable do
 			local pendingBid = unpackPendingBid(pendingBidsTable[index]);
 			if (pendingBid.quantity == quantity and
 				pendingBid.bid == bid and
@@ -181,7 +181,7 @@ function deletePendingBidByIndex(item, index, reason, pendingBids)
 	if (pendingBids) then
 		-- Iterate in reverse since we will be removing the pending bid
 		-- from the list when we find it.
-		for pendingIndex = table.getn(pendingBids), 1, -1 do
+		for pendingIndex = #pendingBids, 1, -1 do
 			local bid = pendingBids[pendingIndex];
 			if (index == bid.index) then
 				pendingBid = bid;
@@ -202,7 +202,7 @@ function deletePendingBidByIndex(item, index, reason, pendingBids)
 		
 		-- Remove the pending bid from the table.
 		table.remove(pendingBidsTable, index);
-		if (table.getn(pendingBidsTable)) then
+		if (#pendingBidsTable) then
 			getPendingBidsTableForItem(item); -- Deletes the table
 		end
 		
@@ -234,7 +234,7 @@ end
 -------------------------------------------------------------------------------
 function unpackPendingBid(packedPendingBid)
 	local pendingBid = {};
-	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout, pendingBid.timeLeft, pendingBid.buyerId = string.find(packedPendingBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, pendingBid.time, pendingBid.quantity, pendingBid.bid, pendingBid.seller, pendingBid.isBuyout, pendingBid.timeLeft, pendingBid.buyerId = packedPendingBid:find("(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	pendingBid.time = numberFromString(pendingBid.time);
 	pendingBid.quantity = numberFromString(pendingBid.quantity);
 	pendingBid.bid = numberFromString(pendingBid.bid);
@@ -261,7 +261,7 @@ function getPendingBidsTableForItem(item, create)
 	if (pendingBidsForItemTable == nil and create) then
 		pendingBidsForItemTable = {};
 		pendingBidsTable[item] = pendingBidsForItemTable;
-	elseif (pendingBidsForItemTable and table.getn(pendingBidsForItemTable) == 0 and not create) then
+	elseif (pendingBidsForItemTable and #pendingBidsForItemTable == 0 and not create) then
 		pendingBidsTable[item] = nil;
 	end
 
@@ -274,9 +274,9 @@ end
 function getPendingBidItems(item)
 	local items = {};
 	if (BeanCounterRealmDB.pendingBids) then
-		for item in BeanCounterRealmDB.pendingBids do
+		for item in pairs(BeanCounterRealmDB.pendingBids) do
 			local pendingBidsTable = getPendingBidsTableForItem(item);
-			if (pendingBidsTable and table.getn(pendingBidsTable) > 0) then
+			if (pendingBidsTable and #pendingBidsTable > 0) then
 				table.insert(items, item);
 			end
 		end
@@ -291,7 +291,7 @@ function getPendingBidsForItem(item, filterFunc)
 	local pendingBids = {};
 	local pendingBidsTable = getPendingBidsTableForItem(item);
 	if (pendingBidsTable) then
-		for index in pendingBidsTable do
+		for index in pairs(pendingBidsTable) do
 			local pendingBid = unpackPendingBid(pendingBidsTable[index]);
 			pendingBid.index = index;
 			if (filterFunc == nil or filterFunc(pendingBid)) then
@@ -308,9 +308,9 @@ end
 function printPendingBids()
 	chatPrint("Pending Bids:");
 	if (BeanCounterRealmDB.pendingBids) then
-		for item in BeanCounterRealmDB.pendingBids do
+		for item in pairs(BeanCounterRealmDB.pendingBids) do
 			local pendingBidsTable = BeanCounterRealmDB.pendingBids[item];
-			for index = 1, table.getn(pendingBidsTable) do
+			for index = 1, #pendingBidsTable do
 				local pendingBid = unpackPendingBid(pendingBidsTable[index]);
 				printPendingBid(chatPrint, nil, item, pendingBid);
 			end
@@ -343,7 +343,7 @@ end
 function isPendingBid(item, quantity, bid, seller, isBuyout, isSuccessful)
 	local pendingBids = getPendingBidsTableForItem(item);
 	if (pendingBids) then
-		for index = 1, table.getn(pendingBids) do
+		for index = 1, #pendingBids do
 			local pendingBid = unpackPendingBid(pendingBids[index]);
 			if ((quantity == nil or pendingBid.quantity == nil or quantity == pendingBid.quantity) and
 				(bid == nil or pendingBid.bid == nil or bid == pendingBid.bid) and
@@ -425,7 +425,7 @@ function deleteCompletedBidByIndex(item, index, reason, completedBids)
 	if (completedBids) then
 		-- Iterate in reverse since we will be removing the completed bid
 		-- from the list when we find it.
-		for completedIndex = table.getn(completedBids), 1, -1 do
+		for completedIndex = #completedBids, 1, -1 do
 			local bid = completedBids[completedIndex];
 			if (index == bid.index) then
 				completedBid = bid;
@@ -446,7 +446,7 @@ function deleteCompletedBidByIndex(item, index, reason, completedBids)
 		
 		-- Remove the completed bid from the table.
 		table.remove(completedBidsTable, index);
-		if (table.getn(completedBidsTable)) then
+		if (#completedBidsTable) then
 			getCompletedBidsTableForItem(item); -- Deletes the table
 		end
 		
@@ -479,7 +479,7 @@ end
 -------------------------------------------------------------------------------
 function unpackCompletedBid(packedCompletedBid)
 	local completedBid = {};
-	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded, completedBid.buyerId = string.find(packedCompletedBid, "(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, completedBid.time, completedBid.quantity, completedBid.bid, completedBid.seller, completedBid.isBuyout, completedBid.isSuccessful, completedBid.isPurchaseRecorded, completedBid.buyerId = packedCompletedBid:find("(.+);(.+);(.+);(.+);(.+);(.+);(.+);(.+)");
 	completedBid.time = numberFromString(completedBid.time);
 	completedBid.quantity = numberFromString(completedBid.quantity);
 	completedBid.bid = numberFromString(completedBid.bid);
@@ -507,7 +507,7 @@ function getCompletedBidsTableForItem(item, create)
 	if (completedBidsForItemTable == nil and create) then
 		completedBidsForItemTable = {};
 		completedBidsTable[item] = completedBidsForItemTable;
-	elseif (completedBidsForItemTable and table.getn(completedBidsForItemTable) == 0 and not create) then
+	elseif (completedBidsForItemTable and #completedBidsForItemTable == 0 and not create) then
 		completedBidsTable[item] = nil;
 	end
 
@@ -521,7 +521,7 @@ function getCompletedBidsForItem(item, filterFunc)
 	local completedBids = {};
 	local completedBidsTable = getCompletedBidsTableForItem(item);
 	if (completedBidsTable) then
-		for index in completedBidsTable do
+		for index in pairs(completedBidsTable) do
 			local completedBid = unpackCompletedBid(completedBidsTable[index]);
 			completedBid.index = index;
 			if (filterFunc == nil or filterFunc(completedBid)) then
@@ -538,9 +538,9 @@ end
 function printCompletedBids()
 	chatPrint("Completed Bids:");
 	if (BeanCounterRealmDB.completedBids) then
-		for item in BeanCounterRealmDB.completedBids do
+		for item in pairs(BeanCounterRealmDB.completedBids) do
 			local completedBidsTable = BeanCounterRealmDB.completedBids[item];
-			for index = 1, table.getn(completedBidsTable) do
+			for index = 1, #completedBidsTable do
 				local completedBid = unpackCompletedBid(completedBidsTable[index]);
 				printCompletedBid(chatPrint, nil, item, completedBid);
 			end
@@ -616,7 +616,7 @@ end
 -------------------------------------------------------------------------------
 function unpackPurchase(packedPurchase)
 	local purchase = {};
-	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout, purchase.buyerId = string.find(packedPurchase, "(.+);(.+);(.+);(.+);(.+);(.+)");
+	_, _, purchase.time, purchase.quantity, purchase.cost, purchase.seller, purchase.isBuyout, purchase.buyerId = packedPurchase:find("(.+);(.+);(.+);(.+);(.+);(.+)");
 	purchase.time = numberFromString(purchase.time);
 	purchase.quantity = numberFromString(purchase.quantity);
 	purchase.cost = numberFromString(purchase.cost);
@@ -642,7 +642,7 @@ function getPurchasesTableForItem(item, create)
 	if (purchasesForItemTable == nil and create) then
 		purchasesForItemTable = {};
 		purchasesTable[item] = purchasesForItemTable;
-	elseif (purchasesForItemTable and table.getn(purchasesForItemTable) == 0 and not create) then
+	elseif (purchasesForItemTable and #purchasesForItemTable == 0 and not create) then
 		purchasesTable[item] = nil;
 	end
 
@@ -655,9 +655,9 @@ end
 function getPurchasedItems(item)
 	local items = {};
 	if (BeanCounterRealmDB.purchases) then
-		for item in BeanCounterRealmDB.purchases do
+		for item in pairs(BeanCounterRealmDB.purchases) do
 			local purchasesTable = getPurchasesTableForItem(item);
-			if (purchasesTable and table.getn(purchasesTable) > 0) then
+			if (purchasesTable and #purchasesTable > 0) then
 				table.insert(items, item);
 			end
 		end
@@ -672,7 +672,7 @@ function getPurchasesForItem(item, filterFunc)
 	local purchases = {};
 	local purchasesTable = getPurchasesTableForItem(item);
 	if (purchasesTable) then
-		for index in purchasesTable do
+		for index in pairs(purchasesTable) do
 			local purchase = unpackPurchase(purchasesTable[index]);
 			purchase.index = index;
 			if (filterFunc == nil or filterFunc(purchase)) then
@@ -689,9 +689,9 @@ end
 function printPurchases()
 	chatPrint("Purchases:");
 	if (BeanCounterRealmDB.purchases) then
-		for item in BeanCounterRealmDB.purchases do
+		for item in pairs(BeanCounterRealmDB.purchases) do
 			local purchasesTable = BeanCounterRealmDB.purchases[item];
-			for index = 1, table.getn(purchasesTable) do
+			for index = 1, #purchasesTable do
 				local purchase = unpackPurchase(purchasesTable[index]);
 				printPurchase(chatPrint, nil, item, purchase);
 			end
@@ -728,7 +728,7 @@ function reconcileBids(reconcileTime, excludeItems)
 	local totalReconciled = 0;
 	local totalDiscarded = 0;
 	local items = getPendingBidItems();
-	for index in items do
+	for index in pairs(items) do
 		local item = items[index];
 		if (excludeItems == nil or excludeItems[item] == nil) then
 			local reconciled, discarded = reconcileBidsByTime(item, reconcileTime);
@@ -754,7 +754,7 @@ function reconcileBidsByTime(item, reconcileTime)
 			return (pendingBid.buyerId == getCurrentPlayerId() and
 					pendingBid.time + MAXIMUM_TIME_LEFT[pendingBid.timeLeft] + AUCTION_OVERRUN_LIMIT < reconcileTime);
 		end);
-	debugPrint(table.getn(pendingBids).." matching pending bids");
+	debugPrint((#pendingBids).." matching pending bids");
 
 	-- Get the list of completed bids that completed before the specified
 	-- time.
@@ -764,7 +764,7 @@ function reconcileBidsByTime(item, reconcileTime)
 			return (completedBid.buyerId == getCurrentPlayerId() and
 					completedBid.time < reconcileTime);
 		end);
-	debugPrint(table.getn(completedBids).." matching completed bids");
+	debugPrint((#completedBids).." matching completed bids");
 
 	-- Reconcile the lists.
 	local reconciledBids = reconcileBidList(item, pendingBids, completedBids, true);
@@ -772,7 +772,7 @@ function reconcileBidsByTime(item, reconcileTime)
 	-- Cleanup the unmatch pending bids that are too old to match any
 	-- completed bids.
 	local discardedPendingBids = 0;
-	for index = table.getn(pendingBids), 1, -1 do
+	for index = #pendingBids, 1, -1 do
 		local pendingBid = pendingBids[index];
 		deletePendingBidByIndex(item, pendingBid.index, "no match", pendingBids);
 		discardedPendingBids = discardedPendingBids + 1;
@@ -781,7 +781,7 @@ function reconcileBidsByTime(item, reconcileTime)
 	-- Cleanup the unmatched completed bids that are too old to match any
 	-- pending bids.
 	local discardedCompletedBids = 0;
-	for index = table.getn(completedBids), 1, -1 do
+	for index = #completedBids, 1, -1 do
 		local completedBid = completedBids[index];
 		if (completedBid.time + AUCTION_DURATION_LIMIT < reconcileTime) then
 			deleteCompletedBidByIndex(item, completedBid.index, "no match", completedBids);
@@ -807,7 +807,7 @@ function reconcileBidsByQuantityOrBids(item, quantityHint, bidHint)
 		local bidsAttempted = {};
 		local completedBids = getCompletedBidsTableForItem(item);
 		if (completedBids) then
-			while (index <= table.getn(completedBids)) do
+			while (index <= #completedBids) do
 				local completedBid = unpackCompletedBid(completedBids[index]);
 				if (completedBid.quantity and not quantitiesAttempted[completedBid.quantity]) then
 					quantitiesAttempted[completedBid.quantity] = true;
@@ -846,7 +846,7 @@ function reconcileBidsByQuantity(item, quantity)
 			return (pendingBid.buyerId == getCurrentPlayerId() and
 					pendingBid.quantity == quantity);
 		end);
-	debugPrint(table.getn(pendingBids).." matching pending bids");
+	debugPrint((#pendingBids).." matching pending bids");
 	
 	-- Get all the completed bids matching the quantity
 	local completedBids = getCompletedBidsForItem(
@@ -855,10 +855,10 @@ function reconcileBidsByQuantity(item, quantity)
 			return (completedBid.buyerId == getCurrentPlayerId() and 
 					completedBid.quantity == quantity);
 		end);
-	debugPrint(table.getn(completedBids).." matching completed bids");
+	debugPrint((#completedBids).." matching completed bids");
 	
 	-- Attempt to reconcile the lists.
-	if (table.getn(pendingBids) == table.getn(completedBids)) then
+	if (#pendingBids == #completedBids) then
 		return reconcileBidList(item, pendingBids, completedBids, false);
 	elseif (doesPendingBidListMatch(pendingBids)) then
 		return reconcileBidList(item, pendingBids, completedBids, false);
@@ -882,7 +882,7 @@ function reconcileBidsByBid(item, bid)
 			return (pendingBid.buyerId == getCurrentPlayerId() and
 					pendingBid.bid == bid);
 		end);
-	debugPrint(table.getn(pendingBids).." matching pending bids");
+	debugPrint((#pendingBids).." matching pending bids");
 	
 	-- Get all the completed bids matching the quantity
 	local completedBids = getCompletedBidsForItem(
@@ -891,10 +891,10 @@ function reconcileBidsByBid(item, bid)
 			return (completedBid.buyerId == getCurrentPlayerId() and 
 					completedBid.bid == bid);
 		end);
-	debugPrint(table.getn(completedBids).." matching completed bids");
+	debugPrint((#completedBids).." matching completed bids");
 	
 	-- Attempt to reconcile the lists.
-	if (table.getn(pendingBids) == table.getn(completedBids)) then
+	if (#pendingBids == #completedBids) then
 		return reconcileBidList(item, pendingBids, completedBids, false);
 	elseif (doesPendingBidListMatch(pendingBids)) then
 		return reconcileBidList(item, pendingBids, completedBids, false);
@@ -914,13 +914,13 @@ end
 function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed)
 	-- If we have some bids, reconcile them!
 	local bidsReconciled = 0;
-	if (table.getn(pendingBids) > 0 or table.getn(completedBids) > 0) then
+	if (#pendingBids > 0 or #completedBids > 0) then
 		-- For each pending bid, get the list of potential completed bids.
 		-- Afterwards, sort the pending bid list by match count.
-		for pendingIndex = 1, table.getn(pendingBids) do
+		for pendingIndex = 1, #pendingBids do
 			local pendingBid = pendingBids[pendingIndex];
 			pendingBid.matches = {};
-			for completedIndex = 1, table.getn(completedBids) do
+			for completedIndex = 1, #completedBids do
 				local completedBid = completedBids[completedIndex];
 				if (doesPendingBidMatchCompletedBid(pendingBid, completedBid)) then
 					table.insert(pendingBid.matches, completedBid);
@@ -933,10 +933,10 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 		-- For each pending bid, pick a suitable completed bid match.
 		-- This algorithm could be much better, but it works for most sane
 		-- cases.
-		for pendingIndex = 1, table.getn(pendingBids) do
+		for pendingIndex = 1, #pendingBids do
 			local pendingBid = pendingBids[pendingIndex];
 			if (pendingBid.match == nil) then
-				for completedIndex = 1, table.getn(pendingBid.matches) do
+				for completedIndex = 1, #(pendingBid.matches) do
 					local completedBid = pendingBid.matches[completedIndex];
 					if (completedBid.match == nil) then
 						completedBid.match = pendingBid;
@@ -949,7 +949,7 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 
 		-- Check for unmatched pending bids.
 		local unmatchedPendingBidCount = 0;
-		for pendingIndex = 1, table.getn(pendingBids) do
+		for pendingIndex = 1, #pendingBids do
 			local pendingBid = pendingBids[pendingIndex];
 			if (pendingBid.match == nil) then
 				unmatchedPendingBidCount = unmatchedPendingBidCount + 1;
@@ -958,7 +958,7 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 
 		-- Check for unmatched completed bids.
 		local unmatchedCompletedBidCount = 0;
-		for completedIndex = 1, table.getn(completedBids) do
+		for completedIndex = 1, #completedBids do
 			local completedBid = completedBids[completedIndex];
 			if (completedBid.match == nil) then
 				unmatchedCompletedBidCount = unmatchedCompletedBidCount + 1;
@@ -972,7 +972,7 @@ function reconcileBidList(item, pendingBids, completedBids, discrepenciesAllowed
 			-- list in reverse since we will be deleting items from
 			-- it.
 			debugPrint("Begin reconciling bid list for "..item);
-			for pendingIndex = table.getn(pendingBids), 1, -1 do
+			for pendingIndex = #pendingBids, 1, -1 do
 				local pendingBid = pendingBids[pendingIndex];
 				if (pendingBid.match ~= nil) then
 					-- Reconcile the matching bids.
@@ -1017,7 +1017,7 @@ end
 -- bids must be within a 5 minute period of time to be considered matches.
 -------------------------------------------------------------------------------
 function doesPendingBidListMatch(pendingBids)
-	local match = (table.getn(pendingBids) > 0);
+	local match = (#pendingBids > 0);
 	if (match) then
 		local pendingBid = pendingBids[1];
 		local firstBidTime = pendingBid.time;
@@ -1027,7 +1027,7 @@ function doesPendingBidListMatch(pendingBids)
 		local buyout = pendingBid.buyout;
 		local deposit = pendingBid.deposit;
 		local buyerId = pendingBid.buyerId;
-		for index = 2, table.getn(pendingBids) do
+		for index = 2, #pendingBids do
 			local pendingBid = pendingBids[index];
 			if (quantity ~= pendingBid.quantity or
 				bid ~= pendingBid.bid or
@@ -1112,8 +1112,8 @@ end
 -- Compare two auctions based on match count.
 -------------------------------------------------------------------------------
 function compareMatchCount(auction1, auction2)
-	local count1 = table.getn(auction1.matches);
-	local count2 = table.getn(auction2.matches);
+	local count1 = #(auction1.matches);
+	local count2 = #(auction2.matches);
 	if (count1 == count2) then
 		return (auction1.time > auction2.time);
 	end
