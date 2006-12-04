@@ -52,15 +52,6 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		if (Auctioneer.Command.GetFilter('show-embed-blankline')) then
 			EnhTooltip.AddLine(" ", nil, embedded);
 		end
-	else
-		EnhTooltip.AddLine(name, nil, embedded);
-		EnhTooltip.LineQuality(quality);
-	end
-
-	if (Auctioneer.Command.GetFilter('show-link')) then
-		-- OUTPUT: show item link
-		EnhTooltip.AddLine("Link: " .. strjoin(":", itemID, enchant, randomProp, uniqID), nil, embedded);
-		EnhTooltip.LineQuality(quality);
 	end
 
 	local itemInfo = nil;
