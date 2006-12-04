@@ -83,36 +83,40 @@ BidResultCodes = {
 	BidSent = "BidSent";
 }
 
-StaticPopupDialogs["AUCTIONEER_BIDORBUYOUT_AUCTION"] = {
-	text = BUYOUT_AUCTION_CONFIRMATION,
-	button1 = ACCEPT,
-	button2 = CANCEL,
-	OnAccept = function()
-		--Bid was confirmed
-		Auctioneer.BidManager.BidConfirmed()
-	end,
-	OnShow = function()
-		--Modify CanSendAuctionQuery() return value
-		Auctioneer.BidManager.ShowingConfirmation(true)
-
-		--Update money field
-		MoneyFrame_Update(this:GetName().."MoneyFrame", Auctioneer.BidManager.GetBidAmmount());
-	end,
-	OnHide = function()
-		--Restore CanSendAuctionQuery()'s return value
-		Auctioneer.BidManager.ShowingConfirmation(false)
-	end,
-	hasMoneyFrame = 1,
-	showAlert = 1,
-	timeout = 0,
-	exclusive = 1,
-	hideOnEscape = 1
-};
-
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function load()
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", -200, prePlaceAuctionBidHook)
+
+	StaticPopupDialogs["AUCTIONEER_BIDORBUYOUT_AUCTION"] = {
+		text = BUYOUT_AUCTION_CONFIRMATION,
+		button1 = ACCEPT,
+		button2 = CANCEL,
+
+		OnAccept = function()
+			--Bid was confirmed
+			Auctioneer.BidManager.BidConfirmed()
+		end,
+
+		OnShow = function()
+			--Modify CanSendAuctionQuery() return value
+			Auctioneer.BidManager.ShowingConfirmation(true)
+
+			--Update money field
+			MoneyFrame_Update(this:GetName().."MoneyFrame", Auctioneer.BidManager.GetBidAmmount());
+		end,
+
+		OnHide = function()
+			--Restore CanSendAuctionQuery()'s return value
+			Auctioneer.BidManager.ShowingConfirmation(false)
+		end,
+
+		hasMoneyFrame = 1,
+		showAlert = 1,
+		timeout = 0,
+		exclusive = 1,
+		hideOnEscape = 1
+	};
 end
 
 -------------------------------------------------------------------------------
