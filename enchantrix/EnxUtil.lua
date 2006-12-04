@@ -87,7 +87,7 @@ function getReagentInfo(id)
 	local cache = EnchantConfig.cache.reagentinfo
 
 	if type(id) == "string" then
-		local _, _, i = string.find(id, "item:(%d+):")
+		local _, _, i = id:find("item:(%d+):")
 		id = i
 	end
 	id = tonumber(id)
@@ -157,7 +157,7 @@ end
 function getReagentPrice(reagentID)
 	-- reagentID ::= number | hyperlink
 	if type(reagentID) == "string" then
-		local _, _, i = string.find(reagentID, "item:(%d+):")
+		local _, _, i = reagentID:find("item:(%d+):")
 		reagentID = i
 	end
 	reagentID = tonumber(reagentID)
@@ -168,7 +168,7 @@ function getReagentPrice(reagentID)
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
 	if Enchantrix.State.Auctioneer_Loaded then
-		local itemKey = string.format("%d:0:0", reagentID);
+		local itemKey = ("%d:0:0"):format(reagentID);
 		local realm = Auctioneer.Util.GetAuctionKey()
 		hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
 		median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
@@ -196,7 +196,7 @@ function getItemType(id)
 	if (id) then
 		local _, _, quality, _, level, _, _, _, equip = GetItemInfo(id)
 		if (quality and quality >= 2 and level > 0 and Enchantrix.Constants.InventoryTypes[equip]) then
-			return string.format("%d:%d:%s", Enchantrix.Util.RoundUp(level, 5), quality, Enchantrix.Constants.InventoryTypes[equip])
+			return ("%d:%d:%s"):format(Enchantrix.Util.RoundUp(level, 5), quality, Enchantrix.Constants.InventoryTypes[equip])
 		end
 	end
 end
@@ -204,7 +204,7 @@ end
 -- Return item id as integer
 function getItemIdFromSig(sig)
 	if type(sig) == "string" then
-		_, _, sig = string.find(sig, "(%d+)")
+		_, _, sig = sig:find("(%d+)")
 	end
 	return tonumber(sig)
 end
@@ -216,7 +216,7 @@ end
 function getSigFromLink(link)
 	assert(type(link) == "string")
 
-	local _, _, id, rand = string.find(link, "item:(%d+):%d+:(%d+):%d+")
+	local _, _, id, rand = link:find("item:(%d+):%d+:(%d+):%d+")
 	if id and rand then
 		return id..":0:"..rand
 	end
@@ -227,7 +227,7 @@ function getItems(str)
 	local itemList = {};
 	local itemKey;
 
-	for itemID, randomProp, enchant, uniqID in string.gmatch(str, "|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
+	for itemID, randomProp, enchant, uniqID in str:gmatch("|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
 		itemKey = itemID..":"..randomProp..":"..enchant;
 		table.insert(itemList, itemKey)
 	end
@@ -239,7 +239,7 @@ function getItemHyperlinks(str)
 	if (not str) then return nil end
 	local itemList = {};
 
-	for color, item, name in string.gmatch(str, "|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
+	for color, item, name in str:gmatch("|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
 		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
 	end
 	return itemList;
@@ -251,7 +251,7 @@ end
 -- Extract the revision number from SVN keyword string
 function getRevision(str)
 	if not str then return 0 end
-	local _, _, rev = string.find(str, "Revision: (%d+)")
+	local _, _, rev = str:find("Revision: (%d+)")
 	return tonumber(rev) or 0
 end
 
@@ -265,7 +265,7 @@ function split(str, at)
 		then table.insert(splut, str)
 
 	else
-		for n, c in string.gmatch(str, '([^%'..at..']*)(%'..at..'?)') do
+		for n, c in str:gmatch('([^%'..at..']*)(%'..at..'?)') do
 			table.insert(splut, n);
 
 			if (c == '') then break end
@@ -286,12 +286,12 @@ function spliterator(str, at)
 	return function()
 		if done then return nil end
 		start = found + 1
-		found = string.find(str, at, start, true)
+		found = str:find(at, start, true)
 		if not found then
 			found = 0
 			done = true
 		end
-		return string.sub(str, start, found - 1)
+		return str:sub(start, found - 1)
 	end
 end
 
@@ -428,8 +428,8 @@ local function _profilerDebugPrint(this)
 	if this.r == nil then
 		EnhTooltip.DebugPrint("  Not started")
 	else
-		EnhTooltip.DebugPrint(string.format("  Time: %0.3f s", this:Time()))
-		EnhTooltip.DebugPrint(string.format("  Mem: %0.0f KiB", this:Mem()))
+		EnhTooltip.DebugPrint(("  Time: %0.3f s"):format(this:Time()))
+		EnhTooltip.DebugPrint(("  Mem: %0.0f KiB"):format(this:Mem()))
 		if this.r then
 			EnhTooltip.DebugPrint("  Running...")
 		end

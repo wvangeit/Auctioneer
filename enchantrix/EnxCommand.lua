@@ -181,7 +181,7 @@ function registerKhaos()
 				end;
 				feedback = function (state)
 					Enchantrix.Config.SetLocale(state.value);
-					return string.format(_ENCH('FrmtActSet'), _ENCH('CmdLocale'), state.value);
+					return _ENCH('FrmtActSet'):format(_ENCH('CmdLocale'), state.value);
 				end;
 				default = {
 					value = Enchantrix.Config.GetLocale();
@@ -227,9 +227,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowEmbed')));
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowEmbed')));
 					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowEmbed')));
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowEmbed')));
 					end
 				end;
 				check=true;
@@ -252,9 +252,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowTerse')));
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowTerse')));
 					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowTerse')));
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowTerse')));
 					end
 				end;
 				check=true;
@@ -277,9 +277,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowCount')));
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowCount')));
 					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowCount')));
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowCount')));
 					end
 				end;
 				check=true;
@@ -313,9 +313,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowValue')));
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowValue')));
 					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowValue')));
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowValue')));
 					end
 				end;
 				check=true;
@@ -338,9 +338,9 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					if (state.checked) then
-						return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowGuessBaseline')));
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessBaseline')));
 					else
-						return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowGuessBaseline')));
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessBaseline')));
 					end
 				end;
 				check=true;
@@ -378,7 +378,7 @@ function registerKhaos()
 					clear(_ENCH('CmdClearAll'));
 				end;
 				feedback=function()
-					return string.format(_ENCH('FrmtActClearall'),  _ENCH('GuiClearallNote'));
+					return _ENCH('FrmtActClearall'):format(_ENCH('GuiClearallNote'));
 				end;
 				dependencies={all={checked=true;}};
 				difficulty=3;
@@ -424,7 +424,7 @@ function registerKhaos()
 				end;
 				feedback=function(state)
 					local _, frameName = Enchantrix.Config.GetFrameNames(state.value)
-					return string.format(_ENCH('FrmtPrintin'), frameName);
+					return _ENCH('FrmtPrintin'):format(frameName);
 				end;
 				default = {
 					value=Enchantrix.Config.GetFrameIndex();
@@ -454,7 +454,7 @@ function registerKhaos()
 					if (state.value == _ENCH('CmdClearAll')) then
 						return _ENCH('FrmtActDefaultAll');
 					else
-						return string.format(_ENCH('FrmtActDefault'), state.value);
+						return _ENCH('FrmtActDefault'):format(state.value);
 					end
 				end;
 				default = {
@@ -503,9 +503,9 @@ function registerAuctioneerOptions()
 			end;
 			feedback=function(state)
 				if (state.checked) then
-					return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowGuessAuctioneerHsp')));
+					return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessAuctioneerHsp')));
 				else
-					return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowGuessAuctioneerHsp')));
+					return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessAuctioneerHsp')));
 				end
 			end;
 			check=true;
@@ -528,9 +528,9 @@ function registerAuctioneerOptions()
 			end;
 			feedback=function(state)
 				if (state.checked) then
-					return (string.format(_ENCH('FrmtActEnable'), _ENCH('ShowGuessAuctioneerMed')));
+					return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessAuctioneerMed')));
 				else
-					return (string.format(_ENCH('FrmtActDisable'), _ENCH('ShowGuessAuctioneerMed')));
+					return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessAuctioneerMed')));
 				end
 			end;
 			check=true;
@@ -632,7 +632,7 @@ function handleCommand(command, source)
 		TODO: other string regexps in Auctioneer/Enchantrix should also be looked at.
 		Hardcoding ' 's and using '.' instead of %a/%d/%w/%s (or their inverses) is not really great coding practice.
 	]]
-	local _, _, cmd, param, param2 = string.find(command, "^(%a+)%s*(%w*)%s*(%w*).*");
+	local _, _, cmd, param, param2 = command:find("^(%a+)%s*(%w*)%s*(%w*).*");
 
 	if (not cmd) then cmd = command end
 	if (not cmd) then cmd = "" end
@@ -693,7 +693,7 @@ function handleCommand(command, source)
 		genVarSet(cmd, param, chatprint);
 
 	elseif (chatprint) then
-		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActUnknown'), cmd));
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtActUnknown'):format(cmd));
 	end
 end
 
@@ -707,28 +707,28 @@ function chatPrintHelp()
 
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
 
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdBarker'), Enchantrix.Locale.GetLocalizedFilterVal('barker'), _ENCH('HelpBarker')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdBarker'), Enchantrix.Locale.GetLocalizedFilterVal('barker'), _ENCH('HelpBarker')));
 
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
 	if Enchantrix.State.Auctioneer_Loaded then
-		Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
-		Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessAuctioneerMed'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
+		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
+		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerMed'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
 	else
 		Enchantrix.Util.ChatPrint(_ENCH('HelpGuessNoauctioneer'));
 	end
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('ShowGuessBaseline'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-baseline'), _ENCH('HelpGuessBaseline')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessBaseline'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-baseline'), _ENCH('HelpGuessBaseline')));
 
 	lineFormat = "  |cffffffff/enchantrix %s %s|r - %s";
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdLocale'), _ENCH('OptLocale'), _ENCH('HelpLocale')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdClear'), _ENCH('OptClear'), _ENCH('HelpClear')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdLocale'), _ENCH('OptLocale'), _ENCH('HelpLocale')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdClear'), _ENCH('OptClear'), _ENCH('HelpClear')));
 
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdFindBidauct'), _ENCH('OptFindBidauct'), _ENCH('HelpFindBidauct')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdFindBuyauct'), _ENCH('OptFindBuyauct'), _ENCH('HelpFindBuyauct')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
-	Enchantrix.Util.ChatPrint(string.format(lineFormat, _ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdFindBidauct'), _ENCH('OptFindBidauct'), _ENCH('HelpFindBidauct')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdFindBuyauct'), _ENCH('OptFindBuyauct'), _ENCH('HelpFindBuyauct')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
 end
 --[[
 	The onOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
@@ -801,7 +801,7 @@ function clear(param, chatprint)
 				EnchantedBaseItems[itemID] = nil
 
 				if (chatprint) then
-					Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActClearOk'), itemKey))
+					Enchantrix.Util.ChatPrint(_ENCH('FrmtActClearOk'):format(itemKey))
 				end
 			end
 		end
@@ -832,7 +832,7 @@ function default(param, chatprint)
 			end
 
 		else
-			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActDefault'), paramLocalized));
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefault'):format(paramLocalized));
 			setKhaosSetKeyValue(param, Enchantrix.Config.GetFilter(param));
 		end
 	end
@@ -851,11 +851,11 @@ function genVarSet(variable, param, chatprint)
 
 	if (chatprint) then
 		if (Enchantrix.Config.GetFilter(variable)) then
-			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActEnable'), Enchantrix.Locale.LocalizeCommand(variable)));
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActEnable'):format(Enchantrix.Locale.LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", true);
 
 		else
-			Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtActDisable'), Enchantrix.Locale.LocalizeCommand(variable)));
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDisable'):format(Enchantrix.Locale.LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", false);
 		end
 	end
@@ -976,7 +976,7 @@ function doPercentLess(percentLess, minProfit)
 	percentLess = math.max(percentLess, MIN_PERCENT_LESS_THAN_HSP)
 	minProfit = math.max(minProfit, MIN_PROFIT_MARGIN)
 
-	Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtPctlessHeader'), percentLess, EnhTooltip.GetTextGSC(minProfit)));
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
@@ -1015,7 +1015,7 @@ function doPercentLess(percentLess, minProfit)
 
 	--TODO: needs to be localized
 	if (skipped_auctions > 0) then
-		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtPctlessSkipped'), skipped_auctions, EnhTooltip.GetTextGSC(minProfit)));
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkipped'):format(skipped_auctions, EnhTooltip.GetTextGSC(minProfit)));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessDone'));
@@ -1037,7 +1037,7 @@ function doBidBroker(minProfit, percentLess)
 	percentLess = math.max(percentLess, MIN_PERCENT_LESS_THAN_HSP)
 	min_profit_value = math.max(minProfit, MIN_PROFIT_MARGIN)
 
-	Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtBidbrokerHeader'), EnhTooltip.GetTextGSC(minProfit), percentLess));
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(EnhTooltip.GetTextGSC(minProfit), percentLess));
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
@@ -1093,7 +1093,7 @@ function doBidBroker(minProfit, percentLess)
 
 	--TODO: needs to be localized
 	if (skipped_auctions > 0) then
-		Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtBidbrokerSkipped'), skipped_auctions, percentLess));
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerSkipped'):format(skipped_auctions, percentLess));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
@@ -1101,7 +1101,7 @@ end
 
 function getAuctionItemDisenchants(auctionSignature, useCache)
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(auctionSignature);
-	local sig = string.format("%d:%d:%d", id, enchant, rprop);
+	local sig = ("%d:%d:%d"):format(id, enchant, rprop);
 	return Enchantrix.Storage.GetItemDisenchants(sig, name, useCache);
 end
 

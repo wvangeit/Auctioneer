@@ -75,7 +75,7 @@ function addonLoaded()
 		for id in pairs(Enchantrix.Constants.StaticPrices) do
 			if not (Enchantrix.Util.GetReagentInfo(id)) then
 				EnchantConfig.zomgBlizzardAreMeanies = true
-				GameTooltip:SetHyperlink(string.format("item:%d:0:0:0", id))
+				GameTooltip:SetHyperlink(("item:%d:0:0:0"):format(id))
 				GameTooltip:Hide()
 				EnchantConfig.zomgBlizzardAreMeanies = nil
 			end
@@ -93,7 +93,7 @@ function unserialize(str)
 	local tbl = {}
 	if type(str) == "string" then
 		for de in Enchantrix.Util.Spliterator(str, ";") do
-			local _, _, id, d, r = string.find(de, "(%d+):(%d+):(%d+)")
+			local _, _, id, d, r = de:find("(%d+):(%d+):(%d+)")
 			id, d, r = tonumber(id), tonumber(d), tonumber(r)
 			if (id and d > 0 and r > 0) then
 				tbl[id] = {[N_DISENCHANTS] = d, [N_REAGENTS] = r}
@@ -110,9 +110,9 @@ function serialize(tbl)
 		for id, counts in pairs(tbl) do
 			if (type(id) == "number" and counts[N_DISENCHANTS] > 0 and counts[N_REAGENTS] > 0) then
 				if (str) then
-					str = string.format("%s;%d:%d:%d:0", str, id, counts[N_DISENCHANTS], counts[N_REAGENTS])
+					str = ("%s;%d:%d:%d:0"):format(str, id, counts[N_DISENCHANTS], counts[N_REAGENTS])
 				else
-					str = string.format("%d:%d:%d:0", id, counts[N_DISENCHANTS], counts[N_REAGENTS])
+					str = ("%d:%d:%d:0"):format(id, counts[N_DISENCHANTS], counts[N_REAGENTS])
 				end
 			end
 		end
@@ -267,7 +267,7 @@ function saveDisenchant(sig, reagentID, count)
 
 	local id = Enchantrix.Util.GetItemIdFromSig(sig)
 	local itype = Enchantrix.Util.GetItemType(id)
-	local disenchant = string.format("%d:1:%d:0", reagentID, count)
+	local disenchant = ("%d:1:%d:0"):format(reagentID, count)
 	EnchantedLocal[sig] = mergeDisenchant(EnchantedLocal[sig], disenchant)
 	LocalBaseItems[id] = mergeDisenchant(LocalBaseItems[id], disenchant)
 	if itype then
@@ -286,7 +286,7 @@ function saveLocal(sig, lData)
 			local iCount = tonumber(eData.i) or 0;
 			local dCount = tonumber(eData.d) or 0;
 			local oCount = tonumber(eData.o) or 0;
-			local serial = string.format("%d:%d:%d:%d", eResult, iCount, dCount, oCount);
+			local serial = ("%d:%d:%d:%d"):format(eResult, iCount, dCount, oCount);
 			if (str == "") then str = serial else str = str..";"..serial end
 		else
 			eData = nil;
@@ -412,7 +412,7 @@ function getItemDisenchants(sig, name, useCache)
 				local count = (counts.biCount or 0) + (counts.iCount or 0);
 				local countI = (counts.biCount or 0) + (counts.iCount or 0);
 				local countD = (counts.bdCount or 0) + (counts.dCount or 0);
-				local pct = tonumber(string.format("%0.1f", count / total * 100));
+				local pct = tonumber(("%0.1f"):format(count / total * 100));
 				local rate
 				if (countI > 0) then
 					rate = countD / countI

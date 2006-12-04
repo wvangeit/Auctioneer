@@ -801,7 +801,7 @@ function Enchantrix_CreateBarker()
 			for index=1, GetNumCrafts() do
 				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
 				--EnhTooltip.DebugPrint(GetCraftInfo(index))
-				if((numEnchantsAvailable > 0) and (string.find(craftName, "Enchant"))) then --have reagents and it is an enchant
+				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
 					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
 					local cost = 0;
 					for j=1,GetCraftNumReagents(index),1 do
@@ -944,7 +944,7 @@ end
 function Enchantrix_GetReagentHSP( itemLink )
 
 	local itemID = Enchantrix.Util.GetItemIdFromLink(itemLink);
-	local itemKey = string.format("%s:0:0", itemID);
+	local itemKey = ("%s:0:0"):format(itemID);
 
 
 	-- Work out what version if any of auctioneer is installed
@@ -1086,7 +1086,7 @@ function EnchantrixBarker_GetItemCategoryString( index )
 
 	for key,category in pairs(categories) do
 		--Enchantrix.Util.ChatPrint( "cat key: "..key);
-		if( string.find( enchant, category.search ) ~= nil ) then
+		if( enchant:find(category.search ) ~= nil ) then
 			--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category.print..", enchant: "..enchant );
 			return category.print;
 		end
@@ -1101,7 +1101,7 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 
 	for key,category in pairs(categories) do
 		--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category );
-		if( string.find( enchant, category.search ) ~= nil ) then
+		if( enchant:find(category.search ) ~= nil ) then
 			return key;
 		end
 	end
@@ -1115,12 +1115,12 @@ function EnchantrixBarker_GetCraftDescription( index )
 end
 
 function Enchantrix_GetShortDescriptor( index )
-	local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
+	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
 	for index,attribute in ipairs(attributes) do
-		if( string.find( long_str, attribute ) ~= nil ) then
-			statvalue = string.sub(long_str ,string.find(long_str,'[0-9]+[^%%]'));
-			statvalue = string.sub(statvalue ,string.find(statvalue,'[0-9]+'));
+		if( long_str:find(attribute ) ~= nil ) then
+			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
+			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
 			return "+"..statvalue..' '..short_attributes[index];
 		end
 	end
@@ -1131,10 +1131,10 @@ end
 
 function EnchantrixBarker_GetEnchantStat( enchant )
 	local index = enchant.index;
-	local long_str = string.lower(EnchantrixBarker_GetCraftDescription(index));
+	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
 	for index,attribute in ipairs(attributes) do
-		if( string.find( long_str, attribute ) ~= nil ) then
+		if( long_str:find(attribute ) ~= nil ) then
 			return short_attributes[index];
 		end
 	end

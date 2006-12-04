@@ -111,7 +111,7 @@ tooltipFormat = {
 		end
 		-- Replace patterns
 		for pat, repl in pairs(this.patterns) do
-			line = string.gsub(line, pat, repl or "")
+			line = line:gsub(pat, repl or "")
 		end
 		return line
 	end,
@@ -157,7 +157,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		-- Header
 		local total = ""
 		if (Enchantrix.Config.GetFilter('counts')) then
-			total = string.format(" |cff7f7f00(%d)|r", totals.total)
+			total = (" |cff7f7f00(%d)|r"):format(totals.total)
 		end
 		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..total, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
@@ -195,7 +195,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 			-- Rate
 			if counts.rate ~= 1 then
-				tooltipFormat:SetPattern("$rate", string.format("x%0.1f", counts.rate))
+				tooltipFormat:SetPattern("$rate", ("x%0.1f"):format(counts.rate))
 			else
 				tooltipFormat:SetPattern("$rate", "")
 			end
@@ -256,8 +256,8 @@ local function getReagentsFromTooltip(frame)
 	for i = 1, nLines do
 		local text = getglobal(frameName.."TextLeft"..i):GetText()
 
-		-- string.find(text, "Reagents: (.+)")
-		local _, _, r = string.find(text, _ENCH('PatReagents'))
+		-- text:find("Reagents: (.+)")
+		local _, _, r = text:find(_ENCH('PatReagents'))
 		if r then
 			reagents = r
 			break
@@ -270,16 +270,16 @@ local function getReagentsFromTooltip(frame)
 	-- Process reagents separated by ","
 	for reagent in Enchantrix.Util.Spliterator(reagents, ",") do
 		-- Chomp whitespace
-		reagent = string.gsub(reagent, "^%s*", "")
-		reagent = string.gsub(reagent, "%s*$", "")
+		reagent = reagent:gsub("^%s*", "")
+		reagent = reagent:gsub("%s*$", "")
 		-- ...and color codes
-		reagent = string.gsub(reagent, "^%|c%x%x%x%x%x%x%x%x", "")
-		reagent = string.gsub(reagent, "%|r$", "")
+		reagent = reagent:gsub("^%|c%x%x%x%x%x%x%x%x", "")
+		reagent = reagent:gsub("%|r$", "")
 
 		-- Get and chomp counts, e.g "Strange Dust (2)"
-		local _, _, count = string.find(reagent, "%((%d+)%)$")
+		local _, _, count = reagent:find("%((%d+)%)$")
 		if count then
-			reagent = string.gsub(reagent, "%s*%(%d+%)$", "")
+			reagent = reagent:gsub("%s*%(%d+%)$", "")
 			count = tonumber(count)
 		else
 			count = 1
@@ -370,7 +370,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		end
 		line = line.." x"..reagent[COUNT]
 		if reagent[COUNT] > 1 and reagent[PRICE] then
-			line = line.." "..string.format(_ENCH('FrmtPriceEach'), EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent[PRICE], 3)))
+			line = line.." ".._ENCH('FrmtPriceEach'):format(EnhTooltip.GetTextGSC(Enchantrix.Util.Round(reagent[PRICE], 3)))
 			EnhTooltip.AddLine(line, Enchantrix.Util.Round(reagent[PRICE] * reagent[COUNT], 3), embed)
 			price = price + reagent[PRICE] * reagent[COUNT]
 		elseif reagent[PRICE] then
@@ -395,7 +395,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
 		if Enchantrix.Config.GetFilter('barker') then
 			-- "Barker Price (%d%% margin)"
-			EnhTooltip.AddLine(string.format(_ENCH('FrmtBarkerPrice'), Enchantrix.Util.Round(margin)), barkerPrice, embed)
+			EnhTooltip.AddLine(_ENCH('FrmtBarkerPrice'):format(Enchantrix.Util.Round(margin)), barkerPrice, embed)
 			EnhTooltip.LineColor(0.8,0.8,0.2)
 		end
 

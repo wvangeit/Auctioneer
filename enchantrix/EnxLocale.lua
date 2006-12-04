@@ -102,7 +102,7 @@ function buildCommandMap()
 end
 
 function getLocalizedCmdString(value)
-	return _ENCH('Cmd'..string.upper(string.sub(value,1,1))..string.sub(value,2))
+	return _ENCH('Cmd'..value:sub(1,1):upper()..value:sub(2))
 end
 
 function delocalizeFilterVal(value)

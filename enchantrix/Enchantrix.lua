@@ -50,7 +50,7 @@ local DisenchantEvent = {}
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
 function addonLoaded(hookArgs, event, addOnName)
-	if (event ~= "ADDON_LOADED") or (string.lower(addOnName) ~= "enchantrix") then
+	if (event ~= "ADDON_LOADED") or (addOnName:lower() ~= "enchantrix") then
 		return
 	end
 	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
@@ -82,8 +82,8 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
 
-	local vstr = string.format("%s-%d", Enchantrix.Version, Enchantrix.Revision)
-	Enchantrix.Util.ChatPrint(string.format(_ENCH('FrmtWelcome'), vstr), 0.8, 0.8, 0.2)
+	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
+	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
 end
 
@@ -91,8 +91,8 @@ end
 function onLoad()
 	Stubby.RegisterBootCode("Enchantrix", "CommandHandler", [[
 		local function cmdHandler(msg)
-			local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.+)$")
-			if (not cmd) then cmd = string.lower(msg) end
+			local i,j, cmd, param = msg:lower():find("^([^ ]+) (.+)$")
+			if (not cmd) then cmd = msg:lower() end
 			if (not cmd) then cmd = "" end
 			if (not param) then param = "" end
 			if (cmd == "load") then
@@ -182,13 +182,13 @@ function onEvent(funcVars, event, spellName, spellDuration)
 			-- Normal range of lootLatency appears to be around -0.1 - 0.7s
 			local lootLatency = GetTime() - (DisenchantEvent.startTime + DisenchantEvent.spellDuration)
 			if (lootLatency > -1) and (lootLatency < 2) then
-				Enchantrix.Util.ChatPrint(string.format(_ENCH("FrmtFound"), DisenchantEvent.finished))
+				Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
 				local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
 				for i = 1, GetNumLootItems(), 1 do
 					if LootSlotIsItem(i) then
 						local icon, name, quantity, rarity = GetLootSlotInfo(i)
 						local link = GetLootSlotLink(i)
-						Enchantrix.Util.ChatPrint(string.format("  %s x%d", link, quantity))
+						Enchantrix.Util.ChatPrint(("  %s x%d"):format(link, quantity))
 						-- Save result
 						local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
 						if reagentID then
