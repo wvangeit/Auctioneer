@@ -30,33 +30,16 @@
 local self = {}
 self.update = {}
 --Local function prototypes
-local split, setOrder, getOrder, fetchString, getString, registerAddOn
+local setOrder, getOrder, fetchString, getString, registerAddOn
 
 --Function Imports
 local tinsert = table.insert
-
-function split(str, at)
-	if (not (type(str) == "string")) then
-		return
-	end
-
-	if (not str) then
-		str = ""
-	end
-
-	if (not at) then
-		return {str}
-
-	else
-		return {strsplit(at, str)};
-	end
-end
 
 function setOrder(order)
 	if (not order) then
 		self.order = {}
 	else
-		self.order = split(order, ",")
+		self.order = { strsplit(",", order) }
 	end
 
 	tinsert(self.order, GetLocale())
