@@ -27,9 +27,10 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
-	<Button name="Enchantrix_BarkerButton" inherits="UIPanelButtonTemplate" hidden="true" text="Trade Barker">
+
+	<Button name="Enchantrix_BarkerButton" inherits="UIPanelButtonTemplate" hidden="true" text="Barker">
 		<Size>
-			<AbsDimension x="105" y="22"/>
+			<AbsDimension x="65" y="22"/>
 		</Size>
 		<Scripts>
 			<OnClick>
@@ -38,9 +39,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Scripts>
 	</Button>
 
-	<Button name="Enchantrix_BarkerOptionsButton" inherits="UIPanelButtonTemplate" hidden="true" text="Barker Options">
+	<Button name="Enchantrix_BarkerOptionsButton" inherits="UIPanelButtonTemplate" hidden="true" text="Options">
 		<Size>
-			<AbsDimension x="105" y="22"/>
+			<AbsDimension x="65" y="22"/>
 		</Size>
 		<Scripts>
 			<OnClick>
@@ -48,7 +49,6 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnClick>
 		</Scripts>
 	</Button>
-
 
 
 	<Slider name="EnchantrixBarker_OptionsSliderTemplate" inherits="OptionsSliderTemplate" virtual="true" minValue="0" maxValue="100" defaultValue="50" valueStep="2">

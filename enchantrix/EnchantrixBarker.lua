@@ -110,13 +110,16 @@ local short_location = {
 	[_ENCH('Ironforge')] = _ENCH('ShortIronForge')
 };
 
+local relevelFrame;
+local relevelFrames
+
 -- UI code
 
 
 function EnchantrixBarker_OnEvent()
 	--Enchantrix.Util.ChatPrint("GotUIEvent...");
 
-	-- Returns "Enchanting" for enchantwindow and nil for Beast Training
+	--Returns "Enchanting" for enchantwindow and nil for Beast Training
 	local craftName, rank, maxRank = GetCraftDisplaySkillLine()
 
 	if craftName then
@@ -177,27 +180,31 @@ function Enchantrix.Barker.AddonLoaded()
 	end
 end
 
-local function relevel(frame)
-	local myLevel = frame:GetFrameLevel() + 1
-	local children = { frame:GetChildren() }
-	for _,child in pairs(children) do
+function relevelFrame(frame)
+	return relevelFrames(frame:GetFrameLevel() + 2, frame:GetChildren())
+end
+
+function relevelFrames(myLevel, ...)
+	for i = 1, select("#", ...) do
+		local child = select(i, ...)
 		child:SetFrameLevel(myLevel)
-		relevel(child)
+		relevelFrame(child)
 	end
 end
+
 
 local function craftUILoaded()
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
 
 	Enchantrix_BarkerButton:SetParent(CraftFrame);
-	Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -40, -60 );
+	Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
 
 	Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
 	Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
 
 	Enchantrix_BarkerOptions_Frame:SetParent(CraftFrame);
 	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", CraftFrame, "TOPRIGHT");
-	relevel(Enchantrix_BarkerOptions_Frame)
+	relevelFrame(Enchantrix_BarkerOptions_Frame)
 end
 
 function EnchantrixBarker_OnLoad()
