@@ -245,14 +245,16 @@ function beginProcessingRequestQueue()
 
 		-- Hook the functions to disable picking up items. This prevents
 		-- spurious ITEM_LOCK_CHANGED events from confusing us.
-		if (not Original_PickupContainerItem) then
-			Original_PickupContainerItem = PickupContainerItem;
-			PickupContainerItem = AucPostManager_PickupContainerItem;
-		end
-		if (not Original_SplitContainerItem) then
-			Original_SplitContainerItem = SplitContainerItem;
-			SplitContainerItem = AucPostManager_SplitContainerItem;
-		end
+-- [[ TODO: FIX THIS ]]
+-- [[ Temp disable to fix enchantrix ]]
+--		if (not Original_PickupContainerItem) then
+--			Original_PickupContainerItem = PickupContainerItem;
+--			PickupContainerItem = AucPostManager_PickupContainerItem;
+--		end
+--		if (not Original_SplitContainerItem) then
+--			Original_SplitContainerItem = SplitContainerItem;
+--			SplitContainerItem = AucPostManager_SplitContainerItem;
+--		end
 	end
 	return ProcessingRequestQueue;
 end
@@ -263,14 +265,16 @@ end
 function endProcessingRequestQueue()
 	if (ProcessingRequestQueue) then
 		-- Unhook the functions.
-		if (Original_PickupContainerItem) then
-			PickupContainerItem = Original_PickupContainerItem;
-			Original_PickupContainerItem = nil;
-		end
-		if (Original_SplitContainerItem) then
-			SplitContainerItem = Original_SplitContainerItem;
-			Original_SplitContainerItem = nil;
-		end
+-- [[ TODO: FIX THIS ]]
+-- [[ Temp disable to fix enchantrix ]]
+--		if (Original_PickupContainerItem) then
+--			PickupContainerItem = Original_PickupContainerItem;
+--			Original_PickupContainerItem = nil;
+--		end
+--		if (Original_SplitContainerItem) then
+--			SplitContainerItem = Original_SplitContainerItem;
+--			Original_SplitContainerItem = nil;
+--		end
 
 		debugPrint("End processing the post queue");
 		ProcessingRequestQueue = false;

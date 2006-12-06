@@ -64,7 +64,8 @@ MoneyTypeInfo.AUCTIONEER = {
 -------------------------------------------------------------------------------
 function load()
 	-- Register for functions and methods we need locally.
-	Stubby.RegisterFunctionHook("PickupContainerItem", 200, postPickupContainerItemHook);
+--	Stubby.RegisterFunctionHook("PickupContainerItem", 200, postPickupContainerItemHook);
+	hooksecurefunc("PickupContainerItem", postPickupContainerItemHook)
 
 	-- Blizzard's auction UI may or may not have been loaded yet.
 	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
