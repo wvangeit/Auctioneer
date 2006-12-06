@@ -111,19 +111,37 @@ local bidBasedCategories = {[classes[1]]=true, [classes[2]]=true, [classes[8]]=t
 
 -- Default filter configuration
 local filterDefaults = { --Auctioneer_FilterDefaults
+	--General Vars
 	["all"]						=	"on",
-	["autofill"]				=	"on",
-	["embed"]					=	"off",
 	["also"]					=	"off",
 	["auction-click"]			=	"on",
-	["show-link"]				=	"off",
-	["show-embed-blankline"]	=	"off",
-	["show-verbose"]			=	"on",
-	["show-stats"]				=	"on",
+	["auction-duration"]		=	3,
+	["autofill"]				=	"on",
+	["constants-warning"]		=	2,
+	["embed"]					=	"off",
+	["finish"]					=	0,
+	["finish-sound"]			=	"on",
+	["last-auction-duration"]	=	1440,
+	["locale"]					=	"default",
+	["printframe"]				=	1,
+	["protect-window"]			=	1,
 	["show-average"]			=	"on",
 	["show-median"]				=	"on",
+	["show-stats"]				=	"on",
 	["show-suggest"]			=	"on",
+	["show-verbose"]			=	"on",
 	["show-warning"]			=	"on",
+	["warn-color"]				=	"on",
+
+	--Percent Vars
+	["pct-bidmarkdown"]			=	20,
+	["pct-markup"]				=	300,
+	["pct-maxless"]				=	30,
+	["pct-nocomp"]				=	2,
+	["pct-underlow"]			=	5,
+	["pct-undermkt"]			=	20,
+
+	--Scan Catogories
 	["scan-class1"]				=	"on",
 	["scan-class2"]				=	"on",
 	["scan-class3"]				=	"on",
@@ -134,29 +152,15 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["scan-class8"]				=	"on",
 	["scan-class9"]				=	"on",
 	["scan-class10"]			=	"on",
-	["warn-color"]				=	"on",
-	["finish-sound"]			=	"on",
-	["printframe"]				=	1,
-	["last-auction-duration"]	=	1440,
-	["auction-duration"]		=	3,
-	["protect-window"]			=	1,
-	["finish"]					=	0,
-	["pct-bidmarkdown"]			=	20,
-	["pct-markup"]				=	300,
-	["pct-maxless"]				=	30,
-	["pct-nocomp"]				=	2,
-	["pct-underlow"]			=	5,
-	["pct-undermkt"]			=	20,
-	["locale"]					=	"default",
 
 	--AskPrice related commands
 	["askprice"]				=	"on",
-	["askprice-vendor"]			=	"off",
-	["askprice-guild"]			=	"off",
-	["askprice-party"]			=	"off",
-	["askprice-smart"]			=	"off",
-	["askprice-trigger"]		=	"?",
 	["askprice-ad"]				=	"on",
+	["askprice-guild"]			=	"off",
+	["askprice-smart"]			=	"off",
+	["askprice-party"]			=	"off",
+	["askprice-trigger"]		=	"?",
+	["askprice-vendor"]			=	"off",
 	["askprice-whispers"]		=	"on",
 	["askprice-word1"]			=	_AUCT('CmdAskPriceSmartWord1', "enUS"), --Initially set these two filters to match the stock english custom words
 	["askprice-word2"]			=	_AUCT('CmdAskPriceSmartWord2', "enUS"),
@@ -200,8 +204,16 @@ function addOnLoaded()
 	Auctioneer.Util.StorePlayerFaction(); --We need to call it first manually, just in case we were loaded after PLAYER_LOGIN fired.
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Auctioneer", Auctioneer.Util.StorePlayerFaction);
 
-	-- Ready to rock and roll!
+	--Ready to rock and roll!
 	Auctioneer.Util.ChatPrint(_AUCT('FrmtWelcome'):format(Auctioneer.Version), 0.8, 0.8, 0.2);
+
+	--Inform the user of the constants limit if it has been two loads without a check
+	if (Auctioneer.Command.GetFilterVal("constants-warning") <= 0) then
+		Auctioneer.Util.CheckConstantsLimit()
+		Auctioneer.Command.SetFilter("constants-warning", 2)
+	else
+		Auctioneer.Command.SetFilter("constants-warning", Auctioneer.Command.GetFilterVal("constants-warning") - 1)
+	end
 
  	-- Cleanup after that massive mem spike.
 	collectgarbage("collect");

@@ -33,6 +33,9 @@
 local storePlayerFaction
 local getTimeLeftString
 local getSecondsLeftString
+local checkConstantsLimit
+local getNumConstants
+local getConstants
 local unpackSeconds
 local getGSC
 local getTextGSC
@@ -61,44 +64,98 @@ local getLocalizedFilterVal
 local delocalizeCommand
 local localizeCommand
 local findEmptySlot
+local debugPrint
 
-function storePlayerFaction(hookParams, event, arg1)
+--Function Imports
+local pairs = pairs;
+local max = math.max
+local ceil = math.ceil
+local floor = math.floor;
+local tonumber = tonumber;
+local tostring = tostring;
+local tinsert = table.insert;
+
+function storePlayerFaction()
 	Auctioneer.Core.Constants.PlayerFaction = (Auctioneer.Core.Constants.PlayerFaction or UnitFactionGroup("player") or "Alliance");
-	return EnhTooltip.DebugPrint(Auctioneer.Core.Constants.PlayerFaction, event, arg1)
 end
 
 -- return the string representation of the given timeLeft constant
 function getTimeLeftString(timeLeft)
-	local timeLeftString = "";
+	local timeLeftTable = Auctioneer.Core.Constants.TimeLeft
 
-	if timeLeft == Auctioneer.Core.Constants.TimeLeft.Short then
-		timeLeftString = _AUCT('TimeShort');
+	if (timeLeft == timeLeftTable.Short) then
+		return _AUCT('TimeShort');
 
-	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.Medium then
-		timeLeftString = _AUCT('TimeMed');
+	elseif (timeLeft == timeLeftTable.Medium) then
+		return _AUCT('TimeMed');
 
-	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.Long then
-		timeLeftString = _AUCT('TimeLong');
+	elseif (timeLeft == timeLeftTable.Long) then
+		return _AUCT('TimeLong');
 
-	elseif timeLeft == Auctioneer.Core.Constants.TimeLeft.VeryLong then
-		timeLeftString = _AUCT('TimeVlong');
+	elseif (timeLeft == timeLeftTable.VeryLong) then
+		return _AUCT('TimeVlong');
 	end
-
-	return timeLeftString;
 end
 
 function getSecondsLeftString(secondsLeft)
-	local timeLeft = nil;
-
-	for i = table.getn(Auctioneer.Core.Constants.TimeLeft.Seconds), 1, -1 do
-
+	for i = #Auctioneer.Core.Constants.TimeLeft.Seconds, 1, -1 do
 		if (secondsLeft >= Auctioneer.Core.Constants.TimeLeft.Seconds[i]) then
-			timeLeft = i;
-			break
+			return getTimeLeftString(i);
 		end
 	end
+end
 
-	return getTimeLeftString(timeLeft);
+function checkConstantsLimit() --%TODO%: Localize
+	debugprofilestart()
+
+	local numConstants = getNumConstants(AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB)
+
+	if (numConstants >= ((((2^18)-1) / 20) * 17)) then --85% Critical
+		chatPrint(_AUCT("ConstantsCritical"):format((numConstants/((2^18)-1)) * 100), 1, 0, 0)
+
+	elseif (numConstants >= ((((2^18)-1) / 20) * 14)) then --70% Warning
+		chatPrint(_AUCT("ConstantsWarning"):format((numConstants/((2^18)-1)) * 100), 1, 1, 0)
+
+	else
+		chatPrint(_AUCT("ConstantsMessage"):format((numConstants/((2^18)-1)) * 100))
+	end
+
+	return EnhTooltip.DebugPrint(debugprofilestop())
+end
+
+function getNumConstants(...)
+	local constantsTable = {}
+	local recursedTables = {}
+	local lastIndex = select("#", ...);
+	local number = lastIndex;
+	for index = 1, lastIndex do
+		getConstants((select(index, ...)), constantsTable, recursedTables);
+	end
+	for key in pairs(constantsTable) do
+		number = number + 1;
+	end
+	return number;
+end
+
+function getConstants(tbl, constants, recursedTables)
+	if (recursedTables[tbl]) then
+		return
+	end
+	for key, value in pairs(tbl) do
+		--First look at the Key
+		if (type(key) == "table") then
+			getConstants(key, constants, recursedTables);
+		else
+			constants[key] = true;
+		end
+
+		--Now look at the value
+		if (type(value) == "table") then
+			getConstants(value, constants, recursedTables);
+		else
+			constants[value] = true;
+		end
+	end
 end
 
 function unpackSeconds(seconds)
@@ -112,23 +169,23 @@ function unpackSeconds(seconds)
 	local hours
 	local minutes
 
-	seconds = math.floor(seconds)
+	seconds = floor(seconds)
 
 	if (seconds > 604800) then
-		weeks = math.floor(seconds / 604800)
-		seconds = math.floor(seconds - (weeks * 604800))
+		weeks = floor(seconds / 604800)
+		seconds = floor(seconds - (weeks * 604800))
 	end
 	if (seconds > 86400) then
-		days = math.floor(seconds / 86400)
-		seconds = math.floor(seconds - (days * 86400))
+		days = floor(seconds / 86400)
+		seconds = floor(seconds - (days * 86400))
 	end
 	if (seconds > 3600) then
-		hours = math.floor(seconds / 3600)
-		seconds = math.floor(seconds - (hours * 3600))
+		hours = floor(seconds / 3600)
+		seconds = floor(seconds - (hours * 3600))
 	end
 	if (seconds >= 60) then
-		minutes = math.floor(seconds / 60)
-		seconds = math.floor(seconds - (minutes * 60))
+		minutes = floor(seconds / 60)
+		seconds = floor(seconds - (minutes * 60))
 	end
 
 	return (weeks or 0), (days or 0), (hours or 0), (minutes or 0), (seconds or 0)
@@ -149,7 +206,7 @@ function nilSafeString(str)
 end
 
 function colorTextWhite(text)
-	if (not text) then text = ""; end
+	text = text or "";
 
 	local COLORING_START = "|cff%s%s|r";
 	local WHITE_COLOR = "e6e6e6";
@@ -311,7 +368,7 @@ function getItemLinks(str)
 	local itemList = {};
 
 	for link, item in str:gmatch("|Hitem:([^|]+)|h%[(.-)%]|h") do
-		table.insert(itemList, item.." = "..link)
+		tinsert(itemList, item.." = "..link)
 	end
 	return itemList;
 end
@@ -323,7 +380,7 @@ function getItems(str)
 	local itemList = {};
 
 	for itemID, enchant, randomProp in link:match("|Hitem:(%p?%d+):(%p?%d+):%p?%d+:%p?%d+:%p?%d+:%p?%d+:(%p?%d+):%p?%d+|h%[(.-)%]|h") do
-		table.insert(itemList, strjoin(":", itemID, randomProp, enchant))
+		tinsert(itemList, strjoin(":", itemID, randomProp, enchant))
 	end
 	return itemList;
 end
@@ -336,7 +393,7 @@ function getItemHyperlinks(str)
 	local itemList = {};
 
 	for color, item, name in str:gmatch("|c(%x+)|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+)|h%[(.-)%]|h|r") do
-		table.insert(itemList, strconcat("|c", color, "|Hitem:", item, "|h[", name, "]|h|r"))
+		tinsert(itemList, strconcat("|c", color, "|Hitem:", item, "|h[", name, "]|h|r"))
 	end
 	return itemList;
 end
@@ -443,12 +500,12 @@ end
 
 function priceForOne(price, count)
 	price = nullSafe(price)
-	count = math.max(nullSafe(count), 1)
-	return math.ceil(price / count)
+	count = max(nullSafe(count), 1)
+	return ceil(price / count)
 end
 
 function round(x)
-	return math.ceil(x - 0.5);
+	return ceil(x - 0.5);
 end
 
 -------------------------------------------------------------------------------
@@ -542,6 +599,8 @@ Auctioneer.Util = {
 	StorePlayerFaction = storePlayerFaction,
 	GetTimeLeftString = getTimeLeftString,
 	GetSecondsLeftString = getSecondsLeftString,
+	CheckConstantsLimit = checkConstantsLimit,
+	GetNumConstants = getNumConstants,
 	UnpackSeconds = unpackSeconds,
 	GetGSC = getGSC,
 	GetTextGSC = getTextGSC,

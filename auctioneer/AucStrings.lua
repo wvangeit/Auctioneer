@@ -1158,6 +1158,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Auktionskauf f\195\188r:";
 		DisableMsg	= "Das automatische Laden von Auctioneer wird deaktiviert.";
 		FrmtWelcome	= "Auctioneer v%s geladen.";
 		MesgNotLoaded	= "Auctioneer ist nicht geladen. Gib /auctioneer für mehr Informationen ein.";
@@ -1400,6 +1401,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "CRITICAL: Your Auctioneer SavedVariables file is %.3f%% Full!";
+		ConstantsMessage	= "Your Auctioneer SavedVariables file is %.3f%% Full";
+		ConstantsWarning	= "WARNING: Your Auctioneer SavedVariables file is %.3f%% Full";
 		FrmtActClearall	= "Clearing all auction data for %s";
 		FrmtActClearFail	= "Unable to find item: %s";
 		FrmtActClearOk	= "Cleared data for item: %s";
@@ -1848,6 +1852,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "CRITICO: Su archivo de variables de Auctioneer está %.3f%% Lleno!";
+		ConstantsMessage	= "Su archivo de variables de Auctioneer está %.3f%% Lleno";
+		ConstantsWarning	= "ADVERTENCIA: Su archivo de variables de Auctioneer está %.3f%% Lleno";
 		FrmtActClearall	= "Eliminando toda la información de subastas para %s";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
 		FrmtActClearOk	= "Información eliminada para el artí­culo: %s";
@@ -5067,6 +5074,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "是否确实要 %s\n%dx%s ：";
 		DisableMsg	= "禁止自动加载拍卖助手。";
 		FrmtWelcome	= "拍卖助手(Auctioneer) v%s已加载！";
 		MesgNotLoaded	= "拍卖助手(Auctioneer)未加载。键入/auctioneer有更多信息。";
