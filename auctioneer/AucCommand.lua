@@ -1387,7 +1387,7 @@ function mainHandler(command, source)
 	end;
 
 	--Divide the large command into smaller logical sections (Shameless copy from the original function)
-	local cmd, param = command:match("^(%w+)%s*(.*)$");
+	local cmd, param = command:match("^([%w%-]+)%s*(.*)$");
 
 	cmd = cmd or command or "";
 	param = param or "";
