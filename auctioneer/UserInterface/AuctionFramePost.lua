@@ -394,17 +394,20 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctionFramePost_AuctionFromSnapshotAuction(frame, snapshotAuction)
+	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+	local bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+
 	return {
 		auctionId = snapshotAuction.auctionId;
-		itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+		itemKey = itemKey;
 		count = snapshotAuction.count;
-		name = Auctioneer.ItemDB.GetItemName(auction.itemKey);
+		name = Auctioneer.ItemDB.GetItemName(itemKey);
 		owner = snapshotAuction.owner;
 		timeLeft = snapshotAuction.timeLeft;
-		bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
-		bidPer = math.floor(auction.bid / auction.count);
+		bid = bid;
+		bidPer = math.floor(bid / snapshotAuction.count);
 		buyout = snapshotAuction.buyoutPrice;
-		buyoutPer = math.floor(auction.buyout / auction.count);
+		buyoutPer = math.floor(snapshotAuction.buyoutPrice / snapshotAuction.count);
 	};
 end
 
