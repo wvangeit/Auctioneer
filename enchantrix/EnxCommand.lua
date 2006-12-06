@@ -1114,6 +1114,7 @@ Enchantrix.Command = {
 	AuctioneerLoaded		= auctioneerLoaded,
 
 	HandleCommand			= handleCommand,
+	ChatPrintHelp			= chatPrintHelp,
 
 	Register				= register,
 	SetKhaosSetKeyValue		= setKhaosSetKeyValue,

@@ -72,14 +72,14 @@ function addonLoaded(hookArgs, event, addOnName)
 
 	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded);
 
-	-- Register disenchant detection hooks
-	Stubby.RegisterFunctionHook("PickupContainerItem", 400, pickupContainerItemHook)
-	Stubby.RegisterFunctionHook("PickupInventoryItem", 400, pickupInventoryItemHook)
+	-- Register disenchant detection hooks (using secure post hooks)
+	hooksecurefunc("PickupContainerItem", pickupContainerItemHook)
+	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 
-	Stubby.RegisterEventHook("SPELLCAST_START", "Enchantrix", onEvent)
-	Stubby.RegisterEventHook("SPELLCAST_STOP", "Enchantrix", onEvent)
-	Stubby.RegisterEventHook("SPELLCAST_FAILED", "Enchantrix", onEvent)
-	Stubby.RegisterEventHook("SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
+	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
+	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)
+	Stubby.RegisterEventHook("UNIT_SPELLCAST_FAILED", "Enchantrix", onEvent)
+	Stubby.RegisterEventHook("UNIT_SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
 
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
@@ -139,68 +139,54 @@ function onLoad()
 	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
 end
 
-function pickupInventoryItemHook(funcArgs, retVal, slot)
+local ns = function(v) return v or "None" end
+function pickupInventoryItemHook(slot)
 	-- Remember last activated item
 	if slot then
 		DisenchantEvent.spellTarget = GetInventoryItemLink("player", slot)
+		DisenchantEvent.targetted = GetTime()
 	end
 end
 
-function pickupContainerItemHook(funcArgs, retVal, bag, slot)
+function pickupContainerItemHook(bag, slot)
 	-- Remember last activated item
 	if bag and slot then
 		DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
+		DisenchantEvent.targetted = GetTime()
 	end
 end
 
-function onEvent(funcVars, event, spellName, spellDuration)
-	if event == "SPELLCAST_START" then
-		if spellName == _ENCH('ArgSpellname') then
-			DisenchantEvent.started = DisenchantEvent.spellTarget
-			DisenchantEvent.finished = nil
-			DisenchantEvent.startTime = GetTime()
-			DisenchantEvent.spellDuration = spellDuration / 1000  -- Convert ms to s
-		else
-			DisenchantEvent.started = nil
-			DisenchantEvent.finished = nil
-		end
-		return
-	end
-	if (event == "SPELLCAST_FAILED") or (event == "SPELLCAST_INTERRUPTED") then
-		DisenchantEvent.started = nil
+function onEvent(funcVars, event, player, spell, rank, target)
+	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		DisenchantEvent.finished = nil
-		return
-	end
-	if event == "SPELLCAST_STOP" then
-		DisenchantEvent.finished = DisenchantEvent.started
-		DisenchantEvent.started = nil
-		return
-	end
-	if event == "LOOT_OPENED" then
+		if spell == _ENCH('ArgSpellname') then
+			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
+				DisenchantEvent.finished = DisenchantEvent.spellTarget
+			end
+		end
+	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
+		DisenchantEvent.finished = nil
+	elseif event == "LOOT_OPENED" then
+		local now = GetTime()
 		if DisenchantEvent.finished then
-			-- Make sure loot windows opens within a few seconds from expected spell completion time
-			-- Normal range of lootLatency appears to be around -0.1 - 0.7s
-			local lootLatency = GetTime() - (DisenchantEvent.startTime + DisenchantEvent.spellDuration)
-			if (lootLatency > -1) and (lootLatency < 2) then
-				Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
-				local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
-				for i = 1, GetNumLootItems(), 1 do
-					if LootSlotIsItem(i) then
-						local icon, name, quantity, rarity = GetLootSlotInfo(i)
-						local link = GetLootSlotLink(i)
-						Enchantrix.Util.ChatPrint(("  %s x%d"):format(link, quantity))
-						-- Save result
-						local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
-						if reagentID then
-							Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)
-						end
+			Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
+			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
+			for i = 1, GetNumLootItems(), 1 do
+				if LootSlotIsItem(i) then
+					local icon, name, quantity, rarity = GetLootSlotInfo(i)
+					local link = GetLootSlotLink(i)
+					Enchantrix.Util.ChatPrint(("  %s x%d"):format(link, quantity))
+					-- Save result
+					local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
+					if reagentID then
+						Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)
 					end
 				end
 			end
 		end
-		DisenchantEvent.started = nil
+		DisenchantEvent.spellTarget = nil
+		DisenchantEvent.targetted = nil
 		DisenchantEvent.finished = nil
-		return
 	end
 end
 

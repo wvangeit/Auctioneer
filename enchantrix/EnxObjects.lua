@@ -34,6 +34,7 @@ Enchantrix = {
 	Command = {},
 	Config = {},
 	Constants = {},
+	Container = {},
 	Locale = {},
 	State = {},
 	Storage = {},
