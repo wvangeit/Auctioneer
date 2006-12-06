@@ -220,7 +220,7 @@ end
 -- Called after Blizzard's PickupContainerItem() method in order to capture
 -- which item is on the cursor.
 -------------------------------------------------------------------------------
-function postPickupContainerItemHook(_, _, bag, slot)
+function postPickupContainerItemHook(bag, slot)
 	if (CursorHasItem()) then
 		AuctioneerCursorItem = { bag = bag, slot = slot };
 		--debugPrint("Picked up item "..AuctioneerCursorItem.bag..", "..AuctioneerCursorItem.slot);

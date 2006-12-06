@@ -152,7 +152,7 @@ function getItem(itemID)
 	sell = tonumber(sell)
 	class = tonumber(class)
 	quality = tonumber(quality)
-	stack = tonumber(itemStackSize) or tonumber(baseSplit[5])
+	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
 	local dataItem = {
