@@ -632,12 +632,14 @@ function handleCommand(command, source)
 		TODO: other string regexps in Auctioneer/Enchantrix should also be looked at.
 		Hardcoding ' 's and using '.' instead of %a/%d/%w/%s (or their inverses) is not really great coding practice.
 	]]
-	local _, _, cmd, param, param2 = command:find("^(%a+)%s*(%w*)%s*(%w*).*");
+	local cmd, param, param2 = command:match("^([%w%-]+)%s*(.*)%S*(.*)$");
 
-	if (not cmd) then cmd = command end
-	if (not cmd) then cmd = "" end
-	if (not param) then param = "" end
-	if (not param2) then param2 = "" end
+	cmd = cmd or command or ""
+	param = param or ""
+	param2 = param2 or ""
+--	if (not cmd) then cmd = "" end
+--	if (not param) then param = "" end
+--	if (not param2) then param2 = "" end
 
 	--delocalize the command so we can work on it in English in here
 	cmd = Enchantrix.Locale.DelocalizeCommand(cmd);
