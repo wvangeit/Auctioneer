@@ -1065,13 +1065,18 @@ function isUpdateSubsetOfUpdate(subset, set)
 		return false;
 	end
 
+	local setMin = tonumber(set.minLevel) or 0
+	local setMax = tonumber(set.maxLevel) or 0
+	local subMin = tonumber(subset.minLevel) or 0
+	local subMax = tonumber(subset.maxLevel) or 0
+
 	-- Check the min level.
-	if (set.minLevel ~= 0 and set.minLevel > subset.minLevel) then
+	if (setMin ~= 0 and setMin > subMin) then
 		return false;
 	end
 
 	-- Check the max level.
-	if (set.maxLevel ~= 0 and set.maxLevel < subset.maxLevel) then
+	if (setMan ~= 0 and setMax < subMax) then
 		return false;
 	end
 
