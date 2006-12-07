@@ -275,13 +275,15 @@ function Enchantrix_BarkerSetConfig( key, value )
 end
 
 function Enchantrix_BarkerOptions_SetDefaults()
-		Enchantrix.Util.ChatPrint("Enchantrix: Setting Barker to defaults"); --TODO: Localize
+		--Enchantrix.Util.ChatPrint("Enchantrix: Setting Barker to defaults"); -- TODO: Localize
 		for k,v in pairs(config_defaults) do
 			Enchantrix_BarkerSetConfig(k,config_defaults[k]);
 		end
---		if Enchantrix_BarkerOptions_Frame:IsVisible() then
---			UpdateBarkerOptionsFrame();
---		end
+		if Enchantrix_BarkerOptions_Frame:IsVisible() then
+			-- TODO: This nicely. Update the frame, rather this. Even popping the previously open tab to the front would be nicer than this. Normal's just getting a bit lazy this afternoon.
+			Enchantrix_BarkerOptions_Frame:Hide();
+			Enchantrix_BarkerOptions_Frame:Show();
+		end
 
 end
 
