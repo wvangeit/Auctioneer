@@ -814,7 +814,7 @@ end
 function default(param, chatprint)
 	local paramLocalized
 
-	if (param == nil) or (param == "") then
+	if  ( (param == nil) or (param == "") ) then
 		return
 	elseif (param == _ENCH('CmdClearAll')) or (param == "all") then
 		param = "all"
@@ -824,6 +824,8 @@ function default(param, chatprint)
 		param = Enchantrix.Locale.DelocalizeCommand(param)
 		Enchantrix.Config.SetFilter(param, nil)
 	end
+
+	Enchantrix_BarkerOptions_SetDefaults(); -- added by Normal to reset Barker
 
 	if (chatprint) then
 		if (param == "all") then

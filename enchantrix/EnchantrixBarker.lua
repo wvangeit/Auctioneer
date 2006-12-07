@@ -274,6 +274,17 @@ function Enchantrix_BarkerSetConfig( key, value )
 	config[key] = value;
 end
 
+function Enchantrix_BarkerOptions_SetDefaults()
+		Enchantrix.Util.ChatPrint("Enchantrix: Setting Barker to defaults"); --TODO: Localize
+		for k,v in pairs(config_defaults) do
+			Enchantrix_BarkerSetConfig(k,config_defaults[k]);
+		end
+--		if Enchantrix_BarkerOptions_Frame:IsVisible() then
+--			UpdateBarkerOptionsFrame();
+--		end
+
+end
+
 function Enchantrix_BarkerOptions_TestButton_OnClick()
 	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
