@@ -192,7 +192,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Scripts>
 			</Button>
 
-			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Profit and Price">
+			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Profit/Price">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset>
