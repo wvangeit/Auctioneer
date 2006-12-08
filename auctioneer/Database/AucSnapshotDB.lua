@@ -1076,7 +1076,7 @@ function isUpdateSubsetOfUpdate(subset, set)
 	end
 
 	-- Check the max level.
-	if (setMan ~= 0 and setMax < subMax) then
+	if (setMax ~= 0 and setMax < subMax) then
 		return false;
 	end
 
