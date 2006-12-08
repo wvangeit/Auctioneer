@@ -984,7 +984,9 @@ function doPercentLess(percentLess, minProfit)
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
-	-- Normal's not too happy about all these nil's, but at least it doesn't fault out now
+	
+	--Normal's not too happy about all these nil's, but at least it doesn't fault out now
+	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess); 
 	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, nil, nil);
 
 	-- sort by profit based on median
