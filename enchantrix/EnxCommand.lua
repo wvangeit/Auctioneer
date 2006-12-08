@@ -637,9 +637,6 @@ function handleCommand(command, source)
 	cmd = cmd or command or ""
 	param = param or ""
 	param2 = param2 or ""
---	if (not cmd) then cmd = "" end
---	if (not param) then param = "" end
---	if (not param2) then param2 = "" end
 
 	--delocalize the command so we can work on it in English in here
 	cmd = Enchantrix.Locale.DelocalizeCommand(cmd);
