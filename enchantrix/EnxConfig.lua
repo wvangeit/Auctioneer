@@ -46,21 +46,23 @@ local isValidLocale
 local filterDefaults = {
 		['all'] = true,
 		['barker'] = true,
-		['embed'] = false,
+		['barkchan'] = true,
 		['counts'] = false,
+		['embed'] = false,
+		['locale'] = 'default',
+		['printframe'] = 1,
 		['terse'] = false,
 		['valuate'] = true,
 		['valuate-hsp'] = true,
 		['valuate-median'] = true,
 		['valuate-baseline'] = true,
-		['locale'] = 'default',
-		['printframe'] = 1,
 	}
 
 -- True if this filter value should be saved per character
 local perCharacterFilter = {
-		['embed'] = true,
 		['counts'] = true,
+		['barkchan'] = true,
+		['embed'] = true,
 		['terse'] = true,
 		['printframe'] = true,
 	}

@@ -126,19 +126,17 @@ function EnchantrixBarker_OnEvent()
 		--Enchantrix.Util.ChatPrint("Barker config is "..tostring(Enchantrix.Config.GetFilter('barker')) );
 		if( event == "CRAFT_SHOW" ) then
 			if( Enchantrix.Config.GetFilter('barker') ) then
-				Enchantrix_BarkerButton:Show();
-				Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
+--				Enchantrix_BarkerButton:Show();
+--				Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
 
-				Enchantrix_BarkerOptionsButton:Show();
-				Enchantrix_BarkerButton.tooltipText = 'Opens the barker options window.'; --TODO: Localize
+				Enchantrix_BarkerDisplayButton:Show();
+				Enchantrix_BarkerDisplayButton.tooltipText = 'Opens the trade barker window.'; --TODO: Localize
 			else
-				Enchantrix_BarkerButton:Hide();
-				Enchantrix_BarkerOptionsButton:Hide();
+				Enchantrix_BarkerDisplayButton:Hide();
 				Enchantrix_BarkerOptions_Frame:Hide();
 			end
 		elseif( event == "CRAFT_CLOSE" )then
-			Enchantrix_BarkerButton:Hide();
-			Enchantrix_BarkerOptionsButton:Hide();
+			Enchantrix_BarkerDisplayButton:Hide();
 			Enchantrix_BarkerOptions_Frame:Hide();
 		end
 	end
@@ -196,11 +194,12 @@ end
 local function craftUILoaded()
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
 
-	Enchantrix_BarkerButton:SetParent(CraftFrame);
-	Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
+	--Enchantrix_BarkerButton:SetParent(CraftFrame);
+	--Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
 
-	Enchantrix_BarkerOptionsButton:SetParent(CraftFrame);
-	Enchantrix_BarkerOptionsButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
+	Enchantrix_BarkerDisplayButton:SetParent(CraftFrame);
+	--Enchantrix_BarkerDisplayButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
+	Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
 
 	Enchantrix_BarkerOptions_Frame:SetParent(CraftFrame);
 	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", CraftFrame, "TOPRIGHT");
@@ -789,8 +788,12 @@ end
 
 function Enchantrix_BarkerOptions_OnClick()
 	--Enchantrix.Util.ChatPrint("You pressed the options button." );
-	Enchantrix_BarkerOptions_Frame:Show();
-	--ShowUIPanel(Enchantrix_BarkerOptions_Frame);
+	--showUIPanel(Enchantrix_BarkerOptions_Frame);
+	if not Enchantrix_BarkerOptions_Frame:IsShown() then
+		Enchantrix_BarkerOptions_Frame:Show();
+	else
+		Enchantrix_BarkerOptions_Frame:Hide();
+	end
 end
 
 

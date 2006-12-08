@@ -28,20 +28,9 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
 
-	<Button name="Enchantrix_BarkerButton" inherits="UIPanelButtonTemplate" hidden="true" text="Barker">
+	<Button name="Enchantrix_BarkerDisplayButton" inherits="UIPanelButtonTemplate" hidden="true" text="Trade Barker">
 		<Size>
-			<AbsDimension x="65" y="22"/>
-		</Size>
-		<Scripts>
-			<OnClick>
-				Enchantrix_BarkerOnClick();
-			</OnClick>
-		</Scripts>
-	</Button>
-
-	<Button name="Enchantrix_BarkerOptionsButton" inherits="UIPanelButtonTemplate" hidden="true" text="Options">
-		<Size>
-			<AbsDimension x="65" y="22"/>
+			<AbsDimension x="125" y="22"/>
 		</Size>
 		<Scripts>
 			<OnClick>
@@ -161,7 +150,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-				<FontString name="Enchantrix_BarkerOptionsFrameTitleText" inherits="GameFontNormal">
+				<FontString name="Enchantrix_BarkerOptionsFrameTitleText" inherits="GameFontNormal" text="Enchantrix Trade Barker">
 					<Anchors>
 						<Anchor point="TOP">
 							<Offset>
@@ -174,6 +163,24 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Layers>
 
 		<Frames>
+			<Button name="Enchantrix_BarkerOptionsTest_Button" inherits="UIPanelButtonTemplate" text="Bark!">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-235" y="-33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Enchantrix_BarkerOnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+
 			<Button name="Enchantrix_BarkerOptionsTest_Button" inherits="UIPanelButtonTemplate" text="Test Barker">
 				<Size>
 					<AbsDimension x="80" y="22"/>
@@ -181,7 +188,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
 						<Offset>
-							<AbsDimension x="-150" y="-50"/>
+							<AbsDimension x="-235" y="-52"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -191,7 +198,26 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnClick>
 				</Scripts>
 			</Button>
-
+			<Frame name="Enchantrix_BarkerOptions_ChanFilterDropDown" inherits="UIDropDownMenuTemplate" id="1" enableMouse="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">>
+						<Offset>
+							<AbsDimension x="-190" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						<!-- Enchantrix_BarkerOptions_ChanFilterDropDown(); -->
+					</OnLoad>
+					<OnShow>
+						<!-- Enchantrix_BarkerOptions_ChanFilterDropDown(); -->
+					</OnShow>
+				</Scripts>
+			</Frame>
 			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Profit/Price">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
