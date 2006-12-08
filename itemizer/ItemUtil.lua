@@ -396,7 +396,7 @@ function binaryTableInsert( t, value, fcomp )
 		end
 
 		if ((GetTime() - startTime) > 5) then
-			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too ling to complete|r", value);
+			EnhTooltip.DebugPrint("|cffffffffItemizer: binaryTableInsert function took too long to complete|r", value);
 			return
 		end
 	end
