@@ -19,6 +19,12 @@
 #		You should have received a copy of the GNU General Public License
 #		along with this program(see GPL.txt); if not, write to the Free Software
 #		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#	Note:
+#		This AddOn's source code is specifically designed to work with
+#		World of Warcraft's interpreted AddOn system.
+#		You have an implicit licence to use this AddOn with these facilities
+#		since that is it's designated purpose as per:
+#		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
 # VERY Useful
 use strict;
@@ -41,9 +47,9 @@ my %interestedEnchants;
 
 # File Handle Declarations
 open($ItemTables, ">", "ItemTables.lua");
-open($EnchantDBC, "SpellItemEnchantment.dbc.csv")
+open($EnchantDBC, "SpellItemEnchantment.txt")
 	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"SpellItemEnchantment.dbc.csv\" file missing.\n\n";
-open($RandomPropDBC, "ItemRandomProperties.dbc.csv")
+open($RandomPropDBC, "ItemRandomProperties.txt")
 	or die "\n\nI'm sorry Dave, I can't do that.\n\n\n\"ItemRandomProperties.dbc.csv\" file missing.\n\n";
 
 if(not($EnchantDBC and $RandomPropDBC)){
@@ -77,6 +83,13 @@ print $ItemTables "--[[
 		You should have received a copy of the GNU General Public License
 		along with this program(see GPL.txt); if not, write to the Free Software
 		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+	Note:
+		This AddOn's source code is specifically designed to work with
+		World of Warcraft's interpreted AddOn system.
+		You have an implicit licence to use this AddOn with these facilities
+		since that is it's designated purpose as per:
+		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]\n\n";
 
 # First up is the RandomProps table
@@ -90,10 +103,10 @@ print $ItemTables "--[[
 print $ItemTables "ItemizerRandomProps = {\n";
 while(<$RandomPropDBC>){
 	chomp;
-	my @line = split(",");
+	my @line = split("	");
 
 	my $curLine;
-	if ($line[2]){
+	if ($line[2] and ($line[2] ne "INT")){
 		$numberOfRandomProps++;
 		if($itemSuffixes{$line[7]}){
 			$line[7] = $itemSuffixes{$line[7]};
@@ -135,7 +148,7 @@ print $ItemTables "--[[
 print $ItemTables "ItemizerSuffixes = {\n";
 my $key;
 foreach $key (sort { $itemSuffixes{$a} <=> $itemSuffixes{$b} } keys %itemSuffixes) {
-	print $ItemTables "\t[", $itemSuffixes{$key}, "] = ", $key, ",\n";
+	print $ItemTables "\t[", $itemSuffixes{$key}, "] = \"", $key, "\",\n";
 }
 print $ItemTables "}\n\n";
 
@@ -151,7 +164,7 @@ print $ItemTables "--[[
 print $ItemTables "ItemizerEnchants = {\n";
 while(<$EnchantDBC>){
 	chomp;
-	my @line = split(",");
+	my @line = split("	");
 
 	my $word2;
 	my $word1;
@@ -187,6 +200,14 @@ while(<$EnchantDBC>){
 				$word1 =~ s/Arcane/Arc/i;
 				$word1 =~ s/Healing/Hea/i;
 				$word1 =~ s/Shadow/Sha/i;
+
+			}elsif($word2 eq "Rating"){
+				$word2 = "Ra";
+
+				$word1 =~ s/Defense/Def/i;
+				$word1 =~ s/Dodge/Dod/i;
+				$word1 =~ s/Parry/Par/i;
+				$word1 =~ s/Block/Blo/i;
 			}elsif($word2 eq "every"){
 				$word2 = "P5";
 
@@ -262,20 +283,7 @@ while(<$EnchantDBC>){
 			print $ItemTables "\n";
 
 			$enchantKeys{"OH-$word1"} = 1;
-		}elsif($curLine =~ m/\+(\d*)%\s(\w*)/i){
-			$word1 = $2;
-			$ammount = $1;
-
-			$word1 =~ s/Block/Blo/i;
-			$word1 =~ s/Dodge/Dod/i;
-			$word1 =~ s/Parry/Par/i;
-
-			print $ItemTables "\t";
-			print $ItemTables "[$line[0]] = {$ammount, \"Ra-$word1\",},\t--$curLine";
-			print $ItemTables "\n";
-
-			$enchantKeys{"Ra-$word1"} = 1;
-		}elsif($curLine =~ m/Critical\sHit\s\+(\d*)%/i){
+		}elsif($curLine =~ m/Critical\sHit\sRating\s\+(\d*)/i){
 			$ammount = $1;
 
 			print $ItemTables "\t";
