@@ -177,7 +177,7 @@ Section "Auctioneer" Auctioneer
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer"
 	File "..\Auctioneer\Auctioneer.toc"
-	File "..\Auctioneer\Readme.txt"
+	File "..\Auctioneer\*.txt"
 	File "..\Auctioneer\*.xml"
 	File "..\Auctioneer\*.lua"
 	File "GPL.txt"
