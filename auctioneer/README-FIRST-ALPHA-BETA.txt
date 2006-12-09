@@ -9,3 +9,5 @@ Known current issues for 3.9.xxxx:
 . /auctioneer (to display settings) faults out
 . Searching after a scan may never return. /console reloadui after completing your scan.
 
+(Normal, 10 Dec 2006)
+. Askprice not functioning
