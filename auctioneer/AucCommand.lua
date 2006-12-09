@@ -1492,10 +1492,10 @@ function mainHandler(command, source)
 	--/auctioneer (GenVars)
 	elseif (
 		cmd == 'embed'					or cmd == 'autofill'		or cmd == 'auction-click'	or
-		cmd == 'show-verbose'			or cmd == 'show-average'	or cmd == 'show-link'		or
+		cmd == 'show-verbose'			or cmd == 'show-average'	or cmd == 'finish-sound'	or
 		cmd == 'show-median'			or cmd == 'show-stats'		or cmd == 'show-suggest'	or
 		cmd == 'show-embed-blankline'	or cmd == 'show-warning'	or cmd == 'warn-color'		or
-		cmd == 'update-price'			or cmd == 'finish-sound'
+		cmd == 'update-price'
 	) then
 		genVarSet(cmd, param, chatprint);
 
@@ -1536,7 +1536,6 @@ function chatPrintHelp()
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowMedian'),		Auctioneer.Util.GetLocalizedFilterVal('show-median'),			_AUCT('HelpMedian')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowSuggest'),		Auctioneer.Util.GetLocalizedFilterVal('show-suggest'),			_AUCT('HelpSuggest')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowStats'),			Auctioneer.Util.GetLocalizedFilterVal('show-stats'),			_AUCT('HelpStats')));
-	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowLink'),			Auctioneer.Util.GetLocalizedFilterVal('show-link'),				_AUCT('HelpLink')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAutofill'),		Auctioneer.Util.GetLocalizedFilterVal('autofill'),				_AUCT('HelpAutofill')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdEmbed'),			Auctioneer.Util.GetLocalizedFilterVal('embed'),					_AUCT('HelpEmbed')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('ShowEmbedBlank'),	Auctioneer.Util.GetLocalizedFilterVal('show-embed-blankline'),	_AUCT('HelpEmbedBlank')));
