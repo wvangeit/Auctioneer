@@ -264,7 +264,7 @@ function setKhaosSetKeyValue(key, value)
 	end
 end
 
-function eventHandler(event, text, player)
+function eventHandler(self, event, text, player)
 	--Nothing to do if askprice is disabled
 	if (not Auctioneer.Command.GetFilter('askprice')) then
 		return;
