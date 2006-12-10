@@ -265,7 +265,7 @@ function hookCall(funcName, ...)
 				retVal = {pcall(orig, ...)}
 				if (not table.remove(retVal, 1)) then
 					if (Swatter and Swatter.IsEnabled()) then
-						Swatter.OnError("Hook error on "..tostring(funcName).."()\n   "retVal[1], Stubby, debugstack(2, 3, 6))
+						Swatter.OnError("Hook error on "..tostring(funcName).."()\n   "..retVal[1], Stubby, debugstack(2, 3, 6))
 					else
 						Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
 					end
