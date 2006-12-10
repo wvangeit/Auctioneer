@@ -48,6 +48,9 @@ local function onLoad()
 	end
 	if (Auctioneer_ShowNotLoaded) then
 		Stubby.UnregisterFunctionHook("AuctionFrame_Show", Auctioneer_ShowNotLoaded);
+		if (BrowseNoResultsText and BrowseNoResultsText:GetText() == _AUCT('MesgNotLoaded')) then
+			BrowseNoResultsText:SetText("")
+		end
 	end
 
 	-- Hook in new tooltip code
@@ -98,7 +101,9 @@ local function onLoad()
 			end
 		end
 		function Auctioneer_ShowNotLoaded()
-			BrowseNoResultsText:SetText("]].._AUCT('MesgNotLoaded')..[[");
+			if (not Auctioneer) then
+				BrowseNoResultsText:SetText("]].._AUCT('MesgNotLoaded')..[[");
+			end
 		end
 		local function onLoaded()
 			Stubby.UnregisterAddOnHook("Blizzard_AuctionUI", "Auctioneer")
