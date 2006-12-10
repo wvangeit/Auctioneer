@@ -510,7 +510,7 @@ BtmScan.ParseGSC = function (price)
 	price = string.gsub(price, "[^0-9]+", " ")
 
 	local total = 0
-	for q in string.gfind(price, "(%d+)") do
+	for q in string.gmatch(price, "(%d+)") do
 		local number = tonumber(q) or 0
 		total = total + number
 	end
