@@ -1442,7 +1442,7 @@ BtmScan.PerformPurchase = function()
 	local sanityKey = BtmScan.Prompt.sanityKey
 
 	data.bids[bidSig] = { whyBuy, bidPrice, bidType, time() }
-	p("Placing bid on", i, bidPrice)
+	--p("Placing bid on", i, bidPrice) --Normal commented this out. It errors, and thinks that the info is shown elsewhere anyways
 	PlaceAuctionBid("list", i, bidPrice)
 	-- Mark this item as "bought"
 	if (not noSafety) then
