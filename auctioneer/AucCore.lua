@@ -126,6 +126,7 @@ local filterDefaults = { --Auctioneer_FilterDefaults
 	["printframe"]				=	1,
 	["protect-window"]			=	1,
 	["show-average"]			=	"on",
+	["show-embed-blankline"]	=	"off",
 	["show-median"]				=	"on",
 	["show-stats"]				=	"on",
 	["show-suggest"]			=	"on",
