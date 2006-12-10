@@ -1,0 +1,5 @@
+## Interface: 20000
+## Title: Swatter
+## Notes: Debugging tool
+## SavedVariables: SwatterData
+Swatter.lua
