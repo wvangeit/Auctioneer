@@ -6,7 +6,7 @@ There are known current issues, but this doesn't mean we're hard at work fixing 
 
 Known current issues for 3.9.xxxx:
 (Normal, 10 Dec 2006)
-. Searching after a scan may never return. /console reloadui after completing your scan.
+. Globally searching never returns. A workaround is to first search a specific category, before trying a global search.
 
 (Normal, 10 Dec 2006)
 . Placing the text focus to the search input box, then selecting scan, then pressing <ENTER> triggers a search which competes with scans.
