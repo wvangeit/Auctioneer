@@ -216,7 +216,7 @@ function createDatabaseFrom3x()
 	if (AuctionConfig.data) then
 		for ahKey, ahData in pairs(AuctionConfig.data) do
 			local newAhKey = ahKey:lower();
-			local ah = createAHDatabase(newAhKey, BASE_HISTORYDB_VERSION);
+			local ah = db[newAhKey] or createAHDatabase(newAhKey, BASE_HISTORYDB_VERSION);
 			db[newAhKey] = ah;
 			for itemKey, itemData in pairs(ahData) do
 				local totals, buyoutPrices = strsplit("|", itemData);
