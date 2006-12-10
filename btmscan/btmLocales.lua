@@ -26,14 +26,13 @@ BtmScan.Locales.Translate = function ( localization, ... )
 	localization = BtmScan.Locales.GetLocalization(localization)
 	local newloc = ""
 
-	local n = arg.n;
-	for i = 1, n do
+	for i = 1, select("#", ...) do
 		local s, b, e
 		s = 1 b = 1
 		while (b > 0) do
 			b,e = string.find(localization, "%"..i, s, true)
 			if (b and b > 0) then
-				local argv = arg[i] or ""
+				local argv = select(i, ...) or ""
 				if (type(argv) == "table") then argv = "TABLE" end
 				newloc = newloc .. string.sub(localization, s, b-1) .. argv;
 				s = e + 1

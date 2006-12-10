@@ -44,18 +44,19 @@ BtmScan.OnLoad = function ()
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
 		Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
 	end
-	if( not BtmFeed.hookedCanSendAuctionQuery ) then
-		BtmFeed.hookedCanSendAuctionQuery = CanSendAuctionQuery
-		CanSendAuctionQuery = BtmFeed.CanSendAuctionQuery;
+	if( not BtmScan.hookedCanSendAuctionQuery ) then
+		BtmScan.hookedCanSendAuctionQuery = CanSendAuctionQuery
+		CanSendAuctionQuery = BtmScan.CanSendAuctionQuery;
 	end
 
 	BtmScan.timer = 0
 end
 
 -- Event handler
-BtmScan.OnEvent = function()
+BtmScan.OnEvent = function(...)
+	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
-		if (string.lower(arg1) == "btmscan") then
+		if (string.lower(arg) == "btmscan") then
 			BtmScan.OnLoad()
 		end
 	end
@@ -64,8 +65,8 @@ end
 -- Timing routines
 BtmScan.interval = 30
 BtmScan.offset = 0
-BtmScan.OnUpdate = function()
-	local elapsed = arg1
+BtmScan.OnUpdate = function(...)
+	local elapsed = select(2, ...)
 
 	if (not BtmScan.lastTry) then BtmScan.lastTry = 0 end
 	if (not BtmScan.LogFrame and AuctionFrame and BtmScan.lastTry < BtmScan.timer - 1 ) then
@@ -79,13 +80,14 @@ BtmScan.OnUpdate = function()
 		table.insert(AuctionFramePost_AdditionalPricingModels, BtmScan.AddAuctPriceModel)
 	end
 
+	if (not BtmScan.interval) then BtmScan.interval = 6 end
 	if (BtmScan.timer) then
 		BtmScan.timer = BtmScan.timer + elapsed
 		if (BtmScan.pageScan) then
 			if (BtmScan.timer > BtmScan.pageScan) then
 				BtmScan.PageScan()
 			elseif (BtmScan.timer > BtmScan.pageScan-0.25) then
-				BtmScan.LogParent:SetBackdropColor(0,0,0.5, 0.9)
+				BtmScan.scanStage = 1
 			end
 		end
 		if (BtmScan.timer < BtmScan.interval) then
@@ -94,6 +96,18 @@ BtmScan.OnUpdate = function()
 		BtmScan.timer = BtmScan.timer - BtmScan.interval
 	else
 		BtmScan.timer = 0
+	end
+
+	-- Set the background at the correct stage color
+	if (not BtmScan.LogParent) then return end
+	if (not BtmScan.scanStage or BtmScan.scanStage == 0) then
+		BtmScan.LogParent:SetBackdropColor(0,0,0,0.9)
+	elseif (BtmScan.scanStage == 1) then
+		BtmScan.LogParent:SetBackdropColor(0,0,0.5,0.9)
+	elseif (BtmScan.scanStage == 2) then
+		BtmScan.LogParent:SetBackdropColor(0,0.5,0,0.9)
+	elseif (BtmScan.scanStage == 3) then
+		BtmScan.LogParent:SetBackdropColor(0.5,0,0,0.9)
 	end
 
 	-- If we are supposed to be scanning, then let's do it!
@@ -116,18 +130,21 @@ BtmScan.OnUpdate = function()
 		end
 
 		-- Check to see if the AH is open for business
-		if (not CanSendAuctionQuery() or not (AuctionFrame and AuctionFrame:IsVisible())) then
+		if (not BtmScan.hookedCanSendAuctionQuery() or not (AuctionFrame and AuctionFrame:IsVisible())) then
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
 
 		-- Every 5 pages, go back a page just to double check that nothing got by us.
-		BtmScan.offset = math.mod(BtmScan.offset + 1, 5)
+		BtmScan.offset = (BtmScan.offset + 1) % 5
 		local offset = 0
 		if (BtmScan.offset == 0) then offset = 1 end
 
 		-- Show me tha money!
-		QueryAuctionItems("", "", "", nil, nil, nil, BtmScan.pageCount-offset, nil, nil)
+		--BtmScan.processing = true
+		BtmScan.scanStage = 2
+		local page = BtmScan.pageCount-offset or 0
+		QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 	end
 end
 
@@ -142,7 +159,7 @@ end
 
 BtmScan.PageScan = function(resume)
 	BtmScan.pageScan = nil
-	if (not BtmScan.processing) then return end
+	if (not BtmScan.scanStage or BtmScan.scanStage == 0) then return end
 
 	-- Make sure the current zone is loaded and has defaults
 	BtmScan.GetZoneConfig("pagescan")
@@ -159,7 +176,6 @@ BtmScan.PageScan = function(resume)
 	BtmScan.scanning = true
 	for i=resume, pageCount do
 		local itemLink = GetAuctionItemLink("list", i)
-
 		-- If:
 		--   * This item has been loaded
 		if (itemLink) then
@@ -268,10 +284,10 @@ BtmScan.PageScan = function(resume)
 							local sanity = BtmScan.ConfidenceList[sanityKey]
 							local iqm, iqwm, iqCount, bBase, bCount
 							if (sanity) then
-								local prices = BtmScan.Split(sanity, ",")
-								iqm = tonumber(prices[1])
-								iqwm = tonumber(prices[2])
-								iqCount = tonumber(prices[3])
+								local iqm, iqwm, iqCount = strsplit(",", sanity)
+								iqm = tonumber(iqm)
+								iqwm = tonumber(iqwm)
+								iqCount = tonumber(iqCount)
 								bCount = data.minSeen
 								bBase = iqwm
 
@@ -474,14 +490,14 @@ BtmScan.PageScan = function(resume)
 			end
 		end
 	end
-	BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
-	BtmScan.processing = false
+
+	BtmScan.scanStage = 0
+	--BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
+	--BtmScan.processing = false
 end
 
 BtmScan.CanSendAuctionQuery = function()
-	if (BtmScan.processing) then
-		return false
-	end
+	if (BtmScan.scanStage and BtmScan.scanStage > 0) then return false end
 	return BtmScan.hookedCanSendAuctionQuery()
 end
 
@@ -503,7 +519,10 @@ end
 -- Break an ItemID into it's component pieces
 BtmScan.BreakLink = function (link)
 	if (type(link) ~= 'string') then return end
-	local i,j, whole, itemID, enchant, randomProp, uniqID, name, remain = string.find(link, "(|c[0-9a-fA-F]+|Hitem:(%d+):(%d+):(%d+):(%d+)|h[[]([^]]+)[]]|h|r)(.*)")
+	local whole, item, name, remain = string.match(link, "(|c[0-9a-fA-F]+|Hitem:([^|]+)|h%[(.-)%]|h|r)(.*)")
+	if (not item) then error("Cannot parse invalid link") end
+
+	local itemID, enchant, gem1, gem2, gem3, gem4, randomProp, uniqID = strsplit(":", item)
 
 	local i,j, count, nextpart = string.find(remain or "", "^x(%d+)(.*)")
 	if (i) then
@@ -539,19 +558,6 @@ BtmScan.FakeLink = function (hyperlink, quality, name)
 	if (name == nil) then name = sName or "unknown ("..hyperlink..")" end
 	local _, _, _, color = GetItemQualityColor(quality)
 	return color.. "|H"..hyperlink.."|h["..name.."]|h|r"
-end
-
--- Split a string at a certain character
-BtmScan.Split = function (str, at)
-	if (type(str) ~= "string") then return nil end
-	local splut = {}
-	if (not str) then str = "" end
-	if (not at) then table.insert(splut, str)
-	else for n, c in string.gfind(str, '([^%'..at..']*)(%'..at..'?)') do
-		table.insert(splut, n)
-		if (c == '') then break end
-	end end
-	return splut
 end
 
 BtmScan.GetGSC = function (money)
@@ -720,8 +726,8 @@ BtmScan.Command = function (msg)
 			BtmScanData.unlocked = true
 			BtmScan.Print(tr("BottomScanner is now unlocked."))
 		else
-			BtmScan.Print(tr("BottomScanner is subject to a Limited Licence."))
-			BtmScan.Print(tr("Please see Licence.txt to unlock this addon."))
+			BtmScan.Print(tr("This program is not intended for unattended play."))
+			BtmScan.Print(tr("In order to use this addon, you must first agree to not use this addon whilst not at the computer. Please type |cff00ff80/btm agree|r now to continue."))
 		end
 		return
 	end
@@ -1030,9 +1036,9 @@ BtmScan.AddAuctPriceModel = function (itemID, itemRand, itemEnch, itemName, coun
 	local sanity = BtmScan.ConfidenceList[sanityKey]
 	local iqm, iqwm
 	if (sanity) then
-		local prices = BtmScan.Split(sanity, ",")
-		iqm = tonumber(prices[1])
-		iqwm = tonumber(prices[2])
+		local iqm, iqwm, iqCount = strsplit(",", sanity)
+		iqm = tonumber(iqm)
+		iqwm = tonumber(iqwm)
 		if (count and count > 1) then
 			iqm = iqm * count
 			iqwm = iqwm * count
@@ -1214,10 +1220,10 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		local sanity = BtmScan.ConfidenceList[sanityKey]
 		local iqm, iqwm, iqCount
 		if (sanity) then
-			local prices = BtmScan.Split(sanity, ",")
-			iqm = tonumber(prices[1])
-			iqwm = tonumber(prices[2])
-			iqCount = tonumber(prices[3])
+			local iqm, iqwm, iqCount = strsplit(",", sanity)
+			iqm = tonumber(iqm)
+			iqwm = tonumber(iqwm)
+			iqCount = tonumber(iqCount)
 			if (count and count > 1) then
 				iqm = iqm * count
 				iqwm = iqwm * count
@@ -1396,6 +1402,7 @@ end
 
 
 BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, iLink, iTex)
+	BtmScan.scanStage = 3
 	BtmScan.Prompt.index     = i
 	BtmScan.Prompt.bidSig    = bidSig
 	BtmScan.Prompt.whyBuy    = whyBuy
@@ -1418,6 +1425,7 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt:Show()
 end
 BtmScan.PerformPurchase = function()
+	BtmScan.scanStage = 2
 	local i         = BtmScan.Prompt.index
 	local bidSig    = BtmScan.Prompt.bidSig
 	local whyBuy    = BtmScan.Prompt.whyBuy
@@ -1453,6 +1461,7 @@ BtmScan.PerformPurchase = function()
 end
 
 BtmScan.CancelPurchase = function()
+	BtmScan.scanStage = 2
 	BtmScan.Prompt:Hide()
 end
 
