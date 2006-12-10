@@ -264,7 +264,11 @@ function hookCall(funcName, ...)
 			if (orig and func.p >= 0) then
 				retVal = {pcall(orig, ...)}
 				if (not table.remove(retVal, 1)) then
-					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
+					if (Swatter and Swatter.IsEnabled()) then
+						Swatter.OnError(retVal[1], Stubby, debugstack(2, 3, 6))
+					else
+						Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
+					end
 				end
 				orig = nil
 			end
@@ -798,4 +802,5 @@ Stubby = {
 	CreateAddOnLoadBootCode = createAddOnLoadBootCode,
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
+	GetName = function return "Stubby" end,
 }
