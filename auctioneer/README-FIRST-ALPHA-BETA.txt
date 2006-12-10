@@ -6,8 +6,12 @@ There are known current issues, but this doesn't mean we're hard at work fixing 
 
 Known current issues for 3.9.xxxx:
 (Normal, 10 Dec 2006)
-. /auctioneer (to display settings) faults out
 . Searching after a scan may never return. /console reloadui after completing your scan.
 
 (Normal, 10 Dec 2006)
-. Askprice not functioning
+. Placing the text focus to the search input box, then selecting scan, then pressing <ENTER> triggers a search which competes with scans.
+
+(Moonmoon, 10 Dec 2006)
+. Search Auctions tab->Search->Competion throws an error message regarding 'logicalColumn'.
+
+If you're going to report a bug to us on our alpha/beta builds, please ensure you're using the latest development version from http://auctioneeraddon.com/dl
