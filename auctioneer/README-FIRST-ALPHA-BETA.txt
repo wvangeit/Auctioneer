@@ -11,4 +11,7 @@ Known current issues for 3.9.xxxx:
 (Moonmoon, 10 Dec 2006)
 . Search Auctions tab->Search->Competion throws an error message regarding 'logicalColumn'.
 
+(Normal, 10 Dec 2006)
+. New addon, btmscan, not playing 100% nicely. It'll throw a couple of errors. Please ignore for now.
+
 If you're going to report a bug to us on our alpha/beta builds, please ensure you're using the latest development version from http://auctioneeraddon.com/dl 
