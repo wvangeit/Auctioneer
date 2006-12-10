@@ -6,10 +6,6 @@ There are known current issues, but this doesn't mean we're hard at work fixing 
 
 Known current issues for 3.9.xxxx:
 (Normal, 10 Dec 2006)
-. Globally searching, as a first action, never returns. A workaround is to first search a specific category, before trying a global search.
-. Searching after a scan, either of a category or globally, never returns. /console reloadui after scanning.
-
-(Normal, 10 Dec 2006)
 . Placing the text focus to the search input box, then selecting scan, then pressing <ENTER> triggers a search which competes with the scan.
 
 (Moonmoon, 10 Dec 2006)
