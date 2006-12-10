@@ -520,7 +520,7 @@ end
 BtmScan.BreakLink = function (link)
 	if (type(link) ~= 'string') then return end
 	local whole, item, name, remain = string.match(link, "(|c[0-9a-fA-F]+|Hitem:([^|]+)|h%[(.-)%]|h|r)(.*)")
-	if (not item) then error("Cannot parse invalid link") end
+	if (not item) then return end
 
 	local itemID, enchant, gem1, gem2, gem3, gem4, randomProp, uniqID = strsplit(":", item)
 
