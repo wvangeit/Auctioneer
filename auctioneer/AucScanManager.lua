@@ -349,14 +349,18 @@ end
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
-function emptyHookFunction()
-	return "killorig";
+local hooked = false
+local function killHook()
+	if (Scanning) then return "killorig" end
 end
 
 function scanStarted()
 	-- Don't allow AuctionFrameBrowse updates during a scan.
-	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
-	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, emptyHookFunction)
+	if (not hooked) then
+		Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
+		Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
+		hooked = true
+	end
 
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
@@ -444,10 +448,6 @@ function scanEnded()
 	elseif (finish == 2) then
 		Quit();
 	end
-
-	-- We can allow AuctionFrameBrowse updates once again.
-	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", emptyHookFunction)
-	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_Update", emptyHookFunction)
 
 	--Cleaning up after oneself is always a good idea.
 	collectgarbage("collect");
