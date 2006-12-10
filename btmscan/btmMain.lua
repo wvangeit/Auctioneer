@@ -108,6 +108,7 @@ BtmScan.OnUpdate = function(...)
 		BtmScan.LogParent:SetBackdropColor(0,0.5,0,0.9)
 	elseif (BtmScan.scanStage == 3) then
 		BtmScan.LogParent:SetBackdropColor(0.5,0,0,0.9)
+		return
 	end
 
 	-- If we are supposed to be scanning, then let's do it!
@@ -159,7 +160,7 @@ end
 
 BtmScan.PageScan = function(resume)
 	BtmScan.pageScan = nil
-	if (not BtmScan.scanStage or BtmScan.scanStage == 0) then return end
+	if (not BtmScan.scanStage or BtmScan.scanStage == 0 or BtmScan.scanStage == 3) then return end
 
 	-- Make sure the current zone is loaded and has defaults
 	BtmScan.GetZoneConfig("pagescan")
@@ -254,7 +255,7 @@ BtmScan.PageScan = function(resume)
 							snatchPrice = 0
 						end
 
-						local _,_,_,_,_,_,stackSize = GetItemInfo(itemID)
+						local _,_,_,_,_,_,_,stackSize = GetItemInfo(itemID)
 						if (not stackSize) then
 							if (snatchStack > 0) then
 								stackSize = snatchStack
@@ -1416,9 +1417,12 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt.iLink     = iLink
 	BtmScan.Prompt.iTex      = iTex
 
-	BtmScan.Prompt.Lines[1]:SetText(tr("Do you want to %1:", bidType))
+	local bidText = bidType
+	if (bidText == tr("bought")) then bidText = tr("buyout") end
+	
+	BtmScan.Prompt.Lines[1]:SetText(tr("Do you want to %1:", bidText))
 	BtmScan.Prompt.Lines[2]:SetText("  "..iLink.."x"..iCount)
-	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", bidType, BtmScan.GSC(bidPrice)))
+	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", bidText, BtmScan.GSC(bidPrice)))
 	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", whyBuy))
 	BtmScan.Prompt.Lines[5]:SetText("");
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(iTex)
@@ -1438,11 +1442,12 @@ BtmScan.PerformPurchase = function()
 	local sanityKey = BtmScan.Prompt.sanityKey
 
 	data.bids[bidSig] = { whyBuy, bidPrice, bidType, time() }
+	p("Placing bid on", i, bidPrice)
 	PlaceAuctionBid("list", i, bidPrice)
 	-- Mark this item as "bought"
 	if (not noSafety) then
 		local bought = 1
-		if (stackSize > 1) then
+		if (stackSize and stackSize > 1) then
 			bought = iCount / stackSize
 		end
 		
@@ -1508,10 +1513,10 @@ BtmScan.Frame:SetScript("OnUpdate", BtmScan.OnUpdate)
 
 BtmScan.Prompt = CreateFrame("Frame", "", UIParent)
 BtmScan.Prompt:Hide()
-BtmScan.Prompt:SetPoint("CENTER", "UIParent", "CENTER")
+BtmScan.Prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
 BtmScan.Prompt:SetFrameStrata("DIALOG")
-BtmScan.Prompt:SetHeight(120)
-BtmScan.Prompt:SetWidth(300)
+BtmScan.Prompt:SetHeight(150)
+BtmScan.Prompt:SetWidth(400)
 BtmScan.Prompt:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -1539,7 +1544,7 @@ for i = 1, 5 do
 		BtmScan.Prompt.Lines[i]:SetPoint("TOPLEFT", BtmScan.Prompt.Lines[i-1], "BOTTOMLEFT")
 		BtmScan.Prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",13)
 	end
-	BtmScan.Prompt.Lines[i]:SetWidth(150)
+	BtmScan.Prompt.Lines[i]:SetWidth(350)
 	BtmScan.Prompt.Lines[i]:SetJustifyH("LEFT")
 	BtmScan.Prompt.Lines[i]:SetText("Prompt Line "..i)
 	BtmScan.Prompt.Lines[i]:Show()
