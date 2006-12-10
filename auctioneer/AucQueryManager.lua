@@ -330,6 +330,12 @@ end
 -- it cannot be called at this time.
 -------------------------------------------------------------------------------
 function preQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
+	-- If BottomScanner is driving, let it do it's own thing without
+	-- interference from us, cause we don't really know what's going
+	-- on, as BtmScan overrides CanSendAuctionQuery()
+	if (BtmScan and BtmScan.scanStage and BtmScan.scanStage > 0) then
+		return
+	end
 	if (hookQueryAuctionItems) then
 		if (not CanSendAuctionQuery()) then
 			debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false");
