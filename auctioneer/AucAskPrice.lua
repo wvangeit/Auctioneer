@@ -288,7 +288,7 @@ function eventHandler(self, event, text, player)
 
 				--Check if the custom SmartWords are present in the chat message
 				local customSmartWord1, customSmartWord2 = Auctioneer.Command.GetFilterVal('askprice-word1'), Auctioneer.Command.GetFilterVal('askprice-word1');
-				if (not ((text:lower():find(customSmartWord1)) and stext:lower():find(customSmartWord2)))  then
+				if (not ((text:lower():find(customSmartWord1, 1, true)) and text:lower():find(customSmartWord2, 1, true)))  then
 					return;
 				end
 			end
