@@ -802,5 +802,5 @@ Stubby = {
 	CreateAddOnLoadBootCode = createAddOnLoadBootCode,
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
-	GetName = function return "Stubby" end,
+	GetName = function() return "Stubby" end,
 }
