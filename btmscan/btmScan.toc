@@ -1,0 +1,14 @@
+## Title: Bottom Scanner
+## Notes: Allows you to monitor new auctions for bargains.
+##
+## Interface: 11200
+## LoadOnDemand: 0
+## SavedVariables: BtmScanData
+## OptionalDeps: EnhTooltip
+##
+## URL: http://norganna.org/btmscan/
+##
+btmObject.lua
+btmLocales.lua
+btmPrices.lua
+btmMain.lua
