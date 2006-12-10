@@ -1484,7 +1484,7 @@ local function dump(...)
 			local first = true
 			if (d) then
 				for k, v in pairs(d) do
-					if (not first) then out = out .. ", \n" end
+					if (not first) then out = out .. ", " end
 					first = false
 					out = out .. dump(k)
 					out = out .. " = "
