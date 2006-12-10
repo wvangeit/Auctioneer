@@ -304,10 +304,10 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function  ListTemplate_DropDownItem_OnClick(self)
-	local logicalColumnIndex = self:GetID();
-	local physicalColumnIndex = self.owner:GetID();
-	local dropdown = self.owner;
+function  ListTemplate_DropDownItem_OnClick()
+	local logicalColumnIndex = this:GetID();
+	local physicalColumnIndex = this.owner:GetID();
+	local dropdown = this.owner;
 	local frame = dropdown:GetParent();
 	if (frame.physicalColumns[physicalColumnIndex].logicalColumn ~= frame.physicalColumns[physicalColumnIndex].logicalColumns[logicalColumnIndex]) then
 		-- Change the physical column's logical column
