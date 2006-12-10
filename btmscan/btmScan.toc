@@ -1,7 +1,7 @@
 ## Title: Bottom Scanner
 ## Notes: Allows you to monitor new auctions for bargains.
 ##
-## Interface: 11200
+## Interface: 20000
 ## LoadOnDemand: 0
 ## SavedVariables: BtmScanData
 ## OptionalDeps: EnhTooltip
