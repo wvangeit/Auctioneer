@@ -965,7 +965,7 @@ function AuctionFrameSearch_SearchCompetition(frame, minUndercut)
 	for _, snapshotAuction in pairs(snapshotAuctions) do
 		local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
 		local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
-		local myBuyoutPer = filterArgs.myHighestBuyouts[itemKey];
+		local myBuyoutPer = competitionFilterArgs.myHighestBuyouts[itemKey];
 
 		local auction = {};
 		auction.auctionId = snapshotAuction.auctionId;
