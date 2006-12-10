@@ -39,7 +39,7 @@ function Swatter.IsEnabled()
 	return SwatterData.enabled
 end
 
-function Swatter.OnError(msg, frame)
+function Swatter.OnError(msg, frame, stack)
 	if (not SwatterData.enabled) then return Swatter.origHandler(msg, frame) end
 	if (not frame) then frame = Swatter.nilFrame end
 
@@ -50,16 +50,30 @@ function Swatter.OnError(msg, frame)
 
 	Swatter.lastFrame = frame
 	Swatter.lastMsg = msg
-	Swatter.lastBt = debugstack(2, 3, 6)
+	Swatter.lastBt = stack or debugstack(2, 20, 20)
 
 	if (count == 0) then
 		if (SwatterData.autoshow) then
 			Swatter.Error:Show()
 		else
-			chat("Swatter caught error in "..frame:GetName()..". Type /swat show")
+			chat("Swatter caught error in "..(frame:GetName() or "Anonymous")..". Type /swat show")
 		end
 	end
 end
+
+-- Error occured in: Global
+-- Count: 1
+-- Message: [string "bla()"] line 1:
+--   attempt to call global 'bla' (a nil value)
+-- Debug:
+-- [C]: in function `bla'
+-- [string "bla()"]:1: in main chunk
+-- [C]: in function `RunScript'
+-- Interface\FrameXML\ChatFrame.lua:1788: in function `value'
+-- Interface\FrameXML\ChatFrame.lua:3008: in function `ChatEdit_ParseText'
+-- Interface\FrameXML\ChatFrame.lua:2734: in function `ChatEdit_SendText'
+-- Interface\FrameXML\ChatFrame.lua:2756: in function `ChatEdit_OnEnterPressed'
+-- [string "ChatFrameEditBox:OnEnterPressed"]:2: in function <[string "ChatFrameEditBox:OnEnterPressed"]:1>
 
 function Swatter.ErrorShow()
 	local frame, msg, bt = Swatter.lastFrame, Swatter.lastMsg, Swatter.lastBt
@@ -68,8 +82,10 @@ function Swatter.ErrorShow()
 	end
 
 	local count = frame.Swatter[msg]
+	local message = msg:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1")
+	local trace = "   "..bt:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n", "\n   ")
 	
-	Swatter.Error.Box:SetText("Error occured in: "..frame:GetName().."\nCount: "..count.."\nMessage: "..msg.."\n".."Debug:\n"..bt.."\n")
+	Swatter.Error.Box:SetText("Error occured in: "..(frame:GetName() or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n")
 end
 function Swatter.ErrorDone()
 	Swatter.Error:Hide()
@@ -108,7 +124,7 @@ Swatter.Error.Box = CreateFrame("EditBox", "SwatterErrorEditBox", Swatter.Error.
 Swatter.Error.Box:SetWidth(460)
 Swatter.Error.Box:SetHeight(85)
 Swatter.Error.Box:SetMultiLine(true)
-Swatter.Error.Box:SetAutoFocus(true)
+Swatter.Error.Box:SetAutoFocus(false)
 Swatter.Error.Box:SetFontObject(GameFontHighlight)
 Swatter.Error.Box:SetScript("OnEscapePressed", Swatter.ErrorDone)
 Swatter.Error.Box:SetScript("OnTextChanged", Swatter.ErrorUpdate)
