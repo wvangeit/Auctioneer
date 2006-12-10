@@ -351,7 +351,9 @@ end
 -------------------------------------------------------------------------------
 local hooked = false
 local function killHook()
-	if (Scanning) then return "killorig" end
+	if (Scanning) then 
+		return "killorig"
+	end
 end
 
 function scanStarted()
@@ -359,6 +361,7 @@ function scanStarted()
 	if (not hooked) then
 		Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
 		Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
+		Stubby.RegisterFunctionHook("AuctionFrameBrowse_Search", -200, killHook)
 		hooked = true
 	end
 
