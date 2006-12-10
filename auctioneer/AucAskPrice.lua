@@ -374,7 +374,7 @@ function getItems(str)
 	if (not str) then return nil end
 	local itemList = {};
 
-	for number, color, item, name in str:gmatch("(%d*)|c(%x+)|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+)|h%[(.-)%]|h|r") do
+	for number, color, item, name in str:gmatch("(%d*)|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
 		table.insert(itemList, {"|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", tonumber(number) or 1})
 	end
 	return itemList;
