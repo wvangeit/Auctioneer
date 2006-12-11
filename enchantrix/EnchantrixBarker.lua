@@ -1167,66 +1167,62 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
-	local dropdown = Enchantrix_BarkerOptions_ChanFilterDropDown
-	local frame = dropdown:GetParent()
+
+       local dropdown = this:GetParent();
+       local frame = dropdown:GetParent()
+
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelTrade');
-       info.value      = "TRADE"; 
-       info.func       = Foo;
-       info.owner	= dropdown;
-       
+       info.value      = "TRADE";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info);
 
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelParty');
-       info.value      = "PARTY"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
+       info.value      = "PARTY";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
 
-
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelRaid');
-       info.value      = "RAID"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
+       info.value      = "RAID";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
 
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelGuild');
-       info.value      = "GUILD"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
-       -- Add the above information to the options menu as a button.
+       info.value      = "GUILD";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        UIDropDownMenu_AddButton(info)
-
 
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelTellRec');
-       info.value      = "TELLR"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
+       info.value      = "TELLR";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
-
 
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelTellSent');
-       info.value      = "TELLS"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
+       info.value      = "TELLS";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
 
-
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelSay');
-       info.value      = "SAY"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
-       
+       info.value      = "SAY";  
+       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
 
@@ -1239,7 +1235,8 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
                       info            = {};
 	              info.text       = channame;
                       info.value      = i; 
-                      --TODO: info.func       = FunctionCalledWhenOptionIsClicked;
+                      info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		      info.owner      = dropdown;
                       --Add the above information to the options menu as a button.
                       UIDropDownMenu_AddButton(info)
 	      end
@@ -1308,4 +1305,9 @@ function dropDownMenuSetSelectedID(dropdown, index)
 	this = oldThis;
 end
 
+function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
+	local index = this:GetID();
+	local dropdown = this.owner;
+	dropDownMenuSetSelectedID(dropdown, index);
+end
 
