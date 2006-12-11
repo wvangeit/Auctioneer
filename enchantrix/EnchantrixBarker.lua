@@ -111,7 +111,7 @@ local short_location = {
 };
 
 local relevelFrame;
-local relevelFrames
+local relevelFrames;
 
 -- UI code
 
@@ -1166,12 +1166,14 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 	return enchant[#enchant];
 end
 
-
-function Enchantrix_BarkerOptions_ChanFilterDropDown_OnLoad()
+function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
+	local dropdown = Enchantrix_BarkerOptions_ChanFilterDropDown
+	local frame = dropdown:GetParent()
        info            = {};
        info.text       = _ENCH('BarkerOptionsChannelTrade');
        info.value      = "TRADE"; 
---       info.func       = FunctionCalledWhenOptionIsClicked;
+       info.func       = Foo;
+       info.owner	= dropdown;
        
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info);
@@ -1244,9 +1246,66 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_OnLoad()
        end
 end
 
-
 function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
        ToggleDropDownMenu(1, nil, Enchantrix_BarkerOptions_ChanFilterDropDown, "cursor");
+end
+
+
+function Foo()
+--Update whatever you want
+--Update_Foo;
+end 
+
+-- The following is shamelessly lifted from auctioneer/UserInterace/AuctioneerUI.lua
+
+-------------------------------------------------------------------------------
+-- Wrapper for UIDropDownMenu_Initialize() that sets 'this' before calling
+-- UIDropDownMenu_Initialize().
+-------------------------------------------------------------------------------
+function dropDownMenuInitialize(dropdown, func)
+	-- Hide all the buttons to prevent any calls to Hide() inside
+	-- UIDropDownMenu_Initialize() which will screw up the value of this.
+	local button, dropDownList;
+	for i = 1, UIDROPDOWNMENU_MAXLEVELS, 1 do
+		dropDownList = getglobal("DropDownList"..i);
+		if ( i >= UIDROPDOWNMENU_MENU_LEVEL or dropdown:GetName() ~= UIDROPDOWNMENU_OPEN_MENU ) then
+			dropDownList.numButtons = 0;
+			dropDownList.maxWidth = 0;
+			for j=1, UIDROPDOWNMENU_MAXBUTTONS, 1 do
+				button = getglobal("DropDownList"..i.."Button"..j);
+				button:Hide();
+			end
+		end
+	end
+
+	-- Call the UIDropDownMenu_Initialize() after swapping in a value for 'this'.
+	local oldThis = this;
+	this = getglobal(dropdown:GetName().."Button");
+	local newThis = this;
+	UIDropDownMenu_Initialize(dropdown, func);
+	-- Double check that the value of 'this' didn't change... this can screw us
+	-- up and prevent the reason for this method!
+	if (newThis ~= this) then
+		debugPrint("WARNING: The value of this changed during dropDownMenuInitialize()");
+	end
+	this = oldThis;
+end
+
+-------------------------------------------------------------------------------
+-- Wrapper for UIDropDownMenu_SetSeletedID() that sets 'this' before calling
+-- UIDropDownMenu_SetSelectedID().
+-------------------------------------------------------------------------------
+function dropDownMenuSetSelectedID(dropdown, index)
+	local oldThis = this;
+	this = dropdown;
+	local newThis = this;
+	UIDropDownMenu_SetSelectedID(dropdown, index);
+	-- Double check that the value of 'this' didn't change... this can screw us
+	-- up and prevent the reason for this method!
+	if (newThis ~= this) then
+		debugPrint("WARNING: The value of this changed during dropDownMenuSetSelectedID()");
+	end
+	this = oldThis;
 end
 
 
