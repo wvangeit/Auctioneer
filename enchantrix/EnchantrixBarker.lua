@@ -1165,3 +1165,88 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 
 	return enchant[#enchant];
 end
+
+
+function Enchantrix_BarkerOptions_ChanFilterDropDown_OnLoad()
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelTrade');
+       info.value      = "TRADE"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info);
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelParty');
+       info.value      = "PARTY"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelRaid');
+       info.value      = "RAID"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelGuild');
+       info.value      = "GUILD"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelTellRec');
+       info.value      = "TELLR"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelTellSent');
+       info.value      = "TELLS"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+
+       info            = {};
+       info.text       = _ENCH('BarkerOptionsChannelSay');
+       info.value      = "SAY"; 
+--       info.func       = FunctionCalledWhenOptionIsClicked;
+       
+       -- Add the above information to the options menu as a button.
+       UIDropDownMenu_AddButton(info)
+
+       local chanlist = {GetChannelList()};
+
+       for i = 1, table.getn(chanlist), 2 do
+	       id, channame = GetChannelName(i);
+	       --TODO: if channame !General.*, ! -i defense, !Trade*
+	      if (channame) then
+                      info            = {};
+	              info.text       = channame;
+                      info.value      = i; 
+                      --TODO: info.func       = FunctionCalledWhenOptionIsClicked;
+                      --Add the above information to the options menu as a button.
+                      UIDropDownMenu_AddButton(info)
+	      end
+       end
+end
+
+
+function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
+       ToggleDropDownMenu(1, nil, Enchantrix_BarkerOptions_ChanFilterDropDown, "cursor");
+end
+
+

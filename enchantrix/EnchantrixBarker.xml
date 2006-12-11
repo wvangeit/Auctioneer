@@ -211,14 +211,18 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnLoad>
+						UIDropDownMenu_Initialize(this, Enchantrix_BarkerOptions_ChanFilterDropDown_OnLoad);
 						<!-- Enchantrix_BarkerOptions_ChanFilterDropDown(); -->
 					</OnLoad>
 					<OnShow>
 						<!-- Enchantrix_BarkerOptions_ChanFilterDropDown(); -->
 					</OnShow>
+					<OnClick>
+						Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick();
+					</OnClick>
 				</Scripts>
 			</Frame>
-			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Profit/Price">
+			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Pricing">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">
 						<Offset>
@@ -227,7 +231,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</Anchor>
 				</Anchors>
 			</Button>
-			<Button name="Enchantrix_BarkerOptions_FrameTab2" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="2" text="Item Priorities">
+			<Button name="Enchantrix_BarkerOptions_FrameTab2" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="2" text="Priorities">
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="Enchantrix_BarkerOptions_FrameTab1" relativePoint="RIGHT">
 						<Offset>

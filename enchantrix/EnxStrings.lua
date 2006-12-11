@@ -421,6 +421,13 @@ EnchantrixLocalizations = {
 		BarkerOptionsRandomFactorTitle	= "Random Factor";
 		BarkerOptionsRandomFactorTooltip	= "The amount of randomness in the enchants chosen for the trade shout.";
 		BarkerOptionsTab1Title	= "Profit and Price Priorities";
+		BarkerOptionsChannelTrade = "Trade - City";
+		BarkerOptionsChannelParty = "Party";
+		BarkerOptionsChannelRaid = "Raid";
+		BarkerOptionsChannelGuild = "Guild";
+		BarkerOptionsChannelTellRec = "Last Received Tell";
+		BarkerOptionsChannelTellSent = "Last Sent Tell";
+		BarkerOptionsChannelSay = "Say";
 
 	};
 
