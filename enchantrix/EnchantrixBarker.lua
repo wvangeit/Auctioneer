@@ -1226,11 +1226,11 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
        -- Add the above information to the options menu as a button.
        UIDropDownMenu_AddButton(info)
 
-       local chanlist = {GetChannelList()};
+       local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
 
-       for i = 1, table.getn(chanlist), 2 do
+       for i = 1, table.getn(chanlist) do
 	       id, channame = GetChannelName(i);
-	       --TODO: if channame !General.*, ! -i defense, !Trade*
+	       --TODO: if channame !General.*, ! -i defense, !Trade*, !GlobalComm, !GuildRecruitment
 	      if (channame) then
                       info            = {};
 	              info.text       = channame;
