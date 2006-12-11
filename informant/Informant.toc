@@ -20,6 +20,7 @@ InfCommand.lua
 InfTooltip.lua
 ## InfTrades.lua
 InfQuests.lua
+InfPrices.lua
 InfData.lua
 
 Informant.xml

@@ -155,6 +155,11 @@ function getItem(itemID)
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
+	local vbuy = self.vendbuy[id]
+	local vsell = self.vendsell[id]
+	if (vbuy) then buy = vbuy end
+	if (vsell) then sell = vsell end
+
 	local dataItem = {
 		buy = buy,
 		sell = sell,
@@ -294,6 +299,15 @@ end
 function setDatabase(database)
 	self.database = database
 	Informant.SetDatabase = nil -- Set only once
+end
+
+function setVendorBuy(vendorlist)
+	self.vendbuy = vendorlist
+	Informant.SetVendorBuy = nil -- Set only once
+end
+function setVendorSell(vendorlist)
+	self.vendsell = vendorlist
+	Informant.SetVendorSell = nil -- Set only once
 end
 
 
@@ -692,6 +706,8 @@ Informant = {
 	SetRequirements = setRequirements,
 	SetVendors = setVendors,
 	SetDatabase = setDatabase,
+	SetVendorBuy = setVendorBuy,
+	SetVendorSell = setVendorSell,
 	FrameActive = frameActive,
 	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,
