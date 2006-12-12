@@ -1231,11 +1231,6 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
                       UIDropDownMenu_AddButton(info)
 	      end
        end
---       for i = 1, UIDROPDOWNMENU_MAXBUTTONS do
---	       if (dropdown.i.text == Enchantrix_BarkerGetConfig('BarkerChan')) then
---		       dropDownMenuSetSelectedID(dropdown, i);
---	       end
---       end
 end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
