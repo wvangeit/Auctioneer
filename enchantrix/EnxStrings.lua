@@ -428,6 +428,9 @@ EnchantrixLocalizations = {
 		BarkerOptionsChannelTellRec = "Last Received Tell";
 		BarkerOptionsChannelTellSent = "Last Sent Tell";
 		BarkerOptionsChannelSay = "Say";
+		BarkerOptionsChannelGeneral = "General -";
+		BarkerOptionsChannelLocalDefense = "LocalDefense -";
+		BarkerOptionsChannelWorldDefense = "WorldDefense";
 
 	};
 

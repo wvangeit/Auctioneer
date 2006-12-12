@@ -211,9 +211,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						getglobal(self:GetName().."Text"):SetJustifyH("LEFT");
+						getglobal(self:GetName().."Text"):SetJustify("LEFT");
 						dropDownMenuInitialize(self,Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize);
-						dropDownMenuSetSelectedID(self, 1);
 					</OnLoad>
 					<OnClick>
 						Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick();

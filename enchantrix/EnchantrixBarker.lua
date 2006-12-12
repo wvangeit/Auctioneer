@@ -113,6 +113,7 @@ local short_location = {
 local relevelFrame;
 local relevelFrames;
 
+
 -- UI code
 
 
@@ -1228,6 +1229,9 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 
        local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
 
+       ZoneName = GetRealZoneText();
+       --Enchantrix.Util.ChatPrint("Zone:"..ZoneName);
+
        for i = 1, table.getn(chanlist) do
 	       id, channame = GetChannelName(i);
 	       --TODO: if channame !General.*, ! -i defense, !Trade*, !GlobalComm, !GuildRecruitment
@@ -1241,6 +1245,7 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
                       UIDropDownMenu_AddButton(info)
 	      end
        end
+	dropDownMenuSetSelectedID(dropdown, 2); -- TODO: Actually select the configured chan
 end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
@@ -1309,5 +1314,9 @@ function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
 	local index = this:GetID();
 	local dropdown = this.owner;
 	dropDownMenuSetSelectedID(dropdown, index);
+
+--	Enchantrix.Util.ChatPrint("Selected "..index.." Text:"..this:GetText().." Value:"..this.value);
+	Enchantrix_BarkerSetConfig("BARKERCHAN", this:GetText())
+
 end
 
