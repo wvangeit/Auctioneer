@@ -1,4 +1,6 @@
-There is no support to import your old settings in alpha or beta releases. Back up your old data first by moving it out of the saved variable directory (preferably right out of the WoW tree). This is because we cannot guarantee that the SV format for any alpha or beta will be permanently set in stone.
+There is no support to import your old settings in alpha or beta releases. Back up your old data first by moving it out of the saved variable directory (preferably right out of the WoW tree). %gamedir%\WTF\Acount\%accountname%\SavedVariables\[eE]nchantrix.lua*
+
+Do this because we cannot guarantee that the SV format for any alpha or beta will be permanently set in stone.
 
 If you don't understand this, you probably shouldn't be using alpha or beta mods.
 
