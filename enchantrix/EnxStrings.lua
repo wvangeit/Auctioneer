@@ -330,6 +330,7 @@ EnchantrixLocalizations = {
 		ChannelWorldDefense	= "WorldDefense";
 		ChannelGuildRecruitment	= "GuildRecruitment - City";
 		ChannelBlock1	= "GlobalComm";
+		ChannelDefault	= "Trade - City";
 
 		-- Section: Generic Messages
 		FrmtCredit	= "  (go to http://enchantrix.org/ to share your data)";
