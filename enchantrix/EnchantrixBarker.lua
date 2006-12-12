@@ -110,6 +110,44 @@ local short_location = {
 	[_ENCH('Ironforge')] = _ENCH('ShortIronForge')
 };
 
+local config_defaults = {
+	lowest_price = 5000,
+	sweet_price = 50000,
+	high_price = 500000,
+	profit_margin = 10,
+	highest_profit = 100000,
+	randomise = 10,
+	AnyWeapon = 100,
+	TwoHanded = 90,
+	Bracer = 70,
+	Gloves = 70,
+	Boots = 70,
+	Chest = 70,
+	Cloak = 70,
+	Shield = 70,
+	INT = 90,
+	STA = 70,
+	AGI = 70,
+	STR = 70,
+	SPI = 45,
+	["all stats"] = 75,
+	["all res"] = 55,
+	armour = 65,
+	["fire res"] = 85,
+	["frost res"] = 85,
+	["nature res"] = 85,
+	["shadow res"] = 85,
+	mana = 35,
+	health = 40,
+	DMG = 90,
+	DEF = 60,
+	other = 70,
+	factor_price = 20,
+	factor_item = 40,
+	factor_stat = 40,
+	BarkerChan = _ENCH('ChannelDefault')
+};
+
 local relevelFrame;
 local relevelFrames;
 
@@ -210,45 +248,6 @@ end
 function EnchantrixBarker_OnLoad()
 	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "Enchantrix", craftUILoaded)
 end
-
-
-
-local config_defaults = {
-	lowest_price = 5000,
-	sweet_price = 50000,
-	high_price = 500000,
-	profit_margin = 10,
-	highest_profit = 100000,
-	randomise = 10,
-	AnyWeapon = 100,
-	TwoHanded = 90,
-	Bracer = 70,
-	Gloves = 70,
-	Boots = 70,
-	Chest = 70,
-	Cloak = 70,
-	Shield = 70,
-	INT = 90,
-	STA = 70,
-	AGI = 70,
-	STR = 70,
-	SPI = 45,
-	["all stats"] = 75,
-	["all res"] = 55,
-	armour = 65,
-	["fire res"] = 85,
-	["frost res"] = 85,
-	["nature res"] = 85,
-	["shadow res"] = 85,
-	mana = 35,
-	health = 40,
-	DMG = 90,
-	DEF = 60,
-	other = 70,
-	factor_price = 20,
-	factor_item = 40,
-	factor_stat = 40
-};
 
 function Enchantrix_BarkerGetConfig( key )
 	if( not EnchantConfig.barker ) then
