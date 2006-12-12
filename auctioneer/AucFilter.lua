@@ -515,7 +515,7 @@ end
 -------------------------------------------------------------------------------
 function doPercentLess(percentLess)
 	-- Normalize the arguments.
-	if not percentLess or percentLess == "" then percentLess = Auctioneer.Core.Constants.MinPercentLessThanHSP end
+	percentLess = tonumber(percentLess) or Auctioneer.Core.Constants.MinPercentLessThanHSP
 
 	-- Query the snapshot and sort the results by increasing time left.
 	local filterArgs = {};
