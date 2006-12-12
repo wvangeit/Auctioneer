@@ -46,7 +46,6 @@ local isValidLocale
 local filterDefaults = {
 		['all'] = true,
 		['barker'] = true,
-		['barkchan'] = true,
 		['counts'] = false,
 		['embed'] = false,
 		['locale'] = 'default',
@@ -61,7 +60,6 @@ local filterDefaults = {
 -- True if this filter value should be saved per character
 local perCharacterFilter = {
 		['counts'] = true,
-		['barkchan'] = true,
 		['embed'] = true,
 		['terse'] = true,
 		['printframe'] = true,
