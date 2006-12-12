@@ -9,7 +9,9 @@ Known current issues for 3.9.xxxx:
 (Normal, 11 Dec 2006)
 . /enchantrix percentless <value> may not work correctly.
 
-(Normal, 11 Dec 2006)
-. Barker's channel drop down doesn't work, nor is there any command line options to control it (absence of new code, not really a bug, but listed here nonetheless).
+(Normal, 12 Dec 2006)
+. Text bleed on Enchantrix_BarkerOptions_ChanFilterDropDown
 
-If you're going to report a bug to us on our alpha/beta builds, please ensure you're using the latest development version from http://auctioneeraddon.com/dl 
+No doubt there are more known and recorded elsewhere, others known and not recorded, thos not known, heisenbugs and others.
+
+If you're going to report a bug to us on our alpha/beta builds, please ensure you're using the latest development version from http://auctioneeraddon.com/dl Occasional IRC support on irc://irc.freenode.net/norganna
