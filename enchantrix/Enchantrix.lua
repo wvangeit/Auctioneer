@@ -81,6 +81,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_FAILED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
+	Stubby.RegisterEventHook("ZONE_CHANGED", "Enchantrix", onEvent)
 
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
@@ -187,6 +188,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		DisenchantEvent.spellTarget = nil
 		DisenchantEvent.targetted = nil
 		DisenchantEvent.finished = nil
+	elseif event == "ZONE_CHANGED" then
+		Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 	end
 end
 

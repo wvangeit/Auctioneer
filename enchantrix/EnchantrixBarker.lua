@@ -1172,70 +1172,57 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
        local dropdown = this:GetParent();
        local frame = dropdown:GetParent()
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelTrade');
-       info.value      = "TRADE";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info);
+       ChnPtyBtn            = {};
+       ChnPtyBtn.text       = _ENCH('ChannelParty');
+       ChnPtyBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnPtyBtn.owner      = dropdown
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelParty');
-       info.value      = "PARTY";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
        -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info)
+       UIDropDownMenu_AddButton(ChnPtyBtn)
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelRaid');
-       info.value      = "RAID";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
+       ChnRdBtn            = {};
+       ChnRdBtn.text       = _ENCH('ChannelRaid');
+       ChnRdBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnRdBtn.owner      = dropdown
        -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info)
+       UIDropDownMenu_AddButton(ChnRdBtn)
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelGuild');
-       info.value      = "GUILD";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
-       UIDropDownMenu_AddButton(info)
+       ChnGldBtn            = {};
+       ChnGldBtn.text       = _ENCH('ChannelGuild');
+       ChnGldBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnGldBtn.owner      = dropdown
+       UIDropDownMenu_AddButton(ChnGldBtn)
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelTellRec');
-       info.value      = "TELLR";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
+       ChnTlRBtn            = {};
+       ChnTlRBtn.text       = _ENCH('ChannelTellRec');
+       ChnTlRBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnTlRBtn.owner      = dropdown
        -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info)
+       UIDropDownMenu_AddButton(ChnTlRBtn)
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelTellSent');
-       info.value      = "TELLS";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
+       ChnTlSBtn            = {};
+       ChnTlSBtn.text       = _ENCH('ChannelTellSent');
+       ChnTlSBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnTlSBtn.owner      = dropdown
        -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info)
+       UIDropDownMenu_AddButton(ChnTlSBtn)
 
-       info            = {};
-       info.text       = _ENCH('BarkerOptionsChannelSay');
-       info.value      = "SAY";  
-       info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       info.owner      = dropdown
+       ChnSayBtn            = {};
+       ChnSayBtn.text       = _ENCH('ChannelSay');
+       ChnSayBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+       ChnSayBtn.owner      = dropdown
        -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(info)
+       UIDropDownMenu_AddButton(ChnSayBtn)
 
        local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
-
-       ZoneName = GetRealZoneText();
-       --Enchantrix.Util.ChatPrint("Zone:"..ZoneName);
+       local ZoneName = GetRealZoneText();
 
        for i = 1, table.getn(chanlist) do
 	       id, channame = GetChannelName(i);
-	       --TODO: if channame !General.*, ! -i defense, !Trade*, !GlobalComm, !GuildRecruitment
-	      if (channame) then
+
+	      if ((channame) and  (channame ~= (_ENCH('ChannelGeneral')..ZoneName)) and 
+		   (channame ~= (_ENCH('ChannelLocalDefense')..ZoneName)) and (channame ~= _ENCH('ChannelWorldDefense')) and 
+		   (channame ~= _ENCH('ChannelGuildRecruitment')) and (channame ~= _ENCH('ChannelBlock1')) ) then
                       info            = {};
 	              info.text       = channame;
                       info.value      = i; 
@@ -1245,18 +1232,16 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
                       UIDropDownMenu_AddButton(info)
 	      end
        end
-	dropDownMenuSetSelectedID(dropdown, 2); -- TODO: Actually select the configured chan
+--       for i = 1, UIDROPDOWNMENU_MAXBUTTONS do
+--	       if (dropdown.i.text == Enchantrix_BarkerGetConfig('BarkerChan')) then
+--		       dropDownMenuSetSelectedID(dropdown, i);
+--	       end
+--       end
 end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
        ToggleDropDownMenu(1, nil, Enchantrix_BarkerOptions_ChanFilterDropDown, "cursor");
 end
-
-
-function Foo()
---Update whatever you want
---Update_Foo;
-end 
 
 -- The following is shamelessly lifted from auctioneer/UserInterace/AuctioneerUI.lua
 
@@ -1313,10 +1298,8 @@ end
 function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
 	local index = this:GetID();
 	local dropdown = this.owner;
+
 	dropDownMenuSetSelectedID(dropdown, index);
-
---	Enchantrix.Util.ChatPrint("Selected "..index.." Text:"..this:GetText().." Value:"..this.value);
-	Enchantrix_BarkerSetConfig("BARKERCHAN", this:GetText())
-
+	Enchantrix_BarkerSetConfig("BarkerChan", this:GetText())
 end
 
