@@ -153,7 +153,7 @@ local config_defaults = {
 	factor_price = 20,
 	factor_item = 40,
 	factor_stat = 40,
-	BarkerChan = _ENCH('ChannelDefault')
+	barker_chan_default = _ENCH('ChannelDefault')
 };
 
 local relevelFrame;
@@ -810,68 +810,61 @@ end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 
-       local dropdown = this:GetParent();
-       local frame = dropdown:GetParent()
+		local dropdown = this:GetParent();
+		local frame = dropdown:GetParent();
 
-       ChnPtyBtn            = {};
-       ChnPtyBtn.text       = _ENCH('ChannelParty');
-       ChnPtyBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnPtyBtn.owner      = dropdown
+		ChnPtyBtn		= {};
+		ChnPtyBtn.text	= _ENCH('ChannelParty');
+		ChnPtyBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnPtyBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnPtyBtn)
 
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(ChnPtyBtn)
+		ChnRdBtn		= {};
+	    ChnRdBtn.text	= _ENCH('ChannelRaid');
+		ChnRdBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnRdBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnRdBtn)
 
-       ChnRdBtn            = {};
-       ChnRdBtn.text       = _ENCH('ChannelRaid');
-       ChnRdBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnRdBtn.owner      = dropdown
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(ChnRdBtn)
+		ChnGldBtn		= {};
+		ChnGldBtn.text	= _ENCH('ChannelGuild');
+		ChnGldBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnGldBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnGldBtn)
 
-       ChnGldBtn            = {};
-       ChnGldBtn.text       = _ENCH('ChannelGuild');
-       ChnGldBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnGldBtn.owner      = dropdown
-       UIDropDownMenu_AddButton(ChnGldBtn)
+		ChnTlRBtn		= {};
+		ChnTlRBtn.text	= _ENCH('ChannelTellRec');
+		ChnTlRBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnTlRBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnTlRBtn)
 
-       ChnTlRBtn            = {};
-       ChnTlRBtn.text       = _ENCH('ChannelTellRec');
-       ChnTlRBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnTlRBtn.owner      = dropdown
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(ChnTlRBtn)
+		ChnTlSBtn		= {};
+		ChnTlSBtn.text	= _ENCH('ChannelTellSent');
+		ChnTlSBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnTlSBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnTlSBtn)
 
-       ChnTlSBtn            = {};
-       ChnTlSBtn.text       = _ENCH('ChannelTellSent');
-       ChnTlSBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnTlSBtn.owner      = dropdown
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(ChnTlSBtn)
+		ChnSayBtn		= {};
+		ChnSayBtn.text	= _ENCH('ChannelSay');
+		ChnSayBtn.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+		ChnSayBtn.owner	= dropdown
+		UIDropDownMenu_AddButton(ChnSayBtn)
 
-       ChnSayBtn            = {};
-       ChnSayBtn.text       = _ENCH('ChannelSay');
-       ChnSayBtn.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-       ChnSayBtn.owner      = dropdown
-       -- Add the above information to the options menu as a button.
-       UIDropDownMenu_AddButton(ChnSayBtn)
+		local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
+		local ZoneName = GetRealZoneText();
 
-       local chanlist = {GetChannelList()}; --GetChannelList can be buggy.
-       local ZoneName = GetRealZoneText();
+		for i = 1, table.getn(chanlist) do
+			id, channame = GetChannelName(i);
 
-       for i = 1, table.getn(chanlist) do
-	       id, channame = GetChannelName(i);
-
-	      if ((channame) and  (channame ~= (_ENCH('ChannelGeneral')..ZoneName)) and 
-		   (channame ~= (_ENCH('ChannelLocalDefense')..ZoneName)) and (channame ~= _ENCH('ChannelWorldDefense')) and 
-		   (channame ~= _ENCH('ChannelGuildRecruitment')) and (channame ~= _ENCH('ChannelBlock1')) ) then
-                      info            = {};
-	              info.text       = channame;
-                      info.value      = i; 
-                      info.func       = Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
-		      info.owner      = dropdown;
-                      --Add the above information to the options menu as a button.
-                      UIDropDownMenu_AddButton(info)
-	      end
+			if ((channame) and  (channame ~= (_ENCH('ChannelGeneral')..ZoneName)) and 
+			 (channame ~= (_ENCH('ChannelLocalDefense')..ZoneName)) and (channame ~= _ENCH('ChannelWorldDefense')) and 
+			 (channame ~= _ENCH('ChannelGuildRecruitment')) and (channame ~= _ENCH('ChannelBlock1')) ) then
+					info	= {};
+				info.text	= channame;
+				info.value	= i; 
+				info.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
+				info.owner	= dropdown;
+				UIDropDownMenu_AddButton(info)
+			end
        end
 end
 
@@ -935,7 +928,7 @@ function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
 	local dropdown = this.owner;
 
 	dropDownMenuSetSelectedID(dropdown, index);
-	Enchantrix_BarkerSetConfig("BarkerChan", this:GetText())
+	Enchantrix_BarkerSetConfig("barker_chan", this:GetText())
 end
 
 -- end UI code
