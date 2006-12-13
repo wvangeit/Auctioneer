@@ -188,8 +188,6 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		DisenchantEvent.spellTarget = nil
 		DisenchantEvent.targetted = nil
 		DisenchantEvent.finished = nil
-	elseif event == "ZONE_CHANGED" then
-		Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 	end
 end
 

@@ -46,8 +46,16 @@ local categories = { --TODO: Localize
 	AnyWeapon = {search = "Enchant Weapon", print = "Any Weapon" }
 };
 
-
-local print_order = { 'Bracer', 'Gloves', 'Boots', 'Chest', 'Cloak', 'Shield', 'TwoHanded', 'AnyWeapon' }; --TODO: Localize
+local print_order = { --TODO: Localize
+	'Bracer',
+	'Gloves',
+	'Boots',
+	'Chest', 
+	'Cloak', 
+	'Shield', 
+	'TwoHanded', 
+	'AnyWeapon'
+};
 
 local attributes = { --TODO: Localize
 	'intellect',
@@ -151,9 +159,7 @@ local config_defaults = {
 local relevelFrame;
 local relevelFrames;
 
-
 -- UI code
-
 
 function EnchantrixBarker_OnEvent()
 	--Enchantrix.Util.ChatPrint("GotUIEvent...");
@@ -177,6 +183,8 @@ function EnchantrixBarker_OnEvent()
 		elseif( event == "CRAFT_CLOSE" )then
 			Enchantrix_BarkerDisplayButton:Hide();
 			Enchantrix_BarkerOptions_Frame:Hide();
+		elseif(	event == "ZONE_CHANGED" ) then
+			Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize();
 		end
 	end
 end
@@ -228,7 +236,6 @@ function relevelFrames(myLevel, ...)
 		relevelFrame(child)
 	end
 end
-
 
 local function craftUILoaded()
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
@@ -300,7 +307,6 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
 	end
 end
-
 
 function Enchantrix_BarkerOptions_Factors_Slider_GetValue(id)
 	if (not id) then
@@ -715,8 +721,6 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 	}
 };
 
-
-
 function EnchantrixBarker_OptionsSlider_OnValueChanged()
 	if Enchantrix_BarkerOptions_ActiveTab ~= -1 then
 		--Enchantrix.Util.ChatPrint( "Tab - Slider changed: "..Enchantrix_BarkerOptions_ActiveTab..' - '..this:GetID() );
@@ -748,7 +752,6 @@ function EnchantrixBarker_OptionsSlider_GetTextFromValue( value, units )
 	end
 	return valuestr;
 end
-
 
 function Enchantrix_BarkerOptions_Tab_OnClick()
 	--Enchantrix.Util.ChatPrint( "Clicked Tab: "..this:GetID() );
@@ -796,7 +799,6 @@ function Enchantrix_BarkerOptions_OnClick()
 	end
 end
 
-
 function Enchantrix_CheckButton_OnShow()
 end
 function Enchantrix_CheckButton_OnClick()
@@ -804,366 +806,6 @@ end
 function Enchantrix_CheckButton_OnEnter()
 end
 function Enchantrix_CheckButton_OnLeave()
-end
-
-
--- end UI code
-
-
-
-
-function Enchantrix_CreateBarker()
-	local availableEnchants = {};
-	local numAvailable = 0;
-	local temp = GetCraftSkillLine(1);
-	if EnchantrixBarker_BarkerGetZoneText() then
-		EnchantrixBarker_ResetBarkerString();
-		EnchantrixBarker_ResetPriorityList();
-		if (temp) then
-			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
-			for index=1, GetNumCrafts() do
-				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-				--EnhTooltip.DebugPrint(GetCraftInfo(index))
-				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
-					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
-					local cost = 0;
-					for j=1,GetCraftNumReagents(index),1 do
-						local a,b,c = GetCraftReagentInfo(index,j);
-						reagent = GetCraftReagentItemLink(index,j);
-
-						--EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
-						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
-					end
-
-					local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
-					if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
-						profit = Enchantrix_BarkerGetConfig("highest_profit");
-					end
-					local price = EnchantrixBarker_RoundPrice(cost + profit);
-
-					local enchant = {
-						index = index,
-						name = craftName,
-						type = craftType,
-						available = numEnchantsAvailable,
-						isExpanded = isExpanded,
-						cost = cost,
-						price = price,
-						profit = price - cost
-					};
-					availableEnchants[ numAvailable] = enchant;
-
-					EnhTooltip.DebugPrint(GetCraftDescription(index));
-					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
-
-					EnchantrixBarker_AddEnchantToPriorityList( enchant )
-					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
-					numAvailable = numAvailable + 1;
-				end
-			end
-
-			if numAvailable == 0 then
-				Enchantrix.Util.ChatPrint(_ENCH('BarkerNoEnchantsAvail'));
-				return nil
-			end
-
-			for i,element in ipairs(priorityList) do
-				EnhTooltip.DebugPrint(element.enchant.name);
-				EnchantrixBarker_AddEnchantToBarker( element.enchant );
-			end
-
-			return EnchantrixBarker_GetBarkerString();
-
-		else
-			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
-		end
-	end
-
-	return nil
-end
-
-
-function EnchantrixBarker_ScoreEnchantPriority( enchant )
-
-	local score_item = 0;
-
-	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) ) then
-		score_item = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) );
-		score_item = score_item * Enchantrix_BarkerGetConfig( 'factor_item' )*0.01;
-	end
-
-	local score_stat = 0;
-
-	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) ) then
-		score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant));
-	else
-		score_stat = Enchantrix_BarkerGetConfig( 'other' );
-	end
-
-	score_stat = score_stat * Enchantrix_BarkerGetConfig( 'factor_stat' )*0.01;
-
-	local score_price = 0;
-	local price_score_floor = Enchantrix_BarkerGetConfig("sweet_price");
-	local price_score_ceiling = Enchantrix_BarkerGetConfig("high_price");
-
-	if enchant.price < price_score_floor then
-		score_price = (price_score_floor - (price_score_floor - enchant.price))/price_score_floor * 100;
-	elseif enchant.price < price_score_ceiling then
-		range = (price_score_ceiling - price_score_floor);
-		score_price = (range - (enchant.price - price_score_floor))/range * 100;
-	end
-
-	score_price = score_price * Enchantrix_BarkerGetConfig( 'factor_price' )*0.01;
-	score_total = (score_item + score_stat + score_price);
-
-	return score_total * (1 - Enchantrix_BarkerGetConfig("randomise")*0.01) + math.random(300) * Enchantrix_BarkerGetConfig("randomise")*0.01;
-end
-
-function EnchantrixBarker_ResetPriorityList()
-	priorityList = {};
-end
-
-function EnchantrixBarker_AddEnchantToPriorityList(enchant)
-
-	local enchant_score = EnchantrixBarker_ScoreEnchantPriority( enchant );
-
-	for i,priorityentry in ipairs(priorityList) do
-		if( priorityentry.score < enchant_score ) then
-			table.insert( priorityList, i, {score = enchant_score, enchant = enchant} );
-			return;
-		end
-	end
-
-	table.insert( priorityList, {score = enchant_score, enchant = enchant} );
-end
-
-
-function EnchantrixBarker_RoundPrice( price )
-
-	local round
-
-	if( price < 5000 ) then
-		round = 1000;
-	elseif ( price < 20000 ) then
-		round = 2500;
-	else
-		round = 5000;
-	end
-
-	odd = math.fmod(price,round);
-
-	price = price + (round - odd);
-
-	if( price < Enchantrix_BarkerGetConfig("lowest_price") ) then
-		price = Enchantrix_BarkerGetConfig("lowest_price");
-	end
-
-	return price
-end
-
-
-function Enchantrix_GetReagentHSP( itemLink )
-
-	local itemID = Enchantrix.Util.GetItemIdFromLink(itemLink);
-	local itemKey = ("%s:0:0"):format(itemID);
-
-
-	-- Work out what version if any of auctioneer is installed
-	local auctVerStr;
-	if (not Auctioneer) then
-		auctVerStr = AUCTIONEER_VERSION or "0.0.0";
-	else
-		auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
-	end
-	local auctVer = Enchantrix.Util.Split(auctVerStr, ".");
-	local major = tonumber(auctVer[1]) or 0;
-	local minor = tonumber(auctVer[2]) or 0;
-	local rev = tonumber(auctVer[3]) or 0;
-	if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
-	local hsp = nil;
-
-	if (major == 3 and minor == 0 and rev <= 11) then
-		--Enchantrix.Util.ChatPrint("Calling Auctioneer_GetHighestSellablePriceForOne");
-
-		if (rev == 11) then
-			hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
-		else
-			if (Auctioneer_GetHighestSellablePriceForOne) then
-				hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false);
-			elseif (getHighestSellablePriceForOne) then
-				hsp = getHighestSellablePriceForOne(itemKey, false);
-			end
-		end
-	elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
-		--Enchantrix.Util.ChatPrint("Calling GetHSP");
-		hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-	elseif (major >= 3 and minor >= 3 and (rev >= 675 or (rev >= 0 and rev <=5))) then
-		--Enchantrix.Util.ChatPrint("Calling Statistic.GetHSP");
-		hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-	else
-		Enchantrix.Util.ChatPrint("Calling Nothing: "..major..", "..minor..", "..rev);
-	end
-	if hsp == nil then
-		hsp = 0;
-	end
-
-	return hsp;
-end
-
-local barkerString = '';
-local barkerCategories = {};
-
-function EnchantrixBarker_ResetBarkerString()
-	barkerString = "("..EnchantrixBarker_BarkerGetZoneText()..") ".._ENCH('BarkerOpening');
-	barkerCategories = {};
-end
-
-function EnchantrixBarker_BarkerGetZoneText()
-	--Enchantrix.Util.ChatPrint(GetZoneText());
-	return short_location[GetZoneText()];
-end
-
-
-function EnchantrixBarker_AddEnchantToBarker( enchant )
-
-	local currBarker = EnchantrixBarker_GetBarkerString();
-
-	local category_key = EnchantrixBarker_GetItemCategoryKey( enchant.index )
-	local category_string = "";
-	local test_category = {};
-	if barkerCategories[ category_key ] then
-		for i,element in ipairs(barkerCategories[category_key]) do
-			--Enchantrix.Util.ChatPrint("Inserting: "..i..", elem: "..element.index );
-			table.insert(test_category, element);
-		end
-	end
-
-	table.insert(test_category, enchant);
-
-	category_string = EnchantrixBarker_GetBarkerCategoryString( test_category );
-
-
-	if #currBarker + #category_string > 255 then
-		return false;
-	end
-
-	if not barkerCategories[ category_key ] then
-		barkerCategories[ category_key ] = {};
-	end
-
-	table.insert( barkerCategories[ category_key ],enchant );
-
-	return true;
-end
-
-
-function EnchantrixBarker_GetBarkerString()
-	local barker = ""..barkerString;
-
-	for index, key in ipairs(print_order) do
-		if( barkerCategories[key] ) then
-			barker = barker..EnchantrixBarker_GetBarkerCategoryString( barkerCategories[key] )
-		end
-	end
-
-	return barker;
-end
-
-function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
-	local barkercat = ""
-	barkercat = barkercat.." ["..EnchantrixBarker_GetItemCategoryString(barkerCategory[1].index)..": ";
-	for j,enchant in ipairs(barkerCategory) do
-		if( j > 1) then
-			barkercat = barkercat..", "
-		end
-		barkercat = barkercat..EnchantrixBarker_GetBarkerEnchantString(enchant);
-	end
-	barkercat = barkercat.."]"
-
-	return barkercat
-end
-
-
-function EnchantrixBarker_GetBarkerEnchantString( enchant )
-	local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-
-	enchant_barker = Enchantrix_GetShortDescriptor(enchant.index).." - ";
-	if( p_gold > 0 ) then
-		enchant_barker = enchant_barker..p_gold.._ENCH('OneLetterGold');
-	end
-	if( p_silver > 0 ) then
-		enchant_barker = enchant_barker..p_silver.._ENCH('OneLetterSilver');
-	end
-	--enchant_barker = enchant_barker..", ";
-	return enchant_barker
-end
-
-
-
-
-function EnchantrixBarker_GetItemCategoryString( index )
-
-	local enchant = GetCraftInfo( index );
-
-	for key,category in pairs(categories) do
-		--Enchantrix.Util.ChatPrint( "cat key: "..key);
-		if( enchant:find(category.search ) ~= nil ) then
-			--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category.print..", enchant: "..enchant );
-			return category.print;
-		end
-	end
-
-	return 'Unknown';
-end
-
-function EnchantrixBarker_GetItemCategoryKey( index )
-
-	local enchant = GetCraftInfo( index );
-
-	for key,category in pairs(categories) do
-		--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category );
-		if( enchant:find(category.search ) ~= nil ) then
-			return key;
-		end
-	end
-
-	return 'Unknown';
-
-end
-
-function EnchantrixBarker_GetCraftDescription( index )
-	return GetCraftDescription(index) or "";
-end
-
-function Enchantrix_GetShortDescriptor( index )
-	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
-
-	for index,attribute in ipairs(attributes) do
-		if( long_str:find(attribute ) ~= nil ) then
-			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
-			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
-			return "+"..statvalue..' '..short_attributes[index];
-		end
-	end
-	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
-
-	return enchant[#enchant];
-end
-
-function EnchantrixBarker_GetEnchantStat( enchant )
-	local index = enchant.index;
-	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
-
-	for index,attribute in ipairs(attributes) do
-		if( long_str:find(attribute ) ~= nil ) then
-			return short_attributes[index];
-		end
-	end
-	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
-
-	return enchant[#enchant];
 end
 
 function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
@@ -1238,7 +880,6 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick()
 end
 
 -- The following is shamelessly lifted from auctioneer/UserInterace/AuctioneerUI.lua
-
 -------------------------------------------------------------------------------
 -- Wrapper for UIDropDownMenu_Initialize() that sets 'this' before calling
 -- UIDropDownMenu_Initialize().
@@ -1295,5 +936,352 @@ function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
 
 	dropDownMenuSetSelectedID(dropdown, index);
 	Enchantrix_BarkerSetConfig("BarkerChan", this:GetText())
+end
+
+-- end UI code
+
+function Enchantrix_CreateBarker()
+	local availableEnchants = {};
+	local numAvailable = 0;
+	local temp = GetCraftSkillLine(1);
+	if EnchantrixBarker_BarkerGetZoneText() then
+		EnchantrixBarker_ResetBarkerString();
+		EnchantrixBarker_ResetPriorityList();
+		if (temp) then
+			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
+			for index=1, GetNumCrafts() do
+				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
+				--EnhTooltip.DebugPrint(GetCraftInfo(index))
+				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
+					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
+					local cost = 0;
+					for j=1,GetCraftNumReagents(index),1 do
+						local a,b,c = GetCraftReagentInfo(index,j);
+						reagent = GetCraftReagentItemLink(index,j);
+
+						--EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
+						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
+					end
+
+					local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
+					if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
+						profit = Enchantrix_BarkerGetConfig("highest_profit");
+					end
+					local price = EnchantrixBarker_RoundPrice(cost + profit);
+
+					local enchant = {
+						index = index,
+						name = craftName,
+						type = craftType,
+						available = numEnchantsAvailable,
+						isExpanded = isExpanded,
+						cost = cost,
+						price = price,
+						profit = price - cost
+					};
+					availableEnchants[ numAvailable] = enchant;
+
+					EnhTooltip.DebugPrint(GetCraftDescription(index));
+					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
+
+					EnchantrixBarker_AddEnchantToPriorityList( enchant )
+					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
+					numAvailable = numAvailable + 1;
+				end
+			end
+
+			if numAvailable == 0 then
+				Enchantrix.Util.ChatPrint(_ENCH('BarkerNoEnchantsAvail'));
+				return nil
+			end
+
+			for i,element in ipairs(priorityList) do
+				EnhTooltip.DebugPrint(element.enchant.name);
+				EnchantrixBarker_AddEnchantToBarker( element.enchant );
+			end
+
+			return EnchantrixBarker_GetBarkerString();
+
+		else
+			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
+		end
+	end
+
+	return nil
+end
+
+function EnchantrixBarker_ScoreEnchantPriority( enchant )
+
+	local score_item = 0;
+
+	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) ) then
+		score_item = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetItemCategoryKey(enchant.index) );
+		score_item = score_item * Enchantrix_BarkerGetConfig( 'factor_item' )*0.01;
+	end
+
+	local score_stat = 0;
+
+	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) ) then
+		score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant));
+	else
+		score_stat = Enchantrix_BarkerGetConfig( 'other' );
+	end
+
+	score_stat = score_stat * Enchantrix_BarkerGetConfig( 'factor_stat' )*0.01;
+
+	local score_price = 0;
+	local price_score_floor = Enchantrix_BarkerGetConfig("sweet_price");
+	local price_score_ceiling = Enchantrix_BarkerGetConfig("high_price");
+
+	if enchant.price < price_score_floor then
+		score_price = (price_score_floor - (price_score_floor - enchant.price))/price_score_floor * 100;
+	elseif enchant.price < price_score_ceiling then
+		range = (price_score_ceiling - price_score_floor);
+		score_price = (range - (enchant.price - price_score_floor))/range * 100;
+	end
+
+	score_price = score_price * Enchantrix_BarkerGetConfig( 'factor_price' )*0.01;
+	score_total = (score_item + score_stat + score_price);
+
+	return score_total * (1 - Enchantrix_BarkerGetConfig("randomise")*0.01) + math.random(300) * Enchantrix_BarkerGetConfig("randomise")*0.01;
+end
+
+function EnchantrixBarker_ResetPriorityList()
+	priorityList = {};
+end
+
+function EnchantrixBarker_AddEnchantToPriorityList(enchant)
+
+	local enchant_score = EnchantrixBarker_ScoreEnchantPriority( enchant );
+
+	for i,priorityentry in ipairs(priorityList) do
+		if( priorityentry.score < enchant_score ) then
+			table.insert( priorityList, i, {score = enchant_score, enchant = enchant} );
+			return;
+		end
+	end
+
+	table.insert( priorityList, {score = enchant_score, enchant = enchant} );
+end
+
+function EnchantrixBarker_RoundPrice( price )
+
+	local round
+
+	if( price < 5000 ) then
+		round = 1000;
+	elseif ( price < 20000 ) then
+		round = 2500;
+	else
+		round = 5000;
+	end
+
+	odd = math.fmod(price,round);
+
+	price = price + (round - odd);
+
+	if( price < Enchantrix_BarkerGetConfig("lowest_price") ) then
+		price = Enchantrix_BarkerGetConfig("lowest_price");
+	end
+
+	return price
+end
+
+function Enchantrix_GetReagentHSP( itemLink )
+
+	local itemID = Enchantrix.Util.GetItemIdFromLink(itemLink);
+	local itemKey = ("%s:0:0"):format(itemID);
+
+
+	-- Work out what version if any of auctioneer is installed
+	local auctVerStr;
+	if (not Auctioneer) then
+		auctVerStr = AUCTIONEER_VERSION or "0.0.0";
+	else
+		auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
+	end
+	local auctVer = Enchantrix.Util.Split(auctVerStr, ".");
+	local major = tonumber(auctVer[1]) or 0;
+	local minor = tonumber(auctVer[2]) or 0;
+	local rev = tonumber(auctVer[3]) or 0;
+	if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
+	local hsp = nil;
+
+	if (major == 3 and minor == 0 and rev <= 11) then
+		--Enchantrix.Util.ChatPrint("Calling Auctioneer_GetHighestSellablePriceForOne");
+
+		if (rev == 11) then
+			hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
+		else
+			if (Auctioneer_GetHighestSellablePriceForOne) then
+				hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false);
+			elseif (getHighestSellablePriceForOne) then
+				hsp = getHighestSellablePriceForOne(itemKey, false);
+			end
+		end
+	elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
+		--Enchantrix.Util.ChatPrint("Calling GetHSP");
+		hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
+	elseif (major >= 3 and minor >= 3 and (rev >= 675 or (rev >= 0 and rev <=5))) then
+		--Enchantrix.Util.ChatPrint("Calling Statistic.GetHSP");
+		hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
+	else
+		Enchantrix.Util.ChatPrint("Calling Nothing: "..major..", "..minor..", "..rev);
+	end
+	if hsp == nil then
+		hsp = 0;
+	end
+
+	return hsp;
+end
+
+local barkerString = '';
+local barkerCategories = {};
+
+function EnchantrixBarker_ResetBarkerString()
+	barkerString = "("..EnchantrixBarker_BarkerGetZoneText()..") ".._ENCH('BarkerOpening');
+	barkerCategories = {};
+end
+
+function EnchantrixBarker_BarkerGetZoneText()
+	--Enchantrix.Util.ChatPrint(GetZoneText());
+	return short_location[GetZoneText()];
+end
+
+function EnchantrixBarker_AddEnchantToBarker( enchant )
+
+	local currBarker = EnchantrixBarker_GetBarkerString();
+
+	local category_key = EnchantrixBarker_GetItemCategoryKey( enchant.index )
+	local category_string = "";
+	local test_category = {};
+	if barkerCategories[ category_key ] then
+		for i,element in ipairs(barkerCategories[category_key]) do
+			--Enchantrix.Util.ChatPrint("Inserting: "..i..", elem: "..element.index );
+			table.insert(test_category, element);
+		end
+	end
+
+	table.insert(test_category, enchant);
+
+	category_string = EnchantrixBarker_GetBarkerCategoryString( test_category );
+
+
+	if #currBarker + #category_string > 255 then
+		return false;
+	end
+
+	if not barkerCategories[ category_key ] then
+		barkerCategories[ category_key ] = {};
+	end
+
+	table.insert( barkerCategories[ category_key ],enchant );
+
+	return true;
+end
+
+function EnchantrixBarker_GetBarkerString()
+	local barker = ""..barkerString;
+
+	for index, key in ipairs(print_order) do
+		if( barkerCategories[key] ) then
+			barker = barker..EnchantrixBarker_GetBarkerCategoryString( barkerCategories[key] )
+		end
+	end
+
+	return barker;
+end
+
+function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
+	local barkercat = ""
+	barkercat = barkercat.." ["..EnchantrixBarker_GetItemCategoryString(barkerCategory[1].index)..": ";
+	for j,enchant in ipairs(barkerCategory) do
+		if( j > 1) then
+			barkercat = barkercat..", "
+		end
+		barkercat = barkercat..EnchantrixBarker_GetBarkerEnchantString(enchant);
+	end
+	barkercat = barkercat.."]"
+
+	return barkercat
+end
+
+function EnchantrixBarker_GetBarkerEnchantString( enchant )
+	local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+
+	enchant_barker = Enchantrix_GetShortDescriptor(enchant.index).." - ";
+	if( p_gold > 0 ) then
+		enchant_barker = enchant_barker..p_gold.._ENCH('OneLetterGold');
+	end
+	if( p_silver > 0 ) then
+		enchant_barker = enchant_barker..p_silver.._ENCH('OneLetterSilver');
+	end
+	--enchant_barker = enchant_barker..", ";
+	return enchant_barker
+end
+
+function EnchantrixBarker_GetItemCategoryString( index )
+
+	local enchant = GetCraftInfo( index );
+
+	for key,category in pairs(categories) do
+		--Enchantrix.Util.ChatPrint( "cat key: "..key);
+		if( enchant:find(category.search ) ~= nil ) then
+			--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category.print..", enchant: "..enchant );
+			return category.print;
+		end
+	end
+
+	return 'Unknown';
+end
+
+function EnchantrixBarker_GetItemCategoryKey( index )
+
+	local enchant = GetCraftInfo( index );
+
+	for key,category in pairs(categories) do
+		--Enchantrix.Util.ChatPrint( "cat key: "..key..", name: "..category );
+		if( enchant:find(category.search ) ~= nil ) then
+			return key;
+		end
+	end
+
+	return 'Unknown';
+
+end
+
+function EnchantrixBarker_GetCraftDescription( index )
+	return GetCraftDescription(index) or "";
+end
+
+function Enchantrix_GetShortDescriptor( index )
+	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
+
+	for index,attribute in ipairs(attributes) do
+		if( long_str:find(attribute ) ~= nil ) then
+			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
+			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
+			return "+"..statvalue..' '..short_attributes[index];
+		end
+	end
+	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
+
+	return enchant[#enchant];
+end
+
+function EnchantrixBarker_GetEnchantStat( enchant )
+	local index = enchant.index;
+	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
+
+	for index,attribute in ipairs(attributes) do
+		if( long_str:find(attribute ) ~= nil ) then
+			return short_attributes[index];
+		end
+	end
+	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
+
+	return enchant[#enchant];
 end
 
