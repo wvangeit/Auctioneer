@@ -1426,7 +1426,9 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", whyBuy))
 	BtmScan.Prompt.Lines[5]:SetText("");
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(iTex)
+	PlaySoundFile("Interface\\AddOns\\btmscan\\sounds\\24102_partymix_Door_Bell.wav")
 	BtmScan.Prompt:Show()
+
 end
 BtmScan.PerformPurchase = function()
 	BtmScan.scanStage = 2
