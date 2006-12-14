@@ -300,6 +300,7 @@ EnchantrixLocalizations = {
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
 		BarkerOpening	= "Selling Enchants:";
+		BarkerTag	= " My mats";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of Ironforge";
 		OneLetterGold	= "g";

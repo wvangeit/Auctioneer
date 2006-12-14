@@ -995,7 +995,7 @@ function Enchantrix_CreateBarker()
 				EnchantrixBarker_AddEnchantToBarker( element.enchant );
 			end
 
-			return EnchantrixBarker_GetBarkerString();
+			return EnchantrixBarker_GetBarkerString().._ENCH('BarkerTag');
 
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
