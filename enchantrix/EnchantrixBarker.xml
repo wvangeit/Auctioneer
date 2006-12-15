@@ -198,6 +198,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnClick>
 				</Scripts>
 			</Button>
+			<!--
 			<Frame name="Enchantrix_BarkerOptions_ChanFilterDropDown" inherits="UIDropDownMenuTemplate" id="1" enableMouse="true">
 				<Size>
 					<AbsDimension x="10" y="10"/>
@@ -219,6 +220,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnClick>
 				</Scripts>
 			</Frame>
+			-->
 			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Pricing">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">

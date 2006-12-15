@@ -183,8 +183,8 @@ function EnchantrixBarker_OnEvent()
 		elseif( event == "CRAFT_CLOSE" )then
 			Enchantrix_BarkerDisplayButton:Hide();
 			Enchantrix_BarkerOptions_Frame:Hide();
-		elseif(	event == "ZONE_CHANGED" ) then
-			Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize();
+		--elseif(	event == "ZONE_CHANGED" ) then
+		--	Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize();
 		end
 	end
 end
@@ -808,6 +808,7 @@ end
 function Enchantrix_CheckButton_OnLeave()
 end
 
+--[[
 function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 
 		local dropdown = this:GetParent();
@@ -930,6 +931,7 @@ function Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick()
 	dropDownMenuSetSelectedID(dropdown, index);
 	Enchantrix_BarkerSetConfig("barker_chan", this:GetText())
 end
+]]
 
 -- end UI code
 
@@ -1121,7 +1123,7 @@ function Enchantrix_GetReagentHSP( itemLink )
 		--Enchantrix.Util.ChatPrint("Calling Statistic.GetHSP");
 		hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
 	else
-		Enchantrix.Util.ChatPrint("Calling Nothing: "..major..", "..minor..", "..rev);
+		Enchantrix.Util.ChatPrint("Calling Nothing: (Auctioneer not loaded?) "..major..", "..minor..", "..rev);
 	end
 	if hsp == nil then
 		hsp = 0;
