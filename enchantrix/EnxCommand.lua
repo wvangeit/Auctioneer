@@ -624,15 +624,8 @@ function handleCommand(command, source)
 	end;
 
 	-- Divide the large command into smaller logical sections (Shameless copy from the original function)
-	--[[
-		(Matthias) Rewrote the match string here to not totally suck... should now work right and be localized better.
-		old: "^([^ ]+) (.+)$" -- breaks with multi params, has issues with multiple spaces and garbage/foreign chars
-		new: "^(%a+)%s*(%w*)%s*(%w*).*" -- works with 0/1/2 parms, eats extra input and extra spaces between parms
-
-		TODO: other string regexps in Auctioneer/Enchantrix should also be looked at.
-		Hardcoding ' 's and using '.' instead of %a/%d/%w/%s (or their inverses) is not really great coding practice.
-	]]
-	local cmd, param, param2 = command:match("^([%w%-]+)%s*(.*)%S*(.*)$");
+	--(Matthias) Rewrote the match string here. Should now work right and be localized better.
+	local cmd, param, param2 = command:match("^([%w%-]+)%s*(.*)%s*(.*)$");
 
 	cmd = cmd or command or ""
 	param = param or ""
@@ -866,10 +859,10 @@ end
 --   Auctioneer dependant commands   --
 ---------------------------------------
 
-function percentLessFilter(percentLess, signature)
+function percentLessFilter(auction, percentLess)
 	local filterAuction = true;
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
-	local disenchantsTo = getAuctionItemDisenchants(signature, true);
+
+	local disenchantsTo = getAuctionItemDisenchants(auction.itemID, auction.suffixId, auction.enchantId, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
 	local hspValue = disenchantsTo.totals.hspValue or 0;
@@ -981,10 +974,10 @@ function doPercentLess(percentLess, minProfit)
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
-	
+
 	--Normal's not too happy about all these nil's, but at least it doesn't fault out now
-	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess); 
-	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, nil, nil);
+	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess);
+	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentLess);
 
 	-- sort by profit based on median
 	table.sort(targetAuctions, profitComparisonSort);
@@ -1001,8 +994,7 @@ function doPercentLess(percentLess, minProfit)
 				local margin = profitMargins[a.signature].margin;
 				local profit = profitMargins[a.signature].profit;
 				if ((profit * count) >= minProfit) then
-					local output = string.format(
-						_ENCH('FrmtPctlessLine'),
+					local output = _ENCH('FrmtPctlessLine'):format(
 						Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink,
 						EnhTooltip.GetTextGSC(value * count),
 						EnhTooltip.GetTextGSC(buyout),
@@ -1071,8 +1063,7 @@ function doBidBroker(minProfit, percentLess)
 						bidText = _ENCH('FrmtBidbrokerCurbid');
 					end
 
-					local output = string.format(
-						_ENCH('FrmtBidbrokerLine'),
+					local output = _ENCH('FrmtBidbrokerLine'):format(
 						Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink,
 						EnhTooltip.GetTextGSC(value * count),
 						bidText,
@@ -1103,9 +1094,8 @@ function doBidBroker(minProfit, percentLess)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end
 
-function getAuctionItemDisenchants(auctionSignature, useCache)
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(auctionSignature);
-	local sig = ("%d:%d:%d"):format(id, enchant, rprop);
+function getAuctionItemDisenchants(itemId, randomProp, enchant, useCache)
+	local sig = ("%d:%d:%d"):format(itemId, enchant, randomProp);
 	return Enchantrix.Storage.GetItemDisenchants(sig, name, useCache);
 end
 

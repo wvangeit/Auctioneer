@@ -44,26 +44,26 @@ local isValidLocale
 
 -- Default filter configuration
 local filterDefaults = {
-		['all'] = true,
-		['barker'] = true,
-		['counts'] = false,
-		['embed'] = false,
-		['locale'] = 'default',
-		['printframe'] = 1,
-		['terse'] = false,
-		['valuate'] = true,
-		['valuate-hsp'] = true,
-		['valuate-median'] = true,
-		['valuate-baseline'] = true,
-	}
+	['all'] = true,
+	['barker'] = true,
+	['counts'] = false,
+	['embed'] = false,
+	['locale'] = 'default',
+	['printframe'] = 1,
+	['terse'] = false,
+	['valuate'] = true,
+	['valuate-hsp'] = true,
+	['valuate-median'] = true,
+	['valuate-baseline'] = true,
+}
 
 -- True if this filter value should be saved per character
 local perCharacterFilter = {
-		['counts'] = true,
-		['embed'] = true,
-		['terse'] = true,
-		['printframe'] = true,
-	}
+	['counts'] = true,
+	['embed'] = true,
+	['terse'] = true,
+	['printframe'] = true,
+}
 
 function addonLoaded()
 	-- Remove unused/unknown filter values
