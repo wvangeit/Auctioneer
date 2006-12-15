@@ -1,0 +1,58 @@
+This documentation describes the structure of the 3.x format and how these entries/tables are converted to the new dataformat.
+
+AuctionConfig
+ - players
+   Syntax:
+      i = [character name as string]
+   Description:
+      Contains a list of all the account account holder's character's names
+   Planned convertion:
+      *TODO*
+
+ - stats
+   - histcount
+   - snapmed
+   - histmed
+   - snapcount
+   Description:
+      Contains some look up tables, used for quick access to median buyout prices
+   Planned convertion:
+      discard this table - it's only a look up table and the entries will be calculated once again
+
+ - sbuy
+   Description:
+      Contains recorded buyout values of the last scan
+   Planned conversion:
+      discard this table - snapshot information are only of temporary use and will be recreated every time a scan is being performed
+
+ - classes
+   *TODO*
+
+ - scanStats
+   *TODO*
+
+ - info
+   *TODO*
+
+ - bids
+   *TODO*
+
+ - version
+   Description:
+      The current dataformat version - 30600
+   Planned conversion:
+      none - simply used to identify correct 3.x dataformat
+
+ - fixedprice
+   *TODO*
+
+ - snap
+   *TODO*
+
+The following tables/entries are ignored by the convertion routine:
+AuctionPrices        - Seems to be an unused table (didn't waste time, checking this out)
+AuctionBids          - Seems to be an unused table (didn't waste time, checking this out)
+AHSnapshot           - Seems to be an unused table (didn't waste time, checking this out)
+AHSnapshotItemPrices - Seems to be an unused table (didn't waste time, checking this out)
+
+
