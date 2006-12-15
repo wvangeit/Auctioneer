@@ -20,9 +20,6 @@ EnxLocale.lua
 
 DisenchantList.lua
 
-EnchantrixBarker.lua
-EnchantrixBarker.xml
-
 EnxCommand.lua
 EnxConfig.lua
 EnxConstants.lua
@@ -30,3 +27,6 @@ EnxStorage.lua
 EnxTooltip.lua
 EnxUtil.lua
 Enchantrix.lua
+
+EnchantrixBarker.lua
+EnchantrixBarker.xml
