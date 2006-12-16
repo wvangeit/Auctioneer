@@ -1038,6 +1038,7 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, categoryIndex, minQuali
 			auction.count = snapshotAuction.count;
 			auction.owner = snapshotAuction.owner;
 			auction.timeLeft = snapshotAuction.timeLeft;
+			auction.level = itemInfo.useLevel;
 
 			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
 			auction.bidPer = math.floor(auction.bid / auction.count);
