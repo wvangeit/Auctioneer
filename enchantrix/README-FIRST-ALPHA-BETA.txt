@@ -9,7 +9,6 @@ There are known current issues, but this doesn't mean we're hard at work fixing 
 Known current issues for 3.9.xxxx:
 
 . /enchantrix percentless <value> may not work correctly.
-. Text bleed on Enchantrix_BarkerOptions_ChanFilterDropDown
 
 No doubt there are more known and recorded elsewhere, others known and not recorded, thos not known, heisenbugs and others.
 
