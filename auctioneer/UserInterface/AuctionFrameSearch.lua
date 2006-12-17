@@ -351,10 +351,10 @@ function load()
 		},
 		{
 			width = 50;
-			logicalColumn = frame.logicalColumns.PercentLess;
+			logicalColumn = frame.logicalColumns.BuyoutPercentLess;
 			logicalColumns =
 			{
-				frame.logicalColumns.PercentLess
+				frame.logicalColumns.BuyoutPercentLess
 			};
 			sortAscending = true;
 		},
