@@ -123,10 +123,10 @@
 InstType "Full"
 InstType "Auctioneer Only"
 InstType "Libraries Only"
+InstType "Development"
 
 Section "!Libraries" Libraries
-
-	SectionIn 1 2 3
+	SectionIn 1 2 3 4
 
 	;EnhTT
 
@@ -143,12 +143,10 @@ Section "!Libraries" Libraries
 	File "..\Stubby\*.xml"
 	File "..\Stubby\*.lua"
 	File "GPL.txt"
-
 SectionEnd
 
 Section "UnInstaller" UnInstaller
-
-	SectionIn 1 2 3
+	SectionIn 1 2 3 4
 
 	;Create uninstaller
 	WriteUninstaller "$INSTDIR\Auctioneer Uninstaller.exe"
@@ -168,12 +166,10 @@ Section "UnInstaller" UnInstaller
 
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "NoModify" 1
 	WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer" "NoRepair" 1
-
 SectionEnd
 
 Section "Auctioneer" Auctioneer
-
-	SectionIn 1 2
+	SectionIn 1 2 4
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer"
 	File "..\Auctioneer\Auctioneer.toc"
@@ -194,7 +190,6 @@ Section "Auctioneer" Auctioneer
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Auctioneer\Babylonian"
 	File "..\Babylonian\*.lua"
-
 SectionEnd
 
 Section "BeanCounter" BeanCounter
@@ -208,12 +203,19 @@ Section "BeanCounter" BeanCounter
 
 	SetOutPath "$INSTDIR\Interface\AddOns\BeanCounter\Babylonian"
 	File "..\Babylonian\*.lua"
+SectionEnd
 
+Section "BottomScanner" BottomScanner
+	SectionIn 1 4
+
+	SetOutPath "$INSTDIR\Interface\AddOns\BtmScan"
+	File "..\BtmScan\BtmScan.toc"
+	File "..\BtmScan\*.lua"
+	File "GPL.txt"
 SectionEnd
 
 Section "Enchantrix" Enchantrix
-
-	SectionIn 1
+	SectionIn 1 4
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix"
 	File "..\Enchantrix\Enchantrix.toc"
@@ -224,12 +226,10 @@ Section "Enchantrix" Enchantrix
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Enchantrix\Babylonian"
 	File "..\Babylonian\*.lua"
-
 SectionEnd
 
 Section "Informant" Informant
-
-	SectionIn 1
+	SectionIn 1 4
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Informant"
 	File "..\Informant\Informant.toc"
@@ -239,13 +239,41 @@ Section "Informant" Informant
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Informant\Babylonian"
 	File "..\Babylonian\*.lua"
-
 SectionEnd
 
+Section "Itemizer" Itemizer
+	SectionIn 1
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Itemizer"
+	File "..\Itemizer\Itemizer.toc"
+	File "..\Itemizer\*.pl"
+	File "..\Itemizer\*.lua"
+	File "..\Itemizer\Art\*.tga"
+	File "GPL.txt"
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Itemizer\Babylonian"
+	File "..\Babylonian\*.lua"
+SectionEnd
+
+Section "Swatter" Swatter
+	SectionIn 1 4
+
+	SetOutPath "$INSTDIR\Interface\AddOns\!Swatter"
+	File "..\!Swatter\!Swatter.toc"
+	File "..\!Swatter\*.lua"
+	File "GPL.txt"
+SectionEnd
 ;--------------------------------
 ;Installer Functions
 
 Function .onInit
+	existingInstallerCheck:
+	System::Call 'kernel32::CreateMutexA(i 0, i 0, t "auctioneerInstallerMutex") i .r1 ?e'
+	Pop $R0
+	StrCmp $R0 0 +3
+		MessageBox MB_OK|MB_ICONEXCLAMATION "An existing instance of the Auctioneer installer was found. Aborting"
+	Abort
+
 	retryCheck:
 	FindWindow $0 "" "${WNDTITLE}"
 		StrCmp $0 0 continueInstall
@@ -270,28 +298,24 @@ Function .onSelChange
 	No:
 FunctionEnd
 
-
 ;--------------------------------
 ;Descriptions
 
 	;Language strings
-
 	!include InsStrings.nsh
 
 	; Assign language strings to sections
 	!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
 
-		!insertmacro MUI_DESCRIPTION_TEXT ${Libraries} $(DESC_Libraries)
-
-		!insertmacro MUI_DESCRIPTION_TEXT ${UnInstaller} $(DESC_UnInstaller)
-
-		!insertmacro MUI_DESCRIPTION_TEXT ${Auctioneer} $(DESC_Auctioneer)
-
-		!insertmacro MUI_DESCRIPTION_TEXT ${BeanCounter} $(DESC_BeanCounter)
-
-		!insertmacro MUI_DESCRIPTION_TEXT ${Enchantrix} $(DESC_Enchantrix)
-
-		!insertmacro MUI_DESCRIPTION_TEXT ${Informant} $(DESC_Informant)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Libraries} $(DESC_Libraries)
+	!insertmacro MUI_DESCRIPTION_TEXT ${UnInstaller} $(DESC_UnInstaller)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Auctioneer} $(DESC_Auctioneer)
+	!insertmacro MUI_DESCRIPTION_TEXT ${BeanCounter} $(DESC_BeanCounter)
+	!insertmacro MUI_DESCRIPTION_TEXT ${BottomScanner} $(DESC_BottomScanner)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Enchantrix} $(DESC_Enchantrix)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Informant} $(DESC_Informant)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Itemizer} $(DESC_Itemizer)
+	!insertmacro MUI_DESCRIPTION_TEXT ${Swatter} $(DESC_Swatter)
 
 	!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -302,7 +326,6 @@ InstType "un.All"
 InstType "un.AddOns"
 
 Section "!un.Libraries" un.Libraries
-
 	SectionIn 1
 
 ;	EnhTT
@@ -314,23 +337,17 @@ Section "!un.Libraries" un.Libraries
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
-
-
-
 SectionEnd
 
 Section "un.UnInstaller" un.UnInstaller
-
 	SectionIn 1
 
 	Delete "$INSTDIR\Auctioneer Uninstaller.exe"
 
 	DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Auctioneer"
-
 SectionEnd
 
 Section "un.Auctioneer" un.Auctioneer
-
 	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Auctioneer"
@@ -338,11 +355,29 @@ Section "un.Auctioneer" un.Auctioneer
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
+SectionEnd
 
+Section "un.BeanCounter" un.BeanCounter
+	SectionIn 1 2
+
+	RMDir /r "$INSTDIR\Interface\AddOns\BeanCounter"
+
+	RMDir "$INSTDIR\Interface\AddOns"
+	RMDir "$INSTDIR\Interface"
+	RMDir "$INSTDIR"
+SectionEnd
+
+Section "un.BottomScanner" un.BottomScanner
+	SectionIn 1 2
+
+	RMDir /r "$INSTDIR\Interface\AddOns\BtmScan"
+
+	RMDir "$INSTDIR\Interface\AddOns"
+	RMDir "$INSTDIR\Interface"
+	RMDir "$INSTDIR"
 SectionEnd
 
 Section "un.Enchantrix" un.Enchantrix
-
 	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Enchantrix"
@@ -350,11 +385,9 @@ Section "un.Enchantrix" un.Enchantrix
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
-
 SectionEnd
 
 Section "un.Informant" un.Informant
-
 	SectionIn 1 2
 
 	RMDir /r "$INSTDIR\Interface\AddOns\Informant"
@@ -362,13 +395,38 @@ Section "un.Informant" un.Informant
 	RMDir "$INSTDIR\Interface\AddOns"
 	RMDir "$INSTDIR\Interface"
 	RMDir "$INSTDIR"
-
 SectionEnd
 
+Section "un.Itemizer" un.Itemizer
+	SectionIn 1 2
+
+	RMDir /r "$INSTDIR\Interface\AddOns\Itemizer"
+
+	RMDir "$INSTDIR\Itemizer\AddOns"
+	RMDir "$INSTDIR\Itemizer"
+	RMDir "$INSTDIR"
+SectionEnd
+
+Section "un.Swatter" un.Swatter
+	SectionIn 1 2
+
+	RMDir /r "$INSTDIR\Interface\AddOns\!Swatter"
+
+	RMDir "$INSTDIR\Interface\AddOns"
+	RMDir "$INSTDIR\Interface"
+	RMDir "$INSTDIR"
+SectionEnd
 ;--------------------------------
 ;UnInstaller Functions
 
 Function un.onInit
+	existingunInstallerCheck:
+	System::Call 'kernel32::CreateMutexA(i 0, i 0, t "auctioneerInstallerMutex") i .r1 ?e'
+	Pop $R0
+	StrCmp $R0 0 +3
+		MessageBox MB_OK|MB_ICONEXCLAMATION "An existing instance of the Auctioneer uninstaller was found. Aborting"
+	Abort
+
 	retryCheck:
 	FindWindow $0 "" "${WNDTITLE}"
 		StrCmp $0 0 continueInstall
