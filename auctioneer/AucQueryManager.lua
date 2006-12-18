@@ -1059,3 +1059,7 @@ Auctioneer.QueryManager = {
 	CanSendAuctionQuery = canSendAuctionQuery;
 	ClearPageCache = clearPageCache;
 }
+
+function Auctioneer.QueryManager.GetRequestQueue()
+	return QueryRequestQueue
+end

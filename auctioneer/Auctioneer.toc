@@ -15,6 +15,7 @@
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 
 AucObjects.lua
+AucClassExt.lua
 
 Babylonian\Babylonian.lua
 AucStrings.lua

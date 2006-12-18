@@ -34,8 +34,42 @@
 local load;
 local postFilterButtonSetTypeHook;
 local postAuctionFrameFiltersUpdateClassesHook;
+local nextButtonHook, prevButtonHook;
 local queryForItemByName;
 local debugPrint;
+
+
+local function nextButton(...)
+	if (IsModifierKeyDown()) then
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
+		local curPage = AuctionFrameBrowse.page
+		local pages = totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE
+		if (IsControlKeyDown()) then
+			-- Jump ahead to the end
+			AuctionFrameBrowse.page = pages - 1
+		elseif (IsAltKeyDown()) then
+			AuctionFrameBrowse.page = math.min(pages - 1, AuctionFrameBrowse.page + 9)
+		elseif (IsShiftKeyDown()) then
+			AuctionFrameBrowse.page = math.min(pages - 1, AuctionFrameBrowse.page + 4)
+		end
+	end
+	return nextButtonHook(...)
+end
+
+local function prevButton(...)
+	if (IsModifierKeyDown()) then
+		local curPage = AuctionFrameBrowse.page
+		if (IsControlKeyDown()) then
+			-- Jump back to the start
+			AuctionFrameBrowse.page = 1
+		elseif (IsAltKeyDown()) then
+			AuctionFrameBrowse.page = math.min(1, AuctionFrameBrowse.page - 9)
+		elseif (IsShiftKeyDown()) then
+			AuctionFrameBrowse.page = math.min(1, AuctionFrameBrowse.page - 4)
+		end
+	end
+	return prevButtonHook(...)
+end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -46,6 +80,40 @@ function load()
 	BrowseScanButton:SetParent("AuctionFrameBrowse");
 	BrowseScanButton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0);
 	BrowseScanButton:Show();
+
+	BrowseIsUsableText:SetPoint("TOPLEFT", 445, -56)
+	local w = BrowseIsUsableText:GetStringWidth() + 5
+	BrowseIsUsableText:SetWidth(w)
+	BrowseSearchButton:SetPoint("LEFT", "IsUsableCheckButton", "RIGHT", 5,0)
+
+	BrowseClearButton:SetText(" ");
+	BrowseClearButton:SetParent("AuctionFrameBrowse");
+	BrowseClearButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
+	BrowseClearButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
+	BrowseClearButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
+	BrowseClearButton:SetPoint("LEFT", "BrowseSearchButton", "RIGHT", 5,0);
+	BrowseClearButton:Show();
+
+	BrowseRefreshButton:SetText(" ");
+	BrowseRefreshButton:SetParent("AuctionFrameBrowse");
+	BrowseRefreshButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
+	BrowseRefreshButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
+	BrowseRefreshButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
+	BrowseRefreshButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 1,9);
+	BrowseRefreshButton:Show();
+
+	BrowseBuySortButton:SetText(" ");
+	BrowseBuySortButton:SetParent("AuctionFrameBrowse");
+	BrowseBuySortButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
+	BrowseBuySortButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
+	BrowseBuySortButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
+	BrowseBuySortButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 1,-9);
+	BrowseBuySortButton:Show();
+
+	nextButtonHook = BrowseNextPageButton:GetScript("OnClick")
+	BrowseNextPageButton:SetScript("OnClick", nextButton);
+	prevButtonHook = BrowsePrevPageButton:GetScript("OnClick")
+	BrowsePrevPageButton:SetScript("OnClick", prevButton);
 
 	-- Register for events and hook methods.
 	Stubby.RegisterFunctionHook("FilterButton_SetType", 200, postFilterButtonSetTypeHook);
@@ -104,23 +172,50 @@ function BrowseScanButton_OnClick()
 end
 
 -------------------------------------------------------------------------------
+-- The OnClick handler for the BrowseResetButton.
+-------------------------------------------------------------------------------
+function BrowseClearButton_OnClick()
+	BrowseName:SetText("")
+	BrowseMinLevel:SetText("")
+	BrowseMaxLevel:SetText("")
+	AuctionFrameBrowse.selectedInvtype = nil
+	AuctionFrameBrowse.selectedInvtypeIndex = nil
+	AuctionFrameBrowse.selectedClass = nil
+	AuctionFrameBrowse.selectedClassIndex = nil
+	AuctionFrameBrowse.selectedSubclass = nil
+	AuctionFrameBrowse.selectedSubclassIndex = nil
+	AuctionFrameFilters_Update()
+	IsUsableCheckButton:SetChecked(0)
+	UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
+end
+
+-------------------------------------------------------------------------------
+-- The OnClick handler for the BrowseRefreshButton.
+-------------------------------------------------------------------------------
+function BrowseRefreshButton_OnClick()
+	AuctionFrameBrowse.page = AuctionFrameBrowse.page + 1
+	prevButtonHook()
+end
+
+-------------------------------------------------------------------------------
+-- The OnClick handler for the BrowseBuySortButton.
+-------------------------------------------------------------------------------
+function BrowseBuySortButton_OnClick()
+	if (IsShiftKeyDown()) then
+		SortAuctionItems("list", "name")
+	else
+		SortAuctionItems("list", "buyout")
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Queries the auction house for the specified item name.
 -------------------------------------------------------------------------------
 function queryForItemByName(itemName)
 	if (CanSendAuctionQuery()) then
+		BrowseResetButton_OnClick()
 		-- Search for the item and switch to the Browse tab.
 		BrowseName:SetText(itemName)
-		BrowseMinLevel:SetText("")
-		BrowseMaxLevel:SetText("")
-		AuctionFrameBrowse.selectedInvtype = nil
-		AuctionFrameBrowse.selectedInvtypeIndex = nil
-		AuctionFrameBrowse.selectedClass = nil
-		AuctionFrameBrowse.selectedClassIndex = nil
-		AuctionFrameBrowse.selectedSubclass = nil
-		AuctionFrameBrowse.selectedSubclassIndex = nil
-		AuctionFrameFilters_Update()
-		IsUsableCheckButton:SetChecked(0)
-		UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
 		AuctionFrameBrowse_Search()
 	end
 end
