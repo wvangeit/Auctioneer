@@ -174,8 +174,8 @@ BtmScan.PageScan = function(resume)
 
 	-- Ok, lets look at all these lovely items
 	if (not resume) then resume = 1 end
-	BtmScan.scanning = true
-	for i=resume, pageCount do
+	i = resume
+	while ((i <= pageCount) and (BtmScan.scanning == true)) do
 		local itemLink = GetAuctionItemLink("list", i)
 		-- If:
 		--   * This item has been loaded
@@ -490,7 +490,11 @@ BtmScan.PageScan = function(resume)
 				end
 			end
 		end
+		i = i + 1
 	end
+	
+	
+	
 
 	BtmScan.scanStage = 0
 	--BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
@@ -811,9 +815,9 @@ BtmScan.Command = function (msg)
 			data.minSeen = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Seen Count"), data.minSeen))
-	elseif (cmd == "end" or cmd == "stop" or cmd == "cancel") then
+	elseif ((cmd == "end") or (cmd == "stop") or (cmd == "cancel")) then
 		BtmScan.EndScan()
-	elseif (cmd == "begin" or cmd == "start" or cmd == "scan") then
+	elseif ((cmd == "begin") or (cmd == "start") or (cmd == "scan")) then
 		BtmScan.dryRun = false
 		BtmScan.BeginScan()
 	elseif (cmd == "dryrun") then
@@ -1023,13 +1027,24 @@ BtmScan.Command = function (msg)
 end
 
 BtmScan.BeginScan = function ()
-	BtmScan.Log(tr("BottomScanner is now scanning"))
-	BtmScan.scanning = true
-	BtmScan.interval = 1
+	if (BtmScan.scanning ~= true) then
+
+		BtmScan.Log(tr("BottomScanner is now scanning"))
+		BtmScan.scanning = true
+		BtmScan.interval = 1
+
+	end
+	
+
 end
 BtmScan.EndScan = function ()
-	BtmScan.Log(tr("BottomScanner is stopping scanning"))
-	BtmScan.scanning = false
+
+    if (BtmScan.scanning == true) then
+
+		BtmScan.Log(tr("BottomScanner is stopping scanning"))
+		BtmScan.scanning = false
+
+	end
 end
 
 BtmScan.AddAuctPriceModel = function (itemID, itemRand, itemEnch, itemName, count)
