@@ -785,17 +785,6 @@ BtmScan.Command = function (msg)
 	if (not i) then cmd = msg param = nil oparam = nil end
 	if (oparam == "") then param = nil oparam = nil end
 
-	if (not BtmScanData.unlocked) then
-		if (cmd == "agree") then
-			BtmScanData.unlocked = true
-			BtmScan.Print(tr("BottomScanner is now unlocked."))
-		else
-			BtmScan.Print(tr("This program is not intended for unattended play."))
-			BtmScan.Print(tr("In order to use this addon, you must first agree to not use this addon whilst not at the computer. Please type |cff00ff80/btm agree|r now to continue."))
-		end
-		return
-	end
-
 	-- Make sure the current zone is loaded and has defaults
 	BtmScan.GetZoneConfig("command")
 
