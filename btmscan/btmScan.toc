@@ -2,9 +2,9 @@
 ## Notes: Allows you to monitor new auctions for bargains.
 ##
 ## Interface: 20000
-## LoadOnDemand: 0
+## LoadOnDemand: 1
 ## SavedVariables: BtmScanData
-## OptionalDeps: EnhTooltip
+## Dependencies: EnhTooltip, Stubby, Auctioneer
 ##
 ## URL: http://norganna.org/btmscan/
 ##
