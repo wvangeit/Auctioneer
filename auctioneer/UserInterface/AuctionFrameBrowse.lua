@@ -81,17 +81,12 @@ function load()
 	BrowseScanButton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0);
 	BrowseScanButton:Show();
 
-	BrowseIsUsableText:SetPoint("TOPLEFT", 445, -56)
-	local w = BrowseIsUsableText:GetStringWidth() + 5
-	BrowseIsUsableText:SetWidth(w)
-	BrowseSearchButton:SetPoint("LEFT", "IsUsableCheckButton", "RIGHT", 5,0)
-
 	BrowseClearButton:SetText(" ");
 	BrowseClearButton:SetParent("AuctionFrameBrowse");
 	BrowseClearButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
 	BrowseClearButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
 	BrowseClearButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
-	BrowseClearButton:SetPoint("LEFT", "BrowseSearchButton", "RIGHT", 5,0);
+	BrowseClearButton:SetPoint("TOPLEFT", "AuctionFrameBrowse", "TOPLEFT", 80, -16);
 	BrowseClearButton:Show();
 
 	BrowseRefreshButton:SetText(" ");
@@ -99,7 +94,7 @@ function load()
 	BrowseRefreshButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
 	BrowseRefreshButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
 	BrowseRefreshButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
-	BrowseRefreshButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 1,9);
+	BrowseRefreshButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 5,0);
 	BrowseRefreshButton:Show();
 
 	BrowseBuySortButton:SetText(" ");
@@ -107,7 +102,7 @@ function load()
 	BrowseBuySortButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
 	BrowseBuySortButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
 	BrowseBuySortButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
-	BrowseBuySortButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 1,-9);
+	BrowseBuySortButton:SetPoint("LEFT", "BrowseRefreshButton", "RIGHT", 5,0);
 	BrowseBuySortButton:Show();
 
 	nextButtonHook = BrowseNextPageButton:GetScript("OnClick")

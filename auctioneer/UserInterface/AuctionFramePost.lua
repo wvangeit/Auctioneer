@@ -299,14 +299,6 @@ function AuctionFramePost_UpdatePriceModels(frame)
 					table.insert(frame.prices, fixedPrice);
 				end
 
-				-- Add any pricing models from external addons
-				for pos, priceFunc in pairs(AuctionFramePost_AdditionalPricingModels) do
-					local priceModel = priceFunc(id, rprop, enchant, name, count)
-					if (type(priceModel) == "table") then
-						table.insert(frame.prices, priceModel)
-					end
-				end
-
 				-- Get the last sale price if BeanCounter is loaded.
 				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.Sales and BeanCounter.Sales.GetLastSaleForItem) then
 					-- TODO: Support should be added to BeanCounter for looking
@@ -330,6 +322,15 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				auctioneerPrice.buyout = buyPrice;
 				auctioneerPrice.bid = bidPrice;
 				table.insert(frame.prices, auctioneerPrice);
+
+				-- Add any pricing models from external addons
+				for pos, priceFunc in pairs(AuctionFramePost_AdditionalPricingModels) do
+					local priceModel = priceFunc(id, rprop, enchant, name, count)
+					if (type(priceModel) == "table") then
+						table.insert(frame.prices, priceModel)
+					end
+				end
+
 			end
 
 			-- Add the fallback custom price
@@ -339,6 +340,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 			customPrice.bid = nil;
 			customPrice.buyout = nil;
 			table.insert(frame.prices, customPrice);
+
 
 			-- Update the price model combo.
 			local dropdown = getglobal(frame:GetName().."PriceModelDropDown");
@@ -979,13 +981,13 @@ function AuctionFramePost_PriceModelDropDown_Initialize()
 	local dropdown = this:GetParent();
 	local frame = dropdown:GetParent();
 	if (frame.prices) then
-		for index, value in pairs(frame.prices) do
+		for index, value in ipairs(frame.prices) do
 			local price = value;
 			local info = {};
 			info.text = price.text;
 			info.func = AuctionFramePost_PriceModelDropDownItem_OnClick;
 			info.owner = dropdown;
-			return UIDropDownMenu_AddButton(info);
+			UIDropDownMenu_AddButton(info);
 		end
 	end
 end
