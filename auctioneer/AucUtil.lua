@@ -379,7 +379,7 @@ function getItems(str)
 	end
 	local itemList = {};
 
-	for itemID, enchant, randomProp in link:match("|Hitem:(%p?%d+):(%p?%d+):%p?%d+:%p?%d+:%p?%d+:%p?%d+:(%p?%d+):%p?%d+|h%[(.-)%]|h") do
+	for itemID, enchant, randomProp in str:gmatch("|Hitem:(%p?%d+):(%p?%d+):%p?%d+:%p?%d+:%p?%d+:%p?%d+:(%p?%d+):%p?%d+|h%[(.-)%]|h") do
 		tinsert(itemList, strjoin(":", itemID, randomProp, enchant))
 	end
 	return itemList;
