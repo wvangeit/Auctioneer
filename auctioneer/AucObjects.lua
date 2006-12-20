@@ -30,4 +30,6 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-Auctioneer = {};
+if (not Auctioneer) then
+	Auctioneer = {};
+end

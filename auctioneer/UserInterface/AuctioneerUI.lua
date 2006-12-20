@@ -362,6 +362,7 @@ end
 --=============================================================================
 -- Initialization
 --=============================================================================
+if (not Auctioneer) then Auctioneer = {} end
 if (Auctioneer.UI) then return end;
 debugPrint("AuctioneerUI.lua loaded");
 
