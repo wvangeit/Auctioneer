@@ -1523,7 +1523,13 @@ local function checkItem(i, iLink, iCount, bidType, bidPrice)
 			if (bidType == tr("bought")) then
 				if (aBuy == bidPrice) then
 					isCorrect = true
-				elseif (aMin + aInc == bidPrice) then
+				end
+			else
+				if (aCur and aCur > 0) then
+					if (aCur + aInc == bidPrice) then
+						isCorrect = true
+					end
+				elseif (aMin == bidPrice) then
 					isCorrect = true
 				end
 			end
