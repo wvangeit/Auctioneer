@@ -264,23 +264,26 @@ end
 -- 5. The bid scanner is performing a scan.
 -- 6. The bid manager is showing the confirmation window.
 -------------------------------------------------------------------------------
-function postCanSendAuctionQuery(_, returnValues)
+function postCanSendAuctionQuery(_, returnValues, noHook, who)
+	-- We've been asked not to tamper with the results
+	if (noHook) then return end
+
 	-- If Blizzard will allow the query, check if should allow it.
 	if (returnValues and returnValues[1]) then
 		if (isQueryInProgress()) then
-			--debugPrint("Overriding CanSendAuctionQuery() due to query being in progress");
+			debugPrint("Overriding CanSendAuctionQuery() due to query being in progress");
 			return "setreturn", { false };
 		elseif (isBidInProgress()) then
-			--debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress");
+			debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress");
 			return "setreturn", { false };
 		elseif (hookCanSendAuctionQuery and Auctioneer.ScanManager.IsScanning()) then
-			--debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress");
+			debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress");
 			return "setreturn", { false };
 		elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
-			--debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
+			debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
 			return "setreturn", { false };
 		elseif (hookCanSendAuctionQuery and Auctioneer.BidManager.ShowingConfirmation()) then
-			--debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown");
+			debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown");
 			return "setreturn", { false };
 		end
 	end
@@ -294,9 +297,7 @@ end
 -- 3. There is a bid in progress.
 -------------------------------------------------------------------------------
 function canSendAuctionQuery()
-	hookCanSendAuctionQuery = false;
-	local result = CanSendAuctionQuery();
-	hookCanSendAuctionQuery = true;
+	local result = CanSendAuctionQuery(true, "auctioneer");
 	return result;
 end
 
@@ -333,9 +334,7 @@ function preQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, 
 	-- If BottomScanner is driving, let it do it's own thing without
 	-- interference from us, cause we don't really know what's going
 	-- on, as BtmScan overrides CanSendAuctionQuery()
-	if (BtmScan and BtmScan.scanStage and BtmScan.scanStage > 0) then
-		return
-	end
+	if (BtmScan and BtmScan.scanStage and BtmScan.scanStage > 0) then return end
 	if (hookQueryAuctionItems) then
 		if (not CanSendAuctionQuery()) then
 			debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false");

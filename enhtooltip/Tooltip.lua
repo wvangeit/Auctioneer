@@ -1513,6 +1513,7 @@ local function dump(...)
 	return out
 end
 
+local lastOut = ""
 function debugPrint(...)
 	local debugWin
 	for i=1, NUM_CHAT_WINDOWS do
@@ -1538,7 +1539,11 @@ function debugPrint(...)
 			out = out .. dump(currentArg)
 		end
 	end
-	getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3)
+
+	if (out ~= lastOut) then
+		getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3)
+		lastOut = out
+	end
 end
 
 

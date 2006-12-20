@@ -43,11 +43,7 @@ BtmScan.OnLoad = function ()
 
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
-
-	if( not BtmScan.hookedCanSendAuctionQuery ) then
-		BtmScan.hookedCanSendAuctionQuery = CanSendAuctionQuery
-		CanSendAuctionQuery = BtmScan.CanSendAuctionQuery;
-	end
+	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.CanSendAuctionQuery)
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("BtmScan", "CommandHandler", [[
@@ -185,7 +181,7 @@ BtmScan.OnUpdate = function(...)
 		end
 
 		-- Check to see if the AH is open for business
-		if (not BtmScan.hookedCanSendAuctionQuery() or not (AuctionFrame and AuctionFrame:IsVisible())) then
+		if (not CanSendAuctionQuery(true, "btmscan") or not (AuctionFrame and AuctionFrame:IsVisible())) then
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
@@ -575,9 +571,11 @@ BtmScan.PageScan = function(resume)
 	--BtmScan.processing = false
 end
 
-BtmScan.CanSendAuctionQuery = function()
-	if (BtmScan.scanStage and BtmScan.scanStage > 0) then return false end
-	return BtmScan.hookedCanSendAuctionQuery()
+BtmScan.CanSendAuctionQuery = function(_, _, noHook, who)
+	-- We don't care about nohook - we need the scan to stop!
+	if (BtmScan.scanStage and BtmScan.scanStage > 0 and (not who or who ~= "btmscan")) then
+		return "setreturn", { false }
+	end
 end
 
 -- Get a GSC value and work out what it's worth
