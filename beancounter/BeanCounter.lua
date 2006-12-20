@@ -219,7 +219,8 @@ function BeanCounter_AuctionHouseLoaded()
 
 	-- Hook the tab click method so we know when to show our tab.
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BeanCounter_AuctionFrameTab_OnClickHook)
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, preContainerFrameItemButtonOnClickHook);
+-- TODO: Reenable hook as of WoW 2.0.3 (BC) patch
+--	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnClick", -200, preContainerFrameItemButtonOnClickHook);
 	Stubby.RegisterFunctionHook("SetSelectedAuctionItem", -200, preSetSelectedAuctionItemHook);
 end
 
