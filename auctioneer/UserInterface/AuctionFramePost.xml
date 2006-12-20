@@ -105,9 +105,9 @@
 				</FontString>
 				<FontString name="$parentStartPriceText" inherits="GameFontHighlightSmall">
 					<Anchors>
-						<Anchor point="TOPLEFT" relativeTo="$parentPriceModelNoteText">
+						<Anchor point="TOPLEFT" relativeTo="$parentPriceModelText">
 							<Offset>
-								<AbsDimension x="0" y="-18"/>
+								<AbsDimension x="0" y="-64"/>
 							</Offset>
 						</Anchor>
 					</Anchors>
