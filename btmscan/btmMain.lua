@@ -1826,7 +1826,7 @@ BtmScan.CreateLogWindow = function()
 
 		BtmScan.LogFrame.Dates[i] = BtmScan.LogFrame.LineFrames[i]:CreateFontString("BtmScanLogDate"..i, "HIGH")
 		BtmScan.LogFrame.Dates[i]:SetPoint("TOPLEFT", BtmScan.LogFrame.LineFrames[i], "TOPLEFT")
-		BtmScan.LogFrame.Dates[i]:SetWidth(150)
+		BtmScan.LogFrame.Dates[i]:SetWidth(90)
 		BtmScan.LogFrame.Dates[i]:SetFont("Fonts\\FRIZQT__.TTF",11)
 		BtmScan.LogFrame.Dates[i]:SetJustifyH("LEFT")
 		BtmScan.LogFrame.Dates[i]:SetText("Date"..i)
@@ -1853,7 +1853,7 @@ BtmScan.CreateLogWindow = function()
 		for i=1, LOG_LINES do
 			line = rows - (FauxScrollFrame_GetOffset(BtmScanLogFrame) + i) + 1
 			if (rows > 0 and line <= rows and line > 0) then
-				BtmScan.LogFrame.Dates[i]:SetText("["..date("%Y-%m-%d %H:%M:%S", data.logText[line][1]).."]")
+				BtmScan.LogFrame.Dates[i]:SetText("["..date("%d %b %H:%M", data.logText[line][1]).."]")
 				BtmScan.LogFrame.Lines[i]:SetText(data.logText[line][2])
 			else
 				BtmScan.LogFrame.Dates[i]:SetText("")
