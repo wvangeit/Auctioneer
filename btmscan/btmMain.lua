@@ -1799,7 +1799,7 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.LogFrame:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 16, edgeSize = 1,
+		tile = true, tileSize = 16, edgeSize = 4,
 		insets = { left = 6, right = 6, top = 6, bottom = 6
 	}})
 	BtmScan.LogFrame:SetBackdropColor(0,0,0, 0.78)
