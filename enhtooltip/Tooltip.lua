@@ -1570,7 +1570,9 @@ end
 
 -- Hook the LootLink tooltip function
 local function hookLootLink()
-	Stubby.RegisterFunctionHook("LootLinkItemButton_OnEnter", 200, llHookOnEnter)
+	if (LootLinkItemButton_OnEnter) then
+		Stubby.RegisterFunctionHook("LootLinkItemButton_OnEnter", 200, llHookOnEnter)
+	end
 end
 
 -- Hook tradeskill functions
