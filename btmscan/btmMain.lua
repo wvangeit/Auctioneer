@@ -326,6 +326,9 @@ BtmScan.PageScan = function(resume)
 						local whyBuy = ""
 						local noSafety = false
 						local buying = itemLink
+						local value = 0
+						local price = 0
+						local profit = 0
 						local message
 
 						if (iCount and iCount > 1) then buying = buying.."x"..iCount end
@@ -422,11 +425,13 @@ BtmScan.PageScan = function(resume)
 								if (bBase and bBase > 0 and bCount >= data.minSeen) then
 									if (iBuy and iBuy>0 and bBase >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
 										whyBuy = tr("resale")
-										message = tr("Buying %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBuy), whyBuy, tr("%1 (%2 med x%3 / %4 cons)", BtmScan.GSC(bBase), BtmScan.GSC(auctMedian), auctCount, BtmScan.GSC(iqwm)), BtmScan.GSC(bBase-iBuy))
+										price = iBuy
+										value = bBase
 										buyIt = true
 									elseif (bBase >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
 										whyBuy = tr("resale")
-										message = tr("Bidding %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBid), whyBuy, tr("%1 (%2 med x%3 / %4 cons)", BtmScan.GSC(bBase), BtmScan.GSC(auctMedian), auctCount, BtmScan.GSC(iqwm)), BtmScan.GSC(bBase-iBid))
+										price = iBid
+										value = bBase
 										bidIt = true
 									end
 								end
@@ -460,12 +465,14 @@ BtmScan.PageScan = function(resume)
 								--   * It's buyout cost is less than our maximum price
 								if (iBuy and iBuy>0 and disenchantValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
 									whyBuy = tr("disenchant")
-									message = tr("Buying %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBuy), whyBuy, BtmScan.GSC(disenchantValue), BtmScan.GSC(disenchantValue-iBuy))
+									price = iBuy
+									value = disenchantValue
 									buyIt = true
 									noSafety = true
 								elseif (not bidIt and disenchantValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
 									whyBuy = tr("disenchant")
-									message = tr("Bidding %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBid), whyBuy, BtmScan.GSC(disenchantValue), BtmScan.GSC(disenchantValue-iBid))
+									price = iBid
+									value = disenchantValue
 									bidIt = true
 									noSafety = true
 								end
@@ -484,12 +491,14 @@ BtmScan.PageScan = function(resume)
 							--   * It's buyout cost is less than our maximum price
 							if (iBuy and iBuy>0 and vendorValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
 								whyBuy = tr("vendor")
-								message = tr("Buying %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBuy), whyBuy, BtmScan.GSC(vendorValue), BtmScan.GSC(vendorValue-iBuy))
+								price = iBuy
+								value = vendorValue
 								buyIt = true
 								noSafety = true
 							elseif (not bidIt and vendorValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
 								whyBuy = tr("vendor")
-								message = tr("Bidding %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBid), whyBuy, BtmScan.GSC(vendorValue), BtmScan.GSC(vendorValue-iBid))
+								price = iBid
+								value = vendorValue
 								bidIt = true
 								noSafety = true
 							end
@@ -504,13 +513,15 @@ BtmScan.PageScan = function(resume)
 						if (not buyIt and snatchPrice > 0) then
 							if (iBuy and iBuy>0 and iBuy < snatchPrice and GetMoney()-iBuy >= data.reserve) then
 								whyBuy = tr("snatch")
-								message = tr("Buying %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBuy), whyBuy, BtmScan.GSC(snatchPrice), BtmScan.GSC(snatchPrice-iBuy))
+								price = iBuy
+								value = snatchPrice
 								buyIt = true
 								noSafety = true
 								snatching = true
 							elseif (not bidIt and iBid <= snatchPrice and GetMoney()-iBid >= data.reserve) then
 								whyBuy = tr("snatch")
-								message = tr("Bidding %1 at %2 [%3 at %4 = %5 profit]", buying, BtmScan.GSC(iBid), whyBuy, BtmScan.GSC(snatchPrice), BtmScan.GSC(snatchPrice-iBid))
+								price = iBid
+								value = snatchPrice
 								bidIt = true
 								noSafety = true
 							end
@@ -521,14 +532,18 @@ BtmScan.PageScan = function(resume)
 						-- If for some reason the buyIt flag was set above, then place a bid on this item
 						-- equal to the buyout price (ie: buy it out)
 						if (buyIt or bidIt) then
-							local bidType, bidPrice
+							local bidText, bidType, bidPrice
 							if (buyIt) then
+								bidText = tr("Buying")
 								bidType = tr("bought")
 								bidPrice = iBuy
 							elseif (bidIt and data.allowBids > 0 and not iHigh and not ignoreIt) then
+								bidText = tr("Bidding")
 								bidType = tr("bid on")
 								bidPrice = iBid
 							end
+							profit = value - price
+							message = tr("%1 %2 at %3 [%4 at %5 = %6 profit]", bidText, buying, BtmScan.GSC(price), whyBuy, BtmScan.GSC(value), BtmScan.GSC(profit))
 							
 							if bidPrice
 							and GetMoney()-bidPrice >= data.reserve
@@ -540,7 +555,7 @@ BtmScan.PageScan = function(resume)
 									BtmScan.Print(tr("Would have %1 %2 for %3, but we are doing a dry run.", bidType, buying, bidPrice))
 								else
 									local bidSig = itemLink.."x"..iCount
-									BtmScan.PromptPurchase(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, itemLink, iTex, message)
+									BtmScan.PromptPurchase(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, itemLink, iTex, price, value, profit, message)
 									return
 								end
 							end
@@ -1482,7 +1497,7 @@ end
 
 
 
-BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, iLink, iTex, message)
+BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, iLink, iTex, price, value, profit, message)
 	BtmScan.scanStage = 3
 	BtmScan.Prompt.index     = i
 	BtmScan.Prompt.bidSig    = bidSig
@@ -1496,6 +1511,9 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt.sanityKey = sanityKey
 	BtmScan.Prompt.iLink     = iLink
 	BtmScan.Prompt.iTex      = iTex
+	BtmScan.Prompt.price     = price
+	BtmScan.Prompt.value     = value
+	BtmScan.Prompt.profit    = profit
 	BtmScan.Prompt.message   = message
 
 	local bidText = bidType
@@ -1505,7 +1523,7 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt.Lines[2]:SetText("  "..iLink.."x"..iCount)
 	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", bidText, BtmScan.GSC(bidPrice)))
 	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", whyBuy))
-	BtmScan.Prompt.Lines[5]:SetText("");
+	BtmScan.Prompt.Lines[5]:SetText("  "..tr("Valued at %1 (%2 profit)", BtmScan.GSC(value), BtmScan.GSC(profit)))
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(iTex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
 	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.ogg")
