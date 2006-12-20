@@ -1226,6 +1226,7 @@ end
 -- Gets the configdata for the current zone
 BtmScan.GetZoneConfig = function (whence)
 	local newZone = BtmScan.ConfigZone(whence.."getzone")
+	if (not BtmScanData.refresh) then BtmScanData.refresh = 25 end -- Page refresh time
 	if not newZone then
 		BtmScan.Print(tr("BottomScanner: %1", tr("Unable to get config zone: %1", whence)))
 		dataZone = ""
@@ -1269,7 +1270,6 @@ BtmScan.GetZoneConfig = function (whence)
 	if (not data.snatch) then data.snatch = {} end -- snatch list
 	if (not data.snatched) then data.snatched = {} end -- snatched list
 	if (not data.worth) then data.worth = {} end -- fixed price list
-	if (not data.refresh) then data.refresh = 25 end -- fixed price list
 	if (not data.bids) then data.bids = {} end -- latest bids and reasons
 	if (not data.safetyCount) then data.safetyCount = 6 end -- safetynet count
 	if (not data.safetyCost) then
