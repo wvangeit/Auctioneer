@@ -185,7 +185,6 @@ function loadDatabase()
 
 	-- Make AuctioneerHistoryDB the loaded database!
 	LoadedTransactionDB = AuctioneerTransactionDB;
-	debugPrint(LoadedTransactionDB)
 end
 
 -------------------------------------------------------------------------------
@@ -205,20 +204,41 @@ function createDatabaseFrom3x()
 		local ah = createAHDatabase(saveName, BASE_TRANSACTIONDB_VERSION)
 		db[saveName] = ah
 
+		local itemKey
+		local itemSignature, bidAmmount, bidOrBuyout, ownerName
+		local itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra
+
 		for charName, charData in pairs(AuctionConfig.bids) do
 			ah[charName] = {}
 			local charDB = ah[charName]
 
 			for epochTime, transactionData in pairs(charData) do
-				local itemData, bidAmmount, bidOrBuyout, ownerName = ("|"):split(transactionData)
-				local itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra= strsplit(":", itemData)
+				if (type(transactionData) == "string") then --Auctioneer 3.8 format (string)
+					itemSignature, bidAmmount, bidOrBuyout, ownerName = ("|"):split(transactionData)
+					itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra = (":"):split(itemSignature)
 
-				if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
-					itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
+					if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
+						itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
+					end
+
+				else --Pre Auctioneer 3.8 format (table)
+					ownerName = transactionData.itemOwner
+					bidAmmount = transactionData.bidAmount
+					itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra = (":"):split(transactionData.signature)
+
+					if (transactionData.itemWon) then
+						bidOrBuyout = 1
+					else
+						bidOrBuyout = 0
+					end
+
+					if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
+						itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
+					end
 				end
-				--[[ ["e1234567890.0"] = "ItemName;AuctioneerItemKey;BidOrBuyout;ResultCode;BidAmmount;MinBid;CurBid;Buyout;PlayerMoney;Owner" ]]
 
-				local itemKey = createItemKey(itemID, randomProp, enchant, uniqueID)
+				itemKey = createItemKey(itemID, randomProp, enchant, uniqueID)
+				--["e1234567890.0"] = "ItemName;AuctioneerItemKey;BidOrBuyout;ResultCode;BidAmmount;MinBid;CurBid;Buyout;PlayerMoney;Owner"
 				charDB[epochTime..".0"] = (";"):join(itemName, itemKey, bidOrBuyout, "BidSent", bidAmmount, minBid, math.min(bidAmmount, buyout), buyout, -1, ownerName)
 			end
 		end
