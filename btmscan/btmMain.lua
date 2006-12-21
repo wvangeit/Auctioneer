@@ -195,7 +195,10 @@ BtmScan.OnUpdate = function(...)
 		--BtmScan.processing = true
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
-		QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
+		if not Auctioneer.ScanManager.IsScanning() then
+			-- If Auctioneer is currently scanning, then we just need to piggyback it's calls
+			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
+		end
 		AuctionFrameBid.page = page
 	end
 end
