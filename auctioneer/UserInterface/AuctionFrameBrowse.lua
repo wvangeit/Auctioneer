@@ -208,7 +208,7 @@ end
 -------------------------------------------------------------------------------
 function queryForItemByName(itemName)
 	if (CanSendAuctionQuery()) then
-		BrowseResetButton_OnClick()
+		BrowseClearButton_OnClick()
 		-- Search for the item and switch to the Browse tab.
 		BrowseName:SetText(itemName)
 		AuctionFrameBrowse_Search()
