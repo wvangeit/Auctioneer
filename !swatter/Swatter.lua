@@ -1,38 +1,39 @@
 --[[
+	Swatter - An AddOn debugging aid for World of Warcraft.
+	$Id$
+	Copyright (C) 2006 Norganna
 
-Swatter - An AddOn debugging aid for World of Warcraft.
-$Id$
-Copyright (C) 2006 Norganna
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ]]
+
 Swatter = {
 	origHandler = geterrorhandler(),
-	nilFrame = {},
+	nilFrame = {
+		GetName = function() return "Global" end
+	},
 }
+
 SwatterData = {
 	enabled = true,
 	autoshow = true,
 }
 
-function Swatter.nilFrame.GetName() return "Global" end
-
 function Swatter.ChatMsg(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(msg)
 end
+
 local chat = Swatter.ChatMsg
 
 function Swatter.IsEnabled()
@@ -41,16 +42,19 @@ end
 
 function Swatter.OnError(msg, frame, stack)
 	if (not SwatterData.enabled) then return Swatter.origHandler(msg, frame) end
-	if (not frame) then frame = Swatter.nilFrame end
 
-	if (not frame.Swatter) then frame.Swatter = {} end
+	msg = msg or ""
+	frame = frame or Swatter.nilFrame
+	stack = stack or debugstack(2, 20, 20)
+
+	frame.Swatter = frame.Swatter or {}
 
 	local count = frame.Swatter[msg] or 0
 	frame.Swatter[msg] = count + 1
 
 	Swatter.lastFrame = frame
 	Swatter.lastMsg = msg
-	Swatter.lastBt = stack or debugstack(2, 20, 20)
+	Swatter.lastBt = stack
 
 	if (count == 0) then
 		if (SwatterData.autoshow) then
@@ -84,14 +88,19 @@ function Swatter.ErrorShow()
 	local count = frame.Swatter[msg]
 	local message = msg:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1")
 	local trace = "   "..bt:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n", "\n   ")
-	
-	Swatter.Error.Box:SetText("Error occured in: "..(frame:GetName() or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n")
+
+	Swatter.Error.lastError = "Error occured in: "..(frame:GetName() or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n"
+	Swatter.Error.Box:SetText(Swatter.Error.lastError)
 end
+
 function Swatter.ErrorDone()
 	Swatter.Error:Hide()
 end
+
 function Swatter.ErrorUpdate()
+	Swatter.Error.Box:SetText(Swatter.Error.lastError)
 	Swatter.Error.Scroll:UpdateScrollChildRect()
+	Swatter.Error.Box:ClearFocus()
 end
 
 -- Create our error message frame
