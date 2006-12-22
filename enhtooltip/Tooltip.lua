@@ -1002,7 +1002,7 @@ function baselinkFromLink(link)
 	if( not link ) then
 		return
 	end
-	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h")
+	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h")
 end
 
 function qualityFromLink(link)
