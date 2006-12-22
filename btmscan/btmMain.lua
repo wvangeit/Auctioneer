@@ -1558,7 +1558,6 @@ local function checkItem(i, iLink, iCount, bidType, bidPrice)
 end
 
 BtmScan.PerformPurchase = function()
-	BtmScan.scanStage = 2
 	local i         = BtmScan.Prompt.index
 	local iLink     = BtmScan.Prompt.iLink
 	local iCount    = BtmScan.Prompt.iCount
@@ -1592,7 +1591,9 @@ BtmScan.PerformPurchase = function()
 	end
 
 	if (not there) then
+		BtmScan.Prompt:Hide()
 		BtmScan.Log(tr("Warning: Unable to make purchase of %1. Can't find on current page.", iLink))
+		BtmScan.scanStage = 2
 		return
 	end
 	
@@ -1618,6 +1619,7 @@ BtmScan.PerformPurchase = function()
 		data.snatched[sanityKey] = snatched + iCount
 	end
 	BtmScan.Prompt:Hide()
+	BtmScan.scanStage = 2
 end
 
 BtmScan.CancelPurchase = function()
