@@ -154,7 +154,6 @@ BtmScan.OnUpdate = function(...)
 
 	-- If we are supposed to be scanning, then let's do it!
 	if (BtmScan.scanning) then
-		p("Checking to scan")
 
 		-- Time to scan the page
 		if (not BtmScan.pageCount) then
@@ -168,16 +167,13 @@ BtmScan.OnUpdate = function(...)
 		if (totalPages ~= BtmScan.pageCount) then
 			BtmScan.pageCount = totalPages
 			BtmScan.interval = 6 -- Short cut the delay, we need to reload now damnit!
-			p("Not last page, scheduling restart in", BtmScan.interval)
 		else
 			BtmScan.interval = BtmScanData.refresh
-			p("At last page, scheduling restart in", BtmScan.interval)
 		end
 
 		-- Check to see if the AH is open for business
 		if not (AuctionFrame and AuctionFrame:IsVisible() and CanSendAuctionQuery(true, "btmscan")) then
 			BtmScan.interval = 1 -- Try again in one second
-			p("Not ready, retrying scan in", BtmScan.interval)
 			return
 		end
 
@@ -189,7 +185,6 @@ BtmScan.OnUpdate = function(...)
 		-- Show me tha money!
 		--BtmScan.processing = true
 		BtmScan.scanStage = 2
-		p("Beginning scan")
 		local page = BtmScan.pageCount-offset or 0
 		if not Auctioneer.ScanManager.IsScanning() then
 			-- Auctioneer is not scanning, so  lets send  off a query
