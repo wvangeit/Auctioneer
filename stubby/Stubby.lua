@@ -191,6 +191,7 @@ local clearConfig					-- clearConfig(ownerAddOn, variable)
 local createAddOnLoadBootCode		-- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 local createEventLoadBootCode		-- createEventLoadBootCode(ownerAddOn, triggerEvent)
 local createFunctionLoadBootCode	-- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
+local errorHandler					-- errorHandler(stackLevel, ...)
 local eventWatcher					-- eventWatcher(event)
 local events						-- events(event, param)
 local getConfig						-- getConfig(ownerAddOn, variable)
@@ -264,11 +265,7 @@ function hookCall(funcName, ...)
 			if (orig and func.p >= 0) then
 				retVal = {pcall(orig, ...)}
 				if (not table.remove(retVal, 1)) then
-					if (Swatter and Swatter.IsEnabled()) then
-						Swatter.OnError("Hook error on "..tostring(funcName).."()\n   "..retVal[1], Stubby, debugstack(2, 3, 6))
-					else
-						Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
-					end
+					Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1])
 				end
 				orig = nil
 			end
@@ -293,11 +290,7 @@ function hookCall(funcName, ...)
 				--]]
 
 			else
-				if (Swatter and Swatter.IsEnabled()) then
-					Swatter.OnError("Hook error on "..tostring(funcName).."()\n   "..res, Stubby, debugstack(2, 3, 6))
-				else
-					Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", res, "\nCall Chain:\n", debugstack(2, 3, 6))
-				end
+				Stubby.Print(2, "Error occured while running hooks for: ", tostring(funcName), "\n", res)
 			end
 		end
 	end
@@ -305,11 +298,7 @@ function hookCall(funcName, ...)
 	if (orig) then
 		retVal = {pcall(orig, ...)}
 		if (not table.remove(retVal, 1)) then
-			if (Swatter and Swatter.IsEnabled()) then
-				Swatter.OnError("Hook error on "..tostring(funcName).."()\n   "..retVal[1], Stubby, debugstack(2, 3, 6))
-			else
-				Stubby.Print("Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1], "\nCall Chain:\n", debugstack(2, 3, 6))
-			end
+			Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1])
 		end
 	end
 
@@ -329,12 +318,7 @@ function hookInto(triggerFunction)
 		local functionString = ']]..triggerFunction..[[';
 
 		if (not (type(Stubby_OldFunction) == "function")) then
-			if (Swatter and Swatter.IsEnabled()) then
-				Swatter.OnError("Compile error on "..tostring(functionString).."()\n   Not a valid function", Stubby, debugstack(2, 3, 6))
-			else
-				Stubby.Print("Error occured while compiling hook: ", tostring(functionString), "is not a valid function \nCall Chain:\n", debugstack(2, 3, 6))
-			end
-			return
+			return Stubby.ErrorHandler(3, "Error occured while compiling hook: ", tostring(functionString), "is not a valid function")
 		end
 
 		Stubby_NewFunction = function(...)
@@ -350,12 +334,7 @@ function hookInto(triggerFunction)
 		Stubby_NewFunction = nil
 		Stubby_OldFunction = nil
 
-		if (Swatter and Swatter.IsEnabled()) then
-			Swatter.OnError("Compile error on "..tostring(triggerFunction).."()\n   "..errorMessage, Stubby, debugstack(2, 3, 6))
-		else
-			Stubby.Print("Error occured while compiling hook: ", tostring(triggerFunction), "\n", errorMessage, "\nCall Chain:\n", debugstack(2, 3, 6))
-		end
-		return
+		return Stubby.ErrorHandler(2, "Error occured while compiling hook:", tostring(triggerFunction), "\n", errorMessage)
 	end
 
 	config.hooks.functions[triggerFunction] = Stubby_NewFunction
@@ -363,6 +342,21 @@ function hookInto(triggerFunction)
 
 	Stubby_NewFunction = nil
 	Stubby_OldFunction = nil
+end
+
+function errorHandler(stackLevel, ...)
+	local msg = tostring(select(1, ...))
+	for i = 1, select("#", ...) do
+		msg = msg.." "..tostring(select(i, ...))
+	end
+	
+	stackLevel = (stackLevel or 1) + 1
+	
+	if (Swatter and Swatter.IsEnabled()) then
+		return Swatter.OnError(msg, Stubby, debugstack(stackLevel, 3, 6))
+	else
+		return Stubby.Print(msg, "\nCall Chain:\n", debugstack(2, 3, 6))
+	end
 end
 
 function getOrigFunc(triggerFunction)
@@ -808,6 +802,7 @@ Stubby = {
 	ClearConfig = clearConfig,
 	GetOrigFunc = getOrigFunc,
 	LoadWatcher = loadWatcher,
+	ErrorHandler = errorHandler,
 	EventWatcher = eventWatcher,
 	RegisterBootCode = registerBootCode,
 	RegisterEventHook = registerEventHook,
