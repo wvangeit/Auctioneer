@@ -213,12 +213,19 @@ function createDatabaseFrom3x()
 			local charDB = ah[charName]
 
 			for epochTime, transactionData in pairs(charData) do
-				if (type(transactionData) == "string") then --Auctioneer 3.8 format (string)
-					itemSignature, bidAmmount, bidOrBuyout, ownerName = ("|"):split(transactionData)
-					itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra = (":"):split(itemSignature)
+				local store --Flag to indicate whether or not we attempt to store data
 
-					if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
-						itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
+				if (type(transactionData) == "string") then --Auctioneer 3.8 format (string)
+					if (transactionData:find("|cffffff00(bid)|r", 1, true)) then --Corrupted data
+						store = false --Flag so that the storage code below doesn't scream
+					else
+						itemSignature, bidAmmount, bidOrBuyout, ownerName = ("|"):split(transactionData)
+						itemID, randomProp, enchant, itemName, stackSize, minBid, buyout, uniqueID, extra = (":"):split(itemSignature)
+
+						if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
+							itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
+						end
+						store = true --Flag so that this data is saved
 					end
 
 				else --Pre Auctioneer 3.8 format (table)
@@ -235,11 +242,14 @@ function createDatabaseFrom3x()
 					if (extra) then --Some items have a colon (":") in their names, so account for this possibility when converting
 						itemName, stackSize, minBid, buyout, uniqueID = itemName..":"..stackSize, minBid, buyout, uniqueID, extra
 					end
+					store = true --Flag so that this data is saved
 				end
 
-				itemKey = createItemKey(itemID, randomProp, enchant, uniqueID)
-				--["e1234567890.0"] = "ItemName;AuctioneerItemKey;BidOrBuyout;ResultCode;BidAmmount;MinBid;CurBid;Buyout;PlayerMoney;Owner"
-				charDB[epochTime..".0"] = (";"):join(itemName, itemKey, bidOrBuyout, "BidSent", bidAmmount, minBid, math.min(bidAmmount, buyout), buyout, -1, ownerName)
+				if (store) then
+					itemKey = createItemKey(itemID, randomProp, enchant, uniqueID)
+					--["e1234567890.0"] = "ItemName;AuctioneerItemKey;BidOrBuyout;ResultCode;BidAmmount;MinBid;CurBid;Buyout;PlayerMoney;Owner"
+					charDB[epochTime..".0"] = (";"):join(itemName, itemKey, bidOrBuyout, "BidSent", bidAmmount, minBid, math.min(bidAmmount, buyout), buyout, -1, ownerName)
+				end
 			end
 		end
 	end
