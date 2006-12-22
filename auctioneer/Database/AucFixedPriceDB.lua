@@ -166,11 +166,13 @@ function createDatabaseFrom3x()
 	local db = {};
 	if (AuctionConfig.fixedprice) then
 		for ahKey, ahData in pairs(AuctionConfig.fixedprice) do
-			local newAhKey = ahKey:lower();
-			local ah = db[newAhKey] or createAHDatabase(newAhKey, BASE_FIXEDPRICEDB_VERSION);
-			db[newAhKey] = ah;
-			for itemKey, itemData in pairs(ahData) do
-				ah.fixedPrices[itemKey] = itemData:gsub(":", ";");
+			if (type(ahData) == "table") then
+				local newAhKey = ahKey:lower();
+				local ah = db[newAhKey] or createAHDatabase(newAhKey, BASE_FIXEDPRICEDB_VERSION);
+				db[newAhKey] = ah;
+				for itemKey, itemData in pairs(ahData) do
+					ah.fixedPrices[itemKey] = itemData:gsub(":", ";");
+				end
 			end
 		end
 	end
