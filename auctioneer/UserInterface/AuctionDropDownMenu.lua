@@ -33,6 +33,7 @@
 -------------------------------------------------------------------------------
 local show;
 local initialize;
+local debugPrint;
 
 -------------------------------------------------------------------------------
 -- Shows the auction dropdown menu for the specified auction.
