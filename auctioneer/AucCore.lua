@@ -186,7 +186,6 @@ function addOnLoaded()
 	Auctioneer.PostManager.Load();
 	Auctioneer.BidManager.Load();
 	Auctioneer.BidScanner.Load();
-	Auctioneer.AskPrice.Init();
 
 	-- Intialize the command handler.
 	SLASH_AUCTIONEER1 = "/auctioneer";
