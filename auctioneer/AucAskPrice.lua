@@ -30,7 +30,7 @@
 --]]
 
 --Local function prototypes
-local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, eventHandler, sendWhisper, onEventHook
+local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, eventHandler, sendWhisper, onEventHook, debugPrint
 
 local whisperList = {}
 
@@ -304,8 +304,8 @@ function eventHandler(self, event, text, player)
 
 	--Parse the text and separate out the different links
 	items = getItems(text)
-	for key, link in ipairs(items) do
-		aCount, historicalMedian, snapshotMedian, vendorSell = getData(link[1]);
+	for key, item in ipairs(items) do
+		aCount, historicalMedian, snapshotMedian, vendorSell = getData(item.link);
 		local askedCount;
 
 		--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
@@ -314,34 +314,34 @@ function eventHandler(self, event, text, player)
 		end
 
 		--If the stackSize is grater than one, add the unit price to the message
-		if (link[2] > 1) then
+		if (item.count > 1) then
 			eachstring = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(historicalMedian, nil, true));
 		else
 			eachstring = "";
 		end
 
 		if (aCount > 0) then
-			Auctioneer.AskPrice.SendWhisper(link[1]..": ".._AUCT('FrmtInfoSeen'):format(aCount), player);
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianHistorical'):format("    ", EnhTooltip.GetTextGSC(historicalMedian*link[2], nil, true), eachstring), player);
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianSnapshot'):format("    ", EnhTooltip.GetTextGSC(snapshotMedian*link[2], nil, true), eachstring), player);
+			Auctioneer.AskPrice.SendWhisper(item.link..": ".._AUCT('FrmtInfoSeen'):format(aCount), player);
+			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianHistorical'):format("    ", EnhTooltip.GetTextGSC(historicalMedian*item.count, nil, true), eachstring), player);
+			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianSnapshot'):format("    ", EnhTooltip.GetTextGSC(snapshotMedian*item.count, nil, true), eachstring), player);
 		else
-			Auctioneer.AskPrice.SendWhisper(link[1]..": ".._AUCT('FrmtInfoNever'):format(Auctioneer.Util.GetAuctionKey()), player);
+			Auctioneer.AskPrice.SendWhisper(item.link..": ".._AUCT('FrmtInfoNever'):format(Auctioneer.Util.GetAuctionKey()), player);
 		end
 
 		--Send out vendor info if we have it
 		if (Auctioneer.Command.GetFilter('askprice-vendor') and (vendorSell > 0)) then
 
 			--Again if the stackSize is grater than one, add the unit price to the message
-			if (link[2] > 1) then
+			if (item.count > 1) then
 				eachstring = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(vendorSell, nil, true));
 			else
 				eachstring = "";
 			end
 
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceVendorPrice'):format("    ",EnhTooltip.GetTextGSC(vendorSell * link[2], nil, true), eachstring), player);
+			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceVendorPrice'):format("    ",EnhTooltip.GetTextGSC(vendorSell * item.count, nil, true), eachstring), player);
 		end
 
-		usedStack = usedStack or (link[2] > 1)
+		usedStack = usedStack or (item.count > 1)
 		multipleItems = true;
 	end
 
@@ -375,7 +375,7 @@ function getItems(str)
 	local itemList = {};
 
 	for number, color, item, name in str:gmatch("(%d*)|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
-		table.insert(itemList, {"|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", tonumber(number) or 1})
+		table.insert(itemList, {link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", count = tonumber(number) or 1})
 	end
 	return itemList;
 end
@@ -392,6 +392,18 @@ function onEventHook() --%ToDo% Change the prototype once Blizzard changes their
 		end
 	end
 end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function debugPrint(...)
+	return EnhTooltip.DebugPrint("[Auc.AskPrice]", ...);
+end
+
+--=============================================================================
+-- Initialization
+--=============================================================================
+if (Auctioneer.AskPrice) then return end;
+debugPrint("AucAskPrice.lua loaded");
 
 Auctioneer.AskPrice = {
 	Init = init,
