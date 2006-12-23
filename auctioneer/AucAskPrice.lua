@@ -33,6 +33,7 @@
 local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, eventHandler, sendWhisper, onEventHook, debugPrint
 
 local whisperList = {}
+local sentAskPriceAd = {}
 
 function init()
 	askPriceFrame = CreateFrame("Frame")
@@ -347,7 +348,10 @@ function eventHandler(self, event, text, player)
 
 	--Once we're done sending out the itemInfo, check if the person used the stack size feature, if not send them the ad message.
 	if ((not usedStack) and (Auctioneer.Command.GetFilter('askprice-ad'))) then
-		Auctioneer.AskPrice.SendWhisper(_AUCT('AskPriceAd'):format(Auctioneer.Command.GetFilterVal('askprice-trigger')), player)
+		if (not sentAskPriceAd[player]) then --If the player in question has been sent the ad message in this session, don't spam them again.
+			sentAskPriceAd[player] = true
+			Auctioneer.AskPrice.SendWhisper(_AUCT('AskPriceAd'):format(Auctioneer.Command.GetFilterVal('askprice-trigger')), player)
+		end
 	end
 end
 
