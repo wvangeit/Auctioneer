@@ -170,14 +170,20 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 			-- seperate line for suggested auction price (for clarification, even if the values have already been shown somewhere else
 			if (Auctioneer.Command.GetFilter('show-suggest')) then -- show item's suggested auction price
-				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count);
+				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count)
 				if (count > 1) then
-					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-					EnhTooltip.AddLine(_AUCT('FrmtInfoSgststx'):format(count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min ([bidPriceForOne] ea)/[buyPrice] BO ([buyPriceForOne] ea)"
+					local bidPriceForOne, buyPriceForOne = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, 1)
+					EnhTooltip.AddLine(_AUCT('FrmtInfoSgststx'):format(count,
+					                                                   EnhTooltip.GetTextGSC(bidPrice, true),
+					                                                   EnhTooltip.GetTextGSC(bidPriceForOne, true),
+					                                                   EnhTooltip.GetTextGSC(buyPrice, true),
+					                                                   EnhTooltip.GetTextGSC(buyPriceForOne, true)), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				else -- count = 0 | 1
 					-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-					EnhTooltip.AddLine(_AUCT('FrmtInfoSgst'):format(EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+					EnhTooltip.AddLine(_AUCT('FrmtInfoSgst'):format(EnhTooltip.GetTextGSC(bidPrice, true),
+					                                                EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				end
 				EnhTooltip.AddLine(warn, nil, embedded);
