@@ -32,6 +32,14 @@
 
 ItemizerLocalizations = {
 
+	daDK = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer er ikke indlæst. Skriv /itemizer for mere info.";
+
+	};
+
 	deDE = {
 
 
@@ -52,7 +60,7 @@ ItemizerLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Itemizer no esta cargado. Escriba /itemizer para mas información.";
+		MesgNotLoaded	= "Itemizer no esta cargado. Escriba /itemizer para más información.";
 
 	};
 
@@ -100,7 +108,7 @@ ItemizerLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "详细说明没有载入.键入 /itemizer 观看更多信息.";
+		MesgNotLoaded	= "详细说明Itemizer 未载入.键入 /itemizer 查看更多信息.";
 
 	};
 

@@ -32,6 +32,202 @@
 
 EnchantrixLocalizations = {
 
+	daDK = {
+
+
+		-- Section: Command Messages
+		BarkerEnxWindowNotOpen	= "Enchantrix: Enchantment vinduet er ikke åbent. Enchantments vinduet skal være åbent for at du kan anvende \"Barker\".";
+		BarkerNoEnchantsAvail	= "Enchantrix: Du har, enten ikke nogen enchants eller du mangler reagenter for at kunne lave dem.";
+		FrmtActClearall	= "Nulstiller al Enchant data";
+		FrmtActClearFail	= "Kan ikke finde item: %s";
+		FrmtActClearOk	= "Data nulstillet for item: %s";
+		FrmtActDefault	= "Enchantrix's %s indstilling er blevet nulstillet";
+		FrmtActDefaultAll	= "Alle Enchantrix indstillinger er blevet gensat til normal";
+		FrmtActDisable	= "Viser ikke item's %s data";
+		FrmtActEnable	= "Viser item's %s data";
+		FrmtActEnabledOn	= "Viser item's %s på %s";
+		FrmtActSet	= "Sæt %s til '%s'";
+		FrmtActUnknown	= "Ukendt kommando nøgleord: '%s'";
+		FrmtActUnknownLocale	= "Sproget du har valgt ('%s') er ukendt. Tilladte sprog er:";
+		FrmtPrintin	= "Encantrix's beskeder vil nu vises i \"%s\" chat rammen";
+		FrmtUsage	= "Brug:";
+		MesgDisable	= "Slår automatisk loading af Enchantrix fra";
+		MesgNotloaded	= "Enchantrix er ikke indlæst. Skriv /enchantrix for mere information";
+
+
+		-- Section: Command Options
+		CmdClearAll	= "alt";
+		OptClear	= "([Item]alt)";
+		OptDefault	= "(<option>|alt)";
+		OptFindBidauct	= "<sølv>";
+		OptFindBuyauct	= "<procent>";
+		OptLocale	= "<sprog>";
+		OptPrintin	= "(<index>[Nummer]<rammenavn>[Streng])";
+
+
+		-- Section: Commands
+		BarkerOff	= "Funzione Imbonitore disabilitata.";
+		BarkerOn	= "Funzione Imbonitore abilitata.";
+		CmdBarker	= "Imbonitore";
+		CmdClear	= "slet";
+		CmdDefault	= "standard";
+		CmdDisable	= "deaktiver";
+		CmdFindBidauct	= "bidbroker";
+		CmdFindBidauctShort	= "bb";
+		CmdFindBuyauct	= "procentunder";
+		CmdFindBuyauctShort	= "pu";
+		CmdHelp	= "hjælp";
+		CmdLocale	= "sprog";
+		CmdOff	= "fra";
+		CmdOn	= "til";
+		CmdPrintin	= "skriv-i";
+		CmdToggle	= "skift";
+		ShowCount	= "optælling";
+		ShowEmbed	= "integreret";
+		ShowGuessAuctioneerHsp	= "evaluer-hsp";
+		ShowGuessAuctioneerMed	= "evaluer-middel";
+		ShowGuessBaseline	= "evaluer-baseværdi";
+		ShowHeader	= "Overskrift";
+		ShowRate	= "Ratio";
+		ShowTerse	= "conciso";
+		ShowValue	= "Evaluer";
+		StatOff	= "Viser ingen enchant data";
+		StatOn	= "Viser konfigureret enchant data";
+
+
+		-- Section: Config Text
+		GuiLoad	= "Load Auctioneer";
+		GuiLoad_Always	= "altid";
+		GuiLoad_Never	= "aldrig";
+
+
+		-- Section: Game Constants
+		ArgSpellname	= "Disenchant";
+		BarkerOpening	= "Enchants til salg:";
+		Darnassus	= "Darnassus";
+		Ironforge	= "City of ironforge";
+		OneLetterGold	= "g";
+		OneLetterSilver	= "s";
+		Orgrimmar	= "Orgrimmar";
+		PatReagents	= "Ingredienser: (.+)";
+		ShortDarnassus	= "Dar";
+		ShortIronForge	= "IF";
+		ShortOrgrimmar	= "Org";
+		ShortStormwind	= "SW";
+		ShortThunderBluff	= "TB";
+		ShortUndercity	= "UC";
+		StormwindCity	= "Stormwind City";
+		TextCombat	= "Kamp";
+		TextGeneral	= "Generelt";
+		ThunderBluff	= "Thunder Bluff";
+		Undercity	= "Undercity";
+
+
+		-- Section: Generic Messages
+		FrmtCredit	= "Gå til http://enchantrix.org/ for at dele dine data";
+		FrmtWelcome	= "Enchantrix v%s læst ind";
+		MesgAuctVersion	= "Enchantix kræver Auctioneer version 3.4 eller højere. Nogle muligheder vil være utilgængelige indtil du opdatere din Auctioneer installation.";
+
+
+		-- Section: Help Text
+		GuiBarker	= "Aktiver Udråber";
+		GuiClearall	= "Slet alle Enchantrix data";
+		GuiClearallButton	= "Slet alt";
+		GuiClearallHelp	= "Klik her for at slette alle Enchantrix data for den aktuelle server.";
+		GuiClearallNote	= "for den aktuelle server/faktion";
+		GuiCount	= "Vis de præcise tal fra databasen";
+		GuiDefaultAll	= "Nulstil alle Enchantrix valg";
+		GuiDefaultAllButton	= "Nulstil alt";
+		GuiDefaultAllHelp	= "Klik her for at sætte alle Enchantrix options til deres standard værdi. ADVARSEL. Dette kan IKKE fortrydes.";
+		GuiDefaultOption	= "Nulstil denne værdi";
+		GuiEmbed	= "Vis indlejrede information i spillets tooltip";
+		GuiLocale	= "Sæt sprog til";
+		GuiMainEnable	= "Aktiver Enchantrix";
+		GuiMainHelp	= "Indeholder værdier for Enchantrix et Add-On som viser information om hvad en ting bliver til ved disenchant.";
+		GuiOtherHeader	= "Andre valg";
+		GuiOtherHelp	= "Diverse Enchantrix valg";
+		GuiPrintin	= "Vælg den ønskede meddelelses frame";
+		GuiRate	= "Vis det gennemsnitlige antal af disenchant";
+		GuiReloadui	= "Genindlæs bruger interface";
+		GuiReloaduiButton	= "GenindlæsUI";
+		GuiReloaduiFeedback	= "Genindlæser WoW UI";
+		GuiReloaduiHelp	= "Klik her for at genindlæse WoW bruger interfacet efter at have ændret localet, så sproget i konfigurations skærmen passer med det som du har valgt. Bemærk: Dette kan tage nogle minutter.";
+		GuiTerse	= "Aktiver kortfattet indstilling";
+		GuiValuateAverages	= "Evaluer mod Auctioneer gennemsnit";
+		GuiValuateBaseline	= "Evaluer mod standard data";
+		GuiValuateEnable	= "Aktiver Evaluering";
+		GuiValuateHeader	= "Evaluering";
+		GuiValuateMedian	= "Evaluer mod Auctioneer middel";
+		HelpBarker	= "Slår udråber til og fra";
+		HelpClear	= "Slet det valgte item data (du skal shift-klikke item ind i kommandoen). Du kan ogsÃ¥ angive all for at slette alt.";
+		HelpCount	= "Vælg om der skal vises nøjagtige tal fra databasen.";
+		HelpDefault	= "Sæt et Enchantrix valg til dets standard vÃ¦rdi. Du kan også angive all for at sætte alle valg til deres standard værdi.";
+		HelpDisable	= "Undlader at loade Enchantrix automatisk næste gang du logger ind.";
+		HelpEmbed	= "Indlejrer teksten i spillets egne tooltip (BemÃ¦rk: Visse valg kan ikke bruges sammen med dette)";
+		HelpFindBidauct	= "Find auktioner hvis potentielle disenchant værdi er et vist sølvbeløb mindre end bud prisen.";
+		HelpFindBuyauct	= "Find auktioner hvis potentielle disenchant værdi er vis procent værdi mindre end bud prisen.";
+		HelpGuessAuctioneerHsp	= "Hvis Evaluer er slået til og du har Auctioneer installeret, vis salgspris (HSP) vurderingen af at disenchante tingen.";
+		HelpGuessAuctioneerMedian	= "Hvis Evaluer er slået til og du har Auctioneer installeret, vis middel værdien af at disenchante tingen.";
+		HelpGuessBaseline	= "Hvis Evaluer er slået til (Auctioneer er ikke nødvendig) vis base værdien af at disenchante ting. Baseret på de indbyggede priser.";
+		HelpGuessNoauctioneer	= "Kommandoerne evaluer-hsp og evaluer-middel er ikke tilgængelige fordi du ikke har Auctioneer installeret.";
+		HelpHeader	= "Vælg om overskriften skal vises";
+		HelpLoad	= "Ændre Enchantrix load indstillinger for denne karakter";
+		HelpLocale	= "Ændrer sproget som bruges til at vises Enchantrix meddelelser";
+		HelpOnoff	= "Skifter mellem om enchant data vises eller ej.";
+		HelpPrintin	= "Vælg hvilken ramme Enchantrix viser sine meddelelser i.\nDu kan enten angive navnet eller nummeret.";
+		HelpRate	= "Vælg om det gennemsnitlige antal af disenchant skal vises.";
+		HelpTerse	= "Aktiver/deaktiver kortfattet indstilling. Viser kun disenchant værdi. Kan tilsidesættes ved at holde control-tasten nede.";
+		HelpValue	= "Vælg om tingens værdi baseret pÃ udfaldet af mulige disenchants skal vises.";
+
+
+		-- Section: Report Messages
+		FrmtBidbrokerCurbid	= "BudNu";
+		FrmtBidbrokerDone	= "Gennemløb for lave priser udført.";
+		FrmtBidbrokerHeader	= "Auktioner som har %s sølv besparelse baseret på gennemsnitlig disenchant værdi. (min %%mindre = %d): ";
+		FrmtBidbrokerLine	= "%s, Vurderet til: %s, %s: %s. Besparelse: %s, Under %s, Tid: %s";
+		FrmtBidbrokerMinbid	= "BudMin";
+		FrmtBidBrokerSkipped	= "Sprang %d auktioner over, pga. for lille profit margin. (%d%%) ";
+		FrmtPctlessDone	= "Bud under gennemfÃ¸rt.";
+		FrmtPctlessHeader	= "Buyouts som har %d%% besparelse i forhold til gennemsnitlige disenchant værdi:";
+		FrmtPctlessLine	= "%s, vurderet til: %s, BO: %s, spar: %d, %s under.";
+		FrmtPctlessSkipped	= "Sprang %d auktioner over, pga. for lille profit mulighed. (%s) ";
+
+
+		-- Section: Tooltip Messages
+		FrmtBarkerPrice	= "Udråbspris (%d%% margen)";
+		FrmtCounts	= "(base=%d, gammel=%d, ny=%d)";
+		FrmtDisinto	= "Disenchants til:";
+		FrmtFound	= "Fandt at %s disenchants til:";
+		FrmtPriceEach	= "(%s/stk.)";
+		FrmtSuggestedPrice	= "Anbefalet pris:";
+		FrmtTotal	= "I alt";
+		FrmtValueAuctHsp	= "Disenchant værdi (HSP)";
+		FrmtValueAuctMed	= "Disenchant værdi (Middel)";
+		FrmtValueMarket	= "Disenchant værdi (Base)";
+		FrmtWarnAuctNotLoaded	= "[Auctioneer ikke indlæst, bruger priser fra cachen]";
+		FrmtWarnNoPrices	= "[Ingen priser er tilgængelige]";
+		FrmtWarnPriceUnavail	= "[Nogen af priserne er ikke tilgængelige]";
+
+
+		-- Section: User Interface
+		BarkerOptionsHighestPriceForFactorTitle	= "Højeste prisfaktor";
+		BarkerOptionsHighestPriceForFactorTooltip	= "Enchentments får en score på nul ved en pris prioritet på eller over denne værdi.";
+		BarkerOptionsHighestProfitTitle	= "Højeste profit.";
+		BarkerOptionsHighestProfitTooltip	= "Højeste totale kontante profit på en enchant.";
+		BarkerOptionsLowestPriceTitle	= "Laveste pris";
+		BarkerOptionsLowestPriceTooltip	= "Laveste kontante udbudspris for en enchantment.";
+		BarkerOptionsPricePriorityTitle	= "Totale pris prioritet";
+		BarkerOptionsPricePriorityTooltip	= "Dette bestemmer hvor vigtig prissætning er for den generelle annoncering.";
+		BarkerOptionsPriceSweetspotTitle	= "Pirsfaktor SweetSpot";
+		BarkerOptionsPriceSweetspotTooltip	= "Dette bruges til at prioritere enchantments omkring denne pris til annoncering.";
+		BarkerOptionsProfitMarginTitle	= "Profit margin";
+		BarkerOptionsProfitMarginTooltip	= "Profit procent der skal ligges til materialernes købspris.";
+		BarkerOptionsRandomFactorTitle	= "Tilfældig faktor";
+		BarkerOptionsRandomFactorTooltip	= "Graden af tilfældighed i enchantments der reklameres for i \"trade\" kanalen.";
+		BarkerOptionsTab1Title	= "Profit og pris prioritering";
+
+	};
+
 	deDE = {
 
 
@@ -300,7 +496,6 @@ EnchantrixLocalizations = {
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
 		BarkerOpening	= "Selling Enchants:";
-		BarkerTag	= " My mats";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of Ironforge";
 		OneLetterGold	= "g";
@@ -319,19 +514,6 @@ EnchantrixLocalizations = {
 		ThunderBluff	= "Thunder Bluff";
 		Undercity	= "Undercity";
 
-		ChannelTrade	= "Trade - City";
-		ChannelParty	= "Party";
-		ChannelRaid	= "Raid";
-		ChannelGuild	= "Guild";
-		ChannelTellRec	= "Last Received Tell";
-		ChannelTellSent	= "Last Sent Tell";
-		ChannelSay	= "Say";
-		ChannelGeneral	= "General - ";
-		ChannelLocalDefense	= "LocalDefense - ";
-		ChannelWorldDefense	= "WorldDefense";
-		ChannelGuildRecruitment	= "GuildRecruitment - City";
-		ChannelBlock1	= "GlobalComm";
-		ChannelDefault	= "Trade - City";
 
 		-- Section: Generic Messages
 		FrmtCredit	= "  (go to http://enchantrix.org/ to share your data)";
@@ -443,12 +625,12 @@ EnchantrixLocalizations = {
 
 		-- Section: Command Messages
 		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana del encantar no está abierta. La ventana encantadora debe estar abierta para utilizar el barker.";
-		BarkerNoEnchantsAvail	= "Enchantrix: Usted no tiene cualesquiera encanta o no tiene los reactivo para hacerlos.";
-		FrmtActClearall	= "Eliminando toda información de desencantamientos";
+		BarkerNoEnchantsAvail	= "Enchantrix: Usted no tiene ningún encantamiento o no tiene los reactivos para hacerlos.";
+		FrmtActClearall	= "Eliminando toda información de encantamientos";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
 		FrmtActClearOk	= "Informacion eliminada para el artí­culo: %s";
-		FrmtActDefault	= "La opción %s de Enchantrix ha sido revertida a su configuración de fábrica.";
-		FrmtActDefaultAll	= "Todas las opciones de Enchantrix han sido revertidas a sus configuraciones de fábrica.";
+		FrmtActDefault	= "La opción %s de Enchantrix ha sido configurada por defecto.";
+		FrmtActDefaultAll	= "Todas las opciones de Enchantrix han sido configuradas por defecto.";
 		FrmtActDisable	= "Ocultando información de artículo: %s ";
 		FrmtActEnable	= "Mostrando información del artí­culo: %s ";
 		FrmtActEnabledOn	= "Mostrando %s de los artí­culos usando %s";
@@ -1306,7 +1488,9 @@ EnchantrixLocalizations = {
 		GuiDefaultAllButton	= "Herstel Alles";
 		GuiDefaultAllHelp	= "Klik hier om alle standaard waardes van de Enchantrix opties te laden. LET OP: Deze actie kan NIET ongedaan worde n gemaakt.";
 		GuiDefaultOption	= "Herstel deze instelling";
-		GuiMainEnable	= "Activeren Enchantrix";
+		GuiLocale	= "Verander taal naar";
+		GuiMainEnable	= "Enchantrix Activeren";
+		GuiMainHelp	= "Bevat instellingen voor Enchantrix, een AddOn die mogelijke uitkomsten bij het disenchanten van een item weergeeft in een tooltip.";
 		GuiOtherHeader	= "Andere Opties";
 		GuiOtherHelp	= "Verschillende Enchantrix Opties";
 		GuiPrintin	= "Selecteer het gewenste berichten scherm";
@@ -1314,6 +1498,7 @@ EnchantrixLocalizations = {
 		GuiReloadui	= "Opnieuw laden Gebruikers scherm.";
 		GuiReloaduiButton	= "HerladenUI";
 		GuiReloaduiFeedback	= "Nu bezig met het herladen van de WoW UI";
+		GuiReloaduiHelp	= "Klik hier om de WoW te herladen nadat je een andere taal hebt geselecteerd zodat de weergegeven tekst in de juiste taal verschijnt. Opmerking: Dit kan enkele minuten duren.";
 		GuiTerse	= "Activeer Beknopte Mode";
 		GuiValuateAverages	= "Taxatie met Auctioneer gemiddelden";
 		GuiValuateBaseline	= "Taxatie met Standaard Data";
@@ -1346,6 +1531,13 @@ EnchantrixLocalizations = {
 		FrmtWarnAuctNotLoaded	= "Auctioneer niet geladen. Opgeslagen waardes worden gebruikt.";
 		FrmtWarnNoPrices	= "Geen prijs beschikbaar ";
 		FrmtWarnPriceUnavail	= "Sommige prijzen niet beschikbaar";
+
+
+		-- Section: User Interface
+		BarkerOptionsHighestProfitTitle	= "Maximale Winst";
+		BarkerOptionsLowestPriceTitle	= "Laagste Prijs";
+		BarkerOptionsProfitMarginTitle	= "Winstmarge";
+		BarkerOptionsRandomFactorTitle	= "Willekeurige Factor";
 
 	};
 
@@ -1474,7 +1666,7 @@ EnchantrixLocalizations = {
 		GuiValuateBaseline	= "以内置数据估价。";
 		GuiValuateEnable	= "启用估价。";
 		GuiValuateHeader	= "估价";
-		GuiValuateMedian	= "以拍卖助手中值价进行估价。";
+		GuiValuateMedian	= "以拍卖助手中位数价进行估价。";
 		HelpBarker	= "切换Barker开关";
 		HelpClear	= "清除指定物品的数据(必须Shift+点击将物品插入命令)。你也可以指定特定关键字\"all\"。";
 		HelpCount	= "选择是否显示数据库中的额外计数。";
@@ -1484,9 +1676,9 @@ EnchantrixLocalizations = {
 		HelpFindBidauct	= "找到拍卖品其可能分解价值低于竞拍价一定银币额。";
 		HelpFindBuyauct	= "找到拍卖品其可能分解价值低于一口价一定比率。";
 		HelpGuessAuctioneerHsp	= "如果启用估价，并且安装了拍卖行助手(Auctioneer)，显示对于物品分解的曾售价格(最高价)。";
-		HelpGuessAuctioneerMedian	= "如果启用估价，并且安装了拍卖助手(Auctioneer)，显示基于物品分解估价的中值。";
+		HelpGuessAuctioneerMedian	= "如果启用估价，并且安装了拍卖助手(Auctioneer)，显示基于物品分解估价的中位数。";
 		HelpGuessBaseline	= "如果启用估价，显示对于物品分解的基准估价，基于系统内置价格(不需要拍卖助手Auctioneer)。";
-		HelpGuessNoauctioneer	= "价格评估上限与价格评估平均值命令不能使用是因为没有安装拍卖助手。";
+		HelpGuessNoauctioneer	= "价格评估上限与价格评估中位数命令不能使用是因为没有安装拍卖助手。";
 		HelpHeader	= "选择是否显示标题线。";
 		HelpLoad	= "改变附魔助手的加载设置。";
 		HelpLocale	= "更改附魔助手显示讯息的地域代码。";
@@ -1519,7 +1711,7 @@ EnchantrixLocalizations = {
 		FrmtSuggestedPrice	= "建议价格：";
 		FrmtTotal	= "合计";
 		FrmtValueAuctHsp	= "分解价值(最高)";
-		FrmtValueAuctMed	= "分解价值(中值)";
+		FrmtValueAuctMed	= "分解价值(中位数)";
 		FrmtValueMarket	= "分解价值(基准)";
 		FrmtWarnAuctNotLoaded	= "[拍卖助手未加载，使用缓冲价格]";
 		FrmtWarnNoPrices	= "[无价可用]";
@@ -1534,9 +1726,9 @@ EnchantrixLocalizations = {
 		BarkerOptionsLowestPriceTitle	= "最低标价";
 		BarkerOptionsLowestPriceTooltip	= "提供附魔最低的现贷价格。";
 		BarkerOptionsPricePriorityTitle	= "总价格优先";
-		BarkerOptionsPricePriorityTooltip	= "这设置怎么重要定价是到整体优先权为做广告。";
+		BarkerOptionsPricePriorityTooltip	= "此设置重要定价如何是到整体优先权为做广告。";
 		BarkerOptionsPriceSweetspotTitle	= "价格代理甜点";
-		BarkerOptionsPriceSweetspotTooltip	= "这用于给予优先在这个价格附近附魔为做广告。";
+		BarkerOptionsPriceSweetspotTooltip	= "用于给予优先在这个价格附近附魔为做广告。";
 		BarkerOptionsProfitMarginTitle	= "边缘收益";
 		BarkerOptionsProfitMarginTooltip	= "增加赢利百分比到基本边际收益费用。";
 		BarkerOptionsRandomFactorTitle	= "随机要素";
@@ -1875,165 +2067,6 @@ EnchantrixLocalizations = {
 		FrmtWarnAuctNotLoaded	= "[Auctioneer nenaloadovan, pouzivam cached ceny]";
 		FrmtWarnNoPrices	= "[Ceny nejsou dostupne]";
 		FrmtWarnPriceUnavail	= "[Nektere ceny nedostupne]";
-
-	};
-
-	daDK = {
-
-
-		-- Section: Command Messages
-		FrmtActClearall	= "Nulstiller al Enchant data";
-		FrmtActClearFail	= "Kan ikke finde item: %s";
-		FrmtActClearOk	= "Data nulstillet for item: %s";
-		FrmtActDefault	= "Enchantrix's %s indstilling er blevet nulstillet";
-		FrmtActDefaultAll	= "Alle Enchantrix indstillinger er blevet gensat til normal";
-		FrmtActDisable	= "Viser ikke item's %s data";
-		FrmtActEnable	= "Viser item's %s data";
-		FrmtActEnabledOn	= "Viser item's %s på %s";
-		FrmtActSet	= "Sæt %s til '%s'";
-		FrmtActUnknown	= "Ukendt kommando nøgleord: '%s'";
-		FrmtActUnknownLocale	= "Sproget du har valgt ('%s') er ukendt. Tilladte sprog er:";
-		FrmtPrintin	= "Encantrix's beskeder vil nu vises i \"%s\" chat rammen";
-		FrmtUsage	= "Brug:";
-		MesgDisable	= "Slår automatisk loading af Enchantrix fra";
-		MesgNotloaded	= "Enchantrix er ikke indlæst. Skriv /enchantrix for mere information";
-
-
-		-- Section: Command Options
-		CmdClearAll	= "alt";
-		OptClear	= "([Item]alt)";
-		OptDefault	= "(<option>|alt)";
-		OptFindBidauct	= "<sølv>";
-		OptFindBuyauct	= "<procent>";
-		OptLocale	= "<sprog>";
-		OptPrintin	= "(<index>[Nummer]<rammenavn>[Streng])";
-
-
-		-- Section: Commands
-		BarkerOff	= "Funzione Imbonitore disabilitata.";
-		BarkerOn	= "Funzione Imbonitore abilitata.";
-		CmdBarker	= "Imbonitore";
-		CmdClear	= "slet";
-		CmdDefault	= "standard";
-		CmdDisable	= "deaktiver";
-		CmdFindBidauct	= "bidbroker";
-		CmdFindBidauctShort	= "bb";
-		CmdFindBuyauct	= "procentunder";
-		CmdFindBuyauctShort	= "pu";
-		CmdHelp	= "hjælp";
-		CmdLocale	= "sprog";
-		CmdOff	= "fra";
-		CmdOn	= "til";
-		CmdPrintin	= "skriv-i";
-		CmdToggle	= "skift";
-		ShowCount	= "optælling";
-		ShowEmbed	= "integreret";
-		ShowGuessAuctioneerHsp	= "evaluer-hsp";
-		ShowGuessAuctioneerMed	= "evaluer-middel";
-		ShowGuessBaseline	= "evaluer-baseværdi";
-		ShowHeader	= "Overskrift";
-		ShowRate	= "Ratio";
-		ShowTerse	= "conciso";
-		ShowValue	= "Evaluer";
-		StatOff	= "Viser ingen enchant data";
-		StatOn	= "Viser konfigureret enchant data";
-
-
-		-- Section: Config Text
-		GuiLoad	= "Load Auctioneer";
-		GuiLoad_Always	= "altid";
-		GuiLoad_Never	= "aldrig";
-
-
-		-- Section: Game Constants
-		ArgSpellname	= "Disenchant";
-		PatReagents	= "Ingredienser: (.+)";
-		TextCombat	= "Kamp";
-		TextGeneral	= "Generelt";
-
-
-		-- Section: Generic Messages
-		FrmtCredit	= "Gå til http://enchantrix.org/ for at dele dine data";
-		FrmtWelcome	= "Enchantrix v%s læst ind";
-		MesgAuctVersion	= "Enchantix kræver Auctioneer version 3.4 eller højere. Nogle muligheder vil være utilgængelige indtil du opdatere din Auctioneer installation.";
-
-
-		-- Section: Help Text
-		GuiBarker	= "Aktiver Udråber";
-		GuiClearall	= "Slet alle Enchantrix data";
-		GuiClearallButton	= "Slet alt";
-		GuiClearallHelp	= "Klik her for at slette alle Enchantrix data for den aktuelle server.";
-		GuiClearallNote	= "for den aktuelle server/faktion";
-		GuiCount	= "Vis de præcise tal fra databasen";
-		GuiDefaultAll	= "Nulstil alle Enchantrix valg";
-		GuiDefaultAllButton	= "Nulstil alt";
-		GuiDefaultAllHelp	= "Klik her for at sætte alle Enchantrix options til deres standard værdi. ADVARSEL. Dette kan IKKE fortrydes.";
-		GuiDefaultOption	= "Nulstil denne værdi";
-		GuiEmbed	= "Vis indlejrede information i spillets tooltip";
-		GuiLocale	= "Sæt sprog til";
-		GuiMainEnable	= "Aktiver Enchantrix";
-		GuiMainHelp	= "Indeholder værdier for Enchantrix et Add-On som viser information om hvad en ting bliver til ved disenchant.";
-		GuiOtherHeader	= "Andre valg";
-		GuiOtherHelp	= "Diverse Enchantrix valg";
-		GuiPrintin	= "Vælg den ønskede meddelelses frame";
-		GuiRate	= "Vis det gennemsnitlige antal af disenchant";
-		GuiReloadui	= "Genindlæs bruger interface";
-		GuiReloaduiButton	= "GenindlæsUI";
-		GuiReloaduiFeedback	= "Genindlæser WoW UI";
-		GuiReloaduiHelp	= "Klik her for at genindlæse WoW bruger interfacet efter at have ændret localet, så sproget i konfigurations skærmen passer med det som du har valgt. Bemærk: Dette kan tage nogle minutter.";
-		GuiTerse	= "Aktiver kortfattet indstilling";
-		GuiValuateAverages	= "Evaluer mod Auctioneer gennemsnit";
-		GuiValuateBaseline	= "Evaluer mod standard data";
-		GuiValuateEnable	= "Aktiver Evaluering";
-		GuiValuateHeader	= "Evaluering";
-		GuiValuateMedian	= "Evaluer mod Auctioneer middel";
-		HelpBarker	= "Slår udråber til og fra";
-		HelpClear	= "Slet det valgte item data (du skal shift-klikke item ind i kommandoen). Du kan ogsÃ¥ angive all for at slette alt.";
-		HelpCount	= "Vælg om der skal vises nøjagtige tal fra databasen.";
-		HelpDefault	= "Sæt et Enchantrix valg til dets standard vÃ¦rdi. Du kan også angive all for at sætte alle valg til deres standard værdi.";
-		HelpDisable	= "Undlader at loade Enchantrix automatisk næste gang du logger ind.";
-		HelpEmbed	= "Indlejrer teksten i spillets egne tooltip (BemÃ¦rk: Visse valg kan ikke bruges sammen med dette)";
-		HelpFindBidauct	= "Find auktioner hvis potentielle disenchant værdi er et vist sølvbeløb mindre end bud prisen.";
-		HelpFindBuyauct	= "Find auktioner hvis potentielle disenchant værdi er vis procent værdi mindre end bud prisen.";
-		HelpGuessAuctioneerHsp	= "Hvis Evaluer er slået til og du har Auctioneer installeret, vis salgspris (HSP) vurderingen af at disenchante tingen.";
-		HelpGuessAuctioneerMedian	= "Hvis Evaluer er slået til og du har Auctioneer installeret, vis middel værdien af at disenchante tingen.";
-		HelpGuessBaseline	= "Hvis Evaluer er slået til (Auctioneer er ikke nødvendig) vis base værdien af at disenchante ting. Baseret på de indbyggede priser.";
-		HelpGuessNoauctioneer	= "Kommandoerne evaluer-hsp og evaluer-middel er ikke tilgængelige fordi du ikke har Auctioneer installeret.";
-		HelpHeader	= "Vælg om overskriften skal vises";
-		HelpLoad	= "Ændre Enchantrix load indstillinger for denne karakter";
-		HelpLocale	= "Ændrer sproget som bruges til at vises Enchantrix meddelelser";
-		HelpOnoff	= "Skifter mellem om enchant data vises eller ej.";
-		HelpPrintin	= "Vælg hvilken ramme Enchantrix viser sine meddelelser i.\nDu kan enten angive navnet eller nummeret.";
-		HelpRate	= "Vælg om det gennemsnitlige antal af disenchant skal vises.";
-		HelpTerse	= "Aktiver/deaktiver kortfattet indstilling. Viser kun disenchant værdi. Kan tilsidesættes ved at holde control-tasten nede.";
-		HelpValue	= "Vælg om tingens værdi baseret pÃ udfaldet af mulige disenchants skal vises.";
-
-
-		-- Section: Report Messages
-		FrmtBidbrokerCurbid	= "BudNu";
-		FrmtBidbrokerDone	= "Gennemløb for lave priser udført.";
-		FrmtBidbrokerHeader	= "Auktioner som har %s sÃ¸lv besparelse baseret på gennemsnitlig disenchant værdi.";
-		FrmtBidbrokerLine	= "%s, Vurderet til: %s, %s: %s. Besparelse: %s, Under %s, Tid: %s";
-		FrmtBidbrokerMinbid	= "BudMin";
-		FrmtPctlessDone	= "Bud under gennemfÃ¸rt.";
-		FrmtPctlessHeader	= "Buyouts som har %d%% besparelse i forhold til gennemsnitlige disenchant værdi:";
-		FrmtPctlessLine	= "%s, vurderet til: %s, BO: %s, spar: %d, %s under.";
-
-
-		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Udråbspris (%d%% margen)";
-		FrmtCounts	= "(base=%d, gammel=%d, ny=%d)";
-		FrmtDisinto	= "Disenchants til:";
-		FrmtFound	= "Fandt at %s disenchants til:";
-		FrmtPriceEach	= "(%s/stk.)";
-		FrmtSuggestedPrice	= "Anbefalet pris:";
-		FrmtTotal	= "I alt";
-		FrmtValueAuctHsp	= "Disenchant værdi (HSP)";
-		FrmtValueAuctMed	= "Disenchant værdi (Middel)";
-		FrmtValueMarket	= "Disenchant værdi (Base)";
-		FrmtWarnAuctNotLoaded	= "[Auctioneer ikke indlæst, bruger priser fra cachen]";
-		FrmtWarnNoPrices	= "[Ingen priser er tilgængelige]";
-		FrmtWarnPriceUnavail	= "[Nogen af priserne er ikke tilgængelige]";
 
 	};
 

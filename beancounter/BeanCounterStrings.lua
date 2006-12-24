@@ -210,7 +210,7 @@ BeanCounterLocalizations = {
 		UiAuctionTransaction	= "Subasta";
 		UiBids	= "Ofertas";
 		UiBidTransaction	= "Oferta";
-		UiBuyerSellerHeader	= "Comrador/Vendedor";
+		UiBuyerSellerHeader	= "Comprador/Vendedor";
 		UiBuyTransaction	= "Compra";
 		UiDateHeader	= "Día";
 		UiDepositTransaction	= "Depósito";
@@ -223,11 +223,11 @@ BeanCounterLocalizations = {
 		UiPurchases	= "Compras";
 		UiQuantityHeader	= "Cta.";
 		UiSales	= "Ventas";
-		UiSearch	= "Búsquedas";
+		UiSearch	= "Búsqueda";
 		UiSearchForLabel	= "Buscar por:";
 		UiSellTransaction	= "Vender";
-		UiTransactions	= "Transacciónes";
-		UiTransactionsLabel	= "Transacciónes:";
+		UiTransactions	= "Transacciones";
+		UiTransactionsLabel	= "Transacciones:";
 		UiTransactionTypeHeader	= "Tipo";
 
 	};
