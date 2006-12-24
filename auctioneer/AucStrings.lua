@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://norganna.org/localizer/index.php
@@ -517,6 +517,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "KRITISK ADVARSEL:Din Auctioneer SavedVariables fil er %.3f%% fuld";
+		ConstantsMessage	= "Din Auctioneer SavedVariables fil er %.3f%% fuld";
+		ConstantsWarning	= "ADVARSEL:Din Auctioneer SavedVariables fil er %.3f%% fuld";
 		FrmtActClearall	= "Fjerner alle data for auktionen %s";
 		FrmtActClearFail	= "Kan ikke finde genstand: %s";
 		FrmtActClearOk	= "Fjerner data for genstand: %s";
@@ -573,6 +576,8 @@ AuctioneerLocalizations = {
 		CmdAskPriceSmartWord2	= "værd";
 		CmdAskPriceTrigger	= "udløser";
 		CmdAskPriceVendor	= "forhandler";
+		CmdAskPriceWhispers	= "private beskeder";
+		CmdAskPriceWord	= "ord";
 		CmdAuctionClick	= "auktion-klik";
 		CmdAuctionDuration	= "Auktionsvarighed";
 		CmdAuctionDuration0	= "sidst";
@@ -597,6 +602,7 @@ AuctioneerLocalizations = {
 		CmdFinish1	= "log af";
 		CmdFinish2	= "luk";
 		CmdFinish3	= "genindlæsUI";
+		CmdFinishSound	= "Slut lyd";
 		CmdHelp	= "hjælp";
 		CmdLocale	= "lokal";
 		CmdOff	= "sluk";
@@ -643,6 +649,8 @@ AuctioneerLocalizations = {
 		GuiAskPriceSmart	= "Brug smarte ord";
 		GuiAskPriceTrigger	= "AskPrice udløser";
 		GuiAskPriceVendor	= "Send forhandler informationer";
+		GuiAskPriceWhispers	= "Vis udgående private beskeder";
+		GuiAskPriceWord	= "brugerdefineret SmartWord %d";
 		GuiAuctionDuration	= "Normal auktions varighed";
 		GuiAuctionHouseHeader	= "Auktionshus vindue";
 		GuiAuctionHouseHeaderHelp	= "Ændr Auktionshusets vinduesindstillinger";
@@ -666,6 +674,7 @@ AuctioneerLocalizations = {
 		GuiEmbedBlankline	= "Viser blank linje i spillets tooltip";
 		GuiEmbedHeader	= "Indrammet";
 		GuiFinish	= "Efter en skanning er afsluttet";
+		GuiFinishSound	= "Afspil lyd når scaning er afsluttet";
 		GuiLink	= "Viser LinkID";
 		GuiLoad	= "Hent Auctioneer";
 		GuiLoad_Always	= "altid";
@@ -716,6 +725,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Er sikker på du vil %s\n%dx%s til:";
 		DisableMsg	= "Stopper automatisk indlaesning af Auctioneer";
 		FrmtWelcome	= "Auctioneer v%s er indlaest";
 		MesgNotLoaded	= "Auctioneer er ikke indlaest. Skriv /auctioneer for mere info.";
@@ -743,7 +753,9 @@ AuctioneerLocalizations = {
 		HelpAskPriceSmart	= "Tillad eller bloker SmartWrods check";
 		HelpAskPriceTrigger	= "Ændre AskPrice's kommando.";
 		HelpAskPriceVendor	= "Tillad eller bloker sendingen af vendor pris data.";
-		HelpAuctionClick	= "Giver dig mulighed for at Alt-klikke paa et objekt i dine tasker for automatisk at starte en auktion for det";
+		HelpAskPriceWhispers	= "Vis eller skjul prisforspørgelser i udgående private beskeder";
+		HelpAskPriceWord	= "Tilføje eller ændre AskPrice´s brugerdefinerede SmartWords.";
+		HelpAuctionClick	= "Tillader Alt-klik paa et objekt i dine tasker for automatisk at starte en auktion for det";
 		HelpAuctionDuration	= "Saet den normale auktions varighed ved aabning af AH vindue";
 		HelpAutofill	= "Saet om Auctioneer skal autoudfylde priser naar objekter overfoeres til auktionshusets boks.";
 		HelpAverage	= "Vaelger om middelprisen paa en auktion skal vises.";
@@ -757,6 +769,7 @@ AuctioneerLocalizations = {
 		HelpEmbed	= "Indrammer teksten i spillets egen tooltip (bemærk: nogle muligheder vil være utilgængelige i denne mode.)";
 		HelpEmbedBlank	= "Vælg om der skal være blanke linjer mellem tooltip info og auktions info når embedded mode er valgt";
 		HelpFinish	= "set for automatisk logge ud eller exit spil ved auktions scan afslutning";
+		HelpFinishSound	= "Vælg om der skal afspilles en lyd når skanning af aktionshuset er færdig.";
 		HelpLink	= "Vælger om der skal vises link id i tooltippet.";
 		HelpLoad	= "Ændre Auctioneers load indstillinger for denne karakter";
 		HelpLocale	= "Skifter sprog på auctioneer scriptet.";
@@ -846,6 +859,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: User Interface
+		FrmtLastSoldOn	= "Sidst solgt den";
 		UiBid	= "bud";
 		UiBidHeader	= "bud";
 		UiBidPerHeader	= "Bud pr.";
@@ -878,6 +892,7 @@ AuctioneerLocalizations = {
 		UiPriceModelAuctioneer	= "Auctioneer Pris";
 		UiPriceModelCustom	= "Personlig pris";
 		UiPriceModelFixed	= "Fast pris";
+		UiPriceModelLastSold	= "Sidste salgspris";
 		UiProfitHeader	= "Profit";
 		UiProfitPerHeader	= "Profit pr.";
 		UiQuantityHeader	= "Kvalitet";
@@ -953,6 +968,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "KRITISCH: Deine gespeicherten Auctioneer Daten sind zu %.3f%% voll!";
+		ConstantsMessage	= "Deine gespeicherten Auctioneer Daten sind zu %.3f%% voll";
+		ConstantsWarning	= "WARNUNG: Deine gespeicherten Auctioneer Daten sind zu %.3f%% voll";
 		FrmtActClearall	= "Lösche alle Auktionsdaten für %s";
 		FrmtActClearFail	= "Objekt nicht gefunden: %s";
 		FrmtActClearOk	= "Daten gelöscht für: %s";
@@ -1286,7 +1304,7 @@ AuctioneerLocalizations = {
 		FrmtInfoNever	= "Noch nie in %s gesehen";
 		FrmtInfoSeen	= "Insgesamt %d mal in Auktionen gesehen";
 		FrmtInfoSgst	= "Empfohlener Preis: %s min/%s Sofortkauf";
-		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf";
+		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min (%s pro Stück)/%s Sofortkauf (%s pro Stück)";
 		FrmtInfoSnapmed	= "Sofortkaufsmedian (pro Stück) aus %d gescannten Auktionen:";
 		FrmtInfoStacksize	= "Durchschnittliche Stapelgröße: %d Stück";
 
@@ -1737,7 +1755,7 @@ AuctioneerLocalizations = {
 		FrmtInfoNever	= "Never seen at %s";
 		FrmtInfoSeen	= "Seen %d times at auction total";
 		FrmtInfoSgst	= "Suggested price: %s min/%s BO";
-		FrmtInfoSgststx	= "Suggested price for your %d stack: %s min/%s BO";
+		FrmtInfoSgststx	= "Suggested price for your %d stack: %s min (%s ea)/%s BO (%s ea)";
 		FrmtInfoSnapmed	= "Scanned %d, median BO (ea)";
 		FrmtInfoStacksize	= "Average stack size: %d items";
 
@@ -1810,10 +1828,10 @@ AuctioneerLocalizations = {
 		AskPriceAd	= "Recibe precios para paquetes con %sx[Enlace de Artículo] (x = tamaño del paquete)";
 		FrmtAskPriceBuyoutMedianHistorical	= "%sMedia histórica: %s%s";
 		FrmtAskPriceBuyoutMedianSnapshot	= "%sMedia última búsqueda: %s%s";
-		FrmtAskPriceDisable	= "Deshabilitando la opción %s de PreguntaPrecios";
+		FrmtAskPriceDisable	= "Deshabilitando la opción %s de PreguntarPrecios";
 		FrmtAskPriceEach	= "(%s c/u)";
-		FrmtAskPriceEnable	= "Activando la opción %s de PreguntaPrecios";
-		FrmtAskPriceVendorPrice	= "%sVender a vendedores por: %s%s";
+		FrmtAskPriceEnable	= "Activando la opción %s de PreguntarPrecios";
+		FrmtAskPriceVendorPrice	= "%sVender a vendedor por: %s%s";
 
 
 		-- Section: Auction Messages
@@ -2303,6 +2321,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "CRITIQUE: Le fichier SavedVariables d'Auctioneer est %.3f%% plein";
+		ConstantsMessage	= "Le fichier SavedVariables d'Auctioneer est %.3f%% plein";
+		ConstantsWarning	= "ATTENTION: Le fichier SavedVariables d'Auctioneer est %.3f%% plein";
 		FrmtActClearall	= "Effacer toutes les données pour l'enchère %s";
 		FrmtActClearFail	= "Objet introuvable : %s";
 		FrmtActClearOk	= "Effacer les infos de l'objet : %s";
@@ -2508,6 +2529,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Etes-vous sûr que vous voulez %s\n%dx%s pour:";
 		DisableMsg	= "Désactiver le chargement automatique d'Auctioneer";
 		FrmtWelcome	= "Auctioneer v%s est chargé";
 		MesgNotLoaded	= "Auctioneer n'est pas chargé. Tapez /auctioneer pour plus d'informations.";
@@ -3166,7 +3188,7 @@ AuctioneerLocalizations = {
 		FrmtAuctinfoHist	= "기존 %d개";
 		FrmtAuctinfoLow	= "낮은 기록";
 		FrmtAuctinfoMktprice	= "상점가";
-		FrmtAuctinfoNolow	= "최근 기록된 정보에서 본적이 없는 아이템.";
+		FrmtAuctinfoNolow	= "최근 기록된 정보에서 본 적이 없는 아이템.";
 		FrmtAuctinfoOrig	= "원래 입찰가";
 		FrmtAuctinfoSnap	= "최근 조사 %d개";
 		FrmtAuctinfoSugbid	= "제안된 입찰가";
@@ -3186,9 +3208,9 @@ AuctioneerLocalizations = {
 		FrmtBidAuction	= "경매에 입찰: %s (x%d)";
 		FrmtBidQueueOutOfSync	= "오류: 입찰 대기열 동기화에 문제가 발생하였습니다!";
 		FrmtBoughtAuction	= "즉시구입된 경매: %s (x%d)";
-		FrmtMaxBidsReached	= "%s(x%d)의 경매품들을 좀더 찾았지만, 입찰 한계에 도달했습니다.(%d)";
+		FrmtMaxBidsReached	= "%s (x%d)의 경매품들을 좀더 찾았지만, 입찰 한계에 도달했습니다.(%d)";
 		FrmtNoAuctionsFound	= "경매를 찾을 수없음: %s (x%d)";
-		FrmtNoMoreAuctionsFound	= "더이상 경매품을 찾을 수 없습니다: %s(x%d)";
+		FrmtNoMoreAuctionsFound	= "더이상 경매품을 찾을 수 없습니다: %s (x%d)";
 		FrmtNotEnoughMoney	= "경매에 입찰하기 위한 메모리가 부족합니다: %s (x%d)";
 		FrmtSkippedAuctionWithHigherBid	= "더 높은 입찰로 인해 건너뛴 경매: %s (x%d)";
 		FrmtSkippedAuctionWithLowerBid	= "더 낮은 입찰로 인해 건너뛴 경매: %s (x$d)";
@@ -3197,6 +3219,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "위험: Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
+		ConstantsMessage	= "Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
+		ConstantsWarning	= "경고: Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
 		FrmtActClearall	= "%s에 대한 모든 경매 데이터 삭제";
 		FrmtActClearFail	= "찾을 수 없는 아이템: %s";
 		FrmtActClearOk	= "아이템관련 삭제된 데이타: %s";
@@ -3279,7 +3304,7 @@ AuctioneerLocalizations = {
 		CmdFinish1	= "접속종료";
 		CmdFinish2	= "나가기";
 		CmdFinish3	= "리로드";
-		CmdFinishSound	= "끝내 소리";
+		CmdFinishSound	= "종료 소리";
 		CmdHelp	= "도움말";
 		CmdLocale	= "지역";
 		CmdOff	= "끔";
@@ -3313,10 +3338,10 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Config Text
-		GuiAlso	= "추가 정보 표시";
+		GuiAlso	= "Also 데이타 표시";
 		GuiAlsoDisplay	= "%s에 관한 데이터 표시";
-		GuiAlsoOff	= "더이상 서버-진영 데이터를 표시하지 않습니다.";
-		GuiAlsoOpposite	= "적대 진영에대한 추가적인 데이터를 표시합니다.";
+		GuiAlsoOff	= "더이상 다른 서버-진영 데이터를 표시하지 않습니다.";
+		GuiAlsoOpposite	= "Also로 적대 진영에 대한 데이터를 표시합니다.";
 		GuiAskPrice	= "가격요청 활성화";
 		GuiAskPriceAd	= "특징 광고 전송";
 		GuiAskPriceGuild	= "길드대화 쿼리 응답";
@@ -3326,32 +3351,32 @@ AuctioneerLocalizations = {
 		GuiAskPriceSmart	= "스마트워드 사용";
 		GuiAskPriceTrigger	= "가격요청 트리거";
 		GuiAskPriceVendor	= "상점 정보 전송";
-		GuiAskPriceWhispers	= "쇼 나가는 속삭임";
-		GuiAskPriceWord	= "주문 똑똑한 낱말 %d";
+		GuiAskPriceWhispers	= "귓속말 보이기";
+		GuiAskPriceWord	= "추가 스마트워드 %d";
 		GuiAuctionDuration	= "기본 경매 기간";
-		GuiAuctionHouseHeader	= "AH창";
-		GuiAuctionHouseHeaderHelp	= "AH창의 동작 변경";
+		GuiAuctionHouseHeader	= "경매장 창";
+		GuiAuctionHouseHeaderHelp	= "경매장 창의 동작 변경";
 		GuiAutofill	= "경매장에서 자동으로 가격 입력";
-		GuiAverages	= "평균값 보기";
+		GuiAverages	= "평균값 표시";
 		GuiBidmarkdown	= "입찰 가격 인하 비율";
 		GuiClearall	= "모든 Auctioneer 데이타 삭제";
 		GuiClearallButton	= "모두 삭제";
-		GuiClearallHelp	= "현재 서버에대한 모든 경매인 데이타를 삭제하려면 이곳을 클릭하십시오.";
-		GuiClearallNote	= "현재 서버 진영";
+		GuiClearallHelp	= "현재 서버-진영에 대한 모든 Auctioneer 데이타를 삭제하려면 이곳을 클릭하십시오.";
+		GuiClearallNote	= "현재 서버-진영";
 		GuiClearHeader	= "데이터 삭제";
-		GuiClearHelp	= "경매인 데이터 삭제. \n모든 데이타 또는 현재 기록정보를 선택.\n경고: 삭제된 경매 정보는 복구할 수 없습니다.";
+		GuiClearHelp	= "Auctioneer 데이터를 삭제합니다. 모든 데이타 또는 현재 기록을 선택하십시오. 경고: 삭제된 경매 정보는 복구할 수 없습니다.";
 		GuiClearsnap	= "기록 정보 삭제";
 		GuiClearsnapButton	= "기록 삭제";
-		GuiClearsnapHelp	= "최근 경매인의 기록 정보를 삭제하시려면 이곳을 클릭하십시오.";
+		GuiClearsnapHelp	= "최근의 Auctioneer 기록 정보를 삭제하려면 이곳을 클릭하십시오.";
 		GuiDefaultAll	= "모든 Auctioneer 설정 초기화";
 		GuiDefaultAllButton	= "모두 초기화";
-		GuiDefaultAllHelp	= "Auctioneer 설정을 기본값으로 설정하려면 여기를 클릭하십시오. \n경고: 지금 경매는 수행되지 않습니다.";
+		GuiDefaultAllHelp	= "Auctioneer 설정을 기본값으로 설정하려면 여기를 클릭하십시오. 경고: 기존의 설정값은 복구할 수 없습니다.";
 		GuiDefaultOption	= "설정 초기화";
 		GuiEmbed	= "게임 툴팁에 정보를 포함시킴";
-		GuiEmbedBlankline	= "게임 툴팁에 공백줄 표시";
+		GuiEmbedBlankline	= "게임 툴팁에 빈줄 표시";
 		GuiEmbedHeader	= "포함";
 		GuiFinish	= "검색이 끝나면";
-		GuiFinishSound	= "검사 끝에 놀이 소리";
+		GuiFinishSound	= "검색이 끝나면 소리 재생";
 		GuiLink	= "링크아이디 보기";
 		GuiLoad	= "Auctioneer 불러오기";
 		GuiLoad_Always	= "항상사용";
@@ -3364,14 +3389,14 @@ AuctioneerLocalizations = {
 		GuiMaxless	= "최대 시장가 절삭 비율";
 		GuiMedian	= "중앙값 보기";
 		GuiNocomp	= "경합 절삭 비율 없음";
-		GuiNoWorldMap	= "Auctioneer: 월드맵 표시를위해 감춰짐";
+		GuiNoWorldMap	= "Auctioneer: 월드맵 표시를 위해 감춰짐";
 		GuiOtherHeader	= "기타 옵션들";
 		GuiOtherHelp	= "자세한 경매인 옵션들";
 		GuiPercentsHeader	= "Auctioneer 경계값 퍼센트";
 		GuiPercentsHelp	= "경고: 다음 설정은 고급 사용자만을 위한 것입니다. 다음 조절값들은 얼마나 적극적으로 Auctioneer가 이윤 수준을 결정할 것인지에 관한 것입니다.";
 		GuiPrintin	= "원하는 메시지 프레임 선택";
-		GuiProtectWindow	= "실수로 AH창 닫기 방지";
-		GuiRedo	= "장기 검색 경고 보기";
+		GuiProtectWindow	= "실수로 경매장 창 닫기 방지";
+		GuiRedo	= "장기 검색 경고 표시";
 		GuiReloadui	= "사용자 인터페이스 리로드";
 		GuiReloaduiButton	= "UI리로드";
 		GuiReloaduiFeedback	= "WoW UI를 리로드 하는중";
@@ -3402,12 +3427,13 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "%dx%s|1을;를; 정말로 %s하시겠습니까?\n가격: ";
 		DisableMsg	= "Auctioneer 자동으로 불러오기 비활성화";
 		FrmtWelcome	= "Auctioneer v%s 로드됨.";
 		MesgNotLoaded	= "Auctioneer 로드되지 않음. 더 많은 정보를 보려면 /auctioneer 라고 입력하세요.";
 		StatAskPriceOff	= "가격요청이 비활성화됩니다.";
 		StatAskPriceOn	= "가격요청이 활성화됩니다.";
-		StatOff	= "어떤 경매 정보도 표시되지 않음";
+		StatOff	= "어떤 경매 데이타도 표시하지 않음";
 		StatOn	= "설정된 경매 데이타 표시";
 
 
@@ -3421,52 +3447,52 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Help Text
-		HelpAlso	= "다른 서버에서의 가격을 툴팁에 표시. 서버명과 진영을 추가. 예제: \"/auctioneer also Al'Akir-Horde\". 특별한 키워드인 \"opposite\"은 적대 진영을 의미하고, \"off\"는 기능 끄기.";
-		HelpAskPrice	= "가격요청 활성화 또는 비활성화";
-		HelpAskPriceAd	= "새로운 특징 광고 가격요청 활성화 또는 비활성화";
-		HelpAskPriceGuild	= "길드 대화에서 퀘리에 응답합니다.";
-		HelpAskPriceParty	= "파티 대화에서 퀘리에 응답합니다.";
-		HelpAskPriceSmart	= "스마트워드 활성화 또는 비활성화를 검사합니다.";
+		HelpAlso	= "다른 서버에서의 가격을 툴팁에 표시합니다. 서버명과 진영을 넣어야 합니다. 예제: \"/auctioneer also 달라란-얼라이언스\". 추가 옵션으로 \"적진영\"은 적대 진영을 의미하고, \"끔\"은 기능을 끕니다.";
+		HelpAskPrice	= "가격요청을 활성화 또는 비활성화합니다.";
+		HelpAskPriceAd	= "새로운 가격요청 기능의 광고를 활성화 또는 비활성화합니다.";
+		HelpAskPriceGuild	= "길드 대화창에서 생성된 쿼리에 응답합니다.";
+		HelpAskPriceParty	= "파티 대화창에서 생성된 쿼리에 응답합니다.";
+		HelpAskPriceSmart	= "스마트워드 체크를 활성화 또는 비활성화합니다.";
 		HelpAskPriceTrigger	= "가격요청의 트리거 문자를 변경합니다.";
-		HelpAskPriceVendor	= "상점 가격 데이타 전송 활성화 또는 비활성화 합니다.";
-		HelpAskPriceWhispers	= "모두의 숨기기 묻는다 가격에게 나가는 속삭임을 가능하게 하거나 무능하게 하십시오.";
-		HelpAskPriceWord	= "묻는다 가격의 주문 똑똑한 낱말을 추가하거나 변경하십시오.";
-		HelpAuctionClick	= "가방에 있는 아이템을 Alt-클릭 하면 자동으로 경매시작";
-		HelpAuctionDuration	= "AH창을 열때 기본 경매 기간을 설정";
-		HelpAutofill	= "AH창에 새로운 경매를 등록하면 자동으로 가격 입력 할것인지 설정";
-		HelpAverage	= "아이템의 평균 경매가 표시 여부 선택";
-		HelpBidbroker	= "최근 검색한 이익을 위해 입찰한 경매에서 단기 또는 중기인 경매를 표시";
-		HelpBidLimit	= "경매품 검색 탭에서 입찰 또는 즉시 구입 버튼이 클릭 되었을 때 입찰 또는 즉시 구입할 경매품의 최대 수량";
-		HelpBroker	= "최근 검색한 경매에서 다시 팔경우 이익이 생기는 아이템 모두 표시";
-		HelpClear	= "특정 아이템에 대한 정보 삭제 (반드시 Shift 클릭을통해 명령줄에 아이템을 입력해야합니다.) 또한 특별히 all 또는 snapshot 키워드를 사용할수 있습니다.";
-		HelpCompete	= "최근 검색된 경매에서 자신보다 낮은 즉구가를 가진 아아템 보기";
-		HelpDefault	= "Auctioneer의 기본값으로 변경. \"all\" 키워드를 통해서 모든 설정을 기본값으로 설정할수 있습니다.";
-		HelpDisable	= "다음 로그인 부터 자동으로 Auctioneer를 로드하지 않음";
-		HelpEmbed	= "기본 게임 툴팁에 텍스트 포함(주의: 이것을 선택하면 어떤 특성들은 사용할 수 없습니다.)";
-		HelpEmbedBlank	= "포함 모드가 켜있을 때 툴팁 정보와 경매 정보 사이에 한줄 띄우기";
-		HelpFinish	= "경매 검색이 끝나면 자동으로 로그아웃 또는 게임을 나갈것인지를 설정";
-		HelpFinishSound	= "경매 집 검사의 끝에 소리를 놀기 위하여 놓으십시오.";
-		HelpLink	= "툴팁에 링크 아이디 보기";
-		HelpLoad	= "Auctioneer 로드 설정 변경";
-		HelpLocale	= "경매인 메세지 표시에 사용되는 지역 정보 변경";
-		HelpMedian	= "아이템의 즉시 구입가 중앙값 보기";
-		HelpOnoff	= "경매 데이타 표시 켜기 또는 끄기";
-		HelpPctBidmarkdown	= "경매인이 즉시 구입가보다 낮은 가격에 입찰할 비율 설정";
-		HelpPctMarkup	= "다른 값이 표시 가능하지 않을 때 상점 가격이 선택될 비율.";
-		HelpPctMaxless	= "포기하기 전에 Auctioneer가 시장가를 절삭할 최대 비율 설정.";
-		HelpPctNocomp	= "경합이 없을 때 Auctioneer가 시장가를 절삭할 비율.";
-		HelpPctUnderlow	= "Auctioneer가 가장 적은 경매가를 절삭할 비율 설정.";
-		HelpPctUndermkt	= "경합에서 입찰 할 수 없는 경우 시장 가격을 절삭할 비율.(maxless에 의해)";
-		HelpPercentless	= "즉시 구입가가 최고 판매가능가 이하의 확률인 최근 검색된 경매 물품들 보기";
-		HelpPrintin	= "Auctioneer가 메시지를 표시할 창을 설정. 프레임명이나 번호를 통해 결정할수 있습니다.";
-		HelpProtectWindow	= "실수로 AH창 닫기 방지";
-		HelpRedo	= "서버의 랙 때문에 경매 검색이 오래 걸릴 경우 경고";
-		HelpScan	= "다음 방문 때 또는 그곳에 있는 동안 경매장 검색 수행(경매창에도 버튼이 있음). 검색할 분류에 체크 상자를 선택하십시오.";
-		HelpStats	= "아이템의 입찰/즉구 퍼센트 보기 여부 설정";
-		HelpSuggest	= "아이템의 제안 경매가 보기 여부 결정";
+		HelpAskPriceVendor	= "상점 가격 데이타의 전송을 활성화 또는 비활성화합니다.";
+		HelpAskPriceWhispers	= "가격요청이 하는 귓속말 숨기기를 활성화 또는 비활성화합니다.";
+		HelpAskPriceWord	= "가격요청의 추가 스마트워드를 추가하거나 변경합니다.";
+		HelpAuctionClick	= "가방에 있는 아이템을 Alt-클릭하면 자동으로 경매를 시작하게 합니다.";
+		HelpAuctionDuration	= "경매장 창을 열때 기본 경매 기간을 설정합니다.";
+		HelpAutofill	= "경매장 창에 아이템을 올려놓으면 자동으로 가격을 입력할지 설정합니다.";
+		HelpAverage	= "아이템의 평균 경매가 표시 여부를 선택합니다.";
+		HelpBidbroker	= "최근 검색한 이익을 위해 입찰한 경매에서 단기 또는 중기인 경매를 표시합니다.";
+		HelpBidLimit	= "경매 검색 탭에서 입찰 또는 즉시 구입 버튼이 클릭 되었을 때 입찰 또는 즉시 구입할 경매품의 최대 수량";
+		HelpBroker	= "최근 검색한 경매에서 입찰 후 다시 팔경우 이익이 생기는 아이템을 모두 표시합니다.";
+		HelpClear	= "특정 아이템에 대한 정보를 삭제합니다. (반드시 Shift 클릭을 통해 명령줄에 아이템을 입력해야합니다.) 또한 \"모두\" 또는 \"기록\" 키워드를 사용할수 있습니다.";
+		HelpCompete	= "최근 검색된 경매에서 자신보다 낮은 즉시 구입가를 가진 아이템을 표시합니다.";
+		HelpDefault	= "Auctioneer의 설정을 기본값으로 되돌립니다. \"모두\" 키워드를 통해서 모든 설정을 기본값으로 되돌릴 수 있습니다.";
+		HelpDisable	= "다음 로그인 부터 자동으로 Auctioneer를 로드하지 않습니다.";
+		HelpEmbed	= "기본 게임 툴팁에 텍스트를 포함합니다.(주의: 이것을 선택하면 일부 기능이 비활성화됩니다.)";
+		HelpEmbedBlank	= "텍스트 포함 모드가 켜있을 때 툴팁 정보와 경매 정보 사이에 한 줄을 띕니다.";
+		HelpFinish	= "경매 검색이 끝나면 자동으로 접속종료 또는 게임을 나갈지를 설정합니다.";
+		HelpFinishSound	= "경매 검색이 끝나면 소리를 재생합니다.";
+		HelpLink	= "툴팁에 링크 아이디를 표시합니다.";
+		HelpLoad	= "Auctioneer 로드 설정을 변경합니다.";
+		HelpLocale	= "경매인 메세지 표시에 사용되는 지역 정보를 변경합니다.";
+		HelpMedian	= "아이템의 즉시 구입가 중앙값을 표시합니다.";
+		HelpOnoff	= "경매 데이타 표시를 켜거나 끕니다.";
+		HelpPctBidmarkdown	= "Auctioneer가 즉시 구입가보다 낮은 가격에 입찰할 비율을 설정합니다.";
+		HelpPctMarkup	= "다른 값이 없을 때 상점 가격을 선택할 비율입니다.";
+		HelpPctMaxless	= "포기하기 전에 Auctioneer가 시장가를 절삭할 최대 비율을 설정합니다.";
+		HelpPctNocomp	= "경합이 없을 때 Auctioneer가 시장가를 절삭할 비율입니다.";
+		HelpPctUnderlow	= "Auctioneer가 가장 낮은 경매가를 절삭할 비율을 설정합니다.";
+		HelpPctUndermkt	= "(maxless에 의해) 경합에서 이길 수 없을 때 시장 가격을 절삭할 비율.";
+		HelpPercentless	= "최근 검색된 경매 물품들중에서 즉시 구입가가 최고 판매가능가보다 특정 퍼센트 미만인 물품을 표시합니다.";
+		HelpPrintin	= "Auctioneer가 메시지를 표시할 창을 선택합니다. 프레임명이나 프레임번호로 지정할수 있습니다.";
+		HelpProtectWindow	= "실수로 경매장 창을 닫는 것을 방지합니다.";
+		HelpRedo	= "서버 랙 때문에 현재 페이지의 경매 검색이 오래 걸릴 경우 경고를 보여줄지를 결정합니다.";
+		HelpScan	= "다음번 경매장 방문 때 또는 경매장에 있는 동안(경매창에도 버튼이 있습니다.) 경매장 검색을 수행합니다. 검색할 분류에 체크 상자를 선택하십시오.";
+		HelpStats	= "아이템의 입찰/즉시 구입 퍼센트 표시 여부를 설정합니다.";
+		HelpSuggest	= "아이템의 제안 경매가 표시 여부를 설정합니다.";
 		HelpUpdatePrice	= "경매품 탭에서 즉시 구입가가 변경되면 경매품에 대한 시작가를 자동으로 갱신합니다.";
-		HelpVerbose	= "평균과 여러가지 제안 사항 보기(또는 한줄에 보기 끄기)";
-		HelpWarnColor	= "현재 AH 가격 모델(절삭된...)을 직관적인 색상으로 표시할지 선택합니다.";
+		HelpVerbose	= "평균 가격과 제안 가격을 여러줄로 표시합니다.(\"끔\"으로 하면 한줄로 표시합니다.)";
+		HelpWarnColor	= "현재 경매장 가격 모델(절삭 등)을 직관적인 색상으로 표시합니다.";
 
 
 		-- Section: Post Messages
@@ -3504,15 +3530,15 @@ AuctioneerLocalizations = {
 		AuctionOldAucts	= "이전에 검색된 경매 물품 수량: %s";
 		AuctionPageN	= "Auctioneer: %s %d/%d 검색중 초당 검색 경매품: %s 추정 남은 시간: %s";
 		AuctionScanDone	= "Auctioneer: 경매 물품 검색 완료";
-		AuctionScanNexttime	= "다음 경매인과 대화할 때, Auctioneer는 전체 검색을 할 것입니다.";
+		AuctionScanNexttime	= "다음번 경매인과 대화할 때, Auctioneer는 전체 검색을 할 것입니다.";
 		AuctionScanNocat	= "검색을 위해 최소한 한개 이상의 분류를 선택하여야 합니다.";
-		AuctionScanRedo	= "현재 페이지를 완료하려면 %d 초 이상 걸립니다. 페이지 재시도.";
+		AuctionScanRedo	= "현재 페이지를 완료하는데 %d 초 이상이 걸렸습니다. 페이지를 재시도합니다.";
 		AuctionScanStart	= "Auctioneer: %s 페이지 1 검색중...";
 		AuctionTotalAucts	= "검색된 경매 물품 총 수량: %s";
 
 
 		-- Section: Tooltip Messages
-		FrmtInfoAlsoseen	= "%s에서 %d회 봄";
+		FrmtInfoAlsoseen	= "%s에서 %d회 검색됨";
 		FrmtInfoAverage	= "최저 %s/%s 즉시 구입가 (%s에 입찰)";
 		FrmtInfoBidMulti	= "입찰 (%s%s 개)";
 		FrmtInfoBidOne	= "입찰 %s";
@@ -3526,7 +3552,7 @@ AuctioneerLocalizations = {
 		FrmtInfoHistmed	= "최근 %d, 즉시 구입가 중앙값 (개)";
 		FrmtInfoMinMulti	= "경매 시작가 (%s 개)";
 		FrmtInfoMinOne	= "경매 시작가";
-		FrmtInfoNever	= "%s에서 본적 없음";
+		FrmtInfoNever	= "%s에서 검색된적 없음";
 		FrmtInfoSeen	= "전체 경매에서 %d회 검색됨";
 		FrmtInfoSgst	= "제안 가격: 최저 %s /%s 즉시 구입가";
 		FrmtInfoSgststx	= "%d 개에 대한 제안 가격: 최저가 %s/ 즉시 구입가 %s";
@@ -3557,10 +3583,10 @@ AuctioneerLocalizations = {
 		UiMinimumQualityLabel	= "최소 품질:";
 		UiMinimumUndercutLabel	= "최소 삭감:";
 		UiNameHeader	= "이름";
-		UiNoPendingBids	= "모든 입찰 완료를 요청했습니다!";
+		UiNoPendingBids	= "모든 입찰 요청이 완료되었습니다!";
 		UiNotEnoughError	= "(충분하지 않음)";
-		UiPendingBidInProgress	= "1개의 입찰이 처리 요청됨...";
-		UiPendingBidsInProgress	= "%d개의 결정되지않은 입찰이 요청됨...";
+		UiPendingBidInProgress	= "1개의 입찰 요청 처리중...";
+		UiPendingBidsInProgress	= "%d개의 결정되지않은 입찰 요청 처리중...";
 		UiPercentLessHeader	= "%";
 		UiPost	= "게시";
 		UiPostAuctions	= "경매 게시";
@@ -3582,7 +3608,7 @@ AuctioneerLocalizations = {
 		UiSearchDropDownLabel	= "검색";
 		UiSearchForLabel	= "아이템으로 검색:";
 		UiSearchTypeBids	= "입찰";
-		UiSearchTypeBuyouts	= "즉시구입";
+		UiSearchTypeBuyouts	= "즉시 구입";
 		UiSearchTypeCompetition	= "경쟁";
 		UiSearchTypePlain	= "아이템";
 		UiStacksLabel	= "묶음";
@@ -4825,8 +4851,8 @@ AuctioneerLocalizations = {
 
 		-- Section: AskPrice Messages
 		AskPriceAd	= "以%sx[物品链接](x=堆叠数量)获取堆叠价格。";
-		FrmtAskPriceBuyoutMedianHistorical	= "%s既往一口价中值：%s%s";
-		FrmtAskPriceBuyoutMedianSnapshot	= "%s最近扫描一口价中值：%s%s";
+		FrmtAskPriceBuyoutMedianHistorical	= "%s既往一口价中位数：%s%s";
+		FrmtAskPriceBuyoutMedianSnapshot	= "%s最近扫描一口价中位数：%s%s";
 		FrmtAskPriceDisable	= "禁用询价%s选项。";
 		FrmtAskPriceEach	= "(每件%s)";
 		FrmtAskPriceEnable	= "启用询价%s选项。";
@@ -4854,7 +4880,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Bid Messages
-		FrmtAlreadyHighBidder	= "已是应拍：%s (x%d)的居高出价人。";
+		FrmtAlreadyHighBidder	= "已是应拍：%s (x%d)的最高出价人。";
 		FrmtBidAuction	= "出价竞拍：%s (x%d)。";
 		FrmtBidQueueOutOfSync	= "错误：竞拍队列不同步！";
 		FrmtBoughtAuction	= "一口价应拍：%s (x%d)。";
@@ -4869,6 +4895,9 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
+		ConstantsCritical	= "严重:你的拍卖助手扫描数据文件(SavedVariables )%.3f%%已满";
+		ConstantsMessage	= "你的拍卖助手扫描数据文件(SavedVariables )%.3f%%已满";
+		ConstantsWarning	= "警告:你的拍卖助手扫描数据文件(SavedVariables )%.3f%%已满";
 		FrmtActClearall	= "清除%s的全部拍卖数据。";
 		FrmtActClearFail	= "无法找到物品:%s。";
 		FrmtActClearOk	= "%s的数据已清除。";
@@ -4926,7 +4955,7 @@ AuctioneerLocalizations = {
 		CmdAskPriceTrigger	= "trigger触发器";
 		CmdAskPriceVendor	= "vendor商贩";
 		CmdAskPriceWhispers	= "whispers 密语";
-		CmdAskPriceWord	= "word";
+		CmdAskPriceWord	= "word 关键字";
 		CmdAuctionClick	= "auction-click拍卖点击";
 		CmdAuctionDuration	= "auction-duration拍卖时限";
 		CmdAuctionDuration0	= "last最近";
@@ -5034,7 +5063,7 @@ AuctioneerLocalizations = {
 		GuiMainHelp	= "包含插件 - 拍卖助手的设置。它用于显示物品信息，并分析拍卖数据。在拍卖行点击\"扫描\"按钮来收集拍卖数据。";
 		GuiMarkup	= "商贩价涨幅比率";
 		GuiMaxless	= "市场价最大削减比率";
-		GuiMedian	= "显示一口价中值";
+		GuiMedian	= "显示一口价中位数";
 		GuiNocomp	= "无竞拍削价比率";
 		GuiNoWorldMap	= "拍卖助手：防止显示世界地图";
 		GuiOtherHeader	= "其他选项";
@@ -5122,7 +5151,7 @@ AuctioneerLocalizations = {
 		HelpLink	= "选择是否在提示中显示链接标识。";
 		HelpLoad	= "改变拍卖助手对这个角色的加载设置。";
 		HelpLocale	= "改变用于显示拍卖助手讯息的语言设置。";
-		HelpMedian	= "选择是否显示物品的一口价中值。";
+		HelpMedian	= "选择是否显示物品的一口价中位数。";
 		HelpOnoff	= "打开/关闭拍卖行数据显示。";
 		HelpPctBidmarkdown	= "设置拍卖助手由一口价削减出价的比率。";
 		HelpPctMarkup	= "当没有可参考价格时按商贩价涨幅比率。";
@@ -5143,8 +5172,8 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Post Messages
-		FrmtNoEmptyPackSpace	= "无背包空间用于新建拍卖！";
-		FrmtNotEnoughOfItem	= "无足够%s用于新建拍卖！";
+		FrmtNoEmptyPackSpace	= "背包没有空间来发布新拍卖项！";
+		FrmtNotEnoughOfItem	= "无足够%s用于新拍卖项！";
 		FrmtPostedAuction	= "已发布1件拍卖：%s (x%d)。";
 		FrmtPostedAuctions	= "已发布%d件拍卖：%s (x%d)。";
 
@@ -5163,7 +5192,7 @@ AuctioneerLocalizations = {
 		FrmtCompeteLine	= "%s，竞拍价：%s，一口价%s vs %s，差额%s";
 		FrmtHspLine	= "每件%s的最高曾售价为：%s";
 		FrmtLowLine	= "%s，一口价：%s，出售者：%s，单价：%s，低于中值:%s";
-		FrmtMedianLine	= "最近出现%d次，每件%s一口价中值为：%s";
+		FrmtMedianLine	= "最近出现%d次，每件%s一口价中位数为：%s";
 		FrmtNoauct	= "物品：%s没有拍卖记录";
 		FrmtPctlessDone	= "比率差额完成。";
 		FrmtPctlessHeader	= "低于最高曾售价比率：%d%%";
@@ -5190,20 +5219,20 @@ AuctioneerLocalizations = {
 		FrmtInfoBidMulti	= "竞拍价(%s每件%s)";
 		FrmtInfoBidOne	= "竞拍价%s";
 		FrmtInfoBidrate	= "竞拍价%d%%,一口价%d%%";
-		FrmtInfoBuymedian	= "一口价中值";
+		FrmtInfoBuymedian	= "一口价中位数";
 		FrmtInfoBuyMulti	= "一口价(%s每件%s)";
 		FrmtInfoBuyOne	= "一口价%s";
 		FrmtInfoForone	= "每件:最低价%s/一口价%s(竞拍价%s)[%d件]";
 		FrmtInfoHeadMulti	= "%d件物品平均:";
 		FrmtInfoHeadOne	= "该物品平均:";
-		FrmtInfoHistmed	= "之前有%d次,一口价中值(每件)";
+		FrmtInfoHistmed	= "之前有%d次,一口价中位数(每件)";
 		FrmtInfoMinMulti	= "起拍价(每件%s)";
 		FrmtInfoMinOne	= "起拍价";
 		FrmtInfoNever	= "从未在%s出现过";
 		FrmtInfoSeen	= "拍卖合计出现过%d次";
 		FrmtInfoSgst	= "建议价格:最低价%s/一口价%s";
 		FrmtInfoSgststx	= "对于堆叠%d件的建议价格:最低价%s/一口价%s";
-		FrmtInfoSnapmed	= "扫描到%d次,一口价中值(每件)";
+		FrmtInfoSnapmed	= "扫描到%d次,一口价中位数(每件)";
 		FrmtInfoStacksize	= "平均堆叠数量:%d件";
 
 
@@ -5303,9 +5332,9 @@ AuctioneerLocalizations = {
 
 		-- Section: Bid Messages
 		FrmtAlreadyHighBidder	= "已經是最高出價者: %s (x%d) ";
-		FrmtBidAuction	= "下標：％s (x%d)";
+		FrmtBidAuction	= "下標：%s (x%d)";
 		FrmtBidQueueOutOfSync	= "錯誤：標價排程已非同步";
-		FrmtBoughtAuction	= "直接購買：％s (x%d)";
+		FrmtBoughtAuction	= "直接購買：%s (x%d)";
 		FrmtMaxBidsReached	= "找到更多拍賣項目:%s (x%d), 但是已經到達查詢數量限制(%d)";
 		FrmtNoAuctionsFound	= "未找到拍賣：%s (x%d)";
 		FrmtNoMoreAuctionsFound	= "找不到新的拍賣項目:%s (x%d) ";
