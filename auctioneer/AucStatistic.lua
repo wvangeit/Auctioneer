@@ -785,6 +785,11 @@ end
 -- Calculates the suggested starting bid and buyout. If there is no info on
 -- which to base a suggestion, this method returns zero for bid, buyout and
 -- market prices.
+--
+-- parameters:
+--    count = number of items to calculate the suggested resale prices for
+--            Note: this value MUST be passed to the function, because
+--                  calculating the prices is no simple multiplication!
 -------------------------------------------------------------------------------
 function getSuggestedResale(itemKey, ahKey, count)
 	if (ahKey == nil) then ahKey = Auctioneer.Util.GetAuctionKey() end;
