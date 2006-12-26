@@ -441,7 +441,7 @@ function scanEnded()
 
 	--The followng was added by MentalPower to implement the "/auc finish-sound" command
 	if (Auctioneer.Command.GetFilter("finish-sound")) then
-		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.ogg")
+		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.mp3")
 	end
 
 	--The followng was added by MentalPower to implement the "/auc finish" command

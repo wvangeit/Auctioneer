@@ -1522,7 +1522,7 @@ BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety
 	BtmScan.Prompt.Lines[5]:SetText("  "..tr("Valued at %1 (%2 profit)", BtmScan.GSC(value), BtmScan.GSC(profit)))
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(iTex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
-	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.ogg")
+	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3")
 	BtmScan.Prompt:Show()
 
 end
