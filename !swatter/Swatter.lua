@@ -86,7 +86,7 @@ function Swatter.ErrorShow()
 	end
 
 	local count = frame.Swatter[msg]
-	local message = msg:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1")
+	local message = msg:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1"):gsub("|", "||")
 	local trace = "   "..bt:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n", "\n   ")
 
 	Swatter.Error.lastError = "Error occured in: "..(frame:GetName() or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n"
