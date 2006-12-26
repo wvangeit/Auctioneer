@@ -216,7 +216,7 @@ function createDatabaseFrom3x()
 				local store --Flag to indicate whether or not we attempt to store data
 
 				if (type(transactionData) == "string") then --Auctioneer 3.8 format (string)
-					if (transactionData:find("|cffffff00(bid)|r", 1, true)) then --Corrupted data
+					if (transactionData:find("|c%x%x%x%x%x%x%x%x")) then --Corrupted data
 						store = false --Flag so that the storage code below doesn't scream
 					else
 						itemSignature, bidAmmount, bidOrBuyout, ownerName = ("|"):split(transactionData)
