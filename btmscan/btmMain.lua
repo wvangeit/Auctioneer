@@ -931,7 +931,7 @@ BtmScan.Command = function (msg)
 				return
 			end
 
-			local _,_,_,_,_,_,stack = GetItemInfo(itemid)
+			local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
 			if (not stack) then
 				stack = 1
 			end
