@@ -290,7 +290,7 @@ function hookCall(funcName, ...)
 				--]]
 
 			else
-				Stubby.Print(2, "Error occured while running hooks for: ", tostring(funcName), "\n", res)
+				Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", res)
 			end
 		end
 	end
@@ -346,7 +346,7 @@ end
 
 function errorHandler(stackLevel, ...)
 	local msg = tostring(select(1, ...))
-	for i = 1, select("#", ...) do
+	for i = 2, select("#", ...) do
 		msg = msg.." "..tostring(select(i, ...))
 	end
 	
