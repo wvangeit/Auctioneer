@@ -997,7 +997,7 @@ function Enchantrix_CreateBarker()
 				EnchantrixBarker_AddEnchantToBarker( element.enchant );
 			end
 
-			return EnchantrixBarker_GetBarkerString().._ENCH('BarkerTag');
+			return EnchantrixBarker_GetBarkerString();
 
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
@@ -1178,6 +1178,8 @@ function EnchantrixBarker_AddEnchantToBarker( enchant )
 end
 
 function EnchantrixBarker_GetBarkerString()
+	if not barkerString then EnchantrixBarker_ResetBarkerString() end
+
 	local barker = ""..barkerString;
 
 	for index, key in ipairs(print_order) do
