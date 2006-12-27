@@ -81,7 +81,7 @@ BtmScan.OnLoad = function ()
 		SLASH_BTMSCAN2 = "/btmscan"
 		SLASH_BTMSCAN3 = "/bottomscan"
 		SLASH_BTMSCAN4 = "/bottomscanner"
-		SlashCmdList["AUCTIONEER"] = cmdHandler
+		SlashCmdList["BTMSCAN"] = cmdHandler
 	]]);
 	Stubby.RegisterBootCode("BtmScan", "Triggers", [[
 		function BtmScan_CheckLoad()
