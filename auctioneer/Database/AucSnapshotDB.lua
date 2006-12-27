@@ -676,6 +676,8 @@ function doesItemKeyMatchQuery(itemKey, query)
 		debugPrint("WARNING: Unable to get item info for itemKey", itemKey);
 		return false;
 	end
+	local equipLoc= itemInfo.equipLocName
+	if (equipLoc== "INVTYPE_ROBE") then equipLoc = "INVTYPE_CHEST" end
 
 	-- Check if the item info matches the query constraints.
 	if (query.name and not Auctioneer.Database.DoesNameMatch(itemInfo.name, query.name, false)) then return false end;
@@ -689,7 +691,7 @@ function doesItemKeyMatchQuery(itemKey, query)
 	if (query.subclassIndex and
 		itemInfo.subCategoryName ~= Auctioneer.ItemDB.GetSubCategoryName(query.classIndex, query.subclassIndex)) then return false end;
 	if (query.invTypeIndex and
-		itemInfo.equipLocName ~= Auctioneer.ItemDB.GetInventoryTypeName(query.classIndex, query.subclassIndex, query.invTypeIndex)) then return false end;
+		equipLoc ~= Auctioneer.ItemDB.GetInventoryTypeName(query.classIndex, query.subclassIndex, query.invTypeIndex)) then return false end;
 
 	-- %todo: Check if its usable...
 

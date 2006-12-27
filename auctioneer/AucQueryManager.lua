@@ -354,7 +354,6 @@ function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex,
 	if (hookQueryAuctionItems) then
 		debugPrint("Blizzard's QueryAuctionItems() called");
 
-
 		-- Construct the request and add it to the front of the queue.
 		local request = {
 			-- Construct a table for the QueryAuctionItem parameters.
