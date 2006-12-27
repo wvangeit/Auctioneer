@@ -1326,8 +1326,8 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			if (BtmScan.BaseRule) then
 				BtmScan.prices = {
 					consKey = sanityKey,
-					consMean = iqm
-					consPrice = iqwm
+					consMean = iqm,
+					consPrice = iqwm,
 					consSeen = iqCount,
 					auctKey = auctKey,
 					auctPrice = auctMedian * count,
