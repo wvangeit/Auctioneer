@@ -1,0 +1,16 @@
+(8:45:02 AM) user1: is the wow 2.0 auctioneer out yet?
+(8:45:22 AM) user1: been lookin like an idiot for it ^^
+(8:45:27 AM) MentalPower|PC: user1: topic
+(8:45:29 AM) user2: still beta i believe user1
+(8:45:33 AM) user1: ah ok
+(8:45:42 AM) user1: hows the beta workin then?
+(8:46:13 AM) user2: ummmmmm it was workin great for me until a few days ago
+(8:46:22 AM) user1: ah ok... what happened?
+(8:46:31 AM) user2: now it won't load....trying to figure out why right now
+(8:46:33 AM) MentalPower|PC: user2: what happens when you type "/auc"
+(8:46:42 AM) bleetah: user2: what kind of error, if any, do you get? is it showing in the mod selection screen as loadable?
+(8:46:59 AM) bleetah: and what MP said
+(8:47:14 AM) user2: no error just won't load
+(8:47:19 AM) user1: nothin happens when I typ /auc
+(8:47:29 AM) user1: or do you mean ingame?
+
