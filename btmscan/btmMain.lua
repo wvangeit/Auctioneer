@@ -119,12 +119,6 @@ BtmScan.OnUpdate = function(...)
 	local elapsed = select(2, ...)
 
 	if (not BtmScan.lastTry) then BtmScan.lastTry = 0 end
-	if (not BtmScan.LogFrame and AuctionFrame and BtmScan.lastTry < BtmScan.timer - 1 ) then
-		BtmScan.CreateLogWindow()
-		if (BtmScan.LogFrame) then BtmScan.LogFrame.Update() end
-		BtmScan.lastTry = BtmScan.timer
-	end
-
 	if (not BtmScan.aucPriceModel and AuctionFramePost_AdditionalPricingModels) then
 		BtmScan.aucPriceModel = true
 		table.insert(AuctionFramePost_AdditionalPricingModels, BtmScan.AddAuctPriceModel)
@@ -132,6 +126,12 @@ BtmScan.OnUpdate = function(...)
 
 	if (not BtmScan.interval) then BtmScan.interval = 6 end
 	if (BtmScan.timer) then
+		if (not BtmScan.LogFrame and AuctionFrame and BtmScan.lastTry < BtmScan.timer - 1 ) then
+			BtmScan.CreateLogWindow()
+			if (BtmScan.LogFrame) then BtmScan.LogFrame.Update() end
+			BtmScan.lastTry = BtmScan.timer
+		end
+
 		BtmScan.timer = BtmScan.timer + elapsed
 		if (BtmScan.pageScan) then
 			if (BtmScan.timer > BtmScan.pageScan) then
