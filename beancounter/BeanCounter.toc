@@ -3,7 +3,7 @@
 ##
 ## Interface: 20000
 ## LoadOnDemand: 1
-## Dependencies: Stubby, EnhTooltip, Auctioneer
+## Dependencies: Stubby, EnhTooltip
 ## SavedVariables: BeanCounterAccountDB
 ##
 ## Version: <%version%> (<%codename%>)
