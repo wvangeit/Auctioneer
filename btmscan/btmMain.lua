@@ -955,7 +955,7 @@ BtmScan.Command = function (msg)
 					amount = tonumber(amount) or 0
 
 					worthLine = worthLine..tr("%1 per unit", BtmScan.GSC(amount,1))
-					local _,_,_,_,_,_,stack = GetItemInfo(itemID)
+					local _,_,_,_,_,_,_,stack = GetItemInfo(itemID)
 					stack = tonumber(stack) or 1;
 					if (stack > 1) then
 						worthLine = worthLine.." ("..tr("%1 per %2 stack", BtmScan.GSC(amount*stack,1), stack)..")"
@@ -985,7 +985,7 @@ BtmScan.Command = function (msg)
 				return
 			end
 
-			local _,_,_,_,_,_,stack = GetItemInfo(itemid)
+			local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
 			if (not stack) then
 				stack = 1
 			end
