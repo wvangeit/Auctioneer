@@ -1170,7 +1170,6 @@ end
 BtmScan.GetDepositCost = function (itemID, count)
 	local vendorValue = BtmScan.GetVendorPrice(itemID, count)
 	if (not vendorValue) then return 0 end
-	if (count and count > 1) then vendorValue = vendorValue * count end
 	local baseDeposit = math.floor(vendorValue * BtmScan.depositRate) -- 2 hr auction
 	return baseDeposit * 12 -- 24 hour auction
 end
@@ -1327,8 +1326,8 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			if (BtmScan.BaseRule) then
 				BtmScan.prices = {
 					consKey = sanityKey,
-					consMean = iqm * count,
-					consPrice = iqwm * count,
+					consMean = iqm
+					consPrice = iqwm
 					consSeen = iqCount,
 					auctKey = auctKey,
 					auctPrice = auctMedian * count,
