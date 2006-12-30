@@ -773,6 +773,7 @@ end
 -- The following functions are almost verbatim copies of the original functions but modified in order to make them compatible with direct GUI access.
 function clear(param, chatprint)
 	if (param == _ENCH('CmdClearAll')) or (param == "all") then
+		DisenchantList = {}
 		EnchantedLocal = {}
 		EnchantedBaseItems = {}
 		Enchantrix.Storage.AddonLoaded()

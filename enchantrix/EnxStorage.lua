@@ -93,7 +93,7 @@ function unserialize(str)
 	local tbl = {}
 	if type(str) == "string" then
 		for de in Enchantrix.Util.Spliterator(str, ";") do
-			local _, _, id, d, r = de:find("(%d+):(%d+):(%d+)")
+			local id, d, r = de:match("(%d+):(%d+):(%d+)")
 			id, d, r = tonumber(id), tonumber(d), tonumber(r)
 			if (id and d > 0 and r > 0) then
 				tbl[id] = {[N_DISENCHANTS] = d, [N_REAGENTS] = r}
@@ -258,7 +258,7 @@ function mergeDisenchantLists()
 	end
 
 	-- Take out the trash
-	collectgarbage()
+	collectgarbage("collect")
 end
 
 function saveDisenchant(sig, reagentID, count)
