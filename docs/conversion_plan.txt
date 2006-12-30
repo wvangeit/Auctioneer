@@ -8,7 +8,7 @@ AuctionConfig
       Contains a list of all the account account holder's character's names
    Planned convertion:
       *TODO*
- 
+
  - stats
    - histcount
    - snapmed
