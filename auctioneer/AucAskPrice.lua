@@ -243,7 +243,10 @@ function setCustomSmartWords(param, number, word, chatprint)
 	end
 
 	if (chatprint) then
-		Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format("askprice ".._AUCT('CmdAskPriceWord').." "..number, Auctioneer.Command.GetFilterVal('askprice-word'..number)));
+		Auctioneer.Util.ChatPrint(_AUCT('FrmtActSet'):format(
+			"askprice ".._AUCT('CmdAskPriceWord').." "..number,
+			Auctioneer.Command.GetFilterVal('askprice-word'..number)
+		));
 		setKhaosSetKeyValue('askprice-word'..number, word)
 	end
 end
@@ -273,8 +276,17 @@ function eventHandler(self, event, text, player)
 
 	--Make sure that we recieve the proper events and that our settings allow a response
 	if (not ((event == "CHAT_MSG_WHISPER")
-		or (((event == "CHAT_MSG_GUILD") or (event == "CHAT_MSG_OFFICER")) and Auctioneer.Command.GetFilter('askprice-guild'))
-		or (((event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER")) and Auctioneer.Command.GetFilter('askprice-party')))) then
+		or (
+			((event == "CHAT_MSG_GUILD") or
+			(event == "CHAT_MSG_OFFICER")) and
+			Auctioneer.Command.GetFilter('askprice-guild')
+		)
+		or (
+			((event == "CHAT_MSG_PARTY") or
+			(event == "CHAT_MSG_RAID") or
+			(event == "CHAT_MSG_RAID_LEADER")) and
+			Auctioneer.Command.GetFilter('askprice-party'))
+		)) then
 		return;
 	end
 
@@ -285,11 +297,16 @@ function eventHandler(self, event, text, player)
 
 		--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
 		if (Auctioneer.Command.GetFilter('askprice-smart')) then
-			if (not (text:lower():find(_AUCT('CmdAskPriceSmartWord1'), 1, true) and text:lower():find(_AUCT('CmdAskPriceSmartWord2'), 1, true))) then
+			if (not (
+				text:lower():find(_AUCT('CmdAskPriceSmartWord1'), 1, true) and
+				text:lower():find(_AUCT('CmdAskPriceSmartWord2'), 1, true)
+			)) then
 
 				--Check if the custom SmartWords are present in the chat message
-				local customSmartWord1, customSmartWord2 = Auctioneer.Command.GetFilterVal('askprice-word1'), Auctioneer.Command.GetFilterVal('askprice-word2');
-				if (not ((text:lower():find(customSmartWord1, 1, true)) and text:lower():find(customSmartWord2, 1, true)))  then
+				if (not (
+					text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word1'), 1, true) and
+					text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word2'), 1, true)
+				))  then
 					return;
 				end
 			end
@@ -323,8 +340,20 @@ function eventHandler(self, event, text, player)
 
 		if (aCount > 0) then
 			Auctioneer.AskPrice.SendWhisper(item.link..": ".._AUCT('FrmtInfoSeen'):format(aCount), player);
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianHistorical'):format("    ", EnhTooltip.GetTextGSC(historicalMedian*item.count, nil, true), eachstring), player);
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceBuyoutMedianSnapshot'):format("    ", EnhTooltip.GetTextGSC(snapshotMedian*item.count, nil, true), eachstring), player);
+			Auctioneer.AskPrice.SendWhisper(
+				_AUCT('FrmtAskPriceBuyoutMedianHistorical'):format(
+					"    ",
+					EnhTooltip.GetTextGSC(historicalMedian*item.count, nil, true),
+					eachstring),
+				player
+			);
+			Auctioneer.AskPrice.SendWhisper(
+				_AUCT('FrmtAskPriceBuyoutMedianSnapshot'):format(
+					"    ",
+					EnhTooltip.GetTextGSC(snapshotMedian*item.count, nil, true),
+					eachstring),
+				player
+			);
 		else
 			Auctioneer.AskPrice.SendWhisper(item.link..": ".._AUCT('FrmtInfoNever'):format(Auctioneer.Util.GetAuctionKey()), player);
 		end
@@ -339,7 +368,13 @@ function eventHandler(self, event, text, player)
 				eachstring = "";
 			end
 
-			Auctioneer.AskPrice.SendWhisper(_AUCT('FrmtAskPriceVendorPrice'):format("    ",EnhTooltip.GetTextGSC(vendorSell * item.count, nil, true), eachstring), player);
+			Auctioneer.AskPrice.SendWhisper(
+				_AUCT('FrmtAskPriceVendorPrice'):format(
+					"    ",
+					EnhTooltip.GetTextGSC(vendorSell * item.count, nil, true),
+					eachstring),
+				player
+			);
 		end
 
 		usedStack = usedStack or (item.count > 1)

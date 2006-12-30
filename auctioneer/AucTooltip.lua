@@ -174,21 +174,30 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (count > 1) then
 					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min ([bidPriceForOne] ea)/[buyPrice] BO ([buyPriceForOne] ea)"
 					local bidPriceForOne, buyPriceForOne = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, 1)
-					EnhTooltip.AddLine(_AUCT('FrmtInfoSgststx'):format(count,
-					                                                   EnhTooltip.GetTextGSC(bidPrice, true),
-					                                                   EnhTooltip.GetTextGSC(bidPriceForOne, true),
-					                                                   EnhTooltip.GetTextGSC(buyPrice, true),
-					                                                   EnhTooltip.GetTextGSC(buyPriceForOne, true)), nil, embedded);
+					EnhTooltip.AddLine(
+						_AUCT('FrmtInfoSgststx'):format(
+							count,
+							EnhTooltip.GetTextGSC(bidPrice, true),
+							EnhTooltip.GetTextGSC(bidPriceForOne, true),
+							EnhTooltip.GetTextGSC(buyPrice, true),
+							EnhTooltip.GetTextGSC(buyPriceForOne, true)
+						), 
+						nil, embedded
+					);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				else -- count = 0 | 1
 					-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"
-					EnhTooltip.AddLine(_AUCT('FrmtInfoSgst'):format(EnhTooltip.GetTextGSC(bidPrice, true),
-					                                                EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+					EnhTooltip.AddLine(
+						_AUCT('FrmtInfoSgst'):format(
+							EnhTooltip.GetTextGSC(bidPrice, true),
+							EnhTooltip.GetTextGSC(buyPrice, true)
+						), 
+						nil, embedded
+					);
 					EnhTooltip.LineColor(0.5,0.5,0.8);
 				end
 				EnhTooltip.AddLine(warn, nil, embedded);
-				local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(warn);
-				EnhTooltip.LineColor(cRed, cGreen, cBlue);
+				EnhTooltip.LineColor(select(2, Auctioneer.Util.GetWarnColor(warn)));
 			end
 			if (not Auctioneer.Command.GetFilter('show-verbose')) then
 				if (Auctioneer.Command.GetFilter('show-stats')) then -- show buyout/bidded percentages
@@ -260,8 +269,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 						EnhTooltip.LineColor(0.5,0.5,0.8);
 					end
 					EnhTooltip.AddLine(">> "..warn, nil, embedded);
-					local cHex, cRed, cGreen, cBlue = Auctioneer.Util.GetWarnColor(warn);
-					EnhTooltip.LineColor(cRed, cGreen, cBlue);
+					EnhTooltip.LineColor(select(2, Auctioneer.Util.GetWarnColor(warn)));
 				end
 			end
 		end
