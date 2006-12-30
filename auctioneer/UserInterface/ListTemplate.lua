@@ -92,6 +92,9 @@ function ListTemplate_Initialize(frame, physicalColumns, logicalColumns)
 	end
 	getglobal(frame:GetName().."Column1SortArrow"):Show();
 	getglobal(frame:GetName().."Column1SortArrow"):SetTexCoord(0, 0.5625, 0, 1.0);
+
+	-- we have to inform FauxScrollFrame of the initial setup, so it can disable the scrollframe, if needed
+	FauxScrollFrame_Update(getglobal(frame:GetName().."ScrollFrame"), #physicalColumns, frame.lines, frame.lineHeight)
 end
 
 -------------------------------------------------------------------------------
@@ -193,6 +196,11 @@ function ListTemplate_Sort(frame, columnIndex)
 end
 
 -------------------------------------------------------------------------------
+-- called whenever scrolling the list
+-- parameters:
+--   frame = the frame to work with or
+--           nil, if working with the current frame (default used by
+--                UIPanelTemplates.lua:FauxScrollFrame_OnVerticalScroll)
 -------------------------------------------------------------------------------
 function ListTemplateScrollFrame_Update(frame)
 	frame = frame or this;
