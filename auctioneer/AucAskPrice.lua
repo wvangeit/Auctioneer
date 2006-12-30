@@ -285,10 +285,10 @@ function eventHandler(self, event, text, player)
 
 		--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
 		if (Auctioneer.Command.GetFilter('askprice-smart')) then
-			if (not (text:lower():find(_AUCT('CmdAskPricSmartWord1')) and text:lower():find(_AUCT('CmdAskPriceSmartWord2')))) then
+			if (not (text:lower():find(_AUCT('CmdAskPriceSmartWord1'), 1, true) and text:lower():find(_AUCT('CmdAskPriceSmartWord2'), 1, true))) then
 
 				--Check if the custom SmartWords are present in the chat message
-				local customSmartWord1, customSmartWord2 = Auctioneer.Command.GetFilterVal('askprice-word1'), Auctioneer.Command.GetFilterVal('askprice-word1');
+				local customSmartWord1, customSmartWord2 = Auctioneer.Command.GetFilterVal('askprice-word1'), Auctioneer.Command.GetFilterVal('askprice-word2');
 				if (not ((text:lower():find(customSmartWord1, 1, true)) and text:lower():find(customSmartWord2, 1, true)))  then
 					return;
 				end
