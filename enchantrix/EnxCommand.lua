@@ -863,7 +863,7 @@ end
 function percentLessFilter(auction, percentLess)
 	local filterAuction = true;
 
-	local disenchantsTo = getAuctionItemDisenchants(auction.itemID, auction.suffixId, auction.enchantId, true);
+	local disenchantsTo = getAuctionItemDisenchants(auction.itemId, auction.suffixId, auction.enchantId, true);
 	if not disenchantsTo.totals then return filterAuction; end
 
 	local hspValue = disenchantsTo.totals.hspValue or 0;
