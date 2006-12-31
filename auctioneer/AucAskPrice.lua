@@ -30,7 +30,7 @@
 --]]
 
 --Local function prototypes
-local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, eventHandler, sendWhisper, onEventHook, debugPrint
+local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, sendAskPrice, eventHandler, sendWhisper, onEventHook, debugPrint
 
 local whisperList = {}
 local sentAskPriceAd = {}
@@ -96,6 +96,9 @@ function commandHandler(command, source)
 	elseif (cmd == 'word') then
 		setCustomSmartWords(param, nil, nil, chatprint);
 
+	elseif (cmd == 'send') then
+		sendAskPrice(param)
+
 	--Command not recognized
 	else
 		if (chatprint) then
@@ -123,6 +126,9 @@ function chatPrintHelp()
 	lineFormat = "  |cffffffff/auctioneer askprice %s %d|r |cff2040ff[%s]|r\n          %s\n\n";
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAskPriceWord'), 1,	Auctioneer.Command.GetFilterVal('askprice-word1'),			_AUCT('HelpAskPriceWord')));
 	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAskPriceWord'), 2,	Auctioneer.Command.GetFilterVal('askprice-word2'),			_AUCT('HelpAskPriceWord')));
+
+	lineFormat = "  |cffffffff/auctioneer askprice %s %s|r\n          %s\n\n";
+	Auctioneer.Util.ChatPrint(lineFormat:format(_AUCT('CmdAskPriceSend'),			_AUCT('OptAskPriceSend'),								_AUCT('HelpAskPriceSend')));
 end
 
 --[[
@@ -251,6 +257,22 @@ function setCustomSmartWords(param, number, word, chatprint)
 	end
 end
 
+--Function to manually send AskPrice messages to a player
+function sendAskPrice(param, player, text)
+	--If we we were passed an unparsed param, and were not passed the digested ones, digest the param
+	if (param and not (player and text)) then
+		player, text = param:match("^(%w+)%s*(.*)$")
+	end
+
+	--If we still don't have the digested params, stop here.
+	if (not (player and text)) then
+		return
+	end
+
+	--Tail call to the eventHandler function, the fourth parameter is set to "true" to bypass the trigger/SmartWords checking.
+	return eventHandler(askPriceFrame, "CHAT_MSG_WHISPER", text, player, true)
+end
+
 function setKhaosSetKeyValue(key, value)
 	if (Auctioneer_Khaos_Registered) then
 		local kKey = Khaos.getSetKey("Auctioneer", key)
@@ -268,7 +290,7 @@ function setKhaosSetKeyValue(key, value)
 	end
 end
 
-function eventHandler(self, event, text, player)
+function eventHandler(self, event, text, player, ignoreTrigger)
 	--Nothing to do if askprice is disabled
 	if (not Auctioneer.Command.GetFilter('askprice')) then
 		return;
@@ -292,26 +314,28 @@ function eventHandler(self, event, text, player)
 
 	local aCount, historicalMedian, snapshotMedian, vendorSell, eachstring, askedCount, items, usedStack, multipleItems;
 
-	-- Check for marker (trigger char or "smart" words)
-	if (not (text:sub(1, 1) == Auctioneer.Command.GetFilterVal('askprice-trigger'))) then
+	-- Check for marker (trigger char or "smart" words) only if the ignore option is not set
+	if (not (ignoreTrigger == true)) then --We need to check for "true" here, since Blizzard might decide to send us a fourth parameter.
+		if (not (text:sub(1, 1) == Auctioneer.Command.GetFilterVal('askprice-trigger'))) then
 
-		--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
-		if (Auctioneer.Command.GetFilter('askprice-smart')) then
-			if (not (
-				text:lower():find(_AUCT('CmdAskPriceSmartWord1'), 1, true) and
-				text:lower():find(_AUCT('CmdAskPriceSmartWord2'), 1, true)
-			)) then
-
-				--Check if the custom SmartWords are present in the chat message
+			--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
+			if (Auctioneer.Command.GetFilter('askprice-smart')) then
 				if (not (
-					text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word1'), 1, true) and
-					text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word2'), 1, true)
-				))  then
-					return;
+					text:lower():find(_AUCT('CmdAskPriceSmartWord1'), 1, true) and
+					text:lower():find(_AUCT('CmdAskPriceSmartWord2'), 1, true)
+				)) then
+
+					--Check if the custom SmartWords are present in the chat message
+					if (not (
+						text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word1'), 1, true) and
+						text:lower():find(Auctioneer.Command.GetFilterVal('askprice-word2'), 1, true)
+					)) then
+						return;
+					end
 				end
+			else
+				return;
 			end
-		else
-			return;
 		end
 	end
 
@@ -322,7 +346,7 @@ function eventHandler(self, event, text, player)
 
 	--Parse the text and separate out the different links
 	items = getItems(text)
-	for key, item in ipairs(items) do
+	for key, item in ipairs(items) do --Do the items in the order they were recieved.
 		aCount, historicalMedian, snapshotMedian, vendorSell = getData(item.link);
 		local askedCount;
 
