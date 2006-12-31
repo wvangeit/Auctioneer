@@ -27,6 +27,7 @@ Swatter = {
 	errorOrder = {},
 	HISTORY_SIZE = 50,
 }
+local origItemRef = Swatter.origItemRef
 
 SwatterData = {
 	enabled = true,
@@ -137,6 +138,17 @@ function Swatter.OnEvent(frame, event, ...)
 	if (event == "ADDON_LOADED") then
 		local addon = select(1, ...)
 		if (addon:lower() == "!swatter") then
+
+			-- Check to see if we still exist
+			if (not SwatterData) then
+				if (BugGrabber) then
+					-- We've been buggrabber-nabbed. Give up.
+					DEFAULT_CHAT_FRAME:AddMessage("|cffffaa11Warning: Swatter has been disabled by BugGrabber. If you want to run Swatter instead of BugGrabber/BugSack, disable those two addons in you addon list and re-enable Swatter. Otherwise, enjoy BugGrabber!|r");
+				end
+				SetItemRef = origItemRef
+				return
+			end
+
 			-- We need to cleanup our error history
 			if (not SwatterData.errors) then SwatterData.errors = {} end
 			local ec = table.getn(SwatterData.errors) or 0
@@ -166,13 +178,19 @@ function Swatter.SetItemRef(...)
 	local id = select(3, msg:find("^swatter:(%d+)"))
 	id = tonumber(id)
 	if (id) then
-		for pos, errid in ipairs(Swatter.errorOrder) do
-			if (errid == id) then
-				Swatter.Error:Show()
-				return Swatter.ErrorDisplay(pos)
+		if (Swatter) then
+			for pos, errid in ipairs(Swatter.errorOrder) do
+				if (errid == id) then
+					Swatter.Error:Show()
+					return Swatter.ErrorDisplay(pos)
+				end
 			end
 		end
 	else
+		if (not Swatter) then
+			SetItemRef = origItemRef
+			return origItemRef(...)
+		end
 		return Swatter.origItemRef(...)
 	end
 end
