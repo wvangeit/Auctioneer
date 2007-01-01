@@ -729,7 +729,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 				auctions  = true,
 				sales     = true
 			}
-			AuctionFrameTransactions_UpdateSearchFrame(name, true, transactions)
+			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
 		end
 	else
 		-- Clear the item's information.

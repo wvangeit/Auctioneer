@@ -42,25 +42,90 @@ local disableResults
 
 -------------------------------------------------------------------------------
 -- Called, when the AuctionFrameTransaction form is loaded
+--
+-- parameters:
+--    self = reference to the transactions frame, which threw this event
 -------------------------------------------------------------------------------
-function AuctionFrameTransactions_OnLoad()
+function AuctionFrameTransactions_OnLoad(transactionFrame)
 	-- Controls
-	local frameName               = this:GetName()
-	this.searchFrame              = getglobal(frameName.."Search")
-	this.resultsList              = getglobal(frameName.."List")
+	local frameName               = transactionFrame:GetName()
+	transactionFrame.searchFrame  = getglobal(frameName.."Search")
+	transactionFrame.resultList   = getglobal(frameName.."List")
 
-	local searchFrameName         = this.searchFrame:GetName()
-	this.searchFrame.searchEdit   = getglobal(searchFrameName.."SearchEdit")
-	this.searchFrame.exactCheck   = getglobal(searchFrameName.."ExactSearchCheckBox")
-	this.searchFrame.bidCheck     = getglobal(searchFrameName.."BidCheckBox")
-	this.searchFrame.buyCheck     = getglobal(searchFrameName.."BuyCheckBox")
-	this.searchFrame.auctionCheck = getglobal(searchFrameName.."AuctionCheckBox")
-	this.searchFrame.sellCheck    = getglobal(searchFrameName.."SellCheckBox")
-	this.searchFrame.searchButton = getglobal(searchFrameName.."SearchButton")
+	local searchFrameName                     = transactionFrame.searchFrame:GetName()
+	transactionFrame.searchFrame.searchEdit   = getglobal(searchFrameName.."SearchEdit")
+	transactionFrame.searchFrame.exactCheck   = getglobal(searchFrameName.."ExactSearchCheckBox")
+	transactionFrame.searchFrame.bidCheck     = getglobal(searchFrameName.."BidCheckBox")
+	transactionFrame.searchFrame.buyCheck     = getglobal(searchFrameName.."BuyCheckBox")
+	transactionFrame.searchFrame.auctionCheck = getglobal(searchFrameName.."AuctionCheckBox")
+	transactionFrame.searchFrame.sellCheck    = getglobal(searchFrameName.."SellCheckBox")
+	transactionFrame.searchFrame.searchButton = getglobal(searchFrameName.."SearchButton")
+end
 
+-------------------------------------------------------------------------------
+-- Called, when the user hits the search button
+--
+-- parameters:
+--    searchButton = reference to the search button, which threw this event
+-------------------------------------------------------------------------------
+function AuctionFrameSearchTransactions_SearchButton_OnClick(searchButton)
+   -- enable and update the result list
+	enableResults(searchButton:GetParent():GetParent().resultList)
+end
 
+-------------------------------------------------------------------------------
+-- Updates the search frame, using the given settings
+--
+-- parameters:
+--   searchFrame   = reference to the search frame to be updated
+--   itemName      = item name for the search box
+--   itemNameExact = flag for the exact item Name checkbox
+--   transactions  = table, containing a list of flags for the transaction
+--                   checkboxes
+--                      bidCheck  = flag for the bid checkbox
+--                      purchases = flag for the purchases checkbox
+--                      auctions  = flag for the auctions checkbox
+--                      sales     = flag for the sales checkbox
+-- Note:
+--    Any value except searchFrame can be nil, in which case the related control
+--    will not be changed.
+-------------------------------------------------------------------------------
+function AuctionFrameTransactions_UpdateSearchFrame(searchFrame, itemName, itemNameExact, transactions)
+	if itemName ~= nil then
+		searchFrame.searchEdit:SetText(itemName)
+	end
+	if itemNameExact ~= nil then
+		searchFrame.exactCheck:SetChecked(itemNameExact)
+	end
+
+	if transactions then
+		if transactions.purchases ~= nil then
+			searchFrame.buyCheck:SetChecked(transactions.purchases)
+		end
+		if transactions.bids ~= nil then
+			searchFrame.bidCheck:SetChecked(transactions.bids)
+		end
+		if transactions.sales ~= nil then
+			searchFrame.sellCheck:SetChecked(transactions.sales)
+		end
+		if transactions.auctions ~= nil then
+			searchFrame.auctionCheck:SetChecked(transactions.auctions)
+		end
+	end
+	
+	-- set the frame to display the results
+	enableResults(searchFrame:GetParent().resultList)
+end
+
+-------------------------------------------------------------------------------
+-- Called, when the AuctionFrameTransaction result list is loaded
+--
+-- parameters:
+--    resultList = reference to the result list, which threw this event
+-------------------------------------------------------------------------------
+function AuctionFrameTransactionsList_OnLoad(resultList)
 	-- Configure the logical columns
-	this.logicalColumns =
+	resultList.logicalColumns =
 	{
 		Date =
 		{
@@ -138,7 +203,7 @@ function AuctionFrameTransactions_OnLoad()
 	}
 
 	-- Configure the transaction search columns
-	this.transactionSearchPhysicalColumns =
+	resultList.transactionSearchPhysicalColumns =
 	{
 		{
 			width = 90;
@@ -183,103 +248,58 @@ function AuctionFrameTransactions_OnLoad()
 			sortAscending = true;
 		},
 	}
-end
 
--------------------------------------------------------------------------------
--- Called, when the user hits the search button
--------------------------------------------------------------------------------
-function AuctionFrameSearchTransactions_SearchButton_OnClick()
-	enableResults() -- enables and updates the result list
-end
-
--------------------------------------------------------------------------------
--- Updates the search frame, using the given settings
---
--- parameters:
---   itemName      = item name for the search box
---   itemNameExact = flag for the exact item Name checkbox
---   transactions  = table, containing a list of flags for the transaction
---                   checkboxes
---                      bidCheck  = flag for the bid checkbox
---                      purchases = flag for the purchases checkbox
---                      auctions  = flag for the auctions checkbox
---                      sales     = flag for the sales checkbox
--- Note:
---    Any value can be nil, in which case the related control will not be
---    changed.
--------------------------------------------------------------------------------
-function AuctionFrameTransactions_UpdateSearchFrame(itemName, itemNameExact, transactions)
-	local searchFrame = getglobal("AuctionFrameTransactionsSearch")
-	
-	if itemName ~= nil then
-		searchFrame.searchEdit:SetText(itemName)
-	end
-	if itemNameExact ~= nil then
-		searchFrame.exactCheck:SetChecked(itemNameExact)
-	end
-	
-	if transactions then
-		if transactions.purchases ~= nil then
-			searchFrame.buyCheck:SetChecked(transactions.purchases)
-		end
-		if transactions.bids ~= nil then
-			searchFrame.bidCheck:SetChecked(transactions.bids)
-		end
-		if transactions.sales ~= nil then
-			searchFrame.sellCheck:SetChecked(transactions.sales)
-		end
-		if transactions.auctions ~= nil then
-			searchFrame.auctionCheck:SetChecked(transactions.auctions)
-		end
-	end
-	
-	-- set the frame to display the results
-	enableResults()
-end
-
--------------------------------------------------------------------------------
--- Called, when the AuctionFrameTransaction result list is loaded
--------------------------------------------------------------------------------
-function AuctionFrameTransactionsList_OnLoad()
 	-- initially do not show any results	
-	disableResults()
+	disableResults(resultList)
 end
 
 -------------------------------------------------------------------------------
 -- Called, when the AuctionFrameTransaction result list is shown
+--
+-- parameters:
+--    resultList = reference to the result list, which threw this event
 -------------------------------------------------------------------------------
-function AuctionFrameTransactionsList_OnShow()
-	if not getglobal("AuctionFrameTransactionsList").bDisplayResults then
-		clearResultList()
+function AuctionFrameTransactionsList_OnShow(resultList)
+	if not resultList.bDisplayResults then
+		clearResultList(resultList)
 	else -- this.bDisplayResults is true
 		-- update the result list
-		updateResultListFromSearchFrame()
+		updateResultListFromSearchFrame(resultList:GetParent())
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Enables displaying of results in the result list and updates it, if the
 -- frame is visible
+--
+-- parameters:
+--    resultList = reference to the result list, which should be enabled
 -------------------------------------------------------------------------------
-function enableResults()
-	getglobal("AuctionFrameTransactionsList").bDisplayResults = true
-	AuctionFrameTransactionsList_OnShow()
+function enableResults(resultList)
+	resultList.bDisplayResults = true
+	AuctionFrameTransactionsList_OnShow(resultList)
 end
 
 -------------------------------------------------------------------------------
 -- Disables displaying of results in the result list and updates it, if the
 -- frame is visible
+--
+-- parameters:
+--    resultList = reference to the result list, which should be disabled
 -------------------------------------------------------------------------------
-function disableResults()
-	getglobal("AuctionFrameTransactionsList").bDisplayResults = false
-	AuctionFrameTransactionsList_OnShow()
+function disableResults(resultList)
+	resultList.bDisplayResults = false
+	AuctionFrameTransactionsList_OnShow(resultList)
 end
 
 -------------------------------------------------------------------------------
 -- Updates the result list using the settings from the search frame
+--
+-- parameters:
+--    transactionFrame = reference to the transaction frame to work with
 -------------------------------------------------------------------------------
-function updateResultListFromSearchFrame()
-	local searchFrame     = getglobal("AuctionFrameTransactionsSearch")
+function updateResultListFromSearchFrame(transactionFrame)
+	local searchFrame     = transactionFrame.searchFrame
 	local itemName        = searchFrame.searchEdit:GetText()
 	local exactNameSearch = searchFrame.exactCheck:GetChecked()
 
@@ -290,14 +310,16 @@ function updateResultListFromSearchFrame()
 		sales     = searchFrame.sellCheck:GetChecked()
 	}
 
-	updateResultList(itemName, exactNameSearch, transactions)
+	updateResultList(transactionFrame.resultList, itemName, exactNameSearch, transactions)
 end
 
 -------------------------------------------------------------------------------
 -- Clears the result list
+--
+-- parameters:
+--    resultList = reference to the result list, which should be cleared
 -------------------------------------------------------------------------------
-function clearResultList()
-	local resultList = getglobal("AuctionFrameTransactionsList")
+function clearResultList(resultList)
 	local emptyList  = {}
 
 	ListTemplate_Initialize(resultList, emptyList, emptyList)
@@ -307,6 +329,7 @@ end
 -- Updates the result list, using the given settings
 --
 -- parameters:
+--   resultList    = reference to the result list, which should be updated
 --   itemName      = name to search for
 --                   "" or nil, if any transaction should be shown
 --   itemNameExact = true, if the search results must exactly match the itemName
@@ -322,7 +345,7 @@ end
 --                      sales     = true, if own sales should be included
 --                                  false, otherwise
 -------------------------------------------------------------------------------
-function updateResultList(itemName, itemNameExact, transactions)
+function updateResultList(resultList, itemName, itemNameExact, transactions)
 	-- create the content from purhcases database
 	local results = {}
 	local itemNames
@@ -432,10 +455,9 @@ function updateResultList(itemName, itemNameExact, transactions)
 	end
 
 	-- Hand the updated results to the list
-	local transactionFrame = getglobal("AuctionFrameTransactions")
-	ListTemplate_Initialize(transactionFrame.resultsList, transactionFrame.transactionSearchPhysicalColumns, transactionFrame.logicalColumns)
-	ListTemplate_SetContent(transactionFrame.resultsList, results)
-	ListTemplate_Sort(transactionFrame.resultsList, 1)
+	ListTemplate_Initialize(resultList, resultList.transactionSearchPhysicalColumns, resultList.logicalColumns)
+	ListTemplate_SetContent(resultList, results)
+	ListTemplate_Sort(resultList, 1)
 end
 
 -------------------------------------------------------------------------------

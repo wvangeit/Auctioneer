@@ -253,7 +253,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchTransactions_SearchButton_OnClick();
+								AuctionFrameSearchTransactions_SearchButton_OnClick(self)
 							</OnClick>
 						</Scripts>
 					</Button>
@@ -459,10 +459,10 @@
 				</Frames>
 				<Scripts>
 					<OnLoad>
-						AuctionFrameTransactionsList_OnLoad()
+						AuctionFrameTransactionsList_OnLoad(self)
 					</OnLoad>
 					<OnShow>
-						AuctionFrameTransactionsList_OnShow()
+						AuctionFrameTransactionsList_OnShow(self)
 					</OnShow>
 				</Scripts>
 			</Frame>
@@ -471,7 +471,7 @@
 			<OnLoad>
 				getglobal(this:GetName().."Title"):SetText(_BC('UiTransactions'))
 				getglobal(this:GetName().."TabText"):SetText(_BC('UiSearch'))
-				AuctionFrameTransactions_OnLoad()
+				AuctionFrameTransactions_OnLoad(self)
 			</OnLoad>
 		</Scripts>
 	</Frame>
