@@ -131,7 +131,7 @@ function onLoad()
 			Stubby.Print("]].._ENCH('MesgNotloaded')..[[")
 		end
 	]]);
-
+	
 	SLASH_ENCHANTRIX1 = "/enchantrix";
 	SLASH_ENCHANTRIX2 = "/enchant";
 	SLASH_ENCHANTRIX3 = "/enx";
@@ -143,17 +143,21 @@ end
 local ns = function(v) return v or "None" end
 function pickupInventoryItemHook(slot)
 	-- Remember last activated item
-	if slot then
-		DisenchantEvent.spellTarget = GetInventoryItemLink("player", slot)
-		DisenchantEvent.targetted = GetTime()
+	if (not UnitCastingInfo("player")) then
+		if slot then
+			DisenchantEvent.spellTarget = GetInventoryItemLink("player", slot)
+			DisenchantEvent.targetted = GetTime()
+		end
 	end
 end
 
 function pickupContainerItemHook(bag, slot)
 	-- Remember last activated item
-	if bag and slot then
-		DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
-		DisenchantEvent.targetted = GetTime()
+	if (not UnitCastingInfo("player")) then
+		if bag and slot then
+			DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
+			DisenchantEvent.targetted = GetTime()
+		end
 	end
 end
 
