@@ -151,7 +151,7 @@
 							<OnTabPressed>
 							</OnTabPressed>
 							<OnEnterPressed>
-								AuctionFrameSearchTransactions_SearchButton_OnClick(this);
+								AuctionFrameSearchTransactions_SearchButton_OnClick();
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>
@@ -253,7 +253,7 @@
 						</Anchors>
 						<Scripts>
 							<OnClick>
-								AuctionFrameSearchTransactions_SearchButton_OnClick(this);
+								AuctionFrameSearchTransactions_SearchButton_OnClick();
 							</OnClick>
 						</Scripts>
 					</Button>
@@ -457,13 +457,21 @@
 						</Anchors>
 					</Button>
 				</Frames>
+				<Scripts>
+					<OnLoad>
+						AuctionFrameTransactionsList_OnLoad()
+					</OnLoad>
+					<OnShow>
+						AuctionFrameTransactionsList_OnShow()
+					</OnShow>
+				</Scripts>
 			</Frame>
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				getglobal(this:GetName().."Title"):SetText(_BC('UiTransactions'));
-				getglobal(this:GetName().."TabText"):SetText(_BC('UiSearch'));
-				AuctionFrameTransactions_OnLoad();
+				getglobal(this:GetName().."Title"):SetText(_BC('UiTransactions'))
+				getglobal(this:GetName().."TabText"):SetText(_BC('UiSearch'))
+				AuctionFrameTransactions_OnLoad()
 			</OnLoad>
 		</Scripts>
 	</Frame>
@@ -471,7 +479,7 @@
 	<Button name="AuctionFrameTabTransactions" inherits="AuctionTabTemplate" hidden="true">
 		<Scripts>
 			<OnLoad>
-				this:SetText(_BC('UiTransactions'));
+				this:SetText(_BC('UiTransactions'))
 			</OnLoad>
 		</Scripts>
 	</Button>

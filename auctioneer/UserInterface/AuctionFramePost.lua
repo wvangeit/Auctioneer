@@ -303,14 +303,14 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.Sales and BeanCounter.Sales.GetLastSaleForItem) then
 					-- TODO: Support should be added to BeanCounter for looking
 					-- up itemKey (itemId:suffixId:enchantID) instead of by name.
-					local lastSale = BeanCounter.Sales.GetLastSaleForItem(name);
+					local lastSale = BeanCounter.Sales.GetLastSaleForItem(name)
 					if (lastSale and lastSale.bid and lastSale.buyout) then
-						local lastPrice = {};
-						lastPrice.text = _AUCT('UiPriceModelLastSold');
-						lastPrice.note = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale.time));
-						lastPrice.bid = (lastSale.bid / lastSale.quantity) * count;
-						lastPrice.buyout = (lastSale.buyout / lastSale.quantity) * count;
-						table.insert(frame.prices, lastPrice);
+						local lastPrice  = {}
+						lastPrice.text   = _AUCT('UiPriceModelLastSold')
+						lastPrice.note   = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale.time))
+						lastPrice.bid    = (lastSale.bid / lastSale.quantity) * count
+						lastPrice.buyout = (lastSale.buyout / lastSale.quantity) * count
+						table.insert(frame.prices, lastPrice)
 					end
 				end
 
@@ -722,8 +722,14 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 
 		-- Update the Transactions tab if BeanCounter is loaded.
-		if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
-			AuctionFrameTransactions:SearchTransactions(name, true, nil);
+		if IsAddOnLoaded("BeanCounter") then
+			local transactions = {
+				bidCheck  = true,
+				purchases = true,
+				auctions  = true,
+				sales     = true
+			}
+			AuctionFrameTransactions_UpdateSearchFrame(name, true, transactions)
 		end
 	else
 		-- Clear the item's information.
