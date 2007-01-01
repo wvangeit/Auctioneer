@@ -18,6 +18,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ]]
 
+-- Check to see if another debugging aid has been loaded.
+for addon, name in pairs({
+	['!buggrabber'] = 'BugGrabber',
+	['!improvederrorframe'] = 'ImprovedErrorFrame',
+}) do
+  local enabled = select(4, GetAddOnInfo(addon))
+  if enabled then
+	  DEFAULT_CHAT_FRAME:AddMessage("|cffffaa11Swatter is not loaded, because you are running "..name.."|r")
+	  return
+  end
+end
+
+DEFAULT_CHAT_FRAME:AddMessage("|cffffaa11Swatter is not loading now|r")
 Swatter = {
 	origHandler = geterrorhandler(),
 	origItemRef = SetItemRef,
