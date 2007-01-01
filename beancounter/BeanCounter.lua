@@ -26,29 +26,29 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
-local debugPrint = EnhTooltip.DebugPrint;
+local debugPrint = EnhTooltip.DebugPrint
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
-local preContainerFrameItemButtonOnClickHook;
-local relevel;
-local chatPrint;
-local nilSafe;
-local commandHandler;
+local preContainerFrameItemButtonOnClickHook
+local relevel
+local chatPrint
+local nilSafe
+local commandHandler
 
 -------------------------------------------------------------------------------
 -- Version
 -------------------------------------------------------------------------------
-BeanCounter = {};
-BeanCounter.Version="<%version%>";
+BeanCounter = {}
+BeanCounter.Version="<%version%>"
 if (BeanCounter.Version == "<".."%version%>") then
-	BeanCounter.Version = "3.9.DEV";
+	BeanCounter.Version = "3.9.DEV"
 end
 
 -------------------------------------------------------------------------------
@@ -60,11 +60,11 @@ function BeanCounter_OnLoad()
 	-- Unhook some boot triggers if necessary.
 	-- These might not exist on initial loading or if an addon depends on BeanCounter
 	if (BeanCounter_CheckLoad) then
-		Stubby.UnregisterFunctionHook("AuctionFrame_LoadUI", BeanCounter_CheckLoad);
-		Stubby.UnregisterFunctionHook("CheckInbox", BeanCounter_CheckLoad);
+		Stubby.UnregisterFunctionHook("AuctionFrame_LoadUI", BeanCounter_CheckLoad)
+		Stubby.UnregisterFunctionHook("CheckInbox", BeanCounter_CheckLoad)
 	end
 	if (BeanCounter_ShowNotLoaded) then
-		Stubby.UnregisterFunctionHook("AuctionFrame_Show", BeanCounter_ShowNotLoaded);
+		Stubby.UnregisterFunctionHook("AuctionFrame_Show", BeanCounter_ShowNotLoaded)
 	end
 
 	-- Register our temporary command hook with stubby
@@ -104,7 +104,7 @@ function BeanCounter_OnLoad()
 		SLASH_BEANCOUNTER2 = "/bean"
 		SLASH_BEANCOUNTER3 = "/bc"
 		SlashCmdList["BEANCOUNTER"] = cmdHandler
-	]]);
+	]])
 	Stubby.RegisterBootCode("BeanCounter", "Triggers", [[
 		function BeanCounter_CheckLoad()
 			local loadType = Stubby.GetConfig("BeanCounter", "LoadType")
@@ -129,10 +129,10 @@ function BeanCounter_OnLoad()
 		else
 			Stubby.Print("BeanCounter is not loaded. Type /beancounter for more info.");
 		end
-	]]);
+	]])
 	
 	-- Register for notification of us being loaded.
-	this:RegisterEvent("ADDON_LOADED");
+	this:RegisterEvent("ADDON_LOADED")
 end
 
 -------------------------------------------------------------------------------
