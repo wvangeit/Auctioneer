@@ -218,7 +218,7 @@ function AuctionFrameTransactions_UpdateSearchFrame(itemName, itemNameExact, tra
 		searchFrame.exactCheck:SetChecked(itemNameExact)
 	end
 	
-	if transactions ~= nil then
+	if transactions then
 		if transactions.purchases ~= nil then
 			searchFrame.buyCheck:SetChecked(transactions.purchases)
 		end
