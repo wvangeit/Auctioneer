@@ -578,8 +578,6 @@ end
 --Return whether the item is disenchantable give the item's level and the user's enchanting level
 BtmScan.isDEAble = function(itemMinLevel)
 	if (data.enchLevel) then
-		BtmScan.Print(itemMinLevel)
-		BtmScan.Print(data.enchLevel)
 		if (data.enchLevel < 25) then
 			if(itemMinLevel < 15) then
 				return true
