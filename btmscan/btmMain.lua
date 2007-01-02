@@ -234,7 +234,7 @@ BtmScan.PageScan = function(resume)
 			local itemID, itemRand, itemEnch, itemUniq = BtmScan.BreakLink(itemLink)
 			local sanityKey = itemID..":"..itemRand
 			local auctKey = itemID..":"..itemRand..":"..itemEnch
-
+			
 			-- Check to see that we're not ignoring this item
 			if (not data.ignore[sanityKey]) then
 
@@ -433,42 +433,48 @@ BtmScan.PageScan = function(resume)
 								if (iBuy > bBase * 100) then ignoreIt = true end
 							end
 
-
+							--Get the itemMinLevel for use with disenchant options
+							local _, _, _, _, itemMinLevel = GetItemInfo(itemID)
+							
 							-- If:
-							--   * We're not buying it
-							--   * It has a disenchant value
-							if (not buyIt and disenchantValue > 0) then
-
-								-- We need to increase the required profit for disenchants
-								-- since there is often a chance that it will not D/E into
-								-- what we want it to. (/btm defactor)
-
-								local profitablePrice = iBuy * (1+data.pctDeProfit/100)
-								local profitableBid = iBid * (1+data.pctDeProfit/100)
-								-- Work out which is larger, pctDeProfit, or minDeProfit
-								if (iBuy + data.minDeProfit > profitablePrice) then
-									-- Use minDeProfit instead
-									profitablePrice = iBuy + data.minDeProfit
-								end
-								if (iBid + data.minDeProfit > profitableBid) then
-									profitableBid = iBid + data.minDeProfit
-								end
-
+							--  * The user can disenchant the item
+							if (BtmScan.isDEAble(itemMinLevel)) then
 								-- If:
-								--   * This item's de value is more than the profitable price
-								--   * It's buyout cost is less than our maximum price
-								if (iBuy and iBuy>0 and disenchantValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
-									whyBuy = tr("disenchant")
-									price = iBuy
-									value = disenchantValue
-									buyIt = true
-									noSafety = true
-								elseif (not bidIt and disenchantValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
-									whyBuy = tr("disenchant")
-									price = iBid
-									value = disenchantValue
-									bidIt = true
-									noSafety = true
+								--   * We're not buying it
+								--   * It has a disenchant value
+								if (not buyIt and disenchantValue > 0) then
+								
+									-- We need to increase the required profit for disenchants
+									-- since there is often a chance that it will not D/E into
+									-- what we want it to. (/btm defactor)
+
+									local profitablePrice = iBuy * (1+data.pctDeProfit/100)
+									local profitableBid = iBid * (1+data.pctDeProfit/100)
+									-- Work out which is larger, pctDeProfit, or minDeProfit
+									if (iBuy + data.minDeProfit > profitablePrice) then
+										-- Use minDeProfit instead
+										profitablePrice = iBuy + data.minDeProfit
+									end
+									if (iBid + data.minDeProfit > profitableBid) then
+										profitableBid = iBid + data.minDeProfit
+									end
+	
+									-- If:
+									--   * This item's de value is more than the profitable price
+									--   * It's buyout cost is less than our maximum price
+									if (iBuy and iBuy>0 and disenchantValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
+										whyBuy = tr("disenchant")
+										price = iBuy
+										value = disenchantValue
+										buyIt = true
+										noSafety = true
+									elseif (not bidIt and disenchantValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
+										whyBuy = tr("disenchant")
+										price = iBid
+										value = disenchantValue
+										bidIt = true
+										noSafety = true
+									end
 								end
 							end
 						end --if (not trash)
@@ -567,6 +573,87 @@ BtmScan.PageScan = function(resume)
 	BtmScan.scanStage = 0
 	--BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
 	--BtmScan.processing = false
+end
+
+--Return whether the item is disenchantable give the item's level and the user's enchanting level
+BtmScan.isDEAble = function(itemMinLevel)
+	if (data.enchLevel) then
+		BtmScan.Print(itemMinLevel)
+		BtmScan.Print(data.enchLevel)
+		if (data.enchLevel < 25) then
+			if(itemMinLevel < 15) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 50) then
+			if(itemMinLevel < 21) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 75) then
+			if(itemMinLevel < 26) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 100) then
+			if(itemMinLevel < 31) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 125) then
+			if(itemMinLevel < 35) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 150) then
+			if(itemMinLevel < 41) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 175) then
+			if(itemMinLevel < 45) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 200) then
+			if(itemMinLevel < 51) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 225) then
+			if(itemMinLevel < 55) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 275) then
+			if(itemMinLevel < 64) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel < 300) then
+			if(itemMinLevel < 70) then
+				return true
+			else
+				return false
+			end
+		elseif (data.enchLevel >= 300) then
+			if(itemMinLevel <= 70) then
+				return true
+			else
+				return false
+			end
+		end
+	end
 end
 
 BtmScan.CanSendAuctionQuery = function(_, _, noHook, who)
@@ -825,6 +912,19 @@ BtmScan.Command = function (msg)
 			data.pctDeProfit = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Percent Disenchant Profit"), data.pctDeProfit.."%"))
+	elseif (cmd == "enchant") then
+		if (param) then
+			if ((tonumber(param) >= 0) and (tonumber(param) <= 375)) then
+				data.enchLevel = math.floor(tonumber(param))
+				BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Enchanting Level"), data.enchLevel))
+			else
+				BtmScan.Print("Enchanting level has to be 0-375, please try again")
+			end
+		elseif (data.enchLevel ~= nil) then
+			BtmScan.Print(tr("BottomScanner has %1 set to %2 currently", tr("Enchanting Level"), data.enchLevel))
+		else
+			BtmScan.Print("Please enter your enchanting level after \"enchant\". IE: /btmscan enchant 300")
+		end
 	elseif (cmd == "vendprofit") then
 		if (param) then
 			data.vendProfit = BtmScan.ParseGSC(param)
@@ -1078,6 +1178,7 @@ BtmScan.Command = function (msg)
 		BtmScan.Print(tr(" %1 [%2]", "unignore <item>", tr("Stops ignoring the specified item")))
 		BtmScan.Print(tr(" %1 [%2]", "snatch <item> <copper> <count>", tr("Sets the item's snatch value")))
 		BtmScan.Print(tr(" %1 [%2]", "worth <item> <copper>", tr("Sets the specified item's value")))
+		BtmScan.Print(tr(" %1 [%2]", "enchant <level>", tr("Sets your enchanting level for disenchant-based purchases")))
 		BtmScan.Print(tr(" %1 [%2]", "clear", tr("Clears the AH event log window")))
 		BtmScan.Print(tr(" %1 [%2]", "dryrun", tr("Begins a test scanning run (must have AH open)")))
 		BtmScan.Print(tr(" %1 [%2]", "begin", tr("Begins the scanning process (must have AH open)")))
@@ -1272,6 +1373,7 @@ BtmScan.GetZoneConfig = function (whence)
 	if (not data.safetyCost) then
 		data.safetyCost = data.safetyCount * data.maxPrice / 2
 	end -- safetynet cost
+	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regaurdless of user's enchanting level
 	BtmScan.CompileBaseRule()
 end
 
@@ -1886,7 +1988,3 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.PlayButton:SetScript("OnClick", BtmScan.ToggleScan)
 	BtmScan.PlayButton:Show()
 end
-
-
-
-
