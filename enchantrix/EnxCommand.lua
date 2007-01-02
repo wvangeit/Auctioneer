@@ -871,6 +871,9 @@ function percentLessFilter(auction, percentLess)
 	local mktValue = disenchantsTo.totals.mktValue or 0;
 	local confidence = disenchantsTo.totals.conf or 0;
 
+	local buyout = auction.buyoutPrice or 0;
+	local count = auction.count or 0;
+	
 	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
 	local profit = (myValue * count) - buyout;
