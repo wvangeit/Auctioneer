@@ -75,6 +75,7 @@ function Swatter.OnError(msg, frame, stack, etype, ...)
 	local context
 	if (not frame.Swatter) then frame.Swatter = {} end
 	local id = frame.Swatter[msg]
+
 	if (not id) then
 		context = "Anonymous"
 		if (frame) then
@@ -83,8 +84,10 @@ function Swatter.OnError(msg, frame, stack, etype, ...)
 				context = frame:GetName()
 			end
 		end
+		local ts = date("%m/%d/%y %H:%M:%S");
 		table.insert(SwatterData.errors, {
 			context = context,
+			timestamp = ts;
 			message = msg,
 			stack = stack,
 			count = 0,
@@ -134,6 +137,7 @@ end
 
 
 -- Error occured in: Global
+-- Date: "%m/%d/%y %H:%M:%S"
 -- Count: 1
 -- Message: [string "bla()"] line 1:
 --   attempt to call global 'bla' (a nil value)
@@ -230,14 +234,17 @@ function Swatter.ErrorDisplay(id)
 		return
 	end
 	
+	local ts = err.timestamp or "Unavailable"
+
 	local message = err.message:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1"):gsub("|", "||")
 	local trace = "   "..err.stack:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n", "\n   ")
 	local count = err.count
 	if (count > 999) then count = "\226\136\158" --[[Infinity]] end
-
-	Swatter.Error.curError = "Error occured in: "..(err.context or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n"
+	
+	Swatter.Error.curError = "Date: "..ts.."\nID: "..id.."\nError occured in: "..(err.context or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n"
 	Swatter.ErrorUpdate()
 	Swatter.Error:Show()
+
 end
 
 
