@@ -280,12 +280,18 @@ function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button,
 	-- If the transactions tab is visible, alt-left click runs a transaction
 	-- search.
 	if (not CursorHasItem() and AuctionFrameTransactions and AuctionFrameTransactions:IsVisible() and IsAltKeyDown()) then
-		local _, count = GetContainerItemInfo(bag, slot);
+		local _, count = GetContainerItemInfo(bag, slot)
 		if (count) then
 			local link = GetContainerItemLink(bag, slot)
-			local _, _, _, _, name = EnhTooltip.BreakLink(link);
-			AuctionFrameTransactions:SearchTransactions(name, true, nil);			
-			return "abort";
+			local _, _, _, _, name = EnhTooltip.BreakLink(link)
+			local transactions = {
+				bidCheck  = true,
+				purchases = true,
+				auctions  = true,
+				sales     = true
+			}
+			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
+			return "abort"
 		end
 	end
 end
@@ -297,7 +303,13 @@ function preSetSelectedAuctionItemHook(hookParams, returnValue, list, index)
 	-- Do a transaction search.
 	local name = GetAuctionItemInfo(list, index);
 	if (name) then
-		AuctionFrameTransactions:SearchTransactions(name, true, nil);			
+			local transactions = {
+				bidCheck  = true,
+				purchases = true,
+				auctions  = true,
+				sales     = true
+			}
+			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
 	end
 end
 
