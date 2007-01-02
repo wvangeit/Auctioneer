@@ -1022,8 +1022,8 @@ function doBidBroker(minProfit, percentLess)
 	if not Auctioneer then
 		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
 		return;
-	elseif not (Auctioneer.Filter and Auctioneer.Filter.QuerySnapshot) then
-		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
+	elseif not (Auctioneer.Filter or Auctioneer.SnapshotDB.Query) then
+		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.9.0.1285 or later");
 		return;
 	end
 
