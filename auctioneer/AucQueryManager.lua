@@ -558,7 +558,7 @@ function onAuctionItemListUpdate()
 		local complete = true;
 		for index, auction in pairs(updatedAuctions) do
 			-- Ignore auctions with no item name (Blizzard bug).
-			if (auction.name ~= "" and auction.owner == "") then
+			if (auction.name == "" and auction.owner == "") then
 				-- No dice... there should be more updates coming...
 				complete = false;
 				break;
