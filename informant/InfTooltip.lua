@@ -47,6 +47,7 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 		itemInfo = Informant.GetItem(itemID)
 	end
 	if (not itemInfo) then return end
+	Informant.itemInfo = itemInfo
 
 	itemInfo.itemName = name
 	itemInfo.itemLink = link

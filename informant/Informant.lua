@@ -71,7 +71,6 @@ local split					-- split(str, at)
 
 local self = {}
 local lines = {}
-local itemInfo
 
 -- GLOBAL VARIABLES
 
@@ -360,6 +359,7 @@ function getCatName(catID)
 end
 
 function showHideInfo()
+	local itemInfo = Informant.itemInfo
 	if (InformantFrame:IsVisible()) then
 		InformantFrame:Hide()
 	elseif (itemInfo) then
