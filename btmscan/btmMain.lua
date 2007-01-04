@@ -987,6 +987,24 @@ BtmScan.Command = function (msg)
 		else
 			BtmScan.EditData("baseRule", BtmScan.CompileBaseRule)
 		end
+	elseif (cmd == "tooltip") then
+		if (param == "on") then
+			data.tooltipOn = true
+		elseif (param == "off") then
+			data.tooltipOn = false
+		end
+		
+		if (data.tooltipOn ~= nil) then
+			local isOn
+			if (data.tooltipOn == true) then
+				isOn = "on"
+			else
+				isOn = "off"
+			end
+			BtmScan.Print(tr("BottomScanner has %1 set to %2", tr("show tooltips"), tr(isOn)))
+		else
+			BtmScan.Print("The tooltip command requires and on or off after it.")
+		end
 	elseif (cmd == "ignore") then
 		if (oparam) then
 			local des = BtmScan.ItemDes(oparam)
@@ -1171,7 +1189,7 @@ BtmScan.Command = function (msg)
 
 		BtmScan.Print(tr(" %1 [%2]", "print-in (<frameIndex>[Number]|<frameName>[String])", tr("Sets the chatFrame that BottomScanner's messages will be printed to")))
 		BtmScan.Print(tr(" %1 [%2]", "baserule <lua>", tr("Advanced users only: Specify your own lua code for calculating the base price")))
-
+		BtmScan.Print(tr(" %1 [%2]", "tooltip <on/off>", tr("Turn on/off the BottomScanner tooltip")))
 		BtmScan.Print(tr(" %1 [%2]", "ignore <item>", tr("Ignores the specified item")))
 		BtmScan.Print(tr(" %1 [%2]", "unignore <item>", tr("Stops ignoring the specified item")))
 		BtmScan.Print(tr(" %1 [%2]", "snatch <item> <copper> <count>", tr("Sets the item's snatch value")))
@@ -1372,11 +1390,21 @@ BtmScan.GetZoneConfig = function (whence)
 		data.safetyCost = data.safetyCount * data.maxPrice / 2
 	end -- safetynet cost
 	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regaurdless of user's enchanting level
+	
+	if (not data.tooltipOn) then
+		data.tooltipOn = true	 --Sets the tooltip as on by default
+	end
+	
 	BtmScan.CompileBaseRule()
 end
 
 
 BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count)
+	--If the option is enabled, disables showing of the BtmScan tooltip.
+	if (data.tooltipOn ~= true) then
+		if (not BtmScan.scanning) then return end
+	end
+
 	-- Make sure the current zone is loaded and has defaults
 	BtmScan.GetZoneConfig("tooltip")
 
