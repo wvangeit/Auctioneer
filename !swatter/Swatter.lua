@@ -30,7 +30,6 @@ for addon, name in pairs({
   end
 end
 
-DEFAULT_CHAT_FRAME:AddMessage("|cffffaa11Swatter is not loading now|r")
 Swatter = {
 	origHandler = geterrorhandler(),
 	origItemRef = SetItemRef,
@@ -290,7 +289,7 @@ end
 Swatter.Error = CreateFrame("Frame", "", UIParent)
 Swatter.Error:Hide()
 Swatter.Error:SetPoint("CENTER", "UIParent", "CENTER")
-Swatter.Error:SetFrameStrata("DIALOG")
+Swatter.Error:SetFrameStrata("TOOLTIP")
 Swatter.Error:SetHeight(280)
 Swatter.Error:SetWidth(500)
 Swatter.Error:SetBackdrop({
