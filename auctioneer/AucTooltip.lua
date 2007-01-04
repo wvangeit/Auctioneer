@@ -178,8 +178,8 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 						_AUCT('FrmtInfoSgststx'):format(
 							count,
 							EnhTooltip.GetTextGSC(bidPrice, true),
-							EnhTooltip.GetTextGSC(bidPriceForOne, true),
 							EnhTooltip.GetTextGSC(buyPrice, true),
+							EnhTooltip.GetTextGSC(bidPriceForOne, true),
 							EnhTooltip.GetTextGSC(buyPriceForOne, true)
 						), 
 						nil, embedded
@@ -261,7 +261,17 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 					local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, also, count);
 					if (count > 1) then
 						-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
-						EnhTooltip.AddLine(">> ".._AUCT('FrmtInfoSgststx'):format(count, EnhTooltip.GetTextGSC(bidPrice, true), EnhTooltip.GetTextGSC(buyPrice, true)), nil, embedded);
+						local bidPriceForOne, buyPriceForOne = Auctioneer.Statistic.GetSuggestedResale(itemKey, also, 1)
+						EnhTooltip.AddLine(
+							_AUCT('FrmtInfoSgststx'):format(
+								count,
+								EnhTooltip.GetTextGSC(bidPrice, true),
+								EnhTooltip.GetTextGSC(buyPrice, true),
+								EnhTooltip.GetTextGSC(bidPriceForOne, true),
+								EnhTooltip.GetTextGSC(buyPriceForOne, true)
+							), 
+							nil, embedded
+						);
 						EnhTooltip.LineColor(0.5,0.5,0.8);
 					else -- count = 0 | 1
 						-- OUTPUT: "Suggested price: [bidPrice] min/[buyPrice] BO"

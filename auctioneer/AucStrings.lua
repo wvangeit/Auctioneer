@@ -1022,6 +1022,7 @@ AuctioneerLocalizations = {
 		CmdAskPriceAd	= "ad";
 		CmdAskPriceGuild	= "guild";
 		CmdAskPriceParty	= "party";
+		CmdAskPriceSend	= "send";
 		CmdAskPriceSmart	= "smart";
 		CmdAskPriceSmartWord1	= "what";
 		CmdAskPriceSmartWord2	= "worth";
@@ -1240,7 +1241,7 @@ AuctioneerLocalizations = {
 		HelpStats	= "Schaltet die Prozentanzeige vom Gebot/Sofortkauf ein/aus.";
 		HelpSuggest	= "Schaltet die Anzeige des empfohlenen Auktionspreises ein/aus.";
 		HelpUpdatePrice	= "Aktualisiert automatisch das Startgebot für eine Auktion auf der Auktionserstellungsseite wenn sich der Sofortkaufpreis ändert.";
-		HelpVerbose	= "Festlegen, ob detaillierte Anzeige der Durchschnittswerte und Preisempfehlungen (Ausschalten für Anzeige in einzelner Zeile)";
+		HelpVerbose	= "Legt fest, ob Durchschnittswerte und Preisempfehlungen ausführlich angezeigt werden (Ausschalten für Anzeige in einzelner Zeile)";
 		HelpWarnColor	= "Festlegen, ob das aktuelle AH-Preismodell (Unterbiete um ...) mit intuitiven Farben angezeigt wird.";
 
 
@@ -1304,7 +1305,7 @@ AuctioneerLocalizations = {
 		FrmtInfoNever	= "Noch nie in %s gesehen";
 		FrmtInfoSeen	= "Insgesamt %d mal in Auktionen gesehen";
 		FrmtInfoSgst	= "Empfohlener Preis: %s min/%s Sofortkauf";
-		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min (%s pro Stück)/%s Sofortkauf (%s pro Stück)";
+		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s/%s pro Stück)";
 		FrmtInfoSnapmed	= "Sofortkaufsmedian (pro Stück) aus %d gescannten Auktionen:";
 		FrmtInfoStacksize	= "Durchschnittliche Stapelgröße: %d Stück";
 
@@ -1758,7 +1759,7 @@ AuctioneerLocalizations = {
 		FrmtInfoNever	= "Never seen at %s";
 		FrmtInfoSeen	= "Seen %d times at auction total";
 		FrmtInfoSgst	= "Suggested price: %s min/%s BO";
-		FrmtInfoSgststx	= "Suggested price for your %d stack: %s min (%s ea)/%s BO (%s ea)";
+		FrmtInfoSgststx	= "Suggested price for your %d stack: %s min/%s BO (%s/%s ea)";
 		FrmtInfoSnapmed	= "Scanned %d, median BO (ea)";
 		FrmtInfoStacksize	= "Average stack size: %d items";
 
@@ -3250,6 +3251,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Command Options
 		OptAlso	= "(서버-진영|적진영|아군진영|중립진영)";
+		OptAskPriceSend	= "(<플레이어이름><요청가격 질의>)";
 		OptAuctionDuration	= "(지난|2시간|8시간|24시간)";
 		OptBidbroker	= "<실버_이윤>";
 		OptBidLimit	= "<숫자>";
@@ -3279,13 +3281,14 @@ AuctioneerLocalizations = {
 		CmdAskPriceAd	= "광고";
 		CmdAskPriceGuild	= "길드";
 		CmdAskPriceParty	= "파티";
+		CmdAskPriceSend	= "보내기";
 		CmdAskPriceSmart	= "스마트";
 		CmdAskPriceSmartWord1	= "무엇";
 		CmdAskPriceSmartWord2	= "가치";
 		CmdAskPriceTrigger	= "트리거";
 		CmdAskPriceVendor	= "상점";
-		CmdAskPriceWhispers	= "속삭임";
-		CmdAskPriceWord	= "낱말";
+		CmdAskPriceWhispers	= "귓속말";
+		CmdAskPriceWord	= "단어";
 		CmdAuctionClick	= "경매-클릭 ";
 		CmdAuctionDuration	= "경매-기간";
 		CmdAuctionDuration0	= "최근";
@@ -3458,6 +3461,7 @@ AuctioneerLocalizations = {
 		HelpAskPriceAd	= "새로운 가격요청 기능의 광고를 활성화 또는 비활성화합니다.";
 		HelpAskPriceGuild	= "길드 대화창에서 생성된 쿼리에 응답합니다.";
 		HelpAskPriceParty	= "파티 대화창에서 생성된 쿼리에 응답합니다.";
+		HelpAskPriceSend	= "수동으로 요청가격 질의에 대한 결과를 플레이어에게 전송합니다.";
 		HelpAskPriceSmart	= "스마트워드 체크를 활성화 또는 비활성화합니다.";
 		HelpAskPriceTrigger	= "가격요청의 트리거 문자를 변경합니다.";
 		HelpAskPriceVendor	= "상점 가격 데이타의 전송을 활성화 또는 비활성화합니다.";
@@ -3676,27 +3680,31 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
-		FrmtActClearall	= "Alle veiling-gegevens voor %s verwijderd";
+		ConstantsCritical	= "KRITIEK: Je Auctioneer SavedVariables bestand is %.3f%% vol!";
+		ConstantsMessage	= "Je Auctioneer SavedVariables bestand is %.3f%% vol";
+		ConstantsWarning	= "WAARSCHUWING: Je Auctioneer SavedVariables bestand is %.3f%% vol";
+		FrmtActClearall	= "Alle veiling-gegevens voor %s worden verwijderd";
 		FrmtActClearFail	= "Kan item niet vinden: %s";
 		FrmtActClearOk	= "Veiling-gegevens voor item verwijderd: %s";
 		FrmtActClearsnap	= "Bezig huidige AH momentopname te wissen";
 		FrmtActDefault	= "Auctioneers %s optie is hersteld naar zijn standaardwaarde";
-		FrmtActDefaultall	= "Alle Auctioneer opties zijn hersteld naar de standaardwaarden";
+		FrmtActDefaultall	= "Alle Auctioneer opties zijn hersteld naar de standaardwaarden.";
 		FrmtActDisable	= "Verberg item's %s gegevens";
 		FrmtActEnable	= "Toon item's %s gegevens";
-		FrmtActSet	= "%s op %s gezet";
+		FrmtActSet	= "%s op '%s' gezet";
 		FrmtActUnknown	= "Onbekend commando of sleutelwoord: '%s'";
-		FrmtAuctionDuration	= "Standaard veilingduur gezet op: %s";
+		FrmtAuctionDuration	= "Standaard veilingduur ingesteld op: %s";
 		FrmtAutostart	= "Automatisch veiling gemaakt voor %s: %s minimum, %s buyout (%d uur) %s";
 		FrmtFinish	= "Nadat een scan is afgelopen, zullen we %s";
 		FrmtPrintin	= "Auctioneers berichten worden nu naar het \"%s\" chat frame geprint";
-		FrmtProtectWindow	= "AH-venster bescherming gezet op: %s";
+		FrmtProtectWindow	= "AH-venster bescherming ingesteld op: %s";
 		FrmtUnknownArg	= "'%s' is geen geldig argument voor '%s'";
 		FrmtUnknownLocale	= "De opgegeven taal ('%s') is onbekend. Geldige talen zijn:";
 		FrmtUnknownRf	= "Ongeldige parameter ('%s'). De parameter moet zo geformatteerd zijn: [realm]-[faction]. Bijvoorbeeld: Al'Akir-Horde";
 
 
 		-- Section: Command Options
+		OptAskPriceSend	= "(<SpelerNaam> <AskPrice Vraag>)";
 		OptBidbroker	= "<opbrengst in zilver>";
 		OptBidLimit	= "<nummer>";
 		OptBroker	= "<opbrengst in zilver>";
@@ -3715,7 +3723,8 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Commands
-		CmdAskPriceWhispers	= "fluister";
+		CmdAskPriceSend	= "stuur";
+		CmdAskPriceWhispers	= "fluister berichten";
 		CmdAskPriceWord	= "woord";
 		CmdFinishSound	= "einde geluid";
 
@@ -3810,13 +3819,14 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Weet je zeker dat je dit wilt %s?\n%dx%s voor:";
 		DisableMsg	= "Automatisch laden van Auctioneer uitgeschakeld";
 		FrmtWelcome	= "Auctioneer v%s geladen";
 		MesgNotLoaded	= "Auctioneer is niet geladen. Type /auctioneer voor meer info.";
 		StatAskPriceOff	= "AskPrice is nu uitgeschakeld.";
 		StatAskPriceOn	= "AskPrice is nu ingeschakeld.";
 		StatOff	= "Veiling-gegevens worden niet weergegeven";
-		StatOn	= "Ingestelde veiling-gegevens worden getoond";
+		StatOn	= "Ingestelde veiling-gegevens worden weergegeven";
 
 
 		-- Section: Generic Strings
@@ -3834,17 +3844,18 @@ AuctioneerLocalizations = {
 		HelpAskPriceAd	= "Zet de nieuwe reclame-feature van AskPrice aan of uit.";
 		HelpAskPriceGuild	= "Reageer op vragen in de guildchat.";
 		HelpAskPriceParty	= "Reageer op vragen in de partychat.";
+		HelpAskPriceSend	= "Stuur een speler handmatig het resultaat van een AskPrice vraag.";
 		HelpAskPriceSmart	= "Zet SmartWords controle aan of uit.";
 		HelpAskPriceTrigger	= "Verander het trigger-karakter van AskPrice.";
 		HelpAskPriceVendor	= "Zet het verzenden van verkoper gegevens aan of uit.";
-		HelpAskPriceWhispers	= "Zet het verbergen van alle AskPrice uitgaande privéberichten aan of uit.";
-		HelpAskPriceWord	= "Voeg persoonlijke AskPrice SmartWords toe of modificeer ze.";
+		HelpAskPriceWhispers	= "Zet het verbergen van alle uitgaande AskPrice privéberichten aan of uit.";
+		HelpAskPriceWord	= "Voeg persoonlijke AskPrice SmartWords toe of verander ze.";
 		HelpAuctionClick	= "Stelt je in staat automatisch een veiling te beginnen voor een item in je inventaris door Alt-Klik.";
 		HelpAuctionDuration	= "Stel de standaard veilingduur in met het openen van het AH venster";
 		HelpAutofill	= "Stel in of prijzen automatisch ingevuld moeten worden wanneer er een item op de AH wordt gezet.";
 		HelpAverage	= "Selecteer of de gemiddelde veilingprijs van items getoond moet worden";
-		HelpBidbroker	= "Toon kort of gemiddeld durende veilingen van de recente scan waar met een bod winst mogelijk is.";
-		HelpBidLimit	= "Maximum aantal veilingen om op te bieden of op te kopen wanneer de bod- of opkoopknop is geklikt in het Zoek Veilingen tabblad.";
+		HelpBidbroker	= "Toon kort of gemiddeld durende veilingen van de recente scan waar met een bod winst te behalen is.";
+		HelpBidLimit	= "Maximum aantal veilingen om op te bieden of op te kopen wanneer op de bod- of opkoopknop wordt geklikt in het Zoek Veilingen tabblad.";
 		HelpBroker	= "Toon veilingen van de recentste scan waar op geboden kan worden om door te verkopen met winst.";
 		HelpClear	= "Wis de data voor het aangegeven item (voeg de items in het commando met shift-klik). Je kunt ook de speciale sleutelwoorden \"all\" of \"snapshot\" aangeven.";
 		HelpCompete	= "Toon alle recent gescande veilingen waarvan de opkoopprijs minder is dan die van een van jouw items.";
