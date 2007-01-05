@@ -564,7 +564,7 @@ function onAuctionItemListUpdate()
 			-- Empty string owner alone is akin to 'Unknown Entity'.
 			--   should cause 2 more attempts at scanning the page, then the item should be skipped.
 			if (auction.owner == nil or auction.name == nil) then 
-				debugPrint("onAuctionItemListUpdate() - Nil owner and name.");
+				debugPrint("onAuctionItemListUpdate() - Nil owner or name.");
 				-- todo: stuff
 				break;
 			end
