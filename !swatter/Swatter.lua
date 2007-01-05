@@ -41,6 +41,12 @@ Swatter = {
 }
 local origItemRef = Swatter.origItemRef
 
+Swatter.Version="<%version%>"
+if (Swatter.Version == "<%".."version%>") then
+	Swatter.Version = "3.9-DEV"
+end
+SWATTER_VERSION = Swatter.Version
+
 SwatterData = {
 	enabled = true,
 	autoshow = true,
@@ -83,10 +89,12 @@ function Swatter.OnError(msg, frame, stack, etype, ...)
 				context = frame:GetName()
 			end
 		end
-		local ts = date("%m/%d/%y %H:%M:%S");
+		local ts = date("%Y-%m-%d %H:%M:%S");
+		local addons = Swatter.GetAddOns()
 		table.insert(SwatterData.errors, {
 			context = context,
-			timestamp = ts;
+			timestamp = ts,
+			addons = addons,
 			message = msg,
 			stack = stack,
 			count = 0,
@@ -132,6 +140,42 @@ function Swatter.NamedFrame(name)
 		}
 	end
 	return Swatter.named[name]
+end
+
+function Swatter.GetAddOns()
+	local addlist = ""
+	for i = 1, GetNumAddOns() do
+		local name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(i)
+
+		local loaded = IsAddOnLoaded(i)
+		if (loaded) then
+			if not name then name = "Anonymous" end
+			name = name:gsub("[^a-zA-Z]+", "")
+			local version = GetAddOnMetadata(i, "Version")
+			local class = getglobal(name)
+			if not class or type(class)~='table' then class = getglobal(name:lower()) end
+			if not class or type(class)~='table' then class = getglobal(name:sub(1,1):upper()..name:sub(2):lower()) end
+			if not class or type(class)~='table' then class = getglobal(name:upper()) end
+			if class and type(class)=='table' then
+				if (class.version) then
+					version = class.version
+				elseif (class.Version) then
+					version = class.Version
+				elseif (class.VERSION) then
+					version = class.VERSION
+				end
+			end
+			local const = getglobal(name:upper().."_VERSION")
+			if (const) then version = const end
+
+			if (version) then
+				addlist = addlist.."  "..name..", v"..version.."\n"
+			else
+				addlist = addlist.."  "..name.."\n" 
+			end
+		end
+	end
+	return addlist
 end
 
 
@@ -234,16 +278,18 @@ function Swatter.ErrorDisplay(id)
 	end
 	
 	local ts = err.timestamp or "Unavailable"
+	local addlist = err.addons or "  Unavailable"
 
 	local message = err.message:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1"):gsub("|", "||")
-	local trace = "   "..err.stack:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n", "\n   ")
+	local trace = "   "..err.stack:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n$",""):gsub("\n", "\n   ")
 	local count = err.count
 	if (count > 999) then count = "\226\136\158" --[[Infinity]] end
+
 	
-	Swatter.Error.curError = "Date: "..ts.."\nID: "..id.."\nError occured in: "..(err.context or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\n".."Debug:\n"..trace.."\n"
+	Swatter.Error.curError = "Date: "..ts.."\nID: "..id.."\nError occured in: "..(err.context or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\nDebug:\n"..trace.."\nAddOns:\n"..addlist.."\n"
+	Swatter.Error.selected = false
 	Swatter.ErrorUpdate()
 	Swatter.Error:Show()
-
 end
 
 
@@ -285,6 +331,12 @@ function Swatter.ErrorUpdate()
 	Swatter.UpdateNextPrev()
 end
 
+function Swatter.ErrorClicked()
+	if (Swatter.Error.selected) then return end
+	Swatter.Error.Box:HighlightText()
+	Swatter.Error.selected = true
+end
+
 -- Create our error message frame
 Swatter.Error = CreateFrame("Frame", "", UIParent)
 Swatter.Error:Hide()
@@ -316,6 +368,13 @@ Swatter.Error.Prev:SetText("< Prev")
 Swatter.Error.Prev:SetPoint("BOTTOMRIGHT", Swatter.Error.Next, "BOTTOMLEFT", -5, 0)
 Swatter.Error.Prev:SetScript("OnClick", Swatter.ErrorPrev)
 
+Swatter.Error.Mesg = Swatter.Error:CreateFontString("", "OVERLAY", "GameFontNormalSmall")
+Swatter.Error.Mesg:SetJustifyH("LEFT")
+Swatter.Error.Mesg:SetPoint("TOPRIGHT", Swatter.Error.Prev, "TOPLEFT", -10, 0)
+Swatter.Error.Mesg:SetPoint("LEFT", Swatter.Error, "LEFT", 15, 0)
+Swatter.Error.Mesg:SetHeight(20)
+Swatter.Error.Mesg:SetText("Select All and Copy the above error message to report this bug.")
+
 Swatter.Error.Scroll = CreateFrame("ScrollFrame", "SwatterErrorInputScroll", Swatter.Error, "UIPanelScrollFrameTemplate")
 Swatter.Error.Scroll:SetPoint("TOPLEFT", Swatter.Error, "TOPLEFT", 20, -20)
 Swatter.Error.Scroll:SetPoint("RIGHT", Swatter.Error, "RIGHT", -30, 0)
@@ -329,6 +388,7 @@ Swatter.Error.Box:SetAutoFocus(false)
 Swatter.Error.Box:SetFontObject(GameFontHighlight)
 Swatter.Error.Box:SetScript("OnEscapePressed", Swatter.ErrorDone)
 Swatter.Error.Box:SetScript("OnTextChanged", Swatter.ErrorUpdate)
+Swatter.Error.Box:SetScript("OnEditFocusGained", Swatter.ErrorClicked)
 
 Swatter.Error.Scroll:SetScrollChild(Swatter.Error.Box)
 
