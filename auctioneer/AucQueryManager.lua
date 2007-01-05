@@ -558,19 +558,21 @@ function onAuctionItemListUpdate()
 		local complete = true;
 		for index, auction in pairs(updatedAuctions) do
 			-- Ignore auctions with no item name (Blizzard bug).
-			-- Missing owner alone is akin to 'Unknown Entity
-			--    should cause 2 more attempts at scanning the page
-			-- Missing name, owner and all other details are due to when the server is restarted its itemCache is cleared, but the AH is not
-			--    it just so happens that the server does not classify an item as being valid (that you can link, display, etc) if its only present in the AH
-			--    These auctions should be skipped
-			if (auction.owner == nil) then
+			-- Missing (nil?) (all?)  details except for auction at position X is due to server restart. its itemCache is cleared but the AH is not
+			--   it just so happens that the server does not classify an item as being valid (that you can link, display, etc) if its only present in the AH
+			--   These auctions should be skipped.
+			-- Empty string owner alone is akin to 'Unknown Entity'.
+			--   should cause 2 more attempts at scanning the page, then the item should be skipped.
+			if (auction.owner == nil and auction.name == nil) then 
+				debugPrint("onAuctionItemListUpdate() - Nil owner and name.");
+				-- todo: stuff
+				break;
+			end
+			if (auction.owner == "") then
 				debugPrint("onAuctionItemListUpdate() - No owner");
-				if (auction.name == nil) then
-					debugPrint("onAuctionItemListUpdate() - No name either");
-					-- No dice... there should be more updates coming...
-					complete = false;
-					break;
-				end
+				-- No dice... there should be more updates coming...
+				complete = false;
+				break;
 			end
 		end
 
