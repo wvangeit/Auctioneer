@@ -172,7 +172,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 			if (Auctioneer.Command.GetFilter('show-suggest')) then -- show item's suggested auction price
 				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count)
 				if (count > 1) then
-					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min ([bidPriceForOne] ea)/[buyPrice] BO ([buyPriceForOne] ea)"
+					-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO ([buyPriceForOne]/[bidPriceForOne] ea)"
 					local bidPriceForOne, buyPriceForOne = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, 1)
 					EnhTooltip.AddLine(
 						_AUCT('FrmtInfoSgststx'):format(
@@ -260,7 +260,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (Auctioneer.Command.GetFilter('show-suggest')) then -- show item's suggested auction price
 					local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, also, count);
 					if (count > 1) then
-						-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO"
+						-- OUTPUT: "Suggested price for your [count] stack: [bidPrice] min/[buyPrice] BO ([buyPriceForOne]/[bidPriceForOne] ea)"
 						local bidPriceForOne, buyPriceForOne = Auctioneer.Statistic.GetSuggestedResale(itemKey, also, 1)
 						EnhTooltip.AddLine(
 							_AUCT('FrmtInfoSgststx'):format(
