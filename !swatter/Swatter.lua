@@ -150,7 +150,7 @@ function Swatter.GetAddOns()
 		local loaded = IsAddOnLoaded(i)
 		if (loaded) then
 			if not name then name = "Anonymous" end
-			name = name:gsub("[^a-zA-Z]+", "")
+			name = name:gsub("[^a-zA-Z0-9]+", "")
 			local version = GetAddOnMetadata(i, "Version")
 			local class = getglobal(name)
 			if not class or type(class)~='table' then class = getglobal(name:lower()) end
