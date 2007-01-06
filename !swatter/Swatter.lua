@@ -226,10 +226,14 @@ function Swatter.OnEvent(frame, event, ...)
 		end
 	elseif (event == "ADDON_ACTION_BLOCKED") then
 		local addon, func = select(1, ...)
-		Swatter.OnError(string.format("Warning: AddOn %s attempted to call a protected function (%s) from a tainted execution path.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
+		if (InCombatLockdown()) then
+			Swatter.OnError(string.format("Note: AddOn %s attempted to call a protected function (%s) during combat lockdown.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
+		else
+			Swatter.OnError(string.format("Warning: AddOn %s attempted to call a protected function (%s) which may require interaction.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
+		end
 	elseif (event == "ADDON_ACTION_FORBIDDEN") then
 		local addon, func = select(1, ...)
-		Swatter.OnError(string.format("Warning: AddOn %s attempted to call a forbidden function (%s) from a tainted execution path.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
+		Swatter.OnError(string.format("Error: AddOn %s attempted to call a forbidden function (%s) from a tainted execution path.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
 	end
 end
 
