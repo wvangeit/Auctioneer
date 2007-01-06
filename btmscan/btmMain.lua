@@ -1400,13 +1400,13 @@ end
 
 
 BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count)
-	--If the option is enabled, disables showing of the BtmScan tooltip.
+	-- Make sure the current zone is loaded and has defaults
+	BtmScan.GetZoneConfig("tooltip")
+
+	--If the tooltip option is disabled, then disable showing of the BtmScan tooltip unless we are currently BTM scanning
 	if (data.tooltipOn ~= true) then
 		if (not BtmScan.scanning) then return end
 	end
-
-	-- Make sure the current zone is loaded and has defaults
-	BtmScan.GetZoneConfig("tooltip")
 
 	local ltype = EnhTooltip.LinkType(link)
 	if ltype == "item" then
