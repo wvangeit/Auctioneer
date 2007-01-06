@@ -563,13 +563,13 @@ function onAuctionItemListUpdate()
 			--   These auctions should be skipped.
 			-- Empty string owner alone is akin to 'Unknown Entity'.
 			--   should cause 2 more attempts at scanning the page, then the item should be skipped.
-			if (auction.name == nil) then
+			if (not auction.name) then
 				chatPrint("Auctioneer alert: Nil name detected. Please contact Auctioneer support ASAP.");
 				chatPrint("(This is a very rare condition which requires live servers for testing. Your data should be fine.)");
 				debugPrint("onAuctionItemListUpdate() - No name");
 				break;
 			end
-			if (auction.owner == "" or auction.owner == nil) then
+			if (not auction.owner or auction.owner == "") then
 				debugPrint("onAuctionItemListUpdate() - No owner");
 				-- No dice... there should be more updates coming... or maybe not.
 				complete = false;
