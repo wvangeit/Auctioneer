@@ -114,6 +114,12 @@ function profitFilter(auction, filterArgs)
 	if (debug) then debugPrint("profitFilter - checking auction: "..auction.auctionId) end;
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+	
+	-- Check to make sure GetItemInfo returned a valid result.  For some reason we are now getting nil itemInfo's at times, which seems odd for an item we're pulling from the snapshot.  
+	if (not itemInfo) then
+		if (debug) then debugPrint("Missing itemInfo for auction "..auction.auctionId) end;
+		return false;
+	end
 
 	-- Check the item category
 	local categoryName = filterArgs.categoryName;
