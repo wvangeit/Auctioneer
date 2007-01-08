@@ -993,6 +993,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Command Options
 		OptAlso	= "([Realm]-[Fraktion]|opposite|home|neutral)";
+		OptAskPriceSend	= "(<Spielername> <Preisnachfrage-Ergebnis>)";
 		OptAuctionDuration	= "(last|2h|8h|24h)";
 		OptBidbroker	= "<Profit in Silber>";
 		OptBidLimit	= "<Nummer> ";
@@ -1202,6 +1203,7 @@ AuctioneerLocalizations = {
 		HelpAskPriceAd	= "Anzeige der neuen Preisnachfrage-Eigenschaften ein-/ausschalten.";
 		HelpAskPriceGuild	= "Auf Gildenchat-Anfragen reagieren.";
 		HelpAskPriceParty	= "Auf Gruppenchat-Anfragen reagieren.";
+		HelpAskPriceSend	= "Einem Spieler manuell das Ergebnis einer Preisnachfrage senden.";
 		HelpAskPriceSmart	= "Schlagwortcheck ein-/ausschalten.";
 		HelpAskPriceTrigger	= "Ändere AskPrice Auslöser.";
 		HelpAskPriceVendor	= "Anzeige von Händlerinformationen ein-/ausschalten.";
@@ -1765,7 +1767,10 @@ AuctioneerLocalizations = {
 
 
 		-- Section: User Interface
+		BuySortTooltip	= "Sort results page by buyout price (hold SHIFT to sort by item name instead)";
+		ClearTooltip	= "Clear any custom search parameters from search fields.";
 		FrmtLastSoldOn	= "Last Sold on %s";
+		RefreshTooltip	= "Resubmit search query at the current page number.";
 		UiBid	= "Bid";
 		UiBidHeader	= "Bid";
 		UiBidPerHeader	= "Bid Per";

@@ -71,6 +71,18 @@ local function prevButton(...)
 	return prevButtonHook(...)
 end
 
+local function showTooltip(obj)
+	local tooltip = obj.tooltip
+	GameTooltip:SetOwner(obj, "ANCHOR_RIGHT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine(tooltip)
+	GameTooltip:Show()
+end
+
+local function hideTooltip()
+	GameTooltip:Hide()
+end
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function load()
@@ -81,28 +93,37 @@ function load()
 	BrowseScanButton:SetPoint("LEFT", "AuctionFrameMoneyFrame", "RIGHT", 5,0);
 	BrowseScanButton:Show();
 
+	BrowseClearButton.tooltip = _AUCT('ClearTooltip')
 	BrowseClearButton:SetText(" ");
 	BrowseClearButton:SetParent("AuctionFrameBrowse");
 	BrowseClearButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
 	BrowseClearButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
 	BrowseClearButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Clear.tga");
 	BrowseClearButton:SetPoint("TOPLEFT", "AuctionFrameBrowse", "TOPLEFT", 80, -16);
+	BrowseClearButton:SetScript("OnEnter", showTooltip);
+	BrowseClearButton:SetScript("OnLeave", hideTooltip);
 	BrowseClearButton:Show();
 
+	BrowseRefreshButton.tooltip = _AUCT('RefreshTooltip')
 	BrowseRefreshButton:SetText(" ");
 	BrowseRefreshButton:SetParent("AuctionFrameBrowse");
 	BrowseRefreshButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
 	BrowseRefreshButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
 	BrowseRefreshButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Refresh.tga");
 	BrowseRefreshButton:SetPoint("LEFT", "BrowseClearButton", "RIGHT", 5,0);
+	BrowseRefreshButton:SetScript("OnEnter", showTooltip);
+	BrowseRefreshButton:SetScript("OnLeave", hideTooltip);
 	BrowseRefreshButton:Show();
 
+	BrowseBuySortButton.tooltip = _AUCT('BuySortTooltip')
 	BrowseBuySortButton:SetText(" ");
 	BrowseBuySortButton:SetParent("AuctionFrameBrowse");
 	BrowseBuySortButton:SetNormalTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
 	BrowseBuySortButton:SetHighlightTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
 	BrowseBuySortButton:SetPushedTexture("Interface\\AddOns\\Auctioneer\\Textures\\Sort.tga");
 	BrowseBuySortButton:SetPoint("LEFT", "BrowseRefreshButton", "RIGHT", 5,0);
+	BrowseBuySortButton:SetScript("OnEnter", showTooltip);
+	BrowseBuySortButton:SetScript("OnLeave", hideTooltip);
 	BrowseBuySortButton:Show();
 
 	nextButtonHook = BrowseNextPageButton:GetScript("OnClick")
