@@ -1,7 +1,7 @@
 ## Title: Bottom Scanner
 ## Notes: Allows you to monitor new auctions for bargains. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 20000
+## Interface: 20003
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby, Auctioneer
 ## SavedVariables: BtmScanData
