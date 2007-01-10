@@ -72,7 +72,7 @@ function unregisterEvent(eventName, callbackFunc)
 end
 
 -------------------------------------------------------------------------------
--- Unregisters for an auctioneer event.
+-- Fires an auctioneer event.
 -------------------------------------------------------------------------------
 function fireEvent(eventName, ...)
 	local listeners = getListeners(eventName);
