@@ -151,7 +151,7 @@
 							<OnTabPressed>
 							</OnTabPressed>
 							<OnEnterPressed>
-								AuctionFrameSearchTransactions_SearchButton_OnClick();
+								AuctionFrameSearchTransactions_SearchButton_OnClick(self);
 							</OnEnterPressed>
 						</Scripts>
 					</EditBox>

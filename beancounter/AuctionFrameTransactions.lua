@@ -63,6 +63,17 @@ function AuctionFrameTransactions_OnLoad(transactionFrame)
 end
 
 -------------------------------------------------------------------------------
+-- Called, when the user hits enter in the edit box
+--
+-- parameters:
+--    editBox = reference to the search button, which threw this event
+-------------------------------------------------------------------------------
+function AuctionFrameSearchTransactions_SearchButton_OnClick(editBox)
+   -- enable and update the result list
+	enableResults(editBox:GetParent():GetParent().resultList)
+end
+
+-------------------------------------------------------------------------------
 -- Called, when the user hits the search button
 --
 -- parameters:
