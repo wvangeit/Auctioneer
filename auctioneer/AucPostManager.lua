@@ -678,8 +678,9 @@ chatPrint = Auctioneer.Util.ChatPrint;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.PostManager]", ...);
+	if debug then EnhTooltip.DebugPrint("[Auc.PostManager]", ...); end
 end
 
 -------------------------------------------------------------------------------

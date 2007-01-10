@@ -1188,8 +1188,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(message)
-	BeanCounter.DebugPrint("[BeanCounter.SalesDB] "..message);
+	if debug then BeanCounter.DebugPrint("[BeanCounter.SalesDB] "..message); end
 end
 
 --[[

@@ -35,7 +35,7 @@
 
 
 Auctioneer.Version="<%version%>";
--- If you want to see debug messages, create a window called "Debug" within the client.
+-- If you want to see debug messages, create a window called "ettdebug" within the client.
 if (Auctioneer.Version == "<".."%version%>") then
 	Auctioneer.Version = "3.9.DEV";
 end

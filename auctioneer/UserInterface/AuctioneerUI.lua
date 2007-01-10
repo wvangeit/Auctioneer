@@ -355,8 +355,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(message)
-	return EnhTooltip.DebugPrint("[Auc.UI]", message);
+	if debug then EnhTooltip.DebugPrint("[Auc.UI]", message); end
 end
 
 --=============================================================================

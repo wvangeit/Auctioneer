@@ -1157,8 +1157,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(message)
-	BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..stringFromNilSafeString(message));
+	if debug then BeanCounter.DebugPrint("[BeanCounter.PurchasesDB] "..stringFromNilSafeString(message)); end
 end
 
 -------------------------------------------------------------------------------

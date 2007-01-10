@@ -419,8 +419,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = truel
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.TransactionDB]", ...)
+	if debug then EnhTooltip.DebugPrint("[Auc.TransactionDB]", ...); end
 end
 
 --=============================================================================

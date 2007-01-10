@@ -577,7 +577,7 @@ function onAuctionItemListUpdate()
 			end
 		end
 
-		-- If the request is comlete, remove it from the queue.
+		-- If the request is complete, remove it from the queue.
 		if (complete) then
 			debugPrint("onAuctionItemListUpdate() - query complete");
 			removeRequestFromQueue(QueryAuctionItemsResultCodes.Complete);
@@ -1052,8 +1052,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(...)
-	EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ...);
+	if debug then EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ...); end
 end
 
 -------------------------------------------------------------------------------

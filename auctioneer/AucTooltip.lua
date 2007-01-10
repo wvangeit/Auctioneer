@@ -33,7 +33,8 @@
 local hookTooltip
 
 function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
-	EnhTooltip.DebugPrint("Displaying "..name)
+	--local debug = true;
+	if debug then EnhTooltip.DebugPrint("Displaying "..name); end
 	if (not link) then EnhTooltip.DebugPrint("No link was passed to the client");  return; end
 
 	-- nothing to do, if auctioneer is disabled

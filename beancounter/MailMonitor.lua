@@ -570,8 +570,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(message)
-	BeanCounter.DebugPrint("[BeanCounter.MailMonitor] "..message);
+	if debug then BeanCounter.DebugPrint("[BeanCounter.MailMonitor] "..message); end
 end
 
 -------------------------------------------------------------------------------

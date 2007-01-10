@@ -307,8 +307,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(...)
-	return EnhTooltip.DebugPrint("[Auc.AuctionsTab]", ...);
+	if debug then EnhTooltip.DebugPrint("[Auc.AuctionsTab]", ...); end
 end
 
 --=============================================================================

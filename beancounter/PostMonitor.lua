@@ -152,6 +152,7 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(message)
-	BeanCounter.DebugPrint("[BeanCounter.PostMonitor] "..message);
+	if debug then BeanCounter.DebugPrint("[BeanCounter.PostMonitor] "..message); end
 end

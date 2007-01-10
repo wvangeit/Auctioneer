@@ -99,8 +99,9 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
+--local debug = true;
 function debugPrint(...)
-	return EnhTooltip.DebugPrint("[Auc.EventManager]", ...);
+	if debug then EnhTooltip.DebugPrint("[Auc.EventManager]", ...); end
 end
 
 -------------------------------------------------------------------------------
