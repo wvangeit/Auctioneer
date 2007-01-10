@@ -540,7 +540,7 @@ function onAuctionItemListUpdate()
 		};
 		if (lastIndexOnPage == 0) then
 			CurrentPage.isLastPage = true;
-		elseif (CurrentPage.pageNum * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
+		elseif (CurrentPage.pageNum == 0) then
 			CurrentPage.isLastPage = true;
 		end
 
