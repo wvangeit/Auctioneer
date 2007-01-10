@@ -130,7 +130,7 @@ function profitFilter(auction, filterArgs)
 	-- Check the item quality
 	local minQuality = filterArgs.minQuality;
 	if (minQuality and itemInfo.quality < minQuality) then
-		if (debug) then debugPrint("No match due to quality") end;
+		if (debug) then debugPrint("No match due to quality", minQuality) end;
 		return false;
 	end
 
@@ -178,7 +178,7 @@ function profitFilter(auction, filterArgs)
 		-- Check the seen count.
 		local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
 		if (seenCount < Auctioneer.Core.Constants.MinBuyoutSeenCount) then
-			if (debug) then debugPrint("No match due to seen count") end;
+			if (debug) then debugPrint("No match due to seen count", seenCount) end;
 			return false;
 		end
 
@@ -189,19 +189,19 @@ function profitFilter(auction, filterArgs)
 
 			-- Check the minimum bid profit.
 			if (minBidProfit and bidProfit < minBidProfit) then
-				if (debug) then debugPrint("No match due bid profit") end;
+				if (debug) then debugPrint("No match due bid profit", bidProfit, minBidProfit) end;
 				return false;
 			end
 
 			-- Check the minimum bid profit percent.
 			if (minBidProfitPercent and bidProfitPercent < minBidProfitPercent) then
-				if (debug) then debugPrint("No match due bid profit percentage") end;
+				if (debug) then debugPrint("No match due bid profit percentage", bidProfitPercent, minBifProfitPercent) end;
 				return false;
 			end
 
 			-- Check the minimum bid percent less then HSP.
 			if (minBidPercentLess and bidPercentLess < minBidPercentLess) then
-				if (debug) then debugPrint("No match due bid profit percent less") end;
+				if (debug) then debugPrint("No match due bid profit percent less", bidPercentLess, minBidPercentLess) end;
 				return false;
 			end
 		end
@@ -217,19 +217,19 @@ function profitFilter(auction, filterArgs)
 
 			-- Check the minimum buyout profit.
 			if (minBuyoutProfit and buyoutProfit < minBuyoutProfit) then
-				if (debug) then debugPrint("No match due buyout price (profit was "..buyoutProfit..")") end;
+				if (debug) then debugPrint("No match due buyout profit", buyoutProfit, minBuyoutProfit, "hsp: "..tostring(hsp)) end;
 				return false;
 			end
 
 			-- Check the minimum buyout profit percent.
 			if (minBuyoutProfitPercent and buyoutProfitPercent < minBuyoutProfitPercent) then
-				if (debug) then debugPrint("No match due buyout price percent") end;
+				if (debug) then debugPrint("No match due buyout profit percent", buyoutProfitPercent, minBuyoutProfitPercent) end;
 				return false;
 			end
 
 			-- Check the minimum buyout percent less then HSP
 			if (minBuyoutPercentLess and buyoutPercentLess < minBuyoutPercentLess) then
-				if (debug) then debugPrint("No match due buyout price percent less") end;
+				if (debug) then debugPrint("No match due buyout profit percent less", buyoutPercentLess, minBuyoutPercentLess) end;
 				return false;
 			end
 		end
