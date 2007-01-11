@@ -317,7 +317,7 @@ nLogLevelFiltLow:SetText("")
 nLogLevelFiltHigh:SetText("")
 nLog.Message.LevelFilt:SetMinMaxValues(1, 5)
 nLog.Message.LevelFilt:SetValueStep(1)
-nLog.Message.LevelFilt:SetValue(N_NOTICE)
+nLog.Message.LevelFilt:SetValue(N_DEBUG)
 nLog.Message.LevelFilt:SetHitRectInsets(0,0,0,0)
 
 nLog.Message.Done = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
