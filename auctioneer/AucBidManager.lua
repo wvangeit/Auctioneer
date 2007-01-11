@@ -156,6 +156,7 @@ function prePlaceAuctionBidHook(_, _, listType, index, bid)
 			currentListType, currentIndex, currentBid, currentCallbackFunc = listType, index, bid, nil;
 		else
 			debugPrint("prePlaceAuctionBidHook() - Bid not allowed");
+			Auctioneer.Util.Debug("AucBidManager", AUC_NOTICE, "Bid not allowed", "Aborting bid on ", listType, index, bid, " in prePlaceAuctionBidHook")
 			return "abort";
 		end
 	end
@@ -184,6 +185,7 @@ function placeAuctionBid(listType, index, bid, callbackFunc)
 		StaticPopup_Show("AUCTIONEER_BIDORBUYOUT_AUCTION");
 	else
 		debugPrint("placeAuctionBid() - Bid not allowed");
+		Auctioneer.Util.Debug("AucBidManager", AUC_NOTICE, "Bid not allowed", "Aborting bid on ", listType, index, bid, " in placeAuctionBid")
 	end
 end
 
@@ -254,9 +256,11 @@ function addPendingBid(listType, index, bid, callbackFunc)
 	end
 	if (auction and auction.auctionId) then
 		debugPrint("Found in snapshot:", auction.auctionId);
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Pending bid found", "Found item ", auction.auctionId, " in snapshot in addPendingBid")
 	else
 		debugPrint("Did not find auction in snapshot");
 		auction = Auctioneer.QueryManager.GetAuctionByIndex(listType, index);
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Pending bid not in snap", "Can't find item ", auction.auctionId, " in snapshot in addPendingBid")
 	end
 
 	-- We had better have an auction by now...
@@ -269,15 +273,18 @@ function addPendingBid(listType, index, bid, callbackFunc)
 		};
 		table.insert(PendingBids, pendingBid);
 		debugPrint("Added pending bid");
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Added pending bid", "Found item ", auction.auctionId, " in addPendingBid")
 
 		-- Register for the response events if this is the first pending bid.
 		if (#PendingBids == 1) then
 			debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+			Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Registering bid handlers", "Registering handlers for bid result")
 			Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_BidManager", onEventHook);
 			Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_BidManager", onEventHook);
 		end
 
 		-- Fire the AUCTIONEER_BID_SENT event.
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Firing bid event", "Sending bid request event to event manager")
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SENT", pendingBid.auction, pendingBid.bid, BidResultCodes.BidSent);
 	end
 end
@@ -291,10 +298,12 @@ function removePendingBid(result)
 		local pendingBid = PendingBids[1];
 		table.remove(PendingBids, 1);
 		debugPrint("Removed pending bid with result "..result);
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Removing pending bid", "Pending bid removed with result: ", result)
 
 		-- Unregister for the response events if this is the last pending bid.
 		if (#PendingBids == 0) then
 			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+			Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Deregistering bid handlers", "Deregistering handlers for bid result")
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "Auctioneer_BidManager");
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "Auctioneer_BidManager");
 		end

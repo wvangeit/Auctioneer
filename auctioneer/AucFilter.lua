@@ -112,12 +112,14 @@ end
 function profitFilter(auction, filterArgs)
 	--local debug = true;
 	if (debug) then debugPrint("profitFilter - checking auction: "..auction.auctionId) end;
+	Auctioneer.Util.Debug("AucFilter", AUC_DEBUG, "Checking profit", "Checking profit on ", auction.auctionId, " in profitFilter")
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
 	
 	-- Check to make sure GetItemInfo returned a valid result.  For some reason we are now getting nil itemInfo's at times, which seems odd for an item we're pulling from the snapshot.  
 	if (not itemInfo) then
 		if (debug) then debugPrint("Missing itemInfo for auction "..auction.auctionId) end;
+		Auctioneer.Util.Debug("AucFilter", AUC_NOTICE, "Item not found", "Missing itemInfo for auction ", auction.auctionId, " in profitFilter")
 		return false;
 	end
 
@@ -131,6 +133,7 @@ function profitFilter(auction, filterArgs)
 	local minQuality = filterArgs.minQuality;
 	if (minQuality and itemInfo.quality < minQuality) then
 		if (debug) then debugPrint("No match due to quality", minQuality) end;
+		Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low quality in profitFilter")
 		return false;
 	end
 
@@ -144,6 +147,7 @@ function profitFilter(auction, filterArgs)
 		end
 		if (not match) then
 			if (debug) then debugPrint("No match due to name") end;
+			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to name mismatch in profitFilter")
 			return false;
 		end
 	end
@@ -151,6 +155,7 @@ function profitFilter(auction, filterArgs)
 	-- Check for auction expiration.
 	if (isAuctionExpired(auction)) then
 		if (debug) then debugPrint("No match due to expired auction (lastSeen="..date("%x", auction.lastSeen)..")") end;
+		Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to expiry in profitFilter")
 		return false;
 	end
 
@@ -158,6 +163,7 @@ function profitFilter(auction, filterArgs)
 	local maxSecondsLeft = filterArgs.maxSecondsLeft;
 	if (maxSecondsLeft and getSecondsLeftForAuction(auction) > maxSecondsLeft) then
 		if (debug) then debugPrint("No match due to time left") end;
+		Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to time left in profitFilter")
 		return false;
 	end
 
@@ -172,6 +178,7 @@ function profitFilter(auction, filterArgs)
 		-- Check for a usable median
 		if (Auctioneer.Statistic.GetUsableMedian(itemKey, auction.ahKey) == nil) then
 			if (debug) then debugPrint("No match due to no usable mean") end;
+			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to no usable mean in profitFilter")
 			return false;
 		end
 
@@ -179,6 +186,7 @@ function profitFilter(auction, filterArgs)
 		local hsp, seenCount = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
 		if (seenCount < Auctioneer.Core.Constants.MinBuyoutSeenCount) then
 			if (debug) then debugPrint("No match due to seen count", seenCount) end;
+			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low seen count in profitFilter")
 			return false;
 		end
 
@@ -190,18 +198,21 @@ function profitFilter(auction, filterArgs)
 			-- Check the minimum bid profit.
 			if (minBidProfit and bidProfit < minBidProfit) then
 				if (debug) then debugPrint("No match due bid profit", bidProfit, minBidProfit) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low bid profit in profitFilter")
 				return false;
 			end
 
 			-- Check the minimum bid profit percent.
 			if (minBidProfitPercent and bidProfitPercent < minBidProfitPercent) then
 				if (debug) then debugPrint("No match due bid profit percentage", bidProfitPercent, minBifProfitPercent) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low bid profit percentage in profitFilter")
 				return false;
 			end
 
 			-- Check the minimum bid percent less then HSP.
 			if (minBidPercentLess and bidPercentLess < minBidPercentLess) then
 				if (debug) then debugPrint("No match due bid profit percent less", bidPercentLess, minBidPercentLess) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low min percent less in profitFilter")
 				return false;
 			end
 		end
@@ -211,6 +222,7 @@ function profitFilter(auction, filterArgs)
 			-- Calculate the buyout profit (no buyout means no match).
 			if (auction.buyoutPrice == nil or auction.buyoutPrice == 0) then
 				if (debug) then debugPrint("No match due to no buyout") end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to no buyout price in profitFilter")
 				return false;
 			end
 			local buyoutProfit, buyoutProfitPercent, buyoutPercentLess = Auctioneer.Statistic.GetBuyoutProfit(auction, hsp);
@@ -218,18 +230,21 @@ function profitFilter(auction, filterArgs)
 			-- Check the minimum buyout profit.
 			if (minBuyoutProfit and buyoutProfit < minBuyoutProfit) then
 				if (debug) then debugPrint("No match due buyout profit", buyoutProfit, minBuyoutProfit, "hsp: "..tostring(hsp)) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low buyout profit in profitFilter")
 				return false;
 			end
 
 			-- Check the minimum buyout profit percent.
 			if (minBuyoutProfitPercent and buyoutProfitPercent < minBuyoutProfitPercent) then
 				if (debug) then debugPrint("No match due buyout profit percent", buyoutProfitPercent, minBuyoutProfitPercent) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low buyout profit percentage in profitFilter")
 				return false;
 			end
 
 			-- Check the minimum buyout percent less then HSP
 			if (minBuyoutPercentLess and buyoutPercentLess < minBuyoutPercentLess) then
 				if (debug) then debugPrint("No match due buyout profit percent less", buyoutPercentLess, minBuyoutPercentLess) end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to low buyout profit percent less in profitFilter")
 				return false;
 			end
 		end
@@ -237,12 +252,14 @@ function profitFilter(auction, filterArgs)
 		-- Check if its a bad resale choice.
 		if (Auctioneer.Statistic.IsBadResaleChoice(auction)) then
 			if (debug) then debugPrint("No match due bad resale choice") end;
+			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to bad resale choice in profitFilter")
 			return false;
 		end
 	end
 
 	-- If we make it this far, its a match!
 	if (debug) then debugPrint("MATCH!") end;
+	Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item matched", "Matching ", auction.auctionId, " in profitFilter")
 	return true;
 end
 

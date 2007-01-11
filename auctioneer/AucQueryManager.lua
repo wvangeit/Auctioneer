@@ -1060,6 +1060,11 @@ end
 --local debug = true;
 function debugPrint(...)
 	if debug then EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ...); end
+	local msg = select(1, ...)
+	if (#msg > 36) then
+		msg = msg:sub(1,33).."..."
+	end
+	Auctioneer.Util.Debug("AucQueryManager", AUC_INFO, msg, "LAZY-DEBUG\n", ...)
 end
 
 -------------------------------------------------------------------------------

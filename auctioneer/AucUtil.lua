@@ -631,3 +631,14 @@ Auctioneer.Util = {
 	LocalizeCommand = localizeCommand,
 	FindEmptySlot = findEmptySlot,
 }
+
+AUC_CRITICAL = 1
+AUC_WARNING = 2
+AUC_NOTICE = 3
+AUC_INFO = 4
+AUC_DEBUG = 5
+function Auctioneer.Util.Debug(...)
+	if (nLog) then
+		nLog.AddMessage("Auctioneer", ...)
+	end
+end

@@ -123,6 +123,7 @@ function bidByAuctionId(auctionId, callbackFunc)
 		placeBidByAuction(auctionInSnapshot, nil, callbackFunc);
 	else
 		debugPrint("bidByAuctionId() - Invalid auctionId");
+		Auctioneer.Util.Debug("AucBidScanner", AUC_INFO, "Invalid auctionId", "Found invalid auctionId ", auctionId, " in bidByAuctionId")
 	end
 end
 
@@ -134,7 +135,8 @@ function buyoutByAuctionId(auctionId, callbackFunc)
 	if (auctionInSnapshot and auctionInSnapshot.buyoutPrice > 0) then
 		placeBidByAuction(auctionInSnapshot, auctionInSnapshot.buyoutPrice, callbackFunc);
 	else
-		debugPrint("bidByAuctionId() - Invalid auctionId");
+		debugPrint("buyoutByAuctionId() - Invalid auctionId");
+		Auctioneer.Util.Debug("AucBidScanner", AUC_INFO, "Invalid auctionId", "Found invalid auctionId ", auctionId, " in buyoutByAuctionId")
 	end
 end
 
@@ -161,6 +163,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 					return FilterResult.Skip;
 				end
 				debugPrint("Found auction with matching id");
+				Auctioneer.Util.Debug("AucBidScanner", AUC_INFO, "Found matching auction", "Found matching auction ", auction.auctionId, " in placeBidByAuction")
 
 				-- If we are bidding, perform checks to see if we should still
 				-- bid on it.
@@ -169,6 +172,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 					if (request.currentBid ~= Auctioneer.SnapshotDB.GetCurrentBid(auction)) then
 						chatPrint(ERR_AUCTION_HIGHER_BID);
 						debugPrint(ERR_AUCTION_HIGHER_BID);
+						Auctioneer.Util.Debug("AucBidScanner", AUC_NOTICE, "Found higher bid", "Matching auction now has a higher bid ", auction.buyoutPrice, " than your bid of ", bidAmount, " in placeBidByAuction")
 						return FilterResult.Abort;
 					end
 
@@ -177,6 +181,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 						-- %todo: localize
 						chatPrint("Already the high bidder");
 						debugPrint("Already the high bidder");
+						Auctioneer.Util.Debug("AucBidScanner", AUC_NOTICE, "Found player's bid", "Matching auction has a player's bid already in placeBidByAuction")
 						return FilterResult.Abort;
 					end
 				end
@@ -192,6 +197,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 					bid = auction.bidAmount + auction.minIncrement;
 				end
 				debugPrint("Bidding on auction: "..bid);
+				Auctioneer.Util.Debug("AucBidScanner", AUC_INFO, "Bidding on Auction", "Bidding ", bid, " on auction in placeBidByAuction")
 				return FilterResult.Bid, bid;
 			end
 
@@ -208,6 +214,7 @@ function placeBidByAuction(auctionInSnapshot, bidAmount, callbackFunc)
 		addRequestToQueue(request);
 	else
 		debugPrint("placeBidByAuction() - No information for item "..itemKey);
+		Auctioneer.Util.Debug("AucBidScanner", AUC_NOTICE, "No Information", "Unable to find information on ", itemKey, " in placeBidByAuction")
 	end
 end
 
@@ -222,6 +229,7 @@ function addRequestToQueue(request)
 	request.currentIndex = 1;
 	request.isBuyout = false;
 	table.insert(BidRequestQueue, request);
+	Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Adding request to queue", "Adding request ", request, " in addRequestToQueue")
 	Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SCAN_QUEUED", request);
 	debugPrint("Added request to back of queue");
 end
@@ -234,6 +242,7 @@ function removeRequestFromQueue()
 		-- Remove the request from the queue.
 		local request = BidRequestQueue[1];
 		table.remove(BidRequestQueue, 1);
+		Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Removing request from queue", "Removing request ", request, " in addRequestToQueue")
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SCAN_COMPLETE", request);
 		debugPrint("Removed request from queue");
 
@@ -281,6 +290,7 @@ function queryCompleteCallback(query, result)
 		request.state = RequestState.WaitingToBid;
 	else
 		debugPrint("WARNING: Received query complete callback in unexpected state");
+		Auctioneer.Util.Debug("AucBidScanner", AUC_WARNING, "Query unexpected", "Query complete callback unexpected in current state: ", request, " in queryCompleteCallback")
 	end
 end
 
@@ -293,6 +303,7 @@ function placeBid(request)
 	-- Iterate through each item on the page, searching for a match
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 	debugPrint("Processing page", request.currentPage, "starting at index", request.currentIndex, "(", lastIndexOnPage, "on page;", totalAuctions, "in total)");
+	Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Processing Page", "Processing page", request.currentPage, "starting at index", request.currentIndex, "(", lastIndexOnPage, "on page;", totalAuctions, "in total) in placeBid")
 	for indexOnPage = request.currentIndex, lastIndexOnPage do
 		local auction = Auctioneer.QueryManager.GetAuctionByIndex("list", indexOnPage);
 		if (Auctioneer.QueryManager.IsAuctionValid(auction)) then
@@ -313,6 +324,7 @@ function placeBid(request)
 					local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 					local name = Auctioneer.ItemDB.GetItemName(itemKey);
 					debugPrint("Placing bid on", name, "at", bidAmount, "(index ", indexOnPage, ")");
+					Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Placing bid", "Placing bid on ", name, " at ", bidAmount, " (index ", indexOnPage, ") in placeBid")
 					Auctioneer.BidManager.PlaceAuctionBid("list", indexOnPage, bidAmount, bidCompleteCallback);
 
 				elseif (result == FilterResult.Abort) then
@@ -322,6 +334,7 @@ function placeBid(request)
 				end
 			else
 				debugPrint("Skipping auction due to no auction id (index", indexOnPage, ")");
+				Auctioneer.Util.Debug("AucBidScanner", AUC_NOTICE, "Skipping bid", "Skipping bid on item (index ", indexOnPage, ") in placeBid")
 			end
 		end
 	end
@@ -374,11 +387,13 @@ function bidCompleteCallback(auction, result)
 			if (not request.isBuyout) then
 				request.currentIndex = request.currentIndex + 1;
 				debugPrint("Incrementing the request's currentIndex to", request.currentIndex);
+				Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Incrementing request index", "Incrementing the request's currentIndex to ", request.currentIndex, " due to no buyout in bidCompleteCallback")
 			end
 		else
 			-- Skip over the auction we failed to bid on.
 			request.currentIndex = request.currentIndex + 1;
 			debugPrint("Incrementing the request's currentIndex to", request.currentIndex);
+			Auctioneer.Util.Debug("AucBidScanner", AUC_DEBUG, "Incrementing request index", "Incrementing the request's currentIndex to ", request.currentIndex, " due to bid not accepted in bidCompleteCallback")
 		end
 
 		-- Get ready to send the next bid if we haven't reached the limit.
@@ -392,6 +407,7 @@ function bidCompleteCallback(auction, result)
 		end
 	else
 		debugPrint("WARNING: Received bid complete callback in unexpected state");
+		Auctioneer.Util.Debug("AucBidScanner", AUC_WARNING, "Bid complete unexpected", "Bid completet callback unexpected in current state: ", request, " in bidCompleteCallback")
 	end
 end
 

@@ -279,6 +279,7 @@ function setKhaosSetKeyValue(key, value)
 
 		if (not kKey) then
 			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key", key, "does not exist")
+			Auctioneer.Util.Debug("AskPrice", AUC_WARNING, "Khaos key doesn't exist", "Khaos key ", key, " does not exist")
 		elseif (kKey.checked) then
 			if (type(value) == "string") then value = (value == "on"); end
 			Khaos.setSetKeyParameter("Auctioneer", key, "checked", value)
@@ -286,6 +287,7 @@ function setKhaosSetKeyValue(key, value)
 			Khaos.setSetKeyParameter("Auctioneer", key, "value", value)
 		else
 			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key", key)
+			Auctioneer.Util.Debug("AskPrice", AUC_WARNING, "Khaos key not updatable", "Khaos key ", key, " does not support update")
 		end
 	end
 end
@@ -468,6 +470,7 @@ end
 --=============================================================================
 if (Auctioneer.AskPrice) then return end;
 debugPrint("AucAskPrice.lua loaded");
+Auctioneer.Util.Debug("AskPrice", AUC_INFO, "Loaded", "AskPrice.lua loaded")
 
 Auctioneer.AskPrice = {
 	Init = init,
