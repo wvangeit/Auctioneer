@@ -63,12 +63,70 @@ function nLog.IsEnabled()
 	return nLogData.enabled
 end
 
+function dump(...)
+	local out = "";
+	local n = select("#", ...)
+	for i = 1, n do
+		local d = select(i, ...);
+		local t = type(d);
+		if (t == "table") then
+			out = out .. "{";
+			local first = true;
+			for k, v in pairs(d) do
+				if (not first) then out = out .. ", "; end
+				first = false;
+				out = out .. dump(k);
+				out = out .. " = ";
+				out = out .. dump(v);
+			end
+			out = out .. "}";
+		elseif (t == "nil") then
+			out = out .. "NIL";
+		elseif (t == "number") then
+			out = out .. d;
+		elseif (t == "string") then
+			out = out .. "\"" .. d .. "\"";
+		elseif (t == "boolean") then
+			if (d) then
+				out = out .. "true";
+			else
+				out = out .. "false";
+			end
+		else
+			out = out .. string.upper(t) .. "??";
+		end
+
+		if (i < n) then out = out .. ", "; end
+	end
+	return out;
+end
+
+local function format(...)
+	local n = select("#", ...)
+	local out = ""
+	for i = 1, n do
+		if i > 1 and out:sub(-1) ~= "  " then out = out .. " "; end
+		local d = select(i, ...)
+		if (type(d) == "string") then
+			if (d:sub(1,1) == " ") then
+				out = out .. d:sub(2)
+			else
+				out = out..d;
+			end
+		else
+			out = out..dump(d);
+		end
+	end
+	return out
+end
+
 local pid = 0
-function nLog.AddMessage(mAddon, mType, mLevel, mTitle, msg)
+function nLog.AddMessage(mAddon, mType, mLevel, mTitle, ...)
 	if broken then return end
-	if not (nLogData.enabled and mAddon and mType and mLevel and mTitle and msg) then return end
+	if not (nLogData.enabled and mAddon and mType and mLevel and mTitle) then return end
 	local ts = date("%b %d %H:%M");
 	pid = pid + 1
+	local msg = format(...)
 
 	-- Once we fill up to 64k entries, treat the table like a loop buffer
 	if (#nLog.messages >= 65535) then
