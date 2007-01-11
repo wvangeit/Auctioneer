@@ -134,6 +134,9 @@ local PendingBidInfo = {};
 
 local CurrentPage = nil;
 
+-- used to trap auction database update on start of scan
+local Scanned =0;
+
 -- True if CanSendAuctionQuery calls should be hooked. This is always the case
 -- unless Auctioneer wants to call it. Setting this to false effectively
 -- unhooks the method.
@@ -540,7 +543,7 @@ function onAuctionItemListUpdate()
 		};
 		if (lastIndexOnPage == 0) then
 			CurrentPage.isLastPage = true;
-		elseif (CurrentPage.pageNum == 0) then
+		elseif (CurrentPage.pageNum == 0 and Scanned == 1) then
 			CurrentPage.isLastPage = true;
 		end
 
@@ -814,12 +817,14 @@ function addPageToCache(page, updateSnapshot)
 			local page = PageCache[pageNum];
 			if (page == nil) then
 				debugPrint("Still missing page "..pageNum);
+				Scanned = CurrentPage.pageNum;
 				break;
 			elseif (page.isLastPage) then
 				debugPrint("Seen all "..(pageNum + 1).." page(s), updating snapshot");
 				local auctions, scannedInReverse = getAuctionsInCache();
 				Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, (not scannedInReverse));
 				clearPageCache();
+				Scanned = 0;
 				break;
 			end
 			pageNum = pageNum + 1;
