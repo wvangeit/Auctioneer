@@ -82,6 +82,7 @@ local AuctionsAdded = 0;
 local AuctionsUpdated = 0;
 local AuctionsRemoved = 0;
 local LastRequestResult = RequestState.Done;
+local AuctionsScannedCacheSize = 0;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -244,6 +245,8 @@ function removeRequestFromQueue()
 		LastRequestResult = request.state;
 		if (LastRequestResult == RequestState.Done) then
 			AuctionsScanned = request.auctionsScanned;
+			AuctionsScannedCacheSize = AuctionsScannedCacheSize + AuctionsScanned;
+			debugPrint("AuctionsScanned: "..AuctionsScannedCacheSize.."("..AuctionsScanned..")");
 		end
 	end
 end
@@ -258,7 +261,7 @@ function sendQuery(request)
 	end
 
 	-- Send the query!
-	debugPrint("Requesting page", request.nextPage);
+	debugPrint("Requesting page"..request.nextPage);
 	request.state = RequestState.WaitingForQueryResult;
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
@@ -286,7 +289,7 @@ function queryCompleteCallback(query, result)
 		local request = RequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
 			-- Query succeeded so update the request.
-			debugPrint("Scanned page", request.nextPage);
+			debugPrint("Scanned page"..request.nextPage);
 			local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 
 			-- Is this the first query?
@@ -383,6 +386,7 @@ function scanStarted()
 	AuctionsAdded = 0;
 	AuctionsUpdated = 0;
 	AuctionsRemoved = 0;
+	AuctionsScannedCacheSize = 0;
 
 	-- Register for snapshot update events so we can track how many auctions
 	-- are added, updated and removed.
@@ -418,13 +422,13 @@ function scanEnded()
 		chatResultText = "Scan complete"; -- %todo: Localize
 		uiResultText = "Auctioneer: auction scanning finished"; -- %todo: Localize
 	elseif (LastRequestResult == RequestState.Canceled) then
-		chatResultText = "Scan canceled"; -- %todo: Localize
+		chatResultText = "Scan cancelled"; -- %todo: Localize
 		uiResultText = "Auctioneer: auction scanning canceled"; -- %todo: Localize
 	else
 		chatResultText = "Scan failed"; -- %todo: Localize
 		uiResultText = "Auctioneer: auction scanning failed"; -- %todo: Localize
 	end
-	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScanned);
+	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScannedCacheSize);
 	local auctionsAddedMessage = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
 	local auctionsRemovedMessage = _AUCT('AuctionDefunctAucts'):format(AuctionsRemoved);
 	local auctionsUpdatedMessage = _AUCT('AuctionOldAucts'):format(AuctionsUpdated);
@@ -435,7 +439,6 @@ function scanEnded()
 	chatPrint(auctionsAddedMessage);
 	chatPrint(auctionsRemovedMessage);
 	chatPrint(auctionsUpdatedMessage);
-
 	-- Report the result to the UI.
 	BrowseNoResultsText:SetText(strjoin("\n", uiResultText, auctionsScannedMessage, auctionsAddedMessage, auctionsRemovedMessage, auctionsUpdatedMessage));
 
@@ -479,7 +482,7 @@ function updateScanProgressUI()
 					request.pages - request.nextPage,
 					request.pages,
 					tostring(auctionsScannedPerSecond),
-					SecondsToTime((secondsLeft))
+					SecondsToTime((secondsLeft)),AuctionsScannedCacheSize
 				)
 			);
 		end

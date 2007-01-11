@@ -541,9 +541,7 @@ function onAuctionItemListUpdate()
 			auctions = updatedAuctions;
 			isLastPage = false;
 		};
-		if (lastIndexOnPage == 0) then
-			CurrentPage.isLastPage = true;
-		elseif (CurrentPage.pageNum == 0 and Scanned == 1) then
+		if (lastIndexOnPage == 0 or (CurrentPage.pageNum == 0 and Scanned == 1)) then
 			CurrentPage.isLastPage = true;
 		end
 
@@ -573,7 +571,7 @@ function onAuctionItemListUpdate()
 				break;
 			end
 			if (not auction.owner or auction.owner == "") then
-				debugPrint("onAuctionItemListUpdate() - No owner");
+				debugPrint("onAuctionItemListUpdate() - No owner for "..auction.name);
 				-- No dice... there should be more updates coming... or maybe not.
 				complete = false;
 				break;
@@ -804,6 +802,7 @@ function addPageToCache(page, updateSnapshot)
 	end
 
 	-- Add the page to the cache.
+	if (not page) then debugPrint("Not page"); end
 	PageCache[page.pageNum] = page;
 	for _, auction in pairs(page.auctions) do
 		Auctioneer.EventManager.FireEvent("AUCTIONEER_AUCTION_SEEN", auction);
@@ -815,8 +814,9 @@ function addPageToCache(page, updateSnapshot)
 		local pageNum = 0;
 		while (true) do
 			local page = PageCache[pageNum];
+			if (pageNum ~= 0) then debugPrint("Page: "..pageNum); end
 			if (page == nil) then
-				debugPrint("Still missing page "..pageNum);
+				if (pageNum ~= 0) then debugPrint("Still missing page "..pageNum); end
 				Scanned = CurrentPage.pageNum;
 				break;
 			elseif (page.isLastPage) then
