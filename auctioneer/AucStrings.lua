@@ -29,7 +29,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-Auctioneer.RegisterRevision("$URL$", "$Rev$")
+Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 AuctioneerLocalizations = {
 

@@ -30,7 +30,7 @@
 	<Frame name="AuctionTemplates" hidden="true">
 		<Scripts>
 			<OnLoad>
-				Auctioneer.RegisterRevision("$URL$", "$Rev$")
+				Auctioneer_RegisterRevision("$URL$", "$Rev$")
 			</OnLoad>
 		</Scripts>
 	</Frame>

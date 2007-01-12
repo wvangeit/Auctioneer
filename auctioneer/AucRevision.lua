@@ -47,7 +47,7 @@ function Auctioneer_RegisterRevision(path, revision)
 		nLog.AddMessage("Auctioneer", "AucRevision", N_INFO, "Loaded revisioned file", "Loaded", file, "revision", rev)
 	end
 end
-Auctioneer.RegisterRevision("$URL$", "$Rev$")
+Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 
 local messageFrame
