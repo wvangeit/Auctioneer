@@ -272,10 +272,10 @@ end
 -------------------------------------------------------------------------------
 function auctionOwnerFilter(auction, filterArgs)
 	-- Normalize the filter arguments.
-	local owner = filterArgs.owner;
+	local owner = strlower(filterArgs.owner);
 
 	-- Check the owner.
-	if (owner and auction.owner ~= owner) then
+	if (owner and strlower(auction.owner) ~= owner) then
 		return false;
 	end
 
@@ -583,6 +583,7 @@ Auctioneer.Filter = {
 	CompetitionFilter = competitionFilter,
 	ProfitFilter = profitFilter;
 	ItemFilter = itemFilter;
+	AuctionOwnerFilter = auctionOwnerFilter;
 
 	GetMyHighestBuyouts = getMyHighestBuyouts;
 }

@@ -63,6 +63,7 @@ function load()
 	frame.SearchBuyouts = AuctionFrameSearch_SearchBuyouts;
 	frame.SearchCompetition = AuctionFrameSearch_SearchCompetition;
 	frame.SearchPlain = AuctionFrameSearch_SearchPlain;
+	frame.SearchOwner = AuctionFrameSearch_SearchOwner;
 	frame.SelectResultByIndex = AuctionFrameSearch_SelectResultByIndex;
 	frame.UpdateAuction = AuctionFrameSearch_UpdateAuction;
 	frame.RemoveAuction = AuctionFrameSearch_RemoveAuction;
@@ -77,6 +78,7 @@ function load()
 	frame.buyoutFrame = getglobal(frame:GetName().."Buyout");
 	frame.competeFrame = getglobal(frame:GetName().."Compete");
 	frame.plainFrame = getglobal(frame:GetName().."Plain");
+	frame.ownerFrame = getglobal(frame:GetName().."Owner");
 	frame.resultsList = getglobal(frame:GetName().."List");
 	frame.bidButton = getglobal(frame:GetName().."BidButton");
 	frame.buyoutButton = getglobal(frame:GetName().."BuyoutButton");
@@ -418,6 +420,63 @@ function load()
 		},
 	};
 
+	-- Configure the owner search physical columns
+	frame.ownerSearchPhysicalColumns =
+	{
+		{
+			width = 50;
+			logicalColumn = frame.logicalColumns.Quantity;
+			logicalColumns = { frame.logicalColumns.Quantity };
+			sortAscending = true;
+		},
+		{
+			width = 160;
+			logicalColumn = frame.logicalColumns.Name;
+			logicalColumns = { frame.logicalColumns.Name };
+			sortAscending = true;
+		},
+		{
+			width = 90;
+			logicalColumn = frame.logicalColumns.TimeLeft;
+			logicalColumns = { frame.logicalColumns.TimeLeft };
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = frame.logicalColumns.Bid;
+			logicalColumns =
+			{
+				frame.logicalColumns.Bid,
+				frame.logicalColumns.BidPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
+			};
+			sortAscending = true;
+		},
+		{
+			width = 130;
+			logicalColumn = frame.logicalColumns.Buyout;
+			logicalColumns =
+			{
+				frame.logicalColumns.BuyoutProfit,
+				frame.logicalColumns.BuyoutProfitPer,
+				frame.logicalColumns.Buyout,
+				frame.logicalColumns.BuyoutPer
+			};
+			sortAscending = true;
+		},
+		{
+			width = 50;
+			logicalColumn = frame.logicalColumns.BuyoutPercentLess;
+			logicalColumns =
+			{
+				frame.logicalColumns.BuyoutPercentLess,
+				frame.logicalColumns.ItemLevel
+			};
+			sortAscending = true;
+		},
+	};
+
 
 	-- Initialize the list to show nothing at first.
 	ListTemplate_Initialize(frame.resultsList, frame.results, frame.results);
@@ -471,8 +530,9 @@ function AuctionFrameSearch_SearchDropDown_Initialize()
 	AUCTIONEER_SEARCH_TYPES[2] = _AUCT("UiSearchTypeBuyouts");
 	AUCTIONEER_SEARCH_TYPES[3] = _AUCT("UiSearchTypeCompetition");
 	AUCTIONEER_SEARCH_TYPES[4] = _AUCT("UiSearchTypePlain");
+	AUCTIONEER_SEARCH_TYPES[5] = _AUCT("UiSearchTypeOwner");
 
-	for i=1, 4 do
+	for i=1, 5 do
 		UIDropDownMenu_AddButton({
 			text = AUCTIONEER_SEARCH_TYPES[i],
 			func = AuctionFrameSearch_SearchDropDownItem_OnClick,
@@ -519,6 +579,7 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 		frame.buyoutFrame:Hide();
 		frame.competeFrame:Hide();
 		frame.plainFrame:Hide();
+		frame.ownerFrame:Hide();
 		if (searchType == 1) then
 			-- Bid search
 			MoneyInputFrame_SetCopper(getglobal(frameName.."BidMinProfit"), tonumber(searchParams[2]))
@@ -577,6 +638,11 @@ function AuctionFrameSearch_SavedSearchDropDownItem_OnClick()
 			getglobal(frameName.."PlainSearchEdit"):SetText(searchParams[5])
 
 			frame.plainFrame:Show();
+		elseif (searchType == 5) then
+			-- Owner search
+			getglobal(frameName.."OwnerSearchEdit"):SetText(searchParams[2])
+
+			frame.ownerFrame:Show();
 		end
 	end
 	getglobal(frameName.."SaveSearchEdit"):SetText(text);
@@ -643,6 +709,7 @@ function AuctionFrameSearch_SearchDropDownItem_SetSelectedID(dropdown, index)
 	frame.buyoutFrame:Hide();
 	frame.competeFrame:Hide();
 	frame.plainFrame:Hide();
+	frame.ownerFrame:Hide();
 	if (index == 1) then
 		frame.bidFrame:Show();
 	elseif (index == 2) then
@@ -651,6 +718,8 @@ function AuctionFrameSearch_SearchDropDownItem_SetSelectedID(dropdown, index)
 		frame.competeFrame:Show();
 	elseif (index == 4) then
 		frame.plainFrame:Show();
+	elseif (index == 5) then
+		frame.ownerFrame:Show();
 	end
 	Auctioneer.UI.DropDownMenu.SetSelectedID(dropdown, index);
 end
@@ -708,6 +777,11 @@ function AuctionFrameSearch_SaveSearchButton_OnClick(button)
 			UIDropDownMenu_GetSelectedID(getglobal(frameName.."PlainCategoryDropDown")),
 			UIDropDownMenu_GetSelectedID(getglobal(frameName.."PlainMinQualityDropDown")),
 			getglobal(frameName.."PlainSearchEdit"):GetText()
+		);
+	elseif (searchType == 5) then
+		-- Owner-based search
+		searchData = strjoin("\t", searchType,
+			getglobal(frameName.."OwnerSearchEdit"):GetText()
 		);
 	end
 
@@ -1020,6 +1094,7 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, categoryIndex, minQuali
 	itemFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
 	itemFilterArgs.minQuality = minQuality;
 	itemFilterArgs.itemNames = Auctioneer.Util.Split(itemNames, "|");
+	
 	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.ItemFilter, itemFilterArgs);
 
 	-- Compile the results of the query.
@@ -1067,6 +1142,73 @@ function AuctionFrameSearch_SearchPlain(frame, maxPrice, categoryIndex, minQuali
 	frame.resultsType = "PlainSearch";
 	frame:SelectResultByIndex(nil);
 	ListTemplate_Initialize(frame.resultsList, frame.plainSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
+	ListTemplate_SetContent(frame.resultsList, frame.results);
+	ListTemplate_Sort(frame.resultsList, 2);
+	ListTemplate_Sort(frame.resultsList, 3);
+
+	-- Update the status line with the age of the data.
+	return frame:UpdateStatusWithQueryAge(itemFilterArgs.itemNames, categoryIndex, minQuality);
+end
+
+-------------------------------------------------------------------------------
+-- Perform an owner search
+-------------------------------------------------------------------------------
+function AuctionFrameSearch_SearchOwner(frame, owner)
+	-- Clear the old results.
+	frame.results = {};
+	frame.resultsByAuctionId = {};
+
+	-- Query the snapshot.
+	local itemFilterArgs = {};
+	itemFilterArgs.owner = owner;
+	
+	local snapshotAuctions = Auctioneer.SnapshotDB.Query(nil, nil, Auctioneer.Filter.AuctionOwnerFilter, itemFilterArgs);
+
+	-- Compile the results of the query.
+	local player = UnitName("player");
+	for _, snapshotAuction in pairs(snapshotAuctions) do
+		if (snapshotAuction.owner ~= player) then
+			local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(snapshotAuction);
+			local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
+			local profit, profitPercent, percentLess = Auctioneer.Statistic.GetBuyoutProfit(snapshotAuction);
+
+			local auction = {};
+			auction.auctionId = snapshotAuction.auctionId;
+			auction.itemKey = itemKey;
+			auction.hsp = Auctioneer.Statistic.GetHSP(itemKey, auction.ahKey);
+
+			auction.name = itemInfo.name;
+			auction.count = snapshotAuction.count;
+			auction.owner = snapshotAuction.owner;
+			auction.timeLeft = snapshotAuction.timeLeft;
+			auction.level = itemInfo.useLevel;
+
+			auction.bid = Auctioneer.SnapshotDB.GetCurrentBid(snapshotAuction);
+			auction.bidPer = math.floor(auction.bid / auction.count);
+
+			auction.buyout = snapshotAuction.buyoutPrice;
+			auction.buyoutPer = math.floor(auction.buyout / auction.count);
+
+			auction.buyoutProfit = profit;
+			auction.buyoutProfitPer = math.floor(auction.buyoutProfit / auction.count);
+			auction.buyoutPercentLess = percentLess;
+
+			if (snapshotAuction.highBidder) then
+				auction.status = AUCTION_STATUS_HIGH_BIDDER;
+			else
+				auction.status = AUCTION_STATUS_NORMAL;
+			end
+			auction.pendingBidCount = 0;
+
+			table.insert(frame.results, auction);
+			frame.resultsByAuctionId[auction.auctionId] = auction;
+		end
+	end
+
+	-- Hand the updated results to the list.
+	frame.resultsType = "OwnerSearch";
+	frame:SelectResultByIndex(nil);
+	ListTemplate_Initialize(frame.resultsList, frame.ownerSearchPhysicalColumns, frame.auctioneerListLogicalColumns);
 	ListTemplate_SetContent(frame.resultsList, frame.results);
 	ListTemplate_Sort(frame.resultsList, 2);
 	ListTemplate_Sort(frame.resultsList, 3);
@@ -1187,6 +1329,9 @@ function AuctionFrameSearch_UpdateButtons(frame)
 				frame.bidButton:Enable();
 				return frame.buyoutButton:Enable();
 			elseif (frame.resultsType == "PlainSearch") then
+				frame.bidButton:Enable();
+				return frame.buyoutButton:Enable();
+			elseif (frame.resultsType == "OwnerSearch") then
 				frame.bidButton:Enable();
 				return frame.buyoutButton:Enable();
 			else
@@ -1378,6 +1523,18 @@ function AuctionFrameSearchPlain_SearchButton_OnClick(button)
 	if (itemName == "") then itemName = nil end
 
 	frame:GetParent():SearchPlain(maxPrice, catID, minQuality, itemName);
+end
+
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function AuctionFrameSearchOwner_SearchButton_OnClick(button)
+	local frame = button:GetParent();
+	local frameName = frame:GetName();
+
+	local owner = getglobal(frameName.."SearchEdit"):GetText();
+	if (owner == "") then owner = nil end
+
+	frame:GetParent():SearchOwner(owner);
 end
 
 -------------------------------------------------------------------------------

@@ -806,6 +806,65 @@
 				</Scripts>
 			</Frame>
 
+			<!-- Owner Search Frame -->
+			<Frame name="$parentOwner" inherits="SearchParametersTemplate">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="$parentSearchText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="$parentSearchEdit" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="140" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentSearchText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="5" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnEnterPressed>
+								AuctionFrameSearchOwner_SearchButton_OnClick(self);
+							</OnEnterPressed>
+						</Scripts>
+					</EditBox>
+					<Button name="$parentSearchButton" inherits="UIPanelButtonTemplate">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="13" y="10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								AuctionFrameSearchOwner_SearchButton_OnClick(self);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
+						getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchForOwnerLabel'));
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
 			<!-- Results List -->
 			<Frame name="$parentList" inherits="ListTemplate">
 				<Anchors>
