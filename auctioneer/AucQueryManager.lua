@@ -192,6 +192,10 @@ function AucQueryManager_OnUpdate()
 						debugPrint("Query response not received in the last", silence, "seconds (maxSilence=", request.maxSilence, ")");
 						removeRequestFromQueue(QueryAuctionItemsResultCodes.PartialComplete);
 					end
+				elseif (not request.ownerTimeout and silence >= request.maxSilence - 1) then
+					Auctioneer.Util.Debug("AucQueryManager", AUC_NOTICE, "Owner timeout", "Triggering owner timeout at", silence, "seconds.")
+					request.ownerTimeout = true
+					onAuctionItemListUpdate()
 				end
 			end
 		-- Otherwise check if we can send the query now.
@@ -572,10 +576,13 @@ function onAuctionItemListUpdate()
 				break;
 			end
 			if (not auction.owner or auction.owner == "") then
-				debugPrint("onAuctionItemListUpdate() - No owner for "..auction.name);
-				-- No dice... there should be more updates coming... or maybe not.
-				complete = false;
-				break;
+				if (request.ownerTimeout) then auction.owner = "unknown"
+				else
+					debugPrint("onAuctionItemListUpdate() - No owner for "..auction.name);
+					-- No dice... there should be more updates coming... or maybe not.
+					complete = false;
+					break;
+				end
 			end
 		end
 
