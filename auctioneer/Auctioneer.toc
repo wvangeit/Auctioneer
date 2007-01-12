@@ -11,11 +11,11 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
-
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 
-AucObjects.lua
 AucRevision.lua
+
+AucObjects.lua
 AucClassExt.lua
 
 Babylonian\Babylonian.lua
@@ -47,17 +47,10 @@ AucBidManager.lua
 AucBidScanner.lua
 
 Auctioneer.xml
-UserInterface\AuctioneerUI.lua
 UserInterface\AuctioneerUI.xml
-UserInterface\ListTemplate.lua
 UserInterface\ListTemplate.xml
-UserInterface\AuctionFrameBrowse.lua
 UserInterface\AuctionFrameBrowse.xml
-UserInterface\AuctionFrameAuctions.lua
 UserInterface\AuctionFrameAuctions.xml
-UserInterface\AuctionFrameSearch.lua
 UserInterface\AuctionFrameSearch.xml
-UserInterface\AuctionFramePost.lua
 UserInterface\AuctionFramePost.xml
-UserInterface\AuctionDropDownMenu.lua
 UserInterface\AuctionDropDownMenu.xml

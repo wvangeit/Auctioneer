@@ -27,6 +27,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
+	<Script file="AuctionFrameAuctions.lua"/>
 	<Frame name="AuctionInfo" hidden="true">
 		<Size>
 			<AbsDimension x="160" y="80"/>

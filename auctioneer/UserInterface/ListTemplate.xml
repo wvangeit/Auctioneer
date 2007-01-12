@@ -25,6 +25,8 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
+	<Script file="../AucRevisions.lua"/>
+	<Script file="ListTemplate.lua"/>
 	<Frame name="ListTemplates" hidden="true">
 		<Scripts>
 			<OnLoad>

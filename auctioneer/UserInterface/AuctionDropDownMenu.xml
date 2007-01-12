@@ -25,6 +25,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
+	<Script file="AuctionDropDownMenu.lua"/>
 	<Frame name="AuctionDropDownMenu" inherits="UIDropDownMenuTemplate" id="1" hidden="true">
 		<Size>
 			<AbsDimension x="10" y="10"/>
