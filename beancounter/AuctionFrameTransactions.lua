@@ -68,7 +68,7 @@ end
 -- parameters:
 --    editBox = reference to the search button, which threw this event
 -------------------------------------------------------------------------------
-function AuctionFrameSearchTransactions_SearchButton_OnClick(editBox)
+function AuctionFrameSearchTransactions_SearchEdit_OnEnterPressed(editBox)
    -- enable and update the result list
 	enableResults(editBox:GetParent():GetParent().resultList)
 end
