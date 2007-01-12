@@ -205,6 +205,9 @@ function addOnLoaded()
 	Auctioneer.Util.StorePlayerFaction(); --We need to call it first manually, just in case we were loaded after PLAYER_LOGIN fired.
 	Stubby.RegisterEventHook("PLAYER_LOGIN", "Auctioneer", Auctioneer.Util.StorePlayerFaction);
 
+	-- Check to see if all file revisions are correct as per the manifest
+	Auctioneer_Manifest.Validate()
+
 	--Ready to rock and roll!
 	Auctioneer.Util.ChatPrint(_AUCT('FrmtWelcome'):format(Auctioneer.Version), 0.8, 0.8, 0.2);
 
