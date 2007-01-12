@@ -13,7 +13,7 @@
 ##
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 
-AucRevision.lua
+AucManifest.lua
 
 AucObjects.lua
 AucClassExt.lua

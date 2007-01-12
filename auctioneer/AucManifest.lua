@@ -3,7 +3,7 @@
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
-	Auctioneer Revisions
+	Auctioneer Manifest
 	Keep track of the revision numbers for various auctioneer files
 
 	License:
@@ -29,34 +29,38 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-if (Auctioneer_RegisterRevision) then return end
+if (Auctioneer_Manifest) then return end
 
-local revs = { }
-local dist = {
---[[<%revisions%>]]
-}
+Auctioneer_Manifest = { }
+local manifest = Auctioneer_Manifest
 
-function Auctioneer_RegisterRevision(path, revision)
+manifest.revs = { }
+manifest.dist = {
+--[[<%revisions%>]]}
+
+function manifest.RegisterRevision(path, revision)
 	local _,_, file = path:find("%$URL: .*/auctioneer/([^%$]+) %$")
 	local _,_, rev = revision:find("%$Rev: (%d+) %$")
 	if not file then return end
 	if not rev then rev = 0 else rev = tonumber(rev) or 0 end
 
-	revs[file] = rev
+	manifest.revs[file] = rev
 	if (nLog) then
 		nLog.AddMessage("Auctioneer", "AucRevision", N_INFO, "Loaded revisioned file", "Loaded", file, "revision", rev)
 	end
 end
-Auctioneer_RegisterRevision("$URL$", "$Rev$")
+Auctioneer_RegisterRevision = manifest.RegisterRevision
 
 
-local messageFrame
-local function message(msg)
+function manifest.ShowMessage(msg)
+	local messageFrame = manifest.messageFrame
 	if not messageFrame then
 		messageFrame = CreateFrame("Frame", "", UIParent)
-		messageFrame:SetPoint("TOP", UIParent, "TOP", 0, 150)
-		messageFrame:SetWidth(300);
-		messageFrame:SetWidth(200);
+		manifest.messageFrame = messageFrame
+
+		messageFrame:SetPoint("CENTER", UIParent, "CENTER", 0, 150)
+		messageFrame:SetWidth(400);
+		messageFrame:SetHeight(200);
 		messageFrame:SetFrameStrata("DIALOG")
 		messageFrame:SetBackdrop({
 			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -72,19 +76,20 @@ local function message(msg)
 		messageFrame.done:SetScript("OnClick", function() messageFrame:Hide() end)
 
 		messageFrame.text = messageFrame:CreateFontString("", "HIGH")
-		messageFrame.text:SetPoint("TOPLEFT", messageFrame, "TOPLEFT")
+		messageFrame.text:SetPoint("TOPLEFT", messageFrame, "TOPLEFT", 10, -10)
 		messageFrame.text:SetPoint("BOTTOMRIGHT", messageFrame.done, "TOPRIGHT")
-		messageFrame.text:SetFont("Fonts\\FRIZQT__.TTF",12)
+		messageFrame.text:SetFont("Fonts\\FRIZQT__.TTF",13)
 		messageFrame.text:SetJustifyH("LEFT")
+		messageFrame.text:SetJustifyV("TOP")
 	end
 	messageFrame.text:SetText(msg)
 	messageFrame:Show()
 end
 
-function Auctioneer_Validate()
+function manifest.Validate()
 	local matches = true
-	for file, revision in pairs(dist) do
-		local current = revs[file]
+	for file, revision in pairs(manifest.dist) do
+		local current = manifest.revs[file]
 		if (not current or current ~= revision) then
 			matches = false
 			if (nLog) then
@@ -93,8 +98,9 @@ function Auctioneer_Validate()
 		end
 	end
 	if (not matches) then
-		message("Warning: Your Auctioneer installation appears to have mismatching file versions.\nPlease make sure you delete the old AddOns/Auctioneer directory, reinstall a fresh copy and restart WoW completely before reporting any bugs.\nThankyou.")
+		manifest.ShowMessage("|cffff1111Warning:|r Your Auctioneer installation appears to have mismatching file versions.\n\nPlease make sure you delete the old:\n  |cffffaa11Interface\\AddOns\\Auctioneer|r\ndirectory, reinstall a fresh copy from:\n  |cff44ff11http://auctioneeraddon.com/dl|r\nand restart WoW completely before reporting any bugs.\n\nThanks,\n  The Auctioneer Dev Team.")
 	end
 	return true
 end
 
+Auctioneer_RegisterRevision("$URL$", "$Rev$")

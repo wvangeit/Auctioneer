@@ -37,11 +37,6 @@
 		<Size>
 			<AbsDimension x="155" y="265"/>
 		</Size>
-		<Scripts>
-			<OnLoad>
-				Auctioneer_RegisterRevision("$URL$", "$Rev$")
-			</OnLoad>
-		</Scripts>
 	</Frame>
 
 	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" virtual="true">
@@ -1034,6 +1029,8 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
+				Auctioneer_RegisterRevision("$URL$", "$Rev$")
+
 				getglobal(self:GetName().."Title"):SetText(_AUCT('UiSearchAuctions'));
 				getglobal(self:GetName().."TabText"):SetText(_AUCT('UiSearch'));
 				getglobal(self:GetName().."SearchText"):SetText(_AUCT('UiSearchDropDownLabel'));
