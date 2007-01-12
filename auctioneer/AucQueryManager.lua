@@ -552,6 +552,10 @@ function onAuctionItemListUpdate()
 		};
 		if (lastIndexOnPage == 0 or (CurrentPage.pageNum == 0 and Scanned == 1)) then
 			CurrentPage.isLastPage = true;
+			debugPrint("isLastPage Now True");
+		elseif (CurrentPage.pageNum * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) then
+			CurrentPage.isLastPage = true;
+			debugPrint("isLastPage is now True");
 		end
 
 		-- Update the receive time of the query request.
