@@ -36,6 +36,11 @@
 		<Size>
 			<AbsDimension x="155" y="265"/>
 		</Size>
+		<Scripts>
+			<OnLoad>
+				Auctioneer.RegisterRevision("$URL$", "$Rev$")
+			</OnLoad>
+		</Scripts>
 	</Frame>
 
 	<Button name="SearchListItemTemplate" inherits="ListItemTemplate" virtual="true">

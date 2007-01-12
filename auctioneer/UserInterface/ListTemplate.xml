@@ -25,6 +25,13 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
+	<Frame name="ListTemplates" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Auctioneer.RegisterRevision("$URL$", "$Rev$")
+			</OnLoad>
+		</Scripts>
+	</Frame>
 	<Button name="ListSortButtonTemplate" virtual="true">
 		<Layers>
 			<Layer level="BACKGROUND">

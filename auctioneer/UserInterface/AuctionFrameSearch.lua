@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Auctioneer.RegisterRevision("$URL$", "$Rev$")
 
 local TIME_LEFT_NAMES = {
 	AUCTION_TIME_LEFT1, -- Short

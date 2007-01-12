@@ -36,5 +36,10 @@
 				</Offset>
 			</Anchor>
 		</Anchors>
+		<Scripts>
+			<OnLoad>
+				Auctioneer.RegisterRevision("$URL$", "$Rev$")
+			</OnLoad>
+		</Scripts>
 	</Frame>
 </Ui>

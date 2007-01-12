@@ -25,6 +25,13 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
+	<Frame name="AuctionTemplates" hidden="true">
+		<Scripts>
+			<OnLoad>
+				Auctioneer.RegisterRevision("$URL$", "$Rev$")
+			</OnLoad>
+		</Scripts>
+	</Frame>
 	<Frame name="AuctionFrameTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="758" y="447"/>

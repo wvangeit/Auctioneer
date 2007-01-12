@@ -15,6 +15,7 @@
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 
 AucObjects.lua
+AucRevision.lua
 AucClassExt.lua
 
 Babylonian\Babylonian.lua
@@ -38,7 +39,7 @@ AucFilter.lua
 AucStatistic.lua
 AucTooltip.lua
 AucAskPrice.lua
-Auctioneer.lua
+AucMain.lua
 AucPostManager.lua
 AucQueryManager.lua
 AucScanManager.lua

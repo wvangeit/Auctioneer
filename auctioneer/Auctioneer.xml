@@ -31,6 +31,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Frame name="AuctioneerFrame" parent="UIParent" hidden="false">
 		<Scripts>
 			<OnLoad>
+				Auctioneer.RegisterRevision("$URL$", "$Rev$")
 				Auctioneer.OnLoad(self);
 				self:RegisterEvent("ADDON_LOADED")
 			</OnLoad>

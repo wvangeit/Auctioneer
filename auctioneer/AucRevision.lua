@@ -33,8 +33,8 @@ Auctioneer.Revisions = {
 }
 
 function Auctioneer.RegisterRevision(path, revision)
-	local file = revision:find("%$URL: .*/([^/]+)%$")
-	local rev = revision:find("%$Rev: (%d)%$")
+	local _,_, file = path:find("%$URL: .*/([^/]+) %$")
+	local _,_, rev = revision:find("%$Rev: (%d+) %$")
 	if not file then return end
 	if not rev then rev = 0 end
 

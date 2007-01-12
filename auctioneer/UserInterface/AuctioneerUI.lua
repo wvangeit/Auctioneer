@@ -27,6 +27,9 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+if (Auctioneer) then
+	Auctioneer.RegisterRevision("$URL$", "$Rev$")
+end
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
