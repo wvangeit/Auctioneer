@@ -29,7 +29,9 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-Auctioneer.Revisions = {
+Auctioneer.Revisions = { }
+local dist = {
+--[[<%revisions%>]]
 }
 
 function Auctioneer.RegisterRevision(path, revision)
@@ -43,6 +45,17 @@ function Auctioneer.RegisterRevision(path, revision)
 		nLog.AddMessage("Auctioneer", "AucRevision", N_INFO, "Loaded revisioned file", "Loaded", file, "revision", rev)
 	end
 end
-
 Auctioneer.RegisterRevision("$URL$", "$Rev$")
+
+
+function Auctioneer.Validate()
+	for file, revision in dist do
+		local current = Auctioneer.Revisions[file]
+		if (not current or current ~= revision) then
+			message("Warning: Your Auctioneer installation appears to have mismatching file versions.\nPlease make sure you delete the old AddOns/Auctioneer directory, reinstall a fresh copy and restart WoW completely before reporting any bugs.\nThankyou.")
+			return false
+		end
+	end
+	return true
+end
 
