@@ -24,6 +24,12 @@ BtmScanData = {}
 local tr = BtmScan.Locales.Translate
 local data, dataZone
 
+BTMSCAN_VERSION = "<%version%>"
+if (BTMSCAN_VERSION == "<\037version%>") then
+	BTMSCAN_VERSION = "3.9.0-DEV"
+end
+BtmScan.Version = BTMSCAN_VERSION
+
 BtmScan.NoPrompt = {}
 
 -- Load function gets run when this addon has loaded.
