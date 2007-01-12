@@ -28,13 +28,16 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+
+-- Debug switch - set to true, to enable debug output for this module
+local debug = false
+
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 --Local function prototypes
 local hookTooltip
 
 function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
-	--local debug = true;
 	if debug then EnhTooltip.DebugPrint("Displaying "..name); end
 	if (not link) then EnhTooltip.DebugPrint("No link was passed to the client");  return; end
 

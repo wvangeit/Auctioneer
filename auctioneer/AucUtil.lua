@@ -28,6 +28,10 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
+
+-- Debug switch - set to true, to enable debug output for this module
+local debug = false
+
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 --Local function prototypes
@@ -586,7 +590,6 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
---local debug = true;
 function debugPrint(...)
 	if debug then EnhTooltip.DebugPrint("[Auc.Util]", ...); end
 end

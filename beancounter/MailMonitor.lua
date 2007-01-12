@@ -28,6 +28,9 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
+-- Debug switch - set to true, to enable debug output for this module
+local debug = false
+
 -------------------------------------------------------------------------------
 -- Function Imports
 -------------------------------------------------------------------------------
@@ -570,7 +573,6 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
---local debug = true;
 function debugPrint(message)
 	if debug then BeanCounter.DebugPrint("[BeanCounter.MailMonitor] "..message); end
 end
