@@ -424,14 +424,14 @@ function scanEnded()
 	local chatResultText;
 	local uiResultText;
 	if (LastRequestResult == RequestState.Done) then
-		chatResultText = "Scan complete"; -- %todo: Localize
-		uiResultText = "Auctioneer: auction scanning finished"; -- %todo: Localize
+		chatResultText = _AUCT('ScanComplete')
+		uiResultText = _AUCT('UIScanComplete')
 	elseif (LastRequestResult == RequestState.Canceled) then
-		chatResultText = "Scan cancelled"; -- %todo: Localize
-		uiResultText = "Auctioneer: auction scanning canceled"; -- %todo: Localize
+		chatResultText = _AUCT('ScanCanceled')
+		uiResultText = _AUCT('UIScanCanceled')
 	else
-		chatResultText = "Scan failed"; -- %todo: Localize
-		uiResultText = "Auctioneer: auction scanning failed"; -- %todo: Localize
+		chatResultText = _AUCT('ScanFailed')
+		uiResultText = _AUCT('UIScanFailed')
 	end
 	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScannedCacheSize);
 	local auctionsAddedMessage = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
