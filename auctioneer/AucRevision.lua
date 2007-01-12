@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: AucObjects.lua 1219 2006-12-20 02:35:01Z norganna $
+	Revision: $Id$
 
 	Auctioneer Revisions
 	Keep track of the revision numbers for various auctioneer files
