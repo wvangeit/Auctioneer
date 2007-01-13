@@ -184,9 +184,9 @@ function AucQueryManager_OnUpdate()
 		-- If the query has been sent, check if it needs to be aborted or resent.
 		if (request.querySent) then
 			-- Check if we've recevied any response from the server.
+			local silence = (GetTime() - request.lastQueryResponseTime);
 			if (request.receivedQueryResponse) then
 				-- Yep, check how long the server has been quite.
-				local silence = (GetTime() - request.lastQueryResponseTime);
 				if (silence > request.maxSilence) then
 					-- Either retry or fail it.
 					if (request.maxRetries > 0) then
@@ -200,6 +200,17 @@ function AucQueryManager_OnUpdate()
 					Auctioneer.Util.Debug("AucQueryManager", AUC_NOTICE, "Owner timeout", "Triggering owner timeout at", silence, "seconds.")
 					request.ownerTimeout = true
 					onAuctionItemListUpdate()
+				end
+			elseif (isQueryInProgress()) then
+				if (silence > request.maxSilence) then
+					--retry or fail 
+					if (request.maxRetries > 0) then
+						request.maxRetries = request.maxRetries -1;
+						sendQuery(request);
+					else
+						debugPrint("Query Response not received in", silence, "seconds (maxSilence=", request.maxSilence, ")");
+						removeRequestFromQueue(QueryAuctionItemsResultCodes.PartialComplete);
+					end
 				end
 			end
 		-- Otherwise check if we can send the query now.
