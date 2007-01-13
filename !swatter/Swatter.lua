@@ -174,7 +174,7 @@ function Swatter.GetAddOns()
 				if (nLog) then 
 					nLog.AddMessage("!swatter", "Swatter.lua", N_INFO, "version is a table", name, table.concat(version,":"))
 				end
-				version = table.concat(version,":");
+				version = table.concat(version,":")
 			end
 			
 			if (version) then
@@ -439,12 +439,15 @@ SlashCmdList["SWATTER"] = function(msg)
 	elseif (msg == "autoshow") then
 		SwatterData.autoshow = true
 		chat("Swatter will popup the first time it sees an error")
+	elseif (msg == "noauto") then
+	   SwatterData.autoshow = false
+	   chat("Swatter will print into chat instead of popping up")
 	elseif (msg == "clear") then
-		Swatter.Error:Hide();
-		SwatterData.errors = {};
-		Swatter.errorOrder = {};
+		Swatter.Error:Hide()
+		SwatterData.errors = {}
+		Swatter.errorOrder = {}
 		--Note: we are not killing the frame.Swatter values - I am hoping that they are transient to the game session and aren't saved anywhere
-		--Swatter.ErrorUpdate();
+		--Swatter.ErrorUpdate()
 		chat("Swatter errors have been cleared")
 	end
 end
