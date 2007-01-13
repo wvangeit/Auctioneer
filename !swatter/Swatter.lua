@@ -81,7 +81,9 @@ function Swatter.OnError(msg, frame, stack, etype, ...)
 	if (not frame.Swatter) then frame.Swatter = {} end
 	local id = frame.Swatter[msg]
 
-	if (not id) then
+	-- id might still exist if we've done a clear, because we don't cycle through the frames killing frame.Swatter data
+	-- So we have to check for both here
+	if (not ( id and #(SwatterData.errors) ~= 0)) then
 		context = "Anonymous"
 		if (frame) then
 			context = "Unnamed"
@@ -167,7 +169,14 @@ function Swatter.GetAddOns()
 			end
 			local const = getglobal(name:upper().."_VERSION")
 			if (const) then version = const end
-
+			
+			if type(version)=='table' then
+				if (nLog) then 
+					nLog.AddMessage("!swatter", "Swatter.lua", N_INFO, "version is a table", name, table.concat(version,":"))
+				end
+				version = table.concat(version,":");
+			end
+			
 			if (version) then
 				addlist = addlist.."  "..name..", v"..version.."\n"
 			else
@@ -418,6 +427,7 @@ SlashCmdList["SWATTER"] = function(msg)
 		chat("  /swat show      -  Shows the last error box again")
 		chat("  /swat autoshow  -  Enables swatter autopopup upon error")
 		chat("  /swat noauto    -  Swatter will only show an error in chat")
+		chat("  /swat clear     -  Swatter will clear the list of errors")
 	elseif (msg == "show") then
 		Swatter.Error:Show()
 	elseif (msg == "enable") then
@@ -429,9 +439,13 @@ SlashCmdList["SWATTER"] = function(msg)
 	elseif (msg == "autoshow") then
 		SwatterData.autoshow = true
 		chat("Swatter will popup the first time it sees an error")
-	elseif (msg == "noautoshow") then
-		SwatterData.autoshow = false
-		chat("Swatter will print into chat instead of popping up")
+	elseif (msg == "clear") then
+		Swatter.Error:Hide();
+		SwatterData.errors = {};
+		Swatter.errorOrder = {};
+		--Note: we are not killing the frame.Swatter values - I am hoping that they are transient to the game session and aren't saved anywhere
+		--Swatter.ErrorUpdate();
+		chat("Swatter errors have been cleared")
 	end
 end
 
