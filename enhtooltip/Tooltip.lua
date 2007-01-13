@@ -223,6 +223,7 @@ local fakeLink					-- FakeLink(hyperlink,quality,name)
 local findItemInBags			-- FindItemInBags(findName)
 local getglobalIterator			-- GetglobalIterator(format,first,last)
 local getGSC					-- GetGSC(money)
+local getLine                 -- getLine(line)
 local getLootLinkLink			-- GetLootLinkLink(name)
 local getLootLinkServer			-- GetLootLinkServer()
 local getRect					-- GetRect(object,curRect)
@@ -335,13 +336,17 @@ end
 function createNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentFontStringIndex = self.lastFontStringIndex
-	self.lastFontStringIndex = currentFontStringIndex + 1
+	local nextFontStringIndex    = currentFontStringIndex + 1
 
-	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..self.lastFontStringIndex, "INFO", "GameFontNormal")
+	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..nextFontStringIndex, "INFO", "GameFontNormal")
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Text"..currentFontStringIndex, "BOTTOMLEFT", 0, -1)
 	newFontString:Hide()
 	newFontString:SetTextColor(1.0,1.0,1.0)
 	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
+
+	-- we do not update the lastFontStringIndex earlier to make sure that the new font string line has successfully been created
+	self.lastFontStringIndex = nextFontStringIndex
+
 	return newFontString
 end
 
@@ -367,6 +372,29 @@ function createNewHeaderFontString(tooltip)
 	newFontString:SetTextColor(1.0,1.0,1.0)
 	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
 	return newFontString
+end
+
+-------------------------------------------------------------------------------
+-- This function returns the requested line object.
+-- If the requested line does not exist, it will be created.
+--
+-- @param  line = line number of the font string line to
+-- @return font string line object for the specified line
+--
+-- Note
+--   This function is not absolutely nil safe. If anytime EnhancedTooltipTextX
+--   is being removed by a 3rd person addon, this function will return nil!
+--   Since this has not been the case, yet, I didn't implement more secure
+--   code.
+-------------------------------------------------------------------------------
+function getLine(line)
+	if (line > self.lastFontStringIndex) then
+		ret = createNewFontString(EnhancedTooltip)
+	else
+		ret = getglobal("EnhancedTooltipText"..line)
+	end
+
+	return ret
 end
 
 function clearTooltip()
@@ -725,13 +753,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 	EnhancedTooltip.curEmbed = false
 
 	local curLine = EnhancedTooltip.lineCount + 1
-
-	local line
-	if (curLine > self.lastFontStringIndex) then
-		line = createNewFontString(EnhancedTooltip)
-	else
-		line = getglobal("EnhancedTooltipText"..curLine)
-	end
+	local line    = getLine(curLine)
 
 	line:SetText(lineText)
 	line:SetTextColor(1.0, 1.0, 1.0)
@@ -831,7 +853,8 @@ function addSeparator(embed)
 	EnhancedTooltip.curEmbed = false
 
 	local curLine = EnhancedTooltip.lineCount + 1
-	local line = getglobal("EnhancedTooltipText"..curLine)
+	local line    = getLine(curLine)
+
 	line:SetText(" ")
 	line:SetTextColor(1.0, 1.0, 1.0)
 	line:Show()
