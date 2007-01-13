@@ -61,6 +61,7 @@ local onAuctionAdded;
 local onAuctionUpdated;
 local onAuctionRemoved;
 local debugPrint;
+local isQueryStyle;
 
 -------------------------------------------------------------------------------
 -- Public Data
@@ -88,6 +89,7 @@ local AuctionsUpdated = 0;
 local AuctionsRemoved = 0;
 local LastRequestResult = RequestState.Done;
 local AuctionsScannedCacheSize = 0;
+local QueryStyleScan = nil;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -204,6 +206,8 @@ function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassI
 			qualityIndex = qualityIndex;
 		};
 		addRequestToQueue(request);
+		debugPrint("Query Style Scan");
+		QueryStyleScan = 1;
 		return true;
 	else
 		debugPrint("Cannot start scan because a scan is already in progress!");
@@ -460,6 +464,10 @@ function scanEnded()
 		Quit();
 	end
 
+	--Reset Scan Type Flag
+	QueryStyleScan = nil;
+	debugPrint("Scan Style Reset");
+
 	--Cleaning up after oneself is always a good idea.
 	collectgarbage("collect");
 end
@@ -519,6 +527,11 @@ function debugPrint(...)
 end
 
 -------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function isQueryStyle()
+	return QueryStyleScan;
+end
+-------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
 Auctioneer.ScanManager = {
@@ -529,6 +542,7 @@ Auctioneer.ScanManager = {
 	ScanQuery = scanQuery;
 	IsScanning = isScanning;
 	EmptyHookFunction = emptyHookFunction;
+	IsQueryStyle = isQueryStyle;
 }
 
 -- This is the variable Auctioneer use to use to indicate scanning. Keep it for
