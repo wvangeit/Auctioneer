@@ -1771,7 +1771,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Defunct auctions removed: %s";
 		AuctionDiscrepancies	= "Discrepancies: %s";
 		AuctionNewAucts	= "New auctions scanned: %s";
-		AuctionOldAucts	= "Previously scanned: %s";
 		AuctionPageN	= "Auctioneer: scanning %s page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAdded to snapshot: %s";
 		AuctionScanDone	= "Auctioneer: auction scanning finished";
 		AuctionScanNexttime	= "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
@@ -1779,6 +1778,7 @@ AuctioneerLocalizations = {
 		AuctionScanRedo	= "Current page took more than %d seconds to complete, retrying page.";
 		AuctionScanStart	= "Auctioneer: scanning %s page 1...";
 		AuctionTotalAucts	= "Total auctions scanned: %s";
+		AuctionUpdatedAucts	= "Updated/Changed auctions: %s";
 
 
 		-- Section: Tooltip Messages

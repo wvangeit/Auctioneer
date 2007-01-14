@@ -440,7 +440,7 @@ function scanEnded()
 	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScannedCacheSize);
 	local auctionsAddedMessage = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
 	local auctionsRemovedMessage = _AUCT('AuctionDefunctAucts'):format(AuctionsRemoved);
-	local auctionsUpdatedMessage = _AUCT('AuctionOldAucts'):format(AuctionsUpdated);
+	local auctionsUpdatedMessage = _AUCT('AuctionUpdatedAucts'):format(AuctionsUpdated);
 
 	-- Report the result to the chat window.
 	chatPrint(chatResultText..":");
