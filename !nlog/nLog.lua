@@ -280,6 +280,25 @@ function nLog.UpdateDisplay()
 	end
 end
 
+function nLog.ClearLog()
+	nLog.messages = {}
+	nLog.UpdateDisplay()
+	nLog.Message.Box:SetText("")
+	chat("Clearing nLog messages.")
+end
+
+local function showTooltip(obj)
+	local tooltip = obj.tooltip
+	GameTooltip:SetOwner(obj, "ANCHOR_RIGHT")
+	GameTooltip:ClearLines()
+	GameTooltip:AddLine(tooltip)
+	GameTooltip:Show()
+end
+
+local function hideTooltip()
+	GameTooltip:Hide()
+end
+
 
 -- Create our message message frame
 nLog.Message = CreateFrame("Frame", "", UIParent)
@@ -302,12 +321,18 @@ nLog.Message.AddonFilt:SetPoint("BOTTOMLEFT", nLog.Message, "BOTTOMLEFT", 20, 12
 nLog.Message.AddonFilt:SetAutoFocus(false)
 nLog.Message.AddonFilt:SetHeight(15)
 nLog.Message.AddonFilt:SetWidth(80)
+nLog.Message.AddonFilt.tooltip = "Filter by AddOn"
+nLog.Message.AddonFilt:SetScript("OnEnter", showTooltip)
+nLog.Message.AddonFilt:SetScript("OnLeave", hideTooltip)
 
 nLog.Message.TypeFilt = CreateFrame("EditBox", "nLogTypeFilt", nLog.Message, "InputBoxTemplate")
 nLog.Message.TypeFilt:SetPoint("BOTTOMLEFT", nLog.Message.AddonFilt, "BOTTOMRIGHT", 5, 0)
 nLog.Message.TypeFilt:SetAutoFocus(false)
 nLog.Message.TypeFilt:SetHeight(15)
 nLog.Message.TypeFilt:SetWidth(80)
+nLog.Message.TypeFilt.tooltip = "Filter by Type"
+nLog.Message.TypeFilt:SetScript("OnEnter", showTooltip)
+nLog.Message.TypeFilt:SetScript("OnLeave", hideTooltip)
 
 nLog.Message.LevelFilt = CreateFrame("Slider", "nLogLevelFilt", nLog.Message, "OptionsSliderTemplate")
 nLog.Message.LevelFilt:SetPoint("BOTTOMLEFT", nLog.Message.TypeFilt, "BOTTOMRIGHT", 5, -3)
@@ -319,6 +344,9 @@ nLog.Message.LevelFilt:SetMinMaxValues(1, 5)
 nLog.Message.LevelFilt:SetValueStep(1)
 nLog.Message.LevelFilt:SetValue(N_DEBUG)
 nLog.Message.LevelFilt:SetHitRectInsets(0,0,0,0)
+nLog.Message.LevelFilt.tooltip = "Filter by maximum message priority type (1=critical, 2=warning, 3=notice, 4=info, 5=debug)"
+nLog.Message.LevelFilt:SetScript("OnEnter", showTooltip)
+nLog.Message.LevelFilt:SetScript("OnLeave", hideTooltip)
 
 nLog.Message.Done = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Done:SetText("Close")
@@ -398,6 +426,7 @@ SlashCmdList["NLOG"] = function(msg)
 		chat("  /nlog enable    -  Enables nLog")
 		chat("  /nlog disable   -  Disables nLog")
 		chat("  /nlog show      -  Shows the nLog frame")
+		chat("  /nlog clear     -  Clears current nLog messages")
 	elseif (msg == "show") then
 		nLog.Message:Show()
 	elseif (msg == "enable") then
@@ -406,6 +435,8 @@ SlashCmdList["NLOG"] = function(msg)
 	elseif (msg == "disable") then
 		nLogData.enabled = false
 		chat("nLog will no longer catch messages")
+	elseif (msg == "clear") then
+		nLog.ClearLog()
 	else
 		chat("Unknown nLog command: "..(msg or "nil"))
 	end
