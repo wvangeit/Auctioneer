@@ -268,7 +268,9 @@ function sendAskPrice(param, player, text)
 	if (param and not (player and text)) then
 		player, text = param:match("^(%w+)%s*(.*)$")
 	end
-
+	
+	if (nLog) then nLog.AddMessage("Auctioneer","AucAskPrice.lua",N_DEBUG,"AskPrice Send command generated","player: "..tostring(player),"text: "..tostring(text));  end
+	
 	--If we still don't have the digested params, stop here.
 	if (not (player and text)) then
 		return
