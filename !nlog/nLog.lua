@@ -124,7 +124,7 @@ local pid = 0
 function nLog.AddMessage(mAddon, mType, mLevel, mTitle, ...)
 	if broken then return end
 	if not (nLogData.enabled and mAddon and mType and mLevel and mTitle) then return end
-	local ts = date("%b %d %H:%M");
+	local ts = date("%b %d %H:%M:%S");
 	pid = pid + 1
 	local msg = format(...)
 
@@ -202,10 +202,12 @@ function nLog.FilterUpdate()
 	nLog.filterLevel = nLog.Message.LevelFilt:GetValue()
 	nLog.filterAddon = nLog.Message.AddonFilt:GetText()
 	nLog.filterType = nLog.Message.TypeFilt:GetText()
+	nLog.filterLabel = nLog.Message.LabelFilt:GetText()
 
 	if nLog.filtered.filterLevel == nLog.filterLevel
 	and nLog.filtered.filterAddon == nLog.filterAddon
 	and nLog.filtered.filterType == nLog.filterType
+	and nLog.filtered.filterLabel == nLog.filterLabel
 	and nLog.filtered.count == #nLog.messages
 	and nLog.filtered.ofs == nLog.Message.ofs
 	then
@@ -218,26 +220,30 @@ function nLog.FilterUpdate()
 	end
 
 	-- Rebuild the filter list
-	local message, mAddon, mType, mLevel
+	local message, mAddon, mType, mLevel, mLabel
 	nLog.filtered.filterLevel = nLog.filterLevel
 	nLog.filtered.filterAddon = nLog.filterAddon
 	nLog.filtered.filterType = nLog.filterType
+	nLog.filtered.filterLabel = nLog.filterLabel
 	nLog.filtered.count = #nLog.messages
 	nLog.filtered.ofs = nLog.Message.ofs
 
 	local fLevel = tonumber(nLog.filtered.filterLevel)
 	local fAddon = (nLog.filtered.filterAddon or ""):lower()
 	local fType = (nLog.filtered.filterType or ""):lower()
+	local fLabel = (nLog.filtered.filterLabel or ""):lower()
 	local fOfs = nLog.filtered.ofs or 0
 	if (fAddon == "") then fAddon = nil end
 	if (fType == "") then fType = nil end
+	if (fLabel == "") then fLabel = nil end
 	for i = 0, #nLog.messages-1 do
 		local fIdx = ((i + fOfs) % 65535)+1
 		message = nLog.messages[fIdx]
-		mAddon, mType, mLevel = message[3], message[4], message[5]
+		mAddon, mType, mLevel, mLabel = message[3], message[4], message[5], message[6]
 		if (not fLevel or fLevel >= mLevel)
-		and (not fAddon or fAddon == "" or fAddon == mAddon:sub(1, #fAddon):lower())
-		and (not fType or fType == "" or fType == mType:sub(1, #fType):lower())
+		and (not fAddon or fAddon == mAddon:sub(1, #fAddon):lower())
+		and (not fType or fType == mType:sub(1, #fType):lower())
+		and (not fLabel or fLabel == mLabel:sub(1, #fLabel):lower())
 		then
 			table.insert(nLog.filtered, fIdx)
 		end
@@ -315,6 +321,15 @@ nLog.Message:SetBackdrop({
 })
 nLog.Message:SetBackdropColor(0,0,0.5, 0.8)
 nLog.Message:SetScript("OnShow", nLog.MessageShow)
+nLog.Message:SetMovable(true)
+
+nLog.Message.Drag = CreateFrame("Button", "", nLog.Message)
+nLog.Message.Drag:SetPoint("TOPLEFT", nLog.Message, "TOPLEFT", 10,-5)
+nLog.Message.Drag:SetPoint("TOPRIGHT", nLog.Message, "TOPRIGHT", -10,-5)
+nLog.Message.Drag:SetHeight(6)
+nLog.Message.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+nLog.Message.Drag:SetScript("OnMouseDown", function() nLog.Message:StartMoving() end)
+nLog.Message.Drag:SetScript("OnMouseUp", function() nLog.Message:StopMovingOrSizing() end)
 
 nLog.Message.AddonFilt = CreateFrame("EditBox", "nLogAddFilt", nLog.Message, "InputBoxTemplate")
 nLog.Message.AddonFilt:SetPoint("BOTTOMLEFT", nLog.Message, "BOTTOMLEFT", 20, 12)
@@ -334,8 +349,17 @@ nLog.Message.TypeFilt.tooltip = "Filter by Type"
 nLog.Message.TypeFilt:SetScript("OnEnter", showTooltip)
 nLog.Message.TypeFilt:SetScript("OnLeave", hideTooltip)
 
+nLog.Message.LabelFilt = CreateFrame("EditBox", "nLogLabelFilt", nLog.Message, "InputBoxTemplate")
+nLog.Message.LabelFilt:SetPoint("BOTTOMLEFT", nLog.Message.TypeFilt, "BOTTOMRIGHT", 5, 0)
+nLog.Message.LabelFilt:SetAutoFocus(false)
+nLog.Message.LabelFilt:SetHeight(15)
+nLog.Message.LabelFilt:SetWidth(80)
+nLog.Message.LabelFilt.tooltip = "Filter by Label"
+nLog.Message.LabelFilt:SetScript("OnEnter", showTooltip)
+nLog.Message.LabelFilt:SetScript("OnLeave", hideTooltip)
+
 nLog.Message.LevelFilt = CreateFrame("Slider", "nLogLevelFilt", nLog.Message, "OptionsSliderTemplate")
-nLog.Message.LevelFilt:SetPoint("BOTTOMLEFT", nLog.Message.TypeFilt, "BOTTOMRIGHT", 5, -3)
+nLog.Message.LevelFilt:SetPoint("BOTTOMLEFT", nLog.Message.LabelFilt, "BOTTOMRIGHT", 5, -3)
 nLog.Message.LevelFilt:SetHeight(20)
 nLog.Message.LevelFilt:SetWidth(60)
 nLogLevelFiltLow:SetText("")
