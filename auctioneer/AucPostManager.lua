@@ -367,7 +367,7 @@ function run(request)
 					pickupContainerItem(stack2.bag, stack2.slot);
 					request.stack = stack2;
 				else
-					-- Not enough of the item found!
+					-- No empty slot found
 					chatPrint(_AUCT('FrmtNoEmptyPackSpace'));
 					removeRequestFromQueue();
 				end
@@ -451,11 +451,22 @@ end
 -------------------------------------------------------------------------------
 -- Finds an empty slot in the player's containers.
 --
--- TODO: Correctly handle containers like ammo packs
+-- returns BagTable
+--    {
+--     bag  = number of bag which contains the empty slot
+--     slot = number of empty slot in that specific bag
+--    }
+--    nil, if no empty slot could be found
+--
+-- TODO: Correctly handle containers like ammo packs, so that if u try to find
+--       an empty place for ammo, the ammo pack will be taken into account and
+--       not skipped, as it's currently the case
 -------------------------------------------------------------------------------
 function findEmptySlot()
 	bag, slot = Auctioneer.Util.FindEmptySlot()
-	return { bag=bag, slot=slot };
+	if bag then
+		return { bag=bag, slot=slot }
+	end
 end
 
 -------------------------------------------------------------------------------
