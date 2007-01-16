@@ -576,9 +576,25 @@ end
 -- Inventory modifying functions
 -------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------
+-- Checks all bags, which can carry any item to find an empty slot.
+-- This function skips any bags, which are not designed to carry any kind of
+-- items.
+--
+-- returns 2 values:
+--    first  = number of bag
+--    second = number of slot in that specific bag
+-- returns nil, if no empty slots are present
+-------------------------------------------------------------------------------
 function findEmptySlot()
 	for bag = 0, 4 do
-		if (not GetBagName(bag):find('(Quiver|Ammo|Bandolier)')) then
+		local strBagName = GetBagName(bag)
+		-- strBagName can be nil, if the user has no bag on the selected bag slot
+		local strBagType = nil
+		if strBagName then
+			_, _, _, _, _, _, strBagType = GetItemInfo(strBagName)
+		end
+		if strBagType and (strBagType == "Bag") then
 			for slot = 1, GetContainerNumSlots(bag) do
 				if not (GetContainerItemInfo(bag,slot)) then
 					return bag, slot;
