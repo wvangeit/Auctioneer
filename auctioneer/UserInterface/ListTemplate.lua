@@ -191,6 +191,9 @@ function ListTemplate_Sort(frame, columnIndex)
 	else
 		getglobal(frame:GetName().."Column"..frame.sortOrder[1].columnIndex.."SortArrow"):SetTexCoord(0, 0.5625, 1.0, 0);
 	end
+	
+	-- Kill the highlight
+	getglobal(frame:GetParent():GetName()):SelectResultByIndex(nil);
 
 	-- Update the scroll pane.
 	ListTemplateScrollFrame_Update(getglobal(frame:GetName().."ScrollFrame"));
