@@ -262,13 +262,37 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				local ahKey = Auctioneer.Util.GetAuctionKey();
 				local itemKey = Auctioneer.ItemDB.CreateItemKey(id, rprop, enchant);
 
-				-- Get player's current lowest starting bid and buyout in the snapshot.
+				-- Right now, the "default pricing model is governed by the order that the "table.insert(frame.prices, XXXX);" prices are listed below
+				
+				-- Add any fixed price, first
+				local fixed = Auctioneer.FixedPriceDB.GetFixedPrice(itemKey);
+				if (fixed) then
+					local fixedPrice = {};
+					fixedPrice.text = _AUCT('UiPriceModelFixed');
+					fixedPrice.note = "";
+					fixedPrice.bid = (fixed.bid / fixed.count) * count;
+					fixedPrice.buyout = (fixed.buyout / fixed.count) * count;
+					table.insert(frame.prices, fixedPrice);
+				end
+
+				-- Calculate and add auctioneer's suggested resale price.
+				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count);
+				local auctioneerPrice = {};
+				auctioneerPrice.text = _AUCT('UiPriceModelAuctioneer');
+				auctioneerPrice.note = warn;
+				auctioneerPrice.buyout = buyPrice;
+				auctioneerPrice.bid = bidPrice;
+				table.insert(frame.prices, auctioneerPrice);
+
+				-- Add my lowest current price
+				-- First, get player's current lowest starting bid and buyout in the snapshot.
 				local myAuctions = Auctioneer.SnapshotDB.QueryWithItemKey(
 					itemKey,
 					ahKey,
 					function (auction)
 						return (auction.buyoutPrice and auction.buyoutPrice > 0 and auction.owner == UnitName("player"));
 					end);
+
 				if (#myAuctions > 0) then
 					-- Calculate the lowest bid and buyout for one.
 					local lowestStartBidForOne = 0;
@@ -293,18 +317,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 					table.insert(frame.prices, currentPrice);
 				end
 
-				-- Get the fixed price
-				local fixed = Auctioneer.FixedPriceDB.GetFixedPrice(itemKey);
-				if (fixed) then
-					local fixedPrice = {};
-					fixedPrice.text = _AUCT('UiPriceModelFixed');
-					fixedPrice.note = "";
-					fixedPrice.bid = (fixed.bid / fixed.count) * count;
-					fixedPrice.buyout = (fixed.buyout / fixed.count) * count;
-					table.insert(frame.prices, fixedPrice);
-				end
-
-				-- Get the last sale price if BeanCounter is loaded.
+				-- Add the last sale price if BeanCounter is loaded.and one exists
 				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.Sales and BeanCounter.Sales.GetLastSaleForItem) then
 					-- TODO: Support should be added to BeanCounter for looking
 					-- up itemKey (itemId:suffixId:enchantID) instead of by name.
@@ -318,15 +331,6 @@ function AuctionFramePost_UpdatePriceModels(frame)
 						table.insert(frame.prices, lastPrice)
 					end
 				end
-
-				-- Calculate auctioneer's suggested resale price.
-				local bidPrice, buyPrice, marketPrice, warn = Auctioneer.Statistic.GetSuggestedResale(itemKey, ahKey, count);
-				local auctioneerPrice = {};
-				auctioneerPrice.text = _AUCT('UiPriceModelAuctioneer');
-				auctioneerPrice.note = warn;
-				auctioneerPrice.buyout = buyPrice;
-				auctioneerPrice.bid = bidPrice;
-				table.insert(frame.prices, auctioneerPrice);
 
 				-- Add any pricing models from external addons
 				for pos, priceFunc in pairs(AuctionFramePost_AdditionalPricingModels) do
