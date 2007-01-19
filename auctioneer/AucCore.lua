@@ -108,6 +108,9 @@ local minBidPercent = 10; --MIN_BID_PERCENT
 -- 10 = miscellaneous
 
 local classes = {GetAuctionItemClasses()};
+
+-- The following is still used by Auctioneer.Statistic.GetMarketPrice to return a bid-weighted (i.e. not just BO median) market value for certain items.  
+-- It is no longer used in bid/BO GUI searches
 local bidBasedCategories = {[classes[1]]=true, [classes[2]]=true, [classes[8]]=true, [classes[10]]=true} --BID_BASED_CATEGORIES
 
 -- Default filter configuration

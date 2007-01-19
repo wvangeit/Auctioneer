@@ -107,6 +107,7 @@ end
 --     categoryName
 --     minQuality
 --     maxSecondsLeft
+--     minBidPct (bid% of the item)
 --     minBidProfit
 --     minBidProfitPercent
 --     minBidPercentLess
@@ -124,7 +125,7 @@ function profitFilter(auction, filterArgs)
 	-- Check to make sure GetItemInfo returned a valid result.  For some reason we are now getting nil itemInfo's at times, which seems odd for an item we're pulling from the snapshot.  
 	if (not itemInfo) then
 		if (debug) then debugPrint("Missing itemInfo for auction "..auction.auctionId) end;
-		Auctioneer.Util.Debug("AucFilter", AUC_NOTICE, "Item not found", "Missing itemInfo for auction ", auction.auctionId, " in profitFilter")
+		Auctioneer.Util.Debug("AucFilter", AUC_WARNING, "Item not found", "Missing itemInfo for auction ", auction.auctionId, " in profitFilter")
 		return false;
 	end
 
@@ -182,8 +183,8 @@ function profitFilter(auction, filterArgs)
 	if (minBidProfit or minBidProfitPercent or minBidPercentLess or minBuyoutProfit or minBuyoutProfitPercent or minBuyoutPercentLess) then
 		-- Check for a usable median
 		if (Auctioneer.Statistic.GetUsableMedian(itemKey, auction.ahKey) == nil) then
-			if (debug) then debugPrint("No match due to no usable mean") end;
-			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to no usable mean in profitFilter")
+			if (debug) then debugPrint("No match due to no usable median") end;
+			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to no usable median in profitFilter")
 			return false;
 		end
 
@@ -253,17 +254,25 @@ function profitFilter(auction, filterArgs)
 				return false;
 			end
 		end
-
-		-- Check if its a bad resale choice.
-		if (Auctioneer.Statistic.IsBadResaleChoice(auction)) then
-			if (debug) then debugPrint("No match due bad resale choice") end;
-			Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to bad resale choice in profitFilter")
-			return false;
+		
+		-- Check for bid percent
+		-- We have eliminated the IsBadResaleChoice check where this used to happen, along with filters that are now handled elsewhere/above (owner==player, poor quality).
+		-- Min Bid % (if specified) is now checked for all items, not just the Auctioneer.Core.Constants.BidBasedCategories
+		-- There is no longer any check for Min Bid % for green/Uncommon items of level 50+
+		local minBidPercent = filterArgs.minBidPct;
+		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auction.ahKey);
+		if (itemTotals) then
+			local bidPercent = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
+			if bidPercent < minBidPercent then
+				if (debug) then debugPrint("No match due to too low bid percent") end;
+				Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item not matched", "Not matching ", auction.auctionId, " due to no too low bid percent in profitFilter")
+				return false;
+			end
 		end
 	end
 
 	-- If we make it this far, its a match!
-	if (debug) then debugPrint("MATCH!") end;
+	if (debug) then debugPrint("MATCH!"); end
 	Auctioneer.Util.Debug("AucFilter", AUC_INFO, "Item matched", "Matching ", auction.auctionId, " in profitFilter")
 	return true;
 end

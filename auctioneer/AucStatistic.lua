@@ -56,7 +56,6 @@ local getMeans;
 local getItemSnapshotMedianBuyout;
 local getItemHistoricalMedianBuyout;
 local getUsableMedian;
-local isBadResaleChoice;
 local profitComparisonSort;
 local roundDownTo95;
 local getAuctionWithLowestBuyout;
@@ -427,34 +426,6 @@ function getUsableMedian(itemKey, ahKey)
 	end
 
 	return median, count;
-end
-
--------------------------------------------------------------------------------
--- This filter will return true if an auction is a bad choice for reselling
--------------------------------------------------------------------------------
-function isBadResaleChoice(auction)
-	local isBadChoice = false;
-
-	-- Get the item info and item historical totals.
-	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
-	local itemInfo = Auctioneer.ItemDB.GetItemInfo(itemKey);
-	local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auction.ahKey);
-
-	-- Determine if its a bad choice.
-	if (itemInfo and itemTotals) then
-		local bidPercent = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
-		if Auctioneer.Core.Constants.BidBasedCategories[itemInfo.categoryName] and bidPercent < Auctioneer.Core.Constants.MinBidPercent then
-			isBadChoice = true; -- bidbased items should have a minimum bid percent
-		elseif (itemInfo.useLevel >= 50 and itemInfo.quality == Auctioneer.Core.Constants.Quality.Uncommon and bidPercent < Auctioneer.Core.Constants.MinBidPercent) then
-			isBadChoice = true; -- level 50 and greater greens that do not have bids do not sell well
-		elseif auction.owner == UnitName("player") then
-			isBadChoice = true; -- don't display auctions that we own
-		elseif itemInfo.quality == Auctioneer.Core.Constants.Quality.Poor then
-			isBadChoice = true; -- gray items are never a good choice
-		end
-	end
-
-	return isBadChoice;
 end
 
 -------------------------------------------------------------------------------
@@ -833,7 +804,6 @@ Auctioneer.Statistic = {
 	GetItemHistoricalMedianBuyout = getItemHistoricalMedianBuyout;
 	GetHistMedian = getItemHistoricalMedianBuyout;
 	GetUsableMedian = getUsableMedian;
-	IsBadResaleChoice = isBadResaleChoice;
 	ProfitComparisonSort = profitComparisonSort;
 	RoundDownTo95 = roundDownTo95;
 	GetAuctionWithLowestBuyout = getAuctionWithLowestBuyout;

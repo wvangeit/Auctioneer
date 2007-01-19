@@ -259,6 +259,15 @@
 								</Anchor>
 							</Anchors>
 						</FontString>
+						<FontString name="$parentMinBidPctText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
+									<Offset>
+										<AbsDimension x="85" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
 						<FontString name="$parentTimeLeftText" inherits="GameFontHighlightSmall">
 							<Anchors>
 								<Anchor point="TOPLEFT" relativeTo="$parentMinPercentLessText">
@@ -327,6 +336,26 @@
 							<OnLoad>
 								self:SetNumber(30);
 							</OnLoad>
+							<OnEditFocusLost>
+								self:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								self:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+					</EditBox>
+					<EditBox name="$parentMinBidPctEdit" letters="3" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="30" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinBidPctText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
 							<OnEditFocusLost>
 								self:HighlightText(0, 0);
 							</OnEditFocusLost>
@@ -427,7 +456,8 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(self:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
-						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessShortLabel'));
+						getglobal(self:GetName().."MinBidPctText"):SetText(_AUCT('UiMinimumBidPercentLabel'));
 						getglobal(self:GetName().."TimeLeftText"):SetText(_AUCT('UiMaximumTimeLeftLabel'));
 						getglobal(self:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
 						getglobal(self:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));
@@ -455,6 +485,15 @@
 								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
 									<Offset>
 										<AbsDimension x="0" y="-38"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentMinBidPctText" inherits="GameFontHighlightSmall">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentMinProfitText">
+									<Offset>
+										<AbsDimension x="85" y="-38"/>
 									</Offset>
 								</Anchor>
 							</Anchors>
@@ -518,6 +557,26 @@
 							<OnLoad>
 								self:SetNumber(30);
 							</OnLoad>
+							<OnEditFocusLost>
+								self:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								self:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+					</EditBox>
+					<EditBox name="$parentMinBidPctEdit" letters="3" autoFocus="false" inherits="InputBoxTemplate">
+						<Size>
+							<AbsDimension x="30" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentMinBidPctText" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="3" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
 							<OnEditFocusLost>
 								self:HighlightText(0, 0);
 							</OnEditFocusLost>
@@ -601,7 +660,8 @@
 				<Scripts>
 					<OnLoad>
 						getglobal(self:GetName().."MinProfitText"):SetText(_AUCT('UiMinimumProfitLabel'));
-						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessLabel'));
+						getglobal(self:GetName().."MinPercentLessText"):SetText(_AUCT('UiMinimumPercentLessShortLabel'));
+						getglobal(self:GetName().."MinBidPctText"):SetText(_AUCT('UiMinimumBidPercentLabel'));
 						getglobal(self:GetName().."SearchButton"):SetText(_AUCT('UiSearch'));
 						getglobal(self:GetName().."CategoryText"):SetText(_AUCT('UiCategoryLabel'));
 						getglobal(self:GetName().."MinQualityText"):SetText(_AUCT('UiMinimumQualityLabel'));

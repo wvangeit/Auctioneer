@@ -748,6 +748,7 @@ function AuctionFrameSearch_SaveSearchButton_OnClick(button)
 	local frameName = frame:GetName();
 	local searchDropdown = getglobal(frameName.."SearchDropDown")
 
+-- todo: need to add new "min Bid %" field to this save function for bid and buyout searches.  also to load function I assume (will have to check for right number of params there, in case was saved under old version)
 	local searchType = UIDropDownMenu_GetSelectedID(searchDropdown);
 	local searchData = nil
 	if (searchType == 1) then
@@ -891,7 +892,7 @@ end
 -------------------------------------------------------------------------------
 -- Perform a bid search (aka bidBroker)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxSecondsLeft, categoryIndex, minQuality, itemName)
+function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, minBidPercent, maxSecondsLeft, categoryIndex, minQuality, itemName)
 	-- Clear the old results.
 	frame.results = {};
 	frame.resultsByAuctionId = {};
@@ -900,6 +901,7 @@ function AuctionFrameSearch_SearchBids(frame, minProfit, minPercentLess, maxSeco
 	local profitFilterArgs = {};
 	profitFilterArgs.minBidProfit = minProfit;
 	profitFilterArgs.minBidPercentLess = minPercentLess;
+	profitFilterArgs.minBidPct = minBidPercent;
 	profitFilterArgs.maxSecondsLeft = maxSecondsLeft;
 	profitFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
 	profitFilterArgs.minQuality = minQuality;
@@ -961,7 +963,7 @@ end
 -------------------------------------------------------------------------------
 -- Perform a buyout search (aka percentLess)
 -------------------------------------------------------------------------------
-function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, categoryIndex, minQuality, itemNames)
+function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, minBidPercent, categoryIndex, minQuality, itemNames)
 	-- Clear the old results.
 	frame.results = {};
 	frame.resultsByAuctionId = {};
@@ -970,6 +972,7 @@ function AuctionFrameSearch_SearchBuyouts(frame, minProfit, minPercentLess, cate
 	local profitFilterArgs = {};
 	profitFilterArgs.minBuyoutProfit = minProfit;
 	profitFilterArgs.minBuyoutPercentLess = minPercentLess;
+	profitFilterArgs.minBidPct = minBidPercent;
 	profitFilterArgs.categoryName = Auctioneer.ItemDB.GetCategoryName(categoryIndex);
 	profitFilterArgs.minQuality = minQuality;
 	profitFilterArgs.itemNames = Auctioneer.Util.Split(itemNames, "|");
@@ -1483,17 +1486,19 @@ function AuctionFrameSearchBid_SearchButton_OnClick(button)
 	local frameName = frame:GetName();
 	local profitMoneyFrame = getglobal(frameName.."MinProfit");
 	local percentLessEdit = getglobal(frameName.."MinPercentLessEdit");
+	local bidPercentEdit = getglobal(frameName.."MinBidPctEdit");
 	local timeLeftDropDown = getglobal(frameName.."TimeLeftDropDown");
 
 	local minProfit = MoneyInputFrame_GetCopper(profitMoneyFrame);
 	local minPercentLess = percentLessEdit:GetNumber();
+	local minBidPercent = bidPercentEdit:GetNumber();
 	local catID = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."CategoryDropDown")) or 1) - 1;
 	local minQuality = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."MinQualityDropDown")) or 1) - 1;
 	local itemName = getglobal(frameName.."SearchEdit"):GetText();
 	if (itemName == "") then itemName = nil end
 
 	local timeLeft = Auctioneer.Core.Constants.TimeLeft.Seconds[UIDropDownMenu_GetSelectedID(timeLeftDropDown)];
-	frame:GetParent():SearchBids(minProfit, minPercentLess, timeLeft, catID, minQuality, itemName);
+	frame:GetParent():SearchBids(minProfit, minPercentLess, minBidPercent, timeLeft, catID, minQuality, itemName);
 end
 
 -------------------------------------------------------------------------------
@@ -1503,15 +1508,17 @@ function AuctionFrameSearchBuyout_SearchButton_OnClick(button)
 	local frameName = frame:GetName();
 	local profitMoneyFrame = getglobal(frame:GetName().."MinProfit");
 	local percentLessEdit = getglobal(frame:GetName().."MinPercentLessEdit");
+	local bidPercentEdit = getglobal(frameName.."MinBidPctEdit");
 
 	local minProfit = MoneyInputFrame_GetCopper(profitMoneyFrame);
 	local minPercentLess = percentLessEdit:GetNumber();
+	local minBidPercent = bidPercentEdit:GetNumber();
 	local catID = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."CategoryDropDown")) or 1) - 1
 	local minQuality = (UIDropDownMenu_GetSelectedID(getglobal(frameName.."MinQualityDropDown")) or 1) - 1;
 	local itemName = getglobal(frameName.."SearchEdit"):GetText();
 	if (itemName == "") then itemName = nil end
 
-	frame:GetParent():SearchBuyouts(minProfit, minPercentLess, catID, minQuality, itemName);
+	frame:GetParent():SearchBuyouts(minProfit, minPercentLess, minBidPercent, catID, minQuality, itemName);
 end
 
 -------------------------------------------------------------------------------
