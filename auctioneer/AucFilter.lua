@@ -255,10 +255,8 @@ function profitFilter(auction, filterArgs)
 			end
 		end
 		
-		-- Check for bid percent
-		-- We have eliminated the IsBadResaleChoice check where this used to happen, along with filters that are now handled elsewhere/above (owner==player, poor quality).
-		-- Min Bid % (if specified) is now checked for all items, not just the Auctioneer.Core.Constants.BidBasedCategories
-		-- There is no longer any check for Min Bid % for green/Uncommon items of level 50+
+		-- Checks to decide if an auction is good for resale.
+		-- We do not check for owner==player or poor quality, since these items have already been filtered out above.
 		local minBidPercent = filterArgs.minBidPct;
 		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auction.ahKey);
 		if (itemTotals) then
