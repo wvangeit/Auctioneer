@@ -148,7 +148,7 @@ function preContainerFrameItemButtonOnModifiedClickHook(hookParams, returnValue,
 	if (count and count > 1 and not noSplit) then
 		if (button == "RightButton") and (IsControlKeyDown()) then
 			local splitCount = math.floor(count / 2)
-			local emptyBag, emptySlot = findEmptySlot()
+			local emptyBag, emptySlot = Auctioneer.Util.FindEmptySlot()
 			if (emptyBag) then
 				SplitContainerItem(bag, slot, splitCount)
 				PickupContainerItem(emptyBag, emptySlot)
