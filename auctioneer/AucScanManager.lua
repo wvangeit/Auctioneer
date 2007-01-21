@@ -91,6 +91,9 @@ local LastRequestResult = RequestState.Done;
 local AuctionsScannedCacheSize = 0;
 local QueryStyleScan = nil;
 
+-- Flag that indicates if scanning has begun.
+local Scanning = false;
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function load()
