@@ -233,7 +233,7 @@ function Swatter.OnEvent(frame, event, ...)
 			frame:UnregisterEvent("ADDON_LOADED")
 			return
 		end
-	elseif (event == "ADDON_ACTION_BLOCKED") then
+	elseif (event == "ADDON_ACTION_BLOCKED" and SwatterData.warning) then
 		local addon, func = select(1, ...)
 		if (InCombatLockdown()) then
 			Swatter.OnError(string.format("Note: AddOn %s attempted to call a protected function (%s) during combat lockdown.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
@@ -427,6 +427,8 @@ SlashCmdList["SWATTER"] = function(msg)
 		chat("  /swat show      -  Shows the last error box again")
 		chat("  /swat autoshow  -  Enables swatter autopopup upon error")
 		chat("  /swat noauto    -  Swatter will only show an error in chat")
+		chat("  /swat warn      -  Enables swatter's blocked warnings")
+		chat("  /swat nowarn    -  Disables swatter's blocked warnings")
 		chat("  /swat clear     -  Swatter will clear the list of errors")
 	elseif (msg == "show") then
 		Swatter.Error:Show()
@@ -436,6 +438,12 @@ SlashCmdList["SWATTER"] = function(msg)
 	elseif (msg == "disable") then
 		SwatterData.enabled = false
 		chat("Swatter will no longer catch errors")
+	elseif (msg == "warn") then
+		SwatterData.warning = true
+		chat("Swatter will now catch warnings")
+	elseif (msg == "nowarn") then
+		SwatterData.warning = false
+		chat("Swatter will no longer catch warnings")
 	elseif (msg == "autoshow") then
 		SwatterData.autoshow = true
 		chat("Swatter will popup the first time it sees an error")
