@@ -259,7 +259,7 @@ function profitFilter(auction, filterArgs)
 		-- We do not check for owner==player or poor quality, since these items have already been filtered out above.
 		local minBidPercent = filterArgs.minBidPct;
 		local itemTotals = Auctioneer.HistoryDB.GetItemTotals(itemKey, auction.ahKey);
-		if (itemTotals) then
+		if (minBidPercent and itemTotals) then
 			local bidPercent = math.floor(itemTotals.bidCount / itemTotals.minCount * 100);
 			if bidPercent < minBidPercent then
 				if (debug) then debugPrint("No match due to too low bid percent") end;
