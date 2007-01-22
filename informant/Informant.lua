@@ -107,7 +107,7 @@ local filterDefaults = {
 	['show-quest'] = 'on',
 	['show-icon'] = 'on',
 	['show-ilevel'] = 'on',
-	['show-link'] = 'on',
+	['show-link'] = 'off',
 };
 
 -- FUNCTION DEFINITIONS
@@ -154,8 +154,8 @@ function getItem(itemID)
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
-	local vbuy = self.vendbuy[id]
-	local vsell = self.vendsell[id]
+	local vbuy = self.vendbuy[itemID]
+	local vsell = self.vendsell[itemID]
 	if (vbuy) then buy = vbuy end
 	if (vsell) then sell = vsell end
 
@@ -275,6 +275,8 @@ function getItemBasic(itemID)
 			texture = itemTexture,
 			reqLevel = itemUseLevel,
 			itemLevel = itemLevel,
+			buy = self.vendbuy[itemID],
+			sell = self.vendsell[itemID],
 			fullData = false,
 		}
 	end
