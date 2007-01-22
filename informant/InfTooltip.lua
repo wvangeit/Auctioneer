@@ -106,7 +106,7 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 		EnhTooltip.HeaderQuality(itemInfo.itemQuality)
 	end
 
-	DEFAULT_CHAT_FRAME:AddMessage("Got vendor: "..(buy or 0).."/"..(sell or 0))
+	--DEFAULT_CHAT_FRAME:AddMessage("Got vendor: "..(buy or 0).."/"..(sell or 0))
 	if (getFilter('show-vendor')) then
 		if ((buy > 0) or (sell > 0)) then
 			local bgsc = EnhTooltip.GetTextGSC(buy, true)
