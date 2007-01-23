@@ -32,6 +32,202 @@
 
 EnchantrixLocalizations = {
 
+	csCZ = {
+
+
+		-- Section: Command Messages
+		BarkerEnxWindowNotOpen	= "Enchantrix: Není otevřené okno Enchanting. Toto okno musí být otevřené aby bylo možné použít Vyvolávače (Trade chat spam).";
+		BarkerNoEnchantsAvail	= "Enchantrix: Buďto nemáš žádné enchanty anebo nemáš dostatek materiálů.";
+		FrmtActClearall	= "Mažu všechna data o enchantech";
+		FrmtActClearFail	= "Nelze najít předmět: %s";
+		FrmtActClearOk	= "Smazána data k předmětu: %s";
+		FrmtActDefault	= "Nastavení Enchantrixu '%s' bylo vráceno na základní hodnotu.";
+		FrmtActDefaultAll	= "Všechna nastavení Enchantrixu byla vrácena na základní hodnoty.";
+		FrmtActDisable	= "Vypnuto zobrazování dat předmětů o: %s";
+		FrmtActEnable	= "Zapnuto zobrazování dat předmetů o: %s";
+		FrmtActEnabledOn	= "Zobrazuji %s predmetu na %s";
+		FrmtActSet	= "Nastavit %s na '%s'";
+		FrmtActUnknown	= "Neznámý příkaz: '%s'";
+		FrmtActUnknownLocale	= "Zvoleny jazyk ('%s') neni dostupny. Dostupne jsou: ";
+		FrmtPrintin	= "Enchantrix bude zpravy zobrazovat v okne: \"%s\"";
+		FrmtUsage	= "Pouzivani:";
+		MesgDisable	= "Vypinam automaticke spusteni Enchantrix";
+		MesgNotloaded	= "Enchantrix neni spusten. Napis /enchantrix a dozvis se vic.";
+
+
+		-- Section: Command Options
+		CmdClearAll	= "vse";
+		OptClear	= "([Objekt]|vse)";
+		OptDefault	= "(<nastaveni>|vse)";
+		OptFindBidauct	= "<stribro>";
+		OptFindBuyauct	= "<procent>";
+		OptLocale	= "<jazyk>";
+		OptPrintin	= "(<frameIndex>[Number]|<frameName>[String])";
+
+
+		-- Section: Commands
+		BarkerOff	= "Vyvolávač vypnut.";
+		BarkerOn	= "Vyvoláva zapnut.";
+		CmdBarker	= "vyvolavac";
+		CmdClear	= "smazat";
+		CmdDefault	= "vychozi";
+		CmdDisable	= "vypnout";
+		CmdFindBidauct	= "bidbroker";
+		CmdFindBidauctShort	= "bb";
+		CmdFindBuyauct	= "procent-mene";
+		CmdFindBuyauctShort	= "pm";
+		CmdHelp	= "pomoc";
+		CmdLocale	= "jazyk";
+		CmdOff	= "vyp";
+		CmdOn	= "zap";
+		CmdPrintin	= "zobraz-v";
+		CmdToggle	= "prepnout";
+		ShowCount	= "pocet";
+		ShowEmbed	= "integrace";
+		ShowGuessAuctioneerHsp	= "urcit-nuc";
+		ShowGuessAuctioneerMed	= "urcit-stred";
+		ShowGuessBaseline	= "urcit-zaklad";
+		ShowHeader	= "nadpis";
+		ShowRate	= "sazby";
+		ShowTerse	= "strucne";
+		ShowValue	= "ohodnotit";
+		StatOff	= "Nejsou zobrazována žádná Enchant data";
+		StatOn	= "Jsou zobrazována vybraná Enchant data";
+
+
+		-- Section: Config Text
+		GuiLoad	= "Spustit Enchantrix";
+		GuiLoad_Always	= "vzdy";
+		GuiLoad_Never	= "nikdy";
+
+
+		-- Section: Game Constants
+		ArgSpellname	= "Disenchant";
+		BarkerOpening	= "Prodám enchanty:";
+		Darnassus	= "Darnassus";
+		Ironforge	= "City of Ironforge";
+		OneLetterGold	= "g";
+		OneLetterSilver	= "s";
+		Orgrimmar	= "Orgrimmar";
+		PatReagents	= "Materiály: (.+)";
+		ShortDarnassus	= "Dar";
+		ShortIronForge	= "IF";
+		ShortOrgrimmar	= "Org";
+		ShortStormwind	= "SW";
+		ShortThunderBluff	= "TB";
+		ShortUndercity	= "UC";
+		StormwindCity	= "Stormwind City";
+		TextCombat	= "Boj";
+		TextGeneral	= "Obecne";
+		ThunderBluff	= "Thunder Bluff";
+		Undercity	= "Undercity";
+
+
+		-- Section: Generic Messages
+		FrmtCredit	= "(navštiv http://enchantrix.org/ a poděl se o svá data)";
+		FrmtWelcome	= "Enchantrix v%s spuštěna";
+		MesgAuctVersion	= "Enchantrix potřebuje Auctioneer od verze 3.4. Dokud neprovedeš update své instalace Auctioneer, tvá Enchantrix nebude umět některé věci.";
+
+
+		-- Section: Help Text
+		GuiBarker	= "Spustit Vyvolavače (\"Trade chat spam\")";
+		GuiClearall	= "Smazat všechna data Enchantrix";
+		GuiClearallButton	= "Smazat vše";
+		GuiClearallHelp	= "Klikni zde a smažou se všechny záznamy Enchantrix pro tento server";
+		GuiClearallNote	= "pro tento server a stranu";
+		GuiCount	= "Zobraz presne pocty v databazi";
+		GuiDefaultAll	= "Obnov všechna nastavení Enchantrix na základní hodnoty";
+		GuiDefaultAllButton	= "Obnovit vše";
+		GuiDefaultAllHelp	= "Klikni zde pro obnoveni vsech nastavení Enchantrix na základní hodnoty. POZOR: Všechny změny nastavení budou ztraceny";
+		GuiDefaultOption	= "Obnov toto nastavení";
+		GuiEmbed	= "Vkládat informace do nápovědy";
+		GuiLocale	= "Nastav jazyk na";
+		GuiMainEnable	= "Aktivovat Enchantrix";
+		GuiMainHelp	= "Obsahuje nastaveni Enchantrixu, AddOnu zobrazujího v nápovědách informace o zisku při provedení \"Disenchant\" na daný předmět.";
+		GuiOtherHeader	= "Dalsi moznosti";
+		GuiOtherHelp	= "Ruzne Enchantrix moznosti";
+		GuiPrintin	= "Vyber si textove okno";
+		GuiRate	= "Zobrazit prumerne mnozstvi odkouzleni";
+		GuiReloadui	= "Znovu nahraj interface";
+		GuiReloaduiButton	= "NahrajUI";
+		GuiReloaduiFeedback	= "Nahravam WoW interface";
+		GuiReloaduiHelp	= "Klikni zde pro nove nahrani interface. Bude take nahran zvoleny jazyk. Pozor: Toto muze trvat nekolik minut.";
+		GuiTerse	= "Nastavit stručné zobrazení";
+		GuiValuateAverages	= "Ohodnocovat podle průměrných hodnot od Auctioneer-a";
+		GuiValuateBaseline	= "Ohodnocovat podle vlastních dat";
+		GuiValuateEnable	= "Zapnout ohodnocování";
+		GuiValuateHeader	= "Ohodnocování";
+		GuiValuateMedian	= "Ohodnocovat podle mediánů od Auctioneer-a";
+		HelpBarker	= "Vypíná a zapíná \"Vyvolavače\" (Trade chat spam)";
+		HelpClear	= "Smazat data k urcenemu objektu (shift - klikem ho vlozite do prikazu, nebo pouzijte urceni \"vse\" nebo \"all\")";
+		HelpCount	= "Nastavi zda se ma zobrazovat pocet zaznamu v databazi";
+		HelpDefault	= "Vrati urcene Enchantrix nastaveni na vychozi. Take lze pouzit urceni \"vse\" nebo \"all\" pro navrat vsech nastaveni na vychozi.";
+		HelpDisable	= "Deaktivuje automaticke zapinani Enchantrixu pri vstupu do hry";
+		HelpEmbed	= "Vkládat informace do nápověd(pozor: nektere funkce nejsou v tomto rezimu dostupne)";
+		HelpFindBidauct	= "Najde aukce u nichz je odhadovany zisk z \"Disenchant\" o urcenou sumu stribra vyssi nez momentalni naBIDka";
+		HelpFindBuyauct	= "Najde aukce u nichz je odhadovany zisk z \"Disenchant\" o urcenou sumu stribra vyssi nez Vykupni cena";
+		HelpGuessAuctioneerHsp	= "Je-li Ohodnocovani zapnuto a je-li instalovan Auctioneer - zobrazi Ohodnoceni podle Nejvyssi Uspesne Ceny (NUC) odhadovaného zisku z \"Disenchant\". ";
+		HelpGuessAuctioneerMedian	= "Je-li Ohodnocovani zapnuto a je-li instalovan Auctioneer - zobrazi Ohodnoceni podle mediánu odhadovaného zisku z \"Disenchant\".";
+		HelpGuessBaseline	= "Je-li Ohodnocovani zapnuto (a Auctioneer neni zapotrebi) - zobrazi jednoduche Ohodnoceni podle vlastních tabulek odhadovaného zisku z \"Disenchant\".";
+		HelpGuessNoauctioneer	= "Ohodnocování NUC nebo mediánem nejsou k dispozici protoze nemas instalovany Auctioneer. ";
+		HelpHeader	= "Nastavi zda se ma zobrazovat nadpis";
+		HelpLoad	= "Nastavi spousteni Enchantrix pro tuto postavu";
+		HelpLocale	= "Nastavi jazyk Enchantrix zprav";
+		HelpOnoff	= "Nastavi zda se maji zobrazovat informace o ocarovani predmetu";
+		HelpPrintin	= "Nastavi v kterem okne ma Enchantrix zobrazovat zpravy. Muzete zvolit nazev okna nebo jeho index.";
+		HelpRate	= "Nastavi zda se ma zobrazovat prumerne mnozstvi odcarovaneho materialu";
+		HelpTerse	= "Přepínač stručného zobrazení, kdy se ukazuje pouze hodnota \"Disenchant\". Dá se obejít podržením \"Control\".";
+		HelpValue	= "Nastavi zda se ma zobrazovat odhadovaný zisk z \"Disenchant\" daného předmětu";
+
+
+		-- Section: Report Messages
+		FrmtBidbrokerCurbid	= "soucBid";
+		FrmtBidbrokerDone	= "Prihazovani dokonceno";
+		FrmtBidbrokerHeader	= "Nabidky usetri %s stribra na prumerne hodnote odcarovani:";
+		FrmtBidbrokerLine	= "%s, Hodnota na: %s, %s: %s, Usetrit: %s, Mene %s, Cas: %s";
+		FrmtBidbrokerMinbid	= "minBid";
+		FrmtBidBrokerSkipped	= "Celkem %d aukcí vynecháno pro nedostatečný percentuální zisk (%d%%)";
+		FrmtPctlessDone	= "Procentuelni snizeni hotovo.";
+		FrmtPctlessHeader	= "Vykupy usetri %d%% oproti prumerne hodnote odcarovani:";
+		FrmtPctlessLine	= "%s, Hodnota na: %s, Vykup: %s, Usetrit: %s, Mene %s";
+		FrmtPctlessSkipped	= "Celkem %d aukcí vynecháno pro nedostatečný peněžní zisk (%s)";
+
+
+		-- Section: Tooltip Messages
+		FrmtBarkerPrice	= "Cena do chatu (%d %% zisk)";
+		FrmtCounts	= "(základ=%d, stará=%d, nová=%d)";
+		FrmtDisinto	= "Disenchant získá: ";
+		FrmtFound	= "Zaznamenáno, že disenchant na %s získá:";
+		FrmtPriceEach	= "(%s za kus)";
+		FrmtSuggestedPrice	= "Doporučená cena:";
+		FrmtTotal	= "Celkem";
+		FrmtValueAuctHsp	= "Prodejní cena získaná Disenchantem (NUC)";
+		FrmtValueAuctMed	= "Střední cena získaná Disenchantem (StredniCena)";
+		FrmtValueMarket	= "Základní cena získaná Disenchantem (ZakladniCena)";
+		FrmtWarnAuctNotLoaded	= "[Auctioneer nebyl nahrán, budu používat uložené ceny]";
+		FrmtWarnNoPrices	= "[Ceny nejsou dostupne]";
+		FrmtWarnPriceUnavail	= "[Nektere ceny nedostupne]";
+
+
+		-- Section: User Interface
+		BarkerOptionsHighestPriceForFactorTitle	= "Nejvyšší cena";
+		BarkerOptionsHighestPriceForFactorTooltip	= "Enchanty s cenou vyšší než tato hodnota dostanou pro Trade chat nulovou prioritu.";
+		BarkerOptionsHighestProfitTitle	= "Nejvyšší zisk";
+		BarkerOptionsHighestProfitTooltip	= "Nastaví nejvyšší možný zisk na enchantu (v penězích, ne procentech).";
+		BarkerOptionsLowestPriceTitle	= "Nejnižší cena";
+		BarkerOptionsLowestPriceTooltip	= "Nejnižší cena, která bude požadována za tento enchant v Trade chatu.";
+		BarkerOptionsPricePriorityTitle	= "Celková priorita ceny";
+		BarkerOptionsPricePriorityTooltip	= "Tohle nastavuje důležitost ceny pro celkovou prioritu enchantů v Trade chatu.";
+		BarkerOptionsPriceSweetspotTitle	= "Ideální cena";
+		BarkerOptionsPriceSweetspotTooltip	= "Tímhle se zvýší priorita enchantů, jejichž cena je blízko této hodnoty.";
+		BarkerOptionsProfitMarginTitle	= "Míra zisku";
+		BarkerOptionsProfitMarginTooltip	= "Procentní přirážka k nákladům na materiály.";
+		BarkerOptionsRandomFactorTitle	= "Náhodný faktor";
+		BarkerOptionsRandomFactorTooltip	= "Míra náhody ve výběru enchantů pro Trade chat.";
+		BarkerOptionsTab1Title	= "Priority zisku a cen";
+
+	};
+
 	daDK = {
 
 
@@ -502,9 +698,11 @@ EnchantrixLocalizations = {
 		OneLetterSilver	= "s";
 		Orgrimmar	= "Orgrimmar";
 		PatReagents	= "Reagents: (.+)";
+		Shattrath	= "Shattrath City";
 		ShortDarnassus	= "Dar";
 		ShortIronForge	= "IF";
 		ShortOrgrimmar	= "Org";
+		ShortShattrath	= "Sha";
 		ShortStormwind	= "SW";
 		ShortThunderBluff	= "TB";
 		ShortUndercity	= "UC";
@@ -624,23 +822,23 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana del encantar no está abierta. La ventana encantadora debe estar abierta para utilizar el barker.";
-		BarkerNoEnchantsAvail	= "Enchantrix: Usted no tiene ningún encantamiento o no tiene los reactivos para hacerlos.";
+		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana de encantamientos no está abierta. La ventana de encantamientos debe estar abierta para utilizar el pregonero.";
+		BarkerNoEnchantsAvail	= "Enchantrix: O no tienes ningún encantamiento o no tienes los componentes para crearlos.";
 		FrmtActClearall	= "Eliminando toda información de encantamientos";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
-		FrmtActClearOk	= "Informacion eliminada para el artí­culo: %s";
-		FrmtActDefault	= "La opción %s de Enchantrix ha sido configurada por defecto.";
-		FrmtActDefaultAll	= "Todas las opciones de Enchantrix han sido configuradas por defecto.";
-		FrmtActDisable	= "Ocultando información de artículo: %s ";
+		FrmtActClearOk	= "Información eliminada para el artí­culo: %s";
+		FrmtActDefault	= "La opción %s de Enchantrix ha sido reestablecida a sus ajustes por defecto.";
+		FrmtActDefaultAll	= "Todas las opciones de Enchantrix han sido reestablecidas a sus ajustes por defecto.";
+		FrmtActDisable	= "Ocultando información del artículo: %s ";
 		FrmtActEnable	= "Mostrando información del artí­culo: %s ";
 		FrmtActEnabledOn	= "Mostrando %s de los artí­culos usando %s";
-		FrmtActSet	= "%s ajustado(a) a '%s'";
+		FrmtActSet	= "%s establecido a '%s'";
 		FrmtActUnknown	= "Comando o palabra clave desconocida: '%s'";
-		FrmtActUnknownLocale	= "La localización que usted especifico ('%s') no es valida. Locales válidos son:";
-		FrmtPrintin	= "Los mensajes de Enchantrix se imprimirán en la ventana de comunicación \"%s\"";
+		FrmtActUnknownLocale	= "La localización que has especificado ('%s') no es válida. Las localizaciones válidas son:";
+		FrmtPrintin	= "Los mensajes de Enchantrix se imprimirán en la ventana de chat \"%s\"";
 		FrmtUsage	= "Uso:";
-		MesgDisable	= "Deshabilitando la carga automática de Enchantrix";
-		MesgNotloaded	= "Enchantrix no esta cargado. Escriba /enchantrix para mas información.";
+		MesgDisable	= "Desactivando la carga automática de Enchantrix";
+		MesgNotloaded	= "Enchantrix no está cargado. Escriba /enchantrix para más información.";
 
 
 		-- Section: Command Options
@@ -648,15 +846,15 @@ EnchantrixLocalizations = {
 		OptClear	= "([Item]|todo)";
 		OptDefault	= "(<opción>|todo)";
 		OptFindBidauct	= "<dinero>";
-		OptFindBuyauct	= "<porciento>";
-		OptLocale	= "<localidad>";
+		OptFindBuyauct	= "<porcentaje>";
+		OptLocale	= "<localización>";
 		OptPrintin	= "(<indiceVentana>[Número]|<nombreVentana>[Serie])";
 
 
 		-- Section: Commands
-		BarkerOff	= "La función de Barker inhabilitó.";
-		BarkerOn	= "Función de Barker permitida.";
-		CmdBarker	= "barker";
+		BarkerOff	= "Función de Pregonero desactivada.";
+		BarkerOn	= "Función de Pregonero activada.";
+		CmdBarker	= "pregonero";
 		CmdClear	= "borrar";
 		CmdDefault	= "original";
 		CmdDisable	= "deshabilitar";
@@ -691,128 +889,128 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Desencantar";
-		BarkerOpening	= "La venta encanta:";
+		BarkerOpening	= "Vendiendo Encantamientos:";
 		Darnassus	= "Darnassus";
-		Ironforge	= "Ciudad de IronForge";
-		OneLetterGold	= "g";
-		OneLetterSilver	= "s";
+		Ironforge	= "Forjaz";
+		OneLetterGold	= "o";
+		OneLetterSilver	= "p";
 		Orgrimmar	= "Orgrimmar";
 		PatReagents	= "Reactivos: (.+)";
 		ShortDarnassus	= "Dar";
-		ShortIronForge	= "IF";
+		ShortIronForge	= "FJ";
 		ShortOrgrimmar	= "Org";
-		ShortStormwind	= "SW";
-		ShortThunderBluff	= "TB";
-		ShortUndercity	= "UC";
-		StormwindCity	= "Ciudad de Stormwind";
+		ShortStormwind	= "VT";
+		ShortThunderBluff	= "CdT";
+		ShortUndercity	= "E";
+		StormwindCity	= "Ciudad de Ventormenta";
 		TextCombat	= "Combate";
 		TextGeneral	= "General";
-		ThunderBluff	= "Thunder Bluff";
-		Undercity	= "Undercity";
+		ThunderBluff	= "Cima del Trueno";
+		Undercity	= "Entrañas";
 
 
 		-- Section: Generic Messages
-		FrmtCredit	= "(vaya a http://enchantrix.org/ para compartí­r su data)";
+		FrmtCredit	= "(ve a http://enchantrix.org/ para comparti­r tu información)";
 		FrmtWelcome	= "Enchantrix versión %s cargado";
-		MesgAuctVersion	= "Enchantrix requiere la versión 3.4 del Auctioneer o más alto. Algunas características serán inasequibles hasta que usted pone al día su instalación del Auctioneer.";
+		MesgAuctVersion	= "Enchantrix requiere la versión 3.4 o mayor de Auctioneer. Algunas características no estarán disponibles hasta que actualices tu instalación de Auctioneer.";
 
 
 		-- Section: Help Text
-		GuiBarker	= "Permita a Barker";
-		GuiClearall	= "Eliminar toda la información";
-		GuiClearallButton	= "Eliminar Todo";
-		GuiClearallHelp	= "Seleccione aqui para eliminar toda la información de Enchantrix para el reino-facción corriente.";
-		GuiClearallNote	= "el reino-facción corriente.";
-		GuiCount	= "Var valores exactos";
-		GuiDefaultAll	= "Revertir todas las opciones de Enchantrix";
-		GuiDefaultAllButton	= "Revertir Todo";
-		GuiDefaultAllHelp	= "Seleccione aqui para revertir todas las opciones de Auctioneer a sus configuraciones de fábrica.\nADVERTENCIA: Esta acción NO es reversible.";
-		GuiDefaultOption	= "Revertir esta opción";
-		GuiEmbed	= "Integrar información en la caja de ayuda";
-		GuiLocale	= "Ajustar localidad a";
-		GuiMainEnable	= "Encender Enchantrix";
-		GuiMainHelp	= "Contiene ajustes para Enchantrix \nun aditamento que muestra información en la caja de ayuda con relación a los resultados de desencantar el artí­culo.";
+		GuiBarker	= "Activa Pregonero";
+		GuiClearall	= "Elimina toda la información de Enchantrix";
+		GuiClearallButton	= "Elimina Todo";
+		GuiClearallHelp	= "Clic aquí para eliminar toda la información de Enchantrix sobre el reino-facción actual.";
+		GuiClearallNote	= "el reino-facción actual.";
+		GuiCount	= "Muestra las cuentas exactas en la base de datos";
+		GuiDefaultAll	= "Reestablece todas las opciones de Enchantrix";
+		GuiDefaultAllButton	= "Reestablece Todo";
+		GuiDefaultAllHelp	= "Clic aquí para establecer todas las opciones de Auctioneer a sus valores por defecto. ADVERTENCIA: Esta acción NO es reversible.";
+		GuiDefaultOption	= "Reestablece esta opción";
+		GuiEmbed	= "Integra la información en la caja de ayuda";
+		GuiLocale	= "Establece la localización a";
+		GuiMainEnable	= "Activa Enchantrix";
+		GuiMainHelp	= "Contiene ajustes para Enchantrix, un accesorio que muestra información en la caja de ayuda de objetos sobre el desencantamiento del objeto en cuestión.";
 		GuiOtherHeader	= "Otras Opciones";
-		GuiOtherHelp	= "Opciones misceláneas de Enchantrix";
-		GuiPrintin	= "Seleccione la ventana deseada";
-		GuiRate	= "Ver cantidad promedio";
-		GuiReloadui	= "Recargar Interfáz";
+		GuiOtherHelp	= "Otras Opciones de Enchantrix";
+		GuiPrintin	= "Selecciona la ventana deseada";
+		GuiRate	= "Muestra la cantidad promedio de desencantamiento";
+		GuiReloadui	= "Recargar Interfaz";
 		GuiReloaduiButton	= "Recargar";
-		GuiReloaduiFeedback	= "Recargando el Interfáz de WoW";
-		GuiReloaduiHelp	= "Presione aqui para recargar el interfáz de WoW luego de haber seleccionado una localidad diferente. Esto es para que el lenguaje de configuración sea el mismo que el de Auctioneer.\nNota: Esta operación puede tomar unos minutos.";
-		GuiTerse	= "Permita el modo conciso";
-		GuiValuateAverages	= "Valorizar con promedios de Auctioneer";
-		GuiValuateBaseline	= "Valorizar con valores de referencia";
-		GuiValuateEnable	= "Encender Valorizaciónes";
-		GuiValuateHeader	= "Valorizaciónes";
-		GuiValuateMedian	= "Valorizar con medianos de Auctioneer";
-		HelpBarker	= "Vueltas Barker por intervalos";
-		HelpClear	= "Eliminar la informacion existente sobre el artí­culo(se debe usar shift-click para insertar el/los articulo(s) en el comando) Tambien se pueden especificar las palabra clave \"todo\"";
-		HelpCount	= "Selecciona para mostrar los valores exactos de la base de datos";
-		HelpDefault	= "Revertir una opción de Enchantrix a su configuración de fábrica. También puede especificar la palabra clave \"todo\" pata revertir todas las opciones de Enchantrix a sus configuraciones de fábrica.";
-		HelpDisable	= "Impide que Enchantrix se carge automaticamente la proxima vez que usted entre al juego";
-		HelpEmbed	= "Insertar el texto en la caja de ayuda original del juego (nota: Algunas capacidades se desabilitan cuando esta opción es seleccionada)";
-		HelpFindBidauct	= "Encontrar subastas donde el valor posible de los desencantamientos es una cierta cantidad de plata menos que el precio de oferta";
-		HelpFindBuyauct	= "Encontrar subastas donde el valor posible de los desencantamientos es un cierto porciento menos que el precio de la opción a compra";
-		HelpGuessAuctioneerHsp	= "Si la valorización esta seleccionada, y usted tiene Auctioneer instalado, mostrar la valorización de los desencantamientos del artí­culo basandose en los precios máximos de venta (PMV) de Auctioneer.";
-		HelpGuessAuctioneerMedian	= "Si la valorización esta seleccionada, y usted tiene Auctioneer instalado, mostrar la valorización de los desencantamientos del artí­culo basandose en los precios medianos de Auctioneer.";
-		HelpGuessBaseline	= "Si la valorización esta seleccionada, (Auctioneer no es necesario) mostrar la valorización de los desencantamientos del artí­culo, basandose en los valores de referencia incluidos.";
-		HelpGuessNoauctioneer	= "Los comandos valorizar-pmv y valorizar-mediano no estan disponibles porque usted no tiene Auctioneer instalado";
-		HelpHeader	= "Selecciona para mostrar la lí­nea del tí­tulo";
-		HelpLoad	= "Cambiar las opciones de carga de Enchantrix para este personaje";
-		HelpLocale	= "Cambiar la localidad que Enchantrix usa para sus mensajes";
-		HelpOnoff	= "Enciende o apaga la información de encantos";
-		HelpPrintin	= "Selecciona cual ventana de mensajes va a usar Enchantrix para imprimir su informacion. Puede especificar el nombre o el í­ndice de la ventana.";
-		HelpRate	= "Selecciona para mostrar las cantidades promedio de los desencantamientos";
-		HelpTerse	= "Permitainhabilite el modo conciso, el demostrar desencanta solamente valor. Puede ser eliminado manteniendo la llave de control.";
-		HelpValue	= "Selecciona para mostrar el precio estimado de los artí­culos basandose en la proporción de los desencantamientos posibles";
+		GuiReloaduiFeedback	= "Recargando el Interfaz de WoW";
+		GuiReloaduiHelp	= "Presione aquí para recargar el interfaz de WoW tras cambiar la localización para que esta ventana de configuración concuerde con la que has seleccionado. Nota: Esta operación puede llevar unos minutos.";
+		GuiTerse	= "Activa el modo conciso";
+		GuiValuateAverages	= "Valora con Promedios de Auctioneer";
+		GuiValuateBaseline	= "Valora con la información integrada";
+		GuiValuateEnable	= "Activa Valoración";
+		GuiValuateHeader	= "Valoración";
+		GuiValuateMedian	= "Valora con Promedios de Auctioneer";
+		HelpBarker	= "Activa y desactiva Pregonero";
+		HelpClear	= "Elimina la información sobre el objeto especificado (debes usar clic-mayúsculas para incluir el/los objeto(s) en el comando) También puedes especificar las palabra clave \"todo\"";
+		HelpCount	= "Determina si se muestran las cuentas exactas en la base de datos";
+		HelpDefault	= "Establece una opción de Enchantrix a su valor por defecto. También puedes especificar la palabra clave especial \"todo\" para establecer todas las opciones de Enchantrix a sus valores por defecto.";
+		HelpDisable	= "Impide que Enchantrix se cargue automáticamente la próxima vez que te conectes";
+		HelpEmbed	= "Inserta el texto en la caja de ayuda original del juego (nota: algunas características se desactivan cuando esta opción es seleccionada)";
+		HelpFindBidauct	= "Encuentra subastas en las que el valor de desencantamiento posible es una cantidad de dinero menor que el precio de puja";
+		HelpFindBuyauct	= "Encuentra subastas en las que el precio de compra es un porcentaje menor que el valor de desencantamiento posible (y, opcionalmente, una cantidad menor que el valor de desenctanemiento)";
+		HelpGuessAuctioneerHsp	= "Si la valoración está activada y tienes Auctioneer instalado, muestra la valoración del precio de venta (PMV) al desencantar el objeto.";
+		HelpGuessAuctioneerMedian	= "Si la valoración está activada y tienes Auctioneer instalado, muestra la valoración basada en promedios al desencantar el objeto.";
+		HelpGuessBaseline	= "Si la valoración está activada (no se necesita Auctioneer) muestra la valoración base al desencantar el objeto, basado en los precios integrados.";
+		HelpGuessNoauctioneer	= "Los comandos valorar-pmv y valorar-promedio no están disponibles porque no tienes Auctioneer instalado";
+		HelpHeader	= "Determina si se muestra la línea de título";
+		HelpLoad	= "Cambia las opciones de carga de Enchantrix para este personaje";
+		HelpLocale	= "Cambia la localización que es usada para mostrar los mensajes de Enchantrix";
+		HelpOnoff	= "Activa y desactiva la visualización de la información de encantamientos";
+		HelpPrintin	= "Determina en qué ventana se imprimen los mensajes d eEnchantrix. Puedes especificar el nombre de la ventana o su índice.";
+		HelpRate	= "Determina si se muestran las cantidades promedio de los desencantamientos";
+		HelpTerse	= "Activa y desactiva el modo conciso, mostrando solo el valor de los desencantamientos. Puede ser desactivado temporalmente manteniendo pulsada la tecla Control.";
+		HelpValue	= "Determina si se muestran los valores de objeto estimados basados en las proporciones de los posibles desencantamientos";
 
 
 		-- Section: Report Messages
-		FrmtBidbrokerCurbid	= "ofertaCorr";
-		FrmtBidbrokerDone	= "Corredor de ofertas finalizado";
-		FrmtBidbrokerHeader	= "Ofertas teniendo promedios de ahorros de %s plata en el valor de los desencantamientos:";
+		FrmtBidbrokerCurbid	= "pujaActual";
+		FrmtBidbrokerDone	= "Corredor de pujas finalizado";
+		FrmtBidbrokerHeader	= "Pujas que tienen un promedio de ahorro de %s de plata en el valor de desencantamiento (min %%menos= %d):";
 		FrmtBidbrokerLine	= "%s, Valorado en: %s, %s: %s, Ahorra: %s, Menos %s, Tiempo: %s";
-		FrmtBidbrokerMinbid	= "ofertaMin";
-		FrmtBidBrokerSkipped	= "Saltadas %d subastas por que estan por debajo de el margen de ganancias (%d%%)";
+		FrmtBidbrokerMinbid	= "pujaMin";
+		FrmtBidBrokerSkipped	= "Saltadas %d subastas que están por debajo del margen de beneficios (%d%%)";
 		FrmtPctlessDone	= "Porcentajes menores finalizado.";
-		FrmtPctlessHeader	= "Opciones a compra teniendo %d%% de ahorro sobre el precio promedio de desencantar el artí­culo:";
-		FrmtPctlessLine	= "%s, Valorado en: %s, OC: %s, Ahorra: %s, Menos %s";
-		FrmtPctlessSkipped	= "Saltadas %d subastas por que estan por debajo de el margen de ganancias (%s)";
+		FrmtPctlessHeader	= "Compras que tienen %d%% de ahorro sobre el precio promedio de desencantamiento del artí­culo (ahorro min= %s):";
+		FrmtPctlessLine	= "%s, Valorado en: %s, Compra: %s, Ahorra: %s, Menos %s";
+		FrmtPctlessSkipped	= "Saltadas %d subastas que están por debajo del margen de beneficios (%s)";
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Precio de Barker (%d%% margen)";
+		FrmtBarkerPrice	= "Precio de Pregonero (%d%% margen)";
 		FrmtCounts	= "(referencia=%d, viejo=%d, nuevo=%d)";
-		FrmtDisinto	= "Se convierte en:";
-		FrmtFound	= "Se encontro que %s se convierte en:";
+		FrmtDisinto	= "Se desencanta en:";
+		FrmtFound	= "Se encontró que %s se desencanta en:";
 		FrmtPriceEach	= "(%s c/u)";
-		FrmtSuggestedPrice	= "Precio Surgido";
+		FrmtSuggestedPrice	= "Precio Sugerido:";
 		FrmtTotal	= "Total";
-		FrmtValueAuctHsp	= "Valor de desencantamientos (PMV)";
-		FrmtValueAuctMed	= "Valor de desencantamientos (Mediano)";
-		FrmtValueMarket	= "Valor de desencantamientos (Referencia)";
-		FrmtWarnAuctNotLoaded	= "[El programa Auctioneer no empezó, se utilizará la información previamente almacenada]";
-		FrmtWarnNoPrices	= "[No precios son disponible]";
-		FrmtWarnPriceUnavail	= "[Algunos precios no son disponible]";
+		FrmtValueAuctHsp	= "Valor de desencantamiento (PMV)";
+		FrmtValueAuctMed	= "Valor de desencantamiento (Promedio)";
+		FrmtValueMarket	= "Valor de desencantamiento (Referencia)";
+		FrmtWarnAuctNotLoaded	= "[Auctioneer no se ha cargado, usando los precios guardados]";
+		FrmtWarnNoPrices	= "[No hay precios disponibles]";
+		FrmtWarnPriceUnavail	= "[Algunos precios no están disponibles]";
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Factor del precio más alto";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Encanta reciben una cuenta de cero para la prioridad del precio en o sobre este valor.";
-		BarkerOptionsHighestProfitTitle	= "El beneficio más alto";
-		BarkerOptionsHighestProfitTooltip	= "El beneficio total más alto del efectivo a hacer en un encantar.";
-		BarkerOptionsLowestPriceTitle	= "El precio bajo";
-		BarkerOptionsLowestPriceTooltip	= "El precio del contado más bajo a cotizar para un encantar.";
-		BarkerOptionsPricePriorityTitle	= "Prioridad total del precio";
-		BarkerOptionsPricePriorityTooltip	= "Esto fija cómo la tasación importante está a la prioridad total para anunciar.";
-		BarkerOptionsPriceSweetspotTitle	= "Punto del dulce del factor del precio";
-		BarkerOptionsPriceSweetspotTooltip	= "Esto se utiliza para dar la prioridad encanta cerca de este precio para anunciar.";
-		BarkerOptionsProfitMarginTitle	= "Margen de beneficio";
-		BarkerOptionsProfitMarginTooltip	= "El beneficio del porcentaje a agregar a la base mats coste.";
-		BarkerOptionsRandomFactorTitle	= "Factor al azar";
-		BarkerOptionsRandomFactorTooltip	= "La cantidad de aleatoriedad en encanta elegido para el grito comercial.";
-		BarkerOptionsTab1Title	= "Beneficio y prioridades del precio";
+		BarkerOptionsHighestPriceForFactorTitle	= "Factor Precio Más Alto";
+		BarkerOptionsHighestPriceForFactorTooltip	= "Los encantamientos reciben una puntuación de cero en la prioridad de precio cuando tienen este precio o superior.";
+		BarkerOptionsHighestProfitTitle	= "Beneficio Más Alto";
+		BarkerOptionsHighestProfitTooltip	= "El beneficio máximo a conseguir en un encantamiento";
+		BarkerOptionsLowestPriceTitle	= "Precio Más Bajo";
+		BarkerOptionsLowestPriceTooltip	= "El precio mínimo para mencionar un encantamiento.";
+		BarkerOptionsPricePriorityTitle	= "Prioridad Global de Precio";
+		BarkerOptionsPricePriorityTooltip	= "Establece cuán importante es el precio en la prioridad global para ser anunciado";
+		BarkerOptionsPriceSweetspotTitle	= "Mejor Punto del Factor Precio";
+		BarkerOptionsPriceSweetspotTooltip	= "Los encantamientos que están cerca de este precio tendrán prioridad a la hora de anunciarse.";
+		BarkerOptionsProfitMarginTitle	= "Margen de Beneficio";
+		BarkerOptionsProfitMarginTooltip	= "El porcentaje de beneficio que se añade al coste base de los materiales";
+		BarkerOptionsRandomFactorTitle	= "Factor Aleatorio";
+		BarkerOptionsRandomFactorTooltip	= "La cantidad de aleatoriedad que se aplica a la hora de elegir qué encantamientos se anuncian.";
+		BarkerOptionsTab1Title	= "Prioridades de Beneficio y Precio";
 
 	};
 
@@ -894,9 +1092,11 @@ EnchantrixLocalizations = {
 		OneLetterSilver	= "pa";
 		Orgrimmar	= "Orgrimmar";
 		PatReagents	= "Ingrédients: (.+)";
+		Shattrath	= "Ville de Shattrath";
 		ShortDarnassus	= "Darna";
 		ShortIronForge	= "IF";
 		ShortOrgrimmar	= "Orgri";
+		ShortShattrath	= "Sha";
 		ShortStormwind	= "SW";
 		ShortThunderBluff	= "TB";
 		ShortUndercity	= "UC";
@@ -1212,7 +1412,7 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: 마력부여 창이 열려있지 않습니다. Barker를 사용하려면 마력부여 창이 열려있어야만 합니다.";
+		BarkerEnxWindowNotOpen	= "Enchantrix: 마법부여 창이 열려있지 않습니다. Barker를 사용하려면 마법부여 창이 열려있어야만 합니다.";
 		BarkerNoEnchantsAvail	= "Enchantrix: 마법부여 재료가 하나도 없거나 추출할 재료가 하나도 없습니다.";
 		FrmtActClearall	= "모든 마법부여 데이터를 삭제합니다.";
 		FrmtActClearFail	= "아이템을 찾을 수 없음: %s";
@@ -1221,10 +1421,10 @@ EnchantrixLocalizations = {
 		FrmtActDefaultAll	= "모든 Enchantrix 설정이 초기화 되었습니다.";
 		FrmtActDisable	= "아이템의 %s 데이터를 표시하지 않습니다.";
 		FrmtActEnable	= "아이템의 %s 데이터를 표시합니다.";
-		FrmtActEnabledOn	= "아이템의 %s 표시(%s에)";
+		FrmtActEnabledOn	= "아이템의 %s 를 %s에 표시합니다.";
 		FrmtActSet	= "%s를 '%s'|1으로;로; 설정합니다.";
 		FrmtActUnknown	= "알 수 없는 명령어: '%s'";
-		FrmtActUnknownLocale	= "('%s') 은 알 수 없습니다. 올바른 지역 설정은 다음과 같습니다.:";
+		FrmtActUnknownLocale	= "('%s|1')은;')는; 알 수 없는 지역입니다. 올바른 지역 설정은 다음과 같습니다:";
 		FrmtPrintin	= "Enchantrix의 메세지는 \"%s\" 채팅창에 출력됩니다.";
 		FrmtUsage	= "사용법:";
 		MesgDisable	= "Enchantrix를 자동 로딩하지 않습니다.";
@@ -1329,7 +1529,7 @@ EnchantrixLocalizations = {
 		GuiReloaduiFeedback	= "WOW UI를 재시작하는 중";
 		GuiReloaduiHelp	= "지역코드를 변경후에 WOW 사용자 인터페이스를 변경하려면 이곳을 클릭해서 여러분이 선택한 것과 설정 화면의 언어가 같아지도록 하십시오. 주의: 이 작업은 몇분 정도 걸릴 수 있습니다.";
 		GuiTerse	= "간결 모드 사용";
-		GuiValuateAverages	= "Autcioneer 평균으로 평가";
+		GuiValuateAverages	= "Auctioneer 평균으로 평가";
 		GuiValuateBaseline	= "내장된 자료를 이용해 평가";
 		GuiValuateEnable	= "평가 활성화";
 		GuiValuateHeader	= "평가";
@@ -1359,7 +1559,7 @@ EnchantrixLocalizations = {
 		-- Section: Report Messages
 		FrmtBidbrokerCurbid	= "현재 입찰";
 		FrmtBidbrokerDone	= "입찰 중개 완료";
-		FrmtBidbrokerHeader	= "입찰이 평균 마력추출 가격에서 %S 실버 절약되었습니다:";
+		FrmtBidbrokerHeader	= "입찰이 평균 마력추출 가격에서 %S 실버 절약되었습니다. (최소 %%less = %d):";
 		FrmtBidbrokerLine	= "%s, 가격: %s, %s: %s, 감소: %s, %s 이하, 시간: %s";
 		FrmtBidbrokerMinbid	= "최소 입찰";
 		FrmtBidBrokerSkipped	= "%d개의 경매품이 마진(%d%%)을 위해 건너뛰어짐";
@@ -1380,7 +1580,7 @@ EnchantrixLocalizations = {
 		FrmtValueAuctHsp	= "마력추출 가격 (HSP)";
 		FrmtValueAuctMed	= "마력추출 가격 (중앙값)";
 		FrmtValueMarket	= "마력추출 가격 (기준값)";
-		FrmtWarnAuctNotLoaded	= "[Auctioneer가 실행되지 않아서, 저장된 가격을 사용]";
+		FrmtWarnAuctNotLoaded	= "[Auctioneer가 실행되지 않아서 저장된 가격을 사용합니다.]";
 		FrmtWarnNoPrices	= "[가능한 가격 없음]";
 		FrmtWarnPriceUnavail	= "[일부 가격을 사용할 수 없음]";
 
@@ -1921,155 +2121,6 @@ EnchantrixLocalizations = {
 
 	};
 
-	csCZ = {
-
-
-		-- Section: Command Messages
-		FrmtActClearall	= "Mazu vsechna Enchant data";
-		FrmtActClearFail	= "Nelze najit predmet: %s";
-		FrmtActClearOk	= "Smazana data k predmetu: %s";
-		FrmtActDefault	= "Nastaveni Enchantrixu '%s' bylo vraceno na vychozi hodnotu.";
-		FrmtActDefaultAll	= "Vsechna nastaveni Enchantrixu byla vracena na vychozi hodnoty.";
-		FrmtActDisable	= "Nejsou zobrazovana data k predmetu %s";
-		FrmtActEnable	= "Zobrazuji data k predmetu %s";
-		FrmtActEnabledOn	= "Zobrazuji %s predmetu na %s";
-		FrmtActSet	= "%s nastaveno na '%s'";
-		FrmtActUnknown	= "Neznamy prikaz: '%s'";
-		FrmtActUnknownLocale	= "Zvoleny jazyk ('%s') neni dostupny. Dostupne jsou: ";
-		FrmtPrintin	= "Enchantrix bude zpravy zobrazovat v okne: \"%s\"";
-		FrmtUsage	= "Pouzivani:";
-		MesgDisable	= "Vypinam automaticke spusteni Enchantrix";
-		MesgNotloaded	= "Enchantrix neni spusten. Napis /enchantrix a dozvis se vic.";
-
-
-		-- Section: Command Options
-		CmdClearAll	= "vse";
-		OptClear	= "([Objekt]|vse)";
-		OptDefault	= "(<nastaveni>|vse)";
-		OptFindBidauct	= "<stribro>";
-		OptFindBuyauct	= "<procent>";
-		OptLocale	= "<jazyk>";
-		OptPrintin	= "(<frameIndex>[Number]|<frameName>[String])";
-
-
-		-- Section: Commands
-		CmdClear	= "smazat";
-		CmdDefault	= "vychozi";
-		CmdDisable	= "vypnout";
-		CmdFindBidauct	= "bidbroker";
-		CmdFindBidauctShort	= "bb";
-		CmdFindBuyauct	= "procent-mene";
-		CmdFindBuyauctShort	= "pm";
-		CmdHelp	= "pomoc";
-		CmdLocale	= "jazyk";
-		CmdOff	= "vyp";
-		CmdOn	= "zap";
-		CmdPrintin	= "zobraz-v";
-		CmdToggle	= "prepnout";
-		ShowCount	= "pocet";
-		ShowEmbed	= "integrace";
-		ShowGuessAuctioneerHsp	= "urcit-nuc";
-		ShowGuessAuctioneerMed	= "urcit-stred";
-		ShowGuessBaseline	= "urcit-zaklad";
-		ShowHeader	= "nadpis";
-		ShowRate	= "sazby";
-		ShowValue	= "ohodnotit";
-		StatOff	= "Nejsou zobrazovana zadna Enchant data";
-		StatOn	= "Jsou zobrazovana zvolena enchant data";
-
-
-		-- Section: Config Text
-		GuiLoad	= "Spustit Enchantrix";
-		GuiLoad_Always	= "vzdy";
-		GuiLoad_Never	= "nikdy";
-
-
-		-- Section: Game Constants
-		ArgSpellname	= "Rozcarovani";
-		PatReagents	= "regenty: (.+)";
-		TextCombat	= "Boj";
-		TextGeneral	= "Obecne";
-
-
-		-- Section: Generic Messages
-		FrmtCredit	= "(navstiv http://enchantrix.org/ a podel se o sva data)";
-		FrmtWelcome	= "Enchantrix v%s spusten";
-
-
-		-- Section: Help Text
-		GuiClearall	= "Smazat vsechna Enchantrix data";
-		GuiClearallButton	= "Smazat vse";
-		GuiClearallHelp	= "Klikni zde pro smazani vsech Enchantrix zaznamu pro tento server";
-		GuiClearallNote	= "pro tento server";
-		GuiCount	= "Zobraz presne pocty v databazi";
-		GuiDefaultAll	= "Obnov vsechna vychozi Enchantrix nastaveni";
-		GuiDefaultAllButton	= "Restartovat vse";
-		GuiDefaultAllHelp	= "Klikni zde pro obnoveni vsech Enchantrix nastaveni na vychozi hodnoty. POZOR: Vlastni nastaveni budou ztracena";
-		GuiDefaultOption	= "Obnov vychozi";
-		GuiEmbed	= "Popis integrovan do in-game popisku";
-		GuiLocale	= "Zvol jazyk";
-		GuiMainEnable	= "Aktivovat Enchantrix";
-		GuiMainHelp	= "Obsahuje nastaveni Enchantrixu, AddOnu ktery v popiskach udava informace ohledne odcarovani predmetu";
-		GuiOtherHeader	= "Dalsi moznosti";
-		GuiOtherHelp	= "Ruzne Enchantrix moznosti";
-		GuiPrintin	= "Vyber si textove okno";
-		GuiRate	= "Zobrazit prumerne mnozstvi odkouzleni";
-		GuiReloadui	= "Znovu nahraj interface";
-		GuiReloaduiButton	= "NahrajUI";
-		GuiReloaduiFeedback	= "Nahravam WoW interface";
-		GuiReloaduiHelp	= "Klikni zde pro nove nahrani interface. Bude take nahran zvoleny jazyk. Pozor: Toto muze trvat nekolik minut.";
-		GuiValuateAverages	= "Ohodnot pomoci Auctioneer prumeru";
-		GuiValuateBaseline	= "Ohodnot pomoci vlastnich dat";
-		GuiValuateEnable	= "Zapnout ohodnoceni";
-		GuiValuateHeader	= "Ohodnoceni";
-		GuiValuateMedian	= "Ohodnotit pomoci Auctioneer strednich cen";
-		HelpClear	= "Smazat data k urcenemu objektu (shift - klikem ho vlozite do prikazu, nebo pouzijte urceni \"vse\" nebo \"all\")";
-		HelpCount	= "Nastavi zda se ma zobrazovat pocet zaznamu v databazi";
-		HelpDefault	= "Vrati urcene Enchantrix nastaveni na vychozi. Take lze pouzit urceni \"vse\" nebo \"all\" pro navrat vsech nastaveni na vychozi.";
-		HelpDisable	= "- Deaktivuje automaticke zapinani Enchantrixu pri vstupu do hry";
-		HelpEmbed	= "Integruje Enchantrix popisy do puvodnich hernich popisek objektu (pozor: nektere funkce nejsou v tomto rezimu dostupne)";
-		HelpFindBidauct	= "Najde aukce u nichz je cena mozneho produktu odcarovanio urcenou sumu stribra nizsi nez momentalni naBIDka";
-		HelpFindBuyauct	= "Najde aukce u nichz je cena mozneho produktu odcarovani o urcenou sumu stribra nizsi nez Vykupni cena";
-		HelpGuessAuctioneerHsp	= "Je-li Ohodnocovani zapnuto a je-li instalovan Auctioneer - zobrazi Ohodnoceni pomoci Nejvyssi Uspesne Ceny (NUC)  za odcarovani predmetu. ";
-		HelpGuessAuctioneerMedian	= "Je-li Ohodnocovani zapnuto a je-li instalovan Auctioneer - zobrazi Ohodnoceni podle Stredni Ceny za odcarovani predmetu.";
-		HelpGuessBaseline	= "Je-li Ohodnocovani zapnuto - zobrazi jednoduche Ohodnoceni podle jistych cen za odcarovani predmetu.";
-		HelpGuessNoauctioneer	= "Ohodnoceni-NUC a Ohodnoceni-StrednichCen nejsou mozna protoze nemate instalovany Auctioneer. ";
-		HelpHeader	= "Nastavi zda se ma zobrazovat nadpis";
-		HelpLoad	= "Nastavi spousteni Enchantrix pro tuto postavu";
-		HelpLocale	= "Nastavi jazyk Enchantrix zprav";
-		HelpOnoff	= "Nastavi zda se maji zobrazovat informace o ocarovani predmetu";
-		HelpPrintin	= "Nastavi v kterem okne ma Enchantrix zobrazovat zpravy. Muzete zvolit nazev okna nebo jeho index.";
-		HelpRate	= "Nastavi zda se ma zobrazovat prumerne mnozstvi odcarovaneho materialu";
-		HelpValue	= "Nastavi zda se ma zobrazovat odhadovana cena predmetu na zaklade jeho moznych odcarovani";
-
-
-		-- Section: Report Messages
-		FrmtBidbrokerCurbid	= "soucBid";
-		FrmtBidbrokerDone	= "Prihazovani dokonceno";
-		FrmtBidbrokerHeader	= "Nabidky usetri %s stribra na prumerne hodnote odcarovani:";
-		FrmtBidbrokerLine	= "%s, Hodnota na: %s, %s: %s, Usetrit: %s, Mene %s, Cas: %s";
-		FrmtBidbrokerMinbid	= "minBid";
-		FrmtPctlessDone	= "Procentuelni snizeni hotovo.";
-		FrmtPctlessHeader	= "Vykupy usetri %d%% oproti prumerne hodnote odcarovani:";
-		FrmtPctlessLine	= "%s, Hodnota na: %s, Vykup: %s, Usetrit: %s, Mene %s";
-
-
-		-- Section: Tooltip Messages
-		FrmtCounts	= "(zaklad=%d, stare=%d, nove=%d)";
-		FrmtDisinto	= "Odcarovatelne na: ";
-		FrmtFound	= "Zjisteno ze %s je odcarovatelne na:";
-		FrmtPriceEach	= "(%s ks)";
-		FrmtSuggestedPrice	= "Navrhnuta cena:";
-		FrmtTotal	= "Celkem";
-		FrmtValueAuctHsp	= "Hodnota Odkouzleni (NUC)";
-		FrmtValueAuctMed	= "Hodnota Odkouzleni (StredniCena)";
-		FrmtValueMarket	= "Hodnota Odkouzleni (ZakladniCena)";
-		FrmtWarnAuctNotLoaded	= "[Auctioneer nenaloadovan, pouzivam cached ceny]";
-		FrmtWarnNoPrices	= "[Ceny nejsou dostupne]";
-		FrmtWarnPriceUnavail	= "[Nektere ceny nedostupne]";
-
-	};
-
 	ptPT = {
 
 
@@ -2288,6 +2339,7 @@ EnchantrixLocalizations = {
 		-- Section: Generic Messages
 		FrmtCredit	= "(на http://enchantrix.org/ можо поделиться своими данными)";
 		FrmtWelcome	= "Enchantrix v%s загружен";
+		MesgAuctVersion	= "Для Enchantrix требуется Auctioneer версии 3.4 или выше. Некоторые функции будут недоступны, пока вы не обновите Auctioneer.";
 
 
 		-- Section: Help Text

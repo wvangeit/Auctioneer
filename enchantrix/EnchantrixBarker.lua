@@ -115,7 +115,8 @@ local short_location = {
 	[_ENCH('Undercity')] = _ENCH('ShortUndercity'),
 	[_ENCH('StormwindCity')] = _ENCH('ShortStormwind'),
 	[_ENCH('Darnassus')] = _ENCH('ShortDarnassus'),
-	[_ENCH('Ironforge')] = _ENCH('ShortIronForge')
+	[_ENCH('Ironforge')] = _ENCH('ShortIronForge'),
+	[_ENCH('Shattrath')] = _ENCH('ShortShattrath')
 };
 
 local config_defaults = {
