@@ -993,7 +993,7 @@ function doPercentLess(percentLess, minProfit)
 		if (a.signature and profitMargins[a.signature]) then
 			local quality = EnhTooltip.QualityFromLink(a.itemLink);
 			if (quality and quality >= 2) then
-				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
+				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer.SnapshotDB.BreakAuctionSignature(a.signature);
 				local value = profitMargins[a.signature].value;
 				local margin = profitMargins[a.signature].margin;
 				local profit = profitMargins[a.signature].profit;
@@ -1041,7 +1041,9 @@ function doBidBroker(minProfit, percentLess)
 
 	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
-	local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
+	
+	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
+	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, minProfit);
 
 	-- sort by profit based on median
 	table.sort(targetAuctions, bidBrokerSort);

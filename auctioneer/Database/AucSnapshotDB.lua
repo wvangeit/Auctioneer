@@ -1208,6 +1208,7 @@ Auctioneer.SnapshotDB = {
 	GetCurrentBid = getCurrentBid;
 	CreateAuctionSignatureFromAuction = createAuctionSignatureFromAuction;
 	GetLastUpdate = getLastUpdate;
+	BreakAuctionSignature = breakAuctionSignature;
 }
 
 -------------------------------------------------------------------------------
