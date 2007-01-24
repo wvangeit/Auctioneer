@@ -37,7 +37,7 @@
 local addonLoaded
 local onLoad
 local pickupInventoryItemHook
-local pickupContainerItemHook
+local useContainerItemHook
 local onEvent
 
 Enchantrix.Version = "<%version%>"
@@ -73,7 +73,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded);
 
 	-- Register disenchant detection hooks (using secure post hooks)
-	hooksecurefunc("PickupContainerItem", pickupContainerItemHook)
+	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
@@ -151,7 +151,7 @@ function pickupInventoryItemHook(slot)
 	end
 end
 
-function pickupContainerItemHook(bag, slot)
+function useContainerItemHook(bag, slot)
 	-- Remember last activated item
 	if (not UnitCastingInfo("player")) then
 		if bag and slot then
