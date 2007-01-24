@@ -245,6 +245,29 @@ function rebuildNotifications(notifyItems)
 	return notifyFuncs
 end
 
+local callDetail = {}
+local function callDebugger(...)
+	local msg = tostring(select(1, ...))
+	for i = 2, select("#", ...) do
+		msg = msg.." "..tostring(select(i, ...))
+	end
+	
+	if (Swatter and Swatter.IsEnabled()) then
+		return Swatter.OnError("Error while calling hook:\n{{{Hook name:}}}\n  "..tostring(callDetail[1]).."\n"..msg.."\n{{{Instantiated from:}}}\n  "..callDetail[2].n, StubbyHook, debugstack(2, 20, 20))
+	else
+		return Stubby.Print("Error while calling hook for: "..tostring(callDetail[1])..". "..msg, "\nCall Chain:\n", debugstack(2, 3, 6))
+	end
+end
+
+local function callRunner(...)
+	local funcName, func, retVal, callParams = unpack(callDetail)
+	local callParamsLen = callParams[1]
+	if (funcName) then
+		return func.f(func.a, retVal, unpack(callParams, 2, callParamsLen+1))
+	end
+end
+
+
 -- This function's purpose is to execute all the attached
 -- functions in order and the original call at just before
 -- position 0.
@@ -254,6 +277,7 @@ function hookCall(funcName, ...)
 
 	local res
 	local retVal
+	local callParams = { select("#",...), select(1,...) }
 
 	local callees
 	if config.calls and config.calls.callList and config.calls.callList[funcName] then
@@ -265,12 +289,16 @@ function hookCall(funcName, ...)
 			if (orig and func.p >= 0) then
 				retVal = {pcall(orig, ...)}
 				if (not table.remove(retVal, 1)) then
-					Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1])
+					Stubby.ErrorHandler(2, "Error: Original call failed while running hooks: ", tostring(funcName), "\n", retVal)
 				end
 				orig = nil
 			end
 
-			local result, res, addit = pcall(func.f, func.a, retVal, ...)
+			callDetail[1] = funcName
+			callDetail[2] = func
+			callDetail[3] = retVal
+			callDetail[4] = callParams
+			local result, res, addit = xpcall(callRunner, callDebugger)
 			if (result) then
 				if (res == 'abort') then
 					return
@@ -280,17 +308,6 @@ function hookCall(funcName, ...)
 					retVal = addit
 					returns = true
 				end
-				--[[
-				--This option has been disabled permanently, since there is no way to do this via the current varArg (...) construct implementation.
-				if (res == 'setparams') then
-					-- Don't use unpack() since that doesn't correctly handle nil values in the middle of the arg list.
-					a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20 =
-						addit[1], addit[2], addit[3], addit[4], addit[5], addit[6], addit[7], addit[8], addit[9], addit[10], addit[11], addit[12], addit[13], addit[14], addit[15], addit[16], addit[17], addit[18], addit[19], addit[20]
-				end
-				--]]
-
-			else
-				Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", res)
 			end
 		end
 	end
@@ -298,7 +315,7 @@ function hookCall(funcName, ...)
 	if (orig) then
 		retVal = {pcall(orig, ...)}
 		if (not table.remove(retVal, 1)) then
-			Stubby.ErrorHandler(2, "Error occured while running hooks for: ", tostring(funcName), "\n", retVal[1])
+			Stubby.ErrorHandler(2, "Error: Original call failed after running hooks for: ", tostring(funcName), "\n", retVal[1])
 		end
 	end
 
@@ -353,7 +370,7 @@ function errorHandler(stackLevel, ...)
 	stackLevel = (stackLevel or 1) + 1
 	
 	if (Swatter and Swatter.IsEnabled()) then
-		return Swatter.OnError(msg, Stubby, debugstack(stackLevel, 3, 6))
+		return Swatter.OnError(msg, Stubby, debugstack(stackLevel, 20, 20))
 	else
 		return Stubby.Print(msg, "\nCall Chain:\n", debugstack(2, 3, 6))
 	end
@@ -378,14 +395,17 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	end
 	local insertPos = tonumber(position) or 200
 	local funcObj
+	local hookFuncName = strsplit("\n", debugstack(2,1,0), 2)
 	if (select("#", ...) == 0) then
 		funcObj = {
 			f = hookFunc,
+			n = hookFuncName,
 			p = position,
 		}
 	else
 		funcObj = {
 			f = hookFunc,
+			n = hookFuncName,
 			a = {select(1, ...)},
 			p = position
 		}
@@ -816,4 +836,8 @@ Stubby = {
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
 	GetName = function() return "Stubby" end,
+}
+
+StubbyHook = {
+	GetName = function() return "Hooked Function" end,
 }
