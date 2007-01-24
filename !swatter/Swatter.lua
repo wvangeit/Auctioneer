@@ -293,13 +293,13 @@ function Swatter.ErrorDisplay(id)
 	local ts = err.timestamp or "Unavailable"
 	local addlist = err.addons or "  Unavailable"
 
-	local message = err.message:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1"):gsub("|", "||")
+	local message = err.message:gsub("(.-):(%d+): ", "%1 line %2:\n   "):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)`", ": %1"):gsub("|", "||"):gsub("{{{", "|cffff8855"):gsub("}}}", "|r")
 	local trace = "   "..err.stack:gsub("Interface\\AddOns\\", ""):gsub("Interface(\\%w+\\)", "..%1"):gsub(": in function `(.-)'", ": %1()"):gsub(": in function <(.-)>", ":\n   %1"):gsub(": in main chunk ", ": "):gsub("\n$",""):gsub("\n", "\n   ")
 	local count = err.count
 	if (count > 999) then count = "\226\136\158" --[[Infinity]] end
 
 	
-	Swatter.Error.curError = "Date: "..ts.."\nID: "..id.."\nError occured in: "..(err.context or "Anonymous").."\nCount: "..count.."\nMessage: "..message.."\nDebug:\n"..trace.."\nAddOns:\n"..addlist.."\n"
+	Swatter.Error.curError = "|cffff5533Date:|r "..ts.."\n|cffff5533ID:|r "..id.."\n|cffff5533Error occured in:|r "..(err.context or "Anonymous").."\n|cffff5533Count:|r "..count.."\n|cffff5533Message:|r "..message.."\n|cffff5533Debug:|r\n"..trace.."\n|cffff5533AddOns:|r\n"..addlist.."\n"
 	Swatter.Error.selected = false
 	Swatter.ErrorUpdate()
 	Swatter.Error:Show()
