@@ -30,8 +30,6 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-Auctioneer_RegisterRevision("$URL$", "$Rev$")
-
 AuctioneerLocalizations = {
 
 	csCZ = {
@@ -394,7 +392,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Neplatnych aukci odstraneno: %s";
 		AuctionDiscrepancies	= "Odlisnosti: %s";
 		AuctionNewAucts	= "Novych aukci zaznamenano: %s";
-		AuctionOldAucts	= "Jiz drive zaznamenanych: %s";
 		AuctionPageN	= "Auctioneer: skenuji %s, stranu %d z %d Aukci za vterinu: %s Odhadovany cas do konce: %s";
 		AuctionScanDone	= "Auctioneer: Skenovani aukci ukonceno.";
 		AuctionScanNexttime	= "Auctioneer provede kompletni sken aukci pri pristi navsteve.";
@@ -448,7 +445,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Nejvyšší cena:";
 		UiMaximumTimeLeftLabel	= "Maximalni zbyvajici doba:";
-		UiMinimumPercentLessLabel	= "Nejmensi procentualni rozdil:";
 		UiMinimumProfitLabel	= "Nejmenší zisk:";
 		UiMinimumQualityLabel	= "Nejnizsi kvalita:";
 		UiMinimumUndercutLabel	= "Nejmensi prebiti:";
@@ -848,7 +844,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Afsluttede auktioner fjernet: %s";
 		AuctionDiscrepancies	= "Uoverensstemmelser: %s";
 		AuctionNewAucts	= "Nye auktioner skannet: %s";
-		AuctionOldAucts	= "Skannet foer: %s";
 		AuctionPageN	= "Auctioneer: skanner nu %s side %d af %d\nAuktioner pr sekund: %s\nBeregnet tid tilbage: %s";
 		AuctionScanDone	= "Auctioneer: Skanningen af auktionerne er faerdig.";
 		AuctionScanNexttime	= "Auctioneer vil udfoere en komplet scanning af auktionshuset naeste gang du snakker med en auktioaer.";
@@ -899,7 +894,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d - Max)";
 		UiMaximumPriceLabel	= "Maximum pris:";
 		UiMaximumTimeLeftLabel	= "Maximum tid tilbage:";
-		UiMinimumPercentLessLabel	= "Minimum procent mindre:";
 		UiMinimumProfitLabel	= "Minimum profit:";
 		UiMinimumQualityLabel	= "Minimum kvalitet:";
 		UiMinimumUndercutLabel	= "Minimum underbyder";
@@ -1194,6 +1188,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Game Constants
+		SubTypeBag	= "Behälter";
 		TimeLong	= "Lang";
 		TimeMed	= "Mittel";
 		TimeShort	= "Kurz";
@@ -1308,7 +1303,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Abgelaufene Auktionen: %s";
 		AuctionDiscrepancies	= "Unstimmigkeiten: %s";
 		AuctionNewAucts	= "Davon neu: %s";
-		AuctionOldAucts	= "Schon bekannt: %s";
 		AuctionPageN	= "Auctioneer: Erfasse \"%s\", Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
 		AuctionScanDone	= "Auctioneer: Scan abgeschlossen";
 		AuctionScanNexttime	= "Auctioneer wird einen vollständigen Auktionsscan durchführen, wenn das nächste Mal ein Auktionator angesprochen wird.";
@@ -1316,6 +1310,7 @@ AuctioneerLocalizations = {
 		AuctionScanRedo	= "Das Erfassen der aktuelle Seite benötigte mehr als %d Sekunden, erneuter Versuch.";
 		AuctionScanStart	= "Auctioneer: Scanne %s Seite 1...";
 		AuctionTotalAucts	= "Insgesamt gescannte Auktionen: %s";
+		AuctionUpdatedAucts	= "Upgedatete/Geänderte Auktionen: %s";
 
 
 		-- Section: Tooltip Messages
@@ -1362,7 +1357,8 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Maximaler Preis:";
 		UiMaximumTimeLeftLabel	= "Maximale Restzeit:";
-		UiMinimumPercentLessLabel	= "Prozent unter HVP:";
+		UiMinimumBidPercentLabel	= "Mindestgebot %";
+		UiMinimumPercentLessShortLabel	= "Mindestens % weniger:";
 		UiMinimumProfitLabel	= "Mindestgewinn:";
 		UiMinimumQualityLabel	= "Mindestqualität:";
 		UiMinimumUndercutLabel	= "Unterbieten um:";
@@ -1657,6 +1653,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Game Constants
+		SubTypeBag	= "Bag";
 		TimeLong	= "Long";
 		TimeMed	= "Medium";
 		TimeShort	= "Short";
@@ -1855,12 +1852,10 @@ AuctioneerLocalizations = {
 		UiSearchAuctions	= "Search Auctions";
 		UiSearchDropDownLabel	= "Search:";
 		UiSearchForLabel	= "Search For Item:";
-		UiSearchForOwnerLabel	= "Search For Items Posted By:";  
 		UiSearchTypeBids	= "Bids";
 		UiSearchTypeBuyouts	= "Buyouts";
 		UiSearchTypeCompetition	= "Competition";
 		UiSearchTypePlain	= "Item";
-		UiSearchTypeOwner	= "Seller"; 
 		UiStacksLabel	= "Stacks";
 		UiStackTooBigError	= "(Stack Too Big)";
 		UiStackTooSmallError	= "(Stack Too Small)";
@@ -2237,14 +2232,14 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Subastas terminadas eliminadas: %s";
 		AuctionDiscrepancies	= "Discrepancias: %s";
 		AuctionNewAucts	= "Nuevas subastas exploradas: %s";
-		AuctionOldAucts	= "Subastas exploradas previamente: %s";
-		AuctionPageN	= "Auctioneer: Explorando \"%s\" página %d de %d\nSubastas por segundo: %s\nTiempo estimado para completar: %s";
+		AuctionPageN	= "Auctioneer: Explorando \"%s\" página %d de %d\nSubastas por segundo: %s\nTiempo restante estimado: %s\nAñadido a imagen: %s";
 		AuctionScanDone	= "Auctioneer: La exploración de las subastas ha finalizado";
 		AuctionScanNexttime	= "Auctioneer realizará una exploración completa de las subastas la próxima vez que hables con un subastador.";
 		AuctionScanNocat	= "Debes tener al menos una categoría seleccionada para poder explorar.";
 		AuctionScanRedo	= "La página actual ha llevado más de %d segundos para ser completada. Reintentando la página.";
 		AuctionScanStart	= "Auctioneer: Explorando \"%s\" página 1...";
 		AuctionTotalAucts	= "Total de subastas exploradas: %s";
+		AuctionUpdatedAucts	= "Subastas actualizadas/cambiadas: %s";
 
 
 		-- Section: Tooltip Messages
@@ -2274,13 +2269,13 @@ AuctioneerLocalizations = {
 		BuySortTooltip	= "Muestra la página de resultados por precio de compra (mantén pulsado MAYÚSCULAS para ordenarlos por nombre de artículo)";
 		ClearTooltip	= "Limpia cualquier parámetro personalizado de los campos de búsqueda.";
 		FrmtLastSoldOn	= "Última venta en %s";
-		RefreshTooltip	= "Realizar de nuevo la búsqueda en el número de página actual.";
-		UiBid	= "Puja";
+		RefreshTooltip	= "Realiza de nuevo la búsqueda en el número de página actual.";
+		UiBid	= "Pujar";
 		UiBidHeader	= "Pujas";
-		UiBidPerHeader	= "Puja c/u";
+		UiBidPerHeader	= "Pujas c/u";
 		UiBuyout	= "Comprar";
-		UiBuyoutHeader	= "Comprar";
-		UiBuyoutPerHeader	= "Comprar c/u";
+		UiBuyoutHeader	= "Compras";
+		UiBuyoutPerHeader	= "Compras c/u";
 		UiBuyoutPriceLabel	= "Precio de Compra:";
 		UiBuyoutPriceTooLowError	= "(Demasiado Bajo)";
 		UiCategoryLabel	= "Restricción de Categoría:";
@@ -2291,8 +2286,9 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Precio Máximo:";
 		UiMaximumTimeLeftLabel	= "Tiempo Restante Máximo:";
-		UiMinimumPercentLessLabel	= "Porcentaje Menos Mínimo:";
-		UiMinimumProfitLabel	= "Ganancia Mínima";
+		UiMinimumBidPercentLabel	= "Mín. Puja %:";
+		UiMinimumPercentLessShortLabel	= "Mín. Pct:";
+		UiMinimumProfitLabel	= "Beneficio Mínimo:";
 		UiMinimumQualityLabel	= "Calidad Mínima:";
 		UiMinimumUndercutLabel	= "Rebaja Mínima:";
 		UiNameHeader	= "Nombre";
@@ -2300,7 +2296,7 @@ AuctioneerLocalizations = {
 		UiNotEnoughError	= "(No Hay Suficiente)";
 		UiPendingBidInProgress	= "1 petición de puja en marcha...";
 		UiPendingBidsInProgress	= "%d peticiones de puja en marcha...";
-		UiPercentLessHeader	= "Porcentaje";
+		UiPercentLessHeader	= "Pct";
 		UiPost	= "Publicar";
 		UiPostAuctions	= "Publicar Subastas";
 		UiPriceBasedOnLabel	= "Precio Basado En:";
@@ -2317,7 +2313,7 @@ AuctioneerLocalizations = {
 		UiSaveSearchButton	= "Guardar";
 		UiSaveSearchLabel	= "Guardar esta búsqueda";
 		UiSearch	= "Buscar";
-		UiSearchAuctions	= "Explorar Subastas";
+		UiSearchAuctions	= "Buscar Subastas";
 		UiSearchDropDownLabel	= "Buscar:";
 		UiSearchForLabel	= "Buscar por artículo:";
 		UiSearchTypeBids	= "Pujas";
@@ -2408,6 +2404,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Command Options
 		OptAlso	= "(royaume-faction|oppose|allie|neutre)";
+		OptAskPriceSend	= "<NomJoueur> <Requête de Prix>";
 		OptAuctionDuration	= "(court|2h|8h|24h)";
 		OptBidbroker	= "<gain_argent>";
 		OptBidLimit	= "<nombre>";
@@ -2437,6 +2434,7 @@ AuctioneerLocalizations = {
 		CmdAskPriceAd	= "annonce";
 		CmdAskPriceGuild	= "guilde";
 		CmdAskPriceParty	= "groupe";
+		CmdAskPriceSend	= "envoi";
 		CmdAskPriceSmart	= "intelligent";
 		CmdAskPriceSmartWord1	= "que";
 		CmdAskPriceSmartWord2	= "vaut";
@@ -2595,10 +2593,16 @@ AuctioneerLocalizations = {
 		DisableMsg	= "Désactiver le chargement automatique d'Auctioneer";
 		FrmtWelcome	= "Auctioneer v%s est chargé";
 		MesgNotLoaded	= "Auctioneer n'est pas chargé. Tapez /auctioneer pour plus d'informations.";
+		ScanCancel	= "Scan annulé";
+		ScanComplete	= "Scan terminé";
+		ScanFailed	= "Scan raté";
 		StatAskPriceOff	= "La fonction DemandePrix est désormais désactivée.";
 		StatAskPriceOn	= "La fonction DemandePrix est désormais activée.";
 		StatOff	= "Aucune enchère à afficher";
 		StatOn	= "Afficher la configuration des enchères";
+		UIScanCanceled	= "Auctioneer: Scan d'actions annulé";
+		UIScanComplete	= "Auctioneer: Scan d'actions terminé";
+		UIScanFailed	= "Auctioneer: Scan d'actions raté";
 
 
 		-- Section: Generic Strings
@@ -2616,6 +2620,7 @@ AuctioneerLocalizations = {
 		HelpAskPriceAd	= "Activer ou désactiver la nouvelle fonction d'annonce DemandePrix.";
 		HelpAskPriceGuild	= "Répondre aux demandes faites dans le canal de guilde.";
 		HelpAskPriceParty	= "Répondre aux demandes faites dans le canal de groupe.";
+		HelpAskPriceSend	= "Envoi manuel au joueur du résultat d'une requête de prix";
 		HelpAskPriceSmart	= "Activer ou désactiver la vérification de MotClé";
 		HelpAskPriceTrigger	= "Changer la clef d'amorcage de DemandePrix.";
 		HelpAskPriceVendor	= "Activer ou désactiver l'envoie des infos de prix au marchand";
@@ -2691,7 +2696,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Ventes terminées retirées : %s";
 		AuctionDiscrepancies	= "Ecarts : %s";
 		AuctionNewAucts	= "Nouvelles enchères analysées : %s";
-		AuctionOldAucts	= "Analysées précédemment : %s";
 		AuctionPageN	= "Auctioneer : analyse en cours, catégorie '%s', \npage %d sur %d,\n%s enchères/s. \nTemps restant estimé : %s";
 		AuctionScanDone	= "Auctioneer : analyse terminée";
 		AuctionScanNexttime	= "Auctioneer fera une analyse complète de l'Hôtel des Ventes la prochaine fois que vous parlerez à un commissaire-priseur.";
@@ -2699,6 +2703,7 @@ AuctioneerLocalizations = {
 		AuctionScanRedo	= "La page actuelle a mis plus de %d secondes pour être analysée, nouvelle tentative.";
 		AuctionScanStart	= "Auctioneer : analyse '%s', page 1";
 		AuctionTotalAucts	= "Nb total d'enchères analysées : %s";
+		AuctionUpdatedAucts	= "Actions changées/mises à jour: %s";
 
 
 		-- Section: Tooltip Messages
@@ -2725,7 +2730,10 @@ AuctioneerLocalizations = {
 
 
 		-- Section: User Interface
+		BuySortTooltip	= "Trier les résultats par prix d'achat (maintenir MAJUSCULE pour tri par nom)";
+		ClearTooltip	= "Effacer toute recherche personnalisée des champs";
 		FrmtLastSoldOn	= "Dernière vente le %s";
+		RefreshTooltip	= "Resoumettre la requête au numéro de page courant";
 		UiBid	= "Offre";
 		UiBidHeader	= "Offre";
 		UiBidPerHeader	= "Offre par";
@@ -2742,7 +2750,8 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Prix maximum :";
 		UiMaximumTimeLeftLabel	= "Temps restant maximum :";
-		UiMinimumPercentLessLabel	= "% min de gain :";
+		UiMinimumBidPercentLabel	= "Offre minimale %:";
+		UiMinimumPercentLessShortLabel	= "Pourcentage minimal inférieur:";
 		UiMinimumProfitLabel	= "Gain minimum : ";
 		UiMinimumQualityLabel	= "Qualité minimum :";
 		UiMinimumUndercutLabel	= "Marge minimum :";
@@ -3138,7 +3147,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Aste obsolete rimosse: %s ";
 		AuctionDiscrepancies	= "Discrepanze: %s  ";
 		AuctionNewAucts	= "Nuove aste scansionate: %s";
-		AuctionOldAucts	= "Scansionate precedentemente: %s";
 		AuctionPageN	= "Auctioneer: scansione %s pagina %d di %d,\nAste al secondo: %s,\nTempo rimasto: %s ";
 		AuctionScanDone	= "Auctioneer: scansione delle aste completata";
 		AuctionScanNexttime	= "Auctioneer eseguira' una scansione completa delle aste la prossima volta che parlerai con un banditore.";
@@ -3189,7 +3197,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Prezzo Massimo:";
 		UiMaximumTimeLeftLabel	= "Massimo Tempo Mancante:";
-		UiMinimumPercentLessLabel	= "Percentuale minima in meno:";
 		UiMinimumProfitLabel	= "Profitto Minimo:";
 		UiMinimumQualityLabel	= "Qualita' minima:";
 		UiMinimumUndercutLabel	= "Ribasso minimo:";
@@ -3246,13 +3253,13 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Auction Messages
-		FrmtActRemove	= "경매장 데이터에서 %s|1을;를; 삭제합니다.";
+		FrmtActRemove	= "현재 경매장 기록에서 %s|1을;를; 삭제합니다.";
 		FrmtAuctinfoHist	= "기존 %d개";
 		FrmtAuctinfoLow	= "낮은 기록";
 		FrmtAuctinfoMktprice	= "상점가";
 		FrmtAuctinfoNolow	= "최근 기록된 정보에서 본 적이 없는 아이템.";
 		FrmtAuctinfoOrig	= "원래 입찰가";
-		FrmtAuctinfoSnap	= "최근 조사 %d개";
+		FrmtAuctinfoSnap	= "최근 검색 %d개";
 		FrmtAuctinfoSugbid	= "제안된 입찰가";
 		FrmtAuctinfoSugbuy	= "제안된 즉시 구입가";
 		FrmtWarnAbovemkt	= "상점가 이상만 경합";
@@ -3271,9 +3278,9 @@ AuctioneerLocalizations = {
 		FrmtBidQueueOutOfSync	= "오류: 입찰 대기열 동기화에 문제가 발생하였습니다!";
 		FrmtBoughtAuction	= "즉시구입된 경매: %s (x%d)";
 		FrmtMaxBidsReached	= "%s (x%d)의 경매품들을 좀더 찾았지만, 입찰 한계에 도달했습니다.(%d)";
-		FrmtNoAuctionsFound	= "경매를 찾을 수없음: %s (x%d)";
+		FrmtNoAuctionsFound	= "경매를 찾을 수 없음: %s (x%d)";
 		FrmtNoMoreAuctionsFound	= "더이상 경매품을 찾을 수 없습니다: %s (x%d)";
-		FrmtNotEnoughMoney	= "경매에 입찰하기 위한 메모리가 부족합니다: %s (x%d)";
+		FrmtNotEnoughMoney	= "경매에 입찰하기 위한 돈이 부족합니다: %s (x%d)";
 		FrmtSkippedAuctionWithHigherBid	= "더 높은 입찰로 인해 건너뛴 경매: %s (x%d)";
 		FrmtSkippedAuctionWithLowerBid	= "더 낮은 입찰로 인해 건너뛴 경매: %s (x$d)";
 		FrmtSkippedBiddingOnOwnAuction	= "자신의 경매라서 입찰을 건너뜀: %s (x%d)";
@@ -3281,27 +3288,27 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
-		ConstantsCritical	= "위험: Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
-		ConstantsMessage	= "Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
-		ConstantsWarning	= "경고: Auctioneer SavedVariables 파일이 %.3f%% 만큼 차 있습니다.";
+		ConstantsCritical	= "위험: Auctioneer SavedVariables 파일을 %.3f%% 사용하고 있습니다.";
+		ConstantsMessage	= "Auctioneer SavedVariables 파일을 %.3f%% 사용하고 있습니다.";
+		ConstantsWarning	= "경고: Auctioneer SavedVariables 파일을 %.3f%% 사용하고 있습니다.";
 		FrmtActClearall	= "%s에 대한 모든 경매 데이터 삭제";
 		FrmtActClearFail	= "찾을 수 없는 아이템: %s";
 		FrmtActClearOk	= "아이템관련 삭제된 데이타: %s";
 		FrmtActClearsnap	= "현재 경매장 기록 정보 삭제";
 		FrmtActDefault	= "Auctioneer의 %s 설정이 초기화되었습니다.";
-		FrmtActDefaultall	= "모든 Auctioneer의 설정이 초기화되었습니다.";
+		FrmtActDefaultall	= "Auctioneer의 모든 설정이 초기화되었습니다.";
 		FrmtActDisable	= "아이템의 %s 데이터 표시하지 않음";
 		FrmtActEnable	= "아이템의 %s 데이터 표시";
-		FrmtActSet	= "%s의 설정을 '%s'으로";
+		FrmtActSet	= "%s|1을;를; '%s|1'으로;'로; 설정";
 		FrmtActUnknown	= "알 수 없는 명령어: '%s'";
 		FrmtAuctionDuration	= "기본 경매 기간으로 설정함: %s ";
 		FrmtAutostart	= "자동으로 경매 시작: 최저가 %s, 즉시 구입가 %s(%d시간) %s";
 		FrmtFinish	= "검색이 끝나면, %s|1을;를; 수행합니다.";
 		FrmtPrintin	= "Auctioneer의 메시지가 \"%s\" 채팅 창에 표시됩니다.";
-		FrmtProtectWindow	= "AH창 보호가 설정됨: %s";
-		FrmtUnknownArg	= "'%s'는 '%s'에 유효하지 않은 매개변수 입니다.";
-		FrmtUnknownLocale	= "설정된 지역 ('%s')을 알수 없습니다. 유효한 지역:";
-		FrmtUnknownRf	= "유효하지 않은 매개변수 ('%s'). 매개변수의 형식은 다음과 같아야 함: [realm]-[faction]. 예: 듀로탄-호드";
+		FrmtProtectWindow	= "경매장 창 보호가 설정됨: %s";
+		FrmtUnknownArg	= "'%s|1'은;'는; '%s'에 유효하지 않은 매개변수 입니다.";
+		FrmtUnknownLocale	= "('%s|1')은;')는; 알 수 없는 지역입니다. 유효한 지역은 다음과 같습니다:";
+		FrmtUnknownRf	= "매개변수 ('%s|1')이;')가; 유효하지 않습니다. 매개변수의 형식은 다음과 같아야 합니다: [realm]-[faction]. 예: 듀로탄-호드";
 
 
 		-- Section: Command Options
@@ -3495,10 +3502,16 @@ AuctioneerLocalizations = {
 		DisableMsg	= "Auctioneer 자동으로 불러오기 비활성화";
 		FrmtWelcome	= "Auctioneer v%s 로드됨.";
 		MesgNotLoaded	= "Auctioneer 로드되지 않음. 더 많은 정보를 보려면 /auctioneer 라고 입력하세요.";
+		ScanCancel	= "검색 취소됨";
+		ScanComplete	= "검색 완료";
+		ScanFailed	= "검색 실패";
 		StatAskPriceOff	= "가격요청이 비활성화됩니다.";
 		StatAskPriceOn	= "가격요청이 활성화됩니다.";
 		StatOff	= "어떤 경매 데이타도 표시하지 않음";
 		StatOn	= "설정된 경매 데이타 표시";
+		UIScanCanceled	= "Auctioneer: 경매 검색이 취소되었습니다.";
+		UIScanComplete	= "Auctioneer: 경매 검색이 완료되었습니다.";
+		UIScanFailed	= "Auctioneer: 경매 검색이 실패했습니다.";
 
 
 		-- Section: Generic Strings
@@ -3592,14 +3605,14 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "삭제된 기본 경매 물품 수량: %s";
 		AuctionDiscrepancies	= "차이나는 수량: %s";
 		AuctionNewAucts	= "새롭게 검색된 경매 물품 수량: %s";
-		AuctionOldAucts	= "이전에 검색된 경매 물품 수량: %s";
-		AuctionPageN	= "Auctioneer: %s %d/%d 검색중 초당 검색 경매품: %s 추정 남은 시간: %s";
+		AuctionPageN	= "Auctioneer: %s %d/%d 페이지 검색중..\n초당 검색 경매품: %s\n남은 예상 시간: %s\n기록에 추가됨: %s";
 		AuctionScanDone	= "Auctioneer: 경매 물품 검색 완료";
 		AuctionScanNexttime	= "다음번 경매인과 대화할 때, Auctioneer는 전체 검색을 할 것입니다.";
 		AuctionScanNocat	= "검색을 위해 최소한 한개 이상의 분류를 선택하여야 합니다.";
 		AuctionScanRedo	= "현재 페이지를 완료하는데 %d 초 이상이 걸렸습니다. 페이지를 재시도합니다.";
-		AuctionScanStart	= "Auctioneer: %s 페이지 1 검색중...";
+		AuctionScanStart	= "Auctioneer: %s 1 페이지 검색중...";
 		AuctionTotalAucts	= "검색된 경매 물품 총 수량: %s";
+		AuctionUpdatedAucts	= "갱신/변경된 경매 물품: %s";
 
 
 		-- Section: Tooltip Messages
@@ -3643,10 +3656,11 @@ AuctioneerLocalizations = {
 		UiDurationLabel	= "경매 기간";
 		UiItemLevelHeader	= "레벨";
 		UiMakeFixedPriceLabel	= "가격 고정";
-		UiMaxError	= "(%d 최대)";
+		UiMaxError	= "(최대 %d)";
 		UiMaximumPriceLabel	= "최고가:";
 		UiMaximumTimeLeftLabel	= "최대 남은 기간";
-		UiMinimumPercentLessLabel	= "최소 감소 비율:";
+		UiMinimumBidPercentLabel	= "최소 입찰 %:";
+		UiMinimumPercentLessShortLabel	= "최소 하한 %:";
 		UiMinimumProfitLabel	= "최소 이익";
 		UiMinimumQualityLabel	= "최소 품질:";
 		UiMinimumUndercutLabel	= "최소 삭감:";
@@ -3978,7 +3992,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Niet meer bestaande veilingen verwijderd: %s";
 		AuctionDiscrepancies	= "Discrepanties: %s";
 		AuctionNewAucts	= "Nieuwe veilingen gescand: %s";
-		AuctionOldAucts	= "Eerder gescand: %s";
 		AuctionPageN	= "Auctioneer: scannen van %s pagina %d van %d Veilingen per seconde: %s Verwachte tijdsduur: %s";
 		AuctionScanDone	= "Auctioneer: veiling scan klaar";
 		AuctionScanNexttime	= "Auctioneer zal een volledige scan uitvoeren de volgende keer dat gepraat wordt met een veilingmeester.";
@@ -4029,7 +4042,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Max)";
 		UiMaximumPriceLabel	= "Maximum Prijs:";
 		UiMaximumTimeLeftLabel	= "Maximale Tijd Over:";
-		UiMinimumPercentLessLabel	= "Laagste Verschil Percentage:";
 		UiMinimumProfitLabel	= "Minimale Opbrengst:";
 		UiMinimumQualityLabel	= "Minimum Kwaliteit:";
 		UiMinimumUndercutLabel	= "Minimum Onderbieding:";
@@ -4425,7 +4437,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Os auctions defunct removeram:  %s";
 		AuctionDiscrepancies	= "Discrepâncias:  %s";
 		AuctionNewAucts	= "Auctions novos feitos a varredura:  %s";
-		AuctionOldAucts	= "Feito a varredura previamente:  %s";
 		AuctionPageN	= "Auctioneer:  página %d da exploração %s de auctions de %d por o segundo:  tempo de %s estimado deixado:  %s";
 		AuctionScanDone	= "Auctioneer:  a exploração do auction terminou";
 		AuctionScanNexttime	= "Auctioneer irÃ¡ iniciar o full scan na proxima vez que vocÃª falar com o com o auctioneer.";
@@ -4476,7 +4487,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d máximo)";
 		UiMaximumPriceLabel	= "Preço Máximo:";
 		UiMaximumTimeLeftLabel	= "Tempo Máximo Deixado:";
-		UiMinimumPercentLessLabel	= "Menos Percentagem Minima:";
 		UiMinimumProfitLabel	= "Lucro Mínimo:";
 		UiMinimumQualityLabel	= "Qualidade Mínima:";
 		UiMinimumUndercutLabel	= "O Mínimo Cortado:";
@@ -4568,21 +4578,24 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Command Messages
-		FrmtActClearall	= "Очистка всех аукционных данных для %s\n";
+		ConstantsCritical	= "КРИТИЧЕСКИ: Ваш файл SavedVariables, используемый для хранения переменных полон на %.3f%% !";
+		ConstantsMessage	= "Ваш файл SavedVariables, используемый для хранения переменных полон на %.3f%%";
+		ConstantsWarning	= "ВНИМАНИЕ: Ваш файл SavedVariables, используемый для хранения переменных полон на %.3f%%";
+		FrmtActClearall	= "Очистка всех данных аукциона для %s\n";
 		FrmtActClearFail	= "Невозможно найти предмет: %s";
-		FrmtActClearOk	= "Данные для предмета удалены: %s\n";
+		FrmtActClearOk	= "Данные предмета удалены: %s\n";
 		FrmtActClearsnap	= "Очистка текущего снимка с аукциона.\n";
 		FrmtActDefault	= "Настройка аукционера %s была переустановлена на значение по умолчанию";
 		FrmtActDefaultall	= "Все настройки аукционера были переустановлены к начальным установкам.\n";
 		FrmtActDisable	= "Не показывать %s данные по предмету";
 		FrmtActEnable	= "Показывать %s данные по предмету";
-		FrmtActSet	= "Установите %s к ' %s'\n";
+		FrmtActSet	= "Установка %s на ' %s'\n";
 		FrmtActUnknown	= "Неизвестная команда или ключ: '%s' ";
 		FrmtAuctionDuration	= "Продолжительность действия по умолчанию установлена на: %s\n";
-		FrmtAutostart	= "Автоматически начинать аукцион для минимума %s, buyout %s (%dh) %s\n";
-		FrmtFinish	= "Мы %s после сканирования аукциона\n";
-		FrmtPrintin	= "Сообщения аукционера теперь теперь будут печататься в \"%s\" окне чата\n";
-		FrmtProtectWindow	= "Защита окна аукциона установлена к: %s\n";
+		FrmtAutostart	= "Автоматически начинать аукцион для %s: %s минимум, %s выкуп (%dh) %s\n";
+		FrmtFinish	= "После сканирования аукциона мы будем %s";
+		FrmtPrintin	= "Сообщения аукционера теперь будут выводиться в \"%s\" окне чата\n";
+		FrmtProtectWindow	= "Защита окна аукциона установлена на: %s\n";
 		FrmtUnknownArg	= "'%s' не является правильным аргументом для '%s'\n";
 		FrmtUnknownLocale	= "Локализация, указанная вами ('%s') неправильна. Правильные локализации:";
 		FrmtUnknownRf	= "Неверный параметр (' %s'). Ожидаемый формат: [ realm]-[faction ]. Например: Al'Akir-Horde\n";
@@ -4590,6 +4603,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Command Options
 		OptAlso	= "(царство-faction|opposite|home|neutral)";
+		OptAskPriceSend	= "(<PlayerName> <AskPrice Query>) ";
 		OptAuctionDuration	= "(посл|2ч|8ч|24ч) ";
 		OptBidbroker	= "<прибыль_серебро> ";
 		OptBidLimit	= "<число>";
@@ -4619,12 +4633,13 @@ AuctioneerLocalizations = {
 		CmdAskPriceAd	= "объявление\n";
 		CmdAskPriceGuild	= "гильдия\n";
 		CmdAskPriceParty	= "группа\n";
+		CmdAskPriceSend	= "отправить";
 		CmdAskPriceSmart	= "умный";
 		CmdAskPriceSmartWord1	= "что";
 		CmdAskPriceSmartWord2	= "ценность";
 		CmdAskPriceTrigger	= "триггер";
 		CmdAskPriceVendor	= "продавец";
-		CmdAskPriceWhispers	= "висперы";
+		CmdAskPriceWhispers	= "приваты";
 		CmdAskPriceWord	= "слово";
 		CmdAuctionClick	= "аукцион-один клик";
 		CmdAuctionDuration	= "аукцион-длительность";
@@ -4650,7 +4665,7 @@ AuctioneerLocalizations = {
 		CmdFinish1	= "logout";
 		CmdFinish2	= "выход";
 		CmdFinish3	= "перегрузить интерфейс";
-		CmdFinishSound	= "звук-окончание сканирования";
+		CmdFinishSound	= "звук по окончанию";
 		CmdHelp	= "помощь";
 		CmdLocale	= "язык";
 		CmdOff	= "выключить";
@@ -4773,13 +4788,20 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Messages
+		ConfirmBidBuyout	= "Вы уверены, что вы хотите %s\n%dx%s для:";
 		DisableMsg	= "Выключение автоматической загрузки Аукционера";
 		FrmtWelcome	= "Аукционер v%s загружен";
 		MesgNotLoaded	= "Аукционер не загружен. Наберите /auctioneer для дополнительной информации.";
+		ScanCancel	= "Сканирование отменено";
+		ScanComplete	= "Сканирование завершено";
+		ScanFailed	= "Сканирование неудачно";
 		StatAskPriceOff	= "AskPrice теперь выключен.";
 		StatAskPriceOn	= "AskPrice теперь включен.";
 		StatOff	= "Не показывается никакой информации по аукциону";
 		StatOn	= "Показывается информация по аукциону";
+		UIScanCanceled	= "Аукционер: Сканирование аукциона отменено";
+		UIScanComplete	= "Аукционер: Сканирование аукциона завершено";
+		UIScanFailed	= "Аукционер: Сканирование аукциона неудачно";
 
 
 		-- Section: Generic Strings
@@ -4794,10 +4816,15 @@ AuctioneerLocalizations = {
 		-- Section: Help Text
 		HelpAlso	= "Так же показывать данные других серверов в подсказке. Вставьте имя сервера, и имя фракции. Например: \"/auctioneer also Warsong-Horde\". Слово \"opposite\" обозначает противоположную фракцию, \"off\" - отключает функции.";
 		HelpAskPrice	= "Включить или выключить AskPrice";
+		HelpAskPriceAd	= "Включить или выключить рекламу новых функций AskPrice";
 		HelpAskPriceGuild	= "Отвечать на запросы, сделанные на канале гильдии";
 		HelpAskPriceParty	= "Отвечать на запросы, сделанные на канале группы";
+		HelpAskPriceSend	= "Отправка ответа на запрос AskPrice в ручную";
 		HelpAskPriceSmart	= "Включить или выключить проверку на ключевые слова";
+		HelpAskPriceTrigger	= "Изменить переключающий символ AskPrice'а";
 		HelpAskPriceVendor	= "Включить или выключить отсылку цен торговца.";
+		HelpAskPriceWhispers	= "Включить или выключить все исходящие приваты AskPrice'а";
+		HelpAskPriceWord	= "Добавить или изменить ключевые слова AskPrice'а, задаваемые пользователем.";
 		HelpAuctionClick	= "Позволяет нажатием Alt-Click на вещи в вашем инвентаре автоматичестки поставить ее на аукцион";
 		HelpAuctionDuration	= "Устанавливает продолжительность аукциона, прелагаемую по умолчанию.";
 		HelpAutofill	= "Установите, чтобы автоматически заполнять цены при создании нового аукциона";
@@ -4806,8 +4833,21 @@ AuctioneerLocalizations = {
 		HelpBidLimit	= "Максимальное количество аукционов на которые делается ставка или выкупается при нажатии на кнопку в окне поиска.";
 		HelpBroker	= "Показывает все аукционы с последнего сканирования, на которые может быть сделана ставка с целью дальнейшего получения прибыли.";
 		HelpClear	= "Отчищает данные по конкретной вещи (shift-click для вставки названия) Вы также можете использовать слова: \"All\" (все) и \"snapshot\" (последний скан)";
+		HelpCompete	= "Показывать любые ранее просканированые аукционы, на которых цена выкупа ниже чем на одну из ваших вещей";
+		HelpDefault	= "Установить настройку в значение по умолчанию. Вы также можете использовать ключевое слово \"all\", чтобы установить все настройки Аукционера в их значения по умолчанию.";
 		HelpDisable	= "Не загружать Аукционер автоматически при следующем входе в игру.";
-		HelpOnoff	= "Включает и выключает показ данных Аукционера";
+		HelpEmbed	= "Встроить текст в оригинальную подсказку игры (некоторые опции выключаются, когда включена эта)";
+		HelpEmbedBlank	= "Выбор, показывать ли пустую строку, чтобы отделить информацию Аукционера от остальной, когда включен режим встраивания";
+		HelpFinish	= "Выбор, как нужно выходить из игры по окончанию сканирования аукциона";
+		HelpFinishSound	= "Выбор, нужно ли проигрывать звук по окончанию сканирования аукциона.";
+		HelpLink	= "Выбор, ужно ли поазывать ссылку в подсказке";
+		HelpLoad	= "Изменить настройки загрузки Аукционера";
+		HelpLocale	= "Изменить локализацию, которая будет использоваться для того, чтобы показывать сообщения Аукционера";
+		HelpMedian	= "Выбрать, показывать ли среднюю цену выкупа для венщи";
+		HelpOnoff	= "Включает и выключает показ данных аукциона";
+		HelpPctBidmarkdown	= "Установка, на сколько Аукционер будет снижать цену от цены выкупа";
+		HelpPctMarkup	= "На сколько процентов будет повышаться цена торговца в случае, когда другие способы рассчета цены не возможны.";
+		HelpPctMaxless	= "На сколько процентов Аукционер будет просаживать рынок перед тем, как сдаться";
 
 
 		-- Section: Post Messages
@@ -4827,14 +4867,14 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Удалено не существующих аукционов: %s";
 		AuctionDiscrepancies	= "Найдено несоответствий: %s";
 		AuctionNewAucts	= "Отсканировано новых аукционов: %s";
-		AuctionOldAucts	= "Отсканировано до этого: %s";
 		AuctionPageN	= "Аукционер: сканируется %s страница %d из %d Аукционов в секунду: %s Осталось времени %s";
 		AuctionScanDone	= "Аукционер: сканирование аукциона завершено.";
 		AuctionScanNexttime	= "Аукционер сделает полное сканирование аукциона, когда Вы в следующий раз поговорите с аукционером.";
 		AuctionScanNocat	= "Вы должны выбрать не менее одной категории для сканирования.";
 		AuctionScanRedo	= "Текущая страница заняла больше чем %d секунд для обработки. Повторная обработка.";
-		AuctionScanStart	= "Аукционер: сканируется %s страница 1";
+		AuctionScanStart	= "Аукционер: сканируется %s страница 1...";
 		AuctionTotalAucts	= "Всего аукционов отсканировано: %s";
+		AuctionUpdatedAucts	= "Обновленных/Измененных аукционов: %s";
 
 
 		-- Section: Tooltip Messages
@@ -4861,14 +4901,17 @@ AuctioneerLocalizations = {
 
 
 		-- Section: User Interface
+		BuySortTooltip	= "Сортировать результаты по цене выкупа (держите SHIFT для сортировки по названию предмета)";
+		ClearTooltip	= "Очистить все заданные пользователем параметры поиска.";
 		FrmtLastSoldOn	= "Последняя продажа %s";
+		RefreshTooltip	= "Использовать заново параметры поиска на текущей странице.";
 		UiBid	= "Предложение";
 		UiBidHeader	= "Предложение";
 		UiBidPerHeader	= "Ставка за";
 		UiBuyout	= "Выкупить";
 		UiBuyoutHeader	= "Скупка";
 		UiBuyoutPerHeader	= "Выкупить за";
-		UiBuyoutPriceLabel	= "Цена на Скупку:";
+		UiBuyoutPriceLabel	= "Цена Выкупа:";
 		UiBuyoutPriceTooLowError	= "(Слишком низкая)";
 		UiCategoryLabel	= "Ограничение категории:";
 		UiDepositLabel	= "Депозит:";
@@ -4878,7 +4921,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d Макс) ";
 		UiMaximumPriceLabel	= "Макс. цена";
 		UiMaximumTimeLeftLabel	= "Макс. время осталось:";
-		UiMinimumPercentLessLabel	= "Минимальный Процент Меньше:";
 		UiMinimumProfitLabel	= "Минимальная прибыль:";
 		UiMinimumQualityLabel	= "Минимальное кол-во";
 		UiMinimumUndercutLabel	= "Минимальная уценка";
@@ -5278,7 +5320,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "删除过期拍卖：%s项";
 		AuctionDiscrepancies	= "出入之处：%s项";
 		AuctionNewAucts	= "扫描新增拍卖：%s项";
-		AuctionOldAucts	= "之前已扫描：%s项";
 		AuctionPageN	= "拍卖助手：正扫描%s\n第%d页 共%d页 %s项/秒\n估计剩余时间: %s";
 		AuctionScanDone	= "拍卖助手：拍卖扫描完毕。";
 		AuctionScanNexttime	= "拍卖助手将在下次与拍卖员对话时进行完全扫描。";
@@ -5329,7 +5370,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(最多%d件)";
 		UiMaximumPriceLabel	= "最高价格";
 		UiMaximumTimeLeftLabel	= "最多剩余时间：";
-		UiMinimumPercentLessLabel	= "最小比率差额：";
 		UiMinimumProfitLabel	= "最低利润：";
 		UiMinimumQualityLabel	= "最低品质：";
 		UiMinimumUndercutLabel	= "最低削价：";
@@ -5725,7 +5765,6 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "已移除過期的拍賣：%s";
 		AuctionDiscrepancies	= "有改變的項目：%s";
 		AuctionNewAucts	= "掃描到的新拍賣：%s";
-		AuctionOldAucts	= "上回掃描到的：%s";
 		AuctionPageN	= "拍賣助手: \n正在掃描 %s 第%d頁 共%d頁\n每秒掃描筆數：%s \n預計剩下時間：%s";
 		AuctionScanDone	= "拍賣助手：拍賣掃描完成";
 		AuctionScanNexttime	= "拍賣助手將會在下次與拍賣員說話時進行完全掃描";
@@ -5776,7 +5815,6 @@ AuctioneerLocalizations = {
 		UiMaxError	= "(%d 最大)";
 		UiMaximumPriceLabel	= "最高價格：";
 		UiMaximumTimeLeftLabel	= "最大剩餘時間：";
-		UiMinimumPercentLessLabel	= "最低減少比例：";
 		UiMinimumProfitLabel	= "最小利潤：";
 		UiMinimumQualityLabel	= "過濾最低級別：";
 		UiMinimumUndercutLabel	= "最低削價：";
