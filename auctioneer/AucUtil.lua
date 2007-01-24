@@ -55,7 +55,6 @@ local getNeutralKey
 local getHomeKey
 local isValidAlso
 local split
-local strSplit
 local getItemLinks
 local getItems
 local getItemHyperlinks
@@ -102,45 +101,6 @@ function getTimeLeftString(timeLeft)
 		return _AUCT('TimeVlong');
 	end
 end
-
-
-function strSplit(fullstr, splitStr)
-  local str = fullstr;
-  local pos = 1;
-  local split = splitStr;
-  local strlen = string.len(fullstr)
-
-  if (str) then
-    if (split and split~="") then
-        return function()
-          if (pos<=strlen) then
-            local nextpos = string.find(str, splitStr, pos, true)
-            if (nextpos) then
-              local retval = string.sub(str, pos, nextpos-pos)
-              pos = nextpos+1
-              return retval
-            else
-              local retval = string.sub(str, pos)
-              pos = strlen+1
-              return retval
-            end
-          end
-        end
-      else
-        return function()
-          if (pos==1) then
-            pos=2
-            return str
-          end
-        end
-    end
-  else
-    -- A do nothing function
-    return function()
-    end
-  end
-end
-
 
 
 function getSecondsLeftString(secondsLeft)
@@ -676,7 +636,6 @@ Auctioneer.Util = {
 	GetNeutralKey = getNeutralKey,
 	GetHomeKey = getHomeKey,
 	IsValidAlso = isValidAlso,
-	StrSplit = strSplit,
 	Split = split,
 	GetItemLinks = getItemLinks,
 	GetItems = getItems,
