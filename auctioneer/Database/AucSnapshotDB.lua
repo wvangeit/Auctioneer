@@ -360,6 +360,7 @@ local function nukeMatches(tbl, ...)
 	local numArgs = select('#', ...)
 	for i=1, numArgs do
 		arg = select(i, ...)
+		arg = tonumber(arg) or 0
 		tbl[arg] = nil
 	end
 end
@@ -389,6 +390,7 @@ function unpackFiltered(src, key, filter, arg, dest, ...)
 	local argc = select("#", ...)
 	for i = 1, argc do
 		argv = select(i, ...)
+		argv = tonumber(argv) or 0
 		packed= src[argv];
 		if (packed) then
 			unpacked = unpackAuction(key, argv, packed);
@@ -472,7 +474,8 @@ function updateForQuery(ahKey, query, auctions, partial)
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
 
 			local auctionIds = {strsplit(";", auctionIdsForItemKey)}
-			for auctionId in ipairs(auctionIds) do
+			for _,auctionId in ipairs(auctionIds) do
+				auctionId = tonumber(auctionId) or 0
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -554,7 +557,8 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
 		local auctionIds = {strsplit(";", auctionIdsForItemKey)}
-		for auctionId in ipairs(auctionIds) do
+		for _, auctionId in ipairs(auctionIds) do
+			auctionId = tonumber(auctionId) or 0
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -951,9 +955,10 @@ function removeAuctionFromSnapshot(ah, auction)
 	-- Remove the auction id from the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	if (ah.auctionIdsByItemKey[itemKey]) then
-		local auctionIdsByItemKey = {strsplit(at, str)}	
+		local auctionIds = {strsplit(";", itemKey)}
 		ah.auctionIdsByItemKey[itemKey]=nil
 		for _, auctionId in ipairs(auctionIdsForItemKey) do
+			auctionId = tonumber(auctionId) or 0
 			if (auctionId ~= auction.auctionId) then
 				if (ah.auctionIdsByItemKey[itemKey]) then
 					ah.auctionIdsByItemKey[itemKey] = ah.auctionIdsByItemKey[itemKey]..";"..auctionId
