@@ -57,7 +57,7 @@ local debugPrint;
 -------------------------------------------------------------------------------
 local NIL_VALUE = "<nil>";
 local DATABASE_VERSION_40 = 40000;
-local CURRENT_DATABASE_VERSION = 40000;
+local CURRENT_DATABASE_VERSION = 40001;
 
 -------------------------------------------------------------------------------
 -- Data members

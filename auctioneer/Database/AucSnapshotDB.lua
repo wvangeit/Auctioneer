@@ -74,7 +74,6 @@ local reconcileAuction;
 local getTimeLeft;
 local getMaxBids;
 local getNextAuctionId;
-local getAuctionIdsForItemKey;
 local addAuctionToSnapshot;
 local updateAuctionInSnapshot;
 local removeAuctionFromSnapshot;
@@ -115,7 +114,7 @@ local LoadedSnapshotDB;
 
 -- The current version of the snapshot database. This number must be incremented
 -- anytime a change is made to the database schema.
-local CURRENT_SNAPSHOTDB_VERSION = 1; -- Auctioneer 4.0
+local CURRENT_SNAPSHOTDB_VERSION = 2; -- Auctioneer 4.0
 
 -- Map of time left index to time left seconds.
 local TimeLeftInSeconds = Auctioneer.Core.Constants.TimeLeft.Seconds
@@ -314,11 +313,54 @@ function upgradeAHDatabase(ah)
 
 	-- Future DB upgrade code goes here...
 	debugPrint("Upgrading snapshot database for", ah.ahKey);
+	if (ah.version < 2) then
+		local auctionIdsByItemKey = ah.auctionIdsByItemKey;
+		for x, y in pairs(ah.auctionIdsByItemKey) do
+			local val = ""
+			for _, auctionId in ipairs(y) do
+				if (val ~= "") then
+					val = val..";"
+				end
+				val = val..auctionId
+			end
+			if (val == "") then
+				ah.auctionIdsByItemKey[x] = nil;
+			else
+				ah.auctionIdsByItemKey[x] = val;
+			end
+		end
+	end
 
 	-- Return the result of the upgrade!
 	return (ah.version == CURRENT_SNAPSHOTDB_VERSION);
 end
 
+--function fixAHdatabase()
+	--for ahKey, ah in pairs(AuctioneerSnapshotDB) do
+		--if (ah.auctionIdsByItemKey and ah.auctionIdsByItemKey
+		--if (not upgradeAHDatabase(AuctioneerSnapshotDB[ahKey])) then
+			--debugPrint("WARNING: Snapshot database corrupted for", ahKey, "! Creating new database.");
+			--AuctioneerSnapshotDB[ahKey] = createAHDatabase(ahKey);
+		--end
+	--end
+--
+		--local auctionIdsByItemKey = ah.auctionIdsByItemKey;
+		--for x, y in pairs(ah.auctionIdsByItemKey) do
+			--local val = ""
+			--for _, auctionId in ipairs(y) do
+				--if (val ~= "") then
+					--val = val..";"
+				--end
+				--val = val..auctionId
+			--end
+			--if (val == "") then
+				--ah.auctionIdsByItemKey[x] = nil;
+			--else
+				--ah.auctionIdsByItemKey[x] = val;
+			--end
+		--end
+--end
+--
 -------------------------------------------------------------------------------
 -- Gets the Auctioneer snapshot database for the specified auction house.
 -------------------------------------------------------------------------------
@@ -346,7 +388,7 @@ function clear(itemKey, ahKey)
 			-- Remove the specified item from the database.
 			local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 			if (auctionIdsForItemKey) then
-				for _, auctionId in ipairs(auctionIdsForItemKey) do
+				for auctionId in Auctioneer.Utils.StrSplit(auctionIdsForItemKey, ";") do
 					ah.auctions[auctionId] = nil;
 				end
 			end
@@ -430,7 +472,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
 			local auctionsInSnapshotBySignature = {};
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
-			for _, auctionId in ipairs(auctionIdsForItemKey) do
+			for auctionId in Auctioneer.Util.StrSplit(auctionIdsForItemKey, ";") do
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -442,7 +484,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 					end
 					table.insert(auctionsInSnapshot, auction);
 				else
-					debugPrint("WARNING: AuctionIdsForItemKey table corrupted!");
+					debugPrint("WARNING: AuctionIdsForItemKey orrupted!");
 				end
 			end
 		end
@@ -511,7 +553,7 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	local itemKey = createItemKeyFromAuctionSignature(auctionSignature);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		for _, auctionId in ipairs(auctionIdsForItemKey) do
+		for auctionId in Auctioneer.Utils.StrSplit(auctionIdsForItemKey, ";") do
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -595,7 +637,7 @@ function query(ahKey, query, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
-			for _, auctionId in ipairs(auctionIdsForItemKey) do
+			for auctionId in Auctioneer.Utils.StrSplit(auctionIdsForItemKey, ";") do
 				local packedAuction = ah.auctions[auctionId];
 				if (packedAuction) then
 					local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -620,9 +662,9 @@ function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	-- Iterate over the list of auctions and find the matching ones.
 	local matchingAuctions = {};
 	local ah = getAHDatabase(ahKey, true);
-	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, false);
+	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		for _, auctionId in ipairs(auctionIdsForItemKey) do
+		for auctionId in Auctioneer.Util.StrSplit(auctionIdsForItemKey, ";") do
 			local packedAuction = ah.auctions[auctionId];
 			if (packedAuction) then
 				local auction = unpackAuction(ahKey, auctionId, packedAuction);
@@ -863,19 +905,6 @@ function getNextAuctionId(ah)
 end
 
 -------------------------------------------------------------------------------
--- Gets the auctionId table for the specified itemKey from the database.
--------------------------------------------------------------------------------
-function getAuctionIdsForItemKey(ah, itemKey, create)
-	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
-	if ((not auctionIdsForItemKey) and create) then
-		debugPrint("Creating auctionIdsForItemKey["..itemKey.."]");
-		auctionIdsForItemKey = {};
-		ah.auctionIdsByItemKey[itemKey] = auctionIdsForItemKey;
-	end
-	return auctionIdsForItemKey;
-end
-
--------------------------------------------------------------------------------
 -- Adds the specified auction to the snapshot.
 -------------------------------------------------------------------------------
 function addAuctionToSnapshot(ah, auction)
@@ -887,8 +916,11 @@ function addAuctionToSnapshot(ah, auction)
 
 	-- Add the auction id to the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
-	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, true);
-	table.insert(auctionIdsForItemKey, auction.auctionId);
+	if (ah.auctionIdsByItemKey[itemKey]) then
+	  ah.auctionIdsByItemKey[itemKey] = ah.auctionIdsByItemKey[itemKey]..";"..auction.auctionId;
+	else
+	  ah.auctionIdsByItemKey[itemKey] = auction.auctionId;
+	end
 
 	-- Fire the auction added event.
 	debugPrint("Added auction", auction.auctionId, ":", packedAuction);
@@ -937,16 +969,19 @@ function removeAuctionFromSnapshot(ah, auction)
 
 	-- Remove the auction id from the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
-	local auctionIdsForItemKey = getAuctionIdsForItemKey(ah, itemKey, false);
-	if (auctionIdsForItemKey) then
-		for index, auctionId in ipairs(auctionIdsForItemKey) do
-			if (auctionId == auction.auctionId) then
-				table.remove(auctionIdsForItemKey, index);
-				break;
-			end
-		end
+	if (ah.auctionIdsByItemKey[itemKey]) then
+      local auctionIdsByItemKey = {strsplit(at, str)}	
+	  ah.auctionIdsByItemKey[itemKey]=nil
+	  for _, auctionId in ipairs(auctionIdsForItemKey) do
+		if (auctionId ~= auction.auctionId) then
+      	  if (ah.auctionIdsByItemKey[itemKey]) then
+		    ah.auctionIdsByItemKey[itemKey] = ah.auctionIdsByItemKey[itemKey]..";"..auctionId
+		  else
+		    ah.auctionIdsByItemKey[itemKey] = auctionId
+		  end
+	    end
+      end
 	end
-
 	-- Fire the auction removed event.
 	debugPrint("Removed auction", auction.auctionId, ":", packAuction(auction));
 	Auctioneer.EventManager.FireEvent("AUCTIONEER_AUCTION_REMOVED", auction);
