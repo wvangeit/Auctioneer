@@ -957,7 +957,7 @@ function removeAuctionFromSnapshot(ah, auction)
 	if (ah.auctionIdsByItemKey[itemKey]) then
 		local auctionIds = {strsplit(";", itemKey)}
 		ah.auctionIdsByItemKey[itemKey]=nil
-		for _, auctionId in ipairs(auctionIdsForItemKey) do
+		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
 			if (auctionId ~= auction.auctionId) then
 				if (ah.auctionIdsByItemKey[itemKey]) then
