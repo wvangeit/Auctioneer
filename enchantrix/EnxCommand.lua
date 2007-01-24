@@ -888,7 +888,7 @@ function percentLessFilter(auction, percentLess)
 	};
 	if (buyout > 0) and (margin >= tonumber(percentLess)) and (profit >= MIN_PROFIT_MARGIN) then
 		filterAuction = false;
-		profitMargins[signature] = results;
+		profitMargins[Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auction)] = results;
 	end
 
 	return filterAuction;
