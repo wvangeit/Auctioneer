@@ -495,3 +495,14 @@ Enchantrix.Util = {
 
 	CreateProfiler		= createProfiler,
 }
+
+ENX_CRITICAL = 1
+ENX_WARNING = 2
+ENX_NOTICE = 3
+ENX_INFO = 4
+ENX_DEBUG = 5
+function Enchantrix.Util.Debug(...)
+        if (nLog) then
+                nLog.AddMessage("Enchantrix", ...)
+        end
+end
