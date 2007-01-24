@@ -659,7 +659,7 @@ function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, strsplit(";", auctionIdsForItemKey))
+		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, strsplit(";", auctionIdsForItemKey))
 	end
 	return matchingAuctions;
 end
