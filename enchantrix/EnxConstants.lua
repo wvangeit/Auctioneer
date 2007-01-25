@@ -94,22 +94,26 @@ const.InventoryTypes = {
 	["INVTYPE_RELIC"] = const.ARMOR,
 }
 
-const.LevelRules = {
-	[const.WEAPON] = {
-		[0] = {
+
+--[[
 			[10940] = const.DUST, -- Strange Dust
 			[11083] = const.DUST, -- Soul Dust
 			[11137] = const.DUST, -- Vision Dust
 			[11176] = const.DUST, -- Dream Dust
 			[16204] = const.DUST, -- Illusion Dust
+			[22445] = const.DUST, -- Arcane Dust
 			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
 			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
+			[10998] = const.ESSENCE_LESSER, -- Lesser Astral Essence -- Armor Only
+			[11082] = const.ESSENCE_GREATER, -- Greater Astral Essence -- Armor Only
 			[11134] = const.ESSENCE_LESSER, -- Lesser Mystic Essence
 			[11135] = const.ESSENCE_GREATER, -- Greater Mystic Essence
 			[11174] = const.ESSENCE_LESSER, -- Lesser Nether Essence
 			[11175] = const.ESSENCE_GREATER, -- Greater Nether Essence
 			[16202] = const.ESSENCE_LESSER, -- Lesser Eternal Essence
 			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
 			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
 			[11084] = const.SHARD_LARGE, -- Large Glimmering Shard
 			[11138] = const.SHARD_SMALL, -- Small Glowing Shard
@@ -118,11 +122,16 @@ const.LevelRules = {
 			[11178] = const.SHARD_LARGE, -- Large Radiant Shard
 			[14343] = const.SHARD_SMALL, -- Small Brilliant Shard
 			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
 			[20725] = const.CRYSTAL, -- Nexus Crystal
-		},
-		[5] = {
+			[22450] = const.CRYSTAL, -- Void Crystal
+]]
+
+const.LevelRules = {
+	[const.WEAPON] = {
+		[5]  = {
 			[10940] = const.DUST, -- Strange Dust
-			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
 		},
 		[10] = {
 			[10940] = const.DUST, -- Strange Dust
@@ -130,8 +139,7 @@ const.LevelRules = {
 		},
 		[15] = {
 			[10940] = const.DUST, -- Strange Dust
-			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
-			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
+			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
 		},
 		[20] = {
 			[10940] = const.DUST, -- Strange Dust
@@ -139,78 +147,146 @@ const.LevelRules = {
 			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
 		},
 		[25] = {
+			[10940] = const.DUST, -- Strange Dust
+			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
+			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
+		},
+		[30] = {
 			[11083] = const.DUST, -- Soul Dust
 			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
 			[11084] = const.SHARD_LARGE, -- Large Glimmering Shard
 		},
-		[30] = {
+		[35] = {
 			[11083] = const.DUST, -- Soul Dust
 			[11134] = const.ESSENCE_LESSER, -- Lesser Mystic Essence
 			[11138] = const.SHARD_SMALL, -- Small Glowing Shard
 		},
-		[35] = {
+		[40] = {
 			[11137] = const.DUST, -- Vision Dust
 			[11135] = const.ESSENCE_GREATER, -- Greater Mystic Essence
 			[11139] = const.SHARD_LARGE, -- Large Glowing Shard
 		},
-		[40] = {
+		[45] = {
 			[11137] = const.DUST, -- Vision Dust
 			[11174] = const.ESSENCE_LESSER, -- Lesser Nether Essence
 			[11177] = const.SHARD_SMALL, -- Small Radiant Shard
 		},
-		[45] = {
+		[50] = {
 			[11176] = const.DUST, -- Dream Dust
 			[11175] = const.ESSENCE_GREATER, -- Greater Nether Essence
 			[11178] = const.SHARD_LARGE, -- Large Radiant Shard
 		},
-		[50] = {
+		[55] = {
 			[11176] = const.DUST, -- Dream Dust
 			[16202] = const.ESSENCE_LESSER, -- Lesser Eternal Essence
 			[14343] = const.SHARD_SMALL, -- Small Brilliant Shard
-		},
-		[55] = {
-			[16204] = const.DUST, -- Illusion Dust
-			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
-			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
-			[20725] = const.CRYSTAL, -- Nexus Crystal
 		},
 		[60] = {
 			[16204] = const.DUST, -- Illusion Dust
 			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
 			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
 			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[65] = {
+			[16204] = const.DUST, -- Illusion Dust
+			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[70] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[75] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[80] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[85] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[90] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[95] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[100] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[105] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[110] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[115] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[120] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[125] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[130] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[135] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[140] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
 		},
 	},
 	[const.ARMOR] = {
-		[0] = {
+		[5]  = {
 			[10940] = const.DUST, -- Strange Dust
-			[11083] = const.DUST, -- Soul Dust
-			[11137] = const.DUST, -- Vision Dust
-			[11176] = const.DUST, -- Dream Dust
-			[16204] = const.DUST, -- Illusion Dust
-			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
-			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
-			[10998] = const.ESSENCE_LESSER, -- Lesser Astral Essence
-			[11082] = const.ESSENCE_GREATER, -- Greater Astral Essence
-			[11134] = const.ESSENCE_LESSER, -- Lesser Mystic Essence
-			[11135] = const.ESSENCE_GREATER, -- Greater Mystic Essence
-			[11174] = const.ESSENCE_LESSER, -- Lesser Nether Essence
-			[11175] = const.ESSENCE_GREATER, -- Greater Nether Essence
-			[16202] = const.ESSENCE_LESSER, -- Lesser Eternal Essence
-			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
-			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
-			[11084] = const.SHARD_LARGE, -- Large Glimmering Shard
-			[11138] = const.SHARD_SMALL, -- Small Glowing Shard
-			[11139] = const.SHARD_LARGE, -- Large Glowing Shard
-			[11177] = const.SHARD_SMALL, -- Small Radiant Shard
-			[11178] = const.SHARD_LARGE, -- Large Radiant Shard
-			[14343] = const.SHARD_SMALL, -- Small Brilliant Shard
-			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
-			[20725] = const.CRYSTAL, -- Nexus Crystal
-		},
-		[5] = {
-			[10940] = const.DUST, -- Strange Dust
-			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
 		},
 		[10] = {
 			[10940] = const.DUST, -- Strange Dust
@@ -218,55 +294,149 @@ const.LevelRules = {
 		},
 		[15] = {
 			[10940] = const.DUST, -- Strange Dust
-			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
-			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
+			[10938] = const.ESSENCE_LESSER, -- Lesser Magic Essence
 		},
 		[20] = {
 			[10940] = const.DUST, -- Strange Dust
-			[10998] = const.ESSENCE_LESSER, -- Lesser Astral Essence
+			[10939] = const.ESSENCE_GREATER, -- Greater Magic Essence
 			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
 		},
 		[25] = {
-			[11083] = const.DUST, -- Soul Dust
-			[11082] = const.ESSENCE_GREATER, -- Greater Astral Essence
-			[11084] = const.SHARD_LARGE, -- Large Glimmering Shard
+			[10940] = const.DUST, -- Strange Dust
+			[10998] = const.ESSENCE_LESSER, -- Lesser Astral Essence -- Armor Only
+			[10978] = const.SHARD_SMALL, -- Small Glimmering Shard
 		},
 		[30] = {
+			[11083] = const.DUST, -- Soul Dust
+			[11082] = const.ESSENCE_GREATER, -- Greater Astral Essence -- Armor Only
+			[11084] = const.SHARD_LARGE, -- Large Glimmering Shard
+		},
+		[35] = {
 			[11083] = const.DUST, -- Soul Dust
 			[11134] = const.ESSENCE_LESSER, -- Lesser Mystic Essence
 			[11138] = const.SHARD_SMALL, -- Small Glowing Shard
 		},
-		[35] = {
+		[40] = {
 			[11137] = const.DUST, -- Vision Dust
 			[11135] = const.ESSENCE_GREATER, -- Greater Mystic Essence
 			[11139] = const.SHARD_LARGE, -- Large Glowing Shard
 		},
-		[40] = {
+		[45] = {
 			[11137] = const.DUST, -- Vision Dust
 			[11174] = const.ESSENCE_LESSER, -- Lesser Nether Essence
 			[11177] = const.SHARD_SMALL, -- Small Radiant Shard
 		},
-		[45] = {
+		[50] = {
 			[11176] = const.DUST, -- Dream Dust
 			[11175] = const.ESSENCE_GREATER, -- Greater Nether Essence
 			[11178] = const.SHARD_LARGE, -- Large Radiant Shard
 		},
-		[50] = {
+		[55] = {
 			[11176] = const.DUST, -- Dream Dust
 			[16202] = const.ESSENCE_LESSER, -- Lesser Eternal Essence
 			[14343] = const.SHARD_SMALL, -- Small Brilliant Shard
-		},
-		[55] = {
-			[16204] = const.DUST, -- Illusion Dust
-			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
-			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
-			[20725] = const.CRYSTAL, -- Nexus Crystal
 		},
 		[60] = {
 			[16204] = const.DUST, -- Illusion Dust
 			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
 			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
 			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[65] = {
+			[16204] = const.DUST, -- Illusion Dust
+			[16203] = const.ESSENCE_GREATER, -- Greater Eternal Essence
+			[14344] = const.SHARD_LARGE, -- Large Brilliant Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[70] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[75] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[80] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[85] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[20725] = const.CRYSTAL, -- Nexus Crystal
+		},
+		[90] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[95] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22448] = const.SHARD_SMALL, -- Small Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[100] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22447] = const.ESSENCE_LESSER, -- Lesser Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[105] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[110] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[115] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[120] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[125] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[130] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[135] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
+		},
+		[140] = {
+			[22445] = const.DUST, -- Arcane Dust
+			[22446] = const.ESSENCE_GREATER, -- Greater Planar Essence
+			[22449] = const.SHARD_LARGE, -- Large Prismatic Shard
+			[22450] = const.CRYSTAL, -- Void Crystal
 		},
 	},
 }

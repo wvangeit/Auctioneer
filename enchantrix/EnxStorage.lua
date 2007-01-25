@@ -158,22 +158,22 @@ end
 function cleanupDisenchant(str, id)
 	-- Remove reagents that don't appear in level rules table
 	if (type(str) == "string") and (id ~= nil) then
-		local _, _, quality, _, level, _, _, _, equip = GetItemInfo(id)
+		local _, _, quality, ilevel, _, _, _, _, equip = GetItemInfo(id)
 		local itype = const.InventoryTypes[equip]
 		if quality and itype then
 			local tbl = unserialize(str)
 			local clean = {}
-			level = Enchantrix.Util.RoundUp(level, 5)
+			ilevel = Enchantrix.Util.RoundUp(ilevel, 5)
 			for id, counts in pairs(tbl) do
-				if const.LevelRules[itype][level][id] then
+				if const.LevelRules[itype][ilevel][id] then
 					if quality == 2 then
 						-- Uncommon item, remove nexus crystal
-						if (const.LevelRules[itype][level][id] < const.CRYSTAL) then
+						if (const.LevelRules[itype][ilevel][id] < const.CRYSTAL) then
 							clean[id] = counts
 						end
 					else
 						-- Rare or epic item, remove dusts and essences
-						if (const.LevelRules[itype][level][id] > const.ESSENCE_GREATER) then
+						if (const.LevelRules[itype][ilevel][id] > const.ESSENCE_GREATER) then
 							clean[id] = counts
 						end
 					end
@@ -363,7 +363,10 @@ function getItemDisenchants(sig, name, useCache)
 			end
 		end
 
-		baseDisenchant = cleanupDisenchant(baseDisenchant, item)
+--This next line is responsible for removing incorrect entries that have been retrieved
+--Disabling this for 4.0 since we're resetting the disenchant database and we're not 100% of the new disenchant tables
+--It will need to be re-enabled, probably for 4.2, once EnxConstants.lua has been double checked
+--		baseDisenchant = cleanupDisenchant(baseDisenchant, item)
 
 		if (baseDisenchant) then
 			-- Base Disenchantments are now serialized
