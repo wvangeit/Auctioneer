@@ -877,6 +877,9 @@ function getAuctionsInCache()
 				-- Yep, check for dups on the previous page.
 				local auctionsOnPrevPage = prevPage.auctions;
 				checkForDups(auctionsOnPage, auctionsOnPrevPage);
+			elseif (not Auctioneer.ScanManager.IsQueryStyle()) then
+				-- Scan was still done in reverse but due to bugged auctions we can't check for dups
+				debugPrint("Bugged auctions encountered cannot check for dupes");
 			else
 				debugPrint("Scan was not done in reverse!");
 				scannedInReverse = false;
