@@ -194,8 +194,8 @@ end
 -- e.g. "20:2:Armor" for uncommon level 20 armor
 function getItemType(id)
 	if (id) then
-		local _, _, quality, ilevel, level, _, _, _, equip = GetItemInfo(id)
-		if (quality and quality >= 2 and level > 0 and Enchantrix.Constants.InventoryTypes[equip]) then
+		local _, _, quality, ilevel, _, _, _, _, equip = GetItemInfo(id)
+		if (quality and quality >= 2 and Enchantrix.Constants.InventoryTypes[equip]) then
 			return ("%d:%d:%s"):format(Enchantrix.Util.RoundUp(ilevel, 5), quality, Enchantrix.Constants.InventoryTypes[equip])
 		end
 	end
