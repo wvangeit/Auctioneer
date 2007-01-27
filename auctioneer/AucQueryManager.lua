@@ -152,7 +152,7 @@ local hookCanSendAuctionQuery = true;
 -- unhooks the method.
 local hookQueryAuctionItems = true;
 -- flag for the Blizzard Scan type 
-local BlizzardScan = nill;
+local BlizzardScan = nil;
 local ForwardScan = nil;
 
 -------------------------------------------------------------------------------
