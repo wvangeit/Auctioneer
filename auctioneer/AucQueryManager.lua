@@ -151,6 +151,9 @@ local hookCanSendAuctionQuery = true;
 -- unless Auctioneer wants to call it. Setting this to false effectively
 -- unhooks the method.
 local hookQueryAuctionItems = true;
+-- flag for the Blizzard Scan type 
+local BlizzardScan = nill;
+local ForwardScan = nil;
 
 -------------------------------------------------------------------------------
 -- Public Data
@@ -376,6 +379,7 @@ end
 function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 	if (hookQueryAuctionItems) then
 		debugPrint("Blizzard's QueryAuctionItems() called");
+		BlizzardScan = 1;
 
 		-- Construct the request and add it to the front of the queue.
 		local request = {
@@ -564,9 +568,10 @@ function onAuctionItemListUpdate()
 		if (lastIndexOnPage == 0 or (CurrentPage.pageNum == 0 and Scanned == 1)) then
 			CurrentPage.isLastPage = true;
 			debugPrint("isLastPage Now True");
-		elseif (CurrentPage.pageNum * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) and (Auctioneer.ScanManager.IsQueryStyle()) then
+		elseif (CurrentPage.pageNum * NUM_AUCTION_ITEMS_PER_PAGE + lastIndexOnPage == totalAuctions) and ((Auctioneer.ScanManager.IsQueryStyle() or BlizzardScan)) then
 			CurrentPage.isLastPage = true;
 			debugPrint("isLastPage is now True");
+			ForwardScan = 1;
 		end
 
 		-- Update the receive time of the query request.
@@ -877,7 +882,7 @@ function getAuctionsInCache()
 				-- Yep, check for dups on the previous page.
 				local auctionsOnPrevPage = prevPage.auctions;
 				checkForDups(auctionsOnPage, auctionsOnPrevPage);
-			elseif (not Auctioneer.ScanManager.IsQueryStyle()) then
+			elseif (not ForwardScan) then
 				-- Scan was still done in reverse but due to bugged auctions we can't check for dups
 				debugPrint("Bugged auctions encountered cannot check for dupes");
 			else
@@ -891,6 +896,9 @@ function getAuctionsInCache()
 			table.insert(auctions, auctionOnPage);
 		end
 	end
+	-- clean up scan flags
+	BlizzardScan = nil; 
+	ForwardScan = nil;
 	return auctions, scannedInReverse;
 end
 
