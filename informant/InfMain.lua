@@ -140,18 +140,20 @@ function skillToName(userSkill)
 end
 
 function getItem(itemID)
+	if (not itemID) then return end
+
 	local baseData = self.database[itemID]
-	if (not baseData) then
-		return getItemBasic(itemID)
+	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist
+	local itemName, itemLink, itemQuality, itemLevel, itemUseLevel, itemType, itemSubType, itemStackSize, itemEquipLoc, itemTexture = GetItemInfo(tonumber(itemID))
+
+	if (baseData) then
+		buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist = strsplit(":", baseData)
+		buy = tonumber(buy)
+		sell = tonumber(sell)
 	end
 
-	local _, _, _, itemLevel, itemUseLevel, itemType, _, itemStackSize, _, itemTexture = GetItemInfo(tonumber(itemID))
-
-	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist  = strsplit(":", baseData)
-	buy = tonumber(buy)
-	sell = tonumber(sell)
 	class = tonumber(class)
-	quality = tonumber(quality)
+	quality = tonumber(quality) or itemQuality
 	stack = tonumber(itemStackSize) or tonumber(stack)
 	local cat = CLASS_TO_CATEGORY_MAP[class]
 
@@ -164,6 +166,7 @@ function getItem(itemID)
 		buy = buy,
 		sell = sell,
 		class = class,
+		classText = itemType,
 		cat = cat,
 		quality = quality,
 		stack = stack,
@@ -173,11 +176,11 @@ function getItem(itemID)
 		limited = limited,
 		texture = itemTexture,
 		itemLevel = itemLevel,
-		fullData = true,
+		reqLevel = itemUseLevel,
 	}
 
 	local addition = ""
-	if (additional ~= "") then
+	if (additional and additional ~= "") then
 		addition = " - ".._INFM("Addit"..additional)
 	end
 	local catName = getCatName(cat)
@@ -390,6 +393,7 @@ function getCatName(catID)
 end
 
 local function getQuestName(questID)
+	questID = tonumber(questID) or 0
 	local questName
 	if (self.questNames[questID]) then
 		questName = self.questNames[questID]
@@ -473,7 +477,7 @@ local function showItem(itemInfo)
 			end
 			if (numRew > 0) then
 				addLine(_INFM('InfoQuestRewardsHeader'):format(numRew), "70ee90")
-				for i=1, numReq do
+				for i=1, numRew do
 					quest = itemInfo.rewardFrom[i]
 					addLine("  ".._INFM('InfoQuestLine'):format(getQuestName(quest)), "80ee80")
 				end
