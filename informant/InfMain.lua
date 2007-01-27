@@ -399,22 +399,6 @@ local function getQuestName(questID)
 	return "|HinfQuest:"..questID.."|h|cff5599ff["..questName.."]|r|h"
 end
 
-
-function showHideInfo(iType, iId)
-	if not iType then iType = "curitem" end
-	iId = tonumber(iId) or 0
-
-	local iTypeCur = tostring(InformantFrame.iType)
-	local iIdCur = tonumber(InformantFrame.iId) or 0
-
-	if (InformantFrame:IsVisible() and iType == iTypeCur and iId == iIdCur) then
-		return InformantFrame:Hide()
-	elseif (iType == "curitem") then
-		showItem(Informant.itemInfo)
-	elseif (iType == "item") then
-	elseif (iType == "quest") then
-	end
-end
 local function showItem(itemInfo)
 	if (itemInfo) then
 		InformantFrameTitle:SetText(_INFM('FrameTitle'))
@@ -519,6 +503,22 @@ local function showItem(itemInfo)
 		clear()
 		addLine(_INFM('InfoNoItem'), "ff4010")
 		InformantFrame:Show()
+	end
+end
+
+function showHideInfo(iType, iId)
+	if not iType then iType = "curitem" end
+	iId = tonumber(iId) or 0
+
+	local iTypeCur = tostring(InformantFrame.iType)
+	local iIdCur = tonumber(InformantFrame.iId) or 0
+
+	if (InformantFrame:IsVisible() and iType == iTypeCur and iId == iIdCur) then
+		return InformantFrame:Hide()
+	elseif (iType == "curitem") then
+		showItem(Informant.itemInfo)
+	elseif (iType == "item") then
+	elseif (iType == "quest") then
 	end
 end
 
