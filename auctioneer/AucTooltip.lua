@@ -71,7 +71,7 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 		-- show auction info
 		if (itemTotals == nil or itemTotals.seenCount == 0) then
 			-- OUTPUT: "Never seen at auction"
-			EnhTooltip.AddLine(_AUCT('FrmtInfoNever'):format(_AUCT('TextAuction')), nil, embedded);
+			EnhTooltip.AddLine(_AUCT('FrmtInfoNeverAtAll'), nil, embedded);
 			EnhTooltip.LineColor(0.5, 0.8, 0.5);
 		else -- (itemTotals.seenCount > 0)
 			-- calculate auction values
