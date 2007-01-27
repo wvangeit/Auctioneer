@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -- Debug switch - set to true, to enable debug output for this module
 local debug = false
@@ -162,7 +162,7 @@ function scanAll()
 	if (#RequestQueue == 0) then
 		-- Construct a scan all request.
 		local request = {};
-		request.description = _AUCT('TextAuction');
+		request.description = _AUCT('AuctionScanAll');
 		addRequestToQueue(request);
 		return true;
 	else
@@ -179,7 +179,7 @@ function scanCategories(categories)
 		-- Construct a scan request for each category requested.
 		for index, category in pairs(categories) do
 			local request = {};
-			request.description = Auctioneer.ItemDB.GetCategoryName(category);
+			request.description = string.format(_AUCT('AuctionScanCat'), Auctioneer.ItemDB.GetCategoryName(category));
 			request.classIndex = category;
 			addRequestToQueue(request);
 		end
@@ -197,7 +197,7 @@ function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassI
 	if (#RequestQueue == 0) then
 		-- Construct the scan request.
 		local request = {
-			description = _AUCT('TextAuction');
+			description = _AUCT('AuctionScanAuctions');
 			name = name;
 			minLevel = minLevel;
 			maxLevel = maxLevel;
@@ -548,7 +548,7 @@ Auctioneer.ScanManager = {
 	IsQueryStyle = isQueryStyle;
 }
 
--- This is the variable Auctioneer use to use to indicate scanning. Keep it for
+-- This is the variable Auctioneer used to use to indicate scanning. Keep it for
 -- compatbility with addons such as AuctionFilterPlus.
 Auctioneer.Scanning = {
 	IsScanningRequested = false;
