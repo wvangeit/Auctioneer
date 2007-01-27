@@ -213,7 +213,7 @@ function onOff(state, chatprint)
 
 	--Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint) then
-		state = getFilter('all')
+		state = Informant.GetFilter('all')
 		setKhaosSetKeyValue("enabled", state)
 
 		if (state) then
