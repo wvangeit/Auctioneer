@@ -1417,6 +1417,11 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 	local ltype = EnhTooltip.LinkType(link)
 	if ltype == "item" then
 		local itemID, itemRand, itemEnch, itemUniq = BtmScan.BreakLink(link)
+		-- Since TooltipHook is a global accessable function, we have to make sure that the given link contains all the necessary information
+		if (not itemID) or (not itemRand) or (not itemEnch) then
+			-- TODO: Add something to log this to identify the incompatible addon and possible bugs
+			return
+		end
 		local sanityKey = itemID..":"..itemRand
 		local auctKey = itemID..":"..itemRand..":"..itemEnch
 
