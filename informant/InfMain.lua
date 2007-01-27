@@ -445,11 +445,11 @@ local function showItem(itemInfo)
 		end
 
 		local reagentInfo = ""
-		if (itemInfo.classText) then
+		if (itemInfo.classText and itemInfo.classText ~= "") then
 			reagentInfo = _INFM('FrmtInfoClass'):format(itemInfo.classText)
 			addLine(reagentInfo, "aa66ee")
 		end
-		if (itemInfo.usageText) then
+		if (itemInfo.usageText and itemInfo.usageText ~= "") then
 			reagentInfo = _INFM('FrmtInfoUse'):format(itemInfo.usageText)
 			addLine(reagentInfo, "aa66ee")
 		end
