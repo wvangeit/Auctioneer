@@ -540,9 +540,9 @@ InformantLocalizations = {
 		HelpLocale	= "Change the locale that is used to display informant messages";
 		HelpMerchant	= "Select whether to show merchants who supply items";
 		HelpOnoff	= "Turns the information data display on and off";
-		HelpQuest	= "Select whether to show quests items' usage";
+		HelpQuest	= "Select whether to show quest item's usage";
 		HelpStack	= "Select whether to show the item's stackable size";
-		HelpUsage	= "Select whether to show tradeskill items' usage";
+		HelpUsage	= "Select whether to show tradeskill item's usage";
 		HelpVendor	= "Select whether to show item's vendor pricing";
 		HelpVendorBuy	= "Select whether to show item's vendor buy pricing (req show-vendor=on)";
 		HelpVendorSell	= "Select whether to show item's vendor sell pricing (req show-vendor=on)";
