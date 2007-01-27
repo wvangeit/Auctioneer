@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Informant_RegisterRevision("$URL$", "$Rev$")
 
 INFORMANT_VERSION = "<%version%>"
 if (INFORMANT_VERSION == "<".."%version%>") then
@@ -239,27 +240,39 @@ function getItem(itemID)
 		dataItem.vendors = vendList
 	end
 
-	dataItem.quests = {}
-	dataItem.questCount = 0
-	local questItemUse = InformantQuests.usage[itemID]
+	dataItem.requiredFor = {}
+	dataItem.rewardFrom = {}
+	dataItem.startsQuest = self.questStarts[itemID]
+
+	local questItemUse = self.questRequires[itemID]
 	if (questItemUse) then
-		local questData = split(questItemUse, ",")
-		local questInfoSplit, questID, questCount
-		for pos, questInfo in pairs(questData) do
-			questInfoSplit = split(questInfo, ":")
-			questID = tonumber(questInfoSplit[1])
-			questCount = tonumber(questInfoSplit[2])
-			if (not dataItem.quests[questID]) then
-				questName = Babylonian.GetString(InformantQuests.names, questID)
-				dataItem.quests[questID] = {
-					count = questCount,
-					name = questName,
-					level = tonumber(InformantQuests.levels[questID])
-				}
-				dataItem.questCount = dataItem.questCount + 1
-			end
+		local list
+		if (type(questItemUse) == 'number') then
+			list = { questItemUse }
+		else
+			list = { strsplit(',', questItemUse) }
 		end
+		for i=1, #list do
+			list[i] = { strsplit('x', list[i]) }
+			list[i][1] = tonumber(list[i][1])
+			if not list[i][2] then list[i][2] = 1 end
+		end
+		dataItem.requiredFor = list
 	end
+
+	questItemUse = self.questRewards[itemID]
+	if (questItemUse) then
+		if (type(questItemUse) == 'number') then
+			list = { questItemUse }
+		else
+			list = { strsplit(',', questItemUse) }
+		end
+		for i=1, #list do
+			list[i] = tonumber(list[i])
+		end
+		dataItem.rewardFrom = list
+	end
+
 	return dataItem
 end
 
@@ -311,6 +324,22 @@ function setVendorSell(vendorlist)
 	Informant.SetVendorSell = nil -- Set only once
 end
 
+function setQuestStarts(list)
+	self.questStarts = list
+	Informant.SetQuestStarts = nil -- Set only once
+end
+function setQuestRewards(list)
+	self.questRewards = list
+	Informant.SetQuestRewards = nil -- Set only once
+end
+function setQuestRequires(list)
+	self.questRequires = list
+	Informant.SetQuestRequires = nil -- Set only once
+end
+function setQuestNames(list)
+	self.questNames = list
+	Informant.SetQuestNames = nil -- Set only once
+end
 
 function setFilter(key, value)
 	if (not InformantConfig.filters) then
@@ -360,11 +389,34 @@ function getCatName(catID)
 	end
 end
 
-function showHideInfo()
-	local itemInfo = Informant.itemInfo
-	if (InformantFrame:IsVisible()) then
-		InformantFrame:Hide()
-	elseif (itemInfo) then
+local function getQuestName(questID)
+	local questName
+	if (self.questNames[questID]) then
+		questName = self.questNames[questID]
+	else
+		questName = _INFM('InfoUntransQuest'):format(questID)
+	end
+	return "|HinfQuest:"..questID.."|h|cff5599ff["..questName.."]|r|h"
+end
+
+
+function showHideInfo(iType, iId)
+	if not iType then iType = "curitem" end
+	iId = tonumber(iId) or 0
+
+	local iTypeCur = tostring(InformantFrame.iType)
+	local iIdCur = tonumber(InformantFrame.iId) or 0
+
+	if (InformantFrame:IsVisible() and iType == iTypeCur and iId == iIdCur) then
+		return InformantFrame:Hide()
+	elseif (iType == "curitem") then
+		showItem(Informant.itemInfo)
+	elseif (iType == "item") then
+		showItem(get
+		
+end
+local function showItem(itemInfo)
+	if (itemInfo) then
 		InformantFrameTitle:SetText(_INFM('FrameTitle'))
 
 		-- Woohoo! We need to provide any information we can from the item currently in itemInfo
@@ -418,17 +470,38 @@ function showHideInfo()
 			addLine(_INFM('InfoPlayerMade'):format(itemInfo.reqLevel, itemInfo.reqSkillName), "5060ff")
 		end
 
-		if (itemInfo.quests) then
-			local questCount = itemInfo.questCount
-			if (questCount > 0) then
-				addLine("")
-				addLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embed)
-				addLine(_INFM('InfoQuestHeader'):format(questCount), "70ee90")
-				for pos, quest in pairs(itemInfo.quests) do
-					addLine(_INFM('InfoQuestName'):format(quest.count, quest.name, quest.level), "80ee80")
-				end
-				addLine(_INFM('InfoQuestSource'):format().." WoWGuru.com");
+		local numReq = 0
+		local numRew = 0
+		local numSta = 0
+		if (itemInfo.startsQuest) then numSta = 1 end
+		if (itemInfo.requiredFor) then numReq = #itemInfo.requiredFor end
+		if (itemInfo.rewardFrom) then numRew = #itemInfo.rewardFrom end
+
+		local questCount = numReq + numRew + numSta
+
+		if (questCount > 0) then
+			addLine("")
+			addLine(_INFM('FrmtInfoQuest'):format(questCount), nil, embed)
+
+			if (numSta > 0) then
+				addLine(_INFM('InfoQuestStartsHeader'), "70ee90")
+				addLine("  ".._INFM('InfoQuestLine'):format(getQuestName(itemInfo.startsQuest)), "80ee80")
 			end
+			if (numRew > 0) then
+				addLine(_INFM('InfoQuestRewardsHeader'):format(numRew), "70ee90")
+				for i=1, numReq do
+					quest = itemInfo.rewardFrom[i]
+					addLine("  ".._INFM('InfoQuestLine'):format(getQuestName(quest)), "80ee80")
+				end
+			end
+			if (numReq > 0) then
+				addLine(_INFM('InfoQuestRequiresHeader'):format(numReq), "70ee90")
+				for i=1, numReq do
+					quest = itemInfo.requiredFor[i]
+					addLine("  ".._INFM('InfoQuestLineMult'):format(quest[2], getQuestName(quest[1])), "80ee80")
+				end
+			end
+			addLine(_INFM('InfoQuestSource'):format().." WoWWatcher.com");
 		end
 
 		if (itemInfo.vendors) then
@@ -710,12 +783,17 @@ Informant = {
 	SetDatabase = setDatabase,
 	SetVendorBuy = setVendorBuy,
 	SetVendorSell = setVendorSell,
+	SetQuestStarts = setQuestStarts,
+	SetQuestRewards = setQuestRewards,
+	SetQuestRequires = setQuestRequires,
+	SetQuestNames = setQuestNames,
 	FrameActive = frameActive,
 	FrameLoaded = frameLoaded,
 	ScrollUpdate = scrollUpdate,
 	GetFilter = getFilter,
 	GetFilterVal = getFilterVal,
 	GetLocale = getLocale,
+	GetQuestName = getQuestName,
 	OnEvent = onEvent,
 	SetFilter = setFilter,
 	SetFilterDefaults = setFilterDefaults,

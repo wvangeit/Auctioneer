@@ -30,6 +30,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Informant_RegisterRevision("$URL$", "$Rev$")
 
 Informant_CustomLocalizations = {
 }

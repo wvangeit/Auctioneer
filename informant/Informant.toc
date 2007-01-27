@@ -10,17 +10,19 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Informant
-
+InfManifest.lua
 Babylonian\Babylonian.lua
 InfStrings.lua
 InfLocale.lua
 
-Informant.lua
+InfMain.lua
+
+Data\InfPrices.lua
+Data\InfQuests.lua
+
 InfCommand.lua
 InfTooltip.lua
-## InfTrades.lua
 InfQuests.lua
-InfPrices.lua
 InfData.lua
 
 Informant.xml
