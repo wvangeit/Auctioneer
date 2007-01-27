@@ -302,7 +302,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "Aukce";
 		TextCombat	= "Boj";
 		TextGeneral	= "Hlavni";
 		TextNone	= "nic";
@@ -755,7 +754,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "auktion";
 		TextCombat	= "Kamp";
 		TextGeneral	= "General";
 		TextNone	= "ingen";
@@ -1213,7 +1211,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "Auktion";
 		TextCombat	= "Kampflog";
 		TextGeneral	= "Allgemein";
 		TextNone	= "nichts";
@@ -1304,11 +1301,14 @@ AuctioneerLocalizations = {
 		AuctionDiscrepancies	= "Unstimmigkeiten: %s";
 		AuctionNewAucts	= "Davon neu: %s";
 		AuctionPageN	= "Auctioneer: Erfasse \"%s\", Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
+		AuctionScanAll	= "Scanne alle Auktionen.";
+		AuctionScanAuctions	= "Scanne Auktionen.";
+		AuctionScanCat	= "Scanne alle Auktionen fuer: %s.";
 		AuctionScanDone	= "Auctioneer: Scan abgeschlossen";
 		AuctionScanNexttime	= "Auctioneer wird einen vollständigen Auktionsscan durchführen, wenn das nächste Mal ein Auktionator angesprochen wird.";
 		AuctionScanNocat	= "Zum Scannen muss mindestens eine Kategorie ausgewählt sein.";
 		AuctionScanRedo	= "Das Erfassen der aktuelle Seite benötigte mehr als %d Sekunden, erneuter Versuch.";
-		AuctionScanStart	= "Auctioneer: Scanne %s Seite 1...";
+		AuctionScanStart	= "Auctioneer: %s Seite 1...";
 		AuctionTotalAucts	= "Insgesamt gescannte Auktionen: %s";
 		AuctionUpdatedAucts	= "Upgedatete/Geänderte Auktionen: %s";
 
@@ -1329,6 +1329,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "Startgebot (%s pro Stück)";
 		FrmtInfoMinOne	= "Startgebot";
 		FrmtInfoNever	= "Noch nie in %s gesehen";
+		FrmtInfoNeverAtAll	= "Noch nie im AH gesehn.";
 		FrmtInfoSeen	= "Insgesamt %d mal in Auktionen gesehen";
 		FrmtInfoSgst	= "Empfohlener Preis: %s min/%s Sofortkauf";
 		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s/%s pro Stück)";
@@ -1387,9 +1388,11 @@ AuctioneerLocalizations = {
 		UiSearchAuctions	= "Durchsuche Auktionen";
 		UiSearchDropDownLabel	= "Suche:";
 		UiSearchForLabel	= "Gegenstand suchen:";
+		UiSearchForOwnerLabel	= "Suche nach Items von:";
 		UiSearchTypeBids	= "Gebote";
 		UiSearchTypeBuyouts	= "Sofortkäufe";
 		UiSearchTypeCompetition	= "Konkurrenz";
+		UiSearchTypeOwner	= "Verkäufer";
 		UiSearchTypePlain	= "Gegenstand";
 		UiStacksLabel	= "Stapel";
 		UiStackTooBigError	= "(Stapel zu groß)";
@@ -1678,7 +1681,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "auction";
 		TextCombat	= "Combat";
 		TextGeneral	= "General";
 		TextNone	= "none";
@@ -1769,11 +1771,14 @@ AuctioneerLocalizations = {
 		AuctionDiscrepancies	= "Discrepancies: %s";
 		AuctionNewAucts	= "New auctions scanned: %s";
 		AuctionPageN	= "Auctioneer: scanning %s page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAdded to snapshot: %s";
+		AuctionScanAll	= "Scanning all auctions.";
+		AuctionScanAuctions	= "Scanning auctions.";
+		AuctionScanCat	= "Scanning all %s auctions.";
 		AuctionScanDone	= "Auctioneer: auction scanning finished";
 		AuctionScanNexttime	= "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 		AuctionScanNocat	= "You must have at least one category selected to scan.";
 		AuctionScanRedo	= "Current page took more than %d seconds to complete, retrying page.";
-		AuctionScanStart	= "Auctioneer: scanning %s page 1...";
+		AuctionScanStart	= "Auctioneer: %s Page 1...";
 		AuctionTotalAucts	= "Total auctions scanned: %s";
 		AuctionUpdatedAucts	= "Updated/Changed auctions: %s";
 
@@ -1794,6 +1799,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "Starting bid (%s ea)";
 		FrmtInfoMinOne	= "Starting bid";
 		FrmtInfoNever	= "Never seen at %s";
+		FrmtInfoNeverAtAll	= "Never seen at auction";
 		FrmtInfoSeen	= "Seen %d times at auction total";
 		FrmtInfoSgst	= "Suggested price: %s min/%s BO";
 		FrmtInfoSgststx	= "Suggested price for your %d stack: %s min/%s BO (%s/%s ea)";
@@ -1852,9 +1858,11 @@ AuctioneerLocalizations = {
 		UiSearchAuctions	= "Search Auctions";
 		UiSearchDropDownLabel	= "Search:";
 		UiSearchForLabel	= "Search For Item:";
+		UiSearchForOwnerLabel	= "Search For Item's Posted By:";
 		UiSearchTypeBids	= "Bids";
 		UiSearchTypeBuyouts	= "Buyouts";
 		UiSearchTypeCompetition	= "Competition";
+		UiSearchTypeOwner	= "Seller";
 		UiSearchTypePlain	= "Item";
 		UiStacksLabel	= "Stacks";
 		UiStackTooBigError	= "(Stack Too Big)";
@@ -2118,6 +2126,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Game Constants
+		SubTypeBag	= "Bolsa";
 		TimeLong	= "Largo";
 		TimeMed	= "Medio";
 		TimeShort	= "Corto";
@@ -2142,7 +2151,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "Subasta";
 		TextCombat	= "Combate";
 		TextGeneral	= "General";
 		TextNone	= "nada";
@@ -2582,6 +2590,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Game Constants
+		SubTypeBag	= "Sac";
 		TimeLong	= "Longue";
 		TimeMed	= "Moyenne";
 		TimeShort	= "Courte";
@@ -2606,7 +2615,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "Enchère";
 		TextCombat	= "Combat";
 		TextGeneral	= "Général";
 		TextNone	= "Aucun";
@@ -3058,7 +3066,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "Asta";
 		TextCombat	= "Combattimento";
 		TextGeneral	= "Generale";
 		TextNone	= "nessuno";
@@ -3491,6 +3498,7 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Game Constants
+		SubTypeBag	= "가방";
 		TimeLong	= "장기";
 		TimeMed	= "중기";
 		TimeShort	= "단기";
@@ -3515,7 +3523,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "경매";
 		TextCombat	= "전투";
 		TextGeneral	= "일반";
 		TextNone	= "없음";
@@ -3689,9 +3696,11 @@ AuctioneerLocalizations = {
 		UiSearchAuctions	= "경매 검색";
 		UiSearchDropDownLabel	= "검색";
 		UiSearchForLabel	= "아이템으로 검색:";
+		UiSearchForOwnerLabel	= "아이템 게시자로 검색:";
 		UiSearchTypeBids	= "입찰";
 		UiSearchTypeBuyouts	= "즉시 구입";
 		UiSearchTypeCompetition	= "경쟁";
+		UiSearchTypeOwner	= "판매자";
 		UiSearchTypePlain	= "아이템";
 		UiStacksLabel	= "묶음";
 		UiStackTooBigError	= "(묶음이 너무 큼)";
@@ -3902,7 +3911,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "veiling";
 		TextCombat	= "Gevecht";
 		TextGeneral	= "Algemeen";
 		TextNone	= "geen";
@@ -4348,7 +4356,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "leilÃ£o";
 		TextCombat	= "Combate";
 		TextGeneral	= "Geral";
 		TextNone	= "nenhum";
@@ -4805,7 +4812,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "аукцион";
 		TextCombat	= "Бой";
 		TextGeneral	= "Основной";
 		TextNone	= "нет";
@@ -5231,7 +5237,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "拍卖";
 		TextCombat	= "战斗";
 		TextGeneral	= "常规";
 		TextNone	= "无";
@@ -5676,7 +5681,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "拍賣";
 		TextCombat	= "戰鬥";
 		TextGeneral	= "一般";
 		TextNone	= "無";
@@ -6087,7 +6091,6 @@ AuctioneerLocalizations = {
 
 
 		-- Section: Generic Strings
-		TextAuction	= "aÃ§Ä±k arttÄ±rma";
 		TextCombat	= "DÃ¶vÃ¼ÅŸ";
 		TextGeneral	= "Genel";
 		TextNone	= "hiÃ§birÅŸey";
