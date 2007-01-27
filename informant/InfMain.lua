@@ -412,8 +412,8 @@ function showHideInfo(iType, iId)
 	elseif (iType == "curitem") then
 		showItem(Informant.itemInfo)
 	elseif (iType == "item") then
-		showItem(get
-		
+	elseif (iType == "quest") then
+	end
 end
 local function showItem(itemInfo)
 	if (itemInfo) then
