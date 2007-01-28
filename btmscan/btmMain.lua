@@ -24,6 +24,11 @@ BtmScanData = {}
 local tr = BtmScan.Locales.Translate
 local data, dataZone
 
+-- Used to control whether BTM tooltip includes help message for items with no "sanity" price history
+-- Preferred setting is true, to eliminate tooltip (for BoP items and others which can't be auctioned)
+-- Right after updates when we don't have all new items uploaded, can be set to false
+local upToDateConservativePrices = false
+
 BTMSCAN_VERSION = "<%version%>"
 if (BTMSCAN_VERSION == "<\037version%>") then
 	BTMSCAN_VERSION = "3.9.0-DEV"
@@ -1567,6 +1572,16 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 				end
 				EnhTooltip.AddLine("  "..tr("Last %1 for %2%3",  bidType, whyBuy, ago), tonumber(howMuch) or 0)
 				EnhTooltip.LineColor(0.2,0.4,0.9)
+			end
+		else
+			-- No sanity key, means we don't have cross-server prices for the item.  
+			-- Since Baserule can depend on these prices, we can't show any BTM valuation
+			-- Display message if BtmPrices.lua file isn't up to date
+			if (not upToDateConservativePrices) then
+				EnhTooltip.AddLine(tr("BottomScanner prices"))
+				EnhTooltip.LineColor(0.9,0.6,0.2)
+				EnhTooltip.AddLine("  "..tr("Not (yet) available for this item"))
+				EnhTooltip.LineColor(0.9,0.6,0.2)
 			end
 		end
 	end
