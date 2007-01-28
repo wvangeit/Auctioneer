@@ -165,7 +165,8 @@ function cleanupDisenchant(str, id)
 			local clean = {}
 			ilevel = Enchantrix.Util.RoundUp(ilevel, 5)
 			for id, counts in pairs(tbl) do
-				if const.LevelRules[itype][ilevel][id] then
+				if itype and ilevel and const.LevelRules[itype] and const.LevelRules[itype][ilevel]
+				and const.LevelRules[itype][ilevel][id] then
 					if quality == 2 then
 						-- Uncommon item, remove nexus crystal
 						if (const.LevelRules[itype][ilevel][id] < const.CRYSTAL) then
@@ -177,6 +178,8 @@ function cleanupDisenchant(str, id)
 							clean[id] = counts
 						end
 					end
+				else
+					Enchantrix.Debug.Util(N_WARNING, "Cleanup", "Unknown level rules", "Level rules for item",id,"are unknown\n  equip =",equip,"\n  itype=",itype,"\n  ilevel=",ilevel) 
 				end
 			end
 			return serialize(clean)
