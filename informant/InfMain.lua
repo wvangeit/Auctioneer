@@ -194,7 +194,7 @@ function getItem(itemID)
 		dataItem.classText = catName..addition
 	end
 
-	if (usedby ~= '') then
+	if (usedby and usedby ~= '') then
 		local usedList = split(usedby, ",")
 		local skillName, localized, localeString
 		local usage = ""
