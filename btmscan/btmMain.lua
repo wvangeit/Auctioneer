@@ -442,7 +442,7 @@ BtmScan.PageScan = function(resume)
 								end
 
 								if (iBuy > bBase * 100) then ignoreIt = true end
-							end
+							end	-- if (sanity)
 
 							--Get the itemMinLevel for use with disenchant options
 							local _, _, _, _, itemMinLevel = GetItemInfo(itemID)
@@ -1850,6 +1850,15 @@ BtmScan.Prompt:SetBackdrop({
 	insets = { left = 9, right = 9, top = 9, bottom = 9 }
 })
 BtmScan.Prompt:SetBackdropColor(0,0,0, 0.8)
+BtmScan.Prompt:SetMovable(true)
+
+BtmScan.Prompt.Drag = CreateFrame("Button", "", BtmScan.Prompt)
+BtmScan.Prompt.Drag:SetPoint("TOPLEFT", BtmScan.Prompt, "TOPLEFT", 10,-5)
+BtmScan.Prompt.Drag:SetPoint("TOPRIGHT", BtmScan.Prompt, "TOPRIGHT", -10,-5)
+BtmScan.Prompt.Drag:SetHeight(6)
+BtmScan.Prompt.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+BtmScan.Prompt.Drag:SetScript("OnMouseDown", function() BtmScan.Prompt:StartMoving() end)
+BtmScan.Prompt.Drag:SetScript("OnMouseUp", function() BtmScan.Prompt:StopMovingOrSizing() end)
 
 BtmScan.Prompt.Item = CreateFrame("Button", "", BtmScan.Prompt)
 BtmScan.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
