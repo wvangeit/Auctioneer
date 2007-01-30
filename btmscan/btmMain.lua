@@ -1526,53 +1526,6 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 				EnhTooltip.AddLine("    ("..tr("Deposit Cost")..")", deposit)
 				EnhTooltip.LineColor(0.9,0.8,0.4)
 			end
-
-			if (data.snatch[sanityKey]) then
-				local sdata = data.snatch[sanityKey]
-				local price, count, stack
-				local snatchLine = ""
-				if (type(sdata) ~= "table") then
-					price = tonumber(amount) or 0
-					count = 0
-					stack = 0
-				else
-					price = tonumber(sdata[1]) or 0
-					count = tonumber(sdata[2]) or 0
-					stack = tonumber(sdata[3]) or 0
-				end
-				if (count == 0) then
-					EnhTooltip.AddLine("  "..tr("Snatch it at"), price)
-				else
-					local fulfilled = tonumber(data.snatched[sanityKey]) or 0
-					EnhTooltip.AddLine("  "..tr("Snatch %1 (%2 done)", count, fulfilled), price)
-				end
-				EnhTooltip.LineColor(0.9,0.9,0.2)
-				if (stack > 1) then
-					EnhTooltip.AddLine("    "..tr("(or per %1 stack)", stack), price * stack)
-					EnhTooltip.LineColor(0.9,0.9,0.2)
-				end
-			end
-
-			if (BtmScan.sessionSpend and BtmScan.sessionSpend[sanityKey]) then
-				local sspend = BtmScan.sessionSpend[sanityKey]
-				EnhTooltip.AddLine("  "..tr("SafetyNet: %1 bought",  sspend.count), tonumber(sspend.cost) or 0)
-				EnhTooltip.LineColor(0.9,0.6,0.2)
-			end
-
-			local bidSig = link.."x"..count
-			if (data.bids and data.bids[bidSig]) then
-				local whyBuy = data.bids[bidSig][1]
-				local howMuch = data.bids[bidSig][2]
-				local bidType = data.bids[bidSig][3] or tr("bought")
-				local tStamp = data.bids[bidSig][4]
-				local ago = ""
-				if (tStamp) then
-					local elapsed = time() - tStamp
-					ago = tr(" (%1 ago)", SecondsToTime(elapsed))
-				end
-				EnhTooltip.AddLine("  "..tr("Last %1 for %2%3",  bidType, whyBuy, ago), tonumber(howMuch) or 0)
-				EnhTooltip.LineColor(0.2,0.4,0.9)
-			end
 		else
 			-- No sanity key, means we don't have cross-server prices for the item.  
 			-- Since Baserule can depend on these prices, we can't show any BTM valuation
@@ -1583,6 +1536,53 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 				EnhTooltip.AddLine("  "..tr("Not (yet) available for this item"))
 				EnhTooltip.LineColor(0.9,0.6,0.2)
 			end
+		end
+
+		if (data.snatch[sanityKey]) then
+			local sdata = data.snatch[sanityKey]
+			local price, count, stack
+			local snatchLine = ""
+			if (type(sdata) ~= "table") then
+				price = tonumber(amount) or 0
+				count = 0
+				stack = 0
+			else
+				price = tonumber(sdata[1]) or 0
+				count = tonumber(sdata[2]) or 0
+				stack = tonumber(sdata[3]) or 0
+			end
+			if (count == 0) then
+				EnhTooltip.AddLine("  "..tr("Snatch it at"), price)
+			else
+				local fulfilled = tonumber(data.snatched[sanityKey]) or 0
+				EnhTooltip.AddLine("  "..tr("Snatch %1 (%2 done)", count, fulfilled), price)
+			end
+			EnhTooltip.LineColor(0.9,0.9,0.2)
+			if (stack > 1) then
+				EnhTooltip.AddLine("    "..tr("(or per %1 stack)", stack), price * stack)
+				EnhTooltip.LineColor(0.9,0.9,0.2)
+			end
+		end
+
+		if (BtmScan.sessionSpend and BtmScan.sessionSpend[sanityKey]) then
+			local sspend = BtmScan.sessionSpend[sanityKey]
+			EnhTooltip.AddLine("  "..tr("SafetyNet: %1 bought",  sspend.count), tonumber(sspend.cost) or 0)
+			EnhTooltip.LineColor(0.9,0.6,0.2)
+		end
+
+		local bidSig = link.."x"..count
+		if (data.bids and data.bids[bidSig]) then
+			local whyBuy = data.bids[bidSig][1]
+			local howMuch = data.bids[bidSig][2]
+			local bidType = data.bids[bidSig][3] or tr("bought")
+			local tStamp = data.bids[bidSig][4]
+			local ago = ""
+			if (tStamp) then
+				local elapsed = time() - tStamp
+				ago = tr(" (%1 ago)", SecondsToTime(elapsed))
+			end
+			EnhTooltip.AddLine("  "..tr("Last %1 for %2%3",  bidType, whyBuy, ago), tonumber(howMuch) or 0)
+			EnhTooltip.LineColor(0.2,0.4,0.9)
 		end
 	end
 end
