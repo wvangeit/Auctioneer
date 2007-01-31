@@ -30,7 +30,7 @@
 --]]
 
 -- Debug switch - set to true, to enable debug output for this module
-local debug = true
+local debug = false
 
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
