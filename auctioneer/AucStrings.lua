@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://norganna.org/localizer/index.php
+	http://www.norganna.org/localizer/index.php
 
 	AddOn: Auctioneer
 	Revision: $Id$
@@ -1300,10 +1300,10 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Abgelaufene Auktionen: %s";
 		AuctionDiscrepancies	= "Unstimmigkeiten: %s";
 		AuctionNewAucts	= "Davon neu: %s";
-		AuctionPageN	= "Auctioneer: Erfasse \"%s\", Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
+		AuctionPageN	= "Auctioneer: %s Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
 		AuctionScanAll	= "Scanne alle Auktionen.";
 		AuctionScanAuctions	= "Scanne Auktionen.";
-		AuctionScanCat	= "Scanne alle Auktionen fuer: %s.";
+		AuctionScanCat	= "Scanne alle Auktionen für: %s.";
 		AuctionScanDone	= "Auctioneer: Scan abgeschlossen";
 		AuctionScanNexttime	= "Auctioneer wird einen vollständigen Auktionsscan durchführen, wenn das nächste Mal ein Auktionator angesprochen wird.";
 		AuctionScanNocat	= "Zum Scannen muss mindestens eine Kategorie ausgewählt sein.";
@@ -1329,7 +1329,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "Startgebot (%s pro Stück)";
 		FrmtInfoMinOne	= "Startgebot";
 		FrmtInfoNever	= "Noch nie in %s gesehen";
-		FrmtInfoNeverAtAll	= "Noch nie im AH gesehn.";
+		FrmtInfoNeverAtAll	= "Noch nie im AH gesehen.";
 		FrmtInfoSeen	= "Insgesamt %d mal in Auktionen gesehen";
 		FrmtInfoSgst	= "Empfohlener Preis: %s min/%s Sofortkauf";
 		FrmtInfoSgststx	= "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s/%s pro Stück)";
@@ -1698,7 +1698,7 @@ AuctioneerLocalizations = {
 		HelpAskPriceSmart	= "Enable or disable SmartWords checking.";
 		HelpAskPriceTrigger	= "Change AskPrice's trigger character.";
 		HelpAskPriceVendor	= "Enable or disable the sending of vendor pricing data.";
-		HelpAskPriceWhispers	= "Enable or disable the hiding of all AskPrice outgoing whispers.";
+		HelpAskPriceWhispers	= "Shows (on) or hides (off) outgoing whispers from Askprice.\n";
 		HelpAskPriceWord	= "Add or modify AskPrice's custom SmartWords.";
 		HelpAuctionClick	= "Allows you to Alt-Click an item in your bag to automatically start an auction for it";
 		HelpAuctionDuration	= "Set the default auction duration upon opening the Auction House interface";
@@ -1770,7 +1770,7 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Defunct auctions removed: %s";
 		AuctionDiscrepancies	= "Discrepancies: %s";
 		AuctionNewAucts	= "New auctions scanned: %s";
-		AuctionPageN	= "Auctioneer: scanning %s page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAdded to snapshot: %s";
+		AuctionPageN	= "Auctioneer: %s Page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAdded to snapshot: %s";
 		AuctionScanAll	= "Scanning all auctions.";
 		AuctionScanAuctions	= "Scanning auctions.";
 		AuctionScanCat	= "Scanning all %s auctions.";
@@ -2241,6 +2241,9 @@ AuctioneerLocalizations = {
 		AuctionDiscrepancies	= "Discrepancias: %s";
 		AuctionNewAucts	= "Nuevas subastas exploradas: %s";
 		AuctionPageN	= "Auctioneer: Explorando \"%s\" página %d de %d\nSubastas por segundo: %s\nTiempo restante estimado: %s\nAñadido a imagen: %s";
+		AuctionScanAll	= "Explorando todas las subastas.";
+		AuctionScanAuctions	= "Explorando subastas.";
+		AuctionScanCat	= "Explorando todas las subastas en %s.";
 		AuctionScanDone	= "Auctioneer: La exploración de las subastas ha finalizado";
 		AuctionScanNexttime	= "Auctioneer realizará una exploración completa de las subastas la próxima vez que hables con un subastador.";
 		AuctionScanNocat	= "Debes tener al menos una categoría seleccionada para poder explorar.";
@@ -2266,6 +2269,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "  Puja inicial (%s c/u)";
 		FrmtInfoMinOne	= "  Puja inicial";
 		FrmtInfoNever	= "Nunca visto en %s";
+		FrmtInfoNeverAtAll	= "Nunca visto en subasta";
 		FrmtInfoSeen	= "Visto un total de %d veces en subasta";
 		FrmtInfoSgst	= "Precio sugerido: %s min/%s compra";
 		FrmtInfoSgststx	= "Precio sugerido para su lote de %d: %s min/%s compra";
@@ -2324,9 +2328,11 @@ AuctioneerLocalizations = {
 		UiSearchAuctions	= "Buscar Subastas";
 		UiSearchDropDownLabel	= "Buscar:";
 		UiSearchForLabel	= "Buscar por artículo:";
+		UiSearchForOwnerLabel	= "Buscar por artículos publicados por:";
 		UiSearchTypeBids	= "Pujas";
 		UiSearchTypeBuyouts	= "Compras";
 		UiSearchTypeCompetition	= "Competencia";
+		UiSearchTypeOwner	= "Vendedor";
 		UiSearchTypePlain	= "Artículo";
 		UiStacksLabel	= "Lotes";
 		UiStackTooBigError	= "(Lote Demasiado Grande)";
@@ -3613,6 +3619,9 @@ AuctioneerLocalizations = {
 		AuctionDiscrepancies	= "차이나는 수량: %s";
 		AuctionNewAucts	= "새롭게 검색된 경매 물품 수량: %s";
 		AuctionPageN	= "Auctioneer: %s %d/%d 페이지 검색중..\n초당 검색 경매품: %s\n남은 예상 시간: %s\n기록에 추가됨: %s";
+		AuctionScanAll	= "모든 경매를 검색합니다.";
+		AuctionScanAuctions	= "경매를 검색합니다.";
+		AuctionScanCat	= "모든 %s 경매를 검색합니다.";
 		AuctionScanDone	= "Auctioneer: 경매 물품 검색 완료";
 		AuctionScanNexttime	= "다음번 경매인과 대화할 때, Auctioneer는 전체 검색을 할 것입니다.";
 		AuctionScanNocat	= "검색을 위해 최소한 한개 이상의 분류를 선택하여야 합니다.";
@@ -3638,6 +3647,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "경매 시작가 (%s 개)";
 		FrmtInfoMinOne	= "경매 시작가";
 		FrmtInfoNever	= "%s에서 검색된적 없음";
+		FrmtInfoNeverAtAll	= "경매에서 검색된 적 없음";
 		FrmtInfoSeen	= "전체 경매에서 %d회 검색됨";
 		FrmtInfoSgst	= "제안 가격: 최저 %s /%s 즉시 구입가";
 		FrmtInfoSgststx	= "%d 개에 대한 제안 가격: 최저가 %s/ 즉시 구입가 %s";

@@ -30,7 +30,7 @@
 --]]
 
 -- Debug switch - set to true, to enable debug output for this module
-local debug = false
+local debug = true
 
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
@@ -454,13 +454,18 @@ end
 
 function sendWhisper(message, player)
 	whisperList[message] = true
+	debugPrint("Sending whisper to " .. player..": " .. message)
+	debugPrint("askprice-whispers is set to: ", Auctioneer.Command.GetFilter('askprice-whispers'))
 	SendChatMessage(message, "WHISPER", Auctioneer.AskPrice.Language, player)
 end
 
 function onEventHook() --%ToDo% Change the prototype once Blizzard changes their functions to use paramenters instead of globals.
-	if (Auctioneer.Command.GetFilter('askprice-whisper')) then
-		if ((event == "CHAT_MSG_WHISPER_INFORM") and (whisperList[arg1])) then
-			return "killorig"
+	if (event == "CHAT_MSG_WHISPER_INFORM") then
+		if (whisperList[arg1]) then
+			whisperList[arg1] = nil
+			if (Auctioneer.Command.GetFilter('askprice-whispers')=false) then
+				return "killorig"
+			end
 		end
 	end
 end
