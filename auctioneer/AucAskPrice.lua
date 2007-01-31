@@ -463,7 +463,7 @@ function onEventHook() --%ToDo% Change the prototype once Blizzard changes their
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
 		if (whisperList[arg1]) then
 			whisperList[arg1] = nil
-			if (Auctioneer.Command.GetFilter('askprice-whispers')=false) then
+			if (Auctioneer.Command.GetFilter('askprice-whispers')==false) then
 				return "killorig"
 			end
 		end
