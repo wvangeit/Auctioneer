@@ -292,8 +292,9 @@
 						if (itemKey) then
 							local itemLink = Auctioneer.ItemDB.GetItemLink(itemKey);
 							if (itemLink) then
+								local longItemKey = parent:GetLongItemKey();
 								GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-								GameTooltip:SetHyperlink(Auctioneer.ItemDB.GetItemString(itemKey));
+								GameTooltip:SetHyperlink(Auctioneer.ItemDB.GetLongItemString(longItemKey));
 								GameTooltip:Show();
 								EnhTooltip.TooltipCall(
 									GameTooltip,

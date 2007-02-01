@@ -55,6 +55,7 @@ function load()
 	frame.UpdateDeposit = AuctionFramePost_UpdateDeposit;
 	frame.GetItemID = AuctionFramePost_GetItemID;
 	frame.GetItemKey = AuctionFramePost_GetItemKey;
+	frame.GetLongItemKey = AuctionFramePost_GetLongItemKey;
 	frame.GetItemName = AuctionFramePost_GetItemName;
 	frame.SetNoteText = AuctionFramePost_SetNoteText;
 	frame.GetSavePrice = AuctionFramePost_GetSavePrice;
@@ -532,6 +533,13 @@ function AuctionFramePost_GetItemKey(frame)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the long item key (with uniqueId).
+-------------------------------------------------------------------------------
+function AuctionFramePost_GetLongItemKey(frame)
+	return frame.longItemKey;
+end
+
+-------------------------------------------------------------------------------
 -- Gets the item name.
 -------------------------------------------------------------------------------
 function AuctionFramePost_GetItemName(frame)
@@ -700,6 +708,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Save the item's information.
 		frame.itemId = itemId;
 		frame.itemKey = Auctioneer.ItemDB.CreateItemKeyFromLink(itemLink);
+		frame.longItemKey = strjoin(":", itemId, randomProp, enchant, uniqueId);
 		frame.itemName = name;
 
 		-- Show the item
@@ -744,6 +753,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Clear the item's information.
 		frame.itemId = nil;
 		frame.itemKey = nil;
+		frame.longItemKey = nil;
 		frame.itemName = nil;
 
 		-- Hide the item

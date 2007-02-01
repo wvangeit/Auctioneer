@@ -346,6 +346,15 @@ function getItemString(itemKey)
 end
 
 -------------------------------------------------------------------------------
+-- Gets the long itemString (item:itemId:enchantId:suffixId:uniqueID) for the specified
+-- item.
+-------------------------------------------------------------------------------
+function getLongItemString(itemKey)
+	local itemId, suffixId, enchantId, uniqueID = breakItemKey(itemKey);
+	return ("item:%s:%s:0:0:0:0:%s:%s"):format(itemId, enchantId, suffixId, uniqueID);
+end
+
+-------------------------------------------------------------------------------
 -- Gets the item's category (aka numeric version of itemType)
 -------------------------------------------------------------------------------
 function getItemCategory(itemKey)
@@ -544,6 +553,7 @@ Auctioneer.ItemDB = {
 	GetItemName = getItemName;
 	GetItemLink = getItemLink;
 	GetItemString = getItemString;
+	GetLongItemString = getLongItemString;
 	GetItemCategory = getItemCategory;
 	GetItemQuality = getItemQuality;
 	IsPlayerMade = isPlayerMade;
