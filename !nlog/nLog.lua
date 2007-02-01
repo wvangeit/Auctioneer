@@ -20,8 +20,8 @@
 
 -- /run for i = 1, 100000 do nLog.AddMessage("Auctioneer", N_NOTICE, "Scan", "Empty Auction "..i, "Found empty auction with item "..i) end
 
--- Call nLog.AddMessage(addon, level, type, title, detail)
--- Eg: nLog.AddMessage("Auctioneer", N_NOTICE, "Scan", "Empty Auction", "Found empty auction on page 10")
+-- Call nLog.AddMessage(addon, filename, level, type, title, detail)
+-- Eg: nLog.AddMessage("Auctioneer", "AucAskPrice.lua", N_NOTICE, "Scan", "Empty Auction", "Found empty auction on page 10")
 
 -- Message Levels
 N_CRITICAL = 1
