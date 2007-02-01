@@ -213,13 +213,8 @@ function addOnLoaded()
 	--Ready to rock and roll!
 	Auctioneer.Util.ChatPrint(_AUCT('FrmtWelcome'):format(Auctioneer.Version), 0.8, 0.8, 0.2);
 
-	--Inform the user of the constants limit if it has been two loads without a check
-	if (Auctioneer.Command.GetFilterVal("constants-warning") <= 0) then
-		Auctioneer.Util.CheckConstantsLimit()
-		Auctioneer.Command.SetFilter("constants-warning", 2)
-	else
-		Auctioneer.Command.SetFilter("constants-warning", Auctioneer.Command.GetFilterVal("constants-warning") - 1)
-	end
+	--Check number of constants in SV file
+	Auctioneer.Util.CheckConstantsLimit()
 
  	-- Cleanup after that massive mem spike.
 	collectgarbage("collect");
