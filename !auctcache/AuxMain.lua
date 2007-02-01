@@ -113,7 +113,9 @@ function Aux.StorePage()
 	end
 end
 
+local lastThrow
 function Aux.ThrowUpdate()
+	lastThrow = GetTime()
 	AuctionFrameBrowse_Update()
 	if (Stubby) then Stubby.Events("AUCTION_ITEM_LIST_UPDATE") end
 end
@@ -124,6 +126,9 @@ function CanSendAuctionQuery(...)
 	-- See if we are in caching mode.
 	if Aux.amCaching then
 		local interval = Aux.pageInterval or 0.5
+		if not lastThrow or GetTime() - lastThrow > 0.5 then
+			Aux.ThrowUpdate()
+		end
 		if not Aux.lastReq or GetTime() - Aux.lastReq > interval then
 			return true
 		else
@@ -180,7 +185,7 @@ function GetNumAuctionItems(...)
 		local numAucts = #AuxData.snap
 		local page = Aux.curQuery.page
 		local maxPages = math.ceil(numAucts/NUM_AUCTION_ITEMS_PER_PAGE)
-		if (page == maxPages) then
+		if (page == maxPages-1) then
 			return numAucts % NUM_AUCTION_ITEMS_PER_PAGE, numAucts
 		end
 		return NUM_AUCTION_ITEMS_PER_PAGE, numAucts
@@ -237,13 +242,17 @@ function GetAuctionItemInfo(...)
 	if lType == "list" and Aux.amCaching then
 		if (not Aux.curQuery) then return end
 		-- Do our funky cache thingo
-		local page = Aux.curQuery.page
-		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
+		local page = Aux.curQuery.page or 0
+		local curPos = (page * NUM_AUCTION_ITEMS_PER_PAGE) + lPos
 		local data = AuxData.snap[curPos]
 		if (data) then
-			return unpack(data, NAME, SELLER)
+			local name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner = unpack(data, NAME, SELLER)
+			if (Aux.noBlankOwner) then
+				owner = owner or "Anon"
+			end
+			return name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner
 		end
-		return
+		return nil,nil,1,-1,nil,0,0,0,0,0,nil,nil
 	end
 
 	-- Call the original hook
