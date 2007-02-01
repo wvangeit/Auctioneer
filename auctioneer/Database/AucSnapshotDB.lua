@@ -114,7 +114,7 @@ local LoadedSnapshotDB;
 
 -- The current version of the snapshot database. This number must be incremented
 -- anytime a change is made to the database schema.
-local CURRENT_SNAPSHOTDB_VERSION = 2; -- Auctioneer 4.0
+local CURRENT_SNAPSHOTDB_VERSION = 3; -- Auctioneer 4.0
 
 -- Map of time left index to time left seconds.
 local TimeLeftInSeconds = Auctioneer.Core.Constants.TimeLeft.Seconds
@@ -329,6 +329,7 @@ function upgradeAHDatabase(ah)
 				ah.auctionIdsByItemKey[x] = val;
 			end
 		end
+		ah.version = 3;
 	end
 
 	-- Return the result of the upgrade!
@@ -487,7 +488,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 					end
 					table.insert(auctionsInSnapshot, auction);
 				else
-					debugPrint("WARNING: AuctionIdsForItemKey orrupted!");
+					debugPrint("WARNING: AuctionIdsForItemKey corrupted!");
 				end
 			end
 		end
@@ -955,7 +956,7 @@ function removeAuctionFromSnapshot(ah, auction)
 	-- Remove the auction id from the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	if (ah.auctionIdsByItemKey[itemKey]) then
-		local auctionIds = {strsplit(";", itemKey)}
+		local auctionIds = {strsplit(";", ah.auctionIdsByItemKey[itemKey])}
 		ah.auctionIdsByItemKey[itemKey]=nil
 		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
