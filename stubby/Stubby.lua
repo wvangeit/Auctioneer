@@ -432,7 +432,7 @@ end
 
 function unregisterFunctionHook(triggerFunction, hookFunc)
 	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then return end
-	for pos, funcObj in ipairs(config.calls.functions[triggerFunction]) do
+	for pos, funcObj in pairs(config.calls.functions[triggerFunction]) do
 		if (funcObj and funcObj.f == hookFunc) then
 			config.calls.functions[triggerFunction][pos] = nil
 		end
