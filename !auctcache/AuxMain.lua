@@ -171,7 +171,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			return Aux.ThrowUpdate()
 		end
 	end
-	p("Query:", name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 	Aux.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
 
