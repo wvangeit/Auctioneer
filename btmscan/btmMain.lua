@@ -199,6 +199,7 @@ BtmScan.OnUpdate = function(...)
 		local page = BtmScan.pageCount-offset or 0
 		if not Auctioneer.ScanManager.IsScanning() then
 			-- Auctioneer is not scanning, so  lets send  off a query
+			AuctionFrameBrowse.page = page
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 		else
 			-- If Auctioneer is currently scanning, then we just need to piggyback it's calls.
@@ -402,7 +403,7 @@ BtmScan.PageScan = function(resume)
 									price = iBid
 									value = bBase
 									bidIt = true
-								elseif action == "buy" then
+								elseif action == "buy" and (tonumber(iBuy) or 0) > 0 then
 									if (not bBase or bBase == 0) then bBase = iBuy*iCount end
 									whyBuy = BtmScan.prices.reason or tr("Actioned")
 									price = iBuy
