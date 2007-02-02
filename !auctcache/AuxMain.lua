@@ -102,12 +102,12 @@ end
 
 function Aux.ScanPage(nextPage)
 	Aux.curPage = nextPage
-	QueryAuctionItems("", "", "", nil, Aux.curCat, nil, nextPage, nil, nil)
+	Aux.Hook.QueryAuctionItems("", "", "", nil, Aux.curCat, nil, nextPage, nil, nil)
 end
 
 function Aux.StorePage()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-	local maxPages = floor(totalAuctions / Aux.numPerPage);
+	local maxPages = floor(totalAuctions / 50);
 	if (not Aux.curScan) then Aux.curScan = {} end
 
 	-- Take a snapshot of everything we've got so far.
@@ -267,7 +267,7 @@ Aux.Hook = {}
 Aux.Hook.CanSendAuctionQuery = CanSendAuctionQuery
 function CanSendAuctionQuery(...)
 	-- See if we are in caching mode.
-	if Aux.amCaching then
+	if not Aux.isScanning and Aux.amCaching then
 		local interval = Aux.pageInterval or 0.5
 		if scheduleThrow and GetTime() - lastThrow > 0.5 then
 			Aux.ThrowUpdate()
