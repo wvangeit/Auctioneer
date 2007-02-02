@@ -1875,12 +1875,19 @@ function protectWindow(param, chatprint)
 
 	if (param == 'never' or param == 'off' or param == _AUCT('CmdProtectWindow0') or param == _AUCT('CmdOff') or tonumber(param) == 0) then
 		mode = 0;
+		Auctioneer.Util.ProtectAuctionFrame(false);
 
 	elseif (param == 'scan' or param == _AUCT('CmdProtectWindow1') or tonumber(param) == 1) then
 		mode = 1;
+		if (Auctioneer.ScanManager.IsScanning) then
+			Auctioneer.Util.ProtectAuctionFrame(true);
+		else
+			Auctioneer.Util.ProtectAuctionFrame(false);
+		end
 
 	elseif (param == 'always' or param == _AUCT('CmdProtectWindow2') or tonumber(param) == 2) then
 		mode = 2;
+		Auctioneer.Util.ProtectAuctionFrame(true);
 
 	else
 		Auctioneer.Util.ChatPrint(_AUCT('FrmtUnknownArg'):format(param, Auctioneer.Util.LocalizeCommand("protect-window")));

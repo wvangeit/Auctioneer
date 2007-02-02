@@ -144,7 +144,7 @@ function scan()
 			table.insert(categories, category);
 		end
 	end
-
+	
 	-- Scan everything or only selected categories?
 	if (#allCategories == #categories) then
 		debugPrint("Scanning all categories");
@@ -406,6 +406,12 @@ function scanStarted()
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
 
+	-- Protect window if needed
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
+		-- We're set to protect only while scanning, so protect the window now
+		Auctioneer.Util.ProtectAuctionFrame(true);
+	end
+
 	-- Scanning has begun!
 	Scanning = true;
 	Auctioneer.Scanning.IsScanningRequested = true;
@@ -421,6 +427,12 @@ function scanEnded()
 	Scanning = false;
 	Auctioneer.Scanning.IsScanningRequested = false;
 	debugPrint("Scan ended with result:", LastRequestResult);
+
+	-- Un-Protect window if needed
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
+		-- We're set to protect only while scanning, so it's time to unprotect the window
+		Auctioneer.Util.ProtectAuctionFrame(false);
+	end
 
 	-- Unregister for snapshot events.
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
