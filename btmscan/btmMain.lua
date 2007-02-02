@@ -345,59 +345,77 @@ BtmScan.PageScan = function(resume)
 							--   Note these are compiled averages from all factions and servers
 							--   This is meant to "double check" the Auctioneer prices, if both
 							--   agree that this item is a "good buy", only then will we buy it
-							local sanity = BtmScan.ConfidenceList[sanityKey]
-							local iqm, iqwm, iqCount, bBase, bCount
-							if (sanity) then
-								local iqm, iqwm, iqCount = strsplit(",", sanity)
-								iqm = tonumber(iqm)
-								iqwm = tonumber(iqwm)
-								iqCount = tonumber(iqCount)
-								bCount = data.minSeen
-								bBase = iqwm
+							local sanity = BtmScan.ConfidenceList[sanityKey] or ""
+							local bBase, bCount
+							local iqm, iqwm, iqCount = strsplit(",", sanity)
+							iqm = tonumber(iqm) or 0
+							iqwm = tonumber(iqwm) or 0
+							iqCount = tonumber(iqCount) or 0
+							bCount = data.minSeen
+							bBase = iqwm
 
-								-- Use the worst case scenario from inbuilt or auctioneer prices
-								-- (if available)
-								local auctMedian, auctCount
-								if (Auctioneer and Auctioneer.Statistic) then
-									auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
-									bCount = 0
-									if (auctMedian and auctCount) then
-										if (bBase >= auctMedian) then
-											bBase = auctMedian
-										end
-										bCount = auctCount
+							-- Use the worst case scenario from inbuilt or auctioneer prices
+							-- (if available)
+							local auctMedian, auctCount
+							if (Auctioneer and Auctioneer.Statistic) then
+								auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
+								bCount = 0
+								if (auctMedian and auctCount) then
+									if (bBase == 0 or bBase >= auctMedian) then
+										bBase = auctMedian
 									end
+									bCount = auctCount
 								end
-								if (not auctMedian) then auctMedian = 0 end
-								if (not auctCount) then auctCount = 0 end
+							end
 
-								if (not iCount or iCount < 1) then iCount = 1 end
-								local deposit = BtmScan.GetDepositCost(itemID, iCount)
-								if (not deposit) then deposit = 0 end
+							if (not auctMedian) then auctMedian = 0 end
+							if (not auctCount) then auctCount = 0 end
 
-								if (BtmScan.BaseRule) then
-									BtmScan.prices = {
-										consKey = sanityKey,
-										consMean = iqm * iCount,
-										consPrice = iqwm * iCount,
-										consSeen = iqCount,
-										auctKey = auctKey,
-										auctPrice = auctMedian * iCount,
-										auctSeen = auctCount,
-										itemID = itemID,
-										itemRand = itemRand,
-										itemEnch = itemEnch,
-										itemCount = iCount,
-										buyPrice = iBuy,
-										bidPrice = iBid,
-										basePrice = bBase * iCount,
-										depositCost = deposit,
-									}
-									bBase = BtmScan.BaseRule()
-								else
-									bBase = bBase * iCount
+							if (not iCount or iCount < 1) then iCount = 1 end
+							local deposit = BtmScan.GetDepositCost(itemID, iCount)
+							if (not deposit) then deposit = 0 end
+
+							if (BtmScan.BaseRule) then
+								BtmScan.prices = {
+									consKey = sanityKey,
+									consMean = iqm * iCount,
+									consPrice = iqwm * iCount,
+									consSeen = iqCount,
+									auctKey = auctKey,
+									auctPrice = auctMedian * iCount,
+									auctSeen = auctCount,
+									itemID = itemID,
+									itemRand = itemRand,
+									itemEnch = itemEnch,
+									itemCount = iCount,
+									buyPrice = iBuy,
+									bidPrice = iBid,
+									basePrice = bBase * iCount,
+									depositCost = deposit,
+								}
+								bBase = BtmScan.BaseRule()
+
+								local action = BtmScan.prices.action
+								if action == "bid" then
+									if (not bBase or bBase == 0) then bBase = iBid*iCount end
+									whyBuy = BtmScan.prices.reason or tr("Actioned")
+									price = iBid
+									value = bBase
+									bidIt = true
+								elseif action == "buy" then
+									if (not bBase or bBase == 0) then bBase = iBuy*iCount end
+									whyBuy = BtmScan.prices.reason or tr("Actioned")
+									price = iBuy
+									value = bBase
+									buyIt = true
+								elseif action == "ignore" then
+									ignoreIt = true
 								end
+							else
+								bBase = bBase * iCount
+							end
 
+							if (bBase > 0 and not (bidIt or buyIt or ignoreIt)) then
 								-- If user has specified a specific worth for this item, use it
 								if (data.worth[sanityKey]) then
 									bBase = tonumber(data.worth[sanityKey]) * iCount
@@ -442,7 +460,7 @@ BtmScan.PageScan = function(resume)
 								end
 
 								if (iBuy > bBase * 100) then ignoreIt = true end
-							end	-- if (sanity)
+							end
 
 							--Get the itemMinLevel for use with disenchant options
 							local _, _, _, _, itemMinLevel = GetItemInfo(itemID)
@@ -1281,6 +1299,8 @@ local auctionFee  = 0
 
 BtmScan.prices.depositCost = depositCost
 BtmScan.prices.auctionFee = auctionFee
+BtmScan.prices.action = action
+BtmScan.prices.reason = reason
 return basePrice
 ]]
 	-- End of block script --
@@ -1430,111 +1450,112 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		local sanityKey = itemID..":"..itemRand
 		local auctKey = itemID..":"..itemRand..":"..itemEnch
 
-		local sanity = BtmScan.ConfidenceList[sanityKey]
-		local iqm, iqwm, iqCount
-		if (sanity) then
-			local iqm, iqwm, iqCount = strsplit(",", sanity)
-			iqm = tonumber(iqm)
-			iqwm = tonumber(iqwm)
-			iqCount = tonumber(iqCount)
-			if (count and count > 1) then
-				iqm = iqm * count
-				iqwm = iqwm * count
-			end
+		local sanity = BtmScan.ConfidenceList[sanityKey] or ""
+		local iqm, iqwm, iqCount = strsplit(",", sanity)
+		iqm = tonumber(iqm) or 0
+		iqwm = tonumber(iqwm) or 0
+		iqCount = tonumber(iqCount) or 0
+		if (count and count > 1) then
+			iqm = iqm * count
+			iqwm = iqwm * count
+		end
 
-			EnhTooltip.AddLine(tr("BottomScanner prices"))
-			EnhTooltip.LineColor(0.9,0.6,0.2)
-			EnhTooltip.AddLine("  "..tr("IQR Mean"), iqm)
-			EnhTooltip.LineColor(0.9,0.6,0.2)
-			EnhTooltip.AddLine("  "..tr("Conservative"), iqwm)
-			EnhTooltip.LineColor(0.9,0.6,0.2)
+		EnhTooltip.AddLine(tr("BottomScanner prices"))
+		EnhTooltip.LineColor(0.9,0.6,0.2)
+		EnhTooltip.AddLine("  "..tr("IQR Mean"), iqm)
+		EnhTooltip.LineColor(0.9,0.6,0.2)
+		EnhTooltip.AddLine("  "..tr("Conservative"), iqwm)
+		EnhTooltip.LineColor(0.9,0.6,0.2)
 
-			local baseIs = "Conservative"
-			local basePrice = iqwm
-			local auctMedian, auctCount
-			if (Auctioneer and Auctioneer.Statistic) then
-				auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
-				if (auctMedian and auctCount) then
-					if (auctMedian > basePrice) then
-						basePrice = auctMedian
-						baseIs = "Auctioneer"
-					end
+		local baseIs = "Conservative"
+		local basePrice = iqwm
+		local auctMedian, auctCount
+		if (Auctioneer and Auctioneer.Statistic) then
+			auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
+			if (auctMedian and auctCount) then
+				if (auctMedian > basePrice) then
+					basePrice = auctMedian
+					baseIs = "Auctioneer"
 				end
 			end
-			if (not auctMedian) then auctMedian = 0 end
-			if (not auctCount) then auctCount = 0 end
+		end
+		if (not auctMedian) then auctMedian = 0 end
+		if (not auctCount) then auctCount = 0 end
 
-			if (not count or count < 1) then count = 1 end
-			local deposit = BtmScan.GetDepositCost(itemID, count)
-			if (not deposit) then deposit = 0 end
-			if (BtmScan.BaseRule) then
-				BtmScan.prices = {
-					consKey = sanityKey,
-					consMean = iqm,
-					consPrice = iqwm,
-					consSeen = iqCount,
-					auctKey = auctKey,
-					auctPrice = auctMedian * count,
-					auctSeen = auctCount,
-					itemID = itemID,
-					itemRand = itemRand,
-					itemEnch = itemEnch,
-					itemCount = count,
-					bidPrice = 0,
-					buyPrice = 0,
-					basePrice = basePrice * count,
-					depositCost = deposit
-				}
-				local newBase = BtmScan.BaseRule()
-				if (not newBase or newBase <= 0) then
-					basePrice = 0
-				elseif (newBase ~= basePrice) then
-					basePrice = newBase
-					baseIs = "Custom"
-				end
-			else
-				basePrice = basePrice * count
-			end
-
-			if (data.worth[sanityKey]) then
-				basePrice = tonumber(data.worth[sanityKey]) or 0
-				baseIs = "Fixed Worth"
-			end
-
-			if (not basePrice or basePrice <= 0) then
+		if (not count or count < 1) then count = 1 end
+		local deposit = BtmScan.GetDepositCost(itemID, count)
+		if (not deposit) then deposit = 0 end
+		if (BtmScan.BaseRule) then
+			BtmScan.prices = {
+				consKey = sanityKey,
+				consMean = iqm,
+				consPrice = iqwm,
+				consSeen = iqCount,
+				auctKey = auctKey,
+				auctPrice = auctMedian * count,
+				auctSeen = auctCount,
+				itemID = itemID,
+				itemRand = itemRand,
+				itemEnch = itemEnch,
+				itemCount = count,
+				bidPrice = 0,
+				buyPrice = 0,
+				basePrice = basePrice * count,
+				depositCost = deposit
+			}
+			local newBase = BtmScan.BaseRule()
+			if (not newBase or newBase <= 0) then
 				basePrice = 0
-				baseIs = "Don't Buy"
-			end
-	
-			local auctionFee
-			if (BtmScan.prices) then
-				auctionFee = BtmScan.prices.auctionFee
-			end
-			if (not auctionFee or auctionFee <= 0) then
-				auctionFee = basePrice * 0.05
-			end
-
-			if (BtmScan.prices and BtmScan.prices.depositCost and BtmScan.prices.depositCost > 0) then
-				deposit = BtmScan.prices.depositCost
-			end
-
-			EnhTooltip.AddLine("  "..tr("Valuation (%1)", tr(baseIs)), basePrice)
-			EnhTooltip.LineColor(0.9,0.9,0.2)
-			if (basePrice > 0) then
-				EnhTooltip.AddLine("    ("..tr("Auction Fee")..")", auctionFee)
-				EnhTooltip.LineColor(0.9,0.8,0.4)
-				EnhTooltip.AddLine("    ("..tr("Deposit Cost")..")", deposit)
-				EnhTooltip.LineColor(0.9,0.8,0.4)
+			elseif (newBase ~= basePrice) then
+				basePrice = newBase
+				baseIs = "Custom"
 			end
 		else
-			-- No sanity key, means we don't have cross-server prices for the item.  
-			-- Since Baserule can depend on these prices, we can't show any BTM valuation
-			-- Display message if BtmPrices.lua file isn't up to date
-			if (not upToDateConservativePrices) then
-				EnhTooltip.AddLine(tr("BottomScanner prices"))
-				EnhTooltip.LineColor(0.9,0.6,0.2)
-				EnhTooltip.AddLine("  "..tr("Not (yet) available for this item"))
-				EnhTooltip.LineColor(0.9,0.6,0.2)
+			basePrice = basePrice * count
+		end
+
+		if (data.worth[sanityKey]) then
+			basePrice = tonumber(data.worth[sanityKey]) or 0
+			baseIs = "Fixed Worth"
+		end
+
+		if (not basePrice or basePrice <= 0) then
+			basePrice = 0
+			baseIs = "Don't Buy"
+		end
+
+		local auctionFee, action, reason
+		if (BtmScan.prices) then
+			auctionFee = BtmScan.prices.auctionFee
+			action = BtmScan.prices.action
+			if not (action == "bid" or action == "buy" or action == "ignore") then
+				action = nil
+			end
+			reason = BtmScan.prices.reason
+		end
+		if (not auctionFee or auctionFee <= 0) then
+			auctionFee = basePrice * 0.05
+		end
+
+		if (BtmScan.prices and BtmScan.prices.depositCost and BtmScan.prices.depositCost > 0) then
+			deposit = BtmScan.prices.depositCost
+		end
+
+		EnhTooltip.AddLine("  "..tr("Valuation (%1)", tr(baseIs)), basePrice)
+		EnhTooltip.LineColor(0.9,0.9,0.2)
+		if (basePrice > 0) then
+			EnhTooltip.AddLine("    ("..tr("Auction Fee")..")", auctionFee)
+			EnhTooltip.LineColor(0.9,0.8,0.4)
+			EnhTooltip.AddLine("    ("..tr("Deposit Cost")..")", deposit)
+			EnhTooltip.LineColor(0.9,0.8,0.4)
+		end
+
+		if (action) then
+			EnhTooltip.AddLine("    "..tr("Recommend")..": "..tr(action))
+			EnhTooltip.LineColor(0.9,0.8,0.4)
+			if (reason) then
+				EnhTooltip.AddLine("    "..tr("Because")..": "..reason)
+				EnhTooltip.LineColor(0.9,0.8,0.4)
 			end
 		end
 
@@ -1768,6 +1789,8 @@ BtmScan.PerformPurchase = function()
 	end
 	BtmScan.Prompt:Hide()
 	BtmScan.scanStage = 2
+	BtmScan.timer = 0
+	BtmScan.pageScan = 0.001
 end
 
 BtmScan.CancelPurchase = function()
@@ -1778,6 +1801,8 @@ BtmScan.CancelPurchase = function()
 		BtmScan.Print(tr("BottomScanner autoignoring %1 for more than %2 this session.", BtmScan.Prompt.iLink, BtmScan.GSC(price)))
 	end
 	BtmScan.scanStage = 2
+	BtmScan.timer = 0
+	BtmScan.pageScan = 0.001
 	BtmScan.Prompt:Hide()
 end
 
@@ -1786,6 +1811,8 @@ BtmScan.IgnorePurchase = function()
 	data.ignore[key] = true
 	BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), BtmScan.Prompt.iLink))
 	BtmScan.scanStage = 2
+	BtmScan.timer = 0
+	BtmScan.pageScan = 0.001
 	BtmScan.Prompt:Hide()
 end
 
