@@ -480,7 +480,7 @@ function protectAuctionFrame(enable)
 				end
 			end
 
-		elseif (ahFrameProtected) then
+		elseif (not enable and ahFrameProtected) then
 			--Handle disabling of protection
 			ahFrameProtected = nil;
 			--If Mobile Frames is around, then put the frame back under its control if it is proper to do so
