@@ -66,6 +66,10 @@ local AMHIGH = 18
 local SELLER = 19
 
 local CLASSES = { GetAuctionItemClasses() }
+local SUBCLASSES = { }
+for i = 1, #CLASSES do
+	SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
+end
 
 function Aux.Commit()
 	if not Aux.curScan then return end
@@ -113,20 +117,104 @@ function Aux.StorePage()
 	end
 end
 
-local lastThrow
+function Aux.ClassConvert(cid, sid)
+	if (sid) then
+		return SUBCLASSES[cid][sid]
+	end
+	return CLASSES[cid]
+end
+
+local lastThrow, scheduleThrow
 function Aux.ThrowUpdate()
+	scheduleThrow = false
 	lastThrow = GetTime()
+
+	-- Simulate AuctionFrameBrowse_OnEvent
+	p("SimulateEvent")
 	AuctionFrameBrowse_Update()
+	AuctionFrameBrowse.isSearching = nil;
+	BrowseNoResultsText:SetText(BROWSE_NO_RESULTS);
+	-- Run any Stubby hooks for auction list updates
+	p("RunStubby")
 	if (Stubby) then Stubby.Events("AUCTION_ITEM_LIST_UPDATE") end
 end
+function Aux.NeedUpdate()
+	lastThrow = GetTime()
+	scheduleThrow = true
+end
+
+local curQuery = { empty = true }
+local curResults = {}
+
+function Aux.GetResults()
+	if not AuxData or not AuxData.snap then p("NoSnap") return end
+
+	local invalid = false
+	for k,v in pairs(Aux.curQuery) do
+		if k ~= "page" and v ~= curQuery[k] then invalid = true end
+	end
+	for k,v in pairs(curQuery) do
+		if k ~= "page" and v ~= Aux.curQuery[k] then invalid = true end
+	end
+	if not invalid then p("NotInvalid") return end
+
+	local numResults = #curResults
+	for i=1, numResults do curResults[i] = nil end
+	for k,v in pairs(curQuery) do curQuery[k] = nil end
+	for k,v in pairs(Aux.curQuery) do curQuery[k] = v end
+
+	local ptr, max = 1, #AuxData.snap
+	while ptr <= max do
+		repeat
+			local data = AuxData.snap[ptr] ptr = ptr + 1
+			if (not data) then break end
+			if curQuery.minUseLevel and data[ULEVEL] < curQuery.minUseLevel then break end
+			if curQuery.maxUseLevel and data[ULEVEL] > curQuery.maxUseLevel then break end
+			if curQuery.minItemLevel and data[ILEVEL] < curQuery.minItemLevel then break end
+			if curQuery.maxItemLevel and data[ILEVEL] > curQuery.maxItemLevel then break end
+			if curQuery.class and data[ITYPE] ~= curQuery.class then break end
+			if curQuery.subclass and data[ISUB] ~= curQuery.subclass then break end
+			if curQuery.quality and data[QUALITY] ~= curQuery.quality then break end
+			if curQuery.invType and data[IEQUIP] ~= curQuery.invType then break end
+			if curQuery.invType and data[IEQUIP] then
+				p("Compare", curQuery.invType, data[IEQUIP])
+			end
+			if curQuery.seller and data[SELLER] ~= curQuery.seller then break end
+			if curQuery.name then
+				local name = data[NAME]:lower()
+				if not name:find(curQuery.name:lower(), 1, true) then break end
+			end
+
+			local stack = data[COUNT]
+			local buyout = data[BUYOUT] or 0
+			local nextBid = data[MINBID]
+			if not stack or stack < 1 then stack = 1 end
+			if data[CURBID] then nextBid = data[CURBID]+data[MININC] end
+			if curQuery.perItem and stack > 1 then
+				nextBid = math.ceil(nextBid / stack)
+				buyout = math.ceil(buyout / stack)
+			end
+			if curQuery.minStack and stack < curQuery.minStack then break end
+			if curQuery.maxStack and stack > curQuery.maxStack then break end
+			if curQuery.minBid and nextBid < curQuery.minBid then break end
+			if curQuery.maxBid and nextBid > curQuery.maxBid then break end
+			if curQuery.minBuyout and buyout < curQuery.minBuyout then break end
+			if curQuery.maxBuyout and buyout > curQuery.maxBuyout then break end
 		
+			-- If we're still here, then we've got a winner
+			table.insert(curResults, data)
+		until true
+	end	
+	p("DoneSearch", #curResults)
+end
+
 Aux.Hook = {}
 Aux.Hook.CanSendAuctionQuery = CanSendAuctionQuery
 function CanSendAuctionQuery(...)
 	-- See if we are in caching mode.
 	if Aux.amCaching then
 		local interval = Aux.pageInterval or 0.5
-		if not lastThrow or GetTime() - lastThrow > 0.5 then
+		if scheduleThrow and GetTime() - lastThrow > 0.5 then
 			Aux.ThrowUpdate()
 		end
 		if not Aux.lastReq or GetTime() - Aux.lastReq > interval then
@@ -165,10 +253,15 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		if (classIndex > 0) then query.class = Aux.ClassConvert(classIndex) end
 		if (subclassIndex > 0) then query.subclass = Aux.ClassConvert(classIndex, subclassIndex) end
 		if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
+		if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
 		Aux.curQuery = query
 		Aux.lastReq = GetTime()
 		if Aux.amCaching then
-			return Aux.ThrowUpdate()
+			p("GettingRes")
+			Aux.GetResults()
+			p("ThrowingUp")
+			Aux.NeedUpdate()
+			return
 		end
 	end
 	Aux.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
@@ -179,15 +272,21 @@ function GetNumAuctionItems(...)
 	-- See if we are in caching mode.
 	local lType = select(1, ...)
 	if lType == "list" and Aux.amCaching then
-		if (not Aux.curQuery) then return 0,0 end
-		-- Do our funky cache thingo
-		local numAucts = #AuxData.snap
-		local page = Aux.curQuery.page
-		local maxPages = math.ceil(numAucts/NUM_AUCTION_ITEMS_PER_PAGE)
-		if (page == maxPages-1) then
-			return numAucts % NUM_AUCTION_ITEMS_PER_PAGE, numAucts
+		if not (curResults and curQuery and curQuery.page) then
+			p("NoSize", pageCount, numAucts)
+			return 0,0
 		end
-		return NUM_AUCTION_ITEMS_PER_PAGE, numAucts
+		-- Do our funky cache thingo
+		local numAucts = #curResults
+		if (numAucts == 0) then return 0,0 end
+		local page = curQuery.page
+		local maxPages = math.ceil(numAucts/NUM_AUCTION_ITEMS_PER_PAGE) - 1
+		local pageCount = NUM_AUCTION_ITEMS_PER_PAGE
+		if (page == maxPages) then
+			pageCount = ((numAucts-1) % NUM_AUCTION_ITEMS_PER_PAGE) + 1
+		end
+		p("PageSize", pageCount, numAucts, page, maxPages)
+		return pageCount, numAucts
 	end
 
 	-- Call the original hook
@@ -199,11 +298,11 @@ function GetAuctionItemLink(...)
 	-- See if we are in caching mode.
 	local lType, lPos = select(1, ...)
 	if lType == "list" and Aux.amCaching then
-		if (not Aux.curQuery) then return end
+		if not (curResults and curQuery and curQuery.page) then return end
 		-- Do our funky cache thingo
-		local page = Aux.curQuery.page
+		local page = curQuery.page
 		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
-		local data = AuxData.snap[curPos]
+		local data = curResults[curPos]
 		if (data) then
 			return data[LINK]
 		end
@@ -219,11 +318,11 @@ function GetAuctionItemTimeLeft(...)
 	-- See if we are in caching mode.
 	local lType, lPos = select(1, ...)
 	if lType == "list" and Aux.amCaching then
-		if (not Aux.curQuery) then return end
+		if not (curResults and curQuery and curQuery.page) then return end
 		-- Do our funky cache thingo
-		local page = Aux.curQuery.page
+		local page = curQuery.page
 		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
-		local data = AuxData.snap[curPos]
+		local data = curResults[curPos]
 		if (data) then
 			return data[TLEFT]
 		end
@@ -239,11 +338,14 @@ function GetAuctionItemInfo(...)
 	-- See if we are in caching mode.
 	local lType, lPos = select(1, ...)
 	if lType == "list" and Aux.amCaching then
-		if (not Aux.curQuery) then return end
+		if not (curResults and curQuery and curQuery.page) then
+			p("Item", lType, lPos, curQuery)
+			return nil,nil,1,-1,nil,0,0,0,0,0,nil,nil
+		end
 		-- Do our funky cache thingo
-		local page = Aux.curQuery.page or 0
-		local curPos = (page * NUM_AUCTION_ITEMS_PER_PAGE) + lPos
-		local data = AuxData.snap[curPos]
+		local page = curQuery.page
+		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
+		local data = curResults[curPos]
 		if (data) then
 			local name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner = unpack(data, NAME, SELLER)
 			if (Aux.noBlankOwner) then
@@ -251,6 +353,7 @@ function GetAuctionItemInfo(...)
 			end
 			return name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner
 		end
+		p("NoData", page, curPos, lType, lPos, curQuery, #curResults)
 		return nil,nil,1,-1,nil,0,0,0,0,0,nil,nil
 	end
 
