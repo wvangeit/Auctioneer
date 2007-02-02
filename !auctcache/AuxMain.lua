@@ -152,6 +152,28 @@ function Aux.NeedUpdate()
 	scheduleThrow = true
 end
 
+local curMode
+function Aux.AucItemEnter(obj)
+	local parent = obj:GetParent()
+	local pos = parent:GetID() + FauxScrollFrame_GetOffset(BrowseScrollFrame)
+
+	if (curMode) then
+		local link = GetAuctionItemLink("list", pos)
+		GameTooltip:SetOwner(parent, "ANCHOR_RIGHT")
+		GameTooltip:SetHyperlink(link)
+		GameTooltip:ClearAllPoints()
+		GameTooltip:SetPoint("TOPLEFT", obj, "BOTTOMRIGHT", 10, 5)
+		if (EnhTooltip) then
+			local name,_,count,quality,_,_,_,_,buyout = GetAuctionItemInfo("list", pos)
+			EnhTooltip.TooltipCall(GameTooltip, name, link, quality, count, buyout)
+		end
+		if IsControlKeyDown() then ShowInspectCursor()
+		else ResetCursor() end
+	else
+		AuctionFrameItem_OnEnter("list", pos)
+	end
+end
+
 function Aux.ButtonMode(display)
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		local o = getglobal("BrowseButton"..i)
@@ -163,12 +185,15 @@ function Aux.ButtonMode(display)
 				t:SetPoint("BOTTOMRIGHT", o, "BOTTOMRIGHT")
 				t:SetTexture(0.3,0.1,0, 0.35)
 				o.cachedTex = t
+				local b = getglobal("BrowseButton"..i.."Item")
+				b:SetScript("OnEnter", Aux.AucItemEnter)
 			end
 			if display then
 				t:Show()
 			else
 				t:Hide()
 			end
+			curMode = display
 		end
 	end
 end
