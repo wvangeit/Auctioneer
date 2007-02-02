@@ -1296,6 +1296,7 @@ local depositCost = BtmScan.prices.depositCost
 local depositRate = BtmScan.depositRate
 local cutRate     = BtmScan.cutRate
 local auctionFee  = 0
+local action, reason
 ]]..data.baseRule..[[
 
 BtmScan.prices.depositCost = depositCost
