@@ -6,6 +6,8 @@ Aux = {}
 
 Aux.amCaching = false
 Aux.isScanning = false
+Aux.noBlankOwner = true
+Aux.numPerPage = 50000
 Aux.curPage = 0
 Aux.curCat = nil
 
@@ -39,6 +41,15 @@ Aux.InvTypes = {
 }
 
 
+function Aux.Caching(enabled)
+	if (enabled) then
+		Aux.amCaching = true
+		NUM_AUCTION_ITEMS_PER_PAGE = Aux.numPerPage
+	else
+		Aux.amCaching = false
+		NUM_AUCTION_ITEMS_PER_PAGE = 50
+	end
+end
 function Aux.StartScan(cat)
 	Aux.curCat = cat
 	Aux.isScanning = true
@@ -96,7 +107,7 @@ end
 
 function Aux.StorePage()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-	local maxPages = floor(totalAuctions / NUM_AUCTION_ITEMS_PER_PAGE);
+	local maxPages = floor(totalAuctions / Aux.numPerPage);
 	if (not Aux.curScan) then Aux.curScan = {} end
 
 	-- Take a snapshot of everything we've got so far.
@@ -130,12 +141,10 @@ function Aux.ThrowUpdate()
 	lastThrow = GetTime()
 
 	-- Simulate AuctionFrameBrowse_OnEvent
-	p("SimulateEvent")
 	AuctionFrameBrowse_Update()
 	AuctionFrameBrowse.isSearching = nil;
 	BrowseNoResultsText:SetText(BROWSE_NO_RESULTS);
 	-- Run any Stubby hooks for auction list updates
-	p("RunStubby")
 	if (Stubby) then Stubby.Events("AUCTION_ITEM_LIST_UPDATE") end
 end
 function Aux.NeedUpdate()
@@ -143,11 +152,33 @@ function Aux.NeedUpdate()
 	scheduleThrow = true
 end
 
+function Aux.ButtonMode(display)
+	for i=1, NUM_BROWSE_TO_DISPLAY do
+		local o = getglobal("BrowseButton"..i)
+		if o then
+			local t = o.cachedTex
+			if not t then
+				t = o:CreateTexture("", "BACKGROUND")
+				t:SetPoint("TOPLEFT", o, "TOPLEFT")
+				t:SetPoint("BOTTOMRIGHT", o, "BOTTOMRIGHT")
+				t:SetTexture(0.3,0.1,0, 0.35)
+				o.cachedTex = t
+			end
+			if display then
+				t:Show()
+			else
+				t:Hide()
+			end
+		end
+	end
+end
+
 local curQuery = { empty = true }
 local curResults = {}
 
 function Aux.GetResults()
-	if not AuxData or not AuxData.snap then p("NoSnap") return end
+	if not AuxData or not AuxData.snap then return end
+	Aux.ButtonMode(true)
 
 	local invalid = false
 	for k,v in pairs(Aux.curQuery) do
@@ -156,7 +187,7 @@ function Aux.GetResults()
 	for k,v in pairs(curQuery) do
 		if k ~= "page" and v ~= Aux.curQuery[k] then invalid = true end
 	end
-	if not invalid then p("NotInvalid") return end
+	if not invalid then return end
 
 	local numResults = #curResults
 	for i=1, numResults do curResults[i] = nil end
@@ -175,9 +206,9 @@ function Aux.GetResults()
 			if curQuery.class and data[ITYPE] ~= curQuery.class then break end
 			if curQuery.subclass and data[ISUB] ~= curQuery.subclass then break end
 			if curQuery.quality and data[QUALITY] ~= curQuery.quality then break end
-			if curQuery.invType and data[IEQUIP] ~= curQuery.invType then break end
 			if curQuery.invType and data[IEQUIP] then
-				p("Compare", curQuery.invType, data[IEQUIP])
+				local equipType = Aux.InvTypes[data[IEQUIP]]
+				if equipType ~= curQuery.invType then break end
 			end
 			if curQuery.seller and data[SELLER] ~= curQuery.seller then break end
 			if curQuery.name then
@@ -205,7 +236,6 @@ function Aux.GetResults()
 			table.insert(curResults, data)
 		until true
 	end	
-	p("DoneSearch", #curResults)
 end
 
 Aux.Hook = {}
@@ -257,13 +287,12 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		Aux.curQuery = query
 		Aux.lastReq = GetTime()
 		if Aux.amCaching then
-			p("GettingRes")
 			Aux.GetResults()
-			p("ThrowingUp")
 			Aux.NeedUpdate()
 			return
 		end
 	end
+	Aux.ButtonMode(false)
 	Aux.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
 
@@ -273,19 +302,17 @@ function GetNumAuctionItems(...)
 	local lType = select(1, ...)
 	if lType == "list" and Aux.amCaching then
 		if not (curResults and curQuery and curQuery.page) then
-			p("NoSize", pageCount, numAucts)
 			return 0,0
 		end
 		-- Do our funky cache thingo
 		local numAucts = #curResults
 		if (numAucts == 0) then return 0,0 end
 		local page = curQuery.page
-		local maxPages = math.ceil(numAucts/NUM_AUCTION_ITEMS_PER_PAGE) - 1
-		local pageCount = NUM_AUCTION_ITEMS_PER_PAGE
+		local maxPages = math.ceil(numAucts/Aux.numPerPage) - 1
+		local pageCount = Aux.numPerPage
 		if (page == maxPages) then
-			pageCount = ((numAucts-1) % NUM_AUCTION_ITEMS_PER_PAGE) + 1
+			pageCount = ((numAucts-1) % Aux.numPerPage) + 1
 		end
-		p("PageSize", pageCount, numAucts, page, maxPages)
 		return pageCount, numAucts
 	end
 
@@ -301,7 +328,7 @@ function GetAuctionItemLink(...)
 		if not (curResults and curQuery and curQuery.page) then return end
 		-- Do our funky cache thingo
 		local page = curQuery.page
-		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
+		local curPos = page * Aux.numPerPage + lPos
 		local data = curResults[curPos]
 		if (data) then
 			return data[LINK]
@@ -321,7 +348,7 @@ function GetAuctionItemTimeLeft(...)
 		if not (curResults and curQuery and curQuery.page) then return end
 		-- Do our funky cache thingo
 		local page = curQuery.page
-		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
+		local curPos = page * Aux.numPerPage + lPos
 		local data = curResults[curPos]
 		if (data) then
 			return data[TLEFT]
@@ -339,12 +366,11 @@ function GetAuctionItemInfo(...)
 	local lType, lPos = select(1, ...)
 	if lType == "list" and Aux.amCaching then
 		if not (curResults and curQuery and curQuery.page) then
-			p("Item", lType, lPos, curQuery)
 			return nil,nil,1,-1,nil,0,0,0,0,0,nil,nil
 		end
 		-- Do our funky cache thingo
 		local page = curQuery.page
-		local curPos = page * NUM_AUCTION_ITEMS_PER_PAGE + lPos
+		local curPos = page * Aux.numPerPage + lPos
 		local data = curResults[curPos]
 		if (data) then
 			local name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner = unpack(data, NAME, SELLER)
@@ -353,7 +379,6 @@ function GetAuctionItemInfo(...)
 			end
 			return name,texture,count,quality,canUse,level,minBid,minIncrement,buyoutPrice,bidAmount,highBidder,owner
 		end
-		p("NoData", page, curPos, lType, lPos, curQuery, #curResults)
 		return nil,nil,1,-1,nil,0,0,0,0,0,nil,nil
 	end
 
