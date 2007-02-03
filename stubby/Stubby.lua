@@ -493,8 +493,8 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 end
 
 -------------------------------------------------------------------------------
--- Unregisters the hooked function. If there the hooked function is hooked
--- multiple times, all these hooks are removed.
+-- Unregisters the hooked function. If the hooked function is hooked multiple
+-- times, all these hooks are removed.
 --
 -- calls:
 --    setError() - always
