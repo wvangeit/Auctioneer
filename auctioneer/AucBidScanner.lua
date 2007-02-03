@@ -319,7 +319,7 @@ function placeBid(request)
 					-- Update the starting point for this page.
 					request.currentIndex = indexOnPage;
 					request.bidAttempts = request.bidAttempts + 1;
-					if (auction.buyout == bidAmount) then
+					if (auction.buyoutPrice == bidAmount) then
 						request.isBuyout = true;
 					end
 					request.state = RequestState.WaitingForBidResult;

@@ -349,7 +349,7 @@ function removePendingBid(result)
 
 		-- If a callback function was provided, call it.
 		if (pendingBid.callbackFunc) then
-			pendingBid.callbackFunc(pendingBid.auction, pendingBid.bid, result);
+			pendingBid.callbackFunc(pendingBid.auction, result);
 		end
 	else
 		-- We got out of sync somehow... this indicates a bug in how we determine
