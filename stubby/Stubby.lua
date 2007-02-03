@@ -172,6 +172,17 @@ end
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
+-------------------------------------------------------------------------------
+-- Error codes
+-------------------------------------------------------------------------------
+-- 0 = no error / function call succeeded
+-- 1 = Trying to remove the hooked function from the trigger function failed
+--     as the hooked function is not hooked in the trigger function at all.
+-- 2 = Trying to remove the hook from a function failed, as the specified is not
+--     hooked at all.
+-- 3 = Trying to remove the hook from a function failed, as another function
+--     meanwhile hooked into the same function.
+
 local cleanList
 local config = {
 	hooks = { functions={}, origFuncs={} },
@@ -179,15 +190,21 @@ local config = {
 	loads = {},
 	events = {},
 }
+-- set to the last errorcode which occured
+local iErrorCode = 0
+-- set to the last errormessage which occured
+local strErrorMessage = ""
 
 
 StubbyConfig = {}
 
 
 -- Function prototypes
+local assert                  -- assert(bTest, strMessage)
 local chatPrint						-- chatPrint(...)
 local checkAddOns					-- checkAddOns()
 local clearConfig					-- clearConfig(ownerAddOn, variable)
+local clearError                 -- clearError()
 local createAddOnLoadBootCode		-- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 local createEventLoadBootCode		-- createEventLoadBootCode(ownerAddOn, triggerEvent)
 local createFunctionLoadBootCode	-- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
@@ -195,7 +212,10 @@ local errorHandler					-- errorHandler(stackLevel, ...)
 local eventWatcher					-- eventWatcher(event)
 local events						-- events(event, param)
 local getConfig						-- getConfig(ownerAddOn, variable)
+local getLastErrorCode        -- getLastErrorCode()
+local getLastErrorMessage     -- getLastErrorMessage()
 local getOrigFunc					-- getOrigFunc(triggerFunction)
+local getRevision             -- getRevision()
 local hookCall						-- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
 local hookInto						-- hookInto(triggerFunction)
 local inspectAddOn					-- inspectAddOn(addonName, title, info)
@@ -209,6 +229,7 @@ local registerEventHook				-- registerEventHook(triggerEvent, ownerAddOn, hookFu
 local registerFunctionHook			-- registerFunctionHook(triggerFunction, position, hookFunc, ...)
 local runBootCodes					-- runBootCodes()
 local searchForNewAddOns			-- searchForNewAddOns()
+local setError                   -- setError(code, message)
 local cleanUpAddOnData				-- cleanUpAddOnData()
 local cleanUpAddOnConfigs			-- cleanUpAddOnConfigs()
 local setConfig						-- setConfig(ownerAddOn, variable, value, isGlobal)
@@ -361,6 +382,47 @@ function hookInto(triggerFunction)
 	Stubby_OldFunction = nil
 end
 
+-------------------------------------------------------------------------------
+-- Unhooks stubby's hooked function from the given trigger function.
+--
+-- calls:
+--    clearError() - always
+--    setError()   - if an error occured
+--    getglobal()  - if there is a hooked function present
+--
+-- called by:
+--    TODO
+--
+-- paramaeters:
+--    triggerFunction - (string) the name of the function to be unhooked
+--
+-- returns:
+--    true, if unhooking was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
+-------------------------------------------------------------------------------
+function unhookFrom(triggerFunction)
+	-- remove old error codes/messages from prior function calls
+	clearError()
+
+	-- check, if the trigger function is really hooked
+	if not config.hooks.origFuncs[triggerFunction] then
+		setError(2, "The trigger function: "..triggerFunction.." is not hooked.")
+		return false
+	end
+
+	-- make sure, that no other addon hooked this function meanwhile
+	if getglobal(triggerFunction) == config.hooks.origFuncs[triggerFunction] then
+		triggerFunction = config.hooks.origFuncs[triggerFunction]
+		config.hooks.origFuncs[triggerFunction] = nil
+		config.hooks.functions[triggerFunction] = nil
+		return true
+	end
+
+	setError(3, "Could not unhook the trigger function "..triggerFunction..", since another addon hooked it meanwhile.")
+	return false
+end
+
 function errorHandler(stackLevel, ...)
 	local msg = tostring(select(1, ...))
 	for i = 2, select("#", ...) do
@@ -430,13 +492,69 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	return hookInto(triggerFunction)
 end
 
+-------------------------------------------------------------------------------
+-- Unregisters the hooked function. If there the hooked function is hooked
+-- multiple times, all these hooks are removed.
+--
+-- calls:
+--    setError() - always
+--
+-- called by:
+--    TODO
+--
+-- paramaeters:
+--    TODO
+--
+-- returns:
+--    (number) number of how many times the given hooked function has been
+--             unhooked
+--             0 indicates an error. Use getLastErrorMessage() and
+--               getLastErrorCode() directly after calling this function to get
+--               more details
+-------------------------------------------------------------------------------
 function unregisterFunctionHook(triggerFunction, hookFunc)
-	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then return end
+	-- remove old error codes/messages from prior function calls
+	clearError()
+
+	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then
+		setError(1, "No hooked functions in trigger function: "..triggerFunction.." at all.")
+		return 0
+	end
+
+	local iHooked  = 0
+	local iRemoved = 0
 	for pos, funcObj in pairs(config.calls.functions[triggerFunction]) do
+		iHooked = iHooked + 1
 		if (funcObj and funcObj.f == hookFunc) then
 			config.calls.functions[triggerFunction][pos] = nil
+			iRemoved = iRemoved + 1
 		end
 	end
+
+	-- config.calls.functions[triggerFunction] should never be empty. If there
+	-- are no hooked functions, it should be nil!
+	-- Otherwise this could produce incorrect error messages.
+	assert(iHooked > 0, "config.calls.functions["..triggerFunction.."] is an empty array!")
+
+	-- clean up the hooking tables, if no more hooked functions are present
+	if(iHooked == iRemoved) then
+		config.calls.functions[triggerFunction] = nil
+		-- make sure that unhooking was sucessful, or could not be done due to another addon hooking the trigger function meanwhile
+		-- TODO: add something like if canBeUnhooked(triggerFunction) then to disable false error messages
+		if not unhookFrom(triggerFunction) then
+			assert(getLastErrorCode() ~= 2, "unhookFrom() reports the trigger function: "..triggerFunction.." not to be hooked, although it should be!")
+		end
+	end
+
+	if iRemoved == 0 then
+		setError(1, "The given function is not hooked in the trigger function: "..triggerFunction..".")
+	end
+
+	-- rebuild the call list, so that the removed functions are also removed from
+	-- the call list
+	config.calls.callList = rebuildNotifications(config.calls.functions)
+
+	return iRemoved
 end
 
 --[[
@@ -806,10 +924,126 @@ function clearConfig(ownerAddOn, variable)
 end
 
 -- Extract the revision number from SVN keyword string
-local function getRevision()
+function getRevision()
 	return tonumber(("$Revision$"):match("(%d+)"))
 end
+-------------------------------------------------------------------------------
+-- Returns the error code of the error which occured during the last function
+-- call, if any.
+--
+-- called by:
+--    TODO
+--
+-- returns:
+--    (number) The error code of the last function call
+--    0, if the last function call was suceessful
+--
+-- remark:
+--    Use getLastErrorMessage() to get the appropriate more detailed
+--    error message. One error code might correspond to more than one error
+--    message.
+--    All possible error codes and their meaning are explained in the
+--    error code section in this file.
+-------------------------------------------------------------------------------
+function getLastErrorCode()
+	return iErrorCode
+end
 
+-------------------------------------------------------------------------------
+-- Returns the error message of the error which occured during the last function
+-- call, if any.
+--
+-- called by:
+--    TODO
+--
+-- returns:
+--    (string) The error message of the last function call
+--    "", if the last function call was suceessful
+--
+-- remark:
+--    Use this function only to display the errormessage. If you want to check
+--    which error occured, use getLastErrorCode() instead, since comparing
+--    error codes is much more performant and while error messages might
+--    change from time to time (for example to fix spelling mistakes), the error
+--    code will not
+-------------------------------------------------------------------------------
+function getLastErrorMessage()
+	return strErrorMessage
+end
+
+-------------------------------------------------------------------------------
+-- Clears the current error message. This should be called at first within each
+-- function.
+--
+-- called by:
+--    TODO
+-------------------------------------------------------------------------------
+function clearError()
+	iErrorCode = 0
+	strErrorMessage = ""
+end
+
+-------------------------------------------------------------------------------
+-- Sets the error code and message and outputs it to nLog, if nLog is present.
+--
+-- called by:
+--    TODO
+--
+-- parameters:
+--    iCode      - (number) the new error code
+--    strMessage - (string) the new error message
+--    priority   - nLog message level (optional - defaulting to N_WARNING)
+--
+-- remark:
+--    By default, messages written to nLog are marked as warnings, only.
+--    If you decide that the error should be handled with another priority,
+--    either use the third, optional flag, or let the calling function decide
+--    what todo about this error message and maybe relog it.
+-------------------------------------------------------------------------------
+function setError(iCode, strMessage, priority)
+	iErrorCode = iCode
+	strErrorMessage = strMessage
+
+	if nLog then
+		if not priority then
+			priority = N_WARNING
+		end
+		nLog.AddMessage("Stubby", "Error", priority, "Errorcode: "..iCode, strMessage)
+	end
+end
+
+-------------------------------------------------------------------------------
+-- Used to make sure that conditions are met within functions.
+-- If bTest is false, the error message will be written to nLog and the user's
+-- default chat channel.
+--
+-- called by:
+--    TODO
+--
+-- parameters:
+--    bTest      - (boolean) true, if the assertion was met
+--                           false, otherwise
+--    strMessage - (string) the message which will be output to the user
+--
+-- remark:
+--    If nLog is present, the message will not only be written to the user's
+--    channel, but also to nLog with the priority set to N_CRITICAL, since it
+--    is assumed that assert() is only used in critical parts of functions and
+--    that bTest is expected to never fail. This is especially useful to track
+--    down bugs which might randomly occure. Therefore this log message is given
+--    the highest priority.
+-------------------------------------------------------------------------------
+function assert(bTest, strMessage)
+	if bTest then
+		return -- test passed, nothing to worry about
+	end
+
+	getglobal("ChatFrame1"):AddMessage(strMessage, 1.0, 0.3, 0.3)
+	
+	if nLog then
+		nLog.AddMessage("Stubby", "Assertion", N_CRITICAL, "assertion failed", strMessage)
+	end
+end
 -- Setup our Stubby global object. All interaction is done
 -- via the methods exposed here.
 Stubby = {
@@ -824,6 +1058,8 @@ Stubby = {
 	LoadWatcher = loadWatcher,
 	ErrorHandler = errorHandler,
 	EventWatcher = eventWatcher,
+	GetLastError = getLastError,
+	GetLastErrorCode = getLastErrorCode,
 	RegisterBootCode = registerBootCode,
 	RegisterEventHook = registerEventHook,
 	RegisterAddOnHook = registerAddOnHook,
