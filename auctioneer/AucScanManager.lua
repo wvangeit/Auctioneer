@@ -42,6 +42,7 @@ local chatPrint = Auctioneer.Util.ChatPrint;
 -- Function Prototypes
 -------------------------------------------------------------------------------
 local load;
+local killHook;
 local onEventHook;
 local isScanning;
 local scan;
@@ -364,21 +365,15 @@ end
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
-local hooked = false
-local function killHook()
-	if (Scanning) then 
-		return "killorig"
-	end
+function killHook()
+	return "killorig"
 end
 
 function scanStarted()
 	-- Don't allow AuctionFrameBrowse updates during a scan.
-	if (not hooked) then
-		Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
-		Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
-		Stubby.RegisterFunctionHook("AuctionFrameBrowse_Search", -200, killHook)
-		hooked = true
-	end
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Search", -200, killHook)
 
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
@@ -438,6 +433,10 @@ function scanEnded()
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
+	-- reenable the original Auction Browse Frame functions
+	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_OnEvent", killHook)
+	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_Update", killHook)
+	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_Search", killHook)
 
 	-- Compile the results.
 	local chatResultText;
