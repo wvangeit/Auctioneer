@@ -79,6 +79,7 @@ local currentListType, currentIndex, currentBid, currentCallbackFunc
 -------------------------------------------------------------------------------
 BidResultCodes = {
 	BidAccepted = "BidAccepted";
+	BidCanceled = "BidCanceled";
 	ItemNotFound = "ItemNotFound";
 	NotEnoughMoney = "NotEnoughMoney";
 	OwnAuction = "OwnAuction";
@@ -101,6 +102,11 @@ function load()
 		OnAccept = function()
 			--Bid was confirmed
 			Auctioneer.BidManager.BidConfirmed()
+		end,
+		
+		OnCancel = function()
+			--Bid was canceled by user
+			Auctioneer.BidManager.BidCanceled()
 		end,
 
 		OnShow = function()
@@ -210,6 +216,31 @@ function bidConfirmed()
 	hookPlaceAuctionBid = false;
 	PlaceAuctionBid(currentListType, currentIndex, currentBid);
 	hookPlaceAuctionBid = true;
+end
+
+function bidCanceled()
+	-- Get the auction being bid on. We first try to get it from the snapshot
+	-- database so that we have the auctionId. If we are unable then we just
+	-- get it from the query manager.
+	local auction;
+	local auctionId = Auctioneer.QueryManager.GetAuctionId(currentListType, currentIndex);
+	if (auctionId) then
+		auction = Auctioneer.SnapshotDB.GetAuctionById(nil, auctionId);
+	end
+	if (auction and auction.auctionId) then
+		debugPrint("Found in snapshot:", auction.auctionId);
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Pending bid found for cancellation", "Found item ", auction.auctionId, " in snapshot in bidCanceled")
+	else
+		debugPrint("Did not find auction in snapshot");
+		auction = Auctioneer.QueryManager.GetAuctionByIndex(currentListType, currentIndex);
+		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Pending bid for cancellation not in snap", "Can't find item ", auction.auctionId, " in snapshot in bidCanceled")
+	end
+
+	-- We had better have an auction by now...
+	if (auction) then
+		currentCallbackFunc(auction, BidResultCodes.BidCanceled)
+	end
+
 end
 
 function getBidAmmount()
@@ -354,6 +385,7 @@ Auctioneer.BidManager = {
 	IsBidAllowed = isBidAllowed;
 	PlaceAuctionBid = placeAuctionBid;
 	BidConfirmed = bidConfirmed;
+	BidCanceled = bidCanceled;
 	ShowingConfirmation = showingConfirmation;
 	GetBidAmmount = getBidAmmount;
 	AddPendingBid = addPendingBid;
