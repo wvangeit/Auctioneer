@@ -270,7 +270,6 @@ function sendQuery(request)
 
 	-- Send the query!
 	debugPrint("Requesting page"..request.nextPage);
-	request.state = ScanRequestState.WaitingForQueryResult;
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
 		request.minLevel,
@@ -285,6 +284,7 @@ function sendQuery(request)
 		3,
 		queryCompleteCallback
 	);
+	request.state = ScanRequestState.WaitingForQueryResult;
 end
 
 -------------------------------------------------------------------------------
