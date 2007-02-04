@@ -308,7 +308,7 @@ function queryCompleteCallback(query, result)
 					-- There's one and only one page. Tally the auctions
 					-- scanned and we are done!
 					request.nextPage = -1;
-					request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
+					request.auctionsScanned = lastIndexOnPage;
 				else
 					-- More then one page so we'll scan in reverse so as to
 					-- not miss any auctions.
