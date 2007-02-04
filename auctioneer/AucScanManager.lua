@@ -375,6 +375,12 @@ function killHook()
 end
 
 function scanStarted()
+	-- Protect window if needed
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
+		-- We're set to protect only while scanning, so protect the window now
+		Auctioneer.Util.ProtectAuctionFrame(true);
+	end
+
 	-- Don't allow AuctionFrameBrowse updates during a scan.
 	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
 	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
@@ -406,12 +412,6 @@ function scanStarted()
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
 	Auctioneer.EventManager.RegisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
 
-	-- Protect window if needed
-	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
-		-- We're set to protect only while scanning, so protect the window now
-		Auctioneer.Util.ProtectAuctionFrame(true);
-	end
-
 	-- Scanning has begun!
 	Scanning = true;
 	Auctioneer.Scanning.IsScanningRequested = true;
@@ -428,16 +428,10 @@ function scanEnded()
 	Auctioneer.Scanning.IsScanningRequested = false;
 	debugPrint("Scan ended with result:", LastRequestResult);
 
-	-- Un-Protect window if needed
-	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
-		-- We're set to protect only while scanning, so it's time to unprotect the window
-		Auctioneer.Util.ProtectAuctionFrame(false);
-	end
-
 	-- Unregister for snapshot events.
-	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded);
-	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated);
-	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved);
+	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded)
+	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated)
+	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved)
 	-- reenable the original Auction Browse Frame functions
 	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_OnEvent", killHook)
 	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_Update", killHook)
@@ -486,6 +480,12 @@ function scanEnded()
 	-- Reset Scan Type Flag
 	QueryStyleScan = nil;
 	debugPrint("Scan Style Reset");
+
+	-- Un-Protect window if needed
+	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
+		-- We're set to protect only while scanning, so it's time to unprotect the window
+		Auctioneer.Util.ProtectAuctionFrame(false);
+	end
 
 	-- Cleaning up after oneself is always a good idea.
 	collectgarbage("collect");
