@@ -1879,7 +1879,7 @@ function protectWindow(param, chatprint)
 
 	elseif (param == 'scan' or param == _AUCT('CmdProtectWindow1') or tonumber(param) == 1) then
 		mode = 1;
-		if (Auctioneer.ScanManager.IsScanning) then
+		if (Auctioneer.ScanManager.IsScanning()) then
 			Auctioneer.Util.ProtectAuctionFrame(true);
 		else
 			Auctioneer.Util.ProtectAuctionFrame(false);
