@@ -62,7 +62,7 @@ local isQueryStyle;
 -------------------------------------------------------------------------------
 -- Public Data
 -------------------------------------------------------------------------------
-local RequestState = {
+local ScanRequestState = {
 	WaitingToQuery = "WaitingToQuery";
 	WaitingForQueryResult = "WaitingForQueryResult";
 	Done = "Done";
@@ -79,12 +79,12 @@ local ScanRequestQueue = {};
 
 -- Counters that keep track of the number of auctions added, updated or removed
 -- during the course of a scan.
-local AuctionsScanned = 0;
-local AuctionsAdded = 0;
-local AuctionsUpdated = 0;
-local AuctionsRemoved = 0;
-local LastRequestResult = RequestState.Done;
-local AuctionsScannedCacheSize = 0;
+local AuctionsScanned
+local AuctionsAdded
+local AuctionsUpdated
+local AuctionsRemoved
+local AuctionsScannedCacheSize
+local LastRequestResult = ScanRequestState.Done;
 local QueryStyleScan = nil;
 
 -- Flag that indicates if scanning has begun.
@@ -101,7 +101,7 @@ end
 function AucScanManager_OnUpdate()
 	local request = ScanRequestQueue[1];
 	if (request) then
-		if (request.state == RequestState.WaitingToQuery and Auctioneer.QueryManager.CanSendAuctionQuery()) then
+		if (request.state == ScanRequestState.WaitingToQuery and Auctioneer.QueryManager.CanSendAuctionQuery()) then
 			if (not Scanning) then
 				scanStarted();
 			end
@@ -221,7 +221,7 @@ function cancelScan()
 	-- %todo: We should probaby wait for the result of any query that is in
 	-- progress.
 	while (#ScanRequestQueue > 0) do
-		ScanRequestQueue[1].state = RequestState.Canceled;
+		ScanRequestQueue[1].state = ScanRequestState.Canceled;
 		removeRequestFromQueue();
 	end
 end
@@ -234,7 +234,7 @@ function addRequestToQueue(request)
 	request.totalAuctions = 0;
 	request.nextPage = 0;
 	request.auctionsScanned = 0;
-	request.state = RequestState.WaitingToQuery;
+	request.state = ScanRequestState.WaitingToQuery;
 	table.insert(ScanRequestQueue, request);
 	debugPrint("Added request to back of queue");
 end
@@ -251,7 +251,7 @@ function removeRequestFromQueue()
 
 		-- If the request succeeded, add the auctions scanned to the total.
 		LastRequestResult = request.state;
-		if (LastRequestResult == RequestState.Done) then
+		if (LastRequestResult == ScanRequestState.Done) then
 			AuctionsScanned = request.auctionsScanned;
 			AuctionsScannedCacheSize = AuctionsScannedCacheSize + AuctionsScanned;
 			debugPrint("AuctionsScanned: "..AuctionsScannedCacheSize.."("..AuctionsScanned..")");
@@ -270,7 +270,7 @@ function sendQuery(request)
 
 	-- Send the query!
 	debugPrint("Requesting page"..request.nextPage);
-	request.state = RequestState.WaitingForQueryResult;
+	request.state = ScanRequestState.WaitingForQueryResult;
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
 		request.minLevel,
@@ -292,7 +292,7 @@ end
 -------------------------------------------------------------------------------
 function queryCompleteCallback(query, result)
 	local request = ScanRequestQueue[1];
-	if (request and request.state == RequestState.WaitingForQueryResult) then
+	if (request and request.state == ScanRequestState.WaitingForQueryResult) then
 		-- Update the current request with query results.
 		local request = ScanRequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
@@ -329,7 +329,7 @@ function queryCompleteCallback(query, result)
 				-- Scanning one page should take at least approximitaly 4-5 seconds due to
 				-- blizzards restrictions on how fast a new page might be querried.
 				-- Therefore scanning one page should never be faster then 4 seconds.
-				local minTimeElapsed = 4.0 * (pagesScanned);
+				local minTimeElapsed = 4.0 * pagesScanned;
 				debugPrint(pagesScanned, "pages scanned thus far in", timeElapsed);
 				if (timeElapsed < minTimeElapsed) then
 					-- TODO: Before the release of 4.0 either remove this debug message, or
@@ -351,16 +351,16 @@ function queryCompleteCallback(query, result)
 			if (request.nextPage < 0) then
 				-- Request is complete!
 				debugPrint("Reached the first page");
-				request.state = RequestState.Done;
+				request.state = ScanRequestState.Done;
 				removeRequestFromQueue();
 			else
 				-- More pages to go...
-				request.state = RequestState.WaitingToQuery;
+				request.state = ScanRequestState.WaitingToQuery;
 			end
 		else
 			-- Query failed!
 			debugPrint("Aborting request due to failed query!");
-			request.state = RequestState.Failed
+			request.state = ScanRequestState.Failed
 			removeRequestFromQueue();
 		end
 	else
@@ -447,10 +447,10 @@ function scanEnded()
 	-- Compile the results.
 	local chatResultText;
 	local uiResultText;
-	if (LastRequestResult == RequestState.Done) then
+	if (LastRequestResult == ScanRequestState.Done) then
 		chatResultText = _AUCT('ScanComplete')
 		uiResultText = _AUCT('UIScanComplete')
-	elseif (LastRequestResult == RequestState.Canceled) then
+	elseif (LastRequestResult == ScanRequestState.Canceled) then
 		chatResultText = _AUCT('ScanCanceled')
 		uiResultText = _AUCT('UIScanCanceled')
 	else
@@ -525,31 +525,31 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function onAuctionAdded()
-	AuctionsAdded = AuctionsAdded + 1;
+	AuctionsAdded = AuctionsAdded + 1
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function onAuctionUpdated()
-	AuctionsUpdated = AuctionsUpdated + 1;
+	AuctionsUpdated = AuctionsUpdated + 1
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function onAuctionRemoved()
-	AuctionsRemoved = AuctionsRemoved + 1;
+	AuctionsRemoved = AuctionsRemoved + 1
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	if debug then EnhTooltip.DebugPrint("[Auc.ScanManager]", ...); end
+	if debug then EnhTooltip.DebugPrint("[Auc.ScanManager]", ...) end
 end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function isQueryStyle()
-	return QueryStyleScan;
+	return QueryStyleScan
 end
 -------------------------------------------------------------------------------
 -- Public API
