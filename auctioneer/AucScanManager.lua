@@ -318,6 +318,7 @@ function queryCompleteCallback(query, result)
 				else
 					-- More then one page so we'll scan in reverse so as to
 					-- not miss any auctions.
+					-- Start counting the time, after scanning the first page is done
 					request.startTime = GetTime();
 					request.nextPage = request.pages - 1;
 					Auctioneer.QueryManager.ClearPageCache();
@@ -327,8 +328,13 @@ function queryCompleteCallback(query, result)
 				-- Tweak the start time if it happened in less than 5 seconds.
 				local currentTime = GetTime();
 				local timeElapsed = currentTime - request.startTime;
+				-- This is off by one page, since we did not record the processing time
+				-- for the first page.
 				local pagesScanned = request.pages - request.nextPage;
-				local minTimeElapsed = 5.0 * (pagesScanned);
+				-- Scanning one page should take at least approximitaly 4-5 seconds due to
+				-- blizzards restrictions on how fast a new page might be querried.
+				-- Therefore scanning one page should never be faster then 4 seconds.
+				local minTimeElapsed = 4.0 * (pagesScanned);
 				debugPrint(pagesScanned, "pages scanned thus far in", timeElapsed);
 				if (timeElapsed < minTimeElapsed) then
 					-- TODO: Before the release of 4.0 either remove this debug message, or
