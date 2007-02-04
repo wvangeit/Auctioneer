@@ -63,11 +63,11 @@ local isQueryStyle;
 -- Public Data
 -------------------------------------------------------------------------------
 local ScanRequestState = {
-	WaitingToQuery = "WaitingToQuery";
+	WaitingToQuery        = "WaitingToQuery";
 	WaitingForQueryResult = "WaitingForQueryResult";
-	Done = "Done";
-	Canceled = "Canceled";
-	Failed = "Failed";
+	Done                  = "Done";
+	Canceled              = "Canceled";
+	Failed                = "Failed";
 }
 
 -------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ function scan()
 			table.insert(categories, category);
 		end
 	end
-	
+
 	-- Scan everything or only selected categories?
 	if (#allCategories == #categories) then
 		debugPrint("Scanning all categories");
@@ -230,11 +230,11 @@ end
 -- Adds a request to the back of the queue.
 -------------------------------------------------------------------------------
 function addRequestToQueue(request)
-	request.pages = 0;
-	request.totalAuctions = 0;
-	request.nextPage = 0;
+	request.pages           = 0;
+	request.totalAuctions   = 0;
+	request.nextPage        = 0;
 	request.auctionsScanned = 0;
-	request.state = ScanRequestState.WaitingToQuery;
+	request.state           = ScanRequestState.WaitingToQuery;
 	table.insert(ScanRequestQueue, request);
 	debugPrint("Added request to back of queue");
 end
@@ -396,7 +396,7 @@ function scanStarted()
 
 	-- Initialize the counters for this scan.
 	AuctionsScanned = 0;
-	AuctionsAdded = 0;
+	AuctionsAdded   = 0;
 	AuctionsUpdated = 0;
 	AuctionsRemoved = 0;
 	AuctionsScannedCacheSize = 0;
@@ -449,16 +449,16 @@ function scanEnded()
 	local uiResultText;
 	if (LastRequestResult == ScanRequestState.Done) then
 		chatResultText = _AUCT('ScanComplete')
-		uiResultText = _AUCT('UIScanComplete')
+		uiResultText   = _AUCT('UIScanComplete')
 	elseif (LastRequestResult == ScanRequestState.Canceled) then
 		chatResultText = _AUCT('ScanCanceled')
-		uiResultText = _AUCT('UIScanCanceled')
+		uiResultText   = _AUCT('UIScanCanceled')
 	else
 		chatResultText = _AUCT('ScanFailed')
-		uiResultText = _AUCT('UIScanFailed')
+		uiResultText   = _AUCT('UIScanFailed')
 	end
 	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScannedCacheSize);
-	local auctionsAddedMessage = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
+	local auctionsAddedMessage   = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
 	local auctionsRemovedMessage = _AUCT('AuctionDefunctAucts'):format(AuctionsRemoved);
 	local auctionsUpdatedMessage = _AUCT('AuctionUpdatedAucts'):format(AuctionsUpdated);
 
@@ -471,12 +471,12 @@ function scanEnded()
 	-- Report the result to the UI.
 	BrowseNoResultsText:SetText(strjoin("\n", uiResultText, auctionsScannedMessage, auctionsAddedMessage, auctionsRemovedMessage, auctionsUpdatedMessage));
 
-	--The followng was added by MentalPower to implement the "/auc finish-sound" command
+	-- The followng was added by MentalPower to implement the "/auc finish-sound" command
 	if (Auctioneer.Command.GetFilter("finish-sound")) then
 		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.mp3")
 	end
 
-	--The followng was added by MentalPower to implement the "/auc finish" command
+	-- The followng was added by MentalPower to implement the "/auc finish" command
 	local finish = Auctioneer.Command.GetFilterVal('finish');
 	if (finish == 1) then
 		Logout();
@@ -484,11 +484,11 @@ function scanEnded()
 		Quit();
 	end
 
-	--Reset Scan Type Flag
+	-- Reset Scan Type Flag
 	QueryStyleScan = nil;
 	debugPrint("Scan Style Reset");
 
-	--Cleaning up after oneself is always a good idea.
+	-- Cleaning up after oneself is always a good idea.
 	collectgarbage("collect");
 end
 
@@ -555,14 +555,14 @@ end
 -- Public API
 -------------------------------------------------------------------------------
 Auctioneer.ScanManager = {
-	Load = load;
-	Scan = scan;
-	ScanAll = scanAll;
-	ScanCategories = scanCategories;
-	ScanQuery = scanQuery;
-	IsScanning = isScanning;
+	Load              = load;
+	Scan              = scan;
+	ScanAll           = scanAll;
+	ScanCategories    = scanCategories;
+	ScanQuery         = scanQuery;
+	IsScanning        = isScanning;
 	EmptyHookFunction = emptyHookFunction;
-	IsQueryStyle = isQueryStyle;
+	IsQueryStyle      = isQueryStyle;
 }
 
 -- This is the variable Auctioneer used to use to indicate scanning. Keep it for
@@ -570,4 +570,3 @@ Auctioneer.ScanManager = {
 Auctioneer.Scanning = {
 	IsScanningRequested = false;
 }
-
