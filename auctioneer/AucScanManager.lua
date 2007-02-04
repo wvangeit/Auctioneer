@@ -294,7 +294,6 @@ function queryCompleteCallback(query, result)
 	local request = ScanRequestQueue[1];
 	if (request and request.state == ScanRequestState.WaitingForQueryResult) then
 		-- Update the current request with query results.
-		local request = ScanRequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
 			-- Query succeeded so update the request.
 			debugPrint("Scanned page"..request.nextPage);
