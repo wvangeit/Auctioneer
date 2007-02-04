@@ -341,6 +341,7 @@ function queryCompleteCallback(query, result)
 					--       if no user reported this issue, remove the complete
 					--       timeElapsed code since it does no longer seem to be of any use.
 					Auctioneer.Util.ChatPrint("Scanning the AH up to now was unexpectingly fast. Please report this issue and explain what exactly you did before this message occured on: http://www.auctioneeraddon.com/scm/ticket/1436.")
+					Auctioneer.Util.ChatPrint("Please also add these details to your report: Number of total pages: "..request.pages.." - calculated time: "..timeElapsed.." - pages scanned: "..pagesScanned)
 					debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 					request.startTime = currentTime - minTimeElapsed;
 				end
