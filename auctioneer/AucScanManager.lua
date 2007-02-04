@@ -34,11 +34,6 @@ local debug = false
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 -------------------------------------------------------------------------------
--- Function Imports
--------------------------------------------------------------------------------
-local chatPrint = Auctioneer.Util.ChatPrint;
-
--------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
 local load;
@@ -468,11 +463,11 @@ function scanEnded()
 	local auctionsUpdatedMessage = _AUCT('AuctionUpdatedAucts'):format(AuctionsUpdated);
 
 	-- Report the result to the chat window.
-	chatPrint(chatResultText..":");
-	chatPrint(auctionsScannedMessage);
-	chatPrint(auctionsAddedMessage);
-	chatPrint(auctionsRemovedMessage);
-	chatPrint(auctionsUpdatedMessage);
+	Auctioneer.Util.ChatPrint(chatResultText..":");
+	Auctioneer.Util.ChatPrint(auctionsScannedMessage);
+	Auctioneer.Util.ChatPrint(auctionsAddedMessage);
+	Auctioneer.Util.ChatPrint(auctionsRemovedMessage);
+	Auctioneer.Util.ChatPrint(auctionsUpdatedMessage);
 	-- Report the result to the UI.
 	BrowseNoResultsText:SetText(strjoin("\n", uiResultText, auctionsScannedMessage, auctionsAddedMessage, auctionsRemovedMessage, auctionsUpdatedMessage));
 
