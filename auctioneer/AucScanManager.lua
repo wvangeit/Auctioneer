@@ -80,7 +80,7 @@ local RequestState = {
 -------------------------------------------------------------------------------
 
 -- Queue of scan requests.
-local RequestQueue = {};
+local ScanRequestQueue = {};
 
 -- Counters that keep track of the number of auctions added, updated or removed
 -- during the course of a scan.
@@ -104,7 +104,7 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AucScanManager_OnUpdate()
-	local request = RequestQueue[1];
+	local request = ScanRequestQueue[1];
 	if (request) then
 		if (request.state == RequestState.WaitingToQuery and Auctioneer.QueryManager.CanSendAuctionQuery()) then
 			if (not Scanning) then
@@ -160,7 +160,7 @@ end
 -- Starts an AH scan of all auctions.
 -------------------------------------------------------------------------------
 function scanAll()
-	if (#RequestQueue == 0) then
+	if (#ScanRequestQueue == 0) then
 		-- Construct a scan all request.
 		local request = {};
 		request.description = _AUCT('AuctionScanAll');
@@ -176,7 +176,7 @@ end
 -- Starts an AH scan of the specified categories.
 -------------------------------------------------------------------------------
 function scanCategories(categories)
-	if (#RequestQueue == 0) then
+	if (#ScanRequestQueue == 0) then
 		-- Construct a scan request for each category requested.
 		for index, category in pairs(categories) do
 			local request = {};
@@ -195,7 +195,7 @@ end
 -- Starts an AH scan base on a query.
 -------------------------------------------------------------------------------
 function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (#RequestQueue == 0) then
+	if (#ScanRequestQueue == 0) then
 		-- Construct the scan request.
 		local request = {
 			description = _AUCT('AuctionScanAuctions');
@@ -225,8 +225,8 @@ end
 function cancelScan()
 	-- %todo: We should probaby wait for the result of any query that is in
 	-- progress.
-	while (#RequestQueue > 0) do
-		RequestQueue[1].state = RequestState.Canceled;
+	while (#ScanRequestQueue > 0) do
+		ScanRequestQueue[1].state = RequestState.Canceled;
 		removeRequestFromQueue();
 	end
 end
@@ -240,7 +240,7 @@ function addRequestToQueue(request)
 	request.nextPage = 0;
 	request.auctionsScanned = 0;
 	request.state = RequestState.WaitingToQuery;
-	table.insert(RequestQueue, request);
+	table.insert(ScanRequestQueue, request);
 	debugPrint("Added request to back of queue");
 end
 
@@ -248,10 +248,10 @@ end
 -- Removes the request at the head of the queue.
 -------------------------------------------------------------------------------
 function removeRequestFromQueue()
-	if (#RequestQueue > 0) then
+	if (#ScanRequestQueue > 0) then
 		-- Remove the request from the queue.
-		local request = RequestQueue[1];
-		table.remove(RequestQueue, 1);
+		local request = ScanRequestQueue[1];
+		table.remove(ScanRequestQueue, 1);
 		debugPrint("Removed request from queue with result:", request.state);
 
 		-- If the request succeeded, add the auctions scanned to the total.
@@ -296,10 +296,10 @@ end
 -- Called when our query request completes.
 -------------------------------------------------------------------------------
 function queryCompleteCallback(query, result)
-	local request = RequestQueue[1];
+	local request = ScanRequestQueue[1];
 	if (request and request.state == RequestState.WaitingForQueryResult) then
 		-- Update the current request with query results.
-		local request = RequestQueue[1];
+		local request = ScanRequestQueue[1];
 		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
 			-- Query succeeded so update the request.
 			debugPrint("Scanned page"..request.nextPage);
@@ -500,8 +500,8 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function updateScanProgressUI()
-	if (#RequestQueue > 0) then
-		local request = RequestQueue[1];
+	if (#ScanRequestQueue > 0) then
+		local request = ScanRequestQueue[1];
 
 		-- Check if we've completed a page yet...
 		local pagesScanned = request.pages - request.nextPage;
