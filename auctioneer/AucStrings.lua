@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://www.norganna.org/localizer/index.php
+	http://norganna.org/localizer/index.php
 
 	AddOn: Auctioneer
 	Revision: $Id$
@@ -867,6 +867,7 @@ AuctioneerLocalizations = {
 		FrmtInfoMinMulti	= "Start bud (%s stk.)";
 		FrmtInfoMinOne	= "Start bud";
 		FrmtInfoNever	= "Aldrig set paa %s";
+		FrmtInfoNeverAtAll	= "Aldrig set på auktion";
 		FrmtInfoSeen	= "Set %d gange paa auktion ialt";
 		FrmtInfoSgst	= "Prisforslag: %s min/%s BO";
 		FrmtInfoSgststx	= "Prisforslag for dine %d stk: %s min/%s BO";
@@ -1300,15 +1301,16 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Abgelaufene Auktionen: %s";
 		AuctionDiscrepancies	= "Unstimmigkeiten: %s";
 		AuctionNewAucts	= "Davon neu: %s";
-		AuctionPageN	= "Auctioneer: %s Seite %d von %d\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s";
+		AuctionPageN	= "Auctioneer: %s\n%d Seite(n) von %d Seite(n) gescannt.\nAuktionen pro Sekunde: %s\nGeschätzte Restzeit: %s\nBisher gescannte Auktionen: %d";
 		AuctionScanAll	= "Scanne alle Auktionen.";
 		AuctionScanAuctions	= "Scanne Auktionen.";
 		AuctionScanCat	= "Scanne alle Auktionen für: %s.";
-		AuctionScanDone	= "Auctioneer: Scan abgeschlossen";
+		AuctionScanDone	= "Auctioneer: Scan abgeschlossen.";
+		AuctionScanFinished	= "fertig";
 		AuctionScanNexttime	= "Auctioneer wird einen vollständigen Auktionsscan durchführen, wenn das nächste Mal ein Auktionator angesprochen wird.";
 		AuctionScanNocat	= "Zum Scannen muss mindestens eine Kategorie ausgewählt sein.";
 		AuctionScanRedo	= "Das Erfassen der aktuelle Seite benötigte mehr als %d Sekunden, erneuter Versuch.";
-		AuctionScanStart	= "Auctioneer: %s Seite 1...";
+		AuctionScanStart	= "Auctioneer: %s\nSeite 1 gescannt...";
 		AuctionTotalAucts	= "Insgesamt gescannte Auktionen: %s";
 		AuctionUpdatedAucts	= "Upgedatete/Geänderte Auktionen: %s";
 
@@ -1770,15 +1772,16 @@ AuctioneerLocalizations = {
 		AuctionDefunctAucts	= "Defunct auctions removed: %s";
 		AuctionDiscrepancies	= "Discrepancies: %s";
 		AuctionNewAucts	= "New auctions scanned: %s";
-		AuctionPageN	= "Auctioneer: %s Page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAdded to snapshot: %s";
+		AuctionPageN	= "Auctioneer: %s\nScanned page %d of %d\nAuctions per second: %s\nEstimated time left: %s\nAuctions scanned thus far: %d";
 		AuctionScanAll	= "Scanning all auctions.";
 		AuctionScanAuctions	= "Scanning auctions.";
 		AuctionScanCat	= "Scanning all %s auctions.";
 		AuctionScanDone	= "Auctioneer: auction scanning finished";
+		AuctionScanFinished	= "finished";
 		AuctionScanNexttime	= "Auctioneer will perform a full auction scan the next time you talk to an auctioneer.";
 		AuctionScanNocat	= "You must have at least one category selected to scan.";
 		AuctionScanRedo	= "Current page took more than %d seconds to complete, retrying page.";
-		AuctionScanStart	= "Auctioneer: %s Page 1...";
+		AuctionScanStart	= "Auctioneer: %s\nScanned page 1...";
 		AuctionTotalAucts	= "Total auctions scanned: %s";
 		AuctionUpdatedAucts	= "Updated/Changed auctions: %s";
 
