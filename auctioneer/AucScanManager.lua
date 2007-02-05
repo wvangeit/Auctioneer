@@ -349,6 +349,7 @@ function queryCompleteCallback(query, result)
 			debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 			request.startTime = currentTime - minTimeElapsed;
 		end
+		updateScanProgressUI();
 
 		-- This was a subsequent query.
 		request.nextPage = request.nextPage - 1;
