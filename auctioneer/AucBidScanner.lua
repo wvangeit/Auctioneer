@@ -37,27 +37,27 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 -- Function Imports
 -------------------------------------------------------------------------------
 local chatPrint = Auctioneer.Util.ChatPrint;
-local emptyHookFunction = Auctioneer.ScanManager.EmptyHookFunction;
 
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
-local load;
-local getBidRequestCount
-local bidByAuctionId;
-local buyoutByAuctionId;
-local placeBidByAuction;
 local addRequestToQueue;
-local removeRequestFromQueue;
-local sendQuery;
-local queryCompleteCallback;
-local placeBid;
+local bidByAuctionId;
 local bidCompleteCallback;
-local emptyHookFunction;
-local scanStarted;
-local scanEnded;
-local isScanning;
+local buyoutByAuctionId;
 local debugPrint;
+local emptyHookFunction;
+local getBidRequestCount
+local isScanning;
+local killOrig;
+local load;
+local placeBid;
+local placeBidByAuction;
+local queryCompleteCallback;
+local removeRequestFromQueue;
+local scanEnded;
+local scanStarted;
+local sendQuery;
 
 -------------------------------------------------------------------------------
 -- Data Members
@@ -416,6 +416,10 @@ function bidCompleteCallback(auction, result)
 	end
 end
 
+function killHook()
+	return "killorig"
+end
+
 -------------------------------------------------------------------------------
 -- Called when a scan starts.
 -------------------------------------------------------------------------------
@@ -435,8 +439,9 @@ function scanStarted()
 	BrowseBuyoutButton:Disable();
 
 	-- Don't allow AuctionFrameBrowse updates during a scan.
-	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, emptyHookFunction)
-	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, emptyHookFunction)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_OnEvent", -200, killHook)
+	Stubby.RegisterFunctionHook("AuctionFrameBrowse_Update", -200, killHook)
+
 
 	-- Bid scanning has begun!
 	Scanning = true;
@@ -452,8 +457,8 @@ function scanEnded()
 	Auctioneer.Scanning.IsScanningRequested = false;
 
 	-- We can allow AuctionFrameBrowse updates once again.
-	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_OnEvent", emptyHookFunction)
-	Stubby.UnregisterFunctionHook("Original_AuctionFrameBrowse_Update", emptyHookFunction)
+	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_OnEvent", killHook)
+	Stubby.UnregisterFunctionHook("AuctionFrameBrowse_Update", killHook)
 
 	-- Update the Browse UI.
 	BrowseNoResultsText:Hide();
