@@ -36,28 +36,27 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 -------------------------------------------------------------------------------
 -- Function Prototypes
 -------------------------------------------------------------------------------
-local load;
-local killHook;
-local onEventHook;
+local addRequestToQueue;
+local cancelScan;
+local debugPrint;
+local isQueryStyle;
 local isScanning;
+local killHook;
+local load;
+local onAuctionAdded;
+local onAuctionRemoved;
+local onAuctionUpdated;
+local onEventHook;
+local queryCompleteCallback;
+local removeRequestFromQueue;
 local scan;
 local scanAll;
 local scanCategories;
-local scanQuery;
-local cancelScan;
-local addRequestToQueue;
-local removeRequestFromQueue;
-local sendQuery;
-local queryCompleteCallback;
-local emptyHookFunction
-local scanStarted;
 local scanEnded;
+local scanQuery;
+local scanStarted;
+local sendQuery;
 local updateScanProgressUI;
-local onAuctionAdded;
-local onAuctionUpdated;
-local onAuctionRemoved;
-local debugPrint;
-local isQueryStyle;
 
 -------------------------------------------------------------------------------
 -- Enumerations
@@ -614,7 +613,6 @@ Auctioneer.ScanManager = {
 	ScanCategories    = scanCategories;
 	ScanQuery         = scanQuery;
 	IsScanning        = isScanning;
-	EmptyHookFunction = emptyHookFunction;
 	IsQueryStyle      = isQueryStyle;
 }
 
