@@ -349,7 +349,6 @@ function queryCompleteCallback(query, result)
 			debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 			request.startTime = currentTime - minTimeElapsed;
 		end
-		updateScanProgressUI();
 
 		-- This was a subsequent query.
 		request.nextPage = request.nextPage - 1;
@@ -495,31 +494,27 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function updateScanProgressUI()
-	if (#ScanRequestQueue > 0) then
-		local request = ScanRequestQueue[1];
+	local request = ScanRequestQueue[1];
 
-		-- Check if we've completed a page yet...
-		local pagesScanned = request.pages - request.nextPage;
-		if (pagesScanned > 0) then
-			local auctionsScanned = pagesScanned * NUM_AUCTION_ITEMS_PER_PAGE;
-			local pagesLeftToScan = request.pages - pagesScanned;
-			local auctionsLeftToScan = pagesLeftToScan * NUM_AUCTION_ITEMS_PER_PAGE;
-			local secondsElapsed = (GetTime() - request.startTime);
-			local auctionsScannedPerSecond = math.floor((auctionsScanned * 100) / secondsElapsed) / 100;
-			local secondsLeft = auctionsLeftToScan / auctionsScannedPerSecond;
+	local pagesScanned = request.pages - request.nextPage;
+	local auctionsScanned = pagesScanned * NUM_AUCTION_ITEMS_PER_PAGE;
+	local pagesLeftToScan = request.pages - pagesScanned;
+	local auctionsLeftToScan = pagesLeftToScan * NUM_AUCTION_ITEMS_PER_PAGE;
+	local secondsElapsed = (GetTime() - request.startTime);
+	local auctionsScannedPerSecond = math.floor((auctionsScanned * 100) / secondsElapsed) / 100;
+	local secondsLeft = auctionsLeftToScan / auctionsScannedPerSecond;
 
-			-- Update the progress of this request in the UI.
-			BrowseNoResultsText:SetText(
-				_AUCT('AuctionPageN'):format(
-					request.description,
-					request.pages - request.nextPage,
-					request.pages,
-					tostring(auctionsScannedPerSecond),
-					SecondsToTime((secondsLeft)),AuctionsScannedCacheSize
-				)
-			);
-		end
-	end
+	-- Update the progress of this request in the UI.
+	BrowseNoResultsText:SetText(
+		_AUCT('AuctionPageN'):format(
+			request.description,
+			request.pages - request.nextPage,
+			request.pages,
+			tostring(auctionsScannedPerSecond),
+			SecondsToTime(secondsLeft),
+			AuctionsScannedCacheSize
+		)
+	)
 end
 
 -------------------------------------------------------------------------------
@@ -551,6 +546,7 @@ end
 function isQueryStyle()
 	return QueryStyleScan
 end
+
 -------------------------------------------------------------------------------
 -- Public API
 -------------------------------------------------------------------------------
