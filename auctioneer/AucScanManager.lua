@@ -508,22 +508,21 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 	-- This explains the following calculation, since it's a bit tricky:
 	-- pagesScanned - 1:
 	--    The parameter startTime passed to this function contains the timestamp
-	--    AFTER the first page was already processed. Therefore secondsElapsed
-	--    only contains the number of seconds we needed to process page 2 to
-	--    the current one.
-	--    That's why we have to reduce pagesScanned by one to calculate the
-	--    value for auctionsPerSecond
-	--    So we get the [NUMBER_OF_SCANNED_PAGES].
+	--    AFTER the last page was already processed. Therefore secondsElapsed
+	--    only contains the number of seconds we needed to process the last but
+	--    one page downto the current one.
+	--    That's why we have to decrease pagesScanned by one to calculate the
+	--    value for auctionsPerSecond to get [NUMBER_OF_SCANNED_PAGES].
 	-- [NUMBER_OF_SCANNED_PAGES] * NUM_AUCTION_ITEMS_PER_PAGE:
 	--    We assume that we scanned the maximum number of auctions on each page;
 	--    even if we would have included the last page in our calculations,
-	--    what we don't, we would have assumed that the last page also contains
-	--    the maximum amount of auctions on the list. That's because we scanning
-	--    one auction takes only few miliseconds, while the most time the scan
-	--    waits for the next page being sent.
-	--    Blizzard limits the interval of requesting AH pages to something like
-	--    4-5 seconds (the latency is included in these 4-5 seconds) to reduce
-	--    the serverload. Therefore most of the time Auctioneer is waiting.
+	--    which we don't, we would have assumed that the last page also contains
+	--    the maximum amount of auctions. That's because scanning one auction
+	--    takes only a few miliseconds, while the most time the scan waits for
+	--    the next page being sent.
+	--    Blizzard limits the interval for requesting AH pages to something like
+	--    4-5 seconds (the latency is included in this assumtion) to reduce the
+	--    serverload. Therefore most of the time Auctioneer is idle.
 	--    That's why there is almost no difference in the needed time to scan 1
 	--    or 50 auctions, and to get a more precise estimated time, we simply
 	--    assume that each page contains these 50 items (which is defined by bliz
@@ -531,9 +530,8 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 	--    We finally get the [NUMBER_OF_SCANNED_AUCTIONS].
 	-- [NUMBER_OF_SCANNED_AUCTION] / secondsElapsed:
 	--    Deviding this number by the seconds which already elapsed, results in
-	--    the 100% accurate [AUCTIONS_PER_SECOND]. Note that this value is a
-	--    float and therfore the positions after the decimal contain the
-	--    milliseconds.
+	--    the very accurate [AUCTIONS_PER_SECOND] value. Note that this value is
+	--    a float and the positions after the decimal represent the milliseconds.
 	-- [AUCTIONS_PER_SECOND] * 100:
 	--    This simply returns the [AUCTIONS_PER_HUNDRED_MILLISECONDS] with the
 	--    rest of the milliseconds still being positioned after the decimal
@@ -541,13 +539,14 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 	-- math.floor([AUCTIONS_PER_HUNDRED_MILLISECONDS]):
 	--    This way we get rid of the milliseconds after the decimal point and
 	--    get [AUCTIONS_PER_HUNDRED_MILLISECONDS_INT].
-	-- [AUCTIONS_PER_HUNDRED_MILLISECONDS] / 100:
-	--    The final operation moves the milliseconds which are still there up to
-	--    two positions back after the decimal point.
+	-- [AUCTIONS_PER_HUNDRED_MILLISECONDS_INT] / 100:
+	--    The final operation moves the milliseconds, which are still there, back
+	--    by two digits after the decimal point.
 	local auctionsPerSecond = math.floor((pagesScanned-1) * NUM_AUCTION_ITEMS_PER_PAGE / secondsElapsed * 100) / 100
 	local secondsLeft       = auctionsToScan / auctionsPerSecond
 
-	-- convert seconds left to a useful string (SecondsToTime would return an empty string, if secondsLeft is 0)
+	-- convert seconds left to a useful string - note that SecondsToTime returns
+	-- an empty string whith whitespaces only, if secondsLeft is 0
 	local strSecondsLeft
 	if secondsLeft == 0 then
 		strSecondsLeft = _AUCT('AuctionScanFinished')
