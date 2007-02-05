@@ -292,78 +292,79 @@ end
 -------------------------------------------------------------------------------
 function queryCompleteCallback(query, result)
 	local request = ScanRequestQueue[1];
-	if (request and request.state == ScanRequestState.WaitingForQueryResult) then
-		-- Update the current request with query results.
-		if (result == QueryAuctionItemsResultCodes.Complete or result == QueryAuctionItemsResultCodes.PartialComplete) then
-			-- Query succeeded so update the request.
-			debugPrint("Scanned page"..request.nextPage);
-			local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
+	if (not request) or (request.state ~= ScanRequestState.WaitingForQueryResult) then
+		debugPrint("WARNING: Received query complete callback in unexpected state")
+		return
+	end
 
-			-- Is this the first query?
-			if (request.totalAuctions == 0) then
-				-- This was the first query to get the total number of auctions.
-				request.totalAuctions = totalAuctions;
-				request.pages = math.floor((totalAuctions - 1) / NUM_AUCTION_ITEMS_PER_PAGE) + 1;
-				if (request.pages == 1) then
-					-- There's one and only one page. Tally the auctions
-					-- scanned and we are done!
-					request.nextPage = -1;
-					request.auctionsScanned = lastIndexOnPage;
-				else
-					-- More then one page so we'll scan in reverse so as to
-					-- not miss any auctions.
-					-- Start counting the time, after scanning the first page is done
-					request.startTime = GetTime();
-					request.nextPage = request.pages - 1;
-					Auctioneer.QueryManager.ClearPageCache();
-				end
-				debugPrint("Found", request.totalAuctions, "auctions (", request.pages, "pages)");
-			else
-				-- Tweak the start time if it happened in less than 5 seconds.
-				local currentTime = GetTime();
-				local timeElapsed = currentTime - request.startTime;
-				-- This is off by one page, since we did not record the processing time
-				-- for the first page.
-				local pagesScanned = request.pages - request.nextPage;
-				-- Scanning one page should take at least approximitaly 4-5 seconds due to
-				-- blizzards restrictions on how fast a new page might be querried.
-				-- Therefore scanning one page should never be faster then 4 seconds.
-				local minTimeElapsed = 4.0 * pagesScanned;
-				debugPrint(pagesScanned, "pages scanned thus far in", timeElapsed);
-				if (timeElapsed < minTimeElapsed) then
-					-- TODO: Before the release of 4.0 either remove this debug message, or
-					--       if no user reported this issue, remove the complete
-					--       timeElapsed code since it does no longer seem to be of any use.
-					Auctioneer.Util.ChatPrint("Scanning the AH up to now was unexpectingly fast. Please report this issue and explain what exactly you did before this message occured on: http://www.auctioneeraddon.com/scm/ticket/1436.")
-					Auctioneer.Util.ChatPrint("Please also add these details to your report: Number of total pages: "..request.pages.." - calculated time: "..timeElapsed.." - pages scanned: "..pagesScanned)
-					debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
-					request.startTime = currentTime - minTimeElapsed;
-				end
-				updateScanProgressUI();
+	-- Check, if query failed
+	if (result ~= QueryAuctionItemsResultCodes.Complete) and (result ~= QueryAuctionItemsResultCodes.PartialComplete) then
+		debugPrint("Aborting request due to failed query!");
+		request.state = ScanRequestState.Failed
+		removeRequestFromQueue();
+		return
+	end
 
-				-- This was a subsequent query.
-				request.nextPage = request.nextPage - 1;
-				request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
-			end
+	-- Query succeeded so update the request.
+	debugPrint("Scanned page"..request.nextPage);
+	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 
-			-- Check if the scan is complete.
-			if (request.nextPage < 0) then
-				-- Request is complete!
-				debugPrint("Reached the first page");
-				request.state = ScanRequestState.Done;
-				removeRequestFromQueue();
-			else
-				-- More pages to go...
-				request.state = ScanRequestState.WaitingToQuery;
-			end
+	-- Is this the first query?
+	if (request.totalAuctions == 0) then
+		-- This was the first query to get the total number of auctions.
+		request.totalAuctions = totalAuctions;
+		request.pages = math.floor((totalAuctions - 1) / NUM_AUCTION_ITEMS_PER_PAGE) + 1;
+		if (request.pages == 1) then
+			-- There's one and only one page. Tally the auctions
+			-- scanned and we are done!
+			request.nextPage = -1;
+			request.auctionsScanned = lastIndexOnPage;
 		else
-			-- Query failed!
-			debugPrint("Aborting request due to failed query!");
-			request.state = ScanRequestState.Failed
-			removeRequestFromQueue();
+			-- More then one page so we'll scan in reverse so as to
+			-- not miss any auctions.
+			-- Start counting the time, after scanning the first page is done
+			request.startTime = GetTime();
+			request.nextPage = request.pages - 1;
+			Auctioneer.QueryManager.ClearPageCache();
 		end
+		debugPrint("Found", request.totalAuctions, "auctions (", request.pages, "pages)");
 	else
-		debugPrint("WARNING: Received query complete callback in unexpected state");
+		-- Tweak the start time if it happened in less than 5 seconds.
+		local currentTime = GetTime();
+		local timeElapsed = currentTime - request.startTime;
+		-- This is off by one page, since we did not record the processing time
+		-- for the first page.
+		local pagesScanned = request.pages - request.nextPage;
+		-- Scanning one page should take at least approximitaly 4-5 seconds due to
+		-- blizzards restrictions on how fast a new page might be querried.
+		-- Therefore scanning one page should never be faster then 4 seconds.
+		local minTimeElapsed = 4.0 * pagesScanned;
+		debugPrint(pagesScanned, "pages scanned thus far in", timeElapsed);
+		if (timeElapsed < minTimeElapsed) then
+			-- TODO: Before the release of 4.0 either remove this debug message, or
+			--       if no user reported this issue, remove the complete
+			--       timeElapsed code since it does no longer seem to be of any use.
+			Auctioneer.Util.ChatPrint("Scanning the AH up to now was unexpectingly fast. Please report this issue and explain what exactly you did before this message occured on: http://www.auctioneeraddon.com/scm/ticket/1436.")
+			Auctioneer.Util.ChatPrint("Please also add these details to your report: Number of total pages: "..request.pages.." - calculated time: "..timeElapsed.." - pages scanned: "..pagesScanned)
+			debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
+			request.startTime = currentTime - minTimeElapsed;
+		end
+		updateScanProgressUI();
+
+		-- This was a subsequent query.
+		request.nextPage = request.nextPage - 1;
+		request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
+	end
+
+	-- Check if the scan is complete.
+	if (request.nextPage < 0) then
+		-- Request is complete!
+		debugPrint("Reached the first page");
+		request.state = ScanRequestState.Done;
+		removeRequestFromQueue();
+	else
+		-- More pages to go...
+		request.state = ScanRequestState.WaitingToQuery;
 	end
 end
 
