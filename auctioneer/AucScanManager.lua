@@ -64,7 +64,7 @@ local isQueryStyle;
 -------------------------------------------------------------------------------
 -- The states, which a scan request can enter.
 local ScanRequestState = {
-	WaitingToQuery        = "WaitingToQuery";        -- request is waiting in queue to be send to the query manager
+	WaitingToQuery        = "WaitingToQuery";        -- request is waiting in queue to be sent to the query manager
 	WaitingForQueryResult = "WaitingForQueryResult"; -- request is waiting in queue to be processed by the callback function
 	Done                  = "Done";                  -- request is done
 	Canceled              = "Canceled";              -- request is meant to be canceled
@@ -351,11 +351,14 @@ function queryCompleteCallback(query, result)
 			debugPrint("Adjusted request.startTime to keep the time remaining accurate.");
 			request.startTime = currentTime - minTimeElapsed;
 		end
-		updateScanProgressUI();
 
 		-- This was a subsequent query.
 		request.nextPage = request.nextPage - 1;
 		request.auctionsScanned = request.auctionsScanned + lastIndexOnPage;
+		if request.nextPage >= 0 then
+			-- update the scan progress only, if there is at least one page left to be processed
+			updateScanProgressUI(request.description, pagesScanned+1, request.pages, request.startTime, request.auctionsScanned)
+		end
 	end
 
 	-- Check if the scan is complete.
@@ -497,16 +500,60 @@ end
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
-function updateScanProgressUI()
-	local request = ScanRequestQueue[1];
+function updateScanProgressUI(description, pagesScanned, pages, startTime, auctionsScanned)
+	local pagesToScan       = pages - pagesScanned
+	local auctionsToScan    = pagesToScan * NUM_AUCTION_ITEMS_PER_PAGE
+	local secondsElapsed    = GetTime() - startTime
 
-	local pagesScanned = request.pages - request.nextPage;
-	local auctionsScanned = pagesScanned * NUM_AUCTION_ITEMS_PER_PAGE;
-	local pagesLeftToScan = request.pages - pagesScanned;
-	local auctionsLeftToScan = pagesLeftToScan * NUM_AUCTION_ITEMS_PER_PAGE;
-	local secondsElapsed = GetTime() - request.startTime;
-	local auctionsScannedPerSecond = math.floor((auctionsScanned * 100) / secondsElapsed) / 100;
-	local secondsLeft = auctionsLeftToScan / auctionsScannedPerSecond;
+	-- This explains the following calculation, since it's a bit tricky:
+	-- pagesScanned - 1:
+	--    The parameter startTime passed to this function contains the timestamp
+	--    AFTER the first page was already processed. Therefore secondsElapsed
+	--    only contains the number of seconds we needed to process page 2 to
+	--    the current one.
+	--    That's why we have to reduce pagesScanned by one to calculate the
+	--    value for auctionsPerSecond
+	--    So we get the [NUMBER_OF_SCANNED_PAGES].
+	-- [NUMBER_OF_SCANNED_PAGES] * NUM_AUCTION_ITEMS_PER_PAGE:
+	--    We assume that we scanned the maximum number of auctions on each page;
+	--    even if we would have included the last page in our calculations,
+	--    what we don't, we would have assumed that the last page also contains
+	--    the maximum amount of auctions on the list. That's because we scanning
+	--    one auction takes only few miliseconds, while the most time the scan
+	--    waits for the next page being sent.
+	--    Blizzard limits the interval of requesting AH pages to something like
+	--    4-5 seconds (the latency is included in these 4-5 seconds) to reduce
+	--    the serverload. Therefore most of the time Auctioneer is waiting.
+	--    That's why there is almost no difference in the needed time to scan 1
+	--    or 50 auctions, and to get a more precise estimated time, we simply
+	--    assume that each page contains these 50 items (which is defined by bliz
+	--    in NUM_AUCTION_ITEMS_PER_PAGE.
+	--    We finally get the [NUMBER_OF_SCANNED_AUCTIONS].
+	-- [NUMBER_OF_SCANNED_AUCTION] / secondsElapsed:
+	--    Deviding this number by the seconds which already elapsed, results in
+	--    the 100% accurate [AUCTIONS_PER_SECOND]. Note that this value is a
+	--    float and therfore the positions after the decimal contain the
+	--    milliseconds.
+	-- [AUCTIONS_PER_SECOND] * 100:
+	--    This simply returns the [AUCTIONS_PER_HUNDRED_MILLISECONDS] with the
+	--    rest of the milliseconds still being positioned after the decimal
+	--    point.
+	-- math.floor([AUCTIONS_PER_HUNDRED_MILLISECONDS]):
+	--    This way we get rid of the milliseconds after the decimal point and
+	--    get [AUCTIONS_PER_HUNDRED_MILLISECONDS_INT].
+	-- [AUCTIONS_PER_HUNDRED_MILLISECONDS] / 100:
+	--    The final operation moves the milliseconds which are still there up to
+	--    two positions back after the decimal point.
+	local auctionsPerSecond = math.floor((pagesScanned-1) * NUM_AUCTION_ITEMS_PER_PAGE / secondsElapsed * 100) / 100
+	local secondsLeft       = auctionsToScan / auctionsPerSecond
+
+	-- convert seconds left to a useful string (SecondsToTime would return an empty string, if secondsLeft is 0)
+	local strSecondsLeft
+	if secondsLeft == 0 then
+		strSecondsLeft = _AUCT('AuctionScanFinished')
+	else
+		strSecondsLeft = SecondsToTime(secondsLeft)
+	end
 
 	-- Update the progress of this request in the UI to
 	-- Auctioneer: [request.description]
@@ -516,11 +563,13 @@ function updateScanProgressUI()
 	-- Auctions scanned thus far: [AuctionsScannedCacheSize]
 	BrowseNoResultsText:SetText(
 		_AUCT('AuctionPageN'):format(
-			request.description,
-			request.pages - request.nextPage,
-			request.pages,
-			tostring(auctionsScannedPerSecond),
-			SecondsToTime(secondsLeft),
+			description,
+			pagesScanned,
+			pages,
+			-- tostring is used instead of %f, so that the number won't be
+			-- displayed with tailing zeroes
+			tostring(auctionsPerSecond),
+			strSecondsLeft,
 			AuctionsScannedCacheSize
 		)
 	)
