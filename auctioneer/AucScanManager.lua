@@ -60,14 +60,15 @@ local debugPrint;
 local isQueryStyle;
 
 -------------------------------------------------------------------------------
--- Public Data
+-- Enumerations
 -------------------------------------------------------------------------------
+-- The states, which a scan request can enter.
 local ScanRequestState = {
-	WaitingToQuery        = "WaitingToQuery";
-	WaitingForQueryResult = "WaitingForQueryResult";
-	Done                  = "Done";
-	Canceled              = "Canceled";
-	Failed                = "Failed";
+	WaitingToQuery        = "WaitingToQuery";        -- request is waiting in queue to be send to the query manager
+	WaitingForQueryResult = "WaitingForQueryResult"; -- request is waiting in queue to be processed by the callback function
+	Done                  = "Done";                  -- request is done
+	Canceled              = "Canceled";              -- request is meant to be canceled
+	Failed                = "Failed";                -- request failed
 }
 
 -------------------------------------------------------------------------------
@@ -87,7 +88,7 @@ local AuctionsScannedCacheSize
 local LastRequestResult = ScanRequestState.Done;
 local QueryStyleScan = nil;
 
--- Flag that indicates if scanning has begun.
+-- Flag that indicates, if scanning has begun.
 local Scanning = false;
 
 -------------------------------------------------------------------------------
@@ -300,6 +301,7 @@ function queryCompleteCallback(query, result)
 	-- Check, if query failed
 	if (result ~= QueryAuctionItemsResultCodes.Complete) and (result ~= QueryAuctionItemsResultCodes.PartialComplete) then
 		debugPrint("Aborting request due to failed query!");
+		-- set, so that the debug output in removeRequestFromQueue() will print the correct state
 		request.state = ScanRequestState.Failed
 		removeRequestFromQueue();
 		return
@@ -390,6 +392,7 @@ function scanStarted()
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
 	BrowseNoResultsText:Show();
+	-- "result buttons" (the entries, shown in the saerch result list)
 	for iButton = 1, NUM_BROWSE_TO_DISPLAY do
 		button = getglobal("BrowseButton"..iButton);
 		button:Hide();
@@ -429,7 +432,7 @@ function scanEnded()
 	Auctioneer.Scanning.IsScanningRequested = false;
 	debugPrint("Scan ended with result:", LastRequestResult);
 
-	-- Unregister for snapshot events.
+	-- Unregister snapshot events.
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_ADDED", onAuctionAdded)
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_UPDATED", onAuctionUpdated)
 	Auctioneer.EventManager.UnregisterEvent("AUCTIONEER_AUCTION_REMOVED", onAuctionRemoved)
@@ -501,11 +504,16 @@ function updateScanProgressUI()
 	local auctionsScanned = pagesScanned * NUM_AUCTION_ITEMS_PER_PAGE;
 	local pagesLeftToScan = request.pages - pagesScanned;
 	local auctionsLeftToScan = pagesLeftToScan * NUM_AUCTION_ITEMS_PER_PAGE;
-	local secondsElapsed = (GetTime() - request.startTime);
+	local secondsElapsed = GetTime() - request.startTime;
 	local auctionsScannedPerSecond = math.floor((auctionsScanned * 100) / secondsElapsed) / 100;
 	local secondsLeft = auctionsLeftToScan / auctionsScannedPerSecond;
 
-	-- Update the progress of this request in the UI.
+	-- Update the progress of this request in the UI to
+	-- Auctioneer: [request.description]
+	-- Scanned page [request.pages - request.nextPage] of [request.pages]
+	-- Auctions per second: [auctionsScannedPerSecond]
+	-- Estimated time left: [secondsLeft]
+	-- Auctions scanned thus far: [AuctionsScannedCacheSize]
 	BrowseNoResultsText:SetText(
 		_AUCT('AuctionPageN'):format(
 			request.description,
