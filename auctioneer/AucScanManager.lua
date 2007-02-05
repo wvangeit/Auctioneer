@@ -570,7 +570,7 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 			-- displayed with tailing zeroes
 			tostring(auctionsPerSecond),
 			strSecondsLeft,
-			AuctionsScannedCacheSize
+			auctionsScanned + AuctionsScannedCacheSize
 		)
 	)
 end
