@@ -324,6 +324,7 @@ function queryCompleteCallback(query, result)
 		if (request.pages == 1) then
 			-- There's one and only one page. Tally the auctions
 			-- scanned and we are done!
+			Auctioneer.QueryManager.ProccessQuery(1);
 			request.nextPage = -1;
 			request.auctionsScanned = lastIndexOnPage;
 		else

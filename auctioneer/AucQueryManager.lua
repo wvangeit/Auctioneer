@@ -74,6 +74,7 @@ local nilSafeString;
 local nilSafeNumber;
 local normalizeNumericQueryParam;
 local debugPrint;
+local proccessQuery;
 
 -------------------------------------------------------------------------------
 -- Private Data
@@ -852,16 +853,22 @@ function addPageToCache(page, updateSnapshot)
 				Scanned = CurrentPage.pageNum;
 				break;
 			elseif (page.isLastPage) then
-				debugPrint("Seen all "..(pageNum + 1).." page(s), updating snapshot");
-				local auctions, scannedInReverse = getAuctionsInCache();
-				Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, (not scannedInReverse));
-				clearPageCache();
-				Scanned = 0;
+				proccessQuery(pageNum)
 				break;
 			end
 			pageNum = pageNum + 1;
 		end
 	end
+end
+-------------------------------------------------------------------------------
+-- calls functions to check for duplicates and update the Snapshot
+-------------------------------------------------------------------------------
+function proccessQuery(pNum)
+	debugPrint("Seen all "..(pNum + 1).." page(s), updating snapshot");
+	local auctions, scannedInReverse = getAuctionsInCache();
+	Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, (not scannedInReverse));
+	clearPageCache();
+	Scanned = 0;
 end
 
 -------------------------------------------------------------------------------
@@ -1116,6 +1123,7 @@ Auctioneer.QueryManager = {
 	IsQueryInProgress = isQueryInProgress;
 	CanSendAuctionQuery = canSendAuctionQuery;
 	ClearPageCache = clearPageCache;
+	ProccessQuery = proccessQuery;
 }
 
 function Auctioneer.QueryManager.GetRequestQueue()
