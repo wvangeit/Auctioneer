@@ -85,7 +85,8 @@ local AuctionsUpdated
 local AuctionsRemoved
 local AuctionsScannedCacheSize
 local LastRequestResult = ScanRequestState.Done;
-local QueryStyleScan = nil;
+-- Flag which indicates, if a QueryStyleScan is queued or currently in progress.
+local QueryStyleScan = false;
 
 -- Flag that indicates, if scanning has begun.
 local Scanning = false;
@@ -206,7 +207,7 @@ function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassI
 		};
 		addRequestToQueue(request);
 		debugPrint("Query Style Scan");
-		QueryStyleScan = 1;
+		QueryStyleScan = true;
 		return true;
 	else
 		debugPrint("Cannot start scan because a scan is already in progress!");
@@ -487,7 +488,7 @@ function scanEnded()
 	end
 
 	-- Reset Scan Type Flag
-	QueryStyleScan = nil;
+	QueryStyleScan = false;
 	debugPrint("Scan Style Reset");
 
 	-- Un-Protect window if needed
