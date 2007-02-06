@@ -87,7 +87,9 @@ local AuctionsRemoved
 -- to the database.
 local AuctionsWrittenToDB
 
-local LastRequestResult = ScanRequestState.Done;
+-- Contains the state of the last request, before it was removed from the scan
+-- request queue.
+local LastRequestResult
 
 -- Flag which indicates, if a QueryStyleScan is queued or currently in progress.
 local QueryStyleScan = false;
