@@ -79,16 +79,20 @@ local ScanRequestQueue = {};
 
 -- Counters that keep track of the number of auctions added, updated or removed
 -- during the course of a scan.
-local AuctionsScanned
 local AuctionsAdded
 local AuctionsUpdated
 local AuctionsRemoved
-local AuctionsScannedCacheSize
+
+-- Counter which records the number of auctions which have been already written
+-- to the database.
+local AuctionsWrittenToDB
+
 local LastRequestResult = ScanRequestState.Done;
+
 -- Flag which indicates, if a QueryStyleScan is queued or currently in progress.
 local QueryStyleScan = false;
 
--- Flag that indicates, if scanning has begun.
+-- Flag that indicates, if scanning is in progress.
 local Scanning = false;
 
 -------------------------------------------------------------------------------
@@ -253,9 +257,8 @@ function removeRequestFromQueue()
 		-- If the request succeeded, add the auctions scanned to the total.
 		LastRequestResult = request.state;
 		if (LastRequestResult == ScanRequestState.Done) then
-			AuctionsScanned = request.auctionsScanned;
-			AuctionsScannedCacheSize = AuctionsScannedCacheSize + AuctionsScanned;
-			debugPrint("AuctionsScanned: "..AuctionsScannedCacheSize.."("..AuctionsScanned..")");
+			AuctionsWrittenToDB = AuctionsWrittenToDB + request.auctionsScanned
+			debugPrint("AuctionsScanned: "..AuctionsWrittenToDB);
 		end
 	end
 end
@@ -410,11 +413,10 @@ function scanStarted()
 	BrowseBuyoutButton:Disable();
 
 	-- Initialize the counters for this scan.
-	AuctionsScanned = 0;
-	AuctionsAdded   = 0;
-	AuctionsUpdated = 0;
-	AuctionsRemoved = 0;
-	AuctionsScannedCacheSize = 0;
+	AuctionsAdded       = 0;
+	AuctionsUpdated     = 0;
+	AuctionsRemoved     = 0;
+	AuctionsWrittenToDB = 0;
 
 	-- Register for snapshot update events so we can track how many auctions
 	-- are added, updated and removed.
@@ -460,7 +462,7 @@ function scanEnded()
 		chatResultText = _AUCT('ScanFailed')
 		uiResultText   = _AUCT('UIScanFailed')
 	end
-	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsScannedCacheSize);
+	local auctionsScannedMessage = _AUCT('AuctionTotalAucts'):format(AuctionsWrittenToDB);
 	local auctionsAddedMessage   = _AUCT('AuctionNewAucts'):format(AuctionsAdded);
 	local auctionsRemovedMessage = _AUCT('AuctionDefunctAucts'):format(AuctionsRemoved);
 	local auctionsUpdatedMessage = _AUCT('AuctionUpdatedAucts'):format(AuctionsUpdated);
@@ -546,7 +548,7 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 	-- Scanning page [request.pages - request.nextPage] of [request.pages]
 	-- Auctions per second: [auctionsScannedPerSecond]
 	-- Estimated time left: [secondsLeft]
-	-- Auctions scanned thus far: [AuctionsScannedCacheSize]
+	-- Auctions scanned thus far: [AuctionsWrittenToDB]
 	BrowseNoResultsText:SetText(
 		_AUCT('AuctionPageN'):format(
 			description,
@@ -556,7 +558,7 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 			-- displayed with tailing zeroes
 			tostring(auctionsPerSecond),
 			SecondsToTime(secondsLeft),
-			auctionsScanned + AuctionsScannedCacheSize
+			auctionsScanned + AuctionsWrittenToDB
 		)
 	)
 end
