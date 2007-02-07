@@ -497,22 +497,24 @@ EnchantrixLocalizations = {
 		ArgSpellname	= "Entzaubern";
 		BarkerOpening	= "Verkaufe Verzauberungen:";
 		Darnassus	= "Darnassus";
-		Ironforge	= "Ironforge";
+		Ironforge	= "Eisenschmiede";
 		OneLetterGold	= "G";
 		OneLetterSilver	= "S";
 		Orgrimmar	= "Orgrimmar";
 		PatReagents	= "Reagenzien: (.+)";
+		Shattrath	= "Shattrath";
 		ShortDarnassus	= "Dar";
 		ShortIronForge	= "IF";
 		ShortOrgrimmar	= "Org";
+		ShortShattrath	= "Sha";
 		ShortStormwind	= "SW";
 		ShortThunderBluff	= "TB";
 		ShortUndercity	= "UC";
-		StormwindCity	= "Stormwind";
+		StormwindCity	= "Sturmwind";
 		TextCombat	= "Kampflog";
 		TextGeneral	= "Allgemein";
-		ThunderBluff	= "Thunderbluff";
-		Undercity	= "Undercity";
+		ThunderBluff	= "Donnerfels";
+		Undercity	= "Unterstadt";
 
 
 		-- Section: Generic Messages
@@ -788,6 +790,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "    (base=%d, old=%d, new=%d)";
 		FrmtDisinto	= "Disenchants into:";
 		FrmtFound	= "Found that %s disenchants into:";
+		FrmtNoDEPrediction	= "No disenchant prediction available";
 		FrmtPriceEach	= "(%s ea)";
 		FrmtSuggestedPrice	= "Suggested price:";
 		FrmtTotal	= "Total";
@@ -823,7 +826,7 @@ EnchantrixLocalizations = {
 
 		-- Section: Command Messages
 		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana de encantamientos no está abierta. La ventana de encantamientos debe estar abierta para utilizar el pregonero.";
-		BarkerNoEnchantsAvail	= "Enchantrix: O no tienes ningún encantamiento o no tienes los componentes para crearlos.";
+		BarkerNoEnchantsAvail	= "Enchantrix: No tienes ningún encantamiento o los componentes para crearlos.";
 		FrmtActClearall	= "Eliminando toda información de encantamientos";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
 		FrmtActClearOk	= "Información eliminada para el artí­culo: %s";
@@ -889,16 +892,18 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Desencantar";
-		BarkerOpening	= "Vendiendo Encantamientos:";
+		BarkerOpening	= "Encanto:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Forjaz";
 		OneLetterGold	= "o";
 		OneLetterSilver	= "p";
 		Orgrimmar	= "Orgrimmar";
-		PatReagents	= "Reactivos: (.+)";
+		PatReagents	= "Componentes:(.+)";
+		Shattrath	= "Ciudad de Shattrath";
 		ShortDarnassus	= "Dar";
 		ShortIronForge	= "FJ";
 		ShortOrgrimmar	= "Org";
+		ShortShattrath	= "Sha";
 		ShortStormwind	= "VT";
 		ShortThunderBluff	= "CdT";
 		ShortUndercity	= "E";
@@ -1479,16 +1484,18 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "마력추출";
-		BarkerOpening	= "판매는 매혹한다:";
+		BarkerOpening	= "마법부여 판매:";
 		Darnassus	= "다르나서스";
 		Ironforge	= "아이언포지";
 		OneLetterGold	= "골드";
 		OneLetterSilver	= "실버";
 		Orgrimmar	= "오그리마";
 		PatReagents	= "재료: (.+)";
+		Shattrath	= "샤트라스";
 		ShortDarnassus	= "다르";
 		ShortIronForge	= "아포";
 		ShortOrgrimmar	= "오그";
+		ShortShattrath	= "샤트";
 		ShortStormwind	= "스톰";
 		ShortThunderBluff	= "썬더";
 		ShortUndercity	= "언더";
