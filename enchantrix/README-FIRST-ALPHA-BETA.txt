@@ -12,7 +12,7 @@ Known current issues for 3.9.xxxx:
 . "/enchantrix bidbroker" may not work correctly, so it's been disabled for now
 . DE predictions for items above ilevel 55 are wrong.
 
-Enchantrix is undergoing a major re-write. The above issues won't be fixed until this re-write is complete.
+Enchantrix is undergoing a major re-write. The above issues won't be fixed until this re-write is complete. During this time, we'll still incorporate Enchantrix into our Auctioneer pack, as we feel the Barker is a very useful function. However, do not read the release status of the auctioneer pack (Beta, Gamma) as the status of enchantrix. Due to build system limitation, we can't easily mark this out for our users. We humbly apologise for any inconvenience caused.
 
 No doubt there are more known and recorded elsewhere, others known and not recorded, those not known, heisenbugs and others.
 
