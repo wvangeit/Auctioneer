@@ -65,8 +65,13 @@ local function onLoad()
 			param = param or "";
 			if (cmd == "load") then
 				if (param == "") then
-					Stubby.Print("Manually loading Auctioneer...")
-					LoadAddOn("Auctioneer")
+					Stubby.Print("Manually loading Auctioneer...Test")
+					local loaded, reason = LoadAddOn("Auctioneer")
+					if loaded then
+						Stubby.Print("Auctioneer loaded successfully")
+					else
+						Stubby.Print("Failed to load Auctioneer. Error message: "..reason)
+					end
 				elseif (param == "auctionhouse") then
 					Stubby.Print("Setting Auctioneer to load when this character visits the auction house")
 					Stubby.SetConfig("Auctioneer", "LoadType", param)
