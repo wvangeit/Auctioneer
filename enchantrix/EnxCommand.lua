@@ -676,10 +676,12 @@ function handleCommand(command, source)
 
 	elseif (cmd == 'bidbroker' or cmd == 'bb') then
 		-- /enchantrix bidbroker
-		doBidBroker(param, param2);
+		--doBidBroker(param, param2);
+		Enchantrix.Util.ChatPrint('Command disabled until next major release');
 
 	elseif (cmd == 'percentless' or cmd == 'pl') then
-		doPercentLess(param, param2);
+		--doPercentLess(param, param2);
+		Enchantrix.Util.ChatPrint('Command disabled until next major release');
 
 	elseif (Enchantrix.Config.GetFilterDefaults(cmd) ~= nil) then
 		genVarSet(cmd, param, chatprint);

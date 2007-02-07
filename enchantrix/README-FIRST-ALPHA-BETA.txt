@@ -8,8 +8,12 @@ There are known current issues, but this doesn't mean we're hard at work fixing 
 
 Known current issues for 3.9.xxxx:
 
-. /enchantrix percentless <value> may not work correctly.
+. "/enchantrix percentless" may not work correctly, so it's been disabled for now
+. "/enchantrix bidbroker" may not work correctly, so it's been disabled for now
+. DE predictions for items above ilevel 55 are wrong.
 
-No doubt there are more known and recorded elsewhere, others known and not recorded, thos not known, heisenbugs and others.
+Enchantrix is undergoing a major re-write. The above issues won't be fixed until this re-write is complete.
+
+No doubt there are more known and recorded elsewhere, others known and not recorded, those not known, heisenbugs and others.
 
 If you're going to report a bug to us on our alpha/beta builds, please ensure you're using the latest development version from http://auctioneeraddon.com/dl Occasional IRC support on irc://irc.freenode.net/norganna
