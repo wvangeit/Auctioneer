@@ -74,7 +74,7 @@ local nilSafeString;
 local nilSafeNumber;
 local normalizeNumericQueryParam;
 local debugPrint;
-local proccessQuery;
+local processQuery;
 
 -------------------------------------------------------------------------------
 -- Private Data
@@ -860,6 +860,7 @@ function addPageToCache(page, updateSnapshot)
 		end
 	end
 end
+
 -------------------------------------------------------------------------------
 -- calls functions to check for duplicates and update the Snapshot
 -------------------------------------------------------------------------------
@@ -941,7 +942,7 @@ end
 
 -------------------------------------------------------------------------------
 -- Creates an auction structure from the listType and index. All of the fields
--- in the auction structure and nil safe. The auctionId field will always be
+-- in the auction structure are nil safe. The auctionId field will always be
 -- nil. The auctionId can be obtained by calling getAuctionId();
 -------------------------------------------------------------------------------
 function getAuctionByIndex(listType, index)
@@ -1124,7 +1125,7 @@ Auctioneer.QueryManager = {
 	IsQueryInProgress = isQueryInProgress;
 	CanSendAuctionQuery = canSendAuctionQuery;
 	ClearPageCache = clearPageCache;
-	ProccessQuery = proccessQuery;
+	ProcessQuery = processQuery;
 }
 
 function Auctioneer.QueryManager.GetRequestQueue()

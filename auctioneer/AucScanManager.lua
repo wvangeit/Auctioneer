@@ -34,7 +34,7 @@ local debug = false
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 -------------------------------------------------------------------------------
--- Function Prototypes
+-- Function definitions
 -------------------------------------------------------------------------------
 local addRequestToQueue;
 local cancelScan;
@@ -56,8 +56,8 @@ local scanEnded;
 local scanQuery;
 local scanStarted;
 local sendQuery;
-local updateScanProgressUI;
 local setUpdated;
+local updateScanProgressUI;
 
 -------------------------------------------------------------------------------
 -- Enumerations
@@ -72,44 +72,130 @@ local ScanRequestState = {
 }
 
 -------------------------------------------------------------------------------
--- Private Data
+-- Table definitions
 -------------------------------------------------------------------------------
+--[[
+	-- The scan request table contains the description of a single scan request.
+	-- [in] means that this variable must/can be set before the request is sent
+	--      to the queue
+	-- [out] means that this variable is automatically being set throghout
+	--       processing the request
+	ScanRequestTable = {
+		[description]     = (string) Describes what the scan is doing. This string
+		                    [in]     is being displayed on the AH frame, while
+		                             scanning is in progress.
+		                             _AUCT('AuctionScanAll') for scanAll()
+		                             _AUCT('AuctionScanCat') for scanCategories()
+		                             _AUCT('AuctionScanAuctions') for scanQuery()
+		                             This value must never be nil.
+		[name]            = (string) (part of) the name of items to be scanned
+		                    [in]     nil, if no name specified
+		[minLevel]        = (number) minimum level of items to be scanned
+		                    [in]     nil, if no minimum level specified
+		[maxLevel]        = (number) maximum level of items to be scanned
+		                    [in]     nil, if no maximum level specified
+		[invTypeIndex]    = (number) index of inventory type of items to be scanned
+		                    [in]     nil, if no inventory type specified
+		[classIndex]      = (number) index of item class of items to be scanned
+		                    [in]     nil, if no item class specified
+		[subclassIndex]   = (number) index of item subclass of items to be scanned
+		                    [in]     nil, if no item subclass specified
+		[qualityIndex]    = (number) index of item quality of items to be scanned
+		                    [in]     nil, if no item quality specified
+		[isUsable]        = (boolean) scan for items only, which the current
+		                    [in]      character can use?
+		                              nil equals setting this to false
+		[page]            = (number) number of page to be scanned
+		                    [in]     nil, scan all pages
+		[pages]           = (number) number of pages of auctions for the current
+		                    [out]    scan request
+		[totalAuctions]   = (number) number of auctions, which are going to be
+		                    [out]    be scanned in this scan request
+		[nextPage]        = (number) page to be scanned next, respectively the
+		                    [out]    page which has been just scanned
+		                             -1, if finished
+		[auctionsScanned] = (number) number of auctions on the current page, which
+		                    [out]    have already been scanned
+		[state]           = (enum) ScanRequestState - Indicates, which state this
+		                    [out]  request is currently in (see enum definitions)
+		[startTime]       = (float) The time, when scanning the first page started
+		                    [out]   nil, if not scanning yet, or just scanning a
+		                            single page
+	}
+]]
 
+-------------------------------------------------------------------------------
+-- Local variables
+-------------------------------------------------------------------------------
 -- Queue of scan requests.
+--    ScanRequestQueue{         - (list) List of scan requests
+--       [x] = ScanRequestTable - (table) ScanRequestTable (see table definitions)
+--   }
 local ScanRequestQueue = {};
 
 -- Counters that keep track of the number of auctions added, updated or removed
 -- during the course of a scan.
-local AuctionsAdded
-local AuctionsUpdated
-local AuctionsRemoved
+local AuctionsAdded   -- (number)
+local AuctionsUpdated -- (number)
+local AuctionsRemoved -- (number)
 
 -- Counter which records the number of auctions which have been already written
 -- to the database.
-local AuctionsWrittenToDB
+local AuctionsWrittenToDB -- (number)
 
 -- Contains the state of the last request, before it was removed from the scan
 -- request queue.
-local LastRequestResult
+local LastRequestResult -- (enum) ScanRequestState (see enumerations)
 
 -- Flag which indicates, if a QueryStyleScan is queued or currently in progress.
-local QueryStyleScan = false;
+local QueryStyleScan = false -- (boolean)
 
 -- Flag that indicates, if scanning is in progress.
-local Scanning = false;
+local Scanning = false -- (boolean)
 
--- Flag that indicates that the database has already been updated on this scan and should not be again.
-local HasUpdated = false;
+-- Flag that indicates that the database has already been updated on this scan.
+local HasUpdated = false -- (boolean)
 
 -------------------------------------------------------------------------------
+-- Function declarations
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- This function is called when the ADDON_LOADED event is fired for Auctioneer.
+-- It registers the function onEventHook() to be called when the event
+-- AUCTION_HOUSE_CLOSED is fired.
+--
+-- called by:
+--    globally - AucScanManager.Load()
+--       called in Auctioneer: AucCore.addOnLoaded()
+--
+-- calls:
+--    Stubby.RegisterEventHook - always
 -------------------------------------------------------------------------------
 function load()
 	Stubby.RegisterEventHook("AUCTION_HOUSE_CLOSED", "Auctioneer_ScanManager", onEventHook);
 end
 
 -------------------------------------------------------------------------------
+-- Called each frame to check out if ScanManager has to perform any operations.
+-- If so, it can start/stop a scanning request and dispatch requests to the
+-- QueryManager.
+--
+-- called by:
+--    globally - AucScanManager_OnUpdate()
+--       called in OnUpdate of the AuctioneerFrame frame
+--
+-- calls:
+--    AucQueryManager.CanSendAuctionQuery() - if a request is queued
+--    scanStarted() - before a queued request is queried and not scanning atm
+--    sendQuery()   - if a request is ready to be sent
+--    scanEnded()   - if the queue is empty and scanning atm
+--
+-- parameters:
+--    elapsed - (float) passed time in seconds.milliseconds, since this
+--                      function's last call --- this value is reserved for
+--                      future use
 -------------------------------------------------------------------------------
-function AucScanManager_OnUpdate()
+function AucScanManager_OnUpdate(elapsed)
 	local request = ScanRequestQueue[1];
 	if (request) then
 		if (request.state == ScanRequestState.WaitingToQuery and Auctioneer.QueryManager.CanSendAuctionQuery()) then
@@ -124,23 +210,63 @@ function AucScanManager_OnUpdate()
 end
 
 -------------------------------------------------------------------------------
--- OnEvent handler.
+-- ScanManager's onEvent handler. It processes all events which are dispatched
+-- to ScanManager and performs the necessary processing.
+-- Currently this function is only registered for AUCTION_HOUSE_CLOSED.
+--
+-- called by:
+--    event - AUCTION_HOUSE_CLOSED
+--
+-- calls:
+--    cancelScan() - when AUCTION_HOUSE_CLOSED is fired
+--
+-- parameters:
+--    _     - ignoreing the first parameter, which is an empty table
+--            (see Stubby.RegisterEventHook() for more details)
+--    event - (string) name of the event which was fired
+--    ...   - contains all event paramters --- this is reserved for future use
+--            (see Stubby.RegisterEventHook() for more details)
 -------------------------------------------------------------------------------
-function onEventHook(_, event)
+function onEventHook(_, event, ...)
 	if (event == "AUCTION_HOUSE_CLOSED") then
 		cancelScan();
 	end
 end
 
 -------------------------------------------------------------------------------
--- Checks if a scan is in progress.
+-- Indicates wheterh or not a scan is in progress.
+--
+-- called by:
+--    globally - AucScanManager.IsScanning()
+--       called in Auctioneer: AucCommand.protectWindow()
+--       called in Auctioneer: AucQueryManager.postCanSendAuctionQuery()
+--
+-- returns:
+--    true, if scanning is in progress
+--    false, otherwise
 -------------------------------------------------------------------------------
 function isScanning()
 	return Scanning;
 end
 
 -------------------------------------------------------------------------------
--- Starts an AH scan of the categories selected in the UI.
+-- Queues a scan request of an AH scan of the categories selected in the UI.
+--
+-- called by:
+--    globally AucScanManager.Scan()
+--       called in Auctioneer: AucAPI.requestAuctionScan()
+--       called in Auctioneer: AucCommand.mainHandler()
+--       called in Auctioneer: AucFrameBrowse.BrowseScanButton_OnClick()
+--
+-- calls:
+--    scanAll()               - if all categories are selected
+--    scanCategories()        - if not each category is selected
+--    GetAuctionItemClasses() - always
+--
+-- returns:
+--    true, if the scan was requested
+--    false, if the scan could not be requested, due to another scan currently
+--           in progress
 -------------------------------------------------------------------------------
 function scan()
 	-- Get the list of categories checked (by index).
@@ -163,7 +289,18 @@ function scan()
 end
 
 -------------------------------------------------------------------------------
--- Starts an AH scan of all auctions.
+-- Queues a scan request of an AH scan of all auctions.
+--
+-- called by:
+--    scan() - if all categories are selected
+--    globally AucScanManager.ScanAll()
+--
+-- calls:
+--    addRequestToQueue() - if no queued requests atm
+--
+-- returns:
+--    true, if the scan was requested
+--    false, if the scan could not be requested, since another scan is currently in progress
 -------------------------------------------------------------------------------
 function scanAll()
 	if (#ScanRequestQueue == 0) then
@@ -179,7 +316,27 @@ function scanAll()
 end
 
 -------------------------------------------------------------------------------
--- Starts an AH scan of the specified categories.
+-- Queues a scan request of an AH scan of the specified categories.
+--
+-- called by:
+--    scan() - if at least one category is not selected
+--    globally AucScanManager.ScanCategories()
+--
+-- calls:
+--    addRequestToQueue()         - if no queued requests atm and at least one
+--                                  selected category
+--    AucItemDB.GetCategoryName() - if no queued requests atm and at least one
+--                                  selected category
+--
+-- parameters:
+--    categories{ - (list) List of categories
+--       [x] = index of selected category
+--    }
+--
+-- returns:
+--    true, if the scan was requested
+--    false, if the scan could not be requested, due to another scan being
+--           currently in progress
 -------------------------------------------------------------------------------
 function scanCategories(categories)
 	if (#ScanRequestQueue == 0) then
@@ -198,7 +355,44 @@ function scanCategories(categories)
 end
 
 -------------------------------------------------------------------------------
--- Starts an AH scan base on a query.
+-- Queues a scan request of an AH scan based on a query.
+--
+-- called:
+--    globally AucScanManager.ScanQuery()
+--       called in Auctioneer: AuctionFramePost - when pressing the UIRefresh
+--                             button
+--       called in Auctioneer: AuctionDropDownMenu - when choosing the refresh
+--                             option (drop down menu is shown upon right-
+--                             clicking on items in the result lists in
+--                             AuctionFramePost and AuctionFrameSearch)
+--
+-- calls:
+--    addRequestToQueue() - if no queued requests atm
+--
+-- parameters:
+--    name          - (string) (part of) the name of items to be scanned
+--                    nil, if no name specified
+--    minLevel      - (number) minimum level of items to be scanned
+--                    nil, if no minimum level specified
+--    maxLevel      - (number) maximum level of items to be scanned
+--                    nil, if no maximum level specified
+--    invTypeIndex  - (number) index of inventory type of items to be scanned
+--                    nil, if no inventory type specified
+--    classIndex    - (number) index of item class of items to be scanned
+--                    nil, if no item class specified
+--    subclassIndex - (number) index of item subclass of items to be scanned
+--                    nil, if no item subclass specified
+--    page          - (number) number of page to be scanned
+--                    nil, scan all pages
+--    isUsable      - (boolean) scan for items only, which the current
+--                    character can use?
+--                    nil equals setting this to false
+--    qualityIndex  - (number) index of item quality of items to be scanned
+--                    nil, if no item quality specified
+--
+-- returns:
+--    true, if the scan query was sucessfully queued
+--    false, otherwise
 -------------------------------------------------------------------------------
 function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 	if (#ScanRequestQueue == 0) then
@@ -216,8 +410,8 @@ function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassI
 			qualityIndex = qualityIndex;
 		};
 		addRequestToQueue(request);
-		debugPrint("Query Style Scan");
 		QueryStyleScan = true;
+		debugPrint("Query Style Scan queued");
 		return true;
 	else
 		debugPrint("Cannot start scan because a scan is already in progress!");
@@ -226,7 +420,13 @@ function scanQuery(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassI
 end
 
 -------------------------------------------------------------------------------
--- Cancels any in progress scan.
+-- Removes any scan request from the queue.
+--
+-- called by:
+--    onEventHook - if AUCTION_HOUSE_CLOSED was thrown
+--
+-- calls:
+--    removeRequestFromQueue() - for each request in the queue
 -------------------------------------------------------------------------------
 function cancelScan()
 	-- %todo: We should probaby wait for the result of any query that is in
@@ -238,10 +438,25 @@ function cancelScan()
 end
 
 -------------------------------------------------------------------------------
--- Adds a request to the back of the queue.
+-- Adds a request at the end of the queue.
+--
+-- called by:
+--    scanAll()        - if queue is empty
+--    scanCategories() - if queue is empty and at least one category was
+--                       selected
+--    scanQuery()      - if queue is empty
+--
+-- parameters:
+--    request - (table) ScanRequestTable (see table definitions)
+--
+-- remarks:
+--    Note that since this function is only called, if the queue is empty,
+--    the resulting queue will always contain requests from one scan, only.
+--    If called by scanAll() or scanQuery() this means that only one request is
+--    present. In case of scanCategories(), this means that there can be several
+--    scan requests (one request for each category).
 -------------------------------------------------------------------------------
 function addRequestToQueue(request)
-	request.pages           = 0;
 	request.totalAuctions   = 0;
 	request.nextPage        = 0;
 	request.auctionsScanned = 0;
@@ -252,6 +467,12 @@ end
 
 -------------------------------------------------------------------------------
 -- Removes the request at the head of the queue.
+-- If the removed request indicates that a scan was finished, updates the
+-- counter.
+--
+-- called by:
+--    cancelScan()            - for each queued scan request
+--    queryCompleteCallback() - if a scan request is complete, or failed
 -------------------------------------------------------------------------------
 function removeRequestFromQueue()
 	if (#ScanRequestQueue > 0) then
@@ -270,7 +491,17 @@ function removeRequestFromQueue()
 end
 
 -------------------------------------------------------------------------------
--- Sends the next query
+-- Sends the next scan request to the query manager.
+--
+-- called by:
+--    AucScanManager_OnUpdate - if a request is waiting in the queue to be sent
+--                              to the query manager
+--
+-- calls:
+--    AucQueryManager.QueryAuctionItems() - always
+--
+-- parameters:
+--    request - (table) ScanRequestTable (see table definitions)
 -------------------------------------------------------------------------------
 function sendQuery(request)
 	-- If this is the first query of the request, update the UI to say so.
@@ -279,7 +510,7 @@ function sendQuery(request)
 	end
 
 	-- Send the query!
-	debugPrint("Requesting page"..request.nextPage);
+	debugPrint("Requesting page "..request.nextPage);
 	Auctioneer.QueryManager.QueryAuctionItems(
 		request.name,
 		request.minLevel,
@@ -299,6 +530,37 @@ end
 
 -------------------------------------------------------------------------------
 -- Called when our query request completes.
+-- In case there is more than one page to be scanned, the first call to this
+-- function initializes the following request to start a reverse scan. All
+-- subsequent calls process the just scanned page and issue the scanning of
+-- the next page.
+-- If there is only one page to be scanned, this function is only called one
+-- single time where it simply does the final processing (i.e. updates the
+-- counter and calls removeRequestFromQueue()).
+--
+-- called by:
+--    AucQueryManager.removeRequestFromQueue() - after the request is finished
+--                                               and removed from the query
+--                                               queue
+--
+-- calls:
+--    removeRequestFromQueue()         - if the requested scan failed or is done
+--    updateScanProgressUI()           - after scanning a page is done for each
+--                                       page, except if only scanning one
+--                                       single page
+--    AucQueryManager.ClearPageCache() - after scanning a page is done for each
+--                                       page, except if only scanning one
+--                                       single page
+--    AucQueryManager.ProcessQuery()   - if scanning only one page and the data
+--                                       has not yet been processed
+--    GetNumAuctionItems()             - always, unless an error occured
+--    GetTime()                        - always, except if only scanning one
+--                                       single page
+--
+-- parameters:
+--    query  = (table) which contains the parameters used creating the query
+--             This is reserved for future use.
+--    result = (string) the querie's result code
 -------------------------------------------------------------------------------
 function queryCompleteCallback(query, result)
 	local request = ScanRequestQueue[1];
@@ -317,26 +579,26 @@ function queryCompleteCallback(query, result)
 	end
 
 	-- Query succeeded so update the request.
-	debugPrint("Scanned page"..request.nextPage);
+	debugPrint("Scanned page "..request.nextPage);
 	local lastIndexOnPage, totalAuctions = GetNumAuctionItems("list");
 
 	-- Is this the first query?
 	if (request.totalAuctions == 0) then
-		-- This was the first query to get the total number of auctions.
+		-- This was the first query to initialize the request.
 		request.totalAuctions = totalAuctions;
 		request.pages = math.floor((totalAuctions - 1) / NUM_AUCTION_ITEMS_PER_PAGE) + 1;
 		if (request.pages == 1) then
 			-- There's one and only one page. Tally the auctions
 			-- scanned and we are done!
 			if (not HasUpdated) then
-				Auctioneer.QueryManager.ProccessQuery(1);
+				Auctioneer.QueryManager.ProcessQuery(1);
 			end
 			request.nextPage = -1;
 			request.auctionsScanned = lastIndexOnPage;
 		else
 			-- More then one page so we'll scan in reverse so as to
 			-- not miss any auctions.
-			-- we are about to start scanning... so safe the start time
+			-- We are about to start scanning... so safe the start time
 			request.startTime = GetTime();
 			-- set the nextPage to the last page (pages are indexed zero based, so
 			-- if there are 67 pages to be scanned, the last one is page 66, the
@@ -344,9 +606,9 @@ function queryCompleteCallback(query, result)
 			request.nextPage = request.pages - 1;
 			Auctioneer.QueryManager.ClearPageCache();
 		end
-		debugPrint("Found", request.totalAuctions, "auctions (", request.pages, "pages)");
+		debugPrint("Found "..request.totalAuctions.." auctions ("..request.pages.." pages)");
 	else
-		-- Tweak the start time if it happened in less than 5 seconds.
+		-- Tweak the start time, if it happened in less than 5 seconds.
 		local currentTime = GetTime();
 		local timeElapsed = currentTime - request.startTime;
 		-- nextPage has not been updated yet and therefore referes to the current
@@ -389,12 +651,45 @@ function queryCompleteCallback(query, result)
 end
 
 -------------------------------------------------------------------------------
--- Called when a scan starts.
+-- Hooked into AuctionFrameBrowser_OnEvent, AuctionFrameBrowser_Update and
+-- AuctionFrameBrowser_Search, this function is used to disable the original
+-- Auction Frame Browser functionality while scanning is in progress.
+-- This fixes the "no search after scan"-bug.
+--
+-- called by:
+--    AuctionFrameBrowse_OnEvent - before the original function, while scanning
+--                                 is in progress
+--    AuctionFrameBrowse_Update  - before the original function, while scanning
+--                                 is in progress
+--    AuctionFrameBrowse_Search  - before the original function, while scanning
+--                                 is in progress
+--
+-- returns:
+--    "killorig", always
 -------------------------------------------------------------------------------
 function killHook()
 	return "killorig"
 end
 
+-------------------------------------------------------------------------------
+-- Called before a scan request is despatched to the query manager, it disables
+-- the Auction House UI elements to disallow searching and hides any search
+-- elements, while scanning is in progress.
+-- Also performs needed initialisations like hooking and resetting the counters,
+-- clearing the page cache and setting the appropriate flags.
+--
+-- called by:
+--    AucScanManager_OnUpdate() - if the next scan request in the queue is to be
+--                                started
+--
+-- calls:
+--    AucCommand.GetFilterVal()        - always
+--    AucEventManager.RegisterEvent()  - always
+--    AucQueryManager.ClearPageCache() - always
+--    AucUtil.ProtectAuctionFrame()    - if protecting the AH window while
+--                                       scanning
+--    Stubby.RegisterFunctionHook()    - always
+-------------------------------------------------------------------------------
 function scanStarted()
 	-- Protect window if needed
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
@@ -410,7 +705,7 @@ function scanStarted()
 	-- Hide the results UI
 	BrowseNoResultsText:SetText("");
 	BrowseNoResultsText:Show();
-	-- "result buttons" (the entries, shown in the saerch result list)
+	-- "result buttons" (i.e. the entries, shown in the saerch result list)
 	for iButton = 1, NUM_BROWSE_TO_DISPLAY do
 		button = getglobal("BrowseButton"..iButton);
 		button:Hide();
@@ -441,7 +736,32 @@ function scanStarted()
 end
 
 -------------------------------------------------------------------------------
--- Called when a scan ends.
+-- Called after a scan is finished, this function handles the necessary updates
+-- to the UI by reenabling buttons and functionality as well as outputs the
+-- scan results to the chat channel as well as to the AH UI.
+-- It also handles playing a soundfile, logging out the character or quitting
+-- WoW as well as unprotecting the AH window again, if the user set the
+-- appropriate options. 
+-- In the end, a garbage collection is being issued to clean up the memory
+-- consumption.
+--
+-- called by:
+--    AucScanManager_OnUpdate() - if the request queue is empty, and we are
+--                                scanning atm
+--
+-- calls:
+--    AucCommand.GetFilter()            - always
+--    AucEventManager.UnregisterEvent() - always
+--    AucUtil.ChatPrint()               - always
+--    AucUtil.ProtectAuctionFrame()     - if Auctioneer is set to protect the
+--                                        AH window only while scanning
+--    Stubby.UnregisterFunctionHook()   - always
+--    Logout()                          - if Auctioneer is set to log out the
+--                                        character when a scan is finished
+--    PlaySoundFile()                   - if Auctioneer is set to play a sound
+--                                        when a scan is finished
+--    Quit()                            - if Auctioneer is set to quit WoW
+--                                        when a scan is finished
 -------------------------------------------------------------------------------
 function scanEnded()
 	-- Scanning has ended!
@@ -500,8 +820,7 @@ function scanEnded()
 
 	-- Reset Flags
 	QueryStyleScan = false;
-	debugPrint("Scan Style Reset");
-	HasUpdated = false;
+	HasUpdated     = false;
 
 	-- Un-Protect window if needed
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
@@ -514,6 +833,25 @@ function scanEnded()
 end
 
 -------------------------------------------------------------------------------
+-- Called for each page when scanning multiple pages, after the last one
+-- (which is the first one being scanned) this function updates the AH UI text
+-- to reflect the current scanning progress.
+--
+-- called by:
+--    queryCompleteCallback() - for each page after the first one
+--
+-- calls:
+--    GetTime()       - always
+--    SecondsToTime() - always
+--
+-- parameters:
+--    description     - (string) the description to be displayed
+--    pagesScanned    - (number) number of pages which already have been scanned
+--    pages           - (number) number of pages to be scanned
+--    startTime       - (float)  time in seconds.milliseconds when the scan
+--                               started
+--    auctionsScanned - (number) number of auctions which have already been
+--                               scanned in the current scan request
 -------------------------------------------------------------------------------
 function updateScanProgressUI(description, pagesScanned, pages, startTime, auctionsScanned)
 	local pagesToScan       = pages - pagesScanned
@@ -564,7 +902,7 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 			description,
 			pagesScanned + 1,
 			pages,
-			-- tostring is used instead of %f, so that the number won't be
+			-- tostring() is used instead of %f, so that the number won't be
 			-- displayed with tailing zeroes
 			tostring(auctionsPerSecond),
 			SecondsToTime(secondsLeft),
@@ -574,52 +912,94 @@ function updateScanProgressUI(description, pagesScanned, pages, startTime, aucti
 end
 
 -------------------------------------------------------------------------------
+-- Callback function used to count the number of added auctions during a scan.
+--
+-- called by:
+--    event - AUCTIONEER_AUCTION_ADDED, while scanning is in progress
 -------------------------------------------------------------------------------
 function onAuctionAdded()
 	AuctionsAdded = AuctionsAdded + 1
 end
 
 -------------------------------------------------------------------------------
+-- Callback function used to count the number of updated auctions during a scan.
+--
+-- called by:
+--    event - AUCTIONEER_AUCTION_UPDATED, while scanning is in progress
 -------------------------------------------------------------------------------
 function onAuctionUpdated()
 	AuctionsUpdated = AuctionsUpdated + 1
 end
 
 -------------------------------------------------------------------------------
+-- Callback function used to count the number of removed auctions in the
+-- complete scan request.
+--
+-- called by:
+--    event - AUCTIONEER_AUCTION_REMOVED, while scanning is in progress
 -------------------------------------------------------------------------------
 function onAuctionRemoved()
 	AuctionsRemoved = AuctionsRemoved + 1
 end
 
 -------------------------------------------------------------------------------
+-- Prints the given parameters to the debug channel, if it's present
+-- and debugging for this file is enabled (refere to the local: debug).
+--
+-- calls:
+--    EnhTooltip.DebugPrint() - if debugging is enabled
+--
+-- parameters:
+--    ... - any number and any kind of variables to be print out to the debug
+--          channel
 -------------------------------------------------------------------------------
 function debugPrint(...)
-	if debug then EnhTooltip.DebugPrint("[Auc.ScanManager]", ...) end
+	if debug then
+		EnhTooltip.DebugPrint("[Auc.ScanManager]", ...)
+	end
 end
 
 -------------------------------------------------------------------------------
+-- Indicates whether or not a query scan is in the scan request queue.
+--
+-- called by:
+--    globally AucScanManager.IsQueryStyle()
+--       called in Auctioneer: AucQueryManager.onAuctionItemListUpdate()
+--
+-- returns:
+--    true, if a query scan is in the scan request queue
+--    false, otherwise
 -------------------------------------------------------------------------------
 function isQueryStyle()
 	return QueryStyleScan
 end
+
 -------------------------------------------------------------------------------
+-- Sets the HasUpdated flag accordingly to the given parameter.
+--
+-- called by:
+--    globally AucScanManager.SetUpdated()
+--       called in Auctioneer: AucQueryManager.proccessQuery()
+--
+-- parameters:
+--    status - (boolean) the new state of the HasUpdated flag
 -------------------------------------------------------------------------------
 function setUpdated(status)
 	HasUpdated = status;
 end
 
 -------------------------------------------------------------------------------
--- Public API
+-- Global access table
 -------------------------------------------------------------------------------
 Auctioneer.ScanManager = {
+	IsQueryStyle      = isQueryStyle;
+	IsScanning        = isScanning;
 	Load              = load;
 	Scan              = scan;
 	ScanAll           = scanAll;
 	ScanCategories    = scanCategories;
 	ScanQuery         = scanQuery;
-	IsScanning        = isScanning;
-	IsQueryStyle      = isQueryStyle;
-	SetUpdated	  = setUpdated;
+	SetUpdated        = setUpdated;
 }
 
 -- This is the variable Auctioneer used to use to indicate scanning. Keep it for
