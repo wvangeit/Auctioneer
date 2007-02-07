@@ -865,6 +865,7 @@ end
 -------------------------------------------------------------------------------
 function proccessQuery(pNum)
 	debugPrint("Seen all "..(pNum + 1).." page(s), updating snapshot");
+	Auctioneer.ScanManager.SetUpdated(true);
 	local auctions, scannedInReverse = getAuctionsInCache();
 	Auctioneer.SnapshotDB.UpdateForQuery(nil, PageCacheQuery, auctions, (not scannedInReverse));
 	clearPageCache();

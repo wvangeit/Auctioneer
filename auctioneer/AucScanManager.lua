@@ -57,6 +57,7 @@ local scanQuery;
 local scanStarted;
 local sendQuery;
 local updateScanProgressUI;
+local setUpdated;
 
 -------------------------------------------------------------------------------
 -- Enumerations
@@ -96,6 +97,9 @@ local QueryStyleScan = false;
 
 -- Flag that indicates, if scanning is in progress.
 local Scanning = false;
+
+-- Flag that indicates that the database has already been updated on this scan and should not be again.
+local HasUpdated = false;
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -324,7 +328,9 @@ function queryCompleteCallback(query, result)
 		if (request.pages == 1) then
 			-- There's one and only one page. Tally the auctions
 			-- scanned and we are done!
-			Auctioneer.QueryManager.ProccessQuery(1);
+			if (not HasUpdated) then
+				Auctioneer.QueryManager.ProccessQuery(1);
+			end
 			request.nextPage = -1;
 			request.auctionsScanned = lastIndexOnPage;
 		else
@@ -492,9 +498,10 @@ function scanEnded()
 		Quit();
 	end
 
-	-- Reset Scan Type Flag
+	-- Reset Flags
 	QueryStyleScan = false;
 	debugPrint("Scan Style Reset");
+	HasUpdated = false;
 
 	-- Un-Protect window if needed
 	if (Auctioneer.Command.GetFilterVal('protect-window') == 1) then
@@ -595,6 +602,11 @@ end
 function isQueryStyle()
 	return QueryStyleScan
 end
+-------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+function setUpdated(status)
+	HasUpdated = status;
+end
 
 -------------------------------------------------------------------------------
 -- Public API
@@ -607,6 +619,7 @@ Auctioneer.ScanManager = {
 	ScanQuery         = scanQuery;
 	IsScanning        = isScanning;
 	IsQueryStyle      = isQueryStyle;
+	SetUpdated	  = setUpdated;
 }
 
 -- This is the variable Auctioneer used to use to indicate scanning. Keep it for
