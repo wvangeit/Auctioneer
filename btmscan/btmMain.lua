@@ -4,6 +4,32 @@ BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear
 $Id$
 Copyright (c) 2006, Norganna
 
+Documentation of the various member variables used in this module:
+
+BtmScan.interval - How many seconds between new last page Queries
+	set to 1 when query isn't available for some reason, to try again in 1 second; also right after you hit the play button to schedule the first scan
+	set to 6 when BTM query first starts and we are trying to zero in on last page, and also when value was previously nil (not sure how this would happen)
+	set to 25 (actually BtmScanData.refresh, but I think this is only set to 25) once we have gotten the last page nailed
+	set to 30 on module load, but I don't think this gets used anywhere
+BtmScan.offset - how many pages back from last page to scan (will be 0 normally, 1 every 5th page scan)
+BtmScan.lasttry - the .timer value from the previous attempt (I think this is used to create the Log window, and maybe to control the flashing it used to do)
+BtmScan.auctPriceModel - used in creating the BtmScanner price model in Auctioneer
+BtmScan.timer - seconds since the last scheduled scan start; gets reset to 0 after any purchase decision
+BtmScan.pageScan - time between scans of the current query results (set to shorter than .interval in order to allow multiple passes through results without requerying, as when a purchase attempt breaks PageScan() early)
+	set to 0.001 after any purchase dialog result or when piggybacking on currently running query (auctioneer scan or manual), to cause immediate search of current results
+	set to 2 after a new last page query is sent to AH (to give results time to return)
+	set to nil once PageScan() begins (to prevent repeated attempts to check this page of items unless we break out early for a purchase and need to resume later)
+BtmScan.scanStage
+	0 - no longer scanning page / reached end of query page
+	1 - 0.25 seconds before next scan begins - I have no idea what this is used for
+	2 - scanning page
+	3 - prompting for a purchase / scanning paused
+BtmScan.scanning - are we currently scanning
+BtmScan.pageCount - number of pages in the AH
+BtmScan.resume - index to resume bargain search for in PageScan() [needed after breaking out of scan to prompt for a bid, to avoid double bidding and generally be slightly more efficient]
+	set to a value just prior to breaking out of PageScan() for a purchase opportunity
+	set to nil on init, when PageScan() completes successfully, or when bottom scanning is ended
+
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
@@ -36,6 +62,7 @@ end
 BtmScan.Version = BTMSCAN_VERSION
 
 BtmScan.NoPrompt = {}
+BtmScan.resume = nil
 
 -- Load function gets run when this addon has loaded.
 BtmScan.OnLoad = function ()
@@ -144,13 +171,19 @@ BtmScan.OnUpdate = function(...)
 		end
 
 		BtmScan.timer = BtmScan.timer + elapsed
+		
+		-- Check whether we should scan the current page of query results for purchase opportunities
 		if (BtmScan.pageScan) then
 			if (BtmScan.timer > BtmScan.pageScan) then
-				BtmScan.PageScan()
+				BtmScan.PageScan(BtmScan.resume)
 			elseif (BtmScan.timer > BtmScan.pageScan-0.25) then
 				BtmScan.scanStage = 1
 			end
 		end
+		
+		-- Now check if enough time has elapsed to do everything else - i.e. request a new last page query, among other tasks
+		-- Note that if any bid opportunity happened above in PageScan(), BtmScan.timer has been reset to 0 now
+		-- So you're going to wait a whole .interval from the time the last bid/BO dialog is dismissed before you get past this next section to get any new query results
 		if (BtmScan.timer < BtmScan.interval) then
 			return
 		end
@@ -161,24 +194,29 @@ BtmScan.OnUpdate = function(...)
 
 	-- Set the background at the correct stage color
 	if (not BtmScan.LogParent) then return end
+	
+	-- Don't go any farther if we're still waiting on a purchase dialog decision
 	if (BtmScan.scanStage == 3) then return end 
 
 	-- If we are supposed to be scanning, then let's do it!
 	if (BtmScan.scanning) then
 
-		-- Time to scan the page
+		-- Get the current number of auctions and pages
+		local pageCount, totalCount = GetNumAuctionItems("list")
+		local totalPages = math.floor((totalCount-1)/50)
+		if (totalPages < 0) then totalPages = 0 end
+
+		-- Set the AH page count to a signal value, if this is our first time
 		if (not BtmScan.pageCount) then
 			BtmScan.pageCount = -1
 		end
 
-		-- Get the current number of auctions
-		local pageCount, totalCount = GetNumAuctionItems("list")
-		local totalPages = math.floor((totalCount-1)/50)
-		if (totalPages < 0) then totalPages = 0 end
+		-- Decide whether we are just starting to use the BtmScanner queries (as opposed to piggybacking), which means we are going to do a few quick scans to get to the last page quickly
 		if (totalPages ~= BtmScan.pageCount) then
 			BtmScan.pageCount = totalPages
 			BtmScan.interval = 6 -- Short cut the delay, we need to reload now damnit!
 		else
+			-- We have the last page pegged, go back to the default slow query speed
 			BtmScan.interval = BtmScanData.refresh
 		end
 
@@ -193,7 +231,7 @@ BtmScan.OnUpdate = function(...)
 		local offset = 0
 		if (BtmScan.offset == 0) then offset = 1 end
 
-		-- Show me tha money!
+		-- Show me tha money!  Either do a new AH query, or piggyback on an existing query
 		--BtmScan.processing = true
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
@@ -206,6 +244,10 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.timer = 0
 			BtmScan.pageScan = 0.001
 		end
+		
+		-- Since we're getting a new set of query results, let's reset resume here to make sure we don't skip anything in the new results
+		BtmScan.resume = nil
+		
 		AuctionFrameBid.page = page
 	end
 end
@@ -586,6 +628,9 @@ BtmScan.PageScan = function(resume)
 								else
 									local bidSig = itemLink.."x"..iCount
 									BtmScan.PromptPurchase(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, itemLink, iTex, price, value, profit, message)
+									
+									--set resume to next auction, so we don't double bid on this one immediately
+									BtmScan.resume = i + 1
 									return
 								end
 							end
@@ -597,10 +642,11 @@ BtmScan.PageScan = function(resume)
 		i = i + 1
 	end
 	
-	
-	
-
 	BtmScan.scanStage = 0
+	
+	--reached the end of the page, set resume back to nil
+	BtmScan.resume = nil
+	
 	--BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
 	--BtmScan.processing = false
 end
@@ -1245,6 +1291,7 @@ BtmScan.EndScan = function ()
 		BtmScan.PlayButton:SetButtonState("NORMAL")
 		BtmScan.Log(tr("BottomScanner is stopping scanning"))
 		BtmScan.scanning = false
+		BtmScan.resume = nil
 	end
 end
 
