@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -- Debug switch - set to true, to enable debug output for this module
 local debug = false
@@ -34,47 +34,51 @@ local debug = false
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 -------------------------------------------------------------------------------
--- Function Imports
+-- Function definitions
 -------------------------------------------------------------------------------
-local chatPrint = Auctioneer.Util.ChatPrint;
-
--------------------------------------------------------------------------------
--- Function Prototypes
--------------------------------------------------------------------------------
-local load;
-local onEventHook;
-local onBidSent;
-local onBidComplete;
-local postCanSendAuctionQuery;
-local canSendAuctionQuery;
-local preSortAuctionItemsHook;
-local postSortAuctionItemsHook;
-local preQueryAuctionItemsHook;
-local postQueryAuctionItemsHook;
-local queryAuctionItems;
-local addRequestToQueue;
-local removeRequestFromQueue;
-local clearRequestQueue;
-local sendQuery;
-local onAuctionItemListUpdate;
-local isQueryInProgress;
-local isBidInProgress;
-local getAuctionByIndex;
-local getAuctionsOnCurrentPage;
-local doQueriesMatch;
-local doAuctionsMatchQuery;
-local reconcileAuctionLists;
 local addPageToCache;
-local getAuctionsInCache;
+local addRequestToQueue;
+local canSendAuctionQuery;
 local checkForDups;
 local clearPageCache;
-local getAuctionId;
-local isAuctionValid;
-local nilSafeString;
-local nilSafeNumber;
-local normalizeNumericQueryParam;
+local clearRequestQueue;
 local debugPrint;
+local doAuctionsMatchQuery;
+local doQueriesMatch;
+local getAuctionByIndex;
+local getAuctionId;
+local getAuctionsInCache;
+local getAuctionsOnCurrentPage;
+local isAuctionValid;
+local isBidInProgress;
+local isQueryInProgress;
+local load;
+local nilSafeNumber;
+local nilSafeString;
+local normalizeNumericQueryParam;
+local onAuctionItemListUpdate;
+local onBidComplete;
+local onBidSent;
+local onEventHook;
+local postCanSendAuctionQuery;
+local postQueryAuctionItemsHook;
+local postSortAuctionItemsHook;
+local preQueryAuctionItemsHook;
+local preSortAuctionItemsHook;
 local processQuery;
+local queryAuctionItems;
+local reconcileAuctionLists;
+local removeRequestFromQueue;
+local sendQuery;
+
+-------------------------------------------------------------------------------
+-- Public Data
+-------------------------------------------------------------------------------
+QueryAuctionItemsResultCodes = {
+	Complete        = "Complete";
+	PartialComplete = "PartialComplete";
+	Canceled        = "Canceled";
+};
 
 -------------------------------------------------------------------------------
 -- Private Data
@@ -141,7 +145,7 @@ local PendingBidInfo = {};
 local CurrentPage = nil;
 
 -- used to trap auction database update on start of scan
-local Scanned =0;
+local Scanned = 0;
 
 -- True if CanSendAuctionQuery calls should be hooked. This is always the case
 -- unless Auctioneer wants to call it. Setting this to false effectively
@@ -155,15 +159,6 @@ local hookQueryAuctionItems = true;
 -- flag for the Blizzard Scan type 
 local BlizzardScan = nil;
 local ForwardScan = nil;
-
--------------------------------------------------------------------------------
--- Public Data
--------------------------------------------------------------------------------
-QueryAuctionItemsResultCodes = {
-	Complete = "Complete";
-	PartialComplete = "PartialComplete";
-	Canceled = "Canceled";
-};
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -595,8 +590,8 @@ function onAuctionItemListUpdate()
 			-- Empty string owner alone is akin to 'Unknown Entity'.
 			--   should cause 2 more attempts at scanning the page, then the item should be skipped.
 			if (not auction.name) then
-				chatPrint("Auctioneer alert: Nil name detected. Please contact Auctioneer support ASAP.");
-				chatPrint("(This is a very rare condition which requires live servers for testing. Your data should be fine.)");
+				Auctioneer.Util.ChatPrint("Auctioneer alert: Nil name detected. Please contact Auctioneer support ASAP.");
+				Auctioneer.Util.ChatPrint("(This is a very rare condition which requires live servers for testing. Your data should be fine.)");
 				debugPrint("onAuctionItemListUpdate() - No name");
 				break;
 			end
@@ -853,7 +848,7 @@ function addPageToCache(page, updateSnapshot)
 				Scanned = CurrentPage.pageNum;
 				break;
 			elseif (page.isLastPage) then
-				proccessQuery(pageNum)
+				processQuery(pageNum)
 				break;
 			end
 			pageNum = pageNum + 1;
@@ -1117,15 +1112,15 @@ end
 -- Public API
 -------------------------------------------------------------------------------
 Auctioneer.QueryManager = {
-	Load = load;
-	QueryAuctionItems = queryAuctionItems;
-	GetAuctionId = getAuctionId;
+	CanSendAuctionQuery = canSendAuctionQuery;
+	ClearPageCache      = clearPageCache;
 	GetAuctionByIndex = getAuctionByIndex;
+	GetAuctionId        = getAuctionId;
 	IsAuctionValid = isAuctionValid;
 	IsQueryInProgress = isQueryInProgress;
-	CanSendAuctionQuery = canSendAuctionQuery;
-	ClearPageCache = clearPageCache;
+	Load                = load;
 	ProcessQuery = processQuery;
+	QueryAuctionItems   = queryAuctionItems;
 }
 
 function Auctioneer.QueryManager.GetRequestQueue()
