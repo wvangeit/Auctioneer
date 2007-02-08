@@ -1,4 +1,17 @@
 --[[
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
 $Id$
@@ -29,21 +42,6 @@ BtmScan.pageCount - number of pages in the AH
 BtmScan.resume - index to resume bargain search for in PageScan() [needed after breaking out of scan to prompt for a bid, to avoid double bidding and generally be slightly more efficient]
 	set to a value just prior to breaking out of PageScan() for a purchase opportunity
 	set to nil on init, when PageScan() completes successfully, or when bottom scanning is ended
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
 ]]
 
 BtmScanData = {}
@@ -203,7 +201,7 @@ BtmScan.OnUpdate = function(...)
 
 		-- Get the current number of auctions and pages
 		local pageCount, totalCount = GetNumAuctionItems("list")
-		local totalPages = math.floor((totalCount-1)/50)
+		local totalPages = math.floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
 		if (totalPages < 0) then totalPages = 0 end
 
 		-- Set the AH page count to a signal value, if this is our first time
