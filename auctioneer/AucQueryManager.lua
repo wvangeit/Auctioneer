@@ -859,7 +859,7 @@ end
 -------------------------------------------------------------------------------
 -- calls functions to check for duplicates and update the Snapshot
 -------------------------------------------------------------------------------
-function proccessQuery(pNum)
+function processQuery(pNum)
 	debugPrint("Seen all "..(pNum + 1).." page(s), updating snapshot");
 	Auctioneer.ScanManager.SetUpdated(true);
 	local auctions, scannedInReverse = getAuctionsInCache();
