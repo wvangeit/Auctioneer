@@ -186,7 +186,7 @@ function placeAuctionBid(listType, index, bid, callbackFunc)
 		local _, _, count, _, _, _, _, _, buyoutPrice = GetAuctionItemInfo(listType, index);
 		local action
 
-		if (bid and (bid >= buyoutPrice)) then
+		if (bid and (buyoutPrice > 0) and (bid >= buyoutPrice)) then
 			action = BUYOUT:lower()
 		else
 			action = BID:lower()
