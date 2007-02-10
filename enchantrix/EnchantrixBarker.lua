@@ -57,6 +57,12 @@ local print_order = { --TODO: Localize
 	'AnyWeapon'
 };
 
+local neg_attributes = {
+	'increases strength by 100',  --Crusader
+    'damage to frost and shadow', --Soulfrost
+    'mana every' -- mana restoration
+}
+
 local attributes = { --TODO: Localize
 	'intellect',
 	'stamina',
@@ -297,16 +303,11 @@ end
 function Enchantrix_BarkerOptions_TestButton_OnClick()
 	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
-	local id = GetChannelName("Trade - City") --TODO: Localize
-	EnhTooltip.DebugPrint("EnxBarker: Attempting to send test barker", barker, "Trade Channel ID", id)
+	EnhTooltip.DebugPrint("EnxBarker: Attempting to send test barker to chat window - ", barker)
 
-	if (id and (not(id == 0))) then
-		if (barker) then
-			Enchantrix.Util.ChatPrint(barker);
-		end
-	else
-		Enchantrix.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
-	end
+	if (barker) then
+		Enchantrix.Util.ChatPrint(barker);
+    end
 end
 
 function Enchantrix_BarkerOptions_Factors_Slider_GetValue(id)
@@ -940,70 +941,69 @@ function Enchantrix_CreateBarker()
 	local availableEnchants = {};
 	local numAvailable = 0;
 	local temp = GetCraftSkillLine(1);
-	if EnchantrixBarker_BarkerGetZoneText() then
-		EnchantrixBarker_ResetBarkerString();
-		EnchantrixBarker_ResetPriorityList();
-		if (temp) then
-			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
-			for index=1, GetNumCrafts() do
-				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-				--EnhTooltip.DebugPrint(GetCraftInfo(index))
-				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
-					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
-					local cost = 0;
-					for j=1,GetCraftNumReagents(index),1 do
-						local a,b,c = GetCraftReagentInfo(index,j);
-						reagent = GetCraftReagentItemLink(index,j);
 
-						--EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
-						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
-					end
+    EnchantrixBarker_ResetBarkerString();
+    EnchantrixBarker_ResetPriorityList();
+    if (temp) then
+        EnhTooltip.DebugPrint("Starting creation of EnxBarker")
+        for index=1, GetNumCrafts() do
+            local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
+            --EnhTooltip.DebugPrint(GetCraftInfo(index))
+            if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
+                --Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
+                local cost = 0;
+                for j=1,GetCraftNumReagents(index),1 do
+                    local a,b,c = GetCraftReagentInfo(index,j);
+                    reagent = GetCraftReagentItemLink(index,j);
 
-					local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
-					if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
-						profit = Enchantrix_BarkerGetConfig("highest_profit");
-					end
-					local price = EnchantrixBarker_RoundPrice(cost + profit);
+                    --EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
+                    cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
+                end
 
-					local enchant = {
-						index = index,
-						name = craftName,
-						type = craftType,
-						available = numEnchantsAvailable,
-						isExpanded = isExpanded,
-						cost = cost,
-						price = price,
-						profit = price - cost
-					};
-					availableEnchants[ numAvailable] = enchant;
+                local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
+                if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
+                    profit = Enchantrix_BarkerGetConfig("highest_profit");
+                end
+                local price = EnchantrixBarker_RoundPrice(cost + profit);
 
-					EnhTooltip.DebugPrint(GetCraftDescription(index));
-					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
+                local enchant = {
+                    index = index,
+                    name = craftName,
+                    type = craftType,
+                    available = numEnchantsAvailable,
+                    isExpanded = isExpanded,
+                    cost = cost,
+                    price = price,
+                    profit = price - cost
+                };
+                availableEnchants[ numAvailable] = enchant;
 
-					EnchantrixBarker_AddEnchantToPriorityList( enchant )
-					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
-					numAvailable = numAvailable + 1;
-				end
-			end
+                EnhTooltip.DebugPrint(GetCraftDescription(index));
+                local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+                local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+                --EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
 
-			if numAvailable == 0 then
-				Enchantrix.Util.ChatPrint(_ENCH('BarkerNoEnchantsAvail'));
-				return nil
-			end
+                EnchantrixBarker_AddEnchantToPriorityList( enchant )
+                --EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
+                numAvailable = numAvailable + 1;
+            end
+        end
 
-			for i,element in ipairs(priorityList) do
-				EnhTooltip.DebugPrint(element.enchant.name);
-				EnchantrixBarker_AddEnchantToBarker( element.enchant );
-			end
+        if numAvailable == 0 then
+            Enchantrix.Util.ChatPrint(_ENCH('BarkerNoEnchantsAvail'));
+            return nil
+        end
 
-			return EnchantrixBarker_GetBarkerString();
+        for i,element in ipairs(priorityList) do
+            EnhTooltip.DebugPrint(element.enchant.name);
+            EnchantrixBarker_AddEnchantToBarker( element.enchant );
+        end
 
-		else
-			Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
-		end
-	end
+        return EnchantrixBarker_GetBarkerString();
+
+    else
+        Enchantrix.Util.ChatPrint(_ENCH('BarkerEnxWindowNotOpen'));
+    end
 
 	return nil
 end
@@ -1137,13 +1137,17 @@ local barkerString = '';
 local barkerCategories = {};
 
 function EnchantrixBarker_ResetBarkerString()
-	barkerString = "("..EnchantrixBarker_BarkerGetZoneText()..") ".._ENCH('BarkerOpening');
+    barkerString = ""
+    if #(EnchantrixBarker_BarkerGetZoneText()) > 0 then
+        barkerString = barkerString.."("..EnchantrixBarker_BarkerGetZoneText()..") "
+    end
+    barkerString = barkerString.._ENCH('BarkerOpening');
 	barkerCategories = {};
 end
 
 function EnchantrixBarker_BarkerGetZoneText()
 	--Enchantrix.Util.ChatPrint(GetZoneText());
-	return short_location[GetZoneText()];
+	return short_location[GetZoneText()] or "";
 end
 
 function EnchantrixBarker_AddEnchantToBarker( enchant )
@@ -1256,7 +1260,14 @@ end
 
 function Enchantrix_GetShortDescriptor( index )
 	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
+	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
 
+	for index,neg in ipairs(neg_attributes) do
+		if( long_str:find(neg) ~= nil ) then
+			return enchant[#enchant];
+		end
+	end
+	
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute ) ~= nil ) then
 			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
@@ -1264,22 +1275,28 @@ function Enchantrix_GetShortDescriptor( index )
 			return "+"..statvalue..' '..short_attributes[index];
 		end
 	end
-	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
 
 	return enchant[#enchant];
 end
 
 function EnchantrixBarker_GetEnchantStat( enchant )
 	local index = enchant.index;
-	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
+	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
+    local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
+
+	for i,neg in ipairs(neg_attributes) do
+		if( long_str:find(neg) ~= nil ) then
+	        return enchant[#enchant];
+		end
+	end
+    
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute ) ~= nil ) then
 			return short_attributes[index];
 		end
 	end
-	local enchant = Enchantrix.Util.Split(GetCraftInfo(index), "-");
-
+	
 	return enchant[#enchant];
 end
 
