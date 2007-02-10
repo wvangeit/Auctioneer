@@ -740,13 +740,14 @@ BtmScan.ParseGSC = function (price)
 	price = string.gsub(price, "|c[0-9a-fA-F]+", " ")
 	price = string.gsub(price, "[gG]", "0000 ")
 	price = string.gsub(price, "[sS]", "00 ")
-	price = string.gsub(price, "[^0-9]+", " ")
+	price = string.gsub(price, "[^0-9]+", " ")	-- Note that we're stripping out all non-digits here, so any garbage in the input stream is automatically lost now
 
 	local total = 0
 	for q in string.gmatch(price, "(%d+)") do
 		local number = tonumber(q) or 0
 		total = total + number
 	end
+	
 	return total
 end
 
@@ -758,16 +759,32 @@ BtmScan.BreakLink = function (link)
 
 	local itemID, enchant, gem1, gem2, gem3, gem4, randomProp, uniqID = strsplit(":", item)
 
-	local i,j, count, nextpart = string.find(remain or "", "^x(%d+)(.*)")
+	-- original search format is "[ItemLink]x(Count) at (Price)".
+	local i,j, count, price, nextpart
+	i,j, count, nextpart = string.find(remain or "", "^x(%d+)(.*)")
 	if (i) then
 		count = tonumber(count) or 0
 		remain = nextpart
 	else count = 0 end
-	local i,j, price, nextpart = string.find(remain or "", "^ at ([^ ]+)(.*)")
+	i,j, price, nextpart = string.find(remain or "", "^ at ([^ ]+)(.*)")
 	if (i) then
 		price = BtmScan.ParseGSC(price)
 		remain = nextpart
 	else price = 0 end 
+	
+	-- Now check for new format "[ItemLink] <price> <count>" if original format came up empty
+	if (price == 0) then
+		i, j, price, count, nextpart = string.find(remain or "", "^ *([%dgGsScC]+) *(%d*)(.*)")
+		if (i) then
+			price = BtmScan.ParseGSC(price)
+			count = tonumber(count) or 0
+			remain = nextpart
+		else
+			price = 0
+			count = 0
+		end
+	end
+	
 	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, name, whole, count, price, remain
 end
 
@@ -1167,7 +1184,7 @@ BtmScan.Command = function (msg)
 			if (price <= 0) then
 				price = BtmScan.ParseGSC(remain) or 0
 			end
-
+			
 			if (price <= 0) then
 				BtmScan.Print(tr("BottomScanner will now %1 %2", tr("not snatch"), itemlink))
 				data.snatched[des] = nil
@@ -1264,10 +1281,10 @@ BtmScan.Command = function (msg)
 		BtmScan.Print(tr(" %1 [%2]", "print-in (<frameIndex>[Number]|<frameName>[String])", tr("Sets the chatFrame that BottomScanner's messages will be printed to")))
 		BtmScan.Print(tr(" %1 [%2]", "baserule <lua>", tr("Advanced users only: Specify your own lua code for calculating the base price")))
 		BtmScan.Print(tr(" %1 [%2]", "tooltip <on/off>", tr("Turn on/off the BottomScanner tooltip")))
-		BtmScan.Print(tr(" %1 [%2]", "ignore <item>", tr("Ignores the specified item")))
-		BtmScan.Print(tr(" %1 [%2]", "unignore <item>", tr("Stops ignoring the specified item")))
-		BtmScan.Print(tr(" %1 [%2]", "snatch <item> <copper> <count>", tr("Sets the item's snatch value")))
-		BtmScan.Print(tr(" %1 [%2]", "worth <item> <copper>", tr("Sets the specified item's value")))
+		BtmScan.Print(tr(" %1 [%2]", "ignore [ItemLink]", tr("Ignores the specified item")))
+		BtmScan.Print(tr(" %1 [%2]", "unignore [ItemLink]", tr("Stops ignoring the specified item")))
+		BtmScan.Print(tr(" %1 [%2]", "snatch [ItemLink] <copper> <count>", tr("Sets the item's snatch value, or leave off '<copper> <count>' to un-snatch")))
+		BtmScan.Print(tr(" %1 [%2]", "worth [ItemLink] <copper>", tr("Sets the specified item's value, or leave off '<copper>' to un-worth")))
 		BtmScan.Print(tr(" %1 [%2]", "enchant <level>", tr("Sets your enchanting level for disenchant-based purchases")))
 		BtmScan.Print(tr(" %1 [%2]", "clear", tr("Clears the AH event log window")))
 		BtmScan.Print(tr(" %1 [%2]", "dryrun", tr("Begins a test scanning run (must have AH open)")))
