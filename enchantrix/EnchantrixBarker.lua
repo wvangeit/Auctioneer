@@ -59,8 +59,7 @@ local print_order = { --TODO: Localize
 
 local neg_attributes = {
 	'increases strength by 100',  --Crusader
-    'damage to frost and shadow', --Soulfrost
-    'mana every' -- mana restoration
+    'damage to frost and shadow' --Soulfrost
 }
 
 local attributes = { --TODO: Localize
@@ -76,6 +75,9 @@ local attributes = { --TODO: Localize
 	'resistance to shadow',
 	'resistance',
 	'all stats',
+    'spell critical strike',
+    'attack power',
+    'mana every',
 	'mana',
 	'health',
 	'additional armor',
@@ -102,6 +104,9 @@ local short_attributes = { --TODO: Localize
 	'shadow res',
 	'all res',
 	'all stats',
+    'spell crit',
+    'attack power',
+    'mana regen',
 	'mana',
 	'health',
 	'armour',
