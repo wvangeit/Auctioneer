@@ -59,7 +59,14 @@ local print_order = { --TODO: Localize
 
 local neg_attributes = {
 	'increases strength by 100',  --Crusader
-    'damage to frost and shadow' --Soulfrost
+    'damage to frost and shadow', --Soulfrost
+    'damage to fire and arcane', --Sunfire
+    'increase snare and root', -- Surefooted
+    'enchant a ring', -- Healing Power / Striking / Spellpower (also a new item category and an bound enchant)
+    'minor movement speed', -- Boar's Speed /Cat's Swiftness
+    'heal nearby', --Battlemaster
+    '3% chance on spellcast', -- Spellsurge
+    'while applied' -- oils
 }
 
 local attributes = { --TODO: Localize
@@ -73,8 +80,16 @@ local attributes = { --TODO: Localize
 	'frost resistance',
 	'nature resistance',
 	'resistance to shadow',
+	'shadow resistance',
 	'resistance',
 	'all stats',
+    'health and mana every',
+    'block rating',
+    'resilience',
+    'healing',
+    'spell hit',
+    'spell damage',
+    'damage to all spells',
     'spell critical strike',
     'attack power',
     'mana every',
@@ -102,8 +117,16 @@ local short_attributes = { --TODO: Localize
 	'frost res',
 	'nature res',
 	'shadow res',
+	'shadow res',
 	'all res',
 	'all stats',
+    'health+mana regen',
+    'block',
+    'resilience',
+    'healing',
+    'spell hit',
+    'spell DMG',
+    'spell DMG',
     'spell crit',
     'attack power',
     'mana regen',
