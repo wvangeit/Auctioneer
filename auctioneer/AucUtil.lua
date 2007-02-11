@@ -179,19 +179,19 @@ function unpackSeconds(seconds)
 
 	if (seconds >= 604800) then
 		weeks = floor(seconds / 604800)
-		seconds = floor(seconds - (weeks * 604800))
+		seconds = (seconds % 604800)
 	end
 	if (seconds >= 86400) then
 		days = floor(seconds / 86400)
-		seconds = floor(seconds - (days * 86400))
+		seconds = (seconds % 86400)
 	end
 	if (seconds >= 3600) then
 		hours = floor(seconds / 3600)
-		seconds = floor(seconds - (hours * 3600))
+		seconds = (seconds % 3600)
 	end
 	if (seconds >= 60) then
 		minutes = floor(seconds / 60)
-		seconds = floor(seconds - (minutes * 60))
+		seconds = (seconds % 60)
 	end
 
 	return (weeks or 0), (days or 0), (hours or 0), (minutes or 0), (seconds or 0)
