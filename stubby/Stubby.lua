@@ -240,6 +240,7 @@ local unregisterAddOnHook			-- unregisterAddOnHook(triggerAddOn, ownerAddOn)
 local unregisterBootCode			-- unregisterBootCode(ownerAddOn, bootName)
 local unregisterEventHook			-- unregisterEventHook(triggerEvent, ownerAddOn)
 local unregisterFunctionHook		-- unregisterFunctionHook(triggerFunction, hookFunc)
+local tableRemoveNilSafe         -- tableRemoveNilSafe(table, [pos])
 
 
 -- Function definitions
@@ -311,7 +312,15 @@ function hookCall(funcName, ...)
 		for _, func in ipairs(callees) do
 			if (orig and func.p >= 0) then
 				retVal = {pcall(orig, ...)}
-				if (not table.remove(retVal, 1)) then
+
+				-- After pcall, the first element in the table is either true, if
+				-- pcall succeeded, or false, if it failed.
+				-- So we remove this result code and check if the call was
+				-- successful. If it wasn't, an errormessage is printed.
+				-- We also have to use a nil-safe variation of table.remove() since
+				-- there are blizard functions which return tables containing
+				-- holes, which are not processed as required by table.remove().
+				if (not tableRemoveNilSafe(retVal, 1)) then
 					Stubby.ErrorHandler(2, "Error: Original call failed while running hooks: ", tostring(funcName), "\n", retVal)
 				end
 				orig = nil
@@ -337,7 +346,7 @@ function hookCall(funcName, ...)
 
 	if (orig) then
 		retVal = {pcall(orig, ...)}
-		if (not table.remove(retVal, 1)) then
+		if (not tableRemoveNilSafe(retVal, 1)) then
 			Stubby.ErrorHandler(2, "Error: Original call failed after running hooks for: ", tostring(funcName), "\n", retVal[1])
 		end
 	end
@@ -1074,6 +1083,71 @@ function assert(bTest, strMessage)
 		nLog.AddMessage("Stubby", "Assertion", N_CRITICAL, "assertion failed", strMessage)
 	end
 end
+
+-------------------------------------------------------------------------------
+-- This function is a modified and slower version of the table.remove()
+-- function. It is designed to work with lists even those which contain holes.
+--
+-- All elements starting from [pos+1] to table.max(n) will be shifted by one.
+-- All elements with either negative, or hashed keys (i.e. keys which use
+-- strings, functions, or anything like this) as well as t[0] are ignored.
+--
+-- If t[pos] does not exist, no elements will be removed, but all elements with
+-- indexes above pos will be shifted by one.
+--
+-- called by:
+--    hookCall() - after the original function has been called
+--
+-- parameters:
+--    t   - (list) table to be adjusted
+--    pos - (number) the position of the element which is to be removed
+--                   the specified number must be greater than 0
+--
+-- returns:
+--    The value of the removed element.
+--
+-- remarks:
+--    The behaviour of table.remove() when working with tables which contain
+--    holes is undefined. For example {nil, true, nil} will properly return
+--    nil when calling table.remove(), but the index of true, is not changed
+--    and will still be [2] after the function call.
+--    If this behaviour is not wanted, use this modified version of the
+--    original function.
+--    Also note that the runtime of this function is O(n), so use it with
+--    precaution.
+-------------------------------------------------------------------------------
+function tableRemoveNilSafe(t, pos)
+	pos = pos or table.maxn(t)
+	
+	if pos == 0 then
+		-- the table does not contain any numeric indexes greater than 0, so there
+		-- is nothing todo for us
+		return
+	end
+
+	-- retrieve the key from the table and remove it
+	local ret = t[pos]
+	t[pos] = nil
+
+	-- construct the new temporary table and clear the current one
+	local u = {}
+	for key, data in pairs(t) do
+		if (type(key) == 'number') and (key > pos) then
+			u[key-1] = data
+		else
+			u[key] = data
+		end
+		t[key] = nil
+	end
+
+	-- copy the temporary table to the current one
+	for key, data in pairs(u) do
+		t[key] = data
+	end
+
+	return ret
+end
+
 -- Setup our Stubby global object. All interaction is done
 -- via the methods exposed here.
 Stubby = {
@@ -1101,7 +1175,7 @@ Stubby = {
 	CreateAddOnLoadBootCode = createAddOnLoadBootCode,
 	CreateEventLoadBootCode = createEventLoadBootCode,
 	CreateFunctionLoadBootCode = createFunctionLoadBootCode,
-	GetName = function() return "Stubby" end,
+	GetName = function() return "Stubby" end
 }
 
 StubbyHook = {
