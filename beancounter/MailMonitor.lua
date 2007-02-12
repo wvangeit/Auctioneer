@@ -218,7 +218,7 @@ function MailMonitor_PreTakeInboxItemHook(funcArgs, retVal, index)
 			InboxTasks[2].name == "ProcessMessageTask");
 		if (#InboxTasks == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxItem() call.
-			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+			local _, _, sender = GetInboxHeaderInfo(index);
 			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
 				debugPrint("Calling GetInboxText() on the message");
 				GetInboxText(index);
@@ -263,7 +263,7 @@ function MailMonitor_PreTakeInboxMoneyHook(funcArgs, retVal, index)
 			InboxTasks[2].name == "ProcessMessageTask");
 		if (#InboxTasks == 0 or isWaitingForInvoice) then
 			-- Read the message, before allowing the TakeInboxMoney() call.
-			local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+			local _, _, sender = GetInboxHeaderInfo(index);
 			if (not wasRead and isSenderAuctionHouse(sender) and not isWaitingForInvoice) then
 				debugPrint("Calling GetInboxText() on the message");
 				GetInboxText(index);
@@ -307,7 +307,7 @@ function MailMonitor_PreGetInboxTextHook(funcArgs, retVal, index)
 		-- Check if we are reading the message for the first time. If so, this
 		-- results in in an immediate client side MAIL_INBOX_UPDATE event to change
 		-- the message to read.
-		local packageIcon, stationeryIcon, sender, subject, money, CODAmount, daysLeft, hasItem, wasRead, wasReturned, textCreated, canReply = GetInboxHeaderInfo(index);
+		local _, _, _, _, _, _, daysLeft, _, wasRead = GetInboxHeaderInfo(index);
 		messageWasRead = wasRead;
 		messageDaysLeft = daysLeft;
 		if (not messageWasRead) then
@@ -332,7 +332,7 @@ function MailMonitor_PostGetInboxTextHook(funcArgs, retVal, index)
 		-- If this task has an invoice, get it.
 		if (isInvoice) then
 			-- Wait for the invoice if we don't have it yet.
-			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(index);
+			local _, _, playerName = GetInboxInvoiceInfo(index);
 			if (not playerName) then
 				addTask(createWaitForInvoiceTask(index));
 			end
