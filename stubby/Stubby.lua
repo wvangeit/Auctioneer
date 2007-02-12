@@ -182,6 +182,8 @@ end
 --     hooked at all.
 -- 3 = Trying to remove the hook from a function failed, as another function
 --     meanwhile hooked into the same function.
+-- 4 = Invalid function call. One or more parameters are missing or invalid.
+-- 5 = Failed to compiling a hook.
 
 local cleanList
 local config = {
@@ -345,12 +347,26 @@ function hookCall(funcName, ...)
 	end
 end
 
+-------------------------------------------------------------------------------
 -- This function automatically hooks Stubby in place of the
 -- original function, dynamically.
+--
+-- returns:
+--    true, if hooking into the triggerFunction was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
+-------------------------------------------------------------------------------
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
 function hookInto(triggerFunction)
-	if ((not triggerFunction) or config.hooks.origFuncs[triggerFunction]) then return end
+	clearError()
+
+	assert(triggerFunction, "No trigger function specified when calling hookInto!")
+	
+	if config.hooks.origFuncs[triggerFunction] then
+		-- Stubby is already hooked into this function. No need to do it again.
+		return true
+	end
 	local stringToLoad = [[
 		Stubby_OldFunction = ]]..triggerFunction..[[;
 		local functionString = ']]..triggerFunction..[[';
@@ -372,7 +388,9 @@ function hookInto(triggerFunction)
 		Stubby_NewFunction = nil
 		Stubby_OldFunction = nil
 
-		return Stubby.ErrorHandler(2, "Error occured while compiling hook:", tostring(triggerFunction), "\n", errorMessage)
+		Stubby.ErrorHandler(2, "Error occured while compiling hook:", tostring(triggerFunction), "\n", errorMessage)
+		SetError(5, "Error occured while compiling hook for "..triggerFunction..". Errormessage: "..errorMessage)
+		return false
 	end
 
 	config.hooks.functions[triggerFunction] = Stubby_NewFunction
@@ -380,6 +398,8 @@ function hookInto(triggerFunction)
 
 	Stubby_NewFunction = nil
 	Stubby_OldFunction = nil
+	
+	return true
 end
 
 -------------------------------------------------------------------------------
@@ -444,6 +464,7 @@ function getOrigFunc(triggerFunction)
 	end
 end
 
+-------------------------------------------------------------------------------
 --[[
 	This function causes a given function to be hooked by stubby and configures the hook function to be called at the given position.
 	The original function gets executed a position 0. Use a negative number to get called before the original function, and positive
@@ -451,9 +472,17 @@ end
 	automatically moved up for after or down for before. Please also leave space for other people who may need to position their hooks
 	in between your hook and the original.
  ]]
+-- returns:
+--    true, if registering the function hook was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
+-------------------------------------------------------------------------------
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
+	clearError()
+
 	if (not (triggerFunction and hookFunc)) then
-		return
+		setError(4, "Invalid function call. No trigger function and/or hook function specified. Usage Stubby.RegisterFunctionHook(triggerFunction, position, hookFunction,...).")
+		return false
 	end
 	local insertPos = tonumber(position) or 200
 	local funcObj
@@ -497,7 +526,8 @@ end
 -- times, all these hooks are removed.
 --
 -- calls:
---    setError() - always
+--    unhookFrom()          - if unregistering the last hooked function
+--    rebuildNotification() - always
 --
 -- called by:
 --    TODO
