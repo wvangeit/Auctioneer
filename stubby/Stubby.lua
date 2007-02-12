@@ -1088,9 +1088,14 @@ end
 -- This function is a modified and slower version of the table.remove()
 -- function. It is designed to work with lists even those which contain holes.
 --
--- All elements starting from [pos+1] to table.max(n) will be shifted by one.
+-- The function removes the element at the given position, which can be any key.
+-- The removed value is returned. In advance if the key is a number greater than
+-- zero, all elements starting at [pos+1] to table.max(n) will be shifted by
+-- one index.
 -- All elements with either negative, or hashed keys (i.e. keys which use
--- strings, functions, or anything like this) as well as t[0] are ignored.
+-- strings, functions, or anything like this) as well as t[0] are not shifted
+-- or changed, except if the element is the one to be removed, in which case the
+-- element is being erased from the table.
 --
 -- If t[pos] does not exist, no elements will be removed, but all elements with
 -- indexes above pos will be shifted by one.
@@ -1102,13 +1107,16 @@ end
 --    t   - (list) table to be adjusted
 --    pos - (number) the position of the element which is to be removed
 --                   the specified number must be greater than 0
+--          (anything else) the element at this position will be removed but
+--                          no shifting is being performed
+--          nil, to remove the element at position: table.maxn(t)
 --
 -- returns:
 --    The value of the removed element.
 --
 -- remarks:
 --    The behaviour of table.remove() when working with tables which contain
---    holes is undefined. For example {nil, true, nil} will properly return
+--    holes is undefined. For example {nil, true, nil} will correctly return
 --    nil when calling table.remove(), but the index of true, is not changed
 --    and will still be [2] after the function call.
 --    If this behaviour is not wanted, use this modified version of the
@@ -1119,10 +1127,13 @@ end
 function tableRemoveNilSafe(t, pos)
 	pos = pos or table.maxn(t)
 	
-	if pos == 0 then
-		-- the table does not contain any numeric indexes greater than 0, so there
-		-- is nothing todo for us
-		return
+	if pos == nil then
+		pos = table.maxn(t)
+		if pos == 0 then
+			-- the table does not contain any numeric indexes greater than 0, so there
+			-- is nothing todo for us
+			return
+		end
 	end
 
 	-- retrieve the key from the table and remove it
