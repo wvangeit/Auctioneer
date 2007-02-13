@@ -211,7 +211,7 @@ local callBagHook				-- CallBagHook(event,bagNumber)
 local callBankHook				-- CallBankHook()
 local callCheckPopup			-- CallCheckPopup(name,link,quality,count,price,hyperlink)
 local callTradeHook				-- CallTradeHook(type,event,selID)
-local chatHookOnHyperlinkShow	-- ChatHookOnHyperlinkShow(reference,link,button)
+local chatHookSetItemRef		-- ChatHookSetItemRef(reference,link,button)
 local checkHide					-- CheckHide()
 local checkPopup				-- CheckPopup(name,link,quality,count,price,hyperlink)
 local clearTooltip				-- ClearTooltip()
@@ -958,6 +958,13 @@ function gtHookOnHide()
 end
 
 function doHyperlink(reference, link, button)
+
+	-- Neither shift-click nor ctrl-click can open a new tooltip, so don't go any farther or else you might accidentally double the embedded tooltip
+	if (IsShiftKeyDown() or IsControlKeyDown()) then
+		return
+	end
+	
+	-- Regular- or alt-clicking will close an existing tooltip, so if one is now visible it is new, and should be enhanced by us
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
 		if (itemName and self.currentItem ~= itemName) then
@@ -1171,7 +1178,7 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button)
+function chatHookSetItemRef(funcArgs, retVal, reference, link, button)
 	if (IsAltKeyDown()) and AuctionFrame and (AuctionFrame:IsVisible()) then
 		AuctionFrameTab_OnClick(1)
 		local itemName = GetItemInfo(tostring(link))
@@ -1592,7 +1599,7 @@ function ttInitialize()
 	----  Establish hooks to all the game tooltips.
 
 	-- Hook in alternative Chat/Hyperlinking code
-	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", 200, chatHookOnHyperlinkShow)
+	Stubby.RegisterFunctionHook("SetItemRef", 200, chatHookSetItemRef)
 
 	-- Game tooltips
 	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem)
