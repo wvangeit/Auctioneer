@@ -202,11 +202,11 @@ StubbyConfig = {}
 
 
 -- Function prototypes
-local assert                  -- assert(bTest, strMessage)
+local assert						-- assert(bTest, strMessage)
 local chatPrint						-- chatPrint(...)
 local checkAddOns					-- checkAddOns()
 local clearConfig					-- clearConfig(ownerAddOn, variable)
-local clearError                 -- clearError()
+local clearError					-- clearError()
 local createAddOnLoadBootCode		-- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 local createEventLoadBootCode		-- createEventLoadBootCode(ownerAddOn, triggerEvent)
 local createFunctionLoadBootCode	-- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
@@ -214,10 +214,10 @@ local errorHandler					-- errorHandler(stackLevel, ...)
 local eventWatcher					-- eventWatcher(event)
 local events						-- events(event, param)
 local getConfig						-- getConfig(ownerAddOn, variable)
-local getLastErrorCode        -- getLastErrorCode()
-local getLastErrorMessage     -- getLastErrorMessage()
+local getLastErrorCode				-- getLastErrorCode()
+local getLastErrorMessage			-- getLastErrorMessage()
 local getOrigFunc					-- getOrigFunc(triggerFunction)
-local getRevision             -- getRevision()
+local getRevision					-- getRevision()
 local hookCall						-- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
 local hookInto						-- hookInto(triggerFunction)
 local inspectAddOn					-- inspectAddOn(addonName, title, info)
@@ -231,7 +231,7 @@ local registerEventHook				-- registerEventHook(triggerEvent, ownerAddOn, hookFu
 local registerFunctionHook			-- registerFunctionHook(triggerFunction, position, hookFunc, ...)
 local runBootCodes					-- runBootCodes()
 local searchForNewAddOns			-- searchForNewAddOns()
-local setError                   -- setError(code, message)
+local setError						-- setError(code, message)
 local cleanUpAddOnData				-- cleanUpAddOnData()
 local cleanUpAddOnConfigs			-- cleanUpAddOnConfigs()
 local setConfig						-- setConfig(ownerAddOn, variable, value, isGlobal)
@@ -240,7 +240,7 @@ local unregisterAddOnHook			-- unregisterAddOnHook(triggerAddOn, ownerAddOn)
 local unregisterBootCode			-- unregisterBootCode(ownerAddOn, bootName)
 local unregisterEventHook			-- unregisterEventHook(triggerEvent, ownerAddOn)
 local unregisterFunctionHook		-- unregisterFunctionHook(triggerFunction, hookFunc)
-local tableRemoveNilSafe         -- tableRemoveNilSafe(table, [pos])
+local tableRemoveNilSafe			-- tableRemoveNilSafe(table, [pos])
 
 
 -- Function definitions
@@ -275,7 +275,7 @@ local function callDebugger(...)
 	for i = 2, select("#", ...) do
 		msg = msg.." "..tostring(select(i, ...))
 	end
-	
+
 	if (Swatter and Swatter.IsEnabled()) then
 		return Swatter.OnError("Error while calling hook:\n{{{Hook name:}}}\n  "..tostring(callDetail[1]).."\n"..msg.."\n{{{Instantiated from:}}}\n  "..callDetail[2].n, StubbyHook, debugstack(2, 20, 20))
 	else
@@ -361,9 +361,9 @@ end
 -- original function, dynamically.
 --
 -- returns:
---    true, if hooking into the triggerFunction was successful
---    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---           identify the error)
+--	true, if hooking into the triggerFunction was successful
+--	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--		identify the error)
 -------------------------------------------------------------------------------
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
@@ -371,7 +371,7 @@ function hookInto(triggerFunction)
 	clearError()
 
 	assert(triggerFunction, "No trigger function specified when calling hookInto!")
-	
+
 	if config.hooks.origFuncs[triggerFunction] then
 		-- Stubby is already hooked into this function. No need to do it again.
 		return true
@@ -407,7 +407,7 @@ function hookInto(triggerFunction)
 
 	Stubby_NewFunction = nil
 	Stubby_OldFunction = nil
-	
+
 	return true
 end
 
@@ -426,9 +426,9 @@ end
 --    triggerFunction - (string) the name of the function to be unhooked
 --
 -- returns:
---    true, if unhooking was successful
---    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---           identify the error)
+--	true, if unhooking was successful
+--	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--		identify the error)
 -------------------------------------------------------------------------------
 function unhookFrom(triggerFunction)
 	-- remove old error codes/messages from prior function calls
@@ -457,9 +457,9 @@ function errorHandler(stackLevel, ...)
 	for i = 2, select("#", ...) do
 		msg = msg.." "..tostring(select(i, ...))
 	end
-	
+
 	stackLevel = (stackLevel or 1) + 1
-	
+
 	if (Swatter and Swatter.IsEnabled()) then
 		return Swatter.OnError(msg, Stubby, debugstack(stackLevel, 20, 20))
 	else
@@ -482,9 +482,9 @@ end
 	in between your hook and the original.
  ]]
 -- returns:
---    true, if registering the function hook was successful
---    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---           identify the error)
+--	true, if registering the function hook was successful
+--	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--		identify the error)
 -------------------------------------------------------------------------------
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	clearError()
@@ -1078,7 +1078,7 @@ function assert(bTest, strMessage)
 	end
 
 	getglobal("ChatFrame1"):AddMessage(strMessage, 1.0, 0.3, 0.3)
-	
+
 	if nLog then
 		nLog.AddMessage("Stubby", "Assertion", N_CRITICAL, "assertion failed", strMessage)
 	end
@@ -1124,9 +1124,10 @@ end
 --    Also note that the runtime of this function is O(n), so use it with
 --    precaution.
 -------------------------------------------------------------------------------
+	local u = {} --Table to re-use
 function tableRemoveNilSafe(t, pos)
 	pos = pos or table.maxn(t)
-	
+
 	if pos == nil then
 		pos = table.maxn(t)
 		if pos == 0 then
@@ -1141,7 +1142,6 @@ function tableRemoveNilSafe(t, pos)
 	t[pos] = nil
 
 	-- construct the new temporary table and clear the current one
-	local u = {}
 	for key, data in pairs(t) do
 		if (type(key) == 'number') and (key > pos) then
 			u[key-1] = data
@@ -1154,6 +1154,11 @@ function tableRemoveNilSafe(t, pos)
 	-- copy the temporary table to the current one
 	for key, data in pairs(u) do
 		t[key] = data
+	end
+
+	-- clear out our temporary table
+	for key, data in pairs(u) do
+		u[key] = nil
 	end
 
 	return ret
