@@ -211,7 +211,6 @@ local callBagHook				-- CallBagHook(event,bagNumber)
 local callBankHook				-- CallBankHook()
 local callCheckPopup			-- CallCheckPopup(name,link,quality,count,price,hyperlink)
 local callTradeHook				-- CallTradeHook(type,event,selID)
-local cfHookUpdate				-- CfHookUpdate(frame)
 local chatHookOnHyperlinkShow	-- ChatHookOnHyperlinkShow(reference,link,button)
 local checkHide					-- CheckHide()
 local checkPopup				-- CheckPopup(name,link,quality,count,price,hyperlink)
@@ -1209,27 +1208,6 @@ function afHookOnEnter(funcArgs, retVal, type, index)
 	end
 end
 
-function cfHookUpdate(funcArgs, retVal, frame)
-	local frameID = frame:GetID()
-	local frameName = frame:GetName()
-	local iButton
-	for iButton = 1, frame.size do
-		local button = getglobal(frameName.."Item"..iButton)
-		if (GameTooltip:IsOwned(button)) then
-			local buttonID = button:GetID()
-			local link = GetContainerItemLink(frameID, buttonID)
-			local name = nameFromLink(link)
-
-			if (name) then
-				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
-				quality = quality or qualityFromLink(link)
-
-				return tooltipCall(GameTooltip, name, link, quality, itemCount)
-			end
-		end
-	end
-end
-
 function gtHookSetLootItem(funcArgs, retVal, frame, slot)
 	local link = GetLootSlotLink(slot)
 	local name = nameFromLink(link)
@@ -1615,9 +1593,6 @@ function ttInitialize()
 
 	-- Hook in alternative Chat/Hyperlinking code
 	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", 200, chatHookOnHyperlinkShow)
-
-	-- Container frame linking
-	Stubby.RegisterFunctionHook("ContainerFrame_Update", 200, cfHookUpdate)
 
 	-- Game tooltips
 	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem)
