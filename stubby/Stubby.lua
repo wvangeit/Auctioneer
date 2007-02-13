@@ -200,48 +200,49 @@ local strErrorMessage = ""
 
 StubbyConfig = {}
 
+-- temporary table used in tableRemoveNilSafe() to modify another table
+local tempTable = {}
 
 -- Function prototypes
-local assert						-- assert(bTest, strMessage)
-local chatPrint						-- chatPrint(...)
-local checkAddOns					-- checkAddOns()
-local clearConfig					-- clearConfig(ownerAddOn, variable)
-local clearError					-- clearError()
-local createAddOnLoadBootCode		-- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
-local createEventLoadBootCode		-- createEventLoadBootCode(ownerAddOn, triggerEvent)
-local createFunctionLoadBootCode	-- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
-local errorHandler					-- errorHandler(stackLevel, ...)
-local eventWatcher					-- eventWatcher(event)
-local events						-- events(event, param)
-local getConfig						-- getConfig(ownerAddOn, variable)
-local getLastErrorCode				-- getLastErrorCode()
-local getLastErrorMessage			-- getLastErrorMessage()
-local getOrigFunc					-- getOrigFunc(triggerFunction)
-local getRevision					-- getRevision()
-local hookCall						-- hookCall(funcName, a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11,a12,a13,a14,a15,a16,a17,a18,a19,a20)
-local hookInto						-- hookInto(triggerFunction)
-local inspectAddOn					-- inspectAddOn(addonName, title, info)
-local loadWatcher					-- loadWatcher(loadedAddOn)
-local onLoaded						-- onLoaded()
-local onWorldStart					-- onWorldStart()
-local rebuildNotifications			-- rebuildNotifications(notifyItems)
-local registerAddOnHook				-- registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
-local registerBootCode				-- registerBootCode(ownerAddOn, bootName, bootCode)
-local registerEventHook				-- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
-local registerFunctionHook			-- registerFunctionHook(triggerFunction, position, hookFunc, ...)
-local runBootCodes					-- runBootCodes()
-local searchForNewAddOns			-- searchForNewAddOns()
-local setError						-- setError(code, message)
-local cleanUpAddOnData				-- cleanUpAddOnData()
-local cleanUpAddOnConfigs			-- cleanUpAddOnConfigs()
-local setConfig						-- setConfig(ownerAddOn, variable, value, isGlobal)
-local shouldInspectAddOn			-- shouldInspectAddOn(addonName)
-local unregisterAddOnHook			-- unregisterAddOnHook(triggerAddOn, ownerAddOn)
-local unregisterBootCode			-- unregisterBootCode(ownerAddOn, bootName)
-local unregisterEventHook			-- unregisterEventHook(triggerEvent, ownerAddOn)
-local unregisterFunctionHook		-- unregisterFunctionHook(triggerFunction, hookFunc)
-local tableRemoveNilSafe			-- tableRemoveNilSafe(table, [pos])
-
+local assert                     -- assert(bTest, strMessage)
+local chatPrint                  -- chatPrint(...)
+local checkAddOns                -- checkAddOns()
+local clearConfig                -- clearConfig(ownerAddOn, variable)
+local clearError                 -- clearError()
+local createAddOnLoadBootCode    -- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
+local createEventLoadBootCode    -- createEventLoadBootCode(ownerAddOn, triggerEvent)
+local createFunctionLoadBootCode -- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
+local errorHandler               -- errorHandler(stackLevel, ...)
+local eventWatcher               -- eventWatcher(event)
+local events                     -- events(event, param)
+local getConfig                  -- getConfig(ownerAddOn, variable)
+local getLastErrorCode           -- getLastErrorCode()
+local getLastErrorMessage        -- getLastErrorMessage()
+local getOrigFunc                -- getOrigFunc(triggerFunction)
+local getRevision                -- getRevision()
+local hookCall                   -- hookCall(funcName, ...)
+local hookInto                   -- hookInto(triggerFunction)
+local inspectAddOn               -- inspectAddOn(addonName, title, info)
+local loadWatcher                -- loadWatcher(loadedAddOn)
+local onLoaded                   -- onLoaded()
+local onWorldStart               -- onWorldStart()
+local rebuildNotifications       -- rebuildNotifications(notifyItems)
+local registerAddOnHook          -- registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
+local registerBootCode           -- registerBootCode(ownerAddOn, bootName, bootCode)
+local registerEventHook          -- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
+local registerFunctionHook       -- registerFunctionHook(triggerFunction, position, hookFunc, ...)
+local runBootCodes               -- runBootCodes()
+local searchForNewAddOns         -- searchForNewAddOns()
+local setError                   -- setError(code, message)
+local cleanUpAddOnData           -- cleanUpAddOnData()
+local cleanUpAddOnConfigs        -- cleanUpAddOnConfigs()
+local setConfig                  -- setConfig(ownerAddOn, variable, value, isGlobal)
+local shouldInspectAddOn         -- shouldInspectAddOn(addonName)
+local unregisterAddOnHook        -- unregisterAddOnHook(triggerAddOn, ownerAddOn)
+local unregisterBootCode         -- unregisterBootCode(ownerAddOn, bootName)
+local unregisterEventHook        -- unregisterEventHook(triggerEvent, ownerAddOn)
+local unregisterFunctionHook     -- unregisterFunctionHook(triggerFunction, hookFunc)
+local tableRemoveNilSafe         -- tableRemoveNilSafe(table, [pos])
 
 -- Function definitions
 
@@ -361,9 +362,9 @@ end
 -- original function, dynamically.
 --
 -- returns:
---	true, if hooking into the triggerFunction was successful
---	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---		identify the error)
+--    true, if hooking into the triggerFunction was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
 -------------------------------------------------------------------------------
 Stubby_OldFunction = nil
 Stubby_NewFunction = nil
@@ -426,9 +427,9 @@ end
 --    triggerFunction - (string) the name of the function to be unhooked
 --
 -- returns:
---	true, if unhooking was successful
---	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---		identify the error)
+--    true, if unhooking was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
 -------------------------------------------------------------------------------
 function unhookFrom(triggerFunction)
 	-- remove old error codes/messages from prior function calls
@@ -482,9 +483,9 @@ end
 	in between your hook and the original.
  ]]
 -- returns:
---	true, if registering the function hook was successful
---	false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
---		identify the error)
+--    true, if registering the function hook was successful
+--    false, otherwise (check getLastErrorMessage() and getLastErrorCode() to
+--           identify the error)
 -------------------------------------------------------------------------------
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	clearError()
@@ -1124,7 +1125,6 @@ end
 --    Also note that the runtime of this function is O(n), so use it with
 --    precaution.
 -------------------------------------------------------------------------------
-	local u = {} --Table to re-use
 function tableRemoveNilSafe(t, pos)
 	pos = pos or table.maxn(t)
 
@@ -1137,28 +1137,28 @@ function tableRemoveNilSafe(t, pos)
 		end
 	end
 
+	-- clearing the temporary table
+	for key, data in pairs(tempTable) do
+		tempTable[key] = nil
+	end
+
 	-- retrieve the key from the table and remove it
 	local ret = t[pos]
 	t[pos] = nil
 
-	-- construct the new temporary table and clear the current one
+	-- construct the new table and clear the current one
 	for key, data in pairs(t) do
 		if (type(key) == 'number') and (key > pos) then
-			u[key-1] = data
+			tempTable[key-1] = data
 		else
-			u[key] = data
+			tempTable[key] = data
 		end
 		t[key] = nil
 	end
 
 	-- copy the temporary table to the current one
-	for key, data in pairs(u) do
+	for key, data in pairs(tempTable) do
 		t[key] = data
-	end
-
-	-- clear out our temporary table
-	for key, data in pairs(u) do
-		u[key] = nil
 	end
 
 	return ret
