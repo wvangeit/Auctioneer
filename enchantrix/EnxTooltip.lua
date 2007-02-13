@@ -128,7 +128,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local _, _, _, ilevel, _, _, _, _, _ = GetItemInfo(id);
 	ilevel = Enchantrix.Util.RoundUp(ilevel, 5);
 	if (ilevel > 55) then
-		EnhTooltip.AddLine(_ENCH('FrmtNoDEPrediction'));
+		EnhTooltip.AddLine(_ENCH('FrmtNoDEPrediction'), nil, embed);
 		return
 	end
 
