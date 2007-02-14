@@ -1071,6 +1071,11 @@ BtmScan.Command = function (msg)
 	elseif (cmd == "dryrun") then
 		BtmScan.dryRun = true
 		BtmScan.BeginScan()
+	elseif (cmd == "load") then
+		if (param == "always") or (param == "never") or (param == "auctionhouse") then
+			Stubby.SetConfig("BtmScan", "LoadType", param)
+			BtmScan.Print(tr("Setting BottomScanner to %1 load for this toon",param))
+		end
 	elseif (cmd == "baserule") then
 		if (oparam) then
 			data.baseRule = oparam
@@ -1290,6 +1295,7 @@ BtmScan.Command = function (msg)
 		BtmScan.Print(tr(" %1 [%2]", "dryrun", tr("Begins a test scanning run (must have AH open)")))
 		BtmScan.Print(tr(" %1 [%2]", "begin", tr("Begins the scanning process (must have AH open)")))
 		BtmScan.Print(tr(" %1 [%2]", "end", tr("Ends the scanning process")))
+		BtmScan.Print(tr(" %1 [%2]", "load (always|never|auctionhouse)", tr("Set when BottomScanner will load")))
 	end
 end
 
