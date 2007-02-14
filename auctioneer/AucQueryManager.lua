@@ -88,7 +88,7 @@ QueryAuctionItemsResultCodes = {
 --QueryRequestQueue[Index] = {
 --	parameters;				-- query parameters
 --	maxSilence;
---	maxRetries;
+--	retriesLeft;
 --	callbackFunc;			-- callback function called when the query is complete.
 --	querySent;				-- true if the query has been sent to the server.
 --	receivedQueryResponse;	-- true if the initial response has been received.
@@ -188,8 +188,8 @@ function AucQueryManager_OnUpdate()
 				-- Yep, check how long the server has been quite.
 				if (silence > request.maxSilence) then
 					-- Either retry or fail it.
-					if (request.maxRetries > 0) then
-						request.maxRetries = request.maxRetries - 1;
+					if (request.retriesLeft > 0) then
+						request.retriesLeft = request.retriesLeft - 1;
 						sendQuery(request);
 					else
 						debugPrint("Query response not received in the last", silence, "seconds (maxSilence=", request.maxSilence, ")");
@@ -203,8 +203,8 @@ function AucQueryManager_OnUpdate()
 			elseif (isQueryInProgress()) then
 				if (silence > request.maxSilence) then
 					--retry or fail 
-					if (request.maxRetries > 0) then
-						request.maxRetries = request.maxRetries -1;
+					if (request.retriesLeft > 0) then
+						request.retriesLeft = request.retriesLeft -1;
 						sendQuery(request);
 					else
 						debugPrint("Query Response not received in", silence, "seconds (maxSilence=", request.maxSilence, ")");
@@ -392,7 +392,7 @@ function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex,
 				qualityIndex = normalizeNumericQueryParam(qualityIndex);
 			};
 			maxSilence = 5; -- 5 seconds
-			maxRetries = 0;
+			retriesLeft = 0;
 			callbackFunc = nil;
 			querySent = true;
 			receivedQueryResponse = false;
@@ -433,7 +433,7 @@ function queryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			qualityIndex = normalizeNumericQueryParam(qualityIndex);
 		};
 		maxSilence = maxSilence;
-		maxRetries = maxRetries;
+		retriesLeft = maxRetries;
 		callbackFunc = callbackFunc;
 		querySent = false;
 		receivedQueryResponse =  false;
