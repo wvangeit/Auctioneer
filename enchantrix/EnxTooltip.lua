@@ -125,14 +125,16 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	-- Check for disenchantable target
 	local id = Enchantrix.Util.GetItemIdFromLink(link)
+	if (not id or id == 0 or not Enchantrix.Util.IsDisenchantable(id)) then
+		return
+	end
+	
+	-- Check for appropriate item level (only needed as temporary stopgap for those items for which we have bogus data
 	local _, _, _, ilevel, _, _, _, _, _ = GetItemInfo(id);
+	if (not ilevel) then return end	-- for some reason we occasionally get nil ilevels from above function
 	ilevel = Enchantrix.Util.RoundUp(ilevel, 5);
 	if ilevel >= 55 and ilevel <= 60 then
 		EnhTooltip.AddLine(_ENCH('FrmtNoDEPrediction'), nil, embed);
-		return
-	end
-
-	if (not id or id == 0 or not Enchantrix.Util.IsDisenchantable(id)) then
 		return
 	end
 
