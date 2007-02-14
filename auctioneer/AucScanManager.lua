@@ -221,7 +221,8 @@ end
 --    cancelScan() - when AUCTION_HOUSE_CLOSED is fired
 --
 -- parameters:
---    _     - ignoreing the first parameter, which is an empty table
+--    _     - ignoreing the first parameter, which is an empty table, since no
+--            parameters are passed when registering this function with Stubby
 --            (see Stubby.RegisterEventHook() for more details)
 --    event - (string) name of the event which was fired
 --    ...   - contains all event paramters --- this is reserved for future use
