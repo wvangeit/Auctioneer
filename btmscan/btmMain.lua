@@ -1865,7 +1865,7 @@ end
 
 BtmScan.CancelPurchase = function()
 	local key = BtmScan.Prompt.sanityKey
-	local price = BtmScan.Prompt.bidPrice
+	local price = math.floor(BtmScan.Prompt.bidPrice / BtmScan.Prompt.iCount)
 	if (not BtmScan.NoPrompt[key]) or (price < BtmScan.NoPrompt[key]) then
 		BtmScan.NoPrompt[key] = price
 		BtmScan.Print(tr("BottomScanner autoignoring %1 for more than %2 this session.", BtmScan.Prompt.iLink, BtmScan.GSC(price)))
