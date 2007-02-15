@@ -373,7 +373,7 @@ end
 -- its assumed that the query went through and we start the waiting game.
 -------------------------------------------------------------------------------
 function postQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if (hookQueryAuctionItems and (not BtmScan.scanning)) then
+	if (hookQueryAuctionItems and (not BtmScan or not BtmScan.scanning)) then
 		debugPrint("Blizzard's QueryAuctionItems() called");
 		BlizzardScan = 1;
 
