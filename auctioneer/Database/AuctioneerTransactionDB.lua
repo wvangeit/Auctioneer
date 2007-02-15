@@ -364,6 +364,8 @@ function onBidEvent(event, auction, bid, result)
 				bid = bid,
 			}
 		end
+
+		result = "BidSent"
 	end
 
 	local itemKey = createItemKey(auction.itemId, auction.suffixId, auction.enchantId, auction.uniqueId or 0)
