@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -- Debug switch - set to true, to enable debug output for this module
 local debug = false
@@ -321,7 +321,7 @@ function addPendingBid(listType, index, bid, callbackFunc)
 
 		-- Fire the AUCTIONEER_BID_SENT event.
 		Auctioneer.Util.Debug("AucBidManager", AUC_INFO, "Firing bid event", "Sending bid request event to event manager")
-		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SENT", pendingBid.auction, pendingBid.bid, BidResultCodes.BidSent);
+		Auctioneer.EventManager.FireEvent("AUCTIONEER_BID_SENT", auction, bid);
 	end
 end
 
