@@ -999,7 +999,7 @@ function debugPrint(strMessage, iCode, type, priority)
 
 	if nLog then
 		if not priority then
-			priority = N_WARNING
+			priority = N_ERROR
 		end
 		if not type then
 			type = "Error"
