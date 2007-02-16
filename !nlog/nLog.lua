@@ -26,21 +26,32 @@
 
 -- Message Levels
 N_CRITICAL = 1
-N_WARNING = 2
-N_NOTICE = 3
-N_INFO = 4
-N_DEBUG = 5
+N_ERROR = 2
+N_WARNING = 3
+N_NOTICE = 4
+N_INFO = 5
+N_DEBUG = 6
 
 nLog = {
 	messages = {},
 	levels = {
 		[N_CRITICAL] = "Critical",
+		[N_ERROR] = "Error",
 		[N_WARNING] = "Warning",
 		[N_NOTICE] = "Notice",
 		[N_INFO] = "Info",
 		[N_DEBUG] = "Debug",
 	}
 }
+
+-- generate the variables used to create the nLogFrame lateron
+local iNumOfLevels   = #nLog.levels
+local strLevelFilter = "Filter by maximum message priority type ("
+for key, data in ipairs(nLog.levels) do
+	strLevelFilter = strLevelFilter..key.."="..data.." "
+end
+-- remove the last whitespace and close the brackets
+strLevelFilter = string.sub(strLevelFilter, 1, #strLevelFilter-1)..")"
 
 nLog.Version="<%version%>"
 if (nLog.Version == "<%".."version%>") then
@@ -365,11 +376,11 @@ nLog.Message.LevelFilt:SetHeight(20)
 nLog.Message.LevelFilt:SetWidth(60)
 nLogLevelFiltLow:SetText("")
 nLogLevelFiltHigh:SetText("")
-nLog.Message.LevelFilt:SetMinMaxValues(1, 5)
+nLog.Message.LevelFilt:SetMinMaxValues(1, iNumOfLevels)
 nLog.Message.LevelFilt:SetValueStep(1)
 nLog.Message.LevelFilt:SetValue(N_DEBUG)
 nLog.Message.LevelFilt:SetHitRectInsets(0,0,0,0)
-nLog.Message.LevelFilt.tooltip = "Filter by maximum message priority type (1=critical, 2=warning, 3=notice, 4=info, 5=debug)"
+nLog.Message.LevelFilt.tooltip = strLevelFilter
 nLog.Message.LevelFilt:SetScript("OnEnter", showTooltip)
 nLog.Message.LevelFilt:SetScript("OnLeave", hideTooltip)
 

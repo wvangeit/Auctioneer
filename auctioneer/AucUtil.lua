@@ -655,10 +655,11 @@ Auctioneer.Util = {
 }
 
 AUC_CRITICAL = 1
-AUC_WARNING = 2
-AUC_NOTICE = 3
-AUC_INFO = 4
-AUC_DEBUG = 5
+AUC_ERROR = 2
+AUC_WARNING = 3
+AUC_NOTICE = 4
+AUC_INFO = 5
+AUC_DEBUG = 6
 function Auctioneer.Util.Debug(...)
 	if (nLog) then
 		nLog.AddMessage("Auctioneer", ...)
