@@ -365,6 +365,10 @@ function onBidEvent(event, auction, bid, result)
 			}
 		end
 
+		-- AUCTIONEER_BID_SENT has no result code (other than
+		-- AUCTIONEER_BID_COMPLETE) - since we write the result variable to the db
+		-- to lateron identify what the entry in the DB means, we have to set it
+		-- to something here.
 		result = "BidSent"
 	end
 
