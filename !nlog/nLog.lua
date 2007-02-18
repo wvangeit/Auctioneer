@@ -25,22 +25,27 @@
 -- Eg: nLog.AddMessage("Auctioneer", "Scan", N_NOTICE, "Empty Auction", "Found empty auction on page 10")
 
 -- Message Levels
-N_CRITICAL = 1
-N_ERROR = 2
-N_WARNING = 3
-N_NOTICE = 4
-N_INFO = 5
-N_DEBUG = 6
+N_CRITICAL = 1 -- used for critical errors which might crash the addon or
+               -- result in corrupted data (especially in the db)
+N_ERROR    = 2 -- used for non-critical errors which won't end up in any addon
+               -- non-responding or result in incorrect data
+N_WARNING  = 3 -- used for states which might cause an error, if they are 
+               -- unexpected
+N_NOTICE   = 4 -- used to give notice of current states which might be useful
+               -- and clarify the current functional behaviour
+N_INFO     = 5 -- used to inform of less important states which still might be
+               -- useful to track down how the code behaves
+N_DEBUG    = 6 -- used for local debugging, only
 
 nLog = {
 	messages = {},
 	levels = {
 		[N_CRITICAL] = "Critical",
-		[N_ERROR] = "Error",
-		[N_WARNING] = "Warning",
-		[N_NOTICE] = "Notice",
-		[N_INFO] = "Info",
-		[N_DEBUG] = "Debug",
+		[N_ERROR]    = "Error",
+		[N_WARNING]  = "Warning",
+		[N_NOTICE]   = "Notice",
+		[N_INFO]     = "Info",
+		[N_DEBUG]    = "Debug",
 	}
 }
 
