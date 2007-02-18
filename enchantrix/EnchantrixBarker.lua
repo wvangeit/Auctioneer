@@ -57,12 +57,21 @@ local print_order = { --TODO: Localize
 	'AnyWeapon'
 };
 
+--N.B. All patterns are matched as lower-case only.
+
+--These will be excluded entirely from being advertised, self-only enchants etc.
+local exclude_patterns = {
+    'enchant a ring', -- Healing Power / Striking / Spellpower (also a new item category and an bound enchant)
+}
+
+--If these match then it will negate any matches for actual attributes.
+--"Combo" enchants should go here. They will still be advertised, but only
+--by name.
 local neg_attributes = {
 	'increases strength by 100',  --Crusader
     'damage to frost and shadow', --Soulfrost
     'damage to fire and arcane', --Sunfire
     'increase snare and root', -- Surefooted
-    'enchant a ring', -- Healing Power / Striking / Spellpower (also a new item category and an bound enchant)
     'minor movement speed', -- Boar's Speed /Cat's Swiftness
     'heal nearby', --Battlemaster
     '3% chance on spellcast', -- Spellsurge
@@ -964,6 +973,15 @@ end
 ]]
 
 -- end UI code
+function EnchantrixBarker_IsExcluded( description )
+    local long_str = description;
+    for i,exclude in ipairs(exclude_patterns) do
+		if( long_str:find(exclude) ~= nil ) then
+	        return true;
+		end
+	end
+    return false;
+end
 
 function Enchantrix_CreateBarker()
 	local availableEnchants = {};
@@ -977,43 +995,47 @@ function Enchantrix_CreateBarker()
         for index=1, GetNumCrafts() do
             local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
             --EnhTooltip.DebugPrint(GetCraftInfo(index))
-            if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
-                --Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
-                local cost = 0;
-                for j=1,GetCraftNumReagents(index),1 do
-                    local a,b,c = GetCraftReagentInfo(index,j);
-                    reagent = GetCraftReagentItemLink(index,j);
-
-                    --EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
-                    cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
+    
+            if( not EnchantrixBarker_IsExcluded( EnchantrixBarker_GetCraftDescription(index):lower() ) ) then
+                if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
+                    --Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
+                    local cost = 0;
+                    for j=1,GetCraftNumReagents(index),1 do
+                        local a,b,c = GetCraftReagentInfo(index,j);
+                        reagent = GetCraftReagentItemLink(index,j);
+    
+                        --EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
+                        cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
+                    end
+    
+                    local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
+                    if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
+                        profit = Enchantrix_BarkerGetConfig("highest_profit");
+                    end
+                    local price = EnchantrixBarker_RoundPrice(cost + profit);
+    
+                    local enchant = {
+                        index = index,
+                        name = craftName,
+                        type = craftType,
+                        available = numEnchantsAvailable,
+                        isExpanded = isExpanded,
+                        cost = cost,
+                        price = price,
+                        profit = price - cost
+                    };
+                    
+                    availableEnchants[ numAvailable] = enchant;
+    
+                    EnhTooltip.DebugPrint(GetCraftDescription(index));
+                    local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+                    local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+                    --EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
+    
+                    EnchantrixBarker_AddEnchantToPriorityList( enchant )
+                    --EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
+                    numAvailable = numAvailable + 1;
                 end
-
-                local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
-                if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
-                    profit = Enchantrix_BarkerGetConfig("highest_profit");
-                end
-                local price = EnchantrixBarker_RoundPrice(cost + profit);
-
-                local enchant = {
-                    index = index,
-                    name = craftName,
-                    type = craftType,
-                    available = numEnchantsAvailable,
-                    isExpanded = isExpanded,
-                    cost = cost,
-                    price = price,
-                    profit = price - cost
-                };
-                availableEnchants[ numAvailable] = enchant;
-
-                EnhTooltip.DebugPrint(GetCraftDescription(index));
-                local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-                local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-                --EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
-
-                EnchantrixBarker_AddEnchantToPriorityList( enchant )
-                --EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
-                numAvailable = numAvailable + 1;
             end
         end
 
