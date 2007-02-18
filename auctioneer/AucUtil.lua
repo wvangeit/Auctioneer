@@ -27,51 +27,53 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 -- Debug switch - set to true, to enable debug output for this module
 local debug = false
 
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
---Local function prototypes
-local storePlayerFaction
-local getTimeLeftString
-local getSecondsLeftString
+-- Local function prototypes
+local aucAssert
+local aucDebugPrint
+local chatPrint
 local checkConstantsLimit
-local getNumConstants
-local getConstants
-local unpackSeconds
-local getGSC
-local getTextGSC
-local nilSafeString
 local colorTextWhite
-local getWarnColor
-local nullSafe
-local sanifyAHSnapshot
+local debugPrint
+local delocalizeCommand
+local delocalizeFilterVal
+local findEmptySlot
 local getAuctionKey
-local getOppositeKey
-local getNeutralKey
+local getConstants
+local getGSC
 local getHomeKey
-local isValidAlso
-local split
+local getItemHyperlinks
 local getItemLinks
 local getItems
-local getItemHyperlinks
-local chatPrint
-local setFilterDefaults
-local protectAuctionFrame
-local priceForOne
-local round
-local delocalizeFilterVal
-local localizeFilterVal
 local getLocalizedFilterVal
-local delocalizeCommand
+local getNeutralKey
+local getNumConstants
+local getOppositeKey
+local getSecondsLeftString
+local getTextGSC
+local getTimeLeftString
+local getWarnColor
+local isValidAlso
 local localizeCommand
-local findEmptySlot
-local debugPrint
+local localizeFilterVal
+local nilSafeString
+local nullSafe
+local priceForOne
+local protectAuctionFrame
+local round
+local sanifyAHSnapshot
+local setFilterDefaults
+local split
+local storePlayerFaction
+local unpackSeconds
 
---Function Imports
+-- Function Imports
 local pairs = pairs;
 local max = math.max
 local ceil = math.ceil
@@ -607,6 +609,85 @@ function findEmptySlot()
 end
 
 -------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- parameters:
+--    strAddon   - (string) the name of the addon/file used to specify where
+--                          the error occured
+--    strMessage - (string) the error message
+--    iCode      - (number) the error code (optional)
+--    type       - (string) type of debug message (optional - defaulting to
+--                          "Error")
+--    priority   - nLog message level (optional - defaulting to N_ERROR)
+--
+-- returns:
+--    first value:
+--       "unspecified", if no iCode is specified
+--       iCode, otherwise
+--    second value:
+--       strMessage
+--
+-- remarks:
+--    This function is not designed to be called directly. Instead it is meant
+--    to have a local counterpart in each file, which automatically specifies
+--    the strAddon parameter and then calls this function.
+-------------------------------------------------------------------------------
+function aucDebugPrint(strAddon, strMessage, iCode, type, priority)
+	if not iCode then
+		iCode = "unspecified"
+	end
+
+	if nLog then
+		if not priority then
+			priority = N_ERROR
+		end
+		if not type then
+			type = "Error"
+		end
+		nLog.AddMessage(strAddon, type, priority, "Errorcode: "..iCode, strMessage)
+	end
+
+	return iCode, strMessage
+end
+
+-------------------------------------------------------------------------------
+-- Used to make sure that conditions are met within functions.
+-- If bTest is false, the error message will be written to nLog and the user's
+-- default chat channel.
+--
+-- parameters:
+--    strAddon   - (string) the name of the addon/file used to identify the
+--                          specific assertion
+--    bTest      - (boolean) true, if the assertion was met
+--                           false, otherwise
+--    strMessage - (string) the message which will be output to the user
+--
+-- remark:
+--    If nLog is present, the message will not only be written to the user's
+--    channel, but also to nLog with the priority set to N_CRITICAL, since it
+--    is assumed that assert() is only used in critical parts of functions and
+--    that bTest is expected to never fail. This is especially useful to track
+--    down bugs which might randomly occure. Therefore this log message is given
+--    the highest priority.
+--
+--    This function is not designed to be called directly. Instead it is meant
+--    to have a local counterpart in each file, which automatically specifies
+--    the strAddon parameter and then calls this function.
+-------------------------------------------------------------------------------
+-- TODO: Outsource this function to a separate embedded lib.
+function aucAssert(strAddon, bTest, strMessage)
+	if bTest then
+		return -- test passed, nothing to worry about
+	end
+
+	getglobal("ChatFrame1"):AddMessage(strMessage, 1.0, 0.3, 0.3)
+
+	if nLog then
+		nLog.AddMessage(strAddon, "Assertion", N_CRITICAL, "assertion failed", strMessage)
+	end
+end
+
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function debugPrint(...)
 	if debug then EnhTooltip.DebugPrint("[Auc.Util]", ...); end
@@ -652,6 +733,8 @@ Auctioneer.Util = {
 	DelocalizeCommand = delocalizeCommand,
 	LocalizeCommand = localizeCommand,
 	FindEmptySlot = findEmptySlot,
+	AucDebugPrint = aucDebugPrint,
+	AucAssert = aucAssert
 }
 
 AUC_CRITICAL = 1
