@@ -980,15 +980,16 @@ end
 -- Prints the specified message to nLog.
 --
 -- parameters:
---    strMessage - (string) the new error message
---    iCode      - (number) the new error code (optional)
+--    strMessage - (string) the error message
+--    iCode      - (number) the error code (optional)
 --    type       - (string) type of debug message (optional - defaulting to
 --                          "Error")
---    priority   - nLog message level (optional - defaulting to N_WARNING)
+--    priority   - nLog message level (optional - defaulting to N_ERROR)
 --
 -- returns:
 --    first value:
---       iCode or "unspecified", if no iCode is specified
+--       "unspecified", if no iCode is specified
+--       iCode, otherwise
 --    second value:
 --       strMessage
 -------------------------------------------------------------------------------
