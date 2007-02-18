@@ -294,19 +294,19 @@ function postCanSendAuctionQuery(_, returnValues, noHook, who)
 	if (returnValues and returnValues[1]) then
 		if (isQueryInProgress()) then
 			debugPrint("Overriding CanSendAuctionQuery() due to query being in progress");
-			return "setreturn", { false };
+			return "setreturn", {};
 		elseif (isBidInProgress()) then
 			debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress");
-			return "setreturn", { false };
+			return "setreturn", {};
 		elseif (hookCanSendAuctionQuery and Auctioneer.ScanManager.IsScanning()) then
 			debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress");
-			return "setreturn", { false };
+			return "setreturn", {};
 		elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
 			debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
-			return "setreturn", { false };
+			return "setreturn", {};
 		elseif (hookCanSendAuctionQuery and Auctioneer.BidManager.ShowingConfirmation()) then
 			debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown");
-			return "setreturn", { false };
+			return "setreturn", {};
 		end
 	end
 end

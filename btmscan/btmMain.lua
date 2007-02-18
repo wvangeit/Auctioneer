@@ -731,7 +731,7 @@ end
 BtmScan.CanSendAuctionQuery = function(_, _, noHook, who)
 	-- We don't care about nohook - we need the scan to stop!
 	if (BtmScan.scanStage and BtmScan.scanStage > 0 and (not who or who ~= "btmscan")) then
-		return "setreturn", { false }
+		return "setreturn", {}
 	end
 end
 
