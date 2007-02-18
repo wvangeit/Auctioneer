@@ -491,7 +491,7 @@ end
 function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	if (not (triggerFunction and hookFunc)) then
 		return debugPrint("Invalid function call. No trigger function and/or hook function specified. Usage Stubby.RegisterFunctionHook(triggerFunction, position, hookFunction,...).",
-								4)
+								4, "Error")
 	end
 	local insertPos = tonumber(position) or 200
 	local funcObj
@@ -529,7 +529,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 	config.calls.callList = rebuildNotifications(config.calls.functions)
 	local iErrorCode, strErrorMessage = hookInto(triggerFunction)
 	if iErrorCode > 0 then
-		return debugPrint(strErrorMessage, iErrorCode)
+		return debugPrint(strErrorMessage, iErrorCode, "Error")
 	else
 		return 0
 	end
@@ -567,7 +567,7 @@ end
 function unregisterFunctionHook(triggerFunction, hookFunc)
 	if not (config.calls and config.calls.functions and config.calls.functions[triggerFunction]) then
 		return 0, debugPrint("Failed to unregister function hook for "..triggerFunction.." since it is not hooked at all",
-		                     1)
+		                     1, "Error")
 	end
 
 	local iHooked  = 0
@@ -595,7 +595,7 @@ function unregisterFunctionHook(triggerFunction, hookFunc)
 
 	if iRemoved == 0 then
 		return 0, debugPrint("Failed to unregister function hook for "..triggerFunction..". The given function is not hooked in this trigger function.",
-		                     1)
+		                     1, "Error")
 	end
 
 	-- rebuild the call list, so that the removed functions are also removed from
@@ -983,8 +983,9 @@ end
 --    strMessage - (string) the error message
 --    iCode      - (number) the error code (optional)
 --    type       - (string) type of debug message (optional - defaulting to
---                          "Error")
---    priority   - nLog message level (optional - defaulting to N_ERROR)
+--                          "Debug")
+--    priority   - nLog message level (optional - see remarks on which default
+--                 value is used)
 --
 -- returns:
 --    first value:
@@ -992,6 +993,14 @@ end
 --       iCode, otherwise
 --    second value:
 --       strMessage
+--
+-- remarks:
+--    If priority is not specified, a default value will be assigned. This
+--    default value depends on the specified type parameter. If type is set to a
+--    valid nLog level, the appropriate priority will be used (i.e. 1 for
+--    "Critical", 2 for "Error", etc.). See nLog.levels for a complete list.
+--    If there is no counterpart to the specified type, priority defaults to
+--    N_DEBUG.
 -------------------------------------------------------------------------------
 function debugPrint(strMessage, iCode, type, priority)
 	if not iCode then
@@ -999,11 +1008,18 @@ function debugPrint(strMessage, iCode, type, priority)
 	end
 
 	if nLog then
-		if not priority then
-			priority = N_ERROR
-		end
 		if not type then
-			type = "Error"
+			type = "Debug"
+		end
+		if not priority then
+			-- search the list of error levels to find the correct priority
+			for iLevel, strLevel in pairs(nLog.levels) do
+				if strLevel == type then
+					priority = iLevel
+					break
+				end
+			end
+			priority = priority or N_DEBUG
 		end
 		nLog.AddMessage("Stubby", type, priority, "Errorcode: "..iCode, strMessage)
 	end

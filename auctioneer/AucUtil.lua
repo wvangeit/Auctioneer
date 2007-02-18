@@ -617,8 +617,9 @@ end
 --    strMessage - (string) the error message
 --    iCode      - (number) the error code (optional)
 --    type       - (string) type of debug message (optional - defaulting to
---                          "Error")
---    priority   - nLog message level (optional - defaulting to N_ERROR)
+--                          "Debug")
+--    priority   - nLog message level (optional - see remarks on which default
+--                 value is used)
 --
 -- returns:
 --    first value:
@@ -628,6 +629,13 @@ end
 --       strMessage
 --
 -- remarks:
+--    If priority is not specified, a default value will be assigned. This
+--    default value depends on the specified type parameter. If type is set to a
+--    valid nLog level, the appropriate priority will be used (i.e. 1 for
+--    "Critical", 2 for "Error", etc.). See nLog.levels for a complete list.
+--    If there is no counterpart to the specified type, priority defaults to
+--    N_DEBUG.
+--
 --    This function is not designed to be called directly. Instead it is meant
 --    to have a local counterpart in each file, which automatically specifies
 --    the strAddon parameter and then calls this function.
@@ -638,11 +646,18 @@ function aucDebugPrint(strAddon, strMessage, iCode, type, priority)
 	end
 
 	if nLog then
-		if not priority then
-			priority = N_ERROR
-		end
 		if not type then
-			type = "Error"
+			type = "Debug"
+		end
+		if not priority then
+			-- search the list of error levels to find the correct priority
+			for iLevel, strLevel in pairs(nLog.levels) do
+				if strLevel == type then
+					priority = iLevel
+					break
+				end
+			end
+			priority = priority or N_DEBUG
 		end
 		nLog.AddMessage(strAddon, type, priority, "Errorcode: "..iCode, strMessage)
 	end
