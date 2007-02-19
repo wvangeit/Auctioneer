@@ -763,7 +763,7 @@ end
 --       nil, if sending an auction query is fine
 --       {}, otherwise
 -------------------------------------------------------------------------------
-BtmScan.PosCanSendAuctionQuery = function(_, _)
+BtmScan.PostCanSendAuctionQuery = function(_, _)
 	if not hookCanSendAuctionQuery then
 		 -- we are calling the function via BtmScan.CanSendAuctionQuery()
 		 -- and therefore are asked not to alter the return value
