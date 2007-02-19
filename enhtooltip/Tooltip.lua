@@ -225,7 +225,7 @@ local getGSC					-- GetGSC(money)
 local getLine                 -- getLine(line)
 local getLootLinkLink			-- GetLootLinkLink(name)
 local getLootLinkServer			-- GetLootLinkServer()
-local getRect					-- GetRect(object,curRect)
+local getRect					-- GetRect(object)
 local getTextGSC				-- GetTextGSC(money,exact)
 local getTooltipHeight			-- GetTooltipHeight(enhTooltip, currentTooltip)
 local getTooltipWidth			-- GetTooltipWidth(enhTooltip, currentTooltip)
@@ -436,11 +436,8 @@ function clearTooltip()
 	end
 end
 
-function getRect(object, curRect)
-	local rect = curRect
-	if (not rect) then
-		rect = {}
-	end
+function getRect(object)
+	local rect = {}
 
 	local left, bottom, width, height = object:GetRect()
 	left = left or 0
@@ -502,7 +499,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	if (parentObject) then
 		local align = currentTooltip.anchor
 
-		enhTooltipParentRect = getRect(currentTooltip.owner, enhTooltipParentRect)
+		enhTooltipParentRect = getRect(currentTooltip.owner)
 
 		local xAnchor, yAnchor
 		if (enhTooltipParentRect.left - width < sWidth * 0.2) then
@@ -567,7 +564,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		EnhTTData.showIgnore=true
 		currentTooltip:Show()
 		EnhTTData.showIgnore=false
-		enhTooltipTipRect = getRect(currentTooltip, enhTooltipTipRect)
+		enhTooltipTipRect = getRect(currentTooltip)
 
 		if (enhTooltipTipRect.bottom - height < 60) then
 			currentTooltip:ClearAllPoints()
