@@ -53,6 +53,12 @@ local data, dataZone
 -- Right after updates when we don't have all new items uploaded, can be set to false
 local upToDateConservativePrices = false
 
+-- Used in BtmScan.CanSendAuctionQuery() to disable the additional checks
+-- performed in the hooked CanSendAuctionQuery() function. This is necessary
+-- since we'd otherwise lock ourselves off from scanning, instead of other
+-- addons.
+local hookCanSendAuctionQuery = true -- (boolean)
+
 BTMSCAN_VERSION = "<%version%>"
 if (BTMSCAN_VERSION == "<\037version%>") then
 	BTMSCAN_VERSION = "3.9.0-DEV"
@@ -219,7 +225,7 @@ BtmScan.OnUpdate = function(...)
 		end
 
 		-- Check to see if the AH is open for business
-		if not (AuctionFrame and AuctionFrame:IsVisible() and CanSendAuctionQuery(true, "btmscan")) then
+		if not (AuctionFrame and AuctionFrame:IsVisible() and BtmScan.CanSendAuctionQuery()) then
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
@@ -728,11 +734,76 @@ BtmScan.isDEAble = function(itemMinLevel)
 	end
 end
 
-BtmScan.PostCanSendAuctionQuery = function(_, _, noHook, who)
-	-- We don't care about nohook - we need the scan to stop!
-	if (BtmScan.scanStage and BtmScan.scanStage > 0 and (not who or who ~= "btmscan")) then
+-------------------------------------------------------------------------------
+-- Hook called after Blizzard's CanSendAuctionQuery().
+-- Overrides the return value, if we are scanning the AH to make sure that no
+-- other addon interferes with our scanning procedure, messing the whole scan
+-- up.
+-- A special version of CanSendAuctionQuery() is provided, which can be used
+-- to receive the almost unaltered return value. See
+-- BtmScan.CanSendAuctionQuery() for more details.
+--
+-- called by:
+--    function hook - CanSendAuctionQuery() (position: 10)
+--    globally      - BtmScan.PostCanSendAuctionQuery()
+--
+-- parameters:
+--    _     - ignoring the first parameter, which is an empty table, since no
+--            parameters are passed when registering this function with Stubby
+--            (see Stubby.RegisterFunctionHook() for more details)
+--    _     - ignoring the second parameter, which is a table containing the
+--            return value of the original function call.
+--            (see Stubby.RegisterFunctionHook() for more details)
+--
+-- returns:
+--    first value:
+--       nil, if sending an auction query is fine
+--       "setreturn", otherwise
+--    second value:
+--       nil, if sending an auction query is fine
+--       {}, otherwise
+-------------------------------------------------------------------------------
+BtmScan.PosCanSendAuctionQuery = function(_, _)
+	if not hookCanSendAuctionQuery then
+		 -- we are calling the function via BtmScan.CanSendAuctionQuery()
+		 -- and therefore are asked not to alter the return value
+		return
+	end
+
+	-- We are performing our own scans. Permit other addons from interfering.
+	if (BtmScan.scanStage and BtmScan.scanStage > 0) then
 		return "setreturn", {}
 	end
+end
+
+
+-------------------------------------------------------------------------------
+-- BottomScanner's version of CanSendAuctionQuery().
+-- This function can be called, if BottomScanner should not interfere with the
+-- CanSendAuctionQuery()-return value.
+-- Refere to AucQueryManager.CanSendAuctionQuery() to see a more detailed
+-- description on when the original return value is still being altered (not
+-- by us, but by Auctioneer).
+--
+-- called by:
+--    globally - BtmScan.CanSendAuctionQuery()
+--       called in BtmScan.OnUpdate()
+--
+-- calls:
+--    AucQueryManager.CanSendAuctionQuery() - always
+--
+-- returns:
+--    1, if sending an auction query is fine
+--    nil, otherwise
+-------------------------------------------------------------------------------
+BtmScan.CanSendAuctionQuery = function()
+	-- Exclude our own checks in CanSendAuctionQuery() as well as use
+	-- Auctioneer's special CanSendAuctionQuery()-function.
+	hookCanSendAuctionQuery = false
+	local ret = Auctioneer.QueryManager.CanSendAuctionQuery()
+	hookCanSendAuctionQuery = true
+
+	return ret
 end
 
 -- Get a GSC value and work out what it's worth

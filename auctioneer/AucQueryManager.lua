@@ -286,28 +286,30 @@ end
 -- 5. The bid scanner is performing a scan.
 -- 6. The bid manager is showing the confirmation window.
 -------------------------------------------------------------------------------
-function postCanSendAuctionQuery(_, returnValues, noHook, who)
-	-- We've been asked not to tamper with the results
-	if (noHook) then return end
+function postCanSendAuctionQuery(_, returnValues)
+	if not returnValues[1] then
+		-- sending a query is already restricted by the origincal
+		-- CanSendAuctionQuery() call - so there's no point in checking, if we
+		-- permit it
+		return
+	end
 
 	-- If Blizzard will allow the query, check if should allow it.
-	if (returnValues and returnValues[1]) then
-		if (isQueryInProgress()) then
-			debugPrint("Overriding CanSendAuctionQuery() due to query being in progress");
-			return "setreturn", {};
-		elseif (isBidInProgress()) then
-			debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress");
-			return "setreturn", {};
-		elseif (hookCanSendAuctionQuery and Auctioneer.ScanManager.IsScanning()) then
-			debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress");
-			return "setreturn", {};
-		elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
-			debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress");
-			return "setreturn", {};
-		elseif (hookCanSendAuctionQuery and Auctioneer.BidManager.ShowingConfirmation()) then
-			debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown");
-			return "setreturn", {};
-		end
+	if (isQueryInProgress()) then
+		debugPrint("Overriding CanSendAuctionQuery() due to query being in progress", nil, "postCanSendAuctionQuery", AUC_NOTICE);
+		return "setreturn", {};
+	elseif (isBidInProgress()) then
+		debugPrint("Overriding CanSendAuctionQuery() due to bid being in progress", nil, "postCanSendAuctionQuery", AUC_NOTICE);
+		return "setreturn", {};
+	elseif (hookCanSendAuctionQuery and Auctioneer.ScanManager.IsScanning()) then
+		debugPrint("Overriding CanSendAuctionQuery() due to scan being in progress", nil, "postCanSendAuctionQuery", AUC_NOTICE);
+		return "setreturn", {};
+	elseif (hookCanSendAuctionQuery and Auctioneer.BidScanner.IsScanning()) then
+		debugPrint("Overriding CanSendAuctionQuery() due to bid scan being in progress", nil, "postCanSendAuctionQuery", AUC_NOTICE);
+		return "setreturn", {};
+	elseif (hookCanSendAuctionQuery and Auctioneer.BidManager.ShowingConfirmation()) then
+		debugPrint("Overriding CanSendAuctionQuery() due to the bid confirmation dialog being shown", nil, "postCanSendAuctionQuery", AUC_NOTICE);
+		return "setreturn", {};
 	end
 end
 
@@ -319,7 +321,10 @@ end
 -- 3. There is a bid in progress.
 -------------------------------------------------------------------------------
 function canSendAuctionQuery()
-	local result = CanSendAuctionQuery(true, "auctioneer");
+	hookCanSendAuctionQuery = false
+	local result = CanSendAuctionQuery();
+	hookCanSendAuctionQuery = true
+
 	return result;
 end
 
