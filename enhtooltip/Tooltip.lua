@@ -227,8 +227,8 @@ local getLootLinkLink			-- GetLootLinkLink(name)
 local getLootLinkServer			-- GetLootLinkServer()
 local getRect					-- GetRect(object)
 local getTextGSC				-- GetTextGSC(money,exact)
-local getTooltipHeight			-- GetTooltipHeight(enhTooltip, currentTooltip)
-local getTooltipWidth			-- GetTooltipWidth(enhTooltip, currentTooltip)
+local getTooltipHeight			-- GetTooltipHeight(enhTooltip)
+local getTooltipWidth			-- GetTooltipWidth(enhTooltip)
 local gtHookOnHide				-- GtHookOnHide()
 local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
 local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
@@ -482,7 +482,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		EnhancedTooltipText1:SetPoint("TOPLEFT", "EnhancedTooltipHeader"..EnhancedTooltip.headerCount, "BOTTOMLEFT", 0, -1)
 	end
 
-	local width, height = getTooltipWidth(EnhancedTooltip, currentTooltip), getTooltipHeight(EnhancedTooltip, currentTooltip)
+	local width, height = getTooltipWidth(EnhancedTooltip), getTooltipHeight(EnhancedTooltip)
 	local sWidth, sHeight = GetScreenWidth(), GetScreenHeight()
 
 	local cWidth = currentTooltip:GetWidth()
@@ -598,7 +598,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	end
 end
 
-function getTooltipWidth(enhTooltip, currentTooltip)
+function getTooltipWidth(enhTooltip)
 	local width = 0
 	local headerCount = enhTooltip.headerCount
 	for headerLine, index in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
@@ -635,7 +635,7 @@ function getTooltipWidth(enhTooltip, currentTooltip)
 	return width
 end
 
-function getTooltipHeight(enhTooltip, currentTooltip)
+function getTooltipHeight(enhTooltip)
 	local height = 0
 	local lineCount = enhTooltip.lineCount
 	local headerCount = enhTooltip.headerCount
