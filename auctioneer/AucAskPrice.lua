@@ -35,7 +35,21 @@ local debug = false
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 --Local function prototypes
-local init, askpriceFrame, commandHandler, chatPrintHelp, onOff, setTrigger, genVarSet, setCustomSmartWords, setKhaosSetKeyValue, sendAskPrice, eventHandler, sendWhisper, onEventHook, debugPrint
+local init
+local askpriceFrame
+local commandHandler
+local chatPrintHelp
+local onOff
+local setTrigger
+local genVarSet
+local setCustomSmartWords
+local setKhaosSetKeyValue
+local sendAskPrice
+local eventHandler
+local sendWhisper
+local onEventHook
+local debugPrint
+local getData
 
 local whisperList = {}
 local sentAskPriceAd = {}
