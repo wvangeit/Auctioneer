@@ -499,7 +499,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	if (parentObject) then
 		local align = currentTooltip.anchor
 
-		enhTooltipParentRect = getRect(parentObject)
+		local enhTooltipParentRect = getRect(parentObject)
 
 		local xAnchor, yAnchor
 		if (enhTooltipParentRect.left - width < sWidth * 0.2) then
@@ -564,7 +564,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		EnhTTData.showIgnore=true
 		currentTooltip:Show()
 		EnhTTData.showIgnore=false
-		enhTooltipTipRect = getRect(currentTooltip)
+		local enhTooltipTipRect = getRect(currentTooltip)
 
 		if (enhTooltipTipRect.bottom - height < 60) then
 			currentTooltip:ClearAllPoints()
