@@ -79,7 +79,7 @@ BtmScan.OnLoad = function ()
 
 	Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, BtmScan.TooltipHook)
 	Stubby.RegisterFunctionHook("QueryAuctionItems", 600, BtmScan.QueryAuctionItems)
-	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.CanSendAuctionQuery)
+	Stubby.RegisterFunctionHook("CanSendAuctionQuery", 10, BtmScan.PosCanSendAuctionQuery)
 
 	-- Register our temporary command hook with stubby
 	Stubby.RegisterBootCode("BtmScan", "CommandHandler", [[
@@ -728,7 +728,7 @@ BtmScan.isDEAble = function(itemMinLevel)
 	end
 end
 
-BtmScan.CanSendAuctionQuery = function(_, _, noHook, who)
+BtmScan.PostCanSendAuctionQuery = function(_, _, noHook, who)
 	-- We don't care about nohook - we need the scan to stop!
 	if (BtmScan.scanStage and BtmScan.scanStage > 0 and (not who or who ~= "btmscan")) then
 		return "setreturn", {}
