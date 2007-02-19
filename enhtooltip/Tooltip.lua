@@ -499,7 +499,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	if (parentObject) then
 		local align = currentTooltip.anchor
 
-		enhTooltipParentRect = getRect(currentTooltip.owner)
+		enhTooltipParentRect = getRect(parentObject)
 
 		local xAnchor, yAnchor
 		if (enhTooltipParentRect.left - width < sWidth * 0.2) then
