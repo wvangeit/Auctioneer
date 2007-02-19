@@ -27,7 +27,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
-	<Frame name="BeanCounterFrame" hidden="true">
+	<Frame name="BeanCounterFrame" hidden="false">
 		<Scripts>
 			<OnLoad>
 				BeanCounter_OnLoad();
