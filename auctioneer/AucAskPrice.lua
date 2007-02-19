@@ -321,7 +321,7 @@ function eventHandler(self, event, text, player, ignoreTrigger)
 		return;
 	end
 
-	local aCount, historicalMedian, snapshotMedian, vendorSell, eachstring, askedCount, items, usedStack, multipleItems;
+	local aCount, historicalMedian, snapshotMedian, vendorSell, askedCount, items, usedStack, multipleItems;
 
 	-- Check for marker (trigger char or "smart" words) only if the ignore option is not set
 	if (not (ignoreTrigger == true)) then --We need to check for "true" here, since Blizzard might decide to send us a fourth parameter.
@@ -364,11 +364,14 @@ function eventHandler(self, event, text, player, ignoreTrigger)
 			Auctioneer.AskPrice.SendWhisper("    ", player);
 		end
 
+		local strHistOne, strSnapOne
 		--If the stackSize is grater than one, add the unit price to the message
 		if (item.count > 1) then
-			eachstring = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(historicalMedian, nil, true));
+			strHistOne = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(historicalMedian, nil, true));
+			strSnapOne = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(snapshotMedian, nil, true));
 		else
-			eachstring = "";
+			strHistOne = "";
+			strSnapOne = ""
 		end
 
 		if (aCount > 0) then
@@ -377,14 +380,14 @@ function eventHandler(self, event, text, player, ignoreTrigger)
 				_AUCT('FrmtAskPriceBuyoutMedianHistorical'):format(
 					"    ",
 					EnhTooltip.GetTextGSC(historicalMedian*item.count, nil, true),
-					eachstring),
+					strHistOne),
 				player
 			);
 			Auctioneer.AskPrice.SendWhisper(
 				_AUCT('FrmtAskPriceBuyoutMedianSnapshot'):format(
 					"    ",
 					EnhTooltip.GetTextGSC(snapshotMedian*item.count, nil, true),
-					eachstring),
+					strSnapOne),
 				player
 			);
 		else
@@ -394,18 +397,19 @@ function eventHandler(self, event, text, player, ignoreTrigger)
 		--Send out vendor info if we have it
 		if (Auctioneer.Command.GetFilter('askprice-vendor') and (vendorSell > 0)) then
 
+			local strVendOne
 			--Again if the stackSize is grater than one, add the unit price to the message
 			if (item.count > 1) then
-				eachstring = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(vendorSell, nil, true));
+				strVendOne = _AUCT('FrmtAskPriceEach'):format(EnhTooltip.GetTextGSC(vendorSell, nil, true));
 			else
-				eachstring = "";
+				strVendOne = "";
 			end
 
 			Auctioneer.AskPrice.SendWhisper(
 				_AUCT('FrmtAskPriceVendorPrice'):format(
 					"    ",
 					EnhTooltip.GetTextGSC(vendorSell * item.count, nil, true),
-					eachstring),
+					strVendOne),
 				player
 			);
 		end
