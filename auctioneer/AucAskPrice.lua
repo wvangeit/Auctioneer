@@ -50,6 +50,7 @@ local sendWhisper
 local onEventHook
 local debugPrint
 local getData
+local getItems
 
 local whisperList = {}
 local sentAskPriceAd = {}
