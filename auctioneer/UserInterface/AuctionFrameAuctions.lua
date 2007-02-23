@@ -97,6 +97,10 @@ function load()
 		AuctPriceRememberCheck:Show()
 	end
 
+	-- initially the remember price checkbutton is disabled and unselected
+	AuctPriceRememberCheck:Disable()
+	AuctPriceRememberCheck:SetChecked(false)
+
 	-- Register for events and hook methods.
 	Stubby.RegisterEventHook("NEW_AUCTION_UPDATE", "Auctioneer_AuctionFrameAuctions", onNewAuctionUpdate);
 	Stubby.RegisterFunctionHook("AuctionFrame_Show", 200, postAuctionFrameShow);
@@ -169,6 +173,12 @@ function onNewAuctionUpdate()
 		else
 			AuctPriceRememberCheck:SetChecked(false)
 		end
+		-- and enable the checkbutton
+		AuctPriceRememberCheck:Enable()
+	else -- the item was removed from the box
+		-- disable the remember price checkbutton and reset it to false
+		AuctPriceRememberCheck:SetChecked(false)
+		AuctPriceRememberCheck:Disable()
 	end
 
 	-- Cache the current auction item and count.
@@ -253,11 +263,6 @@ end
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function AuctPriceRememberCheck_OnClick()
-	if (not currentAuctionItemKey) then
-		AuctPriceRememberCheck:SetChecked(false)
-		return
-	end
-
 	if (not AuctPriceRememberCheck:GetChecked()) then
 		Auctioneer.FixedPriceDB.RemoveFixedPrice(currentAuctionItemKey)
 	else
