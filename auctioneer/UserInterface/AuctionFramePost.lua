@@ -1162,6 +1162,7 @@ end
 -- Called when query based snapshot update completes.
 -------------------------------------------------------------------------------
 function onSnapshotUpdate(event, query)
+	AuctionFramePost:UpdatePriceModels();
 	return AuctionFramePost:UpdateStatusText();
 end
 
