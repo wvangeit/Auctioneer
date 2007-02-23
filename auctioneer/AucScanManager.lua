@@ -801,17 +801,21 @@ function scanEnded()
 	-- Report the result to the UI.
 	BrowseNoResultsText:SetText(strjoin("\n", uiResultText, auctionsScannedMessage, auctionsAddedMessage, auctionsRemovedMessage, auctionsUpdatedMessage));
 
-	-- The followng was added by MentalPower to implement the "/auc finish-sound" command
-	if (Auctioneer.Command.GetFilter("finish-sound") and not QueryStyleScan) then
-		PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.mp3")
-	end
+	-- play finish sound/logout/quit when we performed a full or category scan,
+	-- only
+	if not QueryStyleScan then
+		-- The followng was added by MentalPower to implement the "/auc finish-sound" command
+		if Auctioneer.Command.GetFilter("finish-sound") then
+			PlaySoundFile("Interface\\AddOns\\Auctioneer\\Sounds\\ScanComplete.mp3")
+		end
 
-	-- The followng was added by MentalPower to implement the "/auc finish" command
-	local finish = Auctioneer.Command.GetFilterVal('finish');
-	if (finish == 1 and not QueryStyleScan) then
-		Logout();
-	elseif (finish == 2 and not QueryStyleScan) then
-		Quit();
+		-- The followng was added by MentalPower to implement the "/auc finish" command
+		local finish = Auctioneer.Command.GetFilterVal('finish');
+		if finish == 1 then
+			Logout();
+		elseif finish == 2 then
+			Quit();
+		end
 	end
 
 	-- Reset Flags
