@@ -634,9 +634,8 @@ function onAuctionItemListUpdate()
 		return;
 	end
 
-	-- Unknown update, so clear the page cache.
-	debugPrint("onAuctionItemListUpdate() - unknown update");
-	clearPageCache();
+	-- Unknown update, so reset page and try again.
+	debugPrint("onAuctionItemListUpdate() - unknown update resetting page and trying again");
 	CurrentPage = nil;
 end
 
