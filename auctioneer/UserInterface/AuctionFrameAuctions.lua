@@ -44,6 +44,7 @@ local auctionsSetWarn;
 local setAuctionDuration;
 local getCurrentAuctionItemKeyAndCount;
 local debugPrint;
+local updateFixedPrice
 
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -261,18 +262,106 @@ function postAuctionsRadioButtonOnClick()
 end
 
 -------------------------------------------------------------------------------
+-- Called after the user hits the "Create Auction" button on the Auctions frame
+-- to update the fixed price setting, if necessary.
+--
+-- called by:
+--    function hook - StartAuction() (position: -50) - if the user has the
+--                                                     Auctions frame opened
+--
+-- calls:
+--    updateFixedPrice() - always
+--
+-- parameters:
+--    _ - ignoring the first parameter, which is an empty table, since no
+--        parameters are passed when registering this function with Stubby
+--        (see Stubby.RegisterFunctionHook() for more details)
+--    _ - ignoring the second parameter, which is an empty table, since
+--        hooking into StartAuction() is done before calling the original
+--        function and therefore no return values are set
+--        (see Stubby.RegisterFunctionHook() for more details)
+--    _ - ignoring the third parameter, which is the bid value in coppor
+--    _ - ignoring the fourth parameter, which is the buyout value in coppor
+--    _ - ignoring the fith parameter, which is the duration in minutes
+-------------------------------------------------------------------------------
+function preStartAuction(_, _, _, _, _)
+	updateFixedPrice(AuctPriceRememberCheck:GetChecked())
+end
+
+-------------------------------------------------------------------------------
+-- Called when clicking the remember price checkbutton to update the fixed
+-- price value for the selected item.
+--
+-- called by:
+--    globally AuctPriceRememberCheck_OnClick()
+--       called in OnClick of the Remember Price Checkbutton
+--
+-- calls:
+--    updateFixedPrice() - always
 -------------------------------------------------------------------------------
 function AuctPriceRememberCheck_OnClick()
-	if (not AuctPriceRememberCheck:GetChecked()) then
-		Auctioneer.FixedPriceDB.RemoveFixedPrice(currentAuctionItemKey)
-	else
+	updateFixedPrice(AuctPriceRememberCheck:GetChecked())
+end
+
+-------------------------------------------------------------------------------
+-- Called when Blizzard's auctions tab is shown, to hook the StartAuction
+-- function.
+--
+-- called by:
+--    globally AuctFrameAuctions_OnShow()
+--       called in OnShow of the AuctionInfo frame
+--
+-- calls:
+--    Stubby.RegisterFunctionHook() - always
+-------------------------------------------------------------------------------
+function AuctFrameAuctions_OnShow()
+	Stubby.RegisterFunctionHook("StartAuction", -50, preStartAuction)
+end
+
+-------------------------------------------------------------------------------
+-- Called when Blizzard's auctions tab is hidden, to unhook the StartAuction
+-- function.
+--
+-- called by:
+--    globally AuctFrameAuctions_OnHide()
+--       called in OnHide of the AuctionInfo frame
+--
+-- calls:
+--    Stubby.UnregisterFunctionHook() - always
+-------------------------------------------------------------------------------
+function AuctFrameAuctions_OnHide()
+	Stubby.UnregisterFunctionHook("StartAuction", preStartAuction)
+end
+
+-------------------------------------------------------------------------------
+-- This function updates or removes the fixed price value for the item which
+-- is currently selected in Blizzard's Auctions tab.
+--
+-- called by:
+--    preStartAuction()                - always
+--    AuctPriceRememberCheck_OnClick() - always
+--
+-- calls:
+--    AucFixedPriceDB.SetFixedPrice()    - if updating the fixed price
+--    AucFixedPriceDB.RemoveFixedPrice() - if removing the fixed price
+--
+-- parameters:
+--    bUpdate - (boolean) true, if the fixed price for the item should be
+--                              updated
+--                        false, if the fixed price for the item should be
+--                               removed
+-------------------------------------------------------------------------------
+function updateFixedPrice(bUpdate)
+	if bUpdate then
 		local fixedPrice = {
-			bid = MoneyInputFrame_GetCopper(StartPrice);
-			buyout = MoneyInputFrame_GetCopper(BuyoutPrice);
-			count = currentAuctionCount;
+			bid      = MoneyInputFrame_GetCopper(StartPrice);
+			buyout   = MoneyInputFrame_GetCopper(BuyoutPrice);
+			count    = currentAuctionCount;
 			duration = AuctionFrameAuctions.duration;
 		}
 		Auctioneer.FixedPriceDB.SetFixedPrice(currentAuctionItemKey, nil, fixedPrice);
+	else
+		Auctioneer.FixedPriceDB.RemoveFixedPrice(currentAuctionItemKey)
 	end
 end
 
