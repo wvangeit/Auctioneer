@@ -1089,8 +1089,8 @@ end
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness, name and the four gemSlots.
 function breakLink(link)
 	if (type(link) ~= 'string') then return end
-	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemSocketBonus, randomProp, uniqID, name = link:match("|Hitem:(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+):(%p?%d+)|h%[(.-)%]|h")
-	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemSocketBonus) or 0
+	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemBonus, randomProp, uniqID, name = link:match("|Hitem:(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)|h%[(.-)%]|h")
+	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemBonus) or 0
 end
 
 ------------------------
@@ -1392,7 +1392,7 @@ function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	end
 end
 
-function gtHookSetText(funcArgs, retval, frame, text, r, g, b, a, textWrap)
+function gtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (EnhTTData.currentGametip == frame) then
 		return clearTooltip()
