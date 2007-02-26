@@ -1058,7 +1058,7 @@ BtmScan.Command = function (msg)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Profit"), BtmScan.GSC(data.minProfit,1)))
 	elseif (cmd == "pctprofit") then
-		if (param) then
+		if tonumber(param) then
 			data.pctProfit = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Percent Profit"), data.pctProfit.."%"))
@@ -1068,13 +1068,13 @@ BtmScan.Command = function (msg)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Disenchant Profit"), BtmScan.GSC(data.minDeProfit,1)))
 	elseif (cmd == "pctdeprofit") then
-		if (param) then
+		if tonumber(param) then
 			data.pctDeProfit = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Percent Disenchant Profit"), data.pctDeProfit.."%"))
 	elseif (cmd == "enchant") then
 		if (param) then
-			if ((tonumber(param) >= 0) and (tonumber(param) <= 375)) then
+			if (tonumber(param) and (tonumber(param) >= 0) and (tonumber(param) <= 375)) then
 				data.enchLevel = math.floor(tonumber(param))
 				BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Enchanting Level"), data.enchLevel))
 			else
@@ -1096,17 +1096,17 @@ BtmScan.Command = function (msg)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Reserve"), BtmScan.GSC(data.reserve,1)))
 	elseif (cmd == "defactor") then
-		if (param) then
+		if tonumber(param) then
 			data.deFactor = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Disenchant Factor"), data.deFactor))
 	elseif (cmd == "commonmult") then
-		if (param) then
+		if tonumber(param) then
 			data.commonMult = tonumber(param)
 		end
 		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Common Item Multiplier"), data.commonMult))
 	elseif (cmd == "allowbids") then
-		if (param) then
+		if tonumber(param) then
 			data.allowBids = tonumber(param)
 		end
 		local allowing = tr("Not Allowed")
