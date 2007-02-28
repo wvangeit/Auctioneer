@@ -192,11 +192,11 @@ function AucQueryManager_OnUpdate()
 						request.retriesLeft = request.retriesLeft - 1;
 						sendQuery(request);
 					else
-						debugPrint("Query response not received in the last", silence, "seconds (maxSilence=", request.maxSilence, ")");
+						debugPrint("Query response not received in the last "..silence.." seconds (maxSilence = "..request.maxSilence..")", nil, "Timeout", AUC_WARNING)
 						removeRequestFromQueue(QueryAuctionItemsResultCodes.PartialComplete);
 					end
 				elseif (not request.ownerTimeout and silence >= request.maxSilence - 1) then
-					Auctioneer.Util.Debug("AucQueryManager", AUC_NOTICE, "Owner timeout", "Triggering owner timeout at", silence, "seconds.")
+					debugPrint("Trigger owner timeout at "..silence.." seconds.", nil, "Owner timeout", AUC_NOTICE)
 					request.ownerTimeout = true
 					onAuctionItemListUpdate()
 				end
@@ -207,7 +207,7 @@ function AucQueryManager_OnUpdate()
 						request.retriesLeft = request.retriesLeft -1;
 						sendQuery(request);
 					else
-						debugPrint("Query Response not received in", silence, "seconds (maxSilence=", request.maxSilence, ")");
+						debugPrint("Query Response not received in "..silence.." seconds (maxSilence = "..request.maxSilence..")", nil, "Timeout", AUC_WARNING)
 						removeRequestFromQueue(QueryAuctionItemsResultCodes.PartialComplete);
 					end
 				end
@@ -223,7 +223,7 @@ end
 -- OnEvent handler.
 -------------------------------------------------------------------------------
 function onEventHook(_, event)
-	debugPrint(event);
+	debugPrint("Event: "..event.." caught.", nil, "onEventHook", AUC_INFO)
 	if (event == "AUCTION_ITEM_LIST_UPDATE") then
 		onAuctionItemListUpdate();
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
@@ -243,7 +243,7 @@ function onBidSent(event, auction, bid)
 			receivedAuctionItemListUpdate = false;
 		};
 		PendingBidInfo[auction.auctionId] = bidInfo;
-		debugPrint("Added pending bid for auction", auction.auctionId);
+		debugPrint("Added pending bid for auction "..auction.auctionId..".", nil, "onBidSent", AUC_INFO)
 	else
 		debugPrint("Ignoring bid sent due to no auction id");
 	end
@@ -262,13 +262,13 @@ function onBidComplete(event, auction, bid, result)
 			-- received the AUCTION_ITEM_LIST_UPDATE event.
 			if (result ~= BidResultCodes.BidAccepted or bidInfo.receivedAuctionItemListUpdate) then
 				PendingBidInfo[auction.auctionId] = nil;
-				debugPrint("Removed pending bid for auction", auction.auctionId);
+				debugPrint("Removed pending bid for auction "..auction.auctionId, nil, "onBidComplete", AUC_WARNING)
 			else
 				bidInfo.receivedBidComplete = true;
-				debugPrint("Deferring removal of pending bid for auction", auction.auctionId);
+				debugPrint("Deferring removal of pending bid for auction "..auction.auctionId, nil, "onBidComplete", AUC_INFO)
 			end
 		else
-			debugPrint("WARNING: No pending bid for auction", auction.auctionId);
+			debugPrint("WARNING: No pending bid for auction "..auction.auctionId);
 		end
 	else
 		debugPrint("Ignoring bid complete due to no auction id");
@@ -334,10 +334,10 @@ end
 function preSortAuctionItemsHook(_, _, sortType, sortColumn)
 	if (sortType == "list") then
 		if (isQueryInProgress()) then
-			debugPrint("Overriding SortAuctionItems() - Request in progress");
+			debugPrint("Overriding SortAuctionItems() - Request in progress", nil, "preSortAuctionItemsHook", AUC_NOTICE);
 			return "abort"
 		elseif (isBidInProgress()) then
-			debugPrint("Overriding SortAuctionItems() - Bid in progress");
+			debugPrint("Overriding SortAuctionItems() - Bid in progress", nil, "preSortAuctionItemsHook", AUC_NOTICE);
 			return "abort"
 		end
 		PerformingSortAuctionItems = true;
@@ -364,10 +364,10 @@ function preQueryAuctionItemsHook(_, _, name, minLevel, maxLevel, invTypeIndex, 
 	if (BtmScan and BtmScan.scanStage and BtmScan.scanStage > 0) then return end
 	if (hookQueryAuctionItems) then
 		if (not CanSendAuctionQuery()) then
-			debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false");
+			debugPrint("Aborting QueryAuctionItems() - CanSendAuctionQuery() returned false", nil, "preQueryAuctionItemsHook", AUC_NOTICE);
 			return "abort";
 		elseif (page == nil) then
-			debugPrint("Aborting QueryAuctionItems() - Invalid page number");
+			debugPrint("Aborting QueryAuctionItems() - Invalid page number", nil, "preQueryAuctionItemsHook", AUC_NOTICE);
 			return "abort";
 		end
 	end
@@ -1102,14 +1102,33 @@ function normalizeNumericQueryParam(param)
 end
 
 -------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- parameters:
+--    strMessage - (string) the error message
+--    iCode      - (number) the error code (optional)
+--    type       - (string) type of debug message (optional - defaulting to
+--                          "Debug")
+--    priority   - nLog message level (optional - see remarks on which default
+--                 value is used)
+--
+-- returns:
+--    first value:
+--       "unspecified", if no iCode is specified
+--       iCode, otherwise
+--    second value:
+--       strMessage
+--
+-- remarks:
+--    If priority is not specified, a default value will be assigned. This
+--    default value depends on the specified type parameter. If type is set to a
+--    valid nLog level, the appropriate priority will be used (i.e. 1 for
+--    "Critical", 2 for "Error", etc.). See nLog.levels for a complete list.
+--    If there is no counterpart to the specified type, priority defaults to
+--    N_DEBUG.
 -------------------------------------------------------------------------------
-function debugPrint(...)
-	if debug then EnhTooltip.DebugPrint("[Auc.QueryManager]", date("%X"), ...); end
-	local msg = select(1, ...)
-	if (#msg > 36) then
-		msg = msg:sub(1,33).."..."
-	end
-	Auctioneer.Util.Debug("AucQueryManager", AUC_INFO, msg, "LAZY-DEBUG\n", ...)
+function debugPrint(strMessage, iCode, type, priority)
+	return Auctioneer.Util.AucDebugPrint("AucQueryManager", strMessage, iCode, type, priority)
 end
 
 -------------------------------------------------------------------------------
