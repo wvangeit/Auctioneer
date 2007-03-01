@@ -86,7 +86,6 @@ BidResultCodes = {
 	AlreadyHigherBid = "AlreadyHigherBid";
 	AlreadyHighBidder = "AlreadyHighBidder";
 	MaxItemCount = "MaxItemCount";
-	BidSent = "BidSent";
 }
 
 -------------------------------------------------------------------------------
@@ -240,7 +239,6 @@ function bidCanceled()
 	if (auction) then
 		currentCallbackFunc(auction, BidResultCodes.BidCanceled)
 	end
-
 end
 
 function getBidAmmount()
