@@ -34,6 +34,7 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 Auctioneer_CustomLocalizations = {
 	['TextGeneral'] = GetLocale(),
 	['TextCombat'] = GetLocale(),
+	['SubTypeBag'] = GetLocale(),
 }
 
 function _AUCT(stringKey, locale)

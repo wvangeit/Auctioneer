@@ -116,7 +116,7 @@ end
 function checkConstantsLimit() --%TODO%: Localize
 	debugprofilestart()
 
-	local numConstants = getNumConstants(AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB)
+	local numConstants = getNumConstants(AuctionConfig, AuctioneerItemDB, AuctioneerSnapshotDB, AuctioneerHistoryDB, AuctioneerFixedPriceDB, AuctioneerTransactionDB)
 
 	if (numConstants >= ((((2^18)-1) / 20) * 17)) then --85% Critical
 		chatPrint(_AUCT("ConstantsCritical"):format((numConstants/((2^18)-1)) * 100), 1, 0, 0)
@@ -406,20 +406,21 @@ function getItemHyperlinks(str)
 	return itemList;
 end
 
-function chatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
+function chatPrint(text, cRed, cGreen, cBlue, id)
 	local frameIndex = Auctioneer.Command.GetFrameIndex();
+	local frameReference = getglobal("ChatFrame"..frameIndex)
 
 	if (cRed and cGreen and cBlue) then
-		if getglobal("ChatFrame"..frameIndex) then
-			getglobal("ChatFrame"..frameIndex):AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+		if frameReference then
+			frameReference:AddMessage(text, cRed, cGreen, cBlue, id);
 
 		elseif (DEFAULT_CHAT_FRAME) then
-			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, cAlpha, holdTime);
+			DEFAULT_CHAT_FRAME:AddMessage(text, cRed, cGreen, cBlue, id);
 		end
 
 	else
-		if getglobal("ChatFrame"..frameIndex) then
-			getglobal("ChatFrame"..frameIndex):AddMessage(text, 0.0, 1.0, 0.25);
+		if frameReference then
+			frameReference:AddMessage(text, 0.0, 1.0, 0.25);
 
 		elseif (DEFAULT_CHAT_FRAME) then
 			DEFAULT_CHAT_FRAME:AddMessage(text, 0.0, 1.0, 0.25);
@@ -598,7 +599,7 @@ function findEmptySlot()
 			_, _, _, _, _, _, strBagType = GetItemInfo(strBagName)
 		end
 		-- strBagType is nil for bag 0, for all other bags, it should be "Bag"
-		if not strBagType or (strBagType == _AUCT("SubTypeBag", GetLocale())) then
+		if not strBagType or (strBagType == _AUCT("SubTypeBag")) then
 			for slot = 1, GetContainerNumSlots(bag) do
 				if not (GetContainerItemInfo(bag, slot)) then
 					return bag, slot;
