@@ -235,8 +235,10 @@ Section "Informant" Informant
 	File "..\Informant\Informant.toc"
 	File "..\Informant\*.xml"
 	File "..\Informant\*.lua"
-	File "..\Informant\Data\*.lua"
 	File "GPL.txt"
+
+	SetOutPath "$INSTDIR\Interface\AddOns\Informant\Data" 
+	File "..\Informant\*.lua"
 
 	SetOutPath "$INSTDIR\Interface\AddOns\Informant\Babylonian"
 	File "..\Babylonian\*.lua"
