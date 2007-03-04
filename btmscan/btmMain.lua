@@ -60,8 +60,8 @@ local upToDateConservativePrices = false
 local hookCanSendAuctionQuery = true -- (boolean)
 
 BTMSCAN_VERSION = "<%version%>"
-if (BTMSCAN_VERSION == "<\037version%>") then
-	BTMSCAN_VERSION = "3.9.0-DEV"
+if (BTMSCAN_VERSION == "<".."%version%>") then
+	BTMSCAN_VERSION = "4.1.DEV"
 end
 BtmScan.Version = BTMSCAN_VERSION
 

@@ -43,7 +43,7 @@ local origItemRef = Swatter.origItemRef
 
 Swatter.Version="<%version%>"
 if (Swatter.Version == "<%".."version%>") then
-	Swatter.Version = "3.9.DEV"
+	Swatter.Version = "4.1.DEV"
 end
 SWATTER_VERSION = Swatter.Version
 

@@ -175,7 +175,7 @@ You may use the following methods of the EnhTooltip class:
 -- setting version number
 ENHTOOLTIP_VERSION = "<%version%>"
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
-	ENHTOOLTIP_VERSION = "3.9.DEV"
+	ENHTOOLTIP_VERSION = "4.1.DEV"
 end
 
 -- Initialize a storage space that all our functions can see

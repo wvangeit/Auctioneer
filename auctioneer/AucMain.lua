@@ -38,7 +38,7 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 Auctioneer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "ettdebug" within the client.
 if (Auctioneer.Version == "<".."%version%>") then
-	Auctioneer.Version = "3.9.DEV";
+	Auctioneer.Version = "4.1.DEV";
 end
 
 local function onLoad()

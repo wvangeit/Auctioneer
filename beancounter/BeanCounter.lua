@@ -48,7 +48,7 @@ local commandHandler
 BeanCounter = {}
 BeanCounter.Version="<%version%>"
 if (BeanCounter.Version == "<".."%version%>") then
-	BeanCounter.Version = "3.9.DEV"
+	BeanCounter.Version = "4.1.DEV"
 end
 
 -------------------------------------------------------------------------------

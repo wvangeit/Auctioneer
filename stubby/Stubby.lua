@@ -191,6 +191,7 @@ local config = {
 	calls = { functions={}, callList={} },
 	loads = {},
 	events = {},
+	handlers = {},
 }
 
 StubbyConfig = {}
@@ -224,6 +225,7 @@ local registerAddOnHook          -- registerAddOnHook(triggerAddOn, ownerAddOn, 
 local registerBootCode           -- registerBootCode(ownerAddOn, bootName, bootCode)
 local registerEventHook          -- registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 local registerFunctionHook       -- registerFunctionHook(triggerFunction, position, hookFunc, ...)
+local registerHandlerHook
 local runBootCodes               -- runBootCodes()
 local searchForNewAddOns         -- searchForNewAddOns()
 local cleanUpAddOnData           -- cleanUpAddOnData()
@@ -235,6 +237,7 @@ local unregisterAddOnHook        -- unregisterAddOnHook(triggerAddOn, ownerAddOn
 local unregisterBootCode         -- unregisterBootCode(ownerAddOn, bootName)
 local unregisterEventHook        -- unregisterEventHook(triggerEvent, ownerAddOn)
 local unregisterFunctionHook     -- unregisterFunctionHook(triggerFunction, hookFunc)
+local unregisterHandlerHook
 local tableRemoveNilSafe         -- tableRemoveNilSafe(table, [pos])
 
 -- Function definitions
@@ -506,7 +509,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 		funcObj = {
 			f = hookFunc,
 			n = hookFuncName,
-			a = {select(1, ...)},
+			a = {...},
 			p = position
 		}
 	end
@@ -523,8 +526,9 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 		end
 		config.calls.functions[triggerFunction][insertPos] = funcObj
 	else
-		config.calls.functions[triggerFunction] = {}
-		config.calls.functions[triggerFunction][insertPos] = funcObj
+		config.calls.functions[triggerFunction] = {
+			[insertPos] = funcObj,
+		}
 	end
 	config.calls.callList = rebuildNotifications(config.calls.functions)
 	local iErrorCode, strErrorMessage = hookInto(triggerFunction)
@@ -614,7 +618,7 @@ function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 		if (select("#", ...) == 0) then
 			hookFunction()
 		else
-			hookFunction({select(1, ...)})
+			hookFunction({...})
 		end
 	else
 		local addon = triggerAddOn:lower()
@@ -628,7 +632,7 @@ function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 			else
 				config.loads[addon][ownerAddOn] = {
 					f = hookFunction,
-					a = {select(1, ...)},
+					a = {...},
 				}
 			end
 		end
@@ -668,7 +672,7 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 		else
 			config.events[triggerEvent][ownerAddOn] = {
 				f = hookFunction,
-				a = {select(1, ...)},
+				a = {...},
 			}
 		end
 	end
@@ -677,6 +681,9 @@ end
 function unregisterEventHook(triggerEvent, ownerAddOn)
 	if (config.events and config.events[triggerEvent] and config.events[triggerEvent][ownerAddOn]) then
 		config.events[triggerEvent][ownerAddOn] = nil
+		if (not next(config.events[triggerEvent])) then
+			config.events[triggerEvent] = nil
+		end
 	end
 end
 
@@ -686,6 +693,70 @@ function eventWatcher(event, ...)
 			hookDetail.f(hookDetail.a, event, ...)
 		end
 	end
+end
+
+function registerHandlerHook(frame, handlerToHook, position, hookFunc, ...)
+	if (not config.handlers[frame]) then
+		config.handlers[frame] = {}
+	end
+	if (not config.handlers[frame][handlerToHook]) then
+		config.handlers[frame][handlerToHook] = {}
+	end
+	
+	position = tonumber(position) or 200
+	local funcObj
+	local hookFuncName = strsplit("\n", debugstack(2,1,0), 2)
+	if (select("#", ...) == 0) then
+		funcObj = {
+			f = hookFunc,
+			n = hookFuncName,
+			p = position,
+		}
+	else
+		funcObj = {
+			f = hookFunc,
+			n = hookFuncName,
+			a = {...},
+			p = position
+		}
+	end
+	
+	if (config.handlers[frame][handlerToHook]) then
+		while (config.handlers[frame][handlerToHook]) do
+			if (position >= 0) then
+				insertPos = insertPos + 1
+			else
+				insertPos = insertPos - 1
+			end
+		end
+		config.handlers[frame][handlerToHook][insertPos] = funcObj
+	else
+		config.handlers[frame][handlerToHook] = {
+			[insertPos] = funcObj,
+		}
+	end
+end
+
+function unregisterHandlerHook(frame, handlerToHook, ownerAddOn)
+	if (config.handlers and config.handlers[frame] and config.handlers[frame][handlerToHook] and config.handlers[frame][handlerToHook][ownerAddOn]) then
+		config.handlers[handlerToHook][ownerAddOn] = nil
+		if (not next(config.handlers[handlerToHook])) then
+			config.handlers[handlerToHook] = nil
+		end
+	end
+end
+
+function hookIntoHandler(frame, handlerToHook)
+	if not config.handlers.origFuncs[frame] then
+		config.handlers.origFuncs[frame] = {}
+	end
+
+	if config.handlers.origFuncs[frame][handlerToHook] then
+		return 0
+	end
+	
+	config.handlers.origFuncs[frame][handlerToHook] = frame:GetScript(handlerToHook)
+	frame:SetScript(function(...) return Stubby.HookHandler(handlerToHook, ...) end)
 end
 
 -- This function registers boot code. This is a piece of code

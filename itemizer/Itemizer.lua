@@ -33,7 +33,7 @@
 Itemizer.Version="<%version%>";
 -- If you want to see debug messages, create a window called "ETTDebug" within the client.
 if (Itemizer.Version == "<".."%version%>") then
-	Itemizer.Version = "3.9.DEV";
+	Itemizer.Version = "4.1.DEV";
 end
 
 local function onLoad()

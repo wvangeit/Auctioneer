@@ -60,7 +60,7 @@ strLevelFilter = string.sub(strLevelFilter, 1, #strLevelFilter-1)..")"
 
 nLog.Version="<%version%>"
 if (nLog.Version == "<%".."version%>") then
-	nLog.Version = "3.9-DEV"
+	nLog.Version = "4.1.DEV"
 end
 NLOG_VERSION = nLog.Version
 

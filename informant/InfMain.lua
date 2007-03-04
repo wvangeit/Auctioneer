@@ -31,7 +31,7 @@ Informant_RegisterRevision("$URL$", "$Rev$")
 
 INFORMANT_VERSION = "<%version%>"
 if (INFORMANT_VERSION == "<".."%version%>") then
-	INFORMANT_VERSION = "3.9.DEV"
+	INFORMANT_VERSION = "4.1.DEV"
 end
 
 -- GLOBAL FUNCTION PROTOTYPES:
