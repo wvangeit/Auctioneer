@@ -196,23 +196,23 @@ BeanCounterLocalizations = {
 
 
 		-- Section: Mail
-		MailAllianceAuctionHouse	= "Casa de Subastas de la Alianza";
+		MailAllianceAuctionHouse	= "Casa de subastas de la Alianza";
 		MailAuctionCancelledSubject	= "Subasta cancelada";
-		MailAuctionExpiredSubject	= "Subasta caducada";
-		MailAuctionSuccessfulSubject	= "Subasta acertada";
+		MailAuctionExpiredSubject	= "Subasta terminada";
+		MailAuctionSuccessfulSubject	= "Subasta conseguida";
 		MailAuctionWonSubject	= "Subasta ganada";
-		MailHordeAuctionHouse	= "Casa de Subastas de la Horda";
-		MailOutbidOnSubject	= "Oferta mejorada para";
+		MailHordeAuctionHouse	= "Casa de subastas de la Horda";
+		MailOutbidOnSubject	= "Puja superada en";
 
 
 		-- Section: User Interface
 		UiAuctions	= "Subastas";
 		UiAuctionTransaction	= "Subasta";
-		UiBids	= "Ofertas";
-		UiBidTransaction	= "Oferta";
+		UiBids	= "Pujas";
+		UiBidTransaction	= "Puja";
 		UiBuyerSellerHeader	= "Comprador/Vendedor";
 		UiBuyTransaction	= "Compra";
-		UiDateHeader	= "Día";
+		UiDateHeader	= "Fecha";
 		UiDepositTransaction	= "Depósito";
 		UiExactNameSearch	= "Búsqueda de nombre exacto";
 		UiNameHeader	= "Artículo";
@@ -221,9 +221,9 @@ BeanCounterLocalizations = {
 		UiPriceHeader	= "Precio";
 		UiPricePerHeader	= "Precio c/u";
 		UiPurchases	= "Compras";
-		UiQuantityHeader	= "Cta.";
+		UiQuantityHeader	= "Ctd";
 		UiSales	= "Ventas";
-		UiSearch	= "Búsqueda";
+		UiSearch	= "Buscar";
 		UiSearchForLabel	= "Buscar por:";
 		UiSellTransaction	= "Vender";
 		UiTransactions	= "Transacciones";
@@ -517,6 +517,32 @@ BeanCounterLocalizations = {
 
 		-- Section: Mail
 		MailHordeAuctionHouse	= "Аукцион Орды";
+
+
+		-- Section: User Interface
+		UiAuctions	= "Аукционы";
+		UiAuctionTransaction	= "Аукцион";
+		UiBids	= "Ставки";
+		UiBidTransaction	= "Ставка";
+		UiBuyerSellerHeader	= "Покупатель/Продавец";
+		UiBuyTransaction	= "Купить";
+		UiDateHeader	= "Дата";
+		UiDepositTransaction	= "Депозит";
+		UiExactNameSearch	= "Поиск точного имени";
+		UiNameHeader	= "Предмет";
+		UiNetHeader	= "Net";
+		UiNetPerHeader	= "Net за";
+		UiPriceHeader	= "Цена";
+		UiPricePerHeader	= "Цена Заголовка";
+		UiPurchases	= "Покупок";
+		UiQuantityHeader	= "Кол-во";
+		UiSales	= "Продажи";
+		UiSearch	= "Поиск";
+		UiSearchForLabel	= "Поиск:";
+		UiSellTransaction	= "Продажа";
+		UiTransactions	= "Переводы";
+		UiTransactionsLabel	= "Переводы:";
+		UiTransactionTypeHeader	= "Тип";
 
 	};
 }

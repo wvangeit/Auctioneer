@@ -32,6 +32,14 @@
 
 ItemizerLocalizations = {
 
+	csCZ = {
+
+
+		-- Section: Generic Messages
+		MesgNotLoaded	= "Itemizer nebyl nahrán. Zadej /itemizer a dozvíš se víc.";
+
+	};
+
 	daDK = {
 
 
@@ -45,6 +53,8 @@ ItemizerLocalizations = {
 
 		-- Section: Generic Messages
 		MesgNotLoaded	= "Itemizer ist nicht geladen. Für mehr Info´s tippe /itemizer";
+		NotTranslated	= "%s wurde noch nicht in Deine Sprache übersetzt. Bitte kontaktiere <%s> für Details zur Übermittlung von Übersetzungen.";
+		SemiTranslated	= "%s ist nur teilweise in Deine Sprache übersetzt. Bitte kontaktiere <%s> für Details zur Übermittlung von Übersetzungen.";
 
 	};
 
@@ -53,6 +63,8 @@ ItemizerLocalizations = {
 
 		-- Section: Generic Messages
 		MesgNotLoaded	= "Itemizer is not loaded. Type /itemizer for more info.";
+		NotTranslated	= "%s has not been translated into your language. Please contact <%s> for details on submitting translations.";
+		SemiTranslated	= "%s is only partially translated into your language. Please contact <%s> for details on submitting translations.";
 
 	};
 
@@ -60,7 +72,9 @@ ItemizerLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Itemizer no esta cargado. Escriba /itemizer para más información.";
+		MesgNotLoaded	= "Itemizer no está cargado. Escribe /itemizer para más información.";
+		NotTranslated	= "%s no ha sido traducido a su lenguaje. Favor de contactar a <%s> para detalles de como contribuir traducciones.";
+		SemiTranslated	= "%s solo ha sido parcialmente traducido a su lenguaje. Por favor de contactar a <%s> para detalles de como contribuir traducciones.";
 
 	};
 
@@ -69,6 +83,8 @@ ItemizerLocalizations = {
 
 		-- Section: Generic Messages
 		MesgNotLoaded	= "Itemizer n'est pas chargé. Tapez /itemizer pour plus d'informations.";
+		NotTranslated	= "%s n'a pas été traduit dans votre langue. Veuillez contacter <%s> pour plus de détails sur la proposition de traductions.";
+		SemiTranslated	= "%s n'est que partiellement traduit dans votre langue. Veuillez contacter <%s> pour plus de détails sur la proposition de traductions.";
 
 	};
 
@@ -84,7 +100,9 @@ ItemizerLocalizations = {
 
 
 		-- Section: Generic Messages
-		MesgNotLoaded	= "Itemizer가 로드되지않았습니다. 자세한 정보는 /itemizer를 입력하십시오.";
+		MesgNotLoaded	= "Itemizer가 로드되지 않았습니다. 자세한 정보는 /itemizer를 입력하십시오.";
+		NotTranslated	= "%s|1이;가; 번역되지 않았습니다. 번역을 추가하려면 <%s>에게 연락하십시오.";
+		SemiTranslated	= "%s|1은;는; 일부분만 번역되어 있습니다. 번역을 추가하려면 <%s>에게 연락하십시오.";
 
 	};
 

@@ -592,6 +592,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(Basis=%d, Alt=%d, Neu=%d)";
 		FrmtDisinto	= "Mögliche Entzauberung zu:";
 		FrmtFound	= "%s wird entzaubert zu:";
+		FrmtNoDEPrediction	= "Keine Entzauberungsdaten verfügbar";
 		FrmtPriceEach	= "(%s/stk)";
 		FrmtSuggestedPrice	= "vorgeschlagener Preis";
 		FrmtTotal	= "Gesamtsumme";
@@ -989,6 +990,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(referencia=%d, viejo=%d, nuevo=%d)";
 		FrmtDisinto	= "Se desencanta en:";
 		FrmtFound	= "Se encontró que %s se desencanta en:";
+		FrmtNoDEPrediction	= "No hay disponible una predicción de desencantamiento";
 		FrmtPriceEach	= "(%s c/u)";
 		FrmtSuggestedPrice	= "Precio Sugerido:";
 		FrmtTotal	= "Total";
@@ -1187,6 +1189,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(base=%d, ancienne=%d, nouvelle=%d)";
 		FrmtDisinto	= "Se désenchante en :";
 		FrmtFound	= "%s se désenchante en :";
+		FrmtNoDEPrediction	= "Pas de désenchantement connu";
 		FrmtPriceEach	= "(%s l'unité)";
 		FrmtSuggestedPrice	= "Prix suggéré:";
 		FrmtTotal	= "Total";
@@ -1581,6 +1584,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(기준=%d, 과거=%d, 신규=%d)";
 		FrmtDisinto	= "마력 추출:";
 		FrmtFound	= "%s|1이;가; 마력추출되는 아이템: ";
+		FrmtNoDEPrediction	= "마력추출 예측이 불가능합니다.";
 		FrmtPriceEach	= "(%s 개)";
 		FrmtSuggestedPrice	= "제안 가격:";
 		FrmtTotal	= "총";
@@ -1829,6 +1833,7 @@ EnchantrixLocalizations = {
 		ShortDarnassus	= "Dar ";
 		ShortIronForge	= "IF ";
 		ShortOrgrimmar	= "Org ";
+		ShortShattrath	= "sha";
 		ShortStormwind	= "SW ";
 		ShortThunderBluff	= "TB ";
 		ShortUndercity	= "UC ";
@@ -1914,6 +1919,7 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(基本=%d，旧值=%d，新值=%d)";
 		FrmtDisinto	= "可分解为:";
 		FrmtFound	= "发现%s可分解为：";
+		FrmtNoDEPrediction	= "没有可用的分解信息";
 		FrmtPriceEach	= "(每件%s)";
 		FrmtSuggestedPrice	= "建议价格：";
 		FrmtTotal	= "合计";
