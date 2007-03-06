@@ -1,0 +1,15 @@
+## Title: Auctioneer:Modules:Simple
+## Notes: Simple statistics extension for AuctioneerLite
+##
+## Interface: 20003
+## LoadOnDemand: 0
+## Disabled: 0
+## Dependencies: Auctioneer
+## SavedVariables: AuctioneerStatSimpleData
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+
+StatSimple.lua

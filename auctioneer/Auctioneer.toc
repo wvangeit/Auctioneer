@@ -1,0 +1,24 @@
+## Title: Auctioneer
+## Notes: Auctioneer, An addon to help keep track of items values. You must at least enable a statistics extension (like Auctioneer.Modules:Simple) to start tracking stats.
+##
+## Interface: 20003
+## LoadOnDemand: 0
+## Dependencies: EnhTooltip, Stubby
+## SavedVariables: AuctioneerConfig, AuctioneerData
+## SavedVariablesPerCharacter: AuctioneerLocal
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+CoreManifest.lua
+
+Babylonian\Babylonian.lua
+CoreStrings.lua
+CoreLocale.lua
+
+CoreMain.lua
+CoreAPI.lua
+CoreConst.lua
+CoreConfig.lua
+
