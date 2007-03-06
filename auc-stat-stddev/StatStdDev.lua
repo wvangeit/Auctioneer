@@ -40,8 +40,8 @@ lib.Print = Auctioneer.Print
 local data
 function makeData()
 	if data then return end
-	if (not AuctioneerVarianceData) then AuctioneerVarianceData = {} end
-	data = AuctioneerVarianceData
+	if (not AuctioneerStatStdDevData) then AuctioneerStatStdDevData = {} end
+	data = AuctioneerStatStdDevData
 	lib.DataLoaded()
 end
 
@@ -221,7 +221,5 @@ function lib.DataLoaded()
 end
 
 function lib.OnLoad(addon)
-	if (addon == "auclite-iqr") then
-		makeData()
-	end
+	makeData()
 end
