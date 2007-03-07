@@ -1,0 +1,36 @@
+## Title: Enchantrix
+## Notes: Display information in item tooltips pertaining to the results of disenchanting said item.  [<%version%>] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
+##
+## Interface: 20003
+## LoadOnDemand: 1
+## Dependencies: EnhTooltip, Stubby
+## OptionalDeps: Khaos
+## SavedVariables: EnchantConfig, EnchantrixData
+##
+## Version: <%version%> (<%codename%>)
+## Revision: $Id$
+## URL: http://enchantrix.org
+EnxManifest.lua
+
+EnxObjects.lua
+
+Configator\Load.xml
+Babylonian\Babylonian.lua
+EnxStrings.lua
+EnxLocale.lua
+
+EnxData.lua
+Data\EnxList.lua
+
+EnxSettings.lua
+EnxMiniIcon.lua
+EnxCommand.lua
+EnxConfig.lua
+EnxConstants.lua
+EnxStorage.lua
+EnxTooltip.lua
+EnxUtil.lua
+EnxMain.lua
+
+EnchantrixBarker.lua
+EnchantrixBarker.xml
