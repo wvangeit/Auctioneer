@@ -69,39 +69,6 @@ local function getDefault(setting)
 	end
 	if (setting == "miniicon.angle")          then return 118     end
 	if (setting == "miniicon.distance")       then return 12      end
-	if (setting == "barker.profit_margin")     then return 10      end
-	if (setting == "barker.lowest_price")      then return 5000     end
-	if (setting == "barker.randomise")        then return 10      end
-	if (setting == "barker.sweet_price")        then return 50000      end
-	if (setting == "barker.high_price")        then return 500000      end
-	if (setting == "barker.highest_profit")        then return 100000      end
-	if (setting == "barker.factor_item")        then return 40      end
-	if (setting == "barker.factor_item.2hweap")        then return 90      end
-	if (setting == "barker.factor_item.weapon")        then return 100      end
-	if (setting == "barker.factor_item.bracer")        then return 70      end
-	if (setting == "barker.factor_item.gloves")        then return 70      end
-	if (setting == "barker.factor_item.boots")        then return 70      end
-	if (setting == "barker.factor_item.chest")        then return 70      end
-	if (setting == "barker.factor_item.cloak")        then return 70      end
-	if (setting == "barker.factor_item.shield")        then return 70      end
-	if (setting == "barker.factor_stat")        then return 40      end
-	if (setting == "barker.factor_stat.int")        then return 90      end
-	if (setting == "barker.factor_stat.sta")        then return 70      end
-	if (setting == "barker.factor_stat.agi")        then return 70      end
-	if (setting == "barker.factor_stat.str")        then return 70      end
-	if (setting == "barker.factor_stat.spi")        then return 45      end
-	if (setting == "barker.factor_stat.all")        then return 75      end
-	if (setting == "barker.factor_stat.arm")        then return 65      end
-	if (setting == "barker.factor_stat.fir")        then return 85      end
-	if (setting == "barker.factor_stat.frr")        then return 85      end
-	if (setting == "barker.factor_stat.nar")        then return 85      end
-	if (setting == "barker.factor_stat.shr")        then return 85      end
-	if (setting == "barker.factor_stat.res")        then return 55      end
-	if (setting == "barker.factor_stat.mp")        then return 35      end
-	if (setting == "barker.factor_stat.hp")        then return 40      end
-	if (setting == "barker.factor_stat.dmg")        then return 90      end
-	if (setting == "barker.factor_stat.def")        then return 60      end
-	if (setting == "barker.factor_stat.ski")        then return 70      end
 end
 
 local function setter(setting, value)
@@ -185,8 +152,6 @@ local function setter(setting, value)
 
 	if (a == "miniicon") then
 		Enchantrix.MiniIcon.Reposition()
-	elseif (a == "barker") then
-		Enchantrix_BarkerOptions_Refresh()
 	end
 		
 end
@@ -271,56 +236,4 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",       0, 1, "miniicon.enable", "Display Minimap button")
 	gui.AddControl(id, "Slider",         0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
 	gui.AddControl(id, "Slider",         0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
-  
-  	gui.AddCat("Barker")
-	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",         0,    "Enchantrix Barker options")
-	gui.AddControl(id, "Subhead",        0,    "Profit settings")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.profit_margin", -20, 120, 1, "Profit margin: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.highest_profit", 0, 250000, 5000, "Highest profit: %s", gsc)
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.lowest_price", 0, 50000, 500, "Lowest price: %s", gsc)
-
-	gui.AddControl(id, "Subhead",        0,    "Priority settings")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_price", 0, 100, 1, "Price priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.sweet_price", 0, 500000, 5000, "Sweet spot: %s", gsc)
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.high_price", 0, 5000000, 50000, "High tide: %s", gsc)
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.randomise", 0, 100, 1, "Randomise amount: %d%%")
-
-	id = gui.AddTab("Items, Stats")
-	gui.AddControl(id, "Header",         0,    "Barker options (continued)")
-	gui.AddControl(id, "Subhead",        0,    "Item type priority")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item", 0, 100, 1, "Overall type priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.2hweap", 0, 100, 1, "2H weapon priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.weapon", 0, 100, 1, "Any weapon priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.bracer", 0, 100, 1, "Bracer priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.gloves", 0, 100, 1, "Gloves priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.boots", 0, 100, 1, "Boots priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.chest", 0, 100, 1, "Chest priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.cloak", 0, 100, 1, "Cloak priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.shield", 0, 100, 1, "Shield priority: %d%%")
-
-	gui.AddControl(id, "Subhead",        0,    "Statistics priorities")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat", 0, 100, 1, "Overall stats priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.int", 0, 100, 1, "Intellect priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.str", 0, 100, 1, "Strength priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.agi", 0, 100, 1, "Agility priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.sta", 0, 100, 1, "Staminal priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.spi", 0, 100, 1, "Spirit priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.all", 0, 100, 1, "All Stats priority: %d%%")
-
-	id = gui.AddTab("Resist, Enhance")
-	gui.AddControl(id, "Header",         0,    "Barker options (continued)")
-	gui.AddControl(id, "Subhead",        0,    "Resistances priorities")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.arm", 0, 100, 1, "Armor priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.fir", 0, 100, 1, "Fire Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.frr", 0, 100, 1, "Frost Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.nar", 0, 100, 1, "Nature Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.shr", 0, 100, 1, "Shadow Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.res", 0, 100, 1, "All Resists priority: %d%%")
-	gui.AddControl(id, "Subhead",        0,    "Enhancements priorities")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.mp", 0, 100, 1, "Mana priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.hp", 0, 100, 1, "Health priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.dmg", 0, 100, 1, "Damage priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.def", 0, 100, 1, "Defense priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.ski", 0, 100, 1, "Skill priority: %d%%")
 end
