@@ -53,21 +53,24 @@ lib.curCat = nil
 
 
 function lib.OnLoad()
-	if (not AuctioneerScanSimpleData) then
-		AuctioneerScanSimpleData = {}
-	else
+	if not AuctioneerScanSimpleData then AuctioneerScanSimpleData = {} end
+	if not AuctioneerScanSimpleLocal then AuctioneerScanSimpleLocal = {} end
+	local data = AuctioneerScanSimpleData
+	local ldata = AuctioneerScanSimpleLocal
+	if data.lastScan then
 		local faction = Auctioneer.GetFaction()
-		if AuctioneerScanSimpleData.faction ~= faction and AuctioneerScanSimpleLocal then
-			AuctioneerScanSimpleData = AuctioneerScanSimpleLocal
+		if data.lastScan.faction ~= faction then
+			data.lastScan = ldata.lastScan
 		end
 	end
 
-	AuctioneerScanSimpleLocal = nil
-	if AuctioneerScanSimpleData.lastScan then
-		if time() - AuctioneerScanSimpleData.lastScan > 86400 then
-			AuctioneerScanSimpleData = {}
+	if data.lastScan and data.lastScan.time then
+		if time() - data.lastScan.time > 86400 then
+			data.lastScan = {}
 		end
 	end
+	ldata.lastScan = data.lastScan
+	collectgarbage()
 end
 
 function lib.StartScan(cat)
@@ -276,11 +279,12 @@ function lib.Commit()
 	lib.Print("  {{"..removeCount.."}} removed items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 
-	AuctioneerLocal.lastScan = {
+	AuctioneerScanSimpleLocal.lastScan = {
 		image = lib.image,
 		faction = Auctioneer.GetFaction(),
 		time = time(),
 	}
+	AuctioneerScanSimpleData.lastScan = AuctioneerScanSimpleLocal.lastScan
 	
 	lib.curScan = nil
 end
