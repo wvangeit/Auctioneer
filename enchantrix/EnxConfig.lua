@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local addonLoaded		-- Enchantrix.Config.AddonLoaded()
@@ -67,13 +68,13 @@ local perCharacterFilter = {
 
 function addonLoaded()
 	-- Remove unused/unknown filter values
-	for key in pairs(EnchantConfig.filters) do
-		if getFilterDefaults(key) == nil then
-			setFilter(key, nil)
-		else
-			setFilter(key, getFilter(key))
-		end
-	end
+--	for key in pairs(EnchantConfig.filters) do
+--		if getFilterDefaults(key) == nil then
+--			setFilter(key, nil)
+--		else
+--			setFilter(key, getFilter(key))
+--		end
+--	end
 end
 
 function getFilterDefaults(key)
@@ -81,9 +82,9 @@ function getFilterDefaults(key)
 end
 
 function getFilter(filter)
-	local val = EnchantConfigChar.filters[filter]
+	local val-- = EnchantConfigChar.filters[filter]
 	if val == nil then
-		val = EnchantConfig.filters[filter]
+		--val = EnchantConfig.filters[filter]
 	end
 	if val == nil then
 		val = getFilterDefaults(filter)

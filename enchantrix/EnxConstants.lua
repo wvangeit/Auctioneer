@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 local const = Enchantrix.Constants
 
@@ -65,8 +66,21 @@ const.ESSENCE_GREATER = 3
 const.SHARD_SMALL = 4
 const.SHARD_LARGE = 5
 const.CRYSTAL = 6
-const.WEAPON = 1
-const.ARMOR = 2
+
+const.CONSUMABLE = 0 
+const.CONTAINER  = 1 
+const.WEAPON     = 2 
+const.ARMOR      = 4 
+const.REAGENT    = 5 
+const.PROJECTILE = 6 
+const.TRADE      = 7 
+const.RECIPE     = 9 
+const.QUIVER     = 11
+const.QUEST      = 12
+const.KEY        = 13
+const.MISC       = 15
+
+
 const.InventoryTypes = {
 	["INVTYPE_2HWEAPON"] = const.WEAPON,
 	["INVTYPE_WEAPON"] = const.WEAPON,

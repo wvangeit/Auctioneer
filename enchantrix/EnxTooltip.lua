@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local addonLoaded	-- Enchantrix.Tooltip.AddonLoaded()
@@ -121,20 +122,41 @@ tooltipFormat = {
 }
 
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+	local embed = Enchantrix.Config.GetFilter('embed')
+	local iType = Enchantrix.Util.GetIType(link)
+	if (not iType) then
+		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "Unknown iType", "The iType for the current tooltip item is unknown:", name, link, quality, count)
+		return
+	end
+	local data = Enchantrix.Storage[iType]
+	if not data then
+		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "No data", "No data returned for iType:",  iType)
+		return
+	end
+
+	local total = data.total
+	if (total and total[1] > 0) then
+		local totalNumber, totalQuantity = unpack(total)
+		p("Results for", iType, link)
+		for result, resData in pairs(data) do
+			if (result ~= "total") then
+				local resNumber, resQuantity = unpack(resData)
+				local dName = Enchantrix.Util.GetReagentInfo(result);
+				if (not dName) then dName = "Item "..result; end
+				local hsp, med, mkt = Enchantrix.Util.GetReagentPrice(result)
+				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
+				local resHSP, resMed, resMkt = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb
+				p("  Result", dName, ("%0.02f%% x%0.1f"):format(resProb, resCount),
+					EnhTooltip.GetTextGSC(resHSP,1), EnhTooltip.GetTextGSC(resMed,1), EnhTooltip.GetTextGSC(resMkt,1))
+			end
+		end
+	end
+--[[
 	local embed = Enchantrix.Config.GetFilter('embed');
 
 	-- Check for disenchantable target
 	local id = Enchantrix.Util.GetItemIdFromLink(link)
 	if (not id or id == 0 or not Enchantrix.Util.IsDisenchantable(id)) then
-		return
-	end
-	
-	-- Check for appropriate item level (only needed as temporary stopgap for those items for which we have bogus data
-	local _, _, _, ilevel, _, _, _, _, _ = GetItemInfo(id);
-	if (not ilevel) then return end	-- for some reason we occasionally get nil ilevels from above function
-	ilevel = Enchantrix.Util.RoundUp(ilevel, 5);
-	if ilevel >= 55 and ilevel <= 60 then
-		EnhTooltip.AddLine(_ENCH('FrmtNoDEPrediction'), nil, embed);
 		return
 	end
 
@@ -239,6 +261,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 			end
 		end
 	end
+]]
 end
 
 local function getReagentsFromCraftFrame(craftIndex)

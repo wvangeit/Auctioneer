@@ -1,10 +1,13 @@
 --[[
-	Enchantrix Addon for World of Warcraft(tm).
-	Version: <%version%> (<%codename%>)
+	Auctioneer
 	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
-	Enchantrix namespace.
-	
+	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
+	when the auction is scanned, so that you can easily determine what price
+	you will be able to sell an item for at auction or at a vendor whenever you
+	mouse-over an item in the game
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -26,19 +29,8 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-]]
-Enchantrix_RegisterRevision("$URL$", "$Rev$")
+--]]
 
--- Enchantrix namespace
-Enchantrix = {
-	Barker = {},
-	Command = {},
-	Config = {},
-	Constants = {},
-	Container = {},
-	Locale = {},
-	State = {},
-	Storage = {},
-	Tooltip = {},
-	Util = {},
-}
+Auctioneer.API = {}
+local lib = Auctioneer.API
+

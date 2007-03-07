@@ -1,0 +1,15 @@
+## Title: Auctioneer:Scan:Simple
+## Notes: A simple scan engine for auctioneer.
+##
+## Interface: 20003
+## LoadOnDemand: 1
+## Dependencies: Auctioneer
+## SavedVariables: AuctioneerScanSimpleData
+## SavedVariablesPerCharacter: AuctioneerScanSimpleLocal
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+
+ScanSimple.lua

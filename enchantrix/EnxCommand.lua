@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local addonLoaded				-- Enchantrix.Command.AddonLoaded()
@@ -676,12 +677,10 @@ function handleCommand(command, source)
 
 	elseif (cmd == 'bidbroker' or cmd == 'bb') then
 		-- /enchantrix bidbroker
-		--doBidBroker(param, param2);
-		Enchantrix.Util.ChatPrint('Command disabled until next major release');
+		doBidBroker(param, param2);
 
 	elseif (cmd == 'percentless' or cmd == 'pl') then
-		--doPercentLess(param, param2);
-		Enchantrix.Util.ChatPrint('Command disabled until next major release');
+		doPercentLess(param, param2);
 
 	elseif (Enchantrix.Config.GetFilterDefaults(cmd) ~= nil) then
 		genVarSet(cmd, param, chatprint);

@@ -5,28 +5,32 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
-## SavedVariables: EnchantedLocal, EnchantConfig, EnchantedBaseItems
-## SavedVariablesPerCharacter: EnchantConfigChar
+## SavedVariables: EnchantConfig, EnchantrixData
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
+EnxManifest.lua
 
 EnxObjects.lua
 
+Configator\Load.xml
 Babylonian\Babylonian.lua
 EnxStrings.lua
 EnxLocale.lua
 
-DisenchantList.lua
+EnxData.lua
+Data\EnxList.lua
 
+EnxSettings.lua
+EnxMiniIcon.lua
 EnxCommand.lua
 EnxConfig.lua
 EnxConstants.lua
 EnxStorage.lua
 EnxTooltip.lua
 EnxUtil.lua
-Enchantrix.lua
+EnxMain.lua
 
 EnchantrixBarker.lua
 EnchantrixBarker.xml

@@ -497,24 +497,22 @@ EnchantrixLocalizations = {
 		ArgSpellname	= "Entzaubern";
 		BarkerOpening	= "Verkaufe Verzauberungen:";
 		Darnassus	= "Darnassus";
-		Ironforge	= "Eisenschmiede";
+		Ironforge	= "Ironforge";
 		OneLetterGold	= "G";
 		OneLetterSilver	= "S";
 		Orgrimmar	= "Orgrimmar";
 		PatReagents	= "Reagenzien: (.+)";
-		Shattrath	= "Shattrath";
 		ShortDarnassus	= "Dar";
 		ShortIronForge	= "IF";
 		ShortOrgrimmar	= "Org";
-		ShortShattrath	= "Sha";
 		ShortStormwind	= "SW";
 		ShortThunderBluff	= "TB";
 		ShortUndercity	= "UC";
-		StormwindCity	= "Sturmwind";
+		StormwindCity	= "Stormwind";
 		TextCombat	= "Kampflog";
 		TextGeneral	= "Allgemein";
-		ThunderBluff	= "Donnerfels";
-		Undercity	= "Unterstadt";
+		ThunderBluff	= "Thunderbluff";
+		Undercity	= "Undercity";
 
 
 		-- Section: Generic Messages
@@ -592,7 +590,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(Basis=%d, Alt=%d, Neu=%d)";
 		FrmtDisinto	= "Mögliche Entzauberung zu:";
 		FrmtFound	= "%s wird entzaubert zu:";
-		FrmtNoDEPrediction	= "Keine Entzauberungsdaten verfügbar";
 		FrmtPriceEach	= "(%s/stk)";
 		FrmtSuggestedPrice	= "vorgeschlagener Preis";
 		FrmtTotal	= "Gesamtsumme";
@@ -791,7 +788,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "    (base=%d, old=%d, new=%d)";
 		FrmtDisinto	= "Disenchants into:";
 		FrmtFound	= "Found that %s disenchants into:";
-		FrmtNoDEPrediction	= "No disenchant prediction available";
 		FrmtPriceEach	= "(%s ea)";
 		FrmtSuggestedPrice	= "Suggested price:";
 		FrmtTotal	= "Total";
@@ -827,7 +823,7 @@ EnchantrixLocalizations = {
 
 		-- Section: Command Messages
 		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana de encantamientos no está abierta. La ventana de encantamientos debe estar abierta para utilizar el pregonero.";
-		BarkerNoEnchantsAvail	= "Enchantrix: No tienes ningún encantamiento o los componentes para crearlos.";
+		BarkerNoEnchantsAvail	= "Enchantrix: O no tienes ningún encantamiento o no tienes los componentes para crearlos.";
 		FrmtActClearall	= "Eliminando toda información de encantamientos";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
 		FrmtActClearOk	= "Información eliminada para el artí­culo: %s";
@@ -893,18 +889,16 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Desencantar";
-		BarkerOpening	= "Encanto:";
+		BarkerOpening	= "Vendiendo Encantamientos:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Forjaz";
 		OneLetterGold	= "o";
 		OneLetterSilver	= "p";
 		Orgrimmar	= "Orgrimmar";
-		PatReagents	= "Componentes:(.+)";
-		Shattrath	= "Ciudad de Shattrath";
+		PatReagents	= "Reactivos: (.+)";
 		ShortDarnassus	= "Dar";
 		ShortIronForge	= "FJ";
 		ShortOrgrimmar	= "Org";
-		ShortShattrath	= "Sha";
 		ShortStormwind	= "VT";
 		ShortThunderBluff	= "CdT";
 		ShortUndercity	= "E";
@@ -990,7 +984,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(referencia=%d, viejo=%d, nuevo=%d)";
 		FrmtDisinto	= "Se desencanta en:";
 		FrmtFound	= "Se encontró que %s se desencanta en:";
-		FrmtNoDEPrediction	= "No hay disponible una predicción de desencantamiento";
 		FrmtPriceEach	= "(%s c/u)";
 		FrmtSuggestedPrice	= "Precio Sugerido:";
 		FrmtTotal	= "Total";
@@ -1189,7 +1182,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(base=%d, ancienne=%d, nouvelle=%d)";
 		FrmtDisinto	= "Se désenchante en :";
 		FrmtFound	= "%s se désenchante en :";
-		FrmtNoDEPrediction	= "Pas de désenchantement connu";
 		FrmtPriceEach	= "(%s l'unité)";
 		FrmtSuggestedPrice	= "Prix suggéré:";
 		FrmtTotal	= "Total";
@@ -1487,18 +1479,16 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "마력추출";
-		BarkerOpening	= "마법부여 판매:";
+		BarkerOpening	= "판매는 매혹한다:";
 		Darnassus	= "다르나서스";
 		Ironforge	= "아이언포지";
 		OneLetterGold	= "골드";
 		OneLetterSilver	= "실버";
 		Orgrimmar	= "오그리마";
 		PatReagents	= "재료: (.+)";
-		Shattrath	= "샤트라스";
 		ShortDarnassus	= "다르";
 		ShortIronForge	= "아포";
 		ShortOrgrimmar	= "오그";
-		ShortShattrath	= "샤트";
 		ShortStormwind	= "스톰";
 		ShortThunderBluff	= "썬더";
 		ShortUndercity	= "언더";
@@ -1584,7 +1574,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(기준=%d, 과거=%d, 신규=%d)";
 		FrmtDisinto	= "마력 추출:";
 		FrmtFound	= "%s|1이;가; 마력추출되는 아이템: ";
-		FrmtNoDEPrediction	= "마력추출 예측이 불가능합니다.";
 		FrmtPriceEach	= "(%s 개)";
 		FrmtSuggestedPrice	= "제안 가격:";
 		FrmtTotal	= "총";
@@ -1833,7 +1822,6 @@ EnchantrixLocalizations = {
 		ShortDarnassus	= "Dar ";
 		ShortIronForge	= "IF ";
 		ShortOrgrimmar	= "Org ";
-		ShortShattrath	= "sha";
 		ShortStormwind	= "SW ";
 		ShortThunderBluff	= "TB ";
 		ShortUndercity	= "UC ";
@@ -1919,7 +1907,6 @@ EnchantrixLocalizations = {
 		FrmtCounts	= "(基本=%d，旧值=%d，新值=%d)";
 		FrmtDisinto	= "可分解为:";
 		FrmtFound	= "发现%s可分解为：";
-		FrmtNoDEPrediction	= "没有可用的分解信息";
 		FrmtPriceEach	= "(每件%s)";
 		FrmtSuggestedPrice	= "建议价格：";
 		FrmtTotal	= "合计";

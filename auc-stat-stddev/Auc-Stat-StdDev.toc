@@ -1,0 +1,15 @@
+## Title: Auctioneer:Modules:StdDev
+## Notes: Statistics extension for Auctioneer that uses the variance to detect outliers
+##
+## Interface: 20003
+## LoadOnDemand: 0
+## Disabled: 1
+## Dependencies: Auctioneer
+## SavedVariables: AuctioneerStatStdDevData
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+
+StatStdDev.lua

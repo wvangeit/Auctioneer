@@ -27,6 +27,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local getItems
@@ -211,6 +212,28 @@ end
 
 function getItemIdFromLink(link)
 	return (EnhTooltip.BreakLink(link))
+end
+
+function getIType(link)
+	assert(type(link) == "string")
+	local _, _, iId = link:find("item:(%d+):")
+
+	local iName,iLink,iQual,iLevel,iMin,iType,iSub,iStack,iEquip,iTex=GetItemInfo(link)
+	if (iQual < 2) then
+		Enchantrix.Debug("GetIType", N_DEBUG, "Quality too low", "The quality for", link, "is too low (", iQual, "< 2)")
+		return
+	end
+if not iEquip then
+		Enchantrix.Debug("GetIType", N_DEBUG, "Item not equippable", "The item", link, "is not equippable")
+		return
+	end
+	local invType = Enchantrix.Constants.InventoryTypes[iEquip]
+	if not invType then
+		Enchantrix.Debug("GetIType", N_DEBUG, "Unrecognized equip slot", "The item", link, "has an equip slot (", iEquip, ") that is not recognized")
+		return
+	end
+	
+	return ("%d:%d:%d:%d"):format(iLevel, iQual, invType, iId)
 end
 
 function getSigFromLink(link)
@@ -495,6 +518,18 @@ Enchantrix.Util = {
 
 	CreateProfiler		= createProfiler,
 }
+
+
+function Enchantrix.Util.GetIType(link)
+	local const = Enchantrix.Constants
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
+	local class = const.InventoryTypes[itemEquipLoc] or 0
+	if itemRarity < 2 or not (class and (class == const.WEAPON or class == const.ARMOR)) then
+		return
+	end
+	return ("%d:%d:%d"):format(itemLevel,itemRarity,class)
+end
+
 
 ENX_CRITICAL = 1
 ENX_WARNING = 2

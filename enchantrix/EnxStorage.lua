@@ -27,446 +27,131 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
--- Global functions
-local addonLoaded			-- Enchantrix.Storage.AddonLoaded()
-local saveDisenchant		-- Enchantrix.Storage.SaveDisenchant()
-local getItemDisenchants	-- Enchantrix.Storage.GetItemDisenchants()
+--[[
+Usages:
+  Enchantrix.Storage["4:2:4:1234"] = { [5432] = { 10, 20 } }
+  print(Enchantrix.Storage["4:2:4"])
+]]
 
--- Local functions
-local unserialize
-local serialize
-local mergeDisenchant
-local normalizeDisenchant
-local cleanupDisenchant
-local disenchantTotal
-local disenchantListHash
-local mergeDisenchantLists
-local saveLocal
-local getLocal
+local _G
+Enchantrix.Storage = { data={}, locked=false }
+local lib = Enchantrix.Storage
+lib.data = {}
 
--- Database
-local LocalBaseItems = {} -- EnchantedLocal merged by item id
-local EnchantedItemTypes = {} -- LocalBaseItems and EnchantedBaseItems merged by type
-
-local N_DISENCHANTS = 1
-local N_REAGENTS = 2
-
-Enchantrix.State.MAX_ITEM_ID = 26000
-
-local const = Enchantrix.Constants
-
-function addonLoaded()
-	-- Create and setup saved variables
-	if not EnchantConfig then EnchantConfig = {} end
-	if not EnchantConfig.filters then EnchantConfig.filters = {} end
-	if not EnchantConfigChar then EnchantConfigChar = {} end
-	if not EnchantConfigChar.filters then EnchantConfigChar.filters = {} end
-
-	if not EnchantConfig.cache then EnchantConfig.cache = {} end
-	if not EnchantConfig.cache.reagentinfo then EnchantConfig.cache.reagentinfo = {} end
-	if not EnchantConfig.cache.names then EnchantConfig.cache.names = {} end
-
-	if not EnchantedLocal then EnchantedLocal = {} end
-	if not EnchantedBaseItems then EnchantedBaseItems = {} end
-
-	if not EnchantConfig.zomgBlizzardAreMeanies then
-		-- Push disenchant reagents into cache if needed
-		for id in pairs(Enchantrix.Constants.StaticPrices) do
-			if not (Enchantrix.Util.GetReagentInfo(id)) then
-				EnchantConfig.zomgBlizzardAreMeanies = true
-				GameTooltip:SetHyperlink(("item:%d:0:0:0"):format(id))
-				GameTooltip:Hide()
-				EnchantConfig.zomgBlizzardAreMeanies = nil
-			end
-		end
-	else
-		-- We were kicked from the server last time, better not try that again for a while
-		EnchantConfig.zomgBlizzardAreMeanies = nil
-	end
-
-	mergeDisenchantLists()
-end
-
-function unserialize(str)
-	-- Break up a disenchant string to a table for easy manipulation
-	local tbl = {}
-	if type(str) == "string" then
-		for de in Enchantrix.Util.Spliterator(str, ";") do
-			local id, d, r = de:match("(%d+):(%d+):(%d+)")
-			id, d, r = tonumber(id), tonumber(d), tonumber(r)
-			if (id and d > 0 and r > 0) then
-				tbl[id] = {[N_DISENCHANTS] = d, [N_REAGENTS] = r}
-			end
+local function addResults(data, ...)
+	if not data then return end
+	local result, number, quantity
+	local n = select("#", ...)
+	local v
+	if (not data.total) then data.total = { 0, 0 } end
+	for i = 1, n do
+		v = select(i, ...)
+		result, number, quantity = strsplit(":", v)
+		result = tonumber(result)
+		if (result) then
+			number = tonumber(number) or 0
+			quantity = tonumber(quantity) or 0
+			if (not data[result]) then data[result] = { 0, 0 } end
+			data[result][1] = data[result][1] + number
+			data[result][2] = data[result][2] + quantity
+			data.total[1] = data.total[1] + number
+			data.total[2] = data.total[2] + quantity
 		end
 	end
-	return tbl
 end
 
-function serialize(tbl)
-	-- Serialize a table into a string
-	if type(tbl) == "table" then
-		local str
-		for id, counts in pairs(tbl) do
-			if (type(id) == "number" and counts[N_DISENCHANTS] > 0 and counts[N_REAGENTS] > 0) then
-				if (str) then
-					str = ("%s;%d:%d:%d:0"):format(str, id, counts[N_DISENCHANTS], counts[N_REAGENTS])
-				else
-					str = ("%d:%d:%d:0"):format(id, counts[N_DISENCHANTS], counts[N_REAGENTS])
+local compactres = {}
+local function compact(data)
+	while #compactres > 0 do
+		table.remove(compactres)
+	end
+	for item, value in pairs(data) do
+		table.insert(compactres, strjoin(":", item, value[1], value[2]))
+	end
+	return strjoin(",", unpack(compactres))
+end
+
+local function index(self, key)
+	local iLevel,iQual,iType,iItem
+	if (type(key) == "string") then
+		iLevel,iQual,iType,iItem = strsplit(":", key)
+	end
+	if (iQual) then
+		local data = {}
+		iLevel = tonumber(iLevel) or 0
+		iQual = tonumber(iQual) or 0
+		iType = tonumber(iType) or 0
+		if (iLevel > 0 and iQual >= 2 and (iType == 2 or iType == 4)) then
+			local key = strjoin(":", iLevel, iQual, iType)
+			addResults(data, strsplit(",", Enchantrix.Data.GetDisenchantData(key)))
+			if (EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
+				for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
+					addResults(data, strsplit(",", itemData))
 				end
 			end
 		end
-		return str
+		return data
 	end
+	local val = rawget(self, key)
+	if (val) then
+		return val
+	end
+	return nil
 end
 
-function mergeDisenchant(str1, str2)
-	-- Merge two disenchant strings into a single string
-	local tbl1, tbl2 = unserialize(str1), unserialize(str2)
-	for id, counts in pairs(tbl2) do
-		if (not tbl1[id]) then
-			tbl1[id] = counts
-		else
-			tbl1[id][N_DISENCHANTS] = tbl1[id][N_DISENCHANTS] + counts[N_DISENCHANTS]
-			tbl1[id][N_REAGENTS] = tbl1[id][N_REAGENTS] + counts[N_REAGENTS]
-		end
+local function newindex(self, key, value)
+	local iLevel,iQual,iType,iItem
+	if (type(key) == "string") then
+		iLevel,iQual,iType,iItem = strsplit(":", key)
 	end
-	return serialize(tbl1)
-end
+	if (iQual) then
+		if (type(value) ~= "table") then return end
 
-function normalizeDisenchant(str)
-	-- Divide all counts in disenchant string by gcd
-	local div = 0
-	local count = 0
-	local tbl = unserialize(str)
-	for id, counts in pairs(tbl) do
-		div = Enchantrix.Util.GCD(div, counts[N_DISENCHANTS])
-		div = Enchantrix.Util.GCD(div, counts[N_REAGENTS])
-		count = count + 1
-	end
-	-- Only normalize if there's more than one kind of reagent
-	if count > 1 then
-		for id, counts in pairs(tbl) do
-			counts[N_DISENCHANTS] = counts[N_DISENCHANTS] / div
-			counts[N_REAGENTS] = counts[N_REAGENTS] / div
-		end
-		return serialize(tbl)
-	end
-	return str
-end
+		local data = {}
+		iLevel = tonumber(iLevel) or 0
+		iQual = tonumber(iQual) or 0
+		iType = tonumber(iType) or 0
+		iItem = tonumber(iItem) or 0
 
-function cleanupDisenchant(str, id)
-	-- Remove reagents that don't appear in level rules table
-	if (type(str) == "string") and (id ~= nil) then
-		local _, _, quality, ilevel, _, _, _, _, equip = GetItemInfo(id)
-		local itype = const.InventoryTypes[equip]
-		if quality and itype then
-			local tbl = unserialize(str)
-			local clean = {}
-			ilevel = Enchantrix.Util.RoundUp(ilevel, 5)
-			for id, counts in pairs(tbl) do
-				if itype and ilevel and const.LevelRules[itype] and const.LevelRules[itype][ilevel]
-				and const.LevelRules[itype][ilevel][id] then
-					if quality == 2 then
-						-- Uncommon item, remove nexus crystal
-						if (const.LevelRules[itype][ilevel][id] < const.CRYSTAL) then
-							clean[id] = counts
-						end
-					else
-						-- Rare or epic item, remove dusts and essences
-						if (const.LevelRules[itype][ilevel][id] > const.ESSENCE_GREATER) then
-							clean[id] = counts
-						end
+		if (iLevel > 0 and iQual >= 2 and (iType == 2 or iType == 4) and iItem > 0) then
+			local key = strjoin(":", iLevel, iQual, iType)
+			if (not EnchantrixData) then EnchantrixData = {} end
+			if (not EnchantrixData.disenchants) then EnchantrixData.disenchants = {} end
+			if (not EnchantrixData.disenchants[key]) then EnchantrixData.disenchants[key] = {}
+			else
+				for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
+					if (itemId == iItem) then
+						addResults(data, strsplit(",", itemData))
+						break
 					end
-				else
-					Enchantrix.Debug.Util(N_WARNING, "Cleanup", "Unknown level rules", "Level rules for item",id,"are unknown\n  equip =",equip,"\n  itype=",itype,"\n  ilevel=",ilevel) 
 				end
 			end
-			return serialize(clean)
-		end
-	end
-	return str
-end
-
-function disenchantTotal(str)
-	-- Return total number of disenchants
-	local tot = 0
-	local tbl = unserialize(str)
-	for id in pairs(tbl) do
-		tot = tot + tbl[id][N_DISENCHANTS]
-	end
-	return tot
-end
-
-function disenchantListHash()
-	-- Generate a hash for DisenchantList
-	local hash = 1
-	local id
-	for sig, val in pairs(DisenchantList) do
-		id = Enchantrix.Util.GetItemIdFromSig(sig)
-		Enchantrix.State.MAX_ITEM_ID = math.max(Enchantrix.State.MAX_ITEM_ID, id or 0)
-		hash = math.fmod(3 * hash + 2 * (id or 0) + #val, 16777216)
-	end
-	return hash
-end
-
-function mergeDisenchantLists()
-	-- Merge DisenchantList by base item, i.e. all "Foobar of <x>" are merged into "Foobar"
-	-- This can be rather time consuming so we store this in a saved variable and use a hash
-	-- signature to determine if we need to update the table
-	local hash = disenchantListHash()
-	if (not EnchantedBaseItems.hash) then
-		EnchantedBaseItems.hash = -hash
-	end
-	if (EnchantedBaseItems.hash ~= hash) then
-		-- Hash has changed, update EnchantedBaseItems
-		EnchantedBaseItems = {}
-		for sig, disenchant in pairs(DisenchantList) do
-			local item = Enchantrix.Util.GetItemIdFromSig(sig)
-			if (Enchantrix.Util.IsDisenchantable(item)) then
-				EnchantedBaseItems[item] = mergeDisenchant(EnchantedBaseItems[item],
-					normalizeDisenchant(disenchant))
+			for resultId, resultData in pairs(value) do
+				if (not data[resultId]) then data[resultId] = { 0, 0 } end
+				local node = data[resultId]
+				node[1] = node[1] + resultData[1]
+				node[2] = node[2] + resultData[2]
 			end
-		end
-		EnchantedBaseItems.hash = hash
-	end
 
-	-- We don't need DisenchantList anymore
-	DisenchantList = nil
-
-	-- Merge items from EnchantedLocal
-	for sig, disenchant in pairs(EnchantedLocal) do
-		local item = Enchantrix.Util.GetItemIdFromSig(sig)
-		if type(disenchant) == "table" then
-			saveLocal(sig, disenchant)
-			disenchant = EnchantedLocal[sig]
+			EnchantrixData.disenchants[key][iItem] = compact(data)
 		end
-		if Enchantrix.Util.IsDisenchantable(item) and (type(disenchant) == "string") then
-			LocalBaseItems[item] = mergeDisenchant(LocalBaseItems[item], disenchant)
-		end
+		return
 	end
-
-	-- Merge by item type
-	for id, disenchant in pairs(EnchantedBaseItems) do
-		local itype = Enchantrix.Util.GetItemType(id)
-		if itype then
-			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
-		end
-	end
-	for id, disenchant in pairs(LocalBaseItems) do
-		local itype = Enchantrix.Util.GetItemType(id)
-		if itype then
-			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
-		end
-	end
-
-	-- Take out the trash
-	collectgarbage("collect")
+	if (self.locked) then return end
+	rawset(self, key, value)
 end
 
-function saveDisenchant(sig, reagentID, count)
-	-- Update tables after a disenchant has been detected
-	assert(type(sig) == "string"); assert(tonumber(reagentID)); assert(tonumber(count))
+-- Make all globals local to this file
+_G = getfenv(0)
+local metatable = {__index = index, __newindex = newindex}
+setmetatable(Enchantrix.Storage, metatable)
+setfenv(1, Enchantrix.Storage)
 
-	local id = Enchantrix.Util.GetItemIdFromSig(sig)
-	local itype = Enchantrix.Util.GetItemType(id)
-	local disenchant = ("%d:1:%d:0"):format(reagentID, count)
-	EnchantedLocal[sig] = mergeDisenchant(EnchantedLocal[sig], disenchant)
-	LocalBaseItems[id] = mergeDisenchant(LocalBaseItems[id], disenchant)
-	if itype then
-		EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
-	end
+
+function AddonLoaded()
 end
 
-function saveLocal(sig, lData)
-	local str = "";
-	for eResult, eData in pairs(lData) do
-		eResult = tonumber(eResult)
-		if not eResult then
-			return
-		end
-		if (eData and type(eData) == "table") then
-			local iCount = tonumber(eData.i) or 0;
-			local dCount = tonumber(eData.d) or 0;
-			local oCount = tonumber(eData.o) or 0;
-			local serial = ("%d:%d:%d:%d"):format(eResult, iCount, dCount, oCount);
-			if (str == "") then str = serial else str = str..";"..serial end
-		else
-			eData = nil;
-		end
-	end
-	EnchantedLocal[sig] = str;
-end
-
-function getLocal(sig)
-	local enchantItem = {};
-	if (EnchantedLocal and EnchantedLocal[sig]) then
-		if (type(EnchantedLocal[sig]) == "table") then
-			-- Time to convert it into the new serialized format
-			saveLocal(sig, EnchantedLocal[sig]);
-		end
-
-		-- Get the string and break it apart
-		for enchantResult in Enchantrix.Util.Spliterator(EnchantedLocal[sig], ";") do
-			local enchantBreak = Enchantrix.Util.Split(enchantResult, ":");
-			local rSig = tonumber(enchantBreak[1]) or 0;
-			local iCount = tonumber(enchantBreak[2]) or 0;
-			local dCount = tonumber(enchantBreak[3]) or 0;
-			local oCount = tonumber(enchantBreak[4]) or 0;
-
-			enchantItem[rSig] = { i=iCount, d=dCount, o=oCount };
-		end
-	end
-	return enchantItem;
-end
-
-function getItemDisenchants(sig, name, useCache)
-	local disenchantsTo = {};
-
-	if (not Enchantrix.Storage.Price_Cache) or (time()-Enchantrix.Storage.Price_Cache.t > 300) then
-		Enchantrix.Storage.Price_Cache = {t=time()};
-	end
-
-	-- Automatically convert any named EnchantedLocal items to new items
-	if (name and EnchantedLocal[name]) then
-		local iData = getLocal(name)
-		for dName, count in pairs(iData) do
-			local link = Enchantrix.Util.GetLinkFromName(dName);
-			local dSig = Enchantrix.Util.GetItemIdFromLink(link)
-			if (dSig ~= nil) then
-				if (not iData[dSig]) then iData[dSig] = {}; end
-				local oCount = tonumber(iData[dSig].o);
-				if (oCount == nil) then oCount = 0; end
-				iData[dSig].o = ""..count;
-			end
-		end
-		EnchantedLocal[name] = nil;
-		saveLocal(sig, iData);
-	end
-
-	local item = Enchantrix.Util.GetItemIdFromSig(sig)
-	if (not (item and Enchantrix.Util.IsDisenchantable(item))) then
-		-- Item is not disenchantable
-		return {}
-	end
-
-	-- If there is data, then work out the disenchant data
-	if (EnchantedBaseItems[item] or LocalBaseItems[item]) then
-		local biTotal = 0;
-		local bdTotal = 0;
-		local iTotal = 0;
-		local dTotal = 0;
-
-		local baseDisenchant = EnchantedBaseItems[item]
-
-		local itype = Enchantrix.Util.GetItemType(item)
-		if (itype and EnchantedItemTypes[itype]) then
-			if (disenchantTotal(EnchantedItemTypes[itype]) > disenchantTotal(baseDisenchant)) then
-				baseDisenchant = EnchantedItemTypes[itype]
-			end
-		end
-
---This next line is responsible for removing incorrect entries that have been retrieved
---Disabling this for 4.0 since we're resetting the disenchant database and we're not 100% of the new disenchant tables
---It will need to be re-enabled, probably for 4.2, once EnxConstants.lua has been double checked
---		baseDisenchant = cleanupDisenchant(baseDisenchant, item)
-
-		if (baseDisenchant) then
-			-- Base Disenchantments are now serialized
-			local baseResults = unserialize(baseDisenchant)
-			for dSig, counts in pairs(baseResults) do
-				if (dSig > 0) then
-					disenchantsTo[dSig] = {
-						biCount = counts[N_DISENCHANTS],
-						bdCount = counts[N_REAGENTS],
-						iCount = 0,
-						dCount = 0,
-					}
-					biTotal = biTotal + counts[N_DISENCHANTS]
-					bdTotal = bdTotal + counts[N_REAGENTS]
-				end
-			end
-		end
-
-		if (LocalBaseItems[item]) then
-			local enchantedLocal = unserialize(LocalBaseItems[item])
-			for dSig, counts in pairs(enchantedLocal) do
-				if (dSig and dSig > 0) then
-					if (not disenchantsTo[dSig]) then
-						disenchantsTo[dSig] = {biCount = 0, bdCount = 0, iCount = 0, dCount = 0}
-					end
-					disenchantsTo[dSig].dCount = counts[N_REAGENTS]
-					disenchantsTo[dSig].iCount = counts[N_DISENCHANTS]
-
-					dTotal = dTotal + counts[N_REAGENTS]
-					iTotal = iTotal + counts[N_DISENCHANTS]
-				end
-			end
-		end
-
-		local total = biTotal + iTotal;
-
-		local hspGuess = 0;
-		local medianGuess = 0;
-		local marketGuess = 0;
-		if (total > 0) then
-			for dSig, counts in pairs(disenchantsTo) do
-				local item = 0;
-				if (dSig) then item = tonumber(dSig); end
-				local dName = Enchantrix.Util.GetReagentInfo(item);
-				if (not dName) then dName = "Item "..dSig; end
-				local count = (counts.biCount or 0) + (counts.iCount or 0);
-				local countI = (counts.biCount or 0) + (counts.iCount or 0);
-				local countD = (counts.bdCount or 0) + (counts.dCount or 0);
-				local pct = tonumber(("%0.1f"):format(count / total * 100));
-				local rate
-				if (countI > 0) then
-					rate = countD / countI
-				end
-
-				local count = 1;
-				if (rate and rate > 0) then count = rate; end
-				disenchantsTo[dSig].name = dName;
-				disenchantsTo[dSig].pct = pct;
-				disenchantsTo[dSig].rate = count;
-
-				local hsp, med, mkt = Enchantrix.Util.GetReagentPrice(item)
-
-				local hspValue = (hsp or 0) * pct * count / 100
-				local medValue = (med or 0) * pct * count / 100
-				local mktValue = (mkt or 0) * pct * count / 100
-
-				disenchantsTo[dSig].hspValue = hspValue;
-				disenchantsTo[dSig].medValue = medValue;
-				disenchantsTo[dSig].mktValue = mktValue;
-
-				hspGuess = hspGuess + hspValue;
-				medianGuess = medianGuess + medValue;
-				marketGuess = marketGuess + mktValue;
-			end
-		end
-
-		local confidence = math.log(math.min(total, 19)+1)/3;
-
-		disenchantsTo.totals = {};
-		disenchantsTo.totals.hspValue = hspGuess or 0;
-		disenchantsTo.totals.medValue = medianGuess or 0;
-		disenchantsTo.totals.mktValue = marketGuess or 0;
-		disenchantsTo.totals.biCount = biTotal or 0;
-		disenchantsTo.totals.bdCount = bdTotal or 0;
-		disenchantsTo.totals.dCount = dTotal or 0;
-		disenchantsTo.totals.iCount = iTotal or 0;
-		disenchantsTo.totals.total = total or 0;
-		disenchantsTo.totals.conf = confidence or 0;
-	end
-
-	return disenchantsTo;
-end
-
-Enchantrix.Storage = {
-	Revision			= "$Revision$",
-	AddonLoaded			= addonLoaded,
-
-	GetItemDisenchants	= getItemDisenchants,
-	SaveDisenchant		= saveDisenchant,
-}
+-- Stops any other addon from modifying our stuff.
+loaded = true

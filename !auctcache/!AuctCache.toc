@@ -1,5 +1,0 @@
-## Title: AuctionCacher
-## Notes: A debugging tool
-## Interface: 20003
-## SavedVariables: AuxData
-AuxMain.lua
