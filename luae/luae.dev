@@ -1,20 +1,20 @@
 [Project]
-FileName=luax.dev
+FileName=luae.dev
 Name=Luae
-UnitCount=3
+UnitCount=4
 Type=0
 Ver=1
 ObjFiles=
 Includes=
 Libs=
-PrivateResource=luax_private.rc
+PrivateResource=luae_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=
 CppCompiler=
-Linker=../../Dev-Cpp/lib/liblua.a_@@_
+Linker=M:/Dev-Cpp/lib/liblua.a_@@_
 IsCpp=1
-Icon=luax.ico
+Icon=luae.ico
 ExeOutput=
 ObjectOutput=
 OverrideOutput=1
@@ -24,10 +24,10 @@ Folders=
 CommandLine=
 UseCustomMakefile=0
 CustomMakefile=
-IncludeVersionInfo=0
+IncludeVersionInfo=1
 SupportXPThemes=1
-CompilerSet=0
-CompilerSettings=0000000010000001000000
+CompilerSet=1
+CompilerSettings=0000000001001000000100
 
 [Unit1]
 FileName=main.cpp
@@ -40,22 +40,22 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [VersionInfo]
-Major=0
-Minor=1
-Release=1
-Build=1
-LanguageID=1033
+Major=1
+Minor=0
+Release=0
+Build=10
+LanguageID=3081
 CharsetID=1252
-CompanyName=
+CompanyName=Norganna's addons
 FileVersion=
-FileDescription=Developed using the Dev-C++ IDE
-InternalName=
-LegalCopyright=
+FileDescription=A windowed lua execution environment built for Auctioneer's module building system.
+InternalName=Lua Executor
+LegalCopyright=(c) 2007, Norganna's AddOns. This application and it's source code are available under the GPL v2.
 LegalTrademarks=
 OriginalFilename=
-ProductName=
+ProductName=Luae
 ProductVersion=
-AutoIncBuildNr=0
+AutoIncBuildNr=1
 
 [Unit2]
 FileName=dirlib.c
@@ -71,6 +71,15 @@ BuildCmd=
 FileName=dirlib.h
 CompileCpp=1
 Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit4]
+FileName=luae.rc
+Folder=Resources
 Compile=1
 Link=1
 Priority=1000

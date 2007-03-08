@@ -1,3 +1,26 @@
+/**
+ **  Luae, A windowed lua execution environment built for Auctioneer's
+ **  module building system.
+ **
+*******************************************************************************
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program(see GPL.txt); if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*******************************************************************************
+ **
+ */
+
+
 #define lua_c
 
 #include <signal.h>
@@ -10,6 +33,8 @@
 #include "dirlib.h"
 
 #define IDC_MAIN_EDIT	101
+#define ID_ICON         100
+
 HWND mainWnd;
 
 #define sleep(t) _sleep((long unsigned int)((t) * 1000))
@@ -182,8 +207,8 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     wincl.cbSize = sizeof (WNDCLASSEX);
 
     /* Use default icon and mouse-pointer */
-    wincl.hIcon = LoadIcon (NULL, IDI_APPLICATION);
-    wincl.hIconSm = LoadIcon (NULL, IDI_APPLICATION);
+    wincl.hIcon = LoadIcon (hThisInstance, MAKEINTRESOURCE(ID_ICON));
+    wincl.hIconSm = LoadIcon (hThisInstance, MAKEINTRESOURCE(ID_ICON));
     wincl.hCursor = LoadCursor (NULL, IDC_ARROW);
     wincl.lpszMenuName = NULL;                 /* No menu */
     wincl.cbClsExtra = 0;                      /* No extra bytes after the window class */
@@ -199,7 +224,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     hwnd = CreateWindowEx (
            0,                   /* Extended possibilites for variation */
            szClassName,         /* Classname */
-           "Lua-executor",       /* Title Text */
+           "Lua Executor",       /* Title Text */
            WS_OVERLAPPEDWINDOW, /* default window */
            CW_USEDEFAULT,       /* Windows decides the position */
            CW_USEDEFAULT,       /* where the window ends up on the screen */
@@ -225,7 +250,7 @@ int WINAPI WinMain (HINSTANCE hThisInstance,
     lua_register(L,"sleep",wait);
     lua_register(L,"exit",exit);
 
-    int status = luaL_loadfile(L, "luaerun.lua") || docall(L, 0, 1);
+    int status = luaL_loadfile(L, "autorun.lua") || docall(L, 0, 1);
 
     while (runLoop()) {}
 
