@@ -5,8 +5,10 @@ and have the Active modules list updated.
 
 To update you active modules list, you must either:
   * Run the luae executable in this folder, which will automatically
-    generate a Modules.xml, activating all valid installed modules, and/or
-  * Manually edit the existing Modules.xml and add/remove entries
+    generate a Modules.xml, activating all valid installed modules.
+  * If you have a perl interpreter on your system (eg ActivePerl for
+    Windows, or perl on Unix/OSX) you may simply run rebuild.pl instead.
+  * You may manually edit the existing Modules.xml and add/remove entries
     to your taste.
 
 
