@@ -134,134 +134,125 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		return
 	end
 
+	local lines
+
 	local total = data.total
+	local totalFive = {}
+	local totalHSP, totalMed, totalMkt = 0,0,0
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
-		p("Results for", iType, link)
 		for result, resData in pairs(data) do
 			if (result ~= "total") then
+				if (not lines) then lines = {} end
+
 				local resNumber, resQuantity = unpack(resData)
 				local dName = Enchantrix.Util.GetReagentInfo(result);
-				if (not dName) then dName = "Item "..result; end
-				local hsp, med, mkt = Enchantrix.Util.GetReagentPrice(result)
+				if (not dName) then dName = "Item "..result end
+				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
 				local resHSP, resMed, resMkt = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb
-				p("  Result", dName, ("%0.02f%% x%0.1f"):format(resProb, resCount),
-					EnhTooltip.GetTextGSC(resHSP,1), EnhTooltip.GetTextGSC(resMed,1), EnhTooltip.GetTextGSC(resMkt,1))
+				if (five) then
+					for engine, price in pairs(five) do
+						totalFive[engine] = (totalFive[engine] or 0) + ((price or 0) * resProb)
+					end
+				end
+				totalHSP = totalHSP + resHSP
+				totalMed = totalMed + resMed
+				totalMkt = totalMkt + resMkt
+
+				local prob = resProb
+				local pmin, pmax = Enchantrix.Util.ConfidenceInterval(prob, totalNumber)
+
+				-- Probabilities
+				prob, pmin, pmax = math.floor(prob * 100 + 0.5), math.floor(pmin * 100 + 0.5), math.floor(pmax * 100 + 0.5)
+				tooltipFormat:SetPattern("$prob", tostring(prob))
+				if pmin == 0 then
+					tooltipFormat:SetPattern("$conf", "<"..max(pmax, 1))
+				elseif pmax == 100 then
+					tooltipFormat:SetPattern("$conf", ">"..min(pmin, 99))
+				else
+					if pmin ~= pmax then
+						tooltipFormat:SetPattern("$conf", pmin.."-"..pmax)
+					else
+						tooltipFormat:SetPattern("$conf", tostring(prob))
+					end
+				end
+
+				-- Counts
+				tooltipFormat:SetPattern("$count", tostring(resQuantity))
+
+				-- Name and quality
+				local name, _, quality = Enchantrix.Util.GetReagentInfo(result)
+				local _, _, _, color = GetItemQualityColor(quality or 0)
+				tooltipFormat:SetPattern("|q", color or "|cffcccc33")
+				tooltipFormat:SetPattern("$name", name)
+
+				-- Rate
+				if resCount ~= 1 then
+					tooltipFormat:SetPattern("$rate", ("x%0.1f"):format(resCount))
+				else
+					tooltipFormat:SetPattern("$rate", "")
+				end
+
+				-- Store this line and sort key
+				local line = tooltipFormat:GetString(Enchantrix.Config.GetFilter('counts'))
+				table.insert(lines,  {str = line, sort = pmin})
 			end
 		end
-	end
---[[
-	local embed = Enchantrix.Config.GetFilter('embed');
-
-	-- Check for disenchantable target
-	local id = Enchantrix.Util.GetItemIdFromLink(link)
-	if (not id or id == 0 or not Enchantrix.Util.IsDisenchantable(id)) then
+	else
 		return
 	end
 
-	local disenchantsTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(link), name, true);
-
-	-- Process the results
-	local totals = disenchantsTo.totals;
-	disenchantsTo.totals = nil;
-	if (totals and totals.total > 0) then
-
-		-- Terse mode
-		if Enchantrix.Config.GetFilter('terse') and not IsControlKeyDown() then
-			if Enchantrix.Config.GetFilter('valuate-hsp') and totals.hspValue > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Round(totals.hspValue * totals.conf, 3), embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			elseif Enchantrix.Config.GetFilter('valuate-median') and totals.medValue > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * totals.conf, 3), embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			elseif Enchantrix.Config.GetFilter('valuate-baseline') and totals.mktValue > 0 then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * totals.conf, 3), embed);
+	-- Terse mode
+	if Enchantrix.Config.GetFilter('terse') and not IsControlKeyDown() then
+		if Enchantrix.Config.GetFilter('valuate-hsp') and totalHSP > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Config.GetFilter('valuate-median') and totalMed > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Config.GetFilter('valuate-val') and totalFive then
+			for engine, price in pairs(totalFive) do
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal').." ("..engine..")", price, embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
-			return
+		elseif Enchantrix.Config.GetFilter('valuate-baseline') and totalMkt > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
+		return
+	end
 
-		-- If it looks quirky, and we haven't disenchanted it, then ignore it...
-		if (totals.iCount + totals.biCount < 1) then return; end
+	-- Header
+	local totalText = ""
+	if (Enchantrix.Config.GetFilter('counts')) then
+		totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
+	end
+	EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
+	EnhTooltip.LineColor(0.8,0.8,0.2);
 
-		-- Header
-		local total = ""
-		if (Enchantrix.Config.GetFilter('counts')) then
-			total = (" |cff7f7f00(%d)|r"):format(totals.total)
+	-- Sort in order of decreasing probability before adding to tooltip
+	table.sort(lines, function(a, b) return a.sort > b.sort end)
+	for n, line in ipairs(lines) do
+		EnhTooltip.AddLine(line.str, nil, embed)
+		EnhTooltip.LineColor(0.8, 0.8, 0.2);
+		if n >= 5 then break end -- Don't add more than 5 lines
+	end
+
+	if (Enchantrix.Config.GetFilter('valuate')) then
+		if (Enchantrix.Config.GetFilter('valuate-hsp') and totalHSP > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..total, nil, embed);
-		EnhTooltip.LineColor(0.8,0.8,0.2);
-
-		local lines = {}
-		for dSig, counts in pairs(disenchantsTo) do
-			local p = (counts.biCount + counts.iCount) / totals.total
-			local pmin, pmax = Enchantrix.Util.ConfidenceInterval(p, totals.total)
-
-			-- Probabilities
-			p, pmin, pmax = math.floor(p * 100 + 0.5), math.floor(pmin * 100 + 0.5), math.floor(pmax * 100 + 0.5)
-			tooltipFormat:SetPattern("$prob", tostring(p))
-			if pmin == 0 then
-				tooltipFormat:SetPattern("$conf", "<"..max(pmax, 1))
-			elseif pmax == 100 then
-				tooltipFormat:SetPattern("$conf", ">"..min(pmin, 99))
-			else
-				if pmin ~= pmax then
-					tooltipFormat:SetPattern("$conf", pmin.."-"..pmax)
-				else
-					tooltipFormat:SetPattern("$conf", tostring(p))
-				end
-			end
-
-			-- Counts
-			tooltipFormat:SetPattern("$count", tostring(counts.biCount + counts.iCount))
-			tooltipFormat:SetPattern("$lcount", tostring(counts.iCount))
-			tooltipFormat:SetPattern("$bcount", tostring(counts.biCount))
-
-			-- Name and quality
-			local name, _, quality = Enchantrix.Util.GetReagentInfo(dSig)
-			local _, _, _, color = GetItemQualityColor(quality or 0)
-			tooltipFormat:SetPattern("|q", color or "|cffcccc33")
-			tooltipFormat:SetPattern("$name", name or counts.name)
-
-			-- Rate
-			if counts.rate ~= 1 then
-				tooltipFormat:SetPattern("$rate", ("x%0.1f"):format(counts.rate))
-			else
-				tooltipFormat:SetPattern("$rate", "")
-			end
-
-			-- Store this line and sort key
-			local line = tooltipFormat:GetString(Enchantrix.Config.GetFilter('counts'))
-			table.insert(lines,  {str = line, sort = pmin})
+		if (Enchantrix.Config.GetFilter('valuate-median') and totalMed > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-
-		-- Sort in order of decreasing probability before adding to tooltip
-		table.sort(lines, function(a, b) return a.sort > b.sort end)
-		for n, line in ipairs(lines) do
-			EnhTooltip.AddLine(line.str, nil, embed)
-			EnhTooltip.LineColor(0.8, 0.8, 0.2);
-			if n >= 5 then break end -- Don't add more than 5 lines
-		end
-
-		if (Enchantrix.Config.GetFilter('valuate')) then
-			local confidence = totals.conf;
-
-			if (Enchantrix.Config.GetFilter('valuate-hsp') and totals.hspValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), Enchantrix.Util.Round(totals.hspValue * confidence, 3), embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			end
-			if (Enchantrix.Config.GetFilter('valuate-median') and totals.medValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), Enchantrix.Util.Round(totals.medValue * confidence, 3), embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			end
-			if (Enchantrix.Config.GetFilter('valuate-baseline') and totals.mktValue > 0) then
-				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), Enchantrix.Util.Round(totals.mktValue * confidence, 3), embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			end
+		if (Enchantrix.Config.GetFilter('valuate-baseline') and totalMkt > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
 	end
-]]
 end
 
 local function getReagentsFromCraftFrame(craftIndex)

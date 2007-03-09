@@ -1088,9 +1088,17 @@ end
 
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness, name and the four gemSlots.
 function breakLink(link)
+	if (type(link) == number) then return link,0,0,0,"",0,0,0,0,0 end
 	if (type(link) ~= 'string') then return end
 	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemBonus, randomProp, uniqID, name = link:match("|Hitem:(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)|h%[(.-)%]|h")
-	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemBonus) or 0
+	local randomFactor = 0
+	randomProp = tonumber(randomProp) or 0
+	uniqID = tonumber(uniqID) or 0
+	if (randomProp < 0 and uniqID < 0) then
+		randomFactor = bit.band(uniqID, 65535)
+	end
+
+	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, tostring(name), tonumber(gemSlot1) or 0, tonumber(gemSlot2) or 0, tonumber(gemSlot3) or 0, tonumber(gemBonus) or 0, randomFactor
 end
 
 ------------------------

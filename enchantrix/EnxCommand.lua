@@ -558,12 +558,19 @@ function auctioneerLoaded()
 
 	-- Make sure we have a usable version of Auctioneer loaded (3.4 or higher)
 	if Auctioneer and Auctioneer.Version then
-		local ver = Enchantrix.Util.Split(Auctioneer.Version, ".")
-		local major = tonumber(ver[1]) or 0
-		local minor = tonumber(ver[2]) or 0
-		if ver[3] == "DEV" then minor = minor + 1 end
+		local major,minor,patch,revision = strsplit('.', Auctioneer.Version, 4)
+		local major = tonumber(major) or 0
+		local minor = tonumber(minor) or 0
+		if patch == "DEV" then
+			minor = minor + 1
+			patch = 0
+			revision = 0
+		end
 
-		if major > 3 or (major >= 3 and minor >= 4) then
+		if major >= 5 then
+			Enchantrix.State.Auctioneer_Loaded = true
+			Enchantrix.State.Auctioneer_Five = true
+		elseif major > 3 or (major == 3 and minor >= 4) then
 			Enchantrix.State.Auctioneer_Loaded = true
 		end
 	end
@@ -706,7 +713,9 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
-	if Enchantrix.State.Auctioneer_Loaded then
+	if Enchantrix.State.Auctioneer_Five then
+		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerVal'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-val'), _ENCH('HelpGuessAuctioneerVal')));
+	elseif Enchantrix.State.Auctioneer_Loaded then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerMed'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
 	else

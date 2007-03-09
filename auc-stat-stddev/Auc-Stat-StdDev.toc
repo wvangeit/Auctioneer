@@ -1,4 +1,4 @@
-## Title: Auctioneer:Modules:StdDev
+## Title: Auctioneer:Stat:StdDev
 ## Notes: Statistics extension for Auctioneer that uses the variance to detect outliers
 ##
 ## Interface: 20003

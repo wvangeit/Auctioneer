@@ -127,7 +127,8 @@ function lib.ScanProcessor(operation, itemData, oldData)
 	-- however for this simple case, it doesn't make sense.
 	if (operation == "create") then
 		-- Get the signature of this item and find it's stats.
-		local itemId, property = EnhTooltip.BreakLink(itemData.link)
+		local itemType, itemId, property, factor = Auctioneer.DecodeLink(itemData.link)
+		if (factor ~= 0) then property = property.."x"..factor end
 		local faction = Auctioneer.GetFaction()
 		if not data[faction] then data[faction] = {} end
 		if not data[faction].daily then data[faction].daily = { created = time() } end
@@ -144,7 +145,8 @@ function lib.ScanProcessor(operation, itemData, oldData)
 end
 
 function lib.GetPrice(hyperlink, faction)
-	local linkType = EnhTooltip.LinkType(hyperlink)
+	local linkType,itemId,property,factor = Auctioneer.DecodeLink(hyperlink)
+	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
 
 	if not faction then faction = Auctioneer.GetFaction() end
@@ -152,7 +154,6 @@ function lib.GetPrice(hyperlink, faction)
 	local dayTotal, dayCount, dayAverage = 0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
 
-	local itemId, property = EnhTooltip.BreakLink(hyperlink)
 	local faction = Auctioneer.GetFaction()
 	if not data[faction] then return end
 
@@ -170,6 +171,10 @@ function lib.GetPrice(hyperlink, faction)
 		end
 	end
 	return dayAverage, avg3, avg7, avg14, false, dayTotal, dayCount, seenDays, seenCount
+end
+
+function lib.GetPriceColumns()
+	return "Daily Avg", "3 Day Avg", "7 Day Avg", "14 Day Avg", false, "Daily Total", "Daily Count", "Seen Days", "Seen Count"
 end
 
 function lib.TooltipProcessor(frame, name, hyperlink, quality, quantity, cost)

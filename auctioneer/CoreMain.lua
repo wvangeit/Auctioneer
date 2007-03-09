@@ -36,9 +36,14 @@ if (not AuctioneerData) then AuctioneerData = {} end
 if (not AuctioneerLocal) then AuctioneerLocal = {} end
 if (not AuctioneerConfig) then AuctioneerConfig = {} end
 
+Auctioneer.Version="<%version%>";
+if (Auctioneer.Version == "<".."%version%>") then
+	Auctioneer.Version = "5.0.DEV";
+end
+
 -- For our modular stats system, each stats engine should add their
--- subclass to Auctioneer.Modules.<name> and store their data into their own
--- data table in AuctioneerData.Stats.<name>
+-- subclass to Auctioneer.Modules.<type>.<name> and store their data into their own
+-- data table in AuctioneerData.Stats.<type><name>
 if (not Auctioneer.Modules) then Auctioneer.Modules = {Stat={},Scan={},Util={}} end
 if (not AuctioneerData.Stats) then AuctioneerData.Stats = {} end
 if (not AuctioneerLocal.Stats) then AuctioneerLocal.Stats = {} end
@@ -52,6 +57,19 @@ function Auctioneer.Print(...)
 		else output = part end
 	end
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
+end
+
+function Auctioneer.DecodeLink(link)
+	local vartype = type(link)
+	if (vartype == "string") then
+		local linkType = EnhTooltip.LinkType(link)
+		if (linkType ~= "item") then return end
+		local itemId, property,_,_,_,_,_,_,_,factor = EnhTooltip.BreakLink(link)
+		return linkType, itemId, property, factor
+	elseif (vartype == "number") then
+		return linkType, link, 0, 0
+	end
+	return
 end
 
 function Auctioneer.GetFaction() 

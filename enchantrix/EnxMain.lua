@@ -58,7 +58,6 @@ function addonLoaded(hookArgs, event, addOnName)
 
 	-- Call AddonLoaded for other objects
 	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
-	Enchantrix.Barker.AddonLoaded()
 	Enchantrix.Command.AddonLoaded()
 	Enchantrix.Config.AddonLoaded()
 	Enchantrix.Locale.AddonLoaded()

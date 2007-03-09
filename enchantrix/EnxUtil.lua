@@ -85,6 +85,10 @@ end
 -- Frontend to GetItemInfo()
 -- Information for disenchant reagents are kept in a saved variable cache
 function getReagentInfo(id)
+	if (not EnchantConfig) then EnchantConfig = {} end
+	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
+	if (not EnchantConfig.cache.names) then EnchantConfig.cache.names = {} end
+	if (not EnchantConfig.cache.reagentinfo) then EnchantConfig.cache.reagentinfo = {} end
 	local cache = EnchantConfig.cache.reagentinfo
 
 	if type(id) == "string" then
@@ -168,7 +172,20 @@ function getReagentPrice(reagentID)
 
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
-	if Enchantrix.State.Auctioneer_Loaded then
+	local prices
+	if Enchantrix.State.Auctioneer_Five then
+		if (Auctioneer and Auctioneer.Modules and Auctioneer.Modules.Stat) then
+			prices = {}
+			for engine, engineLib in pairs(Auctioneer.Modules.Stat) do
+				if engineLib.GetPrice then
+					local price = engineLib.GetPrice(reagentID)
+					if price then
+						prices[engine] = price
+					end
+				end
+			end
+		end
+	elseif Enchantrix.State.Auctioneer_Loaded then
 		local itemKey = ("%d:0:0"):format(reagentID);
 		local realm = Auctioneer.Util.GetAuctionKey()
 		hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
@@ -186,9 +203,10 @@ function getReagentPrice(reagentID)
 	cache.hsp = hsp or cache.hsp
 	cache.median = median or cache.median
 	cache.market = market or cache.market
+	cache.prices = prices
 	cache.timestamp = time()
 
-	return cache.hsp, cache.median, cache.market
+	return cache.hsp, cache.median, cache.market, cache.prices
 end
 
 -- Return item level (rounded up to nearest 5 levels), quality and type as string,

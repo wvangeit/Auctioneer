@@ -86,7 +86,7 @@ local function index(self, key)
 		if (iLevel > 0 and iQual >= 2 and (iType == 2 or iType == 4)) then
 			local key = strjoin(":", iLevel, iQual, iType)
 			addResults(data, strsplit(",", Enchantrix.Data.GetDisenchantData(key)))
-			if (EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
+			if (EnchantrixData and EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
 				for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
 					addResults(data, strsplit(",", itemData))
 				end

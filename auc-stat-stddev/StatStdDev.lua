@@ -124,7 +124,8 @@ function lib.ScanProcessor(operation, itemData, oldData)
 	-- however for this simple case, it doesn't make sense.
 	if (operation == "create") then
 		-- Get the signature of this item and find it's stats.
-		local itemId, property = EnhTooltip.BreakLink(itemData.link)
+		local itemType, itemId, property, factor = Auctioneer.DecodeLink(itemData.link)
+		if (factor ~= 0) then property = property.."x"..factor end
 		local faction = Auctioneer.GetFaction()
 		if not data[faction] then data[faction] = {} end
 		local stats = lib.UnpackStats(data[faction][itemId])
@@ -141,13 +142,13 @@ function lib.ScanProcessor(operation, itemData, oldData)
 end
 
 function lib.GetPrice(hyperlink, faction)
-	local linkType = EnhTooltip.LinkType(hyperlink)
+	local linkType,itemId,property,factor = Auctioneer.DecodeLink(hyperlink)
+	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
 
 	if not faction then faction = Auctioneer.GetFaction() end
 	if not data[faction] then return end
 
-	local itemId, property = EnhTooltip.BreakLink(hyperlink)
 	if not data[faction][itemId] then return end
 
 	local stats = lib.UnpackStats(data[faction][itemId])
@@ -186,6 +187,10 @@ function lib.GetPrice(hyperlink, faction)
 
 	local average = total / n
 	return average, mean, false, stdev, variance, count
+end
+
+function lib.GetPriceColumns()
+	return "Average", "Mean", false, "Std Deviation", "Variance", "Count"
 end
 
 function lib.TooltipProcessor(frame, name, hyperlink, quality, quantity, cost, ...)
