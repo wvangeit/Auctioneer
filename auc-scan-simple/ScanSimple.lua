@@ -191,11 +191,12 @@ local function processStats(operation, curItem, oldItem)
 end
 
 function lib.Commit()
+	local now = time()
 	local inscount, delcount = 0, 0
 	if not lib.curScan then return end
 	if not lib.image then
 		local last = AuctioneerScanSimpleData.lastScan
-		if last and last.time and time()-last.time<86400 and last.faction==Auctioneer.GetFaction() then
+		if last and last.time and now-last.time<86400 and last.faction==Auctioneer.GetFaction() then
 			lib.image = last.image
 		else
 			lib.image = {}
@@ -231,13 +232,19 @@ function lib.Commit()
 	local itemPos
 	local oldCount = #lib.image
 	local scanCount = #lib.curScan
-	local updateCount, sameCount, newCount, removeCount = 0,0,0,0
+	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
 	for _, data in ipairs(lib.curScan) do
 		itemPos = lib.FindItem(data, lib.image, lut)
 		if (itemPos) then
 			if not lib.IsIdentical(lib.image[itemPos], data) then
-				processStats("update", data, lib.image[itemPos])
-				updateCount = updateCount + 1
+				if (bit.band(flag, lib.FLAG_UNSEEN) == 0) then
+					-- If it has been recorded as suspended
+					processStats("resume", data, lib.image[itemPos])
+					resumeCount = resumeCount + 1
+				else
+					processStats("update", data, lib.image[itemPos])
+					updateCount = updateCount + 1
+				end
 			else
 				processStats("leave", data)
 				sameCount = sameCount + 1
@@ -256,9 +263,20 @@ function lib.Commit()
 		flag = data[lib.FLAG]
 		if (flag and bit.band(flag, lib.FLAG_DIRTY) > 0) then
 			-- This item should have been seen, but wasn't
-			processStats("delete", data)
-			table.remove(lib.image, pos)
-			removeCount = removeCount + 1
+			if (now - data[lib.TIME] < 86400) then
+				suspendCount = suspendCount + 1
+				-- Don't delete it yet. It may have been either skipped, or may be awaiting relist
+				if (bit.band(flag, lib.FLAG_UNSEEN) == 0) then
+					-- If it hasn't been recorded as suspended yet, do so
+					data[lib.FLAG] = bit.bor(flag, lib.FLAG_UNSEEN)
+					processStats("suspend", data)
+				end
+			else
+				-- Haven't seen this item in ages
+				processStats("delete", data)
+				table.remove(lib.image, pos)
+				removeCount = removeCount + 1
+			end
 		end
 	end
 	local currentCount = #lib.image
@@ -273,9 +291,11 @@ function lib.Commit()
 
 	lib.Print("Auctioneer finished scanning {{"..scanCount.."}} auctions:")
 	lib.Print("  {{"..oldCount.."}} items in DB at start")
+	lib.Print("  {{"..sameCount.."}} unchanged items")
 	lib.Print("  {{"..newCount.."}} new items")
 	lib.Print("  {{"..updateCount.."}} updated items")
-	lib.Print("  {{"..sameCount.."}} unchanged items")
+	lib.Print("  {{"..suspendCount.."}} suspended items")
+	lib.Print("  {{"..resumeCount.."}} resumed items")
 	lib.Print("  {{"..removeCount.."}} removed items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 
