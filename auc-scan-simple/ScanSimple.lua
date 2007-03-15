@@ -237,7 +237,7 @@ function lib.Commit()
 		itemPos = lib.FindItem(data, lib.image, lut)
 		if (itemPos) then
 			if not lib.IsIdentical(lib.image[itemPos], data) then
-				if (bit.band(flag, lib.FLAG_UNSEEN) == 0) then
+				if (bit.band(flag, lib.FLAG_UNSEEN) > 0) then
 					-- If it has been recorded as suspended
 					processStats("resume", data, lib.image[itemPos])
 					resumeCount = resumeCount + 1
