@@ -294,10 +294,10 @@ function lib.Commit()
 	lib.Print("  {{"..sameCount.."}} unchanged items")
 	lib.Print("  {{"..newCount.."}} new items")
 	lib.Print("  {{"..updateCount.."}} updated items")
-	lib.Print("  {{"..suspendCount.."}} suspended items")
 	lib.Print("  {{"..resumeCount.."}} resumed items")
 	lib.Print("  {{"..removeCount.."}} removed items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
+	lib.Print("  ({{"..suspendCount.."}} of these are suspended)")
 
 	AuctioneerScanSimpleLocal.lastScan = {
 		image = lib.image,
