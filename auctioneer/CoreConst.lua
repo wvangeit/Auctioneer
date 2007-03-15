@@ -83,6 +83,7 @@ Auctioneer.Const = {
 	FLAG = 21,
 
 	FLAG_DIRTY = 1,
+	FLAG_UNSEEN = 2,
 
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
