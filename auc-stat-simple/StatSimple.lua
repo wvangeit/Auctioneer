@@ -183,6 +183,7 @@ function lib.TooltipProcessor(frame, name, hyperlink, quality, quantity, cost)
 	-- display in the tooltip.
 	if not quantity or quantity < 1 then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
+	if (not dayAverage) then return end
 
 	if (seenDays + dayCount > 0) then
 		EnhTooltip.AddLine(libName.." prices:")
