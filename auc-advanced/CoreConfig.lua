@@ -1,5 +1,5 @@
 --[[
-	Auctioneer
+	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -31,17 +31,17 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-Auctioneer.Config = {}
-local lib = Auctioneer.Config
-lib.Print = Auctioneer.Print
+AucAdvanced.Config = {}
+local lib = AucAdvanced.Config
+lib.Print = AucAdvanced.Print
 
 function lib.CommandHandler(command, ...)
 	command = command:lower()
 	if (command == "help") then
-		lib.Print("Auctioneer Help")
+		lib.Print("Auctioneer Advanced Help")
 		lib.Print("  {{/auc help}} - Show this help")
 		lib.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
-		for system, systemMods in pairs(Auctioneer.Modules) do
+		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
 					lib.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
@@ -53,7 +53,7 @@ function lib.CommandHandler(command, ...)
 	else
 		local sys, eng = strsplit(" ", command)
 		if sys and eng then
-			for system, systemMods in pairs(Auctioneer.Modules) do
+			for system, systemMods in pairs(AucAdvanced.Modules) do
 				if sys == system:lower() then
 					for engine, engineLib in pairs(systemMods) do
 						if command == engine:lower() then
@@ -79,7 +79,7 @@ end
 function lib.ScanCommand(cat)
 	if cat then cat = tonumber(cat) end
 	if cat then
-		local catName = Auctioneer.Const.CLASSES[cat]
+		local catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
 			lib.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
 		else
@@ -90,21 +90,19 @@ function lib.ScanCommand(cat)
 		lib.Print("Beginning scanning: {{All categories}}")
 	end
 
-	local scanner = AuctioneerConfig.scanner
+	local scanner = AucAdvanced.scanner
 	if not scanner then scanner = "Simple" end
 
-	if not Auctioneer.Modules.Scan[scanner] then
+	if not AucAdvanced.Modules.Scan[scanner] then
 		local loaded, reason = LoadAddOn("Auc-Scan-"..scanner)
 		if not loaded then
 			message("The "..tostring(scanner).." scan engine could not be loaded: "..reason)
 			return
 		end
 	end
-	Auctioneer.Modules.Scan[scanner].StartScan(cat)
+	AucAdvanced.Modules.Scan[scanner].StartScan(cat)
 end
 
-SLASH_AUCTIONEER1 = "/auctioneer"
-SLASH_AUCTIONEER2 = "/auct"
-SLASH_AUCTIONEER3 = "/auc"
-SlashCmdList["AUCTIONEER"] = function(msg) lib.CommandHandler(strsplit(" ", msg)) end
+SLASH_AUCADVANCED1 = "/auc"
+SlashCmdList["AUCADVANCED"] = function(msg) lib.CommandHandler(strsplit(" ", msg)) end
 

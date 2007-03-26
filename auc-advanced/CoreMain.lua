@@ -1,5 +1,5 @@
 --[[
-	Auctioneer
+	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -31,24 +31,24 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-if (not Auctioneer) then Auctioneer = {} end
-if (not AuctioneerData) then AuctioneerData = {} end
-if (not AuctioneerLocal) then AuctioneerLocal = {} end
-if (not AuctioneerConfig) then AuctioneerConfig = {} end
+if (not AucAdvanced) then AucAdvanced = {} end
+if (not AucAdvancedData) then AucAdvancedData = {} end
+if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
+if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 
-Auctioneer.Version="<%version%>";
-if (Auctioneer.Version == "<".."%version%>") then
-	Auctioneer.Version = "5.0.DEV";
+AucAdvanced.Version="<%version%>";
+if (AucAdvanced.Version == "<".."%version%>") then
+	AucAdvanced.Version = "5.0.DEV";
 end
 
 -- For our modular stats system, each stats engine should add their
--- subclass to Auctioneer.Modules.<type>.<name> and store their data into their own
--- data table in AuctioneerData.Stats.<type><name>
-if (not Auctioneer.Modules) then Auctioneer.Modules = {Stat={},Scan={},Util={}} end
-if (not AuctioneerData.Stats) then AuctioneerData.Stats = {} end
-if (not AuctioneerLocal.Stats) then AuctioneerLocal.Stats = {} end
+-- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
+-- data table in AucAdvancedData.Stats.<type><name>
+if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}} end
+if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
+if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
-function Auctioneer.Print(...)
+function AucAdvanced.Print(...)
 	local output, part
 	for i=1, select("#", ...) do
 		part = select(i, ...)
@@ -59,7 +59,7 @@ function Auctioneer.Print(...)
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 end
 
-function Auctioneer.DecodeLink(link)
+function AucAdvanced.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
 		local linkType = EnhTooltip.LinkType(link)
@@ -72,14 +72,14 @@ function Auctioneer.DecodeLink(link)
 	return
 end
 
-function Auctioneer.GetFaction() 
+function AucAdvanced.GetFaction() 
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
 	
-	if not AuctioneerConfig.factions then AuctioneerConfig.factions = {} end
-	if AuctioneerConfig.factions[currentZone] then
-		factionGroup = AuctioneerConfig.factions[currentZone]
+	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
+	if AucAdvancedConfig.factions[currentZone] then
+		factionGroup = AucAdvancedConfig.factions[currentZone]
 	else
 		SetMapToCurrentZone()
 		local map = GetMapInfo()
@@ -90,34 +90,34 @@ function Auctioneer.GetFaction()
 
 	if not factionGroup then return end
 
-	AuctioneerConfig.factions[currentZone] = factionGroup
+	AucAdvancedConfig.factions[currentZone] = factionGroup
 	if (factionGroup == "Neutral") then
-		Auctioneer.cutRate = 0.15
-		Auctioneer.depositRate = 0.25
+		AucAdvanced.cutRate = 0.15
+		AucAdvanced.depositRate = 0.25
 	else
-		Auctioneer.cutRate = 0.05
-		Auctioneer.depositRate = 0.05
+		AucAdvanced.cutRate = 0.05
+		AucAdvanced.depositRate = 0.05
 	end
-	Auctioneer.curFaction = realmName.."-"..factionGroup
-	return Auctioneer.curFaction
+	AucAdvanced.curFaction = realmName.."-"..factionGroup
+	return AucAdvanced.curFaction
 end
 
 
-function Auctioneer.TooltipHook(vars, ret, ...)
-	for system, systemMods in pairs(Auctioneer.Modules) do
+function AucAdvanced.TooltipHook(vars, ret, ...)
+	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then engineLib.Processor("tooltip", ...) end
 		end
 	end
 end
 
-function Auctioneer.OnLoad(addon)
+function AucAdvanced.OnLoad(addon)
 	if (addon == "auctioneer") then
-		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, Auctioneer.TooltipHook)
+		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, AucAdvanced.TooltipHook)
 	end
 	local _, sys, eng = strsplit("-", addon)
 	
-	for system, systemMods in pairs(Auctioneer.Modules) do
+	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (sys and eng and sys == system:lower() and eng == engine:lower() and engineLib.OnLoad) then
 				engineLib.OnLoad()
@@ -129,17 +129,17 @@ function Auctioneer.OnLoad(addon)
 	end
 end
 
-function Auctioneer.OnEvent(...)
+function AucAdvanced.OnEvent(...)
 	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
 		local addon = string.lower(arg)
 		if (addon == "auctioneer" or addon:sub(1,4) == "auc-") then
-			Auctioneer.OnLoad(addon)
+			AucAdvanced.OnLoad(addon)
 		end
 	end
 end
 
-Auctioneer.Frame = CreateFrame("Frame")
-Auctioneer.Frame:RegisterEvent("ADDON_LOADED")
-Auctioneer.Frame:SetScript("OnEvent", Auctioneer.OnEvent)
+AucAdvanced.Frame = CreateFrame("Frame")
+AucAdvanced.Frame:RegisterEvent("ADDON_LOADED")
+AucAdvanced.Frame:SetScript("OnEvent", AucAdvanced.OnEvent)
 

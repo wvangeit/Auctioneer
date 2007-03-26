@@ -1,5 +1,5 @@
 --[[
-	Auctioneer - StatSimple
+	Auctioneer Advanced - StatSimple
 	Revision: $Id$
 	Version: <%version%>
 
@@ -33,15 +33,15 @@
 
 local libName = "Simple"
 
-Auctioneer.Modules.Stat[libName] = {}
-local lib = Auctioneer.Modules.Stat[libName]
-lib.Print = Auctioneer.Print
+AucAdvanced.Modules.Stat[libName] = {}
+local lib = AucAdvanced.Modules.Stat[libName]
+lib.Print = AucAdvanced.Print
 
 local data
 function makeData()
 	if data then return end
-	if (not AuctioneerStatSimpleData) then AuctioneerStatSimpleData = {} end
-	data = AuctioneerStatSimpleData
+	if (not AucAdvancedStatSimpleData) then AucAdvancedStatSimpleData = {} end
+	data = AucAdvancedStatSimpleData
 	lib.DataLoaded()
 end
 
@@ -51,9 +51,9 @@ end
 
 function lib.CommandHandler(command, ...)
 	if (not data) then makeData() end
-	local myFaction = Auctioneer.GetFaction()
+	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
-		lib.Print("Help for Auctioneer "..libName)
+		lib.Print("Help for Auctioneer Advanced - "..libName)
 		local line = "  {{/aul "..libName:lower()
 		lib.Print(line, "help}} - this", libName, "help")
 		lib.Print(line, "clear}} - clear current", myFaction, libName, "price database")
@@ -127,9 +127,9 @@ function lib.ScanProcessor(operation, itemData, oldData)
 	-- however for this simple case, it doesn't make sense.
 	if (operation == "create") then
 		-- Get the signature of this item and find it's stats.
-		local itemType, itemId, property, factor = Auctioneer.DecodeLink(itemData.link)
+		local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
 		if (factor ~= 0) then property = property.."x"..factor end
-		local faction = Auctioneer.GetFaction()
+		local faction = AucAdvanced.GetFaction()
 		if not data[faction] then data[faction] = {} end
 		if not data[faction].daily then data[faction].daily = { created = time() } end
 		if not data[faction].daily[itemId] then data[faction].daily[itemId] = "" end
@@ -145,16 +145,16 @@ function lib.ScanProcessor(operation, itemData, oldData)
 end
 
 function lib.GetPrice(hyperlink, faction)
-	local linkType,itemId,property,factor = Auctioneer.DecodeLink(hyperlink)
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
 
-	if not faction then faction = Auctioneer.GetFaction() end
+	if not faction then faction = AucAdvanced.GetFaction() end
 
 	local dayTotal, dayCount, dayAverage = 0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
 
-	local faction = Auctioneer.GetFaction()
+	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then return end
 
 	if data[faction].daily and data[faction].daily[itemId] then

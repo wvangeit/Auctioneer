@@ -1,5 +1,5 @@
 --[[
-	Auctioneer
+	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -42,10 +42,10 @@ If you do not supply a category, then the whole AH will be scanned and then repl
 
 local libName = "Simple"
 
-Auctioneer.Modules.Scan[libName] = {}
-local lib = Auctioneer.Modules.Scan[libName]
-lib.Print = Auctioneer.Print
-for k, v in pairs(Auctioneer.Const) do lib[k] = v end
+AucAdvanced.Modules.Scan[libName] = {}
+local lib = AucAdvanced.Modules.Scan[libName]
+lib.Print = AucAdvanced.Print
+for k, v in pairs(AucAdvanced.Const) do lib[k] = v end
 
 lib.isScanning = false
 lib.curPage = 0
@@ -53,12 +53,12 @@ lib.curCat = nil
 
 
 function lib.OnLoad()
-	if not AuctioneerScanSimpleData then AuctioneerScanSimpleData = {} end
-	if not AuctioneerScanSimpleLocal then AuctioneerScanSimpleLocal = {} end
-	local data = AuctioneerScanSimpleData
-	local ldata = AuctioneerScanSimpleLocal
+	if not AucAdvancedScanSimpleData then AucAdvancedScanSimpleData = {} end
+	if not AucAdvancedScanSimpleLocal then AucAdvancedScanSimpleLocal = {} end
+	local data = AucAdvancedScanSimpleData
+	local ldata = AucAdvancedScanSimpleLocal
 	if data.lastScan then
-		local faction = Auctioneer.GetFaction()
+		local faction = AucAdvanced.GetFaction()
 		if data.lastScan.faction ~= faction then
 			data.lastScan = ldata.lastScan
 		end
@@ -179,7 +179,7 @@ local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
 	lib.Unpack(curItem, statItem)
 	if (oldItem) then lib.Unpack(oldItem, statItemOld) end
-	for engine, engineLib in pairs(Auctioneer.Modules.Stat) do
+	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
 		if (engineLib.Processor) then
 			if (oldItem) then
 				engineLib.Processor("scan", operation, statItem, statItemOld)
@@ -195,8 +195,8 @@ function lib.Commit()
 	local inscount, delcount = 0, 0
 	if not lib.curScan then return end
 	if not lib.image then
-		local last = AuctioneerScanSimpleData.lastScan
-		if last and last.time and now-last.time<86400 and last.faction==Auctioneer.GetFaction() then
+		local last = AucAdvancedScanSimpleData.lastScan
+		if last and last.time and now-last.time<86400 and last.faction==AucAdvanced.GetFaction() then
 			lib.image = last.image
 		else
 			lib.image = {}
@@ -289,7 +289,7 @@ function lib.Commit()
 		lib.Print(("Warning, discrepency in current count: {{%d - %d + %d != %d}}"):format(oldCount, removeCount, newCount, currentCount))
 	end
 
-	lib.Print("Auctioneer finished scanning {{"..scanCount.."}} auctions:")
+	lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
 	lib.Print("  {{"..oldCount.."}} items in DB at start")
 	lib.Print("  {{"..sameCount.."}} unchanged items")
 	lib.Print("  {{"..newCount.."}} new items")
@@ -299,12 +299,12 @@ function lib.Commit()
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 	lib.Print("  ({{"..suspendCount.."}} of these are suspended)")
 
-	AuctioneerScanSimpleLocal.lastScan = {
+	AucAdvancedScanSimpleLocal.lastScan = {
 		image = lib.image,
-		faction = Auctioneer.GetFaction(),
+		faction = AucAdvanced.GetFaction(),
 		time = time(),
 	}
-	AuctioneerScanSimpleData.lastScan = AuctioneerScanSimpleLocal.lastScan
+	AucAdvancedScanSimpleData.lastScan = AucAdvancedScanSimpleLocal.lastScan
 	
 	lib.curScan = nil
 end

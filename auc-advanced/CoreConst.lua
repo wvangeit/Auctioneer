@@ -1,5 +1,5 @@
 --[[
-	Auctioneer
+	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -31,7 +31,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-Auctioneer.Const = {
+AucAdvanced.Const = {
 	InvTypes = {
 		INVTYPE_HEAD = 1,
 		INVTYPE_NECK = 2,
@@ -89,8 +89,8 @@ Auctioneer.Const = {
 	SUBCLASSES = { },
 }
 
-for i = 1, #Auctioneer.Const.CLASSES do
-	Auctioneer.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
+for i = 1, #AucAdvanced.Const.CLASSES do
+	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
 end
 
 

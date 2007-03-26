@@ -1,5 +1,5 @@
 --[[
-	Auctioneer
+	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -31,6 +31,6 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-Auctioneer.API = {}
-local lib = Auctioneer.API
+AucAdvanced.API = {}
+local lib = AucAdvanced.API
 
