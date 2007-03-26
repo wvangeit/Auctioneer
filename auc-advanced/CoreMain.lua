@@ -67,7 +67,7 @@ function AucAdvanced.DecodeLink(link)
 		local itemId, property,_,_,_,_,_,_,_,factor = EnhTooltip.BreakLink(link)
 		return linkType, itemId, property, factor
 	elseif (vartype == "number") then
-		return linkType, link, 0, 0
+		return "item", link, 0, 0
 	end
 	return
 end
