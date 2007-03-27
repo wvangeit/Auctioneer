@@ -1001,8 +1001,6 @@ function doHyperlink(reference, link, button)
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
 		if (itemName and EnhTTData.currentItem ~= itemName) then
-			EnhTTData.currentItem = itemName
-
 			local testPopup = false
 			if (button == "RightButton") then
 				testPopup = true
