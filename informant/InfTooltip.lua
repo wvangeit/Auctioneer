@@ -41,7 +41,7 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 	local buy = 0
 	local stacks = 1
 
-	local itemID, randomProp, enchant, uniqID, name, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus = EnhTooltip.BreakLink(link)
+	local itemID, randomProp, enchant, uniqID, _, gemSlot1, gemSlot2, gemSlot3, gemSlotBonus = EnhTooltip.BreakLink(link)
 
 	local itemInfo
 	if (itemID and itemID > 0) and (Informant) then
