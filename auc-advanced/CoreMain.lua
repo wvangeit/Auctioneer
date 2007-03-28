@@ -29,7 +29,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end

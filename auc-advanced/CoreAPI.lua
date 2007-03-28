@@ -29,36 +29,38 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 AucAdvanced.API = {}
 local lib = AucAdvanced.API
 
 
 --[[
-		This function acquires the current market value of the mentioned item using
-		a configurable algorithm to process the data used by the other installed
-		algorithms.
-		The result of this function does not take into account competition, it
-		simply returns what a particular item is "Worth", and not what you could
-		currently sell it for.
+	This function acquires the current market value of the mentioned item using
+	a configurable algorithm to process the data used by the other installed
+	algorithms.
+	The result of this function does not take into account competition, it
+	simply returns what a particular item is "Worth", and not what you could
+	currently sell it for.
 
-		AucAdvanced.API.GetMarketValue(itemLink, serverKey)
---]]
+	AucAdvanced.API.GetMarketValue(itemLink, serverKey)
+]]
 function lib.GetMarketValue(itemLink, serverKey)
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
 
-	local value
+	local total, count = 0, 0
 	for engine, engineLib in AucAdvanced.Modules.Stat do
 		if (engineLib.GetPrice) then
 			local price = engineLib.GetPrice(itemLink, serverKey)
 			if (price and price > 0) then
-				if (value) then value = min(price, value)
-				else value = price end
+				total = total + price
+				count = count + 1
 			end
 		end
 	end
-	return value
+	if (total > 0) and (count > 0) then
+		return total/count
+	end
 end
 
