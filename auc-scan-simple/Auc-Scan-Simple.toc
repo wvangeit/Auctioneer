@@ -3,9 +3,9 @@
 ##
 ## Interface: 20003
 ## LoadOnDemand: 1
-## Dependencies: Auctioneer
-## SavedVariables: AuctioneerScanSimpleData
-## SavedVariablesPerCharacter: AuctioneerScanSimpleLocal
+## Dependencies: Auc-Advanced
+## SavedVariables: AucAdvancedScanSimpleData
+## SavedVariablesPerCharacter: AucAdvancedScanSimpleLocal
 ##
 ## Version: <%version%>
 ## Revision: $Id$

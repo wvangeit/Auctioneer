@@ -4,8 +4,8 @@
 ## Interface: 20003
 ## LoadOnDemand: 0
 ## Disabled: 0
-## Dependencies: Auctioneer
-## SavedVariables: AuctioneerStatSimpleData
+## Dependencies: Auc-Advanced
+## SavedVariables: AucAdvancedSimpleData
 ##
 ## Version: <%version%>
 ## Revision: $Id$
