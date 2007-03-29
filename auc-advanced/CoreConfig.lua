@@ -104,5 +104,6 @@ function lib.ScanCommand(cat)
 end
 
 SLASH_AUCADVANCED1 = "/auc"
+SLASH_AUCADVANCED2 = "/aadv"
 SlashCmdList["AUCADVANCED"] = function(msg) lib.CommandHandler(strsplit(" ", msg)) end
 
