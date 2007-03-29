@@ -1148,7 +1148,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 		(EnhTTData.forcePopupKey == "shift" and IsShiftKeyDown())
 	)
 
-	if ((forcePopup == true) or ((forcePopup == nil) and (popupKeyPressed))) then
+	if (forcePopup or popupKeyPressed) then
 		local popupTest = checkPopup(name, link, quality, count, price, hyperlink)
 		if (popupTest) then
 			showTip = false
