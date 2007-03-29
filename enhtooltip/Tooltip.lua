@@ -461,7 +461,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		return
 	end
 	if (EnhancedTooltip.hasEmbed and (not skipEmbedRender)) then
-		embedRender()
+		embedRender(currentTooltip, EnhTTData.embedLines)
 		EnhTTData.showIgnore=true
 		currentTooltip:Show()
 		EnhTTData.showIgnore=false
@@ -752,11 +752,11 @@ function getTextGSC(money, exact, dontUseColorCodes)
 	return gsc
 end
 
-function embedRender()
-	for pos, lData in pairs(EnhTTData.embedLines) do
-		EnhTTData.currentGametip:AddLine(lData.line)
+function embedRender(currentTooltip, lines)
+	for pos, lData in pairs(lines) do
+		currentTooltip:AddLine(lData.line)
 		if (lData.r) then
-			local lastLine = getglobal(EnhTTData.currentGametip:GetName().."TextLeft"..EnhTTData.currentGametip:NumLines())
+			local lastLine = getglobal(currentTooltip:GetName().."TextLeft"..currentTooltip:NumLines())
 			lastLine:SetTextColor(lData.r,lData.g,lData.b)
 		end
 	end
