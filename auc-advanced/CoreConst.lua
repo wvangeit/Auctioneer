@@ -93,4 +93,6 @@ for i = 1, #AucAdvanced.Const.CLASSES do
 	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
 end
 
-
+AucAdvanced.Defaults = {
+	Scanner = "Simple",
+}

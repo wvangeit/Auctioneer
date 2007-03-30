@@ -77,7 +77,8 @@ function lib.CommandHandler(command, ...)
 end
 
 function lib.ScanCommand(cat)
-	if cat then cat = tonumber(cat) end
+	cat = tonumber(cat)
+	--If there was a requested category to scan, we'll first check if its a valid category
 	if cat then
 		local catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
@@ -86,12 +87,13 @@ function lib.ScanCommand(cat)
 			cat = nil
 		end
 	end
+	
+	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
 		lib.Print("Beginning scanning: {{All categories}}")
 	end
 
-	local scanner = AucAdvanced.scanner
-	if not scanner then scanner = "Simple" end
+	local scanner = AucAdvanced.scanner or AucAdvanced.Defaults.Scanner
 
 	if not AucAdvanced.Modules.Scan[scanner] then
 		local loaded, reason = LoadAddOn("Auc-Scan-"..scanner)
