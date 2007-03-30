@@ -112,7 +112,7 @@ function AucAdvanced.TooltipHook(vars, ret, ...)
 end
 
 function AucAdvanced.OnLoad(addon)
-	if (addon == "auctioneer") then
+	if (addon == "auc-advanced") then
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, AucAdvanced.TooltipHook)
 	end
 	local _, sys, eng = strsplit("-", addon)
@@ -133,7 +133,7 @@ function AucAdvanced.OnEvent(...)
 	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
 		local addon = string.lower(arg)
-		if (addon == "auctioneer" or addon:sub(1,4) == "auc-") then
+		if (addon:sub(1,4) == "auc-") then
 			AucAdvanced.OnLoad(addon)
 		end
 	end
