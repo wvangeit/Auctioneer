@@ -313,7 +313,7 @@ end
 
 function hideTooltip()
 	EnhancedTooltip:Hide()
-	EnhTTData.currentItem = ""
+	EnhTTData.currentItem = nil
 	EnhTTData.hideTime = 0
 end
 
@@ -1128,7 +1128,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	if (count) then itemSig = itemSig..count end
 	if (price) then itemSig = itemSig..price end
 
-	if (EnhTTData.currentItem and EnhTTData.currentItem == itemSig) then
+	if (EnhTTData.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
 		showTooltip(EnhTTData.currentGametip)
 		return
@@ -1422,7 +1422,7 @@ function gtHookSetText(funcArgs, retval, frame)
 end
 
 function gtHookAppendText(funcArgs, retVal, frame)
-	if (EnhTTData.currentGametip and EnhTTData.currentItem and EnhTTData.currentItem ~= "") then
+	if (EnhTTData.currentGametip and EnhTTData.currentItem) then
 		return showTooltip(EnhTTData.currentGametip, true)
 	end
 end
@@ -1431,7 +1431,7 @@ function gtHookShow(funcArgs, retVal, frame)
 	if (EnhTTData.hookRecursion) then
 		return
 	end
-	if (EnhTTData.currentGametip and EnhTTData.currentItem and EnhTTData.currentItem ~= "") then
+	if (EnhTTData.currentGametip and EnhTTData.currentItem) then
 		EnhTTData.hookRecursion = true
 		showTooltip(EnhTTData.currentGametip, true)
 		EnhTTData.hookRecursion = nil
