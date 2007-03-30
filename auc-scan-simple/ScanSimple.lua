@@ -179,12 +179,14 @@ local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
 	lib.Unpack(curItem, statItem)
 	if (oldItem) then lib.Unpack(oldItem, statItemOld) end
-	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if (engineLib.Processor) then
-			if (oldItem) then
-				engineLib.Processor("scan", operation, statItem, statItemOld)
-			else
-				engineLib.Processor("scan", operation, statItem)
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.ScanProcessor) then
+				if (oldItem) then
+					engineLib.ScanProcessor(operation, statItem, statItemOld)
+				else
+					engineLib.ScanProcessor(operation, statItem)
+				end
 			end
 		end
 	end

@@ -35,80 +35,54 @@ local libName = "StdDev"
 
 AucAdvanced.Modules.Stat[libName] = {}
 local lib = AucAdvanced.Modules.Stat[libName]
-lib.Print = AucAdvanced.Print
+local self = {}
+local print = AucAdvanced.Print
 
 local data
-function makeData()
-	if data then return end
-	if (not AucAdvancedStatStdDevData) then AucAdvancedStatStdDevData = {} end
-	data = AucAdvancedStatStdDevData
-	lib.DataLoaded()
-end
+
+--[[
+The following functions are part of the module's exposed methods:
+	GetName()         (required) Should return this module's full name
+	CommandHandler()  (optional) Slash command handler for this module
+	Processor()       (optional) Processes messages sent by Auctioneer
+	ScanProcessor()   (optional) Processes items from the scan manager
+*	GetPrice()        (required) Returns estimated price for item link
+*	GetPriceColumns() (optional) Returns the column names for GetPrice
+	OnLoad()          (optional) Receives load message for all modules
+
+	(*) Only implemented in stats modules; util modules do not provide
+]]
 
 function lib.GetName()
 	return libName
 end
 
 function lib.CommandHandler(command, ...)
-	if (not data) then makeData() end
+	if (not data) then self.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
-		lib.Print("Help for Auctioneer Advanced - "..libName)
+		print("Help for Auctioneer Advanced - "..libName)
 		local line = "  {{/aul "..libName:lower()
-		lib.Print(line, "help}} - this", libName, "help")
-		lib.Print(line, "clear}} - clear current", myFaction, libName, "price database")
+		print(line, "help}} - this", libName, "help")
+		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then
-		lib.Print("Clearing all stats for {{", myFaction, "}}")
+		print("Clearing all stats for {{", myFaction, "}}")
 		data[myFaction] = nil
 	end
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then makeData() end
-	if (callbackType == "scan") then
-		lib.ScanProcessor(...)
-	elseif (callbackType == "tooltip") then
-		lib.TooltipProcessor(...)
+	if (not data) then self.makeData() end
+	if (callbackType == "tooltip") then
+		lib.ProcessTooltip(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
 	end
 end
 
-local function unpackStatIter(data, ...)
-	local c = select("#", ...)
-	local v
-	for i = 1, c do
-		v = select(i, ...)
-		local property, info = strsplit(":", v)
-		property = tonumber(property)
-		if (property and info) then
-			data[property] = { strsplit(";", info) }
-			local item
-			for i=1, #data[property] do
-				item = data[property][i]
-				data[property][i] = tonumber(item) or item
-			end
-		end
-	end
-end
-function lib.UnpackStats(dataItem)
-	local data = {}
-	if (dataItem) then
-		unpackStatIter(data, strsplit(",", dataItem))
-	end
-	return data
-end
-function lib.PackStats(data)
-	local stats = ""
-	local joiner = ""
-	for property, info in pairs(data) do
-		stats = stats..joiner..property..":"..strjoin(";", unpack(info))
-		joiner = ","
-	end
-	return stats
-end
-
 function lib.ScanProcessor(operation, itemData, oldData)
+	if (not data) then self.makeData() end
+
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -128,13 +102,13 @@ function lib.ScanProcessor(operation, itemData, oldData)
 		if (factor ~= 0) then property = property.."x"..factor end
 		local faction = AucAdvanced.GetFaction()
 		if not data[faction] then data[faction] = {} end
-		local stats = lib.UnpackStats(data[faction][itemId])
+		local stats = self.UnpackStats(data[faction][itemId])
 		if not stats[property] then stats[property] = {} end
 		if #stats[property] >= 100 then
 			table.remove(stats[property], 1)
 		end
 		table.insert(stats[property], buyout)
-		data[faction][itemId] = lib.PackStats(stats)
+		data[faction][itemId] = self.PackStats(stats)
 	elseif (operation == "delete") then
 	elseif (operation == "update") then
 	elseif (operation == "leave") then
@@ -151,7 +125,7 @@ function lib.GetPrice(hyperlink, faction)
 
 	if not data[faction][itemId] then return end
 
-	local stats = lib.UnpackStats(data[faction][itemId])
+	local stats = self.UnpackStats(data[faction][itemId])
 	if not stats[property] then return end
 
 	local count = #stats[property]
@@ -193,7 +167,7 @@ function lib.GetPriceColumns()
 	return "Average", "Mean", false, "Std Deviation", "Variance", "Count"
 end
 
-function lib.TooltipProcessor(frame, name, hyperlink, quality, quantity, cost, ...)
+function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -219,12 +193,57 @@ function lib.TooltipProcessor(frame, name, hyperlink, quality, quantity, cost, .
 	end
 end
 
-function lib.DataLoaded()
+function lib.OnLoad(addon)
+	self.makeData()
+end
+
+--[[ Local functions ]]--
+
+function self.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
 	
 end
 
-function lib.OnLoad(addon)
-	makeData()
+function self.UnpackStatIter(data, ...)
+	local c = select("#", ...)
+	local v
+	for i = 1, c do
+		v = select(i, ...)
+		local property, info = strsplit(":", v)
+		property = tonumber(property)
+		if (property and info) then
+			data[property] = { strsplit(";", info) }
+			local item
+			for i=1, #data[property] do
+				item = data[property][i]
+				data[property][i] = tonumber(item) or item
+			end
+		end
+	end
 end
+function self.UnpackStats(dataItem)
+	local data = {}
+	if (dataItem) then
+		self.UnpackStatIter(data, strsplit(",", dataItem))
+	end
+	return data
+end
+function self.PackStats(data)
+	local stats = ""
+	local joiner = ""
+	for property, info in pairs(data) do
+		stats = stats..joiner..property..":"..strjoin(";", unpack(info))
+		joiner = ","
+	end
+	return stats
+end
+
+function self.makeData()
+	if data then return end
+	if (not AucAdvancedStatStdDevData) then AucAdvancedStatStdDevData = {} end
+	data = AucAdvancedStatStdDevData
+	self.DataLoaded()
+end
+
+
