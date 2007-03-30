@@ -13,8 +13,8 @@
 ##
 CoreManifest.lua
 
-babylonian\Load.xml
-configator\Load.xml
+Babylonian\Load.xml
+Configator\Load.xml
 CoreStrings.lua
 CoreLocale.lua
 
@@ -23,4 +23,4 @@ CoreAPI.lua
 CoreConst.lua
 CoreConfig.lua
 
-modules\Active.xml
+Modules\Active.xml
