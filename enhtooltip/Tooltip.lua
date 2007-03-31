@@ -397,7 +397,6 @@ end
 
 function clearTooltip()
 	hideTooltip()
-	EnhancedTooltip.hasEmbed = false
 	EnhancedTooltip.curEmbed = false
 	EnhancedTooltip.hasData = false
 	EnhancedTooltip.hasIcon = false
@@ -458,7 +457,10 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	if (EnhTTData.showIgnore) then
 		return
 	end
-	if (EnhancedTooltip.hasEmbed and (not skipEmbedRender)) then
+
+	-- First thing todo is to update the embeded tooltip to get the correct
+	-- width/height it requires, if there are any embeded lines to be displayed.
+	if (next(EnhTTData.embedLines) and (not skipEmbedRender)) then
 		embedRender(currentTooltip, EnhTTData.embedLines)
 		EnhTTData.showIgnore=true
 		currentTooltip:Show()
@@ -471,7 +473,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local lineCount = EnhancedTooltip.lineCount
 	local headerCount = EnhancedTooltip.headerCount
 	if ((lineCount == 0) and (headerCount == 0)) then
-		if (not EnhancedTooltip.hasEmbed) then
+		if (not next(EnhTTData.embedLines)) then
 			hideTooltip()
 			return
 		end
@@ -764,7 +766,6 @@ end
 ]]
 function addLine(lineText, moneyAmount, embed, bExact)
 	if (embed) and (EnhTTData.currentGametip) then
-		EnhancedTooltip.hasEmbed = true
 		EnhancedTooltip.curEmbed = true
 		local line = ""
 		if (moneyAmount) then
@@ -818,7 +819,6 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 	EnhancedTooltip.headerCount = curHeader
 
 	if (embed) and (EnhTTData.currentGametip) then
-		EnhancedTooltip.hasEmbed = true
 		EnhancedTooltip.curHeaderEmbed = true
 		local line = ""
 		if (moneyAmount) then
@@ -870,7 +870,6 @@ end
 
 function addSeparator(embed)
 	if (embed) and (EnhTTData.currentGametip) then
-		EnhancedTooltip.hasEmbed = true
 		EnhancedTooltip.curEmbed = true
 		table.insert(EnhTTData.embedLines, {line = " "})
 		return
@@ -1001,7 +1000,8 @@ function doHyperlink(reference, link, button)
 			end
 			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
 			if (callRes == true) then
-				EnhTTData.oldChatItem = {reference = reference, link = link, button = button, embed = EnhancedTooltip.hasEmbed}
+				local hasEmbed = #EnhTTData.embedLines > 0
+				EnhTTData.oldChatItem = {reference = reference, link = link, button = button, embed = hasEmbed}
 			elseif (callRes == false) then
 				return false
 			end
