@@ -429,7 +429,12 @@ function clearTooltip()
 	EnhancedTooltip.headerCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
-	EnhTTData.embedLines = {}
+
+	-- clear the embedLines table, using ipairs instead of = {} to allow
+	-- reusing old tables, which should be quite common for this table
+	for i in ipairs(EnhTTData.embedLines) do
+		EnhTTData.embedLines[i] = nil
+	end
 end
 
 function getRect(object)
@@ -755,7 +760,7 @@ function getTextGSC(money, exact, dontUseColorCodes)
 end
 
 function embedRender(currentTooltip, lines)
-	for pos, lData in ipairs(lines) do
+	for _, lData in ipairs(lines) do
 		currentTooltip:AddLine(lData.text, lData.r, lData.g, lData.b)
 	end
 end
