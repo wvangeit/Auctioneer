@@ -430,9 +430,7 @@ function clearTooltip()
 	EnhancedTooltip.headerCount = 0
 	EnhancedTooltip.moneyCount = 0
 	EnhancedTooltip.minWidth = 0
-	for curLine in pairs(EnhTTData.embedLines) do
-		EnhTTData.embedLines[curLine] = nil
-	end
+	EnhTTData.embedLines = {}
 end
 
 function getRect(object)
@@ -753,12 +751,8 @@ function getTextGSC(money, exact, dontUseColorCodes)
 end
 
 function embedRender(currentTooltip, lines)
-	for pos, lData in pairs(lines) do
-		currentTooltip:AddLine(lData.line)
-		if (lData.r) then
-			local lastLine = getglobal(currentTooltip:GetName().."TextLeft"..currentTooltip:NumLines())
-			lastLine:SetTextColor(lData.r,lData.g,lData.b)
-		end
+	for pos, lData in ipairs(lines) do
+		currentTooltip:AddLine(lData.line, lData.r, lData.g, lData.b)
 	end
 end
 
