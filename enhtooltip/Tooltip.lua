@@ -754,7 +754,7 @@ end
 
 function embedRender(currentTooltip, lines)
 	for pos, lData in ipairs(lines) do
-		currentTooltip:AddLine(lData.line, lData.r, lData.g, lData.b)
+		currentTooltip:AddLine(lData.text, lData.r, lData.g, lData.b)
 	end
 end
 
@@ -767,13 +767,13 @@ end
 function addLine(lineText, moneyAmount, embed, bExact)
 	if (embed) and (EnhTTData.currentGametip) then
 		EnhancedTooltip.curEmbed = true
-		local line = ""
+		local text = ""
 		if (moneyAmount) then
-			line = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
+			text = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
 		else
-			line = lineText
+			text = lineText
 		end
-		table.insert(EnhTTData.embedLines, {line = line})
+		table.insert(EnhTTData.embedLines, {text = text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -820,13 +820,13 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 
 	if (embed) and (EnhTTData.currentGametip) then
 		EnhancedTooltip.curHeaderEmbed = true
-		local line = ""
+		local text = ""
 		if (moneyAmount) then
-			line = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
+			text = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
 		else
-			line = lineText
+			text = lineText
 		end
-		table.insert(EnhTTData.embedLines, curHeader, {line = line})
+		table.insert(EnhTTData.embedLines, curHeader, {text = text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -871,7 +871,7 @@ end
 function addSeparator(embed)
 	if (embed) and (EnhTTData.currentGametip) then
 		EnhancedTooltip.curEmbed = true
-		table.insert(EnhTTData.embedLines, {line = " "})
+		table.insert(EnhTTData.embedLines, {text = " "})
 		return
 	end
 	EnhancedTooltip.hasData = true
