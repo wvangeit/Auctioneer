@@ -1001,7 +1001,7 @@ function doHyperlink(reference, link, button)
 			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #EnhTTData.embedLines > 0
-				EnhTTData.oldChatItem = {reference = reference, link = link, button = button, embed = hasEmbed}
+				EnhTTData.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
 			elseif (callRes == false) then
 				return false
 			end
@@ -1020,7 +1020,7 @@ function checkHide()
 		elseif EnhTTData.oldChatItem then
 			-- closing another tooltip
 			-- redisplay old chatlinkdata, if it was not embeded
-			if not EnhTTData.oldChatItem.embed then
+			if not EnhTTData.oldChatItem.isEmbeded then
 				doHyperlink(EnhTTData.oldChatItem.reference, EnhTTData.oldChatItem.link, EnhTTData.oldChatItem.button)
 			end
 		end
