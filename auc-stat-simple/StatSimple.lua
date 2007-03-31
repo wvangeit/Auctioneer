@@ -48,7 +48,7 @@ The following functions are part of the module's exposed methods:
 	ScanProcessor()   (optional) Processes items from the scan manager
 *	GetPrice()        (required) Returns estimated price for item link
 *	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
+	OnLoad()          (optional) Receives load message for this specific module
 
 	(*) Only implemented in stats modules; util modules do not provide
 ]]
