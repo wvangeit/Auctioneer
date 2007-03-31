@@ -74,7 +74,7 @@ end
 
 function lib.ScanCommand(cat)
 	cat = tonumber(cat)
-	--If there was a requested category to scan, we'll first check if its a valid category
+	--If there was a requested category to scan, we'll first check if it's a valid category
 	if cat then
 		local catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
