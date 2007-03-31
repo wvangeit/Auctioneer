@@ -35,7 +35,7 @@ AucAdvanced.Config = {}
 local lib = AucAdvanced.Config
 lib.Print = AucAdvanced.Print
 
-function lib.CommandHandler(command, ...)
+function lib.CommandHandler(command, module, ...)
 	command = command:lower()
 	if (command == "help") then
 		lib.Print("Auctioneer Advanced Help")
@@ -49,18 +49,14 @@ function lib.CommandHandler(command, ...)
 			end
 		end
 	elseif command == "begin" then
-		lib.ScanCommand(...)
+		lib.ScanCommand(module, ...)
 	else
-		local sys, eng = strsplit(" ", command)
-		if sys and eng then
+		if command and module then
 			for system, systemMods in pairs(AucAdvanced.Modules) do
-				if sys == system:lower() then
+				if command == system:lower() then
 					for engine, engineLib in pairs(systemMods) do
-						if command == engine:lower() then
+						if module == engine:lower() then
 							if engineLib.CommandHandler then
-								if not engineLib.Print then
-									engineLib.Print = lib.Print
-								end
 								engineLib.CommandHandler(...)
 								return
 							end
@@ -87,7 +83,7 @@ function lib.ScanCommand(cat)
 			cat = nil
 		end
 	end
-	
+
 	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
 		lib.Print("Beginning scanning: {{All categories}}")
