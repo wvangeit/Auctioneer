@@ -182,7 +182,7 @@ end
 local EnhTTData = {
 	showIgnore = false,
 	moneySpacing = 4,
-	embedLines = {},
+	embedLines = {},   -- list of all embeded lines in/for the current tooltip
 	eventTimer = 0,
 	hideTime = 0,
 	currentGametip = nil,
@@ -454,6 +454,7 @@ function getRect(object)
 end
 
 function showTooltip(currentTooltip, skipEmbedRender)
+	-- prevent recursive calls to showTooltip()
 	if (EnhTTData.showIgnore) then
 		return
 	end
@@ -462,9 +463,10 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	-- width/height it requires, if there are any embeded lines to be displayed.
 	if (next(EnhTTData.embedLines) and (not skipEmbedRender)) then
 		embedRender(currentTooltip, EnhTTData.embedLines)
-		EnhTTData.showIgnore=true
+		-- update the tooltip without calling showTooltip recursivly
+		EnhTTData.showIgnore = true
 		currentTooltip:Show()
-		EnhTTData.showIgnore=false
+		EnhTTData.showIgnore = false
 	end
 	if (not EnhancedTooltip.hasData) then
 		return
@@ -993,6 +995,7 @@ function doHyperlink(reference, link, button)
 	-- Regular- or alt-clicking will close an existing tooltip, so if one is now visible it is new, and should be enhanced by us
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
+		-- Prevent multiple calls to show one tooltip
 		if (itemName and EnhTTData.currentItem ~= itemName) then
 			local testPopup = false
 			if (button == "RightButton") then
@@ -1143,6 +1146,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	)
 
 	if (forcePopup or popupKeyPressed) then
+		-- check, if we should show the tooltip even if a popup is being displayed
 		local popupTest = checkPopup(name, link, quality, count, price, hyperlink)
 		if (popupTest) then
 			showTip = false
