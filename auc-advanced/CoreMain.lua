@@ -72,11 +72,11 @@ function AucAdvanced.DecodeLink(link)
 	return
 end
 
-function AucAdvanced.GetFaction() 
+function AucAdvanced.GetFaction()
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
-	
+
 	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
 	if AucAdvancedConfig.factions[currentZone] then
 		factionGroup = AucAdvancedConfig.factions[currentZone]
@@ -113,10 +113,11 @@ end
 
 function AucAdvanced.OnLoad(addon)
 	if (addon == "auc-advanced") then
+		AucAdvanced.LoadEmbedded()
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, AucAdvanced.TooltipHook)
 	end
 	local _, sys, eng = strsplit("-", addon)
-	
+
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (sys and eng and sys == system:lower() and eng == engine:lower() and engineLib.OnLoad) then
@@ -126,6 +127,12 @@ function AucAdvanced.OnLoad(addon)
 				engineLib.Processor("load", addon)
 			end
 		end
+	end
+end
+
+function AucAdvanced.LoadEmbedded()
+	for index, addon in ipairs(AucAdvanced.EmbeddedModules) do
+		AucAdvanced.OnLoad(addon:lower())
 	end
 end
 

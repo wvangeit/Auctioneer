@@ -5,10 +5,12 @@ print "Scanning plugins folder...\n";
 open OUTPUT, "> Active.xml";
 print OUTPUT qq(<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\\FrameXML\\UI.xsd">\n);
 
-$active = $inactive = 0;
+$active = $inactive = $count = 0;
+my @embeddedModules;
 for $fn (<auc-*>) {
 	if (-d $fn) {
 		if (-f "$fn/Embed.xml") {
+			@embeddedModules[$active] = $fn;
 			$active++;
 			print "  + Activating: $fn\n";
 			print OUTPUT "\t<Include file=\"$fn\\Embed.xml\"/>\n";
@@ -19,6 +21,13 @@ for $fn (<auc-*>) {
 		}
 	}
 }
+
+print OUTPUT "\n\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n";
+while ($count < @embeddedModules) {
+	print OUTPUT "\t\t\t\"$embeddedModules[$count]\",\n";
+	$count++
+}
+print OUTPUT "\t\t}\n\t</Script>\n";
 print OUTPUT "</Ui>";
 
 print "Activated: $active modules.\n";

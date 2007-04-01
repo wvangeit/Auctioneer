@@ -21,6 +21,7 @@ local output = io.open("Active.xml", "w");
 output:write([[<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">]].."\n")
 
 local dirs = {}
+local embeddedModules = {}
 local active, invalid = 0,0
 for fn in files(".") do
 	if fn and fn:lower():sub(0,4) == "auc-" then
@@ -29,6 +30,7 @@ for fn in files(".") do
 			local fh = io.open(fn..pathsep.."Embed.xml", "r")
 			if (fh) then
 				active = active + 1
+				embeddedModules[active] = fn
 				print("  + Activating: "..fn)
 				output:write("\t<Include file=\""..fn.."\\Embed.xml\"/>\n");
 			else
@@ -38,6 +40,12 @@ for fn in files(".") do
 		end
 	end
 end
+
+output:write("\n\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n")
+for index, module in ipairs(embeddedModules) do
+	output:write("\t\t\t\""..module.."\",\n")
+end
+output:write("\t\t}\n\t</Script>\n")
 output:write("</Ui>")
 
 print("Activated: "..active.." modules.")
