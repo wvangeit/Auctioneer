@@ -498,9 +498,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	local currentWidth = currentTooltip:GetWidth()
 	if (currentWidth < requiredWidth) then
 		currentTooltip:SetWidth(requiredWidth - 20)
-		EnhTTData.showIgnore=true
-		currentTooltip:Show()
-		EnhTTData.showIgnore=false
 	else
 		requiredWidth = currentWidth
 	end
