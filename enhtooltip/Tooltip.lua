@@ -473,18 +473,14 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		currentTooltip:Show()
 		EnhTTData.showIgnore = false
 	end
+
+	-- if there is no data for the enhanced tooltip frame, we've got nothing todo
 	if (not EnhancedTooltip.hasData) then
 		return
 	end
 
-	local lineCount = EnhancedTooltip.lineCount
+	local lineCount   = EnhancedTooltip.lineCount
 	local headerCount = EnhancedTooltip.headerCount
-	if ((lineCount == 0) and (headerCount == 0)) then
-		if (not next(EnhTTData.embedLines)) then
-			hideTooltip()
-			return
-		end
-	end
 
 	-- We set the position of the normal text lines just below the last header
 	-- line, so they are displayed at the correct place.
