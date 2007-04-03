@@ -48,7 +48,7 @@ if (AucAdvanced.Version == "<".."%version%>") then
 	AucAdvanced.Version = "5.0.DEV";
 end
 
-local lcl = {}
+local private = {}
 
 -- For our modular stats system, each stats engine should add their
 -- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
@@ -119,7 +119,7 @@ end
 AucAdvanced.GetFaction = AucAdvanced.Utilities.GetFaction
 
 
-function lcl.TooltipHook(vars, ret, ...)
+function private.TooltipHook(vars, ret, ...)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then engineLib.Processor("tooltip", ...) end
@@ -127,9 +127,9 @@ function lcl.TooltipHook(vars, ret, ...)
 	end
 end
 
-function lcl.OnLoad(addon)
+function private.OnLoad(addon)
 	if (addon == "auc-advanced") then
-		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, lcl.TooltipHook)
+		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
 	end
 	local _, sys, eng = strsplit("-", addon)
 	
@@ -145,17 +145,17 @@ function lcl.OnLoad(addon)
 	end
 end
 
-function lcl.OnEvent(...)
+function private.OnEvent(...)
 	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
 		local addon = string.lower(arg)
 		if (addon:sub(1,4) == "auc-") then
-			lcl.OnLoad(addon)
+			private.OnLoad(addon)
 		end
 	end
 end
 
-lcl.Frame = CreateFrame("Frame")
-lcl.Frame:RegisterEvent("ADDON_LOADED")
-lcl.Frame:SetScript("OnEvent", lcl.OnEvent)
+private.Frame = CreateFrame("Frame")
+private.Frame:RegisterEvent("ADDON_LOADED")
+private.Frame:SetScript("OnEvent", private.OnEvent)
 

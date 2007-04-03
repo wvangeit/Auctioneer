@@ -33,20 +33,20 @@
 
 AucAdvanced.Config = {}
 local lib = AucAdvanced.Config
-local lcl = {}
-lcl.Print = AucAdvanced.Utilities.Print
+local private = {}
+private.Print = AucAdvanced.Utilities.Print
 
 
-function lcl.CommandHandler(command, ...)
+function private.CommandHandler(command, ...)
 	command = command:lower()
 	if (command == "help") then
-		lcl.Print("Auctioneer Advanced Help")
-		lcl.Print("  {{/auc help}} - Show this help")
-		lcl.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
+		private.Print("Auctioneer Advanced Help")
+		private.Print("  {{/auc help}} - Show this help")
+		private.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
-					lcl.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
+					private.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
 				end
 			end
 		end
@@ -73,8 +73,8 @@ function lcl.CommandHandler(command, ...)
 		end
 
 		-- No match found
-		lcl.Print("Unable to find command: "..command)
-		lcl.Print("Type {{/auc help}} for help")
+		private.Print("Unable to find command: "..command)
+		private.Print("Type {{/auc help}} for help")
 	end
 end
 
@@ -84,7 +84,7 @@ function lib.ScanCommand(cat)
 	if cat then
 		local catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
-			lcl.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
+			private.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
 		else
 			cat = nil
 		end
@@ -92,7 +92,7 @@ function lib.ScanCommand(cat)
 	
 	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
-		lcl.Print("Beginning scanning: {{All categories}}")
+		private.Print("Beginning scanning: {{All categories}}")
 	end
 
 	local scanner = AucAdvanced.scanner or AucAdvanced.Defaults.Scanner
@@ -109,5 +109,5 @@ end
 
 SLASH_AUCADVANCED1 = "/auc"
 SLASH_AUCADVANCED2 = "/aadv"
-SlashCmdList["AUCADVANCED"] = function(msg) lcl.CommandHandler(strsplit(" ", msg)) end
+SlashCmdList["AUCADVANCED"] = function(msg) private.CommandHandler(strsplit(" ", msg)) end
 

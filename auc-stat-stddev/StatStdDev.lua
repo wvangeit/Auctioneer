@@ -36,7 +36,7 @@ local libType = "Stat"
 
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
-local self = {}
+local private = {}
 local print = AucAdvanced.Utilities.Print
 
 local data
@@ -60,7 +60,7 @@ function lib.GetName()
 end
 
 function lib.CommandHandler(command, ...)
-	if (not data) then self.makeData() end
+	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
@@ -74,7 +74,7 @@ function lib.CommandHandler(command, ...)
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then self.makeData() end
+	if (not data) then private.makeData() end
 	if (callbackType == "tooltip") then
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "load") then
@@ -84,7 +84,7 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
-	if (not data) then self.makeData() end
+	if (not data) then private.makeData() end
 
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
@@ -101,13 +101,13 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if (factor ~= 0) then property = property.."x"..factor end
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
-	local stats = self.UnpackStats(data[faction][itemId])
+	local stats = private.UnpackStats(data[faction][itemId])
 	if not stats[property] then stats[property] = {} end
 	if #stats[property] >= 100 then
 		table.remove(stats[property], 1)
 	end
 	table.insert(stats[property], buyout)
-	data[faction][itemId] = self.PackStats(stats)
+	data[faction][itemId] = private.PackStats(stats)
 end
 
 function lib.GetPrice(hyperlink, faction)
@@ -120,7 +120,7 @@ function lib.GetPrice(hyperlink, faction)
 
 	if not data[faction][itemId] then return end
 
-	local stats = self.UnpackStats(data[faction][itemId])
+	local stats = private.UnpackStats(data[faction][itemId])
 	if not stats[property] then return end
 
 	local count = #stats[property]
@@ -189,18 +189,18 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 end
 
 function lib.OnLoad(addon)
-	self.makeData()
+	private.makeData()
 end
 
 --[[ Local functions ]]--
 
-function self.DataLoaded()
+function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
 	
 end
 
-function self.UnpackStatIter(data, ...)
+function private.UnpackStatIter(data, ...)
 	local c = select("#", ...)
 	local v
 	for i = 1, c do
@@ -217,14 +217,14 @@ function self.UnpackStatIter(data, ...)
 		end
 	end
 end
-function self.UnpackStats(dataItem)
+function private.UnpackStats(dataItem)
 	local data = {}
 	if (dataItem) then
-		self.UnpackStatIter(data, strsplit(",", dataItem))
+		private.UnpackStatIter(data, strsplit(",", dataItem))
 	end
 	return data
 end
-function self.PackStats(data)
+function private.PackStats(data)
 	local stats = ""
 	local joiner = ""
 	for property, info in pairs(data) do
@@ -234,11 +234,11 @@ function self.PackStats(data)
 	return stats
 end
 
-function self.makeData()
+function private.makeData()
 	if data then return end
 	if (not AucAdvancedStatStdDevData) then AucAdvancedStatStdDevData = {} end
 	data = AucAdvancedStatStdDevData
-	self.DataLoaded()
+	private.DataLoaded()
 end
 
 

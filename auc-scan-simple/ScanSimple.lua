@@ -45,15 +45,15 @@ local libType = "Scan"
 
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
-local lcl = {}
+local private = {}
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 
-lcl.isScanning = false
+private.isScanning = false
 
-lcl.curPage = 0
-lcl.curCat = nil
+private.curPage = 0
+private.curCat = nil
 
 
 function lib.OnLoad()
@@ -79,9 +79,9 @@ end
 
 function lib.StartScan(cat)
 	if AuctionFrame and AuctionFrame:IsVisible() then
-		lcl.curCat = cat
-		lcl.curScan = nil
-		lcl.isScanning = true
+		private.curCat = cat
+		private.curScan = nil
+		private.isScanning = true
 		lib.ScanPage(0)
 	else
 		message("Steady on; You'll need to talk to the auctioneer first!")
@@ -89,7 +89,7 @@ function lib.StartScan(cat)
 end
 
 function lib.IsScanning()
-	if (lcl.isScanning) then
+	if (private.isScanning) then
 		if (AuctionFrame and AuctionFrame:IsVisible()) then
 			return true
 		else
@@ -101,7 +101,7 @@ function lib.IsScanning()
 	return false
 end
 
-function lcl.Unpack(item, storage)
+function private.Unpack(item, storage)
 	if not storage then storage = {} end
 	storage.link = item[Const.LINK]
 	storage.useLevel = item[Const.ULEVEL]
@@ -126,7 +126,7 @@ function lcl.Unpack(item, storage)
 	return storage
 end
 
-function lcl.IsIdentical(focus, compare)
+function private.IsIdentical(focus, compare)
 	for i = 1, Const.SELLER do
 		if (i ~= Const.TIME and focus[i] ~= compare[i]) then
 			return false
@@ -134,7 +134,7 @@ function lcl.IsIdentical(focus, compare)
 	end
 	return true
 end
-function lcl.IsSameItem(focus, compare, onlyDirt)
+function private.IsSameItem(focus, compare, onlyDirt)
 	if onlyDirt then
 		local flag = focus[Const.FLAG]
 		if not flag or bit.band(flag, Const.FLAG_DIRTY) == 0 then
@@ -162,18 +162,18 @@ function lib.FindItem(item, image, lut)
 		local list = lut[item[Const.LINK]]
 		if not list then return false
 		elseif type(list) == "number" then
-			if (lcl.IsSameItem(image[list], item, true)) then return list end
+			if (private.IsSameItem(image[list], item, true)) then return list end
 		else
 			local pos
 			for i=1, #list do
 				pos = list[i]
-				if (lcl.IsSameItem(image[pos], item, true)) then return pos end
+				if (private.IsSameItem(image[pos], item, true)) then return pos end
 			end
 		end
 	else
 		-- We need to scan the whole thing cause there's no lookup table
 		for i = 1, #image do
-			if (lcl.IsSameItem(image[i], item, true)) then return i end
+			if (private.IsSameItem(image[i], item, true)) then return i end
 		end
 	end
 end
@@ -181,8 +181,8 @@ end
 local statItem = {}
 local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
-	lcl.Unpack(curItem, statItem)
-	if (oldItem) then lcl.Unpack(oldItem, statItemOld) end
+	private.Unpack(curItem, statItem)
+	if (oldItem) then private.Unpack(oldItem, statItemOld) end
 	if (operation ~= "create") then
 		--[[ 
 		filtering out happens here so we only have to do Unpack once.
@@ -210,16 +210,16 @@ local function processStats(operation, curItem, oldItem)
 	return true
 end
 
-function lcl.Commit()
+function private.Commit()
 	local now = time()
 	local inscount, delcount = 0, 0
-	if not lcl.curScan then return end
-	if not lcl.image then
+	if not private.curScan then return end
+	if not private.image then
 		local last = AucAdvancedScanSimpleData.lastScan
 		if last and last.time and now-last.time<86400 and last.faction==AucAdvanced.GetFaction() then
-			lcl.image = last.image
+			private.image = last.image
 		else
-			lcl.image = {}
+			private.image = {}
 		end
 	end
 
@@ -227,8 +227,8 @@ function lcl.Commit()
 	local lut = {}
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
-	for pos, data in ipairs(lcl.image) do
-		if (not lcl.curCat or Const.CLASSES[lcl.curCat] == data[Const.ITYPE]) then
+	for pos, data in ipairs(private.image) do
+		if (not private.curCat or Const.CLASSES[private.curCat] == data[Const.ITYPE]) then
 			-- Mark dirty
 			flag = data[Const.FLAG] or 0
 			data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
@@ -250,29 +250,29 @@ function lcl.Commit()
 	end
 
 	local itemPos
-	local oldCount = #lcl.image
-	local scanCount = #lcl.curScan
+	local oldCount = #private.image
+	local scanCount = #private.curScan
 	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
-	for _, data in ipairs(lcl.curScan) do
-		itemPos = lib.FindItem(data, lcl.image, lut)
+	for _, data in ipairs(private.curScan) do
+		itemPos = lib.FindItem(data, private.image, lut)
 		if (itemPos) then
-			if not lcl.IsIdentical(lcl.image[itemPos], data) then
+			if not private.IsIdentical(private.image[itemPos], data) then
 				if (bit.band(flag, Const.FLAG_UNSEEN) > 0) then
 					-- If it has been recorded as suspended
-					processStats("resume", data, lcl.image[itemPos])
+					processStats("resume", data, private.image[itemPos])
 					resumeCount = resumeCount + 1
 				else
-					processStats("update", data, lcl.image[itemPos])
+					processStats("update", data, private.image[itemPos])
 					updateCount = updateCount + 1
 				end
 			else
 				processStats("leave", data)
 				sameCount = sameCount + 1
 			end
-			lcl.image[itemPos] = data
+			private.image[itemPos] = data
 		else
 			if (processStats("create", data)) then
-				table.insert(lcl.image, data)
+				table.insert(private.image, data)
 				newCount = newCount + 1
 			else
 				scanCount = scanCount - 1
@@ -281,8 +281,8 @@ function lcl.Commit()
 	end
 
 	local data, flag
-	for pos = #lcl.image, 1, -1 do
-		data = lcl.image[pos]
+	for pos = #private.image, 1, -1 do
+		data = private.image[pos]
 		flag = data[Const.FLAG]
 		if (flag and bit.band(flag, Const.FLAG_DIRTY) > 0) then
 			-- This item should have been seen, but wasn't
@@ -307,13 +307,13 @@ function lcl.Commit()
 			else
 				-- Auction Time has expired
 				processStats("delete", data)
-				table.remove(lcl.image, pos)
+				table.remove(private.image, pos)
 				removeCount = removeCount + 1
 			end
 			
 		end
 	end
-	local currentCount = #lcl.image
+	local currentCount = #private.image
 
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
@@ -334,20 +334,20 @@ function lcl.Commit()
 	lib.Print("  ({{"..suspendCount.."}} of these are suspended)")
 
 	AucAdvancedScanSimpleLocal.lastScan = {
-		image = lcl.image,
+		image = private.image,
 		faction = AucAdvanced.GetFaction(),
 		time = time(),
 	}
 	AucAdvancedScanSimpleData.lastScan = AucAdvancedScanSimpleLocal.lastScan
 	
-	lcl.curScan = nil
+	private.curScan = nil
 end
 
 function lib.ScanPage(nextPage)
 	if (lib.IsScanning()) then
-		lcl.curPage = nextPage
+		private.curPage = nextPage
 -- Why aren't all the params set?
-		lib.Hook.QueryAuctionItems("", "", "", nil, lcl.curCat, nil, nextPage, nil, nil)
+		lib.Hook.QueryAuctionItems("", "", "", nil, private.curCat, nil, nextPage, nil, nil)
 		AuctionFrameBrowse.page = nextPage
 	end
 end
@@ -356,12 +356,12 @@ function lib.StorePage()
 	if not lib.IsScanning() then return end
 	if lib.isPaused then
 		lib.isPaused = false
-		lib.ScanPage(lcl.curPage)
+		lib.ScanPage(private.curPage)
 		return
 	end
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = floor(totalAuctions / 50);
-	if not lcl.curScan then lcl.curScan = {} end
+	if not private.curScan then private.curScan = {} end
 
 	local curTime = time()
 
@@ -407,12 +407,12 @@ function lib.StorePage()
 				-- and this item wasn't in the last (next) page
 				if noDupes(lastPage, itemData) then
 					table.insert(thisPage, itemData)
-					table.insert(lcl.curScan, itemData)
+					table.insert(private.curScan, itemData)
 					storecount = storecount + 1
 				end
 			-- Otherwise if we scan forwards, always add
 			else
-				table.insert(lcl.curScan, itemData)
+				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
 		end
@@ -422,11 +422,11 @@ function lib.StorePage()
 	lastPage = thisPage
 
 	-- Send the next page query or finish scanning
-	if lcl.curPage < maxPages then
-		lib.ScanPage(lcl.curPage + 1)
+	if private.curPage < maxPages then
+		lib.ScanPage(private.curPage + 1)
 	else
-		lcl.isScanning = false
-		lcl.Commit()
+		private.isScanning = false
+		private.Commit()
 	end
 end
 
@@ -441,7 +441,7 @@ local curQuery = { empty = true }
 local curResults = {}
 
 function lib.GetResults()
-	if not lcl.image then return end
+	if not private.image then return end
 	lib.ButtonMode(true)
 
 	local invalid = false
@@ -458,10 +458,10 @@ function lib.GetResults()
 	for k,v in pairs(curQuery) do curQuery[k] = nil end
 	for k,v in pairs(lib.curQuery) do curQuery[k] = v end
 
-	local ptr, max = 1, #lcl.image
+	local ptr, max = 1, #private.image
 	while ptr <= max do
 		repeat
-			local data = lcl.image[ptr] ptr = ptr + 1
+			local data = private.image[ptr] ptr = ptr + 1
 			if (not data) then break end
 			if curQuery.minUseLevel and data[Const.ULEVEL] < curQuery.minUseLevel then break end
 			if curQuery.maxUseLevel and data[Const.ULEVEL] > curQuery.maxUseLevel then break end
