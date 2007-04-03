@@ -522,6 +522,30 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	end
 end
 
+-------------------------------------------------------------------------------
+-- Attaches the enhanced tooltip window to the currentTooltip, according to
+-- where the currentTooltip is shown and what it is attached to  at the moment.
+--
+-- called by:
+--    showTooltip() - if the enhanced tooltip window is to be displayed
+--
+-- calls:
+--    getRect()           - unless currentTooltip is anchored to the cursor
+--    ClearAllPoints()    - always
+--    GetAnchorType()     - always
+--    GetCursorPosition() - if currentTooltip is anchored to the cursor
+--    GetHeight()         - if currentTooltip is anchored to another frame
+--    GetName()           - always
+--    GetPoint()          - always
+--    GetScreenWidth()    - always
+--    GetScreenHeight()   - always
+--    Show()              - if currentTooltip is not anchored at all
+--
+-- parameters:
+--    currentTooltip  - the tooltip the enhanced tooltip should be anchored to
+--    requestedHeight - the requested height for the enhanced tooltip window
+--    requestedWidth  - the requested width for the enhanced tooltip window
+-------------------------------------------------------------------------------
 function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
