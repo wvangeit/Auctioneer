@@ -1,4 +1,4 @@
---[[ 
+--[[
 	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
