@@ -490,14 +490,14 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		EnhancedTooltipText1:SetPoint("TOPLEFT", "EnhancedTooltipHeader"..EnhancedTooltip.headerCount, "BOTTOMLEFT", 0, -1)
 	end
 
-	local requiredWidth, requiredHeight = getTooltipWidth(EnhancedTooltip), getTooltipHeight(EnhancedTooltip)
+	local requestedWidth, requestedHeight = getTooltipWidth(EnhancedTooltip), getTooltipHeight(EnhancedTooltip)
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
 	local currentWidth = currentTooltip:GetWidth()
-	if (currentWidth < requiredWidth) then
-		currentTooltip:SetWidth(requiredWidth - 20)
+	if (currentWidth < requestedWidth) then
+		currentTooltip:SetWidth(requestedWidth - 20)
 	else
-		requiredWidth = currentWidth
+		requestedWidth = currentWidth
 	end
 
 	-- Get the frame which the currentTooltip is attached to.
@@ -542,9 +542,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		private.showIgnore = false
 
 		local currentToolTipRect = getRect(currentTooltip)
-		if (currentToolTipRect.bottom - requiredHeight < 60) then
+		if (currentToolTipRect.bottom - requestedHeight < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", currentToolTipRect.left, requiredHeight+60)
+			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", currentToolTipRect.left, requestedHeight+60)
 		end
 		EnhancedTooltip:ClearAllPoints()
 		if (currentToolTipRect.xCenter < 6*screenWidth/10) then
@@ -559,9 +559,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		local currentTooltipOwnerRect = getRect(currentTooltipOwner)
 
 		local xAnchor
-		if (currentTooltipOwnerRect.left - requiredWidth < screenWidth * 0.2) then
+		if (currentTooltipOwnerRect.left - requestedWidth < screenWidth * 0.2) then
 			xAnchor = "RIGHT"
-		elseif (currentTooltipOwnerRect.right + requiredWidth > screenWidth * 0.8) then
+		elseif (currentTooltipOwnerRect.right + requestedWidth > screenWidth * 0.8) then
 			xAnchor = "LEFT"
 		elseif (align == "ANCHOR_LEFT") then
 			xAnchor = "LEFT"
@@ -580,17 +580,17 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
 		local xOffset = 0
-		if (xAnchor == "RIGHT" and currentTooltipOwnerRect.right + requiredWidth > screenWidth - 5) then
-			xOffset = -(currentTooltipOwnerRect.right + requiredWidth - screenWidth + 5)
-		elseif (xAnchor == "LEFT" and currentTooltipOwnerRect.left - requiredWidth < 5) then
-			xOffset = -(currentTooltipOwnerRect.left - requiredWidth - 5)
+		if (xAnchor == "RIGHT" and currentTooltipOwnerRect.right + requestedWidth > screenWidth - 5) then
+			xOffset = -(currentTooltipOwnerRect.right + requestedWidth - screenWidth + 5)
+		elseif (xAnchor == "LEFT" and currentTooltipOwnerRect.left - requestedWidth < 5) then
+			xOffset = -(currentTooltipOwnerRect.left - requestedWidth - 5)
 		end
 
 		-- Handle the situation where there isn't enough room on the top or bottom of
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0
-		local totalHeight = requiredHeight + currentTooltip:GetHeight()
+		local totalHeight = requestedHeight + currentTooltip:GetHeight()
 		if (yAnchor == "TOP" and currentTooltipOwnerRect.top + totalHeight > screenHeight - 5) then
 			yOffset = -(currentTooltipOwnerRect.top + totalHeight - screenHeight + 5)
 		elseif (yAnchor == "BOTTOM" and currentTooltipOwnerRect.bottom - totalHeight < 5) then
@@ -616,9 +616,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		end
 	end
 
-	EnhancedTooltip:SetHeight(requiredHeight)
-	EnhancedTooltip:SetWidth(requiredWidth)
-	currentTooltip:SetWidth(requiredWidth)
+	EnhancedTooltip:SetHeight(requestedHeight)
+	EnhancedTooltip:SetWidth(requestedWidth)
+	currentTooltip:SetWidth(requestedWidth)
 	EnhancedTooltip:Show()
 
 	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
@@ -628,9 +628,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			local ttMoneyLineWidth = myLine:GetWidth()
 			ttMoney:ClearAllPoints()
 			if ((EnhancedTooltip.hasIcon) and (ttMoney.myLineNumber + headerCount < 4)) then
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2 - 34, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2 - 34, 0)
 			else
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2, 0)
 			end
 		end
 	end
