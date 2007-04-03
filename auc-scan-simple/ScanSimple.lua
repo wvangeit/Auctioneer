@@ -41,15 +41,19 @@ If you do not supply a category, then the whole AH will be scanned and then repl
 --]]
 
 local libName = "Simple"
+local libType = "Scan"
 
-AucAdvanced.Modules.Scan[libName] = {}
-local lib = AucAdvanced.Modules.Scan[libName]
+AucAdvanced.Modules[libType][libName] = {}
+local lib = AucAdvanced.Modules[libType][libName]
+local lcl = {}
+
 lib.Print = AucAdvanced.Print
-for k, v in pairs(AucAdvanced.Const) do lib[k] = v end
+local Const = AucAdvanced.Const
 
-lib.isScanning = false
-lib.curPage = 0
-lib.curCat = nil
+lcl.isScanning = false
+
+lcl.curPage = 0
+lcl.curCat = nil
 
 
 function lib.OnLoad()
@@ -58,7 +62,7 @@ function lib.OnLoad()
 	local data = AucAdvancedScanSimpleData
 	local ldata = AucAdvancedScanSimpleLocal
 	if data.lastScan then
-		local faction = AucAdvanced.GetFaction()
+		local faction = AucAdvanced.Utilities.GetFaction()
 		if data.lastScan.faction ~= faction then
 			data.lastScan = ldata.lastScan
 		end
@@ -75,9 +79,9 @@ end
 
 function lib.StartScan(cat)
 	if AuctionFrame and AuctionFrame:IsVisible() then
-		lib.curCat = cat
-		lib.curScan = nil
-		lib.isScanning = true
+		lcl.curCat = cat
+		lcl.curScan = nil
+		lcl.isScanning = true
 		lib.ScanPage(0)
 	else
 		message("Steady on; You'll need to talk to the auctioneer first!")
@@ -85,7 +89,7 @@ function lib.StartScan(cat)
 end
 
 function lib.IsScanning()
-	if (lib.isScanning) then
+	if (lcl.isScanning) then
 		if (AuctionFrame and AuctionFrame:IsVisible()) then
 			return true
 		else
@@ -97,53 +101,53 @@ function lib.IsScanning()
 	return false
 end
 
-function lib.Unpack(item, storage)
+function lcl.Unpack(item, storage)
 	if not storage then storage = {} end
-	storage.link = item[lib.LINK]
-	storage.useLevel = item[lib.ULEVEL]
-	storage.itemLevel = item[lib.ILEVEL]
-	storage.itemType = item[lib.ITYPE]
-	storage.subType = item[lib.ISUB]
-	storage.equipPos = item[lib.IEQUIP]
-	storage.price = item[lib.PRICE]
-	storage.timeLeft = item[lib.TLEFT]
-	storage.seenTime = item[lib.TIME]
-	storage.itemName = item[lib.NAME]
-	storage.texture = item[lib.TEXTURE]
-	storage.stackSize = item[lib.COUNT]
-	storage.quality = item[lib.QUALITY]
-	storage.canUse = item[lib.CANUSE]
-	storage.minBid = item[lib.MINBID]
-	storage.curBid = item[lib.CURBID]
-	storage.increment = item[lib.MININC]
-	storage.sellerName = item[lib.SELLER]
-	storage.buyoutPrice = item[lib.BUYOUT]
-	storage.dataFlag = item[lib.FLAG]
+	storage.link = item[Const.LINK]
+	storage.useLevel = item[Const.ULEVEL]
+	storage.itemLevel = item[Const.ILEVEL]
+	storage.itemType = item[Const.ITYPE]
+	storage.subType = item[Const.ISUB]
+	storage.equipPos = item[Const.IEQUIP]
+	storage.price = item[Const.PRICE]
+	storage.timeLeft = item[Const.TLEFT]
+	storage.seenTime = item[Const.TIME]
+	storage.itemName = item[Const.NAME]
+	storage.texture = item[Const.TEXTURE]
+	storage.stackSize = item[Const.COUNT]
+	storage.quality = item[Const.QUALITY]
+	storage.canUse = item[Const.CANUSE]
+	storage.minBid = item[Const.MINBID]
+	storage.curBid = item[Const.CURBID]
+	storage.increment = item[Const.MININC]
+	storage.sellerName = item[Const.SELLER]
+	storage.buyoutPrice = item[Const.BUYOUT]
+	storage.dataFlag = item[Const.FLAG]
 	return storage
 end
 
-function lib.IsIdentical(focus, compare)
-	for i = 1, lib.SELLER do
-		if (i ~= lib.TIME and focus[i] ~= compare[i]) then
+function lcl.IsIdentical(focus, compare)
+	for i = 1, Const.SELLER do
+		if (i ~= Const.TIME and focus[i] ~= compare[i]) then
 			return false
 		end
 	end
 	return true
 end
-function lib.IsSameItem(focus, compare, onlyDirt)
+function lcl.IsSameItem(focus, compare, onlyDirt)
 	if onlyDirt then
-		local flag = focus[lib.FLAG]
-		if not flag or bit.band(flag, lib.FLAG_DIRTY) == 0 then
+		local flag = focus[Const.FLAG]
+		if not flag or bit.band(flag, Const.FLAG_DIRTY) == 0 then
 			return false
 		end
 	end
-	if (focus[lib.LINK] ~= compare[lib.LINK]) then return false end
-	if (focus[lib.COUNT] ~= compare[lib.COUNT]) then return false end
-	if (focus[lib.MINBID] ~= compare[lib.MINBID]) then return false end
-	if (focus[lib.BUYOUT] ~= compare[lib.BUYOUT]) then return false end
-	if (focus[lib.CURBID] > compare[lib.CURBID]) then return false end
-	local focusOwner = focus[lib.SELLER]
-	local compareOwner = compare[lib.SELLER]
+	if (focus[Const.LINK] ~= compare[Const.LINK]) then return false end
+	if (focus[Const.COUNT] ~= compare[Const.COUNT]) then return false end
+	if (focus[Const.MINBID] ~= compare[Const.MINBID]) then return false end
+	if (focus[Const.BUYOUT] ~= compare[Const.BUYOUT]) then return false end
+	if (focus[Const.CURBID] > compare[Const.CURBID]) then return false end
+	local focusOwner = focus[Const.SELLER]
+	local compareOwner = compare[Const.SELLER]
 	if (focusOwner ~= "" and compareOwner ~= "" and focusOwner ~= compareOwner) then
 		return false
 	end
@@ -155,21 +159,21 @@ function lib.FindItem(item, image, lut)
 
 	-- If we have a lookuptable, then we don't need to scan the whole lot
 	if (lut) then
-		local list = lut[item[lib.LINK]]
+		local list = lut[item[Const.LINK]]
 		if not list then return false
 		elseif type(list) == "number" then
-			if (lib.IsSameItem(image[list], item, true)) then return list end
+			if (lcl.IsSameItem(image[list], item, true)) then return list end
 		else
 			local pos
 			for i=1, #list do
 				pos = list[i]
-				if (lib.IsSameItem(image[pos], item, true)) then return pos end
+				if (lcl.IsSameItem(image[pos], item, true)) then return pos end
 			end
 		end
 	else
 		-- We need to scan the whole thing cause there's no lookup table
 		for i = 1, #image do
-			if (lib.IsSameItem(image[i], item, true)) then return i end
+			if (lcl.IsSameItem(image[i], item, true)) then return i end
 		end
 	end
 end
@@ -177,31 +181,45 @@ end
 local statItem = {}
 local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
-	lib.Unpack(curItem, statItem)
-	if (oldItem) then lib.Unpack(oldItem, statItemOld) end
+	lcl.Unpack(curItem, statItem)
+	if (oldItem) then lcl.Unpack(oldItem, statItemOld) end
+	if (operation ~= "create") then
+		--[[ 
+		filtering out happens here so we only have to do Unpack once.
+		 only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
+		 (it could think it was sold, for instance)
+		 filters are part of the Util subsystem.
+		]]
+		for engine, engineLib in pairs(AucAdvanced.Modules.Util) do
+			if (engineLib.AuctionFilter) then
+				if (engineLib.AuctionFilter(operation, statItem)) then return false end
+			end
+		end	
+	end
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.ScanProcessor) then
+			if (engineLib.ScanProcessors and engineLib.ScanProcessors[operation]) then
 				if (oldItem) then
-					engineLib.ScanProcessor(operation, statItem, statItemOld)
+					engineLib.ScanProcessors[operation](operation, statItem, statItemOld)
 				else
-					engineLib.ScanProcessor(operation, statItem)
+					engineLib.ScanProcessors[operation](operation, statItem)
 				end
 			end
 		end
 	end
+	return true
 end
 
-function lib.Commit()
+function lcl.Commit()
 	local now = time()
 	local inscount, delcount = 0, 0
-	if not lib.curScan then return end
-	if not lib.image then
+	if not lcl.curScan then return end
+	if not lcl.image then
 		local last = AucAdvancedScanSimpleData.lastScan
 		if last and last.time and now-last.time<86400 and last.faction==AucAdvanced.GetFaction() then
-			lib.image = last.image
+			lcl.image = last.image
 		else
-			lib.image = {}
+			lcl.image = {}
 		end
 	end
 
@@ -209,14 +227,14 @@ function lib.Commit()
 	local lut = {}
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
-	for pos, data in ipairs(lib.image) do
-		if (not lib.curCat or lib.CLASSES[lib.curCat] == data[lib.ITYPE]) then
+	for pos, data in ipairs(lcl.image) do
+		if (not lcl.curCat or Const.CLASSES[lcl.curCat] == data[Const.ITYPE]) then
 			-- Mark dirty
-			flag = data[lib.FLAG] or 0
-			data[lib.FLAG] = bit.bor(flag, lib.FLAG_DIRTY)
+			flag = data[Const.FLAG] or 0
+			data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
 
 			-- Build lookup table
-			link = data[lib.LINK]
+			link = data[Const.LINK]
 
 			list = lut[link]
 			if (not list) then
@@ -232,56 +250,70 @@ function lib.Commit()
 	end
 
 	local itemPos
-	local oldCount = #lib.image
-	local scanCount = #lib.curScan
+	local oldCount = #lcl.image
+	local scanCount = #lcl.curScan
 	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
-	for _, data in ipairs(lib.curScan) do
-		itemPos = lib.FindItem(data, lib.image, lut)
+	for _, data in ipairs(lcl.curScan) do
+		itemPos = lib.FindItem(data, lcl.image, lut)
 		if (itemPos) then
-			if not lib.IsIdentical(lib.image[itemPos], data) then
-				if (bit.band(flag, lib.FLAG_UNSEEN) > 0) then
+			if not lcl.IsIdentical(lcl.image[itemPos], data) then
+				if (bit.band(flag, Const.FLAG_UNSEEN) > 0) then
 					-- If it has been recorded as suspended
-					processStats("resume", data, lib.image[itemPos])
+					processStats("resume", data, lcl.image[itemPos])
 					resumeCount = resumeCount + 1
 				else
-					processStats("update", data, lib.image[itemPos])
+					processStats("update", data, lcl.image[itemPos])
 					updateCount = updateCount + 1
 				end
 			else
 				processStats("leave", data)
 				sameCount = sameCount + 1
 			end
-			lib.image[itemPos] = data
+			lcl.image[itemPos] = data
 		else
-			processStats("create", data)
-			table.insert(lib.image, data)
-			newCount = newCount + 1
+			if (processStats("create", data)) then
+				table.insert(lcl.image, data)
+				newCount = newCount + 1
+			else
+				scanCount = scanCount - 1
+			end
 		end
 	end
 
 	local data, flag
-	for pos = #lib.image, 1, -1 do
-		data = lib.image[pos]
-		flag = data[lib.FLAG]
-		if (flag and bit.band(flag, lib.FLAG_DIRTY) > 0) then
+	for pos = #lcl.image, 1, -1 do
+		data = lcl.image[pos]
+		flag = data[Const.FLAG]
+		if (flag and bit.band(flag, Const.FLAG_DIRTY) > 0) then
 			-- This item should have been seen, but wasn't
-			if (now - data[lib.TIME] < 86400) then
-				suspendCount = suspendCount + 1
+			local stillpossible = false
+			local auctionmaxtime = Const.AucMinTimes[data[Const.TLEFT]] or 86400
+			
+			if (now - data[Const.TIME] <= auctionmaxtime) then
+				stillpossible = true
+			end
+
+			
+			if (stillpossible) then
 				-- Don't delete it yet. It may have been either skipped, or may be awaiting relist
-				if (bit.band(flag, lib.FLAG_UNSEEN) == 0) then
+				suspendCount = suspendCount + 1
+				if (bit.band(flag, Const.FLAG_UNSEEN) == 0) then
 					-- If it hasn't been recorded as suspended yet, do so
-					data[lib.FLAG] = bit.bor(flag, lib.FLAG_UNSEEN)
+					data[Const.FLAG] = bit.bor(flag, Const.FLAG_UNSEEN)
 					processStats("suspend", data)
+				else
+					processStats("suspended", data)
 				end
 			else
-				-- Haven't seen this item in ages
+				-- Auction Time has expired
 				processStats("delete", data)
-				table.remove(lib.image, pos)
+				table.remove(lcl.image, pos)
 				removeCount = removeCount + 1
 			end
+			
 		end
 	end
-	local currentCount = #lib.image
+	local currentCount = #lcl.image
 
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
@@ -302,19 +334,20 @@ function lib.Commit()
 	lib.Print("  ({{"..suspendCount.."}} of these are suspended)")
 
 	AucAdvancedScanSimpleLocal.lastScan = {
-		image = lib.image,
+		image = lcl.image,
 		faction = AucAdvanced.GetFaction(),
 		time = time(),
 	}
 	AucAdvancedScanSimpleData.lastScan = AucAdvancedScanSimpleLocal.lastScan
 	
-	lib.curScan = nil
+	lcl.curScan = nil
 end
 
 function lib.ScanPage(nextPage)
 	if (lib.IsScanning()) then
-		lib.curPage = nextPage
-		lib.Hook.QueryAuctionItems("", "", "", nil, lib.curCat, nil, nextPage, nil, nil)
+		lcl.curPage = nextPage
+-- Why aren't all the params set?
+		lib.Hook.QueryAuctionItems("", "", "", nil, lcl.curCat, nil, nextPage, nil, nil)
 		AuctionFrameBrowse.page = nextPage
 	end
 end
@@ -323,12 +356,12 @@ function lib.StorePage()
 	if not lib.IsScanning() then return end
 	if lib.isPaused then
 		lib.isPaused = false
-		lib.ScanPage(lib.curPage)
+		lib.ScanPage(lcl.curPage)
 		return
 	end
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = floor(totalAuctions / 50);
-	if not lib.curScan then lib.curScan = {} end
+	if not lcl.curScan then lcl.curScan = {} end
 
 	local curTime = time()
 
@@ -343,11 +376,18 @@ function lib.StorePage()
 		local itemLink = GetAuctionItemLink("list", i)
 		if itemLink then
 			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc,_ = GetItemInfo(itemLink)
+			--[[
+				Returns Integer giving range of time left for query
+				1 -- short time (Less than 30 mins)
+				2 -- medium time (30 mins to 2 hours)
+				3 -- long time (2 hours to 8 hours)
+				4 -- very long time (8 hours+)
+			]]
 			timeLeft = GetAuctionItemTimeLeft("list", i)
 			name, texture, count, quality, canUse, level, minBid,
 			minIncrement, buyoutPrice, bidAmount, highBidder, owner =
 			GetAuctionItemInfo("list", i)
-			invType = lib.InvTypes[itemEquipLoc]
+			invType = Const.InvTypes[itemEquipLoc]
 			buyoutPrice = buyoutPrice or 0
 			nextBid = minBid
 			if bidAmount then nextBid = bidAmount + minIncrement end
@@ -367,12 +407,12 @@ function lib.StorePage()
 				-- and this item wasn't in the last (next) page
 				if noDupes(lastPage, itemData) then
 					table.insert(thisPage, itemData)
-					table.insert(lib.curScan, itemData)
+					table.insert(lcl.curScan, itemData)
 					storecount = storecount + 1
 				end
 			-- Otherwise if we scan forwards, always add
 			else
-				table.insert(lib.curScan, itemData)
+				table.insert(lcl.curScan, itemData)
 				storecount = storecount + 1
 			end
 		end
@@ -382,26 +422,26 @@ function lib.StorePage()
 	lastPage = thisPage
 
 	-- Send the next page query or finish scanning
-	if lib.curPage < maxPages then
-		lib.ScanPage(lib.curPage + 1)
+	if lcl.curPage < maxPages then
+		lib.ScanPage(lcl.curPage + 1)
 	else
-		lib.isScanning = false
-		lib.Commit()
+		lcl.isScanning = false
+		lcl.Commit()
 	end
 end
 
 function lib.ClassConvert(cid, sid)
 	if (sid) then
-		return lib.SUBCLASSES[cid][sid]
+		return Const.SUBCLASSES[cid][sid]
 	end
-	return lib.CLASSES[cid]
+	return Const.CLASSES[cid]
 end
 
 local curQuery = { empty = true }
 local curResults = {}
 
 function lib.GetResults()
-	if not lib.image then return end
+	if not lcl.image then return end
 	lib.ButtonMode(true)
 
 	local invalid = false
@@ -418,28 +458,28 @@ function lib.GetResults()
 	for k,v in pairs(curQuery) do curQuery[k] = nil end
 	for k,v in pairs(lib.curQuery) do curQuery[k] = v end
 
-	local ptr, max = 1, #lib.image
+	local ptr, max = 1, #lcl.image
 	while ptr <= max do
 		repeat
-			local data = lib.image[ptr] ptr = ptr + 1
+			local data = lcl.image[ptr] ptr = ptr + 1
 			if (not data) then break end
-			if curQuery.minUseLevel and data[lib.ULEVEL] < curQuery.minUseLevel then break end
-			if curQuery.maxUseLevel and data[lib.ULEVEL] > curQuery.maxUseLevel then break end
-			if curQuery.minItemLevel and data[lib.ILEVEL] < curQuery.minItemLevel then break end
-			if curQuery.maxItemLevel and data[lib.ILEVEL] > curQuery.maxItemLevel then break end
-			if curQuery.class and data[lib.ITYPE] ~= curQuery.class then break end
-			if curQuery.subclass and data[lib.ISUB] ~= curQuery.subclass then break end
-			if curQuery.quality and data[lib.QUALITY] ~= curQuery.quality then break end
-			if curQuery.invType and data[lib.IEQUIP] ~= curQuery.invType then break end
-			if curQuery.seller and data[lib.SELLER] ~= curQuery.seller then break end
+			if curQuery.minUseLevel and data[Const.ULEVEL] < curQuery.minUseLevel then break end
+			if curQuery.maxUseLevel and data[Const.ULEVEL] > curQuery.maxUseLevel then break end
+			if curQuery.minItemLevel and data[Const.ILEVEL] < curQuery.minItemLevel then break end
+			if curQuery.maxItemLevel and data[Const.ILEVEL] > curQuery.maxItemLevel then break end
+			if curQuery.class and data[Const.ITYPE] ~= curQuery.class then break end
+			if curQuery.subclass and data[Const.ISUB] ~= curQuery.subclass then break end
+			if curQuery.quality and data[Const.QUALITY] ~= curQuery.quality then break end
+			if curQuery.invType and data[Const.IEQUIP] ~= curQuery.invType then break end
+			if curQuery.seller and data[Const.SELLER] ~= curQuery.seller then break end
 			if curQuery.name then
-				local name = data[lib.NAME]
+				local name = data[Const.NAME]
 				if not (name and name:lower():find(curQuery.name:lower(), 1, true)) then break end
 			end
 
-			local stack = data[lib.COUNT]
-			local nextBid = data[lib.PRICE]
-			local buyout = data[lib.BUYOUT]
+			local stack = data[Const.COUNT]
+			local nextBid = data[Const.PRICE]
+			local buyout = data[Const.BUYOUT]
 			if curQuery.perItem and stack > 1 then
 				nextBid = math.ceil(nextBid / stack)
 				buyout = math.ceil(buyout / stack)

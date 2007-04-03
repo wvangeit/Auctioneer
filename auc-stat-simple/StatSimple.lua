@@ -32,10 +32,11 @@
 --]]
 
 local libName = "Simple"
+local libType = "Stat"
 
-AucAdvanced.Modules.Stat[libName] = {}
-local lib = AucAdvanced.Modules.Stat[libName]
-local private = {}
+AucAdvanced.Modules[libType][libName] = {}
+local lib = AucAdvanced.Modules[libType][libName]
+local lcl = {}
 local print = AucAdvanced.Print
 
 local data
@@ -48,7 +49,7 @@ The following functions are part of the module's exposed methods:
 	ScanProcessor()   (optional) Processes items from the scan manager
 *	GetPrice()        (required) Returns estimated price for item link
 *	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for this specific module
+	OnLoad()          (optional) Receives load message for all modules
 
 	(*) Only implemented in stats modules; util modules do not provide
 ]]
@@ -58,7 +59,7 @@ function lib.GetName()
 end
 
 function lib.CommandHandler(command, ...)
-	if (not data) then private.makeData() end
+	if (not data) then lcl.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
@@ -76,16 +77,18 @@ function lib.CommandHandler(command, ...)
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then private.makeData() end
+	if (not data) then lcl.makeData() end
 	if (callbackType == "tooltip") then
-		private.ProcessTooltip(...)
+		lcl.ProcessTooltip(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
 	end
 end
 
-function lib.ScanProcessor(operation, itemData, oldData)
-	if (not data) then private.makeData() end
+
+lib.ScanProcessors = {}
+function lib.ScanProcessors.create(operation, itemData, oldData)
+	if (not data) then lcl.makeData() end
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -107,11 +110,11 @@ function lib.ScanProcessor(operation, itemData, oldData)
 		if not data[faction] then data[faction] = {} end
 		if not data[faction].daily then data[faction].daily = { created = time() } end
 		if not data[faction].daily[itemId] then data[faction].daily[itemId] = "" end
-		local stats = private.UnpackStats(data[faction].daily[itemId])
+		local stats = lcl.UnpackStats(data[faction].daily[itemId])
 		if not stats[property] then stats[property] = { 0, 0 } end
 		stats[property][1] = stats[property][1] + buyout
 		stats[property][2] = stats[property][2] + 1
-		data[faction].daily[itemId] = private.PackStats(stats)
+		data[faction].daily[itemId] = lcl.PackStats(stats)
 	elseif (operation == "delete") then
 	elseif (operation == "update") then
 	elseif (operation == "leave") then
@@ -132,14 +135,14 @@ function lib.GetPrice(hyperlink, faction)
 	if not data[faction] then return end
 
 	if data[faction].daily and data[faction].daily[itemId] then
-		local stats = private.UnpackStats(data[faction].daily[itemId])
+		local stats = lcl.UnpackStats(data[faction].daily[itemId])
 		if stats[property] then
 			dayTotal, dayCount = unpack(stats[property])
 			dayAverage = dayTotal/dayCount
 		end
 	end
 	if data[faction].means and data[faction].means[itemId] then
-		local stats = private.UnpackStats(data[faction].means[itemId])
+		local stats = lcl.UnpackStats(data[faction].means[itemId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14 = unpack(stats[property])
 		end
@@ -153,7 +156,7 @@ end
 
 function lib.OnLoad(addon)
 	if (addon == "auc-stat-simple") then
-		private.makeData()
+		lcl.makeData()
 	end
 end
 
@@ -161,7 +164,7 @@ end
 
 --[[ Local functions ]]--
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+function lcl.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
@@ -197,7 +200,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	end
 end
 
-function private.DataLoaded()
+function lcl.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
 	
@@ -206,14 +209,14 @@ function private.DataLoaded()
 		if not stats.means then stats.means = {} end
 		if stats.daily.created and time() - stats.daily.created > 3600*16 then
 			-- This data is more than 16 hours old, we classify this as "yesterday's data"
-			private.PushStats(faction)
+			lcl.PushStats(faction)
 		end
 	end
 end
 
 -- This is a function which migrates the data from a daily average to the
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
-function private.PushStats(faction)
+function lcl.PushStats(faction)
 	local dailyAvg
 	if not data[faction] then return end
 	if not data[faction].daily then return end
@@ -222,8 +225,8 @@ function private.PushStats(faction)
 	local pdata
 	for itemId, stats in pairs(data[faction].daily) do
 		if (itemId ~= "created") then
-			pdata = private.UnpackStats(stats)
-			fdata = private.UnpackStats(data[faction].means[itemId] or "")
+			pdata = lcl.UnpackStats(stats)
+			fdata = lcl.UnpackStats(data[faction].means[itemId] or "")
 			for property, info in pairs(pdata) do
 				dailyAvg = info[1] / info[2]
 				if not fdata[property] then
@@ -242,20 +245,20 @@ function private.PushStats(faction)
 					fdata[property][5] = ("%0.01f"):format(((fdata[property][5] * 13) + dailyAvg)/14)
 				end
 			end
-			data[faction].means[itemId] = private.PackStats(fdata)
+			data[faction].means[itemId] = lcl.PackStats(fdata)
 		end
 	end
 	data[faction].daily = { created = time() }
 end
 
-function private.makeData()
+function lcl.makeData()
 	if data then return end
 	if (not AucAdvancedStatSimpleData) then AucAdvancedStatSimpleData = {} end
 	data = AucAdvancedStatSimpleData
-	private.DataLoaded()
+	lcl.DataLoaded()
 end
 
-function private.UnpackStatIter(data, ...)
+function lcl.UnpackStatIter(data, ...)
 	local c = select("#", ...)
 	local v
 	for i = 1, c do
@@ -272,13 +275,13 @@ function private.UnpackStatIter(data, ...)
 		end
 	end
 end
-function private.UnpackStats(dataItem)
+function lcl.UnpackStats(dataItem)
 	local data = {}
-	private.UnpackStatIter(data, strsplit(",", dataItem))
+	lcl.UnpackStatIter(data, strsplit(",", dataItem))
 	return data
 end
 
-function private.PackStats(data)
+function lcl.PackStats(data)
 	local stats = ""
 	local joiner = ""
 	for property, info in pairs(data) do

@@ -1,4 +1,4 @@
---[[
+--[[ 
 	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
@@ -31,7 +31,14 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
+
+--[[
+	See CoreAPI.lua for a description of the modules API
+]]
+
+
 if (not AucAdvanced) then AucAdvanced = {} end
+if (not AucAdvanced.Utilities) then AucAdvanced.Utilities = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
@@ -41,6 +48,8 @@ if (AucAdvanced.Version == "<".."%version%>") then
 	AucAdvanced.Version = "5.0.DEV";
 end
 
+local lcl = {}
+
 -- For our modular stats system, each stats engine should add their
 -- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
 -- data table in AucAdvancedData.Stats.<type><name>
@@ -48,7 +57,7 @@ if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
-function AucAdvanced.Print(...)
+function AucAdvanced.Utilities.Print(...)
 	local output, part
 	for i=1, select("#", ...) do
 		part = select(i, ...)
@@ -58,8 +67,11 @@ function AucAdvanced.Print(...)
 	end
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 end
+-- Because it was defined in top level originally.  (Until all references moved)
+AucAdvanced.Print = AucAdvanced.Utilities.Print
 
-function AucAdvanced.DecodeLink(link)
+
+function AucAdvanced.Utilities.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
 		local linkType = EnhTooltip.LinkType(link)
@@ -71,12 +83,14 @@ function AucAdvanced.DecodeLink(link)
 	end
 	return
 end
+-- Because it was defined in top level originally.  (Until all references moved)
+AucAdvanced.DecodeLink = AucAdvanced.Utilities.DecodeLink
 
-function AucAdvanced.GetFaction()
+function AucAdvanced.Utilities.GetFaction() 
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
-
+	
 	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
 	if AucAdvancedConfig.factions[currentZone] then
 		factionGroup = AucAdvancedConfig.factions[currentZone]
@@ -101,9 +115,11 @@ function AucAdvanced.GetFaction()
 	AucAdvanced.curFaction = realmName.."-"..factionGroup
 	return AucAdvanced.curFaction
 end
+-- Because it was defined in top level originally.  (Until all references moved)
+AucAdvanced.GetFaction = AucAdvanced.Utilities.GetFaction
 
 
-function AucAdvanced.TooltipHook(vars, ret, ...)
+function lcl.TooltipHook(vars, ret, ...)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then engineLib.Processor("tooltip", ...) end
@@ -111,13 +127,12 @@ function AucAdvanced.TooltipHook(vars, ret, ...)
 	end
 end
 
-function AucAdvanced.OnLoad(addon)
+function lcl.OnLoad(addon)
 	if (addon == "auc-advanced") then
-		AucAdvanced.LoadEmbedded()
-		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, AucAdvanced.TooltipHook)
+		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, lcl.TooltipHook)
 	end
 	local _, sys, eng = strsplit("-", addon)
-
+	
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (sys and eng and sys == system:lower() and eng == engine:lower() and engineLib.OnLoad) then
@@ -130,23 +145,17 @@ function AucAdvanced.OnLoad(addon)
 	end
 end
 
-function AucAdvanced.LoadEmbedded()
-	for index, addon in ipairs(AucAdvanced.EmbeddedModules) do
-		AucAdvanced.OnLoad(addon:lower())
-	end
-end
-
-function AucAdvanced.OnEvent(...)
+function lcl.OnEvent(...)
 	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
 		local addon = string.lower(arg)
 		if (addon:sub(1,4) == "auc-") then
-			AucAdvanced.OnLoad(addon)
+			lcl.OnLoad(addon)
 		end
 	end
 end
 
-AucAdvanced.Frame = CreateFrame("Frame")
-AucAdvanced.Frame:RegisterEvent("ADDON_LOADED")
-AucAdvanced.Frame:SetScript("OnEvent", AucAdvanced.OnEvent)
+lcl.Frame = CreateFrame("Frame")
+lcl.Frame:RegisterEvent("ADDON_LOADED")
+lcl.Frame:SetScript("OnEvent", lcl.OnEvent)
 

@@ -33,30 +33,36 @@
 
 AucAdvanced.Config = {}
 local lib = AucAdvanced.Config
-lib.Print = AucAdvanced.Print
+local lcl = {}
+lcl.Print = AucAdvanced.Utilities.Print
 
-function lib.CommandHandler(command, module, ...)
+
+function lcl.CommandHandler(command, ...)
 	command = command:lower()
 	if (command == "help") then
-		lib.Print("Auctioneer Advanced Help")
-		lib.Print("  {{/auc help}} - Show this help")
-		lib.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
+		lcl.Print("Auctioneer Advanced Help")
+		lcl.Print("  {{/auc help}} - Show this help")
+		lcl.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
-					lib.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
+					lcl.Print("  {{/auc "..system:lower().." "..engine:lower().." help}} - Show "..engineLib.GetName().." "..system.." help")
 				end
 			end
 		end
 	elseif command == "begin" then
-		lib.ScanCommand(module, ...)
+		lib.ScanCommand(...)
 	else
-		if command and module then
+		local sys, eng = strsplit(" ", command)
+		if sys and eng then
 			for system, systemMods in pairs(AucAdvanced.Modules) do
-				if command == system:lower() then
+				if sys == system:lower() then
 					for engine, engineLib in pairs(systemMods) do
-						if module == engine:lower() then
+						if command == engine:lower() then
 							if engineLib.CommandHandler then
+--								if not engineLib.Print then
+--									engineLib.Print = lib.Print
+--								end
 								engineLib.CommandHandler(...)
 								return
 							end
@@ -67,26 +73,26 @@ function lib.CommandHandler(command, module, ...)
 		end
 
 		-- No match found
-		lib.Print("Unable to find command: "..command)
-		lib.Print("Type {{/auc help}} for help")
+		lcl.Print("Unable to find command: "..command)
+		lcl.Print("Type {{/auc help}} for help")
 	end
 end
 
 function lib.ScanCommand(cat)
 	cat = tonumber(cat)
-	--If there was a requested category to scan, we'll first check if it's a valid category
+	--If there was a requested category to scan, we'll first check if its a valid category
 	if cat then
 		local catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
-			lib.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
+			lcl.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
 		else
 			cat = nil
 		end
 	end
-
+	
 	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
-		lib.Print("Beginning scanning: {{All categories}}")
+		lcl.Print("Beginning scanning: {{All categories}}")
 	end
 
 	local scanner = AucAdvanced.scanner or AucAdvanced.Defaults.Scanner
@@ -103,5 +109,5 @@ end
 
 SLASH_AUCADVANCED1 = "/auc"
 SLASH_AUCADVANCED2 = "/aadv"
-SlashCmdList["AUCADVANCED"] = function(msg) lib.CommandHandler(strsplit(" ", msg)) end
+SlashCmdList["AUCADVANCED"] = function(msg) lcl.CommandHandler(strsplit(" ", msg)) end
 
