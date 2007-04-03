@@ -174,8 +174,10 @@ You may use the following methods of the EnhTooltip class:
 
 -- setting version number
 ENHTOOLTIP_VERSION = "<%version%>"
+-- split up the version string, so it won't get replaced by the final version
+-- number
 if (ENHTOOLTIP_VERSION == "<".."%version%>") then
-	ENHTOOLTIP_VERSION = "4.1.DEV"
+	ENHTOOLTIP_VERSION = "4.9.DEV"
 end
 
 -- Initialize a storage space that all our functions can see
