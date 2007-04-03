@@ -179,7 +179,7 @@ if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 end
 
 -- Initialize a storage space that all our functions can see
-local EnhTTData = {
+local private = {
 	showIgnore = false,
 	moneySpacing = 4,
 	embedLines = {},   -- list of all embeded lines in/for the current tooltip
@@ -313,8 +313,8 @@ end
 
 function hideTooltip()
 	EnhancedTooltip:Hide()
-	EnhTTData.currentItem = nil
-	EnhTTData.hideTime = 0
+	private.currentItem = nil
+	private.hideTime = 0
 end
 
 -- Iterate over numbered global objects
@@ -333,7 +333,7 @@ end
 --Create a new fontstring
 function createNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
-	local currentFontStringIndex = EnhTTData.lastFontStringIndex
+	local currentFontStringIndex = private.lastFontStringIndex
 	local nextFontStringIndex    = currentFontStringIndex + 1
 
 	local newFontString = tooltip:CreateFontString(tooltipName.."Text"..nextFontStringIndex, "INFO", "GameFontNormal")
@@ -343,16 +343,16 @@ function createNewFontString(tooltip)
 	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
 
 	-- we do not update the lastFontStringIndex earlier to make sure that the new font string line has successfully been created
-	EnhTTData.lastFontStringIndex = nextFontStringIndex
+	private.lastFontStringIndex = nextFontStringIndex
 
 	return newFontString
 end
 
 --Create a new money object
 function createNewMoneyObject(tooltip)
-	EnhTTData.lastMoneyObjectIndex = EnhTTData.lastMoneyObjectIndex + 1
+	private.lastMoneyObjectIndex = private.lastMoneyObjectIndex + 1
 
-	local newMoneyObject = CreateFrame("Frame", tooltip:GetName().."Money"..EnhTTData.lastMoneyObjectIndex, tooltip, "EnhancedTooltipMoneyTemplate")
+	local newMoneyObject = CreateFrame("Frame", tooltip:GetName().."Money"..private.lastMoneyObjectIndex, tooltip, "EnhancedTooltipMoneyTemplate")
 	newMoneyObject:SetPoint("LEFT", tooltip:GetName().."Text1", "LEFT")
 	newMoneyObject:Hide()
 	return newMoneyObject
@@ -361,10 +361,10 @@ end
 --Create a new header fontstring
 function createNewHeaderFontString(tooltip)
 	local tooltipName = tooltip:GetName()
-	local currentHeaderFontStringIndex = EnhTTData.lastHeaderFontStringIndex
-	EnhTTData.lastHeaderFontStringIndex = currentHeaderFontStringIndex + 1
+	local currentHeaderFontStringIndex = private.lastHeaderFontStringIndex
+	private.lastHeaderFontStringIndex = currentHeaderFontStringIndex + 1
 
-	local newFontString = tooltip:CreateFontString(tooltipName.."Header"..EnhTTData.lastHeaderFontStringIndex, "INFO", "GameFontNormal")
+	local newFontString = tooltip:CreateFontString(tooltipName.."Header"..private.lastHeaderFontStringIndex, "INFO", "GameFontNormal")
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Header"..currentHeaderFontStringIndex, "BOTTOMLEFT", 0, -1)
 	newFontString:Hide()
 	newFontString:SetTextColor(1.0,1.0,1.0)
@@ -386,7 +386,7 @@ end
 --   code.
 -------------------------------------------------------------------------------
 function getLine(line)
-	if (line > EnhTTData.lastFontStringIndex) then
+	if (line > private.lastFontStringIndex) then
 		ret = createNewFontString(EnhancedTooltip)
 	else
 		ret = getglobal("EnhancedTooltipText"..line)
@@ -432,8 +432,8 @@ function clearTooltip()
 
 	-- clear the embedLines table, using ipairs instead of = {} to allow
 	-- reusing old tables, which should be quite common for this table
-	for i in ipairs(EnhTTData.embedLines) do
-		EnhTTData.embedLines[i] = nil
+	for i in ipairs(private.embedLines) do
+		private.embedLines[i] = nil
 	end
 end
 
@@ -460,18 +460,18 @@ end
 
 function showTooltip(currentTooltip, skipEmbedRender)
 	-- prevent recursive calls to showTooltip()
-	if (EnhTTData.showIgnore) then
+	if (private.showIgnore) then
 		return
 	end
 
 	-- First thing todo is to update the embeded tooltip to get the correct
 	-- width/height it requires, if there are any embeded lines to be displayed.
-	if (next(EnhTTData.embedLines) and (not skipEmbedRender)) then
-		embedRender(currentTooltip, EnhTTData.embedLines)
+	if (next(private.embedLines) and (not skipEmbedRender)) then
+		embedRender(currentTooltip, private.embedLines)
 		-- update the tooltip without calling showTooltip recursivly
-		EnhTTData.showIgnore = true
+		private.showIgnore = true
 		currentTooltip:Show()
-		EnhTTData.showIgnore = false
+		private.showIgnore = false
 	end
 
 	-- if there is no data for the enhanced tooltip frame, we've got nothing todo
@@ -535,9 +535,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		-- any other frame, so we don't have to bother about correct alignment.
 		-- The only thing todo is put the object underneath / shuffle it up, if
 		-- if there aint enuff room.
-		EnhTTData.showIgnore = true
+		private.showIgnore = true
 		currentTooltip:Show()
-		EnhTTData.showIgnore = false
+		private.showIgnore = false
 
 		local currentToolTipRect = getRect(currentTooltip)
 		if (currentToolTipRect.bottom - requiredHeight < 60) then
@@ -626,9 +626,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			local ttMoneyLineWidth = myLine:GetWidth()
 			ttMoney:ClearAllPoints()
 			if ((EnhancedTooltip.hasIcon) and (ttMoney.myLineNumber + headerCount < 4)) then
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - EnhTTData.moneySpacing * 2 - 34, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2 - 34, 0)
 			else
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - EnhTTData.moneySpacing * 2, 0)
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requiredWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2, 0)
 			end
 		end
 	end
@@ -640,9 +640,9 @@ function getTooltipWidth(enhTooltip)
 	for headerLine, index in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
 		if (headerLine.myMoney) then
 			if ((enhTooltip.hasIcon) and (index < 4)) then
-				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + EnhTTData.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
+				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + private.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
 			else
-				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + EnhTTData.moneySpacing + 20)
+				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + private.moneySpacing + 20)
 			end
 		else
 			if ((enhTooltip.hasIcon) and (index < 4)) then
@@ -656,9 +656,9 @@ function getTooltipWidth(enhTooltip)
 	for currentLine, index in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
 		if (currentLine.myMoney) then
 			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
-				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + EnhTTData.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
+				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + private.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
 			else
-				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + EnhTTData.moneySpacing + 20)
+				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + private.moneySpacing + 20)
 			end
 		else
 			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
@@ -765,7 +765,7 @@ end
 		bExact has no meaning, if moneyAmount is nil.
 ]]
 function addLine(lineText, moneyAmount, embed, bExact)
-	if (embed) and (EnhTTData.currentGametip) then
+	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
 		local text = ""
 		if (moneyAmount) then
@@ -773,7 +773,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(EnhTTData.embedLines, {text = text})
+		table.insert(private.embedLines, {text = text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -792,13 +792,13 @@ function addLine(lineText, moneyAmount, embed, bExact)
 		local curMoney = EnhancedTooltip.moneyCount + 1
 
 		local money
-		if (curMoney > EnhTTData.lastMoneyObjectIndex) then
+		if (curMoney > private.lastMoneyObjectIndex) then
 			money = createNewMoneyObject(EnhancedTooltip)
 		else
 			money = getglobal("EnhancedTooltipMoney"..curMoney)
 		end
 
-		money:SetPoint("LEFT", line, "RIGHT", EnhTTData.moneySpacing, 0)
+		money:SetPoint("LEFT", line, "RIGHT", private.moneySpacing, 0)
 		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money.myLineNumber = curLine
@@ -818,7 +818,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 	local curHeader = EnhancedTooltip.headerCount + 1
 	EnhancedTooltip.headerCount = curHeader
 
-	if (embed) and (EnhTTData.currentGametip) then
+	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curHeaderEmbed = true
 		local text = ""
 		if (moneyAmount) then
@@ -826,7 +826,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(EnhTTData.embedLines, curHeader, {text = text})
+		table.insert(private.embedLines, curHeader, {text = text})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -834,7 +834,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 
 
 	local line
-	if (curHeader > EnhTTData.lastHeaderFontStringIndex) then
+	if (curHeader > private.lastHeaderFontStringIndex) then
 		line = createNewHeaderFontString(EnhancedTooltip)
 	else
 		line = getglobal("EnhancedTooltipHeader"..curHeader)
@@ -850,13 +850,13 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 		local curMoney = EnhancedTooltip.moneyCount + 1
 
 		local money
-		if (curMoney > EnhTTData.lastMoneyObjectIndex) then
+		if (curMoney > private.lastMoneyObjectIndex) then
 			money = createNewMoneyObject(EnhancedTooltip)
 		else
 			money = getglobal("EnhancedTooltipMoney"..curMoney)
 		end
 
-		money:SetPoint("LEFT", line, "RIGHT", EnhTTData.moneySpacing, 0)
+		money:SetPoint("LEFT", line, "RIGHT", private.moneySpacing, 0)
 		TinyMoneyFrame_Update(money, math.floor(moneyAmount))
 		money.myLine = line:GetName()
 		money.myLineNumber = curHeader
@@ -869,9 +869,9 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 end
 
 function addSeparator(embed)
-	if (embed) and (EnhTTData.currentGametip) then
+	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
-		table.insert(EnhTTData.embedLines, {text = " "})
+		table.insert(private.embedLines, {text = " "})
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -887,11 +887,11 @@ function addSeparator(embed)
 end
 
 function lineColor(r, g, b)
-	if (EnhancedTooltip.curEmbed) and (EnhTTData.currentGametip) then
-		local n = #EnhTTData.embedLines
-		EnhTTData.embedLines[n].r = r
-		EnhTTData.embedLines[n].g = g
-		EnhTTData.embedLines[n].b = b
+	if (EnhancedTooltip.curEmbed) and (private.currentGametip) then
+		local n = #private.embedLines
+		private.embedLines[n].r = r
+		private.embedLines[n].g = g
+		private.embedLines[n].b = b
 		return
 	end
 	local curLine = EnhancedTooltip.lineCount
@@ -901,7 +901,7 @@ function lineColor(r, g, b)
 end
 
 function lineSize(fontSize)
-	if (EnhancedTooltip.curEmbed) and (EnhTTData.currentGametip) then
+	if (EnhancedTooltip.curEmbed) and (private.currentGametip) then
 		return
 	end
 
@@ -916,10 +916,10 @@ end
 
 function headerColor(r, g, b)
 	local curLine = EnhancedTooltip.headerCount
-	if (EnhancedTooltip.curHeaderEmbed) and (EnhTTData.currentGametip) then
-		EnhTTData.embedLines[curLine].r = r
-		EnhTTData.embedLines[curLine].g = g
-		EnhTTData.embedLines[curLine].b = b
+	if (EnhancedTooltip.curHeaderEmbed) and (private.currentGametip) then
+		private.embedLines[curLine].r = r
+		private.embedLines[curLine].g = g
+		private.embedLines[curLine].b = b
 		return
 	end
 	if (curLine == 0) then return end
@@ -928,7 +928,7 @@ function headerColor(r, g, b)
 end
 
 function headerSize(fontSize)
-	if (EnhancedTooltip.curHeaderEmbed) and (EnhTTData.currentGametip) then
+	if (EnhancedTooltip.curHeaderEmbed) and (private.currentGametip) then
 		return
 	end
 
@@ -976,10 +976,10 @@ end
 function gtHookOnHide()
 	local curName = ""
 	local hidingName = this:GetName()
-	if (EnhTTData.currentGametip) then curName = EnhTTData.currentGametip:GetName() end
+	if (private.currentGametip) then curName = private.currentGametip:GetName() end
 	if (curName == hidingName) then
 		HideObj = hidingName
-		EnhTTData.hideTime = EnhTTData.eventTimer + 0.1
+		private.hideTime = private.eventTimer + 0.1
 	end
 end
 
@@ -994,15 +994,15 @@ function doHyperlink(reference, link, button)
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
 		-- Prevent multiple calls to show one tooltip
-		if (itemName and EnhTTData.currentItem ~= itemName) then
+		if (itemName and private.currentItem ~= itemName) then
 			local testPopup = false
 			if (button == "RightButton") then
 				testPopup = true
 			end
 			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
 			if (callRes == true) then
-				local hasEmbed = #EnhTTData.embedLines > 0
-				EnhTTData.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
+				local hasEmbed = #private.embedLines > 0
+				private.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
 			elseif (callRes == false) then
 				return false
 			end
@@ -1011,18 +1011,18 @@ function doHyperlink(reference, link, button)
 end
 
 function checkHide()
-	if (EnhTTData.hideTime == 0) then return end
+	if (private.hideTime == 0) then return end
 
-	if (EnhTTData.eventTimer >= EnhTTData.hideTime) then
+	if (private.eventTimer >= private.hideTime) then
 		hideTooltip()
 		if (HideObj and HideObj == "ItemRefTooltip") then
 			-- closing chatreferenceTT?
-			EnhTTData.oldChatItem = nil -- remove old chatlink data
-		elseif EnhTTData.oldChatItem then
+			private.oldChatItem = nil -- remove old chatlink data
+		elseif private.oldChatItem then
 			-- closing another tooltip
 			-- redisplay old chatlinkdata, if it was not embeded
-			if not EnhTTData.oldChatItem.isEmbeded then
-				doHyperlink(EnhTTData.oldChatItem.reference, EnhTTData.oldChatItem.link, EnhTTData.oldChatItem.button)
+			if not private.oldChatItem.isEmbeded then
+				doHyperlink(private.oldChatItem.reference, private.oldChatItem.link, private.oldChatItem.button)
 			end
 		end
 	end
@@ -1115,21 +1115,21 @@ end
 ------------------------
 
 function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
-	EnhTTData.currentGametip = frame
-	EnhTTData.hideTime = 0
+	private.currentGametip = frame
+	private.hideTime = 0
 
 	local itemSig = frame:GetName()
 	if (link) then itemSig = itemSig..link end
 	if (count) then itemSig = itemSig..count end
 	if (price) then itemSig = itemSig..price end
 
-	if (EnhTTData.currentItem == itemSig) then
+	if (private.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
-		showTooltip(EnhTTData.currentGametip)
+		showTooltip(private.currentGametip)
 		return
 	end
 
-	EnhTTData.currentItem = itemSig
+	private.currentItem = itemSig
 
 	quality = quality or qualityFromLink(link)
 	hyperlink = hyperlink or link
@@ -1138,9 +1138,9 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	local showTip = true
 	local popupKeyPressed = (
-		(EnhTTData.forcePopupKey == "ctrl" and IsControlKeyDown()) or
-		(EnhTTData.forcePopupKey == "alt" and IsAltKeyDown()) or
-		(EnhTTData.forcePopupKey == "shift" and IsShiftKeyDown())
+		(private.forcePopupKey == "ctrl" and IsControlKeyDown()) or
+		(private.forcePopupKey == "alt" and IsAltKeyDown()) or
+		(private.forcePopupKey == "shift" and IsShiftKeyDown())
 	)
 
 	if (forcePopup or popupKeyPressed) then
@@ -1153,11 +1153,11 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	if (showTip) then
 		clearTooltip()
-		EnhTTData.showIgnore = true
+		private.showIgnore = true
 		EnhTooltip.AddTooltip(frame, name, link, quality, count, price)
-		EnhTTData.showIgnore = false
+		private.showIgnore = false
 		showTooltip(frame)
-		EnhTTData.currentItem = itemSig
+		private.currentItem = itemSig
 		return true
 	else
 		frame:Hide()
@@ -1412,25 +1412,25 @@ end
 
 function gtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
-	if (EnhTTData.currentGametip == frame) then
+	if (private.currentGametip == frame) then
 		return clearTooltip()
 	end
 end
 
 function gtHookAppendText(funcArgs, retVal, frame)
-	if (EnhTTData.currentGametip and EnhTTData.currentItem) then
-		return showTooltip(EnhTTData.currentGametip, true)
+	if (private.currentGametip and private.currentItem) then
+		return showTooltip(private.currentGametip, true)
 	end
 end
 
 function gtHookShow(funcArgs, retVal, frame)
-	if (EnhTTData.hookRecursion) then
+	if (private.hookRecursion) then
 		return
 	end
-	if (EnhTTData.currentGametip and EnhTTData.currentItem) then
-		EnhTTData.hookRecursion = true
-		showTooltip(EnhTTData.currentGametip, true)
-		EnhTTData.hookRecursion = nil
+	if (private.currentGametip and private.currentItem) then
+		private.hookRecursion = true
+		showTooltip(private.currentGametip, true)
+		private.hookRecursion = nil
 	end
 end
 
@@ -1490,20 +1490,20 @@ end
 
 function setElapsed(elapsed)
 	if (elapsed) then
-		EnhTTData.eventTimer = EnhTTData.eventTimer + elapsed
+		private.eventTimer = private.eventTimer + elapsed
 	end
 	checkHide()
-	return EnhTTData.eventTimer
+	return private.eventTimer
 end
 
 function setMoneySpacing(spacing)
-	EnhTTData.moneySpacing = spacing or EnhTTData.moneySpacing
-	return EnhTTData.moneySpacing
+	private.moneySpacing = spacing or private.moneySpacing
+	return private.moneySpacing
 end
 
 function setPopupKey(key)
-	EnhTTData.forcePopupKey = key or EnhTTData.forcePopupKey
-	return EnhTTData.forcePopupKey
+	private.forcePopupKey = key or private.forcePopupKey
+	return private.forcePopupKey
 end
 
 
