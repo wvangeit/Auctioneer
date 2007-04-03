@@ -543,8 +543,10 @@ end
 --
 -- parameters:
 --    currentTooltip  - the tooltip the enhanced tooltip should be anchored to
---    requestedHeight - the requested height for the enhanced tooltip window
---    requestedWidth  - the requested width for the enhanced tooltip window
+--    requestedHeight - (number) the requested height for the enhanced tooltip
+--                               window in pixel
+--    requestedWidth  - (number) the requested width for the enhanced tooltip
+--                               window in pixel
 -------------------------------------------------------------------------------
 function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
