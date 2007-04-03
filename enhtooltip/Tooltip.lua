@@ -205,6 +205,7 @@ local addHeader					-- AddLine(lineText,moneyAmount,embed)
 local addSeparator				-- AddSeparator(embed)
 local addTooltip				-- AddTooltip(frame,name,link,quality,count,price)
 local afHookOnEnter				-- AfHookOnEnter(type,index)
+local anchorEnhancedTooltip -- anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 local bagHook					-- BagHook()
 local bankHook					-- BankHook()
 local baselinkFromLink			-- BaselinkFromLink(link)
@@ -491,7 +492,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	end
 
 	local requestedWidth, requestedHeight = getTooltipWidth(EnhancedTooltip), getTooltipHeight(EnhancedTooltip)
-	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
 	local currentWidth = currentTooltip:GetWidth()
 	if (currentWidth < requestedWidth) then
@@ -500,11 +500,37 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		requestedWidth = currentWidth
 	end
 
+	anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
+
+	EnhancedTooltip:SetHeight(requestedHeight)
+	EnhancedTooltip:SetWidth(requestedWidth)
+	currentTooltip:SetWidth(requestedWidth)
+	EnhancedTooltip:Show()
+
+	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
+		if (ttMoney.myLine) then
+			local myLine = getglobal(ttMoney.myLine)
+			local ttMoneyWidth = ttMoney:GetWidth()
+			local ttMoneyLineWidth = myLine:GetWidth()
+			ttMoney:ClearAllPoints()
+			if ((EnhancedTooltip.hasIcon) and (ttMoney.myLineNumber + headerCount < 4)) then
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2 - 34, 0)
+			else
+				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2, 0)
+			end
+		end
+	end
+end
+
+function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
+	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
+
 	-- Get the frame which the currentTooltip is attached to.
 	-- We are using the first point, only, even if the gameTooltip is attached
 	-- to multiple anchors, to reduce the code complexity.
 	local _, currentTooltipOwner = currentTooltip:GetPoint(1)
 	local align                  = currentTooltip:GetAnchorType()
+
 	-- If the currentTooltip is already owned by EnhacedTooltip, meaning that we
 	-- already aligned it somewhere, we have to get the EnhancedTooltip owner
 	-- instead to get the correct frame to attach EnhancedTooltip and
@@ -533,6 +559,7 @@ function showTooltip(currentTooltip, skipEmbedRender)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0, 0)
 		end
 	elseif not currentTooltipOwner then
+		-- TODO: acording to wowwiki.com this should never happen => test it and probably add a debugMessage for user testing
 		-- If currentTooltipOwner is nil, the current tooltip is not attached to
 		-- any other frame, so we don't have to bother about correct alignment.
 		-- The only thing todo is put the object underneath / shuffle it up, if
@@ -613,25 +640,6 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		else -- if (anchor == "BOTTOMRIGHT") then
 			currentTooltip:SetPoint("TOPLEFT", currentTooltipOwner, "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
-		end
-	end
-
-	EnhancedTooltip:SetHeight(requestedHeight)
-	EnhancedTooltip:SetWidth(requestedWidth)
-	currentTooltip:SetWidth(requestedWidth)
-	EnhancedTooltip:Show()
-
-	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
-		if (ttMoney.myLine) then
-			local myLine = getglobal(ttMoney.myLine)
-			local ttMoneyWidth = ttMoney:GetWidth()
-			local ttMoneyLineWidth = myLine:GetWidth()
-			ttMoney:ClearAllPoints()
-			if ((EnhancedTooltip.hasIcon) and (ttMoney.myLineNumber + headerCount < 4)) then
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2 - 34, 0)
-			else
-				ttMoney:SetPoint("LEFT", myLine, "RIGHT", requestedWidth - ttMoneyLineWidth - ttMoneyWidth - private.moneySpacing * 2, 0)
-			end
 		end
 	end
 end
