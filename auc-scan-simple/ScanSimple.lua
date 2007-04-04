@@ -32,13 +32,11 @@
 --]]
 
 --[[
+	Auctioneer Scanning Engine.
 
-Auctioneer Scanning Engine.
-
-If you supply a category, that category will be scanned to completion and then the "image" will be updated.
-If you do not supply a category, then the whole AH will be scanned and then replace the current "image"
-
---]]
+	If you supply a category, that category will be scanned to completion and then the "image" will be updated.
+	If you do not supply a category, then the whole AH will be scanned and then replace the current "image"
+]]
 
 local libName = "Simple"
 local libType = "Scan"
