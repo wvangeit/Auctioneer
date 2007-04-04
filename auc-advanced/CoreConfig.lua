@@ -41,7 +41,7 @@ function private.CommandHandler(command, subcommand, ...)
 	if (command == "help") then
 		private.Print("Auctioneer Advanced Help")
 		private.Print("  {{/auc help}} - Show this help")
-		private.Print("  {{/auc begin [catid]}} - Scan the auction house (optional catid)")
+		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
@@ -74,21 +74,36 @@ function private.CommandHandler(command, subcommand, ...)
 	end
 end
 
-function lib.ScanCommand(cat)
+function lib.ScanCommand(cat, subcat)
 	cat = tonumber(cat)
+	subcat = tonumber(subcat)
+	local catName = nil
+	local subcatName = nil
 	--If there was a requested category to scan, we'll first check if its a valid category
 	if cat then
-		local catName = AucAdvanced.Const.CLASSES[cat]
+		catName = AucAdvanced.Const.CLASSES[cat]
 		if catName then
-			private.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
+			if subcat then
+				subcatName = AucAdvanced.Const.SUBCLASSES[cat][subcat]
+				if not subcatName then
+					subcat = nil
+				end
+			end
 		else
 			cat = nil
+			subcat = nil
 		end
+	else
+		subcat = nil
 	end
 	
 	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
 		private.Print("Beginning scanning: {{All categories}}")
+	elseif not subcat then
+			private.Print("Beginning scanning: {{Category "..cat.." ("..catName..")}}")
+	else
+			private.Print("Beginning scanning: {{Category "..cat.."."..subcat.." ("..subcatName.." of "..catName..")}}")
 	end
 
 	local scanner = AucAdvanced.scanner or AucAdvanced.Defaults.Scanner
@@ -100,7 +115,7 @@ function lib.ScanCommand(cat)
 			return
 		end
 	end
-	AucAdvanced.Modules.Scan[scanner].StartScan(cat)
+	AucAdvanced.Modules.Scan[scanner].StartScan(cat, subcat)
 end
 
 function lib.GetCommandLead(llibType, llibName)
