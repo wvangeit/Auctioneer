@@ -36,8 +36,7 @@ local lib = AucAdvanced.Config
 local private = {}
 private.Print = AucAdvanced.Utilities.Print
 
-
-function private.CommandHandler(command, ...)
+function private.CommandHandler(command, subcommand, ...)
 	command = command:lower()
 	if (command == "help") then
 		private.Print("Auctioneer Advanced Help")
@@ -51,14 +50,14 @@ function private.CommandHandler(command, ...)
 			end
 		end
 	elseif command == "begin" then
-		lib.ScanCommand(...)
+		lib.ScanCommand(subcommand, ...)
 	else
-		local sys, eng = strsplit(" ", command)
-		if sys and eng then
+		if command and subcommand then
+			subcommand = subcommand:lower()
 			for system, systemMods in pairs(AucAdvanced.Modules) do
-				if sys == system:lower() then
+				if command == system:lower() then
 					for engine, engineLib in pairs(systemMods) do
-						if command == engine:lower() then
+						if subcommand == engine:lower() then
 							if engineLib.CommandHandler then
 --								if not engineLib.Print then
 --									engineLib.Print = lib.Print
@@ -105,6 +104,10 @@ function lib.ScanCommand(cat)
 		end
 	end
 	AucAdvanced.Modules.Scan[scanner].StartScan(cat)
+end
+
+function lib.GetCommandLead(llibType, llibName)
+	return "  {{"..SLASH_AUCADVANCED1.." "..llibType:lower().." "..llibName:lower()
 end
 
 SLASH_AUCADVANCED1 = "/auc"

@@ -64,7 +64,7 @@ function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
-		local line = "  {{/aul "..libName:lower()
+		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
 		print(line, "help}} - this", libName, "help")
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then

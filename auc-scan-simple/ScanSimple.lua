@@ -77,10 +77,11 @@ function lib.OnLoad()
 	collectgarbage()
 end
 
-function lib.StartScan(cat)
+function lib.StartScan(cat, subcat)
 	if AuctionFrame and AuctionFrame:IsVisible() then
 		private.curCat = cat
 		private.curScan = nil
+		private.curSubCat = subcat
 		private.isScanning = true
 		lib.ScanPage(0)
 	else
@@ -228,7 +229,8 @@ function private.Commit()
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	for pos, data in ipairs(private.image) do
-		if (not private.curCat or Const.CLASSES[private.curCat] == data[Const.ITYPE]) then
+		if (not private.curCat or Const.CLASSES[private.curCat] == data[Const.ITYPE]) 
+			and (not private.curSubCat or (Const.SUBCLASSES[private.curCat] and Const.SUBCLASSES[private.curCat][private.curSubCat] == data[Const.ISUB])) then
 			-- Mark dirty
 			flag = data[Const.FLAG] or 0
 			data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
@@ -259,6 +261,7 @@ function private.Commit()
 			if not private.IsIdentical(private.image[itemPos], data) then
 				if (bit.band(flag, Const.FLAG_UNSEEN) > 0) then
 					-- If it has been recorded as suspended
+					data[Const.FLAG] = bit.bxor(flag, Const.FLAG_UNSEEN)
 					processStats("resume", data, private.image[itemPos])
 					resumeCount = resumeCount + 1
 				else
@@ -346,8 +349,7 @@ end
 function lib.ScanPage(nextPage)
 	if (lib.IsScanning()) then
 		private.curPage = nextPage
--- Why aren't all the params set?
-		lib.Hook.QueryAuctionItems("", "", "", nil, private.curCat, nil, nextPage, nil, nil)
+		lib.Hook.QueryAuctionItems("", "", "", nil, private.curCat, private.curSubCat, nextPage, nil, nil)
 		AuctionFrameBrowse.page = nextPage
 	end
 end
