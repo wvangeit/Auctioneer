@@ -59,9 +59,6 @@ function private.CommandHandler(command, subcommand, ...)
 					for engine, engineLib in pairs(systemMods) do
 						if subcommand == engine:lower() then
 							if engineLib.CommandHandler then
---								if not engineLib.Print then
---									engineLib.Print = lib.Print
---								end
 								engineLib.CommandHandler(...)
 								return
 							end
