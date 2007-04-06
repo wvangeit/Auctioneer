@@ -57,7 +57,7 @@ if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
-function AucAdvanced.Utilities.Print(...)
+function AucAdvanced.Print(...)
 	local output, part
 	for i=1, select("#", ...) do
 		part = select(i, ...)
@@ -67,11 +67,10 @@ function AucAdvanced.Utilities.Print(...)
 	end
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 end
--- Because it was defined in top level originally.  (Until all references moved)
-AucAdvanced.Print = AucAdvanced.Utilities.Print
+AucAdvanced.Utilities.Print = AucAdvanced.Print
 
 
-function AucAdvanced.Utilities.DecodeLink(link)
+function AucAdvanced.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
 		local linkType = EnhTooltip.LinkType(link)
@@ -83,10 +82,9 @@ function AucAdvanced.Utilities.DecodeLink(link)
 	end
 	return
 end
--- Because it was defined in top level originally.  (Until all references moved)
-AucAdvanced.DecodeLink = AucAdvanced.Utilities.DecodeLink
+AucAdvanced.Utilities.DecodeLink = AucAdvanced.DecodeLink
 
-function AucAdvanced.Utilities.GetFaction() 
+function AucAdvanced.GetFaction() 
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
@@ -115,8 +113,7 @@ function AucAdvanced.Utilities.GetFaction()
 	AucAdvanced.curFaction = realmName.."-"..factionGroup
 	return AucAdvanced.curFaction
 end
--- Because it was defined in top level originally.  (Until all references moved)
-AucAdvanced.GetFaction = AucAdvanced.Utilities.GetFaction
+AucAdvanced.Utilities.GetFaction = AucAdvanced.GetFaction
 
 
 function private.TooltipHook(vars, ret, ...)

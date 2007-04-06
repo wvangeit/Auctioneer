@@ -4,6 +4,7 @@
 ## Interface: 20003
 ## LoadOnDemand: 0
 ## Dependencies: EnhTooltip, Stubby
+## OptionalDependencies: !nlog
 ## SavedVariables: AucAdvancedConfig, AucAdvancedData
 ## SavedVariablesPerCharacter: AucAdvancedLocal
 ##

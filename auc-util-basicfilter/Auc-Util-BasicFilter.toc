@@ -1,0 +1,15 @@
+## Title: Auctioneer:Util:BasicFilter
+## Notes: Allows filtering of auctioneer data by some basic items, such as minimum quality, minimum item level, and ignored seller.
+##
+## Interface: 20003
+## LoadOnDemand: 0
+## Disabled: 0
+## Dependencies: Auc-Advanced
+## SavedVariables: AucAdvancedUtilBasicFilter
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+
+BasicFilter.lua

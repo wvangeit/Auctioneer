@@ -37,7 +37,7 @@ local libType = "Stat"
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
 local private = {}
-local print = AucAdvanced.Utilities.Print
+local print = AucAdvanced.Print
 
 local data
 

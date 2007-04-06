@@ -34,7 +34,7 @@
 AucAdvanced.Config = {}
 local lib = AucAdvanced.Config
 local private = {}
-private.Print = AucAdvanced.Utilities.Print
+private.Print = AucAdvanced.Print
 
 function private.CommandHandler(command, subcommand, ...)
 	command = command:lower()

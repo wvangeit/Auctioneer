@@ -60,7 +60,7 @@ function lib.OnLoad()
 	local data = AucAdvancedScanSimpleData
 	local ldata = AucAdvancedScanSimpleLocal
 	if data.lastScan then
-		local faction = AucAdvanced.Utilities.GetFaction()
+		local faction = AucAdvanced.GetFaction()
 		if data.lastScan.faction ~= faction then
 			data.lastScan = ldata.lastScan
 		end
@@ -182,7 +182,7 @@ local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
 	private.Unpack(curItem, statItem)
 	if (oldItem) then private.Unpack(oldItem, statItemOld) end
-	if (operation ~= "create") then
+	if (operation == "create") then
 		--[[ 
 		filtering out happens here so we only have to do Unpack once.
 		 only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
@@ -191,7 +191,8 @@ local function processStats(operation, curItem, oldItem)
 		]]
 		for engine, engineLib in pairs(AucAdvanced.Modules.Util) do
 			if (engineLib.AuctionFilter) then
-				if (engineLib.AuctionFilter(operation, statItem)) then return false end
+				local result=engineLib.AuctionFilter(operation, statItem)
+				if (result) then return false end
 			end
 		end	
 	end
@@ -546,3 +547,8 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	lib.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
 
+function DbgSAC()
+	AucAdvancedScanSimpleData = {}
+	AucAdvancedScanSimpleDataLocal = {}
+	lib.OnLoad()
+end

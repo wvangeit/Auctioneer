@@ -72,7 +72,7 @@ function lib.CommandHandler(command, ...)
 		data[myFaction] = nil
 	elseif (command == "push") then
 		print("Archiving {{", myFaction, "}} daily stats and starting a new day")
-		lib.PushStats(myFaction)
+		private.PushStats(myFaction)
 	end
 end
 
