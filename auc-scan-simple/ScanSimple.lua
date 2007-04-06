@@ -72,7 +72,7 @@ function lib.OnLoad()
 		end
 	end
 	ldata.lastScan = data.lastScan
-	collectgarbage()
+	collectgarbage("collect")
 end
 
 function lib.StartScan(cat, subcat)
@@ -183,18 +183,18 @@ local function processStats(operation, curItem, oldItem)
 	private.Unpack(curItem, statItem)
 	if (oldItem) then private.Unpack(oldItem, statItemOld) end
 	if (operation == "create") then
-		--[[ 
-		filtering out happens here so we only have to do Unpack once.
-		 only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
-		 (it could think it was sold, for instance)
-		 filters are part of the Util subsystem.
+		--[[
+			Filtering out happens here so we only have to do Unpack once.
+			Only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
+			(it could think it was sold, for instance)
+			Filters are part of the Util subsystem.
 		]]
 		for engine, engineLib in pairs(AucAdvanced.Modules.Util) do
 			if (engineLib.AuctionFilter) then
 				local result=engineLib.AuctionFilter(operation, statItem)
 				if (result) then return false end
 			end
-		end	
+		end
 	end
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
@@ -228,7 +228,7 @@ function private.Commit()
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	for pos, data in ipairs(private.image) do
-		if (not private.curCat or Const.CLASSES[private.curCat] == data[Const.ITYPE]) 
+		if (not private.curCat or Const.CLASSES[private.curCat] == data[Const.ITYPE])
 			and (not private.curSubCat or (Const.SUBCLASSES[private.curCat] and Const.SUBCLASSES[private.curCat][private.curSubCat] == data[Const.ISUB])) then
 			-- Mark dirty
 			flag = data[Const.FLAG] or 0
@@ -290,12 +290,12 @@ function private.Commit()
 			-- This item should have been seen, but wasn't
 			local stillpossible = false
 			local auctionmaxtime = Const.AucMinTimes[data[Const.TLEFT]] or 86400
-			
+
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
 			end
 
-			
+
 			if (stillpossible) then
 				-- Don't delete it yet. It may have been either skipped, or may be awaiting relist
 				suspendCount = suspendCount + 1
@@ -312,7 +312,7 @@ function private.Commit()
 				table.remove(private.image, pos)
 				removeCount = removeCount + 1
 			end
-			
+
 		end
 	end
 	local currentCount = #private.image
@@ -320,7 +320,7 @@ function private.Commit()
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
 	end
-	
+
 	if (oldCount - removeCount + newCount ~= currentCount) then
 		lib.Print(("Warning, discrepency in current count: {{%d - %d + %d != %d}}"):format(oldCount, removeCount, newCount, currentCount))
 	end
@@ -341,7 +341,7 @@ function private.Commit()
 		time = time(),
 	}
 	AucAdvancedScanSimpleData.lastScan = AucAdvancedScanSimpleLocal.lastScan
-	
+
 	private.curScan = nil
 end
 
@@ -371,12 +371,12 @@ function lib.StorePage()
 	local timeLeft, name, texture, count, quality, canUse, level, minBid
 	local minIncrement, buyoutPrice, bidAmount, highBidder, owner
 	local invType, nextBid
-	
+
 	local storecount = 0
 	for i = 1, numBatchAuctions do
 		local itemLink = GetAuctionItemLink("list", i)
 		if itemLink then
-			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc,_ = GetItemInfo(itemLink)
+			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
 			--[[
 				Returns Integer giving range of time left for query
 				1 -- short time (Less than 30 mins)
@@ -491,11 +491,11 @@ function lib.GetResults()
 			if curQuery.maxBid and nextBid > curQuery.maxBid then break end
 			if curQuery.minBuyout and buyout < curQuery.minBuyout then break end
 			if curQuery.maxBuyout and buyout > curQuery.maxBuyout then break end
-		
+
 			-- If we're still here, then we've got a winner
 			table.insert(curResults, data)
 		until true
-	end	
+	end
 	return curResults
 end
 
@@ -510,7 +510,7 @@ function CanSendAuctionQuery(...)
 			lib.StorePage()
 		end
 	end
-	
+
 	return unpack(res)
 end
 
@@ -534,7 +534,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
 		lib.curQuery = query
 		lib.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
-			query.name or "", 
+			query.name or "",
 			query.minUseLevel or "",
 			query.maxUseLevel or "",
 			query.class or "",
@@ -544,11 +544,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		)
 		lib.lastReq = GetTime()
 	end
-	lib.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-end
 
-function DbgSAC()
-	AucAdvancedScanSimpleData = {}
-	AucAdvancedScanSimpleDataLocal = {}
-	lib.OnLoad()
+	return lib.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
