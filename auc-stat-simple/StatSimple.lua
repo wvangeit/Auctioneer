@@ -128,11 +128,11 @@ function lib.GetPrice(hyperlink, faction)
 
 	if not faction then faction = AucAdvanced.GetFaction() end
 
-	local dayTotal, dayCount, dayAverage = 0,0,0
-	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
-
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then return end
+
+	local dayTotal, dayCount, dayAverage = 0,0,0
+	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
 
 	if data[faction].daily and data[faction].daily[itemId] then
 		local stats = private.UnpackStats(data[faction].daily[itemId])
@@ -175,7 +175,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	if (seenDays + dayCount > 0) then
 		EnhTooltip.AddLine(libName.." prices:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-	
+
 		if (seenDays > 0) then
 			if (dayCount>0) then seenDays = seenDays + 1 end
 			EnhTooltip.AddLine("  Seen |cffddeeff"..(seenCount+dayCount).."|r over |cffddeeff"..seenDays.."|r days:")
@@ -203,7 +203,7 @@ end
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	
+
 	for faction, stats in pairs(data) do
 		if not stats.daily then stats.daily = { created = time() } end
 		if not stats.means then stats.means = {} end
@@ -233,7 +233,7 @@ function private.PushStats(faction)
 					fdata[property] = {
 						1,
 						info[2],
-						("%0.01f"):format(dailyAvg), 
+						("%0.01f"):format(dailyAvg),
 						("%0.01f"):format(dailyAvg),
 						("%0.01f"):format(dailyAvg),
 					}
