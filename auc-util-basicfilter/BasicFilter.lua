@@ -29,7 +29,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+]]
 
 local libName = "BasicFilter"
 local libType = "Util"
@@ -43,19 +43,6 @@ private.print = AucAdvanced.Print
 
 local data
 
---[[
-The following functions are part of the module's exposed methods:
-	GetName()         (required) Should return this module's full name
-	CommandHandler()  (optional) Slash command handler for this module
-	Processor()       (optional) Processes messages sent by Auctioneer
-	ScanProcessor()   (optional) Processes items from the scan manager
-*	GetPrice()        (required) Returns estimated price for item link
-*	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
-
-	(*) Only implemented in stats modules; util modules do not provide
-]]
-
 function lib.GetName()
 	return libName
 end
@@ -63,41 +50,52 @@ end
 function lib.CommandHandler(command, parm1, ...)
 	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
-	if (command == "help") then
-		private.print("Help for Auctioneer Advanced - "..libName)
+
+	if (not command or command == "" or command == "help") then
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
+
+		private.print("Help for Auctioneer Advanced - "..libName)
 		private.print(line, "help}} - this", libName, "help")
 		private.print(line, "clear}} - clear out all filters")
 		private.print(line, "minquality QUALITY}} - sets minimum quality allowed to QUALITY ["..tostring(data.MinQuality or 0).."]")
 		private.print(line, "minlevel LEVEL}} - sets minimum item level allowed to LEVEL ["..tostring(data.MinLevel or 0).."]")
-		private.print(line, "ignoreseller SELLER}} - adds seller to teh ignored sellers list")
+		private.print(line, "ignoreseller SELLER}} - adds seller to the ignored sellers list")
 		private.print(line, "showignored}} - shows list of ignored sellers")
+
 	elseif (command == "minquality") then
 		private.print("setting minimum quality to ", parm1)
 		data.MinQuality = tonumber(parm1)
+
 	elseif (command == "minlevel") then
 		private.print("setting minimum level to ", parm1)
 		data.MinLevel = tonumber(parm1)
+
 	elseif (command == "ignoreseller") then
-		private.print("adding", parm1, "to ignored sellers list")		
+		private.print("adding", parm1, "to ignored sellers list")
 		if (not data.SellersIgnored) then data.SellersIgnored = {} end
 		data.SellersIgnored[parm1:lower()] = true
+
 	elseif (command == "unignoreseller") then
-		private.print("removing", parm1, "from ignored sellers list")		
+		private.print("removing", parm1, "from ignored sellers list")
 		if (not data.SellersIgnored) then data.SellersIgnored = {} end
 		data.SellersIgnored[parm1:lower()] = nil
+
 	elseif (command == "showignored") then
 		private.print("{{Sellers Currently Ignored}}")
-		for i, _ in pairs(data.SellersIgnored) do
-			private.print("{{"..i.."}}")
+		for seller in pairs(data.SellersIgnored) do
+			private.print("{{"..seller.."}}")
 		end
-	end
-end
 
-function lib.Processor(callbackType, ...)
-	if (not data) then private.makeData() end
-	if (callbackType == "load") then
-		lib.OnLoad(...)
+	elseif (command == "clear") then
+		for seller in pairs(data.SellersIgnored) do
+			data.SellersIgnored[seller] = nil
+		end
+		data.MinQuality = 0
+		data.MinLevel = 0
+
+	else
+		private.print("{{Command not recognized}}")
+		lib.CommandHandler("help")
 	end
 end
 
@@ -115,28 +113,22 @@ function lib.AuctionFilter(operation, itemData)
 	if (quality < minquality) then retval = true end
 	if (level < minlevel) then retval = true end
 	if (sellersignored[seller]) then retval = true end
-	
+
 	if nLog and retval then
-		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ", 
-			itemData.itemName.." from "..(itemData.sellerName or "UNKNOWN")..", quality "..tostring(quality or 0)..", item level "..tostring(itemData.itemLevel or 0))
+		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
+			itemData.itemName, " from ", (itemData.sellerName or "UNKNOWN"), ", quality ", tostring(quality or 0), ", item level ", tostring(itemData.itemLevel or 0))
 	end
 	return retval
 end
 
 function lib.OnLoad(addon)
-	if (addon == "auc-util-basicfilter") then
-		private.makeData()
-	end
+	private.makeData()
 end
 
-
-
 --[[ Local functions ]]--
-
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	
 end
 
 function private.makeData()
@@ -145,4 +137,3 @@ function private.makeData()
 	data = AucAdvancedUtilBasicFilter
 	private.DataLoaded()
 end
-
