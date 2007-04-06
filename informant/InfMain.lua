@@ -139,8 +139,12 @@ function skillToName(userSkill)
 	return localized, skillName
 end
 
-function getItem(itemID)
+local staticDataItem={}
+local emptyTable={}
+local staticDataID
+function getItem(itemID, static)
 	if (not itemID) then return end
+	if (static and staticDataID and staticDataID==itemID) then return staticDataItem end
 
 	local baseData = self.database[itemID]
 	local buy, sell, class, quality, stack, additional, usedby, quantity, limited, merchantlist
@@ -162,22 +166,21 @@ function getItem(itemID)
 	if (vbuy) then buy = vbuy end
 	if (vsell) then sell = vsell end
 
-	local dataItem = {
-		buy = buy,
-		sell = sell,
-		class = class,
-		classText = itemType,
-		cat = cat,
-		quality = quality,
-		stack = stack,
-		additional = additional,
-		usedby = usedby,
-		quantity = quantity,
-		limited = limited,
-		texture = itemTexture,
-		itemLevel = itemLevel,
-		reqLevel = itemUseLevel,
-	}
+	local dataItem = (static and staticDataItem or {})
+	dataItem.buy = buy
+	dataItem.sell = sell
+	dataItem.class = class
+	dataItem.classText = itemType
+	dataItem.cat = cat
+	dataItem.quality = quality
+	dataItem.stack = stack
+	dataItem.additional = additional
+	dataItem.usedby = usedby
+	dataItem.quantity = quantity
+	dataItem.limited = limited
+	dataItem.texture = itemTexture
+	dataItem.itemLevel = itemLevel
+	dataItem.reqLevel = itemUseLevel
 
 	local addition = ""
 	if (additional and additional ~= "") then
@@ -211,7 +214,11 @@ function getItem(itemID)
 			end
 		end
 		dataItem.usageText = usage
+	else
+		dataItem.usedList = nil
+		dataItem.usageText = nil
 	end
+
 
 	local reqSkill = 0
 	local reqLevel = 0
@@ -241,10 +248,10 @@ function getItem(itemID)
 			end
 		end
 		dataItem.vendors = vendList
+	else
+		dataItem.vendors = nil
 	end
 
-	dataItem.requiredFor = {}
-	dataItem.rewardFrom = {}
 	dataItem.startsQuest = self.questStarts[itemID]
 
 	local questItemUse = self.questRequires[itemID]
@@ -261,6 +268,8 @@ function getItem(itemID)
 			if not list[i][2] then list[i][2] = 1 end
 		end
 		dataItem.requiredFor = list
+	else
+		dataItem.requiredFor = (static and emptyTable or {})
 	end
 
 	questItemUse = self.questRewards[itemID]
@@ -274,8 +283,11 @@ function getItem(itemID)
 			list[i] = tonumber(list[i])
 		end
 		dataItem.rewardFrom = list
+	else
+		dataItem.rewardFrom = (static and emptyTable or {})
 	end
 
+	staticDataID=itemID
 	return dataItem
 end
 
