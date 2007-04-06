@@ -100,7 +100,7 @@ AucAdvanced.Const = {
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },
 }
-local i
+
 for i = 1, #AucAdvanced.Const.CLASSES do
 	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
 end
