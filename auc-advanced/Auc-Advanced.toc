@@ -21,6 +21,7 @@ CoreLocale.lua
 
 CoreMain.lua
 CoreAPI.lua
+CoreUtil.lua
 CoreConst.lua
 CoreConfig.lua
 

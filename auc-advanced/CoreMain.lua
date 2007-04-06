@@ -38,7 +38,6 @@
 
 
 if (not AucAdvanced) then AucAdvanced = {} end
-if (not AucAdvanced.Utilities) then AucAdvanced.Utilities = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
@@ -56,65 +55,6 @@ local private = {}
 if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}} end
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
-
-function AucAdvanced.Print(...)
-	local output, part
-	for i=1, select("#", ...) do
-		part = select(i, ...)
-		part = tostring(part):gsub("{{", "|cffddeeff"):gsub("}}", "|r")
-		if (output) then output = output .. " " .. part
-		else output = part end
-	end
-	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
-end
-AucAdvanced.Utilities.Print = AucAdvanced.Print
-
-
-function AucAdvanced.DecodeLink(link)
-	local vartype = type(link)
-	if (vartype == "string") then
-		local linkType = EnhTooltip.LinkType(link)
-		if (linkType ~= "item") then return end
-		local itemId, property,_,_,_,_,_,_,_,factor = EnhTooltip.BreakLink(link)
-		return linkType, itemId, property, factor
-	elseif (vartype == "number") then
-		return "item", link, 0, 0
-	end
-	return
-end
-AucAdvanced.Utilities.DecodeLink = AucAdvanced.DecodeLink
-
-function AucAdvanced.GetFaction() 
-	local realmName = GetRealmName()
-	local currentZone = GetMinimapZoneText()
-	local factionGroup = UnitFactionGroup("player")
-	
-	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
-	if AucAdvancedConfig.factions[currentZone] then
-		factionGroup = AucAdvancedConfig.factions[currentZone]
-	else
-		SetMapToCurrentZone()
-		local map = GetMapInfo()
-		if ((map == "Taneris") or (map == "Winterspring") or (map == "Stranglethorn")) then
-			factionGroup = "Neutral"
-		end
-	end
-
-	if not factionGroup then return end
-
-	AucAdvancedConfig.factions[currentZone] = factionGroup
-	if (factionGroup == "Neutral") then
-		AucAdvanced.cutRate = 0.15
-		AucAdvanced.depositRate = 0.25
-	else
-		AucAdvanced.cutRate = 0.05
-		AucAdvanced.depositRate = 0.05
-	end
-	AucAdvanced.curFaction = realmName.."-"..factionGroup
-	return AucAdvanced.curFaction
-end
-AucAdvanced.Utilities.GetFaction = AucAdvanced.GetFaction
-
 
 function private.TooltipHook(vars, ret, ...)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
