@@ -36,26 +36,29 @@ local lib = AucAdvanced.API
 
 
 --[[
-The following functions are defined for modules's exposed methods:
+	The following functions are defined for modules's exposed methods:
+
 	GetName()         (ALL*)  Should return this module's full name
-	CommandHandler()  (ALL*)  Slash command handler for this module
-	Processor()       (ALL)   Processes messages sent by Auctioneer
-	ScanProcessor()   (ALL)   Processes items from the scan manager
+	OnLoad()          (ALL*)   Receives load message for all modules
+	Processor()       (ALL)  Processes messages sent by Auctioneer
+	CommandHandler()  (ALL)  Slash command handler for this module
+	ScanProcessor {}  (ALL)   Processes items from the scan manager
 	GetPrice()        (STAT*) Returns estimated price for item link
 	GetPriceColumns() (STAT)  Returns the column names for GetPrice
-	OnLoad()          (ALL)   Receives load message for all modules
 	StartScan()       (SCAN*) Begins an AH scan session
 	IsScanning()      (SCAN*) Indicates an AH scan is in session
-	AbortScan()       (SCAN)  Cancels the currently running scan
 	GetResults()      (SCAN*)
+	AbortScan()       (SCAN)  Cancels the currently running scan
 	Hook { }          (ALL)   Functions that are hooked by the module
-	
-	
+
+
 	Module type in parentheses to describe which ones provide.
 	Possible Module Types are STAT, UTIL, SCAN.  ALL is a shorthand for all three.
 	A * after the module type states the function is REQUIRED.
+	
+	Please visit http://norganna.org/wiki/Auctioneer/5.0/Modules_API for a
+	more complete specification.
 ]]
-
 
 
 --[[
