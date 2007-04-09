@@ -404,6 +404,7 @@ function clearTooltip()
 	EnhancedTooltip.hasData        = false
 	EnhancedTooltip.hasIcon        = false
 	EnhancedTooltip.curHeaderEmbed = false
+
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
 
@@ -1447,7 +1448,7 @@ end
 function gtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (private.currentGametip == frame) then
-		return clearTooltip()
+		clearTooltip()
 	end
 end
 
