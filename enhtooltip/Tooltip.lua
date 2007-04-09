@@ -200,81 +200,80 @@ local private = {
 -- =============== LOCAL FUNCTIONS =============== --
 
 -- prototypes for all local functions
-local addLine					-- AddLine(lineText,moneyAmount,embed)
-local addHeader					-- AddLine(lineText,moneyAmount,embed)
-local addSeparator				-- AddSeparator(embed)
-local addTooltip				-- AddTooltip(frame,name,link,quality,count,price)
-local afHookOnEnter				-- AfHookOnEnter(type,index)
-local anchorEnhancedTooltip -- anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
-local bagHook					-- BagHook()
-local bankHook					-- BankHook()
-local baselinkFromLink			-- BaselinkFromLink(link)
-local breakLink					-- BreakLink(link)
-local callBagHook				-- CallBagHook(event,bagNumber)
-local callBankHook				-- CallBankHook()
-local callCheckPopup			-- CallCheckPopup(name,link,quality,count,price,hyperlink)
-local callTradeHook				-- CallTradeHook(type,event,selID)
-local chatHookSetItemRef		-- ChatHookSetItemRef(reference,link,button)
-local checkHide					-- CheckHide()
-local checkPopup				-- CheckPopup(name,link,quality,count,price,hyperlink)
-local clearTooltip				-- ClearTooltip()
-local debugPrint				-- DebugPrint(...)
-local doHyperlink				-- DoHyperlink(reference,link,button)
-local embedRender				-- EmbedRender()
-local fakeLink					-- FakeLink(hyperlink,quality,name)
-local findItemInBags			-- FindItemInBags(findName)
-local getglobalIterator			-- GetglobalIterator(format,first,last)
-local getGSC					-- GetGSC(money)
-local getLine                 -- getLine(line)
-local getLootLinkLink			-- GetLootLinkLink(name)
-local getLootLinkServer			-- GetLootLinkServer()
-local getRect					-- GetRect(object)
-local getTextGSC				-- GetTextGSC(money,exact)
-local getTooltipHeight			-- GetTooltipHeight(enhTooltip)
-local getTooltipWidth			-- GetTooltipWidth(enhTooltip)
-local gtHookOnHide				-- GtHookOnHide()
-local gtHookSetAuctionSellItem	-- GtHookSetAuctionSellItem(frame)
-local gtHookSetBagItem			-- GtHookSetBagItem(frame,frameID,buttonID,retVal)
-local gtHookSetCraftItem		-- GtHookSetCraftItem(frame,skill,slot)
-local gtHookSetCraftSpell		-- GtHookSetCraftSpell(frame,skill,slot)
-local gtHookSetInboxItem		-- GtHookSetinboxItem(frame,index)
-local gtHookSetInventoryItem	-- GtHookSetInventoryItem(frame,unit,slot,retVal)
-local gtHookSetLootItem			-- GtHookSetLootItem(frame,slot)
-local gtHookSetMerchantItem		-- GtHookSetMerchantItem(frame,slot)
-local gtHookSetQuestItem		-- GtHookSetQuestItem(frame,qtype,slot)
-local gtHookSetQuestLogItem		-- GtHookSetQuestLogItem(frame,qtype,slot)
-local gtHookSetTradeSkillItem	-- GtHookSetTradeSkillItem(frame,skill,slot)
-local gtHookSetText				-- GtHookSetText(funcArgs, retval, frame, text, r, g, b, unknown1, unknown2)
-local gtHookAppendText			-- GtHookAppendText(funcArgs, retVal, frame)
-local gtHookShow				-- GtHookShow(funcArgs, retVal, frame)
-local headerColor				-- HeaderColor(r, g, b)
-local headerQuality				-- HeaderQuality(quality)
-local headerSize				-- HeaderSize(fontSize)
-local hideTooltip				-- HideTooltip()
-local hyperlinkFromLink			-- HyperlinkFromLink(link)
-local imHookOnEnter				-- ImHookOnEnter()
-local imiHookOnEnter			-- ImiHookOnEnter()
-local lineColor					-- LineColor(r,g,b)
-local lineQuality				-- LineQuality(quality)
-local lineSize					-- LineSize(fontSize)
-local lineSize_Large			-- LineSize_Large()
-local lineSize_Small			-- LineSize_Small()
-local linkType					-- LinkType()
-local llHookOnEnter				-- LlHookOnEnter()
-local merchantHook				-- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
-local merchantScanner			-- MerchantScanner()
-local nameFromLink				-- NameFromLink(link)
-local onLoad					-- OnLoad
-local qualityFromLink			-- QualityFromLink(link)
-local setElapsed				-- SetElapsed(elapsed)
-local setIcon					-- SetIcon(iconPath)
-local setMoneySpacing			-- SetMoneySpacing(spacing)
-local setPopupKey				-- SetPopupKey(key)
-local showTooltip				-- ShowTooltip(currentTooltip,skipEmbedRender)
-local tooltipCall				-- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
-local tradeHook					-- TradeHook(type,selID)
-local ttInitialize				-- TtInitialize()
-
+local addLine                  -- AddLine(lineText,moneyAmount,embed)
+local addHeader                -- AddLine(lineText,moneyAmount,embed)
+local addSeparator             -- AddSeparator(embed)
+local addTooltip               -- AddTooltip(frame,name,link,quality,count,price)
+local afHookOnEnter            -- AfHookOnEnter(type,index)
+local anchorEnhancedTooltip    -- anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
+local bagHook                  -- BagHook()
+local bankHook                 -- BankHook()
+local baselinkFromLink         -- BaselinkFromLink(link)
+local breakLink                -- BreakLink(link)
+local callBagHook              -- CallBagHook(event,bagNumber)
+local callBankHook             -- CallBankHook()
+local callCheckPopup           -- CallCheckPopup(name,link,quality,count,price,hyperlink)
+local callTradeHook            -- CallTradeHook(type,event,selID)
+local chatHookSetItemRef       -- ChatHookSetItemRef(reference,link,button)
+local checkHide                -- CheckHide()
+local checkPopup               -- CheckPopup(name,link,quality,count,price,hyperlink)
+local clearTooltip             -- ClearTooltip()
+local debugPrint               -- DebugPrint(...)
+local doHyperlink              -- DoHyperlink(reference,link,button)
+local embedRender              -- EmbedRender()
+local fakeLink                 -- FakeLink(hyperlink,quality,name)
+local findItemInBags           -- FindItemInBags(findName)
+local getglobalIterator        -- GetglobalIterator(format,first,last)
+local getGSC                   -- GetGSC(money)
+local getLine                  -- getLine(line)
+local getLootLinkLink          -- GetLootLinkLink(name)
+local getLootLinkServer        -- GetLootLinkServer()
+local getRect                  -- GetRect(object)
+local getTextGSC               -- GetTextGSC(money,exact)
+local getTooltipHeight         -- GetTooltipHeight(enhTooltip)
+local getTooltipWidth          -- GetTooltipWidth(enhTooltip)
+local gtHookOnHide             -- GtHookOnHide()
+local gtHookSetAuctionSellItem -- GtHookSetAuctionSellItem(frame)
+local gtHookSetBagItem         -- GtHookSetBagItem(frame,frameID,buttonID,retVal)
+local gtHookSetCraftItem       -- GtHookSetCraftItem(frame,skill,slot)
+local gtHookSetCraftSpell      -- GtHookSetCraftSpell(frame,skill,slot)
+local gtHookSetInboxItem       -- GtHookSetinboxItem(frame,index)
+local gtHookSetInventoryItem   -- GtHookSetInventoryItem(frame,unit,slot,retVal)
+local gtHookSetLootItem        -- GtHookSetLootItem(frame,slot)
+local gtHookSetMerchantItem    -- GtHookSetMerchantItem(frame,slot)
+local gtHookSetQuestItem       -- GtHookSetQuestItem(frame,qtype,slot)
+local gtHookSetQuestLogItem    -- GtHookSetQuestLogItem(frame,qtype,slot)
+local gtHookSetTradeSkillItem  -- GtHookSetTradeSkillItem(frame,skill,slot)
+local gtHookSetText            -- GtHookSetText(funcArgs, retval, frame, text, r, g, b, unknown1, unknown2)
+local gtHookAppendText         -- GtHookAppendText(funcArgs, retVal, frame)
+local gtHookShow               -- GtHookShow(funcArgs, retVal, frame)
+local headerColor              -- HeaderColor(r, g, b)
+local headerQuality            -- HeaderQuality(quality)
+local headerSize               -- HeaderSize(fontSize)
+local hideTooltip              -- HideTooltip()
+local hyperlinkFromLink        -- HyperlinkFromLink(link)
+local imHookOnEnter            -- ImHookOnEnter()
+local imiHookOnEnter           -- ImiHookOnEnter()
+local lineColor                -- LineColor(r,g,b)
+local lineQuality              -- LineQuality(quality)
+local lineSize                 -- LineSize(fontSize)
+local lineSize_Large           -- LineSize_Large()
+local lineSize_Small           -- LineSize_Small()
+local linkType                 -- LinkType()
+local llHookOnEnter            -- LlHookOnEnter()
+local merchantHook             -- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
+local merchantScanner          -- MerchantScanner()
+local nameFromLink             -- NameFromLink(link)
+local onLoad                   -- OnLoad
+local qualityFromLink          -- QualityFromLink(link)
+local setElapsed               -- SetElapsed(elapsed)
+local setIcon                  -- SetIcon(iconPath)
+local setMoneySpacing          -- SetMoneySpacing(spacing)
+local setPopupKey              -- SetPopupKey(key)
+local showTooltip              -- ShowTooltip(currentTooltip,skipEmbedRender)
+local tooltipCall              -- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
+local tradeHook                -- TradeHook(type,selID)
+local ttInitialize             -- TtInitialize()
 
 ------------------------
 --  Hookable functions
@@ -400,9 +399,10 @@ end
 
 function clearTooltip()
 	hideTooltip()
-	EnhancedTooltip.curEmbed = false
-	EnhancedTooltip.hasData = false
-	EnhancedTooltip.hasIcon = false
+
+	EnhancedTooltip.curEmbed       = false
+	EnhancedTooltip.hasData        = false
+	EnhancedTooltip.hasIcon        = false
 	EnhancedTooltip.curHeaderEmbed = false
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
@@ -428,10 +428,10 @@ function clearTooltip()
 
 	EnhancedTooltipText1:SetPoint("TOPLEFT", EnhancedTooltip, "TOPLEFT", 10, -10)
 
-	EnhancedTooltip.lineCount = 0
+	EnhancedTooltip.lineCount   = 0
 	EnhancedTooltip.headerCount = 0
-	EnhancedTooltip.moneyCount = 0
-	EnhancedTooltip.minWidth = 0
+	EnhancedTooltip.moneyCount  = 0
+	EnhancedTooltip.minWidth    = 0
 
 	-- clear the embedLines table, using ipairs instead of = {} to allow
 	-- reusing old tables, which should be quite common for this table
@@ -621,7 +621,7 @@ function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 		else -- align == ANCHOR_RIGHT or ANCHOR_NONE or ANCHOR_PRESERVE
 			xAnchor = "RIGHT"
 		end
-		
+
 		local yAnchor
 		if (currentTooltipOwnerRect.yCenter < screenHeight/2) then
 			yAnchor = "TOP"
