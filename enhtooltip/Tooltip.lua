@@ -1189,9 +1189,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	if (showTip) then
 		clearTooltip()
-		private.showIgnore = true
 		EnhTooltip.AddTooltip(frame, name, link, quality, count, price)
-		private.showIgnore = false
 		showTooltip(frame)
 		private.currentItem = itemSig
 		return true
