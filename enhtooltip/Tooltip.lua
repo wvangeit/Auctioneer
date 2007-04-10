@@ -1249,29 +1249,7 @@ end
 ------------------------
 
 function chatHookSetItemRef(funcArgs, retVal, reference, link, button)
-	if (IsAltKeyDown()) and AuctionFrame and (AuctionFrame:IsVisible()) then
-		AuctionFrameTab_OnClick(1)
-		local itemName = GetItemInfo(tostring(link))
-		if (itemName) then
-			BrowseName:SetText(itemName)
-			BrowseMinLevel:SetText("")
-			BrowseMaxLevel:SetText("")
-			AuctionFrameBrowse.selectedInvtype = nil
-			AuctionFrameBrowse.selectedInvtypeIndex = nil
-			AuctionFrameBrowse.selectedClass = nil
-			AuctionFrameBrowse.selectedClassIndex = nil
-			AuctionFrameBrowse.selectedSubclass = nil
-			AuctionFrameBrowse.selectedSubclassIndex = nil
-			AuctionFrameFilters_Update()
-			IsUsableCheckButton:SetChecked(0)
-			UIDropDownMenu_SetSelectedValue(BrowseDropDown, -1)
-			AuctionFrameBrowse_Search()
-			BrowseNoResultsText:SetText(BROWSE_NO_RESULTS)
-			ItemRefTooltip:Hide()
-		end
-		return
-	end
-	return doHyperlink(reference, link, button)
+	doHyperlink(reference, link, button)
 end
 
 function afHookOnEnter(funcArgs, retVal, type, index)
