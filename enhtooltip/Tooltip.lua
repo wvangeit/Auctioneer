@@ -1426,7 +1426,8 @@ end
 function gtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (private.currentGametip == frame) then
-		clearTooltip()
+		-- use proper tail call, so we don't need any extra stack space
+		return clearTooltip()
 	end
 end
 
