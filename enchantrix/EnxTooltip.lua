@@ -412,21 +412,6 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 
 		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
-		
-		if Enchantrix.Config.GetFilter('barker') then
-			-- "Barker Price (%d%% margin)"
-			local margin = Enchantrix_BarkerGetConfig("profit_margin")
-			local highest = Enchantrix_BarkerGetConfig("highest_profit")
-			
-			-- protect against case where barker options have not been set
-			if margin and highest then
-				local profit = price * margin * 0.01
-				profit = math.min(profit, highest)
-				local barkerPrice = EnchantrixBarker_RoundPrice(price + profit)
-				EnhTooltip.AddLine(_ENCH('FrmtBarkerPrice'):format(Enchantrix.Util.Round(margin)), barkerPrice, embed)
-				EnhTooltip.LineColor(0.8,0.8,0.2)
-			end
-		end
 
 		if not Enchantrix.State.Auctioneer_Loaded then
 			EnhTooltip.AddLine(_ENCH('FrmtWarnAuctNotLoaded'))

@@ -31,6 +31,3 @@ EnxStorage.lua
 EnxTooltip.lua
 EnxUtil.lua
 EnxMain.lua
-
-EnchantrixBarker.lua
-EnchantrixBarker.xml

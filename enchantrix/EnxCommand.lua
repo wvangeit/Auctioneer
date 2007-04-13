@@ -142,30 +142,6 @@ function registerKhaos()
 				difficulty=1;
 			};
 			{
-				id="barker";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiBarker') -- "Enable Barker"
-				end;
-				helptext=function()
-					return _ENCH('HelpBarker') -- "Turn Enchantrix Barker on or off"
-				end;
-				callback=function(state)
-					genVarSet('barker', state.checked)
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return _ENCH('BarkerOn')
-					else
-						return _ENCH('BarkerOff')
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('barker')};
-				disabled={checked=false};
-				difficulty=1;
-			};
-			{
 				id="locale";
 				type=K_PULLDOWN;
 				setup = {
@@ -707,8 +683,6 @@ function chatPrintHelp()
 
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
 
-	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdBarker'), Enchantrix.Locale.GetLocalizedFilterVal('barker'), _ENCH('HelpBarker')));
-
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
@@ -825,8 +799,6 @@ function default(param, chatprint)
 		param = Enchantrix.Locale.DelocalizeCommand(param)
 		Enchantrix.Config.SetFilter(param, nil)
 	end
-
-	Enchantrix_BarkerOptions_SetDefaults(); -- added by Normal to reset Barker
 
 	if (chatprint) then
 		if (param == "all") then

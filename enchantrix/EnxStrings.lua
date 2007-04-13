@@ -36,8 +36,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: Není otevřené okno Enchanting. Toto okno musí být otevřené aby bylo možné použít Vyvolávače (Trade chat spam).";
-		BarkerNoEnchantsAvail	= "Enchantrix: Buďto nemáš žádné enchanty anebo nemáš dostatek materiálů.";
 		FrmtActClearall	= "Mažu všechna data o enchantech";
 		FrmtActClearFail	= "Nelze najít předmět: %s";
 		FrmtActClearOk	= "Smazána data k předmětu: %s";
@@ -66,9 +64,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Vyvolávač vypnut.";
-		BarkerOn	= "Vyvoláva zapnut.";
-		CmdBarker	= "vyvolavac";
 		CmdClear	= "smazat";
 		CmdDefault	= "vychozi";
 		CmdDisable	= "vypnout";
@@ -103,7 +98,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
-		BarkerOpening	= "Prodám enchanty:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of Ironforge";
 		OneLetterGold	= "g";
@@ -130,7 +124,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Spustit Vyvolavače (\"Trade chat spam\")";
 		GuiClearall	= "Smazat všechna data Enchantrix";
 		GuiClearallButton	= "Smazat vše";
 		GuiClearallHelp	= "Klikni zde a smažou se všechny záznamy Enchantrix pro tento server";
@@ -158,7 +151,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Zapnout ohodnocování";
 		GuiValuateHeader	= "Ohodnocování";
 		GuiValuateMedian	= "Ohodnocovat podle mediánů od Auctioneer-a";
-		HelpBarker	= "Vypíná a zapíná \"Vyvolavače\" (Trade chat spam)";
 		HelpClear	= "Smazat data k urcenemu objektu (shift - klikem ho vlozite do prikazu, nebo pouzijte urceni \"vse\" nebo \"all\")";
 		HelpCount	= "Nastavi zda se ma zobrazovat pocet zaznamu v databazi";
 		HelpDefault	= "Vrati urcene Enchantrix nastaveni na vychozi. Take lze pouzit urceni \"vse\" nebo \"all\" pro navrat vsech nastaveni na vychozi.";
@@ -194,7 +186,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Cena do chatu (%d %% zisk)";
 		FrmtCounts	= "(základ=%d, stará=%d, nová=%d)";
 		FrmtDisinto	= "Disenchant získá: ";
 		FrmtFound	= "Zaznamenáno, že disenchant na %s získá:";
@@ -210,21 +201,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Nejvyšší cena";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Enchanty s cenou vyšší než tato hodnota dostanou pro Trade chat nulovou prioritu.";
-		BarkerOptionsHighestProfitTitle	= "Nejvyšší zisk";
-		BarkerOptionsHighestProfitTooltip	= "Nastaví nejvyšší možný zisk na enchantu (v penězích, ne procentech).";
-		BarkerOptionsLowestPriceTitle	= "Nejnižší cena";
-		BarkerOptionsLowestPriceTooltip	= "Nejnižší cena, která bude požadována za tento enchant v Trade chatu.";
-		BarkerOptionsPricePriorityTitle	= "Celková priorita ceny";
-		BarkerOptionsPricePriorityTooltip	= "Tohle nastavuje důležitost ceny pro celkovou prioritu enchantů v Trade chatu.";
-		BarkerOptionsPriceSweetspotTitle	= "Ideální cena";
-		BarkerOptionsPriceSweetspotTooltip	= "Tímhle se zvýší priorita enchantů, jejichž cena je blízko této hodnoty.";
-		BarkerOptionsProfitMarginTitle	= "Míra zisku";
-		BarkerOptionsProfitMarginTooltip	= "Procentní přirážka k nákladům na materiály.";
-		BarkerOptionsRandomFactorTitle	= "Náhodný faktor";
-		BarkerOptionsRandomFactorTooltip	= "Míra náhody ve výběru enchantů pro Trade chat.";
-		BarkerOptionsTab1Title	= "Priority zisku a cen";
 
 	};
 
@@ -232,8 +208,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: Enchantment vinduet er ikke åbent. Enchantments vinduet skal være åbent for at du kan anvende \"Barker\".";
-		BarkerNoEnchantsAvail	= "Enchantrix: Du har, enten ikke nogen enchants eller du mangler reagenter for at kunne lave dem.";
 		FrmtActClearall	= "Nulstiller al Enchant data";
 		FrmtActClearFail	= "Kan ikke finde item: %s";
 		FrmtActClearOk	= "Data nulstillet for item: %s";
@@ -262,9 +236,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Funzione Imbonitore disabilitata.";
-		BarkerOn	= "Funzione Imbonitore abilitata.";
-		CmdBarker	= "Imbonitore";
 		CmdClear	= "slet";
 		CmdDefault	= "standard";
 		CmdDisable	= "deaktiver";
@@ -299,7 +270,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
-		BarkerOpening	= "Enchants til salg:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of ironforge";
 		OneLetterGold	= "g";
@@ -326,7 +296,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Aktiver Udråber";
 		GuiClearall	= "Slet alle Enchantrix data";
 		GuiClearallButton	= "Slet alt";
 		GuiClearallHelp	= "Klik her for at slette alle Enchantrix data for den aktuelle server.";
@@ -354,7 +323,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Aktiver Evaluering";
 		GuiValuateHeader	= "Evaluering";
 		GuiValuateMedian	= "Evaluer mod Auctioneer middel";
-		HelpBarker	= "Slår udråber til og fra";
 		HelpClear	= "Slet det valgte item data (du skal shift-klikke item ind i kommandoen). Du kan ogsÃ¥ angive all for at slette alt.";
 		HelpCount	= "Vælg om der skal vises nøjagtige tal fra databasen.";
 		HelpDefault	= "Sæt et Enchantrix valg til dets standard vÃ¦rdi. Du kan også angive all for at sætte alle valg til deres standard værdi.";
@@ -390,7 +358,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Udråbspris (%d%% margen)";
 		FrmtCounts	= "(base=%d, gammel=%d, ny=%d)";
 		FrmtDisinto	= "Disenchants til:";
 		FrmtFound	= "Fandt at %s disenchants til:";
@@ -406,21 +373,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Højeste prisfaktor";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Enchentments får en score på nul ved en pris prioritet på eller over denne værdi.";
-		BarkerOptionsHighestProfitTitle	= "Højeste profit.";
-		BarkerOptionsHighestProfitTooltip	= "Højeste totale kontante profit på en enchant.";
-		BarkerOptionsLowestPriceTitle	= "Laveste pris";
-		BarkerOptionsLowestPriceTooltip	= "Laveste kontante udbudspris for en enchantment.";
-		BarkerOptionsPricePriorityTitle	= "Totale pris prioritet";
-		BarkerOptionsPricePriorityTooltip	= "Dette bestemmer hvor vigtig prissætning er for den generelle annoncering.";
-		BarkerOptionsPriceSweetspotTitle	= "Pirsfaktor SweetSpot";
-		BarkerOptionsPriceSweetspotTooltip	= "Dette bruges til at prioritere enchantments omkring denne pris til annoncering.";
-		BarkerOptionsProfitMarginTitle	= "Profit margin";
-		BarkerOptionsProfitMarginTooltip	= "Profit procent der skal ligges til materialernes købspris.";
-		BarkerOptionsRandomFactorTitle	= "Tilfældig faktor";
-		BarkerOptionsRandomFactorTooltip	= "Graden af tilfældighed i enchantments der reklameres for i \"trade\" kanalen.";
-		BarkerOptionsTab1Title	= "Profit og pris prioritering";
 
 	};
 
@@ -428,8 +380,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Das Enchantrix-Fenster ist nicht geöffnet. Das Enchantrix-Fenster muss geöffnet sein um Barker nutzen zu können.";
-		BarkerNoEnchantsAvail	= "Enchantrix: Sie haben entweder keine Entzauberungen oder keine Gegenstände um welche herzustellen.";
 		FrmtActClearall	= "Lösche alle Entzauberungsdaten";
 		FrmtActClearFail	= "Kann Gegenstand %s nicht finden";
 		FrmtActClearOk	= "Daten für Gegenstand %s gelöscht";
@@ -458,9 +408,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Barker ausgeschaltet.";
-		BarkerOn	= "Barker eingeschaltet.";
-		CmdBarker	= "barker";
 		CmdClear	= "clear";
 		CmdDefault	= "default";
 		CmdDisable	= "disable";
@@ -495,7 +442,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Entzaubern";
-		BarkerOpening	= "Verkaufe Verzauberungen:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Ironforge";
 		OneLetterGold	= "G";
@@ -522,7 +468,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Barker aktivieren";
 		GuiClearall	= "Alle Enchantrix-Daten löschen";
 		GuiClearallButton	= "Alles löschen";
 		GuiClearallHelp	= "Hier klicken um alle Enchantrix-Daten auf dem aktuellen Realm zu löschen.";
@@ -550,7 +495,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Wertschätzung aktivieren";
 		GuiValuateHeader	= "Wertschätzung";
 		GuiValuateMedian	= "Ermitteln von Durchschnittspreisen (Auctioneer Median)";
-		HelpBarker	= "Schaltet Barker ein und aus";
 		HelpClear	= "Lösche die Daten des angegebenen Gegenstands (Gegenstände müssen mit Shift-Klick einfügt werden). Mit dem Schlüsselwort \"all\" werden alle Daten gelöscht.";
 		HelpCount	= "Auswählen ob die genaue Anzahl der Entzauberungen aus der Datenbank angezeigt wird";
 		HelpDefault	= "Setzt die angegebene Enchantrix-Option auf ihren Standardwert zurück. Mit dem Schlüsselwort \"all\" werden alle Enchantrix-Optionen zurückgesetzt.";
@@ -586,7 +530,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Barker Preis (%d%% Gewinn)";
 		FrmtCounts	= "(Basis=%d, Alt=%d, Neu=%d)";
 		FrmtDisinto	= "Mögliche Entzauberung zu:";
 		FrmtFound	= "%s wird entzaubert zu:";
@@ -602,21 +545,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Höchster Preisfaktor";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Entzauberungen erhalten einen Score von null für die Preispriorität, auf diesem bzw. über diesem Wert.";
-		BarkerOptionsHighestProfitTitle	= "Höchster Gewinn";
-		BarkerOptionsHighestProfitTooltip	= "Höchster machbarer Gewinn für eine Entzauberung.";
-		BarkerOptionsLowestPriceTitle	= "Niedrigster Preis";
-		BarkerOptionsLowestPriceTooltip	= "Niedrigster Angebotspreis für eine Entzauberung. ";
-		BarkerOptionsPricePriorityTitle	= "Gesamt-Preispriorität";
-		BarkerOptionsPricePriorityTooltip	= "Legt die Wichtigkeit, der Preisermittlung innerhalb der Gesamtpriorität der Werbemaßnahmen, fest.";
-		BarkerOptionsPriceSweetspotTitle	= "Preisfaktor SweetSpot";
-		BarkerOptionsPriceSweetspotTooltip	= "Preisbereich der bevorzugten Entzauberungen für Werbemaßnahmen.";
-		BarkerOptionsProfitMarginTitle	= "Gewinnspanne";
-		BarkerOptionsProfitMarginTooltip	= "Der prozentuale Gewinnanteil, welcher zu den Standartkosten hinzuaddiert werden soll.";
-		BarkerOptionsRandomFactorTitle	= "Zufallsfaktor";
-		BarkerOptionsRandomFactorTooltip	= "Legt die Größe des Zufallsfaktors, in welchem Entzauberungen für die Handelsausrufe ausgewählt werden fest.";
-		BarkerOptionsTab1Title	= "Gewinn und Preisprioritäten";
 
 	};
 
@@ -624,8 +552,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: The enchant window is not open. The enchanting window must be open in order to use the barker.";
-		BarkerNoEnchantsAvail	= "Enchantrix: You either don't have any enchants or don't have the reagents to make them.";
 		FrmtActClearall	= "Clearing all enchant data";
 		FrmtActClearFail	= "Unable to find item: %s";
 		FrmtActClearOk	= "Cleared data for item: %s";
@@ -654,9 +580,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Barker function disabled.";
-		BarkerOn	= "Barker function enabled.";
-		CmdBarker	= "barker";
 		CmdClear	= "clear";
 		CmdDefault	= "default";
 		CmdDisable	= "disable";
@@ -691,7 +614,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
-		BarkerOpening	= "Selling Enchants:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of Ironforge";
 		OneLetterGold	= "g";
@@ -720,7 +642,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Enable Barker";
 		GuiClearall	= "Clear All Enchantrix Data";
 		GuiClearallButton	= "Clear All";
 		GuiClearallHelp	= "Click here to clear all of Enchantrix data for the current server-realm.";
@@ -748,7 +669,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Enable Valuation";
 		GuiValuateHeader	= "Valuation";
 		GuiValuateMedian	= "Valuate with Auctioneer Medians";
-		HelpBarker	= "Turns Barker on and off";
 		HelpClear	= "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 		HelpCount	= "Select whether to show the exact counts in the database";
 		HelpDefault	= "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values.";
@@ -784,7 +704,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Barker Price (%d%% margin)";
 		FrmtCounts	= "    (base=%d, old=%d, new=%d)";
 		FrmtDisinto	= "Disenchants into:";
 		FrmtFound	= "Found that %s disenchants into:";
@@ -800,21 +719,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "PriceFactor Highest";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Enchants receive a score of zero for price priority at or above this value.";
-		BarkerOptionsHighestProfitTitle	= "Highest Profit";
-		BarkerOptionsHighestProfitTooltip	= "The highest total cash profit to make on an enchant.";
-		BarkerOptionsLowestPriceTitle	= "Lowest Price";
-		BarkerOptionsLowestPriceTooltip	= "The lowest cash price to quote for an enchant.";
-		BarkerOptionsPricePriorityTitle	= "Overall Price Priority";
-		BarkerOptionsPricePriorityTooltip	= "This sets how important pricing is to the overall priority for advertising.";
-		BarkerOptionsPriceSweetspotTitle	= "PriceFactor SweetSpot";
-		BarkerOptionsPriceSweetspotTooltip	= "This is used to prioritise enchants near this price for advertising.";
-		BarkerOptionsProfitMarginTitle	= "Profit Margin";
-		BarkerOptionsProfitMarginTooltip	= "The percentage profit to add to the base mats cost.";
-		BarkerOptionsRandomFactorTitle	= "Random Factor";
-		BarkerOptionsRandomFactorTooltip	= "The amount of randomness in the enchants chosen for the trade shout.";
-		BarkerOptionsTab1Title	= "Profit and Price Priorities";
 
 	};
 
@@ -822,8 +726,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: La ventana de encantamientos no está abierta. La ventana de encantamientos debe estar abierta para utilizar el pregonero.";
-		BarkerNoEnchantsAvail	= "Enchantrix: O no tienes ningún encantamiento o no tienes los componentes para crearlos.";
 		FrmtActClearall	= "Eliminando toda información de encantamientos";
 		FrmtActClearFail	= "Imposible encontrar artí­culo: %s";
 		FrmtActClearOk	= "Información eliminada para el artí­culo: %s";
@@ -852,9 +754,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Función de Pregonero desactivada.";
-		BarkerOn	= "Función de Pregonero activada.";
-		CmdBarker	= "pregonero";
 		CmdClear	= "borrar";
 		CmdDefault	= "original";
 		CmdDisable	= "deshabilitar";
@@ -889,7 +788,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Desencantar";
-		BarkerOpening	= "Vendiendo Encantamientos:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Forjaz";
 		OneLetterGold	= "o";
@@ -916,7 +814,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Activa Pregonero";
 		GuiClearall	= "Elimina toda la información de Enchantrix";
 		GuiClearallButton	= "Elimina Todo";
 		GuiClearallHelp	= "Clic aquí para eliminar toda la información de Enchantrix sobre el reino-facción actual.";
@@ -944,7 +841,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Activa Valoración";
 		GuiValuateHeader	= "Valoración";
 		GuiValuateMedian	= "Valora con Promedios de Auctioneer";
-		HelpBarker	= "Activa y desactiva Pregonero";
 		HelpClear	= "Elimina la información sobre el objeto especificado (debes usar clic-mayúsculas para incluir el/los objeto(s) en el comando) También puedes especificar las palabra clave \"todo\"";
 		HelpCount	= "Determina si se muestran las cuentas exactas en la base de datos";
 		HelpDefault	= "Establece una opción de Enchantrix a su valor por defecto. También puedes especificar la palabra clave especial \"todo\" para establecer todas las opciones de Enchantrix a sus valores por defecto.";
@@ -980,7 +876,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Precio de Pregonero (%d%% margen)";
 		FrmtCounts	= "(referencia=%d, viejo=%d, nuevo=%d)";
 		FrmtDisinto	= "Se desencanta en:";
 		FrmtFound	= "Se encontró que %s se desencanta en:";
@@ -996,21 +891,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Factor Precio Más Alto";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Los encantamientos reciben una puntuación de cero en la prioridad de precio cuando tienen este precio o superior.";
-		BarkerOptionsHighestProfitTitle	= "Beneficio Más Alto";
-		BarkerOptionsHighestProfitTooltip	= "El beneficio máximo a conseguir en un encantamiento";
-		BarkerOptionsLowestPriceTitle	= "Precio Más Bajo";
-		BarkerOptionsLowestPriceTooltip	= "El precio mínimo para mencionar un encantamiento.";
-		BarkerOptionsPricePriorityTitle	= "Prioridad Global de Precio";
-		BarkerOptionsPricePriorityTooltip	= "Establece cuán importante es el precio en la prioridad global para ser anunciado";
-		BarkerOptionsPriceSweetspotTitle	= "Mejor Punto del Factor Precio";
-		BarkerOptionsPriceSweetspotTooltip	= "Los encantamientos que están cerca de este precio tendrán prioridad a la hora de anunciarse.";
-		BarkerOptionsProfitMarginTitle	= "Margen de Beneficio";
-		BarkerOptionsProfitMarginTooltip	= "El porcentaje de beneficio que se añade al coste base de los materiales";
-		BarkerOptionsRandomFactorTitle	= "Factor Aleatorio";
-		BarkerOptionsRandomFactorTooltip	= "La cantidad de aleatoriedad que se aplica a la hora de elegir qué encantamientos se anuncian.";
-		BarkerOptionsTab1Title	= "Prioridades de Beneficio y Precio";
 
 	};
 
@@ -1018,8 +898,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix : La fenêtre d'enchantement n'est pas ouverte. Elle doit l'être pour utiliser le Trader.";
-		BarkerNoEnchantsAvail	= "Enchantrix : Vous n'avez aucun enchantement ou vous ne disposez pas des ingrédients nécessaires pour les faire.";
 		FrmtActClearall	= "Effacement de toutes les données d'enchantement";
 		FrmtActClearFail	= "Impossible de trouver l'objet : %s";
 		FrmtActClearOk	= "Information effacée pour l'objet : %s";
@@ -1048,9 +926,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Fonction Trader activée";
-		BarkerOn	= "Fonction Trader désactivée";
-		CmdBarker	= "trader";
 		CmdClear	= "effacer";
 		CmdDefault	= "par défaut";
 		CmdDisable	= "désactiver";
@@ -1085,7 +960,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Désenchanter";
-		BarkerOpening	= "Vends enchantements :";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Ironforge";
 		OneLetterGold	= "po";
@@ -1114,7 +988,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Activer Trader";
 		GuiClearall	= "Réinitialiser toutes les données d'Enchantrix";
 		GuiClearallButton	= "Effacer tout";
 		GuiClearallHelp	= "Cliquer ici pour réinitialiser toutes les données d'Enchantrix pour le serveur-faction actuel.";
@@ -1142,7 +1015,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Activer Evaluation";
 		GuiValuateHeader	= "Evaluation";
 		GuiValuateMedian	= "Evaluer avec les moyennes d'Auctioneer";
-		HelpBarker	= "Active ou désactive le Trader";
 		HelpClear	= "Efface les données de l'objet spécifié (vous devez maj-cliquer le ou les objets dans la ligne de commande) Vous pouvez également spécifier le mot-clef \"tout\"";
 		HelpCount	= "Choisir d'afficher le compte exact dans la base de données.";
 		HelpDefault	= "Réinitialise une option d'Enchantrix à sa valeur par défaut. Vous pouvez spécifier le mot-clef \"tout\" pour réinitialiser toutes les options d'Enchantrix.";
@@ -1178,7 +1050,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Prix Trader (marge : %d%%)";
 		FrmtCounts	= "(base=%d, ancienne=%d, nouvelle=%d)";
 		FrmtDisinto	= "Se désenchante en :";
 		FrmtFound	= "%s se désenchante en :";
@@ -1194,21 +1065,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Plus haut facteur prix";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Les enchantements ont un score de zéro pour les priorités de prix égales ou supérieures à cette valeur";
-		BarkerOptionsHighestProfitTitle	= "Bénéfice le plus élevé";
-		BarkerOptionsHighestProfitTooltip	= "Le profit maximal par enchantement.";
-		BarkerOptionsLowestPriceTitle	= "Plus bas Prix";
-		BarkerOptionsLowestPriceTooltip	= "Le prix minimal à annoncer par enchantement.";
-		BarkerOptionsPricePriorityTitle	= "Priorité de prix générale";
-		BarkerOptionsPricePriorityTooltip	= "Spécifie l'importance du prix lors des annonces.";
-		BarkerOptionsPriceSweetspotTitle	= "Sweetspot pour le facteur prix";
-		BarkerOptionsPriceSweetspotTooltip	= "Ceci est utilisé pour donner la priorité aux enchantements proches de ce prix pour la publicité";
-		BarkerOptionsProfitMarginTitle	= "Marge bénéficiaire";
-		BarkerOptionsProfitMarginTooltip	= "Le pourcentage de bénéfice à ajouter au coût des matériaux de base";
-		BarkerOptionsRandomFactorTitle	= "Facteur aléatoire";
-		BarkerOptionsRandomFactorTooltip	= "La quantité de hasard dans les enchantements choisis pour les cris de commerce";
-		BarkerOptionsTab1Title	= "Priorités de bénéfice et de prix";
 
 	};
 
@@ -1216,8 +1072,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: la finestra per gli enchantments non è aperta. La finestra degli enchantments deve essere aperta per usare il barker";
-		BarkerNoEnchantsAvail	= "Enchantrix: non hai nessun enchantment o non hai ireagenti per poterlo fare";
 		FrmtActClearall	= "Eliminando tutti i dati di enchant";
 		FrmtActClearFail	= "Impossibile trovare l'oggetto: %s";
 		FrmtActClearOk	= "Eliminati i dati dell'oggetto: %s";
@@ -1246,9 +1100,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Funzione Imbonitore disabilitata";
-		BarkerOn	= "Funzione Imbonitore abilitata";
-		CmdBarker	= "Imbonitore";
 		CmdClear	= "cancella";
 		CmdDefault	= "default";
 		CmdDisable	= "disabilita";
@@ -1283,7 +1134,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Disincanta";
-		BarkerOpening	= "Vendita:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "Ironforge";
 		OneLetterGold	= "g";
@@ -1310,7 +1160,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Abilita imbonitore";
 		GuiClearall	= "Cancella tutti i dati di Enchantrix";
 		GuiClearallButton	= "Cancella tutto";
 		GuiClearallHelp	= "Clicca qui per eliminare tutti i dati di Enchantrix per il server/realm corrente";
@@ -1338,7 +1187,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Abilita la valutazione";
 		GuiValuateHeader	= "Valutazione";
 		GuiValuateMedian	= "Valuta con le mediane di Auctioneer";
-		HelpBarker	= "Abilita / disabilita imbonitore";
 		HelpClear	= "Cancella i dati sull'oggetto specificato (devi inserire l'oggetto nella linea di comando usando shift-click). Puoi anche specificare il comando speciale \"tutto\"";
 		HelpCount	= "Scegli se visualizzare o meno i conteggi esatti nel database";
 		HelpDefault	= "Imposta un'opzione di Enchantrix al suo valore di default. Puoi inoltre specificare la parola chiave \"tutto\" per impostare tutte le opzioni di Enchantrix ai loro valori di default.";
@@ -1374,7 +1222,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Prezzo imbonitore (margine %d%%)";
 		FrmtCounts	= "(base=%d, vecchio=%d, nuovo=%d) ";
 		FrmtDisinto	= "Si disincanta in:";
 		FrmtFound	= "%s si disincanta in: ";
@@ -1390,21 +1237,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "Massimo prezzo di costo";
-		BarkerOptionsHighestPriceForFactorTooltip	= "Con questo valore l'enchant riceve un punteggio di 0 per la priorità di prezzo.";
-		BarkerOptionsHighestProfitTitle	= "Massimo profitto";
-		BarkerOptionsHighestProfitTooltip	= "Massimo profitto totale su un enchant.";
-		BarkerOptionsLowestPriceTitle	= "Prezzo più basso";
-		BarkerOptionsLowestPriceTooltip	= "Il prezzo piu' basso da riportare per un Enchantment.";
-		BarkerOptionsPricePriorityTitle	= "Priorita' totale del prezzo";
-		BarkerOptionsPricePriorityTooltip	= "Questo imposta l'importanza del prezzo sulla priorita' totale per l'annuncio.";
-		BarkerOptionsPriceSweetspotTitle	= "SweetSpot del Fattore di Prezzo";
-		BarkerOptionsPriceSweetspotTooltip	= "Questo si usa per dare priorita' agli enchant vicini a questo prezzo per la pubblicita'.";
-		BarkerOptionsProfitMarginTitle	= "Margine di profitto";
-		BarkerOptionsProfitMarginTooltip	= "La percentuale di profitto da aggiungere al prezzo della materia prima.";
-		BarkerOptionsRandomFactorTitle	= "Fattore casuale";
-		BarkerOptionsRandomFactorTooltip	= "Il grado di casualita' nella scelta degli enchant da proporre in vendita.";
-		BarkerOptionsTab1Title	= "Priorita' di profitto e prezzo";
 
 	};
 
@@ -1412,8 +1244,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: 마법부여 창이 열려있지 않습니다. Barker를 사용하려면 마법부여 창이 열려있어야만 합니다.";
-		BarkerNoEnchantsAvail	= "Enchantrix: 마법부여 재료가 하나도 없거나 추출할 재료가 하나도 없습니다.";
 		FrmtActClearall	= "모든 마법부여 데이터를 삭제합니다.";
 		FrmtActClearFail	= "아이템을 찾을 수 없음: %s";
 		FrmtActClearOk	= "아이템 데이터 삭제: %s ";
@@ -1442,9 +1272,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "알림 기능 사용안함.";
-		BarkerOn	= "알림 기능 사용.";
-		CmdBarker	= "알림";
 		CmdClear	= "삭제";
 		CmdDefault	= "기본값";
 		CmdDisable	= "비활성화";
@@ -1479,7 +1306,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "마력추출";
-		BarkerOpening	= "판매는 매혹한다:";
 		Darnassus	= "다르나서스";
 		Ironforge	= "아이언포지";
 		OneLetterGold	= "골드";
@@ -1506,7 +1332,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "알림 사용";
 		GuiClearall	= "모든 Enchantrix 데이터 삭제";
 		GuiClearallButton	= "모두 삭제";
 		GuiClearallHelp	= "클릭하면 현재 서버의 Enchantrix 자료가 모두 삭제됩니다.";
@@ -1534,7 +1359,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "평가 활성화";
 		GuiValuateHeader	= "평가";
 		GuiValuateMedian	= "Autctioneer 중앙값으로 평가";
-		HelpBarker	= "알림 켜기고 끄기";
 		HelpClear	= "지정된 아이템의 데이타를 삭제합니다.(이때 아이템지정은 Shift-click 으로 명령어창에 넣어야합니다.) 모든 아이템데이타를 삭제하기 위해 \"모두\" 를 사용할 수 있습니다.";
 		HelpCount	= "데이타베이스에 있는 정확한 수량을 표시할지 선택합니다.";
 		HelpDefault	= "Enchantrix의 옵션을 기본값으로 설정합니다. 모든 Enchantrix 설정을 기본값으로 하시려면 \"모두\" 를 사용할 수 있습니다.";
@@ -1570,7 +1394,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "가격 알림 (%d%% 마진)";
 		FrmtCounts	= "(기준=%d, 과거=%d, 신규=%d)";
 		FrmtDisinto	= "마력 추출:";
 		FrmtFound	= "%s|1이;가; 마력추출되는 아이템: ";
@@ -1586,21 +1409,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "가격요건 최고가격";
-		BarkerOptionsHighestPriceForFactorTooltip	= "마법부여가 가격 우선순위에서 0점을 받았거나 이점수 이상입니다.";
-		BarkerOptionsHighestProfitTitle	= "최고 이익";
-		BarkerOptionsHighestProfitTooltip	= "마법부여를 하면 최고가로 이득이 됩니다.";
-		BarkerOptionsLowestPriceTitle	= "최저 가격";
-		BarkerOptionsLowestPriceTooltip	= "마법부여에 대한 시세가 최저 현금 가격으로 평가됩니다.";
-		BarkerOptionsPricePriorityTitle	= "전체 가격 정책";
-		BarkerOptionsPricePriorityTooltip	= "가격 중요도가 광고에 대한 전체 우선순위에서 얼마나 될지 설정합니다. ";
-		BarkerOptionsPriceSweetspotTitle	= "가격요건 관심구매가격";
-		BarkerOptionsPriceSweetspotTooltip	= "광고에 대해 이가격에 가까운 마법부여 우선순위를 결정한는데 사용됩니다.";
-		BarkerOptionsProfitMarginTitle	= "이윤폭";
-		BarkerOptionsProfitMarginTooltip	= "기본 비용에 추가하기 적합한 비율입니다.";
-		BarkerOptionsRandomFactorTitle	= "무작위 요건";
-		BarkerOptionsRandomFactorTooltip	= "마법부여에서 무작위로 거래 외침을 선택합니다.";
-		BarkerOptionsTab1Title	= "이익과 가격 우선순위";
 
 	};
 
@@ -1608,8 +1416,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "Enchantrix: Het enchant scherm is niet geopend. Het enchanting scherm moet geopend zijn om de barker te gebruiken.";
-		BarkerNoEnchantsAvail	= "Enchantrix: Je hebt geen enchants, of je hebt geen reagents om  iets te enchanten.";
 		FrmtActClearall	= "Wissen van alle enchant gegevens";
 		FrmtActClearFail	= "Kan item niet vinden: %s";
 		FrmtActClearOk	= "Data gewist voor item: %s";
@@ -1635,9 +1441,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Omroep functie gedeactiveerd.";
-		BarkerOn	= "Omroep functie geactiveerd.";
-		CmdBarker	= "Omroeper";
 		ShowTerse	= "Beknopt";
 		StatOff	= "Enchant gegevens worden niet getoond";
 		StatOn	= "De geconfigureerde enchant gegevens worden getoond";
@@ -1651,7 +1454,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "Disenchant";
-		BarkerOpening	= "Selling Enchants:";
 		Darnassus	= "Darnassus";
 		Ironforge	= "City of Ironforge";
 		OneLetterGold	= "g";
@@ -1678,7 +1480,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Activeren Omroeper";
 		GuiClearall	= "Opschonen alle Enchantrix Data";
 		GuiClearallButton	= "Alles opschonen";
 		GuiClearallHelp	= "Klik hier om alle enchantrix data van de huidige Server/Realm op te schonen.";
@@ -1718,7 +1519,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Omroep Prijs (%d%% marge)";
 		FrmtCounts	= "basis=%d, oud=%d, nieuw=%d";
 		FrmtDisinto	= "Gedisenchant in:";
 		FrmtFound	= "Gevonden dat %s wordt gedisenchant in:";
@@ -1734,10 +1534,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestProfitTitle	= "Maximale Winst";
-		BarkerOptionsLowestPriceTitle	= "Laagste Prijs";
-		BarkerOptionsProfitMarginTitle	= "Winstmarge";
-		BarkerOptionsRandomFactorTitle	= "Willekeurige Factor";
 
 	};
 
@@ -1745,8 +1541,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "附魔助手：附魔窗口没有打开。使用barker指令必须打开附魔窗口";
-		BarkerNoEnchantsAvail	= "附魔助手：您没有附魔技能或没有制作试剂";
 		FrmtActClearall	= "清除全部附魔数据。";
 		FrmtActClearFail	= "无法找到物品：%s。";
 		FrmtActClearOk	= "物品：%s的数据已清除。";
@@ -1775,9 +1569,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "停用Barker函数";
-		BarkerOn	= "启用Barker函数";
-		CmdBarker	= "barker";
 		CmdClear	= "clear清除";
 		CmdDefault	= "default默认";
 		CmdDisable	= "disable禁用";
@@ -1812,7 +1603,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "分解";
-		BarkerOpening	= "出售附魔：";
 		Darnassus	= "达纳苏斯";
 		Ironforge	= "铁炉堡";
 		OneLetterGold	= "G";
@@ -1839,7 +1629,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "允许Barker";
 		GuiClearall	= "清除全部附魔助手数据。";
 		GuiClearallButton	= "全部清除";
 		GuiClearallHelp	= "点此清除对于当前服务器-阵营的全部附魔助手数据。";
@@ -1867,7 +1656,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "启用估价。";
 		GuiValuateHeader	= "估价";
 		GuiValuateMedian	= "以拍卖助手中位数价进行估价。";
-		HelpBarker	= "切换Barker开关";
 		HelpClear	= "清除指定物品的数据(必须Shift+点击将物品插入命令)。你也可以指定特定关键字\"all\"。";
 		HelpCount	= "选择是否显示数据库中的额外计数。";
 		HelpDefault	= "设置某个附魔助手选项为默认值。你也可以输入特定关键字\"all\" 来设置所有附魔助手选项为默认值。";
@@ -1903,7 +1691,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Barker价格(%d%% 最低利润)";
 		FrmtCounts	= "(基本=%d，旧值=%d，新值=%d)";
 		FrmtDisinto	= "可分解为:";
 		FrmtFound	= "发现%s可分解为：";
@@ -1919,21 +1706,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestPriceForFactorTitle	= "最高价格代理";
-		BarkerOptionsHighestPriceForFactorTooltip	= "附魔接受比分价格为零或在这价值之上优先。";
-		BarkerOptionsHighestProfitTitle	= "最大收益";
-		BarkerOptionsHighestProfitTooltip	= "附魔获得最高的总收益金。";
-		BarkerOptionsLowestPriceTitle	= "最低标价";
-		BarkerOptionsLowestPriceTooltip	= "提供附魔最低的现贷价格。";
-		BarkerOptionsPricePriorityTitle	= "总价格优先";
-		BarkerOptionsPricePriorityTooltip	= "此设置重要定价如何是到整体优先权为做广告。";
-		BarkerOptionsPriceSweetspotTitle	= "价格代理甜点";
-		BarkerOptionsPriceSweetspotTooltip	= "用于给予优先在这个价格附近附魔为做广告。";
-		BarkerOptionsProfitMarginTitle	= "边缘收益";
-		BarkerOptionsProfitMarginTooltip	= "增加赢利百分比到基本边际收益费用。";
-		BarkerOptionsRandomFactorTitle	= "随机要素";
-		BarkerOptionsRandomFactorTooltip	= "相当数量随机性在附魔为商业选择。";
-		BarkerOptionsTab1Title	= "收益与价格优先";
 
 	};
 
@@ -1941,8 +1713,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Command Messages
-		BarkerEnxWindowNotOpen	= "附魔視窗沒有開啟。要使用barker指令必須打開附魔視窗";
-		BarkerNoEnchantsAvail	= "附魔助手：您没有附魔技能或没有相對應的材料";
 		FrmtActClearall	= "清除所有附魔資料";
 		FrmtActClearFail	= "無法找到物品：%s";
 		FrmtActClearOk	= "清除物品資料：%s ";
@@ -1971,9 +1741,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "停用聲望提示功能";
-		BarkerOn	= "啟用聲望提示功能";
-		CmdBarker	= "聲望提示";
 		CmdClear	= "clear";
 		CmdDefault	= "default";
 		CmdDisable	= "disable";
@@ -2008,7 +1775,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		ArgSpellname	= "分解";
-		BarkerOpening	= "想出售附魔:";
 		Darnassus	= "達納蘇斯";
 		Ironforge	= "鐵爐堡";
 		OneLetterGold	= "金";
@@ -2035,7 +1801,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "啟用Barker";
 		GuiClearall	= "清除所有附魔資料";
 		GuiClearallButton	= "清除全部";
 		GuiClearallHelp	= "點擊此處，清除目前伺服器之所有附魔資料";
@@ -2063,7 +1828,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "啟動評估系統";
 		GuiValuateHeader	= "估價";
 		GuiValuateMedian	= "評估拍賣平均價值";
-		HelpBarker	= "啟用/停用 Baker";
 		HelpClear	= "清除指定物品的數據(必須Shift+點擊將物品插入命令)。你也可以指定特定關鍵字\"all\"。";
 		HelpCount	= "選擇是否在數據庫裡顯示精確的數字 ";
 		HelpDefault	= "設置某個附魔助手選項為預設值。你也可以輸入特定關鍵字\"all\" 來設置所有附魔助手選項為預設值。";
@@ -2099,7 +1863,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Barker 價格 (%d%% 保証金) ";
 		FrmtCounts	= "(原本=%d, 舊=%d, 新=%d)";
 		FrmtDisinto	= "分解成：";
 		FrmtFound	= "%s可分解成：";
@@ -2115,9 +1878,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: User Interface
-		BarkerOptionsHighestProfitTitle	= "最高盈利";
-		BarkerOptionsLowestPriceTitle	= "最低價格";
-		BarkerOptionsProfitMarginTitle	= "淨利率";
 
 	};
 
@@ -2153,9 +1913,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Commands
-		BarkerOff	= "Função Barker Desligada";
-		BarkerOn	= "Função Barker Ligada";
-		CmdBarker	= "Vendedor";
 		CmdClear	= "apagar";
 		CmdDefault	= "por defeito";
 		CmdDisable	= "desactivar";
@@ -2197,7 +1954,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Help Text
-		GuiBarker	= "Ligar Vendedor";
 		GuiClearall	= "Limpar toda a informação do Enchantrix";
 		GuiClearallButton	= "Limpar tudo";
 		GuiClearallHelp	= "Carrega aqui para limpar toda a informação do Enchantrix do servidor actual.";
@@ -2225,7 +1981,6 @@ EnchantrixLocalizations = {
 		GuiValuateEnable	= "Activar Validação";
 		GuiValuateHeader	= "Validação";
 		GuiValuateMedian	= "Validar com os Números Médios Auctioneer";
-		HelpBarker	= "Ligar e Desligar Vendedor";
 		HelpClear	= "Limpar a informação específica de um objecto (tem de carregar shift+click o objecto no comando) Também podes especificar a palavra especial \"Todos\"";
 		HelpCount	= "Seleccionar se quer ver a contagem exacta dos objectos na Database";
 		HelpDefault	= "Aplicar uma opção do Enchantrix para o seu Padrão. Também podes especificar a palavra especial \"Todos\" para por todos as opções Padrão.";
@@ -2259,7 +2014,6 @@ EnchantrixLocalizations = {
 
 
 		-- Section: Tooltip Messages
-		FrmtBarkerPrice	= "Preço de Vendedor (%d%% margem)";
 		FrmtCounts	= "(base=%d, antigo=%d, novo=%d) ";
 		FrmtDisinto	= "Desencanta em:";
 		FrmtFound	= "Observado que %s desencanta em: ";

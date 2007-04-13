@@ -46,7 +46,6 @@ local isValidLocale
 -- Default filter configuration
 local filterDefaults = {
 	['all'] = true,
-	['barker'] = true,
 	['counts'] = false,
 	['embed'] = false,
 	['locale'] = 'default',

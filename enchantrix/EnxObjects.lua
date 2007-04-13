@@ -31,7 +31,6 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Enchantrix namespace
 Enchantrix = {
-	Barker = {},
 	Command = {},
 	Config = {},
 	Constants = {},
