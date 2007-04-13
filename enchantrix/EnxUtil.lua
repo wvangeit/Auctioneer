@@ -241,7 +241,7 @@ function getIType(link)
 		Enchantrix.Debug("GetIType", N_DEBUG, "Quality too low", "The quality for", link, "is too low (", iQual, "< 2)")
 		return
 	end
-if not iEquip then
+	if not iEquip then
 		Enchantrix.Debug("GetIType", N_DEBUG, "Item not equippable", "The item", link, "is not equippable")
 		return
 	end
@@ -541,10 +541,18 @@ Enchantrix.Util = {
 function Enchantrix.Util.GetIType(link)
 	local const = Enchantrix.Constants
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
+
+	if not (itemName and itemEquipLoc and itemRarity and itemLevel) then
+		Enchantrix.Util.Debug("GetIType", N_DEBUG, "GetItemInfo failed, bad link", "could not get item info for:", link)
+		return
+	end
+	
 	local class = const.InventoryTypes[itemEquipLoc] or 0
+	
 	if itemRarity < 2 or not (class and (class == const.WEAPON or class == const.ARMOR)) then
 		return
 	end
+	
 	return ("%d:%d:%d"):format(itemLevel,itemRarity,class)
 end
 

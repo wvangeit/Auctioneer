@@ -29,16 +29,90 @@
 ]]
 Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
+-- Global functions
+local getItemDisenchants		-- Enchantrix.Storage.GetItemDisenchants()
+local getItemDisenchantTotals	-- Enchantrix.Storage.GetItemDisenchantTotals()
+
 --[[
 Usages:
   Enchantrix.Storage["4:2:4:1234"] = { [5432] = { 10, 20 } }
   print(Enchantrix.Storage["4:2:4"])
 ]]
 
+
+-- NOTE - ccox - this will get more complex than a lookup because of non-disenchantable items
+function getItemDisenchants(link)
+
+	local iType = Enchantrix.Util.GetIType(link)
+	if (not iType) then
+		-- NOTE - ccox - GetIType can return nil for items that are not disenchantable
+		-- a nil result does not mean that we could not find the IType
+		return nil
+	end
+	
+	local data = Enchantrix.Storage[iType]
+	if not data then
+		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "No data", "No data returned for iType:",  iType)
+		return nil
+	end
+	
+	return data
+end
+
+
+
+-- NOTE - ccox - calculation copied from itemTooltip, I couldn't easily reuse the code
+-- TODO - REVISIT - ccox - share the code with itemTooltip
+function getItemDisenchantTotals(link)
+
+	local data = getItemDisenchants(link)
+
+	local data = Enchantrix.Storage.GetItemDisenchants(link)
+	if not data then
+		-- error message would have been printed inside GetItemDisenchants
+		return
+	end
+
+	local lines
+	local total = data.total
+	local totalHSP, totalMed, totalMkt = 0,0,0
+	
+	if (total and total[1] > 0) then
+		local totalNumber, totalQuantity = unpack(total)
+		for result, resData in pairs(data) do
+			if (result ~= "total") then
+				if (not lines) then lines = {} end
+
+				local resNumber, resQuantity = unpack(resData)
+				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
+				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
+				local resHSP, resMed, resMkt = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb
+				totalHSP = totalHSP + resHSP
+				totalMed = totalMed + resMed
+				totalMkt = totalMkt + resMkt
+			end
+		end
+	else
+		return
+	end
+	
+	return totalHSP, totalMed, totalMkt
+	
+end
+
+
 local _G
-Enchantrix.Storage = { data={}, locked=false }
+Enchantrix.Storage = {
+	data={},
+	locked=false,
+
+	GetItemDisenchants	= getItemDisenchants,
+	GetItemDisenchantTotals = getItemDisenchantTotals,
+}
+
 local lib = Enchantrix.Storage
 lib.data = {}
+
 
 local function addResults(data, ...)
 	if not data then return end

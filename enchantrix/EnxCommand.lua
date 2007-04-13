@@ -54,7 +54,7 @@ local profitComparisonSort
 local bidBrokerSort
 local doBidBroker
 local doPercentLess
-local getAuctionItemDisenchants
+local getAuctionItemDisenchantTotals
 
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix.State.GUI_Registered = nil
@@ -760,7 +760,6 @@ function clear(param, chatprint)
 		DisenchantList = {}
 		EnchantedLocal = {}
 		EnchantedBaseItems = {}
-		Enchantrix.Storage.AddonLoaded()
 
 		if (chatprint) then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActClearall'));
@@ -844,19 +843,14 @@ end
 
 function percentLessFilter(auction, percentLess)
 	local filterAuction = true;
-
-	local disenchantsTo = getAuctionItemDisenchants(auction.itemId, auction.suffixId, auction.enchantId, true);
-	if not disenchantsTo.totals then return filterAuction; end
-
-	local hspValue = disenchantsTo.totals.hspValue or 0;
-	local medValue = disenchantsTo.totals.medValue or 0;
-	local mktValue = disenchantsTo.totals.mktValue or 0;
-	local confidence = disenchantsTo.totals.conf or 0;
+	
+	local hspValue, medValue, mktValue = getAuctionItemDisenchantTotals(auction.itemId);	
+	if (not hspValue) then return filterAuction; end
 
 	local buyout = auction.buyoutPrice or 0;
 	local count = auction.count or 0;
 	
-	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
+	local myValue = (hspValue + medValue + mktValue) / 3;
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
 	local profit = (myValue * count) - buyout;
 
@@ -865,12 +859,14 @@ function percentLessFilter(auction, percentLess)
 		count = count,
 		value = myValue,
 		margin = margin,
-		profit = profit,
-		conf = confidence
+		profit = profit
 	};
+	
 	if (buyout > 0) and (margin >= tonumber(percentLess)) and (profit >= MIN_PROFIT_MARGIN) then
-		filterAuction = false;
-		profitMargins[Auctioneer.SnapshotDB.CreateAuctionSignatureFromAuction(auction)] = results;
+--		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
+--		filterAuction = false;
+		profitMargins[ auction.auctionId ] = results;
+		return true;
 	end
 
 	return filterAuction;
@@ -880,15 +876,11 @@ function bidBrokerFilter(minProfit, signature)
 	local filterAuction = true;
 	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
 	local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
-	local disenchantsTo = getAuctionItemDisenchants(signature, true);
-	if not disenchantsTo.totals then return filterAuction; end
+	
+	local hspValue, medValue, mktValue = getAuctionItemDisenchantTotals(signature);	
+	if (not hspValue) then return filterAuction; end
 
-	local hspValue = disenchantsTo.totals.hspValue or 0;
-	local medValue = disenchantsTo.totals.medValue or 0;
-	local mktValue = disenchantsTo.totals.mktValue or 0;
-	local confidence = disenchantsTo.totals.conf or 0;
-
-	local myValue = confidence * (hspValue + medValue + mktValue) / 3;
+	local myValue = (hspValue + medValue + mktValue) / 3;
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
 	local profit = (myValue * count) - currentBid;
 	local profitPricePercent = math.floor((profit / currentBid) * 100);
@@ -898,8 +890,7 @@ function bidBrokerFilter(minProfit, signature)
 		count = count,
 		value = myValue,
 		margin = margin,
-		profit = profit,
-		conf = confidence
+		profit = profit
 	};
 	if (currentBid <= MAX_BUYOUT_PRICE) and (profit >= tonumber(minProfit)) and (profit >= MIN_PROFIT_MARGIN) and (profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
 		filterAuction = false;
@@ -910,8 +901,8 @@ end
 
 function profitComparisonSort(a, b)
 	if (not a) or (not b) then return false; end
-	local aSig = a.signature;
-	local bSig = b.signature;
+	local aSig = a.auctionId;
+	local bSig = b.auctionId;
 	if (not aSig) or (not bSig) then return false; end
 	local aEpm = profitMargins[aSig];
 	local bEpm = profitMargins[bSig];
@@ -958,7 +949,6 @@ function doPercentLess(percentLess, minProfit)
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
 
-	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
 
 	--Normal's not too happy about all these nil's, but at least it doesn't fault out now
@@ -971,26 +961,27 @@ function doPercentLess(percentLess, minProfit)
 	local skipped_auctions = 0;
 
 	-- output the list of auctions
+
 	for _,a in ipairs(targetAuctions) do
-		if (a.signature and profitMargins[a.signature]) then
-			local quality = EnhTooltip.QualityFromLink(a.itemLink);
-			if (quality and quality >= 2) then
-				local id,rprop,enchant, name, count,_,buyout,_ = Auctioneer.SnapshotDB.BreakAuctionSignature(a.signature);
-				local value = profitMargins[a.signature].value;
-				local margin = profitMargins[a.signature].margin;
-				local profit = profitMargins[a.signature].profit;
-				if ((profit * count) >= minProfit) then
-					local output = _ENCH('FrmtPctlessLine'):format(
-						Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink,
-						EnhTooltip.GetTextGSC(value * count),
-						EnhTooltip.GetTextGSC(buyout),
-						EnhTooltip.GetTextGSC(profit * count),
-						Auctioneer.Util.ColorTextWhite(margin.."%")
-					);
-					Enchantrix.Util.ChatPrint(output);
-				else
-					skipped_auctions = skipped_auctions + 1;
-				end
+
+		if (a.auctionId and profitMargins[a.auctionId]) then
+			
+			local profit = profitMargins[a.auctionId].profit;
+			
+			if ((profit * a.count) >= minProfit) then
+				local value = profitMargins[a.auctionId].value;
+				local margin = profitMargins[a.auctionId].margin;
+				local name, link = GetItemInfo( a.itemId );
+				local output = _ENCH('FrmtPctlessLine'):format(
+					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					EnhTooltip.GetTextGSC(value * a.count),
+					EnhTooltip.GetTextGSC(a.buyoutPrice),
+					EnhTooltip.GetTextGSC(profit * a.count),
+					Auctioneer.Util.ColorTextWhite(margin.."%")
+				);
+				Enchantrix.Util.ChatPrint(output);
+			else
+				skipped_auctions = skipped_auctions + 1;
 			end
 		end
 	end
@@ -1021,7 +1012,6 @@ function doBidBroker(minProfit, percentLess)
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(EnhTooltip.GetTextGSC(minProfit), percentLess));
 
-	Enchantrix.Storage.Price_Cache = {t=time()};
 	profitMargins = {};
 	
 	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
@@ -1082,9 +1072,8 @@ function doBidBroker(minProfit, percentLess)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end
 
-function getAuctionItemDisenchants(itemId, randomProp, enchant, useCache)
-	local sig = ("%d:%d:%d"):format(itemId, enchant, randomProp);
-	return Enchantrix.Storage.GetItemDisenchants(sig, name, useCache);
+function getAuctionItemDisenchantTotals(itemId)
+	return Enchantrix.Storage.GetItemDisenchantTotals(itemId);
 end
 
 Enchantrix.Command = {

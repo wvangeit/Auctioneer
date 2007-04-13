@@ -121,16 +121,13 @@ tooltipFormat = {
 	end,
 }
 
+
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local embed = Enchantrix.Config.GetFilter('embed')
-	local iType = Enchantrix.Util.GetIType(link)
-	if (not iType) then
-		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "Unknown iType", "The iType for the current tooltip item is unknown:", name, link, quality, count)
-		return
-	end
-	local data = Enchantrix.Storage[iType]
+
+	local data = Enchantrix.Storage.GetItemDisenchants(link)
 	if not data then
-		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "No data", "No data returned for iType:",  iType)
+		-- error message would have been printed inside GetItemDisenchants
 		return
 	end
 
