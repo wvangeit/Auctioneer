@@ -872,13 +872,17 @@ function percentLessFilter(auction, percentLess)
 	return filterAuction;
 end
 
-function bidBrokerFilter(minProfit, signature)
+function bidBrokerFilter(auction, minProfit)
 	local filterAuction = true;
-	local id,rprop,enchant, name, count,min,buyout,uniq = Auctioneer.Core.GetItemSignature(signature);
-	local currentBid = Auctioneer.Statistic.GetCurrentBid(signature);
 	
-	local hspValue, medValue, mktValue = getAuctionItemDisenchantTotals(signature);	
+	local hspValue, medValue, mktValue = getAuctionItemDisenchantTotals(auction.itemId);	
 	if (not hspValue) then return filterAuction; end
+	
+	local currentBid = auction.bidAmount or 0;
+	local minBid = auction.minBid or 0;
+	local count = auction.count or 0;
+	
+	currentBid = math.max( currentBid, minBid );
 
 	local myValue = (hspValue + medValue + mktValue) / 3;
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
@@ -892,10 +896,14 @@ function bidBrokerFilter(minProfit, signature)
 		margin = margin,
 		profit = profit
 	};
+	
 	if (currentBid <= MAX_BUYOUT_PRICE) and (profit >= tonumber(minProfit)) and (profit >= MIN_PROFIT_MARGIN) and (profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
-		filterAuction = false;
-		profitMargins[signature] = results;
+--		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
+--		filterAuction = false;
+		profitMargins[auction.auctionId] = results;
+		return true;
 	end
+	
 	return filterAuction;
 end
 
@@ -906,7 +914,7 @@ function profitComparisonSort(a, b)
 	if (not aSig) or (not bSig) then return false; end
 	local aEpm = profitMargins[aSig];
 	local bEpm = profitMargins[bSig];
-	if (not aEpm) and (not bEpm) then return false; end
+	if (not aEpm) or (not bEpm) then return false; end
 	local aProfit = aEpm.profit or 0;
 	local bProfit = bEpm.profit or 0;
 	local aMargin = aEpm.margin or 0;
@@ -961,13 +969,9 @@ function doPercentLess(percentLess, minProfit)
 	local skipped_auctions = 0;
 
 	-- output the list of auctions
-
 	for _,a in ipairs(targetAuctions) do
-
 		if (a.auctionId and profitMargins[a.auctionId]) then
-			
 			local profit = profitMargins[a.auctionId].profit;
-			
 			if ((profit * a.count) >= minProfit) then
 				local value = profitMargins[a.auctionId].value;
 				local margin = profitMargins[a.auctionId].margin;
@@ -1022,51 +1026,50 @@ function doBidBroker(minProfit, percentLess)
 
 	local skipped_auctions = 0;
 
+-- TODO - ccox - why don't we just store the auction in profitMargins and avoid the whole auction loop?
 	-- output the list of auctions
 	for _,a in ipairs(targetAuctions) do
-		if (a.signature and profitMargins[a.signature]) then
-			local quality = EnhTooltip.QualityFromLink(a.itemLink);
-			if (quality and quality >= 2) then
-				local id,rprop,enchant, name, count, min, buyout,_ = Auctioneer.Core.GetItemSignature(a.signature);
-				local currentBid = Auctioneer.Statistic.GetCurrentBid(a.signature);
-				local value = profitMargins[a.signature].value;
-				local margin = profitMargins[a.signature].margin;
-				local profit = profitMargins[a.signature].profit;
-				local bidText;
-
-				if (margin >= percentLess) then
-					if (currentBid == min) then
-						bidText = _ENCH('FrmtBidbrokerMinbid');
-					else
-						bidText = _ENCH('FrmtBidbrokerCurbid');
-					end
-
-					local output = _ENCH('FrmtBidbrokerLine'):format(
-						Auctioneer.Util.ColorTextWhite(count.."x")..a.itemLink,
-						EnhTooltip.GetTextGSC(value * count),
-						bidText,
-						EnhTooltip.GetTextGSC(currentBid),
-						EnhTooltip.GetTextGSC(profit * count),
-						Auctioneer.Util.ColorTextWhite(margin.."%"),
-						Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft))
-					);
-					Enchantrix.Util.ChatPrint(output);
+		if (a.auctionId and profitMargins[a.auctionId]) then
+			local currentBid = a.bidAmount or 0;
+			local min = a.minBid or 0;
+			currentBid = math.max( currentBid, min );
+			local value = profitMargins[a.auctionId].value;
+			local margin = profitMargins[a.auctionId].margin;
+			local profit = profitMargins[a.auctionId].profit;
+			local bidText;
+			if (margin >= percentLess) then
+				if (currentBid == min) then
+					bidText = _ENCH('FrmtBidbrokerMinbid');
 				else
-					if (currentBid == min) then
-						bidText = _ENCH('FrmtBidbrokerMinbid');
-					else
-						bidText = _ENCH('FrmtBidbrokerCurbid');
-					end
-
-					skipped_auctions = skipped_auctions + 1;
+					bidText = _ENCH('FrmtBidbrokerCurbid');
 				end
+				local name, link = GetItemInfo( a.itemId );
+				local output = _ENCH('FrmtBidbrokerLine'):format(
+					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					EnhTooltip.GetTextGSC(value * a.count),
+					bidText,
+					EnhTooltip.GetTextGSC(currentBid),
+					EnhTooltip.GetTextGSC(profit * a.count),
+					Auctioneer.Util.ColorTextWhite(margin.."%"),
+					Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft))
+				);
+				Enchantrix.Util.ChatPrint(output);
+			else
+				if (currentBid == min) then
+					bidText = _ENCH('FrmtBidbrokerMinbid');
+				else
+					bidText = _ENCH('FrmtBidbrokerCurbid');
+				end
+
+				skipped_auctions = skipped_auctions + 1;
 			end
 		end
 	end
 
 	--TODO: needs to be localized
 	if (skipped_auctions > 0) then
-		Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerSkipped'):format(skipped_auctions, percentLess));
+		-- if this line fails, then someone changed the case of the localization key again, check the string file
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtBidBrokerSkipped'):format(skipped_auctions, percentLess));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
