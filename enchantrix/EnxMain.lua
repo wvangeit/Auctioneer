@@ -78,11 +78,11 @@ function addonLoaded(hookArgs, event, addOnName)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
-	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)
+--	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)			-- not used right now
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_FAILED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
-	Stubby.RegisterEventHook("ZONE_CHANGED", "Enchantrix", onEvent)
+--	Stubby.RegisterEventHook("ZONE_CHANGED", "Enchantrix", onEvent)			-- not used right now
 
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
@@ -142,6 +142,7 @@ function onLoad()
 end
 
 local ns = function(v) return v or "None" end
+
 function pickupInventoryItemHook(slot)
 	-- Remember last activated item
 	if (not UnitCastingInfo("player")) then
@@ -163,6 +164,7 @@ function useContainerItemHook(bag, slot)
 end
 
 function onEvent(funcVars, event, player, spell, rank, target)
+
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		DisenchantEvent.finished = nil
 		if spell == _ENCH('ArgSpellname') then
@@ -170,7 +172,24 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
 			end
 		end
-	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
+	elseif event == "UNIT_SPELLCAST_FAILED" then
+
+--[[
+		-- NOTE - here we do not get the spell name!
+		-- event order for failed disenchant is: SENT, START, FAILED
+		-- unfortunately, we have no DisenchantEvent info during START or SENT
+		
+		if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 5) then
+			-- this means that the item is not disenchantable!
+			-- first compare to known non-DE items and only print on new ones?
+-- TODO - ccox - need localized string!
+--Enchantrix.Util.Debug("Enchantrix", N_DEBUG, "Disenchant failed", "Event:",  DisenchantEvent)
+			Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
+		end
+]]
+		DisenchantEvent.finished = nil
+	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
+		-- disenchant interrupted
 		DisenchantEvent.finished = nil
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
