@@ -173,7 +173,6 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	elseif event == "UNIT_SPELLCAST_FAILED" or event == "UNIT_SPELLCAST_INTERRUPTED" then
 		DisenchantEvent.finished = nil
 	elseif event == "LOOT_OPENED" then
-		local now = GetTime()
 		if DisenchantEvent.finished then
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)

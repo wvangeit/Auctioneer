@@ -32,12 +32,20 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 -- Global functions
 local getItemDisenchants		-- Enchantrix.Storage.GetItemDisenchants()
 local getItemDisenchantTotals	-- Enchantrix.Storage.GetItemDisenchantTotals()
+local saveDisenchant			-- Enchantrix.Storage.SaveDisenchant()
 
 --[[
 Usages:
   Enchantrix.Storage["4:2:4:1234"] = { [5432] = { 10, 20 } }
   print(Enchantrix.Storage["4:2:4"])
 ]]
+
+
+-- NOTE - ccox - if we are going to keep a log of disenchantments, we need this function
+-- and, if we aren't going to keep a log, we need to remove the saveDisenchant code from onEvent in EnxMain.lua
+function saveDisenchant(sig, reagentID, quantity)
+	-- nothing right now
+end
 
 
 -- NOTE - ccox - this will get more complex than a lookup because of non-disenchantable items
@@ -108,6 +116,7 @@ Enchantrix.Storage = {
 
 	GetItemDisenchants	= getItemDisenchants,
 	GetItemDisenchantTotals = getItemDisenchantTotals,
+	SaveDisenchant = saveDisenchant,
 }
 
 local lib = Enchantrix.Storage
