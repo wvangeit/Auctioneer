@@ -32,32 +32,44 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 local const = Enchantrix.Constants
 
 -- These are market norm prices.
--- Median prices from Allakhazam.com, June 6, 2006
+-- Median prices from Allakhazam.com, April 16, 2007
+-- Prices are in copper aka GGSSCC
 const.StaticPrices = {
-	[20725] = 500000, -- Nexus Crystal
-	[14344] =  62500, -- Large Brilliant Shard
-	[11178] =  55000, -- Large Radiant Shard
-	[11139] =  15000, -- Large Glowing Shard
-	[11084] =   9500, -- Large Glimmering Shard
-	[14343] =  25000, -- Small Brilliant Shard
-	[11177] =  37500, -- Small Radiant Shard
-	[11138] =   5750, -- Small Glowing Shard
-	[10978] =   3000, -- Small Glimmering Shard
-	[16203] =  65000, -- Greater Eternal Essence
-	[11175] =  37500, -- Greater Nether Essence
+	[22450] = 759992, -- Void Crystal
+	[20725] =  80000, -- Nexus Crystal
+	
+	[22449] = 191633, -- Large Prismatic Shard
+	[14344] = 110000, -- Large Brilliant Shard
+	[11178] =  88000, -- Large Radiant Shard
+	[11139] =  28106, -- Large Glowing Shard
+	[11084] =  11250, -- Large Glimmering Shard
+	
+	[22448] =  60000, -- Small Prismatic Shard
+	[14343] =  24000, -- Small Brilliant Shard
+	[11177] =  70200, -- Small Radiant Shard
+	[11138] =   5000, -- Small Glowing Shard
+	[10978] =   3200, -- Small Glimmering Shard
+	
+	[22446] =  64900, -- Greater Planar Essence
+	[16203] = 110225, -- Greater Eternal Essence
+	[11175] =  60000, -- Greater Nether Essence
 	[11135] =  10000, -- Greater Mystic Essence
-	[11082] =  12500, -- Greater Astral Essence
-	[10939] =   3250, -- Greater Magic Essence
-	[16202] =  25000, -- Lesser Eternal Essence
-	[11174] =  15000, -- Lesser Nether Essence
-	[11134] =   4750, -- Lesser Mystic Essence
-	[10998] =   5250, -- Lesser Astral Essence
-	[10938] =   1750, -- Lesser Magic Essence
-	[16204] =  10000, -- Illusion Dust
-	[11176] =   5250, -- Dream Dust
-	[11137] =   2250, -- Vision Dust
-	[11083] =   1750, -- Soul Dust
-	[10940] =    825, -- Strange Dust
+	[11082] =   8750, -- Greater Astral Essence
+	[10939] =   6500, -- Greater Magic Essence
+	
+	[22447] =  21200, -- Lesser Planar Essence
+	[16202] =  42538, -- Lesser Eternal Essence
+	[11174] =  24285, -- Lesser Nether Essence
+	[11134] =   5040, -- Lesser Mystic Essence
+	[10998] =   4000, -- Lesser Astral Essence
+	[10938] =   3215, -- Lesser Magic Essence
+	
+	[22445] =  22500, -- Arcane Dust
+	[16204] =  24800, -- Illusion Dust
+	[11176] =   8333, -- Dream Dust
+	[11137] =   5500, -- Vision Dust
+	[11083] =   3000, -- Soul Dust
+	[10940] =   1250, -- Strange Dust
 }
 
 const.DUST = 1
