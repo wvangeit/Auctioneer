@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
-## SavedVariables: EnchantConfig, EnchantrixData
+## SavedVariables: EnchantConfig, EnchantrixData, EnchantedLocal, EnchantedBaseItems
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

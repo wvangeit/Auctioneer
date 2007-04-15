@@ -34,6 +34,8 @@ data layout:
 			["profile.test4"] = {
 				["miniicon.distance"] = 56,
 				["miniicon.angle"] = 189,
+				["show"] = true,
+				["enable"] = true,
 			},
 			
 			["profiles"] = {
