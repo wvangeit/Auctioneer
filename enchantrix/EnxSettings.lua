@@ -26,6 +26,33 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
+		
+
+data layout:
+		EnchantConfig = {
+		
+			["profile.test4"] = {
+				["miniicon.distance"] = 56,
+				["miniicon.angle"] = 189,
+			},
+			
+			["profiles"] = {
+				"Default", -- [1]
+				"test4", -- [2]
+			},
+			
+			["users.Balnazzar.Picksell"] = "test4",
+			
+			["profile.Default"] = {
+				["miniicon.angle"] = 187,
+				["miniicon.distance"] = 15,
+			},
+			
+		}
+
+if user does not have a set profile name, they get the default profile
+
+
 ]]
 Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
@@ -85,8 +112,9 @@ local function setter(setting, value)
 			EnchantConfig[getUserSig()] = value
 			-- Get the new current profile
 			local newProfile = getUserProfile()
+			
 			-- Clean it out and then resave all data
-			cleanse(newProfile)
+--			cleanse(newProfile)		-- TODO - function does not exist
 			gui.Resave()
 
 			-- Add the new profile to the profiles list
@@ -95,17 +123,22 @@ local function setter(setting, value)
 				profiles = { "Default" }
 				EnchantConfig["profiles"] = profiles
 			end
+			
 			-- Check to see if it already exists
 			local found = false
 			for pos, name in ipairs(profiles) do
 				if (name == value) then found = true end
 			end
+			
 			-- If not, add it and then sort it
 			if (not found) then
 				table.insert(profiles, value)
 				table.sort(profiles)
 			end
+			
+-- TODO - localize string
 			DEFAULT_CHAT_FRAME:AddMessage("Saved profile: "..value)
+			
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
@@ -113,9 +146,11 @@ local function setter(setting, value)
 			-- If there's a profile name supplied
 			if (value) then
 				-- Clean it's profile container of values
-				cleanse(EnchantConfig["profile."..value])
+--				cleanse(EnchantConfig["profile."..value])		-- TODO - function does not exist
+				
 				-- Delete it's profile container
 				EnchantConfig["profile."..value] = nil
+				
 				-- Find it's entry in the profiles list
 				local profiles = EnchantConfig["profiles"]
 				if (profiles) then
@@ -126,11 +161,15 @@ local function setter(setting, value)
 						end
 					end
 				end
+				
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
 					EnchantConfig[getUserSig()] = 'Default'
 				end
+				
+-- TODO - localize string
 				DEFAULT_CHAT_FRAME:AddMessage("Deleted profile: "..value)
+				
 			end
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -138,7 +177,10 @@ local function setter(setting, value)
 
 			-- Change the user's current profile to this new one
 			EnchantConfig[getUserSig()] = value
+			
+-- TODO - localize string
 			DEFAULT_CHAT_FRAME:AddMessage("Changing profile: "..value)
+			
 		end
 
 		-- Refresh all values to reflect current data
