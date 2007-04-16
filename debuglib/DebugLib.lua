@@ -69,7 +69,8 @@ local level = {
 --       nil, if no iCode is specified
 --       iCode, otherwise
 --    second value:
---       strMessage
+--       nil, if no error message is specified
+--       strMessage, otherwise
 --
 -- remarks:
 --    If priority is not specified, a default value will be assigned. This
