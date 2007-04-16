@@ -28,10 +28,29 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
+-------------------------------------------------------------------------------
+-- Function definitions
+-------------------------------------------------------------------------------
 local assert
 local debugPrint
 local dump
 
+-------------------------------------------------------------------------------
+-- Enumerations
+-------------------------------------------------------------------------------
+-- The different supported debug levels.
+local level = {
+		Critical = "Critical",
+		Error    = "Error",
+		Warning  = "Warning",
+		Notice   = "Notice",
+		Info     = "Info",
+		Debug    = "Debug"
+}
+
+-------------------------------------------------------------------------------
+-- Function declarations
+-------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 -- Prints the specified message to nLog.
 --
@@ -39,9 +58,9 @@ local dump
 --    strAddon   - (string) the name of the addon/file used to specify where
 --                          the error occured
 --    strMessage - (string) the error message
---    iCode      - (number) the error code (optional)
---    type       - (string) type of debug message (optional - defaulting to
+--    level      - (string) level of debug message (optional - defaulting to
 --                          "Debug")
+--    iCode      - (number) the error code (optional)
 --    priority   - nLog message level (optional - see remarks on which default
 --                 value is used)
 --
@@ -66,26 +85,26 @@ local dump
 -------------------------------------------------------------------------------
 -- TODO: add better automated logging text, including function name, line number
 --       etc, dump caps
-function debugPrint(strAddon, strMessage, iCode, type, priority)
+function debugPrint(strAddon, strMessage, level, iCode, priority)
 	if not iCode then
 		iCode = "none"
 	end
 
 	if nLog then
-		if not type then
-			type = nLog.levels[N_DEBUG]
+		if not level then
+			level = nLog.levels[N_DEBUG]
 		end
 		if not priority then
 			-- search the list of error levels to find the correct priority
 			for iLevel, strLevel in pairs(nLog.levels) do
-				if strLevel == type then
+				if strLevel == level then
 					priority = iLevel
 					break
 				end
 			end
 			priority = priority or N_DEBUG
 		end
-		nLog.AddMessage(strAddon, type, priority, "Errorcode: "..iCode, strMessage)
+		nLog.AddMessage(strAddon, level, priority, "Errorcode: "..iCode, strMessage)
 	end
 
 	return iCode, strMessage
@@ -184,10 +203,14 @@ function dump(...)
 	return out
 end
 
+-------------------------------------------------------------------------------
+-- Initialization code
+-------------------------------------------------------------------------------
 if not DebugLib then
 	DebugLib = {
 		Assert     = assert,
 		DebugPrint = debugPrint,
-		Dump       = dump		
+		Dump       = dump,
+		Level      = level
 	}
 end
