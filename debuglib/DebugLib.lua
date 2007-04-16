@@ -66,17 +66,17 @@ local level = {
 --
 -- returns:
 --    first value:
---       "none", if no iCode is specified
+--       nil, if no iCode is specified
 --       iCode, otherwise
 --    second value:
 --       strMessage
 --
 -- remarks:
 --    If priority is not specified, a default value will be assigned. This
---    default value depends on the specified type parameter. If type is set to a
---    valid nLog level, the appropriate priority will be used (i.e. 1 for
+--    default value depends on the specified level parameter. If level is set to
+--    a valid nLog level, the appropriate priority will be used (i.e. 1 for
 --    "Critical", 2 for "Error", etc.). See nLog.levels for a complete list.
---    If there is no counterpart to the specified type, priority defaults to
+--    If there is no counterpart to the specified level, priority defaults to
 --    N_DEBUG.
 --
 --    This function is not designed to be called directly. Instead it is meant
@@ -86,14 +86,10 @@ local level = {
 -- TODO: add better automated logging text, including function name, line number
 --       etc, dump caps
 function debugPrint(strAddon, strMessage, level, iCode, priority)
-	if not iCode then
-		iCode = "none"
-	end
-
 	if nLog then
-		if not level then
-			level = nLog.levels[N_DEBUG]
-		end
+		local iCodeText = iCode or "none"
+		      level     = level or nLog.levels[N_DEBUG]
+
 		if not priority then
 			-- search the list of error levels to find the correct priority
 			for iLevel, strLevel in pairs(nLog.levels) do
@@ -104,7 +100,8 @@ function debugPrint(strAddon, strMessage, level, iCode, priority)
 			end
 			priority = priority or N_DEBUG
 		end
-		nLog.AddMessage(strAddon, level, priority, "Errorcode: "..iCode, strMessage)
+
+		nLog.AddMessage(strAddon, level, priority, "Errorcode: "..iCodeText, strMessage)
 	end
 
 	return iCode, strMessage
