@@ -173,20 +173,20 @@ function onEvent(funcVars, event, player, spell, rank, target)
 			end
 		end
 	elseif event == "UNIT_SPELLCAST_FAILED" then
-
---[[
 		-- NOTE - here we do not get the spell name!
 		-- event order for failed disenchant is: SENT, START, FAILED
 		-- unfortunately, we have no DisenchantEvent info during START or SENT
 		
 		if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 5) then
-			-- this means that the item is not disenchantable!
-			-- first compare to known non-DE items and only print on new ones?
+			-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
+			if (Enchantrix.Util.GetIType(DisenchantEvent.spellTarget)) then
+				-- this means that the item is not disenchantable, but we think it is!
+				-- first compare to known non-DE items and only print on new ones?
+				Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
 -- TODO - ccox - need localized string!
---Enchantrix.Util.Debug("Enchantrix", N_DEBUG, "Disenchant failed", "Event:",  DisenchantEvent)
-			Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
+				Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
+			end
 		end
-]]
 		DisenchantEvent.finished = nil
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		-- disenchant interrupted

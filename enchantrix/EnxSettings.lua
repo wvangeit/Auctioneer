@@ -131,7 +131,7 @@ local function getDefault(setting)
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
 	
-	-- no idea what this is, log it for debugging purposes
+	-- no idea what this setting is, so log it for debugging purposes
 	if (result == nil) then
 		Enchantrix.Util.Debug("GetDefault", N_DEBUG, "Unknown key", "default requested for unknown key:",  setting)
 		--DEFAULT_CHAT_FRAME:AddMessage("Enchantrix setting needs default: "..setting)
@@ -328,9 +328,6 @@ function lib.GetSetting(setting, default)
 	end
 end
 
-local function gsc(value)
-	return EnhTooltip.GetTextGSC(value, true)
-end
 
 function lib.MakeGuiConfig()
 	if gui then return end
@@ -359,7 +356,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
 	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Disable enchanting info in item tooltips")
 	-- TODO: locale -- what are the allowed values?
-	-- TODO: printframe  -- what are the allowed values?
+	-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
 	gui.AddControl(id, "Subhead",    0,    "Valuations")
 	gui.AddControl(id, "Checkbox",   0, 1, "valuate", "Show disenchant values")

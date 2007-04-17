@@ -41,6 +41,7 @@ local getItemDisenchants		-- Enchantrix.Storage.GetItemDisenchants()
 local getItemDisenchantTotals	-- Enchantrix.Storage.GetItemDisenchantTotals()
 local saveDisenchant			-- Enchantrix.Storage.SaveDisenchant()
 local addonLoaded				-- Enchantrix.Storage.AddonLoaded()
+local saveNonDisenchantable		-- Enchantrix.Storage.SaveNonDisenchantable()
 
 -- Local functions
 local unserialize
@@ -51,7 +52,6 @@ local mergeDisenchantLists
 
 -- Database
 local LocalBaseItems = {} -- EnchantedLocal merged by item id
-local EnchantedItemTypes = {} -- LocalBaseItems and EnchantedBaseItems merged by type
 
 local N_DISENCHANTS = 1
 local N_REAGENTS = 2
@@ -133,10 +133,11 @@ function mergeDisenchantLists()
 	for sig, disenchant in pairs(EnchantedLocal) do
 		local item = Enchantrix.Util.GetItemIdFromSig(sig)
 		if type(disenchant) == "table" then
-			saveLocal(sig, disenchant)
+			saveLocal(sig, disenchant)				-- TODO - function does not exist!
 			disenchant = EnchantedLocal[sig]
 		end
 		if Enchantrix.Util.IsDisenchantable(item) and (type(disenchant) == "string") then
+Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding to LocalBaseItems", "item:",  item, disenchant)
 			LocalBaseItems[item] = mergeDisenchant(LocalBaseItems[item], disenchant)
 		end
 	end
@@ -149,8 +150,10 @@ function mergeDisenchantLists()
 		end
 	end
 	for id, disenchant in pairs(LocalBaseItems) do
+Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding LocalItem", "item:",  id, disenchant)
 		local itype = Enchantrix.Util.GetItemType(id)
 		if itype then
+Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding LocalBaseItems to EnchantedItemTypes", "item:",  id, disenchant)
 			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 		end
 	end
@@ -188,6 +191,19 @@ function getItemDisenchants(link)
 		-- a nil result does not mean that we could not find the IType
 		return nil
 	end
+	
+	-- see if it is on our non-disenchantable list
+	if type(link) == "string" then
+		sig = Enchantrix.Util.GetSigFromLink(link);
+	else
+		local _, sLink = GetItemInfo(link);
+		sig = Enchantrix.Util.GetSigFromLink(sLink);
+	end
+	
+	if (NonDisenchantables[sig]) then
+		return nil
+	end
+	
 	local data = Enchantrix.Storage[iType]
 	if not data then
 		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "No data", "No data returned for iType:",  iType)
@@ -343,10 +359,20 @@ local function newindex(self, key, value)
 	rawset(self, key, value)
 end
 
+
+function saveNonDisenchantable(itemLink)
+	if not NonDisenchantables then NonDisenchantables = {} end
+	local sig = Enchantrix.Util.GetSigFromLink(itemLink);
+	NonDisenchantables[sig] = true;
+end
+
+
 function addonLoaded()
 	-- Create and setup saved variables
 	if not EnchantedLocal then EnchantedLocal = {} end
 	if not EnchantedBaseItems then EnchantedBaseItems = {} end
+	if not EnchantedItemTypes then EnchantedItemTypes = {} end
+	if not NonDisenchantables then NonDisenchantables = {} end
 	
 	mergeDisenchantLists()
 end
@@ -360,6 +386,7 @@ Enchantrix.Storage = {
 	GetItemDisenchants	= getItemDisenchants,
 	GetItemDisenchantTotals = getItemDisenchantTotals,
 	SaveDisenchant = saveDisenchant,
+	SaveNonDisenchantable = saveNonDisenchantable,
 }
 
 -- Make all globals local to this file
