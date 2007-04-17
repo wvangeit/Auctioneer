@@ -137,7 +137,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('all')};
+				default={checked=Enchantrix.Settings.GetDefault('all')};
 				disabled={checked=false};
 				difficulty=1;
 			};
@@ -210,7 +210,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('embed')};
+				default={checked=Enchantrix.Settings.GetDefault('embed')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
@@ -235,7 +235,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('terse')};
+				default={checked=Enchantrix.Settings.GetDefault('terse')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=2;
@@ -260,7 +260,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('counts')};
+				default={checked=Enchantrix.Settings.GetDefault('counts')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
@@ -296,7 +296,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('valuate')};
+				default={checked=Enchantrix.Settings.GetDefault('valuate')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
@@ -321,7 +321,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Config.GetFilterDefaults('valuate-baseline')};
+				default={checked=Enchantrix.Settings.GetDefault('valuate-baseline')};
 				disabled={checked=false};
 				dependencies={valuate={checked=true;}, all={checked=true;}};
 				difficulty=2;
@@ -486,7 +486,7 @@ function registerAuctioneerOptions()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix.Config.GetFilterDefaults('valuate-hsp')};
+			default={checked = Enchantrix.Settings.GetDefault('valuate-hsp')};
 			disabled={checked = false};
 			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
@@ -511,7 +511,7 @@ function registerAuctioneerOptions()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix.Config.GetFilterDefaults('valuate-median')};
+			default={checked = Enchantrix.Settings.GetDefault('valuate-median')};
 			disabled={checked = false};
 			dependencies={valuate={checked=true;}, all={checked=true;}};
 			difficulty=2;
@@ -665,7 +665,7 @@ function handleCommand(command, source)
 	elseif (cmd == 'percentless' or cmd == 'pl') then
 		doPercentLess(param, param2);
 
-	elseif (Enchantrix.Config.GetFilterDefaults(cmd) ~= nil) then
+	elseif (Enchantrix.Settings.GetDefault(cmd) ~= nil) then
 		genVarSet(cmd, param, chatprint);
 
 	elseif (chatprint) then
@@ -792,7 +792,6 @@ function default(param, chatprint)
 		return
 	elseif (param == _ENCH('CmdClearAll')) or (param == "all") then
 		param = "all"
-		EnchantConfig.filters = {}
 	else
 		paramLocalized = param
 		param = Enchantrix.Locale.DelocalizeCommand(param)
@@ -802,10 +801,13 @@ function default(param, chatprint)
 	if (chatprint) then
 		if (param == "all") then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefaultAll'));
-
+			Enchantrix.Settings.SetSetting('profile.default', true );
+		
+		--[[
 			for k,v in pairs(EnchantConfig.filters) do
 				setKhaosSetKeyValue(k, Enchantrix.Config.GetFilter(k));
 			end
+		]]
 
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefault'):format(paramLocalized));

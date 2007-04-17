@@ -31,7 +31,6 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local addonLoaded		-- Enchantrix.Config.AddonLoaded()
-local getFilterDefaults	-- Enchantrix.Config.GetFilterDefaults()
 local setFilter			-- Enchantrix.Config.SetFilter()
 local getFilter			-- Enchantrix.Config.GetFilter()
 local setFrame			-- Enchantrix.Config.SetFrame()
@@ -43,69 +42,32 @@ local getLocale			-- Enchantrix.Config.GetLocale()
 -- Local functions
 local isValidLocale
 
--- Default filter configuration
-local filterDefaults = {
-	['all'] = true,
-	['counts'] = false,
-	['embed'] = false,
-	['locale'] = 'default',
-	['printframe'] = 1,
-	['terse'] = false,
-	['valuate'] = true,
-	['valuate-hsp'] = true,
-	['valuate-median'] = true,
-	['valuate-baseline'] = true,
-}
-
--- True if this filter value should be saved per character
-local perCharacterFilter = {
-	['counts'] = true,
-	['embed'] = true,
-	['terse'] = true,
-	['printframe'] = true,
-}
 
 function addonLoaded()
-	-- Remove unused/unknown filter values
---	for key in pairs(EnchantConfig.filters) do
---		if getFilterDefaults(key) == nil then
---			setFilter(key, nil)
---		else
---			setFilter(key, getFilter(key))
---		end
---	end
 end
 
-function getFilterDefaults(key)
-	return filterDefaults[key]
-end
 
-function getFilter(filter)
-	local val-- = EnchantConfigChar.filters[filter]
-	if val == nil then
-		--val = EnchantConfig.filters[filter]
-	end
-	if val == nil then
-		val = getFilterDefaults(filter)
-	end
+function getFilter(key)
+	local val = Enchantrix.Settings.GetSetting(key)
 	return val
 end
 
 function setFilter(key, value)
-	if (value == 'default') or (value == getFilterDefaults(key)) then
-		-- Don't save default values
-		value = nil
-	elseif value == 'on' then
+
+	-- turn value into a canonical true or false
+	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
 	end
-	if perCharacterFilter[key] then
-		EnchantConfigChar.filters[key] = value
-	else
-		EnchantConfigChar.filters[key] = nil
+	
+	-- for defaults, just remove the value and it'll fall through
+	if (value == 'default') or (value == Enchantrix.Settings.GetDefault(key)) then
+		-- Don't save default values
+		value = nil
 	end
-	EnchantConfig.filters[key] = value
+	
+	Enchantrix.Settings.SetSetting(key, value);
 end
 
 -- The following three functions were added by MentalPower to implement the /enx print-in command
@@ -237,7 +199,6 @@ Enchantrix.Config = {
 	Revision			= "$Revision$",
 	AddonLoaded			= addonLoaded,
 
-	GetFilterDefaults	= getFilterDefaults,
 	GetFilter			= getFilter,
 	SetFilter			= setFilter,
 

@@ -73,7 +73,6 @@ local function getUserProfileName()
 	return EnchantConfig[userSig] or "Default"
 end
 
-local itc = 0
 local function getUserProfile()
 	if (not EnchantConfig) then EnchantConfig = {} end
 	local profileName = getUserProfileName()
@@ -89,15 +88,62 @@ local function getUserProfile()
 	return EnchantConfig["profile."..profileName]
 end
 
+
+local function cleanse( profile )
+	if (profile) then
+		profile = {}
+	end
+end
+
+
+-- Default setting values
+local settingDefaults = {
+	['all'] = true,
+	['counts'] = false,
+	['embed'] = false,
+	['locale'] = 'default',
+	['printframe'] = 1,
+	['terse'] = false,
+	['valuate'] = true,
+	['valuate-hsp'] = true,
+	['valuate-median'] = true,
+	['valuate-baseline'] = true,
+	['valuate-val'] = true,
+	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
+}
+
 local function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
+	
+	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
+	
+	-- reagent prices
 	if (a == "value") then
 		return Enchantrix.Constants.StaticPrices[tonumber(b) or 0]
 	end
+
+	-- miniicon settings
 	if (setting == "miniicon.angle")          then return 118     end
 	if (setting == "miniicon.distance")       then return 12      end
+	
+	-- lookup the simple settings
+	local result = settingDefaults[setting];
+	
+	-- no idea what this is, log it for debugging purposes
+	if (result == nil) then
+		Enchantrix.Util.Debug("GetDefault", N_DEBUG, "Unknown key", "default requested for unknown key:",  setting)
+		--DEFAULT_CHAT_FRAME:AddMessage("Enchantrix setting needs default: "..setting)
+	end
+	
+	return result
+	
+end
+
+function lib.GetDefault(setting)
+	local val = getDefault(setting);
+	return val;
 end
 
 local function setter(setting, value)
@@ -116,7 +162,7 @@ local function setter(setting, value)
 			local newProfile = getUserProfile()
 			
 			-- Clean it out and then resave all data
---			cleanse(newProfile)		-- TODO - function does not exist
+			cleanse(newProfile)
 			gui.Resave()
 
 			-- Add the new profile to the profiles list
@@ -148,7 +194,7 @@ local function setter(setting, value)
 			-- If there's a profile name supplied
 			if (value) then
 				-- Clean it's profile container of values
---				cleanse(EnchantConfig["profile."..value])		-- TODO - function does not exist
+				cleanse(EnchantConfig["profile."..value])
 				
 				-- Delete it's profile container
 				EnchantConfig["profile."..value] = nil
@@ -173,6 +219,19 @@ local function setter(setting, value)
 				DEFAULT_CHAT_FRAME:AddMessage("Deleted profile: "..value)
 				
 			end
+			
+		elseif (setting == "profile.default") then
+			-- User clicked the reset settings button
+			
+			-- Get the current profile from the select box
+			value = gui.elements["profile"].value
+
+			-- Clean it's profile container of values
+			EnchantConfig["profile."..value] = {}
+			
+-- TODO - localize string
+			DEFAULT_CHAT_FRAME:AddMessage("Reset all settings for:"..value)
+		
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
 			value = gui.elements["profile"].value
@@ -199,6 +258,7 @@ local function setter(setting, value)
 	end
 		
 end
+
 function lib.SetSetting(...)
 	setter(...)
 	if (gui) then
@@ -244,6 +304,7 @@ local function getter(setting)
 		return getDefault(setting)
 	end
 end
+
 function lib.GetSetting(setting, default)
 	local option = getter(setting)
 	if ( option ~= nil ) then
@@ -265,17 +326,22 @@ function lib.MakeGuiConfig()
 	lib.Gui = gui
 
   	gui.AddCat("Enchantrix")
+  	
 	id = gui.AddTab("Profiles")
 	gui.AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
+	
 	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
 	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
+	gui.AddControl(id, "Button",     0, 1, "profile.default", "Reset")
+	
 	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
 	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
 	gui.AddControl(id, "Button",     0, 1, "profile.save", "Save")
 
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",         0,    "General Enchantrix options")
+	
 	gui.AddControl(id, "Subhead",        0,    "Minimap display options")
 	gui.AddControl(id, "Checkbox",       0, 1, "miniicon.enable", "Display Minimap button")
 	gui.AddControl(id, "Slider",         0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")

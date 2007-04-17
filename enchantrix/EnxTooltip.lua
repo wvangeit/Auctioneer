@@ -222,7 +222,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	-- Header
 	local totalText = ""
-	if (Enchantrix.Config.GetFilter('counts')) then
+	if (Enchantrix.Config.GetFilter('counts') and totalNumber) then
 		totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
 	end
 	EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
