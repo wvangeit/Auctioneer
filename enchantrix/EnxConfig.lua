@@ -53,20 +53,6 @@ function getFilter(key)
 end
 
 function setFilter(key, value)
-
-	-- turn value into a canonical true or false
-	if value == 'on' then
-		value = true
-	elseif value == 'off' then
-		value = false
-	end
-	
-	-- for defaults, just remove the value and it'll fall through
-	if (value == 'default') or (value == Enchantrix.Settings.GetDefault(key)) then
-		-- Don't save default values
-		value = nil
-	end
-	
 	Enchantrix.Settings.SetSetting(key, value);
 end
 

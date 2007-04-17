@@ -148,6 +148,20 @@ end
 
 local function setter(setting, value)
 	if (not EnchantConfig) then EnchantConfig = {} end
+	
+	-- turn value into a canonical true or false
+	if value == 'on' then
+		value = true
+	elseif value == 'off' then
+		value = false
+	end
+	
+	-- for defaults, just remove the value and it'll fall through
+	if (value == 'default') or (value == getDefault(setting)) then
+		-- Don't save default values
+		value = nil
+	end
+	
 	local a,b,c = strsplit(".", setting)
 	if (a == "profile") then
 		if (setting == "profile.save") then
@@ -333,17 +347,34 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
 	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Button",     0, 1, "profile.default", "Reset")
+	gui.AddControl(id, "Button",     0, 3, "profile.default", "Reset")
 	
 	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
 	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
 	gui.AddControl(id, "Button",     0, 1, "profile.save", "Save")
 
+
 	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",         0,    "General Enchantrix options")
+	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
+	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
+	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Disable enchanting info in item tooltips")
+	-- TODO: locale -- what are the allowed values?
+	-- TODO: printframe  -- what are the allowed values?
 	
-	gui.AddControl(id, "Subhead",        0,    "Minimap display options")
-	gui.AddControl(id, "Checkbox",       0, 1, "miniicon.enable", "Display Minimap button")
-	gui.AddControl(id, "Slider",         0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
-	gui.AddControl(id, "Slider",         0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
+	gui.AddControl(id, "Subhead",    0,    "Valuations")
+	gui.AddControl(id, "Checkbox",   0, 1, "terse", "Show terse disenchant value")
+	gui.AddControl(id, "Checkbox",   0, 1, "valuate", "Show disenchant values")
+	if (Enchantrix.State.Auctioneer_Loaded) then
+		gui.AddControl(id, "Checkbox",       0, 2, "valuate-hsp", "Show Auctioneer HighestSellablePrice values")
+		gui.AddControl(id, "Checkbox",       0, 2, "valuate-median", "Show Auctioneer median values")
+		if (Enchantrix.State.Auctioneer_Five) then
+			gui.AddControl(id, "Checkbox",       0, 2, "valuate-val", "Show Auctioneer 5 value")
+		end
+	end
+	gui.AddControl(id, "Checkbox",   0, 2, "valuate-baseline", "Show built-in baseline values")
+
+	gui.AddControl(id, "Subhead",    0,    "Minimap display options")
+	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", "Display Minimap button")
+	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
+	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
 end
