@@ -81,7 +81,7 @@ tooltipFormat = {
 	end,
 	SetFormat = function(this, fmt, val, counts)
 		if counts == nil then
-			counts = Enchantrix.Config.GetFilter('counts')
+			counts = Enchantrix.Settings.GetSetting('counts')
 		end
 		if counts then
 			this.format[fmt]['on'] = val
@@ -92,7 +92,7 @@ tooltipFormat = {
 	GetFormat = function(this, fmt, counts)
 		if not this.format[fmt] then return end
 		if counts == nil then
-			counts = Enchantrix.Config.GetFilter('counts')
+			counts = Enchantrix.Settings.GetSetting('counts')
 		end
 		if counts then
 			return this.format[fmt]['on']
@@ -103,7 +103,7 @@ tooltipFormat = {
 	GetString = function(this, counts)
 		local line
 		if counts == nil then
-			counts = Enchantrix.Config.GetFilter('counts')
+			counts = Enchantrix.Settings.GetSetting('counts')
 		end
 		if counts then
 			line = this.format[this.currentFormat]['on']
@@ -123,7 +123,7 @@ tooltipFormat = {
 
 
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
-	local embed = Enchantrix.Config.GetFilter('embed')
+	local embed = Enchantrix.Settings.GetSetting('embed')
 
 	local data = Enchantrix.Storage.GetItemDisenchants(link)
 	if not data then
@@ -192,7 +192,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				end
 
 				-- Store this line and sort key
-				local line = tooltipFormat:GetString(Enchantrix.Config.GetFilter('counts'))
+				local line = tooltipFormat:GetString(Enchantrix.Settings.GetSetting('counts'))
 				table.insert(lines,  {str = line, sort = pmin})
 			end
 		end
@@ -201,19 +201,19 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	-- Terse mode
-	if Enchantrix.Config.GetFilter('terse') and not IsControlKeyDown() then
-		if Enchantrix.Config.GetFilter('valuate-hsp') and totalHSP > 0 then
+	if Enchantrix.Settings.GetSetting('terse') and not IsControlKeyDown() then
+		if Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Config.GetFilter('valuate-median') and totalMed > 0 then
+		elseif Enchantrix.Settings.GetSetting('valuate-median') and totalMed > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Config.GetFilter('valuate-val') and totalFive then
+		elseif Enchantrix.Settings.GetSetting('valuate-val') and totalFive then
 			for engine, price in pairs(totalFive) do
 				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal').." ("..engine..")", price, embed);
 				EnhTooltip.LineColor(0.1,0.6,0.6);
 			end
-		elseif Enchantrix.Config.GetFilter('valuate-baseline') and totalMkt > 0 then
+		elseif Enchantrix.Settings.GetSetting('valuate-baseline') and totalMkt > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
@@ -222,7 +222,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	-- Header
 	local totalText = ""
-	if (Enchantrix.Config.GetFilter('counts') and totalNumber) then
+	if (Enchantrix.Settings.GetSetting('counts') and totalNumber) then
 		totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
 	end
 	EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
@@ -236,16 +236,16 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		if n >= 5 then break end -- Don't add more than 5 lines
 	end
 
-	if (Enchantrix.Config.GetFilter('valuate')) then
-		if (Enchantrix.Config.GetFilter('valuate-hsp') and totalHSP > 0) then
+	if (Enchantrix.Settings.GetSetting('valuate')) then
+		if (Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Config.GetFilter('valuate-median') and totalMed > 0) then
+		if (Enchantrix.Settings.GetSetting('valuate-median') and totalMed > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Config.GetFilter('valuate-baseline') and totalMkt > 0) then
+		if (Enchantrix.Settings.GetSetting('valuate-baseline') and totalMkt > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
@@ -317,7 +317,7 @@ local function getReagentsFromTooltip(frame)
 end
 
 function enchantTooltip(funcVars, retVal, frame, name, link)
-	local embed = Enchantrix.Config.GetFilter('embed');
+	local embed = Enchantrix.Settings.GetSetting('embed');
 
 	local craftIndex
 	for i = 1, GetNumCrafts() do
@@ -427,7 +427,7 @@ end
 
 function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 	-- nothing to do, if enchantrix is disabled
-	if (not Enchantrix.Config.GetFilter('all')) then
+	if (not Enchantrix.Settings.GetSetting('all')) then
 		return
 	end
 

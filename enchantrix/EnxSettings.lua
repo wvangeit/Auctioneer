@@ -347,7 +347,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
 	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Button",     0, 3, "profile.default", "Reset")
+	gui.AddControl(id, "Button",     0, 1, "profile.default", "Reset")
 	
 	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
 	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
@@ -362,8 +362,8 @@ function lib.MakeGuiConfig()
 	-- TODO: printframe  -- what are the allowed values?
 	
 	gui.AddControl(id, "Subhead",    0,    "Valuations")
-	gui.AddControl(id, "Checkbox",   0, 1, "terse", "Show terse disenchant value")
 	gui.AddControl(id, "Checkbox",   0, 1, "valuate", "Show disenchant values")
+	gui.AddControl(id, "Checkbox",   0, 2, "terse", "Show terse disenchant value")
 	if (Enchantrix.State.Auctioneer_Loaded) then
 		gui.AddControl(id, "Checkbox",       0, 2, "valuate-hsp", "Show Auctioneer HighestSellablePrice values")
 		gui.AddControl(id, "Checkbox",       0, 2, "valuate-median", "Show Auctioneer median values")

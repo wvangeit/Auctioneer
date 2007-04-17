@@ -132,7 +132,7 @@ function localizeFilterVal(value)
 end
 
 function getLocalizedFilterVal(key)
-	return localizeFilterVal(Enchantrix.Config.GetFilter(key))
+	return localizeFilterVal(Enchantrix.Settings.GetSetting(key))
 end
 
 -- Turns a localized slash command into the generic English version of the command

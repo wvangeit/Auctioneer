@@ -733,14 +733,14 @@ function onOff(state, chatprint)
 	end
 
 	if (state == 'on') or (state == 'off') then
-		Enchantrix.Config.SetFilter('all', state);
+		Enchantrix.Settings.SetSetting('all', state);
 	elseif (state == "toggle") then
-		Enchantrix.Config.SetFilter('all', not Enchantrix.Config.GetFilter('all'))
+		Enchantrix.Settings.SetSetting('all', not Enchantrix.Settings.GetSetting('all'))
 	end
 
 	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint) then
-		state = Enchantrix.Config.GetFilter('all')
+		state = Enchantrix.Settings.GetSetting('all')
 		setKhaosSetKeyParameter('all', "checked", state);
 
 		if (state) then
@@ -795,7 +795,7 @@ function default(param, chatprint)
 	else
 		paramLocalized = param
 		param = Enchantrix.Locale.DelocalizeCommand(param)
-		Enchantrix.Config.SetFilter(param, nil)
+		Enchantrix.Settings.SetSetting(param, nil)
 	end
 
 	if (chatprint) then
@@ -805,13 +805,13 @@ function default(param, chatprint)
 		
 		--[[
 			for k,v in pairs(EnchantConfig.filters) do
-				setKhaosSetKeyValue(k, Enchantrix.Config.GetFilter(k));
+				setKhaosSetKeyValue(k, Enchantrix.Settings.GetSetting(k));
 			end
 		]]
 
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefault'):format(paramLocalized));
-			setKhaosSetKeyValue(param, Enchantrix.Config.GetFilter(param));
+			setKhaosSetKeyValue(param, Enchantrix.Settings.GetSetting(param));
 		end
 	end
 end
@@ -821,14 +821,14 @@ function genVarSet(variable, param, chatprint)
 	param = Enchantrix.Locale.DelocalizeFilterVal(param);
 
 	if (param == 'on' or param == 'off' or param == true or param == false) then
-		Enchantrix.Config.SetFilter(variable, param);
+		Enchantrix.Settings.SetSetting(variable, param);
 
 	elseif (param == 'toggle' or param == nil or param == "") then
-		Enchantrix.Config.SetFilter(variable, not Enchantrix.Config.GetFilter(variable))
+		Enchantrix.Settings.SetSetting(variable, not Enchantrix.Settings.GetSetting(variable))
 	end
 
 	if (chatprint) then
-		if (Enchantrix.Config.GetFilter(variable)) then
+		if (Enchantrix.Settings.GetSetting(variable)) then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActEnable'):format(Enchantrix.Locale.LocalizeCommand(variable)));
 			setKhaosSetKeyParameter(variable, "checked", true);
 

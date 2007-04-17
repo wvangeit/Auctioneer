@@ -31,8 +31,6 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 local addonLoaded		-- Enchantrix.Config.AddonLoaded()
-local setFilter			-- Enchantrix.Config.SetFilter()
-local getFilter			-- Enchantrix.Config.GetFilter()
 local setFrame			-- Enchantrix.Config.SetFrame()
 local getFrameNames		-- Enchantrix.Config.GetFrameNames()
 local getFrameIndex		-- Enchantrix.Config.GetFrameIndex()
@@ -46,15 +44,6 @@ local isValidLocale
 function addonLoaded()
 end
 
-
-function getFilter(key)
-	local val = Enchantrix.Settings.GetSetting(key)
-	return val
-end
-
-function setFilter(key, value)
-	Enchantrix.Settings.SetSetting(key, value);
-end
 
 -- The following three functions were added by MentalPower to implement the /enx print-in command
 function getFrameNames(index)
@@ -84,7 +73,7 @@ function getFrameNames(index)
 end
 
 function getFrameIndex()
-	return Enchantrix.Config.GetFilter('printframe')
+	return Enchantrix.Settings.GetSetting('printframe')
 end
 
 function setFrame(frame, chatprint)
@@ -127,7 +116,7 @@ function setFrame(frame, chatprint)
 		end
 	end
 
-	Enchantrix.Config.SetFilter("printframe", frameNumber);
+	Enchantrix.Settings.SetSetting("printframe", frameNumber);
 
 	if (chatprint == true) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPrintin'):format(frameName));
@@ -174,7 +163,7 @@ function setLocale(param, chatprint)
 end
 
 function getLocale()
-	local locale = Enchantrix.Config.GetFilter('locale')
+	local locale = Enchantrix.Settings.GetSetting('locale')
 	if locale ~= 'default' then
 		return locale
 	end
@@ -184,9 +173,6 @@ end
 Enchantrix.Config = {
 	Revision			= "$Revision$",
 	AddonLoaded			= addonLoaded,
-
-	GetFilter			= getFilter,
-	SetFilter			= setFilter,
 
 	GetFrameNames		= getFrameNames,
 	GetFrameIndex		= getFrameIndex,
