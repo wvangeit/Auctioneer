@@ -354,7 +354,7 @@ function lib.MakeGuiConfig()
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
 	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
-	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Disable enchanting info in item tooltips")
+	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
 	-- TODO: locale -- what are the allowed values?
 	-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
