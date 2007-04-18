@@ -936,7 +936,7 @@ function doPercentLess(percentLess, minProfit)
 
 	--if string->number conversion fails, use defaults
 	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('DEFAULT_PERCENT_LESS_THAN_HSP');
-	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')) * 100
+	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')/100) * 100
 
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('MIN_PERCENT_LESS_THAN_HSP'))
 	minProfit = math.max(minProfit, Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN'))
@@ -993,7 +993,7 @@ function doBidBroker(minProfit, percentLess)
 
 	--if string->number conversion fails, use defaults
 	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('DEFAULT_PERCENT_LESS_THAN_HSP');
-	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')) * 100
+	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')/100) * 100
 
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('MIN_PERCENT_LESS_THAN_HSP'))
 	min_profit_value = math.max(minProfit, Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN'))

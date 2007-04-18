@@ -117,7 +117,7 @@ local settingDefaults = {
 	['valuate-val'] = true,
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 	['MAX_BUYOUT_PRICE'] = 800000,
-	['DEFAULT_PROFIT_MARGIN'] = 10,			 -- default profit margin = 10s
+	['DEFAULT_PROFIT_MARGIN'] = 1000,		 -- default profit margin = 10s
 	['MIN_PROFIT_MARGIN'] = 100,			 -- min allowed profit margin = 1s (100c)
 	['DEFAULT_PERCENT_LESS_THAN_HSP'] = 20,	 -- default for percentless scan = 20% under HSP
 	['MIN_PERCENT_LESS_THAN_HSP'] = 5,		 -- min for percentless scan = 5% under HSP
@@ -392,11 +392,9 @@ function lib.MakeGuiConfig()
 	
 	id = gui.AddTab("Auction Scans")
 	gui.AddControl(id, "Header",     0,    "Percentless and Bidbroker settings")
--- TODO: configurator desperately needs a GSC control!
-	gui.AddControl(id, "Slider",     0, 1, "MAX_BUYOUT_PRICE", 100, 10000000, 1, "Maximum Buyout price: %d")
---	gui.AddControl(id, "NumberBox",  0, 1, "MAX_BUYOUT_PRICE", 100, 10000000, "Maximum Buyout price in Copper:")
-	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PROFIT_MARGIN", 1, 1000000, 1, "Default Profit Margin in Silver: %d")
-	gui.AddControl(id, "Slider",     0, 1, "MIN_PROFIT_MARGIN", 10, 100000000, 1, "Minimum Profit Margin: %d")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "MAX_BUYOUT_PRICE", 1000, 99990000, "Maximum Buyout price:")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "DEFAULT_PROFIT_MARGIN", 10, nil, "Default Profit Margin:")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "MIN_PROFIT_MARGIN", 10, nil, "Minimum Profit Margin:")
 	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PERCENT_LESS_THAN_HSP", 5, 90, 1, "Default Percentage less than HSP: %d")
 	gui.AddControl(id, "Slider",     0, 1, "MIN_PERCENT_LESS_THAN_HSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
 	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PROFIT_PRICE_PERCENT", 5, 90, 1, "Default bidbroker profit Percentage: %d")
