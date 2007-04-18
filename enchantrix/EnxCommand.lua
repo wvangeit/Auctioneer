@@ -63,15 +63,6 @@ Enchantrix.State.Khaos_Registered = nil
 local optionSet			-- used by Khaos UI
 local profitMargins		-- used by PercentLess and BidBroker
 
--- Local constants
-local MAX_BUYOUT_PRICE = 800000;
-local DEFAULT_PROFIT_MARGIN = 10; -- default profit margin = 10s
-local MIN_PROFIT_MARGIN = 100; -- min allowed profit margin = 1s (100c)
-local DEFAULT_PERCENT_LESS_THAN_HSP = 20; -- default for percentless scan = 20% under HSP
-local MIN_PERCENT_LESS_THAN_HSP = 5; -- min for percentless scan = 5% under HSP
-local DEFAULT_PROFIT_PRICE_PERCENT = 10; --default for bidbroker scan = 10% under HSP
-local MIN_PROFIT_PRICE_PERCENT = 5; --minimum percent under for bidbroker scan = 5% under HSP
-
 
 function addonLoaded()
 	if IsAddOnLoaded("Khaos") then
@@ -863,7 +854,8 @@ function percentLessFilter(auction, percentLess)
 		auction = auction,
 	};
 	
-	if (buyout > 0) and (margin >= tonumber(percentLess)) and (profit >= MIN_PROFIT_MARGIN) then
+	if (buyout > 0) and (margin >= tonumber(percentLess))
+		and (profit >= Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
 		profitMargins[ auction.auctionId ] = results;
@@ -897,7 +889,9 @@ function bidBrokerFilter(auction, minProfit)
 		auction = auction,
 	};
 	
-	if (currentBid <= MAX_BUYOUT_PRICE) and (profit >= tonumber(minProfit)) and (profit >= MIN_PROFIT_MARGIN) and (profitPricePercent >= MIN_PROFIT_PRICE_PERCENT) then
+	if (currentBid <= Enchantrix.Settings.GetSetting('MAX_BUYOUT_PRICE'))
+			 and (profit >= tonumber(minProfit)) and (profit >= Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN'))
+			 and (profitPricePercent >= Enchantrix.Settings.GetSetting('MIN_PROFIT_PRICE_PERCENT')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
 		profitMargins[auction.auctionId] = results;
@@ -941,11 +935,11 @@ function doPercentLess(percentLess, minProfit)
 	end
 
 	--if string->number conversion fails, use defaults
-	percentLess = tonumber(percentLess) or DEFAULT_PERCENT_LESS_THAN_HSP;
-	minProfit = (tonumber(minProfit) or DEFAULT_PROFIT_MARGIN) * 100
+	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('DEFAULT_PERCENT_LESS_THAN_HSP');
+	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')) * 100
 
-	percentLess = math.max(percentLess, MIN_PERCENT_LESS_THAN_HSP)
-	minProfit = math.max(minProfit, MIN_PROFIT_MARGIN)
+	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('MIN_PERCENT_LESS_THAN_HSP'))
+	minProfit = math.max(minProfit, Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN'))
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
 
@@ -998,11 +992,11 @@ function doBidBroker(minProfit, percentLess)
 	end
 
 	--if string->number conversion fails, use defaults
-	percentLess = tonumber(percentLess) or DEFAULT_PERCENT_LESS_THAN_HSP;
-	minProfit = (tonumber(minProfit) or DEFAULT_PROFIT_MARGIN) * 100
+	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('DEFAULT_PERCENT_LESS_THAN_HSP');
+	minProfit = (tonumber(minProfit) or Enchantrix.Settings.GetSetting('DEFAULT_PROFIT_MARGIN')) * 100
 
-	percentLess = math.max(percentLess, MIN_PERCENT_LESS_THAN_HSP)
-	min_profit_value = math.max(minProfit, MIN_PROFIT_MARGIN)
+	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('MIN_PERCENT_LESS_THAN_HSP'))
+	min_profit_value = math.max(minProfit, Enchantrix.Settings.GetSetting('MIN_PROFIT_MARGIN'))
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(EnhTooltip.GetTextGSC(minProfit), percentLess));
 

@@ -55,7 +55,13 @@ data layout:
 if user does not have a set profile name, they get the default profile
 
 
+Usage:
+	def = Enchantrix.Settings.GetDefault('counts')
+	val = Enchantrix.Settings.GetSetting('counts')
+	Enchantrix.Settings.SetSetting('counts', true );
+
 ]]
+
 Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 local lib = {}
@@ -110,6 +116,14 @@ local settingDefaults = {
 	['valuate-baseline'] = true,
 	['valuate-val'] = true,
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
+	['MAX_BUYOUT_PRICE'] = 800000,
+	['DEFAULT_PROFIT_MARGIN'] = 10,			 -- default profit margin = 10s
+	['MIN_PROFIT_MARGIN'] = 100,			 -- min allowed profit margin = 1s (100c)
+	['DEFAULT_PERCENT_LESS_THAN_HSP'] = 20,	 -- default for percentless scan = 20% under HSP
+	['MIN_PERCENT_LESS_THAN_HSP'] = 5,		 -- min for percentless scan = 5% under HSP
+	['DEFAULT_PROFIT_PRICE_PERCENT'] = 10,	 --default for bidbroker scan = 10% under HSP
+	['MIN_PROFIT_PRICE_PERCENT'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
+	
 }
 
 local function getDefault(setting)
@@ -355,8 +369,8 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
 	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
 	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
-	-- TODO: locale -- what are the allowed values?
-	-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
+-- TODO: locale -- what are the allowed values?
+-- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
 	gui.AddControl(id, "Subhead",    0,    "Valuations")
 	gui.AddControl(id, "Checkbox",   0, 1, "valuate", "Show disenchant values")
@@ -374,4 +388,18 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", "Display Minimap button")
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
+	
+	
+	id = gui.AddTab("Auction Scans")
+	gui.AddControl(id, "Header",     0,    "Percentless and Bidbroker settings")
+-- TODO: configurator desperately needs a GSC control!
+	gui.AddControl(id, "Slider",     0, 1, "MAX_BUYOUT_PRICE", 100, 10000000, 1, "Maximum Buyout price: %d")
+--	gui.AddControl(id, "NumberBox",  0, 1, "MAX_BUYOUT_PRICE", 100, 10000000, "Maximum Buyout price in Copper:")
+	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PROFIT_MARGIN", 1, 1000000, 1, "Default Profit Margin in Silver: %d")
+	gui.AddControl(id, "Slider",     0, 1, "MIN_PROFIT_MARGIN", 10, 100000000, 1, "Minimum Profit Margin: %d")
+	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PERCENT_LESS_THAN_HSP", 5, 90, 1, "Default Percentage less than HSP: %d")
+	gui.AddControl(id, "Slider",     0, 1, "MIN_PERCENT_LESS_THAN_HSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
+	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PROFIT_PRICE_PERCENT", 5, 90, 1, "Default bidbroker profit Percentage: %d")
+	gui.AddControl(id, "Slider",     0, 1, "MIN_PROFIT_PRICE_PERCENT", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
+
 end
