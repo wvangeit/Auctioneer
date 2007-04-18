@@ -116,13 +116,13 @@ local settingDefaults = {
 	['valuate-baseline'] = true,
 	['valuate-val'] = true,
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
-	['MAX_BUYOUT_PRICE'] = 800000,
-	['DEFAULT_PROFIT_MARGIN'] = 1000,		 -- default profit margin = 10s
-	['MIN_PROFIT_MARGIN'] = 100,			 -- min allowed profit margin = 1s (100c)
-	['DEFAULT_PERCENT_LESS_THAN_HSP'] = 20,	 -- default for percentless scan = 20% under HSP
-	['MIN_PERCENT_LESS_THAN_HSP'] = 5,		 -- min for percentless scan = 5% under HSP
-	['DEFAULT_PROFIT_PRICE_PERCENT'] = 10,	 --default for bidbroker scan = 10% under HSP
-	['MIN_PROFIT_PRICE_PERCENT'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
+	['maxBuyoutPrice'] = 800000,
+	['defaultProfitMargin'] = 1000,		 -- default profit margin = 10s
+	['minProfitMargin'] = 100,			 -- min allowed profit margin = 1s (100c)
+	['defaultPercentLessThanHSP'] = 20,	 -- default for percentless scan = 20% under HSP
+	['minPercentLessThanHSP'] = 5,		 -- min for percentless scan = 5% under HSP
+	['defaultProfitPricePercent'] = 10,	 --default for bidbroker scan = 10% under HSP
+	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	
 }
 
@@ -392,12 +392,12 @@ function lib.MakeGuiConfig()
 	
 	id = gui.AddTab("Auction Scans")
 	gui.AddControl(id, "Header",     0,    "Percentless and Bidbroker settings")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "MAX_BUYOUT_PRICE", 1000, 99990000, "Maximum Buyout price:")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "DEFAULT_PROFIT_MARGIN", 10, nil, "Default Profit Margin:")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "MIN_PROFIT_MARGIN", 10, nil, "Minimum Profit Margin:")
-	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PERCENT_LESS_THAN_HSP", 5, 90, 1, "Default Percentage less than HSP: %d")
-	gui.AddControl(id, "Slider",     0, 1, "MIN_PERCENT_LESS_THAN_HSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
-	gui.AddControl(id, "Slider",     0, 1, "DEFAULT_PROFIT_PRICE_PERCENT", 5, 90, 1, "Default bidbroker profit Percentage: %d")
-	gui.AddControl(id, "Slider",     0, 1, "MIN_PROFIT_PRICE_PERCENT", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1000, 99990000, "Maximum Buyout price:")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 10, nil, "Default Profit Margin:")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 10, nil, "Minimum Profit Margin:")
+	gui.AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, "Default Percentage less than HSP: %d")
+	gui.AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
+	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, "Default bidbroker profit Percentage: %d")
+	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
 
 end
