@@ -51,7 +51,6 @@ local mergeDisenchant
 local mergeDisenchantLists
 
 -- Database
-local LocalBaseItems = {} -- EnchantedLocal merged by item id
 
 local N_DISENCHANTS = 1
 local N_REAGENTS = 2
@@ -126,40 +125,27 @@ end
 
 
 function mergeDisenchantLists()
+
 -- DisenchantList no longer exists
 -- it used to be merged in here
 
-	-- Merge items from EnchantedLocal
+--[[
+	-- Merge items from EnchantedLocal into EnchantedItemTypes
+	-- now only useful to developers
+	
+	EnchantedItemTypes = {}
 	for sig, disenchant in pairs(EnchantedLocal) do
 		local item = Enchantrix.Util.GetItemIdFromSig(sig)
-		if type(disenchant) == "table" then
-			saveLocal(sig, disenchant)				-- TODO - function does not exist!
-			disenchant = EnchantedLocal[sig]
-		end
-		if Enchantrix.Util.IsDisenchantable(item) and (type(disenchant) == "string") then
-Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding to LocalBaseItems", "item:",  item, disenchant)
-			LocalBaseItems[item] = mergeDisenchant(LocalBaseItems[item], disenchant)
-		end
-	end
-
-	-- Merge by item type
-	for id, disenchant in pairs(EnchantedBaseItems) do
-		local itype = Enchantrix.Util.GetItemType(id)
+		local itype = Enchantrix.Util.GetItemType(item)
 		if itype then
-			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
-		end
-	end
-	for id, disenchant in pairs(LocalBaseItems) do
-Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding LocalItem", "item:",  id, disenchant)
-		local itype = Enchantrix.Util.GetItemType(id)
-		if itype then
-Enchantrix.Util.Debug("MergeDisenchant", N_DEBUG, "Adding LocalBaseItems to EnchantedItemTypes", "item:",  id, disenchant)
 			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 		end
 	end
 
 	-- Take out the trash
 	collectgarbage("collect")
+]]
+
 end
 
 
@@ -176,7 +162,6 @@ function saveDisenchant(sig, reagentID, count)
 	
 	local disenchant = ("%d:1:%d:0"):format(reagentID, count)
 	EnchantedLocal[sig] = mergeDisenchant(EnchantedLocal[sig], disenchant)
-	LocalBaseItems[id] = mergeDisenchant(LocalBaseItems[id], disenchant)
 	if itype then
 		EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 	end
