@@ -123,7 +123,14 @@ local settingDefaults = {
 	['minPercentLessThanHSP'] = 5,		 -- min for percentless scan = 5% under HSP
 	['defaultProfitPricePercent'] = 10,	 --default for bidbroker scan = 10% under HSP
 	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
-	
+	['ScanValueType'] = "average",		-- what value to use for auction scans
+}
+
+local ScanValueNames = {
+	"average",
+	"HSP",
+	"median",
+	"market"
 }
 
 local function getDefault(setting)
@@ -309,6 +316,17 @@ local function getter(setting)
 			return pList
 		end
 	end
+
+	if (a == 'scanvalue') then
+		if (b == 'list') then
+			local stList = ScanValueNames;
+			if (not stList) then
+				stList = { "average" }
+			end
+			return stList
+		end
+	end
+	
 	if (setting == 'profile') then
 		return getUserProfileName()
 	end
@@ -399,5 +417,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
 	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, "Default bidbroker profit Percentage: %d")
 	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
+	gui.AddControl(id, "Subhead",    0,    "Item value calculated from")
+	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
 end

@@ -843,7 +843,22 @@ function percentLessFilter(auction, percentLess)
 	local buyout = auction.buyoutPrice or 0;
 	local count = auction.count or 0;
 	
-	local myValue = (hspValue + medValue + mktValue) / 3;
+	local myValue;
+	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	if (style) then
+		if (style == "average") then
+			myValue = (hspValue + medValue + mktValue) / 3;
+		elseif (style == "HSP") then
+			myValue = hspValue;
+		elseif (style == "median") then
+			myValue = medValue;
+		elseif (style == "market") then
+			myValue = mktValue;
+		end
+	else
+		myValue = (hspValue + medValue + mktValue) / 3;
+	end
+	
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
 	local profit = (myValue * count) - buyout;
 
@@ -876,8 +891,23 @@ function bidBrokerFilter(auction, minProfit)
 	local count = auction.count or 0;
 	
 	currentBid = math.max( currentBid, minBid );
-
-	local myValue = (hspValue + medValue + mktValue) / 3;
+	
+	local myValue;
+	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	if (style) then
+		if (style == "average") then
+			myValue = (hspValue + medValue + mktValue) / 3;
+		elseif (style == "HSP") then
+			myValue = hspValue;
+		elseif (style == "median") then
+			myValue = medValue;
+		elseif (style == "market") then
+			myValue = mktValue;
+		end
+	else
+		myValue = (hspValue + medValue + mktValue) / 3;
+	end
+	
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
 	local profit = (myValue * count) - currentBid;
 	local profitPricePercent = math.floor((profit / currentBid) * 100);
