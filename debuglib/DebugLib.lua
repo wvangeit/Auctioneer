@@ -328,6 +328,8 @@ local dump
 --    the addon parameter and then calls this function.
 --    Refer to the local debugPrint() function for the reference implementation.
 -------------------------------------------------------------------------------
+-- TODO: add better automated logging text, including function name, line number
+--       etc, dump caps
 function libDebugPrint(addon, message, category, errorCode, level)
 	addon, message, category, errorCode, level = normalizeParameters(addon, message, category, errorCode, level)
 	local title = generateTitle(level, errorCode)
@@ -387,7 +389,6 @@ end
 --    errorCode, message = debugPrint([message][, category][, errorCode][, level])
 --
 -- parameters:
---    addon     - (string) the name of the addon
 --    message   - (string) the error message
 --                nil, no error message specified
 --    category  - (string) the category of the debug message
@@ -827,6 +828,8 @@ end
 --    inside of tables. If a recursion occures, this function causes a stack
 --    overflow
 -------------------------------------------------------------------------------
+-- TODO: Add safety measurement to prohibit recursions inside tables causing
+--       a stack overflow.
 function dump(...)
 	local out = ""
 	local numVarArgs = select("#", ...)
