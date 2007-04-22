@@ -1,4 +1,4 @@
---[[
+﻿--[[
 Additional function hooks to allow hooks into more tooltips
 <%version%> (<%codename%>)
 $Id$
@@ -257,8 +257,6 @@ local imiHookOnEnter           -- ImiHookOnEnter()
 local lineColor                -- LineColor(r,g,b)
 local lineQuality              -- LineQuality(quality)
 local lineSize                 -- LineSize(fontSize)
-local lineSize_Large           -- LineSize_Large()
-local lineSize_Small           -- LineSize_Small()
 local linkType                 -- LinkType()
 local llHookOnEnter            -- LlHookOnEnter()
 local merchantHook             -- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
@@ -986,16 +984,6 @@ function headerQuality(quality)
 	end
 end
 
-function lineSize_Large()
-	debugPrint("lineSize_Large() Called. This function is DEPRECATED. Use lineSize(12) instead.")
-	return lineSize(12)
-end
-
-function lineSize_Small()
-	debugPrint("lineSize_Large() Called. This function is DEPRECATED. Use lineSize(11) instead.")
-	return lineSize(10)
-end
-
 function lineQuality(quality)
 	if ( quality ) then
 		return lineColor(GetItemQualityColor(quality))
@@ -1705,8 +1693,6 @@ EnhTooltip = {
 	LineColor			= lineColor,
 	LineQuality			= lineQuality,
 	LineSize			= lineSize,
-	LineSize_Large		= lineSize_Large, --Deprecated, use EnhTooltip.LineSize instead
-	LineSize_Small		= lineSize_Small, --Deprecated, use EnhTooltip.LineSize instead
 	SetIcon				= setIcon,
 
 	AddHeaderLine		= addHeaderLine,
