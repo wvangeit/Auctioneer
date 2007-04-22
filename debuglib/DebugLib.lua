@@ -735,7 +735,9 @@ function libAssert(addon, test, message)
 end
 
 -------------------------------------------------------------------------------
--- Prints the specified message to nLog.
+-- Used to make sure that conditions are met within functions.
+-- If test is false, the error message will be written to nLog and the user's
+-- default chat channel.
 --
 -- syntax:
 --    assertion = assert(test, message)
