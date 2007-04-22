@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	nLog - A debugging console for World of Warcraft.
 	$Id$
 	Copyright (C) 2006 Norganna
@@ -60,7 +60,7 @@ strLevelFilter = string.sub(strLevelFilter, 1, #strLevelFilter-1)..")"
 
 nLog.Version="<%version%>"
 if (nLog.Version == "<%".."version%>") then
-	nLog.Version = "4.1.DEV"
+	nLog.Version = "4.9.DEV"
 end
 NLOG_VERSION = nLog.Version
 
