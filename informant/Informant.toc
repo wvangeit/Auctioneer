@@ -11,7 +11,7 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Informant
 
-DebugLib/DebugLib.lua
+DebugLib\DebugLib.lua
 InfManifest.lua
 Babylonian\Babylonian.lua
 InfStrings.lua

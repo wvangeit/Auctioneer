@@ -8,6 +8,6 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Stubby
 
-DebugLib/DebugLib.lua
+DebugLib\DebugLib.lua
 Stubby.lua
 Stubby.xml
