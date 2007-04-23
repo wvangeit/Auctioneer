@@ -191,7 +191,7 @@ function getItemDisenchants(link)
 	
 	local data = Enchantrix.Storage[iType]
 	if not data then
-		Enchantrix.Util.Debug("ItemTooltip", N_DEBUG, "No data", "No data returned for iType:",  iType)
+		Enchantrix.Util.DebugPrint("ItemTooltip", ENX_INFO, "No data", "No data returned for iType:" .. iType)
 		return nil
 	end
 	return data

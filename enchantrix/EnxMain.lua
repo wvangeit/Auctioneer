@@ -78,7 +78,9 @@ function addonLoaded(hookArgs, event, addOnName)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
---	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)			-- not used right now
+	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)
+--	Stubby.RegisterEventHook("UNIT_SPELLCAST_START", "Enchantrix", onEvent)			-- not used right now
+--	Stubby.RegisterEventHook("UNIT_SPELLCAST_STOP", "Enchantrix", onEvent)			-- not used right now
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_FAILED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_INTERRUPTED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
@@ -166,31 +168,71 @@ end
 function onEvent(funcVars, event, player, spell, rank, target)
 
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
+		-- NOTE: we do get the spell name here
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast succeeded", "info:", funcVars, event, spell, rank, target )
 		DisenchantEvent.finished = nil
 		if spell == _ENCH('ArgSpellname') then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
 			end
 		end
+		DisenchantEvent.sent = nil
 	elseif event == "UNIT_SPELLCAST_FAILED" then
-		-- NOTE - here we do not get the spell name!
-		-- event order for failed disenchant is: SENT, START, FAILED
-		-- unfortunately, we have no DisenchantEvent info during START or SENT
-		
-		if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 5) then
+		-- NOTE: we don't get the spell name here
+		-- Successful disenchant: SENT, START, STOP, SUCCEEDED
+		-- Events for failed disenchant are: SENT, (sometimes START), FAILED
+		-- For an item above our level, the events are: SENT, FAILED
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed", "info:", funcVars, event, spell, rank, target )
+		if (DisenchantEvent.sent
+			and DisenchantEvent.spellTarget
+			and GetTime() - DisenchantEvent.targetted < 5) then
 			-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
 			if (Enchantrix.Util.GetIType(DisenchantEvent.spellTarget)) then
 				-- this means that the item is not disenchantable, but we think it is!
-				-- first compare to known non-DE items and only print on new ones?
-				Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
--- TODO - ccox - need localized string!
-				Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
+				-- now make sure the user had enough skill to disenchant it
+				-- make sure skill level is up to date
+				local skill = Enchantrix.Util.GetUserEnchantingSkill();
+				-- get the maximum item level the user can disenchant
+				local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
+				local name, link, _, itemLevel = GetItemInfo( DisenchantEvent.spellTarget );
+				if (itemLevel <= maxLevel) then
+					-- first compare to known non-DE items and only print on new ones?
+					Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
+	-- TODO - ccox - need localized string!
+					Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
+				end
 			end
 		end
 		DisenchantEvent.finished = nil
+		DisenchantEvent.sent = nil
 	elseif event == "UNIT_SPELLCAST_INTERRUPTED" then
 		-- disenchant interrupted
 		DisenchantEvent.finished = nil
+		DisenchantEvent.sent = nil
+		DisenchantEvent.spellTarget = nil
+		DisenchantEvent.targetted = nil
+
+--[[
+-- left here for debugging purposes
+	elseif event == "UNIT_SPELLCAST_START" then
+		-- NOTE: we don't get the spell name here
+		Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast start", "info:", funcVars, event, spell, rank, target )
+
+	elseif event == "UNIT_SPELLCAST_STOP" then
+		Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast stop", "info:", funcVars, event, spell, rank, target )
+]]
+
+	elseif event == "UNIT_SPELLCAST_SENT" then
+		-- NOTE: we do get the spell name here
+		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast sent", "info:", funcVars, event, spell, rank, target )
+		if spell == _ENCH('ArgSpellname') then
+			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
+				DisenchantEvent.sent = true;
+			end
+		else
+			DisenchantEvent.sent = nil;
+			DisenchantEvent.spellTarget = nil;
+		end
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
@@ -211,6 +253,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		DisenchantEvent.spellTarget = nil
 		DisenchantEvent.targetted = nil
 		DisenchantEvent.finished = nil
+		DisenchantEvent.sent = nil
 	end
 end
 

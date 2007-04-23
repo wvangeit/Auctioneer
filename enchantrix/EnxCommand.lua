@@ -565,7 +565,7 @@ function setKhaosSetKeyParameter(key, parameter, value)
 		if (Khaos.getSetKey("Enchantrix", key)) then
 			Khaos.setSetKeyParameter("Enchantrix", key, parameter, value)
 		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
 		end
 	end
 end
@@ -575,14 +575,14 @@ function setKhaosSetKeyValue(key, value)
 		local kKey = Khaos.getSetKey("Enchantrix", key)
 
 		if (not kKey) then
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
 		elseif (kKey.checked ~= nil) then
-			-- EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): setting ", value, " for key ", key)
+			-- Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): setting ", value, " for key ", key)
 			Khaos.setSetKeyParameter("Enchantrix", key, "checked", value)
 		elseif (kKey.value ~= nil) then
 			Khaos.setSetKeyParameter("Enchantrix", key, "value", value)
 		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): don't know how to update key ", key)
+			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): don't know how to update key ", key)
 		end
 	end
 end
@@ -761,7 +761,7 @@ function clear(param, chatprint)
 
 		if (items) then
 			for pos, itemKey in ipairs(items) do
-				EnhTooltip.DebugPrint(pos, itemKey, sig)
+				Enchantrix.Util.DebugPrintQuick(pos, itemKey, sig)
 				local sig = Enchantrix.Util.GetSigFromLink(itemKey)
 				local itemID = Enchantrix.Util.GetItemIdFromSig(sig)
 				EnchantedLocal[sig] = nil
@@ -853,7 +853,7 @@ function percentLessFilter(auction, percentLess)
 			myValue = hspValue;
 		elseif (style == "median") then
 			myValue = medValue;
-		elseif (style == "market") then
+		elseif (style == "baseline") then
 			myValue = mktValue;
 		end
 	else
@@ -907,7 +907,7 @@ function bidBrokerFilter(auction, minProfit)
 			myValue = hspValue;
 		elseif (style == "median") then
 			myValue = medValue;
-		elseif (style == "market") then
+		elseif (style == "baseline") then
 			myValue = mktValue;
 		end
 	else
@@ -973,6 +973,10 @@ function doPercentLess(percentLess, minProfit)
 		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
 		return;
 	end
+	
+	-- get the maximum item level the user can disenchant
+	local skill = Enchantrix.Util.GetUserEnchantingSkill();
+	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
 
 	--if string->number conversion fails, use defaults
 	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
@@ -993,6 +997,7 @@ function doPercentLess(percentLess, minProfit)
 	table.sort(profitMargins, profitComparisonSort);
 
 	local skipped_auctions = 0;
+	local skipped_skill = 0;
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
@@ -1000,17 +1005,21 @@ function doPercentLess(percentLess, minProfit)
 		local a = auctionItem.auction;
 		-- note: profit value already includes the item count
 		if (profit >= minProfit) then
-			local value = auctionItem.value;
-			local margin = auctionItem.margin;
-			local name, link = GetItemInfo( a.itemId );
-			local output = _ENCH('FrmtPctlessLine'):format(
-				Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
-				EnhTooltip.GetTextGSC(value * a.count),
-				EnhTooltip.GetTextGSC(a.buyoutPrice),
-				EnhTooltip.GetTextGSC(profit * a.count),
-				Auctioneer.Util.ColorTextWhite(margin.."%")
-			);
-			Enchantrix.Util.ChatPrint(output);
+			local name, link, _, itemLevel = GetItemInfo( a.itemId );
+			if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
+				local value = auctionItem.value;
+				local margin = auctionItem.margin;
+				local output = _ENCH('FrmtPctlessLine'):format(
+					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					EnhTooltip.GetTextGSC(value * a.count),
+					EnhTooltip.GetTextGSC(a.buyoutPrice),
+					EnhTooltip.GetTextGSC(profit * a.count),
+					Auctioneer.Util.ColorTextWhite(margin.."%")
+				);
+				Enchantrix.Util.ChatPrint(output);
+			else
+				skipped_skill = skipped_skill + 1;
+			end
 		else
 			skipped_auctions = skipped_auctions + 1;
 		end
@@ -1018,6 +1027,10 @@ function doPercentLess(percentLess, minProfit)
 
 	if (skipped_auctions > 0) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkipped'):format(skipped_auctions, EnhTooltip.GetTextGSC(minProfit)));
+	end
+
+	if (skipped_skill > 0) then
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessDone'));
@@ -1031,6 +1044,11 @@ function doBidBroker(minProfit, percentLess)
 		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.9.0.1285 or later");
 		return;
 	end
+	
+	
+	-- get the maximum item level the user can disenchant
+	local skill = Enchantrix.Util.GetUserEnchantingSkill();
+	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
 
 	--if string->number conversion fails, use defaults
 	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
@@ -1050,6 +1068,7 @@ function doBidBroker(minProfit, percentLess)
 	table.sort(profitMargins, bidBrokerSort);
 
 	local skipped_auctions = 0;
+	local skipped_skill = 0;
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
@@ -1062,22 +1081,26 @@ function doBidBroker(minProfit, percentLess)
 		local profit = auctionItem.profit;
 		local bidText;
 		if (margin >= percentLess) then
-			if (currentBid == min) then
-				bidText = _ENCH('FrmtBidbrokerMinbid');
+			local name, link, _, itemLevel = GetItemInfo( a.itemId );
+			if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
+				if (currentBid == min) then
+					bidText = _ENCH('FrmtBidbrokerMinbid');
+				else
+					bidText = _ENCH('FrmtBidbrokerCurbid');
+				end
+				local output = _ENCH('FrmtBidbrokerLine'):format(
+					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					EnhTooltip.GetTextGSC(value * a.count),
+					bidText,
+					EnhTooltip.GetTextGSC(currentBid),
+					EnhTooltip.GetTextGSC(profit * a.count),
+					Auctioneer.Util.ColorTextWhite(margin.."%"),
+					Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft))
+				);
+				Enchantrix.Util.ChatPrint(output);
 			else
-				bidText = _ENCH('FrmtBidbrokerCurbid');
+				skipped_skill = skipped_skill + 1;
 			end
-			local name, link = GetItemInfo( a.itemId );
-			local output = _ENCH('FrmtBidbrokerLine'):format(
-				Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
-				EnhTooltip.GetTextGSC(value * a.count),
-				bidText,
-				EnhTooltip.GetTextGSC(currentBid),
-				EnhTooltip.GetTextGSC(profit * a.count),
-				Auctioneer.Util.ColorTextWhite(margin.."%"),
-				Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft))
-			);
-			Enchantrix.Util.ChatPrint(output);
 		else
 			if (currentBid == min) then
 				bidText = _ENCH('FrmtBidbrokerMinbid');
@@ -1092,6 +1115,10 @@ function doBidBroker(minProfit, percentLess)
 	if (skipped_auctions > 0) then
 		-- if this line fails, then someone changed the case of the localization key again, check the string file
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtBidBrokerSkipped'):format(skipped_auctions, percentLess));
+	end
+
+	if (skipped_skill > 0) then
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));

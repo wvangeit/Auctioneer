@@ -238,16 +238,16 @@ function getIType(link)
 
 	local iName,iLink,iQual,iLevel,iMin,iType,iSub,iStack,iEquip,iTex=GetItemInfo(link)
 	if (iQual < 2) then
-		Enchantrix.Debug("GetIType", N_DEBUG, "Quality too low", "The quality for", link, "is too low (", iQual, "< 2)")
+		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Quality too low", "The quality for " .. link .. " is too low (" .. iQual .. "< 2)")
 		return
 	end
 	if not iEquip then
-		Enchantrix.Debug("GetIType", N_DEBUG, "Item not equippable", "The item", link, "is not equippable")
+		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Item not equippable", "The item " .. link .. " is not equippable")
 		return
 	end
 	local invType = Enchantrix.Constants.InventoryTypes[iEquip]
 	if not invType then
-		Enchantrix.Debug("GetIType", N_DEBUG, "Unrecognized equip slot", "The item", link, "has an equip slot (", iEquip, ") that is not recognized")
+		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Unrecognized equip slot", "The item " .. link .. " has an equip slot (" .. iEquip .. ") that is not recognized")
 		return
 	end
 	
@@ -462,17 +462,17 @@ end
 -- profiler:DebugPrint()
 local function _profilerDebugPrint(this)
 	if this.n then
-		EnhTooltip.DebugPrint("Profiler ["..this.n.."]")
+		Enchantrix.Util.DebugPrintQuick("Profiler ["..this.n.."]")
 	else
-		EnhTooltip.DebugPrint("Profiler")
+		Enchantrix.Util.DebugPrintQuick("Profiler")
 	end
 	if this.r == nil then
-		EnhTooltip.DebugPrint("  Not started")
+		Enchantrix.Util.DebugPrintQuick("  Not started")
 	else
-		EnhTooltip.DebugPrint(("  Time: %0.3f s"):format(this:Time()))
-		EnhTooltip.DebugPrint(("  Mem: %0.0f KiB"):format(this:Mem()))
+		Enchantrix.Util.DebugPrintQuick(("  Time: %0.3f s"):format(this:Time()))
+		Enchantrix.Util.DebugPrintQuick(("  Mem: %0.0f KiB"):format(this:Mem()))
 		if this.r then
-			EnhTooltip.DebugPrint("  Running...")
+			Enchantrix.Util.DebugPrintQuick("  Running...")
 		end
 	end
 end
@@ -543,7 +543,7 @@ function Enchantrix.Util.GetIType(link)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, invTexture = GetItemInfo(link)
 
 	if not (itemName and itemEquipLoc and itemRarity and itemLevel) then
-		Enchantrix.Util.Debug("GetIType", N_DEBUG, "GetItemInfo failed, bad link", "could not get item info for:", link)
+		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: " .. link)
 		return
 	end
 	
@@ -556,14 +556,93 @@ function Enchantrix.Util.GetIType(link)
 	return ("%d:%d:%d"):format(itemLevel,itemRarity,class)
 end
 
+function Enchantrix.Util.MaxDisenchantItemLevel(skill)
+	local maxLevel = 20 + (5 * math.floor(skill / 25));
+	return maxLevel;
+end
+
+-- NOTE: this is sort of an expensive function, so don't call it often
+-- I've tried to make it friendlier by caching the value and only checking every 5 seconds
+
+function Enchantrix.Util.GetUserEnchantingSkill()
+	local MyExpandedHeaders = {}
+	local i, j
+	
+	-- the user can't have increased their skill too much in 5 seconds
+	if (Enchantrix.EnchantingSkill
+		and Enchantrix.EnchantingSkillTimeStamp
+		and GetTime() - Enchantrix.EnchantingSkillTimeStamp < 5) then
+		return Enchantrix.EnchantingSkill
+	end
+	
+	-- just in case the user doesn't have enchanting
+	Enchantrix.EnchantingSkill = 0;
+	
+	-- search the skill tree for Mying skills
+	for i=0, GetNumSkillLines(), 1 do
+		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
+	
+		-- expand the header if necessary
+		if ( header and not isExpanded ) then
+			MyExpandedHeaders[i] = skillName
+		end
+	end
+	
+	ExpandSkillHeader(0)
+	for i=1, GetNumSkillLines(), 1 do
+		local skillName, header, _, skillRank = GetSkillLineInfo(i)
+		-- check for the skill name
+		if (skillName and not header) then
+			if (skillName == _ENCH("Enchanting")) then
+				-- save this in a global for caching, and the auction filters
+				Enchantrix.EnchantingSkill = skillRank
+				Enchantrix.EnchantingSkillTimeStamp = GetTime()
+				-- no need to look at the rest of the skills
+				break
+			end
+		end
+	end
+	
+	-- close headers expanded during search process
+	for i=0, GetNumSkillLines() do
+		local skillName, header, isExpanded = GetSkillLineInfo(i)
+		for j in pairs(MyExpandedHeaders) do
+			if ( header and skillName == MyExpandedHeaders[j] ) then
+				CollapseSkillHeader(i)
+				MyExpandedHeaders[j] = nil
+			end
+		end
+	end
+
+	return Enchantrix.EnchantingSkill
+end
+
 
 ENX_CRITICAL = 1
 ENX_WARNING = 2
 ENX_NOTICE = 3
+-- info will only go to nLog
 ENX_INFO = 4
+-- Debug will print to the chat console as well as to nLog
 ENX_DEBUG = 5
-function Enchantrix.Util.Debug(...)
-        if (nLog) then
-                nLog.AddMessage("Enchantrix", ...)
-        end
+
+-- this tries to play nicely with DebugLib and nLog
+-- but they don't take the same arguments
+
+function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
+
+	if (DebugLib) then
+		-- function debugPrint(message, category, errorCode, level)
+		local message = format(...)
+		DebugLib.debugPrint(message, "Enchantrix" .. mType .. mTitle, 1, mLevel)
+	elseif (nLog) then
+		-- function nLog.AddMessage(mAddon, mType, mLevel, mTitle, message, ...)
+	    nLog.AddMessage("Enchantrix", mType, mLevel, mTitle, ...)
+	end
+
+end
+
+-- when you just want to print a message and don't care about the rest
+function Enchantrix.Util.DebugPrintQuick(...)
+	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
 end
