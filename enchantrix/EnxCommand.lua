@@ -837,11 +837,12 @@ end
 function percentLessFilter(auction, percentLess)
 	local filterAuction = true;
 	
+	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
 	local hspValue, medValue, mktValue = Enchantrix.Storage.GetItemDisenchantTotals(auction.itemId);	
 	if (not hspValue) then return filterAuction; end
 
 	local buyout = auction.buyoutPrice or 0;
-	local count = auction.count or 0;
+	local count = auction.count or 1;
 	
 	local myValue;
 	local style = Enchantrix.Settings.GetSetting('ScanValueType');
@@ -859,7 +860,9 @@ function percentLessFilter(auction, percentLess)
 		myValue = (hspValue + medValue + mktValue) / 3;
 	end
 	
+	-- margin is percentage PER ITEM
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
+	-- profit is for all items in the stack
 	local profit = (myValue * count) - buyout;
 
 	local results = {
@@ -869,8 +872,10 @@ function percentLessFilter(auction, percentLess)
 		auction = auction,
 	};
 	
-	if (buyout > 0) and (margin >= tonumber(percentLess))
-		and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin')) then
+	if (buyout > 0)
+		and (margin >= tonumber(percentLess))
+		and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
+		and (buyout <= Enchantrix.Settings.GetSetting('maxBuyoutPrice')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
 		profitMargins[ auction.auctionId ] = results;
@@ -883,6 +888,7 @@ end
 function bidBrokerFilter(auction, minProfit)
 	local filterAuction = true;
 	
+	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
 	local hspValue, medValue, mktValue = Enchantrix.Storage.GetItemDisenchantTotals(auction.itemId);	
 	if (not hspValue) then return filterAuction; end
 	
@@ -908,8 +914,11 @@ function bidBrokerFilter(auction, minProfit)
 		myValue = (hspValue + medValue + mktValue) / 3;
 	end
 	
+	-- margin is percentage PER ITEM
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
+	-- profit is for all items in the stack
 	local profit = (myValue * count) - currentBid;
+	-- profitPricePercent is for all items in the stack
 	local profitPricePercent = math.floor((profit / currentBid) * 100);
 
 	local results = {
@@ -920,7 +929,8 @@ function bidBrokerFilter(auction, minProfit)
 	};
 	
 	if (currentBid <= Enchantrix.Settings.GetSetting('maxBuyoutPrice'))
-			 and (profit >= tonumber(minProfit)) and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
+			 and (profit >= tonumber(minProfit))
+			 and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
 			 and (profitPricePercent >= Enchantrix.Settings.GetSetting('minProfitPricePercent')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
@@ -988,7 +998,8 @@ function doPercentLess(percentLess, minProfit)
 	for id, auctionItem in pairs(profitMargins) do
 		local profit = auctionItem.profit;
 		local a = auctionItem.auction;
-		if ((profit * a.count) >= minProfit) then
+		-- note: profit value already includes the item count
+		if (profit >= minProfit) then
 			local value = auctionItem.value;
 			local margin = auctionItem.margin;
 			local name, link = GetItemInfo( a.itemId );
