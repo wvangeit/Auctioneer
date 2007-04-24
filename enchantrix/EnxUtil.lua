@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -619,12 +619,13 @@ end
 
 
 ENX_CRITICAL = 1
-ENX_WARNING = 2
-ENX_NOTICE = 3
+ENX_ERROR = 2
+ENX_WARNING = 3
+ENX_NOTICE = 4
 -- info will only go to nLog
-ENX_INFO = 4
+ENX_INFO = 5
 -- Debug will print to the chat console as well as to nLog
-ENX_DEBUG = 5
+ENX_DEBUG = 6
 
 -- this tries to play nicely with DebugLib and nLog
 -- but they don't take the same arguments
