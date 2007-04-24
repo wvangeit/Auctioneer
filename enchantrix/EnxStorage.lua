@@ -356,9 +356,11 @@ function saveNonDisenchantable(itemLink)
 	local sig = Enchantrix.Util.GetSigFromLink(itemLink);
 	-- put this in the local and combined list
 	-- only the local list will be saved in SavedVariables
-	NonDisenchantablesLocal[sig] = true;
-	NonDisenchantables[sig] = true;
-	Enchantrix.Util.ChatPrint(_ENCH("FrmtFoundNotDisenchant"):format(itemLink))
+	if (not NonDisenchantables[sig]) then
+		Enchantrix.Util.ChatPrint(_ENCH("FrmtFoundNotDisenchant"):format(itemLink))
+		NonDisenchantablesLocal[sig] = true;
+		NonDisenchantables[sig] = true;
+	end
 end
 
 
