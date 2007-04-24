@@ -47,7 +47,6 @@ local lib = AucAdvanced.API
 	GetPriceColumns() (STAT)  Returns the column names for GetPrice
 	StartScan()       (SCAN*) Begins an AH scan session
 	IsScanning()      (SCAN*) Indicates an AH scan is in session
-	GetResults()      (SCAN*)
 	AbortScan()       (SCAN)  Cancels the currently running scan
 	Hook { }          (ALL)   Functions that are hooked by the module
 

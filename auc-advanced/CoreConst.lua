@@ -93,6 +93,7 @@ AucAdvanced.Const = {
 	AMHIGH = 19,
 	SELLER = 20,
 	FLAG = 21,
+	ID = 22,
 
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,
