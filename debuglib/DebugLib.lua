@@ -29,7 +29,7 @@
 
 	Manual:
 		This manual is a basic introduction to this library and gives examples
-		about how to use it. For a more detailed description, refer to the each
+		about how to use it. For a more detailed description, refer to each
 		function's documentation.
 
 		>>>What the library is designed for<<<
