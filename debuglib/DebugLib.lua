@@ -378,8 +378,6 @@ local dump
 --    the addon parameter and then calls this function.
 --    Refer to the local debugPrint() function for the reference implementation.
 -------------------------------------------------------------------------------
--- TODO: add better automated logging text, including function name, line number
---       etc, add errorcode to message
 function libDebugPrint(addon, message, category, title, errorCode, level)
 	addon, message, category, title, errorCode, level = normalizeParameters(addon, message, category, title, errorCode, level)
 
@@ -798,7 +796,6 @@ end
 --    the addon parameter and then calls this function.
 --    Refer to the local assert() function for the reference implementation.
 -------------------------------------------------------------------------------
--- TODO: add more parameters cat, title, vararg
 function libAssert(addon, test, message)
 	-- validate the parameters
 	if type(addon) ~= "string" then
@@ -920,8 +917,6 @@ end
 --    inside of tables. If a recursion occures, this function causes a stack
 --    overflow
 -------------------------------------------------------------------------------
--- TODO: Add safety measurement to prohibit recursions inside tables causing
---       a stack overflow.
 function dump(...)
 	local out = ""
 	local numVarArgs = select("#", ...)
