@@ -408,7 +408,7 @@ end
 --    category  - (string) the category of the debug message
 --                nil, no category specified
 --    title     - (string) the title for the debug message
---                nil, not title specified
+--                nil, no title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
@@ -443,7 +443,7 @@ end
 --    category  - (string) the category of the debug message
 --                nil, no category specified
 --    title     - (string) the title for the debug message
---                nil, not title specified
+--                nil, no title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
