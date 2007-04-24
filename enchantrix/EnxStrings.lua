@@ -754,6 +754,7 @@ EnchantrixLocalizations = {
 		["FrmtCounts"]	= "    (base=%d, old=%d, new=%d)";
 		["FrmtDisinto"]	= "Disenchants into:";
 		["FrmtFound"]	= "Found that %s disenchants into:";
+		["FrmtFoundNotDisenchant"]	= "Found that %s is not disenchantable";
 		["FrmtNoDEPrediction"]	= "No disenchant prediction available";
 		["FrmtPriceEach"]	= "(%s ea)";
 		["FrmtSuggestedPrice"]	= "Suggested price:";

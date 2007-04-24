@@ -77,6 +77,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 
+	-- events that we need to catch
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SENT", "Enchantrix", onEvent)
 --	Stubby.RegisterEventHook("UNIT_SPELLCAST_START", "Enchantrix", onEvent)			-- not used right now
@@ -86,6 +87,15 @@ function addonLoaded(hookArgs, event, addOnName)
 	Stubby.RegisterEventHook("LOOT_OPENED", "Enchantrix", onEvent)
 --	Stubby.RegisterEventHook("ZONE_CHANGED", "Enchantrix", onEvent)			-- not used right now
 
+	-- and hook into tooltips for more info
+	hooksecurefunc("GameTooltip_OnHide", ENX_GameTooltip_OnHide);
+	hooksecurefunc("GameTooltip_SetDefaultAnchor", ENX_GameTooltip_SetDefaultAnchor);
+	ENX_SetTooltipHooks("GameTooltip");
+	ENX_SetTooltipHooks("ItemRefTooltip");
+	ENX_SetTooltipHooks("ShoppingTooltip1");
+	ENX_SetTooltipHooks("ShoppingTooltip2");
+
+	-- now print our version and credits
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
@@ -143,7 +153,57 @@ function onLoad()
 	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
 end
 
-local ns = function(v) return v or "None" end
+
+-- Big thanks to FizzWidget for figuring out how to get the tooltips hooked
+-- names have been changed to prevent conflicts
+ENX_TooltipHooks = {};
+
+function ENX_GameTooltip_OnHide()
+	local tooltipName = this:GetName();
+	ENX_SetTooltipHooks(tooltipName);
+end
+
+function ENX_GameTooltip_SetDefaultAnchor(tooltip, parent)
+	local tooltipName = tooltip:GetName();
+	ENX_SetTooltipHooks(tooltipName);
+end
+
+function ENX_SetTooltipHooks(tooltipName)
+	if (not tooltipName or tooltipName == "") then return; end
+	local tooltip = getglobal(tooltipName);
+	if (tooltip and tooltip:HasScript("OnTooltipSetItem") and not ENX_TooltipHooks[tooltipName]) then
+		ENX_TooltipHooks[tooltipName] = {};
+		ENX_TooltipHooks[tooltipName].OnTooltipSetItem = tooltip:GetScript("OnTooltipSetItem");
+		tooltip:SetScript("OnTooltipSetItem", ENX_OnTooltipSetItem);
+	end
+end
+
+function ENX_OnTooltipSetItem()
+	local tooltipName = this:GetName();
+	local tooltip = getglobal(tooltipName);
+	if (ENX_TooltipHooks[tooltipName] and ENX_TooltipHooks[tooltipName].OnTooltipSetItem) then
+		ENX_TooltipHooks[tooltipName].OnTooltipSetItem(tooltip);
+	end
+	local name, link = this:GetItem();
+	if (link) then
+		-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
+		if (Enchantrix.Util.GetIType(link)) then
+			-- Ok, we think the item is disenchantable
+			-- search the tooltip text for the non-disenchantable string
+			for lineNum = 1, this:NumLines() do
+				local leftText = getglobal(this:GetName().."TextLeft"..lineNum):GetText();
+				if (leftText == ITEM_DISENCHANT_NOT_DISENCHANTABLE) then
+					-- found the string, this item really isn't disenchantable
+					Enchantrix.Storage.SaveNonDisenchantable(link)
+					-- no need to continue
+					return false;
+				end
+				
+			end
+		end
+	end
+	return false;
+end
 
 function pickupInventoryItemHook(slot)
 	-- Remember last activated item
@@ -196,10 +256,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
 				local name, link, _, itemLevel = GetItemInfo( DisenchantEvent.spellTarget );
 				if (itemLevel <= maxLevel) then
-					-- first compare to known non-DE items and only print on new ones?
 					Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
-	-- TODO - ccox - need localized string!
-					Enchantrix.Util.ChatPrint(("Found that %s is not disenchantable"):format(DisenchantEvent.spellTarget))
 				end
 			end
 		end
