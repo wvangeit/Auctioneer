@@ -29,8 +29,8 @@
 
 	Manual:
 		This manual is a basic introduction to this library and gives examples
-		about how to use it. For a more detailed description, refere to the
-		each function's documentation.
+		about how to use it. For a more detailed description, refer to the each
+		function's documentation.
 
 		>>>What the library is designed for<<<
 		DebugLib is designed to act as a layer over the nLog addon. It makes the
@@ -56,8 +56,8 @@
 
 			local addonName = "MyAddon"
 
-			local function debugPrint(message, category, errorCode, level)
-				return DebugLib.DebugPrint(addonName, message, category, errorCode, level)
+			local function debugPrint(message, category, title, errorCode, level)
+				return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
 			end
 
 			local function assert(test, message)
@@ -80,7 +80,7 @@
 			This is the normal usage for defined errors using debugPrint.
 
 			debugPrint("Defaulting the parameters...",
-			           "scan", DebugLib.Level.Notice)
+			           "scan", "Defaulting", DebugLib.Level.Notice)
 			This generates a notice message.
 
 			assert(v < 5, "The given value is too big.")
@@ -177,7 +177,7 @@ local dump
 -- enabled.
 --
 -- syntax:
---    errorCode, message = libDebugPrint(addon[, message][, category][, errorCode][, level])
+--    errorCode, message = libDebugPrint(addon[, message][, category][, title][, errorCode][, level])
 --
 -- parameters:
 --    addon     - (string) the name of the addon
@@ -185,6 +185,8 @@ local dump
 --                nil, no error message specified
 --    category  - (string) the category of the debug message
 --                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
@@ -207,83 +209,131 @@ local dump
 --          nLog and, if enabled in nLog, to the chat channel as well. These
 --          message types are normally used for local debugging, only.
 --
---       2) Complete specified error entry:
+--       2) Complete specified error entry with default title:
 --          libDebugPrint("DebugLib", "Error while processing the frame.",
 --                        "UI", 6)
---          This is the preferred syntax for specifying errors.
+--          This is the preferred syntax for specifying errors, if you don't
+--          want to specify your own title.
 --
---       3) Complete specified debug warning entry:
+--       3) Complete specified error entry with specified title:
+--          libDebugPrint("DebugLib", "Error while processing the frame.",
+--                        "UI", "Process error", 6)
+--          This is the preferred syntax for specifying errors, if you want to
+--          specify your own title.
+--
+--       4) Complete specified debug warning entry with a title:
 --          libDebugPrint("DebugLib", "Entering failsafe mode.", "Backend",
---                        DebugLib.Level.Warning)
+--                        "Failsafe", DebugLib.Level.Warning)
 --          This is the preferred syntax for any message type except errors.
 --
---       4) Fully specified debug message:
+--       5) Complete specified debug warning entry with default title:
+--          libDebugPrint("DebugLib", "Entering failsafe mode.", "Backend",
+--                        DebugLib.Level.Warning)
+--          This is another syntax for any message type except errors, though
+--          this time the default title is used.
+--
+--       6) Fully specified debug message with default title:
 --          libDebugPrint("DebugLib", "Critical error in function call.",
 --                        "Scan", 6, DebugLib.Level.Critical)
---          This is the full syntax. It is the suggested syntax for specifying
---          log entries which return error codes and have a different level than
---          DebugLib.Level.Error.
+--          This is the full syntax except the title. It is the suggested syntax
+--          for specifying log entries which return error codes, have a
+--          different level than DebugLib.Level.Error and do not need their own
+--          title.
 --
---       5) Quick specified error entry, with only basic information:
+--       7) Fully specified debug message:
+--          libDebugPrint("DebugLib", "Critical error in function call.",
+--                        "Scan", "Invalid function call", 6,
+--                        DebugLib.Level.Critical)
+--          This is the full syntax. It is the suggested syntax for specifying
+--          log entries which return error codes, have a different level than
+--          DebugLib.Level.Error and require their own title.
+--
+--       8) Quick specified error entry, with only basic information:
 --          libDebugPrint("DebugLib", "Failed to read data.", 5)
 --          This creates a new error entry in nLog. This syntax can be used, if
 --          you have to add this message quickly but don't want to specify the
 --          category yet.
 --
---       6) Quick specified debug entry, with only basic information:
+--       9) Quick specified debug entry, with only basic information:
 --          libDebugPrint("DebugLib", "Executing unsafe code.",
 --                        DebugLib.Level.Notice)
 --          This creates a new notice entry in nLog. It's basically used, if
 --          you have to quickly add some debug information but don't want to
 --          specify the category yet.
 --
---       7) Partly specified error entry:
---          libDebugPrint("DebugLib", "Fatal error in command handler.", 9,
---                        DebugLib.Level.Critical)
---          This syntax is possible, but quite uncommon. Instead of using this,
---          one should prefer the fully specified debug message.
---          It generates a new log entry for critical errors with no category.
+--       10) Partly specified error entry:
+--           libDebugPrint("DebugLib", "Fatal error in command handler.", 9,
+--                         DebugLib.Level.Critical)
+--           This syntax is possible, but quite uncommon. Instead of using this,
+--           one should prefer the fully specified debug message.
+--           It generates a new log entry for critical errors with no category.
 --
---       8) Empty log entry:
---          libDebugPrint("DebugLib")
---          This unusual usage will generate an empty debug log entry in nLog.
+--       11) Empty log entry:
+--           libDebugPrint("DebugLib")
+--           This unusual usage will generate an empty debug log entry in nLog.
 --
---       9) Empty log entry with defined log level:
---          libDebugPrint("DebugLib", DebugLib.Level.Info)
---          Though valid, this syntax is also not very common. It creates an
---          empty notice in nLog.
+--       12) Empty log entry with defined log level:
+--           libDebugPrint("DebugLib", DebugLib.Level.Info)
+--           Though valid, this syntax is also not very common. It creates an
+--           empty notice in nLog.
 --
 --    >>>SPECIAL FUNCTION HANDLING<<<
 --    Since the level parameter is a string representation, be aware of how the
 --    function handles the following ambiguous calls.
 --
---       Second or third parameter is a string found in DebugLib.Level:
+--       Second, third or fourth parameter is a string found in DebugLib.Level:
 --          libDebugPrint("DebugLib", "Error")
---          This will be interpreted as a type 9 syntax.
+--          This will be interpreted as a type 12 syntax.
 --          message  = nil
 --          category = "unspecified"
+--          title    = "Errorcode: unspecified"
 --          level    = DebugLib.Level.Error
 --
---          libDebugPrint("DebugLib", "Error occured.", "Critical")
---          This will be interpreted as a type 6 syntax.
---          message  = "Error occured."
+--          libDebugPrint("DebugLib", "Ambiguous call.", "Warning")
+--          This will be interpreted as a type 9 syntax.
+--          message  = "Ambiguous call."
 --          category = "unspecified"
+--          title    = "Warning"
+--          level    = DebugLib.Level.Warning
+--
+--          >>libDebugPrint("DebugLib", "Error occured.", "Invalid function call.", "Critical")
+--          This will be interpreted as a type 5 syntax.
+--          message  = "Error occured."
+--          category = "Invalid functioncall."
+--          title    = "Errorcode: unspecified"
 --          level    = DebugLib.Level.Critical
 --
---       Second and third parameters are strings found in DebugLib.Level:
+--       Two out of the second, third and fourth parameters are strings found in
+--       DebugLib.Level:
 --          libDebugPrint("DebugLib", "Warning", "Notice")
---          This will be interpreted as a type 6 syntax.
+--          This will be interpreted as a type 9 syntax.
 --          message  = "Warning"
 --          category = "unspecified"
+--          title    = "Notice"
 --          level    = DebugLib.Level.Notice
 --
---       Second and/or third parameter are strings found in DebugLib.Level and
---       parameter 4 is a string found in DebugLib.Level, too:
---          libDebugPrint("DebugLib", "Warning", "Debug", "Error")
---          This will be interpreted as a type 3 syntax.
+--          libDebugPrint("DebugLib", "Info", "Engine", "Warning")
+--          This will be interpreted as a type 5 syntax.
+--          message  = "Info"
+--          category = "Engine"
+--          title    = "Warning"
+--          level    = DebugLib.Level.Warning
+--
+--          libDebugPrint("DebugLib", "Invalid type", "Error", "Critical")
+--          This will be interpreted as a type 5 syntax.
+--          message  = "Invalid type"
+--          category = "Error"
+--          title    = "Errorcode: unspecified"
+--          level    = DebugLib.Level.Critical
+--
+--       Second and/or third and/or fourth and fifth parameter are strings found
+--       in DebugLib.Level:
+--          libDebugPrint("DebugLib", "Warning", "Debug", "Error", "Critical")
+--          This will be interpreted as a type 4 syntax.
 --          message  = "Warning"
 --          category = "Debug"
---          level    = DebugLib.Level.Error
+--          title    = "Error"
+--          level    = DebugLib.Level.Critical
 --
 --    >>>OPTIONAL PARAMETERS<<<
 --    The examples above show all allowed syntaxes for this function and
@@ -301,9 +351,9 @@ local dump
 --    If no level is specified but an error code is given, the level will be
 --    defaulting to DebugLib.Level.Error.
 --
---    >>>TITLE<<<
---    The titel in nLog is not specified by the developer, but automatically
---    generated based on the errorCode and level.
+--    title:
+--    If no title is specified it will be automatically generated based on the
+--    errorCode and level.
 --    If an errorCode is specified, the title says: "Errorcode: x".
 --    If no errorCode is present and the level is either
 --    DebugLib.Level.Critical or DebugLib.Level.Error, then the title says:
@@ -328,9 +378,10 @@ local dump
 --    the addon parameter and then calls this function.
 --    Refer to the local debugPrint() function for the reference implementation.
 -------------------------------------------------------------------------------
-function libDebugPrint(addon, message, category, errorCode, level)
-	addon, message, category, errorCode, level = normalizeParameters(addon, message, category, errorCode, level)
-	local title = generateTitle(level, errorCode)
+-- TODO: add better automated logging text, including function name, line number
+--       etc, add errorcode to message
+function libDebugPrint(addon, message, category, title, errorCode, level)
+	addon, message, category, title, errorCode, level = normalizeParameters(addon, message, category, title, errorCode, level)
 
 	-- nLog.AddMessage() uses select() to check if any message is there.
 	-- Since select() will count even passed nil values, nLog would create "NIL"
@@ -350,7 +401,7 @@ end
 -- disabled.
 --
 -- syntax:
---    errorCode, message = libDebugPrint(addon[, message][, category][, errorCode][, level])
+--    errorCode, message = libDebugPrint(addon[, message][, category][, title][, errorCode][, level])
 --
 -- parameters:
 --    addon     - (string) the name of the addon
@@ -358,6 +409,8 @@ end
 --                nil, no error message specified
 --    category  - (string) the category of the debug message
 --                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, not title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
@@ -374,8 +427,8 @@ end
 --    Refer to the description of libDebugPrint() to see a more detailed
 --    explanation about this function.
 -------------------------------------------------------------------------------
-function libSimpleDebugPrint(addon, message, category, errorCode, level)
-	_, message, _, errorCode = normalizeParameters(addon, message, category, errorCode, level)
+function libSimpleDebugPrint(addon, message, category, title, errorCode, level)
+	_, message, _, _, errorCode = normalizeParameters(addon, message, category, title, errorCode, level)
 
 	return errorCode, message
 end
@@ -384,13 +437,15 @@ end
 -- Prints the specified message to nLog.
 --
 -- syntax:
---    errorCode, message = debugPrint([message][, category][, errorCode][, level])
+--    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
 --
 -- parameters:
 --    message   - (string) the error message
 --                nil, no error message specified
 --    category  - (string) the category of the debug message
 --                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, not title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
@@ -408,8 +463,8 @@ end
 --    Refer to the documentation about libDebugPrint for a more detailed
 --    description about this function.
 -------------------------------------------------------------------------------
-function debugPrint(message, category, errorCode, level)
-	return DebugLib.DebugPrint(addonName, message, category, errorCode, level)
+function debugPrint(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
 end
 
 -------------------------------------------------------------------------------
@@ -418,7 +473,7 @@ end
 -- handling these cases.
 --
 -- syntax:
---    addon, message, category, errorCode, level = normalizeParameter(addon[, message][, category][, errorCode][, level])
+--    addon, message, category, title, errorCode, level = normalizeParameter(addon[, message][, category][, title][, errorCode][, level])
 --
 -- parameters:
 --    addon     - (string) the name of the addon
@@ -426,6 +481,8 @@ end
 --                nil, no error message specified
 --    category  - (string) the category of the debug message
 --                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
 --    errorCode - (number) the error code
 --                nil, no error code specified
 --    level     - (string) nLog message level
@@ -437,6 +494,7 @@ end
 --                "unspecified", if there was no addon name
 --    message   - (string) message, if one is specified
 --                nil, otherwise
+--    title     - (string) the title for the debug message
 --    category  - (string) category
 --                "unspecified", if no valid category was specified
 --    errorCode - (number) error code
@@ -450,9 +508,9 @@ end
 --    Refer to the documentation about libDebugPrint() to read in detail how
 --    the parameter list is handled.
 -------------------------------------------------------------------------------
-function normalizeParameters(addon, message, category, errorCode, level)
+function normalizeParameters(addon, message, category, title, errorCode, level)
 	-- return values
-	local retAddon, retMessage, retCategory, retErrorCode, retLevel
+	local retAddon, retMessage, retCategory, retTitle, retErrorCode, retLevel
 
 	-- process the addon parameter
 	if addon == nil then
@@ -527,11 +585,43 @@ function normalizeParameters(addon, message, category, errorCode, level)
 		end
 	end
 
+	-- process the title parameter
+	if title ~= nil then
+		-- The title parameter is present. It should contain either the
+		-- title, errorCode or level content.
+		if (type(title) == "number") and (level == nil) then
+			-- It's the error code. Make sure that it's the only one.
+			if retErrorCode then
+				-- errorCode is already present, ignore the one in title
+				debugPrint("Multiple error codes specified! Ignoring the one in title and continue processing the debug message.",
+				           "debugPrint",
+				           1)
+			else
+				-- we got the error code, so safe it in the right place
+				retErrorCode = title
+			end
+		elseif type(title) ~= "string" then
+			-- title contains invalid content
+			debugPrint("Invalid title type. The type "..type(title).." is not supported. Removing the value and continue with processing the debug message.",
+			           "debugPrint",
+			           1)
+		else
+			-- It's either the title or the level content.
+			if (errorCode == nil) and (level == nil) and isDebugLevel(title) then
+				-- it's the level content
+				retLevel = title
+			else
+				-- it's the title
+				retTitle = title
+			end
+		end
+	end
+
 	-- process the category parameter
 	if category ~= nil then
 		-- The category parameter is present. It should contain either the
 		-- category, errorCode or level content.
-		if (type(category) == "number") and (level == nil) then
+		if (type(category) == "number") and (errorCode == nil) and (level == nil) then
 			-- It's the error code. Make sure that it's the only one.
 			if retErrorCode then
 				-- errorCode is already present, ignore the one in category
@@ -549,7 +639,7 @@ function normalizeParameters(addon, message, category, errorCode, level)
 			           1)
 		else
 			-- It's either the category or the level content.
-			if (errorCode == nil) and (level == nil) and not retLevel and isDebugLevel(category) then
+			if (title == nil) and (errorCode == nil) and (level == nil) and isDebugLevel(category) then
 				-- it's the level content
 				retLevel = category
 			else
@@ -563,7 +653,7 @@ function normalizeParameters(addon, message, category, errorCode, level)
 	if message ~= nil then
 		-- The message parameter is present. It should contain either the
 		-- message, errorCode or level content.
-		if (type(message) == "number") and (errorCode == nil) and (level == nil) then
+		if (type(message) == "number") and (title == nil) and (errorCode == nil) and (level == nil) then
 			-- It's the error code. Make sure that it's the only one.
 			if retErrorCode then
 				-- errorCode is already present, ignore the one in message
@@ -581,7 +671,7 @@ function normalizeParameters(addon, message, category, errorCode, level)
 			           1)
 		else
 			-- It's either the message or the level content.
-			if (category == nil) and (errorCode == nil) and (level == nil) and not retLevel and isDebugLevel(message) then
+			if (category == nil) and (title == nil) and (errorCode == nil) and (level == nil) and isDebugLevel(message) then
 				-- it's the level content
 				retLevel = message
 			else
@@ -600,8 +690,11 @@ function normalizeParameters(addon, message, category, errorCode, level)
 			retLevel = levelList.Debug
 		end
 	end
+	if not retTitle then
+		retTitle = generateTitle(retLevel, retErrorCode)
+	end
 
-	return retAddon, retMessage, retCategory, retErrorCode, retLevel
+	return retAddon, retMessage, retCategory, retTitle, retErrorCode, retLevel
 end
 
 -------------------------------------------------------------------------------
@@ -705,6 +798,7 @@ end
 --    the addon parameter and then calls this function.
 --    Refer to the local assert() function for the reference implementation.
 -------------------------------------------------------------------------------
+-- TODO: add more parameters cat, title, vararg
 function libAssert(addon, test, message)
 	-- validate the parameters
 	if type(addon) ~= "string" then
@@ -826,6 +920,8 @@ end
 --    inside of tables. If a recursion occures, this function causes a stack
 --    overflow
 -------------------------------------------------------------------------------
+-- TODO: Add safety measurement to prohibit recursions inside tables causing
+--       a stack overflow.
 function dump(...)
 	local out = ""
 	local numVarArgs = select("#", ...)
