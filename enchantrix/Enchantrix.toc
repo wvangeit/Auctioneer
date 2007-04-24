@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos
-## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantables
+## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
@@ -21,6 +21,7 @@ EnxLocale.lua
 
 EnxData.lua
 Data\EnxList.lua
+Data\EnxNonDisenchant.lua
 
 EnxSettings.lua
 EnxMiniIcon.lua

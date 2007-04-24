@@ -141,10 +141,16 @@ function mergeDisenchantLists()
 			EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 		end
 	end
+]]
 
+	-- now we need to merge the user non-disenchantables with the default non-disenchantables
+	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
+	for sig, value in pairs(NonDisenchantablesLocal) do
+		NonDisenchantables[sig] = value;
+	end
+	
 	-- Take out the trash
 	collectgarbage("collect")
-]]
 
 end
 
@@ -346,8 +352,11 @@ end
 
 
 function saveNonDisenchantable(itemLink)
-	if not NonDisenchantables then NonDisenchantables = {} end
+	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
 	local sig = Enchantrix.Util.GetSigFromLink(itemLink);
+	-- put this in the local and combined list
+	-- only the local list will be saved in SavedVariables
+	NonDisenchantablesLocal[sig] = true;
 	NonDisenchantables[sig] = true;
 end
 
@@ -358,6 +367,7 @@ function addonLoaded()
 	if not EnchantedBaseItems then EnchantedBaseItems = {} end
 	if not EnchantedItemTypes then EnchantedItemTypes = {} end
 	if not NonDisenchantables then NonDisenchantables = {} end
+	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
 	
 	mergeDisenchantLists()
 end
