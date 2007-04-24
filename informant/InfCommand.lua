@@ -34,6 +34,7 @@ Informant_RegisterRevision("$URL$", "$Rev$")
 -- function prototypes
 local commandHandler, cmdHelp, onOff, genVarSet, chatPrint, registerKhaos, restoreDefault, cmdLocale, setLocale, isValidLocale
 local setKhaosSetKeyValue
+local debugPrint
 
 -- Localization function prototypes
 local delocalizeFilterVal, localizeFilterVal, getLocalizedFilterVal, delocalizeCommand, localizeCommand, buildCommandMap
@@ -62,14 +63,14 @@ function setKhaosSetKeyValue(key, value)
 		local kKey = Khaos.getSetKey("Informant", key)
 
 		if (not kKey) then
-			EnhTooltip.DebugPrint("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
+			debugPrint("setKhaosSetKeyParameter(): key "..key.." does not exist", DebugLib.Level.Error)
 		elseif (kKey.checked) then
 			if (type(value) == "string") then value = (value == "on") end
 			Khaos.setSetKeyParameter("Informant", key, "checked", value)
 		elseif (kKey.value) then
 			Khaos.setSetKeyParameter("Informant", key, "value", value)
 		else
-			EnhTooltip.DebugPrint("setKhaosSetKeyValue(): don't know how to update key ", key)
+			debugPrint("setKhaosSetKeyValue(): don't know how to update key "..key, DebugLib.Level.Error)
 		end
 	end
 end
@@ -851,6 +852,33 @@ function localizeCommand(cmd)
 	end
 
 	return commandMapRev[cmd] or cmd
+end
+
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function debugPrint(message, title, errorCode, level)
+	return Informant.DebugPrint(message, "InfCommand", title, errorCode, level)
 end
 
 -- Globally accessible functions

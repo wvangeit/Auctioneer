@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$

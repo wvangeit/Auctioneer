@@ -635,7 +635,7 @@ function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
 	if (DebugLib) then
 		-- function debugPrint(message, category, errorCode, level)
 		local message = format(...)
-		DebugLib.debugPrint(message, "Enchantrix" .. mType .. mTitle, 1, mLevel)
+		DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
 	elseif (nLog) then
 		-- function nLog.AddMessage(mAddon, mType, mLevel, mTitle, message, ...)
 	    nLog.AddMessage("Enchantrix", mType, mLevel, mTitle, ...)

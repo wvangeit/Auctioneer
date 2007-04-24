@@ -1,4 +1,4 @@
---[[
+﻿--[[
 
 	Enchantrix v<%version%> (<%codename%>)
 	$Id$

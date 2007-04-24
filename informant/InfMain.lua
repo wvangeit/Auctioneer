@@ -40,11 +40,10 @@ local getItem--(itemID);     itemID is the first value in a blizzard hyperlink i
 --                           this pattern would extract the id you need:
 --                             "item:(%d+):%d+:%d+:%d+"
 
-
-
 -- LOCAL FUNCTION PROTOTYPES:
 local addLine				-- addLine(text, color)
 local clear					-- clear()
+local debugPrint            -- debugPrint(message, title, errorCode, level)
 local frameActive			-- frameActive(isActive)
 local frameLoaded			-- frameLoaded()
 local getCatName			-- getCatName(catID)
@@ -52,6 +51,7 @@ local getFilter				-- getFilter(filter)
 local getFilterVal			-- getFilterVal(type)
 local getItem				-- getItem(itemID)
 local getRowCount			-- getRowCount()
+local infDebugPrint         -- debugPrint(message, category, title, errorCode, level)
 local onEvent				-- onEvent(event)
 local onLoad				-- onLoad()
 local onVariablesLoaded		-- onVariablesLoaded()
@@ -72,6 +72,7 @@ local split					-- split(str, at)
 
 local self = {}
 local lines = {}
+local addonName = "Informant"
 
 -- GLOBAL VARIABLES
 
@@ -218,7 +219,6 @@ function getItem(itemID, static)
 		dataItem.usedList = nil
 		dataItem.usageText = nil
 	end
-
 
 	local reqSkill = 0
 	local reqLevel = 0
@@ -784,6 +784,62 @@ end
 --]]
 -- GLOBAL OBJECT
 
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = infDebugPrint([message][, category][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    category  - (string) the category of the debug message
+--                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function infDebugPrint(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+end
+
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function debugPrint(message, title, errorCode, level)
+	return Informant.DebugPrint(message, "InfMain", title, errorCode, level)
+end
+
 Informant = {
 	version = INFORMANT_VERSION,
 	GetItem = getItem,
@@ -813,5 +869,6 @@ Informant = {
 	OnEvent = onEvent,
 	SetFilter = setFilter,
 	SetFilterDefaults = setFilterDefaults,
+	DebugPrint = infDebugPrint
 }
 

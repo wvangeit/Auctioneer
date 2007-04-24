@@ -46,7 +46,7 @@ function manifest.RegisterRevision(path, revision)
 
 	manifest.revs[file] = rev
 	if (nLog) then
-		nLog.AddMessage("Informant", "AucRevision", N_INFO, "Loaded revisioned file", "Loaded", file, "revision", rev)
+		nLog.AddMessage("Informant", "AucRevision", N_INFO, "Loaded "..file, "Loaded", file, "revision", rev)
 	end
 end
 Informant_RegisterRevision = manifest.RegisterRevision

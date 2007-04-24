@@ -197,6 +197,8 @@ local private = {
 	numberHeaderLines = 0,
 }
 
+local addonName = "Enhanced Tooltip"
+
 -- =============== LOCAL FUNCTIONS =============== --
 
 -- prototypes for all local functions
@@ -218,7 +220,7 @@ local chatHookSetItemRef       -- ChatHookSetItemRef(reference,link,button)
 local checkHide                -- CheckHide()
 local checkPopup               -- CheckPopup(name,link,quality,count,price,hyperlink)
 local clearTooltip             -- ClearTooltip()
-local debugPrint               -- DebugPrint(...)
+local debugPrint				-- DebugPrint(message, category, title, errorCode, level)
 local doHyperlink              -- DoHyperlink(reference,link,button)
 local embedRender              -- EmbedRender()
 local fakeLink                 -- FakeLink(hyperlink,quality,name)
@@ -1512,80 +1514,34 @@ end
 ------------------------
 -- Debug functions
 ------------------------
-
-local function dump(...)
-	local out = ""
-	local numVarArgs = select("#", ...)
-	for i = 1, numVarArgs do
-		local d = select(i, ...)
-		local t = type(d)
-		if (t == "table") then
-			out = out .. "{"
-			local first = true
-			if (d) then
-				for k, v in pairs(d) do
-					if (not first) then out = out .. ", " end
-					first = false
-					out = out .. dump(k)
-					out = out .. " = "
-					out = out .. dump(v)
-				end
-			end
-			out = out .. "}"
-		elseif (t == "nil") then
-			out = out .. "NIL"
-		elseif (t == "number") then
-			out = out .. d
-		elseif (t == "string") then
-			out = out .. "\"" .. d .. "\""
-		elseif (t == "boolean") then
-			if (d) then
-				out = out .. "true"
-			else
-				out = out .. "false"
-			end
-		else
-			out = out .. t:upper() .. "??"
-		end
-
-		if (i < numVarArgs) then out = out .. ", " end
-	end
-	return out
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    category  - (string) the category of the debug message
+--                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function debugPrint(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
 end
-
-local lastOut = ""
-function debugPrint(...)
-	local debugWin
-	for i=1, NUM_CHAT_WINDOWS do
-		if (GetChatWindowInfo(i):lower() == "ettdebug") then
-			debugWin = i
-			break
-		end
-	end
-	if (not debugWin) then
-		return
-	end
-
-	local out = ""
-	for i = 1, select("#", ...) do
-		if (i > 1) then out = out .. ", " end
-		local currentArg = select(i, ...)
-		local argType = type(currentArg)
-		if (argType == "string") then
-			out = out .. '"'..currentArg..'"'
-		elseif (argType == "number") then
-			out = out .. currentArg
-		else
-			out = out .. dump(currentArg)
-		end
-	end
-
-	if (out ~= lastOut) then
-		getglobal("ChatFrame"..debugWin):AddMessage(out, 1.0, 1.0, 0.3)
-		lastOut = out
-	end
-end
-
 
 ------------------------
 -- Load and initialization functions
@@ -1723,7 +1679,6 @@ EnhTooltip = {
 	TooltipCall			= tooltipCall,
 
 	SetElapsed			= setElapsed,
-	DebugPrint			= debugPrint,
 	OnLoad				= onLoad,
 
 	Version				= ENHTOOLTIP_VERSION,

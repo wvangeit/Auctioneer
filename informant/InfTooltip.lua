@@ -27,6 +27,7 @@ Informant_RegisterRevision("$URL$", "$Rev$")
 local nilSafeString			-- nilSafeString(String)
 local whitespace			-- whitespace(length)
 local getFilter = Informant.GetFilter
+local debugPrint
 
 function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, count, price)
 	-- nothing to do, if informant is disabled
@@ -203,4 +204,31 @@ function whitespace(length)
 		spaces = spaces.." "
 	end
 	return spaces
+end
+
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function debugPrint(message, title, errorCode, level)
+	return Informant.DebugPrint(message, "InfTooltip", title, errorCode, level)
 end
