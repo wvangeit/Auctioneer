@@ -4,7 +4,7 @@
 ## Interface: 20003
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Khaos
+## OptionalDeps: Khaos, !nLog
 ## SavedVariables: InformantConfig
 ##
 ## Version: <%version%> (<%codename%>)

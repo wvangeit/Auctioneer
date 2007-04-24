@@ -4,6 +4,7 @@
 ## Interface: 20003
 ## LoadOnDemand: 1
 ## Dependencies: Stubby
+## OptionalDeps: !nLog
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
