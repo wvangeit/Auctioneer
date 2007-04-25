@@ -64,10 +64,6 @@ if (nLog.Version == "<%".."version%>") then
 end
 NLOG_VERSION = nLog.Version
 
-nLogData = {
-	enabled = true,
-}
-
 function nLog.ChatMsg(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(msg)
 end
@@ -80,7 +76,7 @@ function nLog.IsEnabled()
 	return nLogData.enabled
 end
 
-function dump(...)
+local function dump(...)
 	local out = "";
 	local n = select("#", ...)
 	for i = 1, n do
@@ -158,11 +154,16 @@ function nLog.AddMessage(mAddon, mType, mLevel, mTitle, ...)
 		message[6] = mTitle
 		message[7] = msg
 		nLog.Message.ofs = (ofs+1 % 65535)
-		return
+	else
+		table.insert(nLog.messages, {
+			ts, pid, mAddon, mType, mLevel, mTitle, msg
+		})
 	end
-	table.insert(nLog.messages, {
-		ts, pid, mAddon, mType, mLevel, mTitle, msg
-	})
+
+	-- output debug level messages to the chat channel, too, if set so
+	if (mLevel == N_DEBUG) and nLogData.chatPrint then
+		chat(msg)
+	end
 end
 
 function nLog.OnEvent(frame, event, ...)
@@ -170,6 +171,22 @@ function nLog.OnEvent(frame, event, ...)
 		local addon = select(1, ...)
 		if (addon:lower() == "!nlog") then
 			frame:UnregisterEvent("ADDON_LOADED")
+
+			-- create nLogData for the first time
+			if not nLogData then
+				nLogData = {}
+			end
+
+			-- enable nlog each session
+			nLogData.enabled = true
+
+			-- default chatPrint to true
+			if nLogData.chatPrint == nil then
+				nLogData.chatPrint = true
+			end
+
+			-- initialize nlog's message frame
+			nLog.Message.ChatPrint:SetChecked(nLogData.chatPrint)
 		end
 	end
 end
@@ -183,6 +200,10 @@ function nLog.OnUpdate(frame, delay)
 		-- Do update stuff
 		nLog.UpdateDisplay()
 	end
+end
+
+function nLog.OnClickChatPrintButton()
+	nLogData.chatPrint = (nLog.Message.ChatPrint:GetChecked() == 1)
 end
 
 function nLog.MessageShow()
@@ -323,7 +344,7 @@ local function hideTooltip()
 end
 
 
--- Create our message message frame
+-- Create our message frame
 nLog.Message = CreateFrame("Frame", "", UIParent)
 nLog.Message:Hide()
 nLog.Message:SetPoint("CENTER", "UIParent", "CENTER")
@@ -388,6 +409,12 @@ nLog.Message.LevelFilt:SetHitRectInsets(0,0,0,0)
 nLog.Message.LevelFilt.tooltip = strLevelFilter
 nLog.Message.LevelFilt:SetScript("OnEnter", showTooltip)
 nLog.Message.LevelFilt:SetScript("OnLeave", hideTooltip)
+
+nLog.Message.ChatPrint = CreateFrame("CheckButton", "nLogChatPrint", nLog.Message, "OptionsCheckButtonTemplate")
+nLog.Message.ChatPrint:SetPoint("TOPLEFT", nLog.Message.LevelFilt, "TOPRIGHT", 50, 10)
+nLog.Message.ChatPrint:SetScript("OnClick", nLog.OnClickChatPrintButton)
+nLog.Message.ChatPrint:SetHitRectInsets(0, 0, 0, 0)
+getglobal("nLogChatPrintText"):SetText("ChatPrint")
 
 nLog.Message.Done = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Done:SetText("Close")
@@ -464,10 +491,12 @@ SLASH_NLOG1 = "/nlog"
 SlashCmdList["NLOG"] = function(msg)
 	if (not msg or msg == "" or msg == "help") then
 		chat("nLog help:")
-		chat("  /nlog enable    -  Enables nLog")
-		chat("  /nlog disable   -  Disables nLog")
-		chat("  /nlog show      -  Shows the nLog frame")
-		chat("  /nlog clear     -  Clears current nLog messages")
+		chat("  /nlog enable      -  Enables nLog")
+		chat("  /nlog disable     -  Disables nLog")
+		chat("  /nlog show        -  Shows the nLog frame")
+		chat("  /nlog clear       -  Clears current nLog messages")
+		chat("  /nlog chatEnable  -  Prints debug level messages also to the chat channel")
+		chat("  /nlog chatDisable -  Do no longer print debug level messages to the chat channel")
 	elseif (msg == "show") then
 		nLog.Message:Show()
 	elseif (msg == "enable") then
@@ -478,6 +507,12 @@ SlashCmdList["NLOG"] = function(msg)
 		chat("nLog will no longer catch messages")
 	elseif (msg == "clear") then
 		nLog.ClearLog()
+	elseif (msg == "chatEnable") then
+		nLogData.chatPrint = true
+		nLog.Message.ChatPrint:SetChecked(true)
+	elseif (msg == "chatDisable") then
+		nLogData.chatPrint = false
+		nLog.Message.ChatPrint:SetChecked(false)
 	else
 		chat("Unknown nLog command: "..(msg or "nil"))
 	end
