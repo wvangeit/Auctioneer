@@ -633,7 +633,7 @@ ENX_DEBUG = 6
 function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
 
 	if (DebugLib) then
-		-- function debugPrint(message, category, errorCode, level)
+		-- function libDebugPrint(addon, message, category, title, errorCode, level)
 		local message = format(...)
 		DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
 	elseif (nLog) then
