@@ -1,4 +1,4 @@
---[[
+﻿--[[
 
 	Enchantrix v<%version%> (<%codename%>)
 	$Id$
@@ -161,6 +161,10 @@ local config_defaults = {
 local relevelFrame;
 local relevelFrames;
 
+local addonName = "Enchantrix Barker"
+
+local debugPrint
+
 -- UI code
 
 function EnchantrixBarker_OnEvent()
@@ -196,10 +200,9 @@ function Enchantrix_BarkerOptions_OnShow()
 end
 
 function Enchantrix_BarkerOnClick()
-	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName("Trade - City") --TODO: Localize
-	EnhTooltip.DebugPrint("EnxBarker: Attempting to send barker", barker, "Trade Channel ID", id)
+	debugPrint("Attempting to send barker "..barker.." Trade Channel ID "..id, DebugLib.Level.Info)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
@@ -265,10 +268,9 @@ function Enchantrix_BarkerOptions_SetDefaults()
 end
 
 function Enchantrix_BarkerOptions_TestButton_OnClick()
-	--EnhTooltip.DebugPrint(Enchantrix_CreateBarker());
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName("Trade - City") --TODO: Localize
-	EnhTooltip.DebugPrint("EnxBarker: Attempting to send test barker", barker, "Trade Channel ID", id)
+	debugPrint("Attempting to send test barker "..barker.."Trade Channel ID "..id, DebugLib.Level.Info)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
@@ -880,7 +882,7 @@ function dropDownMenuInitialize(dropdown, func)
 	-- Double check that the value of 'this' didn't change... this can screw us
 	-- up and prevent the reason for this method!
 	if (newThis ~= this) then
-		debugPrint("WARNING: The value of this changed during dropDownMenuInitialize()");
+		debugPrint("WARNING: The value of this changed during dropDownMenuInitialize()", DebugLib.Level.Warning)
 	end
 	this = oldThis;
 end
@@ -897,7 +899,7 @@ function dropDownMenuSetSelectedID(dropdown, index)
 	-- Double check that the value of 'this' didn't change... this can screw us
 	-- up and prevent the reason for this method!
 	if (newThis ~= this) then
-		debugPrint("WARNING: The value of this changed during dropDownMenuSetSelectedID()");
+		debugPrint("WARNING: The value of this changed during dropDownMenuSetSelectedID()", DebugLib.Level.Warning)
 	end
 	this = oldThis;
 end
@@ -921,18 +923,15 @@ function Enchantrix_CreateBarker()
 		EnchantrixBarker_ResetBarkerString();
 		EnchantrixBarker_ResetPriorityList();
 		if (temp) then
-			EnhTooltip.DebugPrint("Starting creation of EnxBarker")
+			debugPrint("Starting creation of EnxBarker", DebugLib.Level.Info)
 			for index=1, GetNumCrafts() do
 				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-				--EnhTooltip.DebugPrint(GetCraftInfo(index))
 				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
-					--Enchantrix.Util.ChatPrint(""..craftName, 0.8, 0.8, 0.2);
 					local cost = 0;
 					for j=1,GetCraftNumReagents(index),1 do
 						local a,b,c = GetCraftReagentInfo(index,j);
 						reagent = GetCraftReagentItemLink(index,j);
 
-						--EnhTooltip.DebugPrint("Adding: "..reagent.." - "..Enchantrix_GetReagentHSP(reagent).." x "..c.." = " ..(Enchantrix_GetReagentHSP(reagent)*c/10000));
 						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
 					end
 
@@ -954,13 +953,10 @@ function Enchantrix_CreateBarker()
 					};
 					availableEnchants[ numAvailable] = enchant;
 
-					EnhTooltip.DebugPrint(GetCraftDescription(index));
 					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
 					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-					--EnhTooltip.DebugPrint("Price: "..p_gold.."."..p_silver.."g, profit: "..pr_gold.."."..pr_silver.."g");
 
 					EnchantrixBarker_AddEnchantToPriorityList( enchant )
-					--EnhTooltip.DebugPrint( "numReagents: "..GetCraftNumReagents(index) );
 					numAvailable = numAvailable + 1;
 				end
 			end
@@ -971,7 +967,6 @@ function Enchantrix_CreateBarker()
 			end
 
 			for i,element in ipairs(priorityList) do
-				EnhTooltip.DebugPrint(element.enchant.name);
 				EnchantrixBarker_AddEnchantToBarker( element.enchant );
 			end
 
@@ -1260,3 +1255,31 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 	return enchant[#enchant];
 end
 
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    category  - (string) the category of the debug message
+--                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function debugPrint(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+end
