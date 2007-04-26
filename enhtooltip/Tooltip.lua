@@ -214,7 +214,6 @@ local baselinkFromLink         -- BaselinkFromLink(link)
 local breakLink                -- BreakLink(link)
 local callBagHook              -- CallBagHook(event,bagNumber)
 local callBankHook             -- CallBankHook()
-local callCheckPopup           -- CallCheckPopup(name,link,quality,count,price,hyperlink)
 local callTradeHook            -- CallTradeHook(type,event,selID)
 local chatHookSetItemRef       -- ChatHookSetItemRef(reference,link,button)
 local checkHide                -- CheckHide()
@@ -1172,7 +1171,7 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	if (forcePopup or popupKeyPressed) then
 		-- check, if we should show the tooltip even if a popup is being displayed
-		local popupTest = checkPopup(name, link, quality, count, price, hyperlink)
+		local popupTest = EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink)
 		if (popupTest) then
 			showTip = false
 		end
@@ -1194,14 +1193,6 @@ end
 ------------------------
 -- Hook calling functions
 ------------------------
-
-function callCheckPopup(name, link, quality, count, price, hyperlink)
-	if (EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink)) then
-		return true
-	end
-	return false
-end
-
 function merchantScanner()
 	local npcName = UnitName("NPC")
 	local numMerchantItems = GetMerchantNumItems()
