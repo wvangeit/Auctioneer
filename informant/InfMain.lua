@@ -34,12 +34,6 @@ if (INFORMANT_VERSION == "<".."%version%>") then
 	INFORMANT_VERSION = "4.1.DEV"
 end
 
--- GLOBAL FUNCTION PROTOTYPES:
-
-local getItem--(itemID);     itemID is the first value in a blizzard hyperlink id
---                           this pattern would extract the id you need:
---                             "item:(%d+):%d+:%d+:%d+"
-
 -- LOCAL FUNCTION PROTOTYPES:
 local addLine				-- addLine(text, color)
 local clear					-- clear()
@@ -287,7 +281,11 @@ function getItem(itemID, static)
 		dataItem.rewardFrom = (static and emptyTable or {})
 	end
 
-	staticDataID=itemID
+	-- we adjusted the static table, if called with static = true
+	-- so save the itemID for future calls
+	if static then
+		staticDataID = itemID
+	end
 	return dataItem
 end
 
