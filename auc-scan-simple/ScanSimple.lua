@@ -56,23 +56,8 @@ private.curCat = nil
 
 function lib.OnLoad()
 	if not AucAdvancedScanSimpleData then AucAdvancedScanSimpleData = {} end
-	if not AucAdvancedScanSimpleLocal then AucAdvancedScanSimpleLocal = {} end
 	local data = AucAdvancedScanSimpleData
-	local ldata = AucAdvancedScanSimpleLocal
-	if data.lastScan then
-		local faction = AucAdvanced.GetFaction()
-		if data.lastScan.faction ~= faction then
-			data.lastScan = ldata.lastScan
-		end
-	end
-
-	if data.lastScan and data.lastScan.time then
-		if time() - data.lastScan.time > 86400 then
-			data.lastScan = {}
-		end
-	end
-	ldata.lastScan = data.lastScan
-	collectgarbage("collect")
+--	collectgarbage("collect")
 end
 
 function lib.StartScan(cat, subcat)
@@ -81,6 +66,7 @@ function lib.StartScan(cat, subcat)
 		private.curScan = nil
 		private.curSubCat = subcat
 		private.isScanning = true
+		private.scanStartTime = time()
 		lib.ScanPage(0)
 	else
 		message("Steady on; You'll need to talk to the auctioneer first!")
@@ -102,6 +88,7 @@ end
 
 function private.Unpack(item, storage)
 	if not storage then storage = {} end
+	storage.id = item[Const.ID]
 	storage.link = item[Const.LINK]
 	storage.useLevel = item[Const.ULEVEL]
 	storage.itemLevel = item[Const.ILEVEL]
@@ -133,6 +120,7 @@ function private.IsIdentical(focus, compare)
 	end
 	return true
 end
+
 function private.IsSameItem(focus, compare, onlyDirt)
 	if onlyDirt then
 		local flag = focus[Const.FLAG]
@@ -155,7 +143,6 @@ end
 
 function lib.FindItem(item, image, lut)
 	local focus
-
 	-- If we have a lookuptable, then we don't need to scan the whole lot
 	if (lut) then
 		local list = lut[item[Const.LINK]]
@@ -210,19 +197,82 @@ local function processStats(operation, curItem, oldItem)
 	return true
 end
 
+function private.GetID(IDlist)
+	for x1, x2 in pairs(IDlist) do
+		if (x1 ~= "none_after") then
+			if (x1==x2) then 
+				IDlist[x1] = nil
+			else
+				IDlist[x1] = tonumber(x2)-1
+			end
+			return x2
+		end
+	end
+	local retval = IDlist.none_after
+	IDlist.none_after = retval+1
+	return retval
+end
+
+function private.ReleaseID(IDlist, ID)
+	if (not ID) then return end
+
+	local setbefore = nil
+	local setafter = nil
+	
+	for x1, x2 in pairs(IDlist) do
+		if (x2) then
+			x2 = tonumber(x2)
+			if (x1 == "none_after") then
+				if (x2-1==ID) then
+					setafter=x1
+				end
+			else
+				x1 = tonumber(x1)
+				if (x1+1==ID) then
+					setbefore = x1
+				elseif (x2-1==ID) then
+					setafter = x1
+				end
+			end
+		end
+	end
+	if (setafter and setafter == "none_after" and setbefore) then
+		IDlist["none_after"] = setbefore
+		IDlist[setbefore] = nil
+	elseif (setafter and setafter == "none_after") then
+		IDlist["none_after"] = ID
+	elseif (setafter and setbefore) then
+		IDlist[setbefore] = IDlist[setafter]
+		IDlist[setafter] = nil
+	elseif (setafter) then
+		IDlist[ID] = IDlist[setafter]
+		IDlist[setafter] = nil
+	elseif (setbefore) then
+		IDlist[setbefore] = ID
+	else
+		IDlist[ID] = ID
+	end	
+end
+
 function private.Commit()
 	local now = time()
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
-	if not private.image then
-		local last = AucAdvancedScanSimpleData.lastScan
-		if last and last.time and now-last.time<86400 and last.faction==AucAdvanced.GetFaction() then
-			private.image = last.image
-		else
-			private.image = {}
-		end
-	end
 
+	local faction = AucAdvanced.GetFaction()
+	local realmName = GetRealmName()
+
+	if (AucAdvancedScanSimpleData and not AucAdvancedScanSimpleData.Version) then AucAdvancedScanSimpleData = {} end
+	
+	if not AucAdvancedScanSimpleData then AucAdvancedScanSimpleData = {Version = "1.0"} end
+	if not AucAdvancedScanSimpleData.scans then AucAdvancedScanSimpleData.scans = {} end
+	if not AucAdvancedScanSimpleData.scans[realmName] then AucAdvancedScanSimpleData.scans[realmName] = {} end
+	if not AucAdvancedScanSimpleData.scans[realmName][faction] then AucAdvancedScanSimpleData.scans[realmName][faction] = {image = {}, nextID = {none_after=1}, time=now} end
+	if not AucAdvancedScanSimpleData.scans[realmName][faction].image then AucAdvancedScanSimpleData.scans[realmName][faction].image = {} end
+
+	local scandata = AucAdvancedScanSimpleData.scans[realmName][faction]
+	private.image = scandata.image
+	
 	local list, link, flag
 	local lut = {}
 
@@ -256,11 +306,13 @@ function private.Commit()
 	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
 	for _, data in ipairs(private.curScan) do
 		itemPos = lib.FindItem(data, private.image, lut)
+		flag = data[Const.FLAG] or 0
+		data[Const.FLAG] = bit.band(flag, bit.bnot(Const.FLAG_DIRTY))
 		if (itemPos) then
-			if not private.IsIdentical(private.image[itemPos], data) then
+			data[Const.ID] = private.image[itemPos][Const.ID]
+			if not private.IsIdentical(private.image[itemPos], data) then				
 				if (bit.band(flag, Const.FLAG_UNSEEN) > 0) then
 					-- If it has been recorded as suspended
-					data[Const.FLAG] = bit.bxor(flag, Const.FLAG_UNSEEN)
 					processStats("resume", data, private.image[itemPos])
 					resumeCount = resumeCount + 1
 				else
@@ -274,6 +326,7 @@ function private.Commit()
 			private.image[itemPos] = data
 		else
 			if (processStats("create", data)) then
+				data[Const.ID] = private.GetID(scandata.nextID)
 				table.insert(private.image, data)
 				newCount = newCount + 1
 			else
@@ -295,7 +348,6 @@ function private.Commit()
 				stillpossible = true
 			end
 
-
 			if (stillpossible) then
 				-- Don't delete it yet. It may have been either skipped, or may be awaiting relist
 				suspendCount = suspendCount + 1
@@ -309,6 +361,7 @@ function private.Commit()
 			else
 				-- Auction Time has expired
 				processStats("delete", data)
+				private.ReleaseID(scandata.nextID, data[Const.ID])
 				table.remove(private.image, pos)
 				removeCount = removeCount + 1
 			end
@@ -325,6 +378,12 @@ function private.Commit()
 		lib.Print(("Warning, discrepency in current count: {{%d - %d + %d != %d}}"):format(oldCount, removeCount, newCount, currentCount))
 	end
 
+	local scanTimeSecs = time() - private.scanStartTime
+	local scanTimeMins = floor(scanTimeSecs / 60)
+	scanTimeSecs =  mod(scanTimeSecs, 60)
+	local scanTimeHours = floor(scanTimeMins / 60)
+	scanTimeMins = mod(scanTimeMins, 60)
+	
 	lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
 	lib.Print("  {{"..oldCount.."}} items in DB at start")
 	lib.Print("  {{"..sameCount.."}} unchanged items")
@@ -334,14 +393,21 @@ function private.Commit()
 	lib.Print("  {{"..removeCount.."}} removed items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 	lib.Print("  ({{"..suspendCount.."}} of these are suspended)")
-
-	AucAdvancedScanSimpleLocal.lastScan = {
-		image = private.image,
-		faction = AucAdvanced.GetFaction(),
-		time = time(),
-	}
-	AucAdvancedScanSimpleData.lastScan = AucAdvancedScanSimpleLocal.lastScan
-
+	local scanTime = "  "
+	if (scanTimeHours and scanTimeHours ~= 0) then
+		scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
+	end
+	if (scanTimeMins and scanTimeMins ~= 0) then
+		scanTime = scanTime.."{{"..scanTimeMins.."}} Mins "
+	end
+	if (scanTimeSecs and scanTimeSecs ~= 0) then
+		scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
+	end
+	scanTime = scanTime.."Spent Scanning Auction House"
+	lib.Print(scanTime)
+		
+	scandata.image = private.image
+	private.image = nil
 	private.curScan = nil
 end
 
@@ -400,7 +466,7 @@ function lib.StorePage()
 			local itemData = {
 				itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
 				timeLeft, curTime, name, texture, count, quality, canUse, level,
-				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner
+				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, 0, -1
 			}
 
 			-- If we're going backwards
@@ -440,64 +506,6 @@ end
 
 local curQuery = { empty = true }
 local curResults = {}
-
-function lib.GetResults()
-	if not private.image then return end
-	lib.ButtonMode(true)
-
-	local invalid = false
-	for k,v in pairs(lib.curQuery) do
-		if k ~= "page" and v ~= curQuery[k] then invalid = true end
-	end
-	for k,v in pairs(curQuery) do
-		if k ~= "page" and v ~= lib.curQuery[k] then invalid = true end
-	end
-	if not invalid then return curResults end
-
-	local numResults = #curResults
-	for i=1, numResults do curResults[i] = nil end
-	for k,v in pairs(curQuery) do curQuery[k] = nil end
-	for k,v in pairs(lib.curQuery) do curQuery[k] = v end
-
-	local ptr, max = 1, #private.image
-	while ptr <= max do
-		repeat
-			local data = private.image[ptr] ptr = ptr + 1
-			if (not data) then break end
-			if curQuery.minUseLevel and data[Const.ULEVEL] < curQuery.minUseLevel then break end
-			if curQuery.maxUseLevel and data[Const.ULEVEL] > curQuery.maxUseLevel then break end
-			if curQuery.minItemLevel and data[Const.ILEVEL] < curQuery.minItemLevel then break end
-			if curQuery.maxItemLevel and data[Const.ILEVEL] > curQuery.maxItemLevel then break end
-			if curQuery.class and data[Const.ITYPE] ~= curQuery.class then break end
-			if curQuery.subclass and data[Const.ISUB] ~= curQuery.subclass then break end
-			if curQuery.quality and data[Const.QUALITY] ~= curQuery.quality then break end
-			if curQuery.invType and data[Const.IEQUIP] ~= curQuery.invType then break end
-			if curQuery.seller and data[Const.SELLER] ~= curQuery.seller then break end
-			if curQuery.name then
-				local name = data[Const.NAME]
-				if not (name and name:lower():find(curQuery.name:lower(), 1, true)) then break end
-			end
-
-			local stack = data[Const.COUNT]
-			local nextBid = data[Const.PRICE]
-			local buyout = data[Const.BUYOUT]
-			if curQuery.perItem and stack > 1 then
-				nextBid = math.ceil(nextBid / stack)
-				buyout = math.ceil(buyout / stack)
-			end
-			if curQuery.minStack and stack < curQuery.minStack then break end
-			if curQuery.maxStack and stack > curQuery.maxStack then break end
-			if curQuery.minBid and nextBid < curQuery.minBid then break end
-			if curQuery.maxBid and nextBid > curQuery.maxBid then break end
-			if curQuery.minBuyout and buyout < curQuery.minBuyout then break end
-			if curQuery.maxBuyout and buyout > curQuery.maxBuyout then break end
-
-			-- If we're still here, then we've got a winner
-			table.insert(curResults, data)
-		until true
-	end
-	return curResults
-end
 
 lib.Hook = {}
 lib.Hook.CanSendAuctionQuery = CanSendAuctionQuery

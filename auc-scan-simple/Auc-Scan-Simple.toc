@@ -5,7 +5,6 @@
 ## LoadOnDemand: 1
 ## Dependencies: Auc-Advanced
 ## SavedVariables: AucAdvancedScanSimpleData
-## SavedVariablesPerCharacter: AucAdvancedScanSimpleLocal
 ##
 ## Version: <%version%>
 ## Revision: $Id$

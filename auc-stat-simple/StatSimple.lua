@@ -59,7 +59,6 @@ function lib.GetName()
 end
 
 function lib.CommandHandler(command, ...)
-	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
@@ -69,7 +68,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "push}} - force the", myFaction, libName, "daily stats to archive (start a new day)")
 	elseif (command == "clear") then
 		print("Clearing all stats for {{", myFaction, "}}")
-		data[myFaction] = nil
+		private.ClearData()
 	elseif (command == "push") then
 		print("Archiving {{", myFaction, "}} daily stats and starting a new day")
 		private.PushStats(myFaction)
@@ -77,7 +76,6 @@ function lib.CommandHandler(command, ...)
 end
 
 function lib.Processor(callbackType, ...)
-	if (not data) then private.makeData() end
 	if (callbackType == "tooltip") then
 		private.ProcessTooltip(...)
 	elseif (callbackType == "load") then
@@ -88,7 +86,6 @@ end
 
 lib.ScanProcessors = {}
 function lib.ScanProcessors.create(operation, itemData, oldData)
-	if (not data) then private.makeData() end
 	-- This function is responsible for processing and storing the stats after each scan
 	-- Note: itemData gets reused over and over again, so do not make changes to it, or use
 	-- it in places where you rely on it. Make a deep copy of it if you need it after this
@@ -98,51 +95,44 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
 	buyout = buyout / itemData.stackSize
-
+	
 	-- In this case, we're only interested in the initial create, other
-	-- stats modules may wish to do more fancy stuff on the other operations
-	-- however for this simple case, it doesn't make sense.
-	if (operation == "create") then
-		-- Get the signature of this item and find it's stats.
-		local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
-		if (factor ~= 0) then property = property.."x"..factor end
-		local faction = AucAdvanced.GetFaction()
-		if not data[faction] then data[faction] = {} end
-		if not data[faction].daily then data[faction].daily = { created = time() } end
-		if not data[faction].daily[itemId] then data[faction].daily[itemId] = "" end
-		local stats = private.UnpackStats(data[faction].daily[itemId])
-		if not stats[property] then stats[property] = { 0, 0 } end
-		stats[property][1] = stats[property][1] + buyout
-		stats[property][2] = stats[property][2] + 1
-		data[faction].daily[itemId] = private.PackStats(stats)
-	elseif (operation == "delete") then
-	elseif (operation == "update") then
-	elseif (operation == "leave") then
-	end
+	-- Get the signature of this item and find it's stats.
+	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
+	if (factor ~= 0) then property = property.."x"..factor end
+
+	local data = private.GetPriceData()
+	if not data.daily then data.daily = { created = time() } end
+	if not data.daily[itemId] then data.daily[itemId] = "" end
+	local stats = private.UnpackStats(data.daily[itemId])
+	if not stats[property] then stats[property] = { 0, 0 } end
+	stats[property][1] = stats[property][1] + buyout
+	stats[property][2] = stats[property][2] + 1
+	data.daily[itemId] = private.PackStats(stats)
 end
 
-function lib.GetPrice(hyperlink, faction)
+function lib.GetPrice(hyperlink, faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
 
 	if not faction then faction = AucAdvanced.GetFaction() end
-
-	local faction = AucAdvanced.GetFaction()
-	if not data[faction] then return end
+	
+	local data = private.GetPriceData(faction, realm)
+	if not data then return end
 
 	local dayTotal, dayCount, dayAverage = 0,0,0
 	local seenDays, seenCount, avg3, avg7, avg14 = 0,0,0,0,0
 
-	if data[faction].daily and data[faction].daily[itemId] then
-		local stats = private.UnpackStats(data[faction].daily[itemId])
+	if data.daily and data.daily[itemId] then
+		local stats = private.UnpackStats(data.daily[itemId])
 		if stats[property] then
 			dayTotal, dayCount = unpack(stats[property])
 			dayAverage = dayTotal/dayCount
 		end
 	end
-	if data[faction].means and data[faction].means[itemId] then
-		local stats = private.UnpackStats(data[faction].means[itemId])
+	if data.means and data.means[itemId] then
+		local stats = private.UnpackStats(data.means[itemId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14 = unpack(stats[property])
 		end
@@ -155,9 +145,7 @@ function lib.GetPriceColumns()
 end
 
 function lib.OnLoad(addon)
-	if (addon == "auc-stat-simple") then
-		private.makeData()
-	end
+
 end
 
 
@@ -200,33 +188,21 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	end
 end
 
-function private.DataLoaded()
-	-- This function gets called when the data is first loaded. You may do any required maintenence
-	-- here before the data gets used.
-
-	for faction, stats in pairs(data) do
-		if not stats.daily then stats.daily = { created = time() } end
-		if not stats.means then stats.means = {} end
-		if stats.daily.created and time() - stats.daily.created > 3600*16 then
-			-- This data is more than 16 hours old, we classify this as "yesterday's data"
-			private.PushStats(faction)
-		end
-	end
-end
-
 -- This is a function which migrates the data from a daily average to the
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
-function private.PushStats(faction)
+function private.PushStats(faction, realm)
 	local dailyAvg
-	if not data[faction] then return end
-	if not data[faction].daily then return end
-	if not data[faction].means then data[faction].means = {} end
+	
+	local data = private.GetPriceData(faction, realm)
+	if not data then return end
+	if not data.daily then return end
+	if not data.means then data.means = {} end
 
 	local pdata
-	for itemId, stats in pairs(data[faction].daily) do
+	for itemId, stats in pairs(data.daily) do
 		if (itemId ~= "created") then
 			pdata = private.UnpackStats(stats)
-			fdata = private.UnpackStats(data[faction].means[itemId] or "")
+			fdata = private.UnpackStats(data.means[itemId] or "")
 			for property, info in pairs(pdata) do
 				dailyAvg = info[1] / info[2]
 				if not fdata[property] then
@@ -245,17 +221,10 @@ function private.PushStats(faction)
 					fdata[property][5] = ("%0.01f"):format(((fdata[property][5] * 13) + dailyAvg)/14)
 				end
 			end
-			data[faction].means[itemId] = private.PackStats(fdata)
+			data.means[itemId] = private.PackStats(fdata)
 		end
 	end
-	data[faction].daily = { created = time() }
-end
-
-function private.makeData()
-	if data then return end
-	if (not AucAdvancedStatSimpleData) then AucAdvancedStatSimpleData = {} end
-	data = AucAdvancedStatSimpleData
-	private.DataLoaded()
+	data.daily = { created = time() }
 end
 
 function private.UnpackStatIter(data, ...)
@@ -275,6 +244,7 @@ function private.UnpackStatIter(data, ...)
 		end
 	end
 end
+
 function private.UnpackStats(dataItem)
 	local data = {}
 	private.UnpackStatIter(data, strsplit(",", dataItem))
@@ -292,3 +262,72 @@ function private.PackStats(data)
 end
 
 
+-- The following Functions are the routines used to access the permanent store data
+function private.UpgradeDb()
+	if (not AucAdvancedStatSimpleData.Version) then
+		local newData = {Version = "1.0", RealmData = {}}
+		for x, y in pairs(AucAdvancedStatSimpleData) do
+			local t = {strsplit(x, "-")}
+			local realm, faction
+			for _, z in ipairs(t) do
+				if (faction) then 
+					if (realm) then realm = realm.."-"..faction 
+					else realm = faction end
+				end
+				faction = z
+			end
+			if (not newData.RealmData[realm]) then newData.RealmData[realm] = {} end
+			newData.RealmData[realm][faction] = y
+		end
+		AucAdvancedStatSimpleData = newData
+	end
+end
+
+local AAStatSimpleData
+
+function private.LoadData()
+	if (AAStatSimpleData) then return end
+	if (not AucAdvancedStatSimpleData) then AucAdvancedStatSimpleData = {Version='1.0', RealmData = {}} end
+	private.UpgradeDb()
+	AAStatSimpleData = AucAdvancedStatSimpleData
+	private.DataLoaded()
+end
+
+function private.ClearData(faction, realmName)
+	if (not AAStatSimpleData) then private.LoadData() end
+	faction = faction or AucAdvanced.GetFaction()
+	if (realmName) then
+		print("Clearing all stats for {{"..myFaction.."}}")	
+	else
+		realmName = GetRealmName()
+		print("Clearing all stats for {{"..myFaction.."}} on {{"..realmName.."}}")
+	end
+	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][myFaction]) then
+		AAStatSimpleData.RealmData[realmName][myFaction] = nil
+	end
+end
+
+function private.GetPriceData(faction, realm)
+	if (not AAStatSimpleData) then private.LoadData() end
+	faction = faction or AucAdvanced.GetFaction()
+	realm = realm or GetRealmName()
+	if (not AAStatSimpleData.RealmData[realm]) then AAStatSimpleData.RealmData[realm] = {} end
+	if (not AAStatSimpleData.RealmData[realm][faction]) then AAStatSimpleData.RealmData[realm][faction] = {} end
+	return AAStatSimpleData.RealmData[realm][faction]
+end
+
+function private.DataLoaded()
+	if (not AAStatSimpleData) then return end
+	-- This function gets called when the data is first loaded. You may do any required maintenence
+	-- here before the data gets used.
+	for realm, realmdata in pairs(AAStatSimpleData.RealmData) do
+		for faction, stats in pairs(realmdata) do
+			if not stats.daily then stats.daily = { created = time() } end
+			if not stats.means then stats.means = {} end
+			if stats.daily.created and time() - stats.daily.created > 3600*16 then
+				-- This data is more than 16 hours old, we classify this as "yesterday's data"
+				private.PushStats(faction, realm)
+			end		
+		end	
+	end
+end

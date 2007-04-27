@@ -59,6 +59,22 @@ end
 function lib.GetFaction() 
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
+	local factionGroup = lib.GetFactionGroup()
+	if not factionGroup then return end
+	
+	if (factionGroup == "Neutral") then
+		AucAdvanced.cutRate = 0.15
+		AucAdvanced.depositRate = 0.25
+	else
+		AucAdvanced.cutRate = 0.05
+		AucAdvanced.depositRate = 0.05
+	end
+	AucAdvanced.curFaction = realmName.."-"..factionGroup
+	return AucAdvanced.curFaction, realmName, factionGroup
+end
+
+function lib.GetFactionGroup()
+	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
 	
 	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
@@ -71,17 +87,7 @@ function lib.GetFaction()
 			factionGroup = "Neutral"
 		end
 	end
-
-	if not factionGroup then return end
-
 	AucAdvancedConfig.factions[currentZone] = factionGroup
-	if (factionGroup == "Neutral") then
-		AucAdvanced.cutRate = 0.15
-		AucAdvanced.depositRate = 0.25
-	else
-		AucAdvanced.cutRate = 0.05
-		AucAdvanced.depositRate = 0.05
-	end
-	AucAdvanced.curFaction = realmName.."-"..factionGroup
-	return AucAdvanced.curFaction, realmName, factionGroup
+	return factionGroup
 end
+
