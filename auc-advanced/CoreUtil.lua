@@ -83,5 +83,5 @@ function lib.GetFaction()
 		AucAdvanced.depositRate = 0.05
 	end
 	AucAdvanced.curFaction = realmName.."-"..factionGroup
-	return AucAdvanced.curFaction
+	return AucAdvanced.curFaction, realmName, factionGroup
 end
