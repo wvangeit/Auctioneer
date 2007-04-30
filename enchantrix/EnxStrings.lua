@@ -472,6 +472,7 @@ EnchantrixLocalizations = {
 		["ArgSpellname"]	= "Entzaubern";
 		["BarkerOpening"]	= "Verkaufe Verzauberungen:";
 		["Darnassus"]	= "Darnassus";
+		["Enchanting"]	= "Verzaubern";
 		["Ironforge"]	= "Eisenschmiede";
 		["OneLetterGold"]	= "G";
 		["OneLetterSilver"]	= "S";
@@ -556,13 +557,15 @@ EnchantrixLocalizations = {
 		["FrmtPctlessDone"]	= "Die Auktionssuche (Prozent unter Sofortkauf) ist abgeschlossen.";
 		["FrmtPctlessHeader"]	= "Sofortkauf-Auktionen mit %d%% Einsparung auf durchschnittlichen Entzauberungswert:";
 		["FrmtPctlessLine"]	= "%s, Wert bei: %s, SK: %s, Ersparnis: %s, %s weniger";
-		["FrmtPctlessSkipped"]	= "%d Auktionen übersprungen, da Gewinngrenze von (%s) Prozen unterschritten";
+		["FrmtPctlessSkillSkipped"]	= "%d Auktionen übersprungen, da Skilllevel von (%s) unterschritten";
+		["FrmtPctlessSkipped"]	= "%d Auktionen übersprungen, da Gewinngrenze von (%s) Prozent unterschritten";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker Preis (%d%% Gewinn)";
 		["FrmtCounts"]	= "(Basis=%d, Alt=%d, Neu=%d)";
 		["FrmtDisinto"]	= "Mögliche Entzauberung zu:";
 		["FrmtFound"]	= "%s wird entzaubert zu:";
+		["FrmtFoundNotDisenchant"]	= "%s kann nicht entzaubert werden";
 		["FrmtNoDEPrediction"]	= "Keine Entzauberungsdaten verfügbar";
 		["FrmtPriceEach"]	= "(%s/stk)";
 		["FrmtSuggestedPrice"]	= "vorgeschlagener Preis";
@@ -1417,6 +1420,7 @@ EnchantrixLocalizations = {
 		["ArgSpellname"]	= "마력추출";
 		["BarkerOpening"]	= "마법부여 판매:";
 		["Darnassus"]	= "다르나서스";
+		["Enchanting"]	= "마법 부여";
 		["Ironforge"]	= "아이언포지";
 		["OneLetterGold"]	= "골드";
 		["OneLetterSilver"]	= "실버";
@@ -1507,7 +1511,8 @@ EnchantrixLocalizations = {
 		["FrmtBarkerPrice"]	= "가격 알림 (%d%% 마진)";
 		["FrmtCounts"]	= "(기준=%d, 과거=%d, 신규=%d)";
 		["FrmtDisinto"]	= "마력 추출:";
-		["FrmtFound"]	= "%s|1이;가; 마력추출되는 아이템: ";
+		["FrmtFound"]	= "%s|1이;가; 마력 추출되는 아이템: ";
+		["FrmtFoundNotDisenchant"]	= "%s는 마력 추출이 불가능한 아이템입니다.";
 		["FrmtNoDEPrediction"]	= "마력추출 예측이 불가능합니다.";
 		["FrmtPriceEach"]	= "(%s 개)";
 		["FrmtSuggestedPrice"]	= "제안 가격:";
