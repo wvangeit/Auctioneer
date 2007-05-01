@@ -228,21 +228,31 @@ function relevelFrames(myLevel, ...)
 end
 
 local function craftUILoaded()
+
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
+	local useFrame = CraftFrame;
+	
+	if (ATSWFrame ~= nil) then
+		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
+		useFrame = ATSWFrame;
+	end
 
-	--Enchantrix_BarkerButton:SetParent(CraftFrame);
-	--Enchantrix_BarkerButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
+	--Enchantrix_BarkerButton:SetParent(useFrame);
+	--Enchantrix_BarkerButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -55 );
 
-	Enchantrix_BarkerDisplayButton:SetParent(CraftFrame);
+	Enchantrix_BarkerDisplayButton:SetParent(useFrame);
 	--Enchantrix_BarkerDisplayButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
-	Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", CraftFrame, "TOPRIGHT", -185, -55 );
+	Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -55 );
 
-	Enchantrix_BarkerOptions_Frame:SetParent(CraftFrame);
-	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", CraftFrame, "TOPRIGHT");
+	Enchantrix_BarkerOptions_Frame:SetParent(useFrame);
+	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", useFrame, "TOPRIGHT");
 	relevelFrame(Enchantrix_BarkerOptions_Frame)
 end
 
 function EnchantrixBarker_OnLoad()
+	if (ATSWFrame ~= nil) then
+		Stubby.RegisterAddOnHook("ATSWFrame", "Enchantrix", craftUILoaded)
+	end
 	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "Enchantrix", craftUILoaded)
 end
 

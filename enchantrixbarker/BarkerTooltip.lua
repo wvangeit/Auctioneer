@@ -30,6 +30,9 @@
 EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctioneer/trunk5/enchantrix/EnxTooltip.lua $", "$Rev: 1605 $")
 
 function enchantTooltip(funcVars, retVal, frame, name, link)
+
+-- currently do all of this inside Enchantrix
+--[[
 	local embed = Barker.Settings.GetSetting('embed');
 
 	local craftIndex
@@ -145,6 +148,8 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 		EnhTooltip.AddLine(_BARKLOC('FrmtWarnNoPrices'))
 		EnhTooltip.LineColor(0.6,0.6,0.1)
 	end
+]]
+
 end
 
 
