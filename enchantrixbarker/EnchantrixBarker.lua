@@ -44,18 +44,18 @@ local categories = { --TODO: Localize
 	Chest = {search = "Chest", print = "Chest" },
 	Cloak = {search = "Cloak", print = "Cloak" },
 	TwoHanded = {search = "2H", print = "2H Weapon"},
-	AnyWeapon = {search = "Enchant Weapon", print = "Any Weapon" }
+	['factor_item.weapon'] = {search = "Enchant Weapon", print = "Any Weapon" }
 };
 
 local print_order = { --TODO: Localize
-	'Bracer',
+	'factor_item.bracer',
 	'Gloves',
 	'Boots',
 	'Chest', 
 	'Cloak', 
 	'Shield', 
 	'TwoHanded', 
-	'AnyWeapon'
+	'factor_item.weapon'
 };
 
 local attributes = { --TODO: Localize
@@ -120,6 +120,7 @@ local short_location = {
 	[_BARKLOC('Shattrath')] = _BARKLOC('ShortShattrath')
 };
 
+--[[
 local config_defaults = {
 	lowest_price = 5000,
 	sweet_price = 50000,
@@ -157,6 +158,7 @@ local config_defaults = {
 	factor_stat = 40,
 	barker_chan_default = _BARKLOC('ChannelDefault')
 };
+]]
 
 local relevelFrame;
 local relevelFrames;
@@ -200,7 +202,7 @@ end
 function Enchantrix_BarkerOnClick()
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName("Trade - City") --TODO: Localize
-	Barker.Util.DebugPrintQuick("Attempting to send barker "..barker.." Trade Channel ID "..id)
+	Barker.Util.DebugPrintQuick("Attempting to send barker ", barker, " Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
@@ -278,7 +280,7 @@ end
 function Enchantrix_BarkerOptions_TestButton_OnClick()
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName("Trade - City") --TODO: Localize
-	Barker.Util.DebugPrintQuick("Attempting to send test barker "..barker.."Trade Channel ID "..id)
+	Barker.Util.DebugPrintQuick("Attempting to send test barker ", barker, "Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
