@@ -688,6 +688,7 @@ function getTooltipWidth(enhTooltip)
 		end
 	end
 
+	local lineCount = enhTooltip.lineCount
 	for currentLine, index in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
 		if (currentLine.myMoney) then
 			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
