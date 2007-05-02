@@ -36,29 +36,39 @@ EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctio
 
 local priorityList = {};
 
-local categories = { --TODO: Localize
-	Bracer = {search = "Bracer", print = "Bracer" },
-	Gloves = {search = "Gloves", print = "Gloves" },
-	Boots = {search = "Boots", print = "Boots" },
-	Shield = {search = "Shield", print = "Shield" },
-	Chest = {search = "Chest", print = "Chest" },
-	Cloak = {search = "Cloak", print = "Cloak" },
-	TwoHanded = {search = "2H", print = "2H Weapon"},
+-- this is used to search the trade categories
+-- the key is our internal value
+-- search is the string to look for
+-- print is what we print for the user
+ --TODO: Localize
+local categories = {
+	['factor_item.bracer'] = {search = "Bracer", print = "Bracer" },
+	['factor_item.gloves'] = {search = "Gloves", print = "Gloves" },
+	['factor_item.boots'] = {search = "Boots", print = "Boots" },
+	['factor_item.shield'] = {search = "Shield", print = "Shield" },
+	['factor_item.chest'] = {search = "Chest", print = "Chest" },
+	['factor_item.cloak'] = {search = "Cloak", print = "Cloak" },
+	['factor_item.2hweap'] = {search = "2H", print = "2H Weapon"},
 	['factor_item.weapon'] = {search = "Enchant Weapon", print = "Any Weapon" }
 };
 
-local print_order = { --TODO: Localize
+-- this is used internally only, to determine the order of enchants shown
+local print_order = {
 	'factor_item.bracer',
-	'Gloves',
-	'Boots',
-	'Chest', 
-	'Cloak', 
-	'Shield', 
-	'TwoHanded', 
+	'factor_item.gloves',
+	'factor_item.boots',
+	'factor_item.chest', 
+	'factor_item.cloak', 
+	'factor_item.shield', 
+	'factor_item.2hweap', 
 	'factor_item.weapon'
 };
 
-local attributes = { --TODO: Localize
+-- these are used to search the craft listing
+-- the order of items is important to get the longest match (ie: "resistance to shadow" before "resistance")
+ --TODO: Localize
+ -- TODO: combine attributes and short_attributes into a single table
+local attributes = {
 	'intellect',
 	'stamina',
 	'spirit',
@@ -84,7 +94,9 @@ local attributes = { --TODO: Localize
 	'defense'
 };
 
-local short_attributes = { --TODO: Localize
+-- this is what we print when barking, order MUST match attributes
+ --TODO: Localize
+local short_attributes = {
 	'INT',
 	'STA',
 	'SPI',
@@ -117,45 +129,13 @@ local short_location = {
 	[_BARKLOC('StormwindCity')] = _BARKLOC('ShortStormwind'),
 	[_BARKLOC('Darnassus')] = _BARKLOC('ShortDarnassus'),
 	[_BARKLOC('Ironforge')] = _BARKLOC('ShortIronForge'),
-	[_BARKLOC('Shattrath')] = _BARKLOC('ShortShattrath')
+	[_BARKLOC('Shattrath')] = _BARKLOC('ShortShattrath'),
+	[_BARKLOC('SilvermoonCity')] = _BARKLOC('ShortSilvermoon'),
+	[_BARKLOC('TheExodar')] = _BARKLOC('ShortExodar'),
 };
 
 --[[
 local config_defaults = {
-	lowest_price = 5000,
-	sweet_price = 50000,
-	high_price = 500000,
-	profit_margin = 10,
-	highest_profit = 100000,
-	randomise = 10,
-	AnyWeapon = 100,
-	TwoHanded = 90,
-	Bracer = 70,
-	Gloves = 70,
-	Boots = 70,
-	Chest = 70,
-	Cloak = 70,
-	Shield = 70,
-	INT = 90,
-	STA = 70,
-	AGI = 70,
-	STR = 70,
-	SPI = 45,
-	["all stats"] = 75,
-	["all res"] = 55,
-	armour = 65,
-	["fire res"] = 85,
-	["frost res"] = 85,
-	["nature res"] = 85,
-	["shadow res"] = 85,
-	mana = 35,
-	health = 40,
-	DMG = 90,
-	DEF = 60,
-	other = 70,
-	factor_price = 20,
-	factor_item = 40,
-	factor_stat = 40,
 	barker_chan_default = _BARKLOC('ChannelDefault')
 };
 ]]
@@ -1130,8 +1110,11 @@ function EnchantrixBarker_ResetBarkerString()
 end
 
 function EnchantrixBarker_BarkerGetZoneText()
-	--Barker.Util.ChatPrint(GetZoneText());
-	return short_location[GetZoneText()];
+	local result = short_location[GetZoneText()];
+	if (not result) then
+		Barker.Util.DebugPrintQuick("Attempting to use barker in zone", GetZoneText() )
+	end
+	return result;
 end
 
 function EnchantrixBarker_AddEnchantToBarker( enchant )

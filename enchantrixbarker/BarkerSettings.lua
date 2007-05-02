@@ -119,6 +119,7 @@ local settingDefaults = {
 	['barker.sweet_price'] = 50000,		-- GSC
 	['barker.high_price'] = 500000,		-- GSC
 	['barker.highest_profit'] = 100000,	-- GSC
+	
 	['barker.factor_item'] = 40,
 	['barker.factor_item.2hweap'] = 90,
 	['barker.factor_item.weapon'] = 100,
@@ -151,7 +152,8 @@ local settingDefaults = {
 -- categories
 -- attributes
 -- short_attributes, needs mapping to factor_stat settings
-	
+
+--[[
 	['barker.AnyWeapon'] = 100,
 	['barker.TwoHanded'] = 90,
 	['barker.Bracer'] = 70,
@@ -160,6 +162,7 @@ local settingDefaults = {
 	['barker.Chest'] = 70,
 	['barker.Cloak'] = 70,
 	['barker.Shield'] = 70,
+]]
 	['barker.INT'] = 90,
 	['barker.STA'] = 70,
 	['barker.AGI'] = 70,
@@ -176,6 +179,7 @@ local settingDefaults = {
 	['barker.health'] = 40,
 	['barker.DMG absorb'] = 90,
 	['barker.DEF'] = 60,
+	
 	['barker.other'] = 70,
 	['barker.factor_price'] = 20,
 }
