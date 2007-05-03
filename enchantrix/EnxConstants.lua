@@ -70,6 +70,78 @@ const.StaticPrices = {
 	[11137] =   5500, -- Vision Dust
 	[11083] =   3000, -- Soul Dust
 	[10940] =   1250, -- Strange Dust
+
+	[3356] =     800, -- Kingsblood
+	[3371] =      20, -- Empty Vial
+	[3372] =     200, -- Leaded Vial
+	[3819] =    4275, -- Wintersbite
+	[3829] =   28500, -- Frost Oil
+	[4470] =      38, -- Simple Wood
+	[5500] =   24000, -- Iridescent Pearl
+	[5637] =    7950, -- Large Fang
+	[6037] =   10000, -- Truesilver Bar
+	[6048] =    9000, -- Shadow Protection Potion
+	[6217] =     124, -- Copper Rod
+	[6370] =    4990, -- Blackmouth Oil
+	[6371] =    5000, -- Fire Oil
+	[7067] =    9000, -- Elemental Earth
+	[7075] =   52664, -- Core of Earth
+	[7077] =   50000, -- Heart of Fire
+	[7078] =   98823, -- Essence of Fire
+	[7079] =    7350, -- Globe of Water
+	[7080] =   79900, -- Essence of Water
+	[7081] =   49000, -- Breath of Wind
+	[7082] =  160000, -- Essence of Air
+	[7392] =    3500, -- Green Whelp Scale
+	[7909] =   20000, -- Aquamarine
+	[7971] =   14700, -- Black Pearl
+	[7972] =    2999, -- Ichor of Undeath
+	[8153] =    9950, -- Wildvine
+	[8170] =    3750, -- Rugged Leather
+	[8838] =    4000, -- Sungrass
+	[9224] =   39500, -- Elixir of Demonslaying
+	[11128] =  29500, -- Golden Rod
+	[11144] =  40000, -- Truesilver Rod
+	[11291] =   4500, -- Star Wood
+	[11382] = 150000, -- Blood of the Mountain
+	[12359] =  10000, -- Thorium Bar
+	[12803] =  35000, -- Living Essence
+	[12808] =  67500, -- Essence of Undeath
+	[12811] = 420000, -- Righteous Orb
+	[13467] =   5875, -- Icecap
+	[13926] =  15500, -- Golden Pearl
+	[16206] = 620000, -- Arcanite Rod
+	[17034] =    200, -- Maple Seed
+	[17035] =    400, -- Stranglethorn Seed
+
+-- TODO - other enchant reagents?
+--[[
+Firebloom
+Imbued Vial
+Guardian Stone
+Black Diamond
+Black Lotus
+Larval Acid
+Iron Ore
+Purple Lotus
+Crystal Vial
+Major Healing Potion
+Major Mana Potion
+Primal Earth
+Netherbloom
+Primal Life
+Primal Mana
+Primal Fire
+Primal Air
+Primal Earth
+Primal Water
+Nightmare Vine
+Adamantite Rod
+Fel Iron Rod
+Primal Shadow
+Eternium Rod
+]]
+
 }
 
 const.DUST = 1
