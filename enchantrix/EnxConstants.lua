@@ -71,12 +71,14 @@ const.StaticPrices = {
 	[11083] =   3000, -- Soul Dust
 	[10940] =   1250, -- Strange Dust
 
+	[2772] =    3000, -- Iron Ore
 	[3356] =     800, -- Kingsblood
 	[3371] =      20, -- Empty Vial
 	[3372] =     200, -- Leaded Vial
 	[3819] =    4275, -- Wintersbite
 	[3829] =   28500, -- Frost Oil
 	[4470] =      38, -- Simple Wood
+	[4625] =    3125, -- Firebloom
 	[5500] =   24000, -- Iridescent Pearl
 	[5637] =    7950, -- Large Fang
 	[6037] =   10000, -- Truesilver Bar
@@ -98,49 +100,42 @@ const.StaticPrices = {
 	[7972] =    2999, -- Ichor of Undeath
 	[8153] =    9950, -- Wildvine
 	[8170] =    3750, -- Rugged Leather
+	[8831] =    3529, -- Purple Lotus
 	[8838] =    4000, -- Sungrass
+	[8925] =    2500, -- Crystal Vial
 	[9224] =   39500, -- Elixir of Demonslaying
 	[11128] =  29500, -- Golden Rod
 	[11144] =  40000, -- Truesilver Rod
 	[11291] =   4500, -- Star Wood
 	[11382] = 150000, -- Blood of the Mountain
+	[11754] =   3135, -- Black Diamond
 	[12359] =  10000, -- Thorium Bar
 	[12803] =  35000, -- Living Essence
 	[12808] =  67500, -- Essence of Undeath
+	[12809] =  58677, -- Guardian Stone
 	[12811] = 420000, -- Righteous Orb
+	[13444] =  16666, -- Major Mana Potion
+	[13446] =  10000, -- Major Healing Potion
 	[13467] =   5875, -- Icecap
+	[13468] = 180000, -- Black Lotus
 	[13926] =  15500, -- Golden Pearl
 	[16206] = 620000, -- Arcanite Rod
 	[17034] =    200, -- Maple Seed
 	[17035] =    400, -- Stranglethorn Seed
-
--- TODO - other enchant reagents?
---[[
-Firebloom
-Imbued Vial
-Guardian Stone
-Black Diamond
-Black Lotus
-Larval Acid
-Iron Ore
-Purple Lotus
-Crystal Vial
-Major Healing Potion
-Major Mana Potion
-Primal Earth
-Netherbloom
-Primal Life
-Primal Mana
-Primal Fire
-Primal Air
-Primal Earth
-Primal Water
-Nightmare Vine
-Adamantite Rod
-Fel Iron Rod
-Primal Shadow
-Eternium Rod
-]]
+	[18256] =  30000, -- Imbued Vial
+	[18512] =  20710, -- Larval Acid
+	[21884] = 294500, -- Primal Fire
+	[21885] = 239900, -- Primal Water
+	[21886] = 140000, -- Primal Life
+	[22451] = 300000, -- Primal Air
+	[22452] =  55000, -- Primal Earth
+	[22456] =  17525, -- Primal Shadow
+	[22457] = 220000, -- Primal Mana
+	[22791] =  19090, -- Netherbloom
+	[22792] =  18362, -- Nightmare Vine
+	[25843] = 150000, -- Fel Iron Rod
+	[25844] = 185000, -- Adamantite Rod
+	[25845] = 450000, -- Eternium Rod
 
 }
 
