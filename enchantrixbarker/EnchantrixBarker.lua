@@ -1087,49 +1087,12 @@ end
 
 function Enchantrix_GetReagentHSP( itemLink )
 
+	if ((not Enchantrix) or (not Enchantrix.Util)) then
+		Barker.Util.ChatPrint(_BARKLOC("MesgNotloaded"));
+		return 0;
+	end
+
 	local hsp, median, market, prices = Enchantrix.Util.GetReagentPrice( itemLink );
-
---[[
-	local itemID = Barker.Util.GetItemIdFromLink(itemLink);
-	local itemKey = ("%s:0:0"):format(itemID);
-
-	-- Work out what version if any of auctioneer is installed
-	local auctVerStr;
-	if (not Auctioneer) then
-		auctVerStr = AUCTIONEER_VERSION or "0.0.0";
-	else
-		auctVerStr = AUCTIONEER_VERSION or Auctioneer.Version or "0.0.0";
-	end
-	local auctVer = Barker.Util.Split(auctVerStr, ".");
-	local major = tonumber(auctVer[1]) or 0;
-	local minor = tonumber(auctVer[2]) or 0;
-	local rev = tonumber(auctVer[3]) or 0;
-	if (auctVer[3] == "DEV") then rev = 0; minor = minor + 1; end
-	local hsp = nil;
-
-	if (major == 3 and minor == 0 and rev <= 11) then
-		--Barker.Util.ChatPrint("Calling Auctioneer_GetHighestSellablePriceForOne");
-
-		if (rev == 11) then
-			hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false, Auctioneer_GetAuctionKey());
-		else
-			if (Auctioneer_GetHighestSellablePriceForOne) then
-				hsp = Auctioneer_GetHighestSellablePriceForOne(itemKey, false);
-			elseif (getHighestSellablePriceForOne) then
-				hsp = getHighestSellablePriceForOne(itemKey, false);
-			end
-		end
-	elseif (major == 3 and (minor > 0 and minor <= 3) and (rev > 11 and rev < 675)) then
-		--Barker.Util.ChatPrint("Calling GetHSP");
-		hsp = Auctioneer_GetHSP(itemKey, Auctioneer_GetAuctionKey());
-	elseif (major >= 3 and minor >= 3 and (rev >= 675 or (rev >= 0 and rev <=5))) then
-		--Barker.Util.ChatPrint("Calling Statistic.GetHSP");
-		hsp = Auctioneer.Statistic.GetHSP(itemKey, Auctioneer.Util.GetAuctionKey());
-	else
-		Barker.Util.ChatPrint("Calling Nothing: (Auctioneer not loaded?) "..major..", "..minor..", "..rev);
-	end
-]]
-
 
 	if hsp == nil then
 		hsp = 0;
