@@ -515,6 +515,10 @@ BarkerLocalizations = {
 		TextGeneral	= "Allgemein";
 		ThunderBluff	= "Donnerfels";
 		Undercity	= "Unterstadt";
+		["ShortExodar"]	= "Exo";
+		["ShortSilvermoon"]	= "SM";
+		["SilvermoonCity"]	= "Silbermond";
+		["TheExodar"]	= "Exodar";
 
 
 		-- Section: Generic Messages
@@ -718,12 +722,63 @@ BarkerLocalizations = {
 		TheExodar = "The Exodar";
 		ThunderBluff	= "Thunder Bluff";
 		Undercity	= "Undercity";
+		Bracer		= "Bracer";
+		Gloves		= "Gloves";
+		Boots		= "Boots";
+		Shield		= "Shield";
+		Chest		= "Chest";
+		Cloak		= "Cloak";
+		TwoHandWeapon	= "2H Weapon";
+		AnyWeapon		= "Any Weapon";
+		Weapon		= "Weapon";
+		Ring		= "Ring";
+		
+		["EnchSearchCrusader"] = 'heals for [0-9]+ to [0-9]+ and increases strength';
+		["EnchSearchIntellect"] = 'intellect';
+		["EnchSearchStamina"] = 'stamina';
+		["EnchSearchSpirit"] = 'spirit';
+		["EnchSearchStrength"] = 'strength';
+		["EnchSearchAgility"] = 'agility';
+		["EnchSearchFireRes"] = 'fire resistance';
+		["EnchSearchResFire"] = 'resistance to fire';
+		["EnchSearchFrostRes"] = 'frost resistance';
+		["EnchSearchNatureRes"] = 'nature resistance';
+		["EnchSearchResShadow"] = 'resistance to shadow';
+		["EnchSearchAllStats"] = 'all stats';
+		["EnchSearchMana"] = 'mana';
+		["EnchSearchHealth"] = 'health';
+		["EnchSearchArmor"] = 'armor';
+		["EnchSearchDMGAbsorption"] = 'absorption';
+		["EnchSearchDamage1"] = 'points? of damage';
+		["EnchSearchDamage2"] = '\+[0-9]+ damage';
+		["EnchSearchDefense"] = 'defense';
+		["EnchSearchAllResistance1"] = 'resistance to all schools of magic';
+		["EnchSearchAllResistance2"] = 'resistance to all magic schools';
+		["EnchSearchAllResistance3"] = 'all resistances';
 
 
 		-- Section: Generic Messages
 		FrmtCredit	= "  (go to http://enchantrix.org/ to share your data)";
 		FrmtWelcome	= "Enchantrix v%s loaded";
 		MesgAuctVersion	= "Enchantrix requires Auctioneer version 3.4 or higher. Some features will be unavailable until you update your Auctioneer installation.";
+		["AGI"]	= "AGI";
+		["AllStats"]	= "all stats";
+		["Crusader"]	= "Crusader";
+		["DEF"]	= "DEF";
+		["DMG"]	= "DMG";
+		["DMGAbsorb"]	= "DMG absorb";
+		["FireRes"]	= "fire res";
+		["FrostRes"]	= "frost res";
+		["INT"]	= "INT";
+		["NatureRes"]	= "nature res";
+		["ShadowRes"]	= "shadow res";
+		["ShortAllRes"]	= "all res";
+		["ShortArmor"]	= "armor";
+		["ShortHealth"]	= "health";
+		["ShortMana"]	= "mana";
+		["SPI"]	= "SPI";
+		["STA"]	= "STA";
+		["STR"]	= "STR";
 
 
 		-- Section: Help Text

@@ -36,92 +36,116 @@ EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctio
 
 local priorityList = {};
 
--- this is used to search the trade categories
--- the key is our internal value
--- search is the string to look for
--- print is what we print for the user
- --TODO: Localize
+	-- this is used to search the trade categories
+	-- the key is our internal value
+	-- search is the string to look for in the enchant name
+	-- print is what we print for the output
 local categories = {
-	['factor_item.bracer'] = {search = "Bracer", print = "Bracer" },
-	['factor_item.gloves'] = {search = "Gloves", print = "Gloves" },
-	['factor_item.boots'] = {search = "Boots", print = "Boots" },
-	['factor_item.shield'] = {search = "Shield", print = "Shield" },
-	['factor_item.chest'] = {search = "Chest", print = "Chest" },
-	['factor_item.cloak'] = {search = "Cloak", print = "Cloak" },
-	['factor_item.2hweap'] = {search = "2H", print = "2H Weapon"},
-	['factor_item.weapon'] = {search = "Enchant Weapon", print = "Any Weapon" }
+	['factor_item.bracer'] = {search = _BARKLOC('Bracer'), print = _BARKLOC('Bracer') },
+	['factor_item.gloves'] = {search = _BARKLOC('Gloves'), print = _BARKLOC('Gloves') },
+	['factor_item.boots'] = {search = _BARKLOC('Boots'), print = _BARKLOC('Boots') },
+	['factor_item.shield'] = {search = _BARKLOC('Shield'), print = _BARKLOC('Shield') },
+	['factor_item.chest'] = {search = _BARKLOC('Chest'), print = _BARKLOC('Chest') },
+	['factor_item.cloak'] = {search = _BARKLOC('Cloak'), print = _BARKLOC('Cloak') },
+	['factor_item.2hweap'] = {search = _BARKLOC('TwoHandWeapon'), print = _BARKLOC('TwoHandWeapon')},
+	['factor_item.weapon'] = {search = _BARKLOC('Weapon'), print = _BARKLOC('AnyWeapon') },
+	['factor_item.ring'] = {search = _BARKLOC('Ring'), print = _BARKLOC('Ring') },
 };
 
--- this is used internally only, to determine the order of enchants shown
+
+	-- this is used internally only, to determine the order of enchants shown
 local print_order = {
 	'factor_item.bracer',
 	'factor_item.gloves',
 	'factor_item.boots',
+	'factor_item.ring',
 	'factor_item.chest', 
 	'factor_item.cloak', 
 	'factor_item.shield', 
 	'factor_item.2hweap', 
-	'factor_item.weapon'
+	'factor_item.weapon',
 };
 
--- these are used to search the craft listing
--- the order of items is important to get the longest match (ie: "resistance to shadow" before "resistance")
- --TODO: Localize
- -- TODO: combine attributes and short_attributes into a single table
+
+	-- these are used to search the craft listing
+	-- the order of items is important to get the longest match (ie: "resistance to shadow" before "resistance")
+	--  	BUT that may not work with locallized strings!   Try to get longer string matches
+	-- search is what we use to search the enchant description text
+	--		all strings are reduced to lower case!
+	-- key is how we lookup percentanges from the settings (internal only)
+	-- print is what we print for the output
+ -- TODO: check for mistakes and mis-classifications/exceptions
 local attributes = {
-	'intellect',
-	'stamina',
-	'spirit',
-	'strength',
-	'agility',
-	'fire resistance',
-	'resistance to fire',
-	'frost resistance',
-	'nature resistance',
-	'resistance to shadow',
-	'resistance',
-	'all stats',
-	'mana',
-	'health',
-	'additional armor',
-	'additional points of armor',
-	'increase armor',
-	'increase its armor',
-	'absorption',
-	'damage to beasts',
-	'points? of damage',
-	'\+[0-9]+ damage',
-	'defense'
+	{ search = _BARKLOC("EnchSearchCrusader"), key = "other", print = _BARKLOC("Crusader") },	-- to differentiate from strength
+	{ search = _BARKLOC("EnchSearchIntellect"), key = 'INT', print = _BARKLOC("INT") },
+	{ search = _BARKLOC("EnchSearchStamina"), key = "STA", print = _BARKLOC("STA") },
+	{ search = _BARKLOC("EnchSearchSpirit"), key = "SPI", print = _BARKLOC("SPI") },
+	{ search = _BARKLOC("EnchSearchStrength"), key = "STR", print = _BARKLOC("STR") },
+	{ search = _BARKLOC("EnchSearchAgility"), key = "AGI", print = _BARKLOC("AGI") },
+	{ search = _BARKLOC("EnchSearchFireRes"), key = "fire res", print = _BARKLOC("FireRes") },
+	{ search = _BARKLOC("EnchSearchResFire"), key = "fire res", print = _BARKLOC("FireRes") },
+	{ search = _BARKLOC("EnchSearchFrostRes"), key = "frost res", print = _BARKLOC("FrostFes") },
+	{ search = _BARKLOC("EnchSearchNatureRes"), key = "nature res", print = _BARKLOC("NatureRes") },
+	{ search = _BARKLOC("EnchSearchResShadow"), key = "shadow res", print = _BARKLOC("ShadowRes") },
+	{ search = _BARKLOC("EnchSearchAllStats"), key = "all stats", print = _BARKLOC("AllStats") },
+	{ search = _BARKLOC("EnchSearchMana"), key = "mana", print = _BARKLOC("ShortMana") },
+	{ search = _BARKLOC("EnchSearchHealth"), key = "health", print = _BARKLOC("ShortHealth") },
+	{ search = _BARKLOC("EnchSearchArmor"), key = "armor", print = _BARKLOC("ShortArmor") },
+	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "DMG absorb", print = _BARKLOC("DMGAbsorb") },
+	{ search = _BARKLOC("EnchSearchDamage1"), key = "DMG", print = _BARKLOC("DMG") },
+	{ search = _BARKLOC("EnchSearchDamage2"), key = "DMG", print = _BARKLOC("DMG") },
+	{ search = _BARKLOC("EnchSearchDefense"),  key = "DEF", print = _BARKLOC("DEF") },
+	{ search = _BARKLOC("EnchSearchAllResistance1"), key = "all res", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "all res", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "all res", print = _BARKLOC("ShortAllRes") },
+	
 };
 
--- this is what we print when barking, order MUST match attributes
- --TODO: Localize
-local short_attributes = {
-	'INT',
-	'STA',
-	'SPI',
-	'STR',
-	'AGI',
-	'fire res',
-	'fire res',
-	'frost res',
-	'nature res',
-	'shadow res',
-	'all res',
-	'all stats',
-	'mana',
-	'health',
-	'armour',
-	'armour',
-	'armour',
-	'armour',
-	'DMG absorb',
-	'Beastslayer',
-	'DMG',
-	'DMG',
-	'DEF'
-};
 
+--[[
+Other possible exceptions or additions
+
+	{ search = 'damage to beasts', key = "other", print = "Beastslayer" },
+	{ search = 'damage against elementals', key = "other", print = "Elementalslayer" },
+	{ search = 'damage to demons', key = "other", print = "Demonslayer" },
+	{ search = 'damage to spells', key = "other", print = "spell" },
+	{ search = 'damage to all spells', key = "other", print = "spell" },
+	{ search = 'spell damage', key = "other", print = "spell" },
+	{ search = 'healing', key = "other", print = "heal" },
+	{ search = 'frost spells', key = "other", print = "frost" },
+	{ search = 'frost damage', key = "other", print = "frost" },
+	{ search = 'shadow damage', key = "other", print = "shadow" },
+	{ search = "increase fire damage", key = "other", print = "fire" },
+	{ search = 'block rating', key = "other", print = "block" },
+	{ search = 'block value', key = "other", print = "block" },
+
+stealth  "increase to stealth"
+dodge  "dodge rating"
+assult  "increase attack power"
+brawn  "increase Strength"
+haste "attack speed bonus"
+vitality  "restore [0-9]+ health and mana"
+blasting  "spell critical strike rating"
+spell penetration  "spell penetration"
+savagery 	"attack power"
+battlemaster "heal nearby party members"
+spellsurge "restore [0-9]+ mana to all party members"
+spellstrike "spell hit rating"
+cat's swiftness "movement speed increase and [0-9]+ Agility"
+boar's speed "movement speed increase and [0-9]+ Stamina"
+surefooted "snare and root resistance"
+mongoose "increase agility by [0-9]+ and attack speed"
+sunfire  "fire and arcane spells"
+soulfrost "frost and shadow spells"
+crusader "heals for [0-9]+ to [0-9]+ and increases Strength"
+
+enchanted leather "Enchanted Leather"
+enchanted thorium "Enchanted Thorium Bar"
+
+]]
+
+
+	-- this is used to match up trade zone game names with short strings for the output
 local short_location = {
 	[_BARKLOC('Orgrimmar')] = _BARKLOC('ShortOrgrimmar'),
 	[_BARKLOC('ThunderBluff')] = _BARKLOC('ShortThunderBluff'), 
@@ -133,6 +157,7 @@ local short_location = {
 	[_BARKLOC('SilvermoonCity')] = _BARKLOC('ShortSilvermoon'),
 	[_BARKLOC('TheExodar')] = _BARKLOC('ShortExodar'),
 };
+
 
 --[[
 local config_defaults = {
@@ -287,7 +312,9 @@ end
 
 Enchantrix_BarkerOptions_ActiveTab = -1;
 
-Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
+
+ --TODO: Localize
+Enchantrix_BarkerOptions_TabFrames = {
 	{
 		title = _BARKLOC('BarkerOptionsTab1Title'),
 		options = {
@@ -367,7 +394,7 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				key = 'randomise',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-			}
+			},
 		}
 	},
 	{
@@ -471,7 +498,18 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				key = 'factor_item.shield',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-			}
+			},
+			{
+				name = 'Ring',
+				tooltip = 'The priority score for ring enchants.',
+				units = 'percentage',
+				min = 0,
+				max = 100,
+				step = 1,
+				key = 'factor_item.ring',
+				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
+				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
+			},
 		}
 	},
 	{
@@ -564,7 +602,7 @@ Enchantrix_BarkerOptions_TabFrames = { --TODO: Localize
 				key = 'factor_stat.all',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-			}
+			},
 		}
 	},
 	{
@@ -980,11 +1018,8 @@ function EnchantrixBarker_ScoreEnchantPriority( enchant )
 		score_item = score_item * Enchantrix_BarkerGetConfig( 'factor_item' )*0.01;
 	end
 
-	local score_stat = 0;
-
-	if Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) ) then
-		score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant));
-	else
+	local score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) );
+	if not score_stat then
 		score_stat = Enchantrix_BarkerGetConfig( 'other' );
 	end
 
@@ -1033,8 +1068,10 @@ function EnchantrixBarker_RoundPrice( price )
 		round = 1000;
 	elseif ( price < 20000 ) then
 		round = 2500;
-	else
+	elseif (price < 100000) then
 		round = 5000;
+	else
+		round = 10000;
 	end
 
 	odd = math.fmod(price,round);
@@ -1165,6 +1202,7 @@ end
 
 function EnchantrixBarker_GetBarkerCategoryString( barkerCategory )
 	local barkercat = ""
+	--Barker.Util.DebugPrintQuick("setting up ", barkerCategory[1].index, EnchantrixBarker_GetItemCategoryString(barkerCategory[1].index) );
 	barkercat = barkercat.." ["..EnchantrixBarker_GetItemCategoryString(barkerCategory[1].index)..": ";
 	for j,enchant in ipairs(barkerCategory) do
 		if( j > 1) then
@@ -1196,12 +1234,14 @@ function EnchantrixBarker_GetItemCategoryString( index )
 	local enchant = GetCraftInfo( index );
 
 	for key,category in pairs(categories) do
-		--Barker.Util.ChatPrint( "cat key: "..key);
+		--Barker.Util.DebugPrintQuick( "cat key: ", key);
 		if( enchant:find(category.search ) ~= nil ) then
-			--Barker.Util.ChatPrint( "cat key: "..key..", name: "..category.print..", enchant: "..enchant );
+			--Barker.Util.DebugPrintQuick( "cat key: ", key, ", name: ", category.print, ", enchant: ", enchant );
 			return category.print;
 		end
 	end
+
+	Barker.Util.DebugPrintQuick("Unknown category for", enchant )
 
 	return 'Unknown';
 end
@@ -1217,6 +1257,8 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 		end
 	end
 
+	Barker.Util.DebugPrintQuick("Unknown category for", enchant )
+	
 	return 'Unknown';
 
 end
@@ -1229,10 +1271,10 @@ function Enchantrix_GetShortDescriptor( index )
 	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
 	for index,attribute in ipairs(attributes) do
-		if( long_str:find(attribute ) ~= nil ) then
+		if( long_str:find(attribute.search ) ~= nil ) then
 			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
 			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
-			return "+"..statvalue..' '..short_attributes[index];
+			return "+"..statvalue..' '..attribute.print;
 		end
 	end
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
@@ -1245,8 +1287,8 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
 	for index,attribute in ipairs(attributes) do
-		if( long_str:find(attribute ) ~= nil ) then
-			return short_attributes[index];
+		if( long_str:find(attribute.search ) ~= nil ) then
+			return attribute.key;
 		end
 	end
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");

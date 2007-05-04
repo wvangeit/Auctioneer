@@ -129,6 +129,7 @@ local settingDefaults = {
 	['barker.factor_item.chest'] = 70,
 	['barker.factor_item.cloak'] = 70,
 	['barker.factor_item.shield'] = 70,
+	['barker.factor_item.ring'] = 70,
 	['barker.factor_stat'] = 40,
 	['barker.factor_stat.int'] = 90,
 	['barker.factor_stat.sta'] = 70,
@@ -153,16 +154,6 @@ local settingDefaults = {
 -- attributes
 -- short_attributes, needs mapping to factor_stat settings
 
---[[
-	['barker.AnyWeapon'] = 100,
-	['barker.TwoHanded'] = 90,
-	['barker.Bracer'] = 70,
-	['barker.Gloves'] = 70,
-	['barker.Boots'] = 70,
-	['barker.Chest'] = 70,
-	['barker.Cloak'] = 70,
-	['barker.Shield'] = 70,
-]]
 	['barker.INT'] = 90,
 	['barker.STA'] = 70,
 	['barker.AGI'] = 70,
@@ -179,6 +170,7 @@ local settingDefaults = {
 	['barker.health'] = 40,
 	['barker.DMG absorb'] = 90,
 	['barker.DEF'] = 60,
+	['barker.DMG'] = 90,
 	
 	['barker.other'] = 70,
 	['barker.factor_price'] = 20,
@@ -455,6 +447,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.chest", 0, 100, 1, "Chest priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.cloak", 0, 100, 1, "Cloak priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.shield", 0, 100, 1, "Shield priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.ring", 0, 100, 1, "Ring priority: %d%%")
 
 	gui.AddControl(id, "Subhead",        0,    "Statistics priorities")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat", 0, 100, 1, "Overall stats priority: %d%%")
