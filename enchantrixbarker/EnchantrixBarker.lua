@@ -182,11 +182,8 @@ function EnchantrixBarker_OnEvent()
 		--Barker.Util.ChatPrint("Barker config is "..tostring(Barker.Settings.GetSetting('barker')) );
 		if( event == "CRAFT_SHOW" ) then
 			if( Barker.Settings.GetSetting('barker') ) then
---				Enchantrix_BarkerButton:Show();
---				Enchantrix_BarkerButton.tooltipText = 'Posts a sales message to the Trade channel, if available.'; --TODO: Localize
-
 				Enchantrix_BarkerDisplayButton:Show();
-				Enchantrix_BarkerDisplayButton.tooltipText = 'Opens the trade barker window.'; --TODO: Localize
+				Enchantrix_BarkerDisplayButton.tooltipText = _BARKLOC('OpenBarkerWindow');
 			else
 				Enchantrix_BarkerDisplayButton:Hide();
 				Enchantrix_BarkerOptions_Frame:Hide();
@@ -206,7 +203,7 @@ end
 
 function Enchantrix_BarkerOnClick()
 	local barker = Enchantrix_CreateBarker();
-	local id = GetChannelName("Trade - City") --TODO: Localize
+	local id = GetChannelName( _BARKLOC("TradeChannel") ) ;
 	Barker.Util.DebugPrintQuick("Attempting to send barker ", barker, " Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
@@ -214,12 +211,12 @@ function Enchantrix_BarkerOnClick()
 			SendChatMessage(barker,"CHANNEL", GetDefaultLanguage("player"), id);
 		end
 	else
-		Barker.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
+		Barker.Util.ChatPrint( _BARKLOC("BarkerNotTradeZone") );
 	end
 end
 
 function Barker.Barker.AddonLoaded()
-	Barker.Util.ChatPrint("Barker Loaded...");
+	Barker.Util.ChatPrint( _BARKLOC("BarkerLoaded") );
 end
 
 function relevelFrame(frame)
@@ -284,7 +281,7 @@ end
 
 function Enchantrix_BarkerOptions_TestButton_OnClick()
 	local barker = Enchantrix_CreateBarker();
-	local id = GetChannelName("Trade - City") --TODO: Localize
+	local id = GetChannelName( _BARKLOC("TradeChannel") )
 	Barker.Util.DebugPrintQuick("Attempting to send test barker ", barker, "Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
@@ -292,7 +289,7 @@ function Enchantrix_BarkerOptions_TestButton_OnClick()
 			Barker.Util.ChatPrint(barker);
 		end
 	else
-		Barker.Util.ChatPrint("Enchantrix: You aren't in a trade zone."); --TODO: Localize
+		Barker.Util.ChatPrint( _BARKLOC("BarkerNotTradeZone") );
 	end
 end
 
@@ -401,8 +398,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 		title = 'Item Priorities',
 		options = {
 			{
-				name = 'Overall Items Priority',
-				tooltip = 'This sets how important the item is to the overall priority for advertising.',
+				name = _BARKLOC('BarkerOptionsItemsPriority'),
+				tooltip = _BARKLOC('BarkerOptionsItemsPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -412,8 +409,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = '2H Weapon',
-				tooltip = 'The priority score for 2H weapon enchants.',
+				name = _BARKLOC('TwoHandWeapon'),
+				tooltip = _BARKLOC('BarkerOptions2HWeaponPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -423,8 +420,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Any Weapon',
-				tooltip = 'The priority score for enchants to any weapon.',
+				name = _BARKLOC('AnyWeapon'),
+				tooltip = _BARKLOC('BarkerOptionsAnyWeaponPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -434,8 +431,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Bracer',
-				tooltip = 'The priority score for bracer enchants.',
+				name = _BARKLOC('Bracer'),
+				tooltip = _BARKLOC('BarkerOptionsBracerPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -445,8 +442,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Gloves',
-				tooltip = 'The priority score for glove enchants.',
+				name = _BARKLOC('Gloves'),
+				tooltip = _BARKLOC('BarkerOptionsGlovesPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -456,8 +453,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Boots',
-				tooltip = 'The priority score for boots enchants.',
+				name = _BARKLOC('Boots'),
+				tooltip = _BARKLOC('BarkerOptionsBootsPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -467,8 +464,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Chest',
-				tooltip = 'The priority score for chest enchants.',
+				name = _BARKLOC('Chest'),
+				tooltip = _BARKLOC('BarkerOptionsChestPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -478,8 +475,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Cloak',
-				tooltip = 'The priority score for cloak enchants.',
+				name = _BARKLOC('Cloak'),
+				tooltip = _BARKLOC('BarkerOptionsCloakPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -489,8 +486,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Shield',
-				tooltip = 'The priority score for shield enchants.',
+				name = _BARKLOC('Shield'),
+				tooltip = _BARKLOC('BarkerOptionsShieldPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -500,8 +497,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Ring',
-				tooltip = 'The priority score for ring enchants.',
+				name = _BARKLOC('Ring'),
+				tooltip = _BARKLOC('BarkerOptionsRingPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -516,8 +513,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 		title = 'Stats 1',
 		options = {
 			{
-				name = 'Overall Stats Priority',
-				tooltip = 'This sets how important the stat is to the overall priority for advertising.',
+				name = _BARKLOC('BarkerOptionsStatsPriority'),
+				tooltip = _BARKLOC('BarkerOptionsStatsPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -527,8 +524,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Intellect',
-				tooltip = 'The priority score for Intellect enchants.',
+				name = _BARKLOC('BarkerOptionsIntellectPriority'),
+				tooltip = _BARKLOC('BarkerOptionsIntellectPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -538,8 +535,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Strength',
-				tooltip = 'The priority score for Strength enchants.',
+				name = _BARKLOC('BarkerOptionsStrengthPriority'),
+				tooltip = _BARKLOC('BarkerOptionsStrengthPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -549,8 +546,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Agility',
-				tooltip = 'The priority score for Agility enchants.',
+				name = _BARKLOC('BarkerOptionsAgilityPriority'),
+				tooltip = _BARKLOC('BarkerOptionsAgilityPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -560,8 +557,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Stamina',
-				tooltip = 'The priority score for Stamina enchants.',
+				name = _BARKLOC('BarkerOptionsStaminaPriority'),
+				tooltip = _BARKLOC('BarkerOptionsStaminaPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -571,8 +568,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Spirit',
-				tooltip = 'The priority score for Spirit enchants.',
+				name = _BARKLOC('BarkerOptionsSpiritPriority'),
+				tooltip = _BARKLOC('BarkerOptionsSpiritPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -582,8 +579,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Armour',
-				tooltip = 'The priority score for Armour enchants.',
+				name = _BARKLOC('BarkerOptionsArmorPriority'),
+				tooltip = _BARKLOC('BarkerOptionsArmorPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -593,8 +590,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'All Stats',
-				tooltip = 'The priority score for enchants that increase all stats.',
+				name = _BARKLOC('BarkerOptionsAllStatsPriority'),
+				tooltip = _BARKLOC('BarkerOptionsAllStatsPriorityTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -609,8 +606,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 		title = 'Stats 2',
 		options = {
 			{
-				name = 'All Resistances',
-				tooltip = 'The priority score for enchants that boost all resistances.',
+				name = _BARKLOC('BarkerOptionsAllResistances'),
+				tooltip = _BARKLOC('BarkerOptionsAllResistancesTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -620,8 +617,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Fire Resistance',
-				tooltip = 'The priority score for Fire Resistance enchants.',
+				name = _BARKLOC('BarkerOptionsFireResistance'),
+				tooltip = _BARKLOC('BarkerOptionsFireResistanceTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -631,8 +628,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Frost Resistance',
-				tooltip = 'The priority score for Frost Resistance enchants.',
+				name = _BARKLOC('BarkerOptionsFrostResistance'),
+				tooltip = _BARKLOC('BarkerOptionsFrostResistanceTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -642,8 +639,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Nature Resistance',
-				tooltip = 'The priority score for Nature Resistance enchants.',
+				name = _BARKLOC('BarkerOptionsNatureResistance'),
+				tooltip = _BARKLOC('BarkerOptionsNatureResistanceTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -653,8 +650,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Shadow Resistance',
-				tooltip = 'The priority score for Shadow Resistance enchants.',
+				name = _BARKLOC('BarkerOptionsShadowResistance'),
+				tooltip = _BARKLOC('BarkerOptionsShadowResistanceTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -664,8 +661,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Mana',
-				tooltip = 'The priority score for Mana enchants.',
+				name = _BARKLOC('BarkerOptionsMana'),
+				tooltip = _BARKLOC('BarkerOptionsManaTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -675,8 +672,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Health',
-				tooltip = 'The priority score for Health enchants.',
+				name = _BARKLOC('BarkerOptionsHealth'),
+				tooltip = _BARKLOC('BarkerOptionsHealthTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -686,8 +683,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Damage',
-				tooltip = 'The priority score for Damage enchants.',
+				name = _BARKLOC('BarkerOptionsDamage'),
+				tooltip = _BARKLOC('BarkerOptionsDamageTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -697,8 +694,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Defense',
-				tooltip = 'The priority score for Defense enchants.',
+				name = _BARKLOC('BarkerOptionsDefense'),
+				tooltip = _BARKLOC('BarkerOptionsDefenseTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,
@@ -708,8 +705,8 @@ Enchantrix_BarkerOptions_TabFrames = {
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
 			{
-				name = 'Other',
-				tooltip = 'The priority score for enchants such as skinning, mining, riding etc.',
+				name = _BARKLOC('BarkerOptionsOther'),
+				tooltip = _BARKLOC('BarkerOptionsOtherTooltip'),
 				units = 'percentage',
 				min = 0,
 				max = 100,

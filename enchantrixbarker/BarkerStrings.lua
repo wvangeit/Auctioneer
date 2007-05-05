@@ -722,6 +722,7 @@ BarkerLocalizations = {
 		TheExodar = "The Exodar";
 		ThunderBluff	= "Thunder Bluff";
 		Undercity	= "Undercity";
+		
 		Bracer		= "Bracer";
 		Gloves		= "Gloves";
 		Boots		= "Boots";
@@ -755,6 +756,8 @@ BarkerLocalizations = {
 		["EnchSearchAllResistance1"] = 'resistance to all schools of magic';
 		["EnchSearchAllResistance2"] = 'resistance to all magic schools';
 		["EnchSearchAllResistance3"] = 'all resistances';
+		
+		["TradeChannel"] = "Trade - City";
 
 
 		-- Section: Generic Messages
@@ -779,6 +782,8 @@ BarkerLocalizations = {
 		["SPI"]	= "SPI";
 		["STA"]	= "STA";
 		["STR"]	= "STR";
+		["BarkerNotTradeZone"] = "Enchantrix Barker: You aren't in a trade zone.";
+		["BarkerLoaded"] = "Enchantrix Barker Loaded...";
 
 
 		-- Section: Help Text
@@ -860,6 +865,7 @@ BarkerLocalizations = {
 		FrmtWarnAuctNotLoaded	= "[Auctioneer not loaded, using cached prices]";
 		FrmtWarnNoPrices	= "[No prices available]";
 		FrmtWarnPriceUnavail	= "[Some prices unavailable]";
+		["OpenBarkerWindow"]  = "Opens the trade barker window.";
 
 
 		-- Section: User Interface
@@ -878,6 +884,56 @@ BarkerLocalizations = {
 		BarkerOptionsRandomFactorTitle	= "Random Factor";
 		BarkerOptionsRandomFactorTooltip	= "The amount of randomness in the enchants chosen for the trade shout.";
 		BarkerOptionsTab1Title	= "Profit and Price Priorities";
+		
+		BarkerOptionsItemsPriority = 'Overall Items Priority';
+		BarkerOptionsItemsPriorityTooltip = 'This sets how important the item is to the overall priority for advertising.';
+		BarkerOptions2HWeaponPriorityTooltip = 'The priority score for 2H weapon enchants.';
+		BarkerOptionsAnyWeaponPriorityTooltip = 'The priority score for enchants to any weapon.';
+		BarkerOptionsBracerPriorityTooltip = 'The priority score for bracer enchants.';
+		BarkerOptionsGlovesPriorityTooltip = 'The priority score for glove enchants.';
+		BarkerOptionsBootsPriorityTooltip = 'The priority score for boots enchants.';
+		BarkerOptionsChestPriorityTooltip = 'The priority score for chest enchants.';
+		BarkerOptionsCloakPriorityTooltip = 'The priority score for cloak enchants.';
+		BarkerOptionsShieldPriorityTooltip = 'The priority score for shield enchants.';
+		BarkerOptionsRingPriorityTooltip = 'The priority score for ring enchants.';
+		
+		BarkerOptionsStatsPriority = 'Overall Stats Priority';
+		BarkerOptionsStatsPriorityTooltip = 'This sets how important the stat is to the overall priority for advertising.';
+		BarkerOptionsIntellectPriority = 'Intellect';
+		BarkerOptionsIntellectPriorityTooltip = 'The priority score for Intellect enchants.';
+		BarkerOptionsStrengthPriority = 'Strength';
+		BarkerOptionsStrengthPriorityTooltip = 'The priority score for Strength enchants.';
+		BarkerOptionsAgilityPriority = 'Agility';
+		BarkerOptionsAgilityPriorityTooltip = 'The priority score for Agility enchants.';
+		BarkerOptionsStaminaPriority = 'Stamina';
+		BarkerOptionsStaminaPriorityTooltip = 'The priority score for Stamina enchants.';
+		BarkerOptionsSpiritPriority = 'Spirit';
+		BarkerOptionsSpiritPriorityTooltip = 'The priority score for Spirit enchants.';
+		BarkerOptionsArmorPriority = 'Armor';
+		BarkerOptionsArmorPriorityTooltip = 'The priority score for armor enchants.';
+		BarkerOptionsAllStatsPriority = 'All Stats';
+		BarkerOptionsAllStatsPriorityTooltip = 'The priority score for enchants that increase all stats.';
+		
+		BarkerOptionsAllResistances = 'All Resistances';
+		BarkerOptionsAllResistancesTooltip = 'The priority score for enchants that boost all resistances.';
+		BarkerOptionsFireResistance = 'Fire Resistance';
+		BarkerOptionsFireResistanceTooltip = 'The priority score for Fire Resistance enchants.';
+		BarkerOptionsFrostResistance = 'Frost Resistance';
+		BarkerOptionsFrostResistanceTooltip = 'The priority score for Frost Resistance enchants.';
+		BarkerOptionsNatureResistance = 'Nature Resistance';
+		BarkerOptionsNatureResistanceTooltip = 'The priority score for Nature Resistance enchants.';
+		BarkerOptionsShadowResistance = 'Shadow Resistance';
+		BarkerOptionsShadowResistanceTooltip = 'The priority score for Shadow Resistance enchants.';
+		BarkerOptionsMana = 'Mana';
+		BarkerOptionsManaTooltip = 'The priority score for Mana enchants.';
+		BarkerOptionsHealth = 'Health';
+		BarkerOptionsHealthTooltip = 'The priority score for Health enchants.';
+		BarkerOptionsDamage = 'Damage';
+		BarkerOptionsDamageTooltip = 'The priority score for Damage enchants.';
+		BarkerOptionsDefense = 'Defense';
+		BarkerOptionsDefenseTooltip = 'The priority score for Defense enchants.';
+		BarkerOptionsOther = 'Other';
+		BarkerOptionsOtherTooltip = 'The priority score for enchants such as skinning, mining, riding etc.';
 
 	};
 
