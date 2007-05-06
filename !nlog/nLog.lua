@@ -223,12 +223,37 @@ end
 function nLog.MessageClicked(...)
 end
 
-function nLog.LineClicked(frame)
-	local idx = frame.idx
+
+-- keep track of which message is being displayed
+nLog.currentMessage = nil;
+
+-- display a particular message
+function nLog.ShowMessage(idx)
+	nLog.currentMessage = idx;
 	local ts, mId, mAddon, mType, mLevel, mTitle, msg = unpack(nLog.messages[idx])
 	local mLevelName = nLog.levels[mLevel]
 	local text = string.format("|cffffaa11Date:|r  %s\n|cffffaa11MsgId:|r %s\n|cffffaa11AddOn:|r %s\n|cffffaa11Type:|r  %s\n|cffffaa11Level:|r %s\n|cffffaa11Title:|r %s\n|cffffaa11Message:|r\n%s\n", ts, mId, mAddon, mType, mLevelName, mTitle, msg)
 	nLog.Message.Box:SetText(text)
+end
+
+-- display the message clicked on
+function nLog.LineClicked(frame)
+	nLog.ShowMessage(frame.idx);
+end
+
+-- TODO: these also need to scroll the list to match the current location, see nLog.UpdateDisplay()
+-- TODO: make these deal with filtered messages correctly (current filter scheme doesn't make it easy)
+--			add fidx to list, compare index to filtered list, use filtered indirection
+function nLog.PreviousMessage()
+	if (nLog.currentMessage and nLog.currentMessage > 1) then
+		nLog.ShowMessage(nLog.currentMessage - 1)
+	end
+end
+
+function nLog.NextMessage()
+	if (nLog.currentMessage and nLog.currentMessage < #nLog.messages) then
+		nLog.ShowMessage(nLog.currentMessage + 1)
+	end
 end
 
 function nLog.MessageUpdate()
@@ -349,7 +374,7 @@ nLog.Message = CreateFrame("Frame", "", UIParent)
 nLog.Message:Hide()
 nLog.Message:SetPoint("CENTER", "UIParent", "CENTER")
 nLog.Message:SetFrameStrata("DIALOG")
-nLog.Message:SetHeight(400)
+nLog.Message:SetHeight(440)
 nLog.Message:SetWidth(600)
 nLog.Message:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -369,6 +394,8 @@ nLog.Message.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-
 nLog.Message.Drag:SetScript("OnMouseDown", function() nLog.Message:StartMoving() end)
 nLog.Message.Drag:SetScript("OnMouseUp", function() nLog.Message:StopMovingOrSizing() end)
 
+
+-- bottom row
 nLog.Message.AddonFilt = CreateFrame("EditBox", "nLogAddFilt", nLog.Message, "InputBoxTemplate")
 nLog.Message.AddonFilt:SetPoint("BOTTOMLEFT", nLog.Message, "BOTTOMLEFT", 20, 12)
 nLog.Message.AddonFilt:SetAutoFocus(false)
@@ -418,9 +445,23 @@ getglobal("nLogChatPrintText"):SetText("ChatPrint")
 
 nLog.Message.Done = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Done:SetText("Close")
-nLog.Message.Done:SetPoint("BOTTOMRIGHT", nLog.Message, "BOTTOMRIGHT", -10, 10)
+nLog.Message.Done:SetPoint("BOTTOMRIGHT", nLog.Message, "BOTTOMRIGHT", -20, 10)
 nLog.Message.Done:SetScript("OnClick", nLog.MessageDone)
 
+
+-- just below message box (above bottom row)
+nLog.Message.Previous = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
+nLog.Message.Previous:SetText("Previous")
+nLog.Message.Previous:SetPoint("BOTTOMRIGHT", nLog.Message.Done, "TOPRIGHT", 0, 10)
+nLog.Message.Previous:SetScript("OnClick", nLog.PreviousMessage)
+
+nLog.Message.Next = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
+nLog.Message.Next:SetText("Next")
+nLog.Message.Next:SetPoint("BOTTOMRIGHT", nLog.Message.Previous, "BOTTOMLEFT", -10, 0)
+nLog.Message.Next:SetScript("OnClick", nLog.NextMessage)
+
+
+-- scroll bar for the list
 nLog.Message.MsgScroll = CreateFrame("ScrollFrame", "nLogMessageScroll", nLog.Message, "FauxScrollFrameTemplate")
 nLog.Message.MsgScroll:SetPoint("TOPLEFT", nLog.Message, "TOPLEFT", 20, -20)
 nLog.Message.MsgScroll:SetPoint("RIGHT", nLog.Message, "RIGHT", -40, 0)
@@ -428,6 +469,7 @@ nLog.Message.MsgScroll:SetHeight(200)
 nLog.Message.MsgScroll:SetScript("OnVerticalScroll", function () FauxScrollFrame_OnVerticalScroll(LOG_LINES, nLog.UpdateDisplay) end)
 nLog.Message.MsgScroll:SetScript("OnShow", function() nLog.UpdateDisplay() end)
 
+-- box frame for the message text and scroller
 nLog.Message.BoxFrame = CreateFrame("Frame", "", nLog.Message)
 nLog.Message.BoxFrame:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -438,12 +480,14 @@ nLog.Message.BoxFrame:SetBackdrop({
 nLog.Message.BoxFrame:SetBackdropColor(0,0,0.5, 0.8)
 nLog.Message.BoxFrame:SetPoint("TOPLEFT", nLog.Message.MsgScroll, "BOTTOMLEFT", -5, 0)
 nLog.Message.BoxFrame:SetPoint("RIGHT", nLog.Message, "RIGHT", -15, 0)
-nLog.Message.BoxFrame:SetPoint("BOTTOM", nLog.Message.Done, "TOP", 0, 5)
+nLog.Message.BoxFrame:SetPoint("BOTTOM", nLog.Message.Previous, "TOP", 0, 5)
 
+-- scroll bar for the message text
 nLog.Message.BoxScroll = CreateFrame("ScrollFrame", "nLogMessageInputScroll", nLog.Message.BoxFrame, "UIPanelScrollFrameTemplate")
 nLog.Message.BoxScroll:SetPoint("TOPLEFT", nLog.Message.BoxFrame, "TOPLEFT", 10, -5)
 nLog.Message.BoxScroll:SetPoint("BOTTOMRIGHT", nLog.Message.BoxFrame, "BOTTOMRIGHT", -27, 4)
 
+-- the message box itself
 nLog.Message.Box = CreateFrame("EditBox", "nLogMessageEditBox", nLog.Message.BoxScroll)
 nLog.Message.Box:SetFont("Interface\\AddOns\\!nLog\\VeraMono.TTF", 11)
 nLog.Message.Box:SetPoint("BOTTOM", nLog.Message.BoxFrame, "BOTTOM", 0,0)
@@ -457,6 +501,7 @@ nLog.Message.Box:SetScript("OnEditFocusGained", nLog.MessageClicked)
 nLog.Message.Box:SetText("|cffffa011Select a message above to view it's contents.|r")
 nLog.Message.BoxScroll:SetScrollChild(nLog.Message.Box)
 
+-- the message list (faked with buttons)
 nLog.Message.Lines = {}
 for i=1, 16 do
 	local line = CreateFrame("Button", "", nLog.Message)
