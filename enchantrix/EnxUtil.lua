@@ -627,20 +627,10 @@ ENX_INFO = 5
 -- Debug will print to the chat console as well as to nLog
 ENX_DEBUG = 6
 
--- this tries to play nicely with DebugLib and nLog
--- but they don't take the same arguments
-
 function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
-
-	if (DebugLib) then
-		-- function libDebugPrint(addon, message, category, title, errorCode, level)
-		local message = format(...)
-		DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
-	elseif (nLog) then
-		-- function nLog.AddMessage(mAddon, mType, mLevel, mTitle, message, ...)
-	    nLog.AddMessage("Enchantrix", mType, mLevel, mTitle, ...)
-	end
-
+	-- function libDebugPrint(addon, message, category, title, errorCode, level)
+	local message = DebugLib.Dump(...)
+	DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
 end
 
 -- when you just want to print a message and don't care about the rest

@@ -380,30 +380,21 @@ Barker.Util = {
 
 
 ENX_CRITICAL = 1
-ENX_WARNING = 2
-ENX_NOTICE = 3
+ENX_ERROR = 2
+ENX_WARNING = 3
+ENX_NOTICE = 4
 -- info will only go to nLog
-ENX_INFO = 4
+ENX_INFO = 5
 -- Debug will print to the chat console as well as to nLog
-ENX_DEBUG = 5
-
--- this tries to play nicely with DebugLib and nLog
--- but they don't take the same arguments
+ENX_DEBUG = 6
 
 function Barker.Util.DebugPrint(mType, mLevel, mTitle, ...)
-
-	if (DebugLib) then
-		-- function debugPrint(message, category, errorCode, level)
-		local message = format(...)
-		DebugLib.debugPrint(message, "EnchantrixBarker" .. mType .. mTitle, 1, mLevel)
-	elseif (nLog) then
-		-- function nLog.AddMessage(mAddon, mType, mLevel, mTitle, message, ...)
-	    nLog.AddMessage("EnchantrixBarker", mType, mLevel, mTitle, ...)
-	end
-
+	-- function debugPrint(addon, message, category, title, errorCode, level)
+	local message = DebugLib.Dump(...)
+	DebugLib.DebugPrint("EnchantrixBarker", message, mType, mTitle, 1, mLevel)
 end
 
 -- when you just want to print a message and don't care about the rest
 function Barker.Util.DebugPrintQuick(...)
-	Barker.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
+	Barker.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebugMsg:", ... )
 end

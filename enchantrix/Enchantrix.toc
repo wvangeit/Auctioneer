@@ -4,7 +4,7 @@
 ## Interface: 20003
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Khaos
+## OptionalDeps: Khaos, nLog
 ## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal
 ##
 ## Version: <%version%> (<%codename%>)
@@ -16,6 +16,7 @@ EnxObjects.lua
 
 Configator\Load.xml
 Babylonian\Babylonian.lua
+debuglib\DebugLib.lua
 EnxStrings.lua
 EnxLocale.lua
 
