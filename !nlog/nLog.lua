@@ -225,34 +225,52 @@ end
 
 
 -- keep track of which message is being displayed
-nLog.currentMessage = nil;
+-- invalidate this when the filter changes?
+nLog.currentFilteredMessage = nil;
 
 -- display a particular message
-function nLog.ShowMessage(idx)
-	nLog.currentMessage = idx;
-	local ts, mId, mAddon, mType, mLevel, mTitle, msg = unpack(nLog.messages[idx])
-	local mLevelName = nLog.levels[mLevel]
-	local text = string.format("|cffffaa11Date:|r  %s\n|cffffaa11MsgId:|r %s\n|cffffaa11AddOn:|r %s\n|cffffaa11Type:|r  %s\n|cffffaa11Level:|r %s\n|cffffaa11Title:|r %s\n|cffffaa11Message:|r\n%s\n", ts, mId, mAddon, mType, mLevelName, mTitle, msg)
-	nLog.Message.Box:SetText(text)
+function nLog.ShowFilteredMessage(fidx)
+	nLog.currentFilteredMessage = fidx;
+	local idx = nLog.filtered[fidx];
+	if (idx) then
+		local ts, mId, mAddon, mType, mLevel, mTitle, msg = unpack(nLog.messages[idx])
+		local mLevelName = nLog.levels[mLevel]
+		local text = string.format("|cffffaa11Date:|r  %s\n|cffffaa11MsgId:|r %s\n|cffffaa11AddOn:|r %s\n|cffffaa11Type:|r  %s\n|cffffaa11Level:|r %s\n|cffffaa11Title:|r %s\n|cffffaa11Message:|r\n%s\n", ts, mId, mAddon, mType, mLevelName, mTitle, msg)
+		nLog.Message.Box:SetText(text)
+	end
 end
 
 -- display the message clicked on
 function nLog.LineClicked(frame)
-	nLog.ShowMessage(frame.idx);
+	nLog.ShowFilteredMessage(frame.fidx);
 end
 
 -- TODO: these also need to scroll the list to match the current location, see nLog.UpdateDisplay()
--- TODO: make these deal with filtered messages correctly (current filter scheme doesn't make it easy)
---			add fidx to list, compare index to filtered list, use filtered indirection
 function nLog.PreviousMessage()
-	if (nLog.currentMessage and nLog.currentMessage > 1) then
-		nLog.ShowMessage(nLog.currentMessage - 1)
+	if (nLog.currentFilteredMessage) then
+		-- message displayed, go to previous if we can
+		if (nLog.currentFilteredMessage > 1) then
+			nLog.ShowFilteredMessage(nLog.currentFilteredMessage - 1)
+		end
+	else
+		-- nothing being displayed, or not in filter, go to last available message
+		if (#nLog.filtered > 0) then
+			nLog.ShowFilteredMessage(#nLog.filtered);
+		end
 	end
 end
 
 function nLog.NextMessage()
-	if (nLog.currentMessage and nLog.currentMessage < #nLog.messages) then
-		nLog.ShowMessage(nLog.currentMessage + 1)
+	if (nLog.currentFilteredMessage) then
+		-- message displayed, go to next if we can
+		if (nLog.currentFilteredMessage < #nLog.filtered) then
+			nLog.ShowFilteredMessage(nLog.currentFilteredMessage + 1)
+		end
+	else
+		-- nothing being displayed, go to first available message
+		if (#nLog.filtered > 0) then
+			nLog.ShowFilteredMessage(1);
+		end
 	end
 end
 
@@ -276,6 +294,9 @@ function nLog.FilterUpdate()
 	then
 		return
 	end
+	
+	-- invalidate the currently shown filtered message index
+	nLog.currentFilteredMessage = nil;
 
 	-- Clean out the filter list and update
 	for key in ipairs(nLog.filtered) do
@@ -340,6 +361,7 @@ function nLog.UpdateDisplay()
 				nLog.Message.Lines[i]:SetText(string.format("%s: %s-%s-%s: %s", ts, mAddon, mType, mLevelName, mTitle, msg))
 				nLog.Message.Lines[i]:Show()
 				nLog.Message.Lines[i].idx = midx
+				nLog.Message.Lines[i].fidx = idx;
 			else
 				nLog.Message.Lines[i]:Hide()
 			end
