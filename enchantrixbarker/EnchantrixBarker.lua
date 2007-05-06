@@ -69,35 +69,35 @@ local print_order = {
 
 	-- these are used to search the craft listing
 	-- the order of items is important to get the longest match (ie: "resistance to shadow" before "resistance")
-	--  	BUT that may not work with locallized strings!   Try to get longer string matches
+	--  	BUT that may not work with locallized strings!   Try to get longer string matches!
 	-- search is what we use to search the enchant description text
-	--		all strings are reduced to lower case!
+	--		all strings are reduced to lower case
 	-- key is how we lookup percentanges from the settings (internal only)
 	-- print is what we print for the output
  -- TODO: check for mistakes and mis-classifications/exceptions
 local attributes = {
-	{ search = _BARKLOC("EnchSearchCrusader"), key = "other", print = _BARKLOC("Crusader") },	-- to differentiate from strength
-	{ search = _BARKLOC("EnchSearchIntellect"), key = 'INT', print = _BARKLOC("INT") },
-	{ search = _BARKLOC("EnchSearchStamina"), key = "STA", print = _BARKLOC("STA") },
-	{ search = _BARKLOC("EnchSearchSpirit"), key = "SPI", print = _BARKLOC("SPI") },
-	{ search = _BARKLOC("EnchSearchStrength"), key = "STR", print = _BARKLOC("STR") },
-	{ search = _BARKLOC("EnchSearchAgility"), key = "AGI", print = _BARKLOC("AGI") },
-	{ search = _BARKLOC("EnchSearchFireRes"), key = "fire res", print = _BARKLOC("FireRes") },
-	{ search = _BARKLOC("EnchSearchResFire"), key = "fire res", print = _BARKLOC("FireRes") },
-	{ search = _BARKLOC("EnchSearchFrostRes"), key = "frost res", print = _BARKLOC("FrostFes") },
-	{ search = _BARKLOC("EnchSearchNatureRes"), key = "nature res", print = _BARKLOC("NatureRes") },
-	{ search = _BARKLOC("EnchSearchResShadow"), key = "shadow res", print = _BARKLOC("ShadowRes") },
-	{ search = _BARKLOC("EnchSearchAllStats"), key = "all stats", print = _BARKLOC("AllStats") },
-	{ search = _BARKLOC("EnchSearchMana"), key = "mana", print = _BARKLOC("ShortMana") },
-	{ search = _BARKLOC("EnchSearchHealth"), key = "health", print = _BARKLOC("ShortHealth") },
-	{ search = _BARKLOC("EnchSearchArmor"), key = "armor", print = _BARKLOC("ShortArmor") },
-	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "DMG absorb", print = _BARKLOC("DMGAbsorb") },
-	{ search = _BARKLOC("EnchSearchDamage1"), key = "DMG", print = _BARKLOC("DMG") },
-	{ search = _BARKLOC("EnchSearchDamage2"), key = "DMG", print = _BARKLOC("DMG") },
-	{ search = _BARKLOC("EnchSearchDefense"),  key = "DEF", print = _BARKLOC("DEF") },
-	{ search = _BARKLOC("EnchSearchAllResistance1"), key = "all res", print = _BARKLOC("ShortAllRes") },
-	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "all res", print = _BARKLOC("ShortAllRes") },
-	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "all res", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", print = _BARKLOC("Crusader") },	-- to differentiate from strength
+	{ search = _BARKLOC("EnchSearchIntellect"), key = 'factor_stat.intellect', print = _BARKLOC("INT") },
+	{ search = _BARKLOC("EnchSearchStamina"), key = "factor_stat.stamina", print = _BARKLOC("STA") },
+	{ search = _BARKLOC("EnchSearchSpirit"), key = "factor_stat.spirit", print = _BARKLOC("SPI") },
+	{ search = _BARKLOC("EnchSearchStrength"), key = "factor_stat.strength", print = _BARKLOC("STR") },
+	{ search = _BARKLOC("EnchSearchAgility"), key = "factor_stat.agility", print = _BARKLOC("AGI") },
+	{ search = _BARKLOC("EnchSearchFireRes"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
+	{ search = _BARKLOC("EnchSearchResFire"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
+	{ search = _BARKLOC("EnchSearchFrostRes"), key = "factor_stat.frostRes", print = _BARKLOC("FrostFes") },
+	{ search = _BARKLOC("EnchSearchNatureRes"), key = "factor_stat.natureRes", print = _BARKLOC("NatureRes") },
+	{ search = _BARKLOC("EnchSearchResShadow"), key = "factor_stat.shadowRes", print = _BARKLOC("ShadowRes") },
+	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
+	{ search = _BARKLOC("EnchSearchMana"), key = "factor_stat.mana", print = _BARKLOC("ShortMana") },
+	{ search = _BARKLOC("EnchSearchHealth"), key = "factor_stat.health", print = _BARKLOC("ShortHealth") },
+	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "factor_stat.damageAbsorb", print = _BARKLOC("DMGAbsorb") },	-- must come before armor!
+	{ search = _BARKLOC("EnchSearchDamage1"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
+	{ search = _BARKLOC("EnchSearchDamage2"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
+	{ search = _BARKLOC("EnchSearchDefense"),  key = "factor_stat.defense", print = _BARKLOC("DEF") },
+	{ search = _BARKLOC("EnchSearchAllResistance1"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
+	{ search = _BARKLOC("EnchSearchArmor"), key = "factor_stat.armor", print = _BARKLOC("ShortArmor") },				-- too general, gives false matches to other things
 	
 };
 
@@ -105,42 +105,44 @@ local attributes = {
 --[[
 Other possible exceptions or additions
 
-	{ search = 'damage to beasts', key = "other", print = "Beastslayer" },
-	{ search = 'damage against elementals', key = "other", print = "Elementalslayer" },
-	{ search = 'damage to demons', key = "other", print = "Demonslayer" },
-	{ search = 'damage to spells', key = "other", print = "spell" },
-	{ search = 'damage to all spells', key = "other", print = "spell" },
+	{ search = 'damage to beasts', key = "other", print = "Beastslayer" },				-- incorrectly matches damage?
+	{ search = 'damage against elementals', key = "other", print = "Elementalslayer" },	-- probably safe
+	{ search = 'damage to demons', key = "other", print = "Demonslayer" },				-- probably safe
+	{ search = 'damage to spells', key = "other", print = "spell" },					-- incorrectly matches damage?
+	{ search = 'damage to all spells', key = "other", print = "spell" },				-- incorrectly matches damage?
 	{ search = 'spell damage', key = "other", print = "spell" },
-	{ search = 'healing', key = "other", print = "heal" },
-	{ search = 'frost spells', key = "other", print = "frost" },
-	{ search = 'frost damage', key = "other", print = "frost" },
-	{ search = 'shadow damage', key = "other", print = "shadow" },
-	{ search = "increase fire damage", key = "other", print = "fire" },
-	{ search = 'block rating', key = "other", print = "block" },
-	{ search = 'block value', key = "other", print = "block" },
+	{ search = 'healing', key = "other", print = "heal" },								-- probably safe
+	{ search = 'frost spells', key = "other", print = "frost" },						-- probably safe
+	{ search = 'frost damage', key = "other", print = "frost" },						-- probably safe
+	{ search = 'shadow damage', key = "other", print = "shadow" },						-- probably safe
+	{ search = "increase fire damage", key = "other", print = "fire" },					-- probably safe
+	{ search = 'block rating', key = "other", print = "block" },						-- probably safe
+	{ search = 'block value', key = "other", print = "block" },							-- probably safe
 
+vitality  "restore [0-9]+ health and mana"						-- INCORRECTLY matches health?
+battlemaster "heal nearby party members"						-- INCORRECTLY matches health?
+spellsurge "restore [0-9]+ mana to all party members"			-- INCORRECTLY matches mana?
+cat's swiftness "movement speed increase and [0-9]+ Agility"	-- INCORRECTLY matches agility?
+boar's speed "movement speed increase and [0-9]+ Stamina"		-- INCORRECTLY matches stamina?
+mongoose "increase agility by [0-9]+ and attack speed"			-- INCORRECTLY matches agility?
+sunfire  "fire and arcane spells"								-- INCORRECTLY matches damage?
+soulfrost "frost and shadow spells"								-- INCORRECTLY matches damage?
+crusader "heals for [0-9]+ to [0-9]+ and increases Strength"	-- INCORRECTLY matches damage (FIXED?)
+
+
+Other... (these should be ok as-is)
+surefooted "snare and root resistance"
+spell strike "spell hit rating"
+spell penetration  "spell penetration"
+blasting  "spell critical strike rating"
+savagery 	"attack power"
+haste "attack speed bonus"
 stealth  "increase to stealth"
 dodge  "dodge rating"
 assult  "increase attack power"
-brawn  "increase Strength"
-haste "attack speed bonus"
-vitality  "restore [0-9]+ health and mana"
-blasting  "spell critical strike rating"
-spell penetration  "spell penetration"
-savagery 	"attack power"
-battlemaster "heal nearby party members"
-spellsurge "restore [0-9]+ mana to all party members"
-spellstrike "spell hit rating"
-cat's swiftness "movement speed increase and [0-9]+ Agility"
-boar's speed "movement speed increase and [0-9]+ Stamina"
-surefooted "snare and root resistance"
-mongoose "increase agility by [0-9]+ and attack speed"
-sunfire  "fire and arcane spells"
-soulfrost "frost and shadow spells"
-crusader "heals for [0-9]+ to [0-9]+ and increases Strength"
-
 enchanted leather "Enchanted Leather"
 enchanted thorium "Enchanted Thorium Bar"
+brawn  "increase Strength"										-- correctly matches strength
 
 ]]
 
@@ -158,12 +160,6 @@ local short_location = {
 	[_BARKLOC('TheExodar')] = _BARKLOC('ShortExodar'),
 };
 
-
---[[
-local config_defaults = {
-	barker_chan_default = _BARKLOC('ChannelDefault')
-};
-]]
 
 local relevelFrame;
 local relevelFrames;
@@ -310,7 +306,6 @@ end
 Enchantrix_BarkerOptions_ActiveTab = -1;
 
 
- --TODO: Localize
 Enchantrix_BarkerOptions_TabFrames = {
 	{
 		title = _BARKLOC('BarkerOptionsTab1Title'),
@@ -530,7 +525,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.int',
+				key = 'factor_stat.intellect',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -541,7 +536,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.str',
+				key = 'factor_stat.strength',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -552,7 +547,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.agi',
+				key = 'factor_stat.agility',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -563,7 +558,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.sta',
+				key = 'factor_stat.stamina',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -574,7 +569,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.spi',
+				key = 'factor_stat.spirit',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -585,7 +580,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.arm',
+				key = 'factor_stat.armor',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -612,7 +607,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.res',
+				key = 'factor_stat.allRes',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -623,7 +618,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.fir',
+				key = 'factor_stat.fireRes',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -634,7 +629,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.frr',
+				key = 'factor_stat.frostRes',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -645,7 +640,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.nar',
+				key = 'factor_stat.natureRes',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -656,7 +651,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.shr',
+				key = 'factor_stat.shadowRes',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -667,7 +662,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.mp',
+				key = 'factor_stat.mana',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -678,7 +673,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.hp',
+				key = 'factor_stat.health',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -689,7 +684,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.dmg',
+				key = 'factor_stat.damage',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -700,7 +695,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.def',
+				key = 'factor_stat.defense',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -711,7 +706,7 @@ Enchantrix_BarkerOptions_TabFrames = {
 				min = 0,
 				max = 100,
 				step = 1,
-				key = 'factor_stat.ski',
+				key = 'factor_stat.other',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
@@ -1017,7 +1012,7 @@ function EnchantrixBarker_ScoreEnchantPriority( enchant )
 
 	local score_stat = Enchantrix_BarkerGetConfig( EnchantrixBarker_GetEnchantStat(enchant) );
 	if not score_stat then
-		score_stat = Enchantrix_BarkerGetConfig( 'other' );
+		score_stat = Enchantrix_BarkerGetConfig( 'factor_stat.other' );
 	end
 
 	score_stat = score_stat * Enchantrix_BarkerGetConfig( 'factor_stat' )*0.01;
@@ -1201,7 +1196,7 @@ function EnchantrixBarker_GetItemCategoryString( index )
 		end
 	end
 
-	Barker.Util.DebugPrintQuick("Unknown category for", enchant )
+	--Barker.Util.DebugPrintQuick("Unknown category for", enchant )
 
 	return 'Unknown';
 end
@@ -1211,13 +1206,13 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 	local enchant = GetCraftInfo( index );
 
 	for key,category in pairs(categories) do
-		--Barker.Util.ChatPrint( "cat key: "..key..", name: "..category );
+		--Barker.Util.DebugPrintQuick( "cat key: ", key, ", name: ", category );
 		if( enchant:find(category.search ) ~= nil ) then
 			return key;
 		end
 	end
 
-	Barker.Util.DebugPrintQuick("Unknown category for", enchant )
+	--Barker.Util.DebugPrintQuick("Unknown category for", enchant )
 	
 	return 'Unknown';
 
@@ -1232,12 +1227,17 @@ function Enchantrix_GetShortDescriptor( index )
 
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute.search ) ~= nil ) then
+			--Barker.Util.DebugPrintQuick("Matched attribute: ", attribute.print, " in: ", long_str);
 			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
 			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
 			return "+"..statvalue..' '..attribute.print;
 		end
 	end
+	
+	
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
+
+	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfo(index),  long_str,  enchant  );
 
 	return enchant[#enchant];
 end
@@ -1251,6 +1251,7 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 			return attribute.key;
 		end
 	end
+	
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
 
 	return enchant[#enchant];

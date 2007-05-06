@@ -119,6 +119,7 @@ local settingDefaults = {
 	['barker.sweet_price'] = 50000,		-- GSC
 	['barker.high_price'] = 500000,		-- GSC
 	['barker.highest_profit'] = 100000,	-- GSC
+	['barker.factor_price'] = 20,
 	
 	['barker.factor_item'] = 40,
 	['barker.factor_item.2hweap'] = 90,
@@ -131,25 +132,26 @@ local settingDefaults = {
 	['barker.factor_item.shield'] = 70,
 	['barker.factor_item.ring'] = 70,
 	['barker.factor_stat'] = 40,
-	['barker.factor_stat.int'] = 90,
-	['barker.factor_stat.sta'] = 70,
-	['barker.factor_stat.agi'] = 70,
-	['barker.factor_stat.str'] = 70,
-	['barker.factor_stat.spi'] = 45,
+	['barker.factor_stat.intellect'] = 90,
+	['barker.factor_stat.stamina'] = 70,
+	['barker.factor_stat.agility'] = 70,
+	['barker.factor_stat.strength'] = 70,
+	['barker.factor_stat.spirit'] = 45,
 	['barker.factor_stat.all'] = 75,
-	['barker.factor_stat.arm'] = 65,
-	['barker.factor_stat.fir'] = 85,
-	['barker.factor_stat.frr'] = 85,
-	['barker.factor_stat.nar'] = 85,
-	['barker.factor_stat.shr'] = 85,
-	['barker.factor_stat.res'] = 55,
-	['barker.factor_stat.mp'] = 35,
-	['barker.factor_stat.hp'] = 40,
-	['barker.factor_stat.dmg'] = 90,
-	['barker.factor_stat.def'] = 60,
-	['barker.factor_stat.ski'] = 70,
+	['barker.factor_stat.armor'] = 65,
+	['barker.factor_stat.fireRes'] = 85,
+	['barker.factor_stat.frostRes'] = 85,
+	['barker.factor_stat.natureRes'] = 85,
+	['barker.factor_stat.shadowRes'] = 85,
+	['barker.factor_stat.allRes'] = 55,
+	['barker.factor_stat.mana'] = 35,
+	['barker.factor_stat.health'] = 40,
+	['barker.factor_stat.damageAbsorb'] = 90,
+	['barker.factor_stat.damage'] = 90,
+	['barker.factor_stat.defense'] = 60,
+	['barker.factor_stat.other'] = 70,
 
--- EnxBarker.lua
+--[[ EnxBarker.lua
 -- categories
 -- attributes
 -- short_attributes, needs mapping to factor_stat settings
@@ -171,9 +173,9 @@ local settingDefaults = {
 	['barker.DMG absorb'] = 90,
 	['barker.DEF'] = 60,
 	['barker.DMG'] = 90,
-	
 	['barker.other'] = 70,
-	['barker.factor_price'] = 20,
+]]
+	
 }
 
 
@@ -451,27 +453,27 @@ function lib.MakeGuiConfig()
 
 	gui.AddControl(id, "Subhead",        0,    "Statistics priorities")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat", 0, 100, 1, "Overall stats priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.int", 0, 100, 1, "Intellect priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.str", 0, 100, 1, "Strength priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.agi", 0, 100, 1, "Agility priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.sta", 0, 100, 1, "Staminal priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.spi", 0, 100, 1, "Spirit priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.intellect", 0, 100, 1, "Intellect priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.strength", 0, 100, 1, "Strength priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.agility", 0, 100, 1, "Agility priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.stamina", 0, 100, 1, "Staminal priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.spirit", 0, 100, 1, "Spirit priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.armor", 0, 100, 1, "Armor priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.all", 0, 100, 1, "All Stats priority: %d%%")
 
 	id = gui.AddTab("Resist, Enhance")
 	gui.AddControl(id, "Header",         0,    "Barker options (continued)")
 	gui.AddControl(id, "Subhead",        0,    "Resistances priorities")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.arm", 0, 100, 1, "Armor priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.fir", 0, 100, 1, "Fire Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.frr", 0, 100, 1, "Frost Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.nar", 0, 100, 1, "Nature Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.shr", 0, 100, 1, "Shadow Resist priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.res", 0, 100, 1, "All Resists priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.fireRes", 0, 100, 1, "Fire Resist priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.frostRes", 0, 100, 1, "Frost Resist priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.natureRes", 0, 100, 1, "Nature Resist priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.shadowRes", 0, 100, 1, "Shadow Resist priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.allRes", 0, 100, 1, "All Resists priority: %d%%")
 	gui.AddControl(id, "Subhead",        0,    "Enhancements priorities")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.mp", 0, 100, 1, "Mana priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.hp", 0, 100, 1, "Health priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.dmg", 0, 100, 1, "Damage priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.def", 0, 100, 1, "Defense priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.ski", 0, 100, 1, "Skill priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.mana", 0, 100, 1, "Mana priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.health", 0, 100, 1, "Health priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.damage", 0, 100, 1, "Damage priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.defense", 0, 100, 1, "Defense priority: %d%%")
+	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat.other", 0, 100, 1, "Other priority: %d%%")
 end
 
