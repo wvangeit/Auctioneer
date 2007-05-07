@@ -1247,7 +1247,12 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 	local long_str = EnchantrixBarker_GetCraftDescription(index):lower();
 
 	for index,attribute in ipairs(attributes) do
-		if( long_str:find(attribute.search ) ~= nil ) then
+
+		--if (not attribute.search) then
+		--	Barker.Util.DebugPrintQuick("bad attribute: ", index, attribute  );
+		--end
+		
+		if( long_str:find(attribute.search) ~= nil ) then
 			return attribute.key;
 		end
 	end
