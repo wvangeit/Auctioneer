@@ -295,8 +295,14 @@ function nLog.FilterUpdate()
 		return
 	end
 	
-	-- invalidate the currently shown filtered message index
-	nLog.currentFilteredMessage = nil;
+	-- invalidate the currently shown filtered message index only if the filters changed
+	if nLog.filtered.filterLevel ~= nLog.filterLevel
+	or nLog.filtered.filterAddon ~= nLog.filterAddon
+	or nLog.filtered.filterType ~= nLog.filterType
+	or nLog.filtered.filterLabel ~= nLog.filterLabel
+	then
+		nLog.currentFilteredMessage = nil;
+	end
 
 	-- Clean out the filter list and update
 	for key in ipairs(nLog.filtered) do
