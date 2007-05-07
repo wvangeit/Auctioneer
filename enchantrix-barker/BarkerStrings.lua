@@ -301,6 +301,18 @@ BarkerLocalizations = {
 		["EnchSearchAllResistance1"] = 'resistance to all schools of magic';
 		["EnchSearchAllResistance2"] = 'resistance to all magic schools';
 		["EnchSearchAllResistance3"] = 'all resistances';
+		["EnchSearchVitality"] = 'restore [0-9]+ health and mana';
+		["EnchSearchBattlemaster"] = 'heal nearby party members';
+		["EnchSearchSpellsurge"] = 'restore [0-9]+ mana to all party members';
+		["EnchSearchCatSwiftness"] = 'movement speed increase and [0-9]+ Agility';
+		["EnchSearchBoarSpeed"] = 'movement speed increase and [0-9]+ Stamina';
+		["EnchSearchMongoose"] = 'increase agility by [0-9]+ and attack speed';
+		["EnchSearchSunfire"] = 'fire and arcane spells';
+		["EnchSearchSoulfrost"] = 'frost and shadow spells';
+		["EnchSearchBeastmaster"] = 'damage to beasts';
+		["EnchSearchSpellPower1"] = 'damage to spells';
+		["EnchSearchSpellPower2"] = 'damage to all spells';
+		["EnchSearchSpellPower3"] = 'spell damage';
 		
 		["TradeChannel"] = "Trade - City";
 
@@ -329,7 +341,16 @@ BarkerLocalizations = {
 		["STR"]	= "STR";
 		["BarkerNotTradeZone"] = "Enchantrix Barker: You aren't in a trade zone.";
 		["BarkerLoaded"] = "Enchantrix Barker Loaded...";
-
+		["ShortVitality"] = "Vitality";
+		["ShortBattlemaster"]	= "Battlemaster";
+		["ShortSpellSurge"] = "Spellsurge";
+		["ShortCatSwiftness"] = "Cat Swiftness";
+		["ShortBoarSpeed"] = "Boar Speed";
+		["ShortMongoose"] = "Mongoose";
+		["ShortSunfire"] = "Sunfire";
+		["ShortSoulfrost"] = "Soulfrost";
+		["ShortBeastmaster"] = "Beast";
+		["ShortSpellPower"] = "spell";
 
 		-- Section: Help Text
 		GuiBarker	= "Enable Barker";

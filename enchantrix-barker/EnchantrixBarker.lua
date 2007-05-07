@@ -74,13 +74,16 @@ local print_order = {
 	--		all strings are reduced to lower case
 	-- key is how we lookup percentanges from the settings (internal only)
 	-- print is what we print for the output
- -- TODO: check for mistakes and mis-classifications/exceptions
+ -- TODO: check for mistakes and mis-classifications/exceptions, need high level enchanters to check output!
 local attributes = {
-	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", print = _BARKLOC("Crusader") },	-- to differentiate from strength
+	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("Crusader") },	-- incorrectly matched strength
 	{ search = _BARKLOC("EnchSearchIntellect"), key = 'factor_stat.intellect', print = _BARKLOC("INT") },
+	{ search = _BARKLOC("EnchSearchBoarSpeed"), key = "other", ignoreValues = true, print = _BARKLOC("ShortBoarSpeed") },		-- INCORRECTLY matches stamina?
 	{ search = _BARKLOC("EnchSearchStamina"), key = "factor_stat.stamina", print = _BARKLOC("STA") },
 	{ search = _BARKLOC("EnchSearchSpirit"), key = "factor_stat.spirit", print = _BARKLOC("SPI") },
 	{ search = _BARKLOC("EnchSearchStrength"), key = "factor_stat.strength", print = _BARKLOC("STR") },
+	{ search = _BARKLOC("EnchSearchCatSwiftness"), key = "other", ignoreValues = true, print = _BARKLOC("ShortCatSwiftness") },	-- INCORRECTLY matches agility?
+	{ search = _BARKLOC("EnchSearchMongoose"), key = "other", ignoreValues = true, print = _BARKLOC("ShortMongoose") },			-- INCORRECTLY matches agility?
 	{ search = _BARKLOC("EnchSearchAgility"), key = "factor_stat.agility", print = _BARKLOC("AGI") },
 	{ search = _BARKLOC("EnchSearchFireRes"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
 	{ search = _BARKLOC("EnchSearchResFire"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
@@ -88,29 +91,33 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchNatureRes"), key = "factor_stat.natureRes", print = _BARKLOC("NatureRes") },
 	{ search = _BARKLOC("EnchSearchResShadow"), key = "factor_stat.shadowRes", print = _BARKLOC("ShadowRes") },
 	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
+	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSpellsurge") },		-- INCORRECTLY matches mana?
+	{ search = _BARKLOC("EnchSearchVitality"), key = "other", ignoreValues = true, print = _BARKLOC("ShortVitality") },			-- INCORRECTLY matches health and mana?
 	{ search = _BARKLOC("EnchSearchMana"), key = "factor_stat.mana", print = _BARKLOC("ShortMana") },
+	{ search = _BARKLOC("EnchSearchBattlemaster"), key = "other", ignoreValues = true, print = _BARKLOC("ShortBattlemaster") },	-- INCORRECTLY matches health?
 	{ search = _BARKLOC("EnchSearchHealth"), key = "factor_stat.health", print = _BARKLOC("ShortHealth") },
-	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "factor_stat.damageAbsorb", print = _BARKLOC("DMGAbsorb") },	-- must come before armor!
+	{ search = _BARKLOC("EnchSearchSunfire"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSunfire") },			-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchSoulfrost"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSoulfrost") },		-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchBeastmaster"), key = "other", print = _BARKLOC("ShortBeastmaster") },						-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchSpellPower1"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "spell power"
+	{ search = _BARKLOC("EnchSearchSpellPower2"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "major spell power"
+	{ search = _BARKLOC("EnchSearchSpellPower3"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		bracer, ring, gloves "spell power"
+	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "factor_stat.damageAbsorb", print = _BARKLOC("DMGAbsorb") },			-- must come before armor and damage
 	{ search = _BARKLOC("EnchSearchDamage1"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
 	{ search = _BARKLOC("EnchSearchDamage2"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
 	{ search = _BARKLOC("EnchSearchDefense"),  key = "factor_stat.defense", print = _BARKLOC("DEF") },
 	{ search = _BARKLOC("EnchSearchAllResistance1"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
-	{ search = _BARKLOC("EnchSearchArmor"), key = "factor_stat.armor", print = _BARKLOC("ShortArmor") },				-- too general, gives false matches to other things
+	{ search = _BARKLOC("EnchSearchArmor"), key = "factor_stat.armor", print = _BARKLOC("ShortArmor") },						-- too general, has to come near last
 	
 };
 
-
 --[[
 Other possible exceptions or additions
-
-	{ search = 'damage to beasts', key = "other", print = "Beastslayer" },				-- incorrectly matches damage?
-	{ search = 'damage against elementals', key = "other", print = "Elementalslayer" },	-- probably safe
-	{ search = 'damage to demons', key = "other", print = "Demonslayer" },				-- probably safe
-	{ search = 'damage to spells', key = "other", print = "spell" },					-- incorrectly matches damage?
-	{ search = 'damage to all spells', key = "other", print = "spell" },				-- incorrectly matches damage?
-	{ search = 'spell damage', key = "other", print = "spell" },
+	
+	{ search = 'damage against elementals', key = "other", print = "Elemental" },		-- probably safe
+	{ search = 'damage to demons', key = "other", print = "Demon" },					-- probably safe
 	{ search = 'healing', key = "other", print = "heal" },								-- probably safe
 	{ search = 'frost spells', key = "other", print = "frost" },						-- probably safe
 	{ search = 'frost damage', key = "other", print = "frost" },						-- probably safe
@@ -118,17 +125,6 @@ Other possible exceptions or additions
 	{ search = "increase fire damage", key = "other", print = "fire" },					-- probably safe
 	{ search = 'block rating', key = "other", print = "block" },						-- probably safe
 	{ search = 'block value', key = "other", print = "block" },							-- probably safe
-
-vitality  "restore [0-9]+ health and mana"						-- INCORRECTLY matches health?
-battlemaster "heal nearby party members"						-- INCORRECTLY matches health?
-spellsurge "restore [0-9]+ mana to all party members"			-- INCORRECTLY matches mana?
-cat's swiftness "movement speed increase and [0-9]+ Agility"	-- INCORRECTLY matches agility?
-boar's speed "movement speed increase and [0-9]+ Stamina"		-- INCORRECTLY matches stamina?
-mongoose "increase agility by [0-9]+ and attack speed"			-- INCORRECTLY matches agility?
-sunfire  "fire and arcane spells"								-- INCORRECTLY matches damage?
-soulfrost "frost and shadow spells"								-- INCORRECTLY matches damage?
-crusader "heals for [0-9]+ to [0-9]+ and increases Strength"	-- INCORRECTLY matches damage (FIXED?)
-
 
 Other... (these should be ok as-is)
 surefooted "snare and root resistance"
@@ -1228,9 +1224,13 @@ function Enchantrix_GetShortDescriptor( index )
 	for index,attribute in ipairs(attributes) do
 		if( long_str:find(attribute.search ) ~= nil ) then
 			--Barker.Util.DebugPrintQuick("Matched attribute: ", attribute.print, " in: ", long_str);
-			statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
-			statvalue = statvalue:sub(statvalue:find('[0-9]+'));
-			return "+"..statvalue..' '..attribute.print;
+			if (not attribute.ignoreValues) then
+				statvalue = long_str:sub(long_str:find('[0-9]+[^%%]'));
+				statvalue = statvalue:sub(statvalue:find('[0-9]+'));
+				return "+"..statvalue..' '..attribute.print;
+			else
+				return attribute.print;
+			end
 		end
 	end
 	
