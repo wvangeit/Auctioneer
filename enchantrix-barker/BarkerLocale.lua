@@ -57,14 +57,14 @@ end
 function _BARKLOC(stringKey, locale)
 	if locale then
 		if type(locale) == "string" then
-			return Babylonian.FetchString(BarkerLocalizations, locale, stringKey)
+			return Babylonian.FetchString(EnchantrixBarkerLocalizations, locale, stringKey)
 		else
-			return Babylonian.FetchString(BarkerLocalizations, GetLocale(), stringKey)
+			return Babylonian.FetchString(EnchantrixBarkerLocalizations, GetLocale(), stringKey)
 		end
 	elseif (customLocalizations[stringKey]) then
-		return Babylonian.FetchString(BarkerLocalizations, customLocalizations[stringKey], stringKey)
+		return Babylonian.FetchString(EnchantrixBarkerLocalizations, customLocalizations[stringKey], stringKey)
 	else
-		return Babylonian.GetString(BarkerLocalizations, stringKey)
+		return Babylonian.GetString(EnchantrixBarkerLocalizations, stringKey)
 	end
 end
 
