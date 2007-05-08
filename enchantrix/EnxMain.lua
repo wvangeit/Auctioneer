@@ -71,8 +71,6 @@ function addonLoaded(hookArgs, event, addOnName)
 		end
 	end
 
-	Stubby.RegisterAddOnHook("Auctioneer", "Enchantrix", Enchantrix.Command.AuctioneerLoaded);
-
 	-- Register disenchant detection hooks (using secure post hooks)
 	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
@@ -99,6 +97,10 @@ function addonLoaded(hookArgs, event, addOnName)
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
+	
+	-- check for auctioneer and version
+	Enchantrix.Command.AuctioneerLoaded();
+	
 end
 
 -- Register our temporary command hook with stubby

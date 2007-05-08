@@ -157,6 +157,7 @@ function getLinkFromName(name)
 	return EnchantConfig.cache.names[name]
 end
 
+
 -- Returns HSP, median and static price for reagent
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
 function getReagentPrice(reagentID)
@@ -168,23 +169,12 @@ function getReagentPrice(reagentID)
 	reagentID = tonumber(reagentID)
 	if not reagentID then return nil end
 
-	local hsp, median, market
+	local hsp, median, market, price5
 
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
-	local prices
-	if Enchantrix.State.Auctioneer_Five then
-		if (Auctioneer and Auctioneer.Modules and Auctioneer.Modules.Stat) then
-			prices = {}
-			for engine, engineLib in pairs(Auctioneer.Modules.Stat) do
-				if engineLib.GetPrice then
-					local price = engineLib.GetPrice(reagentID)
-					if price then
-						prices[engine] = price
-					end
-				end
-			end
-		end
+	if AucAdvanced then
+		price5 = AucAdvanced.API.GetMarketValue(reagentID)
 	elseif Enchantrix.State.Auctioneer_Loaded then
 		local itemKey = ("%d:0:0"):format(reagentID);
 		local realm = Auctioneer.Util.GetAuctionKey()
@@ -203,11 +193,12 @@ function getReagentPrice(reagentID)
 	cache.hsp = hsp or cache.hsp
 	cache.median = median or cache.median
 	cache.market = market or cache.market
-	cache.prices = prices
+	cache.price5 = price5 or cache.price5
 	cache.timestamp = time()
 
-	return cache.hsp, cache.median, cache.market, cache.prices
+	return cache.hsp, cache.median, cache.market, cache.price5
 end
+
 
 -- Return item level (rounded up to nearest 5 levels), quality and type as string,
 -- e.g. "20:2:Armor" for uncommon level 20 armor

@@ -396,7 +396,7 @@ function lib.MakeGuiConfig()
 	if (Enchantrix.State.Auctioneer_Loaded) then
 		gui.AddControl(id, "Checkbox",       0, 2, "valuate-hsp", "Show Auctioneer HighestSellablePrice values")
 		gui.AddControl(id, "Checkbox",       0, 2, "valuate-median", "Show Auctioneer median values")
-		if (Enchantrix.State.Auctioneer_Five) then
+		if (AucAdvanced) then
 			gui.AddControl(id, "Checkbox",       0, 2, "valuate-val", "Show Auctioneer 5 value")
 		end
 	end

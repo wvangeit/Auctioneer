@@ -520,11 +520,27 @@ function registerAuctioneerOptions()
 	Khaos.refresh();
 end
 
+
 function auctioneerLoaded()
-	Stubby.UnregisterAddOnHook("Auctioneer", "Enchantrix")
 
 	-- Make sure we have a usable version of Auctioneer loaded (3.4 or higher)
-	if Auctioneer and Auctioneer.Version then
+	
+	if AucAdvanced and AucAdvanced.Version then
+		local major,minor,patch,revision = strsplit('.', AucAdvanced.Version, 4)
+		local major = tonumber(major) or 0
+		local minor = tonumber(minor) or 0
+		if patch == "DEV" then
+			minor = minor + 1
+			patch = 0
+			revision = 0
+		end
+
+		if major >= 5 then
+			Enchantrix.State.Auctioneer_Loaded = true
+			Enchantrix.State.Auctioneer_Five = true
+		end
+		
+	elseif Auctioneer and Auctioneer.Version then
 		local major,minor,patch,revision = strsplit('.', Auctioneer.Version, 4)
 		local major = tonumber(major) or 0
 		local minor = tonumber(minor) or 0
@@ -678,7 +694,7 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
-	if Enchantrix.State.Auctioneer_Five then
+	if AucAdvanced then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerVal'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-val'), _ENCH('HelpGuessAuctioneerVal')));
 	elseif Enchantrix.State.Auctioneer_Loaded then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));

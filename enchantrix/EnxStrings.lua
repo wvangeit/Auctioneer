@@ -764,6 +764,7 @@ EnchantrixLocalizations = {
 		["FrmtTotal"]	= "Total";
 		["FrmtValueAuctHsp"]	= "Disenchant value (HSP)";
 		["FrmtValueAuctMed"]	= "Disenchant value (Median)";
+		["FrmtValueAuctVal"] = "Disenchant value (AucAdv)";
 		["FrmtValueMarket"]	= "Disenchant value (Baseline)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer not loaded, using cached prices]";
 		["FrmtWarnNoPrices"]	= "[No prices available]";

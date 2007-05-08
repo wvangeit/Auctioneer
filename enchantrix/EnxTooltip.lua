@@ -135,7 +135,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	local total = data.total
 	local totalFive = {}
-	local totalHSP, totalMed, totalMkt = 0,0,0
+	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
@@ -147,15 +147,11 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (not dName) then dName = "Item "..result end
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
-				local resHSP, resMed, resMkt = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb
-				if (five) then
-					for engine, price in pairs(five) do
-						totalFive[engine] = (totalFive[engine] or 0) + ((price or 0) * resProb)
-					end
-				end
+				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
 				totalHSP = totalHSP + resHSP
 				totalMed = totalMed + resMed
 				totalMkt = totalMkt + resMkt
+				totalFive = totalFive + resFive
 
 				local prob = resProb
 				local pmin, pmax = Enchantrix.Util.ConfidenceInterval(prob, totalNumber)
@@ -202,17 +198,15 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	-- Terse mode
 	if Enchantrix.Settings.GetSetting('terse') and not IsControlKeyDown() then
-		if Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0 then
+		if Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		elseif Enchantrix.Settings.GetSetting('valuate-median') and totalMed > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('valuate-val') and totalFive then
-			for engine, price in pairs(totalFive) do
-				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal').." ("..engine..")", price, embed);
-				EnhTooltip.LineColor(0.1,0.6,0.6);
-			end
 		elseif Enchantrix.Settings.GetSetting('valuate-baseline') and totalMkt > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
@@ -237,6 +231,10 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	if (Enchantrix.Settings.GetSetting('valuate')) then
+		if (Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
 		if (Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
@@ -343,13 +341,17 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	-- Append additional reagent info
 	for _, reagent in ipairs(reagentList) do
 		local name, link, quality = Enchantrix.Util.GetReagentInfo(reagent[1])
-		local hsp, median, market = Enchantrix.Util.GetReagentPrice(reagent[1])
+		local hsp, median, market, five = Enchantrix.Util.GetReagentPrice(reagent[1])
 		local _, _, _, color = GetItemQualityColor(quality)
 
 		reagent[1] = name
 		table.insert(reagent, quality)
 		table.insert(reagent, color)
-		table.insert(reagent, hsp)
+		if AucAdvanced then
+			table.insert(reagent, five)
+		else
+			table.insert(reagent, hsp)
+		end
 	end
 
 	local NAME, COUNT, QUALITY, COLOR, PRICE = 1, 2, 3, 4, 5

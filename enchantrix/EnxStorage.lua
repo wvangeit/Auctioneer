@@ -155,8 +155,6 @@ function mergeDisenchantLists()
 end
 
 
--- NOTE - ccox - if we are going to keep a log of disenchantments, we need this function
--- and, if we aren't going to keep a log, we need to remove the saveDisenchant code from onEvent in EnxMain.lua
 function saveDisenchant(sig, reagentID, count)
 	-- Update tables after a disenchant has been detected
 	assert(type(sig) == "string");
@@ -174,7 +172,6 @@ function saveDisenchant(sig, reagentID, count)
 end
 
 
--- NOTE - ccox - this will get more complex than a lookup because of non-disenchantable items
 function getItemDisenchants(link)
 	local iType = Enchantrix.Util.GetIType(link)
 	if (not iType) then
@@ -217,7 +214,7 @@ function getItemDisenchantTotals(link)
 
 	local lines
 	local total = data.total
-	local totalHSP, totalMed, totalMkt = 0,0,0
+	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
@@ -228,17 +225,18 @@ function getItemDisenchantTotals(link)
 				local resNumber, resQuantity = unpack(resData)
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
-				local resHSP, resMed, resMkt = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb
+				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
 				totalHSP = totalHSP + resHSP
 				totalMed = totalMed + resMed
 				totalMkt = totalMkt + resMkt
+				totalFive = totalFive + resFive
 			end
 		end
 	else
 		return
 	end
 	
-	return totalHSP, totalMed, totalMkt
+	return totalHSP, totalMed, totalMkt, totalFive
 end
 
 
