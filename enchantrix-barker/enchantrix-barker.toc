@@ -3,7 +3,7 @@
 ##
 ## Interface: 20003
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Khaos, Enchantrix, nLog
+## OptionalDeps: Khaos, Enchantrix, !nLog
 ## SavedVariables: EnchantrixBarkerConfig
 ##
 ## Version: 3.9.0.1560 (Wallaby)

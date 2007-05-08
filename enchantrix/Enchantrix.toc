@@ -4,7 +4,7 @@
 ## Interface: 20003
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Khaos, nLog, Auctioneer, Auctioneer Advanced
+## OptionalDeps: Khaos, !nLog, Auctioneer, auc-advanced
 ## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal
 ##
 ## Version: <%version%> (<%codename%>)
