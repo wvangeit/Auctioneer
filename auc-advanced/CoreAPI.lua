@@ -75,7 +75,7 @@ function lib.GetMarketValue(itemLink, serverKey)
 	-- This algorithm is currently less than adequate.
 
 	local total, count = 0, 0
-	for engine, engineLib in AucAdvanced.Modules.Stat do
+	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
 		if (engineLib.GetPrice) then
 			local price = engineLib.GetPrice(itemLink, serverKey)
 			if (price and price > 0) then
