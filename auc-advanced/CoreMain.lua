@@ -1,5 +1,4 @@
---[[
-	Auctioneer Advanced
+--[[	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -36,11 +35,27 @@
 	See CoreAPI.lua for a description of the modules API
 ]]
 
-
 if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
+
+if (not AucAdvanced.Debug) then
+	if (nlog) then
+		AucAdvanced.Debug = nlog
+	else
+		AucAdvanced.Debug = {}
+		function AucAdvanced.Debug.AddMessage(mAddon, mType, mLevel, mTitle, ...)
+			-- Do nothing
+		end
+		function AucAdvanced.Debug.ChatMsg(msg)
+			-- Do nothing
+		end
+		function AucAdvanced.Debug.IsEnabled()
+			return false
+		end
+	end
+end
 
 AucAdvanced.Version="<%version%>";
 if (AucAdvanced.Version == "<".."%version%>") then
@@ -89,10 +104,15 @@ function private.OnEvent(...)
 		if (addon:sub(1,4) == "auc-") then
 			private.OnLoad(addon)
 		end
+	elseif (event == "AUCTION_HOUSE_SHOW") then
+		-- Do Nothing for now
+	elseif (event == "AUCTION_HOUSE_CLOSED") then
+		AucAdvanced.Scan.Cancel()
 	end
 end
 
 private.Frame = CreateFrame("Frame")
 private.Frame:RegisterEvent("ADDON_LOADED")
+private.Frame:RegisterEvent("AUCTION_HOUSE_SHOW")
+private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 private.Frame:SetScript("OnEvent", private.OnEvent)
-

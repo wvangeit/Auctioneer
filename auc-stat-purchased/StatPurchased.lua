@@ -104,6 +104,19 @@ end
 
 function lib.ScanProcessors.delete(operation, itemData, oldData)
 	local auctiondata = private.GetAuctionData()
+
+	if (itemData.buyoutPrice) then
+		local stillpossible = false
+		local auctionmaxtime = AucAdvanced.Const.AucMinTimes[itemData.timeLeft] or 86400
+		if (time() - itemData.seenTime <= auctionmaxtime) then
+			stillpossible = true
+		end
+
+		if (stillpossible) then
+			if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
+			auctiondata[itemData.id].boughtout = true
+		end
+	end
 	
 	if (not auctiondata[itemData.id]) then return end
 	

@@ -96,7 +96,6 @@ function lib.ScanCommand(cat, subcat)
 	else
 		subcat = nil
 	end
-	
 	--If the requested category was invalid, we'll scan the whole AH
 	if not cat then
 		private.Print("Beginning scanning: {{All categories}}")
@@ -105,17 +104,7 @@ function lib.ScanCommand(cat, subcat)
 	else
 			private.Print("Beginning scanning: {{Category "..cat.."."..subcat.." ("..subcatName.." of "..catName..")}}")
 	end
-
-	local scanner = AucAdvanced.scanner or AucAdvanced.Defaults.Scanner
-
-	if not AucAdvanced.Modules.Scan[scanner] then
-		local loaded, reason = LoadAddOn("Auc-Scan-"..scanner)
-		if not loaded then
-			message("The "..tostring(scanner).." scan engine could not be loaded: "..reason)
-			return
-		end
-	end
-	AucAdvanced.Modules.Scan[scanner].StartScan(cat, subcat)
+	AucAdvanced.Scan.StartScan(nil, nil, nil, nil, cat, subcat, nil, nil)
 end
 
 function lib.GetCommandLead(llibType, llibName)
