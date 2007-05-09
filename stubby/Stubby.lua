@@ -679,6 +679,10 @@ end
 function unregisterEventHook(triggerEvent, ownerAddOn)
 	if (config.events and config.events[triggerEvent] and config.events[triggerEvent][ownerAddOn]) then
 		config.events[triggerEvent][ownerAddOn] = nil
+		if (#config.events[triggerEvent] == 0) then
+			config.events[triggerEvent] = nil
+			StubbyFrame:UnregisterEvent(triggerEvent)
+		end
 	end
 end
 
