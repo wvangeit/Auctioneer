@@ -98,7 +98,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchHealth"), key = "factor_stat.health", print = _BARKLOC("ShortHealth") },
 	{ search = _BARKLOC("EnchSearchSunfire"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSunfire") },			-- INCORRECTLY matches damage?
 	{ search = _BARKLOC("EnchSearchSoulfrost"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSoulfrost") },		-- INCORRECTLY matches damage?
-	{ search = _BARKLOC("EnchSearchBeastmaster"), key = "other", print = _BARKLOC("ShortBeastmaster") },						-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchBeastslayer"), key = "other", print = _BARKLOC("ShortBeastslayer") },						-- INCORRECTLY matches damage?
 	{ search = _BARKLOC("EnchSearchSpellPower1"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "spell power"
 	{ search = _BARKLOC("EnchSearchSpellPower2"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "major spell power"
 	{ search = _BARKLOC("EnchSearchSpellPower3"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		bracer, ring, gloves "spell power"

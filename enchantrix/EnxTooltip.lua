@@ -231,7 +231,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	if (Enchantrix.Settings.GetSetting('valuate')) then
-		if (Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0) then
+		if (Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0 and AucAdvanced) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
