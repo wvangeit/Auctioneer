@@ -56,9 +56,9 @@ if user does not have a set profile name, they get the default profile
 
 
 Usage:
-	def = Enchantrix.Settings.GetDefault('counts')
-	val = Enchantrix.Settings.GetSetting('counts')
-	Enchantrix.Settings.SetSetting('counts', true );
+	def = Enchantrix.Settings.GetDefault('ToolTipShowCounts')
+	val = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
+	Enchantrix.Settings.SetSetting('ToolTipShowCounts', true );
 
 ]]
 
@@ -105,17 +105,22 @@ end
 -- Default setting values
 local settingDefaults = {
 	['all'] = true,
-	['counts'] = false,
-	['embed'] = false,
 	['locale'] = 'default',
 	['printframe'] = 1,
-	['terse'] = false,
-	['valuate'] = true,
-	['valuate-hsp'] = true,
-	['valuate-median'] = true,
-	['valuate-baseline'] = true,
-	['valuate-val'] = true,
+	
+	['ToolTipShowCounts'] = false,
+	['ToolTipEmbedInGameTip'] = false,
+	['ToolTipTerseFormat'] = false,
+	['TooltipShowValues'] = true,
+	['TooltipShowAuctValueHSP'] = true,
+	['TooltipShowAuctValueMedian'] = true,
+	['TooltipShowBaselineValue'] = true,
+	['TooltipShowAuctAdvValue'] = true,
+	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
+	['TooltipShowDisenchantMats'] = true,	-- should the item tooltip show what it disenchants into? (for those who are just greedy)
+	
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
+	
 	['maxBuyoutPrice'] = 800000,
 	['defaultProfitMargin'] = 1000,		 -- default profit margin = 10s
 	['minProfitMargin'] = 100,			 -- min allowed profit margin = 1s (100c)
@@ -125,7 +130,6 @@ local settingDefaults = {
 	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
-	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
 }
 
 local ScanValueNames = {
@@ -388,21 +392,22 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", "Show the enchanting skill needed to disenchant an item in the tooltip")
 	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
-	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
+	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", "Show materials that the item may disenchant into")
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
 	gui.AddControl(id, "Subhead",    0,    "Valuations")
-	gui.AddControl(id, "Checkbox",   0, 1, "valuate", "Show disenchant values")
-	gui.AddControl(id, "Checkbox",   0, 2, "terse", "Show terse disenchant value")
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", "Show disenchant values")
+	gui.AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", "Show ToolTipTerseFormat disenchant value")
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui.AddControl(id, "Checkbox",       0, 2, "valuate-hsp", "Show Auctioneer HighestSellablePrice values")
-		gui.AddControl(id, "Checkbox",       0, 2, "valuate-median", "Show Auctioneer median values")
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", "Show Auctioneer HighestSellablePrice values")
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", "Show Auctioneer median values")
 		if (AucAdvanced) then
-			gui.AddControl(id, "Checkbox",       0, 2, "valuate-val", "Show Auctioneer 5 value")
+			gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", "Show Auctioneer 5 value")
 		end
 	end
-	gui.AddControl(id, "Checkbox",   0, 2, "valuate-baseline", "Show built-in baseline values")
+	gui.AddControl(id, "Checkbox",   0, 2, "TooltipShowBaselineValue", "Show built-in baseline values")
 
 	gui.AddControl(id, "Subhead",    0,    "Minimap display options")
 	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", "Display Minimap button")

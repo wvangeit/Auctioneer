@@ -81,7 +81,7 @@ tooltipFormat = {
 	end,
 	SetFormat = function(this, fmt, val, counts)
 		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('counts')
+			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
 		end
 		if counts then
 			this.format[fmt]['on'] = val
@@ -92,7 +92,7 @@ tooltipFormat = {
 	GetFormat = function(this, fmt, counts)
 		if not this.format[fmt] then return end
 		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('counts')
+			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
 		end
 		if counts then
 			return this.format[fmt]['on']
@@ -103,7 +103,7 @@ tooltipFormat = {
 	GetString = function(this, counts)
 		local line
 		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('counts')
+			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
 		end
 		if counts then
 			line = this.format[this.currentFormat]['on']
@@ -123,7 +123,7 @@ tooltipFormat = {
 
 
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
-	local embed = Enchantrix.Settings.GetSetting('embed')
+	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
 	local data = Enchantrix.Storage.GetItemDisenchants(link)
 	if not data then
@@ -188,7 +188,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				end
 
 				-- Store this line and sort key
-				local line = tooltipFormat:GetString(Enchantrix.Settings.GetSetting('counts'))
+				local line = tooltipFormat:GetString(Enchantrix.Settings.GetSetting('ToolTipShowCounts'))
 				table.insert(lines,  {str = line, sort = pmin})
 			end
 		end
@@ -197,37 +197,38 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	-- Terse mode
-	if Enchantrix.Settings.GetSetting('terse') and not IsControlKeyDown() then
-		if Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0 then
+	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0 then
+		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('valuate-median') and totalMed > 0 then
+		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('valuate-baseline') and totalMkt > 0 then
+		elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
 			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
 		return
 	end
 
-	-- Header
-	local totalText = ""
-	if (Enchantrix.Settings.GetSetting('counts') and totalNumber) then
-		totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
-	end
-	EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
-	EnhTooltip.LineColor(0.8,0.8,0.2);
-
-	-- Sort in order of decreasing probability before adding to tooltip
-	table.sort(lines, function(a, b) return a.sort > b.sort end)
-	for n, line in ipairs(lines) do
-		EnhTooltip.AddLine(line.str, nil, embed)
-		EnhTooltip.LineColor(0.8, 0.8, 0.2);
-		if n >= 5 then break end -- Don't add more than 5 lines
+	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
+		-- Header
+		local totalText = ""
+		if (Enchantrix.Settings.GetSetting('ToolTipShowCounts') and totalNumber) then
+			totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
+		end
+		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
+		EnhTooltip.LineColor(0.8,0.8,0.2);
+		-- Sort in order of decreasing probability before adding to tooltip
+		table.sort(lines, function(a, b) return a.sort > b.sort end)
+		for n, line in ipairs(lines) do
+			EnhTooltip.AddLine(line.str, nil, embed)
+			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			if n >= 5 then break end -- Don't add more than 5 lines
+		end
 	end
 	
 	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantLevel')) then
@@ -242,20 +243,20 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		end
 	end
 
-	if (Enchantrix.Settings.GetSetting('valuate')) then
-		if (Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0 and AucAdvanced) then
+	if (Enchantrix.Settings.GetSetting('TooltipShowValues')) then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('valuate-hsp') and totalHSP > 0) then
+		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('valuate-median') and totalMed > 0) then
+		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('valuate-baseline') and totalMkt > 0) then
+		if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
 			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
@@ -327,7 +328,7 @@ local function getReagentsFromTooltip(frame)
 end
 
 function enchantTooltip(funcVars, retVal, frame, name, link)
-	local embed = Enchantrix.Settings.GetSetting('embed');
+	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip');
 
 	local craftIndex
 	for i = 1, GetNumCrafts() do

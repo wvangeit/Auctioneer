@@ -182,7 +182,7 @@ function registerKhaos()
 				difficulty=1;
 			};
 			{
-				id="embed";
+				id="ToolTipEmbedInGameTip";
 				type=K_TEXT;
 				text=function()
 					return _ENCH('GuiEmbed')
@@ -191,7 +191,7 @@ function registerKhaos()
 					return _ENCH('HelpEmbed')
 				end;
 				callback=function(state)
-					genVarSet('embed', state.checked);
+					genVarSet('ToolTipEmbedInGameTip', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -201,13 +201,13 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('embed')};
+				default={checked=Enchantrix.Settings.GetDefault('ToolTipEmbedInGameTip')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
 			};
 			{
-				id="terse";
+				id="ToolTipTerseFormat";
 				type=K_TEXT;
 				text=function()
 					return _ENCH('GuiTerse')
@@ -216,7 +216,7 @@ function registerKhaos()
 					return _ENCH('HelpTerse')
 				end;
 				callback=function(state)
-					genVarSet('terse', state.checked);
+					genVarSet('ToolTipTerseFormat', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -226,7 +226,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('terse')};
+				default={checked=Enchantrix.Settings.GetDefault('ToolTipTerseFormat')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=2;
@@ -241,7 +241,7 @@ function registerKhaos()
 					return _ENCH('HelpCount')
 				end;
 				callback=function(state)
-					genVarSet('counts', state.checked);
+					genVarSet('ToolTipShowCounts', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -251,7 +251,7 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('counts')};
+				default={checked=Enchantrix.Settings.GetDefault('ToolTipShowCounts')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=3;
@@ -268,7 +268,7 @@ function registerKhaos()
 				difficulty=2;
 			};
 			{
-				id="valuate";
+				id="TooltipShowValues";
 				type=K_TEXT;
 				text=function()
 					return _ENCH('GuiValuateEnable')
@@ -277,7 +277,7 @@ function registerKhaos()
 					return _ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer')
 				end;
 				callback=function(state)
-					genVarSet('valuate', state.checked);
+					genVarSet('TooltipShowValues', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -287,13 +287,13 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('valuate')};
+				default={checked=Enchantrix.Settings.GetDefault('TooltipShowValues')};
 				disabled={checked=false};
 				dependencies={all={checked=true;}};
 				difficulty=1;
 			};
 			{
-				id="valuate-baseline";
+				id="TooltipShowBaselineValue";
 				type=K_TEXT;
 				text=function()
 					return _ENCH('GuiValuateBaseline')
@@ -302,7 +302,7 @@ function registerKhaos()
 					return _ENCH('HelpGuessBaseline')
 				end;
 				callback=function(state)
-					genVarSet('valuate-baseline', state.checked);
+					genVarSet('TooltipShowBaselineValue', state.checked);
 				end;
 				feedback=function(state)
 					if (state.checked) then
@@ -312,9 +312,9 @@ function registerKhaos()
 					end
 				end;
 				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('valuate-baseline')};
+				default={checked=Enchantrix.Settings.GetDefault('TooltipShowBaselineValue')};
 				disabled={checked=false};
-				dependencies={valuate={checked=true;}, all={checked=true;}};
+				dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
 				difficulty=2;
 			};
 			{
@@ -447,18 +447,18 @@ end
 function registerAuctioneerOptions()
 	local insertPos
 	for key, value in ipairs(optionSet.options) do
-		if value.id == "valuate" then
+		if value.id == "TooltipShowValues" then
 			insertPos = key + 1
 		end
 	end
 
-	if (optionSet.options[insertPos].id == 'valuate-hsp') then
+	if (optionSet.options[insertPos].id == 'TooltipShowAuctValueHSP') then
 		return
 	end
 
 	local AuctioneerOptions = {
 		{
-			id="valuate-hsp";
+			id="TooltipShowAuctValueHSP";
 			type=K_TEXT;
 			text=function()
 				return _ENCH('GuiValuateAverages')
@@ -467,7 +467,7 @@ function registerAuctioneerOptions()
 				return _ENCH('HelpGuessAuctioneerHsp')
 			end;
 			callback=function(state)
-				genVarSet('valuate-hsp', state.checked);
+				genVarSet('TooltipShowAuctValueHSP', state.checked);
 			end;
 			feedback=function(state)
 				if (state.checked) then
@@ -477,13 +477,13 @@ function registerAuctioneerOptions()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix.Settings.GetDefault('valuate-hsp')};
+			default={checked = Enchantrix.Settings.GetDefault('TooltipShowAuctValueHSP')};
 			disabled={checked = false};
-			dependencies={valuate={checked=true;}, all={checked=true;}};
+			dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
 			difficulty=2;
 		};
 		{
-			id="valuate-median";
+			id="TooltipShowAuctValueMedian";
 			type=K_TEXT;
 			text=function()
 				return _ENCH('GuiValuateMedian')
@@ -492,7 +492,7 @@ function registerAuctioneerOptions()
 				return _ENCH('HelpGuessAuctioneerMedian')
 			end;
 			callback=function(state)
-				genVarSet('valuate-median', state.checked);
+				genVarSet('TooltipShowAuctValueMedian', state.checked);
 			end;
 			feedback=function(state)
 				if (state.checked) then
@@ -502,9 +502,9 @@ function registerAuctioneerOptions()
 				end
 			end;
 			check=true;
-			default={checked = Enchantrix.Settings.GetDefault('valuate-median')};
+			default={checked = Enchantrix.Settings.GetDefault('TooltipShowAuctValueMedian')};
 			disabled={checked = false};
-			dependencies={valuate={checked=true;}, all={checked=true;}};
+			dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
 			difficulty=2;
 		};
 	};
