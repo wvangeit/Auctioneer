@@ -125,6 +125,7 @@ local settingDefaults = {
 	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
+	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
 }
 
 local ScanValueNames = {
@@ -385,6 +386,7 @@ function lib.MakeGuiConfig()
 
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", "Show the enchanting skill needed to disenchant an item in the tooltip")
 	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
 	gui.AddControl(id, "Checkbox",   0, 1, "embed", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
 -- TODO: locale -- what are the allowed values?

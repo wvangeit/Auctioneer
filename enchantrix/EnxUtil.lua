@@ -552,6 +552,27 @@ function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	return maxLevel;
 end
 
+function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level)
+	-- should we cache this in a table?
+	if (level > 20) then
+		local temp = level - 21;
+		temp = 1 + floor( temp / 5 );
+		temp = temp * 25;
+		if (temp > 375) then
+			temp = 375;
+		end
+		return temp;
+	end
+	
+	return 1;
+end
+
+function Enchantrix.Util.DisenchantSkillRequiredForItem(link)
+	local _, _, _, itemLevel = GetItemInfo(link);
+	return  Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel);
+end
+
+
 -- NOTE: this is sort of an expensive function, so don't call it often
 -- I've tried to make it friendlier by caching the value and only checking every 5 seconds
 

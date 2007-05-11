@@ -769,6 +769,7 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer not loaded, using cached prices]";
 		["FrmtWarnNoPrices"]	= "[No prices available]";
 		["FrmtWarnPriceUnavail"]	= "[Some prices unavailable]";
+		["TooltipShowDisenchantLevel"] = "Disenchanting requires skill %d";
 
 		-- Section: User Interface
 		["BarkerOptionsHighestPriceForFactorTitle"]	= "PriceFactor Highest";

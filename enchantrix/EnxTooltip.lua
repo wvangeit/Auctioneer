@@ -229,6 +229,18 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		EnhTooltip.LineColor(0.8, 0.8, 0.2);
 		if n >= 5 then break end -- Don't add more than 5 lines
 	end
+	
+	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantLevel')) then
+		local reqSkill = Enchantrix.Util.DisenchantSkillRequiredForItem(link);
+		local userSkill = Enchantrix.Util.GetUserEnchantingSkill();
+		local deText = format(_ENCH("TooltipShowDisenchantLevel"), reqSkill );
+		EnhTooltip.AddLine(deText, nil, embed);
+		if (userSkill < reqSkill) then
+			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
+		else
+			EnhTooltip.LineColor(0.1,0.8,0.1);		-- greenish
+		end
+	end
 
 	if (Enchantrix.Settings.GetSetting('valuate')) then
 		if (Enchantrix.Settings.GetSetting('valuate-val') and totalFive > 0 and AucAdvanced) then
