@@ -138,6 +138,7 @@ function private.Unpack(item, storage)
 	storage.sellerName = item[Const.SELLER]
 	storage.buyoutPrice = item[Const.BUYOUT]
 	storage.dataFlag = item[Const.FLAG]
+	
 	return storage
 end
 
@@ -347,17 +348,12 @@ function private.Commit(wasInComplete)
 		itemPos = lib.FindItem(data, private.image, lut)
 		flag = data[Const.FLAG] or 0
 		data[Const.FLAG] = bit.band(flag, bit.bnot(Const.FLAG_DIRTY))
+		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
 			data[Const.ID] = private.image[itemPos][Const.ID]
 			if not private.IsIdentical(private.image[itemPos], data) then				
---				if (bit.band(flag, Const.FLAG_UNSEEN) > 0) then
---					-- If it has been recorded as suspended
---					processStats("resume", data, private.image[itemPos])
---					resumeCount = resumeCount + 1
---				else
-					processStats("update", data, private.image[itemPos])
-					updateCount = updateCount + 1
---				end
+				processStats("update", data, private.image[itemPos])
+				updateCount = updateCount + 1
 			else
 				processStats("leave", data)
 				sameCount = sameCount + 1
@@ -388,29 +384,21 @@ function private.Commit(wasInComplete)
 
 			if (stillpossible) then
 				if (not wasInComplete) then
-					dodelete = true
+					if bit.band(data[Const.FLAG], Const.FLAG_UNSEEN) then
+						dodelete = true
+					else
+						data[Const.FLAG] = bit.bor(flag, Const.FLAG_UNSEEN)
+					end
 				end
 			else
 				dodelete = true
 			end
---					suspendCount = suspendCount + 1
---					if (bit.band(flag, Const.FLAG_UNSEEN) == 0) then
---						-- If it hasn't been recorded as suspended yet, do so
---						data[Const.FLAG] = bit.bor(flag, Const.FLAG_UNSEEN)
---						processStats("suspend", data)
---					else
---						processStats("suspended", data)
---					end
---				else
---					scanCount = scanCount - 1
 			if dodelete then
 				-- Auction Time has expired
 				processStats("delete", data)
 				private.ReleaseID(scandata.nextID, data[Const.ID])
 				table.remove(private.image, pos)
 				removeCount = removeCount + 1
-			else
-				sameCount = sameCount + 1
 			end
 
 		end
@@ -523,7 +511,7 @@ function lib.StorePage()
 			-- If we're going backwards
 			if private.scanDir == -1 then
 				-- and this item wasn't in the last (next) page
-				if noDupes(lastPage, itemData) then
+				if noDupes(lastPage, itemData) then 
 					table.insert(thisPage, itemData)
 					table.insert(private.curScan, itemData)
 					storecount = storecount + 1
