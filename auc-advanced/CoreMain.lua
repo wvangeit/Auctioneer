@@ -71,10 +71,14 @@ if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
-function private.TooltipHook(vars, ret, ...)
+function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantity, cost)
+	if EnhTooltip.LinkType(hyperlink) ~= "item" then
+		return -- Auctioneer hooks into item tooltips only
+	end
+
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then engineLib.Processor("tooltip", ...) end
+			if (engineLib.Processor) then engineLib.Processor("tooltip", frame, name, hyperlink, quality, quantity, cost) end
 		end
 	end
 end
