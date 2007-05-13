@@ -308,6 +308,31 @@ function getItemBasic(itemID)
 	end
 end
 
+--Implementation of GetSellValue API proposed by Tekkub at http://www.wowwiki.com/API_GetSellValue
+local origGetSellValue = GetSellValue
+function GetSellValue(item)
+	local id
+	if type(item) == "number" then 
+		id = item
+	elseif type(item) == "string" then
+		-- Find the itemid
+		local _, link = GetItemInfo(item)
+		local _, _, itemid = string.find(link, "item:(%d+)")
+		id = tonumber(itemid)
+	end
+	
+	-- Return out if we didn't find an id
+	if not id then return end
+	
+	local sellval = getItem(id, true).sell -- Retrieve the price here...
+	if sellval then 
+		return sellval
+	elseif origGetSellValue then 
+		-- Call our hook if present, pass the id to save processing it again
+		return origGetSellValue(id)
+	end
+end
+
 function setSkills(skills)
 	self.skills = skills
 	Informant.SetSkills = nil -- Set only once
