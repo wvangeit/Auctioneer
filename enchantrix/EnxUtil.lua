@@ -558,8 +558,8 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level)
 		local temp = level - 21;
 		temp = 1 + floor( temp / 5 );
 		temp = temp * 25;
-		if (temp > 375) then
-			temp = 375;
+		if (temp > 300) then
+			temp = 300;		-- 300 skill is required for some rare/epic items
 		end
 		return temp;
 	end
