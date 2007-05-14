@@ -136,8 +136,10 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local total = data.total
 	local totalFive = {}
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
+	local totalNumber, totalQuantity
+	
 	if (total and total[1] > 0) then
-		local totalNumber, totalQuantity = unpack(total)
+		totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
 			if (result ~= "total") then
 				if (not lines) then lines = {} end
@@ -172,7 +174,9 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				end
 
 				-- Counts
-				tooltipFormat:SetPattern("$count", tostring(resQuantity))
+				tooltipFormat:SetPattern("$count", tostring(resNumber))		-- local plus base count
+				tooltipFormat:SetPattern("$lcount", tostring(0))			-- local count
+				tooltipFormat:SetPattern("$bcount", tostring(resNumber))	-- base count
 
 				-- Name and quality
 				local name, _, quality = Enchantrix.Util.GetReagentInfo(result)

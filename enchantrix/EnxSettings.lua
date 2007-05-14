@@ -391,7 +391,7 @@ function lib.MakeGuiConfig()
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", "Show the enchanting skill needed to disenchant an item in the tooltip")
-	gui.AddControl(id, "Checkbox",   0, 1, "counts", "Show the exact disenchant counts from the database")
+	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", "Show the exact disenchant counts from the database")
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", "Show materials that the item may disenchant into")
 -- TODO: locale -- what are the allowed values?
