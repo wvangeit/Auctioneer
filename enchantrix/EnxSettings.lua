@@ -130,6 +130,8 @@ local settingDefaults = {
 	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
+	
+	['DisenchantUsingBaseTableOnly']	= true,	-- for debugging and development, use only the basetable for disenchant values
 }
 
 local ScanValueNames = {
@@ -394,6 +396,9 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", "Show the exact disenchant counts from the database")
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", "Show materials that the item may disenchant into")
+-- TODO: this control is for debugging only
+	gui.AddControl(id, "Checkbox",   0, 1, "DisenchantUsingBaseTableOnly", "Use base table only for disenchant info - DEBUGGING")
+
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	

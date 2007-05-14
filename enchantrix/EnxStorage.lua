@@ -194,7 +194,8 @@ function getItemDisenchants(link)
 	
 	local data = Enchantrix.Storage[iType]
 	if not data then
-		Enchantrix.Util.DebugPrint("ItemTooltip", ENX_INFO, "No data", "No data returned for iType:" .. iType)
+		-- we really should have data
+		Enchantrix.Util.DebugPrint("getItemDisenchants", ENX_INFO, "No data", "No data returned for iType:", iType, link)
 		return nil
 	end
 	return data
@@ -225,7 +226,8 @@ function getItemDisenchantTotals(link)
 				local resNumber, resQuantity = unpack(resData)
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
-				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
+				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
+				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield
 				totalHSP = totalHSP + resHSP
 				totalMed = totalMed + resMed
 				totalMkt = totalMkt + resMkt
@@ -249,11 +251,11 @@ local function addResults(data, ...)
 	if not data then return end
 	local result, number, quantity
 	local n = select("#", ...)
-	local v
+	local stats
 	if (not data.total) then data.total = { 0, 0 } end
 	for i = 1, n do
-		v = select(i, ...)
-		result, number, quantity = strsplit(":", v)
+		stats = select(i, ...)
+		result, number, quantity = strsplit(":", stats)
 		result = tonumber(result)
 		if (result) then
 			number = tonumber(number) or 0
@@ -266,6 +268,61 @@ local function addResults(data, ...)
 		end
 	end
 end
+
+
+-- take an ilevel and round it up to the corresponding bracket
+local function roundupLevel(level)
+	for _, bracket in pairs(Enchantrix.Constants.levelUpperBounds) do
+		if bracket >= level then
+			return bracket
+		end
+	end
+	return nil
+end
+
+-- get entry from disenchant table (or nil if nothing found)
+local function getBaseTableDisenchants(level, quality, type)
+	local rLevel = roundupLevel(level);
+
+	if Enchantrix.Constants.baseDisenchantTable[quality]
+		and Enchantrix.Constants.baseDisenchantTable[quality][type]
+		and Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel] then
+			return Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel]
+	end
+	
+	-- no matching entry found, this is bad because this is the backup!
+	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level )
+	return nil
+end
+
+
+-- normal (history) data is material, number of times disenchanted, number of items returned
+-- base data is material, percentage given, number returned
+-- this will work as-is, but return a total count of 1
+-- we have to multiply this to get a reasonable result after the confidence function
+local BASE_SCALE = 1000
+
+local function addResultFromBaseTable(data, baseData)
+	if not data then return end
+	local result, number, quantity
+	if (not data.total) then data.total = { 0, 0 } end
+    for _, stats in pairs(baseData) do
+		result, number, quantity = stats[1], stats[2], stats[3];
+		result = tonumber(result)
+		if (result) then
+			number = tonumber(number) or 0
+			quantity = tonumber(quantity) or 0
+			number = BASE_SCALE * number
+			quantity = number * quantity
+			if (not data[result]) then data[result] = { 0, 0 } end
+			data[result][1] = number
+			data[result][2] = quantity
+			data.total[1] = data.total[1] + number
+			data.total[2] = data.total[2] + quantity
+		end
+	end
+end
+
 
 local compactres = {}
 local function compact(data)
@@ -289,14 +346,27 @@ local function index(self, key)
 		iQual = tonumber(iQual) or 0
 		iType = tonumber(iType) or 0
 		if (iLevel > 0 and iQual >= 2 and (iType == 2 or iType == 4)) then
-			local key = strjoin(":", iLevel, iQual, iType)
-			addResults(data, strsplit(",", Enchantrix.Data.GetDisenchantData(key)))
-			if (EnchantrixData and EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
-				for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
-					addResults(data, strsplit(",", itemData))
+
+			if (not Enchantrix.Settings.GetSetting('DisenchantUsingBaseTableOnly')) then
+				local key = strjoin(":", iLevel, iQual, iType)
+				addResults(data, strsplit(",", Enchantrix.Data.GetDisenchantData(key)))
+				if (EnchantrixData and EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
+					for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
+						addResults(data, strsplit(",", itemData))
+					end
+				end
+			end
+
+			if ((not data.total) or (data.total[1] == 0)) then
+				-- we couldn't find anything in the normal table, use our fallback table
+				local baseData = getBaseTableDisenchants(iLevel,iQual,iType);
+				--Enchantrix.Util.DebugPrint("basedata", ENX_INFO, "basetable data", "basetable data", baseData )
+				if (baseData) then
+					addResultFromBaseTable(data,baseData);
 				end
 			end
 		end
+		--Enchantrix.Util.DebugPrint("final disenchant data", ENX_INFO, "final data", "disenchant data", data )
 		return data
 	end
 	local val = rawget(self, key)

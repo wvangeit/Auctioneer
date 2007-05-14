@@ -149,7 +149,8 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (not dName) then dName = "Item "..result end
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
-				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resProb, (med or 0)*resProb, (mkt or 0)*resProb, (five or 0)*resProb
+				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
+				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield
 				totalHSP = totalHSP + resHSP
 				totalMed = totalMed + resMed
 				totalMkt = totalMkt + resMkt
