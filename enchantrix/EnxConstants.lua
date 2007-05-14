@@ -219,6 +219,50 @@ local VISION = 11137
 local SOUL = 11083
 local STRANGE = 10940
 
+
+-- and in a form we can iterate over
+
+const.DisenchantReagentList = {
+
+	22450, -- Void Crystal
+	20725, -- Nexus Crystal
+	
+	22449, -- Large Prismatic Shard
+	14344, -- Large Brilliant Shard
+	11178, -- Large Radiant Shard
+	11139, -- Large Glowing Shard
+	11084, -- Large Glimmering Shard
+	
+	22448, -- Small Prismatic Shard
+	14343, -- Small Brilliant Shard
+	11177, -- Small Radiant Shard
+	11138, -- Small Glowing Shard
+	10978, -- Small Glimmering Shard
+	
+	22446, -- Greater Planar Essence
+	16203, -- Greater Eternal Essence
+	11175, -- Greater Nether Essence
+	11135, -- Greater Mystic Essence
+	11082, -- Greater Astral Essence
+	10939, -- Greater Magic Essence
+	
+	22447, -- Lesser Planar Essence
+	16202, -- Lesser Eternal Essence
+	11174, -- Lesser Nether Essence
+	11134, -- Lesser Mystic Essence
+	10998, -- Lesser Astral Essence
+	10938, -- Lesser Magic Essence
+	
+	22445, -- Arcane Dust
+	16204, -- Illusion Dust
+	11176, -- Dream Dust
+	11137, -- Vision Dust
+	11083, -- Soul Dust
+	10940, -- Strange Dust
+
+}
+
+
 -- item qualities
 local UNCOMMON = 2
 local RARE = 3
@@ -301,7 +345,8 @@ const.baseDisenchantTable = {
  },
  [EPIC] = {
   [const.WEAPON] = {
-   [45]  = { { SRADIANT  , 1.00, 3.5 }, },
+   [40]  = { { SRADIANT  , 1.00, 3.0 }, },
+   [45]  = { { SRADIANT  , 1.00, 3.5 }, },	-- there is a lot of varience in these results
    [50]  = { { LRADIANT  , 1.00, 3.5 }, },
    [55]  = { { SBRILLIANT, 1.00, 3.5 }, },
    [60]  = { { NEXUS     , 1.00, 1.0 }, },
@@ -311,7 +356,8 @@ const.baseDisenchantTable = {
    [120] = { { VOID      , 1.00, 1.5 }, },
   },
   [const.ARMOR] = {
-   [45]  = { { SRADIANT  , 1.00, 3.5 }, },
+   [40]  = { { SRADIANT  , 1.00, 3.0 }, },
+   [45]  = { { SRADIANT  , 1.00, 3.5 }, },	-- there is a lot of varience in these results
    [50]  = { { LRADIANT  , 1.00, 3.5 }, },
    [55]  = { { SBRILLIANT, 1.00, 3.5 }, },
    [60]  = { { NEXUS     , 1.00, 1.0 }, },

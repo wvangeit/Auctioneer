@@ -37,11 +37,12 @@ Usages:
 
 
 -- Global functions
-local getItemDisenchants		-- Enchantrix.Storage.GetItemDisenchants()
-local getItemDisenchantTotals	-- Enchantrix.Storage.GetItemDisenchantTotals()
-local saveDisenchant			-- Enchantrix.Storage.SaveDisenchant()
-local addonLoaded				-- Enchantrix.Storage.AddonLoaded()
-local saveNonDisenchantable		-- Enchantrix.Storage.SaveNonDisenchantable()
+local getItemDisenchants			-- Enchantrix.Storage.GetItemDisenchants()
+local getItemDisenchantTotals		-- Enchantrix.Storage.GetItemDisenchantTotals()
+local getItemDisenchantFromTable	-- Enchantrix.Storage.GetItemDisenchantFromTable()
+local saveDisenchant				-- Enchantrix.Storage.SaveDisenchant()
+local addonLoaded					-- Enchantrix.Storage.AddonLoaded()
+local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
 
 -- Local functions
 local unserialize
@@ -206,14 +207,12 @@ end
 -- NOTE - ccox - calculation copied from itemTooltip, I couldn't easily reuse the code
 -- TODO - REVISIT - ccox - share the code with itemTooltip
 function getItemDisenchantTotals(link)
-	local data = getItemDisenchants(link)
 	local data = Enchantrix.Storage.GetItemDisenchants(link)
 	if not data then
 		-- error message would have been printed inside GetItemDisenchants
 		return
 	end
 
-	local lines
 	local total = data.total
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	
@@ -221,7 +220,6 @@ function getItemDisenchantTotals(link)
 		local totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
 			if (result ~= "total") then
-				if (not lines) then lines = {} end
 
 				local resNumber, resQuantity = unpack(resData)
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
@@ -239,6 +237,42 @@ function getItemDisenchantTotals(link)
 	end
 	
 	return totalHSP, totalMed, totalMkt, totalFive
+end
+
+
+-- NOTE - ccox - calculation copied from itemTooltip, but not remotely shareable
+-- this version takes a table of pre-calculated reagent prices
+-- this simplifies the inner loop of some calculations, and allow for custom pricing
+
+function getItemDisenchantFromTable(link, reagentTable)
+	local data = Enchantrix.Storage.GetItemDisenchants(link)
+	if not data then
+		-- error message would have been printed inside GetItemDisenchants
+		return
+	end
+
+	local total = data.total
+	local priceTotal = 0;
+	
+	if (total and total[1] > 0) then
+		local totalNumber, totalQuantity = unpack(total)
+		for result, resData in pairs(data) do
+			if (result ~= "total") then
+				local resNumber, resQuantity = unpack(resData)
+				local reagentPrice = reagentTable[ result ];
+				if (not reagentPrice) then
+					Enchantrix.Util.DebugPrint("reagentTable", ENX_INFO, "No data", "No data in reagent table for ", result, reagentTable )
+				end
+				local resYield = resQuantity / totalNumber;
+				local resPrice = (reagentPrice or 0) * resYield;
+				priceTotal = priceTotal + resPrice;
+			end
+		end
+	else
+		return
+	end
+	
+	return priceTotal
 end
 
 
@@ -451,6 +485,7 @@ Enchantrix.Storage = {
 
 	GetItemDisenchants	= getItemDisenchants,
 	GetItemDisenchantTotals = getItemDisenchantTotals,
+	GetItemDisenchantFromTable = getItemDisenchantFromTable,
 	SaveDisenchant = saveDisenchant,
 	SaveNonDisenchantable = saveNonDisenchantable,
 }

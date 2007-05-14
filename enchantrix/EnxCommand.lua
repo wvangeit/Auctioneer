@@ -850,37 +850,59 @@ end
 --   Auctioneer dependant commands   --
 ---------------------------------------
 
-function percentLessFilter(auction, percentLess)
+function createReagentPricingTable()
+	scanReagentTable = {};
+	local n = #Enchantrix.Constants.DisenchantReagentList;
+	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	if (not style) then
+		style = "average";
+	end
+	
+	for i = 1, n do
+		reagent = Enchantrix.Constants.DisenchantReagentList[i];
+		reagent = tonumber(reagent);
+
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent);
+		local myValue = 0;
+		
+		if (style == "HSP") then
+			myValue = hsp;
+		elseif (style == "median") then
+			myValue = med;
+		elseif (style == "baseline") then
+			myValue = mkt;
+		elseif (AucAdvanced and style == "AucAdvanced") then
+			myValue = five;
+		else
+			-- "average", and our fallback
+			myValue = (hsp + med + mkt) / 3;
+		end
+		
+		scanReagentTable[ reagent ] = myValue;
+	end
+	--Enchantrix.Util.DebugPrintQuick("createReagentPricingTable: final table", scanReagentTable )
+	
+	return scanReagentTable;
+end
+
+function percentLessFilter(auction, args)
 	local filterAuction = true;
 	
+	percentLess = args['percentLess'];
+	reagentPriceTable = args['reagentPriceTable'];
+	
 	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
-	local hspValue, medValue, mktValue = Enchantrix.Storage.GetItemDisenchantTotals(auction.itemId);	
-	if (not hspValue) then return filterAuction; end
-
+	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);	
+	if (not myValue) then return filterAuction; end
+	
 	local buyout = auction.buyoutPrice or 0;
 	local count = auction.count or 1;
-	
-	local myValue;
-	local style = Enchantrix.Settings.GetSetting('ScanValueType');
-	if (style) then
-		if (style == "average") then
-			myValue = (hspValue + medValue + mktValue) / 3;
-		elseif (style == "HSP") then
-			myValue = hspValue;
-		elseif (style == "median") then
-			myValue = medValue;
-		elseif (style == "baseline") then
-			myValue = mktValue;
-		end
-	else
-		myValue = (hspValue + medValue + mktValue) / 3;
-	end
 	
 	-- margin is percentage PER ITEM
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
 	-- profit is for all items in the stack
 	local profit = (myValue * count) - buyout;
-
+	
 	local results = {
 		value = myValue,
 		margin = margin,
@@ -901,34 +923,21 @@ function percentLessFilter(auction, percentLess)
 	return filterAuction;
 end
 
-function bidBrokerFilter(auction, minProfit)
+function bidBrokerFilter(auction, args)
 	local filterAuction = true;
 	
-	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
-	local hspValue, medValue, mktValue = Enchantrix.Storage.GetItemDisenchantTotals(auction.itemId);	
-	if (not hspValue) then return filterAuction; end
+	minProfit = args['minProfit'];
+	reagentPriceTable = args['reagentPriceTable'];
+	
+	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)	
+	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);
+	if (not myValue) then return filterAuction; end
 	
 	local currentBid = auction.bidAmount or 0;
 	local minBid = auction.minBid or 0;
 	local count = auction.count or 0;
 	
 	currentBid = math.max( currentBid, minBid );
-	
-	local myValue;
-	local style = Enchantrix.Settings.GetSetting('ScanValueType');
-	if (style) then
-		if (style == "average") then
-			myValue = (hspValue + medValue + mktValue) / 3;
-		elseif (style == "HSP") then
-			myValue = hspValue;
-		elseif (style == "median") then
-			myValue = medValue;
-		elseif (style == "baseline") then
-			myValue = mktValue;
-		end
-	else
-		myValue = (hspValue + medValue + mktValue) / 3;
-	end
 	
 	-- margin is percentage PER ITEM
 	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
@@ -1004,10 +1013,18 @@ function doPercentLess(percentLess, minProfit)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
 
 	profitMargins = {};
+	
+	-- setup the reagent pricing table
+	local reagentPriceTable = createReagentPricingTable();
 
+	local percentless_args = {
+		['percentLess'] = percentLess,
+		['reagentPriceTable'] = reagentPriceTable,
+		}
+	
 	--Normal's not too happy about all these nil's, but at least it doesn't fault out now
 	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess);
-	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentLess);
+	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentless_args);
 
 	-- sort by profit
 	table.sort(profitMargins, profitComparisonSort);
@@ -1077,8 +1094,16 @@ function doBidBroker(minProfit, percentLess)
 
 	profitMargins = {};
 	
+	-- setup the reagent pricing table
+	local reagentPriceTable = createReagentPricingTable();
+
+	local bidbroker_args = {
+		['minProfit'] = minProfit,
+		['reagentPriceTable'] = reagentPriceTable,
+		}
+	
 	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
-	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, minProfit);
+	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, bidbroker_args);
 
 	-- sort by profit
 	table.sort(profitMargins, bidBrokerSort);
