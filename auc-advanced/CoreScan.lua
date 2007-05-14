@@ -55,9 +55,9 @@ private.scanDir = 1
 local LclAucScanData = nil
 function private.GetAuctionSnapshots()
 	if (LclAucScanData) then return LclAucScanData end
-	local loaded, reason = LoadAddOn("Auc-Scan-Data")
+	local loaded, reason = LoadAddOn("Auc-ScanData")
 	if not loaded then
-		message("The Auc-Scan-Data storage module could not be loaded: "..reason)
+		message("The Auc-ScanData storage module could not be loaded: "..reason)
 	end
 
 	if (AucAdvancedData.ScanData) then
