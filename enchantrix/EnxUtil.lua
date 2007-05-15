@@ -160,7 +160,7 @@ end
 
 -- Returns HSP, median and static price for reagent
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
-function getReagentPrice(reagentID)
+function getReagentPrice(reagentID, extra)
 	-- reagentID ::= number | hyperlink
 	if type(reagentID) == "string" then
 		local _, _, i = reagentID:find("item:(%d+):")
@@ -174,7 +174,11 @@ function getReagentPrice(reagentID)
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
 	if AucAdvanced then
-		price5 = AucAdvanced.API.GetMarketValue(reagentID)
+		if extra then
+			price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentID)
+		else
+			price5 = AucAdvanced.API.GetMarketValue(reagentID)
+		end
 	elseif Enchantrix.State.Auctioneer_Loaded then
 		local itemKey = ("%d:0:0"):format(reagentID);
 		local realm = Auctioneer.Util.GetAuctionKey()

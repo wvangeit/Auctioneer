@@ -872,28 +872,36 @@ function createReagentPricingTable()
 	scanReagentTable = {};
 	local n = #Enchantrix.Constants.DisenchantReagentList;
 	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	local extra = nil
 	if (not style) then
 		style = "average";
+	end
+	if (style:sub(1,9) == "adv:stat:") then
+		extra = style:sub(10)
 	end
 
 	for i = 1, n do
 		reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);
 
-		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent);
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
 		local myValue = 0;
 		
-		if (style == "HSP") then
+		if (style == "auc4:hsp") then
 			myValue = hsp;
-		elseif (style == "median") then
+		elseif (style == "auc4:med") then
 			myValue = med;
 		elseif (style == "baseline") then
 			myValue = mkt;
-		elseif (AucAdvanced and style == "AucAdvanced") then
+		elseif (AucAdvanced and (style == "adv:market" or extra)) then
 			myValue = five;
 		else
-			-- "average", and our fallback
-			myValue = (hsp + med + mkt) / 3;
+			local c = 0
+			if (hsp) then  myValue=myValue+hsp  c=c+1 end
+			if (med) then  myValue=myValue+med  c=c+1 end
+			if (mkt) then  myValue=myValue+mkt  c=c+1 end
+			if (five) then myValue=myValue+five c=c+1 end
+			myValue = myValue / c
 		end
 		
 		scanReagentTable[ reagent ] = myValue;

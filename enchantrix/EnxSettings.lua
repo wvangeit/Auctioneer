@@ -66,6 +66,7 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 local lib = {}
 Enchantrix.Settings = lib
+local private = {}
 local gui
 
 local function getUserSig()
@@ -132,13 +133,6 @@ local settingDefaults = {
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
 	
 	['DisenchantUsingBaseTableOnly']	= false,	-- for debugging and development, use only the basetable for disenchant values
-}
-
-local ScanValueNames = {
-	"average",
-	"HSP",
-	"median",
-	"baseline"
 }
 
 local function getDefault(setting)
@@ -326,11 +320,27 @@ local function getter(setting)
 
 	if (a == 'scanvalue') then
 		if (b == 'list') then
-			local stList = ScanValueNames;
-			if (not stList) then
-				stList = { "average" }
+			if not private.scanValueNames then private.scanValueNames = {} end
+
+			for i = 1, #private.scanValueNames do
+				private.scanValueNames[i] = nil
 			end
-			return stList
+
+			table.insert(private.scanValueNames,{"average", "Average (default)"})
+			table.insert(private.scanValueNames,{"baseline", "Market Baseline"})
+			if AucAdvanced then
+				table.insert(private.scanValueNames,{"adv:market", "AucAdv Market Value"})
+				local algoList = AucAdvanced.API.GetAlgorithms()
+				for pos, name in ipairs(algoList) do
+					table.insert(private.scanValueNames,{"aucadv:stat:"..name, "AucAdv Stat:"..name})
+				end
+			end
+			if Auctioneer then
+				table.insert(private.scanValueNames,{"auc4:hsp", "Auc4 HSP"})
+				table.insert(private.scanValueNames,{"auc4:med", "Auc4 Median"})
+			end
+			
+			return private.scanValueNames
 		end
 	end
 	

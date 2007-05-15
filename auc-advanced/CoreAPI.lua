@@ -92,6 +92,24 @@ function lib.GetMarketValue(itemLink, serverKey)
 	end
 end
 
+function lib.GetAlgorithms()
+	local engines = {}
+	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+		table.insert(engines, engine)
+	end
+	return engines
+end
+
+function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
+	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+		if engine == algorithm and engineLib.GetPrice then
+			local price = engineLib.GetPrice(itemLink, serverKey)
+			return price
+		end
+	end
+end
+
+
 private.queryTime = 0
 private.prevQuery = { empty = true }
 private.curResults = {}
