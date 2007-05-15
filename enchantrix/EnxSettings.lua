@@ -131,7 +131,7 @@ local settingDefaults = {
 	['ScanValueType'] = "average",		-- what value to use for auction scans
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
 	
-	['DisenchantUsingBaseTableOnly']	= true,	-- for debugging and development, use only the basetable for disenchant values
+	['DisenchantUsingBaseTableOnly']	= false,	-- for debugging and development, use only the basetable for disenchant values
 }
 
 local ScanValueNames = {
