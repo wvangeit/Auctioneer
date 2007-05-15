@@ -447,7 +447,7 @@ function private.Commit(wasIncomplete)
 	scanTime = scanTime.."Spent Scanning Auction House"
 	lib.Print(scanTime)
 	
-	scandata.time = now()
+	scandata.time = time()
 	private.curQuery = nil
 	private.scanStartTime = nil
 	private.curScan = nil
