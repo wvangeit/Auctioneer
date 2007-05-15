@@ -556,14 +556,40 @@ function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	return maxLevel;
 end
 
-function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level)
+
+--[[
+items over level 65 are special
+item_level blizzard_de_skill
+70			225		riding crop
+99			225
+100			275
+102			275
+
+61epic		225
+66epic		225
+darnit, where is the breakpoint?  I need more epics!
+95epic		300
+100epic		300
+
+]]
+function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
-	if (level > 20) then
+	
+	if (level > 65) then
+		if (quality > 3) then
+			return 300;
+		end
+		if (level >= 100) then
+			return 275;
+		else
+			return 225;
+		end
+	elseif (level > 20) then
 		local temp = level - 21;
 		temp = 1 + floor( temp / 5 );
 		temp = temp * 25;
-		if (temp > 300) then
-			temp = 300;		-- 300 skill is required for some rare/epic items
+		if (temp > 275) then
+			temp = 275;		-- 300 skill is required for some rare/epic items
 		end
 		return temp;
 	end
@@ -572,8 +598,8 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level)
 end
 
 function Enchantrix.Util.DisenchantSkillRequiredForItem(link)
-	local _, _, _, itemLevel = GetItemInfo(link);
-	return  Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel);
+	local _, _, quality, itemLevel = GetItemInfo(link);
+	return  Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel, quality);
 end
 
 
