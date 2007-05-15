@@ -33,7 +33,10 @@
 
 AucAdvanced.API = {}
 local lib = AucAdvanced.API
+local private = {}
 
+lib.Print = AucAdvanced.Print
+local Const = AucAdvanced.Const
 
 --[[
 	The following functions are defined for modules's exposed methods:
@@ -89,3 +92,72 @@ function lib.GetMarketValue(itemLink, serverKey)
 	end
 end
 
+private.queryTime = 0
+private.prevQuery = { empty = true }
+private.curResults = {}
+function lib.QueryImage(query, faction, realm, ...)
+	local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
+
+	local prevQuery = private.prevQuery
+	local curResults = private.curResults
+
+	local invalid = false
+	for k,v in pairs(prevQuery) do
+		if k ~= "page" and v ~= query[k] then invalid = true end
+	end
+	for k,v in pairs(query) do
+		if k ~= "page" and v ~= prevQuery[k] then invalid = true end
+	end
+	if (private.queryTime ~= scandata.time) then invalid = true end
+	if not invalid then return curResults end
+
+	local numResults = #curResults
+	for i=1, numResults do curResults[i] = nil end
+	for k,v in pairs(prevQuery) do prevQuery[k] = v end
+
+	local ptr, max = 1, #scandata.image
+	while ptr <= max do
+		repeat
+			local data = scandata.image[ptr] ptr = ptr + 1
+			if (not data) then break end
+			if query.filter and query.filter(data, ...) then break end
+			if query.minUseLevel and data[Const.ULEVEL] < query.minUseLevel then break end
+			if query.maxUseLevel and data[Const.ULEVEL] > query.maxUseLevel then break end
+			if query.minItemLevel and data[Const.ILEVEL] < query.minItemLevel then break end
+			if query.maxItemLevel and data[Const.ILEVEL] > query.maxItemLevel then break end
+			if query.class and data[Const.ITYPE] ~= query.class then break end
+			if query.subclass and data[Const.ISUB] ~= query.subclass then break end
+			if query.quality and data[Const.QUALITY] ~= query.quality then break end
+			if query.invType and data[Const.IEQUIP] ~= query.invType then break end
+			if query.seller and data[Const.SELLER] ~= query.seller then break end
+			if query.name then
+				local name = data[Const.NAME]
+				if not (name and name:lower():find(query.name:lower(), 1, true)) then break end
+			end
+
+			local stack = data[Const.COUNT]
+			local nextBid = data[Const.PRICE]
+			local buyout = data[Const.BUYOUT]
+			if query.perItem and stack > 1 then
+				nextBid = math.ceil(nextBid / stack)
+				buyout = math.ceil(buyout / stack)
+			end
+			if query.minStack and stack < query.minStack then break end
+			if query.maxStack and stack > query.maxStack then break end
+			if query.minBid and nextBid < query.minBid then break end
+			if query.maxBid and nextBid > query.maxBid then break end
+			if query.minBuyout and buyout < query.minBuyout then break end
+			if query.maxBuyout and buyout > query.maxBuyout then break end
+
+			-- If we're still here, then we've got a winner
+			table.insert(curResults, data)
+		until true
+	end
+
+	private.queryTime = scandata.time
+	return curResults
+end
+
+function lib.UnpackImageItem(item)
+	return AucAdvanced.Scan.UnpackImageItem(item)
+end

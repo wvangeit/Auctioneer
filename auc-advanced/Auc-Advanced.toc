@@ -20,10 +20,10 @@ CoreStrings.lua
 CoreLocale.lua
 
 CoreMain.lua
-CoreAPI.lua
 CoreUtil.lua
 CoreConst.lua
 CoreConfig.lua
 CoreScan.lua
+CoreAPI.lua
 
 Modules\Active.xml

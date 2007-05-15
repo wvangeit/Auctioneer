@@ -850,6 +850,24 @@ end
 --   Auctioneer dependant commands   --
 ---------------------------------------
 
+local function percentLessThan(v1, v2)
+        if v1 and v1 > 0 and v2 and v2 < v1 then
+                return 100 - math.floor((100 * v2)/v1);
+        else
+                return 0;
+        end
+end
+
+local function whiteText(text)
+	local COLORING_START = "|cff%s%s|r";
+	local WHITE_COLOR = "e6e6e6";
+	return COLORING_START:format(WHITE_COLOR, tostring(text or ""));
+end
+
+local function timeLeftString(timeleft)
+	return (getglobal("AUCTION_TIME_LEFT"..timeleft))
+end
+
 function createReagentPricingTable()
 	scanReagentTable = {};
 	local n = #Enchantrix.Constants.DisenchantReagentList;
@@ -857,7 +875,7 @@ function createReagentPricingTable()
 	if (not style) then
 		style = "average";
 	end
-	
+
 	for i = 1, n do
 		reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);
@@ -887,6 +905,13 @@ end
 
 function percentLessFilter(auction, args)
 	local filterAuction = true;
+
+	if not Auctioneer and AucAdvanced then
+		auction = AucAdvanced.API.UnpackImageItem(auction)
+		auction.auctionId = auction.id
+		auction.count = auction.stackSize
+		auction.itemId = EnhTooltip.BreakLink(auction.link)
+	end
 	
 	percentLess = args['percentLess'];
 	reagentPriceTable = args['reagentPriceTable'];
@@ -899,7 +924,7 @@ function percentLessFilter(auction, args)
 	local count = auction.count or 1;
 	
 	-- margin is percentage PER ITEM
-	local margin = Auctioneer.Statistic.PercentLessThan(myValue, buyout/count);
+	local margin = percentLessThan(myValue, buyout/count);
 	-- profit is for all items in the stack
 	local profit = (myValue * count) - buyout;
 	
@@ -925,6 +950,13 @@ end
 
 function bidBrokerFilter(auction, args)
 	local filterAuction = true;
+
+	if not Auctioneer and AucAdvanced then
+		auction = AucAdvanced.API.UnpackImageItem(auction)
+		auction.auctionId = auction.id
+		auction.count = auction.stackSize
+		auction.itemId = EnhTooltip.BreakLink(auction.link)
+	end
 	
 	minProfit = args['minProfit'];
 	reagentPriceTable = args['reagentPriceTable'];
@@ -940,7 +972,7 @@ function bidBrokerFilter(auction, args)
 	currentBid = math.max( currentBid, minBid );
 	
 	-- margin is percentage PER ITEM
-	local margin = Auctioneer.Statistic.PercentLessThan(myValue, currentBid/count);
+	local margin = percentLessThan(myValue, currentBid/count);
 	-- profit is for all items in the stack
 	local profit = (myValue * count) - currentBid;
 	-- profitPricePercent is for all items in the stack
@@ -991,9 +1023,14 @@ function bidBrokerSort(a, b)
 end
 
 function doPercentLess(percentLess, minProfit)
+	local adv = false
 	if not Auctioneer then
-		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
-		return;
+		if AucAdvanced then
+			adv = true
+		else
+			Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+			return;
+		end
 	elseif not (Auctioneer.Filter or Auctioneer.Filter.QuerySnapshot) then
 		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
 		return;
@@ -1022,15 +1059,20 @@ function doPercentLess(percentLess, minProfit)
 		['reagentPriceTable'] = reagentPriceTable,
 		}
 	
-	--Normal's not too happy about all these nil's, but at least it doesn't fault out now
-	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(percentLessFilter, percentLess);
-	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentless_args);
+	local targetAuctions
+	
+	if adv then
+		targetAuctions = AucAdvanced.API.QueryImage({filter=percentLessFilter}, nil, nil, percentless_args);
+	else
+		targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentless_args);
+	end
 
 	-- sort by profit
 	table.sort(profitMargins, profitComparisonSort);
 
 	local skipped_auctions = 0;
 	local skipped_skill = 0;
+	local name, link, _, itemLevel
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
@@ -1038,16 +1080,22 @@ function doPercentLess(percentLess, minProfit)
 		local a = auctionItem.auction;
 		-- note: profit value already includes the item count
 		if (profit >= minProfit) then
-			local name, link, _, itemLevel = GetItemInfo( a.itemId );
+			if adv then
+				name = a.itemName
+				link = a.link
+				itemLevel = a.itemLevel
+			else
+				name, link, _, itemLevel = GetItemInfo( a.itemId );
+			end
 			if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
 				local value = auctionItem.value;
 				local margin = auctionItem.margin;
 				local output = _ENCH('FrmtPctlessLine'):format(
-					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					whiteText(a.count.."x")..link,
 					EnhTooltip.GetTextGSC(value * a.count),
 					EnhTooltip.GetTextGSC(a.buyoutPrice),
 					EnhTooltip.GetTextGSC(profit * a.count),
-					Auctioneer.Util.ColorTextWhite(margin.."%")
+					whiteText(margin.."%")
 				);
 				Enchantrix.Util.ChatPrint(output);
 			else
@@ -1070,9 +1118,14 @@ function doPercentLess(percentLess, minProfit)
 end
 
 function doBidBroker(minProfit, percentLess)
+	local adv = false
 	if not Auctioneer then
-		Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
-		return;
+		if AucAdvanced then
+			adv = true
+		else
+			Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+			return;
+		end
 	elseif not (Auctioneer.Filter or Auctioneer.SnapshotDB.Query) then
 		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.9.0.1285 or later");
 		return;
@@ -1103,13 +1156,19 @@ function doBidBroker(minProfit, percentLess)
 		}
 	
 	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
-	local targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, bidbroker_args);
+	local targetAuctions
+	if adv then
+		targetAuctions = AucAdvanced.API.QueryImage({filter=bidBrokerFilter}, nil, nil, bidbroker_args);
+	else
+		targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, bidbroker_args);
+	end
 
 	-- sort by profit
 	table.sort(profitMargins, bidBrokerSort);
 
 	local skipped_auctions = 0;
 	local skipped_skill = 0;
+	local name, link, _, itemLevel
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
@@ -1122,7 +1181,13 @@ function doBidBroker(minProfit, percentLess)
 		local profit = auctionItem.profit;
 		local bidText;
 		if (margin >= percentLess) then
-			local name, link, _, itemLevel = GetItemInfo( a.itemId );
+			if adv then
+				name = a.itemName
+				link = a.link
+				itemLevel = a.itemLevel
+			else
+				name, link, _, itemLevel = GetItemInfo( a.itemId );
+			end
 			if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
 				if (currentBid == min) then
 					bidText = _ENCH('FrmtBidbrokerMinbid');
@@ -1130,13 +1195,13 @@ function doBidBroker(minProfit, percentLess)
 					bidText = _ENCH('FrmtBidbrokerCurbid');
 				end
 				local output = _ENCH('FrmtBidbrokerLine'):format(
-					Auctioneer.Util.ColorTextWhite(a.count.."x")..link,
+					whiteText(a.count.."x")..link,
 					EnhTooltip.GetTextGSC(value * a.count),
 					bidText,
 					EnhTooltip.GetTextGSC(currentBid),
 					EnhTooltip.GetTextGSC(profit * a.count),
-					Auctioneer.Util.ColorTextWhite(margin.."%"),
-					Auctioneer.Util.ColorTextWhite(Auctioneer.Util.GetTimeLeftString(a.timeLeft))
+					whiteText(margin.."%"),
+					whiteText(timeLeftString(a.timeLeft))
 				);
 				Enchantrix.Util.ChatPrint(output);
 			else

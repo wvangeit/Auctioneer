@@ -53,7 +53,7 @@ private.scanDir = 1
 
 
 local LclAucScanData = nil
-function private.GetAuctionSnapshots()
+function private.LoadAuctionImage()
 	if (LclAucScanData) then return LclAucScanData end
 	local loaded, reason = LoadAddOn("Auc-ScanData")
 	if not loaded then
@@ -83,6 +83,11 @@ function private.GetAuctionSnapshots()
 	if not loaded then AucAdvancedData.Scandata = AucScanData end
 	LclAucScanData = AucScanData
 	return LclAucScanData
+end
+
+function lib.GetImage()
+	LoadAuctionImage()
+	return image
 end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
@@ -141,6 +146,8 @@ function private.Unpack(item, storage)
 	
 	return storage
 end
+-- Define a public accessor for the above upack function
+lib.UnpackImageItem = private.Unpack
 
 function private.IsIdentical(focus, compare)
 	for i = 1, Const.SELLER do
@@ -299,26 +306,28 @@ function private.IsInQuery(curQuery, data)
 	return false
 end
 
-function private.Commit(wasInComplete)
+function lib.GetScanData(faction, realmName)
+	if not faction then faction = AucAdvanced.GetFactionGroup() end
+	if not realmName then realmName = GetRealmName() end
+	local AucScanData = private.LoadAuctionImage()
+	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
+	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, nextID = {none_after=1}, time=time()} end
+	if not AucScanData.scans[realmName][faction].image then AucScanData.scans[realmName][faction].image = {} end
+	return AucScanData.scans[realmName][faction]
+end
+
+function private.Commit(wasIncomplete)
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
 	if not private.curQuery then return end
-	local now = time()	
-	local faction = AucAdvanced.GetFactionGroup()
-	local realmName = GetRealmName()
-
-	local AucScanData = private.GetAuctionSnapshots()
-	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
-	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, nextID = {none_after=1}, time=now} end
-	if not AucScanData.scans[realmName][faction].image then AucScanData.scans[realmName][faction].image = {} end
-	local scandata = AucScanData.scans[realmName][faction]
-	private.image = scandata.image
+	local scandata = lib.GetScanData()
+	local now = time()
 	
 	local list, link, flag
 	local lut = {}
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
-	for pos, data in ipairs(private.image) do
+	for pos, data in ipairs(scandata.image) do
 		if private.IsInQuery(private.curQuery, data) then
 			-- Mark dirty
 			flag = data[Const.FLAG] or 0
@@ -341,28 +350,28 @@ function private.Commit(wasInComplete)
 	end
 
 	local itemPos
-	local oldCount = #private.image
+	local oldCount = #scandata.image
 	local scanCount = #private.curScan
 	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
 	for _, data in ipairs(private.curScan) do
-		itemPos = lib.FindItem(data, private.image, lut)
+		itemPos = lib.FindItem(data, scandata.image, lut)
 		flag = data[Const.FLAG] or 0
 		data[Const.FLAG] = bit.band(flag, bit.bnot(Const.FLAG_DIRTY))
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
-			data[Const.ID] = private.image[itemPos][Const.ID]
-			if not private.IsIdentical(private.image[itemPos], data) then				
-				processStats("update", data, private.image[itemPos])
+			data[Const.ID] = scandata.image[itemPos][Const.ID]
+			if not private.IsIdentical(scandata.image[itemPos], data) then				
+				processStats("update", data, scandata.image[itemPos])
 				updateCount = updateCount + 1
 			else
 				processStats("leave", data)
 				sameCount = sameCount + 1
 			end
-			private.image[itemPos] = data
+			scandata.image[itemPos] = data
 		else
 			if (processStats("create", data)) then
 				data[Const.ID] = private.GetID(scandata.nextID)
-				table.insert(private.image, data)
+				table.insert(scandata.image, data)
 				newCount = newCount + 1
 			else
 				scanCount = scanCount - 1
@@ -371,8 +380,8 @@ function private.Commit(wasInComplete)
 	end
 
 	local data, flag
-	for pos = #private.image, 1, -1 do
-		data = private.image[pos]
+	for pos = #scandata.image, 1, -1 do
+		data = scandata.image[pos]
 		flag = data[Const.FLAG]
 		if (flag and bit.band(flag, Const.FLAG_DIRTY) > 0) then
 			local stillpossible = false
@@ -383,7 +392,7 @@ function private.Commit(wasInComplete)
 			end
 
 			if (stillpossible) then
-				if (not wasInComplete) then
+				if (not wasIncomplete) then
 					if bit.band(data[Const.FLAG], Const.FLAG_UNSEEN) then
 						dodelete = true
 					else
@@ -397,13 +406,13 @@ function private.Commit(wasInComplete)
 				-- Auction Time has expired
 				processStats("delete", data)
 				private.ReleaseID(scandata.nextID, data[Const.ID])
-				table.remove(private.image, pos)
+				table.remove(scandata.image, pos)
 				removeCount = removeCount + 1
 			end
 
 		end
 	end
-	local currentCount = #private.image
+	local currentCount = #scandata.image
 
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
@@ -437,9 +446,8 @@ function private.Commit(wasInComplete)
 	end
 	scanTime = scanTime.."Spent Scanning Auction House"
 	lib.Print(scanTime)
-		
-	scandata.image = private.image
-	private.image = nil
+	
+	scandata.time = now()
 	private.curQuery = nil
 	private.scanStartTime = nil
 	private.curScan = nil
@@ -629,7 +637,6 @@ end
 
 function lib.Abort()
 	if (private.curQuery) then
-		private.image = nil
 		private.curQuery = nil
 		private.curScan = nil
 	end
