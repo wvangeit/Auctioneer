@@ -593,7 +593,6 @@ function setKhaosSetKeyValue(key, value)
 		if (not kKey) then
 			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
 		elseif (kKey.checked ~= nil) then
-			-- Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): setting ", value, " for key ", key)
 			Khaos.setSetKeyParameter("Enchantrix", key, "checked", value)
 		elseif (kKey.value ~= nil) then
 			Khaos.setSetKeyParameter("Enchantrix", key, "value", value)
@@ -777,7 +776,6 @@ function clear(param, chatprint)
 
 		if (items) then
 			for pos, itemKey in ipairs(items) do
-				Enchantrix.Util.DebugPrintQuick(pos, itemKey, sig)
 				local sig = Enchantrix.Util.GetSigFromLink(itemKey)
 				local itemID = Enchantrix.Util.GetItemIdFromSig(sig)
 				EnchantedLocal[sig] = nil
@@ -906,7 +904,6 @@ function createReagentPricingTable()
 		
 		scanReagentTable[ reagent ] = myValue;
 	end
-	--Enchantrix.Util.DebugPrintQuick("createReagentPricingTable: final table", scanReagentTable )
 	
 	return scanReagentTable;
 end

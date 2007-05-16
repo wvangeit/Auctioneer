@@ -394,13 +394,11 @@ local function index(self, key)
 			if ((not data.total) or (data.total[1] == 0)) then
 				-- we couldn't find anything in the normal table, use our fallback table
 				local baseData = getBaseTableDisenchants(iLevel,iQual,iType);
-				--Enchantrix.Util.DebugPrint("basedata", ENX_INFO, "basetable data", "basetable data", baseData )
 				if (baseData) then
 					addResultFromBaseTable(data,baseData);
 				end
 			end
 		end
-		--Enchantrix.Util.DebugPrint("final disenchant data", ENX_INFO, "final data", "disenchant data", data )
 		return data
 	end
 	local val = rawget(self, key)

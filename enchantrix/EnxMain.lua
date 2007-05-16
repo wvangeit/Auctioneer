@@ -231,7 +231,6 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		-- NOTE: we do get the spell name here
-		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast succeeded", "info:", funcVars, event, spell, rank, target )
 		DisenchantEvent.finished = nil
 		if spell == _ENCH('ArgSpellname') then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
@@ -244,7 +243,6 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		-- Successful disenchant: SENT, START, STOP, SUCCEEDED
 		-- Events for failed disenchant are: SENT, (sometimes START), FAILED
 		-- For an item above our level, the events are: SENT, FAILED
-		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast failed", "info:", funcVars, event, spell, rank, target )
 		if (DisenchantEvent.sent
 			and DisenchantEvent.spellTarget
 			and GetTime() - DisenchantEvent.targetted < 5) then
@@ -283,7 +281,6 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		-- NOTE: we do get the spell name here
-		--Enchantrix.Util.DebugPrint("Spellcast", ENX_INFO, "cast sent", "info:", funcVars, event, spell, rank, target )
 		if spell == _ENCH('ArgSpellname') then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.sent = true;
