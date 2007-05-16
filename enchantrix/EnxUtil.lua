@@ -67,6 +67,7 @@ function isDisenchantable(id)
 		end
 		if (not Enchantrix.Constants.InventoryTypes[equip]) then
 			-- Neither weapon nor armor
+			--Enchantrix.Util.DebugPrintQuick("no inv type for item ", id, ", location ", equip );
 			return false
 		end
 		if (quality and quality < 2) then
@@ -75,6 +76,7 @@ function isDisenchantable(id)
 		end
 		if (count and count > 1) then
 			-- Stackable item
+			--Enchantrix.Util.DebugPrintQuick("found stackable weapon/armor ", id, ", location ", equip );
 			return false
 		end
 		return true
@@ -233,11 +235,11 @@ function getIType(link)
 
 	local iName,iLink,iQual,iLevel,iMin,iType,iSub,iStack,iEquip,iTex=GetItemInfo(link)
 	if (iQual < 2) then
-		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Quality too low", "The quality for " .. link .. " is too low (" .. iQual .. "< 2)")
+		--Enchantrix.DebugPrint("GetIType", ENX_INFO, "Quality too low", "The quality for " .. link .. " is too low (" .. iQual .. "< 2)")
 		return
 	end
 	if not iEquip then
-		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Item not equippable", "The item " .. link .. " is not equippable")
+		--Enchantrix.DebugPrint("GetIType", ENX_INFO, "Item not equippable", "The item " .. link .. " is not equippable")
 		return
 	end
 	local invType = Enchantrix.Constants.InventoryTypes[iEquip]
@@ -545,6 +547,7 @@ function Enchantrix.Util.GetIType(link)
 	local class = const.InventoryTypes[itemEquipLoc] or 0
 	
 	if itemRarity < 2 or not (class and (class == const.WEAPON or class == const.ARMOR)) then
+		--Enchantrix.Util.DebugPrintQuick("not weapon or armor for ", link, ", location ", itemEquipLoc );
 		return
 	end
 	

@@ -167,6 +167,7 @@ const.InventoryTypes = {
 	["INVTYPE_WEAPONOFFHAND"] = const.WEAPON,
 	["INVTYPE_RANGED"] = const.WEAPON,
 	["INVTYPE_RANGEDRIGHT"] = const.WEAPON,
+	["INVTYPE_THROWN"] = const.WEAPON,
 	["INVTYPE_BODY"] = const.ARMOR,
 	["INVTYPE_CHEST"] = const.ARMOR,
 	["INVTYPE_CLOAK"] = const.ARMOR,
