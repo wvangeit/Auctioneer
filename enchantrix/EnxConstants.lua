@@ -271,19 +271,21 @@ local EPIC = 4
 
 -- disenchanting level bracket upper bounds
 -- e.g. an ilevel 52 item goes into bracket 55
-const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 85, 99, 120 }
+const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 120 }
 
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
 -- and yielding { { reagent type, drop probability, average drop quantity }, ... }
--- Thanks Chardonnay
+-- Thanks to Chardonnay, Tekkub and Wowhead
+
+-- TODO - ccox - can I use a bounds list per quality to make the tables smaller?
 const.baseDisenchantTable = {
  [UNCOMMON] = {
   [const.WEAPON] = {
    [15]  = { { STRANGE , 0.20, 1.5 }, { LMAGIC  , 0.80, 1.5 }, },
    [20]  = { { STRANGE , 0.20, 2.5 }, { GMAGIC  , 0.75, 1.5 }, { SGLIMMERING, 0.05, 1.0 }, },
-   [25]  = { { STRANGE , 0.15, 5.0 }, { GMAGIC  , 0.75, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
-   [30]  = { { SOUL    , 0.20, 1.5 }, { GMAGIC  , 0.75, 1.5 }, { LGLIMMERING, 0.05, 1.0 }, },
+   [25]  = { { STRANGE , 0.15, 5.0 }, { LASTRAL , 0.75, 1.5 }, { SGLIMMERING, 0.10, 1.0 }, },
+   [30]  = { { SOUL    , 0.20, 1.5 }, { GASTRAL , 0.75, 1.5 }, { LGLIMMERING, 0.05, 1.0 }, },
    [35]  = { { SOUL    , 0.20, 3.5 }, { LMYSTIC , 0.75, 1.5 }, { SGLOWING   , 0.05, 1.0 }, },
    [40]  = { { VISION  , 0.20, 1.5 }, { GMYSTIC , 0.75, 1.5 }, { LGLOWING   , 0.05, 1.0 }, },
    [45]  = { { VISION  , 0.15, 3.5 }, { LNETHER , 0.80, 1.5 }, { SRADIANT   , 0.05, 1.0 }, },
@@ -291,7 +293,10 @@ const.baseDisenchantTable = {
    [55]  = { { DREAM   , 0.20, 3.5 }, { LETERNAL, 0.75, 1.5 }, { SBRILLIANT , 0.05, 1.0 }, },
    [60]  = { { ILLUSION, 0.20, 1.5 }, { GETERNAL, 0.75, 1.5 }, { LBRILLIANT , 0.05, 1.0 }, },
    [65]  = { { ILLUSION, 0.20, 3.5 }, { GETERNAL, 0.75, 2.5 }, { LBRILLIANT , 0.05, 1.0 }, },
+   [70]  = { { ARCANE  , 0.20, 1.5 }, { LPLANAR , 0.75, 1.5 }, { SPRISMATIC , 0.05, 1.0 }, },
+   [79]  = { { ARCANE  , 0.20, 1.5 }, { LPLANAR , 0.75, 1.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [85]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
+   [94]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [99]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
   },
@@ -307,7 +312,10 @@ const.baseDisenchantTable = {
    [55]  = { { DREAM   , 0.75, 3.5 }, { LETERNAL, 0.20, 1.5 }, { SBRILLIANT , 0.05, 1.0 }, },
    [60]  = { { ILLUSION, 0.75, 1.5 }, { GETERNAL, 0.20, 1.5 }, { LBRILLIANT , 0.05, 1.0 }, },
    [65]  = { { ILLUSION, 0.75, 3.5 }, { GETERNAL, 0.20, 2.5 }, { LBRILLIANT , 0.05, 1.0 }, },
+   [70]  = { { ARCANE  , 0.80, 1.5 }, { LPLANAR , 0.15, 1.5 }, { SPRISMATIC , 0.05, 1.0 }, },
+   [79]  = { { ARCANE  , 0.80, 1.5 }, { LPLANAR , 0.15, 1.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [85]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
+   [94]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [99]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
   },
@@ -324,7 +332,10 @@ const.baseDisenchantTable = {
    [55]  = { { SBRILLIANT , 1.00, 1.0 }, },
    [60]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [65]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [70]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [79]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [85]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
   },
@@ -339,7 +350,10 @@ const.baseDisenchantTable = {
    [55]  = { { SBRILLIANT , 1.00, 1.0 }, },
    [60]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [65]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [70]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- this is for pre-BC items, there is some overlap 66-70
+   [79]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [85]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
   },
@@ -347,26 +361,47 @@ const.baseDisenchantTable = {
  [EPIC] = {
   [const.WEAPON] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
-   [45]  = { { SRADIANT  , 1.00, 3.5 }, },	-- there is a lot of varience in these results
+   [45]  = { { SRADIANT  , 1.00, 3.5 }, },
    [50]  = { { LRADIANT  , 1.00, 3.5 }, },
    [55]  = { { SBRILLIANT, 1.00, 3.5 }, },
    [60]  = { { NEXUS     , 1.00, 1.0 }, },
-   [65]  = { { NEXUS     , 1.00, 1.0 }, },
-   [85]  = { { NEXUS     , 1.00, 1.0 }, },
+   [65]  = { { NEXUS     , 1.00, 1.5 }, },
+   [70]  = { { NEXUS     , 1.00, 1.5 }, },
+   [79]  = { { NEXUS     , 1.00, 1.5 }, },
+   [85]  = { { NEXUS     , 1.00, 1.5 }, },
+   [94]  = { { NEXUS     , 1.00, 1.5 }, },	-- BC gear appears to start at 95
    [99]  = { { VOID      , 1.00, 1.0 }, },
    [120] = { { VOID      , 1.00, 1.5 }, },
   },
   [const.ARMOR] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
-   [45]  = { { SRADIANT  , 1.00, 3.5 }, },	-- there is a lot of varience in these results
+   [45]  = { { SRADIANT  , 1.00, 3.5 }, },
    [50]  = { { LRADIANT  , 1.00, 3.5 }, },
    [55]  = { { SBRILLIANT, 1.00, 3.5 }, },
    [60]  = { { NEXUS     , 1.00, 1.0 }, },
-   [65]  = { { NEXUS     , 1.00, 1.0 }, },
-   [85]  = { { NEXUS     , 1.00, 1.0 }, },
+   [65]  = { { NEXUS     , 1.00, 1.5 }, },
+   [70]  = { { NEXUS     , 1.00, 1.5 }, },
+   [79]  = { { NEXUS     , 1.00, 1.5 }, },
+   [85]  = { { NEXUS     , 1.00, 1.5 }, },
+   [94]  = { { NEXUS     , 1.00, 1.5 }, },	-- BC gear appears to start at 95
    [99]  = { { VOID      , 1.00, 1.0 }, },
    [120] = { { VOID      , 1.00, 1.5 }, },
   },
  },
+}
+
+
+-- this is for the few items that overlap Pre and Post Burning Crusade item level 66 to 70
+-- because pre and post disenchant to different things
+-- generated from  http://www.wowhead.com/?items=4&filter=qu=3;minle=66;maxle=70;cr=82:93;crs=1:2;crv=0:0
+-- all the weapons in this range are pre-BC
+const.RareArmorExceptionList = {
+	[32695] = true,
+	[32481] = true,
+	[23835] = true,
+	[23836] = true,
+	[25653] = true,
+	[32863] = true,
+	[70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- result for post-BC items
 }
 

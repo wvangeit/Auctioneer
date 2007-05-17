@@ -315,8 +315,15 @@ local function roundupLevel(level)
 end
 
 -- get entry from disenchant table (or nil if nothing found)
-local function getBaseTableDisenchants(level, quality, type)
+local function getBaseTableDisenchants(level, quality, type, item)
 	local rLevel = roundupLevel(level);
+
+	-- check for some exceptions due to overlap of pre and post Burning Crusade blues in the 66-70 range
+	if (quality == 3 and rLevel == 70 and type == const.ARMOR ) then
+		if (Enchantrix.Constants.RareArmorExceptionList[item]) then
+			return Enchantrix.Constants.RareArmorExceptionList[rLevel];
+		end
+	end
 
 	if Enchantrix.Constants.baseDisenchantTable[quality]
 		and Enchantrix.Constants.baseDisenchantTable[quality][type]
@@ -393,7 +400,7 @@ local function index(self, key)
 
 			if ((not data.total) or (data.total[1] == 0)) then
 				-- we couldn't find anything in the normal table, use our fallback table
-				local baseData = getBaseTableDisenchants(iLevel,iQual,iType);
+				local baseData = getBaseTableDisenchants(iLevel,iQual,iType,iItem);
 				if (baseData) then
 					addResultFromBaseTable(data,baseData);
 				end
