@@ -916,6 +916,9 @@ function percentLessFilter(auction, args)
 		auction.auctionId = auction.id
 		auction.count = auction.stackSize
 		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		if (auction.sellerName == UnitName("player") or auction.amBidder) then
+			return false
+		end
 	end
 	
 	percentLess = args['percentLess'];
@@ -946,7 +949,7 @@ function percentLessFilter(auction, args)
 		and (buyout <= Enchantrix.Settings.GetSetting('maxBuyoutPrice')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
-		profitMargins[ auction.auctionId ] = results;
+		table.insert(profitMargins, results);
 		return true;
 	end
 
@@ -961,6 +964,9 @@ function bidBrokerFilter(auction, args)
 		auction.auctionId = auction.id
 		auction.count = auction.stackSize
 		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		if (auction.sellerName == UnitName("player") or auction.amBidder) then
+			return false
+		end
 	end
 	
 	minProfit = args['minProfit'];
@@ -996,7 +1002,7 @@ function bidBrokerFilter(auction, args)
 			 and (profitPricePercent >= Enchantrix.Settings.GetSetting('minProfitPricePercent')) then
 --		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
 --		filterAuction = false;
-		profitMargins[auction.auctionId] = results;
+		table.insert(profitMargins, results);
 		return true;
 	end
 	
@@ -1076,8 +1082,9 @@ function doPercentLess(percentLess, minProfit)
 	table.sort(profitMargins, profitComparisonSort);
 
 	local skipped_auctions = 0;
+	local skipped_hasbid = 0;
 	local skipped_skill = 0;
-	local name, link, _, itemLevel
+	local name, link, _, itemLevel, hasBid
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
@@ -1172,15 +1179,30 @@ function doBidBroker(minProfit, percentLess)
 	table.sort(profitMargins, bidBrokerSort);
 
 	local skipped_auctions = 0;
+	local skipped_hasbid = 0;
 	local skipped_skill = 0;
-	local name, link, _, itemLevel
+	local name, link, _, itemLevel, hasBid
 
 	-- output the list of auctions
 	for id, auctionItem in pairs(profitMargins) do
 		local a = auctionItem.auction;
 		local currentBid = a.bidAmount or 0;
 		local min = a.minBid or 0;
-		currentBid = math.max( currentBid, min );
+		if adv then
+			if a.increment > 0 then
+				currentBid = a.curBid + a.increment
+				hasBid = true
+			else
+				currentBid = a.minBid
+				hasBid = false
+			end
+		elseif currentBid == 0 then
+			hasBid = false
+			currentBid = min
+		else
+			hasBid = true
+		end
+		if currentBid == 0 then p("Detail", a) end
 		local value = auctionItem.value;
 		local margin = auctionItem.margin;
 		local profit = auctionItem.profit;
@@ -1194,21 +1216,25 @@ function doBidBroker(minProfit, percentLess)
 				name, link, _, itemLevel = GetItemInfo( a.itemId );
 			end
 			if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
-				if (currentBid == min) then
-					bidText = _ENCH('FrmtBidbrokerMinbid');
+				if not (Enchantrix.Settings.GetSetting('RestrictUnbidded') and hasBid) then
+					if (currentBid == min) then
+						bidText = _ENCH('FrmtBidbrokerMinbid');
+					else
+						bidText = _ENCH('FrmtBidbrokerCurbid');
+					end
+					local output = _ENCH('FrmtBidbrokerLine'):format(
+						whiteText(a.count.."x")..link,
+						EnhTooltip.GetTextGSC(value * a.count),
+						bidText,
+						EnhTooltip.GetTextGSC(currentBid),
+						EnhTooltip.GetTextGSC(profit * a.count),
+						whiteText(margin.."%"),
+						whiteText(timeLeftString(a.timeLeft))
+					);
+					Enchantrix.Util.ChatPrint(output);
 				else
-					bidText = _ENCH('FrmtBidbrokerCurbid');
+					skipped_hasbid = skipped_hasbid + 1;
 				end
-				local output = _ENCH('FrmtBidbrokerLine'):format(
-					whiteText(a.count.."x")..link,
-					EnhTooltip.GetTextGSC(value * a.count),
-					bidText,
-					EnhTooltip.GetTextGSC(currentBid),
-					EnhTooltip.GetTextGSC(profit * a.count),
-					whiteText(margin.."%"),
-					whiteText(timeLeftString(a.timeLeft))
-				);
-				Enchantrix.Util.ChatPrint(output);
 			else
 				skipped_skill = skipped_skill + 1;
 			end
@@ -1230,6 +1256,10 @@ function doBidBroker(minProfit, percentLess)
 
 	if (skipped_skill > 0) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
+	end
+
+	if (skipped_hasbid > 0) then
+		Enchantrix.Util.ChatPrint(("%s skipped due to having bids"):format(skipped_hasbid));
 	end
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));

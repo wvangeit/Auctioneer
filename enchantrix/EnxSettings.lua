@@ -131,6 +131,7 @@ local settingDefaults = {
 	['minProfitPricePercent'] = 5,		 --minimum percent under for bidbroker scan = 5% under HSP
 	['ScanValueType'] = "average",		-- what value to use for auction scans
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
+	['RestrictUnbidded'] = false,		-- should bidbroker only show items that don't have bids?
 	
 	['DisenchantUsingBaseTableOnly']	= false,	-- for debugging and development, use only the basetable for disenchant values
 }
@@ -440,6 +441,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, "Default bidbroker profit Percentage: %d")
 	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
 	gui.AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", "Only show items disenchantable at current skill")
+	gui.AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", "Restrict BidBroker to unbidded items only")
 	gui.AddControl(id, "Subhead",    0,    "Item value calculated from")
 	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
