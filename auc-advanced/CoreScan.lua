@@ -352,11 +352,11 @@ function private.Commit(wasIncomplete)
 	local itemPos
 	local oldCount = #scandata.image
 	local scanCount = #private.curScan
-	local updateCount, sameCount, newCount, suspendCount, removeCount, resumeCount = 0,0,0,0,0,0
+	local updateCount, sameCount, newCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0
+
 	for _, data in ipairs(private.curScan) do
 		itemPos = lib.FindItem(data, scandata.image, lut)
-		flag = data[Const.FLAG] or 0
-		data[Const.FLAG] = bit.band(flag, bit.bnot(Const.FLAG_DIRTY))
+		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
 			data[Const.ID] = scandata.image[itemPos][Const.ID]
@@ -382,10 +382,9 @@ function private.Commit(wasIncomplete)
 	local data, flag
 	for pos = #scandata.image, 1, -1 do
 		data = scandata.image[pos]
-		flag = data[Const.FLAG]
-		if (flag and bit.band(flag, Const.FLAG_DIRTY) > 0) then
+		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local stillpossible = false
-			local auctionmaxtime = Const.AucMinTimes[data[Const.TLEFT]] or 86400
+			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 86400
 			local dodelete = false
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
@@ -393,33 +392,38 @@ function private.Commit(wasIncomplete)
 
 			if (stillpossible) then
 				if (not wasIncomplete) then
-					if bit.band(data[Const.FLAG], Const.FLAG_UNSEEN) then
+					if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
 						dodelete = true
+						earlyDeleteCount = earlyDeleteCount + 1
 					else
-						data[Const.FLAG] = bit.bor(flag, Const.FLAG_UNSEEN)
+						data[Const.FLAG] = bit.bor(data[Const.FLAG] or 0, Const.FLAG_UNSEEN)
+						missedCount = missedCount + 1
 					end
+				else
+					missedCount = missedCount + 1
 				end
 			else
 				dodelete = true
+				expiredDeleteCount = expiredDeleteCount + 1
 			end
 			if dodelete then
 				-- Auction Time has expired
 				processStats("delete", data)
 				private.ReleaseID(scandata.nextID, data[Const.ID])
 				table.remove(scandata.image, pos)
-				removeCount = removeCount + 1
 			end
 
 		end
 	end
-	local currentCount = #scandata.image
 
+	local currentCount = #scandata.image	
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
 	end
 
-	if (oldCount - removeCount + newCount ~= currentCount) then
-		lib.Print(("Warning, discrepency in current count: {{%d - %d + %d != %d}}"):format(oldCount, removeCount, newCount, currentCount))
+	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount ~= currentCount) then
+		lib.Print(("Warning, discrepency in current count: {{%d - %d - %d + %d != %d}}"):format(oldCount, earlyDeleteCount, expiredDeleteCount,
+			newCount, currentCount))
 	end
 
 	local scanTimeSecs = time() - private.scanStartTime
@@ -428,11 +432,16 @@ function private.Commit(wasIncomplete)
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
 	
-	lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
+	if (wasIncomplete) then
+		lib.Print("Auctioneer Advanced scanned {{"..scanCount.."}} auctions before interruption:")
+	else
+		lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
+	end
 	lib.Print("  {{"..oldCount.."}} items in DB at start")
 	lib.Print("  {{"..sameCount.."}} unchanged items")
 	lib.Print("  {{"..newCount.."}} new items")
 	lib.Print("  {{"..updateCount.."}} updated items")
+	lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 	local scanTime = "  "
 	if (scanTimeHours and scanTimeHours ~= 0) then
@@ -447,6 +456,15 @@ function private.Commit(wasIncomplete)
 	scanTime = scanTime.."Spent Scanning Auction House"
 	lib.Print(scanTime)
 	
+	if (not scandata.scanstats) then scandata.scanstats = {} end
+	if (scandata.scanstats[1]) then 
+		scandata.scanstats[2] = scandata.scanstats[1] 
+		scandata.scanstats[1] = nil 
+	end
+	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
+	scandata.scanstats[0] = {oldCount = oldCount, sameCount = sameCount, newCount = newCount, updateCount = updateCount,
+		earlyDeleteCount = earlyDeleteCount, expiredDeleteCount = expiredDeleteCount, currentCount = currentCount, missedCount = missedCount}
+	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
 	scandata.time = time()
 	private.curQuery = nil
 	private.scanStartTime = nil
@@ -457,14 +475,14 @@ function lib.ScanPage(nextPage)
 	if (private.isScanning) then
 		private.Hook.QueryAuctionItems(private.curQuery.name or "", 
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
-			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subClassIndex, nextPage, 
+			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage, 
 			private.curQuery.isUsable, private.curQuery.quality) 
 		AuctionFrameBrowse.page = nextPage
 	end
 	private.curPage = nextPage
 end
 
-function lib.StorePage()	
+function lib.StorePage()
 	if (private.curPage == -1) then
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
@@ -567,6 +585,11 @@ function CanSendAuctionQuery(...)
 	end
 
 	return unpack(res)
+end
+
+private.Hook.PlaceAuctionBid = PlaceAuctionBid
+function PlaceAuctionBid(type, index, bid)
+	return private.Hook.PlaceAuctionBid(type, index, bid)
 end
 
 private.Hook.QueryAuctionItems = QueryAuctionItems
