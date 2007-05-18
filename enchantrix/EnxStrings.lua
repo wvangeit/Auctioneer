@@ -743,6 +743,9 @@ EnchantrixLocalizations = {
 		["HelpShowDELevels"] = "Select whether to show the enchanting skill needed to disenchant the item in the tooltip.";
 		["HelpShowDEMaterials"] = "Select whether to show the possible materials given by disenchanting the item in the tooltip.";
 		
+		["GuiDELevels"]	= "Enable disenchant level requirements in tooltip";
+		["GuiDEMaterials"]	= "Enable disenchant material info in tooltip";
+		
 		-- Section: Report Messages
 		["FrmtBidbrokerCurbid"]	= "curBid";
 		["FrmtBidbrokerDone"]	= "Bid brokering done";

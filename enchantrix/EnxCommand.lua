@@ -257,6 +257,56 @@ function registerKhaos()
 				difficulty=3;
 			};
 			{
+				id="levels";
+				type=K_TEXT;
+				text=function()
+					return _ENCH('GuiDELevels')
+				end;
+				helptext=function()
+					return _ENCH('HelpShowDELevels')
+				end;
+				callback=function(state)
+					genVarSet('TooltipShowDisenchantLevel', state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowDELevels')));
+					else
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowDELevels')));
+					end
+				end;
+				check=true;
+				default={checked=Enchantrix.Settings.GetDefault('TooltipShowDisenchantLevel')};
+				disabled={checked=false};
+				dependencies={all={checked=true;}};
+				difficulty=3;
+			};
+			{
+				id="materials";
+				type=K_TEXT;
+				text=function()
+					return _ENCH('GuiDEMaterials')
+				end;
+				helptext=function()
+					return _ENCH('HelpShowDEMaterials')
+				end;
+				callback=function(state)
+					genVarSet('TooltipShowDisenchantMats', state.checked);
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowDEMaterials')));
+					else
+						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowDEMaterials')));
+					end
+				end;
+				check=true;
+				default={checked=Enchantrix.Settings.GetDefault('TooltipShowDisenchantMats')};
+				disabled={checked=false};
+				dependencies={all={checked=true;}};
+				difficulty=3;
+			};
+			{
 				id="EnchantrixValuateHeader";
 				type=K_HEADER;
 				text=function()
