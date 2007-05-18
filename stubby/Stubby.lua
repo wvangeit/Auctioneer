@@ -207,7 +207,7 @@ local clearConfig                -- clearConfig(ownerAddOn, variable)
 local createAddOnLoadBootCode    -- createAddOnLoadBootCode(ownerAddOn, triggerAddOn)
 local createEventLoadBootCode    -- createEventLoadBootCode(ownerAddOn, triggerEvent)
 local createFunctionLoadBootCode -- createFunctionLoadBootCode(ownerAddOn, triggerFunction)
-local debugPrint                 -- debugPrint(message, category, errorCode, level)
+local debugPrint                 -- debugPrint(message, category, title, errorCode, level)
 local errorHandler               -- errorHandler(stackLevel, ...)
 local eventWatcher               -- eventWatcher(event)
 local events                     -- events(event, param)
@@ -676,25 +676,19 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 	end
 end
 
-
 function unregisterEventHook(triggerEvent, ownerAddOn)
 	if (config.events and config.events[triggerEvent] and config.events[triggerEvent][ownerAddOn]) then
 		config.events[triggerEvent][ownerAddOn] = nil
 
--- The # operator will not work here due to implementation/specification details
--- See http://www.lua.org/manual/5.1/manual.html#2.5.5
--- 		Because of that, you can have a table with entries still in it, but # will return 0
--- Debugged by ccox and Cera
---		if (0 == (#(config.events[triggerEvent]))) then
-
+		-- events is indexed using the addons name as the key value,
+		-- so we have to use next() to check, if the table is empty
+		-- Debugged by ccox and Cera
 		if ( not next( config.events[triggerEvent] ) ) then
 			config.events[triggerEvent] = nil
 			StubbyFrame:UnregisterEvent(triggerEvent)
 		end
-
 	end
 end
-
 
 function eventWatcher(event, ...)
 	if (config.events[event]) then
