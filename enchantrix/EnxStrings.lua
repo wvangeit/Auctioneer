@@ -654,6 +654,10 @@ EnchantrixLocalizations = {
 		["ShowValue"]	= "valuate";
 		["StatOff"]	= "Not displaying any enchant data";
 		["StatOn"]	= "Displaying configured enchant data";
+		
+		["ShowUI"]	= "show";
+		["ShowDELevels"]	= "levels";
+		["ShowDEMaterials"]	= "materials";
 
 		-- Section: Config Text
 		["GuiLoad"]	= "Load Enchantrix";
@@ -708,10 +712,6 @@ EnchantrixLocalizations = {
 		["GuiOtherHelp"]	= "Miscellaneous Enchantrix Options";
 		["GuiPrintin"]	= "Select the desired message frame";
 		["GuiRate"]	= "Show the average quantity of disenchant";
-		["GuiReloadui"]	= "Reload User Interface";
-		["GuiReloaduiButton"]	= "ReloadUI";
-		["GuiReloaduiFeedback"]	= "Now Reloading the WoW UI";
-		["GuiReloaduiHelp"]	= "Click here to reload the WoW User Interface after changing the locale so that the language in this configuration screen matches the one you selected.\nNote: This operation may take a few minutes.";
 		["GuiTerse"]	= "Enable terse mode";
 		["GuiValuateAverages"]	= "Valuate with Auctioneer Averages";
 		["GuiValuateBaseline"]	= "Valuate with Built-in Data";
@@ -739,6 +739,10 @@ EnchantrixLocalizations = {
 		["HelpTerse"]	= "Enable/disable terse mode, showing only disenchant value. Can be overridden by holding down the control key.";
 		["HelpValue"]	= "Select whether to show item's estimated values based on the proportions of possible disenchants";
 
+		["HelpShowUI"] = "Show or hide the settings panel.";
+		["HelpShowDELevels"] = "Select whether to show the enchanting skill needed to disenchant the item in the tooltip.";
+		["HelpShowDEMaterials"] = "Select whether to show the possible materials given by disenchanting the item in the tooltip.";
+		
 		-- Section: Report Messages
 		["FrmtBidbrokerCurbid"]	= "curBid";
 		["FrmtBidbrokerDone"]	= "Bid brokering done";

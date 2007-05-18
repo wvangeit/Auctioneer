@@ -602,6 +602,23 @@ function setKhaosSetKeyValue(key, value)
 	end
 end
 
+
+-- TODO - ccox - merge this somewhere sane
+-- we have too many locations for these commands
+-- can we use commandmap for this?
+
+local commandToSettingLookup = {
+	['terse'] = 'ToolTipTerseFormat',
+	['counts'] = 'ToolTipShowCounts',
+	['embed'] = 'ToolTipEmbedInGameTip',
+	['valuate'] = 'TooltipShowValues',
+	['valuate-hsp'] = 'TooltipShowAuctValueHSP',
+	['valuate-median'] = 'TooltipShowAuctValueMedian',
+	['valuate-baseline'] = 'TooltipShowBaselineValue',
+	['levels'] = 'TooltipShowDisenchantLevel',
+	['materials'] = 'TooltipShowDisenchantMats',
+}
+
 -- Cleaner Command Handling Functions (added by MentalPower)
 function handleCommand(command, source)
 
@@ -648,6 +665,16 @@ function handleCommand(command, source)
 			end
 		end
 
+	elseif (cmd == 'show') then
+		-- show or hide our settings UI
+		Enchantrix.Settings.MakeGuiConfig()
+		local gui = Enchantrix.Settings.Gui
+		if (gui:IsVisible()) then
+			gui:Hide()
+		else
+			gui:Show()
+		end
+
 	elseif (cmd == 'clear') then
 		-- /enchantrix clear
 		clear(param, chatprint);
@@ -671,11 +698,20 @@ function handleCommand(command, source)
 	elseif (cmd == 'percentless' or cmd == 'pl') then
 		doPercentLess(param, param2);
 
-	elseif (Enchantrix.Settings.GetDefault(cmd) ~= nil) then
-		genVarSet(cmd, param, chatprint);
+	else
+	
+		-- lookup conversion to internal variable names
+		if (commandToSettingLookup[cmd]) then
+			cmd = commandToSettingLookup[cmd];
+		end
+		
+		-- try direct access
+		if (Enchantrix.Settings.GetDefault(cmd) ~= nil) then
+			genVarSet(cmd, param, chatprint);
 
-	elseif (chatprint) then
-		Enchantrix.Util.ChatPrint(_ENCH('FrmtActUnknown'):format(cmd));
+		elseif (chatprint) then
+			Enchantrix.Util.ChatPrint(_ENCH('FrmtActUnknown'):format(cmd));
+		end
 	end
 end
 
@@ -686,12 +722,15 @@ function chatPrintHelp()
 	local lineFormat = "  |cffffffff/enchantrix %s "..onOffToggle.."|r |cff2040ff[%s]|r - %s";
 
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix.Locale.GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
-
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
-
+	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('ShowUI').."|r - " .. _ENCH('HelpShowUI'));
+	
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowDELevels'), Enchantrix.Locale.GetLocalizedFilterVal('levels'), _ENCH('HelpShowDELevels')));
+	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowDEMaterials'), Enchantrix.Locale.GetLocalizedFilterVal('materials'), _ENCH('HelpShowDEMaterials')));
+	
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
 	if AucAdvanced then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerVal'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-val'), _ENCH('HelpGuessAuctioneerVal')));
@@ -712,6 +751,8 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
 end
+
+
 --[[
 	The onOff(state, chatprint) function handles the state of the Enchantrix AddOn (whether it is currently on or off)
 	If "on" or "off" is specified in the "state" variable then Enchantrix's state is changed to that value,
