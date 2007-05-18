@@ -676,15 +676,25 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 	end
 end
 
+
 function unregisterEventHook(triggerEvent, ownerAddOn)
 	if (config.events and config.events[triggerEvent] and config.events[triggerEvent][ownerAddOn]) then
 		config.events[triggerEvent][ownerAddOn] = nil
-		if (#config.events[triggerEvent] == 0) then
+
+-- The # operator will not work here due to implementation/specification details
+-- See http://www.lua.org/manual/5.1/manual.html#2.5.5
+-- 		Because of that, you can have a table with entries still in it, but # will return 0
+-- Debugged by ccox and Cera
+--		if (0 == (#(config.events[triggerEvent]))) then
+
+		if ( not next( config.events[triggerEvent] ) ) then
 			config.events[triggerEvent] = nil
 			StubbyFrame:UnregisterEvent(triggerEvent)
 		end
+
 	end
 end
+
 
 function eventWatcher(event, ...)
 	if (config.events[event]) then
