@@ -277,7 +277,7 @@ local function setter(setting, value)
 			EnchantConfig[getUserSig()] = value
 			
 -- TODO - localize string
-			DEFAULT_CHAT_FRAME:AddMessage("Changing profile: "..value)
+			DEFAULT_CHAT_FRAME:AddMessage("Now using profile: "..value)
 			
 		end
 
@@ -327,18 +327,18 @@ local function getter(setting)
 				private.scanValueNames[i] = nil
 			end
 
-			table.insert(private.scanValueNames,{"average", "Average (default)"})
-			table.insert(private.scanValueNames,{"baseline", "Market Baseline"})
+			table.insert(private.scanValueNames,{"average", _ENCH("GuiItemValueAverage") })
+			table.insert(private.scanValueNames,{"baseline", _ENCH("GuiItemValueBaseline") })
 			if AucAdvanced then
-				table.insert(private.scanValueNames,{"adv:market", "AucAdv Market Value"})
+				table.insert(private.scanValueNames,{"adv:market", _ENCH("GuiItemValueAuc5Market") })
 				local algoList = AucAdvanced.API.GetAlgorithms()
 				for pos, name in ipairs(algoList) do
 					table.insert(private.scanValueNames,{"aucadv:stat:"..name, "AucAdv Stat:"..name})
 				end
 			end
 			if Auctioneer then
-				table.insert(private.scanValueNames,{"auc4:hsp", "Auc4 HSP"})
-				table.insert(private.scanValueNames,{"auc4:med", "Auc4 Median"})
+				table.insert(private.scanValueNames,{"auc4:hsp", _ENCH("GuiItemValueAuc4HSP") })
+				table.insert(private.scanValueNames,{"auc4:med", _ENCH("GuiItemValueAuc4Median") })
 			end
 			
 			return private.scanValueNames
@@ -348,19 +348,7 @@ local function getter(setting)
 	if (setting == 'profile') then
 		return getUserProfileName()
 	end
-	if (setting == 'track.styles') then
-		return {
-			"Black",
-			"Blue",
-			"Cyan",
-			"Green",
-			"Magenta",
-			"Red",
-			"Test",
-			"White",
-			"Yellow",
-		}
-	end
+
 	local db = getUserProfile()
 	if ( db[setting] ~= nil ) then
 		return db[setting]
@@ -387,62 +375,63 @@ function lib.MakeGuiConfig()
 	lib.Gui = gui
 
   	gui.AddCat("Enchantrix")
-  	
-	id = gui.AddTab("Profiles")
-	gui.AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
-	
-	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
-	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
-	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Button",     0, 1, "profile.default", "Reset")
-	
-	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
-	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
-	gui.AddControl(id, "Button",     0, 1, "profile.save", "Save")
+  
 
+	id = gui.AddTab(_ENCH("GuiTabProfiles"))
+	gui.AddControl(id, "Header",     0,    _ENCH("GuiConfigProfiles"))
+	
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiActivateProfile"))
+	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
+	gui.AddControl(id, "Button",     0, 1, "profile.delete", _ENCH("GuiDeleteProfileButton"))
+	gui.AddControl(id, "Button",     0, 1, "profile.default", _ENCH("GuiResetProfileButton"))
+	
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiCreateReplaceProfile"))
+	gui.AddControl(id, "Text",       0, 1, "profile.name", _ENCH("GuiNewProfileName"))
+	gui.AddControl(id, "Button",     0, 1, "profile.save", _ENCH("GuiSaveProfileButton"))
 
-	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",     0,    "General Enchantrix options")
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", "Show the enchanting skill needed to disenchant an item in the tooltip")
-	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", "Show the exact disenchant counts from the database")
-	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)")
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", "Show materials that the item may disenchant into")
+	id = gui.AddTab(_ENCH("GuiTabGeneral"))
+	gui.AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
+	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", _ENCH("GuiCount") )
+	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 -- TODO: this control is for debugging only
 	gui.AddControl(id, "Checkbox",   0, 1, "DisenchantUsingBaseTableOnly", "Use base table only for disenchant info - DEBUGGING")
 
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
-	gui.AddControl(id, "Subhead",    0,    "Valuations")
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", "Show disenchant values")
-	gui.AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", "Show ToolTipTerseFormat disenchant value")
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
+	gui.AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", _ENCH("GuiValueTerse"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", "Show Auctioneer HighestSellablePrice values")
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", "Show Auctioneer median values")
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
 		if (AucAdvanced) then
-			gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", "Show Auctioneer 5 value")
+			gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
 		end
 	end
-	gui.AddControl(id, "Checkbox",   0, 2, "TooltipShowBaselineValue", "Show built-in baseline values")
+	gui.AddControl(id, "Checkbox",   0, 2, "TooltipShowBaselineValue", _ENCH("GuiValueShowBaseline"))
 
-	gui.AddControl(id, "Subhead",    0,    "Minimap display options")
-	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", "Display Minimap button")
-	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
-	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiMinimapOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", _ENCH("GuiMinimapShowButton"))
+	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, _ENCH("GuiMinimapButtonAngle"))
+	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
 	
 	
-	id = gui.AddTab("Auction Scans")
-	gui.AddControl(id, "Header",     0,    "Percentless and Bidbroker settings")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1, 99999999, "Maximum Buyout price:")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 1, nil, "Default Profit Margin:")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 1, nil, "Minimum Profit Margin:")
-	gui.AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, "Default Percentage less than HSP: %d")
-	gui.AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, "Minimum Percentage less than HSP: %d")
-	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, "Default bidbroker profit Percentage: %d")
-	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, "Minimum bidbroker profit Percentage: %d")
-	gui.AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", "Only show items disenchantable at current skill")
-	gui.AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", "Restrict BidBroker to unbidded items only")
-	gui.AddControl(id, "Subhead",    0,    "Item value calculated from")
+	id = gui.AddTab(_ENCH("GuiTabAuctions"))
+	gui.AddControl(id, "Header",     0,    _ENCH("GuiPLBBSettings"))
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1, 99999999, _ENCH("GuiMaxBuyout"))
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 1, nil, _ENCH("GuiDefaultProfitMargin"))
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 1, nil, _ENCH("GuiMinProfitMargin"))
+	gui.AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, _ENCH("GuiDefaultLessHSP"))
+	gui.AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, _ENCH("GuiMinLessHSP"))
+	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, _ENCH("GuiDefaultBBProfitPercent"))
+	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, _ENCH("GuiMinBBProfitPercent"))
+	gui.AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", _ENCH("GuiPLBBOnlyBelowDESkill"))
+	gui.AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", _ENCH("GuiBBUnbiddedOnly"))
+	
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
 	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
 end
