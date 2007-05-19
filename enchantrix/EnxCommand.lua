@@ -1100,27 +1100,32 @@ function bidBrokerFilter(auction, args)
 	return filterAuction;
 end
 
+-- greatest profit first
+-- greatest margin first
+-- greatest value first
 function profitComparisonSort(a, b)
-	local aProfit = a.profit or 0;
-	local bProfit = b.profit or 0;
+	local aProfit = profitMargins[a].profit or 0;
+	local bProfit = profitMargins[b].profit or 0;
 	if (aProfit > bProfit) then return true; end
 	if (aProfit < bProfit) then return false; end
-	local aMargin = a.margin or 0;
-	local bMargin = b.margin or 0;
+	local aMargin = profitMargins[a].margin or 0;
+	local bMargin = profitMargins[b].margin or 0;
 	if (aMargin > bMargin) then return true; end
 	if (aMargin < bMargin) then return false; end
-	local aValue  = a.value or 0;
-	local bValue  = b.value or 0;
+	local aValue  = profitMargins[a].value or 0;
+	local bValue  = profitMargins[b].value or 0;
 	if (aValue > bValue) then return true; end
 	if (aValue < bValue) then return false; end
 	return false;
 end
 
+-- shortest time first
+-- then profit (above)
 function bidBrokerSort(a, b)
-	local aTime = a.auction.timeLeft or 0;
-	local bTime = b.auction.timeLeft or 0;
-	if (aTime > bTime) then return true; end
-	if (aTime < bTime) then return false; end
+	local aTime = profitMargins[a].auction.timeLeft or 0;
+	local bTime = profitMargins[b].auction.timeLeft or 0;
+	if (aTime > bTime) then return false; end
+	if (aTime < bTime) then return true; end
 	return profitComparisonSort(a, b);
 end
 
@@ -1169,16 +1174,19 @@ function doPercentLess(percentLess, minProfit)
 		targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, percentLessFilter, percentless_args);
 	end
 
-	-- sort by profit
-	table.sort(profitMargins, profitComparisonSort);
+	-- sort by profit into temporary array
+	sortedTable = {}
+	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
+	table.sort(sortedTable, profitComparisonSort);
 
 	local skipped_auctions = 0;
 	local skipped_hasbid = 0;
 	local skipped_skill = 0;
 	local name, link, _, itemLevel, hasBid
 
-	-- output the list of auctions
-	for id, auctionItem in pairs(profitMargins) do
+	-- output the list of auctions, iterating over our temp array
+	for _, n in ipairs(sortedTable) do
+		auctionItem = profitMargins[ n ];
 		local profit = auctionItem.profit;
 		local a = auctionItem.auction;
 		-- note: profit value already includes the item count
@@ -1266,8 +1274,10 @@ function doBidBroker(minProfit, percentLess)
 		targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, bidBrokerFilter, bidbroker_args);
 	end
 
-	-- sort by profit
-	table.sort(profitMargins, bidBrokerSort);
+	-- sort by profit into temporary array
+	sortedTable = {}
+	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
+	table.sort(sortedTable, bidBrokerSort);
 
 	local skipped_auctions = 0;
 	local skipped_hasbid = 0;
@@ -1275,7 +1285,8 @@ function doBidBroker(minProfit, percentLess)
 	local name, link, _, itemLevel, hasBid
 
 	-- output the list of auctions
-	for id, auctionItem in pairs(profitMargins) do
+	for _, n in ipairs(sortedTable) do
+		auctionItem = profitMargins[ n ];
 		local a = auctionItem.auction;
 		local currentBid = a.bidAmount or 0;
 		local min = a.minBid or 0;
