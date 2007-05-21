@@ -43,7 +43,7 @@ data layout:
 				"test4", -- [2]
 			},
 			
-			["users.Balnazzar.Picksell"] = "test4",
+			["users.Foobar.Picksell"] = "test4",
 			
 			["profile.Default"] = {
 				["miniicon.angle"] = 187,
@@ -133,6 +133,9 @@ local settingDefaults = {
 	['RestrictToLevel'] = true,			-- should scans only show items that the user can disenchant at their current skill level
 	['RestrictUnbidded'] = false,		-- should bidbroker only show items that don't have bids?
 	
+	['AuctionBalanceEssencePrices'] = false,	-- should we balance the price of essences before doing auction scans?
+	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences
+	
 	['DisenchantUsingBaseTableOnly']	= false,	-- for debugging and development, use only the basetable for disenchant values
 }
 
@@ -221,8 +224,7 @@ local function setter(setting, value)
 				table.sort(profiles)
 			end
 			
--- TODO - localize string
-			DEFAULT_CHAT_FRAME:AddMessage("Saved profile: "..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatSavedProfile")..value)
 			
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
@@ -252,8 +254,7 @@ local function setter(setting, value)
 					EnchantConfig[getUserSig()] = 'Default'
 				end
 				
--- TODO - localize string
-				DEFAULT_CHAT_FRAME:AddMessage("Deleted profile: "..value)
+				DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatDeletedProfile")..value)
 				
 			end
 			
@@ -266,8 +267,7 @@ local function setter(setting, value)
 			-- Clean it's profile container of values
 			EnchantConfig["profile."..value] = {}
 			
--- TODO - localize string
-			DEFAULT_CHAT_FRAME:AddMessage("Reset all settings for:"..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatResetProfile")..value)
 		
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
@@ -276,8 +276,7 @@ local function setter(setting, value)
 			-- Change the user's current profile to this new one
 			EnchantConfig[getUserSig()] = value
 			
--- TODO - localize string
-			DEFAULT_CHAT_FRAME:AddMessage("Now using profile: "..value)
+			DEFAULT_CHAT_FRAME:AddMessage(_ENCH("ChatUsingProfile")..value)
 			
 		end
 

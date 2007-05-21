@@ -940,11 +940,11 @@ end
 ---------------------------------------
 
 local function percentLessThan(v1, v2)
-        if v1 and v1 > 0 and v2 and v2 < v1 then
-                return 100 - math.floor((100 * v2)/v1);
-        else
-                return 0;
-        end
+    if v1 and v1 > 0 and v2 and v2 < v1 then
+		return 100 - math.floor((100 * v2)/v1);
+    else
+        return 0;
+    end
 end
 
 local function whiteText(text)
@@ -956,6 +956,45 @@ end
 local function timeLeftString(timeleft)
 	return (getglobal("AUCTION_TIME_LEFT"..timeleft))
 end
+
+
+-- an attempt to balance the price of essences when doing auction scans
+-- still experimental
+local function balanceEssencePrices(scanReagentTable, style)
+
+	-- lesser_itemid = greater_itemid
+	local essenceTable = {
+		[10938] = 10939,	-- magic
+		[10998] = 11082,	-- astral
+		[11134] = 11135,	-- mystic
+		[11174] = 11175,  	-- nether
+		[16202] = 16203,  	-- eternal
+		[22447] = 22446,	-- planar
+	};
+
+	for lesser, greater in pairs(essenceTable) do
+	
+		local priceLesser = scanReagentTable[ lesser ];
+		local priceGreater = scanReagentTable[ greater ];
+		
+		if (style == "min") then
+			-- for pessimists who want to hedge their bets (and possibly undervalue their disenchant predictions)
+			priceLesser = math.min( priceLesser, priceGreater / 3 );
+		elseif (style == "max") then
+			-- for optimists who want to maximize profits when selling mats (and possibly overvalue their disenchant predictions)
+			priceLesser = math.max( priceLesser, priceGreater / 3 );
+		else 	-- if (style == "avg") then
+			-- for those who want the middle of the road
+			priceLesser = ( priceLesser + (priceGreater / 3) ) / 2;
+		end
+		
+		scanReagentTable[ lesser ] = priceLesser;
+		scanReagentTable[ greater ] = 3 * priceLesser;
+		
+	end
+	
+end
+
 
 function createReagentPricingTable()
 	scanReagentTable = {};
@@ -970,7 +1009,7 @@ function createReagentPricingTable()
 	end
 
 	for i = 1, n do
-		reagent = Enchantrix.Constants.DisenchantReagentList[i];
+		local reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);
 
 		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
@@ -996,8 +1035,13 @@ function createReagentPricingTable()
 		scanReagentTable[ reagent ] = myValue;
 	end
 	
+	if (Enchantrix.Settings.GetSetting('AuctionBalanceEssencePrices')) then
+		balanceEssencePrices(scanReagentTable, Enchantrix.Settings.GetSetting('AuctionBalanceEssenceStyle'));
+	end
+	
 	return scanReagentTable;
 end
+
 
 function percentLessFilter(auction, args)
 	local filterAuction = true;
@@ -1012,8 +1056,8 @@ function percentLessFilter(auction, args)
 		end
 	end
 	
-	percentLess = args['percentLess'];
-	reagentPriceTable = args['reagentPriceTable'];
+	local percentLess = args['percentLess'];
+	local reagentPriceTable = args['reagentPriceTable'];
 	
 	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
 	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);	
@@ -1060,8 +1104,8 @@ function bidBrokerFilter(auction, args)
 		end
 	end
 	
-	minProfit = args['minProfit'];
-	reagentPriceTable = args['reagentPriceTable'];
+	local minProfit = args['minProfit'];
+	local reagentPriceTable = args['reagentPriceTable'];
 	
 	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)	
 	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);
@@ -1135,11 +1179,11 @@ function doPercentLess(percentLess, minProfit)
 		if AucAdvanced then
 			adv = true
 		else
-			Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+			Enchantrix.Util.ChatPrint(_ENCH("AuctionScanAuctNotInstalled"));
 			return;
 		end
 	elseif not (Auctioneer.Filter or Auctioneer.Filter.QuerySnapshot) then
-		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.3.0.0675 or later");
+		Enchantrix.Util.ChatPrint(_ENCH("AuctionScanVersionTooOld"));
 		return;
 	end
 	
@@ -1175,7 +1219,7 @@ function doPercentLess(percentLess, minProfit)
 	end
 
 	-- sort by profit into temporary array
-	sortedTable = {}
+	local sortedTable = {}
 	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
 	table.sort(sortedTable, profitComparisonSort);
 
@@ -1224,6 +1268,9 @@ function doPercentLess(percentLess, minProfit)
 	if (skipped_skill > 0) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
 	end
+	
+	-- so we free all the references
+	profitMargins = {};
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessDone'));
 end
@@ -1234,11 +1281,11 @@ function doBidBroker(minProfit, percentLess)
 		if AucAdvanced then
 			adv = true
 		else
-			Enchantrix.Util.ChatPrint("You do not have Auctioneer installed. Auctioneer must be installed to do an enchanting percentless scan");
+			Enchantrix.Util.ChatPrint(_ENCH("AuctionScanAuctNotInstalled"));
 			return;
 		end
 	elseif not (Auctioneer.Filter or Auctioneer.SnapshotDB.Query) then
-		Enchantrix.Util.ChatPrint("You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v3.9.0.1285 or later");
+		Enchantrix.Util.ChatPrint(_ENCH("AuctionScanVersionTooOld"));
 		return;
 	end
 	
@@ -1275,7 +1322,7 @@ function doBidBroker(minProfit, percentLess)
 	end
 
 	-- sort by profit into temporary array
-	sortedTable = {}
+	local sortedTable = {}
 	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
 	table.sort(sortedTable, bidBrokerSort);
 
@@ -1361,8 +1408,11 @@ function doBidBroker(minProfit, percentLess)
 	end
 
 	if (skipped_hasbid > 0) then
-		Enchantrix.Util.ChatPrint(("%s skipped due to having bids"):format(skipped_hasbid));
+		Enchantrix.Util.ChatPrint((_ENCH("FrmtBidBrokerSkippedBids")):format(skipped_hasbid));
 	end
+	
+	-- so we free all the references
+	profitMargins = {};
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
 end

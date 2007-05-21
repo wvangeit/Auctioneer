@@ -594,6 +594,8 @@ EnchantrixLocalizations = {
 		["HelpValue"]	= "Select whether to show item's estimated values based on the proportions of possible disenchants";
 
 		-- Section: Report Messages
+		["AuctionScanAuctNotInstalled"]	= "You do not have Auctioneer installed. Auctioneer must be installed to perform an auction scan.";
+		["AuctionScanVersionTooOld"]	= "You do not have the correct version of Auctioneer installed, this feature requires Auctioneer v4.0 or later.";
 		["ChatDeletedProfile"]	= "Deleted profile: ";
 		["ChatResetProfile"]	= "Reset all settings for: ";
 		["ChatSavedProfile"]	= "Saved profile: ";
@@ -604,6 +606,7 @@ EnchantrixLocalizations = {
 		["FrmtBidbrokerLine"]	= "%s, Valued at: %s, %s: %s, Save: %s, Less %s, Time: %s";
 		["FrmtBidbrokerMinbid"]	= "minBid";
 		["FrmtBidBrokerSkipped"]	= "Skipped %d auctions due to profit margin cutoff (%d%%)";
+		["FrmtBidBrokerSkippedBids"]	= "Skipped %d auctions due to existing bids";
 		["FrmtPctlessDone"]	= "Percent less done.";
 		["FrmtPctlessHeader"]	= "Buyouts having %d%% savings over average item disenchant value (min savings = %s):";
 		["FrmtPctlessLine"]	= "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
