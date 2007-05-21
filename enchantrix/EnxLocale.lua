@@ -39,7 +39,6 @@ local localizeCommand		-- Enchantrix.Locale.LocalizeCommand()
 
 -- Local functions
 local buildCommandMap
-local getLocalizedCmdString
 
 local customLocalizations = {
 	['TextGeneral'] = GetLocale(),
@@ -103,10 +102,6 @@ function buildCommandMap()
 	for k, v in pairs(commandMap) do
 		commandMapRev[v] = k
 	end
-end
-
-function getLocalizedCmdString(value)
-	return _ENCH('Cmd'..value:sub(1,1):upper()..value:sub(2))
 end
 
 function delocalizeFilterVal(value)

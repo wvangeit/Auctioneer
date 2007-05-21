@@ -35,8 +35,6 @@ EnchantrixLocalizations = {
 	csCZ = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: Není otevřené okno Enchanting. Toto okno musí být otevřené aby bylo možné použít Vyvolávače (Trade chat spam).";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: Buďto nemáš žádné enchanty anebo nemáš dostatek materiálů.";
 		["FrmtActClearall"]	= "Mažu všechna data o enchantech";
 		["FrmtActClearFail"]	= "Nelze najít předmět: %s";
 		["FrmtActClearOk"]	= "Smazána data k předmětu: %s";
@@ -44,7 +42,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Všechna nastavení Enchantrixu byla vrácena na základní hodnoty.";
 		["FrmtActDisable"]	= "Vypnuto zobrazování dat předmětů o: %s";
 		["FrmtActEnable"]	= "Zapnuto zobrazování dat předmetů o: %s";
-		["FrmtActEnabledOn"]	= "Zobrazuji %s predmetu na %s";
 		["FrmtActSet"]	= "Nastavit %s na '%s'";
 		["FrmtActUnknown"]	= "Neznámý příkaz: '%s'";
 		["FrmtActUnknownLocale"]	= "Zvoleny jazyk ('%s') neni dostupny. Dostupne jsou: ";
@@ -63,9 +60,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Number]|<frameName>[String])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Vyvolávač vypnut.";
-		["BarkerOn"]	= "Vyvoláva zapnut.";
-		["CmdBarker"]	= "vyvolavac";
 		["CmdClear"]	= "smazat";
 		["CmdDefault"]	= "vychozi";
 		["CmdDisable"]	= "vypnout";
@@ -84,8 +78,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "urcit-nuc";
 		["ShowGuessAuctioneerMed"]	= "urcit-stred";
 		["ShowGuessBaseline"]	= "urcit-zaklad";
-		["ShowHeader"]	= "nadpis";
-		["ShowRate"]	= "sazby";
 		["ShowTerse"]	= "strucne";
 		["ShowValue"]	= "ohodnotit";
 		["StatOff"]	= "Nejsou zobrazována žádná Enchant data";
@@ -98,24 +90,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Disenchant";
-		["BarkerOpening"]	= "Prodám enchanty:";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "City of Ironforge";
-		["OneLetterGold"]	= "g";
-		["OneLetterSilver"]	= "s";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Materiály: (.+)";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Stormwind City";
 		["TextCombat"]	= "Boj";
 		["TextGeneral"]	= "Obecne";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(navštiv http://enchantrix.org/ a poděl se o svá data)";
@@ -123,7 +100,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix potřebuje Auctioneer od verze 3.4. Dokud neprovedeš update své instalace Auctioneer, tvá Enchantrix nebude umět některé věci.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Spustit Vyvolavače (\"Trade chat spam\")";
 		["GuiClearall"]	= "Smazat všechna data Enchantrix";
 		["GuiClearallButton"]	= "Smazat vše";
 		["GuiClearallHelp"]	= "Klikni zde a smažou se všechny záznamy Enchantrix pro tento server";
@@ -140,18 +116,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Dalsi moznosti";
 		["GuiOtherHelp"]	= "Ruzne Enchantrix moznosti";
 		["GuiPrintin"]	= "Vyber si textove okno";
-		["GuiRate"]	= "Zobrazit prumerne mnozstvi odkouzleni";
-		["GuiReloadui"]	= "Znovu nahraj interface";
-		["GuiReloaduiButton"]	= "NahrajUI";
-		["GuiReloaduiFeedback"]	= "Nahravam WoW interface";
-		["GuiReloaduiHelp"]	= "Klikni zde pro nove nahrani interface. Bude take nahran zvoleny jazyk. Pozor: Toto muze trvat nekolik minut.";
 		["GuiTerse"]	= "Nastavit stručné zobrazení";
 		["GuiValuateAverages"]	= "Ohodnocovat podle průměrných hodnot od Auctioneer-a";
 		["GuiValuateBaseline"]	= "Ohodnocovat podle vlastních dat";
 		["GuiValuateEnable"]	= "Zapnout ohodnocování";
 		["GuiValuateHeader"]	= "Ohodnocování";
 		["GuiValuateMedian"]	= "Ohodnocovat podle mediánů od Auctioneer-a";
-		["HelpBarker"]	= "Vypíná a zapíná \"Vyvolavače\" (Trade chat spam)";
 		["HelpClear"]	= "Smazat data k urcenemu objektu (shift - klikem ho vlozite do prikazu, nebo pouzijte urceni \"vse\" nebo \"all\")";
 		["HelpCount"]	= "Nastavi zda se ma zobrazovat pocet zaznamu v databazi";
 		["HelpDefault"]	= "Vrati urcene Enchantrix nastaveni na vychozi. Take lze pouzit urceni \"vse\" nebo \"all\" pro navrat vsech nastaveni na vychozi.";
@@ -163,12 +133,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Je-li Ohodnocovani zapnuto a je-li instalovan Auctioneer - zobrazi Ohodnoceni podle mediánu odhadovaného zisku z \"Disenchant\".";
 		["HelpGuessBaseline"]	= "Je-li Ohodnocovani zapnuto (a Auctioneer neni zapotrebi) - zobrazi jednoduche Ohodnoceni podle vlastních tabulek odhadovaného zisku z \"Disenchant\".";
 		["HelpGuessNoauctioneer"]	= "Ohodnocování NUC nebo mediánem nejsou k dispozici protoze nemas instalovany Auctioneer. ";
-		["HelpHeader"]	= "Nastavi zda se ma zobrazovat nadpis";
 		["HelpLoad"]	= "Nastavi spousteni Enchantrix pro tuto postavu";
 		["HelpLocale"]	= "Nastavi jazyk Enchantrix zprav";
 		["HelpOnoff"]	= "Nastavi zda se maji zobrazovat informace o ocarovani predmetu";
 		["HelpPrintin"]	= "Nastavi v kterem okne ma Enchantrix zobrazovat zpravy. Muzete zvolit nazev okna nebo jeho index.";
-		["HelpRate"]	= "Nastavi zda se ma zobrazovat prumerne mnozstvi odcarovaneho materialu";
 		["HelpTerse"]	= "Přepínač stručného zobrazení, kdy se ukazuje pouze hodnota \"Disenchant\". Dá se obejít podržením \"Control\".";
 		["HelpValue"]	= "Nastavi zda se ma zobrazovat odhadovaný zisk z \"Disenchant\" daného předmětu";
 
@@ -186,7 +154,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Cena do chatu (%d %% zisk)";
-		["FrmtCounts"]	= "(základ=%d, stará=%d, nová=%d)";
 		["FrmtDisinto"]	= "Disenchant získá: ";
 		["FrmtFound"]	= "Zaznamenáno, že disenchant na %s získá:";
 		["FrmtPriceEach"]	= "(%s za kus)";
@@ -199,15 +166,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[Ceny nejsou dostupne]";
 		["FrmtWarnPriceUnavail"]	= "[Nektere ceny nedostupne]";
 
-		-- Section: User Interface
-
 	};
 
 	daDK = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: Enchantment vinduet er ikke åbent. Enchantments vinduet skal være åbent for at du kan anvende \"Barker\".";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: Du har, enten ikke nogen enchants eller du mangler reagenter for at kunne lave dem.";
 		["FrmtActClearall"]	= "Nulstiller al Enchant data";
 		["FrmtActClearFail"]	= "Kan ikke finde item: %s";
 		["FrmtActClearOk"]	= "Data nulstillet for item: %s";
@@ -215,7 +178,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Alle Enchantrix indstillinger er blevet gensat til normal";
 		["FrmtActDisable"]	= "Viser ikke item's %s data";
 		["FrmtActEnable"]	= "Viser item's %s data";
-		["FrmtActEnabledOn"]	= "Viser item's %s på %s";
 		["FrmtActSet"]	= "Sæt %s til '%s'";
 		["FrmtActUnknown"]	= "Ukendt kommando nøgleord: '%s'";
 		["FrmtActUnknownLocale"]	= "Sproget du har valgt ('%s') er ukendt. Tilladte sprog er:";
@@ -234,9 +196,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<index>[Nummer]<rammenavn>[Streng])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Funzione Imbonitore disabilitata.";
-		["BarkerOn"]	= "Funzione Imbonitore abilitata.";
-		["CmdBarker"]	= "Imbonitore";
 		["CmdClear"]	= "slet";
 		["CmdDefault"]	= "standard";
 		["CmdDisable"]	= "deaktiver";
@@ -255,8 +214,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "evaluer-hsp";
 		["ShowGuessAuctioneerMed"]	= "evaluer-middel";
 		["ShowGuessBaseline"]	= "evaluer-baseværdi";
-		["ShowHeader"]	= "Overskrift";
-		["ShowRate"]	= "Ratio";
 		["ShowTerse"]	= "conciso";
 		["ShowValue"]	= "Evaluer";
 		["StatOff"]	= "Viser ingen enchant data";
@@ -269,24 +226,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Disenchant";
-		["BarkerOpening"]	= "Enchants til salg:";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "City of ironforge";
-		["OneLetterGold"]	= "g";
-		["OneLetterSilver"]	= "s";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Ingredienser: (.+)";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Stormwind City";
 		["TextCombat"]	= "Kamp";
 		["TextGeneral"]	= "Generelt";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "Gå til http://enchantrix.org/ for at dele dine data";
@@ -294,7 +236,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantix kræver Auctioneer version 3.4 eller højere. Nogle muligheder vil være utilgængelige indtil du opdatere din Auctioneer installation.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Aktiver Udråber";
 		["GuiClearall"]	= "Slet alle Enchantrix data";
 		["GuiClearallButton"]	= "Slet alt";
 		["GuiClearallHelp"]	= "Klik her for at slette alle Enchantrix data for den aktuelle server.";
@@ -311,18 +252,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Andre valg";
 		["GuiOtherHelp"]	= "Diverse Enchantrix valg";
 		["GuiPrintin"]	= "Vælg den ønskede meddelelses frame";
-		["GuiRate"]	= "Vis det gennemsnitlige antal af disenchant";
-		["GuiReloadui"]	= "Genindlæs bruger interface";
-		["GuiReloaduiButton"]	= "GenindlæsUI";
-		["GuiReloaduiFeedback"]	= "Genindlæser WoW UI";
-		["GuiReloaduiHelp"]	= "Klik her for at genindlæse WoW bruger interfacet efter at have ændret localet, så sproget i konfigurations skærmen passer med det som du har valgt. Bemærk: Dette kan tage nogle minutter.";
 		["GuiTerse"]	= "Aktiver kortfattet indstilling";
 		["GuiValuateAverages"]	= "Evaluer mod Auctioneer gennemsnit";
 		["GuiValuateBaseline"]	= "Evaluer mod standard data";
 		["GuiValuateEnable"]	= "Aktiver Evaluering";
 		["GuiValuateHeader"]	= "Evaluering";
 		["GuiValuateMedian"]	= "Evaluer mod Auctioneer middel";
-		["HelpBarker"]	= "Slår udråber til og fra";
 		["HelpClear"]	= "Slet det valgte item data (du skal shift-klikke item ind i kommandoen). Du kan ogsÃ¥ angive all for at slette alt.";
 		["HelpCount"]	= "Vælg om der skal vises nøjagtige tal fra databasen.";
 		["HelpDefault"]	= "Sæt et Enchantrix valg til dets standard vÃ¦rdi. Du kan også angive all for at sætte alle valg til deres standard værdi.";
@@ -334,12 +269,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Hvis Evaluer er slået til og du har Auctioneer installeret, vis middel værdien af at disenchante tingen.";
 		["HelpGuessBaseline"]	= "Hvis Evaluer er slået til (Auctioneer er ikke nødvendig) vis base værdien af at disenchante ting. Baseret på de indbyggede priser.";
 		["HelpGuessNoauctioneer"]	= "Kommandoerne evaluer-hsp og evaluer-middel er ikke tilgængelige fordi du ikke har Auctioneer installeret.";
-		["HelpHeader"]	= "Vælg om overskriften skal vises";
 		["HelpLoad"]	= "Ændre Enchantrix load indstillinger for denne karakter";
 		["HelpLocale"]	= "Ændrer sproget som bruges til at vises Enchantrix meddelelser";
 		["HelpOnoff"]	= "Skifter mellem om enchant data vises eller ej.";
 		["HelpPrintin"]	= "Vælg hvilken ramme Enchantrix viser sine meddelelser i.\nDu kan enten angive navnet eller nummeret.";
-		["HelpRate"]	= "Vælg om det gennemsnitlige antal af disenchant skal vises.";
 		["HelpTerse"]	= "Aktiver/deaktiver kortfattet indstilling. Viser kun disenchant værdi. Kan tilsidesættes ved at holde control-tasten nede.";
 		["HelpValue"]	= "Vælg om tingens værdi baseret pÃ udfaldet af mulige disenchants skal vises.";
 
@@ -357,7 +290,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Udråbspris (%d%% margen)";
-		["FrmtCounts"]	= "(base=%d, gammel=%d, ny=%d)";
 		["FrmtDisinto"]	= "Disenchants til:";
 		["FrmtFound"]	= "Fandt at %s disenchants til:";
 		["FrmtPriceEach"]	= "(%s/stk.)";
@@ -370,16 +302,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[Ingen priser er tilgængelige]";
 		["FrmtWarnPriceUnavail"]	= "[Nogen af priserne er ikke tilgængelige]";
 
-		-- Section: User Interface
-
-
 	};
 
 	deDE = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Das Enchantrix-Fenster ist nicht geöffnet. Das Enchantrix-Fenster muss geöffnet sein um Barker nutzen zu können.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: Sie haben entweder keine Entzauberungen oder keine Gegenstände um welche herzustellen.";
 		["FrmtActClearall"]	= "Lösche alle Entzauberungsdaten";
 		["FrmtActClearFail"]	= "Kann Gegenstand %s nicht finden";
 		["FrmtActClearOk"]	= "Daten für Gegenstand %s gelöscht";
@@ -387,7 +314,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Alle Enchantrix-Optionen wurden auf die Standardwerte zurückgesetzt.";
 		["FrmtActDisable"]	= "Zeige keine Daten von Gegenstand %s";
 		["FrmtActEnable"]	= "Zeige Daten von Gegenstand %s";
-		["FrmtActEnabledOn"]	= "Zeige Gegenstand %s auf %s";
 		["FrmtActSet"]	= "Setze %s zu '%s'";
 		["FrmtActUnknown"]	= "Unbekannter Befehl: '%s'";
 		["FrmtActUnknownLocale"]	= "Das angegebene Gebietsschema ('%s') ist unbekannt. Gültige Gebietsschemata sind:";
@@ -406,9 +332,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<Fenster-Index>[Nummer]|<Fenster-Name>[String])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Barker ausgeschaltet.";
-		["BarkerOn"]	= "Barker eingeschaltet.";
-		["CmdBarker"]	= "barker";
 		["CmdClear"]	= "clear";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -423,13 +346,14 @@ EnchantrixLocalizations = {
 		["CmdPrintin"]	= "print-in";
 		["CmdToggle"]	= "toggle";
 		["ShowCount"]	= "counts";
+		["ShowDELevels"]	= "skill";
+		["ShowDEMaterials"]	= "material";
 		["ShowEmbed"]	= "embed";
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
 		["ShowGuessBaseline"]	= "valuate-baseline";
-		["ShowHeader"]	= "header";
-		["ShowRate"]	= "rates";
 		["ShowTerse"]	= "terse";
+		["ShowUI"]	= "zeigen";
 		["ShowValue"]	= "valuate";
 		["StatOff"]	= "Die Anzeige von Entzauberungsdaten wurde deaktiviert";
 		["StatOn"]	= "Die Anzeige von Entzauberungsdaten wurde aktiviert";
@@ -441,27 +365,10 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Entzaubern";
-		["BarkerOpening"]	= "Verkaufe Verzauberungen:";
-		["Darnassus"]	= "Darnassus";
 		["Enchanting"]	= "Verzaubern";
-		["Ironforge"]	= "Eisenschmiede";
-		["OneLetterGold"]	= "G";
-		["OneLetterSilver"]	= "S";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Reagenzien: (.+)";
-		["Shattrath"]	= "Shattrath";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortShattrath"]	= "Sha";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Sturmwind";
 		["TextCombat"]	= "Kampflog";
 		["TextGeneral"]	= "Allgemein";
-		["ThunderBluff"]	= "Donnerfels";
-		["Undercity"]	= "Unterstadt";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(besuche http://enchantrix.org/ um deine Entzauberdaten mit anderen zu teilen)";
@@ -469,7 +376,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix benötigt Auctioneer Version 3.4 oder höher. Einige Funktionen werden nicht verfügbar sein, bis Sie ihre Auctioneer Version aktualisieren.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Barker aktivieren";
 		["GuiClearall"]	= "Alle Enchantrix-Daten löschen";
 		["GuiClearallButton"]	= "Alles löschen";
 		["GuiClearallHelp"]	= "Hier klicken um alle Enchantrix-Daten auf dem aktuellen Realm zu löschen.";
@@ -479,6 +385,8 @@ EnchantrixLocalizations = {
 		["GuiDefaultAllButton"]	= "Zurücksetzen";
 		["GuiDefaultAllHelp"]	= "Hier klicken um alle Enchantrix-Optionen auf ihren Standardwert zu setzen.\nWARNUNG: Dieser Vorgang kann NICHT rückgängig gemacht werden.";
 		["GuiDefaultOption"]	= "Zurücksetzen folgender Einstellung";
+		["GuiDELevels"]	= "Zeige den notwendigen Entzauberungsskill im Tooltip an";
+		["GuiDEMaterials"]	= "Zeige notwendiges Entzauberungsmaterial im Tooltip an";
 		["GuiEmbed"]	= "In-Game Tooltip zur Anzeige verwenden";
 		["GuiLocale"]	= "Setze das Gebietsschema auf";
 		["GuiMainEnable"]	= "Enchantrix aktivieren";
@@ -486,18 +394,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Sonstige Optionen";
 		["GuiOtherHelp"]	= "Sonstige Enchantrix-Optionen";
 		["GuiPrintin"]	= "Fenster für Meldungen auswählen";
-		["GuiRate"]	= "Zeige die durchschnittliche Anzahl der Entzauberungen";
-		["GuiReloadui"]	= "Benutzeroberfläche neu laden";
-		["GuiReloaduiButton"]	= "Neu laden";
-		["GuiReloaduiFeedback"]	= "WoW-Benutzeroberfläche wird neu geladen";
-		["GuiReloaduiHelp"]	= "Hier klicken um die WoW-Benutzeroberfläche nach einer \nÄnderung des Gebietsschemas neu zu laden, so dass die Sprache des Konfigurationsmenüs diesem entspricht.\nHinweis: Dieser Vorgang kann einige Minuten dauern.";
 		["GuiTerse"]	= "Kurzinfo-Modus aktivieren";
 		["GuiValuateAverages"]	= "Verkaufspreis anzeigen (Auctioneer Durchschnittswerte)";
 		["GuiValuateBaseline"]	= "Verkaufspreis anzeigen (Interne Preisliste)";
 		["GuiValuateEnable"]	= "Wertschätzung aktivieren";
 		["GuiValuateHeader"]	= "Wertschätzung";
 		["GuiValuateMedian"]	= "Ermitteln von Durchschnittspreisen (Auctioneer Median)";
-		["HelpBarker"]	= "Schaltet Barker ein und aus";
 		["HelpClear"]	= "Lösche die Daten des angegebenen Gegenstands (Gegenstände müssen mit Shift-Klick einfügt werden). Mit dem Schlüsselwort \"all\" werden alle Daten gelöscht.";
 		["HelpCount"]	= "Auswählen ob die genaue Anzahl der Entzauberungen aus der Datenbank angezeigt wird";
 		["HelpDefault"]	= "Setzt die angegebene Enchantrix-Option auf ihren Standardwert zurück. Mit dem Schlüsselwort \"all\" werden alle Enchantrix-Optionen zurückgesetzt.";
@@ -509,16 +411,21 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Wenn die Wertschätzung aktiviert und Auctioneer installiert ist, zeige den durchschnittlichen Verkaufspreis (Auctioneer-MEDIAN) für das Entzaubern";
 		["HelpGuessBaseline"]	= "Wenn die Wertschätzung aktiviert ist, zeige den Marktpreis aus der internen Preisliste (Auctioneer wird nicht benötigt)";
 		["HelpGuessNoauctioneer"]	= "Die Befehle \"valuate-hsp\" und \"valuate-median\" sind nicht verfügbar weil Auctioneer nicht installiert ist";
-		["HelpHeader"]	= "Auswählen ob die Kopfzeile angezeigt werden soll";
 		["HelpLoad"]	= "Ladeverhalten von Enchantrix für diesen Charakter ändern";
 		["HelpLocale"]	= "Ändern des Gebietsschemas das zur Anzeige \nvon Enchantrix-Meldungen verwendet wird";
 		["HelpOnoff"]	= "Schaltet die Anzeige von Entzauberungsdaten ein oder aus";
 		["HelpPrintin"]	= "Auswählen in welchem Fenster die Enchantrix-Meldungen angezeigt werden. Es kann entweder der Fensterindex oder der Fenstername angegeben werden.";
-		["HelpRate"]	= "Auswählen ob die durchschnittliche Anzahl der Entzauberungen angezeigt wird";
+		["HelpShowDELevels"]	= "Auswählen ob der notwendige Verzauberungsskill für das Entzaubern der Items im Tooltip angezeigt werden soll.";
+		["HelpShowDEMaterials"]	= "Auswählen ob das mögliche Material aus der Entzauberung der Items im Tooltip angezeigt werden soll.";
+		["HelpShowUI"]	= "Anzeigen oder verstecken der Einstellungskonsole.";
 		["HelpTerse"]	= "Aktivieren/Deaktivieren des Kurzinfo-Modus, bei dem nur der Entzauberungswert angezeigt wird. Durch drücken der STRG-Taste werden in diesem Modus alle Infos gezeigt.";
 		["HelpValue"]	= "Auswählen ob geschätzte Verkaufspreise aufgrund \nder Anteile an möglichen Entzauberungen angezeigt werden";
 
 		-- Section: Report Messages
+		["ChatDeletedProfile"]	= "Profil gelöscht:";
+		["ChatResetProfile"]	= "Einstellungen zurückgesetzt für:";
+		["ChatSavedProfile"]	= "Profil gespeichert:";
+		["ChatUsingProfile"]	= "Aktuell verwendetes Profil:";
 		["FrmtBidbrokerCurbid"]	= "aktGeb";
 		["FrmtBidbrokerDone"]	= "Die Auktionssuche (Betrag unter Gebotspreis) ist abgeschlossen.";
 		["FrmtBidbrokerHeader"]	= "Auktionen mit %s Silber Einsparung auf den durchschnittlichen Entzauberungswert:";
@@ -533,31 +440,44 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker Preis (%d%% Gewinn)";
-		["FrmtCounts"]	= "(Basis=%d, Alt=%d, Neu=%d)";
 		["FrmtDisinto"]	= "Mögliche Entzauberung zu:";
 		["FrmtFound"]	= "%s wird entzaubert zu:";
 		["FrmtFoundNotDisenchant"]	= "%s kann nicht entzaubert werden";
-		["FrmtNoDEPrediction"]	= "Keine Entzauberungsdaten verfügbar";
 		["FrmtPriceEach"]	= "(%s/stk)";
 		["FrmtSuggestedPrice"]	= "vorgeschlagener Preis";
 		["FrmtTotal"]	= "Gesamtsumme";
 		["FrmtValueAuctHsp"]	= "Entzauberungswert (HVP)";
 		["FrmtValueAuctMed"]	= "Entzauberungswert (Median)";
+		["FrmtValueAuctVal"]	= "Entzauberungswert (AucAdv)";
 		["FrmtValueMarket"]	= "Entzauberungswert (Marktpreis)";
 		["FrmtWarnAuctNotLoaded"]	= "Auktionstool nicht geladen, es werden gespeicherte Preise benutzt";
 		["FrmtWarnNoPrices"]	= "Keine Preise verfügbar";
 		["FrmtWarnPriceUnavail"]	= "Einige Preise nicht verfügbar";
+		["TooltipShowDisenchantLevel"]	= "Entzaubern erfordert Skill &d";
 
 		-- Section: User Interface
-
+		["GuiActivateProfile"]	= "Aktiviere ein vorhandenes Profil";
+		["GuiConfigProfiles"]	= "Erstelle, konfiguriere und editiere Profile";
+		["GuiCreateReplaceProfile"]	= "Erstelle oder ersetze ein Profil";
+		["GuiDeleteProfileButton"]	= "Löschen";
+		["GuiGeneralOptions"]	= "Allgemeine Enchantrix Optionen";
+		["GuiItemValueCalc"]	= "Itemwert kalkuliert von";
+		["GuiMinimapButtonDist"]	= "Distanz: %d";
+		["GuiMinimapOptions"]	= "Minimapanzeige Optionen";
+		["GuiMinimapShowButton"]	= "Minimapbutton anzeigen";
+		["GuiNewProfileName"]	= "Neuer Profilname:";
+		["GuiPLBBOnlyBelowDESkill"]	= "Zeige nur mit aktuellem Skill entzauberbare Items";
+		["GuiResetProfileButton"]	= "Zurücksetzen";
+		["GuiSaveProfileButton"]	= "Speichern";
+		["GuiTabAuctions"]	= "Auktionen";
+		["GuiTabGeneral"]	= "Allgemein";
+		["GuiTabProfiles"]	= "Profile";
 
 	};
 
 	enUS = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: The enchant window is not open. The enchanting window must be open in order to use the barker.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: You either don't have any enchants or don't have the reagents to make them.";
 		["FrmtActClearall"]	= "Clearing all enchant data";
 		["FrmtActClearFail"]	= "Unable to find item: %s";
 		["FrmtActClearOk"]	= "Cleared data for item: %s";
@@ -565,7 +485,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "All Enchantrix options have been reset to default settings.";
 		["FrmtActDisable"]	= "Not displaying item's %s data";
 		["FrmtActEnable"]	= "Displaying item's %s data";
-		["FrmtActEnabledOn"]	= "Displaying item's %s on %s";
 		["FrmtActSet"]	= "Set %s to '%s'";
 		["FrmtActUnknown"]	= "Unknown command keyword: '%s'";
 		["FrmtActUnknownLocale"]	= "The locale you specified ('%s') is unknown. Valid locales are:";
@@ -584,9 +503,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Number]|<frameName>[String])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Barker function disabled.";
-		["BarkerOn"]	= "Barker function enabled.";
-		["CmdBarker"]	= "barker";
 		["CmdClear"]	= "clear";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -601,20 +517,17 @@ EnchantrixLocalizations = {
 		["CmdPrintin"]	= "print-in";
 		["CmdToggle"]	= "toggle";
 		["ShowCount"]	= "counts";
+		["ShowDELevels"]	= "levels";
+		["ShowDEMaterials"]	= "materials";
 		["ShowEmbed"]	= "embed";
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
 		["ShowGuessBaseline"]	= "valuate-baseline";
-		["ShowHeader"]	= "header";
-		["ShowRate"]	= "rates";
 		["ShowTerse"]	= "terse";
+		["ShowUI"]	= "show";
 		["ShowValue"]	= "valuate";
 		["StatOff"]	= "Not displaying any enchant data";
 		["StatOn"]	= "Displaying configured enchant data";
-		
-		["ShowUI"]	= "show";
-		["ShowDELevels"]	= "levels";
-		["ShowDEMaterials"]	= "materials";
 
 		-- Section: Config Text
 		["GuiLoad"]	= "Load Enchantrix";
@@ -623,27 +536,10 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Disenchant";
-		["BarkerOpening"]	= "Selling Enchants:";
-		["Darnassus"]	= "Darnassus";
 		["Enchanting"]	= "Enchanting";
-		["Ironforge"]	= "City of Ironforge";
-		["OneLetterGold"]	= "g";
-		["OneLetterSilver"]	= "s";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Reagents: (.+)";
-		["Shattrath"]	= "Shattrath City";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortShattrath"]	= "Sha";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Stormwind City";
 		["TextCombat"]	= "Combat";
 		["TextGeneral"]	= "General";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "  (go to http://enchantrix.org/ to share your data)";
@@ -651,7 +547,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix requires Auctioneer version 3.4 or higher. Some features will be unavailable until you update your Auctioneer installation.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Enable Barker";
 		["GuiClearall"]	= "Clear All Enchantrix Data";
 		["GuiClearallButton"]	= "Clear All";
 		["GuiClearallHelp"]	= "Click here to clear all of Enchantrix data for the current server-realm.";
@@ -661,6 +556,8 @@ EnchantrixLocalizations = {
 		["GuiDefaultAllButton"]	= "Reset All";
 		["GuiDefaultAllHelp"]	= "Click here to set all Enchantrix options to their default values.\nWARNING: This action is NOT undoable.";
 		["GuiDefaultOption"]	= "Reset this setting";
+		["GuiDELevels"]	= "Show disenchant level requirements in the tooltip";
+		["GuiDEMaterials"]	= "Show disenchant material info in the tooltip";
 		["GuiEmbed"]	= "Embed info in in-game tooltip";
 		["GuiLocale"]	= "Set locale to";
 		["GuiMainEnable"]	= "Enable Enchantrix";
@@ -668,14 +565,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Other Options";
 		["GuiOtherHelp"]	= "Miscellaneous Enchantrix Options";
 		["GuiPrintin"]	= "Select the desired message frame";
-		["GuiRate"]	= "Show the average quantity of disenchant";
 		["GuiTerse"]	= "Enable terse mode";
 		["GuiValuateAverages"]	= "Valuate with Auctioneer Averages";
 		["GuiValuateBaseline"]	= "Valuate with Built-in Data";
 		["GuiValuateEnable"]	= "Enable Valuation";
 		["GuiValuateHeader"]	= "Valuation";
 		["GuiValuateMedian"]	= "Valuate with Auctioneer Medians";
-		["HelpBarker"]	= "Turns Barker on and off";
 		["HelpClear"]	= "Clear the specified item's data (you must shift click insert the item(s) into the command) You may also specify the special keyword \"all\"";
 		["HelpCount"]	= "Select whether to show the exact counts in the database";
 		["HelpDefault"]	= "Set an Enchantrix option to it's default value. You may also specify the special keyword \"all\" to set all Enchantrix options to their default values.";
@@ -683,27 +578,26 @@ EnchantrixLocalizations = {
 		["HelpEmbed"]	= "Embed the text in the original game tooltip (note: certain features are disabled when this is selected)";
 		["HelpFindBidauct"]	= "Find auctions whose possible disenchant value is a certain silver amount less than the bid price";
 		["HelpFindBuyauct"]	= "Find auctions whose buyout price is a certain percent less than the possible disenchant value (and, optionally, a certain amount less than the disenchant value)";
+		["HelpGuessAuctioneer5Val"]	= "If valuation is enabled, and you have Auctioneer installed, display the market value of disenchanting the item.";
 		["HelpGuessAuctioneerHsp"]	= "If valuation is enabled, and you have Auctioneer installed, display the sellable price (HSP) valuation of disenchanting the item.";
 		["HelpGuessAuctioneerMedian"]	= "If valuation is enabled, and you have Auctioneer installed, display the median based valuation of disenchanting the item.";
 		["HelpGuessBaseline"]	= "If valuation is enabled, (Auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 		["HelpGuessNoauctioneer"]	= "The valuate-hsp and valuate-median commands are not available because you do not have auctioneer installed";
-		["HelpHeader"]	= "Select whether to show the header line";
 		["HelpLoad"]	= "Change Enchantrix's load settings for this toon";
 		["HelpLocale"]	= "Change the locale that is used to display Enchantrix messages";
 		["HelpOnoff"]	= "Turns the enchant data display on and off";
 		["HelpPrintin"]	= "Select which frame Enchantix will print out it's messages. You can either specify the frame's name or the frame's index.";
-		["HelpRate"]	= "Select whether to show the average quantity of disenchant";
+		["HelpShowDELevels"]	= "Select whether to show the enchanting skill needed to disenchant the item in the tooltip.";
+		["HelpShowDEMaterials"]	= "Select whether to show the possible materials given by disenchanting the item in the tooltip.";
+		["HelpShowUI"]	= "Show or hide the settings panel.";
 		["HelpTerse"]	= "Enable/disable terse mode, showing only disenchant value. Can be overridden by holding down the control key.";
 		["HelpValue"]	= "Select whether to show item's estimated values based on the proportions of possible disenchants";
 
-		["HelpShowUI"] = "Show or hide the settings panel.";
-		["HelpShowDELevels"] = "Select whether to show the enchanting skill needed to disenchant the item in the tooltip.";
-		["HelpShowDEMaterials"] = "Select whether to show the possible materials given by disenchanting the item in the tooltip.";
-		
-		["GuiDELevels"]	= "Show disenchant level requirements in the tooltip";
-		["GuiDEMaterials"]	= "Show disenchant material info in the tooltip";
-		
 		-- Section: Report Messages
+		["ChatDeletedProfile"]	= "Deleted profile: ";
+		["ChatResetProfile"]	= "Reset all settings for: ";
+		["ChatSavedProfile"]	= "Saved profile: ";
+		["ChatUsingProfile"]	= "Now using profile: ";
 		["FrmtBidbrokerCurbid"]	= "curBid";
 		["FrmtBidbrokerDone"]	= "Bid brokering done";
 		["FrmtBidbrokerHeader"]	= "Bids having %s silver savings on average disenchant value (min %%less = %d):";
@@ -715,83 +609,69 @@ EnchantrixLocalizations = {
 		["FrmtPctlessLine"]	= "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 		["FrmtPctlessSkillSkipped"]	= "Skipped %d auctions due to skill level cutoff (%s)";
 		["FrmtPctlessSkipped"]	= "Skipped %d auctions due to profitability cutoff (%s)";
-		
-		["ChatSavedProfile"] = "Saved profile: ";
-		["ChatDeletedProfile"] = "Deleted profile: ";
-		["ChatResetProfile"] = "Reset all settings for:";
-		["ChatUsingProfile"] = "Now using profile: ";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker Price (%d%% margin)";
-		["FrmtCounts"]	= "    (base=%d, old=%d, new=%d)";
 		["FrmtDisinto"]	= "Disenchants into:";
 		["FrmtFound"]	= "Found that %s disenchants into:";
 		["FrmtFoundNotDisenchant"]	= "Found that %s is not disenchantable";
-		["FrmtNoDEPrediction"]	= "No disenchant prediction available";
 		["FrmtPriceEach"]	= "(%s ea)";
 		["FrmtSuggestedPrice"]	= "Suggested price:";
 		["FrmtTotal"]	= "Total";
 		["FrmtValueAuctHsp"]	= "Disenchant value (HSP)";
 		["FrmtValueAuctMed"]	= "Disenchant value (Median)";
-		["FrmtValueAuctVal"] = "Disenchant value (AucAdv)";
+		["FrmtValueAuctVal"]	= "Disenchant value (AucAdv)";
 		["FrmtValueMarket"]	= "Disenchant value (Baseline)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer not loaded, using cached prices]";
 		["FrmtWarnNoPrices"]	= "[No prices available]";
 		["FrmtWarnPriceUnavail"]	= "[Some prices unavailable]";
-		["TooltipShowDisenchantLevel"] = "Disenchanting requires skill %d";
+		["TooltipShowDisenchantLevel"]	= "Disenchanting requires skill %d";
 
 		-- Section: User Interface
-		["GuiConfigProfiles"] = "Setup, configure and edit profiles";
-		["GuiActivateProfile"] = "Activate a current profile";
-		["GuiDeleteProfileButton"] = "Delete";
-		["GuiResetProfileButton"] = "Reset";
-		["GuiCreateReplaceProfile"] = "Create or replace a profile";
-		["GuiNewProfileName"] = "New profile name:";
-		["GuiSaveProfileButton"] = "Save";
-
-		["GuiGeneralOptions"] = "General Enchantrix options";
-		["GuiValueOptions"] = "Value Display Options";
-		["GuiValueShowDEValues"] = "Show estimated disenchant values";
-		["GuiValueTerse"] = "Show terse disenchant value";
-		["GuiValueShowAuc4HSP"] = "Show Auctioneer HSP values";
-		["GuiValueShowAuc4Median"] = "Show Auctioneer median values";
-		["GuiValueShowAuc5Market"] = "Show Auctioneer market value";
-		["GuiValueShowBaseline"] = "Show built-in baseline values";
-
-		["GuiMinimapOptions"] = "Minimap display options";
-		["GuiMinimapShowButton"] = "Display Minimap button";
-		["GuiMinimapButtonAngle"] = "Button angle: %d";
-		["GuiMinimapButtonDist"] = "Distance: %d";
-
-		["GuiPLBBSettings"] = "Percentless and Bidbroker settings";
-		["GuiMaxBuyout"] = "Maximum Buyout price:";
-		["GuiDefaultProfitMargin"] = "Default Profit Margin:";
-		["GuiMinProfitMargin"] = "Minimum Profit Margin:";
-		["GuiDefaultLessHSP"] = "Default Percentage less than HSP: %d";
-		["GuiMinLessHSP"] = "Minimum Percentage less than HSP: %d";
-		["GuiDefaultBBProfitPercent"] = "Default bidbroker profit Percentage: %d";
-		["GuiMinBBProfitPercent"] = "Minimum bidbroker profit Percentage: %d";
-		["GuiPLBBOnlyBelowDESkill"] = "Only show items disenchantable at current skill";
-		["GuiBBUnbiddedOnly"] = "Restrict BidBroker to unbidded items only";
-
-		["GuiItemValueCalc"] = "Item value calculated from";
-		["GuiItemValueAverage"] = "Average (default)";
-		["GuiItemValueBaseline"] = "Market Baseline";
-		["GuiItemValueAuc4HSP"] = "Auc4 HSP";
-		["GuiItemValueAuc4Median"] = "Auc4 Median";
-		["GuiItemValueAuc5Market"] = "AucAdv Market Value";
-		
-		["GuiTabProfiles"] = "Profiles";
-		["GuiTabGeneral"] = "General";
-		["GuiTabAuctions"] = "Auctions";
+		["GuiActivateProfile"]	= "Activate a current profile";
+		["GuiBBUnbiddedOnly"]	= "Restrict BidBroker to unbidded items only";
+		["GuiConfigProfiles"]	= "Setup, configure and edit profiles";
+		["GuiCreateReplaceProfile"]	= "Create or replace a profile";
+		["GuiDefaultBBProfitPercent"]	= "Default bidbroker profit Percentage: %d";
+		["GuiDefaultLessHSP"]	= "Default Percentage less than HSP: %d";
+		["GuiDefaultProfitMargin"]	= "Default Profit Margin:";
+		["GuiDeleteProfileButton"]	= "Delete";
+		["GuiGeneralOptions"]	= "General Enchantrix options";
+		["GuiItemValueAuc4HSP"]	= "Auc4 HSP";
+		["GuiItemValueAuc4Median"]	= "Auc4 Median";
+		["GuiItemValueAuc5Market"]	= "AucAdv Market Value";
+		["GuiItemValueAverage"]	= "Average (default)";
+		["GuiItemValueBaseline"]	= "Market Baseline";
+		["GuiItemValueCalc"]	= "Item value calculated from";
+		["GuiMaxBuyout"]	= "Maximum Buyout price:";
+		["GuiMinBBProfitPercent"]	= "Minimum bidbroker profit Percentage: %d";
+		["GuiMinimapButtonAngle"]	= "Button angle: %d";
+		["GuiMinimapButtonDist"]	= "Distance: %d";
+		["GuiMinimapOptions"]	= "Minimap display options";
+		["GuiMinimapShowButton"]	= "Display Minimap button";
+		["GuiMinLessHSP"]	= "Minimum Percentage less than HSP: %d";
+		["GuiMinProfitMargin"]	= "Minimum Percentage less than HSP: %d";
+		["GuiNewProfileName"]	= "New profile name:";
+		["GuiPLBBOnlyBelowDESkill"]	= "Only show items disenchantable at current skill";
+		["GuiPLBBSettings"]	= "Percentless and Bidbroker settings";
+		["GuiResetProfileButton"]	= "Reset";
+		["GuiSaveProfileButton"]	= "Save";
+		["GuiTabAuctions"]	= "Auctions";
+		["GuiTabGeneral"]	= "General";
+		["GuiTabProfiles"]	= "Profiles";
+		["GuiValueOptions"]	= "Value Display Options";
+		["GuiValueShowAuc4HSP"]	= "Show Auctioneer HSP values";
+		["GuiValueShowAuc4Median"]	= "Show Auctioneer median values";
+		["GuiValueShowAuc5Market"]	= "Show Auctioneer market value";
+		["GuiValueShowBaseline"]	= "Show built-in baseline values";
+		["GuiValueShowDEValues"]	= "Show estimated disenchant values";
+		["GuiValueTerse"]	= "Show terse disenchant value";
 
 	};
 
 	esES = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: La ventana de encantamientos no está abierta. La ventana de encantamientos debe estar abierta para utilizar el pregonero.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: No tienes ningún encantamiento o los componentes para crearlos.";
 		["FrmtActClearall"]	= "Eliminando toda información de encantamientos";
 		["FrmtActClearFail"]	= "Imposible encontrar artí­culo: %s";
 		["FrmtActClearOk"]	= "Información eliminada para el artí­culo: %s";
@@ -799,7 +679,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Todas las opciones de Enchantrix han sido reestablecidas a sus ajustes por defecto.";
 		["FrmtActDisable"]	= "Ocultando información del artículo: %s ";
 		["FrmtActEnable"]	= "Mostrando información del artí­culo: %s ";
-		["FrmtActEnabledOn"]	= "Mostrando %s de los artí­culos usando %s";
 		["FrmtActSet"]	= "%s establecido a '%s'";
 		["FrmtActUnknown"]	= "Comando o palabra clave desconocida: '%s'";
 		["FrmtActUnknownLocale"]	= "La localización que has especificado ('%s') no es válida. Las localizaciones válidas son:";
@@ -818,9 +697,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<indiceVentana>[Número]|<nombreVentana>[Serie])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Función de Pregonero desactivada.";
-		["BarkerOn"]	= "Función de Pregonero activada.";
-		["CmdBarker"]	= "pregonero";
 		["CmdClear"]	= "borrar";
 		["CmdDefault"]	= "original";
 		["CmdDisable"]	= "deshabilitar";
@@ -839,8 +715,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "valorizar-pmv";
 		["ShowGuessAuctioneerMed"]	= "valorizar-mediano";
 		["ShowGuessBaseline"]	= "valorizar-referencia";
-		["ShowHeader"]	= "titulo";
-		["ShowRate"]	= "razones";
 		["ShowTerse"]	= "conciso";
 		["ShowValue"]	= "valorizar";
 		["StatOff"]	= "Ocultando toda información de los desencantamientos";
@@ -853,26 +727,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Desencantar";
-		["BarkerOpening"]	= "Encanto:";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "Forjaz";
-		["OneLetterGold"]	= "o";
-		["OneLetterSilver"]	= "p";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Componentes:(.+)";
-		["Shattrath"]	= "Ciudad de Shattrath";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "FJ";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortShattrath"]	= "Sha";
-		["ShortStormwind"]	= "VT";
-		["ShortThunderBluff"]	= "CdT";
-		["ShortUndercity"]	= "E";
-		["StormwindCity"]	= "Ciudad de Ventormenta";
 		["TextCombat"]	= "Combate";
 		["TextGeneral"]	= "General";
-		["ThunderBluff"]	= "Cima del Trueno";
-		["Undercity"]	= "Entrañas";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(ve a http://enchantrix.org/ para comparti­r tu información)";
@@ -880,7 +737,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix requiere la versión 3.4 o mayor de Auctioneer. Algunas características no estarán disponibles hasta que actualices tu instalación de Auctioneer.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Activar Pregonero";
 		["GuiClearall"]	= "Elimina toda la información de Enchantrix";
 		["GuiClearallButton"]	= "Eliminar Todo";
 		["GuiClearallHelp"]	= "Clic aquí para eliminar toda la información de Enchantrix sobre el reino-facción actual.";
@@ -897,18 +753,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Otras Opciones";
 		["GuiOtherHelp"]	= "Otras Opciones de Enchantrix";
 		["GuiPrintin"]	= "Selecciona la ventana deseada";
-		["GuiRate"]	= "Muestra la cantidad promedio de desencantamiento";
-		["GuiReloadui"]	= "Recargar Interfaz";
-		["GuiReloaduiButton"]	= "Recargar";
-		["GuiReloaduiFeedback"]	= "Recargando el Interfaz de WoW";
-		["GuiReloaduiHelp"]	= "Presione aquí para recargar el interfaz de WoW tras cambiar la localización para que esta ventana de configuración concuerde con la que has seleccionado. Nota: Esta operación puede llevar unos minutos.";
 		["GuiTerse"]	= "Activa el modo conciso";
 		["GuiValuateAverages"]	= "Valora con Promedios de Auctioneer";
 		["GuiValuateBaseline"]	= "Valora con la información integrada";
 		["GuiValuateEnable"]	= "Activa Valoración";
 		["GuiValuateHeader"]	= "Valoración";
 		["GuiValuateMedian"]	= "Valora con Promedios de Auctioneer";
-		["HelpBarker"]	= "Activa y desactiva Pregonero";
 		["HelpClear"]	= "Elimina la información sobre el objeto especificado (debes usar clic-mayúsculas para incluir el/los objeto(s) en el comando) También puedes especificar las palabra clave \"todo\"";
 		["HelpCount"]	= "Determina si se muestran las cuentas exactas en la base de datos";
 		["HelpDefault"]	= "Establece una opción de Enchantrix a su valor por defecto. También puedes especificar la palabra clave especial \"todo\" para establecer todas las opciones de Enchantrix a sus valores por defecto.";
@@ -920,12 +770,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Si la valoración está activada y tienes Auctioneer instalado, muestra la valoración basada en promedios al desencantar el objeto.";
 		["HelpGuessBaseline"]	= "Si la valoración está activada (no se necesita Auctioneer) muestra la valoración base al desencantar el objeto, basado en los precios integrados.";
 		["HelpGuessNoauctioneer"]	= "Los comandos valorar-pmv y valorar-promedio no están disponibles porque no tienes Auctioneer instalado";
-		["HelpHeader"]	= "Determina si se muestra la línea de título";
 		["HelpLoad"]	= "Cambia las opciones de carga de Enchantrix para este personaje";
 		["HelpLocale"]	= "Cambia la localización que es usada para mostrar los mensajes de Enchantrix";
 		["HelpOnoff"]	= "Activa y desactiva la visualización de la información de encantamientos";
 		["HelpPrintin"]	= "Determina en qué ventana se imprimen los mensajes d eEnchantrix. Puedes especificar el nombre de la ventana o su índice.";
-		["HelpRate"]	= "Determina si se muestran las cantidades promedio de los desencantamientos";
 		["HelpTerse"]	= "Activa y desactiva el modo conciso, mostrando solo el valor de los desencantamientos. Puede ser desactivado temporalmente manteniendo pulsada la tecla Control.";
 		["HelpValue"]	= "Determina si se muestran los valores de objeto estimados basados en las proporciones de los posibles desencantamientos";
 
@@ -943,10 +791,8 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Precio de Pregonero (margen de %d%%)";
-		["FrmtCounts"]	= "(referencia=%d, viejo=%d, nuevo=%d)";
 		["FrmtDisinto"]	= "Se desencanta en:";
 		["FrmtFound"]	= "Se ha descubierto que %s se desencanta en:";
-		["FrmtNoDEPrediction"]	= "No hay disponible una predicción de desencantamiento";
 		["FrmtPriceEach"]	= "(%s c/u)";
 		["FrmtSuggestedPrice"]	= "Precio Sugerido:";
 		["FrmtTotal"]	= "Total";
@@ -957,16 +803,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[No hay precios disponibles]";
 		["FrmtWarnPriceUnavail"]	= "[Algunos precios no están disponibles]";
 
-		-- Section: User Interface
-
-
 	};
 
 	frFR = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix : La fenêtre d'enchantement n'est pas ouverte. Elle doit l'être pour utiliser le Trader.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix : Vous n'avez aucun enchantement ou vous ne disposez pas des ingrédients nécessaires pour les faire.";
 		["FrmtActClearall"]	= "Effacement de toutes les données d'enchantement";
 		["FrmtActClearFail"]	= "Impossible de trouver l'objet : %s";
 		["FrmtActClearOk"]	= "Information effacée pour l'objet : %s";
@@ -974,7 +815,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Toutes les options d'Enchantrix ont été réinitialisées à  leurs valeurs par défaut.";
 		["FrmtActDisable"]	= "N'affiche pas les données de l'objet %s";
 		["FrmtActEnable"]	= "Affichage des données de l'objet %s";
-		["FrmtActEnabledOn"]	= "Affichage de l'objet %s sur %s";
 		["FrmtActSet"]	= "Fixe la valeur de %s à '%s'";
 		["FrmtActUnknown"]	= "Mot-clé de commande inconnu : '%s'";
 		["FrmtActUnknownLocale"]	= "La langue que vous avez specifiée ('%s') est inconnue. Les langues valides sont :";
@@ -993,9 +833,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<fenetreIndex>[nombre]|<fenetreNom>[Chaine])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Fonction Trader activée";
-		["BarkerOn"]	= "Fonction Trader désactivée";
-		["CmdBarker"]	= "trader";
 		["CmdClear"]	= "effacer";
 		["CmdDefault"]	= "par défaut";
 		["CmdDisable"]	= "désactiver";
@@ -1014,8 +851,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "evaluer-pvm";
 		["ShowGuessAuctioneerMed"]	= "evaluer-median";
 		["ShowGuessBaseline"]	= "evaluer-reference";
-		["ShowHeader"]	= "en-tete";
-		["ShowRate"]	= "taux";
 		["ShowTerse"]	= "concis";
 		["ShowValue"]	= "evaluer";
 		["StatOff"]	= "Aucune donnée d'enchantement affichée";
@@ -1028,26 +863,10 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Désenchanter";
-		["BarkerOpening"]	= "Vends enchantements :";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "Ironforge";
-		["OneLetterGold"]	= "po";
-		["OneLetterSilver"]	= "pa";
-		["Orgrimmar"]	= "Orgrimmar";
+		["Enchanting"]	= "Ensorcellement";
 		["PatReagents"]	= "Ingrédients: (.+)";
-		["Shattrath"]	= "Ville de Shattrath";
-		["ShortDarnassus"]	= "Darna";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Orgri";
-		["ShortShattrath"]	= "Sha";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Cité de Stormwind";
 		["TextCombat"]	= "Combat";
 		["TextGeneral"]	= "Général";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(visitez http://enchantrix.org/ pour partager vos données)";
@@ -1055,7 +874,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix nécessite Auctioneer version 3.4 ou plus. Quelques fonctions seront désactivées tant que vous ne mettrez pas à jour auctioneer.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Activer Trader";
 		["GuiClearall"]	= "Réinitialiser toutes les données d'Enchantrix";
 		["GuiClearallButton"]	= "Effacer tout";
 		["GuiClearallHelp"]	= "Cliquer ici pour réinitialiser toutes les données d'Enchantrix pour le serveur-faction actuel.";
@@ -1072,18 +890,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Autres Options";
 		["GuiOtherHelp"]	= "Options diverses d'Enchantrix";
 		["GuiPrintin"]	= "Choisir la fenêtre de message souhaitée";
-		["GuiRate"]	= "Afficher la quantité moyenne de désenchantement";
-		["GuiReloadui"]	= "Recharger l'Interface Utilisateur";
-		["GuiReloaduiButton"]	= "RechargerIU";
-		["GuiReloaduiFeedback"]	= "Rechargement de l'IU de WoW";
-		["GuiReloaduiHelp"]	= "Cliquer ici pour recharger l'Interface Utilisateur (IU) de WoW après avoir changé la langue afin de refléter les changements dans cet écran de configuration. Remarque: Cette opération peut prendre quelques minutes.";
 		["GuiTerse"]	= "Active le mode concis";
 		["GuiValuateAverages"]	= "Evaluer avec les moyennes d'Auctioneer";
 		["GuiValuateBaseline"]	= "Evaluer avec les données intégrées.";
 		["GuiValuateEnable"]	= "Activer Evaluation";
 		["GuiValuateHeader"]	= "Evaluation";
 		["GuiValuateMedian"]	= "Evaluer avec les moyennes d'Auctioneer";
-		["HelpBarker"]	= "Active ou désactive le Trader";
 		["HelpClear"]	= "Efface les données de l'objet spécifié (vous devez maj-cliquer le ou les objets dans la ligne de commande) Vous pouvez également spécifier le mot-clef \"tout\"";
 		["HelpCount"]	= "Choisir d'afficher le compte exact dans la base de données.";
 		["HelpDefault"]	= "Réinitialise une option d'Enchantrix à sa valeur par défaut. Vous pouvez spécifier le mot-clef \"tout\" pour réinitialiser toutes les options d'Enchantrix.";
@@ -1095,12 +907,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Si évaluation est activé et qu'Auctioneer est installé, affiche l'évaluation basée sur la moyenne de désenchantement de l'objet.";
 		["HelpGuessBaseline"]	= "Si évaluation est activé (Auctioneer n'est pas nécessaire), affiche les informations de base de désenchantement, en s'appuyant sur la liste de prix intégrée.";
 		["HelpGuessNoauctioneer"]	= "Les commandes \"evaluer-hsp\" et \"evaluer-moyenne\" ne sont pas disponibles car vous n'avez pas Auctioneer d'installé";
-		["HelpHeader"]	= "Choisir d'afficher la ligne d'en-tête";
 		["HelpLoad"]	= "Change les règlages de chargement pour ce personnage";
 		["HelpLocale"]	= "Change la langue utilisée pour afficher les messages d'Enchantrix";
 		["HelpOnoff"]	= "Active ou désactive les informations d'enchantement";
 		["HelpPrintin"]	= "Choisir dans quelle fenêtre Enchantrix affichera ses messages. Vous pouvez spécifier le nom de la fenêtre ou son index.";
-		["HelpRate"]	= "Choisir d'afficher la quantité moyenne de désenchantement";
 		["HelpTerse"]	= "Active ou désactive le mode concis, qui ne montre que les valeurs de désenchantement. Peut être annulé en appuyant sur la touche contrôle.";
 		["HelpValue"]	= "Choisir d'afficher les valeurs estimées basées sur les proportions de désenchantement possible";
 
@@ -1114,14 +924,14 @@ EnchantrixLocalizations = {
 		["FrmtPctlessDone"]	= "Pourcentage inférieur terminé.";
 		["FrmtPctlessHeader"]	= "Achats immédiats %d%% économisant plus que la valeur moyenne de désenchantement de l'objet (min. %s d'économie) :";
 		["FrmtPctlessLine"]	= "%s, Estimé à : %s, AI: %s, Economie: %s, Moins %s";
+		["FrmtPctlessSkillSkipped"]	= "Enchères sautées de %d dues à la coupure de niveau de compétence (%s)";
 		["FrmtPctlessSkipped"]	= "%d enchères ignorées pour marge trop faible (%s)";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prix Trader (marge : %d%%)";
-		["FrmtCounts"]	= "(base=%d, ancienne=%d, nouvelle=%d)";
 		["FrmtDisinto"]	= "Se désenchante en :";
 		["FrmtFound"]	= "%s se désenchante en :";
-		["FrmtNoDEPrediction"]	= "Pas de désenchantement connu";
+		["FrmtFoundNotDisenchant"]	= "Constaté que %s n'est pas disenchantable";
 		["FrmtPriceEach"]	= "(%s l'unité)";
 		["FrmtSuggestedPrice"]	= "Prix suggéré:";
 		["FrmtTotal"]	= "Total";
@@ -1132,16 +942,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[Aucun prix disponible]";
 		["FrmtWarnPriceUnavail"]	= "[Quelques prix indisponibles]";
 
-		-- Section: User Interface
-
-
 	};
 
 	itIT = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: la finestra per gli enchantments non è aperta. La finestra degli enchantments deve essere aperta per usare il barker";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: non hai nessun enchantment o non hai ireagenti per poterlo fare";
 		["FrmtActClearall"]	= "Eliminando tutti i dati di enchant";
 		["FrmtActClearFail"]	= "Impossibile trovare l'oggetto: %s";
 		["FrmtActClearOk"]	= "Eliminati i dati dell'oggetto: %s";
@@ -1149,7 +954,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Tutte le opzioni di Enchantrix sono state resettate al valore di default.";
 		["FrmtActDisable"]	= "Non visualizzo i dati dell'oggetto %s";
 		["FrmtActEnable"]	= "Visualizzo i dati dell'oggetto %s";
-		["FrmtActEnabledOn"]	= "Visualizzo i %s dell'oggetto in %s";
 		["FrmtActSet"]	= "Imposta %s a '%s'";
 		["FrmtActUnknown"]	= "Comando sconosciuto: '%s'";
 		["FrmtActUnknownLocale"]	= "La lingua specificata ('%s') e' sconosciuta. Le lingue valide sono:";
@@ -1168,9 +972,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Numero]|<frameName>[Stringa])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Funzione Imbonitore disabilitata";
-		["BarkerOn"]	= "Funzione Imbonitore abilitata";
-		["CmdBarker"]	= "Imbonitore";
 		["CmdClear"]	= "cancella";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disabilita";
@@ -1189,8 +990,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "valuta-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuta-mediana";
 		["ShowGuessBaseline"]	= "valuta-base";
-		["ShowHeader"]	= "intestazione";
-		["ShowRate"]	= "tassi";
 		["ShowTerse"]	= "conciso";
 		["ShowValue"]	= "valuta";
 		["StatOff"]	= "Visualizzazione dei dati di enchant disabilitata";
@@ -1203,24 +1002,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Disincanta";
-		["BarkerOpening"]	= "Vendita:";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "Ironforge";
-		["OneLetterGold"]	= "g";
-		["OneLetterSilver"]	= "s";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Reagente:(.+)";
-		["ShortDarnassus"]	= "Darn.";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Stormwind";
 		["TextCombat"]	= "Combattimento";
 		["TextGeneral"]	= "Generico";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(vai su http://enchantrix.org/ per condividere i tuoi dati) ";
@@ -1228,7 +1012,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix richiede Auctioneer versione 3.4 o superiore. Alcune funzionalità non saranno disponibili finché Auctioneer non verrà aggiornato.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Abilita imbonitore";
 		["GuiClearall"]	= "Cancella tutti i dati di Enchantrix";
 		["GuiClearallButton"]	= "Cancella tutto";
 		["GuiClearallHelp"]	= "Clicca qui per eliminare tutti i dati di Enchantrix per il server/realm corrente";
@@ -1245,18 +1028,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Altre opzioni";
 		["GuiOtherHelp"]	= "Opzioni aggiuntive di Enchantrix";
 		["GuiPrintin"]	= "Seleziona la finestra di chat desiderata";
-		["GuiRate"]	= "Mostra la quantità  media di disenchant";
-		["GuiReloadui"]	= "Ricarica l'interfaccia utente";
-		["GuiReloaduiButton"]	= "ReloadUI";
-		["GuiReloaduiFeedback"]	= "ReloadUI in corso";
-		["GuiReloaduiHelp"]	= "Dopo aver cambiato la lingua, cliccare qui per ricaricare l'interfaccia utente di WoW, e visualizzare così la lingua scelta. L'operazione può richiedere qualche minuto.";
 		["GuiTerse"]	= "Abilita modo conciso";
 		["GuiValuateAverages"]	= "Valuta con le medie di Auctioneer";
 		["GuiValuateBaseline"]	= "Valuta con i dati di base";
 		["GuiValuateEnable"]	= "Abilita la valutazione";
 		["GuiValuateHeader"]	= "Valutazione";
 		["GuiValuateMedian"]	= "Valuta con le mediane di Auctioneer";
-		["HelpBarker"]	= "Abilita / disabilita imbonitore";
 		["HelpClear"]	= "Cancella i dati sull'oggetto specificato (devi inserire l'oggetto nella linea di comando usando shift-click). Puoi anche specificare il comando speciale \"tutto\"";
 		["HelpCount"]	= "Scegli se visualizzare o meno i conteggi esatti nel database";
 		["HelpDefault"]	= "Imposta un'opzione di Enchantrix al suo valore di default. Puoi inoltre specificare la parola chiave \"tutto\" per impostare tutte le opzioni di Enchantrix ai loro valori di default.";
@@ -1268,12 +1045,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Se la valutazione è attivata, e tu hai Auctioneer installato, mostra la valutazione mediana dell'oggetto disincantato.";
 		["HelpGuessBaseline"]	= "Se la valutazione è abilitata (Auctioneer non è necessario), visualizza il prezzo di base per il disenchant dell'oggetto (dai dati interni)";
 		["HelpGuessNoauctioneer"]	= "I comandi valuate-hsp e valuate-median non sono disponibili perchè non hai auctioneer installato.";
-		["HelpHeader"]	= "Seleziona per mostrare la linea del titolo";
 		["HelpLoad"]	= "Cambia le impostazioni di caricamento di Enchantrix per questo personaggio";
 		["HelpLocale"]	= "Cambia la lingua con la quale vuoi che Enchantrix comunichi";
 		["HelpOnoff"]	= "Abilita o disabilita le informazioni sull'incantesimo";
 		["HelpPrintin"]	= "Seleziona in quale finestra di chat verranno mandati i messaggi di Enchantrix. Puoi specificare il nome del frame oppure l'indice.";
-		["HelpRate"]	= "Seleziona se visualizzare o meno la quantità media di disenchant";
 		["HelpTerse"]	= "Abilita/disabilita il modo conciso, facendo vedre solo il valore disenchant. Può essere cambiato tenendo premuto il tasto control.";
 		["HelpValue"]	= "Seleziona per visualizzare il valore stimato dell'oggetto in base alla proporzione dei disincantamenti possibili";
 
@@ -1291,7 +1066,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prezzo imbonitore (margine %d%%)";
-		["FrmtCounts"]	= "(base=%d, vecchio=%d, nuovo=%d) ";
 		["FrmtDisinto"]	= "Si disincanta in:";
 		["FrmtFound"]	= "%s si disincanta in: ";
 		["FrmtPriceEach"]	= "(%s ognuno)";
@@ -1304,16 +1078,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[Prezzi non disponibili]";
 		["FrmtWarnPriceUnavail"]	= "[Alcuni prezzi non disponibili]";
 
-		-- Section: User Interface
-
-
 	};
 
 	koKR = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: 마법부여 창이 열려있지 않습니다. Barker를 사용하려면 마법부여 창이 열려있어야만 합니다.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: 마법부여 재료가 하나도 없거나 추출할 재료가 하나도 없습니다.";
 		["FrmtActClearall"]	= "모든 마법부여 데이터를 삭제합니다.";
 		["FrmtActClearFail"]	= "아이템을 찾을 수 없음: %s";
 		["FrmtActClearOk"]	= "아이템 데이터 삭제: %s ";
@@ -1321,7 +1090,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "모든 Enchantrix 설정이 초기화 되었습니다.";
 		["FrmtActDisable"]	= "아이템의 %s 데이터를 표시하지 않습니다.";
 		["FrmtActEnable"]	= "아이템의 %s 데이터를 표시합니다.";
-		["FrmtActEnabledOn"]	= "아이템의 %s 를 %s에 표시합니다.";
 		["FrmtActSet"]	= "%s를 '%s'|1으로;로; 설정합니다.";
 		["FrmtActUnknown"]	= "알 수 없는 명령어: '%s'";
 		["FrmtActUnknownLocale"]	= "('%s|1')은;')는; 알 수 없는 지역입니다. 올바른 지역 설정은 다음과 같습니다:";
@@ -1340,9 +1108,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<창번호>[번호]|<창이름>[문자열])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "알림 기능 사용안함.";
-		["BarkerOn"]	= "알림 기능 사용.";
-		["CmdBarker"]	= "알림";
 		["CmdClear"]	= "삭제";
 		["CmdDefault"]	= "기본값";
 		["CmdDisable"]	= "비활성화";
@@ -1361,8 +1126,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "평가된 HSP";
 		["ShowGuessAuctioneerMed"]	= "평가된 중앙값";
 		["ShowGuessBaseline"]	= "평가된 기본값";
-		["ShowHeader"]	= "머리말";
-		["ShowRate"]	= "비율";
 		["ShowTerse"]	= "간결";
 		["ShowValue"]	= "평가";
 		["StatOff"]	= "어떤 마법부여자료도 표시하지 않음";
@@ -1375,27 +1138,10 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "마력추출";
-		["BarkerOpening"]	= "마법부여 판매:";
-		["Darnassus"]	= "다르나서스";
 		["Enchanting"]	= "마법 부여";
-		["Ironforge"]	= "아이언포지";
-		["OneLetterGold"]	= "골드";
-		["OneLetterSilver"]	= "실버";
-		["Orgrimmar"]	= "오그리마";
 		["PatReagents"]	= "재료: (.+)";
-		["Shattrath"]	= "샤트라스";
-		["ShortDarnassus"]	= "다르";
-		["ShortIronForge"]	= "아포";
-		["ShortOrgrimmar"]	= "오그";
-		["ShortShattrath"]	= "샤트";
-		["ShortStormwind"]	= "스톰";
-		["ShortThunderBluff"]	= "썬더";
-		["ShortUndercity"]	= "언더";
-		["StormwindCity"]	= "스톰윈드";
 		["TextCombat"]	= "전투";
 		["TextGeneral"]	= "일반";
-		["ThunderBluff"]	= "썬더블러프";
-		["Undercity"]	= "언더시티";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(당신의 데이터를 공유하려면 http://enchantrix.org/ 에 방문하십시오.)";
@@ -1403,7 +1149,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix는 Auctioneer 버전 3.4 이상이 필요합니다. 여러분이 새로운 Auctioneer를 설치하기전까지 몇가지 기능을 사용할 수 없습니다.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "알림 사용";
 		["GuiClearall"]	= "모든 Enchantrix 데이터 삭제";
 		["GuiClearallButton"]	= "모두 삭제";
 		["GuiClearallHelp"]	= "클릭하면 현재 서버의 Enchantrix 자료가 모두 삭제됩니다.";
@@ -1420,18 +1165,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "기타 설정";
 		["GuiOtherHelp"]	= "기타 Enchantrix 설정";
 		["GuiPrintin"]	= "원하는 메시지 프레임을 선택";
-		["GuiRate"]	= "평균적인 마력추출 양 보기";
-		["GuiReloadui"]	= "UI 재시작";
-		["GuiReloaduiButton"]	= "UI 재시작";
-		["GuiReloaduiFeedback"]	= "WOW UI를 재시작하는 중";
-		["GuiReloaduiHelp"]	= "지역코드를 변경후에 WOW 사용자 인터페이스를 변경하려면 이곳을 클릭해서 여러분이 선택한 것과 설정 화면의 언어가 같아지도록 하십시오. 주의: 이 작업은 몇분 정도 걸릴 수 있습니다.";
 		["GuiTerse"]	= "간결 모드 사용";
 		["GuiValuateAverages"]	= "Auctioneer 평균으로 평가";
 		["GuiValuateBaseline"]	= "내장된 자료를 이용해 평가";
 		["GuiValuateEnable"]	= "평가 활성화";
 		["GuiValuateHeader"]	= "평가";
 		["GuiValuateMedian"]	= "Autctioneer 중앙값으로 평가";
-		["HelpBarker"]	= "알림 켜기고 끄기";
 		["HelpClear"]	= "지정된 아이템의 데이타를 삭제합니다.(이때 아이템지정은 Shift-click 으로 명령어창에 넣어야합니다.) 모든 아이템데이타를 삭제하기 위해 \"모두\" 를 사용할 수 있습니다.";
 		["HelpCount"]	= "데이타베이스에 있는 정확한 수량을 표시할지 선택합니다.";
 		["HelpDefault"]	= "Enchantrix의 옵션을 기본값으로 설정합니다. 모든 Enchantrix 설정을 기본값으로 하시려면 \"모두\" 를 사용할 수 있습니다.";
@@ -1443,12 +1182,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "만약 평가가 활성화 되었으면, 그리고 Auctioneer가 설치되어 있으면, 아이템을 마력추출시 가치의 중앙값이 표시됩니다.";
 		["HelpGuessBaseline"]	= "만약 평가가 활성화 되었으면, (Autctionner는 필요하지 않습니다) 아이템을 마력추출시 가치의 기본값이 표시됩니다.";
 		["HelpGuessNoauctioneer"]	= "Auctioneer가 설치되어 있지 않아서 평가된 HSP, 평가된 중앙값 명령어를 사용할 수 없습니다.";
-		["HelpHeader"]	= "머리말 보기 여부 선택";
 		["HelpLoad"]	= "이 케릭터의 Enchantrix 로드 설정 변경";
 		["HelpLocale"]	= "Enchantrix가 메시지를 표시하기위해 사용하는 언어 변경";
 		["HelpOnoff"]	= "Enchantrix자료 표시 켬/끔";
 		["HelpPrintin"]	= "Enchantrix가 메시지를 출력할 프레임 선택. 프레임의 이름이나, 번호를 사용할 수 있습니다.";
-		["HelpRate"]	= "평균적인 마력추출 양의 보기 여부 선택";
 		["HelpTerse"]	= "마력추출 가격만 보이도록하는 간결 모드 사용/사용안함. 컨트롤 키를 눌러서 겹쳐쓸 수 있음.";
 		["HelpValue"]	= "가능한 마력추출 비율에 근거한 아이템의 평가값 보기 여부 선택";
 
@@ -1466,11 +1203,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "가격 알림 (%d%% 마진)";
-		["FrmtCounts"]	= "(기준=%d, 과거=%d, 신규=%d)";
 		["FrmtDisinto"]	= "마력 추출:";
 		["FrmtFound"]	= "%s|1이;가; 마력 추출되는 아이템: ";
 		["FrmtFoundNotDisenchant"]	= "%s는 마력 추출이 불가능한 아이템입니다.";
-		["FrmtNoDEPrediction"]	= "마력추출 예측이 불가능합니다.";
 		["FrmtPriceEach"]	= "(%s 개)";
 		["FrmtSuggestedPrice"]	= "제안 가격:";
 		["FrmtTotal"]	= "총";
@@ -1481,16 +1216,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[가능한 가격 없음]";
 		["FrmtWarnPriceUnavail"]	= "[일부 가격을 사용할 수 없음]";
 
-		-- Section: User Interface
-
-
 	};
 
 	nlNL = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "Enchantrix: Het enchant scherm is niet geopend. Het enchanting scherm moet geopend zijn om de barker te gebruiken.";
-		["BarkerNoEnchantsAvail"]	= "Enchantrix: Je hebt geen enchants, of je hebt geen reagents om  iets te enchanten.";
 		["FrmtActClearall"]	= "Wissen van alle enchant gegevens";
 		["FrmtActClearFail"]	= "Kan item niet vinden: %s";
 		["FrmtActClearOk"]	= "Data gewist voor item: %s";
@@ -1498,7 +1228,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Alle Enchantrix opties zijn teruggezet naar standaard instelling.";
 		["FrmtActDisable"]	= "Item's %s gegevens worden niet weergegeven";
 		["FrmtActEnable"]	= "Item's %s gegevens worden weergegeven";
-		["FrmtActEnabledOn"]	= "Weergeven Item's %s op %s";
 		["FrmtActSet"]	= "Stel %s naar '%s' in";
 		["FrmtActUnknown"]	= "Onbekende opdracht: '%s'";
 		["FrmtActUnknownLocale"]	= "De opgegeven taal ('%s') is onbekend. Geldige talen zijn:";
@@ -1514,9 +1243,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Nummer]|<frameNaam>[Tekst])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Omroep functie gedeactiveerd.";
-		["BarkerOn"]	= "Omroep functie geactiveerd.";
-		["CmdBarker"]	= "Omroeper";
 		["ShowTerse"]	= "Beknopt";
 		["StatOff"]	= "Enchant gegevens worden niet getoond";
 		["StatOn"]	= "De geconfigureerde enchant gegevens worden getoond";
@@ -1528,24 +1254,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Disenchant";
-		["BarkerOpening"]	= "Selling Enchants:";
-		["Darnassus"]	= "Darnassus";
-		["Ironforge"]	= "City of Ironforge";
-		["OneLetterGold"]	= "g";
-		["OneLetterSilver"]	= "s";
-		["Orgrimmar"]	= "Orgrimmar";
 		["PatReagents"]	= "Reagents: (.+)";
-		["ShortDarnassus"]	= "Dar";
-		["ShortIronForge"]	= "IF";
-		["ShortOrgrimmar"]	= "Org";
-		["ShortStormwind"]	= "SW";
-		["ShortThunderBluff"]	= "TB";
-		["ShortUndercity"]	= "UC";
-		["StormwindCity"]	= "Stormwind City";
 		["TextCombat"]	= "Combat";
 		["TextGeneral"]	= "General";
-		["ThunderBluff"]	= "Thunder Bluff";
-		["Undercity"]	= "Undercity";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(ga naar http://enchantrix.org/ om uw data te delen)";
@@ -1553,7 +1264,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix heeft Auctioneer versie 3.4 of hoger nodig. Sommige functionaliteiten zijn niet beschikbaar totdat Auctioneer is geupgrade.";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Activeren Omroeper";
 		["GuiClearall"]	= "Opschonen alle Enchantrix Data";
 		["GuiClearallButton"]	= "Alles opschonen";
 		["GuiClearallHelp"]	= "Klik hier om alle enchantrix data van de huidige Server/Realm op te schonen.";
@@ -1569,11 +1279,6 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Andere Opties";
 		["GuiOtherHelp"]	= "Verschillende Enchantrix Opties";
 		["GuiPrintin"]	= "Selecteer het gewenste berichten scherm";
-		["GuiRate"]	= "Toon de gemiddelde hoeveelheid van de disenchant";
-		["GuiReloadui"]	= "Opnieuw laden Gebruikers scherm.";
-		["GuiReloaduiButton"]	= "HerladenUI";
-		["GuiReloaduiFeedback"]	= "Nu bezig met het herladen van de WoW UI";
-		["GuiReloaduiHelp"]	= "Klik hier om de WoW te herladen nadat je een andere taal hebt geselecteerd zodat de weergegeven tekst in de juiste taal verschijnt. Opmerking: Dit kan enkele minuten duren.";
 		["GuiTerse"]	= "Activeer Beknopte Mode";
 		["GuiValuateAverages"]	= "Taxatie met Auctioneer gemiddelden";
 		["GuiValuateBaseline"]	= "Taxatie met Standaard Data";
@@ -1592,7 +1297,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Omroep Prijs (%d%% marge)";
-		["FrmtCounts"]	= "basis=%d, oud=%d, nieuw=%d";
 		["FrmtDisinto"]	= "Gedisenchant in:";
 		["FrmtFound"]	= "Gevonden dat %s wordt gedisenchant in:";
 		["FrmtPriceEach"]	= "Prijs per item";
@@ -1604,9 +1308,6 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "Auctioneer niet geladen. Opgeslagen waardes worden gebruikt.";
 		["FrmtWarnNoPrices"]	= "Geen prijs beschikbaar ";
 		["FrmtWarnPriceUnavail"]	= "Sommige prijzen niet beschikbaar";
-
-		-- Section: User Interface
-
 
 	};
 
@@ -1620,7 +1321,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Todas as opções Enchantrix revertidas para o normal.";
 		["FrmtActDisable"]	= "Não está a ser mostrada informação do objecto %s";
 		["FrmtActEnable"]	= "Está a ser mostrada informação do objecto %s";
-		["FrmtActEnabledOn"]	= "A mostrar o objecto %s em %s";
 		["FrmtActSet"]	= "Definir %s para '%s'";
 		["FrmtActUnknown"]	= "Comando de palavra-chave desconhecido: '%s'";
 		["FrmtActUnknownLocale"]	= "A localização dada ('%s') nao foi encontrada. Localizações válidas são:";
@@ -1639,9 +1339,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Número]<frameName>[Corda])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "Função Barker Desligada";
-		["BarkerOn"]	= "Função Barker Ligada";
-		["CmdBarker"]	= "Vendedor";
 		["CmdClear"]	= "apagar";
 		["CmdDefault"]	= "por defeito";
 		["CmdDisable"]	= "desactivar";
@@ -1655,8 +1352,6 @@ EnchantrixLocalizations = {
 		["ShowEmbed"]	= "embebido";
 		["ShowGuessAuctioneerMed"]	= "valor médio";
 		["ShowGuessBaseline"]	= "valor base";
-		["ShowHeader"]	= "cabeçalho";
-		["ShowRate"]	= "taxas";
 		["ShowTerse"]	= "breve";
 		["ShowValue"]	= "avaliar";
 		["StatOff"]	= "Não está a ser mostrada informação do enchant";
@@ -1679,7 +1374,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix requer a versão 3.4 do Auctioneer ou mais elevado. Algumas características serão desligadas até que você actualize sua instalação do Auctioneer. ";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "Ligar Vendedor";
 		["GuiClearall"]	= "Limpar toda a informação do Enchantrix";
 		["GuiClearallButton"]	= "Limpar tudo";
 		["GuiClearallHelp"]	= "Carrega aqui para limpar toda a informação do Enchantrix do servidor actual.";
@@ -1696,18 +1390,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "Outras Opções";
 		["GuiOtherHelp"]	= "Outras Opções do Enchantrix";
 		["GuiPrintin"]	= "Seleccionar a expressão desejada da mensagem";
-		["GuiRate"]	= "Mostrar a quantidade média de desencanto";
-		["GuiReloadui"]	= "Recarregar o Interface do Utilizador";
-		["GuiReloaduiButton"]	= "RecarregarUI";
-		["GuiReloaduiFeedback"]	= "A recarregar o UI do WoW";
-		["GuiReloaduiHelp"]	= "Carrega aqui para recarregar o Interface de Utilizador (UI) do WoW após mudar a localização para que a linguagem neste menu de configuração confira com a que escolheste. Nota: Esta operação poderá demorar alguns minutos.";
 		["GuiTerse"]	= "Ligar modo breve";
 		["GuiValuateAverages"]	= "Validar com as médias Auctioneer";
 		["GuiValuateBaseline"]	= "Validar com a Data Padrão";
 		["GuiValuateEnable"]	= "Activar Validação";
 		["GuiValuateHeader"]	= "Validação";
 		["GuiValuateMedian"]	= "Validar com os Números Médios Auctioneer";
-		["HelpBarker"]	= "Ligar e Desligar Vendedor";
 		["HelpClear"]	= "Limpar a informação específica de um objecto (tem de carregar shift+click o objecto no comando) Também podes especificar a palavra especial \"Todos\"";
 		["HelpCount"]	= "Seleccionar se quer ver a contagem exacta dos objectos na Database";
 		["HelpDefault"]	= "Aplicar uma opção do Enchantrix para o seu Padrão. Também podes especificar a palavra especial \"Todos\" para por todos as opções Padrão.";
@@ -1719,12 +1407,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "Se a validação estiver permitida, e você tiver o Auctioneer instalado, indicar o valor baseado mediano de disencanto do artigo. ";
 		["HelpGuessBaseline"]	= "Se a validação for permitida, (Auctioneer não necessitado) indicar o valor da linha de base de disencanto do artigo, baseado nos preços inbutidos. ";
 		["HelpGuessNoauctioneer"]	= "Se a validação for permitida, (Auctioneer não necessitado) indicar o valor da linha de base de disencanto do artigo, baseado nos preços inbutidos";
-		["HelpHeader"]	= "Selecionar se quer mostrar o cabeçalho";
 		["HelpLoad"]	= "Mudar as opções de carregamento para este personagem";
 		["HelpLocale"]	= "Mudar a localização que é usada para mostrar as mensagens do Enchantrix";
 		["HelpOnoff"]	= "Liga e Desliga a exposição de dados do Enchant";
 		["HelpPrintin"]	= "Selecionar em que janela o Enchantrix irá imprimir as suas mensagens. Poderás expecificar o nome da janela ou o inicio da janela.";
-		["HelpRate"]	= "Seleccionar se quer exibir as quantidades médias do desencanto.";
 		["HelpTerse"]	= "Ligar/Desligar o modo breve, montrando somente o valor do desencanto. Pode ser sobreposto carregando na tecla Ctrl.";
 		["HelpValue"]	= "Seleccionar se quer ver os valores estimados baseados em proporções possiveis dos desencantos.";
 
@@ -1740,7 +1426,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Preço de Vendedor (%d%% margem)";
-		["FrmtCounts"]	= "(base=%d, antigo=%d, novo=%d) ";
 		["FrmtDisinto"]	= "Desencanta em:";
 		["FrmtFound"]	= "Observado que %s desencanta em: ";
 		["FrmtPriceEach"]	= "(%s cada)";
@@ -1765,7 +1450,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "Все Enchantrix были сброшены\n";
 		["FrmtActDisable"]	= "Показ данных по %s деталя\n";
 		["FrmtActEnable"]	= "Показ данных по %s деталя\n";
-		["FrmtActEnabledOn"]	= "Показ %s деталя на %s\n";
 		["FrmtActSet"]	= "Установите %s к ' %s'\n";
 		["FrmtActUnknown"]	= "Неизвестный keyword команды: ' %s'\n";
 		["FrmtActUnknownLocale"]	= "Locale, котор вы определили (' %s') неизвестны. Действительные locales являются следующими:\n";
@@ -1797,8 +1481,6 @@ EnchantrixLocalizations = {
 		["CmdPrintin"]	= "print-in ";
 		["CmdToggle"]	= "переключить";
 		["ShowCount"]	= "отсчеты\n";
-		["ShowHeader"]	= "заголовок";
-		["ShowRate"]	= "оценивается";
 
 		-- Section: Config Text
 		["GuiLoad"]	= "Загрузить Enchantrix ";
@@ -1827,8 +1509,6 @@ EnchantrixLocalizations = {
 		["GuiLocale"]	= "Сменить язык на";
 		["GuiMainEnable"]	= "Включить Enchantrix";
 		["GuiOtherHeader"]	= "Другие настройки";
-		["GuiReloadui"]	= "Перезагруза интерфейса пользователя";
-		["GuiReloaduiFeedback"]	= "Идет перезагрузка интерфейса пользователя";
 		["HelpDisable"]	= "Не загружать enchantrix в следующий раз, когда вы войдете в игру";
 
 		-- Section: Tooltip Messages
@@ -1851,7 +1531,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "TÃ¼m Enchantrix seÃ§enekleri varsayÄ±lan hallerine dÃ¶ndÃ¼rÃ¼ldÃ¼.";
 		["FrmtActDisable"]	= "Cismin %s verisi gÃ¶sterilmiyor";
 		["FrmtActEnable"]	= "Cismin %s verisi gÃ¶steriliyor";
-		["FrmtActEnabledOn"]	= "Cismin %s si %s de gÃ¶steriliyor";
 		["FrmtActSet"]	= "%s yi '%s' ye ayarla";
 		["FrmtActUnknown"]	= "Bilinmeyen komut anahtar kelimesi: '%s' ";
 
@@ -1863,8 +1542,6 @@ EnchantrixLocalizations = {
 	zhCN = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "附魔助手：附魔窗口没有打开。使用barker指令必须打开附魔窗口";
-		["BarkerNoEnchantsAvail"]	= "附魔助手：您没有附魔技能或没有制作试剂";
 		["FrmtActClearall"]	= "清除全部附魔数据。";
 		["FrmtActClearFail"]	= "无法找到物品：%s。";
 		["FrmtActClearOk"]	= "物品：%s的数据已清除。";
@@ -1872,7 +1549,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "所有附魔助手选项已重置为默认值。";
 		["FrmtActDisable"]	= "不显示物品的%s数据。";
 		["FrmtActEnable"]	= "显示物品的%s数据。";
-		["FrmtActEnabledOn"]	= "显示物品的%s于%s。";
 		["FrmtActSet"]	= "设置%s为'%s'。";
 		["FrmtActUnknown"]	= "未知命令关键字：'%s'。";
 		["FrmtActUnknownLocale"]	= "你输入的地域代码('%s')未知。有效的地域代码为：";
@@ -1891,9 +1567,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<窗口标签>[数字]|<窗口名称>[字符串])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "停用Barker函数";
-		["BarkerOn"]	= "启用Barker函数";
-		["CmdBarker"]	= "barker";
 		["CmdClear"]	= "clear清除";
 		["CmdDefault"]	= "default默认";
 		["CmdDisable"]	= "disable禁用";
@@ -1912,8 +1585,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp估价-最高";
 		["ShowGuessAuctioneerMed"]	= "valuate-median估价-中值";
 		["ShowGuessBaseline"]	= "valuate-baseline估价-基准";
-		["ShowHeader"]	= "header标题";
-		["ShowRate"]	= "rates估价";
 		["ShowTerse"]	= "terse简洁";
 		["ShowValue"]	= "valuate估价";
 		["StatOff"]	= "Not displaying any enchant data不显示任何分解数据";
@@ -1926,25 +1597,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "分解";
-		["BarkerOpening"]	= "出售附魔：";
-		["Darnassus"]	= "达纳苏斯";
-		["Ironforge"]	= "铁炉堡";
-		["OneLetterGold"]	= "G";
-		["OneLetterSilver"]	= "S";
-		["Orgrimmar"]	= "奥格瑞玛";
 		["PatReagents"]	= "材料：(.+)";
-		["ShortDarnassus"]	= "Dar ";
-		["ShortIronForge"]	= "IF ";
-		["ShortOrgrimmar"]	= "Org ";
-		["ShortShattrath"]	= "sha";
-		["ShortStormwind"]	= "SW ";
-		["ShortThunderBluff"]	= "TB ";
-		["ShortUndercity"]	= "UC ";
-		["StormwindCity"]	= "暴风城";
 		["TextCombat"]	= "战斗";
 		["TextGeneral"]	= "普通";
-		["ThunderBluff"]	= "雷霆崖";
-		["Undercity"]	= "幽暗城";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= "(去http://enchantrix.org/网站共享数据)";
@@ -1952,7 +1607,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix需要Auctioneer版本3.4或更高。某些特性会失效请升级你的Auctioneer";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "允许Barker";
 		["GuiClearall"]	= "清除全部附魔助手数据。";
 		["GuiClearallButton"]	= "全部清除";
 		["GuiClearallHelp"]	= "点此清除对于当前服务器-阵营的全部附魔助手数据。";
@@ -1969,18 +1623,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "其他选项";
 		["GuiOtherHelp"]	= "附魔助手杂项";
 		["GuiPrintin"]	= "选择期望的讯息窗口。";
-		["GuiRate"]	= "显示分解平均数量。";
-		["GuiReloadui"]	= "重新加载用户界面。";
-		["GuiReloaduiButton"]	= "重载UI";
-		["GuiReloaduiFeedback"]	= "正在重新加载魔兽用户界面。";
-		["GuiReloaduiHelp"]	= "在改变地域代码后点此重新加载魔兽用户界面使此配置屏幕中的语言匹配选择。注意：此操作可能耗时几分钟。";
 		["GuiTerse"]	= "开启简洁模式";
 		["GuiValuateAverages"]	= "以拍卖助手平均价进行估价。";
 		["GuiValuateBaseline"]	= "以内置数据估价。";
 		["GuiValuateEnable"]	= "启用估价。";
 		["GuiValuateHeader"]	= "估价";
 		["GuiValuateMedian"]	= "以拍卖助手中位数价进行估价。";
-		["HelpBarker"]	= "切换Barker开关";
 		["HelpClear"]	= "清除指定物品的数据(必须Shift+点击将物品插入命令)。你也可以指定特定关键字\"all\"。";
 		["HelpCount"]	= "选择是否显示数据库中的额外计数。";
 		["HelpDefault"]	= "设置某个附魔助手选项为默认值。你也可以输入特定关键字\"all\" 来设置所有附魔助手选项为默认值。";
@@ -1992,12 +1640,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "如果启用估价，并且安装了拍卖助手(Auctioneer)，显示基于物品分解估价的中位数。";
 		["HelpGuessBaseline"]	= "如果启用估价，显示对于物品分解的基准估价，基于系统内置价格(不需要拍卖助手Auctioneer)。";
 		["HelpGuessNoauctioneer"]	= "价格评估上限与价格评估中位数命令不能使用是因为没有安装拍卖助手。";
-		["HelpHeader"]	= "选择是否显示标题线。";
 		["HelpLoad"]	= "改变附魔助手的加载设置。";
 		["HelpLocale"]	= "更改附魔助手显示讯息的地域代码。";
 		["HelpOnoff"]	= "打开/关闭附魔数据的显示。";
 		["HelpPrintin"]	= "选择附魔助手使用哪个窗口来显示输出讯息。你可以指定窗口名称或索引。";
-		["HelpRate"]	= "选择是否显示分解的平均数量。";
 		["HelpTerse"]	= "开启/关闭 简洁模式，只显示分解价值。能持续忽略控制键。";
 		["HelpValue"]	= "选择是否显示物品基于可能分解几率的预计价值。";
 
@@ -2015,10 +1661,8 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker价格(%d%% 最低利润)";
-		["FrmtCounts"]	= "(基本=%d，旧值=%d，新值=%d)";
 		["FrmtDisinto"]	= "可分解为:";
 		["FrmtFound"]	= "发现%s可分解为：";
-		["FrmtNoDEPrediction"]	= "没有可用的分解信息";
 		["FrmtPriceEach"]	= "(每件%s)";
 		["FrmtSuggestedPrice"]	= "建议价格：";
 		["FrmtTotal"]	= "合计";
@@ -2029,16 +1673,11 @@ EnchantrixLocalizations = {
 		["FrmtWarnNoPrices"]	= "[无价可用]";
 		["FrmtWarnPriceUnavail"]	= "[某些价格不可用]";
 
-		-- Section: User Interface
-
-
 	};
 
 	zhTW = {
 
 		-- Section: Command Messages
-		["BarkerEnxWindowNotOpen"]	= "附魔視窗沒有開啟。要使用barker指令必須打開附魔視窗";
-		["BarkerNoEnchantsAvail"]	= "附魔助手：您没有附魔技能或没有相對應的材料";
 		["FrmtActClearall"]	= "清除所有附魔資料";
 		["FrmtActClearFail"]	= "無法找到物品：%s";
 		["FrmtActClearOk"]	= "清除物品資料：%s ";
@@ -2046,7 +1685,6 @@ EnchantrixLocalizations = {
 		["FrmtActDefaultAll"]	= "所有Enchantrix的設定已經重設為初始值";
 		["FrmtActDisable"]	= "不要顯示物品的 %s 資料";
 		["FrmtActEnable"]	= "顯示物品的 %s 資料";
-		["FrmtActEnabledOn"]	= "顯示物品的 %s 在 %s";
 		["FrmtActSet"]	= "設定%s為'%s'";
 		["FrmtActUnknown"]	= "未知的命令關鍵字：'%s'";
 		["FrmtActUnknownLocale"]	= "找不到您選擇的語言('%s')。可用的語言有：";
@@ -2065,9 +1703,6 @@ EnchantrixLocalizations = {
 		["OptPrintin"]	= "(<frameIndex>[Number]|<frameName>[String])";
 
 		-- Section: Commands
-		["BarkerOff"]	= "停用聲望提示功能";
-		["BarkerOn"]	= "啟用聲望提示功能";
-		["CmdBarker"]	= "聲望提示";
 		["CmdClear"]	= "clear";
 		["CmdDefault"]	= "default";
 		["CmdDisable"]	= "disable";
@@ -2086,8 +1721,6 @@ EnchantrixLocalizations = {
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
 		["ShowGuessBaseline"]	= "valuate-baseline";
-		["ShowHeader"]	= "header";
-		["ShowRate"]	= "rates";
 		["ShowTerse"]	= "精簡";
 		["ShowValue"]	= "valuate";
 		["StatOff"]	= "不顯示任何附魔資料";
@@ -2100,26 +1733,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "分解";
-		["BarkerOpening"]	= "想出售附魔:";
-		["Darnassus"]	= "達納蘇斯";
-		["Ironforge"]	= "鐵爐堡";
-		["OneLetterGold"]	= "金";
-		["OneLetterSilver"]	= "銀";
-		["Orgrimmar"]	= "奧格瑞瑪";
 		["PatReagents"]	= "魔法元素: (.+) ";
-		["Shattrath"]	= "撒塔斯城";
-		["ShortDarnassus"]	= "達納蘇斯";
-		["ShortIronForge"]	= "鐵爐堡";
-		["ShortOrgrimmar"]	= "奧格瑞瑪";
-		["ShortShattrath"]	= "撒塔斯城";
-		["ShortStormwind"]	= "暴風城";
-		["ShortThunderBluff"]	= "雷霆崖";
-		["ShortUndercity"]	= "幽暗城";
-		["StormwindCity"]	= "暴風城";
 		["TextCombat"]	= "戰鬥記錄";
 		["TextGeneral"]	= "綜合";
-		["ThunderBluff"]	= "雷霆崖";
-		["Undercity"]	= "幽暗城";
 
 		-- Section: Generic Messages
 		["FrmtCredit"]	= " (請至 http://enchantrix.org/ 以分享您的資料) ";
@@ -2127,7 +1743,6 @@ EnchantrixLocalizations = {
 		["MesgAuctVersion"]	= "Enchantrix需要Auctioneer3.4或更新版本。某些功能在您未更新您的Auctioneer前無法使用。";
 
 		-- Section: Help Text
-		["GuiBarker"]	= "啟用Barker";
 		["GuiClearall"]	= "清除所有附魔資料";
 		["GuiClearallButton"]	= "清除全部";
 		["GuiClearallHelp"]	= "點擊此處，清除目前伺服器之所有附魔資料";
@@ -2144,18 +1759,12 @@ EnchantrixLocalizations = {
 		["GuiOtherHeader"]	= "其他選項";
 		["GuiOtherHelp"]	= "其他 Enchantrix 雜項設定";
 		["GuiPrintin"]	= "選擇崁入的訊息框架";
-		["GuiRate"]	= "顯示分析後的分解資訊";
-		["GuiReloadui"]	= "重新載入使用者界面";
-		["GuiReloaduiButton"]	= "重新載入UI";
-		["GuiReloaduiFeedback"]	= "正在重新啟動UI";
-		["GuiReloaduiHelp"]	= "點選後將重新啟動UI，並轉換為玩家所選擇的語言版本。注意︰此次操作可能花費幾分鐘。 ";
 		["GuiTerse"]	= "啟用精簡模式";
 		["GuiValuateAverages"]	= "拍賣評估";
 		["GuiValuateBaseline"]	= "崁入拍賣資料";
 		["GuiValuateEnable"]	= "啟動評估系統";
 		["GuiValuateHeader"]	= "估價";
 		["GuiValuateMedian"]	= "評估拍賣平均價值";
-		["HelpBarker"]	= "啟用/停用 Baker";
 		["HelpClear"]	= "清除指定物品的數據(必須Shift+點擊將物品插入命令)。你也可以指定特定關鍵字\"all\"。";
 		["HelpCount"]	= "選擇是否在數據庫裡顯示精確的數字 ";
 		["HelpDefault"]	= "設置某個附魔助手選項為預設值。你也可以輸入特定關鍵字\"all\" 來設置所有附魔助手選項為預設值。";
@@ -2167,12 +1776,10 @@ EnchantrixLocalizations = {
 		["HelpGuessAuctioneerMedian"]	= "If valuation is enabled, and you have Auctioneer installed, display the median based valuation of disenchanting the item.";
 		["HelpGuessBaseline"]	= "If valuation is enabled, (Auctioneer not needed) display the baseline valuation of disenchanting the item, based upon the inbuilt prices.";
 		["HelpGuessNoauctioneer"]	= "The valuate-hsp and valuate-median commands are not available because you do not have auctioneer installed";
-		["HelpHeader"]	= "選擇是否顯示標題列";
 		["HelpLoad"]	= "Change Enchantrix's load settings for this toon";
 		["HelpLocale"]	= "改變用來顯示Enchantrix訊息的語言";
 		["HelpOnoff"]	= "附魔資料開啟或關閉";
 		["HelpPrintin"]	= "選擇Enchantrix訊息顯示的框架。你可以輸入框架名字或者是index。";
-		["HelpRate"]	= "選擇是否顯示分解的平均量";
 		["HelpTerse"]	= "開啟/關閉 簡略模式，只顯示分解價值。能持續忽略控制鍵。";
 		["HelpValue"]	= "Select whether to show item's estimated values based on the proportions of possible disenchants";
 
@@ -2190,7 +1797,6 @@ EnchantrixLocalizations = {
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker 價格 (%d%% 保証金) ";
-		["FrmtCounts"]	= "(原本=%d, 舊=%d, 新=%d)";
 		["FrmtDisinto"]	= "分解成：";
 		["FrmtFound"]	= "%s可分解成：";
 		["FrmtPriceEach"]	= "(%s 每個) ";
@@ -2202,9 +1808,6 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer未載入，使用暫存區價格]";
 		["FrmtWarnNoPrices"]	= "[無有效價格]";
 		["FrmtWarnPriceUnavail"]	= "[部分價格無效]";
-
-		-- Section: User Interface
-
 
 	};
 
