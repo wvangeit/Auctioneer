@@ -1,7 +1,7 @@
 ## Title: Auctioneer Advanced
 ## Notes: Auctioneer, An addon to help keep track of items values. You must at least enable a statistics extension (like Auctioneer Stats Simple) to start tracking stats.
 ##
-## Interface: 20003
+## Interface: 20100
 ## LoadOnDemand: 0
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDependencies: !nlog
