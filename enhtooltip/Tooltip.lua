@@ -1027,7 +1027,7 @@ function doHyperlink(reference, link, button)
 			if (button == "RightButton") then
 				testPopup = true
 			end
-			local callRes = tooltipCall(ItemRefTooltip, itemName, link, -1, 1, 0, testPopup, reference)
+			local callRes = tooltipCall(ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #private.embedLines > 0
 				private.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
@@ -1146,10 +1146,16 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	private.currentGametip = frame
 	private.hideTime = 0
 
+	-- quality, count and price are optional parameters, so set them to their
+    -- defaults, if they are not specified
+	quality = quality or -1
+    count   = count   or  1
+	price   = price   or  0
+
 	local itemSig = frame:GetName()
-	if (link) then itemSig = itemSig..link end
-	if (count) then itemSig = itemSig..count end
-	if (price) then itemSig = itemSig..price end
+	itemSig = itemSig..link
+	itemSig = itemSig..count
+	itemSig = itemSig..price
 
 	if (private.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
@@ -1337,14 +1343,14 @@ function gtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot)
 			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, quantity, 0)
+			return tooltipCall(GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetCraftItemLink(skill)
 		if (link) then
 			local name = nameFromLink(link)
 			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, 1, 0)
+			return tooltipCall(GameTooltip, name, link, quality)
 		end
 	end
 end
@@ -1364,14 +1370,14 @@ function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot)
 			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, quantity, 0)
+			return tooltipCall(GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetTradeSkillItemLink(skill)
 		if (link) then
 			local name = nameFromLink(link)
 			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, 1, 0)
+			return tooltipCall(GameTooltip, name, link, quality)
 		end
 	end
 end
@@ -1445,7 +1451,7 @@ function imiHookOnEnter()
 	local imlink = ItemsMatrix_GetHyperlink(item.name)
 	local link = fakeLink(imlink, item.quality, item.name)
 	if (link) then
-		return tooltipCall(GameTooltip, item.name, link, item.quality, item.count, 0)
+		return tooltipCall(GameTooltip, item.name, link, item.quality, item.count)
 	end
 end
 
@@ -1454,7 +1460,7 @@ function imHookOnEnter()
 	if (imlink) then
 		local name = this:GetText()
 		local link = fakeLink(imlink, -1, name)
-		return tooltipCall(GameTooltip, name, link, -1, 1, 0)
+		return tooltipCall(GameTooltip, name, link)
 	end
 end
 
@@ -1477,7 +1483,7 @@ function llHookOnEnter()
 	local link = getLootLinkLink(name)
 	if (link) then
 		local quality = qualityFromLink(link)
-		return tooltipCall(LootLinkTooltip, name, link, quality, 1, 0)
+		return tooltipCall(LootLinkTooltip, name, link, quality)
 	end
 end
 
