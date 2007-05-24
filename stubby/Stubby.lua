@@ -97,6 +97,30 @@ RegisterFunctionHook allows you to hook into a function.
 	or nil if none.
 	- hook1..hookN are the original parameters of the hooked
 	function in the original order.
+  The passed function can return one of the following three special commands:
+    - "abort" will abort the function call imidiatly and any hook positioned
+              after the function won't be called (this includes the original
+              function, if position of the function retunring "abort" is < 0)
+    - "killorig" causes the original function tonot being called. All other
+                 hooked functions will still be called. If position of the
+                 functions returning "killorig" is > 0, this has no affect
+                 (since the original function was already called before)
+    - "setreturn" sets the return value according to the second return value
+                  which must be a table. All function hooks which are called
+                  after the function hook which set the return value, will
+                  receive this new return value as their second parameter. Note
+                  that the original function still resets the return value. So
+                  in case you want the complete function hook to return
+                  something different than the original function's return value,
+                  make sure to set the position > 0.
+                  Also note, that any hooked function called after this one can
+                  change the return value again.
+                  Examples:
+                     return "setreturn", {1} sets the return value to 1
+                     return "setreturn", {} sets the return value to nil
+                     return "setreturn", {{[1] = "foo", [2] = "bar"}}
+                        sets the return value to the table:
+                        {[1] = "foo", [2] = "bar"}
 
 RegisterAddOnHook is very much like the register function hook
 call except that there is no positioning (you may get notified in
