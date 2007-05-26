@@ -457,5 +457,5 @@ function lib.MakeGuiConfig()
 	end
 	gui.SetLast(id, cont)
 
-	gui.AddControl(id, "Note",     0, 1, 600, 60, "The weightings above change the valuation of the given reagent by the specified amount. Generally you will want to leave them at 100% unless you think they should be more or less valuable than the valuation method you are using is saying.")
+	gui.AddControl(id, "Note",     0, 1, 600, 60, _ENCH("GuiWeighSettingsNote"))
 end
