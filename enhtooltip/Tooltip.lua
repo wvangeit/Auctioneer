@@ -467,15 +467,37 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		return
 	end
 
+	-- if set to true, the flag indicates, that we have already repainted the
+	-- game tooltip once and it is now properly aligned (i.e. has the correct
+	-- width/height)
+	local bTooltipRepainted = false
+
 	-- First thing todo is to update the embeded tooltip to get the correct
 	-- width/height it requires, if there are any embeded lines to be displayed.
 	if (next(private.embedLines) and (not skipEmbedRender)) then
 		embedRender(currentTooltip, private.embedLines)
+
+		-- update the tooltip without calling our own showTooltip
+		-- this will repaint the game tooltip and update its width and height so
+		-- that our just added text is now displayed inside the tooltip
+		private.showIgnore = true
+		currentTooltip:Show()
+		private.showIgnore = false
+		bTooltipRepainted  = true
 	end
 
 	-- if there is no data for the enhanced tooltip frame, we've got nothing todo
 	if (not EnhancedTooltip.hasData) then
 		return
+	end
+
+	-- repaint the tooltip, if we haven't done so before, to get the tooltip's
+	-- correct width/height including all the new lines other addons might add
+	-- after our own call
+	if not bTooltipRepainted then
+		private.showIgnore = true
+		currentTooltip:Show()
+		private.showIgnore = false
 	end
 
 	local lineCount   = EnhancedTooltip.lineCount
