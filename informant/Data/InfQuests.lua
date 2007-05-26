@@ -1,7 +1,7 @@
 ﻿--[[
 	Up-to-date list of quest items and rewards for informant.
 	File courtesy of http://wowwatcher.com/
-	File generated at: 2007-04-12 08:52:00 Z
+	File generated at: 2007-05-26 07:34:55 Z
 ]]
 Informant.SetQuestStarts({
  [688]=1470,
