@@ -125,6 +125,11 @@ function getReagentInfo(id)
 	return sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture
 end
 
+-- TODO: what is the correct limit post TBC?
+-- ccox - 32090 is the highest I can find so far
+-- but we REALLY should get rid of this search!
+Enchantrix.State.MAX_ITEM_ID = 33000
+
 function getLinkFromName(name)
 	assert(type(name) == "string")
 
