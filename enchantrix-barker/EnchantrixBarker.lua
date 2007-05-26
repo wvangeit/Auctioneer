@@ -233,12 +233,16 @@ local function craftUILoaded()
 		useFrame = ATSWFrame;
 	end
 
-	--Enchantrix_BarkerButton:SetParent(useFrame);
-	--Enchantrix_BarkerButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -55 );
-
 	Enchantrix_BarkerDisplayButton:SetParent(useFrame);
 	--Enchantrix_BarkerDisplayButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
-	Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -55 );
+	
+	if (ATSWFrame ~= nil) then
+		-- this works for ATSW
+		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
+	else
+		-- and this works for the WoW 2.1 trade Window
+		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -68 );
+	end
 
 	Enchantrix_BarkerOptions_Frame:SetParent(useFrame);
 	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", useFrame, "TOPRIGHT");
