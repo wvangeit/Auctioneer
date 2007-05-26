@@ -162,6 +162,8 @@ end
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
 function getReagentPrice(reagentID, extra)
 	-- reagentID ::= number | hyperlink
+	local weight = Enchantrix.Settings.GetSetting("weight."..reagentID) / 100
+	
 	if type(reagentID) == "string" then
 		local _, _, i = reagentID:find("item:(%d+):")
 		reagentID = i
@@ -200,7 +202,13 @@ function getReagentPrice(reagentID, extra)
 	cache.price5 = price5 or cache.price5
 	cache.timestamp = time()
 
-	return cache.hsp, cache.median, cache.market, cache.price5
+	hsp, median, market, price5 = cache.hsp, cache.median, cache.market, cache.price5
+	if (hsp) then hsp = hsp * weight end
+	if (median) then median = median * weight end
+	if (market) then market = market * weight end
+	if (price5) then price5 = price5 * weight end
+
+	return hsp, median, market, price5
 end
 
 

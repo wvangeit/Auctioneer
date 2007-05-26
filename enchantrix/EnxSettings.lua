@@ -151,6 +151,9 @@ local function getDefault(setting)
 		return Enchantrix.Constants.StaticPrices[tonumber(b) or 0]
 	end
 
+	-- Weights default to 100%
+	if (a == "weight") then return 100 end
+
 	-- miniicon settings
 	if (setting == "miniicon.angle")          then return 118     end
 	if (setting == "miniicon.distance")       then return 12      end
@@ -433,4 +436,26 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
 	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
+	id = gui.AddTab(_ENCH("GuiTabWeights"))
+	gui.AddControl(id, "Header",     0,    _ENCH("GuiWeightSettings"))
+	last = gui.GetLast(id)
+	cont = nil
+
+	local numReag = #Enchantrix.Constants.DisenchantReagentList
+	local colPos = 0
+	for i=1, numReag do
+		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
+		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
+		reagName = reagName:gsub("Large", "L"):gsub("Small", "S"):gsub("Greater", "G"):gsub("Lesser", "L")
+
+		if (cont == nil and i > numReag/2) then
+			cont = gui.GetLast(id)
+			gui.SetLast(id, last)
+			colPos = 0.5
+		end
+		gui.AddControl(id, "Slider", colPos, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
+	end
+	gui.SetLast(id, cont)
+
+	gui.AddControl(id, "Note",     0, 1, 600, 60, "The weightings above change the valuation of the given reagent by the specified amount. Generally you will want to leave them at 100% unless you think they should be more or less valuable than the valuation method you are using is saying.")
 end

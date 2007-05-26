@@ -662,6 +662,7 @@ EnchantrixLocalizations = {
 		["GuiTabAuctions"]	= "Auctions";
 		["GuiTabGeneral"]	= "General";
 		["GuiTabProfiles"]	= "Profiles";
+		["GuiTabWeights"]	= "Weights";
 		["GuiValueOptions"]	= "Value Display Options";
 		["GuiValueShowAuc4HSP"]	= "Show Auctioneer HSP values";
 		["GuiValueShowAuc4Median"]	= "Show Auctioneer median values";
@@ -669,6 +670,8 @@ EnchantrixLocalizations = {
 		["GuiValueShowBaseline"]	= "Show built-in baseline values";
 		["GuiValueShowDEValues"]	= "Show estimated disenchant values";
 		["GuiValueTerse"]	= "Show terse disenchant value";
+		["GuiWeighSettingsNote"]	= "The weights above change the valuation of the given reagent by the specified amount. Generally you will want to leave them at 100% unless you think they should be more or less valuable than the valuation method you are using is saying.";
+		["GuiWeightSettings"]	= "Disenchant reagent desirability";
 
 	};
 
