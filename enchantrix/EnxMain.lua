@@ -50,11 +50,7 @@ local DisenchantEvent = {}
 
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
-function addonLoaded(hookArgs, event, addOnName)
-	if (event ~= "ADDON_LOADED") or (addOnName:lower() ~= "enchantrix") then
-		return
-	end
-
+function addonLoaded()
 	-- Call AddonLoaded for other objects
 	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
 	Enchantrix.Command.AddonLoaded()
