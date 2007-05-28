@@ -686,7 +686,7 @@ end
 
 -- when you just want to print a message and don't care about the rest
 function Enchantrix.Util.DebugPrintQuick(...)
-	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
+	Enchantrix.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebug:", ... )
 end
 
 

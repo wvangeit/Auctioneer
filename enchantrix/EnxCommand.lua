@@ -973,7 +973,7 @@ function percentLessFilter(auction, args)
 	
 	local percentLess = args['percentLess'];
 	local reagentPriceTable = args['reagentPriceTable'];
-	
+
 	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
 	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);	
 	if (not myValue) then return filterAuction; end
@@ -1221,14 +1221,13 @@ function doBidBroker(minProfit, percentLess)
 	profitMargins = {};
 	
 	-- setup the reagent pricing table
-	local reagentPriceTable = createReagentPricingTable();
+	local reagentPriceTable = Enchantrix.Util.CreateReagentPricingTable();
 
 	local bidbroker_args = {
 		['minProfit'] = minProfit,
 		['reagentPriceTable'] = reagentPriceTable,
 		}
 	
-	--local targetAuctions = Auctioneer.Filter.QuerySnapshot(bidBrokerFilter, minProfit);
 	local targetAuctions
 	if adv then
 		targetAuctions = AucAdvanced.API.QueryImage({filter=bidBrokerFilter}, nil, nil, bidbroker_args);
