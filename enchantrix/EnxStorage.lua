@@ -176,8 +176,10 @@ end
 function getItemDisenchants(link)
 	local iType
 	if (type(link) == "string") then
-		if (link:match("%d+:0:%d+")) then
-			iType = Enchantrix.Util.GetIType("item:"..link)
+		local id = link:match("(%d+):0:%d+")
+		id = tonumber(id)
+		if (id) then
+			iType = Enchantrix.Util.GetIType("item:"..id..":0:0:0:0:0:0:0")
 		else
 			iType = Enchantrix.Util.GetIType(link)
 		end
