@@ -1507,7 +1507,6 @@ end
 
 -- Hook in alternative Auctionhouse tooltip code
 function private.HookAuctionHouse()
-	p("Registering AuctionHouseLoad")
 	Stubby.RegisterFunctionHook("AuctionFrameItem_OnEnter", 200, private.AfHookOnEnter)
 end
 
