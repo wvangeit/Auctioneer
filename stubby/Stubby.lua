@@ -709,7 +709,10 @@ function unregisterEventHook(triggerEvent, ownerAddOn)
 		-- Debugged by ccox and Cera
 		if ( not next( config.events[triggerEvent] ) ) then
 			config.events[triggerEvent] = nil
-			StubbyFrame:UnregisterEvent(triggerEvent)
+			-- Never unregister ADDON_LOADED, because this is used by RegisterAddOnHook()
+			if (triggerEvent ~= "ADDON_LOADED") then
+				StubbyFrame:UnregisterEvent(triggerEvent)
+			end
 		end
 	end
 end
