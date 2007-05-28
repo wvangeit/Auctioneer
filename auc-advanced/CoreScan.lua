@@ -646,7 +646,6 @@ end
 
 function private.OnUpdate(me, dur)
 	if private.sentQuery and CanSendAuctionQuery() then
-		private.updater:SetText("Store")
 		lib.StorePage()
 	end
 end
