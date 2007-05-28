@@ -688,3 +688,89 @@ end
 function Enchantrix.Util.DebugPrintQuick(...)
 	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
 end
+
+
+-- an attempt to balance the price of essences when doing auction scans
+-- still experimental
+local function balanceEssencePrices(scanReagentTable, style)
+
+	-- lesser_itemid = greater_itemid
+	local essenceTable = {
+		[10938] = 10939,	-- magic
+		[10998] = 11082,	-- astral
+		[11134] = 11135,	-- mystic
+		[11174] = 11175,  	-- nether
+		[16202] = 16203,  	-- eternal
+		[22447] = 22446,	-- planar
+	};
+
+	for lesser, greater in pairs(essenceTable) do
+	
+		local priceLesser = scanReagentTable[ lesser ];
+		local priceGreater = scanReagentTable[ greater ];
+		
+		if (style == "min") then
+			-- for pessimists who want to hedge their bets (and possibly undervalue their disenchant predictions)
+			priceLesser = math.min( priceLesser, priceGreater / 3 );
+		elseif (style == "max") then
+			-- for optimists who want to maximize profits when selling mats (and possibly overvalue their disenchant predictions)
+			priceLesser = math.max( priceLesser, priceGreater / 3 );
+		else 	-- if (style == "avg") then
+			-- for those who want the middle of the road
+			priceLesser = ( priceLesser + (priceGreater / 3) ) / 2;
+		end
+		
+		scanReagentTable[ lesser ] = priceLesser;
+		scanReagentTable[ greater ] = 3 * priceLesser;
+		
+	end
+	
+end
+
+function Enchantrix.Util.CreateReagentPricingTable()
+	local scanReagentTable = {};
+	local n = #Enchantrix.Constants.DisenchantReagentList;
+	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	local extra = nil
+	if (not style) then
+		style = "average";
+	end
+	if (style:sub(1,9) == "adv:stat:") then
+		extra = style:sub(10)
+	end
+
+	for i = 1, n do
+		local reagent = Enchantrix.Constants.DisenchantReagentList[i];
+		reagent = tonumber(reagent);
+
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
+		local myValue = 0;
+		
+		if (style == "auc4:hsp") then
+			myValue = hsp;
+		elseif (style == "auc4:med") then
+			myValue = med;
+		elseif (style == "baseline") then
+			myValue = mkt;
+		elseif (AucAdvanced and (style == "adv:market" or extra)) then
+			myValue = five;
+		else
+			local c = 0
+			if (hsp) then  myValue=myValue+hsp  c=c+1 end
+			if (med) then  myValue=myValue+med  c=c+1 end
+			if (mkt) then  myValue=myValue+mkt  c=c+1 end
+			if (five) then myValue=myValue+five c=c+1 end
+			myValue = myValue / c
+		end
+		
+		scanReagentTable[ reagent ] = myValue;
+	end
+	
+	if (Enchantrix.Settings.GetSetting('AuctionBalanceEssencePrices')) then
+		balanceEssencePrices(scanReagentTable, Enchantrix.Settings.GetSetting('AuctionBalanceEssenceStyle'));
+	end
+	
+	return scanReagentTable;
+end
+
+

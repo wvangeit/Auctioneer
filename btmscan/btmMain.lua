@@ -279,6 +279,11 @@ BtmScan.PageScan = function(resume)
 	-- lets get the items on the list and scan them.
 	local pageCount, totalCount = GetNumAuctionItems("list")
 
+	local deReagentTable
+	if Enchantrix and Enchantrix.Util and Enchantrix.Util.CreateReagentPricingTable then
+		deReagentTable = Enchantrix.Util.CreateReagentPricingTable()
+	end
+
 	local log = BtmScan.Log
 	if (BtmScan.dryRun) then log = BtmScan.Print end
 
@@ -334,16 +339,19 @@ BtmScan.PageScan = function(resume)
 
 					-- If this item doesn't breach the safetynet
 					if (not ignoreItem) then
-
 						-- Get vendor price if available
 						local vendorValue = BtmScan.GetVendorPrice(itemID, iCount)
 
 						-- Get disenchant value if available
 						local disenchantValue = 0
 						if (Enchantrix and Enchantrix.Storage) then
-							local disenchantTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(itemLink), itemName, true)
-							if (disenchantTo and disenchantTo.totals and disenchantTo.totals.hspValue and iQual > 1 and iCount <= 1) then
-								disenchantValue = disenchantTo.totals.hspValue * disenchantTo.totals.conf
+							if (deReagentTable) then
+								disenchantValue = Enchantrix.Storage.GetItemDisenchantFromTable(itemLink, deReagentTable)
+							else
+								local disenchantTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(itemLink), itemName, true)
+								if (disenchantTo and disenchantTo.totals and disenchantTo.totals.hspValue and iQual > 1 and iCount <= 1) then
+									disenchantValue = disenchantTo.totals.hspValue * disenchantTo.totals.conf
+								end
 							end
 						end
 
@@ -390,7 +398,6 @@ BtmScan.PageScan = function(resume)
 
 						-- If this item is not trash (grey) quality
 						if (iQual > 0) then
-
 							-- Grab the sane price from our list
 							--   Note these are compiled averages from all factions and servers
 							--   This is meant to "double check" the Auctioneer prices, if both
@@ -525,7 +532,7 @@ BtmScan.PageScan = function(resume)
 								-- If:
 								--   * We're not buying it
 								--   * It has a disenchant value
-								if (not buyIt and disenchantValue > 0) then
+								if (not buyIt and disenchantValue and disenchantValue > 0) then
 								
 									-- We need to increase the required profit for disenchants
 									-- since there is often a chance that it will not D/E into
@@ -541,7 +548,7 @@ BtmScan.PageScan = function(resume)
 									if (iBid + data.minDeProfit > profitableBid) then
 										profitableBid = iBid + data.minDeProfit
 									end
-	
+
 									-- If:
 									--   * This item's de value is more than the profitable price
 									--   * It's buyout cost is less than our maximum price
