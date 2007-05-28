@@ -51,7 +51,6 @@ private.isScanning = false
 private.curPage = 0
 private.scanDir = 1
 
-
 local LclAucScanData = nil
 function private.LoadAuctionImage()
 	if (LclAucScanData) then return LclAucScanData end
@@ -99,6 +98,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			startPage = 0
 		else
 			private.curPage = -1
+			private.sentQuery = true
 			-- Get "list" from appropriately filtered list
 			private.Hook.QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality) 
@@ -142,6 +142,7 @@ function private.Unpack(item, storage)
 	storage.increment = item[Const.MININC]
 	storage.sellerName = item[Const.SELLER]
 	storage.buyoutPrice = item[Const.BUYOUT]
+	storage.amBidder = item[Const.AMHIGH]
 	storage.dataFlag = item[Const.FLAG]
 	
 	return storage
@@ -473,6 +474,7 @@ end
 
 function lib.ScanPage(nextPage)
 	if (private.isScanning) then
+		private.sentQuery = true
 		private.Hook.QueryAuctionItems(private.curQuery.name or "", 
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
 			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage, 
@@ -490,6 +492,7 @@ function lib.StorePage()
 	
 	if not (private.curPage == AuctionFrameBrowse.page) then return end
 	if not private.curQuery then return end
+	private.sentQuery = false
 
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = floor(totalAuctions / 50);
@@ -522,7 +525,7 @@ function lib.StorePage()
 			invType = Const.InvTypes[itemEquipLoc]
 			buyoutPrice = buyoutPrice or 0
 			nextBid = minBid
-			if bidAmount then nextBid = bidAmount + minIncrement end
+			if bidAmount > 0 then nextBid = bidAmount + minIncrement end
 			if not count or count == 0 then count = 1 end
 			if not highbidder then highbidder = false
 			else highbidder = true end
@@ -575,18 +578,6 @@ local curQuery = { empty = true }
 local curResults = {}
 
 private.Hook = {}
-private.Hook.CanSendAuctionQuery = CanSendAuctionQuery
-function CanSendAuctionQuery(...)
-	-- Call the original hook
-	local res = { private.Hook.CanSendAuctionQuery(...) }
-	if res[1] then
-		lib.StorePage()
-		-- Take a snapshot of the page as it is currently
-	end
-
-	return unpack(res)
-end
-
 private.Hook.PlaceAuctionBid = PlaceAuctionBid
 function PlaceAuctionBid(type, index, bid)
 	return private.Hook.PlaceAuctionBid(type, index, bid)
@@ -647,10 +638,20 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		query.quality or "",
 		query.invType or ""
 	)
+	private.sentQuery = true
 	lib.lastReq = GetTime()	
 
 	return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
+
+function private.OnUpdate(me, dur)
+	if private.sentQuery and CanSendAuctionQuery() then
+		private.updater:SetText("Store")
+		lib.StorePage()
+	end
+end
+private.updater = CreateFrame("Frame", "", UIParent)
+private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
 	if (private.curQuery) then

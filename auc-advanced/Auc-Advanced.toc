@@ -24,6 +24,7 @@ CoreUtil.lua
 CoreConst.lua
 CoreConfig.lua
 CoreScan.lua
+CoreReport.lua
 CoreAPI.lua
 
 Modules\Active.xml

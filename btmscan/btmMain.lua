@@ -226,11 +226,8 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.interval = BtmScanData.refresh
 		end
 
-	p("Update")
 		-- Check to see if the AH is open for business
 		if not (AuctionFrame and AuctionFrame:IsVisible() and BtmScan.CanSendAuctionQuery()) then
-	p("noaucframe")
-
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
@@ -242,18 +239,15 @@ BtmScan.OnUpdate = function(...)
 
 		-- Show me tha money!  Either do a new AH query, or piggyback on an existing query
 		--BtmScan.processing = true
-	p("checkscan")
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
 		if not (Auctioneer and (Auctioneer.ScanManager.IsScanning() or Auctioneer.BidScanner.IsScanning())) and
 			not (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
 			-- Auctioneer is not scanning, so  let's send  off a query
-	p("nextscan")
 			AuctionFrameBrowse.page = page
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 		else
 			-- If Auctioneer is currently scanning, then we just need to piggyback its calls.
-	p("waitscan")
 			BtmScan.timer = 0
 			BtmScan.pageScan = 0.001
 		end

@@ -174,7 +174,14 @@ end
 
 
 function getItemDisenchants(link)
-	local iType = Enchantrix.Util.GetIType(link)
+	local iType
+	if (type(link) == "string") then
+		if (link:match("%d+:0:%d+")) then
+			iType = Enchantrix.Util.GetIType("item:"..link)
+		else
+			iType = Enchantrix.Util.GetIType(link)
+		end
+	end
 	if (not iType) then
 		-- NOTE - ccox - GetIType can return nil for items that are not disenchantable
 		-- a nil result does not mean that we could not find the IType
