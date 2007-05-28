@@ -22,20 +22,20 @@ You should hook into EnhTooltip using Stubby:
 
 	The appropriate function calls are, respectively:
 		tooltip - A tooltip is being displayed, hookFunc will be called as:
-		addTooltipHook(frame, name, link, quality, count, price)
+		EnhTooltip.AddTooltipHook(frame, name, link, quality, count, price)
 		popup - A tooltip may be displayed, unless you want to popup something:
-		popped = checkPopupHook(name, link, quality, count, price, hyperlink)
+		popped = EnhTooltip.CheckPopupHook(name, link, quality, count, price, hyperlink)
 			If your function returns true, then we won't present a tooltip
 		merchant - Get called for each of a merchant's items.
-		merchantHook(frame, name, link, quality, count, price)
+		EnhTooltip.MerchantHook(frame, name, link, quality, count, price)
 		trade - Get called when a tradeskill window is displayed / item selected
-		tradeHook(type, selid)
+		EnhTooltip.TradeHook(type, selid)
 			valid types: 'trade', 'craft'
 			selID will be nil when the window is first displayed
 		bank - You are at the bank and are able to scan it's containers
-			bankHook()
+			EnhTooltip.BankHook()
 		bag - One or more of the items in your bags has updated.
-			bagHook()
+			EnhTooltip.BagHook()
 
 
 You may use the following methods of the EnhTooltip class:
@@ -101,20 +101,20 @@ You may use the following methods of the EnhTooltip class:
 		Where:
 			hookType = The type of event to be notified of. One of:
 				tooltip - A tooltip is being displayed, hookFunc will be called as:
-				addTooltipHook(frame, name, link, quality, count, price)
+				EnhTooltip.AddTooltipHook(frame, name, link, quality, count, price)
 				popup - A tooltip may be displayed, unless you want to popup something:
-				popped = checkPopupHook(name, link, quality, count, price, hyperlink)
+				popped = EnhTooltip.CheckPopupHook(name, link, quality, count, price, hyperlink)
 					If your function returns true, then we won't present a tooltip
 				merchant - Get called for each of a merchant's items.
-				merchantHook(frame, name, link, quality, count, price)
+				EnhTooltip.MerchantHook(frame, name, link, quality, count, price)
 				trade - Get called when a tradeskill window is displayed / item selected
-				tradeHook(type, selid)
+				EnhTooltip.TradeHook(type, selid)
 					valid types: 'trade', 'craft'
 					selID will be nil when the window is first displayed
 				bank - You are at the bank and are able to scan it's containers
-				bankHook()
+				EnhTooltip.BankHook()
 				bag - One or more of the items in your bags has updated.
-					bagHook()
+					EnhTooltip.BagHook()
 			hookFunction = Your function (prototyped as above) that we will call.
 			position = A number that determines calling order
 				The default position if not supplied is 100.
@@ -180,6 +180,8 @@ if (ENHTOOLTIP_VERSION == "<".."%version%>") then
 	ENHTOOLTIP_VERSION = "4.9.DEV"
 end
 
+local addonName = "Enhanced Tooltip"
+
 -- Initialize a storage space that all our functions can see
 local private = {
 	showIgnore = false,
@@ -197,111 +199,40 @@ local private = {
 	numberHeaderLines = 0,
 }
 
-local addonName = "Enhanced Tooltip"
+EnhTooltip = {}
+EnhTooltip.Version = ENHTOOLTIP_VERSION
 
--- =============== LOCAL FUNCTIONS =============== --
-
--- prototypes for all local functions
-local addLine                  -- AddLine(lineText,moneyAmount,embed)
-local addHeader                -- AddLine(lineText,moneyAmount,embed)
-local addSeparator             -- AddSeparator(embed)
-local addTooltip               -- AddTooltip(frame,name,link,quality,count,price)
-local afHookOnEnter            -- AfHookOnEnter(type,index)
-local anchorEnhancedTooltip    -- anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
-local bagHook                  -- BagHook()
-local bankHook                 -- BankHook()
-local baselinkFromLink         -- BaselinkFromLink(link)
-local breakLink                -- BreakLink(link)
-local callBagHook              -- CallBagHook(event,bagNumber)
-local callBankHook             -- CallBankHook()
-local callTradeHook            -- CallTradeHook(type,event,selID)
-local chatHookSetItemRef       -- ChatHookSetItemRef(reference,link,button)
-local checkHide                -- CheckHide()
-local checkPopup               -- CheckPopup(name,link,quality,count,price,hyperlink)
-local clearTooltip             -- ClearTooltip()
-local debugPrint				-- DebugPrint(message, category, title, errorCode, level)
-local doHyperlink              -- DoHyperlink(reference,link,button)
-local embedRender              -- EmbedRender()
-local fakeLink                 -- FakeLink(hyperlink,quality,name)
-local findItemInBags           -- FindItemInBags(findName)
-local getglobalIterator        -- GetglobalIterator(format,first,last)
-local getGSC                   -- GetGSC(money)
-local getLine                  -- getLine(line)
-local getLootLinkLink          -- GetLootLinkLink(name)
-local getLootLinkServer        -- GetLootLinkServer()
-local getRect                  -- GetRect(object)
-local getTextGSC               -- GetTextGSC(money,exact)
-local getTooltipHeight         -- GetTooltipHeight(enhTooltip)
-local getTooltipWidth          -- GetTooltipWidth(enhTooltip)
-local gtHookOnHide             -- GtHookOnHide()
-local gtHookSetAuctionSellItem -- GtHookSetAuctionSellItem(frame)
-local gtHookSetBagItem         -- GtHookSetBagItem(frame,frameID,buttonID,retVal)
-local gtHookSetCraftItem       -- GtHookSetCraftItem(frame,skill,slot)
-local gtHookSetCraftSpell      -- GtHookSetCraftSpell(frame,skill,slot)
-local gtHookSetInboxItem       -- GtHookSetinboxItem(frame,index)
-local gtHookSetInventoryItem   -- GtHookSetInventoryItem(frame,unit,slot,retVal)
-local gtHookSetLootItem        -- GtHookSetLootItem(frame,slot)
-local gtHookSetMerchantItem    -- GtHookSetMerchantItem(frame,slot)
-local gtHookSetQuestItem       -- GtHookSetQuestItem(frame,qtype,slot)
-local gtHookSetQuestLogItem    -- GtHookSetQuestLogItem(frame,qtype,slot)
-local gtHookSetTradeSkillItem  -- GtHookSetTradeSkillItem(frame,skill,slot)
-local gtHookSetText            -- GtHookSetText(funcArgs, retval, frame, text, r, g, b, unknown1, unknown2)
-local gtHookAppendText         -- GtHookAppendText(funcArgs, retVal, frame)
-local gtHookShow               -- GtHookShow(funcArgs, retVal, frame)
-local headerColor              -- HeaderColor(r, g, b)
-local headerQuality            -- HeaderQuality(quality)
-local headerSize               -- HeaderSize(fontSize)
-local hideTooltip              -- HideTooltip()
-local hyperlinkFromLink        -- HyperlinkFromLink(link)
-local imHookOnEnter            -- ImHookOnEnter()
-local imiHookOnEnter           -- ImiHookOnEnter()
-local lineColor                -- LineColor(r,g,b)
-local lineQuality              -- LineQuality(quality)
-local lineSize                 -- LineSize(fontSize)
-local linkType                 -- LinkType()
-local llHookOnEnter            -- LlHookOnEnter()
-local merchantHook             -- MerchantHook(merchant,slot,name,link,quality,count,price,limit)
-local merchantScanner          -- MerchantScanner()
-local nameFromLink             -- NameFromLink(link)
-local onLoad                   -- OnLoad
-local qualityFromLink          -- QualityFromLink(link)
-local setElapsed               -- SetElapsed(elapsed)
-local setIcon                  -- SetIcon(iconPath)
-local setMoneySpacing          -- SetMoneySpacing(spacing)
-local setPopupKey              -- SetPopupKey(key)
-local showTooltip              -- ShowTooltip(currentTooltip,skipEmbedRender)
-local tooltipCall              -- TooltipCall(frame,name,link,quality,count,price,forcePopup,hyperlink)
-local tradeHook                -- TradeHook(type,selID)
-local ttInitialize             -- TtInitialize()
+local public = EnhTooltip
+local debugPrint
 
 ------------------------
 --  Hookable functions
 ------------------------
 
-function addTooltip(frame, name, link, quality, count, price)
+function public.AddTooltip(frame, name, link, quality, count, price)
 	-- This is it.
 	-- Hook this function when you have something to put into the
 	-- tooltip and use the AddLine etc methods to do so.
 end
 
-function checkPopup(name, link, quality, count, price, hyperlink)
+function public.CheckPopup(name, link, quality, count, price, hyperlink)
 	-- Hook this function to stop EnhTooltip putting up a tooltip
 	-- Return true to stop EnhTooltip's tooltip.
 end
 
-function merchantHook(merchant, slot, name, link, quality, count, price, limit)
+function public.MerchantHook(merchant, slot, name, link, quality, count, price, limit)
 	-- Hook this function to be notified of an item at a merchant
 end
 
-function bankHook()
+function public.BankHook()
 	-- Hook this function to be alerted to do a bank scan
 end
 
-function bagHook()
+function public.BagHook()
 	-- Hook this function to be alerted to do a bag scan
 end
 
-function tradeHook(type,selID)
+function public.TradeHook(type,selID)
 	-- Hook this function to be notified when a trade window is
 	-- displayed or an item therein is selected.
 	--   type is one of: "trade", or "craft"
@@ -312,14 +243,14 @@ end
 -- Function definitions
 ------------------------
 
-function hideTooltip()
+function public.HideTooltip()
 	EnhancedTooltip:Hide()
 	private.currentItem = nil
 	private.hideTime = 0
 end
 
 -- Iterate over numbered global objects
-function getglobalIterator(fmt, first, last)
+function public.GetglobalIterator(fmt, first, last)
 	local i = tonumber(first) or 1
 	return function()
 		if last and (i > last) then
@@ -332,7 +263,7 @@ function getglobalIterator(fmt, first, last)
 end
 
 --Create a new fontstring
-function createNewFontString(tooltip)
+function private.CreateNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentFontStringIndex = private.lastFontStringIndex
 	local nextFontStringIndex    = currentFontStringIndex + 1
@@ -350,7 +281,7 @@ function createNewFontString(tooltip)
 end
 
 --Create a new money object
-function createNewMoneyObject(tooltip)
+function private.CreateNewMoneyObject(tooltip)
 	private.lastMoneyObjectIndex = private.lastMoneyObjectIndex + 1
 
 	local newMoneyObject = CreateFrame("Frame", tooltip:GetName().."Money"..private.lastMoneyObjectIndex, tooltip, "EnhancedTooltipMoneyTemplate")
@@ -360,7 +291,7 @@ function createNewMoneyObject(tooltip)
 end
 
 --Create a new header fontstring
-function createNewHeaderFontString(tooltip)
+function private.CreateNewHeaderFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentHeaderFontStringIndex = private.lastHeaderFontStringIndex
 	private.lastHeaderFontStringIndex = currentHeaderFontStringIndex + 1
@@ -386,9 +317,9 @@ end
 --   Since this has not been the case, yet, I didn't implement more secure
 --   code.
 -------------------------------------------------------------------------------
-function getLine(line)
+function private.GetLine(line)
 	if (line > private.lastFontStringIndex) then
-		ret = createNewFontString(EnhancedTooltip)
+		ret = private.CreateNewFontString(EnhancedTooltip)
 	else
 		ret = getglobal("EnhancedTooltipText"..line)
 	end
@@ -396,8 +327,8 @@ function getLine(line)
 	return ret
 end
 
-function clearTooltip()
-	hideTooltip()
+function public.ClearTooltip()
+	public.HideTooltip()
 
 	EnhancedTooltip.curEmbed       = false
 	EnhancedTooltip.hasData        = false
@@ -407,21 +338,21 @@ function clearTooltip()
 	EnhancedTooltipIcon:Hide()
 	EnhancedTooltipIcon:SetTexture("Interface\\Buttons\\UI-Quickslot2")
 
-	for ttText in getglobalIterator("EnhancedTooltipText%d") do
+	for ttText in public.GetglobalIterator("EnhancedTooltipText%d") do
 		ttText:Hide()
 		ttText.myMoney = nil
 		ttText:SetTextColor(1.0,1.0,1.0)
 		ttText:SetFont(STANDARD_TEXT_FONT, 10)
 	end
 
-	for ttHeader in getglobalIterator("EnhancedTooltipHeader%d") do
+	for ttHeader in public.GetglobalIterator("EnhancedTooltipHeader%d") do
 		ttHeader:Hide()
 		ttHeader.myMoney = nil
 		ttHeader:SetTextColor(1.0,1.0,1.0)
 		ttHeader:SetFont(STANDARD_TEXT_FONT, 10)
 	end
 
-	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
+	for ttMoney in public.GetglobalIterator("EnhancedTooltipMoney%d") do
 		ttMoney.myLine = nil
 		ttMoney:Hide()
 	end
@@ -440,7 +371,7 @@ function clearTooltip()
 	end
 end
 
-function getRect(object)
+function public.GetRect(object)
 	local rect = {}
 
 	local left, bottom, width, height = object:GetRect()
@@ -461,8 +392,8 @@ function getRect(object)
 	return rect
 end
 
-function showTooltip(currentTooltip, skipEmbedRender)
-	-- prevent recursive calls to showTooltip()
+function public.ShowTooltip(currentTooltip, skipEmbedRender)
+	-- prevent recursive calls to public.ShowTooltip()
 	if (private.showIgnore) then
 		return
 	end
@@ -475,9 +406,9 @@ function showTooltip(currentTooltip, skipEmbedRender)
 	-- First thing todo is to update the embeded tooltip to get the correct
 	-- width/height it requires, if there are any embeded lines to be displayed.
 	if (next(private.embedLines) and (not skipEmbedRender)) then
-		embedRender(currentTooltip, private.embedLines)
+		private.EmbedRender(currentTooltip, private.embedLines)
 
-		-- update the tooltip without calling our own showTooltip
+		-- update the tooltip without calling our own public.ShowTooltip
 		-- this will repaint the game tooltip and update its width and height so
 		-- that our just added text is now displayed inside the tooltip
 		private.showIgnore = true
@@ -509,13 +440,13 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		EnhancedTooltipText1:SetPoint("TOPLEFT", "EnhancedTooltipHeader"..EnhancedTooltip.headerCount, "BOTTOMLEFT", 0, -1)
 	end
 
-	-- update the tooltip without calling showTooltip so we get the correct
+	-- update the tooltip without calling public.ShowTooltip so we get the correct
 	-- tooltip width
 	private.showIgnore = true
 	currentTooltip:Show()
 	private.showIgnore = false
 
-	local requestedWidth, requestedHeight = getTooltipWidth(EnhancedTooltip), getTooltipHeight(EnhancedTooltip)
+	local requestedWidth, requestedHeight = private.GetTooltipWidth(EnhancedTooltip), private.GetTooltipHeight(EnhancedTooltip)
 
 	local currentWidth = currentTooltip:GetWidth()
 	if (currentWidth < requestedWidth) then
@@ -524,14 +455,14 @@ function showTooltip(currentTooltip, skipEmbedRender)
 		requestedWidth = currentWidth
 	end
 
-	anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
+	private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 
 	EnhancedTooltip:SetHeight(requestedHeight)
 	EnhancedTooltip:SetWidth(requestedWidth)
 	currentTooltip:SetWidth(requestedWidth)
 	EnhancedTooltip:Show()
 
-	for ttMoney in getglobalIterator("EnhancedTooltipMoney%d") do
+	for ttMoney in public.GetglobalIterator("EnhancedTooltipMoney%d") do
 		if (ttMoney.myLine) then
 			local myLine = getglobal(ttMoney.myLine)
 			local ttMoneyWidth = ttMoney:GetWidth()
@@ -551,10 +482,10 @@ end
 -- where the currentTooltip is shown and what it is attached to  at the moment.
 --
 -- called by:
---    showTooltip() - if the enhanced tooltip window is to be displayed
+--    public.ShowTooltip() - if the enhanced tooltip window is to be displayed
 --
 -- calls:
---    getRect()           - unless currentTooltip is anchored to the cursor
+--    public.GetRect()           - unless currentTooltip is anchored to the cursor
 --    ClearAllPoints()    - always
 --    GetAnchorType()     - always
 --    GetCursorPosition() - if currentTooltip is anchored to the cursor
@@ -572,7 +503,7 @@ end
 --    requestedWidth  - (number) the requested width for the enhanced tooltip
 --                               window in pixel
 -------------------------------------------------------------------------------
-function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
+function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 	local screenWidth, screenHeight = GetScreenWidth(), GetScreenHeight()
 
 	-- Get the frame which the currentTooltip is attached to.
@@ -617,7 +548,7 @@ function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 		currentTooltip:Show()
 		private.showIgnore = false
 
-		local currentToolTipRect = getRect(currentTooltip)
+		local currentToolTipRect = public.GetRect(currentTooltip)
 		if (currentToolTipRect.bottom - requestedHeight < 60) then
 			currentTooltip:ClearAllPoints()
 			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", currentToolTipRect.left, requestedHeight+60)
@@ -632,7 +563,7 @@ function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 		-- The tooltip is anchored to another frame but not to the cursor. So
 		-- we should properly align it.
 
-		local currentTooltipOwnerRect = getRect(currentTooltipOwner)
+		local currentTooltipOwnerRect = public.GetRect(currentTooltipOwner)
 
 		local xAnchor
 		if (currentTooltipOwnerRect.left - requestedWidth < screenWidth * 0.2) then
@@ -693,10 +624,10 @@ function anchorEnhancedTooltip(currentTooltip, requestedHeight, requestedWidth)
 	end
 end
 
-function getTooltipWidth(enhTooltip)
+function private.GetTooltipWidth(enhTooltip)
 	local width = 0
 	local headerCount = enhTooltip.headerCount
-	for headerLine, index in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
+	for headerLine, index in public.GetglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
 		if (headerLine.myMoney) then
 			if ((enhTooltip.hasIcon) and (index < 4)) then
 				width = math.max(width, headerLine:GetWidth() + headerLine.myMoney:GetWidth() + private.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
@@ -713,7 +644,7 @@ function getTooltipWidth(enhTooltip)
 	end
 
 	local lineCount = enhTooltip.lineCount
-	for currentLine, index in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
+	for currentLine, index in public.GetglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
 		if (currentLine.myMoney) then
 			if ((enhTooltip.hasIcon) and (index + headerCount < 4)) then
 				width = math.max(width, currentLine:GetWidth() + currentLine.myMoney:GetWidth() + private.moneySpacing + 20 + enhTooltip.hasIcon:GetWidth())
@@ -731,16 +662,16 @@ function getTooltipWidth(enhTooltip)
 	return width
 end
 
-function getTooltipHeight(enhTooltip)
+function private.GetTooltipHeight(enhTooltip)
 	local height = 0
 	local lineCount = enhTooltip.lineCount
 	local headerCount = enhTooltip.headerCount
 
-	for headerLine in getglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
+	for headerLine in public.GetglobalIterator(enhTooltip:GetName().."Header%d", 1, headerCount) do
 		height = height + headerLine:GetHeight() + 1
 	end
 
-	for currentLine in getglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
+	for currentLine in public.GetglobalIterator(enhTooltip:GetName().."Text%d", 1, lineCount) do
 		height = height + currentLine:GetHeight() + 1
 	end
 
@@ -753,7 +684,7 @@ function getTooltipHeight(enhTooltip)
 end
 
 -- calculate the gold, silver, and copper values based the amount of copper
-function getGSC(money)
+function public.GetGSC(money)
 	if (not money) then money = 0 end
 	local g = math.floor(money / 10000)
 	local s = math.floor((money - (g*10000)) / 100)
@@ -762,7 +693,7 @@ function getGSC(money)
 end
 
 -- formats money text by color for gold, silver, copper
-function getTextGSC(money, exact, dontUseColorCodes)
+function public.GetTextGSC(money, exact, dontUseColorCodes)
 	local TEXT_NONE = "0"
 
 	local GSC_GOLD="ffd100"
@@ -776,7 +707,7 @@ function getTextGSC(money, exact, dontUseColorCodes)
 		-- Round to nearest silver
 		money = math.floor(money / 100 + 0.5) * 100
 	end
-	local g, s, c = getGSC(money)
+	local g, s, c = public.GetGSC(money)
 
 	local gsc = ""
 	if (not dontUseColorCodes) then
@@ -812,7 +743,7 @@ function getTextGSC(money, exact, dontUseColorCodes)
 	return gsc
 end
 
-function embedRender(currentTooltip, lines)
+function private.EmbedRender(currentTooltip, lines)
 	for _, lData in ipairs(lines) do
 		currentTooltip:AddLine(lData.text, lData.r, lData.g, lData.b)
 	end
@@ -821,15 +752,15 @@ end
 --[[
 	@param bExact (boolean) - optional parameter
 		if true, then the copper value of the given moneyAmount will always be printed out
-		if false (default), then the copper value of the given moneyAmount will not be printed out, if the moneyAmount is too high (see getTextGSC for the exact limit)
+		if false (default), then the copper value of the given moneyAmount will not be printed out, if the moneyAmount is too high (see public.GetTextGSC for the exact limit)
 		bExact has no meaning, if moneyAmount is nil.
 ]]
-function addLine(lineText, moneyAmount, embed, bExact)
+function public.AddLine(lineText, moneyAmount, embed, bExact)
 	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
 		local text = ""
 		if (moneyAmount) then
-			text = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
+			text = lineText .. ": " .. public.GetTextGSC(moneyAmount, bExact)
 		else
 			text = lineText
 		end
@@ -840,7 +771,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 	EnhancedTooltip.curEmbed = false
 
 	local curLine = EnhancedTooltip.lineCount + 1
-	local line    = getLine(curLine)
+	local line    = private.GetLine(curLine)
 
 	line:SetText(lineText)
 	line:SetTextColor(1.0, 1.0, 1.0)
@@ -853,7 +784,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 
 		local money
 		if (curMoney > private.lastMoneyObjectIndex) then
-			money = createNewMoneyObject(EnhancedTooltip)
+			money = private.CreateNewMoneyObject(EnhancedTooltip)
 		else
 			money = getglobal("EnhancedTooltipMoney"..curMoney)
 		end
@@ -870,7 +801,7 @@ function addLine(lineText, moneyAmount, embed, bExact)
 	end
 end
 
-function addHeaderLine(lineText, moneyAmount, embed, bExact)
+function public.AddHeaderLine(lineText, moneyAmount, embed, bExact)
 	moneyAmount = nil
 	if (not lineText) then
 		return
@@ -882,7 +813,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 		EnhancedTooltip.curHeaderEmbed = true
 		local text = ""
 		if (moneyAmount) then
-			text = lineText .. ": " .. getTextGSC(moneyAmount, bExact)
+			text = lineText .. ": " .. public.GetTextGSC(moneyAmount, bExact)
 		else
 			text = lineText
 		end
@@ -895,7 +826,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 
 	local line
 	if (curHeader > private.lastHeaderFontStringIndex) then
-		line = createNewHeaderFontString(EnhancedTooltip)
+		line = private.CreateNewHeaderFontString(EnhancedTooltip)
 	else
 		line = getglobal("EnhancedTooltipHeader"..curHeader)
 	end
@@ -911,7 +842,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 
 		local money
 		if (curMoney > private.lastMoneyObjectIndex) then
-			money = createNewMoneyObject(EnhancedTooltip)
+			money = private.CreateNewMoneyObject(EnhancedTooltip)
 		else
 			money = getglobal("EnhancedTooltipMoney"..curMoney)
 		end
@@ -928,7 +859,7 @@ function addHeaderLine(lineText, moneyAmount, embed, bExact)
 	end
 end
 
-function addSeparator(embed)
+function public.AddSeparator(embed)
 	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
 		table.insert(private.embedLines, {text = " "})
@@ -938,7 +869,7 @@ function addSeparator(embed)
 	EnhancedTooltip.curEmbed = false
 
 	local curLine = EnhancedTooltip.lineCount + 1
-	local line    = getLine(curLine)
+	local line    = private.GetLine(curLine)
 
 	line:SetText(" ")
 	line:SetTextColor(1.0, 1.0, 1.0)
@@ -946,7 +877,7 @@ function addSeparator(embed)
 	EnhancedTooltip.lineCount = curLine
 end
 
-function lineColor(r, g, b)
+function public.LineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (private.currentGametip) then
 		local n = #private.embedLines
 		private.embedLines[n].r = r
@@ -960,7 +891,7 @@ function lineColor(r, g, b)
 	return line:SetTextColor(r, g, b)
 end
 
-function lineSize(fontSize)
+function public.LineSize(fontSize)
 	if (EnhancedTooltip.curEmbed) and (private.currentGametip) then
 		return
 	end
@@ -974,7 +905,7 @@ function lineSize(fontSize)
 	return line:SetFont(STANDARD_TEXT_FONT, fontSize)
 end
 
-function headerColor(r, g, b)
+function public.HeaderColor(r, g, b)
 	local curLine = EnhancedTooltip.headerCount
 	if (EnhancedTooltip.curHeaderEmbed) and (private.currentGametip) then
 		private.embedLines[curLine].r = r
@@ -987,7 +918,7 @@ function headerColor(r, g, b)
 	return line:SetTextColor(r, g, b)
 end
 
-function headerSize(fontSize)
+function public.HeaderSize(fontSize)
 	if (EnhancedTooltip.curHeaderEmbed) and (private.currentGametip) then
 		return
 	end
@@ -1001,29 +932,29 @@ function headerSize(fontSize)
 	return line:SetFont(STANDARD_TEXT_FONT, fontSize)
 end
 
-function headerQuality(quality)
+function public.HeaderQuality(quality)
 	if ( quality ) then
-		return headerColor(GetItemQualityColor(quality))
+		return public.HeaderColor(GetItemQualityColor(quality))
 	else
-		return headerColor(1.0, 1.0, 1.0)
+		return public.HeaderColor(1.0, 1.0, 1.0)
 	end
 end
 
-function lineQuality(quality)
+function public.LineQuality(quality)
 	if ( quality ) then
-		return lineColor(GetItemQualityColor(quality))
+		return public.LineColor(GetItemQualityColor(quality))
 	else
-		return lineColor(1.0, 1.0, 1.0)
+		return public.LineColor(1.0, 1.0, 1.0)
 	end
 end
 
-function setIcon(iconPath)
+function public.SetIcon(iconPath)
 	EnhancedTooltipIcon:SetTexture(iconPath)
 	EnhancedTooltipIcon:Show()
 	EnhancedTooltip.hasIcon = EnhancedTooltipIcon
 end
 
-function gtHookOnHide()
+function private.GtHookOnHide()
 	local curName = ""
 	local hidingName = this:GetName()
 	if (private.currentGametip) then curName = private.currentGametip:GetName() end
@@ -1033,7 +964,7 @@ function gtHookOnHide()
 	end
 end
 
-function doHyperlink(reference, link, button)
+function private.DoHyperlink(reference, link, button)
 
 	-- Neither shift-click nor ctrl-click can open a new tooltip, so don't go any farther or else you might accidentally double the embedded tooltip
 	if (IsShiftKeyDown() or IsControlKeyDown()) then
@@ -1049,7 +980,7 @@ function doHyperlink(reference, link, button)
 			if (button == "RightButton") then
 				testPopup = true
 			end
-			local callRes = tooltipCall(ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
+			local callRes = public.TooltipCall(ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #private.embedLines > 0
 				private.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
@@ -1060,11 +991,11 @@ function doHyperlink(reference, link, button)
 	end
 end
 
-function checkHide()
+function private.CheckHide()
 	if (private.hideTime == 0) then return end
 
 	if (private.eventTimer >= private.hideTime) then
-		hideTooltip()
+		public.HideTooltip()
 		if (HideObj and HideObj == "ItemRefTooltip") then
 			-- closing chatreferenceTT?
 			private.oldChatItem = nil -- remove old chatlink data
@@ -1072,7 +1003,7 @@ function checkHide()
 			-- closing another tooltip
 			-- redisplay old chatlinkdata, if it was not embeded
 			if not private.oldChatItem.isEmbeded then
-				doHyperlink(private.oldChatItem.reference, private.oldChatItem.link, private.oldChatItem.button)
+				private.DoHyperlink(private.oldChatItem.reference, private.oldChatItem.link, private.oldChatItem.button)
 			end
 		end
 	end
@@ -1082,35 +1013,35 @@ end
 -- ItemLink functions
 ------------------------
 
-function linkType(link)
+function public.LinkType(link)
 	if type(link) ~= "string" then
 		return
 	end
 	return link:match("|H(%a+):")
 end
 
-function nameFromLink(link)
+function public.NameFromLink(link)
 	if (not link) then
 		return
 	end
 	return link:match("|c%x+|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[(.-)%]|h|r")
 end
 
-function hyperlinkFromLink(link)
+function public.HyperlinkFromLink(link)
 	if( not link ) then
 		return
 	end
 	return link:match("|H([^|]+)|h")
 end
 
-function baselinkFromLink(link)
+function public.BaselinkFromLink(link)
 	if( not link ) then
 		return
 	end
 	return link:match("|Hitem:(%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+):%p?%d+|h")
 end
 
-function qualityFromLink(link)
+function public.QualityFromLink(link)
 	if (not link) then return end
 	local color = link:match("(|c%x+)|Hitem:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+:%p?%d+|h%[.-%]|h|r")
 	if (color) then
@@ -1124,7 +1055,7 @@ function qualityFromLink(link)
 	return -1
 end
 
-function fakeLink(hyperlink, quality, name)
+function public.FakeLink(hyperlink, quality, name)
 	-- make this function nilSafe, as it's a global one and might be used by external addons
 	if (not hyperlink) then
 		return
@@ -1146,7 +1077,7 @@ function fakeLink(hyperlink, quality, name)
 end
 
 -- Given a Blizzard item link, breaks it into it's itemID, randomProperty, enchantProperty, uniqueness, name and the four gemSlots.
-function breakLink(link)
+function public.BreakLink(link)
 	if (type(link) == number) then return link,0,0,0,"",0,0,0,0,0 end
 	if (type(link) ~= 'string') then return end
 	local itemID, enchant, gemSlot1, gemSlot2, gemSlot3, gemBonus, randomProp, uniqID, name = link:match("|Hitem:(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+):(%-?%d+)|h%[(.-)%]|h")
@@ -1164,7 +1095,7 @@ end
 -- Tooltip generating function
 ------------------------
 
-function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
+function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
 	private.currentGametip = frame
 	private.hideTime = 0
 
@@ -1181,15 +1112,15 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 
 	if (private.currentItem == itemSig) then
 		-- We are already showing this... No point doing it again.
-		showTooltip(private.currentGametip)
+		public.ShowTooltip(private.currentGametip)
 		return
 	end
 
 	private.currentItem = itemSig
 
-	quality = quality or qualityFromLink(link)
+	quality = quality or public.QualityFromLink(link)
 	hyperlink = hyperlink or link
-	local extract = hyperlinkFromLink(hyperlink)
+	local extract = public.HyperlinkFromLink(hyperlink)
 	hyperlink = extract or hyperlink
 
 	local showTip = true
@@ -1208,14 +1139,14 @@ function tooltipCall(frame, name, link, quality, count, price, forcePopup, hyper
 	end
 
 	if (showTip) then
-		clearTooltip()
+		public.ClearTooltip()
 		EnhTooltip.AddTooltip(frame, name, link, quality, count, price)
-		showTooltip(frame)
+		public.ShowTooltip(frame)
 		private.currentItem = itemSig
 		return true
 	else
 		frame:Hide()
-		hideTooltip()
+		public.HideTooltip()
 		return false
 	end
 end
@@ -1223,24 +1154,24 @@ end
 ------------------------
 -- Hook calling functions
 ------------------------
-function merchantScanner()
+function private.MerchantScanner()
 	local npcName = UnitName("NPC")
 	local numMerchantItems = GetMerchantNumItems()
 	local link, quality, name, texture, price, quantity, numAvailable, isUsable
 	for i=1, numMerchantItems, 1 do
 		link = GetMerchantItemLink(i)
-		quality = qualityFromLink(link)
+		quality = public.QualityFromLink(link)
 		name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(i)
 		return EnhTooltip.MerchantHook(npcName, i, name, link, quality, quantity, price, numAvailable)
 	end
 end
 
-function callBankHook()
+function private.CallBankHook()
 	if not (BankFrame and BankFrame:IsVisible()) then return end
 	return EnhTooltip.BankHook(0)
 end
 
-function callBagHook(funcVars, event, bagNumber)
+function private.CallBagHook(funcVars, event, bagNumber)
 	if (bagNumber >= 5) and (bagNumber < 10) then
 		if not (BankFrame and BankFrame:IsVisible()) then return end
 		return EnhTooltip.BankHook(bagNumber)
@@ -1249,7 +1180,7 @@ function callBagHook(funcVars, event, bagNumber)
 	end
 end
 
-function callTradeHook(funcVars, event, selID)
+function private.CallTradeHook(funcVars, event, selID)
 	return EnhTooltip.TradeHook(funcVars[1], selID)
 end
 
@@ -1259,78 +1190,78 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function chatHookSetItemRef(funcArgs, retVal, reference, link, button)
-	doHyperlink(reference, link, button)
+function private.ChatHookSetItemRef(funcArgs, retVal, reference, link, button)
+	private.DoHyperlink(reference, link, button)
 end
 
-function afHookOnEnter(funcArgs, retVal, type, index)
+function private.AfHookOnEnter(funcArgs, retVal, type, index)
 	local link = GetAuctionItemLink(type, index)
 	if (link) then
-		local name = nameFromLink(link)
+		local name = public.NameFromLink(link)
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index)
-			return tooltipCall(GameTooltip, name, link, aiQuality, aiCount)
+			return public.TooltipCall(GameTooltip, name, link, aiQuality, aiCount)
 		end
 	end
 end
 
-function gtHookSetLootItem(funcArgs, retVal, frame, slot)
+function private.GtHookSetLootItem(funcArgs, retVal, frame, slot)
 	local link = GetLootSlotLink(slot)
-	local name = nameFromLink(link)
+	local name = public.NameFromLink(link)
 	if (name) then
 		local texture, item, quantity, quality = GetLootSlotInfo(slot)
-		quality = quality or qualityFromLink(link)
-		return tooltipCall(GameTooltip, name, link, quality, quantity)
+		quality = quality or public.QualityFromLink(link)
+		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
-function gtHookSetQuestItem(funcArgs, retVal, frame, qtype, slot)
+function private.GtHookSetQuestItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestItemInfo(qtype, slot)
-		return tooltipCall(GameTooltip, name, link, quality, quantity)
+		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
-function gtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
+function private.GtHookSetQuestLogItem(funcArgs, retVal, frame, qtype, slot)
 	local link = GetQuestLogItemLink(qtype, slot)
 	if (link) then
 		local name, texture, quantity, quality, usable = GetQuestLogRewardInfo(slot)
-		name = name or nameFromLink(link)
-		quality = qualityFromLink(link) -- I don't trust the quality returned from the above function.
+		name = name or public.NameFromLink(link)
+		quality = public.QualityFromLink(link) -- I don't trust the quality returned from the above function.
 
-		return tooltipCall(GameTooltip, name, link, quality, quantity)
+		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
-function gtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
+function private.GtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 	local link = GetContainerItemLink(frameID, buttonID)
-	local name = nameFromLink(link)
+	local name = public.NameFromLink(link)
 
 	if (name) then
 		local texture, itemCount, locked, quality, readable = GetContainerItemInfo(frameID, buttonID)
-		quality = (quality ~= -1 and quality) or qualityFromLink(link)
+		quality = (quality ~= -1 and quality) or public.QualityFromLink(link)
 
-		return tooltipCall(GameTooltip, name, link, quality, itemCount)
+		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
 	end
 end
 
-function gtHookSetInboxItem(funcArgs, retVal, frame, index)
+function private.GtHookSetInboxItem(funcArgs, retVal, frame, index)
 	local inboxItemName, itemTexture, inboxItemCount, inboxItemQuality = GetInboxItem(index)
 	local itemName, itemLink, itemQuality
 
 	for itemID = 1, 30000 do
 		itemName, itemLink, itemQuality = GetItemInfo(itemID)
 		if (itemName and itemName == inboxItemName) then
-			return tooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
+			return public.TooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
 		end
 	end
 end
 
-function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
+function private.GtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 	local link = GetInventoryItemLink(unit, slot)
 	if (link) then
-		local name = nameFromLink(link)
+		local name = public.NameFromLink(link)
 		local quantity
 		if (slot >= 20 and slot <= 23) then
 			-- Workaround for bag slots. Quiver slots report the number of
@@ -1343,75 +1274,75 @@ function gtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
 			quantity = GetInventoryItemCount(unit, slot)
 		end
 		local quality = GetInventoryItemQuality(unit, slot)
-		quality = quality or qualityFromLink(link)
+		quality = quality or public.QualityFromLink(link)
 
-		return tooltipCall(GameTooltip, name, link, quality, quantity)
+		return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 	end
 end
 
-function gtHookSetMerchantItem(funcArgs, retVal, frame, slot)
+function private.GtHookSetMerchantItem(funcArgs, retVal, frame, slot)
 	local link = GetMerchantItemLink(slot)
 	if (link) then
 		local name, texture, price, quantity, numAvailable, isUsable = GetMerchantItemInfo(slot)
-		local quality = qualityFromLink(link)
-		return tooltipCall(GameTooltip, name, link, quality, quantity, price)
+		local quality = public.QualityFromLink(link)
+		return public.TooltipCall(GameTooltip, name, link, quality, quantity, price)
 	end
 end
 
-function gtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
+function private.GtHookSetCraftItem(funcArgs, retVal, frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetCraftReagentItemLink(skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetCraftReagentInfo(skill, slot)
-			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, quantity)
+			local quality = public.QualityFromLink(link)
+			return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetCraftItemLink(skill)
 		if (link) then
-			local name = nameFromLink(link)
-			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality)
+			local name = public.NameFromLink(link)
+			local quality = public.QualityFromLink(link)
+			return public.TooltipCall(GameTooltip, name, link, quality)
 		end
 	end
 end
 
-function gtHookSetCraftSpell(funcArgs, retVal, frame, slot)
+function private.GtHookSetCraftSpell(funcArgs, retVal, frame, slot)
 	local name = GetCraftInfo(slot)
 	local link = GetCraftItemLink(slot)
 	if name and link then
-		return tooltipCall(GameTooltip, name, link)
+		return public.TooltipCall(GameTooltip, name, link)
 	end
 end
 
-function gtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
+function private.GtHookSetTradeSkillItem(funcArgs, retVal, frame, skill, slot)
 	local link
 	if (slot) then
 		link = GetTradeSkillReagentItemLink(skill, slot)
 		if (link) then
 			local name, texture, quantity, quantityHave = GetTradeSkillReagentInfo(skill, slot)
-			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality, quantity)
+			local quality = public.QualityFromLink(link)
+			return public.TooltipCall(GameTooltip, name, link, quality, quantity)
 		end
 	else
 		link = GetTradeSkillItemLink(skill)
 		if (link) then
-			local name = nameFromLink(link)
-			local quality = qualityFromLink(link)
-			return tooltipCall(GameTooltip, name, link, quality)
+			local name = public.NameFromLink(link)
+			local quality = public.QualityFromLink(link)
+			return public.TooltipCall(GameTooltip, name, link, quality)
 		end
 	end
 end
 
-function findItemInBags(findName)
+function public.FindItemInBags(findName)
 	for bag = 0, 4, 1 do
 		size = GetContainerNumSlots(bag)
 		if (size) then
 			for slot = size, 1, -1 do
 				local link = GetContainerItemLink(bag, slot)
 				if (link) then
-					local itemID, randomProp, enchant, uniqID, itemName = breakLink(link)
+					local itemID, randomProp, enchant, uniqID, itemName = public.BreakLink(link)
 					if (itemName == findName) then
 						return bag, slot, itemID, randomProp, enchant, uniqID
 					end
@@ -1421,45 +1352,45 @@ function findItemInBags(findName)
 	end
 end
 
-function gtHookSetAuctionSellItem(funcArgs, retVal, frame)
+function private.GtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	local name, texture, quantity, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name) then
-		local bag, slot = findItemInBags(name)
+		local bag, slot = public.FindItemInBags(name)
 		if (bag) then
 			local link = GetContainerItemLink(bag, slot)
 			if (link) then
-				return tooltipCall(GameTooltip, name, link, quality, quantity, price)
+				return public.TooltipCall(GameTooltip, name, link, quality, quantity, price)
 			end
 		end
 	end
 end
 
-function gtHookSetText(funcArgs, retval, frame)
+function private.GtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (private.currentGametip == frame) then
 		-- use proper tail call, so we don't need any extra stack space
-		return clearTooltip()
+		return public.ClearTooltip()
 	end
 end
 
-function gtHookAppendText(funcArgs, retVal, frame)
+function private.GtHookAppendText(funcArgs, retVal, frame)
 	if (private.currentGametip and private.currentItem) then
-		return showTooltip(private.currentGametip, true)
+		return public.ShowTooltip(private.currentGametip, true)
 	end
 end
 
-function gtHookShow(funcArgs, retVal, frame)
+function private.GtHookShow(funcArgs, retVal, frame)
 	if (private.hookRecursion) then
 		return
 	end
 	if (private.currentGametip and private.currentItem) then
 		private.hookRecursion = true
-		showTooltip(private.currentGametip, true)
+		public.ShowTooltip(private.currentGametip, true)
 		private.hookRecursion = nil
 	end
 end
 
-function imiHookOnEnter()
+function private.ImiHookOnEnter()
 	if(not IM_InvList) then return end
 	local id = this:GetID()
 
@@ -1471,26 +1402,26 @@ function imiHookOnEnter()
 
 	if (not item) then return end
 	local imlink = ItemsMatrix_GetHyperlink(item.name)
-	local link = fakeLink(imlink, item.quality, item.name)
+	local link = public.FakeLink(imlink, item.quality, item.name)
 	if (link) then
-		return tooltipCall(GameTooltip, item.name, link, item.quality, item.count)
+		return public.TooltipCall(GameTooltip, item.name, link, item.quality, item.count)
 	end
 end
 
-function imHookOnEnter()
+function private.ImHookOnEnter()
 	local imlink = ItemsMatrix_GetHyperlink(this:GetText())
 	if (imlink) then
 		local name = this:GetText()
-		local link = fakeLink(imlink, -1, name)
-		return tooltipCall(GameTooltip, name, link)
+		local link = public.FakeLink(imlink, -1, name)
+		return public.TooltipCall(GameTooltip, name, link)
 	end
 end
 
-function getLootLinkServer()
+function private.GetLootLinkServer()
 	return LootLinkState.ServerNamesToIndices[GetCVar("realmName")]
 end
 
-function getLootLinkLink(name)
+function private.GetLootLinkLink(name)
 	local itemLink = ItemLinks[name]
 	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
 		local item = itemLink.i:gsub("(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
@@ -1500,12 +1431,12 @@ function getLootLinkLink(name)
 	return
 end
 
-function llHookOnEnter()
+function private.LlHookOnEnter()
 	local name = this:GetText()
 	local link = getLootLinkLink(name)
 	if (link) then
-		local quality = qualityFromLink(link)
-		return tooltipCall(LootLinkTooltip, name, link, quality)
+		local quality = public.QualityFromLink(link)
+		return public.TooltipCall(LootLinkTooltip, name, link, quality)
 	end
 end
 
@@ -1513,20 +1444,20 @@ end
 -- Operation functions
 ------------------------
 
-function setElapsed(elapsed)
+function public.SetElapsed(elapsed)
 	if (elapsed) then
 		private.eventTimer = private.eventTimer + elapsed
 	end
-	checkHide()
+	private.CheckHide()
 	return private.eventTimer
 end
 
-function setMoneySpacing(spacing)
+function public.SetMoneySpacing(spacing)
 	private.moneySpacing = spacing or private.moneySpacing
 	return private.moneySpacing
 end
 
-function setPopupKey(key)
+function public.SetPopupKey(key)
 	private.forcePopupKey = key or private.forcePopupKey
 	return private.forcePopupKey
 end
@@ -1575,132 +1506,82 @@ end
 
 
 -- Hook in alternative Auctionhouse tooltip code
-local function hookAuctionHouse()
-	Stubby.RegisterFunctionHook("AuctionFrameItem_OnEnter", 200, afHookOnEnter)
+function private.HookAuctionHouse()
+	p("Registering AuctionHouseLoad")
+	Stubby.RegisterFunctionHook("AuctionFrameItem_OnEnter", 200, private.AfHookOnEnter)
 end
 
 -- Hook the ItemsMatrix tooltip functions
-local function hookItemsMatrix()
-	Stubby.RegisterFunctionHook("IMInv_ItemButton_OnEnter", 200, imiHookOnEnter)
-	Stubby.RegisterFunctionHook("ItemsMatrixItemButton_OnEnter", 200, imHookOnEnter)
+function private.HookItemsMatrix()
+	Stubby.RegisterFunctionHook("IMInv_ItemButton_OnEnter", 200, private.ImiHookOnEnter)
+	Stubby.RegisterFunctionHook("ItemsMatrixItemButton_OnEnter", 200, private.ImHookOnEnter)
 end
 
 -- Hook the LootLink tooltip function
-local function hookLootLink()
+function private.HookLootLink()
 	if (LootLinkItemButton_OnEnter) then
-		Stubby.RegisterFunctionHook("LootLinkItemButton_OnEnter", 200, llHookOnEnter)
+		Stubby.RegisterFunctionHook("LootLinkItemButton_OnEnter", 200, private.LlHookOnEnter)
 	end
 end
 
 -- Hook tradeskill functions
-local function hookTradeskill()
-	Stubby.RegisterFunctionHook("TradeSkillFrame_Update", 200, callTradeHook, "trade", "")
-	Stubby.RegisterFunctionHook("TradeSkillFrame_SetSelection", 200, callTradeHook, "trade", "")
+function private.HookTradeskill()
+	Stubby.RegisterFunctionHook("TradeSkillFrame_Update", 200, private.CallTradeHook, "trade", "")
+	Stubby.RegisterFunctionHook("TradeSkillFrame_SetSelection", 200, private.CallTradeHook, "trade", "")
 end
 
 -- Hook craft functions
-local function hookCraft()
-	Stubby.RegisterFunctionHook("CraftFrame_Update", 200, callTradeHook, "craft", "")
-	Stubby.RegisterFunctionHook("CraftFrame_SetSelection", 200, callTradeHook, "craft", "")
+function private.HookCraft()
+	Stubby.RegisterFunctionHook("CraftFrame_Update", 200, private.CallTradeHook, "craft", "")
+	Stubby.RegisterFunctionHook("CraftFrame_SetSelection", 200, private.CallTradeHook, "craft", "")
 end
 
-function ttInitialize()
+function private.TtInitialize()
 	----  Establish hooks to all the game tooltips.
 
 	-- Hook in alternative Chat/Hyperlinking code
-	Stubby.RegisterFunctionHook("SetItemRef", 200, chatHookSetItemRef)
+	Stubby.RegisterFunctionHook("SetItemRef", 200, private.ChatHookSetItemRef)
 
 	-- Game tooltips
-	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, gtHookSetLootItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, gtHookSetQuestItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, gtHookSetQuestLogItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetInboxItem", 200, gtHookSetInboxItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, gtHookSetInventoryItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, gtHookSetBagItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, gtHookSetMerchantItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, gtHookSetCraftItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, gtHookSetCraftSpell)
-	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, gtHookSetTradeSkillItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, gtHookSetAuctionSellItem)
-	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, gtHookSetText)
-	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, gtHookAppendText)
-	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, gtHookShow)
-	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, gtHookOnHide)
+	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, private.GtHookSetLootItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetQuestItem", 200, private.GtHookSetQuestItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetQuestLogItem", 200, private.GtHookSetQuestLogItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetInboxItem", 200, private.GtHookSetInboxItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetInventoryItem", 200, private.GtHookSetInventoryItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetBagItem", 200, private.GtHookSetBagItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetMerchantItem", 200, private.GtHookSetMerchantItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetCraftItem", 200, private.GtHookSetCraftItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, private.GtHookSetCraftSpell)
+	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, private.GtHookSetTradeSkillItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, private.GtHookSetAuctionSellItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, private.GtHookSetText)
+	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, private.GtHookAppendText)
+	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, private.GtHookShow)
+	Stubby.RegisterFunctionHook("GameTooltip_OnHide", 200, private.GtHookOnHide)
 
 	-- Establish hooks for us to use.
-	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "EnhTooltip", hookAuctionHouse)
-	Stubby.RegisterAddOnHook("ItemsMatrix", "EnhTooltip", hookItemsMatrix)
-	Stubby.RegisterAddOnHook("LootLink", "EnhTooltip", hookLootLink)
-	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "EnhTooltip", hookTradeskill)
-	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", hookCraft)
+	Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "EnhTooltip", private.HookAuctionHouse)
+	Stubby.RegisterAddOnHook("ItemsMatrix", "EnhTooltip", private.HookItemsMatrix)
+	Stubby.RegisterAddOnHook("LootLink", "EnhTooltip", private.HookLootLink)
+	Stubby.RegisterAddOnHook("Blizzard_TradeSkillUI", "EnhTooltip", private.HookTradeskill)
+	Stubby.RegisterAddOnHook("Blizzard_CraftUI", "EnhTooltip", private.HookCraft)
 
 	-- Register event notification
-	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", merchantScanner)
-	Stubby.RegisterEventHook("TRADE_SKILL_SHOW", "EnhTooltip", callTradeHook, 'trade')
-	Stubby.RegisterEventHook("TRADE_SKILL_CLOSE", "EnhTooltip", callTradeHook, 'trade')
-	Stubby.RegisterEventHook("CRAFT_SHOW", "EnhTooltip", callTradeHook, 'craft')
-	Stubby.RegisterEventHook("CRAFT_CLOSE", "EnhTooltip", callTradeHook, 'craft')
-	Stubby.RegisterEventHook("BANKFRAME_OPENED", "EnhTooltip", callBankHook)
-	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "EnhTooltip", callBankHook)
-	Stubby.RegisterEventHook("BAG_UPDATE", "EnhTooltip", callBagHook)
+	Stubby.RegisterEventHook("MERCHANT_SHOW", "EnhTooltip", private.MerchantScanner)
+	Stubby.RegisterEventHook("TRADE_SKILL_SHOW", "EnhTooltip", private.CallTradeHook, 'trade')
+	Stubby.RegisterEventHook("TRADE_SKILL_CLOSE", "EnhTooltip", private.CallTradeHook, 'trade')
+	Stubby.RegisterEventHook("CRAFT_SHOW", "EnhTooltip", private.CallTradeHook, 'craft')
+	Stubby.RegisterEventHook("CRAFT_CLOSE", "EnhTooltip", private.CallTradeHook, 'craft')
+	Stubby.RegisterEventHook("BANKFRAME_OPENED", "EnhTooltip", private.CallBankHook)
+	Stubby.RegisterEventHook("PLAYERBANKSLOTS_CHANGED", "EnhTooltip", private.CallBankHook)
+	Stubby.RegisterEventHook("BAG_UPDATE", "EnhTooltip", private.CallBagHook)
 end
 
 
 -- =============== EVENT HANDLERS =============== --
 
-function onLoad()
+function public.OnLoad()
 	EnhancedTooltip:SetBackdropColor(0,0,0)
-	clearTooltip()
-	ttInitialize()
+	public.ClearTooltip()
+	private.TtInitialize()
 end
-
--- =============== DEFINE ACCESS OBJECT =============== --
-
--- Global object
-EnhTooltip = {
-	AddTooltip			= addTooltip,
-	CheckPopup			= checkPopup,
-	MerchantHook		= merchantHook,
-	TradeHook			= tradeHook,
-	BankHook			= bankHook,
-	BagHook				= bagHook,
-
-	AddLine				= addLine,
-	AddSeparator		= addSeparator,
-	LineColor			= lineColor,
-	LineQuality			= lineQuality,
-	LineSize			= lineSize,
-	SetIcon				= setIcon,
-
-	AddHeaderLine		= addHeaderLine,
-	HeaderColor			= headerColor,
-	HeaderQuality		= headerQuality,
-	HeaderSize			= headerSize,
-
-	ClearTooltip		= clearTooltip,
-	HideTooltip			= hideTooltip,
-	ShowTooltip			= showTooltip,
-
-	GetglobalIterator	= getglobalIterator,
-	GetRect				= getRect,
-	GetGSC				= getGSC,
-	GetTextGSC			= getTextGSC,
-	BaselinkFromLink	= baselinkFromLink,
-	BreakLink			= breakLink,
-	FindItemInBags		= findItemInBags,
-
-	FakeLink			= fakeLink,
-	HyperlinkFromLink	= hyperlinkFromLink,
-	NameFromLink		= nameFromLink,
-	QualityFromLink		= qualityFromLink,
-	LinkType			= linkType,
-
-	SetMoneySpacing		= setMoneySpacing,
-	SetPopupKey			= setPopupKey,
-	TooltipCall			= tooltipCall,
-
-	SetElapsed			= setElapsed,
-	OnLoad				= onLoad,
-
-	Version				= ENHTOOLTIP_VERSION,
-}
