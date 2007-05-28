@@ -54,7 +54,6 @@ function addonLoaded(hookArgs, event, addOnName)
 	if (event ~= "ADDON_LOADED") or (addOnName:lower() ~= "enchantrix") then
 		return
 	end
-	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
 
 	-- Call AddonLoaded for other objects
 	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
@@ -152,7 +151,7 @@ function onLoad()
 	SLASH_ENCHANTRIX3 = "/enx";
 	SlashCmdList["ENCHANTRIX"] = function(msg) Enchantrix.Command.HandleCommand(msg) end
 
-	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
+	Stubby.RegisterAddOnHook("Enchantrix", "Enchantrix", addonLoaded)
 end
 
 
