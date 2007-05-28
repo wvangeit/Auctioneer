@@ -3,7 +3,7 @@
 ##
 ## Interface: 20100
 ## LoadOnDemand: 1
-## Dependencies: EnhTooltip, Stubby, Auctioneer
+## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: !nLog
 ## SavedVariables: BtmScanData
 ##

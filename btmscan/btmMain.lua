@@ -226,8 +226,11 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.interval = BtmScanData.refresh
 		end
 
+	p("Update")
 		-- Check to see if the AH is open for business
 		if not (AuctionFrame and AuctionFrame:IsVisible() and BtmScan.CanSendAuctionQuery()) then
+	p("noaucframe")
+
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
@@ -239,15 +242,18 @@ BtmScan.OnUpdate = function(...)
 
 		-- Show me tha money!  Either do a new AH query, or piggyback on an existing query
 		--BtmScan.processing = true
+	p("checkscan")
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
-		if not Auctioneer.ScanManager.IsScanning() and
-		   not Auctioneer.BidScanner.IsScanning() then
+		if not (Auctioneer and (Auctioneer.ScanManager.IsScanning() or Auctioneer.BidScanner.IsScanning())) and
+			not (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
 			-- Auctioneer is not scanning, so  let's send  off a query
+	p("nextscan")
 			AuctionFrameBrowse.page = page
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 		else
 			-- If Auctioneer is currently scanning, then we just need to piggyback its calls.
+	p("waitscan")
 			BtmScan.timer = 0
 			BtmScan.pageScan = 0.001
 		end
@@ -407,15 +413,19 @@ BtmScan.PageScan = function(resume)
 							-- Use the worst case scenario from inbuilt or auctioneer prices
 							-- (if available)
 							local auctMedian, auctCount
-							if (Auctioneer and Auctioneer.Statistic) then
+							if (AucAdvanced) then
+								auctMedian = AucAdvanced.API.GetMarketValue(itemLink)
+								auctCount = 1
+							elseif (Auctioneer and Auctioneer.Statistic) then
 								auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
-								bCount = 0
-								if (auctMedian and auctCount) then
-									if (bBase == 0 or bBase >= auctMedian) then
-										bBase = auctMedian
-									end
-									bCount = auctCount
+							end
+
+							bCount = 0
+							if (auctMedian and auctCount) then
+								if (bBase == 0 or bBase >= auctMedian) then
+									bBase = auctMedian
 								end
+								bCount = auctCount
 							end
 
 							if (not auctMedian) then auctMedian = 0 end
@@ -803,10 +813,12 @@ end
 BtmScan.CanSendAuctionQuery = function()
 	-- Exclude our own checks in CanSendAuctionQuery() as well as use
 	-- Auctioneer's special CanSendAuctionQuery()-function.
-	hookCanSendAuctionQuery = false
-	local ret = Auctioneer.QueryManager.CanSendAuctionQuery()
-	hookCanSendAuctionQuery = true
-
+	local ret = true
+	if (Auctioneer and Auctioneer.QueryManager) then
+		hookCanSendAuctionQuery = false
+		ret = Auctioneer.QueryManager.CanSendAuctionQuery()
+		hookCanSendAuctionQuery = true
+	end
 	return ret
 end
 
@@ -1615,13 +1627,17 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		local baseIs = "Conservative"
 		local basePrice = iqwm
 		local auctMedian, auctCount
-		if (Auctioneer and Auctioneer.Statistic) then
+		if (AucAdvanced) then
+			auctMedian = AucAdvanced.API.GetMarketValue(link)
+			auctCount = 1
+		elseif (Auctioneer and Auctioneer.Statistic) then
 			auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
-			if (auctMedian and auctCount) then
-				if (auctMedian > basePrice) then
-					basePrice = auctMedian
-					baseIs = "Auctioneer"
-				end
+		end
+
+		if (auctMedian and auctCount) then
+			if (auctMedian > basePrice) then
+				basePrice = auctMedian
+				baseIs = "Auctioneer"
 			end
 		end
 		if (not auctMedian) then auctMedian = 0 end
@@ -2212,7 +2228,7 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.ScanTab:Show()
 	PanelTemplates_DeselectTab(BtmScan.ScanTab);
 
-	Auctioneer.UI.InsertAHTab(BtmScan.ScanTab, BtmScan.LogParent);
+	if (Auctioneer and Auctioneer.UI) then Auctioneer.UI.InsertAHTab(BtmScan.ScanTab, BtmScan.LogParent) end
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BtmScan.AuctionFrameTabClickHook)
 
 	BtmScan.PlayButton = CreateFrame("Button", "", BtmScan.LogParent);
