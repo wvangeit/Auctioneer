@@ -1247,15 +1247,10 @@ function private.GtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 end
 
 function private.GtHookSetInboxItem(funcArgs, retVal, frame, index)
-	local inboxItemName, itemTexture, inboxItemCount, inboxItemQuality = GetInboxItem(index)
-	local itemName, itemLink, itemQuality
-
-	for itemID = 1, 30000 do
-		itemName, itemLink, itemQuality = GetItemInfo(itemID)
-		if (itemName and itemName == inboxItemName) then
-			return public.TooltipCall(GameTooltip, inboxItemName, itemLink, inboxItemQuality, inboxItemCount)
-		end
-	end
+	local name, _, count, quality = GetInboxItem(index)
+	local itemString = GetInboxItemLink(index)
+	local _, itemLink = GetItemInfo(itemString)
+	return public.TooltipCall(GameTooltip, name, itemLink, quality, count)
 end
 
 function private.GtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
