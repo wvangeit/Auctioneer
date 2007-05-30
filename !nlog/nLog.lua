@@ -398,7 +398,7 @@ end
 
 
 -- Create our message frame
-nLog.Message = CreateFrame("Frame", "", UIParent)
+nLog.Message = CreateFrame("Frame", nil, UIParent)
 nLog.Message:Hide()
 nLog.Message:SetPoint("CENTER", "UIParent", "CENTER")
 nLog.Message:SetFrameStrata("DIALOG")
@@ -414,7 +414,7 @@ nLog.Message:SetBackdropColor(0,0,0.5, 0.8)
 nLog.Message:SetScript("OnShow", nLog.MessageShow)
 nLog.Message:SetMovable(true)
 
-nLog.Message.Drag = CreateFrame("Button", "", nLog.Message)
+nLog.Message.Drag = CreateFrame("Button", nil, nLog.Message)
 nLog.Message.Drag:SetPoint("TOPLEFT", nLog.Message, "TOPLEFT", 10,-5)
 nLog.Message.Drag:SetPoint("TOPRIGHT", nLog.Message, "TOPRIGHT", -10,-5)
 nLog.Message.Drag:SetHeight(6)
@@ -471,19 +471,19 @@ nLog.Message.ChatPrint:SetScript("OnClick", nLog.OnClickChatPrintButton)
 nLog.Message.ChatPrint:SetHitRectInsets(0, 0, 0, 0)
 getglobal("nLogChatPrintText"):SetText("ChatPrint")
 
-nLog.Message.Done = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
+nLog.Message.Done = CreateFrame("Button", nil, nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Done:SetText("Close")
 nLog.Message.Done:SetPoint("BOTTOMRIGHT", nLog.Message, "BOTTOMRIGHT", -20, 10)
 nLog.Message.Done:SetScript("OnClick", nLog.MessageDone)
 
 
 -- just below message box (above bottom row)
-nLog.Message.Previous = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
+nLog.Message.Previous = CreateFrame("Button", nil, nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Previous:SetText("Previous")
 nLog.Message.Previous:SetPoint("BOTTOMRIGHT", nLog.Message.Done, "TOPRIGHT", 0, 10)
 nLog.Message.Previous:SetScript("OnClick", nLog.PreviousMessage)
 
-nLog.Message.Next = CreateFrame("Button", "", nLog.Message, "OptionsButtonTemplate")
+nLog.Message.Next = CreateFrame("Button", nil, nLog.Message, "OptionsButtonTemplate")
 nLog.Message.Next:SetText("Next")
 nLog.Message.Next:SetPoint("BOTTOMRIGHT", nLog.Message.Previous, "BOTTOMLEFT", -10, 0)
 nLog.Message.Next:SetScript("OnClick", nLog.NextMessage)
@@ -498,7 +498,7 @@ nLog.Message.MsgScroll:SetScript("OnVerticalScroll", function () FauxScrollFrame
 nLog.Message.MsgScroll:SetScript("OnShow", function() nLog.UpdateDisplay() end)
 
 -- box frame for the message text and scroller
-nLog.Message.BoxFrame = CreateFrame("Frame", "", nLog.Message)
+nLog.Message.BoxFrame = CreateFrame("Frame", nil, nLog.Message)
 nLog.Message.BoxFrame:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 	edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -532,7 +532,7 @@ nLog.Message.BoxScroll:SetScrollChild(nLog.Message.Box)
 -- the message list (faked with buttons)
 nLog.Message.Lines = {}
 for i=1, 16 do
-	local line = CreateFrame("Button", "", nLog.Message)
+	local line = CreateFrame("Button", nil, nLog.Message)
 	nLog.Message.Lines[i] = line
 	line.id = i
 	if (i == 1) then
@@ -543,7 +543,7 @@ for i=1, 16 do
 	line:SetPoint("RIGHT", nLog.Message.MsgScroll, "RIGHT", -5, 0)
 	line:SetHeight(12)
 	line:SetScript("OnClick", nLog.LineClicked)
-	line.text = line:CreateFontString("", "HIGH")
+	line.text = line:CreateFontString(nil, "HIGH")
 	line.text:SetPoint("LEFT", line, "LEFT")
 	line.text:SetPoint("RIGHT", line, "RIGHT")
 	line.text:SetFont("Interface\\AddOns\\!nLog\\VeraMono.TTF", 11)
