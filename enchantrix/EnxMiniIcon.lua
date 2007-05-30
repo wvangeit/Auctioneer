@@ -132,8 +132,11 @@ miniIcon:SetScript("OnDragStop", dragStop)
 miniIcon:SetScript("OnClick", click)
 miniIcon:SetScript("OnUpdate", update)
 
-if nSideBar then
-	Enchantrix.SideIcon = nSideBar.AddButton("Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
-	Enchantrix.SideIcon:SetScript("OnClick", click)
+if (DongleStub) then
+	local nSideBar = DongleStub("nSideBar-0.1")
+	if nSideBar then
+		Enchantrix.SideIcon = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
+		Enchantrix.SideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+		Enchantrix.SideIcon:SetScript("OnClick", click)
+	end
 end
-
