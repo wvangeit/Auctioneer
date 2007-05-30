@@ -4,7 +4,7 @@
 ---------------------------------------------------------------------------]]
 
 local major = "DongleStub"
-local minor = tonumber(string.match("$Revision: 313 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
 local g = getfenv(0)
 
