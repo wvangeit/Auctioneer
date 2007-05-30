@@ -178,7 +178,7 @@ function getItemDisenchants(link)
 	
 	if (type(link) == "string") then
 		-- link format:   item number, enchant, dk, dk, dk, dk, random unique id
-		local id = link:match("(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+):(%d+)")
+		local id = link:match("(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+")
 		id = tonumber(id)
 		if (id) then
 			iType = Enchantrix.Util.GetIType("item:"..id..":0:0:0:0:0:0:0")
