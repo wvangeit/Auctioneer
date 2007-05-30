@@ -1,0 +1,9 @@
+## Title: SideBar
+## Notes: Allows alternative placement of minimap icons into an expanding sidebar tab.
+##
+## Interface: 20100
+## LoadOnDemand: 0
+##
+## Revision: $Id$
+## URL: http://norganna.org
+Load.xml

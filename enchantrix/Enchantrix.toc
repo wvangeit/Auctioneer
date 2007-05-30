@@ -15,6 +15,7 @@ EnxManifest.lua
 EnxObjects.lua
 
 Configator\Load.xml
+nSideBar\Load.xml
 Babylonian\Babylonian.lua
 debuglib\DebugLib.lua
 EnxStrings.lua

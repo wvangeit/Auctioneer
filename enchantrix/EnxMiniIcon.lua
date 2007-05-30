@@ -131,3 +131,9 @@ miniIcon:SetScript("OnDragStart", dragStart)
 miniIcon:SetScript("OnDragStop", dragStop)
 miniIcon:SetScript("OnClick", click)
 miniIcon:SetScript("OnUpdate", update)
+
+if nSideBar then
+	Enchantrix.SideIcon = nSideBar.AddButton("Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
+	Enchantrix.SideIcon:SetScript("OnClick", click)
+end
+
