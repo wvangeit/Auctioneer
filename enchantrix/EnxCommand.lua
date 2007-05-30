@@ -681,8 +681,7 @@ function handleCommand(command, source)
 	end;
 
 	-- Divide the large command into smaller logical sections (Shameless copy from the original function)
-	--(Matthias) Rewrote the match string here. Should now work right and be localized better.
-	local cmd, param, param2 = command:match("^([%w%-]+)%s*(.*)%s*(.*)$");
+	local cmd, param, param2 = command:match("^([%w%-]+)%s*([^%s]*)%s*(.*)$");
 
 	cmd = cmd or command or ""
 	param = param or ""
