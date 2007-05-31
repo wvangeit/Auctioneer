@@ -241,7 +241,9 @@ BtmScan.OnUpdate = function(...)
 		--BtmScan.processing = true
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
-		if not (Auctioneer and (Auctioneer.ScanManager.IsScanning() or Auctioneer.BidScanner.IsScanning())) and
+		-- Nothing will fix this logic except renesting
+		if not (Auctioneer and (Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning()
+			or Auctioneer.BidScanner and Auctioneer.BidScanner.IsScanning())) and
 			not (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
 			-- Auctioneer is not scanning, so  let's send  off a query
 			AuctionFrameBrowse.page = page
