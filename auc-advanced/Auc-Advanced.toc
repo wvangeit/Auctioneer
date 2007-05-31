@@ -16,6 +16,7 @@ CoreManifest.lua
 
 Babylonian\Load.xml
 Configator\Load.xml
+nSideBar\Load.xml
 CoreStrings.lua
 CoreLocale.lua
 
@@ -24,6 +25,7 @@ CoreUtil.lua
 CoreConst.lua
 CoreConfig.lua
 CoreScan.lua
+CoreSettings.lua
 CoreReport.lua
 CoreAPI.lua
 

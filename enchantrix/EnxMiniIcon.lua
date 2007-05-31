@@ -132,7 +132,7 @@ miniIcon:SetScript("OnDragStop", dragStop)
 miniIcon:SetScript("OnClick", click)
 miniIcon:SetScript("OnUpdate", update)
 
-if (DongleStub) then
+if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
 	local nSideBar = DongleStub("nSideBar-0.1")
 	if nSideBar then
 		Enchantrix.SideIcon = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")

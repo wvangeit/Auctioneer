@@ -13,7 +13,12 @@
 ##
 
 DebugLib\DebugLib.lua
+Babylonian\Load.xml
+Configator\Load.xml
+nSideBar\Load.xml
+
 btmObject.lua
 btmLocales.lua
 btmPrices.lua
+btmSettings.lua
 btmMain.lua
