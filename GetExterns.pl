@@ -30,17 +30,20 @@ for $uri (keys %uris) {
 			$rl = $r->get_resourcelist();
 			for $ri ($rl->get_resources) {
 				$filename = $ri->get_property("rel_uri");
-				$data = $ri->get();
-				print " - $filename\n";
-				for $folder (@folders) {
-					if (!$cleaned{$folder}) {
-						remove($folder);
-						mkdir($folder);
-						$cleaned{$folder}++;
+				$res = $ri->get;
+				if ($res->is_success) {
+					$data = $ri->get_content;
+					print " - $filename\n";
+					for $folder (@folders) {
+						if (!$cleaned{$folder}) {
+							remove($folder);
+							mkdir($folder);
+							$cleaned{$folder}++;
+						}
+						open DATA, "> $folder/$filename";
+						print DATA $data;
+						close DATA;
 					}
-					open DATA, "> $folder/$filename";
-					print DATA $data;
-					close DATA;
 				}
 			}
 		}
