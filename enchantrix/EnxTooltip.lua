@@ -145,8 +145,6 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (not lines) then lines = {} end
 
 				local resNumber, resQuantity = unpack(resData)
-				local dName = Enchantrix.Util.GetReagentInfo(result);
-				if (not dName) then dName = "Item "..result end
 				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
 				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
@@ -180,10 +178,10 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				tooltipFormat:SetPattern("$bcount", tostring(resNumber))	-- base count
 
 				-- Name and quality
-				local name, _, quality = Enchantrix.Util.GetReagentInfo(result)
-				local _, _, _, color = GetItemQualityColor(quality or 0)
+				local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
+				local _, _, _, color = GetItemQualityColor(rQuality or 0)
 				tooltipFormat:SetPattern("|q", color or "|cffcccc33")
-				tooltipFormat:SetPattern("$name", name)
+				tooltipFormat:SetPattern("$name", rName)
 
 				-- Rate
 				if resCount ~= 1 then
@@ -358,12 +356,12 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 
 	-- Append additional reagent info
 	for _, reagent in ipairs(reagentList) do
-		local name, link, quality = Enchantrix.Util.GetReagentInfo(reagent[1])
+		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(reagent[1])
 		local hsp, median, market, five = Enchantrix.Util.GetReagentPrice(reagent[1])
-		local _, _, _, color = GetItemQualityColor(quality)
+		local _, _, _, color = GetItemQualityColor(rQuality)
 
-		reagent[1] = name
-		table.insert(reagent, quality)
+		reagent[1] = rName
+		table.insert(reagent, rQuality)
 		table.insert(reagent, color)
 		if AucAdvanced then
 			table.insert(reagent, five)
