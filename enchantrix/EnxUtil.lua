@@ -84,20 +84,34 @@ end
 
 -- Frontend to GetItemInfo()
 -- Information for disenchant reagents are kept in a saved variable cache
-function getReagentInfo(id)
+function getReagentInfo(reagentID)
 	if (not EnchantConfig) then EnchantConfig = {} end
 	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
 	if (not EnchantConfig.cache.names) then EnchantConfig.cache.names = {} end
 	if (not EnchantConfig.cache.reagentinfo) then EnchantConfig.cache.reagentinfo = {} end
 	local cache = EnchantConfig.cache.reagentinfo
-
+	local id = reagentID;
+	
 	if type(id) == "string" then
 		local _, _, i = id:find("item:(%d+):")
+		if (not i)  then
+			Enchantrix.Util.DebugPrintQuick("reagentinfo failed to get item number from string ", id );
+		end
 		id = i
 	end
+	
 	id = tonumber(id)
+	
+	if (not sName)  then
+		Enchantrix.Util.DebugPrintQuick("reagentinfo nil ID", reagentID );
+	end
 
 	local sName, sLink, iQuality, _, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
+	
+	if (not sName)  then
+		Enchantrix.Util.DebugPrintQuick("reagentinfo GetItemInfo failed ", id, reagentID );
+	end
+	
 	if id and Enchantrix.Constants.StaticPrices[id] then
 		if sName then
 			cache[id] = sName.."|"..iQuality.."|"..sTexture
@@ -120,6 +134,8 @@ function getReagentInfo(id)
 	if sName and id then
 		-- Might as well save this name while we have the data
 		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0"
+	else
+		Enchantrix.Util.DebugPrintQuick("Could not find reagent info for ", id, reagentID );
 	end
 
 	return sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture
@@ -147,7 +163,24 @@ function getLinkFromName(name)
 			EnchantConfig.cache.names[name] = nil
 		end
 	end
+	
 	if not EnchantConfig.cache.names[name] then
+		
+		-- if we didn't find it in the cache, try something else
+		-- first, check our list of reagent item ids, because they're most likely
+		for i, _ in ipairs( Enchantrix.Constants.StaticPrices ) do
+			local n, link = GetItemInfo(i)
+			if n and (n == name) then
+				EnchantConfig.cache.names[name] = link
+				break
+			end
+		end
+	end
+	
+	if not EnchantConfig.cache.names[name] then
+		
+		-- still no result?  Darn.
+		-- last resort,  check ALL item ids until we find a name match, and cache it!
 		for i = 1, Enchantrix.State.MAX_ITEM_ID + 4000 do
 			local n, link = GetItemInfo(i)
 			if n then
@@ -159,6 +192,7 @@ function getLinkFromName(name)
 			end
 		end
 	end
+	
 	return EnchantConfig.cache.names[name]
 end
 
