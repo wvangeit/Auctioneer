@@ -181,6 +181,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
 				local _, _, _, color = GetItemQualityColor(rQuality or 0)
 				tooltipFormat:SetPattern("|q", color or "|cffcccc33")
+				if (not rName) then rName = "item:"..result; end
 				tooltipFormat:SetPattern("$name", rName)
 
 				-- Rate
