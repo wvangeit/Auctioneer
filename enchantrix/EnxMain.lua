@@ -50,7 +50,15 @@ local DisenchantEvent = {}
 
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
-function addonLoaded()
+function addonLoaded(hookArgs, event, addOnName)
+
+	-- this cruft is only needed when using Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
+	if (event ~= "ADDON_LOADED") or (addOnName:lower() ~= "enchantrix") then
+		return
+	end
+	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
+
+
 	-- Call AddonLoaded for other objects
 	Enchantrix.Storage.AddonLoaded() -- Sets up saved variables so should be called first
 	Enchantrix.Command.AddonLoaded()
@@ -147,7 +155,15 @@ function onLoad()
 	SLASH_ENCHANTRIX3 = "/enx";
 	SlashCmdList["ENCHANTRIX"] = function(msg) Enchantrix.Command.HandleCommand(msg) end
 
-	Stubby.RegisterAddOnHook("Enchantrix", "Enchantrix", addonLoaded)
+
+	-- this version gets addonLoaded called AFTER SavedVariables have been loaded
+	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
+	
+	-- this version gets addonLoaded called BEFORE SavedVariables have been loaded
+	-- 			so all settings then end up with default values during the addonLoaded call
+	-- this ends up showing the minimap icon in the wrong location
+	--Stubby.RegisterAddOnHook("Enchantrix", "Enchantrix", addonLoaded)
+	
 end
 
 
