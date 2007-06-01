@@ -323,7 +323,6 @@ function lib.MakeGuiConfig()
   	gui.AddCat("Modules")
 end
 
-DEFAULT_CHAT_FRAME:AddMessage("Here")
 local sideIcon
 if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
 	local nSideBar = DongleStub("nSideBar-0.1")
