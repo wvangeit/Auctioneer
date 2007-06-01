@@ -102,8 +102,8 @@ function getReagentInfo(reagentID)
 	
 	id = tonumber(id)
 	
-	if (not sName)  then
-		Enchantrix.Util.DebugPrintQuick("reagentinfo nil ID", reagentID );
+	if (not id)  then
+		Enchantrix.Util.DebugPrintQuick("reagentinfo nil ID: ", type(reagentID), reagentID, tonumber(reagentID) );
 	end
 
 	local sName, sLink, iQuality, _, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
