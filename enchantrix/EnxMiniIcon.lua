@@ -72,7 +72,7 @@ end
 
 local function click(obj, button)
 	if (button == "LeftButton") then
-		CastSpellByName("Enchanting")
+		CastSpellByName(_ENCH("Enchanting"))
 	elseif (button == "RightButton") then
 		settings.MakeGuiConfig()
 		local gui = settings.Gui
