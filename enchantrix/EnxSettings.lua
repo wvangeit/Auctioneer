@@ -446,6 +446,7 @@ function lib.MakeGuiConfig()
 	for i=1, numReag do
 		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
 		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
+		if (not reagName) then reagName = "item:"..reagId end
 		reagName = reagName:gsub("Large", "L"):gsub("Small", "S"):gsub("Greater", "G"):gsub("Lesser", "L")
 
 		if (cont == nil and i > numReag/2) then
