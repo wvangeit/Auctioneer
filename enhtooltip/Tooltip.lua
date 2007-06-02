@@ -1095,7 +1095,7 @@ end
 -- Tooltip generating function
 ------------------------
 
-function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink)
+function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
 	private.currentGametip = frame
 	private.hideTime = 0
 
@@ -1132,7 +1132,7 @@ function public.TooltipCall(frame, name, link, quality, count, price, forcePopup
 
 	if (forcePopup or popupKeyPressed) then
 		-- check, if we should show the tooltip even if a popup is being displayed
-		local popupTest = EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink)
+		local popupTest = EnhTooltip.CheckPopup(name, link, quality, count, price, hyperlink, additional)
 		if (popupTest) then
 			showTip = false
 		end
@@ -1140,7 +1140,7 @@ function public.TooltipCall(frame, name, link, quality, count, price, forcePopup
 
 	if (showTip) then
 		public.ClearTooltip()
-		EnhTooltip.AddTooltip(frame, name, link, quality, count, price)
+		EnhTooltip.AddTooltip(frame, name, link, quality, count, price, additional)
 		public.ShowTooltip(frame)
 		private.currentItem = itemSig
 		return true
@@ -1200,7 +1200,17 @@ function private.AfHookOnEnter(funcArgs, retVal, type, index)
 		local name = public.NameFromLink(link)
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index)
-			return public.TooltipCall(GameTooltip, name, link, aiQuality, aiCount)
+	
+			local aiNextBid = aiMinBid
+			if (aiBidAmount>0) then aiNextBid = aiBidAmount + aiMinIncrement end
+
+			if not private.priceTable then private.priceTable = {} end
+			private.priceTable[0] = "AuctionPrices"
+			private.priceTable[1] = aiBuyoutPrice
+			private.priceTable[2] = aiMinBid
+			private.priceTable[3] = aiNextBid
+
+			return public.TooltipCall(GameTooltip, name, link, aiQuality, aiCount, nil, nil, nil, private.priceTable)
 		end
 	end
 end
