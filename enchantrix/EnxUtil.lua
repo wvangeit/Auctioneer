@@ -88,12 +88,20 @@ function getReagentInfo(reagentID)
 	if (not EnchantConfig) then EnchantConfig = {} end
 	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
 	if (not EnchantConfig.cache.names) then EnchantConfig.cache.names = {} end
-	if (not EnchantConfig.cache.reagentinfo) then EnchantConfig.cache.reagentinfo = {} end
-	local cache = EnchantConfig.cache.reagentinfo
+	
+	if (not EnchantConfig.cache.reagentItemInfo) then
+		EnchantConfig.cache.reagentItemInfo = {}
+		-- copy in the default cache data (English only)
+		-- the localizations will get updated as the items come into the user's cache
+		EnchantConfig.cache.reagentItemInfo = Enchantrix.Constants.BackupReagentItemInfo;
+		end
+	
+	local cache = EnchantConfig.cache.reagentItemInfo
+	
 	local id = reagentID;
 	
 	if type(id) == "string" then
-		local _, _, i = id:find("item:(%d+):")
+		local _, _, i = id:find("item:(%d-):")
 		if (not i)  then
 			Enchantrix.Util.DebugPrintQuick("reagentinfo failed to get item number from string ", id );
 		end
@@ -106,40 +114,37 @@ function getReagentInfo(reagentID)
 		Enchantrix.Util.DebugPrintQuick("reagentinfo nil ID: ", type(reagentID), reagentID, tonumber(reagentID) );
 	end
 
-	local sName, sLink, iQuality, _, iLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
+	local sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
 	
-	if (not sName)  then
-		Enchantrix.Util.DebugPrintQuick("reagentinfo GetItemInfo failed ", id, reagentID );
+	if (id and sName) then
+		-- save this reagent data while we have it
+		-- full item info by item id
+		cache[id] = { sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture };
+		-- name to id mapping for getLinkFromName()
+		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0";
 	end
 	
-	if id and Enchantrix.Constants.StaticPrices[id] then
-		if sName then
-			cache[id] = sName.."|"..iQuality.."|"..sTexture
-			cache["t"] = sType
-		elseif type(cache[id]) == "string" then
-			local cdata = split(cache[id], "|")
-
-			sName = cdata[1]
-			iQuality = tonumber(cdata[2])
-			iLevel = 0
-			sType = cache["t"]
-			sSubtype = cache["t"]
-			iStack = 10
-			sEquip = ""
-			sTexture = cdata[3]
-			sLink = "item:"..id..":0:0:0"
+	if (id and (not sName))  then
+		-- last resort is getting the data from our cache, because the WoW cache does not have this item
+		-- remember: the cache is not our primary storage for this data, only a backup
+		if ( cache[id] ) then
+			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = unpack( cache[id] );
 		end
 	end
-
-	if sName and id then
-		-- Might as well save this name while we have the data
-		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0"
-	else
-		Enchantrix.Util.DebugPrintQuick("Could not find reagent info for ", id, reagentID );
+	
+	if (id and (not sName)) then
+		Enchantrix.Util.DebugPrintQuick("Could not find any reagent info for ", id, reagentID );
+		
+		-- fake the info as best we can
+		sName = "item:"..id;
+		sLink = "item:"..id..":0:0:0"
+		iQuality = 0;
+		rLevel = 0;
 	end
 
-	return sName, sLink, iQuality, iLevel, sType, sSubtype, iStack, sEquip, sTexture
+	return sName, sLink, iQuality, rLevel, sType, sSubtype, iStack, sEquip, sTexture
 end
+
 
 -- TODO: what is the correct limit post TBC?
 -- ccox - 32090 is the highest I can find so far

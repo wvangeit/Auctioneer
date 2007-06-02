@@ -221,7 +221,7 @@ local SOUL = 11083
 local STRANGE = 10940
 
 
--- and in a form we can iterate over
+-- and in a form we can iterate over, with a fixed order for the UI
 
 const.DisenchantReagentList = {
 
@@ -411,3 +411,367 @@ const.RareArmorExceptionList = {
 	[70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- result for post-BC items
 }
 
+
+-- needed because GetItemInfo fails when items are not in the cache
+const.BackupReagentItemInfo = {
+	[10939] = {
+		"Greater Magic Essence", -- [1]
+		"|cff1eff00|Hitem:10939:0:0:0:0:0:0:0|h[Greater Magic Essence]|h|r", -- [2]
+		2, -- [3]
+		15, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceMagicLarge", -- [10]
+	},
+	[10978] = {
+		"Small Glimmering Shard", -- [1]
+		"|cff0070dd|Hitem:10978:0:0:0:0:0:0:0|h[Small Glimmering Shard]|h|r", -- [2]
+		3, -- [3]
+		20, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardGlimmeringSmall", -- [10]
+	},
+	[16202] = {
+		"Lesser Eternal Essence", -- [1]
+		"|cff1eff00|Hitem:16202:0:0:0:0:0:0:0|h[Lesser Eternal Essence]|h|r", -- [2]
+		2, -- [3]
+		50, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceEternalSmall", -- [10]
+	},
+	[10940] = {
+		"Strange Dust", -- [1]
+		"|cffffffff|Hitem:10940:0:0:0:0:0:0:0|h[Strange Dust]|h|r", -- [2]
+		1, -- [3]
+		10, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustStrange", -- [10]
+	},
+	[11134] = {
+		"Lesser Mystic Essence", -- [1]
+		"|cff1eff00|Hitem:11134:0:0:0:0:0:0:0|h[Lesser Mystic Essence]|h|r", -- [2]
+		2, -- [3]
+		30, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceMysticalSmall", -- [10]
+	},
+	[14343] = {
+		"Small Brilliant Shard", -- [1]
+		"|cff0070dd|Hitem:14343:0:0:0:0:0:0:0|h[Small Brilliant Shard]|h|r", -- [2]
+		3, -- [3]
+		50, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardBrilliantSmall", -- [10]
+	},
+	[16203] = {
+		"Greater Eternal Essence", -- [1]
+		"|cff1eff00|Hitem:16203:0:0:0:0:0:0:0|h[Greater Eternal Essence]|h|r", -- [2]
+		2, -- [3]
+		55, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceEternalLarge", -- [10]
+	},
+	[11135] = {
+		"Greater Mystic Essence", -- [1]
+		"|cff1eff00|Hitem:11135:0:0:0:0:0:0:0|h[Greater Mystic Essence]|h|r", -- [2]
+		2, -- [3]
+		35, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceMysticalLarge", -- [10]
+	},
+	[11174] = {
+		"Lesser Nether Essence", -- [1]
+		"|cff1eff00|Hitem:11174:0:0:0:0:0:0:0|h[Lesser Nether Essence]|h|r", -- [2]
+		2, -- [3]
+		40, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceNetherSmall", -- [10]
+	},
+	[14344] = {
+		"Large Brilliant Shard", -- [1]
+		"|cff0070dd|Hitem:14344:0:0:0:0:0:0:0|h[Large Brilliant Shard]|h|r", -- [2]
+		3, -- [3]
+		55, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardBrilliantLarge", -- [10]
+	},
+	[11082] = {
+		"Greater Astral Essence", -- [1]
+		"|cff1eff00|Hitem:11082:0:0:0:0:0:0:0|h[Greater Astral Essence]|h|r", -- [2]
+		2, -- [3]
+		25, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceAstralLarge", -- [10]
+	},
+	[10998] = {
+		"Lesser Astral Essence", -- [1]
+		"|cff1eff00|Hitem:10998:0:0:0:0:0:0:0|h[Lesser Astral Essence]|h|r", -- [2]
+		2, -- [3]
+		20, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceAstralSmall", -- [10]
+	},
+	[11175] = {
+		"Greater Nether Essence", -- [1]
+		"|cff1eff00|Hitem:11175:0:0:0:0:0:0:0|h[Greater Nether Essence]|h|r", -- [2]
+		2, -- [3]
+		45, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceNetherLarge", -- [10]
+	},
+	[11084] = {
+		"Large Glimmering Shard", -- [1]
+		"|cff0070dd|Hitem:11084:0:0:0:0:0:0:0|h[Large Glimmering Shard]|h|r", -- [2]
+		3, -- [3]
+		25, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardGlimmeringLarge", -- [10]
+	},
+	[22450] = {
+		"Void Crystal", -- [1]
+		"|cffa335ee|Hitem:22450:0:0:0:0:0:0:0|h[Void Crystal]|h|r", -- [2]
+		4, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_VoidCrystal", -- [10]
+	},
+	[22445] = {
+		"Arcane Dust", -- [1]
+		"|cffffffff|Hitem:22445:0:0:0:0:0:0:0|h[Arcane Dust]|h|r", -- [2]
+		1, -- [3]
+		60, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustArcane", -- [10]
+	},
+	[11176] = {
+		"Dream Dust", -- [1]
+		"|cffffffff|Hitem:11176:0:0:0:0:0:0:0|h[Dream Dust]|h|r", -- [2]
+		1, -- [3]
+		45, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustDream", -- [10]
+	},
+	[22446] = {
+		"Greater Planar Essence", -- [1]
+		"|cff1eff00|Hitem:22446:0:0:0:0:0:0:0|h[Greater Planar Essence]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceArcaneLarge", -- [10]
+	},
+	[11138] = {
+		"Small Glowing Shard", -- [1]
+		"|cff0070dd|Hitem:11138:0:0:0:0:0:0:0|h[Small Glowing Shard]|h|r", -- [2]
+		3, -- [3]
+		30, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardGlowingSmall", -- [10]
+	},
+	[22447] = {
+		"Lesser Planar Essence", -- [1]
+		"|cff1eff00|Hitem:22447:0:0:0:0:0:0:0|h[Lesser Planar Essence]|h|r", -- [2]
+		2, -- [3]
+		60, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceArcaneSmall", -- [10]
+	},
+	[11177] = {
+		"Small Radiant Shard", -- [1]
+		"|cff0070dd|Hitem:11177:0:0:0:0:0:0:0|h[Small Radiant Shard]|h|r", -- [2]
+		3, -- [3]
+		40, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardRadientSmall", -- [10]
+	},
+	[22448] = {
+		"Small Prismatic Shard", -- [1]
+		"|cff0070dd|Hitem:22448:0:0:0:0:0:0:0|h[Small Prismatic Shard]|h|r", -- [2]
+		3, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardPrismaticSmall", -- [10]
+	},
+	[11139] = {
+		"Large Glowing Shard", -- [1]
+		"|cff0070dd|Hitem:11139:0:0:0:0:0:0:0|h[Large Glowing Shard]|h|r", -- [2]
+		3, -- [3]
+		35, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardGlowingLarge", -- [10]
+	},
+	[22449] = {
+		"Large Prismatic Shard", -- [1]
+		"|cff0070dd|Hitem:22449:0:0:0:0:0:0:0|h[Large Prismatic Shard]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardPrismaticLarge", -- [10]
+	},
+	[11178] = {
+		"Large Radiant Shard", -- [1]
+		"|cff0070dd|Hitem:11178:0:0:0:0:0:0:0|h[Large Radiant Shard]|h|r", -- [2]
+		3, -- [3]
+		45, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardRadientLarge", -- [10]
+	},
+	[10938] = {
+		"Lesser Magic Essence", -- [1]
+		"|cff1eff00|Hitem:10938:0:0:0:0:0:0:0|h[Lesser Magic Essence]|h|r", -- [2]
+		2, -- [3]
+		10, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		10, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_EssenceMagicSmall", -- [10]
+	},
+	[11083] = {
+		"Soul Dust", -- [1]
+		"|cffffffff|Hitem:11083:0:0:0:0:0:0:0|h[Soul Dust]|h|r", -- [2]
+		1, -- [3]
+		25, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustSoul", -- [10]
+	},
+	[11137] = {
+		"Vision Dust", -- [1]
+		"|cffffffff|Hitem:11137:0:0:0:0:0:0:0|h[Vision Dust]|h|r", -- [2]
+		1, -- [3]
+		35, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustVision", -- [10]
+	},
+	[20725] = {
+		"Nexus Crystal", -- [1]
+		"|cffa335ee|Hitem:20725:0:0:0:0:0:0:0|h[Nexus Crystal]|h|r", -- [2]
+		4, -- [3]
+		60, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_ShardNexusLarge", -- [10]
+	},
+	[16204] = {
+		"Illusion Dust", -- [1]
+		"|cffffffff|Hitem:16204:0:0:0:0:0:0:0|h[Illusion Dust]|h|r", -- [2]
+		1, -- [3]
+		55, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Enchant_DustIllusion", -- [10]
+	},
+}
