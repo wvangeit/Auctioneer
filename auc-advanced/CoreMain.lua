@@ -71,31 +71,38 @@ if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
-function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantity, cost)
+function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantity, cost, additional)
 	if EnhTooltip.LinkType(hyperlink) ~= "item" then
 		return -- Auctioneer hooks into item tooltips only
 	end
 
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then engineLib.Processor("tooltip", frame, name, hyperlink, quality, quantity, cost) end
+			if (engineLib.Processor) then engineLib.Processor("tooltip", frame, name, hyperlink, quality, quantity, cost, additional) end
 		end
 	end
 end
 
 function private.OnLoad(addon)
-	if (addon == "auc-advanced") then
+	if (addon:lower() == "auc-advanced") then
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
+		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
+			-- These embedded modules have also just been loaded
+			private.OnLoad(module)
+		end
 	end
-	local _, sys, eng = strsplit("-", addon)
+	local auc, sys, eng = strsplit("-", addon:lower())
+	if (auc ~= "auc" or not sys or not eng) then return end
 	
 	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (sys and eng and sys == system:lower() and eng == engine:lower() and engineLib.OnLoad) then
-				engineLib.OnLoad()
-			end
-			if (engineLib.Processor) then
-				engineLib.Processor("load", addon)
+		if (sys == system:lower()) then
+			for engine, engineLib in pairs(systemMods) do
+				if (eng == engine:lower() and engineLib.OnLoad) then
+					engineLib.OnLoad()
+				end
+				if (engineLib.Processor) then
+					engineLib.Processor("load", addon)
+				end
 			end
 		end
 	end
