@@ -125,6 +125,10 @@ function lib.GetDefault(setting)
 	return val;
 end
 
+function lib.SetDefault(setting, default)
+	settingDefaults[setting] = default
+end
+
 local function setter(setting, value)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
 	
@@ -321,6 +325,14 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Header",     0,    "Main AucAdvanced options")
 
   	gui.AddCat("Modules")
+
+	-- Alert all modules that the config screen is being built, so that they
+	-- may place their own configuration should they desire it.
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then engineLib.Processor("config", gui) end
+		end
+	end
 end
 
 local sideIcon
