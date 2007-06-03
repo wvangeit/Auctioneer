@@ -189,7 +189,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 
 		EnhTooltip.AddLine("  Mean price", mean*quantity)
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		if (average > 0) then
+		if (average and average > 0) then
 			EnhTooltip.AddLine("  Normalized", average*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 			if (quantity > 1) then
