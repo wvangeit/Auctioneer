@@ -1500,6 +1500,15 @@ function debugPrint(message, category, title, errorCode, level)
 	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
 end
 
+
+-- for compatibility with older addons that called EnhTooltip.DebugPrint directly
+-- without this, older Auctioneer addons cannot use this version of EnhTooltip
+function debugPrintExternal(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint("unknown", message, category, title, errorCode, level)
+end
+EnhTooltip.DebugPrint	= debugPrintExternal;
+
+
 ------------------------
 -- Load and initialization functions
 ------------------------
