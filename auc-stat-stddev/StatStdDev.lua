@@ -94,7 +94,9 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
-	buyout = buyout / itemData.stackSize
+	if (itemData.stackSize > 1) then
+		buyout = buyout.."/"..itemData.stackSize
+	end
 
 	-- Get the signature of this item and find it's stats.
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
@@ -126,35 +128,46 @@ function lib.GetPrice(hyperlink, faction)
 	local count = #stats[property]
 	if (count < 1) then return end
 
-	local total = 0
+	local total, number = 0, 0
 	for i = 1, count do
-		total = total + stats[property][i]
+		local price, stack = strsplit("/", stats[property][i])
+		price = tonumber(price) or 0
+		stack = tonumber(stack) or 1
+		if (stack < 1) then stack = 1 end
+		total = total + tonumber(price)
+		number = number + stack
 	end
-	local mean = total / count
+	local mean = total / number
 
 	if (count < 2) then return 0,0,0, mean, count end
 
 	local variance = 0
 	for i = 1, count do
-		variance = variance + (math.abs(mean - stats[property][i]) ^ 2)
+		local price, stack = strsplit("/", stats[property][i])
+		price = tonumber(price) or 0
+		stack = tonumber(stack) or 1
+		if (stack < 1) then stack = 1 end
+		variance = variance + (math.abs(mean - price) ^ 2)
 	end
-	variance = variance / count
+	variance = variance / number
 	local stdev = variance ^ 0.5
 
 	local deviation = 1.5 * stdev
 
 	total = 0
-	local value
-	local n = 0
+	number = 0
 	for i = 1, count do
-		value = stats[property][i]
-		if (math.abs(value - mean) < deviation) then
-			total = total + stats[property][i]
-			n = n + 1
+		local price, stack = strsplit("/", stats[property][i])
+		price = tonumber(price) or 0
+		stack = tonumber(stack) or 1
+		if (stack < 1) then stack = 1 end
+		if (math.abs(price - mean) < deviation) then
+			total = total + price
+			number = number + stack
 		end
 	end
 
-	local average = total / n
+	local average = total / number
 	return average, mean, false, stdev, variance, count
 end
 

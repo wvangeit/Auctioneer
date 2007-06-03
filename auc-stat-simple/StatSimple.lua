@@ -94,7 +94,6 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
-	buyout = buyout / itemData.stackSize
 	
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
@@ -107,7 +106,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	local stats = private.UnpackStats(data.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 } end
 	stats[property][1] = stats[property][1] + buyout
-	stats[property][2] = stats[property][2] + 1
+	stats[property][2] = stats[property][2] + itemData.stackSize
 	data.daily[itemId] = private.PackStats(stats)
 end
 
@@ -297,13 +296,13 @@ function private.ClearData(faction, realmName)
 	if (not AAStatSimpleData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFaction()
 	if (realmName) then
-		print("Clearing all stats for {{"..myFaction.."}}")	
+		print("Clearing all stats for {{"..faction.."}}")	
 	else
 		realmName = GetRealmName()
-		print("Clearing all stats for {{"..myFaction.."}} on {{"..realmName.."}}")
+		print("Clearing all stats for {{"..faction.."}} on {{"..realmName.."}}")
 	end
-	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][myFaction]) then
-		AAStatSimpleData.RealmData[realmName][myFaction] = nil
+	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][faction]) then
+		AAStatSimpleData.RealmData[realmName][faction] = nil
 	end
 end
 
