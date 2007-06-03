@@ -167,7 +167,8 @@ function lib.GetPrice(hyperlink, faction)
 		end
 	end
 
-	local average = total / number
+	local average
+	if (number > 0) then average = total / number end
 	return average, mean, false, stdev, variance, count
 end
 
