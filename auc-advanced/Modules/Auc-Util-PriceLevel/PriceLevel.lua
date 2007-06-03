@@ -63,6 +63,8 @@ function lib.Processor(callbackType, ...)
 		lib.ProcessTooltip(...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
+	elseif (callbackType == "listupdate") then
+		private.ListUpdate(...)
 	end
 end
 
@@ -81,7 +83,6 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 end
 
 function lib.OnLoad()
-	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.pricelevel.colorize", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.single", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.model", "market")
@@ -89,15 +90,9 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.pricelevel.yellow", 95)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.orange", 115)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.red", 130)
-
-	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Util-PriceLevel", private.HookAH)
 end
 
 --[[ Local functions ]]--
-
-function private.HookAH()
-	hooksecurefunc("AuctionFrameBrowse_Update", private.ListUpdate)
-end
 
 function private.GetPriceModels()
 	if not private.scanValueNames then private.scanValueNames = {} end
@@ -141,21 +136,43 @@ function private.ResetBars()
 	end
 end
 
-function private.SetBar(i, r,g,b)
-	local tex = getglobal("BrowseButton"..i.."PriceLevel")
+function private.SetBar(i, r,g,b, pct)
+	local tex
+	local button = getglobal("BrowseButton"..i)
+	if (button.AddTexture) then
+		tex = button.AddTexture
+		if (button.Value) then
+			if (pct) then
+				if pct > 999 then
+					button.Value:SetText(">999%")
+				else
+					button.Value:SetText(("%d%%"):format(pct))
+				end
+				button.Value:SetTextColor(r,g,b)
+			else
+				button.Value:SetText("")
+				button.Value:SetTextColor(1,1,1)
+			end
+		end
+	else
+		tex = getglobal("BrowseButton"..i.."PriceLevel")
+	end
 	if not tex then
-		local button = getglobal("BrowseButton"..i)
 		tex = button:CreateTexture("BrowseButton"..i.."PriceLevel")
-		tex:SetTexture(1,1,1, 0.33)
 		tex:SetPoint("TOPLEFT")
 		tex:SetPoint("BOTTOMRIGHT", 0, 5)
 	end
 
-	tex:SetGradientAlpha("Vertical", r,g,b, 0.2, r,g,b, 0.5)
-	tex:Show()
+	if (r and g and b) then
+		tex:SetTexture(1,1,1, 0.33)
+		tex:SetGradientAlpha("Horizontal", r,g,b, 0, r,g,b, 0.8)
+		tex:Show()
+	else
+		tex:Hide()
+	end
 end
 
-function private.ListUpdate(...)
+function private.ListUpdate()
 	private.ResetBars()
 	if not AucAdvanced.Settings.GetSetting("util.pricelevel.colorize") then return end
 
@@ -171,7 +188,7 @@ function private.ListUpdate(...)
 			if bidPrice>0 then bidPrice = bidPrice + minInc
 			else bidPrice = minBid end
 			priceLevel, perItem, r,g,b = private.CalcLevel(link, quantity, bidPrice, buyPrice)
-			private.SetBar(i, r,g,b)
+			private.SetBar(i, r,g,b, priceLevel)
 		end
 	end
 end

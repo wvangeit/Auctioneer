@@ -179,3 +179,15 @@ end
 function lib.UnpackImageItem(item)
 	return AucAdvanced.Scan.UnpackImageItem(item)
 end
+
+function lib.ListUpdate()
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("listupdate")
+			end
+		end
+	end
+end
+
+

@@ -83,8 +83,20 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 	end
 end
 
+function private.HookAH()
+	hooksecurefunc("AuctionFrameBrowse_Update", AucAdvanced.API.ListUpdate)
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("auctionui")
+			end
+		end
+	end
+end
+
 function private.OnLoad(addon)
 	if (addon:lower() == "auc-advanced") then
+		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
