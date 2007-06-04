@@ -169,10 +169,12 @@ function private.HookAH()
 		button.Bid.SetMoney = private.SetMoney
 		button.Bid:SetPoint("TOPRIGHT", button.Owner, "TOPRIGHT", 122, 0)
 		button.Bid:SetWidth(120)
+		button.Bid:SetFrameStrata("MEDIUM")
 		button.Buy = CreateFrame("Frame", "AucAdvancedUtilCompactUIMoneyBuy"..i, button, "EnhancedTooltipMoneyTemplate")
 		button.Buy.SetMoney = private.SetMoney
 		button.Buy:SetPoint("TOPRIGHT", button.Bid, "BOTTOMRIGHT", 0, 1)
 		button.Buy:SetWidth(120)
+		button.Buy:SetFrameStrata("MEDIUM")
 		button.Value = button:CreateFontString(nil,nil,"GameFontHighlight")
 		button.Value:SetPoint("TOPLEFT", button.Bid, "TOPRIGHT")
 		button.Value:SetWidth(45)
@@ -210,13 +212,13 @@ function private.HookAH()
 
 	tex = AuctionFrameBrowse:CreateTexture()
 	tex:SetTexture(1,1,0.5, 0.2)
-	tex:SetPoint("TOPLEFT", private.buttons[NEW_NUM_BROWSE].Count, "BOTTOMLEFT")
+	tex:SetPoint("TOPLEFT", private.buttons[NEW_NUM_BROWSE].Count, "BOTTOMLEFT", 0, -1)
 	tex:SetWidth(610)
-	tex:SetHeight(39)
+	tex:SetHeight(38)
 	table.insert(private.candy, tex)
 
 	BrowsePrevPageButton:ClearAllPoints()
-	BrowsePrevPageButton:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", -150, -5)
+	BrowsePrevPageButton:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", -170, -5)
 	BrowseNextPageButton:ClearAllPoints()
 	BrowseNextPageButton:SetPoint("BOTTOMRIGHT", tex, "BOTTOMRIGHT", -5, -5)
 	BrowseSearchCountText:ClearAllPoints()
@@ -232,6 +234,14 @@ function private.HookAH()
 	local text = AuctionFrameBrowse:CreateFontString(nil,nil,"GameFontNormal")
 	text:SetPoint("LEFT", check, "LEFT", 30, 0)
 	text:SetText("Show stacks as price per unit")
+	table.insert(private.candy, text)
+
+	text = AuctionFrameBrowse:CreateFontString(nil,nil,"GameFontNormalLarge")
+	private.PageNum = text
+	text:SetPoint("TOPLEFT", BrowsePrevPageButton, "TOPLEFT")
+	text:SetPoint("BOTTOMRIGHT", BrowseNextPageButton, "BOTTOMRIGHT")
+	text:SetFont(STANDARD_TEXT_FONT, 18, "OUTLINE")
+	text:SetShadowOffset(1,1)
 	table.insert(private.candy, text)
 end
 
@@ -441,22 +451,9 @@ function private.MyAuctionFrameUpdate()
 		BrowseSearchCountText:Hide()
 	end
 	
+	private.PageNum:SetText(AuctionFrameBrowse.page+1)
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
 	AucAdvanced.API.ListUpdate()
-end
-
-function private.GetPriceModels()
-	if not private.scanValueNames then private.scanValueNames = {} end
-	for i = 1, #private.scanValueNames do
-		private.scanValueNames[i] = nil
-	end
-
-	table.insert(private.scanValueNames,{"market", "Market value"})
-	local algoList = AucAdvanced.API.GetAlgorithms()
-	for pos, name in ipairs(algoList) do
-		table.insert(private.scanValueNames,{name, "Stats: "..name})
-	end
-	return private.scanValueNames
 end
 
 function private.SetupConfigGui(gui)
