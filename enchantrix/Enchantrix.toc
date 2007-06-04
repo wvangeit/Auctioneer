@@ -5,7 +5,7 @@
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos, !nLog, Auctioneer, auc-advanced
-## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal
+## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal, ProspectedLocal
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

@@ -136,6 +136,40 @@ const.StaticPrices = {
 	[25843] = 150000, -- Fel Iron Rod
 	[25844] = 185000, -- Adamantite Rod
 	[25845] = 450000, -- Eternium Rod
+	
+	[24186] =   50, 	-- COPPERPOWDER, vendor
+	[24188] =  125, 	-- TINPOWDER, vendor
+	[24190] =  400, 	-- IRONPOWDER, vendor
+	[24234] =  500, 	-- MITHRILPOWDER, vendor
+	[24235] =  800, 	-- THORIUMPOWDER, vendor
+	[24242] = 1500, 	-- FELIRONPOWDER, vendor
+	[24243] = 5000, 	-- ADAMANTITEPOWDER, auction
+
+	[818] =     2633, 	-- TIGERSEYE
+	[774] =     2000, 	-- MALACHITE
+	[1210] =    6076,	-- SHADOWGEM
+	[1705] =   14000, 	-- LESSERMOONSTONE
+	[1206] =   12100, 	-- MOSSAGATE
+	[3864] =   10000, 	-- CITRINE
+	[1529] =   20000, 	-- JADE
+	[7909] =   22500, 	-- AQUAMARINE
+	[7910] =   22500, 	-- STARRUBY
+	[12800] = 105000, 	-- AZEROTHIANDIAMOND
+	[12361] =  50000, 	-- BLUESAPPHIRE
+	[12799] =  50000, 	-- LARGEOPAL
+	[12364] = 100000, 	-- HUGEEMERALD
+	[23077] =  15000, 	-- BLOODGARNET
+	[21929] =  12666, 	-- FLAMESPESSARITE
+	[23112] =  16332, 	-- GOLDENDRAENITE
+	[23079] =  14000, 	-- DEEPPERIDOT
+	[23117] =  14000, 	-- AZUREMOONSTONE
+	[23107] =  15000, 	-- SHADOWDRAENITE
+	[23436] = 600000,	-- LIVINGRUBY
+	[23439] = 400000, 	-- NOBLETOPAZ
+	[23440] = 300000, 	-- DAWNSTONE
+	[23437] = 250000, 	-- TALASITE
+	[23438] = 541772, 	-- STAROFELUNE
+	[23441] = 480000, 	-- NIGHTSEYE
 
 }
 
@@ -412,7 +446,156 @@ const.RareArmorExceptionList = {
 }
 
 
+
+local COPPER_ORE = 2770
+local TIN_ORE = 2771
+local IRON_ORE = 2772
+local MITHRIL_ORE = 3858
+local THORIUM_ORE = 10620
+local FEL_IRON_ORE = 23424
+local ADAMANTITE_ORE = 23425
+
+local COPPERPOWDER = 24186
+local TINPOWDER = 24188
+local IRONPOWDER = 24190
+local MITHRILPOWDER = 24234
+local THORIUMPOWDER = 24235
+local FELIRONPOWDER = 24242
+local ADAMANTITEPOWDER = 24243
+
+local TIGERSEYE = 818
+local MALACHITE = 774
+local SHADOWGEM = 1210
+local LESSERMOONSTONE = 1705
+local MOSSAGATE = 1206
+local CITRINE = 3864
+local JADE = 1529
+local AQUAMARINE = 7909
+local STARRUBY = 7910
+local AZEROTHIANDIAMOND = 12800
+local BLUESAPPHIRE = 12361
+local LARGEOPAL = 12799
+local HUGEEMERALD = 12364
+local BLOODGARNET = 23077
+local FLAMESPESSARITE = 21929
+local GOLDENDRAENITE = 23112
+local DEEPPERIDOT = 23079
+local AZUREMOONSTONE = 23117
+local SHADOWDRAENITE = 23107
+local LIVINGRUBY = 23436
+local NOBLETOPAZ = 23439
+local DAWNSTONE = 23440
+local TALASITE = 23437
+local STAROFELUNE = 23438
+local NIGHTSEYE = 23441
+
+
+--[[
+	Prospectable ores
+	Current percentages from http://www.wowwiki.com/Prospecting
+]]
+
+const.ProspectMinLevels = {
+	[COPPER_ORE] = 20,
+	[TIN_ORE] = 50,
+	[IRON_ORE] = 125,
+	[MITHRIL_ORE] = 175,
+	[THORIUM_ORE] = 250,
+	[FEL_IRON_ORE] = 275,
+	[ADAMANTITE_ORE] = 325,
+}
+
+const.ProspectableItems = {
+
+	[COPPER_ORE] = {
+			[COPPERPOWDER] = 1.0,
+			[TIGERSEYE] = 0.5,
+			[MALACHITE] = 0.5,
+			[SHADOWGEM] = 0.1,
+			},
+	
+	[TIN_ORE] = {
+			[TINPOWDER] = 1.0,
+			[SHADOWGEM] = 0.375,
+			[LESSERMOONSTONE] = 0.375,
+			[MOSSAGATE] = 0.375,
+			[CITRINE] = 0.033,
+			[JADE] = 0.033,
+			[AQUAMARINE] = 0.033,
+			},
+	
+	[IRON_ORE] = {
+			[IRONPOWDER] = 1.0,
+			[CITRINE] = 0.30,
+			[LESSERMOONSTONE] = 0.30,
+			[JADE] = 0.30,
+			[AQUAMARINE] = 0.05,
+			[STARRUBY] = 0.05,
+			},
+	
+	[MITHRIL_ORE] = {
+			[MITHRILPOWDER] = 1.0,
+			[CITRINE] = 0.30,
+			[STARRUBY] = 0.30,
+			[AQUAMARINE] = 0.30,
+			[AZEROTHIANDIAMOND] = 0.025,
+			[BLUESAPPHIRE] = 0.025,
+			[LARGEOPAL] = 0.025,
+			[HUGEEMERALD] = 0.025,
+			},
+	
+	[THORIUM_ORE] = {
+			[THORIUMPOWDER] = 1.0,
+			[STARRUBY] = 0.30,
+			[LARGEOPAL] = 0.16,
+			[BLUESAPPHIRE] = 0.16,
+			[AZEROTHIANDIAMOND] = 0.16,
+			[HUGEEMERALD] = 0.16,
+			[BLOODGARNET] = 0.0167,
+			[FLAMESPESSARITE] = 0.0167,
+			[GOLDENDRAENITE] = 0.0167,
+			[DEEPPERIDOT] = 0.0167,
+			[AZUREMOONSTONE] = 0.0167,
+			[SHADOWDRAENITE] = 0.0167,
+			},
+	
+	[FEL_IRON_ORE] = {
+			[FELIRONPOWDER] = 1.0,
+			[BLOODGARNET] = 0.16,
+			[FLAMESPESSARITE] = 0.16,
+			[GOLDENDRAENITE] = 0.16,
+			[DEEPPERIDOT] = 0.16,
+			[AZUREMOONSTONE] = 0.16,
+			[SHADOWDRAENITE] = 0.16,
+			[LIVINGRUBY] = 0.083,
+			[NOBLETOPAZ] = 0.083,
+			[DAWNSTONE] = 0.083,
+			[TALASITE] = 0.083,
+			[STAROFELUNE] = 0.083,
+			[NIGHTSEYE] = 0.083,
+			},
+	
+	[ADAMANTITE_ORE] = {
+			[ADAMANTITEPOWDER] = 1.0,
+			[BLOODGARNET] = 0.19,
+			[FLAMESPESSARITE] = 0.19,
+			[GOLDENDRAENITE] = 0.19,
+			[DEEPPERIDOT] = 0.19,
+			[AZUREMOONSTONE] = 0.19,
+			[SHADOWDRAENITE] = 0.19,
+			[LIVINGRUBY] = 0.025,
+			[NOBLETOPAZ] = 0.025,
+			[DAWNSTONE] = 0.025,
+			[TALASITE] = 0.025,
+			[STAROFELUNE] = 0.025,
+			[NIGHTSEYE] = 0.025,
+			},
+}
+
+
 -- needed because GetItemInfo fails when items are not in the cache
+-- TODO - ccox - find a more compact representation for this table
+-- 		serialization?  lots of separators we can't use here... how about "#@$!"?
 const.BackupReagentItemInfo = {
 	[10939] = {
 		"Greater Magic Essence", -- [1]
@@ -773,5 +956,341 @@ const.BackupReagentItemInfo = {
 		20, -- [8]
 		"", -- [9]
 		"Interface\\Icons\\INV_Enchant_DustIllusion", -- [10]
+	},
+	[12799] = {
+		"Large Opal", -- [1]
+		"|cff1eff00|Hitem:12799:0:0:0:0:0:0:0|h[Large Opal]|h|r", -- [2]
+		2, -- [3]
+		55, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Opal_01", -- [10]
+	},
+	[1210] = {
+		"Shadowgem", -- [1]
+		"|cff1eff00|Hitem:1210:0:0:0:0:0:0:0|h[Shadowgem]|h|r", -- [2]
+		2, -- [3]
+		20, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Amethyst_01", -- [10]
+	},
+	[3864] = {
+		"Citrine", -- [1]
+		"|cff1eff00|Hitem:3864:0:0:0:0:0:0:0|h[Citrine]|h|r", -- [2]
+		2, -- [3]
+		40, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Opal_02", -- [10]
+	},
+	[1206] = {
+		"Moss Agate", -- [1]
+		"|cff1eff00|Hitem:1206:0:0:0:0:0:0:0|h[Moss Agate]|h|r", -- [2]
+		2, -- [3]
+		25, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Emerald_02", -- [10]
+	},
+	[818] = {
+		"Tigerseye", -- [1]
+		"|cff1eff00|Hitem:818:0:0:0:0:0:0:0|h[Tigerseye]|h|r", -- [2]
+		2, -- [3]
+		15, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Opal_03", -- [10]
+	},
+	[24243] = {
+		"Adamantite Powder", -- [1]
+		"|cffffffff|Hitem:24243:0:0:0:0:0:0:0|h[Adamantite Powder]|h|r", -- [2]
+		1, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Powder_Adamantite", -- [10]
+	},
+	[7909] = {
+		"Aquamarine", -- [1]
+		"|cff1eff00|Hitem:7909:0:0:0:0:0:0:0|h[Aquamarine]|h|r", -- [2]
+		2, -- [3]
+		45, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Crystal_02", -- [10]
+	},
+	[1529] = {
+		"Jade", -- [1]
+		"|cff1eff00|Hitem:1529:0:0:0:0:0:0:0|h[Jade]|h|r", -- [2]
+		2, -- [3]
+		35, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Stone_01", -- [10]
+	},
+	[23112] = {
+		"Golden Draenite", -- [1]
+		"|cff1eff00|Hitem:23112:0:0:0:0:0:0:0|h[Golden Draenite]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Yellow", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_GoldenDraenite_03", -- [10]
+	},
+	[23079] = {
+		"Deep Peridot", -- [1]
+		"|cff1eff00|Hitem:23079:0:0:0:0:0:0:0|h[Deep Peridot]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Green", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_DeepPeridot_03", -- [10]
+	},
+	[23441] = {
+		"Nightseye", -- [1]
+		"|cff0070dd|Hitem:23441:0:0:0:0:0:0:0|h[Nightseye]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Purple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_Nightseye_02", -- [10]
+	},
+	[24186] = {
+		"Copper Powder", -- [1]
+		"|cff9d9d9d|Hitem:24186:0:0:0:0:0:0:0|h[Copper Powder]|h|r", -- [2]
+		0, -- [3]
+		10, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Powder_Copper", -- [10]
+	},
+	[23117] = {
+		"Azure Moonstone", -- [1]
+		"|cff1eff00|Hitem:23117:0:0:0:0:0:0:0|h[Azure Moonstone]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Blue", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_AzureDraenite_03", -- [10]
+	},
+	[24188] = {
+		"Tin Powder", -- [1]
+		"|cff9d9d9d|Hitem:24188:0:0:0:0:0:0:0|h[Tin Powder]|h|r", -- [2]
+		0, -- [3]
+		10, -- [4]
+		0, -- [5]
+		"Trade Goods", -- [6]
+		"Trade Goods", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Powder_Tin", -- [10]
+	},
+	[1705] = {
+		"Lesser Moonstone", -- [1]
+		"|cff1eff00|Hitem:1705:0:0:0:0:0:0:0|h[Lesser Moonstone]|h|r", -- [2]
+		2, -- [3]
+		30, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Crystal_01", -- [10]
+	},
+	[23077] = {
+		"Blood Garnet", -- [1]
+		"|cff1eff00|Hitem:23077:0:0:0:0:0:0:0|h[Blood Garnet]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Red", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_BloodGem_03", -- [10]
+	},
+	[23436] = {
+		"Living Ruby", -- [1]
+		"|cff0070dd|Hitem:23436:0:0:0:0:0:0:0|h[Living Ruby]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Red", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_LivingRuby_02", -- [10]
+	},
+	[23437] = {
+		"Talasite", -- [1]
+		"|cff0070dd|Hitem:23437:0:0:0:0:0:0:0|h[Talasite]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Green", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_Talasite_02", -- [10]
+	},
+	[23438] = {
+		"Star of Elune", -- [1]
+		"|cff0070dd|Hitem:23438:0:0:0:0:0:0:0|h[Star of Elune]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Blue", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_StarOfElune_02", -- [10]
+	},
+	[23439] = {
+		"Noble Topaz", -- [1]
+		"|cff0070dd|Hitem:23439:0:0:0:0:0:0:0|h[Noble Topaz]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Orange", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_NobleTopaz_02", -- [10]
+	},
+	[23440] = {
+		"Dawnstone", -- [1]
+		"|cff0070dd|Hitem:23440:0:0:0:0:0:0:0|h[Dawnstone]|h|r", -- [2]
+		3, -- [3]
+		70, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Yellow", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Jewelcrafting_Dawnstone_02", -- [10]
+	},
+	[21929] = {
+		"Flame Spessarite", -- [1]
+		"|cff1eff00|Hitem:21929:0:0:0:0:0:0:0|h[Flame Spessarite]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Orange", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_FlameSpessarite_03", -- [10]
+	},
+	[23107] = {
+		"Shadow Draenite", -- [1]
+		"|cff1eff00|Hitem:23107:0:0:0:0:0:0:0|h[Shadow Draenite]|h|r", -- [2]
+		2, -- [3]
+		65, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Purple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_EbonDraenite_03", -- [10]
+	},
+	[774] = {
+		"Malachite", -- [1]
+		"|cff1eff00|Hitem:774:0:0:0:0:0:0:0|h[Malachite]|h|r", -- [2]
+		2, -- [3]
+		7, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Emerald_03", -- [10]
+	},
+	[7910] = {
+		"Star Ruby", -- [1]
+		"|cff1eff00|Hitem:7910:0:0:0:0:0:0:0|h[Star Ruby]|h|r", -- [2]
+		2, -- [3]
+		50, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Ruby_02", -- [10]
+	},
+	[12361] = {
+		"Blue Sapphire", -- [1]
+		"|cff1eff00|Hitem:12361:0:0:0:0:0:0:0|h[Blue Sapphire]|h|r", -- [2]
+		2, -- [3]
+		55, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Sapphire_02", -- [10]
+	},
+	[12364] = {
+		"Huge Emerald", -- [1]
+		"|cff1eff00|Hitem:12364:0:0:0:0:0:0:0|h[Huge Emerald]|h|r", -- [2]
+		2, -- [3]
+		60, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Emerald_01", -- [10]
+	},
+	[12800] = {
+		"Azerothian Diamond", -- [1]
+		"|cff1eff00|Hitem:12800:0:0:0:0:0:0:0|h[Azerothian Diamond]|h|r", -- [2]
+		2, -- [3]
+		60, -- [4]
+		0, -- [5]
+		"Gem", -- [6]
+		"Simple", -- [7]
+		20, -- [8]
+		"", -- [9]
+		"Interface\\Icons\\INV_Misc_Gem_Diamond_01", -- [10]
 	},
 }

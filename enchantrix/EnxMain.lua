@@ -43,7 +43,7 @@ local onEvent
 
 Enchantrix.Version = "<%version%>"
 if (Enchantrix.Version == "<".."%version%>") then
-	Enchantrix.Version = "3.9.DEV"
+	Enchantrix.Version = "4.0.DEV"
 end
 
 local DisenchantEvent = {}
@@ -243,9 +243,10 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		-- NOTE: we do get the spell name here
 		DisenchantEvent.finished = nil
-		if spell == _ENCH('ArgSpellname') then
+		if (spell == _ENCH('ArgSpellname')) or (spell == "Prospecting") then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
+				DisenchantEvent.spellname = spell;
 			end
 		end
 		DisenchantEvent.sent = nil
@@ -258,7 +259,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 			and DisenchantEvent.spellTarget
 			and GetTime() - DisenchantEvent.targetted < 5) then
 			-- first, make sure that we think this item is disenchantable to start with (reduce false positives)
-			if (Enchantrix.Util.GetIType(DisenchantEvent.spellTarget)) then
+			if ( (DisenchantEvent.spellname == _ENCH('ArgSpellname'))
+				and Enchantrix.Util.GetIType(DisenchantEvent.spellTarget) ) then
 				-- this means that the item is not disenchantable, but we think it is!
 				-- now make sure the user had enough skill to disenchant it
 				-- make sure skill level is up to date
@@ -302,8 +304,18 @@ function onEvent(funcVars, event, player, spell, rank, target)
 		end
 	elseif event == "LOOT_OPENED" then
 		if DisenchantEvent.finished then
-			Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
+			local isDisenchant = nil
+			if (DisenchantEvent.spellname == _ENCH('ArgSpellname')) then
+				Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
+				isDisenchant = true;
+-- TODO - need localized string for Prospecting
+			elseif (DisenchantEvent.spellname == "Prospecting") then
+-- TODO - need localized string for "prospects into"
+				Enchantrix.Util.ChatPrint( ("Found that %s prospects into:"):format(DisenchantEvent.finished))
+				isDisenchant = nil;
+			end
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)
+			local reagentList = {}
 			for i = 1, GetNumLootItems(), 1 do
 				if LootSlotIsItem(i) then
 					local icon, name, quantity, rarity = GetLootSlotInfo(i)
@@ -312,9 +324,18 @@ function onEvent(funcVars, event, player, spell, rank, target)
 					-- Save result
 					local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
 					if reagentID then
-						Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)
+						-- for prospecting, we need to save the whole list
+						reagentList[ reagentID ] = quantity;
+						if (isDisenchant) then
+							-- disenchant only yields one item, so we can pass it in one at a time
+							Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)
+						end
 					end
 				end
+			end
+
+			if (not isDisenchant)  then
+				Enchantrix.Storage.SaveProspect(sig, reagentList)
 			end
 		end
 		DisenchantEvent.spellTarget = nil

@@ -120,6 +120,8 @@ local settingDefaults = {
 	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
 	['TooltipShowDisenchantMats'] = true,	-- should the item tooltip show what it disenchants into? (for those who are just greedy)
 	
+	['TooltipShowProspecting'] = false,		-- should the tooltip show any prospecting data?
+	
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 	
 	['maxBuyoutPrice'] = 800000,
@@ -399,6 +401,9 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 -- TODO: this control is for debugging only
 	gui.AddControl(id, "Checkbox",   0, 1, "DisenchantUsingBaseTableOnly", "Use base table only for disenchant info - DEBUGGING")
+
+-- TODO - need localized string!
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", "Show Prospecting data for ores - TEST" )
 
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)

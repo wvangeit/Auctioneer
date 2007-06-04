@@ -43,6 +43,7 @@ local getItemDisenchantFromTable	-- Enchantrix.Storage.GetItemDisenchantFromTabl
 local saveDisenchant				-- Enchantrix.Storage.SaveDisenchant()
 local addonLoaded					-- Enchantrix.Storage.AddonLoaded()
 local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
+local getItemProspects				-- Enchantrix.Storage.GetItemProspects()
 
 -- Local functions
 local unserialize
@@ -170,6 +171,35 @@ function saveDisenchant(sig, reagentID, count)
 	if itype then
 		EnchantedItemTypes[itype] = mergeDisenchant(EnchantedItemTypes[itype], disenchant)
 	end
+end
+
+
+
+-- for this, we need to pass in a list of reagents
+function saveProspect(sig, reagentList )
+	-- Update tables after a prospect has been detected
+	assert(type(sig) == "string");
+	
+	local id = Enchantrix.Util.GetItemIdFromSig(sig)
+	if (not ProspectedLocal[id]) then
+		ProspectedLocal[id] = {}
+		ProspectedLocal[id].total = 0;
+	end
+	
+	ProspectedLocal[id].total = ProspectedLocal[id].total + 1;
+	for reagentID, quantity in pairs( reagentList ) do
+		if (not ProspectedLocal[id][reagentID]) then
+			ProspectedLocal[id][reagentID] = 0;
+		end
+		ProspectedLocal[id][reagentID] = ProspectedLocal[id][reagentID] + quantity;
+	end
+
+end
+
+-- this will return nil for anything that is not prospectable
+function getItemProspects(link)
+	local itemID = EnhTooltip.BreakLink(link);
+	return Enchantrix.Constants.ProspectableItems[ itemID ];
 end
 
 
@@ -493,6 +523,7 @@ function addonLoaded()
 	if not EnchantedItemTypes then EnchantedItemTypes = {} end
 	if not NonDisenchantables then NonDisenchantables = {} end
 	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
+	if not ProspectedLocal then ProspectedLocal = {} end
 	
 	mergeDisenchantLists()
 end
@@ -508,6 +539,9 @@ Enchantrix.Storage = {
 	GetItemDisenchantFromTable = getItemDisenchantFromTable,
 	SaveDisenchant = saveDisenchant,
 	SaveNonDisenchantable = saveNonDisenchantable,
+	
+	SaveProspect = saveProspect,
+	GetItemProspects = getItemProspects,
 }
 
 -- Make all globals local to this file

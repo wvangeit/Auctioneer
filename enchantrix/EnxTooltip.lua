@@ -122,14 +122,138 @@ tooltipFormat = {
 }
 
 
-function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
+	
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
+	
+	local lines
 
+	local totalFive = {}
+	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
+	local totalNumber, totalQuantity
+	
+	for result, resYield in pairs( prospect ) do
+		if (not lines) then lines = {} end
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
+		local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield
+		totalHSP = totalHSP + resHSP
+		totalMed = totalMed + resMed
+		totalMkt = totalMkt + resMkt
+		totalFive = totalFive + resFive
+
+		-- Probabilities
+		local prob = tostring( resYield * 100 )
+		tooltipFormat:SetPattern("$prob", prob)
+		tooltipFormat:SetPattern("$conf", prob)
+
+		-- Name and quality
+		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
+		local _, _, _, color = GetItemQualityColor(rQuality or 0)
+		tooltipFormat:SetPattern("|q", color or "|cffcccc33")
+		if (not rName) then rName = "item:"..result; end
+		tooltipFormat:SetPattern("$name", rName)
+
+		-- Rate is always unity here (not really 1, but handled in the probability)
+		tooltipFormat:SetPattern("$rate", "")
+
+		-- Store this line and sort key
+		local line = tooltipFormat:GetString(false)	-- no counts here
+		table.insert(lines,  {str = line, sort = resYield})
+	end
+	
+	
+	-- multiply values by the number of items in this stack
+	local groups = math.floor( count / 5 );
+	totalHSP = totalHSP * groups;
+	totalMed = totalMed * groups;
+	totalMkt = totalMkt * groups;
+	totalFive = totalFive * groups;
+
+	-- Terse mode
+	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
+		return
+	end
+
+	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
+		-- Header
+		local totalText = ""
+-- TODO -- need string for Prospects into
+		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
+		EnhTooltip.LineColor(0.8,0.8,0.2);
+		-- Sort in order of decreasing probability before adding to tooltip
+		table.sort(lines, function(a, b) return a.sort > b.sort end)
+		for n, line in ipairs(lines) do
+			EnhTooltip.AddLine(line.str, nil, embed)
+			EnhTooltip.LineColor(0.8, 0.8, 0.2);
+			if n >= 12 then break end -- Don't add more than 12 lines
+		end
+	end
+	
+	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantLevel')) then
+		local reqSkill = Enchantrix.Util.JewelCraftSkillRequiredForItem(link);
+		local userSkill = Enchantrix.Util.GetUserJewelCraftingSkill();
+-- TODO - need localized string "requires Jewel Crafting skill %d"
+		local deText = format(_ENCH("TooltipShowDisenchantLevel"), reqSkill );
+		EnhTooltip.AddLine(deText, nil, embed);
+		if (userSkill < reqSkill) then
+			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
+		else
+			EnhTooltip.LineColor(0.1,0.8,0.1);		-- greenish
+		end
+	end
+
+	if (Enchantrix.Settings.GetSetting('TooltipShowValues')) then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
+		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
+		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
+		if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+			EnhTooltip.LineColor(0.1,0.6,0.6);
+		end
+	end
+
+end
+
+
+function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+
+	-- first, see if this is a prospectable item (short list)
+	local prospect = Enchantrix.Storage.GetItemProspects(link)
+	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then
+		prospectTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
+		return
+	end
+
+	-- then see if it's disenchantable
 	local data = Enchantrix.Storage.GetItemDisenchants(link)
 	if not data then
 		-- error message would have been printed inside GetItemDisenchants
 		return
 	end
+
+	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
 	local lines
 

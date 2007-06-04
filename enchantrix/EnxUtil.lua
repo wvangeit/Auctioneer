@@ -645,6 +645,15 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 end
 
 
+function Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
+	local item = getItemIdFromLink(link);
+	local minLevel = Enchantrix.Constants.ProspectMinLevels[item];
+	if (not minLevel) then
+		Enchantrix.Util.DebugPrintQuick("Failed to get min level for prospect item", link, item );
+	end
+	return minLevel;
+end
+
 function Enchantrix.Util.DisenchantSkillRequiredForItem(link)
 	local _, _, quality, itemLevel = GetItemInfo(link);
 	return  Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel, quality);
@@ -653,6 +662,7 @@ end
 
 -- NOTE: this is sort of an expensive function, so don't call it often
 -- I've tried to make it friendlier by caching the value and only checking every 5 seconds
+-- TODO - can these 2 functions be merged?
 
 function Enchantrix.Util.GetUserEnchantingSkill()
 	local MyExpandedHeaders = {}
@@ -705,6 +715,60 @@ function Enchantrix.Util.GetUserEnchantingSkill()
 	end
 
 	return Enchantrix.EnchantingSkill
+end
+
+function Enchantrix.Util.GetUserJewelCraftingSkill()
+	local MyExpandedHeaders = {}
+	local i, j
+	
+	-- the user can't have increased their skill too much in 5 seconds
+	if (Enchantrix.JewelCraftingSkill
+		and Enchantrix.JewelCraftingSkillTimeStamp
+		and GetTime() - Enchantrix.JewelCraftingSkillTimeStamp < 5) then
+		return Enchantrix.JewelCraftingSkill
+	end
+	
+	-- just in case the user doesn't have jewelcrafting
+	Enchantrix.JewelCraftingSkill = 0;
+	
+	-- search the skill tree for Mying skills
+	for i=0, GetNumSkillLines(), 1 do
+		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
+	
+		-- expand the header if necessary
+		if ( header and not isExpanded ) then
+			MyExpandedHeaders[i] = skillName
+		end
+	end
+	
+	ExpandSkillHeader(0)
+	for i=1, GetNumSkillLines(), 1 do
+		local skillName, header, _, skillRank = GetSkillLineInfo(i)
+		-- check for the skill name
+		if (skillName and not header) then
+-- TODO - need localized string
+			if (skillName == "Jewelcrafting") then
+				-- save this in a global for caching, and the auction filters
+				Enchantrix.JewelCraftingSkill = skillRank
+				Enchantrix.JewelCraftingSkillTimeStamp = GetTime()
+				-- no need to look at the rest of the skills
+				break
+			end
+		end
+	end
+	
+	-- close headers expanded during search process
+	for i=0, GetNumSkillLines() do
+		local skillName, header, isExpanded = GetSkillLineInfo(i)
+		for j in pairs(MyExpandedHeaders) do
+			if ( header and skillName == MyExpandedHeaders[j] ) then
+				CollapseSkillHeader(i)
+				MyExpandedHeaders[j] = nil
+			end
+		end
+	end
+
+	return Enchantrix.JewelCraftingSkill
 end
 
 
