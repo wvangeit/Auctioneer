@@ -236,6 +236,13 @@ local function setter(setting, value)
 		db[setting] = value
 	end
 
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("configchanged")
+			end
+		end
+	end
 end
 
 function lib.SetSetting(...)

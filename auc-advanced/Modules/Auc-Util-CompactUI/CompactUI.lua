@@ -63,6 +63,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "auctionui") then
 		private.HookAH(...)
+	elseif (callbackType == "configchanged") then
+		private.MyAuctionFrameUpdate()
 	end
 end
 
@@ -70,12 +72,14 @@ function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.compactui.activated", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
+	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
 end
 
 --[[ Local functions ]]--
 private.buttons = {}
 function private.HookAH()
 	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
+		private.MyAuctionFrameUpdate = function() end
 		return
 	end
 
@@ -331,8 +335,14 @@ function private.SetAuction(button, id)
 	if (not count or count < 1) then count = 1 end
 
 	local requiredBid = minBid
+	local showBid = minBid
 	if ( bidAmount > 0 ) then
 		requiredBid = bidAmount + minIncrement
+		if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
+			showBid = requiredBid
+		else
+			showBid = bidAmount
+		end
 	end
 
 	if ( requiredBid >= MAXIMUM_BID_PRICE ) then
@@ -380,7 +390,7 @@ function private.SetAuction(button, id)
 	button.iLevel:SetText(itemLevel or level)
 	button.tLeft:SetText(timeLeft)
 	button.Owner:SetText(owner)
-	button.Bid:SetMoney(requiredBid/perUnit, requiredBid ~= minBid, highBidder)
+	button.Bid:SetMoney(showBid/perUnit, requiredBid ~= minBid, highBidder)
 	button.Buy:SetMoney(buyoutPrice/perUnit)
 	button:Show()
 end
@@ -463,5 +473,6 @@ function private.SetupConfigGui(gui)
 	gui.AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
 	gui.AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. For this reason, it is disabled by default. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading you interface.\nThankyou.")
 	gui.AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when zero")
+	gui.AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show required bid instead of current bid value")
 end
 
