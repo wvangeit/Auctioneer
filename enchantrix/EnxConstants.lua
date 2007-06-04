@@ -137,13 +137,13 @@ const.StaticPrices = {
 	[25844] = 185000, -- Adamantite Rod
 	[25845] = 450000, -- Eternium Rod
 	
-	[24186] =   50, 	-- COPPERPOWDER, vendor
-	[24188] =  125, 	-- TINPOWDER, vendor
-	[24190] =  400, 	-- IRONPOWDER, vendor
-	[24234] =  500, 	-- MITHRILPOWDER, vendor
-	[24235] =  800, 	-- THORIUMPOWDER, vendor
-	[24242] = 1500, 	-- FELIRONPOWDER, vendor
-	[24243] = 5000, 	-- ADAMANTITEPOWDER, auction
+	[24186] =     50, 	-- COPPERPOWDER, vendor
+	[24188] =    125, 	-- TINPOWDER, vendor
+	[24190] =    400, 	-- IRONPOWDER, vendor
+	[24234] =    500, 	-- MITHRILPOWDER, vendor
+	[24235] =    800, 	-- THORIUMPOWDER, vendor
+	[24242] =   1500, 	-- FELIRONPOWDER, vendor
+	[24243] =   5000, 	-- ADAMANTITEPOWDER, auction
 
 	[818] =     2633, 	-- TIGERSEYE
 	[774] =     2000, 	-- MALACHITE
@@ -590,6 +590,16 @@ const.ProspectableItems = {
 			[STAROFELUNE] = 0.025,
 			[NIGHTSEYE] = 0.025,
 			},
+}
+
+-- reagents that have no use, sell to vendor, and thus get vendor prices
+const.VendorTrash =  {
+	[COPPERPOWDER] = true,
+	[TINPOWDER] = true,
+	[IRONPOWDER] = true,
+	[MITHRILPOWDER] = true,
+	[THORIUMPOWDER] = true,
+	[FELIRONPOWDER] = true,
 }
 
 

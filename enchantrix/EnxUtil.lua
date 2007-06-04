@@ -219,17 +219,25 @@ function getReagentPrice(reagentID, extra)
 
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
-	if AucAdvanced then
-		if extra then
-			price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentID)
-		else
-			price5 = AucAdvanced.API.GetMarketValue(reagentID)
+	if ( Enchantrix.Constants.VendorTrash[reagentID] ) then
+		-- it's trash, so we'll just use the vendor price
+		hsp = market;
+		median = market;
+		price5 = market;
+	else
+		-- not trash, lookup the auction price
+		if AucAdvanced then
+			if extra then
+				price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentID)
+			else
+				price5 = AucAdvanced.API.GetMarketValue(reagentID)
+			end
+		elseif Enchantrix.State.Auctioneer_Loaded then
+			local itemKey = ("%d:0:0"):format(reagentID);
+			local realm = Auctioneer.Util.GetAuctionKey()
+			hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
+			median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
 		end
-	elseif Enchantrix.State.Auctioneer_Loaded then
-		local itemKey = ("%d:0:0"):format(reagentID);
-		local realm = Auctioneer.Util.GetAuctionKey()
-		hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
-		median = Auctioneer.Statistic.GetUsableMedian(itemKey, realm)
 	end
 
 	if not EnchantConfig.cache then EnchantConfig.cache = {} end
