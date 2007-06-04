@@ -64,7 +64,9 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "auctionui") then
 		private.HookAH(...)
 	elseif (callbackType == "configchanged") then
-		private.MyAuctionFrameUpdate()
+		if (private.Active) then
+			private.MyAuctionFrameUpdate()
+		end
 	end
 end
 
@@ -247,6 +249,8 @@ function private.HookAH()
 	text:SetFont(STANDARD_TEXT_FONT, 18, "OUTLINE")
 	text:SetShadowOffset(1,1)
 	table.insert(private.candy, text)
+
+	private.Active = true
 end
 
 function private.SetMoney(me, value, hasBid, highBidder)
