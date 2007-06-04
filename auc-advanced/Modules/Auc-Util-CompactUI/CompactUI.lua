@@ -110,18 +110,9 @@ function private.HookAH()
 		button:SetWidth(610)
 		button:SetHeight(19)
 		button:EnableMouse(true)
-		if (i % 2 == 0) then
-			line = button:CreateTexture()
-			line:SetTexture(0.5,0.5,1, 0.1)
-			line:SetPoint("TOPLEFT", 0,-1)
-			line:SetPoint("BOTTOMRIGHT")
-		else
-			line = button:CreateTexture()
-			line:SetTexture(0,0,0.5, 0.1)
-			line:SetPoint("TOPLEFT", 0,-1)
-			line:SetPoint("BOTTOMRIGHT")
-		end
-		button.LineTexture = line
+		button.LineTexture = button:CreateTexture()
+		button.LineTexture:SetPoint("TOPLEFT", 0,-1)
+		button.LineTexture:SetPoint("BOTTOMRIGHT")
 		button.AddTexture = button:CreateTexture()
 		button.AddTexture:SetPoint("TOPLEFT", 0,-1)
 		button.AddTexture:SetPoint("BOTTOMRIGHT")
@@ -196,28 +187,27 @@ function private.HookAH()
 	NUM_BROWSE_TO_DISPLAY = NEW_NUM_BROWSE
 
 	local tex
-	
 	private.candy = {}
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(1,1,1, 0.1)
+	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].rLevel, "TOPLEFT")
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].rLevel, "BOTTOMRIGHT")
 	table.insert(private.candy, tex)
 	
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(1,1,1, 0.1)
+	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].tLeft, "TOPLEFT")
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].tLeft, "BOTTOMRIGHT")
 	table.insert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(1,1,1, 0.1)
+	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].Owner, "TOPRIGHT", 2, 0)
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].Buy, "BOTTOMRIGHT", -10, 0)
 	table.insert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
-	tex:SetTexture(1,1,0.5, 0.2)
+	tex:SetTexture(1,1,0.5, 0.1)
 	tex:SetPoint("TOPLEFT", private.buttons[NEW_NUM_BROWSE].Count, "BOTTOMLEFT", 0, -1)
 	tex:SetWidth(610)
 	tex:SetHeight(38)
@@ -319,11 +309,11 @@ function private.SetAuction(button, id)
 
 	local selected = GetSelectedAuctionItem("list") or 0
 	if (selected == id) then
-		button.LineTexture:SetTexture(1,1,0.5, 0.33)
+		button.LineTexture:SetTexture(1,1,0.3, 0.2)
 	elseif (id % 2 == 0) then
-		button.LineTexture:SetTexture(0.5,0.5,1, 0.1)
+		button.LineTexture:SetTexture(0.3,0.3,0.4, 0.1)
 	else
-		button.LineTexture:SetTexture(0,0,0.5, 0.1)
+		button.LineTexture:SetTexture(0,0,0.1, 0.1)
 	end
 	button.id = id
 	

@@ -75,6 +75,9 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	if not additional or additional[0] ~= "AuctionPrices" then return end
 	local buyPrice, bidPrice = additional[1], additional[3]
 
+	local showPerUnit = AucAdvanced.Settings.GetSetting("util.pricelevel.single")
+	if not showPerUnit then return end
+	
 	local priceLevel, perItem, r,g,b = private.CalcLevel(hyperlink, quantity, bidPrice, buyPrice)
 	if (not priceLevel) then return end
 
@@ -83,13 +86,16 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 end
 
 function lib.OnLoad()
-	AucAdvanced.Settings.SetDefault("util.pricelevel.colorize", true)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.colorize", false)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.single", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.model", "market")
-	AucAdvanced.Settings.SetDefault("util.pricelevel.basis", "buy")
+	AucAdvanced.Settings.SetDefault("util.pricelevel.basis", "try")
 	AucAdvanced.Settings.SetDefault("util.pricelevel.yellow", 95)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.orange", 115)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.red", 130)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.opacity", 33)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.gradient", true)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.direction", "LEFT")
 end
 
 --[[ Local functions ]]--
@@ -112,8 +118,16 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui.AddTab(libName)
 	gui.AddControl(id, "Header",     0,    libName.." options")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show unit price of stacked item in the tooltip")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House")
+	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show price level and unit price in the tooltips?")
+	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House?")
+	gui.AddControl(id, "Slider",     0, 2, "util.pricelevel.opacity", 1, 100, 1, "Opacity level: %d%%")
+	gui.AddControl(id, "Checkbox",   0, 2, "util.pricelevel.gradient", "Use a gradient:")
+	gui.AddControl(id, "Selectbox",  0, 3, {
+		{"LEFT", "Left"},
+		{"RIGHT", "Right"},
+		{"TOP", "Top"},
+		{"BOTTOM", "Bottom"},
+	}, "util.pricelevel.direction", "Pick the gradient direction")
 	gui.AddControl(id, "Subhead",    0,    "Price valuation method:")
 	gui.AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
 	gui.AddControl(id, "Subhead",    0,    "Price level basis:")
@@ -139,6 +153,8 @@ end
 function private.SetBar(i, r,g,b, pct)
 	local tex
 	local button = getglobal("BrowseButton"..i)
+	local colorize = AucAdvanced.Settings.GetSetting("util.pricelevel.colorize")
+		
 	if (button.AddTexture) then
 		tex = button.AddTexture
 		if (button.Value) then
@@ -148,15 +164,24 @@ function private.SetBar(i, r,g,b, pct)
 				else
 					button.Value:SetText(("%d%%"):format(pct))
 				end
-				button.Value:SetTextColor(r,g,b)
+				if colorize then
+					button.Value:SetTextColor(1,1,1)
+				else
+					button.Value:SetTextColor(r,g,b)
+				end
 			else
 				button.Value:SetText("")
 				button.Value:SetTextColor(1,1,1)
 			end
 		end
+		if not colorize then
+			tex:Hide()
+		end
 	else
 		tex = getglobal("BrowseButton"..i.."PriceLevel")
 	end
+	if not colorize then return end
+
 	if not tex then
 		tex = button:CreateTexture("BrowseButton"..i.."PriceLevel")
 		tex:SetPoint("TOPLEFT")
@@ -164,8 +189,27 @@ function private.SetBar(i, r,g,b, pct)
 	end
 
 	if (r and g and b) then
-		tex:SetTexture(1,1,1, 0.33)
-		tex:SetGradientAlpha("Horizontal", r,g,b, 0, r,g,b, 0.8)
+		local opacity = AucAdvanced.Settings.GetSetting("util.pricelevel.opacity")
+		opacity = math.floor(tonumber(opacity) or 50) / 100
+		if (opacity < 0) then opacity = 0.01
+		elseif (opacity > 1) then opacity = 1 end
+
+		local gradient = AucAdvanced.Settings.GetSetting("util.pricelevel.gradient")
+		tex:SetTexture(1,1,1)
+		if (gradient) then
+			local direction = AucAdvanced.Settings.GetSetting("util.pricelevel.direction")
+			if (direction == "LEFT") then
+				tex:SetGradientAlpha("Horizontal", r,g,b, 0, r,g,b, opacity)
+			elseif (direction == "RIGHT") then
+				tex:SetGradientAlpha("Horizontal", r,g,b, opacity, r,g,b, 0)
+			elseif (direction == "BOTTOM") then
+				tex:SetGradientAlpha("Vertical", r,g,b, 0, r,g,b, opacity)
+			elseif (direction == "TOP") then
+				tex:SetGradientAlpha("Vertical", r,g,b, opacity, r,g,b, 0)
+			end
+		else
+			tex:SetGradientAlpha("Vertical", r,g,b, opacity, r,g,b, opacity)
+		end
 		tex:Show()
 	else
 		tex:Hide()
@@ -174,8 +218,6 @@ end
 
 function private.ListUpdate()
 	private.ResetBars()
-	if not AucAdvanced.Settings.GetSetting("util.pricelevel.colorize") then return end
-
 	local index, link, quantity, minBid, minInc, buyPrice, bidPrice, priceLevel, perItem, r,g,b, _
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
@@ -196,9 +238,6 @@ end
 function private.CalcLevel(link, quantity, bidPrice, buyPrice)
 	if not quantity or quantity < 1 then quantity = 1 end
 
-	local showPerUnit = AucAdvanced.Settings.GetSetting("util.pricelevel.single")
-	if not showPerUnit then return end
-	
 	local priceModel = AucAdvanced.Settings.GetSetting("util.pricelevel.model")
 	local priceBasis = AucAdvanced.Settings.GetSetting("util.pricelevel.basis")
 	local itemWorth
