@@ -112,8 +112,8 @@ end
 
 function lib.GetPrice(hyperlink, faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
+	if (factor ~= 0) then property = property.."x"..factor end
 
 	if not faction then faction = AucAdvanced.GetFaction() end
 	
