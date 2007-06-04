@@ -82,6 +82,19 @@ function isDisenchantable(id)
 	return false
 end
 
+
+-- keep these abstracted in case they need more complex serialization
+local function serializeItemInfo(...)
+	local str = strjoin("#", ...);
+	return str;
+end
+
+local function deserializeItemInfo(str)
+	assert(type(str) == "string")
+	return strsplit("#", str);
+end
+
+
 -- Frontend to GetItemInfo()
 -- Information for disenchant reagents are kept in a saved variable cache
 function getReagentInfo(reagentID)
@@ -89,14 +102,14 @@ function getReagentInfo(reagentID)
 	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
 	if (not EnchantConfig.cache.names) then EnchantConfig.cache.names = {} end
 	
-	if (not EnchantConfig.cache.reagentItemInfo) then
-		EnchantConfig.cache.reagentItemInfo = {}
+	if (not EnchantConfig.cache.reagentItemInfoBackup) then
+		EnchantConfig.cache.reagentItemInfoBackup = {}
 		-- copy in the default cache data (English only)
 		-- the localizations will get updated as the items come into the user's cache
-		EnchantConfig.cache.reagentItemInfo = Enchantrix.Constants.BackupReagentItemInfo;
+		EnchantConfig.cache.reagentItemInfoBackup = Enchantrix.Constants.BackupReagentItemInfo;
 		end
 	
-	local cache = EnchantConfig.cache.reagentItemInfo
+	local cache = EnchantConfig.cache.reagentItemInfoBackup
 	
 	local id = reagentID;
 	
@@ -119,7 +132,7 @@ function getReagentInfo(reagentID)
 	if (id and sName) then
 		-- save this reagent data while we have it
 		-- full item info by item id
-		cache[id] = { sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture };
+		cache[id] = serializeItemInfo( sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture );
 		-- name to id mapping for getLinkFromName()
 		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0";
 	end
@@ -128,7 +141,7 @@ function getReagentInfo(reagentID)
 		-- last resort is getting the data from our cache, because the WoW cache does not have this item
 		-- remember: the cache is not our primary storage for this data, only a backup
 		if ( cache[id] ) then
-			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = unpack( cache[id] );
+			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = deserializeItemInfo( cache[id] );
 		end
 	end
 	

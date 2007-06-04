@@ -163,7 +163,7 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 	
 	
 	-- multiply values by the number of items in this stack
-	local groups = math.floor( count / 5 );
+	local groups = count / 5;
 	totalHSP = totalHSP * groups;
 	totalMed = totalMed * groups;
 	totalMkt = totalMkt * groups;
