@@ -204,7 +204,7 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice)
 	local itemWorth
 
 	local stackPrice
-	if (priceBasis == "bid") then
+	if (priceBasis == "cur") then
 		stackPrice = bidPrice
 	elseif (priceBasis == "buy") then
 		if not buyPrice or buyPrice <= 0 then return end
@@ -215,7 +215,7 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice)
 			stackPrice = bidPrice
 		end
 	end
-
+p("Basis", priceBasis, stackPrice)
 	if (priceModel == "market") then
 		itemWorth = AucAdvanced.API.GetMarketValue(link)
 	else
