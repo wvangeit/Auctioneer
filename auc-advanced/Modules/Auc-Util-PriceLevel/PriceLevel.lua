@@ -215,7 +215,7 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice)
 			stackPrice = bidPrice
 		end
 	end
-p("Basis", priceBasis, stackPrice)
+
 	if (priceModel == "market") then
 		itemWorth = AucAdvanced.API.GetMarketValue(link)
 	else
