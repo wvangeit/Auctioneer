@@ -93,7 +93,7 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.pricelevel.yellow", 95)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.orange", 115)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.red", 130)
-	AucAdvanced.Settings.SetDefault("util.pricelevel.opacity", 33)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.opacity", 20)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.gradient", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.direction", "LEFT")
 end
