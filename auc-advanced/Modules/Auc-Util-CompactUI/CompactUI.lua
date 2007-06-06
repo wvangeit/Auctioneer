@@ -320,7 +320,7 @@ function private.SetAuction(button, id)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("list", id)
 	local link = GetAuctionItemLink("list", id)
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-		itemEquipLoc, itemTexture = GetItemInfo(itemID or "itemString" or "itemName" or "itemLink") 
+		itemEquipLoc, itemTexture = GetItemInfo(link)
 	local timeLeft = GetAuctionItemTimeLeft("list", id)
 	if (timeLeft == 4) then timeLeft = "24h"
 	elseif (timeLeft == 3) then timeLeft = "8h"
