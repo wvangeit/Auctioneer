@@ -232,12 +232,12 @@ function private.HookAH()
 	text:SetText("Show stacks as price per unit")
 	table.insert(private.candy, text)
 
-	text = AuctionFrameBrowse:CreateFontString(nil,nil,"GameFontNormalLarge")
+	text = AuctionFrameBrowse:CreateFontString(nil,nil,"GameFontNormal")
 	private.PageNum = text
 	text:SetPoint("TOPLEFT", BrowsePrevPageButton, "TOPLEFT")
 	text:SetPoint("BOTTOMRIGHT", BrowseNextPageButton, "BOTTOMRIGHT")
-	text:SetFont(STANDARD_TEXT_FONT, 18, "OUTLINE")
-	text:SetShadowOffset(1,1)
+	text:SetFont(STANDARD_TEXT_FONT, 12)
+	text:SetShadowOffset(2,2)
 	table.insert(private.candy, text)
 
 	private.Active = true
@@ -319,8 +319,14 @@ function private.SetAuction(button, id)
 	
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("list", id)
 	local link = GetAuctionItemLink("list", id)
-	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount,
-		itemEquipLoc, itemTexture = GetItemInfo(link)
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
+	if link then
+		itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
+	end
+	if not itemLevel then itemLevel = level end
+	if not itemMinLevel then itemMinLevel = level end
+	if itemLevel == 0 then itemLevel = "" end
+	if itemMinLevel == 0 then itemMinLevel = "" end
 	local timeLeft = GetAuctionItemTimeLeft("list", id)
 	if (timeLeft == 4) then timeLeft = "24h"
 	elseif (timeLeft == 3) then timeLeft = "8h"
@@ -380,8 +386,8 @@ function private.SetAuction(button, id)
 	button.Count:SetText(count)
 	button.Icon:SetTexture(texture)
 	button.Name:SetText(link)
-	button.rLevel:SetText(itemMinLevel or level)
-	button.iLevel:SetText(itemLevel or level)
+	button.rLevel:SetText(itemMinLevel)
+	button.iLevel:SetText(itemLevel)
 	button.tLeft:SetText(timeLeft)
 	button.Owner:SetText(owner)
 	button.Bid:SetMoney(showBid/perUnit, requiredBid ~= minBid, highBidder)
@@ -455,7 +461,7 @@ function private.MyAuctionFrameUpdate()
 		BrowseSearchCountText:Hide()
 	end
 	
-	private.PageNum:SetText(AuctionFrameBrowse.page+1)
+	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)))
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
 	AucAdvanced.API.ListUpdate()
 end
