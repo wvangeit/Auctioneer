@@ -305,7 +305,7 @@ local EPIC = 4
 
 -- disenchanting level bracket upper bounds
 -- e.g. an ilevel 52 item goes into bracket 55
-const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 120, 175 }
+const.levelUpperBounds = { 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 79, 85, 94, 99, 120, 151 }
 
 
 -- the big disenchant table, indexed by [quality][type][level bracket]
@@ -333,7 +333,7 @@ const.baseDisenchantTable = {
    [94]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [99]  = { { ARCANE  , 0.20, 2.5 }, { LPLANAR , 0.75, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
-   [175] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
+   [151] = { { ARCANE  , 0.20, 3.5 }, { GPLANAR , 0.75, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
   },
   [const.ARMOR] = {
    [15]  = { { STRANGE , 0.80, 1.5 }, { LMAGIC  , 0.20, 1.5 }, },
@@ -353,7 +353,7 @@ const.baseDisenchantTable = {
    [94]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [99]  = { { ARCANE  , 0.75, 2.5 }, { LPLANAR , 0.20, 2.5 }, { SPRISMATIC , 0.05, 1.0 }, },
    [120] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
-   [175] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
+   [151] = { { ARCANE  , 0.75, 3.5 }, { GPLANAR , 0.20, 1.5 }, { LPRISMATIC , 0.05, 1.0 }, },
   },
  },
  [RARE] = {
@@ -374,7 +374,7 @@ const.baseDisenchantTable = {
    [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [175] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
+   [151] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
   },
   [const.ARMOR] = {
    [20]  = { { SGLIMMERING, 1.00, 1.0 }, },
@@ -393,7 +393,7 @@ const.baseDisenchantTable = {
    [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [99]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
    [120] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
-   [175] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
+   [151] = { { LPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
   },
  },
  [EPIC] = {
@@ -410,7 +410,7 @@ const.baseDisenchantTable = {
    [94]  = { { NEXUS     , 1.00, 1.5 }, },	-- BC gear appears to start at 95
    [99]  = { { VOID      , 1.00, 1.0 }, },
    [120] = { { VOID      , 1.00, 1.5 }, },
-   [175] = { { VOID      , 1.00, 1.5 }, },	-- Highest known ilvl is 151 but Illidan loot should be around this
+   [151] = { { VOID      , 1.00, 1.5 }, },	-- BC loot tops at 151
   },
   [const.ARMOR] = {
    [40]  = { { SRADIANT  , 1.00, 3.0 }, },
@@ -425,7 +425,7 @@ const.baseDisenchantTable = {
    [94]  = { { NEXUS     , 1.00, 1.5 }, },	-- BC gear appears to start at 95
    [99]  = { { VOID      , 1.00, 1.0 }, },
    [120] = { { VOID      , 1.00, 1.5 }, },
-   [175] = { { VOID      , 1.00, 1.5 }, },	-- Highest known ilvl is 151 but Illidan loot should be around this
+   [151] = { { VOID      , 1.00, 1.5 }, },	-- BC loot tops at 151
   },
  },
 }
