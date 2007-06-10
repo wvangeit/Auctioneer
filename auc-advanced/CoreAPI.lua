@@ -94,19 +94,53 @@ end
 
 function lib.GetAlgorithms()
 	local engines = {}
-	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		table.insert(engines, engine)
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.GetPrice) then
+				table.insert(engines, engine)
+			end
+		end
 	end
 	return engines
 end
 
-function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
-	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if engine == algorithm and engineLib.GetPrice then
-			local price = engineLib.GetPrice(itemLink, serverKey)
-			return price
+function lib.IsValidAlgorithm(algorithm)
+	local engines = {}
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engine == algorithm and engineLib.GetPrice then
+				return true
+			end
 		end
 	end
+	return false
+end
+
+private.algorithmstack = {}
+function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engine == algorithm and engineLib.GetPrice then
+				local algosig = strjoin(":", algorithm, itemLink, serverKey)
+				for pos, history in private.algorithmstack do
+					if (history == algosig) then
+						-- We are looping
+						local origAlgo = private.algorithmstack[1]
+						local endSize = #(private.algorithmstack)+1
+						while (#(private.algorithmstack)) do
+							table.remove(private.algorithmstack)
+						end
+						error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
+					end
+				end
+				table.insert(private.algorithmstack, algosig)
+				local price = engineLib.GetPrice(itemLink, serverKey)
+				table.remove(private.algorithmstack, -1)
+				return price
+			end
+		end
+	end
+	error(("Cannot find pricing algorithm: %s"):format(algorithm))
 end
 
 
