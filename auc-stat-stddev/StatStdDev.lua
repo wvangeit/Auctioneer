@@ -99,8 +99,10 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	end
 
 	-- Get the signature of this item and find it's stats.
-	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
-	if (factor ~= 0) then property = property.."x"..factor end
+	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(itemData.link)
+	if (linkType ~= "item") then return end
+	if (factor and factor ~= 0) then property = property.."x"..factor end
+
 	local faction = AucAdvanced.GetFaction()
 	if not data[faction] then data[faction] = {} end
 	local stats = private.UnpackStats(data[faction][itemId])
@@ -114,8 +116,8 @@ end
 
 function lib.GetPrice(hyperlink, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
+	if (factor and factor ~= 0) then property = property.."x"..factor end
 
 	if not faction then faction = AucAdvanced.GetFaction() end
 	if not data[faction] then return end
