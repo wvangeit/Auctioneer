@@ -170,28 +170,27 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 	totalFive = totalFive * groups;
 
 	-- Terse mode
-	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+	if Enchantrix.Settings.GetSetting('ToolTipProspectTerseFormat') and not IsControlKeyDown() then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipProspectShowAuctAdvValue') and totalFive > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctVal'), totalFive, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueHSP') and totalHSP > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueMedian') and totalMed > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+		elseif Enchantrix.Settings.GetSetting('TooltipProspectShowBaselineValue') and totalMkt > 0 then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
 		return
 	end
 
-	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
+	if (Enchantrix.Settings.GetSetting('TooltipProspectMats')) then
 		-- Header
 		local totalText = ""
--- TODO -- need string for Prospects into
-		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
+		EnhTooltip.AddLine(_ENCH('FrmtProspectInto')..totalText, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
 		-- Sort in order of decreasing probability before adding to tooltip
 		table.sort(lines, function(a, b) return a.sort > b.sort end)
@@ -202,11 +201,10 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		end
 	end
 	
-	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantLevel')) then
+	if (Enchantrix.Settings.GetSetting('TooltipProspectLevels')) then
 		local reqSkill = Enchantrix.Util.JewelCraftSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserJewelCraftingSkill();
--- TODO - need localized string "requires Jewel Crafting skill %d"
-		local deText = format(_ENCH("TooltipShowDisenchantLevel"), reqSkill );
+		local deText = format(_ENCH("TooltipProspectLevel"), reqSkill );
 		EnhTooltip.AddLine(deText, nil, embed);
 		if (userSkill < reqSkill) then
 			EnhTooltip.LineColor(0.8,0.1,0.1);		-- reddish
@@ -215,21 +213,21 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		end
 	end
 
-	if (Enchantrix.Settings.GetSetting('TooltipShowValues')) then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+	if (Enchantrix.Settings.GetSetting('TooltipProspectValues')) then
+		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipProspectShowAuctAdvValue') and totalFive > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctVal'), totalFive, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+		if (Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueHSP') and totalHSP > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctHsp'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+		if (Enchantrix.Settings.GetSetting('TooltipProspectShowAuctValueMedian') and totalMed > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueAuctMed'), totalMed, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+		if (Enchantrix.Settings.GetSetting('TooltipProspectShowBaselineValue') and totalMkt > 0) then
+			EnhTooltip.AddLine(_ENCH('FrmtProspectValueMarket'), totalMkt, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
 		end
 	end

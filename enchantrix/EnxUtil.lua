@@ -219,7 +219,6 @@ end
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
 function getReagentPrice(reagentID, extra)
 	-- reagentID ::= number | hyperlink
-	local weight = Enchantrix.Settings.GetSetting("weight."..reagentID) / 100
 	
 	if type(reagentID) == "string" then
 		local _, _, i = reagentID:find("item:(%d+):")
@@ -268,6 +267,7 @@ function getReagentPrice(reagentID, extra)
 	cache.timestamp = time()
 
 	hsp, median, market, price5 = cache.hsp, cache.median, cache.market, cache.price5
+	local weight = Enchantrix.Settings.GetSetting("weight."..reagentID) / 100
 	if (hsp) then hsp = hsp * weight end
 	if (median) then median = median * weight end
 	if (market) then market = market * weight end
@@ -767,8 +767,7 @@ function Enchantrix.Util.GetUserJewelCraftingSkill()
 		local skillName, header, _, skillRank = GetSkillLineInfo(i)
 		-- check for the skill name
 		if (skillName and not header) then
--- TODO - need localized string
-			if (skillName == "Jewelcrafting") then
+			if (skillName == _ENCH("Jewelcrafting")) then
 				-- save this in a global for caching, and the auction filters
 				Enchantrix.JewelCraftingSkill = skillRank
 				Enchantrix.JewelCraftingSkillTimeStamp = GetTime()
@@ -792,26 +791,6 @@ function Enchantrix.Util.GetUserJewelCraftingSkill()
 	return Enchantrix.JewelCraftingSkill
 end
 
-
-ENX_CRITICAL = 1
-ENX_ERROR = 2
-ENX_WARNING = 3
-ENX_NOTICE = 4
--- info will only go to nLog
-ENX_INFO = 5
--- Debug will print to the chat console as well as to nLog
-ENX_DEBUG = 6
-
-function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
-	-- function libDebugPrint(addon, message, category, title, errorCode, level)
-	local message = DebugLib.Dump(...)
-	DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
-end
-
--- when you just want to print a message and don't care about the rest
-function Enchantrix.Util.DebugPrintQuick(...)
-	Enchantrix.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebug:", ... )
-end
 
 
 -- an attempt to balance the price of essences when doing auction scans
@@ -896,5 +875,29 @@ function Enchantrix.Util.CreateReagentPricingTable()
 	
 	return scanReagentTable;
 end
+
+
+
+
+ENX_CRITICAL = 1
+ENX_ERROR = 2
+ENX_WARNING = 3
+ENX_NOTICE = 4
+-- info will only go to nLog
+ENX_INFO = 5
+-- Debug will print to the chat console as well as to nLog
+ENX_DEBUG = 6
+
+function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
+	-- function libDebugPrint(addon, message, category, title, errorCode, level)
+	local message = DebugLib.Dump(...)
+	DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
+end
+
+-- when you just want to print a message and don't care about the rest
+function Enchantrix.Util.DebugPrintQuick(...)
+	Enchantrix.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebug:", ... )
+end
+
 
 

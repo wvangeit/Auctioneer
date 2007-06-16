@@ -243,7 +243,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 	if event == "UNIT_SPELLCAST_SUCCEEDED" then
 		-- NOTE: we do get the spell name here
 		DisenchantEvent.finished = nil
-		if (spell == _ENCH('ArgSpellname')) or (spell == "Prospecting") then
+		if (spell == _ENCH('ArgSpellname')) or (spell == _ENCH('ArgSpellProspectingName')) then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.finished = DisenchantEvent.spellTarget
 				DisenchantEvent.spellname = spell;
@@ -308,10 +308,8 @@ function onEvent(funcVars, event, player, spell, rank, target)
 			if (DisenchantEvent.spellname == _ENCH('ArgSpellname')) then
 				Enchantrix.Util.ChatPrint(_ENCH("FrmtFound"):format(DisenchantEvent.finished))
 				isDisenchant = true;
--- TODO - need localized string for Prospecting
-			elseif (DisenchantEvent.spellname == "Prospecting") then
--- TODO - need localized string for "prospects into"
-				Enchantrix.Util.ChatPrint( ("Found that %s prospects into:"):format(DisenchantEvent.finished))
+			elseif (DisenchantEvent.spellname == _ENCH('ArgSpellProspectingName')) then
+				Enchantrix.Util.ChatPrint( _ENCH("FrmtProspectFound"):format(DisenchantEvent.finished))
 				isDisenchant = nil;
 			end
 			local sig = Enchantrix.Util.GetSigFromLink(DisenchantEvent.finished)

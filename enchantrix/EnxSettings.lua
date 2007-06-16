@@ -121,6 +121,14 @@ local settingDefaults = {
 	['TooltipShowDisenchantMats'] = true,	-- should the item tooltip show what it disenchants into? (for those who are just greedy)
 	
 	['TooltipShowProspecting'] = false,		-- should the tooltip show any prospecting data?
+	['TooltipProspectLevels'] = true,		-- should the tooltip show skill level needed to prospect?
+	['TooltipProspectValues'] = true,		-- should the tooltip show prospecting values
+	['TooltipProspectMats'] = true,			-- should the item tooltip show what it prospects into? (for those who are just greedy)
+	['ToolTipProspectTerseFormat'] = false,
+	['TooltipProspectShowAuctValueHSP'] = true,
+	['TooltipProspectShowAuctValueMedian'] = true,
+	['TooltipProspectShowBaselineValue'] = true,
+	['TooltipProspectShowAuctAdvValue'] = true,
 	
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 	
@@ -402,8 +410,6 @@ function lib.MakeGuiConfig()
 -- TODO: this control is for debugging only
 	gui.AddControl(id, "Checkbox",   0, 1, "DisenchantUsingBaseTableOnly", "Use base table only for disenchant info - DEBUGGING")
 
--- TODO - need localized string!
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", "Show Prospecting data for ores - TEST" )
 
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
@@ -424,6 +430,23 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", _ENCH("GuiMinimapShowButton"))
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, _ENCH("GuiMinimapButtonAngle"))
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
+	
+	id = gui.AddTab(_ENCH("GuiTabProspecting"))
+	gui.AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", _ENCH("GuiShowProspecting") )
+	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectLevels", _ENCH("GuiProspectingLevels") )
+	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectMats", _ENCH("GuiProspectingMaterials") )
+	
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "TooltipProspectValues",  _ENCH("GuiProspectingValues"))
+	if (Enchantrix.State.Auctioneer_Loaded) then
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+		gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		if (AucAdvanced) then
+			gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
+		end
+	end
+	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectShowBaselineValue", _ENCH("GuiValueShowBaseline"))
 	
 	
 	id = gui.AddTab(_ENCH("GuiTabAuctions"))
