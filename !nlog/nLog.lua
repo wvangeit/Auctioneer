@@ -144,7 +144,13 @@ function nLog.AddMessage(mAddon, mType, mLevel, mTitle, ...)
 	-- Once we fill up to 64k entries, treat the table like a loop buffer
 	if (#nLog.messages >= 65535) then
 		local ofs = nLog.Message.ofs or 0
-		local message = nLog.messages[ofs+1]
+		ofs = ((ofs+1) % 65535)
+		-- lots of fun cases thanks to the modulus operation, but an index of zero is bad
+		if (ofs == 0) then
+			ofs = 1;
+		end
+		-- reuse the old message table
+		local message = nLog.messages[ofs]
 		if (not message) then chat("Error logging message at offset("..ofs..")") broken = true return end
 		message[1] = ts
 		message[2] = pid
@@ -153,7 +159,7 @@ function nLog.AddMessage(mAddon, mType, mLevel, mTitle, ...)
 		message[5] = mLevel
 		message[6] = mTitle
 		message[7] = msg
-		nLog.Message.ofs = (ofs+1 % 65535)
+		nLog.Message.ofs = ofs
 	else
 		table.insert(nLog.messages, {
 			ts, pid, mAddon, mType, mLevel, mTitle, msg
