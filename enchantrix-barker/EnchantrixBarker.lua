@@ -937,68 +937,88 @@ end
 -- end UI code
 
 function Enchantrix_CreateBarker()
+	
+	if (not EnchantrixBarker_BarkerGetZoneText()) then
+		-- not in a recognized trade zone
+		return nil;
+	end
+	
+	local temp = GetCraftSkillLine(1);
+	
+	if (not temp) then
+		-- trade skill window isn't open (how did this happen?)
+		Barker.Util.ChatPrint(_BARKLOC('BarkerEnxWindowNotOpen'));
+		return nil;
+	end
+
 	local availableEnchants = {};
 	local numAvailable = 0;
-	local temp = GetCraftSkillLine(1);
-	if EnchantrixBarker_BarkerGetZoneText() then
-		EnchantrixBarker_ResetBarkerString();
-		EnchantrixBarker_ResetPriorityList();
-		if (temp) then
-			Barker.Util.DebugPrintQuick("Starting creation of EnxBarker")
-			for index=1, GetNumCrafts() do
-				local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
-				if((numEnchantsAvailable > 0) and (craftName:find("Enchant"))) then --have reagents and it is an enchant
-					local cost = 0;
-					for j=1,GetCraftNumReagents(index),1 do
-						local a,b,c = GetCraftReagentInfo(index,j);
-						reagent = GetCraftReagentItemLink(index,j);
 
-						cost = cost + (Enchantrix_GetReagentHSP(reagent)*c);
-					end
+	EnchantrixBarker_ResetBarkerString();
+	EnchantrixBarker_ResetPriorityList();
 
-					local profit = cost * Enchantrix_BarkerGetConfig("profit_margin")*0.01;
-					if( profit > Enchantrix_BarkerGetConfig("highest_profit") ) then
-						profit = Enchantrix_BarkerGetConfig("highest_profit");
-					end
-					local price = EnchantrixBarker_RoundPrice(cost + profit);
+	Barker.Util.DebugPrintQuick("Starting creation of EnxBarker")
+	
+	local highestProfit = Enchantrix_BarkerGetConfig("highest_profit");
+	local profitMargin = Enchantrix_BarkerGetConfig("profit_margin");
+	
+	for index=1, GetNumCrafts() do
+		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
 
-					local enchant = {
-						index = index,
-						name = craftName,
-						type = craftType,
-						available = numEnchantsAvailable,
-						isExpanded = isExpanded,
-						cost = cost,
-						price = price,
-						profit = price - cost
-					};
-					availableEnchants[ numAvailable] = enchant;
-
-					local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
-					local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
-
-					EnchantrixBarker_AddEnchantToPriorityList( enchant )
-					numAvailable = numAvailable + 1;
+		if ( numEnchantsAvailable > 0 ) then -- user has reagents
+			
+			-- does this skill produce an enchant, or a trade good?
+			local itemLink = GetCraftItemLink(index);
+			local itemName, newItemLink = GetItemInfo(itemLink);
+			
+			-- item name and link are nil for enchants, and valid for produced items (which we want to ignore)
+			if (not itemName and not newItemLink) then
+			
+				local cost = 0;
+				for j=1,GetCraftNumReagents(index),1 do
+					local reagentName,_,countRequired = GetCraftReagentInfo(index,j);
+					reagent = GetCraftReagentItemLink(index,j);
+					cost = cost + (Enchantrix_GetReagentHSP(reagent)*countRequired);
 				end
+
+				local profit = cost * profitMargin*0.01;
+				if( profit > highestProfit ) then
+					profit = highestProfit;
+				end
+				local price = EnchantrixBarker_RoundPrice(cost + profit);
+
+				local enchant = {
+					index = index,
+					name = craftName,
+					type = craftType,
+					available = numEnchantsAvailable,
+					isExpanded = isExpanded,
+					cost = cost,
+					price = price,
+					profit = price - cost
+				};
+				availableEnchants[ numAvailable] = enchant;
+
+				local p_gold,p_silver,p_copper = EnhTooltip.GetGSC(enchant.price);
+				local pr_gold,pr_silver,pr_copper = EnhTooltip.GetGSC(enchant.profit);
+
+				EnchantrixBarker_AddEnchantToPriorityList( enchant )
+				numAvailable = numAvailable + 1;
 			end
-
-			if numAvailable == 0 then
-				Barker.Util.ChatPrint(_BARKLOC('BarkerNoEnchantsAvail'));
-				return nil
-			end
-
-			for i,element in ipairs(priorityList) do
-				EnchantrixBarker_AddEnchantToBarker( element.enchant );
-			end
-
-			return EnchantrixBarker_GetBarkerString();
-
-		else
-			Barker.Util.ChatPrint(_BARKLOC('BarkerEnxWindowNotOpen'));
 		end
 	end
 
-	return nil
+	if numAvailable == 0 then
+		Barker.Util.ChatPrint(_BARKLOC('BarkerNoEnchantsAvail'));
+		return nil
+	end
+
+	for i,element in ipairs(priorityList) do
+		EnchantrixBarker_AddEnchantToBarker( element.enchant );
+	end
+
+	return EnchantrixBarker_GetBarkerString();
+
 end
 
 function EnchantrixBarker_ScoreEnchantPriority( enchant )
