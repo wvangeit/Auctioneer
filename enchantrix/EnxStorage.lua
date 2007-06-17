@@ -363,13 +363,6 @@ end
 local function getBaseTableDisenchants(level, quality, type, item)
 	local rLevel = roundupLevel(level);
 
-	-- check for some exceptions due to overlap of pre and post Burning Crusade blues in the 66-70 range
-	if (quality == 3 and rLevel == 70 and type == Enchantrix.Constants.ARMOR ) then
-		if (Enchantrix.Constants.RareArmorExceptionList[item]) then
-			return Enchantrix.Constants.RareArmorExceptionList[rLevel];
-		end
-	end
-
 	if Enchantrix.Constants.baseDisenchantTable[quality]
 		and Enchantrix.Constants.baseDisenchantTable[quality][type]
 		and Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel] then

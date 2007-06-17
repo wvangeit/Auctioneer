@@ -368,7 +368,7 @@ const.baseDisenchantTable = {
    [55]  = { { SBRILLIANT , 1.00, 1.0 }, },
    [60]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [65]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [70]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
+   [70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [79]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [85]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
@@ -387,7 +387,7 @@ const.baseDisenchantTable = {
    [55]  = { { SBRILLIANT , 1.00, 1.0 }, },
    [60]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [65]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
-   [70]  = { { LBRILLIANT , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- this is for pre-BC items, there is some overlap 66-70
+   [70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- this is for pre-BC items, there is some overlap 66-70
    [79]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [85]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },
    [94]  = { { SPRISMATIC , 0.99, 1.0 }, { VOID , 0.01, 1.0 }, },
@@ -429,22 +429,6 @@ const.baseDisenchantTable = {
   },
  },
 }
-
-
--- this is for the few items that overlap Pre and Post Burning Crusade item level 66 to 70
--- because pre and post disenchant to different things
--- generated from  http://www.wowhead.com/?items=4&filter=qu=3;minle=66;maxle=70;cr=82:93;crs=1:2;crv=0:0
--- all the weapons in this range are pre-BC
-const.RareArmorExceptionList = {
-	[32695] = true,
-	[32481] = true,
-	[23835] = true,
-	[23836] = true,
-	[25653] = true,
-	[32863] = true,
-	[70]  = { { SPRISMATIC , 0.99, 1.0 }, { NEXUS, 0.01, 1.0 }, },	-- result for post-BC items
-}
-
 
 
 local COPPER_ORE = 2770
