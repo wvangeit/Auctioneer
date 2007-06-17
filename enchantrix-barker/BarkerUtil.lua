@@ -30,22 +30,14 @@
 EnchantrixBarker_RegisterRevision("$URL: http://norganna.org/svn/auctioneer/trunk/enchantrix/EnxUtil.lua $", "$Rev: 1735 $")
 
 -- Global functions
-local getItems
-local getSigFromLink
-local getLinkFromName
-local getItemIdFromSig
-local getItemHyperlinks
-local getItemIdFromLink
 
 local split
 local chatPrint
 local getRevision
-local spliterator
 
 local gcd
 local round
 local roundUp
-local confidenceInterval
 
 local createProfiler
 
@@ -53,82 +45,7 @@ local createProfiler
 --   Item functions   --
 ------------------------
 
-function getLinkFromName(name)
-	assert(type(name) == "string")
 
-	if not EnchantConfig.cache then
-		EnchantConfig.cache = {}
-	end
-	if not EnchantConfig.cache.names then
-		EnchantConfig.cache.names = {}
-	end
-
-	local link = EnchantConfig.cache.names[name]
-	if link then
-		local n = GetItemInfo(link)
-		if n ~= name then
-			EnchantConfig.cache.names[name] = nil
-		end
-	end
-	if not EnchantConfig.cache.names[name] then
-		for i = 1, Barker.State.MAX_ITEM_ID + 4000 do
-			local n, link = GetItemInfo(i)
-			if n then
-				if n == name then
-					EnchantConfig.cache.names[name] = link
-					break
-				end
-				Barker.State.MAX_ITEM_ID = math.max(Barker.State.MAX_ITEM_ID, i)
-			end
-		end
-	end
-	return EnchantConfig.cache.names[name]
-end
-
-
--- Return item id as integer
-function getItemIdFromSig(sig)
-	if type(sig) == "string" then
-		_, _, sig = sig:find("(%d+)")
-	end
-	return tonumber(sig)
-end
-
-function getItemIdFromLink(link)
-	return (EnhTooltip.BreakLink(link))
-end
-
-function getSigFromLink(link)
-	assert(type(link) == "string")
-
-	local _, _, id, rand = link:find("item:(%d+):%d+:(%d+):%d+")
-	if id and rand then
-		return id..":0:"..rand
-	end
-end
-
-function getItems(str)
-	if (not str) then return end
-	local itemList = {};
-	local itemKey;
-
-	for itemID, randomProp, enchant, uniqID in str:gmatch("|Hitem:(%d+):(%d+):(%d+):(%d+)|h") do
-		itemKey = itemID..":"..randomProp..":"..enchant;
-		table.insert(itemList, itemKey)
-	end
-	return itemList;
-end
-
---Many thanks to the guys at irc://irc.datavertex.com/cosmostesters for their help in creating this function
-function getItemHyperlinks(str)
-	if (not str) then return nil end
-	local itemList = {};
-
-	for color, item, name in str:gmatch("|c(%x+)|Hitem:(%d+:%d+:%d+:%d+)|h%[(.-)%]|h|r") do
-		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
-	end
-	return itemList;
-end
 -----------------------------------
 --   General Utility Functions   --
 -----------------------------------
@@ -159,26 +76,6 @@ function split(str, at)
 	return splut;
 end
 
--- Iterator version of split()
---   for i in spliterator(a, b) do
--- is equivalent to
---   for _, i in ipairs(split(a, b)) do
--- but puts less strain on the garbage collector
-function spliterator(str, at)
-	local start
-	local found = 0
-	local done = (type(str) ~= "string")
-	return function()
-		if done then return nil end
-		start = found + 1
-		found = str:find(at, start, true)
-		if not found then
-			found = 0
-			done = true
-		end
-		return str:sub(start, found - 1)
-	end
-end
 
 function chatPrint(text, cRed, cGreen, cBlue, cAlpha, holdTime)
 	local frameIndex = Barker.Settings.GetSetting('printframe');
@@ -257,31 +154,6 @@ function round(m, n, base, offset)
 	end
 end
 
--- Returns confidence interval for binomial distribution given observed
--- probability p, sample size n, and z-value
-function confidenceInterval(p, n, z)
-	if not z then
-		--[[
-		z		conf
-		1.282	80%
-		1.645	90%
-		1.960	95%
-		2.326	98%
-		2.576	99%
-		3.090	99.8%
-		3.291	99.9%
-		]]
-		z = 1.645
-	end
-	assert(p >= 0 and p <= 1)
-	assert(n > 0)
-
-	local a = p + z^2 / (2 * n)
-	local b = z * math.sqrt(p * (1 - p) / n + z^2 / (4 * n^2))
-	local c = 1 + z^2 / n
-
-	return (a - b) / c, (a + b) / c
-end
 
 ---------------------
 -- Debug functions --
@@ -356,23 +228,13 @@ end
 Barker.Util = {
 	Revision			= "$Revision: 1735 $",
 
-	GetItems			= getItems,
-	SigFromLink			= sigFromLink,
-	GetSigFromLink		= getSigFromLink,
-	GetLinkFromName		= getLinkFromName,
-	GetItemIdFromSig	= getItemIdFromSig,
-	GetItemIdFromLink	= getItemIdFromLink,
-	GetItemHyperlinks	= getItemHyperlinks,
-
 	Split				= split,
 	ChatPrint			= chatPrint,
-	Spliterator			= spliterator,
 	GetRevision			= getRevision,
 
 	GCD					= gcd,
 	Round				= round,
 	RoundUp				= roundUp,
-	ConfidenceInterval	= confidenceInterval,
 
 	CreateProfiler		= createProfiler,
 }
