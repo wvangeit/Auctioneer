@@ -1,4 +1,4 @@
---[[	Auctioneer Advanced
+﻿--[[	Auctioneer Advanced
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
@@ -39,23 +39,6 @@ if (not AucAdvanced) then AucAdvanced = {} end
 if (not AucAdvancedData) then AucAdvancedData = {} end
 if (not AucAdvancedLocal) then AucAdvancedLocal = {} end
 if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-
-if (not AucAdvanced.Debug) then
-	if (nlog) then
-		AucAdvanced.Debug = nlog
-	else
-		AucAdvanced.Debug = {}
-		function AucAdvanced.Debug.AddMessage(mAddon, mType, mLevel, mTitle, ...)
-			-- Do nothing
-		end
-		function AucAdvanced.Debug.ChatMsg(msg)
-			-- Do nothing
-		end
-		function AucAdvanced.Debug.IsEnabled()
-			return false
-		end
-	end
-end
 
 AucAdvanced.Version="<%version%>";
 if (AucAdvanced.Version == "<".."%version%>") then
@@ -139,3 +122,57 @@ private.Frame:RegisterEvent("ADDON_LOADED")
 private.Frame:RegisterEvent("AUCTION_HOUSE_SHOW")
 private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 private.Frame:SetScript("OnEvent", private.OnEvent)
+
+-- Auctioneer's debug functions
+AucAdvanced.Debug = {}
+local addonName = "Auctioneer" -- the addon's name as it will be displayed in
+                               -- the debug messages
+-------------------------------------------------------------------------------
+-- Prints the specified message to nLog.
+--
+-- syntax:
+--    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
+--
+-- parameters:
+--    message   - (string) the error message
+--                nil, no error message specified
+--    category  - (string) the category of the debug message
+--                nil, no category specified
+--    title     - (string) the title for the debug message
+--                nil, no title specified
+--    errorCode - (number) the error code
+--                nil, no error code specified
+--    level     - (string) nLog message level
+--                         Any nLog.levels string is valid.
+--                nil, no level specified
+--
+-- returns:
+--    errorCode - (number) errorCode, if one is specified
+--                nil, otherwise
+--    message   - (string) message, if one is specified
+--                nil, otherwise
+-------------------------------------------------------------------------------
+function AucAdvanced.Debug.DebugPrint(message, category, title, errorCode, level)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+end
+
+-------------------------------------------------------------------------------
+-- Used to make sure that conditions are met within functions.
+-- If test is false, the error message will be written to nLog and the user's
+-- default chat channel.
+--
+-- syntax:
+--    assertion = assert(test, message)
+--
+-- parameters:
+--    test    - (any)     false/nil, if the assertion failed
+--                        anything else, otherwise
+--    message - (string)  the message which will be output to the user
+--
+-- returns:
+--    assertion - (boolean) true, if the test passed
+--                          false, otherwise
+-------------------------------------------------------------------------------
+function AucAdvanced.Debug.Assert(test, message)
+	return DebugLib.Assert(addonName, test, message)
+end
