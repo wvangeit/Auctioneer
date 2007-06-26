@@ -86,9 +86,23 @@ end
 
 
 lib.ScanProcessors = {}
+local auctiondata
+function lib.ScanProcessors.begin()
+	auctiondata = private.GetAuctionData()
+end
+function lib.ScanProcessors.complete()
+	auctiondata = nil
+end
+
 function lib.ScanProcessors.suspend(operation, itemData, oldData)
 	if (itemData.buyoutPrice) then
-		local auctiondata = private.GetAuctionData()
+		if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
+		auctiondata[itemData.id].boughtout = true
+	end
+end
+
+function lib.ScanProcessors.suspend(operation, itemData, oldData)
+	if (itemData.buyoutPrice) then
 		if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
 		auctiondata[itemData.id].boughtout = true
 	end
@@ -96,15 +110,12 @@ end
 
 function lib.ScanProcessors.update(operation, itemData, oldData)
 	if (itemData.price ~= oldData.price) then
-		local auctiondata = private.GetAuctionData()
 		if (not auctiondata[itemData.id]) then auctiondata[itemData.id] = {} end
 		auctiondata[itemData.id].bidon = true
 	end
 end
 
 function lib.ScanProcessors.delete(operation, itemData, oldData)
-	local auctiondata = private.GetAuctionData()
-
 	if (itemData.buyoutPrice) then
 		local stillpossible = false
 		local auctionmaxtime = AucAdvanced.Const.AucMinTimes[itemData.timeLeft] or 86400
@@ -141,6 +152,8 @@ function lib.ScanProcessors.delete(operation, itemData, oldData)
 	pricedata.daily[itemId] = private.PackStats(stats)
 	auctiondata[itemData.id] = nil	
 end
+
+lib.Private = private
 
 function lib.GetPrice(hyperlink, faction, realm)
 	local data = private.GetPriceData(faction, realm)

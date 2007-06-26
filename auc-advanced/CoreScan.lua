@@ -43,6 +43,7 @@ if (not AucAdvanced.Scan) then AucAdvanced.Scan = {} end
 
 local lib = AucAdvanced.Scan
 local private = {}
+lib.Private = private
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
@@ -81,6 +82,7 @@ function private.LoadAuctionImage()
 	if not AucScanData.scans then AucScanData.scans = {} end
 	if not loaded then AucAdvancedData.Scandata = AucScanData end
 	LclAucScanData = AucScanData
+
 	return LclAucScanData
 end
 
@@ -205,7 +207,7 @@ end
 local statItem = {}
 local statItemOld = {}
 local function processStats(operation, curItem, oldItem)
-	private.Unpack(curItem, statItem)
+	if (curItem) then private.Unpack(curItem, statItem) end
 	if (oldItem) then private.Unpack(oldItem, statItemOld) end
 	if (operation == "create") then
 		--[[
@@ -307,21 +309,51 @@ function private.IsInQuery(curQuery, data)
 	return false
 end
 
+local idLists = {}
+function private.BuildIDList(scandata, faction, realmName)
+	local sig = realmName.."-"..faction
+	if (idLists[sig]) then return idLists[sig] end
+	idLists[sig] = {}
+	local idList = idLists[sig]
+
+	local id
+	for i = 1, #scandata.image do
+		id = scandata.image[i][Const.ID]
+		table.insert(idList, id)
+	end
+	table.sort(idList)
+	return idList
+end
+function private.GetNextID(idList)
+	local first = idList[1]
+	local second = idList[2]
+	while first and second and second == first + 1 do
+		first = second
+		table.remove(idList, 1)
+		second = idList[2]
+	end
+	first = first + 1
+	idList[1] = first
+	return first
+end
 function lib.GetScanData(faction, realmName)
 	if not faction then faction = AucAdvanced.GetFactionGroup() end
 	if not realmName then realmName = GetRealmName() end
 	local AucScanData = private.LoadAuctionImage()
 	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
-	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, nextID = {none_after=1}, time=time()} end
+	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, time=time()} end
 	if not AucScanData.scans[realmName][faction].image then AucScanData.scans[realmName][faction].image = {} end
-	return AucScanData.scans[realmName][faction]
+	if AucScanData.scans[realmName][faction].nextID then AucScanData.scans[realmName][faction].nextID = nil end
+	local idList = private.BuildIDList(AucScanData.scans[realmName][faction], faction, realmName)
+	return AucScanData.scans[realmName][faction], idList
 end
+
 
 function private.Commit(wasIncomplete)
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
 	if not private.curQuery then return end
-	local scandata = lib.GetScanData()
+	local scandata, idList = lib.GetScanData()
 	local now = time()
 	
 	local list, link, flag
@@ -355,6 +387,7 @@ function private.Commit(wasIncomplete)
 	local scanCount = #private.curScan
 	local updateCount, sameCount, newCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0
 
+	processStats("begin")
 	for _, data in ipairs(private.curScan) do
 		itemPos = lib.FindItem(data, scandata.image, lut)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
@@ -371,7 +404,7 @@ function private.Commit(wasIncomplete)
 			scandata.image[itemPos] = data
 		else
 			if (processStats("create", data)) then
-				data[Const.ID] = private.GetID(scandata.nextID)
+				data[Const.ID] = private.GetNextID(idList)
 				table.insert(scandata.image, data)
 				newCount = newCount + 1
 			else
@@ -410,12 +443,12 @@ function private.Commit(wasIncomplete)
 			if dodelete then
 				-- Auction Time has expired
 				processStats("delete", data)
-				private.ReleaseID(scandata.nextID, data[Const.ID])
 				table.remove(scandata.image, pos)
 			end
 
 		end
 	end
+	processStats("complete")
 
 	local currentCount = #scandata.image	
 	if (updateCount + sameCount + newCount ~= scanCount) then

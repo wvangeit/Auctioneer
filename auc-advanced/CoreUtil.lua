@@ -43,13 +43,32 @@ function lib.Print(...)
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 end
 
+local function breakHyperlink(match, matchlen, ...)
+	local v
+	local n = select("#", ...)
+	for i = 2, n do
+		v = select(i, ...)
+		if (v:sub(1,matchlen) == match) then
+			return strsplit(":", v:sub(2))
+		end
+	end
+end
+lib.breakHyperlink = breakHyperlink
+
 function lib.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
-		local linkType = EnhTooltip.LinkType(link)
-		if (linkType ~= "item") then return end
-		local itemId, property,_,_,_,_,_,_,_,factor = EnhTooltip.BreakLink(link)
-		return linkType, itemId, property, factor
+		local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed = breakHyperlink("Hitem:", 6, strsplit("|", link))
+		if (lType ~= "item") then return end
+		local factor = 0
+		id = tonumber(id) or 0
+		suffix = tonumber(suffix) or 0
+		seed = tonumber(seed) or 0
+		if (suffix < 0) then
+			factor = bit.band(seed, 65535)
+		end
+
+		return lType, id, suffix, factor
 	elseif (vartype == "number") then
 		return "item", link, 0, 0
 	end
