@@ -595,8 +595,12 @@ function lib.StorePage()
 			or (private.scanDir == -1 and private.curPage > 0) then
 		lib.ScanPage(private.curPage + private.scanDir)
 	else
+		local incomplete = false
+		if (#(private.curScan) > 0.90 * numBatchAuctions) then
+			incomplete = true
+		end
 		private.isScanning = false
-		private.Commit()
+		private.Commit(incomplete)
 	end
 end
 
@@ -680,6 +684,9 @@ end
 function private.OnUpdate(me, dur)
 	if private.sentQuery and CanSendAuctionQuery() then
 		lib.StorePage()
+	end
+	if private.curQuery and not AuctionFrame:IsVisible() then
+		private.Commit(true)
 	end
 end
 private.updater = CreateFrame("Frame", "", UIParent)

@@ -158,8 +158,8 @@ lib.Private = private
 function lib.GetPrice(hyperlink, faction, realm)
 	local data = private.GetPriceData(faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
-	if (factor ~= 0) then property = property.."x"..factor end
 	if (linkType ~= "item") then return end
+	if (factor ~= 0) then property = property.."x"..factor end
 
 	if not data then return end
 	local dayTotal, dayCount, dayAverage = 0,0,0

@@ -65,6 +65,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "listupdate") then
 		private.ListUpdate(...)
+	elseif (callbackType == "configchanged") then
+		AuctionFrameBrowse_Update()
 	end
 end
 

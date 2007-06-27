@@ -49,7 +49,7 @@ function private.CommandHandler(command, subcommand, ...)
 				end
 			end
 		end
-	elseif command == "begin" then
+	elseif command == "begin" or command == "scan" then
 		lib.ScanCommand(subcommand, ...)
 	else
 		if command and subcommand then
