@@ -517,13 +517,24 @@ function lib.ScanPage(nextPage)
 	private.curPage = nextPage
 end
 
+function private.NoDupes(pageData, compare)
+	if not pageData then return true end
+	for pos, pageItem in ipairs(pageData) do
+		if (compare[Const.LINK] == pageItem[Const.LINK]) then
+			if (private.IsSameItem(pageItem, compare)) then
+				return false
+			end
+		end
+	end
+	return true
+end
+
 function lib.StorePage()
 	if (private.curPage == -1) then
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
 	end
 	
-	if not (private.curPage == AuctionFrameBrowse.page) then return end
 	if not private.curQuery then return end
 	private.sentQuery = false
 
@@ -570,24 +581,16 @@ function lib.StorePage()
 				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, 0, -1
 			}
 
-			-- If we're going backwards
-			if private.scanDir == -1 then
-				-- and this item wasn't in the last (next) page
-				if noDupes(lastPage, itemData) then 
-					table.insert(thisPage, itemData)
-					table.insert(private.curScan, itemData)
-					storecount = storecount + 1
-				end
-			-- Otherwise if we scan forwards, always add
-			else
+			-- We only store one of the same item/owner/price/quantity in the scan
+			-- unless we are doing a forward scan (in which case we can be sure they
+			-- are not duplicate entries.
+			if (private.isScanning and private.scanDir == 1)
+			or private.NoDupes(private.curScan, itemData) then 
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
 		end
 	end
-
-	-- Store the last page for duplicate detection
-	lastPage = thisPage
 
 	-- Send the next page query or finish scanning
 	
