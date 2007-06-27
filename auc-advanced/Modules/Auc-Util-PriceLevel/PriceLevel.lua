@@ -66,7 +66,9 @@ function lib.Processor(callbackType, ...)
 	elseif (callbackType == "listupdate") then
 		private.ListUpdate(...)
 	elseif (callbackType == "configchanged") then
-		AuctionFrameBrowse_Update()
+		if (AuctionFrameBrowse_Update) then
+			AuctionFrameBrowse_Update()
+		end
 	end
 end
 

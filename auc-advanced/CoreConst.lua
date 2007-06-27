@@ -94,6 +94,9 @@ AucAdvanced.Const = {
 	SELLER = 20,
 	FLAG = 21,
 	ID = 22,
+	ITEMID = 23,
+	SUFFIX = 24,
+	FACTOR = 25,
 
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,

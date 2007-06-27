@@ -58,6 +58,12 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 	if EnhTooltip.LinkType(hyperlink) ~= "item" then
 		return -- Auctioneer hooks into item tooltips only
 	end
+	
+	-- Check to see if we need to force load scandata
+	local getter = AucAdvanced.Settings.GetSetting
+	if (getter("scandata.tooltip.display") and getter("scandata.force")) then
+		AucAdvanced.Scan.GetImage()
+	end
 
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do

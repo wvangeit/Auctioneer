@@ -87,7 +87,7 @@ function private.LoadAuctionImage()
 end
 
 function lib.GetImage()
-	LoadAuctionImage()
+	private.LoadAuctionImage()
 	return image
 end
 
@@ -146,6 +146,7 @@ function private.Unpack(item, storage)
 	storage.buyoutPrice = item[Const.BUYOUT]
 	storage.amBidder = item[Const.AMHIGH]
 	storage.dataFlag = item[Const.FLAG]
+	storage.itemId = item[Const.ITEMID]
 	
 	return storage
 end
@@ -555,6 +556,7 @@ function lib.StorePage()
 		local itemLink = GetAuctionItemLink("list", i)
 		if itemLink then
 			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
+		 	local _, itemId, itemSuffix, itemFactor = AucAdvanced.DecodeLink(itemLink)
 			--[[
 				Returns Integer giving range of time left for query
 				1 -- short time (Less than 30 mins)
@@ -578,7 +580,8 @@ function lib.StorePage()
 			local itemData = {
 				itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
 				timeLeft, curTime, name, texture, count, quality, canUse, level,
-				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner, 0, -1
+				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
+				0, -1, itemId, itemSuffix, itemFactor
 			}
 
 			-- We only store one of the same item/owner/price/quantity in the scan

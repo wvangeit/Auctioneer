@@ -396,6 +396,7 @@ function private.SetAuction(button, id)
 end
 
 function private.MyAuctionFrameUpdate()
+	if not BrowseScrollFrame then return end
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
 	local index, button

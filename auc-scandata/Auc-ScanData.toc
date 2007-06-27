@@ -8,3 +8,4 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/dl/Auc-Advanced
+ScanTooltip.lua

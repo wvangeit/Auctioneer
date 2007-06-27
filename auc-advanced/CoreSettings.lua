@@ -105,6 +105,9 @@ end
 local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
+	['scandata.tooltip.display'] = false,
+	['scandata.tooltip.modifier'] = true,
+	['scandata.force'] = false,
 }
 
 local function getDefault(setting)
@@ -330,6 +333,9 @@ function lib.MakeGuiConfig()
 	
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",     0,    "Main AucAdvanced options")
+	gui.AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
+	gui.AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
+	gui.AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
 
   	gui.AddCat("Modules")
 
