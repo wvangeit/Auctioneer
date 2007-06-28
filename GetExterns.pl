@@ -1,23 +1,7 @@
 #!/usr/bin/perl
 use HTTP::DAV;
 
-for $propfile (<*/.svn/dir-prop-base>) {
-	$dir = $propfile;
-	$dir =~ s/\/\.svn\/dir-prop-base//;
-
-	%p = readPropFile($propfile);
-
-	if ($ext = $p{"svn:externals"}) {
-		@l = split(/[\r\n]+/, $ext);
-		for $l (@l) {
-			if ($l) {
-				($folder, $uri) = split(/\s+/, $l, 2);
-				$uris{$uri} = 1;
-				push(@{$uridata->{$uri}}, "$dir/$folder");
-			}
-		}
-	}
-}
+getExterns();
 
 for $uri (keys %uris) {
 	print "URI: $uri\n";
@@ -40,6 +24,7 @@ for $uri (keys %uris) {
 							mkdir($folder);
 							$cleaned{$folder}++;
 						}
+						print "  => $folder/$filename\n";
 						open DATA, "> $folder/$filename";
 						print DATA $data;
 						close DATA;
@@ -96,5 +81,37 @@ sub readPropFile {
 	return %props
 }
 
+sub getExterns {
+	my ($dir, $level) = @_;
+	$dir = "." unless ($dir);
+	$level = 0 unless ($level);
+	return if ($level > 10);
+	
+	processProp($dir);
+
+	my $entry;
+	for $entry (<$dir/*>) {
+		getExterns($entry, $level+1) if (-d $entry);
+	}
+}
+	
+sub processProp {
+	my ($dir) = @_;
+	my $propfile = "$dir/.svn/dir-prop-base";
+	if (-f $propfile) {
+		my %p = readPropFile($propfile);
+		if ($ext = $p{"svn:externals"}) {
+			my @l = split(/[\r\n]+/, $ext);
+			my $l;
+			for $l (@l) {
+				if ($l) {
+					my ($folder, $uri) = split(/\s+/, $l, 2);
+					$uris{$uri} = 1;
+					push(@{$uridata->{$uri}}, "$dir/$folder");
+				}
+			}
+		}
+	}
+}
 
 
