@@ -239,12 +239,11 @@ function private.ListUpdate()
 	end
 end
 
-function private.CalcLevel(link, quantity, bidPrice, buyPrice)
+function private.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 	if not quantity or quantity < 1 then quantity = 1 end
 
 	local priceModel = AucAdvanced.Settings.GetSetting("util.pricelevel.model")
 	local priceBasis = AucAdvanced.Settings.GetSetting("util.pricelevel.basis")
-	local itemWorth
 
 	local stackPrice
 	if (priceBasis == "cur") then
@@ -259,25 +258,27 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice)
 		end
 	end
 
-	if (priceModel == "market") then
-		itemWorth = AucAdvanced.API.GetMarketValue(link)
-	else
-		itemWorth = AucAdvanced.API.GetAlgorithmValue(priceModel, link)
+	if not itemWorth then
+		if (priceModel == "market") then
+			itemWorth = AucAdvanced.API.GetMarketValue(link)
+		else
+			itemWorth = AucAdvanced.API.GetAlgorithmValue(priceModel, link)
+		end
+		if not itemWorth then return end
 	end
-	if not itemWorth then return end
 
 	local perItem = stackPrice / quantity
 	local priceLevel = perItem / itemWorth * 100
 
-	local r, g, b = 0.2,1.0,0.2
+	local r, g, b, lvl = 0.2,1.0,0.2, "green"
 	if priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.red") then
-		r,g,b = 1.0,0.0,0.0
+		r,g,b,lvl = 1.0,0.0,0.0, "red"
 	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.orange") then
-		r,g,b = 1.0,0.6,0.1
+		r,g,b,lvl = 1.0,0.6,0.1, "orange"
 	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.yellow") then
-		r,g,b = 1.0,1.0,0.0
+		r,g,b,lvl = 1.0,1.0,0.0, "yellow"
 	end
 
-	return priceLevel, perItem, r,g,b
+	return priceLevel, perItem, r,g,b, lvl, itemWorth
 end
-
+lib.CalcLevel = private.CalcLevel
