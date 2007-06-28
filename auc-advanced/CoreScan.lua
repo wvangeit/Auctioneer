@@ -629,8 +629,20 @@ function PlaceAuctionBid(type, index, bid)
 end
 
 private.Hook.QueryAuctionItems = QueryAuctionItems
+
+local isSecure, taint = issecurevariable("CanSendAuctionQuery")
+if (isSecure) then
+	private.CanSend = CanSendAuctionQuery
+else
+	private.warnTaint = taint
+end
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
-	if not CanSendAuctionQuery() then return end
+	if private.warnTaint then
+		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
+		private.warnTaint = nil
+	end
+	if private.CanSend and not private.CanSend() then return end
+
 	local is_same = true
 	query = {}
 	name = name or ""
@@ -687,6 +699,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	private.sentQuery = true
 	lib.lastReq = GetTime()	
 
+	
 	return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 end
 
