@@ -597,16 +597,18 @@ function lib.StorePage()
 
 	-- Send the next page query or finish scanning
 	
-	if (private.scanDir == 1 and private.curPage < maxPages) 
-			or (private.scanDir == -1 and private.curPage > 0) then
-		lib.ScanPage(private.curPage + private.scanDir)
-	else
-		local incomplete = false
-		if (#(private.curScan) > 0.90 * numBatchAuctions) then
-			incomplete = true
+	if private.isScanning then
+		if (private.scanDir == 1 and private.curPage < maxPages) or
+		(private.scanDir == -1 and private.curPage > 0) then
+			lib.ScanPage(private.curPage + private.scanDir)
+		else
+			local incomplete = false
+			if (#(private.curScan) < 0.90 * totalAuctions) then
+				incomplete = true
+			end
+			private.isScanning = false
+			private.Commit(incomplete)
 		end
-		private.isScanning = false
-		private.Commit(incomplete)
 	end
 end
 
@@ -628,6 +630,7 @@ end
 
 private.Hook.QueryAuctionItems = QueryAuctionItems
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
+	if not CanSendAuctionQuery() then return end
 	local is_same = true
 	query = {}
 	name = name or ""
