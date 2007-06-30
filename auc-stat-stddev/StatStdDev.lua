@@ -178,6 +178,28 @@ function lib.GetPriceColumns()
 	return "Average", "Mean", false, "Std Deviation", "Variance", "Count"
 end
 
+local array = {}
+function lib.GetPriceArray(hyperlink, faction, realm)
+	-- Clean out the old array
+	while (#array > 0) do table.remove(array) end
+
+	-- Get our statistics
+	local average, mean, _, stdev, variance, count = lib.GetPrice(hyperlink, faction, realm)
+
+	-- These 2 are the ones that most algorithms will look for
+	array.price = average or mean
+	array.seen = count
+	-- This is additional data
+	array.normalized = average
+	array.mean = mean
+	array.deviation = stdev
+	array.variance = variance
+
+	-- Return a temporary array. Data in this array is
+	-- only valid until this function is called again.
+	return array
+end
+
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should

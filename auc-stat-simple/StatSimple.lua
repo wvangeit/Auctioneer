@@ -143,6 +143,31 @@ function lib.GetPriceColumns()
 	return "Daily Avg", "3 Day Avg", "7 Day Avg", "14 Day Avg", false, "Daily Total", "Daily Count", "Seen Days", "Seen Count"
 end
 
+local array = {}
+function lib.GetPriceArray(hyperlink, faction, realm)
+	-- Clean out the old array
+	while (#array > 0) do table.remove(array) end
+
+	-- Get our statistics
+	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
+
+	-- These 2 are the ones that most algorithms will look for
+	array.price = avg3 or dayAverage
+	array.seen = seenCount
+	-- This is additional data
+	array.avgday = dayAverage
+	array.avg3 = avg3
+	array.avg7 = avg7
+	array.avg14 = avg14
+	array.daytotal = dayTotal
+	array.daycount = dayCount
+	array.seendays = seenDays
+
+	-- Return a temporary array. Data in this array is
+	-- only valid until this function is called again.
+	return array
+end
+
 function lib.OnLoad(addon)
 
 end

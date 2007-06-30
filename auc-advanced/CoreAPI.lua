@@ -77,18 +77,26 @@ function lib.GetMarketValue(itemLink, serverKey)
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
 
-	local total, count = 0, 0
+	local total, count, seen = 0, 0, 0
 	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if (engineLib.GetPrice) then
+		if (engineLib.GetPriceArray) then
+			local array = engineLib.GetPriceArray(itemLink, serverKey)
+			if (array and array.price) then
+				total = total + array.price
+				seen = seen + (array.seen or 1)
+				count = count + 1
+			end
+		elseif (engineLib.GetPrice) then
 			local price = engineLib.GetPrice(itemLink, serverKey)
 			if (price and price > 0) then
 				total = total + price
 				count = count + 1
+				seen = seen + 1
 			end
 		end
 	end
 	if (total > 0) and (count > 0) then
-		return total/count
+		return total/count, seen, count
 	end
 end
 
@@ -133,10 +141,18 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
 						error(("Cannot solve price algorithm for: %s. (Recursion at level %d->%d: %s)"):format(origAlgo, algosig, endSize, pos))
 					end
 				end
+
+				local price, seen, array
 				table.insert(private.algorithmstack, algosig)
-				local price = engineLib.GetPrice(itemLink, serverKey)
+				if (engineLib.GetPriceArray) then
+					array = engineLib.GetPriceArray(itemLink, serverKey)
+					price = array.price
+					seen = array.seen
+				else
+					price = engineLib.GetPrice(itemLink, serverKey)
+				end
 				table.remove(private.algorithmstack, -1)
-				return price
+				return price, seen, array
 			end
 		end
 	end

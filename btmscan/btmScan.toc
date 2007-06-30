@@ -22,3 +22,13 @@ btmLocales.lua
 btmPrices.lua
 btmSettings.lua
 btmMain.lua
+
+# Place the following modules in the order that you wish them to
+# be processed. An earlier module will have first crack at purchasing
+# the item, and will only be beaten if a later module can make more
+# profit.
+#
+# Evaluation modules:
+EvalResale.lua
+EvalVendor.lua
+EvalDisenchant.lua

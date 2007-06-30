@@ -163,11 +163,6 @@ BtmScan.OnUpdate = function(...)
 	local elapsed = select(2, ...)
 
 	if (not BtmScan.lastTry) then BtmScan.lastTry = 0 end
-	if (not BtmScan.aucPriceModel and AuctionFramePost_AdditionalPricingModels) then
-		BtmScan.aucPriceModel = true
-		table.insert(AuctionFramePost_AdditionalPricingModels, BtmScan.AddAuctPriceModel)
-	end
-
 	if (not BtmScan.interval) then BtmScan.interval = 6 end
 	if (BtmScan.timer) then
 		if (not BtmScan.LogFrame and AuctionFrame and BtmScan.lastTry < BtmScan.timer - 1 ) then
@@ -270,7 +265,7 @@ BtmScan.QueryAuctionItems = function(par,ret, name,lmin,lmax,itype,class,sclass,
 	BtmScan.pageScan = 2
 end
 
-BtmScan.PageScan = function(resume)
+function BtmScan.PageScan(resume)
 	BtmScan.pageScan = nil
 	if (not BtmScan.scanStage or BtmScan.scanStage == 0 or BtmScan.scanStage == 3) then return end
 
@@ -281,473 +276,150 @@ BtmScan.PageScan = function(resume)
 	-- lets get the items on the list and scan them.
 	local pageCount, totalCount = GetNumAuctionItems("list")
 
-	local deReagentTable
 	if Enchantrix and Enchantrix.Util and Enchantrix.Util.CreateReagentPricingTable then
-		deReagentTable = Enchantrix.Util.CreateReagentPricingTable()
+		BtmScan.deReagentTable = Enchantrix.Util.CreateReagentPricingTable()
 	end
 
 	local log = BtmScan.Log
 	if (BtmScan.dryRun) then log = BtmScan.Print end
 
+	local reserve = BtmScan.Settings.GetSetting("global.reserve")
+	local maxprice = BtmScan.Settings.GetSetting("global.maxprice")
+	local ignore = BtmScan.Settings.GetSetting("ignore.list")
+
 	-- Ok, lets look at all these lovely items
 	if (not resume) then resume = 1 end
 	i = resume
+
+	local item = {}
 	while ((i <= pageCount) and (BtmScan.scanning == true)) do
-		local itemLink = GetAuctionItemLink("list", i)
-		-- If:
-		--   * This item has been loaded
-		if (itemLink) then
+		item.pos = i
 
-			-- Break apart the link and assemble the keys
-			local itemID, itemRand, itemEnch, itemUniq = BtmScan.BreakLink(itemLink)
-			local sanityKey = itemID..":"..itemRand
-			local auctKey = itemID..":"..itemRand..":"..itemEnch
-			
-			-- Check to see that we're not ignoring this item
-			if (not data.ignore[sanityKey]) then
+		item.link = GetAuctionItemLink("list", item.pos)
 
-				-- Get the auction information for this this item
-				local iName, iTex, iCount, iQual, iUse, iLvl, iMin, iInc, iBuy, iCur, iHigh, iOwner = GetAuctionItemInfo("list", i)
+		-- If this item exists
+		if (item.link) then
+			item.name, item.tex, item.count, item.qual,
+			item.use, item.lvl, item.min, item.inc, item.buy,
+			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
 
-				-- Work out what the next bid will be
-				local iBid = iMin
-				if (iCur and iCur > 0) then iBid = iCur + iInc end
+			if (item.owner ~= UnitName("player")) then
+				-- Disassemble the link
+				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
+				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
 
-				-- If:
-				--   * This item has a buyout price
-				--   * It's not owned by us
-				--   * It's not gonna break the bank
-				if (iOwner ~= UnitName('player')) then
+				-- Check that we're not ignoring this item
+				if not ignore[item.sig] then
 
-					-- Check to see if we have overspent the safetynet on this item
-					-- Note that it is possible to overspend the safety amount, as
-					-- the safetynet only kicks in once you have met or exceeded this
-					-- amount spent.
-					local ignoreItem = false
-					if (not BtmScan.sessionSpend) then BtmScan.sessionSpend = {} end
-					if (BtmScan.sessionSpend[sanityKey]) then
-						local sSpend = BtmScan.sessionSpend[sanityKey]
-						if (sSpend.count >= data.safetyCount) then
-							ignoreItem = true
-						elseif (sSpend.cost >= data.safetyCost) then
-							ignoreItem = true
-						end
+					-- Work out the item's "next-bid"
+					item.bid = item.min
+					if (item.cur and item.cur > 0) then item.bid = item.cur + item.inc end
 
-						if (not BtmScan.dryRun and ignoreItem and not sSpend.warned) then
-							log(tr("Warning: Safety limit reached on item: %1", itemLink))
-							BtmScan.sessionSpend[sanityKey].warned = true
+					-- Determine whether buys/bid are valid
+					item.canbid = true
+					item.canbuy = true
+					local balance = GetMoney()
+					if (BtmScan.Settings.GetSetting("never.bid")) then item.canbid = false end
+					if (BtmScan.Settings.GetSetting("never.buy")) then item.canbuy = false end
+					if (balance - item.bid < reserve) then item.canbid = false end
+					if (balance - item.buy < reserve) then item.canbuy = false end
+					if (item.bid > maxprice) then item.canbid = false end
+					if (item.buy > maxprice) then item.canbuy = false end
+					local autoignore = BtmScan.NoPrompt[item.sig]
+					if (autoignore) then
+						if (item.bid >= autoignore) then item.canbid = false end
+						if (item.buy >= autoignore) then item.canbuy = false end
+					end
+
+					-- Initialize the purchasing variables
+					item.purchase = 0   -- The amount to purchase for
+					item.reason = ""    -- The reason why we are purchasing
+					item.what = ""      -- The component that is making the purchase
+					item.profit = 0     -- The projected profit amount
+					item.valuation = 0  -- The estimated value of this item
+
+					item.force = false  -- Forcefully purchase now!
+					item.ignore = false -- Forcefully ignore this item!
+
+					-- Run through all the evaluators to find the best purchase order
+					local purchasable = BtmScan.EvaluateItem(item)
+					if purchasable then
+						if item.force then
+							if balance - item.purchase < 0 then purchasable = false end
+						else
+							if balance - item.purchase < reserve then purchasable = false end
+							if item.purchase > maxprice then purchasable = false end
 						end
 					end
 
-					-- If this item doesn't breach the safetynet
-					if (not ignoreItem) then
-						-- Get vendor price if available
-						local vendorValue = BtmScan.GetVendorPrice(itemID, iCount)
-
-						-- Get disenchant value if available
-						local disenchantValue = 0
-						if (Enchantrix and Enchantrix.Storage) then
-							if (deReagentTable) then
-								disenchantValue = Enchantrix.Storage.GetItemDisenchantFromTable(itemLink, deReagentTable)
-							else
-								local disenchantTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(itemLink), itemName, true)
-								if (disenchantTo and disenchantTo.totals and disenchantTo.totals.hspValue and iQual > 1 and iCount <= 1) then
-									disenchantValue = disenchantTo.totals.hspValue * disenchantTo.totals.conf
-								end
-							end
-						end
-
-						-- Get snatch value if it has been set
-						local snatchAmount = data.snatch[sanityKey]
-						local snatchPrice, snatchCount, snatchStack
-						if (type(snatchAmount) ~= "table") then
-							snatchPrice = tonumber(snatchAmount) or 0
-							snatchCount = 0
-							snatchStack = 0
-						else
-							snatchPrice = tonumber(snatchAmount[1]) or 0
-							snatchCount = tonumber(snatchAmount[2]) or 0
-							snatchStack = tonumber(snatchAmount[3]) or 0
-						end
-						snatchPrice = snatchPrice * iCount
-						local snatched = tonumber(data.snatched[sanityKey]) or 0
-						if (snatched + iCount > snatchCount and snatchCount > 0) then
-							snatchPrice = 0
-						end
-
-						local _,_,_,_,_,_,_,stackSize = GetItemInfo(itemID)
-						if (not stackSize) then
-							if (snatchStack > 0) then
-								stackSize = snatchStack
-							else
-								stackSize = 1
-							end
-						end
-
-						-- Initialize buyIt to false
-						local buyIt = false
-						local bidIt = false
-						local ignoreIt = false
-						local whyBuy = ""
-						local noSafety = false
-						local buying = itemLink
-						local value = 0
-						local price = 0
-						local profit = 0
-						local message
-
-						if (iCount and iCount > 1) then buying = buying.."x"..iCount end
-
-						-- If this item is not trash (grey) quality
-						if (iQual > 0) then
-							-- Grab the sane price from our list
-							--   Note these are compiled averages from all factions and servers
-							--   This is meant to "double check" the Auctioneer prices, if both
-							--   agree that this item is a "good buy", only then will we buy it
-							local sanity = BtmScan.ConfidenceList[sanityKey] or ""
-							local bBase, bCount
-							local iqm, iqwm, iqCount = strsplit(",", sanity)
-							iqm = tonumber(iqm) or 0
-							iqwm = tonumber(iqwm) or 0
-							iqCount = tonumber(iqCount) or 0
-							bCount = data.minSeen
-							bBase = iqwm
-
-							-- Use the worst case scenario from inbuilt or auctioneer prices
-							-- (if available)
-							local auctMedian, auctCount
-							if (AucAdvanced) then
-								auctMedian = AucAdvanced.API.GetMarketValue(itemLink)
-								auctCount = 1
-							elseif (Auctioneer and Auctioneer.Statistic) then
-								auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
-							end
-
-							bCount = 0
-							if (auctMedian and auctCount) then
-								if (bBase == 0 or bBase >= auctMedian) then
-									bBase = auctMedian
-								end
-								bCount = auctCount
-							end
-
-							if (not auctMedian) then auctMedian = 0 end
-							if (not auctCount) then auctCount = 0 end
-
-							if (not iCount or iCount < 1) then iCount = 1 end
-							local deposit = BtmScan.GetDepositCost(itemID, iCount)
-							if (not deposit) then deposit = 0 end
-
-							if (BtmScan.BaseRule) then
-								BtmScan.prices = {
-									consKey = sanityKey,
-									consMean = iqm * iCount,
-									consPrice = iqwm * iCount,
-									consSeen = iqCount,
-									auctKey = auctKey,
-									auctPrice = auctMedian * iCount,
-									auctSeen = auctCount,
-									itemID = itemID,
-									itemRand = itemRand,
-									itemEnch = itemEnch,
-									itemCount = iCount,
-									buyPrice = iBuy,
-									bidPrice = iBid,
-									basePrice = bBase * iCount,
-									depositCost = deposit,
-								}
-								bBase = BtmScan.BaseRule()
-
-								local action = BtmScan.prices.action
-								if action == "bid" then
-									if (not bBase or bBase == 0) then bBase = iBid*iCount end
-									whyBuy = BtmScan.prices.reason or tr("Actioned")
-									price = iBid
-									value = bBase
-									bidIt = true
-								elseif action == "buy" and (tonumber(iBuy) or 0) > 0 then
-									if (not bBase or bBase == 0) then bBase = iBuy*iCount end
-									whyBuy = BtmScan.prices.reason or tr("Actioned")
-									price = iBuy
-									value = bBase
-									buyIt = true
-								elseif action == "ignore" then
-									ignoreIt = true
-								end
-							else
-								bBase = bBase * iCount
-							end
-
-							if (bBase > 0 and not (bidIt or buyIt or ignoreIt)) then
-								-- If user has specified a specific worth for this item, use it
-								if (data.worth[sanityKey]) then
-									bBase = tonumber(data.worth[sanityKey]) * iCount
-									bCount = data.minSeen
-									noSafety = true
-								end
-
-								-- Work out what the required profit will be
-								local requiredProfit = data.minProfit
-								-- White or lower items have a multiplier added to them
-								if (iQual < 2) then requiredProfit = requiredProfit * data.commonMult end
-
-								-- Find out what the profitable price will be based on pctprofit
-								local profitablePrice = iBuy * (1+data.pctProfit/100)
-								local profitableBid = iBid * (1+data.pctProfit/100)
-								-- Work out which is larger, pctProfit, or requiredProfit
-								if (iBuy + requiredProfit > profitablePrice) then
-									-- Use requiredProfit instead
-									profitablePrice = iBuy + requiredProfit
-								end
-								if (iBid + requiredProfit > profitableBid) then
-									profitableBid = iBid + requiredProfit
-								end
-
-								-- If:
-								--    * It's base price (what we think it's worth) is better
-								--      than what would be profitable for this item.
-								--    * It's buyout cost is less than our maximum price
-								--    * It meets our minimum seen count requirement
-								if (bBase and bBase > 0 and bCount >= data.minSeen) then
-									if (iBuy and iBuy>0 and bBase >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
-										whyBuy = tr("resale")
-										price = iBuy
-										value = bBase
-										buyIt = true
-									elseif (bBase >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
-										whyBuy = tr("resale")
-										price = iBid
-										value = bBase
-										bidIt = true
-									end
-								end
-
-								if (iBuy > bBase * 100) then ignoreIt = true end
-							end
-
-							--Get the itemMinLevel for use with disenchant options
-							local _, _, _, _, itemMinLevel = GetItemInfo(itemID)
-							
-							-- If:
-							--  * The user can disenchant the item
-							if (BtmScan.isDEAble(itemMinLevel)) then
-								-- If:
-								--   * We're not buying it
-								--   * It has a disenchant value
-								if (not buyIt and disenchantValue and disenchantValue > 0) then
-								
-									-- We need to increase the required profit for disenchants
-									-- since there is often a chance that it will not D/E into
-									-- what we want it to. (/btm defactor)
-
-									local profitablePrice = iBuy * (1+data.pctDeProfit/100)
-									local profitableBid = iBid * (1+data.pctDeProfit/100)
-									-- Work out which is larger, pctDeProfit, or minDeProfit
-									if (iBuy + data.minDeProfit > profitablePrice) then
-										-- Use minDeProfit instead
-										profitablePrice = iBuy + data.minDeProfit
-									end
-									if (iBid + data.minDeProfit > profitableBid) then
-										profitableBid = iBid + data.minDeProfit
-									end
-
-									-- If:
-									--   * This item's de value is more than the profitable price
-									--   * It's buyout cost is less than our maximum price
-									if (iBuy and iBuy>0 and disenchantValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
-										whyBuy = tr("disenchant")
-										price = iBuy
-										value = disenchantValue
-										buyIt = true
-										noSafety = true
-									elseif (not bidIt and disenchantValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
-										whyBuy = tr("disenchant")
-										price = iBid
-										value = disenchantValue
-										bidIt = true
-										noSafety = true
-									end
-								end
-							end
-						end --if (not trash)
-
-						-- If:
-						--   * We're not buying it
-						--   * It has a vendor value
-						if (not buyIt and vendorValue and vendorValue > 0) then
-							local profitablePrice = iBuy + data.vendProfit
-							local profitableBid = iBid + data.vendProfit
-
-							-- If:
-							--   * This item's vendor value is more than the profitable price
-							--   * It's buyout cost is less than our maximum price
-							if (iBuy and iBuy>0 and vendorValue >= profitablePrice and iBuy <= data.maxPrice and GetMoney()-iBuy >= data.reserve) then
-								whyBuy = tr("vendor")
-								price = iBuy
-								value = vendorValue
-								buyIt = true
-								noSafety = true
-							elseif (not bidIt and vendorValue >= profitableBid and iBid <= data.maxPrice and GetMoney()-iBid >= data.reserve) then
-								whyBuy = tr("vendor")
-								price = iBid
-								value = vendorValue
-								bidIt = true
-								noSafety = true
-							end
-
-							if (iBuy > vendorValue * 100) then ignoreIt = true end
-						end
-
-						-- If:
-						--   * We're not buying it
-						--   * It has a snatch value
-						local snatching
-						if (not buyIt and snatchPrice > 0) then
-							if (iBuy and iBuy>0 and iBuy < snatchPrice and GetMoney()-iBuy >= data.reserve) then
-								whyBuy = tr("snatch")
-								price = iBuy
-								value = snatchPrice
-								buyIt = true
-								noSafety = true
-								snatching = true
-							elseif (not bidIt and iBid <= snatchPrice and GetMoney()-iBid >= data.reserve) then
-								whyBuy = tr("snatch")
-								price = iBid
-								value = snatchPrice
-								bidIt = true
-								noSafety = true
-							end
-
-							if (iBuy > snatchPrice * 100) then ignoreIt = true end
-						end
-
-						-- If for some reason the buyIt flag was set above, then place a bid on this item
-						-- equal to the buyout price (ie: buy it out)
-						if (buyIt or bidIt) then
-							local bidText, bidType, bidPrice
-							if (buyIt) then
-								bidText = tr("Buying")
-								bidType = tr("bought")
-								bidPrice = iBuy
-							elseif (bidIt and data.allowBids > 0 and not iHigh and not ignoreIt) then
-								bidText = tr("Bidding")
-								bidType = tr("bid on")
-								bidPrice = iBid
-							end
-							profit = value - price
-							local profitPercent = math.floor( (100 * profit / price) + 0.5 );
-							message = tr("%1 %2 at %3 [%4 at %5 = %6 profit / %7%]", bidText, buying, BtmScan.GSC(price), whyBuy, BtmScan.GSC(value), BtmScan.GSC(profit), profitPercent)
-							
-							if bidPrice
-							and GetMoney()-bidPrice >= data.reserve
-							and bidPrice <= data.maxPrice
-							and (not BtmScan.NoPrompt[sanityKey] or
-								BtmScan.NoPrompt[sanityKey] > bidPrice)
-							then
-								if (BtmScan.dryRun) then
-									BtmScan.Print(tr("Would have %1 %2 for %3, but we are doing a dry run.", bidType, buying, bidPrice))
-								else
-									local bidSig = itemLink.."x"..iCount
-									BtmScan.PromptPurchase(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, itemLink, iTex, price, value, profit, message)
-									
-									--set resume to next auction, so we don't double bid on this one immediately
-									BtmScan.resume = i + 1
-									return
-								end
-							end
-						end
+					-- One last check to make sure this is a valid purchase order
+					if purchasable then
+						BtmScan.PromptPurchase(item)
+						BtmScan.resume = i + 1
+						return
 					end
 				end
 			end
 		end
 		i = i + 1
 	end
-	
+
 	BtmScan.scanStage = 0
 	
 	--reached the end of the page, set resume back to nil
 	BtmScan.resume = nil
-	
-	--BtmScan.LogParent:SetBackdropColor(0,0,0, 0.8)
-	--BtmScan.processing = false
 end
 
---Return whether the item is disenchantable give the item's level and the user's enchanting level
-BtmScan.isDEAble = function(itemMinLevel)
-	if (data.enchLevel) then
-		if (data.enchLevel < 25) then
-			if(itemMinLevel < 15) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 50) then
-			if(itemMinLevel < 21) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 75) then
-			if(itemMinLevel < 26) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 100) then
-			if(itemMinLevel < 31) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 125) then
-			if(itemMinLevel < 35) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 150) then
-			if(itemMinLevel < 41) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 175) then
-			if(itemMinLevel < 45) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 200) then
-			if(itemMinLevel < 51) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 225) then
-			if(itemMinLevel < 55) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 275) then
-			if(itemMinLevel < 64) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel < 300) then
-			if(itemMinLevel < 70) then
-				return true
-			else
-				return false
-			end
-		elseif (data.enchLevel >= 300) then
-			if(itemMinLevel <= 70) then
-				return true
-			else
-				return false
+
+BtmScan.evaluators = {}
+function BtmScan.EvaluateItem(item)
+	for pos, name in ipairs(BtmScan.evaluators) do
+		local valuator = BtmScan.evaluators[name]
+		if (valuator and valuator.valuate) then
+			valuator:valuate(item)
+			if item.ignore or item.force then
+				break
 			end
 		end
+	end
+	if item.purchase < item.bid then item.purchase = 0 end
+	if item.purchase > item.buy then item.purchase = buy end
+	if item.ignore then item.purchase = 0 end
+	if item.purchase > 0 then return true end
+end
+
+function BtmScan.Markdown(price, pct, min)
+	local mark = 0
+	if (min) then
+		mark = min
+	end
+	if (pct) then
+		mark = math.max(price * pct / 100, mark)
+	end
+	return price - mark
+end
+
+
+--Return whether the item is disenchantable give the item's level and the user's enchanting level
+BtmScan.isDEAble = function(mLevel, eLevel)
+	if not eLevel then
+		eLevel = data.enchLevel
+	end
+	if (eLevel) then
+		if     eLevel<  25 then if mLevel< 15 then return true end
+		elseif eLevel<  50 then if mLevel< 21 then return true end
+		elseif eLevel<  75 then if mLevel< 26 then return true end
+		elseif eLevel< 100 then if mLevel< 31 then return true end
+		elseif eLevel< 125 then if mLevel< 35 then return true end
+		elseif eLevel< 150 then if mLevel< 41 then return true end
+		elseif eLevel< 175 then if mLevel< 45 then return true end
+		elseif eLevel< 200 then if mLevel< 51 then return true end
+		elseif eLevel< 225 then if mLevel< 55 then return true end
+		elseif eLevel< 275 then if mLevel< 64 then return true end
+		elseif eLevel< 300 then if mLevel< 70 then return true end
+		elseif eLevel>=300 then if mLevel<=70 then return true end
+		end
+		return false
 	end
 end
 
@@ -1066,286 +738,18 @@ BtmScan.Command = function (msg)
 	BtmScan.GetZoneConfig("command")
 
 	local help = false
-	if (cmd == "maxprice") then
-		if (param) then
-			data.maxPrice = BtmScan.ParseGSC(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Maximum Price"), BtmScan.GSC(data.maxPrice,1)))
-	elseif (cmd == "minprofit") then
-		if (param) then
-			data.minProfit = BtmScan.ParseGSC(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Profit"), BtmScan.GSC(data.minProfit,1)))
-	elseif (cmd == "pctprofit") then
-		if tonumber(param) then
-			data.pctProfit = tonumber(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Percent Profit"), data.pctProfit.."%"))
-	elseif (cmd == "mindeprofit") then
-		if (param) then
-			data.minDeProfit = BtmScan.ParseGSC(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Disenchant Profit"), BtmScan.GSC(data.minDeProfit,1)))
-	elseif (cmd == "pctdeprofit") then
-		if tonumber(param) then
-			data.pctDeProfit = tonumber(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Percent Disenchant Profit"), data.pctDeProfit.."%"))
-	elseif (cmd == "enchant") then
-		if (param) then
-			if (tonumber(param) and (tonumber(param) >= 0) and (tonumber(param) <= 375)) then
-				data.enchLevel = math.floor(tonumber(param))
-				BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Enchanting Level"), data.enchLevel))
-			else
-				BtmScan.Print("Enchanting level has to be 0-375, please try again")
-			end
-		elseif (data.enchLevel ~= nil) then
-			BtmScan.Print(tr("BottomScanner has %1 set to %2 currently", tr("Enchanting Level"), data.enchLevel))
-		else
-			BtmScan.Print("Please enter your enchanting level after \"enchant\". IE: /btmscan enchant 300")
-		end
-	elseif (cmd == "vendprofit") then
-		if (param) then
-			data.vendProfit = BtmScan.ParseGSC(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Vendor Profit"), BtmScan.GSC(data.vendProfit)))
-	elseif (cmd == "reserve") then
-		if (param) then
-			data.reserve = BtmScan.ParseGSC(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Reserve"), BtmScan.GSC(data.reserve,1)))
-	elseif (cmd == "defactor") then
-		if tonumber(param) then
-			data.deFactor = tonumber(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Disenchant Factor"), data.deFactor))
-	elseif (cmd == "commonmult") then
-		if tonumber(param) then
-			data.commonMult = tonumber(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Common Item Multiplier"), data.commonMult))
-	elseif (cmd == "allowbids") then
-		if tonumber(param) then
-			data.allowBids = tonumber(param)
-		end
-		local allowing = tr("Not Allowed")
-		if (data.allowBids > 0) then
-			allowing = tr("Allowed")
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Item Bidding"), allowing))
-	elseif (cmd == "safetynet") then
-		local i,j, scount, scost = string.find(oparam, "^(%d+) (%d+)")
-		if (i) then
-			scount = tonumber(scount)
-			scost = BtmScan.ParseGSC(scost)
-			if (scount < 0) then scount = 0 end
-			if (scost < 0) then scost = 0 end
-			data.safetyCount = scount
-			data.safetyCost = scost
-		end
-		scount = data.safetyCount
-		scost = data.safetyCost
-		if (scount == 0) then scount = "unlimited" end
-		if (scost == 0) then scost = "unlimited" else scost = BtmScan.GSC(scost) end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Safety Net"), tr("%1 items, %2 total spend", scount, scost)))
-	elseif (cmd == "minseen") then
-		if (param) then
-			data.minSeen = tonumber(param)
-		end
-		BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Minimum Seen Count"), data.minSeen))
-	elseif ((cmd == "end") or (cmd == "stop") or (cmd == "cancel")) then
-		BtmScan.EndScan()
-	elseif ((cmd == "begin") or (cmd == "start") or (cmd == "scan")) then
-		BtmScan.dryRun = false
-		BtmScan.BeginScan()
-	elseif (cmd == "dryrun") then
-		BtmScan.dryRun = true
-		BtmScan.BeginScan()
+	if (not cmd or cmd == "config" or cmd == "") then
+		BtmScan.Settings.Toggle()
 	elseif (cmd == "load") then
 		if (param == "always") or (param == "never") or (param == "auctionhouse") then
 			Stubby.SetConfig("BtmScan", "LoadType", param)
 			BtmScan.Print(tr("Setting BottomScanner to %1 load for this toon",param))
 		end
-	elseif (cmd == "baserule") then
-		if (oparam) then
-			data.baseRule = oparam
-			BtmScan.CompileBaseRule()
-		else
-			BtmScan.EditData("baseRule", BtmScan.CompileBaseRule)
-		end
-	elseif (cmd == "tooltip") then
-		if (param == "on") then
-			data.tooltipOn = true
-		elseif (param == "off") then
-			data.tooltipOn = false
-		end
-		
-		if (data.tooltipOn ~= nil) then
-			local isOn
-			if (data.tooltipOn == true) then
-				isOn = "on"
-			else
-				isOn = "off"
-			end
-			BtmScan.Print(tr("BottomScanner has %1 set to %2", tr("show tooltips"), tr(isOn)))
-		else
-			BtmScan.Print("The tooltip command requires and on or off after it.")
-		end
-	elseif (cmd == "ignore") then
-		if (oparam) then
-			local des = BtmScan.ItemDes(oparam)
-			data.ignore[des] = true
-			BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), oparam))
-		else
-			BtmScan.Print(tr("Your current %1 list is:", tr("ignore")))
-			if (data.ignore and next(data.ignore)) then
-				for des, ignored in pairs(data.ignore) do
-					local itemID, itemRand = BtmScan.BreakItemDes(des)
-					local itemString = "item:"..itemID..":0:"..itemRand..":0"
-					local itemLink = BtmScan.FakeLink(itemString)
-					BtmScan.Print(tr("  * %1", itemLink))
-				end
-			else
-				BtmScan.Print(tr("  -- Empty --"))
-			end
-		end
-	elseif (cmd == "unignore") then
-		if (oparam) then
-			local des = BtmScan.ItemDes(oparam)
-			data.ignore[des] = nil
-			BtmScan.Print(tr("BottomScanner will now %1 %2", tr("not ignore"), oparam))
-		end
-	elseif (cmd == "worth") then
-		if (oparam) then
-			local des, count, price, itemid,itemrand,itemlink, remain = BtmScan.ItemDes(oparam)
-			if (not des) then
-				BtmScan.Print(tr("Unable to understand command. Please see /btm help"))
-				return
-			end
-
-			if (price <= 0) then
-				price = BtmScan.ParseGSC(remain) or 0
-			end
-
-			if (price <= 0) then
-				BtmScan.Print(tr("BottomScanner will now %1 %2", tr("not value"), itemlink))
-				data.worth[des] = nil
-				return
-			end
-
-			local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
-			if (not stack) then
-				stack = 1
-			end
-
-			local stackText = ""
-			if (stack > 1) then
-				stackText = " ("..tr("%1 per %2 stack", BtmScan.GSC(price*stack, 1), stack)..")"
-			end
-
-			data.worth[des] = price
-			BtmScan.Print(tr("BottomScanner will now %1 %2", tr("value"), tr("%1 at %2", itemlink, tr("%1 per unit", BtmScan.GSC(price, 1)))..stackText))
-		else
-			BtmScan.Print(tr("Your current %1 list is:", tr("worth")))
-			if (data.worth and data.worth ~= {}) then
-				for des, amount in pairs(data.worth) do
-					local itemID, itemRand = BtmScan.BreakItemDes(des)
-					local itemString = "item:"..itemID..":0:"..itemRand..":0"
-					local itemLink = BtmScan.FakeLink(itemString)
-
-					local worthLine = ""
-					amount = tonumber(amount) or 0
-
-					worthLine = worthLine..tr("%1 per unit", BtmScan.GSC(amount,1))
-					local _,_,_,_,_,_,_,stack = GetItemInfo(itemID)
-					stack = tonumber(stack) or 1;
-					if (stack > 1) then
-						worthLine = worthLine.." ("..tr("%1 per %2 stack", BtmScan.GSC(amount*stack,1), stack)..")"
-					end
-					BtmScan.Print(tr("  * %1 = %2", itemLink, worthLine))
-				end
-			else
-				BtmScan.Print(tr("  -- Empty --"))
-			end
-		end
-	elseif (cmd == "snatch") then
-		if (oparam) then
-			local des, count, price, itemid,itemrand,itemlink, remain = BtmScan.ItemDes(oparam)
-			if (not des) then
-				BtmScan.Print(tr("Unable to understand command. Please see /btm help"))
-				return
-			end
-
-			if (price <= 0) then
-				price = BtmScan.ParseGSC(remain) or 0
-			end
-			
-			if (price <= 0) then
-				BtmScan.Print(tr("BottomScanner will now %1 %2", tr("not snatch"), itemlink))
-				data.snatched[des] = nil
-				data.snatch[des] = nil
-				return
-			end
-
-			local _,_,_,_,_,_,_,stack = GetItemInfo(itemid)
-			if (not stack) then
-				stack = 1
-			end
-
-			local stackText = ""
-			if (stack > 1) then
-				stackText = " ("..tr("%1 per %2 stack", BtmScan.GSC(price*stack, 1), stack)..")"
-			end
-			local countText =""
-			if (count > 0) then
-				countText = tr("up to %1", count).." "
-			else
-				countText = tr("unlimited").." "
-			end
-
-			data.snatch[des] = { price, count, stack }
-			data.snatched[des] = 0
-			BtmScan.Print(tr("BottomScanner will now %1 %2", tr("snatch"), countText..tr("%1 at %2", itemlink, tr("%1 per unit", BtmScan.GSC(price, 1)))..stackText))
-		else
-			BtmScan.Print(tr("Your current %1 list is:", tr("snatch")))
-			if (data.snatch and data.snatch ~= {}) then
-				for des, amount in pairs(data.snatch) do
-					local itemID, itemRand = BtmScan.BreakItemDes(des)
-					local itemString = "item:"..itemID..":0:"..itemRand..":0"
-					local itemLink = BtmScan.FakeLink(itemString)
-
-					local price, count, stack
-					local snatchLine = ""
-					if (type(amount) ~= "table") then
-						price = tonumber(amount) or 0
-						count = 0
-						stack = 0
-					else
-						price = tonumber(amount[1]) or 0
-						count = tonumber(amount[2]) or 0
-						stack = tonumber(amount[3]) or 0
-					end
-
-					if (count > 0) then
-						local fulfilled = tonumber(data.snatched[des]) or 0
-						snatchLine = snatchLine..tr("%1 / %2 at", fulfilled, count).." "
-					end
-					snatchLine = snatchLine..tr("%1 per unit", BtmScan.GSC(price,1))
-					if (stack > 1) then
-						snatchLine = snatchLine.." ("..tr("%1 per %2 stack", BtmScan.GSC(price*stack,1), stack)..")"
-					end
-					BtmScan.Print(tr("  * %1 = %2", itemLink, snatchLine))
-				end
-			else
-				BtmScan.Print(tr("  -- Empty --"))
-			end
-		end
-	elseif (cmd == "print-in") then
-		BtmScan.setFrame(oparam)
-	elseif (cmd == "clear") then
-		data.logText = { { time(), "--- Welcome to BottomScanner ---" } }
-		if (BtmScan.LogFrame) then BtmScan.LogFrame.Update() end
-	elseif (cmd == "help" or cmd == "") then
+	elseif ((cmd == "end") or (cmd == "stop") or (cmd == "cancel")) then
+		BtmScan.EndScan()
+	elseif ((cmd == "begin") or (cmd == "start") or (cmd == "scan")) then
+		BtmScan.BeginScan()
+	elseif (cmd == "help") then
 		help = true
 	else
 		BtmScan.Print(tr("BottomScanner: %1 [%2]", tr("Unknown command"), cmd))
@@ -1353,36 +757,8 @@ BtmScan.Command = function (msg)
 	end
 
 	if (help) then
-		BtmScan.Print(tr("BottomScanner is using %1 configuration", dataZone))
-		BtmScan.Print(tr(" %1 [%2] = %3", "reserve <copper>", tr("Reserves a certain amount of your money from being spent"), BtmScan.GSC(data.reserve,1)))
-		BtmScan.Print(tr(" %1 [%2] = %3", "maxprice <copper>", tr("Sets the maximum price that we will buy auctions for"), BtmScan.GSC(data.maxPrice,1)))
-		BtmScan.Print(tr(" %1 [%2] = %3", "minprofit <copper>", tr("Sets the minimum profit that we consider an auction"), BtmScan.GSC(data.minProfit,1)))
-		BtmScan.Print(tr(" %1 [%2] = %3", "pctprofit <percent>", tr("Sets the minimum percentage of profit to buy an auction"), data.pctProfit.."%"))
-		BtmScan.Print(tr(" %1 [%2] = %3", "mindeprofit <copper>", tr("Sets the minimum disenchant profit that we consider an auction"), BtmScan.GSC(data.minDeProfit,1)))
-		BtmScan.Print(tr(" %1 [%2] = %3", "pctdeprofit <percent>", tr("Sets the minimum percentage of disenchant profit to buy an auction"), data.pctDeProfit.."%"))
-		BtmScan.Print(tr(" %1 [%2] = %3", "vendprofit <copper>", tr("Sets the minimum profit on vendorable items"), data.vendProfit))
-		BtmScan.Print(tr(" %1 [%2] = %3", "commonmult <factor>", tr("Sets a penalty factor on white items' profitability"), data.commonMult))
-		local allowing = tr("Not Allowed") if (data.allowBids > 0) then allowing = tr("Allowed") end
-		BtmScan.Print(tr(" %1 [%2] = %3", "allowbids <0/1>", tr("Sets whether to allow bidding if the rules would have bought at that price"), allowing))
-		BtmScan.Print(tr(" %1 [%2] = %3", "minseen <count>", tr("Sets the minimum Auctioneer \"seen count\" before we will buy an item"), data.minSeen))
-
-		local scount, scost
-		scount = data.safetyCount
-		scost = data.safetyCost
-		if (scount == 0) then scount = "unlimited" end
-		if (scost == 0) then scost = "unlimited" else scost = BtmScan.GSC(scost) end
-		BtmScan.Print(tr(" %1 [%2] = %3", "safetynet <count> <copper>", tr("Sets the maximum number / cost of any single item that will be bought in any one session (0 for unlimited)"), tr("%1 items, %2 total spend", scount, scost)))
-
-		BtmScan.Print(tr(" %1 [%2]", "print-in (<frameIndex>[Number]|<frameName>[String])", tr("Sets the chatFrame that BottomScanner's messages will be printed to")))
-		BtmScan.Print(tr(" %1 [%2]", "baserule <lua>", tr("Advanced users only: Specify your own lua code for calculating the base price")))
-		BtmScan.Print(tr(" %1 [%2]", "tooltip <on/off>", tr("Turn on/off the BottomScanner tooltip")))
-		BtmScan.Print(tr(" %1 [%2]", "ignore [ItemLink]", tr("Ignores the specified item")))
-		BtmScan.Print(tr(" %1 [%2]", "unignore [ItemLink]", tr("Stops ignoring the specified item")))
-		BtmScan.Print(tr(" %1 [%2]", "snatch [ItemLink] <copper> <count>", tr("Sets the item's snatch value, or leave off '<copper> <count>' to un-snatch")))
-		BtmScan.Print(tr(" %1 [%2]", "worth [ItemLink] <copper>", tr("Sets the specified item's value, or leave off '<copper>' to un-worth")))
-		BtmScan.Print(tr(" %1 [%2]", "enchant <level>", tr("Sets your enchanting level for disenchant-based purchases")))
-		BtmScan.Print(tr(" %1 [%2]", "clear", tr("Clears the AH event log window")))
-		BtmScan.Print(tr(" %1 [%2]", "dryrun", tr("Begins a test scanning run (must have AH open)")))
+		BtmScan.Print(tr("BottomScanner help:"))
+		BtmScan.Print(tr(" %1 [%2]", "config", tr("Opens up the configuration screen")))
 		BtmScan.Print(tr(" %1 [%2]", "begin", tr("Begins the scanning process (must have AH open)")))
 		BtmScan.Print(tr(" %1 [%2]", "end", tr("Ends the scanning process")))
 		BtmScan.Print(tr(" %1 [%2]", "load (always|never|auctionhouse)", tr("Set when BottomScanner will load")))
@@ -1406,79 +782,11 @@ BtmScan.EndScan = function ()
 	end
 end
 
-BtmScan.AddAuctPriceModel = function (itemID, itemRand, itemEnch, itemName, count)
-	local sanityKey = itemID..":"..itemRand
-	local sanity = BtmScan.ConfidenceList[sanityKey]
-	local iqm, iqwm
-	if (sanity) then
-		local iqm, iqwm, iqCount = strsplit(",", sanity)
-		iqm = tonumber(iqm)
-		iqwm = tonumber(iqwm)
-		if (count and count > 1) then
-			iqm = iqm * count
-			iqwm = iqwm * count
-		end
- 		return {
-			text = "BottomScanner",
-			note = "",
-			bid = iqwm,
-			buyout = iqm
-		}
-	end
-	return nil
-end
-
-BtmScan.CompileBaseRule = function()
-	if not data or not data.baseRule or data.baseRule == "default" then
-		BtmScan.BaseRule = nil
-		return
-	end
-
-	local script = -- Block script below:
-[[
-local consKey     = BtmScan.prices.consKey
-local consMean    = BtmScan.prices.consMean
-local consPrice   = BtmScan.prices.consPrice
-local consSeen    = BtmScan.prices.consSeen
-local auctKey     = BtmScan.prices.auctKey
-local auctPrice   = BtmScan.prices.auctPrice
-local auctSeen    = BtmScan.prices.auctSeen
-local itemID      = BtmScan.prices.itemID
-local itemRand    = BtmScan.prices.itemRand
-local itemEnch    = BtmScan.prices.itemEnch
-local itemCount   = BtmScan.prices.itemCount
-local bidPrice    = BtmScan.prices.bidPrice
-local buyPrice    = BtmScan.prices.buyPrice
-local basePrice   = BtmScan.prices.basePrice
-local depositCost = BtmScan.prices.depositCost
-local depositRate = BtmScan.depositRate
-local cutRate     = BtmScan.cutRate
-local auctionFee  = 0
-local action, reason
-]]..data.baseRule..[[
-
-BtmScan.prices.depositCost = depositCost
-BtmScan.prices.auctionFee = auctionFee
-BtmScan.prices.action = action
-BtmScan.prices.reason = reason
-return basePrice
-]]
-	-- End of block script --
-
-	local scriptFunc = loadstring(script)
-	if (not scriptFunc) then
-		BtmScan.Print("Error compiling BottomScanner BaseRule script")
-		BtmScan.BaseRule = nil
-		return
-	end
-	BtmScan.Print(tr("BottomScanner has set %1 to %2", tr("Base Rule"), tr("the provided value")))
-	BtmScan.BaseRule = scriptFunc
-end
-
-BtmScan.GetDepositCost = function (itemID, count)
+BtmScan.GetDepositCost = function (itemID, count, rate)
+	if (not rate) then rate = BtmScan.depositRate end
 	local vendorValue = BtmScan.GetVendorPrice(itemID, count)
 	if (not vendorValue) then return 0 end
-	local baseDeposit = math.floor(vendorValue * BtmScan.depositRate) -- 2 hr auction
+	local baseDeposit = math.floor(vendorValue * rate) -- 2 hr auction
 	return baseDeposit * 12 -- 24 hour auction
 end
 
@@ -1558,35 +866,12 @@ BtmScan.GetZoneConfig = function (whence)
 	else
 		return
 	end
-
-	-- Check config data
-	if (not data.maxPrice) then data.maxPrice = 25000 end -- 2g50 max buyout
-	if (not data.minProfit) then data.minProfit = 3000 end -- 30s min profit
-	if (not data.pctProfit) then data.pctProfit = 30 end -- 30% min profit
-	if (not data.minDeProfit) then data.minDeProfit = 4500 end -- 4g50
-	if (not data.pctDeProfit) then data.pctDeProfit = 45 end -- 45%
-	if (not data.reserve) then data.reserve = 20000 end -- 2gReserve
-	if (not data.deFactor) then data.deFactor = 1.5 end -- 150%
-	if (not data.minSeen) then data.minSeen = 3 end -- 150%
-	if (not data.vendProfit) then data.vendProfit = 20 end -- 20c min vendor profit
-	if (not data.commonMult) then data.commonMult = 1.5 end -- common multiplier
-	if (not data.allowBids) then data.allowBids = 0 end -- to allow or not allow
 	if (not data.ignore) then data.ignore = {} end -- ignore nothing
-	if (not data.snatch) then data.snatch = {} end -- snatch list
-	if (not data.snatched) then data.snatched = {} end -- snatched list
-	if (not data.worth) then data.worth = {} end -- fixed price list
-	if (not data.bids) then data.bids = {} end -- latest bids and reasons
-	if (not data.safetyCount) then data.safetyCount = 6 end -- safetynet count
-	if (not data.safetyCost) then
-		data.safetyCost = data.safetyCount * data.maxPrice / 2
-	end -- safetynet cost
 	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regaurdless of user's enchanting level
 	
 	if (not data.tooltipOn) then
 		data.tooltipOn = true	 --Sets the tooltip as on by default
 	end
-	
-	BtmScan.CompileBaseRule()
 end
 
 
@@ -1791,17 +1076,18 @@ BtmScan.DoTooltip = function ()
 	end
 end
 BtmScan.PurchaseTooltip = function()
-	local iLink = BtmScan.Prompt.iLink
-	if (iLink) then
-		local itemID, itemRand, itemEnch, itemUniq, itemName, wholeLink = BtmScan.BreakLink(iLink)
-		if (itemID and itemID > 0) then
+	local item = BtmScan.Prompt.item
+	if (item.link) then
+		if (item.id and item.id > 0) then
 			GameTooltip:SetOwner(AuctionFrameCloseButton, "ANCHOR_NONE")
-			GameTooltip:SetHyperlink(iLink)
+			GameTooltip:SetHyperlink(item.link)
 			GameTooltip:ClearAllPoints()
-			GameTooltip:SetPoint("TOPLEFT", "AuctionFrame", "TOPRIGHT", 10, -20)
+			GameTooltip:SetPoint("TOPRIGHT", "BtmScanPromptItem", "TOPLEFT", -10, -20)
 			if (EnhTooltip) then
-				EnhTooltip.TooltipCall(GameTooltip, itemName, wholeLink, -1, BtmScan.Prompt.iCount, BtmScan.Prompt.bidPrice)
+				EnhTooltip.TooltipCall(GameTooltip, item.name, item.link, -1, item.count, item.purchase)
 			end
+			GameTooltip:ClearAllPoints()
+			GameTooltip:SetPoint("TOPRIGHT", "BtmScanPromptItem", "TOPLEFT", -10, -20)
 		end
 	end
 end
@@ -1830,61 +1116,44 @@ function BtmScan.AuctionFrameTabClickHook(_,_, index)
 end
 
 
-
-BtmScan.PromptPurchase = function(i, bidSig, whyBuy, bidPrice, bidType, noSafety, snatching, iCount, stackSize, sanityKey, iLink, iTex, price, value, profit, message)
+BtmScan.PromptPurchase = function(item)
 	BtmScan.scanStage = 3
-	BtmScan.Prompt.index     = i
-	BtmScan.Prompt.bidSig    = bidSig
-	BtmScan.Prompt.whyBuy    = whyBuy
-	BtmScan.Prompt.bidPrice  = bidPrice
-	BtmScan.Prompt.bidType   = bidType
-	BtmScan.Prompt.noSafety  = noSafety
-	BtmScan.Prompt.snatching = snatching
-	BtmScan.Prompt.iCount    = iCount
-	BtmScan.Prompt.stackSize = stackSize
-	BtmScan.Prompt.sanityKey = sanityKey
-	BtmScan.Prompt.iLink     = iLink
-	BtmScan.Prompt.iTex      = iTex
-	BtmScan.Prompt.price     = price
-	BtmScan.Prompt.value     = value
-	BtmScan.Prompt.profit    = profit
-	BtmScan.Prompt.message   = message
+	BtmScan.Prompt.item = item
 
 	-- format the profit percentage as an integer (can still be huge)
-	local profitPercent = math.floor( (100 * profit / bidPrice) + 0.5 );
+	local profitPercent = math.floor( (100 * item.profit / item.purchase) + 0.5 );
 	
-	local bidText = bidType
-	if (bidText == tr("bought")) then bidText = tr("buyout") end
+	local bidText, BidText = "purchase", "Buyout"
+	if (item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
 	
 	BtmScan.Prompt.Lines[1]:SetText(tr("Do you want to %1:", bidText))
-	BtmScan.Prompt.Lines[2]:SetText("  "..iLink.."x"..iCount)
-	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", bidText, BtmScan.GSC(bidPrice)))
-	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", whyBuy))
-	BtmScan.Prompt.Lines[5]:SetText("  "..tr("Valued at %1 (%2 profit / %3%)", BtmScan.GSC(value), BtmScan.GSC(profit), profitPercent))
-	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(iTex)
+	BtmScan.Prompt.Lines[2]:SetText("  "..item.link.."x"..item.count)
+	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", BidText, BtmScan.GSC(item.purchase)))
+	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", item.reason))
+	BtmScan.Prompt.Lines[5]:SetText("  "..tr("Valued at %1 (%2 profit / %3%)", BtmScan.GSC(item.valuation), BtmScan.GSC(item.profit), profitPercent))
+	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(item.tex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
 	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3")
 	BtmScan.Prompt:Show()
-
 end
 
 
-local function checkItem(i, iLink, iCount, bidType, bidPrice)
+local function checkItem(pos, item)
 	local isCorrect = false
-	local itemLink = GetAuctionItemLink("list", i)
-	if (itemLink == iLink) then
-		local aName,aTex,aCount,aQual,aUse,aLvl,aMin,aInc,aBuy,aCur,aHigh,aOwner = GetAuctionItemInfo("list", i)
-		if (aCount == iCount) then
-			if (bidType == tr("bought")) then
-				if (aBuy == bidPrice) then
+	local link = GetAuctionItemLink("list", pos)
+	if (link == item.link) then
+		local aName,aTex,aCount,aQual,aUse,aLvl,aMin,aInc,aBuy,aCur,aHigh,aOwner = GetAuctionItemInfo("list", pos)
+		if (aCount == item.count) then
+			if (item.purchase == item.buy) then
+				if (aBuy == item.buy) then
 					isCorrect = true
 				end
 			else
 				if (aCur and aCur > 0) then
-					if (aCur + aInc == bidPrice) then
+					if (aCur + aInc <= item.purchase) then
 						isCorrect = true
 					end
-				elseif (aMin == bidPrice) then
+				elseif (aMin <= item.purchase) then
 					isCorrect = true
 				end
 			end
@@ -1894,31 +1163,20 @@ local function checkItem(i, iLink, iCount, bidType, bidPrice)
 end
 
 BtmScan.PerformPurchase = function()
-	local i         = BtmScan.Prompt.index
-	local iLink     = BtmScan.Prompt.iLink
-	local iCount    = BtmScan.Prompt.iCount
-	local bidSig    = BtmScan.Prompt.bidSig
-	local whyBuy    = BtmScan.Prompt.whyBuy
-	local bidPrice  = BtmScan.Prompt.bidPrice
-	local bidType   = BtmScan.Prompt.bidType
-	local noSafety  = BtmScan.Prompt.noSafety
-	local snatching = BtmScan.Prompt.snatching
-	local stackSize = BtmScan.Prompt.stackSize
-	local sanityKey = BtmScan.Prompt.sanityKey
-	local message   = BtmScan.Prompt.message
-
-	data.bids[bidSig] = { whyBuy, bidPrice, bidType, time() }
+	local item = BtmScan.Prompt.item
+	data.bids[item.sig] = { whyBuy, bidPrice, bidType, time() }
 	
 	-- Verify first that the item is still there
 	local there = false
 	local pageCount, totalCount = GetNumAuctionItems("list")
+	local i = item.pos
 	if (i <= pageCount) then
-		there = checkItem(i, iLink, iCount, bidType, bidPrice)
+		there = checkItem(item.pos, item)
 	end
 	
 	if (not there) then
 		for j = 1, pageCount do
-			there = checkItem(j, iLink, iCount, bidType, bidPrice)
+			there = checkItem(j, item)
 			if (there) then
 				i = j
 				break
@@ -1934,26 +1192,8 @@ BtmScan.PerformPurchase = function()
 	end
 	
 	BtmScan.Log(message)
-	PlaceAuctionBid("list", i, bidPrice)
+	PlaceAuctionBid("list", i, item.purchase)
 
-	-- Mark this item as "bought"
-	if (not noSafety) then
-		local bought = 1
-		if (stackSize and stackSize > 1) then
-			bought = iCount / stackSize
-		end
-		
-		if (BtmScan.sessionSpend[sanityKey]) then
-			BtmScan.sessionSpend[sanityKey].count = BtmScan.sessionSpend[sanityKey].count + bought 
-			BtmScan.sessionSpend[sanityKey].cost = BtmScan.sessionSpend[sanityKey].cost + bidPrice
-		else
-			BtmScan.sessionSpend[sanityKey] = { count = bought, cost = bidPrice }
-		end
-	end
-	if (snatching) then
-		local snatched = tonumber(data.snatched[sanityKey]) or 0
-		data.snatched[sanityKey] = snatched + iCount
-	end
 	BtmScan.Prompt:Hide()
 	BtmScan.scanStage = 2
 	BtmScan.timer = 0
@@ -1961,11 +1201,11 @@ BtmScan.PerformPurchase = function()
 end
 
 BtmScan.CancelPurchase = function()
-	local key = BtmScan.Prompt.sanityKey
-	local price = math.floor(BtmScan.Prompt.bidPrice / BtmScan.Prompt.iCount)
-	if (not BtmScan.NoPrompt[key]) or (price < BtmScan.NoPrompt[key]) then
-		BtmScan.NoPrompt[key] = price
-		BtmScan.Print(tr("BottomScanner autoignoring %1 for more than %2 this session.", BtmScan.Prompt.iLink, BtmScan.GSC(price)))
+	local item = BtmScan.Prompt.item
+	local price = math.floor(item.purchase / item.count)
+	if (not BtmScan.NoPrompt[item.sig]) or (price < BtmScan.NoPrompt[item.sig]) then
+		BtmScan.NoPrompt[item.sig] = price
+		BtmScan.Print(tr("BottomScanner autoignoring %1 for more than %2 this session.", item.link, BtmScan.GSC(price)))
 	end
 	BtmScan.scanStage = 2
 	BtmScan.timer = 0
@@ -1974,9 +1214,10 @@ BtmScan.CancelPurchase = function()
 end
 
 BtmScan.IgnorePurchase = function()
-	local key = BtmScan.Prompt.sanityKey
-	data.ignore[key] = true
-	BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), BtmScan.Prompt.iLink))
+	local item = BtmScan.Prompt.item
+	local ignore = BtmScan.Settings.GetSetting("ignore.list")
+	ignore[item.sig] = true
+	BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), item.link))
 	BtmScan.scanStage = 2
 	BtmScan.timer = 0
 	BtmScan.pageScan = 0.001
@@ -2054,7 +1295,7 @@ BtmScan.Prompt.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFram
 BtmScan.Prompt.Drag:SetScript("OnMouseDown", function() BtmScan.Prompt:StartMoving() end)
 BtmScan.Prompt.Drag:SetScript("OnMouseUp", function() BtmScan.Prompt:StopMovingOrSizing() end)
 
-BtmScan.Prompt.Item = CreateFrame("Button", "", BtmScan.Prompt)
+BtmScan.Prompt.Item = CreateFrame("Button", "BtmScanPromptItem", BtmScan.Prompt)
 BtmScan.Prompt.Item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
 BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,0.640625, 0,0.640625)
 BtmScan.Prompt.Item:SetPoint("TOPLEFT", BtmScan.Prompt, "TOPLEFT", 15, -15)
@@ -2272,3 +1513,5 @@ end
 function BtmScan.DebugPrint(message, category, title, errorCode, level)
 	return DebugLib.DebugPrint(message, category, title, errorCode, level)
 end
+
+-- vim:fen:fdm=marker:fdl=1:fcl=:

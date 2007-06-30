@@ -101,18 +101,35 @@ local function cleanse( profile )
 end
 
 
+local setter, getter, getDefault
+
 -- Default setting values
 local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
+	['scan.always'] = false,
+	['scan.reload.enable'] = true,
+	['scan.reload.interval'] = 30,
+	['global.reserve'] = 20000,
+	['global.maxprice'] = 25000,
+	['never.buy'] = false,
+	['never.bid'] = false,
 }
 
-local function getDefault(setting)
+function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
 	
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
+	
+	-- custom settings
+	if (setting == "ignore.list") then
+		local db = getUserProfile()
+		if db[setting] then return nil end
+		db[setting] = {}
+		return db[setting]
+	end
 	
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
@@ -125,7 +142,11 @@ function lib.GetDefault(setting)
 	return val;
 end
 
-local function setter(setting, value)
+function lib.SetDefault(setting, default)
+	settingDefaults[setting] = default
+end
+
+function setter(setting, value)
 	if (not BtmScanData) then BtmScanData = {} end
 	
 	-- turn value into a canonical true or false
@@ -226,6 +247,9 @@ local function setter(setting, value)
 
 		-- Refresh all values to reflect current data
 		gui.Refresh()
+
+	elseif (setting == "baserule.edit") then
+		BtmScan.EditData("baseRule", BtmScan.CompileBaseRule)
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
@@ -242,7 +266,7 @@ function lib.SetSetting(...)
 end
 	
 
-local function getter(setting)
+function getter(setting)
 	if (not BtmScanData) then BtmScanData = {} end
 	if not setting then return end
 
@@ -309,18 +333,35 @@ function lib.MakeGuiConfig()
   	gui.AddCat("Core Options")
   
 	id = gui.AddTab("Profiles")
-	gui.AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
-	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
-	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
-	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
-	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
-	gui.AddControl(id, "Button",     0, 1, "profile.save", "Save")
+	gui.AddControl(id, "Header",           0,    "Setup, configure and edit profiles")
+	gui.AddControl(id, "Subhead",          0,    "Activate a current profile")
+	gui.AddControl(id, "Selectbox",        0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui.AddControl(id, "Button",           0, 1, "profile.delete", "Delete")
+	gui.AddControl(id, "Subhead",          0,    "Create or replace a profile")
+	gui.AddControl(id, "Text",             0, 1, "profile.name", "New profile name:")
+	gui.AddControl(id, "Button",           0, 1, "profile.save", "Save")
 	
 	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",     0,    "Main BtmScanner options")
+	gui.AddControl(id, "Header",           0,    "Main BtmScanner options")
+	gui.AddControl(id, "Subhead",          0,    "Scan Settings")
+	gui.AddControl(id, "Checkbox",         0, 1, "scan.always", "Look for bargains while browsing")
+	gui.AddControl(id, "Checkbox",         0, 1, "scan.reload.enable", "Enable automatic last page reload (bottom scan):")
+	gui.AddControl(id, "WideSlider",       0, 1, "scan.reload.interval", 6, 60, 1, "Reload interval: %s seconds")
+	gui.AddControl(id, "Subhead",          0,    "Purchase Settings")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "global.reserve", 1, 99999999, "Reserve Amount")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "global.maxprice", 1, 99999999, "Maximum Price")
+	gui.AddControl(id, "Subhead",          0,    "Buy/Bid Preferences")
+	gui.AddControl(id, "Checkbox",         0, 1, "never.buy", "Never buyout items")
+	gui.AddControl(id, "Checkbox",         0, 1, "never.bid", "Never bid on items")
 
-  	gui.AddCat("Modules")
+  	gui.AddCat("Evaluators:")
+
+	for pos, name in ipairs(BtmScan.evaluators) do
+		local evaluator = BtmScan.evaluators[name]
+		if (evaluator and evaluator.setup) then
+			evaluator:setup(gui)
+		end
+	end
 end
 
 local sideIcon
