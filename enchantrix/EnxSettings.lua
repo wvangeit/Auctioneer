@@ -305,6 +305,10 @@ local function setter(setting, value)
 	if (a == "miniicon") then
 		Enchantrix.MiniIcon.Reposition()
 	end
+
+	if (a == "sideIcon") then
+		Enchantrix.SIdeIcon.Update()
+	end
 		
 end
 
@@ -430,6 +434,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", _ENCH("GuiMinimapShowButton"))
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, _ENCH("GuiMinimapButtonAngle"))
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
+	gui.AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the sidebar button")
 	
 	id = gui.AddTab(_ENCH("GuiTabProspecting"))
 	gui.AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))

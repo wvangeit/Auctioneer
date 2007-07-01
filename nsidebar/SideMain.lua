@@ -24,7 +24,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local LIBRARY_VERSION_MAJOR = "nSideBar-0.1"
+local LIBRARY_VERSION_MAJOR = "nSideBar-0.2"
 local LIBRARY_VERSION_MINOR = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
 if not DongleStub then error(LIBRARY_VERSION_MAJOR .. " requires DongleStub.") end
@@ -202,6 +202,18 @@ function lib.AddButton(id, texture, priority)
 	return button
 end
 
+
+-- TODO - do we need a show/hide function, possibly keyed off of a per-button "shown" value?
+-- or is add/remove good enough?  It's not something likely to be changed often.
+
+function lib.RemoveButton(id)
+	local button = frame.buttons[id];
+	if button then button:Hide() end
+	frame.buttons[id] = nil;
+	lib.ApplyLayout()
+end
+
+
 function lib.ApplyLayout(useLayout)
 	local configVar = GetCVar("nSideBarPos")
 	if not (lib.lastConfig and configVar == lib.lastConfig) then
@@ -218,7 +230,7 @@ function lib.ApplyLayout(useLayout)
 		useLayout = false
 	end
 	local layout = lib.private.layout
-
+	
 	if not useLayout then
 		for i = 1, #layout do table.remove(layout) end
 		for id, button in pairs(frame.buttons) do

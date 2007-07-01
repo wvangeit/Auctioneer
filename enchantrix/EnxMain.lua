@@ -66,6 +66,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Enchantrix.Locale.AddonLoaded()
 	Enchantrix.Tooltip.AddonLoaded()
 	Enchantrix.MiniIcon.Reposition()
+	Enchantrix.SIdeIcon.Update()
 
 	Enchantrix.Revision = Enchantrix.Util.GetRevision("$Revision$")
 	for name, obj in pairs(Enchantrix) do

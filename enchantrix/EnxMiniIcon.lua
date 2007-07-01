@@ -30,44 +30,32 @@
 Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 local settings = Enchantrix.Settings
+
+--[[
+
+Icon on the minimap related bits
+
+]]
+
 local miniIcon = CreateFrame("Button", "", Minimap);
 Enchantrix.MiniIcon = miniIcon
-
-miniIcon:SetToplevel(true)
-miniIcon:SetMovable(true)
-miniIcon:SetFrameStrata("LOW")
-miniIcon:SetWidth(20)
-miniIcon:SetHeight(20)
-miniIcon:SetPoint("RIGHT", Minimap, "LEFT", 0,0)
-miniIcon:Hide()
-miniIcon.icon = miniIcon:CreateTexture("", "BACKGROUND")
-miniIcon.icon:SetTexture("Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
-miniIcon.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
-miniIcon.icon:SetWidth(20)
-miniIcon.icon:SetHeight(20)
-miniIcon.icon:SetPoint("TOPLEFT", miniIcon, "TOPLEFT", 0,0)
-miniIcon.mask = miniIcon:CreateTexture("", "OVERLAY")
-miniIcon.mask:SetTexCoord(0.0, 0.6, 0.0, 0.6)
-miniIcon.mask:SetTexture("Interface\\Minimap\\Minimap-TrackingBorder")
-miniIcon.mask:SetWidth(36)
-miniIcon.mask:SetHeight(36)
-miniIcon.mask:SetPoint("TOPLEFT", miniIcon, "TOPLEFT", -8,8)
-
+miniIcon.enxMoving = false
 
 local function mouseDown()
 	miniIcon.icon:SetTexCoord(0, 1, 0, 1)
 end
+
 local function mouseUp()
 	miniIcon.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
 end
 
-local moving = false
 local function dragStart()
-	moving = true
+	miniIcon.enxMoving = true
 end
+
 local function dragStop()
 	miniIcon.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
-	moving = false
+	miniIcon.enxMoving = false
 end
 
 local function click(obj, button)
@@ -84,7 +72,7 @@ local function click(obj, button)
 	end
 end
 
-local function reposition(angle)
+function miniIcon.Reposition(angle)
 	if (not settings.GetSetting("miniicon.enable")) then
 		miniIcon:Hide()
 		return
@@ -106,10 +94,9 @@ local function reposition(angle)
 	miniIcon:ClearAllPoints()
 	miniIcon:SetPoint("CENTER", Minimap, "CENTER", iconX, iconY)
 end
-miniIcon.Reposition = reposition
 
 local function update()
-	if moving then
+	if miniIcon.enxMoving then
 		local curX, curY = GetCursorPosition()
 		local miniX, miniY = Minimap:GetCenter()
 		miniX = miniX * Minimap:GetEffectiveScale()
@@ -119,9 +106,29 @@ local function update()
 		local relY = miniY - curY
 		local angle = math.deg(math.atan2(relY, relX)) + 180
 
-		reposition(angle)
+		miniIcon.Reposition(angle)
 	end
 end
+
+miniIcon:SetToplevel(true)
+miniIcon:SetMovable(true)
+miniIcon:SetFrameStrata("LOW")
+miniIcon:SetWidth(20)
+miniIcon:SetHeight(20)
+miniIcon:SetPoint("RIGHT", Minimap, "LEFT", 0,0)
+miniIcon:Hide()
+miniIcon.icon = miniIcon:CreateTexture("", "BACKGROUND")
+miniIcon.icon:SetTexture("Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
+miniIcon.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+miniIcon.icon:SetWidth(20)
+miniIcon.icon:SetHeight(20)
+miniIcon.icon:SetPoint("TOPLEFT", miniIcon, "TOPLEFT", 0,0)
+miniIcon.mask = miniIcon:CreateTexture("", "OVERLAY")
+miniIcon.mask:SetTexCoord(0.0, 0.6, 0.0, 0.6)
+miniIcon.mask:SetTexture("Interface\\Minimap\\Minimap-TrackingBorder")
+miniIcon.mask:SetWidth(36)
+miniIcon.mask:SetHeight(36)
+miniIcon.mask:SetPoint("TOPLEFT", miniIcon, "TOPLEFT", -8,8)
 
 miniIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 miniIcon:RegisterForDrag("LeftButton")
@@ -132,11 +139,52 @@ miniIcon:SetScript("OnDragStop", dragStop)
 miniIcon:SetScript("OnClick", click)
 miniIcon:SetScript("OnUpdate", update)
 
-if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
-	local nSideBar = DongleStub("nSideBar-0.1")
+
+
+--[[
+
+nSIdeBar related bits
+
+]]
+
+Enchantrix.SIdeIcon = {};
+local sideLib = Enchantrix.SIdeIcon;
+
+-- Get the DongleStub Library for nSideBar
+local function GetSideBarLib()
+	if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
+		local nSideBar = DongleStub("nSideBar-0.1")
+		return nSideBar;
+	end
+end
+
+-- Really, this is AddIcon, but the nSideBar library has no show/hide
+function sideLib.ShowSideIcon()
+Enchantrix.Util.DebugPrintQuick("Showing Side Icon");
+	local nSideBar = GetSideBarLib()
 	if nSideBar then
-		Enchantrix.SideIcon = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
-		Enchantrix.SideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
-		Enchantrix.SideIcon:SetScript("OnClick", click)
+		sideLib.Button = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
+		sideLib.Button:RegisterForClicks("LeftButtonUp","RightButtonUp")
+		sideLib.Button:SetScript("OnClick", click)
+Enchantrix.Util.DebugPrintQuick("Showing Side Icon, done");
+	end
+end
+
+-- Really, this is RemoveIcon, but the nSideBar library has no show/hide
+function sideLib.HideSideIcon()
+Enchantrix.Util.DebugPrintQuick("Hiding Side Icon");
+	local nSideBar = GetSideBarLib()
+	if nSideBar and nSideBar.RemoveButton then
+		nSideBar.RemoveButton("Enchantrix")
+		sideLib.Button = nil;
+Enchantrix.Util.DebugPrintQuick("Hiding Side Icon, done");
+	end
+end
+
+function sideLib.Update()
+	if (settings.GetSetting("sideIcon.enable")) then
+		sideLib.ShowSideIcon();
+	else
+		sideLib.HideSideIcon();
 	end
 end

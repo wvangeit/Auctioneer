@@ -349,8 +349,8 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
-	local nSideBar = DongleStub("nSideBar-0.1")
+if (DongleStub and DongleStub.versions["nSideBar-0.2"]) then
+	local nSideBar = DongleStub("nSideBar-0.2")
 	if nSideBar then
 		sideIcon = nSideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
