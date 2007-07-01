@@ -120,7 +120,7 @@ local settingDefaults = {
 	['TooltipShowDisenchantLevel'] = true,	-- should the item tooltip show the enchanting level needed to disenchant
 	['TooltipShowDisenchantMats'] = true,	-- should the item tooltip show what it disenchants into? (for those who are just greedy)
 	
-	['TooltipShowProspecting'] = false,		-- should the tooltip show any prospecting data?
+	['TooltipShowProspecting'] = true,		-- should the tooltip show any prospecting data?
 	['TooltipProspectLevels'] = true,		-- should the tooltip show skill level needed to prospect?
 	['TooltipProspectValues'] = true,		-- should the tooltip show prospecting values
 	['TooltipProspectMats'] = true,			-- should the item tooltip show what it prospects into? (for those who are just greedy)
