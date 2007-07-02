@@ -68,7 +68,6 @@ function lib:valuate(item, tooltip)
 		end
 		-- If it's not disenchantable by our maxlevel, we don't want it
 		if (required < get(lcName..".level.min")) then
-			p("ItemDE", iLevel)
 			item:info("Abort: DE level < min")
 			return
 		end
