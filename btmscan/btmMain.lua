@@ -309,7 +309,7 @@ function BtmScan.PageScan(resume)
 			item.use, item.lvl, item.min, item.inc, item.buy,
 			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
 
-			if (item.owner ~= UnitName("player")) then
+			if (item.owner ~= UnitName("player") and item.high ~= 1) then
 				-- Disassemble the link
 				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
@@ -981,7 +981,7 @@ BtmScan.GetZoneConfig = function (whence)
 end
 
 local tooltipItem = {}
-BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count)
+BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count, price,force,hyperlink, additional)
 	--If the tooltip option is disabled, then disable the tooltip
 	if (not BtmScan.Settings.GetSetting("show.tooltip")) then return end
 
@@ -1001,12 +1001,19 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 	-- If this item exists
 	if (item.link) then
 		item.name, _, item.qual, item.ilevel, item.level, _, _, _, _, item.tex = GetItemInfo(item.link)
-		item.count = 1
+		item.count = count
 		item.use = 1
 		item.inc = 0
 		item.min = 0
 		item.buy = 0
 		item.bid = 0
+
+		if (additional and additional[0] == "AuctionPrices") then
+			item.min = additional[2]
+			item.bid = additional[3]
+			item.inc = item.bid - item.min
+			item.buy = additional[1]
+		end
 		
 		item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 		item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
