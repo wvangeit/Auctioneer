@@ -1088,6 +1088,23 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 				end
 			end
 		end
+		local bids = BtmScan.Settings.GetSetting("bid.list")
+		if (bids) then
+			local lastbid = bids[item.sig..":"..item.seed.."x"..item.count]
+			if (lastbid) then
+				local whyBuy =  lastbid[1]
+				local howMuch = lastbid[2]
+				local bidType = tr("bid")
+				if lastbid[3] then bidType = tr("bought") end
+				local tStamp =  lastbid[4]
+				local ago = ""
+				if (tStamp) then
+					local elapsed = time() - tStamp
+					ago = tr(" (%1 ago)", SecondsToTime(elapsed))
+				end
+				tt("  "..tr("Last %1 for %2%3", bidType, whyBuy, ago), tonumber(howMuch) or 0)
+			end
+		end
 	end
 end
 
@@ -1198,7 +1215,6 @@ end
 
 BtmScan.PerformPurchase = function()
 	local item = BtmScan.Prompt.item
-	data.bids[item.sig] = { whyBuy, bidPrice, bidType, time() }
 	
 	-- Verify first that the item is still there
 	local there = false
@@ -1220,13 +1236,18 @@ BtmScan.PerformPurchase = function()
 
 	if (not there) then
 		BtmScan.Prompt:Hide()
-		BtmScan.Log(tr("Warning: Unable to make purchase of %1. Can't find on current page.", iLink))
+		BtmScan.Log(tr("Warning: Unable to make purchase of %1. Can't find on current page.", item.link))
 		BtmScan.scanStage = 2
 		return
 	end
 	
-	BtmScan.Log(message)
+	local buyout, btext = false, ""
+	if item.purchase == item.buy then buyout = true btext = " ("..tr("buyout")..")" end
+	
+	BtmScan.Log(tr("Purchasing %1x%2 at %3 for %4%5", item.link, item.count, BtmScan.GSC(item.purchase,1), item.what, btext))
 	PlaceAuctionBid("list", i, item.purchase)
+	local bids = BtmScan.Settings.GetSetting("bid.list")
+	bids[item.sig..":"..item.seed.."x"..item.count] = { item.what, item.purchase, buyout, time() }
 
 	BtmScan.Prompt:Hide()
 	BtmScan.scanStage = 2

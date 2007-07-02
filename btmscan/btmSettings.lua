@@ -124,7 +124,7 @@ function getDefault(setting)
 	if (b == "enable") then return true end
 	
 	-- custom settings
-	if (setting == "ignore.list") then
+	if (b == "list") then
 		local db = getUserProfile()
 		if db[setting] then return nil end
 		db[setting] = {}
