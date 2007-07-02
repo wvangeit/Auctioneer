@@ -156,7 +156,9 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 					colorDist.base[vColor] = colorDist.base[vColor] + vCount
 				end
 			end
-			colorDist.all[vColor] = colorDist.all[vColor] + vCount
+			if (vColor) then
+				colorDist.all[vColor] = colorDist.all[vColor] + vCount
+			end
 		end
 	end		
 
