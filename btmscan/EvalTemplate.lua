@@ -28,7 +28,7 @@ If you wish to make your own module, do the following:
 
 local libName = "" --<--(( TODO: Put your name here ))
 local lcName = libName:lower()
-local lib = { name = lcName }
+local lib = { name = lcName, propername = libName }
 table.insert(BtmScan.evaluators, lcName)
 local define = BtmScan.Settings.SetDefault
 local get = BtmScan.Settings.GetSetting
@@ -36,7 +36,7 @@ local set = BtmScan.Settings.SetSetting
 
 BtmScan.evaluators[lcName] = lib
 
-function lib:valuate(item)
+function lib:valuate(item, tooltip)
 	local price = 0
 
 	-- If we're not enabled, scadaddle!
@@ -47,6 +47,15 @@ function lib:valuate(item)
 
 	-- Valuate this item
 	local value = 0 --<--(( TODO: Put your valuation formula here! ))
+
+	-- Check for tooltip evaluation
+	if (tooltip) then
+		item.what = self.name
+		item.valuation = value
+		if (item.bid == 0) then
+			return
+		end
+	end
 
 	-- If the current purchase price is more than our valuation,
 	-- another module "wins" this purchase.

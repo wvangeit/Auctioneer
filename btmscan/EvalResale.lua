@@ -31,7 +31,7 @@ if not (AucAdvanced or (Auctioneer and Auctioneer.Statistic)) then return end
 
 local libName = "Resale"
 local lcName = libName:lower()
-local lib = { name = lcName }
+local lib = { name = lcName, propername = libName }
 table.insert(BtmScan.evaluators, lcName)
 local define = BtmScan.Settings.SetDefault
 local get = BtmScan.Settings.GetSetting
@@ -39,7 +39,7 @@ local set = BtmScan.Settings.SetSetting
 
 BtmScan.evaluators[lcName] = lib
 
-function lib:valuate(item)
+function lib:valuate(item, tooltip)
 	local price = 0
 
 	-- If we're not enabled, scadaddle!
@@ -64,11 +64,14 @@ function lib:valuate(item)
 	-- If we don't know what it's worth, then there's not much we can do
 	if not market then return end
 	market = market * item.count
+	item:info("Market price", market)
 
 	-- Check to see if it meets the min seen count (if applicable)
 	if (get(lcName..".seen.check")) then
 		if (seen < get(lcName..".seen.mincount")) then return end
+		item:info("Seen count < min: "..seen)
 	end
+	item:info("Seen count ("..seen..")")
 
 	-- Adjust for brokerage / deposit costs
 	local adjusted = market
@@ -83,17 +86,34 @@ function lib:valuate(item)
 		end
 		if (deposit) then 
 			local relistings = get(lcName..'.adjust.listings')
-			adjusted = adjusted - (BtmScan.GetDepositCost(item.id, item.count, depositRate) * relistings)
+			local amount = (BtmScan.GetDepositCost(item.id, item.count, depositRate) * relistings)
+			adjusted = adjusted - amount
+			item:info(" - "..relistings.." x deposit", amount)
 		end
 		if (brokerage) then
-			adjusted = adjusted - (market * brokerRate)
+			local amount = (market * brokerRate)
+			adjusted = adjusted - amount
+			item:info(" - Brokerage", amount)
 		end
 	end
+	item:info(" = Adjusted amount", adjusted)
 
 	-- Valuate this item
 	local pct = get(lcName..".profit.pct")
 	local min = get(lcName..".profit.min")
-	local value = BtmScan.Markdown(adjusted, pct, min)
+	local value, mkdown = BtmScan.Markdown(adjusted, pct, min)
+	item:info((" - %d%% / %d markdown"):format(pct,min), mkdown)
+
+	item:info(" = Valuation", value)
+
+	-- Check for tooltip evaluation
+	if (tooltip) then
+		item.what = self.name
+		item.valuation = value
+		if (item.bid == 0) then
+			return
+		end
+	end
 
 	-- If the current purchase price is more than our valuation,
 	-- another module "wins" this purchase.

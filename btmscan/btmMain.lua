@@ -146,6 +146,11 @@ BtmScan.OnLoad = function ()
 	BtmScan.timer = 0
 end
 
+local function tt(tip, price)
+	EnhTooltip.AddLine(tip, price)
+	EnhTooltip.LineColor(0.9,0.6,0.2)
+end
+
 -- Event handler
 BtmScan.OnEvent = function(...)
 	local event, arg = select(2, ...)
@@ -292,6 +297,7 @@ function BtmScan.PageScan(resume)
 	i = resume
 
 	local item = {}
+	
 	while ((i <= pageCount) and (BtmScan.scanning == true)) do
 		item.pos = i
 
@@ -319,16 +325,29 @@ function BtmScan.PageScan(resume)
 					item.canbid = true
 					item.canbuy = true
 					local balance = GetMoney()
+
 					if (BtmScan.Settings.GetSetting("never.bid")) then item.canbid = false end
 					if (BtmScan.Settings.GetSetting("never.buy")) then item.canbuy = false end
-					if (balance - item.bid < reserve) then item.canbid = false end
-					if (balance - item.buy < reserve) then item.canbuy = false end
-					if (item.bid > maxprice) then item.canbid = false end
-					if (item.buy > maxprice) then item.canbuy = false end
+					if (item.canbid and balance - item.bid < reserve) then
+						item.canbid = false
+						item.canbuy = false
+					elseif (item.canbuy and balance - item.buy < reserve) then
+						item.canbuy = false
+					end
+					if (item.canbid and item.bid > maxprice) then
+						item.canbid = false
+						item.canbuy = false
+					elseif (item.canbuy and item.buy > maxprice) then
+						item.canbuy = false
+					end
 					local autoignore = BtmScan.NoPrompt[item.sig]
 					if (autoignore) then
-						if (item.bid >= autoignore) then item.canbid = false end
-						if (item.buy >= autoignore) then item.canbuy = false end
+						if (item.canbid and item.bid >= autoignore) then
+							item.canbid = false
+							item.canbuy = false
+						elseif (item.canbuy and item.buy >= autoignore) then
+							item.canbuy = false
+						end
 					end
 
 					-- Initialize the purchasing variables
@@ -345,10 +364,16 @@ function BtmScan.PageScan(resume)
 					local purchasable = BtmScan.EvaluateItem(item)
 					if purchasable then
 						if item.force then
-							if balance - item.purchase < 0 then purchasable = false end
+							if balance - item.purchase < 0 then
+								purchasable = false
+							end
 						else
-							if balance - item.purchase < reserve then purchasable = false end
-							if item.purchase > maxprice then purchasable = false end
+							if balance - item.purchase < reserve then
+								purchasable = false
+							end
+							if item.purchase > maxprice then
+								purchasable = false
+							end
 						end
 					end
 
@@ -370,20 +395,77 @@ function BtmScan.PageScan(resume)
 	BtmScan.resume = nil
 end
 
+local function itemAddInfo(self, info, amount)
+	if not self or not info then return end
+	amount = tonumber(amount)
+	if amount then
+		table.insert(self, tostring(info))
+		table.insert(self, amount)
+	else
+		table.insert(self, tostring(info))
+	end
+end
+
+local function itemClearInfo(self)
+	if not self then return end
+	while (#self > 0) do
+		table.remove(self)
+	end
+end
+
+local function ttItemInfo(item)
+	i = 1
+	while i <= #item do
+		if (type(item[i+1]) == "number") then
+			tt(item[i], item[i+1])
+			i = i + 1
+		else
+			tt(item[i])
+		end
+		i = i + 1
+	end
+end
 
 BtmScan.evaluators = {}
-function BtmScan.EvaluateItem(item)
+function BtmScan.EvaluateItem(item, doTooltip)
+	item.info = itemAddInfo
+	item.clear = itemClearInfo
 	for pos, name in ipairs(BtmScan.evaluators) do
 		local valuator = BtmScan.evaluators[name]
 		if (valuator and valuator.valuate) then
-			valuator:valuate(item)
+			item:clear()
+			valuator:valuate(item, doTooltip)
+			if (doTooltip) then
+				if (item.valuation > 0) then
+					tt(valuator.propername.." valuation", item.valuation)
+					if (item.force) then
+						tt(" - Forced: "..item.reason)
+					end
+				end
+				if (item.ignore) then
+						tt(" - Ignore: "..item.reason)
+				end
+				if (IsModifierKeyDown()) then
+					ttItemInfo(item)
+				end
+				if (item.bid == 0) then
+					item.purchase = 0
+					item.reason = ""
+					item.what = ""
+					item.profit = 0
+					item.valuation = 0
+
+					item.force = false
+					item.ignore = false
+				end
+			end
 			if item.ignore or item.force then
 				break
 			end
 		end
 	end
 	if item.purchase < item.bid then item.purchase = 0 end
-	if item.purchase > item.buy then item.purchase = buy end
+	if item.buy and item.purchase > item.buy then item.purchase = buy end
 	if item.ignore then item.purchase = 0 end
 	if item.purchase > 0 then return true end
 end
@@ -396,14 +478,19 @@ function BtmScan.Markdown(price, pct, min)
 	if (pct) then
 		mark = math.max(price * pct / 100, mark)
 	end
-	return price - mark
+	return price - mark, mark
 end
 
 
 --Return whether the item is disenchantable give the item's level and the user's enchanting level
 BtmScan.isDEAble = function(mLevel, eLevel)
 	if not eLevel then
-		eLevel = data.enchLevel
+		if (data) then
+			eLevel = data.enchLevel
+		end
+		if not eLevel then
+			eLevel = 300
+		end
 	end
 	if (eLevel) then
 		if     eLevel<  25 then if mLevel< 15 then return true end
@@ -867,192 +954,108 @@ BtmScan.GetZoneConfig = function (whence)
 		return
 	end
 	if (not data.ignore) then data.ignore = {} end -- ignore nothing
-	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regaurdless of user's enchanting level
+	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regardless of user's enchanting level
 	
 	if (not data.tooltipOn) then
 		data.tooltipOn = true	 --Sets the tooltip as on by default
 	end
 end
 
-
+local tooltipItem = {}
 BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count)
-	-- Make sure the current zone is loaded and has defaults
-	BtmScan.GetZoneConfig("tooltip")
+	--If the tooltip option is disabled, then disable the tooltip
+	if (not BtmScan.Settings.GetSetting("show.tooltip")) then return end
 
-	--If the tooltip option is disabled, then disable showing of the BtmScan tooltip unless we are currently BTM scanning
-	if (data.tooltipOn ~= true) then
-		if (not BtmScan.scanning) then return end
-	end
+	local reserve = BtmScan.Settings.GetSetting("global.reserve")
+	local maxprice = BtmScan.Settings.GetSetting("global.maxprice")
+	local ignore = BtmScan.Settings.GetSetting("ignore.list")
 
-	local ltype = EnhTooltip.LinkType(link)
-	if ltype == "item" then
-		local itemID, itemRand, itemEnch, itemUniq = BtmScan.BreakLink(link)
-		-- Since TooltipHook is a global accessable function, we have to make sure that the given link contains all the necessary information
-		if (not itemID) or (not itemRand) or (not itemEnch) then
-			-- TODO: Add something to log this to identify the incompatible addon and possible bugs
+	local item = tooltipItem
+	item.link = link
+
+
+	-- If this item exists
+	if (item.link) then
+		item.name, _, item.qual, item.ilevel, item.level, _, _, _, _, item.tex = GetItemInfo(item.link)
+		item.count = 1
+		item.use = 1
+		item.inc = 0
+		item.min = 0
+		item.buy = 0
+		item.bid = 0
+		
+		item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
+		item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
+
+		-- Check that we're not ignoring this item
+		if ignore[item.sig] then
+			-- TODO: Do tooltip that we are ignoring
 			return
 		end
-		local sanityKey = itemID..":"..itemRand
-		local auctKey = itemID..":"..itemRand..":"..itemEnch
+			
+		-- Determine whether buys/bid are valid
+		item.canbid = true
+		item.canbuy = true
+		local balance = GetMoney()
 
-		local sanity = BtmScan.ConfidenceList[sanityKey] or ""
-		local iqm, iqwm, iqCount = strsplit(",", sanity)
-		iqm = tonumber(iqm) or 0
-		iqwm = tonumber(iqwm) or 0
-		iqCount = tonumber(iqCount) or 0
-		if (count and count > 1) then
-			iqm = iqm * count
-			iqwm = iqwm * count
+		if (BtmScan.Settings.GetSetting("never.bid")) then item.canbid = false end
+		if (BtmScan.Settings.GetSetting("never.buy")) then item.canbuy = false end
+		if (item.canbid and balance - item.bid < reserve) then
+			tt("Bid exceeds reserve")
+			item.canbid = false
+			item.canbuy = false
+		elseif (item.canbuy and balance - item.buy < reserve) then
+			tt("Buy exceeds reserve")
+			item.canbuy = false
 		end
-
-		EnhTooltip.AddLine(tr("BottomScanner prices"))
-		EnhTooltip.LineColor(0.9,0.6,0.2)
-		EnhTooltip.AddLine("  "..tr("IQR Mean"), iqm)
-		EnhTooltip.LineColor(0.9,0.6,0.2)
-		EnhTooltip.AddLine("  "..tr("Conservative"), iqwm)
-		EnhTooltip.LineColor(0.9,0.6,0.2)
-
-		local baseIs = "Conservative"
-		local basePrice = iqwm
-		local auctMedian, auctCount
-		if (AucAdvanced) then
-			auctMedian = AucAdvanced.API.GetMarketValue(link)
-			auctCount = 1
-		elseif (Auctioneer and Auctioneer.Statistic) then
-			auctMedian, auctCount = Auctioneer.Statistic.GetUsableMedian(auctKey)
+		if (item.canbid and item.bid > maxprice) then
+			tt("Bid exceeds maxprice")
+			item.canbid = false
+			item.canbuy = false
+		elseif (item.canbuy and item.buy > maxprice) then
+			tt("Buy exceeds maxprice")
+			item.canbuy = false
 		end
-
-		if (auctMedian and auctCount) then
-			if (auctMedian > basePrice) then
-				basePrice = auctMedian
-				baseIs = "Auctioneer"
-			end
-		end
-		if (not auctMedian) then auctMedian = 0 end
-		if (not auctCount) then auctCount = 0 end
-
-		if (not count or count < 1) then count = 1 end
-		local deposit = BtmScan.GetDepositCost(itemID, count)
-		if (not deposit) then deposit = 0 end
-		if (BtmScan.BaseRule) then
-			BtmScan.prices = {
-				consKey = sanityKey,
-				consMean = iqm,
-				consPrice = iqwm,
-				consSeen = iqCount,
-				auctKey = auctKey,
-				auctPrice = auctMedian * count,
-				auctSeen = auctCount,
-				itemID = itemID,
-				itemRand = itemRand,
-				itemEnch = itemEnch,
-				itemCount = count,
-				bidPrice = 0,
-				buyPrice = 0,
-				basePrice = basePrice * count,
-				depositCost = deposit
-			}
-			local newBase = BtmScan.BaseRule()
-			if (not newBase or newBase <= 0) then
-				basePrice = 0
-			elseif (newBase ~= basePrice) then
-				basePrice = newBase
-				baseIs = "Custom"
-			end
-		else
-			basePrice = basePrice * count
-		end
-
-		if (data.worth[sanityKey]) then
-			basePrice = tonumber(data.worth[sanityKey]) or 0
-			baseIs = "Fixed Worth"
-		end
-
-		if (not basePrice or basePrice <= 0) then
-			basePrice = 0
-			baseIs = "Don't Buy"
-		end
-
-		local auctionFee, action, reason
-		if (BtmScan.prices) then
-			auctionFee = BtmScan.prices.auctionFee
-			action = BtmScan.prices.action
-			if not (action == "bid" or action == "buy" or action == "ignore") then
-				action = nil
-			end
-			reason = BtmScan.prices.reason
-		end
-		if (not auctionFee or auctionFee <= 0) then
-			auctionFee = basePrice * 0.05
-		end
-
-		if (BtmScan.prices and BtmScan.prices.depositCost and BtmScan.prices.depositCost > 0) then
-			deposit = BtmScan.prices.depositCost
-		end
-
-		EnhTooltip.AddLine("  "..tr("Valuation (%1)", tr(baseIs)), basePrice)
-		EnhTooltip.LineColor(0.9,0.9,0.2)
-		if (basePrice > 0) then
-			EnhTooltip.AddLine("    ("..tr("Auction Fee")..")", auctionFee)
-			EnhTooltip.LineColor(0.9,0.8,0.4)
-			EnhTooltip.AddLine("    ("..tr("Deposit Cost")..")", deposit)
-			EnhTooltip.LineColor(0.9,0.8,0.4)
-		end
-
-		if (action) then
-			EnhTooltip.AddLine("    "..tr("Recommend")..": "..tr(action))
-			EnhTooltip.LineColor(0.9,0.8,0.4)
-			if (reason) then
-				EnhTooltip.AddLine("    "..tr("Because")..": "..reason)
-				EnhTooltip.LineColor(0.9,0.8,0.4)
+		local autoignore = BtmScan.NoPrompt[item.sig]
+		if (autoignore) then
+			if (item.canbid and item.bid >= autoignore) then
+				tt("Auto-ignoring item")
+				item.canbid = false
+				item.canbuy = false
+			elseif (item.canbuy and item.buy >= autoignore) then
+				tt("Auto-ignoring buyout")
+				item.canbuy = false
 			end
 		end
 
-		if (data.snatch[sanityKey]) then
-			local sdata = data.snatch[sanityKey]
-			local price, count, stack
-			local snatchLine = ""
-			if (type(sdata) ~= "table") then
-				price = tonumber(amount) or 0
-				count = 0
-				stack = 0
+		-- Initialize the purchasing variables
+		item.purchase = 0   -- The amount to purchase for
+		item.reason = ""    -- The reason why we are purchasing
+		item.what = ""      -- The component that is making the purchase
+		item.profit = 0     -- The projected profit amount
+		item.valuation = 0  -- The estimated value of this item
+
+		item.force = false  -- Forcefully purchase now!
+		item.ignore = false -- Forcefully ignore this item!
+
+		-- Run through all the evaluators to find the best purchase order
+		local purchasable = BtmScan.EvaluateItem(item, true)
+		if purchasable then
+			if item.force then
+				if balance - item.purchase < 0 then
+					tt("Not enough funds")
+					purchasable = false
+				end
 			else
-				price = tonumber(sdata[1]) or 0
-				count = tonumber(sdata[2]) or 0
-				stack = tonumber(sdata[3]) or 0
+				if balance - item.purchase < reserve then
+					tt("Not enough reserve")
+					purchasable = false
+				end
+				if item.purchase > maxprice then
+					tt("Price > MaxPrice")
+					purchasable = false
+				end
 			end
-			if (count == 0) then
-				EnhTooltip.AddLine("  "..tr("Snatch it at"), price)
-			else
-				local fulfilled = tonumber(data.snatched[sanityKey]) or 0
-				EnhTooltip.AddLine("  "..tr("Snatch %1 (%2 done)", count, fulfilled), price)
-			end
-			EnhTooltip.LineColor(0.9,0.9,0.2)
-			if (stack > 1) then
-				EnhTooltip.AddLine("    "..tr("(or per %1 stack)", stack), price * stack)
-				EnhTooltip.LineColor(0.9,0.9,0.2)
-			end
-		end
-
-		if (BtmScan.sessionSpend and BtmScan.sessionSpend[sanityKey]) then
-			local sspend = BtmScan.sessionSpend[sanityKey]
-			EnhTooltip.AddLine("  "..tr("SafetyNet: %1 bought",  sspend.count), tonumber(sspend.cost) or 0)
-			EnhTooltip.LineColor(0.9,0.6,0.2)
-		end
-
-		local bidSig = link.."x"..count
-		if (data.bids and data.bids[bidSig]) then
-			local whyBuy = data.bids[bidSig][1]
-			local howMuch = data.bids[bidSig][2]
-			local bidType = data.bids[bidSig][3] or tr("bought")
-			local tStamp = data.bids[bidSig][4]
-			local ago = ""
-			if (tStamp) then
-				local elapsed = time() - tStamp
-				ago = tr(" (%1 ago)", SecondsToTime(elapsed))
-			end
-			EnhTooltip.AddLine("  "..tr("Last %1 for %2%3",  bidType, whyBuy, ago), tonumber(howMuch) or 0)
-			EnhTooltip.LineColor(0.2,0.4,0.9)
 		end
 	end
 end
