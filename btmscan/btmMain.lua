@@ -417,10 +417,11 @@ local function ttItemInfo(item)
 	i = 1
 	while i <= #item do
 		if (type(item[i+1]) == "number") then
-			tt(item[i], item[i+1])
+			local val = item[i+1]
+			tt("  "..item[i], val)
 			i = i + 1
 		else
-			tt(item[i])
+			tt("  "..item[i])
 		end
 		i = i + 1
 	end
@@ -436,16 +437,20 @@ function BtmScan.EvaluateItem(item, doTooltip)
 			item:clear()
 			valuator:valuate(item, doTooltip)
 			if (doTooltip) then
+				local header = false
 				if (item.valuation > 0) then
 					tt(valuator.propername.." valuation", item.valuation)
 					if (item.force) then
-						tt(" - Forced: "..item.reason)
+						item:info("- Forced: "..item.reason)
 					end
 				end
 				if (item.ignore) then
-						tt(" - Ignore: "..item.reason)
+					item:info("- Ignore: "..item.reason)
 				end
-				if (IsModifierKeyDown()) then
+				if (#item > 0 and IsModifierKeyDown()) then
+					if (item.valuation <= 0) then
+						tt(valuator.propername.." valuation", 0)
+					end
 					ttItemInfo(item)
 				end
 				if (item.bid == 0) then
@@ -481,33 +486,47 @@ function BtmScan.Markdown(price, pct, min)
 	return price - mark, mark
 end
 
-
 --Return whether the item is disenchantable give the item's level and the user's enchanting level
-BtmScan.isDEAble = function(mLevel, eLevel)
+BtmScan.isDEAble = function(iLevel, iQual, eLevel)
 	if not eLevel then
-		if (data) then
-			eLevel = data.enchLevel
-		end
+		if (data) then eLevel = data.enchLevel end
 		if not eLevel then
-			eLevel = 300
+			if Enchantrix and Enchantrix.Util and Enchantrix.Util.GetUserEnchantingSkill then
+				eLevel = Enchantrix.Util.GetUserEnchantingSkill()
+				data.enchLevel = eLevel
+			end
+		end
+		if not eLevel then eLevel = 300 end
+	end
+	
+	local required = 1
+	if (iQual < 2) then return false end
+	if iLevel > 100 then required = 275
+	elseif iLevel > 60 then required = 225
+	elseif iLevel > 55 then required = 200
+	elseif iLevel > 50 then required = 175
+	elseif iLevel > 45 then required = 150
+	elseif iLevel > 40 then required = 125
+	elseif iLevel > 35 then required = 100
+	elseif iLevel > 30 then required = 75
+	elseif iLevel > 25 then required = 50
+	elseif iLevel > 20 then required = 25
+	end
+	if (iQual == 3) then
+		required = math.max(25, required)
+	elseif (iQual == 4) then
+		required = math.max(125, required)
+		if (iLevel >= 90) then
+			required = 300
 		end
 	end
+
 	if (eLevel) then
-		if     eLevel<  25 then if mLevel< 15 then return true end
-		elseif eLevel<  50 then if mLevel< 21 then return true end
-		elseif eLevel<  75 then if mLevel< 26 then return true end
-		elseif eLevel< 100 then if mLevel< 31 then return true end
-		elseif eLevel< 125 then if mLevel< 35 then return true end
-		elseif eLevel< 150 then if mLevel< 41 then return true end
-		elseif eLevel< 175 then if mLevel< 45 then return true end
-		elseif eLevel< 200 then if mLevel< 51 then return true end
-		elseif eLevel< 225 then if mLevel< 55 then return true end
-		elseif eLevel< 275 then if mLevel< 64 then return true end
-		elseif eLevel< 300 then if mLevel< 70 then return true end
-		elseif eLevel>=300 then if mLevel<=70 then return true end
+		if eLevel >= required then
+			return true, required
 		end
-		return false
 	end
+	return false, required
 end
 
 -------------------------------------------------------------------------------
@@ -965,6 +984,11 @@ local tooltipItem = {}
 BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, count)
 	--If the tooltip option is disabled, then disable the tooltip
 	if (not BtmScan.Settings.GetSetting("show.tooltip")) then return end
+
+	-- Create the deReagentTable once only if it does not exist
+	if not BtmScan.deReagentTable and Enchantrix and Enchantrix.Util and Enchantrix.Util.CreateReagentPricingTable then
+		BtmScan.deReagentTable = Enchantrix.Util.CreateReagentPricingTable()
+	end
 
 	local reserve = BtmScan.Settings.GetSetting("global.reserve")
 	local maxprice = BtmScan.Settings.GetSetting("global.maxprice")

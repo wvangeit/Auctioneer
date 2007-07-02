@@ -49,29 +49,52 @@ function lib:valuate(item, tooltip)
 	if (item.qual <= 1) then return end
 
 	-- Check to see if the ilevel is below the disenchant threshold
-	local _, _, _, _, ilevel = GetItemInfo(item.id)
+	local _, _, iQual, iLevel = GetItemInfo(item.id)
 	if (get(lcName..".level.custom")) then
+		if (NonDisenchantables) then
+			if (NonDisenchantables[item.id..":0:0"]) then
+				item:info("Abort: Not DEable")
+				return true
+			end
+		end
+		
 		-- We have to test a custom level
-		-- If it's disenchantable by our minlevel, then we don't want it
-		if (BtmScan.isDEAble(ilevel, get(lcName..".level.min"))) then return end
-		-- If it's not disenchantable by our maxlevel, we don't want it either
-		if not (BtmScan.isDEAble(ilevel, get(lcName..".level.max"))) then return end
+		local canDe, required = BtmScan.isDEAble(iLevel, iQual, get(lcName..".level.max"))
+
+		-- If it's not disenchantable by our maxlevel, we don't want it
+		if not canDe then
+			item:info("Abort: DE level > max")
+			return
+		end
+		-- If it's not disenchantable by our maxlevel, we don't want it
+		if (required < get(lcName..".level.min")) then
+			p("ItemDE", iLevel)
+			item:info("Abort: DE level < min")
+			return
+		end
 	else
 		-- Otherwise, just use our current level
-		if (BtmScan.isDEAble(ilevel)) then return end
+		if (BtmScan.isDEAble(iLevel, iQual)) then
+			item:info("Abort: DE level > current")
+			return
+		end
 	end
 
 	-- Valuate this item
 	local market
 	if (BtmScan.deReagentTable) then
-		market = Enchantrix.Storage.GetItemDisenchantFromTable(itemLink, deReagentTable)
+		market = Enchantrix.Storage.GetItemDisenchantFromTable(item.link, BtmScan.deReagentTable)
 	else
 		local disenchantTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(item.link), item.name, true)
 		if (disenchantTo and disenchantTo.totals and disenchantTo.totals.hspValue and item.qual > 1 and item.count <= 1) then
 			market = disenchantTo.totals.hspValue * disenchantTo.totals.conf
 		end
 	end
-	if not market then return end
+	if not market then 
+		item:info("Unable to get DE value")
+		return
+	end
+	item:info("Disenchant value", market)
 
 	-- Adjust for brokerage / deposit costs
 	local adjusted = market
@@ -84,12 +107,18 @@ function lib:valuate(item, tooltip)
 			brokerRate, depositRate = 0.15, 0.25
 		end
 		if (brokerage) then
-			adjusted = adjusted - (market * brokerRate)
+			local amount = (market * brokerRate)
+			adjusted = adjusted - amount
+			item:info(" - Brokerage", amount)
 		end
+		item:info(" = Adjusted amount", adjusted)
 	end
 
 	-- Calculate the real value of this item once our profit is taken out
-	local value = BtmScan.Markdown(adjusted, pct, min)
+	local pct = get(lcName..".profit.pct")
+	local min = get(lcName..".profit.min")
+	local value, mkdown = BtmScan.Markdown(adjusted, pct, min)
+	item:info((" - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
 
 	-- Check for tooltip evaluation
 	if (tooltip) then
@@ -145,7 +174,7 @@ function lib:setup(gui)
 	gui.AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
-	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 500, 1, "Percent Profit: %s%%")
+	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".level.custom", "Use custom levels")
 	gui.AddControl(id, "Slider",           0, 2, lcName..".level.min", 0, 375, 25, "Minimum skill: %s")
 	gui.AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")

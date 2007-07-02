@@ -48,8 +48,11 @@ function lib:valuate(item, tooltip)
 	local vendor = BtmScan.GetVendorPrice(item.id, item.count)
 	-- If there's no price, then we obviously can't sell it, ignore!
 	if not vendor or vendor == 0 then return end
+	item:info("Vendor price", vendor)
+
 	-- Mark it down
-	local value = BtmScan.Markdown(vendor, pct, min)
+	local value, mkdown = BtmScan.Markdown(vendor, pct, min)
+	item:info((" - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
 
 	-- Check for tooltip evaluation
 	if (tooltip) then
@@ -94,6 +97,6 @@ function lib:setup(gui)
 	gui.AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
-	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 500, 1, "Percent Profit: %s%%")
+	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
 end
 

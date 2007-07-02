@@ -47,7 +47,10 @@ function lib:valuate(item, tooltip)
 
 	-- If this item is not good enough, forget about it.
 	if (get(lcName..".quality.check")) then
-		if (item.qual < get(lcName..".quality.min")) then return end
+		if (item.qual < get(lcName..".quality.min")) then
+			item:info("Abort: Quality < min")
+			return
+		end
 	end
 
 	-- Valuate this item
@@ -68,10 +71,11 @@ function lib:valuate(item, tooltip)
 
 	-- Check to see if it meets the min seen count (if applicable)
 	if (get(lcName..".seen.check")) then
-		if (seen < get(lcName..".seen.mincount")) then return end
-		item:info("Seen count < min: "..seen)
+		if (seen < get(lcName..".seen.mincount")) then
+			item:info("Abort: Seen < min")
+			return
+		end
 	end
-	item:info("Seen count ("..seen..")")
 
 	-- Adjust for brokerage / deposit costs
 	local adjusted = market
@@ -95,16 +99,14 @@ function lib:valuate(item, tooltip)
 			adjusted = adjusted - amount
 			item:info(" - Brokerage", amount)
 		end
+		item:info(" = Adjusted amount", adjusted)
 	end
-	item:info(" = Adjusted amount", adjusted)
 
 	-- Valuate this item
 	local pct = get(lcName..".profit.pct")
 	local min = get(lcName..".profit.min")
 	local value, mkdown = BtmScan.Markdown(adjusted, pct, min)
-	item:info((" - %d%% / %d markdown"):format(pct,min), mkdown)
-
-	item:info(" = Valuation", value)
+	item:info((" - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
 
 	-- Check for tooltip evaluation
 	if (tooltip) then
@@ -171,7 +173,7 @@ function lib:setup(gui)
 	gui.AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
-	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 500, 1, "Percent Profit: %s%%")
+	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
 	if not AucAdvanced then
 		gui.AddControl(id, "Checkbox",         0, 1, lcName..".auct.usehsp", "Use Auctioneer HSP instead of Median")
 	end
