@@ -361,11 +361,13 @@ function private.Commit(wasIncomplete)
 	local lut = {}
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
+	local dirtyCount = 0
 	for pos, data in ipairs(scandata.image) do
 		if private.IsInQuery(private.curQuery, data) then
 			-- Mark dirty
 			flag = data[Const.FLAG] or 0
 			data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
+			dirtyCount = dirtyCount+1
 
 			-- Build lookup table
 			link = data[Const.LINK]
@@ -380,6 +382,9 @@ function private.Commit(wasIncomplete)
 				end
 				table.insert(lut[link], pos)
 			end
+		else
+			-- Mark NOT dirty
+			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		end
 	end
 
@@ -472,7 +477,7 @@ function private.Commit(wasIncomplete)
 	else
 		lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
 	end
-	lib.Print("  {{"..oldCount.."}} items in DB at start")
+	lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query)")
 	lib.Print("  {{"..sameCount.."}} unchanged items")
 	lib.Print("  {{"..newCount.."}} new items")
 	lib.Print("  {{"..updateCount.."}} updated items")
@@ -588,6 +593,7 @@ function lib.StorePage()
 			-- unless we are doing a forward scan (in which case we can be sure they
 			-- are not duplicate entries.
 			if (private.isScanning and private.scanDir == 1)
+			or totalAuctions <= 50
 			or private.NoDupes(private.curScan, itemData) then 
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
@@ -609,6 +615,8 @@ function lib.StorePage()
 			private.isScanning = false
 			private.Commit(incomplete)
 		end
+	elseif (totalAuctions <= 50) then
+		private.Commit(false)
 	end
 end
 
