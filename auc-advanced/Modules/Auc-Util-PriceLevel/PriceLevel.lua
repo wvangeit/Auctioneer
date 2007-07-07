@@ -94,12 +94,17 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.pricelevel.single", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.model", "market")
 	AucAdvanced.Settings.SetDefault("util.pricelevel.basis", "try")
+	AucAdvanced.Settings.SetDefault("util.pricelevel.blue", 0)
+	AucAdvanced.Settings.SetDefault("util.pricelevel.green", 50)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.yellow", 95)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.orange", 115)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.red", 130)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.opacity", 20)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.gradient", true)
 	AucAdvanced.Settings.SetDefault("util.pricelevel.direction", "LEFT")
+
+	AucAdvanced.Settings.SetSetting("util.pricelevel.blue", nil)
+
 end
 
 --[[ Local functions ]]--
@@ -141,9 +146,11 @@ function private.SetupConfigGui(gui)
 		{"try", "Buyout or bid"},
 	}, "util.pricelevel.basis", "Which price to use for the price level")
 	gui.AddControl(id, "Subhead",    0,    "Pricing points:")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "Yellow price level: %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "Orange price level: %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "Red price level: %d%%")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "Red price level > %d%%")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "Orange price level > %d%%")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "Yellow price level > %d%%")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.green", 0, 500, 5, "Green price level > %d%%")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "Blue price level > %d%%")
 end
 
 function private.ResetBars()
@@ -270,13 +277,17 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 	local perItem = stackPrice / quantity
 	local priceLevel = perItem / itemWorth * 100
 
-	local r, g, b, lvl = 0.2,1.0,0.2, "green"
+	local r, g, b, lvl
+
+	r,g,b,lvl = 0.2,0.6,1.0, "blue"
 	if priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.red") then
 		r,g,b,lvl = 1.0,0.0,0.0, "red"
 	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.orange") then
 		r,g,b,lvl = 1.0,0.6,0.1, "orange"
 	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.yellow") then
 		r,g,b,lvl = 1.0,1.0,0.0, "yellow"
+	elseif priceLevel > AucAdvanced.Settings.GetSetting("util.pricelevel.green") then
+		r,g,b,lvl = 0.1,1.0,0.1, "green"
 	end
 
 	return priceLevel, perItem, r,g,b, lvl, itemWorth

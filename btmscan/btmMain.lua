@@ -1479,7 +1479,7 @@ BtmScan.CreateLogWindow = function()
 		BtmScan.LogFrame.Dates[i] = BtmScan.LogFrame.LineFrames[i]:CreateFontString("BtmScanLogDate"..i, "HIGH")
 		BtmScan.LogFrame.Dates[i]:SetPoint("TOPLEFT", BtmScan.LogFrame.LineFrames[i], "TOPLEFT")
 		BtmScan.LogFrame.Dates[i]:SetWidth(90)
-		BtmScan.LogFrame.Dates[i]:SetFont("Fonts\\FRIZQT__.TTF",11)
+		BtmScan.LogFrame.Dates[i]:SetFont("Fonts\\FRIZQT__.TTF",10)
 		BtmScan.LogFrame.Dates[i]:SetJustifyH("LEFT")
 		BtmScan.LogFrame.Dates[i]:SetText("Date"..i)
 		BtmScan.LogFrame.Dates[i]:Show()
@@ -1527,7 +1527,10 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.ScanTab:Show()
 	PanelTemplates_DeselectTab(BtmScan.ScanTab);
 
-	if (Auctioneer and Auctioneer.UI) then Auctioneer.UI.InsertAHTab(BtmScan.ScanTab, BtmScan.LogParent) end
+	if (Auctioneer and Auctioneer.UI) then Auctioneer.UI.InsertAHTab(BtmScan.ScanTab, BtmScan.LogParent)
+	elseif (AucAdvanced and AucAdvanced.AddTab) then AucAdvanced.AddTab(BtmScan.ScanTab, BtmScan.LogParent)
+	end
+
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BtmScan.AuctionFrameTabClickHook)
 
 	BtmScan.PlayButton = CreateFrame("Button", "", BtmScan.LogParent);

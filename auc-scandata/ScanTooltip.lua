@@ -70,15 +70,19 @@ local Const = AucAdvanced.Const
 
 local itemWorth = {}
 local colorDist = {
-	exact = { red=0, orange=0, yellow=0, green=0 },
-	suffix = { red=0, orange=0, yellow=0, green=0 },
-	base = { red=0, orange=0, yellow=0, green=0 },
-	all = { red=0, orange=0, yellow=0, green=0 },
+	exact = { red=0, orange=0, yellow=0, green=0, blue=0 },
+	suffix = { red=0, orange=0, yellow=0, green=0, blue=0 },
+	base = { red=0, orange=0, yellow=0, green=0, blue=0 },
+	all = { red=0, orange=0, yellow=0, green=0, blue=0 },
 }
 function colored(doIt, counts, alt)
 	local text
+	if (counts.blue > 0) then
+		text = ("|cff3399ff%d|r"):format(counts.blue)
+	end
 	if (counts.green > 0) then
-		text = ("|cff33ff33%d|r"):format(counts.green)
+		if text then text = text .. " / " else text = "" end
+		text = text..("|cff33ff44%d|r"):format(counts.green)
 	end
 	if (counts.yellow > 0) then
 		if text then text = text .. " / " else text = "" end

@@ -31,6 +31,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 local lib = AucAdvanced
+local private = {}
 
 function lib.Print(...)
 	local output, part
@@ -108,5 +109,63 @@ function lib.GetFactionGroup()
 	end
 	AucAdvancedConfig.factions[currentZone] = factionGroup
 	return factionGroup
+end
+
+
+function private.relevelFrame(frame)
+	return private.relevelFrames(frame:GetFrameLevel() + 2, frame:GetChildren())
+end
+
+function private.relevelFrames(myLevel, ...)
+	for i = 1, select("#", ...) do
+		local child = select(i, ...)
+		child:SetFrameLevel(myLevel)
+		private.relevelFrame(child)
+	end
+end
+
+function lib.AddTab(tabButton, tabFrame)
+	-- Count the number of auction house tabs (including the tab we are going
+	-- to insert).
+	local tabCount = 1;
+	while (getglobal("AuctionFrameTab"..(tabCount))) do
+		tabCount = tabCount + 1;
+	end
+
+	-- Find the correct location to insert our Search Auctions and Post Auctions
+	-- tabs. We want to insert them at the end or before BeanCounter's
+	-- Transactions tab.
+	local tabIndex = 1;
+	while (getglobal("AuctionFrameTab"..(tabIndex)) and
+		   getglobal("AuctionFrameTab"..(tabIndex)):GetName() ~= "AuctionFrameTabTransactions") do
+		tabIndex = tabIndex + 1;
+	end
+
+	-- Make room for the tab, if needed.
+	for index = tabCount, tabIndex + 1, -1  do
+		setglobal("AuctionFrameTab"..(index), getglobal("AuctionFrameTab"..(index - 1)));
+		getglobal("AuctionFrameTab"..(index)):SetID(index);
+	end
+
+	-- Configure the frame.
+	tabFrame:SetParent("AuctionFrame");
+	tabFrame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0);
+	private.relevelFrame(tabFrame);
+
+	-- Configure the tab button.
+	setglobal("AuctionFrameTab"..tabIndex, tabButton);
+	tabButton:SetParent("AuctionFrame");
+	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
+	tabButton:SetID(tabIndex);
+	tabButton:Show();
+
+	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
+	if (tabIndex < tabCount) then
+		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
+		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
+	end
+
+	-- Update the tab count.
+	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end
 
