@@ -125,12 +125,20 @@ function lib.IsValidAlgorithm(algorithm)
 end
 
 private.algorithmstack = {}
-function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
+function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+	if (not algorithm) then
+		error("No pricing algorithm supplied")
+	end
+	if (not itemLink) then
+		error("No itemLink supplied")
+	end
+	faction = faction or AucAdvanced.GetFaction()
+	realm = realm or GetRealmName()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and engineLib.GetPrice then
-				local algosig = strjoin(":", algorithm, itemLink, serverKey)
-				for pos, history in private.algorithmstack do
+				local algosig = strjoin(":", algorithm, itemLink, faction, realm)
+				for pos, history in ipairs(private.algorithmstack) do
 					if (history == algosig) then
 						-- We are looping
 						local origAlgo = private.algorithmstack[1]
@@ -145,11 +153,11 @@ function lib.GetAlgorithmValue(algorithm, itemLink, serverKey)
 				local price, seen, array
 				table.insert(private.algorithmstack, algosig)
 				if (engineLib.GetPriceArray) then
-					array = engineLib.GetPriceArray(itemLink, serverKey)
+					array = engineLib.GetPriceArray(itemLink, faction, realm)
 					price = array.price
 					seen = array.seen
 				else
-					price = engineLib.GetPrice(itemLink, serverKey)
+					price = engineLib.GetPrice(itemLink, faction, realm)
 				end
 				table.remove(private.algorithmstack, -1)
 				return price, seen, array

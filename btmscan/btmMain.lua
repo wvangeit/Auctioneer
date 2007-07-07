@@ -470,7 +470,7 @@ function BtmScan.EvaluateItem(item, doTooltip)
 		end
 	end
 	if item.purchase < item.bid then item.purchase = 0 end
-	if item.buy and item.purchase > item.buy then item.purchase = buy end
+	if item.buy and item.purchase > item.buy then item.purchase = item.buy end
 	if item.ignore then item.purchase = 0 end
 	if item.purchase > 0 then return true end
 end
