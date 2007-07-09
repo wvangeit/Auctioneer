@@ -426,22 +426,9 @@ local function index(self, key)
 		iType = tonumber(iType) or 0
 		if (iLevel > 0 and iQual >= 2 and (iType == 2 or iType == 4)) then
 
-			if (not Enchantrix.Settings.GetSetting('DisenchantUsingBaseTableOnly')) then
-				local key = strjoin(":", iLevel, iQual, iType)
-				addResults(data, strsplit(",", Enchantrix.Data.GetDisenchantData(key)))
-				if (EnchantrixData and EnchantrixData.disenchants and EnchantrixData.disenchants[key]) then
-					for itemId, itemData in pairs(EnchantrixData.disenchants[key]) do
-						addResults(data, strsplit(",", itemData))
-					end
-				end
-			end
-
-			if ((not data.total) or (data.total[1] == 0)) then
-				-- we couldn't find anything in the normal table, use our fallback table
-				local baseData = getBaseTableDisenchants(iLevel,iQual,iType,iItem);
-				if (baseData) then
-					addResultFromBaseTable(data,baseData);
-				end
+			local baseData = getBaseTableDisenchants(iLevel,iQual,iType,iItem);
+			if (baseData) then
+				addResultFromBaseTable(data,baseData);
 			end
 		end
 		return data

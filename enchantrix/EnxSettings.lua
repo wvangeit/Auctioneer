@@ -145,8 +145,6 @@ local settingDefaults = {
 	
 	['AuctionBalanceEssencePrices'] = false,	-- should we balance the price of essences before doing auction scans?
 	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences
-	
-	['DisenchantUsingBaseTableOnly']	= false,	-- for debugging and development, use only the basetable for disenchant values
 }
 
 local function getDefault(setting)
@@ -411,8 +409,6 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", _ENCH("GuiCount") )
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
--- TODO: this control is for debugging only
-	gui.AddControl(id, "Checkbox",   0, 1, "DisenchantUsingBaseTableOnly", "Use base table only for disenchant info - DEBUGGING")
 
 
 -- TODO: locale -- what are the allowed values?

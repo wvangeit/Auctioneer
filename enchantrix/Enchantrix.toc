@@ -21,8 +21,6 @@ debuglib\DebugLib.lua
 EnxStrings.lua
 EnxLocale.lua
 
-EnxData.lua
-Data\EnxList.lua
 Data\EnxNonDisenchant.lua
 
 EnxSettings.lua
