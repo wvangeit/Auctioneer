@@ -26,7 +26,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		
+
 
 data layout:
 		EnchantConfig = {
@@ -53,7 +53,6 @@ data layout:
 		}
 
 if user does not have a set profile name, they get the default profile
-
 
 Usage:
 	def = Enchantrix.Settings.GetDefault('TooltipShowValues')
