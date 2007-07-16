@@ -912,14 +912,17 @@ EnchantrixLocalizations = {
 		["CmdPrintin"]	= "afficher-dans";
 		["CmdToggle"]	= "activer-desactiver";
 		["ShowCount"]	= "comptes";
+		["ShowDELevels"]	= "niveaux";
+		["ShowDEMaterials"]	= "matériaux";
 		["ShowEmbed"]	= "integrer";
 		["ShowGuessAuctioneerHsp"]	= "evaluer-pvm";
 		["ShowGuessAuctioneerMed"]	= "evaluer-median";
 		["ShowGuessBaseline"]	= "evaluer-reference";
 		["ShowTerse"]	= "concis";
+		["ShowUI"]	= "montrer";
 		["ShowValue"]	= "evaluer";
-		["StatOff"]	= "Aucune donnée d'enchantement affichée";
-		["StatOn"]	= "Affichage des données d'enchantement formatées";
+		["StatOff"]	= "N'affiche aucune donnée d'enchantement";
+		["StatOn"]	= "Affiche les données d'enchantement configurées";
 
 		-- Section: Config Text
 		["GuiLoad"]	= "Charger Enchantrix";
@@ -928,7 +931,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Désenchanter";
-		["Enchanting"]	= "Ensorcellement";
+		["ArgSpellProspectingName"]	= "Prospecter";
+		["Enchanting"]	= "Enchantement";
+		["Jewelcrafting"]	= "Joaillerie";
 		["PatReagents"]	= "Ingrédients: (.+)";
 		["TextCombat"]	= "Combat";
 		["TextGeneral"]	= "Général";
