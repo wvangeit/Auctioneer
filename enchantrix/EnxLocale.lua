@@ -87,7 +87,6 @@ function buildCommandMap()
 		[_ENCH('CmdFindBuyauct')] = 'percentless',
 		[_ENCH('CmdFindBuyauctShort')] = 'percentless',
 		[_ENCH('ShowEmbed')] = 'embed',
-		[_ENCH('ShowCount')] = 'counts',
 		[_ENCH('ShowTerse')] = 'terse',
 		[_ENCH('ShowValue')] = 'valuate',
 		[_ENCH('ShowGuessAuctioneerHsp')] = 'valuate-hsp',

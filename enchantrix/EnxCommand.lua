@@ -232,31 +232,6 @@ function registerKhaos()
 				difficulty=2;
 			};
 			{
-				id="counts";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiCount')
-				end;
-				helptext=function()
-					return _ENCH('HelpCount')
-				end;
-				callback=function(state)
-					genVarSet('ToolTipShowCounts', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowCount')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowCount')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('ToolTipShowCounts')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};
-			{
 				id="levels";
 				type=K_TEXT;
 				text=function()
@@ -659,7 +634,6 @@ end
 
 local commandToSettingLookup = {
 	['terse'] = 'ToolTipTerseFormat',
-	['counts'] = 'ToolTipShowCounts',
 	['embed'] = 'ToolTipEmbedInGameTip',
 	['valuate'] = 'TooltipShowValues',
 	['valuate-hsp'] = 'TooltipShowAuctValueHSP',
@@ -774,7 +748,6 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('ShowUI').."|r - " .. _ENCH('HelpShowUI'));
 	
-	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowCount'), Enchantrix.Locale.GetLocalizedFilterVal('counts'), _ENCH('HelpCount')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowDELevels'), Enchantrix.Locale.GetLocalizedFilterVal('levels'), _ENCH('HelpShowDELevels')));

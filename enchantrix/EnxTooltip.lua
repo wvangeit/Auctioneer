@@ -46,24 +46,12 @@ end
 tooltipFormat = {
 	currentFormat = "fancy",
 	format = {
-		["fancy"] = {
-			-- counts = off
-			['off'] = "  $conf% |q$name|r $rate",
-			-- counts = on
-			['on'] = "  $conf% |q$name|r $rate |e(B=$bcount L=$lcount)|r",
-		},
-		["default"] = {
-			['off'] = "  $name: $prob% $rate",
-			['on'] = "  $name: $prob% $rate |e(B=$bcount L=$lcount)|r",
-		},
+		["fancy"] = "  $prob% |q$name|r $rate",
+		["default"] = "  $name: $prob% $rate",
 	},
 	patterns = {
 		-- Strings
 		["$prob"]	= "",			-- Probability: "75"
-		["$conf"]	= "",			-- Confidence interval: "<1", "72-78", ">99"
-		["$count"]	= "",			-- Local + base counts: "51"
-		["$lcount"] = "",			-- Local count: "13"
-		["$bcount"] = "",			-- Base count: "38"
 		["$name"]	= "",			-- Name: "Lesser Magic Essence"
 		["$rate"]	= "",			-- Avg drop amount: "x1.5"
 		-- Colors
@@ -80,36 +68,14 @@ tooltipFormat = {
 		end
 	end,
 	SetFormat = function(this, fmt, val, counts)
-		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
-		end
-		if counts then
-			this.format[fmt]['on'] = val
-		else
-			this.format[fmt]['off'] = val
-		end
+		this.format[fmt] = val
 	end,
 	GetFormat = function(this, fmt, counts)
 		if not this.format[fmt] then return end
-		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
-		end
-		if counts then
-			return this.format[fmt]['on']
-		else
-			return this.format[fmt]['off']
-		end
+		return this.format[fmt]
 	end,
-	GetString = function(this, counts)
-		local line
-		if counts == nil then
-			counts = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
-		end
-		if counts then
-			line = this.format[this.currentFormat]['on']
-		else
-			line = this.format[this.currentFormat]['off']
-		end
+	GetString = function(this)
+		local line = this.format[this.currentFormat]
 		-- Replace patterns
 		for pat, repl in pairs(this.patterns) do
 			line = line:gsub(pat, repl or "")
@@ -144,7 +110,6 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		-- Probabilities
 		local prob = tostring( resYield * 100 )
 		tooltipFormat:SetPattern("$prob", prob)
-		tooltipFormat:SetPattern("$conf", prob)
 
 		-- Name and quality
 		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
@@ -251,8 +216,6 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 		return
 	end
 
-	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
-
 	local lines
 
 	local total = data.total
@@ -276,28 +239,10 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				totalMkt = totalMkt + resMkt
 				totalFive = totalFive + resFive
 
-				local prob = resProb
-				local pmin, pmax = Enchantrix.Util.ConfidenceInterval(prob, totalNumber)
+				local prob = 100 * resProb
 
 				-- Probabilities
-				prob, pmin, pmax = math.floor(prob * 100 + 0.5), math.floor(pmin * 100 + 0.5), math.floor(pmax * 100 + 0.5)
 				tooltipFormat:SetPattern("$prob", tostring(prob))
-				if pmin == 0 then
-					tooltipFormat:SetPattern("$conf", "<"..max(pmax, 1))
-				elseif pmax == 100 then
-					tooltipFormat:SetPattern("$conf", ">"..min(pmin, 99))
-				else
-					if pmin ~= pmax then
-						tooltipFormat:SetPattern("$conf", pmin.."-"..pmax)
-					else
-						tooltipFormat:SetPattern("$conf", tostring(prob))
-					end
-				end
-
-				-- Counts
-				tooltipFormat:SetPattern("$count", tostring(resNumber))		-- local plus base count
-				tooltipFormat:SetPattern("$lcount", tostring(0))			-- local count
-				tooltipFormat:SetPattern("$bcount", tostring(resNumber))	-- base count
 
 				-- Name and quality
 				local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(result)
@@ -307,20 +252,18 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				tooltipFormat:SetPattern("$name", rName)
 
 				-- Rate
-				if resCount ~= 1 then
-					tooltipFormat:SetPattern("$rate", ("x%0.1f"):format(resCount))
-				else
-					tooltipFormat:SetPattern("$rate", "")
-				end
+                tooltipFormat:SetPattern("$rate", ("x%0.1f"):format(resCount))
 
 				-- Store this line and sort key
-				local line = tooltipFormat:GetString(Enchantrix.Settings.GetSetting('ToolTipShowCounts'))
-				table.insert(lines,  {str = line, sort = pmin})
+				local line = tooltipFormat:GetString()
+				table.insert(lines,  {str = line, sort = prob})
 			end
 		end
 	else
 		return
 	end
+
+	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
 
 	-- Terse mode
 	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
@@ -343,9 +286,6 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantMats')) then
 		-- Header
 		local totalText = ""
-		if (Enchantrix.Settings.GetSetting('ToolTipShowCounts') and totalNumber) then
-			totalText = (" |cff7f7f00(%d)|r"):format(totalNumber)
-		end
 		EnhTooltip.AddLine(_ENCH('FrmtDisinto')..totalText, nil, embed);
 		EnhTooltip.LineColor(0.8,0.8,0.2);
 		-- Sort in order of decreasing probability before adding to tooltip

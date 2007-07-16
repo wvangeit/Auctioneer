@@ -56,9 +56,9 @@ if user does not have a set profile name, they get the default profile
 
 
 Usage:
-	def = Enchantrix.Settings.GetDefault('ToolTipShowCounts')
-	val = Enchantrix.Settings.GetSetting('ToolTipShowCounts')
-	Enchantrix.Settings.SetSetting('ToolTipShowCounts', true );
+	def = Enchantrix.Settings.GetDefault('TooltipShowValues')
+	val = Enchantrix.Settings.GetSetting('TooltipShowValues')
+	Enchantrix.Settings.SetSetting('TooltipShowValues', true );
 
 ]]
 
@@ -109,7 +109,6 @@ local settingDefaults = {
 	['locale'] = 'default',
 	['printframe'] = 1,
 	
-	['ToolTipShowCounts'] = false,
 	['ToolTipEmbedInGameTip'] = false,
 	['ToolTipTerseFormat'] = false,
 	['TooltipShowValues'] = true,
@@ -406,7 +405,6 @@ function lib.MakeGuiConfig()
 	id = gui.AddTab(_ENCH("GuiTabGeneral"))
 	gui.AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
-	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipShowCounts", _ENCH("GuiCount") )
 	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 
