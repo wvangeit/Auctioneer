@@ -40,6 +40,8 @@ local isDisenchantable
 local getItemIdFromSig
 local getItemHyperlinks
 local getItemIdFromLink
+local saveCraftReagentInfoToCache
+local getCraftReagentInfoFromCache
 
 local split
 local chatPrint
@@ -157,6 +159,118 @@ function getReagentInfo(reagentID)
 
 	return sName, sLink, iQuality, rLevel, sType, sSubtype, iStack, sEquip, sTexture
 end
+
+
+
+
+local function checkReagentCacheVersion()
+	if (not EnchantConfig) then EnchantConfig = {} end
+	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
+	if (not EnchantConfig.cache.CraftReagentCache) then EnchantConfig.cache.CraftReagentCache = {} end
+
+	local myFormatVersion = 1;		-- in case we need to change the format dramatically
+	local version,build,date = GetBuildInfo();
+	local versionString = strjoin(".", version, build, myFormatVersion );
+	
+	if EnchantConfig.cache.CraftReagentCache.Version then
+		-- version stamp exists, check it
+		if (EnchantConfig.cache.CraftReagentCache.Version ~= versionString) then
+			Enchantrix.Util.DebugPrintQuick("Found a new WoW version, wiping out reagent cache");
+			EnchantConfig.cache.CraftReagentCache = {}
+		end
+	end
+	
+	EnchantConfig.cache.CraftReagentCache.Version = versionString;
+end
+
+
+-- ccox - originally I had a timestamp in here, but think that's pointless when reagents don't change without WoW version changes
+-- also, without the timestamp, you're more likely to keep a cache of items you've seen from your alts
+
+--   ["itemname"] = "reagent1itemNo:reagent1count;reagent2itemNo:count;reagent3itemNo:reagent3count"
+
+local function assembleReagentEntryString( reagentList )
+	
+	local reagentString = nil
+	for _, reagent in ipairs(reagentList) do
+	
+		local itemLink = reagent[1]
+		local count = reagent[2]
+		
+		local itemNumber
+		if type(itemLink) == "string" then
+			local _, _, i = itemLink:find("item:(%d-):")
+			if (not i)  then
+				Enchantrix.Util.DebugPrintQuick("assembleReagentEntryString failed to get item number from string ", itemLink );
+			end
+			itemNumber = i
+		else
+			itemNumber = Enchantrix.Util.GetItemIdFromLink(itemLink)
+		end
+		
+		itemNumber = tonumber(itemNumber)
+		if (not itemNumber) then
+			-- something failed, bail
+			return nil
+		end
+		
+		local oneEntry = strjoin(":", itemNumber, count );
+		
+		if (reagentString) then
+			reagentString = strjoin(";", reagentString, oneEntry);
+		else
+			reagentString = oneEntry;
+		end
+	end
+
+	return reagentString;
+end
+
+
+local function createReagentList(...)
+	local n = select("#", ... )
+	local reagentList = {}
+	for i = 1, n do
+		local oneEntry = select(i, ...)
+		local itemNumber, itemCount = strsplit(":", oneEntry);
+		itemNumber = tonumber(itemNumber)
+		itemCount = tonumber(itemCount)
+		reagentList[i] = { itemNumber, itemCount }
+	end
+	return reagentList
+end
+
+local function dissectReagentEntryString(entryString)
+	if not entryString then
+		return
+	end
+	assert(type(entryString) == "string")
+	local reagentList = createReagentList( strsplit(";", entryString ) );
+	return reagentList
+end
+
+
+
+
+function saveCraftReagentInfoToCache(itemname, reagentList)
+	checkReagentCacheVersion();
+	local entryString = assembleReagentEntryString( reagentList );
+	if (entryString) then
+		EnchantConfig.cache.CraftReagentCache[ itemname ] = entryString;
+	end
+end
+
+
+function getCraftReagentInfoFromCache(itemname)
+	checkReagentCacheVersion();
+	local entryString = EnchantConfig.cache.CraftReagentCache[ itemname ];
+	if (not entryString) then
+		return nil;
+	end
+	local reagentList = dissectReagentEntryString(entryString);
+	return reagentList
+end
+
 
 
 -- TODO: what is the correct limit post TBC?
@@ -591,6 +705,8 @@ Enchantrix.Util = {
 	IsDisenchantable	= isDisenchantable,
 	GetItemIdFromLink	= getItemIdFromLink,
 	GetItemHyperlinks	= getItemHyperlinks,
+	SaveCraftReagentInfoToCache		= saveCraftReagentInfoToCache,
+	GetCraftReagentInfoFromCache	= getCraftReagentInfoFromCache,
 
 	Split				= split,
 	ChatPrint			= chatPrint,

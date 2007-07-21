@@ -329,6 +329,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 end
 
+-- using the Craft APIs
 local function getReagentsFromCraftFrame(craftIndex)
 	local reagentList = {}
 
@@ -338,6 +339,23 @@ local function getReagentsFromCraftFrame(craftIndex)
 		if link then
 			local hlink = EnhTooltip.HyperlinkFromLink(link)
 			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(craftIndex, i)
+			table.insert(reagentList, {hlink, reagentCount})
+		end
+	end
+
+	return reagentList
+end
+
+-- using the Trade APIs
+local function getReagentsFromTradeFrame(craftIndex)
+	local reagentList = {}
+
+	local numReagents = GetTradeSkillNumReagents(craftIndex)
+	for i = 1, numReagents do
+		local link = GetTradeSkillReagentItemLink(craftIndex, i)
+		if link then
+			local hlink = EnhTooltip.HyperlinkFromLink(link)
+			local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(craftIndex, i)
 			table.insert(reagentList, {hlink, reagentCount})
 		end
 	end
@@ -393,28 +411,67 @@ local function getReagentsFromTooltip(frame)
 	return reagentList
 end
 
-function enchantTooltip(funcVars, retVal, frame, name, link)
-	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip');
 
-	local craftIndex
-	for i = 1, GetNumCrafts() do
-		local craftName = GetCraftInfo(i)
-		if name == craftName then
-			craftIndex = i
-			break
-		end
-	end
+function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 
-	-- Get reagent list
+-- TODO - ccox - this should only be active between event=="TRADE_SKILL_SHOW" / "TRADE_SKILL_CLOSE"
+--		or "CRAFT_SHOW" / "CRAFT_CLOSE" -- those should also tell us the API to use
+-- but it can be bloody useful in the auction house :-)
+
+-- TODO - ccox - for items, get the number made!  But what about items with random yield?
+
+-- TODO - ccox - this really should recursively descend crafted items for true costs not AH prices
+--		most of the time they'll be in the cache, so it won't add a lot of time to the search
+
+	local craftIndex = nil
+	local tradeIndex = nil
 	local reagentList
-	if craftIndex then
-		reagentList = getReagentsFromCraftFrame(craftIndex)
-	else
-		reagentList = getReagentsFromTooltip(frame)
+	
+	-- if it's an item, try our cache
+	if isItem then
+		reagentList = Enchantrix.Util.GetCraftReagentInfoFromCache(name)
 	end
-
+	
 	if not reagentList or (#reagentList < 1) then
-		return
+		
+		-- first try craft APIs
+		for i = 1, GetNumCrafts() do
+			local craftName = GetCraftInfo(i)
+			if name == craftName then
+				craftIndex = i
+				break
+			end
+		end
+		
+		if craftIndex then
+			reagentList = getReagentsFromCraftFrame(craftIndex)
+		else
+			-- try trade skill APIs next
+			for i = GetFirstTradeSkill(), GetNumTradeSkills() do
+				local tradeName = GetTradeSkillInfo(i);
+				if name == tradeName then
+					tradeIndex = i
+					break
+				end
+			end
+			
+			if tradeIndex then
+				reagentList = getReagentsFromTradeFrame(tradeIndex)
+			else
+				-- if all else fails
+				reagentList = getReagentsFromTooltip(frame)
+			end
+		end
+
+		if not reagentList or (#reagentList < 1) then
+			return
+		end
+		
+		-- now save it to the cache
+		if isItem then
+			Enchantrix.Util.SaveCraftReagentInfoToCache( name, reagentList );
+		end
+		
 	end
 
 	-- Append additional reagent info
@@ -442,10 +499,13 @@ function enchantTooltip(funcVars, retVal, frame, name, link)
 	end)
 
 	-- Header
-	if not embed then
+	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip');
+	if not embed and not isItem then
 		local icon
 		if craftIndex then
 			icon = GetCraftIcon(craftIndex)
+		elseif tradeIndex then
+			icon = GetTradeSkillIcon(tradeIndex)
 		else
 			icon = "Interface\\Icons\\Spell_Holy_GreaterHeal"
 		end
@@ -534,8 +594,11 @@ function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local ltype = EnhTooltip.LinkType(link)
 	if ltype == "item" then
 		itemTooltip(funcVars, retVal, frame, name, link, quality, count)
+		if (Enchantrix.Settings.GetSetting('ShowAllCraftReagents')) then
+			enchantTooltip(funcVars, retVal, frame, name, link, true)
+		end
 	elseif ltype == "enchant" then
-		enchantTooltip(funcVars, retVal, frame, name, link)
+		enchantTooltip(funcVars, retVal, frame, name, link, false)
 	end
 end
 
