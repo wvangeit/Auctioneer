@@ -333,7 +333,7 @@ function private.GetNextID(idList)
 		table.remove(idList, 1)
 		second = idList[2]
 	end
-	first = first + 1
+	first = (first or 0) + 1 --Normalize it, since it will be nil if theres nothing in the tables.
 	idList[1] = first
 	return first
 end
