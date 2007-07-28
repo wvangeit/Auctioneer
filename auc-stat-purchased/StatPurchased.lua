@@ -61,7 +61,7 @@ end
 
 function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
-	local realm = GetCurrentRealm()
+	local realm = GetRealmName()
 	if (command == "help") then
 		print("Help for Auctioneer Advanced - "..libName)
 		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
