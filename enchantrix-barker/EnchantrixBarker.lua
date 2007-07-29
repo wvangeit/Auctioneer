@@ -93,6 +93,7 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
 	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSpellsurge") },		-- INCORRECTLY matches mana?
 	{ search = _BARKLOC("EnchSearchVitality"), key = "other", ignoreValues = true, print = _BARKLOC("ShortVitality") },			-- INCORRECTLY matches health and mana?
+	{ search = _BARKLOC("EnchSearchManaPerFive"), key = "other", print = _BARKLOC("ShortManaPerFive") },						-- INCORRECTLY matches mana
 	{ search = _BARKLOC("EnchSearchMana"), key = "factor_stat.mana", print = _BARKLOC("ShortMana") },
 	{ search = _BARKLOC("EnchSearchBattlemaster"), key = "other", ignoreValues = true, print = _BARKLOC("ShortBattlemaster") },	-- INCORRECTLY matches health?
 	{ search = _BARKLOC("EnchSearchHealth"), key = "factor_stat.health", print = _BARKLOC("ShortHealth") },
