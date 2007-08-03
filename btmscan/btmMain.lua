@@ -1000,6 +1000,9 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 
 	-- If this item exists
 	if (item.link) then
+		item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
+		if (not item.id) then return end -- Not an "item"
+
 		item.name, _, item.qual, item.ilevel, item.level, _, _, _, _, item.tex = GetItemInfo(item.link)
 		item.count = count
 		item.use = 1
@@ -1015,7 +1018,6 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			item.buy = additional[1]
 		end
 		
-		item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 		item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
 
 		-- Check that we're not ignoring this item
