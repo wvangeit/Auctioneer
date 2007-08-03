@@ -118,7 +118,7 @@ local function format(...)
 	local n = select("#", ...)
 	local out = ""
 	for i = 1, n do
-		if i > 1 and out:sub(-1) ~= "  " then out = out .. " "; end
+		if i > 1 and out:sub(-1) ~= " " then out = out .. " "; end
 		local d = select(i, ...)
 		if (type(d) == "string") then
 			if (d:sub(1,1) == " ") then
