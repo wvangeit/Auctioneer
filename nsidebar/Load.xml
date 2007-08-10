@@ -1,5 +1,0 @@
-<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
-	<Script file="DongleStub.lua"/>
-	<Script file="SideMain.lua"/>
-</Ui>
-
