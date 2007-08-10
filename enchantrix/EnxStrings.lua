@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://norganna.org/localizer/
+	http://www.norganna.org/localizer/
 
 	AddOn: Enchantrix
 	Revision: $Id$
@@ -507,13 +507,6 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "Zeige Kurzinfo zu Entzauberungswert";
 		["GuiWeighSettingsNote"]	= "Die Gewichtung oben ändert die Schätzung der erhaltenen Reagenz durch die spezifizierte Menge. Im Allgemeinen kann man sie bei 100% lassen, es sei denn, daß sie mehr oder weniger wertvoll sein sollten, wie die Schätzungsmethode die verwendet wird.";
 		["GuiWeightSettings"]	= "Reagenzwunsch bei Entzauberung";
-		["GuiAutoDeOptions"] = "Automation";
-		["GuiAutoDeEnable"] = "Watch bags for disenchantable items - USE WITH CARE";
-		["GuiYes"] = "Yes";
-		["GuiNo"] = "No";
-		["GuiIgnore"] = "Ignore";
-		["GuiAutoDePromptLine1"] = "Do you want do disenchant:";
-		["GuiAutoDePromptLine3"] = "  Valued at %s";
 
 	};
 
@@ -641,6 +634,13 @@ EnchantrixLocalizations = {
 		["ChatResetProfile"]	= "Reset all settings for: ";
 		["ChatSavedProfile"]	= "Saved profile: ";
 		["ChatUsingProfile"]	= "Now using profile: ";
+		["FrmtAutoDeActive"]	= "AutoDisenchant active";
+		["FrmtAutoDeDisabled"]	= "AutoDisenchant disabled";
+		["FrmtAutoDeDisenchantCancelled"]	= "Disenchant cancelled: item not found";
+		["FrmtAutoDeDisenchanting"]	= "Disenchanting %s";
+		["FrmtAutoDeIgnorePermanent"]	= "Ignoring %s permanently";
+		["FrmtAutoDeIgnoreSession"]	= "Ignoring %s this session";
+		["FrmtAutoDeInactive"]	= "AutoDisenchant inactive";
 		["FrmtBidbrokerCurbid"]	= "curBid";
 		["FrmtBidbrokerDone"]	= "Bid brokering done";
 		["FrmtBidbrokerHeader"]	= "Bids having %s silver savings on average disenchant value (min %%less = %d):";
@@ -653,13 +653,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessLine"]	= "%s, Valued at: %s, BO: %s, Save: %s, Less %s";
 		["FrmtPctlessSkillSkipped"]	= "Skipped %d auctions due to skill level cutoff (%s)";
 		["FrmtPctlessSkipped"]	= "Skipped %d auctions due to profitability cutoff (%s)";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker Price (%d%% margin)";
@@ -687,6 +680,10 @@ EnchantrixLocalizations = {
 
 		-- Section: User Interface
 		["GuiActivateProfile"]	= "Activate a current profile";
+		["GuiAutoDeEnable"]	= "Watch bags for disenchantable items - USE WITH CARE\n";
+		["GuiAutoDeOptions"]	= "Automation\n";
+		["GuiAutoDePromptLine1"]	= "Do you want do disenchant:\n";
+		["GuiAutoDePromptLine3"]	= "  Valued at %s\n";
 		["GuiBBUnbiddedOnly"]	= "Restrict BidBroker to unbidded items only";
 		["GuiConfigProfiles"]	= "Setup, configure and edit profiles";
 		["GuiCreateReplaceProfile"]	= "Create or replace a profile";
@@ -695,6 +692,7 @@ EnchantrixLocalizations = {
 		["GuiDefaultProfitMargin"]	= "Default Profit Margin:";
 		["GuiDeleteProfileButton"]	= "Delete";
 		["GuiGeneralOptions"]	= "General Enchantrix options";
+		["GuiIgnore"]	= "Ignore\n";
 		["GuiItemValueAuc4HSP"]	= "Auc4 HSP";
 		["GuiItemValueAuc4Median"]	= "Auc4 Median";
 		["GuiItemValueAuc5Market"]	= "AucAdv Market Value";
@@ -710,6 +708,7 @@ EnchantrixLocalizations = {
 		["GuiMinLessHSP"]	= "Minimum Percentage less than HSP: %d";
 		["GuiMinProfitMargin"]	= "Minimum Profit Margin:";
 		["GuiNewProfileName"]	= "New profile name:";
+		["GuiNo"]	= "No\n";
 		["GuiPLBBOnlyBelowDESkill"]	= "Only show items disenchantable at current skill";
 		["GuiPLBBSettings"]	= "Percentless and Bidbroker settings";
 		["GuiProspectingLevels"]	= "Show prospecting level requirements in the tooltip";
@@ -733,13 +732,7 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "Show terse disenchant value";
 		["GuiWeighSettingsNote"]	= "The weights above change the valuation of the given reagent by the specified amount. Generally you will want to leave them at 100% unless you think they should be more or less valuable than the valuation method you are using is saying.";
 		["GuiWeightSettings"]	= "Disenchant reagent desirability";
-		["GuiAutoDeOptions"] = "Automation";
-		["GuiAutoDeEnable"] = "Watch bags for disenchantable items - USE WITH CARE";
-		["GuiYes"] = "Yes";
-		["GuiNo"] = "No";
-		["GuiIgnore"] = "Ignore";
-		["GuiAutoDePromptLine1"] = "Do you want do disenchant:";
-		["GuiAutoDePromptLine3"] = "  Valued at %s";
+		["GuiYes"]	= "Yes";
 
 	};
 
@@ -859,13 +852,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessHeader"]	= "Compras que tienen %d%% de ahorro sobre el precio promedio de desencantamiento del artí­culo (ahorro min= %s):";
 		["FrmtPctlessLine"]	= "%s, Valorado en: %s, Compra: %s, Ahorra: %s, Menos %s";
 		["FrmtPctlessSkipped"]	= "Saltadas %d subastas que están por debajo del margen de beneficios (%s)";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Precio de Pregonero (margen de %d%%)";
@@ -1006,13 +992,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessLine"]	= "%s, Estimé à : %s, AI: %s, Economie: %s, Moins %s";
 		["FrmtPctlessSkillSkipped"]	= "Enchères sautées de %d dues à la coupure de niveau de compétence (%s)";
 		["FrmtPctlessSkipped"]	= "%d enchères ignorées pour marge trop faible (%s)";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prix Trader (marge : %d%%)";
@@ -1147,13 +1126,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessHeader"]	= "Buyout che hanno un risparmio di %s sul prezzo medio di disincantamento: ";
 		["FrmtPctlessLine"]	= "%s, Valutato: %s, BO: %s, Risparmio: %s, Meno %s ";
 		["FrmtPctlessSkipped"]	= "Saltate le aste %d per un taglio del profitto (%s)";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prezzo imbonitore (margine %d%%)";
@@ -1290,13 +1262,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessHeader"]	= "즉시 구입가격이 평균 마력추출 가격상에서 %d%% 절약되었습니다.:";
 		["FrmtPctlessLine"]	= "%s, 가격: %s, BO: %s, 감소: %s, %s 이하";
 		["FrmtPctlessSkipped"]	= "%d개의 경매품이 수익성(%s)을 위해 건너뛰어짐";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "가격 알림 (%d%% 마진)";
@@ -1775,13 +1740,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessLine"]	= "%s，估价：%s，一口价：%s，节省：%s，差额%s";
 		["FrmtPctlessSkillSkipped"]	= "所需技能等级不够(%s),跳过%d拍卖\n";
 		["FrmtPctlessSkipped"]	= "所需收益率不足(%s),跳过%d拍卖";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker价格(%d%% 最低利润)";
@@ -1842,13 +1800,6 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "简洁显示分解价";
 		["GuiWeighSettingsNote"]	= "上述比重值根据特定的数量改变该原材料数量。 您通常将想要留下他们在100%，除非您认为他们比您使用应该或多或少是贵重物品的估价方法认为。";
 		["GuiWeightSettings"]	= "分解材料需求度";
-		["GuiAutoDeOptions"] = "Automation";
-		["GuiAutoDeEnable"] = "Watch bags for disenchantable items - USE WITH CARE";
-		["GuiYes"] = "Yes";
-		["GuiNo"] = "No";
-		["GuiIgnore"] = "Ignore";
-		["GuiAutoDePromptLine1"] = "Do you want do disenchant:";
-		["GuiAutoDePromptLine3"] = "  Valued at %s";
 
 	};
 
@@ -1986,13 +1937,6 @@ EnchantrixLocalizations = {
 		["FrmtPctlessLine"]	= "%s，估價：%s，買斷價：%s，節省：%s，差額%s";
 		["FrmtPctlessSkillSkipped"]	= "所需技能等級不夠(%s),跳過%d拍賣";
 		["FrmtPctlessSkipped"]	= "所需收益率不足(%s),跳過%d拍賣";
-		["FrmtAutoDeIgnorePermanent"] = "Ignoring %s permanently";
-		["FrmtAutoDeIgnoreSession"] = "Ignoring %s this session";
-		["FrmtAutoDeDisenchanting"] = "Disenchanting %s";
-		["FrmtAutoDeDisenchantCancelled"] = "Disenchant cancelled: item not found";
-		["FrmtAutoDeActive"] = "AutoDisenchant activated";
-		["FrmtAutoDeDisabled"] = "AutoDisenchant disabled";
-		["FrmtAutoDeInactive"] = "AutoDisenchant deactivated";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker 價格 (%d%% 保証金) ";
@@ -2053,13 +1997,6 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "簡潔顯示分解價";
 		["GuiWeighSettingsNote"]	= "上述比重值根據特定的數量改變該原材料數量。 您通常將想要留下他們在100%，除非您認為他們比您使用應該或多或少是貴重物品的估價方法認為。";
 		["GuiWeightSettings"]	= "分解材料需求度";
-		["GuiAutoDeOptions"] = "Automation";
-		["GuiAutoDeEnable"] = "Watch bags for disenchantable items - USE WITH CARE";
-		["GuiYes"] = "Yes";
-		["GuiNo"] = "No";
-		["GuiIgnore"] = "Ignore";
-		["GuiAutoDePromptLine1"] = "Do you want do disenchant:";
-		["GuiAutoDePromptLine3"] = "  Valued at %s";
 
 	};
 
