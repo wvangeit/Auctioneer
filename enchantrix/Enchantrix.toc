@@ -6,6 +6,7 @@
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Khaos, !nLog, Auctioneer, auc-advanced
 ## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal, ProspectedLocal
+## SavedVariablesPerCharacter: AutoDisenchantIgnoreList
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
@@ -31,4 +32,5 @@ EnxConstants.lua
 EnxStorage.lua
 EnxTooltip.lua
 EnxUtil.lua
+EnxAutoDisenchant.lua
 EnxMain.lua

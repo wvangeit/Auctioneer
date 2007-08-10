@@ -146,6 +146,8 @@ local settingDefaults = {
 	
 	['AuctionBalanceEssencePrices'] = false,	-- should we balance the price of essences before doing auction scans?
 	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences
+
+	['AutoDisenchantEnable'] = false,	-- off by default - potentially dangerous if you're not expecting it :)
 }
 
 local function getDefault(setting)
@@ -432,6 +434,9 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
 	gui.AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the sidebar button")
 	
+	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiAutoDeOptions"))
+	gui.AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
+
 	id = gui.AddTab(_ENCH("GuiTabProspecting"))
 	gui.AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))
 	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", _ENCH("GuiShowProspecting") )

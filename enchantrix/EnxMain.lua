@@ -39,6 +39,7 @@ local addonLoaded
 local onLoad
 local pickupInventoryItemHook
 local useContainerItemHook
+local spellTargetItemHook
 local onEvent
 
 Enchantrix.Version = "<%version%>"
@@ -65,6 +66,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	Enchantrix.Config.AddonLoaded()
 	Enchantrix.Locale.AddonLoaded()
 	Enchantrix.Tooltip.AddonLoaded()
+	Enchantrix.AutoDisenchant.AddonLoaded()
 	Enchantrix.MiniIcon.Reposition()
 	Enchantrix.SIdeIcon.Update()
 
@@ -78,6 +80,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	-- Register disenchant detection hooks (using secure post hooks)
 	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
+	hooksecurefunc("SpellTargetItem", spellTargetItemHook)
 
 	-- events that we need to catch
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
@@ -235,6 +238,19 @@ function useContainerItemHook(bag, slot)
 		if bag and slot then
 			DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
 			DisenchantEvent.targetted = GetTime()
+		end
+	end
+end
+
+function spellTargetItemHook(itemString)
+	-- Remember targeted item
+	if (not UnitCastingInfo("player")) then
+		if itemString then
+			local _, itemLink = GetItemInfo(itemString)
+			if itemLink then
+				DisenchantEvent.spellTarget = itemLink
+				DisenchantEvent.targetted = GetTime()
+			end
 		end
 	end
 end
