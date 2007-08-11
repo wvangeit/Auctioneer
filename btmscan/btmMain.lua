@@ -427,6 +427,35 @@ local function ttItemInfo(item)
 	end
 end
 
+function BtmScan.CreateItem(itemLink, itemCount)
+	local item = {
+		count = itemCount or 1,
+		canbid = false,
+		canbuy = false,
+		bid = 0,
+		buy = 0,
+		purchase = 0,
+		profit = 0,
+		valuation = 0,
+		info = itemAddInfo,
+		clear = itemClearInfo,
+	}
+	item.name, item.link, item.qual, item.ilevel, item.level = GetItemInfo(itemLink)
+	item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
+	item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
+	return item
+end
+
+function BtmScan.CrossEvaluateItem(evaluatorName, item, doTooltip)
+	local evaluator = BtmScan.evaluators[evaluatorName]
+	if not evaluator then return end
+
+	local pushEnabled = BtmScan.Settings.GetSetting(evaluatorName .. ".enable")
+	BtmScan.Settings.SetSetting(evaluatorName .. ".enable", true)
+	evaluator:valuate(item, doTooltip)
+	BtmScan.Settings.SetSetting(evaluatorName .. ".enable", pushEnabled)
+end
+
 BtmScan.evaluators = {}
 function BtmScan.EvaluateItem(item, doTooltip)
 	item.info = itemAddInfo
@@ -470,9 +499,10 @@ function BtmScan.EvaluateItem(item, doTooltip)
 		end
 	end
 	if item.purchase < item.bid then item.purchase = 0 end
-	if item.buy and item.purchase > item.buy then item.purchase = item.buy end
+	if item.bid > 0 and item.purchase >= item.bid then item.purchase = item.bid end
+	if item.buy > 0 and item.purchase >= item.buy then item.purchase = item.buy end
 	if item.ignore then item.purchase = 0 end
-	if item.purchase > 0 then return true end
+	return item.purchase > 0
 end
 
 function BtmScan.Markdown(price, pct, min)
