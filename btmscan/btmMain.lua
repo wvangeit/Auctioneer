@@ -339,6 +339,9 @@ function BtmScan.PageScan(resume)
 						item.canbuy = false
 					elseif (item.canbuy and item.buy > maxprice) then
 						item.canbuy = false
+					elseif (item.canbuy and item.buy == 0) then
+						-- can't buy if no buyout
+						item.canbuy = false
 					end
 					local autoignore = BtmScan.NoPrompt[item.sig]
 					if (autoignore) then
@@ -498,10 +501,16 @@ function BtmScan.EvaluateItem(item, doTooltip)
 			end
 		end
 	end
-	if item.purchase < item.bid then item.purchase = 0 end
-	if item.bid > 0 and item.purchase >= item.bid then item.purchase = item.bid end
-	if item.buy > 0 and item.purchase >= item.buy then item.purchase = item.buy end
-	if item.ignore then item.purchase = 0 end
+	-- if item is overpriced or ignored, skip it
+	-- or if it's at least as valuable as buyout price, buy it
+	-- or if it's at least as valuable as bid price, bid on it
+	if item.ignore or item.purchase < item.bid then
+		item.purchase = 0
+	elseif item.canbuy and item.purchase >= item.buy then
+		item.purchase = item.buy
+	elseif item.canbid and item.purchase >= item.bid then
+		item.purchase = item.bid
+	end
 	return item.purchase > 0
 end
 
@@ -1078,6 +1087,9 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		elseif (item.canbuy and item.buy > maxprice) then
 			tt("Buy exceeds maxprice")
 			item.canbuy = false
+		elseif (item.canbuy and item.buy == 0) then
+			-- can't buy if no buyout
+			item.canbuy = false
 		end
 		local autoignore = BtmScan.NoPrompt[item.sig]
 		if (autoignore) then
@@ -1207,7 +1219,7 @@ BtmScan.PromptPurchase = function(item)
 	local profitPercent = math.floor( (100 * item.profit / item.purchase) + 0.5 );
 	
 	local bidText, BidText = "purchase", "Buyout"
-	if (item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
+	if (not item.canbuy or item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
 	
 	BtmScan.Prompt.Lines[1]:SetText(tr("Do you want to %1:", bidText))
 	BtmScan.Prompt.Lines[2]:SetText("  "..item.link.."x"..item.count)
