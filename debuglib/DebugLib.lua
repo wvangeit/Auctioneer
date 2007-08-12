@@ -33,19 +33,19 @@
 		function's documentation.
 
 		>>>What the library is designed for<<<
-        DebugLib is designed to help developers to add structured error handling
-        to their code. That is being done by providing developers with three
-        new functions: DebugPrint(), Assert() and Dump().
-        The library was designed with the idea in mind that each function
-        returns two new error values: An error code and a descriptive error
-        message. These two additional values could then be used by the caller to
-        check and, in case an error occured, handle the function's outcome.
+		DebugLib is designed to help developers to add structured error handling
+		to their code. That is being done by providing developers with three
+		new functions: DebugPrint(), Assert() and Dump().
+		The library was designed with the idea in mind that each function
+		returns two new error values: An error code and a descriptive error
+		message. These two additional values could then be used by the caller to
+		check and, in case an error occured, handle the function's outcome.
 
-        Even if the developer does not use this feature, each error will be
-        recorded using nLog. The benefit of DebugLib is that it's working even
-        without nLog being installed at all (which is most likely the case for
-        any user of your addon, since he does not want being bothered with
-        having to install a debug addon, he does not need at all).
+		Even if the developer does not use this feature, each error will be
+		recorded using nLog. The benefit of DebugLib is that it's working even
+		without nLog being installed at all (which is most likely the case for
+		any user of your addon, since he does not want being bothered with
+		having to install a debug addon, he does not need at all).
 		On the other side developers can install nLog and at once have access to
 		all the debug messages without having to change anything in the code.
 		If you want to know more about nLog, please refer to the nLog
@@ -423,14 +423,14 @@ function libDebugPrint(addon, message, category, title, errorCode, level, ...)
 	nLog.AddMessage(addon, category, levelLookupList[level], title, textMessage, ...)
 
 	-- We explicitly do not append any additional passed data to the returned
-    -- errormessage.
-    -- Doing so, would require us to call the dump/format functions for each
-    -- vararg parameter, causing a big performance loss, which is normally
-    -- unwanted.
-    -- If the developer wants the additional data to be added to the returned
-    -- errormessage, he'd have to concatenate it first and instead of adding
-    -- each single variable to the function's parameter list, pass the
-    -- concatenated string right into the message parameter.
+	-- errormessage.
+	-- Doing so, would require us to call the dump/format functions for each
+	-- vararg parameter, causing a big performance loss, which is normally
+	-- unwanted.
+	-- If the developer wants the additional data to be added to the returned
+	-- errormessage, he'd have to concatenate it first and instead of adding
+	-- each single variable to the function's parameter list, pass the
+	-- concatenated string right into the message parameter.
 	return errorCode, message
 end
 
