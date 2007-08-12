@@ -33,15 +33,23 @@
 		function's documentation.
 
 		>>>What the library is designed for<<<
-		DebugLib is designed to act as a layer over the nLog addon. It makes the
-		usage of nLog features easier and even works without nLog being
-		installed at all. This allows the integration of a useful debug system
-		in any addon without forcing the users to install a debug addon which
-		they don't need.
+        DebugLib is designed to help developers to add structured error handling
+        to their code. That is being done by providing developers with three
+        new functions: DebugPrint(), Assert() and Dump().
+        The library was designed with the idea in mind that each function
+        returns two new error values: An error code and a descriptive error
+        message. These two additional values could then be used by the caller to
+        check and, in case an error occured, handle the function's outcome.
+
+        Even if the developer does not use this feature, each error will be
+        recorded using nLog. The benefit of DebugLib is that it's working even
+        without nLog being installed at all (which is most likely the case for
+        any user of your addon, since he does not want being bothered with
+        having to install a debug addon, he does not need at all).
 		On the other side developers can install nLog and at once have access to
 		all the debug messages without having to change anything in the code.
 		If you want to know more about nLog, please refer to the nLog
-		documentation.
+		documentation and www.auctioneeraddon.com.
 
 		>>>Installation Requirements<<<
 		Any addon which uses debugLib should add nLog as an optional dependancy.
@@ -56,12 +64,12 @@
 
 			local addonName = "MyAddon"
 
-			local function debugPrint(message, category, title, errorCode, level)
-				return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+			local function debugPrint(message, category, title, errorCode, level, ...)
+				return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level, ...)
 			end
 
-			local function assert(test, message)
-				return DebugLib.Assert(addonName, test, message)
+			local function assert(test, ...)
+				return DebugLib.Assert(addonName, test, ...)
 			end
 
 		Refer to the assert() and debugPrint() functions in this file to see a
@@ -104,7 +112,7 @@
 			Example usage of the assert return value.
 
 		For a more detailed description of possible syntaxes for these functions
-		refer to the description of the specific function.
+		refer to the specific function's description.
 ]]
 
 -------------------------------------------------------------------------------
@@ -155,10 +163,11 @@ end
 local addonName = "DebugLib"
 
 -------------------------------------------------------------------------------
--- Function definitions
+-- Function declarations
 -------------------------------------------------------------------------------
 local assert
 local debugPrint
+local format
 local generateTitle
 local libAssert
 local libDebugPrint
@@ -168,7 +177,7 @@ local normalizeParameters
 local dump
 
 -------------------------------------------------------------------------------
--- Function declarations
+-- Function definitions
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
@@ -177,7 +186,8 @@ local dump
 -- enabled.
 --
 -- syntax:
---    errorCode, message = libDebugPrint(addon[, message][, category][, title][, errorCode][, level])
+--    errorCode, message = libDebugPrint(addon[, message][, category][, title][, errorCode][, level] |
+--                                       addon, message, category, title, errorCode, level, ...)
 --
 -- parameters:
 --    addon     - (string) the name of the addon
@@ -192,6 +202,8 @@ local dump
 --    level     - (string) nLog message level
 --                         Any nLog.levels string is valid.
 --                nil, no level specified
+--    ...       - (any) additional data which will be appended to the error
+--                      message in nLog
 --
 -- returns:
 --    errorCode - (number) errorCode, if one is specified
@@ -235,10 +247,10 @@ local dump
 --       6) Fully specified debug message with default title:
 --          libDebugPrint("DebugLib", "Critical error in function call.",
 --                        "Scan", 6, DebugLib.Level.Critical)
---          This is the full syntax except the title. It is the suggested syntax
---          for specifying log entries which return error codes, have a
---          different level than DebugLib.Level.Error and do not need their own
---          title.
+--          This is the full syntax except the title is missing. It is the
+--          suggested syntax for specifying log entries which return error
+--          codes, have a different level than DebugLib.Level.Error and do not
+--          need their own title.
 --
 --       7) Fully specified debug message:
 --          libDebugPrint("DebugLib", "Critical error in function call.",
@@ -248,31 +260,52 @@ local dump
 --          log entries which return error codes, have a different level than
 --          DebugLib.Level.Error and require their own title.
 --
---       8) Quick specified error entry, with only basic information:
+--       8) Fully specified debug message with additional output data:
+--          libDebugPrint("DebugLib", "Critical error in function call.",
+--                        "Scan", "Invalid function call", 6,
+--                        DebugLib.Level.Critical,
+--                        "table = ", table1,
+--                        "variable = ", variable1)
+--          This is the full syntax including additional data for the generated
+--          message. It is the suggested syntax for specifying log entries, if
+--          the developer wants to dump additional variables to the generated
+--          error message.
+--          Note, that the additional data will only be added to the message
+--          displayed within nLog. It will not be appended to the error message
+--          which is returned by debugPrint(). If you want the additional
+--          data to also be included in the function's return value, generate
+--          the message yourself first and then pass it to debugPrint() using
+--          syntax style no 7. For instance:
+--          Instead of using:
+--          DebugPrint("DebugLib", "Message", [...], "variable1=", variable1)
+--          use the following method:
+--          DebugPrint("DebugLib", "Message".." variable1="..DebugLib.Dump(variable1))
+--
+--       9) Quick specified error entry, with only basic information:
 --          libDebugPrint("DebugLib", "Failed to read data.", 5)
 --          This creates a new error entry in nLog. This syntax can be used, if
 --          you have to add this message quickly but don't want to specify the
 --          category yet.
 --
---       9) Quick specified debug entry, with only basic information:
+--      10) Quick specified debug entry, with only basic information:
 --          libDebugPrint("DebugLib", "Executing unsafe code.",
 --                        DebugLib.Level.Notice)
 --          This creates a new notice entry in nLog. It's basically used, if
 --          you have to quickly add some debug information but don't want to
 --          specify the category yet.
 --
---       10) Partly specified error entry:
+--       11) Partly specified error entry:
 --           libDebugPrint("DebugLib", "Fatal error in command handler.", 9,
 --                         DebugLib.Level.Critical)
 --           This syntax is possible, but quite uncommon. Instead of using this,
 --           one should prefer the fully specified debug message.
 --           It generates a new log entry for critical errors with no category.
 --
---       11) Empty log entry:
+--       12) Empty log entry:
 --           libDebugPrint("DebugLib")
 --           This unusual usage will generate an empty debug log entry in nLog.
 --
---       12) Empty log entry with defined log level:
+--       13) Empty log entry with defined log level:
 --           libDebugPrint("DebugLib", DebugLib.Level.Info)
 --           Though valid, this syntax is also not very common. It creates an
 --           empty notice in nLog.
@@ -370,7 +403,7 @@ local dump
 --    of invalid ambiguous function calls, a decision is made about which value
 --    will be used. The generated error message in nLog will explain, what was
 --    wrong.
---    For a list of possible errorcodes, refer to the Error Codes section.
+--    For a list of possible errorcodes, refer to the "Error Codes" section.
 --
 --    >>>TEMPLATE FUNCTION<<<
 --    This function is not designed to be called directly. Instead it is meant
@@ -378,7 +411,7 @@ local dump
 --    the addon parameter and then calls this function.
 --    Refer to the local debugPrint() function for the reference implementation.
 -------------------------------------------------------------------------------
-function libDebugPrint(addon, message, category, title, errorCode, level)
+function libDebugPrint(addon, message, category, title, errorCode, level, ...)
 	addon, message, category, title, errorCode, level = normalizeParameters(addon, message, category, title, errorCode, level)
 
 	-- nLog.AddMessage() uses select() to check if any message is there.
@@ -387,8 +420,17 @@ function libDebugPrint(addon, message, category, title, errorCode, level)
 	-- care of this behavior and handle it by ourself.
 	local textMessage = message or ""
 
-	nLog.AddMessage(addon, category, levelLookupList[level], title, textMessage)
+	nLog.AddMessage(addon, category, levelLookupList[level], title, textMessage, ...)
 
+	-- We explicitly do not append any additional passed data to the returned
+    -- errormessage.
+    -- Doing so, would require us to call the dump/format functions for each
+    -- vararg parameter, causing a big performance loss, which is normally
+    -- unwanted.
+    -- If the developer wants the additional data to be added to the returned
+    -- errormessage, he'd have to concatenate it first and instead of adding
+    -- each single variable to the function's parameter list, pass the
+    -- concatenated string right into the message parameter.
 	return errorCode, message
 end
 
@@ -399,7 +441,8 @@ end
 -- disabled.
 --
 -- syntax:
---    errorCode, message = libDebugPrint(addon[, message][, category][, title][, errorCode][, level])
+--    errorCode, message = libSimpleDebugPrint(addon[, message][, category][, title][, errorCode][, level] |
+--                                             addon, message, category, title, errorCode, level, ...)
 --
 -- parameters:
 --    addon     - (string) the name of the addon
@@ -414,6 +457,8 @@ end
 --    level     - (string) nLog message level
 --                         Any nLog.levels string is valid.
 --                nil, no level specified
+--    ...       - (any) additional data which will be appended to the error
+--                      message in nLog
 --
 -- returns:
 --    errorCode - (number) errorCode, if one is specified
@@ -425,7 +470,7 @@ end
 --    Refer to the description of libDebugPrint() to see a more detailed
 --    explanation about this function.
 -------------------------------------------------------------------------------
-function libSimpleDebugPrint(addon, message, category, title, errorCode, level)
+function libSimpleDebugPrint(addon, message, category, title, errorCode, level, ...)
 	_, message, _, _, errorCode = normalizeParameters(addon, message, category, title, errorCode, level)
 
 	return errorCode, message
@@ -435,7 +480,8 @@ end
 -- Prints the specified message to nLog.
 --
 -- syntax:
---    errorCode, message = debugPrint([message][, category][, title][, errorCode][, level])
+--    errorCode, message = debugPrint(addon[, message][, category][, title][, errorCode][, level] |
+--                                    addon, message, category, title, errorCode, level, ...)
 --
 -- parameters:
 --    message   - (string) the error message
@@ -449,6 +495,8 @@ end
 --    level     - (string) nLog message level
 --                         Any nLog.levels string is valid.
 --                nil, no level specified
+--    ...       - (any) additional data which will be appended to the error
+--                      message in nLog
 --
 -- returns:
 --    errorCode - (number) errorCode, if one is specified
@@ -461,8 +509,8 @@ end
 --    Refer to the documentation about libDebugPrint for a more detailed
 --    description about this function.
 -------------------------------------------------------------------------------
-function debugPrint(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+function debugPrint(message, category, title, errorCode, level, ...)
+	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level, ...)
 end
 
 -------------------------------------------------------------------------------
@@ -760,14 +808,14 @@ end
 -- enabled.
 --
 -- syntax:
---    assertion = libAssert(addon, test, message)
+--    assertion = libAssert(addon, test, ...)
 --
 -- parameters:
 --    addon   - (string)  the name of the addon/file used to identify the
 --                        specific assertion
 --    test    - (any)     false/nil, if the assertion failed
 --                        anything else, otherwise
---    message - (string)  the message which will be output to the user
+--    ...     - (any)     data which will be appended to the nLog message
 --
 -- return:
 --    assertion - (boolean) true, if the test passed
@@ -776,11 +824,11 @@ end
 -- remark:
 --    >>>NLOG ENTRY<<<
 --    If nLog is present, the message will not only be written to the user's
---    channel, but also to nLog with the priority set to N_CRITICAL, since it
---    is assumed that Assert() is only used in critical parts of functions and
---    that test is expected to never fail. This is especially useful to track
---    down bugs which might randomly occure. Therefore this log message is given
---    the highest priority.
+--    chat channel, but also to nLog with the priority set to N_CRITICAL, since
+--    it is assumed that Assert() is only used in critical parts of functions
+--    and that test is expected to never fail. This is especially useful to
+--    track down bugs which might randomly occure. Therefore this log message is
+--    given the highest priority.
 --
 --    >>>ERROR HANDLING<<<
 --    If any error occurs, the error will be written to nLog, if nLog is
@@ -796,7 +844,7 @@ end
 --    the addon parameter and then calls this function.
 --    Refer to the local assert() function for the reference implementation.
 -------------------------------------------------------------------------------
-function libAssert(addon, test, message)
+function libAssert(addon, test, ...)
 	-- validate the parameters
 	if type(addon) ~= "string" then
 		debugPrint("Invalid addon parameter. Addon must be a string.",
@@ -804,22 +852,16 @@ function libAssert(addon, test, message)
 		           1)
 		addon = "unspecified"
 	end
-	if type(message) ~= "string" then
-		debugPrint("Invalid message parameter. Message must be a string.",
-		           "assert",
-		           1)
-		message = ""
-	end
 
 	if test then
 		return true -- test passed
 	end
 
+	local message = format(...)
+
 	getglobal("ChatFrame1"):AddMessage(message, 1.0, 0.3, 0.3)
 
-	if nLog then
-		nLog.AddMessage(addon, "Assertion", N_CRITICAL, "assertion failed", message)
-	end
+	nLog.AddMessage(addon, "Assertion", N_CRITICAL, "assertion failed", message)
 
 	return false -- test failed
 end
@@ -835,7 +877,7 @@ end
 -- parameters:
 --    test    - (any)     false/nil, if the assertion failed
 --                        anything else, otherwise
---    message - (string)  the message which will be output to the user
+--    ...     - (any)     data which will be appended to the nLog message
 --
 -- returns:
 --    assertion - (boolean) true, if the test passed
@@ -846,8 +888,8 @@ end
 --    Refer to the documentation about libAssert for a more detailed
 --    description about this function.
 -------------------------------------------------------------------------------
-function assert(test, message)
-	return DebugLib.Assert(addonName, test, message)
+function assert(test, ...)
+	return DebugLib.Assert(addonName, test, ...)
 end
 
 -------------------------------------------------------------------------------
@@ -858,14 +900,14 @@ end
 -- disabled.
 --
 -- syntax:
---    assertion = libSimpleAssert(addon, test, message)
+--    assertion = libSimpleAssert(addon, test, ...)
 --
 -- parameters:
 --    addon   - (string)  the name of the addon/file used to identify the
 --                        specific assertion
 --    test    - (any)     false/nil, if the assertion failed
 --                        anything else, otherwise
---    message - (string)  the message which will be output to the user
+--    ...     - (any)     data which will be appended to the nLog message
 --
 -- return:
 --    assertion - (boolean) true, if the test passed
@@ -875,7 +917,7 @@ end
 --    Refer to the description of libAssert() to see a more detailed explanation
 --    about this function.
 -------------------------------------------------------------------------------
-function libSimpleAssert(addon, test, message)
+function libSimpleAssert(addon, test, ...)
 	-- validate the parameters
 	if type(addon) ~= "string" then
 		debugPrint("Invalid addon parameter. Addon must be a string.",
@@ -883,16 +925,12 @@ function libSimpleAssert(addon, test, message)
 		           1)
 		addon = "unspecified"
 	end
-	if type(message) ~= "string" then
-		debugPrint("Invalid message parameter. Message must be a string.",
-		           "assert",
-		           1)
-		message = ""
-	end
 
 	if test then
 		return true -- test passed
 	end
+
+	local message = format(...)
 
 	getglobal("ChatFrame1"):AddMessage(message, 1.0, 0.3, 0.3)
 
@@ -900,8 +938,8 @@ function libSimpleAssert(addon, test, message)
 end
 
 -------------------------------------------------------------------------------
--- Creates a string by transforming all parameters into string representations
--- and concatenating these.
+-- Creates a comma-separated string by transforming all parameters into string
+-- representations and concatenating these.
 --
 -- syntax:
 --    concatString = dump(...)
@@ -910,12 +948,21 @@ end
 --    ... - (any) parameters which should be added to the string
 --
 -- returns:
---    concatStrin - (string) The concatenated string.
+--    concatString - (string) The concatenated string.
 --
 -- remark:
 --    Be aware that there is no safety measurement in place to handle recursions
 --    inside of tables. If a recursion occures, this function causes a stack
---    overflow
+--    overflow.
+--
+--    Variables are concatenated the following way:
+--    variable type => resulting string
+--    [table]       => {[key1] = [value1], [key2] = [value2], ...}
+--    [nil]         => NIL
+--    [number]      => [number]
+--    [string]      => "[string]"
+--    [boolean]     => true/false
+--    [other]       => TYPE_OF_OTHER??
 -------------------------------------------------------------------------------
 function dump(...)
 	local out = ""
@@ -953,6 +1000,48 @@ function dump(...)
 		end
 
 		if (i < numVarArgs) then out = out .. ", " end
+	end
+	return out
+end
+
+-------------------------------------------------------------------------------
+-- Transforms all parameters into string representations and concatenates those
+-- into a comma separated string (except strings, which are separated by a
+-- single space).
+--
+-- syntax:
+--    concatString = format(...)
+--
+-- parameters:
+--    ... - (any) parameters which should be added to the string
+--
+-- returns:
+--    concatString - (string) The concatenated string.
+--
+-- remark:
+--    What makes this function different from the dump() function is how it
+--    handles strings. For example:
+--    format("str1", " str2") = str1 str2
+--    dump("str1", " str2")   = "str1", " str2"
+--
+--    Since this function uses dump() for the table output, it suffers from the
+--    same possible stack overflow as the dump() function.
+-------------------------------------------------------------------------------
+function format(...)
+	local n = select("#", ...)
+	local out = ""
+	for i = 1, n do
+		if i > 1 and out:sub(-1) ~= " " then out = out .. " "; end
+		local d = select(i, ...)
+		if (type(d) == "string") then
+			if (d:sub(1,1) == " ") then
+				out = out .. d:sub(2)
+			else
+				out = out..d;
+			end
+		else
+			out = out..dump(d);
+		end
 	end
 	return out
 end
