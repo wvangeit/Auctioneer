@@ -43,10 +43,10 @@ local clearPrompt
 -- Debug stuff
 
 local function debugSpam(message, r, g, b)
-	if not b then
-		r, g, b = 0, 0.75, 1
-	end
-	-- getglobal("ChatFrame1"):AddMessage("AutoDe: " .. message, r, g, b)
+--	if not b then
+--		r, g, b = 0, 0.75, 1
+--	end
+--	getglobal("ChatFrame1"):AddMessage("AutoDe: " .. message, r, g, b)
 end
 
 local function eventSpam(message)
@@ -101,34 +101,48 @@ function isState(state)
 	return moduleState == state
 end
 
-local function getDisenchantValue(link)
+local function getDisenchantOrProspectValue(link, count)
 	local _, _, quality, level = GetItemInfo(link)
-	if quality < 2 then return end
-
-	local skill = Enchantrix.Util.GetUserEnchantingSkill()
-	if skill == 0 then return end
-
-	local skillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
-	if skillRequired > skill then return end
-
-	return Enchantrix.Storage.GetItemDisenchantTotals(link)
+	if quality >= 2 then
+		local enchSkillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
+		if enchSkillRequired and Enchantrix.Util.GetUserEnchantingSkill() >= enchSkillRequired then
+			local disenchantValue = Enchantrix.Storage.GetItemDisenchantTotals(link)
+			if disenchantValue and disenchantValue > 0 then
+				return disenchantValue, _ENCH('ArgSpellname')
+			end
+		end
+	elseif count >= 5 then
+		local jcSkillRequired = Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
+		if jcSkillRequired and Enchantrix.Util.GetUserJewelCraftingSkill() >= jcSkillRequired then
+			local prospect = Enchantrix.Storage.GetItemProspects(link)
+			if prospect then
+				local prospectValue = 0
+				for result, yield in pairs(prospect) do
+					local hsp = Enchantrix.Util.GetReagentPrice(result)
+					local value = (hsp or 0) * yield
+					prospectValue = prospectValue + value
+				end
+				return prospectValue, _ENCH('ArgSpellProspectingName')
+			end
+		end
+	end
 end
 
 local function findItemInBags(findLink)
 	for bag = 0, 4 do
    		for slot = 1, GetContainerNumSlots(bag) do
+			local _, count = GetContainerItemInfo(bag, slot)
 	    	local link = GetContainerItemLink(bag, slot)
 			if link and (not findLink or link == findLink) then
-				if not findLink and link == prompt.link and bag == prompt.bag and slot == prompt.slot then
+				if not findLink and prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellname')
+				   and prompt.link == prompt.link and bag == prompt.bag and slot == prompt.slot then
 					-- items sometimes linger after they've been disenchanted and looted
 					debugSpam("Skipping zombie item " .. link)
 				else
 					if not isItemIgnored(link) then
-						local value = getDisenchantValue(link)
+						local value, spell = getDisenchantOrProspectValue(link, count)
 						if value and value > 0 then
-							return link, bag, slot, value
-						else
-							ignoreItemSession(link, true)
+							return link, bag, slot, value, spell
 						end
 					end
 				end
@@ -139,11 +153,11 @@ end
 
 function beginScan()
 	setState("scan")
-	local link, bag, slot, value = findItemInBags()
+	local link, bag, slot, value, spell = findItemInBags()
 	if link then
 		-- prompt for disenchant
 		setState("prompt")
-		showPrompt(link, bag, slot, value)
+		showPrompt(link, bag, slot, value, spell)
 	end
 end
 
@@ -155,7 +169,9 @@ local function onEvent(...)
 		if isState("loot_wait") then
 			-- loot window opened - grab the spoils
 			eventSpam(event)
-			LootSlot(1)
+			for slot = 1, GetNumLootItems() do
+				LootSlot(slot)
+			end
 			setState("loot")
 		end
 	elseif event == "LOOT_CLOSED" then
@@ -165,9 +181,10 @@ local function onEvent(...)
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SENT" then
-		if isState("prompt") and arg1 == "player" and arg2 == _ENCH("ArgSpellname") then
+		if isState("prompt") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- disenchant started - wait for completion
 			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3 .." ".. arg4)
+			-- TODO: should refer to prospecting if that's what it's doing
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
 			hidePrompt()
 			setState("cast")
@@ -187,12 +204,14 @@ local function onEvent(...)
 			beginScan()
 		end
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
-		if isState("cast") and arg1 == "player" and arg2 == "Disenchant" then
+		if isState("cast") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- completed - wait for loot window to come up
 			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3)
 			setState("loot_wait")
 		end
 	elseif event == "BAG_UPDATE" then
+		-- TODO: should also be watching for UNIT_INVENTORY_CHANGED here. splitting/combining stacks
+		-- of ores does NOT trigger BAG_UPDATE
 		if isState("scan") then
 			-- bag contents changed - rescan bags
 			eventSpam(event .." ".. arg1)
@@ -205,13 +224,15 @@ local function onEvent(...)
 				debugSpam(prompt.link .. " moved/disappeared")
 				hidePrompt()
 
-				link, bag, slot, value = findItemInBags(prompt.link)
+				local bag, slot, value, spell
+				link, bag, slot, value, spell = findItemInBags(prompt.link)
 				if link then
 					-- moved
 					debugSpam("  found again at [" .. bag .. "," .. slot .. "]")
-					showPrompt(link, bag, slot, value)
+					showPrompt(link, bag, slot, value, spell)
 				else
 					-- sold, traded, banked, destroyed, ...
+					-- TODO: should refer to prospecting if that's what it's doing
 					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
 					clearPrompt()
 					beginScan()
@@ -235,7 +256,7 @@ local function onUpdate(frame, elapsed)
 	local enabledInOptions = Enchantrix.Settings.GetSetting('AutoDisenchantEnable')
 	if enabledInOptions then
 		if isState("sleep") or isState("init") then
-			if Enchantrix.Util.GetUserEnchantingSkill() > 0 then
+			if Enchantrix.Util.GetUserEnchantingSkill() >= 1 or Enchantrix.Util.GetUserJewelCraftingSkill() >= 20 then
 				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeActive"))
 				beginScan()
 			elseif isState("init") then
@@ -293,15 +314,23 @@ local function getTextGSC(money)
 	return gsc
 end
 
-function showPrompt(link, bag, slot, value)
+function showPrompt(link, bag, slot, value, spell)
+	debugSpam(link ..",".. bag ..",".. slot ..",".. value ..",".. spell)
+
 	prompt.link, prompt.bag, prompt.slot = link, bag, slot
 
 	local _, _, _, _, _, _, _, _, _, texture = GetItemInfo(prompt.link)
 	prompt.Item:SetNormalTexture(texture)
 	prompt.Yes:SetAttribute("target-item", itemStringFromLink(prompt.link))
+	prompt.Yes:SetAttribute("spell", spell)
 
+	-- TODO: should refer to prospecting if that's what it's doing
 	prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
-	prompt.Lines[2]:SetText("  " .. prompt.link)
+	if spell == _ENCH('ArgSpellProspectingName') then
+		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
+	else
+		prompt.Lines[2]:SetText("  " .. prompt.link)
+	end
 	prompt.Lines[3]:SetText(_ENCH("GuiAutoDePromptLine3"):format(getTextGSC(floor(value))))
 
 	prompt:Show()
@@ -313,7 +342,7 @@ end
 
 function clearPrompt()
 	hidePrompt()
-	prompt.link, prompt.bag, prompt.slot = nil, nil, nil
+	prompt.link, prompt.bag, prompt.slot = nil, nil, nil, nil
 end
 
 local function promptNo()
@@ -340,7 +369,11 @@ local function showTooltip()
 
 	if (EnhTooltip) then
 		local name = GetItemInfo(prompt.link)
-		EnhTooltip.TooltipCall(GameTooltip, name, prompt.link, -1, 1, 0)
+		local count = 1
+		if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
+			count = 5
+		end
+		EnhTooltip.TooltipCall(GameTooltip, name, prompt.link, -1, count, 0)
 		GameTooltip:ClearAllPoints()
 		GameTooltip:SetPoint("TOPRIGHT", "AutoDisenchantPromptItem", "TOPLEFT", -10, -20)
 	end
@@ -441,7 +474,6 @@ local function initUI()
 	copyButtonVisuals(prompt.Yes, prompt.DummyYes)
 	prompt.Yes:SetAttribute("unit", "none")
 	prompt.Yes:SetAttribute("type", "spell")
-	prompt.Yes:SetAttribute("spell", "Disenchant")
 
 	prompt.No = CreateFrame("Button", "", prompt, "OptionsButtonTemplate")
 	prompt.No:SetText(_ENCH("GuiNo"))
