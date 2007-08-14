@@ -383,6 +383,15 @@ function lib.GetSetting(setting, default)
 	end
 end
 
+function lib.UpdateGuiConfig()
+	if gui then
+		if gui:IsVisible() then
+			gui:Hide()
+		end
+		gui = nil
+		lib.MakeGuiConfig()
+	end
+end
 
 function lib.MakeGuiConfig()
 	if gui then return end

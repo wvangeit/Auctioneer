@@ -4,7 +4,7 @@
 ## Interface: 20100
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: Khaos, !nLog, Auctioneer, auc-advanced
+## OptionalDeps: Khaos, !nLog
 ## SavedVariables: EnchantConfig, EnchantedLocal, EnchantedItemTypes, NonDisenchantablesLocal, ProspectedLocal
 ## SavedVariablesPerCharacter: AutoDisenchantIgnoreList
 ##

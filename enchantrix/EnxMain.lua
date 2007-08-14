@@ -49,6 +49,24 @@ end
 
 local DisenchantEvent = {}
 
+-- Secondary hook for Enchantrix to update itself if Auctioneer is loaded later
+function addonLoadedPost(hookArgs, event, addOnName)
+	if event ~= "ADDON_LOADED" then
+		return
+	end
+	if addOnName:lower() ~= "auctioneer" and addOnName:lower() ~= "auc-advanced" then
+		return
+	end
+
+	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
+
+	-- check for auctioneer and version
+	Enchantrix.Command.AuctioneerLoaded()
+
+	-- update gui to match
+	Enchantrix.Settings.UpdateGuiConfig()
+end
+
 -- This function differs from onLoad in that it is executed
 -- after variables have been loaded.
 function addonLoaded(hookArgs, event, addOnName)
@@ -58,6 +76,7 @@ function addonLoaded(hookArgs, event, addOnName)
 		return
 	end
 	Stubby.UnregisterEventHook("ADDON_LOADED", "Enchantrix")
+	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoadedPost)
 
 
 	-- Call AddonLoaded for other objects
