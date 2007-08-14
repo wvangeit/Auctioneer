@@ -61,7 +61,7 @@ function lib:valuate(item, tooltip)
 		local auctKey = item.id..":"..item.suffix..":"..item.enchant
 		market, seen = Auctioneer.Statistic.GetUsableMedian(auctKey)
 		if (get(lcName..".auct.usehsp")) then
-			market = Auctioneer.Statistic.GetHSP(auctKey)
+			market, seen = Auctioneer.Statistic.GetHSP(auctKey)
 		end
 	end
 	-- If we don't know what it's worth, then there's not much we can do
@@ -71,7 +71,7 @@ function lib:valuate(item, tooltip)
 
 	-- Check to see if it meets the min seen count (if applicable)
 	if (get(lcName..".seen.check")) then
-		if (seen < get(lcName..".seen.mincount")) then
+		if (not seen or seen < get(lcName..".seen.mincount")) then
 			item:info("Abort: Seen < min")
 			return
 		end
@@ -129,7 +129,8 @@ function lib:valuate(item, tooltip)
 	end
 
 	-- Check our projected profit level
-	local profit = adjusted - price
+	local profit = 0
+	if price > 0 then profit = value - price end
 
 	-- If what we are willing to pay for this item beats what
 	-- other modules are willing to pay, and we can make more

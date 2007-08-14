@@ -69,7 +69,8 @@ function lib:valuate(item, tooltip)
 	end
 
 	-- Check our projected profit level
-	local profit = value - price
+	local profit = 0
+	if price > 0 then profit = value - price end
 
 	-- If what we are willing to pay for this item beats what
 	-- other modules are willing to pay, and we can make more

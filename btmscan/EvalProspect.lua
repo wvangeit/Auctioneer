@@ -26,7 +26,7 @@ If you wish to make your own module, do the following:
 
 ]]
 
-local libName = "Disenchant"
+local libName = "Prospect"
 local lcName = libName:lower()
 local lib = { name = lcName, propername = libName }
 table.insert(BtmScan.evaluators, lcName)
@@ -39,85 +39,72 @@ BtmScan.evaluators[lcName] = lib
 function lib:valuate(item, tooltip)
 	local price = 0
 
-	-- Unless Enchantrix is running, the rest is moot
-	if not (Enchantrix and Enchantrix.Storage) then return end
-
-	-- If we're not enabled, scadaddle!
+	-- Bail immediately if we're not enabled
 	if (not get(lcName..".enable")) then return end
 
-	-- If this item is white or lower, forget about it.
-	if (item.qual <= 1) then return end
+	-- Can't do anything without Enchantrix
+	if not (Enchantrix and Enchantrix.Storage) then return end
 
-	-- Check to see if the ilevel is below the disenchant threshold
-	local _, _, iQual, iLevel = GetItemInfo(item.id)
-	if (get(lcName..".level.custom")) then
-		if (NonDisenchantables) then
-			if (NonDisenchantables[item.id..":0:0"]) then
-				item:info("Abort: Not DEable")
-				return true
+	-- All prospectable ores are "Common" quality
+	if (item.qual ~= 1) then return end
+
+	-- Give up if it doesn't prospect to anything
+	local prospects = Enchantrix.Storage.GetItemProspects(item.link)
+	if not prospects then return end
+
+	-- Set up deposit/brokerage factors
+	local useDeposit = get(lcName..'.adjust.deposit')
+	local relistCount = get(lcName..'.adjust.listings')
+	local useBroker = get(lcName..'.adjust.brokerage')
+	local feesBasis = get(lcName..'.adjust.basis')
+	local brokerRate, depositRate = 0.05, 0.05
+	if (feesBasis == "neutral") then
+		brokerRate, depositRate = 0.15, 0.25
+	end
+
+	-- Tally up value for each possible result
+	local trashTotal, marketTotal, depositTotal, brokerTotal = 0, 0, 0, 0
+	for result, yield in pairs(prospects) do
+		-- adjust for stack size
+		yield = yield * item.count / 5
+
+		local _, _, quality = GetItemInfo(result)
+		if quality == 0 then
+			-- vendor trash (lower level powders)
+			local info = Informant.GetItem(result)
+			local _, powderLink = GetItemInfo(result)
+			if info and info.sell then
+				trashTotal = trashTotal + info.sell * yield
+			end
+		else
+			-- gem or non-trashy powder
+			local marketPrice = Enchantrix.Util.GetReagentPrice(result) * yield
+			marketTotal = marketTotal + marketPrice
+
+			-- calculate costs
+			if (useDeposit) then
+				depositTotal = depositTotal + BtmScan.GetDepositCost(result, 1, depositRate) * relistCount * yield
+			end
+			if (useBroker) then
+				brokerTotal = brokerTotal + marketPrice * brokerRate
 			end
 		end
-		
-		-- We have to test a custom level
-		local canDe, required = BtmScan.isDEAble(iLevel, iQual, get(lcName..".level.max"))
-
-		-- If it's not disenchantable by our maxlevel, we don't want it
-		if not canDe then
-			item:info("Abort: DE level > max")
-			return
-		end
-		-- If it's not disenchantable by our maxlevel, we don't want it
-		if (required < get(lcName..".level.min")) then
-			item:info("Abort: DE level < min")
-			return
-		end
-	else
-		-- Otherwise, just use our current level
-		if (BtmScan.isDEAble(iLevel, iQual)) then
-			item:info("Abort: DE level > current")
-			return
-		end
 	end
 
-	-- Valuate this item
-	local market
-	if (BtmScan.deReagentTable) then
-		market = Enchantrix.Storage.GetItemDisenchantFromTable(item.link, BtmScan.deReagentTable)
-	else
-		local disenchantTo = Enchantrix.Storage.GetItemDisenchants(Enchantrix.Util.GetSigFromLink(item.link), item.name, true)
-		if (disenchantTo and disenchantTo.totals and disenchantTo.totals.hspValue and item.qual > 1 and item.count <= 1) then
-			market = disenchantTo.totals.hspValue * disenchantTo.totals.conf
-		end
-	end
-	if not market then 
-		item:info("Unable to get DE value")
-		return
-	end
-	item:info("Disenchant value", market)
+	local resaleTotal = marketTotal - depositTotal - brokerTotal
 
-	-- Adjust for brokerage / deposit costs
-	local adjusted = market
-	local brokerage = get(lcName..'.adjust.brokerage')
-
-	if (brokerage) then
-		local basis = get(lcName..'.adjust.basis')
-		local brokerRate, depositRate = 0.05, 0.05
-		if (basis == "neutral") then
-			brokerRate, depositRate = 0.15, 0.25
-		end
-		if (brokerage) then
-			local amount = (market * brokerRate)
-			adjusted = adjusted - amount
-			item:info(" - Brokerage", amount)
-		end
-		item:info(" = Adjusted amount", adjusted)
+	if tooltip then 
+		item:info("Market value", marketTotal)
+		if depositTotal > 0 then item:info(" - " .. relistCount .. " x deposits", depositTotal) end
+		if brokerTotal  > 0 then item:info(" - brokerage", brokerTotal) end
+		if trashTotal   > 0 then item:info(" + vendor trash", trashTotal) end
 	end
 
-	-- Calculate the real value of this item once our profit is taken out
+	local total = resaleTotal + trashTotal
 	local pct = get(lcName..".profit.pct")
 	local min = get(lcName..".profit.min")
-	local value, mkdown = BtmScan.Markdown(adjusted, pct, min)
-	item:info((" - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
+	local value, mkdown = BtmScan.Markdown(total, pct, min)
+	if tooltip then item:info((" - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown) end
 
 	-- Check for tooltip evaluation
 	if (tooltip) then
@@ -151,7 +138,7 @@ function lib:valuate(item, tooltip)
 		item.reason = self.name
 		item.what = self.name
 		item.profit = profit
-		item.valuation = market
+		item.valuation = marketTotal + trashTotal
 	end
 end
 
@@ -161,25 +148,20 @@ local ahList = {
 }
 
 define(lcName..'.enable', true)
-define(lcName..'.profit.min', 4500)
-define(lcName..'.profit.pct', 45)
-define(lcName..'.level.custom', false)
-define(lcName..'.level.min', 0)
-define(lcName..'.level.max', 375)
-define(lcName..'.adjust.brokerage', true)
+define(lcName..'.profit.min', 3000)
+define(lcName..'.profit.pct', 30)
 define(lcName..'.adjust.basis', "faction")
-
+define(lcName..'.adjust.brokerage', true)
+define(lcName..'.adjust.listings', 1)
 function lib:setup(gui)
 	id = gui.AddTab(libName)
 	gui.AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".level.custom", "Use custom levels")
-	gui.AddControl(id, "Slider",           0, 2, lcName..".level.min", 0, 375, 25, "Minimum skill: %s")
-	gui.AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")
 	gui.AddControl(id, "Subhead",          0,    "Fees adjustment")
-	gui.AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Auction fees basis")
+	gui.AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
+	gui.AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
+	gui.AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average relistings: %0.1fx")
 end
-
