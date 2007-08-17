@@ -87,7 +87,7 @@ CLASS_TO_CATEGORY_MAP = {
 	[11] = 7,
 	[9]  = 8,
 	[5]  = 9,
-	[15] = 10,
+	[15] = 11,
 }
 
 local filterDefaults = {
