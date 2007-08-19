@@ -55,23 +55,28 @@ local function breakHyperlink(match, matchlen, ...)
 	end
 end
 lib.breakHyperlink = breakHyperlink
+lib.BreakHyperlink = breakHyperlink
+
+function lib.GetFactor(suffix, seed)
+	if (suffix < 0) then
+		return bit.band(seed, 65535)
+	end
+	return 0
+end
 
 function lib.DecodeLink(link)
 	local vartype = type(link)
 	if (vartype == "string") then
 		local lType,id,enchant,gem1,gem2,gem3,gemBonus,suffix,seed = breakHyperlink("Hitem:", 6, strsplit("|", link))
 		if (lType ~= "item") then return end
-		local factor = 0
 		id = tonumber(id) or 0
+		enchant = tonumber(enchant) or 0
 		suffix = tonumber(suffix) or 0
 		seed = tonumber(seed) or 0
-		if (suffix < 0) then
-			factor = bit.band(seed, 65535)
-		end
-
-		return lType, id, suffix, factor
+		local factor = lib.GetFactor(suffix, seed)
+		return lType, id, suffix, factor, enchant, seed
 	elseif (vartype == "number") then
-		return "item", link, 0, 0
+		return "item", link, 0, 0, 0, 0
 	end
 	return
 end
