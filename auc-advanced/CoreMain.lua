@@ -84,7 +84,10 @@ function private.HookAH()
 end
 
 function private.OnLoad(addon)
-	if (addon:lower() == "auc-advanced") then
+	addon = addon:lower()
+
+	-- Check if the actual addon itself is loading
+	if (addon == "auc-advanced") then
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
@@ -92,18 +95,30 @@ function private.OnLoad(addon)
 			private.OnLoad(module)
 		end
 	end
-	local auc, sys, eng = strsplit("-", addon:lower())
+
+	-- Notify the actual module if it exists
+	local auc, sys, eng = strsplit("-", addon)
 	if (auc ~= "auc" or not sys or not eng) then return end
-	
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		if (sys == system:lower()) then
 			for engine, engineLib in pairs(systemMods) do
 				if (eng == engine:lower() and engineLib.OnLoad) then
-					engineLib.OnLoad()
+					engineLib.OnLoad(addon)
 				end
-				if (engineLib.Processor) then
-					engineLib.Processor("load", addon)
+			end
+		end
+	end
+
+	-- Check all modules' load triggers and pass event to processors
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.LoadTriggers and engineLib.LoadTriggers[addon]) then
+				if (engineLib.OnLoad) then
+					engineLib.OnLoad(addon)
 				end
+			end
+			if (engineLib.Processor) then
+				engineLib.Processor("load", addon)
 			end
 		end
 	end
