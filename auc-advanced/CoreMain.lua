@@ -98,12 +98,13 @@ function private.OnLoad(addon)
 
 	-- Notify the actual module if it exists
 	local auc, sys, eng = strsplit("-", addon)
-	if (auc ~= "auc" or not sys or not eng) then return end
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		if (sys == system:lower()) then
-			for engine, engineLib in pairs(systemMods) do
-				if (eng == engine:lower() and engineLib.OnLoad) then
-					engineLib.OnLoad(addon)
+	if (auc == "auc" and sys and eng) then
+		for system, systemMods in pairs(AucAdvanced.Modules) do
+			if (sys == system:lower()) then
+				for engine, engineLib in pairs(systemMods) do
+					if (eng == engine:lower() and engineLib.OnLoad) then
+						engineLib.OnLoad(addon)
+					end
 				end
 			end
 		end
@@ -117,7 +118,7 @@ function private.OnLoad(addon)
 					engineLib.OnLoad(addon)
 				end
 			end
-			if (engineLib.Processor) then
+			if (engineLib.Processor and auc == "auc" and sys and eng) then
 				engineLib.Processor("load", addon)
 			end
 		end
