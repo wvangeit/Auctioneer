@@ -50,10 +50,12 @@ local default
 local genVarSet
 local percentLessFilter
 local bidBrokerFilter
+local findMaterialFIlter
 local profitComparisonSort
 local bidBrokerSort
 local doBidBroker
 local doPercentLess
+local doFindMaterial
 
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix.State.GUI_Registered = nil
@@ -594,7 +596,10 @@ function auctioneerLoaded()
 		end
 		return
 	end
-	EnchantConfig.displayedAuctioneerWarning = nil
+
+-- ccox - with this enabled, we'll warn the user every single time they log in
+-- that's very, very annoying	
+--	EnchantConfig.displayedAuctioneerWarning = nil
 
 	if Enchantrix.State.Khaos_Registered then
 		registerAuctioneerOptions()
@@ -720,6 +725,9 @@ function handleCommand(command, source)
 
 	elseif (cmd == 'percentless' or cmd == 'pl') then
 		doPercentLess(param, param2);
+
+	elseif (cmd == 'findmat' or cmd == 'fm') then
+		doFindMaterial(param, param2);
 
 	else
 	
@@ -1031,6 +1039,56 @@ function bidBrokerFilter(auction, args)
 	return filterAuction;
 end
 
+
+function findMaterialFilter(auction, args)
+	local filterAuction = true;
+
+	if not Auctioneer and AucAdvanced then
+		auction = AucAdvanced.API.UnpackImageItem(auction)
+		auction.auctionId = auction.id
+		auction.count = auction.stackSize
+		auction.itemId = EnhTooltip.BreakLink(auction.link)
+		if (auction.sellerName == UnitName("player") or auction.amBidder) then
+			return false
+		end
+	end
+	
+	local reagentPriceTable = args['reagentPriceTable'];
+	local materialID = args['materialID'];
+	local percentLess = args['percentLess'];
+
+	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
+	local myValue, percentChance, yield = Enchantrix.Storage.GetItemDisenchantFromTableForOneMaterial(auction.itemId, reagentPriceTable, materialID);
+	if (not myValue) then return filterAuction; end
+
+	local buyout = auction.buyoutPrice or 0;
+	local count = auction.count or 1;
+	
+	-- margin is percentage PER ITEM
+	local margin = percentLessThan(myValue, buyout/count);
+	-- profit is for all items in the stack
+	local profit = (myValue * count) - buyout;
+	
+	local results = {
+		value = myValue,
+		margin = margin,
+		profit = profit,
+		auction = auction,
+		percentChance = percentChance,
+		yield = yield,
+	};
+	
+	if (buyout > 0)
+		and (margin >= tonumber(percentLess))
+--		and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
+		and (buyout <= Enchantrix.Settings.GetSetting('maxBuyoutPrice')) then
+		table.insert(profitMargins, results);
+		return true;
+	end
+
+	return filterAuction;
+end
+
 -- greatest profit first
 -- greatest margin first
 -- greatest value first
@@ -1060,17 +1118,53 @@ function bidBrokerSort(a, b)
 	return profitComparisonSort(a, b);
 end
 
-function doPercentLess(percentLess, minProfit)
+
+-- greatest margin first
+-- greatest chance first
+-- greatest yield first
+function findMaterialComparisonSort(a, b)
+
+	local aMargin = profitMargins[a].margin or 0;
+	local bMargin = profitMargins[b].margin or 0;
+	if (aMargin > bMargin) then return true; end
+	if (aMargin < bMargin) then return false; end
+	
+	local aChance = profitMargins[a].percentChance or 0;
+	local bChance = profitMargins[b].percentChance or 0;
+	if (aChance > bChance) then return true; end
+	if (aChance < bChance) then return false; end
+	
+	local aYield = profitMargins[a].yield or 0;
+	local bYield = profitMargins[b].yield or 0;
+	if (aYield > bYield) then return true; end
+	if (aYield < bYield) then return false; end
+	
+	return false;
+end
+
+local function CheckAuctioneerScanAvailable()
+
 	local adv = false
+	
 	if not Auctioneer then
 		if AucAdvanced then
 			adv = true
 		else
 			Enchantrix.Util.ChatPrint(_ENCH("AuctionScanAuctNotInstalled"));
-			return;
+			return false, false;
 		end
 	elseif not (Auctioneer.Filter or Auctioneer.Filter.QuerySnapshot) then
 		Enchantrix.Util.ChatPrint(_ENCH("AuctionScanVersionTooOld"));
+		return false, false;
+	end
+
+	return true, adv;
+end
+
+function doPercentLess(percentLess, minProfit)
+
+	local aucAvail, adv = CheckAuctioneerScanAvailable();
+	if (not aucAvail) then
 		return;
 	end
 	
@@ -1111,7 +1205,6 @@ function doPercentLess(percentLess, minProfit)
 	table.sort(sortedTable, profitComparisonSort);
 
 	local skipped_auctions = 0;
-	local skipped_hasbid = 0;
 	local skipped_skill = 0;
 	local name, link, _, itemLevel, hasBid
 
@@ -1163,16 +1256,9 @@ function doPercentLess(percentLess, minProfit)
 end
 
 function doBidBroker(minProfit, percentLess)
-	local adv = false
-	if not Auctioneer then
-		if AucAdvanced then
-			adv = true
-		else
-			Enchantrix.Util.ChatPrint(_ENCH("AuctionScanAuctNotInstalled"));
-			return;
-		end
-	elseif not (Auctioneer.Filter or Auctioneer.SnapshotDB.Query) then
-		Enchantrix.Util.ChatPrint(_ENCH("AuctionScanVersionTooOld"));
+
+	local aucAvail, adv = CheckAuctioneerScanAvailable();
+	if (not aucAvail) then
 		return;
 	end
 	
@@ -1301,6 +1387,102 @@ function doBidBroker(minProfit, percentLess)
 	profitMargins = {};
 
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerDone'));
+end
+
+
+function doFindMaterial(material, percentLess)
+
+	local aucAvail, adv = CheckAuctioneerScanAvailable();
+	if (not aucAvail) then
+		return;
+	end
+	
+	-- get the maximum item level the user can disenchant
+	local skill = Enchantrix.Util.GetUserEnchantingSkill();
+	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
+
+	--if string->number conversion fails, use defaults
+	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
+	materialID = tonumber(material);
+	
+	if (not materialID) then return end
+	
+	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('minPercentLessThanHSP'))
+	
+-- ccox - TODO - localize
+	Enchantrix.Util.ChatPrint("Starting Find Material scan for "..materialID.." with price "..percentLess.." % less than market.");
+
+	profitMargins = {};
+	
+	-- setup the reagent pricing table
+	local reagentPriceTable = Enchantrix.Util.CreateReagentPricingTable();
+
+	local find_material_args = {
+		['percentLess'] = percentLess,
+		['materialID'] = materialID,
+		['reagentPriceTable'] = reagentPriceTable,
+		}
+	
+	local targetAuctions
+	
+	if adv then
+		targetAuctions = AucAdvanced.API.QueryImage({filter=findMaterialFilter}, nil, nil, find_material_args);
+	else
+		targetAuctions = Auctioneer.SnapshotDB.Query(nil, nil, findMaterialFilter, find_material_args);
+	end
+
+	-- sort by profit into temporary array
+	local sortedTable = {}
+	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
+	table.sort(sortedTable, findMaterialComparisonSort);
+
+	local skipped_skill = 0;
+	local name, link, _, itemLevel, hasBid
+
+	-- output the list of auctions, iterating over our temp array
+	for _, n in ipairs(sortedTable) do
+		auctionItem = profitMargins[ n ];
+		local profit = auctionItem.profit;
+		local a = auctionItem.auction;
+		-- note: profit value already includes the item count
+		if adv then
+			name = a.itemName
+			link = a.link
+			itemLevel = a.itemLevel
+		else
+			name, link, _, itemLevel = GetItemInfo( a.itemId );
+		end
+		if ((not Enchantrix.Settings.GetSetting('RestrictToLevel')) or (itemLevel <= maxLevel)) then
+			local value = auctionItem.value or 0;
+			local margin = auctionItem.margin or 0;
+			local percentChance = auctionItem.percentChance or 0;
+			local yield = auctionItem.yield or 0;
+
+-- TODO - ccox - localize
+			local output = ("%s, Valued at: %s, BO: %s, Save: %s, Less %s, Chance %s, Yield %s"):format(
+				whiteText(a.count.."x")..link,
+				EnhTooltip.GetTextGSC(value * a.count),
+				EnhTooltip.GetTextGSC(a.buyoutPrice),
+				EnhTooltip.GetTextGSC(profit * a.count),
+				whiteText(margin.."%"),
+				whiteText((100 * percentChance).."%"),
+				whiteText(yield * a.count)
+			);
+			Enchantrix.Util.ChatPrint(output);
+		else
+			skipped_skill = skipped_skill + 1;
+		end
+	end
+
+	if (skipped_skill > 0) then
+		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
+	end
+	
+	-- so we free all the references
+	profitMargins = {};
+
+-- TODO - ccox - localize
+	Enchantrix.Util.ChatPrint("Find material done.");
 end
 
 

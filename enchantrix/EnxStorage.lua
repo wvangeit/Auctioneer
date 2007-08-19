@@ -40,6 +40,7 @@ Usages:
 local getItemDisenchants			-- Enchantrix.Storage.GetItemDisenchants()
 local getItemDisenchantTotals		-- Enchantrix.Storage.GetItemDisenchantTotals()
 local getItemDisenchantFromTable	-- Enchantrix.Storage.GetItemDisenchantFromTable()
+local getItemDisenchantFromTableForOneMaterial	-- Enchantrix.Storage.GetItemDisenchantFromTableForOneMaterial()
 local saveDisenchant				-- Enchantrix.Storage.SaveDisenchant()
 local addonLoaded					-- Enchantrix.Storage.AddonLoaded()
 local saveNonDisenchantable			-- Enchantrix.Storage.SaveNonDisenchantable()
@@ -321,6 +322,40 @@ function getItemDisenchantFromTable(link, reagentTable)
 end
 
 
+function getItemDisenchantFromTableForOneMaterial(link, reagentTable, material)
+	local data = Enchantrix.Storage.GetItemDisenchants(link)
+	if not data then
+		-- error message would have been printed inside GetItemDisenchants
+		return
+	end
+
+	local total = data.total
+	local priceTotal = 0;
+	
+	if (total and total[1] > 0) then
+		local totalNumber, totalQuantity = unpack(total)
+		for result, resData in pairs(data) do
+			if (result ~= "total" and result == material) then
+
+				local resNumber, resQuantity = unpack(resData)
+				local reagentPrice = reagentTable[ result ];
+				if (not reagentPrice) then
+					Enchantrix.Util.DebugPrint("reagentTable", ENX_INFO, "No data", "No data in reagent table for ", result, reagentTable )
+				end
+				local resYield = resQuantity / totalNumber;
+				local resPrice = (reagentPrice or 0) * resYield;
+				local percentage = resNumber / totalNumber;
+				local simpleYield = resQuantity/resNumber;
+				return resPrice, percentage, simpleYield;
+			end
+		end
+	end
+	
+	-- material not matched
+	return
+end
+
+
 local _G
 local lib = Enchantrix.Storage
 lib.data = {}
@@ -379,6 +414,7 @@ end
 -- base data is material, percentage given, number returned
 -- this will work as-is, but return a total count of 1
 -- we have to multiply this to get a reasonable result after the confidence function
+-- TODO - ccox - clean this up now that the confidence function is gone
 local BASE_SCALE = 1000
 
 local function addResultFromBaseTable(data, baseData)
@@ -517,6 +553,7 @@ Enchantrix.Storage = {
 	GetItemDisenchants	= getItemDisenchants,
 	GetItemDisenchantTotals = getItemDisenchantTotals,
 	GetItemDisenchantFromTable = getItemDisenchantFromTable,
+	GetItemDisenchantFromTableForOneMaterial = getItemDisenchantFromTableForOneMaterial,
 	SaveDisenchant = saveDisenchant,
 	SaveNonDisenchantable = saveNonDisenchantable,
 	
