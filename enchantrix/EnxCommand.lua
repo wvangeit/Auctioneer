@@ -726,7 +726,7 @@ function handleCommand(command, source)
 	elseif (cmd == 'percentless' or cmd == 'pl') then
 		doPercentLess(param, param2);
 
-	elseif (cmd == 'findmat' or cmd == 'fm') then
+	elseif (cmd == 'findmaterial' or cmd == 'findmat' or cmd == 'fm') then
 		doFindMaterial(param, param2);
 
 	else
@@ -778,6 +778,8 @@ function chatPrintHelp()
 
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdFindBidauct'), _ENCH('OptFindBidauct'), _ENCH('HelpFindBidauct')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdFindBuyauct'), _ENCH('OptFindBuyauct'), _ENCH('HelpFindBuyauct')));
+-- TODO - ccox - localize!
+	Enchantrix.Util.ChatPrint(lineFormat:format("findmaterial", "material <percentless>", "Find auctions where disenchanting can yield a given material (and, optionally, a minimum percentage less than auction value for that material)" ));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdDefault'), _ENCH('OptDefault'), _ENCH('HelpDefault')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('CmdPrintin'), _ENCH('OptPrintin'), _ENCH('HelpPrintin')));
 end
@@ -1390,28 +1392,70 @@ function doBidBroker(minProfit, percentLess)
 end
 
 
+-- ccox - TODO - this could be a lot more efficient
+-- but for now, we won't be calling it often, and the list is short
+local function resolveDisenchantMaterial( mat )
+	
+	local n = #Enchantrix.Constants.DisenchantReagentList;
+	
+	matID = tonumber(mat);
+	if (matID) then
+		for i = 1, n do
+			local reagent = Enchantrix.Constants.DisenchantReagentList[i];
+			reagent = tonumber(reagent);
+			if (matID == reagent) then
+				return reagent;
+			end
+		end
+	else
+		local matLower = mat:lower();
+		for i = 1, n do
+			local reagentID = Enchantrix.Constants.DisenchantReagentList[i];
+			reagentID = tonumber(reagentID);
+			local reagentName = Enchantrix.Util.GetReagentInfo(reagentID);
+			if (matLower == reagentName) then
+				return reagentID;
+			end
+		end
+	end
+	
+	return nil;
+end
+
+
+-- ccox - TODO - this should also take material names or something similar
+--		needs to handle capitalization, needs to deal with misspelling, localization, etc.
+-- ccox - TODO -- handleCommand command line parsing is breaking up item names
+--			need a better way to handle string input on command line
 function doFindMaterial(material, percentLess)
+
+	if (not material) then
+		return;
+	end
 
 	local aucAvail, adv = CheckAuctioneerScanAvailable();
 	if (not aucAvail) then
 		return;
 	end
-	
-	-- get the maximum item level the user can disenchant
-	local skill = Enchantrix.Util.GetUserEnchantingSkill();
-	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
 
-	--if string->number conversion fails, use defaults
-	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
-	materialID = tonumber(material);
+	local materialID = resolveDisenchantMaterial(material);
+	
+	if (not materialID) then
+-- ccox - TODO - localize
+		Enchantrix.Util.ChatPrint( material.." is not a disenchantable material." );
+		return;
+	end
 	
 	if (not materialID) then return end
 	
+	--if string->number conversion fails, use defaults
+	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('minPercentLessThanHSP'))
 	
 -- ccox - TODO - localize
 	Enchantrix.Util.ChatPrint("Starting Find Material scan for "..materialID.." with price "..percentLess.." % less than market.");
 
+	
 	profitMargins = {};
 	
 	-- setup the reagent pricing table
@@ -1435,6 +1479,10 @@ function doFindMaterial(material, percentLess)
 	local sortedTable = {}
 	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
 	table.sort(sortedTable, findMaterialComparisonSort);
+	
+	-- get the maximum item level the user can disenchant
+	local skill = Enchantrix.Util.GetUserEnchantingSkill();
+	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
 
 	local skipped_skill = 0;
 	local name, link, _, itemLevel, hasBid
