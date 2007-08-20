@@ -99,6 +99,70 @@ function colored(doIt, counts, alt)
 	if text then text = "( "..text.." )" else text = alt end
 	return text
 end
+
+function lib.GetImageCounts(hyperlink, maxPrice, items)
+	local scandata = AucAdvanced.Scan.GetScanData()
+
+	local itemID, itemSuffix, itemFactor
+	if type(hyperlink) == "number" then
+		itemID = hyperlink
+		itemSuffix = 0
+		itemFactor = 0
+	else
+		local iType, iID, iSuffix, iFactor = AucAdvanced.DecodeLink(hyperlink)
+		if iType == "item" then
+			itemID = iID
+			itemSuffix = iSuffix
+			itemFactor = iFactor
+		end
+	end
+
+	local totalBid, totalBuy = 0
+
+	local n = #(scandata.image)
+	local v, vID, vSuffix, vFactor, vSig, vLink, vLevel, vPer, vColor, vBid, vBuy, _
+	for i=1, n do
+		v = scandata.image[i]
+		vID = v[Const.ITEMID]
+		if (vID == iID) then
+			vSuffix = v[Const.SUFFIX]
+			vFactor = v[Const.FACTOR]
+			vCount = v[Const.COUNT]
+
+			if (vSuffix == iSuffix) then
+				if (vFactor == iFactor) then
+					vBid = v[Const.PRICE]
+					vBuy = v[Const.BUYOUT]
+
+					local matched = false
+					if (maxPrice) then 
+						if (vBuy and vBuy > 0 and vBuy < maxPrice) then 
+							totalBuy = totalBuy + count
+							matched = true
+						elseif (not maxPrice or vBid < maxPrice) then 
+							totalBid = totalBid + count
+							matched = true
+						end
+					else
+						if (vBuy and vBuy > 0) then
+							totalBuy = totalBuy + 1
+							matched = true
+						else
+							totalBid = totalBid + 1
+							matched = true
+						end
+					end
+					if items and matched then
+						table.insert(items, v)
+					end
+				end
+			end
+		end
+	end
+
+	return totalBuy, totalBid
+end
+
 function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	local getter = AucAdvanced.Settings.GetSetting
 	if not getter("scandata.tooltip.display") then return  end
