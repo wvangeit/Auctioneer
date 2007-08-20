@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://www.norganna.org/localizer/
+	http://norganna.org/localizer/
 
 	AddOn: Enchantrix
 	Revision: $Id$
@@ -422,6 +422,13 @@ EnchantrixLocalizations = {
 		["ChatResetProfile"]	= "Einstellungen zurückgesetzt für:";
 		["ChatSavedProfile"]	= "Profil gespeichert:";
 		["ChatUsingProfile"]	= "Aktuell verwendetes Profil:";
+		["FrmtAutoDeActive"]	= "Autom. Entzaubern aktiv";
+		["FrmtAutoDeDisabled"]	= "Autom. Entzaubern deaktiviert";
+		["FrmtAutoDeDisenchantCancelled"]	= "Entzaubern abgebrochen: Item nicht gefunden";
+		["FrmtAutoDeDisenchanting"]	= "Entzaubere %s";
+		["FrmtAutoDeIgnorePermanent"]	= "Ignoriere %s permanent";
+		["FrmtAutoDeIgnoreSession"]	= "Ignoriere %s diese Sitzung";
+		["FrmtAutoDeInactive"]	= "Autom. Entzaubern nicht aktiv";
 		["FrmtBidbrokerCurbid"]	= "aktGeb";
 		["FrmtBidbrokerDone"]	= "Die Auktionssuche (Betrag unter Gebotspreis) ist abgeschlossen.";
 		["FrmtBidbrokerHeader"]	= "Auktionen mit %s Silber Einsparung auf den durchschnittlichen Entzauberungswert:";
@@ -461,6 +468,10 @@ EnchantrixLocalizations = {
 
 		-- Section: User Interface
 		["GuiActivateProfile"]	= "Aktiviere ein vorhandenes Profil";
+		["GuiAutoDeEnable"]	= "Suche nach entzauberbaren Items in Taschen - VORSICHTIG VERWENDEN";
+		["GuiAutoDeOptions"]	= "Automatisierung";
+		["GuiAutoDePromptLine1"]	= "Willst Du dies entzaubern:";
+		["GuiAutoDePromptLine3"]	= "Bewertet um %s";
 		["GuiBBUnbiddedOnly"]	= "Limitiere BidBroker auf Items ohne Gebote";
 		["GuiConfigProfiles"]	= "Erstelle, konfiguriere und editiere Profile";
 		["GuiCreateReplaceProfile"]	= "Erstelle oder ersetze ein Profil";
@@ -468,7 +479,10 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "Standardprozentwert unter HVP: %d";
 		["GuiDefaultProfitMargin"]	= "Standard Profitgewinn:";
 		["GuiDeleteProfileButton"]	= "Löschen";
+		["GuiFixedSettings"]	= "Standard Reagenzpreise";
+		["GuiFixedSettingsNote"]	= "Hinweis: Diese Werte werden anstelle vom Auctioneer oder von allen anderen Schätzungsmethoden verwendet, wenn die Checkbox aktiviert wird. Die folgenden Werte werden noch durch die Reagenzgewichtung im vorhergehenden Abschnitt beeinflußt. Um sicher zu stellen, dass die Reagenz genau anhand der unten spezifizierten Menge bewertet wird, muss die Gewichtung im Gewichtungsabschnitt auf 100% eingestellt sein.";
 		["GuiGeneralOptions"]	= "Allgemeine Enchantrix Optionen";
+		["GuiIgnore"]	= "Ignorieren";
 		["GuiItemValueAuc4HSP"]	= "Auc4 HVP";
 		["GuiItemValueAuc4Median"]	= "Auc4 Median";
 		["GuiItemValueAuc5Market"]	= "AucAdv Marktwert";
@@ -484,6 +498,7 @@ EnchantrixLocalizations = {
 		["GuiMinLessHSP"]	= "Mindestprozentwert unter HVP: %d";
 		["GuiMinProfitMargin"]	= "Minimaler Profitgewinn:";
 		["GuiNewProfileName"]	= "Neuer Profilname:";
+		["GuiNo"]	= "Nein";
 		["GuiPLBBOnlyBelowDESkill"]	= "Zeige nur mit aktuellem Skill entzauberbare Items";
 		["GuiPLBBSettings"]	= "Prozentwerte- und BidBrokereinstellungen";
 		["GuiProspectingLevels"]	= "Zeige benötigten Skilllevel für Sondierung im Tooltip";
@@ -494,6 +509,7 @@ EnchantrixLocalizations = {
 		["GuiSaveProfileButton"]	= "Speichern";
 		["GuiShowProspecting"]	= "Zeige Sondierungsdaten für Erze";
 		["GuiTabAuctions"]	= "Auktionen";
+		["GuiTabFixed"]	= "Standardwerte";
 		["GuiTabGeneral"]	= "Allgemein";
 		["GuiTabProfiles"]	= "Profile";
 		["GuiTabProspecting"]	= "Sondieren";
@@ -507,6 +523,7 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "Zeige Kurzinfo zu Entzauberungswert";
 		["GuiWeighSettingsNote"]	= "Die Gewichtung oben ändert die Schätzung der erhaltenen Reagenz durch die spezifizierte Menge. Im Allgemeinen kann man sie bei 100% lassen, es sei denn, daß sie mehr oder weniger wertvoll sein sollten, wie die Schätzungsmethode die verwendet wird.";
 		["GuiWeightSettings"]	= "Reagenzwunsch bei Entzauberung";
+		["GuiYes"]	= "Ja";
 
 	};
 
@@ -671,6 +688,7 @@ EnchantrixLocalizations = {
 		["FrmtValueAuctHsp"]	= "Disenchant value (HSP)";
 		["FrmtValueAuctMed"]	= "Disenchant value (Median)";
 		["FrmtValueAuctVal"]	= "Disenchant value (AucAdv)";
+		["FrmtValueFixedVal"]	= "Disenchant value (Fixed)";
 		["FrmtValueMarket"]	= "Disenchant value (Baseline)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer not loaded, using cached prices]";
 		["FrmtWarnNoPrices"]	= "[No prices available]";
@@ -691,6 +709,8 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "Default Percentage less than HSP: %d";
 		["GuiDefaultProfitMargin"]	= "Default Profit Margin:";
 		["GuiDeleteProfileButton"]	= "Delete";
+		["GuiFixedSettings"]	= "Fixed reagent prices";
+		["GuiFixedSettingsNote"]	= "Note: These values will be used instead of Auctioneer or any other valuation methods if the checkbox is checked.\nThe following values are still affected by the reagent weights in the previous section, so if you want to make sure that the reagent is valued at exactly the specified amount below, then also make sure that it's weight is set to 100% in the weights section.";
 		["GuiGeneralOptions"]	= "General Enchantrix options";
 		["GuiIgnore"]	= "Ignore\n";
 		["GuiItemValueAuc4HSP"]	= "Auc4 HSP";
@@ -719,6 +739,7 @@ EnchantrixLocalizations = {
 		["GuiSaveProfileButton"]	= "Save";
 		["GuiShowProspecting"]	= "Show Prospecting data for ores";
 		["GuiTabAuctions"]	= "Auctions";
+		["GuiTabFixed"]	= "Fixed Value";
 		["GuiTabGeneral"]	= "General";
 		["GuiTabProfiles"]	= "Profiles";
 		["GuiTabProspecting"]	= "Prospecting";
@@ -1280,6 +1301,9 @@ EnchantrixLocalizations = {
 
 		-- Section: User Interface
 		["GuiActivateProfile"]	= "현재 프로필 활성화";
+		["GuiAutoDeEnable"]	= "가방에서 마력추출할 아이템을 찾습니다. - \"주의해서 사용하세요.\"";
+		["GuiAutoDePromptLine1"]	= "마력추출하겠습니까? : ";
+		["GuiAutoDePromptLine3"]	= "가격 : %s";
 		["GuiCreateReplaceProfile"]	= "프로필 생성 또는 갱신";
 		["GuiDeleteProfileButton"]	= "삭제";
 		["GuiMinimapShowButton"]	= "미니맵 버튼 표시";

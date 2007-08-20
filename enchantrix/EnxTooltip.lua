@@ -222,6 +222,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local totalFive = {}
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	local totalNumber, totalQuantity
+	local allFixed = true
 	
 	if (total and total[1] > 0) then
 		totalNumber, totalQuantity = unpack(total)
@@ -230,10 +231,15 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (not lines) then lines = {} end
 
 				local resNumber, resQuantity = unpack(resData)
-				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
+				local hsp, med, mkt, five, fix = Enchantrix.Util.GetReagentPrice(result)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
 				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
-				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield
+				local resHSP, resMed, resMkt, resFive, resFix = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield, (fix or 0)*resYield
+				if (fix) then
+					resHSP, resMed, resMkt, resFive = resFix,resFix,resFix,resFix
+				else
+					allFixed = false
+				end
 				totalHSP = totalHSP + resHSP
 				totalMed = totalMed + resMed
 				totalMkt = totalMkt + resMkt
@@ -267,18 +273,23 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 
 	-- Terse mode
 	if Enchantrix.Settings.GetSetting('ToolTipTerseFormat') and not IsControlKeyDown() then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+		if (allFixed) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueFixedVal'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
-			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+		else
+			if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			elseif Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			elseif Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0 then
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
 		end
 		return
 	end
@@ -310,21 +321,26 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	end
 
 	if (Enchantrix.Settings.GetSetting('TooltipShowValues')) then
-		if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+		if (allFixed) then
+			EnhTooltip.AddLine(_ENCH('FrmtValueFixedVal'), totalHSP, embed);
 			EnhTooltip.LineColor(0.1,0.6,0.6);
-		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
-		end
-		if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
-			EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
-			EnhTooltip.LineColor(0.1,0.6,0.6);
+		else
+			if (AucAdvanced and Enchantrix.Settings.GetSetting('TooltipShowAuctAdvValue') and totalFive > 0) then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctVal'), totalFive, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
+			if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueHSP') and totalHSP > 0) then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctHsp'), totalHSP, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
+			if (Enchantrix.Settings.GetSetting('TooltipShowAuctValueMedian') and totalMed > 0) then
+				EnhTooltip.AddLine(_ENCH('FrmtValueAuctMed'), totalMed, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
+			if (Enchantrix.Settings.GetSetting('TooltipShowBaselineValue') and totalMkt > 0) then
+				EnhTooltip.AddLine(_ENCH('FrmtValueMarket'), totalMkt, embed);
+				EnhTooltip.LineColor(0.1,0.6,0.6);
+			end
 		end
 	end
 end
@@ -477,13 +493,15 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	-- Append additional reagent info
 	for _, reagent in ipairs(reagentList) do
 		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(reagent[1])
-		local hsp, median, market, five = Enchantrix.Util.GetReagentPrice(reagent[1])
+		local hsp, median, market, five, fix = Enchantrix.Util.GetReagentPrice(reagent[1])
 		local _, _, _, color = GetItemQualityColor(rQuality)
 
 		reagent[1] = rName
 		table.insert(reagent, rQuality)
 		table.insert(reagent, color)
-		if AucAdvanced then
+		if fix then
+			table.insert(reagent, fix)
+		elseif AucAdvanced and five and five > 0 then
 			table.insert(reagent, five)
 		else
 			table.insert(reagent, hsp)

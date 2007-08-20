@@ -164,6 +164,12 @@ local function getDefault(setting)
 
 	-- Weights default to 100%
 	if (a == "weight") then return 100 end
+	if (a == "fixed" and c == "value") then
+		local reagId = tonumber(b)
+		if (reagId) then
+			return Enchantrix.Constants.StaticPrices[reagId]
+		end
+	end
 
 	-- miniicon settings
 	if (setting == "miniicon.angle")          then return 118     end
@@ -480,26 +486,32 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
 	id = gui.AddTab(_ENCH("GuiTabWeights"))
+	gui.MakeScrollable(id)
 	gui.AddControl(id, "Header",     0,    _ENCH("GuiWeightSettings"))
-	last = gui.GetLast(id)
-	cont = nil
-
+	gui.AddControl(id, "Note",     0, 1, 600, 60, _ENCH("GuiWeighSettingsNote"))
 	local numReag = #Enchantrix.Constants.DisenchantReagentList
 	local colPos = 0
 	for i=1, numReag do
 		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
 		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
 		if (not reagName) then reagName = "item:"..reagId end
-		reagName = reagName:gsub("Large", "L"):gsub("Small", "S"):gsub("Greater", "G"):gsub("Lesser", "L")
-
-		if (cont == nil and i > numReag/2) then
-			cont = gui.GetLast(id)
-			gui.SetLast(id, last)
-			colPos = 0.5
-		end
-		gui.AddControl(id, "Slider", colPos, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
+		gui.AddControl(id, "WideSlider", 0, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
 	end
-	gui.SetLast(id, cont)
 
-	gui.AddControl(id, "Note",     0, 1, 600, 60, _ENCH("GuiWeighSettingsNote"))
+	id = gui.AddTab(_ENCH("GuiTabFixed"))
+	gui.MakeScrollable(id)
+	gui.AddControl(id, "Header",     0,  _ENCH("GuiFixedSettings"))
+	gui.AddControl(id, "Note",     0, 1, 600, 90, _ENCH("GuiFixedSettingsNote"))
+	local numReag = #Enchantrix.Constants.DisenchantReagentList
+	local colPos = 0
+	for i=1, numReag do
+		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
+		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
+		if (not reagName) then reagName = "item:"..reagId end
+		last = gui.GetLast(id)
+		gui.AddControl(id, "Checkbox", 0, 1, "fixed."..reagId, ("%s:"):format(reagName))
+		gui.SetLast(id, last)
+		gui.AddControl(id, "MoneyFramePinned", 0.6, 1, "fixed."..reagId..".value", 0, 99999999)
+	end
+
 end

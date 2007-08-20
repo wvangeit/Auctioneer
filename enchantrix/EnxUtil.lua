@@ -341,8 +341,16 @@ function getReagentPrice(reagentID, extra)
 	reagentID = tonumber(reagentID)
 	if not reagentID then return nil end
 
-	local hsp, median, market, price5
+	if Enchantrix.Settings.GetSetting('fixed.'..reagentID) then
+		myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagentID..'.value'))
+		if myValue then
+			-- Shouldn't be calling this function in this scenario.
+			-- Should check first!
+			return nil,nil,nil,nil,myValue
+		end
+	end
 
+	local hsp, median, market, price5
 	market = Enchantrix.Constants.StaticPrices[reagentID]
 
 	if ( Enchantrix.Constants.VendorTrash[reagentID] ) then
@@ -963,26 +971,30 @@ function Enchantrix.Util.CreateReagentPricingTable()
 		local reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);
 
-		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
 		local myValue = 0;
-		
-		if (style == "auc4:hsp") then
-			myValue = hsp;
-		elseif (style == "auc4:med") then
-			myValue = med;
-		elseif (style == "baseline") then
-			myValue = mkt;
-		elseif (AucAdvanced and (style == "adv:market" or extra)) then
-			myValue = five;
+		if Enchantrix.Settings.GetSetting('fixed.'..reagent) then
+			myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagent..'.value')) or 0
 		else
-			local c = 0
-			if (hsp) then  myValue=myValue+hsp  c=c+1 end
-			if (med) then  myValue=myValue+med  c=c+1 end
-			if (mkt) then  myValue=myValue+mkt  c=c+1 end
-			if (five) then myValue=myValue+five c=c+1 end
-			myValue = myValue / c
-		end
+			local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
 		
+			if (style == "auc4:hsp") then
+				myValue = hsp;
+			elseif (style == "auc4:med") then
+				myValue = med;
+			elseif (style == "baseline") then
+				myValue = mkt;
+			elseif (AucAdvanced and (style == "adv:market" or extra)) then
+				myValue = five;
+			else
+				local c = 0
+				if (hsp) then  myValue=myValue+hsp  c=c+1 end
+				if (med) then  myValue=myValue+med  c=c+1 end
+				if (mkt) then  myValue=myValue+mkt  c=c+1 end
+				if (five) then myValue=myValue+five c=c+1 end
+				myValue = myValue / c
+			end
+		end
+
 		scanReagentTable[ reagent ] = myValue;
 	end
 	
