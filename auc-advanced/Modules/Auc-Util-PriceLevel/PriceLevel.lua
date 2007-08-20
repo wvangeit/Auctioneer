@@ -237,11 +237,13 @@ function private.ListUpdate()
 		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page);
 		if (index <= numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) then
 			link =  GetAuctionItemLink("list", offset + i)
-			_,_, quantity, _,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)
-			if bidPrice>0 then bidPrice = bidPrice + minInc
-			else bidPrice = minBid end
-			priceLevel, perItem, r,g,b = private.CalcLevel(link, quantity, bidPrice, buyPrice)
-			private.SetBar(i, r,g,b, priceLevel)
+			if link then
+				_,_, quantity, _,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)
+				if bidPrice>0 then bidPrice = bidPrice + minInc
+				else bidPrice = minBid end
+				priceLevel, perItem, r,g,b = private.CalcLevel(link, quantity, bidPrice, buyPrice)
+				private.SetBar(i, r,g,b, priceLevel)
+			end
 		end
 	end
 end
