@@ -359,7 +359,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 					local reagentID = Enchantrix.Util.GetItemIdFromLink(link)
 					if reagentID then
 						-- for prospecting, we need to save the whole list
-						reagentList[ reagentID ] = quantity;
+						reagentList[ reagentID ] = (reagentList[ reagentID ] or 0) + quantity
 						if (isDisenchant) then
 							-- disenchant only yields one item, so we can pass it in one at a time
 							Enchantrix.Storage.SaveDisenchant(sig, reagentID, quantity)

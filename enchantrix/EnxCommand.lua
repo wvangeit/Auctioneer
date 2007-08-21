@@ -586,14 +586,22 @@ function auctioneerLoaded()
 	end
 
 	if not Enchantrix.State.Auctioneer_Loaded then
-		-- Old version of Auctioneer
-		if not EnchantConfig.displayedAuctioneerWarning then
-			-- Yell at the user, but only once
-			message(_ENCH('MesgAuctVersion'))
-			EnchantConfig.displayedAuctioneerWarning = true
-		else
-			Enchantrix.Util.ChatPrint(_ENCH('MesgAuctVersion'))
+
+		-- Don't complain if we are still waiting for Auctioneer to load
+		local aucLoadPending =    (not Auctioneer and Stubby.GetConfig("Auctioneer", "LoadType") == "always")
+		                       or (not AucAdvanced and Stubby.GetConfig("Auc-Advanced", "LoadType") == "always")
+
+		if not aucLoadPending then
+			-- Old version of Auctioneer
+			if not EnchantConfig.displayedAuctioneerWarning then
+				-- Yell at the user, but only once
+				message(_ENCH('MesgAuctVersion'))
+				EnchantConfig.displayedAuctioneerWarning = true
+			else
+				Enchantrix.Util.ChatPrint(_ENCH('MesgAuctVersion'))
+			end
 		end
+
 		return
 	end
 

@@ -162,7 +162,7 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		for n, line in ipairs(lines) do
 			EnhTooltip.AddLine(line.str, nil, embed)
 			EnhTooltip.LineColor(0.8, 0.8, 0.2);
-			if n >= 12 then break end -- Don't add more than 12 lines
+			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
 	
