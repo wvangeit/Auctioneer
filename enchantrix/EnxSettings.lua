@@ -164,10 +164,14 @@ local function getDefault(setting)
 
 	-- Weights default to 100%
 	if (a == "weight") then return 100 end
-	if (a == "fixed" and c == "value") then
-		local reagId = tonumber(b)
-		if (reagId) then
-			return Enchantrix.Constants.StaticPrices[reagId]
+	if (a == "fixed") then
+		if (c == "value") then
+			local reagId = tonumber(b)
+			if (reagId) then
+				return Enchantrix.Constants.StaticPrices[reagId]
+			end
+		else
+			return false
 		end
 	end
 
