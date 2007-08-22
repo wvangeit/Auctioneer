@@ -242,7 +242,7 @@ local function setter(setting, value)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then
-				engineLib.Processor("configchanged")
+				engineLib.Processor("configchanged", setting, value)
 			end
 		end
 	end
