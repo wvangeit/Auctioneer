@@ -59,9 +59,12 @@ function lib.GetName()
 	return libName
 end
 
+private.cache = {}
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		private.ProcessTooltip(...)
+	elseif (callbackType == "scanstats") then
+		private.cache = {}
 	end
 end
 
@@ -75,7 +78,7 @@ local colorDist = {
 	base = { red=0, orange=0, yellow=0, green=0, blue=0 },
 	all = { red=0, orange=0, yellow=0, green=0, blue=0 },
 }
-function colored(doIt, counts, alt)
+function lib.Colored(doIt, counts, alt)
 	local text
 	if (counts.blue > 0) then
 		text = ("|cff3399ff%d|r"):format(counts.blue)
@@ -96,7 +99,13 @@ function colored(doIt, counts, alt)
 		if text then text = text .. " / " else text = "" end
 		text = text..("|cffff0000%d|r"):format(counts.red)
 	end
-	if text then text = "( "..text.." )" else text = alt end
+	if alt then
+		if text then
+			text = "( "..text.." )"
+		else
+			text = alt
+		end
+	end
 	return text
 end
 
@@ -163,25 +172,23 @@ function lib.GetImageCounts(hyperlink, maxPrice, items)
 	return totalBuy, totalBid
 end
 
-function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
-	local getter = AucAdvanced.Settings.GetSetting
-	if not getter("scandata.tooltip.display") then return  end
+function lib.GetDistribution(hyperlink)
 
-	local full = false
 	local iType, iID, iSuffix, iFactor = AucAdvanced.DecodeLink(hyperlink)
-	if (getter("scandata.tooltip.modifier") and IsShiftKeyDown()) then
-		full = true
-	end
+	local sig = strjoin(":", iID, iSuffix, iFactor)
+	if private.cache[sig] then return unpack(private.cache[sig]) end
+
 	local scandata = AucAdvanced.Scan.GetScanData()
 
-	local calcLevel, doColor
+	local calcLevel, doColor, myColors
 	if (AucAdvanced.Modules.Util and AucAdvanced.Modules.Util.PriceLevel) then
 		calcLevel = AucAdvanced.Modules.Util.PriceLevel.CalcLevel
-		doColor = true
 		while (#itemWorth>0) do table.remove(itemWorth) end
+		myColors = {}
 		for k,v in pairs(colorDist) do
+			myColors[k] = {}
 			for c,n in pairs(v) do
-				colorDist[k][c] = 0
+				myColors[k][c] = 0
 			end
 		end
 	end
@@ -210,46 +217,63 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 				if (vFactor == iFactor) then
 					exact = exact + vCount
 					if (vColor) then
-						colorDist.exact[vColor] = colorDist.exact[vColor] + vCount
+						myColors.exact[vColor] = myColors.exact[vColor] + vCount
 					end
 				else
 					suffix = suffix + vCount
 					if (vColor) then
-						colorDist.suffix[vColor] = colorDist.suffix[vColor] + vCount
+						myColors.suffix[vColor] = myColors.suffix[vColor] + vCount
 					end
 				end
 			else
 				base = base + vCount
 				if (vColor) then
-					colorDist.base[vColor] = colorDist.base[vColor] + vCount
+					myColors.base[vColor] = myColors.base[vColor] + vCount
 				end
 			end
 			if (vColor) then
-				colorDist.all[vColor] = colorDist.all[vColor] + vCount
+				myColors.all[vColor] = myColors.all[vColor] + vCount
 			end
 		end
-	end		
+	end
+
+	private.cache[sig] = {exact, suffix, base, myColors}
+	return exact, suffix, base, myColors
+end
+
+function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
+	local getter = AucAdvanced.Settings.GetSetting
+	if not getter("scandata.tooltip.display") then return  end
+
+	local full = false
+	if (getter("scandata.tooltip.modifier") and IsShiftKeyDown()) then
+		full = true
+	end
+
+	local doColor = false
+	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
+	if hasColor then doColor = true end
 
 	if full and (base+suffix+exact > 0) then
 		EnhTooltip.AddLine("Items in image:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		if (exact > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r exact "..colored(doColor, colorDist.exact, "matches"))
+			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r exact "..lib.Colored(doColor, dist.exact, "matches"))
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (suffix > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r suffix "..colored(doColor, colorDist.suffix, "matches"))
+			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r suffix "..lib.Colored(doColor, dist.suffix, "matches"))
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (base > 0) then
-			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r base "..colored(doColor, colorDist.base, "matches"))
+			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r base "..lib.Colored(doColor, dist.base, "matches"))
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	elseif base+suffix+exact > 0 then
 		if (suffix+base > 0) then
-			EnhTooltip.AddLine("|cffddeeff"..exact.." +"..(suffix+base).."|r matches "..colored(doColor, colorDist.all, "in image"))
+			EnhTooltip.AddLine("|cffddeeff"..exact.." +"..(suffix+base).."|r matches "..lib.Colored(doColor, dist.all, "in image"))
 		else
-			EnhTooltip.AddLine("|cffddeeff"..exact.."|r matches "..colored(doColor, colorDist.exact, "in image"))
+			EnhTooltip.AddLine("|cffddeeff"..exact.."|r matches "..lib.Colored(doColor, dist.exact, "in image"))
 		end
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	else
