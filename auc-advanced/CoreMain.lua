@@ -125,6 +125,7 @@ function private.OnLoad(addon)
 	end
 end
 
+private.Schedule = {}
 function private.OnEvent(...)
 	local event, arg = select(2, ...)
 	if (event == "ADDON_LOADED") then
@@ -136,6 +137,24 @@ function private.OnEvent(...)
 		-- Do Nothing for now
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		AucAdvanced.Scan.Cancel()
+	elseif (event == "UNIT_INVENTORY_CHANGED") then
+		private.Schedule["inventory"] = GetTime() + 0.25
+	end
+end
+
+function private.OnUpdate(...)
+	local now = GetTime()
+	for event, time in pairs(private.Schedule) do
+		if time > now then
+			for system, systemMods in pairs(AucAdvanced.Modules) do
+				for engine, engineLib in pairs(systemMods) do
+					if engineLib.Processor then
+						engineLib.Processor(event, time)
+					end
+				end
+			end
+		end
+		private.Schedule[event] = nil
 	end
 end
 
@@ -143,7 +162,9 @@ private.Frame = CreateFrame("Frame")
 private.Frame:RegisterEvent("ADDON_LOADED")
 private.Frame:RegisterEvent("AUCTION_HOUSE_SHOW")
 private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
+private.Frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 private.Frame:SetScript("OnEvent", private.OnEvent)
+private.Frame:SetScript("OnUpdate", private.OnUpdate)
 
 -- Auctioneer's debug functions
 AucAdvanced.Debug = {}
