@@ -466,7 +466,8 @@ function private.Commit(wasIncomplete)
 			newCount, currentCount))
 	end
 
-	local scanTimeSecs = time() - private.scanStartTime
+	local now = time()
+	local scanTimeSecs = now - private.scanStartTime
 	local scanTimeMins = floor(scanTimeSecs / 60)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
@@ -505,10 +506,23 @@ function private.Commit(wasIncomplete)
 	scandata.scanstats[0] = {oldCount = oldCount, sameCount = sameCount, newCount = newCount, updateCount = updateCount,
 		earlyDeleteCount = earlyDeleteCount, expiredDeleteCount = expiredDeleteCount, currentCount = currentCount, missedCount = missedCount}
 	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
-	scandata.time = time()
+	scandata.scanstats[0].startTime = private.scanStartTime
+	scandata.scanstats[0].endTime = now
+	scandata.scanstats[0].query = private.curQuery
+	scandata.time = now
+
 	private.curQuery = nil
 	private.scanStartTime = nil
 	private.curScan = nil
+
+	-- Tell everyone that our stats are updated
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engineLib.Processor then
+				engineLib.Processor("scanstats", scandata.scanstats[0])
+			end
+		end
+	end
 end
 
 function lib.ScanPage(nextPage)
