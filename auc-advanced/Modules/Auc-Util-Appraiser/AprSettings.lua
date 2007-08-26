@@ -56,6 +56,11 @@ function private.GetExtraPriceModels()
 	return vals
 end
 
+private.durations = {
+	{ 120, "2 hours" },
+	{ 480, "8 hours" },
+	{ 1440, "24 hours" },
+}
 
 --[[ The items are stored as:
 ----   id, name, texture, quality
@@ -78,10 +83,11 @@ end
 function private.roundValue(value)
 	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
 	local pos = AucAdvanced.Settings.GetSetting("util.appraiser.round.position") or 0.00
+	local magstep = AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep") or 5
 
 	local magnitude
-	if (value > 20000) then magnitude = 10000
-	elseif (value > 200) then magnitude = 100
+	if (value > 10000*magstep) then magnitude = 10000
+	elseif (value > 100*magstep) then magnitude = 100
 	else magnitude = 1 end
 
 	local modulus = math.floor(value / magnitude) * magnitude
@@ -105,11 +111,22 @@ function private.roundValue(value)
 		fractio = nextdiv
 	end
 	value = modulus + fractio
-	p("Preround", value)
 	return math.floor(value + 0.5)
 end
 
+function lib.RoundBid(value)
+	if AucAdvanced.Settings.GetSetting("util.appraiser.round.bid") then
+		return private.roundValue(value)
+	end
+	return value
+end
 
+function lib.RoundBuy(value)
+	if AucAdvanced.Settings.GetSetting("util.appraiser.round.buy") then
+		return private.roundValue(value)
+	end
+	return value
+end
 
 local scrollItems = {}
 function lib.UpdateList()
@@ -222,6 +239,19 @@ function private:SetVisibility()
 	end
 end
 
+-- Configure our defaults
+AucAdvanced.Settings.SetDefault("util.appraiser.enable", false)
+AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
+AucAdvanced.Settings.SetDefault("util.appraiser.duration", 1440)
+AucAdvanced.Settings.SetDefault("util.appraiser.round.bid", false)
+AucAdvanced.Settings.SetDefault("util.appraiser.round.buy", false)
+AucAdvanced.Settings.SetDefault("util.appraiser.round.method", "unit")
+AucAdvanced.Settings.SetDefault("util.appraiser.round.position", 0.00)
+AucAdvanced.Settings.SetDefault("util.appraiser.round.magstep", 5)
+AucAdvanced.Settings.SetDefault("util.appraiser.bid.markdown", 10)
+AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
+AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", false)
+
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui.AddTab(lib.name)
@@ -229,19 +259,37 @@ function private.SetupConfigGui(gui)
 	
 	gui.AddControl(id, "Header",     0,    lib.name.." options")
 	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
+	gui.AddControl(id, "Subhead",    0,    "Default pricing model")
 	gui.AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
+	gui.AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", "Default listing duration")
+
+	gui.AddControl(id, "Note",       0, 2, 500, 40,
+"This is the pricing model that will be used by default for all items. You may change the individual pricing models on a per item basis when creating the auctions"
+	)
 
 	gui.AddControl(id, "Subhead",    0,    "Starting bid calculation")
 	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
-	gui.AddControl(id, "MoneyFrame", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost (requires Informant)")
+	gui.AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
+	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
+	gui.AddControl(id, "Note",       0, 2, 500, 60,
+"Except for fixed price items, the starting bid price is calculated based off the original buyout price.\n"..
+"The above options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as Buyout-Markdown-Deposit"
+	)
 
 	gui.AddControl(id, "Subhead",    0,    "Value rounding")
 	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.bid", "Round starting bid")
 	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.buy", "Round buyout value")
-	gui.AddControl(id, "Selectbox",  0, 1, {{"unit","Next unit place"},{"div","Next division"}}, "util.appraiser.round.method", "Rounding method to use")
+	gui.AddControl(id, "Selectbox",  0, 1, {{"unit","Stop value"},{"div","Divisions"}}, "util.appraiser.round.method", "Rounding method to use")
 	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, "Rounding at: %0.02f")
+	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 0, 100, 1, "Step magnitude at: %d")
+	gui.AddControl(id, "Note",       0, 2, 500, 150,
+"If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
+"The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..
+"You set the rounding position by setting the slider to the value you want the number to be rounded to.\n"..
+"Finally, set the magnitude step position to the place where you want the rounding to step-up to the next place (eg if this is set to 5, then 4g 72s 15c will round at the copper position, but 5g 72s 15c will round at the silver position)"
+	)
 
+	--[[
 	gui.AddControl(id, "Subhead",    0,    "Item pricing models")
 
 	local last = gui.GetLast(id)
@@ -336,10 +384,11 @@ function private.SetupConfigGui(gui)
 
 	gui.SetLast(id, continue)
 
+	lib.UpdateList()
+]]
+
 	private.gui = gui
 	private.guiId = id
-
-	lib.UpdateList()
 end
 
 
