@@ -367,7 +367,9 @@ end
 --   nil = Cached result from past actual AH data
 --   false = Best guess deposit rate from GetSellValue() provider and/or guessed AH rate based off location
 local depositCache = {}
-function lib.GetDepositAmount(sig)
+function lib.GetDepositAmount(sig, count)
+	if not count then count = 1 end
+
 	local deposit, rate, sellBasis
 
 	if depositCache[sig] then
@@ -378,7 +380,7 @@ function lib.GetDepositAmount(sig)
 		if sellBasis then
 			AucAdvanced.GetFaction()
 			rate = AucAdvanced.depositRate
-			deposit = math.floor(sellBasis * rate)
+			deposit = math.floor(sellBasis * rate * count)
 
 			return deposit, rate, nil
 		else
@@ -389,7 +391,7 @@ function lib.GetDepositAmount(sig)
 	rate = GetAuctionHouseDepositRate() / 100
 	AucAdvanced.depositRate = rate
 	if sellBasis then
-		deposit = math.floor(sellBasis * rate)
+		deposit = math.floor(sellBasis * rate * count)
 		return deposit, rate, nil
 	end
 
@@ -398,7 +400,7 @@ function lib.GetDepositAmount(sig)
 		local itemId = strsplit(":", sig)
 		local sell = GetSellValue(itemId)
 		if (sell) then
-			deposit = math.floor(sell * rate)
+			deposit = math.floor(sell * rate * count)
 		end
 	end
 
@@ -418,6 +420,8 @@ function lib.GetDepositAmount(sig)
 	local matches = private.FindMatchesInBags(sig)
 	if #matches <= 0 then return deposit, rate, false end
 
+	-- For the best resolution, find the largest stack
+	table.sort(matches, function (a,b) return a[3] > b[3] end)
 	local match = matches[1]
 	local bag, slot, count = unpack(match)
 
@@ -434,6 +438,7 @@ function lib.GetDepositAmount(sig)
 	sellBasis = deposit / rate
 	depositCache[sig] = sellBasis
 
+	deposit = math.floor(sellBasis * rate * count)
 	-- Return the deposit cost and the auction rate
 	return deposit, rate, true
 end

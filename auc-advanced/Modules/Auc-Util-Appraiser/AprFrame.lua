@@ -278,8 +278,8 @@ function private.CreateFrames()
 		local sig = frame.salebox.sig
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
-		local singleDeposit = lib.GetDepositAmount(sig)
-		singleDeposit = singleDeposit * (curDurationMins / 120)
+
+		local depositMult = curDurationMins / 120
 
 		if (frame.salebox.stacksize > 1) then
 			local count = frame.salebox.count
@@ -304,7 +304,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-					depositVal = singleDeposit * curSize
+					depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
 					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
@@ -324,7 +324,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-					depositVal = singleDeposit * curSize
+					depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
 					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
@@ -335,7 +335,7 @@ function private.CreateFrames()
 				if (remain > 0) then
 					bidVal = lib.RoundBid(curBid * remain)
 					buyVal = lib.RoundBuy(curBuy * remain)
-					depositVal = singleDeposit * remain
+					depositVal = lib.GetDepositAmount(sig, remain) * depositMult
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
 					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal)
@@ -359,7 +359,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 				bidVal = lib.RoundBid(curBid * curSize)
 				buyVal = lib.RoundBuy(curBuy * curSize)
-				depositVal = singleDeposit * curSize
+				depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
 				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 				frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
@@ -393,7 +393,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("%d items"):format(curNumber))
 				bidVal = lib.RoundBid(curBid)
 				buyVal = lib.RoundBuy(curBuy)
-				depositVal = singleDeposit
+				depositVal = lib.GetDepositAmount(sig) * depositMult
 				frame.manifest.lines:Add(("  Bid per item"), bidVal)
 				frame.manifest.lines:Add(("  Buyout per item"), buyVal)
 				frame.manifest.lines:Add(("  Deposit per item"), depositVal)
