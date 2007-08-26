@@ -137,8 +137,12 @@ function private.OnEvent(...)
 		-- Do Nothing for now
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		AucAdvanced.Scan.Cancel()
-	elseif (event == "UNIT_INVENTORY_CHANGED") then
-		private.Schedule["inventory"] = GetTime() + 0.25
+	elseif event == "UNIT_INVENTORY_CHANGED"
+	or event == "ITEM_LOCK_CHANGED"
+	or event == "CURSOR_UPDATE"
+	or event == "BAG_UPDATE"
+	then
+		private.Schedule["inventory"] = GetTime() + 0.15
 	end
 end
 
@@ -163,6 +167,9 @@ private.Frame:RegisterEvent("ADDON_LOADED")
 private.Frame:RegisterEvent("AUCTION_HOUSE_SHOW")
 private.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 private.Frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
+private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
+private.Frame:RegisterEvent("CURSOR_UPDATE")
+private.Frame:RegisterEvent("BAG_UPDATE")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
 
