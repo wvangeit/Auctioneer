@@ -580,7 +580,7 @@ function private.CreateFrames()
 			bidVal = lib.RoundBid(itemBid)
 			buyVal = lib.RoundBuy(itemBuy)
 			if (bidVal > buyVal) then buyVal = bidVal end
-			print(" - Queueing %d items", number)
+			print((" - Queueing {{%d}} items"):format(number))
 			if dryRun then
 				print(" -- Post: ", sig, 1, bidVal, buyVal, duration, number)
 			else
@@ -593,7 +593,7 @@ function private.CreateFrames()
 		end
 
 		print("-----------------------------------")
-		print(("Queued up %d items"):format(totalNum))
+		print(("Queued up {{%d}} items"):format(totalNum))
 		print(("Total minbid value: %s"):format(EnhTooltip.GetTextGSC(totalBid, true)))
 		print(("Total buyout value: %s"):format(EnhTooltip.GetTextGSC(totalBuy, true)))
 		print("-----------------------------------")
