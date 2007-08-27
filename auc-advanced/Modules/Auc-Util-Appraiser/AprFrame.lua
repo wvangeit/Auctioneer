@@ -198,7 +198,8 @@ function private.CreateFrames()
 			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
 			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
 			if (deposit) then
-				local deposit,rate = lib.GetDepositAmount(frame.salebox.sig)
+				local rate
+				deposit, rate = lib.GetDepositAmount(frame.salebox.sig)
 				if not rate then rate = AucAdvanced.depositRate or 0.05 end
 			else deposit = 0 end
 
