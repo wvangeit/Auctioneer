@@ -137,6 +137,10 @@ function private.CreateFrames()
 			frame.scroller:SetValue(math.max(0, math.min(n-NUM_ITEMS+1, pos-(NUM_ITEMS/2))))
 		end
 		frame:SetScroll()
+
+		if frame.itembox.sig then
+			frame.UpdateControls()
+		end
 	end
 
 	function frame.SelectItem(obj, ...)
@@ -424,6 +428,63 @@ function private.CreateFrames()
 			frame.go:Disable()
 		end
 
+		-- Give this function a chance to save the current settings
+		-- (if we're not already running within it)
+		if not frame.salebox.config then
+			frame.ChangeControls()
+		end
+	end
+
+	function frame.ChangeControls(obj, ...)
+		if frame.salebox.config then return end
+		frame.salebox.config = true
+
+		frame.UpdateControls()
+		local curStack = frame.salebox.stack:GetValue()
+		local curNumber = frame.salebox.number:GetValue()
+		local curDurationIdx = frame.salebox.duration:GetValue()
+		local curDuration = private.durations[curDurationIdx][1]
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", curStack)
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", curNumber)
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".duration", curDuration)
+
+		local curModel
+		if (obj and obj.element == "model") then
+			curModel = select(2, ...)
+			frame.SetPriceFromModel(curModel)
+		else
+			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model")
+		end
+
+		local curBid = MoneyInputFrame_GetCopper(frame.salebox.bid)
+		local curBuy = MoneyInputFrame_GetCopper(frame.salebox.buy)
+		if frame.salebox.bid.modelvalue ~= curBid
+		or frame.salebox.buy.modelvalue ~= curBuy
+		then
+			p("Setting fixed cause", frame.salebox.bid.modelvalue, curBid, frame.salebox.buy.modelvalue, curBuy)
+			curModel = "fixed"
+			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
+			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid", curBid)
+			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy", curBuy)
+			frame.salebox.model.value = curModel
+			frame.salebox.model:UpdateValue()
+		end
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".bid", curBid)
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".buy", curBuy)
+
+		local good = true
+		if curModel == "fixed" and curBid <= 0 then
+			frame.salebox.warn:SetText("Bid price must be > 0")
+			good = false
+		elseif (curBuy > 0 and curBid > curBuy) then
+			frame.salebox.warn:SetText("Buy price must be > bid")
+			good = false
+		end
+		if (good and curModel == "fixed") then
+			frame.salebox.warn:SetText("")
+		end
+
+		frame.salebox.config = false
 	end
 
 	function frame.PostAuctions(obj)
@@ -536,58 +597,6 @@ function private.CreateFrames()
 		print(("Total minbid value: %s"):format(EnhTooltip.GetTextGSC(totalBid, true)))
 		print(("Total buyout value: %s"):format(EnhTooltip.GetTextGSC(totalBuy, true)))
 		print("-----------------------------------")
-	end
-
-	function frame.ChangeControls(obj, ...)
-		if frame.salebox.config then return end
-		frame.salebox.config = true
-
-		frame.UpdateControls()
-		local curStack = frame.salebox.stack:GetValue()
-		local curNumber = frame.salebox.number:GetValue()
-		local curDurationIdx = frame.salebox.duration:GetValue()
-		local curDuration = private.durations[curDurationIdx][1]
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", curStack)
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", curNumber)
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".duration", curDuration)
-
-		local curModel
-		if (obj and obj.element == "model") then
-			curModel = select(2, ...)
-			frame.SetPriceFromModel(curModel)
-		else
-			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model")
-		end
-
-		local curBid = MoneyInputFrame_GetCopper(frame.salebox.bid)
-		local curBuy = MoneyInputFrame_GetCopper(frame.salebox.buy)
-		if frame.salebox.bid.modelvalue ~= curBid
-		or frame.salebox.buy.modelvalue ~= curBuy
-		then
-			p("Setting fixed cause", frame.salebox.bid.modelvalue, curBid, frame.salebox.buy.modelvalue, curBuy)
-			curModel = "fixed"
-			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
-			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid", curBid)
-			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy", curBuy)
-			frame.salebox.model.value = curModel
-			frame.salebox.model:UpdateValue()
-		end
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".bid", curBid)
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".buy", curBuy)
-
-		local good = true
-		if curModel == "fixed" and curBid <= 0 then
-			frame.salebox.warn:SetText("Bid price must be > 0")
-			good = false
-		elseif (curBuy > 0 and curBid > curBuy) then
-			frame.salebox.warn:SetText("Buy price must be > bid")
-			good = false
-		end
-		if (good and curModel == "fixed") then
-			frame.salebox.warn:SetText("")
-		end
-
-		frame.salebox.config = false
 	end
 
 	function frame.SetScroll(...)
