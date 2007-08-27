@@ -963,6 +963,9 @@ function private.CreateFrames()
 		obj[obj.pos]:Set(text, coins)
 	end
 
+
+	local myStrata = frame.manifest:GetFrameStrata()
+
 	local lines = { pos = 0, max = 20, Clear = linesClear, Add = linesAdd }
 	for i=1, lines.max do
 		local text = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -977,6 +980,7 @@ function private.CreateFrames()
 
 		local coins = CreateFrame("Frame", "AppraisalManifestCoins"..i, frame.manifest, "EnhancedTooltipMoneyTemplate")
 		coins:SetPoint("RIGHT", text, "RIGHT", 0,0)
+		coins:SetFrameStrata(myStrata)
 		coins.info.showSmallerCoins = "backpack"
 
 		local line = { text, coins, id = i, Hide = lineHide, Set = lineSet, Reset = lineReset }
