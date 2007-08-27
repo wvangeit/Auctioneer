@@ -565,7 +565,7 @@ function private.CreateFrames()
 				bidVal = lib.RoundBid(itemBid * stack)
 				buyVal = lib.RoundBuy(itemBuy * stack)
 				if (bidVal > buyVal) then buyVal = bidVal end
-				print(" - Queueing {{%d}} lots of {{%d}}", number, stack)
+				print((" - Queueing {{%d}} lots of {{%d}}"):format(number, stack))
 				if dryRun then
 					print(" -- Post: ", sig, stack, bidVal, buyVal, duration, number)
 				else
