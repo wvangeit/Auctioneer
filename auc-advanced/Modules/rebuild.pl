@@ -7,7 +7,7 @@ print OUTPUT qq(<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://ww
 
 $active = $inactive = $count = 0;
 my @embeddedModules;
-for $fn (<auc-*>) {
+for $fn (<[aA]uc-*>) {
 	if (-d $fn) {
 		if (-f "$fn/Embed.xml") {
 			@embeddedModules[$active] = $fn;
