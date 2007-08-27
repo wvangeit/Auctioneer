@@ -766,7 +766,7 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	frame.salebox:SetBackdropColor(0, 0, 0.6, 0.8)
+	frame.salebox:SetBackdropColor(0, 0, 0, 0.8)
 	frame.salebox:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3,35)
 	frame.salebox:SetPoint("RIGHT", frame, "RIGHT", -5,0)
 	frame.salebox:SetHeight(170)
@@ -912,7 +912,7 @@ function private.CreateFrames()
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	frame.manifest:SetBackdropColor(0, 0.6, 0, 0.8)
+	frame.manifest:SetBackdropColor(0, 0, 0, 0.8)
 	frame.manifest:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT", 0,3)
 	frame.manifest:SetPoint("BOTTOM", frame.itembox, "BOTTOM", -3,3)
 	frame.manifest:SetWidth(250)
