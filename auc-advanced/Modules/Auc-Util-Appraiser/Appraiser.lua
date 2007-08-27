@@ -84,11 +84,10 @@ function lib.Processor(callbackType, ...)
 		private.CreateFrames(...)
 	elseif (callbackType == "config") then
 		private.SetupConfigGui(...)
---	elseif (callbackType == "configchanged") then
---		if not private.gui then return end
---		if private.currentfilter ~= AucAdvanced.Settings.GetSetting('util.appraiser.filter') then
---			lib.UpdateList()
---		end
+	elseif (callbackType == "configchanged") then
+		if private.frame then
+			private.frame.UpdateControls()
+		end
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
 			private.frame.GenerateList()
