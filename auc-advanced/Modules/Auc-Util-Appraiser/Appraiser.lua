@@ -171,6 +171,7 @@ function private.FindMatchesInBags(...)
 	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = private.DecodeSig(...)
 	local blankBag, blankSlot
 	local specialBlank = false
+	local foundLink
 	local total = 0
 
 	for bag=0,4 do
@@ -209,6 +210,7 @@ function private.FindMatchesInBags(...)
 						if not itemCount or itemCount < 0 then itemCount = 1 end
 						table.insert(matches, {bag, slot, itemCount})
 						total = total + itemCount
+						foundLink = link
 					end
 				end
 			else -- Blank slot
@@ -225,7 +227,7 @@ function private.FindMatchesInBags(...)
 			end
 		end
 	end
-	return matches, total, blankBag, blankSlot
+	return matches, total, blankBag, blankSlot, foundLink
 end
 
 -- /run p(AucAdvanced.Modules.Util.Appraiser.FindOrMakeStack(28399, 5))
@@ -301,15 +303,18 @@ end)
 -- Posting manager
 -- /run p(AucAdvanced.Modules.Util.Appraiser.PostAuction(28399, 5, 10000, 12000, 1440))
 private.postRequests = {}
-function lib.PostAuction(sig, size, bid, buyout, duration)
+function lib.PostAuction(sig, size, bid, buyout, duration, multiple)
 	if not AuctionFrame
 	or not AuctionFrame:IsVisible()
 	then
 		return error(ERROR_AHCLOSED)
 	end
 
-	table.insert(private.postRequests, { sig, size, bid, buyout, duration, 0 })
-	private.ProcessPosts()
+	if not multiple then multiple = 1 end
+	for i = 1, multiple do
+		table.insert(private.postRequests, { sig, size, bid, buyout, duration, 0 })
+	end
+	updateFrame.timer = -1
 end
 
 function private.ProcessPosts()

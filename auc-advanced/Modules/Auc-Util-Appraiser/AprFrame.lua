@@ -265,6 +265,7 @@ function private.CreateFrames()
 		frame.salebox.bid:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
+		frame.go:Show()
 		frame.manifest.lines:Clear()
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
@@ -407,6 +408,134 @@ function private.CreateFrames()
 			frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 		end
 
+		local canAuction = true
+		local warnText = frame.salebox.warn:GetText()
+		if warnText and warnText ~= "" then
+			canAuction = false
+		end
+
+		if totalBid == 0 then
+			canAuction = false
+		end
+
+		if canAuction then
+			frame.go:Enable()
+		else
+			frame.go:Disable()
+		end
+
+	end
+
+	function frame.PostAuctions(obj)
+		local postType = obj.postType
+		if postType == "single" then
+			frame.PostBySig(frame.salebox.sig)
+		end
+	end
+
+	function frame.PostBySig(sig, dryRun)
+		local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".stack")
+		local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".number")
+		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
+		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
+		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
+		local _, total, _,_, link = private.FindMatchesInBags(sig)
+	
+		-- Just a quick bit of sanity checking first
+		assert(stack >= 1)
+		assert(number >= -2) 
+		assert(number ~= 0)
+		assert(itemBid > 0) 
+		assert(itemBuy == 0 or itemBuy >= itemBid)
+		assert(duration == 120 or duration == 480 or duration == 1440)
+		assert(total > 0)
+		if (number > 0) then
+			assert(number * stack <= total)
+		end
+		if (number == -2) then
+			assert(stack <= total)
+		end
+	
+		print(("Posting batch of: %s"):format(link))
+	
+		print((" - Duration: {{%d hours}}"):format(duration/60))
+
+		local bidVal, buyVal
+		local totalBid, totalBuy, totalNum = 0,0,0
+
+		if (stack > 1) then
+			local fullStacks = math.floor(total / stack)
+			local fullPop = fullStacks * stack
+			local remain = total - fullPop
+
+			if (number < 0) then
+				if (fullStacks > 0) then
+					bidVal = lib.RoundBid(itemBid * stack)
+					buyVal = lib.RoundBuy(itemBuy * stack)
+					if (bidVal > buyVal) then buyVal = bidVal end
+					print((" - Queueing {{%d}} lots of {{%d}}"):format(fullStacks, stack))
+					if dryRun then
+						print(" -- Post: ", sig, stack, bidVal, buyVal, duration, fullStacks)
+					else
+						lib.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
+					end
+					
+					totalBid = totalBid + (bidVal * fullStacks)
+					totalBuy = totalBuy + (buyVal * fullStacks)
+					totalNum = totalNum + (stack * fullStacks)
+				end
+				if (number == -1 and remain > 0) then
+					bidVal = lib.RoundBid(itemBid * remain)
+					buyVal = lib.RoundBuy(itemBuy * remain)
+					if (bidVal > buyVal) then buyVal = bidVal end
+					print((" - Queueing {{%d}} lots of {{%d}}"):format(1, remain))
+					if dryRun then
+						print(" -- Post: ", sig, remain, bidVal, buyVal, duration)
+					else
+						lib.PostAuction(sig, remain, bidVal, buyVal, duration)
+					end
+					
+					totalBid = totalBid + bidVal
+					totalBuy = totalBuy + buyVal
+					totalNum = totalNum + remain
+				end
+			else
+				bidVal = lib.RoundBid(itemBid * stack)
+				buyVal = lib.RoundBuy(itemBuy * stack)
+				if (bidVal > buyVal) then buyVal = bidVal end
+				print(" - Queueing {{%d}} lots of {{%d}}", number, stack)
+				if dryRun then
+					print(" -- Post: ", sig, stack, bidVal, buyVal, duration, number)
+				else
+					lib.PostAuction(sig, stack, bidVal, buyVal, duration, number)
+				end
+					
+				totalBid = totalBid + (bidVal * number)
+				totalBuy = totalBuy + (buyVal * number)
+				totalNum = totalNum + (stack * number)
+			end
+		else
+			if number < 0 then number = total end
+			bidVal = lib.RoundBid(itemBid)
+			buyVal = lib.RoundBuy(itemBuy)
+			if (bidVal > buyVal) then buyVal = bidVal end
+			print(" - Queueing %d items", number)
+			if dryRun then
+				print(" -- Post: ", sig, 1, bidVal, buyVal, duration, number)
+			else
+				lib.PostAuction(sig, 1, bidVal, buyVal, duration, number)
+			end
+				
+			totalBid = totalBid + (bidVal * number)
+			totalBuy = totalBuy + (buyVal * number)
+			totalNum = totalNum + number
+		end
+
+		print("-----------------------------------")
+		print(("Queued up %d items"):format(totalNum))
+		print(("Total minbid value: %s"):format(EnhTooltip.GetTextGSC(totalBid, true)))
+		print(("Total buyout value: %s"):format(EnhTooltip.GetTextGSC(totalBuy, true)))
+		print("-----------------------------------")
 	end
 
 	function frame.ChangeControls(obj, ...)
@@ -443,6 +572,8 @@ function private.CreateFrames()
 			frame.salebox.model.value = curModel
 			frame.salebox.model:UpdateValue()
 		end
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".bid", curBid)
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".buy", curBuy)
 
 		local good = true
 		if curModel == "fixed" and curBid <= 0 then
@@ -626,7 +757,7 @@ function private.CreateFrames()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
 	frame.salebox:SetBackdropColor(0, 0, 0.6, 0.8)
-	frame.salebox:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", 0,35)
+	frame.salebox:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3,35)
 	frame.salebox:SetPoint("RIGHT", frame, "RIGHT", -5,0)
 	frame.salebox:SetHeight(170)
 
@@ -641,7 +772,6 @@ function private.CreateFrames()
 	frame.salebox.icon:SetPoint("TOPLEFT", frame.salebox.slot, "TOPLEFT", 3, -3)
 	frame.salebox.icon:SetWidth(32)
 	frame.salebox.icon:SetHeight(32)
-	frame.salebox.icon:SetTexture("Interface\\Icons\\Spell_unused2")
 
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
@@ -731,7 +861,7 @@ function private.CreateFrames()
 	frame.salebox.model.label:SetText("Pricing model to use:")
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
-	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-10)
+	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
 	frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, frame.ChangeControls)
 	frame.salebox.bid.element = "bid"
@@ -757,6 +887,14 @@ function private.CreateFrames()
 	frame.salebox.buy.label:SetText("Buy price/item:")
 	frame.salebox.buy.label:SetJustifyH("RIGHT")
 
+	frame.go = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
+	frame.go:SetText("Post items")
+	frame.go:SetWidth(80)
+	frame.go:SetScript("OnClick", frame.PostAuctions)
+	frame.go.postType = "single"
+	frame.go:Disable()
+
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -765,8 +903,8 @@ function private.CreateFrames()
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
 	frame.manifest:SetBackdropColor(0, 0.6, 0, 0.8)
-	frame.manifest:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT", 0,0)
-	frame.manifest:SetPoint("BOTTOM", frame.itembox, "BOTTOM", 0,0)
+	frame.manifest:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT", 0,3)
+	frame.manifest:SetPoint("BOTTOM", frame.itembox, "BOTTOM", -3,3)
 	frame.manifest:SetWidth(250)
 
 	local function lineHide(obj)
@@ -819,7 +957,7 @@ function private.CreateFrames()
 	for i=1, lines.max do
 		local text = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 		if i == 1 then
-			text:SetPoint("TOPLEFT", frame.manifest, "TOPLEFT", 5,-5)
+			text:SetPoint("TOPLEFT", frame.manifest, "TOPLEFT", 8,-5)
 		else
 			text:SetPoint("TOPLEFT", lines[i-1][1], "BOTTOMLEFT", 0,0)
 		end
