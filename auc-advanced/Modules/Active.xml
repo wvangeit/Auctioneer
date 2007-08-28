@@ -3,6 +3,7 @@
 	<Include file="Auc-Util-CompactUI\Embed.xml"/>
 	<Include file="Auc-Util-Example\Embed.xml"/>
 	<Include file="Auc-Util-PriceLevel\Embed.xml"/>
+	<Include file="Auc-Util-Vendmarkup\Embed.xml"/>
 
 	<Script>
 		AucAdvanced.EmbeddedModules = {
@@ -10,6 +11,7 @@
 			"Auc-Util-CompactUI",
 			"Auc-Util-Example",
 			"Auc-Util-PriceLevel",
+			"Auc-Util-Vendmarkup",
 		}
 	</Script>
 </Ui>
