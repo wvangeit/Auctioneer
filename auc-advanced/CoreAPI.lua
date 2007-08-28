@@ -197,6 +197,10 @@ function lib.QueryImage(query, faction, realm, ...)
 			local data = scandata.image[ptr] ptr = ptr + 1
 			if (not data) then break end
 			if query.filter and query.filter(data, ...) then break end
+			if query.link and data[Const.LINK] ~= query.link then break end
+			if query.itemId and data[Const.ITEMID] ~= query.itemId then break end
+			if query.suffix and data[Const.SUFFIX] ~= query.suffix then break end
+			if query.factor and data[Const.FACTOR] ~= query.factor then break end
 			if query.minUseLevel and data[Const.ULEVEL] < query.minUseLevel then break end
 			if query.maxUseLevel and data[Const.ULEVEL] > query.maxUseLevel then break end
 			if query.minItemLevel and data[Const.ILEVEL] < query.minItemLevel then break end

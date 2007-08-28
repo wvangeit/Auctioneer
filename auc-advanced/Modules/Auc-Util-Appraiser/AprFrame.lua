@@ -32,6 +32,7 @@
 local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local print = AucAdvanced.Print
+local Const = AucAdvanced.Const
 
 local frame
 
@@ -161,6 +162,37 @@ function private.CreateFrames()
 		frame.salebox.sig = sig
 		frame.salebox.stacksize = item[5]
 		frame.salebox.count = item[6]
+
+		local itemId, suffix, factor = strsplit(":", sig)
+		itemId = tonumber(itemId)
+		suffix = tonumber(suffix) or 0
+		factor = tonumber(factor) or 0
+		
+		local results = AucAdvanced.API.QueryImage({
+			itemId = itemId,
+			suffix = suffix,
+			factor = factor,
+		})
+		local data = {}
+		for i = 1, #results do
+			local result = results[i]
+			local tLeft = result[Const.TLEFT]
+			if (tLeft == 1) then tLeft = "<30m"
+			elseif (tLeft == 2) then tLeft = "<2h"
+			elseif (tLeft == 3) then tLeft = "<8h"
+			elseif (tLeft == 4) then tLeft = "<1d"
+			end
+			data[i] = {
+				result[Const.NAME],
+				result[Const.SELLER],
+				tLeft,
+				result[Const.COUNT],
+				result[Const.MINBID],
+				result[Const.CURBID],
+				result[Const.BUYOUT],
+			}
+		end
+		frame.imageview.sheet:SetData(data)
 
 		frame.InitControls()
 	end
@@ -970,6 +1002,27 @@ function private.CreateFrames()
 		lines[i] = line
 	end
 	frame.manifest.lines = lines
+
+	frame.imageview = CreateFrame("Frame", nil, frame)
+	frame.imageview:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
+	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
+	frame.imageview:SetPoint("BOTTOMRIGHT", frame.manifest, "BOTTOMLEFT")
+	
+	frame.imageview.sheet = ScrollSheet.Create(frame.imageview, {
+		{ "Item", "TEXT", 120 },
+		{ "Seller", "TEXT", 80 },
+		{ "Remain", "TEXT", 60 },
+		{ "Stack", "INT", 50 },
+		{ "MinBid", "COIN", 80 },
+		{ "CurBid", "COIN", 80 },
+		{ "Buyout", "COIN", 80 },
+	})
 	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("Appraiser")
