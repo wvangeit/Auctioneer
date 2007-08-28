@@ -286,6 +286,7 @@ function private.CreateFrames()
 		local bidVal, buyVal, depositVal
 
 		local depositMult = curDurationMins / 120
+		local curNumber = frame.salebox.number:GetValue()
 
 		if (frame.salebox.stacksize > 1) then
 			local count = frame.salebox.count
@@ -303,9 +304,13 @@ function private.CreateFrames()
 			local fullPop = maxStax*curSize
 			local remain = count - fullPop
 			frame.salebox.number:SetMinMaxValues(-2, maxStax)
-			local curNumber = frame.salebox.number:GetValue()
-			if (curNumber == -2) then
-				frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
+			if (curNumber >= -2 and curNumber < 0) then
+				if (curNumber == -2) then
+					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
+				else
+					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
+				end
+
 				if (maxStax > 0) then
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
@@ -315,30 +320,11 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
 
-					frame.manifest.lines:Add(("Totals:"))
 					totalBid = totalBid + (bidVal * maxStax)
 					totalBuy = totalBuy + (buyVal * maxStax)
 					totalDeposit = totalDeposit + (depositVal * maxStax)
 				end
-				frame.manifest.lines:Add(("  Total Bid"), totalBid)
-				frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-				frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
-
-			elseif (curNumber == -1) then
-				frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
-				if (maxStax > 0) then
-					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
-					bidVal = lib.RoundBid(curBid * curSize)
-					buyVal = lib.RoundBuy(curBuy * curSize)
-					depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
-					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
-					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
-					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
-					totalBid = totalBid + (bidVal * maxStax)
-					totalBuy = totalBuy + (buyVal * maxStax)
-					totalDeposit = totalDeposit + (depositVal * maxStax)
-				end
-				if (remain > 0) then
+				if (curNumber == -1 and remain > 0) then
 					bidVal = lib.RoundBid(curBid * remain)
 					buyVal = lib.RoundBuy(curBuy * remain)
 					depositVal = lib.GetDepositAmount(sig, remain) * depositMult
@@ -346,20 +332,13 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(remain), depositVal)
-					totalBid = totalBid + (bidVal * remain)
-					totalBuy = totalBuy + (buyVal * remain)
-					totalDeposit = totalDeposit + (depositVal * remain)
+
+					totalBid = totalBid + bidVal
+					totalBuy = totalBuy + buyVal
+					totalDeposit = totalDeposit + depositVal
 				end
-				frame.manifest.lines:Add(("Totals:"))
-				frame.manifest.lines:Add(("  Total Bid"), totalBid)
-				frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-				frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 			elseif (curNumber == 0) then
 				frame.salebox.number.label:SetText(("Number: %s"):format("|cffffee30"..("%d stacks = %d"):format(0,0)))
-				frame.manifest.lines:Add(("Totals:"))
-				frame.manifest.lines:Add(("  Total Bid"), totalBid)
-				frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-				frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
@@ -369,13 +348,10 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 				frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
+
 				totalBid = totalBid + (bidVal * curNumber)
 				totalBuy = totalBuy + (buyVal * curNumber)
 				totalDeposit = totalDeposit + (depositVal * curNumber)
-				frame.manifest.lines:Add(("Totals:"))
-				frame.manifest.lines:Add(("  Total Bid"), totalBid)
-				frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-				frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 			end
 
 		else
@@ -385,7 +361,6 @@ function private.CreateFrames()
 			frame.salebox.stack:SetAlpha(0.6)
 		
 			frame.salebox.number:SetMinMaxValues(-1, frame.salebox.count)
-			local curNumber = frame.salebox.number:GetValue()
 			if (curNumber == -1) then
 				curNumber = frame.salebox.count
 				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
@@ -407,10 +382,18 @@ function private.CreateFrames()
 				totalBuy = totalBuy + (buyVal * curNumber)
 				totalDeposit = totalDeposit + (depositVal * curNumber)
 			end
-			frame.manifest.lines:Add(("Totals:"))
-			frame.manifest.lines:Add(("  Total Bid"), totalBid)
-			frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-			frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
+		end
+		frame.manifest.lines:Add(("Totals:"))
+		frame.manifest.lines:Add(("  Total Bid"), totalBid)
+		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
+		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
+
+		if (totalBid < 1) then
+			frame.manifest.lines:Add(("------------------------------"))
+			frame.manifest.lines:Add(("Note: No auctionable items"))
+			if (curNumber == 0) then
+				frame.manifest.lines:Add(("Check |cffffffffNumber|r is more than 0"))
+			end
 		end
 
 		local canAuction = true
@@ -419,7 +402,7 @@ function private.CreateFrames()
 			canAuction = false
 		end
 
-		if totalBid == 0 then
+		if totalBid < 1 then
 			canAuction = false
 		end
 
