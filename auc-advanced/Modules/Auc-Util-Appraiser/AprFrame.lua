@@ -177,19 +177,23 @@ function private.CreateFrames()
 		for i = 1, #results do
 			local result = results[i]
 			local tLeft = result[Const.TLEFT]
-			if (tLeft == 1) then tLeft = "<30m"
-			elseif (tLeft == 2) then tLeft = "<2h"
-			elseif (tLeft == 3) then tLeft = "<8h"
-			elseif (tLeft == 4) then tLeft = "<1d"
+			if (tLeft == 1) then tLeft = "30m"
+			elseif (tLeft == 2) then tLeft = "2h"
+			elseif (tLeft == 3) then tLeft = "8h"
+			elseif (tLeft == 4) then tLeft = "24h"
 			end
+			local count = result[Const.COUNT]
 			data[i] = {
 				result[Const.NAME],
 				result[Const.SELLER],
 				tLeft,
-				result[Const.COUNT],
+				count,
 				result[Const.MINBID],
 				result[Const.CURBID],
 				result[Const.BUYOUT],
+				math.floor(0.5+result[Const.MINBID]/count),
+				math.floor(0.5+result[Const.CURBID]/count),
+				math.floor(0.5+result[Const.BUYOUT]/count),
 			}
 		end
 		frame.imageview.sheet:SetData(data)
@@ -198,7 +202,11 @@ function private.CreateFrames()
 	end
 
 	function frame.SetPriceFromModel(curModel)
-		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
+		if not curModel then
+			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
+		else
+			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
+		end
 		
 		frame.salebox.warn:SetText("")
 		if curModel == "default" then
@@ -268,6 +276,7 @@ function private.CreateFrames()
 	end
 
 	function frame.InitControls()
+		if frame.salebox.config then return end
 		frame.salebox.config = true
 		frame.UpdateControls()
 
@@ -290,7 +299,7 @@ function private.CreateFrames()
 		frame.salebox.model.value = curModel
 		frame.salebox.model:UpdateValue()
 		frame.SetPriceFromModel(curModel)
-		
+
 		frame.UpdateControls()
 		frame.salebox.config = nil
 	end
@@ -309,7 +318,7 @@ function private.CreateFrames()
 		local curDurationMins = private.durations[curDurationIdx][1]
 		local curDurationText = private.durations[curDurationIdx][2]
 		frame.salebox.duration.label:SetText(("Duration: %s"):format(curDurationText))
-
+		
 		local curBid = frame.salebox.bid.modelvalue or 0
 		local curBuy = frame.salebox.buy.modelvalue or 0
 
@@ -407,9 +416,9 @@ function private.CreateFrames()
 				bidVal = lib.RoundBid(curBid)
 				buyVal = lib.RoundBuy(curBuy)
 				depositVal = lib.GetDepositAmount(sig) * depositMult
-				frame.manifest.lines:Add(("  Bid per item"), bidVal)
-				frame.manifest.lines:Add(("  Buyout per item"), buyVal)
-				frame.manifest.lines:Add(("  Deposit per item"), depositVal)
+				frame.manifest.lines:Add(("  Bid /item"), bidVal)
+				frame.manifest.lines:Add(("  Buyout /item"), buyVal)
+				frame.manifest.lines:Add(("  Deposit /item"), depositVal)
 				totalBid = totalBid + (bidVal * curNumber)
 				totalBuy = totalBuy + (buyVal * curNumber)
 				totalDeposit = totalDeposit + (depositVal * curNumber)
@@ -477,7 +486,6 @@ function private.CreateFrames()
 		if frame.salebox.bid.modelvalue ~= curBid
 		or frame.salebox.buy.modelvalue ~= curBuy
 		then
-			p("Setting fixed cause", frame.salebox.bid.modelvalue, curBid, frame.salebox.buy.modelvalue, curBuy)
 			curModel = "fixed"
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid", curBid)
@@ -692,7 +700,7 @@ function private.CreateFrames()
 	})
 	frame.itembox:SetBackdropColor(0, 0, 0, 0.8)
 	frame.itembox:SetPoint("TOPLEFT", frame, "TOPLEFT", 13, -71)
-	frame.itembox:SetWidth(250)
+	frame.itembox:SetWidth(240)
 	frame.itembox:SetHeight(340)
 
 	frame.items = {}
@@ -922,15 +930,16 @@ function private.CreateFrames()
 
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		bgFile = "Interface\\Tooltips\\ChatBubble-Background",
+		edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
 		tile = true, tileSize = 32, edgeSize = 16,
 		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	frame.manifest:SetBackdropColor(0, 0, 0, 0.8)
-	frame.manifest:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT", 0,3)
-	frame.manifest:SetPoint("BOTTOM", frame.itembox, "BOTTOM", -3,3)
-	frame.manifest:SetWidth(250)
+	frame.manifest:SetBackdropColor(0, 0, 0, 1)
+	frame.manifest:SetPoint("TOPLEFT", frame, "TOPRIGHT", -20,-30)
+	frame.manifest:SetPoint("BOTTOM", frame, "BOTTOM", 0,30)
+	frame.manifest:SetWidth(230)
+	frame.manifest:SetFrameStrata("LOW")
 
 	local function lineHide(obj)
 		local id = obj.id
@@ -981,11 +990,17 @@ function private.CreateFrames()
 
 	local myStrata = frame.manifest:GetFrameStrata()
 
-	local lines = { pos = 0, max = 20, Clear = linesClear, Add = linesAdd }
+	frame.manifest.header = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.manifest.header:SetPoint("TOPLEFT", frame.manifest, "TOPLEFT", 24, -5)
+	frame.manifest.header:SetPoint("RIGHT", frame.manifest, "RIGHT", 0,0)
+	frame.manifest.header:SetJustifyH("LEFT")
+	frame.manifest.header:SetText("Auction detail:")
+
+	local lines = { pos = 0, max = 40, Clear = linesClear, Add = linesAdd }
 	for i=1, lines.max do
 		local text = frame.manifest:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 		if i == 1 then
-			text:SetPoint("TOPLEFT", frame.manifest, "TOPLEFT", 8,-5)
+			text:SetPoint("TOPLEFT", frame.manifest, "TOPLEFT", 26,-18)
 		else
 			text:SetPoint("TOPLEFT", lines[i-1][1], "BOTTOMLEFT", 0,0)
 		end
@@ -997,6 +1012,7 @@ function private.CreateFrames()
 		coins:SetPoint("RIGHT", text, "RIGHT", 0,0)
 		coins:SetFrameStrata(myStrata)
 		coins.info.showSmallerCoins = "backpack"
+		coins:SetScale(0.85)
 
 		local line = { text, coins, id = i, Hide = lineHide, Set = lineSet, Reset = lineReset }
 		lines[i] = line
@@ -1012,16 +1028,20 @@ function private.CreateFrames()
 	})
 	frame.imageview:SetBackdropColor(0, 0, 0, 0.8)
 	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
-	frame.imageview:SetPoint("BOTTOMRIGHT", frame.manifest, "BOTTOMLEFT")
+	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
+	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 	
 	frame.imageview.sheet = ScrollSheet.Create(frame.imageview, {
 		{ "Item", "TEXT", 120 },
 		{ "Seller", "TEXT", 80 },
-		{ "Remain", "TEXT", 60 },
-		{ "Stack", "INT", 50 },
+		{ "Left", "INT", 40 },
+		{ "Stk", "INT", 30 },
 		{ "MinBid", "COIN", 80 },
 		{ "CurBid", "COIN", 80 },
 		{ "Buyout", "COIN", 80 },
+		{ "Min/ea", "COIN", 80 },
+		{ "Cur/ea", "COIN", 80 },
+		{ "Buy/ea", "COIN", 80 },
 	})
 	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
@@ -1041,10 +1061,18 @@ function private.CreateFrames()
 			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
 			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
 			AuctionFrameMoneyFrame:Hide()
+			if (AuctionDressUpFrame:IsVisible()) then
+				AuctionDressUpFrame:Hide()
+				AuctionDressUpFrame.reshow = true
+			end
 			frame:Show()
 			AucAdvanced.Scan.GetImage()
 			frame.GenerateList(true)
 		else
+			if (AuctionDressUpFrame.reshow) then
+				AuctionDressUpFrame:Show()
+				AuctionDressUpFrame.reshow = nil
+			end
 			AuctionFrameMoneyFrame:Show()
 			frame:Hide()
 		end

@@ -236,6 +236,7 @@ local function setter(setting, value)
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
+		if db[setting] == value then return end
 		db[setting] = value
 	end
 

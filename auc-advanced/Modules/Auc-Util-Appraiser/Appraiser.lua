@@ -86,7 +86,10 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "configchanged") then
 		if private.frame then
+			private.frame.salebox.config = true
+			private.frame.SetPriceFromModel()
 			private.frame.UpdateControls()
+			private.frame.salebox.config = nil
 		end
 	elseif (callbackType == "inventory") then
 		if private.frame and private.frame:IsVisible() then
@@ -327,6 +330,31 @@ function private.ProcessPosts()
 
 	local request = private.postRequests[1]
 
+	if (request[7]) then
+		-- We're waiting for the item to vanish from the bags
+		local bag, slot, origLink, expire = unpack(request[7])
+		local link = GetContainerItemLink(bag,slot)
+		if not link or link ~= origLink then
+			-- Successful Auction!
+			table.remove(private.postRequests, 1)
+			updateFrame.timer = -0.1
+		elseif GetTime() > expire then
+			local tries = (request[6] or 0) + 1
+			request[6] = tries
+			if tries > 5 then
+				-- Can't auction this item!
+				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
+				print(("Error attempting to auction item: %s x%d"):format(link, itemCount))
+				table.remove(private.postRequests, 1)
+				updateFrame.timer = -5
+			else
+				request[7] = nil
+				updateFrame.timer = -1
+			end
+		end
+		return
+	end
+		
 	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
 	if not success then
 		updateFrame.timer = -1
@@ -335,6 +363,7 @@ function private.ProcessPosts()
 
 	if (CursorHasItem() or SpellIsTargeting()) then return end
 	if bag then
+		local link = GetContainerItemLink(bag,slot)
 		PickupContainerItem(bag, slot)
 		ClickAuctionSellItemButton()
 		StartAuction(request[3], request[4], request[5])
@@ -347,7 +376,6 @@ function private.ProcessPosts()
 			request[6] = tries
 			if tries > 5 then
 				-- Can't auction this item!
-				local link = GetContainerItemLink(bag,slot)
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
 				print(("Error attempting to auction item: %s x%d"):format(link, itemCount))
 				table.remove(private.postRequests, 1)
@@ -357,8 +385,12 @@ function private.ProcessPosts()
 			end
 			return
 		end
-		table.remove(private.postRequests, 1)
-		updateFrame.timer = -5
+
+		local _,_, lag = GetNetStats()
+		lag = 2.5 * lag / 1000
+		local expire = GetTime() + lag
+		request[7] = { bag, slot, link, expire }
+		updateFrame.timer = -1
 	end
 end
 
