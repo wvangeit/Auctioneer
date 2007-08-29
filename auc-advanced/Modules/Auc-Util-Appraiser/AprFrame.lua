@@ -188,12 +188,12 @@ function private.CreateFrames()
 				result[Const.SELLER],
 				tLeft,
 				count,
-				result[Const.MINBID],
-				result[Const.CURBID],
-				result[Const.BUYOUT],
 				math.floor(0.5+result[Const.MINBID]/count),
 				math.floor(0.5+result[Const.CURBID]/count),
 				math.floor(0.5+result[Const.BUYOUT]/count),
+				result[Const.MINBID],
+				result[Const.CURBID],
+				result[Const.BUYOUT],
 			}
 		end
 		frame.imageview.sheet:SetData(data)
@@ -1033,15 +1033,15 @@ function private.CreateFrames()
 	
 	frame.imageview.sheet = ScrollSheet.Create(frame.imageview, {
 		{ "Item", "TEXT", 120 },
-		{ "Seller", "TEXT", 80 },
+		{ "Seller", "TEXT", 75 },
 		{ "Left", "INT", 40 },
 		{ "Stk", "INT", 30 },
-		{ "MinBid", "COIN", 80 },
-		{ "CurBid", "COIN", 80 },
-		{ "Buyout", "COIN", 80 },
-		{ "Min/ea", "COIN", 80 },
-		{ "Cur/ea", "COIN", 80 },
-		{ "Buy/ea", "COIN", 80 },
+		{ "Min/ea", "COIN", 85 },
+		{ "Cur/ea", "COIN", 85 },
+		{ "Buy/ea", "COIN", 85 },
+		{ "MinBid", "COIN", 85 },
+		{ "CurBid", "COIN", 85 },
+		{ "Buyout", "COIN", 85 },
 	})
 	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
