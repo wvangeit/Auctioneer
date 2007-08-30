@@ -524,18 +524,23 @@ function private.CreateFrames()
 		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
 		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
 		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
-		local _, total, _,_, link = private.FindMatchesInBags(sig)
+		local success, errortext, total, _,_, link = pcall(private.FindMatchesInBags, sig)
+		if success==false then
+			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
+			print("Cannot post auctions: ", errortext)
+			return
+		end
 	
 		-- Just a quick bit of sanity checking first
-		assert(stack >= 1)
-		assert(number >= -2) 
+		assert(stack and stack >= 1)
+		assert(number and number >= -2) 
 		assert(number ~= 0)
-		assert(itemBid > 0) 
-		assert(itemBuy == 0 or itemBuy >= itemBid)
-		assert(duration == 120 or duration == 480 or duration == 1440)
-		assert(total > 0)
-		if (number > 0) then
-			assert(number * stack <= total)
+		assert(itemBid and itemBid > 0) 
+		assert(itemBuy and itemBuy == 0 or itemBuy >= itemBid)
+		assert(duration and duration == 120 or duration == 480 or duration == 1440)
+		if not (total and total > 0) or (number > 0 and number * stack > total) then
+			UIErrorsFrame:AddMessage("You do not have enough items to do that")
+			print("You do not have enough items to do that")
 		end
 		if (number == -2) then
 			assert(stack <= total)

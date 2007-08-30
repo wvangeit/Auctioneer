@@ -41,7 +41,6 @@ lib.name = libName
 
 local data
 
-local ERROR_LOCKED = "Locked item exists in inventory"
 local ERROR_NOITEM = "ItemId is empty"
 local ERROR_NOLOCAL = "Item is unknown"
 local ERROR_NOBLANK = "No blank spaces available"
@@ -50,7 +49,6 @@ local ERROR_AHCLOSED = "AH is not open"
 local ERROR_NOTFOUND = "Item was not found in inventory"
 local ERROR_NOTENOUGH = "Not enough of item available"
 lib.Const = {
-	ERROR_LOCKED = ERROR_LOCKED,
 	ERROR_NOITEM = ERROR_NOITEM,
 	ERROR_NOLOCAL = ERROR_NOLOCAL,
 	ERROR_NOBLANK = ERROR_NOBLANK,
@@ -173,6 +171,7 @@ function private.FindMatchesInBags(...)
 	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = private.DecodeSig(...)
 	local blankBag, blankSlot
 	local specialBlank = false
+	local isLocked = true
 	local foundLink
 	local total = 0
 
@@ -192,7 +191,7 @@ function private.FindMatchesInBags(...)
 			if link then
 				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
 				if (locked) then
-					return error(ERROR_LOCKED)
+					isLocked = true
 				end
 					
 				local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
@@ -229,7 +228,7 @@ function private.FindMatchesInBags(...)
 			end
 		end
 	end
-	return matches, total, blankBag, blankSlot, foundLink
+	return matches, total, blankBag, blankSlot, foundLink, isLocked
 end
 
 -- /run p(AucAdvanced.Modules.Util.Appraiser.FindOrMakeStack(28399, 5))
@@ -453,8 +452,8 @@ function lib.GetDepositAmount(sig, count)
 	end
 
 	-- Ok, so find the item in our bags
-	local matches = private.FindMatchesInBags(sig)
-	if #matches <= 0 then return deposit, rate, false end
+	local success, matches = pcall(private.FindMatchesInBags, sig)
+	if success==false or #matches <= 0 then return deposit, rate, false end
 
 	-- For the best resolution, find the largest stack
 	table.sort(matches, function (a,b) return a[3] > b[3] end)
