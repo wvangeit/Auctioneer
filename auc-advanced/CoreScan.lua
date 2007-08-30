@@ -47,6 +47,7 @@ lib.Private = private
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
+local print = lib.Print
 
 private.isScanning = false
 private.curPage = 0
@@ -91,9 +92,69 @@ function lib.GetImage()
 	return image
 end
 
+private.scanStack = {}
+function lib.PushScan()
+	if private.isScanning then
+		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
+		table.insert(private.scanStack, {
+			private.scanStartTime,
+			private.sentQuery,
+			private.curPage,
+			private.curQuery,
+			private.curScan,
+			GetTime(),
+		})
+		private.isScanning = false
+		private.scanStartTime = nil
+		private.sentQuery = nil
+		private.curPage = nil
+		private.curQuery = nil
+		private.curScan = nil
+	end
+end
+
+function lib.PopScan()
+	if #private.scanStack > 0 then
+		local now, pauseTime = GetTime()
+		private.scanStartTime,
+		private.sentQuery,
+		private.curPage,
+		private.curQuery,
+		private.curScan,
+		pauseTime = unpack(private.scanStack[1])
+		table.remove(private.scanStack, 1)
+
+		if now - pauseTime > 300 then
+			-- 5 minutes old
+			print("Paused scan is older than 5 minutes, aborting")
+			private.Commit(true)
+			return
+		end
+
+		print(("Resuming paused scan at page {{%d}}..."):format(private.curPage+1))
+		private.isScanning = true
+		private.sentQuery = false
+		lib.ScanPage(private.curPage)
+	end
+end
+
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 	if AuctionFrame and AuctionFrame:IsVisible() then
-		private.Commit(true)
+		if private.isScanning then
+			message("Scan is currently in progress")
+			return
+		end
+		if not CanSendAuctionQuery() then
+			private.queueScan = {
+				name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex
+			}
+			return
+		end
+		
+		if private.curQuery then
+			private.Commit(true)
+		end
+
 		private.isScanning = true
 		local startPage = 0
 		if (private.scanDir == 1) then
@@ -523,10 +584,16 @@ function private.Commit(wasIncomplete)
 			end
 		end
 	end
+
+	lib.PopScan()
 end
 
 function lib.ScanPage(nextPage)
 	if (private.isScanning) then
+		if not CanSendAuctionQuery() then
+			private.scanNext = nextPage
+			return
+		end
 		private.sentQuery = true
 		private.Hook.QueryAuctionItems(private.curQuery.name or "", 
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
@@ -555,7 +622,9 @@ function lib.StorePage()
 		private.curPage = floor(totalAuctions / 50);
 	end
 	
-	if not private.curQuery then return end
+	if not private.curQuery then
+		return
+	end
 	private.sentQuery = false
 
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
@@ -641,9 +710,6 @@ function private.ClassConvert(cid, sid)
 	return Const.CLASSES[cid]
 end
 
-local curQuery = { empty = true }
-local curResults = {}
-
 private.Hook = {}
 private.Hook.PlaceAuctionBid = PlaceAuctionBid
 function PlaceAuctionBid(type, index, bid)
@@ -663,7 +729,10 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
 	end
-	if private.CanSend and not private.CanSend() then return end
+	if private.CanSend and not private.CanSend() then
+		print("Can't send query just at the moment")
+		return
+	end
 
 	local is_same = true
 	query = {}
@@ -721,24 +790,49 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	private.sentQuery = true
 	lib.lastReq = GetTime()	
 
-	
-	return private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
+	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex))
 end
 
+private.unexpectedClose = false
 function private.OnUpdate(me, dur)
-	if private.sentQuery and CanSendAuctionQuery() then
-		lib.StorePage()
+	if not AuctionFrame then return end
+
+	if private.queueScan then
+		if CanSendAuctionQuery() and (not private.CanSend or private.CanSend()) then
+			local queued = private.queueScan
+			private.queueScan = nil
+			lib.StartScan(unpack(queued))
+		end
+		return
 	end
-	if private.curQuery and not AuctionFrame:IsVisible() then
-		private.Commit(true)
+	if private.scanNext then
+		if CanSendAuctionQuery() then
+			local nextPage = private.scanNext
+			private.scanNext = nil
+			lib.ScanPage(nextPage)
+		end
+		return
+	end
+		
+	if AuctionFrame:IsVisible() then
+		if private.unexpectedClose then
+			private.unexpectedClose = false
+			lib.PopScan()
+			return
+		end
+
+		if private.sentQuery and CanSendAuctionQuery() then
+			lib.StorePage()
+		end
 	end
 end
 private.updater = CreateFrame("Frame", "", UIParent)
 private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
-	if (private.curQuery) then
-		private.Commit(true)
+	if private.curQuery and not AuctionFrame:IsVisible() then
+		private.unexpectedClose = true
+		lib.PushScan()
 	end
 end
 

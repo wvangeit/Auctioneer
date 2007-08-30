@@ -98,6 +98,7 @@ function lib.Processor(callbackType, ...)
 		if private.frame then
 			private.frame.cache = {}
 			private.frame.GenerateList()
+			private.frame.UpdateImage()
 		end
 	end
 end

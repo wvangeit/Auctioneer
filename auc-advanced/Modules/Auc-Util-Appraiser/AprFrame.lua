@@ -163,7 +163,14 @@ function private.CreateFrames()
 		frame.salebox.stacksize = item[5]
 		frame.salebox.count = item[6]
 
-		local itemId, suffix, factor = strsplit(":", sig)
+		frame.UpdateImage()
+		frame.InitControls()
+	end
+
+	function frame.UpdateImage()
+		if not frame.salebox.sig then return end
+
+		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
@@ -197,8 +204,6 @@ function private.CreateFrames()
 			}
 		end
 		frame.imageview.sheet:SetData(data)
-
-		frame.InitControls()
 	end
 
 	function frame.SetPriceFromModel(curModel)
@@ -292,7 +297,7 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or frame.salebox.stacksize
 		frame.salebox.stack:SetValue(curStack)
 		frame.UpdateControls()
-		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or 0
+		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -2 
 		frame.salebox.number:SetValue(curNumber)
 
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
@@ -311,7 +316,7 @@ function private.CreateFrames()
 		frame.salebox.bid:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
-		frame.go:Show()
+		frame.refresh:Enable()
 		frame.manifest.lines:Clear()
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
@@ -509,6 +514,27 @@ function private.CreateFrames()
 		end
 
 		frame.salebox.config = false
+	end
+
+	function frame.RefreshView()
+		local link = frame.salebox.link
+		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack, equipLoc = GetItemInfo(link)
+		local itemTypeId, itemSubId
+		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
+			if catName == itemType then
+				itemTypeId = catId
+				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES) do
+					if subName == itemSubType then
+						itemSubId = subId
+						break
+					end
+				end
+				break
+			end
+		end
+		
+		AucAdvanced.Scan.PushScan()
+		AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
 	end
 
 	function frame.PostAuctions(obj)
@@ -932,6 +958,21 @@ function private.CreateFrames()
 	frame.go:SetScript("OnClick", frame.PostAuctions)
 	frame.go.postType = "single"
 	frame.go:Disable()
+
+	frame.gobatch = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.gobatch:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -87,15)
+	frame.gobatch:SetText("Batch post")
+	frame.gobatch:SetWidth(80)
+	frame.gobatch:SetScript("OnClick", frame.PostAuctions)
+	frame.gobatch.postType = "batch"
+	frame.gobatch:Disable()
+
+	frame.refresh = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.refresh:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -167,15)
+	frame.refresh:SetText("Refresh")
+	frame.refresh:SetWidth(80)
+	frame.refresh:SetScript("OnClick", frame.RefreshView)
+	frame.refresh:Disable()
 
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
