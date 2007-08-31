@@ -55,15 +55,22 @@ function lib:valuate(item, tooltip)
 
 	-- Valuate this item
 	local market, seen
-	if (AucAdvanced) then
-		market, seen = AucAdvanced.API.GetMarketValue(item.link)
-	elseif (Auctioneer and Auctioneer.Statistic) then
-		local auctKey = item.id..":"..item.suffix..":"..item.enchant
-		market, seen = Auctioneer.Statistic.GetUsableMedian(auctKey)
-		if (get(lcName..".auct.usehsp")) then
-			market, seen = Auctioneer.Statistic.GetHSP(auctKey)
+	local useFour = get(lcName..".auct.usefour")
+	local useHSP = get(lcName..".auct.usehsp")
+	if Auctioneer and Auctioneer.Statistic.GetUsableMedian then
+		if (AucAdvanced and useFour) or not AucAdvanced then
+			if (useHSP) then
+				market, seen = Auctioneer.Statistic.GetHSP(auctKey)
+			end
+			if not market then
+				market, seen = AucAdvanced.API.GetMarketValue(item.link)
+			end
 		end
 	end
+	if (AucAdvanced and not market) then
+		market, seen = AucAdvanced.API.GetMarketValue(item.link)
+	end
+
 	-- If we don't know what it's worth, then there's not much we can do
 	if not market then return end
 	market = market * item.count
@@ -175,13 +182,20 @@ function lib:setup(gui)
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
-	if not AucAdvanced then
-		gui.AddControl(id, "Checkbox",         0, 1, lcName..".auct.usehsp", "Use Auctioneer HSP instead of Median")
-	end
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".quality.check", "Enable quality checking:")
 	gui.AddControl(id, "Selectbox",        0, 2, qualityTable, lcName..".quality.min", "Minimum item quality")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".seen.check", "Enable checking \"seen\" count:")
 	gui.AddControl(id, "WideSlider",       0, 2, lcName..".seen.mincount", 1, 100, 1, "Minimum seen count: %s")
+	if Auctioneer and Auctioneer.Statistic.GetUsableMedian then
+		if AucAdvanced then
+			gui.AddControl(id, "Checkbox",         0, 1, lcName..".auct.usefour", "Prefer Auctioneer 4 prices when avaiable")
+		else
+			gui.AddControl(id, "Subhead", 0, "Auctioneer options")
+		end
+		if Auctioneer.Statistic.GetHSP then
+			gui.AddControl(id, "Checkbox",         0, 2, lcName..".auct.usehsp", "Prefer HSP instead of Median")
+		end
+	end
 	gui.AddControl(id, "Subhead",          0,    "Fees adjustment")
 	gui.AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
