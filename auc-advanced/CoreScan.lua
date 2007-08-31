@@ -140,6 +140,10 @@ end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
 	if AuctionFrame and AuctionFrame:IsVisible() then
+		if private.isPaused then
+			message("Scanning is currently paused")
+			return
+		end
 		if private.isScanning then
 			message("Scan is currently in progress")
 			return
@@ -181,6 +185,10 @@ end
 
 function lib.IsScanning()
 	return private.isScanning
+end
+
+function lib.IsPaused()
+	return private.isPaused
 end
 
 function private.Unpack(item, storage)
@@ -793,9 +801,21 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex))
 end
 
+function private.SetPaused(pause)
+	if pause then
+		if private.isPaused then return end
+		lib.PushScan()
+		private.isPaused = true
+	elseif private.isPaused then
+		lib.PopScan()
+		private.isPaused = false
+	end
+end
+
 private.unexpectedClose = false
 function private.OnUpdate(me, dur)
 	if not AuctionFrame then return end
+	if private.isPaused then return end
 
 	if private.queueScan then
 		if CanSendAuctionQuery() and (not private.CanSend or private.CanSend()) then
