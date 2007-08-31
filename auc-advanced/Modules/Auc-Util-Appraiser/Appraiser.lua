@@ -178,58 +178,60 @@ function private.FindMatchesInBags(...)
 
 	for bag=0,4 do
 		local bagName = GetBagName(bag)
-		local bagType, isMultibag, _
+		if bagName then
+			local bagType, isMultibag, _
 
-		if bag == 0 then
-			isMultibag = true
-			bagType = "Bag"
-		else
-			_,_,_,_,_,_, bagType = GetItemInfo(bagName)
-			isMultibag = (bagType == private.BagTypes[1])
-		end
+			if bag == 0 then
+				isMultibag = true
+				bagType = "Bag"
+			else
+				_,_,_,_,_,_, bagType = GetItemInfo(bagName)
+				isMultibag = (bagType == private.BagTypes[1])
+			end
 
-		if not (isMultibag or private.BagInfo[bagType]) then
-			private.BagInfo[bagType] = {}
-		end
+			if not (isMultibag or private.BagInfo[bagType]) then
+				private.BagInfo[bagType] = {}
+			end
 
-		for slot=1,GetContainerNumSlots(bag) do
-			local link = GetContainerItemLink(bag,slot)
-			if link then
-				local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
-				if (locked) then
-					isLocked = true
-				end
-					
-				local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-				if not isMultibag then
-					-- Store info that this bag can contain this item
-					private.BagInfo[bagType][id] = true
-				end
-
-				if itype == "item"
-				and id == matchId
-				and suffix == matchSuffix
-				and factor == matchFactor
-				and enchant == matchEnchant
-				and (matchSeed == 0 or seed == matchSeed)
-				then
-					if private.IsAuctionable(bag, slot) then
-						if not itemCount or itemCount < 0 then itemCount = 1 end
-						table.insert(matches, {bag, slot, itemCount})
-						total = total + itemCount
-						foundLink = link
+			for slot=1,GetContainerNumSlots(bag) do
+				local link = GetContainerItemLink(bag,slot)
+				if link then
+					local texture, itemCount, locked, quality, readable = GetContainerItemInfo(bag,slot)
+					if (locked) then
+						isLocked = true
 					end
-				end
-			else -- Blank slot
-				if isMultibag then
-					if not blankBag then
+						
+					local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+					if not isMultibag then
+						-- Store info that this bag can contain this item
+						private.BagInfo[bagType][id] = true
+					end
+
+					if itype == "item"
+					and id == matchId
+					and suffix == matchSuffix
+					and factor == matchFactor
+					and enchant == matchEnchant
+					and (matchSeed == 0 or seed == matchSeed)
+					then
+						if private.IsAuctionable(bag, slot) then
+							if not itemCount or itemCount < 0 then itemCount = 1 end
+							table.insert(matches, {bag, slot, itemCount})
+							total = total + itemCount
+							foundLink = link
+						end
+					end
+				else -- Blank slot
+					if isMultibag then
+						if not blankBag then
+							blankBag = bag
+							blankSlot = slot
+						end
+					elseif not specialBlank and private.BagInfo[bagType][matchId] then
 						blankBag = bag
 						blankSlot = slot
+						specialBlank = true
 					end
-				elseif not specialBlank and private.BagInfo[bagType][matchId] then
-					blankBag = bag
-					blankSlot = slot
-					specialBlank = true
 				end
 			end
 		end
