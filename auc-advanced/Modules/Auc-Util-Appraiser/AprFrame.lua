@@ -122,6 +122,7 @@ function private.CreateFrames()
 		n = #frame.list
 		if (n <= NUM_ITEMS) then
 			frame.scroller:Hide()
+			frame.scroller:SetMinMaxValues(0, 0)
 			frame.scroller:SetValue(0)
 		else
 			frame.scroller:Show()
@@ -230,38 +231,38 @@ function private.CreateFrames()
 			newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
 		end
 
-		if not newBuy or newBuy <= 0 then
-			frame.salebox.warn:SetText(("No %s price available!"):format(curModel))
-			MoneyInputFrame_ResetMoney(frame.salebox.bid)
-			MoneyInputFrame_ResetMoney(frame.salebox.buy)
-			frame.salebox.bid.modelvalue = 0
-			frame.salebox.buy.modelvalue = 0
-			return
-		end
-
-		if newBuy and not newBid then
-			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-			if (deposit) then
-				local rate
-				deposit, rate = lib.GetDepositAmount(frame.salebox.sig)
-				if not rate then rate = AucAdvanced.depositRate or 0.05 end
-			else deposit = 0 end
-
-			-- Scale up for duration > 2 hours
-			if deposit > 0 then
-				local curDurationIdx = frame.salebox.duration:GetValue()
-				local duration = private.durations[curDurationIdx][1]
-				deposit = deposit * duration/120
+		if curModel ~= "fixed" then
+			if not newBuy or newBuy <= 0 then
+				frame.salebox.warn:SetText(("No %s price available!"):format(curModel))
+				MoneyInputFrame_ResetMoney(frame.salebox.bid)
+				MoneyInputFrame_ResetMoney(frame.salebox.buy)
+				frame.salebox.bid.modelvalue = 0
+				frame.salebox.buy.modelvalue = 0
+				return
 			end
 
-			markdown = newBuy * markdown
+			if newBuy and not newBid then
+				local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
+				local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
+				local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
+				if (deposit) then
+					local rate
+					deposit, rate = lib.GetDepositAmount(frame.salebox.sig)
+					if not rate then rate = AucAdvanced.depositRate or 0.05 end
+				else deposit = 0 end
 
-			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-		end
+				-- Scale up for duration > 2 hours
+				if deposit > 0 then
+					local curDurationIdx = frame.salebox.duration:GetValue()
+					local duration = private.durations[curDurationIdx][1]
+					deposit = deposit * duration/120
+				end
 
-		if curModel ~= "fixed" then
+				markdown = newBuy * markdown
+
+				newBid = math.max(newBuy - markdown - subtract - deposit, 1)
+			end
+
 			if newBid and (not newBuy or newBid > newBuy) then
 				newBuy = newBid
 			end
@@ -269,6 +270,7 @@ function private.CreateFrames()
 
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
+
 		if (curModel ~= "fixed" and newBuy > 0 and newBid > newBuy) then
 			newBuy = newBid
 		end
@@ -946,6 +948,11 @@ function private.CreateFrames()
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, frame.ChangeControls)
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
+
+	MoneyInputFrame_SetNextFocus(frame.salebox.bid, AppraiserSaleboxBuyGold)
+	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid, AppraiserSaleboxBuyCopper)
+	MoneyInputFrame_SetNextFocus(frame.salebox.buy, AppraiserSaleboxBidGold)
+	MoneyInputFrame_SetPreviousFocus(frame.salebox.buy, AppraiserSaleboxBidCopper)
 
 	frame.salebox.buy.label = frame.salebox.buy:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.buy.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
