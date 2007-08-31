@@ -311,6 +311,7 @@ function private.CreateFrames()
 	end
 
 	function frame.UpdateControls()
+		if not frame.salebox.sig then return end
 		frame.salebox.stack:Show()
 		frame.salebox.number:Show()
 		frame.salebox.model:Show()
@@ -533,6 +534,7 @@ function private.CreateFrames()
 				break
 			end
 		end
+		if equipLoc == "" then equipLoc = nil end
 		
 		AucAdvanced.Scan.PushScan()
 		AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
