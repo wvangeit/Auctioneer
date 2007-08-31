@@ -207,6 +207,7 @@ function private.CreateFrames()
 	end
 
 	function frame.SetPriceFromModel(curModel)
+		if not frame.salebox.sig then return end
 		if not curModel then
 			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		else
