@@ -422,7 +422,6 @@ function private.BrowseSort(a, b)
 		end
 	end	
 	
-	p("Sort by", col, dir)
 	if a[col] ~= b[col] then
 		if dir > 0 then return (a[col] < b[col])
 		else return (a[col] > b[col])
