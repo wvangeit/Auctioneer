@@ -801,7 +801,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex))
 end
 
-function private.SetPaused(pause)
+function lib.SetPaused(pause)
 	if pause then
 		if private.isPaused then return end
 		lib.PushScan()
