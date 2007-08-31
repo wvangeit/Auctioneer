@@ -82,7 +82,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 	local showPerUnit = AucAdvanced.Settings.GetSetting("util.pricelevel.single")
 	if not showPerUnit then return end
 	
-	local priceLevel, perItem, r,g,b = private.CalcLevel(hyperlink, quantity, bidPrice, buyPrice)
+	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, bidPrice, buyPrice)
 	if (not priceLevel) then return end
 
 	EnhTooltip.AddLine(("Price Level: %d%%"):format(priceLevel), perItem)
@@ -153,7 +153,7 @@ function private.SetupConfigGui(gui)
 	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "Blue price level > %d%%")
 end
 
-function private.ResetBars()
+function lib.ResetBars()
 	local tex
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		tex = getglobal("BrowseButton"..i.."PriceLevel")
@@ -161,7 +161,7 @@ function private.ResetBars()
 	end
 end
 
-function private.SetBar(i, r,g,b, pct)
+function lib.SetBar(i, r,g,b, pct)
 	local tex
 	local button = getglobal("BrowseButton"..i)
 	local colorize = AucAdvanced.Settings.GetSetting("util.pricelevel.colorize")
@@ -228,7 +228,7 @@ function private.SetBar(i, r,g,b, pct)
 end
 
 function private.ListUpdate()
-	private.ResetBars()
+	lib.ResetBars()
 	local index, link, quantity, minBid, minInc, buyPrice, bidPrice, priceLevel, perItem, r,g,b, _
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
@@ -236,19 +236,26 @@ function private.ListUpdate()
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page);
 		if (index <= numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) then
-			link =  GetAuctionItemLink("list", offset + i)
-			if link then
-				_,_, quantity, _,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)
-				if bidPrice>0 then bidPrice = bidPrice + minInc
-				else bidPrice = minBid end
-				priceLevel, perItem, r,g,b = private.CalcLevel(link, quantity, bidPrice, buyPrice)
-				private.SetBar(i, r,g,b, priceLevel)
+			if AucAdvanced.Modules.Util.CompactUI
+			and AucAdvanced.Modules.Util.CompactUI.inUse then
+				_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
+				priceLevel,_,r,g,b = AucAdvanced.Modules.Util.CompactUI.GetContents(offset+i)
+				lib.SetBar(i, r,g,b, priceLevel)
+			else	
+				link =  GetAuctionItemLink("list", offset + i)
+				if link then
+					_,_, quantity, _,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)
+					if bidPrice>0 then bidPrice = bidPrice + minInc
+					else bidPrice = minBid end
+					priceLevel, perItem, r,g,b = lib.CalcLevel(link, quantity, bidPrice, buyPrice)
+					lib.SetBar(i, r,g,b, priceLevel)
+				end
 			end
 		end
 	end
 end
 
-function private.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
+function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 	if not quantity or quantity < 1 then quantity = 1 end
 
 	local priceModel = AucAdvanced.Settings.GetSetting("util.pricelevel.model")
@@ -294,4 +301,3 @@ function private.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 
 	return priceLevel, perItem, r,g,b, lvl, itemWorth
 end
-lib.CalcLevel = private.CalcLevel

@@ -78,8 +78,11 @@ function lib.OnLoad()
 end
 
 --[[ Local functions ]]--
+private.candy = {}
 private.buttons = {}
 function private.HookAH()
+	lib.inUse = true
+
 	if (not AucAdvanced.Settings.GetSetting("util.compactui.activated")) then
 		private.MyAuctionFrameUpdate = function() end
 		return
@@ -88,6 +91,12 @@ function private.HookAH()
 	AuctionFrameBrowse_Update = private.MyAuctionFrameUpdate
 	local button, lastButton, origButton
 	local line
+
+	BrowseQualitySort:Hide()
+	BrowseLevelSort:Hide()
+	BrowseDurationSort:Hide()
+	BrowseHighBidderSort:Hide()
+	BrowseCurrentBidSort:Hide()
 
 	local NEW_NUM_BROWSE = 14
 	for i = 1, NEW_NUM_BROWSE do
@@ -124,14 +133,14 @@ function private.HookAH()
 		button.Count:SetJustifyH("RIGHT")
 		button.Count:SetFont(STANDARD_TEXT_FONT, 11)
 		button.IconButton = CreateFrame("Button", nil, button)
-		button.IconButton:SetPoint("TOPLEFT", button, "TOPLEFT", 30, -2)
+		button.IconButton:SetPoint("TOPLEFT", button, "TOPLEFT", 30, 0)
 		button.IconButton:SetWidth(16)
-		button.IconButton:SetHeight(16)
+		button.IconButton:SetHeight(19)
 		button.IconButton:SetScript("OnEnter", private.IconEnter)
 		button.IconButton:SetScript("OnLeave", private.IconLeave)
 		button.Icon = button.IconButton:CreateTexture()
-		button.Icon:SetPoint("TOPLEFT")
-		button.Icon:SetPoint("BOTTOMRIGHT")
+		button.Icon:SetPoint("TOPLEFT", button.IconButton, "TOPLEFT", 0,-2)
+		button.Icon:SetPoint("BOTTOMRIGHT", button.IconButton, "BOTTOMRIGHT" , 0, 1)
 		button.Name = button:CreateFontString(nil,nil,"GameFontHighlight")
 		button.Name:SetPoint("TOPLEFT", button, "TOPLEFT", 50, 0)
 		button.Name:SetWidth(220)
@@ -186,8 +195,89 @@ function private.HookAH()
 	end
 	NUM_BROWSE_TO_DISPLAY = NEW_NUM_BROWSE
 
+	local function selectHeader(self, ...)
+		local id = self.id
+		private.headers.sort = 0
+		private.headers.dir = 0
+		private.headers.pos = 0
+		for i=1, #private.headers do
+			local header = private.headers[i]
+			if i == id then
+				if header.dir ~= 0 then
+					header.dir = header.dir * -1
+					if header.dir == header.defaultdir then
+						header.pos = header.pos + 1
+					end
+				else
+					header.pos = 1
+					header.dir = header.defaultdir
+				end
+				if header.dir > 0 then
+					header.Back:SetVertexColor(0.6,1,1, 1)
+				else
+					header.Back:SetVertexColor(1,0.6,1, 1)
+				end
+				if header.cycle then
+					local headPos = ((header.pos-1) % #header.cycle)+1
+					header.Text:SetText(header.cycle[headPos])
+					private.headers.pos = headPos
+				end
+				private.headers.sort = id
+				private.headers.dir = header.dir 
+			else
+				header.dir = 0
+				header.Back:SetVertexColor(1,1,1, 0.8)
+				header.Text:SetText(header.Text.default)
+			end
+		end
+		private.MyAuctionFrameUpdate()
+	end
+					
+
+	local function createHeader(id, dir, text, parentLeft, parentRight, lOfs, rOfs, cycle)
+		if not parentRight then parentRight = parentLeft end
+
+		local header = CreateFrame("Button", nil, private.headers)
+		header:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+		header:SetPoint("BOTTOMLEFT", parentLeft, "TOPLEFT", lOfs or 0, 2)
+		header:SetPoint("BOTTOMRIGHT", parentRight, "TOPRIGHT", rOfs or 0, 2)
+		header:SetHeight(16)
+		header.Text = header:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		header.Text:SetPoint("TOPLEFT", header, "TOPLEFT", 2, 0)
+		header.Text:SetPoint("BOTTOMRIGHT", header, "BOTTOMRIGHT")
+		header.Text:SetJustifyH("LEFT")
+		header.Text:SetJustifyV("CENTER")
+		header.Text:SetText(text)
+		header.Text.default = text
+		header.Back = header:CreateTexture(nil, "ARTWORK")
+		header.Back:SetPoint("TOPLEFT", header, "TOPLEFT")
+		header.Back:SetPoint("BOTTOMRIGHT", header, "BOTTOMRIGHT")
+		header.Back:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+		header.Back:SetTexCoord(0.1, 0.8, 0, 1)
+		header.Back:SetVertexColor(1,1,1, 0.8)
+		header:SetScript("OnClick", selectHeader)
+		header.defaultdir = dir
+		header.cycle = cycle
+		header.pos = 1
+		header.dir = 0
+		header.id = id
+		private.headers[id] = header
+	end
+
+	private.headers = CreateFrame("Frame", nil, AuctionFrameBrowse)
+	table.insert(private.candy, private.headers)
+
+	local bOne = private.buttons[1]
+	createHeader(1, 1, "#", bOne.Count)
+	createHeader(2, 1, "Auction Item", bOne.IconButton, bOne.Name, 0, 0, { "Name", "Quality" })
+	createHeader(3, -1, "Min", bOne.rLevel)
+	createHeader(4, -1, "iLvl", bOne.iLevel)
+	createHeader(5, 1, "Left", bOne.tLeft)
+	createHeader(6, 1, "Owner", bOne.Owner)
+	createHeader(7, -1, "Price", bOne.Value, bOne.Bid, -110, -13, {"Buy total", "Bid total", "Buy each", "Bid each"})
+	createHeader(8, 1, "Pct", bOne.Value, nil, 0, -2)
+
 	local tex
-	private.candy = {}
 	tex = AuctionFrameBrowse:CreateTexture()
 	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].rLevel, "TOPLEFT")
@@ -203,7 +293,8 @@ function private.HookAH()
 	tex = AuctionFrameBrowse:CreateTexture()
 	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].Owner, "TOPRIGHT", 2, 0)
-	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].Buy, "BOTTOMRIGHT", -10, 0)
+	tex:SetPoint("BOTTOM", private.buttons[NEW_NUM_BROWSE].Buy, "BOTTOM", 0, 0)
+	tex:SetPoint("RIGHT", private.buttons[1].Bid, "RIGHT", -10, 0)
 	table.insert(private.candy, tex)
 
 	tex = AuctionFrameBrowse:CreateTexture()
@@ -241,6 +332,9 @@ function private.HookAH()
 	table.insert(private.candy, text)
 
 	private.Active = true
+
+	-- Select our PCT column
+	selectHeader(private.headers[8])
 end
 
 function private.SetMoney(me, value, hasBid, highBidder)
@@ -301,56 +395,166 @@ function private.IconLeave(this)
 	ResetCursor()
 end
 
-function private.SetAuction(button, id)
+
+function private.BrowseSort(a, b)
+	local sort = private.headers.sort
+	local dir = private.headers.dir
+
+	if sort then
+		if sort == 1 then            col = 3       -- Count
+		elseif sort == 2 then                      -- 
+			local pos = private.headers.pos    -- 
+			if pos == 1 then     col = 6       -- Name
+			elseif pos == 2 then col = 5       -- Quality
+			end                                -- 
+		elseif sort == 3 then        col = 8       -- MinLevel
+		elseif sort == 4 then        col = 9       -- ItemLevel
+		elseif sort == 5 then        col = 10      -- TimeLeft
+		elseif sort == 6 then        col = 11      -- Owner
+		elseif sort == 7 then                      -- 
+			local pos = private.headers.pos    -- 
+			if pos == 1 then     col = 16      -- Buy
+			elseif pos == 2 then col = 15      -- Bid
+			elseif pos == 3 then col = 18      -- BuyEach
+			elseif pos == 4 then col = 17      -- BidEach
+			end                                -- 
+		elseif sort == 8 then        col = 21      -- PriceLevel
+		end
+	end	
+	
+	p("Sort by", col, dir)
+	if a[col] ~= b[col] then
+		if dir > 0 then return (a[col] < b[col])
+		else return (a[col] > b[col])
+		end
+	end
+	if a[3] ~= b[3] then return a[3] < b[3] end
+	if a[4] ~= b[4] then return a[4] < b[4] end
+	if a[2] ~= b[2] then return a[2] < b[2] end
+end
+
+private.pageContents = {}
+private.pageElements = {}
+function private.RetrievePage()
+	for i = 1, #private.pageContents do
+		private.pageContents[i] = nil
+	end
+
+	local selected = GetSelectedAuctionItem("list") or 0
+	for i = 1, NUM_AUCTION_ITEMS_PER_PAGE do
+		if not private.pageElements[i] then private.pageElements[i] = {} end
+
+		local link = GetAuctionItemLink("list", i)
+		if link then
+			local item = private.pageElements[i]
+
+			item[1] = i
+			if (selected == i) then
+				item[2] = true
+			else
+				item[2] = false
+			end
+
+			local name, texture, count, quality, canUse, level,
+				minBid, minIncrement, buyoutPrice, bidAmount,
+				highBidder, owner  = GetAuctionItemInfo("list", i)
+			local itemName, itemLink, itemRarity, itemLevel,
+				itemMinLevel, itemType, itemSubType, itemStackCount,
+				itemEquipLoc, itemTexture = GetItemInfo(link)
+
+			if not itemLevel then itemLevel = level end
+			if not itemMinLevel then itemMinLevel = level end
+			local timeLeft = GetAuctionItemTimeLeft("list", i)
+			if (timeLeft == 4) then timeLeftText = "24h"
+			elseif (timeLeft == 3) then timeLeftText = "8h"
+			elseif (timeLeft == 2) then timeLeftText = "2h"
+			else timeLeftText = "30m" end
+			if (not count or count < 1) then count = 1 end
+
+			local requiredBid = minBid
+			local showBid = minBid
+			if ( bidAmount > 0 ) then
+				requiredBid = bidAmount + minIncrement
+				if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
+					showBid = requiredBid
+				else
+					showBid = bidAmount
+				end
+			end
+
+			if ( requiredBid >= MAXIMUM_BID_PRICE ) then
+				-- Lie about our buyout price
+				buyoutPrice = requiredBid
+			end
+
+			local priceLevel, perItem, r,g,b
+			if AucAdvanced.Modules.Util.PriceLevel then
+				priceLevel, perItem, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
+			end
+
+			item[3] = count
+			item[4] = texture
+			item[5] = itemRarity
+			item[6] = name
+			item[7] = link
+			item[8] = itemMinLevel
+			item[9] = itemLevel
+			item[10] = timeLeft
+			item[11] = owner or ""
+			item[12] = minBid
+			item[13] = bidAmount
+			item[14] = minIncrement
+			item[15] = requiredBid
+			item[16] = buyoutPrice
+			item[17] = requiredBid / count
+			item[18] = buyoutPrice / count
+			item[19] = timeLeftText
+			item[20] = highBidder
+			item[21] = priceLevel or 0
+			item[22] = perItem
+			item[23] = r
+			item[24] = g
+			item[25] = b
+
+			table.insert(private.pageContents, item)
+		end
+	end
+
+	table.sort(private.pageContents, private.BrowseSort)
+end
+
+function lib.GetContents(pos)
+	if private.pageContents[pos] then
+		return unpack(private.pageContents[pos])
+	end
+	-- id, selected, count, texture, itemRarity, name, link, itemMinLevel, itemLevel, timeLeft, owner, minBid, bidAmount, minIncrement, requiredBid, buyoutPrice, requiredBidEach, buyoutPriceEach, timeLeftText, highBidder, priceLevel, perItem, r, g, b
+end
+
+function private.SetAuction(button, pos)
+	local id, selected, count, texture, itemRarity, name, link, itemMinLevel, itemLevel, timeLeft, owner, minBid, bidAmount, minIncrement, requiredBid, buyoutPrice, requiredBidEach, buyoutPriceEach, timeLeftText, highBidder, priceLevel, perItem, r, g, b = lib.GetContents(pos)
+
 	if not id then
 		button:Hide()
 		return
 	end
 
-	local selected = GetSelectedAuctionItem("list") or 0
-	if (selected == id) then
+	if (selected) then
 		button.LineTexture:SetTexture(1,1,0.3, 0.2)
-	elseif (id % 2 == 0) then
+	elseif (pos % 2 == 0) then
 		button.LineTexture:SetTexture(0.3,0.3,0.4, 0.1)
 	else
 		button.LineTexture:SetTexture(0,0,0.1, 0.1)
 	end
 	button.id = id
 	
-	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("list", id)
-	local link = GetAuctionItemLink("list", id)
-	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
-	if link then
-		itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
-	end
-	if not itemLevel then itemLevel = level end
-	if not itemMinLevel then itemMinLevel = level end
-	if itemLevel == 0 then itemLevel = "" end
-	if itemMinLevel == 0 then itemMinLevel = "" end
-	local timeLeft = GetAuctionItemTimeLeft("list", id)
-	if (timeLeft == 4) then timeLeft = "24h"
-	elseif (timeLeft == 3) then timeLeft = "8h"
-	elseif (timeLeft == 2) then timeLeft = "2h"
-	else timeLeft = "30m" end
-	if (not count or count < 1) then count = 1 end
-
-	local requiredBid = minBid
-	local showBid = minBid
-	if ( bidAmount > 0 ) then
-		requiredBid = bidAmount + minIncrement
-		if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
-			showBid = requiredBid
-		else
-			showBid = bidAmount
-		end
+	local showBid
+	if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
+		showBid = requiredBid
+	else
+		showBid = bidAmount
 	end
 
-	if ( requiredBid >= MAXIMUM_BID_PRICE ) then
-		-- Lie about our buyout price
-		buyoutPrice = requiredBid
-	end
-
-	if (selected == id) then
+	if (selected) then
 		if (buyoutPrice > 0 and buyoutPrice >= minBid) then
 			local canBuyout = 1
 			if (GetMoney() < buyoutPrice) then
@@ -383,12 +587,15 @@ function private.SetAuction(button, id)
 		perUnit = count
 	end
 
+	if itemLevel == 0 then itemLevel = "" end
+	if itemMinLevel == 0 then itemMinLevel = "" end
+
 	button.Count:SetText(count)
 	button.Icon:SetTexture(texture)
 	button.Name:SetText(link)
 	button.rLevel:SetText(itemMinLevel)
 	button.iLevel:SetText(itemLevel)
-	button.tLeft:SetText(timeLeft)
+	button.tLeft:SetText(timeLeftText)
 	button.Owner:SetText(owner)
 	button.Bid:SetMoney(showBid/perUnit, requiredBid ~= minBid, highBidder)
 	button.Buy:SetMoney(buyoutPrice/perUnit)
@@ -402,18 +609,14 @@ function private.MyAuctionFrameUpdate()
 	local index, button
 	BrowseBidButton:Disable()
 	BrowseBuyoutButton:Disable()
-	-- Update sort arrows
-	SortButton_UpdateArrow(BrowseQualitySort, "list", "quality")
-	SortButton_UpdateArrow(BrowseLevelSort, "list", "level")
-	SortButton_UpdateArrow(BrowseDurationSort, "list", "duration")
-	SortButton_UpdateArrow(BrowseHighBidderSort, "list", "seller")
-	SortButton_UpdateArrow(BrowseCurrentBidSort, "list", "buyoutthenbid")
 
 	if ( numBatchAuctions == 0 ) then
 		BrowseNoResultsText:Show()
 	else
 		BrowseNoResultsText:Hide()
 	end
+
+	private.RetrievePage()
 
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)
@@ -452,9 +655,6 @@ function private.MyAuctionFrameUpdate()
 			BrowsePrevPageButton.isEnabled = nil
 			BrowseNextPageButton.isEnabled = nil
 		end
-		
-		-- Artifically inflate the number of results so the scrollbar scrolls one extra row
-		numBatchAuctions = numBatchAuctions + NUM_BROWSE_TO_DISPLAY
 	else
 		for pos, candy in ipairs(private.candy) do candy:Hide() end
 		BrowsePrevPageButton:Hide()
@@ -464,6 +664,7 @@ function private.MyAuctionFrameUpdate()
 	
 	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)))
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
+	BrowseScrollFrame:Show()
 	AucAdvanced.API.ListUpdate()
 end
 
