@@ -136,7 +136,7 @@ function private.OnEvent(...)
 	elseif (event == "AUCTION_HOUSE_SHOW") then
 		-- Do Nothing for now
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
-		AucAdvanced.Scan.Cancel()
+		AucAdvanced.Scan.Interrupt()
 	elseif event == "UNIT_INVENTORY_CHANGED"
 	or event == "ITEM_LOCK_CHANGED"
 	or event == "CURSOR_UPDATE"

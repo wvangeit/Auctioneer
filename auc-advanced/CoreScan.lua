@@ -850,6 +850,14 @@ private.updater = CreateFrame("Frame", "", UIParent)
 private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
+	if (private.curQuery) then 
+		print("Cancelling current scan")
+		private.Commit(true)
+	end
+	private.ResetAll()
+end
+
+function lib.Interrupt()
 	if private.curQuery and not AuctionFrame:IsVisible() then
 		private.unexpectedClose = true
 		lib.PushScan()
@@ -858,7 +866,22 @@ end
 
 function lib.Abort()
 	if (private.curQuery) then
-		private.curQuery = nil
-		private.curScan = nil
+		print("Aborting current scan")
 	end
+	private.ResetAll()
+end
+
+
+
+function private.ResetAll()
+	private.scanStartTime = nil
+	private.curQuerySig = nil
+	private.curQuery = nil
+	private.curScan = nil
+	private.curPage = 0
+	private.scanStack = {}
+	private.isPaused = nil
+	private.sentQuery = nil
+	private.isScanning = false
+	private.unexpectedClose = false
 end

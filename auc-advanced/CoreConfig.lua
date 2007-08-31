@@ -42,6 +42,9 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("Auctioneer Advanced Help")
 		private.Print("  {{/auc help}} - Show this help")
 		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
+		private.Print("  {{/auc pause|resume}} - Pause/resume scanning of the auctionhouse")
+		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
+		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
@@ -51,6 +54,15 @@ function private.CommandHandler(command, subcommand, ...)
 		end
 	elseif command == "begin" or command == "scan" then
 		lib.ScanCommand(subcommand, ...)
+	elseif command == "end" or command == "stop" then
+		AucAdvanced.Scan.SetPaused(false)
+		AucAdvanced.Scan.Cancel()
+	elseif command == "pause" then
+		AucAdvanced.Scan.SetPaused(true)
+	elseif command == "resume" or command == "unpause" then
+		AucAdvanced.Scan.SetPaused(false)
+	elseif command == "abort" then
+		AucAdvanced.Scan.Abort()
 	else
 		if command and subcommand then
 			subcommand = subcommand:lower()
