@@ -178,10 +178,15 @@ function private.FindMatchesInBags(...)
 
 	for bag=0,4 do
 		local bagName = GetBagName(bag)
-		
-		local _,_,_,_,_,_, bagType = GetItemInfo(bagName)
-		local isMultibag = (bagType == private.BagTypes[1])
-		if bag == 0 then isMultibag = true  end
+		local bagType, isMultibag, _
+
+		if bag == 0 then
+			isMultibag = true
+			bagType = "Bag"
+		else
+			_,_,_,_,_,_, bagType = GetItemInfo(bagName)
+			isMultibag = (bagType == private.BagTypes[1])
+		end
 
 		if not (isMultibag or private.BagInfo[bagType]) then
 			private.BagInfo[bagType] = {}
