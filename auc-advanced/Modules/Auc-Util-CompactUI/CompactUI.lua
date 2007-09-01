@@ -39,7 +39,7 @@ local private = {}
 local print = AucAdvanced.Print
 
 local data
-
+private.cache = {}
 
 --[[
 The following functions are part of the module's exposed methods:
@@ -67,6 +67,8 @@ function lib.Processor(callbackType, ...)
 		if (private.Active) then
 			private.MyAuctionFrameUpdate()
 		end
+	elseif (callbackType == "scanstats") then
+		private.cache = {}
 	end
 end
 
@@ -487,8 +489,12 @@ function private.RetrievePage()
 			end
 
 			local priceLevel, perItem, r,g,b
-			if AucAdvanced.Modules.Util.PriceLevel then
+			local cacheSig = strjoin(":", link, count, requiredBid, buyoutPrice)
+			if private.cache[cacheSig] then
+				priceLevel, perItem, r,g,b = unpack(private.cache[cacheSig])
+			elseif AucAdvanced.Modules.Util.PriceLevel then
 				priceLevel, perItem, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
+				private.cache[cacheSig] = { priceLevel, perItem, r,g,b }
 			end
 
 			item[3] = count
