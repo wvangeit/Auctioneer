@@ -517,6 +517,16 @@ function private.CreateFrames()
 			frame.salebox.warn:SetText("")
 		end
 
+		frame.salebox.note:SetText("")
+		if GetSellValue then
+			local sellValue = GetSellValue(frame.salebox.link)
+			if curBuy > 0 and curBuy < sellValue then
+				frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
+			elseif curBid < sellValue then
+				frame.salebox.note:SetText("Note: Min Bid < Vendor")
+			end
+		end
+
 		frame.salebox.config = false
 	end
 
@@ -861,10 +871,20 @@ function private.CreateFrames()
 	frame.salebox.warn = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5,7)
 	frame.salebox.warn:SetPoint("RIGHT", frame.salebox, "RIGHT", -10,0)
+	frame.salebox.warn:SetHeight(12)
 	frame.salebox.warn:SetTextColor(1, 0.3, 0.06)
 	frame.salebox.warn:SetText("")
 	frame.salebox.warn:SetJustifyH("RIGHT")
 	frame.salebox.warn:SetJustifyV("BOTTOM")
+
+	frame.salebox.note = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.note:SetPoint("TOPLEFT", frame.salebox.warn, "BOTTOMLEFT", 0,0)
+	frame.salebox.note:SetPoint("RIGHT", frame.salebox, "RIGHT", -10,0)
+	frame.salebox.note:SetHeight(12)
+	frame.salebox.note:SetTextColor(1, 0.8, 0.1)
+	frame.salebox.note:SetText("")
+	frame.salebox.note:SetJustifyH("RIGHT")
+	frame.salebox.note:SetJustifyV("BOTTOM")
 
 	frame.salebox.stack = CreateFrame("Slider", "AppraiserSaleboxStack", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.stack:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -5)
