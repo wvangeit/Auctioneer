@@ -532,7 +532,9 @@ BtmScan.isDEAble = function(iLevel, iQual, eLevel)
 		if not eLevel then
 			if Enchantrix and Enchantrix.Util and Enchantrix.Util.GetUserEnchantingSkill then
 				eLevel = Enchantrix.Util.GetUserEnchantingSkill()
-				data.enchLevel = eLevel
+				if data then
+					data.enchLevel = eLevel
+				end
 			end
 		end
 		if not eLevel then eLevel = 300 end
@@ -560,7 +562,7 @@ BtmScan.isDEAble = function(iLevel, iQual, eLevel)
 		end
 	end
 
-	if (eLevel) then
+	if eLevel and eLevel > 0 then
 		if eLevel >= required then
 			return true, required
 		end
