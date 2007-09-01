@@ -427,9 +427,9 @@ function private.BrowseSort(a, b)
 		else return (a[col] > b[col])
 		end
 	end
+	if a[5] ~= b[5] then return a[5] < b[5] end
+	if a[6] ~= b[6] then return a[6] < b[6] end
 	if a[3] ~= b[3] then return a[3] < b[3] end
-	if a[4] ~= b[4] then return a[4] < b[4] end
-	if a[2] ~= b[2] then return a[2] < b[2] end
 end
 
 private.pageContents = {}
