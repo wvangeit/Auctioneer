@@ -438,7 +438,7 @@ function lib.GetDepositAmount(sig, count)
 		return deposit, rate, nil
 	end
 
-	if not sellBasis then
+	if not sellBasis and GetSellValue then
 		-- Check for a GetSellValue valuation
 		local itemId = strsplit(":", sig)
 		local sell = GetSellValue(itemId)
