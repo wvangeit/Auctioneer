@@ -520,10 +520,12 @@ function private.CreateFrames()
 		frame.salebox.note:SetText("")
 		if GetSellValue then
 			local sellValue = GetSellValue(frame.salebox.link)
-			if curBuy > 0 and curBuy < sellValue then
-				frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
-			elseif curBid < sellValue then
-				frame.salebox.note:SetText("Note: Min Bid < Vendor")
+			if (sellValue and sellValue > 0) then
+				if curBuy > 0 and curBuy < sellValue then
+					frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
+				elseif curBid < sellValue then
+					frame.salebox.note:SetText("Note: Min Bid < Vendor")
+				end
 			end
 		end
 
