@@ -57,7 +57,7 @@ function lib:valuate(item, tooltip)
 	local market, seen
 	local useFour = get(lcName..".auct.usefour")
 	local useHSP = get(lcName..".auct.usehsp")
-	if Auctioneer and Auctioneer.Statistic.GetUsableMedian then
+	if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
 		if (AucAdvanced and useFour) or not AucAdvanced then
 			if (useHSP) then
 				market, seen = Auctioneer.Statistic.GetHSP(auctKey)
@@ -186,7 +186,7 @@ function lib:setup(gui)
 	gui.AddControl(id, "Selectbox",        0, 2, qualityTable, lcName..".quality.min", "Minimum item quality")
 	gui.AddControl(id, "Checkbox",         0, 1, lcName..".seen.check", "Enable checking \"seen\" count:")
 	gui.AddControl(id, "WideSlider",       0, 2, lcName..".seen.mincount", 1, 100, 1, "Minimum seen count: %s")
-	if Auctioneer and Auctioneer.Statistic.GetUsableMedian then
+	if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
 		if AucAdvanced then
 			gui.AddControl(id, "Checkbox",         0, 1, lcName..".auct.usefour", "Prefer Auctioneer 4 prices when avaiable")
 		else
