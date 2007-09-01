@@ -38,6 +38,7 @@ for $uri (keys %uris) {
 sub remove {
 	my ($arg) = @_;
 	if (-d $arg) {
+		remove("$arg/.svn");
 		for $entry (<$arg/*>) {
 			if (-d $entry) {
 				remove($entry);
