@@ -41,6 +41,9 @@ local NUM_ITEMS = 12
 function private.CreateFrames()
 	if frame then return end
 
+	local nSelectBox = LibStub:GetLibrary("nSelectBox")
+	local nScrollSheet = LibStub:GetLibrary("nScrollSheet")
+
 	frame = CreateFrame("Frame", nil, AuctionFrame)
 	private.frame = frame
 
@@ -218,7 +221,7 @@ function private.CreateFrames()
 		frame.salebox.warn:SetText("")
 		if curModel == "default" then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-			frame.salebox.model:SetValue("Default ("..curModel..")")
+			frame.salebox.model:SetText("Default ("..curModel..")")
 		end
 		
 		local newBuy, newBid
@@ -523,7 +526,7 @@ function private.CreateFrames()
 			if (sellValue and sellValue > 0) then
 				if curBuy > 0 and curBuy < sellValue then
 					frame.salebox.note:SetText("|cffff8010".."Note: Buyout < Vendor")
-				elseif curBid < sellValue then
+				elseif curBid > 0 and curBid < sellValue then
 					frame.salebox.note:SetText("Note: Min Bid < Vendor")
 				end
 			end
@@ -942,7 +945,7 @@ function private.CreateFrames()
 	frame.salebox.duration.label:SetJustifyH("LEFT")
 	frame.salebox.duration.label:SetJustifyV("CENTER")
 
-	frame.salebox.model = SelectBox.Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, private.GetExtraPriceModels, "default")
+	frame.salebox.model = nSelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, private.GetExtraPriceModels, "default")
 	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0,-16)
 	frame.salebox.model.element = "model"
 	frame.salebox.model:Hide()
@@ -1109,7 +1112,7 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 	
-	frame.imageview.sheet = ScrollSheet.Create(frame.imageview, {
+	frame.imageview.sheet = nScrollSheet:Create(frame.imageview, {
 		{ "Item", "TEXT", 120 },
 		{ "Seller", "TEXT", 75 },
 		{ "Left", "INT", 40 },
