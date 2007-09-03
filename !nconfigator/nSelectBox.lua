@@ -160,11 +160,16 @@ end
 
 
 function buttonKit:Open()
-	local box = self:GetParent()
+	local box = self
+	if not box.items then box = self:GetParent() end
+	if not box.items then box = this:GetParent() end
+	if not box.items then error("Unable to open menu") end
+
 	PlaySound("igMainMenuOptionCheckBoxOn")
-	lib.menu:SetWidth(box:GetWidth())
 	lib.menu:ClearAllPoints()
 	lib.menu:SetPoint("TOPLEFT", box, "TOPLEFT", 0, 0)
+	lib.menu:SetWidth(box:GetWidth())
+
 	lib.menu.currentBox = box
 	lib.menu.cp = nil
 	lib.menu.ts = nil
@@ -247,7 +252,7 @@ function lib:DoHide()
 end
 function lib:DoFade()
 	UIFrameFadeOut(lib.menu, 0.25, 1, 0)
-	menu.fadeInfo.finishedFunc = lib.DoHide
+	lib.menu.fadeInfo.finishedFunc = lib.DoHide
 end
 
 local scrollTime = 0.2
@@ -287,9 +292,9 @@ end
 function lib:OnClick()
 	local pos = self.index
 	if (type(pos) == 'string') then return end
-	menu.currentBox.value = keys[pos]			-- the value for setter callback
-	menu.currentBox:SetValue(values[pos])		-- the string shown in the UI
-	menu.currentBox:onsel(pos, keys[pos], values[pos])
+	lib.menu.currentBox.value = keys[pos]			-- the value for setter callback
+	lib.menu.currentBox:SetText(values[pos])		-- the string shown in the UI
+	lib.menu.currentBox:onsel(pos, keys[pos], values[pos])
 	lib:DoHide()
 end
 
@@ -306,8 +311,8 @@ if not lib.menu then
 	lib.menu:SetScript("OnUpdate", lib.OnUpdate)
 	
 	lib.menu.back = CreateFrame("Frame", "", lib.menu)
-	lib.menu.back:SetPoint("TOPLEFT", lib.Menu, "TOPLEFT", 15, -20)
-	lib.menu.back:SetPoint("BOTTOMRIGHT", lib.Menu, "BOTTOMRIGHT", -15, 10)
+	lib.menu.back:SetPoint("TOPLEFT", lib.menu, "TOPLEFT", 15, -20)
+	lib.menu.back:SetPoint("BOTTOMRIGHT", lib.menu, "BOTTOMRIGHT", -15, 10)
 	lib.menu.back:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
