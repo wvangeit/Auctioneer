@@ -317,7 +317,7 @@ function lib.MakeGuiConfig()
 	if gui then return end
 
 	local id, last, cont
-	local nConfigator = nStub:Get("nConfigator")
+	local nConfigator = LibStub:GetLibrary("nConfigator")
 	gui = nConfigator:Create(setter, getter)
 	lib.Gui = gui
 
@@ -350,8 +350,8 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if nStub then
-	local nSideBar = nStub:Get("nSideBar")
+if LibStub then
+	local nSideBar = LibStub:GetLibrary("nSideBar")
 	if nSideBar then
 		sideIcon = nSideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")

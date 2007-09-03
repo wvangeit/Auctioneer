@@ -367,8 +367,8 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if nStub then
-	local nSideBar = nStub:Get("nSideBar")
+if LibStub then
+	local nSideBar = LibStub:GetLibrary("nSideBar")
 	if nSideBar then
 		sideIcon = nSideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
