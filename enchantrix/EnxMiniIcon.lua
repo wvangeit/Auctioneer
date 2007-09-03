@@ -147,44 +147,23 @@ nSIdeBar related bits
 
 ]]
 
-Enchantrix.SIdeIcon = {};
-local sideLib = Enchantrix.SIdeIcon;
-
--- Get the DongleStub Library for nSideBar
-local function GetSideBarLib()
-	if (DongleStub and DongleStub.versions["nSideBar-0.1"]) then
-		local nSideBar = DongleStub("nSideBar-0.1")
-		return nSideBar;
-	end
-end
-
--- Really, this is AddIcon, but the nSideBar library has no show/hide
-function sideLib.ShowSideIcon()
-Enchantrix.Util.DebugPrintQuick("Showing Side Icon");
-	local nSideBar = GetSideBarLib()
+local sideIcon
+if nStub then
+	local nSideBar = nStub:Get("nSideBar")
 	if nSideBar then
-		sideLib.Button = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
-		sideLib.Button:RegisterForClicks("LeftButtonUp","RightButtonUp")
-		sideLib.Button:SetScript("OnClick", click)
-Enchantrix.Util.DebugPrintQuick("Showing Side Icon, done");
+		sideIcon = nSideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
+		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+		sideIcon:SetScript("OnClick", click)
 	end
 end
 
--- Really, this is RemoveIcon, but the nSideBar library has no show/hide
-function sideLib.HideSideIcon()
-Enchantrix.Util.DebugPrintQuick("Hiding Side Icon");
-	local nSideBar = GetSideBarLib()
-	if nSideBar and nSideBar.RemoveButton then
-		nSideBar.RemoveButton("Enchantrix")
-		sideLib.Button = nil;
-Enchantrix.Util.DebugPrintQuick("Hiding Side Icon, done");
-	end
-end
-
-function sideLib.Update()
+function sideIcon.Update()
 	if (settings.GetSetting("sideIcon.enable")) then
-		sideLib.ShowSideIcon();
+		sideIcon:Enable();
 	else
-		sideLib.HideSideIcon();
+		sideIcon:Disable();
 	end
 end
+
+Enchantrix.SideIcon = sideIcon
+

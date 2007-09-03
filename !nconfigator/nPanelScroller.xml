@@ -1,0 +1,170 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/">
+	<Script file="nPanelScroller.lua"/>
+	<Texture name="nPanelScrollerScrollBarButton" virtual="true">
+		<TexCoords left="0.25" right="0.75" top="0.25" bottom="0.75"/>
+	</Texture>
+	<Button name="nPanelScrollerScrollUpButtonTemplate_v1" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Up"/>
+		<PushedTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Down"/>
+		<DisabledTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Disabled"/>
+		<HighlightTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollUpButton-Highlight" alphaMode="ADD"/>
+	</Button>
+	<Button name="nPanelScrollerScrollDownButtonTemplate_v1" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Up"/>
+		<PushedTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Down"/>
+		<DisabledTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Disabled"/>
+		<HighlightTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-ScrollDownButton-Highlight" alphaMode="ADD"/>
+	</Button>
+	<Button name="nPanelScrollerScrollLeftButtonTemplate_v1" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-LeftArrow-Button-Up"/>
+		<PushedTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-LeftArrow-Button-Down"/>
+		<HighlightTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-LeftArrow-Button-Highlight" alphaMode="ADD"/>
+	</Button>
+	<Button name="nPanelScrollerScrollRightButtonTemplate_v1" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<NormalTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-RightArrow-Button-Up"/>
+		<PushedTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-RightArrow-Button-Down"/>
+		<HighlightTexture inherits="nPanelScrollerScrollBarButton" file="Interface\Glues\Common\Glue-RightArrow-Button-Highlight" alphaMode="ADD"/>
+	</Button>
+	<Slider name="nPanelScrollerHorizontalScrollBarTemplate_v1" orientation="HORIZONTAL" virtual="true">
+		<Size>
+			<AbsDimension x="0" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentScrollLeftButton" inherits="nPanelScrollerScrollLeftButtonTemplate_v1">
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():GetParent():ScrollByPercent("HORIZONTAL", -0.25)
+						PlaySound("UChatScrollButton");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentScrollRightButton" inherits="nPanelScrollerScrollRightButtonTemplate_v1">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():GetParent():ScrollByPercent("HORIZONTAL", 0.25)
+						PlaySound("UChatScrollButton");
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this.incrButton = getglobal(this:GetName().."ScrollRightButton")
+				this.decrButton = getglobal(this:GetName().."ScrollLeftButton")
+			</OnLoad>
+			<OnValueChanged>
+				this:GetParent():ScrollToCoords(arg1, nil);
+			</OnValueChanged>
+		</Scripts>
+		<ThumbTexture name="$parentThumbTexture" inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+		</ThumbTexture>
+	</Slider>
+	<Slider name="nPanelScrollerVerticalScrollBarTemplate_v1" orientation="VERTICAL" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="0"/>
+		</Size>
+		<Frames>
+			<Button name="$parentScrollUpButton" inherits="nPanelScrollerScrollUpButtonTemplate_v1">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="TOP"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():GetParent():ScrollByPercent("VERTICAL", -0.25)
+						PlaySound("UChatScrollButton");
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentScrollDownButton" inherits="nPanelScrollerScrollDownButtonTemplate_v1">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						this:GetParent():GetParent():ScrollByPercent("VERTICAL", 0.25)
+						PlaySound("UChatScrollButton");
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				this.incrButton = getglobal(this:GetName().."ScrollUpButton")
+				this.decrButton = getglobal(this:GetName().."ScrollDownButton")
+			</OnLoad>
+			<OnValueChanged>
+				this:GetParent():ScrollToCoords(nil, arg1);
+			</OnValueChanged>
+		</Scripts>
+		<ThumbTexture name="$parentThumbTexture" inherits="nPanelScrollerScrollBarButton" file="Interface\Buttons\UI-ScrollBar-Knob">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+		</ThumbTexture>
+	</Slider>
+	<ScrollFrame name="nPanelScrollerTemplate_v1" virtual="true">
+		<Frames>
+			<Slider name="$parentHorizontalScrollBar" inherits="nPanelScrollerHorizontalScrollBarTemplate_v1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-1"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="-16" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+			<Slider name="$parentVerticalScrollBar" inherits="nPanelScrollerVerticalScrollBarTemplate_v1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="1" y="-16"/>
+						</Offset>
+					</Anchor>
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="1" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnScrollRangeChanged>
+				this:Update()
+			</OnScrollRangeChanged>
+			<OnVerticalScroll>
+				this:Update()
+			</OnVerticalScroll>
+			<OnMouseWheel>
+				this:MouseScroll(arg1);
+			</OnMouseWheel>
+		</Scripts>
+	</ScrollFrame>
+</Ui>
+

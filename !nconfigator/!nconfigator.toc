@@ -1,0 +1,9 @@
+## Title: Configator
+## Notes: Easily construct a GUI configuration editor.
+##
+## Interface: 21000
+## LoadOnDemand: 0
+##
+## Revision: $Id$
+## URL: http://norganna.org
+Load.xml

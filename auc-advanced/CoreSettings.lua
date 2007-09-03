@@ -163,7 +163,7 @@ local function setter(setting, value)
 			
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
-			gui.Resave()
+			gui:Resave()
 
 			-- Add the new profile to the profiles list
 			local profiles = AucAdvancedConfig["profiles"]
@@ -232,7 +232,7 @@ local function setter(setting, value)
 		end
 
 		-- Refresh all values to reflect current data
-		gui.Refresh()
+		gui:Refresh()
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
@@ -252,7 +252,7 @@ end
 function lib.SetSetting(...)
 	setter(...)
 	if (gui) then
-		gui.Refresh()
+		gui:Refresh()
 	end
 end
 	
@@ -313,32 +313,32 @@ function lib.Toggle()
 	end
 end
 
-
 function lib.MakeGuiConfig()
 	if gui then return end
 
 	local id, last, cont
-	gui = Configator.NewConfigator(setter, getter)
+	local nConfigator = nStub:Get("nConfigator")
+	gui = nConfigator:Create(setter, getter)
 	lib.Gui = gui
 
-  	gui.AddCat("Core Options")
+  	gui:AddCat("Core Options")
   
-	id = gui.AddTab("Profiles")
-	gui.AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
-	gui.AddControl(id, "Subhead",    0,    "Activate a current profile")
-	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
-	gui.AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Subhead",    0,    "Create or replace a profile")
-	gui.AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
-	gui.AddControl(id, "Button",     0, 1, "profile.save", "Save")
+	id = gui:AddTab("Profiles")
+	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
+	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui:AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
+	gui:AddControl(id, "Subhead",    0,    "Create or replace a profile")
+	gui:AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
+	gui:AddControl(id, "Button",     0, 1, "profile.save", "Save")
 	
-	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",     0,    "Main AucAdvanced options")
-	gui.AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
-	gui.AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
-	gui.AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
+	id = gui:AddTab("General")
+	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
+	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
+	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
 
-  	gui.AddCat("Modules")
+  	gui:AddCat("Modules")
 
 	-- Alert all modules that the config screen is being built, so that they
 	-- may place their own configuration should they desire it.
@@ -350,12 +350,11 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if (DongleStub and DongleStub.versions["nSideBar-0.2"]) then
-	local nSideBar = DongleStub("nSideBar-0.2")
+if nStub then
+	local nSideBar = nStub:Get("nSideBar")
 	if nSideBar then
 		sideIcon = nSideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", lib.Toggle)
 	end
 end
-

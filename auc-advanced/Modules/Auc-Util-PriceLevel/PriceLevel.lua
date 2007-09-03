@@ -125,32 +125,32 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui.AddTab(libName)
-	gui.AddControl(id, "Header",     0,    libName.." options")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show price level and unit price in the tooltips?")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House?")
-	gui.AddControl(id, "Slider",     0, 2, "util.pricelevel.opacity", 1, 100, 1, "Opacity level: %d%%")
-	gui.AddControl(id, "Checkbox",   0, 2, "util.pricelevel.gradient", "Use a gradient:")
-	gui.AddControl(id, "Selectbox",  0, 3, {
+	id = gui:AddTab(libName)
+	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show price level and unit price in the tooltips?")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House?")
+	gui:AddControl(id, "Slider",     0, 2, "util.pricelevel.opacity", 1, 100, 1, "Opacity level: %d%%")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.pricelevel.gradient", "Use a gradient:")
+	gui:AddControl(id, "Selectbox",  0, 3, {
 		{"LEFT", "Left"},
 		{"RIGHT", "Right"},
 		{"TOP", "Top"},
 		{"BOTTOM", "Bottom"},
 	}, "util.pricelevel.direction", "Pick the gradient direction")
-	gui.AddControl(id, "Subhead",    0,    "Price valuation method:")
-	gui.AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
-	gui.AddControl(id, "Subhead",    0,    "Price level basis:")
-	gui.AddControl(id, "Selectbox",  0, 1, {
+	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
+	gui:AddControl(id, "Subhead",    0,    "Price level basis:")
+	gui:AddControl(id, "Selectbox",  0, 1, {
 		{"cur", "Next bid price"},
 		{"buy", "Buyout only"},
 		{"try", "Buyout or bid"},
 	}, "util.pricelevel.basis", "Which price to use for the price level")
-	gui.AddControl(id, "Subhead",    0,    "Pricing points:")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "Red price level > %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "Orange price level > %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "Yellow price level > %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.green", 0, 500, 5, "Green price level > %d%%")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "Blue price level > %d%%")
+	gui:AddControl(id, "Subhead",    0,    "Pricing points:")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "Red price level > %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "Orange price level > %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "Yellow price level > %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.green", 0, 500, 5, "Green price level > %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "Blue price level > %d%%")
 end
 
 function lib.ResetBars()

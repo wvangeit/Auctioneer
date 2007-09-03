@@ -32,3 +32,4 @@ btmMain.lua
 EvalResale.lua
 EvalVendor.lua
 EvalDisenchant.lua
+EvalDisencraft.lua

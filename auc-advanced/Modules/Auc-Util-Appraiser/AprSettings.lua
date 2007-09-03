@@ -212,7 +212,7 @@ function private:SetVisibility()
 		private.itemStack.setting = "util.appraiser.item."..private.selected..".stack"
 		private.itemFixBid.setting = "util.appraiser.item."..private.selected..".fixed.bid"
 		private.itemFixBuy.setting = "util.appraiser.item."..private.selected..".fixed.buy"
-		private.gui.Refresh()
+		private.gui:Refresh()
 
 		private.itemModel:Show()
 		private.itemStack:Show()
@@ -254,35 +254,35 @@ AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", false)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui.AddTab(lib.name)
-	gui.MakeScrollable(id)
+	id = gui:AddTab(lib.name)
+	gui:MakeScrollable(id)
 	
-	gui.AddControl(id, "Header",     0,    lib.name.." options")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
-	gui.AddControl(id, "Subhead",    0,    "Default pricing model")
-	gui.AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
-	gui.AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", "Default listing duration")
+	gui:AddControl(id, "Header",     0,    lib.name.." options")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
+	gui:AddControl(id, "Subhead",    0,    "Default pricing model")
+	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
+	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", "Default listing duration")
 
-	gui.AddControl(id, "Note",       0, 2, 500, 40,
+	gui:AddControl(id, "Note",       0, 2, 500, 40,
 "This is the pricing model that will be used by default for all items. You may change the individual pricing models on a per item basis when creating the auctions"
 	)
 
-	gui.AddControl(id, "Subhead",    0,    "Starting bid calculation")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
-	gui.AddControl(id, "Note",       0, 2, 500, 60,
+	gui:AddControl(id, "Subhead",    0,    "Starting bid calculation")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
+	gui:AddControl(id, "Note",       0, 2, 500, 60,
 "Except for fixed price items, the starting bid price is calculated based off the original buyout price.\n"..
 "The above options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as Buyout-Markdown-Deposit"
 	)
 
-	gui.AddControl(id, "Subhead",    0,    "Value rounding")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.bid", "Round starting bid")
-	gui.AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.buy", "Round buyout value")
-	gui.AddControl(id, "Selectbox",  0, 1, {{"unit","Stop value"},{"div","Divisions"}}, "util.appraiser.round.method", "Rounding method to use")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, "Rounding at: %0.02f")
-	gui.AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 0, 100, 1, "Step magnitude at: %d")
-	gui.AddControl(id, "Note",       0, 2, 500, 150,
+	gui:AddControl(id, "Subhead",    0,    "Value rounding")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.bid", "Round starting bid")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.round.buy", "Round buyout value")
+	gui:AddControl(id, "Selectbox",  0, 1, {{"unit","Stop value"},{"div","Divisions"}}, "util.appraiser.round.method", "Rounding method to use")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.position", 0, 0.99, 0.01, "Rounding at: %0.02f")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.round.magstep", 0, 100, 1, "Step magnitude at: %d")
+	gui:AddControl(id, "Note",       0, 2, 500, 150,
 "If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
 "The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..
 "You set the rounding position by setting the slider to the value you want the number to be rounded to.\n"..
@@ -290,16 +290,16 @@ function private.SetupConfigGui(gui)
 	)
 
 	--[[
-	gui.AddControl(id, "Subhead",    0,    "Item pricing models")
+	gui:AddControl(id, "Subhead",    0,    "Item pricing models")
 
-	local last = gui.GetLast(id)
+	local last = gui:GetLast(id)
 
 	gui.scalewidth = 0.4
 	local content = gui.tabs[id][3]
 
 	local box = CreateFrame("Frame", nil, content)
 
-	local filter = gui.AddControl(id, "Text", 0.01, 1, "util.appraiser.filter", "");
+	local filter = gui:AddControl(id, "Text", 0.01, 1, "util.appraiser.filter", "");
 	filter.textEl:Hide()
 	filter.textEl:SetHeight(0)
 	filter:SetBackdropColor(0, 0, 0.6, 0.8)
@@ -340,7 +340,7 @@ function private.SetupConfigGui(gui)
 		frame:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 
 		frame.clearance = -3
-		gui.AddControl(id, "Custom", 0, 1, frame)
+		gui:AddControl(id, "Custom", 0, 1, frame)
 	end
 	gui.scalewidth = nil
 
@@ -373,16 +373,16 @@ function private.SetupConfigGui(gui)
 	scroller:SetScript("OnValueChanged", private.SetScroll)
 	private.scroller = scroller
 
-	local continue = gui.GetLast(id)
+	local continue = gui:GetLast(id)
 
-	gui.SetLast(id, last)
+	gui:SetLast(id, last)
 
-	private.itemModel = gui.AddControl(id, "Selectbox", 0.5, 1, private.GetExtraPriceModels, "util.appraiser.item.0.model", "Pricing model to use for this item")
-	private.itemStack = gui.AddControl(id, "Slider", 0.5, 1, "util.appraiser.item.0.stack", 0, 20, 1, "Stack size: %s")
-	private.itemFixBid = gui.AddControl(id, "MoneyFramePinned", 0.5, 1, "util.appraiser.item.0.fixed.bid", 0, 99999999, "Fixed bid:")
-	private.itemFixBuy = gui.AddControl(id, "MoneyFramePinned", 0.5, 1, "util.appraiser.item.0.fixed.buy", 0, 99999999, "Fixed buyout:")
+	private.itemModel = gui:AddControl(id, "Selectbox", 0.5, 1, private.GetExtraPriceModels, "util.appraiser.item.0.model", "Pricing model to use for this item")
+	private.itemStack = gui:AddControl(id, "Slider", 0.5, 1, "util.appraiser.item.0.stack", 0, 20, 1, "Stack size: %s")
+	private.itemFixBid = gui:AddControl(id, "MoneyFramePinned", 0.5, 1, "util.appraiser.item.0.fixed.bid", 0, 99999999, "Fixed bid:")
+	private.itemFixBuy = gui:AddControl(id, "MoneyFramePinned", 0.5, 1, "util.appraiser.item.0.fixed.buy", 0, 99999999, "Fixed buyout:")
 
-	gui.SetLast(id, continue)
+	gui:SetLast(id, continue)
 
 	lib.UpdateList()
 ]]

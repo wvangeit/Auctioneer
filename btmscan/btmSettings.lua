@@ -367,12 +367,11 @@ function lib.MakeGuiConfig()
 end
 
 local sideIcon
-if (DongleStub and DongleStub.versions["nSideBar-0.2"]) then
-	local nSideBar = DongleStub("nSideBar-0.2")
+if nStub then
+	local nSideBar = nStub:Get("nSideBar")
 	if nSideBar then
 		sideIcon = nSideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", lib.Toggle)
 	end
 end
-

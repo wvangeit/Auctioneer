@@ -1,0 +1,310 @@
+--[[
+	nSelectBox
+	Revision: $Id$
+
+	License:
+		This library is free software; you can redistribute it and/or
+		modify it under the terms of the GNU Lesser General Public
+		License as published by the Free Software Foundation; either
+		version 2.1 of the License, or (at your option) any later version.
+
+		This library is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+		Lesser General Public License for more details.
+
+		You should have received a copy of the GNU Lesser General Public
+		License along with this library; if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor,
+		Boston, MA  02110-1301  USA
+
+	Additional:
+		Regardless of any other conditions, you may freely use this code
+		within the World of Warcraft game client.
+--]]
+
+local LIBRARY_VERSION_MAJOR = "nSelectBox"
+local LIBRARY_VERSION_MINOR = 1
+
+do -- A very simple stub library
+        local major, minor = "nStub", 1
+        local lib = _G[major]
+        if not lib or not lib.versions[major] or lib.versions[major] < minor then
+                lib = lib or { libs = {}, versions = {} }
+                _G[major] = lib
+                lib.libs[major], lib.versions[major] = lib, minor
+                function lib:New(major, minor)
+						major = tostring(major)
+                        minor = tonumber(strmatch(minor, "%d+")) or 0
+                        local old = self.versions[major]
+                        if old and old >= minor then return nil end
+                        self.versions[major], self.libs[major] = minor, self.libs[major] or {}
+                        return self.libs[major], old
+                end
+                function lib:Get(major, ignore)
+						major = tostring(major)
+                        if not ignore and not self.libs[major] then
+                                error(("nStub cannot load: %s"):format(major))
+                        end
+                        return self.libs[major], self.versions[major]
+                end
+        end
+end -- nStub
+
+local lib = nStub:New(LIBRARY_VERSION_MAJOR, LIBRARY_VERSION_MINOR)
+if not lib then return end
+
+local kit = {}
+local buttonKit = {}
+
+local keys = {}
+local values = {}
+
+function kit:GetItems()
+	for pos in pairs(keys) do keys[pos] = nil end
+	for pos in pairs(values) do values[pos] = nil end
+
+	local curpos
+	local current = self.value
+
+	local items
+	if type(self.items) == "function" then
+		items = self.items()
+	else
+		items = self.items
+	end
+
+	if (not items) then items = {} end
+
+	local key, value
+	for pos, item in ipairs(items) do
+		if type(item) == "table" then
+			key = item[1]
+			value = item[2]
+		else
+			key = item
+			value = item
+		end
+		if (key) then
+			table.insert(keys, key)
+			table.insert(values, value)
+			if (not curpos and type(key)==type(current) and key==current) then
+				curpos = table.getn(keys)
+			end
+		end
+	end
+
+	return curpos or 1
+end
+
+function kit:setWidth(width)
+	local fname = self:GetName()
+	self:origSetWidth(width + 50)
+	getglobal(fname.."Middle"):SetWidth(width)
+	getglobal(fname.."Text"):SetWidth(width - 25)
+end
+
+function kit:GetHeight()
+	local minx,miny,width,height = self:GetBoundsRect()
+	return height
+end
+
+function kit:GetWidth()
+	local minx,miny,width,height = self:GetBoundsRect()
+	return width
+end
+
+function kit:SetText(text)
+	local fname = self:GetName()
+	getglobal(fname.."Text"):SetText(text)
+end
+
+function kit:UpdateValue()
+	local pos = self:GetItems()
+	self:SetText(values[pos])
+end
+
+function kit:OnClose()
+	if (menu.currentBox == self) then
+		lib:DoHide()
+	end
+end
+
+
+function buttonKit:Open()
+	local box = self:GetParent()
+	PlaySound("igMainMenuOptionCheckBoxOn")
+	lib.menu:SetWidth(box:GetWidth())
+	lib.menu:ClearAllPoints()
+	lib.menu:SetPoint("TOPLEFT", box, "TOPLEFT", 0, 0)
+	lib.menu.currentBox = box
+	lib.menu.cp = nil
+	lib.menu.ts = nil
+	lib.menu.position = box:GetItems()
+	lib:DoUpdate()
+	lib:DoShow()
+end
+
+function lib:Create(name, parent, width, callback, list, current)
+	local frame = CreateFrame("Frame", name, parent, "nSelectBoxTemplate_v1")
+	if (not width) then width = 100 end
+	frame.items = list
+	frame.value = current
+	frame.onsel = callback
+	frame.origSetWidth = frame.SetWidth
+
+	for k,v in pairs(kit) do
+		frame[k] = v
+	end
+	for k,v in pairs(buttonKit) do
+		_G[name.."Button"][k] = v
+	end
+
+	frame:SetWidth(width)
+	return frame
+end
+
+function lib:DoUpdate()
+	local key, value, pos, j
+
+	local ts, cp
+	if (lib.menu.cp) then
+		cp = lib.menu.cp
+		ts = lib.menu.ts
+	else
+		ts = table.getn(keys)
+		cp = lib.menu.position
+		cp = math.max(1, math.min(cp-7, ts-10))
+		lib.menu.cp = cp
+		lib.menu.ts = ts
+	end
+
+	j = 0
+	for i = 1, 10 do
+		pos = cp + i - 1
+		if (i==1 and pos > 1) then
+			j = j + 1
+			lib.menu.buttons[j].index = "prev"
+			lib.menu.buttons[j]:SetText("...")
+			lib.menu.buttons[j]:Show()
+		elseif (i == 10 and pos < ts) then
+			j = j + 1
+			lib.menu.buttons[j].index = "next"
+			lib.menu.buttons[j]:SetText("...")
+			lib.menu.buttons[j]:Show()
+		else
+			key = keys[pos]
+			value = values[pos]
+			if (key) then
+				j = j + 1
+				lib.menu.buttons[j].index = pos
+				lib.menu.buttons[j]:SetText(value)
+				lib.menu.buttons[j]:Show()
+			end
+		end
+	end
+	for i = j+1, 10 do
+		lib.menu.buttons[i]:SetText("")
+		lib.menu.buttons[i]:Hide()
+	end
+end
+
+function lib:DoShow()
+	lib.menu:SetAlpha(0)
+	lib.menu:Show()
+	UIFrameFadeIn(lib.menu, 0.15, 0, 1)
+end
+function lib:DoHide()
+	lib.menu:Hide()
+end
+function lib:DoFade()
+	UIFrameFadeOut(lib.menu, 0.25, 1, 0)
+	menu.fadeInfo.finishedFunc = lib.DoHide
+end
+
+local scrollTime = 0.2
+function lib:MouseIn()
+	if (self.index == 'prev') then
+		lib.menu.scrollTimer = scrollTime
+		lib.menu.scrollDir = -1
+	elseif (self.index == 'next') then
+		lib.menu.scrollTimer = scrollTime
+		lib.menu.scrollDir = 1
+	end
+	lib.menu.outTimer = nil
+end
+function lib:MouseOut()
+	lib.menu.scrollTimer = nil
+	lib.menu.outTimer = 0.5
+end
+function lib:OnUpdate(delay)
+	if (not delay) then return end
+	if (lib.menu.scrollTimer ~= nil) then
+		lib.menu.scrollTimer = lib.menu.scrollTimer - delay
+		if lib.menu.scrollTimer <= 0 then
+			lib.menu.scrollTimer = lib.menu.scrollTimer + scrollTime
+			lib.menu.cp = math.max(1, math.min(lib.menu.ts-9, lib.menu.cp + lib.menu.scrollDir))
+			lib:DoUpdate()
+		end
+	end
+
+	if (not lib.menu.outTimer) then return end
+	lib.menu.outTimer = lib.menu.outTimer - delay
+	if (lib.menu.outTimer <= 0) then
+		lib.menu.outTimer = nil
+		lib:DoFade()
+	end
+end
+
+function lib:OnClick()
+	local pos = self.index
+	if (type(pos) == 'string') then return end
+	menu.currentBox.value = keys[pos]			-- the value for setter callback
+	menu.currentBox:SetValue(values[pos])		-- the string shown in the UI
+	menu.currentBox:onsel(pos, keys[pos], values[pos])
+	lib:DoHide()
+end
+
+if not lib.menu then
+	lib.menu = CreateFrame("Frame", "SelectBoxMenu", UIParent)
+	lib.menu:Hide()
+	lib.menu:SetWidth(120)
+	lib.menu:SetHeight(165)
+	lib.menu:EnableMouse(true)
+	lib.menu:SetFrameStrata("TOOLTIP")
+	lib.menu:SetScript("OnEnter", lib.MouseIn)
+	lib.menu:SetScript("OnLeave", lib.MouseOut)
+	lib.menu:SetScript("OnMouseDown", lib.DoHide)
+	lib.menu:SetScript("OnUpdate", lib.OnUpdate)
+	
+	lib.menu.back = CreateFrame("Frame", "", lib.menu)
+	lib.menu.back:SetPoint("TOPLEFT", lib.Menu, "TOPLEFT", 15, -20)
+	lib.menu.back:SetPoint("BOTTOMRIGHT", lib.Menu, "BOTTOMRIGHT", -15, 10)
+	lib.menu.back:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	lib.menu.back:SetBackdropColor(0,0,0, 0.8)
+	lib.menu.buttons = {}
+	for i=1, 10 do
+		local l = CreateFrame("Button", "SelectBoxMenuButton"..i, lib.menu.back)
+		lib.menu.buttons[i] = l
+		if (i == 1) then
+			l:SetPoint("TOPLEFT", lib.menu.back, "TOPLEFT", 0,-5)
+		else
+			l:SetPoint("TOPLEFT", lib.menu.buttons[i-1], "BOTTOMLEFT", 0,0)
+		end
+		l:SetPoint("RIGHT", lib.menu.back, "RIGHT", 0,0)
+		l:SetTextFontObject(GameFontHighlightSmall)
+		l:SetHighlightFontObject(GameFontNormalSmall)
+		l:SetHeight(12)
+		l:SetText("Line "..i)
+		l:SetScript("OnEnter", lib.MouseIn)
+		l:SetScript("OnLeave", lib.MouseOut)
+		l:SetScript("OnClick", lib.OnClick)
+		l:Show()
+	end
+end
+
