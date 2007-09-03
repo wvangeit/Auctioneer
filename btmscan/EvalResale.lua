@@ -177,29 +177,29 @@ define(lcName..'.adjust.listings', 1)
 define(lcName..'.seen.check', false)
 define(lcName..'.seen.mincount', 10)
 function lib:setup(gui)
-	id = gui.AddTab(libName)
-	gui.AddControl(id, "Subhead",          0,    libName.." Settings")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
-	gui.AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".quality.check", "Enable quality checking:")
-	gui.AddControl(id, "Selectbox",        0, 2, qualityTable, lcName..".quality.min", "Minimum item quality")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".seen.check", "Enable checking \"seen\" count:")
-	gui.AddControl(id, "WideSlider",       0, 2, lcName..".seen.mincount", 1, 100, 1, "Minimum seen count: %s")
+	id = gui:AddTab(libName)
+	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
+	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".quality.check", "Enable quality checking:")
+	gui:AddControl(id, "Selectbox",        0, 2, qualityTable, lcName..".quality.min", "Minimum item quality")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".seen.check", "Enable checking \"seen\" count:")
+	gui:AddControl(id, "WideSlider",       0, 2, lcName..".seen.mincount", 1, 100, 1, "Minimum seen count: %s")
 	if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
 		if AucAdvanced then
-			gui.AddControl(id, "Checkbox",         0, 1, lcName..".auct.usefour", "Prefer Auctioneer 4 prices when avaiable")
+			gui:AddControl(id, "Checkbox",         0, 1, lcName..".auct.usefour", "Prefer Auctioneer 4 prices when avaiable")
 		else
-			gui.AddControl(id, "Subhead", 0, "Auctioneer options")
+			gui:AddControl(id, "Subhead", 0, "Auctioneer options")
 		end
 		if Auctioneer.Statistic.GetHSP then
-			gui.AddControl(id, "Checkbox",         0, 2, lcName..".auct.usehsp", "Prefer HSP instead of Median")
+			gui:AddControl(id, "Checkbox",         0, 2, lcName..".auct.usehsp", "Prefer HSP instead of Median")
 		end
 	end
-	gui.AddControl(id, "Subhead",          0,    "Fees adjustment")
-	gui.AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
-	gui.AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
-	gui.AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average relistings: %0.1fx")
+	gui:AddControl(id, "Subhead",          0,    "Fees adjustment")
+	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
+	gui:AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average relistings: %0.1fx")
 end
 

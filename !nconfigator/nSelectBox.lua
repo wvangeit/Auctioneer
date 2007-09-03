@@ -153,7 +153,7 @@ function kit:UpdateValue()
 end
 
 function kit:OnClose()
-	if (menu.currentBox == self) then
+	if (lib.menu.currentBox == self) then
 		lib:DoHide()
 	end
 end

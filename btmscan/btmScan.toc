@@ -14,7 +14,7 @@
 
 DebugLib\DebugLib.lua
 Babylonian\Load.xml
-Configator\Load.xml
+nConfigator\Load.xml
 nSideBar\Load.xml
 
 btmObject.lua

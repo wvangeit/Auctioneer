@@ -177,7 +177,7 @@ function setter(setting, value)
 			
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
-			gui.Resave()
+			gui:Resave()
 
 			-- Add the new profile to the profiles list
 			local profiles = BtmScanData["profiles"]
@@ -246,7 +246,7 @@ function setter(setting, value)
 		end
 
 		-- Refresh all values to reflect current data
-		gui.Refresh()
+		gui:Refresh()
 
 	elseif (setting == "baserule.edit") then
 		BtmScan.EditData("baseRule", BtmScan.CompileBaseRule)
@@ -261,7 +261,7 @@ end
 function lib.SetSetting(...)
 	setter(...)
 	if (gui) then
-		gui.Refresh()
+		gui:Refresh()
 	end
 end
 	
@@ -327,36 +327,37 @@ function lib.MakeGuiConfig()
 	if gui then return end
 
 	local id, last, cont
-	gui = Configator.NewConfigator(setter, getter)
+	local nConfigator = LibStub:GetLibrary("nConfigator")
+	gui = nConfigator:Create(setter, getter)
 	lib.Gui = gui
 
-  	gui.AddCat("Core Options")
+  	gui:AddCat("Core Options")
   
-	id = gui.AddTab("Profiles")
-	gui.AddControl(id, "Header",           0,    "Setup, configure and edit profiles")
-	gui.AddControl(id, "Subhead",          0,    "Activate a current profile")
-	gui.AddControl(id, "Selectbox",        0, 1, "profile.profiles", "profile", "Switch to given profile")
-	gui.AddControl(id, "Button",           0, 1, "profile.delete", "Delete")
-	gui.AddControl(id, "Subhead",          0,    "Create or replace a profile")
-	gui.AddControl(id, "Text",             0, 1, "profile.name", "New profile name:")
-	gui.AddControl(id, "Button",           0, 1, "profile.save", "Save")
+	id = gui:AddTab("Profiles")
+	gui:AddControl(id, "Header",           0,    "Setup, configure and edit profiles")
+	gui:AddControl(id, "Subhead",          0,    "Activate a current profile")
+	gui:AddControl(id, "Selectbox",        0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui:AddControl(id, "Button",           0, 1, "profile.delete", "Delete")
+	gui:AddControl(id, "Subhead",          0,    "Create or replace a profile")
+	gui:AddControl(id, "Text",             0, 1, "profile.name", "New profile name:")
+	gui:AddControl(id, "Button",           0, 1, "profile.save", "Save")
 	
-	id = gui.AddTab("General")
-	gui.AddControl(id, "Header",           0,    "Main BtmScanner options")
-	gui.AddControl(id, "Subhead",          0,    "Scan Settings")
-	gui.AddControl(id, "Checkbox",         0, 1, "scan.always", "Look for bargains while browsing")
-	gui.AddControl(id, "Checkbox",         0, 1, "scan.reload.enable", "Enable automatic last page reload (bottom scan):")
-	gui.AddControl(id, "WideSlider",       0, 1, "scan.reload.interval", 6, 60, 1, "Reload interval: %s seconds")
-	gui.AddControl(id, "Subhead",          0,    "Display Settings")
-	gui.AddControl(id, "Checkbox",         0, 1, "show.tooltip", "Display evaluations in tooltip")
-	gui.AddControl(id, "Subhead",          0,    "Purchase Settings")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "global.reserve", 1, 99999999, "Reserve Amount")
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "global.maxprice", 1, 99999999, "Maximum Price")
-	gui.AddControl(id, "Subhead",          0,    "Buy/Bid Preferences")
-	gui.AddControl(id, "Checkbox",         0, 1, "never.buy", "Never buyout items")
-	gui.AddControl(id, "Checkbox",         0, 1, "never.bid", "Never bid on items")
+	id = gui:AddTab("General")
+	gui:AddControl(id, "Header",           0,    "Main BtmScanner options")
+	gui:AddControl(id, "Subhead",          0,    "Scan Settings")
+	gui:AddControl(id, "Checkbox",         0, 1, "scan.always", "Look for bargains while browsing")
+	gui:AddControl(id, "Checkbox",         0, 1, "scan.reload.enable", "Enable automatic last page reload (bottom scan):")
+	gui:AddControl(id, "WideSlider",       0, 1, "scan.reload.interval", 6, 60, 1, "Reload interval: %s seconds")
+	gui:AddControl(id, "Subhead",          0,    "Display Settings")
+	gui:AddControl(id, "Checkbox",         0, 1, "show.tooltip", "Display evaluations in tooltip")
+	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.reserve", 1, 99999999, "Reserve Amount")
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.maxprice", 1, 99999999, "Maximum Price")
+	gui:AddControl(id, "Subhead",          0,    "Buy/Bid Preferences")
+	gui:AddControl(id, "Checkbox",         0, 1, "never.buy", "Never buyout items")
+	gui:AddControl(id, "Checkbox",         0, 1, "never.bid", "Never bid on items")
 
-  	gui.AddCat("Evaluators:")
+  	gui:AddCat("Evaluators:")
 
 	for pos, name in ipairs(BtmScan.evaluators) do
 		local evaluator = BtmScan.evaluators[name]

@@ -184,7 +184,7 @@ local function getDefault(setting)
 	
 	-- no idea what this setting is, so log it for debugging purposes
 	if (result == nil) then
-		Enchantrix.Util.DebugPrint("GetDefault", ENX_INFO, "Unknown key", "default requested for unknown key:" .. setting)
+--		Enchantrix.Util.DebugPrint("GetDefault", ENX_INFO, "Unknown key", "default requested for unknown key:" .. setting)
 	end
 	
 	return result
@@ -227,7 +227,7 @@ local function setter(setting, value)
 			
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
-			gui.Resave()
+			gui:Resave()
 
 			-- Add the new profile to the profiles list
 			local profiles = EnchantConfig["profiles"]
@@ -305,7 +305,7 @@ local function setter(setting, value)
 		end
 
 		-- Refresh all values to reflect current data
-		gui.Refresh()
+		gui:Refresh()
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
@@ -326,7 +326,7 @@ end
 function lib.SetSetting(...)
 	setter(...)
 	if (gui) then
-		gui.Refresh()
+		gui:Refresh()
 	end
 end
 	
@@ -407,115 +407,116 @@ function lib.MakeGuiConfig()
 	if gui then return end
 
 	local id, last, cont
-	gui = Configator.NewConfigator(setter, getter)
+	local nConfigator = LibStub:GetLibrary("nConfigator")
+	gui = nConfigator:Create(setter, getter)
 	lib.Gui = gui
 
-  	gui.AddCat("Enchantrix")
+  	gui:AddCat("Enchantrix")
   
 
-	id = gui.AddTab(_ENCH("GuiTabProfiles"))
-	gui.AddControl(id, "Header",     0,    _ENCH("GuiConfigProfiles"))
+	id = gui:AddTab(_ENCH("GuiTabProfiles"))
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiConfigProfiles"))
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiActivateProfile"))
-	gui.AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
-	gui.AddControl(id, "Button",     0, 1, "profile.delete", _ENCH("GuiDeleteProfileButton"))
-	gui.AddControl(id, "Button",     0, 1, "profile.default", _ENCH("GuiResetProfileButton"))
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiActivateProfile"))
+	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "this string isn't shown")
+	gui:AddControl(id, "Button",     0, 1, "profile.delete", _ENCH("GuiDeleteProfileButton"))
+	gui:AddControl(id, "Button",     0, 1, "profile.default", _ENCH("GuiResetProfileButton"))
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiCreateReplaceProfile"))
-	gui.AddControl(id, "Text",       0, 1, "profile.name", _ENCH("GuiNewProfileName"))
-	gui.AddControl(id, "Button",     0, 1, "profile.save", _ENCH("GuiSaveProfileButton"))
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiCreateReplaceProfile"))
+	gui:AddControl(id, "Text",       0, 1, "profile.name", _ENCH("GuiNewProfileName"))
+	gui:AddControl(id, "Button",     0, 1, "profile.save", _ENCH("GuiSaveProfileButton"))
 
-	id = gui.AddTab(_ENCH("GuiTabGeneral"))
-	gui.AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
-	gui.AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
+	id = gui:AddTab(_ENCH("GuiTabGeneral"))
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiGeneralOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
+	gui:AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
 
 
 -- TODO: locale -- what are the allowed values?
 -- TODO: printframe  -- what are the allowed values?  Configurator really needs a restricted value number box (without a slider)
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
-	gui.AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", _ENCH("GuiValueTerse"))
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
+	gui:AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", _ENCH("GuiValueTerse"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+		gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
 		if (AucAdvanced) then
-			gui.AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
 		end
 	end
-	gui.AddControl(id, "Checkbox",   0, 2, "TooltipShowBaselineValue", _ENCH("GuiValueShowBaseline"))
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipShowBaselineValue", _ENCH("GuiValueShowBaseline"))
 
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiMinimapOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "miniicon.enable", _ENCH("GuiMinimapShowButton"))
-	gui.AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, _ENCH("GuiMinimapButtonAngle"))
-	gui.AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
-	gui.AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the sidebar button")
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiMinimapOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "miniicon.enable", _ENCH("GuiMinimapShowButton"))
+	gui:AddControl(id, "Slider",     0, 2, "miniicon.angle", 0, 360, 1, _ENCH("GuiMinimapButtonAngle"))
+	gui:AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
+	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the sidebar button")
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiAutoDeOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiAutoDeOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
 
-	id = gui.AddTab(_ENCH("GuiTabProspecting"))
-	gui.AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", _ENCH("GuiShowProspecting") )
-	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectLevels", _ENCH("GuiProspectingLevels") )
-	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectMats", _ENCH("GuiProspectingMaterials") )
+	id = gui:AddTab(_ENCH("GuiTabProspecting"))
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowProspecting", _ENCH("GuiShowProspecting") )
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipProspectLevels", _ENCH("GuiProspectingLevels") )
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipProspectMats", _ENCH("GuiProspectingMaterials") )
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
-	gui.AddControl(id, "Checkbox",   0, 1, "TooltipProspectValues",  _ENCH("GuiProspectingValues"))
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
+	gui:AddControl(id, "Checkbox",   0, 1, "TooltipProspectValues",  _ENCH("GuiProspectingValues"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
-		gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+		gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
 		if (AucAdvanced) then
-			gui.AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
 		end
 	end
-	gui.AddControl(id, "Checkbox",   0, 2, "TooltipProspectShowBaselineValue", _ENCH("GuiValueShowBaseline"))
+	gui:AddControl(id, "Checkbox",   0, 2, "TooltipProspectShowBaselineValue", _ENCH("GuiValueShowBaseline"))
 	
 	
-	id = gui.AddTab(_ENCH("GuiTabAuctions"))
-	gui.AddControl(id, "Header",     0,    _ENCH("GuiPLBBSettings"))
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1, 99999999, _ENCH("GuiMaxBuyout"))
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 1, nil, _ENCH("GuiDefaultProfitMargin"))
-	gui.AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 1, nil, _ENCH("GuiMinProfitMargin"))
-	gui.AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, _ENCH("GuiDefaultLessHSP"))
-	gui.AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, _ENCH("GuiMinLessHSP"))
-	gui.AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, _ENCH("GuiDefaultBBProfitPercent"))
-	gui.AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, _ENCH("GuiMinBBProfitPercent"))
-	gui.AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", _ENCH("GuiPLBBOnlyBelowDESkill"))
-	gui.AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", _ENCH("GuiBBUnbiddedOnly"))
+	id = gui:AddTab(_ENCH("GuiTabAuctions"))
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiPLBBSettings"))
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "maxBuyoutPrice", 1, 99999999, _ENCH("GuiMaxBuyout"))
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "defaultProfitMargin", 1, nil, _ENCH("GuiDefaultProfitMargin"))
+	gui:AddControl(id, "MoneyFramePinned", 0, 1, "minProfitMargin", 1, nil, _ENCH("GuiMinProfitMargin"))
+	gui:AddControl(id, "Slider",     0, 1, "defaultPercentLessThanHSP", 5, 90, 1, _ENCH("GuiDefaultLessHSP"))
+	gui:AddControl(id, "Slider",     0, 1, "minPercentLessThanHSP", 1, 10, 1, _ENCH("GuiMinLessHSP"))
+	gui:AddControl(id, "Slider",     0, 1, "defaultProfitPricePercent", 5, 90, 1, _ENCH("GuiDefaultBBProfitPercent"))
+	gui:AddControl(id, "Slider",     0, 1, "minProfitPricePercent", 1, 10, 1, _ENCH("GuiMinBBProfitPercent"))
+	gui:AddControl(id, "Checkbox",   0, 1, "RestrictToLevel", _ENCH("GuiPLBBOnlyBelowDESkill"))
+	gui:AddControl(id, "Checkbox",   0, 1, "RestrictUnbidded", _ENCH("GuiBBUnbiddedOnly"))
 	
-	gui.AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
-	gui.AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
+	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiItemValueCalc"))
+	gui:AddControl(id, "Selectbox",  0, 1, "scanvalue.list", "ScanValueType", "this string isn't shown")
 
-	id = gui.AddTab(_ENCH("GuiTabWeights"))
-	gui.MakeScrollable(id)
-	gui.AddControl(id, "Header",     0,    _ENCH("GuiWeightSettings"))
-	gui.AddControl(id, "Note",     0, 1, 600, 60, _ENCH("GuiWeighSettingsNote"))
+	id = gui:AddTab(_ENCH("GuiTabWeights"))
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",     0,    _ENCH("GuiWeightSettings"))
+	gui:AddControl(id, "Note",     0, 1, 600, 60, _ENCH("GuiWeighSettingsNote"))
 	local numReag = #Enchantrix.Constants.DisenchantReagentList
 	local colPos = 0
 	for i=1, numReag do
 		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
 		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
 		if (not reagName) then reagName = "item:"..reagId end
-		gui.AddControl(id, "WideSlider", 0, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
+		gui:AddControl(id, "WideSlider", 0, 1, "weight."..reagId, 0, 250, 5, reagName..": %s%%")
 	end
 
-	id = gui.AddTab(_ENCH("GuiTabFixed"))
-	gui.MakeScrollable(id)
-	gui.AddControl(id, "Header",     0,  _ENCH("GuiFixedSettings"))
-	gui.AddControl(id, "Note",     0, 1, 600, 90, _ENCH("GuiFixedSettingsNote"))
+	id = gui:AddTab(_ENCH("GuiTabFixed"))
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",     0,  _ENCH("GuiFixedSettings"))
+	gui:AddControl(id, "Note",     0, 1, 600, 90, _ENCH("GuiFixedSettingsNote"))
 	local numReag = #Enchantrix.Constants.DisenchantReagentList
 	local colPos = 0
 	for i=1, numReag do
 		local reagId = Enchantrix.Constants.DisenchantReagentList[i]
 		local reagName = Enchantrix.Util.GetReagentInfo(reagId)
 		if (not reagName) then reagName = "item:"..reagId end
-		last = gui.GetLast(id)
-		gui.AddControl(id, "Checkbox", 0, 1, "fixed."..reagId, ("%s:"):format(reagName))
-		gui.SetLast(id, last)
-		gui.AddControl(id, "MoneyFramePinned", 0.6, 1, "fixed."..reagId..".value", 0, 99999999)
+		last = gui:GetLast(id)
+		gui:AddControl(id, "Checkbox", 0, 1, "fixed."..reagId, ("%s:"):format(reagName))
+		gui:SetLast(id, last)
+		gui:AddControl(id, "MoneyFramePinned", 0.6, 1, "fixed."..reagId..".value", 0, 99999999)
 	end
 
 end

@@ -218,11 +218,9 @@ end
 
 function lib.AddButton(id, texture, priority)
 	if not priority then priority = 200 end
-	p("Adding button", id, texture, priority)
 
 	local button
 	if not frame.buttons[id] then
-		p("Creating button")
 		button = CreateFrame("Button", "", frame)
 		button.frame = frame
 		button:SetPoint("TOPLEFT", frame, "TOPLEFT", 0,0)
@@ -240,10 +238,8 @@ function lib.AddButton(id, texture, priority)
 		button.id = id
 		frame.buttons[id] = button
 	else
-		p("Using existing button")
 		button = frame.buttons[id]
 	end
-	p("Seting icon texture")
 	button.icon:SetTexture(texture)
 	button.priority = priority
 
@@ -256,7 +252,6 @@ end
 -- or is add/remove good enough?  It's not something likely to be changed often.
 
 function lib.RemoveButton(id)
-	p("Removing button", id)
 	local button = frame.buttons[id]
 	if button then button:Hide() end
 	frame.buttons[id] = nil
@@ -265,7 +260,6 @@ end
 
 
 function lib.ApplyLayout(useLayout)
-	p("Applying Layout")
 	local configVar = GetCVar("nSideBarPos")
 	if not (lib.lastConfig and configVar == lib.lastConfig) then
 		useLayout = false
