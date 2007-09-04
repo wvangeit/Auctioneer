@@ -139,6 +139,7 @@ function lib:Create(setter, getter, w,h)
 	end
 	gui:Hide()
 	gui:SetFrameStrata("DIALOG")
+	gui:SetToplevel(true)
 	gui:SetMovable(true)
 	gui:SetWidth(w or 800)
 	gui:SetHeight(h or 450)
@@ -388,7 +389,7 @@ function kit:AddControl(id, cType, column, ...)
 			el.hit:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 			el.hit.setting = setting
 			el.hit.stype = "Button";
-			el.hit:SetScript("OnClick", function() self:ChangeSetting(el) end)
+			el.hit:SetScript("OnClick", function() self:ChangeSetting(this) end)
 			el.hit:Show()
 		end
 		control = el
@@ -418,7 +419,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.stype = "EditBox"
 		el:SetAutoFocus(false)
 		self:GetSetting(el)
-		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(el) end)
+		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(this) end)
 		el:SetScript("OnEscapePressed", kit.Unfocus)
 		el:SetScript("OnEnterPressed", kit.Unfocus)
 		self.elements[setting] = el
@@ -442,7 +443,7 @@ function kit:AddControl(id, cType, column, ...)
 		end
 
 		local nSelectBox = LibStub:GetLibrary("nSelectBox")
-		el = nSelectBox:Create(tmpName, content, 140, function() self:ChangeSetting(el) end, list, "Default")
+		el = nSelectBox:Create(tmpName, content, 140, function(...) self:ChangeSetting(...) end, list, "Default")
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last, column+indent - 5, colwidth or 140, 22, 4)
 		el.list = list
@@ -463,7 +464,7 @@ function kit:AddControl(id, cType, column, ...)
 		anchorPoint(content, el, last, 10 + column + indent, colwidth or 80, 22, 4)
 		el.setting = setting
 		el.stype = "Button";
-		el:SetScript("OnClick", function() self:ChangeSetting(el) end)
+		el:SetScript("OnClick", function() self:ChangeSetting(this) end)
 		el:SetText(text)
 		control = el
 		last = el
@@ -480,7 +481,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.setting = setting
 		el.stype = "CheckButton"
 		self:GetSetting(el)
-		el:SetScript("OnClick", function() self:ChangeSetting(el) end)
+		el:SetScript("OnClick", function() self:ChangeSetting(this) end)
 		self.elements[setting] = el
 		control = el
 		-- FontString
@@ -520,7 +521,7 @@ function kit:AddControl(id, cType, column, ...)
 		el:SetValueStep(step)
 		self:GetSetting(el)
 		el:SetHitRectInsets(0,0,0,0)
-		el:SetScript("OnValueChanged", function() self:ChangeSetting(el) end)
+		el:SetScript("OnValueChanged", function() self:ChangeSetting(this) end)
 		self.elements[setting] = el
 		control = el
 		last = textElement
@@ -546,7 +547,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.maxValue = maxVal;
 		el.Numeric = true;
 		self:GetSetting(el)
-		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(el) end)
+		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(this) end)
 		el:SetScript("OnEscapePressed", kit.Unfocus)
 		el:SetScript("OnEnterPressed", kit.Unfocus)
 		self.elements[setting] = el
@@ -571,7 +572,8 @@ function kit:AddControl(id, cType, column, ...)
 		-- MoneyFrame
 		frameName = lib.CreateAnonName();
 		el = CreateFrame("Frame", frameName, content, "MoneyInputFrameTemplate")
-		MoneyInputFrame_SetOnvalueChangedFunc(el, function() self:ChangeSetting(el) end);
+		local cur = el
+		MoneyInputFrame_SetOnvalueChangedFunc(el, function() self:ChangeSetting(cur) end);
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last, 20+column+indent, colwidth or 160, 32, 4)
 		el.frameName = frameName;
@@ -628,6 +630,7 @@ function kit:Resave()
 end
 
 function kit:GetSetting(element)
+	assert(element, "You must pass a valid element")
 	local setting = element.setting
 	local value = self.getter(setting)
 	if (element.stype == "CheckButton") then
@@ -686,7 +689,7 @@ function kit:GetSetting(element)
 end
 
 function kit:ChangeSetting(element, ...)
-	if (not element) then element = this end
+	assert(element and element.stype, "You must pass a valid element")
 	local setting = element.setting
 	local value
 	if (element.stype == "CheckButton") then
@@ -735,8 +738,10 @@ function kit:ChangeSetting(element, ...)
 		if (oldvalue ~= value) then
 			MoneyInputFrame_SetCopper( element, value );
 		end
-	else
+	elseif element.GetValue then
 		value = element:GetValue()
+	else
+		return
 	end
 	self.setter(setting, value)
 end
