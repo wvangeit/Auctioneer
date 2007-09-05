@@ -68,9 +68,9 @@ function lib:valuate(item, tooltip)
 	if (value < item.purchase) then return end
 
 	-- Check to see what the most we can pay for this item is.
-	if (item.canbuy and item.buy < value) then
+	if (item.canbuy and not get(lcName..".never.buy") and item.buy < value) then
 		price = item.buy
-	elseif (item.canbid and item.bid < value) then
+	elseif (item.canbid and not get(lcName..".never.bid") and item.bid < value) then
 		price = item.bid
 	end
 
@@ -93,11 +93,14 @@ end
 define(lcName..'.enable', true)
 define(lcName..'.profit.min', 20)
 define(lcName..'.profit.pct', 0)
+define(lcName..'.never.bid', false)
+define(lcName..'.never.buyout', false)
 function lib:setup(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".never.buy", "Never buyout items")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".never.bid", "Never bid on items")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
 end
-
