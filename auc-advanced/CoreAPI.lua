@@ -81,7 +81,7 @@ function lib.GetMarketValue(itemLink, serverKey)
 	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
 		if (engineLib.GetPriceArray) then
 			local array = engineLib.GetPriceArray(itemLink, serverKey)
-			if (array and array.price) then
+			if (array and array.price and array.price > 0) then
 				total = total + array.price
 				seen = seen + (array.seen or 1)
 				count = count + 1

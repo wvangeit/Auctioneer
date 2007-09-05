@@ -104,6 +104,43 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
+
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
+	if itype == "item" then
+		local sig
+		if enchant ~= 0 then
+			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+		elseif factor ~= 0 then
+			sig = ("%d:%d:%d"):format(id, suffix, factor)
+		elseif suffix ~= 0 then
+			sig = ("%d:%d"):format(id, suffix)
+		else
+			sig = tostring(id)
+		end
+
+		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
+		if curModel == "default" then
+			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+		end
+
+		local value
+		if curModel == "fixed" then
+			value = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.buy")
+			if not value then
+				value = AucAdvanced.Settings.GetSetting("util.appraiser.item."..sig..".fixed.bid")
+			end
+		elseif curModel == "market" then
+			value = AucAdvanced.API.GetMarketValue(hyperlink)
+		else
+			value = AucAdvanced.API.GetAlgorithmValue(curModel, hyperlink)
+		end
+
+		if value then
+			EnhTooltip.AddLine("Appraiser |cffddeeff("..curModel..")|r x|cffddeeff"..quantity.."|r", value * quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		end
+	end
 end
 
 function lib.OnLoad()
