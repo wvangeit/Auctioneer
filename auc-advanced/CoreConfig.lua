@@ -42,7 +42,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("Auctioneer Advanced Help")
 		private.Print("  {{/auc help}} - Show this help")
 		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
-		private.Print("  {{/auc pause|resume}} - Pause/resume scanning of the auctionhouse")
+		private.Print("  {{/auc pause||resume}} - Pause/resume scanning of the auctionhouse")
 		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
 		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
