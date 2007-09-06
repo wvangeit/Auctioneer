@@ -182,11 +182,17 @@ end
 
 local addonName = "Enhanced Tooltip"
 
+local EMBED_R = 2
+local EMBED_G = 3
+local EMBED_B = 4
+
+
 -- Initialize a storage space that all our functions can see
 local private = {
 	showIgnore = false,
 	moneySpacing = 4,
 	embedLines = {},   -- list of all embeded lines in/for the current tooltip
+	recycleBin = {},
 	eventTimer = 0,
 	hideTime = 0,
 	currentGametip = nil,
@@ -201,6 +207,7 @@ local private = {
 
 EnhTooltip = {}
 EnhTooltip.Version = ENHTOOLTIP_VERSION
+EnhTooltip.Private = private
 
 local public = EnhTooltip
 local debugPrint
@@ -327,6 +334,59 @@ function private.GetLine(line)
 	return ret
 end
 
+function private.recycle(...)
+	-- Get the passed parameter/s
+	local n = select("#", ...)
+	local tbl, key, item
+	if n == 1 then
+		item = select(1, ...)
+	else
+		tbl, key = select(1, ...)
+		item = tbl[key]
+	end
+
+	-- We can only clean tables
+	if type(item) ~= 'table' then return end
+
+	-- Clean out any values from this table
+	for k,v in pairs(item) do
+		if type(v) == 'table' then
+			-- Recycle this table too
+			private.recycle(item, k)
+		else
+			item[k] = nil
+		end
+	end
+
+	-- If we are to clean the input value
+	if tbl and key then
+		-- Place the husk of a table in the recycle bin
+		table.insert(private.recycleBin, item)
+
+		-- Clean out the original table entry too
+		tbl[key] = nil
+	end
+end
+
+function private.reuse(...)
+	-- Get a recycled table or create a new one.
+	local item
+	if #private.recycleBin > 0 then
+		item = table.remove(private.recycleBin)
+	end
+	if not item then
+		item = {}
+	end
+	
+	-- And populate it if there's any args
+	local n = select("#", ...)
+	for i = 1, n do
+		local v = select(i, ...)
+		item[i] = v
+	end
+	return item
+end
+
 function public.ClearTooltip()
 	public.HideTooltip()
 
@@ -366,30 +426,35 @@ function public.ClearTooltip()
 
 	-- clear the embedLines table, using ipairs instead of = {} to allow
 	-- reusing old tables, which should be quite common for this table
-	for i in ipairs(private.embedLines) do
-		private.embedLines[i] = nil
-	end
+	private.recycle(private.embedLines)
 end
 
-function public.GetRect(object)
-	local rect = {}
-
+function public.GetBounds(object)
 	local left, bottom, width, height = object:GetRect()
 	left = left or 0
 	bottom = bottom or 0
 	width = width or 0
 	height = height or 0
+	
+	local top = bottom + height
+	local right = left + width
+	local xCenter = left + (width / 2)
+	local yCenter = bottom + (height / 2)
 
-	rect.top = bottom + height
-	rect.left = left
-	rect.bottom = bottom
-	rect.right = left + width
-	rect.width = width
-	rect.height = height
-	rect.xCenter = left + (width / 2)
-	rect.yCenter = bottom + (height / 2)
-
-	return rect
+	return top, left, bottom, right, width, height, xCenter, yCenter
+end
+function public.GetRect(object)
+	local top, left, bottom, right, width, height, xCenter, yCenter = public.GetBounds(object)
+	return {
+		top = top,
+		left = left,
+		bottom = bottom,
+		right = right,
+		width = width,
+		height = height,
+		xCenter = xCenter,
+		yCenter = yCenter,
+	}
 end
 
 function public.ShowTooltip(currentTooltip, skipEmbedRender)
@@ -548,13 +613,13 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		currentTooltip:Show()
 		private.showIgnore = false
 
-		local currentToolTipRect = public.GetRect(currentTooltip)
-		if (currentToolTipRect.bottom - requestedHeight < 60) then
+		local top, left, bottom, right, width, height, xCenter, yCenter = public.GetBounds(currentTooltip)
+		if (bottom - requestedHeight < 60) then
 			currentTooltip:ClearAllPoints()
-			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", currentToolTipRect.left, requestedHeight+60)
+			currentTooltip:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", left, requestedHeight+60)
 		end
 		EnhancedTooltip:ClearAllPoints()
-		if (currentToolTipRect.xCenter < 6*screenWidth/10) then
+		if (xCenter < 6*screenWidth/10) then
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
@@ -562,13 +627,12 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 	else
 		-- The tooltip is anchored to another frame but not to the cursor. So
 		-- we should properly align it.
-
-		local currentTooltipOwnerRect = public.GetRect(currentTooltipOwner)
+		local top, left, bottom, right, width, height, xCenter, yCenter = public.GetBounds(currentTooltipOwner)
 
 		local xAnchor
-		if (currentTooltipOwnerRect.left - requestedWidth < screenWidth * 0.2) then
+		if (left - requestedWidth < screenWidth * 0.2) then
 			xAnchor = "RIGHT"
-		elseif (currentTooltipOwnerRect.right + requestedWidth > screenWidth * 0.8) then
+		elseif (right + requestedWidth > screenWidth * 0.8) then
 			xAnchor = "LEFT"
 		elseif (align == "ANCHOR_LEFT") then
 			xAnchor = "LEFT"
@@ -577,7 +641,7 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		end
 
 		local yAnchor
-		if (currentTooltipOwnerRect.yCenter < screenHeight/2) then
+		if (yCenter < screenHeight/2) then
 			yAnchor = "TOP"
 		else
 			yAnchor = "BOTTOM"
@@ -587,10 +651,10 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough to the left or right so that it doesn't hang off the screen.
 		local xOffset = 0
-		if (xAnchor == "RIGHT" and currentTooltipOwnerRect.right + requestedWidth > screenWidth - 5) then
-			xOffset = -(currentTooltipOwnerRect.right + requestedWidth - screenWidth + 5)
-		elseif (xAnchor == "LEFT" and currentTooltipOwnerRect.left - requestedWidth < 5) then
-			xOffset = -(currentTooltipOwnerRect.left - requestedWidth - 5)
+		if (xAnchor == "RIGHT" and right + requestedWidth > screenWidth - 5) then
+			xOffset = -(right + requestedWidth - screenWidth + 5)
+		elseif (xAnchor == "LEFT" and left - requestedWidth < 5) then
+			xOffset = -(left - requestedWidth - 5)
 		end
 
 		-- Handle the situation where there isn't enough room on the top or bottom of
@@ -598,10 +662,10 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0
 		local totalHeight = requestedHeight + currentTooltip:GetHeight()
-		if (yAnchor == "TOP" and currentTooltipOwnerRect.top + totalHeight > screenHeight - 5) then
-			yOffset = -(currentTooltipOwnerRect.top + totalHeight - screenHeight + 5)
-		elseif (yAnchor == "BOTTOM" and currentTooltipOwnerRect.bottom - totalHeight < 5) then
-			yOffset = -(currentTooltipOwnerRect.bottom - totalHeight - 5)
+		if (yAnchor == "TOP" and top + totalHeight > screenHeight - 5) then
+			yOffset = -(top + totalHeight - screenHeight + 5)
+		elseif (yAnchor == "BOTTOM" and bottom - totalHeight < 5) then
+			yOffset = -(bottom - totalHeight - 5)
 		end
 
 		currentTooltip:ClearAllPoints()
@@ -744,8 +808,8 @@ function public.GetTextGSC(money, exact, dontUseColorCodes)
 end
 
 function private.EmbedRender(currentTooltip, lines)
-	for _, lData in ipairs(lines) do
-		currentTooltip:AddLine(lData.text, lData.r, lData.g, lData.b)
+	for pos, lData in ipairs(lines) do
+		currentTooltip:AddLine(unpack(lData))
 	end
 end
 
@@ -764,7 +828,7 @@ function public.AddLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(private.embedLines, {text = text})
+		table.insert(private.embedLines, private.reuse(text))
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -817,7 +881,7 @@ function public.AddHeaderLine(lineText, moneyAmount, embed, bExact)
 		else
 			text = lineText
 		end
-		table.insert(private.embedLines, curHeader, {text = text})
+		table.insert(private.embedLines, curHeader, private.reuse(text))
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -862,7 +926,7 @@ end
 function public.AddSeparator(embed)
 	if (embed) and (private.currentGametip) then
 		EnhancedTooltip.curEmbed = true
-		table.insert(private.embedLines, {text = " "})
+		table.insert(private.embedLines, private.reuse(" "))
 		return
 	end
 	EnhancedTooltip.hasData = true
@@ -880,9 +944,9 @@ end
 function public.LineColor(r, g, b)
 	if (EnhancedTooltip.curEmbed) and (private.currentGametip) then
 		local n = #private.embedLines
-		private.embedLines[n].r = r
-		private.embedLines[n].g = g
-		private.embedLines[n].b = b
+		private.embedLines[n][EMBED_R] = r
+		private.embedLines[n][EMBED_G] = g
+		private.embedLines[n][EMBED_B] = b
 		return
 	end
 	local curLine = EnhancedTooltip.lineCount
@@ -908,9 +972,9 @@ end
 function public.HeaderColor(r, g, b)
 	local curLine = EnhancedTooltip.headerCount
 	if (EnhancedTooltip.curHeaderEmbed) and (private.currentGametip) then
-		private.embedLines[curLine].r = r
-		private.embedLines[curLine].g = g
-		private.embedLines[curLine].b = b
+		private.embedLines[curLine][EMBED_R] = r
+		private.embedLines[curLine][EMBED_G] = g
+		private.embedLines[curLine][EMBED_B] = b
 		return
 	end
 	if (curLine == 0) then return end
@@ -983,7 +1047,7 @@ function private.DoHyperlink(reference, link, button)
 			local callRes = public.TooltipCall(ItemRefTooltip, itemName, link, nil, nil, nil, testPopup, reference)
 			if (callRes == true) then
 				local hasEmbed = #private.embedLines > 0
-				private.oldChatItem = {reference = reference, link = link, button = button, isEmbeded = hasEmbed}
+				private.oldChatItem = private.reuse(reference, link, button, hasEmbed)
 			elseif (callRes == false) then
 				return false
 			end
@@ -998,12 +1062,13 @@ function private.CheckHide()
 		public.HideTooltip()
 		if (HideObj and HideObj == "ItemRefTooltip") then
 			-- closing chatreferenceTT?
-			private.oldChatItem = nil -- remove old chatlink data
+			private.recycle(private.oldChatItem)
 		elseif private.oldChatItem then
 			-- closing another tooltip
 			-- redisplay old chatlinkdata, if it was not embeded
-			if not private.oldChatItem.isEmbeded then
-				private.DoHyperlink(private.oldChatItem.reference, private.oldChatItem.link, private.oldChatItem.button)
+			local reference, link, button, isEmbeded = unpack(private.oldChatItem)
+			if not isEmbeded then
+				private.DoHyperlink(reference, link, button)
 			end
 		end
 	end
@@ -1204,7 +1269,9 @@ function private.AfHookOnEnter(funcArgs, retVal, type, index)
 			local aiNextBid = aiMinBid
 			if (aiBidAmount>0) then aiNextBid = aiBidAmount + aiMinIncrement end
 
-			if not private.priceTable then private.priceTable = {} end
+			if not private.priceTable then
+				private.priceTable = private.reuse()
+			end
 			private.priceTable[0] = "AuctionPrices"
 			private.priceTable[1] = aiBuyoutPrice
 			private.priceTable[2] = aiMinBid
