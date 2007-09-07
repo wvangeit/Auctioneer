@@ -63,7 +63,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 	
-	if (itemId and itemId > 0) and (Informant) then
+	if (itemId and itemId > 0) and (GetSellValue) then
 		local vendorFor = GetSellValue(itemId)
 		if not vendorFor then return end
 		vendorFor = vendorFor * 3
