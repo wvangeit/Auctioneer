@@ -678,7 +678,7 @@ function private.SetupConfigGui(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
-	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. For this reason, it is disabled by default. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading you interface.\nThankyou.")
+	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading you interface.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when zero")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show required bid instead of current bid value")
 end
