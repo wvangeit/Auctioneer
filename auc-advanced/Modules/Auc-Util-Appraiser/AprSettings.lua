@@ -66,16 +66,9 @@ private.durations = {
 ----   id, name, texture, quality
 --]]
 function private.sortItems(a,b)
-	if a[4] > b[4] then
-		return true
-	elseif a[4] < b[4] then
-		return false
-	end
-	if a[2] < b[2] then
-		return true
-	elseif a[2] > b[2] then
-		return false
-	end
+	if a[0] and b[0] and a[0] ~= b[0] then return a[0] < b[0] end
+	if a[4] ~= b[4] then return a[4] > b[4] end
+	if a[2] ~= b[2] then return a[2] < b[2] end
 	return a[1] < b[1]
 end
 

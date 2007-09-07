@@ -93,7 +93,12 @@ function private.CreateFrames()
 								if not frame.buffer[i] then
 									frame.buffer[i] = {}
 								end
+								local ignore = 0
+								if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".ignore")) then
+									ignore = 1
+								end
 								local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
+								frame.buffer[i][0] = ignore
 								frame.buffer[i][1] = sig
 								frame.buffer[i][2] = name
 								frame.buffer[i][3] = texture
@@ -101,6 +106,7 @@ function private.CreateFrames()
 								frame.buffer[i][5] = stack
 								frame.buffer[i][6] = itemCount
 								frame.buffer[i][7] = link
+								
 								table.insert(frame.list, frame.buffer[i])
 								if AucAdvanced.Modules.Util
 								and AucAdvanced.Modules.Util.ScanData
@@ -157,7 +163,8 @@ function private.CreateFrames()
 		frame.selected = sig
 		frame.SetScroll()
 
-		frame.salebox.icon:SetTexture(item[3])
+		frame.salebox.icon:SetNormalTexture(item[3])
+
 		local _,_,_, hex = GetItemQualityColor(item[4])
 		frame.salebox.name:SetText(hex.."["..item[2].."]|r")
 		frame.salebox.info:SetText("You have "..item[6].." available to auction")
@@ -331,6 +338,9 @@ function private.CreateFrames()
 		local curDurationText = private.durations[curDurationIdx][2]
 		frame.salebox.duration.label:SetText(("Duration: %s"):format(curDurationText))
 		
+		local curIgnore = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
+		frame.salebox.icon:GetNormalTexture():SetDesaturated(curIgnore)
+
 		local curBid = frame.salebox.bid.modelvalue or 0
 		local curBuy = frame.salebox.buy.modelvalue or 0
 
@@ -535,6 +545,13 @@ function private.CreateFrames()
 		frame.salebox.config = false
 	end
 
+	function frame.ToggleDisabled()
+		if not frame.salebox.sig then return end
+		local curDisable = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore", not curDisable)
+		frame.GenerateList()
+	end
+
 	function frame.RefreshView()
 		local link = frame.salebox.link
 		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack, equipLoc = GetItemInfo(link)
@@ -680,12 +697,22 @@ function private.CreateFrames()
 			local item = frame.list[pos+i]
 			local button = frame.items[i]
 			if item then
+				local curIgnore = item[0] == 1
+
 				button.icon:SetTexture(item[3])
+				button.icon:SetDesaturated(curIgnore)
+
 				local _,_,_, hex = GetItemQualityColor(item[4])
+				local stackX = "x "
+				if (curIgnore) then
+					hex = "|cff444444"
+					stackX = hex..stackX
+				end
+
 				button.name:SetText(hex.."["..item[2].."]|r")
-				button.size:SetText("x "..item[6])
+				button.size:SetText(stackX..item[6])
 				local info = ""	
-				if frame.cache[item[1]] then
+				if frame.cache[item[1]] and not curIgnore then
 					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
 					info = "Counts: "..exact.." +"..suffix.." +"..base
 					if (dist) then
@@ -696,9 +723,12 @@ function private.CreateFrames()
 				button:Show()
 				if (item[1] == frame.selected) then
 					button.bg:SetAlpha(0.6)
+				elseif curIgnore then
+					button.bg:SetAlpha(0.1)
 				else
 					button.bg:SetAlpha(0.2)
 				end
+				button.bg:SetDesaturated(curIgnore)
 			else
 				button:Hide()
 			end
@@ -852,10 +882,12 @@ function private.CreateFrames()
 	frame.salebox.slot:SetTexCoord(0.15, 0.85, 0.15, 0.85)
 	frame.salebox.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
 
-	frame.salebox.icon = frame.salebox:CreateTexture(nil, "ARTWORK")
+	frame.salebox.icon = CreateFrame("Button", nil, frame.salebox)
 	frame.salebox.icon:SetPoint("TOPLEFT", frame.salebox.slot, "TOPLEFT", 3, -3)
 	frame.salebox.icon:SetWidth(32)
 	frame.salebox.icon:SetHeight(32)
+	frame.salebox.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
+	frame.salebox.icon:SetScript("OnClick", frame.ToggleDisabled)
 
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
