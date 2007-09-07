@@ -74,7 +74,7 @@ end
 
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("util.compactui.activated", false)
+	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
 end
