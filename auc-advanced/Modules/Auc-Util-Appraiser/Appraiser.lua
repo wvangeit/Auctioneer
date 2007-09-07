@@ -392,7 +392,6 @@ function private.ProcessPosts()
 				table.remove(private.postRequests, 1)
 				updateFrame.timer = -5
 			else
-				request[7] = nil
 				updateFrame.timer = -1
 			end
 		end
