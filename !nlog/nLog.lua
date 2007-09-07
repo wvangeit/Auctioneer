@@ -174,7 +174,7 @@ end
 
 function nLog.OnEvent(frame, event, ...)
 	if (event == "ADDON_LOADED") then
-		local addon = select(1, ...)
+		local addon = ...
 		if (addon:lower() == "!nlog") then
 			frame:UnregisterEvent("ADDON_LOADED")
 

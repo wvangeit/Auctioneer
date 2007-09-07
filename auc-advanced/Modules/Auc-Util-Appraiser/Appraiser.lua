@@ -154,7 +154,7 @@ end
 
 function private.DecodeSig(...)
 	local matchId, matchSuffix, matchFactor, matchEnchant, matchSeed
-	local sig = select(1, ...)
+	local sig = ...
 	if (type(sig) == "string") then
 		matchId, matchSuffix, matchFactor, matchEnchant, matchSeed = strsplit(":", sig)
 		matchId = tonumber(matchId)
@@ -163,7 +163,7 @@ function private.DecodeSig(...)
 		matchEnchant = tonumber(matchEnchant) or 0
 		matchSeed = tonumber(matchSeed) or 0
 	end
-	if not matchId or matchId == 0 then matchId = select(1, ...) end
+	if not matchId or matchId == 0 then matchId = ... end
 	if not matchSuffix or matchSuffix == 0 then matchSuffix = select(2, ...) end
 	if not matchFactor or matchFactor == 0 then matchFactor = select(3, ...) end
 	if not matchEnchant or matchEnchant == 0 then matchEnchant = select(4, ...) end

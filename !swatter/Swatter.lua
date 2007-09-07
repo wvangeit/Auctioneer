@@ -205,7 +205,7 @@ end
 
 function Swatter.OnEvent(frame, event, ...)
 	if (event == "ADDON_LOADED") then
-		local addon = select(1, ...)
+		local addon = ...
 		if (addon:lower() == "!swatter") then
 
 			-- Check to see if we still exist
@@ -234,20 +234,20 @@ function Swatter.OnEvent(frame, event, ...)
 			return
 		end
 	elseif (event == "ADDON_ACTION_BLOCKED" and SwatterData.warning) then
-		local addon, func = select(1, ...)
+		local addon, func = ...
 		if (InCombatLockdown()) then
 			Swatter.OnError(string.format("Note: AddOn %s attempted to call a protected function (%s) during combat lockdown.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
 		else
 			Swatter.OnError(string.format("Warning: AddOn %s attempted to call a protected function (%s) which may require interaction.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
 		end
 	elseif (event == "ADDON_ACTION_FORBIDDEN") then
-		local addon, func = select(1, ...)
+		local addon, func = ...
 		Swatter.OnError(string.format("Error: AddOn %s attempted to call a forbidden function (%s) from a tainted execution path.", addon, func), Swatter.NamedFrame("AddOn: "..addon), debugstack(2, 20, 20), event, ...)
 	end
 end
 
 function Swatter.SetItemRef(...)
-	local msg = select(1, ...)
+	local msg = ...
 	local id = select(3, msg:find("^swatter:(%d+)"))
 	id = tonumber(id)
 	if (id) then

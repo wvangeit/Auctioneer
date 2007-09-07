@@ -349,7 +349,7 @@ function kit:AddControl(id, cType, column, ...)
 		el = content:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last)
-		local text = select(1, ...)
+		local text = ...
 		el:SetText(text)
 		last = el
 	elseif (cType == "Subhead") then
@@ -357,11 +357,11 @@ function kit:AddControl(id, cType, column, ...)
 		el:SetJustifyH("LEFT")
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last, column+15, colwidth, nil, -10)
-		local text = select(1, ...)
+		local text = ...
 		el:SetText(text)
 		last = el
 	elseif (cType == "Note") then
-		local level, width, height, text = select(1, ...)
+		local level, width, height, text = ...
 		local indent = 10 * (level or 1)
 		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		el:SetJustifyH("LEFT")
@@ -372,7 +372,7 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = el
 	elseif (cType == "Label") then
-		local level, setting, text = select(1, ...)
+		local level, setting, text = ...
 		local indent = 10 * (level or 1)
 		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		el:SetJustifyH("LEFT")
@@ -395,14 +395,14 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = el
 	elseif (cType == "Custom") then
-		local level, el = select(1, ...)
+		local level, el = ...
 		local indent = 10 * (level or 1)
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last, column + indent + 15, colwidth)
 		control = el
 		last = el
 	elseif (cType == "Text") then
-		local level, setting, label = select(1, ...)
+		local level, setting, label = ...
 		local indent = 10 * (level or 1)
 		-- FontString
 		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -428,7 +428,7 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = el
 	elseif (cType == "Selectbox") then
-		local level, list, setting, text = select(1, ...)
+		local level, list, setting, text = ...
 		local indent = 10 * (level or 1)
 		-- Selectbox
 		local tmpName = lib.CreateAnonName()
@@ -456,7 +456,7 @@ function kit:AddControl(id, cType, column, ...)
 		last = el
 
 	elseif (cType == "Button") then
-		local level, setting, text = select(1, ...)
+		local level, setting, text = ...
 		local indent = 10 * (level or 1)
 		-- Button
 		el = CreateFrame("Button", nil, content, "OptionsButtonTemplate")
@@ -469,7 +469,7 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = el
 	elseif (cType == "Checkbox") then
-		local level, setting, text, singleLine, maxLabelLength = select(1, ...)
+		local level, setting, text, singleLine, maxLabelLength = ...
 		if ( maxLabelLength and maxLabelLength <= 1 ) then
 			maxLabelLength = maxLabelLength * framewidth - 25
 		end
@@ -496,7 +496,7 @@ function kit:AddControl(id, cType, column, ...)
 	elseif (cType == "Slider" or cType == "WideSlider") then
 		local swidth = 140
 		if (cType == "WideSlider") then swidth = 260 end
-		local level, setting, min, max, step, text, fmtfunc = select(1, ...)
+		local level, setting, min, max, step, text, fmtfunc = ...
 		local indent = 10 * (level or 1)
 		-- FontString
 		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -526,7 +526,7 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = textElement
 	elseif (cType == "NumberBox") then
-		local level, setting, minVal, maxVal, label = select(1, ...)
+		local level, setting, minVal, maxVal, label = ...
 		local indent = 10 * (level or 1)
 		-- FontString
 		el = content:CreateFontString("", "OVERLAY", "GameFontHighlight")
@@ -555,7 +555,7 @@ function kit:AddControl(id, cType, column, ...)
 		control = el
 		last = el
 	elseif (cType == "MoneyFrame" or cType == "MoneyFramePinned") then
-		local level, setting, minVal, maxVal, label  = select(1, ...)
+		local level, setting, minVal, maxVal, label  = ...
 		if (cType == "MoneyFrame") then
 			label, minVal, maxVal = minVal, nil, nil
 		end

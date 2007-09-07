@@ -290,7 +290,7 @@ end
 
 local callDetail = {}
 local function callDebugger(...)
-	local msg = tostring(select(1, ...))
+	local msg = tostring(...)
 	for i = 2, select("#", ...) do
 		msg = msg.." "..tostring(select(i, ...))
 	end
@@ -320,7 +320,7 @@ function hookCall(funcName, ...)
 
 	local res
 	local retVal
-	local callParams = { select("#",...), select(1,...) }
+	local callParams = { select("#",...), ... }
 
 	local callees
 	if config.calls and config.calls.callList and config.calls.callList[funcName] then
@@ -474,7 +474,7 @@ function unhookFrom(triggerFunction)
 end
 
 function errorHandler(stackLevel, ...)
-	local msg = tostring(select(1, ...))
+	local msg = tostring(...)
 	for i = 2, select("#", ...) do
 		msg = msg.." "..tostring(select(i, ...))
 	end
@@ -532,7 +532,7 @@ function registerFunctionHook(triggerFunction, position, hookFunc, ...)
 		funcObj = {
 			f = hookFunc,
 			n = hookFuncName,
-			a = {select(1, ...)},
+			a = {...},
 			p = position
 		}
 	end
@@ -640,7 +640,7 @@ function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 		if (select("#", ...) == 0) then
 			hookFunction()
 		else
-			hookFunction({select(1, ...)})
+			hookFunction({...})
 		end
 	else
 		local addon = triggerAddOn:lower()
@@ -654,7 +654,7 @@ function registerAddOnHook(triggerAddOn, ownerAddOn, hookFunction, ...)
 			else
 				config.loads[addon][ownerAddOn] = {
 					f = hookFunction,
-					a = {select(1, ...)},
+					a = {...},
 				}
 			end
 		end
@@ -694,7 +694,7 @@ function registerEventHook(triggerEvent, ownerAddOn, hookFunction, ...)
 		else
 			config.events[triggerEvent][ownerAddOn] = {
 				f = hookFunction,
-				a = {select(1, ...)},
+				a = {...},
 			}
 		end
 	end
@@ -936,7 +936,7 @@ end
 
 function events(event, ...)
 	if (not event) then event = "" end
-	local firstArg = select(1, ...)
+	local firstArg = ...
 	if (event == "ADDON_LOADED") then
 		if (firstArg and (firstArg:lower() == "stubby")) then
 			onLoaded()

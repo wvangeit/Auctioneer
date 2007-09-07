@@ -339,9 +339,9 @@ function private.recycle(...)
 	local n = select("#", ...)
 	local tbl, key, item
 	if n == 1 then
-		item = select(1, ...)
+		item = ...
 	else
-		tbl, key = select(1, ...)
+		tbl, key = ...
 		item = tbl[key]
 	end
 
