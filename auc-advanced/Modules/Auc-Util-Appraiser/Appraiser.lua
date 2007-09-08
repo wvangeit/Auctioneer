@@ -374,6 +374,9 @@ function private.ProcessPosts()
 
 	local request = private.postRequests[1]
 
+	local _,_, lag = GetNetStats()
+	lag = 2.5 * lag / 1000
+
 	if (request[7]) then
 		-- We're waiting for the item to vanish from the bags
 		local bag, slot, origLink, expire = unpack(request[7])
@@ -393,6 +396,9 @@ function private.ProcessPosts()
 				updateFrame.timer = -5
 			else
 				updateFrame.timer = -1
+				-- Wait for another "lag" interval
+				local expire = GetTime() + lag
+				request[7][4] = expire
 			end
 		end
 		return
@@ -429,8 +435,7 @@ function private.ProcessPosts()
 			return
 		end
 
-		local _,_, lag = GetNetStats()
-		lag = 2.5 * lag / 1000
+		-- Need to wait for this item to vanish.
 		local expire = GetTime() + lag
 		request[7] = { bag, slot, link, expire }
 		updateFrame.timer = -1
