@@ -1058,6 +1058,16 @@ function private.CreateFrames()
 	frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
 	frame.manifest:Hide()
 
+	frame.manifest.close = CreateFrame("Button", nil, frame.manifest)
+	frame.manifest.close:SetNormalTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Up")
+	frame.manifest.close:SetHighlightTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight")
+	frame.manifest.close:SetPushedTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Down")
+	frame.manifest.close:SetDisabledTexture("Interface\\Buttons\\UI-Panel-MinimizeButton-Disabled")
+	frame.manifest.close:SetPoint("TOPRIGHT", frame.manifest, "TOPRIGHT", 0,0)
+	frame.manifest.close:SetWidth(26)
+	frame.manifest.close:SetHeight(26)
+	frame.manifest.close:SetScript("OnClick", function() frame.manifest:Hide() end)
+
 	local function lineHide(obj)
 		local id = obj.id
 		local line = frame.manifest.lines[id]
