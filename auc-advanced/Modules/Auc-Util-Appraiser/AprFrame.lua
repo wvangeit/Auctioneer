@@ -331,7 +331,9 @@ function private.CreateFrames()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
 		frame.refresh:Enable()
+		frame.manifest:Show()
 		frame.manifest.lines:Clear()
+		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
 		local curDurationMins = private.durations[curDurationIdx][1]
@@ -769,7 +771,7 @@ function private.CreateFrames()
 	frame.config:SetText("Configure")
 	frame.config:SetScript("OnClick", function()
 		AucAdvanced.Settings.Show()
-		private.gui.ActivateTab(private.guiId)
+		private.gui:ActivateTab(private.guiId)
 	end)
 
 	frame.itembox = CreateFrame("Frame", nil, frame)
@@ -1052,7 +1054,9 @@ function private.CreateFrames()
 	frame.manifest:SetPoint("TOPLEFT", frame, "TOPRIGHT", -20,-30)
 	frame.manifest:SetPoint("BOTTOM", frame, "BOTTOM", 0,30)
 	frame.manifest:SetWidth(230)
-	frame.manifest:SetFrameStrata("LOW")
+	frame.manifest:SetFrameStrata("MEDIUM")
+	frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
+	frame.manifest:Hide()
 
 	local function lineHide(obj)
 		local id = obj.id
