@@ -406,7 +406,23 @@ function private.ProcessPosts()
 		
 	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
 	if not success then
-		updateFrame.timer = -1
+		local err = bag
+		local err = bag:match(": (.*)")
+		if err == ERROR_NOITEM         -- ItemId is empty
+		or err == ERROR_NOLOCAL        -- Item is unknown
+		or err == ERROR_NOBLANK        -- No blank spaces available
+		or err == ERROR_MAXSIZE        -- Item cannot stack that big
+		or err == ERROR_AHCLOSED       -- AH is not open
+		or err == ERROR_NOTFOUND       -- Item was not found in inventory
+		or err == ERROR_NOTENOUGH then -- Not enough of item available
+			print("Aborting post request: {{", err, "}}")
+			message(err)
+			table.remove(private.postRequests, 1)
+			updateFrame.timer = -0.1
+		else
+			print("Delaying post request: {{", err "}}")
+			updateFrame.timer = -1
+		end
 		return
 	end
 
