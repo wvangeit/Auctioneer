@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - VendMarkup
-	Revision: $Id: vendMarkup.lua 2002 2007-08-27 17:19:13Z calliee $
-	Version: <%version%>
+	Revision: $Id$
+	Version: <%version%> (<%codename%>)
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price

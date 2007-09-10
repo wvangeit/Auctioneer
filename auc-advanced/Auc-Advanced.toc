@@ -8,7 +8,7 @@
 ## SavedVariables: AucAdvancedConfig, AucAdvancedData
 ## SavedVariablesPerCharacter: AucAdvancedLocal
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Appraisals and Auction Posting
 	Revision: $Id$
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 
 	This is an addon for World of Warcraft that adds an appriasals dialog for
 	easy posting of your auctionables when you are at the auction-house.

@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Revision: $Id$
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
 
 	This is an addon for World of Warcraft that adds a price level indicator
 	to auctions when browsing the Auction House, so that you may readily see
