@@ -65,7 +65,7 @@ end
 
 -- Test:  /run Swatter.OnError("Test")
 function Swatter.OnError(msg, frame, stack, etype, ...)
-	if (not SwatterData.enabled) then 
+	if (not SwatterData.enabled) then
 		if (not etype) then
 			return Swatter.origHandler(msg, frame)
 		else
@@ -169,18 +169,18 @@ function Swatter.GetAddOns()
 			end
 			local const = getglobal(name:upper().."_VERSION")
 			if (const) then version = const end
-			
+
 			if type(version)=='table' then
-				if (nLog) then 
+				if (nLog) then
 					nLog.AddMessage("!swatter", "Swatter.lua", N_INFO, "version is a table", name, table.concat(version,":"))
 				end
 				version = table.concat(version,":")
 			end
-			
+
 			if (version) then
 				addlist = addlist.."  "..name..", v"..version.."\n"
 			else
-				addlist = addlist.."  "..name.."\n" 
+				addlist = addlist.."  "..name.."\n"
 			end
 		end
 	end
@@ -270,6 +270,9 @@ end
 
 function Swatter.ErrorShow()
 	Swatter.Error.pos = table.getn(Swatter.errorOrder)
+	if (Swatter.Error.pos == 0) then
+		Swatter.Error.pos = -1
+	end
 	Swatter.ErrorDisplay()
 end
 
@@ -277,8 +280,14 @@ function Swatter.ErrorDisplay(id)
 	if id then Swatter.Error.pos = id else id = Swatter.Error.pos end
 	Swatter.ErrorUpdate()
 
+	if (id == -1) then
+		Swatter.Error.curError = "There are no errors to show."
+		Swatter.ErrorUpdate()
+		return
+	end
+
 	local errid = Swatter.errorOrder[id]
-	if (not errid) then 
+	if (not errid) then
 		Swatter.Error.curError = "Unknown error at position "..id
 		Swatter.ErrorUpdate()
 		return
@@ -289,7 +298,7 @@ function Swatter.ErrorDisplay(id)
 		Swatter.ErrorUpdate()
 		return
 	end
-	
+
 	local ts = err.timestamp or "Unavailable"
 	local addlist = err.addons or "  Unavailable"
 
@@ -298,7 +307,7 @@ function Swatter.ErrorDisplay(id)
 	local count = err.count
 	if (count > 999) then count = "\226\136\158" --[[Infinity]] end
 
-	
+
 	Swatter.Error.curError = "|cffff5533Date:|r "..ts.."\n|cffff5533ID:|r "..id.."\n|cffff5533Error occured in:|r "..(err.context or "Anonymous").."\n|cffff5533Count:|r "..count.."\n|cffff5533Message:|r "..message.."\n|cffff5533Debug:|r\n"..trace.."\n|cffff5533AddOns:|r\n"..addlist.."\n"
 	Swatter.Error.selected = false
 	Swatter.ErrorUpdate()
@@ -332,7 +341,7 @@ end
 function Swatter.UpdateNextPrev()
 	local cur = Swatter.Error.pos or 1
 	local max = table.getn(Swatter.errorOrder) or 0
-	if (max > cur) then Swatter.Error.Next:Enable() else Swatter.Error.Next:Disable() end
+	if ((max > cur) and (cur ~= -1)) then Swatter.Error.Next:Enable() else Swatter.Error.Next:Disable() end
 	if (cur > 1) then Swatter.Error.Prev:Enable() else Swatter.Error.Prev:Disable() end
 end
 
