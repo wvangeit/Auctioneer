@@ -609,7 +609,11 @@ function kit:ActivateTab(id)
 	id = tonumber(id)
 	if not id then id = self.id end
 
-	self = self:GetParent()
+	if not self.tabs then self = self:GetParent() end
+	if not self.tabs then
+		return error("Must call ActivateTab from a valid nConfigator object")
+	end
+
 	if (self.tabs.active) then
 		self.tabs[self.tabs.active][2]:Hide()
 	end

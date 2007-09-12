@@ -264,9 +264,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "util.appraiser.bid.markdown", 0, 100, 0.1, "Markdown by: %d%%")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.appraiser.bid.subtract", 0, 9999999, "Subtract amount:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.bid.deposit", "Subtract deposit cost")
-	gui:AddControl(id, "Note",       0, 2, 500, 60,
+	gui:AddControl(id, "Note",       0, 2, 500, 75,
 "Except for fixed price items, the starting bid price is calculated based off the original buyout price.\n"..
-"The above options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as Buyout-Markdown-Deposit"
+"The above options allow you to specify how the bid price is reduced, and the options are cumulative, so if you set both a markdown percent, and subtract the deposit cost, then the bid value will be calculated as:\n  (Buyout - Markdown - Deposit)"
 	)
 
 	gui:AddControl(id, "Subhead",    0,    "Value rounding")
