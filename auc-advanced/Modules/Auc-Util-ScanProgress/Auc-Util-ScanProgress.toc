@@ -1,0 +1,4 @@
+## Name: Auctioneer:Util:Example
+## Interface: 20100
+## Dependancies: Auctioneer
+Embed.xml
