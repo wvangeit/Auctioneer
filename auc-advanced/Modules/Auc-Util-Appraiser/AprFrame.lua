@@ -60,7 +60,7 @@ function private.CreateFrames()
 			for slot=1,GetContainerNumSlots(bag) do
 				local link = GetContainerItemLink(bag,slot)
 				if link then
-					if private.IsAuctionable(bag, slot) then
+					if AucAdvanced.Post.IsAuctionable(bag, slot) then
 						local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 						if itype == "item" then
 							local sig
@@ -152,30 +152,55 @@ function private.CreateFrames()
 		if frame.itembox.sig then
 			frame.UpdateControls()
 		end
+		return pos
 	end
 
-	function frame.SelectItem(obj, ...)
+	private.empty = {}
+	function frame.SelectItem(obj, button)
 		if not obj.id then obj = obj:GetParent() end
 		local pos = math.floor(frame.scroller:GetValue())
 		local id = obj.id
-		local item = frame.list[pos + id]
-		local sig = item[1]
+		pos = math.min(pos + id, #frame.list)
+		local item = frame.list[pos]
+		local sig = item[1] or nil
+		if button and sig == frame.selected then
+			sig = nil
+			pos = nil
+		end
 		frame.selected = sig
+		frame.selectedPos = pos
+		frame.selectedObj = obj
 		frame.SetScroll()
 
-		frame.salebox.icon:SetNormalTexture(item[3])
-
-		local _,_,_, hex = GetItemQualityColor(item[4])
-		frame.salebox.name:SetText(hex.."["..item[2].."]|r")
-		frame.salebox.info:SetText("You have "..item[6].." available to auction")
-		frame.salebox.info:SetTextColor(1,1,1, 0.8)
-		frame.salebox.link = item[7]
 		frame.salebox.sig = sig
-		frame.salebox.stacksize = item[5]
-		frame.salebox.count = item[6]
+		if sig then
+			local _,_,_, hex = GetItemQualityColor(item[4])
+			frame.salebox.icon:SetNormalTexture(item[3])
+			frame.salebox.name:SetText(hex.."["..item[2].."]|r")
+			frame.salebox.info:SetText("You have "..item[6].." available to auction")
+			frame.salebox.info:SetTextColor(1,1,1, 0.8)
+			frame.salebox.link = item[7]
+			frame.salebox.stacksize = item[5]
+			frame.salebox.count = item[6]
 
-		frame.UpdateImage()
-		frame.InitControls()
+			frame.UpdateImage()
+			frame.InitControls()
+		else
+			frame.salebox.name:SetText("No item selected")
+			frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
+			frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
+			frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
+			frame.imageview.sheet:SetData(private.empty)
+			frame.UpdateControls()
+		end
+	end
+
+	function frame.Reselect(posted)
+		local reselect = (frame.selected == posted[1])
+		frame.GenerateList()
+		if reselect then
+			frame.SelectItem(frame.selectedObj)
+		end
 	end
 
 	function frame.UpdateImage()
@@ -257,7 +282,7 @@ function private.CreateFrames()
 				local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
 				if (deposit) then
 					local rate
-					deposit, rate = lib.GetDepositAmount(frame.salebox.sig)
+					deposit, rate = AucAdvanced.Post.GetDepositAmount(frame.salebox.sig)
 					if not rate then rate = AucAdvanced.depositRate or 0.05 end
 				else deposit = 0 end
 
@@ -323,7 +348,20 @@ function private.CreateFrames()
 	end
 
 	function frame.UpdateControls()
-		if not frame.salebox.sig then return end
+		if not frame.salebox.sig then
+			frame.salebox.icon:Hide()
+			frame.salebox.stack:Hide()
+			frame.salebox.number:Hide()
+			frame.salebox.model:Hide()
+			frame.salebox.bid:Hide()
+			frame.salebox.buy:Hide()
+			frame.salebox.duration:Hide()
+			frame.manifest:Hide()
+			frame.refresh:Disable()
+			frame.go:Disable()
+			return
+		end
+		frame.salebox.icon:Show()
 		frame.salebox.stack:Show()
 		frame.salebox.number:Show()
 		frame.salebox.model:Show()
@@ -380,7 +418,7 @@ function private.CreateFrames()
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
-					depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
+					depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
 					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
@@ -392,7 +430,7 @@ function private.CreateFrames()
 				if (curNumber == -1 and remain > 0) then
 					bidVal = lib.RoundBid(curBid * remain)
 					buyVal = lib.RoundBuy(curBuy * remain)
-					depositVal = lib.GetDepositAmount(sig, remain) * depositMult
+					depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
 					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal)
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal)
@@ -409,7 +447,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 				bidVal = lib.RoundBid(curBid * curSize)
 				buyVal = lib.RoundBuy(curBuy * curSize)
-				depositVal = lib.GetDepositAmount(sig, curSize) * depositMult
+				depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
 				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
 				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
 				frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
@@ -439,7 +477,7 @@ function private.CreateFrames()
 				frame.manifest.lines:Add(("%d items"):format(curNumber))
 				bidVal = lib.RoundBid(curBid)
 				buyVal = lib.RoundBuy(curBuy)
-				depositVal = lib.GetDepositAmount(sig) * depositMult
+				depositVal = AucAdvanced.Post.GetDepositAmount(sig) * depositMult
 				frame.manifest.lines:Add(("  Bid /item"), bidVal)
 				frame.manifest.lines:Add(("  Buyout /item"), buyVal)
 				frame.manifest.lines:Add(("  Deposit /item"), depositVal)
@@ -589,7 +627,7 @@ function private.CreateFrames()
 		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
 		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
 		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
-		local success, errortext, total, _,_, link = pcall(private.FindMatchesInBags, sig)
+		local success, errortext, total, _,_, link = pcall(AucAdvanced.Post.FindMatchesInBags, sig)
 		if success==false then
 			UIErrorsFrame:AddMessage("Unable to post auctions at this time")
 			print("Cannot post auctions: ", errortext)
@@ -632,7 +670,7 @@ function private.CreateFrames()
 					if dryRun then
 						print(" -- Post: ", sig, stack, bidVal, buyVal, duration, fullStacks)
 					else
-						lib.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
+						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
 					end
 					
 					totalBid = totalBid + (bidVal * fullStacks)
@@ -647,7 +685,7 @@ function private.CreateFrames()
 					if dryRun then
 						print(" -- Post: ", sig, remain, bidVal, buyVal, duration)
 					else
-						lib.PostAuction(sig, remain, bidVal, buyVal, duration)
+						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
 					end
 					
 					totalBid = totalBid + bidVal
@@ -662,7 +700,7 @@ function private.CreateFrames()
 				if dryRun then
 					print(" -- Post: ", sig, stack, bidVal, buyVal, duration, number)
 				else
-					lib.PostAuction(sig, stack, bidVal, buyVal, duration, number)
+					AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
 				end
 					
 				totalBid = totalBid + (bidVal * number)
@@ -678,7 +716,7 @@ function private.CreateFrames()
 			if dryRun then
 				print(" -- Post: ", sig, 1, bidVal, buyVal, duration, number)
 			else
-				lib.PostAuction(sig, 1, bidVal, buyVal, duration, number)
+				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
 			end
 				
 			totalBid = totalBid + (bidVal * number)
