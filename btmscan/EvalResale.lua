@@ -63,7 +63,7 @@ function lib:valuate(item, tooltip)
 				market, seen = Auctioneer.Statistic.GetHSP(auctKey)
 			end
 			if not market then
-				market, seen = AucAdvanced.API.GetMarketValue(item.link)
+				market, seen = Auctioneer.Statistic.GetUsableMedian(item.link)
 			end
 		end
 	end
