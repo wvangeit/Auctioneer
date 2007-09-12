@@ -140,6 +140,7 @@ function private.HookAH()
 		button.IconButton:SetHeight(19)
 		button.IconButton:SetScript("OnEnter", private.IconEnter)
 		button.IconButton:SetScript("OnLeave", private.IconLeave)
+		button.IconButton:SetFrameLevel(button.IconButton:GetFrameLevel() + 5)
 		button.Icon = button.IconButton:CreateTexture()
 		button.Icon:SetPoint("TOPLEFT", button.IconButton, "TOPLEFT", 0,-2)
 		button.Icon:SetPoint("BOTTOMRIGHT", button.IconButton, "BOTTOMRIGHT" , 0, 1)
@@ -225,7 +226,7 @@ function private.HookAH()
 					private.headers.pos = headPos
 				end
 				private.headers.sort = id
-				private.headers.dir = header.dir 
+				private.headers.dir = header.dir
 			else
 				header.dir = 0
 				header.Back:SetVertexColor(1,1,1, 0.8)
@@ -234,7 +235,7 @@ function private.HookAH()
 		end
 		private.MyAuctionFrameUpdate()
 	end
-					
+
 
 	local function createHeader(id, dir, text, parentLeft, parentRight, lOfs, rOfs, cycle)
 		if not parentRight then parentRight = parentLeft end
@@ -285,7 +286,7 @@ function private.HookAH()
 	tex:SetPoint("TOPLEFT", private.buttons[1].rLevel, "TOPLEFT")
 	tex:SetPoint("BOTTOMRIGHT", private.buttons[NEW_NUM_BROWSE].rLevel, "BOTTOMRIGHT")
 	table.insert(private.candy, tex)
-	
+
 	tex = AuctionFrameBrowse:CreateTexture()
 	tex:SetTexture(1,1,1, 0.05)
 	tex:SetPoint("TOPLEFT", private.buttons[1].tLeft, "TOPLEFT")
@@ -404,26 +405,26 @@ function private.BrowseSort(a, b)
 
 	if sort then
 		if sort == 1 then            col = 3       -- Count
-		elseif sort == 2 then                      -- 
-			local pos = private.headers.pos    -- 
+		elseif sort == 2 then                      --
+			local pos = private.headers.pos    --
 			if pos == 1 then     col = 6       -- Name
 			elseif pos == 2 then col = 5       -- Quality
-			end                                -- 
+			end                                --
 		elseif sort == 3 then        col = 8       -- MinLevel
 		elseif sort == 4 then        col = 9       -- ItemLevel
 		elseif sort == 5 then        col = 10      -- TimeLeft
 		elseif sort == 6 then        col = 11      -- Owner
-		elseif sort == 7 then                      -- 
-			local pos = private.headers.pos    -- 
+		elseif sort == 7 then                      --
+			local pos = private.headers.pos    --
 			if pos == 1 then     col = 16      -- Buy
 			elseif pos == 2 then col = 15      -- Bid
 			elseif pos == 3 then col = 18      -- BuyEach
 			elseif pos == 4 then col = 17      -- BidEach
-			end                                -- 
+			end                                --
 		elseif sort == 8 then        col = 21      -- PriceLevel
 		end
-	end	
-	
+	end
+
 	if a[col] ~= b[col] then
 		if dir > 0 then return (a[col] < b[col])
 		else return (a[col] > b[col])
@@ -551,7 +552,7 @@ function private.SetAuction(button, pos)
 		button.LineTexture:SetTexture(0,0,0.1, 0.1)
 	end
 	button.id = id
-	
+
 	local showBid
 	if (AucAdvanced.Settings.GetSetting("util.compactui.bidrequired")) then
 		showBid = requiredBid
@@ -666,7 +667,7 @@ function private.MyAuctionFrameUpdate()
 		BrowseNextPageButton:Hide()
 		BrowseSearchCountText:Hide()
 	end
-	
+
 	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)))
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
 	BrowseScrollFrame:Show()
@@ -678,8 +679,7 @@ function private.SetupConfigGui(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
-	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading you interface.")
+	gui:AddControl(id, "Note",       0, 2, 600, 70, "Note: This module heavily modifies your standard auction browser window, and may not play well with other auction house addons. Should you enable this module and notice any incompatabilities, please turn this module off again by unticking the above box and reloading your interface.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.collapse", "Remove smaller denomination coins when zero")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.bidrequired", "Show required bid instead of current bid value")
 end
-
