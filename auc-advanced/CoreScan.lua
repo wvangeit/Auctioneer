@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced
-	Revision: $Id: ScanSimple.lua 1761 2007-04-27 20:50:28Z prowell $
+	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
@@ -74,11 +74,11 @@ function private.LoadAuctionImage()
 		AucAdvancedScanSimpleData = nil
 	end
 
-	if (AucScanData and not AucScanData.Version) then 
-		AucScanData = nil 
+	if (AucScanData and not AucScanData.Version) then
+		AucScanData = nil
 		lib.Print("Warning, Scan Data in wrong format, clearing data")
 	end
-	
+
 	if not AucScanData then AucScanData = {Version = "1.0"} end
 	if not AucScanData.scans then AucScanData.scans = {} end
 	if not loaded then AucAdvancedData.Scandata = AucScanData end
@@ -154,13 +154,14 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			}
 			return
 		end
-		
+
 		if private.curQuery then
 			private.Commit(true)
 		end
 
 		private.isScanning = true
 		local startPage = 0
+		local numBatchAuctions, totalAuctions
 		if (private.scanDir == 1) then
 			startPage = 0
 		else
@@ -168,16 +169,19 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			private.sentQuery = true
 			-- Get "list" from appropriately filtered list
 			private.Hook.QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
-				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality) 
-			local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
+				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality)
+			numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 			local maxPages = floor(totalAuctions / 50);
 			startPage = maxPages
 		end
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
-				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex) 
+				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex)
 		AuctionFrameBrowse.page = startPage
 		private.curPage = startPage
+
+		--Show the progress indicator
+		private.UpdateScanProgress(true, totalAuctions)
 	else
 		message("Steady on; You'll need to talk to the auctioneer first!")
 	end
@@ -216,11 +220,28 @@ function private.Unpack(item, storage)
 	storage.amBidder = item[Const.AMHIGH]
 	storage.dataFlag = item[Const.FLAG]
 	storage.itemId = item[Const.ITEMID]
-	
+
 	return storage
 end
 -- Define a public accessor for the above upack function
 lib.UnpackImageItem = private.Unpack
+
+--The first parameter will be true if we want to show the process indicator, false if we want to hide it. and nil if we only want to update it.
+--The second parameter will be a number that is the max number of items in the scan.
+--The third parameter is the current progress of the scan.
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
+	if (not (lib.IsScanning() or (state == false))) then
+		return
+	end
+
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("scanprogress", state, totalAuctions, scannedAuctions)
+			end
+		end
+	end
+end
 
 function private.IsIdentical(focus, compare)
 	for i = 1, Const.SELLER do
@@ -310,7 +331,7 @@ end
 function private.GetID(IDlist)
 	for x1, x2 in pairs(IDlist) do
 		if (x1 ~= "none_after") then
-			if (x1==x2) then 
+			if (x1==x2) then
 				IDlist[x1] = nil
 			else
 				IDlist[x1] = tonumber(x2)-1
@@ -328,7 +349,7 @@ function private.ReleaseID(IDlist, ID)
 
 	local setbefore = nil
 	local setafter = nil
-	
+
 	for x1, x2 in pairs(IDlist) do
 		if (x2) then
 			x2 = tonumber(x2)
@@ -361,12 +382,12 @@ function private.ReleaseID(IDlist, ID)
 		IDlist[setbefore] = ID
 	else
 		IDlist[ID] = ID
-	end	
+	end
 end
 
 function private.IsInQuery(curQuery, data)
 	if 	(not curQuery.class or curQuery.class == data[Const.ITYPE])
-			and (not curQuery.subClass or (curQuery.subClass == data[Const.ISUB])) 
+			and (not curQuery.subClass or (curQuery.subClass == data[Const.ISUB]))
 			and (not curQuery.minUseLevel or (data[Const.ULEVEL] >= curQuery.minUseLevel))
 			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
 			and (not curQuery.name or (strfind(data[Const.NAME], curQuery.name, 1, true)))
@@ -394,6 +415,7 @@ function private.BuildIDList(scandata, faction, realmName)
 	table.sort(idList)
 	return idList
 end
+
 function private.GetNextID(idList)
 	local first = idList[1]
 	local second = idList[2]
@@ -406,6 +428,7 @@ function private.GetNextID(idList)
 	idList[1] = first
 	return first
 end
+
 function lib.GetScanData(faction, realmName)
 	if not faction then faction = AucAdvanced.GetFactionGroup() end
 	if not realmName then realmName = GetRealmName() end
@@ -418,14 +441,13 @@ function lib.GetScanData(faction, realmName)
 	return AucScanData.scans[realmName][faction], idList
 end
 
-
 function private.Commit(wasIncomplete)
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
 	if not private.curQuery then return end
 	local scandata, idList = lib.GetScanData()
 	local now = time()
-	
+
 	local list, link, flag
 	local lut = {}
 
@@ -469,7 +491,7 @@ function private.Commit(wasIncomplete)
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
 			data[Const.ID] = scandata.image[itemPos][Const.ID]
-			if not private.IsIdentical(scandata.image[itemPos], data) then				
+			if not private.IsIdentical(scandata.image[itemPos], data) then
 				processStats("update", data, scandata.image[itemPos])
 				updateCount = updateCount + 1
 			else
@@ -525,7 +547,7 @@ function private.Commit(wasIncomplete)
 	end
 	processStats("complete")
 
-	local currentCount = #scandata.image	
+	local currentCount = #scandata.image
 	if (updateCount + sameCount + newCount ~= scanCount) then
 		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
 	end
@@ -541,7 +563,7 @@ function private.Commit(wasIncomplete)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
-	
+
 	if (wasIncomplete) then
 		lib.Print("Auctioneer Advanced scanned {{"..scanCount.."}} auctions before interruption:")
 	else
@@ -565,11 +587,11 @@ function private.Commit(wasIncomplete)
 	end
 	scanTime = scanTime.."Spent Scanning Auction House"
 	lib.Print(scanTime)
-	
+
 	if (not scandata.scanstats) then scandata.scanstats = {} end
-	if (scandata.scanstats[1]) then 
-		scandata.scanstats[2] = scandata.scanstats[1] 
-		scandata.scanstats[1] = nil 
+	if (scandata.scanstats[1]) then
+		scandata.scanstats[2] = scandata.scanstats[1]
+		scandata.scanstats[1] = nil
 	end
 	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
 	scandata.scanstats[0] = {oldCount = oldCount, sameCount = sameCount, newCount = newCount, updateCount = updateCount,
@@ -593,6 +615,8 @@ function private.Commit(wasIncomplete)
 		end
 	end
 
+	--Hide the progress indicator
+	private.UpdateScanProgress(false)
 	lib.PopScan()
 end
 
@@ -603,10 +627,10 @@ function lib.ScanPage(nextPage)
 			return
 		end
 		private.sentQuery = true
-		private.Hook.QueryAuctionItems(private.curQuery.name or "", 
+		private.Hook.QueryAuctionItems(private.curQuery.name or "",
 			private.curQuery.minUseLevel or "", private.curQuery.maxUseLevel or "",
-			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage, 
-			private.curQuery.isUsable, private.curQuery.quality) 
+			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
+			private.curQuery.isUsable, private.curQuery.quality)
 		AuctionFrameBrowse.page = nextPage
 	end
 	private.curPage = nextPage
@@ -629,7 +653,7 @@ function lib.StorePage()
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
 	end
-	
+
 	if not private.curQuery then
 		return
 	end
@@ -638,6 +662,9 @@ function lib.StorePage()
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = floor(totalAuctions / 50);
 	if not private.curScan then private.curScan = {} end
+
+	--Update the progress indicator
+	private.UpdateScanProgress(nil, totalAuctions, #private.curScan)
 
 	local curTime = time()
 
@@ -685,7 +712,7 @@ function lib.StorePage()
 			-- are not duplicate entries.
 			if (private.isScanning and private.scanDir == 1)
 			or totalAuctions <= 50
-			or private.NoDupes(private.curScan, itemData) then 
+			or private.NoDupes(private.curScan, itemData) then
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
@@ -693,7 +720,7 @@ function lib.StorePage()
 	end
 
 	-- Send the next page query or finish scanning
-	
+
 	if private.isScanning then
 		if (private.scanDir == 1 and private.curPage < maxPages) or
 		(private.scanDir == -1 and private.curPage > 0) then
@@ -732,6 +759,7 @@ if (isSecure) then
 else
 	private.warnTaint = taint
 end
+
 function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
 	if private.warnTaint then
 		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
@@ -754,26 +782,26 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	if (name and name ~= "") then query.name = name end
 	if (minLevel > 0) then query.minUseLevel = minLevel end
 	if (maxLevel > 0) then query.maxUseLevel = maxLevel end
-	if (classIndex > 0) then 
-		query.class = private.ClassConvert(classIndex) 
+	if (classIndex > 0) then
+		query.class = private.ClassConvert(classIndex)
 		query.classIndex = classIndex
 	end
-	if (subclassIndex > 0) then 
+	if (subclassIndex > 0) then
 		query.subclass = private.ClassConvert(classIndex, subclassIndex)
 		query.subclassIndex = subclassIndex
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	
+
 	if (private.curQuery) then
 		for x, y in pairs(query) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end		
+			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end
 		end
 		for x, y in pairs(private.curQuery) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end		
+			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end
 		end
 	end
-	
+
 	if (not is_same or not private.curQuery) then
 		private.Commit(true)
 		private.scanStartTime = time()
@@ -784,7 +812,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			private.curPage = -1
 		end
 		private.curPage = startPage
-	end	
+	end
 	private.curQuery = query
 	private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 		query.name or "",
@@ -796,7 +824,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		query.invType or ""
 	)
 	private.sentQuery = true
-	lib.lastReq = GetTime()	
+	lib.lastReq = GetTime()
 
 	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex))
 end
@@ -833,7 +861,7 @@ function private.OnUpdate(me, dur)
 		end
 		return
 	end
-		
+
 	if AuctionFrame:IsVisible() then
 		if private.unexpectedClose then
 			private.unexpectedClose = false
@@ -846,11 +874,11 @@ function private.OnUpdate(me, dur)
 		end
 	end
 end
-private.updater = CreateFrame("Frame", "", UIParent)
+private.updater = CreateFrame("Frame", nil, UIParent)
 private.updater:SetScript("OnUpdate", private.OnUpdate)
 
 function lib.Cancel()
-	if (private.curQuery) then 
+	if (private.curQuery) then
 		print("Cancelling current scan")
 		private.Commit(true)
 	end
@@ -871,8 +899,6 @@ function lib.Abort()
 	private.ResetAll()
 end
 
-
-
 function private.ResetAll()
 	private.scanStartTime = nil
 	private.curQuerySig = nil
@@ -884,4 +910,7 @@ function private.ResetAll()
 	private.sentQuery = nil
 	private.isScanning = false
 	private.unexpectedClose = false
+
+	--Hide the progress indicator
+	private.UpdateScanProgress(false)
 end
