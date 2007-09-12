@@ -137,6 +137,8 @@ function private.OnEvent(...)
 		-- Do Nothing for now
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		AucAdvanced.Scan.Interrupt()
+	elseif (event == "PLAYER_LEAVING_WORLD") then
+		AucAdvanced.Scan.Commit(true)
 	elseif event == "UNIT_INVENTORY_CHANGED"
 	or event == "ITEM_LOCK_CHANGED"
 	or event == "CURSOR_UPDATE"
@@ -147,6 +149,10 @@ function private.OnEvent(...)
 end
 
 function private.OnUpdate(...)
+	if event == "inventory" then
+		AucAdvanced.Post.AlertBagsChanged()
+	end
+
 	local now = GetTime()
 	for event, time in pairs(private.Schedule) do
 		if time > now then
@@ -170,6 +176,7 @@ private.Frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
 private.Frame:RegisterEvent("CURSOR_UPDATE")
 private.Frame:RegisterEvent("BAG_UPDATE")
+private.Frame:RegisterEvent("PLAYER_LEAVING_WORLD")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
 
