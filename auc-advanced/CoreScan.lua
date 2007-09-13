@@ -620,10 +620,11 @@ function private.Commit(wasIncomplete)
 	lib.PopScan()
 end
 
-function lib.ScanPage(nextPage)
+function lib.ScanPage(nextPage, really)
 	if (private.isScanning) then
-		if not CanSendAuctionQuery() then
-			private.scanNext = nextPage
+		if not CanSendAuctionQuery() or not really then
+			private.scanNext = GetTime() + 0.1
+			private.scanNextPage = nextPage
 			return
 		end
 		private.sentQuery = true
@@ -854,10 +855,10 @@ function private.OnUpdate(me, dur)
 		return
 	end
 	if private.scanNext then
-		if CanSendAuctionQuery() then
-			local nextPage = private.scanNext
+		if GetTime() > private.scanNext and CanSendAuctionQuery() then
+			local nextPage = private.scanNextPage
 			private.scanNext = nil
-			lib.ScanPage(nextPage)
+			lib.ScanPage(nextPage, true)
 		end
 		return
 	end
