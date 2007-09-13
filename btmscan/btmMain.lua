@@ -70,6 +70,13 @@ BtmScan.Version = BTMSCAN_VERSION
 BtmScan.NoPrompt = {}
 BtmScan.resume = nil
 
+if (AucAdvanced and AucAdvanced.Modules) then
+	if not AucAdvanced.Modules.External then
+		AucAdvanced.Modules.External = {}
+	end
+	AucAdvanced.Modules.External.BtmScan = BtmScan
+end
+
 -- Load function gets run when this addon has loaded.
 BtmScan.OnLoad = function ()
 	BtmScan.Print(tr("Welcome to BottomScanner. Type /btm for help"))
@@ -93,8 +100,8 @@ BtmScan.OnLoad = function ()
 	Stubby.RegisterBootCode("BtmScan", "CommandHandler", [[
 		local function cmdHandler(msg)
 			local cmd, param = msg:lower():match("^(%w+)%s*(.*)$")
-			cmd = cmd or msg:lower() or "";
-			param = param or "";
+			cmd = cmd or msg:lower() or ""
+			param = param or ""
 			if (cmd == "load") then
 				if (param == "") then
 					Stubby.Print("Manually loading BottomScanner...")
@@ -126,7 +133,7 @@ BtmScan.OnLoad = function ()
 		SLASH_BTMSCAN3 = "/bottomscan"
 		SLASH_BTMSCAN4 = "/bottomscanner"
 		SlashCmdList["BTMSCAN"] = cmdHandler
-	]]);
+	]])
 	Stubby.RegisterBootCode("BtmScan", "Triggers", [[
 		function BtmScan_CheckLoad()
 			local loadType = Stubby.GetConfig("BtmScan", "LoadType")
@@ -139,9 +146,9 @@ BtmScan.OnLoad = function ()
 		if (loadType == "always") then
 			LoadAddOn("BtmScan")
 		else
-			Stubby.Print("BottomScanner is not loaded. Type /btmscan for more info.");
+			Stubby.Print("BottomScanner is not loaded. Type /btmscan for more info.")
 		end
-	]]);
+	]])
 
 	BtmScan.timer = 0
 end
@@ -261,13 +268,33 @@ BtmScan.OnUpdate = function(...)
 	end
 end
 
-
+local lastNextPage = 0
 BtmScan.QueryAuctionItems = function(par,ret, name,lmin,lmax,itype,class,sclass,page,able,qual)
-	if (not BtmScan.scanning) then return end
+	lastNextPage = 0
 
-	-- Kewl, lets schedule a scan of this page for 2 seconds into the future.
+	if (not BtmScan.scanning) then return end
+	if (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
+		-- We will get notified when to check the page. We don't have to "guess".
+		return
+	end
+
+	-- Lets guess that the results should be available in about 2 seconds time and
+	-- schedule a scan of this page for 2 seconds into the future.
 	BtmScan.timer = 0
 	BtmScan.pageScan = 2
+end
+
+-- Called by AucAdvanced when it's finished it's page to ask us if we're finished with it.
+-- We'll schedule an immediate page scan to make certian!
+function BtmScan.FinishedPage(nextPage)
+	if (not BtmScan.scanning) then return end
+	if lastNextPage == nextPage then return end
+	lastNextPage = nextPage
+	BtmScan.timer = 0.1 -- Force a scan
+	BtmScan.pageScan = 0
+	if (BtmScan.scanStage and BtmScan.scanStage ~= 3) then
+		BtmScan.scanStage = 2
+	end
 end
 
 function BtmScan.PageScan(resume)
@@ -308,6 +335,7 @@ function BtmScan.PageScan(resume)
 			item.name, item.tex, item.count, item.qual,
 			item.use, item.lvl, item.min, item.inc, item.buy,
 			item.cur, item.high, item.owner = GetAuctionItemInfo("list", item.pos)
+			item.remain = GetAuctionItemTimeLeft("list", item.pos)
 
 			if (item.owner ~= UnitName("player") and item.high ~= 1) then
 				-- Disassemble the link
@@ -761,6 +789,29 @@ BtmScan.GSC = function (money, exact, dontUseColorCodes)
 	return gsc
 end
 
+local GSC_GOLD="ffd100"
+local GSC_SILVER="e6e6e6"
+local GSC_COPPER="c8602c"
+
+local GSC_3 = "|cff%s%d|cff000000.|cff%s%02d|cff000000.|cff%s%02d|r"
+local GSC_2 = "|cff%s%d|cff000000.|cff%s%02d|r"
+local GSC_1 = "|cff%s%d|r"
+
+function BtmScan.Coins(money)
+	money = math.floor(tonumber(money) or 0)
+	local g = math.floor(money / 10000)
+	local s = math.floor(money % 10000 / 100)
+	local c = money % 100
+
+	if (g>0) then
+		return (GSC_3):format(GSC_GOLD, g, GSC_SILVER, s, GSC_COPPER, c)
+	elseif (s>0) then
+		return (GSC_2):format(GSC_SILVER, s, GSC_COPPER, c)
+	end
+	return (GSC_1):format(GSC_COPPER, c)
+end
+local coins = BtmScan.Coins
+
 BtmScan.Print = function (text, cRed, cGreen, cBlue, cAlpha, holdTime)
 	local frameIndex = BtmScan.getFrameIndex()
 
@@ -1195,20 +1246,20 @@ end
 function BtmScan.AuctionFrameTabClickHook(_,_, index)
 	if (not index) then index = this:GetID(); end
 
-	local tab = getglobal("AuctionFrameTab"..index);
+	local tab = getglobal("AuctionFrameTab"..index)
 	if (tab and tab:GetName() == "AuctionFrameTabBtmScan") then
-		AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
-		AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
-		AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
-		AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
-		AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
-		AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
+		AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft")
+		AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top")
+		AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight")
+		AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft")
+		AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot")
+		AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight")
 		BtmScan.LogParent:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 10,-70)
-		BtmScan.LogParent:Show();
-		AuctionFrameMoneyFrame:Hide();
+		BtmScan.LogParent:Show()
+		AuctionFrameMoneyFrame:Hide()
 	else
-		BtmScan.LogParent:Hide();
-		AuctionFrameMoneyFrame:Show();
+		BtmScan.LogParent:Hide()
+		AuctionFrameMoneyFrame:Show()
 	end
 end
 
@@ -1218,16 +1269,32 @@ BtmScan.PromptPurchase = function(item)
 	BtmScan.Prompt.item = item
 
 	-- format the profit percentage as an integer (can still be huge)
-	local profitPercent = math.floor( (100 * item.profit / item.purchase) + 0.5 );
+	local Vi, Vf = item.purchase, item.valuation
+
+	local profit = Vf - Vi
+	local roi = math.floor( (100 * profit / Vi) + 0.5 )
+	local disc = math.floor( (100 * (1 - Vi / Vf)) + 0.5 )
 	
 	local bidText, BidText = "purchase", "Buyout"
 	if (not item.canbuy or item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
+
+	local hours
+	if (item.remain == 4) then hours = 24
+	elseif (item.remain == 3) then hours = 8
+	elseif (item.remain == 2) then hours = 2
+	elseif (item.remain == 1) then hours = 0.5
+	end
 	
-	BtmScan.Prompt.Lines[1]:SetText(tr("Do you want to %1:", bidText))
-	BtmScan.Prompt.Lines[2]:SetText("  "..item.link.."x"..item.count)
-	BtmScan.Prompt.Lines[3]:SetText("  "..tr("%1 price: %2", BidText, BtmScan.GSC(item.purchase)))
-	BtmScan.Prompt.Lines[4]:SetText("  "..tr("Purchasing for: %1", item.reason))
-	BtmScan.Prompt.Lines[5]:SetText("  "..tr("Valued at %1 (%2 profit / %3%)", BtmScan.GSC(item.valuation), BtmScan.GSC(item.profit), profitPercent))
+	BtmScan.Prompt.Lines[1]:SetLine(tr("Do you want to %1:", bidText))
+	BtmScan.Prompt.Lines[2]:SetLine("  "..item.link.." x"..item.count)
+	BtmScan.Prompt.Lines[3]:SetLine("  "..tr("Seller: %1, Remain: %2h", item.owner, hours))
+	BtmScan.Prompt.Lines[4]:SetLine("  "..tr("%1 price:", BidText), BtmScan.Coins(Vi,true))
+	BtmScan.Prompt.Lines[5]:SetLine("  "..tr("Purchasing for:"), item.reason)
+	BtmScan.Prompt.Lines[6]:SetLine("  "..tr("Valuation estimate:"), BtmScan.Coins(Vf,true))
+	BtmScan.Prompt.Lines[7]:SetLine("  "..tr("Potential profit:"), BtmScan.Coins(profit,true))
+	BtmScan.Prompt.Lines[8]:SetLine("  "..tr("Return on investment:"), roi.."%")
+	BtmScan.Prompt.Lines[9]:SetLine("  "..tr("Discounted rate:"), disc.."%")
+	BtmScan.Prompt.Lines[10]:SetLine("  "..tr("Profit above requirements:"), BtmScan.Coins(item.profit,true))
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(item.tex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
 	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3")
@@ -1377,7 +1444,7 @@ BtmScan.Prompt = CreateFrame("Frame", "", UIParent)
 BtmScan.Prompt:Hide()
 BtmScan.Prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
 BtmScan.Prompt:SetFrameStrata("DIALOG")
-BtmScan.Prompt:SetHeight(150)
+BtmScan.Prompt:SetHeight(195)
 BtmScan.Prompt:SetWidth(400)
 BtmScan.Prompt:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -1406,19 +1473,34 @@ BtmScan.Prompt.Item:SetScript("OnEnter", BtmScan.PurchaseTooltip)
 BtmScan.Prompt.Item:SetScript("OnLeave", BtmScan.UndoTooltip)
 
 BtmScan.Prompt.Lines = {}
-for i = 1, 5 do
-	BtmScan.Prompt.Lines[i] = BtmScan.Prompt:CreateFontString("BtmScanPromptLine"..i, "HIGH")
+for i = 1, 10 do
+	BtmScan.Prompt.Lines[i] = BtmScan.Prompt:CreateFontString("BtmScanPromptLine"..i, "HIGH", "GameFontHighlight")
+	local path, size, flags = BtmScan.Prompt.Lines[i]:GetFont()
 	if (i == 1) then
 		BtmScan.Prompt.Lines[i]:SetPoint("TOPLEFT", BtmScan.Prompt.Item, "TOPRIGHT", 5, 5)
-		BtmScan.Prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",16)
+		BtmScan.Prompt.Lines[i]:SetFont(path, 16, flags)
 	else
-		BtmScan.Prompt.Lines[i]:SetPoint("TOPLEFT", BtmScan.Prompt.Lines[i-1], "BOTTOMLEFT")
-		BtmScan.Prompt.Lines[i]:SetFont("Fonts\\FRIZQT__.TTF",13)
+		BtmScan.Prompt.Lines[i]:SetPoint("TOPLEFT", BtmScan.Prompt.Lines[i-1], "BOTTOMLEFT", 0,-2)
+		if (i == 2) then
+			BtmScan.Prompt.Lines[i]:SetFont(path, 14, flags)
+		else
+			BtmScan.Prompt.Lines[i]:SetFont(path, 13, flags)
+		end
 	end
-	BtmScan.Prompt.Lines[i]:SetWidth(350)
+	BtmScan.Prompt.Lines[i]:SetPoint("RIGHT", BtmScan.Prompt, "RIGHT", -20, 0)
 	BtmScan.Prompt.Lines[i]:SetJustifyH("LEFT")
-	BtmScan.Prompt.Lines[i]:SetText("Prompt Line "..i)
+	BtmScan.Prompt.Lines[i]:SetJustifyV("CENTER")
+	BtmScan.Prompt.Lines[i]:SetText("")
 	BtmScan.Prompt.Lines[i]:Show()
+	BtmScan.Prompt.Lines[i].Right = BtmScan.Prompt:CreateFontString("BtmScanPromptLine"..i.."Right", "HIGH", "GameFontHighlight")
+	BtmScan.Prompt.Lines[i].Right:SetAllPoints(BtmScan.Prompt.Lines[i])
+	BtmScan.Prompt.Lines[i].Right:SetJustifyH("RIGHT")
+	BtmScan.Prompt.Lines[i].Right:SetJustifyV("CENTER")
+	BtmScan.Prompt.Lines[i].Right:SetFont(path, 14, flags)
+	BtmScan.Prompt.Lines[i].SetLine = function(self, left, right)
+		self:SetText(left or "")
+		self.Right:SetText(right or "")
+	end
 end
 
 BtmScan.Prompt.Yes = CreateFrame("Button", "", BtmScan.Prompt, "OptionsButtonTemplate")
@@ -1567,11 +1649,11 @@ BtmScan.CreateLogWindow = function()
 	end)
 
 	-- Insert a tab into the AH
-	BtmScan.ScanTab = CreateFrame("Button", "AuctionFrameTabBtmScan", AuctionFrame, "AuctionTabTemplate");
+	BtmScan.ScanTab = CreateFrame("Button", "AuctionFrameTabBtmScan", AuctionFrame, "AuctionTabTemplate")
 	BtmScan.ScanTab:SetText(tr("BtmScan"))
 	BtmScan.ScanTab:Hide()
 	BtmScan.ScanTab:Show()
-	PanelTemplates_DeselectTab(BtmScan.ScanTab);
+	PanelTemplates_DeselectTab(BtmScan.ScanTab)
 
 	if (Auctioneer and Auctioneer.UI) then Auctioneer.UI.InsertAHTab(BtmScan.ScanTab, BtmScan.LogParent)
 	elseif (AucAdvanced and AucAdvanced.AddTab) then AucAdvanced.AddTab(BtmScan.ScanTab, BtmScan.LogParent)
@@ -1579,7 +1661,7 @@ BtmScan.CreateLogWindow = function()
 
 	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BtmScan.AuctionFrameTabClickHook)
 
-	BtmScan.PlayButton = CreateFrame("Button", "", BtmScan.LogParent);
+	BtmScan.PlayButton = CreateFrame("Button", "", BtmScan.LogParent)
 	BtmScan.PlayButton:SetNormalTexture("Interface\\AddOns\\BtmScan\\Textures\\Play")
 	BtmScan.PlayButton:SetPushedTexture("Interface\\AddOns\\BtmScan\\Textures\\Stop")
 	BtmScan.PlayButton:SetPoint("BOTTOMLEFT", BtmScan.LogParent, "TOPLEFT", 70, 5)

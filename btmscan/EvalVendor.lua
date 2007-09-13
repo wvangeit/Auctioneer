@@ -102,5 +102,5 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".never.buy", "Never buyout items")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".never.bid", "Never bid on items")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
-	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Percent Profit: %0.01f%%")
+	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 end
