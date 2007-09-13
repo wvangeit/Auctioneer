@@ -318,7 +318,7 @@ local function setter(setting, value)
 	end
 
 	if (a == "sideIcon") then
-		Enchantrix.SIdeIcon.Update()
+		Enchantrix.SideIcon.Update()
 	end
 		
 end
