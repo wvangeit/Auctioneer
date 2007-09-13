@@ -325,10 +325,10 @@ function private.ClearData(faction, realmName)
 	if (not AAStatSimpleData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFaction()
 	if (realmName) then
-		print("Clearing Simple stats for {{"..faction.."}}")	
+		print("Clearing "..libName.." stats for {{"..faction.."}}")	
 	else
 		realmName = GetRealmName()
-		print("Clearing Simple stats for {{"..faction.."}} on {{"..realmName.."}}")
+		print("Clearing "..libName.." stats for {{"..faction.."}} on {{"..realmName.."}}")
 	end
 	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][faction]) then
 		AAStatSimpleData.RealmData[realmName][faction] = nil
