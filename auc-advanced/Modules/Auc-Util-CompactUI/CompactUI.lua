@@ -77,6 +77,7 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
+	AucAdvanced.Settings.SetDefault("util.browseoverride.activated", false)
 end
 
 --[[ Local functions ]]--
