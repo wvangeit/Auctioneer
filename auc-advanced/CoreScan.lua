@@ -243,6 +243,22 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
 	end
 end
 
+-- function to prevent modifications to the browse tab if the user desires
+-- parameter will be true if changes are not allowed, false to accept all changes
+function private.UpdateBrowseOverride(state)
+	if (not (lib.IsScanning() or (state == false))) then
+		return
+	end
+	
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("browseoverride", state)
+			end
+		end
+	end
+end
+
 function private.IsIdentical(focus, compare)
 	for i = 1, Const.SELLER do
 		if (i ~= Const.TIME and focus[i] ~= compare[i]) then

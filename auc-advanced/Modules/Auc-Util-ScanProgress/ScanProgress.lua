@@ -77,8 +77,8 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
 	if (not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")) then
 		return
 	end
-	--Check to see if Compact UI is being used, if so gracefully allow it to continue as is
-	if AucAdvanced.Settings.GetSetting("util.compactui.activated") then
+	--Check to see if browseoverride has been set, if so gracefully allow it to continue as is
+	if AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
 		return
 	end
 
