@@ -127,7 +127,7 @@ function lib.PopScan()
 		if now - pauseTime > 300 then
 			-- 5 minutes old
 			print("Paused scan is older than 5 minutes, aborting")
-			private.Commit(true)
+			lib.Commit(true)
 			return
 		end
 
@@ -156,7 +156,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		end
 
 		if private.curQuery then
-			private.Commit(true)
+			lib.Commit(true)
 		end
 
 		private.isScanning = true
@@ -441,7 +441,7 @@ function lib.GetScanData(faction, realmName)
 	return AucScanData.scans[realmName][faction], idList
 end
 
-function private.Commit(wasIncomplete)
+function lib.Commit(wasIncomplete)
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
 	if not private.curQuery then return end
@@ -747,10 +747,10 @@ function lib.StorePage()
 				incomplete = true
 			end
 			private.isScanning = false
-			private.Commit(incomplete)
+			lib.Commit(incomplete)
 		end
 	elseif (totalAuctions <= 50) then
-		private.Commit(false)
+		lib.Commit(false)
 	end
 end
 
@@ -819,7 +819,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 
 	if (not is_same or not private.curQuery) then
-		private.Commit(true)
+		lib.Commit(true)
 		private.scanStartTime = time()
 		local startPage = 0
 		if (private.scanDir == 1) then
@@ -896,7 +896,7 @@ private.updater:SetScript("OnUpdate", private.OnUpdate)
 function lib.Cancel()
 	if (private.curQuery) then
 		print("Cancelling current scan")
-		private.Commit(true)
+		lib.Commit(true)
 	end
 	private.ResetAll()
 end
