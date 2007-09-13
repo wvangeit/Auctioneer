@@ -1333,7 +1333,6 @@ function doBidBroker(minProfit, percentLess)
 		else
 			hasBid = true
 		end
-		if currentBid == 0 then p("Detail", a) end
 		local value = auctionItem.value;
 		local margin = auctionItem.margin;
 		local profit = auctionItem.profit;
