@@ -620,9 +620,24 @@ function private.Commit(wasIncomplete)
 	lib.PopScan()
 end
 
+function private.FinishedPage(nextPage)
+	-- Tell everyone that our stats are updated
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engineLib.FinishedPage then
+				local finished = engineLib.FinishedPage(nextPage)
+				if finished and finished == false then
+					return false
+				end
+			end
+		end
+	end
+	return true
+end
+
 function lib.ScanPage(nextPage, really)
 	if (private.isScanning) then
-		if not CanSendAuctionQuery() or not really then
+		if not (CanSendAuctionQuery() and private.FinishedPage(nextPage) and really) then
 			private.scanNext = GetTime() + 0.1
 			private.scanNextPage = nextPage
 			return
