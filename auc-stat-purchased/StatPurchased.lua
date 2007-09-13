@@ -337,10 +337,10 @@ function private.ClearData(faction, realmName)
 	if (not AAStatPurchasedData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFactionGroup()
 	if (realmName) then
-		print("Clearing all stats for {{"..faction.."}}")	
+		print("Clearing Purchased stats for {{"..faction.."}}")	
 	else
 		realmName = GetRealmName()
-		print("Clearing all stats for {{"..faction.."}} on {{"..realmName.."}}")
+		print("Clearing Purchased stats for {{"..faction.."}} on {{"..realmName.."}}")
 	end
 	if (AAStatPurchasedData.RealmData[realmName] and AAStatPurchasedData.RealmData[realmName][faction]) then
 		AAStatPurchasedData.RealmData[realmName][faction] = nil

@@ -68,7 +68,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "help}} - this", libName, "help")
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then
-		print("Clearing all stats for {{", myFaction, "}}")
+		print("Clearing StdDev stats for {{", myFaction, "}}")
 		data[myFaction] = nil
 	end
 end

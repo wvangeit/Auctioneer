@@ -67,7 +67,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 		print(line, "push}} - force the", myFaction, libName, "daily stats to archive (start a new day)")
 	elseif (command == "clear") then
-		print("Clearing all stats for {{", myFaction, "}}")
+		print("Clearing Simple stats for {{", myFaction, "}}")
 		private.ClearData()
 	elseif (command == "push") then
 		print("Archiving {{", myFaction, "}} daily stats and starting a new day")
@@ -325,10 +325,10 @@ function private.ClearData(faction, realmName)
 	if (not AAStatSimpleData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFaction()
 	if (realmName) then
-		print("Clearing all stats for {{"..faction.."}}")	
+		print("Clearing Simple stats for {{"..faction.."}}")	
 	else
 		realmName = GetRealmName()
-		print("Clearing all stats for {{"..faction.."}} on {{"..realmName.."}}")
+		print("Clearing Simple stats for {{"..faction.."}} on {{"..realmName.."}}")
 	end
 	if (AAStatSimpleData.RealmData[realmName] and AAStatSimpleData.RealmData[realmName][faction]) then
 		AAStatSimpleData.RealmData[realmName][faction] = nil
