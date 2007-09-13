@@ -77,6 +77,10 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
 	if (not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")) then
 		return
 	end
+	--Check to see if Compact UI is being used, if so gracefully allow it to continue as is
+	if AucAdvanced.Settings.GetSetting("util.compactui.activated") then
+		return
+	end
 
 	--Change the state if we have not scanned any auctions yet.
 	--This is done so that we don't start the timer too soon and thus get skewed numbers
