@@ -109,7 +109,16 @@ function private.HideScanProgressUI()
 	BrowseNoResultsText:SetText(SEARCHING_FOR_ITEMS)
 	AuctionFrameBrowse:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	for i=1, NUM_BROWSE_TO_DISPLAY do
-		_G["BrowseButton"..i]:Show()
+	end
+	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
+	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
+	for i=1, NUM_BROWSE_TO_DISPLAY do
+		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)
+		if ( index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) ) then
+			_G["BrowseButton"..i]:Hide()
+		else
+			_G["BrowseButton"..i]:Show()
+		end
 	end
 end
 
