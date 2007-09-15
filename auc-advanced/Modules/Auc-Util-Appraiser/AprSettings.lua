@@ -75,8 +75,12 @@ end
 -- Function to round a value according to the current rounding method
 function private.roundValue(value)
 	local method = AucAdvanced.Settings.GetSetting("util.appraiser.round.method") or "unit"
-	local pos = AucAdvanced.Settings.GetSetting("util.appraiser.round.position") or 0.00
+	local pos = math.floor((AucAdvanced.Settings.GetSetting("util.appraiser.round.position") or 0.00) * 100 + 0.5)/100
 	local magstep = AucAdvanced.Settings.GetSetting("util.appraiser.round.magstep") or 5
+
+	if method == "div" and pos <= 0.01 then
+		return math.floor(value + 0.5)
+	end
 
 	local magnitude
 	if (value > 10000*magstep) then magnitude = 10000
