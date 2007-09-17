@@ -389,7 +389,7 @@ function kit:AddControl(id, cType, column, ...)
 			el.hit:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 			el.hit.setting = setting
 			el.hit.stype = "Button";
-			el.hit:SetScript("OnClick", function() self:ChangeSetting(this) end)
+			el.hit:SetScript("OnClick", function(...) self:ChangeSetting(...) end)
 			el.hit:Show()
 		end
 		control = el
@@ -419,7 +419,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.stype = "EditBox"
 		el:SetAutoFocus(false)
 		self:GetSetting(el)
-		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(this) end)
+		el:SetScript("OnEditFocusLost", function(...) self:ChangeSetting(...) end)
 		el:SetScript("OnEscapePressed", kit.Unfocus)
 		el:SetScript("OnEnterPressed", kit.Unfocus)
 		self.elements[setting] = el
@@ -464,7 +464,7 @@ function kit:AddControl(id, cType, column, ...)
 		anchorPoint(content, el, last, 10 + column + indent, colwidth or 80, 22, 4)
 		el.setting = setting
 		el.stype = "Button";
-		el:SetScript("OnClick", function() self:ChangeSetting(this) end)
+		el:SetScript("OnClick", function(...) self:ChangeSetting(...) end)
 		el:SetText(text)
 		control = el
 		last = el
@@ -481,7 +481,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.setting = setting
 		el.stype = "CheckButton"
 		self:GetSetting(el)
-		el:SetScript("OnClick", function() self:ChangeSetting(this) end)
+		el:SetScript("OnClick", function(...) self:ChangeSetting(...) end)
 		self.elements[setting] = el
 		control = el
 		-- FontString
@@ -521,7 +521,7 @@ function kit:AddControl(id, cType, column, ...)
 		el:SetValueStep(step)
 		self:GetSetting(el)
 		el:SetHitRectInsets(0,0,0,0)
-		el:SetScript("OnValueChanged", function() self:ChangeSetting(this) end)
+		el:SetScript("OnValueChanged", function(...) self:ChangeSetting(...) end)
 		self.elements[setting] = el
 		control = el
 		last = textElement
@@ -547,7 +547,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.maxValue = maxVal;
 		el.Numeric = true;
 		self:GetSetting(el)
-		el:SetScript("OnEditFocusLost", function() self:ChangeSetting(this) end)
+		el:SetScript("OnEditFocusLost", function(...) self:ChangeSetting(...) end)
 		el:SetScript("OnEscapePressed", kit.Unfocus)
 		el:SetScript("OnEnterPressed", kit.Unfocus)
 		self.elements[setting] = el
