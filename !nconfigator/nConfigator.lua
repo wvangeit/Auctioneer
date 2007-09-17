@@ -1,5 +1,4 @@
 --[[
-
 	nConfigator - A library to help you create a gui config
 	Revision: $Id$
 
