@@ -3,9 +3,8 @@
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
-	This is an addon for World of Warcraft that adds a price level indicator
-	to auctions when browsing the Auction House, so that you may readily see
-	which items are bargains or overpriced at a glance.
+	This is an Auctioneer Advanced module that adds a textual scan progress
+	indicator to the Auction House UI.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -67,16 +66,17 @@ end
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.scanprogress.activated", true)
+	AucAdvanced.Settings.SetDefault("util.scanprogress.leaveshown", true)
 end
 
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
 private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
 
-
 function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	--Check that we're enabled before passing on the callback
 	if not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")
+
 	--Check to see if browseoverride has been set, if so gracefully allow it to continue as is
 	or AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
 		state = false
@@ -118,38 +118,36 @@ function private.ShowScanProgressUI(totalAuctions)
 	else
 		BrowseNoResultsText:SetText("Scanning...")
 	end
-	AucAdvanced.API.BlockUpdate(true)
+	AucAdvanced.API.BlockUpdate(true, true)
 end
 
 function private.HideScanProgressUI()
-	BrowseNoResultsText:Hide()
-	BrowseNoResultsText:SetText(SEARCHING_FOR_ITEMS)
-	AuctionFrameBrowse:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	for i=1, NUM_BROWSE_TO_DISPLAY do
-	end
-	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
-	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
-	for i=1, NUM_BROWSE_TO_DISPLAY do
-		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)
-		if ( index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) ) then
-			_G["BrowseButton"..i]:Hide()
-		else
-			_G["BrowseButton"..i]:Show()
+	if (AucAdvanced.Settings.GetSetting("util.scanprogress.leaveshown")) then
+		AucAdvanced.API.BlockUpdate(false, false)
+	else
+		BrowseNoResultsText:Hide()
+		BrowseNoResultsText:SetText(SEARCHING_FOR_ITEMS)
+
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
+		local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
+		for i=1, NUM_BROWSE_TO_DISPLAY do
+			index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)
+			if ( index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) ) then
+				_G["BrowseButton"..i]:Hide()
+			else
+				_G["BrowseButton"..i]:Show()
+			end
 		end
+		AucAdvanced.API.BlockUpdate(false, true)
 	end
-	AucAdvanced.API.BlockUpdate(false)
 end
 
 function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
 	local numAuctionsPerPage = NUM_AUCTION_ITEMS_PER_PAGE
 
-	local secondsElapsed = time() - private.scanStartTime
-	
 	-- Prefer the elapsed time which is provided by core and excludes paused time.
-	if elapsedTime then
-		secondsElapsed = elapsedTime
-	end
-	
+	local secondsElapsed = elapsedTime or (time() - private.scanStartTime)
+
 	local auctionsToScan = totalAuctions - scannedAuctions
 
 	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)
@@ -177,6 +175,7 @@ function private.SetupConfigGui(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.activated", "Show a textual progress indicator when scanning.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.leaveshown", "Leave the scan progress text shown after scan completion.")
 end
 
 function private.ConfigChanged()

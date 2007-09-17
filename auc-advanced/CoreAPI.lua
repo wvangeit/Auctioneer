@@ -57,7 +57,7 @@ local Const = AucAdvanced.Const
 	Module type in parentheses to describe which ones provide.
 	Possible Module Types are STAT, UTIL, SCAN.  ALL is a shorthand for all three.
 	A * after the module type states the function is REQUIRED.
-	
+
 	Please visit http://norganna.org/wiki/Auctioneer/5.0/Modules_API for a
 	more complete specification.
 ]]
@@ -254,7 +254,7 @@ function lib.ListUpdate()
 end
 
 
-function lib.BlockUpdate(block)
+function lib.BlockUpdate(block, propagate)
 	local blocked
 	if block == true then
 		blocked = true
@@ -265,16 +265,19 @@ function lib.BlockUpdate(block)
 		private.isBlocked = nil
 		AuctionFrameBrowse:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	end
-	for system, systemMods in pairs(AucAdvanced.Modules) do
-		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.Processor) then
-				engineLib.Processor("blockupdate", blocked)
+
+	if (propagate) then
+		for system, systemMods in pairs(AucAdvanced.Modules) do
+			for engine, engineLib in pairs(systemMods) do
+				if (engineLib.Processor) then
+					engineLib.Processor("blockupdate", blocked)
+				end
 			end
 		end
 	end
 end
 
 function lib.IsBlocked()
-	return (private.isBlocked and private.isBlocked == true)
+	return private.isBlocked == true
 end
 

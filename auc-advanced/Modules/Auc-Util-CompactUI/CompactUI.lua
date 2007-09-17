@@ -612,7 +612,7 @@ end
 
 function private.MyAuctionFrameUpdate()
 	if not BrowseScrollFrame then return end
-	
+
 	if AucAdvanced.API.IsBlocked() then
 		for pos, candy in ipairs(private.candy) do candy:Hide() end
 		BrowsePrevPageButton:Hide()
@@ -620,7 +620,7 @@ function private.MyAuctionFrameUpdate()
 		BrowseSearchCountText:Hide()
 		return
 	end
-		
+
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
 	local index, button
