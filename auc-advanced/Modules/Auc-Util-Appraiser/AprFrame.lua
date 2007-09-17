@@ -106,7 +106,7 @@ function private.CreateFrames()
 								frame.buffer[i][5] = stack
 								frame.buffer[i][6] = itemCount
 								frame.buffer[i][7] = link
-								
+
 								table.insert(frame.list, frame.buffer[i])
 								if AucAdvanced.Modules.Util
 								and AucAdvanced.Modules.Util.ScanData
@@ -210,7 +210,7 @@ function private.CreateFrames()
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
-		
+
 		local results = AucAdvanced.API.QueryImage({
 			itemId = itemId,
 			suffix = suffix,
@@ -249,13 +249,13 @@ function private.CreateFrames()
 		else
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
 		end
-		
+
 		frame.salebox.warn:SetText("")
 		if curModel == "default" then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
 			frame.salebox.model:SetText("Default ("..curModel..")")
 		end
-		
+
 		local newBuy, newBid
 		if curModel == "fixed" then
 			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
@@ -335,7 +335,7 @@ function private.CreateFrames()
 		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or frame.salebox.stacksize
 		frame.salebox.stack:SetValue(curStack)
 		frame.UpdateControls()
-		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -1 
+		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -1
 		frame.salebox.number:SetValue(curNumber)
 
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
@@ -377,7 +377,7 @@ function private.CreateFrames()
 		local curDurationMins = private.durations[curDurationIdx][1]
 		local curDurationText = private.durations[curDurationIdx][2]
 		frame.salebox.duration.label:SetText(("Duration: %s"):format(curDurationText))
-		
+
 		local curIgnore = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
 		frame.salebox.icon:GetNormalTexture():SetDesaturated(curIgnore)
 
@@ -406,9 +406,9 @@ function private.CreateFrames()
 			local maxStax = math.floor(count / curSize)
 			local fullPop = maxStax*curSize
 			local remain = count - fullPop
-			frame.salebox.number:SetMinMaxValues(-2, maxStax)
-			if (curNumber >= -2 and curNumber < 0) then
-				if (curNumber == -2) then
+			frame.salebox.number:SetMinMaxValues(-1, maxStax)
+			if (curNumber >= -1 and curNumber < 1) then
+				if (curNumber == -1) then
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
 				else
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
@@ -427,7 +427,7 @@ function private.CreateFrames()
 					totalBuy = totalBuy + (buyVal * maxStax)
 					totalDeposit = totalDeposit + (depositVal * maxStax)
 				end
-				if (curNumber == -1 and remain > 0) then
+				if (curNumber == 0 and remain > 0) then
 					bidVal = lib.RoundBid(curBid * remain)
 					buyVal = lib.RoundBuy(curBuy * remain)
 					depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
@@ -440,8 +440,6 @@ function private.CreateFrames()
 					totalBuy = totalBuy + buyVal
 					totalDeposit = totalDeposit + depositVal
 				end
-			elseif (curNumber == 0) then
-				frame.salebox.number.label:SetText(("Number: %s"):format("|cffffee30"..("%d stacks = %d"):format(0,0)))
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
@@ -462,13 +460,13 @@ function private.CreateFrames()
 			frame.salebox.stack:SetValue(1)
 			frame.salebox.stack.label:SetText("Item is not stackable")
 			frame.salebox.stack:SetAlpha(0.6)
-		
+
 			frame.salebox.number:SetMinMaxValues(-1, frame.salebox.count)
-			if (curNumber == -1) then
+			if (curNumber == 0) then
 				curNumber = frame.salebox.count
 				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
-			elseif (curNumber == 0) then
-				frame.salebox.number.label:SetText(("Number: %s"):format("|cffffee30"..("%d items"):format(0)))
+			--elseif (curNumber == 0) then
+				--frame.salebox.number.label:SetText(("Number: %s"):format("|cffffee30"..("%d items"):format(0)))
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
 			end
@@ -494,9 +492,6 @@ function private.CreateFrames()
 		if (totalBid < 1) then
 			frame.manifest.lines:Add(("------------------------------"))
 			frame.manifest.lines:Add(("Note: No auctionable items"))
-			if (curNumber == 0) then
-				frame.manifest.lines:Add(("Check |cffffffffNumber|r is more than 0"))
-			end
 		end
 
 		local canAuction = true
@@ -609,7 +604,7 @@ function private.CreateFrames()
 			end
 		end
 		if equipLoc == "" then equipLoc = nil end
-		
+
 		AucAdvanced.Scan.PushScan()
 		AucAdvanced.Scan.StartScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
 	end
@@ -633,12 +628,12 @@ function private.CreateFrames()
 			print("Cannot post auctions: ", errortext)
 			return
 		end
-	
+
 		-- Just a quick bit of sanity checking first
 		assert(stack and stack >= 1)
-		assert(number and number >= -2) 
+		assert(number and number >= -2)
 		assert(number ~= 0)
-		assert(itemBid and itemBid > 0) 
+		assert(itemBid and itemBid > 0)
 		assert(itemBuy and itemBuy == 0 or itemBuy >= itemBid)
 		assert(duration and duration == 120 or duration == 480 or duration == 1440)
 		if not (total and total > 0) or (number > 0 and number * stack > total) then
@@ -648,9 +643,9 @@ function private.CreateFrames()
 		if (number == -2) then
 			assert(stack <= total)
 		end
-	
+
 		print(("Posting batch of: %s"):format(link))
-	
+
 		print((" - Duration: {{%d hours}}"):format(duration/60))
 
 		local bidVal, buyVal
@@ -672,7 +667,7 @@ function private.CreateFrames()
 					else
 						AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, fullStacks)
 					end
-					
+
 					totalBid = totalBid + (bidVal * fullStacks)
 					totalBuy = totalBuy + (buyVal * fullStacks)
 					totalNum = totalNum + (stack * fullStacks)
@@ -687,7 +682,7 @@ function private.CreateFrames()
 					else
 						AucAdvanced.Post.PostAuction(sig, remain, bidVal, buyVal, duration)
 					end
-					
+
 					totalBid = totalBid + bidVal
 					totalBuy = totalBuy + buyVal
 					totalNum = totalNum + remain
@@ -702,7 +697,7 @@ function private.CreateFrames()
 				else
 					AucAdvanced.Post.PostAuction(sig, stack, bidVal, buyVal, duration, number)
 				end
-					
+
 				totalBid = totalBid + (bidVal * number)
 				totalBuy = totalBuy + (buyVal * number)
 				totalNum = totalNum + (stack * number)
@@ -718,7 +713,7 @@ function private.CreateFrames()
 			else
 				AucAdvanced.Post.PostAuction(sig, 1, bidVal, buyVal, duration, number)
 			end
-				
+
 			totalBid = totalBid + (bidVal * number)
 			totalBuy = totalBuy + (buyVal * number)
 			totalNum = totalNum + number
@@ -751,7 +746,7 @@ function private.CreateFrames()
 
 				button.name:SetText(hex.."["..item[2].."]|r")
 				button.size:SetText(stackX..item[6])
-				local info = ""	
+				local info = ""
 				if frame.cache[item[1]] and not curIgnore then
 					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
 					info = "Counts: "..exact.." +"..suffix.." +"..base
@@ -796,7 +791,7 @@ function private.CreateFrames()
 	frame.UndoTooltip = function ()
 		GameTooltip:Hide()
 	end
-	
+
 	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 10,-70)
 	frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
 
@@ -1195,7 +1190,7 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("TOPLEFT", frame.salebox, "BOTTOMLEFT")
 	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
-	
+
 	frame.imageview.sheet = nScrollSheet:Create(frame.imageview, {
 		{ "Item", "TEXT", 120 },
 		{ "Seller", "TEXT", 75 },
@@ -1208,7 +1203,7 @@ function private.CreateFrames()
 		{ "CurBid", "COIN", 85 },
 		{ "Buyout", "COIN", 85 },
 	})
-	
+
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("Appraiser")
 	frame.ScanTab:Show()
