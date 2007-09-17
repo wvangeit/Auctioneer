@@ -1,6 +1,6 @@
 --[[
 	nPanelScroller
-	Revision: $Id$
+	Revision: $Id: PriceLevel.lua 2145 2007-09-10 02:24:49Z mentalpower $
 
 	License:
 		This library is free software; you can redistribute it and/or
