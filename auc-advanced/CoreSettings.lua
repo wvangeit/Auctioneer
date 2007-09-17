@@ -343,6 +343,10 @@ function lib.MakeGuiConfig()
 		"What is a profile?",
 		"A profile is used to contain a group of settings, you can use different profiles for different characters, or switch between profiles for the same character when doing different tasks."
 	)
+	gui:AddHelp(id, "how create",
+		"How do I create a new profile?",
+		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+	)
 	gui:AddHelp(id, "how delete",
 		"How do I delete a profile?",
 		"To delete a profile, simply select the profile you wish to delete with the drop-down selecteion box and then click the Delete button"
@@ -351,17 +355,29 @@ function lib.MakeGuiConfig()
 		"Why would I want to delete a profile?",
 		"You can delete a profile when you don't want to use it anymore, or you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
 	)
-	gui:AddHelp(id, "how create",
-		"How do I create a new profile?",
-		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
-	)
 	
 	id = gui:AddTab("General")
 	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
+	gui:AddTip(id, "Enable the display of how many items in the current scan image match this item")
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.tooltip.modifier", "Only show exact match unless SHIFT is held")
+	gui:AddTip(id, "Makes the scan data to only display exact matches unless the shift key is held down")
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
+	gui:AddTip(id, "Forces the scan data to load when AuctioneerAdvanced is first loaded rather than on demand when first needed")
 
+	gui:AddHelp(id, "what is scandata",
+		"What is the scan data tooltip?",
+		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen it the auctionhouse image.")
+	gui:AddHelp(id, "what is image",
+		"What is an auctionhouse image?",
+		"As you scan the auctionhouse, AuctioneerAdvanced builds up an image of what is at auction. This is the image. It represents AuctioneerAdvanced's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not, then it will not.")
+	gui:AddHelp(id, "what is exact",
+		"What is an exact match?",
+		"Some items can vary slightly by suffix (for example: of the Bear/Eagle/Ferret etc), or exact stats (eg: two items both of the Bear, but have differing statistics). An exact match will not match anything that is not 100% the same.")
+	gui:AddHelp(id, "why force load",
+		"Why would you want to force load the scan data?",
+		"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded.")
+	
   	gui:AddCat("Modules")
 
 	-- Alert all modules that the config screen is being built, so that they
