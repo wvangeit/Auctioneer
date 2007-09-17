@@ -327,10 +327,34 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
+	gui:AddTip(id, "Select the profile that you wish to use for this character")
+
 	gui:AddControl(id, "Button",     0, 1, "profile.delete", "Delete")
+	gui:AddTip(id, "Deletes the currently selected profile")
+
 	gui:AddControl(id, "Subhead",    0,    "Create or replace a profile")
 	gui:AddControl(id, "Text",       0, 1, "profile.name", "New profile name:")
+	gui:AddTip(id, "Enter the name of the profile that you wish to create")
+
 	gui:AddControl(id, "Button",     0, 1, "profile.save", "Save")
+	gui:AddTip(id, "Click this button to create or overwrite the specified profile name")
+
+	gui:AddHelp(id, "what is",
+		"What is a profile?",
+		"A profile is used to contain a group of settings, you can use different profiles for different characters, or switch between profiles for the same character when doing different tasks."
+	)
+	gui:AddHelp(id, "how delete",
+		"How do I delete a profile?",
+		"To delete a profile, simply select the profile you wish to delete with the drop-down selecteion box and then click the Delete button"
+	)
+	gui:AddHelp(id, "why delete",
+		"Why would I want to delete a profile?",
+		"You can delete a profile when you don't want to use it anymore, or you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
+	)
+	gui:AddHelp(id, "how create",
+		"How do I create a new profile?",
+		"You enter the name of the new profile that you wish to create into the textbox labelled \"New profile name\", and then click the \"Save\" button. A profile may be called whatever you wish, but it should reflect the purpose of the profile so that you may more easily recall that purpose at a later date."
+	)
 	
 	id = gui:AddTab("General")
 	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
