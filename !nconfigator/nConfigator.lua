@@ -259,6 +259,8 @@ if not lib.help then
 	lib.help:SetMovable(true)
 	lib.help:EnableMouse(true)
 	lib.help:SetScript("OnUpdate", function() if lib.help.refresh then lib.help.Update() end end)
+	lib.help:SetScript("OnEvent", function() if lib.help:IsVisible() then lib.help.Update() end end)
+	lib.help:RegisterEvent("UPDATE_FLOATING_CHAT_WINDOWS")
 	lib.help:Hide()
 
 	lib.help.title = CreateFrame("Button", nil, lib.help)
