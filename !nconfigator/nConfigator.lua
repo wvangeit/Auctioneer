@@ -351,6 +351,7 @@ if not lib.help then
 		for qid, question in pairs(faq) do
 			lib.help:AddHelp(question, faa[qid])
 		end
+		lib.help:SetFrameStrata(self:GetFrameStrata())
 		lib.help:Update()
 		lib.help:Show()
 	end
