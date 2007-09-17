@@ -258,6 +258,7 @@ if not lib.help then
 	lib.help:SetHeight(500)
 	lib.help:SetMovable(true)
 	lib.help:EnableMouse(true)
+	lib.help:SetScript("OnUpdate", function() if lib.help.refresh then lib.help.Update() end end)
 	lib.help:Hide()
 
 	lib.help.title = CreateFrame("Button", nil, lib.help)
@@ -303,33 +304,21 @@ if not lib.help then
 
 		font:SetFont(file, size)
 		font:SetTextColor(r,g,b,1)
+		font:SetText(text)
+		font.pad = pad
 
 		table.insert(lib.help.rows, font)
-		local n = #lib.help.rows
 
-		local height, top
-		if n == 1 then
-			top = -5
-			height = 5
-		else
-			top = -lib.help.content.totalHeight - 2
-			height = 2
-		end
+		font:SetPoint("TOPLEFT", lib.help.content, "TOPLEFT", 5, -5)
+		font:SetPoint("TOPRIGHT", lib.help.content, "TOPRIGHT", -5, -5)
+		font:SetWidth(lib.help.content:GetWidth()-10)
 
-		top = top - pad
-		height = height + pad
-
-		font:SetPoint("TOPLEFT", lib.help.content, "TOPLEFT", 5, top)
-		font:SetPoint("TOPRIGHT", lib.help.content, "TOPRIGHT", -5, top)
-		font:SetWidth(lib.help.content:GetWidth()-35)
 		font:SetJustifyV("TOP")
 		font:SetJustifyH("LEFT")
 
-		font:SetText(text)
 		font:Show()
-		height = height + font:GetHeight()
-		lib.help.content.totalHeight = lib.help.content.totalHeight + height
 
+		lib.help.refresh = true
 		return n, font, height
 	end
 	function lib.help:ClearAllLines()
@@ -340,10 +329,33 @@ if not lib.help then
 			table.insert(lib.help.fontcache, lib.help.rows[i])
 			table.remove(lib.help.rows, i)
 		end
+		lib.help.refresh = true
 	end
 	function lib.help:Update()
-		lib.help.content:SetHeight(lib.help.content.totalHeight)
+		local height, top = 0, 0
+
+		for i = 1, #lib.help.rows do
+			local font = lib.help.rows[i]
+			if i == 1 then
+				top = -5
+				height = height + 5
+			else
+				top = -height - 2
+				height = height + 2
+			end
+
+			top = top - font.pad
+			height = height + font.pad
+
+			font:SetPoint("TOPLEFT", lib.help.content, "TOPLEFT", 5, top)
+			font:SetPoint("TOPRIGHT", lib.help.content, "TOPRIGHT", -5, top)
+			font:SetWidth(lib.help.content:GetWidth()-10)
+
+			height = height + font:GetHeight()
+		end
+		lib.help.content:SetHeight(height+10)
 		lib.help.scroll:Update()
+		lib.help.refresh = nil
 	end
 
 	function lib.help:Activate()
@@ -355,7 +367,7 @@ if not lib.help then
 			lib.help:AddHelp(question, faa[qid])
 		end
 		lib.help:SetFrameStrata(self:GetFrameStrata())
-		lib.help:Update()
+		lib.help.refresh = true
 		lib.help:Show()
 	end
 
@@ -404,9 +416,11 @@ end
 function kit:AddTab(tabName)
 	assert(isGuiObject(self), "Must be called on a valid object")
 	local button, frame, content, id
-	button = CreateFrame("Button", nil, self, "OptionsButtonTemplate")
-	frame = CreateFrame("Frame", nil, self)
-	content = CreateFrame("Frame", lib.CreateAnonName(), frame)
+
+	local myName = lib.CreateAnonName()
+	button = CreateFrame("Button", myName, self, "OptionsButtonTemplate")
+	frame = CreateFrame("Frame", myName.."Frame", self)
+	content = CreateFrame("Frame", myName.."Content", frame)
 
 	table.insert(self.tabs, { button, frame, content })
 	id = table.getn(self.tabs)
@@ -514,8 +528,8 @@ function kit:MakeScrollable(id)
 	content:SetHeight(250)
 	local nPanelScroller = LibStub:GetLibrary("nPanelScroller")
 	local scroll = nPanelScroller:Create(lib.CreateAnonName(), frame)
-	scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", 5,-5)
-	scroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -25,5)
+	scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", 5,-6)
+	scroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -25,7)
 	scroll:SetScrollChild(content:GetName())
 	scroll:UpdateScrollChildRect()
 	self.tabs[id][4] = scroll
@@ -559,7 +573,7 @@ function kit:AddHelp(id, qid, question, answer)
 	local content
 	local idType = type(id)
 	if idType == "number" and self.tabs then
-		content = self.tabs[id][3]
+		content = self.tabs[id][2]
 	elseif idType == "string" then
 		content = _G[id]
 	elseif idType == "table" and type(id[0]) == "userdata" then
@@ -571,7 +585,7 @@ function kit:AddHelp(id, qid, question, answer)
 	if question and answer then
 		if content and not content.HelpButton then
 			content.HelpButton = CreateFrame("BUTTON", content:GetName().."HelpButton", content)
-			content.HelpButton:SetPoint("TOPRIGHT", content, "TOPRIGHT", -2,3)
+			content.HelpButton:SetPoint("TOPRIGHT", content, "TOPRIGHT", -20,0)
 			content.HelpButton:SetWidth(42)
 			content.HelpButton:SetHeight(42)
 			content.HelpButton:SetNormalTexture("Interface\\TUTORIALFRAME\\TutorialFrame-QuestionMark")
