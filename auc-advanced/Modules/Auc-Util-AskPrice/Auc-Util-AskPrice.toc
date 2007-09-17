@@ -1,0 +1,4 @@
+## Name: Auctioneer:Util:AskPrice
+## Interface: 20003
+## Dependancies: Auc-Advanced
+Embed.xml
