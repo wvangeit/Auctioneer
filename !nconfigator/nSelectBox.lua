@@ -1,6 +1,6 @@
 --[[
 	nSelectBox
-	Revision: $Id: PriceLevel.lua 2145 2007-09-10 02:24:49Z mentalpower $
+	Revision: $Id$
 
 	License:
 		This library is free software; you can redistribute it and/or
@@ -38,23 +38,23 @@ do -- LibStub
 		LibStub = LibStub or {libs = {}, minors = {} }
 		_G[LIBSTUB_MAJOR] = LibStub
 		LibStub.minor = LIBSTUB_MINOR
-		
+
 		-- LibStub:NewLibrary(major, minor)
 		-- major (string) - the major version of the library
 		-- minor (string or number ) - the minor version of the library
-		-- 
+		--
 		-- returns nil if a newer or same version of the lib is already present
 		-- returns empty library object or old library object if upgrade is needed
 		function LibStub:NewLibrary(major, minor)
 			assert(type(major) == "string", "Bad argument #2 to `NewLibrary' (string expected)")
 			minor = assert(tonumber(strmatch(minor, "%d+")), "Minor version must either be a number or contain a number.")
-			
+
 			local oldminor = self.minors[major]
 			if oldminor and oldminor >= minor then return nil end
 			self.minors[major], self.libs[major] = minor, self.libs[major] or {}
 			return self.libs[major], oldminor
 		end
-		
+
 		-- LibStub:GetLibrary(major, [silent])
 		-- major (string) - the major version of the library
 		-- silent (boolean) - if true, library is optional, silently return nil if its not found
@@ -67,14 +67,14 @@ do -- LibStub
 			end
 			return self.libs[major], self.minors[major]
 		end
-		
+
 		-- LibStub:IterateLibraries()
-		-- 
+		--
 		-- Returns an iterator for the currently registered libraries
-		function LibStub:IterateLibraries() 
-			return pairs(self.libs) 
+		function LibStub:IterateLibraries()
+			return pairs(self.libs)
 		end
-		
+
 		setmetatable(LibStub, { __call = LibStub.GetLibrary })
 	end
 end -- LibStub
@@ -309,7 +309,7 @@ if not lib.menu then
 	lib.menu:SetScript("OnLeave", lib.MouseOut)
 	lib.menu:SetScript("OnMouseDown", lib.DoHide)
 	lib.menu:SetScript("OnUpdate", lib.OnUpdate)
-	
+
 	lib.menu.back = CreateFrame("Frame", "", lib.menu)
 	lib.menu.back:SetPoint("TOPLEFT", lib.menu, "TOPLEFT", 15, -20)
 	lib.menu.back:SetPoint("BOTTOMRIGHT", lib.menu, "BOTTOMRIGHT", -15, 10)

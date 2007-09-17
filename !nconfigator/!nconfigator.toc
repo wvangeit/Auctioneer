@@ -4,6 +4,6 @@
 ## Interface: 21000
 ## LoadOnDemand: 0
 ##
-## Revision: $Id: PriceLevel.lua 2145 2007-09-10 02:24:49Z mentalpower $
+## Revision: $Id$
 ## URL: http://norganna.org
 Load.xml
