@@ -465,6 +465,7 @@ function kit:AddControl(id, cType, column, ...)
 		el.stype = "Button";
 		el:SetScript("OnClick", function(...) self:ChangeSetting(...) end)
 		el:SetText(text)
+		el:SetWidth(math.max(el:GetWidth(), el:GetFontString():GetStringWidth() + 16))
 		control = el
 		last = el
 	elseif (cType == "Checkbox") then
