@@ -49,7 +49,7 @@ USAGE:
 ]]
 
 local LIBRARY_VERSION_MAJOR = "nConfigator"
-local LIBRARY_VERSION_MINOR = 1
+local LIBRARY_VERSION_MINOR = 2
 
 do -- LibStub
 	-- LibStub is a simple versioning stub meant for use in Libraries.  http://www.wowace.com/wiki/LibStub for more info
@@ -118,7 +118,6 @@ function lib:CreateAnonName()
 	return "nConfigatorAnon"..lib.tmpId
 end
 
-
 function lib:Create(setter, getter, w,h)
 	local id = #(lib.frames) + 1
 	local name = "nConfigatorDialog_"..id
@@ -140,6 +139,7 @@ function lib:Create(setter, getter, w,h)
 	gui:SetFrameStrata("DIALOG")
 	gui:SetToplevel(true)
 	gui:SetMovable(true)
+	gui:EnableMouse(true)
 	gui:SetWidth(w or 800)
 	gui:SetHeight(h or 450)
 	gui:SetBackdrop({
@@ -177,9 +177,207 @@ function lib:Create(setter, getter, w,h)
 	return gui
 end
 
+-- Create a special tooltip just for us
+if not lib.tooltip then
+	lib.tooltip = CreateFrame("GameTooltip", "nConfigatorTipTooltip", UIParent, "GameTooltipTemplate")
+	local function hide_tip()
+		lib.tooltip:Hide()
+	end
+	lib.tooltip.fadeInfo = {}
+	function lib:SetTip(frame, ...)
+		local n = select("#", ...)
+		if n == 1 then
+			-- Allow passing of tip lines as a single table
+			local tip = select(1, ...)
+			if type(tip) == "table" then
+				lib:SetTip(frame, unpack(tip))
+				return
+			end
+		end
+				
+		if not frame or n == 0 then
+			lib.tooltip.fadeInfo.finishedFunc = hide_tip
+			UIFrameFadeOut(lib.tooltip, 0.5, lib.tooltip:GetAlpha(), 0)
+			lib.tooltip.schedule = nil
+			return
+		end
+
+		if lib.tooltip:GetAlpha() > 0 then
+			-- Speed up this fade
+			UIFrameFadeOut(lib.tooltip, 0.1, lib.tooltip:GetAlpha(), 0)
+		end
+
+		lib.tooltip:SetOwner(frame, "ANCHOR_NONE")
+		lib.tooltip:ClearLines()
+
+		local tip
+		for i=1, n do
+			tip = select(i, ...)
+			lib.tooltip:AddLine(tostring(tip) or "", 1,1,0.5, 1)
+		end
+		lib.tooltip:Show()
+		lib.tooltip:SetAlpha(0)
+		lib.tooltip:SetBackdropColor(0,0,0, 1)
+		lib.tooltip:SetPoint("TOP", frame, "BOTTOM", 10, -5)
+		lib.tooltip.schedule = GetTime() + 1.5
+	end
+	lib.tooltip:SetScript("OnUpdate", function()
+		if lib.tooltip.schedule and GetTime() > lib.tooltip.schedule then
+			local alpha = lib.tooltip:GetAlpha()
+			UIFrameFadeIn(lib.tooltip, 0.75, alpha, 1)
+			lib.tooltip:SetAlpha(alpha) -- Tooltips set alpha when they are shown, and UIFrameFadeIn does a :Show()
+			lib.tooltip.schedule = nil
+		end
+	end)
+	lib.tooltip:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Glues/Common/Glue-Tooltip-Border",
+		tile = false, tileSize = 32, edgeSize = 16,
+		insets = { left = 4, right = 4, top = 4, bottom = 4 }
+	})
+	lib.tooltip:SetBackdropColor(0,0,0.3, 1)
+	lib.tooltip:SetClampedToScreen(true)
+end
+
+-- Create our help window
+if not lib.help then
+	lib.help = CreateFrame("Frame", "nConfigatorHelpFrame", UIParent)
+	lib.help:SetBackdrop({
+		bgFile = "Interface/Stationery/StationeryTest1",
+		edgeFile = "Interface/TUTORIALFRAME/TUTORIALFRAMEBORDER",
+		tile = false, tileSize = 32, edgeSize = 32,
+		insets = { left = 4, right = 4, top = 22, bottom = 4 }
+	})
+	lib.help:SetBackdropColor(0.15,0.15,0.15, 0.98)
+	lib.help:SetToplevel(true)
+	lib.help:SetPoint("CENTER")
+	lib.help:SetWidth(450)
+	lib.help:SetHeight(500)
+	lib.help:SetMovable(true)
+	lib.help:EnableMouse(true)
+	lib.help:Hide()
+
+	lib.help.title = CreateFrame("Button", nil, lib.help)
+	lib.help.title:SetScript("OnMouseDown", function() lib.help:StartMoving() end)
+	lib.help.title:SetScript("OnMouseUp", function() lib.help:StopMovingOrSizing() end)
+	lib.help.title:SetPoint("TOPLEFT", lib.help, "TOPLEFT", 3,-3)
+	lib.help.title:SetPoint("BOTTOMRIGHT", lib.help, "TOPRIGHT", -28,-20)
+	lib.help.title:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+	lib.help.title:SetTextFontObject("GameFontNormal")
+	lib.help.title:SetText("nConfigator Help Window")
+
+	lib.help.close = CreateFrame("Button", nil, lib.help, "UIPanelCloseButton")
+	lib.help.close:SetPoint("TOPRIGHT", lib.help, "TOPRIGHT", 3, 5)
+	lib.help.close:SetHeight(32)
+	lib.help.close:SetWidth(32)
+	lib.help.close:SetScript("OnClick", function () lib.help:Hide() end)
+
+	lib.help.content = CreateFrame("Frame", "nConfigatorHelpContent", lib.help)
+	lib.help.content:SetWidth(420)
+	lib.help.content:SetHeight(100)
+	lib.help.content.totalHeight = 0
+
+	lib.help.rows = {}
+	lib.help.fontcache = {}
+	function lib.help:AddHelp(question, answer)
+		lib.help:AddRow(question, 14, 1,0.9,0, 8)
+		lib.help:AddRow(answer, 12, 1,1,1)
+	end
+	function lib.help:AddRow(text, size, r,g,b, pad)
+		if not size then size = 12 end
+		if not (r and g and b) then r,g,b = 1,1,1 end
+		if not pad then pad = 0 end
+
+		local font
+		local remain = #lib.help.fontcache
+		if remain > 0 then
+			font = lib.help.fontcache[remain]
+			table.remove(lib.help.fontcache)
+		else
+			font = lib.help.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		end
+		local file = font:GetFont()
+
+		font:SetFont(file, size)
+		font:SetTextColor(r,g,b,1)
+
+		table.insert(lib.help.rows, font)
+		local n = #lib.help.rows
+
+		local height, top
+		if n == 1 then
+			top = -5
+			height = 5
+		else
+			top = -lib.help.content.totalHeight - 2
+			height = 2
+		end
+
+		top = top - pad
+		height = height + pad
+
+		font:SetPoint("TOPLEFT", lib.help.content, "TOPLEFT", 5, top)
+		font:SetPoint("TOPRIGHT", lib.help.content, "TOPRIGHT", -5, top)
+		font:SetWidth(lib.help.content:GetWidth()-35)
+		font:SetJustifyV("TOP")
+		font:SetJustifyH("LEFT")
+
+		font:SetText(text)
+		font:Show()
+		height = height + font:GetHeight()
+		lib.help.content.totalHeight = lib.help.content.totalHeight + height
+
+		return n, font, height
+	end
+	function lib.help:ClearAllLines()
+		lib.help.content.totalHeight = 0
+		for i=#lib.help.rows, 1, -1 do
+			lib.help.rows[i]:Hide()
+			lib.help.rows[i]:ClearAllPoints()
+			table.insert(lib.help.fontcache, lib.help.rows[i])
+			table.remove(lib.help.rows, i)
+		end
+	end
+	function lib.help:Update()
+		lib.help.content:SetHeight(lib.help.content.totalHeight)
+		lib.help.scroll:Update()
+	end
+
+	function lib.help:Activate()
+		local faq = self.faq
+		local faa = self.faa
+
+		lib.help:ClearAllLines()
+		for qid, question in pairs(faq) do
+			lib.help:AddHelp(question, faa[qid])
+		end
+		lib.help:Update()
+		lib.help:Show()
+	end
+
+	local nPanelScroller = LibStub:GetLibrary("nPanelScroller")
+	lib.help.scroll = nPanelScroller:Create(lib.CreateAnonName(), lib.help)
+	lib.help.scroll:SetPoint("TOPLEFT", lib.help, "TOPLEFT", 10,-25)
+	lib.help.scroll:SetPoint("BOTTOMRIGHT", lib.help, "BOTTOMRIGHT", -25,5)
+	lib.help.scroll:SetScrollChild(lib.help.content:GetName())
+	lib.help.scroll:SetScrollBarVisible("HORIZONTAL", "NO")
+end
+
+nConf = lib
+
+
+-- Local function to get the UI object type
+local function isGuiObject(obj)
+	if not obj then return false end
+	if type(obj) ~= "table" then return false end
+	if not obj[0] or type(obj[0]) ~= "userdata" then return false end
+	if not obj.GetObjectType then return false end
+	return obj:GetObjectType()
+end
 
 
 function kit:ZeroFrame()
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local id = 0
 	local frame
 	frame = CreateFrame("Frame", nil, self)
@@ -200,6 +398,7 @@ function kit:ZeroFrame()
 end
 
 function kit:AddTab(tabName)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local button, frame, content, id
 	button = CreateFrame("Button", nil, self, "OptionsButtonTemplate")
 	frame = CreateFrame("Frame", nil, self)
@@ -226,12 +425,12 @@ function kit:AddTab(tabName)
 	frame:SetPoint("TOPLEFT", self.tabs[1][1], "TOPRIGHT", 0, 0)
 	frame:SetPoint("BOTTOMRIGHT", self.Done, "TOPRIGHT", 0, 5)
 	frame:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 4, right = 4, top = 4, bottom = 4 }
+		bgFile = "Interface/Tooltips/ChatBubble-Background",
+		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 32, right = 32, top = 32, bottom = 32 }
 	})
-	frame:SetBackdropColor(0,0,0, 0.5)
+	frame:SetBackdropColor(0,0,0, 1)
 	content:SetPoint("TOPLEFT", frame, "TOPLEFT", 5,-5)
 	content:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -5,5)
 	button:SetText(tabName)
@@ -240,6 +439,7 @@ function kit:AddTab(tabName)
 end
 
 function kit:AddCat(catName)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local button, frame, id
 	button = CreateFrame("Button", nil, self)
 	frame = {}
@@ -288,16 +488,19 @@ local function anchorPoint(frame, el, last, indent, width, height, yofs)
 end
 
 function kit:Unfocus()
+	assert(isGuiObject(self), "Must be called on a valid object")
 	self:Hide()
 	self:ClearFocus()
 	self:Show()
 end
 
 function kit:SetControlWidth(width)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	self.scalewidth = width
 end
 
 function kit:MakeScrollable(id)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	if (self.tabs[id][4]) then return end
 	local frame = self.tabs[id][2]
 	local content = self.tabs[id][3]
@@ -315,7 +518,72 @@ function kit:MakeScrollable(id)
 	GSC = scroll
 end
 
+function kit:AddTip(id, tip)
+	assert(isGuiObject(self), "Must be called on a valid object")
+	local control
+	local idType = type(id)
+	if idType == "number" and self.tabs then
+		control = self:GetLast(id)
+	elseif idType == "string" then
+		control = _G[id]
+	elseif idType == "table" and type(id[0]) == "userdata" then
+		control = id
+	end
+	assert(isGuiObject(control), "Usage: nConfigatorGui:AddTip(tabId|controlName|control, tip)")
+	if control and control.button and isGuiObject(control.button) then
+		control = control.button
+	end
+
+	local old_enter = control:GetScript("OnEnter")
+	local old_leave = control:GetScript("OnLeave")
+	local function help_enter(self, ...)
+		if old_enter then self:old_enter(...) end
+		if tip then lib:SetTip(self, tip) end
+	end
+	local function help_leave(self, ...)
+		if old_enter then self:old_leave(...) end
+		if tip then lib:SetTip() end
+	end
+	control:SetScript("OnEnter", help_enter)
+	control:SetScript("OnLeave", help_leave)
+end
+
+function kit:AddHelp(id, qid, question, answer)
+	assert(isGuiObject(self), "Must be called on a valid object")
+	local content
+	local idType = type(id)
+	if idType == "number" and self.tabs then
+		content = self.tabs[id][3]
+	elseif idType == "string" then
+		content = _G[id]
+	elseif idType == "table" and type(id[0]) == "userdata" then
+		content = id
+	end
+	assert(isGuiObject(content), "Usage: nConfigatorGui:AddHelp(tabId|controlName|control, question, answer)")
+	assert(question and answer, "Usage: nConfigatorGui:AddHelp(tabId|controlName|control, question, answer)")
+
+	if question and answer then
+		if content and not content.HelpButton then
+			content.HelpButton = CreateFrame("BUTTON", content:GetName().."HelpButton", content)
+			content.HelpButton:SetPoint("TOPRIGHT", content, "TOPRIGHT", -2,3)
+			content.HelpButton:SetWidth(42)
+			content.HelpButton:SetHeight(42)
+			content.HelpButton:SetNormalTexture("Interface\\TUTORIALFRAME\\TutorialFrame-QuestionMark")
+			content.HelpButton:SetHighlightTexture("Interface\\TUTORIALFRAME\\TutorialFrame-QuestionMark")
+			content.HelpButton:SetScript("OnClick", lib.help.Activate)
+			content.HelpButton.text = content.HelpButton:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+			content.HelpButton.text:SetText("Help")
+			content.HelpButton.text:SetPoint("TOP", content.HelpButton, "BOTTOM", 0,5)
+			content.HelpButton.faq = {}
+			content.HelpButton.faa = {}
+		end
+		content.HelpButton.faq[qid] = question
+		content.HelpButton.faa[qid] = answer
+	end
+end
+
 function kit:AddControl(id, cType, column, ...)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local frame = self.tabs[id][2]
 	if (frame.contentWidth == 0) then
 		error("Attempting to add a control to a non-existent frame")
@@ -529,7 +797,7 @@ function kit:AddControl(id, cType, column, ...)
 		local level, setting, minVal, maxVal, label = ...
 		local indent = 10 * (level or 1)
 		-- FontString
-		el = content:CreateFontString("", "OVERLAY", "GameFontHighlight")
+		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		el:SetJustifyH("LEFT")
 		kpos = kpos+1 kids[kpos] = el
 		anchorPoint(content, el, last, 10+column+indent)
@@ -562,7 +830,7 @@ function kit:AddControl(id, cType, column, ...)
 		local indent = 10 * (level or 1)
 		-- FontString
 		if label then
-			el = content:CreateFontString("", "OVERLAY", "GameFontHighlight")
+			el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 			el:SetJustifyH("LEFT")
 			kpos = kpos+1 kids[kpos] = el
 			anchorPoint(content, el, last, 10+column+indent)
@@ -594,18 +862,21 @@ function kit:AddControl(id, cType, column, ...)
 end
 
 function kit:GetLast(id)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	if (self.tabs[id] and self.tabs[id][2].ctrls) then
 		return self.tabs[id][2].ctrls.last
 	end
 end
 
 function kit:SetLast(id, last)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	if (self.tabs[id] and self.tabs[id][2].ctrls) then
 		self.tabs[id][2].ctrls.last = last
 	end
 end
 
 function kit:ActivateTab(id)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	id = tonumber(id)
 	if not id then id = self.id end
 
@@ -622,19 +893,22 @@ function kit:ActivateTab(id)
 end
 
 function kit:Refresh()
+	assert(isGuiObject(self), "Must be called on a valid object")
 	for name, el in pairs(self.elements) do
 		self:GetSetting(el)
 	end
 end
 
 function kit:Resave()
+	assert(isGuiObject(self), "Must be called on a valid object")
 	for name, el in pairs(self.elements) do
 		self:ChangeSetting(el)
 	end
 end
 
 function kit:GetSetting(element)
-	assert(element, "You must pass a valid element")
+	assert(isGuiObject(self), "Must be called on a valid object")
+	assert(isGuiObject(element), "You must pass a valid element")
 	local setting = element.setting
 	local value = self.getter(setting)
 	if (element.stype == "CheckButton") then
@@ -693,7 +967,9 @@ function kit:GetSetting(element)
 end
 
 function kit:ChangeSetting(element, ...)
-	assert(element and element.stype, "You must pass a valid element")
+	assert(isGuiObject(self), "Must be called on a valid object")
+	assert(isGuiObject(element), "You must pass a valid element")
+	assert(element.stype, "You must pass a valid nConfigator settings object")
 	local setting = element.setting
 	local value
 	if (element.stype == "CheckButton") then
@@ -751,6 +1027,7 @@ function kit:ChangeSetting(element, ...)
 end
 
 function kit:ColumnCheckboxes(id, cols, options)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local last, cont, el, setting, text
 	last = self:GetLast(id)
 	local optc = table.getn(options)
@@ -773,6 +1050,7 @@ function kit:ColumnCheckboxes(id, cols, options)
 end
 
 function kit:SetEscSensitive(setting)
+	assert(isGuiObject(self), "Must be called on a valid object")
 	local name = self:GetName()
 	for i = #UISpecialFrames, 1, -1 do
 		if (name == UISpecialFrames[i]) then

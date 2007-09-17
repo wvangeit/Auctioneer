@@ -24,7 +24,7 @@
 --]]
 
 local LIBRARY_VERSION_MAJOR = "nSelectBox"
-local LIBRARY_VERSION_MINOR = 1
+local LIBRARY_VERSION_MINOR = 2
 
 do -- LibStub
 	-- LibStub is a simple versioning stub meant for use in Libraries.  http://www.wowace.com/wiki/LibStub for more info
@@ -125,11 +125,12 @@ function kit:GetItems()
 	return curpos or 1
 end
 
-function kit:setWidth(width)
+function kit:SetWidth(width)
 	local fname = self:GetName()
 	self:origSetWidth(width + 50)
 	getglobal(fname.."Middle"):SetWidth(width)
 	getglobal(fname.."Text"):SetWidth(width - 25)
+	getglobal(fname.."Button"):SetHitRectInsets(0-width+5, -2,-2,-2)
 end
 
 function kit:GetHeight()
@@ -185,6 +186,7 @@ function lib:Create(name, parent, width, callback, list, current)
 	frame.value = current
 	frame.onsel = callback
 	frame.origSetWidth = frame.SetWidth
+	frame.button = _G[name.."Button"]
 
 	for k,v in pairs(kit) do
 		frame[k] = v
