@@ -359,12 +359,15 @@ if not lib.help then
 	end
 
 	function lib.help:Activate()
+		local qlist = self.qlist
 		local faq = self.faq
 		local faa = self.faa
+		local qid
 
 		lib.help:ClearAllLines()
-		for qid, question in pairs(faq) do
-			lib.help:AddHelp(question, faa[qid])
+		for i = 1, #qlist do
+			qid = qlist[i]
+			lib.help:AddHelp(faq[qid], faa[qid])
 		end
 		lib.help:SetFrameStrata(self:GetFrameStrata())
 		lib.help.refresh = true
@@ -594,11 +597,19 @@ function kit:AddHelp(id, qid, question, answer)
 			content.HelpButton.text = content.HelpButton:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
 			content.HelpButton.text:SetText("Help")
 			content.HelpButton.text:SetPoint("TOP", content.HelpButton, "BOTTOM", 0,5)
+			content.HelpButton.qlist = {}
 			content.HelpButton.faq = {}
 			content.HelpButton.faa = {}
 		end
 		content.HelpButton.faq[qid] = question
 		content.HelpButton.faa[qid] = answer
+
+		for i = 1, #content.HelpButton.qlist do
+			if content.HelpButton.qlist[i] == qid then
+				return
+			end
+		end
+		table.insert(content.HelpButton.qlist, qid)
 	end
 end
 
