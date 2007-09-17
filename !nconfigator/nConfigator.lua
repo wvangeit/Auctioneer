@@ -197,14 +197,17 @@ if not lib.tooltip then
 				
 		if not frame or n == 0 then
 			lib.tooltip.fadeInfo.finishedFunc = hide_tip
-			UIFrameFadeOut(lib.tooltip, 0.5, lib.tooltip:GetAlpha(), 0)
+			local curAlpha = lib.tooltip:GetAlpha()
+			UIFrameFadeOut(lib.tooltip, 0.25, curAlpha, 0)
+			lib.tooltip:SetAlpha(curAlpha)
 			lib.tooltip.schedule = nil
 			return
 		end
 
 		if lib.tooltip:GetAlpha() > 0 then
 			-- Speed up this fade
-			UIFrameFadeOut(lib.tooltip, 0.1, lib.tooltip:GetAlpha(), 0)
+			UIFrameFadeOut(lib.tooltip, 0.01, 0, 0)
+			lib.tooltip:SetAlpha(0)
 		end
 
 		lib.tooltip:SetOwner(frame, "ANCHOR_NONE")
@@ -219,13 +222,13 @@ if not lib.tooltip then
 		lib.tooltip:SetAlpha(0)
 		lib.tooltip:SetBackdropColor(0,0,0, 1)
 		lib.tooltip:SetPoint("TOP", frame, "BOTTOM", 10, -5)
-		lib.tooltip.schedule = GetTime() + 1.5
+		lib.tooltip.schedule = GetTime() + 1
 	end
 	lib.tooltip:SetScript("OnUpdate", function()
 		if lib.tooltip.schedule and GetTime() > lib.tooltip.schedule then
-			local alpha = lib.tooltip:GetAlpha()
-			UIFrameFadeIn(lib.tooltip, 0.75, alpha, 1)
-			lib.tooltip:SetAlpha(alpha) -- Tooltips set alpha when they are shown, and UIFrameFadeIn does a :Show()
+			local curAlpha = lib.tooltip:GetAlpha()
+			UIFrameFadeIn(lib.tooltip, 0.33, curAlpha, 1)
+			lib.tooltip:SetAlpha(curAlpha) -- Tooltips set alpha when they are shown, and UIFrameFadeIn does a :Show()
 			lib.tooltip.schedule = nil
 		end
 	end)
@@ -531,18 +534,21 @@ function kit:AddTip(id, tip)
 		control = id
 	end
 	assert(isGuiObject(control), "Usage: nConfigatorGui:AddTip(tabId|controlName|control, tip)")
-	if control and control.button and isGuiObject(control.button) then
+	if control.button and isGuiObject(control.button) then
 		control = control.button
+	elseif control.control and isGuiObject(control.control) then
+		control = control.control
 	end
 
+	p("Control", control:GetName(), isGuiObject(control))
 	local old_enter = control:GetScript("OnEnter")
 	local old_leave = control:GetScript("OnLeave")
 	local function help_enter(self, ...)
-		if old_enter then self:old_enter(...) end
+		if old_enter then old_enter(self, ...) end
 		if tip then lib:SetTip(self, tip) end
 	end
 	local function help_leave(self, ...)
-		if old_enter then self:old_leave(...) end
+		if old_enter then old_leave(self, ...) end
 		if tip then lib:SetTip() end
 	end
 	control:SetScript("OnEnter", help_enter)
@@ -754,12 +760,14 @@ function kit:AddControl(id, cType, column, ...)
 		self.elements[setting] = el
 		control = el
 		-- FontString
-		el = content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+		el = control:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 		el:SetJustifyH("LEFT")
 		kpos = kpos+1 kids[kpos] = el
 		if (colwidth) then colwidth = colwidth - 15 end
 		anchorPoint(content, el, last, 35+column+indent, (colwidth or maxLabelLength), (singleLine and 14))
 		el:SetText(text)
+		local textWidth = el:GetStringWidth()+25
+		control:SetHitRectInsets(-2,-textWidth, -2,-2)
 		control.textEl = el
 		last = el
 	elseif (cType == "Slider" or cType == "WideSlider") then
@@ -856,6 +864,10 @@ function kit:AddControl(id, cType, column, ...)
 		el.textEl = last
 		control = el
 		last = el
+	end
+
+	if last ~= control then
+		last.control = control
 	end
 
 	self:SetLast(id, last)
