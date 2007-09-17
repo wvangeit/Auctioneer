@@ -126,31 +126,74 @@ end
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui:AddTab(libName)
+
+	gui:AddHelp(id, "what is pricelevel",
+		"What is PriceLevel?",
+		"PriceLevel is an AuctioneerAdvanced module that analyses the current market position with regard to the calculated value of the item.\n"..
+		"PriceLevel is all about determining if what AuctioneerAdvanced thinks is what the rest of the market currently thinks. It's also about determining if the rest of the market are selling their stuff for crazy prices.\n"..
+		"What it all comes down to is the color... PriceLevel breaks the current market down into 5 categories: |cff3296ffWay underpriced|r, |cff19ff19Fairly underpriced|r, |cffffff00Just underpriced|r, |cffff9619Reasonable|r, and |cffff0000Overpriced|r. It also has options for adding the calculated level to the tooltip and in the browse window of the auctionhouse.")
+	
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show price level and unit price in the tooltips?")
+	gui:AddTip(id, "Enable this to display the price level information in the tooltip when you mouse over an item in your inventory")
+
+	gui:AddHelp(id, "what is ahcolor",
+		"What does changing the auction house items' colors do?",
+		"This will change the background of the items at the auctionhouse so that you can more easily identify bargains or overpriced items as you are browsing.")
+
 	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.colorize", "Change the color of items in the Auction House?")
+	gui:AddTip(id, "This option changes the color of the items lines in the auctionhouse so that you may more easily determine whether they are over or under priced prior to purchase")
 	gui:AddControl(id, "Slider",     0, 2, "util.pricelevel.opacity", 1, 100, 1, "Opacity level: %d%%")
+	gui:AddTip(id, "This controls the level of opacity for the colored bars in the auction browse window (if enabled)")
 	gui:AddControl(id, "Checkbox",   0, 2, "util.pricelevel.gradient", "Use a gradient:")
+	gui:AddTip(id, "This causes the colored bars in the auction browse window to be drawn with a gradient instead of a solid color (if enabled)")
 	gui:AddControl(id, "Selectbox",  0, 3, {
 		{"LEFT", "Left"},
 		{"RIGHT", "Right"},
 		{"TOP", "Top"},
 		{"BOTTOM", "Bottom"},
 	}, "util.pricelevel.direction", "Pick the gradient direction")
+	gui:AddTip(id, "This determines the direction that the above gradient is drawn in for the auction browse window (if enabled)")
 	gui:AddControl(id, "Subhead",    0,    "Price valuation method:")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.pricelevel.model", "Pricing model to use for the valuation")
+	gui:AddTip(id, "The pricing model that is used to work out the calculated value of items at the auctionhouse")
 	gui:AddControl(id, "Subhead",    0,    "Price level basis:")
 	gui:AddControl(id, "Selectbox",  0, 1, {
 		{"cur", "Next bid price"},
 		{"buy", "Buyout only"},
 		{"try", "Buyout or bid"},
 	}, "util.pricelevel.basis", "Which price to use for the price level")
+	gui:AddTip(id, "Selects which price to base the price level calculation off")
+	
+	gui:AddHelp(id, "what is basis",
+		"What is the price level basis?",
+		"The auction house has both bids and buyout values to calculate from. You can select to price the item based off either exclusively the buyout or bid, or first the buyout if it exists, and then the bid")
+
 	gui:AddControl(id, "Subhead",    0,    "Pricing points:")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "Red price level > %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "Orange price level > %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "Yellow price level > %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.green", 0, 500, 5, "Green price level > %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "Blue price level > %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.red",    0, 500, 5, "|cffff0000Red|r price level > %d%%")
+	gui:AddTip(id, "This determines the minimum level for an item to be counted as a red item")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.orange", 0, 500, 5, "|cffff9619Orange|r price level > %d%%")
+	gui:AddTip(id, "This determines the minimum level for an item to be counted as a red item")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.yellow", 0, 500, 5, "|cffffff00Yellow|r price level > %d%%")
+	gui:AddTip(id, "This determines the minimum level for an item to be counted as a red item")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.green", 0, 500, 5, "|cff19ff19Green|r price level > %d%%")
+	gui:AddTip(id, "This determines the minimum level for an item to be counted as a red item")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.pricelevel.blue", 0, 0, 1, "|cff3296ffBlue|r price level > %d%%")
+	gui:AddTip(id, "This slider does nothing and is just here for completeness to show that blue is under green")
+
+	gui:AddHelp(id, "what is points",
+		"What are the pricing points for?",
+		"The pricing points determine the ranges for the various price level colored bands.\n"..
+		"As an item's price moves up through the bands, it will change to the next color.")
+
+	gui:AddHelp(id, "wtf blue stuck qq",
+		"Why is the blue slider stuck at zero?",
+		"Something has to start at zero, and blue's the one that does it. If you moved blue off zero, then what would we color stuff under blue?")
+
+	gui:AddHelp(id, "wtf blue stuck l2code",
+		"Ok, so why did you put the blue slider in then?",
+		"To appease my wife... Deal. :)")
+
 end
 
 function lib.ResetBars()
