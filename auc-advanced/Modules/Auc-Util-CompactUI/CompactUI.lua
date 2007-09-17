@@ -63,7 +63,8 @@ function lib.Processor(callbackType, ...)
 		private.SetupConfigGui(...)
 	elseif (callbackType == "auctionui") then
 		private.HookAH(...)
-	elseif (callbackType == "configchanged") then
+	elseif callbackType == "configchanged"
+	or callbackType == "blockupdate" then
 		if (private.Active) then
 			private.MyAuctionFrameUpdate()
 		end
@@ -611,6 +612,15 @@ end
 
 function private.MyAuctionFrameUpdate()
 	if not BrowseScrollFrame then return end
+	
+	if AucAdvanced.API.IsBlocked() then
+		for pos, candy in ipairs(private.candy) do candy:Hide() end
+		BrowsePrevPageButton:Hide()
+		BrowseNextPageButton:Hide()
+		BrowseSearchCountText:Hide()
+		return
+	end
+		
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
 	local index, button

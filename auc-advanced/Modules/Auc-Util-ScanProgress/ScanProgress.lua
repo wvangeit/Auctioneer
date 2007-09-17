@@ -72,29 +72,38 @@ end
 ----  Functions to manage the progress indicator ----
 private.scanStartTime = time()
 private.scanProgressFormat = "Auctioneer Advanced: %s\nScanning page %d of %d\n\nAuctions per second: %.2f\nAuctions scanned thus far: %d\n\nEstimated time left: %s\nElapsed scan time: %s"
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
+
+
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	--Check that we're enabled before passing on the callback
-	if (not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")) then
-		return
-	end
+	if not AucAdvanced.Settings.GetSetting("util.scanprogress.activated")
 	--Check to see if browseoverride has been set, if so gracefully allow it to continue as is
-	if AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
-		return
+	or AucAdvanced.Settings.GetSetting("util.browseoverride.activated") then
+		state = false
 	end
 
 	--Change the state if we have not scanned any auctions yet.
 	--This is done so that we don't start the timer too soon and thus get skewed numbers
-	if ((state == nil) and ((not scannedAuctions) or (scannedAuctions == 0))) then
+	if (state == nil and (
+		not scannedAuctions or
+		scannedAuctions == 0 or
+		not AucAdvanced.API.IsBlocked() or
+		BrowseButton1:IsVisible()
+	)) then
 		state = true
 	end
 
 	--Distribute the callback according to the value of the state variable
-	if (state == nil) then
-		private.UpdateScanProgressUI(totalAuctions, scannedAuctions)
+	if (state == false) then
+		if AucAdvanced.API.IsBlocked() then
+			private.HideScanProgressUI()
+		end
+		return
 	elseif (state == true) then
 		private.ShowScanProgressUI(totalAuctions)
-	else--if (state == false) then
-		private.HideScanProgressUI()
+	end
+	if scannedAuctions and scannedAuctions > 0 then
+		private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
 	end
 end
 
@@ -104,8 +113,12 @@ function private.ShowScanProgressUI(totalAuctions)
 	end
 	BrowseNoResultsText:Show()
 	private.scanStartTime = time()
-	AuctionFrameBrowse:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	BrowseNoResultsText:SetText("Scanning "..(totalAuctions or "").." items...")
+	if totalAuctions and totalAuctions > 0 then
+		BrowseNoResultsText:SetText(("Scanning %d items..."):format(totalAuctions))
+	else
+		BrowseNoResultsText:SetText("Scanning...")
+	end
+	AucAdvanced.API.BlockUpdate(true)
 end
 
 function private.HideScanProgressUI()
@@ -124,12 +137,19 @@ function private.HideScanProgressUI()
 			_G["BrowseButton"..i]:Show()
 		end
 	end
+	AucAdvanced.API.BlockUpdate(false)
 end
 
-function private.UpdateScanProgressUI(totalAuctions, scannedAuctions)
+function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTime)
 	local numAuctionsPerPage = NUM_AUCTION_ITEMS_PER_PAGE
 
 	local secondsElapsed = time() - private.scanStartTime
+	
+	-- Prefer the elapsed time which is provided by core and excludes paused time.
+	if elapsedTime then
+		secondsElapsed = elapsedTime
+	end
+	
 	local auctionsToScan = totalAuctions - scannedAuctions
 
 	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)

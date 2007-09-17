@@ -102,6 +102,8 @@ function lib.PushScan()
 			private.curPage,
 			private.curQuery,
 			private.curScan,
+			private.scanStarted,
+			private.totalPaused,
 			GetTime(),
 		})
 		private.isScanning = false
@@ -110,6 +112,9 @@ function lib.PushScan()
 		private.curPage = nil
 		private.curQuery = nil
 		private.curScan = nil
+		private.scanStarted = nil
+		private.totalPaused = nil
+		private.UpdateScanProgress(false)
 	end
 end
 
@@ -121,20 +126,25 @@ function lib.PopScan()
 		private.curPage,
 		private.curQuery,
 		private.curScan,
+		private.scanStarted,
+		private.totalPaused,
 		pauseTime = unpack(private.scanStack[1])
 		table.remove(private.scanStack, 1)
 
-		if now - pauseTime > 300 then
+		local elapsed = now - pauseTime
+		if elapsed > 300 then
 			-- 5 minutes old
 			print("Paused scan is older than 5 minutes, aborting")
 			lib.Commit(true)
 			return
 		end
 
+		private.totalPaused = private.totalPaused + elapsed
 		print(("Resuming paused scan at page {{%d}}..."):format(private.curPage+1))
 		private.isScanning = true
 		private.sentQuery = false
 		lib.ScanPage(private.curPage)
+		private.UpdateScanProgress(true)
 	end
 end
 
@@ -229,7 +239,7 @@ lib.UnpackImageItem = private.Unpack
 --The first parameter will be true if we want to show the process indicator, false if we want to hide it. and nil if we only want to update it.
 --The second parameter will be a number that is the max number of items in the scan.
 --The third parameter is the current progress of the scan.
-function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
+function private.UpdateScanProgress(state, totalAuctions, scannedAuctions, elapsedTime)
 	if (not (lib.IsScanning() or (state == false))) then
 		return
 	end
@@ -237,7 +247,7 @@ function private.UpdateScanProgress(state, totalAuctions, scannedAuctions)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then
-				engineLib.Processor("scanprogress", state, totalAuctions, scannedAuctions)
+				engineLib.Processor("scanprogress", state, totalAuctions, scannedAuctions, elapsedTime)
 			end
 		end
 	end
@@ -558,7 +568,7 @@ function lib.Commit(wasIncomplete)
 	end
 
 	local now = time()
-	local scanTimeSecs = now - private.scanStartTime
+	local scanTimeSecs = math.floor(GetTime() - private.scanStarted - private.totalPaused)
 	local scanTimeMins = floor(scanTimeSecs / 60)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
@@ -599,11 +609,17 @@ function lib.Commit(wasIncomplete)
 	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
 	scandata.scanstats[0].startTime = private.scanStartTime
 	scandata.scanstats[0].endTime = now
+	scandata.scanstats[0].started = private.scanStarted
+	scandata.scanstats[0].paused = private.totalPaused
+	scandata.scanstats[0].ended = GetTime()
+	scandata.scanstats[0].elapsed = GetTime() - private.scanStarted - private.totalPaused
 	scandata.scanstats[0].query = private.curQuery
 	scandata.time = now
 
 	private.curQuery = nil
 	private.scanStartTime = nil
+	private.scanStarted = nil
+	private.totalPaused = nil
 	private.curScan = nil
 
 	-- Tell everyone that our stats are updated
@@ -680,7 +696,9 @@ function lib.StorePage()
 	if not private.curScan then private.curScan = {} end
 
 	--Update the progress indicator
-	private.UpdateScanProgress(nil, totalAuctions, #private.curScan)
+	local now = GetTime()
+	local elapsed = now - private.scanStarted - private.totalPaused
+	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
 
 	local curTime = time()
 
@@ -821,6 +839,8 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	if (not is_same or not private.curQuery) then
 		lib.Commit(true)
 		private.scanStartTime = time()
+		private.scanStarted = GetTime()
+		private.totalPaused = 0
 		local startPage = 0
 		if (private.scanDir == 1) then
 			private.curPage = 0
@@ -917,6 +937,8 @@ end
 
 function private.ResetAll()
 	private.scanStartTime = nil
+	private.scanStarted = nil
+	private.totalPaused = nil
 	private.curQuerySig = nil
 	private.curQuery = nil
 	private.curScan = nil

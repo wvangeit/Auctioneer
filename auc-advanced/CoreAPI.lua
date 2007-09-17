@@ -243,6 +243,7 @@ function lib.UnpackImageItem(item)
 end
 
 function lib.ListUpdate()
+	if lib.IsBlocked() then return end
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.Processor) then
@@ -252,4 +253,28 @@ function lib.ListUpdate()
 	end
 end
 
+
+function lib.BlockUpdate(block)
+	local blocked
+	if block == true then
+		blocked = true
+		private.isBlocked = true
+		AuctionFrameBrowse:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	else
+		blocked = false
+		private.isBlocked = nil
+		AuctionFrameBrowse:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	end
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.Processor) then
+				engineLib.Processor("blockupdate", blocked)
+			end
+		end
+	end
+end
+
+function lib.IsBlocked()
+	return (private.isBlocked and private.isBlocked == true)
+end
 
