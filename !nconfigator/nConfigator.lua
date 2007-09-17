@@ -540,7 +540,6 @@ function kit:AddTip(id, tip)
 		control = control.control
 	end
 
-	p("Control", control:GetName(), isGuiObject(control))
 	local old_enter = control:GetScript("OnEnter")
 	local old_leave = control:GetScript("OnLeave")
 	local function help_enter(self, ...)
