@@ -267,7 +267,7 @@ if not lib.help then
 	lib.help.title:SetPoint("BOTTOMRIGHT", lib.help, "TOPRIGHT", -28,-20)
 	lib.help.title:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
 	lib.help.title:SetTextFontObject("GameFontNormal")
-	lib.help.title:SetText("nConfigator Help Window")
+	lib.help.title:SetText("Help Window")
 
 	lib.help.close = CreateFrame("Button", nil, lib.help, "UIPanelCloseButton")
 	lib.help.close:SetPoint("TOPRIGHT", lib.help, "TOPRIGHT", 3, 5)
