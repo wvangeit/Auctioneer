@@ -1,9 +1,11 @@
 --[[
+	EnhTooltip - Additional function hooks to allow hooks into more tooltips
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/EnhTooltip
+
 	TinyMoneyFrame functions
-	<%version%> (<%codename%>)
-   
-	$Id$
-  
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -55,7 +57,7 @@ function TinyMoneyFrame_Update(frame, money)
 	goldButton:SetText(gold);
 	goldButton:SetWidth(goldButton:GetTextWidth() + iconWidth);
 	goldButton:Show();
-	
+
 	if (gold > 0) then
 		silverButton:SetText(("%."..math.log10(SILVER_PER_GOLD).."d"):format(silver));
 	else
@@ -63,7 +65,7 @@ function TinyMoneyFrame_Update(frame, money)
 	end
 	silverButton:SetWidth(silverButton:GetTextWidth() + iconWidth);
 	silverButton:Show();
-	
+
 	if (gold > 0 or silver > 0) then
 		copperButton:SetText(("%."..math.log10(COPPER_PER_SILVER).."d"):format(copper));
 	else
@@ -98,7 +100,7 @@ function TinyMoneyFrame_Update(frame, money)
 		if ( gold > 0 ) then
 			silverButton:SetWidth(25);
 		end
-		
+
 		width = width + silverButton:GetWidth();
 		goldButton:SetPoint("RIGHT", silverButton, "LEFT", spacing, 0);
 		if ( goldButton:IsVisible() ) then
@@ -117,7 +119,7 @@ function TinyMoneyFrame_Update(frame, money)
 		if ( gold > 0 or silver > 0 ) then
 			copperButton:SetWidth(25);
 		end
-		
+
 		width = width + copperButton:GetWidth();
 		silverButton:SetPoint("RIGHT", copperButton, "LEFT", spacing, 0);
 		if ( silverButton:IsVisible() ) then

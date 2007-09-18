@@ -11,6 +11,7 @@
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://enchantrix.org
+##
 EnxManifest.lua
 
 EnxObjects.lua

@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - ScanData
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	Version: <%version%>
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -144,11 +145,11 @@ function lib.GetImageCounts(hyperlink, maxPrice, items)
 					vBuy = v[Const.BUYOUT]
 
 					local matched = false
-					if (maxPrice) then 
-						if (vBuy and vBuy > 0 and vBuy < maxPrice) then 
+					if (maxPrice) then
+						if (vBuy and vBuy > 0 and vBuy < maxPrice) then
 							totalBuy = totalBuy + count
 							matched = true
-						elseif (not maxPrice or vBid < maxPrice) then 
+						elseif (not maxPrice or vBid < maxPrice) then
 							totalBid = totalBid + count
 							matched = true
 						end
@@ -212,7 +213,7 @@ function lib.GetDistribution(hyperlink)
 				vSig = ("%d:%d:%d"):format(vID, vSuffix, vFactor)
 				vLevel, vPer, _,_,_, vColor, itemWorth[vSig] = calcLevel(vLink, vCount, vBid, vBuy, itemWorth[vSig])
 			end
-		
+
 			if (vSuffix == iSuffix) then
 				if (vFactor == iFactor) then
 					exact = exact + vCount

@@ -1,6 +1,8 @@
 --[[
 	nConfigator - A library to help you create a gui config
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/
 
 	License:
 		This library is free software; you can redistribute it and/or
@@ -194,7 +196,7 @@ if not lib.tooltip then
 				return
 			end
 		end
-				
+
 		if not frame or n == 0 then
 			lib.tooltip.fadeInfo.finishedFunc = hide_tip
 			local curAlpha = lib.tooltip:GetAlpha()

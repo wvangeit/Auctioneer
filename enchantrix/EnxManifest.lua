@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Enchantrix Manifest
 	Keep track of the revision numbers for various enchantrix files

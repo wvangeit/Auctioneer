@@ -1,47 +1,49 @@
 ﻿--[[
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+	BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/BottomScanner/
+	Copyright (c) 2006, Norganna
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+	Documentation of the various member variables used in this module:
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	BtmScan.interval - How many seconds between new last page Queries
+		set to 1 when query isn't available for some reason, to try again in 1 second; also right after you hit the play button to schedule the first scan
+		set to 6 when BTM query first starts and we are trying to zero in on last page, and also when value was previously nil (not sure how this would happen)
+		set to 25 (actually BtmScanData.refresh, but I think this is only set to 25) once we have gotten the last page nailed
+		set to 30 on module load, but I don't think this gets used anywhere
+	BtmScan.offset - how many pages back from last page to scan (will be 0 normally, 1 every 5th page scan)
+	BtmScan.lasttry - the .timer value from the previous attempt (I think this is used to create the Log window, and maybe to control the flashing it used to do)
+	BtmScan.auctPriceModel - used in creating the BtmScanner price model in Auctioneer
+	BtmScan.timer - seconds since the last scheduled scan start; gets reset to 0 after any purchase decision
+	BtmScan.pageScan - time between scans of the current query results (set to shorter than .interval in order to allow multiple passes through results without requerying, as when a purchase attempt breaks PageScan() early)
+		set to 0.001 after any purchase dialog result or when piggybacking on currently running query (auctioneer scan or manual), to cause immediate search of current results
+		set to 2 after a new last page query is sent to AH (to give results time to return)
+		set to nil once PageScan() begins (to prevent repeated attempts to check this page of items unless we break out early for a purchase and need to resume later)
+	BtmScan.scanStage
+		0 - no longer scanning page / reached end of query page
+		1 - 0.25 seconds before next scan begins - I have no idea what this is used for
+		2 - scanning page
+		3 - prompting for a purchase / scanning paused
+	BtmScan.scanning - are we currently scanning
+	BtmScan.pageCount - number of pages in the AH
+	BtmScan.resume - index to resume bargain search for in PageScan() [needed after breaking out of scan to prompt for a bid, to avoid double bidding and generally be slightly more efficient]
+		set to a value just prior to breaking out of PageScan() for a purchase opportunity
+		set to nil on init, when PageScan() completes successfully, or when bottom scanning is ended
 
-BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
-$Id$
-Copyright (c) 2006, Norganna
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
 
-Documentation of the various member variables used in this module:
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-BtmScan.interval - How many seconds between new last page Queries
-	set to 1 when query isn't available for some reason, to try again in 1 second; also right after you hit the play button to schedule the first scan
-	set to 6 when BTM query first starts and we are trying to zero in on last page, and also when value was previously nil (not sure how this would happen)
-	set to 25 (actually BtmScanData.refresh, but I think this is only set to 25) once we have gotten the last page nailed
-	set to 30 on module load, but I don't think this gets used anywhere
-BtmScan.offset - how many pages back from last page to scan (will be 0 normally, 1 every 5th page scan)
-BtmScan.lasttry - the .timer value from the previous attempt (I think this is used to create the Log window, and maybe to control the flashing it used to do)
-BtmScan.auctPriceModel - used in creating the BtmScanner price model in Auctioneer
-BtmScan.timer - seconds since the last scheduled scan start; gets reset to 0 after any purchase decision
-BtmScan.pageScan - time between scans of the current query results (set to shorter than .interval in order to allow multiple passes through results without requerying, as when a purchase attempt breaks PageScan() early)
-	set to 0.001 after any purchase dialog result or when piggybacking on currently running query (auctioneer scan or manual), to cause immediate search of current results
-	set to 2 after a new last page query is sent to AH (to give results time to return)
-	set to nil once PageScan() begins (to prevent repeated attempts to check this page of items unless we break out early for a purchase and need to resume later)
-BtmScan.scanStage
-	0 - no longer scanning page / reached end of query page
-	1 - 0.25 seconds before next scan begins - I have no idea what this is used for
-	2 - scanning page
-	3 - prompting for a purchase / scanning paused
-BtmScan.scanning - are we currently scanning
-BtmScan.pageCount - number of pages in the AH
-BtmScan.resume - index to resume bargain search for in PageScan() [needed after breaking out of scan to prompt for a bid, to avoid double bidding and generally be slightly more efficient]
-	set to a value just prior to breaking out of PageScan() for a purchase opportunity
-	set to nil on init, when PageScan() completes successfully, or when bottom scanning is ended
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ]]
 
 BtmScanData = {}
@@ -184,7 +186,7 @@ BtmScan.OnUpdate = function(...)
 		end
 
 		BtmScan.timer = BtmScan.timer + elapsed
-		
+
 		-- Check whether we should scan the current page of query results for purchase opportunities
 		if (BtmScan.pageScan) then
 			if (BtmScan.timer > BtmScan.pageScan) then
@@ -193,7 +195,7 @@ BtmScan.OnUpdate = function(...)
 				BtmScan.scanStage = 1
 			end
 		end
-		
+
 		-- Now check if enough time has elapsed to do everything else - i.e. request a new last page query, among other tasks
 		-- Note that if any bid opportunity happened above in PageScan(), BtmScan.timer has been reset to 0 now
 		-- So you're going to wait a whole .interval from the time the last bid/BO dialog is dismissed before you get past this next section to get any new query results
@@ -207,9 +209,9 @@ BtmScan.OnUpdate = function(...)
 
 	-- Set the background at the correct stage color
 	if (not BtmScan.LogParent) then return end
-	
+
 	-- Don't go any farther if we're still waiting on a purchase dialog decision
-	if (BtmScan.scanStage == 3) then return end 
+	if (BtmScan.scanStage == 3) then return end
 
 	-- If we are supposed to be scanning, then let's do it!
 	if (BtmScan.scanning) then
@@ -260,10 +262,10 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.timer = 0
 			BtmScan.pageScan = 0.001
 		end
-		
+
 		-- Since we're getting a new set of query results, let's reset resume here to make sure we don't skip anything in the new results
 		BtmScan.resume = nil
-		
+
 		AuctionFrameBid.page = page
 	end
 end
@@ -324,7 +326,7 @@ function BtmScan.PageScan(resume)
 	i = resume
 
 	local item = {}
-	
+
 	while ((i <= pageCount) and (BtmScan.scanning == true)) do
 		item.pos = i
 
@@ -421,7 +423,7 @@ function BtmScan.PageScan(resume)
 	end
 
 	BtmScan.scanStage = 0
-	
+
 	--reached the end of the page, set resume back to nil
 	BtmScan.resume = nil
 end
@@ -567,7 +569,7 @@ BtmScan.isDEAble = function(iLevel, iQual, eLevel)
 		end
 		if not eLevel then eLevel = 300 end
 	end
-	
+
 	local required = 1
 	if (iQual < 2) then return false end
 	if iLevel > 100 then required = 275
@@ -684,7 +686,7 @@ BtmScan.ParseGSC = function (price)
 		local number = tonumber(q) or 0
 		total = total + number
 	end
-	
+
 	return total
 end
 
@@ -707,8 +709,8 @@ BtmScan.BreakLink = function (link)
 	if (i) then
 		price = BtmScan.ParseGSC(price)
 		remain = nextpart
-	else price = 0 end 
-	
+	else price = 0 end
+
 	-- Now check for new format "[ItemLink] <price> <count>" if original format came up empty
 	if (price == 0) then
 		i, j, price, count, nextpart = string.find(remain or "", "^ *([%dgGsScC]+) *(%d*)(.*)")
@@ -721,7 +723,7 @@ BtmScan.BreakLink = function (link)
 			count = 0
 		end
 	end
-	
+
 	return tonumber(itemID) or 0, tonumber(randomProp) or 0, tonumber(enchant) or 0, tonumber(uniqID) or 0, name, whole, count, price, remain
 end
 
@@ -1005,7 +1007,7 @@ BtmScan.ConfigZone = function (whence)
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup
-	
+
 	if (not BtmScanData.factions) then
 		BtmScan.Print(tr("BottomScanner: %1", tr("Zone data uninitialized: %1", whence)))
 		return
@@ -1030,7 +1032,7 @@ BtmScan.ConfigZone = function (whence)
 		BtmScan.cutRate = 0.05
 		BtmScan.depositRate = 0.05
 	end
-		
+
 	return realmName.."-"..factionGroup
 end
 
@@ -1066,7 +1068,7 @@ BtmScan.GetZoneConfig = function (whence)
 	end
 	if (not data.ignore) then data.ignore = {} end -- ignore nothing
 	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regardless of user's enchanting level
-	
+
 	if (not data.tooltipOn) then
 		data.tooltipOn = true	 --Sets the tooltip as on by default
 	end
@@ -1109,7 +1111,7 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			item.inc = item.bid - item.min
 			item.buy = additional[1]
 		end
-		
+
 		item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
 
 		-- Check that we're not ignoring this item
@@ -1117,7 +1119,7 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 			-- TODO: Do tooltip that we are ignoring
 			return
 		end
-			
+
 		-- Determine whether buys/bid are valid
 		item.canbid = true
 		item.canbuy = true
@@ -1274,7 +1276,7 @@ BtmScan.PromptPurchase = function(item)
 	local profit = Vf - Vi
 	local roi = math.floor( (100 * profit / Vi) + 0.5 )
 	local disc = math.floor( (100 * (1 - Vi / Vf)) + 0.5 )
-	
+
 	local bidText, BidText = "purchase", "Buyout"
 	if (not item.canbuy or item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
 
@@ -1284,7 +1286,7 @@ BtmScan.PromptPurchase = function(item)
 	elseif (item.remain == 2) then hours = 2
 	elseif (item.remain == 1) then hours = 0.5
 	end
-	
+
 	BtmScan.Prompt.Lines[1]:SetLine(tr("Do you want to %1:", bidText))
 	BtmScan.Prompt.Lines[2]:SetLine("  "..item.link.." x"..item.count)
 	BtmScan.Prompt.Lines[3]:SetLine("  "..tr("Seller: %1, Remain: %2h", item.owner, hours))
@@ -1328,7 +1330,7 @@ end
 
 BtmScan.PerformPurchase = function()
 	local item = BtmScan.Prompt.item
-	
+
 	-- Verify first that the item is still there
 	local there = false
 	local pageCount, totalCount = GetNumAuctionItems("list")
@@ -1336,7 +1338,7 @@ BtmScan.PerformPurchase = function()
 	if (i <= pageCount) then
 		there = checkItem(item.pos, item)
 	end
-	
+
 	if (not there) then
 		for j = 1, pageCount do
 			there = checkItem(j, item)
@@ -1353,10 +1355,10 @@ BtmScan.PerformPurchase = function()
 		BtmScan.scanStage = 2
 		return
 	end
-	
+
 	local buyout, btext = false, ""
 	if item.purchase == item.buy then buyout = true btext = " ("..tr("buyout")..")" end
-	
+
 	BtmScan.Log(tr("Purchasing %1x%2 at %3 for %4%5", item.link, item.count, BtmScan.GSC(item.purchase,1), item.what, btext))
 	PlaceAuctionBid("list", i, item.purchase)
 	local bids = BtmScan.Settings.GetSetting("bid.list")

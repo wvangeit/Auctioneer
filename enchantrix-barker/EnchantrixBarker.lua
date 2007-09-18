@@ -1,13 +1,11 @@
 ﻿--[[
+	Enchantrix:Barker Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
-	Enchantrix v<%version%> (<%codename%>)
-	$Id: EnchantrixBarker.lua 1748 2007-04-25 00:32:05Z luke1410 $
-
-	By Norganna
-	http://enchantrix.org/
-
-	This is an addon for World of Warcraft that add a list of what an item
-	disenchants into to the items that you mouse-over in the game.
+	This is an addon for World of Warcraft that adds the ability to advertise
+	your enchants to other players via the Trade channel.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -32,7 +30,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 
 ]]
-EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctioneer/trunk5/enchantrix/EnchantrixBarker.lua $", "$Rev: 1748 $")
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 local priorityList = {};
 
@@ -59,10 +57,10 @@ local print_order = {
 	'factor_item.gloves',
 	'factor_item.boots',
 	'factor_item.ring',
-	'factor_item.chest', 
-	'factor_item.cloak', 
-	'factor_item.shield', 
-	'factor_item.2hweap', 
+	'factor_item.chest',
+	'factor_item.cloak',
+	'factor_item.shield',
+	'factor_item.2hweap',
 	'factor_item.weapon',
 };
 
@@ -111,12 +109,12 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchAllResistance2"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchAllResistance3"), key = "factor_stat.allRes", print = _BARKLOC("ShortAllRes") },
 	{ search = _BARKLOC("EnchSearchArmor"), key = "factor_stat.armor", print = _BARKLOC("ShortArmor") },						-- too general, has to come near last
-	
+
 };
 
 --[[
 Other possible exceptions or additions
-	
+
 	{ search = 'damage against elementals', key = "other", print = "Elemental" },		-- probably safe
 	{ search = 'damage to demons', key = "other", print = "Demon" },					-- probably safe
 	{ search = 'healing', key = "other", print = "heal" },								-- probably safe
@@ -147,7 +145,7 @@ brawn  "increase Strength"										-- correctly matches strength
 	-- this is used to match up trade zone game names with short strings for the output
 local short_location = {
 	[_BARKLOC('Orgrimmar')] = _BARKLOC('ShortOrgrimmar'),
-	[_BARKLOC('ThunderBluff')] = _BARKLOC('ShortThunderBluff'), 
+	[_BARKLOC('ThunderBluff')] = _BARKLOC('ShortThunderBluff'),
 	[_BARKLOC('Undercity')] = _BARKLOC('ShortUndercity'),
 	[_BARKLOC('StormwindCity')] = _BARKLOC('ShortStormwind'),
 	[_BARKLOC('Darnassus')] = _BARKLOC('ShortDarnassus'),
@@ -228,7 +226,7 @@ local function craftUILoaded()
 
 	Stubby.UnregisterAddOnHook("Blizzard_CraftUI", "Enchantrix")
 	local useFrame = CraftFrame;
-	
+
 	if (ATSWFrame ~= nil) then
 		Stubby.UnregisterAddOnHook("ATSWFrame", "Enchantrix")
 		useFrame = ATSWFrame;
@@ -236,7 +234,7 @@ local function craftUILoaded()
 
 	Enchantrix_BarkerDisplayButton:SetParent(useFrame);
 	--Enchantrix_BarkerDisplayButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
-	
+
 	if (ATSWFrame ~= nil) then
 		-- this works for ATSW
 		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -51 );
@@ -858,12 +856,12 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
 		for i = 1, table.getn(chanlist) do
 			id, channame = GetChannelName(i);
 
-			if ((channame) and  (channame ~= (_BARKLOC('ChannelGeneral')..ZoneName)) and 
-			 (channame ~= (_BARKLOC('ChannelLocalDefense')..ZoneName)) and (channame ~= _BARKLOC('ChannelWorldDefense')) and 
+			if ((channame) and  (channame ~= (_BARKLOC('ChannelGeneral')..ZoneName)) and
+			 (channame ~= (_BARKLOC('ChannelLocalDefense')..ZoneName)) and (channame ~= _BARKLOC('ChannelWorldDefense')) and
 			 (channame ~= _BARKLOC('ChannelGuildRecruitment')) and (channame ~= _BARKLOC('ChannelBlock1')) ) then
 					info	= {};
 				info.text	= channame;
-				info.value	= i; 
+				info.value	= i;
 				info.func	= Enchantrix_BarkerOptions_ChanFilterDropDownItem_OnClick;
 				info.owner	= dropdown;
 				UIDropDownMenu_AddButton(info)
@@ -871,7 +869,7 @@ function Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize()
        end
 end
 
-function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick() 
+function Enchantrix_BarkerOptions_ChanFilterDropDown_OnClick()
        ToggleDropDownMenu(1, nil, Enchantrix_BarkerOptions_ChanFilterDropDown, "cursor");
 end
 
@@ -938,14 +936,14 @@ end
 -- end UI code
 
 function Enchantrix_CreateBarker()
-	
+
 	if (not EnchantrixBarker_BarkerGetZoneText()) then
 		-- not in a recognized trade zone
 		return nil;
 	end
-	
+
 	local temp = GetCraftSkillLine(1);
-	
+
 	if (not temp) then
 		-- trade skill window isn't open (how did this happen?)
 		Barker.Util.ChatPrint(_BARKLOC('BarkerEnxWindowNotOpen'));
@@ -959,22 +957,22 @@ function Enchantrix_CreateBarker()
 	EnchantrixBarker_ResetPriorityList();
 
 	Barker.Util.DebugPrintQuick("Starting creation of EnxBarker")
-	
+
 	local highestProfit = Enchantrix_BarkerGetConfig("highest_profit");
 	local profitMargin = Enchantrix_BarkerGetConfig("profit_margin");
-	
+
 	for index=1, GetNumCrafts() do
 		local craftName, craftSubSpellName, craftType, numEnchantsAvailable, isExpanded = GetCraftInfo(index);
 
 		if ( numEnchantsAvailable > 0 ) then -- user has reagents
-			
+
 			-- does this skill produce an enchant, or a trade good?
 			local itemLink = GetCraftItemLink(index);
 			local itemName, newItemLink = GetItemInfo(itemLink);
-			
+
 			-- item name and link are nil for enchants, and valid for produced items (which we want to ignore)
 			if (not itemName and not newItemLink) then
-			
+
 				local cost = 0;
 				for j=1,GetCraftNumReagents(index),1 do
 					local reagentName,_,countRequired = GetCraftReagentInfo(index,j);
@@ -1234,7 +1232,7 @@ function EnchantrixBarker_GetItemCategoryKey( index )
 	end
 
 	--Barker.Util.DebugPrintQuick("Unknown category for", enchant )
-	
+
 	return 'Unknown';
 
 end
@@ -1258,8 +1256,8 @@ function Enchantrix_GetShortDescriptor( index )
 			end
 		end
 	end
-	
-	
+
+
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
 
 	--Barker.Util.DebugPrintQuick("Nomatch in: ", GetCraftInfo(index),  long_str,  enchant  );
@@ -1276,12 +1274,12 @@ function EnchantrixBarker_GetEnchantStat( enchant )
 		--if (not attribute.search) then
 		--	Barker.Util.DebugPrintQuick("bad attribute: ", index, attribute  );
 		--end
-		
+
 		if( long_str:find(attribute.search) ~= nil ) then
 			return attribute.key;
 		end
 	end
-	
+
 	local enchant = Barker.Util.Split(GetCraftInfo(index), "-");
 
 	return enchant[#enchant];

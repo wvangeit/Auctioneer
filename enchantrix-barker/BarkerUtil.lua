@@ -1,7 +1,8 @@
 --[[
-	Enchantrix Addon for World of Warcraft(tm).
+	Enchantrix:Barker Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EnxUtil.lua 1735 2007-04-23 22:48:30Z ccox $
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	General utility functions
 
@@ -27,7 +28,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-EnchantrixBarker_RegisterRevision("$URL: http://norganna.org/svn/auctioneer/trunk/enchantrix/EnxUtil.lua $", "$Rev: 1735 $")
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 -- Global functions
 
@@ -226,7 +227,7 @@ function createProfiler(name)
 end
 
 Barker.Util = {
-	Revision			= "$Revision: 1735 $",
+	Revision			= "$Revision$",
 
 	Split				= split,
 	ChatPrint			= chatPrint,

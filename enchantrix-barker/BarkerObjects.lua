@@ -1,10 +1,11 @@
 --[[
-	Enchantrix Addon for World of Warcraft(tm).
-	Version: 3.9.0.1560 (Wallaby)
-	Revision: $Id: BarkerObjects.lua 1326 2007-01-12 03:25:09Z norganna $
+	Enchantrix:Barker Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Barker namespace.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License

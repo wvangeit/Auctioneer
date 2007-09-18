@@ -1,5 +1,8 @@
 --[[
-	$Id$
+	nSidebar AddOn for World of Warcraft (tm)
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -39,23 +42,23 @@ do -- LibStub
 		LibStub = LibStub or {libs = {}, minors = {} }
 		_G[LIBSTUB_MAJOR] = LibStub
 		LibStub.minor = LIBSTUB_MINOR
-		
+
 		-- LibStub:NewLibrary(major, minor)
 		-- major (string) - the major version of the library
 		-- minor (string or number ) - the minor version of the library
-		-- 
+		--
 		-- returns nil if a newer or same version of the lib is already present
 		-- returns empty library object or old library object if upgrade is needed
 		function LibStub:NewLibrary(major, minor)
 			assert(type(major) == "string", "Bad argument #2 to `NewLibrary' (string expected)")
 			minor = assert(tonumber(strmatch(minor, "%d+")), "Minor version must either be a number or contain a number.")
-			
+
 			local oldminor = self.minors[major]
 			if oldminor and oldminor >= minor then return nil end
 			self.minors[major], self.libs[major] = minor, self.libs[major] or {}
 			return self.libs[major], oldminor
 		end
-		
+
 		-- LibStub:GetLibrary(major, [silent])
 		-- major (string) - the major version of the library
 		-- silent (boolean) - if true, library is optional, silently return nil if its not found
@@ -68,14 +71,14 @@ do -- LibStub
 			end
 			return self.libs[major], self.minors[major]
 		end
-		
+
 		-- LibStub:IterateLibraries()
-		-- 
+		--
 		-- Returns an iterator for the currently registered libraries
-		function LibStub:IterateLibraries() 
-			return pairs(self.libs) 
+		function LibStub:IterateLibraries()
+			return pairs(self.libs)
 		end
-		
+
 		setmetatable(LibStub, { __call = LibStub.GetLibrary })
 	end
 end -- LibStub
@@ -181,8 +184,8 @@ function private.CommandHandler(msg)
 		DEFAULT_CHAT_FRAME:AddMessage("/nsb size [ <n> ]")
 		return
 	end
-	if (a == "top") 
-	or (a == "left") 
+	if (a == "top")
+	or (a == "left")
 	or (a == "bottom")
 	or (a == "right") then
 		side = a
@@ -275,18 +278,18 @@ function lib.ApplyLayout(useLayout)
 		useLayout = false
 	end
 	local layout = lib.private.layout
-	
+
 	if not useLayout then
 		for i = 1, #layout do table.remove(layout) end
 		for id, button in pairs(frame.buttons) do
 			table.insert(layout, button)
 		end
-	
+
 		if (#layout == 0) then
 			frame:Hide()
 			return
 		end
-		
+
 		table.sort(layout, function (a, b)
 			if (a.priority < b.priority) then
 				return true
@@ -301,7 +304,7 @@ function lib.ApplyLayout(useLayout)
 		frame:Hide()
 		return
 	end
-		
+
 	local width = wide
 	if (#layout < wide) then width = #layout end
 	local height = math.floor((#layout - 1) / wide) + 1
@@ -356,7 +359,7 @@ function lib.ApplyLayout(useLayout)
 		frame.Tab:SetWidth(3)
 	end
 	frame:Show()
-	
+
 	local button
 	for pos = 1, #layout do
 		button = layout[pos]

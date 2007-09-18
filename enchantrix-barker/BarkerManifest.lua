@@ -1,7 +1,8 @@
 --[[
-	EnchantrixBarker Addon for World of Warcraft(tm).
+	Enchantrix:Barker Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BarkerManifest.lua 1605 2007-03-26 05:19:07Z mentalpower $
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	EnchantrixBarker Manifest
 	Keep track of the revision numbers for various enchantrix files
@@ -105,4 +106,4 @@ function manifest.Validate()
 	return true
 end
 
-EnchantrixBarker_RegisterRevision("$URL: http://norganna.org/svn/auctioneer/trunk/enchantrixbarker/BarkerManifest.lua $", "$Rev: 1605 $")
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")

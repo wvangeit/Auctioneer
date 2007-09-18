@@ -11,5 +11,4 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
-
 Embed.xml

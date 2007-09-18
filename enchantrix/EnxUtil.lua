@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	General utility functions
 
@@ -103,18 +104,18 @@ function getReagentInfo(reagentID)
 	if (not EnchantConfig) then EnchantConfig = {} end
 	if (not EnchantConfig.cache) then EnchantConfig.cache = {} end
 	if (not EnchantConfig.cache.names) then EnchantConfig.cache.names = {} end
-	
+
 	if (not EnchantConfig.cache.reagentItemInfoBackup) then
 		EnchantConfig.cache.reagentItemInfoBackup = {}
 		-- copy in the default cache data (English only)
 		-- the localizations will get updated as the items come into the user's cache
 		EnchantConfig.cache.reagentItemInfoBackup = Enchantrix.Constants.BackupReagentItemInfo;
 		end
-	
+
 	local cache = EnchantConfig.cache.reagentItemInfoBackup
-	
+
 	local id = reagentID;
-	
+
 	if type(id) == "string" then
 		local _, _, i = id:find("item:(%d-):")
 		if (not i)  then
@@ -122,15 +123,15 @@ function getReagentInfo(reagentID)
 		end
 		id = i
 	end
-	
+
 	id = tonumber(id)
-	
+
 	if (not id)  then
 		Enchantrix.Util.DebugPrintQuick("reagentinfo nil ID: ", type(reagentID), reagentID, tonumber(reagentID) );
 	end
 
 	local sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = GetItemInfo(id)
-	
+
 	if (id and sName) then
 		-- save this reagent data while we have it
 		-- full item info by item id
@@ -138,7 +139,7 @@ function getReagentInfo(reagentID)
 		-- name to id mapping for getLinkFromName()
 		EnchantConfig.cache.names[sName] = "item:"..id..":0:0:0";
 	end
-	
+
 	if (id and (not sName))  then
 		-- last resort is getting the data from our cache, because the WoW cache does not have this item
 		-- remember: the cache is not our primary storage for this data, only a backup
@@ -146,10 +147,10 @@ function getReagentInfo(reagentID)
 			sName, sLink, iQuality, iLevel, rLevel, sType, sSubtype, iStack, sEquip, sTexture = deserializeItemInfo( cache[id] );
 		end
 	end
-	
+
 	if (id and (not sName)) then
 		Enchantrix.Util.DebugPrintQuick("Could not find any reagent info for ", id, reagentID );
-		
+
 		-- fake the info as best we can
 		sName = "item:"..id;
 		sLink = "item:"..id..":0:0:0"
@@ -171,7 +172,7 @@ local function checkReagentCacheVersion()
 	local myFormatVersion = 1;		-- in case we need to change the format dramatically
 	local version,build,date = GetBuildInfo();
 	local versionString = strjoin(".", version, build, myFormatVersion );
-	
+
 	if EnchantConfig.cache.CraftReagentCache.Version then
 		-- version stamp exists, check it
 		if (EnchantConfig.cache.CraftReagentCache.Version ~= versionString) then
@@ -179,7 +180,7 @@ local function checkReagentCacheVersion()
 			EnchantConfig.cache.CraftReagentCache = {}
 		end
 	end
-	
+
 	EnchantConfig.cache.CraftReagentCache.Version = versionString;
 end
 
@@ -190,13 +191,13 @@ end
 --   ["itemname"] = "reagent1itemNo:reagent1count;reagent2itemNo:count;reagent3itemNo:reagent3count"
 
 local function assembleReagentEntryString( reagentList )
-	
+
 	local reagentString = nil
 	for _, reagent in ipairs(reagentList) do
-	
+
 		local itemLink = reagent[1]
 		local count = reagent[2]
-		
+
 		local itemNumber
 		if type(itemLink) == "string" then
 			local _, _, i = itemLink:find("item:(%d-):")
@@ -207,15 +208,15 @@ local function assembleReagentEntryString( reagentList )
 		else
 			itemNumber = Enchantrix.Util.GetItemIdFromLink(itemLink)
 		end
-		
+
 		itemNumber = tonumber(itemNumber)
 		if (not itemNumber) then
 			-- something failed, bail
 			return nil
 		end
-		
+
 		local oneEntry = strjoin(":", itemNumber, count );
-		
+
 		if (reagentString) then
 			reagentString = strjoin(";", reagentString, oneEntry);
 		else
@@ -295,9 +296,9 @@ function getLinkFromName(name)
 			EnchantConfig.cache.names[name] = nil
 		end
 	end
-	
+
 	if not EnchantConfig.cache.names[name] then
-		
+
 		-- if we didn't find it in the cache, try something else
 		-- first, check our list of reagent item ids, because they're most likely
 		for i, _ in ipairs( Enchantrix.Constants.StaticPrices ) do
@@ -308,9 +309,9 @@ function getLinkFromName(name)
 			end
 		end
 	end
-	
+
 	if not EnchantConfig.cache.names[name] then
-		
+
 		-- still no result?  Darn.
 		-- last resort,  check ALL item ids until we find a name match, and cache it!
 		for i = 1, Enchantrix.State.MAX_ITEM_ID + 4000 do
@@ -324,7 +325,7 @@ function getLinkFromName(name)
 			end
 		end
 	end
-	
+
 	return EnchantConfig.cache.names[name]
 end
 
@@ -333,7 +334,7 @@ end
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
 function getReagentPrice(reagentID, extra)
 	-- reagentID ::= number | hyperlink
-	
+
 	if type(reagentID) == "string" then
 		local _, _, i = reagentID:find("item:(%d+):")
 		reagentID = i
@@ -440,7 +441,7 @@ function getIType(link)
 		Enchantrix.DebugPrint("GetIType", ENX_INFO, "Unrecognized equip slot", "The item " .. link .. " has an equip slot (" .. iEquip .. ") that is not recognized")
 		return
 	end
-	
+
 	return ("%d:%d:%d:%d"):format(iLevel, iQual, invType, iId)
 end
 
@@ -739,13 +740,13 @@ function Enchantrix.Util.GetIType(link)
 		Enchantrix.Util.DebugPrint("GetIType", ENX_INFO, "GetItemInfo failed, bad link", "could not get item info for: " .. link)
 		return
 	end
-	
+
 	local class = const.InventoryTypes[itemEquipLoc] or 0
-	
+
 	if itemRarity < 2 or not (class and (class == const.WEAPON or class == const.ARMOR)) then
 		return
 	end
-	
+
 	return ("%d:%d:%d"):format(itemLevel,itemRarity,class)
 end
 
@@ -758,10 +759,10 @@ end
 
 function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 	-- should we cache this in a table?
-	
+
 	-- someone changed their math with the Burning Crusade
 	if (level > 65) then
-	
+
 		-- epics are a little different
 		if (quality == 4) then
 			if (level >= 90) then
@@ -770,13 +771,13 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 				return 225;
 			end
 		end
-		
+
 		if (level >= 100) then
 			return 275;
 		else
 			return 225;
 		end
-	
+
 	elseif (level > 20) then
 		local temp = level - 21;
 		temp = 1 + floor( temp / 5 );
@@ -786,7 +787,7 @@ function Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		end
 		return temp;
 	end
-	
+
 	return 1;
 end
 
@@ -813,27 +814,27 @@ end
 function Enchantrix.Util.GetUserEnchantingSkill()
 	local MyExpandedHeaders = {}
 	local i, j
-	
+
 	-- the user can't have increased their skill too much in 5 seconds
 	if (Enchantrix.EnchantingSkill
 		and Enchantrix.EnchantingSkillTimeStamp
 		and GetTime() - Enchantrix.EnchantingSkillTimeStamp < 5) then
 		return Enchantrix.EnchantingSkill
 	end
-	
+
 	-- just in case the user doesn't have enchanting
 	Enchantrix.EnchantingSkill = 0;
-	
+
 	-- search the skill tree for Mying skills
 	for i=0, GetNumSkillLines(), 1 do
 		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-	
+
 		-- expand the header if necessary
 		if ( header and not isExpanded ) then
 			MyExpandedHeaders[i] = skillName
 		end
 	end
-	
+
 	ExpandSkillHeader(0)
 	for i=1, GetNumSkillLines(), 1 do
 		local skillName, header, _, skillRank = GetSkillLineInfo(i)
@@ -848,7 +849,7 @@ function Enchantrix.Util.GetUserEnchantingSkill()
 			end
 		end
 	end
-	
+
 	-- close headers expanded during search process
 	for i=0, GetNumSkillLines() do
 		local skillName, header, isExpanded = GetSkillLineInfo(i)
@@ -866,27 +867,27 @@ end
 function Enchantrix.Util.GetUserJewelCraftingSkill()
 	local MyExpandedHeaders = {}
 	local i, j
-	
+
 	-- the user can't have increased their skill too much in 5 seconds
 	if (Enchantrix.JewelCraftingSkill
 		and Enchantrix.JewelCraftingSkillTimeStamp
 		and GetTime() - Enchantrix.JewelCraftingSkillTimeStamp < 5) then
 		return Enchantrix.JewelCraftingSkill
 	end
-	
+
 	-- just in case the user doesn't have jewelcrafting
 	Enchantrix.JewelCraftingSkill = 0;
-	
+
 	-- search the skill tree for Mying skills
 	for i=0, GetNumSkillLines(), 1 do
 		local skillName, header, isExpanded, skillRank = GetSkillLineInfo(i)
-	
+
 		-- expand the header if necessary
 		if ( header and not isExpanded ) then
 			MyExpandedHeaders[i] = skillName
 		end
 	end
-	
+
 	ExpandSkillHeader(0)
 	for i=1, GetNumSkillLines(), 1 do
 		local skillName, header, _, skillRank = GetSkillLineInfo(i)
@@ -901,7 +902,7 @@ function Enchantrix.Util.GetUserJewelCraftingSkill()
 			end
 		end
 	end
-	
+
 	-- close headers expanded during search process
 	for i=0, GetNumSkillLines() do
 		local skillName, header, isExpanded = GetSkillLineInfo(i)
@@ -933,10 +934,10 @@ local function balanceEssencePrices(scanReagentTable, style)
 	};
 
 	for lesser, greater in pairs(essenceTable) do
-	
+
 		local priceLesser = scanReagentTable[ lesser ];
 		local priceGreater = scanReagentTable[ greater ];
-		
+
 		if (style == "min") then
 			-- for pessimists who want to hedge their bets (and possibly undervalue their disenchant predictions)
 			priceLesser = math.min( priceLesser, priceGreater / 3 );
@@ -947,12 +948,12 @@ local function balanceEssencePrices(scanReagentTable, style)
 			-- for those who want the middle of the road
 			priceLesser = ( priceLesser + (priceGreater / 3) ) / 2;
 		end
-		
+
 		scanReagentTable[ lesser ] = priceLesser;
 		scanReagentTable[ greater ] = 3 * priceLesser;
-		
+
 	end
-	
+
 end
 
 function Enchantrix.Util.CreateReagentPricingTable()
@@ -976,7 +977,7 @@ function Enchantrix.Util.CreateReagentPricingTable()
 			myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagent..'.value')) or 0
 		else
 			local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(reagent, extra);
-		
+
 			if (style == "auc4:hsp") then
 				myValue = hsp;
 			elseif (style == "auc4:med") then
@@ -997,11 +998,11 @@ function Enchantrix.Util.CreateReagentPricingTable()
 
 		scanReagentTable[ reagent ] = myValue;
 	end
-	
+
 	if (Enchantrix.Settings.GetSetting('AuctionBalanceEssencePrices')) then
 		balanceEssencePrices(scanReagentTable, Enchantrix.Settings.GetSetting('AuctionBalanceEssenceStyle'));
 	end
-	
+
 	return scanReagentTable;
 end
 

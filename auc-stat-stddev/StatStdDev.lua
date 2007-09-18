@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Standard Deviation Statistics module
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	Version: <%version%>
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -235,7 +236,7 @@ end
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-	
+
 end
 
 function private.UnpackStatIter(data, ...)

@@ -1,6 +1,8 @@
 ﻿--[[
 	nLog - A debugging console for World of Warcraft.
-	$Id$
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/nLog/
 	Copyright (C) 2006 Norganna
 
 	This library is free software; you can redistribute it and/or
@@ -29,7 +31,7 @@ N_CRITICAL = 1 -- used for critical errors which might crash the addon or
                -- result in corrupted data (especially in the db)
 N_ERROR    = 2 -- used for non-critical errors which won't end up in any addon
                -- non-responding or result in incorrect data
-N_WARNING  = 3 -- used for states which might cause an error, if they are 
+N_WARNING  = 3 -- used for states which might cause an error, if they are
                -- unexpected
 N_NOTICE   = 4 -- used to give notice of current states which might be useful
                -- and clarify the current functional behaviour
@@ -300,7 +302,7 @@ function nLog.FilterUpdate()
 	then
 		return
 	end
-	
+
 	-- invalidate the currently shown filtered message index only if the filters changed
 	if nLog.filtered.filterLevel ~= nLog.filterLevel
 	or nLog.filtered.filterAddon ~= nLog.filterAddon

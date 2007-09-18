@@ -1,7 +1,8 @@
 --[[
 	Enchantrix:Barker Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BarkerTooltip.lua 1605 2007-03-26 05:19:07Z mentalpower $
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Tooltip functions.
 
@@ -27,7 +28,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctioneer/trunk5/enchantrix/EnxTooltip.lua $", "$Rev: 1605 $")
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 function enchantTooltip(funcVars, retVal, frame, name, link)
 

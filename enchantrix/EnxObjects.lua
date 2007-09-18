@@ -2,9 +2,10 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Enchantrix namespace.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License

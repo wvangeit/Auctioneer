@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Tooltip functions.
 
@@ -89,15 +90,15 @@ tooltipFormat = {
 
 
 local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, quality, count)
-	
+
 	local embed = Enchantrix.Settings.GetSetting('ToolTipEmbedInGameTip')
-	
+
 	local lines
 
 	local totalFive = {}
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	local totalNumber, totalQuantity
-	
+
 	for result, resYield in pairs( prospect ) do
 		if (not lines) then lines = {} end
 		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
@@ -125,8 +126,8 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 		local line = tooltipFormat:GetString(false)	-- no counts here
 		table.insert(lines,  {str = line, sort = resYield})
 	end
-	
-	
+
+
 	-- multiply values by the number of items in this stack
 	local groups = count / 5;
 	totalHSP = totalHSP * groups;
@@ -165,7 +166,7 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 			if n >= 13 then break end -- Don't add more than 13 lines (1 Powder + 6 Uncommon + 6 Rare)
 		end
 	end
-	
+
 	if (Enchantrix.Settings.GetSetting('TooltipProspectLevels')) then
 		local reqSkill = Enchantrix.Util.JewelCraftSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserJewelCraftingSkill();
@@ -223,7 +224,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
 	local totalNumber, totalQuantity
 	local allFixed = true
-	
+
 	if (total and total[1] > 0) then
 		totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
@@ -307,7 +308,7 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 			if n >= 5 then break end -- Don't add more than 5 lines
 		end
 	end
-	
+
 	if (Enchantrix.Settings.GetSetting('TooltipShowDisenchantLevel')) then
 		local reqSkill = Enchantrix.Util.DisenchantSkillRequiredForItem(link);
 		local userSkill = Enchantrix.Util.GetUserEnchantingSkill();
@@ -442,14 +443,14 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	local craftIndex = nil
 	local tradeIndex = nil
 	local reagentList
-	
+
 	-- if it's an item, try our cache
 	if isItem then
 		reagentList = Enchantrix.Util.GetCraftReagentInfoFromCache(name)
 	end
-	
+
 	if not reagentList or (#reagentList < 1) then
-		
+
 		-- first try craft APIs
 		for i = 1, GetNumCrafts() do
 			local craftName = GetCraftInfo(i)
@@ -458,7 +459,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 				break
 			end
 		end
-		
+
 		if craftIndex then
 			reagentList = getReagentsFromCraftFrame(craftIndex)
 		else
@@ -470,7 +471,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 					break
 				end
 			end
-			
+
 			if tradeIndex then
 				reagentList = getReagentsFromTradeFrame(tradeIndex)
 			else
@@ -482,12 +483,12 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		if not reagentList or (#reagentList < 1) then
 			return
 		end
-		
+
 		-- now save it to the cache
 		if isItem then
 			Enchantrix.Util.SaveCraftReagentInfoToCache( name, reagentList );
 		end
-		
+
 	end
 
 	-- Append additional reagent info
@@ -561,12 +562,12 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		end
 		EnhTooltip.LineColor(0.7,0.7,0.1)
 	end
-	
+
 	-- add barker line, if barker is loaded
 	local margin = 0
 	local profit = 0
 	local barkerPrice = 0
-	
+
 	if (Barker and Barker.Settings.GetSetting('barker')) then
 	-- Barker price
 		margin = Barker.Settings.GetSetting("barker.profit_margin")
@@ -581,7 +582,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 
 		EnhTooltip.AddLine(_ENCH('FrmtTotal'), Enchantrix.Util.Round(price, 2.5), embed)
 		EnhTooltip.LineColor(0.8,0.8,0.2)
-		
+
 		if (Barker and Barker.Settings.GetSetting('barker')) then
 			-- "Barker Price (%d%% margin)"
 			EnhTooltip.AddLine(_ENCH('FrmtBarkerPrice'):format(Barker.Util.Round(margin)), barkerPrice, embed)

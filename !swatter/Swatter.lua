@@ -1,6 +1,8 @@
 --[[
 	Swatter - An AddOn debugging aid for World of Warcraft.
-	$Id$
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/Swatter/
 	Copyright (C) 2006 Norganna
 
 	This library is free software; you can redistribute it and/or

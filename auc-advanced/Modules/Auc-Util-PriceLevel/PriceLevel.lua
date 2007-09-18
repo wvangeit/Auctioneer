@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds a price level indicator
 	to auctions when browsing the Auction House, so that you may readily see
@@ -81,7 +82,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, add
 
 	local showPerUnit = AucAdvanced.Settings.GetSetting("util.pricelevel.single")
 	if not showPerUnit then return end
-	
+
 	local priceLevel, perItem, r,g,b = lib.CalcLevel(hyperlink, quantity, bidPrice, buyPrice)
 	if (not priceLevel) then return end
 
@@ -132,7 +133,7 @@ function private.SetupConfigGui(gui)
 		"PriceLevel is an AuctioneerAdvanced module that analyses the current market position with regard to the calculated value of the item.\n"..
 		"PriceLevel is all about determining if what AuctioneerAdvanced thinks is what the rest of the market currently thinks. It's also about determining if the rest of the market are selling their stuff for crazy prices.\n"..
 		"What it all comes down to is the color... PriceLevel breaks the current market down into 5 categories: |cff3296ffWay underpriced|r, |cff19ff19Fairly underpriced|r, |cffffff00Just underpriced|r, |cffff9619Reasonable|r, and |cffff0000Overpriced|r. It also has options for adding the calculated level to the tooltip and in the browse window of the auctionhouse.")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.pricelevel.single", "Show price level and unit price in the tooltips?")
 	gui:AddTip(id, "Enable this to display the price level information in the tooltip when you mouse over an item in your inventory")
@@ -164,7 +165,7 @@ function private.SetupConfigGui(gui)
 		{"try", "Buyout or bid"},
 	}, "util.pricelevel.basis", "Which price to use for the price level")
 	gui:AddTip(id, "Selects which price to base the price level calculation off")
-	
+
 	gui:AddHelp(id, "what is basis",
 		"What is the price level basis?",
 		"The auction house has both bids and buyout values to calculate from. You can select to price the item based off either exclusively the buyout or bid, or first the buyout if it exists, and then the bid")
@@ -208,7 +209,7 @@ function lib.SetBar(i, r,g,b, pct)
 	local tex
 	local button = getglobal("BrowseButton"..i)
 	local colorize = AucAdvanced.Settings.GetSetting("util.pricelevel.colorize")
-		
+
 	if (button.AddTexture) then
 		tex = button.AddTexture
 		if (button.Value) then
@@ -275,7 +276,7 @@ function private.ListUpdate()
 	local index, link, quantity, minBid, minInc, buyPrice, bidPrice, priceLevel, perItem, r,g,b, _
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local offset = FauxScrollFrame_GetOffset(BrowseScrollFrame)
-	
+
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page);
 		if (index <= numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) then
@@ -284,7 +285,7 @@ function private.ListUpdate()
 				_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,
 				priceLevel,_,r,g,b = AucAdvanced.Modules.Util.CompactUI.GetContents(offset+i)
 				lib.SetBar(i, r,g,b, priceLevel)
-			else	
+			else
 				link =  GetAuctionItemLink("list", offset + i)
 				if link then
 					_,_, quantity, _,_,_, minBid, minInc, buyPrice, bidPrice =  GetAuctionItemInfo("list", offset + i)

@@ -2,8 +2,10 @@
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 <!--
-	Enchantrix v<%version%> (<%codename%>)
-	$Id: EnchantrixBarker.xml 1554 2007-03-07 04:23:01Z norganna $
+	Enchantrix:Barker Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -28,7 +30,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 -->
 	<Script>
-		EnchantrixBarker_RegisterRevision("$URL: http://norganna@norganna.org/svn/auctioneer/trunk5/enchantrix/EnchantrixBarker.xml $", "$Rev: 1554 $")
+		EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 	</Script>
 
 	<Button name="Enchantrix_BarkerDisplayButton" inherits="UIPanelButtonTemplate" hidden="true" text="Trade Barker">

@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Appraisals and Auction Posting
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds an appriasals dialog for
 	easy posting of your auctionables when you are at the auction-house.
@@ -260,7 +261,7 @@ function private.SetupConfigGui(gui)
 		"The Appraiser interface attatches to your auctionhouse window as an extra tab at the bottom of the window.\n"..
 		"When you first select the Appraiser window, it will display all your auctionable items on the left side of your window. When you select an item from the left, you will see the control window at the top and the current auctions list at the bottom.\n"..
 		"The control window allows you to specify the posting stack size, for posting stack-splitted auctions, and the number of stacks to post by sliding the two sliders left and right.")
-	
+
 	gui:AddControl(id, "Header",     0,    lib.name.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
 	gui:AddTip(id, "This option will cause the current appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
@@ -324,7 +325,7 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what is magnitude",
 		"What is the setp magnitude?",
 		"The step magnitude specifies the point at which the algorithm decides to move up to the next unit place |cffffff00(copper->silver->gold)|r. For example, if the step magnitude was set to 5, then an amount of 1g 45s 12c would round at the copper place, but an amount of 5g 45s 12c would round at the silver place.")
-	
+
 	gui:AddControl(id, "Note",       0, 2, 500, 150,
 "If you like your numbers being rounded off to a certain division (eg: multiples of 0.25 = 0.25, 0.50, 0.75, etc), or at a certain stop value (always at 0.95, 0.99, etc) then you can activate this option here.\n"..
 "The method of rounding can be either at a fixed stop value (eg 0.95) or at a given division interval (eg 0.25).\n"..
@@ -352,7 +353,7 @@ function private.SetupConfigGui(gui)
 	filter.text:SetPoint("LEFT", filter, "LEFT", 3,0)
 	filter.text:SetText("Filter:")
 	AucAdvanced.Settings.SetSetting('util.appraiser.filter', "")
-	
+
 	private.items = {}
 	for i=1, 8 do
 		local frame = CreateFrame("Button", "AucApraiserItem"..i, box)

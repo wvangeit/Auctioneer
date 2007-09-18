@@ -2,9 +2,10 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Enchantrix Constants.
-	
+
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -37,33 +38,33 @@ local const = Enchantrix.Constants
 const.StaticPrices = {
 	[22450] = 759992, -- Void Crystal
 	[20725] =  80000, -- Nexus Crystal
-	
+
 	[22449] = 191633, -- Large Prismatic Shard
 	[14344] = 110000, -- Large Brilliant Shard
 	[11178] =  88000, -- Large Radiant Shard
 	[11139] =  28106, -- Large Glowing Shard
 	[11084] =  11250, -- Large Glimmering Shard
-	
+
 	[22448] =  60000, -- Small Prismatic Shard
 	[14343] =  24000, -- Small Brilliant Shard
 	[11177] =  70200, -- Small Radiant Shard
 	[11138] =   5000, -- Small Glowing Shard
 	[10978] =   3200, -- Small Glimmering Shard
-	
+
 	[22446] =  64900, -- Greater Planar Essence
 	[16203] = 110225, -- Greater Eternal Essence
 	[11175] =  60000, -- Greater Nether Essence
 	[11135] =  10000, -- Greater Mystic Essence
 	[11082] =   8750, -- Greater Astral Essence
 	[10939] =   6500, -- Greater Magic Essence
-	
+
 	[22447] =  21200, -- Lesser Planar Essence
 	[16202] =  42538, -- Lesser Eternal Essence
 	[11174] =  24285, -- Lesser Nether Essence
 	[11134] =   5040, -- Lesser Mystic Essence
 	[10998] =   4000, -- Lesser Astral Essence
 	[10938] =   3215, -- Lesser Magic Essence
-	
+
 	[22445] =  22500, -- Arcane Dust
 	[16204] =  24800, -- Illusion Dust
 	[11176] =   8333, -- Dream Dust
@@ -136,7 +137,7 @@ const.StaticPrices = {
 	[25843] = 150000, -- Fel Iron Rod
 	[25844] = 185000, -- Adamantite Rod
 	[25845] = 450000, -- Eternium Rod
-	
+
 	[24186] =     50, 	-- COPPERPOWDER, vendor
 	[24188] =    125, 	-- TINPOWDER, vendor
 	[24190] =    400, 	-- IRONPOWDER, vendor
@@ -180,14 +181,14 @@ const.SHARD_SMALL = 4
 const.SHARD_LARGE = 5
 const.CRYSTAL = 6
 
-const.CONSUMABLE = 0 
-const.CONTAINER  = 1 
-const.WEAPON     = 2 
-const.ARMOR      = 4 
-const.REAGENT    = 5 
-const.PROJECTILE = 6 
-const.TRADE      = 7 
-const.RECIPE     = 9 
+const.CONSUMABLE = 0
+const.CONTAINER  = 1
+const.WEAPON     = 2
+const.ARMOR      = 4
+const.REAGENT    = 5
+const.PROJECTILE = 6
+const.TRADE      = 7
+const.RECIPE     = 9
 const.QUIVER     = 11
 const.QUEST      = 12
 const.KEY        = 13
@@ -261,33 +262,33 @@ const.DisenchantReagentList = {
 
 	22450, -- Void Crystal
 	20725, -- Nexus Crystal
-	
+
 	22449, -- Large Prismatic Shard
 	14344, -- Large Brilliant Shard
 	11178, -- Large Radiant Shard
 	11139, -- Large Glowing Shard
 	11084, -- Large Glimmering Shard
-	
+
 	22448, -- Small Prismatic Shard
 	14343, -- Small Brilliant Shard
 	11177, -- Small Radiant Shard
 	11138, -- Small Glowing Shard
 	10978, -- Small Glimmering Shard
-	
+
 	22446, -- Greater Planar Essence
 	16203, -- Greater Eternal Essence
 	11175, -- Greater Nether Essence
 	11135, -- Greater Mystic Essence
 	11082, -- Greater Astral Essence
 	10939, -- Greater Magic Essence
-	
+
 	22447, -- Lesser Planar Essence
 	16202, -- Lesser Eternal Essence
 	11174, -- Lesser Nether Essence
 	11134, -- Lesser Mystic Essence
 	10998, -- Lesser Astral Essence
 	10938, -- Lesser Magic Essence
-	
+
 	22445, -- Arcane Dust
 	16204, -- Illusion Dust
 	11176, -- Dream Dust
@@ -497,7 +498,7 @@ const.ProspectableItems = {
 			[MALACHITE] = 0.5,
 			[SHADOWGEM] = 0.1,
 			},
-	
+
 	[TIN_ORE] = {
 			[TINPOWDER] = 1.0,
 			[SHADOWGEM] = 0.375,
@@ -507,7 +508,7 @@ const.ProspectableItems = {
 			[JADE] = 0.033,
 			[AQUAMARINE] = 0.033,
 			},
-	
+
 	[IRON_ORE] = {
 			[IRONPOWDER] = 1.0,
 			[CITRINE] = 0.30,
@@ -516,7 +517,7 @@ const.ProspectableItems = {
 			[AQUAMARINE] = 0.05,
 			[STARRUBY] = 0.05,
 			},
-	
+
 	[MITHRIL_ORE] = {
 			[MITHRILPOWDER] = 1.0,
 			[CITRINE] = 0.30,
@@ -527,7 +528,7 @@ const.ProspectableItems = {
 			[LARGEOPAL] = 0.025,
 			[HUGEEMERALD] = 0.025,
 			},
-	
+
 	[THORIUM_ORE] = {
 			[THORIUMPOWDER] = 1.0,
 			[STARRUBY] = 0.30,
@@ -542,7 +543,7 @@ const.ProspectableItems = {
 			[AZUREMOONSTONE] = 0.0167,
 			[SHADOWDRAENITE] = 0.0167,
 			},
-	
+
 	[FEL_IRON_ORE] = {
 			[FELIRONPOWDER] = 1.0,
 			[BLOODGARNET] = 0.16,
@@ -558,7 +559,7 @@ const.ProspectableItems = {
 			[STAROFELUNE] = 0.0083,
 			[NIGHTSEYE] = 0.0083,
 			},
-	
+
 	[ADAMANTITE_ORE] = {
 			[ADAMANTITEPOWDER] = 1.0,
 			[BLOODGARNET] = 0.19,

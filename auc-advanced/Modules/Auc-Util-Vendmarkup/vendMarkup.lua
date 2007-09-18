@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - VendMarkup
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -62,13 +63,13 @@ function lib.GetPrice(hyperlink, faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
-	
+
 	if (itemId and itemId > 0) and (type(GetSellValue) == "function") then
 		local vendorFor = GetSellValue(itemId)
 		if not vendorFor then return end
 		vendorFor = vendorFor * 3
 		return vendorFor
-	end	
+	end
 end
 
 function lib.GetPriceColumns()
@@ -85,7 +86,7 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 
 	-- These 2 are the ones that most algorithms will look for
 	array.price = vendorPrice
-	
+
 	-- Return a temporary array. Data in this array is
 	-- only valid until this function is called again.
 	return array

@@ -2,8 +2,40 @@
 	BottomScanner Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/BottomScanner/
+	Copyright (c) 2006, Norganna
 
 	Settings GUI
+
+	Data Layout:
+		BtmScanData = {
+
+			["profile.test4"] = {
+				["miniicon.distance"] = 56,
+				["miniicon.angle"] = 189,
+				["show"] = true,
+				["enable"] = true,
+			},
+
+			["profiles"] = {
+				"Default", -- [1]
+				"test4", -- [2]
+			},
+
+			["users.Foobar.Picksell"] = "test4",
+
+			["profile.Default"] = {
+				["miniicon.angle"] = 187,
+				["miniicon.distance"] = 15,
+			},
+
+		}
+	if user does not have a set profile name, they get the default profile
+
+	Usage:
+		def = BtmScanner.Settings.GetDefault('ToolTipShowCounts')
+		val = BtmScanner.Settings.GetSetting('ToolTipShowCounts')
+		BtmScanner.Settings.SetSetting('ToolTipShowCounts', true );
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -26,40 +58,6 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		
-
-data layout:
-		BtmScanData = {
-		
-			["profile.test4"] = {
-				["miniicon.distance"] = 56,
-				["miniicon.angle"] = 189,
-				["show"] = true,
-				["enable"] = true,
-			},
-			
-			["profiles"] = {
-				"Default", -- [1]
-				"test4", -- [2]
-			},
-			
-			["users.Foobar.Picksell"] = "test4",
-			
-			["profile.Default"] = {
-				["miniicon.angle"] = 187,
-				["miniicon.distance"] = 15,
-			},
-			
-		}
-
-if user does not have a set profile name, they get the default profile
-
-
-Usage:
-	def = BtmScanner.Settings.GetDefault('ToolTipShowCounts')
-	val = BtmScanner.Settings.GetSetting('ToolTipShowCounts')
-	BtmScanner.Settings.SetSetting('ToolTipShowCounts', true );
-
 ]]
 
 local lib = {}
@@ -118,11 +116,11 @@ local settingDefaults = {
 
 function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
-	
+
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
-	
+
 	-- custom settings
 	if (b == "list") then
 		local db = getUserProfile()
@@ -130,10 +128,10 @@ function getDefault(setting)
 		db[setting] = {}
 		return db[setting]
 	end
-	
+
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
-	
+
 	return result
 end
 
@@ -148,20 +146,20 @@ end
 
 function setter(setting, value)
 	if (not BtmScanData) then BtmScanData = {} end
-	
+
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
 	end
-	
+
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then
 		-- Don't save default values
 		value = nil
 	end
-	
+
 	local a,b,c = strsplit(".", setting)
 	if (a == "profile") then
 		if (setting == "profile.save") then
@@ -174,7 +172,7 @@ function setter(setting, value)
 			BtmScanData[getUserSig()] = value
 			-- Get the new current profile
 			local newProfile = getUserProfile()
-			
+
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
 			gui:Resave()
@@ -185,19 +183,19 @@ function setter(setting, value)
 				profiles = { "Default" }
 				BtmScanData["profiles"] = profiles
 			end
-			
+
 			-- Check to see if it already exists
 			local found = false
 			for pos, name in ipairs(profiles) do
 				if (name == value) then found = true end
 			end
-			
+
 			-- If not, add it and then sort it
 			if (not found) then
 				table.insert(profiles, value)
 				table.sort(profiles)
 			end
-			
+
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
@@ -206,10 +204,10 @@ function setter(setting, value)
 			if (value) then
 				-- Clean it's profile container of values
 				cleanse(BtmScanData["profile."..value])
-				
+
 				-- Delete it's profile container
 				BtmScanData["profile."..value] = nil
-				
+
 				-- Find it's entry in the profiles list
 				local profiles = BtmScanData["profiles"]
 				if (profiles) then
@@ -220,16 +218,16 @@ function setter(setting, value)
 						end
 					end
 				end
-				
+
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
 					BtmScanData[getUserSig()] = 'Default'
 				end
 			end
-			
+
 		elseif (setting == "profile.default") then
 			-- User clicked the reset settings button
-			
+
 			-- Get the current profile from the select box
 			value = gui.elements["profile"].value
 
@@ -264,7 +262,7 @@ function lib.SetSetting(...)
 		gui:Refresh()
 	end
 end
-	
+
 
 function getter(setting)
 	if (not BtmScanData) then BtmScanData = {} end
@@ -332,7 +330,7 @@ function lib.MakeGuiConfig()
 	lib.Gui = gui
 
   	gui:AddCat("Core Options")
-  
+
 	id = gui:AddTab("Profiles")
 	gui:AddControl(id, "Header",           0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",          0,    "Activate a current profile")
@@ -341,7 +339,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",          0,    "Create or replace a profile")
 	gui:AddControl(id, "Text",             0, 1, "profile.name", "New profile name:")
 	gui:AddControl(id, "Button",           0, 1, "profile.save", "Save")
-	
+
 	id = gui:AddTab("General")
 	gui:AddControl(id, "Header",           0,    "Main BtmScanner options")
 	gui:AddControl(id, "Subhead",          0,    "Scan Settings")

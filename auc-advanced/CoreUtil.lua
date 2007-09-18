@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -81,12 +82,12 @@ function lib.DecodeLink(link)
 	return
 end
 
-function lib.GetFaction() 
+function lib.GetFaction()
 	local realmName = GetRealmName()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = lib.GetFactionGroup()
 	if not factionGroup then return end
-	
+
 	if (factionGroup == "Neutral") then
 		AucAdvanced.cutRate = 0.15
 		AucAdvanced.depositRate = 0.25
@@ -101,7 +102,7 @@ end
 function lib.GetFactionGroup()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
-	
+
 	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
 	if AucAdvancedConfig.factions[currentZone] then
 		factionGroup = AucAdvancedConfig.factions[currentZone]

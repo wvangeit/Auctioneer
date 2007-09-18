@@ -1,6 +1,8 @@
-﻿--[[	Auctioneer Advanced
-	Revision: $Id$
+﻿--[[
+	Auctioneer Advanced
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -58,7 +60,7 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 	if EnhTooltip.LinkType(hyperlink) ~= "item" then
 		return -- Auctioneer hooks into item tooltips only
 	end
-	
+
 	-- Check to see if we need to force load scandata
 	local getter = AucAdvanced.Settings.GetSetting
 	if (getter("scandata.tooltip.display") and getter("scandata.force")) then

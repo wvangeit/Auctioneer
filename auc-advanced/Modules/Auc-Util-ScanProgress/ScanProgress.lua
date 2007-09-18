@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced module that adds a textual scan progress
 	indicator to the Auction House UI.

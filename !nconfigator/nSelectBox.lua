@@ -1,6 +1,8 @@
 --[[
 	nSelectBox
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/
 
 	License:
 		This library is free software; you can redistribute it and/or

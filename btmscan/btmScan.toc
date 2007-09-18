@@ -9,7 +9,7 @@
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
-## URL: http://auctioneeraddon.com/
+## URL: http://auctioneeraddon.com/dl/BottomScanner/
 ##
 
 DebugLib\DebugLib.lua

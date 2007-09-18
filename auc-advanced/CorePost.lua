@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced
-	Revision: $Id: CoreScan.lua 2147 2007-09-12 02:45:15Z mentalpower $
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -102,7 +103,7 @@ private.bagInfo = {}
     DecodeSig(itemid, suffix, factor, enchant, seed)
       Returns: itemid, suffix, factor, enchant, seed
       Throws: ERROR_NOITEM
-  
+
       This function can take either an encoded sig or predecoded values
       in order to save time.
 ]]
@@ -160,7 +161,7 @@ end
     FindMatchesInBags(id, [suffix, [factor, [enchant, [seed] ] ] ])
       Returns: { {bag, slot, count}, ... }
 	  Throws: ERROR_NOITEM
- 
+
       The table is expanded as needed to hold all the matches in all the
       inventory bags that the user has. Does not include bank or other
       special bags, which are not searched at all.
@@ -198,7 +199,7 @@ function lib.FindMatchesInBags(...)
 					if (locked) then
 						isLocked = true
 					end
-						
+
 					local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
 					if not isMultibag then
 						-- Store info that this bag can contain this item
@@ -242,7 +243,7 @@ end
       Returns: bag, slot
       Throws: ERROR_NOITEM, ERROR_NOLOCAL, ERROR_MAXSIZE, ERROR_NOTFOUND,
 	          ERROR_NOTENOUGH, ERROR_NOBLANK
-  
+
       If it is possible to make a stack of the specified size, with items
       of the specified sig, this function will combine or split items to
       make the stack.
@@ -501,7 +502,7 @@ function private.ProcessPosts()
 		end
 		return
 	end
-		
+
 	local success, bag, slot = pcall(lib.FindOrMakeStack, request[1], request[2])
 	if not success then
 		local err = bag:match(": (.*)")
@@ -584,7 +585,7 @@ end
 
 -- Simple timer to keep actions up-to-date even if an event misfires
 private.updateFrame = CreateFrame("frame", nil, UIParent)
-private.updateFrame.timer = -5 
+private.updateFrame.timer = -5
 private.updateFrame:SetScript("OnUpdate", function(obj, delay)
 	obj.timer = obj.timer + delay
 	if obj.timer > 0 then

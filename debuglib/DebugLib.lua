@@ -1,31 +1,9 @@
 ﻿--[[
-	DebugLib
-	An embedded library which works as a higher layer for nLog, by providing
-	easier usage of debugging features.
-	<%version%> (<%codename%>)
-	$Id$
-
-	License:
-		This program is free software; you can redistribute it and/or
-		modify it under the terms of the GNU General Public License
-		as published by the Free Software Foundation; either version 2
-		of the License, or (at your option) any later version.
-
-		This program is distributed in the hope that it will be useful,
-		but WITHOUT ANY WARRANTY; without even the implied warranty of
-		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-		GNU General Public License for more details.
-
-		You should have received a copy of the GNU General Public License
-		along with this program(see GPL.txt); if not, write to the Free Software
-		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-	Note:
-		This AddOn's source code is specifically designed to work with
-		World of Warcraft's interpreted AddOn system.
-		You have an implicit licence to use this AddOn with these facilities
-		since that is its designated purpose as per:
-		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
+	DebugLib - An embedded library which works as a higher layer for nLog,
+	by providing easier usage of debugging features.
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/
 
 	Manual:
 		This manual is a basic introduction to this library and gives examples
@@ -113,6 +91,28 @@
 
 		For a more detailed description of possible syntaxes for these functions
 		refer to the specific function's description.
+
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+	Note:
+		This AddOn's source code is specifically designed to work with
+		World of Warcraft's interpreted AddOn system.
+		You have an implicit licence to use this AddOn with these facilities
+		since that is its designated purpose as per:
+		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
 -------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ if not nLog then
 		["Debug"]    = 6
 	}
 else
-	-- if nLog exists, we can use its list to make 100% sure, that the content 
+	-- if nLog exists, we can use its list to make 100% sure, that the content
 	-- is the same
 	levelLookupList = {}
 	for index, levelString in ipairs(nLog.levels) do

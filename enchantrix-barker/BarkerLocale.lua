@@ -1,7 +1,8 @@
 --[[
-	Enchantrix Barker Addon for World of Warcraft(tm).
-	Version: 3.9.0.1560 (Wallaby)
-	Revision: $Id: EnxLocale.lua 1326 2007-01-12 03:25:09Z norganna $
+	Enchantrix:Barker Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Localization routines
 
@@ -148,7 +149,7 @@ function localizeCommand(cmd)
 end
 
 Barker.Locale = {
-	Revision = "$Revision: 1326 $",
+	Revision = "$Revision$",
 
 	AddonLoaded				= addonLoaded,
 

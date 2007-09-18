@@ -1,7 +1,8 @@
 ﻿--[[
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EnxAutoDisenchant.lua 1 2007-08-10 00:00:00Z chardonnay $
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Automatic disenchant scanner.
 
@@ -27,7 +28,7 @@
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-Enchantrix_RegisterRevision("$URL: http://norganna.org/svn/auctioneer/trunk/enchantrix/EnxAutoDisenchant.lua $", "$Rev: 1 $")
+Enchantrix_RegisterRevision("$URL$", "$Rev$")
 
 local ignoreList = {}
 local frame
@@ -492,7 +493,7 @@ end
 
 function addonLoaded()
 	if not AutoDisenchantIgnoreList then AutoDisenchantIgnoreList = {} end
-	
+
 	setState("init")
 
 	initUI()

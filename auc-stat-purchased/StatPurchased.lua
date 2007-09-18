@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - StatPurchased
-	Revision: $Id: StatSimple.lua 1660 2007-04-06 02:36:10Z prowell $
-	Version: <%version%>
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -128,9 +129,9 @@ function lib.ScanProcessors.delete(operation, itemData, oldData)
 			auctiondata[itemData.id].boughtout = true
 		end
 	end
-	
+
 	if (not auctiondata[itemData.id]) then return end
-	
+
 	local pricedata = private.GetPriceData()
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
 	if (factor ~= 0) then property = property.."x"..factor end
@@ -150,7 +151,7 @@ function lib.ScanProcessors.delete(operation, itemData, oldData)
 	stats[property][1] = stats[property][1] + price
 	stats[property][2] = stats[property][2] + 1
 	pricedata.daily[itemId] = private.PackStats(stats)
-	auctiondata[itemData.id] = nil	
+	auctiondata[itemData.id] = nil
 end
 
 lib.Private = private
@@ -257,7 +258,7 @@ end
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
 function private.PushStats(faction, realm)
 	local dailyAvg
-	
+
 	local data = private.GetPriceData(faction, realm)
 	if not data then return end
 	if not data.daily then return end
@@ -337,7 +338,7 @@ function private.ClearData(faction, realmName)
 	if (not AAStatPurchasedData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFactionGroup()
 	if (realmName) then
-		print("Clearing "..libName.." stats for {{"..faction.."}}")	
+		print("Clearing "..libName.." stats for {{"..faction.."}}")
 	else
 		realmName = GetRealmName()
 		print("Clearing "..libName.." stats for {{"..faction.."}} on {{"..realmName.."}}")
@@ -376,8 +377,8 @@ function private.DataLoaded()
 			if stats.daily.created and time() - stats.daily.created > 3600*16 then
 				-- This data is more than 16 hours old, we classify this as "yesterday's data"
 				private.PushStats(faction, realm)
-			end		
-		end	
+			end
+		end
 	end
 end
 

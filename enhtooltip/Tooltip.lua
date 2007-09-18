@@ -1,9 +1,10 @@
 ﻿--[[
-Additional function hooks to allow hooks into more tooltips
-<%version%> (<%codename%>)
-$Id$
+	EnhTooltip - Additional function hooks to allow hooks into more tooltips
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/EnhTooltip
 
-You should hook into EnhTooltip using Stubby:
+	You should hook into EnhTooltip using Stubby:
 	Stubby.RegisterFunctionHook("EnhTooltip.HOOK", 200, myHookingFunction)
 	Where myHooking function is one of your functions (see calling parameters below)
 	And HOOK is one of:
@@ -38,7 +39,7 @@ You should hook into EnhTooltip using Stubby:
 			EnhTooltip.BagHook()
 
 
-You may use the following methods of the EnhTooltip class:
+	You may use the following methods of the EnhTooltip class:
 
 	EnhTooltip.HideTooltip()
 		Causes the enhanced tooltip to vanish.
@@ -377,7 +378,7 @@ function private.reuse(...)
 	if not item then
 		item = {}
 	end
-	
+
 	-- And populate it if there's any args
 	local n = select("#", ...)
 	for i = 1, n do
@@ -435,7 +436,7 @@ function public.GetBounds(object)
 	bottom = bottom or 0
 	width = width or 0
 	height = height or 0
-	
+
 	local top = bottom + height
 	local right = left + width
 	local xCenter = left + (width / 2)
@@ -1034,7 +1035,7 @@ function private.DoHyperlink(reference, link, button)
 	if (IsShiftKeyDown() or IsControlKeyDown()) then
 		return
 	end
-	
+
 	-- Regular- or alt-clicking will close an existing tooltip, so if one is now visible it is new, and should be enhanced by us
 	if (ItemRefTooltip:IsVisible()) then
 		local itemName = ItemRefTooltipTextLeft1:GetText()
@@ -1265,7 +1266,7 @@ function private.AfHookOnEnter(funcArgs, retVal, type, index)
 		local name = public.NameFromLink(link)
 		if (name) then
 			local aiName, aiTexture, aiCount, aiQuality, aiCanUse, aiLevel, aiMinBid, aiMinIncrement, aiBuyoutPrice, aiBidAmount, aiHighBidder, aiOwner = GetAuctionItemInfo(type, index)
-	
+
 			local aiNextBid = aiMinBid
 			if (aiBidAmount>0) then aiNextBid = aiBidAmount + aiMinIncrement end
 

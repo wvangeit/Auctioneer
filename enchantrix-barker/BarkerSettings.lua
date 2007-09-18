@@ -1,7 +1,8 @@
 --[[
 	Enchantrix:Barker Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BarkerSettings.lua 1605 2007-03-26 05:19:07Z mentalpower $
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Settings GUI
 
@@ -26,30 +27,30 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		
-		
+
+
 data layout:
 		EnchantrixBarkerConfig = {
-		
+
 			["profile.test4"] = {
 				["miniicon.distance"] = 56,
 				["miniicon.angle"] = 189,
 				["show"] = true,
 				["enable"] = true,
 			},
-			
+
 			["profiles"] = {
 				"Default", -- [1]
 				"test4", -- [2]
 			},
-			
+
 			["users.Balnazzar.Picksell"] = "test4",
-			
+
 			["profile.Default"] = {
 				["miniicon.angle"] = 187,
 				["miniicon.distance"] = 15,
 			},
-			
+
 		}
 
 if user does not have a set profile name, they get the default profile
@@ -61,7 +62,7 @@ Usage:
 	Barker.Settings.SetSetting('counts', true );
 
 ]]
-EnchantrixBarker_RegisterRevision("$URL$", "$Rev: 1605 $")
+EnchantrixBarker_RegisterRevision("$URL$", "$Rev$")
 
 local lib = {}
 Barker.Settings = lib
@@ -104,14 +105,14 @@ local settingDefaults = {
 	['all'] = true,
 	['locale'] = 'default',
 	['embed'] = 'false',
-	
+
 	['printframe'] = 1,
-	
+
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
-	
+
 	['miniicon.angle'] = 118,
 	['miniicon.distance'] = 12,
-	
+
 	['barker'] = true,
 	['barker.profit_margin'] = 10,		-- percent
 	['barker.lowest_price'] = 5000,		-- GSC
@@ -120,7 +121,7 @@ local settingDefaults = {
 	['barker.high_price'] = 500000,		-- GSC
 	['barker.highest_profit'] = 100000,	-- GSC
 	['barker.factor_price'] = 20,
-	
+
 	['barker.factor_item'] = 40,
 	['barker.factor_item.2hweap'] = 90,
 	['barker.factor_item.weapon'] = 100,
@@ -175,30 +176,30 @@ local settingDefaults = {
 	['barker.DMG'] = 90,
 	['barker.other'] = 70,
 ]]
-	
+
 }
 
 
 local function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
-	
+
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
-	
+
 	-- reagent prices
 	if (a == "value") then
 		return Barker.Constants.StaticPrices[tonumber(b) or 0]
 	end
-	
+
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
-	
+
 	-- no idea what this setting is, so log it for debugging purposes
 	if (result == nil) then
 		Barker.Util.DebugPrint("GetDefault", ENX_INFO, "Unknown key", "default requested for unknown key:" .. setting)
 	end
-	
+
 	return result
 end
 
@@ -209,20 +210,20 @@ end
 
 local function setter(setting, value)
 	if (not EnchantrixBarkerConfig) then EnchantrixBarkerConfig = {} end
-	
+
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
 	end
-	
+
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then
 		-- Don't save default values
 		value = nil
 	end
-	
+
 	local a,b,c = strsplit(".", setting)
 	if (a == "profile") then
 		if (setting == "profile.save") then
@@ -233,10 +234,10 @@ local function setter(setting, value)
 
 			-- Set the current profile to the new profile
 			EnchantrixBarkerConfig[getUserSig()] = value
-			
+
 			-- Get the new current profile
 			local newProfile = getUserProfile()
-			
+
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
 			gui.Resave()
@@ -247,22 +248,22 @@ local function setter(setting, value)
 				profiles = { "Default" }
 				EnchantrixBarkerConfig["profiles"] = profiles
 			end
-			
+
 			-- Check to see if it already exists
 			local found = false
 			for pos, name in ipairs(profiles) do
 				if (name == value) then found = true end
 			end
-			
+
 			-- If not, add it and then sort it
 			if (not found) then
 				table.insert(profiles, value)
 				table.sort(profiles)
 			end
-			
+
 -- TODO - localize string
 			DEFAULT_CHAT_FRAME:AddMessage("Saved profile: "..value)
-			
+
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
@@ -271,10 +272,10 @@ local function setter(setting, value)
 			if (value) then
 				-- Clean it's profile container of values
 				cleanse(EnchantrixBarkerConfig["profile."..value])
-				
+
 				-- Delete it's profile container
 				EnchantrixBarkerConfig["profile."..value] = nil
-				
+
 				-- Find it's entry in the profiles list
 				local profiles = EnchantrixBarkerConfig["profiles"]
 				if (profiles) then
@@ -285,39 +286,39 @@ local function setter(setting, value)
 						end
 					end
 				end
-				
+
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
 					EnchantrixBarkerConfig[getUserSig()] = 'Default'
 				end
-				
+
 -- TODO - localize string
 				DEFAULT_CHAT_FRAME:AddMessage("Deleted profile: "..value)
-				
+
 			end
-			
+
 		elseif (setting == "profile.default") then
 			-- User clicked the reset settings button
-			
+
 			-- Get the current profile from the select box
 			value = gui.elements["profile"].value
 
 			-- Clean it's profile container of values
 			EnchantrixBarkerConfig["profile."..value] = {}
-			
+
 -- TODO - localize string
 			DEFAULT_CHAT_FRAME:AddMessage("Reset all settings for:"..value)
-			
+
 		elseif (setting == "profile") then
 			-- User selected a different value in the select box, get it
 			value = gui.elements["profile"].value
 
 			-- Change the user's current profile to this new one
 			EnchantrixBarkerConfig[getUserSig()] = value
-			
+
 -- TODO - localize string
 			DEFAULT_CHAT_FRAME:AddMessage("Changing profile: "..value)
-			
+
 		end
 
 		-- Refresh all values to reflect current data
@@ -343,7 +344,7 @@ function lib.SetSetting(...)
 		gui.Refresh()
 	end
 end
-	
+
 
 local function getter(setting)
 	if (not EnchantrixBarkerConfig) then EnchantrixBarkerConfig = {} end
@@ -359,11 +360,11 @@ local function getter(setting)
 			return pList
 		end
 	end
-	
+
 	if (setting == 'profile') then
 		return getUserProfileName()
 	end
-	
+
 	if (setting == 'track.styles') then
 		return {
 			"Black",
@@ -377,7 +378,7 @@ local function getter(setting)
 			"Yellow",
 		}
 	end
-	
+
 	local db = getUserProfile()
 	if ( db[setting] ~= nil ) then
 		return db[setting]
@@ -422,7 +423,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "Checkbox",       0, 1, "miniicon.enable", "Display Minimap button")
 	gui.AddControl(id, "Slider",         0, 2, "miniicon.angle", 0, 360, 1, "Button angle: %d")
 	gui.AddControl(id, "Slider",         0, 2, "miniicon.distance", -80, 80, 1, "Distance: %d")
-  
+
   	gui.AddCat("Barker")
 	id = gui.AddTab("General")
 	gui.AddControl(id, "Header",         0,    "Enchantrix Barker options")

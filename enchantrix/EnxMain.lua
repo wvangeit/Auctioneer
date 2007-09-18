@@ -1,10 +1,8 @@
 ﻿--[[
-
-	Enchantrix v<%version%> (<%codename%>)
-	$Id$
-
-	By Norganna
-	http://enchantrix.org/
+	Enchantrix Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	This is an addon for World of Warcraft that add a list of what an item
 	disenchants into to the items that you mouse-over in the game.
@@ -123,10 +121,10 @@ function addonLoaded(hookArgs, event, addOnName)
 	local vstr = ("%s-%d"):format(Enchantrix.Version, Enchantrix.Revision)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtWelcome'):format(vstr), 0.8, 0.8, 0.2)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtCredit'), 0.6, 0.6, 0.1)
-	
+
 	-- check for auctioneer and version
 	Enchantrix.Command.AuctioneerLoaded();
-	
+
 end
 
 -- Register our temporary command hook with stubby
@@ -172,7 +170,7 @@ function onLoad()
 			Stubby.Print("]].._ENCH('MesgNotloaded')..[[")
 		end
 	]]);
-	
+
 	SLASH_ENCHANTRIX1 = "/enchantrix";
 	SLASH_ENCHANTRIX2 = "/enchant";
 	SLASH_ENCHANTRIX3 = "/enx";
@@ -181,12 +179,12 @@ function onLoad()
 
 	-- this version gets addonLoaded called AFTER SavedVariables have been loaded
 	Stubby.RegisterEventHook("ADDON_LOADED", "Enchantrix", addonLoaded)
-	
+
 	-- this version gets addonLoaded called BEFORE SavedVariables have been loaded
 	-- 			so all settings then end up with default values during the addonLoaded call
 	-- this ends up showing the minimap icon in the wrong location
 	--Stubby.RegisterAddOnHook("Enchantrix", "Enchantrix", addonLoaded)
-	
+
 end
 
 
@@ -234,7 +232,7 @@ function ENX_OnTooltipSetItem()
 					-- no need to continue
 					return false;
 				end
-				
+
 			end
 		end
 	end

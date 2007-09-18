@@ -4,6 +4,8 @@
 ## Interface: 21000
 ## LoadOnDemand: 0
 ##
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
-## URL: http://norganna.org
+## URL: http://auctioneeraddon.com/dl/Swatter/
+##
 Load.xml

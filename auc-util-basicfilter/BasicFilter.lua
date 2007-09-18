@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - BasicFilter
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	Version: <%version%>
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price

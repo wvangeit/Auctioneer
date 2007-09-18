@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds a price level indicator
 	to auctions when browsing the Auction House, so that you may readily see
@@ -693,7 +694,7 @@ function private.SetupConfigGui(gui)
 		"What is CompactUI?",
 		"CompactUI is a space optimized browse interface to replace the default Blizzard auction browse interface.\n"..
 		"Due to the fact that it heavily modifies your auction frames, it may cause it to be incompatible with other addons that also modify the auction frames. If this is the case you will have to make a choice between CompactUI and the other addons. You may disable CompactUI easily by unticking the \"Enable use of CompactUI (requires logout)\" option in the settings window.")
-	
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.compactui.activated", "Enable use of CompactUI (requires logout)")
 	gui:AddTip(id, "Ticking this box will enable CompactUI to take over your auction browse window after your next reload")

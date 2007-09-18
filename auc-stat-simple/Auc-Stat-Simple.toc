@@ -7,7 +7,7 @@
 ## Dependencies: Auc-Advanced
 ## SavedVariables: AucAdvancedStatSimpleData
 ##
-## Version: <%version%>
+## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##

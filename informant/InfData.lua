@@ -1,9 +1,10 @@
 --[[
-	Informant
-	An addon for World of Warcraft that shows pertinent information about
+	Informant - An addon for World of Warcraft that shows pertinent information about
 	an item in a tooltip when you hover over the item in the game.
-	<%version%> (<%codename%>)
-	$Id$
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/Informant/
+
 	Informant ItemData
 
 	License:
@@ -8549,7 +8550,7 @@ Informant.SetDatabase({
 	[10202]="19943:3988:4:4:1:::0:0:", -- Overlord's Vambraces
 	[9971]="19976:3995:4:4:1:::0:0:", -- Embossed Plate Pauldrons
 	[10206]="20243:4048:4:4:1:::0:0:", -- Overlord's Girdle
-	[14940]="20297:4059:4:4:1:::0:0:", -- Warbringer's Sabatons 
+	[14940]="20297:4059:4:4:1:::0:0:", -- Warbringer's Sabatons
 	[14831]="20603:4120:4:4:1:::0:0:", -- Symbolic Crown
 	[14946]="20757:4151:4:4:1:::0:0:", -- Warbringer's Spaulders
 	[14853]="20870:4174:4:4:1:::0:0:", -- Sunscale Wristguards

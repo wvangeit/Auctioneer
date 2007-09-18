@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Database functions and saved variables.
 
@@ -135,7 +136,7 @@ function mergeDisenchantLists()
 --[[
 	-- Merge items from EnchantedLocal into EnchantedItemTypes
 	-- now only useful to developers
-	
+
 	EnchantedItemTypes = {}
 	for sig, disenchant in pairs(EnchantedLocal) do
 		local item = Enchantrix.Util.GetItemIdFromSig(sig)
@@ -151,7 +152,7 @@ function mergeDisenchantLists()
 	for sig, value in pairs(NonDisenchantablesLocal) do
 		NonDisenchantables[sig] = value;
 	end
-	
+
 	-- Take out the trash
 	collectgarbage("collect")
 
@@ -166,7 +167,7 @@ function saveDisenchant(sig, reagentID, count)
 
 	local id = Enchantrix.Util.GetItemIdFromSig(sig)
 	local itype = Enchantrix.Util.GetIType(id)
-	
+
 	local disenchant = ("%d:1:%d:0"):format(reagentID, count)
 	EnchantedLocal[sig] = mergeDisenchant(EnchantedLocal[sig], disenchant)
 	if itype then
@@ -180,13 +181,13 @@ end
 function saveProspect(sig, reagentList )
 	-- Update tables after a prospect has been detected
 	assert(type(sig) == "string");
-	
+
 	local id = Enchantrix.Util.GetItemIdFromSig(sig)
 	if (not ProspectedLocal[id]) then
 		ProspectedLocal[id] = {}
 		ProspectedLocal[id].total = 0;
 	end
-	
+
 	ProspectedLocal[id].total = ProspectedLocal[id].total + 1;
 	for reagentID, quantity in pairs( reagentList ) do
 		if (not ProspectedLocal[id][reagentID]) then
@@ -206,7 +207,7 @@ end
 
 function getItemDisenchants(link)
 	local iType
-	
+
 	if (type(link) == "string") then
 		-- link format:   item number, enchant, dk, dk, dk, dk, random unique id
 		local id = link:match("(%d+):%d+:%d+:%d+:%d+:%d+:%d+:%d+")
@@ -220,13 +221,13 @@ function getItemDisenchants(link)
 		-- probably a number
 		iType = Enchantrix.Util.GetIType(link)
 	end
-	
+
 	if (not iType) then
 		-- NOTE - ccox - GetIType can return nil for items that are not disenchantable
 		-- a nil result does not mean that we could not find the IType
 		return nil
 	end
-	
+
 	-- see if it is on our non-disenchantable list
 	if type(link) == "string" then
 		sig = Enchantrix.Util.GetSigFromLink(link);
@@ -234,11 +235,11 @@ function getItemDisenchants(link)
 		local _, sLink = GetItemInfo(link);
 		sig = Enchantrix.Util.GetSigFromLink(sLink);
 	end
-	
+
 	if (NonDisenchantables[sig]) then
 		return nil
 	end
-	
+
 	local data = Enchantrix.Storage[iType]
 	if not data then
 		-- we really should have data
@@ -261,7 +262,7 @@ function getItemDisenchantTotals(link)
 
 	local total = data.total
 	local totalHSP, totalMed, totalMkt, totalFive = 0,0,0,0
-	
+
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
@@ -281,7 +282,7 @@ function getItemDisenchantTotals(link)
 	else
 		return
 	end
-	
+
 	return totalHSP, totalMed, totalMkt, totalFive
 end
 
@@ -299,7 +300,7 @@ function getItemDisenchantFromTable(link, reagentTable)
 
 	local total = data.total
 	local priceTotal = 0;
-	
+
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
@@ -317,7 +318,7 @@ function getItemDisenchantFromTable(link, reagentTable)
 	else
 		return
 	end
-	
+
 	return priceTotal
 end
 
@@ -331,7 +332,7 @@ function getItemDisenchantFromTableForOneMaterial(link, reagentTable, material)
 
 	local total = data.total
 	local priceTotal = 0;
-	
+
 	if (total and total[1] > 0) then
 		local totalNumber, totalQuantity = unpack(total)
 		for result, resData in pairs(data) do
@@ -350,7 +351,7 @@ function getItemDisenchantFromTableForOneMaterial(link, reagentTable, material)
 			end
 		end
 	end
-	
+
 	-- material not matched
 	return
 end
@@ -403,7 +404,7 @@ local function getBaseTableDisenchants(level, quality, type, item)
 		and Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel] then
 			return Enchantrix.Constants.baseDisenchantTable[quality][type][rLevel]
 	end
-	
+
 	-- no matching entry found, this is bad because this is the backup!
 	Enchantrix.Util.DebugPrint("disenchantTable", ENX_INFO, "No data", "No match found in base disenchant table for", rLevel, quality, type, level )
 	return nil
@@ -540,7 +541,7 @@ function addonLoaded()
 	if not NonDisenchantables then NonDisenchantables = {} end
 	if not NonDisenchantablesLocal then NonDisenchantablesLocal = {} end
 	if not ProspectedLocal then ProspectedLocal = {} end
-	
+
 	mergeDisenchantLists()
 end
 
@@ -556,7 +557,7 @@ Enchantrix.Storage = {
 	GetItemDisenchantFromTableForOneMaterial = getItemDisenchantFromTableForOneMaterial,
 	SaveDisenchant = saveDisenchant,
 	SaveNonDisenchantable = saveNonDisenchantable,
-	
+
 	SaveProspect = saveProspect,
 	GetItemProspects = getItemProspects,
 }

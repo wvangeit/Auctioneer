@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
-	Revision: $Id$
 	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced module that does something nifty.
 
@@ -81,7 +82,7 @@ end
 function lib.OnLoad()
 	--This function is called when your variables have been loaded.
 	--You should also set your Configator defaults here
-	
+
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.example.active", true)
 	AucAdvanced.Settings.SetDefault("util.example.slider", 50)
@@ -130,11 +131,11 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",    0,    "There are two ways to get input via keyboard:")
 	gui:AddControl(id, "Text",       0, 1, "util.example.text", "Via the Text Control...")
 	gui:AddControl(id, "NumberBox",  0, 1, "util.example.numberbox", 0, 9, "Or using the NumberBox if you only need numbers.")
-	
+
 	gui:AddControl(id, "Subhead",          0,    "There are two kinds of Money Frames:")
 	gui:AddControl(id, "MoneyFrame",       0, 1, "util.example.moneyframe", "MoneyFrames...")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "util.example.moneyframepinned", 0, 101010, "And PinnedMoneyFrames.")
-	
+
 	gui:AddControl(id, "Subhead",    0,    "And finally...")
 	gui:AddControl(id, "Button",     0, 1, "util.example.button", "The Button!")
 end

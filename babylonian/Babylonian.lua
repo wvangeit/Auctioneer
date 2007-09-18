@@ -1,8 +1,8 @@
 --[[
-	Babylonian
-	A sub-addon that manages the locales for other addons.
-	<%version%> (<%codename%>)
-	$Id$
+	Babylonian - A sub-addon that manages the locales for other addons.
+	Version: <%version%> (<%codename%>)
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/dl/
 
 	License:
 		This program is free software; you can redistribute it and/or

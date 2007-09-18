@@ -1,7 +1,8 @@
 --[[
-	AuctioneerAdvanced Addon for World of Warcraft(tm).
+	Auctioneer Advanced
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	Settings GUI
 
@@ -26,30 +27,30 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
-		
+
 
 data layout:
 		AucAdvancedConfig = {
-		
+
 			["profile.test4"] = {
 				["miniicon.distance"] = 56,
 				["miniicon.angle"] = 189,
 				["show"] = true,
 				["enable"] = true,
 			},
-			
+
 			["profiles"] = {
 				"Default", -- [1]
 				"test4", -- [2]
 			},
-			
+
 			["users.Foobar.Picksell"] = "test4",
-			
+
 			["profile.Default"] = {
 				["miniicon.angle"] = 187,
 				["miniicon.distance"] = 15,
 			},
-			
+
 		}
 
 if user does not have a set profile name, they get the default profile
@@ -112,14 +113,14 @@ local settingDefaults = {
 
 local function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
-	
+
 	-- basic settings
 	if (a == "show") then return true end
 	if (b == "enable") then return true end
-	
+
 	-- lookup the simple settings
 	local result = settingDefaults[setting];
-	
+
 	return result
 end
 
@@ -134,20 +135,20 @@ end
 
 local function setter(setting, value)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
-	
+
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
 	elseif value == 'off' then
 		value = false
 	end
-	
+
 	-- for defaults, just remove the value and it'll fall through
 	if (value == 'default') or (value == getDefault(setting)) then
 		-- Don't save default values
 		value = nil
 	end
-	
+
 	local a,b,c = strsplit(".", setting)
 	if (a == "profile") then
 		if (setting == "profile.save") then
@@ -160,7 +161,7 @@ local function setter(setting, value)
 			AucAdvancedConfig[getUserSig()] = value
 			-- Get the new current profile
 			local newProfile = getUserProfile()
-			
+
 			-- Clean it out and then resave all data
 			cleanse(newProfile)
 			gui:Resave()
@@ -171,19 +172,19 @@ local function setter(setting, value)
 				profiles = { "Default" }
 				AucAdvancedConfig["profiles"] = profiles
 			end
-			
+
 			-- Check to see if it already exists
 			local found = false
 			for pos, name in ipairs(profiles) do
 				if (name == value) then found = true end
 			end
-			
+
 			-- If not, add it and then sort it
 			if (not found) then
 				table.insert(profiles, value)
 				table.sort(profiles)
 			end
-			
+
 		elseif (setting == "profile.delete") then
 			-- User clicked the Delete button, see what the select box's value is.
 			value = gui.elements["profile"].value
@@ -192,10 +193,10 @@ local function setter(setting, value)
 			if (value) then
 				-- Clean it's profile container of values
 				cleanse(AucAdvancedConfig["profile."..value])
-				
+
 				-- Delete it's profile container
 				AucAdvancedConfig["profile."..value] = nil
-				
+
 				-- Find it's entry in the profiles list
 				local profiles = AucAdvancedConfig["profiles"]
 				if (profiles) then
@@ -206,16 +207,16 @@ local function setter(setting, value)
 						end
 					end
 				end
-				
+
 				-- If the user was using this one, then move them to Default
 				if (getUserProfileName() == value) then
 					AucAdvancedConfig[getUserSig()] = 'Default'
 				end
 			end
-			
+
 		elseif (setting == "profile.default") then
 			-- User clicked the reset settings button
-			
+
 			-- Get the current profile from the select box
 			value = gui.elements["profile"].value
 
@@ -255,7 +256,7 @@ function lib.SetSetting(...)
 		gui:Refresh()
 	end
 end
-	
+
 
 local function getter(setting)
 	if (not AucAdvancedConfig) then AucAdvancedConfig = {} end
@@ -322,7 +323,7 @@ function lib.MakeGuiConfig()
 	lib.Gui = gui
 
   	gui:AddCat("Core Options")
-  
+
 	id = gui:AddTab("Profiles")
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
@@ -355,7 +356,7 @@ function lib.MakeGuiConfig()
 		"Why would I want to delete a profile?",
 		"You can delete a profile when you don't want to use it anymore, or you want to create it from scratch again with default values. Deleting a profile will also affect any other characters who are using the profile."
 	)
-	
+
 	id = gui:AddTab("General")
 	gui:AddControl(id, "Header",     0,    "Main AucAdvanced options")
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.tooltip.display", "Display scan data tooltip")
@@ -377,7 +378,7 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "why force load",
 		"Why would you want to force load the scan data?",
 		"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded.")
-	
+
   	gui:AddCat("Modules")
 
 	-- Alert all modules that the config screen is being built, so that they

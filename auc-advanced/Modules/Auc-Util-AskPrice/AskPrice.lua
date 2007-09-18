@@ -2,6 +2,7 @@
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://auctioneeraddon.com/
 
 	Auctioneer AskPrice created by Mikezter and merged into
 	Auctioneer Advanced by MentalPower.

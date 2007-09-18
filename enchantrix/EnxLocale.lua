@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Localization routines
 
@@ -92,7 +93,7 @@ function buildCommandMap()
 		[_ENCH('ShowGuessAuctioneerHsp')] = 'valuate-hsp',
 		[_ENCH('ShowGuessAuctioneerMed')] = 'valuate-median',
 		[_ENCH('ShowGuessBaseline')] = 'valuate-baseline',
-		
+
 		[_ENCH('ShowUI')] = 'show',
 		[_ENCH('ShowDELevels')] = 'levels',
 		[_ENCH('ShowDEMaterials')] = 'materials',

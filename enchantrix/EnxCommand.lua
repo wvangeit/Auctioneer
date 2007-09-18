@@ -2,6 +2,7 @@
 	Enchantrix Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
+	URL: http://enchantrix.org/
 
 	Slash command and GUI functions.
 
@@ -551,7 +552,7 @@ end
 function auctioneerLoaded()
 
 	-- Make sure we have a usable version of Auctioneer loaded (3.4 or higher)
-	
+
 	if AucAdvanced and AucAdvanced.Version then
 		local major,minor,patch,revision = strsplit('.', AucAdvanced.Version, 4)
 		local major = tonumber(major) or 0
@@ -566,7 +567,7 @@ function auctioneerLoaded()
 			Enchantrix.State.Auctioneer_Loaded = true
 			Enchantrix.State.Auctioneer_Five = true
 		end
-		
+
 	elseif Auctioneer and Auctioneer.Version then
 		local major,minor,patch,revision = strsplit('.', Auctioneer.Version, 4)
 		local major = tonumber(major) or 0
@@ -606,7 +607,7 @@ function auctioneerLoaded()
 	end
 
 -- ccox - with this enabled, we'll warn the user every single time they log in
--- that's very, very annoying	
+-- that's very, very annoying
 --	EnchantConfig.displayedAuctioneerWarning = nil
 
 	if Enchantrix.State.Khaos_Registered then
@@ -738,12 +739,12 @@ function handleCommand(command, source)
 		doFindMaterial(param, param2);
 
 	else
-	
+
 		-- lookup conversion to internal variable names
 		if (commandToSettingLookup[cmd]) then
 			cmd = commandToSettingLookup[cmd];
 		end
-		
+
 		-- try direct access
 		if (Enchantrix.Settings.GetDefault(cmd) ~= nil) then
 			genVarSet(cmd, param, chatprint);
@@ -763,12 +764,12 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix "..onOffToggle.."|r |cff2040ff["..Enchantrix.Locale.GetLocalizedFilterVal('all').."]|r - " .. _ENCH('HelpOnoff'));
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('CmdDisable').."|r - " .. _ENCH('HelpDisable'));
 	Enchantrix.Util.ChatPrint("  |cffffffff/enchantrix ".._ENCH('ShowUI').."|r - " .. _ENCH('HelpShowUI'));
-	
+
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowTerse'), Enchantrix.Locale.GetLocalizedFilterVal('terse'), _ENCH('HelpTerse')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowEmbed'), Enchantrix.Locale.GetLocalizedFilterVal('embed'), _ENCH('HelpEmbed')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowDELevels'), Enchantrix.Locale.GetLocalizedFilterVal('levels'), _ENCH('HelpShowDELevels')));
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowDEMaterials'), Enchantrix.Locale.GetLocalizedFilterVal('materials'), _ENCH('HelpShowDEMaterials')));
-	
+
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
 	if AucAdvanced then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerVal'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-val'), _ENCH('HelpGuessAuctioneer5Val')));
@@ -888,7 +889,7 @@ function default(param, chatprint)
 		if (param == "all") then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefaultAll'));
 			Enchantrix.Settings.SetSetting('profile.default', true );
-		
+
 		--[[
 			for k,v in pairs(EnchantConfig.filters) do
 				setKhaosSetKeyValue(k, Enchantrix.Settings.GetSetting(k));
@@ -960,34 +961,34 @@ function percentLessFilter(auction, args)
 			return false
 		end
 	end
-	
+
 	local percentLess = args['percentLess'];
 	local reagentPriceTable = args['reagentPriceTable'];
 
 	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
-	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);	
+	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);
 	if (not myValue) then return filterAuction; end
-	
+
 	local buyout = auction.buyoutPrice or 0;
 	local count = auction.count or 1;
-	
+
 	-- margin is percentage PER ITEM
 	local margin = percentLessThan(myValue, buyout/count);
 	-- profit is for all items in the stack
 	local profit = (myValue * count) - buyout;
-	
+
 	local results = {
 		value = myValue,
 		margin = margin,
 		profit = profit,
 		auction = auction,
 	};
-	
+
 	if (buyout > 0)
 		and (margin >= tonumber(percentLess))
 		and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
 		and (buyout <= Enchantrix.Settings.GetSetting('maxBuyoutPrice')) then
---		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
+--		If we return false, then this item will be removed from the list, and we won't be able to find it later...
 --		filterAuction = false;
 		table.insert(profitMargins, results);
 		return true;
@@ -1008,20 +1009,20 @@ function bidBrokerFilter(auction, args)
 			return false
 		end
 	end
-	
+
 	local minProfit = args['minProfit'];
 	local reagentPriceTable = args['reagentPriceTable'];
-	
-	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)	
+
+	-- this returns the disenchant value for a SINGLE item, not a stack (if that ever happens)
 	local myValue = Enchantrix.Storage.GetItemDisenchantFromTable(auction.itemId, reagentPriceTable);
 	if (not myValue) then return filterAuction; end
-	
+
 	local currentBid = auction.bidAmount or 0;
 	local minBid = auction.minBid or 0;
 	local count = auction.count or 0;
-	
+
 	currentBid = math.max( currentBid, minBid );
-	
+
 	-- margin is percentage PER ITEM
 	local margin = percentLessThan(myValue, currentBid/count);
 	-- profit is for all items in the stack
@@ -1035,17 +1036,17 @@ function bidBrokerFilter(auction, args)
 		profit = profit,
 		auction = auction,
 	};
-	
+
 	if (currentBid <= Enchantrix.Settings.GetSetting('maxBuyoutPrice'))
 			 and (profit >= tonumber(minProfit))
 			 and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
 			 and (profitPricePercent >= Enchantrix.Settings.GetSetting('minProfitPricePercent')) then
---		If we return false, then this item will be removed from the list, and we won't be able to find it later...	
+--		If we return false, then this item will be removed from the list, and we won't be able to find it later...
 --		filterAuction = false;
 		table.insert(profitMargins, results);
 		return true;
 	end
-	
+
 	return filterAuction;
 end
 
@@ -1062,7 +1063,7 @@ function findMaterialFilter(auction, args)
 			return false
 		end
 	end
-	
+
 	local reagentPriceTable = args['reagentPriceTable'];
 	local materialID = args['materialID'];
 	local percentLess = args['percentLess'];
@@ -1073,12 +1074,12 @@ function findMaterialFilter(auction, args)
 
 	local buyout = auction.buyoutPrice or 0;
 	local count = auction.count or 1;
-	
+
 	-- margin is percentage PER ITEM
 	local margin = percentLessThan(myValue, buyout/count);
 	-- profit is for all items in the stack
 	local profit = (myValue * count) - buyout;
-	
+
 	local results = {
 		value = myValue,
 		margin = margin,
@@ -1087,7 +1088,7 @@ function findMaterialFilter(auction, args)
 		percentChance = percentChance,
 		yield = yield,
 	};
-	
+
 	if (buyout > 0)
 		and (margin >= tonumber(percentLess))
 --		and (profit >= Enchantrix.Settings.GetSetting('minProfitMargin'))
@@ -1138,24 +1139,24 @@ function findMaterialComparisonSort(a, b)
 	local bMargin = profitMargins[b].margin or 0;
 	if (aMargin > bMargin) then return true; end
 	if (aMargin < bMargin) then return false; end
-	
+
 	local aChance = profitMargins[a].percentChance or 0;
 	local bChance = profitMargins[b].percentChance or 0;
 	if (aChance > bChance) then return true; end
 	if (aChance < bChance) then return false; end
-	
+
 	local aYield = profitMargins[a].yield or 0;
 	local bYield = profitMargins[b].yield or 0;
 	if (aYield > bYield) then return true; end
 	if (aYield < bYield) then return false; end
-	
+
 	return false;
 end
 
 local function CheckAuctioneerScanAvailable()
 
 	local adv = false
-	
+
 	if not Auctioneer then
 		if AucAdvanced then
 			adv = true
@@ -1177,7 +1178,7 @@ function doPercentLess(percentLess, minProfit)
 	if (not aucAvail) then
 		return;
 	end
-	
+
 	-- get the maximum item level the user can disenchant
 	local skill = Enchantrix.Util.GetUserEnchantingSkill();
 	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
@@ -1192,7 +1193,7 @@ function doPercentLess(percentLess, minProfit)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessHeader'):format(percentLess, EnhTooltip.GetTextGSC(minProfit)));
 
 	profitMargins = {};
-	
+
 	-- setup the reagent pricing table
 	local reagentPriceTable = Enchantrix.Util.CreateReagentPricingTable();
 
@@ -1200,9 +1201,9 @@ function doPercentLess(percentLess, minProfit)
 		['percentLess'] = percentLess,
 		['reagentPriceTable'] = reagentPriceTable,
 		}
-	
+
 	local targetAuctions
-	
+
 	if adv then
 		targetAuctions = AucAdvanced.API.QueryImage({filter=percentLessFilter}, nil, nil, percentless_args);
 	else
@@ -1258,7 +1259,7 @@ function doPercentLess(percentLess, minProfit)
 	if (skipped_skill > 0) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
 	end
-	
+
 	-- so we free all the references
 	profitMargins = {};
 
@@ -1271,8 +1272,8 @@ function doBidBroker(minProfit, percentLess)
 	if (not aucAvail) then
 		return;
 	end
-	
-	
+
+
 	-- get the maximum item level the user can disenchant
 	local skill = Enchantrix.Util.GetUserEnchantingSkill();
 	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
@@ -1287,7 +1288,7 @@ function doBidBroker(minProfit, percentLess)
 	Enchantrix.Util.ChatPrint(_ENCH('FrmtBidbrokerHeader'):format(EnhTooltip.GetTextGSC(minProfit), percentLess));
 
 	profitMargins = {};
-	
+
 	-- setup the reagent pricing table
 	local reagentPriceTable = Enchantrix.Util.CreateReagentPricingTable();
 
@@ -1295,7 +1296,7 @@ function doBidBroker(minProfit, percentLess)
 		['minProfit'] = minProfit,
 		['reagentPriceTable'] = reagentPriceTable,
 		}
-	
+
 	local targetAuctions
 	if adv then
 		targetAuctions = AucAdvanced.API.QueryImage({filter=bidBrokerFilter}, nil, nil, bidbroker_args);
@@ -1391,7 +1392,7 @@ function doBidBroker(minProfit, percentLess)
 	if (skipped_hasbid > 0) then
 		Enchantrix.Util.ChatPrint((_ENCH("FrmtBidBrokerSkippedBids")):format(skipped_hasbid));
 	end
-	
+
 	-- so we free all the references
 	profitMargins = {};
 
@@ -1402,9 +1403,9 @@ end
 -- ccox - TODO - this could be a lot more efficient
 -- but for now, we won't be calling it often, and the list is short
 local function resolveDisenchantMaterial( mat )
-	
+
 	local n = #Enchantrix.Constants.DisenchantReagentList;
-	
+
 	matID = tonumber(mat);
 	if (matID) then
 		for i = 1, n do
@@ -1425,7 +1426,7 @@ local function resolveDisenchantMaterial( mat )
 			end
 		end
 	end
-	
+
 	return nil;
 end
 
@@ -1446,25 +1447,25 @@ function doFindMaterial(material, percentLess)
 	end
 
 	local materialID = resolveDisenchantMaterial(material);
-	
+
 	if (not materialID) then
 -- ccox - TODO - localize
 		Enchantrix.Util.ChatPrint( material.." is not a disenchantable material." );
 		return;
 	end
-	
+
 	if (not materialID) then return end
-	
+
 	--if string->number conversion fails, use defaults
 	percentLess = tonumber(percentLess) or Enchantrix.Settings.GetSetting('defaultPercentLessThanHSP');
 	percentLess = math.max(percentLess, Enchantrix.Settings.GetSetting('minPercentLessThanHSP'))
-	
+
 -- ccox - TODO - localize
 	Enchantrix.Util.ChatPrint("Starting Find Material scan for "..materialID.." with price "..percentLess.." % less than market.");
 
-	
+
 	profitMargins = {};
-	
+
 	-- setup the reagent pricing table
 	local reagentPriceTable = Enchantrix.Util.CreateReagentPricingTable();
 
@@ -1473,9 +1474,9 @@ function doFindMaterial(material, percentLess)
 		['materialID'] = materialID,
 		['reagentPriceTable'] = reagentPriceTable,
 		}
-	
+
 	local targetAuctions
-	
+
 	if adv then
 		targetAuctions = AucAdvanced.API.QueryImage({filter=findMaterialFilter}, nil, nil, find_material_args);
 	else
@@ -1486,7 +1487,7 @@ function doFindMaterial(material, percentLess)
 	local sortedTable = {}
 	for n in pairs(profitMargins) do table.insert(sortedTable, n) end
 	table.sort(sortedTable, findMaterialComparisonSort);
-	
+
 	-- get the maximum item level the user can disenchant
 	local skill = Enchantrix.Util.GetUserEnchantingSkill();
 	local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
@@ -1532,7 +1533,7 @@ function doFindMaterial(material, percentLess)
 	if (skipped_skill > 0) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPctlessSkillSkipped'):format(skipped_skill, skill));
 	end
-	
+
 	-- so we free all the references
 	profitMargins = {};
 

@@ -1,7 +1,8 @@
 --[[
 	Auctioneer Advanced - StatSimple
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-	Version: <%version%>
+	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
 	when the auction is scanned, so that you can easily determine what price
@@ -94,7 +95,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
-	
+
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
 	local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
@@ -116,7 +117,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 	if (factor ~= 0) then property = property.."x"..factor end
 
 	if not faction then faction = AucAdvanced.GetFaction() end
-	
+
 	local data = private.GetPriceData(faction, realm)
 	if not data then return end
 
@@ -220,7 +221,7 @@ end
 -- Exponential Moving Averages over the 3, 7 and 14 day ranges.
 function private.PushStats(faction, realm)
 	local dailyAvg
-	
+
 	local data = private.GetPriceData(faction, realm)
 	if not data then return end
 	if not data.daily then return end
@@ -298,8 +299,8 @@ function private.UpgradeDb()
 			local t = {strsplit(x, "-")}
 			local realm, faction
 			for _, z in ipairs(t) do
-				if (faction) then 
-					if (realm) then realm = realm.."-"..faction 
+				if (faction) then
+					if (realm) then realm = realm.."-"..faction
 					else realm = faction end
 				end
 				faction = z
@@ -325,7 +326,7 @@ function private.ClearData(faction, realmName)
 	if (not AAStatSimpleData) then private.LoadData() end
 	faction = faction or AucAdvanced.GetFaction()
 	if (realmName) then
-		print("Clearing "..libName.." stats for {{"..faction.."}}")	
+		print("Clearing "..libName.." stats for {{"..faction.."}}")
 	else
 		realmName = GetRealmName()
 		print("Clearing "..libName.." stats for {{"..faction.."}} on {{"..realmName.."}}")
@@ -355,7 +356,7 @@ function private.DataLoaded()
 			if stats.daily.created and time() - stats.daily.created > 3600*16 then
 				-- This data is more than 16 hours old, we classify this as "yesterday's data"
 				private.PushStats(faction, realm)
-			end		
-		end	
+			end
+		end
 	end
 end
