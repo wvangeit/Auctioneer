@@ -407,7 +407,7 @@ function private.CreateFrames()
 			local maxStax = math.floor(count / curSize)
 			local fullPop = maxStax*curSize
 			local remain = count - fullPop
-			frame.salebox.number:SetMinMaxValues(1, maxStax+2)
+			frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
 			if (curNumber >= -2 and curNumber < 0) then
 				if (curNumber == -2) then
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
@@ -462,7 +462,7 @@ function private.CreateFrames()
 			frame.salebox.stack.label:SetText("Item is not stackable")
 			frame.salebox.stack:SetAlpha(0.6)
 
-			frame.salebox.number:SetMinMaxValues(1, frame.salebox.count + 2)
+			frame.salebox.number:SetAdjustedRange(frame.salebox.count, -1)
 			if (curNumber == -1) then
 				curNumber = frame.salebox.count
 				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
@@ -978,9 +978,9 @@ function private.CreateFrames()
 	frame.salebox.number = CreateFrame("Slider", "AppraiserSaleboxNumber", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0,0)
 	frame.salebox.number:SetHitRectInsets(0,0,0,0)
-	frame.salebox.number:SetMinMaxValues(-1,20)
+	frame.salebox.number:SetMinMaxValues(1,1)
 	frame.salebox.number:SetValueStep(1)
-	frame.salebox.number:SetValue(-1)
+	frame.salebox.number:SetValue(1)
 	frame.salebox.number:SetWidth(285)
 	frame.salebox.number:SetScript("OnValueChanged", frame.ChangeControls)
 	frame.salebox.number.element = "number"
@@ -988,21 +988,33 @@ function private.CreateFrames()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
 	function frame.salebox.number:GetAdjustedValue()
-		local slideMin, slideMax = self:GetMinMaxValues()
-		local maxStax = slideMax-2
+		local maxStax = self.maxStax or 0
 		local value = self:GetValue()
 		if value > maxStax then
-			value = maxStax-value
+			local extraPos = value - maxStax
+			value = self.extra[extraPos]
 		end
-		return value
+		return value or 1
 	end
 	function frame.salebox.number:SetAdjustedValue(value)
-		local slideMin, slideMax = self:GetMinMaxValues()
-		if value < 0 then
-			local maxStax = slideMax-2
-			value = maxStax -value
+		local maxStax = self.maxStax or 0
+		if value < 1 or value > maxStax then
+			for i = 1, #self.extra do
+				if self.extra[i] == value then
+					value = maxStax + i
+					break
+				end
+			end
 		end
 		self:SetValue(value)
+	end
+	frame.salebox.number.extra = {}
+	function frame.salebox.number:SetAdjustedRange(maxStax, ...)
+		self.maxStax = maxStax
+		local n = select("#", ...)
+		for i = 1, #self.extra do self.extra[i] = nil end
+		for i = 1, select("#", ...) do self.extra[i] = select(i, ...) end
+		self:SetMinMaxValues(1, maxStax+n)
 	end
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
