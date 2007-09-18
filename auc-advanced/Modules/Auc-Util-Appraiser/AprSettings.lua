@@ -323,7 +323,7 @@ function private.SetupConfigGui(gui)
 		"The rounding position (\"Rounding at\" value in the settings) used by the rounding methods to determine the point at which they are going to round to. Perhaps the easiest way to see how this works is to open up the auctionhouse and select an item, then play with the sliders, and watch what happens to the stack prices that are listed on the right side of the auction window.")
 
 	gui:AddHelp(id, "what is magnitude",
-		"What is the setp magnitude?",
+		"What is the step magnitude?",
 		"The step magnitude specifies the point at which the algorithm decides to move up to the next unit place |cffffff00(copper->silver->gold)|r. For example, if the step magnitude was set to 5, then an amount of 1g 45s 12c would round at the copper place, but an amount of 5g 45s 12c would round at the silver place.")
 
 	gui:AddControl(id, "Note",       0, 2, 500, 150,
