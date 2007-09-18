@@ -336,7 +336,7 @@ function private.CreateFrames()
 		frame.salebox.stack:SetValue(curStack)
 		frame.UpdateControls()
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -1
-		frame.salebox.number:SetValue(curNumber)
+		frame.salebox.number:SetAdjustedValue(curNumber)
 
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		frame.salebox.model.value = curModel
@@ -389,7 +389,7 @@ function private.CreateFrames()
 		local bidVal, buyVal, depositVal
 
 		local depositMult = curDurationMins / 120
-		local curNumber = frame.salebox.number:GetValue()
+		local curNumber = frame.salebox.number:GetAdjustedValue()
 
 		if (frame.salebox.stacksize > 1) then
 			local count = frame.salebox.count
@@ -406,9 +406,9 @@ function private.CreateFrames()
 			local maxStax = math.floor(count / curSize)
 			local fullPop = maxStax*curSize
 			local remain = count - fullPop
-			frame.salebox.number:SetMinMaxValues(-1, maxStax)
-			if (curNumber >= -1 and curNumber < 1) then
-				if (curNumber == -1) then
+			frame.salebox.number:SetMinMaxValues(1, maxStax+2)
+			if (curNumber >= -2 and curNumber < 0) then
+				if (curNumber == -2) then
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
 				else
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
@@ -427,7 +427,7 @@ function private.CreateFrames()
 					totalBuy = totalBuy + (buyVal * maxStax)
 					totalDeposit = totalDeposit + (depositVal * maxStax)
 				end
-				if (curNumber == 0 and remain > 0) then
+				if (curNumber == -1 and remain > 0) then
 					bidVal = lib.RoundBid(curBid * remain)
 					buyVal = lib.RoundBuy(curBuy * remain)
 					depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
@@ -461,12 +461,10 @@ function private.CreateFrames()
 			frame.salebox.stack.label:SetText("Item is not stackable")
 			frame.salebox.stack:SetAlpha(0.6)
 
-			frame.salebox.number:SetMinMaxValues(-1, frame.salebox.count)
-			if (curNumber == 0) then
+			frame.salebox.number:SetMinMaxValues(1, frame.salebox.count + 2)
+			if (curNumber == -1) then
 				curNumber = frame.salebox.count
 				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
-			--elseif (curNumber == 0) then
-				--frame.salebox.number.label:SetText(("Number: %s"):format("|cffffee30"..("%d items"):format(0)))
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
 			end
@@ -523,7 +521,7 @@ function private.CreateFrames()
 
 		frame.UpdateControls()
 		local curStack = frame.salebox.stack:GetValue()
-		local curNumber = frame.salebox.number:GetValue()
+		local curNumber = frame.salebox.number:GetAdjustedValue()
 		local curDurationIdx = frame.salebox.duration:GetValue()
 		local curDuration = private.durations[curDurationIdx][1]
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", curStack)
@@ -988,6 +986,23 @@ function private.CreateFrames()
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
+	function frame.salebox.number:GetAdjustedValue()
+		local slideMin, slideMax = self:GetMinMaxValues()
+		local maxStax = slideMax-2
+		local value = self:GetValue()
+		if value > maxStax then
+			value = maxStax-value
+		end
+		return value
+	end
+	function frame.salebox.number:SetAdjustedValue(value)
+		local slideMin, slideMax = self:GetMinMaxValues()
+		if value < 0 then
+			local maxStax = slideMax-2
+			value = maxStax -value
+		end
+		self:SetValue(value)
+	end
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.number.label:SetPoint("LEFT", frame.salebox.number, "RIGHT", 3,2)
