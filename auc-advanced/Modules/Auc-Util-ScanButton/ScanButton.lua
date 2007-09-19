@@ -60,44 +60,48 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanbutton.enabled", true)
 end
 
+-- /run local t = AucAdvanced.Modules.Util.ScanButton.Private.buttons.stop.tex t:SetPoint("TOPLEFT", t:GetParent() "TOPLEFT", 3,-3) t:SetPoint("BOTTOMRIGHT", t:GetParent(), "BOTTOMRIGHT", -3,3)
+-- /run local t = AucAdvanced.Modules.Util.ScanButton.Private.buttons.stop.tex t:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons") t:SetTexCoord(0.25, 0.5, 0, 1) t:SetVertexColor(1.0, 0.9, 0.1)
+
 function private.HookAH()
 	private.buttons = CreateFrame("Frame", nil, AuctionFrameBrowse)
-	private.buttons:SetPoint("TOPLEFT", AuctionFrameBrowse, "TOPLEFT", 100,-14)
-	private.buttons:SetWidth(20*3 + 4)
-	private.buttons:SetHeight(20)
+	private.buttons:SetPoint("TOPLEFT", AuctionFrameBrowse, "TOPLEFT", 200,-15)
+	private.buttons:SetWidth(22*3 + 4)
+	private.buttons:SetHeight(18)
+	private.buttons:SetScript("OnUpdate", private.OnUpdate)
 	
 	private.buttons.stop = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.stop:SetPoint("TOPLEFT", private.buttons, "TOPLEFT", 0,0)
-	private.buttons.stop:SetWidth(20)
-	private.buttons.stop:SetHeight(20)
+	private.buttons.stop:SetWidth(22)
+	private.buttons.stop:SetHeight(18)
 	private.buttons.stop:SetScript("OnClick", private.stop)
 	private.buttons.stop.tex = private.buttons.stop:CreateTexture(nil, "OVERLAY")
-	private.buttons.stop.tex:SetPoint("TOPLEFT", private.buttons.stop, "TOPLEFT", 3,-3)
-	private.buttons.stop.tex:SetPoint("BOTTOMRIGHT", private.buttons.stop, "BOTTOMRIGHT", -3,3)
+	private.buttons.stop.tex:SetPoint("TOPLEFT", private.buttons.stop, "TOPLEFT", 4,-2)
+	private.buttons.stop.tex:SetPoint("BOTTOMRIGHT", private.buttons.stop, "BOTTOMRIGHT", -4,2)
 	private.buttons.stop.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.stop.tex:SetTexCoord(0.25, 0.5, 0, 1)
 	private.buttons.stop.tex:SetVertexColor(1.0, 0.9, 0.1)
 	
 	private.buttons.play = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.play:SetPoint("TOPLEFT", private.buttons.stop, "TOPRIGHT", 2,0)
-	private.buttons.play:SetWidth(20)
-	private.buttons.play:SetHeight(20)
+	private.buttons.play:SetWidth(22)
+	private.buttons.play:SetHeight(18)
 	private.buttons.play:SetScript("OnClick", private.play)
 	private.buttons.play.tex = private.buttons.play:CreateTexture(nil, "OVERLAY")
-	private.buttons.play.tex:SetPoint("TOPLEFT", private.buttons.play, "TOPLEFT", 3,-3)
-	private.buttons.play.tex:SetPoint("BOTTOMRIGHT", private.buttons.play, "BOTTOMRIGHT", -3,3)
+	private.buttons.play.tex:SetPoint("TOPLEFT", private.buttons.play, "TOPLEFT", 4,-2)
+	private.buttons.play.tex:SetPoint("BOTTOMRIGHT", private.buttons.play, "BOTTOMRIGHT", -4,2)
 	private.buttons.play.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.play.tex:SetTexCoord(0, 0.25, 0, 1)
 	private.buttons.play.tex:SetVertexColor(1.0, 0.9, 0.1)
 	
 	private.buttons.pause = CreateFrame("Button", nil, private.buttons, "OptionsButtonTemplate")
 	private.buttons.pause:SetPoint("TOPLEFT", private.buttons.play, "TOPRIGHT", 2,0)
-	private.buttons.pause:SetWidth(20)
-	private.buttons.pause:SetHeight(20)
+	private.buttons.pause:SetWidth(22)
+	private.buttons.pause:SetHeight(18)
 	private.buttons.pause:SetScript("OnClick", private.pause)
 	private.buttons.pause.tex = private.buttons.pause:CreateTexture(nil, "OVERLAY")
-	private.buttons.pause.tex:SetPoint("TOPLEFT", private.buttons.pause, "TOPLEFT", 3,-3)
-	private.buttons.pause.tex:SetPoint("BOTTOMRIGHT", private.buttons.pause, "BOTTOMRIGHT", -3,3)
+	private.buttons.pause.tex:SetPoint("TOPLEFT", private.buttons.pause, "TOPLEFT", 4,-2)
+	private.buttons.pause.tex:SetPoint("BOTTOMRIGHT", private.buttons.pause, "BOTTOMRIGHT", -4,2)
 	private.buttons.pause.tex:SetTexture("Interface\\AddOns\\Auc-Advanced\\Textures\\NavButtons")
 	private.buttons.pause.tex:SetTexCoord(0.5, 0.75, 0, 1)
 	private.buttons.pause.tex:SetVertexColor(1.0, 0.9, 0.1)
@@ -110,16 +114,46 @@ function private.UpdateScanProgress()
 
 	if scanning or paused then
 		private.buttons.stop:Enable()
+		private.buttons.stop.tex:SetVertexColor(1.0, 0.9, 0.1)
 	else
 		private.buttons.stop:Disable()
+		private.buttons.stop.tex:SetVertexColor(0.3,0.3,0.3)
 	end
 
+	private.blink = nil
 	if scanning and not paused then
 		private.buttons.pause:Enable()
+		private.buttons.pause.tex:SetVertexColor(1.0, 0.9, 0.1)
 		private.buttons.play:Disable()
+		private.buttons.play.tex:SetVertexColor(0.3,0.3,0.3)
 	else
 		private.buttons.play:Enable()
+		private.buttons.play.tex:SetVertexColor(1.0, 0.9, 0.1)
 		private.buttons.pause:Disable()
+		private.buttons.pause.tex:SetVertexColor(0.3,0.3,0.3)
+		if paused then
+			private.blink = 1
+		end
+	end
+end
+
+function private:OnUpdate(delay)
+	if private.blink then
+		private.timer = (private.timer or 0) - delay
+		if private.timer < 0 then
+			if not AucAdvanced.Scan.IsPaused() then
+				private.UpdateScanProgress()
+				return
+			end
+			if private.blink == 1 then
+				private.buttons.pause.tex:SetVertexColor(0.1, 0.3, 1.0)
+				private.blink = 2
+			else
+				private.buttons.pause.tex:SetVertexColor(0.3, 0.3, 0.3)
+				private.blink = 1
+			end
+			private.timer = 0.75
+		end
 	end
 end
 
