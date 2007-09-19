@@ -80,19 +80,22 @@ function lib.GetMarketValue(itemLink, serverKey)
 
 	local total, count, seen = 0, 0, 0
 	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
-		if (engineLib.GetPriceArray) then
-			local array = engineLib.GetPriceArray(itemLink, serverKey)
-			if (array and array.price and array.price > 0) then
-				total = total + array.price
-				seen = seen + (array.seen or 1)
-				count = count + 1
-			end
-		elseif (engineLib.GetPrice) then
-			local price = engineLib.GetPrice(itemLink, serverKey)
-			if (price and price > 0) then
-				total = total + price
-				count = count + 1
-				seen = seen + 1
+		if not engineLib.CanSupplyMarket
+		or engineLib.CanSupplyMarket(itemLink, serverKey) then
+			if (engineLib.GetPriceArray) then
+				local array = engineLib.GetPriceArray(itemLink, serverKey)
+				if (array and array.price and array.price > 0) then
+					total = total + array.price
+					seen = seen + (array.seen or 1)
+					count = count + 1
+				end
+			elseif (engineLib.GetPrice) then
+				local price = engineLib.GetPrice(itemLink, serverKey)
+				if (price and price > 0) then
+					total = total + price
+					count = count + 1
+					seen = seen + 1
+				end
 			end
 		end
 	end
@@ -106,7 +109,10 @@ function lib.GetAlgorithms()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.GetPrice) then
-				table.insert(engines, engine)
+				if not engineLib.IsValidAlgorithm
+				or engineLib.IsValidAlgorithm() then
+					table.insert(engines, engine)
+				end
 			end
 		end
 	end
@@ -118,6 +124,9 @@ function lib.IsValidAlgorithm(algorithm)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and engineLib.GetPrice then
+				if engineLib.IsValidAlgorithm then
+					return engineLib.IsValidAlgorithm()
+				end
 				return true
 			end
 		end
@@ -138,6 +147,10 @@ function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and engineLib.GetPrice then
+				if engineLib.IsValidAlgorithm
+				and not engineLib.IsValidAlgorithm() then
+					return
+				end
 				local algosig = strjoin(":", algorithm, itemLink, faction, realm)
 				for pos, history in ipairs(private.algorithmstack) do
 					if (history == algosig) then
@@ -155,8 +168,10 @@ function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 				table.insert(private.algorithmstack, algosig)
 				if (engineLib.GetPriceArray) then
 					array = engineLib.GetPriceArray(itemLink, faction, realm)
-					price = array.price
-					seen = array.seen
+					if (array) then
+						price = array.price
+						seen = array.seen
+					end
 				else
 					price = engineLib.GetPrice(itemLink, faction, realm)
 				end
@@ -165,7 +180,8 @@ function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 			end
 		end
 	end
-	error(("Cannot find pricing algorithm: %s"):format(algorithm))
+	--error(("Cannot find pricing algorithm: %s"):format(algorithm))
+	return
 end
 
 

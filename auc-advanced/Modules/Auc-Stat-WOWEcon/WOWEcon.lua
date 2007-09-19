@@ -70,3 +70,13 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	return array
 end
 
+function lib.IsValidAlgorithm()
+	if not (Wowecon and Wowecon.API) then return false end
+	return true
+end
+
+function lib.CanSupplyMarket()
+	if not (Wowecon and Wowecon.API) then return false end
+	return true
+end
+
