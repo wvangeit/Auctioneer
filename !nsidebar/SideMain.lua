@@ -28,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "nSideBar"
-local LIBRARY_VERSION_MINOR = 1
+local LIBRARY_VERSION_MINOR = 2
 
 do -- LibStub
 	-- LibStub is a simple versioning stub meant for use in Libraries.  http://www.wowace.com/wiki/LibStub for more info
@@ -129,29 +129,36 @@ else
 	lib.frame = frame
 end
 
-function private:PopOut(button)
+function private:PopOut(...)
 	self.PopTimer = 0.15
 	self.PopDirection = 1
+	if self.OnEnter then self:OnEnter(...) end
 end
 
-function private:PopBack(button)
+function private:PopBack(...)
 	self.PopTimer = 0.75
 	self.PopDirection = -1
+	if self.OnLeave then self:OnLeave(...) end
 end
 
-function private:MouseDown(button)
+function private:MouseDown(...)
+	local button = ...
 	if button then
 		button.icon:SetTexCoord(0, 1, 0, 1)
 	end
+	if self.MouseDown then self:MouseDown(...) end
 end
 
-function private:MouseUp(button)
+function private:MouseUp(...)
+	local button = ...
 	if button then
 		button.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
 	end
+	if self.MouseUp then self:MouseUp(...) end
 end
 
-function private:Popper(duration)
+function private:Popper(...)
+	local duration = ...
 	if self.PopDirection then
 		self.PopTimer = self.PopTimer - duration
 		if self.PopTimer < 0 then
