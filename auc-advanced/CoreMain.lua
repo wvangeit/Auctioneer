@@ -52,7 +52,7 @@ local private = {}
 -- For our modular stats system, each stats engine should add their
 -- subclass to AucAdvanced.Modules.<type>.<name> and store their data into their own
 -- data table in AucAdvancedData.Stats.<type><name>
-if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Scan={},Util={}} end
+if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Util={}} end
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
