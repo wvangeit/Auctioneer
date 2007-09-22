@@ -1,5 +1,6 @@
 --[[
 	nStringRope Lib for World of Warcraft (tm)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://norganna.org
 
@@ -27,7 +28,7 @@
 ]]
 
 local LIBRARY_VERSION_MAJOR = "nStringRope"
-local LIBRARY_VERSION_MINOR = 1
+local LIBRARY_VERSION_MINOR = 2
 
 do -- LibStub
 	-- LibStub is a simple versioning stub meant for use in Libraries.  http://www.wowace.com/wiki/LibStub for more info
@@ -85,6 +86,11 @@ end -- LibStub
 local lib = LibStub:NewLibrary(LIBRARY_VERSION_MAJOR, LIBRARY_VERSION_MINOR)
 if not lib then return end
 
+--Local references of used functions
+local pairs = pairs
+local tconcat = table.concat
+local tinsert = table.insert
+
 -- Create a new nStringRope instance
 function lib:New()
 	local new = { strings = {} }
@@ -99,12 +105,12 @@ lib.kit = {}
 
 -- Clears the nStringRope instance
 function lib.kit:Clear()
-	while #self.strings > 0 do table.remove(self.strings) end
+	local size = #self.strings
+	for i = size, 1, -1 do self.strings[i] = nil end
 end
 -- Gets the current nStringRope instance
 function lib.kit:Get()
-	local text = strconcat(unpack(self.strings))
-	return text
+	return tconcat(self.strings)
 end
 -- Adds a substring to the nStringRope instance
 function lib.kit:Add(text)
@@ -113,6 +119,6 @@ function lib.kit:Add(text)
 		self:Clear()
 		self:Add(text)
 	end
-	table.insert(self.strings, text)
+	return tinsert(self.strings, text)
 end
 
