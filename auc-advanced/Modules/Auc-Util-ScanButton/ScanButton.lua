@@ -111,6 +111,7 @@ end
 
 function private.UpdateScanProgress()
 	local scanning, paused = AucAdvanced.Scan.IsScanning(), AucAdvanced.Scan.IsPaused()
+	private.ConfigChanged()
 
 	if scanning or paused then
 		private.buttons.stop:Enable()
@@ -165,6 +166,7 @@ function private.SetupConfigGui(gui)
 end
 
 function private.ConfigChanged()
+	if not private.buttons then return end
 	if AucAdvanced.Settings.GetSetting("util.scanbutton.enabled") then
 		private.buttons:Show()
 	else
