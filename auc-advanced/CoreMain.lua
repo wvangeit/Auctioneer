@@ -127,6 +127,16 @@ function private.OnLoad(addon)
 	end
 end
 
+function private.OnUnload()
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if (engineLib.OnUnload) then
+				engineLib.OnUnload()
+			end
+		end
+	end
+end
+
 private.Schedule = {}
 function private.OnEvent(...)
 	local event, arg = select(2, ...)
@@ -139,8 +149,9 @@ function private.OnEvent(...)
 		-- Do Nothing for now
 	elseif (event == "AUCTION_HOUSE_CLOSED") then
 		AucAdvanced.Scan.Interrupt()
-	elseif (event == "PLAYER_LEAVING_WORLD") then
+	elseif (event == "PLAYER_LOGOUT") then
 		AucAdvanced.Scan.Commit(true)
+		private.OnUnload()
 	elseif event == "UNIT_INVENTORY_CHANGED"
 	or event == "ITEM_LOCK_CHANGED"
 	or event == "CURSOR_UPDATE"
@@ -178,7 +189,7 @@ private.Frame:RegisterEvent("UNIT_INVENTORY_CHANGED")
 private.Frame:RegisterEvent("ITEM_LOCK_CHANGED")
 private.Frame:RegisterEvent("CURSOR_UPDATE")
 private.Frame:RegisterEvent("BAG_UPDATE")
-private.Frame:RegisterEvent("PLAYER_LEAVING_WORLD")
+private.Frame:RegisterEvent("PLAYER_LOGOUT")
 private.Frame:SetScript("OnEvent", private.OnEvent)
 private.Frame:SetScript("OnUpdate", private.OnUpdate)
 

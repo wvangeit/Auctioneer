@@ -60,6 +60,11 @@ function private.LoadAuctionImage()
 	local loaded, reason = LoadAddOn("Auc-ScanData")
 	if not loaded then
 		message("The Auc-ScanData storage module could not be loaded: "..reason)
+	elseif AucAdvanced.Modules
+	and AucAdvanced.Modules.Util
+	and AucAdvanced.Modules.Util.ScanData
+	and AucAdvanced.Modules.Util.ScanData.Unpack then
+		AucAdvanced.Modules.Util.ScanData.Unpack()
 	end
 
 	if (AucAdvancedData.ScanData) then

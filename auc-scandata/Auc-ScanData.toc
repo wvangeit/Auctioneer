@@ -9,4 +9,5 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
+nStringRope.lua
 ScanTooltip.lua

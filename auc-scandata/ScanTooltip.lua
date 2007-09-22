@@ -282,3 +282,78 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	end
 end
+
+function lib.Unpack(realm)
+	if not (AucScanData and AucScanData.scans) then return end
+	if not realm then realm = GetRealmName() end
+	local sData = AucScanData.scans[realm]
+	if not sData then return end
+
+	for faction, fData in pairs(sData) do
+		if fData.image and type(fData.image) == "string" then
+			local loader, err = loadstring(fData.image)
+			if (loader) then
+				fData.image = loader()
+				collectgarbage()
+			else
+				print("Error loading scan image: {{", err, "}}")
+			end
+		end
+	end
+end
+
+function lib.OnLoad()
+	lib.Unpack()
+end
+
+function lib.OnUnload()
+	local nStringRope = LibStub:GetLibrary("nStringRope")
+	local rope = nStringRope:New()
+
+	if not (AucScanData and AucScanData.scans) then return end
+	
+	-- If you only scan 3 servers, then you don't need the overflow protection
+	local count = 0
+	for server in pairs(AucScanData.scans) do
+		count = count+1
+	end
+	if count <= 3 then return end
+		
+	-- Convert all image data to loadstring strings
+	for server, sData in pairs(AucScanData.scans) do
+		for faction, fData in pairs(sData) do
+			if fData.image and type(fData.image) == "table" then
+				rope:Add("return {")
+				local fCount = #fData.image
+				for i = 1, fCount do
+					local item = fData.image[i]
+					if item and type(item) == "table" then
+						rope:Add("{")
+						local pos = 1
+						while item[pos] or item[pos+1] or item[pos+2] or item[pos+3] do
+							local v = item[pos]
+							if v == nil then
+								rope:Add("nil,")
+							else
+								local t = type(v)
+								if t == "string" then
+									rope:Add(("%q,"):format(v))
+								elseif t == "number" then
+									rope:Add(v..",")
+								end
+							end
+							pos = pos + 1
+						end
+						rope:Add("},")
+					elseif item == nil then
+						rope:Add("nil,")
+					end
+				end
+				rope:Add("}")
+				p("SetRopeFor", server, faction)
+				fData.image = rope:Get()
+				rope:Clear()
+			end
+		end
+	end
+end
