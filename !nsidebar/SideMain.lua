@@ -86,8 +86,6 @@ end -- LibStub
 local lib = LibStub:NewLibrary(LIBRARY_VERSION_MAJOR, LIBRARY_VERSION_MINOR)
 if not lib then return end
 
-RegisterCVar("nSideBarPos", "fadeout:10:right:180")
-
 if not lib.private then
 	lib.private = {}
 end
@@ -95,143 +93,42 @@ end
 local private = lib.private
 local frame
 
-function lib:GetVersion()
+
+
+--[[  API FUNCTIONS ]]--
+
+-- Return the version of the current bar library
+function lib.GetVersion()
 	return LIBRARY_VERSION_MAJOR, LIBRARY_VERSION_MINOR;
 end
 
-if lib.frame then
-	frame = lib.frame
-else
-	frame = CreateFrame("Frame", "", UIParent)
-	frame:SetToplevel(true)
-	frame:SetHitRectInsets(-3, -3, -3, -3)
-	frame:SetBackdrop({
-		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 16,
-		insets = { left = 4, right = 4, top = 4, bottom = 4 }
-	})
-	frame:SetBackdropColor(0,0,0, 0.5)
-	frame:EnableMouse(true)
-	frame:SetScript("OnEnter", function(...) private.PopOut(...) end)
-	frame:SetScript("OnLeave", function(...) private.PopBack(...) end)
-	frame:SetScript("OnUpdate", function(...) private.Popper(...) end)
-	frame.Tab = frame:CreateTexture()
-	frame.Tab:SetTexture(0.98, 0.78, 0)
-	frame.buttons = {}
-
-	SLASH_NSIDEBAR1 = "/nsb"
-	SLASH_NSIDEBAR2 = "/nsidebar"
-	SlashCmdList["NSIDEBAR"] = function(msg)
-		frame.private.CommandHandler(msg)
-	end
-
-	lib.frame = frame
+-- Capture the bar and stop it from closing (must release!)
+function lib.Capture()
+	frame.PopTimer = 0.01
+	frame.PopDirection = 1
+	frame.captured = true
 end
 
-function private:PopOut(...)
-	self.PopTimer = 0.15
-	self.PopDirection = 1
-	if self.OnEnter then self:OnEnter(...) end
+-- Release the bar if you have captured it
+function lib.Release()
+	if not frame.captured then return end
+	frame.PopTimer = 0.75
+	frame.PopDirection = -1
+	frame.captured = nil
 end
 
-function private:PopBack(...)
-	self.PopTimer = 0.75
-	self.PopDirection = -1
-	if self.OnLeave then self:OnLeave(...) end
-end
-
-function private:MouseDown(...)
-	local button = ...
-	if button then
-		button.icon:SetTexCoord(0, 1, 0, 1)
-	end
-	if self.MouseDown then self:MouseDown(...) end
-end
-
-function private:MouseUp(...)
-	local button = ...
-	if button then
-		button.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
-	end
-	if self.MouseUp then self:MouseUp(...) end
-end
-
-function private:Popper(...)
-	local duration = ...
-	if self.PopDirection then
-		self.PopTimer = self.PopTimer - duration
-		if self.PopTimer < 0 then
-			if self.PopDirection > 0 then
-				-- Pop Out
-				self.PopDirection = nil
-				self:ClearAllPoints()
-				self.isOpen = true
-			else
-				-- Pop Back
-				self.PopDirection = nil
-				self:ClearAllPoints()
-				self.isOpen = false
-			end
-			lib.ApplyLayout(true)
-		end
-	end
-end
-
-function private.CommandHandler(msg)
-	local configVar = GetCVar("nSideBarPos")
-	local vis, wide, side, position = strsplit(":", configVar)
-
-	local save = false
-	if (not msg or msg == "") then msg = "help" end
-	local a, b, c = strsplit(" ", msg:lower())
-	if (a == "help") then
-		DEFAULT_CHAT_FRAME:AddMessage("/nsb [ top | left | bottom | right ] [ <n> ]")
-		DEFAULT_CHAT_FRAME:AddMessage("/nsb [ fadeout | nofade ]")
-		DEFAULT_CHAT_FRAME:AddMessage("/nsb size [ <n> ]")
-		return
-	end
-	if (a == "top")
-	or (a == "left")
-	or (a == "bottom")
-	or (a == "right") then
-		side = a
-		save = true
-		if (tonumber(b)) then
-			a, b, c = b, nil, nil
-		end
-	end
-	if (tonumber(a)) then
-		position = math.min(math.abs(tonumber(a)), 1200)
-		save = true
-	end
-	if (a == "fadeout" or a == "fade") then
-		vis = "fadeout"
-		save = true
-	elseif (a == "nofade") then
-		vis = "visible"
-		save = true
-	end
-	if (a == "size") then
-		if (tonumber(b)) then
-			wide = math.floor(tonumber(b))
-			if (wide < 1) then wide = 1 end
-			save = true
-		end
-	end
-
-	if (save) then
-		SetCVar("nSideBarPos", strjoin(":", vis, wide, side, position))
-		lib.ApplyLayout()
-	end
-end
-
-function lib.AddButton(id, texture, priority)
-	if not priority then priority = 200 end
+-- Add a button to the bar, where:
+--   id = the id for this button (you will use this to reference the button).
+--   texture = the path to your button's texture.
+--   priority = determines your button's position in the list (lower numbers = earlier).
+--   globalname = if specified, sets your button's "frame name".
+--   quiet = stops nsidebar from popping open to let the user know there's a new button.
+function lib.AddButton(id, texture, priority, globalname, quiet)
+	assert(type(id)=="string", "ButtonId must be a string")
 
 	local button
 	if not frame.buttons[id] then
-		button = CreateFrame("Button", "", frame)
+		button = CreateFrame("Button", globalname, frame)
 		button.frame = frame
 		button:SetPoint("TOPLEFT", frame, "TOPLEFT", 0,0)
 		button:SetWidth(30)
@@ -241,7 +138,7 @@ function lib.AddButton(id, texture, priority)
 		button:SetScript("OnEnter", function (...) private.PopOut(this.frame, this, ...) end)
 		button:SetScript("OnLeave", function (...) private.PopBack(this.frame, this, ...) end)
 		button.icon = button:CreateTexture("", "BACKGROUND")
-		button.icon:SetTexCoord(0.075, 0.925, 0.075, 0.925)
+		button.icon:SetTexCoord(0.025, 0.975, 0.025, 0.975)
 		button.icon:SetPoint("TOPLEFT", button, "TOPLEFT", 0,0)
 		button.icon:SetWidth(30)
 		button.icon:SetHeight(30)
@@ -250,35 +147,86 @@ function lib.AddButton(id, texture, priority)
 	else
 		button = frame.buttons[id]
 	end
-	button.icon:SetTexture(texture)
-	button.priority = priority
+	if texture then
+		button.icon:SetTexture(texture)
+	end
+	if priority or not button.priority then
+		button.priority = priority or 200
+	end
+	button.removed = nil
+	button:Show()
 
-	lib.ApplyLayout()
+	if quiet then
+		lib.ApplyLayout()
+	else
+		-- Show people that the button has popped in
+		lib.FlashOpen(1.5)
+	end
 	return button
 end
 
-
--- TODO - do we need a show/hide function, possibly keyed off of a per-button "shown" value?
--- or is add/remove good enough?  It's not something likely to be changed often.
-
+-- Removes the button with the associated id from the bar
 function lib.RemoveButton(id)
 	local button = frame.buttons[id]
-	if button then button:Hide() end
-	frame.buttons[id] = nil
+	if not button then return end
+
+	button:Hide()
+	frame.buttons[id].removed = true
 	lib.ApplyLayout()
 end
 
+-- Causes the button to be displayed (persists across sessions)
+function lib.ShowButton(id)
+	local button = frame.buttons[id]
+	assert(button, "ButtonId "..id.." does not exist")
+	private.config[id..".hide"] = nil
+	private.saveConfig()
+	lib.ApplyLayout()
+end
 
+-- Causes the button to be hidden (persists across sessions)
+function lib.HideButton(id)
+	local button = frame.buttons[id]
+	assert(button, "ButtonId "..id.." does not exist")
+	private.config[id..".hide"] = 1
+	private.saveConfig()
+	lib.ApplyLayout()
+end
+
+-- Causes the bar to flash open for a given number of seconds
+function lib.FlashOpen(delay)
+	private:PerformOpen()
+	-- Schedule a close in 1.5 seconds
+	frame.PopTimer = delay or 1.5
+	frame.PopDirection = -1
+end
+
+-- Updates the bar's buttons and position, where
+--   useLayout = if set, uses the cached layout, otherwise regenerates it;
+--               if you hide, show, add or remove buttons, you should regenerate.
 function lib.ApplyLayout(useLayout)
-	local configVar = GetCVar("nSideBarPos")
-	if not (lib.lastConfig and configVar == lib.lastConfig) then
-		useLayout = false
+	local vis = private.config.visibility or "fade"
+	local wide = private.config.maxWidth or "10"
+	local side = private.config.anchor or "right"
+	local position = private.config.position or "180"
+	local active = private.config.enabled or "1"
+
+	for k,v in pairs(private.config) do
+		if not private.lastConfig[k] or private.lastConfig[k] ~= v then
+			useLayout = false
+		end
+		private.lastConfig[k] = v
 	end
 
-	local vis, wide, side, position = strsplit(":", configVar)
-	position = math.abs(tonumber(position) or 180)
+	position = tonumber(position) or 180
 	wide = tonumber(wide)
 	side = side:lower()
+	active = (active ~= "0")
+
+	if not active then
+		frame:Hide()
+		return
+	end
 
 	if not lib.private.layout then
 		lib.private.layout = {}
@@ -289,7 +237,12 @@ function lib.ApplyLayout(useLayout)
 	if not useLayout then
 		for i = 1, #layout do table.remove(layout) end
 		for id, button in pairs(frame.buttons) do
-			table.insert(layout, button)
+			if not button.removed
+			and not private.config[id..".hide"] then
+				table.insert(layout, button)
+			elseif button:IsShown() then
+				button:Hide()
+			end
 		end
 
 		if (#layout == 0) then
@@ -297,14 +250,7 @@ function lib.ApplyLayout(useLayout)
 			return
 		end
 
-		table.sort(layout, function (a, b)
-			if (a.priority < b.priority) then
-				return true
-			elseif (a.id < b.id) then
-				return true
-			end
-			return false
-		end)
+		table.sort(layout, private.buttonSort)
 	end
 
 	if (#layout == 0) then
@@ -384,8 +330,325 @@ function lib.ApplyLayout(useLayout)
 		elseif (side == "bottom") then
 			button:SetPoint("TOPLEFT", frame, "TOPLEFT", row*32+5, 0-(col*32+10))
 		elseif (side == "top") then
-			button:SetPoint("TOPLEFT", frame, "TOPLEFT", row*32+5, 0-(col*32+5))
+			button:SetPoint("TOPLEFT", frame, "TOPLEFT", row*32+5, 0-(col*32+10))
+		end
+
+		if not button:IsShown() then
+			button:Show()
 		end
 	end
+end
+
+
+--[[  END OF API FUNCTIONS ]]--
+
+-- Private functions and variables follow, you shouldn't need to fiddle with these.
+
+-- Setup our main frame (or reuse the old one)
+if lib.frame then
+	frame = lib.frame
+else
+	frame = CreateFrame("Frame", "", UIParent)
+	frame:SetToplevel(true)
+	frame:SetFrameStrata("TOOLTIP")
+	frame:SetHitRectInsets(-3, -3, -3, -3)
+	frame:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 4, right = 4, top = 4, bottom = 4 }
+	})
+	frame:SetBackdropColor(0,0,0, 0.5)
+	frame:EnableMouse(true)
+	frame:SetScript("OnEnter", function(...) private.PopOut(...) end)
+	frame:SetScript("OnLeave", function(...) private.PopBack(...) end)
+	frame:SetScript("OnMouseDown", function(...) private.BeginMove(...) end)
+	frame:SetScript("OnMouseUp", function(...) private.EndMove(...) end)
+	frame:SetScript("OnUpdate", function(...) private.Popper(...) end)
+	frame:SetScript("OnEvent", function(...)
+		private.startCounter = 10
+		frame:UnregisterEvent("PLAYER_LOGIN")
+	end)
+	frame:RegisterEvent("PLAYER_LOGIN")
+
+	frame.Tab = frame:CreateTexture()
+	frame.Tab:SetTexture(0.98, 0.78, 0)
+	frame.buttons = {}
+
+	SLASH_NSIDEBAR1 = "/nsb"
+	SLASH_NSIDEBAR2 = "/nsidebar"
+	SlashCmdList["NSIDEBAR"] = function(msg)
+		private.CommandHandler(msg)
+	end
+
+	lib.frame = frame
+end
+private.lastConfig = {}
+
+-- Functions to start and stop the sidebar drag
+function private:BeginMove(...)
+	if private.config.locked then return end
+	local button = ...
+	if button == "LeftButton" then
+		private.moving = true
+	end
+end
+
+function private:EndMove(...)
+	if private.moving then
+		private:saveConfig()
+		private.moving = nil
+	end
+end
+
+-- Checks to see if the argument is a button
+function private.IsButton(button)
+	if not button then return end
+	if type(button) ~= "table" then return end
+	if button.id and button.icon then return true end
+end
+
+-- Functions to control the popping in and out of the bar
+function private:PopOut(...)
+	local button = ...
+	self.PopTimer = 0.15
+	self.PopDirection = 1
+	if private.IsButton(button) then -- this is a button
+		button.icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
+		if button.OnEnter then button:OnEnter(select(2, ...)) end
+	end
+end
+
+function private:PopBack(...)
+	local button = ...
+	self.PopTimer = 0.75
+	self.PopDirection = -1
+	if private.IsButton(button) then -- this is a button
+		button.icon:SetTexCoord(0.025, 0.975, 0.025, 0.975)
+		if button.OnLeave then button:OnLeave(select(2, ...)) end
+	end
+end
+
+function private:PerformOpen(useLayout)
+	-- Pop Out
+	frame.PopDirection = nil
+	frame:ClearAllPoints()
+	frame.isOpen = true
+	lib.ApplyLayout(useLayout)
+	for _,button in ipairs(frame.buttons) do
+		if button.OnOpen then button:OnOpen() end
+	end
+end
+
+function private:PerformClose(useLayout)
+	-- Pop Back
+	frame.PopDirection = nil
+	frame:ClearAllPoints()
+	frame.isOpen = false
+	lib.ApplyLayout(useLayout)
+	for _,button in ipairs(frame.buttons) do
+		if button.OnOpen then button:OnClose() end
+	end
+end
+
+function private:Popper(...)
+	local duration = ...
+	if private.moving then
+		local side, pos = private.boxMover()
+		private.config.anchor = side
+		private.config.position = pos
+		lib.ApplyLayout(true)
+		return
+	end
+	if self.PopDirection then
+		self.PopTimer = self.PopTimer - duration
+		if self.PopTimer < 0 then
+			if self.PopDirection > 0 then
+				private:PerformOpen(true)
+			elseif not frame.captured then
+				private:PerformClose(true)
+			end
+		end
+	end
+	if private.startCounter then
+		private.startCounter = private.startCounter - 1
+		if private.startCounter == 0 then
+			lib.FlashOpen(5)
+			private.startCounter = nil
+		end
+	end
+end
+
+-- Functions to make the icon enlarge/shrink when the mouse moves over it
+function private:MouseDown(...)
+	local button = ...
+	if button then
+		button.icon:SetTexCoord(0, 1, 0, 1)
+	end
+	if self.MouseDown then self:MouseDown(...) end
+end
+
+function private:MouseUp(...)
+	local button = ...
+	if button then
+		button.icon:SetTexCoord(0.025, 0.975, 0.025, 0.975)
+	end
+	if self.MouseUp then self:MouseUp(...) end
+end
+
+-- Functions for handling loading and saving of config
+RegisterCVar("nSideBarConfig", "")
+function private.loadElements(...)
+	local n = select("#", ...)
+	local e, k, v
+	for i=1, n do
+		e = select(i, ...)
+		k, v = strsplit("=", e, 2)
+		private.config[k] = v
+	end
+end
+private.config = {}
+private.loadElements(strsplit(";", GetCVar("nSideBarConfig")))
+function private.saveConfig()
+	local config, sep = "", ""
+	for k,v in pairs(private.config) do
+		config = strconcat(config, sep, k, "=", v)
+		sep = ";"
+	end
+	SetCVar("nSideBarConfig", config)
+end
+
+-- Command processor
+function private.CommandHandler(msg)
+	local vis = private.config.visibility or "fade"
+	local wide = private.config.maxWidth or "10"
+	local side = private.config.anchor or "right"
+	local position = private.config.position or "180"
+	local active = private.config.enabled or "1"
+
+	if not active or active=="0" or active=="" then active = 1 else active = 0 end
+
+	local save = false
+	if (not msg or msg == "") then msg = "help" end
+	local a, b, c = strsplit(" ", msg:lower())
+	if (a == "help") then
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb top | left | bottom | right  |cff1020ff Set the anchor for the sidebar |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb <n>  |cff1020ff Set the position for the sidebar |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb fadeout | nofade  |cff1020ff Set whether the sidebar fades or not |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb size <n>  |cff1020ff Set the number of icons before the bar wraps |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb lock | unlock  |cff1020ff Lock/Unlock the bar's drag mode |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb reset  |cff1020ff Reset the bar to factory defaults |r")
+		DEFAULT_CHAT_FRAME:AddMessage("/nsb off | on | toggle  |cff1020ff Disable/Enable/Toggle bar's visibility |r")
+		return
+	end
+
+	if a == "lock" then
+		private.config.locked = "1"
+		save = true
+	elseif a == "unlock" then
+		private.config.locked = nil
+		save = true
+	end
+
+	if a == "reset" then
+		private.config = {}
+		save = true
+	end
+	
+	if (a == "top")
+	or (a == "left")
+	or (a == "bottom")
+	or (a == "right") then
+		private.config.anchor = a
+		save = true
+		if (tonumber(b)) then
+			a, b, c = b, nil, nil
+		end
+	end
+	if (tonumber(a)) then
+		private.config.position = math.min(math.abs(tonumber(a)), 1200)
+		save = true
+	end
+	if (a == "fadeout" or a == "fade") then
+		private.config.visibility = "fadeout"
+		save = true
+	elseif (a == "nofade") then
+		private.config.visibility = "visible"
+		save = true
+	end
+	if (a == "size") then
+		if (tonumber(b)) then
+			wide = math.floor(tonumber(b))
+			if (wide < 1) then wide = 1 end
+			private.config.maxWidth = wide
+			save = true
+		end
+	end
+
+	if (a == "on") then
+		private.config.enabled = 1
+		save = true
+	elseif (a == "off") then
+		private.config.enabled = 0
+		save = true
+	elseif (a == "toggle") then
+		if active == 1 then
+			private.config.enabled = 0
+		else
+			private.config.enabled = 1
+		end
+		save = true
+	end
+
+	if (save) then
+		private.saveConfig()
+		lib.ApplyLayout()
+	end
+end
+
+-- Function to sort the buttons by priority during the layout phase
+function private.buttonSort(a, b)
+	if (a.priority < b.priority) then
+		return true
+	elseif (a.id < b.id) then
+		return true
+	end
+	return false
+end
+
+-- Function to work out where along the edge of the screen to position the bar
+local SWITCH_TEXELS = 100 -- number of texels to do edge switches at
+function private.boxMover()
+	local curX, curY = GetCursorPosition()
+	local uiScale = UIParent:GetEffectiveScale()
+	local uiWidth, uiHeight = UIParent:GetWidth(), UIParent:GetHeight()
+	curX, curY = curX / uiScale, curY / uiScale
+
+	local anchor = private.config.anchor or "right"
+	
+	if anchor == "top" and curY < uiHeight - SWITCH_TEXELS
+	or anchor == "bottom" and curY > SWITCH_TEXELS then
+		if curX < SWITCH_TEXELS then
+			anchor = "left"
+		elseif curX > uiWidth - SWITCH_TEXELS  then
+			anchor = "right"
+		end
+	elseif anchor == "left" and curX > SWITCH_TEXELS
+	or anchor == "right" and curX < uiWidth - SWITCH_TEXELS then
+		if curY < SWITCH_TEXELS then
+			anchor = "bottom"
+		elseif curY > uiHeight - SWITCH_TEXELS  then
+			anchor = "top"
+		end
+	end
+	
+	local pos
+	if anchor == "top" or anchor == "bottom" then
+		pos = curX
+	else
+		pos = uiHeight - curY
+	end
+
+	return anchor, pos - 16
 end
 
