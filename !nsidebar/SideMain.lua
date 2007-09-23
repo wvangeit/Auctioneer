@@ -326,7 +326,7 @@ function lib.ApplyLayout(useLayout)
 		if (side == "right") then
 			button:SetPoint("TOPLEFT", frame, "TOPLEFT", col*32+10, 0-(row*32+5))
 		elseif (side == "left") then
-			button:SetPoint("TOPLEFT", frame, "TOPLEFT", col*32+5, 0-(row*32+5))
+			button:SetPoint("TOPLEFT", frame, "TOPLEFT", col*32+10, 0-(row*32+5))
 		elseif (side == "bottom") then
 			button:SetPoint("TOPLEFT", frame, "TOPLEFT", row*32+5, 0-(col*32+10))
 		elseif (side == "top") then
