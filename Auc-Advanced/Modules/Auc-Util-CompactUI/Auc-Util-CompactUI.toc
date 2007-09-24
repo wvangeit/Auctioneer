@@ -1,0 +1,9 @@
+## Name: Auctioneer:Util:PriceLevel
+## Interface: 20100
+## Dependancies: Auc-Advanced
+##
+## Version: <%version%> (<%codename%>)
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+Embed.xml
