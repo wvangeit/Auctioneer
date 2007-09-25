@@ -32,8 +32,8 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "BasicFilter"
-local libType = "Util"
+local libName = "Basic"
+local libType = "filter"
 
 
 AucAdvanced.Modules[libType][libName] = {}
@@ -134,7 +134,7 @@ end
 
 function private.makeData()
 	if data then return end
-	if (not AucAdvancedUtilBasicFilter) then AucAdvancedUtilBasicFilter = {MinQuality=1, MinLevel=0, SellersIgnored={}} end
-	data = AucAdvancedUtilBasicFilter
+	if (not AucAdvancedFilterBasic) then AucAdvancedFilterBasic = {MinQuality=1, MinLevel=0, SellersIgnored={}} end
+	data = AucAdvancedFilterBasic
 	private.DataLoaded()
 end
