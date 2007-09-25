@@ -112,7 +112,7 @@ function lib.AuctionFilter(operation, itemData)
 
 	-- Otherwise this item needs to be filtered
 	-- We need to see if this auction is to be ignored or not.
-	if nLog and retval then
+	if nLog then
 		nLog.AddMessage(
 			"auc-"..libType.."-"..libName,
 			"AuctionFilter",

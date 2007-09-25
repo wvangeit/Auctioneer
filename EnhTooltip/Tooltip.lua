@@ -1536,6 +1536,17 @@ function public.SetPopupKey(key)
 end
 
 
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib(addonName)
+else
+	function debug() end
+	assert = debug
+end
+
+
+
 ------------------------
 -- Debug functions
 ------------------------
@@ -1565,16 +1576,9 @@ end
 --                nil, otherwise
 -------------------------------------------------------------------------------
 function debugPrint(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint(addonName, message, category, title, errorCode, level)
+	return debug(message, category, title, errorCode, level)
 end
-
-
--- for compatibility with older addons that called EnhTooltip.DebugPrint directly
--- without this, older Auctioneer addons cannot use this version of EnhTooltip
-function debugPrintExternal(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint("unknown", message, category, title, errorCode, level)
-end
-EnhTooltip.DebugPrint	= debugPrintExternal;
+EnhTooltip.DebugPrint	= debugPrint;
 
 
 ------------------------

@@ -858,6 +858,11 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		end
 		private.curPage = startPage
 	end
+
+	if private.sentQuery then
+		lib.StorePage()
+	end
+	
 	private.curQuery = query
 	private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 		query.name or "",

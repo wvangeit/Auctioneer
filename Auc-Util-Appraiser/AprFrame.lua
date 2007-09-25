@@ -1010,11 +1010,13 @@ function private.CreateFrames()
 	end
 	frame.salebox.number.extra = {}
 	function frame.salebox.number:SetAdjustedRange(maxStax, ...)
+		local curVal = self:GetAdjustedValue()
 		self.maxStax = maxStax
 		local n = select("#", ...)
 		for i = 1, #self.extra do self.extra[i] = nil end
 		for i = 1, select("#", ...) do self.extra[i] = select(i, ...) end
 		self:SetMinMaxValues(1, maxStax+n)
+		self:SetAdjustedValue(math.min(curVal, maxStax))
 	end
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
