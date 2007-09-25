@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:ScanButton
+## Title: Auc:Util:Scan Button
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

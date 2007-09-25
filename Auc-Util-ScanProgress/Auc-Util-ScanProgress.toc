@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:Example
+## Title: Auc:Util:Scan Progress
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

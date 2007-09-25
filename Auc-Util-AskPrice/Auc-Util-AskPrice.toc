@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:AskPrice
+## Title: Auc:Util:Ask Price
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

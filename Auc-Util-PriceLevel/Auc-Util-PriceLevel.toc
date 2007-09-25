@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:PriceLevel
+## Title: Auc:Util:Price Level
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

@@ -1,5 +1,5 @@
-## Title: Auctioneer Advanced
-## Notes: Auctioneer, An addon to help keep track of items values. You must at least enable a statistics extension (like Auctioneer Stats Simple) to start tracking stats.
+## Title: Auc-Advanced |cff665555(core)
+## Notes: AuctioneerAdvanced, An addon to help keep track of items values. You must at least enable a statistics extension (like Auc:Stats:Simple) to start tracking stats.
 ##
 ## Interface: 20100
 ## LoadOnDemand: 0

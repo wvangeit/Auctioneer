@@ -1,4 +1,4 @@
-## Name: Auctioneer:Stat:WOWEcon
+## Title: Auc:Stat:WOWEcon Prices
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

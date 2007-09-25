@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:Appraiser
+## Title: Auc:Util:Appraiser
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

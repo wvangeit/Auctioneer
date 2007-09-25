@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:PriceLevel
+## Title: Auc:Util:Compact UI
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##

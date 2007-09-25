@@ -1,4 +1,4 @@
-## Title: Auctioneer:Util:BasicFilter
+## Title: Auc:Util:Basic Filter
 ## Notes: Allows filtering of auctioneer data by some basic items, such as minimum quality, minimum item level, and ignored seller.
 ##
 ## Interface: 20100
