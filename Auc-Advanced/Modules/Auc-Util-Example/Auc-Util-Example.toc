@@ -1,4 +1,4 @@
-## Name: Auctioneer:Util:Example
+## Title: Auctioneer:Util:Example
 ## Interface: 20100
 ## Dependancies: Auc-Advanced
 ##
