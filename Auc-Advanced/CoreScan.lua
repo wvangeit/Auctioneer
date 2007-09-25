@@ -321,9 +321,8 @@ local function processStats(operation, curItem, oldItem)
 			Filtering out happens here so we only have to do Unpack once.
 			Only filter on create because once its in the system, dropping it can give the wrong impression to other mods.
 			(it could think it was sold, for instance)
-			Filters are part of the Util subsystem.
 		]]
-		for engine, engineLib in pairs(AucAdvanced.Modules.Util) do
+		for engine, engineLib in pairs(AucAdvanced.Modules.Filter) do
 			if (engineLib.AuctionFilter) then
 				local result=engineLib.AuctionFilter(operation, statItem)
 				if (result) then return false end
