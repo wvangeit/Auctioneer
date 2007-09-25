@@ -33,7 +33,7 @@
 ]]
 
 local libName = "Basic"
-local libType = "filter"
+local libType = "Filter"
 
 
 AucAdvanced.Modules[libType][libName] = {}
