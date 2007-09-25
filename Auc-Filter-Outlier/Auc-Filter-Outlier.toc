@@ -5,7 +5,6 @@
 ## LoadOnDemand: 0
 ## Disabled: 0
 ## Dependencies: Auc-Advanced
-## SavedVariables: AucAdvancedFilterOutlier
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id: Auc-Filter-Basic.toc 2232 2007-09-25 03:38:43Z norganna $
