@@ -459,6 +459,7 @@ EnchantrixLocalizations = {
 		["FrmtValueAuctHsp"]	= "Entzauberungswert (HVP)";
 		["FrmtValueAuctMed"]	= "Entzauberungswert (Median)";
 		["FrmtValueAuctVal"]	= "Entzauberungswert (AucAdv)";
+		["FrmtValueFixedVal"]	= "Entzauberungswert (Fixiert)";
 		["FrmtValueMarket"]	= "Entzauberungswert (Marktpreis)";
 		["FrmtWarnAuctNotLoaded"]	= "Auktionstool nicht geladen, es werden gespeicherte Preise benutzt";
 		["FrmtWarnNoPrices"]	= "Keine Preise verfügbar";
@@ -573,6 +574,7 @@ EnchantrixLocalizations = {
 		["ShowEmbed"]	= "embed";
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
+		["ShowGuessAuctioneerVal"]	= "valueate-val";
 		["ShowGuessBaseline"]	= "valuate-baseline";
 		["ShowTerse"]	= "terse";
 		["ShowUI"]	= "show";
@@ -998,10 +1000,12 @@ EnchantrixLocalizations = {
 		["HelpLocale"]	= "Change la langue utilisée pour afficher les messages d'Enchantrix";
 		["HelpOnoff"]	= "Active ou désactive les informations d'enchantement";
 		["HelpPrintin"]	= "Choisir dans quelle fenêtre Enchantrix affichera ses messages. Vous pouvez spécifier le nom de la fenêtre ou son index.";
+		["HelpShowUI"]	= "Afficher ou éteindre le panneau de réglage.";
 		["HelpTerse"]	= "Active ou désactive le mode concis, qui ne montre que les valeurs de désenchantement. Peut être annulé en appuyant sur la touche contrôle.";
 		["HelpValue"]	= "Choisir d'afficher les valeurs estimées basées sur les proportions de désenchantement possible";
 
 		-- Section: Report Messages
+		["AuctionScanAuctNotInstalled"]	= "Vous n'avez pas installé Auctioneer. Auctioneer doit être installé afin d'effectuer un scannage des enchères.";
 		["FrmtBidbrokerCurbid"]	= "EnchAct";
 		["FrmtBidbrokerDone"]	= "L'agent d'enchères a terminé";
 		["FrmtBidbrokerHeader"]	= "Enchères présentant %s pièces d'argent d'économie sur la valeur moyenne de désenchantement (min. %d%% de moins) :";
@@ -1020,6 +1024,11 @@ EnchantrixLocalizations = {
 		["FrmtFound"]	= "%s se désenchante en :";
 		["FrmtFoundNotDisenchant"]	= "Constaté que %s n'est pas disenchantable";
 		["FrmtPriceEach"]	= "(%s l'unité)";
+		["FrmtProspectFound"]	= "Constaté que %s prospecte en:";
+		["FrmtProspectInto"]	= "Prospecte en:";
+		["FrmtProspectValueAuctHsp"]	= "Valeur prospectée (HSP)";
+		["FrmtProspectValueAuctMed"]	= "Valeur prospectée (médiane)";
+		["FrmtProspectValueMarket"]	= "Valeur prospectée (référence)";
 		["FrmtSuggestedPrice"]	= "Prix suggéré:";
 		["FrmtTotal"]	= "Total";
 		["FrmtValueAuctHsp"]	= "Valeur désenchantée (HSP)";
@@ -1028,6 +1037,17 @@ EnchantrixLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer non chargé, utilisation du prix en cache]";
 		["FrmtWarnNoPrices"]	= "[Aucun prix disponible]";
 		["FrmtWarnPriceUnavail"]	= "[Quelques prix indisponibles]";
+		["TooltipProspectLevel"]	= "Prospection demande niveau %d";
+		["TooltipShowDisenchantLevel"]	= "Désenchantement demande niveau %d";
+
+		-- Section: User Interface
+		["GuiAutoDePromptLine3"]	= "valué à %s";
+		["GuiCreateReplaceProfile"]	= "Créer ou replacer un profile";
+		["GuiDeleteProfileButton"]	= "Éffacer";
+		["GuiIgnore"]	= "Ignorer";
+		["GuiItemValueAuc4Median"]	= "Auc4 médiane";
+		["GuiItemValueCalc"]	= "Valeur calculée à partir de";
+		["GuiMinimapButtonDist"]	= "Distance: %d";
 
 	};
 
@@ -1690,7 +1710,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "分解";
+		["ArgSpellProspectingName"]	= "选矿";
 		["Enchanting"]	= "附魔";
+		["Jewelcrafting"]	= "珠宝加工";
 		["PatReagents"]	= "材料：(.+)";
 		["TextCombat"]	= "战斗";
 		["TextGeneral"]	= "普通";
@@ -1752,6 +1774,13 @@ EnchantrixLocalizations = {
 		["ChatResetProfile"]	= "重置所有设置：";
 		["ChatSavedProfile"]	= "保存配置：";
 		["ChatUsingProfile"]	= "现在使用配置：";
+		["FrmtAutoDeActive"]	= "自动分解-激活";
+		["FrmtAutoDeDisabled"]	= "自动分解-关闭";
+		["FrmtAutoDeDisenchantCancelled"]	= "分解已取消：物品没找到";
+		["FrmtAutoDeDisenchanting"]	= "分解 %s";
+		["FrmtAutoDeIgnorePermanent"]	= "忽视 %s 永久";
+		["FrmtAutoDeIgnoreSession"]	= "忽视 %s 本次连接";
+		["FrmtAutoDeInactive"]	= "自动分解-无效";
 		["FrmtBidbrokerCurbid"]	= "目前的拍卖价";
 		["FrmtBidbrokerDone"]	= "交易价代理完成";
 		["FrmtBidbrokerHeader"]	= "比平均分解价值节省%s出价(最少%%差额= %d)：";
@@ -1887,7 +1916,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Game Constants
 		["ArgSpellname"]	= "分解";
+		["ArgSpellProspectingName"]	= "選礦";
 		["Enchanting"]	= "附魔";
+		["Jewelcrafting"]	= "珠寶製作";
 		["PatReagents"]	= "魔法元素: (.+) ";
 		["TextCombat"]	= "戰鬥記錄";
 		["TextGeneral"]	= "綜合";
@@ -1949,6 +1980,13 @@ EnchantrixLocalizations = {
 		["ChatResetProfile"]	= "重置所有設置：";
 		["ChatSavedProfile"]	= "保存記錄檔：";
 		["ChatUsingProfile"]	= "使用記錄檔：";
+		["FrmtAutoDeActive"]	= "啟動自動分解";
+		["FrmtAutoDeDisabled"]	= "停用自動分解";
+		["FrmtAutoDeDisenchantCancelled"]	= "分解取消: 找不到物品";
+		["FrmtAutoDeDisenchanting"]	= "%s 分解中";
+		["FrmtAutoDeIgnorePermanent"]	= "永久忽略 %s";
+		["FrmtAutoDeIgnoreSession"]	= "這一次忽略 %s";
+		["FrmtAutoDeInactive"]	= "暫停自動分解";
 		["FrmtBidbrokerCurbid"]	= "目前的拍賣價";
 		["FrmtBidbrokerDone"]	= "交易價代理完成";
 		["FrmtBidbrokerHeader"]	= "比平均分解價值平%s銀的拍賣：";
@@ -1968,19 +2006,28 @@ EnchantrixLocalizations = {
 		["FrmtFound"]	= "%s可分解成：";
 		["FrmtFoundNotDisenchant"]	= "發現%s不可分解";
 		["FrmtPriceEach"]	= "(%s 每個) ";
+		["FrmtProspectFound"]	= "可能有 %s 分解成";
+		["FrmtProspectInto"]	= "分解成";
+		["FrmtProspectValueAuctHsp"]	= "分解價值 (HSP)";
 		["FrmtSuggestedPrice"]	= "建議價格：";
 		["FrmtTotal"]	= "總共";
 		["FrmtValueAuctHsp"]	= "分解價值(HSP)";
 		["FrmtValueAuctMed"]	= "分解價值(Median)";
 		["FrmtValueAuctVal"]	= "分解价值(AucAdv)";
+		["FrmtValueFixedVal"]	= "分解價格(固定)";
 		["FrmtValueMarket"]	= "分解價值(Baseline)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer未載入，使用暫存區價格]";
 		["FrmtWarnNoPrices"]	= "[無有效價格]";
 		["FrmtWarnPriceUnavail"]	= "[部分價格無效]";
+		["TooltipProspectLevel"]	= "選礦需要%d技能";
 		["TooltipShowDisenchantLevel"]	= "分解必要技能%d";
 
 		-- Section: User Interface
-		["GuiActivateProfile"]	= "激活當前記錄檔";
+		["GuiActivateProfile"]	= "啟用當前記錄檔";
+		["GuiAutoDeEnable"]	= "監看背包中可分解的物品 - 小心使用";
+		["GuiAutoDeOptions"]	= "自動化";
+		["GuiAutoDePromptLine1"]	= "你正要分解:";
+		["GuiAutoDePromptLine3"]	= "%s 的價格";
 		["GuiBBUnbiddedOnly"]	= "僅代理無人出價的物品";
 		["GuiConfigProfiles"]	= "設置或編輯記錄檔";
 		["GuiCreateReplaceProfile"]	= "新建或替換記錄檔";
@@ -1988,7 +2035,9 @@ EnchantrixLocalizations = {
 		["GuiDefaultLessHSP"]	= "默認最高售價差額率:%d";
 		["GuiDefaultProfitMargin"]	= "默認利潤率：";
 		["GuiDeleteProfileButton"]	= "刪除";
+		["GuiFixedSettings"]	= "固定藥劑費用";
 		["GuiGeneralOptions"]	= "常規附魔助手選項";
+		["GuiIgnore"]	= "忽略";
 		["GuiItemValueAuc4HSP"]	= "Auc最高售價";
 		["GuiItemValueAuc4Median"]	= "Auc中位數";
 		["GuiItemValueAuc5Market"]	= "AucAdv市場價";
@@ -2004,8 +2053,13 @@ EnchantrixLocalizations = {
 		["GuiMinLessHSP"]	= "最低最高售價差額率:%d";
 		["GuiMinProfitMargin"]	= "最低利润率：";
 		["GuiNewProfileName"]	= "新記錄檔名字：";
+		["GuiNo"]	= "否";
 		["GuiPLBBOnlyBelowDESkill"]	= "僅顯示當前技能可分解物品";
 		["GuiPLBBSettings"]	= "差額率與代理設置";
+		["GuiProspectingLevels"]	= "在工具列上顯示選礦等級需求";
+		["GuiProspectingMaterials"]	= "在工具列選礦礦物資訊";
+		["GuiProspectingOptions"]	= "選礦選項";
+		["GuiProspectingValues"]	= "顯示大致選礦價格";
 		["GuiResetProfileButton"]	= "重置";
 		["GuiSaveProfileButton"]	= "保存";
 		["GuiTabAuctions"]	= "拍賣";
@@ -2021,6 +2075,7 @@ EnchantrixLocalizations = {
 		["GuiValueTerse"]	= "簡潔顯示分解價";
 		["GuiWeighSettingsNote"]	= "上述比重值根據特定的數量改變該原材料數量。 您通常將想要留下他們在100%，除非您認為他們比您使用應該或多或少是貴重物品的估價方法認為。";
 		["GuiWeightSettings"]	= "分解材料需求度";
+		["GuiYes"]	= "確定";
 
 	};
 
