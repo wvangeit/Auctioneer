@@ -1,0 +1,14 @@
+## Title: Auc:Stat:Debug
+## Notes: Debugging extension for Auctioneer.
+##
+## Interface: 20200
+## LoadOnDemand: 0
+## Disabled: 1
+## Dependencies: Auc-Advanced
+## SavedVariables: AucAdvancedStatDebugData
+##
+## Version: <%version%> (<%codename%>)
+## Revision: $Id$
+## URL: http://auctioneeraddon.com/
+##
+StatDebug.lua

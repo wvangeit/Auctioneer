@@ -1,0 +1,16 @@
+## Title: Auc:Database
+## Notes: AuctioneerDb.com UI Integration AddOn 
+##
+## Interface: 20200
+## LoadOnDemand: 0
+## Disabled: 0
+## Dependencies: Auc-Advanced
+## SavedVariables: AucDbData
+##
+## Version: <%version%>
+## Revision: $Id$
+## URL: http://auctioneerdb.com/
+##
+StringRope.lua
+DbCore.lua
+DbData.lua

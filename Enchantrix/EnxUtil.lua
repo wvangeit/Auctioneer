@@ -1006,8 +1006,14 @@ function Enchantrix.Util.CreateReagentPricingTable()
 	return scanReagentTable;
 end
 
-
-
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib("Enchantrix")
+else
+	function debug() end
+	assert = debug
+end
 
 ENX_CRITICAL = 1
 ENX_ERROR = 2
@@ -1020,8 +1026,8 @@ ENX_DEBUG = 6
 
 function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
 	-- function libDebugPrint(addon, message, category, title, errorCode, level)
-	local message = DebugLib.Dump(...)
-	DebugLib.DebugPrint("Enchantrix", message, mType, mTitle, nil, mLevel)
+	local message = debug:Dump(...)
+	debug(message, mType, mTitle, nil, mLevel)
 end
 
 -- when you just want to print a message and don't care about the rest

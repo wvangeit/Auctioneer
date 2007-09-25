@@ -98,6 +98,8 @@ AucAdvanced.Const = {
 	ITEMID = 23,
 	SUFFIX = 24,
 	FACTOR = 25,
+	ENCHANT = 26,
+	SEED = 27,
 
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,

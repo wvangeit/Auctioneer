@@ -39,6 +39,8 @@ AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print = AucAdvanced.Print
+local acquire = AucAdvanced.Acquire
+local recycle = AucAdvanced.Recycle
 
 local data
 
@@ -70,7 +72,7 @@ function lib.CommandHandler(command, ...)
 		print(line, "clear}} - clear current", myFaction, libName, "price database")
 	elseif (command == "clear") then
 		print("Clearing "..libName.." stats for {{", myFaction, "}}")
-		data[myFaction] = nil
+		recycle(data, myFaction)
 	end
 end
 
@@ -113,6 +115,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	end
 	table.insert(stats[property], buyout)
 	data[faction][itemId] = private.PackStats(stats)
+	recycle(stats)
 end
 
 function lib.GetPrice(hyperlink, faction)
@@ -170,6 +173,7 @@ function lib.GetPrice(hyperlink, faction)
 		end
 	end
 
+	recycle(stats)
 	local average
 	if (number > 0) then average = total / number end
 	return average, mean, false, stdev, variance, count
@@ -245,9 +249,9 @@ function private.UnpackStatIter(data, ...)
 	for i = 1, c do
 		v = select(i, ...)
 		local property, info = strsplit(":", v)
-		property = tonumber(property)
+		property = tonumber(property) or property
 		if (property and info) then
-			data[property] = { strsplit(";", info) }
+			data[property] = acquire( strsplit(";", info) )
 			local item
 			for i=1, #data[property] do
 				item = data[property][i]
@@ -257,7 +261,7 @@ function private.UnpackStatIter(data, ...)
 	end
 end
 function private.UnpackStats(dataItem)
-	local data = {}
+	local data = acquire()
 	if (dataItem) then
 		private.UnpackStatIter(data, strsplit(",", dataItem))
 	end

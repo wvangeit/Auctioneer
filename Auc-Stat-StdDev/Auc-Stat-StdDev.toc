@@ -1,7 +1,7 @@
 ## Title: Auc:Stat:Std Deviation
 ## Notes: Statistics extension for Auctioneer that uses the variance to detect outliers
 ##
-## Interface: 20100
+## Interface: 20200
 ## LoadOnDemand: 0
 ## Disabled: 1
 ## Dependencies: Auc-Advanced
