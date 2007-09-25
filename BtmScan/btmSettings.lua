@@ -367,7 +367,7 @@ end
 
 local sideIcon
 if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar")
+	local SlideBar = LibStub:GetLibrary("SlideBar", true)
 	if SlideBar then
 		sideIcon = SlideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")

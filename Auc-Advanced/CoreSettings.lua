@@ -392,7 +392,7 @@ end
 
 local sideIcon
 if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar")
+	local SlideBar = LibStub:GetLibrary("SlideBar", true)
 	if SlideBar then
 		sideIcon = SlideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")

@@ -318,7 +318,7 @@ local function setter(setting, value)
 		Enchantrix.MiniIcon.Reposition()
 	end
 
-	if (a == "sideIcon") then
+	if (a == "sideIcon") and Enchantrix.SideIcon then
 		Enchantrix.SideIcon.Update()
 	end
 

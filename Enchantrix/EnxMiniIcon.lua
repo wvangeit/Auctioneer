@@ -150,7 +150,7 @@ nSIdeBar related bits
 
 local sideIcon
 if LibStub then
-	local SlideBar = LibStub:GetLibrary("SlideBar")
+	local SlideBar = LibStub:GetLibrary("SlideBar", true)
 	if SlideBar then
 		sideIcon = SlideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
@@ -158,12 +158,17 @@ if LibStub then
 	end
 end
 
-function sideIcon.Update()
-	if (settings.GetSetting("sideIcon.enable")) then
-		sideIcon:Enable();
-	else
-		sideIcon:Disable();
+if sideIcon then
+	function sideIcon.Update()
+		if (settings.GetSetting("sideIcon.enable")) then
+			sideIcon:Enable();
+		else
+			sideIcon:Disable();
+		end
 	end
+else
+	sideIcon = {}
+	function sideIcon.Update() end
 end
 
 Enchantrix.SideIcon = sideIcon
