@@ -1162,6 +1162,8 @@ end
 ------------------------
 
 function public.TooltipCall(frame, name, link, quality, count, price, forcePopup, hyperlink, additional)
+	if not link then exit end
+
 	private.currentGametip = frame
 	private.hideTime = 0
 
