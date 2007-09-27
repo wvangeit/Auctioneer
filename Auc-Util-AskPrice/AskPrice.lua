@@ -77,16 +77,16 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("CHAT_MSG_GUILD")
 	private.frame:RegisterEvent("CHAT_MSG_RAID")
 
-	private.frame:RegisterEvent("GUILD_ROSTER_UPDATE");--Used to monitor guild so we update USER table 
-	private.frame:RegisterEvent("CHAT_MSG_ADDON"); --standard addon event
-	private.frame:RegisterEvent("PLAYER_LOGIN");  --we use this event to anncounce we are a USER
+	private.frame:RegisterEvent("GUILD_ROSTER_UPDATE")--Used to monitor guild so we update USER table 
+	private.frame:RegisterEvent("CHAT_MSG_ADDON") --standard addon event
+	private.frame:RegisterEvent("PLAYER_LOGIN")  --we use this event to anncounce we are a USER
 		
 	private.frame:SetScript("OnEvent", private.eventHandler)
 	private.frame:SetScript("OnUpdate", private.OnUpdate)
 	
-	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player");
+	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
-	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook);
+	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
 
 	--Setup Configator defaults
 	for config, value in pairs(private.defaults) do
@@ -117,7 +117,7 @@ function private.OnUpdate()
 	   Seen,Value = 0,0 --reset 
 	end
 	--We have now converted the Table to a Average price count of all data
-	SVT.TimeSinceLastUpdate = time();
+	SVT.TimeSinceLastUpdate = time()
 	SVT.QuestionAsked = false
 	
 	private.Format_Whisper()
@@ -128,7 +128,7 @@ function private.eventHandler(event, ...)
 
     --Nothing to do if askprice is disabled
 	if (not private.getOption('util.askprice.activated')) then
-		return;
+		return
 	end
 	
 	if (event == "CHAT_MSG_ADDON") then 
@@ -152,7 +152,7 @@ function private.eventHandler(event, ...)
 			(event == "CHAT_MSG_RAID_LEADER")) and
 			private.getOption('util.askprice.party'))
 		)) then
-		return;
+		return
 	end
 	private.eventSwarm(event, ...)	
 end
@@ -170,22 +170,22 @@ local event, text, player, ignoreTrigger = select(1, ...)
 					text:lower():find(private.getOption('util.askprice.word1'), 1, true) and
 					text:lower():find(private.getOption('util.askprice.word2'), 1, true)
 				)) then
-					return;
+					return
 				end
 			else
-				return;
+				return
 			end
 		end
 
 	-- Check for itemlink after trigger
 	if (not (text:find("|Hitem:"))) then
-		return;
+		return
 	end
 
 --Need a way to handle party/raid when non announcer client is present. Possibly second/announcer list? 
 --Or shall we just keep it simple i.e. if non annoucer present spam the question even if multiple non announcer clients present.
 	if (SVT.Announcer == false) then --If not the announcer ignore
-	   if private.getOption('util.askprice.login') then print("not announcer "..event) end
+	   if private.getOption('util.askprice.debug') then print("not announcer "..event) end
 		if (event == "CHAT_MSG_WHISPER") then --Needed to have a way to respond to a whisper to a non announcer client. 
 			SendAddonMessage("AskPrice$", "WHISP: "..player.." "..text, "GUILD") --Send to the Addon channel, the current Announcer will handle it and respond to questioner
 		elseif (event == "CHAT_MSG_PARTY") and (not UnitInParty(SVT.Users[1]))then
@@ -211,13 +211,13 @@ end
 
 function private.Format_Whisper()
 
-	local seenCount, marketValue, vendorPrice, askedCount, usedStack, multipleItems;
+	local seenCount, marketValue, vendorPrice, askedCount, usedStack, multipleItems
 	local count,player
 
 	--Parse the text and separate out the different links
 	for link,v in pairs(SVT.PricePending) do
 
-		  _, _, vendorPrice = private.getData(link); 
+		  _, _, vendorPrice = private.getData(link)
 		seenCount = SVT.PricePending[link]["seen"]
 		marketValue = SVT.PricePending[link]["value"]
 		
@@ -230,20 +230,20 @@ function private.Format_Whisper()
 				
 			--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
 			if (multipleItems) then
-				private.sendWhisper("    ", player);
+				private.sendWhisper("    ", player)
 			end
 
 			local strMarketOne
 			--If the stackSize is grater than one, add the unit price to the message
 		if not count then count = 0 end
 			if (count > 1) then
-				strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketValue, nil, true));
+				strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketValue, nil, true))
 			else
 				strMarketOne = ""
 			end
 
 			if (seenCount > 0) then
-				private.sendWhisper(("%s: Seen %d times at auction total by Auctioneer Advanced"):format(link, seenCount), player);
+				private.sendWhisper(("%s: Seen %d times at auction total by Auctioneer Advanced"):format(link, seenCount), player)
 				private.sendWhisper(
 					("%sMarket Value: %s%s"):format(
 						"    ",
@@ -252,7 +252,7 @@ function private.Format_Whisper()
 					player
 				)
 			else
-				private.sendWhisper(link..": "..("Never seen at %s by Auctioneer Advanced"):format(AucAdvanced.GetFaction()), player);
+				private.sendWhisper(link..": "..("Never seen at %s by Auctioneer Advanced"):format(AucAdvanced.GetFaction()), player)
 			end
 
 			--Send out vendor info if we have it
@@ -262,9 +262,9 @@ function private.Format_Whisper()
 				local strVendOne
 				--Again if the stackSize is greater than one, add the unit price to the message
 				if (count > 1) then
-					strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true));
+					strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true))
 				else
-					strVendOne = "";
+					strVendOne = ""
 				end
 
 				private.sendWhisper(
@@ -273,11 +273,11 @@ function private.Format_Whisper()
 						EnhTooltip.GetTextGSC(vendorPrice * count, nil, true),
 						strVendOne),
 					player
-				);
+				)
 			end
 
 			usedStack = usedStack or (count > 1)
-			multipleItems = true;
+			multipleItems = true
 	end
 
 	--Once we're done sending out the itemInfo, check if the person used the stack size feature, if not send them the ad message.
@@ -297,7 +297,7 @@ function private.Util_Query(_, prefix, msg, how, player)
 if private.getOption('util.askprice.debug') then print("Query sent") end 
 
 	local  _,link = string.match( msg, "(QUERY:%s)(.*)" )
-	local seenCount, marketValue, _ =  private.getData(link);
+	local seenCount, marketValue, _ =  private.getData(link)
 	if not seenCount then seenCount = 0 end
 	if not marketValue then marketValue = 0 end
 	
@@ -357,7 +357,7 @@ function private.getItems(str)
 	for number, color, item, name in str:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
 		table.insert(itemList, {link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", count = tonumber(number) or 1})
 	end
-	return itemList;
+	return itemList
 end
 
 function private.sendWhisper(message, player)
@@ -406,9 +406,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.debug", "Shows (enabled) or hides (disabled) debug messages.")
 	
 	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable or disable new AskPrice features ad.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable or disable SmartWords checking.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable or disable the sending of vendor pricing data.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable SmartWords checking.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable the sending of vendor pricing data.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
 	
 end
@@ -478,16 +478,16 @@ function private.Guild_Roster_Update()
 
 	if (time() - SVT.FinishedLoading) < 60 then return end --We have to Delay or we get an unknown unit token error on login
 	local guildName, _,_ = GetGuildInfo(SVT.PlayerName) --this little statement prevents us from trying to update a guild if the character is not guilded
-	if guildName == nil then return end; --this little statement prevents us from trying to update a guild if the character is not guilded
+	if guildName == nil then return end --this little statement prevents us from trying to update a guild if the character is not guilded
 
-	local count = GetNumGuildMembers(true);
+	local count = GetNumGuildMembers(true)
 	local tempTable={}
-	local OnlineTable = {};  --this will give us a clean table on every Guild update event
+	local OnlineTable = {}  --this will give us a clean table on every Guild update event
 
 
 	for i=1,count
 	do
-	    local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i);
+	    local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
 	    if(name and online)
 	    then
 		table.insert(OnlineTable,name)
