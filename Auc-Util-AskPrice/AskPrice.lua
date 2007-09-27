@@ -61,9 +61,9 @@ function lib.OnLoad(addon)
 
 	private.frame:SetScript("OnEvent", private.eventHandler)
 
-	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player");
+	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
-	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook);
+	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
 
 	--Setup Configator defaults
 	for config, value in pairs(private.defaults) do
@@ -76,7 +76,7 @@ end
 function private.eventHandler(self, event, text, player, ignoreTrigger)
 	--Nothing to do if askprice is disabled
 	if (not private.getOption('util.askprice.activated')) then
-		return;
+		return
 	end
 
 	--Make sure that we recieve the proper events and that our settings allow a response
@@ -92,10 +92,10 @@ function private.eventHandler(self, event, text, player, ignoreTrigger)
 			(event == "CHAT_MSG_RAID_LEADER")) and
 			private.getOption('util.askprice.party'))
 		)) then
-		return;
+		return
 	end
 
-	local seenCount, marketValue, vendorPrice, askedCount, items, usedStack, multipleItems;
+	local seenCount, marketValue, vendorPrice, askedCount, items, usedStack, multipleItems
 
 	-- Check for marker (trigger char or "smart" words) only if the ignore option is not set
 	if (not (ignoreTrigger == true)) then --We need to check for "true" here, since Blizzard might decide to send us a fourth parameter.
@@ -109,41 +109,41 @@ function private.eventHandler(self, event, text, player, ignoreTrigger)
 					text:lower():find(private.getOption('util.askprice.word1'), 1, true) and
 					text:lower():find(private.getOption('util.askprice.word2'), 1, true)
 				)) then
-					return;
+					return
 				end
 			else
-				return;
+				return
 			end
 		end
 	end
 
 	-- Check for itemlink after trigger
 	if (not (text:find("|Hitem:"))) then
-		return;
+		return
 	end
 
 	--Parse the text and separate out the different links
 	items = private.getItems(text)
 
 	for key, item in ipairs(items) do --Do the items in the order they were recieved.
-		seenCount, marketValue, vendorPrice = private.getData(item.link);
-		local askedCount;
+		seenCount, marketValue, vendorPrice = private.getData(item.link)
+		if (seenCount and (seenCount > 0)) then
+			local askedCount
 
-		--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
-		if (multipleItems) then
-			Auctioneer.AskPrice.SendWhisper("    ", player);
-		end
+			--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
+			if (multipleItems) then
+				Auctioneer.AskPrice.SendWhisper("    ", player)
+			end
 
-		local strMarketOne
-		--If the stackSize is grater than one, add the unit price to the message
-		if (item.count > 1) then
-			strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketValue, nil, true));
-		else
-			strMarketOne = ""
-		end
+			local strMarketOne
+			--If the stackSize is grater than one, add the unit price to the message
+			if (item.count > 1) then
+				strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketValue, nil, true))
+			else
+				strMarketOne = ""
+			end
 
-		if (seenCount > 0) then
-			private.sendWhisper(("%s: Seen %d times at auction total by Auctioneer Advanced"):format(item.link, seenCount), player);
+			private.sendWhisper(("%s: Seen %d times at auction total by Auctioneer Advanced"):format(item.link, seenCount), player)
 			private.sendWhisper(
 				("%sMarket Value: %s%s"):format(
 					"    ",
@@ -152,18 +152,18 @@ function private.eventHandler(self, event, text, player, ignoreTrigger)
 				player
 			)
 		else
-			private.sendWhisper(item.link..": "..("Never seen at %s by Auctioneer Advanced"):format(AucAdvanced.GetFaction()), player);
+			private.sendWhisper(item.link..": "..("Never seen at %s by Auctioneer Advanced"):format(AucAdvanced.GetFaction()), player)
 		end
 
 		--Send out vendor info if we have it
-		if (private.getOption('util.askprice.vendor') and (vendorPrice > 0)) then
+		if (private.getOption('util.askprice.vendor') and (vendorPrice and (vendorPrice > 0))) then
 
 			local strVendOne
 			--Again if the stackSize is grater than one, add the unit price to the message
 			if (item.count > 1) then
-				strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true));
+				strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true))
 			else
-				strVendOne = "";
+				strVendOne = ""
 			end
 
 			private.sendWhisper(
@@ -172,11 +172,11 @@ function private.eventHandler(self, event, text, player, ignoreTrigger)
 					EnhTooltip.GetTextGSC(vendorPrice * item.count, nil, true),
 					strVendOne),
 				player
-			);
+			)
 		end
 
 		usedStack = usedStack or (item.count > 1)
-		multipleItems = true;
+		multipleItems = true
 	end
 
 	--Once we're done sending out the itemInfo, check if the person used the stack size feature, if not send them the ad message.
@@ -217,7 +217,7 @@ function private.getItems(str)
 	for number, color, item, name in str:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
 		table.insert(itemList, {link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", count = tonumber(number) or 1})
 	end
-	return itemList;
+	return itemList
 end
 
 function private.sendWhisper(message, player)
@@ -259,8 +259,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", "Askprice Trigger character")
 
 	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable or disable new AskPrice features ad.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable or disable SmartWords checking.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable or disable the sending of vendor pricing data.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable SmartWords checking.")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable the sending of vendor pricing data.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
 end
