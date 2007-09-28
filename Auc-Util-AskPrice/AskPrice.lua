@@ -47,10 +47,11 @@ local SVT = {
 		PricePending = {},--Table containing all data from users and later Average of all data recived
 		items = {}, --Table value containing all data from msg
 		PlayerName =  UnitName("player"),
-		UpdateInterval = 1, --how often OnUpdate code will execute in seconds
+		UpdateInterval = 0.5, --how often OnUpdate code will execute in seconds
 		TimeSinceLastUpdate = 0,
 		QuestionAsked = false,
 		FinishedLoading = 0,
+		private = {sentAskPriceAd = {}, whisperList = {}}
 	}
 		
 table.insert(SVT.Users,SVT.PlayerName)  --Places player into the user table at start		
@@ -124,7 +125,7 @@ function private.OnUpdate()
 end
 
 function private.eventHandler(event, ...)
-    local event, prefix, msg, how, who = select(1, ...)
+    local event, prefix, msg, how, who = select(1, ...) --This is for an CHAT_MSG_ADDON event
 
     --Nothing to do if askprice is disabled
 	if (not private.getOption('util.askprice.activated')) then
@@ -134,7 +135,7 @@ function private.eventHandler(event, ...)
 	if (event == "CHAT_MSG_ADDON") then 
 	     private.CHAT_MSG_ADDON(event,...)--used to collect a ADDON Message
 	elseif (event == "PLAYER_LOGIN") then --lets annouce we are a USER
-            SendAddonMessage("AskPrice$", "login", "GUILD") --send msg to tell em' we joined and see who is out there. 
+            --SendAddonMessage("AskPrice$", "login", "GUILD") --send msg to tell em' we joined and see who is out there. 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 	    private.Guild_Roster_Update() --updates the current Announcers/remove offline
 	end 
@@ -154,12 +155,14 @@ function private.eventHandler(event, ...)
 		)) then
 		return
 	end
-	private.eventSwarm(event, ...)	
+local event, text, player = select(1, ...) --This is format for a "CHAT_MSG_WHISPER"
+	private.eventSwarm(event, text, player)
 end
 
 --Ok we need to collect all necessary info
-function private.eventSwarm(event, ...)
-local event, text, player, ignoreTrigger = select(1, ...)
+function private.eventSwarm(event, text, player, client)
+
+ if private.getOption('util.askprice.debug') and (event ~= "CHAT_MSG_GUILD")then print("Swarm Start",event," Text ", text, " Player ", player, " Client ",client) end
 	-- Check for marker (trigger char or "smart" words) only if the ignore option is not set
 		if (not (text:sub(1, 1) == private.getOption('util.askprice.trigger'))) then
 			--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
@@ -202,18 +205,16 @@ local event, text, player, ignoreTrigger = select(1, ...)
 	SVT.TimeSinceLastUpdate = time() --keeps the onupdate from fireing, as long as we are reciving data
 	--Query other users using addon channel 
 	for key, item in ipairs(SVT.items) do
-		SVT.items[key]["name"] = player --add player who asked the question so we can refrence it later
+		SVT.items[key]["name"] = player --add player whooriginally asked the question 
+		SVT.items[key]["client"] = client --client who sent question
 		SVT.QuestionAsked = true --used to prevent onupdate from running unless we need it 
 		SendAddonMessage("AskPrice$", "QUERY: "..item.link, "GUILD")
 	end
-
+ if private.getOption('util.askprice.debug') then print("Swarm End") end
 end
 
 function private.Format_Whisper()
-
-	local seenCount, marketValue, vendorPrice, askedCount, usedStack, multipleItems
-	local count,player
-
+	local seenCount, marketValue, vendorPrice, askedCount, usedStack, multipleItems, count, player,client
 	--Parse the text and separate out the different links
 	for link,v in pairs(SVT.PricePending) do
 
@@ -224,10 +225,19 @@ function private.Format_Whisper()
 			for key, item in ipairs(SVT.items) do --Do the items in the order they were recieved.
 			   if link == item.link then
 				count = item.count
-				player = item.name	
+				player = item.name
+				client = item.client	
 			   end
 			end
-				
+			
+		--If this is a raid/party/whisper message to a non announcer client lets send the data to them. they will whisper to Original questioner
+		if client and player then --client is nil on normal operations, only valid if its a PRW
+			if not count then count = 0 end
+			local msg = strjoin(":", client, player, count, seenCount, marketValue)
+			if private.getOption('util.askprice.debug') then print(client, player, count, seenCount, marketValue) end
+			SendAddonMessage("AskPrice$", "PRW: "..msg.." "..link, "GUILD") 
+		end
+	
 			--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
 			if (multipleItems) then
 				private.sendWhisper("    ", player)
@@ -293,8 +303,7 @@ end
 
 --Send a response to the addon channel when a QUERY is sent by the announcer
 function private.Util_Query(_, prefix, msg, how, player) 
-
-if private.getOption('util.askprice.debug') then print("Query sent") end 
+	if private.getOption('util.askprice.debug') then print("Query sent") end 
 
 	local  _,link = string.match( msg, "(QUERY:%s)(.*)" )
 	local seenCount, marketValue, _ =  private.getData(link)
@@ -305,19 +314,34 @@ if private.getOption('util.askprice.debug') then print("Query sent") end
 		SendAddonMessage("AskPrice$", "PRICE: "..seenCount.." "..marketValue.." "..link, "GUILD") 
 	end
 end
-
-function private.Util_Whisper(_, prefix, msg, how, player) 
-if private.getOption('util.askprice.debug') then print("Whisper from non announcer Recived") end
-
-	local  _,player,text = string.match( msg, "(WHISP:%s)(.-)%s(.*)" )  --we replace the player with the original questioner From here on its treated as if they whispered the announcer directly
+--WHISP this even is triggered by a non announcer client in a party/raid/direct whisp setting
+function private.Util_Whisper(_, prefix, msg, how, client) 
+	local  _, player, text = string.match( msg, "(WHISP:%s)(.-)%s(.*)" ) 
 	local event = "CHAT_MSG_WHISPER"
-	private.eventSwarm(event, text, player, ignoreTrigger)
+	
+	if private.getOption('util.askprice.debug') then print("Whisper from non announcer Recived ", text, player, client) end
+	private.eventSwarm(event, text, player, client)
 
+end
+--PRW Party/Raid/Whisper to Announcer to client response
+function private.Util_PRW(_, prefix, msg, how, who) 
+	if private.getOption('util.askprice.debug') then print("Announcer response from party/raid/whisper client recived") end
+			
+	local  _,data, link = string.match(msg, "(PRW:%s)(.-)%s(.+)" )
+	local _, player, count, seen, value = strsplit(":", data)
+	--Bah need to convert my values back to Numeric
+	count = tonumber(count) or 0; seen = tonumber(seen) or 0; value = tonumber(value) or 0
+						
+	table.insert(SVT.items, {["link"] = link, ["count"] = count, ["name"] = player,})
+	
+	if not SVT.PricePending[link] then SVT.PricePending[link]={} end 
+	local S = (#(SVT.PricePending[link])+1) --Size of the table +1
+	SVT.PricePending[link][S]={["seen"]=seen,["value"]=value}
+	SVT.QuestionAsked = true --used to prevent onupdate from running unless we need it 
 end
 
 function private.Util_Response(_, prefix, msg, how, who)
-
-if private.getOption('util.askprice.debug') then print("response sent") end
+	if private.getOption('util.askprice.debug') then print("response sent") end
 
 	local  _,seen,value,link = string.match(msg, "(PRICE:%s)(%d-%s)(.-%s)(.+)" )
 	if not SVT.PricePending[link] then SVT.PricePending[link]={} end 
@@ -326,6 +350,7 @@ if private.getOption('util.askprice.debug') then print("response sent") end
 
 if private.getOption('util.askprice.debug') then print("Response "..link.." "..seen.." "..value) end		
 end
+
 
 function private.onEventHook() --%ToDo% Change the prototype once Blizzard changes their functions to use paramenters instead of globals.
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
@@ -416,10 +441,7 @@ end
 
 function private.CHAT_MSG_ADDON(event, ...)
 	local event, prefix, msg, how, who = select(1, ...)
-	local PlayerInTable = false
 	
---if private.getOption('util.askprice.debug') then print("pre "..prefix..", msg "..msg..", how "..how..", who "..who) end
-
 	if ( prefix ~= "AskPrice$" ) then return end --Event for deciding who the guild announcer is
       
 	if  "QUERY: " == (string.match( msg, "(QUERY:%s)" )) then --This handles a query for a price check from teh guild addon channel
@@ -430,44 +452,42 @@ function private.CHAT_MSG_ADDON(event, ...)
 			return 
 	elseif  "WHISP: " == (string.match( msg, "(WHISP:%s)" )) and (SVT.Announcer == true) then --This handles a Whsiper when we are not the announcer
 		private.Util_Whisper(event, prefix, msg, how, who) 
-	end		
-	   
-	--prevents the event from firing when we login and announce	
-	if  (who == SVT.PlayerName) then return end
-	  
-	if ( msg == "login" )  then --handles logins after our login
-		SendAddonMessage("AskPrice$", "online", "GUILD") --send alert letting them know we are online
-	if private.getOption('util.askprice.login') then print("we recived a login msg from "..who) end --send a login/online message if the user wants to see it
-	    for index,value in pairs(SVT.Users) do
-		 if who == value then 
-		    PlayerInTable = true  --set if player is already been added
+			return
+	elseif ("PRW: "..SVT.PlayerName) == (string.match( msg, "(PRW:%s%a-):" )) then --This handles a GuildAnnouncer response to a client in PartyRaidWhisper question
+		private.Util_PRW(event, prefix, msg, how, who) 
+			return
+	elseif ( msg == "login" ) or ( msg == "online" ) and (who ~= SVT.PlayerName) then  --prevents the event from firing when we login and announce	
+		local PlayerInTable = false
+
+		if ( msg == "login" )  then --handles logins after our login
+		   SendAddonMessage("AskPrice$", "online", "GUILD") --send alert letting them know we are online
+			if private.getOption('util.askprice.login') then print("we recived a login msg from "..who) end --send a login/online message if the user wants to see it
+		elseif ( msg == "online" )  then --handles logins before our login
+			if private.getOption('util.askprice.login') then print("we recived a online msg from "..who) end--send a login/online message if the user wants to see it
 		end
-	    end
-	elseif ( msg == "online" )  then --handles logins before our login
-	if private.getOption('util.askprice.login') then print("we recived a online msg from "..who) end--send a login/online message if the user wants to see it
-	    for index,value in pairs(SVT.Users) do
-		if who == value then 
-		    PlayerInTable = true  --set true if player is in table already
+
+		for index,value in pairs(SVT.Users) do
+			if who == value then 
+			    PlayerInTable = true  --set true if player is in table already
+			end
 		end
-	     end
+				
+		if PlayerInTable == false then  --adds the player to the list of share users
+		    table.insert(SVT.Users,who)
+		end
+
+		table.sort(SVT.Users, function (a,b)
+			return (a < b)
+		end)
+
+		 if private.getOption('util.askprice.login') then print("announcer is "..SVT.Users[1] ) end --send a login/online message if the user wants to see it
+			
+		if SVT.Users[1] == SVT.PlayerName then 
+			SVT.Announcer = true
+		else    
+			SVT.Announcer = false
+		end  
 	end
-
-	if PlayerInTable == false then  --adds the plyer to the list of share users
-	    table.insert(SVT.Users,who)
-	end
-
-	table.sort(SVT.Users, function (a,b)
-		return (a < b)
-	end)
-
-	if private.getOption('util.askprice.login') then print("announcer is "..SVT.Users[1] ) end --send a login/online message if the user wants to see it
-		
-	if SVT.Users[1] == SVT.PlayerName then 
-		SVT.Announcer = true
-	else    
-		SVT.Announcer = false
-	end  
-
  
 end
 
