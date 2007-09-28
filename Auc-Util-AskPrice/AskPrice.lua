@@ -135,7 +135,7 @@ function private.eventHandler(event, ...)
 	if (event == "CHAT_MSG_ADDON") then 
 	     private.CHAT_MSG_ADDON(event,...)--used to collect a ADDON Message
 	elseif (event == "PLAYER_LOGIN") then --lets annouce we are a USER
-            --SendAddonMessage("AskPrice$", "login", "GUILD") --send msg to tell em' we joined and see who is out there. 
+            SendAddonMessage("AskPrice$", "login", "GUILD") --send msg to tell em' we joined and see who is out there. 
 	elseif (event == "GUILD_ROSTER_UPDATE") then
 	    private.Guild_Roster_Update() --updates the current Announcers/remove offline
 	end 
