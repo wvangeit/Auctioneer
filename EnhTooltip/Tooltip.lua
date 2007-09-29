@@ -1498,7 +1498,7 @@ end
 
 function private.GetLootLinkLink(name)
 	local itemLink = ItemLinks[name]
-	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, getLootLinkServer())) then
+	if (itemLink and itemLink.c and itemLink.i and LootLink_CheckItemServer(itemLink, private.GetLootLinkServer())) then
 		local item = itemLink.i:gsub("(%d+):(%d+):(%d+):(%d+)", "%1:0:%3:%4")
 		local link = "|c"..itemLink.c.."|Hitem:"..item.."|h["..name.."]|h|r"
 		return link
@@ -1508,10 +1508,10 @@ end
 
 function private.LlHookOnEnter()
 	local name = this:GetText()
-	local link = getLootLinkLink(name)
+	local link = private.GetLootLinkLink(name)
 	if (link) then
 		local quality = public.QualityFromLink(link)
-		return public.TooltipCall(LootLinkTooltip, name, link, quality)
+		return public.TooltipCall(GameTooltip, name, link, quality)
 	end
 end
 
