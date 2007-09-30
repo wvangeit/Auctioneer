@@ -44,7 +44,7 @@ local print = AucAdvanced.Print
 local SVT = {
 		Users = {},
 		Announcer = true,
-		PricePending = {},--Table containing all data from users and later Average of all data recived
+		PricePending = {},--Table containing all data from users and later Average of all data received
 		items = {}, --Table value containing all data from msg
 		PlayerName =  UnitName("player"),
 		UpdateInterval = 0.5, --how often OnUpdate code will execute in seconds
@@ -319,13 +319,13 @@ function private.Util_Whisper(_, prefix, msg, how, client)
 	local  _, player, text = string.match( msg, "(WHISP:%s)(.-)%s(.*)" ) 
 	local event = "CHAT_MSG_WHISPER"
 	
-	if private.getOption('util.askprice.debug') then print("Whisper from non announcer Recived ", text, player, client) end
+	if private.getOption('util.askprice.debug') then print("Whisper from non announcer Received ", text, player, client) end
 	private.eventSwarm(event, text, player, client)
 
 end
 --PRW Party/Raid/Whisper to Announcer to client response
 function private.Util_PRW(_, prefix, msg, how, who) 
-	if private.getOption('util.askprice.debug') then print("Announcer response from party/raid/whisper client recived") end
+	if private.getOption('util.askprice.debug') then print("Announcer response from party/raid/whisper client received") end
 			
 	local  _,data, link = string.match(msg, "(PRW:%s)(.-)%s(.+)" )
 	local _, player, count, seen, value = strsplit(":", data)
@@ -461,9 +461,9 @@ function private.CHAT_MSG_ADDON(event, ...)
 
 		if ( msg == "login" )  then --handles logins after our login
 		   SendAddonMessage("AskPrice$", "online", "GUILD") --send alert letting them know we are online
-			if private.getOption('util.askprice.login') then print("we recived a login msg from "..who) end --send a login/online message if the user wants to see it
+			if private.getOption('util.askprice.login') then print("we received a login msg from "..who) end --send a login/online message if the user wants to see it
 		elseif ( msg == "online" )  then --handles logins before our login
-			if private.getOption('util.askprice.login') then print("we recived a online msg from "..who) end--send a login/online message if the user wants to see it
+			if private.getOption('util.askprice.login') then print("we received a online msg from "..who) end--send a login/online message if the user wants to see it
 		end
 
 		for index,value in pairs(SVT.Users) do
