@@ -38,8 +38,7 @@ local strScanCompleteMP3Path = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Ut
 local blnScanStarted = false
 local blnScanStatsReceived = false
 local blnScanLastPage = false
-local blnScanCompleted = false
-local intScanMinThreshold = 300
+local intScanMinThreshold = 300  --Safeguard to prevent Auditor Refresh button scans from executing our finish events. Use 300 or more to be safe
 local blnScanMinThresholdMet = false
 
 AucAdvanced.Modules[libType][libName] = {}
@@ -77,7 +76,6 @@ function lib.Processor(callbackType, ...)
           print("  Debug:ScanStarted="..castToString(blnScanStarted))
           print("  Debug:ScanLastPage="..castToString(blnScanLastPage))
           print("  Debug:ScanStatsReceived="..castToString(blnScanStatsReceived))
-          print("  Debug:ScanCompleted="..castToString(blnScanCompleted))
         end
 	
 	if (callbackType == "scanprogress") then
@@ -96,7 +94,7 @@ function lib.OnLoad()
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.shutdown", false)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.logoff", false)
+	AucAdvanced.Settings.SetDefault("util.scanfinish.logout", false)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.soundpath", strScanCompleteMP3Path)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.message", "So many auctions...so little time")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.messagechannel", "none")
@@ -106,7 +104,7 @@ function lib.OnLoad()
 end
 
 function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, elapsedTime)
-	if blnDebug then print("  Debug:ScanProgressReceiver:Init") end
+	if blnDebug then print("   -Debug:ScanProgressReceiver:Init") end
         if blnDebug then print("    Debug:Process State="..castToString(state)) end       
 
 	--Check that we're enabled before passing on the callback
@@ -120,6 +118,15 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 	  state = false
 	end
 
+      	if blnDebug then
+                print("    Debug:ScanStarted="..castToString(blnScanStarted))
+                print("    Debug:ScanLastPage="..castToString(blnScanLastPage))
+                print("    Debug:ScanStatsReceived="..castToString(blnScanStatsReceived))
+                print("    Debug:ScanMinThreshold="..castToString(intScanMinThreshold))
+                if scannedAuctions then print("    Debug:ScannedAuctions="..castToString(scannedAuctions)) end
+                if totalAuctions then print("    Debug:TotalAuctions="..castToString(totalAuctions)) end
+        end
+
 	--Change the state if we have not scanned any auctions yet.
 	--This is done so that we don't start the timer too soon and thus get skewed numbers
 	if (state == nil and (
@@ -129,9 +136,9 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		BrowseButton1:IsVisible()
 	)) then
           if blnDebug then 
-            print("  Debug:ScanFinish Switching State=true")
-            print("  Debug:Updating ScanStarted=true") 
-            print("  Debug:Updating ScanStatsReceived=false") 
+            print("    Debug:ScanFinish Switching State=true")
+            print("    Debug:Updating ScanStarted=true") 
+            print("    Debug:Updating ScanStatsReceived=false") 
           end
           blnScanStarted = true
           blnScanStatsReceived = false
@@ -139,21 +146,13 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 	end
 
       
-      	if blnDebug then
-                print("    Debug:ScanStarted="..castToString(blnScanStarted))
-                print("    Debug:ScanLastPage="..castToString(blnScanLastPage))
-                print("    Debug:ScanStatsReceived="..castToString(blnScanStatsReceived))
-                print("    Debug:ScanCompleted="..castToString(blnScanCompleted))
-                Print("    Debug:ScanMinThreshold:"..castToString(intScanMinThreshold))
-        end
 
-        --if all of the following conditions are met, we should have had a successfully completed scan
+        --if all of the following conditions are met, we should have had a successfully completed full scan
         --1. Has the Processor sent a state of false
         --2. Did we find a successful scan start
-        --3. Did we find a mimimum amount of scan items
+        --3. Did we find a minimum amount of scan items
         --4. Did we see the last page of the scan
         --5. Did we receive the stats
-        
 	if (state == false
 	  and blnScanStarted
 	  and blnScanMinThresholdMet
@@ -167,24 +166,24 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
         --detect if we've reached the last page. Print progress on the way if we're in debug
         --don't detect do this before the completed detection to prevent premature execution
         if totalAuctions and scannedAuctions then
-	  if blnDebug then  print("  Debug:ScanFinish:totalAuctions:"..totalAuctions.."   scannedAuctions:"..scannedAuctions) end                
+	  if blnDebug then  print("    Debug:ScanFinish:totalAuctions:"..totalAuctions.."   scannedAuctions:"..scannedAuctions) end                
           
-          --Check to see if we've scanned to our minimum threshold to enable shutdown or logoff
+          --Check to see if we've scanned to our minimum threshold to enable shutdown or logout
           if scannedAuctions > intScanMinThreshold then
-            if blnDebug then print("  Debug:ScanFinish Switching ScanMinThresholdMet=true") end          
+            if blnDebug then print("    Debug:ScanFinish Switching ScanMinThresholdMet=true") end          
             blnScanMinThresholdMet = true
           end
           
-          --Send a warning about the impending shutdown/logoff as we approach the end of our auction scan
+          --Send a warning about the impending shutdown/logout as we approach the end of our auction scan
           if blnScanStarted and blnScanMinThresholdMet and (totalAuctions - scannedAuctions < 150) then
 	    if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
 	      print("AucAdvanced: {{"..libName.."}} |cffff0000Warning|r: Shutdown is enabled. World of Warcraft will be shut down once the current scan successfully completes.")
-	    elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logoff")) then
-	      print("AucAdvanced: {{"..libName.."}} |cffff0000Warning|r: Logoff is enabled. This character will be logged of once the current scan successfully completes.")  
+	    elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
+	      print("AucAdvanced: {{"..libName.."}} |cffff0000Warning|r: LogOut is enabled. This character will be logged of once the current scan successfully completes.")  
 	    end
           end
           if totalAuctions - scannedAuctions < 50 then
-            if blnDebug then print("  Debug:ScanFinish Switching LastPageReached=true") end          
+            if blnDebug then print("    Debug:ScanFinish Switching LastPageReached=true") end          
             blnScanLastPage = true
           end
         end
@@ -196,16 +195,14 @@ function private.PerformFinishEvents()
 	blnScanStarted = false
         blnScanStatsReceived = false
         blnScanLastPage = false
-        blnScanCompleted = false
         blnScanMinThresholdMet = false
 	
 	if blnDebug then
   	  print("  Debug:SoundPath: "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-	  --print(string.find(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"), "\\"))
 	  print("  Debug:Message: "..AucAdvanced.Settings.GetSetting("util.scanfinish.message"))
 	  print("  Debug:MessageChannel: "..AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel"))
 	  print("  Debug:Emote: "..AucAdvanced.Settings.GetSetting("util.scanfinish.emote"))
-	  print("  Debug:LogOff: "..castToString(AucAdvanced.Settings.GetSetting("util.scanfinish.logoff")))
+	  print("  Debug:LogOut: "..castToString(AucAdvanced.Settings.GetSetting("util.scanfinish.logout")))
 	  print("  Debug:ShutDown: "..castToString(AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")))
 	end
 
@@ -242,24 +239,24 @@ function private.PerformFinishEvents()
 	
 	--Shutdown or Logoff
 	if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
-	  print("AucAdvanced: {{"..libName.."}} Shutting Down!!   Enjoy the outside :)")
-	  Quit()
-	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logoff")) then
-	  print("AucAdvanced: {{"..libName.."}} Logging Out!      See ya soon :)")
-	  logoff()
+	  print("AucAdvanced: {{"..libName.."}} Shutting Down!!")
+	  if not blnDebug then Quit() end
+	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
+	  print("AucAdvanced: {{"..libName.."}} Logging Out!")
+	  if not blnDebug then Logout() end
 	end
 end
 	
 
 function castToString(input)
-  if (type(input) == "boolean") then
+  if (type(input) == "nil") then
+    return "nil"
+  elseif (type(input) == "boolean") then
     if input then
       return "true"
     else 
       return "false"
     end
-  elseif (type(input) == "nil") then
-    return "nil"
   elseif (type(input) == "string") or (type(input) == "number") then
     return input
   else
@@ -275,7 +272,7 @@ function private.SetupConfigGui(gui)
 
 	gui:AddHelp(id, "what is scanfinish",
 		"What is ScanFinish?",
-		" ScanFinish is an AuctioneerAdvanced module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\n ScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or btmscan activities. Unfortunatly, this also means the functionality will not be enabled in neutral auction houses with under "..intScanMinThreshold.." items."
+		" ScanFinish is an AuctioneerAdvanced module that will execute one or more useful events once Auctioneer has completed a scan successfully.\n\n ScanFinish will only execute these events during full Auctioneer scans with a minimum threshold of "..intScanMinThreshold .." items, so there is no worry about logging off or spamming emotes during the incremental scans or BottomScanner activities. Unfortunately, this also means the functionality will not be enabled in auction houses with under "..intScanMinThreshold.." items."
         )
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
@@ -326,14 +323,14 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Selecting one of these channels will cause your character say the message text into the selected channel once Auctioneer has completed a scan successfully. \n\nBy choosing Emote, your character will use the text above as a custom emote. \n\nBy selecting None, no message will be sent.")
 
 
-	gui:AddControl(id, "Subhead",    0,    "Shutdown or Log Off")
+	gui:AddControl(id, "Subhead",    0,    "Shutdown or Log Out")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanfinish.shutdown", "Shutdown World of Warcraft")
 	gui:AddTip(id, "Selecting this option will cause Auctioneer to shut down World of Warcraft completely once Auctioneer has completed a scan successfully.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.scanfinish.logoff", "Log Off the current character")
-	gui:AddTip(id, "Selecting this option will cause Auctioneer to log off the current character once Auctioneer has completed a scan successfully. \n\nIf Shutdown is enabled, selecting this will have no effect")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.scanfinish.logout", "Log Out the current character")
+	gui:AddTip(id, "Selecting this option will cause Auctioneer to log out to the character select screen once Auctioneer has completed a scan successfully. \n\nIf Shutdown is enabled, selecting this will have no effect")
 	
 	
-	--Debug
+	--Debug switch via gui. Currently not exposed to the end user
 	--gui:AddControl(id, "Subhead",    0,    "")
 	--gui:AddControl(id, "Checkbox",   0, 1, "util.scanfinish.debug", "Show Debug Information for this session")
 
