@@ -53,6 +53,7 @@ local print = lib.Print
 private.isScanning = false
 private.curPage = 0
 private.scanDir = 1
+private.filteredCount = 0
 
 local LclAucScanData = nil
 function private.LoadAuctionImage()
@@ -329,7 +330,10 @@ local function processStats(operation, curItem, oldItem)
 		for engine, engineLib in pairs(AucAdvanced.Modules.Filter) do
 			if (engineLib.AuctionFilter) then
 				local result=engineLib.AuctionFilter(operation, statItem)
-				if (result) then return false end
+				if (result) then 
+					private.filteredCount = private.filteredCount + 1
+					return false 
+				end
 			end
 		end
 	end
@@ -593,6 +597,7 @@ function lib.Commit(wasIncomplete)
 	lib.Print("  {{"..newCount.."}} new items")
 	lib.Print("  {{"..updateCount.."}} updated items")
 	lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
+	lib.Print("  {{"..private.filteredCount.."}} filtered items")
 	lib.Print("  {{"..currentCount.."}} items in DB at end")
 	local scanTime = "  "
 	if (scanTimeHours and scanTimeHours ~= 0) then
@@ -614,7 +619,8 @@ function lib.Commit(wasIncomplete)
 	end
 	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
 	scandata.scanstats[0] = {oldCount = oldCount, sameCount = sameCount, newCount = newCount, updateCount = updateCount,
-		earlyDeleteCount = earlyDeleteCount, expiredDeleteCount = expiredDeleteCount, currentCount = currentCount, missedCount = missedCount}
+		earlyDeleteCount = earlyDeleteCount, expiredDeleteCount = expiredDeleteCount, currentCount = currentCount, 
+		missedCount = missedCount, filteredCount = private.filteredCount}
 	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
 	scandata.scanstats[0].startTime = private.scanStartTime
 	scandata.scanstats[0].endTime = now
@@ -630,6 +636,7 @@ function lib.Commit(wasIncomplete)
 	private.scanStarted = nil
 	private.totalPaused = nil
 	private.curScan = nil
+	private.filteredCount = 0
 
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
