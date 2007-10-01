@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	EnhTooltip - Additional function hooks to allow hooks into more tooltips
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -1328,9 +1328,11 @@ end
 
 function private.GtHookSetInboxItem(funcArgs, retVal, frame, index)
 	local name, _, count, quality = GetInboxItem(index)
-	local itemString = GetInboxItemLink(index)
-	local _, itemLink = GetItemInfo(itemString)
-	return public.TooltipCall(GameTooltip, name, itemLink, quality, count)
+	if (name) then
+		local itemString = GetInboxItemLink(index)
+		local _, itemLink = GetItemInfo(itemString)
+		return public.TooltipCall(GameTooltip, name, itemLink, quality, count)
+	end
 end
 
 function private.GtHookSetInventoryItem(funcArgs, retVal, frame, unit, slot)
