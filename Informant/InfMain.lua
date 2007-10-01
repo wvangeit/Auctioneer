@@ -317,7 +317,7 @@ function GetSellValue(item)
 	elseif type(item) == "string" then
 		-- Find the itemid
 		local _, link = GetItemInfo(item)
-		local _, _, itemid = string.find(link, "item:(%d+)")
+		local _, _, itemid = string.find(link or item, "item:(%d+)")
 		id = tonumber(itemid)
 	end
 
