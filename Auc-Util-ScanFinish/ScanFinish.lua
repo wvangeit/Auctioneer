@@ -1,6 +1,6 @@
 --[[
 	Auctioneer Advanced - Scan Finish module
-	Version: 5.0.2249 (Innuendo of Uther)
+	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
