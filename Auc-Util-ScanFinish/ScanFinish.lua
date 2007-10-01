@@ -40,6 +40,7 @@ local blnScanStatsReceived = false
 local blnScanLastPage = false
 local intScanMinThreshold = 300  --Safeguard to prevent Auditor Refresh button scans from executing our finish events. Use 300 or more to be safe
 local blnScanMinThresholdMet = false
+local strPrevSound = strScanCompleteMP3Path
 
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
@@ -63,13 +64,14 @@ function lib.GetName()
 end
 
 function lib.Processor(callbackType, ...)
-
 	if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
           return
         end
-
+ 
 	if blnDebug then
           print(".")
+          print("  Debug:CallbackType:"..callbackType)
+          print("  Debug:SoundPath:"..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
           print("  Debug:ScanFinish:Processor:CallbackType:"..callbackType)
           print("  Debug:API.IsBlocked="..castToString(AucAdvanced.API.IsBlocked()))          
           print("  Debug:API.IsScanning="..castToString(AucAdvanced.Scan.IsScanning()))
@@ -143,9 +145,7 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
           blnScanStarted = true
           blnScanStatsReceived = false
 	  state = true
-	end
-
-      
+	end      
 
         --if all of the following conditions are met, we should have had a successfully completed full scan
         --1. Has the Processor sent a state of false
@@ -207,18 +207,7 @@ function private.PerformFinishEvents()
 	end
 
         --Sound
-	if AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "none" then
-	  --don't do anything
-	else
-	  if blnDebug then print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) end
-	  if string.find(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"), "\\") == nil then
-	    --print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-	    PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-	  else
-	    --print("AucAdvanced: {{"..libName.."}} You are listening to File "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-	    PlaySoundFile(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"));
-	  end
-	end
+        PlayCompleteSound()
 
 	--Message
 	if AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel") == "none" then
@@ -247,6 +236,20 @@ function private.PerformFinishEvents()
 	end
 end
 	
+function PlayCompleteSound()
+	if AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "none" then
+	  --don't do anything
+	else
+	  if blnDebug then print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) end
+	  if string.find(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"), "\\") == nil then
+	    --print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+	    PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+	  else
+	    --print("AucAdvanced: {{"..libName.."}} You are listening to File "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+	    PlaySoundFile(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"));
+	  end
+	end
+end
 
 function castToString(input)
   if (type(input) == "nil") then
@@ -284,9 +287,14 @@ function private.SetupConfigGui(gui)
 		{"none", "None (do not play a sound)"},
 		{strScanCompleteMP3Path, "Auctioneer Classic"},
 		{"QUESTCOMPLETED","Quest Completed"},
+		{"LEVELUP","Level Up"},
+		{"AuctionWindowOpen","AuctionHouse Open"},
+		{"AuctionWindowClose","AuctionHouse Close"},
+		{"ReadyCheck","Raid ReadyCheck"},
+		{"RaidWarning","Raid Warning"},
+		{"LOOTWINDOWCOINSOUND","Coin"},
 	}, "util.scanfinish.soundpath", "Pick the sound to play")
 	gui:AddTip(id, "Selecting one of these sounds will cause Auctioneer to play that sound once Auctioneer has completed a scan successfully. \n\nBy selecting None, no sound will be played.")
-
 
 	gui:AddControl(id, "Selectbox",  0, 3, {
 		{"none"      , "None (do not emote)"},
@@ -338,8 +346,15 @@ function private.SetupConfigGui(gui)
 end
 
 function private.ConfigChanged()
-        blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")
+	
+	--Debug switch via gui. Currently not exposed to the end user
+        --blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")        
         if blnDebug then print("  Debug:Configuration Changed") end
+       
+        if not (strPrevSound == AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) then
+          PlayCompleteSound()
+          strPrevSound = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+        end
 
 	if (not AucAdvanced.Settings.GetSetting("util.scanfinish.activated")) then
 		if blnDebug then print("  Debug:Updating ScanFinish:Deactivated") end
