@@ -50,7 +50,6 @@ local private = {
 	timeToWaitForResponse = 5,
 	playerName = UnitName("player"),
 }
-AskPrice = private
 local print = AucAdvanced.Print
 
 function lib.GetName()
