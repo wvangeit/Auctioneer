@@ -5,7 +5,8 @@
 	URL: http://auctioneeraddon.com/
 
 	Auctioneer AskPrice created by Mikezter and merged into
-	Auctioneer Advanced by MentalPower.
+	Auctioneer Advanced by MentalPower. Swarm response
+	functionallity added by Kandoko.
 
 	Functions responsible for AskPrice's operation.
 
@@ -33,29 +34,24 @@
 ]]
 
 local libName = "AskPrice"
-AucAdvanced.Modules.Util[libName] = {}
+local libType = "Util"
+AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules.Util[libName]
-local private = {sentAskPriceAd = {}, whisperList = {}}
+local private = {
+	raidUsers = {},
+	raidRoster = {},
+	guildUsers = {},
+	guildRoster = {},
+	whisperList = {},
+	sentRequest = {},
+	requestQueue = {},
+	sentAskPriceAd = {},
+	timeToWaitForPrices = 2,
+	timeToWaitForResponse = 5,
+	playerName = UnitName("player"),
+}
+AskPrice = private
 local print = AucAdvanced.Print
-
-
---Static Variable Table
---Set to local when done debugging
-local SVT = {
-		Users = {},
-		Announcer = true,
-		PricePending = {},--Table containing all data from users and later Average of all data received
-		items = {}, --Table value containing all data from msg
-		PlayerName =  UnitName("player"),
-		UpdateInterval = 0.5, --how often OnUpdate code will execute in seconds
-		TimeSinceLastUpdate = 0,
-		QuestionAsked = false,
-		FinishedLoading = 0,
-		private = {sentAskPriceAd = {}, whisperList = {}}
-	}
-		
-table.insert(SVT.Users,SVT.PlayerName)  --Places player into the user table at start		
-
 
 function lib.GetName()
 	return libName
@@ -68,23 +64,25 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-
 	private.frame = CreateFrame("Frame")
 
 	private.frame:RegisterEvent("CHAT_MSG_RAID_LEADER")
+	private.frame:RegisterEvent("CHAT_MSG_IGNORED")
 	private.frame:RegisterEvent("CHAT_MSG_WHISPER")
 	private.frame:RegisterEvent("CHAT_MSG_OFFICER")
 	private.frame:RegisterEvent("CHAT_MSG_PARTY")
 	private.frame:RegisterEvent("CHAT_MSG_GUILD")
 	private.frame:RegisterEvent("CHAT_MSG_RAID")
 
-	private.frame:RegisterEvent("GUILD_ROSTER_UPDATE")--Used to monitor guild so we update USER table 
-	private.frame:RegisterEvent("CHAT_MSG_ADDON") --standard addon event
-	private.frame:RegisterEvent("PLAYER_LOGIN")  --we use this event to anncounce we are a USER
-		
-	private.frame:SetScript("OnEvent", private.eventHandler)
-	private.frame:SetScript("OnUpdate", private.OnUpdate)
-	
+	private.frame:RegisterEvent("PARTY_MEMBERS_CHANGED")
+	private.frame:RegisterEvent("GUILD_ROSTER_UPDATE")
+	private.frame:RegisterEvent("RAID_ROSTER_UPDATE")
+	private.frame:RegisterEvent("CHAT_MSG_ADDON")
+	private.frame:RegisterEvent("PLAYER_LOGIN")
+
+	private.frame:SetScript("OnEvent", private.onEvent)
+	private.frame:SetScript("OnUpdate", private.onUpdate)
+
 	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
 	Stubby.RegisterFunctionHook("ChatFrame_OnEvent", -200, private.onEventHook)
@@ -93,266 +91,194 @@ function lib.OnLoad(addon)
 	for config, value in pairs(private.defaults) do
 		AucAdvanced.Settings.SetDefault(config, value)
 	end
-	
-	SVT.FinishedLoading = time() --Start the countdown till we monitor the first GuildrosterUpdate .
 end
-
 
 --[[ Local functions ]]--
-function private.OnUpdate()
-
-	if SVT.QuestionAsked == false then return end --If we have nothing pending skip it all
-	 if not (time()-SVT.TimeSinceLastUpdate > SVT.UpdateInterval) then return end --Delay to allow time to recive answers.
-	
-	local Value, Seen = 0,0
-	--Better stat average formula for each response: total = total + (price * seen); count = count + seen; end;  average = total/count
-	for link,t in pairs(SVT.PricePending) do
-	  local size = #(SVT.PricePending[link])--Take size of table use that to iterate over values in the for/do
-	    for count = 1,size do
-	 	Seen = Seen + SVT.PricePending[link][count]["seen"]
-		Value = Value + (SVT.PricePending[link][count]["value"] * SVT.PricePending[link][count]["seen"])		
-	    end
-	   Value = (Value/Seen) --Weighted Average by # of times seen by each client
-	   SVT.PricePending[link] = nil --This nukes that particulair key from the table
-	   SVT.PricePending[link] = {["seen"]=Seen,["value"]=Value} --This replaces the key
-	   Seen,Value = 0,0 --reset 
-	end
-	--We have now converted the Table to a Average price count of all data
-	SVT.TimeSinceLastUpdate = time()
-	SVT.QuestionAsked = false
-	
-	private.Format_Whisper()
-end
-
-function private.eventHandler(event, ...)
-    local event, prefix, msg, how, who = select(1, ...) --This is for an CHAT_MSG_ADDON event
-
-    --Nothing to do if askprice is disabled
+function private.onUpdate(frame, secondsSinceLastUpdate)
+	--Nothing to do if AskPrice is disabled
 	if (not private.getOption('util.askprice.activated')) then
 		return
 	end
-	
-	if (event == "CHAT_MSG_ADDON") then 
-	     private.CHAT_MSG_ADDON(event,...)--used to collect a ADDON Message
-	elseif (event == "PLAYER_LOGIN") then --lets annouce we are a USER
-            SendAddonMessage("AskPrice$", "login", "GUILD") --send msg to tell em' we joined and see who is out there. 
+
+	--Check the request queue for timeouts (We've finished waiting for other clients to send prices)
+	for request, details in pairs(private.requestQueue) do
+		if ((GetTime() - details.timer) >= private.timeToWaitForPrices) then
+			private.sendRequest(request, details)
+			private.requestQueue[request] = nil
+		end
+	end
+
+	--Check the sent queue for timeouts (We've finished waiting the asker to ignore us)
+	for request, details in pairs(private.sentRequest) do
+		if ((GetTime() - details.timer) >= private.timeToWaitForResponse) then
+			private.sentRequest[request] = nil
+		end
+	end
+end
+
+function private.onEvent(frame, event, ...)
+	if (event == "CHAT_MSG_ADDON") then
+		return private.addOnEvent(...)
 	elseif (event == "GUILD_ROSTER_UPDATE") then
-	    private.Guild_Roster_Update() --updates the current Announcers/remove offline
-	end 
+		return private.guildRosterEvent(...)
+	elseif (event == "PARTY_MEMBERS_CHANGED") or (event == "RAID_ROSTER_UPDATE") then
+		return private.raidRosterEvent(...)
+	elseif (event == "PLAYER_LOGIN") then
+		return private.playerLoginEvent(...)
+	elseif (event == "CHAT_MSG_IGNORED") then
+		return private.beingIgnored(...)
+	else
+		return private.chatEvent(event, ...)
+	end
+end
 
-	--Make sure that we recieve the proper events and that our settings allow a response
-	if (not ((event == "CHAT_MSG_WHISPER")
-		or (
-			((event == "CHAT_MSG_GUILD") or
-			(event == "CHAT_MSG_OFFICER")) and
-			private.getOption('util.askprice.guild')
+function private.playerLoginEvent()
+	if (IsInGuild()) then
+		GuildRoster() --Request the Guild data
+	end
+
+	private.sendAddOnMessage("RAID", "MAINR", "login")
+	private.sendAddOnMessage("GUILD", "MAINR", "login")
+end
+
+function private.chatEvent(event, text, player)
+	local channel
+	if (((event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_PARTY") or (event == "CHAT_MSG_RAID_LEADER")) and (private.raidUsers[1] == private.playerName))then
+		channel = "RAID"
+	end
+
+	if (((event == "CHAT_MSG_GUILD") or (event == "CHAT_MSG_OFFICER") and (private.guildUsers[1] == private.playerName))) then
+		channel = "GUILD"
+	end
+
+	if (((event == "CHAT_MSG_WHISPER") and (private.getOption('util.askprice.activated')))) then
+		channel = "WHISPER"
+	end
+
+	if (not (
+		text:find("|Hitem:", 1, true)
+		and
+		(
+			text:sub(1, 1) == private.getOption('util.askprice.trigger')
+			or
+			(
+				private.getOption('util.askprice.smart')
+				and
+				text:lower():find(private.getOption('util.askprice.word1'), 1, true)
+				and
+				text:lower():find(private.getOption('util.askprice.word2'), 1, true)
+			)
 		)
-		or (
-			((event == "CHAT_MSG_PARTY") or
-			(event == "CHAT_MSG_RAID") or
-			(event == "CHAT_MSG_RAID_LEADER")) and
-			private.getOption('util.askprice.party'))
-		)) then
-		return
-	end
-local event, text, player = select(1, ...) --This is format for a "CHAT_MSG_WHISPER"
-	private.eventSwarm(event, text, player)
-end
-
---Ok we need to collect all necessary info
-function private.eventSwarm(event, text, player, client)
-
- if private.getOption('util.askprice.debug') and (event ~= "CHAT_MSG_GUILD")then print("Swarm Start",event," Text ", text, " Player ", player, " Client ",client) end
-	-- Check for marker (trigger char or "smart" words) only if the ignore option is not set
-		if (not (text:sub(1, 1) == private.getOption('util.askprice.trigger'))) then
-			--If the trigger char was not found scan the text for SmartWords (if the feature has been enabled)
-			if (private.getOption('util.askprice.smart')) then
-				-- Check if the custom SmartWords are present in the chat message
-				-- Note, that both words must be contained in the text, to be identified as a valid askprice request.
-				if (not (
-					text:lower():find(private.getOption('util.askprice.word1'), 1, true) and
-					text:lower():find(private.getOption('util.askprice.word2'), 1, true)
-				)) then
-					return
-				end
-			else
-				return
-			end
-		end
-
-	-- Check for itemlink after trigger
-	if (not (text:find("|Hitem:"))) then
+	)) then
 		return
 	end
 
---Need a way to handle party/raid when non announcer client is present. Possibly second/announcer list? 
---Or shall we just keep it simple i.e. if non annoucer present spam the question even if multiple non announcer clients present.
-	if (SVT.Announcer == false) then --If not the announcer ignore
-	   if private.getOption('util.askprice.debug') then print("not announcer "..event) end
-		if (event == "CHAT_MSG_WHISPER") then --Needed to have a way to respond to a whisper to a non announcer client. 
-			SendAddonMessage("AskPrice$", "WHISP: "..player.." "..text, "GUILD") --Send to the Addon channel, the current Announcer will handle it and respond to questioner
-		elseif (event == "CHAT_MSG_PARTY") and (not UnitInParty(SVT.Users[1]))then
-			SendAddonMessage("AskPrice$", "WHISP: "..player.." "..text, "GUILD")
-		elseif (event == "CHAT_MSG_RAID") or (event == "CHAT_MSG_RAID_LEADER") and (not UnitInRaid(SVT.Users[1]))then
-			SendAddonMessage("AskPrice$", "WHISP: "..player.." "..text, "GUILD")
-		end
-	   return
-	end 
+	local items = private.getItems(text)
+	if (channel == "GUILD") or (channel == "RAID") then
+		for i = 1, #items, 2 do
+			local count = items[i]
+			local link = items[i+1]
 
-	--OK Lets QUERY our clients for item info
-	SVT.items = private.getItems(text)	--Parse the text and separate out the different links
-		
-	SVT.TimeSinceLastUpdate = time() --keeps the onupdate from fireing, as long as we are reciving data
-	--Query other users using addon channel 
-	for key, item in ipairs(SVT.items) do
-		SVT.items[key]["name"] = player --add player whooriginally asked the question 
-		SVT.items[key]["client"] = client --client who sent question
-		SVT.QuestionAsked = true --used to prevent onupdate from running unless we need it 
-		SendAddonMessage("AskPrice$", "QUERY: "..item.link, "GUILD")
+			private.sendAddOnMessage(channel, "QUERY", link, count, player, channel)
+		end
+	elseif (channel == "WHISPER") then
+		for i = 1, #items, 2 do
+			local count = items[i]
+			local link = items[i+1]
+
+			private.sendResponse(link, count, player, 1, private.getData(link))
+		end
 	end
- if private.getOption('util.askprice.debug') then print("Swarm End") end
 end
 
-function private.Format_Whisper()
-	local seenCount, marketValue, vendorPrice, askedCount, usedStack, multipleItems, count, player,client
-	--Parse the text and separate out the different links
-	for link,v in pairs(SVT.PricePending) do
+function private.sendRequest(request, details)
+	local link = details.itemLink
+	local count = details.stackCount
+	local player = details.sourcePlayer
+	local totalPrice = details.totalPrice
+	local vendorPrice = details.vendorPrice
+	local answerCount = details.answerCount
+	local totalSeenCount = details.totalSeenCount
 
-		  _, _, vendorPrice = private.getData(link)
-		seenCount = SVT.PricePending[link]["seen"]
-		marketValue = SVT.PricePending[link]["value"]
-		
-			for key, item in ipairs(SVT.items) do --Do the items in the order they were recieved.
-			   if link == item.link then
-				count = item.count
-				player = item.name
-				client = item.client	
-			   end
-			end
-			
-		--If this is a raid/party/whisper message to a non announcer client lets send the data to them. they will whisper to Original questioner
-		if client and player then --client is nil on normal operations, only valid if its a PRW
-			if not count then count = 0 end
-			local msg = strjoin(":", client, player, count, seenCount, marketValue)
-			if private.getOption('util.askprice.debug') then print(client, player, count, seenCount, marketValue) end
-			SendAddonMessage("AskPrice$", "PRW: "..msg.." "..link, "GUILD") 
+	--Reset the timer and move the request over to the sent queue.
+	details.timer = GetTime()
+	private.sentRequest[request] = details
+
+	--Send the response
+	return private.sendResponse(link, count, player, answerCount, totalSeenCount, totalPrice, vendorPrice)
+end
+
+function private.sendResponse(link, count, player, answerCount, totalSeenCount, totalPrice, vendorPrice)
+	local marketPrice = math.floor(totalPrice/totalSeenCount)
+
+	--If the stack size is grater than one, add the unit price to the message
+	local strMarketOne
+	if (count > 1) then
+		strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketPrice, nil, true))
+	else
+		strMarketOne = ""
+	end
+
+	if (totalSeenCount > 0) then
+		local averageSeenCount = math.floor(totalSeenCount/answerCount + 0.5)
+		private.sendWhisper(
+			("%s: Seen an average of %d times at auction by %d people using Auctioneer Advanced"):format(
+				link,
+				averageSeenCount,
+				answerCount),
+			player
+		)
+		private.sendWhisper(
+			("%sMarket Value: %s%s"):format(
+				"    ",
+				EnhTooltip.GetTextGSC(marketPrice * count, nil, true),
+				strMarketOne),
+			player
+		)
+	else
+		private.sendWhisper(
+			("%s: Never seen at %s by Auctioneer Advanced"):format(
+				link,
+				AucAdvanced.GetFaction()
+			),
+			player
+		)
+	end
+
+	--Send out vendor info if we have it
+	if --[[private.getOption('util.askprice.vendor') and ]](vendorPrice and (vendorPrice > 0)) then
+
+		local strVendOne
+		--Again if the stack Size is greater than one, add the unit price to the message
+		if (count > 1) then
+			strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true))
+		else
+			strVendOne = ""
 		end
+
+		private.sendWhisper(
+			("%sSell to vendor for: %s%s"):format(
+				"    ",
+				EnhTooltip.GetTextGSC(
+					vendorPrice * count,
+					nil,
+					true
+				),
+				strVendOne
+			),
+			player
+		)
+	end
 	
-			--If there are multiple items send a separator line (since we can't send \n's as those would cause DC's)
-			if (multipleItems) then
-				private.sendWhisper("    ", player)
-			end
-
-			local strMarketOne
-			--If the stackSize is grater than one, add the unit price to the message
-		if not count then count = 0 end
-			if (count > 1) then
-				strMarketOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(marketValue, nil, true))
-			else
-				strMarketOne = ""
-			end
-
-			if (seenCount > 0) then
-				private.sendWhisper(("%s: Seen %d times at auction total by Auctioneer Advanced"):format(link, seenCount), player)
-				private.sendWhisper(
-					("%sMarket Value: %s%s"):format(
-						"    ",
-						EnhTooltip.GetTextGSC(marketValue*count, nil, true),
-						strMarketOne),
-					player
-				)
-			else
-				private.sendWhisper(link..": "..("Never seen at %s by Auctioneer Advanced"):format(AucAdvanced.GetFaction()), player)
-			end
-
-			--Send out vendor info if we have it
-		if not vendorPrice then vendorPrice = 0 end --Hearthstone and other non vendor pice items threw errors here
-			if (private.getOption('util.askprice.vendor') and (vendorPrice > 0)) then
-
-				local strVendOne
-				--Again if the stackSize is greater than one, add the unit price to the message
-				if (count > 1) then
-					strVendOne = ("(%s each)"):format(EnhTooltip.GetTextGSC(vendorPrice, nil, true))
-				else
-					strVendOne = ""
-				end
-
-				private.sendWhisper(
-					("%sSell to vendor for: %s%s"):format(
-						"    ",
-						EnhTooltip.GetTextGSC(vendorPrice * count, nil, true),
-						strVendOne),
-					player
-				)
-			end
-
-			usedStack = usedStack or (count > 1)
-			multipleItems = true
-	end
-
-	--Once we're done sending out the itemInfo, check if the person used the stack size feature, if not send them the ad message.
-	if ((not usedStack) and (private.getOption('util.askprice.ad'))) then
+	if (not (count > 1)) and (private.getOption('util.askprice.ad')) then
 		if (not private.sentAskPriceAd[player]) then --If the player in question has been sent the ad message in this session, don't spam them again.
 			private.sentAskPriceAd[player] = true
 			private.sendWhisper(("Get stack prices with %sCount[ItemLink] (Count = stacksize)"):format(private.getOption('util.askprice.trigger')), player)
 		end
 	end
-
-SVT.PricePending = {}	
 end
 
---Send a response to the addon channel when a QUERY is sent by the announcer
-function private.Util_Query(_, prefix, msg, how, player) 
-	if private.getOption('util.askprice.debug') then print("Query sent") end 
-
-	local  _,link = string.match( msg, "(QUERY:%s)(.*)" )
-	local seenCount, marketValue, _ =  private.getData(link)
-	if not seenCount then seenCount = 0 end
-	if not marketValue then marketValue = 0 end
-	
-	if (seenCount) and (marketValue) then
-		SendAddonMessage("AskPrice$", "PRICE: "..seenCount.." "..marketValue.." "..link, "GUILD") 
-	end
-end
---WHISP this even is triggered by a non announcer client in a party/raid/direct whisp setting
-function private.Util_Whisper(_, prefix, msg, how, client) 
-	local  _, player, text = string.match( msg, "(WHISP:%s)(.-)%s(.*)" ) 
-	local event = "CHAT_MSG_WHISPER"
-	
-	if private.getOption('util.askprice.debug') then print("Whisper from non announcer Received ", text, player, client) end
-	private.eventSwarm(event, text, player, client)
-
-end
---PRW Party/Raid/Whisper to Announcer to client response
-function private.Util_PRW(_, prefix, msg, how, who) 
-	if private.getOption('util.askprice.debug') then print("Announcer response from party/raid/whisper client received") end
-			
-	local  _,data, link = string.match(msg, "(PRW:%s)(.-)%s(.+)" )
-	local _, player, count, seen, value = strsplit(":", data)
-	--Bah need to convert my values back to Numeric
-	count = tonumber(count) or 0; seen = tonumber(seen) or 0; value = tonumber(value) or 0
-						
-	table.insert(SVT.items, {["link"] = link, ["count"] = count, ["name"] = player,})
-	
-	if not SVT.PricePending[link] then SVT.PricePending[link]={} end 
-	local S = (#(SVT.PricePending[link])+1) --Size of the table +1
-	SVT.PricePending[link][S]={["seen"]=seen,["value"]=value}
-	SVT.QuestionAsked = true --used to prevent onupdate from running unless we need it 
-end
-
-function private.Util_Response(_, prefix, msg, how, who)
-	if private.getOption('util.askprice.debug') then print("response sent") end
-
-	local  _,seen,value,link = string.match(msg, "(PRICE:%s)(%d-%s)(.-%s)(.+)" )
-	if not SVT.PricePending[link] then SVT.PricePending[link]={} end 
-	local S = (#(SVT.PricePending[link])+1) --Size of the table +1
-	SVT.PricePending[link][S]={["seen"]=seen,["value"]=value}
-
-if private.getOption('util.askprice.debug') then print("Response "..link.." "..seen.." "..value) end		
-end
-
-
-function private.onEventHook() --%ToDo% Change the prototype once Blizzard changes their functions to use paramenters instead of globals.
+function private.onEventHook() --%ToDo% Change the prototype once Blizzard changes their functions to use parameters instead of globals.
 	if (event == "CHAT_MSG_WHISPER_INFORM") then
 		if (private.whisperList[arg1]) then
 			private.whisperList[arg1] = nil
@@ -365,22 +291,22 @@ end
 
 function private.getData(itemLink)
 	local marketValue, seenCount = AucAdvanced.API.GetMarketValue(itemLink, AucAdvanced.GetFaction())
-	local vendorPrice = GetSellValue(itemLink)
+	local vendorPrice = GetSellValue and GetSellValue(itemLink)
 
-	return seenCount, marketValue, vendorPrice
+	return seenCount or 0, marketValue or 0, vendorPrice or 0
 end
-
 
 --Many thanks to the guys at irc://chat.freenode.net/wowi-lounge for their help in creating this function
 local itemList = {}
 function private.getItems(str)
 	if (not str) then return nil end
-	for k in pairs(itemList) do
-		itemList[k] = nil
+	for i = #itemList, 1, -1 do
+		itemList[i] = nil
 	end
 
 	for number, color, item, name in str:gmatch("(%d*)%s*|c(%x+)|Hitem:([^|]+)|h%[(.-)%]|h|r") do
-		table.insert(itemList, {link = "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r", count = tonumber(number) or 1})
+		table.insert(itemList, tonumber(number) or 1)
+		table.insert(itemList, "|c"..color.."|Hitem:"..item.."|h["..name.."]|h|r")
 	end
 	return itemList
 end
@@ -388,6 +314,200 @@ end
 function private.sendWhisper(message, player)
 	private.whisperList[message] = true
 	SendChatMessage(message, "WHISPER", AucAdvanced.Const.PLAYERLANGUAGE, player)
+end
+
+function private.sendAddOnMessage(channel, ...)
+	local message = string.join(";", ...)
+	SendAddonMessage("AucAdvAskPrice", message, channel)
+end
+
+function private.addOnEvent(prefix, message, sourceChannel, sourcePlayer)
+	if (not (prefix == "AucAdvAskPrice")) then
+		return
+	end
+
+	--Decode the message
+	local requestType, link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount = string.split(";", message)
+	local request
+	if (link and count and player and channel) then
+		request = link..count..player..channel
+	end
+
+	if (sourceChannel == "PARTY") then --Adjust the source if its party.
+		sourceChannel = "RAID"
+	end
+
+	if (requestType == "QUERY") then --AskPrice query was received by someone and is requesting prices for that query.
+		if (
+			(
+				(channel == "GUILD")
+				and
+				(private.guildUsers[1] == private.playerName)
+			) or (
+				(channel == "RAID")
+				and
+				(private.raidUsers[1] == private.playerName)
+			)
+		) then
+			private.requestQueue[request] = {
+				timer = GetTime(),
+
+				itemLink = link,
+				stackCount = tonumber(count),
+				sourcePlayer = player,
+				sourceChannel = channel,
+
+				totalPrice = 0,
+				answerCount = 0,
+				totalSeenCount = 0,
+			}
+		end
+
+		local seenCount, marketValue, vendorPrice = private.getData(link)
+		private.sendAddOnMessage(sourceChannel, "PRICE", link, count, player, channel, marketValue, seenCount, vendorPrice)
+	elseif (requestType == "PRICE") then --AskPrice users are responding to the query. We only listen to these if we were the announcer when the QUERY event that pertained to this PRICE event was fired (see above)
+		if (private.requestQueue[request]) then
+			--Better stat average formula for each response: total = total + (price * seen) count = count + seen end  average = total/count
+			local request = private.requestQueue[request]
+			local count = request.totalSeenCount + totalSeenCount
+			local total = request.totalPrice + (totalPrice * totalSeenCount)
+
+			request.totalPrice = total
+			request.totalSeenCount = count
+			request.vendorPrice = request.vendorPrice or tonumber(vendorPrice)
+			request.answerCount = request.answerCount + 1
+		end
+	elseif (requestType == "WFAIL") then --Whisper failed (Announcer is being ignored)
+		if (
+			(
+				(channel == "GUILD")
+				and
+				private.binarySearch(private.guildUsers, private.playerName) == private.binarySearch(private.guildUsers, sourcePlayer) + 1
+			) or (
+				(channel == "RAID")
+				and
+				private.binarySearch(private.raidUsers, private.playerName) == private.binarySearch(private.raidUsers, sourcePlayer) + 1
+			)
+		) then
+			local details = {
+				timer = GetTime(),
+
+				itemLink = link,
+				stackCount = count,
+				sourcePlayer = player,
+				sourceChannel = channel,
+
+				totalPrice = totalPrice,
+				vendorPrice = vendorPrice,
+				answerCount = answerCount,
+				totalSeenCount = totalSeenCount
+			}
+
+			private.sendRequest(request, details)
+		end
+	elseif (requestType == "MAINR") then --General type of request (Version, login, etc)
+		local subRequest = link
+
+		if (subRequest == "login") then
+			private.sendAddOnMessage(sourceChannel, "MAINR", "online")
+
+		elseif (subRequest == "online") or (subRequest == "logout") then
+			local askPriceUserList
+			if (sourceChannel == "GUILD") then
+				askPriceUserList = private.guildUsers
+			elseif ((sourceChannel == "PARTY") or (sourceChannel == "RAID")) then
+				askPriceUserList = private.raidUsers
+			end
+
+			local insertOrRemoveLocation = private.binarySearch(askPriceUserList, sourcePlayer)
+
+			if (subRequest == "online") then
+				if (not (askPriceUserList[insertOrRemoveLocation] == sourcePlayer)) then
+					table.insert(askPriceUserList, insertOrRemoveLocation, sourcePlayer)
+				end
+
+			elseif (subRequest == "logout") then
+				if (askPriceUserList[insertOrRemoveLocation] == sourcePlayer) then
+					table.remove(askPriceUserList, insertOrRemoveLocation, sourcePlayer)
+				end
+			end
+
+		elseif (subRequest == "version") then
+			private.sendAddOnMessage(sourceChannel, "MAINR", "version:", private.GetVersion())
+		end
+	end
+end
+
+function private.beingIgnored(sourcePlayer)
+	--Check the sent queue for occurances of the ignored player
+	for request, details in pairs(private.sentRequest) do
+		if (details.sourcePlayer == sourcePlayer) then
+			local link, count, player, channel = details.itemLink, details.stackCount, details.sourcePlayer, details.sourceChannel
+			local totalPrice, totalSeenCount, vendorPrice, answerCount = details.totalPrice, details.totalSeenCount, details.vendorPrice, details.answerCount
+			private.sendAddOnMessage(sourceChannel, "WFAIL", link, count, player, channel, totalPrice, totalSeenCount, vendorPrice, answerCount)
+		end
+	end
+end
+
+--This will retrieve current online Guild members and remove anyone no longer online from the Guild AskPrice users list
+function private.guildRosterEvent()
+	if (not GetGuildInfo("player")) then
+		return
+	end
+
+	for name in pairs(private.guildRoster) do
+		private.guildRoster[name] = nil
+	end
+
+	for i = 1, GetNumGuildMembers(true) do
+		local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
+		if (name and online) then
+			private.guildRoster[name] = true
+		end
+	end
+
+	for index, name in ipairs(private.guildUsers) do
+	    if not private.guildRoster[name] then --Person is no longer online
+			table.remove(private.guildUsers, index)
+	    end
+	end
+end
+
+function private.raidRosterEvent(...) --TODO: There MUST be a better way of doing this
+	private.sendAddOnMessage("RAID", "MAINR", "login") --Always send a login event, since groups are volatile
+
+	--Clear out the table in preparation for the online events to fire
+	for i = #private.raidUsers, 1, -1 do
+		private.raidUsers[i] = nil
+	end
+end
+
+function private.GetVersion()
+	return tonumber(("$Revision$"):match("(%d+)"))
+end
+
+local function compDefault(a, b) return a < b end
+function private.binarySearch(table, value, compFunction)
+	compFunction = compFunction or compDefault
+
+	local startIndex, endIndex, middleIndex, stateIndex = 1, #table, 1, 0
+
+	while (startIndex <= endIndex) do
+		middleIndex = math.floor((startIndex + endIndex) / 2)
+
+		if (compFunction(value, table[middleIndex])) then
+			endIndex, stateIndex = middleIndex - 1, 0
+		else
+			startIndex, stateIndex = middleIndex + 1, 1
+		end
+	end
+
+	local finalIndex = middleIndex + stateIndex
+	if (table[finalIndex - 1] == value) then
+		return finalIndex - 1
+	else
+		return finalIndex
+	end
 end
 
 --[[ Configator Section ]]--
@@ -402,8 +522,8 @@ private.defaults = {
 	["util.askprice.whispers"]     = true,
 	["util.askprice.word1"]        = "what",
 	["util.askprice.word2"]        = "worth",
-	["util.askprice.login"]		= true,
-	["util.askprice.debug"]		= false,	
+	["util.askprice.login"]        = true,
+	["util.askprice.debug"]        = true,
 }
 
 function private.getOption(option)
@@ -429,110 +549,11 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",    0,    "Swarm:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.login", "Shows (enabled) or hides (disabled) Login/Online/Anouncer message.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.debug", "Shows (enabled) or hides (disabled) debug messages.")
-	
+
 	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.smart", "Enable SmartWords checking.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.vendor", "Enable the sending of vendor pricing data.")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
-	
+
 end
-
-
-function private.CHAT_MSG_ADDON(event, ...)
-	local event, prefix, msg, how, who = select(1, ...)
-	
-	if ( prefix ~= "AskPrice$" ) then return end --Event for deciding who the guild announcer is
-      
-	if  "QUERY: " == (string.match( msg, "(QUERY:%s)" )) then --This handles a query for a price check from teh guild addon channel
-		private.Util_Query(event, prefix, msg, how, who)
-			return
-	elseif  "PRICE: " == (string.match( msg, "(PRICE:%s)" )) and (SVT.Announcer == true) then --This handles a response for a price check from the guild addon channel
-		private.Util_Response(event, prefix, msg, how, who) 
-			return 
-	elseif  "WHISP: " == (string.match( msg, "(WHISP:%s)" )) and (SVT.Announcer == true) then --This handles a Whsiper when we are not the announcer
-		private.Util_Whisper(event, prefix, msg, how, who) 
-			return
-	elseif ("PRW: "..SVT.PlayerName) == (string.match( msg, "(PRW:%s%a-):" )) then --This handles a GuildAnnouncer response to a client in PartyRaidWhisper question
-		private.Util_PRW(event, prefix, msg, how, who) 
-			return
-	elseif ( msg == "login" ) or ( msg == "online" ) and (who ~= SVT.PlayerName) then  --prevents the event from firing when we login and announce	
-		local PlayerInTable = false
-
-		if ( msg == "login" )  then --handles logins after our login
-		   SendAddonMessage("AskPrice$", "online", "GUILD") --send alert letting them know we are online
-			if private.getOption('util.askprice.login') then print("we received a login msg from "..who) end --send a login/online message if the user wants to see it
-		elseif ( msg == "online" )  then --handles logins before our login
-			if private.getOption('util.askprice.login') then print("we received a online msg from "..who) end--send a login/online message if the user wants to see it
-		end
-
-		for index,value in pairs(SVT.Users) do
-			if who == value then 
-			    PlayerInTable = true  --set true if player is in table already
-			end
-		end
-				
-		if PlayerInTable == false then  --adds the player to the list of share users
-		    table.insert(SVT.Users,who)
-		end
-
-		table.sort(SVT.Users, function (a,b)
-			return (a < b)
-		end)
-
-		 if private.getOption('util.askprice.login') then print("announcer is "..SVT.Users[1] ) end --send a login/online message if the user wants to see it
-			
-		if SVT.Users[1] == SVT.PlayerName then 
-			SVT.Announcer = true
-		else    
-			SVT.Announcer = false
-		end  
-	end
- 
-end
-
--- *****************************************************************************
--- This will retrive current online Guild members.
--- *****************************************************************************
-function private.Guild_Roster_Update()
-
-	if (time() - SVT.FinishedLoading) < 60 then return end --We have to Delay or we get an unknown unit token error on login
-	local guildName, _,_ = GetGuildInfo(SVT.PlayerName) --this little statement prevents us from trying to update a guild if the character is not guilded
-	if guildName == nil then return end --this little statement prevents us from trying to update a guild if the character is not guilded
-
-	local count = GetNumGuildMembers(true)
-	local tempTable={}
-	local OnlineTable = {}  --this will give us a clean table on every Guild update event
-
-
-	for i=1,count
-	do
-	    local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
-	    if(name and online)
-	    then
-		table.insert(OnlineTable,name)
-	    end
-	end
-
-	for index,value in pairs(SVT.Users) do
-	    for i,v in pairs(OnlineTable) do
-		if v == value then --name is online
-		    table.insert(tempTable,value)
-		end
-	    end
-	end
-
-	SVT.Users = tempTable  --replace old table with new
-
-	table.sort(SVT.Users, function (a,b)
-		return (a < b)
-	end)
-
-	--DOH we need change the variable if we become announcer 
-	if SVT.Users[1] == SVT.PlayerName then 
-	   SVT.Announcer = true
-	else    
-	   SVT.Announcer = false
-	end  
-
-end 
