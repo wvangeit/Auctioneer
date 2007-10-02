@@ -56,6 +56,9 @@ if (not AucAdvanced.Modules) then AucAdvanced.Modules = {Stat={},Util={},Filter=
 if (not AucAdvancedData.Stats) then AucAdvancedData.Stats = {} end
 if (not AucAdvancedLocal.Stats) then AucAdvancedLocal.Stats = {} end
 
+-- Load DebugLib
+local DebugLib = LibStub("DebugLib")
+
 function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantity, cost, additional)
 	if EnhTooltip.LinkType(hyperlink) ~= "item" then
 		return -- Auctioneer hooks into item tooltips only
