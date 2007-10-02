@@ -108,6 +108,7 @@ function lib.AuctionFilter(operation, itemData)
 	local maxcap = value * level
 
 	-- If the price is acceptible then allow it
+	if itemData.stackSize > 1 then price = math.floor(price / itemData.stackSize) end
 	if price < maxcap then return false end
 
 	-- Otherwise this item needs to be filtered
