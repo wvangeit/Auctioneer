@@ -42,6 +42,9 @@ local roundUp
 
 local createProfiler
 
+local DebugLib = LibStub("DebugLib")
+DebugLib = DebugLib("Enchantrix-Barker")
+
 ------------------------
 --   Item functions   --
 ------------------------
@@ -253,8 +256,8 @@ ENX_DEBUG = 6
 
 function Barker.Util.DebugPrint(mType, mLevel, mTitle, ...)
 	-- function debugPrint(addon, message, category, title, errorCode, level)
-	local message = DebugLib.Dump(...)
-	DebugLib.DebugPrint("EnchantrixBarker", message, mType, mTitle, 1, mLevel)
+	local message = DebugLib:Dump(...)
+	DebugLib:Debug(message, mType, mTitle, 1, mLevel)
 end
 
 -- when you just want to print a message and don't care about the rest
