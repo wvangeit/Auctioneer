@@ -1,4 +1,4 @@
-﻿--[[
+--[[
 	BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -1299,7 +1299,7 @@ BtmScan.PromptPurchase = function(item)
 	BtmScan.Prompt.Lines[10]:SetLine("  "..tr("Profit above requirements:"), BtmScan.Coins(item.profit,true))
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexture(item.tex)
 	BtmScan.Prompt.Item:GetNormalTexture():SetTexCoord(0,1,0,1)
-	PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3")
+	if BtmScan.Settings.GetSetting("playSound") then PlaySoundFile("Interface\\AddOns\\btmScan\\Sounds\\DoorBell.mp3") end
 	BtmScan.Prompt:Show()
 end
 

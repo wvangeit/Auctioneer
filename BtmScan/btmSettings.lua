@@ -112,6 +112,7 @@ local settingDefaults = {
 	['global.maxprice'] = 25000,
 	['never.buy'] = false,
 	['never.bid'] = false,
+	['playSound'] = true,
 }
 
 function getDefault(setting)
@@ -354,6 +355,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",          0,    "Buy/Bid Preferences")
 	gui:AddControl(id, "Checkbox",         0, 1, "never.buy", "Never buyout items")
 	gui:AddControl(id, "Checkbox",         0, 1, "never.bid", "Never bid on items")
+	gui:AddControl(id, "Checkbox",	       0, 1, "playSound", "Play sound when a bargain is found")
 
   	gui:AddCat("Evaluators:")
 
