@@ -33,14 +33,16 @@
 local libName = "ScanFinish"
 local libType = "Util"
 local blnDebug = false
-local strScanCompleteMP3Path = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+local strScanCompleteMP3Path = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+
+
 
 local blnScanStarted = false
 local blnScanStatsReceived = false
 local blnScanLastPage = false
 local intScanMinThreshold = 300  --Safeguard to prevent Auditor Refresh button scans from executing our finish events. Use 300 or more to be safe
 local blnScanMinThresholdMet = false
-local strPrevSound = strScanCompleteMP3Path
+local strPrevSound = "AuctioneerClassic"
 
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
@@ -57,7 +59,7 @@ The following functions are part of the module's exposed methods:
 	OnLoad()          (optional) Receives load message for all modules
 
 	(*) Only implemented in stats modules; util modules do not provide
-]]
+--]]
 
 function lib.GetName()
 	return libName
@@ -71,7 +73,7 @@ function lib.Processor(callbackType, ...)
 	if blnDebug then
 		print(".")
 		print("  Debug:CallbackType:", callbackType)
-		print("  Debug:SoundPath:", AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+		print("  Debug:Sound:", AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		print("  Debug:ScanFinish:Processor:CallbackType:", callbackType)
 		print("  Debug:API.IsBlocked=", AucAdvanced.API.IsBlocked())
 		print("  Debug:API.IsScanning=", AucAdvanced.Scan.IsScanning())
@@ -121,6 +123,7 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 	end
 
 	if blnDebug then
+		print(" Debug:Sound: "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		print("	Debug:ScanStarted="..tostring(blnScanStarted))
 		print("	Debug:ScanLastPage="..tostring(blnScanLastPage))
 		print("	Debug:ScanStatsReceived="..tostring(blnScanStatsReceived))
@@ -143,6 +146,7 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 			print("	Debug:Updating ScanStatsReceived=false")
 		end
 		blnScanStarted = true
+		blnScanLastPage = false
 		blnScanStatsReceived = false
 		state = true
 	end
@@ -202,7 +206,6 @@ function private.PerformFinishEvents()
 	blnScanMinThresholdMet = false
 
 	if blnDebug then
-		print("  Debug:SoundPath: "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		print("  Debug:Message: "..AucAdvanced.Settings.GetSetting("util.scanfinish.message"))
 		print("  Debug:MessageChannel: "..AucAdvanced.Settings.GetSetting("util.scanfinish.messagechannel"))
 		print("  Debug:Emote: "..AucAdvanced.Settings.GetSetting("util.scanfinish.emote"))
@@ -247,12 +250,12 @@ function PlayCompleteSound()
 		if blnDebug then
 			print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		end
-		if string.find(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"), "\\") == nil then
-			--print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-			PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+		if AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "AuctioneerClassic" then
+			strAucClassSoundPath = GetAuctioneerClassicSoundPath()
+			if blnDebug then print("  Debug:Auctioneer Classic path set to"..strAucClassSoundPath) end
+			PlaySoundFile(strAucClassSoundPath)
 		else
-			--print("AucAdvanced: {{"..libName.."}} You are listening to File "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
-			PlaySoundFile(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+			PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		end
 	end
 end
@@ -275,7 +278,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",	0,	"Sound & Emote")
 	gui:AddControl(id, "Selectbox",  0, 3, {
 		{"none", "None (do not play a sound)"},
-		{strScanCompleteMP3Path, "Auctioneer Classic"},
+		{"AuctioneerClassic", "Auctioneer Classic"},
 		{"QUESTCOMPLETED","Quest Completed"},
 		{"LEVELUP","Level Up"},
 		{"AuctionWindowOpen","AuctionHouse Open"},
@@ -335,8 +338,28 @@ function private.SetupConfigGui(gui)
 
 end
 
-function private.ConfigChanged()
+function GetAuctioneerClassicSoundPath()
+	
+	strAucClassicSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+	-- Check to see if we are an embedded module instead of a plain add-on
+	--If so, return the Auc-Advanced\\Modules path to the ScanComplete.mp3 accordingly
+	--Tried to get this to work on OnLoad, but this isn't working since it most likely isn't in the table yet
+	if blnDebug then print("  Debug:Determining AuctioneerClassic Path") end
+	for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
+		--print("  Debug:Comparing Auc-Util-"..libName.." with "..module)
+		if "Auc-Util-"..libName == module then
+			if blnDebug then print("  Debug:Auc-Util-"..libName.." is an embedded module") end
+			strAucClassicSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+			break
+		end
+	end
+	if blnDebug then print("  Debug:Auc-Util-"..libName.." is an addon (non-embedded)") end
+	return strAucClassicSoundPath
+end
 
+
+
+function private.ConfigChanged()
 	--Debug switch via gui. Currently not exposed to the end user
 		--blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")
 		if blnDebug then
