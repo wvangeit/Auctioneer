@@ -33,8 +33,7 @@
 local libName = "ScanFinish"
 local libType = "Util"
 local blnDebug = false
-local strScanCompleteMP3Path = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
-
+local blnLibEmbedded = nil
 
 
 local blnScanStarted = false
@@ -99,7 +98,6 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.scanfinish.activated", true)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.shutdown", false)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.logout", false)
-	AucAdvanced.Settings.SetDefault("util.scanfinish.soundpath", strScanCompleteMP3Path)
 	AucAdvanced.Settings.SetDefault("util.scanfinish.message", "So many auctions...so little time")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.messagechannel", "none")
 	AucAdvanced.Settings.SetDefault("util.scanfinish.emote", "none")
@@ -251,9 +249,21 @@ function PlayCompleteSound()
 			print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		end
 		if AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "AuctioneerClassic" then
-			strAucClassSoundPath = GetAuctioneerClassicSoundPath()
-			if blnDebug then print("  Debug:Auctioneer Classic path set to"..strAucClassSoundPath) end
-			PlaySoundFile(strAucClassSoundPath)
+			if blnLibEmbedded == nil then
+			  	blnLibEmbedded = IsLibEmbedded()
+			end
+			strSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+			if blnLibEmbedded then
+				strSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"		
+			end
+			
+			--Known PlaySoundFile bug seems to require some event preceeding it to get it to work reliably
+			--Can get this working as a print to screen or an internal sound. Other developers
+			--suggested this workaround.
+			--http://forums.worldofwarcraft.com/thread.html?topicId=1777875494&sid=1&pageNo=4
+			PlaySound("GAMEHIGHLIGHTFRIENDLYUNIT")
+			PlaySoundFile(strSoundPath)
+
 		else
 			PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
 		end
@@ -338,38 +348,32 @@ function private.SetupConfigGui(gui)
 
 end
 
-function GetAuctioneerClassicSoundPath()
-	
-	strAucClassicSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
-	-- Check to see if we are an embedded module instead of a plain add-on
-	--If so, return the Auc-Advanced\\Modules path to the ScanComplete.mp3 accordingly
-	--Tried to get this to work on OnLoad, but this isn't working since it most likely isn't in the table yet
-	if blnDebug then print("  Debug:Determining AuctioneerClassic Path") end
+function IsLibEmbedded()
+	blnResult = false
 	for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 		--print("  Debug:Comparing Auc-Util-"..libName.." with "..module)
 		if "Auc-Util-"..libName == module then
-			if blnDebug then print("  Debug:Auc-Util-"..libName.." is an embedded module") end
-			strAucClassicSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+			if blnDebug then 
+				print("  Debug:Auc-Util-"..libName.." is an embedded module") 
+			end
+			blnResult = true
 			break
 		end
 	end
-	if blnDebug then print("  Debug:Auc-Util-"..libName.." is an addon (non-embedded)") end
-	return strAucClassicSoundPath
+	return blnResult
 end
-
-
 
 function private.ConfigChanged()
 	--Debug switch via gui. Currently not exposed to the end user
-		--blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")
-		if blnDebug then
-			print("  Debug:Configuration Changed")
-		end
+	--blnDebug = AucAdvanced.Settings.GetSetting("util.scanfinish.debug")
+	if blnDebug then
+		print("  Debug:Configuration Changed")
+	end
 
-		if not (strPrevSound == AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) then
-			PlayCompleteSound()
-			strPrevSound = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
-		end
+	if not (strPrevSound == AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")) then
+		PlayCompleteSound()
+		strPrevSound = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+	end
 
 	if (not AucAdvanced.Settings.GetSetting("util.scanfinish.activated")) then
 		if blnDebug then print("  Debug:Updating ScanFinish:Deactivated") end
