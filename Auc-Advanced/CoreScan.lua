@@ -587,30 +587,34 @@ function lib.Commit(wasIncomplete)
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
 
-	if (wasIncomplete) then
-		lib.Print("Auctioneer Advanced scanned {{"..scanCount.."}} auctions before interruption:")
-	else
-		lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
+	--Hides the end of scan summary if user is not interested
+	if private.getOption("scandata.summary") then
+		if (wasIncomplete) then
+			lib.Print("Auctioneer Advanced scanned {{"..scanCount.."}} auctions before interruption:")
+		else
+
+			lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
+		end
+		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query)")
+		lib.Print("  {{"..sameCount.."}} unchanged items")
+		lib.Print("  {{"..newCount.."}} new items")
+		lib.Print("  {{"..updateCount.."}} updated items")
+		lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
+		lib.Print("  {{"..private.filteredCount.."}} filtered items")
+		lib.Print("  {{"..currentCount.."}} items in DB at end")
+		local scanTime = "  "
+		if (scanTimeHours and scanTimeHours ~= 0) then
+			scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
+		end
+		if (scanTimeMins and scanTimeMins ~= 0) then
+			scanTime = scanTime.."{{"..scanTimeMins.."}} Mins "
+		end
+		if (scanTimeSecs and scanTimeSecs ~= 0) then
+			scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
+		end
+		scanTime = scanTime.."Spent Scanning Auction House"
+		lib.Print(scanTime)
 	end
-	lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query)")
-	lib.Print("  {{"..sameCount.."}} unchanged items")
-	lib.Print("  {{"..newCount.."}} new items")
-	lib.Print("  {{"..updateCount.."}} updated items")
-	lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
-	lib.Print("  {{"..private.filteredCount.."}} filtered items")
-	lib.Print("  {{"..currentCount.."}} items in DB at end")
-	local scanTime = "  "
-	if (scanTimeHours and scanTimeHours ~= 0) then
-		scanTime = scanTime.."{{"..scanTimeHours.."}} Hours "
-	end
-	if (scanTimeMins and scanTimeMins ~= 0) then
-		scanTime = scanTime.."{{"..scanTimeMins.."}} Mins "
-	end
-	if (scanTimeSecs and scanTimeSecs ~= 0) then
-		scanTime = scanTime.."{{"..scanTimeSecs.."}} Secs "
-	end
-	scanTime = scanTime.."Spent Scanning Auction House"
-	lib.Print(scanTime)
 
 	if (not scandata.scanstats) then scandata.scanstats = {} end
 	if (scandata.scanstats[1]) then
@@ -972,4 +976,8 @@ function private.ResetAll()
 
 	--Hide the progress indicator
 	private.UpdateScanProgress(false)
+end
+--Did not have a way of easily retrieving options for corescan  Kandoko
+function private.getOption(option)
+	return AucAdvanced.Settings.GetSetting(option)
 end

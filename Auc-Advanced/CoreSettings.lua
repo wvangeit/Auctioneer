@@ -109,6 +109,7 @@ local settingDefaults = {
 	['scandata.tooltip.display'] = false,
 	['scandata.tooltip.modifier'] = true,
 	['scandata.force'] = false,
+	['scandata.summary'] = true,	
 }
 
 local function getDefault(setting)
@@ -366,6 +367,10 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 2, "scandata.force", "Force load scan data")
 	gui:AddTip(id, "Forces the scan data to load when AuctioneerAdvanced is first loaded rather than on demand when first needed")
 
+	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
+	gui:AddTip(id, "Display the summation of a Auction House scan")
+
+	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
 		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen it the auctionhouse image.")
@@ -378,7 +383,11 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "why force load",
 		"Why would you want to force load the scan data?",
 		"If you are going to be using the image data in the game, some people would prefer to wait longer for the game to start, rather than the game lagging for a couple of seconds when the data is demand loaded.")
+	gui:AddHelp(id, "why show summation",
+		"What is the post scan summary?",
+		"If you want to know the number on new, updated, or unchanged auctions gathered from a scan of the auction house.")
 
+		
   	gui:AddCat("Modules")
 
 	-- Alert all modules that the config screen is being built, so that they
