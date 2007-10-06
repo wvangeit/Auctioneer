@@ -30,6 +30,11 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
+local Babylonian = LibStub("Babylonian")
+assert(Babylonian, "Babylonian is not installed")
+
+local babylonian = Babylonian(BeanCounterLocalizations)
+
 BeanCounter_CustomLocalizations = {
 	['MailAllianceAuctionHouse'] = GetLocale(),
 	['MailAuctionCancelledSubject'] = GetLocale(),
@@ -43,16 +48,14 @@ BeanCounter_CustomLocalizations = {
 function _BC(stringKey, locale)
 	if (locale) then
 		if (type(locale) == "string") then
-			return Babylonian.FetchString(BeanCounterLocalizations, locale, stringKey);
+			return babylonian(locale, stringKey);
 		else
-			return Babylonian.FetchString(BeanCounterLocalizations, GetLocale(), stringKey);
+			return babylonian(GetLocale(), stringKey);
 		end
 	elseif (BeanCounter_CustomLocalizations[stringKey]) then
-		return Babylonian.FetchString(BeanCounterLocalizations, BeanCounter_CustomLocalizations[stringKey], stringKey)
+		return babylonian(BeanCounter_CustomLocalizations[stringKey], stringKey)
 	else
-		local str = Babylonian.GetString(BeanCounterLocalizations, stringKey)
-		if (not str) then return stringKey end
-		return str
+		return babylonian[stringKey] or stringKey
 	end
 end
 

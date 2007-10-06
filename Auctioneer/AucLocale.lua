@@ -31,6 +31,11 @@
 ]]
 Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
+local Babylonian = LibStub("Babylonian")
+assert(Babylonian, "Babylonian is not installed")
+
+local babylonian = Babylonian(AuctioneerLocalizations)
+
 Auctioneer_CustomLocalizations = {
 	['TextGeneral'] = GetLocale(),
 	['TextCombat'] = GetLocale(),
@@ -40,14 +45,14 @@ Auctioneer_CustomLocalizations = {
 function _AUCT(stringKey, locale)
 	if (locale) then
 		if (type(locale) == "string") then
-			return Babylonian.FetchString(AuctioneerLocalizations, locale, stringKey);
+			return babylonian(locale, stringKey);
 		else
-			return Babylonian.FetchString(AuctioneerLocalizations, GetLocale(), stringKey);
+			return babylonian(GetLocale(), stringKey);
 		end
 	elseif (Auctioneer_CustomLocalizations[stringKey]) then
-		return Babylonian.FetchString(AuctioneerLocalizations, Auctioneer_CustomLocalizations[stringKey], stringKey)
+		return babylonian(Auctioneer_CustomLocalizations[stringKey], stringKey)
 	else
-		return Babylonian.GetString(AuctioneerLocalizations, stringKey) or stringKey
+		return babylonian[stringKey] or stringKey
 	end
 end
 
