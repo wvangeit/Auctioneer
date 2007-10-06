@@ -265,7 +265,8 @@ function PlayCompleteSound()
 			PlaySoundFile(strSoundPath)
 
 		else
-			PlaySound(AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+			local soundFile = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+			if soundFile then PlaySound(soundFile) end
 		end
 	end
 end
