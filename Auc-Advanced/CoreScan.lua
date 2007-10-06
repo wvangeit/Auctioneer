@@ -179,18 +179,18 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		private.isScanning = true
 		local startPage = 0
 		local numBatchAuctions, totalAuctions
-		if (private.scanDir == 1) then
+--		if (private.scanDir == 1) then
 			startPage = 0
-		else
-			private.curPage = -1
-			private.sentQuery = true
-			-- Get "list" from appropriately filtered list
-			private.Hook.QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
-				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality)
-			numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-			local maxPages = floor(totalAuctions / 50);
-			startPage = maxPages
-		end
+--		else
+--			private.curPage = -1
+--			private.sentQuery = true
+--			-- Get "list" from appropriately filtered list
+--			private.Hook.QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
+--				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality)
+--			numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
+--			local maxPages = floor(totalAuctions / 50);
+--			startPage = maxPages
+--		end
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex)
@@ -764,7 +764,8 @@ function lib.StorePage()
 			-- We only store one of the same item/owner/price/quantity in the scan
 			-- unless we are doing a forward scan (in which case we can be sure they
 			-- are not duplicate entries.
-			if (private.isScanning and private.scanDir == 1)
+			if private.isScanning
+			or (Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning)
 			or totalAuctions <= 50
 			or private.NoDupes(private.curScan, itemData) then
 				table.insert(private.curScan, itemData)
@@ -824,6 +825,11 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		return
 	end
 
+	-- If we're getting called after we've sent a query, but before it's been stored, take this chance to save it.
+	if private.sentQuery then
+		lib.StorePage()
+	end
+	
 	local is_same = true
 	query = {}
 	name = name or ""
@@ -870,10 +876,6 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		private.curPage = startPage
 	end
 
-	if private.sentQuery then
-		lib.StorePage()
-	end
-	
 	private.curQuery = query
 	private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 		query.name or "",
@@ -933,6 +935,8 @@ function private.OnUpdate(me, dur)
 		if private.sentQuery and CanSendAuctionQuery() then
 			lib.StorePage()
 		end
+	elseif private.curQuery then
+		lib.Interrupt()
 	end
 end
 private.updater = CreateFrame("Frame", nil, UIParent)
@@ -948,8 +952,13 @@ end
 
 function lib.Interrupt()
 	if private.curQuery and not AuctionFrame:IsVisible() then
-		private.unexpectedClose = true
-		lib.PushScan()
+		if private.isScanning then
+			private.unexpectedClose = true
+			lib.PushScan()
+		else
+			lib.Commit(true)
+			private.sentQuery = false
+		end
 	end
 end
 
