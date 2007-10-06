@@ -721,9 +721,9 @@ function doesItemKeyMatchQuery(itemKey, query)
 	-- Check the inventory type, sub class and class.
 	if (query.classIndex and
 		itemInfo.categoryName ~= Auctioneer.ItemDB.GetCategoryName(query.classIndex)) then return false end;
-	if (query.subclassIndex and
+	if (query.classIndex and query.subclassIndex and
 		itemInfo.subCategoryName ~= Auctioneer.ItemDB.GetSubCategoryName(query.classIndex, query.subclassIndex)) then return false end;
-	if (query.invTypeIndex and
+	if (query.classIndex and query.subclassIndex and query.invTypeIndex and
 		equipLoc ~= Auctioneer.ItemDB.GetInventoryTypeName(query.classIndex, query.subclassIndex, query.invTypeIndex)) then return false end;
 
 	-- %todo: Check if its usable...
