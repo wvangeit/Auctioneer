@@ -172,18 +172,16 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		end
 
 		--Check to see if we've scanned to our minimum threshold to enable shutdown or logout
-		if scannedAuctions > intScanMinThreshold then
+		if scannedAuctions > intScanMinThreshold and blnScanMinThresholdMet == false then
 			if blnDebug then print("	Debug:ScanFinish Switching ScanMinThresholdMet=true") end
+			--Send a friendly reminder that we may be shutting down or logging off now
+			AlertShutdownOrLogOff()
 			blnScanMinThresholdMet = true
 		end
 
 		--Send a warning about the impending shutdown/logout as we approach the end of our auction scan
 		if blnScanStarted and blnScanMinThresholdMet and (totalAuctions - scannedAuctions < 150) then
-			if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
-				print("AucAdvanced: {{"..libName.."}} |cffff0000Warning|r: Shutdown is enabled. World of Warcraft will be shut down once the current scan successfully completes.")
-			elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
-				print("AucAdvanced: {{"..libName.."}} |cffff0000Warning|r: LogOut is enabled. This character will be logged of once the current scan successfully completes.")
-			end
+			AlertShutdownOrLogOff()
 		end
 		if totalAuctions - scannedAuctions < 50 then
 			if blnDebug then
@@ -243,18 +241,29 @@ function private.PerformFinishEvents()
 	end
 end
 
+function AlertShutdownOrLogOff()
+	if (AucAdvanced.Settings.GetSetting("util.scanfinish.shutdown")) then
+		PlaySound("TellMessage")
+		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: Shutdown is enabled. World of Warcraft will be shut down once the current scan successfully completes.")
+	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
+		PlaySound("TellMessage")
+		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: LogOut is enabled. This character will be logged of once the current scan successfully completes.")
+	end
+end
+
 function PlayCompleteSound()
-	if not (AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "none") then
+	strConfiguredSoundPath = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
+	if strConfiguredSoundPath and not (strConfiguredSoundPath == "none") then
 		if blnDebug then
-			print("AucAdvanced: {{"..libName.."}} You are listening to "..AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath"))
+			print("AucAdvanced: {{"..libName.."}} You are listening to "..strConfiguredSoundPath)
 		end
-		if AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath") == "AuctioneerClassic" then
+		if strConfiguredSoundPath == "AuctioneerClassic" then
 			if blnLibEmbedded == nil then
 			  	blnLibEmbedded = IsLibEmbedded()
 			end
-			strSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
+			strConfiguredSoundPath = "Interface\\AddOns\\Auc-Util-ScanFinish\\ScanComplete.mp3"
 			if blnLibEmbedded then
-				strSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"		
+				strConfiguredSoundPath = "Interface\\AddOns\\Auc-Advanced\\Modules\\Auc-Util-ScanFinish\\ScanComplete.mp3"		
 			end
 			
 			--Known PlaySoundFile bug seems to require some event preceeding it to get it to work reliably
@@ -262,11 +271,10 @@ function PlayCompleteSound()
 			--suggested this workaround.
 			--http://forums.worldofwarcraft.com/thread.html?topicId=1777875494&sid=1&pageNo=4
 			PlaySound("GAMEHIGHLIGHTFRIENDLYUNIT")
-			PlaySoundFile(strSoundPath)
+			PlaySoundFile(strConfiguredSoundPath)
 
 		else
-			local soundFile = AucAdvanced.Settings.GetSetting("util.scanfinish.soundpath")
-			if soundFile then PlaySound(soundFile) end
+			PlaySound(strConfiguredSoundPath)
 		end
 	end
 end
