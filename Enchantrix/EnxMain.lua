@@ -299,10 +299,9 @@ function onEvent(funcVars, event, player, spell, rank, target)
 				-- now make sure the user had enough skill to disenchant it
 				-- make sure skill level is up to date
 				local skill = Enchantrix.Util.GetUserEnchantingSkill();
-				-- get the maximum item level the user can disenchant
-				local maxLevel = Enchantrix.Util.MaxDisenchantItemLevel(skill);
-				local name, link, _, itemLevel = GetItemInfo( DisenchantEvent.spellTarget );
-				if (itemLevel <= maxLevel) then
+				local name, link, quality, itemLevel = GetItemInfo( DisenchantEvent.spellTarget );
+				local skillNeeded = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(itemLevel, quality);
+				if (skill >= skillNeeded) then
 					Enchantrix.Storage.SaveNonDisenchantable(DisenchantEvent.spellTarget)
 				end
 			end
