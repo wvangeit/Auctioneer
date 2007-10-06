@@ -95,6 +95,8 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
 	if not buyout or buyout == 0 then return end
+	local count = itemData.stackSize or 1
+	if count < 1 then count = 1 end
 
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
@@ -105,7 +107,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not data[id] then data[id] = {} end
 
 	while (#data[id] >= 10) do table.remove(data[id], 1) end
-	table.insert(data[id], buyout)
+	table.insert(data[id], buyout/count)
 end
 
 function lib.GetPrice(hyperlink)
@@ -144,6 +146,9 @@ function lib.OnLoad(addon)
 
 end
 
+function lib.CanSupplyMarket()
+	return false
+end
 
 
 --[[ Local functions ]]--
