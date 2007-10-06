@@ -307,8 +307,8 @@ function lib.OnLoad()
 end
 
 function lib.OnUnload()
-	local nStringRope = LibStub:GetLibrary("nStringRope")
-	local rope = nStringRope:New()
+	local StringRope = LibStub:GetLibrary("StringRope")
+	local rope = StringRope:New()
 
 	if not (AucScanData and AucScanData.scans) then return end
 	
@@ -350,7 +350,6 @@ function lib.OnUnload()
 					end
 				end
 				rope:Add("}")
-				p("SetRopeFor", server, faction)
 				fData.image = rope:Get()
 				rope:Clear()
 			end

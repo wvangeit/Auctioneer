@@ -1,7 +1,7 @@
 --[[
 	StringRope Lib for World of Warcraft (tm)
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: StringRope.lua 2210 2007-09-22 19:36:01Z mentalpower $
+	Revision: $Id$
 	URL: http://norganna.org
 
 	License:
