@@ -332,6 +332,7 @@ end
 
 -- Returns HSP, median and static price for reagent
 -- Auctioneer values are kept in cache for 48h in case Auctioneer isn't loaded
+-- Please remember that this gets called by things outside of enchantrix (barker, btmscan, etc.) and they need valid pricing
 function getReagentPrice(reagentID, extra)
 	-- reagentID ::= number | hyperlink
 
@@ -345,9 +346,8 @@ function getReagentPrice(reagentID, extra)
 	if Enchantrix.Settings.GetSetting('fixed.'..reagentID) then
 		myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagentID..'.value'))
 		if myValue then
-			-- Shouldn't be calling this function in this scenario.
-			-- Should check first!
-			return nil,nil,nil,nil,myValue
+			-- this function can get called by anyone, and must return usable valuess
+			return myValue,myValue,myValue,myValue,myValue
 		end
 	end
 
