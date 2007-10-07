@@ -76,12 +76,12 @@ local print_order = {
 local attributes = {
 	{ search = _BARKLOC("EnchSearchCrusader"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("Crusader") },	-- incorrectly matched strength
 	{ search = _BARKLOC("EnchSearchIntellect"), key = 'factor_stat.intellect', print = _BARKLOC("INT") },
-	{ search = _BARKLOC("EnchSearchBoarSpeed"), key = "other", ignoreValues = true, print = _BARKLOC("ShortBoarSpeed") },		-- INCORRECTLY matches stamina?
+	{ search = _BARKLOC("EnchSearchBoarSpeed"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortBoarSpeed") },		-- INCORRECTLY matches stamina?
 	{ search = _BARKLOC("EnchSearchStamina"), key = "factor_stat.stamina", print = _BARKLOC("STA") },
 	{ search = _BARKLOC("EnchSearchSpirit"), key = "factor_stat.spirit", print = _BARKLOC("SPI") },
 	{ search = _BARKLOC("EnchSearchStrength"), key = "factor_stat.strength", print = _BARKLOC("STR") },
-	{ search = _BARKLOC("EnchSearchCatSwiftness"), key = "other", ignoreValues = true, print = _BARKLOC("ShortCatSwiftness") },	-- INCORRECTLY matches agility?
-	{ search = _BARKLOC("EnchSearchMongoose"), key = "other", ignoreValues = true, print = _BARKLOC("ShortMongoose") },			-- INCORRECTLY matches agility?
+	{ search = _BARKLOC("EnchSearchCatSwiftness"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortCatSwiftness") },	-- INCORRECTLY matches agility?
+	{ search = _BARKLOC("EnchSearchMongoose"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortMongoose") },			-- INCORRECTLY matches agility?
 	{ search = _BARKLOC("EnchSearchAgility"), key = "factor_stat.agility", print = _BARKLOC("AGI") },
 	{ search = _BARKLOC("EnchSearchFireRes"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
 	{ search = _BARKLOC("EnchSearchResFire"), key = "factor_stat.fireRes", print = _BARKLOC("FireRes") },
@@ -89,18 +89,18 @@ local attributes = {
 	{ search = _BARKLOC("EnchSearchNatureRes"), key = "factor_stat.natureRes", print = _BARKLOC("NatureRes") },
 	{ search = _BARKLOC("EnchSearchResShadow"), key = "factor_stat.shadowRes", print = _BARKLOC("ShadowRes") },
 	{ search = _BARKLOC("EnchSearchAllStats"), key = "factor_stat.all", print = _BARKLOC("AllStats") },
-	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSpellsurge") },		-- INCORRECTLY matches mana?
-	{ search = _BARKLOC("EnchSearchVitality"), key = "other", ignoreValues = true, print = _BARKLOC("ShortVitality") },			-- INCORRECTLY matches health and mana?
-	{ search = _BARKLOC("EnchSearchManaPerFive"), key = "other", print = _BARKLOC("ShortManaPerFive") },						-- INCORRECTLY matches mana
+	{ search = _BARKLOC("EnchSearchSpellsurge"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortSpellsurge") },		-- INCORRECTLY matches mana?
+	{ search = _BARKLOC("EnchSearchVitality"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortVitality") },			-- INCORRECTLY matches health and mana?
+	{ search = _BARKLOC("EnchSearchManaPerFive"), key = "factor_stat.other", print = _BARKLOC("ShortManaPerFive") },						-- INCORRECTLY matches mana
 	{ search = _BARKLOC("EnchSearchMana"), key = "factor_stat.mana", print = _BARKLOC("ShortMana") },
-	{ search = _BARKLOC("EnchSearchBattlemaster"), key = "other", ignoreValues = true, print = _BARKLOC("ShortBattlemaster") },	-- INCORRECTLY matches health?
+	{ search = _BARKLOC("EnchSearchBattlemaster"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortBattlemaster") },	-- INCORRECTLY matches health?
 	{ search = _BARKLOC("EnchSearchHealth"), key = "factor_stat.health", print = _BARKLOC("ShortHealth") },
-	{ search = _BARKLOC("EnchSearchSunfire"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSunfire") },			-- INCORRECTLY matches damage?
-	{ search = _BARKLOC("EnchSearchSoulfrost"), key = "other", ignoreValues = true, print = _BARKLOC("ShortSoulfrost") },		-- INCORRECTLY matches damage?
-	{ search = _BARKLOC("EnchSearchBeastslayer"), key = "other", print = _BARKLOC("ShortBeastslayer") },						-- INCORRECTLY matches damage?
-	{ search = _BARKLOC("EnchSearchSpellPower1"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "spell power"
-	{ search = _BARKLOC("EnchSearchSpellPower2"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "major spell power"
-	{ search = _BARKLOC("EnchSearchSpellPower3"), key = "other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		bracer, ring, gloves "spell power"
+	{ search = _BARKLOC("EnchSearchSunfire"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortSunfire") },			-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchSoulfrost"), key = "factor_stat.other", ignoreValues = true, print = _BARKLOC("ShortSoulfrost") },		-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchBeastslayer"), key = "factor_stat.other", print = _BARKLOC("ShortBeastslayer") },						-- INCORRECTLY matches damage?
+	{ search = _BARKLOC("EnchSearchSpellPower1"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "spell power"
+	{ search = _BARKLOC("EnchSearchSpellPower2"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		weapon "major spell power"
+	{ search = _BARKLOC("EnchSearchSpellPower3"), key = "factor_stat.other", print = _BARKLOC("ShortSpellPower") },							-- INCORRECTLY matches damage?		bracer, ring, gloves "spell power"
 	{ search = _BARKLOC("EnchSearchDMGAbsorption"), key = "factor_stat.damageAbsorb", print = _BARKLOC("DMGAbsorb") },			-- must come before armor and damage
 	{ search = _BARKLOC("EnchSearchDamage1"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
 	{ search = _BARKLOC("EnchSearchDamage2"), key = "factor_stat.damage", print = _BARKLOC("DMG") },
@@ -115,15 +115,15 @@ local attributes = {
 --[[
 Other possible exceptions or additions
 
-	{ search = 'damage against elementals', key = "other", print = "Elemental" },		-- probably safe
-	{ search = 'damage to demons', key = "other", print = "Demon" },					-- probably safe
-	{ search = 'healing', key = "other", print = "heal" },								-- probably safe
-	{ search = 'frost spells', key = "other", print = "frost" },						-- probably safe
-	{ search = 'frost damage', key = "other", print = "frost" },						-- probably safe
-	{ search = 'shadow damage', key = "other", print = "shadow" },						-- probably safe
-	{ search = "increase fire damage", key = "other", print = "fire" },					-- probably safe
-	{ search = 'block rating', key = "other", print = "block" },						-- probably safe
-	{ search = 'block value', key = "other", print = "block" },							-- probably safe
+	{ search = 'damage against elementals', key = "factor_stat.other", print = "Elemental" },		-- probably safe
+	{ search = 'damage to demons', key = "factor_stat.other", print = "Demon" },					-- probably safe
+	{ search = 'healing', key = "factor_stat.other", print = "heal" },								-- probably safe
+	{ search = 'frost spells', key = "factor_stat.other", print = "frost" },						-- probably safe
+	{ search = 'frost damage', key = "factor_stat.other", print = "frost" },						-- probably safe
+	{ search = 'shadow damage', key = "factor_stat.other", print = "shadow" },						-- probably safe
+	{ search = "increase fire damage", key = "factor_stat.other", print = "fire" },					-- probably safe
+	{ search = 'block rating', key = "factor_stat.other", print = "block" },						-- probably safe
+	{ search = 'block value', key = "factor_stat.other", print = "block" },							-- probably safe
 
 Other... (these should be ok as-is)
 surefooted "snare and root resistance"
@@ -195,7 +195,7 @@ end
 function Enchantrix_BarkerOnClick()
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName( _BARKLOC("TradeChannel") ) ;
-	Barker.Util.DebugPrintQuick("Attempting to send barker ", barker, " Trade Channel ID ", id)
+	--Barker.Util.DebugPrintQuick("Attempting to send barker ", barker, " Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
@@ -277,7 +277,7 @@ end
 function Enchantrix_BarkerOptions_TestButton_OnClick()
 	local barker = Enchantrix_CreateBarker();
 	local id = GetChannelName( _BARKLOC("TradeChannel") )
-	Barker.Util.DebugPrintQuick("Attempting to send test barker ", barker, "Trade Channel ID ", id)
+	--Barker.Util.DebugPrintQuick("Attempting to send test barker ", barker, "Trade Channel ID ", id)
 
 	if (id and (not(id == 0))) then
 		if (barker) then
@@ -955,9 +955,7 @@ function Enchantrix_CreateBarker()
 
 	EnchantrixBarker_ResetBarkerString();
 	EnchantrixBarker_ResetPriorityList();
-
-	Barker.Util.DebugPrintQuick("Starting creation of EnxBarker")
-
+	
 	local highestProfit = Enchantrix_BarkerGetConfig("highest_profit");
 	local profitMargin = Enchantrix_BarkerGetConfig("profit_margin");
 
@@ -1107,6 +1105,11 @@ function Enchantrix_GetReagentHSP( itemLink )
 
 	if hsp == nil then
 		hsp = 0;
+	end
+	
+	-- if auc4 is missing, and auc5 has a price, use the auc5 market price
+	if (hsp == 0 and AucAdvanced and market) then
+		hsp = market;
 	end
 
 	return hsp;
