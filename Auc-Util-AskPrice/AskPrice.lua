@@ -134,10 +134,9 @@ end
 function private.playerLoginEvent()
 	if (IsInGuild()) then
 		GuildRoster() --Request the Guild data
+		private.sendAddOnMessage("GUILD", "MAINR", "login")
 	end
-
 	private.sendAddOnMessage("RAID", "MAINR", "login")
-	private.sendAddOnMessage("GUILD", "MAINR", "login")
 end
 
 function private.chatEvent(event, text, player)
@@ -450,7 +449,7 @@ end
 
 --This will retrieve current online Guild members and remove anyone no longer online from the Guild AskPrice users list
 function private.guildRosterEvent()
-	if (not GetGuildInfo("player")) then
+	if not (IsInGuild() and GetGuildInfo("player")) then
 		return
 	end
 
