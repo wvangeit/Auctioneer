@@ -57,6 +57,9 @@ function lib:valuate(item, tooltip)
 
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
+	
+	-- Check for bogus/corrupted item links
+	if not (item and item.qual) then return end
 
 	-- If this item is white or lower, forget about it.
 	if (item.qual <= 1) then return end
