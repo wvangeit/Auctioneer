@@ -222,6 +222,7 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchHealth"]	= "gesundheit";
 		["EnchSearchIntellect"]	= "intelligenz";
 		["EnchSearchMana"]	= "mana";
+		["EnchSearchManaPerFive"]	= "Mana alle 5 Sekunden";
 		["EnchSearchMongoose"]	= "erhöht Beweglichkeit um [0-9]+ und Angriffsgeschwindigkeit";
 		["EnchSearchNatureRes"]	= "naturwiderstand";
 		["EnchSearchResFire"]	= "Feuerwiderstand";
@@ -286,6 +287,7 @@ EnchantrixBarkerLocalizations = {
 		["ShortCatSwiftness"]	= "Katzenschnelligkeit";
 		["ShortHealth"]	= "GES";
 		["ShortMana"]	= "Mana";
+		["ShortManaPerFive"]	= "Mana/5sek";
 		["ShortMongoose"]	= "Mungo";
 		["ShortSoulfrost"]	= "Seelenfrost";
 		["ShortSpellPower"]	= "Zauber";
@@ -609,9 +611,28 @@ EnchantrixBarkerLocalizations = {
 		["ShowValue"]	= "valorizar";
 
 		-- Section: Game Constants
+		["AnyWeapon"]	= "Cualquier arma";
 		["BarkerOpening"]	= "Encanto:";
+		["Boots"]	= "Botas";
+		["Bracer"]	= "Brazal";
+		["Chest"]	= "Pecho";
+		["Cloak"]	= "Capa";
+		["Darnassus"]	= "Darnassus";
+		["EnchSearchAgility"]	= "agilidad";
+		["EnchSearchArmor"]	= "armadura";
+		["EnchSearchDefense"]	= "defensa";
+		["EnchSearchDMGAbsorption"]	= "absorción";
+		["EnchSearchHealth"]	= "salud";
+		["EnchSearchIntellect"]	= "intelecto";
+		["EnchSearchManaPerFive"]	= "maná cada 5 segundos";
+		["EnchSearchSpirit"]	= "espíritu";
+		["EnchSearchStamina"]	= "aguante";
+		["EnchSearchStrength"]	= "fuerza";
+		["Gloves"]	= "Guantes";
 		["OneLetterGold"]	= "o";
 		["OneLetterSilver"]	= "p";
+		["Ring"]	= "Anillo";
+		["Shield"]	= "Escudo";
 		["ShortDarnassus"]	= "Dar";
 		["ShortIronForge"]	= "FJ";
 		["ShortOrgrimmar"]	= "Org";
@@ -619,6 +640,8 @@ EnchantrixBarkerLocalizations = {
 		["ShortStormwind"]	= "VT";
 		["ShortThunderBluff"]	= "CdT";
 		["ShortUndercity"]	= "E";
+		["TwoHandWeapon"]	= "Arma 2M";
+		["Weapon"]	= "arma";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Precio de Pregonero (margen de %d%%)";
@@ -688,6 +711,10 @@ EnchantrixBarkerLocalizations = {
 		["ShortThunderBluff"]	= "TB";
 		["ShortUndercity"]	= "UC";
 
+		-- Section: Generic Messages
+		["BarkerLoaded"]	= "Echantrix Barker chargé...";
+		["BarkerNotTradeZone"]	= "Enchantrix Barker: Vous n'êtes pas dans une zone de commerce.";
+
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Prix Trader (marge : %d%%)";
 		["FrmtPriceEach"]	= "(%s l'unité)";
@@ -696,6 +723,7 @@ EnchantrixBarkerLocalizations = {
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer non chargé, utilisation du prix en cache]";
 		["FrmtWarnNoPrices"]	= "[Aucun prix disponible]";
 		["FrmtWarnPriceUnavail"]	= "[Quelques prix indisponibles]";
+		["OpenBarkerWindow"]	= "Ouvre la fenêtre du Barker.";
 
 		-- Section: User Interface
 		["BarkerOptionsHighestPriceForFactorTitle"]	= "Plus haut facteur prix";
@@ -863,6 +891,15 @@ EnchantrixBarkerLocalizations = {
 		["FrmtWarnPriceUnavail"]	= "[일부 가격을 사용할 수 없음]";
 
 		-- Section: User Interface
+		["BarkerOptionsAgilityPriority"]	= "민첩성";
+		["BarkerOptionsAllResistances"]	= "모든 저항력";
+		["BarkerOptionsAllStatsPriority"]	= "모든 능력치";
+		["BarkerOptionsArmorPriority"]	= "방어";
+		["BarkerOptionsDamage"]	= "공격력";
+		["BarkerOptionsDefense"]	= "방어도";
+		["BarkerOptionsFireResistance"]	= "화염 저항";
+		["BarkerOptionsFrostResistance"]	= "냉기 저항";
+		["BarkerOptionsHealth"]	= "생명력";
 		["BarkerOptionsHighestPriceForFactorTitle"]	= "가격요건 최고가격";
 		["BarkerOptionsHighestPriceForFactorTooltip"]	= "마법부여가 가격 우선순위에서 0점을 받았거나 이점수 이상입니다.";
 		["BarkerOptionsHighestProfitTitle"]	= "최고 이익";
@@ -1039,6 +1076,7 @@ EnchantrixBarkerLocalizations = {
 		["EnchSearchHealth"]	= "生命";
 		["EnchSearchIntellect"]	= "智力";
 		["EnchSearchMana"]	= "魔法";
+		["EnchSearchManaPerFive"]	= "5秒回蓝";
 		["EnchSearchMongoose"]	= "提升敏捷[0-9]+和攻击速度";
 		["EnchSearchNatureRes"]	= "自然抗性";
 		["EnchSearchResFire"]	= "火焰抗性";
@@ -1103,6 +1141,7 @@ EnchantrixBarkerLocalizations = {
 		["ShortCatSwiftness"]	= "貓之迅捷";
 		["ShortHealth"]	= "生命";
 		["ShortMana"]	= "魔法";
+		["ShortManaPerFive"]	= "5秒回蓝";
 		["ShortMongoose"]	= "猫鼬";
 		["ShortSoulfrost"]	= "霜魂";
 		["ShortSpellPower"]	= "法术";
@@ -1218,16 +1257,38 @@ EnchantrixBarkerLocalizations = {
 		["ShowValue"]	= "valuate";
 
 		-- Section: Game Constants
+		["AnyWeapon"]	= "任何武器";
 		["BarkerOpening"]	= "想出售附魔:";
+		["Boots"]	= "靴子";
+		["Bracer"]	= "護腕";
+		["Chest"]	= "胸甲";
+		["Cloak"]	= "披風";
+		["Darnassus"]	= "達納蘇斯";
+		["EnchSearchAgility"]	= "敏捷";
+		["EnchSearchAllResistance1"]	= "全魔法抗性";
+		["EnchSearchAllResistance2"]	= "全魔法抗性";
+		["EnchSearchAllResistance3"]	= "全抗性";
+		["EnchSearchArmor"]	= "護甲";
+		["EnchSearchBattlemaster"]	= "治療附近同伴";
+		["EnchSearchBeastslayer"]	= "對野獸傷害";
+		["EnchSearchMana"]	= "法力";
+		["EnchSearchManaPerFive"]	= "5秒回魔";
+		["Ironforge"]	= "鐵爐堡";
 		["OneLetterGold"]	= "金";
 		["OneLetterSilver"]	= "銀";
+		["Orgrimmar"]	= "奧格瑪";
+		["Ring"]	= "戒指";
+		["Shattrath"]	= "撒塔斯城";
+		["Shield"]	= "盾牌";
 		["ShortDarnassus"]	= "達納蘇斯";
 		["ShortIronForge"]	= "鐵爐堡";
-		["ShortOrgrimmar"]	= "奧格瑞瑪";
+		["ShortOrgrimmar"]	= "奧格瑪";
 		["ShortShattrath"]	= "撒塔斯城";
 		["ShortStormwind"]	= "暴風城";
 		["ShortThunderBluff"]	= "雷霆崖";
 		["ShortUndercity"]	= "幽暗城";
+		["StormwindCity"]	= "暴風城";
+		["Weapon"]	= "武器";
 
 		-- Section: Tooltip Messages
 		["FrmtBarkerPrice"]	= "Barker 價格 (%d%% 保証金) ";
@@ -1239,6 +1300,30 @@ EnchantrixBarkerLocalizations = {
 		["FrmtWarnPriceUnavail"]	= "[部分價格無效]";
 
 		-- Section: User Interface
+		["BarkerOptions2HWeaponPriorityTooltip"]	= "優先顯示附魔-雙手武器";
+		["BarkerOptionsAgilityPriority"]	= "敏捷";
+		["BarkerOptionsAgilityPriorityTooltip"]	= "優先顯示附魔-敏捷";
+		["BarkerOptionsAllResistances"]	= "所有抗性";
+		["BarkerOptionsAllResistancesTooltip"]	= "優先顯示附魔-所有抗性提升";
+		["BarkerOptionsAllStatsPriority"]	= "所有屬性";
+		["BarkerOptionsAllStatsPriorityTooltip"]	= "優先顯示附魔-所有屬性提升";
+		["BarkerOptionsAnyWeaponPriorityTooltip"]	= "優先顯示附魔-武器";
+		["BarkerOptionsArmorPriority"]	= "護甲";
+		["BarkerOptionsArmorPriorityTooltip"]	= "優先顯示附魔-護甲";
+		["BarkerOptionsBootsPriorityTooltip"]	= "優先顯示附魔-鞋子";
+		["BarkerOptionsBracerPriorityTooltip"]	= "優先顯示附魔-腰帶";
+		["BarkerOptionsChestPriorityTooltip"]	= "優先顯示附魔-胸甲";
+		["BarkerOptionsCloakPriorityTooltip"]	= "優先顯示附魔-披風";
+		["BarkerOptionsDamage"]	= "傷害";
+		["BarkerOptionsDefense"]	= "防禦";
+		["BarkerOptionsDefenseTooltip"]	= "優先顯示附魔-防禦";
+		["BarkerOptionsFireResistance"]	= "火焰抗性";
+		["BarkerOptionsFireResistanceTooltip"]	= "優先顯示附魔-火焰抗性";
+		["BarkerOptionsFrostResistance"]	= "冰霜抗性";
+		["BarkerOptionsFrostResistanceTooltip"]	= "優先顯示附魔-冰霜抗性";
+		["BarkerOptionsGlovesPriorityTooltip"]	= "優先顯示附魔-手套";
+		["BarkerOptionsHealth"]	= "生命值";
+		["BarkerOptionsHealthTooltip"]	= "優先顯示附魔-生命值";
 		["BarkerOptionsHighestProfitTitle"]	= "最高盈利";
 		["BarkerOptionsLowestPriceTitle"]	= "最低價格";
 		["BarkerOptionsProfitMarginTitle"]	= "淨利率";
