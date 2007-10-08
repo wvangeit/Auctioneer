@@ -365,6 +365,15 @@ function lib.MakeGuiConfig()
 			evaluator:setup(gui)
 		end
 	end
+
+  	gui:AddCat("Filters:")
+
+	for pos, name in ipairs(BtmScan.filters) do
+		local filter = BtmScan.filters[name]
+		if (filter and filter.setup) then
+			filter:setup(gui)
+		end
+	end
 end
 
 local sideIcon

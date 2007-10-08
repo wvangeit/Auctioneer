@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -319,7 +319,7 @@ function BtmScan.PageScan(resume)
 
 	local reserve = BtmScan.Settings.GetSetting("global.reserve")
 	local maxprice = BtmScan.Settings.GetSetting("global.maxprice")
-	local ignore = BtmScan.Settings.GetSetting("ignore.list")
+	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
 
 	-- Ok, lets look at all these lovely items
 	if (not resume) then resume = 1 end
@@ -344,8 +344,20 @@ function BtmScan.PageScan(resume)
 				item.id, item.suffix, item.enchant, item.seed = BtmScan.BreakLink(item.link)
 				item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
 
+				-- read ItemConfig
+				local itemconfig = itemConfigTable[item.sig]
+				if (itemconfig) then
+					itemconfig = BtmScan.unpackItemConfiguration(itemconfig)
+				else
+					itemconfig = {}
+				end
+				itemconfig.ownerTable=itemConfigTable
+				item.itemconfig=itemconfig
+
 				-- Check that we're not ignoring this item
-				if not ignore[item.sig] then
+				if itemconfig.isIgnore==true then
+--					BtmScan.Print(" is on item-ignore-list ")
+				else
 
 					-- Work out the item's "next-bid"
 					item.bid = item.min
@@ -410,12 +422,16 @@ function BtmScan.PageScan(resume)
 						end
 					end
 
+					-- check if itemConfig is used now
+
 					-- One last check to make sure this is a valid purchase order
 					if purchasable then
 						BtmScan.PromptPurchase(item)
 						BtmScan.resume = i + 1
 						return
 					end
+				-- check if itemConfig is used now
+				BtmScan.storeItemConfig(itemconfig, item.sig, itemConfigTable)
 				end
 			end
 		end
@@ -490,11 +506,36 @@ function BtmScan.CrossEvaluateItem(evaluatorName, item, doTooltip)
 end
 
 BtmScan.evaluators = {}
+BtmScan.filters = {}
+
 function BtmScan.EvaluateItem(item, doTooltip)
 	item.info = itemAddInfo
 	item.clear = itemClearInfo
 	for pos, name in ipairs(BtmScan.evaluators) do
 		local valuator = BtmScan.evaluators[name]
+
+		-- first check filters for this module
+		local isFiltered
+		for filterPos, filterName in ipairs(BtmScan.filters) do
+			local filter=BtmScan.filters[filterName]
+			if (filter and filter.filterItem) then
+				if (filter:filterItem(item,name)) then
+					-- disable only this module
+--					BtmScan.Print(" got filter hit "..name..":"..filterName)
+					valuator=nil
+				end
+			end
+		end
+
+
+
+		
+		local ignoreString = item.itemconfig.ignoreModuleList
+		if (ignoreString and strfind(ignoreString,name)) then
+--				BtmScan.Print(" got filter hit(ignore-list) "..item.sig..":"..ignoreString)
+				valuator=nil
+		end
+
 		if (valuator and valuator.valuate) then
 			item:clear()
 			valuator:valuate(item, doTooltip)
@@ -956,12 +997,34 @@ BtmScan.Command = function (msg)
 		help = true
 	end
 
+	for pos, name in ipairs(BtmScan.evaluators) do
+		local valuator = BtmScan.evaluators[name]
+		if (name==cmd and valuator.CommandHandler) then
+			valuator.CommandHandler(msg)
+			help=false
+		end
+	end
+
 	if (help) then
 		BtmScan.Print(tr("BottomScanner help:"))
 		BtmScan.Print(tr(" %1 [%2]", "config", tr("Opens up the configuration screen")))
 		BtmScan.Print(tr(" %1 [%2]", "begin", tr("Begins the scanning process (must have AH open)")))
 		BtmScan.Print(tr(" %1 [%2]", "end", tr("Ends the scanning process")))
 		BtmScan.Print(tr(" %1 [%2]", "load (always|never|auctionhouse)", tr("Set when BottomScanner will load")))
+
+		for pos, name in ipairs(BtmScan.evaluators) do
+			local valuator = BtmScan.evaluators[name]
+			if (valuator.PrintHelp) then
+				valuator.PrintHelp()
+			end
+		end
+		for filterPos, filterName in ipairs(BtmScan.filters) do
+			local filter=BtmScan.filters[filterName]
+			if (filter.PrintHelp) then
+				filter.PrintHelp()
+			end
+		end
+
 	end
 end
 
@@ -1066,7 +1129,6 @@ BtmScan.GetZoneConfig = function (whence)
 	else
 		return
 	end
-	if (not data.ignore) then data.ignore = {} end -- ignore nothing
 	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regardless of user's enchanting level
 
 	if (not data.tooltipOn) then
@@ -1086,7 +1148,7 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 
 	local reserve = BtmScan.Settings.GetSetting("global.reserve")
 	local maxprice = BtmScan.Settings.GetSetting("global.maxprice")
-	local ignore = BtmScan.Settings.GetSetting("ignore.list")
+	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
 
 	local item = tooltipItem
 	item.link = link
@@ -1114,8 +1176,19 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 
 		item.sig = ("%d:%d:%d"):format(item.id, item.suffix, item.enchant)
 
+		-- read ItemConfig
+		local itemconfig = itemConfigTable[item.sig]
+		if (itemconfig) then
+--			BtmScan.Print(" use itemconfig "..itemconfig)
+			itemconfig = BtmScan.unpackItemConfiguration(itemconfig)
+		else
+			itemconfig = {}
+		end
+		item.itemconfig=itemconfig
+
+
 		-- Check that we're not ignoring this item
-		if ignore[item.sig] then
+		if itemconfig.isIgnore then
 			-- TODO: Do tooltip that we are ignoring
 			return
 		end
@@ -1385,13 +1458,35 @@ end
 
 BtmScan.IgnorePurchase = function()
 	local item = BtmScan.Prompt.item
-	local ignore = BtmScan.Settings.GetSetting("ignore.list")
-	ignore[item.sig] = true
+	item.itemconfig.isIgnore=true
+	BtmScan.Print(" ignoreStatusAfter:"..tostring(BtmScan.Prompt.item.itemconfig.isIgnore))
+
+	
+--	local ignore = BtmScan.Settings.GetSetting("ignore.list")
+--	ignore[item.sig] = true
 	BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), item.link))
 	BtmScan.scanStage = 2
 	BtmScan.timer = 0
 	BtmScan.pageScan = 0.001
 	BtmScan.Prompt:Hide()
+	BtmScan.storeItemConfig(item.itemconfig, item.sig)
+end
+
+BtmScan.IgnorePurchaseModule = function()
+	local item = BtmScan.Prompt.item
+	local ignoreString = item.itemconfig.ignoreModuleList
+
+	if (not item.itemconfig.ignoreModuleList) then
+		item.itemconfig.ignoreModuleList=item.reason
+	else
+		item.itemconfig.ignoreModuleList=item.itemconfig.ignoreModuleList..";"..item.reason
+	end
+	BtmScan.Print(tr("BottomScanner will now %1 %2 for module %3", tr("ignore"), item.link,item.reason))
+	BtmScan.scanStage = 2
+	BtmScan.timer = 0
+	BtmScan.pageScan = 0.001
+	BtmScan.Prompt:Hide()
+	BtmScan.storeItemConfig(item.itemconfig, item.sig)
 end
 
 BtmScan.InputData = {
@@ -1446,7 +1541,7 @@ BtmScan.Prompt = CreateFrame("Frame", "", UIParent)
 BtmScan.Prompt:Hide()
 BtmScan.Prompt:SetPoint("TOP", "UIParent", "TOP", 0, -100)
 BtmScan.Prompt:SetFrameStrata("DIALOG")
-BtmScan.Prompt:SetHeight(195)
+BtmScan.Prompt:SetHeight(220)
 BtmScan.Prompt:SetWidth(400)
 BtmScan.Prompt:SetBackdrop({
 	bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -1513,10 +1608,17 @@ BtmScan.Prompt.No = CreateFrame("Button", "", BtmScan.Prompt, "OptionsButtonTemp
 BtmScan.Prompt.No:SetText(tr("No"))
 BtmScan.Prompt.No:SetPoint("BOTTOMRIGHT", BtmScan.Prompt.Yes, "BOTTOMLEFT", -5, 0)
 BtmScan.Prompt.No:SetScript("OnClick", BtmScan.CancelPurchase)
+
 BtmScan.Prompt.Ignore = CreateFrame("Button", "", BtmScan.Prompt, "OptionsButtonTemplate")
 BtmScan.Prompt.Ignore:SetText(tr("Ignore"))
 BtmScan.Prompt.Ignore:SetPoint("BOTTOMRIGHT", BtmScan.Prompt.No, "BOTTOMLEFT", -5, 0)
 BtmScan.Prompt.Ignore:SetScript("OnClick", BtmScan.IgnorePurchase)
+
+BtmScan.Prompt.IgnorePurchase = CreateFrame("Button", "", BtmScan.Prompt, "OptionsButtonTemplate")
+BtmScan.Prompt.IgnorePurchase:SetText(tr("IgnoreMod"))
+BtmScan.Prompt.IgnorePurchase:SetPoint("BOTTOMLEFT", BtmScan.Prompt, "BOTTOMLEFT", 5, 30)
+BtmScan.Prompt.IgnorePurchase:SetScript("OnClick", BtmScan.IgnorePurchaseModule)
+BtmScan.Prompt.lastbutton=BtmScan.Prompt.IgnorePurchase
 
 BtmScan.Input = CreateFrame("Frame", "", UIParent)
 BtmScan.Input:Hide()
@@ -1703,3 +1805,89 @@ function BtmScan.DebugPrint(message, category, title, errorCode, level)
 end
 
 -- vim:fen:fdm=marker:fdl=1:fcl=:
+
+
+-------------------------------------------------------------------------------
+-- Converts a itemconfiguration into a ';' delimited string.
+-------------------------------------------------------------------------------
+function BtmScan.packItemConfiguration(itemconfig)
+	return
+		tostring(itemconfig.maxPrice)..";"..
+		tostring(itemconfig.isIgnore)..";"..
+		tostring(itemconfig.ignoreModuleList)..";"..
+		tostring(itemconfig.buyBelow);
+end
+
+-------------------------------------------------------------------------------
+-- Converts a ';' delimited string into a completed auction.
+-------------------------------------------------------------------------------
+function BtmScan.unpackItemConfiguration(packedItemConfiguration)
+	local itemconfig = {};
+	_, _, itemconfig.maxPrice, itemconfig.isIgnore, itemconfig.ignoreModuleList, itemconfig.buyBelow = packedItemConfiguration:find("(.+);(.+);(.+);(.+)");
+
+	itemconfig.maxPrice = BtmScan.numberFromString(itemconfig.maxPrice);
+	itemconfig.buyBelow = BtmScan.numberFromString(itemconfig.buyBelow);
+	itemconfig.isIgnore = BtmScan.booleanFromString(itemconfig.isIgnore);
+
+	return itemconfig;
+end
+
+-------------------------------------------------------------------------------
+-- Converts a ';' delimited string into a completed auction.
+-------------------------------------------------------------------------------
+function BtmScan.checkEmptyItemConfig(itemconfig)
+	local used=false
+
+	if (itemconfig.maxPrice~=nil) then used=true end
+	if (itemconfig.isIgnore~=nil) then used=true end
+	if (itemconfig.ignoreModuleList~=nil) then used=true end
+	if (itemconfig.buyBelow~=nil) then used=true end
+	return used
+end
+
+-------------------------------------------------------------------------------
+-- stores the itemConfig-Structure
+-------------------------------------------------------------------------------
+function BtmScan.storeItemConfig(itemconfig, itemid)
+	if (not BtmScan.checkEmptyItemConfig(itemconfig)) then return end
+	if (not itemconfig.ownerTable) then return end
+
+	local itemConfigString=BtmScan.packItemConfiguration(itemconfig)
+	itemconfig.ownerTable[itemid]=itemConfigString
+end
+
+-------------------------------------------------------------------------------
+-- Converts numeric string into a number.
+-------------------------------------------------------------------------------
+function BtmScan.numberFromString(number)
+	if (number == "nil") then
+		return nil;
+	end
+	return tonumber(number);
+end
+
+-------------------------------------------------------------------------------
+-- Converts a numeric string into a boolean.
+-------------------------------------------------------------------------------
+function BtmScan.booleanFromString(string)
+	if (string == NIL_VALUE) then
+		return nil;
+	elseif (string == "true") then
+		return true;
+	elseif (string == "false") then
+		return false;
+	end
+	return nil;
+end
+
+function BtmScan.getItemConfig(itemsig)
+	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
+	local itemconfig = itemConfigTable[itemsig]
+	if (itemconfig) then
+		itemconfig = BtmScan.unpackItemConfiguration(itemconfig)
+	else
+		itemconfig = {}
+	end
+	itemconfig.ownerTable =itemConfigTable
+	return itemconfig
+end
