@@ -197,6 +197,9 @@ function private.sendRequest(request, details)
 	local vendorPrice = details.vendorPrice
 	local answerCount = details.answerCount
 	local totalSeenCount = details.totalSeenCount
+	
+	--Format pricing data
+	totalPrice = math.floor(totalPrice/totalSeenCount) 
 
 	--Reset the timer and move the request over to the sent queue.
 	details.timer = GetTime()
@@ -207,7 +210,7 @@ function private.sendRequest(request, details)
 end
 
 function private.sendResponse(link, count, player, answerCount, totalSeenCount, totalPrice, vendorPrice)
-	local marketPrice = math.floor(totalPrice/totalSeenCount)
+	local marketPrice = totalPrice
 
 	--If the stack size is grater than one, add the unit price to the message
 	local strMarketOne
