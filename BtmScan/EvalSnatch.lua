@@ -1,7 +1,7 @@
 --[[
 	BottomScanner - An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EvalSnatch.lua 2193 2007-10-08 18:00:0Z ironmind $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 
@@ -59,7 +59,7 @@ function lib:valuate(item, tooltip)
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
 
-	if (item.itemconfig.buyBelow==nil or item.itemconfig.buyBelow==0) then return end
+	if ((not item.itemconfig.buyBelow) or item.itemconfig.buyBelow==0) then return end
 
 	local value = item.itemconfig.buyBelow * item.count
 
@@ -101,14 +101,14 @@ function lib.CommandHandler(msg)
 		end
 
 		local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(itemlink)
-		local itemsig = ("%d:%d:%d"):format(itemid, itemsuffix, itemenchant)
+		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
 		local itemconfig = BtmScan.getItemConfig(itemsig)
 
 
 		if (price <= 0) then
 			price = BtmScan.ParseGSC(remain) or 0
 		end
-		
+
 		if (price <= 0) then
 			BtmScan.Print(translate("BottomScanner will now %1 %2", translate("not snatch"), itemlink))
 			return

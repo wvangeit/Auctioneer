@@ -1,7 +1,7 @@
 --[[
 	BottomScanner - An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: FilterItemPrice.lua 2193 2007-10-08 18:00:0Z ironmind $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 
@@ -57,9 +57,9 @@ function lib:filterItem(item, evaluationModule)
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
 
-	if (get(lcName..".filter."..evaluationModule)==false) then 
+	if (get(lcName..".filter."..evaluationModule)==false) then
 --		BtmScan.Print(" not enabled for"..evaluationModule)
-		return 
+		return
 	end
 
 --	BtmScan.Print(" got configured "..tostring(item.itemconfig.maxPrice).." bid:"..tostring(item.bid).." buy:"..tostring(item.buy))

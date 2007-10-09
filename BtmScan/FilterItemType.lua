@@ -1,7 +1,7 @@
 --[[
 	BottomScanner - An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: FilterItemType.lua 2193 2007-10-08 18:00:0Z ironmind $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 
@@ -99,7 +99,7 @@ function lib:filterItem(item, evaluationModule)
 		minLevel = get(lcName..".tradegoods.minlevel")
 	end
 
-	if (itemLevel < minLevel) then 
+	if (itemLevel < minLevel) then
 --		BtmScan.Print(" filterd "..itemType.." level:"..tostring(itemLevel).." required:"..tostring(minLevel))
 		-- module-filter ->
 		filterModule=true

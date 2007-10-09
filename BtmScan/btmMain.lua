@@ -529,7 +529,7 @@ function BtmScan.EvaluateItem(item, doTooltip)
 
 
 
-		
+
 		local ignoreString = item.itemconfig.ignoreModuleList
 		if (ignoreString and strfind(ignoreString,name)) then
 --				BtmScan.Print(" got filter hit(ignore-list) "..item.sig..":"..ignoreString)
@@ -1319,7 +1319,7 @@ BtmScan.UndoTooltip = function ()
 end
 
 function BtmScan.AuctionFrameTabClickHook(_,_, index)
-	if (not index) then index = this:GetID(); end
+	if (not index) then index = this:GetID() end
 
 	local tab = getglobal("AuctionFrameTab"..index)
 	if (tab and tab:GetName() == "AuctionFrameTabBtmScan") then
@@ -1461,7 +1461,7 @@ BtmScan.IgnorePurchase = function()
 	item.itemconfig.isIgnore=true
 	BtmScan.Print(" ignoreStatusAfter:"..tostring(BtmScan.Prompt.item.itemconfig.isIgnore))
 
-	
+
 --	local ignore = BtmScan.Settings.GetSetting("ignore.list")
 --	ignore[item.sig] = true
 	BtmScan.Print(tr("BottomScanner will now %1 %2", tr("ignore"), item.link))
@@ -1804,9 +1804,6 @@ function BtmScan.DebugPrint(message, category, title, errorCode, level)
 	return DebugLib.DebugPrint(message, category, title, errorCode, level)
 end
 
--- vim:fen:fdm=marker:fdl=1:fcl=:
-
-
 -------------------------------------------------------------------------------
 -- Converts a itemconfiguration into a ';' delimited string.
 -------------------------------------------------------------------------------
@@ -1815,34 +1812,44 @@ function BtmScan.packItemConfiguration(itemconfig)
 		tostring(itemconfig.maxPrice)..";"..
 		tostring(itemconfig.isIgnore)..";"..
 		tostring(itemconfig.ignoreModuleList)..";"..
-		tostring(itemconfig.buyBelow);
+		tostring(itemconfig.buyBelow)
 end
 
 -------------------------------------------------------------------------------
 -- Converts a ';' delimited string into a completed auction.
 -------------------------------------------------------------------------------
 function BtmScan.unpackItemConfiguration(packedItemConfiguration)
-	local itemconfig = {};
-	_, _, itemconfig.maxPrice, itemconfig.isIgnore, itemconfig.ignoreModuleList, itemconfig.buyBelow = packedItemConfiguration:find("(.+);(.+);(.+);(.+)");
+	local itemconfig = {}
+	itemconfig.maxPrice, itemconfig.isIgnore, itemconfig.ignoreModuleList, itemconfig.buyBelow = (";"):split(packedItemConfiguration)
 
-	itemconfig.maxPrice = BtmScan.numberFromString(itemconfig.maxPrice);
-	itemconfig.buyBelow = BtmScan.numberFromString(itemconfig.buyBelow);
-	itemconfig.isIgnore = BtmScan.booleanFromString(itemconfig.isIgnore);
+	itemconfig.maxPrice = tonumber(itemconfig.maxPrice)
+	itemconfig.buyBelow = tonumber(itemconfig.buyBelow)
+	itemconfig.isIgnore = BtmScan.booleanFromString(itemconfig.isIgnore)
 
-	return itemconfig;
+	return itemconfig
 end
 
 -------------------------------------------------------------------------------
 -- Converts a ';' delimited string into a completed auction.
 -------------------------------------------------------------------------------
 function BtmScan.checkEmptyItemConfig(itemconfig)
-	local used=false
+	if (itemconfig.maxPrice) then
+		return true
+	end
 
-	if (itemconfig.maxPrice~=nil) then used=true end
-	if (itemconfig.isIgnore~=nil) then used=true end
-	if (itemconfig.ignoreModuleList~=nil) then used=true end
-	if (itemconfig.buyBelow~=nil) then used=true end
-	return used
+	if (itemconfig.isIgnore) then
+		return true
+	end
+
+	if (itemconfig.ignoreModuleList) then
+		return true
+	end
+
+	if (itemconfig.buyBelow) then
+		return true
+	end
+
+	return false
 end
 
 -------------------------------------------------------------------------------
@@ -1857,27 +1864,16 @@ function BtmScan.storeItemConfig(itemconfig, itemid)
 end
 
 -------------------------------------------------------------------------------
--- Converts numeric string into a number.
--------------------------------------------------------------------------------
-function BtmScan.numberFromString(number)
-	if (number == "nil") then
-		return nil;
-	end
-	return tonumber(number);
-end
-
--------------------------------------------------------------------------------
 -- Converts a numeric string into a boolean.
 -------------------------------------------------------------------------------
 function BtmScan.booleanFromString(string)
 	if (string == NIL_VALUE) then
-		return nil;
+		return nil
 	elseif (string == "true") then
-		return true;
+		return true
 	elseif (string == "false") then
-		return false;
+		return false
 	end
-	return nil;
 end
 
 function BtmScan.getItemConfig(itemsig)
