@@ -271,6 +271,7 @@ function private.UnpackStatIter(data, ...)
 	for i = 1, c do
 		v = select(i, ...)
 		local property, info = strsplit(":", v)
+		property = tonumber(property) or property
 		if (property and info) then
 			data[property] = AucAdvanced.Acquire(strsplit(";", info))
 			local item
