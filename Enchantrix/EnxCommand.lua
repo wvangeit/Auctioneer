@@ -773,10 +773,12 @@ function chatPrintHelp()
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowValue'), Enchantrix.Locale.GetLocalizedFilterVal('valuate'), _ENCH('HelpValue')));
 	if AucAdvanced then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerVal'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-val'), _ENCH('HelpGuessAuctioneer5Val')));
-	elseif Enchantrix.State.Auctioneer_Loaded then
+	end
+	if Auctioneer and Enchantrix.State.Auctioneer_Loaded then
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerHsp'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-hsp'), _ENCH('HelpGuessAuctioneerHsp')));
 		Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessAuctioneerMed'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-median'), _ENCH('HelpGuessAuctioneerMedian')));
-	else
+	end
+	if not AucAdvanced and not (Auctioneer and Enchantrix.State.Auctioneer_Loaded) then
 		Enchantrix.Util.ChatPrint(_ENCH('HelpGuessNoauctioneer'));
 	end
 	Enchantrix.Util.ChatPrint(lineFormat:format(_ENCH('ShowGuessBaseline'), Enchantrix.Locale.GetLocalizedFilterVal('valuate-baseline'), _ENCH('HelpGuessBaseline')));

@@ -441,8 +441,10 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowValues", _ENCH("GuiValueShowDEValues"))
 	gui:AddControl(id, "Checkbox",   0, 2, "ToolTipTerseFormat", _ENCH("GuiValueTerse"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
-		gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		if (Auctioneer) then
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		end
 		if (AucAdvanced) then
 			gui:AddControl(id, "Checkbox",       0, 2, "TooltipShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
 		end
@@ -467,8 +469,10 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiValueOptions"))
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipProspectValues",  _ENCH("GuiProspectingValues"))
 	if (Enchantrix.State.Auctioneer_Loaded) then
-		gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
-		gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		if (Auctioneer) then
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueHSP", _ENCH("GuiValueShowAuc4HSP"))
+			gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctValueMedian", _ENCH("GuiValueShowAuc4Median"))
+		end
 		if (AucAdvanced) then
 			gui:AddControl(id, "Checkbox",       0, 2, "TooltipProspectShowAuctAdvValue", _ENCH("GuiValueShowAuc5Market"))
 		end
