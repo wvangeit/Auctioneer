@@ -137,7 +137,7 @@ local function findItemInBags(findLink)
 	    	local link = GetContainerItemLink(bag, slot)
 			if link and (not findLink or link == findLink) then
 				if not findLink and prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellname')
-				   and prompt.link == prompt.link and bag == prompt.bag and slot == prompt.slot then
+				   and link == prompt.link and bag == prompt.bag and slot == prompt.slot then
 					-- items sometimes linger after they've been disenchanted and looted
 					debugSpam("Skipping zombie item " .. link)
 				else
