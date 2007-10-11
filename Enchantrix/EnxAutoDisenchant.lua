@@ -108,9 +108,13 @@ local function getDisenchantOrProspectValue(link, count)
 	if quality >= 2 then
 		local enchSkillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		if enchSkillRequired and Enchantrix.Util.GetUserEnchantingSkill() >= enchSkillRequired then
-			local disenchantValue = Enchantrix.Storage.GetItemDisenchantTotals(link)
-			if disenchantValue and disenchantValue > 0 then
-				return disenchantValue, _ENCH('ArgSpellname')
+			local hsp, median, market, valFive = Enchantrix.Storage.GetItemDisenchantTotals(link)
+			if (not hsp) or (hsp == 0) then
+				-- what to do when Auc4 isn't loaded, but Auc5 is
+				hsp = valFive;
+			end
+			if hsp and hsp > 0 then
+				return hsp, _ENCH('ArgSpellname')
 			end
 		end
 	elseif count >= 5 then
@@ -120,7 +124,11 @@ local function getDisenchantOrProspectValue(link, count)
 			if prospect then
 				local prospectValue = 0
 				for result, yield in pairs(prospect) do
-					local hsp = Enchantrix.Util.GetReagentPrice(result)
+					local hsp, median, market, valFive = Enchantrix.Util.GetReagentPrice(result)
+					if (not hsp) or (hsp == 0) then
+						-- what to do when Auc4 isn't loaded, but Auc5 is
+						hsp = valFive;
+					end
 					local value = (hsp or 0) * yield
 					prospectValue = prospectValue + value
 				end
