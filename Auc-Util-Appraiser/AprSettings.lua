@@ -240,7 +240,7 @@ end
 -- Configure our defaults
 AucAdvanced.Settings.SetDefault("util.appraiser.enable", false)
 AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
-AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
+AucAdvanced.Settings.SetDefault("util.appraiser.altModel", "market")
 AucAdvanced.Settings.SetDefault("util.appraiser.duration", 1440)
 AucAdvanced.Settings.SetDefault("util.appraiser.round.bid", false)
 AucAdvanced.Settings.SetDefault("util.appraiser.round.buy", false)
