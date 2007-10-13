@@ -243,9 +243,16 @@ local function craftUILoaded()
 		Enchantrix_BarkerDisplayButton:SetPoint("TOPRIGHT", useFrame, "TOPRIGHT", -185, -68 );
 	end
 
+	-- skillet has an API to add buttons
+	if SkilletFrame then
+	    local frame = Skillet:AddButtonToTradeskillWindow(Enchantrix_BarkerDisplayButton)
+	    useFrame = frame;
+	end
+	
 	Enchantrix_BarkerOptions_Frame:SetParent(useFrame);
 	Enchantrix_BarkerOptions_Frame:SetPoint("TOPLEFT", useFrame, "TOPRIGHT");
 	relevelFrame(Enchantrix_BarkerOptions_Frame)
+	
 end
 
 function EnchantrixBarker_OnLoad()
