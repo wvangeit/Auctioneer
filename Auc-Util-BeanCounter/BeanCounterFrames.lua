@@ -33,7 +33,7 @@ function private.CreateFrames()
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
-	title:SetText("BeanCounter: Dude, Where's my gold?!") --Not our real title
+	title:SetText("BeanCounter: Auction History Database")
 
 	
 	function frame.ScanTab.OnClick(_, _, index)
@@ -161,9 +161,9 @@ function private.CreateFrames()
 		{ "Price", "COIN", 80 },
 		{ "Deposit", "COIN", 50 },
 		{ "Fee", "COIN", 50 },
-		{ "Buyout", "COIN", 80 },
-		{ "Bid", "COIN", 80 },
-		{ "Wealth", "COIN", 80 },
+		{ "Bid", "COIN", 70 },
+		{ "Buyout", "COIN", 70 },
+		{ "Wealth", "COIN", 70 },
 		--{ "Time", "INT", 80 },
 	})
 	
@@ -191,8 +191,8 @@ function private.CreateFrames()
 									tbl[3], --money,
 									tbl[4], --deposit
 									tbl[5], --fee
-									tbl[6], --buyout
 									tbl[7], --bid
+									tbl[6], --buyout
 									tbl[10], --current wealth
 									tbl[9], --time,
 									--math.floor(0.5+result[Const.MINBID]/count),
@@ -221,8 +221,8 @@ function private.CreateFrames()
 									nil, --money,
 									deposit, --deposit
 									nil, --fee
-									buyoutPrice, --buyout
 									minBid, --bid
+									buyoutPrice, --buyout
 									tbl[4], --current wealth
 									tbl[3], --time,
 								})
@@ -249,8 +249,8 @@ function private.CreateFrames()
 									tbl[3], --money,
 									tbl[4], --deposit
 									tbl[5], --fee
-									tbl[6], --buyout
 									tbl[7], --bid
+									tbl[6], --buyout
 									tbl[10], --current wealth
 									tbl[9], --time,
 								    })
@@ -273,8 +273,8 @@ function private.CreateFrames()
 									tbl[3], --money,
 									nil, --deposit
 									nil, --fee
-									nil, --buyout
 									nil, --bid
+									nil, --buyout
 									tbl[5], --current wealth
 									tbl[4], --time,
 								    })
