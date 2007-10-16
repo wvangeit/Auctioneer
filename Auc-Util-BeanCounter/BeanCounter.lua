@@ -1,3 +1,36 @@
+--[[
+	Auctioneer Addon for World of Warcraft(tm).
+	Version: <%version%> (<%codename%>)
+	Revision: $Id: BeanCounterDB.lua 1326 2007-01-12 03:25:09Z kandoko $
+
+	BeanCounterCore - BeanCounter: Auction House History
+
+	License:
+		This program is free software; you can redistribute it and/or
+		modify it under the terms of the GNU General Public License
+		as published by the Free Software Foundation; either version 2
+		of the License, or (at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program(see GPL.txt); if not, write to the Free Software
+		Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+	Note:
+		This AddOn's source code is specifically designed to work with
+		World of Warcraft's interpreted AddOn system.
+		You have an implicit licence to use this AddOn with these facilities
+		since that is it's designated purpose as per:
+		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
+]]
+
+
+
+
 local libName = "BeanCounter"
 local libType = "Util"
 
@@ -108,21 +141,21 @@ function private.initializeDB()
 private.playerData = BeanCounterDB[private.realmName][private.playerName]
 private.serverData = BeanCounterDB[private.realmName]
 
---Ok, create a fake table telling folks what our data base means
+--Ok, create a fake table telling folks what our database means
 	BeanCounterDBFormat = {"This is a diagram for the layout of the BeanCounterDB.",
 	'POSTING DATABASE -- records Auction house activities',
 	"['postedAuctions'] == Item, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), current wealth",
-	'["postedBids"] == itemName, count, bid, owner, isBuyout, timeLeft, time(),current wealth',
-	'["postedBuyouts"] ==  itemName, count, bid, owner, isBuyout, timeLeft, time(), current wealth',
+	"['postedBids'] == itemName, count, bid, owner, isBuyout, timeLeft, time(),current wealth",
+	"['postedBuyouts'] ==  itemName, count, bid, owner, isBuyout, timeLeft, time(), current wealth",
 	' ',
 	' ',
 	'MAIL DATABASE --records mail received from Auction House',	
 	'(Some of these values will be nil If we were unable to Retrieve the Invoice), current wealth',
-	'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth',
-	'["failedAuctions"] == itemName, "Auction expired", (time the mail arrived in our mailbox), current wealth',
-	'completedBids/Buyouts are a combination of the mail data from postedBuyouts and postedBids, current wealth',
-	'["completedBids/Buyouts"] == itemName, "Auction won", (time the mail arrived in our mailbox), current wealth',
-	'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox), current wealth',
+	"['completedAuctions'] == itemName, Auction successful, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth",
+	"['failedAuctions'] == itemName, Auction expired, (time the mail arrived in our mailbox), current wealth",
+	"completedBids/Buyouts are a combination of the mail data from postedBuyouts and postedBids, current wealth",
+	"['completedBids/Buyouts] == itemName, Auction won, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth",
+	"[failedBids] == itemName, Outbid, money, (time the mail arrived in our mailbox), current wealth",
 	'',
 	'APIs',
     'TODO',
