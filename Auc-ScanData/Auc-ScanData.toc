@@ -11,4 +11,4 @@
 ## URL: http://auctioneeraddon.com/
 ##
 StringRope.lua
-ScanTooltip.lua
+ScanData.lua
