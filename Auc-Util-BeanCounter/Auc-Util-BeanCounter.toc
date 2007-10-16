@@ -1,0 +1,11 @@
+## Title: Auc:Util:BeanCounter
+## Interface: 20200
+## Dependancies: Auc-Advanced
+## SavedVariables: BeanCounterDBFormat, BeanCounterDB
+##
+## Version: <%version%> (<%codename%>)
+## Revision: $Id: Auc-Util-BeanCounter.toc 2241 2007-09-25 09:59:50Z norganna $
+## URL: http://auctioneeraddon.com/
+##
+Embed.xml
+ListTemplate.xml
