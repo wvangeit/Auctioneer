@@ -4,8 +4,8 @@
 ## SavedVariables: BeanCounterDBFormat, BeanCounterDB
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Util-BeanCounter.toc 2241 2007-09-25 09:59:50Z norganna $
+## Revision: $Id:$
 ## URL: http://auctioneeraddon.com/
 ##
 Embed.xml
-ListTemplate.xml
+

@@ -4,7 +4,7 @@
 	http://norganna.org/localizer/
 
 	AddOn: BeanCounter
-	Revision: $Id: BeanCounterStrings.lua 1685 2007-04-12 11:07:02Z luke1410 $
+	Revision: $Id:$
 	Version: <%version%> (<%codename%>)
 
 	License:

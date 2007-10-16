@@ -1,7 +1,7 @@
 --[[
 	BeanCounter Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BeanCounterLocale.lua 2291 2007-10-06 05:25:28Z norganna $
+	Revision: $Id:$
 
 	BeanCounterLocale
 	Functions for localizing BeanCounter

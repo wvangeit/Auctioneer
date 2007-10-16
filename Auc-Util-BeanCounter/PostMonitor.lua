@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BeanCounterDB.lua 1326 2007-01-12 03:25:09Z kandoko $
+	Revision: $Id:$
 
 	PostMonitor - Records items posted up for auction
 
