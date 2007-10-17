@@ -1,8 +1,9 @@
 --[[
 	BeanCounter Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
-
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
+	
 	BeanCounterLocale
 	Functions for localizing BeanCounter
 	Thanks to Telo for the LootLink code from which this was based.

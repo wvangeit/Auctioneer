@@ -1,8 +1,9 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
-
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
+	
 	PostMonitor - Records items posted up for auction
 
 	License:
@@ -34,7 +35,11 @@ local lib = AucAdvanced.Modules[libType][libName]
 local private = lib.Private
 
 local print = AucAdvanced.Print
-local debugPrint = private.debugPrint
+
+local function debugPrint(...) 
+private.debugPrint("PostMonitor",...)
+end
+
 -------------------------------------------------------------------------------
 -- Called before StartAuction()
 -------------------------------------------------------------------------------

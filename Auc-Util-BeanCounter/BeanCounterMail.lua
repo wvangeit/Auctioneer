@@ -1,8 +1,9 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
-
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
+	
 	BeanCounteMail - Handles recording of all auction house related mail 
 
 	License:
@@ -34,7 +35,12 @@ local libType = "Util"
 local lib = AucAdvanced.Modules[libType][libName]
 local private = lib.Private
 
+local debugPrint 
 local print = AucAdvanced.Print
+
+local function debugPrint(...) 
+private.debugPrint("BeanCounterMail",...)
+end
 
 
 function private.mailMonitor(event,arg1)
@@ -95,10 +101,10 @@ function private.getInvoice(n,sender, subject)
 		if  "Auction successful: " == (string.match( subject , "(Auction successful:%s)" )) or "Auction won: " == (string.match( subject , "(Auction won:%s)" )) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n);
 			if  playerName then
-				private.debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
+				debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes"
 			else
-				private.debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no")
+				debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no"
 			end
 		end
@@ -110,7 +116,9 @@ end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
-	if not ignore then
+	if private.TakeInboxIgnore == false then
+	--Messages called by TakeInboxItem(index) "Used by mass mail mods".  the message is never read so we never have it in the pending table
+	if private.inboxCurrent[index]["read"] == 0 then GetInboxText(index) end--Forces message to be read.
 		for i,v in pairs(private.reconcilePending) do
 			if (private.reconcilePending[i]["index"] == index) then --ok lets get the invoice
 				table.insert(private.Task, {["MailboxIndex"] = private.reconcilePending[i]["index"], ["time"] = time(), ["PendingIndex"] = i,  ["task"] = "money"})
@@ -118,19 +126,22 @@ function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
 			end
 		end
 	end
+	private.TakeInboxIgnore = false
 end
---Dang if we want data on auctions Won we need another hook on take item
+
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
-	    
-function private.PreTakeInboxItemHook(funcArgs, retVal, index, ignore)
-	if not ignore then
-		for i,v in pairs(private.reconcilePending) do
+function private.PreTakeInboxItemHook( ignore, retVal, index)
+	if private.TakeInboxIgnore == false then
+	--Messages called by TakeInboxItem(index) "Used by mass mail mods".  the message is never read so we never have it in the pending table
+	if private.inboxCurrent[index]["read"] == 0 then GetInboxText(index) end--Forces message to be read.
+		for i,v in pairs(private.reconcilePending) do --This will only full if theres a message with an invoice
 			if (private.reconcilePending[i]["index"] == index) then --ok lets get the invoice
 				table.insert(private.Task, {["MailboxIndex"] = private.reconcilePending[i]["index"], ["time"] = time(), ["PendingIndex"] = i, ["task"] = "item"})
 				return "abort"
 			end
 		end
 	end
+	private.TakeInboxIgnore = false 
 end
 
 --This is the task handler, if we have a paused item/money hook this processes it
@@ -143,13 +154,15 @@ private.reconcilePending[i]["type"], private.reconcilePending[i]["itemName"], pr
 		else
 			if private.reconcilePending[i]["retrieved"] == "no" then --we failed to get invoice 
 				private.reconcilePending[i]["retrieved"] = "failed"
-					end
+			end
 			if private.Task[1]["task"] == "money" then 
 				table.remove(private.Task,1)
-				TakeInboxMoney(index, "ignore")
+				private.TakeInboxIgnore = true
+				TakeInboxMoney(index)
 			else
 				table.remove(private.Task,1)
-				TakeInboxItem(index, "ignore")
+				private.TakeInboxIgnore = true
+				TakeInboxItem(index)
 			end
 		end
 	
@@ -165,11 +178,11 @@ function private.mailSort()
 		
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
 		
-		private.debugPrint("mail sort")
+		--debugPrint("mail sort")
 		
 		if (private.reconcilePending[i]["sender"] == "Alliance Auction House") or (private.reconcilePending[i]["sender"] == "Horde Auction House") then
 			if  "Auction successful: " == (string.match(private.reconcilePending[i]["subject"], "(Auction successful:%s)" )) and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
-				private.debugPrint("Auction successful: ")
+				debugPrint("Auction successful: ")
 				--Get itemID from database
 				local itemName = string.match(private.reconcilePending[i]["subject"], "Auction successful:%s(.*)" )
 				local itemID = private.matchDB("postedAuctions", itemName)
@@ -185,7 +198,7 @@ function private.mailSort()
 				if itemID then    
 				--Do we want to insert nil values into the exp auc string to match length with comp auc string?
 				--local value = private.packString(itemName, "Auction expired", _, _, _, _, _, _, private.reconcilePending[i]["time"], private.wealth)
-					private.debugPrint("Auction Expired")
+					debugPrint("Auction Expired")
 					local value = private.packString(itemName, "Auction expired", private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedAuctions", itemID, value)
 				end
@@ -194,21 +207,21 @@ function private.mailSort()
 			
 			elseif "Auction won: " == (string.match(private.reconcilePending[i]["subject"], "(Auction won:%s)" )) and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
 				
-				private.debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
+				debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
 				local itemName = string.match(private.reconcilePending[i]["subject"], "Auction won:%s(.*)" )
 				local itemID = private.matchDB("postedBids", itemName)
 				--try to get itemID from bids, if not then buyouts. One of these DB MUST have it
 				if not itemID then itemID = private.matchDB("postedBuyouts", itemName) end
 				
 				if itemID then
-					private.debugPrint("Auction won: ", itemID)
+					debugPrint("Auction won: ", itemID)
 					local value = private.packString(itemName, "Auction won", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
 					private.databaseAdd("completedBids/Buyouts", itemID, value)
 				end				
 				table.remove(private.reconcilePending,i)			
 			
 			elseif "Outbid on " == (string.match(private.reconcilePending[i]["subject"], "(Outbid on%s)" )) then
-				private.debugPrint("Outbid on ")
+				debugPrint("Outbid on ")
 				
 				local itemName = string.match(private.reconcilePending[i]["subject"], "Outbid on%s(.*)" )
 				local itemID = private.matchDB("postedBids", itemName)
@@ -221,12 +234,12 @@ function private.mailSort()
 				table.remove(private.reconcilePending,i)
 						
 			elseif "Sale Pending: " == (string.match(private.reconcilePending[i]["subject"], "(Sale Pending:%s)" )) then
-                private.debugPrint("Sale Pending: " )	--ignore We dont care about this message
+                debugPrint("Sale Pending: " )	--ignore We dont care about this message
                 table.remove(private.reconcilePending,i)
 			end	
 	
 			else --if its not AH do we care? We need to record cash arrival from other toons
-			private.debugPrint("OTHER", private.reconcilePending[i]["subject"])
+			debugPrint("OTHER", private.reconcilePending[i]["subject"])
 			table.remove(private.reconcilePending,i)
 		end
 	end
@@ -237,11 +250,11 @@ function private.matchDB(key, text)
 	for i,v in pairs(private.playerData[key]) do
 		if private.playerData[key][i][1] then
 			if text == (string.match(private.playerData[key][i][1], "(.-):" )) then
-				private.debugPrint("private.matchDB",private.playerData[key][i][1])
+				debugPrint("private.matchDB",private.playerData[key][i][1])
 				return i 
 			end
 		else 
-		private.debugPrint("private.matchDB", key, text, "Failed")
+		debugPrint("private.matchDB", key, text, "Failed")
 			return nil
 		end
 	end

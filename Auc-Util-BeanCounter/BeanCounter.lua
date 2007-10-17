@@ -1,10 +1,11 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
+	Revision: $Id$
 
 	BeanCounterCore - BeanCounter: Auction House History
-
+	URL: http://auctioneeraddon.com/
+	
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -60,10 +61,15 @@ local private = {
 	inboxStart = {},
 	inboxCurrent = {},
 	Task ={},
+	TakeInboxIgnore = false,
 	}
 	
 lib.Private = private --allow beancounter's sub lua's access
 local print = AucAdvanced.Print
+
+local function debugPrint(...) 
+private.debugPrint("BeanCounterCore",...)
+end
 
 
 function lib.GetName()
@@ -188,8 +194,10 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
 
-	--gui:AddControl(id, "Subhead",    0,    "Respond from:")
-
+	--gui:AddControl(id, "Subhead",    0,    "Debug from specific modules:")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Maildebug", "Show BeanCounterMail Debugging Messages.")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterFrames Debugging Messages.")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterPosting/Bid Debugging Messages.")	
 end
 
 
@@ -259,7 +267,7 @@ function private.databaseRemove(key, itemID, ITEM, NAME)
 end
 --Get item Info or a specific subset. accepts itemID or "itemString" or "itemName ONLY IF THE ITEM IS IN PLAYERS BAG" or "itemLink"
 function private.getItemInfo(link, cmd) 
-private.debugPrint(link, cmd)
+debugPrint(link, cmd)
 local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
 	if not cmd then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture

@@ -1,8 +1,9 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
-
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
+	
 	BeanCounterFrames - AuctionHouse UI for Beancounter 
 
 	License:
@@ -34,7 +35,11 @@ local lib = AucAdvanced.Modules[libType][libName]
 local private = lib.Private
 
 local print = AucAdvanced.Print
-local debugPrint = print
+
+local function debugPrint(...) 
+private.debugPrint("BeanCounterFrames",...)
+end
+
 
 local frame
 function private.CreateFrames()
@@ -185,14 +190,16 @@ function private.CreateFrames()
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ "Item", "TEXT", 120 },
 		{ "Type", "TEXT", 110 },
-		{ "Seller", "TEXT", 85 },
-		{ "Buyer", "TEXT", 85 },
-		--{ "Stk", "INT", 30 },
-		{ "Price", "COIN", 80 },
-		{ "Deposit", "COIN", 50 },
-		{ "Fee", "COIN", 50 },
+		
 		{ "Bid", "COIN", 70 },
 		{ "Buyout", "COIN", 70 },
+		{ "Price", "COIN", 70},
+		
+		{ "Seller", "TEXT", 70 },
+		{ "Buyer", "TEXT", 70 },
+		
+		{ "Deposit", "COIN", 50 },
+		{ "Fee", "COIN", 50 },
 		{ "Wealth", "COIN", 70 },
 		--{ "Time", "INT", 80 },
 	})
@@ -216,13 +223,16 @@ function private.CreateFrames()
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
-									    nil,  --seller
-									tbl[8], --buyer
-									tbl[3], --money,
-									tbl[4], --deposit
-									tbl[5], --fee
+									 
 									tbl[7], --bid
 									tbl[6], --buyout
+									tbl[3], --money,
+									
+									   nil,  --seller
+									tbl[8], --buyer
+									
+									tbl[4], --deposit
+									tbl[5], --fee
 									tbl[10], --current wealth
 									tbl[9], --time,
 									--math.floor(0.5+result[Const.MINBID]/count),
@@ -246,13 +256,16 @@ function private.CreateFrames()
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
-									    nil,  --seller
-									nil, --buyer
-									nil, --money,
-									deposit, --deposit
-									nil, --fee
+									
 									minBid, --bid
 									buyoutPrice, --buyout
+									nil, --money,
+									
+									nil,  --seller
+									nil, --buyer
+									
+									deposit, --deposit
+									nil, --fee
 									tbl[4], --current wealth
 									tbl[3], --time,
 								})
@@ -274,13 +287,16 @@ function private.CreateFrames()
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
-									tbl[8],   --seller
-									  nil, --buyer
-									tbl[3], --money,
-									tbl[4], --deposit
-									tbl[5], --fee
+									
 									tbl[7], --bid
 									tbl[6], --buyout
+									tbl[3], --money,
+									
+									tbl[8],   --seller
+									nil, --buyer
+									  
+									tbl[4], --deposit
+									tbl[5], --fee
 									tbl[10], --current wealth
 									tbl[9], --time,
 								    })
@@ -298,13 +314,16 @@ function private.CreateFrames()
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
-									nil,  --seller
-									nil, --buyer
-									tbl[3], --money,
-									nil, --deposit
-									nil, --fee
+									
 									nil, --bid
 									nil, --buyout
+									tbl[3], --money,
+									
+									nil,  --seller
+									nil, --buyer
+									
+									nil, --deposit
+									nil, --fee
 									tbl[5], --current wealth
 									tbl[4], --time,
 								    })
@@ -316,7 +335,7 @@ function private.CreateFrames()
 		
 	
 		table.sort(data, function (a,b)  --Sort tables by time
-			return (a[11] < b[11]) 
+			return (a[11] > b[11]) 
 		end)
 		
 		frame.resultlist.sheet:SetData(data)
@@ -336,15 +355,18 @@ function private.CreateFrames()
 	function private.reconcileFailedAuctions(player, itemID, tbl)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
     			local tbl2 = {strsplit(":", v)}
-			local runtime = tbl2[5]*60  --Time the auction was set to last
-			local TimeFailedAuctionEnded = tbl[3] - runtime --Time this message should have been posted
-			TimeFailedAuctionEnded = tostring(TimeFailedAuctionEnded) 
-			local TimePostedAuction = tostring(tbl2[7])
+			
+			 --Time the auction was set to last
+			local TimeFailedAuctionStarted= tbl[3] - (tbl2[5]*60) --Time this message should have been posted
+			local TimePostedAuction = tbl2[7]
+					    
+			TimeFailedAuctionStarted = math.floor(TimeFailedAuctionStarted/100)
+			TimePostedAuction = math.floor(TimePostedAuction/100)
 		
-		TimeFailedAuctionEnded = TimeFailedAuctionEnded:match("(.*).") --removes the last digit. This gives a 10 sec time window for our matching post
-		TimePostedAuction = TimePostedAuction:match("(.*).")
-		    
-		    if TimePostedAuction == TimeFailedAuctionEnded then
+			   
+		   
+		    if TimePostedAuction == TimeFailedAuctionStarted then
+		    debugPrint(TimePostedAuction,TimeFailedAuctionStarted, tbl[3])
 			--post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth
 			return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
 		    end

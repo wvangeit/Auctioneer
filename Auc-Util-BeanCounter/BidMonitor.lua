@@ -1,8 +1,9 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
-
+	Revision: $Id$
+	URL: http://auctioneeraddon.com/
+	
 	BidMonitor - Records bids posted in the Auctionhouse
 
 	License:
@@ -35,6 +36,10 @@ local private = lib.Private
 
 local print = AucAdvanced.Print
 
+local function debugPrint(...) 
+private.debugPrint("BidMonitor",...)
+end
+
 -------------------------------------------------------------------------------
 -- Called after PlaceAuctionBid()
 -------------------------------------------------------------------------------
@@ -62,11 +67,11 @@ function private.addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, 
 	pendingBid.timeLeft = timeLeft;
 	pendingBid.itemLink = itemLink;
 	table.insert(private.PendingBids, pendingBid);
-	private.debugPrint("addPendingBid() - Added pending bid");
+	debugPrint("addPendingBid() - Added pending bid");
 	
 	-- Register for the response events if this is the first pending bid.
 	if (#private.PendingBids == 1) then
-		private.debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+		debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", private.onEventHookBid);
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", private.onEventHookBid);
 	end
@@ -80,11 +85,11 @@ function private.removePendingBid()
 		-- Remove the first pending bid.
 		local bid = private.PendingBids[1];
 		table.remove(private.PendingBids, 1);
-		private.debugPrint("removePendingBid() - Removed pending bid");
+		debugPrint("removePendingBid() - Removed pending bid");
 
 		-- Unregister for the response events if this is the last pending bid.
 		if (#private.PendingBids == 0) then
-			private.debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
+			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
 			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", private.onEventHookBid);
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", private.onEventHookBid);
 		end
@@ -105,7 +110,7 @@ function private.onEventHookBid(_, event, arg1)
 		 	private.onBidAccepted();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		if (arg1) then private.debugPrint("    "..arg1) end;
+		if (arg1) then debugPrint("    "..arg1) end;
 		if (arg1 == ERR_ITEM_NOT_FOUND or
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
@@ -125,16 +130,16 @@ function private.onBidAccepted()
 	
 	local itemID = bid.itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
 	local text = private.packString(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(),private.wealth)
-		private.debugPrint(bid.isBuyout, bid.isHighBidder)		
+		debugPrint(bid.isBuyout, bid.isHighBidder)		
 		if (bid.isBuyout) then
 			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid
-				private.debugPrint('private.databaseRemove(',"postedBids", itemID, bid.name, bid.owner, bid.bid)
+				debugPrint('private.databaseRemove(',"postedBids", itemID, bid.name, bid.owner, bid.bid)
 				private.databaseRemove("postedBids", itemID, bid.name, bid.owner, bid.bid)
 			end	
 			private.databaseAdd("postedBuyouts", itemID, text) 
 		else
 		
-		private.debugPrint('private.databaseAdd(pendingBids',itemID, text)
+		debugPrint('private.databaseAdd(pendingBids',itemID, text)
 		private.databaseAdd("postedBids", itemID, text)
 		end
 	end

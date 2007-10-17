@@ -2,9 +2,10 @@
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
 	http://norganna.org/localizer/
-
+	URL: http://auctioneeraddon.com/
+	
 	AddOn: BeanCounter
-	Revision: $Id:$
+	Revision: $Id$
 	Version: <%version%> (<%codename%>)
 
 	License:
