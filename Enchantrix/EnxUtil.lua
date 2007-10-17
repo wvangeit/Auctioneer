@@ -368,7 +368,8 @@ function getReagentPrice(reagentID, extra)
 				price5 = AucAdvanced.API.GetMarketValue(reagentID)
 			end
 		end
-		if Auctioneer and Enchantrix.State.Auctioneer_Loaded then
+		if Auctioneer and Enchantrix.State.Auctioneer_Loaded 
+			and Auctioneer.Util and Auctioneer.Statistic then
 			local itemKey = ("%d:0:0"):format(reagentID);
 			local realm = Auctioneer.Util.GetAuctionKey()
 			hsp = Auctioneer.Statistic.GetHSP(itemKey, realm)
