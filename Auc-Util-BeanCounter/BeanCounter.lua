@@ -139,6 +139,9 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName]["faction]"] = private.faction
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
 		
+		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
+		
 		BeanCounterDB[private.realmName][private.playerName]["postedAuctions"] = {}
 		BeanCounterDB[private.realmName][private.playerName]["completedAuctions"] = {}
 		BeanCounterDB[private.realmName][private.playerName]["failedAuctions"] = {}
