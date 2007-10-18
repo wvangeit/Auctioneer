@@ -5,6 +5,7 @@
 <Script file="BeanCounterLocale.lua"/>
 <Script file="BeanCounterFrames.lua"/>
 <Script file="BeanCounterMail.lua"/>
+<Script file="BeancounterVendor.lua"/>
 <Script file="PostMonitor.lua"/>
 <Script file="BidMonitor.lua"/>
 </Ui>

@@ -250,11 +250,11 @@ function private.matchDB(key, text)
 	for i,v in pairs(private.playerData[key]) do
 		if private.playerData[key][i][1] then
 			if text == (string.match(private.playerData[key][i][1], "(.-):" )) then
-				debugPrint("private.matchDB",private.playerData[key][i][1])
+				debugPrint("Searching DB for ItemID..",private.playerData[key][i][1])
 				return i 
 			end
 		else 
-		debugPrint("private.matchDB", key, text, "Failed")
+				debugPrint("Searching DB for ItemID..", key, text, "Failed")
 			return nil
 		end
 	end

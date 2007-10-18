@@ -46,7 +46,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.0,
+	version = 1.01,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -89,11 +89,17 @@ end
 
 function lib.OnLoad(addon)
 	private.frame = CreateFrame("Frame")
+
+	private.frame:RegisterEvent("PLAYER_MONEY")
 	
 	private.frame:RegisterEvent("MAIL_INBOX_UPDATE")
 	private.frame:RegisterEvent("UI_ERROR_MESSAGE")
 	private.frame:RegisterEvent("MAIL_SHOW")
 	private.frame:RegisterEvent("MAIL_CLOSED")
+	
+	private.frame:RegisterEvent("MERCHANT_SHOW")	
+	private.frame:RegisterEvent("MERCHANT_UPDATE")
+	private.frame:RegisterEvent("MERCHANT_CLOSED")
 	
 	private.frame:SetScript("OnEvent", private.onEvent)
 	private.frame:SetScript("OnUpdate", private.onUpdate)
@@ -121,7 +127,6 @@ function private.initializeDB()
 
 	if not BeanCounterDB  then
 		BeanCounterDB  = {}
-		BeanCounterDB["version"] = private.version
 	end
 	if not BeanCounterDB[private.realmName] then
 		BeanCounterDB[private.realmName] = {}
@@ -129,6 +134,7 @@ function private.initializeDB()
 	end
 	if not BeanCounterDB[private.realmName][private.playerName] then
 		BeanCounterDB[private.realmName][private.playerName] = {}
+		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
 		
 		BeanCounterDB[private.realmName][private.playerName]["faction]"] = private.faction
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
@@ -173,8 +179,20 @@ private.serverData = BeanCounterDB[private.realmName]
 	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
 	}]]
 
+ private.UpgradeDatabaseVersion() 
 
+end
 
+function private.UpgradeDatabaseVersion()
+	
+	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
+		BeanCounterDB["version"] = nil
+	end
+	if not BeanCounterDB[private.realmName][private.playerName]["version"] then  --added in 1.01 update
+		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
+		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
+	end
 end
 
 --[[ Configator Section ]]--
@@ -204,20 +222,25 @@ end
 --[[ Local functions ]]--
 function private.onUpdate()
 	private.mailonUpdate()
-	private.wealth = GetMoney()
-	private.playerData["wealth"] = private.wealth
 end
 
 function private.onEvent(frame, event, ...)
-	if (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
+	if (event == "PLAYER_MONEY") then
+		private.wealth = GetMoney()
+		private.playerData["wealth"] = private.wealth
+	
+	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event,...)
+	
+	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
+		private.vendorOnevent(event,...)
 	end
+	
+	
+	
 end
 
 
-function private.addOnEvent(...)
-
-end
 --[[ Utility Functions]]--
 --will return any length arguments into a : seperated string
 function private.packString(...)
