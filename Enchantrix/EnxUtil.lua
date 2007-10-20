@@ -760,12 +760,12 @@ function Enchantrix.Util.MaxDisenchantItemLevel(skill)
 	if (skill >= 300) then
 		-- NOTE - ccox - this is higher than any item level available in WoW 2.2, but may need to be changed later
 		maxLevel = 200;
-	elseif (skill > 125) then
+	elseif (skill >= 125) then
 		-- skill 125 to 299
-		maxLevel = 24 + (5 * math.floor(skill / 25));
+		maxLevel = 19 + (5 * math.floor(skill / 25));
 	else
 		-- skill 1 to 124
-		maxLevel = 20 + (5 * math.floor(skill / 25));
+		maxLevel = 15 + (5 * math.floor(skill / 25));
 	end
 	
 	return maxLevel;
