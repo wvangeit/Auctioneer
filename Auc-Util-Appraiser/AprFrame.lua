@@ -240,6 +240,7 @@ function private.CreateFrames()
 				result[Const.BUYOUT],
 			}
 		end
+		frame.refresh:Enable()
 		frame.imageview.sheet:SetData(data)
 	end
 
@@ -592,6 +593,7 @@ function private.CreateFrames()
 	end
 
 	function frame.RefreshView()
+		frame.refresh:Disable()
 		local link = frame.salebox.link
 		local name, _, rarity, _, itemMinLevel, itemType, itemSubType, stack, equipLoc = GetItemInfo(link)
 		local itemTypeId, itemSubId
