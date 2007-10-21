@@ -217,6 +217,7 @@ function private.CreateFrames()
 			suffix = suffix,
 			factor = factor,
 		})
+				
 		local data = {}
 		for i = 1, #results do
 			local result = results[i]
@@ -238,12 +239,27 @@ function private.CreateFrames()
 				result[Const.MINBID],
 				result[Const.CURBID],
 				result[Const.BUYOUT],
+				["ScrollSettings"] = frame.SetPriceColor(itemId, count, result[Const.CURBID], result[Const.BUYOUT]),
+				
 			}
 		end
 		frame.refresh:Enable()
 		frame.imageview.sheet:SetData(data)
 	end
 
+	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice)
+		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
+		local _, link, _,_, _, _, _, _, _, _ = GetItemInfo(itemID)
+		local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
+			if r and g and b then
+				return {["color"]={r,g,b}}
+			else
+				return nil
+			end
+		end
+		return nil
+	end
+		
 	function frame.SetPriceFromModel(curModel)
 		if not frame.salebox.sig then return end
 		if not curModel then
