@@ -243,6 +243,7 @@ function private.CreateFrames()
 				
 			}
 		end
+		frame.SetPriceFromModel(curModel)
 		frame.refresh:Enable()
 		frame.imageview.sheet:SetData(data)
 	end
