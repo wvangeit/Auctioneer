@@ -175,68 +175,9 @@ function lib.AddTab(tabButton, tabFrame)
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end
 
+local psychler = LibStub("Psychler")
 
--- Table recycling facilities
-local tremove = table.remove
-local tinsert = table.insert
-local recyclebin = {}
-local function recycle(...)
-	-- Get the passed parameter/s
-	local n = select("#", ...)
-	local tbl, key, item
-	if n <= 0 then
-		return
-	elseif n == 1 then
-		item = ...
-	else
-		tbl, key = ...
-		item = tbl[key]
-	end
-
-	-- We can only clean tables
-	if type(item) ~= 'table' then return end
-
-	-- Clean out any values from this table
-	for k,v in pairs(item) do
-		if type(v) == 'table' then
-			-- Recycle this table too
-			recycle(item, k)
-		else
-			item[k] = nil
-		end
-	end
-
-	-- If we are to clean the input value
-	if tbl and key then
-		-- Place the husk of a table in the recycle bin
-		tinsert(recyclebin, item)
-
-		-- Clean out the original table entry too
-		tbl[key] = nil
-	end
-end
-local function acquire(...)
-	-- Get a recycled table or create a new one.
-	local item
-	if #recyclebin > 0 then
-		item = tremove(recyclebin)
-	end
-	if not item then
-		item = {}
-	end
-
-	-- And populate it if there's any args
-	local n = select("#", ...)
-	for i = 1, n do
-		local v = select(i, ...)
-		item[i] = v
-	end
-	return item
-end
-
--- Place the above recyling bits in their correct places
-private.recycleBin = recyclebin
-lib.Recycle = recycle
-lib.Acquire = acquire
+lib.Recycle = Psychler.Recycle
+lib.Acquire = Psychler.Acquire
 
 
