@@ -104,13 +104,13 @@ function lib.GetMarketValue(itemLink, serverKey)
 	end
 end
 
-function lib.GetAlgorithms()
+function lib.GetAlgorithms(itemLink)
 	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if (engineLib.GetPrice) then
 				if not engineLib.IsValidAlgorithm
-				or engineLib.IsValidAlgorithm() then
+				or engineLib.IsValidAlgorithm(itemLink) then
 					table.insert(engines, engine)
 				end
 			end
@@ -119,13 +119,13 @@ function lib.GetAlgorithms()
 	return engines
 end
 
-function lib.IsValidAlgorithm(algorithm)
+function lib.IsValidAlgorithm(algorithm, itemLink)
 	local engines = {}
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
 			if engine == algorithm and engineLib.GetPrice then
 				if engineLib.IsValidAlgorithm then
-					return engineLib.IsValidAlgorithm()
+					return engineLib.IsValidAlgorithm(itemLink)
 				end
 				return true
 			end
