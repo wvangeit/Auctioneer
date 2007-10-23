@@ -34,6 +34,9 @@ local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local print = AucAdvanced.Print
 local Const = AucAdvanced.Const
+local recycle = AucAdvanced.Recycle
+local acquire = AucAdvanced.Acquire
+local clone = AucAdvanced.Clone
 
 local frame
 
@@ -218,7 +221,8 @@ function private.CreateFrames()
 			factor = factor,
 		})
 				
-		local data = {}
+		local data = acquire()
+		local style = acquire()
 		for i = 1, #results do
 			local result = results[i]
 			local tLeft = result[Const.TLEFT]
@@ -228,7 +232,7 @@ function private.CreateFrames()
 			elseif (tLeft == 4) then tLeft = "24h"
 			end
 			local count = result[Const.COUNT]
-			data[i] = {
+			data[i] = acquire (
 				result[Const.NAME],
 				result[Const.SELLER],
 				tLeft,
@@ -238,14 +242,20 @@ function private.CreateFrames()
 				math.floor(0.5+result[Const.BUYOUT]/count),
 				result[Const.MINBID],
 				result[Const.CURBID],
-				result[Const.BUYOUT],
-				["ScrollSettings"] = frame.SetPriceColor(itemId, count, result[Const.CURBID], result[Const.BUYOUT]),
-				
-			}
+				result[Const.BUYOUT]
+			)
+			local color = frame.SetPriceColor(itemId, count, result[Const.CURBID], result[Const.BUYOUT])
+			if color then
+				style[i] = acquire()
+				style[i][1] = acquire()
+				style[i][1].textColor = color
+			end
 		end
 		frame.SetPriceFromModel(curModel)
 		frame.refresh:Enable()
-		frame.imageview.sheet:SetData(data)
+		frame.imageview.sheet:SetData(data, style)
+		recycle(data)
+		recycle(style)
 	end
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice)
@@ -253,7 +263,7 @@ function private.CreateFrames()
 		local _, link, _,_, _, _, _, _, _, _ = GetItemInfo(itemID)
 		local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 			if r and g and b then
-				return {["color"]={r,g,b}}
+				return acquire(r,g,b)
 			else
 				return nil
 			end
@@ -1066,7 +1076,10 @@ function private.CreateFrames()
 	frame.salebox.duration.label:SetJustifyH("LEFT")
 	frame.salebox.duration.label:SetJustifyV("CENTER")
 
-	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, private.GetExtraPriceModels, "default")
+	function frame.GetLinkPriceModels()
+		return private.GetExtraPriceModels(frame.salebox.link)
+	end
+	frame.salebox.model = SelectBox:Create("AppraiserSaleboxModel", frame.salebox, 140, frame.ChangeControls, frame.GetLinkPriceModels, "default")
 	frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0,-16)
 	frame.salebox.model.element = "model"
 	frame.salebox.model:Hide()
@@ -1246,16 +1259,16 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Item", "TEXT", 120 },
-		{ "Seller", "TEXT", 75 },
-		{ "Left", "INT", 40 },
-		{ "Stk", "INT", 30 },
-		{ "Min/ea", "COIN", 85 },
-		{ "Cur/ea", "COIN", 85 },
-		{ "Buy/ea", "COIN", 85 },
-		{ "MinBid", "COIN", 85 },
-		{ "CurBid", "COIN", 85 },
-		{ "Buyout", "COIN", 85 },
+		{ "Item",   "TEXT", 120 },
+		{ "Seller", "TEXT", 75  },
+		{ "Left",   "INT",  40  },
+		{ "Stk",    "INT",  30  },
+		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
+		{ "MinBid", "COIN", 85, { DESCENDING=true } },
+		{ "CurBid", "COIN", 85, { DESCENDING=true } },
+		{ "Buyout", "COIN", 85, { DESCENDING=true } },
 	})
 
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
