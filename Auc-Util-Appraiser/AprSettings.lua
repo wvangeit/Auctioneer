@@ -34,14 +34,14 @@ local lib = AucAdvanced.Modules.Util.Appraiser
 local private = lib.Private
 local print = AucAdvanced.Print
 
-function private.GetPriceModels()
+function private.GetPriceModels(itemLink)
 	if not private.scanValueNames then private.scanValueNames = {} end
 	for i = 1, #private.scanValueNames do
 		private.scanValueNames[i] = nil
 	end
 
 	table.insert(private.scanValueNames,{"market", "Market value"})
-	local algoList = AucAdvanced.API.GetAlgorithms()
+	local algoList = AucAdvanced.API.GetAlgorithms(itemLink)
 	for pos, name in ipairs(algoList) do
 		if (name ~= lib.name) then
 			table.insert(private.scanValueNames,{name, "Stats: "..name})
@@ -50,8 +50,8 @@ function private.GetPriceModels()
 	return private.scanValueNames
 end
 
-function private.GetExtraPriceModels()
-	local vals = private.GetPriceModels()
+function private.GetExtraPriceModels(itemLink)
+	local vals = private.GetPriceModels(itemLink)
 	table.insert(vals, {"fixed", "Fixed price"})
 	table.insert(vals, {"default", "Default"})
 	return vals
