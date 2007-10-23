@@ -175,9 +175,10 @@ function lib.AddTab(tabButton, tabFrame)
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)
 end
 
-local psychler = LibStub("Psychler")
+local LibRecycle = LibStub("LibRecycle")
 
-lib.Recycle = Psychler.Recycle
-lib.Acquire = Psychler.Acquire
+lib.Recycle = LibRecycle.Recycle
+lib.Acquire = LibRecycle.Acquire
+lib.Clone = LibRecycle.Clone
 
 
