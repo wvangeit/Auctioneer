@@ -344,6 +344,7 @@ EnchantrixLocalizations = {
 		["ShowEmbed"]	= "embed";
 		["ShowGuessAuctioneerHsp"]	= "valuate-hsp";
 		["ShowGuessAuctioneerMed"]	= "valuate-median";
+		["ShowGuessAuctioneerVal"]	= "valuate-val";
 		["ShowGuessBaseline"]	= "valuate-baseline";
 		["ShowTerse"]	= "kurz";
 		["ShowUI"]	= "zeigen";
@@ -699,6 +700,7 @@ EnchantrixLocalizations = {
 		["TooltipShowDisenchantLevel"]	= "Disenchanting requires skill %d";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "Export Enchantrix prices to AuctioneerAdvanced";
 		["GuiActivateProfile"]	= "Activate a current profile";
 		["GuiAutoDeEnable"]	= "Watch bags for disenchantable items - USE WITH CARE\n";
 		["GuiAutoDeOptions"]	= "Automation\n";
@@ -938,6 +940,7 @@ EnchantrixLocalizations = {
 		["ShowEmbed"]	= "integrer";
 		["ShowGuessAuctioneerHsp"]	= "evaluer-pvm";
 		["ShowGuessAuctioneerMed"]	= "evaluer-median";
+		["ShowGuessAuctioneerVal"]	= "evaluer-val";
 		["ShowGuessBaseline"]	= "evaluer-reference";
 		["ShowTerse"]	= "concis";
 		["ShowUI"]	= "montrer";
@@ -1006,6 +1009,9 @@ EnchantrixLocalizations = {
 
 		-- Section: Report Messages
 		["AuctionScanAuctNotInstalled"]	= "Vous n'avez pas installé Auctioneer. Auctioneer doit être installé afin d'effectuer un scannage des enchères.";
+		["AuctionScanVersionTooOld"]	= "Vous n'avez pas la bonne version d4auctioneer installée, cette fonctionnalité requiert Auctioneer v4.0 ou plus.";
+		["ChatDeletedProfile"]	= "Profil effacé:";
+		["ChatSavedProfile"]	= "Profil enregistré:";
 		["FrmtBidbrokerCurbid"]	= "EnchAct";
 		["FrmtBidbrokerDone"]	= "L'agent d'enchères a terminé";
 		["FrmtBidbrokerHeader"]	= "Enchères présentant %s pièces d'argent d'économie sur la valeur moyenne de désenchantement (min. %d%% de moins) :";
@@ -1053,6 +1059,16 @@ EnchantrixLocalizations = {
 		["GuiItemValueAuc4Median"]	= "Auc4 médiane";
 		["GuiItemValueCalc"]	= "Valeur calculée à partir de";
 		["GuiMinimapButtonDist"]	= "Distance: %d";
+		["GuiMinimapShowButton"]	= "Afficher le bouton de la minimap";
+		["GuiNewProfileName"]	= "Nom du nouveau profil:";
+		["GuiNo"]	= "Non";
+		["GuiProspectingOptions"]	= "Options de prospection";
+		["GuiSaveProfileButton"]	= "Sauver";
+		["GuiShowProspecting"]	= "Afficher les données de prospection pour les minerais";
+		["GuiTabFixed"]	= "Valeur fixe";
+		["GuiTabGeneral"]	= "Général";
+		["GuiTabProfiles"]	= "Profils";
+		["GuiYes"]	= "Oui";
 
 	};
 

@@ -149,6 +149,8 @@ local settingDefaults = {
 	['AuctionBalanceEssenceStyle'] = "avg",		-- how do we balance the price of essences
 
 	['AutoDisenchantEnable'] = false,	-- off by default - potentially dangerous if you're not expecting it :)
+
+	['export.aucadv'] = true, -- Send our price values to auctioneer advanced as stats
 }
 
 local function getDefault(setting)
@@ -432,6 +434,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantLevel", _ENCH("GuiDELevels") )
 	gui:AddControl(id, "Checkbox",   0, 1, "ToolTipEmbedInGameTip", _ENCH("HelpEmbed") )
 	gui:AddControl(id, "Checkbox",   0, 1, "TooltipShowDisenchantMats", _ENCH("GuiDEMaterials") )
+	gui:AddControl(id, "Checkbox",   0, 1, "export.aucadv", _ENCH("ExportPriceAucAdv"))
 
 
 -- TODO: locale -- what are the allowed values?

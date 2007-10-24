@@ -972,8 +972,14 @@ local function balanceEssencePrices(scanReagentTable, style)
 
 end
 
-function Enchantrix.Util.CreateReagentPricingTable()
-	local scanReagentTable = {};
+function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
+	if not scanReagentTable then
+		scanReagentTable = {}
+	else
+		for k,v in pairs(scanReagentTable) do
+			scanReagentTable[k] = nil
+		end
+	end
 	local n = #Enchantrix.Constants.DisenchantReagentList;
 	local style = Enchantrix.Settings.GetSetting('ScanValueType');
 	local extra = nil

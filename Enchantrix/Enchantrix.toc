@@ -33,3 +33,5 @@ EnxTooltip.lua
 EnxUtil.lua
 EnxAutoDisenchant.lua
 EnxMain.lua
+
+EnxAucUtil.lua
