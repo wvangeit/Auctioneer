@@ -56,7 +56,7 @@ function private.CreateFrames()
 	
 	--Create the TAB
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
-	frame.ScanTab:SetText("BeanCounter ADV")
+	frame.ScanTab:SetText("BeanCounter")
 	frame.ScanTab:Show()
 	
 	PanelTemplates_DeselectTab(frame.ScanTab)
