@@ -159,7 +159,7 @@ function lib:valuate(item, tooltip)
 		-- be safe and handle nil results
 		local adjustment = get(lcName..".PriceAdjust."..item.id) or 0;
 		
-		market = reagentPrice * adjustment / 100;
+		market = (reagentPrice or 0) * adjustment / 100;
 	end
 
 
