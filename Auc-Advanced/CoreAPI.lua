@@ -38,6 +38,9 @@ local private = {}
 
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
+local recycle = AucAdvanced.Recycle
+local acquire = AucAdvanced.Acquire
+local clone = AucAdvanced.Clone
 
 --[[
 	The following functions are defined for modules's exposed methods:
@@ -105,10 +108,10 @@ function lib.GetMarketValue(itemLink, serverKey)
 end
 
 function lib.GetAlgorithms(itemLink)
-	local engines = {}
+	local engines = acquire()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if (engineLib.GetPrice) then
+			if engineLib.GetPrice or engineLib.GetPriceArray then
 				if not engineLib.IsValidAlgorithm
 				or engineLib.IsValidAlgorithm(itemLink) then
 					table.insert(engines, engine)
@@ -120,10 +123,10 @@ function lib.GetAlgorithms(itemLink)
 end
 
 function lib.IsValidAlgorithm(algorithm, itemLink)
-	local engines = {}
+	local engines = acquire()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if engine == algorithm and engineLib.GetPrice then
+			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 				if engineLib.IsValidAlgorithm then
 					return engineLib.IsValidAlgorithm(itemLink)
 				end
@@ -134,7 +137,7 @@ function lib.IsValidAlgorithm(algorithm, itemLink)
 	return false
 end
 
-private.algorithmstack = {}
+private.algorithmstack = acquire()
 function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 	if (not algorithm) then
 		error("No pricing algorithm supplied")
@@ -146,9 +149,9 @@ function lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 	realm = realm or GetRealmName()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if engine == algorithm and engineLib.GetPrice then
+			if engine == algorithm and (engineLib.GetPrice or engineLib.GetPriceArray) then
 				if engineLib.IsValidAlgorithm
-				and not engineLib.IsValidAlgorithm() then
+				and not engineLib.IsValidAlgorithm(itemLink) then
 					return
 				end
 				local algosig = strjoin(":", algorithm, itemLink, faction, realm)
@@ -187,7 +190,7 @@ end
 
 private.queryTime = 0
 private.prevQuery = { empty = true }
-private.curResults = {}
+private.curResults = acquire()
 function lib.QueryImage(query, faction, realm, ...)
 	local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
 
