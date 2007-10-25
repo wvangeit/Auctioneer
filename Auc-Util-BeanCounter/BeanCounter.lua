@@ -46,7 +46,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.01,
+	version = 1.02,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -111,6 +111,9 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, private.postPlaceAuctionBidHook)
 	--Posting
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
+	--Vendor
+	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
+	
 	
 	AucAdvanced.Const.PLAYERLANGUAGE = GetDefaultLanguage("player")
 
@@ -119,12 +122,20 @@ function lib.OnLoad(addon)
 		AucAdvanced.Settings.SetDefault(config, value)
 	end
 	
+	
 	private.initializeDB() --create or initialize the saved DB
 end
 
 --Create the database
 function private.initializeDB()  
-
+--TESTING TABLES REMOVE
+	if not reconcilePending then
+		reconcilePending = {}
+	end
+	if not Task then
+		Task = {}
+	end
+--**************************************************************
 	if not BeanCounterDB  then
 		BeanCounterDB  = {}
 	end
@@ -182,20 +193,11 @@ private.serverData = BeanCounterDB[private.realmName]
 	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
 	}]]
 
- private.UpgradeDatabaseVersion() 
+	private.wealth = GetMoney()
+	private.playerData["wealth"] = private.wealth
 
-end
-
-function private.UpgradeDatabaseVersion()
-	
-	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
-		BeanCounterDB["version"] = nil
-	end
-	if not BeanCounterDB[private.realmName][private.playerName]["version"] then  --added in 1.01 update
-		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
-		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
-		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
-	end
+	private.UpgradeDatabaseVersion() 
+ 
 end
 
 --[[ Configator Section ]]--
@@ -245,7 +247,7 @@ end
 
 
 --[[ Utility Functions]]--
---will return any length arguments into a : seperated string
+--will return any length arguments into a ; seperated string
 function private.packString(...)
 	for n = 1, select("#", ...) do
 		local msg = select(n, ...)
@@ -259,11 +261,16 @@ function private.packString(...)
 		if n == 1 then  --This prevents a seperator from being the first character.  :foo:foo:
 			String = msg
 		else
-			String = strjoin(":",String,msg)
+			String = strjoin(";",String,msg)
 		end
 	end
 	return(String)
 end
+--Will split any string and return a table value
+function private.unpackString(text)
+	return {strsplit(";", text)}
+end
+
 --Add data to DB
 function private.databaseAdd(key, itemID, value)
 	if private.playerData[key][itemID] then
@@ -276,7 +283,7 @@ end
 function private.databaseRemove(key, itemID, ITEM, NAME)
 	if key == "postedBids" then	
 		for i,v in pairs(private.playerData[key][itemID]) do
-			local tbl = {strsplit(":", v)}
+			local tbl = private.unpackString(text)
 			if tbl and itemID and ITEM and NAME then
 				if tbl[1] == ITEM and tbl[4] == NAME then
                 if (#playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value              

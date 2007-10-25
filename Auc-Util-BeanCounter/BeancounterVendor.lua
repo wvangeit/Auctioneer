@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
-	Revision: $Id:$
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	
 	BeanCounterVendor - Records Vendor Transactions
@@ -46,28 +46,46 @@ function private.vendorOnevent(event,...)
 	if (event == "MERCHANT_SHOW") then 
 		private.merchantShow()
 	elseif (event == "MERCHANT_CLOSED") then 
-	
+		
+		
 	elseif (event == "MERCHANT_UPDATE") then
+		--private.merchantUpdate()
+	end
+end
+local moneyStart, LastitemSold, repairAllCost
+
+function private.merchantShow()
+--hooksecurefunc("ShowContainerSellCursor", private.merchantUpdate)
+
+moneyStart = private.wealth
 	
+	if CanMerchantRepair() then
+		repairAllCost = GetRepairAllCost()	
 	end
 end
 
-function private.merchantShow()
-hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-	--local moneyStart = private.wealth
-	--if CanMerchantRepair() then
-	--	local moneyMax, _ = GetRepairAllCost()
+ function private.merchantUpdate(...)
+--print("SOLD",...)	
+ 
+ end
 
-end
-
-function private.merchantBuy(id, amount)
+ function private.merchantRepairAllItems()
+	if CanMerchantRepair() then
+		if (GetRepairAllCost() == 0) and (repairAllCost > 0) then --we repaired
+			--print("we repaired this amount",repairAllCost)
+		end
+	end
+ 
+ end
+ 
+function private.merchantBuy(id, amount) --Hooked function
 	local name, _, price, quantity, _, _, _ = GetMerchantItemInfo(id)
 	local link = GetMerchantItemLink(id)
 	local itemID, _ = private.getItemInfo(link, "itemid") 
 	
 	if amount then quantity = amount end --Amount only send for stacked items
 	
-	local value = private.packString(name, price, quantity, time(), private.wealth)
+	local value = private.packString(link, price, quantity, time(), private.wealth, date("%m-%d-%y"))
 	
 	private.databaseAdd("vendorbuy", itemID, value)
 	debugPrint("Vendor buy added..",itemID, value)

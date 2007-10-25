@@ -48,7 +48,7 @@ function private.CreateFrames()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
-	frame = CreateFrame("Frame", nil, AuctionFrame)
+	frame = CreateFrame("Frame", "TESTING", AuctionFrame)
 	private.frame = frame
 	frame.list = {}
 	frame.buffer = {}
@@ -201,43 +201,42 @@ function private.CreateFrames()
 		{ "Deposit", "COIN", 50 },
 		{ "Fee", "COIN", 50 },
 		{ "Wealth", "COIN", 70 },
-		--{ "Time", "INT", 80 },
+		{ "Date", "text", 70 },
 	})
 	
 	
 	function private.startSearch(itemName, settings)
 		if not itemName then return end
 		
-		local data ={}
-		
+		local data = {}
+		local style = {}
 		for a,b in pairs(private.serverData) do
+			
 				if settings.auction then	 
 					for i,v in pairs(private.serverData[a]["completedAuctions"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = {strsplit(":", text)}
+						local tbl = private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-						--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth',
+						--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
 									 
-									tbl[7], --bid
-									tbl[6], --buyout
+									"-", --tbl[7], --bid
+									"-", --tbl[6], --buyout
 									tbl[3], --money,
 									
-									   nil,  --seller
+									  "-",  --seller
 									tbl[8], --buyer
 									
 									tbl[4], --deposit
 									tbl[5], --fee
 									tbl[10], --current wealth
-									tbl[9], --time,
-									--math.floor(0.5+result[Const.MINBID]/count),
-									--math.floor(0.5+result[Const.CURBID]/count),
-									--math.floor(0.5+result[Const.BUYOUT]/count),
+									--tbl[9], --time,
+									tbl[12], --date
 								    })
 							end
 						end
@@ -245,7 +244,7 @@ function private.CreateFrames()
 					for i,v in pairs(private.serverData[a]["failedAuctions"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = {strsplit(":", text)}
+						local tbl = private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
@@ -259,16 +258,20 @@ function private.CreateFrames()
 									
 									minBid, --bid
 									buyoutPrice, --buyout
-									nil, --money,
+									"-", --money,
 									
-									nil,  --seller
-									nil, --buyer
+									"-",  --seller
+									"-", --buyer
 									
 									deposit, --deposit
-									nil, --fee
+									"-", --fee
 									tbl[4], --current wealth
-									tbl[3], --time,
+									--tbl[3], --time,
+									tbl[5], --date
 								})
+								style[#data] = {}
+								style[#data][1] = {}
+								style[#data][1].textColor = {1,0,0}
 							end
 						end
 					end
@@ -278,7 +281,7 @@ function private.CreateFrames()
 					for i,v in pairs(private.serverData[a]["completedBids/Buyouts"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = {strsplit(":", text)}
+						local tbl = private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
@@ -293,12 +296,13 @@ function private.CreateFrames()
 									tbl[3], --money,
 									
 									tbl[8],   --seller
-									nil, --buyer
+									"-", --buyer
 									  
 									tbl[4], --deposit
 									tbl[5], --fee
 									tbl[10], --current wealth
-									tbl[9], --time,
+									--tbl[9], --time,
+									tbl[11], --date
 								    })
 							end
 						end
@@ -306,7 +310,7 @@ function private.CreateFrames()
 					for i,v in pairs(private.serverData[a]["failedBids"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = {strsplit(":", text)}
+						local tbl = private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
@@ -315,17 +319,18 @@ function private.CreateFrames()
 									tbl[1], --itemname
 									tbl[2], --status
 									
-									nil, --bid
-									nil, --buyout
+									"-", --bid
+									"-", --buyout
 									tbl[3], --money,
 									
-									nil,  --seller
-									nil, --buyer
+									"-",  --seller
+									"-", --buyer
 									
-									nil, --deposit
-									nil, --fee
+									"-", --deposit
+									"-", --fee
 									tbl[5], --current wealth
-									tbl[4], --time,
+									--tbl[4], --time,
+									tbl[6], --date
 								    })
 							end
 						end
@@ -333,12 +338,8 @@ function private.CreateFrames()
 				end
 		end
 		
-	
-		table.sort(data, function (a,b)  --Sort tables by time
-			return (a[11] > b[11]) 
-		end)
-		
-		frame.resultlist.sheet:SetData(data)
+
+		frame.resultlist.sheet:SetData(data, style)
 	end
 	
 	
@@ -354,7 +355,7 @@ function private.CreateFrames()
 	
 	function private.reconcileFailedAuctions(player, itemID, tbl)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-    			local tbl2 = {strsplit(":", v)}
+    			local tbl2 = private.unpackString(v)
 			
 			 --Time the auction was set to last
 			local TimeFailedAuctionStarted= tbl[3] - (tbl2[5]*60) --Time this message should have been posted
@@ -366,7 +367,7 @@ function private.CreateFrames()
 			   
 		   
 		    if TimePostedAuction == TimeFailedAuctionStarted then
-		    debugPrint(TimePostedAuction,TimeFailedAuctionStarted, tbl[3])
+		    --debugPrint(TimePostedAuction,TimeFailedAuctionStarted, tbl[3])
 			--post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth
 			return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
 		    end
@@ -374,10 +375,6 @@ function private.CreateFrames()
 		end
 	
 	end
-	
-	
-	
-	
 	
 hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 

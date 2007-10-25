@@ -124,8 +124,8 @@ function private.onAuctionCreated()
 	local post = private.removePendingPost();
 	if (post) then
 		-- Add to sales database
-		local itemID, _ = private.getItemInfo(post.name, "itemid")
-		local text = private.packString(post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
+		local itemID, itemLink = private.getItemInfo(post.name, "itemid")
+		local text = private.packString(itemLink, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth, date("%m-%d-%y"))
 		private.databaseAdd("postedAuctions", itemID, text)
 	end
 end
