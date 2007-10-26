@@ -113,6 +113,8 @@ local settingDefaults = {
 	['never.buy'] = false,
 	['never.bid'] = false,
 	['playSound'] = true,
+	['EnableTopScan'] = false,
+	['override.nobid'] = false,
 }
 
 function getDefault(setting)
@@ -347,6 +349,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",         0, 1, "scan.always", "Look for bargains while browsing")
 	gui:AddControl(id, "Checkbox",         0, 1, "scan.reload.enable", "Enable automatic last page reload (bottom scan):")
 	gui:AddControl(id, "WideSlider",       0, 1, "scan.reload.interval", 6, 60, 1, "Reload interval: %s seconds")
+	gui:AddControl(id, "Checkbox",         0, 1, "EnableTopScan", "Top scan as well as bottom scan")
+	gui:AddControl(id, "Checkbox",         0, 1, "override.nobid", "Override 'Never bid on items' when topscanning")
 	gui:AddControl(id, "Subhead",          0,    "Display Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "show.tooltip", "Display evaluations in tooltip")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
