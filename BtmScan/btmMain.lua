@@ -377,7 +377,9 @@ function BtmScan.PageScan(resume)
 					item.canbuy = true
 					local balance = GetMoney()
 
-					if ((BtmScan.Settings.GetSetting("never.bid")) and not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
+					if (BtmScan.Settings.GetSetting("never.bid")) then
+						if (not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
+					end
 					if (BtmScan.Settings.GetSetting("never.buy")) then item.canbuy = false end
 					if (item.canbid and balance - item.bid < reserve) then
 						item.canbid = false
@@ -1207,7 +1209,9 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		item.canbuy = true
 		local balance = GetMoney()
 
-		if ((BtmScan.Settings.GetSetting("never.bid")) and not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
+		if (BtmScan.Settings.GetSetting("never.bid")) then
+			if (not (TopScanActive and BtmScan.Settings.GetSetting("override.nobid"))) then item.canbid = false end
+		end
 		if (BtmScan.Settings.GetSetting("never.buy")) then item.canbuy = false end
 		if (item.canbid and balance - item.bid < reserve) then
 			tt("Bid exceeds reserve")
