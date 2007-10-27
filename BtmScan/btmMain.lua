@@ -251,23 +251,24 @@ BtmScan.OnUpdate = function(...)
 		--BtmScan.processing = true
 		BtmScan.scanStage = 2
 		local page = BtmScan.pageCount-offset or 0
-		if (BtmScan.Settings.GetSetting("EnableTopScan")) then
-			TopScanActive = not TopScanActive
-		else
-			TopScanActive = false --Makes sure it doesn't get stuck on if BtmScan.Settings.GetSetting("EnableTopScan") is turned off
-		end
-		if (TopScanActive) then
-			page = 0
-		end
 		-- Nothing will fix this logic except renesting
 		if not (Auctioneer and (Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning()
 			or Auctioneer.BidScanner and Auctioneer.BidScanner.IsScanning())) and
 			not (AucAdvanced and AucAdvanced.Scan.IsScanning()) and (BtmScan.Settings.GetSetting("scan.reload.enable")) then
 			-- Auctioneer is not scanning and page refresh is enabled, so let's send  off a query
+				if (BtmScan.Settings.GetSetting("EnableTopScan")) then
+					TopScanActive = not TopScanActive
+				else
+					TopScanActive = false --Makes sure it doesn't get stuck on if BtmScan.Settings.GetSetting("EnableTopScan") is turned off
+				end
+				if (TopScanActive) then
+					page = 0
+				end	
 			AuctionFrameBrowse.page = page
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 		else
 			-- If Auctioneer is currently scanning, then we just need to piggyback its calls.
+			TopScanActive = false
 			BtmScan.timer = 0
 			BtmScan.pageScan = 0.001
 		end
