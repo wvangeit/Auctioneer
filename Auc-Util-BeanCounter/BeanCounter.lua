@@ -302,9 +302,9 @@ end
 function private.getItemInfo(link, cmd) 
 debugPrint(link, cmd)
 local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
-	if not cmd then --return all
+	if not cmd and itemLink then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
-	elseif cmd == "itemid" then
+	elseif itemLink and (cmd == "itemid") then
 		local itemID = itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
 		return itemID, itemLink
 	end

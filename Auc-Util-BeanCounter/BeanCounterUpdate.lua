@@ -42,7 +42,7 @@ end
 
 
 function private.UpgradeDatabaseVersion()
-	
+	print("START")
 	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
 		BeanCounterDB["version"] = nil
 	end
@@ -52,40 +52,68 @@ function private.UpgradeDatabaseVersion()
 		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
 	end
 
-	if private.playerData["version"] < 1.02 then
-		private.updateTo1_02()
+	if private.playerData["version"] < 1.015 then
+		private.updateTo1_02A()
+	elseif private.playerData["version"] < 1.02 then
+		private.updateTo1_02B()
 	end
 		
 end
 --[[This changes the database to use ; and to replace itemNames with and itemlink]]--
-function private.updateTo1_02() 
-	
+function private.updateTo1_02A() 
+	print("START A")
 	--: to ; and itemName to itemlink
 	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
 			if type(data) == "table" then
 				for itemID, value in pairs(data) do
-					for index, text in ipairs(value) do
-						private.serverData[player][DB][itemID][index] = private.packString(strsplit(":", text)) --repackage all strings using ;
-					end
+				    for index, text in ipairs(value) do
+					private.serverData[player][DB][itemID][index] = private.packString(strsplit(":", text)) --repackage all strings using ;
+				    end
 				end
 			end
 		end
 	end
 	for player, v in pairs(private.serverData) do
+	    for DB, data in pairs(v) do
+		print(DB)
+		if DB == "version" then
+		    private.serverData[player]["version"] = 1.015 --update each players version #
+		end
+	    end
+	end
+	private.updateTo1_02B()
+end
+function private.updateTo1_02B() 
+print("START B")
+	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
 			if type(data) == "table" then
 				for itemID, value in pairs(data) do
-					for index, text in ipairs(value) do
-						local _, link = private.getItemInfo(itemID, "itemid")
+				    for index, text in ipairs(value) do
+					local _, link = private.getItemInfo(itemID, "itemid")
+					    if link then 
 						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
-						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink
-					end
+						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
+					    else
+						name = text:match("(.-);")
+						link = private.updateCreatelink(itemID, name)
+						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
+						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
+					    end
+				    end
 				end
-			elseif DB == "version" then
-				private.serverData[player]["version"] = 1.02 --update each players version #
 			end
 		end
 	end
-	
+	for player, v in pairs(private.serverData) do
+	    for DB, data in pairs(v) do
+		if DB == "version" then
+		    private.serverData[player]["version"] = 1.02 --update each players version #
+		end
+	    end
+	end
+end 
+function private.updateCreatelink(itemID, name) --If the server query dails make a fake link so we can still view item
+    return "|cffffff33|Hitem:"..itemID..":0:0:0:0:0:0:1529248154|h["..name.."]|h|r" --Our fake links are always yellow
 end
