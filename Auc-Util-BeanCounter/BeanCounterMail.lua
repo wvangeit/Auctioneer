@@ -185,7 +185,7 @@ function private.mailSort()
 				debugPrint("Auction successful: ")
 				--Get itemID from database
 				local itemName = string.match(reconcilePending[i]["subject"], "Auction successful:%s(.*)" )
-				local itemID = private.matchDB("postedAuctions", itemName)
+				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then
 					local value = private.packString(itemLink, "Auction successful", reconcilePending[i]["money"], reconcilePending[i]["deposit"], reconcilePending[i]["fee"], reconcilePending[i]["buyout"], reconcilePending[i]["bid"], reconcilePending[i]["Seller/buyer"], reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))
 					private.databaseAdd("completedAuctions", itemID, value)
@@ -194,7 +194,7 @@ function private.mailSort()
 				
 			elseif "Auction expired: " == (string.match(reconcilePending[i]["subject"], "(Auction expired:%s)" )) then
 				local itemName = string.match(reconcilePending[i]["subject"], "Auction expired:%s(.*)" )
-				local itemID = private.matchDB("postedAuctions", itemName)
+				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then    
 				--Do we want to insert nil values into the exp auc string to match length with comp auc string?
 				--local value = private.packString(itemName, "Auction expired", _, _, _, _, _, _, reconcilePending[i]["time"], private.wealth)
@@ -209,7 +209,7 @@ function private.mailSort()
 				
 				debugPrint("Auction WON", reconcilePending[i]["retrieved"])
 				local itemName = string.match(reconcilePending[i]["subject"], "Auction won:%s(.*)" )
-				local itemID = private.matchDB("postedBids", itemName)
+				local itemID, itemLink = private.matchDB("postedBids", itemName)
 	
 				--try to get itemID from bids, if not then buyouts. One of these DB MUST have it
 				if not itemID then itemID = private.matchDB("postedBuyouts", itemName) end
@@ -226,7 +226,7 @@ function private.mailSort()
 				debugPrint("Outbid on ")
 				
 				local itemName = string.match(reconcilePending[i]["subject"], "Outbid on%s(.*)" )
-				local itemID = private.matchDB("postedBids", itemName)
+				local itemID, itemLink = private.matchDB("postedBids", itemName)
 				if itemID then
 				
 				local value = private.packString(itemLink, "Outbid",reconcilePending[i]["money"], reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))
@@ -252,8 +252,9 @@ function private.matchDB(key, text)
 	for i,v in pairs(private.playerData[key]) do
 		if private.playerData[key][i][1] then
 			if text == (string.match(private.playerData[key][i][1], "^|c%x+|H.+|h%[(.+)%]" )) then
-				debugPrint("Searching DB for ItemID..",private.playerData[key][i][1])
-				return i 
+			    local itemLink = private.playerData[key][i][1]:match("(.-);")
+				debugPrint("Searching DB for ItemID..",private.playerData[key][i][1], "Sucess")
+				return i, itemLink
 			else
 				debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
 			end
