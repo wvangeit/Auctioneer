@@ -1,10 +1,11 @@
 --[[
-	BeanCounter Addon for World of Warcraft(tm).
+	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
 
-	BeanCounter - trackes AH purchases and sales
-
+	BeanCounterCore - BeanCounter: Auction House History
+	URL: http://auctioneeraddon.com/
+	
 	License:
 		This program is free software; you can redistribute it and/or
 		modify it under the terms of the GNU General Public License
@@ -28,321 +29,305 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
--------------------------------------------------------------------------------
--- Function Imports
--------------------------------------------------------------------------------
-local debugPrint = EnhTooltip.DebugPrint
 
--------------------------------------------------------------------------------
--- Function Prototypes
--------------------------------------------------------------------------------
-local preContainerFrameItemButtonOnClickHook
-local relevel
-local chatPrint
-local nilSafe
-local commandHandler
+--AucAdvanced.Modules["Util"]["BeanCounter"]
 
--------------------------------------------------------------------------------
--- Version
--------------------------------------------------------------------------------
-BeanCounter = {}
-BeanCounter.Version="<%version%>"
-if (BeanCounter.Version == "<".."%version%>") then
-	BeanCounter.Version = "3.9.DEV"
+local libName = "BeanCounter"
+local libType = "Util"
+--Handle if Auc Adv is not loaded
+if AucAdvanced then
+	AucAdvanced.Modules[libType][libName] = {}
+else
+	AucAdvanced={}
+	AucAdvanced.Modules={}
+	AucAdvanced.Modules[libType]={}
+	AucAdvanced.Modules[libType][libName] = {}
 end
 
--------------------------------------------------------------------------------
--- OnLoad handler for BeanCounterFrame.
--------------------------------------------------------------------------------
-function BeanCounter_OnLoad()
-	debugPrint("BeanCounter_OnLoad() called");
+local lib = AucAdvanced.Modules[libType][libName]
 
-	-- Unhook some boot triggers if necessary.
-	-- These might not exist on initial loading or if an addon depends on BeanCounter
-	if (BeanCounter_CheckLoad) then
-		Stubby.UnregisterFunctionHook("AuctionFrame_LoadUI", BeanCounter_CheckLoad)
-		Stubby.UnregisterFunctionHook("CheckInbox", BeanCounter_CheckLoad)
+local private = {
+	--BeanCounterCore
+	playerName = UnitName("player"),
+	realmName = GetRealmName(), 
+	faction, _ = UnitFactionGroup(UnitName("player")),
+	version = 1.02,
+	wealth, --This characters current net worth. This will be appended to each transaction.
+	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
+	serverData, --Alias for BeanCounterDB[private.realmName]
+		
+	--BeanCounter Bids/posts
+	PendingBids = {},
+	PendingPosts = {},
+	
+	--BeanCounterMail 
+	reconcilePending = {},
+	inboxStart = {},
+	inboxCurrent = {},
+	Task ={},
+	TakeInboxIgnore = false,
+	}
+	
+lib.Private = private --allow beancounter's sub lua's access
+--Taken from AucAdvCore
+function BeanCounterPrint(...)
+	local output, part
+	for i=1, select("#", ...) do
+		part = select(i, ...)
+		part = tostring(part):gsub("{{", "|cffddeeff"):gsub("}}", "|r")
+		if (output) then output = output .. " " .. part
+		else output = part end
 	end
-	if (BeanCounter_ShowNotLoaded) then
-		Stubby.UnregisterFunctionHook("AuctionFrame_Show", BeanCounter_ShowNotLoaded)
-	end
+	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
+end
 
-	-- Register our temporary command hook with stubby
-	Stubby.RegisterBootCode("BeanCounter", "CommandHandler", [[
-		local function cmdHandler(msg)
-			local i,j, cmd, param = msg:lower():find("^([^ ]+) (.+)$")
-			if (not cmd) then cmd = msg:lower() end
-			if (not cmd) then cmd = "" end
-			if (not param) then param = "" end
-			if (cmd == "load") then
-				if (param == "") then
-					Stubby.Print("Manually loading BeanCounter...")
-					LoadAddOn("BeanCounter")
-				elseif (param == "auctionhouse") then
-					Stubby.Print("Setting BeanCounter to load when this character visits the auction house or mailbox")
-					Stubby.SetConfig("BeanCounter", "LoadType", param)
-				elseif (param == "always") then
-					Stubby.Print("Setting BeanCounter to always load for this character")
-					Stubby.SetConfig("BeanCounter", "LoadType", param)
-					LoadAddOn("BeanCounter")
-				elseif (param == "never") then
-					Stubby.Print("Setting BeanCounter to never load automatically for this character (you may still load manually)")
-					Stubby.SetConfig("BeanCounter", "LoadType", param)
-				else
-					Stubby.Print("Your command was not understood")
-				end
-			else
-				Stubby.Print("BeanCounter is currently not loaded.")
-				Stubby.Print("  You may load it now by typing |cffffffff/BeanCounter load|r")
-				Stubby.Print("  You may also set your loading preferences for this character by using the following commands:")
-				Stubby.Print("  |cffffffff/BeanCounter load auctionhouse|r - BeanCounter will load when you visit the auction house or mailbox")
-				Stubby.Print("  |cffffffff/BeanCounter load always|r - BeanCounter will always load for this character")
-				Stubby.Print("  |cffffffff/BeanCounter load never|r - BeanCounter will never load automatically for this character (you may still load it manually)")
-			end
+local print = BeanCounterPrint
+
+local function debugPrint(...) 
+    private.debugPrint("BeanCounterCore",...)
+end
+
+function lib.GetName()
+	return libName
+end
+
+function lib.Processor(callbackType, ...)
+	if (callbackType == "config") then
+		private.SetupConfigGui(...)
+	end
+end
+
+function lib.OnLoad(addon)
+	private.frame:RegisterEvent("PLAYER_MONEY")
+	
+	private.frame:RegisterEvent("MAIL_INBOX_UPDATE")
+	private.frame:RegisterEvent("UI_ERROR_MESSAGE")
+	private.frame:RegisterEvent("MAIL_SHOW")
+	private.frame:RegisterEvent("MAIL_CLOSED")
+	
+	private.frame:RegisterEvent("MERCHANT_SHOW")	
+	private.frame:RegisterEvent("MERCHANT_UPDATE")
+	private.frame:RegisterEvent("MERCHANT_CLOSED")
+	
+	private.frame:RegisterEvent("AUCTION_HOUSE_SHOW")
+	
+	private.frame:SetScript("OnUpdate", private.onUpdate)
+	
+	-- Hook all the methods we need
+	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.CreateFrames) --To be standalone we cannot depend on AucAdv for lib.Processor
+	
+	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook);
+	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook);
+	--Bids
+	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, private.postPlaceAuctionBidHook)
+	--Posting
+	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
+	--Vendor
+	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
+
+	--Setup Configator defaults if AucAdv loaded
+	if AucAdvanced.Settings then
+	    for config, value in pairs(private.defaults) do
+		    AucAdvanced.Settings.SetDefault(config, value)
+	    end
+	end
+	private.initializeDB() --create or initialize the saved DB
+end
+
+--Create the database
+function private.initializeDB()  
+	if not BeanCounterDB  then
+		BeanCounterDB  = {}
+		BeanCounterDB["settings"] = {}
+	end
+	if not BeanCounterDB[private.realmName] then
+		BeanCounterDB[private.realmName] = {}
+		
+	end
+	if not BeanCounterDB[private.realmName][private.playerName] then
+		BeanCounterDB[private.realmName][private.playerName] = {}
+		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
+		
+		BeanCounterDB[private.realmName][private.playerName]["faction]"] = private.faction
+		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
+		
+		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["vendorsell"] = {}
+		
+		BeanCounterDB[private.realmName][private.playerName]["postedAuctions"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["completedAuctions"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["failedAuctions"] = {}
+		
+		BeanCounterDB[private.realmName][private.playerName]["postedBids"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["postedBuyouts"] = {}
+		BeanCounterDB[private.realmName][private.playerName]["completedBids/Buyouts"]  = {}
+		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
+		
+	end
+--OK we now have our Database ready, lets create an Alias to make refrencing easier
+private.playerData = BeanCounterDB[private.realmName][private.playerName]
+private.serverData = BeanCounterDB[private.realmName]
+
+
+--Ok, create a fake table telling folks what our database means
+	BeanCounterDBFormat = {"This is a diagram for the layout of the BeanCounterDB.",
+	'POSTING DATABASE -- records Auction house activities',
+	"['postedAuctions'] == Item, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), current wealth, date",
+	"['postedBids'] == itemName, count, bid, owner, isBuyout, timeLeft, time(),current wealth, date",
+	"['postedBuyouts'] ==  itemName, count, bid, owner, isBuyout, timeLeft, time(), current wealth, date",
+	' ',
+	' ',
+	'MAIL DATABASE --records mail received from Auction House',	
+	'(Some of these values will be nil If we were unable to Retrieve the Invoice), current wealth, date',
+	"['completedAuctions'] == itemName, Auction successful, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth, date",
+	"['failedAuctions'] == itemName, Auction expired, (time the mail arrived in our mailbox), current wealth, date",
+	"completedBids/Buyouts are a combination of the mail data from postedBuyouts and postedBids, current wealth, date",
+	"['completedBids/Buyouts] == itemName, Auction won, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth, date",
+	"[failedBids] == itemName, Outbid, money, (time the mail arrived in our mailbox), current wealth, date",
+	'',
+	'APIs',
+    'TODO',
+    }
+    --[[
+	'private.playerData is an alias for BeanCounterDB[private.realmName][private.playerName]',
+	'private.packString(...) --will return any length arguments into a : seperated string',
+	'private.databaseAdd(key, itemID, value)  --Adds to the DB. Example "postedBids", itemID, ( : seperated string)',
+	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
+	}]]
+
+	private.wealth = GetMoney()
+	private.playerData["wealth"] = private.wealth
+
+	private.UpgradeDatabaseVersion() 
+ 
+end
+
+--[[ Configator Section ]]--
+
+private.defaults = {
+	["util.beancounter.activated"] = true,
+	["util.beancounter.debug"] = false,
+	}
+
+function private.getOption(option)
+    if AucAdvanced.Settings then
+	return AucAdvanced.Settings.GetSetting(option)
+    end
+end
+
+function private.SetupConfigGui(gui)
+	-- The defaults for the following settings are set in the lib.OnLoad function
+	id = gui:AddTab(libName)
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
+
+	--gui:AddControl(id, "Subhead",    0,    "Debug from specific modules:")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Maildebug", "Show BeanCounterMail Debugging Messages.")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterFrames Debugging Messages.")
+	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterPosting/Bid Debugging Messages.")	
+end
+
+
+--[[ Local functions ]]--
+function private.onUpdate()
+	private.mailonUpdate()
+end
+
+function private.onEvent(frame, event, arg, ...)
+	if (event == "PLAYER_MONEY") then
+		private.wealth = GetMoney()
+		private.playerData["wealth"] = private.wealth
+	
+	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
+		private.mailMonitor(event, arg, ...)
+	
+	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
+		--private.vendorOnevent(event, arg, ...)
+
+	elseif (event == "ADDON_LOADED") then
+		if arg == "BeanCounter" then
+		   lib.OnLoad()
+		elseif arg == "Auc-Advanced" then
+		     for config, value in pairs(private.defaults) do
+			AucAdvanced.Settings.SetDefault(config, value)
+		    end
 		end
-		SLASH_BEANCOUNTER1 = "/beancounter"
-		SLASH_BEANCOUNTER2 = "/bean"
-		SLASH_BEANCOUNTER3 = "/bc"
-		SlashCmdList["BEANCOUNTER"] = cmdHandler
-	]])
-	Stubby.RegisterBootCode("BeanCounter", "Triggers", [[
-		function BeanCounter_CheckLoad()
-			local loadType = Stubby.GetConfig("BeanCounter", "LoadType")
-			if (loadType == "auctionhouse" or not loadType) then
-				LoadAddOn("BeanCounter")
-			end
+	end
+end
+
+
+--[[ Utility Functions]]--
+--will return any length arguments into a ; seperated string
+function private.packString(...)
+	for n = 1, select("#", ...) do
+		local msg = select(n, ...)
+		if msg == nil then 
+			msg = "<nil>" 
+		elseif msg == true then
+			msg = "boolean true"
+		elseif msg == false then
+			msg = "boolean false"
 		end
-		function BeanCounter_ShowNotLoaded()
-		end
-		local function onLoaded()
-			Stubby.UnregisterAddOnHook("Blizzard_AuctionUI", "BeanCounter")
-			if (not IsAddOnLoaded("BeanCounter")) then
-				Stubby.RegisterFunctionHook("AuctionFrame_Show", 100, BeanCounter_ShowNotLoaded)
-			end
-		end
-		Stubby.RegisterFunctionHook("AuctionFrame_LoadUI", 100, BeanCounter_CheckLoad)
-		Stubby.RegisterFunctionHook("CheckInbox", 100, BeanCounter_CheckLoad);
-		Stubby.RegisterAddOnHook("Blizzard_AuctionUI", "BeanCounter", onLoaded)
-		local loadType = Stubby.GetConfig("BeanCounter", "LoadType")
-		if (loadType == "always") then
-			LoadAddOn("BeanCounter")
+		if n == 1 then  --This prevents a seperator from being the first character.  :foo:foo:
+			String = msg
 		else
-			Stubby.Print("BeanCounter is not loaded. Type /beancounter for more info.");
+			String = strjoin(";",String,msg)
 		end
-	]])
-	
-	-- Register for notification of us being loaded.
-	this:RegisterEvent("ADDON_LOADED")
-end
-
--------------------------------------------------------------------------------
--- Called when the BeanCounter AddOn has completed loading.
--------------------------------------------------------------------------------
-function BeanCounter_AddOnLoaded()
-	debugPrint("BeanCounter_AddOnLoaded() called");
-
-	-- Blizzard's auction UI may or may not have been loaded yet.
-	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
-		BeanCounter_AuctionHouseLoaded();
 	end
-
-	-- Initialize our various modules.
-	MailMonitor_OnLoad();
-	BidMonitor_OnLoad();
-	PostMonitor_OnLoad();
-	
-	-- Load the realm's database.
-	BeanCounter.Database.Load(GetRealmName());
-
-	-- Hello world!
-	chatPrint(("BeanCounter v%s loaded"):format(BeanCounter.Version));
-	
-	SLASH_BEANCOUNTER1 = "/beancounter"
-	SLASH_BEANCOUNTER2 = "/bean"
-	SLASH_BEANCOUNTER3 = "/bc"
-	SlashCmdList["BEANCOUNTER"] = commandHandler
+	return(String)
+end
+--Will split any string and return a table value
+function private.unpackString(text)
+	return {strsplit(";", text)}
 end
 
-function commandHandler(msg)
-	local i,j, cmd, param = msg:lower():find("^([^ ]+) (.+)$")
-	if (not cmd) then cmd = msg:lower() end
-	if (not cmd) then cmd = "" end
-	if (not param) then param = "" end
-
-	if (cmd == "load") then
-		if (param == "auctionhouse") then
-			chatPrint("Setting BeanCounter to load when this character visits the auction house or mailbox")
-			Stubby.SetConfig("BeanCounter", "LoadType", param)
-		elseif (param == "always") then
-			chatPrint("Setting BeanCounter to always load for this character")
-			Stubby.SetConfig("BeanCounter", "LoadType", param)
-		elseif (param == "never") then
-			chatPrint("Setting BeanCounter to never load automatically for this character (you may still load manually)")
-			Stubby.SetConfig("BeanCounter", "LoadType", param)
-		else
-			chatPrint("Your command was not understood")
-		end
+--Add data to DB
+function private.databaseAdd(key, itemID, value)
+	if private.playerData[key][itemID] then
+		table.insert(private.playerData[key][itemID], value)
 	else
-		chatPrint(("BeanCounter v%s loaded"):format(BeanCounter.Version));
-		chatPrint("  You may set your loading preferences for this character by using the following commands:")
-		chatPrint("  |cffffffff/BeanCounter load auctionhouse|r - BeanCounter will load when you visit the auction house or mailbox")
-		chatPrint("  |cffffffff/BeanCounter load always|r - BeanCounter will always load for this character")
-		chatPrint("  |cffffffff/BeanCounter load never|r - BeanCounter will never load automatically for this character (you may still load it manually)")
+		private.playerData[key][itemID]={value}
 	end
 end
-
--------------------------------------------------------------------------------
--- Called when the Blizzard_AuctionUI has completed loading.
--------------------------------------------------------------------------------
-function BeanCounter_AuctionHouseLoaded()
-	debugPrint("BeanCounter_AuctionHouseLoaded() called");
-
-	-- Find the index of the first unused AuctionHouse tab
-	local tabIndex = 1;
-	while (getglobal("AuctionFrameTab"..tabIndex) ~= nil) do
-		tabIndex = tabIndex + 1;
-	end
-
-	-- Add the Transactions tab
-	AuctionFrameTransactions:SetParent("AuctionFrame")
-	AuctionFrameTransactions:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0, 0)
-	relevel(AuctionFrameTransactions);
-	setglobal("AuctionFrameTab"..tabIndex, AuctionFrameTabTransactions);
-	AuctionFrameTabTransactions:SetParent("AuctionFrame")
-
-	AuctionFrameTabTransactions:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0)
-	AuctionFrameTabTransactions:SetID(tabIndex);
-	AuctionFrameTabTransactions:Show();
-
-	-- Tell the AuctionFrame that we've added tabs
-	PanelTemplates_SetNumTabs(AuctionFrame, tabIndex)
-
-	-- Hook the tab click method so we know when to show our tab.
-	Stubby.RegisterFunctionHook("AuctionFrameTab_OnClick", 200, BeanCounter_AuctionFrameTab_OnClickHook)
-	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, preContainerFrameItemButtonOnClickHook)
-	Stubby.RegisterFunctionHook("SetSelectedAuctionItem", -200, preSetSelectedAuctionItemHook);
-end
-
--------------------------------------------------------------------------------
--- OnEvent handler for BeanCounterFrame.
--------------------------------------------------------------------------------
-function BeanCounter_OnEvent(event, arg1)
-	if (event == "ADDON_LOADED") then
-		if (arg1:lower() == "beancounter") then
-			BeanCounter_AddOnLoaded();
-		elseif (arg1:lower() == "blizzard_auctionui") then
-			BeanCounter_AuctionHouseLoaded();
+--remove item (for pending bids only atm) Can I make this universal?
+function private.databaseRemove(key, itemID, ITEM, NAME)
+	if key == "postedBids" then	
+		for i,v in pairs(private.playerData[key][itemID]) do
+			local tbl = private.unpackString(v)
+			if tbl and itemID and ITEM and NAME then
+				if tbl[1] == ITEM and tbl[4] == NAME then
+				if (#playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value              
+			playerData[key][itemID] = nil
+                        break
+                    else
+                        table.remove(playerData[key][itemID],i)--Just remove the key
+                        break
+                    end
+				end
+			end
 		end
 	end
 end
-
--------------------------------------------------------------------------------
--- OnUpdate handler for BeanCounterFrame.
--------------------------------------------------------------------------------
-function BeanCounter_OnUpdate()
-	MailMonitor_OnUpdate();
-end
-
--------------------------------------------------------------------------------
--- Hooks Blizzard's AuctionFrameTab_OnClick() method.
--------------------------------------------------------------------------------
-function BeanCounter_AuctionFrameTab_OnClickHook(_, _, index)
-	if (not index) then
-		index = this:GetID();
-	end
-
-	-- Hide our tabs
-	AuctionFrameTransactions:Hide();
-	
-	-- Show an Auctioneer tab if its the one clicked
-	local tab = getglobal("AuctionFrameTab"..index);
-	if (tab) then
-		if (tab:GetName() == "AuctionFrameTabTransactions") then
-			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
-			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
-			AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
-			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
-			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
-			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
-			AuctionFrameTransactions:Show();
-		end
+--Get item Info or a specific subset. accepts itemID or "itemString" or "itemName ONLY IF THE ITEM IS IN PLAYERS BAG" or "itemLink"
+function private.getItemInfo(link, cmd) 
+debugPrint(link, cmd)
+local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
+	if not cmd and itemLink then --return all
+		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
+	elseif itemLink and (cmd == "itemid") then
+		local itemID = itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
+		return itemID, itemLink
 	end
 end
 
--------------------------------------------------------------------------------
--- Called before Blizzard's ContainerFrameItemButton_OnClick()
--------------------------------------------------------------------------------
-function preContainerFrameItemButtonOnClickHook(hookParams, returnValue, button, ignoreShift)
-	local bag = this:GetParent():GetID()
-	local slot = this:GetID()
-
-	-- If the transactions tab is visible, alt-left click runs a transaction
-	-- search.
-	if (not CursorHasItem() and AuctionFrameTransactions and AuctionFrameTransactions:IsVisible() and IsAltKeyDown()) then
-		local _, count = GetContainerItemInfo(bag, slot)
-		if (count) then
-			local link = GetContainerItemLink(bag, slot)
-			local _, _, _, _, name = EnhTooltip.BreakLink(link)
-			local transactions = {
-				bidCheck  = true,
-				purchases = true,
-				auctions  = true,
-				sales     = true
-			}
-			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
-			return "abort"
-		end
+function private.debugPrint(...)
+	if private.getOption("util.beancounter.debug") then
+		print(...)
 	end
 end
 
--------------------------------------------------------------------------------
--- Called before Blizzard's SetSelectedAuctionItem()
--------------------------------------------------------------------------------
-function preSetSelectedAuctionItemHook(hookParams, returnValue, list, index)
-	-- Do a transaction search.
-	local name = GetAuctionItemInfo(list, index);
-	if (name) then
-			local transactions = {
-				bidCheck  = true,
-				purchases = true,
-				auctions  = true,
-				sales     = true
-			}
-			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
-	end
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function relevel(frame)
-	local myLevel = frame:GetFrameLevel() + 1
-	local children = { frame:GetChildren() }
-	for _,child in pairs(children) do
-		child:SetFrameLevel(myLevel)
-		relevel(child)
-	end
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function nilSafe(string)
-	if (string) then
-		return string;
-	end
-	return "<nil>";
-end
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function chatPrint(...)
-	if (DEFAULT_CHAT_FRAME) then 
-		DEFAULT_CHAT_FRAME:AddMessage(strjoin(" ", ...), 1.0, 0.35, 0.15)
-	end
-end
-
--------------------------------------------------------------------------------
--- Public API
--------------------------------------------------------------------------------
-BeanCounter.DebugPrint = debugPrint;
-BeanCounter.ChatPrint = chatPrint;
-BeanCounter.NilSafe = nilSafe;
+--[[Bootstrap Code]]
+private.frame = CreateFrame("Frame")
+private.frame:RegisterEvent("ADDON_LOADED")
+private.frame:SetScript("OnEvent", private.onEvent)

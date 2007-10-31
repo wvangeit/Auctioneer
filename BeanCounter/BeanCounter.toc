@@ -1,29 +1,11 @@
 ## Title: BeanCounter
-## Notes: An Auctioneer addon that maintains an auction house transaction database. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
-##
 ## Interface: 20200
-## LoadOnDemand: 1
-## Dependencies: Stubby, EnhTooltip, Auctioneer
-## SavedVariables: BeanCounterAccountDB
+## Dependancies: Configator, Stubby
+## SavedVariables: BeanCounterDBFormat, BeanCounterDB, BeanCounterAccountDB
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
+##
+Embed.xml
 
-..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
-UserInterface\ListTemplate.xml
-
-Babylonian\Babylonian.lua
-BeanCounterStrings.lua
-BeanCounterLocale.lua
-
-BeanCounter.lua
-MailMonitor.lua
-BidMonitor.lua
-PostMonitor.lua
-BeanCounterDB.lua
-PurchasesDB.lua
-SalesDB.lua
-
-BeanCounter.xml
-AuctionFrameTransactions.xml

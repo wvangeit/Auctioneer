@@ -1,9 +1,10 @@
 --[[
-	BeanCounter Addon for World of Warcraft(tm).
+	Auctioneer Addon for World of Warcraft(tm).
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
-
-	BidMonitor - Monitors auction bids
+	URL: http://auctioneeraddon.com/
+	
+	BidMonitor - Records bids posted in the Auctionhouse
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -28,51 +29,33 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
--- Debug switch - set to true, to enable debug output for this module
-local debug = false
+local libName = "BeanCounter"
+local libType = "Util"
+local lib = AucAdvanced.Modules[libType][libName]
+local private = lib.Private
 
--------------------------------------------------------------------------------
--- Function Imports
--------------------------------------------------------------------------------
-local nilSafe = BeanCounter.NilSafe;
+local print = BeanCounterPrint
 
--------------------------------------------------------------------------------
--- Function Prototypes
--------------------------------------------------------------------------------
-local postPlaceAuctionBidHook;
-local addPendingBid;
-local removePendingBid;
-local onEventHook;
-local onBidAccepted;
-local onBidFailed;
-local debugPrint;
-
--------------------------------------------------------------------------------
--- Data Members
--------------------------------------------------------------------------------
-local PendingBids = {};
-
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function BidMonitor_OnLoad()
-	Stubby.RegisterFunctionHook("PlaceAuctionBid", 50, postPlaceAuctionBidHook)
+local function debugPrint(...) 
+private.debugPrint("BidMonitor",...)
 end
 
 -------------------------------------------------------------------------------
 -- Called after PlaceAuctionBid()
 -------------------------------------------------------------------------------
-function postPlaceAuctionBidHook(_, _, listType, index, bid)
+function private.postPlaceAuctionBidHook(_, _, listType, index, bid)
 	local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner = GetAuctionItemInfo(listType, index);
+	local itemLink = GetAuctionItemLink(listType, index)
 	local timeLeft = GetAuctionItemTimeLeft(listType, index);
 	if (name and count and bid) then
-		addPendingBid(name, count, bid, owner, (bid == buyoutPrice), highBidder, timeLeft);
+		private.addPendingBid(name, count, bid, owner, (bid == buyoutPrice), highBidder, timeLeft, itemLink);
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Adds a pending bid to the queue.
 -------------------------------------------------------------------------------
-function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, timeLeft)
+function private.addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, timeLeft, itemLink)
 	-- Add a pending bid to the queue.
 	local pendingBid = {};
 	pendingBid.name = name;
@@ -82,32 +65,33 @@ function addPendingBid(name, count, bid, owner, isBuyout, isHighBidder, timeLeft
 	pendingBid.isBuyout = isBuyout;
 	pendingBid.isHighBidder = isHighBidder;
 	pendingBid.timeLeft = timeLeft;
-	table.insert(PendingBids, pendingBid);
+	pendingBid.itemLink = itemLink;
+	table.insert(private.PendingBids, pendingBid);
 	debugPrint("addPendingBid() - Added pending bid");
 	
 	-- Register for the response events if this is the first pending bid.
-	if (#PendingBids == 1) then
+	if (#private.PendingBids == 1) then
 		debugPrint("addPendingBid() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
-		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", onEventHook);
-		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", onEventHook);
+		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", private.onEventHookBid);
+		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", private.onEventHookBid);
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Removes the pending bid from the queue.
 -------------------------------------------------------------------------------
-function removePendingBid()
-	if (#PendingBids > 0) then
+function private.removePendingBid()
+	if (#private.PendingBids > 0) then
 		-- Remove the first pending bid.
-		local bid = PendingBids[1];
-		table.remove(PendingBids, 1);
+		local bid = private.PendingBids[1];
+		table.remove(private.PendingBids, 1);
 		debugPrint("removePendingBid() - Removed pending bid");
 
 		-- Unregister for the response events if this is the last pending bid.
-		if (#PendingBids == 0) then
+		if (#private.PendingBids == 0) then
 			debugPrint("removePendingBid() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
-			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", onEventHook);
-			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", onEventHook);
+			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_BidMonitor", private.onEventHookBid);
+			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_BidMonitor", private.onEventHookBid);
 		end
 
 		return bid;
@@ -118,24 +102,21 @@ function removePendingBid()
 end
 
 -------------------------------------------------------------------------------
--- OnEvent handler.
+-- OnEvent handler BIDS. these are unhooked when not needed
 -------------------------------------------------------------------------------
-function onEventHook(_, event, arg1)
+function private.onEventHookBid(_, event, arg1)
 	if (event == "CHAT_MSG_SYSTEM" and arg1) then
-		debugPrint(event);
-		if (arg1) then debugPrint("    "..arg1) end;
 		if (arg1 == ERR_AUCTION_BID_PLACED) then
-		 	onBidAccepted();
+		 	private.onBidAccepted();
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		debugPrint(event);
 		if (arg1) then debugPrint("    "..arg1) end;
 		if (arg1 == ERR_ITEM_NOT_FOUND or
 			arg1 == ERR_NOT_ENOUGH_MONEY or
 			arg1 == ERR_AUCTION_BID_OWN or
 			arg1 == ERR_AUCTION_HIGHER_BID or 
 			arg1 == ERR_ITEM_MAX_COUNT) then
-			onBidFailed();
+			private.onBidFailed();
 		end
 	end
 end
@@ -143,27 +124,32 @@ end
 -------------------------------------------------------------------------------
 -- Called when a bid is accepted by the server.
 -------------------------------------------------------------------------------
-function onBidAccepted()
-	local bid = removePendingBid();
+function private.onBidAccepted()
+	local bid = private.removePendingBid();
 	if (bid) then
-		-- If the player is buying out an auction they already bid on, we
-		-- need to remove the pending bid since an outbid e-mail is not sent.
-		if (bid.isBuyout and bid.isHighBidder) then
-			BeanCounter.Purchases.DeletePendingBid(bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft);
+	
+	local itemID = bid.itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
+	local text = private.packString(bid.itemLink, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), private.wealth, date("%m-%d-%y"))
+		debugPrint(bid.isBuyout, bid.isHighBidder)		
+		if (bid.isBuyout) then
+			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid
+				debugPrint('private.databaseRemove(',"postedBids", itemID, bid.name, bid.owner, bid.bid)
+				private.databaseRemove("postedBids", itemID, bid.name, bid.owner, bid.bid)
+			end	
+			private.databaseAdd("postedBuyouts", itemID, text) 
+		else
+		
+		debugPrint('private.databaseAdd(pendingBids',itemID, text)
+		private.databaseAdd("postedBids", itemID, text)
 		end
-		BeanCounter.Purchases.AddPendingBid(time(), bid.name, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft);
 	end
 end
 
 -------------------------------------------------------------------------------
 -- Called when a bid is rejected by the server.
 -------------------------------------------------------------------------------
-function onBidFailed()
-	removePendingBid();
+function private.onBidFailed()
+	private.removePendingBid();
 end
 
--------------------------------------------------------------------------------
--------------------------------------------------------------------------------
-function debugPrint(message)
-	if debug then BeanCounter.DebugPrint("[BeanCounter.BidMonitor] "..message); end
-end
+
