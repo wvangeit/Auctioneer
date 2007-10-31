@@ -283,7 +283,7 @@ end
 function private.databaseRemove(key, itemID, ITEM, NAME)
 	if key == "postedBids" then	
 		for i,v in pairs(private.playerData[key][itemID]) do
-			local tbl = private.unpackString(text)
+			local tbl = private.unpackString(v)
 			if tbl and itemID and ITEM and NAME then
 				if tbl[1] == ITEM and tbl[4] == NAME then
                 if (#playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value              
