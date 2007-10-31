@@ -31,10 +31,9 @@
 
 local libName = "BeanCounter"
 local libType = "Util"
-local lib = AucAdvanced.Modules[libType][libName]
+local lib = BeanCounter
 local private = lib.Private
-
-local print = BeanCounterPrint
+local print =  BeanCounter.Print
 
 local function debugPrint(...) 
 private.debugPrint("BidMonitor",...)

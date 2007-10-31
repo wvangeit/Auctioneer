@@ -29,22 +29,22 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-
 --AucAdvanced.Modules["Util"]["BeanCounter"]
 
 local libName = "BeanCounter"
 local libType = "Util"
+local lib
+BeanCounter={}
+lib = BeanCounter
+
 --Handle if Auc Adv is not loaded
+local lib2 = lib --this will only be used when Auc is running
 if AucAdvanced then
 	AucAdvanced.Modules[libType][libName] = {}
-else
-	AucAdvanced={}
-	AucAdvanced.Modules={}
-	AucAdvanced.Modules[libType]={}
-	AucAdvanced.Modules[libType][libName] = {}
+	lib2 = AucAdvanced.Modules[libType][libName]
 end
+	
 
-local lib = AucAdvanced.Modules[libType][libName]
 
 local private = {
 	--BeanCounterCore
@@ -70,7 +70,7 @@ local private = {
 	
 lib.Private = private --allow beancounter's sub lua's access
 --Taken from AucAdvCore
-function BeanCounterPrint(...)
+function BeanCounter.Print(...)
 	local output, part
 	for i=1, select("#", ...) do
 		part = select(i, ...)
@@ -81,17 +81,17 @@ function BeanCounterPrint(...)
 	DEFAULT_CHAT_FRAME:AddMessage(output, 0.3, 0.9, 0.8)
 end
 
-local print = BeanCounterPrint
+local print = BeanCounter.Print
 
 local function debugPrint(...) 
     private.debugPrint("BeanCounterCore",...)
 end
 
-function lib.GetName()
+function lib2.GetName()
 	return libName
 end
 
-function lib.Processor(callbackType, ...)
+function lib2.Processor(callbackType, ...)
 	if (callbackType == "config") then
 		private.SetupConfigGui(...)
 	end
@@ -126,7 +126,7 @@ function lib.OnLoad(addon)
 	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 
 	--Setup Configator defaults if AucAdv loaded
-	if AucAdvanced.Settings then
+	if AucAdvanced then
 	    for config, value in pairs(private.defaults) do
 		    AucAdvanced.Settings.SetDefault(config, value)
 	    end
@@ -169,7 +169,7 @@ private.playerData = BeanCounterDB[private.realmName][private.playerName]
 private.serverData = BeanCounterDB[private.realmName]
 
 
---Ok, create a fake table telling folks what our database means
+--[[Ok, create a fake table telling folks what our database means
 	BeanCounterDBFormat = {"This is a diagram for the layout of the BeanCounterDB.",
 	'POSTING DATABASE -- records Auction house activities',
 	"['postedAuctions'] == Item, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), current wealth, date",
@@ -187,7 +187,7 @@ private.serverData = BeanCounterDB[private.realmName]
 	'',
 	'APIs',
     'TODO',
-    }
+    }]]
     --[[
 	'private.playerData is an alias for BeanCounterDB[private.realmName][private.playerName]',
 	'private.packString(...) --will return any length arguments into a : seperated string',
@@ -210,14 +210,14 @@ private.defaults = {
 	}
 
 function private.getOption(option)
-    if AucAdvanced.Settings then
+    if AucAdvanced then
 	return AucAdvanced.Settings.GetSetting(option)
     end
 end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
@@ -249,7 +249,9 @@ function private.onEvent(frame, event, arg, ...)
 		if arg == "BeanCounter" then
 		   lib.OnLoad()
 		elseif arg == "Auc-Advanced" then
-		     for config, value in pairs(private.defaults) do
+		    AucAdvanced.Modules[libType][libName] = {}
+		    lib2 = AucAdvanced.Modules[libType][libName]
+		    for config, value in pairs(private.defaults) do
 			AucAdvanced.Settings.SetDefault(config, value)
 		    end
 		end
@@ -260,6 +262,7 @@ end
 --[[ Utility Functions]]--
 --will return any length arguments into a ; seperated string
 function private.packString(...)
+local String
 	for n = 1, select("#", ...) do
 		local msg = select(n, ...)
 		if msg == nil then 

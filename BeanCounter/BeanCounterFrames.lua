@@ -31,10 +31,9 @@
 
 local libName = "BeanCounter"
 local libType = "Util"
-local lib = AucAdvanced.Modules[libType][libName]
+local lib = BeanCounter
 local private = lib.Private
-
-local print =  BeanCounterPrint
+local print =  BeanCounter.Print
 
 local function debugPrint(...) 
 private.debugPrint("BeanCounterFrames",...)
@@ -60,11 +59,11 @@ function private.CreateFrames()
 	frame.ScanTab:Show()
 	
 	PanelTemplates_DeselectTab(frame.ScanTab)
-	if AucAdvanced.AddTab then
-		AucAdvanced.AddTab(frame.ScanTab, frame)
-    else
-		private.AddTab(frame.ScanTab, frame)
-    end
+	if AucAdvanced then
+		    AucAdvanced.AddTab(frame.ScanTab, frame)
+	else
+		    private.AddTab(frame.ScanTab, frame)
+	end
 	
 	--Set our Coordinate system relative to top left AH Frame
 	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
@@ -256,7 +255,7 @@ function private.CreateFrames()
 							if match then
 						--'["failedAuctions"] == itemName, "Auction expired", (time the mail arrived in our mailbox), curretn wealth',
 						   --Lets try some basic reconciling here
-						count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
+						local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
 						   
 						   table.insert(data,{
 									tbl[1], --itemname
@@ -385,7 +384,7 @@ hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 
 end
 
---Taken from AucCore to make beancounter Standalone
+--Taken from AucCore to make beancounter Standalone, Need to remove Redudundant stuff
 function private.AddTab(tabButton, tabFrame)
 	-- Count the number of auction house tabs (including the tab we are going
 	-- to insert).
@@ -420,12 +419,6 @@ function private.AddTab(tabButton, tabFrame)
 	tabButton:SetPoint("TOPLEFT", getglobal("AuctionFrameTab"..(tabIndex - 1)):GetName(), "TOPRIGHT", -8, 0);
 	tabButton:SetID(tabIndex);
 	tabButton:Show();
-
-	-- If we inserted a tab in the middle, adjust the layout of the next tab button.
-	if (tabIndex < tabCount) then
-		nextTabButton = getglobal("AuctionFrameTab"..(tabIndex + 1));
-		nextTabButton:SetPoint("TOPLEFT", tabButton:GetName(), "TOPRIGHT", -8, 0);
-	end
 
 	-- Update the tab count.
 	PanelTemplates_SetNumTabs(AuctionFrame, tabCount)

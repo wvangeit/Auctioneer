@@ -31,10 +31,10 @@
 
 local libName = "BeanCounter"
 local libType = "Util"
-local lib = AucAdvanced.Modules[libType][libName]
+local lib = BeanCounter
 local private = lib.Private
+local print =  BeanCounter.Print
 
-local print = BeanCounterPrint
 
 local function debugPrint(...) 
 private.debugPrint("BeanCounterFrames",...)
@@ -98,7 +98,7 @@ function private.updateTo1_02B()
 						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
 						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
 					    else
-						name = text:match("(.-);")
+						local name = text:match("(.-);")
 						link = private.updateCreatelink(itemID, name)
 						text = text:gsub("(.-);", link..";", 1) --Change item Name to item links
 						private.serverData[player][DB][itemID][index] = private.packString(strsplit(";", text)) --repackage string with new itemlink   
@@ -116,6 +116,6 @@ function private.updateTo1_02B()
 	    end
 	end
 end 
-function private.updateCreatelink(itemID, name) --If the server query dails make a fake link so we can still view item
+function private.updateCreatelink(itemID, name) --If the server query fails make a fake link so we can still view item
     return "|cffffff33|Hitem:"..itemID..":0:0:0:0:0:0:1529248154|h["..name.."]|h|r" --Our fake links are always yellow
 end

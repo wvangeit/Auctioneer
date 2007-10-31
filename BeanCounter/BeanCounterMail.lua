@@ -29,14 +29,13 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-
 local libName = "BeanCounter"
 local libType = "Util"
-local lib = AucAdvanced.Modules[libType][libName]
+local lib = BeanCounter
 local private = lib.Private
+local print =  BeanCounter.Print
 
 local debugPrint 
-local print =  BeanCounterPrint
 
 local function debugPrint(...) 
 private.debugPrint("BeanCounterMail",...)

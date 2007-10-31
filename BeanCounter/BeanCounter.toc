@@ -1,7 +1,7 @@
 ## Title: BeanCounter
 ## Interface: 20200
 ## Dependancies: Configator, Stubby
-## SavedVariables: BeanCounterDBFormat, BeanCounterDB, BeanCounterAccountDB
+## SavedVariables: BeanCounterDB, BeanCounterAccountDB
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

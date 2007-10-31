@@ -28,19 +28,15 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-
 local libName = "BeanCounter"
 local libType = "Util"
-local lib = AucAdvanced.Modules[libType][libName]
+local lib = BeanCounter
 local private = lib.Private
-
-local print = BeanCounterPrint
+local print =  BeanCounter.Print
 
 local function debugPrint(...) 
 private.debugPrint("BeanCounterVendor",...)
 end
-
-
 
 function private.vendorOnevent(event,...)
 	if (event == "MERCHANT_SHOW") then 
