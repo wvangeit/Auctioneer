@@ -693,7 +693,7 @@ function private.CreateFrames()
 				if (fullStacks > 0) then
 					bidVal = lib.RoundBid(itemBid * stack)
 					buyVal = lib.RoundBuy(itemBuy * stack)
-					if (bidVal > buyVal) then buyVal = bidVal end
+					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					print((" - Queueing {{%d}} lots of {{%d}}"):format(fullStacks, stack))
 					if dryRun then
 						print(" -- Post: ", sig, stack, bidVal, buyVal, duration, fullStacks)
@@ -708,7 +708,7 @@ function private.CreateFrames()
 				if (number == -1 and remain > 0) then
 					bidVal = lib.RoundBid(itemBid * remain)
 					buyVal = lib.RoundBuy(itemBuy * remain)
-					if (bidVal > buyVal) then buyVal = bidVal end
+					if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 					print((" - Queueing {{%d}} lots of {{%d}}"):format(1, remain))
 					if dryRun then
 						print(" -- Post: ", sig, remain, bidVal, buyVal, duration)
@@ -723,7 +723,7 @@ function private.CreateFrames()
 			else
 				bidVal = lib.RoundBid(itemBid * stack)
 				buyVal = lib.RoundBuy(itemBuy * stack)
-				if (bidVal > buyVal) then buyVal = bidVal end
+				if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 				print((" - Queueing {{%d}} lots of {{%d}}"):format(number, stack))
 				if dryRun then
 					print(" -- Post: ", sig, stack, bidVal, buyVal, duration, number)
@@ -739,7 +739,7 @@ function private.CreateFrames()
 			if number < 0 then number = total end
 			bidVal = lib.RoundBid(itemBid)
 			buyVal = lib.RoundBuy(itemBuy)
-			if (bidVal > buyVal) then buyVal = bidVal end
+			if (buyVal ~= 0 and bidVal > buyVal) then buyVal = bidVal end
 			print((" - Queueing {{%d}} items"):format(number))
 			if dryRun then
 				print(" -- Post: ", sig, 1, bidVal, buyVal, duration, number)
