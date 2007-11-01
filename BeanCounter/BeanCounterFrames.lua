@@ -101,20 +101,16 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
-	
-	--[[function private.ChangeControls(obj, ...)
-		print("Clicked the button Option 1",obj, ...)
+local BeanCounterSelectBoxSetting 	= {"1","server"}
+	function private.ChangeControls(obj, arg1,arg2,...)
+		--debugPrint("Clicked the button Option #", arg1, arg2)
+		BeanCounterSelectBoxSetting = {arg1, arg2}
 	end
 	
-	local vals = {
-			{"sever", "Search Sever Data"},
-			{"player", "Current character's data"},
-			--"alliance", "Alliance Faction data",
-			--"horde", "Horde Faction data"
-			}
-		
-		--INSERT available toons to search them --TODO
-	
+	local vals = {{"server", "Search Server Data"},}
+	for name,data in pairs(private.serverData) do 
+		table.insert(vals,{name, "Search "..name.."'s Data"})
+	end
 	
 	--Default Server wide
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
@@ -122,12 +118,13 @@ function private.CreateFrames()
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
 	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-115)
 	frame.selectbox.box.element = "selectBox"
+	--frame.selectbox.box.value = BeanCounterSelectBoxSetting 
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
 	frame.selectbox.box:SetText("Data to show:")
 	
 	
-]]
+
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
 	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -183)
@@ -135,7 +132,7 @@ function private.CreateFrames()
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
 	frame.searchBox:SetScript("OnEnterPressed", function()
-		local settings = {["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 		private.startSearch(frame.searchBox:GetText(), settings)
 	end)
 	
@@ -144,7 +141,7 @@ function private.CreateFrames()
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, 0)
 	frame.searchButton:SetText("Search")
 	frame.searchButton:SetScript("OnClick", function()
-		local settings = {["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		local settings = {["selectbox"] = BeanCounterSelectBoxSetting,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 		private.startSearch(frame.searchBox:GetText(), settings)
 	end)
 		
@@ -213,12 +210,15 @@ function private.CreateFrames()
 	
 	function private.startSearch(itemName, settings)
 		if not itemName then return end
-		
 		local data = {}
+		
 		local style = {}
 		for a,b in pairs(private.serverData) do
-				if settings.auction then	 
-					for i,v in pairs(private.serverData[a]["completedAuctions"]) do
+				if settings.auction then
+					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+						--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+					else				
+					for i,v in pairs(private.serverData[a]["completedAuctions"]) do 
 						for index, text in pairs(v) do
 						
 						local tbl = private.unpackString(text)
@@ -275,14 +275,18 @@ function private.CreateFrames()
 									tbl[5], --date
 								})
 								style[#data] = {}
-								style[#data][1] = {}
-								style[#data][1].textColor = {1,0,0}
+								style[#data][1] = {textColor = {1,0,0}}
 							end
 						end
 					end
-			    end
+				end
+			   end
 			
-				if settings.bid then--or settings.buy then	 
+				if settings.bid then--or settings.buy then
+					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+						--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+					else				
+					
 					for i,v in pairs(private.serverData[a]["completedBids/Buyouts"]) do
 						for index, text in pairs(v) do
 						
@@ -339,6 +343,7 @@ function private.CreateFrames()
 								    })
 							end
 						end
+					end
 					end
 				end
 		end
@@ -442,7 +447,7 @@ function private.classicSearch(data, style, itemName, settings)
 		for index, text in pairs(v) do
 		    local tbl = private.unpackString(text)
 		    local match = false
-		    match = private.fragmentsearch(tbl[1], itemName, settings.exact)
+		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
 			    --	1	2	    3	     4	   5	      6	      7	       8		9	   10
 			    --"time;saleResult;quantity;bid;buyout;netPrice;price;isBuyout;buyerName;sellerId"
@@ -478,7 +483,7 @@ function private.classicSearch(data, style, itemName, settings)
 		for index, text in pairs(v) do
 		    local tbl = private.unpackString(text)
 		    local match = false
-		    match = private.fragmentsearch(tbl[1], itemName, settings.exact)
+		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
 			    --	1	2	    3	     4	   5	      6	      7	       8		9	   10
 			    --time;     quantity;value;seller;isBuyout;buyerId
