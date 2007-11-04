@@ -56,7 +56,8 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.AuctionFilter(operation, itemData)
-	if (not data) then private.makeData() end
+	local active = get("filter.basic.activated")
+	if not active or active ~= true then return end
 	local retval = false
 	-- Get the signature of this item and find it's stats.
 	--local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
