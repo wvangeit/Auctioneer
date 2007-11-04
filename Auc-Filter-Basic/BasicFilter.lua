@@ -87,7 +87,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName.." "..libType)
+	local id = gui:AddTab(libName.." "..libType)
 
 	gui:AddHelp(id, "what basic filter",
 		"What is this Basic Filter?",
