@@ -43,35 +43,80 @@ local private = {}
 private.print = AucAdvanced.Print
 
 local data
+local get = AucAdvanced.Settings.GetSetting
 
 function lib.GetName()
 	return libName
 end
 
-function lib.CommandHandler(command, parm1, ...)
+function lib.Processor(callbackType, ...)
+	if callbackType == "config" then
+		private.SetupConfigGui(...)
+	end
+end
+
+function lib.AuctionFilter(operation, itemData)
 	if (not data) then private.makeData() end
-	local myFaction = AucAdvanced.GetFaction()
+	local retval = false
+	-- Get the signature of this item and find it's stats.
+	--local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
+	local quality = EnhTooltip.QualityFromLink(itemData.link)
+	local level = tonumber(itemData.itemLevel) or 0
+	local seller = itemData.sellerName:lower()
+	local minquality = tonumber(get("filter.basic.min.quality")) or 1
+	local minlevel = tonumber(get("filter.basic.min.level")) or 0
+	local sellersignored = get("filter.basic.sellersignored") or {}
+	if (quality < minquality) then retval = true end
+	if (level < minlevel) then retval = true end
+	if (sellersignored[seller]) then retval = true end
 
-	if (not command or command == "" or command == "help") then
-		local line = AucAdvanced.Config.GetCommandLead(libType, libName)
+	if nLog and retval then
+		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
+			itemData.itemName, " from ", (itemData.sellerName or "UNKNOWN"), ", quality ", tostring(quality or 0), ", item level ", tostring(itemData.itemLevel or 0))
+	end
+	return retval
+end
 
-		private.print("Help for Auctioneer Advanced - "..libName)
-		private.print(line, "help}} - this", libName, "help")
-		private.print(line, "clear}} - clear out all filters")
-		private.print(line, "minquality QUALITY}} - sets minimum quality allowed to QUALITY ["..tostring(data.MinQuality or 0).."]")
-		private.print(line, "minlevel LEVEL}} - sets minimum item level allowed to LEVEL ["..tostring(data.MinLevel or 0).."]")
-		private.print(line, "ignoreseller SELLER}} - adds seller to the ignored sellers list")
-		private.print(line, "showignored}} - shows list of ignored sellers")
+function lib.OnLoad(addon)
+	AucAdvanced.Settings.SetDefault("filter.basic.activated", true)
+	AucAdvanced.Settings.SetDefault("filter.basic.min.quality", 1)
+	AucAdvanced.Settings.SetDefault("filter.basic.min.level", 0)
+	AucAdvanced.Settings.SetDefault("filter.basic.sellersignored", {})
+	private.DataLoaded()
+end
 
-	elseif (command == "minquality") then
-		private.print("setting minimum quality to ", parm1)
-		data.MinQuality = tonumber(parm1)
+function private.SetupConfigGui(gui)
+	-- The defaults for the following settings are set in the lib.OnLoad function
+	id = gui:AddTab(libName.." "..libType)
 
-	elseif (command == "minlevel") then
-		private.print("setting minimum level to ", parm1)
-		data.MinLevel = tonumber(parm1)
+	gui:AddHelp(id, "what basic filter",
+		"What is this Basic Filter?",
+		"This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the Minimum Item level, and the Minimum Quality (Junk, Common, Uncommon, Rare, etc)\n"..
+		"It also allows you to specify that items from a certain seller not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items\n")
 
-	elseif (command == "ignoreseller") then
+	gui:AddControl(id, "Header",	0,	libName.." "..libType.." options")
+	
+	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.activated", "Enable use of the Basic filter")
+	gui:AddTip(id, "Ticking this box will enable the Basic filter to perform filtering your auction scans")
+	
+	gui:AddControl(id, "Subhead",	0, "Filter by Quality")
+	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, "Minimum Quality: %d")
+	gui:AddTip(id, "Use this slider to choose the minimum quality to go into the storage.\n"..
+		"\n"..
+		"0 = Junk (Grey),\n"..
+		"1 = Common (White),\n"..
+		"2 = Uncommon (Green),\n"..
+		"3 = Rare (Blue),\n"..
+		"4 = Epic (Purple)")
+	
+	gui:AddControl(id, "Subhead",	0, "Filter by Item Level")
+	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, "Minimum item level")
+	gui:AddTip(id, "Enter the minimum item level to go into the storage.")
+	
+end
+		
+--[[function lib.CommandHandler(command, parm1, ...)
+	if (command == "ignoreseller") then
 		private.print("adding", parm1, "to ignored sellers list")
 		if (not data.SellersIgnored) then data.SellersIgnored = {} end
 		data.SellersIgnored[parm1:lower()] = true
@@ -93,48 +138,11 @@ function lib.CommandHandler(command, parm1, ...)
 		end
 		data.MinQuality = 0
 		data.MinLevel = 0
-
-	else
-		private.print("{{Command not recognized}}")
-		lib.CommandHandler("help")
 	end
-end
-
-function lib.AuctionFilter(operation, itemData)
-	if (not data) then private.makeData() end
-	local retval = false
-	-- Get the signature of this item and find it's stats.
-	--local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
-	local quality = EnhTooltip.QualityFromLink(itemData.link)
-	local level = tonumber(itemData.itemLevel) or 0
-	local seller = itemData.sellerName:lower()
-	local minquality = tonumber(data.MinQuality) or 0
-	local minlevel = tonumber(data.MinLevel) or 0
-	local sellersignored = data.SellersIgnored or {}
-	if (quality < minquality) then retval = true end
-	if (level < minlevel) then retval = true end
-	if (sellersignored[seller]) then retval = true end
-
-	if nLog and retval then
-		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
-			itemData.itemName, " from ", (itemData.sellerName or "UNKNOWN"), ", quality ", tostring(quality or 0), ", item level ", tostring(itemData.itemLevel or 0))
-	end
-	return retval
-end
-
-function lib.OnLoad(addon)
-	private.makeData()
-end
+end]]--
 
 --[[ Local functions ]]--
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
-end
-
-function private.makeData()
-	if data then return end
-	if (not AucAdvancedFilterBasic) then AucAdvancedFilterBasic = {MinQuality=1, MinLevel=0, SellersIgnored={}} end
-	data = AucAdvancedFilterBasic
-	private.DataLoaded()
 end
