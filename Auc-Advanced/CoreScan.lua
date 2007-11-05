@@ -695,7 +695,7 @@ end
 
 function lib.ScanPage(nextPage, really)
 	if (private.isScanning) then
-		CanQuery, CanQueryAll = CanSendAuctionQuery()
+		local CanQuery, CanQueryAll = CanSendAuctionQuery()
 		if not (CanQuery and private.FinishedPage(nextPage) and really) then
 			private.scanNext = GetTime() + 0.1
 			private.scanNextPage = nextPage
