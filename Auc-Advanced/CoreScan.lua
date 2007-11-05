@@ -50,6 +50,7 @@ lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local print = lib.Print
 
+private.lastfullscan = 0
 private.isScanning = false
 private.curPage = 0
 private.scanDir = 1
@@ -155,7 +156,7 @@ function lib.PopScan()
 	end
 end
 
-function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex)
+function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
 	if AuctionFrame and AuctionFrame:IsVisible() then
 		if private.isPaused then
 			message("Scanning is currently paused")
@@ -165,11 +166,29 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			message("Scan is currently in progress")
 			return
 		end
-		if not CanSendAuctionQuery() then
-			private.queueScan = {
-				name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex
-			}
-			return
+		local CanQuery, CanQueryAll = CanSendAuctionQuery()
+		local now = time()
+		local minleft = ceil((now - private.lastfullscan) / 60) 
+		local secleft = (now - private.lastfullscan) - (minleft - 1 ) * 60
+		--this can be removed once 2.3 rolls out
+		if (CanQueryAll == nil) and (minleft > 20) then
+			CanQueryAll = true
+		end
+		minleft = 15 - minleft
+		secleft = 60 - secleft
+		if not GetAll then
+			if not CanQuery then
+				private.queueScan = {
+					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
+				}
+				return
+			end
+		else
+			if not CanQueryAll then
+				
+				message("You must wait "..minleft..":"..secleft.." until you can do a full scan again")
+				return
+			end
 		end
 
 		if private.curQuery then
@@ -193,7 +212,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 --		end
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
-				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex)
+				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
 		AuctionFrameBrowse.page = startPage
 		private.curPage = startPage
 
@@ -464,7 +483,7 @@ function lib.GetScanData(faction, realmName)
 	return AucScanData.scans[realmName][faction], idList
 end
 
-function lib.Commit(wasIncomplete)
+function lib.Commit(wasIncomplete, wasGetAll)
 	local inscount, delcount = 0, 0
 	if not private.curScan then return end
 	if not private.curQuery then return end
@@ -542,6 +561,9 @@ function lib.Commit(wasIncomplete)
 			local dodelete = false
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
+			end
+			if wasGetAll then
+				stillpossible = false
 			end
 
 			if (stillpossible) then
@@ -673,7 +695,8 @@ end
 
 function lib.ScanPage(nextPage, really)
 	if (private.isScanning) then
-		if not (CanSendAuctionQuery() and private.FinishedPage(nextPage) and really) then
+		CanQuery, CanQueryAll = CanSendAuctionQuery()
+		if not (CanQuery and private.FinishedPage(nextPage) and really) then
 			private.scanNext = GetTime() + 0.1
 			private.scanNextPage = nextPage
 			return
@@ -713,6 +736,9 @@ function lib.StorePage()
 
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = floor(totalAuctions / 50);
+	if (numBatchAuctions > 50) then
+		maxPages = 1
+	end
 	if not private.curScan then private.curScan = {} end
 
 	--Update the progress indicator
@@ -767,6 +793,7 @@ function lib.StorePage()
 			if private.isScanning
 			or (Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning)
 			or totalAuctions <= 50
+			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
 			or private.NoDupes(private.curScan, itemData) then
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
@@ -777,7 +804,11 @@ function lib.StorePage()
 	-- Send the next page query or finish scanning
 
 	if private.isScanning then
-		if (private.scanDir == 1 and private.curPage < maxPages) or
+		if numBatchAuctions > 50 then
+			private.isScanning = false
+			private.lastfullscan = time()
+			lib.Commit(false, true)
+		elseif (private.scanDir == 1 and private.curPage < maxPages) or
 		(private.scanDir == -1 and private.curPage > 0) then
 			lib.ScanPage(private.curPage + private.scanDir)
 		else
@@ -815,7 +846,7 @@ else
 	private.warnTaint = taint
 end
 
-function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex)
+function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll)
 	if private.warnTaint then
 		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
@@ -889,7 +920,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	private.sentQuery = true
 	lib.lastReq = GetTime()
 
-	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex))
+	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll))
 end
 
 function lib.SetPaused(pause)

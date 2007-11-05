@@ -118,7 +118,7 @@ function lib.ScanCommand(cat, subcat)
 	else
 			private.Print("Beginning scanning: {{Category "..cat.."."..subcat.." ("..subcatName.." of "..catName..")}}")
 	end
-	AucAdvanced.Scan.StartScan(nil, nil, nil, nil, cat, subcat, nil, nil)
+	AucAdvanced.Scan.StartScan(nil, nil, nil, nil, cat, subcat, nil, nil, true)
 end
 
 function lib.GetCommandLead(llibType, llibName)
