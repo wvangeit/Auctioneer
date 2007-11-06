@@ -44,6 +44,7 @@ private.print = AucAdvanced.Print
 
 local data
 local get = AucAdvanced.Settings.GetSetting
+IgnoreList = {}
 
 function lib.GetName()
 	return libName
@@ -66,10 +67,10 @@ function lib.AuctionFilter(operation, itemData)
 	local seller = itemData.sellerName:lower()
 	local minquality = tonumber(get("filter.basic.min.quality")) or 1
 	local minlevel = tonumber(get("filter.basic.min.level")) or 0
-	local sellersignored = get("filter.basic.sellersignored") or {}
+	IgnoreList = get("filter.basic.sellersignored") or {}
 	if (quality < minquality) then retval = true end
 	if (level < minlevel) then retval = true end
-	if (sellersignored[seller]) then retval = true end
+	if (IgnoreList[seller]) then retval = true end
 
 	if nLog and retval then
 		nLog.AddMessage("auc-"..libType.."-"..libName, "AuctionFilter", N_INFO, "Filtered Data", "Auction Filter Removed Data for ",
@@ -83,20 +84,24 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.quality", 1)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.level", 0)
 	AucAdvanced.Settings.SetDefault("filter.basic.sellersignored", {})
+	IgnoreList_Load()
 	private.DataLoaded()
 end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	local id = gui:AddTab(libName.." "..libType)
+	local id, last
 
+	id = gui:AddTab(libName.." "..libType)
 	gui:AddHelp(id, "what basic filter",
 		"What is this Basic Filter?",
 		"This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the Minimum Item level, and the Minimum Quality (Junk, Common, Uncommon, Rare, etc)\n"..
 		"It also allows you to specify that items from a certain seller not be recorded.  One use of this is if a particular seller posts all of his items well over or under the market price, you can ignore all of his/her items\n")
 
 	gui:AddControl(id, "Header",	0,	libName.." "..libType.." options")
+	last = gui:GetLast(id)
 	
+	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.activated", "Enable use of the Basic filter")
 	gui:AddTip(id, "Ticking this box will enable the Basic filter to perform filtering your auction scans")
 	
@@ -114,36 +119,175 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "NumberBox",	0, 1, "filter.basic.min.level", 0, 9, "Minimum item level")
 	gui:AddTip(id, "Enter the minimum item level to go into the storage.")
 	
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Subhead",	0.55,    "Ignore List")
+	gui:AddControl(id, "Custom", 	0.55, 0, BasicFilter_IgnoreListFrame); BasicFilter_IgnoreListFrame:SetParent(gui.tabs[id][3])
+	
 end
 		
---[[function lib.CommandHandler(command, parm1, ...)
-	if (command == "ignoreseller") then
-		private.print("adding", parm1, "to ignored sellers list")
-		if (not data.SellersIgnored) then data.SellersIgnored = {} end
-		data.SellersIgnored[parm1:lower()] = true
-
-	elseif (command == "unignoreseller") then
-		private.print("removing", parm1, "from ignored sellers list")
-		if (not data.SellersIgnored) then data.SellersIgnored = {} end
-		data.SellersIgnored[parm1:lower()] = nil
-
-	elseif (command == "showignored") then
-		private.print("{{Sellers Currently Ignored}}")
-		for seller in pairs(data.SellersIgnored) do
-			private.print("{{"..seller.."}}")
-		end
-
-	elseif (command == "clear") then
-		for seller in pairs(data.SellersIgnored) do
-			data.SellersIgnored[seller] = nil
-		end
-		data.MinQuality = 0
-		data.MinLevel = 0
-	end
-end]]--
-
 --[[ Local functions ]]--
 function private.DataLoaded()
 	-- This function gets called when the data is first loaded. You may do any required maintenence
 	-- here before the data gets used.
 end
+
+--**************************************
+-- Ignore List Frame Functionality
+--**************************************
+
+local numIgnoreButtons = 18
+SelectedIgnore = 1
+LastIgnoredPlayer = nil
+
+function lib.IgnoreList_IsPlayerIgnored( name )
+	if ( IgnoreList[name] ) then
+		return true
+	else
+		return false
+	end
+end
+
+function IgnoreList_Update()
+	--private.print("IgnoreList_Update()")
+	local numIgnores = #IgnoreList
+	local nameText;
+	local name;
+	local ignoreButton;
+	if ( numIgnores > 0 ) then
+		if ( SelectedIgnore == 0 ) then
+			SelectedIgnore = 1
+		end
+		BasicFilter_IgnoreList_StopIgnoreButton:Enable();
+	else
+		BasicFilter_IgnoreList_StopIgnoreButton:Disable();
+	end
+
+	local ignoreOffset = FauxScrollFrame_GetOffset(BasicFilter_IgnoreList_ScrollFrame);
+	local ignoreIndex;
+	for i=1, numIgnoreButtons, 1 do
+		ignoreIndex = i + ignoreOffset;
+		ignoreButton = getglobal("BasicFilter_IgnoreList_IgnoreButton"..i);
+		ignoreButton:SetText(IgnoreList[ignoreIndex] or "");
+		ignoreButton:SetID(ignoreIndex);
+		-- Update the highlight
+		if ( ignoreIndex == SelectedIgnore ) then
+			ignoreButton:LockHighlight();
+		else
+			ignoreButton:UnlockHighlight();
+		end
+		
+		if ( ignoreIndex > numIgnores ) then
+			ignoreButton:Hide();
+		else
+			ignoreButton:Show();
+		end
+	end
+	
+	-- ScrollFrame stuff
+	FauxScrollFrame_Update(BasicFilter_IgnoreList_ScrollFrame, numIgnores, numIgnoreButtons, 16);
+	
+	IgnoreList_Save()
+end
+
+function IgnoreList_IgnoreButton_OnClick( button )
+	--private.print("IgnoreList_IgnoreButton_OnClick()")
+	SelectedIgnore = button:GetID()
+	IgnoreList_Update()
+end
+
+function IgnoreList_UnignoreButton_OnClick( button )
+	--private.print("IgnoreList_UnignoreButton_OnClick()")
+	local name = IgnoreList[SelectedIgnore]
+	IgnoreList_Remove(name)
+end
+
+function IgnoreList_Load()
+	if ( get("filter.basic.sellersignored") ) then
+		IgnoreList = get("filter.basic.sellersignored")
+	end
+	for i, name in ipairs(IgnoreList) do
+		IgnoreList[name] = i
+	end
+	IgnoreList_Update()
+end
+
+function IgnoreList_Save()
+	private.print("IgnoreList_Save()")
+	for key in pairs(IgnoreList) do
+		if not ( type(key) == "number" ) then
+			IgnoreList[key] = nil
+		end
+	end
+	AucAdvanced.Settings.SetSetting("filter.basic.sellersignored", IgnoreList)
+end
+
+function IgnoreList_Add( name )
+	-- name validity checks
+	if ( (not name) or name == "" ) then return end
+	if ( #name < 2 ) then return end
+	name = name:sub(1,1):upper()..name:sub(2)
+	local currentSelection = IgnoreList[SelectedIgnore]
+
+	if not ( IgnoreList[name] ) then
+		table.insert(IgnoreList, name)
+		LastIgnoredPlayer = name
+	end
+	table.sort(IgnoreList)
+	for i, name in ipairs(IgnoreList) do
+		IgnoreList[name] = i
+	end
+	SelectedIgnore = IgnoreList[currentSelection] or 1
+	IgnoreList_Update()
+end
+
+function IgnoreList_Remove( name )
+	--private.print("IgnoreList_Remove()")
+	if ( IgnoreList[name] ) then
+		IgnoreList[name] = nil
+		for i, ignoreName in ipairs(IgnoreList) do
+			if ( ignoreName == name ) then
+				table.remove(IgnoreList, i)
+			end
+		end
+		SelectedIgnore = 1
+	end
+	table.sort(IgnoreList)
+	for i, name in ipairs(IgnoreList) do
+		IgnoreList[name] = i
+	end
+	IgnoreList_Update()
+end
+
+StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
+	text = ADD_IGNORE_LABEL,
+	button1 = ACCEPT,
+	button2 = CANCEL,
+	hasEditBox = 1,
+	maxLetters = 12,
+	OnAccept = function()
+		local editBox = getglobal(this:GetParent():GetName().."EditBox");
+		IgnoreList_Add(editBox:GetText());
+	end,
+	OnShow = function()
+		getglobal(this:GetName().."EditBox"):SetFocus();
+	end,
+	OnHide = function()
+		if ( ChatFrameEditBox:IsShown() ) then
+			ChatFrameEditBox:SetFocus();
+		end
+		getglobal(this:GetName().."EditBox"):SetText("");
+	end,
+	EditBoxOnEnterPressed = function()
+		local name = getglobal(this:GetParent():GetName().."EditBox"):GetText();
+		this:GetParent():Hide();
+		IgnoreList_Add(name);
+	end,
+	EditBoxOnEscapePressed = function()
+		this:GetParent():Hide();
+	end,
+	timeout = 0,
+	exclusive = 1,
+	whileDead = 1,
+	hideOnEscape = 1
+};
+

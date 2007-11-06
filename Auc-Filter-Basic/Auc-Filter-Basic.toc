@@ -13,3 +13,4 @@
 ##
 
 BasicFilter.lua
+BasicFilter.xml
