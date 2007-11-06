@@ -89,7 +89,8 @@ function lib:valuate(item, tooltip)
 		end
 	else
 		-- Otherwise, just use our current level
-		if (BtmScan.isDEAble(iLevel, iQual)) then
+		local canDe = BtmScan.isDEAble(iLevel, iQual)
+		if not canDe then
 			item:info("Abort: DE level > current")
 			return
 		end
