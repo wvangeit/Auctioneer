@@ -37,15 +37,6 @@ local lib
 BeanCounter={}
 lib = BeanCounter
 
---Handle if Auc Adv is not loaded
-local lib2 = lib --this will only be used when Auc is running
-if AucAdvanced then
-	AucAdvanced.Modules[libType][libName] = {}
-	lib2 = AucAdvanced.Modules[libType][libName]
-end
-	
-
-
 local private = {
 	--BeanCounterCore
 	playerName = UnitName("player"),
@@ -87,16 +78,6 @@ local function debugPrint(...)
     private.debugPrint("BeanCounterCore",...)
 end
 
-function lib2.GetName()
-	return libName
-end
-
-function lib2.Processor(callbackType, ...)
-	if (callbackType == "config") then
-		private.SetupConfigGui(...)
-	end
-end
-
 function lib.OnLoad(addon)
 	private.frame:RegisterEvent("PLAYER_MONEY")
 	
@@ -114,7 +95,7 @@ function lib.OnLoad(addon)
 	private.frame:SetScript("OnUpdate", private.onUpdate)
 	
 	-- Hook all the methods we need
-	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.CreateFrames) --To be standalone we cannot depend on AucAdv for lib.Processor
+	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
 	
 	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook);
 	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook);
@@ -124,14 +105,11 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-
-	--Setup Configator defaults if AucAdv loaded
-	if AucAdvanced then
-	    for config, value in pairs(private.defaults) do
-		    AucAdvanced.Settings.SetDefault(config, value)
-	    end
-	end
+		
 	private.initializeDB() --create or initialize the saved DB
+	private.CreateFrames() --create our framework used for AH and GUI
+	lib.MakeGuiConfig() --create the configurator GUI frame
+	private.slidebar() --create slidebar icon
 end
 
 --Create the database
@@ -204,15 +182,8 @@ end
 
 --[[ Configator Section ]]--
 
-private.defaults = {
-	["util.beancounter.activated"] = true,
-	["util.beancounter.debug"] = false,
-	}
-
 function private.getOption(option)
-    if AucAdvanced then
-	return AucAdvanced.Settings.GetSetting(option)
-    end
+	return lib.GetSetting(option)
 end
 
 function private.SetupConfigGui(gui)
@@ -228,6 +199,18 @@ function private.SetupConfigGui(gui)
 	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterPosting/Bid Debugging Messages.")	
 end
 
+--[[Sidebar Section]]--
+local sideIcon
+function private.slidebar()
+	if LibStub then
+		local SlideBar = LibStub:GetLibrary("SlideBar", true)
+		if SlideBar then
+			sideIcon = SlideBar.AddButton("BeanCounter", "Interface\\AddOns\\BeanCounter\\Icon")
+			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+			sideIcon:SetScript("OnClick", private.GUI)
+		end
+	end
+end
 
 --[[ Local functions ]]--
 function private.onUpdate()
@@ -248,12 +231,6 @@ function private.onEvent(frame, event, arg, ...)
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
 		   lib.OnLoad()
-		elseif arg == "Auc-Advanced" then
-		    AucAdvanced.Modules[libType][libName] = {}
-		    lib2 = AucAdvanced.Modules[libType][libName]
-		    for config, value in pairs(private.defaults) do
-			AucAdvanced.Settings.SetDefault(config, value)
-		    end
 		end
 	end
 end
@@ -293,7 +270,7 @@ function private.databaseAdd(key, itemID, value)
 		private.playerData[key][itemID]={value}
 	end
 end
---remove item (for pending bids only atm) Can I make this universal?
+--remove item (for pending bids only atm)
 function private.databaseRemove(key, itemID, ITEM, NAME)
 	if key == "postedBids" then	
 		for i,v in pairs(private.playerData[key][itemID]) do

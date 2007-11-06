@@ -1,6 +1,7 @@
 ## Title: BeanCounter
 ## Interface: 20200
 ## Dependancies: Configator, Stubby
+## OptionalDeps: !nLog, Babylonian, DebugLib, Configator, SlideBar, Auc-Advanced
 ## SavedVariables: BeanCounterDB, BeanCounterAccountDB
 ##
 ## Version: <%version%> (<%codename%>)

@@ -41,17 +41,15 @@ end
 
 
 local frame
-function private.CreateFrames()
+function private.AuctionUI()
 	if frame then return end
-
-	local SelectBox = LibStub:GetLibrary("SelectBox")
-	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-
-	frame = CreateFrame("Frame", "TESTING", AuctionFrame)
-	private.frame = frame
-	frame.list = {}
-	frame.buffer = {}
-	frame.cache = {}
+	
+	lib.Gui:Hide()
+	frame = private.frame
+	
+	private.frame:SetParent(AuctionFrame)
+	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
+	frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
 	
 	--Create the TAB
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
@@ -65,16 +63,14 @@ function private.CreateFrames()
 		    private.AddTab(frame.ScanTab, frame)
 	end
 	
-	--Set our Coordinate system relative to top left AH Frame
-	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
-	frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
-	--Add Title to the Top
-	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
-	title:SetText("BeanCounter: Auction History Database")
-
-	
 	function frame.ScanTab.OnClick(_, _, index)
+		if private.frame:GetParent() == BeanCounter.Gui or private.frame:GetParent() == UIParent then
+			lib.Gui:Hide()
+			private.frame:SetParent(AuctionFrame)
+			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
+			frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
+		end
+	
 		if not index then index = this:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
@@ -101,30 +97,65 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
-local BeanCounterSelectBoxSetting 	= {"1","server"}
+	
+	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
+end
+--Change parent to our GUI frame
+function private.GUI()
+	if private.frame:GetParent() == AuctionFrame or private.frame:GetParent() == UIParent then
+		private.frame:SetParent(lib.Gui)
+		private.frame:SetPoint("TOPLEFT", lib.Gui, "TOPLEFT", 0,0)
+		private.frame:SetPoint("BOTTOMRIGHT", lib.Gui, "BOTTOMRIGHT", 0,0)
+	end
+	if not lib.Gui:IsVisible() then
+		if AuctionFrame then AuctionFrame:Hide() end
+		lib.Gui:Show()
+		private.frame:SetFrameStrata("FULLSCREEN")
+		private.frame:Show()
+
+	else
+		lib.Gui:Hide()
+	end
+		
+end
+
+--Seperated frame items from frame creation, this should allow the same code to be reused for AH UI and Standalone UI
+function private.CreateFrames()
+
+	local frame = CreateFrame("Frame", nil, UIParent)
+	private.frame = frame
+	frame:Hide()
+	
+	private.frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 18,-95)
+	private.frame:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -760,455)
+	--Add Title to the Top
+	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
+	title:SetText("BeanCounter: Auction History Database")
+
+	local SelectBox = LibStub:GetLibrary("SelectBox")
+	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
+
+	local BeanCounterSelectBoxSetting 	= {"1","server"}
 	function private.ChangeControls(obj, arg1,arg2,...)
 		--debugPrint("Clicked the button Option #", arg1, arg2)
 		BeanCounterSelectBoxSetting = {arg1, arg2}
 	end
-	
+	--Default Server wide
 	local vals = {{"server", "Search Server Data"},}
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, "Search "..name.."'s Data"})
 	end
 	
-	--Default Server wide
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
 	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-115)
 	frame.selectbox.box.element = "selectBox"
-	--frame.selectbox.box.value = BeanCounterSelectBoxSetting 
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
 	frame.selectbox.box:SetText("Data to show:")
-	
-	
-
+		
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
 	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -183)
@@ -147,37 +178,45 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 		
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
-	getglobal(BeancounterexactCheck:GetName().."Text"):SetText("Exact name search")
+	frame.exactCheck:SetChecked(false)
+	getglobal("BeancounterexactCheckText"):SetText("Exact name search")
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
 
+	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
 	frame.classicCheck:SetChecked(false)
-	getglobal(BeancounterclassicCheck:GetName().."Text"):SetText("Show BC Classic data")
+	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data")
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
+	if not BeanCounterAccountDB then --no need to show this button if theres no classic data to search
+		frame.classicCheck:Hide()
+	end
 	
+	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(true)
-	getglobal(BeancounterbidCheck:GetName().."Text"):SetText("Bids")
+	getglobal("BeancounterbidCheckText"):SetText("Bids")
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -280)
 	
-	--frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
-	--frame.buyCheck:SetChecked(true)
-	--getglobal(BeancounterbuyCheck:GetName().."Text"):SetText("Buys")
-	--frame.buyCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -255)
-	
+	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(true)
-	getglobal(BeancounterauctionCheck:GetName().."Text"):SetText("Auctions")
+	getglobal("BeancounterauctionCheckText"):SetText("Auctions")
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -305)
 	
-	--frame.sellCheck = CreateFrame("CheckButton", "BeancountersellCheck", frame, "OptionsCheckButtonTemplate")
-	--frame.sellCheck:SetChecked(true)
-	--getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
-	--frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)
+	--[[search Purchases (vendor/trade)
+	frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
+	frame.buyCheck:SetChecked(true)
+	getglobal(BeancounterbuyCheck:GetName().."Text"):SetText("Buys")
+	frame.buyCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -255)
+	--search Sold (vendor/trade)
+	frame.sellCheck = CreateFrame("CheckButton", "BeancountersellCheck", frame, "OptionsCheckButtonTemplate")
+	frame.sellCheck:SetChecked(true)
+	getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
+	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
 	
 	
 	--Create the results window
-	frame.resultlist = CreateFrame("Frame", "BeanCounterResultList", frame)
+	frame.resultlist = CreateFrame("Frame", nil, frame)
 	frame.resultlist:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -186,9 +225,15 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 	})
 	
 	frame.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	frame.resultlist:SetPoint("TOPLEFT", AuctionFrame, "BOTTOMLEFT", 187, 320)
-	frame.resultlist:SetPoint("TOPRIGHT", AuctionFrame, "BOTTOMRIGHT", -5, 0)
-	frame.resultlist:SetPoint("BOTTOM", AuctionFrame, "BOTTOM", 0, 34)
+	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 320)
+	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -5, 0)
+	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 34)
+	--This changed the scroll sheet parent from AH to GUI or vice versa
+	function private.resultlistSetPoint(frame)
+		frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 320)
+		frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -5, 0)
+		frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 34)
+	end
 
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ "Item", "TEXT", 120 },
@@ -210,9 +255,10 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 	
 	function private.startSearch(itemName, settings)
 		if not itemName then return end
-		local data = {}
 		
+		local data = {}
 		local style = {}
+		
 		for a,b in pairs(private.serverData) do
 				if settings.auction then
 					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
@@ -243,6 +289,9 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 									--tbl[9], --time,
 									tbl[12], --date
 								    })
+								style[#data] = {}
+								style[#data][2] = {}
+								style[#data][2].textColor = {0.3, 0.9, 0.8}	
 							end
 						end
 					end
@@ -275,7 +324,8 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 									tbl[5], --date
 								})
 								style[#data] = {}
-								style[#data][1] = {textColor = {1,0,0}}
+								style[#data][2] = {}
+								style[#data][2].textColor = {1,0,0}
 							end
 						end
 					end
@@ -313,6 +363,9 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 									--tbl[9], --time,
 									tbl[11], --date
 								    })
+								style[#data] = {}
+								style[#data][2] = {}
+								style[#data][2].textColor = {1,1,0}	
 							end
 						end
 					end
@@ -341,6 +394,9 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 									--tbl[4], --time,
 									tbl[6], --date
 								    })
+								style[#data] = {}
+								style[#data][2] = {}
+								style[#data][2].textColor = {1,1,1}	
 							end
 						end
 					end
@@ -352,7 +408,6 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 		data, style = private.classicSearch(data, style, itemName, settings)
 	    end
 
-		
 		frame.resultlist.sheet:SetData(data, style)
 	end
 	 
@@ -385,7 +440,7 @@ local BeanCounterSelectBoxSetting 	= {"1","server"}
 	
 	end
 	
-hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
+
 
 end
 
@@ -507,9 +562,9 @@ function private.classicSearch(data, style, itemName, settings)
 					--tbl[9], --time,
 					"-", --date
 					 })
-			    style[#data] = {}
-			    style[#data][1] = {}
-			    style[#data][1].textColor = {1,0,0}					 
+			   style[#data] = {}
+			   style[#data][2] = {}
+			   style[#data][2].textColor = {1,0,0}					 
 			end
 		end
 	    end
