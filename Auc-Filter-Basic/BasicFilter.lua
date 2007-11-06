@@ -46,7 +46,7 @@ private.print = AucAdvanced.Print
 
 local get = AucAdvanced.Settings.GetSetting
 
- IgnoreList = {}
+local IgnoreList = {}
 
 function lib.GetName()
 	return libName
