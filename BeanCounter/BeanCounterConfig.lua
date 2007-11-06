@@ -36,6 +36,7 @@ local private = lib.Private
 local print =  BeanCounter.Print
 
 local gui
+local settings
 
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
