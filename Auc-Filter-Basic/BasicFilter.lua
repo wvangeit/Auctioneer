@@ -66,7 +66,8 @@ function lib.AuctionFilter(operation, itemData)
 	--local itemType, itemId, property, factor = AucAdvanced.DecodeLink(itemData.link)
 	local quality = EnhTooltip.QualityFromLink(itemData.link)
 	local level = tonumber(itemData.itemLevel) or 0
-	local seller = itemData.sellerName:lower()
+	--This needs to have the case conversions done because the data is stored in the SV the same way, and LUA is case-sensitive
+	local seller = itemData.sellerName:sub(1,1):upper()..itemData.sellerName:sub(2):lower()
 	local minquality = tonumber(get("filter.basic.min.quality")) or 1
 	local minlevel = tonumber(get("filter.basic.min.level")) or 0
 	if (quality < minquality) then retval = true end
@@ -209,11 +210,10 @@ end
 function IgnoreList_OnEvent()
 	if event == "PLAYER_LOGOUT" then
 		for key in pairs(IgnoreList) do
-			if not ( type(key) == "number" ) then
-				IgnoreList[key] = nil
+			if type(key) == "number" then
+				AucAdvancedFilterBasic_IgnoreList[key] = IgnoreList[key]
 			end
 		end
-		AucAdvancedFilterBasic_IgnoreList = IgnoreList
 	end
 end
 
@@ -221,7 +221,9 @@ function IgnoreList_Add( name )
 	-- name validity checks
 	if ( (not name) or name == "" ) then return end
 	if ( #name < 2 ) then return end
-	name = name:sub(1,1):upper()..name:sub(2)
+	--This is stored in the SV with the first letter capitalized and the rest lowercased
+	--so that it appears that way in the config
+	name = name:sub(1,1):upper()..name:sub(2):lower()
 	local currentSelection = IgnoreList[SelectedIgnore]
 
 	if not ( IgnoreList[name] ) then
