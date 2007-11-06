@@ -35,16 +35,18 @@
 local libName = "Basic"
 local libType = "Filter"
 
-
 AucAdvanced.Modules[libType][libName] = {}
 local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
 
+if not AucAdvancedFilterBasic then AucAdvancedFilterBasic = {} end
+if not AucAdvancedFilterBasic_IgnoreList then AucAdvancedFilterBasic_IgnoreList = {} end
+
+local private = {}
 private.print = AucAdvanced.Print
 
-local data
 local get = AucAdvanced.Settings.GetSetting
-IgnoreList = {}
+
+ IgnoreList = {}
 
 function lib.GetName()
 	return libName
@@ -67,7 +69,6 @@ function lib.AuctionFilter(operation, itemData)
 	local seller = itemData.sellerName:lower()
 	local minquality = tonumber(get("filter.basic.min.quality")) or 1
 	local minlevel = tonumber(get("filter.basic.min.level")) or 0
-	IgnoreList = get("filter.basic.sellersignored") or {}
 	if (quality < minquality) then retval = true end
 	if (level < minlevel) then retval = true end
 	if (IgnoreList[seller]) then retval = true end
@@ -83,9 +84,9 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.basic.activated", true)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.quality", 1)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.level", 0)
-	AucAdvanced.Settings.SetDefault("filter.basic.sellersignored", {})
 	IgnoreList_Load()
 	private.DataLoaded()
+	BasicFilter_IgnoreListFrame:RegisterEvent("PLAYER_LOGOUT")
 end
 
 function private.SetupConfigGui(gui)
@@ -148,7 +149,6 @@ function lib.IgnoreList_IsPlayerIgnored( name )
 end
 
 function IgnoreList_Update()
-	--private.print("IgnoreList_Update()")
 	local numIgnores = #IgnoreList
 	local nameText;
 	local name;
@@ -186,39 +186,35 @@ function IgnoreList_Update()
 	-- ScrollFrame stuff
 	FauxScrollFrame_Update(BasicFilter_IgnoreList_ScrollFrame, numIgnores, numIgnoreButtons, 16);
 	
-	IgnoreList_Save()
 end
 
 function IgnoreList_IgnoreButton_OnClick( button )
-	--private.print("IgnoreList_IgnoreButton_OnClick()")
 	SelectedIgnore = button:GetID()
 	IgnoreList_Update()
 end
 
 function IgnoreList_UnignoreButton_OnClick( button )
-	--private.print("IgnoreList_UnignoreButton_OnClick()")
 	local name = IgnoreList[SelectedIgnore]
 	IgnoreList_Remove(name)
 end
 
 function IgnoreList_Load()
-	if ( get("filter.basic.sellersignored") ) then
-		IgnoreList = get("filter.basic.sellersignored")
-	end
+	IgnoreList = AucAdvancedFilterBasic_IgnoreList
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
 	end
 	IgnoreList_Update()
 end
 
-function IgnoreList_Save()
-	private.print("IgnoreList_Save()")
-	for key in pairs(IgnoreList) do
-		if not ( type(key) == "number" ) then
-			IgnoreList[key] = nil
+function IgnoreList_OnEvent()
+	if event == "PLAYER_LOGOUT" then
+		for key in pairs(IgnoreList) do
+			if not ( type(key) == "number" ) then
+				IgnoreList[key] = nil
+			end
 		end
+		AucAdvancedFilterBasic_IgnoreList = IgnoreList
 	end
-	AucAdvanced.Settings.SetSetting("filter.basic.sellersignored", IgnoreList)
 end
 
 function IgnoreList_Add( name )
@@ -241,7 +237,6 @@ function IgnoreList_Add( name )
 end
 
 function IgnoreList_Remove( name )
-	--private.print("IgnoreList_Remove()")
 	if ( IgnoreList[name] ) then
 		IgnoreList[name] = nil
 		for i, ignoreName in ipairs(IgnoreList) do

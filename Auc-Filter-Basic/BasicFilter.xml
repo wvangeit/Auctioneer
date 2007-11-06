@@ -45,6 +45,9 @@
 					<OnLeave>
 						GameTooltip:Hide();
 					</OnLeave>
+					<OnEvent>
+						IgnoreList_OnEvent();
+					</OnEvent>
 				</Scripts>
 			</Button>
 			<Button name="BasicFilter_IgnoreList_StopIgnoreButton" inherits="UIPanelButtonTemplate" text="STOP_IGNORE">
