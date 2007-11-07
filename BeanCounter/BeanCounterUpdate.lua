@@ -60,6 +60,8 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_02A()
 	elseif private.playerData["version"] < 1.02 then
 		private.updateTo1_02B()
+	elseif private.playerData["version"] < 1.03 then
+		private.updateTo1_03()
 	end
 		
 end
@@ -118,4 +120,18 @@ function private.updateTo1_02B()
 end 
 function private.updateCreatelink(itemID, name) --If the server query fails make a fake link so we can still view item
     return "|cffffff33|Hitem:"..itemID..":0:0:0:0:0:0:1529248154|h["..name.."]|h|r" --Our fake links are always yellow
+end
+--[[This removes the redundent "date" field]]--
+function private.updateTo1_03()
+	for DB,data in pairs(private.playerData) do
+		if type(data) == "table" then
+			for itemID, value in pairs(data) do
+				for index, text in ipairs(value) do
+					text = text:gsub(";(%d-%-%d-%-%d-)$", "", 1) --Remove the date field
+					private.playerData[DB][itemID][index] = text
+				end
+			end
+		end
+	end
+	private.playerData.version = 1.03
 end

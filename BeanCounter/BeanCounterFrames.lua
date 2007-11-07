@@ -286,8 +286,8 @@ function private.CreateFrames()
 									tbl[4], --deposit
 									tbl[5], --fee
 									tbl[10], --current wealth
-									--tbl[9], --time,
-									tbl[12], --date
+									date("%c", tbl[9]), --time, --Make this a user choosable option.
+									--tbl[12], --date
 								    })
 								style[#data] = {}
 								style[#data][2] = {}
@@ -320,8 +320,8 @@ function private.CreateFrames()
 									deposit, --deposit
 									"-", --fee
 									tbl[4], --current wealth
-									--tbl[3], --time,
-									tbl[5], --date
+									date("%c", tbl[3]), --time,
+									--tbl[5], --date
 								})
 								style[#data] = {}
 								style[#data][2] = {}
@@ -360,8 +360,8 @@ function private.CreateFrames()
 									tbl[4], --deposit
 									tbl[5], --fee
 									tbl[10], --current wealth
-									--tbl[9], --time,
-									tbl[11], --date
+									date("%c", tbl[9]), --time,
+									--tbl[11], --date
 								    })
 								style[#data] = {}
 								style[#data][2] = {}
@@ -391,8 +391,8 @@ function private.CreateFrames()
 									"-", --deposit
 									"-", --fee
 									tbl[5], --current wealth
-									--tbl[4], --time,
-									tbl[6], --date
+									date("%c", tbl[4]), --time,
+									--tbl[6], --date
 								    })
 								style[#data] = {}
 								style[#data][2] = {}
@@ -528,8 +528,8 @@ function private.classicSearch(data, style, itemName, settings)
 					"-",--tbl[7], --deposit
 					"-", --tbl[8], --fee
 					"-", --current wealth
-					--tbl[9], --time,
-					"-", --date
+					date("%c", tbl[1]), --time,
+		
 					 })	 
 			end
 		end
@@ -559,8 +559,7 @@ function private.classicSearch(data, style, itemName, settings)
 					"-",--tbl[7], --deposit
 					"-", --tbl[8], --fee
 					"-", --current wealth
-					--tbl[9], --time,
-					"-", --date
+					date("%c", tbl[1]), --time,
 					 })
 			   style[#data] = {}
 			   style[#data][2] = {}

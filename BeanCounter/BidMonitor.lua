@@ -128,7 +128,7 @@ function private.onBidAccepted()
 	if (bid) then
 	
 	local itemID = bid.itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
-	local text = private.packString(bid.itemLink, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), private.wealth, date("%m-%d-%y"))
+	local text = private.packString(bid.itemLink, bid.count, bid.bid, bid.owner, bid.isBuyout, bid.timeLeft, time(), private.wealth)
 		debugPrint(bid.isBuyout, bid.isHighBidder)		
 		if (bid.isBuyout) then
 			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid

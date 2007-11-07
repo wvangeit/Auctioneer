@@ -186,7 +186,7 @@ function private.mailSort()
 				local itemName = string.match(private.reconcilePending[i]["subject"], "Auction successful:%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then
-					local value = private.packString(itemLink, "Auction successful", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))
+					local value = private.packString(itemLink, "Auction successful", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("completedAuctions", itemID, value)
 				end
 				table.remove(private.reconcilePending,i)
@@ -198,7 +198,7 @@ function private.mailSort()
 				--Do we want to insert nil values into the exp auc string to match length with comp auc string?
 				--local value = private.packString(itemName, "Auction expired", _, _, _, _, _, _, private.reconcilePending[i]["time"], private.wealth)
 					debugPrint("Auction Expired")
-					local value = private.packString(itemLink, "Auction expired", private.reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))
+					local value = private.packString(itemLink, "Auction expired", private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedAuctions", itemID, value)
 				end
 				
@@ -216,7 +216,7 @@ function private.mailSort()
 				if itemID then
 				local  _, itemLink = private.getItemInfo(itemID, "itemid") 
 					debugPrint("Auction won: ", itemID)
-					local value = private.packString(itemLink, "Auction won", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))				
+					local value = private.packString(itemLink, "Auction won", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
 					private.databaseAdd("completedBids/Buyouts", itemID, value)
 				end				
 				table.remove(private.reconcilePending,i)			
@@ -228,7 +228,7 @@ function private.mailSort()
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 				if itemID then
 				
-				local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth, date("%m-%d-%y"))
+				local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
 				private.databaseAdd("failedBids", itemID, value)
 				end
 				

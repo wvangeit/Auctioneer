@@ -124,7 +124,7 @@ function private.onAuctionCreated()
 	if (post) then
 		-- Add to sales database
 		local itemID, itemLink = private.getItemInfo(post.name, "itemid")
-		local text = private.packString(itemLink, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth, date("%m-%d-%y"))
+		local text = private.packString(itemLink, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
 		private.databaseAdd("postedAuctions", itemID, text)
 	end
 end
