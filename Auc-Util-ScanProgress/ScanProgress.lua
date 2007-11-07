@@ -152,7 +152,13 @@ function private.UpdateScanProgressUI(totalAuctions, scannedAuctions, elapsedTim
 	local auctionsToScan = totalAuctions - scannedAuctions
 
 	local currentPage = math.floor(scannedAuctions / numAuctionsPerPage)
-	local totalPages = math.floor(totalAuctions / numAuctionsPerPage)
+	
+	local totalPages = totalAuctions / numAuctionsPerPage
+	if (totalPages - math.floor(totalPages) > 0.5) then
+		totalPages = math.ceil(totalPages)
+	else
+		totalPages = math.floor(totalPages)
+	end
 
 	local auctionsScannedPerSecond = scannedAuctions / secondsElapsed
 	local secondsToScanCompletion = auctionsToScan / auctionsScannedPerSecond
