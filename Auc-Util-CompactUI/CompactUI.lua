@@ -446,7 +446,11 @@ function private.RetrievePage()
 	end
 
 	local selected = GetSelectedAuctionItem("list") or 0
-	for i = 1, NUM_AUCTION_ITEMS_PER_PAGE do
+	local pagesize = GetNumAuctionItems("list")
+	if pagesize < 50 then
+		pagesize = 50
+	end
+	for i = 1, pagesize do
 		if not private.pageElements[i] then private.pageElements[i] = {} end
 
 		local link = GetAuctionItemLink("list", i)
@@ -640,11 +644,14 @@ function private.MyAuctionFrameUpdate()
 	end
 
 	private.RetrievePage()
-
+	local pagesize = GetNumAuctionItems("list")
+	if pagesize < 50 then
+		pagesize = 50
+	end
 	for i=1, NUM_BROWSE_TO_DISPLAY do
-		index = offset + i + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)
+		index = offset + i + (pagesize * AuctionFrameBrowse.page)
 		button = private.buttons[i]
-		if ( index > (numBatchAuctions + (NUM_AUCTION_ITEMS_PER_PAGE * AuctionFrameBrowse.page)) ) then
+		if ( index > (numBatchAuctions + (pagesize * AuctionFrameBrowse.page)) ) then
 			button:SetAuction()
 			-- If the last button is empty then set isLastSlotEmpty var
 			if ( i == NUM_BROWSE_TO_DISPLAY ) then
@@ -660,7 +667,7 @@ function private.MyAuctionFrameUpdate()
 		BrowsePrevPageButton:Show()
 		BrowseNextPageButton:Show()
 		BrowseSearchCountText:Show()
-		local itemsMin = AuctionFrameBrowse.page * NUM_AUCTION_ITEMS_PER_PAGE + 1
+		local itemsMin = AuctionFrameBrowse.page * pagesize + 1
 		local itemsMax = itemsMin + numBatchAuctions - 1
 		BrowseSearchCountText:SetText(format(NUMBER_OF_RESULTS_TEMPLATE, itemsMin, itemsMax, totalAuctions ))
 		if ( isLastSlotEmpty ) then
@@ -669,7 +676,7 @@ function private.MyAuctionFrameUpdate()
 			else
 				BrowsePrevPageButton.isEnabled = 1
 			end
-			if ( AuctionFrameBrowse.page == (ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE) - 1) ) then
+			if ( AuctionFrameBrowse.page == (ceil(totalAuctions/pagesize) - 1) ) then
 				BrowseNextPageButton.isEnabled = nil
 			else
 				BrowseNextPageButton.isEnabled = 1
@@ -685,7 +692,7 @@ function private.MyAuctionFrameUpdate()
 		BrowseSearchCountText:Hide()
 	end
 
-	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/NUM_AUCTION_ITEMS_PER_PAGE)))
+	private.PageNum:SetText(("%d/%d"):format(AuctionFrameBrowse.page+1, ceil(totalAuctions/pagesize)))
 	FauxScrollFrame_Update(BrowseScrollFrame, numBatchAuctions, NUM_BROWSE_TO_DISPLAY, AUCTIONS_BUTTON_HEIGHT)
 	BrowseScrollFrame:Show()
 	AucAdvanced.API.ListUpdate()
