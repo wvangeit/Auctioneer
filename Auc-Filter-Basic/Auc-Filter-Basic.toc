@@ -12,5 +12,5 @@
 ## URL: http://auctioneeraddon.com/
 ##
 
-BasicFilter.lua
 BasicFilter.xml
+BasicFilter.lua
