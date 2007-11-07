@@ -301,3 +301,72 @@ function lib.IsBlocked()
 	return private.isBlocked == true
 end
 
+--Market matcher APIs
+function lib.GetBestMatch(itemLink, algorithm, faction, realm)
+	-- TODO: Make a configurable algorithm.
+	-- This algorithm is currently less than adequate.
+
+	local matchers = lib.GetMatchers(itemLink)
+	local total, count = 0, 0
+
+	faction = faction or AucAdvanced.GetFaction()
+	realm = realm or GetRealmName()
+
+	local _, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+
+	for index, matcher in ipairs(matchers) do
+		local value = lib.GetMatcherValue(matcher, itemLink, priceArray, faction, realm)
+
+		total = total + value
+		count = count + 1
+	end
+
+	if (total > 0) and (count > 0) then
+		return total/count, total, count
+	end
+end
+
+function lib.GetMatchers(itemLink)
+	local engines = acquire()
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engineLib.GetPrice or engineLib.GetPriceArray then
+				if not engineLib.IsValidMatcher
+				or engineLib.IsValidMatcher(itemLink) then
+					table.insert(engines, engine)
+				end
+			end
+		end
+	end
+	return engines
+end
+
+function lib.IsValidMatcher(matcher, itemLink)
+	local engines = acquire()
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engine == matcher and engineLib.GetMatchArray then
+				if engineLib.IsValidMatcher then
+					return engineLib.IsValidMatcher(itemLink)
+				end
+				return engineLib
+			end
+		end
+	end
+	return false
+end
+
+function lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
+	if (type(matcher) == "string") then
+		matcher = lib.IsValidMatcher(matcher, itemLink)
+	end
+
+	--If matcher is not a table at this point, the following code will throw an "attempt to index a <something> value" type error
+	faction = faction or AucAdvanced.GetFaction()
+	realm = realm or GetRealmName()
+
+	local matchArray = matcher.GetMatchArray(hyperlink, algorithm, faction, realm)
+
+	return matchArray.value, matchArray
+end
+
