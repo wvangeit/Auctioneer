@@ -200,7 +200,22 @@ function IgnoreList_UnignoreButton_OnClick( button )
 end
 
 function IgnoreList_Load()
-	IgnoreList = AucAdvancedFilterBasic_IgnoreList
+	local realm = GetRealmName()
+	local faction = UnitFactionGroup("player")
+
+	--If the realm doesn't exist in the SV, create it
+	if not AucAdvancedFilterBasic_IgnoreList[realm] then
+		AucAdvancedFilterBasic_IgnoreList[realm] = {}
+	end
+
+	--If the faction doesn't exist in the SV, create it under the realm
+	if not AucAdvancedFilterBasic_IgnoreList[realm][faction] then
+		AucAdvancedFilterBasic_IgnoreList[realm][faction] = {}
+	end
+
+	--Get the ignore list for the current realm and faction
+	IgnoreList = AucAdvancedFilterBasic_IgnoreList[realm][faction]
+
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
 	end
@@ -211,7 +226,7 @@ function IgnoreList_OnEvent()
 	if event == "PLAYER_LOGOUT" then
 		for key in pairs(IgnoreList) do
 			if type(key) == "number" then
-				AucAdvancedFilterBasic_IgnoreList[key] = IgnoreList[key]
+				AucAdvancedFilterBasic_IgnoreList[realm][faction][key] = IgnoreList[key]
 			end
 		end
 	end
