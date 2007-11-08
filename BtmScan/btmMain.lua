@@ -265,6 +265,7 @@ BtmScan.OnUpdate = function(...)
 					page = 0
 				end	
 			AuctionFrameBrowse.page = page
+			if SortAuctionClearSort then SortAuctionClearSort("list") end--the If-Then can be removed once 2.3 is live
 			QueryAuctionItems("", "", "", nil, nil, nil, page, nil, nil)
 		else
 			-- If Auctioneer is currently scanning, then we just need to piggyback its calls.
@@ -611,21 +612,16 @@ end
 --Return whether the item is disenchantable give the item's level and the user's enchanting level
 BtmScan.isDEAble = function(iLevel, iQual, eLevel)
 	if not eLevel then
+		if (data) then eLevel = data.enchLevel end
 		if not eLevel then
 			if Enchantrix and Enchantrix.Util and Enchantrix.Util.GetUserEnchantingSkill then
 				eLevel = Enchantrix.Util.GetUserEnchantingSkill()
 				if data then
 					data.enchLevel = eLevel
 				end
-			else eLevel = 0
 			end
 		end
-		if eLevel == 0 then
-			if (data) then eLevel = data.enchLevel end
-		end
-		if eLevel == 0 then 
-			eLevel = 375 
-		end
+		if not eLevel then eLevel = 300 end
 	end
 
 	local required = 1
@@ -1146,7 +1142,8 @@ BtmScan.GetZoneConfig = function (whence)
 	else
 		return
 	end
-	
+	if (not data.enchLevel) then data.enchLevel = 300 end --Shows all disenchant deals regardless of user's enchanting level
+
 	if (not data.tooltipOn) then
 		data.tooltipOn = true	 --Sets the tooltip as on by default
 	end
