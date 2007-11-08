@@ -50,7 +50,7 @@ function private.CreateFrames()
 
 	frame = CreateFrame("Frame", nil, AuctionFrame)
 	private.frame = frame
-
+	local DiffFromModel = 0
 	frame.list = {}
 	frame.buffer = {}
 	frame.cache = {}
@@ -278,7 +278,6 @@ function private.CreateFrames()
 		else
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
 		end
-
 		frame.salebox.warn:SetText("")
 		if curModel == "default" then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
@@ -291,13 +290,22 @@ function private.CreateFrames()
 		end
 
 		local newBuy, newBid
+		local match = frame.salebox.matcher:GetChecked()
 		if curModel == "fixed" then
 			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
 		elseif curModel == "market" then
-			newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
+			if match then
+				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
+			else
+				newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
+			end
 		else
-			newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
+			if match then
+				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
+			else
+				newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
+			end
 		end
 
 		if curModel ~= "fixed" then
@@ -371,6 +379,8 @@ function private.CreateFrames()
 		frame.UpdateControls()
 		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -1
 		frame.salebox.number:SetAdjustedValue(curNumber)
+		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match") or false
+		frame.salebox.matcher:SetChecked(curMatch)
 
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		frame.salebox.model.value = curModel
@@ -400,6 +410,7 @@ function private.CreateFrames()
 		frame.salebox.stack:Show()
 		frame.salebox.number:Show()
 		frame.salebox.model:Show()
+		frame.salebox.matcher:Show()
 		frame.salebox.bid:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
@@ -527,6 +538,10 @@ function private.CreateFrames()
 		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
 		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 
+		if frame.salebox.matcher:GetChecked() then
+			frame.manifest.lines:Add(("Difference from Model: "..DiffFromModel.."%"))
+		end
+		
 		if (totalBid < 1) then
 			frame.manifest.lines:Add(("------------------------------"))
 			frame.manifest.lines:Add(("Note: No auctionable items"))
@@ -564,9 +579,11 @@ function private.CreateFrames()
 		local curNumber = frame.salebox.number:GetAdjustedValue()
 		local curDurationIdx = frame.salebox.duration:GetValue()
 		local curDuration = private.durations[curDurationIdx][1]
+		local curMatch = frame.salebox.matcher:GetChecked()
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", curStack)
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", curNumber)
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".duration", curDuration)
+		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".match", curMatch)
 
 		local curModel
 		if (obj and obj.element == "model") then
@@ -1093,6 +1110,18 @@ function private.CreateFrames()
 	frame.salebox.model.label = frame.salebox.model:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.model.label:SetPoint("BOTTOMLEFT", frame.salebox.model, "TOPLEFT", 0,0)
 	frame.salebox.model.label:SetText("Pricing model to use:")
+	
+	frame.salebox.matcher = CreateFrame("CheckButton", "AppraiserSaleboxMatch", frame.salebox, "UICheckButtonTemplate")
+	frame.salebox.matcher:SetPoint("TOPLEFT", frame.salebox.model, "BOTTOMLEFT", 22, 7)
+	frame.salebox.matcher:SetHeight(20)
+	frame.salebox.matcher:SetWidth(20)
+	frame.salebox.matcher:SetChecked(false)
+	frame.salebox.matcher:SetScript("OnUpdate", frame.ChangeControls)
+	frame.salebox.matcher:Hide()
+	
+	frame.salebox.matcher.label = frame.salebox.matcher:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 6)
+	frame.salebox.matcher.label:SetText("Match Competition")
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
