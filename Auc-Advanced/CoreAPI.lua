@@ -307,22 +307,27 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	-- This algorithm is currently less than adequate.
 
 	local matchers = lib.GetMatchers(itemLink)
-	local total, count = 0, 0
+	local total, count, diff = 0, 0, 0
 
 	faction = faction or AucAdvanced.GetFaction()
 	realm = realm or GetRealmName()
-
-	local _, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
-
+	local priceArray = {}
+	
+	if algorithm == "market" then
+		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, faction, realm)
+	else
+		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+	end
+		
 	for index, matcher in ipairs(matchers) do
-		local value = lib.GetMatcherValue(matcher, itemLink, priceArray, faction, realm)
-
+		local value, priceArray = lib.GetMatcherValue(matcher, itemLink, priceArray, faction, realm)
 		total = total + value
 		count = count + 1
+		diff = diff + priceArray.diff
 	end
 
 	if (total > 0) and (count > 0) then
-		return total/count, total, count
+		return total/count, total, count, diff/count
 	end
 end
 
