@@ -82,20 +82,28 @@ function lib.GetMarketValue(itemLink, serverKey)
 	-- This algorithm is currently less than adequate.
 
 	local total, count, seen = 0, 0, 0
+	local weight, totalweight = 0, 0
 	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
 		if not engineLib.CanSupplyMarket
 		or engineLib.CanSupplyMarket(itemLink, serverKey) then
+			weight = 0.25
 			if (engineLib.GetPriceArray) then
 				local array = engineLib.GetPriceArray(itemLink, serverKey)
 				if (array and array.price and array.price > 0) then
-					total = total + array.price
+					if array.confidence then
+						weight = array.confidence
+					end
+					if (weight > 1) then weight = 1 end
+					total = total + array.price * weight
+					totalweight = totalweight + weight
 					seen = seen + (array.seen or 1)
 					count = count + 1
 				end
 			elseif (engineLib.GetPrice) then
 				local price = engineLib.GetPrice(itemLink, serverKey)
 				if (price and price > 0) then
-					total = total + price
+					total = total + price * weight
+					totalweight = totalweight + weight
 					count = count + 1
 					seen = seen + 1
 				end
@@ -103,7 +111,7 @@ function lib.GetMarketValue(itemLink, serverKey)
 		end
 	end
 	if (total > 0) and (count > 0) then
-		return total/count, seen, count
+		return total/totalweight, seen, count
 	end
 end
 
