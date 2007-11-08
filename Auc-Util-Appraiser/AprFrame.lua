@@ -291,6 +291,9 @@ function private.CreateFrames()
 
 		local newBuy, newBid
 		local match = frame.salebox.matcher:GetChecked()
+		if (frame.salebox.matcher:IsEnabled() == 0) then
+			match = false
+		end
 		if curModel == "fixed" then
 			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
@@ -538,7 +541,7 @@ function private.CreateFrames()
 		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
 		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 
-		if frame.salebox.matcher:GetChecked() then
+		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1)) then
 			frame.manifest.lines:Add(("Difference from Model: "..DiffFromModel.."%"))
 		end
 		
@@ -1117,11 +1120,18 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
 	frame.salebox.matcher:SetScript("OnUpdate", frame.ChangeControls)
+	local Matchers = AucAdvanced.API.GetMatchers()
+	if #Matchers == 0 then
+		frame.salebox.matcher:Disable()
+	end
 	frame.salebox.matcher:Hide()
 	
 	frame.salebox.matcher.label = frame.salebox.matcher:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.matcher.label:SetPoint("BOTTOMLEFT", frame.salebox.matcher, "BOTTOMRIGHT", 0, 6)
 	frame.salebox.matcher.label:SetText("Match Competition")
+	if (frame.salebox.matcher:IsEnabled() == 0) then
+		frame.salebox.matcher.label:SetTextColor(.5, .5, .5)
+	end
 
 	frame.salebox.bid = CreateFrame("Frame", "AppraiserSaleboxBid", frame.salebox, "MoneyInputFrameTemplate")
 	frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
