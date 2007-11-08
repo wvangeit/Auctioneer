@@ -30,6 +30,7 @@ EvalResale.lua
 EvalVendor.lua
 EvalDisenchant.lua
 EvalDisencraft.lua
+EvalProspect.lua
 EvalSnatch.lua
 FilterItemType.lua
 FilterItemPrice.lua
