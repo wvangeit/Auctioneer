@@ -391,6 +391,7 @@ function private.CreateFrames()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
 			frame.manifest:Hide()
+			frame.toggleManifest:Hide()
 			frame.refresh:Disable()
 			frame.go:Disable()
 			return
@@ -402,10 +403,15 @@ function private.CreateFrames()
 		frame.salebox.bid:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
-		frame.refresh:Enable()
-		frame.manifest:Show()
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
+		if frame.manifest:IsShown() then
+			frame.toggleManifest:SetText("Close Sidebar")
+		else
+			frame.toggleManifest:SetText("Open Sidebar")
+		end
+		frame.toggleManifest:Show()
+		frame.refresh:Enable()
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
 		local curDurationMins = private.durations[curDurationIdx][1]
@@ -1166,7 +1172,24 @@ function private.CreateFrames()
 	frame.manifest.close:SetPoint("TOPRIGHT", frame.manifest, "TOPRIGHT", 0,0)
 	frame.manifest.close:SetWidth(26)
 	frame.manifest.close:SetHeight(26)
-	frame.manifest.close:SetScript("OnClick", function() frame.manifest:Hide() end)
+	frame.manifest.close:SetScript("OnClick", function()
+		frame.manifest:Hide()
+		frame.toggleManifest:SetText("Open Sidebar")
+	end)
+
+	frame.toggleManifest = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.toggleManifest:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -15, -45)
+	frame.toggleManifest:SetText("Open Sidebar")
+	frame.toggleManifest:SetScript("OnClick", function()
+		if frame.manifest:IsShown() then
+			frame.toggleManifest:SetText("Open Sidebar")
+			frame.manifest:Hide()
+		else
+			frame.toggleManifest:SetText("Close Sidebar")
+			frame.manifest:Show()
+		end
+	end)
+	frame.toggleManifest:Hide()
 
 	local function lineHide(obj)
 		local id = obj.id
