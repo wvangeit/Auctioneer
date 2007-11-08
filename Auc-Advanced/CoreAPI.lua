@@ -365,7 +365,7 @@ function lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
 	faction = faction or AucAdvanced.GetFaction()
 	realm = realm or GetRealmName()
 
-	local matchArray = matcher.GetMatchArray(hyperlink, algorithm, faction, realm)
+	local matchArray = matcher.GetMatchArray(itemLink, algorithm, faction, realm)
 
 	return matchArray.value, matchArray
 end
