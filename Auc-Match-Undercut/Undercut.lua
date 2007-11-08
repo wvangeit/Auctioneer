@@ -95,6 +95,7 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 	local competing = 0
 	local matchprice = 0
 	local minprice = 0
+	if not marketprice then marketprice = 0 end
 	if marketprice > 0 then
 		matchprice = floor(marketprice*(1+(overmarket/100)))
 		minprice = ceil(marketprice*(1+(undermarket/100)))
@@ -127,7 +128,7 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 			end
 		end
 	end
-	if marketprice then
+	if (marketprice > 0) then
 		marketdiff = (((matchprice - marketprice)/marketprice)*100)
 		if (marketdiff-floor(marketdiff))<0.5 then
 			marketdiff = floor(marketdiff)
