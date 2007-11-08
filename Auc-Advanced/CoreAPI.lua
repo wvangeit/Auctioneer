@@ -330,7 +330,7 @@ function lib.GetMatchers(itemLink)
 	local engines = acquire()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
-			if engineLib.GetPrice or engineLib.GetPriceArray then
+			if engineLib.GetMatchArray then
 				if not engineLib.IsValidMatcher
 				or engineLib.IsValidMatcher(itemLink) then
 					table.insert(engines, engine)
