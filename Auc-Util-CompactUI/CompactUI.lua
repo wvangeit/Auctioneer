@@ -59,6 +59,8 @@ function lib.GetName()
 	return libName
 end
 
+local searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll
+
 function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
 		private.SetupConfigGui(...)
@@ -76,6 +78,10 @@ end
 
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	if SortAuctionApplySort then
+		SortAuctionApplySort=private.QueryCurrent
+	end
+	hooksecurefunc("QueryAuctionItems", private.CopyQuery)
 	AucAdvanced.Settings.SetDefault("util.compactui.activated", true)
 	AucAdvanced.Settings.SetDefault("util.compactui.collapse", false)
 	AucAdvanced.Settings.SetDefault("util.compactui.bidrequired", true)
@@ -85,6 +91,14 @@ end
 --[[ Local functions ]]--
 private.candy = {}
 private.buttons = {}
+function private.CopyQuery(...)
+	searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll = ...
+end
+
+function private.QueryCurrent()
+	QueryAuctionItems(searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll)
+end
+
 function private.HookAH()
 	lib.inUse = true
 
@@ -234,6 +248,44 @@ function private.HookAH()
 				header.dir = 0
 				header.Back:SetVertexColor(1,1,1, 0.8)
 				header.Text:SetText(header.Text.default)
+			end
+		end
+		if SortAuctionSetSort then
+			local sort = private.headers.sort
+			local dir = private.headers.dir
+			local col = ""
+			if sort then
+				if sort == 1 then            col = "quantity"       -- Count
+				elseif sort == 2 then                      --
+					local pos = private.headers.pos    --
+					if pos == 1 then     col = "name"       -- Name
+					elseif pos == 2 then col = "quality"       -- Quality
+					end                                --
+				elseif sort == 3 then        col = "level"       -- MinLevel
+				--elseif sort == 4 then        col = 9       -- ItemLevel
+				elseif sort == 5 then        col = "duration"      -- TimeLeft
+				elseif sort == 6 then        col = "seller"      -- Owner
+				elseif sort == 7 then                      --
+					local pos = private.headers.pos    --
+					if pos == 1 then     col = "buyoutthenbid"     -- Buy
+					elseif pos == 2 then col = "bid"      -- Bid
+					--elseif pos == 3 then col = 18      -- BuyEach
+					--elseif pos == 4 then col = 17      -- BidEach
+					end                                --
+				--elseif sort == 8 then        col = 21      -- PriceLevel
+				end
+			end
+			if dir > 0 then
+				dir = false
+			else
+				dir = true
+			end
+			if (col ~= "") then
+				SortAuctionSetSort("list", col, dir)
+				pagesize=GetNumAuctionItems("list")
+				if pagesize <= 50 then
+					SortAuctionApplySort("list")
+				end
 			end
 		end
 		private.MyAuctionFrameUpdate()
