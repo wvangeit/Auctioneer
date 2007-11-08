@@ -400,6 +400,7 @@ function private.CreateFrames()
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
 			frame.salebox.model:Hide()
+			frame.salebox.matcher:Hide()
 			frame.salebox.bid:Hide()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
@@ -541,7 +542,7 @@ function private.CreateFrames()
 		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
 		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
 
-		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1)) then
+		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 			frame.manifest.lines:Add(("Difference from Model: "..DiffFromModel.."%"))
 		end
 		
@@ -1119,7 +1120,7 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetHeight(20)
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
-	frame.salebox.matcher:SetScript("OnUpdate", frame.ChangeControls)
+	frame.salebox.matcher:SetScript("OnClick", frame.ChangeControls)
 	local Matchers = AucAdvanced.API.GetMatchers()
 	if #Matchers == 0 then
 		frame.salebox.matcher:Disable()
