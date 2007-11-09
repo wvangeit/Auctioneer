@@ -77,9 +77,9 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 
 	if not faction then faction = AucAdvanced.GetFaction() end
 	
-	local overmarket = AucAdvanced.Settings.GetSetting("util.MarketMatch.overmarket")
-	local undermarket = AucAdvanced.Settings.GetSetting("util.MarketMatch.undermarket")
-	local undercut = AucAdvanced.Settings.GetSetting("util.MarketMatch.undercut")
+	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
+	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
+	local undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
 	local playerName = UnitName("player")
 	local marketprice = 0
 	if algorithm.price then
@@ -148,28 +148,17 @@ end
 local array = {}
 
 function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
-	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
-	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
-	-- display in the tooltip.
---[[	local matchprice, marketdiff, competing = lib.GetPrice(hyperlink, faction, realm)
-	if matchprice then
-		EnhTooltip.AddLine(libName.."Price:", matchprice*quantity)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		
-		EnhTooltip.AddLine("  market difference: |cffddeeff"..marketdiff.."%")
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-	end
-	--]]
+
 end
 
 function lib.OnLoad()
 	--This function is called when your variables have been loaded.
 	--You should also set your Configator defaults here
 
-	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("util.MarketMatch.undermarket", -10)
-	AucAdvanced.Settings.SetDefault("util.MarketMatch.overmarket", 10)
-	AucAdvanced.Settings.SetDefault("util.MarketMatch.undercut", 5)
+	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	AucAdvanced.Settings.SetDefault("match.undermarket.undermarket", -10)
+	AucAdvanced.Settings.SetDefault("match.undermarket.overmarket", 10)
+	AucAdvanced.Settings.SetDefault("match.undermarket.undercut", 5)
 end
 
 --[[ Local functions ]]--
@@ -181,9 +170,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	
 	gui:AddControl(id, "Subhead",    0,    "Competition Matching")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.MarketMatch.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.MarketMatch.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
-	gui:AddControl(id, "Slider",     0, 1, "util.MarketMatch.undercut", 0, 20, 1, "Undercut: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
+	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 1, "Undercut: %d%%")
 	
 	
 end
