@@ -120,6 +120,9 @@ end
 
 function private.GetCfromZ(Z)
 	--C = 0.05*i
+	if not Z then
+		return .05
+	end
 	local i = 1
 	while Z > ZValues[i] do
 		i = i + 1
