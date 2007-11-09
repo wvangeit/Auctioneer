@@ -440,9 +440,41 @@ function private.CreateFrames()
 	
 	end
 	
-
+private.CreateMailFrames()
 
 end
+
+
+function private.CreateMailFrames()
+
+	local frame = CreateFrame("Frame", "BeanCounterMail", MailFrame)
+	frame:Hide()
+	private.MailGUI = frame
+	local count, total = 0,0
+	
+	frame:SetPoint("TOPLEFT", MailFrame, "TOPLEFT", 19,-71)
+	frame:SetPoint("BOTTOMRIGHT", MailFrame, "BOTTOMRIGHT", -39,115)
+	--Add Title to the Top
+	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	title:SetPoint("CENTER", frame, "CENTER", 0,60)
+	title:SetText("BeanCounter is recording your mail")
+	
+	local body = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	body:SetPoint("CENTER", frame, "CENTER", 0, 30)
+	body:SetText("Please do not close the mail frame or")
+	local body1 = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	body1:SetPoint("CENTER", frame, "CENTER", 0,0)
+	body1:SetText("Auction Items will not be recorded")
+	
+	
+	local countdown = frame:CreateFontString("BeanCounterMailCount", "OVERLAY", "GameFontNormalLarge")
+	private.CountGUI = countdown
+	countdown:SetPoint("CENTER", frame, "CENTER", 0, -60)
+	countdown:SetText("Recording: "..count.." of "..total.." items")
+	
+end
+
+
 
 --Taken from AucCore to make beancounter Standalone, Need to remove Redudundant stuff
 function private.AddTab(tabButton, tabFrame)

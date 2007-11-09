@@ -173,9 +173,8 @@ private.serverData = BeanCounterDB[private.realmName]
 	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
 	}]]
 
-	private.wealth = GetMoney()
-	private.playerData["wealth"] = private.wealth
-
+	
+	private.wealth = private.playerData["wealth"]
 	private.UpgradeDatabaseVersion() 
  
 end
