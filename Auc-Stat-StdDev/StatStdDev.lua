@@ -43,7 +43,6 @@ local acquire = AucAdvanced.Acquire
 local recycle = AucAdvanced.Recycle
 
 local data
-local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 1000}
 
 --[[
 The following functions are part of the module's exposed methods:
@@ -120,6 +119,7 @@ end
 
 function private.GetCfromZ(Z)
 	--C = 0.05*i
+	local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 1000}
 	if not Z then
 		return .05
 	end
