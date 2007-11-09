@@ -187,11 +187,15 @@ function lib.GetPrice(hyperlink, faction)
 		end
 	end
 
+	local confidence = .01
 	recycle(stats)
 	local average
-	if (number > 0) then average = total / number end
-	local confidence = (.15*average)*(count^0.5)/(stdev)
-	confidence = private.GetCfromZ(confidence)
+	if (number > 0) then 
+		average = total / number 
+		confidence = (.15*average)*(number^0.5)/(stdev)
+		confidence = private.GetCfromZ(confidence)
+	end
+	
 	return average, mean, false, stdev, variance, count, confidence
 end
 
