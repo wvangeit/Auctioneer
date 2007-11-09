@@ -128,7 +128,6 @@ function private.GetCfromZ(Z)
 		return .99
 	end
 	local i = 1
-	AucAdvanced.Print("Z:"..Z)
 	while Z > ZValues[i] do
 		i = i + 1
 	end
