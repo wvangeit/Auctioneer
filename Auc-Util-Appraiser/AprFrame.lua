@@ -408,6 +408,7 @@ function private.CreateFrames()
 			frame.salebox.warn:SetText("")
 			frame.manifest:Hide()
 			frame.toggleManifest:Hide()
+			frame.age:SetText("")
 			frame.refresh:Disable()
 			frame.go:Disable()
 			return
@@ -432,6 +433,24 @@ function private.CreateFrames()
 		end
 		frame.toggleManifest:Show()
 		frame.refresh:Enable()
+
+		local scandata = AucAdvanced.Scan.GetScanData()
+		if (time() - scandata.time) < 60 then
+			frame.age:SetText("Data is < 1 minute old")
+		elseif ((time() - scandata.time) / 60) < 60 then
+			local minutes = math.floor((time() - scandata.time) / 60)
+			frame.age:SetText("Data is "..minutes.." minutes old")
+		elseif ((time() - scandata.time) / 3600) <= 48 then
+			local hours = math.floor((time() - scandata.time) / 3600)
+			--(time() - scandata.time)/3600 == hours, minutes, and seconds
+			--subtracting the math.floor of that gives you the minutes, and seconds in decimal format
+			--multiplying the result of all of that by 60 gives you the number of minutes pre-decimal, and the seconds, post decimal
+			--we may need the number of seconds at some point in the future, so we don't math.floor it in the variable, but rather in the SetText()
+			local minutes = (((time() - scandata.time)/3600)-math.floor((time() - scandata.time)/3600))*60
+			frame.age:SetText("Data is "..hours.." hours, "..math.floor(minutes).." minutes old")
+		else
+			frame.age:SetText("Data is > 48 hours old")
+		end
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
 		local curDurationMins = private.durations[curDurationIdx][1]
@@ -1193,6 +1212,13 @@ function private.CreateFrames()
 	frame.refresh:SetWidth(80)
 	frame.refresh:SetScript("OnClick", frame.RefreshView)
 	frame.refresh:Disable()
+
+	frame.age = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.age:SetPoint("RIGHT", frame.refresh, "LEFT", -5,0)
+	frame.age:SetTextColor(1, 0.8, 0)
+	frame.age:SetText("")
+	frame.age:SetJustifyH("RIGHT")
+	--frame.age:SetJustifyV("BOTTOM")
 
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
