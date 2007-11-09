@@ -194,6 +194,7 @@ function private.CreateFrames()
 			frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
 			frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
 			frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
+			frame.toggleManifest:SetText("")
 			frame.imageview.sheet:SetData(private.empty)
 			frame.UpdateControls()
 		end
@@ -260,7 +261,7 @@ function private.CreateFrames()
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice)
 		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
-		local _, link, _,_, _, _, _, _, _, _ = GetItemInfo(itemID)
+		local _, link, _, _, _, _, _, _, _, _ = GetItemInfo(itemID)
 		local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 			if r and g and b then
 				return acquire(r,g,b)
@@ -405,6 +406,7 @@ function private.CreateFrames()
 			frame.salebox.buy:Hide()
 			frame.salebox.duration:Hide()
 			frame.manifest:Hide()
+			frame.toggleManifest:SetText("")
 			frame.toggleManifest:Hide()
 			frame.refresh:Disable()
 			frame.go:Disable()
@@ -418,6 +420,9 @@ function private.CreateFrames()
 		frame.salebox.bid:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
+		if not frame.toggleManifest:GetText() then
+			frame.manifest:Show()
+		end
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
 		if frame.manifest:IsShown() then
@@ -1219,7 +1224,6 @@ function private.CreateFrames()
 
 	frame.toggleManifest = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.toggleManifest:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -15, -45)
-	frame.toggleManifest:SetText("Open Sidebar")
 	frame.toggleManifest:SetScript("OnClick", function()
 		if frame.manifest:IsShown() then
 			frame.toggleManifest:SetText("Open Sidebar")
