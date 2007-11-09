@@ -43,7 +43,7 @@ local acquire = AucAdvanced.Acquire
 local recycle = AucAdvanced.Recycle
 
 local data
-
+local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 1000}
 
 --[[
 The following functions are part of the module's exposed methods:
@@ -118,6 +118,20 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	recycle(stats)
 end
 
+function private.GetCfromZ(Z)
+	--C = 0.05*i
+	local i = 1
+	while Z > ZValues[i] do
+		i = i + 1
+	end
+	if i == 1 then 
+		return .05
+	else
+		i = i - 1 + ((Z - ZValues[i-1]) / (ZValues[i] - ZValues[i-1]))
+		return i*0.05
+	end
+end
+
 function lib.GetPrice(hyperlink, faction)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -176,7 +190,9 @@ function lib.GetPrice(hyperlink, faction)
 	recycle(stats)
 	local average
 	if (number > 0) then average = total / number end
-	return average, mean, false, stdev, variance, count
+	local confidence = (.15*average)*(count^0.5)/(stdev)
+	confidence = private.GetCfromZ(confidence)
+	return average, mean, false, stdev, variance, count, confidence
 end
 
 function lib.GetPriceColumns()
@@ -189,11 +205,12 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	while (#array > 0) do table.remove(array) end
 
 	-- Get our statistics
-	local average, mean, _, stdev, variance, count = lib.GetPrice(hyperlink, faction, realm)
+	local average, mean, _, stdev, variance, count, confidence = lib.GetPrice(hyperlink, faction, realm)
 
-	-- These 2 are the ones that most algorithms will look for
+	-- These 3 are the ones that most algorithms will look for
 	array.price = average or mean
 	array.seen = count
+	array.confidence = confidence
 	-- This is additional data
 	array.normalized = average
 	array.mean = mean
@@ -210,7 +227,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 	if not quantity or quantity < 1 then quantity = 1 end
-	local average, mean, _, stdev, var, count = lib.GetPrice(hyperlink)
+	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
 
 	if (mean and mean > 0) then
 		EnhTooltip.AddLine(libName.." prices ("..count.." points):")
@@ -226,6 +243,8 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 				EnhTooltip.LineColor(0.3, 0.9, 0.8)
 			end
 			EnhTooltip.AddLine("  Std Deviation", stdev)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+			EnhTooltip.AddLine("  Confidence: "..(floor(confidence*1000))/1000)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	end
