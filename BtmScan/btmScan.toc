@@ -27,6 +27,7 @@ btmMain.lua
 #
 # Evaluation modules:
 EvalResale.lua
+EvalAppraiser.lua
 EvalVendor.lua
 EvalDisenchant.lua
 EvalDisencraft.lua

@@ -82,7 +82,12 @@ function lib:valuate(item, tooltip)
 	local link = item["link"]
 	local sig = item["id"]
 	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
-	item:info("Model:"..curModel)
+	local curModelText = curModel
+
+	-- This is the code to get whether the "Price matching" is turned on or not.
+	-- Currently choosing not to use this information as it only applies to current market and BTMscan may not have a current full scan to work with, so it needs to use the historical values	
+	-- 		local Match = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match") or false
+
 
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
@@ -91,7 +96,9 @@ function lib:valuate(item, tooltip)
 		AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
 		end
+		curModelText = curModelText.."("..curModel..")"
 	end
+	item:info("Pricing Model:"..curModelText)
 	
 	local newBuy, newBid
 	if curModel == "fixed" then
@@ -113,13 +120,12 @@ function lib:valuate(item, tooltip)
 				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
 				if not rate then rate = AucAdvanced.depositRate or 0.05 end
 			end
-			if not deposit then deposit = 0 end
+			if (not deposit) then deposit = 0 end
 
 			-- Scale up for duration > 2 hours
 			-- Assume 24 hours since we can't get this info
 			if deposit > 0 then
-				local duration = 60*24
-				deposit = deposit * duration/120
+				deposit = deposit * 12
 			end
 
 			markdown = newBuy * markdown
@@ -135,18 +141,11 @@ function lib:valuate(item, tooltip)
 	newBid = math.floor((newBid or 0) + 0.5)
 	newBuy = math.floor((newBuy or 0) + 0.5)
 
-	item:info("Bid:"..newBid)
-	item:info("Buy:"..newBuy)
-	if (curModel ~= "fixed" and newBuy > 0 and newBid > newBuy) then
-		newBuy = newBid
-	end
+	item:info("Estimated Bid: "..item.count.." x",newBid)
+	item:info("Estimated Buy: "..item.count.." x",newBuy)
 	
 	-- Ok, market price is the Bid price, not the buyout. This makes it very conservative, but allows you to use your other settings better and is safer for beginners.
 	local market = newBid
-
-	if (AucAdvanced and not market) then
-		market, seen = AucAdvanced.API.GetMarketValue(item.link)
-	end
 
 	-- If we don't know what it's worth, then there's not much we can do
 	if not market then return end
@@ -156,7 +155,7 @@ function lib:valuate(item, tooltip)
 	-- Check to see if it meets the min seen count (if applicable)
 	if (get(lcName..".seen.check")) then
 		if (not seen or seen < get(lcName..".seen.mincount")) then
-			item:info("Abort: Seen < min")
+			item:info("Abort: Seen < "..get(lcName..".seen.mincount"))
 			return
 		end
 	end
@@ -183,7 +182,12 @@ function lib:valuate(item, tooltip)
 			adjusted = adjusted - amount
 			item:info(" - Brokerage", amount)
 		end
-		item:info(" = Adjusted amount", adjusted)
+		if (adjusted<0) then
+			item:info(" = Adjusted value below zero")
+			return
+		else
+			item:info(" = Adjusted value: ", adjusted)
+		end
 	end
 
 	-- Valuate this item
