@@ -678,6 +678,43 @@ function private.CreateFrames()
 		frame.salebox.config = false
 	end
 
+	function frame.GetItembyLink(link)
+		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+		local sig
+		if enchant ~= 0 then
+			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+		elseif factor ~= 0 then
+			sig = ("%d:%d:%d"):format(id, suffix, factor)
+		elseif suffix ~= 0 then
+			sig = ("%d:%d"):format(id, suffix)
+		else
+			sig = tostring(id)
+		end
+		for i = 1, #(frame.list) do
+			if frame.list[i] then
+				if frame.list[i][1] == sig then
+					local obj = {}
+					obj.id = i
+					local pos = math.floor(frame.scroller:GetValue())
+					obj.id = obj.id - pos
+					frame.SelectItem(obj)
+					frame.scroller:SetValue(i-(NUM_ITEMS*(i/#frame.list)))
+					break
+				end
+			end
+		end
+	end
+	
+	function frame.IconClicked()
+		objtype, _, itemlink = GetCursorInfo()
+		ClearCursor()
+		if objtype == "item" then
+			frame.GetItembyLink(itemlink)
+		else
+			frame.ToggleDisabled()
+		end
+	end
+	
 	function frame.ToggleDisabled()
 		if not frame.salebox.sig then return end
 		local curDisable = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".ignore") or false
@@ -1021,7 +1058,8 @@ function private.CreateFrames()
 	frame.salebox.icon:SetWidth(32)
 	frame.salebox.icon:SetHeight(32)
 	frame.salebox.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
-	frame.salebox.icon:SetScript("OnClick", frame.ToggleDisabled)
+	frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
+	frame.salebox.icon:SetScript("OnReceiveDrag", frame.IconClicked)
 
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
