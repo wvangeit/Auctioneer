@@ -91,7 +91,13 @@ function lib:valuate(item, tooltip)
 			end
 		else
 			-- gem or non-trashy powder
-			local marketPrice = Enchantrix.Util.GetReagentPrice(result) * yield
+			local market, _, _, market5 = Enchantrix.Util.GetReagentPrice(result)
+			-- if Auc4 price not available, use Auc5 market value
+			-- also, use a zero value if no price is available (may happen for reagents you haven't seen)
+			if (not market) then
+				market = market5 or 0
+			end
+			local marketPrice = market * yield
 			marketTotal = marketTotal + marketPrice
 
 			-- calculate costs
