@@ -434,22 +434,37 @@ function private.CreateFrames()
 		frame.toggleManifest:Show()
 		frame.refresh:Enable()
 
-		local scandata = AucAdvanced.Scan.GetScanData()
-		if (time() - scandata.time) < 60 then
-			frame.age:SetText("Data is < 1 minute old")
-		elseif ((time() - scandata.time) / 60) < 60 then
-			local minutes = math.floor((time() - scandata.time) / 60)
-			frame.age:SetText("Data is "..minutes.." minutes old")
-		elseif ((time() - scandata.time) / 3600) <= 48 then
-			local hours = math.floor((time() - scandata.time) / 3600)
-			--(time() - scandata.time)/3600 == hours, minutes, and seconds
-			--subtracting the math.floor of that gives you the minutes, and seconds in decimal format
-			--multiplying the result of all of that by 60 gives you the number of minutes pre-decimal, and the seconds, post decimal
-			--we may need the number of seconds at some point in the future, so we don't math.floor it in the variable, but rather in the SetText()
-			local minutes = (((time() - scandata.time)/3600)-math.floor((time() - scandata.time)/3600))*60
-			frame.age:SetText("Data is "..hours.." hours, "..math.floor(minutes).." minutes old")
+		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
+		itemId = tonumber(itemId)
+		suffix = tonumber(suffix) or 0
+		factor = tonumber(factor) or 0
+		
+		local results = AucAdvanced.API.QueryImage({
+			itemId = itemId,
+			suffix = suffix,
+			factor = factor,
+		})
+		
+		if results[1] then 
+			local seen = results[1][Const.TIME]
+			if (time() - seen) < 60 then
+				frame.age:SetText("Data is < 1 minute old")
+			elseif ((time() - seen) / 60) < 60 then
+				local minutes = math.floor((time() - seen) / 60)
+				frame.age:SetText("Data is "..minutes.." minutes old")
+			elseif ((time() - seen) / 3600) <= 48 then
+				local hours = math.floor((time() - seen) / 3600)
+				--(time() - scandata.time)/3600 == hours, minutes, and seconds
+				--subtracting the math.floor of that gives you the minutes, and seconds in decimal format
+				--multiplying the result of all of that by 60 gives you the number of minutes pre-decimal, and the seconds, post decimal
+				--we may need the number of seconds at some point in the future, so we don't math.floor it in the variable, but rather in the SetText()
+				local minutes = (((time() - seen)/3600)-math.floor((time() - seen)/3600))*60
+				frame.age:SetText("Data is "..hours.." hours, "..math.floor(minutes).." minutes old")
+			else
+				frame.age:SetText("Data is > 48 hours old")
+			end
 		else
-			frame.age:SetText("Data is > 48 hours old")
+			frame.age:SetText("No data for "..string.sub(frame.salebox.name:GetText(), 12, -4))
 		end
 
 		local curDurationIdx = frame.salebox.duration:GetValue() or 3
