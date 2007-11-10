@@ -38,6 +38,12 @@ local print =  BeanCounter.Print
 local gui
 local settings
 
+local function debugPrint(...)
+    if private.getOption("util.beancounter.debugConfig") then
+        private.debugPrint("BeanCounterConfig",...)
+    end
+end
+
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
 	return userSig
@@ -76,7 +82,15 @@ end
 private.settingDefaults = {
 	["util.beancounter.activated"] = true,
 	["util.beancounter.debug"] = false,
-}
+	["util.beancounter.debugMail"] = true,
+	["util.beancounter.debugCore"] = true,
+	["util.beancounter.debugConfig"] = true,
+	["util.beancounter.debugVendor"] = true,
+	["util.beancounter.debugBid"] = true,
+	["util.beancounter.debugPost"] = true,
+	["util.beancounter.debugUpdate"] = true,
+	["util.beancounter.debugFrames"] = true,
+    }
 
 local function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
@@ -285,21 +299,39 @@ function lib.GetSetting(setting, default)
 	end
 end
 
-
+private.setter = setter
+private.getter = getter
 function lib.MakeGuiConfig()
+
 	
 	if gui then return end
 	
-	local id, last, cont
+	local id
 	local Configator = LibStub:GetLibrary("Configator")
 	gui = Configator:Create(setter, getter)
+		
+	local baseGUI
 	lib.Gui = gui
 
   	gui:AddCat("BeanCounter")
 	
-	--local id = gui:AddTab(libName)
-	--gui:MakeScrollable(id)
-	--gui:AddControl(id, "Header",     0,    libName.." options")
-	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
+	id = gui:AddTab("BeanCounter Config")
+	gui:MakeScrollable(id)
+	gui:AddControl(id, "Header",     0,    "BeanCounter options")
+	
+	
+	id = gui:AddTab("BeanCounter Debug")
+	gui:AddControl(id, "Header",     0,    "BeanCounter options")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
+	gui:AddControl(id, "Subhead",    0,    "Reports From Specific Modules")
+
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugMail", "Mail")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugCore", "Core")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugConfig", "Config")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugVendor", "Vendor")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugBid", "Bid")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugPost", "Post")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugUpdate", "Update")
+	gui:AddControl(id, "Checkbox",   0, 2, "util.beancounter.debugFrames", "Frames")
 
 end

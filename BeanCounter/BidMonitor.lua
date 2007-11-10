@@ -35,8 +35,10 @@ local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
 
-local function debugPrint(...) 
-private.debugPrint("BidMonitor",...)
+local function debugPrint(...)
+    if private.getOption("util.beancounter.debugBid") then
+        private.debugPrint("BidMonitor",...)
+    end
 end
 
 -------------------------------------------------------------------------------

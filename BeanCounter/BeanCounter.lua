@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.02,
+	version = 1.03,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -75,7 +75,9 @@ end
 local print = BeanCounter.Print
 
 local function debugPrint(...) 
-    private.debugPrint("BeanCounterCore",...)
+    if private.getOption("util.beancounter.debugCore") then
+        private.debugPrint("BeanCounterCore",...)
+    end
 end
 
 function lib.OnLoad(addon)
@@ -107,8 +109,8 @@ function lib.OnLoad(addon)
 	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 		
 	private.initializeDB() --create or initialize the saved DB
-	private.CreateFrames() --create our framework used for AH and GUI
 	lib.MakeGuiConfig() --create the configurator GUI frame
+	private.CreateFrames() --create our framework used for AH and GUI
 	private.slidebar() --create slidebar icon
 end
 

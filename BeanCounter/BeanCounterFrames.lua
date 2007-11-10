@@ -36,20 +36,16 @@ local private = lib.Private
 local print =  BeanCounter.Print
 
 local function debugPrint(...) 
-private.debugPrint("BeanCounterFrames",...)
+    if private.getOption("util.beancounter.debugFrames") then
+        private.debugPrint("BeanCounterFrames",...)
+    end
 end
 
 
 local frame
 function private.AuctionUI()
 	if frame then return end
-	
-	lib.Gui:Hide()
 	frame = private.frame
-	
-	private.frame:SetParent(AuctionFrame)
-	frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
-	frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
 	
 	--Create the TAB
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilBeanCounter", AuctionFrame, "AuctionTabTemplate")
@@ -57,18 +53,21 @@ function private.AuctionUI()
 	frame.ScanTab:Show()
 	
 	PanelTemplates_DeselectTab(frame.ScanTab)
+	
 	if AucAdvanced then
-		    AucAdvanced.AddTab(frame.ScanTab, frame)
+		AucAdvanced.AddTab(frame.ScanTab, frame)
 	else
-		    private.AddTab(frame.ScanTab, frame)
+		private.AddTab(frame.ScanTab, frame)
 	end
 	
 	function frame.ScanTab.OnClick(_, _, index)
-		if private.frame:GetParent() == BeanCounter.Gui or private.frame:GetParent() == UIParent then
-			lib.Gui:Hide()
+		if private.frame:GetParent() == BeanCounterBaseFrame then
+			--BeanCounterBaseFrame:Hide()
 			private.frame:SetParent(AuctionFrame)
-			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT", 0,0)
-			frame:SetPoint("BOTTOMRIGHT", "AuctionFrame", "BOTTOMRIGHT", 0,0)
+			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
+			--private.frame:SetWidth(828)
+			--private.frame:SetHeight(450)
+			private.relevelFrame(frame)--make sure our frame stays in proper order		
 		end
 	
 		if not index then index = this:GetID() end
@@ -101,20 +100,33 @@ function private.AuctionUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
 --Change parent to our GUI frame
-function private.GUI()
-	if private.frame:GetParent() == AuctionFrame or private.frame:GetParent() == UIParent then
-		private.frame:SetParent(lib.Gui)
-		private.frame:SetPoint("TOPLEFT", lib.Gui, "TOPLEFT", 0,0)
-		private.frame:SetPoint("BOTTOMRIGHT", lib.Gui, "BOTTOMRIGHT", 0,0)
-	end
-	if not lib.Gui:IsVisible() then
-		if AuctionFrame then AuctionFrame:Hide() end
-		lib.Gui:Show()
-		private.frame:SetFrameStrata("FULLSCREEN")
-		private.frame:Show()
 
-	else
-		lib.Gui:Hide()
+function private.GUI(_,button)
+	if (button == "LeftButton") then
+		if private.frame:GetParent() == AuctionFrame then 
+			--BeanCounterBaseFrame:SetWidth(800)
+			--BeanCounterBaseFrame:SetHeight(450)
+			
+			private.frame:SetParent("BeanCounterBaseFrame")
+			private.frame:SetPoint("TOPLEFT", BeanCounterBaseFrame, "TOPLEFT")
+			--BeanCounterBaseFrame:SetPoint("TOPLEFT", lib.Gui, "TOPLEFT")
+			
+			--private.frame:SetPoint("BOTTOMRIGHT", lib.Gui, "BOTTOMRIGHT", 0,0)
+		end
+		if not BeanCounterBaseFrame:IsVisible() then
+			if AuctionFrame then AuctionFrame:Hide() end
+			BeanCounterBaseFrame:Show()
+			private.frame:SetFrameStrata("FULLSCREEN")
+			private.frame:Show()
+		else
+			BeanCounterBaseFrame:Hide()
+		end
+	else 
+		if not lib.Gui:IsVisible() then
+			lib.Gui:Show()
+		else
+			lib.Gui:Hide()
+		end
 	end
 		
 end
@@ -122,12 +134,62 @@ end
 --Seperated frame items from frame creation, this should allow the same code to be reused for AH UI and Standalone UI
 function private.CreateFrames()
 
-	local frame = CreateFrame("Frame", nil, UIParent)
+	--Create the base frame for external GUI
+	local base = CreateFrame("Frame", "BeanCounterBaseFrame", UIParent)
+	base:SetBackdrop({
+		bgFile = "Interface/Tooltips/ChatBubble-Background",
+		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 32, right = 32, top = 32, bottom = 32 }
+	})
+	base:SetBackdropColor(0,0,0, 1)
+	base:Hide()
+	
+	base:SetPoint("TOPLEFT", UIParent, "TOPLEFT")
+	base:SetWidth(828)
+	base:SetHeight(450)
+	
+	--base:SetToplevel(true)
+	base:SetMovable(true)
+	base:EnableMouse(true)
+	base.Drag = CreateFrame("Button", nil, base)
+	base.Drag:SetPoint("TOPLEFT", base, "TOPLEFT", 10,-5)
+	base.Drag:SetPoint("TOPRIGHT", base, "TOPRIGHT", -10,-5)
+	base.Drag:SetHeight(6)
+	base.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+	base.Drag:SetScript("OnMouseDown", function() base:StartMoving() end)
+	base.Drag:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
+		
+	--Launch BeanCounter GUI Config frame
+	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
+	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
+	base.Config:SetScript("OnClick", function() base:Hide() end)
+	base.Config:SetText("Done")
+	
+	function private.toggleConfig()
+		if base:IsVisible() then
+			base:Hide()
+			lib.Gui:Show()
+			frame.Config:SetText("GUI")
+		else
+			base:Show()
+			lib.Gui:Hide()
+			frame.Config:SetText("Config")
+		end
+	end	
+	
+		
+	
+	--Create the Actual Usable Frame
+	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
 	private.frame = frame
 	frame:Hide()
 	
-	private.frame:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 18,-95)
-	private.frame:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -760,455)
+	private.frame:SetPoint("TOPLEFT", base, "TOPLEFT")
+	private.frame:SetWidth(828)
+	private.frame:SetHeight(450)	
+	
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
@@ -142,11 +204,11 @@ function private.CreateFrames()
 		BeanCounterSelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", "Search Server Data"},}
+	local vals = {{"server", "Search "..private.realmName.." Data"},}
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, "Search "..name.."'s Data"})
 	end
-	
+			
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
@@ -249,7 +311,7 @@ function private.CreateFrames()
 		{ "Deposit", "COIN", 50 },
 		{ "Fee", "COIN", 50 },
 		{ "Wealth", "COIN", 70 },
-		{ "Date", "text", 70 },
+		{ "Date", "text", 110 },
 	})
 	
 	

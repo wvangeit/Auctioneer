@@ -34,8 +34,10 @@ local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
 
-local function debugPrint(...) 
-private.debugPrint("BeanCounterVendor",...)
+local function debugPrint(...)
+    if private.getOption("util.beancounter.debugVendor") then
+        private.debugPrint("BeanCounterVendor",...)
+    end
 end
 
 function private.vendorOnevent(event,...)

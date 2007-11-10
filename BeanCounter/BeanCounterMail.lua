@@ -38,7 +38,9 @@ local print =  BeanCounter.Print
 local debugPrint 
 
 local function debugPrint(...) 
-	private.debugPrint("BeanCounterMail",...)
+    if private.getOption("util.beancounter.debugMail") then
+        private.debugPrint("BeanCounterMail",...)
+    end
 end
 
 function private.mailMonitor(event,arg1)

@@ -37,7 +37,9 @@ local print =  BeanCounter.Print
 
 
 local function debugPrint(...) 
-private.debugPrint("BeanCounterFrames",...)
+    if private.getOption("util.beancounter.debugUpdate") then
+        private.debugPrint("BeanCounterFrames",...)
+    end
 end
 
 
