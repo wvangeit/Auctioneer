@@ -352,10 +352,6 @@ function private.CreateFrames()
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
 
-		if (curModel ~= "fixed" and newBuy > 0 and newBid > newBuy) then
-			newBuy = newBid
-		end
-
 		MoneyInputFrame_ResetMoney(frame.salebox.bid)
 		MoneyInputFrame_ResetMoney(frame.salebox.buy)
 		MoneyInputFrame_SetCopper(frame.salebox.bid, newBid)
