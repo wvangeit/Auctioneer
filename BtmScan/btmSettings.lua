@@ -387,5 +387,10 @@ if LibStub then
 		sideIcon = SlideBar.AddButton("BtmScanner", "Interface\\AddOns\\BtmScan\\Textures\\BtmScanIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", lib.Toggle)
+		sideIcon.tip = {
+			"Bottom Scanner",
+			"Bottom Scanner allows you to continually scan the auction house's new auctions for bargains. When it finds a good deal, it will ask you if you wish to purchase it.",
+			"{{Click}} to edit the configuration options.",
+		}
 	end
 end

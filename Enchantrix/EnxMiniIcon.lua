@@ -61,7 +61,11 @@ end
 
 local function click(obj, button)
 	if (button == "LeftButton") then
-		CastSpellByName(_ENCH("Enchanting"))
+		if (IsModifierKeyDown()) then
+			CastSpellByName(_ENCH("Jewelcrafting"))
+		else
+			CastSpellByName(_ENCH("Enchanting"))
+		end
 	elseif (button == "RightButton") then
 		settings.MakeGuiConfig()
 		local gui = settings.Gui
@@ -155,6 +159,13 @@ if LibStub then
 		sideIcon = SlideBar.AddButton("Enchantrix", "Interface\\AddOns\\Enchantrix\\Skin\\EnxOrb")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", click)
+		sideIcon.tip = {
+			"Enchantrix",
+			"Enchantrix shows you what reagents an item will disenchant or prospect into. It also provides integration into Auctioneer Advanced to allow pricing and purchasing decisions to be made.",
+			"{{Click}} to open the Enchanting window.",
+			"{{Shift-Click}} to open Jewelcrafting.",
+			"{{Right-Click}} to edit the configuration.",
+		}
 	end
 end
 

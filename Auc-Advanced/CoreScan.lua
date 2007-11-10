@@ -198,18 +198,8 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		private.isScanning = true
 		local startPage = 0
 		local numBatchAuctions, totalAuctions
---		if (private.scanDir == 1) then
-			startPage = 0
---		else
---			private.curPage = -1
---			private.sentQuery = true
---			-- Get "list" from appropriately filtered list
---			private.Hook.QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
---				invTypeIndex, classIndex, subclassIndex, 0, isUsable, quality)
---			numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
---			local maxPages = floor(totalAuctions / 50);
---			startPage = maxPages
---		end
+
+	--	/run QueryAuctionItems("", "", "", nil, nil, nil, 0, nil, nil, true)
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
@@ -846,7 +836,7 @@ else
 	private.warnTaint = taint
 end
 
-function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll)
+function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...)
 	if private.warnTaint then
 		lib.Print("\nAuctioneer Advanced:\n  WARNING, The CanSendAuctionQuery() function was tainted by the addon: {{"..private.warnTaint.."}}.\n  This may cause minor inconsistencies with scanning.\n  If possible, adjust the load order to get me to load first.\n ")
 		private.warnTaint = nil
@@ -920,7 +910,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	private.sentQuery = true
 	lib.lastReq = GetTime()
 
-	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll))
+	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...))
 end
 
 function lib.SetPaused(pause)

@@ -207,6 +207,11 @@ function private.slidebar()
 			sideIcon = SlideBar.AddButton("BeanCounter", "Interface\\AddOns\\BeanCounter\\Textures\\BeanCounterIcon")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 			sideIcon:SetScript("OnClick", private.GUI)
+			sideIcon.tip = {
+				"BeanCounter",
+				"BeanCounter tracks your trading activities so that you may review your expenditures and income, perform searches and use this data to determine your successes and failures.",
+				"{{Click}} to view your activity report.",
+			}
 		end
 	end
 end

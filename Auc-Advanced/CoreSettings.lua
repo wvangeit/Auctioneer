@@ -406,5 +406,11 @@ if LibStub then
 		sideIcon = SlideBar.AddButton("AucAdvanced", "Interface\\AddOns\\Auc-Advanced\\Textures\\AucAdvIcon")
 		sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 		sideIcon:SetScript("OnClick", lib.Toggle)
+		sideIcon.tip = {
+			"Auctioneer Advanced",
+			"Auctioneer Advanced allows you to scan the auction house and collect statistics about prices.",
+			"It also provides a framework for creating auction related addons.",
+			"{{Click}} to edit the configuration.",
+		}
 	end
 end
