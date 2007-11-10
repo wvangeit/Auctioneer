@@ -204,7 +204,7 @@ function private.slidebar()
 	if LibStub then
 		local SlideBar = LibStub:GetLibrary("SlideBar", true)
 		if SlideBar then
-			sideIcon = SlideBar.AddButton("BeanCounter", "Interface\\AddOns\\BeanCounter\\Icon")
+			sideIcon = SlideBar.AddButton("BeanCounter", "Interface\\AddOns\\BeanCounter\\Textures\\BeanCounterIcon")
 			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
 			sideIcon:SetScript("OnClick", private.GUI)
 		end
