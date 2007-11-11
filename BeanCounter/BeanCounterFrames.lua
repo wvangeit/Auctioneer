@@ -62,7 +62,7 @@ function private.AuctionUI()
 	
 	function frame.ScanTab.OnClick(_, _, index)
 		if private.frame:GetParent() == BeanCounterBaseFrame then
-			--BeanCounterBaseFrame:Hide()
+			BeanCounterBaseFrame:Hide()
 			private.frame:SetParent(AuctionFrame)
 			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
 			--private.frame:SetWidth(828)
@@ -249,7 +249,7 @@ function private.CreateFrames()
 	frame.classicCheck:SetChecked(false)
 	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data")
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
-	if not BeanCounterAccountDB then --no need to show this button if theres no classic data to search
+	if not BeanCounterAccountDB[private.realmName] then --no need to show this button if theres no classic data to search
 		frame.classicCheck:Hide()
 	end
 	
