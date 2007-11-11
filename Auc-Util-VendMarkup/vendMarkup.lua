@@ -32,7 +32,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "vendMarkup"
+local libName = "VendMarkup"
 local libType = "Util"
 
 AucAdvanced.Modules[libType][libName] = {}
@@ -67,7 +67,8 @@ function lib.GetPrice(hyperlink, faction, realm)
 	if (itemId and itemId > 0) and (type(GetSellValue) == "function") then
 		local vendorFor = GetSellValue(itemId)
 		if not vendorFor then return end
-		vendorFor = vendorFor * 3
+		local multiplier = AucAdvanced.Settings.GetSetting("util.vendmarkup.multiplier") / 100
+		vendorFor = vendorFor * multiplier
 		return vendorFor
 	end
 end
@@ -92,9 +93,29 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	return array
 end
 
-function lib.OnLoad(addon)
-
+function lib.Processor(callbackType, ...)
+	if callbackType == "config" then
+		private.SetupConfigGui(...)
+	end
 end
 
+function lib.OnLoad(addon)
+	AucAdvanced.Settings.SetDefault("util.vendmarkup.multiplier", 300)
+end
 
+function private.SetupConfigGui(gui)
+	-- The defaults for the following settings are set in the lib.OnLoad function
 
+	local id = gui:AddTab(libName)
+	
+	gui:AddHelp(id, "what vendmarkup",
+		"What is the Vendor Markup module?",
+		"This module will give you the price to vendor an item multiplied by a percentage of that vendor price to give you the vendor markup price.\n"..
+		"This vendor markup is most often used when posting items for auction, which do not have any data, you can tell Appraiser to use the vendor markup\n"..
+		"for the buyout price, and that will give you a good starting point for what the item might sell for.\n")
+
+	gui:AddControl(id, "Header",     0, libName.." options")
+
+	gui:AddControl(id, "TinyNumber", 0, 1, "util.vendmarkup.multiplier" or 300, 100, 1000, "Vendor markup (in percent)")
+
+end
