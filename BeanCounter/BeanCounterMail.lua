@@ -49,23 +49,21 @@ function private.mailMonitor(event,arg1)
 	elseif (event == "MAIL_SHOW") then 
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
 	elseif (event == "MAIL_CLOSED") then
-		--Well we may need it
+		InboxCloseButton:Show()
+		InboxFrame:Show()
+		MailFrameTab2:Show()
+		private.MailGUI:Hide()
+		HideMailGUI = false
 	end
 end
 --Mailbox Snapshots
 local HideMailGUI = false
 
 function private.updateInboxStart()
-
-		InboxCloseButton:Hide()
-		InboxFrame:Hide()
-		MailFrameTab2:Hide()
-		private.MailGUI:Show()
-		HideMailGUI = true
-
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
 		if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
 			table.insert(private.inboxStart, {["n"] = n,["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft, 
@@ -74,6 +72,13 @@ function private.updateInboxStart()
 					})
 			GetInboxText(n) --read message
 		end
+	end
+	
+	if HideMailGUI == true then
+		InboxCloseButton:Hide()
+		InboxFrame:Hide()
+		MailFrameTab2:Hide()
+		private.MailGUI:Show()
 	end
 end
 
@@ -121,7 +126,7 @@ local total = #private.inboxStart
 			private.inboxStart[i] = nil
 			debugPrint("data.retrieved == yes")
 		
-		elseif  time() - data.startTime > 10 then --time exceded so fail it and process on next update
+		elseif  time() - data.startTime > private.getOption("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
 			debugPrint("time to retieve invoice exceded")
 			tbl["retrieved"] = "failed" 
 		else 
@@ -211,11 +216,15 @@ function private.mailSort()
 			elseif "Sale Pending: " == (string.match(private.reconcilePending[i]["subject"], "(Sale Pending:%s)" )) then
 				debugPrint("Sale Pending: " )	--ignore We dont care about this message
 				table.remove(private.reconcilePending,i)
+			else
+				debugPrint("We had an Auction mail that failed mailsort() ")
+				table.remove(private.reconcilePending,i)	
 			end	
 	
-			else --if its not AH do we care? We need to record cash arrival from other toons
-				debugPrint("OTHER", private.reconcilePending[i]["subject"])
-				table.remove(private.reconcilePending,i)
+		else --if its not AH do we care? We need to record cash arrival from other toons
+			debugPrint("OTHER", private.reconcilePending[i]["subject"])
+			table.remove(private.reconcilePending,i)
+				
 		end
 	end
 end
@@ -240,7 +249,7 @@ end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
-	if (#private.inboxStart > 0 or #private.reconcilePending > 0)then
+	if #private.inboxStart > 0 then
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
@@ -249,7 +258,7 @@ end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 function private.PreTakeInboxItemHook( ignore, retVal, index)
-	if (#private.inboxStart > 0 or #private.reconcilePending > 0)then
+	if #private.inboxStart > 0 then
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end

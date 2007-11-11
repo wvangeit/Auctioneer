@@ -90,6 +90,8 @@ private.settingDefaults = {
 	["util.beancounter.debugPost"] = true,
 	["util.beancounter.debugUpdate"] = true,
 	["util.beancounter.debugFrames"] = true,
+	
+	 ["util.beacounter.invoicetime"] = 5,
     }
 
 local function getDefault(setting)
@@ -318,10 +320,11 @@ function lib.MakeGuiConfig()
 	id = gui:AddTab("BeanCounter Config")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    "BeanCounter options")
-	
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, "Mail Invoice Timeout = %d seconds")
+	gui:AddTip(id, "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy")
 	
 	id = gui:AddTab("BeanCounter Debug")
-	gui:AddControl(id, "Header",     0,    "BeanCounter options")
+	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
 	gui:AddControl(id, "Subhead",    0,    "Reports From Specific Modules")
 
