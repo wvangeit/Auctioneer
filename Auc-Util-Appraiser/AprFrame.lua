@@ -192,10 +192,15 @@ function private.CreateFrames()
 		else
 			frame.salebox.name:SetText("No item selected")
 			frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
-			frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
+			if not AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+				frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
+			else
+				frame.salebox.info:SetText("Select an item to begin auctioning...")
+			end
 			frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
 			frame.toggleManifest:SetText("")
 			frame.imageview.sheet:SetData(private.empty)
+			frame.imageviewclassic.sheet:SetData(private.empty)
 			frame.UpdateControls()
 		end
 	end
@@ -254,7 +259,9 @@ function private.CreateFrames()
 		end
 		frame.SetPriceFromModel(curModel)
 		frame.refresh:Enable()
+		frame.switchUI:Enable()
 		frame.imageview.sheet:SetData(data, style)
+		frame.imageviewclassic.sheet:SetData(data, style)
 		recycle(data)
 		recycle(style)
 	end
@@ -409,25 +416,32 @@ function private.CreateFrames()
 			return
 		end
 		frame.salebox.icon:Show()
-		frame.salebox.stack:Show()
-		frame.salebox.number:Show()
-		frame.salebox.model:Show()
 		frame.salebox.matcher:Show()
 		frame.salebox.bid:Show()
+		frame.salebox.model:Show()
 		frame.salebox.buy:Show()
 		frame.salebox.duration:Show()
-		if not frame.toggleManifest:GetText() then
-			frame.manifest:Show()
-		end
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
-		if frame.manifest:IsShown() then
-			frame.toggleManifest:SetText("Close Sidebar")
+		if frame.itembox:IsShown() then
+			frame.salebox.number:Show()
+			frame.salebox.stack:Show()
+			frame.toggleManifest:Show()
+			if not frame.toggleManifest:GetText() then
+				frame.manifest:Show()
+			end
+			if frame.manifest:IsShown() then
+				frame.toggleManifest:SetText("Close Sidebar")
+			else
+				frame.toggleManifest:SetText("Open Sidebar")
+			end
 		else
-			frame.toggleManifest:SetText("Open Sidebar")
+				frame.salebox.stackentry:Show()
+				frame.salebox.stacksoflabel:Show()
+				frame.salebox.numberentry:Show()
 		end
-		frame.toggleManifest:Show()
 		frame.refresh:Enable()
+		frame.switchUI:Enable()
 
 		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
 		itemId = tonumber(itemId)
@@ -479,6 +493,9 @@ function private.CreateFrames()
 
 		local depositMult = curDurationMins / 120
 		local curNumber = frame.salebox.number:GetAdjustedValue()
+		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+			curNumber = frame.salebox.numberentry:GetNumber()
+		end
 
 		if (frame.salebox.stacksize > 1) then
 			local count = frame.salebox.count
@@ -491,6 +508,7 @@ function private.CreateFrames()
 			end
 			frame.salebox.stack.label:SetText(("Stack size: %d"):format(curSize)..extra)
 			frame.salebox.stack:SetAlpha(1)
+			frame.salebox.stackentry:SetNumber(curSize)
 
 			local maxStax = math.floor(count / curSize)
 			local fullPop = maxStax*curSize
@@ -502,7 +520,8 @@ function private.CreateFrames()
 				else
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
 				end
-
+				frame.salebox.numberentry:SetNumber(maxStax)
+				
 				if (maxStax > 0) then
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
@@ -531,6 +550,7 @@ function private.CreateFrames()
 				end
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
+				frame.salebox.numberentry:SetText(curNumber)
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 				bidVal = lib.RoundBid(curBid * curSize)
 				buyVal = lib.RoundBuy(curBuy * curSize)
@@ -548,6 +568,7 @@ function private.CreateFrames()
 			frame.salebox.stack:SetMinMaxValues(1,1)
 			frame.salebox.stack:SetValue(1)
 			frame.salebox.stack.label:SetText("Item is not stackable")
+			frame.salebox.stackentry:SetNumber(1)
 			frame.salebox.stack:SetAlpha(0.6)
 
 			frame.salebox.number:SetAdjustedRange(frame.salebox.count, -1)
@@ -557,7 +578,8 @@ function private.CreateFrames()
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
 			end
-
+			frame.salebox.numberentry:SetNumber(curNumber)
+			
 			if curNumber > 0 then
 				frame.manifest.lines:Add(("%d items"):format(curNumber))
 				bidVal = lib.RoundBid(curBid)
@@ -575,6 +597,9 @@ function private.CreateFrames()
 		frame.manifest.lines:Add(("  Total Bid"), totalBid)
 		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
 		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
+		frame.salebox.depositcost:SetText("Deposit:      "..EnhTooltip.GetTextGSC(totalDeposit, true))
+		frame.salebox.totalbid:SetText("Total Bid:    "..EnhTooltip.GetTextGSC(totalBid, true))
+		frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
 
 		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 			frame.manifest.lines:Add(("Difference from Model: "..DiffFromModel.."%"))
@@ -672,6 +697,94 @@ function private.CreateFrames()
 
 		frame.salebox.config = false
 	end
+	
+	function frame.ChangeUI()
+		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+			frame.itembox:Hide()
+			frame.salebox:SetPoint("TOPLEFT", frame, "TOPLEFT", 13, -71)
+			frame.salebox:SetPoint("RIGHT", frame, "LEFT", 253, 0)
+			frame.salebox:SetHeight(340) 
+			frame.salebox.stack:Hide()
+			frame.salebox.number:Hide()
+			frame.manifest:Hide()
+			frame.toggleManifest:Hide()
+			frame.salebox.icon:SetScript("OnClick", nil)
+			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
+			frame.salebox.bid:ClearAllPoints()
+			frame.salebox.bid:SetPoint("TOP", frame.salebox.model, "BOTTOM", 0, -35)
+			frame.salebox.bid:SetPoint("LEFT", frame.salebox, "LEFT", 25, 0)
+			frame.salebox.bid.label:ClearAllPoints()
+			frame.salebox.bid.label:SetPoint("BOTTOMLEFT", frame.salebox.bid, "TOPLEFT", 0, 2)
+			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0, -20)
+			frame.salebox.buy.label:ClearAllPoints()
+			frame.salebox.buy.label:SetPoint("BOTTOMLEFT", frame.salebox.buy, "TOPLEFT", 0, 2)
+			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.buy, "BOTTOMLEFT", -10, -10)
+			frame.gobatch:Hide()
+			frame.go:SetPoint("BOTTOMRIGHT", frame.salebox, "BOTTOMRIGHT", -20, 15)
+			frame.salebox.info:ClearAllPoints()
+			frame.salebox.info:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, 8)
+			frame.imageview:Hide()
+			frame.imageviewclassic:Show()
+			if not frame.salebox.sig then
+				frame.salebox.info:SetText("Select an item to begin auctioning...")
+			else
+				frame.salebox.stackentry:Show()
+				frame.salebox.stacksoflabel:Show()
+				frame.salebox.numberentry:Show()
+				frame.salebox.depositcost:Show()
+				frame.salebox.totalbid:Show()
+				frame.salebox.totalbuyout:Show()
+			end
+			frame.salebox.name:SetHeight(36)
+			frame.salebox.warn:SetJustifyH("LEFT")
+			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -25)
+		else
+			frame.salebox.stackentry:Hide()
+			frame.salebox.stacksoflabel:Hide()
+			frame.salebox.numberentry:Hide()
+			frame.salebox.depositcost:Hide()
+			frame.salebox.totalbid:Hide()
+			frame.salebox.totalbuyout:Hide()
+			frame.itembox:Show()
+			frame.salebox:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3,35)
+			frame.salebox:SetPoint("RIGHT", frame, "RIGHT", -5,0)
+			frame.salebox:SetHeight(170)
+			if frame.salebox.sig then
+				frame.toggleManifest:Show()
+				if (frame.toggleManifest:GetText() == "Close Sidebar") then
+					frame.manifest:Show()
+				end
+				frame.salebox.stack:Show()
+				frame.salebox.number:Show()
+			else
+				frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
+			end
+			frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
+			frame.salebox.bid:ClearAllPoints()
+			frame.salebox.bid:SetPoint("TOP", frame.salebox.number, "BOTTOM", 0,-5)
+			frame.salebox.bid:SetPoint("RIGHT", frame.salebox, "RIGHT", 0,0)
+			frame.salebox.buy:SetPoint("TOPLEFT", frame.salebox.bid, "BOTTOMLEFT", 0,-5)
+			frame.salebox.duration:SetPoint("TOPLEFT", frame.salebox.number, "BOTTOMLEFT", 0,0)
+			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 0,-16)
+			frame.salebox.bid.label:ClearAllPoints()
+			frame.salebox.bid.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
+			frame.salebox.bid.label:SetPoint("TOPRIGHT", frame.salebox.bid, "TOPLEFT", -5,0)
+			frame.salebox.bid.label:SetPoint("BOTTOMRIGHT", frame.salebox.bid, "BOTTOMLEFT", -5,0)
+			frame.salebox.buy.label:ClearAllPoints()
+			frame.salebox.buy.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
+			frame.salebox.buy.label:SetPoint("TOPRIGHT", frame.salebox.buy, "TOPLEFT", -5,0)
+			frame.salebox.buy.label:SetPoint("BOTTOMRIGHT", frame.salebox.buy, "BOTTOMLEFT", -5,0)
+			frame.gobatch:Show()
+			frame.go:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -7,15)
+			frame.salebox.info:ClearAllPoints()
+			frame.salebox.info:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5,7)
+			frame.imageview:Show()
+			frame.imageviewclassic:Hide()
+			frame.salebox.name:SetHeight(20)
+			frame.salebox.warn:SetJustifyH("RIGHT")
+			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 7)
+		end
+	end
 
 	function frame.GetItembyLink(link)
 		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
@@ -750,6 +863,10 @@ function private.CreateFrames()
 	function frame.PostBySig(sig, dryRun)
 		local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".stack")
 		local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".number")
+		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+			stack = frame.salebox.stackentry:GetNumber()
+			number = frame.salebox.numberentry:GetNumber()
+		end
 		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
 		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
 		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
@@ -1058,6 +1175,7 @@ function private.CreateFrames()
 
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
+	frame.salebox.name:SetPoint("RIGHT", frame.salebox, "RIGHT", -15)
 	frame.salebox.name:SetHeight(20)
 	frame.salebox.name:SetJustifyH("LEFT")
 	frame.salebox.name:SetJustifyV("TOP")
@@ -1100,6 +1218,7 @@ function private.CreateFrames()
 	frame.salebox.stack:SetScript("OnValueChanged", frame.ChangeControls)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
+	
 	AppraiserSaleboxStackLow:SetText("")
 	AppraiserSaleboxStackHigh:SetText("")
 
@@ -1107,7 +1226,7 @@ function private.CreateFrames()
 	frame.salebox.stack.label:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 3,2)
 	frame.salebox.stack.label:SetJustifyH("LEFT")
 	frame.salebox.stack.label:SetJustifyV("CENTER")
-
+	
 	frame.salebox.number = CreateFrame("Slider", "AppraiserSaleboxNumber", frame.salebox, "OptionsSliderTemplate")
 	frame.salebox.number:SetPoint("TOPLEFT", frame.salebox.stack, "BOTTOMLEFT", 0,0)
 	frame.salebox.number:SetHitRectInsets(0,0,0,0)
@@ -1120,6 +1239,8 @@ function private.CreateFrames()
 	frame.salebox.number:Hide()
 	AppraiserSaleboxNumberLow:SetText("")
 	AppraiserSaleboxNumberHigh:SetText("")
+
+	
 	function frame.salebox.number:GetAdjustedValue()
 		local maxStax = self.maxStax or 0
 		local value = self:GetValue()
@@ -1260,9 +1381,19 @@ function private.CreateFrames()
 	frame.refresh:SetWidth(80)
 	frame.refresh:SetScript("OnClick", frame.RefreshView)
 	frame.refresh:Disable()
+	
+	frame.switchUI = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
+	frame.switchUI:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -247,15)
+	frame.switchUI:SetText("Switch UI")
+	frame.switchUI:SetWidth(80)
+	frame.switchUI:SetScript("OnClick", function()
+		AucAdvanced.Settings.SetSetting("util.appraiser.classic", (not AucAdvanced.Settings.GetSetting("util.appraiser.classic")))
+		frame.ChangeUI()
+	end)
+	frame.switchUI:Enable()
 
 	frame.age = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.age:SetPoint("RIGHT", frame.refresh, "LEFT", -5,0)
+	frame.age:SetPoint("RIGHT", frame.refresh, "LEFT", -85,0)
 	frame.age:SetTextColor(1, 0.8, 0)
 	frame.age:SetText("")
 	frame.age:SetJustifyH("RIGHT")
@@ -1411,7 +1542,33 @@ function private.CreateFrames()
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
 	})
-
+	
+	frame.imageviewclassic = CreateFrame("Frame", nil, frame)
+	frame.imageviewclassic:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	
+	frame.imageviewclassic:SetBackdropColor(0, 0, 0, 0.8)
+	frame.imageviewclassic:SetPoint("TOPLEFT", frame.itembox, "TOPRIGHT", -3, 35)
+	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
+	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
+	frame.imageviewclassic.sheet = ScrollSheet:Create(frame.imageviewclassic, {
+		{ "Item",   "TEXT", 120 },
+		{ "Seller", "TEXT", 75  },
+		{ "Left",   "INT",  40  },
+		{ "Stk",    "INT",  30  },
+		{ "Min/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Cur/ea", "COIN", 85, { DESCENDING=true } },
+		{ "Buy/ea", "COIN", 85, { DESCENDING=true, DEFAULT=true } },
+		{ "MinBid", "COIN", 85, { DESCENDING=true } },
+		{ "CurBid", "COIN", 85, { DESCENDING=true } },
+		{ "Buyout", "COIN", 85, { DESCENDING=true } },
+	})
+	frame.imageviewclassic:Hide()
+	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
 	frame.ScanTab:SetText("Appraiser")
 	frame.ScanTab:Show()
@@ -1445,6 +1602,54 @@ function private.CreateFrames()
 			frame:Hide()
 		end
 	end
+	
+	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
+	frame.salebox.numberentry:SetNumeric(true)
+	frame.salebox.numberentry:SetHeight(16)
+	frame.salebox.numberentry:SetWidth(30)
+	frame.salebox.numberentry:SetNumber(0)
+	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
+		frame.salebox.number:SetAdjustedValue(frame.salebox.numberentry:GetNumber())
+	end)
+	frame.salebox.numberentry:Hide()
+	
+	frame.salebox.stacksoflabel = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.stacksoflabel:SetPoint("TOPLEFT", frame.salebox.numberentry, "TOPRIGHT", 5, 0)
+	frame.salebox.stacksoflabel:SetJustifyH("LEFT")
+	frame.salebox.stacksoflabel:SetJustifyV("CENTER")
+	frame.salebox.stacksoflabel:SetText("stacks of")
+	frame.salebox.stacksoflabel:Hide()
+	
+	frame.salebox.stackentry = CreateFrame("EditBox", "AppraiserSaleboxStackEntry", frame.salebox, "InputBoxTemplate")
+	frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
+	frame.salebox.stackentry:SetNumeric(true)
+	frame.salebox.stackentry:SetNumber(0)
+	frame.salebox.stackentry:SetHeight(16)
+	frame.salebox.stackentry:SetWidth(30)
+	frame.salebox.stackentry:SetScript("OnEnterPressed", function()
+		frame.salebox.stack:SetValue(frame.salebox.stackentry:GetNumber())
+	end)
+	frame.salebox.stackentry:Hide()
+	
+	frame.salebox.depositcost = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", -15, -5)
+	frame.salebox.depositcost:SetJustifyH("LEFT")
+	frame.salebox.depositcost:SetJustifyV("CENTER")
+	frame.salebox.depositcost:Hide()
+	frame.salebox.totalbid = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.totalbid:SetPoint("TOPLEFT", frame.salebox.depositcost, "BOTTOMLEFT", 0, 0)
+	frame.salebox.totalbid:SetJustifyH("LEFT")
+	frame.salebox.totalbid:SetJustifyV("CENTER")
+	frame.salebox.totalbid:Hide()
+	frame.salebox.totalbuyout = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.totalbuyout:SetPoint("TOPLEFT", frame.salebox.totalbid, "BOTTOMLEFT", 0, 0)
+	frame.salebox.totalbuyout:SetJustifyH("LEFT")
+	frame.salebox.totalbuyout:SetJustifyV("CENTER")
+	frame.salebox.totalbuyout:Hide()
+	
+	
+	frame.ChangeUI()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
 
