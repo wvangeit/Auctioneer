@@ -283,7 +283,7 @@ function private.CreateFrames()
 		if curModel == "default" then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
 			if (not (curModel == "fixed") and ((curModel == "market") and (not AucAdvanced.API.GetMarketValue(frame.salebox.link) or 
-			AucAdvanced.API.GetMarketValue(frame.salebox.link) <= 0) or (not AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) or 
+			AucAdvanced.API.GetMarketValue(frame.salebox.link) <= 0)) or ((curmodel ~= market) and (not AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) or 
 			AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) <= 0))) then
 				curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
 			end
