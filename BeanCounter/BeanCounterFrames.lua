@@ -41,7 +41,6 @@ local function debugPrint(...)
     end
 end
 
-
 local frame
 function private.AuctionUI()
 	if frame then return end
@@ -307,7 +306,8 @@ function private.CreateFrames()
 		
 		{ "Bid", "COIN", 70 },
 		{ "Buyout", "COIN", 70 },
-		{ "Price", "COIN", 70},
+		{ "Profit", "COIN", 70},
+		{ "Profit/Per", "COIN", 70},
 		
 		{ "Seller", "TEXT", 70 },
 		{ "Buyer", "TEXT", 70 },
@@ -338,20 +338,26 @@ function private.CreateFrames()
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
 						--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
-						   table.insert(data,{
+						
+						local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
+						if stack > 0 then	stack = tbl[3]/stack end
+						
+		
+						  table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
 									 
-									"-", --tbl[7], --bid
-									"-", --tbl[6], --buyout
-									tbl[3], --money,
+									0, --tbl[7], --bid
+									0, --tbl[6], --buyout
+									tonumber(tbl[3]), --Profit,
+									tonumber(stack), --Profit/per
 									
 									  "-",  --seller
 									tbl[8], --buyer
 									
-									tbl[4], --deposit
-									tbl[5], --fee
-									tbl[10], --current wealth
+									tonumber(tbl[4]), --deposit
+									tonumber(tbl[5]), --fee
+									tonumber(tbl[10]) or 0, --current wealth
 									date("%c", tbl[9]), --time, --Make this a user choosable option.
 									--tbl[12], --date
 								    })
@@ -376,16 +382,17 @@ function private.CreateFrames()
 									tbl[1], --itemname
 									tbl[2], --status
 									
-									minBid, --bid
-									buyoutPrice, --buyout
-									"-", --money,
+									tonumber(minBid) or 0, --bid
+									tonumber(buyoutPrice) or 0, --buyout
+									0, --money,
+									0, --Profit/per
 									
 									"-",  --seller
 									"-", --buyer
 									
-									deposit, --deposit
-									"-", --fee
-									tbl[4], --current wealth
+									tonumber(deposit) or 0, --deposit
+									0, --fee
+									tonumber(tbl[4]) or 0, --current wealth
 									date("%c", tbl[3]), --time,
 									--tbl[5], --date
 								})
@@ -416,16 +423,17 @@ function private.CreateFrames()
 									tbl[1], --itemname
 									tbl[2], --status
 									
-									tbl[7], --bid
-									tbl[6], --buyout
-									tbl[3], --money,
+									tonumber(tbl[7]), --bid
+									tonumber(tbl[6]), --buyout
+									tonumber(tbl[3]), --money,
+									0, --Profit/per
 									
 									tbl[8],   --seller
 									"-", --buyer
 									  
-									tbl[4], --deposit
-									tbl[5], --fee
-									tbl[10], --current wealth
+									tonumber(tbl[4]), --deposit
+									tonumber(tbl[5]), --fee
+									tonumber(tbl[10]) or 0, --current wealth
 									date("%c", tbl[9]), --time,
 									--tbl[11], --date
 								    })
@@ -447,16 +455,17 @@ function private.CreateFrames()
 									tbl[1], --itemname
 									tbl[2], --status
 									
-									"-", --bid
-									"-", --buyout
-									tbl[3], --money,
+									0, --bid
+									0, --buyout
+									tonumber(tbl[3]), --money,
+									0, --Profit/per
 									
 									"-",  --seller
 									"-", --buyer
 									
-									"-", --deposit
-									"-", --fee
-									tbl[5], --current wealth
+									0, --deposit
+									0, --fee
+									tonumber(tbl[5]) or 0, --current wealth
 									date("%c", tbl[4]), --time,
 									--tbl[6], --date
 								    })
@@ -469,11 +478,11 @@ function private.CreateFrames()
 					end
 				end
 		end
---BC CLASSIC DATA SEARCH	
+	--BC CLASSIC DATA SEARCH	
 	    if settings.classic then
 		data, style = private.classicSearch(data, style, itemName, settings)
 	    end
-
+	    
 		frame.resultlist.sheet:SetData(data, style)
 	end
 	 
@@ -485,7 +494,7 @@ function private.CreateFrames()
 			return match
 		end
 	end
-	
+	--reconcile with auction DB to get info for data
 	function private.reconcileFailedAuctions(player, itemID, tbl)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
     			local tbl2 = private.unpackString(v)
@@ -501,12 +510,21 @@ function private.CreateFrames()
 			--post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth
 			return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
 		    end
-    
 		end
-	
+	end
+	function private.reconcileCompletedAuctions(player, itemID, soldDeposit)
+		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
+			local tbl2 = private.unpackString(v)
+			local postDeposit = tbl2[6]
+			if postDeposit ==  soldDeposit then
+				return tonumber(tbl2[2])
+			else 
+				return 0
+			end
+		end
 	end
 	
-private.CreateMailFrames()
+	private.CreateMailFrames()
 
 end
 
@@ -598,7 +616,8 @@ end
 function private.classicSearch(data, style, itemName, settings)
    	    for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
 		for index, text in pairs(v) do
-		    local tbl = private.unpackString(text)
+				
+		    local tbl = {strsplit(";", text)}
 		    local match = false
 		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
@@ -607,34 +626,40 @@ function private.classicSearch(data, style, itemName, settings)
 			    --"1173571623;1;1;11293;22000;-1500;<nil>;<nil>;<nil>;2"
 			    local status = "Sold"
 			 			    
-			    if tbl[9] == "<nil>" then
-				status = "Un-Sold"
-				tbl[9] = "-"
-			    end
+				if tbl[9] == "<nil>" then
+					status = "Un-Sold"
+					tbl[9] = "-"
+				end
+					
+				local stack = tonumber(tbl[3]) or 1
+				local price = tonumber(tbl[7]) or 0
+				if stack < 1 then	stack = 1 end
+				local pricePer = (price/stack)
 			    			    
 			    table.insert(data,{
 					name, --itemname
 					status, --status
 
-					tbl[4], --tbl[7], --bid
-					tbl[5], --buyout
-					tbl[7], --money,
-								
+					tonumber(tbl[4]) or 0, --tbl[7], --bid
+					tonumber(tbl[5]) or 0, --buyout
+					price, --money,
+					pricePer, --Profit/per
+					
 					 "-",  --seller
 					tbl[9], --buyer
 									
-					"-",--tbl[7], --deposit
-					"-", --tbl[8], --fee
-					"-", --current wealth
+					0,--tbl[7], --deposit
+					0, --tbl[8], --fee
+					0, --current wealth
 					date("%c", tbl[1]), --time,
 		
 					 })	 
 			end
 		end
 	    end
-	    for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
+	for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
 		for index, text in pairs(v) do
-		    local tbl = private.unpackString(text)
+		    local tbl = {strsplit(";", text)}
 		    local match = false
 		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
@@ -647,16 +672,17 @@ function private.classicSearch(data, style, itemName, settings)
 					name, --itemname
 					status, --status
 
-					"-", --tbl[7], --bid
-					tbl[3], --buyout
-					"-", --money,
-								
+					0, --tbl[7], --bid
+					tonumber(tbl[3]) or 0, --buyout
+					0, --money,
+					0, --Profit/per
+					
 					tbl[4],  --seller
 					"-", --buyer
 									
-					"-",--tbl[7], --deposit
-					"-", --tbl[8], --fee
-					"-", --current wealth
+					0,--tbl[7], --deposit
+					0, --tbl[8], --fee
+					0, --current wealth
 					date("%c", tbl[1]), --time,
 					 })
 			   style[#data] = {}

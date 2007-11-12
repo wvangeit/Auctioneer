@@ -265,6 +265,7 @@ local String
 end
 --Will split any string and return a table value
 function private.unpackString(text)
+	text = text:gsub("<nil>", 0) --Remove out <NIL> holder with 0
 	return {strsplit(";", text)}
 end
 

@@ -58,7 +58,6 @@ function private.mailMonitor(event,arg1)
 end
 --Mailbox Snapshots
 local HideMailGUI = false
-
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
@@ -235,13 +234,13 @@ function private.matchDB(key, text)
 		if private.playerData[key][i][1] then
 			if text == (string.match(private.playerData[key][i][1], "^|c%x+|H.+|h%[(.+)%]" )) then
 			    local itemLink = private.playerData[key][i][1]:match("(.-);")
-				debugPrint("Searching DB for ItemID..",private.playerData[key][i][1], "Sucess")
+				--debugPrint("Searching DB for ItemID..",private.playerData[key][i][1], "Sucess")
 				return i, itemLink
 			else
-				debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
+				--debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
 			end
 		else 
-				debugPrint("Searching DB for ItemID..", key, text, "Failed")
+				--debugPrint("Searching DB for ItemID..", key, text, "Failed")
 			return nil
 		end
 	end
