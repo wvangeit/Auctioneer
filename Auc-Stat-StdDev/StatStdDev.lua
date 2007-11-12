@@ -265,6 +265,21 @@ function lib.OnLoad(addon)
 	private.makeData()
 end
 
+function lib.ClearItem(hyperlink, faction, realm)
+	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then
+		return
+	end
+	if (factor ~= 0) then property = property.."x"..factor end
+	if not faction then faction = AucAdvanced.GetFaction() end
+	if not realm then realm = GetRealmName() end
+	if (not data) then private.makeData() end
+	if (data[faction]) then
+		print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
+		data[faction][itemID] = nil
+	end
+end
+
 --[[ Local functions ]]--
 
 function private.DataLoaded()
