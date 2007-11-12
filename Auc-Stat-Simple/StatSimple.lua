@@ -182,7 +182,25 @@ function lib.OnLoad(addon)
 
 end
 
+local AAStatSimpleData
 
+function lib.ClearItem(hyperlink, faction, realm)
+	local linkType, itemID, property, factor = AucAdvanced.DecodeLink(hyperlink)
+	if (linkType ~= "item") then 
+		return 
+	end
+	if (factor ~= 0) then property = property.."x"..factor end
+	if not faction then faction = AucAdvanced.GetFaction() end
+	if not realm then
+		realm = GetRealmName()
+	end
+	if (not AAStatSimpleData) then private.LoadData() end
+	print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
+	if (AAStatSimpleData.RealmData[realm] and AAStatSimpleData.RealmData[realm][faction]) then
+		AAStatSimpleData.RealmData[realm][faction]["means"][itemID] = nil
+		AAStatSimpleData.RealmData[realm][faction]["daily"][itemID] = nil
+	end	
+end
 
 --[[ Local functions ]]--
 
@@ -324,7 +342,6 @@ function private.UpgradeDb()
 	end
 end
 
-local AAStatSimpleData
 
 function private.LoadData()
 	if (AAStatSimpleData) then return end
