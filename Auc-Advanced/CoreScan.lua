@@ -552,7 +552,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
 			end
-			if wasGetAll and #private.curScan <= 50 then
+			if wasGetAll or (#private.curScan <= 50 and not wasIncomplete) then
 				stillpossible = false
 			end
 
