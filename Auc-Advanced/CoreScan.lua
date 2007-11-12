@@ -50,7 +50,6 @@ lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local print = lib.Print
 
-private.lastfullscan = 0
 private.isScanning = false
 private.curPage = 0
 private.scanDir = 1
@@ -167,9 +166,13 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			return
 		end
 		local CanQuery, CanQueryAll = CanSendAuctionQuery()
+		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
 		local now = time()
-		local minleft = ceil((now - private.lastfullscan) / 60) 
-		local secleft = (now - private.lastfullscan) - (minleft - 1 ) * 60
+		if not scandata.LastFullScan then
+			scandata.LastFullScan = 0
+		end
+		local minleft = ceil((now - scandata.LastFullScan) / 60) 
+		local secleft = (now - scandata.LastFullScan) - (minleft - 1 ) * 60
 		--this can be removed once 2.3 rolls out
 		if (CanQueryAll == nil) and (minleft > 20) then
 			CanQueryAll = true
@@ -645,6 +648,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	scandata.scanstats[0].elapsed = GetTime() - private.scanStarted - private.totalPaused
 	scandata.scanstats[0].query = private.curQuery
 	scandata.time = now
+	if wasGetAll then scandata.LastFullScan = now end
 
 	private.curQuery = nil
 	private.scanStartTime = nil
@@ -795,7 +799,6 @@ function lib.StorePage()
 	if private.isScanning then
 		if numBatchAuctions > 50 then
 			private.isScanning = false
-			private.lastfullscan = time()
 			lib.Commit(false, true)
 		elseif (private.scanDir == 1 and private.curPage < maxPages) or
 		(private.scanDir == -1 and private.curPage > 0) then
