@@ -232,7 +232,7 @@ function lib.QueryImage(query, faction, realm, ...)
 		repeat
 			local data = scandata.image[ptr] ptr = ptr + 1
 			if (not data) then break end
-			if bit.band(data[Const.FLAG], Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
+			if bit.band(data[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then break end
 			if query.filter and query.filter(data, ...) then break end
 			if query.link and data[Const.LINK] ~= query.link then break end
 			if query.itemId and data[Const.ITEMID] ~= query.itemId then break end

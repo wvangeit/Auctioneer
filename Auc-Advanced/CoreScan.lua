@@ -351,13 +351,13 @@ local function processStats(operation, curItem, oldItem)
 				local result=engineLib.AuctionFilter(operation, statItem)
 				if (result) then 
 					private.filteredCount = private.filteredCount + 1
-					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG], Const.FLAG_FILTER)
+					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
 					operation = "filter"
 					break
 				end
 			end
 		end
-	elseif curItem and bit.band(curItem[Const.FLAG], Const.FLAG_FILTER) == Const.FLAG_FILTER then
+	elseif curItem and bit.band(curItem[Const.FLAG] or 0, Const.FLAG_FILTER) == Const.FLAG_FILTER then
 		-- This item is a filtered item
 		operation = "filter"
 		private.filteredCount = private.filteredCount + 1
@@ -488,7 +488,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		if (itemPos) then
 			local oldItem = scandata.image[itemPos]
 			data[Const.ID] = oldItem[Const.ID]
-			data[Const.FLAG] = bit.band(oldItem[Const.FLAG], bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
 			if not private.IsIdentical(oldItem, data) then
 				if processStats("update", data, oldItem) then
 					updateCount = updateCount + 1
