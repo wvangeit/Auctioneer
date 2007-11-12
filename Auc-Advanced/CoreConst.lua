@@ -103,6 +103,7 @@ AucAdvanced.Const = {
 
 	FLAG_DIRTY = 1,
 	FLAG_UNSEEN = 2,
+	FLAG_FILTER = 4,
 
 	CLASSES = { GetAuctionItemClasses() },
 	SUBCLASSES = { },

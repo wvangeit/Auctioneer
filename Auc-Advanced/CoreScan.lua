@@ -49,6 +49,9 @@ lib.Private = private
 lib.Print = AucAdvanced.Print
 local Const = AucAdvanced.Const
 local print = lib.Print
+local recycle = AucAdvanced.Recycle
+local acquire = AucAdvanced.Acquire
+local clone = AucAdvanced.Clone
 
 private.isScanning = false
 private.curPage = 0
@@ -99,39 +102,43 @@ function lib.GetImage()
 	return image
 end
 
-private.scanStack = {}
 function lib.PushScan()
 	if private.isScanning then
 		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
-		table.insert(private.scanStack, {
+		if not private.scanStack then private.scanStack = acquire() end
+		table.insert(private.scanStack, acquire(
 			private.scanStartTime,
 			private.sentQuery,
 			private.curPage,
 			private.curQuery,
+			private.curPages,
 			private.curScan,
 			private.scanStarted,
 			private.totalPaused,
-			GetTime(),
-		})
-		private.isScanning = false
+			GetTime()
+		))
 		private.scanStartTime = nil
-		private.sentQuery = nil
-		private.curPage = nil
-		private.curQuery = nil
-		private.curScan = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
+		private.curQuerySig = nil
+		recycle(private, "curQuery")
+		recycle(private, "curScan")
+		private.curPage = 0
+		recycle(private, "curPages")
+		private.sentQuery = nil
+		private.isScanning = false
 		private.UpdateScanProgress(false)
 	end
 end
 
 function lib.PopScan()
-	if #private.scanStack > 0 then
+	if private.scanStack and #private.scanStack > 0 then
 		local now, pauseTime = GetTime()
 		private.scanStartTime,
 		private.sentQuery,
 		private.curPage,
 		private.curQuery,
+		private.curPages,
 		private.curScan,
 		private.scanStarted,
 		private.totalPaused,
@@ -181,9 +188,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		secleft = 60 - secleft
 		if not GetAll then
 			if not CanQuery then
-				private.queueScan = {
+				private.queueScan = acquire(
 					name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll
-				}
+				)
 				return
 			end
 		else
@@ -225,7 +232,7 @@ function lib.IsPaused()
 end
 
 function private.Unpack(item, storage)
-	if not storage then storage = {} end
+	if not storage then storage = acquire() end
 	storage.id = item[Const.ID]
 	storage.link = item[Const.LINK]
 	storage.useLevel = item[Const.ULEVEL]
@@ -344,10 +351,16 @@ local function processStats(operation, curItem, oldItem)
 				local result=engineLib.AuctionFilter(operation, statItem)
 				if (result) then 
 					private.filteredCount = private.filteredCount + 1
-					return false 
+					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG], Const.FLAG_FILTER)
+					operation = "filter"
+					break
 				end
 			end
 		end
+	elseif curItem and bit.band(curItem[Const.FLAG], Const.FLAG_FILTER) == Const.FLAG_FILTER then
+		-- This item is a filtered item
+		operation = "filter"
+		private.filteredCount = private.filteredCount + 1
 	end
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
@@ -360,64 +373,10 @@ local function processStats(operation, curItem, oldItem)
 			end
 		end
 	end
+	if operation == "filter" then
+		return false
+	end
 	return true
-end
-
-function private.GetID(IDlist)
-	for x1, x2 in pairs(IDlist) do
-		if (x1 ~= "none_after") then
-			if (x1==x2) then
-				IDlist[x1] = nil
-			else
-				IDlist[x1] = tonumber(x2)-1
-			end
-			return x2
-		end
-	end
-	local retval = IDlist.none_after
-	IDlist.none_after = retval+1
-	return retval
-end
-
-function private.ReleaseID(IDlist, ID)
-	if (not ID) then return end
-
-	local setbefore = nil
-	local setafter = nil
-
-	for x1, x2 in pairs(IDlist) do
-		if (x2) then
-			x2 = tonumber(x2)
-			if (x1 == "none_after") then
-				if (x2-1==ID) then
-					setafter=x1
-				end
-			else
-				x1 = tonumber(x1)
-				if (x1+1==ID) then
-					setbefore = x1
-				elseif (x2-1==ID) then
-					setafter = x1
-				end
-			end
-		end
-	end
-	if (setafter and setafter == "none_after" and setbefore) then
-		IDlist["none_after"] = setbefore
-		IDlist[setbefore] = nil
-	elseif (setafter and setafter == "none_after") then
-		IDlist["none_after"] = ID
-	elseif (setafter and setbefore) then
-		IDlist[setbefore] = IDlist[setafter]
-		IDlist[setafter] = nil
-	elseif (setafter) then
-		IDlist[ID] = IDlist[setafter]
-		IDlist[setafter] = nil
-	elseif (setbefore) then
-		IDlist[setbefore] = ID
-	else
-		IDlist[ID] = ID
-	end
 end
 
 function private.IsInQuery(curQuery, data)
@@ -484,33 +443,35 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	local now = time()
 
 	local list, link, flag
-	local lut = {}
+	local lut = acquire()
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	local dirtyCount = 0
 	for pos, data in ipairs(scandata.image) do
-		if private.IsInQuery(private.curQuery, data) then
-			-- Mark dirty
-			flag = data[Const.FLAG] or 0
-			data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
-			dirtyCount = dirtyCount+1
+		link = data[Const.LINK]
 
-			-- Build lookup table
-			link = data[Const.LINK]
+		if link then
+			if private.IsInQuery(private.curQuery, data) then
+				-- Mark dirty
+				flag = data[Const.FLAG] or 0
+				data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
+				dirtyCount = dirtyCount+1
 
-			list = lut[link]
-			if (not list) then
-				lut[link] = pos
-			else
-				if (type(list) == "number") then
-					lut[link] = {}
-					table.insert(lut[link], list)
+				-- Build lookup table
+				list = lut[link]
+				if (not list) then
+					lut[link] = pos
+				else
+					if (type(list) == "number") then
+						lut[link] = acquire() 
+						table.insert(lut[link], list)
+					end
+					table.insert(lut[link], pos)
 				end
-				table.insert(lut[link], pos)
+			else
+				-- Mark NOT dirty
+				data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 			end
-		else
-			-- Mark NOT dirty
-			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		end
 	end
 
@@ -525,25 +486,28 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
 		if (itemPos) then
-			data[Const.ID] = scandata.image[itemPos][Const.ID]
-			if not private.IsIdentical(scandata.image[itemPos], data) then
-				processStats("update", data, scandata.image[itemPos])
-				updateCount = updateCount + 1
+			local oldItem = scandata.image[itemPos]
+			data[Const.ID] = oldItem[Const.ID]
+			data[Const.FLAG] = bit.band(oldItem[Const.FLAG], bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			if not private.IsIdentical(oldItem, data) then
+				if processStats("update", data, oldItem) then
+					updateCount = updateCount + 1
+				end
 			else
-				processStats("leave", data)
-				sameCount = sameCount + 1
+				if processStats("leave", data) then
+					sameCount = sameCount + 1
+				end
 			end
-			scandata.image[itemPos] = data
+			scandata.image[itemPos] = clone(data)
 		else
 			if (processStats("create", data)) then
 				data[Const.ID] = private.GetNextID(idList)
-				table.insert(scandata.image, data)
+				table.insert(scandata.image, clone(data))
 				newCount = newCount + 1
-			else
-				scanCount = scanCount - 1
 			end
 		end
 	end
+	recycle(lut)
 
 	local data, flag
 	for pos = #scandata.image, 1, -1 do
@@ -555,7 +519,9 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
 			end
-			if wasGetAll or (#private.curScan <= 50 and not wasIncomplete) then
+			if wasGetAll then
+				stillpossible = false
+			elseif #private.curScan <= 50 and not wasIncomplete then
 				stillpossible = false
 			end
 
@@ -584,9 +550,11 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	end
 	processStats("complete")
 
+	local filterCount = private.filteredCount
+
 	local currentCount = #scandata.image
-	if (updateCount + sameCount + newCount ~= scanCount) then
-		lib.Print(("Warning, discrepency in scan count: {{%d + %d + %d != %d}}"):format(updateCount, sameCount, newCount, scanCount))
+	if (updateCount + sameCount + newCount + filterCount ~= scanCount) then
+		lib.Print(("Warning, discrepency in scan count: {{%d updated + %d same + %d new + %d filtered != %d scanned}}"):format(updateCount, sameCount, newCount, filterCount, scanCount))
 	end
 
 	if (oldCount - earlyDeleteCount - expiredDeleteCount + newCount ~= currentCount) then
@@ -614,7 +582,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		lib.Print("  {{"..newCount.."}} new items")
 		lib.Print("  {{"..updateCount.."}} updated items")
 		lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
-		lib.Print("  {{"..private.filteredCount.."}} filtered items")
+		lib.Print("  {{"..filterCount.."}} filtered items")
 		lib.Print("  {{"..currentCount.."}} items in DB at end")
 		local scanTime = "  "
 		if (scanTimeHours and scanTimeHours ~= 0) then
@@ -630,15 +598,22 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		lib.Print(scanTime)
 	end
 
-	if (not scandata.scanstats) then scandata.scanstats = {} end
+	if (not scandata.scanstats) then scandata.scanstats = acquire() end
 	if (scandata.scanstats[1]) then
 		scandata.scanstats[2] = scandata.scanstats[1]
-		scandata.scanstats[1] = nil
+		recycle(scandata.scanstats, 1)
 	end
 	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
-	scandata.scanstats[0] = {oldCount = oldCount, sameCount = sameCount, newCount = newCount, updateCount = updateCount,
-		earlyDeleteCount = earlyDeleteCount, expiredDeleteCount = expiredDeleteCount, currentCount = currentCount, 
-		missedCount = missedCount, filteredCount = private.filteredCount}
+	scandata.scanstats[0] = acquire()
+	scandata.scanstats[0].oldCount = oldCount
+	scandata.scanstats[0].sameCount = sameCount
+	scandata.scanstats[0].newCount = newCount
+	scandata.scanstats[0].updateCount = updateCount
+	scandata.scanstats[0].earlyDeleteCount = earlyDeleteCount
+	scandata.scanstats[0].expiredDeleteCount = expiredDeleteCount
+	scandata.scanstats[0].currentCount = currentCount
+	scandata.scanstats[0].missedCount = missedCount
+	scandata.scanstats[0].filteredCount = filterCount
 	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
 	scandata.scanstats[0].startTime = private.scanStartTime
 	scandata.scanstats[0].endTime = now
@@ -650,11 +625,14 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
 
-	private.curQuery = nil
 	private.scanStartTime = nil
 	private.scanStarted = nil
 	private.totalPaused = nil
-	private.curScan = nil
+	private.curQuerySig = nil
+	recycle(private, "curQuery")
+	recycle(private, "curScan")
+	recycle(private, "curPages")
+
 	private.filteredCount = 0
 
 	-- Tell everyone that our stats are updated
@@ -728,16 +706,17 @@ function lib.StorePage()
 	private.sentQuery = false
 
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
-	local maxPages = floor(totalAuctions / 50);
+	local maxPages = ceil(totalAuctions / 50);
 	if (numBatchAuctions > 50) then
 		maxPages = 1
 	end
-	if not private.curScan then private.curScan = {} end
+	if not private.curScan then private.curScan = acquire() end
 
 	--Update the progress indicator
 	local now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
 	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
+	local pageNumber = private.curQuery.page+1
 
 	local curTime = time()
 
@@ -773,20 +752,30 @@ function lib.StorePage()
 			else highbidder = true end
 			if not owner then owner = "" end
 
-			local itemData = {
+			local itemData = acquire(
 				itemLink, itemLevel, itemType, itemSubType, invType, nextBid,
 				timeLeft, curTime, name, texture, count, quality, canUse, level,
 				minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner,
 				0, -1, itemId, itemSuffix, itemFactor, itemEnchant, itemSeed
-			}
+			)
+
+			local legacyScanning = private.legacyScanning
+			if legacyScanning == nil then
+				if Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning then
+					legacyScanning = Auctioneer.ScanManager.IsScanning
+				else
+					legacyScanning = function () return false end
+				end
+				private.legacyScanning = legacyScanning
+			end
 
 			-- We only store one of the same item/owner/price/quantity in the scan
 			-- unless we are doing a forward scan (in which case we can be sure they
 			-- are not duplicate entries.
 			if private.isScanning
-			or (Auctioneer and Auctioneer.ScanManager and Auctioneer.ScanManager.IsScanning)
 			or totalAuctions <= 50
 			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
+			or legacyScanning() -- Is AucClassic scanning?
 			or private.NoDupes(private.curScan, itemData) then
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
@@ -813,6 +802,22 @@ function lib.StorePage()
 		end
 	elseif (totalAuctions <= 50) then
 		lib.Commit(false)
+	elseif maxPages and maxPages > 0 then
+		if not private.curPages then
+			private.curPages = acquire()
+		end
+		private.curPages[pageNumber] = true
+		local incomplete = 0
+		for i = 1, maxPages do
+			if not private.curPages[i] then
+				incomplete = incomplete + 1
+			end
+		end
+
+		local pctIncomplete = incomplete/maxPages
+		if (pageNumber == maxPages and incomplete < 2 and pctIncomplete < 0.05) or incomplete == 0 then
+			lib.Commit(true)
+		end
 	end
 end
 
@@ -854,7 +859,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 	
 	local is_same = true
-	query = {}
+	query = acquire() 
 	name = name or ""
 	minLevel = tonumber(minLevel) or 0
 	maxLevel = tonumber(maxLevel) or 0
@@ -997,10 +1002,11 @@ function private.ResetAll()
 	private.scanStarted = nil
 	private.totalPaused = nil
 	private.curQuerySig = nil
-	private.curQuery = nil
-	private.curScan = nil
+	recycle(private, "curQuery")
+	recycle(private, "curScan")
 	private.curPage = 0
-	private.scanStack = {}
+	recycle(private, "curPages")
+	recycle(private, "scanStack")
 	private.isPaused = nil
 	private.sentQuery = nil
 	private.isScanning = false
