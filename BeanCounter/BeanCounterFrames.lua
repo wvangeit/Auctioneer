@@ -249,8 +249,12 @@ function private.CreateFrames()
 	frame.classicCheck:SetChecked(false)
 	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data")
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
-	if not BeanCounterAccountDB[private.realmName] then --no need to show this button if theres no classic data to search
-		frame.classicCheck:Hide()
+	frame.classicCheck:Hide()
+	--no need to show this button if theres no classic data to search
+	if BeanCounterAccountDB then
+		if BeanCounterAccountDB[private.realmName] then 
+			frame.classicCheck:Show()
+		end
 	end
 	
 	--search bids
