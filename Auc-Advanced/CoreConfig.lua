@@ -47,6 +47,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("  {{/auc resume||unpause||cont||continue}} - Recommence scanning of the auctionhouse")
 		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
 		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
+		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
@@ -65,6 +66,8 @@ function private.CommandHandler(command, subcommand, ...)
 		AucAdvanced.Scan.SetPaused(false)
 	elseif command == "abort" then
 		AucAdvanced.Scan.Abort()
+	elseif command == "clear" then
+		AucAdvanced.API.ClearItem(subcommand)
 	else
 		if command and subcommand then
 			subcommand = subcommand:lower()

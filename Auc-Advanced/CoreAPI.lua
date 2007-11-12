@@ -115,6 +115,14 @@ function lib.GetMarketValue(itemLink, serverKey)
 	end
 end
 
+function lib.ClearItem(itemLink, serverKey)
+	for engine, engineLib in pairs(AucAdvanced.Modules.Stat) do
+		if engineLib.ClearItem then
+			engineLib.ClearItem(itemLink, serverKey)
+		end
+	end
+end
+
 function lib.GetAlgorithms(itemLink)
 	local engines = acquire()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
