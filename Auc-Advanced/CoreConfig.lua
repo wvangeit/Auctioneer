@@ -67,6 +67,7 @@ function private.CommandHandler(command, subcommand, ...)
 	elseif command == "abort" then
 		AucAdvanced.Scan.Abort()
 	elseif command == "clear" then
+		subcommand = subcommand.." ".. ...
 		AucAdvanced.API.ClearItem(subcommand)
 	else
 		if command and subcommand then
