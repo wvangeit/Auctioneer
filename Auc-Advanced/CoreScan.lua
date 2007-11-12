@@ -552,7 +552,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			if (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
 			end
-			if wasGetAll then
+			if wasGetAll and #private.curScan <= 50 then
 				stillpossible = false
 			end
 
@@ -577,7 +577,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 				processStats("delete", data)
 				table.remove(scandata.image, pos)
 			end
-
 		end
 	end
 	processStats("complete")
