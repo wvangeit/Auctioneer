@@ -380,13 +380,47 @@ function private.CreateFrames()
 			end
 		end
 
-		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or frame.salebox.stacksize
+		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.stack")
+		if defStack == "max" then
+			defStack = frame.salebox.stacksize
+		elseif (not (tonumber(defStack))) then
+			defStack = frame.salebox.stacksize
+			AucAdvanced.Settings.SetSetting("util.appraiser.stack", "max")
+		end
+		defStack = tonumber(defStack)
+		if defStack > frame.salebox.stacksize then
+			defStack = frame.salebox.stacksize
+		end
+		local curStack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".stack") or defStack
 		frame.salebox.stack:SetValue(curStack)
 		frame.UpdateControls()
-		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or -1
+		
+		local defStack = AucAdvanced.Settings.GetSetting("util.appraiser.number")
+		if defStack == "maxplus" then
+			defStack = -1
+		elseif defStack == "maxfull" then
+			defStack = -2
+		elseif (not (tonumber(defStack))) then
+			defStack = -1
+			AucAdvanced.Settings.SetSetting("util.appraiser.number", "maxplus")
+		else
+			defStack = tonumber(defStack)
+		end
+		local curNumber = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".number") or defStack
 		frame.salebox.number:SetAdjustedValue(curNumber)
-		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match") or false
-		frame.salebox.matcher:SetChecked(curMatch)
+		
+		local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+		local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".match")
+		if curMatch == nil then
+			curMatch = defMatch
+		end
+		if curMatch == "on" then
+			frame.salebox.matcher:SetChecked(true)
+		elseif curMatch == "off" then
+			frame.salebox.matcher:SetChecked(false)
+		else
+			frame.salebox.matcher:SetChecked(curMatch)
+		end
 
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		frame.salebox.model.value = curModel
@@ -646,6 +680,11 @@ function private.CreateFrames()
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".stack", curStack)
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".number", curNumber)
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".duration", curDuration)
+		if curMatch then
+			curMatch = "on"
+		else
+			curMatch = "off"
+		end  --must be something other than true/false, as false == nil, so false would cause default to be used
 		AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".match", curMatch)
 
 		local curModel

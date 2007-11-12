@@ -251,6 +251,9 @@ AucAdvanced.Settings.SetDefault("util.appraiser.bid.markdown", 10)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.subtract", 0)
 AucAdvanced.Settings.SetDefault("util.appraiser.bid.deposit", false)
 AucAdvanced.Settings.SetDefault("util.appraiser.color", true)
+AucAdvanced.Settings.SetDefault("util.appraiser.match", "off")
+AucAdvanced.Settings.SetDefault("util.appraiser.stack", "max")
+AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
@@ -275,9 +278,18 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Subhead",    0,    "Alternate pricing model")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.altModel", "Alternate pricing model to use for appraisals")
 	gui:AddTip(id, "You may select a default and alternate pricing model for items that do no have a specific model set")
-	gui:AddControl(id, "Subhead",    0,    "Listing Time")
+	gui:AddControl(id, "Subhead",    0,    "Use Matching by Default")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.match", "Use Matching by Default")
+	gui:AddControl(id, "Subhead",    0,    "Default Listing Time")
 	gui:AddControl(id, "Selectbox",  0, 1, private.durations, "util.appraiser.duration", "Default listing duration")
 	gui:AddTip(id, "You may set a default auction listing duration for items that do not have a specific duration set")
+	gui:AddControl(id, "Subhead",    0,    "Default Stack Size")
+	gui:AddControl(id, "Text",       0, 1, "util.appraiser.stack")
+	gui:AddTip(id, [[Input number or "max" to set the default size for stacks]])
+	gui:AddControl(id, "Subhead",    0,    "Default Number of Stacks")
+	gui:AddControl(id, "Text",       0, 1, "util.appraiser.number")
+	gui:AddTip(id, [[Input number, "maxfull", or "maxplus" to set the default number of stacks.  "maxfull" sets to all full stacks, while "maxplus" sets to all stacks, including any incomplete stack]])
+	
 
 	gui:AddHelp(id, "what is model",
 		"What is the default pricing model used for?",
