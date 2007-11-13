@@ -68,10 +68,12 @@ function lib.AuctionFilter(operation, itemData)
 	local level = tonumber(itemData.itemLevel) or 0
 	--This needs to have the case conversions done because the data is stored in the SV the same way, and LUA is case-sensitive
 	local seller = itemData.sellerName:sub(1,1):upper()..itemData.sellerName:sub(2):lower()
+	local ignoreself = get("filter.basic.ignoreself")
 	local minquality = tonumber(get("filter.basic.min.quality")) or 1
 	local minlevel = tonumber(get("filter.basic.min.level")) or 0
 	if (quality < minquality) then retval = true end
 	if (level < minlevel) then retval = true end
+	if (ignoreself and seller == UnitName("player")) then retval = true end
 	if (IgnoreList[seller]) then retval = true end
 
 	if nLog and retval then
@@ -85,6 +87,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.basic.activated", true)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.quality", 1)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.level", 0)
+	AucAdvanced.Settings.SetDefault("filter.basic.ignoreself", false)
 	IgnoreList_Load()
 	private.DataLoaded()
 	BasicFilter_IgnoreListFrame:RegisterEvent("PLAYER_LOGOUT")
@@ -106,6 +109,10 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.activated", "Enable use of the Basic filter")
 	gui:AddTip(id, "Ticking this box will enable the Basic filter to perform filtering your auction scans")
+	
+	gui:AddControl(id, "Note",		0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",	0, 1, "filter.basic.ignoreself", "Ignore own auctions")
+	gui:AddTip(id, "Ticking this box will disable adding auctions that you posted yourself to the snapshot.")
 	
 	gui:AddControl(id, "Subhead",	0, "Filter by Quality")
 	gui:AddControl(id, "Slider",	0, 1, "filter.basic.min.quality", 0, 4, 1, "Minimum Quality: %d")
