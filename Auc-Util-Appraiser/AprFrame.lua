@@ -433,7 +433,7 @@ function private.CreateFrames()
 
 	function frame.UpdateControls()
 		if not frame.salebox.sig then
-			frame.salebox.icon:Hide()
+			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
 			frame.salebox.model:Hide()
@@ -449,7 +449,7 @@ function private.CreateFrames()
 			frame.go:Disable()
 			return
 		end
-		frame.salebox.icon:Show()
+		frame.salebox.icon:SetAlpha(1)
 		frame.salebox.matcher:Show()
 		frame.salebox.bid:Show()
 		frame.salebox.model:Show()
@@ -1211,7 +1211,7 @@ function private.CreateFrames()
 	frame.salebox.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.salebox.icon:SetScript("OnClick", frame.IconClicked)
 	frame.salebox.icon:SetScript("OnReceiveDrag", frame.IconClicked)
-
+	
 	frame.salebox.name = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.salebox.name:SetPoint("TOPLEFT", frame.salebox.slot, "TOPRIGHT", 5,-2)
 	frame.salebox.name:SetPoint("RIGHT", frame.salebox, "RIGHT", -15)
