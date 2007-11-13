@@ -57,7 +57,7 @@
 	EnhTooltip.AddLine(lineText, moneyAmount, embed)
 		Adds the lineText to the tooltip.
 		If moneyAmount is supplied, the line has a money amount right-aligned after it.
-		It embed evaluates to true, then the line is placed at the end of the game tooltip
+		If embed evaluates to true, then the line is placed at the end of the game tooltip
 		and the money amount is converted to a textual form.
 
 	EnhTooltip.AddSeparator()
@@ -196,7 +196,8 @@ local private = {
 	recycleBin = {},
 	eventTimer = 0,
 	hideTime = 0,
-	currentGametip = nil,
+	currentGametip = nil, -- tooltip frame, for which our enhanced tooltip frame
+	                      -- currently displays the information
 	currentItem = nil,
 	forcePopupKey = "alt",
 	oldChatItem = nil,
@@ -270,7 +271,7 @@ function public.GetglobalIterator(fmt, first, last)
 	end
 end
 
---Create a new fontstring
+-- Create a new fontstring
 function private.CreateNewFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentFontStringIndex = private.lastFontStringIndex
@@ -288,7 +289,7 @@ function private.CreateNewFontString(tooltip)
 	return newFontString
 end
 
---Create a new money object
+-- Create a new money object
 function private.CreateNewMoneyObject(tooltip)
 	private.lastMoneyObjectIndex = private.lastMoneyObjectIndex + 1
 
@@ -298,7 +299,7 @@ function private.CreateNewMoneyObject(tooltip)
 	return newMoneyObject
 end
 
---Create a new header fontstring
+-- Create a new header fontstring
 function private.CreateNewHeaderFontString(tooltip)
 	local tooltipName = tooltip:GetName()
 	local currentHeaderFontStringIndex = private.lastHeaderFontStringIndex
