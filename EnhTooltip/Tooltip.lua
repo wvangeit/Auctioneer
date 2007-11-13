@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	EnhTooltip - Additional function hooks to allow hooks into more tooltips
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -1258,7 +1258,7 @@ end
 -- Tooltip functions that we have hooked
 ------------------------
 
-function private.ChatHookSetItemRef(funcArgs, retVal, reference, link, button)
+function private.chatHookOnHyperlinkShow(funcArgs, retVal, reference, link, button)
 	private.DoHyperlink(reference, link, button)
 end
 
@@ -1629,7 +1629,7 @@ function private.TtInitialize()
 	----  Establish hooks to all the game tooltips.
 
 	-- Hook in alternative Chat/Hyperlinking code
-	Stubby.RegisterFunctionHook("SetItemRef", 200, private.ChatHookSetItemRef)
+	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", 200, private.chatHookOnHyperlinkShow)
 
 	-- Game tooltips
 	Stubby.RegisterFunctionHook("GameTooltip.SetLootItem", 200, private.GtHookSetLootItem)
