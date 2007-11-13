@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Scan Button
-## Interface: 20200
+## Interface: 20300
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)

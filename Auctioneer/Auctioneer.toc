@@ -1,7 +1,7 @@
 ## Title: Auctioneer
 ## Notes: Displays item info and analyzes auction data. Use "/auctioneer scan" at AH to collect auction data. [<%version%> (<%codename%>)] This AddOn is licenced under the GNU GPL, see GPL.txt for details.
 ##
-## Interface: 20200
+## Interface: 20300
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
 ## OptionalDeps: Informant, Khaos, ImprovedErrorFrame, !nLog

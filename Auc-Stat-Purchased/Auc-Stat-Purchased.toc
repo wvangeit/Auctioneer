@@ -1,7 +1,7 @@
 ## Title: Auc:Stat:Purchased Stats
 ## Notes: Purchased Items statistics extension for Auctioneer. Performs historical exponential moving averages at the 1, 3, 7 and 14 day intervals, using items last known price before expiration and buy-out price if auction ends early.
 ##
-## Interface: 20200
+## Interface: 20300
 ## LoadOnDemand: 0
 ## Disabled: 0
 ## Dependencies: Auc-Advanced
