@@ -32,25 +32,15 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "Outlier"
-local libType = "Filter"
-
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-
-private.print = AucAdvanced.Print
+local libType, libName = "Filter", "Outlier"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 local data
 
-function lib.GetName()
-	return libName
-end
-
 local reset = true
 local cache, model, minseen, levels
-local get = AucAdvanced.Settings.GetSetting
 
 function lib.Processor(callbackType, ...)
 	if callbackType == "config" then
@@ -162,7 +152,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
+	id = gui:AddTab(libName, libType.." Modules")
 
 	gui:AddHelp(id, "what outlier filter",
 		"What is this Outlier Filter?",

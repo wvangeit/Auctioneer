@@ -180,5 +180,70 @@ local LibRecycle = LibStub("LibRecycle")
 lib.Recycle = LibRecycle.Recycle
 lib.Acquire = LibRecycle.Acquire
 lib.Clone = LibRecycle.Clone
+lib.Scrub = LibRecycle.Scrub
 
+
+--[[
+Functions for establishing a new copy of the library.
+Recommended method:
+
+  local libType, libName = "myType", "myName"
+  local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+  if not lib then return end
+  local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+
+--]]
+
+--[[
+
+Usage:
+  local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+
+--]]
+local moduleKit = {}
+function lib.NewModule(libType, libName)
+	assert(lib.Modules[libType], "Invalid AucAdvanced libType specified: "..tostring(libType))
+
+	if not lib.Modules[libType][libName] then
+		local module = {}
+		local private = {}
+		module.libType = libType
+		module.libName = libName
+		module.Private = private
+		module.GetName = function() return libName end
+		for k,v in pairs(moduleKit) do
+			module[k] = v
+		end
+
+		lib.Modules[libType][libName] = module
+		return module, lib, private
+	end
+	p("Unable to create", libType, libName)
+end
+
+--[[
+
+Usage:
+  local libCopy = AucAdvanced.GetModule(libType, libName)
+
+--]]
+function lib.GetModule(libType, libName)
+	assert(lib.Modules[libType], "Invalid AucAdvanced libType specified: "..tostring(libType))
+	
+	if lib.Modules[libType][libName] then
+		return lib.Modules[libType][libName], lib, private
+	end
+end
+
+--[[
+
+Usage:
+  local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+
+-- ]]
+function lib.GetModuleLocals()
+	return lib.Print, lib.DecodeLink,
+	lib.Recycle, lib.Acquire, lib.Clone, lib.Scrub,
+	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault
+end
 

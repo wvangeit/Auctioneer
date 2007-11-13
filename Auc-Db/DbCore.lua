@@ -37,18 +37,12 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "AucDb"
-local libType = "Util"
+local libType, libName = "Util", "AucDB"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub = AucAdvanced.GetModuleLocals()
 
-AucDb = {}
-AucAdvanced.Modules[libType][libName] = AucDb
-local lib = AucDb
-local private = {}
-local print = AucAdvanced.Print
-
-function lib.GetName()
-	return libName
-end
+AucDB = lib
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then

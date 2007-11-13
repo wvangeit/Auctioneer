@@ -43,7 +43,7 @@ function private.GetPriceModels(itemLink)
 	table.insert(private.scanValueNames,{"market", "Market value"})
 	local algoList = AucAdvanced.API.GetAlgorithms(itemLink)
 	for pos, name in ipairs(algoList) do
-		if (name ~= lib.name) then
+		if (name ~= lib.libName) then
 			table.insert(private.scanValueNames,{name, "Stats: "..name})
 		end
 	end
@@ -257,7 +257,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(lib.name)
+	id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	gui:MakeScrollable(id)
 
 	gui:AddHelp(id, "what appraiser",
@@ -267,7 +267,7 @@ function private.SetupConfigGui(gui)
 		"When you first select the Appraiser window, it will display all your auctionable items on the left side of your window. When you select an item from the left, you will see the control window at the top and the current auctions list at the bottom.\n"..
 		"The control window allows you to specify the posting stack size, for posting stack-splitted auctions, and the number of stacks to post by sliding the two sliders left and right.")
 
-	gui:AddControl(id, "Header",     0,    lib.name.." options")
+	gui:AddControl(id, "Header",     0,    lib.libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.enable", "Show appraisal in the tooltips?")
 	gui:AddTip(id, "This option will cause the current appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", "Color Appraiser items by their PriceLevel data")

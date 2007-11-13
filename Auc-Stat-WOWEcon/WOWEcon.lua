@@ -29,17 +29,10 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "WOWEcon"
-local libType = "Stat"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
-
-function lib.GetName()
-	return libName
-end
+local libType, libName = "Stat", "WOWEcon"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 function lib.GetPrice(hyperlink, faction, realm)
 	if not (Wowecon and Wowecon.API) then return end

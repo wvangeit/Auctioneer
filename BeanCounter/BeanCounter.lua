@@ -189,7 +189,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	local id = gui:AddTab(libName)
+	id = gui:AddTab(libName, libType.." Modules")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")

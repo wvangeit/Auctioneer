@@ -30,19 +30,10 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "ScanButton"
-local libType = "Util"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
-lib.Private = private
-
--- Required:
-function lib.GetName()
-	return libName
-end
+local libType, libName = "Util", "ScanButton"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "scanprogress") then
@@ -160,7 +151,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
+	id = gui:AddTab(libName, libType.." Modules")
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanbutton.enabled", "Show scan buttons in the AuctionHouse")
 end

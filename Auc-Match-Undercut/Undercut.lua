@@ -31,30 +31,10 @@
 --]]
 
 
-local libName = "Undercut"
-local libType = "Match"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
-
---[[
-The following functions are part of the module's exposed methods:
-	GetName()         (required) Should return this module's full name
-	CommandHandler()  (optional) Slash command handler for this module
-	Processor()       (optional) Processes messages sent by Auctioneer
-	ScanProcessor()   (optional) Processes items from the scan manager
-*	GetPrice()        (required) Returns estimated price for item link
-*	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
-
-	(*) Only implemented in stats modules; util modules do not provide
-]]
-
-function lib.GetName()
-	return libName
-end
+local libType, libName = "Match", "Undercut"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
@@ -165,7 +145,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	local id = gui:AddTab(libName)
+	id = gui:AddTab(libName, libType.." Modules")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	

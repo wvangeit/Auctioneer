@@ -30,11 +30,13 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "ScanFinish"
-local libType = "Util"
+local libType, libName = "Util", "ScanFinish"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+
 local blnDebug = false
 local blnLibEmbedded = nil
-
 
 local blnScanStarted = false
 local blnScanStatsReceived = false
@@ -42,27 +44,6 @@ local blnScanLastPage = false
 local intScanMinThreshold = 300  --Safeguard to prevent Auditor Refresh button scans from executing our finish events. Use 300 or more to be safe
 local blnScanMinThresholdMet = false
 local strPrevSound = "AuctioneerClassic"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
---[[
-The following functions are part of the module's exposed methods:
-	GetName()         (required) Should return this module's full name
-	CommandHandler()  (optional) Slash command handler for this module
-	Processor()       (optional) Processes messages sent by Auctioneer
-	ScanProcessor()   (optional) Processes items from the scan manager
-*	GetPrice()        (required) Returns estimated price for item link
-*	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
-
-	(*) Only implemented in stats modules; util modules do not provide
---]]
-
-function lib.GetName()
-	return libName
-end
 
 function lib.Processor(callbackType, ...)
 	if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
@@ -282,8 +263,7 @@ end
 --Config UI functions
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
-
+	id = gui:AddTab(libName, libType.." Modules")
 
 	gui:AddHelp(id, "what is scanfinish",
 		"What is ScanFinish?",

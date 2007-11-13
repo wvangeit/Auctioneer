@@ -33,28 +33,22 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "AskPrice"
-local libType = "Util"
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules.Util[libName]
-local private = {
-	raidUsers = {},
-	raidRoster = {},
-	guildUsers = {},
-	guildRoster = {},
-	whisperList = {},
-	sentRequest = {},
-	requestQueue = {},
-	sentAskPriceAd = {},
-	timeToWaitForPrices = 2,
-	timeToWaitForResponse = 5,
-	playerName = UnitName("player"),
-}
-local print = AucAdvanced.Print
+local libType, libName = "Util", "AskPrice"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
-function lib.GetName()
-	return libName
-end
+private.raidUsers = {}
+private.raidRoster = {}
+private.guildUsers = {}
+private.guildRoster = {}
+private.whisperList = {}
+private.sentRequest = {}
+private.requestQueue = {}
+private.sentAskPriceAd = {}
+private.timeToWaitForPrices = 2
+private.timeToWaitForResponse = 5
+private.playerName = UnitName("player")
 
 function lib.Processor(callbackType, ...)
 	if (callbackType == "config") then
@@ -533,7 +527,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
+	id = gui:AddTab(libName, libType.." Modules")
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.activated", "Respond to queries for item market values sent via chat.")

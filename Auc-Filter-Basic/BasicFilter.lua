@@ -32,25 +32,15 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "Basic"
-local libType = "Filter"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
+local libType, libName = "Filter", "Basic"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 if not AucAdvancedFilterBasic then AucAdvancedFilterBasic = {} end
 if not AucAdvancedFilterBasic_IgnoreList then AucAdvancedFilterBasic_IgnoreList = {} end
 
-local private = {}
-private.print = AucAdvanced.Print
-
-local get = AucAdvanced.Settings.GetSetting
-
 local IgnoreList = {}
-
-function lib.GetName()
-	return libName
-end
 
 function lib.Processor(callbackType, ...)
 	if callbackType == "config" then
@@ -97,7 +87,7 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	local id, last
 
-	id = gui:AddTab(libName.." "..libType)
+	id = gui:AddTab(libName, libType.." Modules")
 	gui:AddHelp(id, "what basic filter",
 		"What is this Basic Filter?",
 		"This filter allows you to specify certain minimums for an item to be entered into the data stream, such as the Minimum Item level, and the Minimum Quality (Junk, Common, Uncommon, Rare, etc)\n"..

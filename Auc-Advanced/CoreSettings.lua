@@ -387,8 +387,10 @@ function lib.MakeGuiConfig()
 		"What is the post scan summary?",
 		"If you want to know the number on new, updated, or unchanged auctions gathered from a scan of the auction house.")
 
-		
-  	gui:AddCat("Modules")
+  	gui:AddCat("Stat Modules")
+  	gui:AddCat("Filter Modules")
+  	gui:AddCat("Match Modules")
+  	gui:AddCat("Util Modules")
 
 	-- Alert all modules that the config screen is being built, so that they
 	-- may place their own configuration should they desire it.

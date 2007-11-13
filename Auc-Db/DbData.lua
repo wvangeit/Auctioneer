@@ -1,5 +1,5 @@
 
-local lib = AucDb
+local lib = AucDB
 
 -- This activates the addon, without this, the addon lies dormant
 lib.Enabled = true

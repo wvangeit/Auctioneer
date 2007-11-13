@@ -32,34 +32,12 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 --]]
 
-local libName = "Simple"
-local libType = "Stat"
-
-AucAdvanced.Modules[libType][libName] = {}
-local lib = AucAdvanced.Modules[libType][libName]
-local private = {}
-local print = AucAdvanced.Print
-local acquire = AucAdvanced.Acquire
-local recycle = AucAdvanced.Recycle
+local libType, libName = "Stat", "Simple"
+local lib,parent,private = AucAdvanced.NewModule(libType, libName)
+if not lib then return end
+local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
 local data
-
---[[
-The following functions are part of the module's exposed methods:
-	GetName()         (required) Should return this module's full name
-	CommandHandler()  (optional) Slash command handler for this module
-	Processor()       (optional) Processes messages sent by Auctioneer
-	ScanProcessor()   (optional) Processes items from the scan manager
-*	GetPrice()        (required) Returns estimated price for item link
-*	GetPriceColumns() (optional) Returns the column names for GetPrice
-	OnLoad()          (optional) Receives load message for all modules
-
-	(*) Only implemented in stats modules; util modules do not provide
-]]
-
-function lib.GetName()
-	return libName
-end
 
 function lib.CommandHandler(command, ...)
 	local myFaction = AucAdvanced.GetFaction()
