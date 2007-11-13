@@ -58,9 +58,9 @@ function private.GetExtraPriceModels(itemLink)
 end
 
 private.durations = {
-	{ 120, "2 hours" },
-	{ 480, "8 hours" },
+	{ 720, "12 hours" },
 	{ 1440, "24 hours" },
+	{ 2880, "48 hours" },
 }
 
 --[[ The items are stored as:

@@ -234,8 +234,8 @@ function private.CreateFrames()
 			local tLeft = result[Const.TLEFT]
 			if (tLeft == 1) then tLeft = "30m"
 			elseif (tLeft == 2) then tLeft = "2h"
-			elseif (tLeft == 3) then tLeft = "8h"
-			elseif (tLeft == 4) then tLeft = "24h"
+			elseif (tLeft == 3) then tLeft = "12h"
+			elseif (tLeft == 4) then tLeft = "48h"
 			end
 			local count = result[Const.COUNT]
 			data[i] = acquire (
@@ -922,7 +922,7 @@ function private.CreateFrames()
 		assert(number ~= 0)
 		assert(itemBid and itemBid > 0)
 		assert(itemBuy and itemBuy == 0 or itemBuy >= itemBid)
-		assert(duration and duration == 120 or duration == 480 or duration == 1440)
+		assert(duration and duration == 720 or duration == 1440 or duration == 2880)
 		if not (total and total > 0) or (number > 0 and number * stack > total) then
 			UIErrorsFrame:AddMessage("You do not have enough items to do that")
 			print("You do not have enough items to do that")

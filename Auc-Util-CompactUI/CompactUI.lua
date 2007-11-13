@@ -526,8 +526,8 @@ function private.RetrievePage()
 			if not itemLevel then itemLevel = level end
 			if not itemMinLevel then itemMinLevel = level end
 			local timeLeft = GetAuctionItemTimeLeft("list", i)
-			if (timeLeft == 4) then timeLeftText = "24h"
-			elseif (timeLeft == 3) then timeLeftText = "8h"
+			if (timeLeft == 4) then timeLeftText = "48h"
+			elseif (timeLeft == 3) then timeLeftText = "12h"
 			elseif (timeLeft == 2) then timeLeftText = "2h"
 			else timeLeftText = "30m" end
 			if (not count or count < 1) then count = 1 end
