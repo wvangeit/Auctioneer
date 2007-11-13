@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	BottomScanner  -  An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -1073,6 +1073,9 @@ BtmScan.GetVendorPrice = function(itemID, count)
 		if (itemInfo and itemInfo.sell) then
 			vendorValue = tonumber(itemInfo.sell) or 0
 		end
+	end
+	if ((not vendorValue) and GetSellValue) then
+		vendorValue = GetSellValue(itemID)
 	end
 	if not vendorValue then return end
 	if (count and count > 1) then vendorValue = vendorValue * count end
