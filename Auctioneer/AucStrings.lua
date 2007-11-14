@@ -2554,7 +2554,7 @@ AuctioneerLocalizations = {
 		["MesgNotconverting"]	= "Auctioneer ne convertit pas votre base de données, mais ne fonctionnera pas tant que vous ne l'aurez pas fait.";
 
 		-- Section: Game Constants
-		["SubTypeBag"]	= "Sac";
+		["SubTypeBag"]	= "Conteneur";
 		["TimeLong"]	= "Longue";
 		["TimeMed"]	= "Moyenne";
 		["TimeShort"]	= "Courte";
