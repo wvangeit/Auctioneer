@@ -399,7 +399,7 @@ function lib.GetDepositAmount(sig, count)
 		local itemId = strsplit(":", sig)
 		local sell = GetSellValue(itemId)
 		if (sell) then
-			deposit = math.floor(sell * rate * count)
+			deposit = math.floor(sell * rate * 3 * count)
 		end
 	end
 
@@ -424,10 +424,10 @@ function lib.GetDepositAmount(sig, count)
 	local match = matches[1]
 	local bag, slot, count = unpack(match)
 
-	-- Drop it in the auction slot, so we can get the per item / 2 hour deposit rate
+	-- Drop it in the auction slot, so we can get the per item / 12 hour deposit rate
 	PickupContainerItem(bag, slot)
 	ClickAuctionSellItemButton()
-	deposit = CalculateAuctionDeposit(120)
+	deposit = CalculateAuctionDeposit(720)
 	deposit = deposit / count
 	-- Take it back out of the auction slot again
 	ClickAuctionSellItemButton()

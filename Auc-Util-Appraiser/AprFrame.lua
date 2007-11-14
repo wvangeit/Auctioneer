@@ -341,11 +341,11 @@ function private.CreateFrames()
 					if not rate then rate = AucAdvanced.depositRate or 0.05 end
 				else deposit = 0 end
 
-				-- Scale up for duration > 2 hours
+				-- Scale up for duration > 12 hours
 				if deposit > 0 then
 					local curDurationIdx = frame.salebox.duration:GetValue()
 					local duration = private.durations[curDurationIdx][1]
-					deposit = deposit * duration/120
+					deposit = deposit * duration/720
 				end
 
 				markdown = newBuy * markdown
@@ -528,7 +528,7 @@ function private.CreateFrames()
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
 
-		local depositMult = curDurationMins / 120
+		local depositMult = curDurationMins / 720
 		local curNumber = frame.salebox.number:GetAdjustedValue()
 		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
 			curNumber = frame.salebox.numberentry:GetNumber()

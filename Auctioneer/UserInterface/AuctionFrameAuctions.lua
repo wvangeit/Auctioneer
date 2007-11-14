@@ -74,12 +74,12 @@ function load()
 		AuctionInfo:SetPoint("TOPLEFT", "AuctionsDepositText", "TOPLEFT", -4, -33);
 	end
 
-	AuctionsShortAuctionButtonText:SetText("2");
+	AuctionsShortAuctionButtonText:SetText("12");
 	AuctionsMediumAuctionButton:SetPoint("TOPLEFT", "AuctionsDurationText", "BOTTOMLEFT", 3, 1);
-	AuctionsMediumAuctionButtonText:SetText("8");
+	AuctionsMediumAuctionButtonText:SetText("24");
 	AuctionsMediumAuctionButton:ClearAllPoints();
 	AuctionsMediumAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsShortAuctionButton", "BOTTOMRIGHT", 20,0);
-	AuctionsLongAuctionButtonText:SetText("24 "..HOURS);
+	AuctionsLongAuctionButtonText:SetText("48 "..HOURS);
 	AuctionsLongAuctionButton:ClearAllPoints();
 	AuctionsLongAuctionButton:SetPoint("BOTTOMLEFT", "AuctionsMediumAuctionButton", "BOTTOMRIGHT", 20,0);
 

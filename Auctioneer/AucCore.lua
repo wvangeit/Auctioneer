@@ -58,7 +58,7 @@ local timeLeft = {
 		[1] = 1800,		-- If it disappears within 30 mins of last seing it, it was BO'd
 		[2] = 7200,		-- Ditto but for 2 hours.
 		[3] = 28800,	-- 8 hours.
-		[4] = 86400,	-- 24 hours.
+		[4] = 172800,	-- 24 hours.
 	}
 }
 

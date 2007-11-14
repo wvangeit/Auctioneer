@@ -651,11 +651,11 @@ end
 function AuctionFramePost_GetDuration(frame)
 	local frameName = frame:GetName()
 	if (getglobal(frameName.."ShortAuctionRadio"):GetChecked()) then
-		return 120;
+		return 720;
 	elseif(getglobal(frameName.."MediumAuctionRadio"):GetChecked()) then
-		return 480;
-	else
 		return 1440;
+	else
+		return 2880;
 	end
 end
 
@@ -669,11 +669,11 @@ function AuctionFramePost_SetDuration(frame, duration)
 	local longRadio = getglobal(frameName.."LongAuctionRadio");
 
 	-- Figure out radio to set as checked.
-	if (duration == 120) then
+	if (duration == 720) then
 		shortRadio:SetChecked(1);
 		mediumRadio:SetChecked(nil);
 		longRadio:SetChecked(nil);
-	elseif (duration == 480) then
+	elseif (duration == 1440) then
 		shortRadio:SetChecked(nil);
 		mediumRadio:SetChecked(1);
 		longRadio:SetChecked(nil);
@@ -730,14 +730,14 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		-- Set the defaults.
 		local duration = Auctioneer.Command.GetFilterVal('auction-duration')
 		if duration == 1 then
-			-- 2h
-			frame:SetDuration(120)
+			-- 12h
+			frame:SetDuration(720)
 		elseif duration == 2 then
-			-- 8h
-			frame:SetDuration(480)
-		elseif duration == 3 then
 			-- 24h
 			frame:SetDuration(1440)
+		elseif duration == 3 then
+			-- 48h
+			frame:SetDuration(2880)
 		else
 			-- last
 			frame:SetDuration(Auctioneer.Command.GetFilterVal('last-auction-duration'))
@@ -911,14 +911,14 @@ end
 function AuctionFramePost_DurationRadioButton_OnClick(button, index)
 	local frame = button:GetParent();
 	if (index == 1) then
-		Auctioneer.Command.SetFilter('last-auction-duration', 120)
-		return frame:SetDuration(120);
+		Auctioneer.Command.SetFilter('last-auction-duration', 720)
+		return frame:SetDuration(720);
 	elseif (index == 2) then
-		Auctioneer.Command.SetFilter('last-auction-duration', 480)
-		return frame:SetDuration(480);
-	else
 		Auctioneer.Command.SetFilter('last-auction-duration', 1440)
 		return frame:SetDuration(1440);
+	else
+		Auctioneer.Command.SetFilter('last-auction-duration', 2880)
+		return frame:SetDuration(2880);
 	end
 end
 
@@ -1124,8 +1124,8 @@ end
 function AuctionFramePost_CalculateAuctionDeposit(itemId, count, duration)
 	local price = Auctioneer.API.GetVendorSellPrice(itemId);
 	if (price) then
-		local base = math.floor(count * price * GetAuctionHouseDepositRate() / 100);
-		return base * duration / 120;
+		local base = math.floor(3 * count * price * GetAuctionHouseDepositRate() / 100);
+		return base * duration / 720;
 	end
 end
 

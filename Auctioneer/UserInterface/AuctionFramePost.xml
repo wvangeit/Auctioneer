@@ -441,7 +441,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>getglobal(self:GetName().."Text"):SetText("2");</OnLoad>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("12");</OnLoad>
 					<OnClick>AuctionFramePost_DurationRadioButton_OnClick(self, self:GetID())</OnClick>
 				</Scripts>
 			</CheckButton>
@@ -449,12 +449,12 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentShortAuctionRadio" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="16" y="0"/>
+							<AbsDimension x="20" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>getglobal(self:GetName().."Text"):SetText("8");</OnLoad>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("24");</OnLoad>
 					<OnClick>AuctionFramePost_DurationRadioButton_OnClick(self, self:GetID())</OnClick>
 				</Scripts>
 			</CheckButton>
@@ -462,12 +462,12 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentMediumAuctionRadio" relativePoint="RIGHT">
 						<Offset>
-							<AbsDimension x="16" y="0"/>
+							<AbsDimension x="20" y="0"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>getglobal(self:GetName().."Text"):SetText("24");</OnLoad>
+					<OnLoad>getglobal(self:GetName().."Text"):SetText("48");</OnLoad>
 					<OnClick>AuctionFramePost_DurationRadioButton_OnClick(self, self:GetID())</OnClick>
 				</Scripts>
 			</CheckButton>

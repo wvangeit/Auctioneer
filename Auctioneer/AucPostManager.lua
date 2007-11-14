@@ -562,11 +562,11 @@ end
 -------------------------------------------------------------------------------
 function getTimeLeftFromDuration(duration)
 	if (duration) then
-		if (duration == 2*60) then
+		if (duration == 12*60) then
 			return 2;
-		elseif (duration == 8*60) then
-			return 3;
 		elseif (duration == 24*60) then
+			return 3;
+		elseif (duration == 48*60) then
 			return 4;
 		end
 	end

@@ -122,10 +122,10 @@ function lib:valuate(item, tooltip)
 			end
 			if (not deposit) then deposit = 0 end
 
-			-- Scale up for duration > 2 hours
+			-- Scale up for duration > 12 hours
 			-- Assume 24 hours since we can't get this info
 			if deposit > 0 then
-				deposit = deposit * 12
+				deposit = deposit * 2
 			end
 
 			markdown = newBuy * markdown

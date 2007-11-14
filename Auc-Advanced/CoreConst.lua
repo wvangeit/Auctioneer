@@ -37,13 +37,13 @@ AucAdvanced.Const = {
 		0,
 		1800, -- 30 mins
 		7200, -- 2 hours
-		28800, -- 4 hours
+		43200, -- 12 hours
 	},
 	AucMaxTimes = {
 		1800,  -- 30 mins
 		7200,  -- 2 hours
-		28800, -- 8 hours
-		86400 -- 24 hours
+		28800, -- 12 hours
+		172800 -- 48 hours
 	},
 	InvTypes = {
 		INVTYPE_HEAD = 1,

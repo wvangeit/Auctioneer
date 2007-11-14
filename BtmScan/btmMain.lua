@@ -1062,8 +1062,8 @@ BtmScan.GetDepositCost = function (itemID, count, rate)
 	if (not rate) then rate = BtmScan.depositRate end
 	local vendorValue = BtmScan.GetVendorPrice(itemID, count)
 	if (not vendorValue) then return 0 end
-	local baseDeposit = math.floor(vendorValue * rate) -- 2 hr auction
-	return baseDeposit * 12 -- 24 hour auction
+	local baseDeposit = math.floor(vendorValue * rate * 3) -- 12 hr auction
+	return baseDeposit * 2 -- 24 hour auction
 end
 
 BtmScan.GetVendorPrice = function(itemID, count)
