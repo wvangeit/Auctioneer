@@ -1,5 +1,5 @@
 ## Title: Auc:Util:Search UI
-## Interface: 20200
+## Interface: 20300
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
