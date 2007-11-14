@@ -678,6 +678,7 @@ function lib.ScanPage(nextPage, really)
 			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
 			private.curQuery.isUsable, private.curQuery.quality)
 		AuctionFrameBrowse.page = nextPage
+		private.scanDelay = GetTime() + 5
 	end
 	private.curPage = nextPage
 end
@@ -944,8 +945,15 @@ function private.OnUpdate(me, dur)
 		end
 		return
 	end
+	local now = GetTime()
+	if private.scanDelay then
+		if now < private.scanDelay then
+			return
+		end
+		private.scanDelay = nil
+	end
 	if private.scanNext then
-		if GetTime() > private.scanNext and CanSendAuctionQuery() then
+		if now > private.scanNext and CanSendAuctionQuery() then
 			local nextPage = private.scanNextPage
 			private.scanNext = nil
 			lib.ScanPage(nextPage, true)
