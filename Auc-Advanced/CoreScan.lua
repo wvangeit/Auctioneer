@@ -478,7 +478,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	local itemPos
 	local oldCount = #scandata.image
 	local scanCount = #private.curScan
-	local updateCount, sameCount, newCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0
+	local updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0
 
 	processStats("begin")
 	for _, data in ipairs(private.curScan) do
@@ -493,9 +493,15 @@ function lib.Commit(wasIncomplete, wasGetAll)
 				if processStats("update", data, oldItem) then
 					updateCount = updateCount + 1
 				end
+				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					updateRecoveredCount = updateRecoveredCount + 1
+				end
 			else
 				if processStats("leave", data) then
 					sameCount = sameCount + 1
+				end
+				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					sameRecoveredCount = sameRecoveredCount + 1
 				end
 			end
 			scandata.image[itemPos] = clone(data)
@@ -578,11 +584,21 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			lib.Print("Auctioneer Advanced finished scanning {{"..scanCount.."}} auctions:")
 		end
 		lib.Print("  {{"..oldCount.."}} items in DB at start ({{"..dirtyCount.."}} matched query)")
-		lib.Print("  {{"..sameCount.."}} unchanged items")
+		if (sameRecoveredCount > 0) then
+			lib.Print("  {{"..sameCount.."}} unchanged items (of which, "..sameRecoveredCount.." were missed last scan)")
+		else
+			lib.Print("  {{"..sameCount.."}} unchanged items")
+		end
 		lib.Print("  {{"..newCount.."}} new items")
-		lib.Print("  {{"..updateCount.."}} updated items")
-		lib.Print("  {{"..(earlyDeleteCount+expiredDeleteCount).."}} removed items")
+		if (updateRecoveredCount > 0) then
+			lib.Print("  {{"..updateCount.."}} updated items (of which, "..updateRecoveredCount.." were missed last scan)")
+		else
+			lib.Print("  {{"..updateCount.."}} updated items")
+		end
+		lib.Print("  {{"..earlyDeleteCount.."}} items removed due to buyout or cancellation")
+		lib.Print("  {{"..expiredDeleteCount.."}} items removed due to expiration")
 		lib.Print("  {{"..filterCount.."}} filtered items")
+		lib.Print("  {{"..missedCount.."}} missed items")
 		lib.Print("  {{"..currentCount.."}} items in DB at end")
 		local scanTime = "  "
 		if (scanTimeHours and scanTimeHours ~= 0) then
