@@ -37,7 +37,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 			</OnLoad>
 			<OnEvent>
 				if (event == "ADDON_LOADED" and select(1, ...):lower() == "auctioneer") then
-					Auctioneer.Util.DebugPrint("Auctioneer ADDDON_LOADED Fired!", "Auctioneer - XML", DebugLib.Level.Info)
+					Auctioneer.Util.DebugPrint("Auctioneer ADDDON_LOADED Fired!", "Auctioneer - XML", Auctioneer.Util.DebugLib.Level.Info)
 					Auctioneer.Core.AddOnLoaded()
 					self:UnregisterEvent("ADDON_LOADED")
 				end
@@ -50,4 +50,5 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Scripts>
 	</Frame>
 </Ui>
+
 

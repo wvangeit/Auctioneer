@@ -55,6 +55,8 @@ local bidCallback
 local initializeSavedSearchDropDown
 local debugPrint;
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Being called in AucUI.Load, once Auctioneer and its saved variables has been
 -- loaded.
@@ -1707,5 +1709,6 @@ if (Auctioneer.UI.SearchTab) then return end;
 Auctioneer.UI.SearchTab = {
 	Load = load
 };
+
 
 

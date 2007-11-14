@@ -69,6 +69,8 @@ local getSuggestedResale;
 local clearCache;
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Constants
 -------------------------------------------------------------------------------

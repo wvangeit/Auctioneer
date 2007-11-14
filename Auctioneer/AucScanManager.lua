@@ -56,6 +56,7 @@ local sendQuery;
 local setUpdated;
 local updateScanProgressUI;
 
+local DebugLib = Auctioneer.Util.DebugLib
 -------------------------------------------------------------------------------
 -- Enumerations
 -------------------------------------------------------------------------------

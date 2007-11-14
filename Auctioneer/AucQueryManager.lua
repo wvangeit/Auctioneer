@@ -69,6 +69,8 @@ local reconcileAuctionLists;
 local removeRequestFromQueue;
 local sendQuery;
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Public Data
 -------------------------------------------------------------------------------

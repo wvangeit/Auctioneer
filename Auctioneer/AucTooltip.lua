@@ -35,6 +35,8 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 local debugPrint
 local hookTooltip
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 function hookTooltip(funcVars, retVal, frame, name, link, quality, count)
 	debugPrint("Displaying "..name, DebugLib.Level.Info)
 	if (not link) then

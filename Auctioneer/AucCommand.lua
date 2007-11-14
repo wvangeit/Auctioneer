@@ -72,6 +72,8 @@ local debugPrint
 local fixLocaleDefault
 local onBabylonianSetOrder
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 function register()
 	if (Khaos) then
 		if (not Auctioneer_Khaos_Registered) then

@@ -57,6 +57,8 @@ local scanEnded;
 local scanStarted;
 local sendQuery;
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
@@ -517,4 +519,5 @@ Auctioneer.BidScanner =
 	IsScanning = isScanning,
 	IsAuctionInProgress = isAuctionInProgress
 }
+
 

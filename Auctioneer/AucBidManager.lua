@@ -53,6 +53,8 @@ local isPendingBidForAuction;
 local debugPrint
 local onAHClosed
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
@@ -415,4 +417,5 @@ Auctioneer.BidManager = {
 	GetBidAmmount = getBidAmmount;
 	AddPendingBid = addPendingBid;
 }
+
 

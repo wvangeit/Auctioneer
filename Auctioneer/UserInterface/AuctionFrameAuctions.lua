@@ -43,6 +43,8 @@ local getCurrentAuctionItemKeyAndCount;
 local debugPrint;
 local updateFixedPrice
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 local ignoreAuctionDurationChange = false;

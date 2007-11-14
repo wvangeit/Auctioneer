@@ -74,6 +74,8 @@ local breakItemKey;
 
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
@@ -588,4 +590,5 @@ Auctioneer.HistoryDB = {
 -------------------------------------------------------------------------------
 AuctioneerHistoryDB = createDatabase();
 LoadedHistoryDB = AuctioneerHistoryDB;
+
 

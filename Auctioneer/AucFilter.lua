@@ -50,6 +50,8 @@ local doPercentLess;
 
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Determines if this auction in the snapshot has expired.
 -------------------------------------------------------------------------------

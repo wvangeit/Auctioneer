@@ -36,6 +36,8 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 local addOnLoaded;
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------

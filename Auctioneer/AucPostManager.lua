@@ -77,6 +77,8 @@ local addPendingAuction;
 local removePendingAuction;
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -------------------------------------------------------------------------------
 function load()

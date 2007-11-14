@@ -92,6 +92,8 @@ local unpackUpdate;
 
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------

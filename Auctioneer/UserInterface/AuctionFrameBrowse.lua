@@ -40,6 +40,7 @@ local nextButtonHook, prevButtonHook;
 local queryForItemByName;
 local debugPrint;
 
+local DebugLib = Auctioneer.Util.DebugLib
 
 local function nextButton(...)
 	if (IsModifierKeyDown()) then

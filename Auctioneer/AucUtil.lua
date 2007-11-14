@@ -35,6 +35,8 @@ Auctioneer_RegisterRevision("$URL$", "$Rev$")
 
 local addonName = "Auctioneer"
 
+local DebugLib = LibStub("DebugLib")
+
 -- Local function prototypes
 local aucAssert
 local aucDebugPrint
@@ -785,5 +787,6 @@ Auctioneer.Util = {
 	LocalizeCommand = localizeCommand,
 	FindEmptySlot = findEmptySlot,
 	DebugPrint = aucDebugPrint,
-	Assert = aucAssert
+	Assert = aucAssert,
+	DebugLib = DebugLib
 }

@@ -51,6 +51,8 @@ local dropDownMenuInitialize;
 local dropDownMenuSetSelectedID;
 local debugPrint;
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data members
 -------------------------------------------------------------------------------

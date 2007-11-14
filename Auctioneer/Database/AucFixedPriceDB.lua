@@ -55,6 +55,8 @@ local removeFixedPrice;
 
 local debugPrint
 
+local DebugLib = Auctioneer.Util.DebugLib
+
 -------------------------------------------------------------------------------
 -- Data Members
 -------------------------------------------------------------------------------
@@ -330,6 +332,7 @@ Auctioneer.FixedPriceDB = {
 -------------------------------------------------------------------------------
 AuctioneerFixedPriceDB = createDatabase();
 LoadedFixedPriceDB = AuctioneerFixedPriceDB;
+
 
 
 
