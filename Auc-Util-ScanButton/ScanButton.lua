@@ -176,7 +176,7 @@ function private.play()
 	if AucAdvanced.Scan.IsPaused() then
 		AucAdvanced.Scan.SetPaused(false)
 	elseif not AucAdvanced.Scan.IsScanning() then
-		AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil, true)
+		AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
 	end
 	private.UpdateScanProgress()
 end
