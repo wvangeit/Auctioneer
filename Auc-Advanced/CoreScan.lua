@@ -694,9 +694,41 @@ function lib.ScanPage(nextPage, really)
 			private.curQuery.invType, private.curQuery.classIndex, private.curQuery.subclassIndex, nextPage,
 			private.curQuery.isUsable, private.curQuery.quality)
 		AuctionFrameBrowse.page = nextPage
-		private.scanDelay = GetTime() + 5
+
+		-- The maximum time we'll wait for the pagedata to be returned to us:
+		local now = GetTime()
+		private.scanDelay = now + 8 -- Only wait for up to ?? seconds
+		private.nextCheck = now + 1 -- Check complete in ?? seconds
+		private.verifyStart = nil
 	end
 	private.curPage = nextPage
+end
+
+function private.HasAllData()
+	local check = private.nextCheck
+	local start = private.verifyStart or 1
+	if not check then return true end
+	local now = GetTime()
+	if now > check then -- Wait at least 1 second before checking
+		-- Check to see if we have all the page data
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
+		if start > numBatchAuctions then
+			-- Already verified 100%
+			return true
+		end
+		for i = start, numBatchAuctions do
+			local _,_,_,_,_,_,_,_,_,_,_,owner = GetAuctionItemInfo("list", i)
+			if not owner then
+				-- We'll start from here again next cycle since we're waiting
+				private.verifyStart = i
+				private.nextCheck = now + 0.25
+				return false
+			end
+		end
+		private.verifyStart = numBatchAuctions + 1
+		return true
+	end
+	return false
 end
 
 function private.NoDupes(pageData, compare)
@@ -963,8 +995,13 @@ function private.OnUpdate(me, dur)
 	end
 	local now = GetTime()
 	if private.scanDelay then
+		-- If we are within the delay interval
 		if now < private.scanDelay then
-			return
+			-- Check to see if all the auctions have fully populated
+			if not private.HasAllData() then
+				-- If not, we still have time to wait
+				return
+			end
 		end
 		private.scanDelay = nil
 	end
