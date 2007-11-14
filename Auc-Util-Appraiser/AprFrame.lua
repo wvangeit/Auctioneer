@@ -166,7 +166,10 @@ function private.CreateFrames()
 		local id = obj.id
 		pos = math.min(pos + id, #frame.list)
 		local item = frame.list[pos]
-		local sig = item[1] or nil
+		local sig = nil
+		if item then
+			sig = item[1] or nil
+		end
 		if button and sig == frame.selected then
 			sig = nil
 			pos = nil
