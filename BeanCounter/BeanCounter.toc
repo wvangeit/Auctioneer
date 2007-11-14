@@ -1,6 +1,6 @@
 ## Title: BeanCounter
 ## Interface: 20300
-## Dependancies: Configator, Stubby
+## Dependancies: Stubby
 ## OptionalDeps: !nLog, Babylonian, DebugLib, SlideBar, Auc-Advanced
 ## SavedVariables: BeanCounterDB, BeanCounterAccountDB
 ##
@@ -8,5 +8,7 @@
 ## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
+
+libs\Load.xml
 Embed.xml
 
