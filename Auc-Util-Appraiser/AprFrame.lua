@@ -375,7 +375,7 @@ function private.CreateFrames()
 		frame.UpdateControls()
 
 		local curDuration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".duration") or
-			AucAdvanced.Settings.GetSetting('util.appraiser.duration') or 1440
+			AucAdvanced.Settings.GetSetting('util.appraiser.duration') or 2880
 		for i=1, #private.durations do
 			if (curDuration == private.durations[i][1]) then
 				frame.salebox.duration:SetValue(i)
