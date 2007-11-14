@@ -115,14 +115,11 @@ local settingDefaults = {
 	['playSound'] = true,
 	['EnableTopScan'] = false,
 	['override.nobid'] = false,
+	['show.tooltip'] = true,
 }
 
 function getDefault(setting)
 	local a,b,c = strsplit(".", setting)
-
-	-- basic settings
-	if (a == "show") then return true end
-	if (b == "enable") then return true end
 
 	-- custom settings
 	if (b == "list") then
