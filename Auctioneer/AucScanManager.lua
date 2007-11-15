@@ -267,6 +267,7 @@ end
 --    false, if the scan could not be requested, due to another scan currently
 --           in progress
 -------------------------------------------------------------------------------
+function scan()
 	if not AucFrameBrowse then return false end
 
 	-- Get the list of categories checked (by index).
