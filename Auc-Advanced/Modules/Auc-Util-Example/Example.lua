@@ -100,7 +100,7 @@ end
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.example.active", "This is a checkbox, it has two settings true (selected) and false (cleared)")
