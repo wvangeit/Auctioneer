@@ -67,6 +67,7 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+	if not AucAdvanced.Settings.GetSetting("util.appraiser.enable") then return end
 	if not AucAdvanced.Settings.GetSetting("util.appraiser.model") then return end
 
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(hyperlink)
