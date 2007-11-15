@@ -150,9 +150,9 @@ function lib:valuate(item, tooltip)
 	if (value < item.purchase) then return end
 
 	-- Check to see what the most we can pay for this item is.
-	if (item.canbuy and item.buy < value) then
+	if (item.canbuy and get(lcName..".allow.buy") and item.buy < value) then
 		price = item.buy
-	elseif (item.canbid and item.bid < value) then
+	elseif (item.canbid and get(lcName..".allow.bid") and item.bid < value) then
 		price = item.bid
 	end
 
@@ -185,11 +185,16 @@ define(lcName..'.level.min', 0)
 define(lcName..'.level.max', 375)
 define(lcName..'.adjust.brokerage', true)
 define(lcName..'.adjust.basis', "faction")
+define(lcName..'.allow.bid', true)
+define(lcName..'.allow.buy', true)
 
 function lib:setup(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
+	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
+	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
+
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".level.custom", "Use custom levels")

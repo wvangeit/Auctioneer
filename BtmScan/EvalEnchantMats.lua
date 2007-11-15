@@ -259,9 +259,9 @@ function lib:valuate(item, tooltip)
 	local price = 0;
 
 	-- Check to see what the most we can pay for this item is.
-	if (item.canbuy and item.buy < value) then
+	if (item.canbuy and get(lcName..".allow.buy") and item.buy < value) then
 		price = item.buy
-	elseif (item.canbid and item.bid < value) then
+	elseif (item.canbid and get(lcName..".allow.bid") and item.bid < value) then
 		price = item.bid
 	end
 
@@ -288,6 +288,8 @@ define(lcName..'.enable', false)
 define(lcName..'.level.custom', false)
 define(lcName..'.level.min', 0)
 define(lcName..'.level.max', 375)
+define(lcName..'.allow.bid', true)
+define(lcName..'.allow.buy', true)
 
 --Slider variables
 define(lcName..'.PriceAdjust.'..GPLANAR, 100)
@@ -329,6 +331,9 @@ function lib:setup(gui)
 	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
+	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
+	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
+
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".level.custom", "Use custom enchanting skill levels")
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.min", 0, 375, 25, "Minimum skill: %s")
 	gui:AddControl(id, "Slider",           0, 2, lcName..".level.max", 25, 375, 25, "Maximum skill: %s")

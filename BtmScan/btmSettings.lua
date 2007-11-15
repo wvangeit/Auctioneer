@@ -110,8 +110,8 @@ local settingDefaults = {
 	['scan.reload.interval'] = 30,
 	['global.reserve'] = 20000,
 	['global.maxprice'] = 25000,
-	['never.buy'] = false,
-	['never.bid'] = false,
+	['allow.buy'] = true,
+	['allow.bid'] = true,
 	['playSound'] = true,
 	['EnableTopScan'] = false,
 	['override.nobid'] = false,
@@ -141,6 +141,13 @@ function lib.GetDefault(setting)
 end
 
 function lib.SetDefault(setting, default)
+	local a,b,c = strsplit(".", setting)
+	if (b == "allow") then 
+		if lib.GetSetting(a..".never."..c) then 
+			default = false 
+			lib.SetSetting(a..".never."..c, false)
+		end
+	end
 	settingDefaults[setting] = default
 end
 
@@ -347,15 +354,15 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",         0, 1, "scan.reload.enable", "Enable automatic last page reload (bottom scan):")
 	gui:AddControl(id, "WideSlider",       0, 1, "scan.reload.interval", 6, 60, 1, "Reload interval: %s seconds")
 	gui:AddControl(id, "Checkbox",         0, 1, "EnableTopScan", "Top scan as well as bottom scan")
-	gui:AddControl(id, "Checkbox",         0, 1, "override.nobid", "Override 'Never bid on items' when topscanning")
+	gui:AddControl(id, "Checkbox",         0, 1, "override.nobid", "Override 'Allow bid on items' when topscanning")
 	gui:AddControl(id, "Subhead",          0,    "Display Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, "show.tooltip", "Display evaluations in tooltip")
 	gui:AddControl(id, "Subhead",          0,    "Purchase Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.reserve", 1, 99999999, "Reserve Amount")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, "global.maxprice", 1, 99999999, "Maximum Price")
 	gui:AddControl(id, "Subhead",          0,    "Buy/Bid Preferences")
-	gui:AddControl(id, "Checkbox",         0, 1, "never.buy", "Never buyout items")
-	gui:AddControl(id, "Checkbox",         0, 1, "never.bid", "Never bid on items")
+	gui:AddControl(id, "Checkbox",         0, 1, "allow.buy", "Allow buyout on items")
+	gui:AddControl(id, "Checkbox",         0, 1, "allow.bid", "Allow bid on items")
 	gui:AddControl(id, "Checkbox",	       0, 1, "playSound", "Play sound when a bargain is found")
 
   	gui:AddCat("Evaluators:")
