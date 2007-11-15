@@ -13,12 +13,11 @@
 ##
 ..\Blizzard_AuctionUI\Blizzard_AuctionUITemplates.xml
 
-DebugLib\DebugLib.lua
+Libs\Load.xml
 AucManifest.lua
 
 AucObjects.lua
 
-Babylonian\Babylonian.lua
 AucStrings.lua
 AucLocale.lua
 

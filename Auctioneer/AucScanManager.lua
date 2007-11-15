@@ -267,7 +267,8 @@ end
 --    false, if the scan could not be requested, due to another scan currently
 --           in progress
 -------------------------------------------------------------------------------
-function scan()
+	if not AucFrameBrowse then return false end
+
 	-- Get the list of categories checked (by index).
 	categories = {};
 	local allCategories = {GetAuctionItemClasses()};
@@ -302,6 +303,7 @@ end
 --    false, if the scan could not be requested, since another scan is currently in progress
 -------------------------------------------------------------------------------
 function scanAll()
+	if not AucFrameBrowse then return false end
 	if (#ScanRequestQueue == 0) then
 		-- Construct a scan all request.
 		local request = {};
@@ -338,6 +340,7 @@ end
 --           currently in progress
 -------------------------------------------------------------------------------
 function scanCategories(categories)
+	if not AucFrameBrowse then return false end
 	if (#ScanRequestQueue == 0) then
 		-- Construct a scan request for each category requested.
 		for index, category in pairs(categories) do
