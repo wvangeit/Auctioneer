@@ -59,6 +59,9 @@ end
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then
 		private.ProcessTooltip(...)
+	elseif (callbackType == "config") then
+		--Called when you should build your Configator tab.
+		private.SetupConfigGui(...)
 	elseif (callbackType == "load") then
 		lib.OnLoad(...)
 	end
@@ -180,12 +183,27 @@ function lib.ClearItem(hyperlink, faction, realm)
 	end	
 end
 
+
+AucAdvanced.Settings.SetDefault("stat.simple.tooltip", true)
+
+function private.SetupConfigGui(gui)
+	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	gui:MakeScrollable(id)
+	
+	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.tooltip", "Show simple stats in the tooltips?")
+	
+end
+
 --[[ Local functions ]]--
 
 function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- In this function, you are afforded the opportunity to add data to the tooltip should you so
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
+	
+	if not AucAdvanced.Settings.GetSetting("stat.simple.tooltip") then return end
+	
 	if not quantity or quantity < 1 then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 	if (not dayAverage) then return end
