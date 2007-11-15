@@ -218,7 +218,6 @@ function lib.NewModule(libType, libName)
 		lib.Modules[libType][libName] = module
 		return module, lib, private
 	end
-	p("Unable to create", libType, libName)
 end
 
 --[[
