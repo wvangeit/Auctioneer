@@ -1506,7 +1506,7 @@ function mainHandler(command, source)
 	--/auctioneer scan
 	elseif (cmd == 'scan') then
 		if (not Auctioneer.ScanManager.Scan()) then
-			Auctioneer.Util.ChatPrint(_AUCT('AuctionScanNexttime'));
+			Auctioneer.Util.ChatPrint(_AUCT('ScanFailed'));
 		end
 
 	--/auctioneer protect-window
