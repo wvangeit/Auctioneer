@@ -73,6 +73,7 @@ local fixLocaleDefault
 local onBabylonianSetOrder
 
 local DebugLib = Auctioneer.Util.DebugLib
+local Babylonian = LibStub("Babylonian")
 
 function register()
 	if (Khaos) then
