@@ -38,13 +38,12 @@ local print =  BeanCounter.Print
 
 local function debugPrint(...) 
     if private.getOption("util.beancounter.debugUpdate") then
-        private.debugPrint("BeanCounterFrames",...)
+        private.debugPrint("BeanCounterUpdate",...)
     end
 end
 
 
 function private.UpgradeDatabaseVersion()
-	
 	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
 		BeanCounterDB["version"] = nil
 	end
@@ -64,6 +63,9 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_02B()
 	elseif private.playerData["version"] < 1.03 then
 		private.updateTo1_03()
+	elseif private.playerData["version"] < 1.04 then
+		debugPrint("private.updateTo1_04()")
+		private.updateTo1_04()
 	end
 		
 end
@@ -119,6 +121,7 @@ function private.updateTo1_02B()
 		end
 	    end
 	end
+	private.updateTo1_03()
 end 
 function private.updateCreatelink(itemID, name) --If the server query fails make a fake link so we can still view item
     return "|cffffff33|Hitem:"..itemID..":0:0:0:0:0:0:1529248154|h["..name.."]|h|r" --Our fake links are always yellow
@@ -136,4 +139,15 @@ function private.updateTo1_03()
 		end
 	end
 	private.playerData.version = 1.03
+	
+	private.updateTo1_04()
+end
+
+--[[This adds the MailBox table, used to pretend messages are unread from a user point a view]]--
+function private.updateTo1_04()
+	debugPrint("Start")
+	if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then
+		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
+	end
+	private.playerData.version = 1.04
 end

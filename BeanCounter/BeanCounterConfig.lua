@@ -91,7 +91,8 @@ private.settingDefaults = {
 	["util.beancounter.debugUpdate"] = true,
 	["util.beancounter.debugFrames"] = true,
 	
-	 ["util.beacounter.invoicetime"] = 5,
+	["util.beacounter.invoicetime"] = 5,
+	["util.beancounter.mailrecolor"] = "icon",
     }
 
 local function getDefault(setting)
@@ -322,6 +323,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Header",     0,    "BeanCounter options")
 	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, "Mail Invoice Timeout = %d seconds")
 	gui:AddTip(id, "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy")
+	gui:AddControl(id, "Subhead",    0,    "Mail Re-Color Method")
+	gui:AddControl(id, "Selectbox",  0, 1, {{"off","No Re-Color"},{"icon","Re-Color Icons"},{"both","Re-Color Icons and Text"},{"text","Re-Color Text"}}, "util.beancounter.mailrecolor", "Mail Re-Color Method")
+	gui:AddTip(id, "Choose how Mail will appear after BeanCounter has scanned the Mail Box")
 	
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")

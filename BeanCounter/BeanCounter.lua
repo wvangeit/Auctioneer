@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.03,
+	version = 1.04,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -54,9 +54,6 @@ local private = {
 	--BeanCounterMail 
 	reconcilePending = {},
 	inboxStart = {},
-	inboxCurrent = {},
-	Task ={},
-	TakeInboxIgnore = false,
 	}
 	
 lib.Private = private --allow beancounter's sub lua's access
@@ -143,12 +140,15 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName]["completedBids/Buyouts"]  = {}
 		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
 		
+		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
+		
 	end
---OK we now have our Database ready, lets create an Alias to make refrencing easier
-private.playerData = BeanCounterDB[private.realmName][private.playerName]
-private.serverData = BeanCounterDB[private.realmName]
-
-
+	
+	
+	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
+	private.playerData = BeanCounterDB[private.realmName][private.playerName]
+	private.serverData = BeanCounterDB[private.realmName]
+	
 --[[Ok, create a fake table telling folks what our database means
 	BeanCounterDBFormat = {"This is a diagram for the layout of the BeanCounterDB.",
 	'POSTING DATABASE -- records Auction house activities',
@@ -174,31 +174,18 @@ private.serverData = BeanCounterDB[private.realmName]
 	'private.databaseAdd(key, itemID, value)  --Adds to the DB. Example "postedBids", itemID, ( : seperated string)',
 	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
 	}]]
-
 	
 	private.wealth = private.playerData["wealth"]
 	private.UpgradeDatabaseVersion() 
- 
+	 
 end
 
 --[[ Configator Section ]]--
-
+--See BeanCounterConfig.lua
 function private.getOption(option)
 	return lib.GetSetting(option)
 end
 
-function private.SetupConfigGui(gui)
-	-- The defaults for the following settings are set in the lib.OnLoad function
-	id = gui:AddTab(libName, libType.." Modules")
-	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    libName.." options")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.debug", "Turn on BeanCounter Debugging.")
-
-	--gui:AddControl(id, "Subhead",    0,    "Debug from specific modules:")
-	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Maildebug", "Show BeanCounterMail Debugging Messages.")
-	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterFrames Debugging Messages.")
-	--gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.Framedebug", "Show BeanCounterPosting/Bid Debugging Messages.")	
-end
 
 --[[Sidebar Section]]--
 local sideIcon

@@ -47,6 +47,8 @@ function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
 		private.updateInboxStart() 
 	elseif (event == "MAIL_SHOW") then 
+	hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
+	hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
 	elseif (event == "MAIL_CLOSED") then
 		InboxCloseButton:Show()
@@ -56,6 +58,7 @@ function private.mailMonitor(event,arg1)
 		HideMailGUI = false
 	end
 end
+
 --Mailbox Snapshots
 local HideMailGUI = false
 function private.updateInboxStart()
@@ -79,6 +82,7 @@ function private.updateInboxStart()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
 	end
+	private.mailBoxReadStart()
 end
 
 function private.getInvoice(n,sender, subject)
@@ -252,7 +256,7 @@ function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-		
+	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
 end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
@@ -261,8 +265,94 @@ function private.PreTakeInboxItemHook( ignore, retVal, index)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
+	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
 end
 
 
+--[[The below code manages the mailboxes Icon color /rad/unread status]]--
+function private.mailFrameClick(index)
+	BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
+end
+function private.mailFrameUpdate()
+--Change Icon back color if only addon read
 
+if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
+if private.getOption("util.beancounter.mailrecolor") == "off" then return end
+
+	local numItems = GetInboxNumItems();
+	local  index
+	if (InboxFrame.pageNum * 7) < numItems then
+		index = 7
+	else
+		index = 7 - ((InboxFrame.pageNum * 7) - numItems)
+	end
+	for i = 1,index do
+		local button = getglobal("MailItem"..i.."Button")
+		local buttonIcon = getglobal("MailItem"..i.."ButtonIcon")
+		local senderText = getglobal("MailItem"..i.."Sender")
+		local subjectText = getglobal("MailItem"..i.."Subject")
+		button:Show()
+			
+		local itemindex = ((InboxFrame.pageNum * 7) - 7 +i) --this gives us the actual itemindex as oposed to teh 1-7 button index
+		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex);
+		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
+			if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
+				if private.getOption("util.beancounter.mailrecolor") == "icon" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+					getglobal("MailItem"..i.."ButtonSlot"):SetVertexColor(1.0, 0.82, 0)
+					SetDesaturation(buttonIcon, nil)
+				end
+				if private.getOption("util.beancounter.mailrecolor") == "text" or private.getOption("util.beancounter.mailrecolor") == "both" then 
+					senderText = getglobal("MailItem"..i.."Sender");senderText:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+					subjectText:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+				end
+			end
+		end
+	end
+
+end
+
+local mailCurrent
+function private.mailBoxReadStart()
+	mailCurrent = {} --clean table every update
+	
+	for n = 1,GetInboxNumItems() do
+		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
+		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead or 0 }
+	end
+		
+
+	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+1) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
+		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
+		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
+		for i, v in pairs(mailCurrent) do
+			BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] = v
+		end
+			
+	--[[ lets try using our mail delet hooks to know the exact index to remove.This may solve the items with same name inherit the deleted color
+	elseif #private.mailData > #mailCurrent then --mail was deleted  
+		for i,v in ipairs(private.mailData) do
+			if not mailCurrent[i] then
+				debugPrint("#private.mailData > #mailCurrent removing non existant", i, private.mailData[i]["subject"])
+				table.remove(private.mailData, i)
+			elseif mailCurrent[i]["subject"] ~= private.mailData[i]["subject"] then
+				debugPrint("#private.mailData > #mailCurrent removing", i, private.mailData[i]["subject"])
+				table.remove(private.mailData, i)
+			end
+		end]]
+	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] <= #mailCurrent then --mail was added
+		for i,v in ipairs(mailCurrent) do
+			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] then
+				if mailCurrent[i]["subject"] ~=  BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
+					debugPrint("#private.mailData < #mailCurrent adding", i, mailCurrent[i]["subject"])
+					table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+				end
+			else
+			--debugPrint("need to add key ", i)
+			--table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+			end
+		end
+	end
+		
+	private.mailFrameUpdate()
+end
 
