@@ -92,7 +92,7 @@ function lib:valuate(item, tooltip)
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
 		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(frame.salebox.link)) or (AucAdvanced.API.GetMarketValue(frame.salebox.link) <= 0))) or
-		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) <= 0))) then
+		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
 			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
 		end
 		curModelText = curModelText.."("..curModel..")"
