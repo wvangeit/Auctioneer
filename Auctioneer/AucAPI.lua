@@ -120,3 +120,4 @@ Auctioneer.API = {
 -------------------------------------------------------------------------------
 Auctioneer_GetVendorBuyPrice = Auctioneer.API.GetVendorBuyPrice;
 Auctioneer_GetVendorSellPrice = Auctioneer.API.GetVendorSellPrice;
+
