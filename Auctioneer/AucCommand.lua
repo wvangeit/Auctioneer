@@ -1359,7 +1359,7 @@ function registerKhaos()
 	setKhaosSetKeyValue("LoadSettings", Stubby.GetConfig("Auctioneer", "LoadType") or "auctionhouse")
 
 	-- hook into Babylonian:SetOrder() to change the local setting in Khaos
-	Babylonian:Notify(onBabylonianSetOrder)
+	Babylonian:AddNotify(onBabylonianSetOrder)
 end
 
 
