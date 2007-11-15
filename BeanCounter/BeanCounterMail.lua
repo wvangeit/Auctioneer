@@ -271,7 +271,9 @@ end
 
 --[[The below code manages the mailboxes Icon color /rad/unread status]]--
 function private.mailFrameClick(index)
-	BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
+	if BeanCounterDB[private.realmName][private.playerName]["mailbox"][index] then
+		BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
+	end
 end
 function private.mailFrameUpdate()
 --Change Icon back color if only addon read

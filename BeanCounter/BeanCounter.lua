@@ -200,6 +200,7 @@ function private.slidebar()
 				"BeanCounter",
 				"BeanCounter tracks your trading activities so that you may review your expenditures and income, perform searches and use this data to determine your successes and failures.",
 				"{{Click}} to view your activity report.",
+				"{{Right-Click}} to edit the configuration.",
 			}
 		end
 	end

@@ -144,7 +144,7 @@ function private.CreateFrames()
 	base:SetBackdropColor(0,0,0, 1)
 	base:Hide()
 	
-	base:SetPoint("TOPLEFT", UIParent, "TOPLEFT")
+	base:SetPoint("CENTER", UIParent, "CENTER")
 	base:SetWidth(828)
 	base:SetHeight(450)
 	
@@ -159,6 +159,16 @@ function private.CreateFrames()
 
 	base.Drag:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.Drag:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
+	
+	base.DragBottom = CreateFrame("Button","beancounterdragbottom", base)
+	base.DragBottom:SetPoint("BOTTOMLEFT", base, "BOTTOMLEFT", 10,5)
+	base.DragBottom:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10,5)
+	base.DragBottom:SetHeight(6)
+	base.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+	base.DragBottom:SetScript("OnMouseDown", function() base:StartMoving() end)
+	base.DragBottom:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
+	
 		
 	--Launch BeanCounter GUI Config frame
 	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
