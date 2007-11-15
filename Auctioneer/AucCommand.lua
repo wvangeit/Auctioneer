@@ -1358,8 +1358,8 @@ function registerKhaos()
 	-- requires special treatment to be updated
 	setKhaosSetKeyValue("LoadSettings", Stubby.GetConfig("Auctioneer", "LoadType") or "auctionhouse")
 
-	-- hook into Babylonian.SetOrder() to change the local setting in Khaos
-	Stubby.RegisterFunctionHook("Babylonian.SetOrder", 200, onBabylonianSetOrder)
+	-- hook into Babylonian:SetOrder() to change the local setting in Khaos
+	Babylonian:Notify(onBabylonianSetOrder)
 end
 
 
@@ -1765,10 +1765,10 @@ function setLocale(param, khaosCommand)
 	local validLocale;
 
 	if (param == 'default') or (param == 'off') then
-		Babylonian.SetOrder('');
+		Babylonian:SetOrder('');
 		validLocale = true;
 	elseif (Auctioneer.Command.IsValidLocale(param)) then
-		Babylonian.SetOrder(param);
+		Babylonian:SetOrder(param);
 		validLocale = true;
 	else
 		validLocale = false;
@@ -2134,7 +2134,7 @@ end
 -- used.
 -------------------------------------------------------------------------------
 function getLocale()
-	local ret = strsplit(",", Babylonian.GetOrder(), 1)
+	local ret = strsplit(",", Babylonian:GetOrder(), 1)
 	if ret == "" then
 		ret = "default"
 	end
@@ -2142,7 +2142,7 @@ function getLocale()
 end
 
 -------------------------------------------------------------------------------
--- Called when Babylonian.SetOrder() is called to update Khaos' locale setting.
+-- Called when Babylonian:SetOrder() is called to update Khaos' locale setting.
 --
 -- parameters:
 --    _ - ignoring the first parameter, which is an empty table, since no
