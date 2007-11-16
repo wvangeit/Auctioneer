@@ -77,6 +77,43 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 	end
 end
 
+function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
+	local bag = this:GetParent():GetID()
+	local slot = this:GetID()
+
+	local link = GetContainerItemLink(bag, slot)
+	
+	if (AuctionFrame and AuctionFrame:IsVisible()) then
+		if link then
+			if (button == "RightButton") and (IsAltKeyDown()) then
+				local itemID = EnhTooltip.BreakLink(link)
+				if (itemID) then
+					local itemName = GetItemInfo(tostring(itemID))
+					if (itemName) then
+						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
+					end
+				end
+			end
+		end
+	end
+end
+
+function private.ClickLinkHook(_, _, item, link, button)
+	if (AuctionFrame and AuctionFrame:IsVisible()) then
+		if link then
+			if (button == "LeftButton") and (IsAltKeyDown()) then
+				local itemID = EnhTooltip.BreakLink(link)
+				if (itemID) then
+					local itemName = GetItemInfo(tostring(itemID))
+					if itemName then
+						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
+					end
+				end
+			end
+		end
+	end
+end
+
 function private.HookAH()
 	hooksecurefunc("AuctionFrameBrowse_Update", AucAdvanced.API.ListUpdate)
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -95,6 +132,8 @@ function private.OnLoad(addon)
 	if (addon == "auc-advanced") then
 		Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "Auc-Advanced", private.HookAH)
 		Stubby.RegisterFunctionHook("EnhTooltip.AddTooltip", 600, private.TooltipHook)
+		Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -200, private.ClickBagHook)
+		Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -200, private.ClickLinkHook)
 		for pos, module in ipairs(AucAdvanced.EmbeddedModules) do
 			-- These embedded modules have also just been loaded
 			private.OnLoad(module)
