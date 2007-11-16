@@ -64,7 +64,8 @@ local HideMailGUI = false
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
-		if sender and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+		if ((sender == "Alliance Auction House") or (sender == "Horde Auction House")) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
+			print(sender, wasRead)
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
@@ -256,7 +257,7 @@ function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
+	--table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
@@ -265,11 +266,11 @@ function private.PreTakeInboxItemHook( ignore, retVal, index)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
+	--table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 
---[[The below code manages the mailboxes Icon color /rad/unread status]]--
+--[[The below code manages the mailboxes Icon color /read/unread status]]--
 function private.mailFrameClick(index)
 	if BeanCounterDB[private.realmName][private.playerName]["mailbox"][index] then
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"][index]["read"] = 2
@@ -295,7 +296,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 		local subjectText = getglobal("MailItem"..i.."Subject")
 		button:Show()
 			
-		local itemindex = ((InboxFrame.pageNum * 7) - 7 +i) --this gives us the actual itemindex as oposed to teh 1-7 button index
+		local itemindex = ((InboxFrame.pageNum * 7) - 7 + i) --this gives us the actual itemindex as oposed to teh 1-7 button index
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(itemindex);
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex] then
 			if (BeanCounterDB[private.realmName][private.playerName]["mailbox"][itemindex]["read"] < 2) then
@@ -329,19 +330,10 @@ function private.mailBoxReadStart()
 		for i, v in pairs(mailCurrent) do
 			BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] = v
 		end
-			
-	--[[ lets try using our mail delet hooks to know the exact index to remove.This may solve the items with same name inherit the deleted color
-	elseif #private.mailData > #mailCurrent then --mail was deleted  
-		for i,v in ipairs(private.mailData) do
-			if not mailCurrent[i] then
-				debugPrint("#private.mailData > #mailCurrent removing non existant", i, private.mailData[i]["subject"])
-				table.remove(private.mailData, i)
-			elseif mailCurrent[i]["subject"] ~= private.mailData[i]["subject"] then
-				debugPrint("#private.mailData > #mailCurrent removing", i, private.mailData[i]["subject"])
-				table.remove(private.mailData, i)
-			end
-		end]]
-	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] <= #mailCurrent then --mail was added
+		
+	elseif	#BeanCounterDB[private.realmName][private.playerName]["mailbox"] >= #mailCurrent then
+		private.diff()	
+	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] < #mailCurrent then --mail was added
 		for i,v in ipairs(mailCurrent) do
 			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] then
 				if mailCurrent[i]["subject"] ~=  BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
@@ -349,12 +341,26 @@ function private.mailBoxReadStart()
 					table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
 				end
 			else
-			--debugPrint("need to add key ", i)
-			--table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+			debugPrint("need to add key ", i)
+			table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
 			end
 		end
 	end
 		
 	private.mailFrameUpdate()
 end
-
+function private.diff()
+	local count
+	if #mailCurrent > #BeanCounterDB[private.realmName][private.playerName]["mailbox"] then
+		count =  #BeanCounterDB[private.realmName][private.playerName]["mailbox"]
+	else
+		count =  #mailCurrent
+	end
+	for i = 1, count do
+		if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
+		    debugPrint("Diff", i,mailCurrent[i]["subject"], "vs", BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] )
+			table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
+		    private.diff()
+		end
+	end
+end

@@ -92,7 +92,7 @@ private.settingDefaults = {
 	["util.beancounter.debugFrames"] = true,
 	
 	["util.beacounter.invoicetime"] = 5,
-	["util.beancounter.mailrecolor"] = "icon",
+	["util.beancounter.mailrecolor"] = "both",
     }
 
 local function getDefault(setting)
