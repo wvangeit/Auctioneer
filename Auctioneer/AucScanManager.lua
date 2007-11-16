@@ -620,12 +620,12 @@ function queryCompleteCallback(query, result)
 		-- Scanning one page should take at least approximitaly 4-5 seconds due to
 		-- blizzards restrictions on how fast a new page might be querried.
 		-- Therefore scanning one page should never be faster then 4 seconds.
-		local minTimeElapsed = 4.0 * pagesScanned;
+		--local minTimeElapsed = 4.0 * pagesScanned;
 		debugPrint(pagesScanned.." pages scanned thus far in "..timeElapsed, DebugLib.Level.Info)
-		if (timeElapsed < minTimeElapsed) then
-			debugPrint("Adjusted request.startTime to keep the time remaining accurate.", DebugLib.Level.Info)
-			request.startTime = currentTime - minTimeElapsed;
-		end
+		--if (timeElapsed < minTimeElapsed) then
+		--	debugPrint("Adjusted request.startTime to keep the time remaining accurate.", DebugLib.Level.Info)
+		--	request.startTime = currentTime - minTimeElapsed;
+		--end
 
 		-- This was a subsequent query.
 		request.nextPage = request.nextPage - 1;
