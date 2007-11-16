@@ -750,7 +750,6 @@ function private.CreateFrames()
 			frame.salebox.number:Hide()
 			frame.manifest:Hide()
 			frame.toggleManifest:Hide()
-			frame.salebox.icon:SetScript("OnClick", nil)
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
 			frame.salebox.bid:ClearAllPoints()
 			frame.salebox.bid:SetPoint("TOP", frame.salebox.model, "BOTTOM", 0, -35)
@@ -861,7 +860,9 @@ function private.CreateFrames()
 		if objtype == "item" then
 			frame.GetItembyLink(itemlink)
 		else
-			frame.ToggleDisabled()
+			if not AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+				frame.ToggleDisabled()
+			end
 		end
 	end
 	
