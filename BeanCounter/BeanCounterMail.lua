@@ -256,7 +256,7 @@ function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
+	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
@@ -265,7 +265,7 @@ function private.PreTakeInboxItemHook( ignore, retVal, index)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
+	table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 

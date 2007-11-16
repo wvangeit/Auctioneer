@@ -160,7 +160,7 @@ function private.CreateFrames()
 	base.Drag:SetScript("OnMouseDown", function() base:StartMoving() end)
 	base.Drag:SetScript("OnMouseUp", function() base:StopMovingOrSizing() private.setter("configator.left", base:GetLeft()) private.setter("configator.top", base:GetTop()) end)
 	
-	base.DragBottom = CreateFrame("Button","beancounterdragbottom", base)
+	base.DragBottom = CreateFrame("Button",nil, base)
 	base.DragBottom:SetPoint("BOTTOMLEFT", base, "BOTTOMLEFT", 10,5)
 	base.DragBottom:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10,5)
 	base.DragBottom:SetHeight(6)
