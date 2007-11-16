@@ -1447,10 +1447,14 @@ BtmScan.PerformPurchase = function()
 		return
 	end
 
-	local buyout, btext = false, ""
-	if item.purchase == item.buy then buyout = true btext = " ("..tr("buyout")..")" end
-
-	BtmScan.Log(tr("Purchasing %1x%2 at %3 for %4%5", item.link, item.count, BtmScan.GSC(item.purchase,1), item.what, btext))
+	local buyout, btext, ptext = false, "", "Bidding on"
+	if item.purchase == item.buy then 
+		buyout = true 
+		btext = " ("..tr("buyout")..")" 
+		ptext = "Purchasing"
+	end
+	
+	BtmScan.Log(tr(ptext.." %1x%2 at %3 for %4%5", item.link, item.count, BtmScan.GSC(item.purchase,1), item.what, btext))
 	PlaceAuctionBid("list", i, item.purchase)
 	local bids = BtmScan.Settings.GetSetting("bid.list")
 	bids[item.sig..":"..item.seed.."x"..item.count] = { item.what, item.purchase, buyout, time() }
