@@ -41,7 +41,7 @@ local onAuctionUILoaded;
 local onAuctionHouseShow;
 local onAuctionHouseClose;
 local preContainerFrameItemButtonOnModifiedClickHook;
-local postGetAuctionItemSubClasses
+--local postGetAuctionItemSubClasses
 local postPickupContainerItemHook;
 local getCursorContainerItem;
 local relevelFrame;
@@ -75,7 +75,7 @@ function load()
 	hooksecurefunc("PickupContainerItem", postPickupContainerItemHook)
 
 	-- register our hook to add the new trade skill sub classes to the AH
-	Stubby.RegisterFunctionHook("GetAuctionItemSubClasses", 200, postGetAuctionItemSubClasses)
+	--Stubby.RegisterFunctionHook("GetAuctionItemSubClasses", 200, postGetAuctionItemSubClasses)
 
 	-- Blizzard's auction UI may or may not have been loaded yet.
 	if (IsAddOnLoaded("Blizzard_AuctionUI")) then
@@ -382,6 +382,7 @@ end
 --       always localised (based on the client's language) strings in the form:
 --       {"Trade Goods", "Parts", "Explosives", "Devices"}
 -------------------------------------------------------------------------------
+--[[
 function postGetAuctionItemSubClasses(_, _, index)
 	if (index == 5) then
 		return "setreturn", {_AUCT("SubClassTradeGoods", GetLocale()),
@@ -390,7 +391,7 @@ function postGetAuctionItemSubClasses(_, _, index)
 		                     _AUCT("SubClassDevices",    GetLocale())}
 	end
 end
-
+]]
 -------------------------------------------------------------------------------
 -- Prints the specified message to nLog.
 --
