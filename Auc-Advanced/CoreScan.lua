@@ -765,7 +765,13 @@ function lib.StorePage()
 	local now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
 	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
-	local pageNumber = private.curQuery.page+1
+	local pageNumber
+	if private.curQuery.page then
+		pageNumber = private.curQuery.page+1
+	else
+		pageNumber = private.curPage
+	end
+
 
 	local curTime = time()
 
@@ -1069,6 +1075,7 @@ function private.ResetAll()
 	recycle(private, "curPages")
 	recycle(private, "scanStack")
 	private.isPaused = nil
+	private.Pausing = nil
 	private.sentQuery = nil
 	private.isScanning = false
 	private.unexpectedClose = false
