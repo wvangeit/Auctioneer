@@ -522,7 +522,9 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			local stillpossible = false
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 86400
 			local dodelete = false
-			if (now - data[Const.TIME] <= auctionmaxtime) then
+			if not data[Const.TIME] then
+				stillpossible = true
+			elseif (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
 			end
 			if wasGetAll then
