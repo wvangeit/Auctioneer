@@ -28,7 +28,7 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
-
+--[[Most of this code is from BC classic]]--
 local libName = "BeanCounter"
 local libType = "Util"
 local lib = BeanCounter
@@ -45,10 +45,10 @@ end
 -- Called before StartAuction()
 -------------------------------------------------------------------------------
 function private.preStartAuctionHook(_, _, minBid, buyoutPrice, runTime)
-	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo();
+	local name, texture, count, quality, canUse, price = GetAuctionSellItemInfo()
 	if (name and count and price) then
-		local deposit = CalculateAuctionDeposit(runTime);
-		private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit);
+		local deposit = CalculateAuctionDeposit(runTime)
+		private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
 	end
 end
 
@@ -57,21 +57,21 @@ end
 -------------------------------------------------------------------------------
 function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, deposit)
 	-- Add a pending post to the queue.
-	local pendingPost = {};
-	pendingPost.name = name;
-	pendingPost.count = count;
-	pendingPost.minBid = minBid;
-	pendingPost.buyoutPrice = buyoutPrice;
-	pendingPost.runTime = runTime;
-	pendingPost.deposit = deposit;
-	table.insert(private.PendingPosts, pendingPost);
-	debugPrint("private.addPendingPost() - Added pending post");
+	local pendingPost = {}
+	pendingPost.name = name
+	pendingPost.count = count
+	pendingPost.minBid = minBid
+	pendingPost.buyoutPrice = buyoutPrice
+	pendingPost.runTime = runTime
+	pendingPost.deposit = deposit
+	table.insert(private.PendingPosts, pendingPost)
+	debugPrint("private.addPendingPost() - Added pending post")
 	
 	-- Register for the response events if this is the first pending post.
 	if (#private.PendingPosts == 1) then
-		debugPrint("private.addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
-		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting);
-		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting);
+		debugPrint("private.addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
+		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting)
+		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 	end
 end
 
@@ -81,22 +81,22 @@ end
 function private.removePendingPost()
 	if (#private.PendingPosts > 0) then
 		-- Remove the first pending post.
-		local post = private.PendingPosts[1];
-		table.remove(private.PendingPosts, 1);
-		debugPrint("private.removePendingPost() - Removed pending post");
+		local post = private.PendingPosts[1]
+		table.remove(private.PendingPosts, 1)
+		debugPrint("private.removePendingPost() - Removed pending post")
 
 		-- Unregister for the response events if this is the last pending post.
 		if (#private.PendingPosts == 0) then
-			debugPrint("private.removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE");
-			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting);
-			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting);
+			debugPrint("private.removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
+			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting)
+			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 		end
 
-		return post;
+		return post
 	end
 	
 	-- No pending post to remove!
-	return nil;
+	return nil
 end
 
 -------------------------------------------------------------------------------
@@ -104,16 +104,16 @@ end
 -------------------------------------------------------------------------------
 function private.onEventHookPosting(_, event, arg1)
 	if (event == "CHAT_MSG_SYSTEM" and arg1) then
-		debugPrint(event);
-		if (arg1) then debugPrint("    "..arg1) end;
+		debugPrint(event)
+		if (arg1) then debugPrint("    "..arg1) end
 		if (arg1 == ERR_AUCTION_STARTED) then
-		 	private.onAuctionCreated();
+		 	private.onAuctionCreated()
 		end
 	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
-		debugPrint(event);
-		if (arg1) then debugPrint("    "..arg1) end;
+		debugPrint(event)
+		if (arg1) then debugPrint("    "..arg1) end
 		if (arg1 == ERR_NOT_ENOUGH_MONEY) then
-			private.onPostFailed();
+			private.onPostFailed()
 		end
 	end
 end
@@ -122,7 +122,7 @@ end
 -- Called when a post is accepted by the server.
 -------------------------------------------------------------------------------
 function private.onAuctionCreated()
-	local post = private.removePendingPost();
+	local post = private.removePendingPost()
 	if (post) then
 		-- Add to sales database
 		local itemID, itemLink = private.getItemInfo(post.name, "itemid")
@@ -134,7 +134,7 @@ end
 -------------------------------------------------------------------------------
 -- Called when a post is rejected by the server.
 -------------------------------------------------------------------------------
-function onPostFailed()
-	private.removePendingPost();
+function private.onPostFailed()
+	private.removePendingPost()
 end
 
