@@ -425,7 +425,7 @@ function lib.GetBidBuyPrices(itemLink, defaultOnly)
 	end
 	local match = (curMatch == "on")
 		
-	local newBuy, newBid
+	local newBuy, newBid, DiffFromModel
 	if curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
