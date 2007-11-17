@@ -284,80 +284,20 @@ function private.CreateFrames()
 		
 	function frame.SetPriceFromModel(curModel)
 		if not frame.salebox.sig then return end
-		if not curModel then
-			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
-		else
-			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
-		end
+
 		frame.salebox.warn:SetText("")
-		if curModel == "default" then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-			if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(frame.salebox.link)) or (AucAdvanced.API.GetMarketValue(frame.salebox.link) <= 0))) or
-			   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link) <= 0))) then
-				curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
-			end
-			frame.salebox.model:SetText("Default ("..curModel..")")
+
+		local newBid, newBuy, curModel = AucAdvanced.API.GetBidBuyPrices(frame.salebox.link, false)
+
+		if not newBuy or newBuy <= 0 then
+			frame.salebox.warn:SetText(("No %s price available!"):format(curModel))
+			MoneyInputFrame_ResetMoney(frame.salebox.bid)
+			MoneyInputFrame_ResetMoney(frame.salebox.buy)
+			frame.salebox.bid.modelvalue = 0
+			frame.salebox.buy.modelvalue = 0
+			return
 		end
-
-		local newBuy, newBid
-		local match = frame.salebox.matcher:GetChecked()
-		if (frame.salebox.matcher:IsEnabled() == 0) then
-			match = false
-		end
-		if curModel == "fixed" then
-			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
-			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
-		elseif curModel == "market" then
-			if match then
-				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
-			else
-				newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
-			end
-		else
-			if match then
-				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
-			else
-				newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
-			end
-		end
-
-		if curModel ~= "fixed" then
-			if not newBuy or newBuy <= 0 then
-				frame.salebox.warn:SetText(("No %s price available!"):format(curModel))
-				MoneyInputFrame_ResetMoney(frame.salebox.bid)
-				MoneyInputFrame_ResetMoney(frame.salebox.buy)
-				frame.salebox.bid.modelvalue = 0
-				frame.salebox.buy.modelvalue = 0
-				return
-			end
-
-			if newBuy and not newBid then
-				local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-				local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-				local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-				if (deposit) then
-					local rate
-					deposit, rate = AucAdvanced.Post.GetDepositAmount(frame.salebox.sig)
-					if not rate then rate = AucAdvanced.depositRate or 0.05 end
-				else deposit = 0 end
-
-				-- Scale up for duration > 12 hours
-				if deposit > 0 then
-					local curDurationIdx = frame.salebox.duration:GetValue()
-					local duration = private.durations[curDurationIdx][1]
-					deposit = deposit * duration/720
-				end
-
-				markdown = newBuy * markdown
-
-				newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-			end
-
-			if newBid and (not newBuy or newBid > newBuy) then
-				newBuy = newBid
-			end
-		end
-
+			
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
 
@@ -1018,7 +958,6 @@ function private.CreateFrames()
 	end
 
 	function frame.ClickBagHook(_,_,button)
-		if (not AucAdvanced.Settings.GetSetting("util.appraiser.clickhook")) then return end
 		local bag = this:GetParent():GetID()
 		local slot = this:GetID()
 		local texture, count, noSplit = GetContainerItemInfo(bag, slot)
