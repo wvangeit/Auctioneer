@@ -67,76 +67,10 @@ function lib:valuate(item, tooltip)
 	end
 
 	-- Valuate this item
+	local newBid, newBuy, curModel = AucAdvanced.API.GetBidBuyPrices(item["link"], false)
 	
-	-- debug to see what's in the item!
-	--for k,v in pairs(item) do 
-	--	AucAdvanced.Print("Link:"..k.."-"..tostring(v))
-	--end
+	item:info("Pricing Model:"..curModel)
 	
-	-- Largely ripped from AprFrame.lua
-	-- We deliberate want to value it exactly the same as what we'd sell it at by default
-	
-	-- these locals are to keep the naming conventions as close to those is Aprframe as possible.
-	-- cause the item["sig"] we have here doesn't match the one in Aprframe but id does.
-	-- this'll let us largely transplant any Aprframe code changes easily
-	local link = item["link"]
-	local sig = item["id"]
-	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
-	local curModelText = curModel
-
-	-- This is the code to get whether the "Price matching" is turned on or not.
-	-- Currently choosing not to use this information as it only applies to current market and BTMscan may not have a current full scan to work with, so it needs to use the historical values	
-	-- 		local Match = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match") or false
-
-
-	if curModel == "default" then
-		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(link)) or (AucAdvanced.API.GetMarketValue(link) <= 0))) or
-		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
-		end
-		curModelText = curModelText.."("..curModel..")"
-	end
-	item:info("Pricing Model:"..curModelText)
-	
-	local newBuy, newBid
-	if curModel == "fixed" then
-		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
-		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
-	elseif curModel == "market" then
-		newBuy = AucAdvanced.API.GetMarketValue(link)
-	else
-		newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, link)
-	end
-
-	if curModel ~= "fixed" then
-		if newBuy and not newBid then
-			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-			if (deposit) then
-				local rate
-				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
-				if not rate then rate = AucAdvanced.depositRate or 0.05 end
-			end
-			if (not deposit) then deposit = 0 end
-
-			-- Scale up for duration > 12 hours
-			-- Assume 24 hours since we can't get this info
-			if deposit > 0 then
-				deposit = deposit * 2
-			end
-
-			markdown = newBuy * markdown
-
-			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-		end
-
-		if newBid and (not newBuy or newBid > newBuy) then
-			newBuy = newBid
-		end
-	end
-
 	newBid = math.floor((newBid or 0) + 0.5)
 	newBuy = math.floor((newBuy or 0) + 0.5)
 
