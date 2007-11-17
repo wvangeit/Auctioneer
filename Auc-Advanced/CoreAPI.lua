@@ -392,3 +392,85 @@ function lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
 	return matchArray.value, matchArray
 end
 
+-- Appraiser APIs
+
+function lib.GetBidBuyPrices(itemLink, defaultOnly)
+	-- itemLink is a link
+	-- defaultOnly is whether to only use default prices or not (ie. whether to ignore fixed values, etc)
+	
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
+	local sig = tostring(id)
+	local link=itemLink
+	
+	if not sig then 
+		return 0, 0, "Unknown" 
+	end
+	
+	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
+	local curModelText = curModel
+
+	if (curModel == "default") or defaultOnly then
+		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(link)) or (AucAdvanced.API.GetMarketValue(link) <= 0))) or
+		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
+			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
+		end
+		curModelText = "Default ("..curModel..")"
+	end
+	
+	local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+	local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match")
+	if curMatch == nil then
+		curMatch = defMatch
+	end
+	local match = (curMatch == "on")
+		
+	local newBuy, newBid
+	if curModel == "fixed" then
+		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
+		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
+	elseif curModel == "market" then
+		if match then
+			newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(link, curModel)
+		else
+			newBuy = AucAdvanced.API.GetMarketValue(link)
+		end
+	else
+		if match then
+			newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(link, curModel)
+		else
+			newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+		end
+	end
+
+	if curModel ~= "fixed" then
+		if newBuy and not newBid then
+			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
+			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
+			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
+			if (deposit) then
+				local rate
+				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
+				if not rate then rate = AucAdvanced.depositRate or 0.05 end
+			end
+			if (not deposit) then deposit = 0 end
+
+			-- Scale up for duration > 12 hours
+			local curDuration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration") or AucAdvanced.Settings.GetSetting('util.appraiser.duration') or 2880
+			-- Assume 24 hours since we can't get this info
+			if deposit > 0 then
+				deposit = deposit * curDuration/720
+			end
+
+			markdown = newBuy * markdown
+
+			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
+		end
+
+		if newBid and (not newBuy or newBid > newBuy) then
+			newBuy = newBid
+		end
+	end
+	
+	return newBid, newBuy, curModelText
+end
