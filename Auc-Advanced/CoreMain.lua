@@ -78,6 +78,9 @@ function private.TooltipHook(vars, ret, frame, name, hyperlink, quality, quantit
 end
 
 function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
+	--if click-hooks are disabled, do nothing
+	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
+	
 	local bag = this:GetParent():GetID()
 	local slot = this:GetID()
 
@@ -99,6 +102,9 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 end
 
 function private.ClickLinkHook(_, _, item, link, button)
+	--if click-hooks are disabled, do nothing
+	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
+	
 	if (AuctionFrame and AuctionFrame:IsVisible()) then
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then

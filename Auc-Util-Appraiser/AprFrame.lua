@@ -1018,6 +1018,7 @@ function private.CreateFrames()
 	end
 
 	function frame.ClickBagHook(_,_,button)
+		if (not AucAdvanced.Settings.GetSetting("util.appraiser.clickhook")) then return end
 		local bag = this:GetParent():GetID()
 		local slot = this:GetID()
 		local texture, count, noSplit = GetContainerItemInfo(bag, slot)

@@ -109,7 +109,8 @@ local settingDefaults = {
 	['scandata.tooltip.display'] = false,
 	['scandata.tooltip.modifier'] = true,
 	['scandata.force'] = false,
-	['scandata.summary'] = true,	
+	['scandata.summary'] = true,
+	['clickhook.enable'] = true,
 }
 
 local function getDefault(setting)
@@ -369,7 +370,9 @@ function lib.MakeGuiConfig()
 
 	gui:AddControl(id, "Checkbox",   0, 1, "scandata.summary", "Enables the display of the post scan summary")
 	gui:AddTip(id, "Display the summation of a Auction House scan")
-
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", "Enable searching click-hooks")
+	gui:AddTip(id, "Enables the click-hooks for searching")
 	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
@@ -386,7 +389,10 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "why show summation",
 		"What is the post scan summary?",
 		"If you want to know the number on new, updated, or unchanged auctions gathered from a scan of the auction house.")
-
+	gui:AddHelp(id, "what is clickhook",
+		"What are the click-hooks?",
+		"The click-hooks let you perform a search for an item either by Alt-rightclicking the item in your bags, or by Alt-clicking an itemlink in the chat pane.")
+		
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
   	gui:AddCat("Match Modules")

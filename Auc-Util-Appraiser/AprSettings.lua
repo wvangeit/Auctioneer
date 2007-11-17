@@ -254,6 +254,7 @@ AucAdvanced.Settings.SetDefault("util.appraiser.color", true)
 AucAdvanced.Settings.SetDefault("util.appraiser.match", "off")
 AucAdvanced.Settings.SetDefault("util.appraiser.stack", "max")
 AucAdvanced.Settings.SetDefault("util.appraiser.number", "maxplus")
+AucAdvanced.Settings.SetDefault("util.appraiser.clickhook", true)
 
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
@@ -272,6 +273,8 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This option will cause the current appraiser pricing model and calculated sale price in your tooltips when you mouseover the given item")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.color", "Color Appraiser items by their PriceLevel data")
 	gui:AddTip(id, "This option will use information from PriceLevel to tint the current auction valuations by how far above/below the current priceing model's mean in shades from red to blue. ")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.appraiser.clickhook", "Enable click-hooks")
+	gui:AddTip(id, "This option will enable the use of click-hooks to select and post")
 	gui:AddControl(id, "Subhead",    0,    "Default pricing model")
 	gui:AddControl(id, "Selectbox",  0, 1, private.GetPriceModels, "util.appraiser.model", "Default pricing model to use for appraisals")
 	gui:AddTip(id, "You may select a default and alternate pricing model for items that do no have a specific model set")
@@ -290,7 +293,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Text",       0, 1, "util.appraiser.number")
 	gui:AddTip(id, [[Input number, "maxfull", or "maxplus" to set the default number of stacks.  "maxfull" sets to all full stacks, while "maxplus" sets to all stacks, including any incomplete stack]])
 	
-
+	gui:AddHelp(id, "what is clickhook",
+		"What are the click-hooks?",
+		"The click-hooks let you select an item by Alt-clicking on it, or post it by Alt-Shift-clicking on it.")
 	gui:AddHelp(id, "what is model",
 		"What is the default pricing model used for?",
 		"When Appraiser calculates the price to list an item for, it will use either a market price, which is an average of certain other pricing models, or a price returned by a specific AuctioneerAdvanced statistics module. You may select the model that is used for items that have not had a particular model selected.")
