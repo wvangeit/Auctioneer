@@ -98,7 +98,7 @@ function private.AuctionUI()
 	
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
---Change parent to our GUI frame
+--Change parent to our GUI base frame
 
 function private.GUI(_,button)
 	if (button == "LeftButton") then
@@ -175,21 +175,7 @@ function private.CreateFrames()
 	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
 	base.Config:SetScript("OnClick", function() base:Hide() end)
 	base.Config:SetText("Done")
-	
-	function private.toggleConfig()
-		if base:IsVisible() then
-			base:Hide()
-			lib.Gui:Show()
-			frame.Config:SetText("GUI")
-		else
-			base:Show()
-			lib.Gui:Hide()
-			frame.Config:SetText("Config")
-		end
-	end	
-	
-		
-	
+			
 	--Create the Actual Usable Frame
 	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
 	private.frame = frame
@@ -213,9 +199,9 @@ function private.CreateFrames()
 		BeanCounterSelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", "Search "..private.realmName.." Data"},}
+	local vals = {{"server", private.realmName.." Data"},}
 	for name,data in pairs(private.serverData) do 
-		table.insert(vals,{name, "Search "..name.."'s Data"})
+		table.insert(vals,{name, name.."'s Data"})
 	end
 			
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
@@ -225,7 +211,7 @@ function private.CreateFrames()
 	frame.selectbox.box.element = "selectBox"
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
-	frame.selectbox.box:SetText("Data to show:")
+	frame.selectbox.box:SetText(private.realmName.." Data")
 		
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
@@ -246,7 +232,37 @@ function private.CreateFrames()
 		local settings = {["selectbox"] = BeanCounterSelectBoxSetting,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 		private.startSearch(frame.searchBox:GetText(), settings)
 	end)
-		
+	--Clicking for BC search --Thanks for the code Rockslice
+	function private.ClickBagHook(_,_,button)
+		local bag = this:GetParent():GetID()
+		local slot = this:GetID()
+		local link = GetContainerItemLink(bag, slot)
+		if (frame.searchBox and frame.searchBox:IsVisible()) then
+			if link then
+				local itemName = private.getItemInfo(link, "name") 
+				if (button == "LeftButton") and (IsAltKeyDown()) then
+					frame.searchBox:SetText(itemName)
+					local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+					private.startSearch(itemName, settings)
+				end
+			end
+		end
+	end	
+	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)	
+	function private.ClickLinkHook(_, _, _, link, button)
+		if (frame.searchBox and frame.searchBox:IsVisible()) then
+			if link then
+				local itemName = private.getItemInfo(link, "name")
+				if (button == "LeftButton") and (IsAltKeyDown()) then
+					frame.searchBox:SetText(itemName)
+					local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+					private.startSearch(itemName, settings)	
+				end
+			end
+		end
+	end
+	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, private.ClickLinkHook)
+	
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
 	frame.exactCheck:SetChecked(false)
@@ -288,8 +304,7 @@ function private.CreateFrames()
 	frame.sellCheck:SetChecked(true)
 	getglobal(BeancountersellCheck:GetName().."Text"):SetText("Sold")
 	frame.sellCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -330)]]
-	
-	
+		
 	--Create the results window
 	frame.resultlist = CreateFrame("Frame", nil, frame)
 	frame.resultlist:SetBackdrop({

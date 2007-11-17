@@ -65,7 +65,6 @@ function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
 		if ((sender == "Alliance Auction House") or (sender == "Horde Auction House")) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
-			print(sender, wasRead)
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
@@ -322,8 +321,7 @@ function private.mailBoxReadStart()
 		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
 		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead or 0 }
 	end
-		
-
+	
 	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+1) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
 		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}

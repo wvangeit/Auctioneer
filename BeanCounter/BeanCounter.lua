@@ -95,7 +95,7 @@ function lib.OnLoad(addon)
 	
 	-- Hook all the methods we need
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
-	
+	--mail
 	Stubby.RegisterFunctionHook("TakeInboxMoney", -100, private.PreTakeInboxMoneyHook);
 	Stubby.RegisterFunctionHook("TakeInboxItem", -100, private.PreTakeInboxItemHook);
 	--Bids
@@ -104,7 +104,7 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-		
+	
 	private.initializeDB() --create or initialize the saved DB
 	lib.MakeGuiConfig() --create the configurator GUI frame
 	private.CreateFrames() --create our framework used for AH and GUI
@@ -290,9 +290,13 @@ debugPrint(link, cmd)
 local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(link)
 	if not cmd and itemLink then --return all
 		return itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture
+	
 	elseif itemLink and (cmd == "itemid") then
 		local itemID = itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
 		return itemID, itemLink
+	
+	elseif itemName and (cmd == "name") then
+		return itemName
 	end
 end
 
