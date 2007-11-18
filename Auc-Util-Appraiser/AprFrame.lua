@@ -390,6 +390,9 @@ function private.CreateFrames()
 			frame.age:SetText("")
 			frame.refresh:Disable()
 			frame.go:Disable()
+			frame.salebox.depositcost:SetText("")
+			frame.salebox.totalbid:SetText("")
+			frame.salebox.totalbuyout:SetText("")
 			return
 		end
 		frame.salebox.icon:SetAlpha(1)
@@ -413,9 +416,12 @@ function private.CreateFrames()
 				frame.toggleManifest:SetText("Open Sidebar")
 			end
 		else
-				frame.salebox.stackentry:Show()
-				frame.salebox.stacksoflabel:Show()
-				frame.salebox.numberentry:Show()
+			frame.salebox.stackentry:Show()
+			frame.salebox.stacksoflabel:Show()
+			frame.salebox.numberentry:Show()
+			frame.salebox.depositcost:Show()
+			frame.salebox.totalbid:Show()
+			frame.salebox.totalbuyout:Show()
 		end
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
@@ -470,9 +476,6 @@ function private.CreateFrames()
 
 		local depositMult = curDurationMins / 720
 		local curNumber = frame.salebox.number:GetAdjustedValue()
-		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
-			curNumber = frame.salebox.numberentry:GetNumber()
-		end
 
 		if (frame.salebox.stacksize > 1) then
 			local count = frame.salebox.count
@@ -527,7 +530,7 @@ function private.CreateFrames()
 				end
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
-				frame.salebox.numberentry:SetText(curNumber)
+				frame.salebox.numberentry:SetNumber(curNumber)
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 				bidVal = lib.RoundBid(curBid * curSize)
 				buyVal = lib.RoundBuy(curBuy * curSize)
@@ -633,7 +636,9 @@ function private.CreateFrames()
 		local curModel
 		if (obj and obj.element == "model") then
 			curModel = select(2, ...)
-			frame.SetPriceFromModel(curModel)
+			if curModel ~= "fixed" then
+				frame.SetPriceFromModel(curModel)
+			end
 		else
 			curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model")
 		end
@@ -719,6 +724,8 @@ function private.CreateFrames()
 			frame.salebox.name:SetHeight(36)
 			frame.salebox.warn:SetJustifyH("LEFT")
 			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, -25)
+			frame.salebox.oldnote = frame.salebox.note
+			frame.salebox.note = frame.salebox.warn
 		else
 			frame.salebox.stackentry:Hide()
 			frame.salebox.stacksoflabel:Hide()
@@ -764,6 +771,8 @@ function private.CreateFrames()
 			frame.salebox.name:SetHeight(20)
 			frame.salebox.warn:SetJustifyH("RIGHT")
 			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 7)
+			frame.salebox.note = frame.salebox.oldnote
+			frame.salebox.oldnote = nil
 		end
 	end
 
