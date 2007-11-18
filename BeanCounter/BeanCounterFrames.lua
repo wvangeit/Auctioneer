@@ -208,7 +208,7 @@ function private.CreateFrames()
 	
 	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
 	function frame.IconClicked()
-	objtype, _, link = GetCursorInfo()
+	local objtype, _, link = GetCursorInfo()
 		ClearCursor()
 		if objtype == "item" then
 			local itemName, itemTexture = private.getItemInfo(link, "name")
@@ -386,7 +386,7 @@ function private.CreateFrames()
 		if itemTexture then 
 			frame.icon:SetNormalTexture(itemTexture)
 		else
-			_, itemTexture= private.getItemInfo(itemName, "name")
+			local _, itemTexture = private.getItemInfo(itemName, "name")
 			frame.icon:SetNormalTexture(itemTexture)
 		end
 		
