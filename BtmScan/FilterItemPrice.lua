@@ -100,7 +100,7 @@ end
 lib.IgnorePurchasePrice = function()
 	local item = BtmScan.Prompt.item
 
-	local price = item.purchase / item.count
+	local price = (item.purchase / item.count) - 1
 	if (item.itemconfig.maxPrice==nil) or (price < item.itemconfig.maxPrice) then
 		item.itemconfig.maxPrice = price
 	end
