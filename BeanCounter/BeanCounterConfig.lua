@@ -93,6 +93,7 @@ private.settingDefaults = {
 	
 	["util.beacounter.invoicetime"] = 5,
 	["util.beancounter.mailrecolor"] = "both",
+	["util.beancounter.externalSearch"] = true,
     }
 
 local function getDefault(setting)
@@ -326,6 +327,8 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Subhead",    0,    "Mail Re-Color Method")
 	gui:AddControl(id, "Selectbox",  0, 1, {{"off","No Re-Color"},{"icon","Re-Color Icons"},{"both","Re-Color Icons and Text"},{"text","Re-Color Text"}}, "util.beancounter.mailrecolor", "Mail Re-Color Method")
 	gui:AddTip(id, "Choose how Mail will appear after BeanCounter has scanned the Mail Box")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", "Allow External Addons to use BeanCounter's Search?")
+	gui:AddTip(id, "When entering a search in another addon, BeanCounter will also display a search for that item.")
 	
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")

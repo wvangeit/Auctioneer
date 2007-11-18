@@ -231,6 +231,19 @@ end
 
 
 --[[ Utility Functions]]--
+--External Search Stub, allows other addons searches to search to display in BC
+--Can be item Name or link or itemID
+function lib.externalSearch(name)
+	 if private.getOption("util.beancounter.externalSearch") then
+		local frame = private.frame
+		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
+		local itemName = private.getItemInfo(name, "name") or name
+		frame.searchBox:SetText(itemName)
+		local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = 1, ["auction"] = 1 } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		private.startSearch(itemName, settings)
+	end
+end
+
 --will return any length arguments into a ; seperated string
 function private.packString(...)
 local String

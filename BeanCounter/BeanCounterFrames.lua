@@ -193,10 +193,10 @@ function private.CreateFrames()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
-	local BeanCounterSelectBoxSetting 	= {"1","server"}
+	frame.SelectBoxSetting = {"1","server"}
 	function private.ChangeControls(obj, arg1,arg2,...)
 		--debugPrint("Clicked the button Option #", arg1, arg2)
-		BeanCounterSelectBoxSetting = {arg1, arg2}
+		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
 	local vals = {{"server", private.realmName.." Data"},}
@@ -220,7 +220,7 @@ function private.CreateFrames()
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
 	frame.searchBox:SetScript("OnEnterPressed", function()
-		local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 		private.startSearch(frame.searchBox:GetText(), settings)
 	end)
 	
@@ -229,7 +229,7 @@ function private.CreateFrames()
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, 0)
 	frame.searchButton:SetText("Search")
 	frame.searchButton:SetScript("OnClick", function()
-		local settings = {["selectbox"] = BeanCounterSelectBoxSetting,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		local settings = {["selectbox"] = frame.SelectBoxSetting ,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 		private.startSearch(frame.searchBox:GetText(), settings)
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
@@ -242,7 +242,7 @@ function private.CreateFrames()
 				local itemName = private.getItemInfo(link, "name") 
 				if (button == "LeftButton") and (IsAltKeyDown()) then
 					frame.searchBox:SetText(itemName)
-					local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 					private.startSearch(itemName, settings)
 				end
 			end
@@ -255,7 +255,7 @@ function private.CreateFrames()
 				local itemName = private.getItemInfo(link, "name")
 				if (button == "LeftButton") and (IsAltKeyDown()) then
 					frame.searchBox:SetText(itemName)
-					local settings = {["selectbox"] = BeanCounterSelectBoxSetting, ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 					private.startSearch(itemName, settings)	
 				end
 			end
@@ -719,3 +719,4 @@ function private.classicSearch(data, style, itemName, settings)
     
     return data, style
 end
+
