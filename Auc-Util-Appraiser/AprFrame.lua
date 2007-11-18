@@ -771,7 +771,7 @@ function private.CreateFrames()
 			frame.salebox.name:SetHeight(20)
 			frame.salebox.warn:SetJustifyH("RIGHT")
 			frame.salebox.warn:SetPoint("BOTTOMLEFT", frame.salebox.slot, "BOTTOMRIGHT", 5, 7)
-			frame.salebox.note = frame.salebox.oldnote
+			frame.salebox.note = frame.salebox.oldnote or frame.salebox.note 
 			frame.salebox.oldnote = nil
 		end
 	end
