@@ -134,7 +134,7 @@ for i = 1, 13 do
 	define(lcName.."."..typename[i]..".".."Poor", true)
 end
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
@@ -151,13 +151,13 @@ function lib:setup(gui)
 
 	gui:AddControl(id, "Subhead",          0,    "Item Quality by Type")
 	for i = 0, 6 do
-		last = gui:GetLast(id)
+		local last = gui:GetLast(id)
 		gui:AddControl(id, "Note", i*0.07, 1, 50, 20, qualname[i])--tostring(i) )
 		if i < 6 then gui:SetLast(id, last) end
 	end
 	for i = 1, 13 do
 		for j = 0, 6 do
-		last = gui:GetLast(id)
+		local last = gui:GetLast(id)
 		gui:AddControl(id, "Checkbox", j*0.07+0.02, 1, lcName.."."..typename[i].."."..qualname[j], "")
 		gui:AddTip(id, qualname[j].." "..typename[i])
 		gui:SetLast(id, last)
