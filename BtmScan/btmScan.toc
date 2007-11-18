@@ -36,4 +36,5 @@ EvalSnatch.lua
 FilterItemType.lua
 FilterItemPrice.lua
 FilterTimeLeft.lua
+FilterItemQuality.lua
 EvalEnchantMats.lua
