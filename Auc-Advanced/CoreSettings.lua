@@ -376,7 +376,7 @@ function lib.MakeGuiConfig()
 	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
-		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen it the auctionhouse image.")
+		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auctionhouse image.")
 	gui:AddHelp(id, "what is image",
 		"What is an auctionhouse image?",
 		"As you scan the auctionhouse, AuctioneerAdvanced builds up an image of what is at auction. This is the image. It represents AuctioneerAdvanced's best guess at what is currently being auctioned. If your scan is fresh, this will be reasonably accurate, if it is not, then it will not.")
