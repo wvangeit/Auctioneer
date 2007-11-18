@@ -3,7 +3,7 @@
 ## Dependancies: Auc-Advanced
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Util-MarketMatch.toc 2248 2007-09-25 17:58:52Z mentalpower $
+## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
 Embed.xml

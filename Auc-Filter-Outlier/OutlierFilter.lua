@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Outlier Filter
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BasicFilter.lua 2232 2007-09-25 03:38:43Z norganna $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
@@ -209,4 +209,4 @@ function private.SetupConfigGui(gui)
 
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auctioneer/AucManifest.lua $", "$Rev: 1746 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

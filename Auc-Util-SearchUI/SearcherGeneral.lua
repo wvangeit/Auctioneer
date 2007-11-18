@@ -108,4 +108,4 @@ function private.NameSearch(itemName)
 	return false
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auctioneer/AucManifest.lua $", "$Rev: 1746 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

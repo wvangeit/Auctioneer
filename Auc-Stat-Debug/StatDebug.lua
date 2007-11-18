@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - StatDebug
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: StatSimple.lua 2193 2007-09-18 06:10:48Z mentalpower $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected
@@ -200,4 +200,4 @@ function private.DataLoaded()
 	if (not StatData) then return end
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auctioneer/AucManifest.lua $", "$Rev: 1746 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
