@@ -308,8 +308,8 @@ local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSub
 		local itemID = itemLink:match("|c%x+|Hitem:(%d-):.-|h%[.-%]|h|r")
 		return itemID, itemLink
 	
-	elseif itemName and (cmd == "name") then
-		return itemName
+	elseif itemName and itemTexture  and (cmd == "name") then
+		return itemName, itemTexture
 	end
 end
 

@@ -64,7 +64,7 @@ function private.AuctionUI()
 			BeanCounterBaseFrame:Hide()
 			private.frame:SetParent(AuctionFrame)
 			frame:SetPoint("TOPLEFT", "AuctionFrame", "TOPLEFT")
-			--private.frame:SetWidth(828)
+			--private.frame:SetWidth(834.
 			--private.frame:SetHeight(450)
 			private.relevelFrame(frame)--make sure our frame stays in proper order		
 		end
@@ -72,12 +72,14 @@ function private.AuctionUI()
 		if not index then index = this:GetID() end
 		local tab = getglobal("AuctionFrameTab"..index)
 		if (tab and tab:GetName() == "AuctionFrameTabUtilBeanCounter") then
-			AuctionFrameTopLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopLeft");
-			AuctionFrameTop:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Top");
-			AuctionFrameTopRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-TopRight");
-			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotLeft");
-			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-Bot");
-			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Browse-BotRight");
+			--Modified Textures
+			AuctionFrameTopLeft:SetTexture("Interface\\AddOns\\BeanCounter\\Textures\\BC-TopLeft")
+			AuctionFrameTop:SetTexture("Interface\\AddOns\\BeanCounter\\Textures\\BC-Top")
+			AuctionFrameTopRight:SetTexture("Interface\\AddOns\\BeanCounter\\Textures\\BC-TopRight")
+			--Default AH textures
+			AuctionFrameBotLeft:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotLeft")
+			AuctionFrameBot:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-Bot")
+			AuctionFrameBotRight:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-Bid-BotRight")
 			
 			--print(tab:GetName())
 			
@@ -145,7 +147,7 @@ function private.CreateFrames()
 	base:Hide()
 	
 	base:SetPoint("CENTER", UIParent, "CENTER")
-	base:SetWidth(828)
+	base:SetWidth(834.5)
 	base:SetHeight(450)
 	
 	--base:SetToplevel(true)
@@ -203,11 +205,47 @@ function private.CreateFrames()
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, name.."'s Data"})
 	end
+	
+	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
+	function frame.IconClicked()
+	objtype, _, link = GetCursorInfo()
+		ClearCursor()
+		if objtype == "item" then
+			local itemName, itemTexture = private.getItemInfo(link, "name")
+			local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+			frame.icon:SetNormalTexture(itemTexture)
+			frame.searchBox:SetText(itemName)
+			private.startSearch(itemName, settings, itemTexture)	
+		end
+	end 
+	
+	frame.slot = frame:CreateTexture(nil, "BORDER")
+	frame.slot:SetPoint("TOPLEFT", frame, "TOPLEFT", 23, -125)
+	frame.slot:SetWidth(45)
+	frame.slot:SetHeight(45)
+	frame.slot:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+	frame.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+
+	frame.icon = CreateFrame("Button", nil, frame)
+	frame.icon:SetPoint("TOPLEFT", frame.slot, "TOPLEFT", 3, -3)
+	frame.icon:SetWidth(38)
+	frame.icon:SetHeight(38)
+	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
+	frame.icon:SetScript("OnClick", frame.IconClicked)
+	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
+	--help text
+	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
+	frame.slot.help:SetText("Drop item into")
+
+	frame.slot.help2 = frame:CreateFontString(nil, "OVERLAY","GameFontNormal")
+	frame.slot.help2:SetPoint("TOP", frame.slot.help, "BOTTOM", 0, 0)
+	frame.slot.help2:SetText("box to search.")
 			
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
-	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-115)
+	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-80)
 	frame.selectbox.box.element = "selectBox"
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
@@ -215,7 +253,7 @@ function private.CreateFrames()
 		
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
-	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -183)
+	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -180)
 	frame.searchBox:SetAutoFocus(false)
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
@@ -226,7 +264,7 @@ function private.CreateFrames()
 	
 	--Search Button	
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
-	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, 0)
+	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
 	frame.searchButton:SetText("Search")
 	frame.searchButton:SetScript("OnClick", function()
 		local settings = {["selectbox"] = frame.SelectBoxSetting ,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
@@ -239,24 +277,27 @@ function private.CreateFrames()
 		local link = GetContainerItemLink(bag, slot)
 		if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
-				local itemName = private.getItemInfo(link, "name") 
-				if (button == "LeftButton") and (IsAltKeyDown()) then
+				local itemName, itemTexture = private.getItemInfo(link, "name") 
+				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
+					debugPrint(itemName, itemTexture, link)
 					frame.searchBox:SetText(itemName)
 					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-					private.startSearch(itemName, settings)
+					private.startSearch(itemName, settings, itemTexture)
 				end
 			end
 		end
 	end	
 	Stubby.RegisterFunctionHook("ContainerFrameItemButton_OnModifiedClick", -50, private.ClickBagHook)	
+	
 	function private.ClickLinkHook(_, _, _, link, button)
 		if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
-				local itemName = private.getItemInfo(link, "name")
-				if (button == "LeftButton") and (IsAltKeyDown()) then
+				local itemName, itemTexture = private.getItemInfo(link, "name")
+				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
+					debugPrint(itemName, itemTexture, link)
 					frame.searchBox:SetText(itemName)
 					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-					private.startSearch(itemName, settings)	
+					private.startSearch(itemName, settings, itemTexture)	
 				end
 			end
 		end
@@ -315,15 +356,9 @@ function private.CreateFrames()
 	})
 	
 	frame.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
-	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 320)
-	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -5, 0)
-	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 34)
-	--This changed the scroll sheet parent from AH to GUI or vice versa
-	function private.resultlistSetPoint(frame)
-		frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 320)
-		frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", -5, 0)
-		frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 34)
-	end
+	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
+	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 3, 0)
+	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
 
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ "Item", "TEXT", 120 },
@@ -344,8 +379,16 @@ function private.CreateFrames()
 	})
 	
 	
-	function private.startSearch(itemName, settings)
+	function private.startSearch(itemName, settings, itemTexture)
 		if not itemName then return end
+			
+		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
+		if itemTexture then 
+			frame.icon:SetNormalTexture(itemTexture)
+		else
+			_, itemTexture= private.getItemInfo(itemName, "name")
+			frame.icon:SetNormalTexture(itemTexture)
+		end
 		
 		local data = {}
 		local style = {}
@@ -504,10 +547,10 @@ function private.CreateFrames()
 				end
 		end
 	--BC CLASSIC DATA SEARCH	
-	    if settings.classic then
+	if settings.classic then
 		data, style = private.classicSearch(data, style, itemName, settings)
-	    end
-	    
+	end
+	
 		frame.resultlist.sheet:SetData(data, style)
 	end
 	 
