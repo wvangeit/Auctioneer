@@ -192,6 +192,10 @@ function private.CreateFrames()
 
 			frame.UpdateImage()
 			frame.InitControls()
+			--Also pass this search to BeanCounter's frame
+			if BeanCounter and BeanCounter.externalSearch then
+				BeanCounter.externalSearch(item[2])
+			end			
 		else
 			frame.salebox.name:SetText("No item selected")
 			frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
