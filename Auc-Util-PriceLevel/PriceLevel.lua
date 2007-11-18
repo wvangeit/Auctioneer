@@ -324,3 +324,5 @@ function lib.CalcLevel(link, quantity, bidPrice, buyPrice, itemWorth)
 
 	return priceLevel, perItem, r,g,b, lvl, itemWorth
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

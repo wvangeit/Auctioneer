@@ -152,3 +152,5 @@ end
 
 function private.Baz()
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

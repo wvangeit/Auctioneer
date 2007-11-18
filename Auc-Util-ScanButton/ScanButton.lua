@@ -188,3 +188,4 @@ function private.pause()
 	private.UpdateScanProgress()
 end
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

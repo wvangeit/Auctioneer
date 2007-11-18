@@ -372,3 +372,5 @@ function private.ConfigChanged()
 		private.ScanProgressReceiver(true)
 	end
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

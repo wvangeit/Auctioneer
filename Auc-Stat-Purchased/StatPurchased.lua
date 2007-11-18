@@ -383,3 +383,5 @@ function private.LoadData()
 	AAStatPurchasedData = AucAdvancedStatPurchasedData
 	private.DataLoaded()
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

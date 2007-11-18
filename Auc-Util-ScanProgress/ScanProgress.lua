@@ -173,3 +173,5 @@ function private.ConfigChanged()
 		private.UpdateScanProgress(true)
 	end
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

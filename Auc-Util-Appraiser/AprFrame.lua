@@ -1688,5 +1688,4 @@ function private.CreateFrames()
 	hooksecurefunc("AuctionFrameTab_OnClick", frame.ScanTab.OnClick)
 end
 
-
-
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

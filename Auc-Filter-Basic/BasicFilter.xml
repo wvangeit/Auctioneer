@@ -1,5 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
+	<Script>
+		AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auctioneer/AucManifest.lua $", "$Rev: 1746 $")
+	</Script>
 	<Button name="BF_IgnoreListLineTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="260" y="16"/>

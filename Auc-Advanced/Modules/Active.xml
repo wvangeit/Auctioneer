@@ -5,5 +5,6 @@
 		AucAdvanced.EmbeddedModules = {
 			"Auc-Util-Example",
 		}
+		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 	</Script>
 </Ui>

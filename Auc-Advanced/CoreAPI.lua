@@ -393,7 +393,6 @@ function lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
 end
 
 -- Appraiser APIs
-
 function lib.GetBidBuyPrices(itemLink, defaultOnly)
 	-- itemLink is a link
 	-- defaultOnly is whether to only use default prices or not (ie. whether to ignore fixed values, etc)
@@ -474,3 +473,5 @@ function lib.GetBidBuyPrices(itemLink, defaultOnly)
 	
 	return newBid, newBuy, curModelText
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

@@ -3,4 +3,7 @@
 	<Script file="Appraiser.lua"/>
 	<Script file="AprSettings.lua"/>
 	<Script file="AprFrame.lua"/>
+	<Script>
+		AucAdvanced.RegisterRevision("$URL$", "$Rev$")
+	</Script>
 </Ui>

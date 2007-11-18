@@ -764,3 +764,5 @@ function private.SetupConfigGui(gui)
 		"Why do I want to prevent other modules from changing the browse window?",
 		"If you have a module such as ScanProgress installed, and activated, it will change the browse interface so that you cannot see the items as you are scanning. This option will revert the display so that you can see the items while scanning instead.")
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

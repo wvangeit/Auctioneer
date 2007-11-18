@@ -27,7 +27,10 @@ while ($count < @embeddedModules) {
 	print OUTPUT "\t\t\t\"$embeddedModules[$count]\",\n";
 	$count++
 }
-print OUTPUT "\t\t}\n\t</Script>\n";
+print OUTPUT "\t\t}";
+print OUTPUT "\n\t\t";
+print OUTPUT 'AucAdvanced.RegisterRevision("$URL$", "$Rev$")';
+print OUTPUT "\n\t</Script>\n";
 print OUTPUT "</Ui>";
 
 print "Activated: $active modules.\n";

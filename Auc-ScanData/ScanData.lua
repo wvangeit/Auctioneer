@@ -335,3 +335,5 @@ function lib.OnUnload()
 		end
 	end
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

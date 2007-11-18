@@ -246,3 +246,4 @@ function lib.GetModuleLocals()
 	lib.Settings.GetSetting, lib.Settings.SetSetting, lib.Settings.SetDefault
 end
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

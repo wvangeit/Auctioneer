@@ -97,3 +97,5 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "TinyNumber", 0, 1, "util.vendmarkup.multiplier" or 300, 100, 1000, "Vendor markup (in percent)")
 
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

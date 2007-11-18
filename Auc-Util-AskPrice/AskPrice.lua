@@ -552,3 +552,5 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.whispers", "Shows (enabled) or hides (disabled) outgoing whispers from Askprice.")
 
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

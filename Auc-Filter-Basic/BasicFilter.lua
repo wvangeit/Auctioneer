@@ -300,3 +300,4 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	hideOnEscape = 1
 };
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

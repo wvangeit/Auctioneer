@@ -73,3 +73,4 @@ function lib.CanSupplyMarket()
 	return true
 end
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

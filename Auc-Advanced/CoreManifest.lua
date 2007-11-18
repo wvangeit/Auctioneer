@@ -32,89 +32,51 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-AucAdvanced.Const = {
-	AucMinTimes = {
-		0,
-		1800, -- 30 mins
-		7200, -- 2 hours
-		43200, -- 12 hours
-	},
-	AucMaxTimes = {
-		1800,  -- 30 mins
-		7200,  -- 2 hours
-		28800, -- 12 hours
-		172800 -- 48 hours
-	},
-	InvTypes = {
-		INVTYPE_HEAD = 1,
-		INVTYPE_NECK = 2,
-		INVTYPE_SHOULDER = 3,
-		INVTYPE_BODY = 4,
-		INVTYPE_CHEST = 5,
-		INVTYPE_WAIST = 6,
-		INVTYPE_LEGS = 7,
-		INVTYPE_FEET = 8,
-		INVTYPE_WRIST = 9,
-		INVTYPE_HAND = 10,
-		INVTYPE_FINGER = 11,
-		INVTYPE_TRINKET = 12,
-		INVTYPE_WEAPON = 13,
-		INVTYPE_SHIELD = 14,
-		INVTYPE_RANGEDRIGHT = 15,
-		INVTYPE_CLOAK = 16,
-		INVTYPE_2HWEAPON = 17,
-		INVTYPE_BAG = 18,
-		INVTYPE_TABARD = 19,
-		INVTYPE_ROBE = 20,
-		INVTYPE_WEAPONMAINHAND = 21,
-		INVTYPE_WEAPONOFFHAND = 22,
-		INVTYPE_HOLDABLE = 23,
-		INVTYPE_AMMO = 24,
-		INVTYPE_THROWN = 25,
-		INVTYPE_RANGED = 26,
-	},
-	LINK = 1,
-	ILEVEL = 2,
-	ITYPE = 3,
-	ISUB = 4,
-	IEQUIP = 5,
-	PRICE = 6,
-	TLEFT = 7,
-	TIME = 8,
-	NAME = 9,
-	TEXTURE = 10,
-	COUNT = 11,
-	QUALITY = 12,
-	CANUSE = 13,
-	ULEVEL = 14,
-	MINBID = 15,
-	MININC = 16,
-	BUYOUT = 17,
-	CURBID = 18,
-	AMHIGH = 19,
-	SELLER = 20,
-	FLAG = 21,
-	ID = 22,
-	ITEMID = 23,
-	SUFFIX = 24,
-	FACTOR = 25,
-	ENCHANT = 26,
-	SEED = 27,
+if (not AucAdvanced) then AucAdvanced = {} end
+local lib = AucAdvanced
 
-	FLAG_DIRTY = 1,
-	FLAG_UNSEEN = 2,
-	FLAG_FILTER = 4,
+lib.revisions = {}
+lib.distribution = {--[[<%revisions%>]]} --Currently unused, needs a change in the build script
 
-	CLASSES = { GetAuctionItemClasses() },
-	SUBCLASSES = { },
-}
+function lib.RegisterRevision(path, revision)
+	if (not path and revision) then
+		return
+	end
 
-for i = 1, #AucAdvanced.Const.CLASSES do
-	AucAdvanced.Const.SUBCLASSES[i] = { GetAuctionItemSubClasses(i) }
+	local file = path:match("%$URL: .*/auctioneer/([^%$]+) %$")
+	local rev = revision:match("(%d+)")
+
+	if (not file) then
+		return
+	end
+	rev = tonumber(rev) or 0
+
+	lib.revisions[file] = rev
 end
 
-AucAdvanced.Defaults = {
-	Scanner = "Simple",
-}
+function lib.GetCurrentRevision()
+	local revNumber = 0
+	local revFile
+	for file, revision in pairs(lib.revisions) do
+		if (revision > revNumber) then
+			revNumber = revision
+			revFile = file
+		end
+	end
+
+	return revNumber, revFile
+end
+
+function lib.GetRevisionList()
+	return lib.revisions
+end
+
+function lib.GetDistributionList()
+	return lib.distribution
+end
+
+function lib.ValidateInstall()
+	return true --NoOp for the moment
+end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")

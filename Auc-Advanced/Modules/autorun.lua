@@ -45,7 +45,9 @@ output:write("\n\t<Script>\n\t\tAucAdvanced.EmbeddedModules = {\n")
 for index, module in ipairs(embeddedModules) do
 	output:write("\t\t\t\""..module.."\",\n")
 end
-output:write("\t\t}\n\t</Script>\n")
+output:write("\t\t}\n\t\t")
+output:write([[AucAdvanced.RegisterRevision("$URL$", "$Rev$")]])
+output:write("\n\t</Script>\n")
 output:write("</Ui>")
 
 print("Activated: "..active.." modules.")

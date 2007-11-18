@@ -294,3 +294,5 @@ end
 function AucAdvanced.Debug.Assert(test, message)
 	return DebugLib.Assert(addonName, test, message)
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

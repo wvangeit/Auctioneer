@@ -422,3 +422,5 @@ if LibStub then
 		}
 	end
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

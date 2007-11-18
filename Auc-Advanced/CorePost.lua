@@ -596,3 +596,5 @@ end)
 
 -- Local tooltip for getting soulbound line from tooltip contents
 private.tip = CreateFrame("GameTooltip", "AppraiserTip", UIParent, "GameTooltipTemplate")
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

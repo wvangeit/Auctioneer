@@ -1087,3 +1087,5 @@ end
 function private.getOption(option)
 	return AucAdvanced.Settings.GetSetting(option)
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

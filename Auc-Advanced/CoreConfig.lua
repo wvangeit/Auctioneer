@@ -48,6 +48,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
 		private.Print("  {{/auc abort}} - Stop scanning the auctionhouse, discard current data")
 		private.Print("  {{/auc clear <itemlink>}} - Clears data for <itemlink> from the stat modules")
+		private.Print("  {{/auc about [all]}} - Shows the currenly running version of Auctioneer Advanced, if all is specified, also shows the version for every file in the package")
 		for system, systemMods in pairs(AucAdvanced.Modules) do
 			for engine, engineLib in pairs(systemMods) do
 				if (engineLib.CommandHandler) then
@@ -71,6 +72,8 @@ function private.CommandHandler(command, subcommand, ...)
 			subcommand = string.join(" ", subcommand, ...)
 		end
 		AucAdvanced.API.ClearItem(subcommand)
+	elseif command == "about" then
+		lib.About(subcommand, ...)
 	else
 		if command and subcommand then
 			subcommand = subcommand:lower()
@@ -131,7 +134,22 @@ function lib.GetCommandLead(llibType, llibName)
 	return "  {{"..SLASH_AUCADVANCED1.." "..llibType:lower().." "..llibName:lower()
 end
 
+function lib.About(all)
+	local rev = AucAdvanced.GetCurrentRevision()
+	private.Print(("Auctioneer Advanced rev.%d loaded"):format(rev))
+	
+	if (all) then
+		local revisionsList = AucAdvanced.GetRevisionList()
+		
+		for file, revision in pairs(revisionsList) do
+			local shortName = file:match(".-/(%u.*)")
+			private.Print(("    File \"%s\", revision: %d"):format(shortName, revision))
+		end
+	end
+end
+
 SLASH_AUCADVANCED1 = "/auc"
 SLASH_AUCADVANCED2 = "/aadv"
 SlashCmdList["AUCADVANCED"] = function(msg) private.CommandHandler(strsplit(" ", msg)) end
 
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

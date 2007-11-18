@@ -39,7 +39,7 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 
 local data
 local ZValues = {.063, .126, .189, .253, .319, .385, .454, .525, .598, .675, .756, .842, .935, 1.037, 1.151, 1.282, 1.441, 1.646, 1.962, 20, 20000}
-	
+
 function lib.CommandHandler(command, ...)
 	if (not data) then private.makeData() end
 	local myFaction = AucAdvanced.GetFaction()
@@ -111,7 +111,7 @@ function private.GetCfromZ(Z)
 	while Z > ZValues[i] do
 		i = i + 1
 	end
-	if i == 1 then 
+	if i == 1 then
 		return .05
 	else
 		i = i - 1 + ((Z - ZValues[i-1]) / (ZValues[i] - ZValues[i-1]))
@@ -177,12 +177,12 @@ function lib.GetPrice(hyperlink, faction)
 	local confidence = .01
 	recycle(stats)
 	local average
-	if (number > 0) then 
-		average = total / number 
+	if (number > 0) then
+		average = total / number
 		confidence = (.15*average)*(number^0.5)/(stdev)
 		confidence = private.GetCfromZ(confidence)
 	end
-	
+
 	return average, mean, false, stdev, variance, count, confidence
 end
 
@@ -323,4 +323,4 @@ function private.makeData()
 	private.DataLoaded()
 end
 
-
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

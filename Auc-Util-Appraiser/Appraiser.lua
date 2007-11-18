@@ -111,5 +111,4 @@ function lib.OnLoad()
 	AucAdvanced.Settings.SetDefault("util.appraiser.model", "market")
 end
 
-
-
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

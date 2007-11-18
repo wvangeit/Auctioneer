@@ -460,4 +460,4 @@ function private.SetupConfigGui(gui)
 	private.guiId = id
 end
 
-
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

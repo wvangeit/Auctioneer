@@ -385,3 +385,5 @@ function private.DataLoaded()
 		end
 	end
 end
+
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

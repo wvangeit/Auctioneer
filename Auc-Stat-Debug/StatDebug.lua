@@ -199,3 +199,5 @@ end
 function private.DataLoaded()
 	if (not StatData) then return end
 end
+
+AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auctioneer/AucManifest.lua $", "$Rev: 1746 $")
