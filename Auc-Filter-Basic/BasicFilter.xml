@@ -13,7 +13,7 @@
 				this:SetFrameLevel( this:GetFrameLevel() + 4 );
 			</OnLoad>
 			<OnClick>
-				IgnoreList_IgnoreButton_OnClick(self)
+				BF_IgnoreList_IgnoreButton_OnClick(self)
 			</OnClick>
 		</Scripts>
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
@@ -49,7 +49,7 @@
 						GameTooltip:Hide();
 					</OnLeave>
 					<OnEvent>
-						IgnoreList_OnEvent();
+						BF_IgnoreList_OnEvent();
 					</OnEvent>
 				</Scripts>
 			</Button>
@@ -69,7 +69,7 @@
 						this:SetFrameLevel( this:GetFrameLevel() + 3 );
 					</OnLoad>
 					<OnClick>
-						IgnoreList_UnignoreButton_OnClick(self)
+						BF_IgnoreList_UnignoreButton_OnClick(self)
 					</OnClick>
 					<OnEnter>
 						
@@ -308,7 +308,7 @@
 						ScrollFrame_OnLoad();
 					</OnLoad>
 					<OnVerticalScroll>
-						FauxScrollFrame_OnVerticalScroll(16, IgnoreList_Update);
+						FauxScrollFrame_OnVerticalScroll(16, BF_IgnoreList_Update);
 					</OnVerticalScroll>
 				</Scripts>
 			</ScrollFrame>

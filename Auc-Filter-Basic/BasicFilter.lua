@@ -78,7 +78,7 @@ function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.quality", 1)
 	AucAdvanced.Settings.SetDefault("filter.basic.min.level", 0)
 	AucAdvanced.Settings.SetDefault("filter.basic.ignoreself", false)
-	IgnoreList_Load()
+	BF_IgnoreList_Load()
 	private.DataLoaded()
 	BasicFilter_IgnoreListFrame:RegisterEvent("PLAYER_LOGOUT")
 end
@@ -146,7 +146,7 @@ function lib.IgnoreList_IsPlayerIgnored( name )
 	end
 end
 
-function IgnoreList_Update()
+function BF_IgnoreList_Update()
 	local numIgnores = #IgnoreList
 	local nameText;
 	local name;
@@ -186,17 +186,17 @@ function IgnoreList_Update()
 	
 end
 
-function IgnoreList_IgnoreButton_OnClick( button )
+function BF_IgnoreList_IgnoreButton_OnClick( button )
 	SelectedIgnore = button:GetID()
-	IgnoreList_Update()
+	BF_IgnoreList_Update()
 end
 
-function IgnoreList_UnignoreButton_OnClick( button )
+function BF_IgnoreList_UnignoreButton_OnClick( button )
 	local name = IgnoreList[SelectedIgnore]
-	IgnoreList_Remove(name)
+	BF_IgnoreList_Remove(name)
 end
 
-function IgnoreList_Load()
+function BF_IgnoreList_Load()
 	local realm = GetRealmName()
 	local faction = UnitFactionGroup("player")
 
@@ -216,10 +216,10 @@ function IgnoreList_Load()
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
 	end
-	IgnoreList_Update()
+	BF_IgnoreList_Update()
 end
 
-function IgnoreList_OnEvent()
+function BF_IgnoreList_OnEvent()
 	if event == "PLAYER_LOGOUT" then
 		for key in pairs(IgnoreList) do
 			if type(key) == "number" then
@@ -229,7 +229,7 @@ function IgnoreList_OnEvent()
 	end
 end
 
-function IgnoreList_Add( name )
+function BF_IgnoreList_Add( name )
 	-- name validity checks
 	if ( (not name) or name == "" ) then return end
 	if ( #name < 2 ) then return end
@@ -247,10 +247,10 @@ function IgnoreList_Add( name )
 		IgnoreList[name] = i
 	end
 	SelectedIgnore = IgnoreList[currentSelection] or 1
-	IgnoreList_Update()
+	BF_IgnoreList_Update()
 end
 
-function IgnoreList_Remove( name )
+function BF_IgnoreList_Remove( name )
 	if ( IgnoreList[name] ) then
 		IgnoreList[name] = nil
 		for i, ignoreName in ipairs(IgnoreList) do
@@ -264,7 +264,7 @@ function IgnoreList_Remove( name )
 	for i, name in ipairs(IgnoreList) do
 		IgnoreList[name] = i
 	end
-	IgnoreList_Update()
+	BF_IgnoreList_Update()
 end
 
 StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
@@ -275,7 +275,7 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	maxLetters = 12,
 	OnAccept = function()
 		local editBox = getglobal(this:GetParent():GetName().."EditBox");
-		IgnoreList_Add(editBox:GetText());
+		BF_IgnoreList_Add(editBox:GetText());
 	end,
 	OnShow = function()
 		getglobal(this:GetName().."EditBox"):SetFocus();
@@ -289,7 +289,7 @@ StaticPopupDialogs["BASICFILTER_ADD_IGNORE"] = {
 	EditBoxOnEnterPressed = function()
 		local name = getglobal(this:GetParent():GetName().."EditBox"):GetText();
 		this:GetParent():Hide();
-		IgnoreList_Add(name);
+		BF_IgnoreList_Add(name);
 	end,
 	EditBoxOnEscapePressed = function()
 		this:GetParent():Hide();
