@@ -1290,8 +1290,8 @@ AuctioneerLocalizations = {
 		["FrmtInfoNever"]	= "Noch nie in %s gesehen";
 		["FrmtInfoNeverAtAll"]	= "Noch nie im AH gesehen.";
 		["FrmtInfoSeen"]	= "Insgesamt %d mal in Auktionen gesehen";
-		["FrmtInfoSgst"]	= "Empfohlener Preis: %s min/%s Sofortkauf";
-		["FrmtInfoSgststx"]	= "Empfohlener Preis für diesen %der Stapel: %s min/%s Sofortkauf (%s/%s pro Stück)";
+		["FrmtInfoSgst"]	= "Empf. Preis: %s min/%s Sofortkauf";
+		["FrmtInfoSgststx"]	= "Empf. Preis für %der Stapel: %s min/%s Sofortkauf (%s/%s pro Stück)";
 		["FrmtInfoSnapmed"]	= "Sofortkaufsmedian (pro Stück) aus %d gescannten Auktionen:";
 		["FrmtInfoStacksize"]	= "Durchschnittliche Stapelgröße: %d Stück";
 
@@ -2554,7 +2554,7 @@ AuctioneerLocalizations = {
 		["MesgNotconverting"]	= "Auctioneer ne convertit pas votre base de données, mais ne fonctionnera pas tant que vous ne l'aurez pas fait.";
 
 		-- Section: Game Constants
-		["SubTypeBag"]	= "Conteneur";
+		["SubTypeBag"]	= "Sac";
 		["TimeLong"]	= "Longue";
 		["TimeMed"]	= "Moyenne";
 		["TimeShort"]	= "Courte";
@@ -2577,6 +2577,10 @@ AuctioneerLocalizations = {
 		["UIScanFailed"]	= "Auctioneer: Scan d'actions raté";
 
 		-- Section: Generic Strings
+		["SubClassDevices"]	= "Appareils";
+		["SubClassExplosives"]	= "Explosifs";
+		["SubClassParts"]	= "Eléments";
+		["SubClassTradeGoods"]	= "Artisanat";
 		["TextCombat"]	= "Combat";
 		["TextGeneral"]	= "Général";
 		["TextNone"]	= "Aucun";
@@ -3461,6 +3465,10 @@ AuctioneerLocalizations = {
 		["UIScanFailed"]	= "Auctioneer: 경매 검색이 실패했습니다.";
 
 		-- Section: Generic Strings
+		["SubClassDevices"]	= "장치";
+		["SubClassExplosives"]	= "폭발물";
+		["SubClassParts"]	= "부품";
+		["SubClassTradeGoods"]	= "물품";
 		["TextCombat"]	= "전투";
 		["TextGeneral"]	= "일반";
 		["TextNone"]	= "없음";
@@ -5097,20 +5105,20 @@ AuctioneerLocalizations = {
 		-- Section: Auction Messages
 		["FrmtActRemove"]	= "从当前拍卖行汇总中删除标识%s。";
 		["FrmtAuctinfoHist"]	= "既往%d次";
-		["FrmtAuctinfoLow"]	= "汇总后降至";
+		["FrmtAuctinfoLow"]	= "当前市场中的最低价";
 		["FrmtAuctinfoMktprice"]	= "市场价格";
 		["FrmtAuctinfoNolow"]	= "最近汇总未发现该物品";
-		["FrmtAuctinfoOrig"]	= "原起拍价";
+		["FrmtAuctinfoOrig"]	= "默认起拍价";
 		["FrmtAuctinfoSnap"]	= "刚扫描到%d次";
 		["FrmtAuctinfoSugbid"]	= "建议起拍价";
 		["FrmtAuctinfoSugbuy"]	= "建议一口价";
-		["FrmtWarnAbovemkt"]	= "竞卖超出行情";
-		["FrmtWarnMarkup"]	= "标高为商贩收购价的%s%%";
+		["FrmtWarnAbovemkt"]	= "竞争者定价过高";
+		["FrmtWarnMarkup"]	= "设为卖给商店价格的%s%%";
 		["FrmtWarnMyprice"]	= "使用当前自定价";
-		["FrmtWarnNocomp"]	= "无竞价";
+		["FrmtWarnNocomp"]	= "已知目前无人在拍卖此件商品";
 		["FrmtWarnNodata"]	= "无最高曾售价的数据";
-		["FrmtWarnToolow"]	= "无法匹配最低价";
-		["FrmtWarnUndercut"]	= "削价%s%%";
+		["FrmtWarnToolow"]	= "竞争者定价过低";
+		["FrmtWarnUndercut"]	= "设为比已知的最低一口价还要低%s%%";
 		["FrmtWarnUser"]	= "使用自定价";
 
 		-- Section: Bid Messages
@@ -5176,8 +5184,8 @@ AuctioneerLocalizations = {
 
 		-- Section: Commands
 		["CmdAlso"]	= "also而且";
-		["CmdAlsoHome"]	= "home";
-		["CmdAlsoNeutral"]	= "neutral";
+		["CmdAlsoHome"]	= "home 自身";
+		["CmdAlsoNeutral"]	= "neutral 中立";
 		["CmdAlsoOpposite"]	= "opposite对立";
 		["CmdAlt"]	= "Alt";
 		["CmdAskPriceAd"]	= "ad启事";
@@ -5250,6 +5258,8 @@ AuctioneerLocalizations = {
 		-- Section: Config Text
 		["GuiAlso"]	= "同时显示数据";
 		["GuiAlsoDisplay"]	= "显示%s的数据";
+		["GuiAlsoHome"]	= "同时显示自身阵营的数据。";
+		["GuiAlsoNeutral"]	= "同时显示中立阵营的数据。";
 		["GuiAlsoOff"]	= "不再显示其他服务器-阵营的数据。";
 		["GuiAlsoOpposite"]	= "同时显示对立阵营的数据。";
 		["GuiAskPrice"]	= "启用询价";
@@ -5351,6 +5361,10 @@ AuctioneerLocalizations = {
 		["UIScanFailed"]	= "拍卖助手: 拍卖扫描失败";
 
 		-- Section: Generic Strings
+		["SubClassDevices"]	= "装置";
+		["SubClassExplosives"]	= "炸药";
+		["SubClassParts"]	= "零件";
+		["SubClassTradeGoods"]	= "商品";
 		["TextCombat"]	= "战斗";
 		["TextGeneral"]	= "常规";
 		["TextNone"]	= "无";
@@ -5363,7 +5377,7 @@ AuctioneerLocalizations = {
 		["HelpAskPriceAd"]	= "启用或禁用新的询价特色启事。";
 		["HelpAskPriceGuild"]	= "响应公会频道中的查询。";
 		["HelpAskPriceParty"]	= "响应队伍频道中的查询。";
-		["HelpAskPriceSend"]	= "手动发送给玩家询价查询结果";
+		["HelpAskPriceSend"]	= "手动发送给玩家询价查询结果。";
 		["HelpAskPriceSmart"]	= "启用或禁用智能字检查。";
 		["HelpAskPriceTrigger"]	= "更改询价触发器特性。";
 		["HelpAskPriceVendor"]	= "启用或禁用发送商贩定价数据。";
@@ -5458,10 +5472,10 @@ AuctioneerLocalizations = {
 		["FrmtInfoBuyMulti"]	= "一口价(%s每件%s)";
 		["FrmtInfoBuyOne"]	= "一口价%s";
 		["FrmtInfoForone"]	= "每件:最低价%s/一口价%s(竞拍价%s)[%d件]";
-		["FrmtInfoHeadMulti"]	= "%d件物品平均:";
-		["FrmtInfoHeadOne"]	= "该物品平均:";
+		["FrmtInfoHeadMulti"]	= "%d件物品平均数据:";
+		["FrmtInfoHeadOne"]	= "该物品平均数据:";
 		["FrmtInfoHistmed"]	= "之前有%d次,一口价中位数(每件)";
-		["FrmtInfoMinMulti"]	= "起拍价(每件%s)";
+		["FrmtInfoMinMulti"]	= "平均起拍价(每件%s)";
 		["FrmtInfoMinOne"]	= "起拍价";
 		["FrmtInfoNever"]	= "从未在%s出现过";
 		["FrmtInfoNeverAtAll"]	= "拍卖所从未出现过";
@@ -5472,7 +5486,10 @@ AuctioneerLocalizations = {
 		["FrmtInfoStacksize"]	= "平均堆叠数量:%d件";
 
 		-- Section: User Interface
+		["BuySortTooltip"]	= "按一口价排序结果页(按住Shift排序物品名称)";
+		["ClearTooltip"]	= "清除搜索框所有自定义搜索参数。";
 		["FrmtLastSoldOn"]	= "最终以%s售出";
+		["RefreshTooltip"]	= "再次提交当前页面搜索请求。";
 		["UiBid"]	= "竞标";
 		["UiBidHeader"]	= "出价";
 		["UiBidPerHeader"]	= "单件出价";
@@ -5489,6 +5506,8 @@ AuctioneerLocalizations = {
 		["UiMaxError"]	= "(最多%d件)";
 		["UiMaximumPriceLabel"]	= "最高价格";
 		["UiMaximumTimeLeftLabel"]	= "最多剩余时间：";
+		["UiMinimumBidPercentLabel"]	= "最低出价%:";
+		["UiMinimumPercentLessShortLabel"]	= "最低比率以下：";
 		["UiMinimumProfitLabel"]	= "最低利润：";
 		["UiMinimumQualityLabel"]	= "最低品质：";
 		["UiMinimumUndercutLabel"]	= "最低削价：";
@@ -5517,9 +5536,11 @@ AuctioneerLocalizations = {
 		["UiSearchAuctions"]	= "搜索拍卖";
 		["UiSearchDropDownLabel"]	= "搜索";
 		["UiSearchForLabel"]	= "搜索物品";
+		["UiSearchForOwnerLabel"]	= "物品消息搜索为：";
 		["UiSearchTypeBids"]	= "出价";
 		["UiSearchTypeBuyouts"]	= "一口价";
 		["UiSearchTypeCompetition"]	= "竞卖";
+		["UiSearchTypeOwner"]	= "卖主";
 		["UiSearchTypePlain"]	= "物品";
 		["UiStacksLabel"]	= "堆叠";
 		["UiStackTooBigError"]	= "(堆叠太多)";
@@ -5534,7 +5555,7 @@ AuctioneerLocalizations = {
 	zhTW = {
 
 		-- Section: AskPrice Messages
-		["AskPriceAd"]	= "得到每疊價格: %sx[ItemLink ] (x = stacksize)\n";
+		["AskPriceAd"]	= "以%sx[物品鏈接](x=堆疊數量)獲取堆疊價格\n";
 		["FrmtAskPriceBuyoutMedianHistorical"]	= "%s歷來平均售出價: %s%s";
 		["FrmtAskPriceBuyoutMedianSnapshot"]	= "%s上次掃瞄平均售出價: %s%s";
 		["FrmtAskPriceDisable"]	= "禁用詢價選項:%s";
@@ -5600,6 +5621,7 @@ AuctioneerLocalizations = {
 
 		-- Section: Command Options
 		["OptAlso"]	= "(伺服器-聯盟|部落|opposite(敵對陣營))";
+		["OptAskPriceSend"]	= "(<玩家名> <詢價請求>)";
 		["OptAuctionDuration"]	= "(last(上次)|2h(2小時)|8h(8小時)|24h(24小時))";
 		["OptBidbroker"]	= "<可得利潤>";
 		["OptBidLimit"]	= "<數量>";
@@ -5623,11 +5645,14 @@ AuctioneerLocalizations = {
 
 		-- Section: Commands
 		["CmdAlso"]	= "also";
+		["CmdAlsoHome"]	= "home";
+		["CmdAlsoNeutral"]	= "neutral";
 		["CmdAlsoOpposite"]	= "opposite";
 		["CmdAlt"]	= "alt";
 		["CmdAskPriceAd"]	= "ad";
 		["CmdAskPriceGuild"]	= "guild";
 		["CmdAskPriceParty"]	= "party";
+		["CmdAskPriceSend"]	= "send";
 		["CmdAskPriceSmart"]	= "smart";
 		["CmdAskPriceSmartWord1"]	= "what";
 		["CmdAskPriceSmartWord2"]	= "worth";
@@ -5694,6 +5719,8 @@ AuctioneerLocalizations = {
 		-- Section: Config Text
 		["GuiAlso"]	= "總是顯示資料";
 		["GuiAlsoDisplay"]	= "顯示 %s 的資料";
+		["GuiAlsoHome"]	= "同時顯示自身陣營的數據。";
+		["GuiAlsoNeutral"]	= "同时显示中立阵营的数据。";
 		["GuiAlsoOff"]	= "不再顯示其他伺服器-陣營的資料。";
 		["GuiAlsoOpposite"]	= "同時顯示敵立陣營的數據。";
 		["GuiAskPrice"]	= "啟動詢價功能";
@@ -5772,12 +5799,14 @@ AuctioneerLocalizations = {
 		["MesgNotconverting"]	= "您的資料庫尚未經過轉換更新，您必須轉換資料庫才能使用拍賣助手。";
 
 		-- Section: Game Constants
+		["SubTypeBag"]	= "背包";
 		["TimeLong"]	= "長";
 		["TimeMed"]	= "中";
 		["TimeShort"]	= "短";
 		["TimeVlong"]	= "非常長";
 
 		-- Section: Generic Messages
+		["ConfirmBidBuyout"]	= "是否確實要 %s\n%dx%s ：";
 		["DisableMsg"]	= "禁止自動載入拍賣助手";
 		["FrmtWelcome"]	= "拍賣助手 v%s 已載入";
 		["MesgNotLoaded"]	= "拍賣助手尚未載入。 輸入 /auctioneer 取得說明。";
@@ -5793,11 +5822,15 @@ AuctioneerLocalizations = {
 		["UIScanFailed"]	= "拍賣助手: 賣場掃描失敗";
 
 		-- Section: Generic Strings
+		["SubClassDevices"]	= "裝置";
+		["SubClassExplosives"]	= "炸藥";
+		["SubClassParts"]	= "零件";
+		["SubClassTradeGoods"]	= "商品";
 		["TextCombat"]	= "戰鬥";
 		["TextGeneral"]	= "一般";
 		["TextNone"]	= "無";
 		["TextScan"]	= "掃描";
-		["TextUsage"]	= "使用：";
+		["TextUsage"]	= "用法：";
 
 		-- Section: Help Text
 		["HelpAlso"]	= "提示中顯示其他伺服器上的價格。例如: \"/auctioneer also 阿薩斯-部落\" 或是使用參數：opposite(對立陣營), off(關閉功能)";
@@ -5805,6 +5838,7 @@ AuctioneerLocalizations = {
 		["HelpAskPriceAd"]	= "啟用或關閉新的詢價功能廣告。";
 		["HelpAskPriceGuild"]	= "回應團隊頻道的詢價。";
 		["HelpAskPriceParty"]	= "回應隊伍頻道的詢價。";
+		["HelpAskPriceSend"]	= "手動發送給玩家詢價查詢結果。";
 		["HelpAskPriceSmart"]	= "允許或關閉智慧觸發字元偵測(SmartWords checking)。\n";
 		["HelpAskPriceTrigger"]	= "改變詢價(AskPrice)的觸發字元。";
 		["HelpAskPriceVendor"]	= "允許或關閉商店價格資料發送。\n";
@@ -5878,12 +5912,16 @@ AuctioneerLocalizations = {
 		["AuctionDiscrepancies"]	= "有改變的項目：%s";
 		["AuctionNewAucts"]	= "掃描到的新拍賣：%s";
 		["AuctionPageN"]	= "拍賣助手: \n正在掃描 %s 第%d頁 共%d頁\n每秒掃描筆數：%s \n預計剩下時間：%s";
+		["AuctionScanAll"]	= "掃描所有拍賣項。";
+		["AuctionScanAuctions"]	= "掃描拍賣項.";
+		["AuctionScanCat"]	= "掃描 %s 所有拍賣項";
 		["AuctionScanDone"]	= "拍賣助手：拍賣掃描完成";
 		["AuctionScanNexttime"]	= "拍賣助手將會在下次與拍賣員說話時進行完全掃描";
 		["AuctionScanNocat"]	= "你必須最少選擇一個類別進行掃描。";
 		["AuctionScanRedo"]	= "目前這頁花了超過 %d 秒掃描，重試本頁。";
 		["AuctionScanStart"]	= "拍賣助手：正在掃描 %s 第1頁．．．";
 		["AuctionTotalAucts"]	= "掃描到的拍賣數量：%s";
+		["AuctionUpdatedAucts"]	= "更新/修改 拍賣項: %s";
 
 		-- Section: Tooltip Messages
 		["FrmtInfoAlsoseen"]	= "在 %s 看過 %d 次";
@@ -5901,6 +5939,7 @@ AuctioneerLocalizations = {
 		["FrmtInfoMinMulti"]	= "起標價(每個 %s)";
 		["FrmtInfoMinOne"]	= "起標價";
 		["FrmtInfoNever"]	= "從未出現在 %s 過";
+		["FrmtInfoNeverAtAll"]	= "拍賣所從未出現過";
 		["FrmtInfoSeen"]	= "在拍賣場中出現過 %d 次";
 		["FrmtInfoSgst"]	= "建議價格：起標 %s／直購 %s";
 		["FrmtInfoSgststx"]	= "對你這一疊共 %d 個的建議價格：起標 %s／直購 %s";
@@ -5908,7 +5947,10 @@ AuctioneerLocalizations = {
 		["FrmtInfoStacksize"]	= "平均堆疊數量：%d個";
 
 		-- Section: User Interface
+		["BuySortTooltip"]	= "按一口價排序結果頁(按住Shift排序物品名稱)";
+		["ClearTooltip"]	= "清除搜索框所有自定義搜索參數。";
 		["FrmtLastSoldOn"]	= "最後售出價格";
+		["RefreshTooltip"]	= "再次提交當前頁面搜索請求。";
 		["UiBid"]	= "出價";
 		["UiBidHeader"]	= "出價";
 		["UiBidPerHeader"]	= "每個標價";
@@ -5925,6 +5967,8 @@ AuctioneerLocalizations = {
 		["UiMaxError"]	= "(%d 最大)";
 		["UiMaximumPriceLabel"]	= "最高價格：";
 		["UiMaximumTimeLeftLabel"]	= "最大剩餘時間：";
+		["UiMinimumBidPercentLabel"]	= "最低出價%:";
+		["UiMinimumPercentLessShortLabel"]	= "最低比率以下：";
 		["UiMinimumProfitLabel"]	= "最小利潤：";
 		["UiMinimumQualityLabel"]	= "過濾最低級別：";
 		["UiMinimumUndercutLabel"]	= "最低削價：";
@@ -5953,9 +5997,11 @@ AuctioneerLocalizations = {
 		["UiSearchAuctions"]	= "搜尋拍賣";
 		["UiSearchDropDownLabel"]	= "搜尋：";
 		["UiSearchForLabel"]	= "尋找物品：";
+		["UiSearchForOwnerLabel"]	= "物品消息搜索為：";
 		["UiSearchTypeBids"]	= "出價查詢";
 		["UiSearchTypeBuyouts"]	= "直購價查詢";
 		["UiSearchTypeCompetition"]	= "競標";
+		["UiSearchTypeOwner"]	= "賣主";
 		["UiSearchTypePlain"]	= "物品";
 		["UiStacksLabel"]	= "疊";
 		["UiStackTooBigError"]	= "(疊數太多)";
