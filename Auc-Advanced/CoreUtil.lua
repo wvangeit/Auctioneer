@@ -109,7 +109,7 @@ function lib.GetFactionGroup()
 	else
 		SetMapToCurrentZone()
 		local map = GetMapInfo()
-		if ((map == "Taneris") or (map == "Winterspring") or (map == "Stranglethorn")) then
+		if ((map == "Tanaris") or (map == "Winterspring") or (map == "Stranglethorn")) then
 			factionGroup = "Neutral"
 		end
 	end
