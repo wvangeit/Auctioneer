@@ -1372,8 +1372,8 @@ BtmScan.PromptPurchase = function(item)
 	if (not item.canbuy or item.purchase < item.buy) then bidText, BidText = "bid on", "Bid" end
 
 	local hours
-	if (item.remain == 4) then hours = 24
-	elseif (item.remain == 3) then hours = 8
+	if (item.remain == 4) then hours = 48
+	elseif (item.remain == 3) then hours = 12
 	elseif (item.remain == 2) then hours = 2
 	elseif (item.remain == 1) then hours = 0.5
 	end
