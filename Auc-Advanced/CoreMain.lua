@@ -86,7 +86,7 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 
 	local link = GetContainerItemLink(bag, slot)
 	
-	if (AuctionFrame and AuctionFrame:IsVisible()) then
+	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "RightButton") and (IsAltKeyDown()) then
 				local itemID = EnhTooltip.BreakLink(link)
@@ -94,6 +94,7 @@ function private.ClickBagHook(hookParams, returnValue, button, ignoreShift)
 					local itemName = GetItemInfo(tostring(itemID))
 					if (itemName) then
 						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
+						BrowseName:SetText(itemName)
 					end
 				end
 			end
@@ -105,7 +106,7 @@ function private.ClickLinkHook(_, _, item, link, button)
 	--if click-hooks are disabled, do nothing
 	if (not AucAdvanced.Settings.GetSetting("clickhook.enable")) then return end
 	
-	if (AuctionFrame and AuctionFrame:IsVisible()) then
+	if (AuctionFrame and AuctionFrameBrowse and AuctionFrameBrowse:IsVisible()) then
 		if link then
 			if (button == "LeftButton") and (IsAltKeyDown()) then
 				local itemID = EnhTooltip.BreakLink(link)
@@ -113,6 +114,7 @@ function private.ClickLinkHook(_, _, item, link, button)
 					local itemName = GetItemInfo(tostring(itemID))
 					if itemName then
 						QueryAuctionItems(itemName, "", "", nil, nil, nil, nil, nil)
+						BrowseName:SetText(itemName)
 					end
 				end
 			end
