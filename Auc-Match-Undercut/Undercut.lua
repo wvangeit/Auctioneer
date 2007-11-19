@@ -146,14 +146,27 @@ end
 function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui:AddTab(libName, libType.." Modules")
-	gui:MakeScrollable(id)
+	--gui:MakeScrollable(id)
+
+	gui:AddHelp(id, "what undercut module",
+		"What is this undercut module?",
+		"The undercut module allows you to undercut the lowest price of all currently available "..
+		"items, based on your settings.")
+
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	
 	gui:AddControl(id, "Subhead",    0,    "Competition Matching")
-	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
-	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
-	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 1, "Undercut: %d%%")
 	
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.undermarket", -100, 0, 1, "Max under market price (markdown): %d%%")
+	gui:AddTip(id, "This controls how much below the market price you are willing to undercut before giving up.\n"..
+		"If Auctioneer cannot beat the lowest price, it will revert back to the market price.")
+	
+	gui:AddControl(id, "WideSlider", 0, 1, "match.undermarket.overmarket", 0, 100, 1, "Max over market price (markup): %d%%")
+	gui:AddTip(id, "This controls how much above the market price you are willing to mark up.\n"..
+		"If the competition is marked up at 200%, and you set max markup to 10%, Auctioneer will go no more than 10% above market")
+	
+	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 1, "Undercut: %d%%")
+	gui:AddTip(id, "This controls the minimum undercut.  If there is no competition, or the competition is at market price, Auctioneer will undercut by this amount")
 	
 end
 
