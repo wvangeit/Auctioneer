@@ -89,7 +89,7 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("MERCHANT_UPDATE")
 	private.frame:RegisterEvent("MERCHANT_CLOSED")
 	
-	private.frame:RegisterEvent("AUCTION_HOUSE_SHOW")
+	private.frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 	
 	private.frame:SetScript("OnUpdate", private.onUpdate)
 	
@@ -210,7 +210,7 @@ end
 function private.onUpdate()
 	private.mailonUpdate()
 end
-
+local lastAucSearch 
 function private.onEvent(frame, event, arg, ...)
 	if (event == "PLAYER_MONEY") then
 		private.wealth = GetMoney()
@@ -218,7 +218,15 @@ function private.onEvent(frame, event, arg, ...)
 	
 	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event, arg, ...)
-	
+		--Used to send searches in teh normal auction frame to BC
+	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
+		local search = BrowseName:GetText()
+		if not lastAucSearch then
+			lastAucSearch = search
+			lib.externalSearch(search)
+		elseif lastAucSearch ~= search then 
+			lib.externalSearch(search)
+		end
 	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
 		--private.vendorOnevent(event, arg, ...)
 
