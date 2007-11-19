@@ -162,8 +162,17 @@ function private.SetupConfigGui(gui)
 	-- The defaults for the following settings are set in the lib.OnLoad function
 	id = gui:AddTab(libName, libType.." Modules")
 	gui:AddControl(id, "Header",     0,    libName.." options")
+
+	gui:AddHelp(id, "what scanprogress",
+		"What is the Scan Progress indicator?",
+		"The Scan Progress indicator is the text that appears while scanning the AuctionHouse, indicating "..
+		"how fast you are scanning, how many auctions you have scanned so far, and how many total auctions there are, "..
+		"and how many pages you have scanned so far, and how many total pages there are.")
+
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.activated", "Show a textual progress indicator when scanning.")
+	gui:AddTip(id, "If enabled, will show the scan progress indicator")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.scanprogress.leaveshown", "Leave the scan progress text shown after scan completion.")
+	gui:AddTip(id, "If enabled, will leave the scan progress indicator on the screen after scan has completed.\n\nIf disabled will show the last scanned page.")
 end
 
 function private.ConfigChanged()
