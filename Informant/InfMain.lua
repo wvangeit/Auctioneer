@@ -94,6 +94,7 @@ local filterDefaults = {
 	['all'] = 'on',
 	['embed'] = 'off',
 	['locale'] = 'default',
+	['show-name'] = 'on',
 	['show-vendor'] = 'on',
 	['show-vendor-buy'] = 'on',
 	['show-vendor-sell'] = 'on',

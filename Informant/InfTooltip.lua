@@ -91,7 +91,7 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 		end
 	end
 
-	if (not embedded) then
+	if (not embedded and getFilter('show-name')) then
 		EnhTooltip.AddHeaderLine(itemInfo.itemName, nil, embedded)
 		EnhTooltip.HeaderQuality(itemInfo.itemQuality)
 		EnhTooltip.HeaderSize(12)

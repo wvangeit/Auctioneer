@@ -87,6 +87,7 @@ function buildCommandMap()
 		[_INFM('CmdDefault')]		=	'default',
 		[_INFM('CmdEmbed')]			=	'embed',
 		[_INFM('ShowIcon')]			=	'show-icon',
+		[_INFM('ShowName')]			=	'show-name',
 		[_INFM('ShowILevel')]		=	'show-ilevel',
 		[_INFM('ShowLink')]			=	'show-link',
 		[_INFM('ShowStack')]		=	'show-stack',
@@ -144,7 +145,8 @@ function commandHandler(command, source)
 		cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
 		cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
 		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon" or
-		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants"
+		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants" or
+		cmd == "show-name"
 	) then
 		genVarSet(cmd, param, chatprint)
 	else
@@ -165,6 +167,7 @@ function cmdHelp()
 
 	chatPrint("  |cffffffff/informant ".._INFM('CmdDisable').."|r - " .. _INFM('HelpDisable'))
 
+	chatPrint(lineFormat:format(_INFM('ShowName'), getLocalizedFilterVal('show-name'), _INFM('HelpName')))
 	chatPrint(lineFormat:format(_INFM('ShowVendor'), getLocalizedFilterVal('show-vendor'), _INFM('HelpVendor')))
 	chatPrint(lineFormat:format(_INFM('ShowVendorSell'), getLocalizedFilterVal('show-vendor-sell'), _INFM('HelpVendorSell')))
 	chatPrint(lineFormat:format(_INFM('ShowVendorBuy'), getLocalizedFilterVal('show-vendor-buy'), _INFM('HelpVendorBuy')))
@@ -390,6 +393,31 @@ function registerKhaos()
 						return _INFM('FrmtActEnable'):format(_INFM('ShowIcon'))
 					else
 						return _INFM('FrmtActDisable'):format(_INFM('ShowIcon'))
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
+			{
+				id="show-name";
+				type=K_TEXT;
+				text=function()
+					return _INFM('GuiInfoName')
+				end;
+				helptext=function()
+					return _INFM('HelpName')
+				end;
+				callback=function(state)
+					genVarSet("show-name", state.checked)
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _INFM('FrmtActEnable'):format(_INFM('ShowName'))
+					else
+						return _INFM('FrmtActDisable'):format(_INFM('ShowName'))
 					end
 				end;
 				check=true;
