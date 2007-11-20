@@ -364,13 +364,14 @@ function private.CreateFrames()
 		{ "Item", "TEXT", 120 },
 		{ "Type", "TEXT", 110 },
 		
-		{ "Bid", "COIN", 70 },
-		{ "Buyout", "COIN", 70 },
-		{ "Profit", "COIN", 70},
-		{ "Profit/Per", "COIN", 70},
+		{ "Bid", "COIN", 60 },
+		{ "Buyout", "COIN", 60 },
+		{ "Net", "COIN", 65},
+		{ "Stack", "TEXT", 40},
+		{ "Price/Per", "COIN", 65},
 		
-		{ "Seller", "TEXT", 70 },
-		{ "Buyer", "TEXT", 70 },
+		{ "|CFFFFFF00Seller/|CFF4CE5CCBuyer", "TEXT", 80 },
+		--{ "Buyer", "TEXT", 70 },
 		
 		{ "Deposit", "COIN", 50 },
 		{ "Fee", "COIN", 50 },
@@ -378,21 +379,22 @@ function private.CreateFrames()
 		{ "Date", "text", 110 },
 	})
 	
-	
+	local data = {}
+	local style = {}
+	local tbl = {}
 	function private.startSearch(itemName, settings, itemTexture)
 		if not itemName then return end
-			
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
+		local _  --Cause I fear the norgjira  ;)
 		if itemTexture then 
 			frame.icon:SetNormalTexture(itemTexture)
 		else
-			local _, itemTexture = private.getItemInfo(itemName, "name")
+			_, itemTexture = private.getItemInfo(itemName, "name")
 			frame.icon:SetNormalTexture(itemTexture)
 		end
 		
-		local data = {}
-		local style = {}
-		
+		data = {}
+		style = {}
 		for a,b in pairs(private.serverData) do
 				if settings.auction then
 					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
@@ -401,16 +403,16 @@ function private.CreateFrames()
 					for i,v in pairs(private.serverData[a]["completedAuctions"]) do 
 						for index, text in pairs(v) do
 						
-						local tbl = private.unpackString(text)
+						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
 						--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
 						
 						local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
-						if stack > 0 then	stack = tbl[3]/stack end
-						
-		
+						local pricePer = 0
+						if stack > 0 then	pricePer = tbl[3]/stack end
+			
 						  table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
@@ -418,10 +420,10 @@ function private.CreateFrames()
 									0, --tbl[7], --bid
 									0, --tbl[6], --buyout
 									tonumber(tbl[3]), --Profit,
-									tonumber(stack), --Profit/per
+									tonumber(stack),  --stacksize
+									tonumber(pricePer), --Profit/per
 									
-									  "-",  --seller
-									tbl[8], --buyer
+									tbl[8], -- "-",  --seller/seller
 									
 									tonumber(tbl[4]), --deposit
 									tonumber(tbl[5]), --fee
@@ -430,15 +432,15 @@ function private.CreateFrames()
 									--tbl[12], --date
 								    })
 								style[#data] = {}
-								style[#data][2] = {}
-								style[#data][2].textColor = {0.3, 0.9, 0.8}	
+								style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
+								style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
 							end
 						end
 					end
 					for i,v in pairs(private.serverData[a]["failedAuctions"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = private.unpackString(text)
+						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
@@ -453,10 +455,10 @@ function private.CreateFrames()
 									tonumber(minBid) or 0, --bid
 									tonumber(buyoutPrice) or 0, --buyout
 									0, --money,
+									tonumber(count) or 0,
 									0, --Profit/per
 									
-									"-",  --seller
-									"-", --buyer
+									"-",  --seller/buyer
 									
 									tonumber(deposit) or 0, --deposit
 									0, --fee
@@ -465,8 +467,8 @@ function private.CreateFrames()
 									--tbl[5], --date
 								})
 								style[#data] = {}
-								style[#data][2] = {}
-								style[#data][2].textColor = {1,0,0}
+								style[#data][2] = {["textColor"] = {1,0,0}}
+								style[#data][8] ={["textColor"] = {1,0,0}}
 							end
 						end
 					end
@@ -481,23 +483,33 @@ function private.CreateFrames()
 					for i,v in pairs(private.serverData[a]["completedBids/Buyouts"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = private.unpackString(text)
+						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-									--  		1		2	    3	       4	       5       6         7      8                      9				10
+							
+							local stack, matchedBID = private.reconcileCompletedBids(a, i, tbl[8], tbl[6], tbl[7])
+							local pricePer = 0
+							local text = "Won on Buyout"
+							if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
+								text = "Won on Bid "
+								if stack > 0 then	pricePer = tbl[7]/stack end
+							else
+								if stack > 0 then	pricePer = tbl[6]/stack end
+							end
+						--  				1		2	    3	       4	       5       6         7      8                      9				10
 						--'["completedBids"] == itemName, "Auction won", money, deposit , fee, buyout , bid, seller, (time the mail arrived in our mailbox), current wealth',
 						   table.insert(data,{
 									tbl[1], --itemname
-									tbl[2], --status
+									text,--tbl[2], --status
 									
 									tonumber(tbl[7]), --bid
 									tonumber(tbl[6]), --buyout
 									tonumber(tbl[3]), --money,
-									0, --Profit/per
+									tonumber(stack),  --stacksize
+									pricePer, --Profit/per
 									
-									tbl[8],   --seller
-									"-", --buyer
+									tbl[8],   --seller/buyer
 									  
 									tonumber(tbl[4]), --deposit
 									tonumber(tbl[5]), --fee
@@ -506,30 +518,31 @@ function private.CreateFrames()
 									--tbl[11], --date
 								    })
 								style[#data] = {}
-								style[#data][2] = {}
-								style[#data][2].textColor = {1,1,0}	
+								style[#data][2] = {["textColor"] = {1,1,0}}
+								style[#data][8] ={["textColor"] = {1,1,0}}								
 							end
 						end
 					end
 					for i,v in pairs(private.serverData[a]["failedBids"]) do
 						for index, text in pairs(v) do
 						
-						local tbl = private.unpackString(text)
+						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
+							
 						--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
 						   table.insert(data,{
 									tbl[1], --itemname
 									tbl[2], --status
 									
-									0, --bid
+									tonumber(tbl[3]), --bid
 									0, --buyout
-									tonumber(tbl[3]), --money,
+									0, --money,
+									0, --stack
 									0, --Profit/per
 									
-									"-",  --seller
-									"-", --buyer
+									"-",  --seller/buyer
 									
 									0, --deposit
 									0, --fee
@@ -538,8 +551,8 @@ function private.CreateFrames()
 									--tbl[6], --date
 								    })
 								style[#data] = {}
-								style[#data][2] = {}
-								style[#data][2].textColor = {1,1,1}	
+								style[#data][2] = {["textColor"] = {1,1,1}}
+								style[#data][8] ={["textColor"] = {1,1,1}}
 							end
 						end
 					end
@@ -552,6 +565,8 @@ function private.CreateFrames()
 	end
 	
 		frame.resultlist.sheet:SetData(data, style)
+		frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
+		frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
 	end
 	 
 	function private.fragmentsearch(compare, itemName, exact)
@@ -563,9 +578,10 @@ function private.CreateFrames()
 		end
 	end
 	--reconcile with auction DB to get info for data
+	local tbl2 = {}
 	function private.reconcileFailedAuctions(player, itemID, tbl)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-    			local tbl2 = private.unpackString(v)
+    			tbl2 = private.unpackString(v)
 			
 			 --Time the auction was set to last
 			local TimeFailedAuctionStarted= tbl[3] - (tbl2[5]*60) --Time this message should have been posted
@@ -582,7 +598,7 @@ function private.CreateFrames()
 	end
 	function private.reconcileCompletedAuctions(player, itemID, soldDeposit)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-			local tbl2 = private.unpackString(v)
+			tbl2 = private.unpackString(v)
 			local postDeposit = tbl2[6]
 			if postDeposit ==  soldDeposit then
 				return tonumber(tbl2[2])
@@ -591,7 +607,25 @@ function private.CreateFrames()
 			end
 		end
 	end
-	
+	function private.reconcileCompletedBids(player, itemID, seller, buy, bid)
+		if private.serverData[player]["postedBids"][itemID] then
+			for i,v in pairs(private.serverData[player]["postedBids"][itemID]) do
+				tbl2 = private.unpackString(v)
+				local postSeller, postbid = tbl2[4], tbl2[3]
+				if seller ==  postSeller and postbid == bid then
+					return tonumber(tbl2[2]), true
+				end
+			end
+		end
+		for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
+			tbl2 = private.unpackString(v)
+			local postSeller, postbid = tbl2[4], tbl2[3]
+			if seller ==  postSeller and postbid == buy then
+				return tonumber(tbl2[2])
+			end
+		end
+		return 0 --if we fail then show 0 
+	end
 	private.CreateMailFrames()
 
 end
@@ -685,7 +719,7 @@ function private.classicSearch(data, style, itemName, settings)
    	    for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
 		for index, text in pairs(v) do
 				
-		    local tbl = {strsplit(";", text)}
+		    tbl= {strsplit(";", text)}
 		    local match = false
 		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
@@ -711,10 +745,10 @@ function private.classicSearch(data, style, itemName, settings)
 					tonumber(tbl[4]) or 0, --tbl[7], --bid
 					tonumber(tbl[5]) or 0, --buyout
 					price, --money,
+					tonumber(stack),  --stacksize
 					pricePer, --Profit/per
 					
-					 "-",  --seller
-					tbl[9], --buyer
+					 "-",  --seller/buyer
 									
 					0,--tbl[7], --deposit
 					0, --tbl[8], --fee
@@ -727,7 +761,7 @@ function private.classicSearch(data, style, itemName, settings)
 	    end
 	for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
 		for index, text in pairs(v) do
-		    local tbl = {strsplit(";", text)}
+		    tbl= {strsplit(";", text)}
 		    local match = false
 		    match = private.fragmentsearch(name, itemName, settings.exact)
 			if match then
@@ -735,7 +769,7 @@ function private.classicSearch(data, style, itemName, settings)
 			    --time;     quantity;value;seller;isBuyout;buyerId
 			    --"1178840165;1;980000;Eruder;1;5",
 			    local status = "Purchased"
-			 			   		    			    
+			 			 			   		    			    
 			    table.insert(data,{
 					name, --itemname
 					status, --status
@@ -743,10 +777,10 @@ function private.classicSearch(data, style, itemName, settings)
 					0, --tbl[7], --bid
 					tonumber(tbl[3]) or 0, --buyout
 					0, --money,
-					0, --Profit/per
+					tonumber(tbl[2]),  --stacksize,
+					tonumber(tbl[3]) or 0 / tonumber(tbl[2]) or 1, --Profit/per
 					
-					tbl[4],  --seller
-					"-", --buyer
+					tbl[4],  --seller/buyer
 									
 					0,--tbl[7], --deposit
 					0, --tbl[8], --fee
