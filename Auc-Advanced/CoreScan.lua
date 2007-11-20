@@ -665,6 +665,18 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	lib.PopScan()
 end
 
+function private.QuerySent(query, isSearch, isNavigate, ...)
+	-- Tell everyone that our stats are updated
+	for system, systemMods in pairs(AucAdvanced.Modules) do
+		for engine, engineLib in pairs(systemMods) do
+			if engineLib.Processor then
+				engineLib.Processor("querysent", query, isSearch, ...)
+			end
+		end
+	end
+	return ...
+end
+
 function private.FinishedPage(nextPage)
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -909,12 +921,14 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 		return
 	end
 
+	local isSearch = (BrowseSearchButton:GetButtonState() == "PUSHED")
+
 	-- If we're getting called after we've sent a query, but before it's been stored, take this chance to save it.
 	if private.sentQuery then
 		lib.StorePage()
 	end
 	
-	local is_same = true
+	local isSame = true
 	query = acquire() 
 	name = name or ""
 	minLevel = tonumber(minLevel) or 0
@@ -922,7 +936,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	classIndex = tonumber(classIndex) or 0
 	subclassIndex = tonumber(subclassIndex) or 0
 	qualityIndex = tonumber(qualityIndex)
-	query.page = tonumber(page) or 0
+	page = tonumber(page) or 0
 	if (name and name ~= "") then query.name = name end
 	if (minLevel > 0) then query.minUseLevel = minLevel end
 	if (maxLevel > 0) then query.maxUseLevel = maxLevel end
@@ -936,17 +950,18 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
+	query.page = page
 
 	if (private.curQuery) then
 		for x, y in pairs(query) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end
+			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 		for x, y in pairs(private.curQuery) do
-			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then is_same = false break end
+			if (x~="page" and (not (query[x] and private.curQuery[x] and query[x]==private.curQuery[x]))) then isSame = false break end
 		end
 	end
 
-	if (not is_same or not private.curQuery) then
+	if (not isSame or not private.curQuery) then
 		lib.Commit(true)
 		private.scanStartTime = time()
 		private.scanStarted = GetTime()
@@ -958,22 +973,31 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 			private.curPage = -1
 		end
 		private.curPage = startPage
+
+		recycle(private.curQuery)
+		private.curQuery = query
+		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
+			query.name or "",
+			query.minUseLevel or "",
+			query.maxUseLevel or "",
+			query.class or "",
+			query.subclass or "",
+			query.quality or "",
+			query.invType or ""
+		)
+	else
+		recycle(query)
+		query = private.curQuery
+		query.page = page
 	end
 
-	private.curQuery = query
-	private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
-		query.name or "",
-		query.minUseLevel or "",
-		query.maxUseLevel or "",
-		query.class or "",
-		query.subclass or "",
-		query.quality or "",
-		query.invType or ""
-	)
 	private.sentQuery = true
 	lib.lastReq = GetTime()
 
-	return (private.Hook.QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex, page, isUsable, qualityIndex, GetAll, ...))
+	return private.QuerySent(query, isSearch,
+		private.Hook.QueryAuctionItems(
+			name, minLevel, maxLevel, invTypeIndex, classIndex, subclassIndex,
+			page, isUsable, qualityIndex, GetAll, ...))
 end
 
 function lib.SetPaused(pause)
