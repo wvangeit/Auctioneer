@@ -894,7 +894,7 @@ function private.CreateFrames()
 		for catId, catName in pairs(AucAdvanced.Const.CLASSES) do
 			if catName == itemType then
 				itemTypeId = catId
-				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES) do
+				for subId, subName in pairs(AucAdvanced.Const.SUBCLASSES[itemTypeId]) do
 					if subName == itemSubType then
 						itemSubId = subId
 						break

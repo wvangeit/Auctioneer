@@ -386,7 +386,7 @@ function private.IsInQuery(curQuery, data)
 			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
 			and (not curQuery.name or (data[Const.NAME] and strfind(data[Const.NAME]:lower(), curQuery.name:lower(), 1, true)))
 			and (not curQuery.isUsable or (data[Const.CANUSE]))
-			and (not curQuery.invType or (data[Const.INVTYPE] == curQuery.invType))
+			and (not curQuery.invType or (data[Const.IEQUIP] == Const.InvTypes[curQuery.invType]))
 			and (not curQuery.quality or (data[Const.QUALITY] >= curQuery.quality))
 			then
 		return true
