@@ -713,7 +713,7 @@ function private.relevelFrames(myLevel, ...)
 		private.relevelFrame(child)
 	end
 end
-
+local tbl = {}
 --Search BeancounterClassic Data
 function private.classicSearch(data, style, itemName, settings)
    	    for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
