@@ -929,7 +929,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	end
 	
 	local isSame = true
-	query = acquire() 
+	local query = acquire() 
 	name = name or ""
 	minLevel = tonumber(minLevel) or 0
 	maxLevel = tonumber(maxLevel) or 0
