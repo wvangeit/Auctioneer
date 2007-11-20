@@ -47,6 +47,7 @@ function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
 		private.updateInboxStart() 
 	elseif (event == "MAIL_SHOW") then 
+	private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
 	hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
 	hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
@@ -82,7 +83,7 @@ function private.updateInboxStart()
 		MailFrameTab2:Hide()
 		private.MailGUI:Show()
 	end
-	private.mailBoxReadStart()
+	private.mailBoxColorStart()
 end
 
 function private.getInvoice(n,sender, subject)
@@ -256,7 +257,6 @@ function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	--table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
@@ -265,7 +265,6 @@ function private.PreTakeInboxItemHook( ignore, retVal, index)
 		print("Please allow BeanCounter time to reconcile the mail box")
 		return "abort"
 	end
-	--table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], index)
 end
 
 
@@ -277,7 +276,6 @@ function private.mailFrameClick(index)
 end
 function private.mailFrameUpdate()
 --Change Icon back color if only addon read
-
 if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then return end  --we havn't read mail yet
 if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 
@@ -314,7 +312,8 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 end
 
 local mailCurrent
-function private.mailBoxReadStart()
+local group = {["n"] = "", ["start"] = nil, ["end"] = nil} --stores the start and end locations for a group of same name items
+function private.mailBoxColorStart()
 	mailCurrent = {} --clean table every update
 	
 	for n = 1,GetInboxNumItems() do
@@ -322,16 +321,43 @@ function private.mailBoxReadStart()
 		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead or 0 }
 	end
 	
-	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+1) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
+	--Create Characters Mailbox, or resync if we get more that 5 mails out of tune
+	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+4) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
 		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 		for i, v in pairs(mailCurrent) do
 			BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] = v
 		end
-		
-	elseif	#BeanCounterDB[private.realmName][private.playerName]["mailbox"] >= #mailCurrent then
-		private.diff()	
-	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] < #mailCurrent then --mail was added
+	end
+	
+	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] >= #mailCurrent then --mail removed or same
+		for i in ipairs(mailCurrent) do 
+			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] == group["n"] then
+				if group["start"] then group["end"] = i else group["start"] = i end
+			else
+				group["n"], group["start"], group["end"] = BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"], i, i
+			end
+			
+			if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
+				print("group = ",group["n"], group["start"], group["end"])
+				if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] == 2 then
+					debugPrint("This is marked read so removing ", i)
+					table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
+					break
+				elseif BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] < 2 then
+	--This message has not been read, so we have a sequence of messages with the same name. Need to go back recursivly till we find the "Real read" message that need removal
+					for V = group["end"], group["start"], -1 do
+						if BeanCounterDB[private.realmName][private.playerName]["mailbox"][V]["read"] == 2 then
+							debugPrint("recursive read group",group["end"] ,"--",group["start"], "found read at",V )
+							table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], V)
+							break
+						end
+					end
+				end
+				break
+			end
+		end
+	elseif #BeanCounterDB[private.realmName][private.playerName]["mailbox"] < #mailCurrent then --mail added
 		for i,v in ipairs(mailCurrent) do
 			if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i] then
 				if mailCurrent[i]["subject"] ~=  BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
@@ -340,25 +366,11 @@ function private.mailBoxReadStart()
 				end
 			else
 			debugPrint("need to add key ", i)
-			table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
+				table.insert(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i, v)
 			end
 		end
-	end
 		
+	end	
 	private.mailFrameUpdate()
-end
-function private.diff()
-	local count
-	if #mailCurrent > #BeanCounterDB[private.realmName][private.playerName]["mailbox"] then
-		count =  #BeanCounterDB[private.realmName][private.playerName]["mailbox"]
-	else
-		count =  #mailCurrent
-	end
-	for i = 1, count do
-		if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
-		    debugPrint("Diff", i,mailCurrent[i]["subject"], "vs", BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] )
-			table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
-		    private.diff()
-		end
-	end
+	
 end
