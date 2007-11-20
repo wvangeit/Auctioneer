@@ -844,7 +844,8 @@ function lib.StorePage()
 		if numBatchAuctions > 50 then
 			private.isScanning = false
 			lib.Commit(false, true)
-		elseif (private.scanDir == 1 and private.curPage < maxPages) or
+		--Check against private.curPage + 1 because the first page in the AH is actually page 0, so if you don't then you end up one page over the max at the end of scan
+		elseif (private.scanDir == 1 and private.curPage + 1 < maxPages) or
 		(private.scanDir == -1 and private.curPage > 0) then
 			lib.ScanPage(private.curPage + private.scanDir)
 		else
