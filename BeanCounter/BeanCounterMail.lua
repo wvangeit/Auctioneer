@@ -339,7 +339,7 @@ function private.mailBoxColorStart()
 			end
 			
 			if mailCurrent[i]["subject"] ~= BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["subject"] then
-				print("group = ",group["n"], group["start"], group["end"])
+				debugPrint("group = ",group["n"], group["start"], group["end"])
 				if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] == 2 then
 					debugPrint("This is marked read so removing ", i)
 					table.remove(BeanCounterDB[private.realmName][private.playerName]["mailbox"], i)
