@@ -100,6 +100,7 @@ local filterDefaults = {
 	['show-usage'] = 'on',
 	['show-stack'] = 'on',
 	['show-merchant'] = 'on',
+	['show-zero-merchants'] = 'on',
 	['show-quest'] = 'on',
 	['show-icon'] = 'on',
 	['show-ilevel'] = 'on',

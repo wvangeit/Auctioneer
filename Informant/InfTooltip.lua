@@ -148,6 +148,18 @@ function Informant.TooltipHandler(funcVars, retVal, frame, name, link, quality, 
 			if (merchantCount > 0) then
 				EnhTooltip.AddLine(_INFM('FrmtInfoMerchants'):format(merchantCount), nil, embedded)
 				EnhTooltip.LineColor(0.5, 0.8, 0.5)
+			else
+				-- NOTE - there are 2 cases for "no known":  nil list, and zero length list
+				if (getFilter('show-zero-merchants')) then
+					EnhTooltip.AddLine(_INFM('FrmtInfoNoKnownMerchants'), nil, embedded)
+					EnhTooltip.LineColor(0.8, 0.2, 0.2)
+				end
+			end
+		else
+			-- NOTE - there are 2 cases for "no known":  nil list, and zero length list
+			if (getFilter('show-zero-merchants')) then
+				EnhTooltip.AddLine(_INFM('FrmtInfoNoKnownMerchants'), nil, embedded)
+				EnhTooltip.LineColor(0.8, 0.2, 0.2)
 			end
 		end
 	end

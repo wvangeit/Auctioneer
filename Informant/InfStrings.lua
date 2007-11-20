@@ -487,6 +487,7 @@ InformantLocalizations = {
 		["ShowVendor"]	= "show-vendor";
 		["ShowVendorBuy"]	= "show-vendor-buy";
 		["ShowVendorSell"]	= "show-vendor-sell";
+		["ShowZeroMerchants"]	= "show-zero-merchants";
 
 		-- Section: Generic Messages
 		["MesgNotLoaded"]	= "Informant is not loaded. Type /informant for more info.";
@@ -510,6 +511,7 @@ InformantLocalizations = {
 		["GuiInfoQuest"]	= "Show quest information";
 		["GuiInfoStack"]	= "Show stack sizes";
 		["GuiInfoUsage"]	= "Show usage information";
+		["GuiInfoZeroMerchants"]	= "Show when no known merchants";
 		["GuiLocale"]	= "Set locale to";
 		["GuiMainEnable"]	= "Enable Informant";
 		["GuiMainHelp"]	= "Contains settings for Informant \nan AddOn that displays detailed item information";
@@ -539,6 +541,7 @@ InformantLocalizations = {
 		["HelpVendor"]	= "Select whether to show item's vendor pricing";
 		["HelpVendorBuy"]	= "Select whether to show item's vendor buy pricing (req show-vendor=on)";
 		["HelpVendorSell"]	= "Select whether to show item's vendor sell pricing (req show-vendor=on)";
+		["HelpZeroMerchants"]	= "Select whether to show when no known merchants supply an item";
 
 		-- Section: Keybinding Text
 		["BindingHeader"]	= "Informant";
@@ -559,6 +562,7 @@ InformantLocalizations = {
 		["FrmtInfoItemLevel"]	= "Item Level: %d";
 		["FrmtInfoItemLink"]	= "Link: %s";
 		["FrmtInfoMerchants"]	= "Sold by %d merchants";
+		["FrmtInfoNoKnownMerchants"]	= "Sold by no known merchants";
 		["FrmtInfoQuest"]	= "Quest item in %d quests";
 		["FrmtInfoSell"]	= "Sell to vendor";
 		["FrmtInfoSellmult"]	= "Sell %d (%s each)";
@@ -1859,7 +1863,8 @@ InformantLocalizations = {
 		["InfoPlayerMade"]	= "由等級%d的%s製造";
 		["InfoQuestHeader"]	= "%d項任務中使用:";
 		["InfoQuestLine"]	= "任務: %s";
-		["InfoQuestName"]	= "  %d for \"%s\" (level %d)";
+		["InfoQuestLineMult"]	= "%d 需要: %s";
+		["InfoQuestName"]	= "  %d 為\"%s\" (等級%d)";
 		["InfoQuestRequiresHeader"]	= "%d 個任務需要:";
 		["InfoQuestRewardsHeader"]	= "%d 個任務的獎勵:";
 		["InfoQuestSource"]	= "任務資料提供者";

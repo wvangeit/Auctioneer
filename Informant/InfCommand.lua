@@ -93,6 +93,7 @@ function buildCommandMap()
 		[_INFM('ShowUsage')]		=	'show-usage',
 		[_INFM('ShowQuest')]		=	'show-quest',
 		[_INFM('ShowMerchant')]		=	'show-merchant',
+		[_INFM('ShowZeroMerchants')] =	'show-zero-merchants',
 		[_INFM('ShowVendor')]		=	'show-vendor',
 		[_INFM('ShowVendorBuy')]	=	'show-vendor-buy',
 		[_INFM('ShowVendorSell')]	=	'show-vendor-sell',
@@ -143,7 +144,7 @@ function commandHandler(command, source)
 		cmd == "embed" or cmd == "show-stack" or cmd == "show-usage" or
 		cmd == "show-quest" or cmd == "show-merchant" or cmd == "show-vendor" or
 		cmd == "show-vendor-buy" or cmd == "show-vendor-sell" or cmd == "show-icon" or
-		cmd == "show-ilevel" or cmd == "show-link"
+		cmd == "show-ilevel" or cmd == "show-link" or cmd == "show-zero-merchants"
 	) then
 		genVarSet(cmd, param, chatprint)
 	else
@@ -170,6 +171,7 @@ function cmdHelp()
 	chatPrint(lineFormat:format(_INFM('ShowUsage'), getLocalizedFilterVal('show-usage'), _INFM('HelpUsage')))
 	chatPrint(lineFormat:format(_INFM('ShowQuest'), getLocalizedFilterVal('show-quest'), _INFM('HelpQuest')))
 	chatPrint(lineFormat:format(_INFM('ShowMerchant'), getLocalizedFilterVal('show-merchant'), _INFM('HelpMerchant')))
+	chatPrint(lineFormat:format(_INFM('ShowZeroMerchants'), getLocalizedFilterVal('show-zero-merchants'), _INFM('HelpZeroMerchants')))
 	chatPrint(lineFormat:format(_INFM('ShowStack'), getLocalizedFilterVal('show-stack'), _INFM('HelpStack')))
 	chatPrint(lineFormat:format(_INFM('ShowIcon'), getLocalizedFilterVal('show-icon'), _INFM('HelpIcon')))
 	chatPrint(lineFormat:format(_INFM('ShowILevel'), getLocalizedFilterVal('show-ilevel'), _INFM('HelpILevel')))
@@ -538,6 +540,31 @@ function registerKhaos()
 						return _INFM('FrmtActEnable'):format(_INFM('ShowMerchant'))
 					else
 						return _INFM('FrmtActDisable'):format(_INFM('ShowMerchant'))
+					end
+				end;
+				check=true;
+				default={checked=true};
+				disabled={checked=false};
+				dependencies={enabled={checked=true}};
+				difficulty=1;
+			};
+			{
+				id="show-zero-merchants";
+				type=K_TEXT;
+				text=function()
+					return _INFM('GuiInfoMerchant')
+				end;
+				helptext=function()
+					return _INFM('HelpZeroMerchants')
+				end;
+				callback=function(state)
+					genVarSet("show-zero-merchants", state.checked)
+				end;
+				feedback=function(state)
+					if (state.checked) then
+						return _INFM('FrmtActEnable'):format(_INFM('ShowZeroMerchants'))
+					else
+						return _INFM('FrmtActDisable'):format(_INFM('ShowZeroMerchants'))
 					end
 				end;
 				check=true;
