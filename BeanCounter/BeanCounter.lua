@@ -88,9 +88,7 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("MERCHANT_SHOW")	
 	private.frame:RegisterEvent("MERCHANT_UPDATE")
 	private.frame:RegisterEvent("MERCHANT_CLOSED")
-	
-	private.frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
-	
+			
 	private.frame:SetScript("OnUpdate", private.onUpdate)
 	
 	-- Hook all the methods we need
@@ -218,15 +216,7 @@ function private.onEvent(frame, event, arg, ...)
 	
 	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event, arg, ...)
-		--Used to send searches in teh normal auction frame to BC
-	elseif (event == "AUCTION_ITEM_LIST_UPDATE") then
-		local search = BrowseName:GetText()
-		if not lastAucSearch then
-			lastAucSearch = search
-			lib.externalSearch(search)
-		elseif lastAucSearch ~= search then 
-			lib.externalSearch(search)
-		end
+	
 	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
 		--private.vendorOnevent(event, arg, ...)
 
@@ -245,10 +235,10 @@ function lib.externalSearch(name)
 	 if private.getOption("util.beancounter.externalSearch") then
 		local frame = private.frame
 		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
-		local itemName = private.getItemInfo(name, "name") or name
+		local itemName, itemTexture = private.getItemInfo(name, "name") or name
 		frame.searchBox:SetText(itemName)
 		local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = 1, ["auction"] = 1 } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-		private.startSearch(itemName, settings)
+		private.startSearch(itemName, settings, itemTexture)
 	end
 end
 
