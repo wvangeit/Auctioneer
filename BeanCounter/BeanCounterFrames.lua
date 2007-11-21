@@ -212,10 +212,9 @@ function private.CreateFrames()
 		ClearCursor()
 		if objtype == "item" then
 			local itemName, itemTexture = private.getItemInfo(link, "name")
-			local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
 			frame.icon:SetNormalTexture(itemTexture)
 			frame.searchBox:SetText(itemName)
-			private.startSearch(itemName, settings, itemTexture)	
+			private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)	
 		end
 	end 
 	
@@ -250,7 +249,7 @@ function private.CreateFrames()
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
 	frame.selectbox.box:SetText(private.realmName.." Data")
-		
+	
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
 	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -180)
@@ -258,8 +257,7 @@ function private.CreateFrames()
 	frame.searchBox:SetHeight(15)
 	frame.searchBox:SetWidth(150)
 	frame.searchBox:SetScript("OnEnterPressed", function()
-		local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-		private.startSearch(frame.searchBox:GetText(), settings)
+		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
 	end)
 	
 	--Search Button	
@@ -267,8 +265,7 @@ function private.CreateFrames()
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
 	frame.searchButton:SetText("Search")
 	frame.searchButton:SetScript("OnClick", function()
-		local settings = {["selectbox"] = frame.SelectBoxSetting ,["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(),["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-		private.startSearch(frame.searchBox:GetText(), settings)
+		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
 	function private.ClickBagHook(_,_,button)
@@ -281,8 +278,7 @@ function private.CreateFrames()
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					debugPrint(itemName, itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-					private.startSearch(itemName, settings, itemTexture)
+					private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)
 				end
 			end
 		end
@@ -296,8 +292,7 @@ function private.CreateFrames()
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					debugPrint(itemName, itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = frame.bidCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked() } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
-					private.startSearch(itemName, settings, itemTexture)	
+					private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)	
 				end
 			end
 		end
@@ -327,13 +322,29 @@ function private.CreateFrames()
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(true)
 	getglobal("BeancounterbidCheckText"):SetText("Bids")
-	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -280)
+	frame.bidCheck:SetScale(0.85)
+	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
+	
+	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
+	frame.bidFailedCheck:SetChecked(false)
+	frame.bidFailedCheck:SetScale(0.85)
+	getglobal("BeancounterbidFailedCheckText"):SetText("Outbids")
+	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(true)
 	getglobal("BeancounterauctionCheckText"):SetText("Auctions")
-	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -305)
+	frame.auctionCheck:SetScale(0.85)
+	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
+	
+	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
+	frame.auctionFailedCheck:SetChecked(false)
+	frame.auctionFailedCheck:SetScale(0.85)
+	getglobal("BeancounterauctionFailedCheckText"):SetText("Failed Auctions")
+	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
+	
+	
 	
 	--[[search Purchases (vendor/trade)
 	frame.buyCheck = CreateFrame("CheckButton", "BeancounterbuyCheck", frame, "OptionsCheckButtonTemplate")
@@ -379,6 +390,14 @@ function private.CreateFrames()
 		{ "Date", "text", 110 },
 	})
 	
+	--All the UI settings are stored here. We then split it to get the appropriate search settings
+	function frame.getCheckboxSettings()
+		return {["selectbox"] = frame.SelectBoxSetting , ["exact"] = frame.exactCheck:GetChecked(), ["classic"] = frame.classicCheck:GetChecked(), 
+			["bid"] = frame.bidCheck:GetChecked(), ["failedbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = frame.auctionCheck:GetChecked(),
+			["failedauction"] = frame.auctionFailedCheck:GetChecked() 
+			}
+	end
+	
 	local data = {}
 	local style = {}
 	local tbl = {}
@@ -386,85 +405,90 @@ function private.CreateFrames()
 		if not itemName then return end
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		local _  --Cause I fear the norgjira  ;)
-		if itemTexture then 
-			frame.icon:SetNormalTexture(itemTexture)
-		else
-			_, itemTexture = private.getItemInfo(itemName, "name")
-			frame.icon:SetNormalTexture(itemTexture)
-		end
+			if itemTexture then 
+				frame.icon:SetNormalTexture(itemTexture)
+			else
+				_, itemTexture = private.getItemInfo(itemName, "name")
+				frame.icon:SetNormalTexture(itemTexture)
+			end
 		
 		data = {}
 		style = {}
 		for a,b in pairs(private.serverData) do
-				if settings.auction then
-					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-						--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-					else				
+			if settings.auction then
+				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+				else				
 					for i,v in pairs(private.serverData[a]["completedAuctions"]) do 
 						for index, text in pairs(v) do
-						
-						tbl= private.unpackString(text)
-						local match = false
-						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
+							tbl= private.unpackString(text)
+							local match = false
+							match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-						--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
-						
-						local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
-						local pricePer = 0
-						if stack > 0 then	pricePer = tbl[3]/stack end
-			
-						  table.insert(data,{
-									tbl[1], --itemname
-									tbl[2], --status
-									 
-									0, --tbl[7], --bid
-									0, --tbl[6], --buyout
-									tonumber(tbl[3]), --Profit,
-									tonumber(stack),  --stacksize
-									tonumber(pricePer), --Profit/per
-									
-									tbl[8], -- "-",  --seller/seller
-									
-									tonumber(tbl[4]), --deposit
-									tonumber(tbl[5]), --fee
-									tonumber(tbl[10]) or 0, --current wealth
-									date("%c", tbl[9]), --time, --Make this a user choosable option.
-									--tbl[12], --date
-								    })
+								--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
+
+								local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
+								local pricePer = 0
+								if stack > 0 then	pricePer = tbl[3]/stack end
+
+								table.insert(data,{
+								tbl[1], --itemname
+								tbl[2], --status
+								 
+								0, --tbl[7], --bid
+								0, --tbl[6], --buyout
+								tonumber(tbl[3]), --Profit,
+								tonumber(stack),  --stacksize
+								tonumber(pricePer), --Profit/per
+
+								tbl[8], -- "-",  --seller/seller
+
+								tonumber(tbl[4]), --deposit
+								tonumber(tbl[5]), --fee
+								tonumber(tbl[10]) or 0, --current wealth
+								date("%c", tbl[9]), --time, --Make this a user choosable option.
+								--tbl[12], --date
+								})
 								style[#data] = {}
 								style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
 								style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
 							end
 						end
 					end
+				end
+			end
+			if settings.failedauction then
+				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+				else	
 					for i,v in pairs(private.serverData[a]["failedAuctions"]) do
 						for index, text in pairs(v) do
-						
+
 						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-						--'["failedAuctions"] == itemName, "Auction expired", (time the mail arrived in our mailbox), curretn wealth',
-						   --Lets try some basic reconciling here
-						local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
-						   
-						   table.insert(data,{
-									tbl[1], --itemname
-									tbl[2], --status
-									
-									tonumber(minBid) or 0, --bid
-									tonumber(buyoutPrice) or 0, --buyout
-									0, --money,
-									tonumber(count) or 0,
-									0, --Profit/per
-									
-									"-",  --seller/buyer
-									
-									tonumber(deposit) or 0, --deposit
-									0, --fee
-									tonumber(tbl[4]) or 0, --current wealth
-									date("%c", tbl[3]), --time,
-									--tbl[5], --date
+								--'["failedAuctions"] == itemName, "Auction expired", (time the mail arrived in our mailbox), curretn wealth',
+								--Lets try some basic reconciling here
+								local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
+
+								table.insert(data,{
+								tbl[1], --itemname
+								tbl[2], --status
+
+								tonumber(minBid) or 0, --bid
+								tonumber(buyoutPrice) or 0, --buyout
+								0, --money,
+								tonumber(count) or 0,
+								0, --Profit/per
+
+								"-",  --seller/buyer
+
+								tonumber(deposit) or 0, --deposit
+								0, --fee
+								tonumber(tbl[4]) or 0, --current wealth
+								date("%c", tbl[3]), --time,
+								--tbl[5], --date
 								})
 								style[#data] = {}
 								style[#data][2] = {["textColor"] = {1,0,0}}
@@ -473,91 +497,95 @@ function private.CreateFrames()
 						end
 					end
 				end
-			   end
+			end
 			
-				if settings.bid then--or settings.buy then
-					if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-						--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-					else				
-					
+			if settings.bid then--or settings.buy then
+				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+				else				
 					for i,v in pairs(private.serverData[a]["completedBids/Buyouts"]) do
 						for index, text in pairs(v) do
-						
+
 						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-							
-							local stack, matchedBID = private.reconcileCompletedBids(a, i, tbl[8], tbl[6], tbl[7])
-							local pricePer = 0
-							local text = "Won on Buyout"
-							if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
-								text = "Won on Bid "
-								if stack > 0 then	pricePer = tbl[7]/stack end
-							else
-								if stack > 0 then	pricePer = tbl[6]/stack end
-							end
-						--  				1		2	    3	       4	       5       6         7      8                      9				10
-						--'["completedBids"] == itemName, "Auction won", money, deposit , fee, buyout , bid, seller, (time the mail arrived in our mailbox), current wealth',
-						   table.insert(data,{
-									tbl[1], --itemname
-									text,--tbl[2], --status
-									
-									tonumber(tbl[7]), --bid
-									tonumber(tbl[6]), --buyout
-									tonumber(tbl[3]), --money,
-									tonumber(stack),  --stacksize
-									pricePer, --Profit/per
-									
-									tbl[8],   --seller/buyer
-									  
-									tonumber(tbl[4]), --deposit
-									tonumber(tbl[5]), --fee
-									tonumber(tbl[10]) or 0, --current wealth
-									date("%c", tbl[9]), --time,
-									--tbl[11], --date
-								    })
+								local stack, matchedBID = private.reconcileCompletedBids(a, i, tbl[8], tbl[6], tbl[7])
+								local pricePer = 0
+								local text = "Won on Buyout"
+								if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
+									text = "Won on Bid "
+									if stack > 0 then	pricePer = tbl[7]/stack end
+									else
+									if stack > 0 then	pricePer = tbl[6]/stack end
+								end
+								--  				1		2	    3	       4	       5       6         7      8                      9				10
+								--'["completedBids"] == itemName, "Auction won", money, deposit , fee, buyout , bid, seller, (time the mail arrived in our mailbox), current wealth',
+								table.insert(data,{
+								tbl[1], --itemname
+								text,--tbl[2], --status
+
+								tonumber(tbl[7]), --bid
+								tonumber(tbl[6]), --buyout
+								tonumber(tbl[3]), --money,
+								tonumber(stack),  --stacksize
+								pricePer, --Profit/per
+
+								tbl[8],   --seller/buyer
+
+								tonumber(tbl[4]), --deposit
+								tonumber(tbl[5]), --fee
+								tonumber(tbl[10]) or 0, --current wealth
+								date("%c", tbl[9]), --time,
+								--tbl[11], --date
+								})
 								style[#data] = {}
 								style[#data][2] = {["textColor"] = {1,1,0}}
-								style[#data][8] ={["textColor"] = {1,1,0}}								
+								style[#data][8] ={["textColor"] = {1,1,0}}
 							end
 						end
 					end
+				end
+			end
+			if settings.failedbid then--or settings.buy then
+				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
+				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
+				else	
 					for i,v in pairs(private.serverData[a]["failedBids"]) do
 						for index, text in pairs(v) do
-						
+
 						tbl= private.unpackString(text)
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-							
-						--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
-						   table.insert(data,{
-									tbl[1], --itemname
-									tbl[2], --status
-									
-									tonumber(tbl[3]), --bid
-									0, --buyout
-									0, --money,
-									0, --stack
-									0, --Profit/per
-									
-									"-",  --seller/buyer
-									
-									0, --deposit
-									0, --fee
-									tonumber(tbl[5]) or 0, --current wealth
-									date("%c", tbl[4]), --time,
-									--tbl[6], --date
-								    })
+
+								--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
+								table.insert(data,{
+								tbl[1], --itemname
+								tbl[2], --status
+
+								tonumber(tbl[3]), --bid
+								0, --buyout
+								0, --money,
+								0, --stack
+								0, --Profit/per
+
+								"-",  --seller/buyer
+
+								0, --deposit
+								0, --fee
+								tonumber(tbl[5]) or 0, --current wealth
+								date("%c", tbl[4]), --time,
+								--tbl[6], --date
+								})
 								style[#data] = {}
 								style[#data][2] = {["textColor"] = {1,1,1}}
 								style[#data][8] ={["textColor"] = {1,1,1}}
 							end
 						end
 					end
-					end
 				end
+			end
 		end
 	--BC CLASSIC DATA SEARCH	
 	if settings.classic then

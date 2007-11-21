@@ -237,7 +237,10 @@ function lib.externalSearch(name)
 		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
 		local itemName, itemTexture = private.getItemInfo(name, "name") or name
 		frame.searchBox:SetText(itemName)
-		local settings = {["selectbox"] = frame.SelectBoxSetting , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), ["bid"] = 1, ["auction"] = 1 } --["buy"] = frame.buyCheck:GetChecked(), }--["sell"] = frame.sellCheck:GetChecked()}
+		local settings = {["selectbox"] = "server" , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 
+						["bid"] = true, ["outbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = true,
+						["failedauction"] = frame.auctionFailedCheck:GetChecked() 
+						}
 		private.startSearch(itemName, settings, itemTexture)
 	end
 end
