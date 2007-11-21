@@ -1,0 +1,10 @@
+## Title: Auc:Stat:Classic
+## Interface: 20300
+## Dependancies: Auc-Advanced
+## OptionalDeps: Auctioneer
+##
+## SavedVariables: AucAdvancedStatClassicData
+## Version: <%version%> (<%codename%>)
+## URL: http://auctioneeraddon.com/
+##
+StatClassic.lua
