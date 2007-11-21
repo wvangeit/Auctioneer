@@ -278,6 +278,7 @@ function private.PushStats(faction, realm)
 			fdata = private.UnpackStats(data.means[itemId] or "")
 			for property, info in pairs(pdata) do
 				dailyAvg = info[1] / info[2]
+				if not info[3] then info[3] = 0 end
 				if not fdata[property] then
 					fdata[property] = acquire(
 						1,
@@ -293,19 +294,24 @@ function private.PushStats(faction, realm)
 					fdata[property][3] = ("%0.01f"):format(((fdata[property][3] * 2) + dailyAvg)/3)
 					fdata[property][4] = ("%0.01f"):format(((fdata[property][4] * 6) + dailyAvg)/7)
 					fdata[property][5] = ("%0.01f"):format(((fdata[property][5] * 13) + dailyAvg)/14)
-					if fdata[property][6] then
-						temp = fdata[property][6]
-						if temp < info[3] then
-							if (temp*10/info[3]) < 9 then
-								fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+					if not fdata[property][6] then fdata[property][6] = 0 end
+					temp = fdata[property][6]
+					if temp < 1 then
+						fdata[property][6] = info[3]
+					else
+						if info[3] ~= 0 then
+							if temp < info[3] then
+								if (temp*10/info[3]) < 9 then
+									fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+								else
+									fdata[property][6] = ("%0.01f"):format((temp+info[3]*7)/8)
+								end
 							else
-								fdata[property][6] = ("%0.01f"):format((temp+info[3]*3)/4)
-							end
-						else
-							if (info[3]*10/temp) < 9 then
-								fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
-							else
-								fdata[property][6] = ("%0.01f"):format((temp*7+info[3])/8)
+								if (info[3]*10/temp) < 9 then
+									fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+								else
+									fdata[property][6] = ("%0.01f"):format((temp*7+info[3])/8)
+								end
 							end
 						end
 					end
