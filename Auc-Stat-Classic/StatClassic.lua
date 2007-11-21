@@ -70,12 +70,14 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.GetPrice(hyperlink, faction)
+function lib.GetPrice(hyperlink, ahKey)
 	if (not data) then private.makeData() end
 	local linkType,itemId,property,factor,enchant = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
-	if not faction then faction = AucAdvanced.GetFaction() end
-	local ahKey = faction:lower()
+	if not ahKey then
+		ahKey = AucAdvanced.GetFaction() 
+	end
+	ahKey = ahKey:lower()
 	local median, seen, confidence = 0, 0, 0.1
 	local lastdata
 	local ItemString = strjoin(":",itemId,property,enchant)
@@ -85,12 +87,12 @@ function lib.GetPrice(hyperlink, faction)
 		--print(median, seen)
 		if median and (median > 0) then
 			confidence = 1 - math.exp(-seen/30)
-			private.StoreData(ItemString, median, seen, faction)
+			private.StoreData(ItemString, median, seen, ahKey)
 		end
 	else
-		if not data[faction] then return end
-		if not data[faction][ItemString] then return end
-		median, seen, lastdata = strsplit(",", data[faction][ItemString])
+		if not data[ahKey] then return end
+		if not data[ahKey][ItemString] then return end
+		median, seen, lastdata = strsplit(",", data[ahKey][ItemString])
 		median = tonumber(median)
 		seen = tonumber(seen)
 		lastdata = tonumber(lastdata)
@@ -108,12 +110,12 @@ function lib.GetPriceColumns()
 end
 
 local array = {}
-function lib.GetPriceArray(hyperlink, faction, realm)
+function lib.GetPriceArray(hyperlink, ahKey, realm)
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
 
 	-- Get our statistics
-	local median, seen, confidence = lib.GetPrice(hyperlink, faction, realm)
+	local median, seen, confidence = lib.GetPrice(hyperlink, ahKey, realm)
 
 	-- These 3 are the ones that most algorithms will look for
 	array.price = median
@@ -128,7 +130,7 @@ end
 AucAdvanced.Settings.SetDefault("stat.classic.tooltip", true)
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 	--gui:MakeScrollable(id)
 	
 	gui:AddHelp(id, "what classic stats",
@@ -171,18 +173,19 @@ function lib.OnLoad(addon)
 	private.makeData()
 end
 
-function lib.ClearItem(hyperlink, faction, realm)
+function lib.ClearItem(hyperlink, ahKey, realm)
 	local linkType, itemID, property, factor, enchant = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then
 		return
 	end
 	local ItemString = strjoin(":",itemId,property,enchant)
-	if not faction then faction = AucAdvanced.GetFaction() end
+	if not ahKey then ahKey = AucAdvanced.GetFaction() end
+	ahKey = ahKey:lower()
 	if not realm then realm = GetRealmName() end
 	if (not data) then private.makeData() end
-	if (data[faction]) then
-		print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..faction.."}}")
-		data[faction][ItemString] = nil
+	if (data[ahKey]) then
+		print(libType.."-"..libName..": clearing data for "..hyperlink.." for {{"..ahKey.."}}")
+		data[ahKey][ItemString] = nil
 	end
 end
 
@@ -191,32 +194,35 @@ local importstarted = false
 function lib.ImportRoutine()
 	importstarted = true
 	if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
-		local faction = AucAdvanced.GetFaction()
-		local ahKey = faction:lower()
+		--local ahKey = AucAdvanced.GetFaction()
+		--local ahKey = ahKey:lower()
 		local ClassicData = {}
 		if AuctioneerHistoryDB then
 			ClassicData = AuctioneerHistoryDB
 		else
 			print("AuctioneerHistoryDB not found")
 		end
-		if ClassicData[ahKey] and ClassicData[ahKey]["buyoutPrices"] then
-			local i = 0
-			for itemKey, v in pairs(ClassicData[ahKey]["buyoutPrices"]) do
-				local median, seen = Auctioneer.Statistic.GetUsableMedian(itemKey, ahKey)
-				if median and seen then
-					private.StoreData(itemKey, median, seen, faction)
-				end
-				i = i + 1
-				if ((i/200) == floor(i/200)) then
-					if ((i/1000) == floor(i/1000)) then
-						print("Auc-Stat-Classic: Imported "..i)--.." of "..#(ClassicData[ahKey]["buyoutPrices"]))
+		for ahKey, k in pairs(ClassicData) do
+			if ClassicData[ahKey]["buyoutPrices"] then
+				local i = 0
+				print("Importing "..ahKey)
+				for itemKey, v in pairs(ClassicData[ahKey]["buyoutPrices"]) do
+					local median, seen = Auctioneer.Statistic.GetUsableMedian(itemKey, ahKey)
+					if median and seen then
+						private.StoreData(itemKey, median, seen, ahKey)
 					end
-					coroutine.yield()
+					i = i + 1
+					if ((i/200) == floor(i/200)) then
+						if ((i/1000) == floor(i/1000)) then
+							print("Auc-Stat-Classic: Imported "..i)--.." of "..#(ClassicData[ahKey]["buyoutPrices"]))
+						end
+						coroutine.yield()
+					end
 				end
+				print("Auc-Stat-Classic: Finished importing "..i.." items for "..ahKey.." from AucClassic")
+			else
+				print("No data for "..ahKey.." available")
 			end
-			print("Auc-Stat-Classic: Finished importing "..i.." items from AucClassic")
-		else
-			print("No data for "..ahKey.." available")
 		end
 	else
 		print("AucClassic must be loaded to import any data from it")
@@ -257,13 +263,16 @@ function private.DataLoaded()
 end
 
 
-function private.StoreData(ItemString, median, seen, faction)
+function private.StoreData(ItemString, median, seen, ahKey)
 	if (not data) then private.makeData() end
 	local now = time()
-	if not faction then faction = AucAdvanced.GetFaction() end
+	if not ahKey then
+		ahKey = AucAdvanced.GetFaction() 
+	end
+	ahKey = ahKey:lower()
 	local PriceString = strjoin(",", median, seen, time())
 	--print(PriceString)
-	if not data[faction] then data[faction] = {} end
-	data[faction][ItemString] = PriceString
+	if not data[ahKey] then data[ahKey] = {} end
+	data[ahKey][ItemString] = PriceString
 end
 
