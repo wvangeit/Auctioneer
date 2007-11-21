@@ -1176,6 +1176,11 @@ BtmScan.TooltipHook = function (funcVars, retVal, frame, name, link, quality, co
 		if (not item.id) then return end -- Not an "item"
 
 		item.name, _, item.qual, item.ilevel, item.level, _, _, _, _, item.tex = GetItemInfo(item.link)
+		--GetItemInfo will return nil if the item data is not in your local cache
+		--So we need to make sure that we have the data before proceeding, or a nil error may occur later
+		if not item.name or not item.qual or not item.ilevel or not item.level or not item.tex then
+			return
+		end
 		item.count = count
 		item.use = 1
 		item.inc = 0
