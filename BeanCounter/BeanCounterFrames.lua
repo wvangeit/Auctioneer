@@ -599,6 +599,7 @@ function private.CreateFrames()
 	 
 	function private.fragmentsearch(compare, itemName, exact)
 		if exact then 
+			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) --extract item name from itemlink
 			if compare:lower() == itemName:lower() then return true end
 		else
 			local match = (compare:lower():find(itemName:lower(), 1, true) ~= nil)
