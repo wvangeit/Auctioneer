@@ -90,6 +90,7 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 	if not data.daily[itemId] then data.daily[itemId] = "" end
 	local stats = private.UnpackStats(data.daily[itemId])
 	if not stats[property] then stats[property] = { 0, 0 , buyoutper } end
+	if not stats[property][3] then stats[property][3] = buyoutper end
 	stats[property][1] = stats[property][1] + buyout
 	stats[property][2] = stats[property][2] + itemData.stackSize
 	if stats[property][3] > buyoutper then stats[property][3] = buyoutper end
@@ -115,6 +116,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 		if stats[property] then
 			dayTotal, dayCount, minBuyout = unpack(stats[property])
 			dayAverage = dayTotal/dayCount
+			if not minBuyout then minBuyout = 0 end
 		end
 		recycle(stats)
 	end
@@ -122,6 +124,7 @@ function lib.GetPrice(hyperlink, faction, realm)
 		local stats = private.UnpackStats(data.means[itemId])
 		if stats[property] then
 			seenDays, seenCount, avg3, avg7, avg14, avgmins = unpack(stats[property])
+			if not avgmins then avgmins = 0 end
 		end
 		recycle(stats)
 	end
@@ -243,11 +246,11 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 			EnhTooltip.AddLine("  3 day average", avg3*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
-		if (dayCount > 0) then
+		if (dayCount > 0) and (minBuyout > 0) then
 			EnhTooltip.AddLine("  Min BO", minBuyout*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
-		if (seenDays > 0) then
+		if (seenDays > 0) and (avgmins > 0) then
 			EnhTooltip.AddLine("  Average MBO", avgmins*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
@@ -290,18 +293,20 @@ function private.PushStats(faction, realm)
 					fdata[property][3] = ("%0.01f"):format(((fdata[property][3] * 2) + dailyAvg)/3)
 					fdata[property][4] = ("%0.01f"):format(((fdata[property][4] * 6) + dailyAvg)/7)
 					fdata[property][5] = ("%0.01f"):format(((fdata[property][5] * 13) + dailyAvg)/14)
-					temp = fdata[property][6]
-					if temp < info[3] then
-						if (temp*10/info[3]) < 9 then
-							fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+					if fdata[property][6] then
+						temp = fdata[property][6]
+						if temp < info[3] then
+							if (temp*10/info[3]) < 9 then
+								fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+							else
+								fdata[property][6] = ("%0.01f"):format((temp+info[3]*3)/4)
+							end
 						else
-							fdata[property][6] = ("%0.01f"):format((temp+info[3]*3)/4)
-						end
-					else
-						if (info[3]*10/temp) < 9 then
-							fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
-						else
-							fdata[property][6] = ("%0.01f"):format((temp*7+info[3])/8)
+							if (info[3]*10/temp) < 9 then
+								fdata[property][6] = ("%0.01f"):format((temp+info[3])/2)
+							else
+								fdata[property][6] = ("%0.01f"):format((temp*7+info[3])/8)
+							end
 						end
 					end
 				end
