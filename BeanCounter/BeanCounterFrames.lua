@@ -137,6 +137,7 @@ function private.CreateFrames()
 
 	--Create the base frame for external GUI
 	local base = CreateFrame("Frame", "BeanCounterBaseFrame", UIParent)
+	base:SetFrameStrata("HIGH")
 	base:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
 		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
