@@ -337,7 +337,7 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	end
 		
 	for index, matcher in ipairs(matchers) do
-		local value, priceArray = lib.GetMatcherValue(matcher, itemLink, priceArray, faction, realm)
+		local value, priceArray = lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
 		total = total + value
 		count = count + 1
 		diff = diff + priceArray.diff
