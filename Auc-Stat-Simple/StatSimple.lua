@@ -227,7 +227,7 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, "Moving X day average is formulated by")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "((X-1)*TodaysAverage + YesterdaysMovingAverage)/X")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, "((X-1)*YesterdaysMovingAverage + TodaysAverage)/X")
 end
 
 --[[ Local functions ]]--
