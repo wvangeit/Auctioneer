@@ -77,8 +77,8 @@ function lib.ScanProcessors.create(operation, itemData, oldData)
 
 	-- We're only interested in items with buyouts.
 	local buyout = itemData.buyoutPrice
-	local buyoutper = ceil(buyout/itemData.stackSize)
 	if not buyout or buyout == 0 then return end
+	local buyoutper = ceil(buyout/itemData.stackSize)
 
 	-- In this case, we're only interested in the initial create, other
 	-- Get the signature of this item and find it's stats.
@@ -209,25 +209,70 @@ function private.SetupConfigGui(gui)
 		"Simple module averages all of the prices for items that it sees and provides "..
 		"moving 3, 7, and 14 day averages.  It also provides daily minimum buyout "..
 		"along with a running average minimum buyout within 10% variance.")
+	
+	gui:AddHelp(id, "what moving day average",
+		"What does 'moving day average' mean?",
+		"Moving average means that it places more value on yesterday's moving average "..
+		"than today's average.  The determined amount is then used for "..
+		"tomorrow's moving average calculation.")
+	
+	gui:AddHelp(id, "how day average calculated",
+		"How is the moving day averages calculated exactly?",
+		"Todays Moving Average is ((X-1)*YesterdaysMovingAverage + TodaysAverage) / X, "..
+		"where X is the number of days (3,7, or 14).")
 
+	gui:AddHelp(id, "no day saved",
+		"So you aren't saving a day-to-day average?",
+		"No, that would not only take up space, but heavy calculations on each "..
+		"auction house scan, and this is only a simple model.")
+
+	gui:AddHelp(id, "minimum buyout",
+		"Why do I need to know minimum buyout?",
+		"While some items will sell very well at average within 2 days, others "..
+		"may sell only if it is the lowest price listed.  This was an easy "..
+		"calculation to do, so it was put in this module.")
+
+	gui:AddHelp(id, "average minimum buyout",
+		"What's the point in an average minimum buyout?",
+		"This way you know how good a market is dealing.  If the MBO (minimum buyout) "..
+		"is bigger than the Average MBO, then it's usually a good time to sell, and "..
+		"if the Average MBO is greater than the MBO, then it's a good time to buy.")
+	
+	gui:AddHelp(id, "average minimum buyout variance",
+		"What's the '10% variance' mentioned earlier for?",
+		"If the current MBO is inside a 10% range of the running average, "..
+		"the current MBO is averaged in to the running average at 50% (normal).  "..
+		"If the current MBO is outside the 10% range, the current MBO will only "..
+		"be averaged in at a 12.5% rate.")
+	
+	gui:AddHelp(id, "why have variance",
+		"What's the point of a variance on minimum buyout?",
+		"Because some people put their items on the market for rediculous price "..
+		"(too low or too high), so this helps keep the average from getting out "..
+		"of hand.")
+	
+	gui:AddHelp(id, "why multiply stack size simple",
+		"Why have the option to multiply stack size?",
+		"The original Stat-Simple multiplied by the stack size of the item, "..
+		"but some like dealing on a per-item basis.")
+	
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.tooltip", "Show simple stats in the tooltips?")
 	gui:AddTip(id, "Toggle display of stats from the Simple module on or off")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Subhead",    0,    "Each part can then be further turned on and off:")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.avg3", "Disply Moving 3 Day Average")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.avg7", "Disply Moving 7 Day Average")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.avg14", "Disply Moving 14 Day Average")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.minbuyout", "Disply Daily Minimum Buyout")
-	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.avgmins", "Disply Average of Daily Minimum Buyouts")
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg3", "Display Moving 3 Day Average")
+	gui:AddTip(id, "Toggle display of 3-Day Average from the Simple module on or off")
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg7", "Display Moving 7 Day Average")
+	gui:AddTip(id, "Toggle display of 7-Day Average from the Simple module on or off")
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avg14", "Display Moving 14 Day Average")
+	gui:AddTip(id, "Toggle display of 14-Day Average from the Simple module on or off")
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.minbuyout", "Display Daily Minimum Buyout")
+	gui:AddTip(id, "Toggle display of Minimum Buyout from the Simple module on or off")
+	gui:AddControl(id, "Checkbox",   0, 2, "stat.simple.avgmins", "Display Average of Daily Minimum Buyouts")
+	gui:AddTip(id, "Toggle display of Minimum Buyout Average from the Simple module on or off")
 	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
 	gui:AddControl(id, "Checkbox",   0, 1, "stat.simple.quantmul", "Multiply by Stack Size")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "Multiplies values by current stack size of item if checked, otherwise it will only be a price-per item basis.")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "Moving X day average is formulated by")
-	gui:AddControl(id, "Note",       0, 1, nil, nil, "((X-1)*YesterdaysMovingAverage + TodaysAverage)/X")
+	gui:AddTip(id, "Multiplies by current Stack Size if on")
 end
 
 --[[ Local functions ]]--
