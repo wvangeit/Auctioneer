@@ -252,7 +252,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	if not AucAdvanced.Settings.GetSetting("stat.purchased.tooltip") then return end
 	
 	if not quantity or quantity < 1 then quantity = 1 end
-	if AucAdvanced.Settings.GetSetting("stat.purchased.quantmul") then quantity = 1 end
+	if not AucAdvanced.Settings.GetSetting("stat.purchased.quantmul") then quantity = 1 end
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink)
 	if (not dayAverage) then return end
 	local dispAvg3 = AucAdvanced.Settings.GetSetting("stat.purchased.avg3")

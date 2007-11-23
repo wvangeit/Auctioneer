@@ -273,7 +273,7 @@ function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, ...
 	if not AucAdvanced.Settings.GetSetting("stat.stddev.tooltip") then return end
 	
 	if not quantity or quantity < 1 then quantity = 1 end
-	if AucAdvanced.Settings.GetSetting("stat.stddev.quantmul") then quantity = 1 end
+	if not AucAdvanced.Settings.GetSetting("stat.stddev.quantmul") then quantity = 1 end
 	local average, mean, _, stdev, var, count, confidence = lib.GetPrice(hyperlink)
 
 	if (mean and mean > 0) then
