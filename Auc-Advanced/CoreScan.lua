@@ -525,7 +525,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		data = scandata.image[pos]
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local stillpossible = false
-			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 86400
+			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
 			local dodelete = false
 			if (not data[Const.TIME]) or (now - data[Const.TIME] <= auctionmaxtime) then
 				stillpossible = true
