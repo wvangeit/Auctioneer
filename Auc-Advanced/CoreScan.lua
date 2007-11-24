@@ -600,8 +600,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		else
 			lib.Print("  {{"..updateCount.."}} updated items")
 		end
-		lib.Print("  {{"..earlyDeleteCount.."}} items removed due to buyout or cancellation")
-		lib.Print("  {{"..expiredDeleteCount.."}} items removed due to expiration")
+		lib.Print("  {{"..earlyDeleteCount+expiredDeleteCount.."}} items removed")
 		lib.Print("  {{"..filterCount.."}} filtered items")
 		lib.Print("  {{"..missedCount.."}} missed items")
 		lib.Print("  {{"..currentCount.."}} items in DB at end")
