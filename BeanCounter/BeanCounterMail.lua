@@ -47,11 +47,14 @@ function private.mailMonitor(event,arg1)
 	if (event == "MAIL_INBOX_UPDATE") then
 		private.updateInboxStart() 
 	elseif (event == "MAIL_SHOW") then 
-	private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
-	hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
-	hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
+		private.inboxStart = {} --clear the inbox list, if we errored out this should give us a fresh start.
+		hooksecurefunc("InboxFrame_OnClick", private.mailFrameClick)
+		hooksecurefunc("InboxFrame_Update", private.mailFrameUpdate)
 		--We cannot use mail show since the GetInboxNumItems() returns 0 till the first "MAIL_INBOX_UPDATE"
 	elseif (event == "MAIL_CLOSED") then
+		--Hide or show the mail Minimap button if we have "Unread" mail
+		private.hasUnreadMail()
+		
 		InboxCloseButton:Show()
 		InboxFrame:Show()
 		MailFrameTab2:Show()
@@ -322,7 +325,7 @@ function private.mailBoxColorStart()
 	end
 	
 	--Create Characters Mailbox, or resync if we get more that 5 mails out of tune
-	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+4) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
+	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+2) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
 		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 		for i, v in pairs(mailCurrent) do
@@ -372,5 +375,23 @@ function private.mailBoxColorStart()
 		
 	end	
 	private.mailFrameUpdate()
+	private.hasUnreadMail()
+end
+
+function private.hasUnreadMail(text)
+	if private.getOption("util.beancounter.mailrecolor") == "off" then return end --no need to do this if user isn't using recolor system
 	
+	local mailunread = false
+	for i,v in pairs(BeanCounterDB[private.realmName][private.playerName]["mailbox"]) do
+		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] < 2 then
+			  mailunread = true
+		end
+	end
+	if mailunread then
+		lib.SetSetting("util.beancounter.hasUnreadMail", true)
+		MiniMapMailFrame:Show()
+	else
+		lib.SetSetting("util.beancounter.hasUnreadMail", false)
+		MiniMapMailFrame:Hide()
+	end
 end

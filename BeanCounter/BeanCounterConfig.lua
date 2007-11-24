@@ -94,6 +94,9 @@ private.settingDefaults = {
 	["util.beacounter.invoicetime"] = 5,
 	["util.beancounter.mailrecolor"] = "both",
 	["util.beancounter.externalSearch"] = true,
+	
+	["util.beancounter.hasUnreadMail"] = false,
+	
     }
 
 local function getDefault(setting)

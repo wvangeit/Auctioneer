@@ -84,7 +84,7 @@ function lib.OnLoad(addon)
 	private.frame:RegisterEvent("UI_ERROR_MESSAGE")
 	private.frame:RegisterEvent("MAIL_SHOW")
 	private.frame:RegisterEvent("MAIL_CLOSED")
-	
+	private.frame:RegisterEvent("UPDATE_PENDING_MAIL")
 	private.frame:RegisterEvent("MERCHANT_SHOW")	
 	private.frame:RegisterEvent("MERCHANT_UPDATE")
 	private.frame:RegisterEvent("MERCHANT_CLOSED")
@@ -218,8 +218,11 @@ function private.onEvent(frame, event, arg, ...)
 		private.mailMonitor(event, arg, ...)
 	
 	elseif (event == "MERCHANT_CLOSED") or (event == "MERCHANT_SHOW") or (event == "MERCHANT_UPDATE") then
-		--private.vendorOnevent(event, arg, ...)
-
+			--private.vendorOnevent(event, arg, ...)
+			
+	elseif (event == "UPDATE_PENDING_MAIL") then 
+		private.hasUnreadMail()
+		
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
 		   lib.OnLoad()
