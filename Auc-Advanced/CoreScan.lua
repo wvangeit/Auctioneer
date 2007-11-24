@@ -485,7 +485,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 		if type(data) == "string" then
 			print("Warning, data is a string value.  Please report the following debug information to"..
 				"http://jira.norganna.org/browse/ADV-78")
-			print("data: %s"):format(data)
+			print(("data: %s"):format(data))
 		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
