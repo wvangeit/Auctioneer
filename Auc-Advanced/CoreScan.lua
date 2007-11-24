@@ -482,41 +482,56 @@ function lib.Commit(wasIncomplete, wasGetAll)
 
 	processStats("begin")
 	for _, data in ipairs(private.curScan) do
-		if type(data) == "string" then
-			print("Warning, data is a string value.  Please report the following debug information to"..
+	
+-- TODO - remove this debugging code once we figure out where the bad values are coming from
+		if (not data or type(data) == "string") then
+		
+			print("Warning, data is a string value.  Please report the following debug information to "..
 				"http://jira.norganna.org/browse/ADV-78")
-			print(("data: %s"):format(data))
-		end
-		itemPos = lib.FindItem(data, scandata.image, lut)
-		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
-		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
-		if (itemPos) then
-			local oldItem = scandata.image[itemPos]
-			data[Const.ID] = oldItem[Const.ID]
-			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
-			if not private.IsIdentical(oldItem, data) then
-				if processStats("update", data, oldItem) then
-					updateCount = updateCount + 1
-				end
-				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-					updateRecoveredCount = updateRecoveredCount + 1
-				end
+			if (not data) then
+				print("data is nil")
 			else
-				if processStats("leave", data) then
-					sameCount = sameCount + 1
-				end
-				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-					sameRecoveredCount = sameRecoveredCount + 1
-				end
+				print(("data: %s"):format(data))
 			end
-			scandata.image[itemPos] = clone(data)
+		
 		else
-			if (processStats("create", data)) then
-				data[Const.ID] = private.GetNextID(idList)
-				table.insert(scandata.image, clone(data))
-				newCount = newCount + 1
+	
+-- the non-error case, only if data was not a string and not nil
+-- this should be the remaining code after we remove the debugging bits
+			itemPos = lib.FindItem(data, scandata.image, lut)
+			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
+			data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
+			if (itemPos) then
+				local oldItem = scandata.image[itemPos]
+				data[Const.ID] = oldItem[Const.ID]
+				data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+				if not private.IsIdentical(oldItem, data) then
+					if processStats("update", data, oldItem) then
+						updateCount = updateCount + 1
+					end
+					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+						updateRecoveredCount = updateRecoveredCount + 1
+					end
+				else
+					if processStats("leave", data) then
+						sameCount = sameCount + 1
+					end
+					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+						sameRecoveredCount = sameRecoveredCount + 1
+					end
+				end
+				scandata.image[itemPos] = clone(data)
+			else
+				if (processStats("create", data)) then
+					data[Const.ID] = private.GetNextID(idList)
+					table.insert(scandata.image, clone(data))
+					newCount = newCount + 1
+				end
 			end
+	
+-- end of debugging code
 		end
+	
 	end
 	recycle(lut)
 
