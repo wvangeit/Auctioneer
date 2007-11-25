@@ -104,16 +104,15 @@ end
 
 -- TODO - ccox - debugging code, remove me!
 local function VerifyOneItem( index, data, labelstring )
-	if (not data or type(data) == "string" or type(data) == "number") then
+	if (not data or type(data) ~= "table") then
 		
 		print("bad data in curScan during "..labelstring)
 		if (not data) then
 			print("data is nil")
 		elseif (type(data) == "number") then
-			print(("index: %s, data number: %d"):format(index, data))
-		else
-			print(("index: %s, data string: %s"):format(index, data))
+			data = ("%d"):format(data)
 		end
+		print(("index: %s, data: %s"):format(index, data))
 	end
 end
 
@@ -517,50 +516,49 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	for index, data in ipairs(private.curScan) do
 
 -- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
-		if (not data or type(data) == "string" or type(data) == "number") then
+		if (not data or type(data) ~= "table") then
 		
 			VerifyOneItem( index, data, "Commit")
-
-		else
+		end
 
 -- the non-error case, only if data was not a string, not a number and not nil
--- and this code should only execute if data is a valid table!  Otherwise it goes kaboom!
+-- this code should execute as long as data is NOT NIL!  Otherwise it goes kaboom, and some information will be lost! DONT change it again, please
+-- ALSO, please be in IRC when committing so that you and I can collaborate on fixing this.  I am asleep most days and at work most nights, but online in the evening (central time) -Speeddymon
 
 -- this should be the remaining code after we remove the debugging bits
 
-			itemPos = lib.FindItem(data, scandata.image, lut)
-			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
-			data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
-			if (itemPos) then
-				local oldItem = scandata.image[itemPos]
-				data[Const.ID] = oldItem[Const.ID]
-				data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
-				if not private.IsIdentical(oldItem, data) then
-					if processStats("update", data, oldItem) then
-						updateCount = updateCount + 1
-					end
-					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-						updateRecoveredCount = updateRecoveredCount + 1
-					end
-				else
-					if processStats("leave", data) then
-						sameCount = sameCount + 1
-					end
-					if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
-						sameRecoveredCount = sameRecoveredCount + 1
-					end
+		itemPos = lib.FindItem(data, scandata.image, lut)
+		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
+		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
+		if (itemPos) then
+			local oldItem = scandata.image[itemPos]
+			data[Const.ID] = oldItem[Const.ID]
+			data[Const.FLAG] = bit.band(oldItem[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY+Const.FLAG_UNSEEN))
+			if not private.IsIdentical(oldItem, data) then
+				if processStats("update", data, oldItem) then
+					updateCount = updateCount + 1
 				end
-				scandata.image[itemPos] = clone(data)
+				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					updateRecoveredCount = updateRecoveredCount + 1
+				end
 			else
-				if (processStats("create", data)) then
-					data[Const.ID] = private.GetNextID(idList)
-					table.insert(scandata.image, clone(data))
-					newCount = newCount + 1
+				if processStats("leave", data) then
+					sameCount = sameCount + 1
+				end
+				if bit.band(oldItem[Const.FLAG] or 0, Const.FLAG_UNSEEN) == Const.FLAG_UNSEEN then
+					sameRecoveredCount = sameRecoveredCount + 1
 				end
 			end
-	
--- end of debugging code
+			scandata.image[itemPos] = clone(data)
+		else
+			if (processStats("create", data)) then
+				data[Const.ID] = private.GetNextID(idList)
+				table.insert(scandata.image, clone(data))
+				newCount = newCount + 1
+			end
 		end
+
+-- end of debugging code
 	
 	end
 	recycle(lut)
