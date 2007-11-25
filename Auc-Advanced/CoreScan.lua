@@ -102,10 +102,39 @@ function lib.GetImage()
 	return image
 end
 
+-- TODO - ccox - debugging code, remove me!
+local function VerifyOneItem( index, data, labelstring )
+	if (not data or type(data) == "string" or type(data) == "number") then
+		
+		print("bad data in curScan during "..labelstring)
+		if (not data) then
+			print("data is nil")
+		elseif (type(data) == "number") then
+			print(("index: %s, data number: %d"):format(index, data))
+		else
+			print(("index: %s, data string: %s"):format(index, data))
+		end
+	end
+end
+
+-- TODO - ccox - debugging code, remove me!
+local function VerifyCurScan( labelstring )
+
+	if not private.curScan then
+		return;
+	end
+
+	for index, data in ipairs(private.curScan) do
+		VerifyOneItem(index, data, labelstring)
+	end	
+
+end
+
 function lib.PushScan()
 	if private.isScanning then
 		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
 		if not private.scanStack then private.scanStack = acquire() end
+VerifyCurScan("before PushScan acquire");
 		table.insert(private.scanStack, acquire(
 			private.scanStartTime,
 			private.sentQuery,
@@ -117,6 +146,7 @@ function lib.PushScan()
 			private.totalPaused,
 			GetTime()
 		))
+VerifyCurScan("after PushScan acquire");
 		private.scanStartTime = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
@@ -129,6 +159,7 @@ function lib.PushScan()
 		private.isScanning = false
 		private.UpdateScanProgress(false)
 	end
+VerifyCurScan("end of PushScan");
 end
 
 function lib.PopScan()
@@ -145,6 +176,7 @@ function lib.PopScan()
 		pauseTime = unpack(private.scanStack[1])
 		table.remove(private.scanStack, 1)
 
+VerifyCurScan("after PopScan unpack");
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
 			-- 5 minutes old
@@ -160,6 +192,7 @@ function lib.PopScan()
 		lib.ScanPage(private.curPage)
 		private.UpdateScanProgress(true)
 	end
+VerifyCurScan("end of PopScan");
 end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
@@ -486,16 +519,8 @@ function lib.Commit(wasIncomplete, wasGetAll)
 -- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
 		if (not data or type(data) == "string" or type(data) == "number") then
 		
-			print("Warning, data has returned invalid information.  Please report the following debug information to "..
-				"http://jira.norganna.org/browse/ADV-78")
-			if (not data) then
-				print("data is nil")
-			elseif (type(data) == "number") then
-				print(("index: %s, data number: %d"):format(index, data))
-			else
-				print(("index: %s, data string: %s"):format(index, data))
-			end
-		
+			VerifyOneItem( index, data, "Commit")
+
 		else
 
 -- the non-error case, only if data was not a string, not a number and not nil
@@ -795,7 +820,11 @@ function lib.StorePage()
 	if (numBatchAuctions > 50) then
 		maxPages = 1
 	end
-	if not private.curScan then private.curScan = acquire() end
+	if not private.curScan then 
+		private.curScan = acquire()
+VerifyCurScan("after StorePage acquire");
+	end
+
 
 	--Update the progress indicator
 	local now = GetTime()
@@ -868,24 +897,7 @@ function lib.StorePage()
 			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
 			or legacyScanning() -- Is AucClassic scanning?
 			or private.NoDupes(private.curScan, itemData) then
-
-
--- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
-if (not itemData or type(itemData) == "string" or type(itemData) == "number") then
-
-	print("Warning, itemData is invalid.  Please report the following debug information to "..
-		"http://jira.norganna.org/browse/ADV-78")
-	
-	if (not itemData) then
-		print("itemData is nil")
-	elseif (type(itemData) == "number") then
-		print(("itemData number: %d"):format(data))
-	else
-		print(("itemData string: %s"):format(data))
-	end
-
-end
-
+VerifyOneItem( 0, itemData, "StorePage insert")
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
@@ -1146,7 +1158,7 @@ function private.ResetAll()
 	private.sentQuery = nil
 	private.isScanning = false
 	private.unexpectedClose = false
-
+VerifyCurScan("after ResetAll recycle");
 	--Hide the progress indicator
 	private.UpdateScanProgress(false)
 end
