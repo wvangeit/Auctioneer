@@ -195,24 +195,14 @@ function private.CreateFrames()
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
-
-	frame.SelectBoxSetting = {"1","server"}
-	function private.ChangeControls(obj, arg1,arg2,...)
-		--debugPrint("Clicked the button Option #", arg1, arg2)
-		frame.SelectBoxSetting = {arg1, arg2}
-	end
-	--Default Server wide
-	local vals = {{"server", private.realmName.." Data"},}
-	for name,data in pairs(private.serverData) do 
-		table.insert(vals,{name, name.."'s Data"})
-	end
-	
+		
 	--ICON box, used to drag item and display ICo for item being searched. Based Appraiser Code
 	function frame.IconClicked()
 	local objtype, _, link = GetCursorInfo()
 		ClearCursor()
 		if objtype == "item" then
 			local itemName, itemTexture = private.getItemInfo(link, "name")
+			frame.icon.tootip = {itemName, link}
 			frame.icon:SetNormalTexture(itemTexture)
 			frame.searchBox:SetText(itemName)
 			private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)	
@@ -233,6 +223,18 @@ function private.CreateFrames()
 	frame.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
 	frame.icon:SetScript("OnClick", frame.IconClicked)
 	frame.icon:SetScript("OnReceiveDrag", frame.IconClicked)
+	--[[tooltip script
+	frame.icon:SetScript("OnEnter", function() GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
+		 if (frame.icon.tootip) then
+		    local name, link = frame.icon.tootip[1], frame.icon.tootip[2]
+		    GameTooltip:SetHyperlink(link)
+		    if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
+		else
+		    GameTooltip:SetText("Drag and drop an item to search or Type the item name in the search box", 1.0, 1.0, 1.0)
+		end        
+        end)
+
+	frame.icon:SetScript("OnLeave", function() GameTooltip:Hide() end)]]
 	--help text
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
@@ -243,6 +245,17 @@ function private.CreateFrames()
 	frame.slot.help2:SetText("box to search.")
 			
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
+	frame.SelectBoxSetting = {"1","server"}
+	function private.ChangeControls(obj, arg1,arg2,...)
+		--debugPrint("Clicked the button Option #", arg1, arg2)
+		frame.SelectBoxSetting = {arg1, arg2}
+	end
+	--Default Server wide
+	local vals = {{"server", private.realmName.." Data"},}
+	for name,data in pairs(private.serverData) do 
+		table.insert(vals,{name, name.."'s Data"})
+	end	
+	
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
 	frame.selectbox.box = SelectBox:Create("BeanCounterSelectBox", frame.selectbox, 140, private.ChangeControls, vals, "default")
 	frame.selectbox.box:SetPoint("TOPLEFT", frame, "TOPLEFT", 4,-80)
@@ -626,6 +639,7 @@ function private.CreateFrames()
 		    end
 		end
 	end
+	--reconcile stack sizes
 	function private.reconcileCompletedAuctions(player, itemID, soldDeposit)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
 			tbl2 = private.unpackString(v)
@@ -810,7 +824,7 @@ function private.classicSearch(data, style, itemName, settings)
 					tonumber(tbl[3]) or 0, --buyout
 					0, --money,
 					tonumber(tbl[2]),  --stacksize,
-					tonumber(tbl[3]) or 0 / tonumber(tbl[2]) or 1, --Profit/per
+					tonumber(tbl[3]) / tonumber(tbl[2]) or 1, --Profit/per
 					
 					tbl[4],  --seller/buyer
 									
