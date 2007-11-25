@@ -481,23 +481,20 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	local updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0
 
 	processStats("begin")
-	for _, data in ipairs(private.curScan) do
+	for index, data in ipairs(private.curScan) do
 	
 -- TODO - remove this debugging code once we figure out where the bad values are coming from
-		if (not data or type(data) == "string") then
-		
-			print("Warning, data is a string value.  Please report the following debug information to "..
+		if (type(data) == "string") then
+			print("Warning, data has returned invalid information.  Please report the following debug information to "..
 				"http://jira.norganna.org/browse/ADV-78")
-			if (not data) then
-				print("data is nil")
-			else
-				print(("data: %s"):format(data))
-			end
-		
-		else
+			print(("index: %s, data: %s"):format(index, data))
+		end
 	
 -- the non-error case, only if data was not a string and not nil
 -- this should be the remaining code after we remove the debugging bits
+		if not data then
+			print("data is nil")
+		else
 			itemPos = lib.FindItem(data, scandata.image, lut)
 			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 			data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
@@ -528,7 +525,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 					newCount = newCount + 1
 				end
 			end
-	
 -- end of debugging code
 		end
 	
