@@ -482,19 +482,27 @@ function lib.Commit(wasIncomplete, wasGetAll)
 
 	processStats("begin")
 	for index, data in ipairs(private.curScan) do
-	
--- TODO - remove this debugging code once we figure out where the bad values are coming from
-		if (type(data) == "string") then
+
+-- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
+		if (not data or type(data) == "string" or type(data) == "number") then
+		
 			print("Warning, data has returned invalid information.  Please report the following debug information to "..
 				"http://jira.norganna.org/browse/ADV-78")
-			print(("index: %s, data: %s"):format(index, data))
-		end
-	
--- the non-error case, only if data was not a string and not nil
--- this should be the remaining code after we remove the debugging bits
-		if not data then
-			print("data is nil")
+			if (not data) then
+				print("data is nil")
+			elseif (type(data) == "number") then
+				print(("index: %s, data number: %d"):format(index, data))
+			else
+				print(("index: %s, data string: %s"):format(index, data))
+			end
+		
 		else
+
+-- the non-error case, only if data was not a string, not a number and not nil
+-- and this code should only execute if data is a valid table!  Otherwise it goes kaboom!
+
+-- this should be the remaining code after we remove the debugging bits
+
 			itemPos = lib.FindItem(data, scandata.image, lut)
 			data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 			data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
@@ -525,6 +533,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 					newCount = newCount + 1
 				end
 			end
+	
 -- end of debugging code
 		end
 	
@@ -859,6 +868,24 @@ function lib.StorePage()
 			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
 			or legacyScanning() -- Is AucClassic scanning?
 			or private.NoDupes(private.curScan, itemData) then
+
+
+-- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
+if (not itemData or type(itemData) == "string" or type(itemData) == "number") then
+
+	print("Warning, itemData is invalid.  Please report the following debug information to "..
+		"http://jira.norganna.org/browse/ADV-78")
+	
+	if (not itemData) then
+		print("itemData is nil")
+	elseif (type(itemData) == "number") then
+		print(("itemData number: %d"):format(data))
+	else
+		print(("itemData string: %s"):format(data))
+	end
+
+end
+
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
