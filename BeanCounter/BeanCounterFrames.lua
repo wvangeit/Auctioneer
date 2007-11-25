@@ -647,13 +647,15 @@ function private.CreateFrames()
 				end
 			end
 		end
-		for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
-			tbl2 = private.unpackString(v)
-			local postSeller, postbid = tbl2[4], tbl2[3]
-			if seller ==  postSeller and postbid == buy then
-				return tonumber(tbl2[2])
-			end
-		end
+        if private.serverData[player]["postedBuyouts"][itemID] then
+            for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
+                tbl2 = private.unpackString(v)
+                local postSeller, postbid = tbl2[4], tbl2[3]
+                if seller ==  postSeller and postbid == buy then
+                    return tonumber(tbl2[2])
+                end
+            end
+        end
 		return 0 --if we fail then show 0 
 	end
 	private.CreateMailFrames()
