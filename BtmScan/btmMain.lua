@@ -1118,7 +1118,7 @@ end
 -- Gets the configdata for the current zone
 BtmScan.GetZoneConfig = function (whence)
 	local newZone = BtmScan.ConfigZone(whence.."getzone")
-	if (not BtmScanData.refresh) then BtmScanData.refresh = 25 end -- Page refresh time
+	BtmScanData.refresh = BtmScan.Settings.GetSetting("scan.reload.interval") -- Page refresh time
 	if not newZone then
 		BtmScan.Print(tr("BottomScanner: %1", tr("Unable to get config zone: %1", whence)))
 		dataZone = ""
