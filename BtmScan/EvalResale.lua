@@ -71,14 +71,17 @@ function lib:valuate(item, tooltip)
 	local useFour = get(lcName..".auct.usefour")
 	local useHSP = get(lcName..".auct.usehsp")
 	if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
+		local _, itemId, enchant, _, _, _, _, property, _ = strsplit(":", item.link)
+		local auctKey = strjoin(":",itemId,property,enchant)
 		if (AucAdvanced and useFour) or not AucAdvanced then
 			if (useHSP) then
 				market, seen = Auctioneer.Statistic.GetHSP(auctKey)
 			end
 			if not market then
-				market, seen = Auctioneer.Statistic.GetUsableMedian(item.link)
+				market, seen = Auctioneer.Statistic.GetUsableMedian(auctKey)
 			end
 		end
+	else BtmScan.Print("no AucClassic loaded")
 	end
 	if (AucAdvanced and not market) then
 		market, seen = AucAdvanced.API.GetMarketValue(item.link)
