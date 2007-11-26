@@ -102,38 +102,10 @@ function lib.GetImage()
 	return image
 end
 
--- TODO - ccox - debugging code, remove me!
-local function VerifyOneItem( index, data, labelstring )
-	if (not data or type(data) ~= "table") then
-		
-		print("bad data in curScan during "..labelstring)
-		if (not data) then
-			print("data is nil")
-		elseif (type(data) == "number") then
-			data = ("%d"):format(data)
-		end
-		print(("index: %s, data: %s"):format(index, data))
-	end
-end
-
--- TODO - ccox - debugging code, remove me!
-local function VerifyCurScan( labelstring )
-
-	if not private.curScan then
-		return;
-	end
-
-	for index, data in ipairs(private.curScan) do
-		VerifyOneItem(index, data, labelstring)
-	end	
-
-end
-
 function lib.PushScan()
 	if private.isScanning then
 		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
 		if not private.scanStack then private.scanStack = acquire() end
-VerifyCurScan("before PushScan acquire");
 		table.insert(private.scanStack, acquire(
 			private.scanStartTime,
 			private.sentQuery,
@@ -145,20 +117,19 @@ VerifyCurScan("before PushScan acquire");
 			private.totalPaused,
 			GetTime()
 		))
-VerifyCurScan("after PushScan acquire");
 		private.scanStartTime = nil
 		private.scanStarted = nil
 		private.totalPaused = nil
 		private.curQuerySig = nil
-		recycle(private, "curQuery")
-		recycle(private, "curScan")
+		private.curQuery = nil
+		private.curScan = nil
+
 		private.curPage = 0
-		recycle(private, "curPages")
+		private.curPages = nil
 		private.sentQuery = nil
 		private.isScanning = false
 		private.UpdateScanProgress(false)
 	end
-VerifyCurScan("end of PushScan");
 end
 
 function lib.PopScan()
@@ -175,7 +146,6 @@ function lib.PopScan()
 		pauseTime = unpack(private.scanStack[1])
 		table.remove(private.scanStack, 1)
 
-VerifyCurScan("after PopScan unpack");
 		local elapsed = now - pauseTime
 		if elapsed > 300 then
 			-- 5 minutes old
@@ -191,7 +161,6 @@ VerifyCurScan("after PopScan unpack");
 		lib.ScanPage(private.curPage)
 		private.UpdateScanProgress(true)
 	end
-VerifyCurScan("end of PopScan");
 end
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
@@ -240,8 +209,6 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 		private.isScanning = true
 		local startPage = 0
 		local numBatchAuctions, totalAuctions
-
-	--	/run QueryAuctionItems("", "", "", nil, nil, nil, 0, nil, nil, true)
 
 		QueryAuctionItems(name or "", minUseLevel or "", maxUseLevel or "",
 				invTypeIndex, classIndex, subclassIndex, startPage, isUsable, qualityIndex, GetAll)
@@ -514,19 +481,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 
 	processStats("begin")
 	for index, data in ipairs(private.curScan) do
-
--- TODO - ccox - remove this debugging code once we figure out where the bad values are coming from
-		if (not data or type(data) ~= "table") then
-		
-			VerifyOneItem( index, data, "Commit")
-		end
-
--- the non-error case, only if data was not a string, not a number and not nil
--- this code should execute as long as data is NOT NIL!  Otherwise it goes kaboom, and some information will be lost! DONT change it again, please
--- ALSO, please be in IRC when committing so that you and I can collaborate on fixing this.  I am asleep most days and at work most nights, but online in the evening (central time) -Speeddymon
-
--- this should be the remaining code after we remove the debugging bits
-
 		itemPos = lib.FindItem(data, scandata.image, lut)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
@@ -664,7 +618,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	if (not scandata.scanstats) then scandata.scanstats = acquire() end
 	if (scandata.scanstats[1]) then
 		scandata.scanstats[2] = scandata.scanstats[1]
-		recycle(scandata.scanstats, 1)
+		scandata.scanstats[1] = nil
 	end
 	if (scandata.scanstats[0]) then scandata.scanstats[1] = scandata.scanstats[0] end
 	scandata.scanstats[0] = acquire()
@@ -684,7 +638,8 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	scandata.scanstats[0].paused = private.totalPaused
 	scandata.scanstats[0].ended = GetTime()
 	scandata.scanstats[0].elapsed = GetTime() - private.scanStarted - private.totalPaused
-	scandata.scanstats[0].query = private.curQuery
+
+	scandata.scanstats[0].query = clone(private.curQuery)
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
 
@@ -692,11 +647,11 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private.scanStarted = nil
 	private.totalPaused = nil
 	private.curQuerySig = nil
+	private.filteredCount = 0
+
 	recycle(private, "curQuery")
 	recycle(private, "curScan")
 	recycle(private, "curPages")
-
-	private.filteredCount = 0
 
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -820,7 +775,6 @@ function lib.StorePage()
 	end
 	if not private.curScan then 
 		private.curScan = acquire()
-VerifyCurScan("after StorePage acquire");
 	end
 
 
@@ -895,7 +849,6 @@ VerifyCurScan("after StorePage acquire");
 			or numBatchAuctions > 50 --if GetAll, we can be sure they aren't duplicates
 			or legacyScanning() -- Is AucClassic scanning?
 			or private.NoDupes(private.curScan, itemData) then
-VerifyOneItem( 0, itemData, "StorePage insert")
 				table.insert(private.curScan, itemData)
 				storecount = storecount + 1
 			end
@@ -1028,6 +981,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 
 		recycle(private.curQuery)
 		private.curQuery = query
+		
 		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 			query.name or "",
 			query.minUseLevel or "",
@@ -1146,17 +1100,18 @@ function private.ResetAll()
 	private.scanStarted = nil
 	private.totalPaused = nil
 	private.curQuerySig = nil
+
 	recycle(private, "curQuery")
 	recycle(private, "curScan")
-	private.curPage = 0
 	recycle(private, "curPages")
 	recycle(private, "scanStack")
+
+	private.curPage = 0
 	private.isPaused = nil
 	private.Pausing = nil
 	private.sentQuery = nil
 	private.isScanning = false
 	private.unexpectedClose = false
-VerifyCurScan("after ResetAll recycle");
 	--Hide the progress indicator
 	private.UpdateScanProgress(false)
 end
