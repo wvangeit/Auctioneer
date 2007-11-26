@@ -378,13 +378,14 @@ function private.mailBoxColorStart()
 	private.hasUnreadMail()
 end
 
-function private.hasUnreadMail(text)
-	if private.getOption("util.beancounter.mailrecolor") == "off" then return end --no need to do this if user isn't using recolor system
-	
+function private.hasUnreadMail()
+	if HasNewMail() then MiniMapMailFrame:Show() debugPrint("We have real unread mail, mail icon show/hide code bypassed") return end  --no need to process if we have real unread messages waiting
+	if not private.getOption("util.beancounter.mailrecolor") then MiniMapMailFrame:Hide() return end --no need to do this if user isn't using recolor system, and mail icon should not show since HasnewMail() failed
+
 	local mailunread = false
 	for i,v in pairs(BeanCounterDB[private.realmName][private.playerName]["mailbox"]) do
 		if BeanCounterDB[private.realmName][private.playerName]["mailbox"][i]["read"] < 2 then
-			  mailunread = true
+		    mailunread = true
 		end
 	end
 	if mailunread then
