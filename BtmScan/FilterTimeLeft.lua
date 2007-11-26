@@ -69,10 +69,19 @@ function lib:filterItem(item, evaluationModule)
 
 	-- no remain -> no check (called tooltip outside ah ...)
 	if (not item.remain) then return end
+	
+	-- timeleft is less than configured limit
+	if (tonumber(item.remain) <= tonumber(maxTimeLeft)) then 
+		return 
+	else
+	end
 
-	-- timeleft is higher than configured limit
-	if (tonumber(item.remain)<tonumber(maxTimeLeft)) then return end
-
+	-- item has buyout and we're not filtering buyouts
+	if (item.canbuy and get(lcName..".onlyonbids")) then 
+		item.canbid = false
+		return 
+	end
+	
 --	BtmScan.Print(" filtered timeleft "..item.remain..":"..maxTimeLeft..":"..item.sig)
 	return true
 end
@@ -80,19 +89,21 @@ end
 lib.durations = {
 	{ 1, "less than 30min" },
 	{ 2, "2 hours" },
-	{ 3, "8 hours" },
+	{ 3, "12 hours" },
 }
 
 define(lcName..'.enable', false)
 define(lcName..'.filter.timeleft', 1)
+define(lcName..'.onlyonbids', true)
 
 function lib:setup(gui)
 	id = gui:AddTab(libName)
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable time-left-filtering")
+	gui:AddControl(id, "Checkbox",         0, 2, lcName..".onlyonbids", "Only filter for bids")
 	gui:AddControl(id, "Subhead",          0,    "filter if more than")
 	gui:AddControl(id, "Selectbox",        0, 2, lib.durations, lcName..".filter.timeleft", "Max time left")
-
+	
 	for pos, name in ipairs(BtmScan.evaluators) do
 		if (name=="vendor") then
 			define(lcName..".filter."..name, false)
