@@ -81,7 +81,6 @@ function lib:valuate(item, tooltip)
 				market, seen = Auctioneer.Statistic.GetUsableMedian(auctKey)
 			end
 		end
-	else BtmScan.Print("no AucClassic loaded")
 	end
 	if (AucAdvanced and not market) then
 		market, seen = AucAdvanced.API.GetMarketValue(item.link)
