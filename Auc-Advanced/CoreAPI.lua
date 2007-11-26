@@ -96,7 +96,9 @@ function lib.GetMarketValue(itemLink, serverKey)
 					if (weight > 1) then weight = 1 end
 					total = total + array.price * weight
 					totalweight = totalweight + weight
-					seen = seen + (array.seen or 1)
+					if (array.seen) and (array.seen > seen) then
+						seen = array.seen
+					end
 					count = count + 1
 				end
 			elseif (engineLib.GetPrice) then
@@ -105,7 +107,6 @@ function lib.GetMarketValue(itemLink, serverKey)
 					total = total + price * weight
 					totalweight = totalweight + weight
 					count = count + 1
-					seen = seen + 1
 				end
 			end
 		end
