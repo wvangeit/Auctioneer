@@ -387,7 +387,7 @@ function private.CreateFrames()
 
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
 		{ "Item", "TEXT", 120 },
-		{ "Type", "TEXT", 110 },
+		{ "Type", "TEXT", 100 },
 		
 		{ "Bid", "COIN", 60 },
 		{ "Buyout", "COIN", 60 },
@@ -440,17 +440,17 @@ function private.CreateFrames()
 							match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
 								--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
-
+								
 								local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
 								local pricePer = 0
 								if stack > 0 then	pricePer = tbl[3]/stack end
-
+								
 								table.insert(data,{
 								tbl[1], --itemname
-								tbl[2], --status
+								"Auc Successful", --status
 								 
-								0, --tbl[7], --bid
-								0, --tbl[6], --buyout
+								tonumber(tbl[7]) or 0,  --bid
+								tonumber(tbl[6]) or 0,  --buyout
 								tonumber(tbl[3]), --Profit,
 								tonumber(stack),  --stacksize
 								tonumber(pricePer), --Profit/per
@@ -488,7 +488,7 @@ function private.CreateFrames()
 
 								table.insert(data,{
 								tbl[1], --itemname
-								tbl[2], --status
+								"Auc Expired", --status
 
 								tonumber(minBid) or 0, --bid
 								tonumber(buyoutPrice) or 0, --buyout
@@ -762,84 +762,111 @@ end
 local tbl = {}
 --Search BeancounterClassic Data
 function private.classicSearch(data, style, itemName, settings)
-   	    for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
-		for index, text in pairs(v) do
-				
-		    tbl= {strsplit(";", text)}
-		    local match = false
-		    match = private.fragmentsearch(name, itemName, settings.exact)
-			if match then
-			    --	1	2	    3	     4	   5	      6	      7	       8		9	   10
-			    --"time;saleResult;quantity;bid;buyout;netPrice;price;isBuyout;buyerName;sellerId"
-			    --"1173571623;1;1;11293;22000;-1500;<nil>;<nil>;<nil>;2"
-			    local status = "Sold"
-			 			    
-				if tbl[9] == "<nil>" then
-					status = "Un-Sold"
-					tbl[9] = "-"
+	if settings.auction or settings.failedauction then
+		for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
+			for index, text in pairs(v) do
+
+				tbl= {strsplit(";", text)}
+				local match = false
+				match = private.fragmentsearch(name, itemName, settings.exact)
+				if match then
+					--    1    2        3         4       5          6          7           8        9       10
+					--"time;saleResult;quantity;bid;buyout;netPrice;price;isBuyout;buyerName;sellerId"
+					--"1173571623;1;1;11293;22000;-1500;<nil>;<nil>;<nil>;2"
+					--tbl[2]  0 = sold 1 exp 3 = CANCELED
+					local status = "Auc Successful CL"
+
+					if tbl[2] == "1" then
+						if not settings.failedauction then break end --used to filter Exp auc 
+						status = "Auc Expired CL"
+						tbl[9] = "-"
+					else   
+						if not settings.auction then break end --used to filter comp auc if user only wants expend
+					end
+					
+					local stack = tonumber(tbl[3]) or 1
+					local price = tonumber(tbl[6]) or 0
+					if stack < 1 then    stack = 1 end
+					local pricePer = (price/stack)
+
+					table.insert(data,{
+							name, --itemname
+							status, --status
+
+							tonumber(tbl[4]) or 0,  --bid
+							tonumber(tbl[5]) or 0, --buyout
+							price, --money,
+							tonumber(stack),  --stacksize
+							pricePer, --Profit/per
+
+							tbl[9],  --seller/buyer
+
+							0, --deposit
+							0,  --fee
+							0, --current wealth
+							date("%c", tbl[1]), --time,
+							})   
+							
+					style[#data] = {}
+					if status == "Auc Successful CL" then
+						style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
+						style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+					else
+						style[#data][2] = {["textColor"] = {1,0,0}}
+						style[#data][8] ={["textColor"] = {1,0,0}}
+					end
+
 				end
-					
-				local stack = tonumber(tbl[3]) or 1
-				local price = tonumber(tbl[7]) or 0
-				if stack < 1 then	stack = 1 end
-				local pricePer = (price/stack)
-			    			    
-			    table.insert(data,{
-					name, --itemname
-					status, --status
-
-					tonumber(tbl[4]) or 0, --tbl[7], --bid
-					tonumber(tbl[5]) or 0, --buyout
-					price, --money,
-					tonumber(stack),  --stacksize
-					pricePer, --Profit/per
-					
-					 "-",  --seller/buyer
-									
-					0,--tbl[7], --deposit
-					0, --tbl[8], --fee
-					0, --current wealth
-					date("%c", tbl[1]), --time,
-		
-					 })	 
 			end
 		end
-	    end
-	for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
-		for index, text in pairs(v) do
-		    tbl= {strsplit(";", text)}
-		    local match = false
-		    match = private.fragmentsearch(name, itemName, settings.exact)
-			if match then
-			    --	1	2	    3	     4	   5	      6	      7	       8		9	   10
-			    --time;     quantity;value;seller;isBuyout;buyerId
-			    --"1178840165;1;980000;Eruder;1;5",
-			    local status = "Purchased"
-			 			 			   		    			    
-			    table.insert(data,{
-					name, --itemname
-					status, --status
+	end
+	
+	if settings.bid then
+		for name, v in pairs(BeanCounterAccountDB[private.realmName]["purchases"]) do
+			for index, text in pairs(v) do
+				tbl= {strsplit(";", text)}
+				local match = false
+				match = private.fragmentsearch(name, itemName, settings.exact)
+				if match then
+					--    1                 2        3         4       5          6          7           8        9       10
+					--time; quantity;value;seller;isBuyout;buyerId
+					--"1178840165;1;980000;Eruder;1;5",
+					local bid, buyout, status = 0,0,"Invalid data"
+					if tbl[5] == "1" then --is bid
+						status = "Won on Buyout CL"
+						buyout = tbl[3]
+						bid = 0
+					else
+						status = "Won on Bid CL"
+						buyout = 0
+						bid = tbl[3]
+					end
 
-					0, --tbl[7], --bid
-					tonumber(tbl[3]) or 0, --buyout
-					0, --money,
-					tonumber(tbl[2]),  --stacksize,
-					tonumber(tbl[3]) / tonumber(tbl[2]) or 1, --Profit/per
-					
-					tbl[4],  --seller/buyer
-									
-					0,--tbl[7], --deposit
-					0, --tbl[8], --fee
-					0, --current wealth
-					date("%c", tbl[1]), --time,
-					 })
-			   style[#data] = {}
-			   style[#data][2] = {}
-			   style[#data][2].textColor = {1,0,0}					 
+					table.insert(data,{
+							name, --itemname
+							status, --status
+
+							tonumber(bid),  --bid
+							tonumber(buyout), --buyout
+							0, --money,
+							tonumber(tbl[2]),  --stacksize,
+							tonumber(tbl[3]) / tonumber(tbl[2]) or 1, --Profit/per
+
+							tbl[4],  --seller/buyer
+
+							0,--deposit
+							0, --fee
+							0, --current wealth
+							date("%c", tbl[1]), --time,
+							})
+							
+					style[#data] = {}
+					style[#data][2] = {["textColor"] = {1,1,0}}
+					style[#data][8] ={["textColor"] = {1,1,0}}
+				end
 			end
 		end
-	    end
-    
-    return data, style
+	end
+	return data, style
 end
 
