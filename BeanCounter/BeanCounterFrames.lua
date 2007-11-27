@@ -482,9 +482,11 @@ function private.CreateFrames()
 						local match = false
 						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
 							if match then
-								--'["failedAuctions"] == itemName, "Auction expired", (time the mail arrived in our mailbox), curretn wealth',
+								--'["failedAuctions"] == itemName, "Auction expired",0,(time the mail arrived in our mailbox), curretn wealth',
 								--Lets try some basic reconciling here
 								local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
+								--Ok we will use the proper stack count from expired auctions, but if thats 0 then we will try to get a stack price from posted auctions
+								if tonumber(tbl[3]) > 0 then count = tbl[3] end
 
 								table.insert(data,{
 								tbl[1], --itemname
@@ -624,19 +626,23 @@ function private.CreateFrames()
 	local tbl2 = {}
 	function private.reconcileFailedAuctions(player, itemID, tbl)
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-    			tbl2 = private.unpackString(v)
-			
-			 --Time the auction was set to last
-			local TimeFailedAuctionStarted= tbl[3] - (tbl2[5]*60) --Time this message should have been posted
-			local TimePostedAuction = tbl2[7]
-			
-			TimeFailedAuctionStarted = math.floor(TimeFailedAuctionStarted/100)
-			TimePostedAuction = math.floor(TimePostedAuction/100)
-		    if TimePostedAuction == TimeFailedAuctionStarted then
-		    --debugPrint(TimePostedAuction,TimeFailedAuctionStarted, tbl[3])
-			--post.name, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth
-			return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
-		    end
+			tbl2 = private.unpackString(v)
+
+			--Time the auction was set to last
+			local TimeFailedAuctionStarted = tonumber(tbl[4] - (tbl2[5]*60)) --Time this message should have been posted
+			local TimePostedAuction = tonumber(tbl2[7])
+
+			--get a stacksize from the expired auction if it exists(added in 1.05 DB)
+			local stack
+			if tonumber (tbl[3]) > 0 then stack = tbl[3] end
+
+			if (TimePostedAuction - 500) < TimeFailedAuctionStarted and TimeFailedAuctionStarted < (TimePostedAuction+500) then
+				if stack and stack == tonumber(tbl2[2]) then
+					return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
+				else
+					return 0, tbl2[3], tbl2[4], tbl2[5], tbl2[6]
+				end
+			end
 		end
 	end
 	--reconcile stack sizes
@@ -697,8 +703,7 @@ function private.CreateMailFrames()
 	local body1 = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	body1:SetPoint("CENTER", frame, "CENTER", 0,0)
 	body1:SetText("Auction Items will not be recorded")
-	
-	
+		
 	local countdown = frame:CreateFontString("BeanCounterMailCount", "OVERLAY", "GameFontNormalLarge")
 	private.CountGUI = countdown
 	countdown:SetPoint("CENTER", frame, "CENTER", 0, -60)

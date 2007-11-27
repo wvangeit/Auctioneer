@@ -66,9 +66,13 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 1.04 then
 		debugPrint("private.updateTo1_04()")
 		private.updateTo1_04()
+	elseif private.playerData["version"] < 1.05 then
+		debugPrint("private.updateTo1_05()")
+		private.updateTo1_05()
 	end
 		
 end
+
 --[[This changes the database to use ; and to replace itemNames with and itemlink]]--
 function private.updateTo1_02A() 
 	
@@ -150,4 +154,22 @@ function private.updateTo1_04()
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 	end
 	private.playerData.version = 1.04
+end
+
+--[[This adds the missing stack size count for expired auctions]]--
+function private.updateTo1_05()
+	for player,data in pairs(private.serverData) do
+	    for itemID,value in pairs(private.serverData[player]["failedAuctions"]) do
+		for i,v in pairs(value) do
+		   local tbl = private.unpackString(v)
+			if #tbl == 4 then
+				local value = private.packString(tbl[1], tbl[2], 0, tbl[3], tbl[4])
+				private.serverData[player]["failedAuctions"][itemID][i] = value
+			else
+				print("There has been an error updating versions ", player, itemID, tbl[1], tbl[2],tbl[3], tbl[4])
+			end
+		end
+	    end
+	private.serverData[player]["version"] = 1.05
+	end
 end

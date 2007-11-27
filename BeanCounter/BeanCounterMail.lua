@@ -72,9 +72,10 @@ function private.updateInboxStart()
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment, retrieved, startTime = private.getInvoice(n,sender, subject)
+			local _, _, stack, _, _ = GetInboxItem(i)
 			table.insert(private.inboxStart, {["n"] = n,["sender"]=sender, ["subject"]=subject,["money"]=money, ["read"]=wasRead, ["age"] = daysLeft, 
 					["invoiceType"] = invoiceType, ["itemName"] = itemName, ["Seller/buyer"] = playerName, ['bid'] = bid, ["buyout"] = buyout, 
-					["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime
+					["deposit"] = deposit, ["fee"] = consignment, ["retrieved"] = retrieved, ["startTime"] = startTime, ["stack"] = stack
 					})
 			GetInboxText(n) --read message
 		end
@@ -184,7 +185,7 @@ function private.mailSort()
 				--Do we want to insert nil values into the exp auc string to match length with comp auc string?
 				--local value = private.packString(itemName, "Auction expired", _, _, _, _, _, _, private.reconcilePending[i]["time"], private.wealth)
 					debugPrint("Auction Expired")
-					local value = private.packString(itemLink, "Auction expired", private.reconcilePending[i]["time"], private.wealth)
+					local value = private.packString(itemLink, "Auction expired", private.reconcilePending[i]["stack"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedAuctions", itemID, value)
 				end
 				
