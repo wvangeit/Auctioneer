@@ -82,7 +82,7 @@ function lib:valuate(item, tooltip)
 end
 
 function lib.PrintHelp()
-	BtmScan.Print("/btm snatch maxPrice item ")
+	BtmScan.Print("/btm snatch item maxPrice ")
 end
 
 function lib.CommandHandler(msg)
