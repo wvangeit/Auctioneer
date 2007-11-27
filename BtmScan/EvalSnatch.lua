@@ -143,6 +143,15 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
 	id = gui:AddTab(libName)
+	
+	gui:AddHelp(id, "what snatch evaluator",
+		"What is the snatch evaluator?",
+		"This evaluator allows you to purchase items you want, based on criteria you specify.\n\n"..
+		""..
+		"Unfortunately, for right now, you must use slash commands in order to specify the items to purchase.\n\n"..
+		""..
+		"Please see /btm snatch help for more information.\n")
+	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
