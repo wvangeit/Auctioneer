@@ -1327,10 +1327,10 @@ function private.GtHookSetBagItem(funcArgs, retVal, frame, frameID, buttonID)
 	end
 end
 
-function private.GtHookSetInboxItem(funcArgs, retVal, frame, index)
-	local name, _, count, quality = GetInboxItem(index)
+function private.GtHookSetInboxItem(funcArgs, retVal, frame, index, attachIndex)
+	local name, _, count, quality = GetInboxItem(index, attachIndex)
 	if (name) then
-		local itemString = GetInboxItemLink(index)
+		local itemString = GetInboxItemLink(index, attachIndex)
 		local _, itemLink = GetItemInfo(itemString)
 		return public.TooltipCall(GameTooltip, name, itemLink, quality, count)
 	end
