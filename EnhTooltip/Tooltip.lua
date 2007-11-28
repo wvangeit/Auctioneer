@@ -1443,6 +1443,17 @@ function private.GtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	end
 end
 
+function private.GtHookSetGuildBankItem(funcArgs, retVal, frame, tab, slot)
+	local link = GetGuildBankItemLink(tab, slot)
+	local name = public.NameFromLink(link)
+
+	if (name) then
+		local texture, itemCount, locked = GetGuildBankItemInfo(tab, slot)
+		local quality = public.QualityFromLink(link)
+		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+	end
+end
+
 function private.GtHookSetText(funcArgs, retval, frame)
 	-- Nothing to do for plain text
 	if (private.currentGametip == frame) then
@@ -1644,6 +1655,7 @@ function private.TtInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetCraftSpell", 200, private.GtHookSetCraftSpell)
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, private.GtHookSetTradeSkillItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, private.GtHookSetAuctionSellItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetGuildBankItem", 200, private.GtHookSetGuildBankItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, private.GtHookSetText)
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, private.GtHookAppendText)
 	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, private.GtHookShow)
