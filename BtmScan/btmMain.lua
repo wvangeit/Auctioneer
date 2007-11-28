@@ -730,7 +730,7 @@ end
 
 -- Get a GSC value and work out what it's worth
 BtmScan.ParseGSC = function (price)
-	price = string.gsub(price, "|c[0-9a-fA-F]+", " ")
+	price = string.gsub(price, "|c[%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d][%a%d]", " ") 
 	price = string.gsub(price, "[gG]", "0000 ")
 	price = string.gsub(price, "[sS]", "00 ")
 	price = string.gsub(price, "[^0-9]+", " ")	-- Note that we're stripping out all non-digits here, so any garbage in the input stream is automatically lost now
@@ -762,7 +762,7 @@ BtmScan.BreakLink = function (link)
 	i,j, price, nextpart = string.find(remain or "", "^ at ([^ ]+)(.*)")
 	if (i) then
 		price = BtmScan.ParseGSC(price)
-		remain = nextpart
+	remain = nextpart
 	else price = 0 end
 
 	-- Now check for new format "[ItemLink] <price> <count>" if original format came up empty
