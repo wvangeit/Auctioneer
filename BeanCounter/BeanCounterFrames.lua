@@ -384,24 +384,24 @@ function private.CreateFrames()
 	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
 	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 3, 0)
 	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
-
+	--localize UI text
+	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
-		{ "Item", "TEXT", 120 },
-		{ "Type", "TEXT", 100 },
+		{ _BC('UiNameHeader'), "TEXT", 120 },
+		{ _BC('UiTransactions'), "TEXT", 100 },
 		
-		{ "Bid", "COIN", 60 },
-		{ "Buyout", "COIN", 60 },
-		{ "Net", "COIN", 65},
-		{ "Stack", "TEXT", 40},
-		{ "Price/Per", "COIN", 65},
+		{_BC('UiBidTransaction') , "COIN", 60 },
+		{ _BC('UiBuyTransaction') , "COIN", 60 },
+		{ _BC('UiNetHeader'), "COIN", 65},
+		{ _BC('UiQuantityHeader'), "TEXT", 40},
+		{ "Price/Per", "COIN", 65}, --Needs localization
 		
-		{ "|CFFFFFF00Seller/|CFF4CE5CCBuyer", "TEXT", 80 },
-		--{ "Buyer", "TEXT", 70 },
-		
-		{ "Deposit", "COIN", 50 },
-		{ "Fee", "COIN", 50 },
-		{ "Wealth", "COIN", 70 },
-		{ "Date", "text", 110 },
+		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", 80 },
+				
+		{ _BC('UiDepositTransaction'), "COIN", 50 },
+		{ "Fee", "COIN", 50 }, --needs localization
+		{ "Wealth", "COIN", 70 }, --needs localization
+		{ _BC('UiDateHeader'), "text", 110 },
 	})
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings

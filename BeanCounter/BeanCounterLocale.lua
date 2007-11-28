@@ -30,6 +30,11 @@
 		since that is it's designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
+local libName = "BeanCounter"
+local libType = "Util"
+local lib = BeanCounter
+local private = lib.Private
+local print =  BeanCounter.Print
 
 local Babylonian = LibStub("Babylonian")
 assert(Babylonian, "Babylonian is not installed")

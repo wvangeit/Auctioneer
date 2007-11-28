@@ -78,18 +78,18 @@ local function debugPrint(...)
 end
 
 function lib.OnLoad(addon)
-	private.frame:RegisterEvent("PLAYER_MONEY")
+	private.scriptframe:RegisterEvent("PLAYER_MONEY")
 	
-	private.frame:RegisterEvent("MAIL_INBOX_UPDATE")
-	private.frame:RegisterEvent("UI_ERROR_MESSAGE")
-	private.frame:RegisterEvent("MAIL_SHOW")
-	private.frame:RegisterEvent("MAIL_CLOSED")
-	private.frame:RegisterEvent("UPDATE_PENDING_MAIL")
-	private.frame:RegisterEvent("MERCHANT_SHOW")	
-	private.frame:RegisterEvent("MERCHANT_UPDATE")
-	private.frame:RegisterEvent("MERCHANT_CLOSED")
+	private.scriptframe:RegisterEvent("MAIL_INBOX_UPDATE")
+	private.scriptframe:RegisterEvent("UI_ERROR_MESSAGE")
+	private.scriptframe:RegisterEvent("MAIL_SHOW")
+	private.scriptframe:RegisterEvent("MAIL_CLOSED")
+	private.scriptframe:RegisterEvent("UPDATE_PENDING_MAIL")
+	private.scriptframe:RegisterEvent("MERCHANT_SHOW")	
+	private.scriptframe:RegisterEvent("MERCHANT_UPDATE")
+	private.scriptframe:RegisterEvent("MERCHANT_CLOSED")
 			
-	private.frame:SetScript("OnUpdate", private.onUpdate)
+	private.scriptframe:SetScript("OnUpdate", private.onUpdate)
 	
 	-- Hook all the methods we need
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
@@ -208,7 +208,7 @@ end
 function private.onUpdate()
 	private.mailonUpdate()
 end
-local lastAucSearch 
+
 function private.onEvent(frame, event, arg, ...)
 	if (event == "PLAYER_MONEY") then
 		private.wealth = GetMoney()
@@ -324,6 +324,7 @@ function private.debugPrint(...)
 end
 
 --[[Bootstrap Code]]
-private.frame = CreateFrame("Frame")
-private.frame:RegisterEvent("ADDON_LOADED")
-private.frame:SetScript("OnEvent", private.onEvent)
+private.scriptframe = CreateFrame("Frame")
+private.scriptframe:RegisterEvent("ADDON_LOADED")
+private.scriptframe:SetScript("OnEvent", private.onEvent)
+Babylonian.private.order = {"deDE"}
