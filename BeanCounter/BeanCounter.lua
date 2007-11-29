@@ -33,7 +33,7 @@
 
 local libName = "BeanCounter"
 local libType = "Util"
-local lib
+local lib 
 BeanCounter={}
 lib = BeanCounter
 
@@ -74,6 +74,18 @@ local print = BeanCounter.Print
 local function debugPrint(...) 
     if private.getOption("util.beancounter.debugCore") then
         private.debugPrint("BeanCounterCore",...)
+    end
+end
+
+--used to allow beancounter to recive Processor events from Auctioneer. Allows us to send a search request to BC GUI
+local AucModule ={}
+if AucAdvanced and AucAdvanced.NewModule then
+	AucModule = AucAdvanced.NewModule(libType, libName)
+end
+function AucModule.Processor(callbackType, ...)
+    if (callbackType == "querysent") then
+        local item = ...
+        if item.name then BeanCounter.externalSearch(item.name) end
     end
 end
 
