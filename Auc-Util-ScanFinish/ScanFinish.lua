@@ -46,9 +46,6 @@ local blnScanMinThresholdMet = false
 local strPrevSound = "AuctioneerClassic"
 
 function lib.Processor(callbackType, ...)
-	if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
-		return
-	end
 
 	if blnDebug then
 		print(".")
@@ -63,8 +60,14 @@ function lib.Processor(callbackType, ...)
 	end
 
 	if (callbackType == "scanprogress") then
+		if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
+			return
+		end
 		private.ScanProgressReceiver(...)
 	elseif (callbackType == "scanstats") then
+		if not AucAdvanced.Settings.GetSetting("util.scanfinish.activated") then
+			return
+		end
 		if blnDebug then print("  Debug:Updating ScanStatsReceived=true") end
 		blnScanStatsReceived = true
 	elseif (callbackType == "config") then
