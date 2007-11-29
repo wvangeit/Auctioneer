@@ -401,7 +401,7 @@ function private.CreateFrames()
 		{ _BC('UiDepositTransaction'), "COIN", 50 },
 		{ "Fee", "COIN", 50 }, --needs localization
 		{ "Wealth", "COIN", 70 }, --needs localization
-		{ _BC('UiDateHeader'), "text", 110 },
+		{ _BC('UiDateHeader'), "text", 150 },
 	})
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
@@ -415,6 +415,7 @@ function private.CreateFrames()
 	local data = {}
 	local style = {}
 	local tbl = {}
+	local dateString = "%c"
 	function private.startSearch(itemName, settings, itemTexture)
 		if not itemName then return end
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
@@ -426,6 +427,7 @@ function private.CreateFrames()
 				frame.icon:SetNormalTexture(itemTexture)
 			end
 		
+		if private.getOption("dateString") then dateString = private.getOption("dateString") end
 		data = {}
 		style = {}
 		for a,b in pairs(private.serverData) do
@@ -460,10 +462,11 @@ function private.CreateFrames()
 								tonumber(tbl[4]), --deposit
 								tonumber(tbl[5]), --fee
 								tonumber(tbl[10]) or 0, --current wealth
-								date("%c", tbl[9]), --time, --Make this a user choosable option.
-								--tbl[12], --date
+								tbl[9], --time, --Make this a user choosable option.
+								
 								})
 								style[#data] = {}
+								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
 								style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
 							end
@@ -503,10 +506,11 @@ function private.CreateFrames()
 								tonumber(deposit) or 0, --deposit
 								0, --fee
 								tonumber(tbl[4]) or 0, --current wealth
-								date("%c", tbl[3]), --time,
-								--tbl[5], --date
+								tbl[3], --time,
+								
 								})
 								style[#data] = {}
+								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,0,0}}
 								style[#data][8] ={["textColor"] = {1,0,0}}
 							end
@@ -552,10 +556,11 @@ function private.CreateFrames()
 								tonumber(tbl[4]), --deposit
 								tonumber(tbl[5]), --fee
 								tonumber(tbl[10]) or 0, --current wealth
-								date("%c", tbl[9]), --time,
-								--tbl[11], --date
+								tbl[9], --time,
+								
 								})
 								style[#data] = {}
+								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,1,0}}
 								style[#data][8] ={["textColor"] = {1,1,0}}
 							end
@@ -591,10 +596,11 @@ function private.CreateFrames()
 								0, --deposit
 								0, --fee
 								tonumber(tbl[5]) or 0, --current wealth
-								date("%c", tbl[4]), --time,
+								tbl[4], --time,
 								--tbl[6], --date
 								})
 								style[#data] = {}
+								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,1,1}}
 								style[#data][8] ={["textColor"] = {1,1,1}}
 							end
@@ -605,7 +611,7 @@ function private.CreateFrames()
 		end
 	--BC CLASSIC DATA SEARCH	
 	if settings.classic then
-		data, style = private.classicSearch(data, style, itemName, settings)
+		data, style = private.classicSearch(data, style, itemName, settings, dateString)
 	end
 	
 		frame.resultlist.sheet:SetData(data, style)
@@ -766,7 +772,7 @@ function private.relevelFrames(myLevel, ...)
 end
 local tbl = {}
 --Search BeancounterClassic Data
-function private.classicSearch(data, style, itemName, settings)
+function private.classicSearch(data, style, itemName, settings, dateString)
 	if settings.auction or settings.failedauction then
 		for name, v in pairs(BeanCounterAccountDB[private.realmName]["sales"]) do
 			for index, text in pairs(v) do
@@ -809,10 +815,11 @@ function private.classicSearch(data, style, itemName, settings)
 							0, --deposit
 							0,  --fee
 							0, --current wealth
-							date("%c", tbl[1]), --time,
+							tbl[1], --time,
 							})   
 							
 					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}
 					if status == "Auc Successful CL" then
 						style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
 						style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
@@ -862,10 +869,10 @@ function private.classicSearch(data, style, itemName, settings)
 							0,--deposit
 							0, --fee
 							0, --current wealth
-							date("%c", tbl[1]), --time,
+							tbl[1], --time,
 							})
-							
 					style[#data] = {}
+					style[#data][12] = {["date"] = dateString}	
 					style[#data][2] = {["textColor"] = {1,1,0}}
 					style[#data][8] ={["textColor"] = {1,1,0}}
 				end

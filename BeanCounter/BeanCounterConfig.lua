@@ -97,6 +97,8 @@ private.settingDefaults = {
 	
 	["util.beancounter.hasUnreadMail"] = false,
 	
+	--["util.beancounter.dateFormat"] = "%c",
+	["dateString"] = "%c", 
     }
 
 local function getDefault(setting)
@@ -116,10 +118,9 @@ function lib.GetDefault(setting)
 	local val = getDefault(setting);
 	return val;
 end
-
+local tbl = {}
 local function setter(setting, value)
 	if (not settings) then settings = BeanCounterDB["settings"] end
-
 	-- turn value into a canonical true or false
 	if value == 'on' then
 		value = true
@@ -133,7 +134,27 @@ local function setter(setting, value)
 		value = nil
 	end
 
-	local a,b,c = strsplit(".", setting)
+	local a,b = strsplit(".", setting)
+	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string 
+		if not value then value = "%c" end
+		tbl = {}
+		for w in string.gmatch(value, "%%(.)" ) do --look for the date commands prefaced by %  
+			tinsert(tbl, w)
+		end
+		
+		local valid, count = {'a','A','b','B','c','d','H','I','m','M','p','S','U','w','x','X','y', 'Y'} --valid date commands
+		local count = #tbl
+		for i,v in pairs(tbl) do
+			for ii, vv in pairs(valid) do
+				if v == vv then count = count - 1 break end
+			end
+		end
+		if count > 0 then print("Invalid Date Format")  return end --Prevent processing if we have an inalid command
+		
+		local text = gui.elements.dateString:GetText()
+		gui.elements.dateStringdisplay.textEl:SetText("|CCFFFCC00Example Date: "..date(text, 1196303661))
+	end
+	
 	if (a == "profile") then
 		if (setting == "profile.save") then
 			value = gui.elements["profile.name"]:GetText()
@@ -332,6 +353,32 @@ function lib.MakeGuiConfig()
 	gui:AddTip(id, "Choose how Mail will appear after BeanCounter has scanned the Mail Box")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", "Allow External Addons to use BeanCounter's Search?")
 	gui:AddTip(id, "When entering a search in another addon, BeanCounter will also display a search for that item.")
+	
+	gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00Date format to use:")
+	gui:AddTip(id, "Enter the format that you would like your date field to show. Default is %c")
+	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00Example Date: 11/28/07 21:34:21")
+	gui:AddTip(id, "Displays an example of what your formated date will look like")
+	
+	gui:AddHelp(id, "what is invoice",
+		"What is Mail Invoice Timeout?",
+		"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
+		)
+	gui:AddHelp(id, "what is recolor",
+		"What is Mail Re-Color Method?",
+		"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
+		)
+	gui:AddHelp(id, "what is external",
+		"Allow External Addons to use BeanCounter?",
+		"Other addons can have BeanCounter search for an item to be displayed in BeanCounter's GUI. For example this allows BeanCounter to show what items you are looking at in Appraiser"
+		)
+	gui:AddHelp(id, "what is date",
+		"Date Format to use?",
+		"This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21"
+		)
+	gui:AddHelp(id, "what is date command",
+			"Acceptable Date Commands?",
+			"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
+			)			
 	
 	id = gui:AddTab("BeanCounter Debug")
 	gui:AddControl(id, "Header",     0,    "BeanCounter Debug")
