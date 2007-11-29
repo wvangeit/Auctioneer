@@ -339,4 +339,3 @@ end
 private.scriptframe = CreateFrame("Frame")
 private.scriptframe:RegisterEvent("ADDON_LOADED")
 private.scriptframe:SetScript("OnEvent", private.onEvent)
-Babylonian.private.order = {"deDE"}
