@@ -1322,6 +1322,11 @@ function private.CreateFrames()
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
 	
+	frame.salebox.stack:EnableMouseWheel(1)
+	frame.salebox.stack:SetScript("OnMouseWheel", function()
+		frame.salebox.stack:SetValue(frame.salebox.stack:GetValue() + arg1)
+	end)
+	
 	AppraiserSaleboxStackLow:SetText("")
 	AppraiserSaleboxStackHigh:SetText("")
 
@@ -1375,7 +1380,12 @@ function private.CreateFrames()
 		self:SetMinMaxValues(1, maxStax+n)
 		self:SetAdjustedValue(math.min(curVal, maxStax))
 	end
-
+	
+	frame.salebox.number:EnableMouseWheel(1)
+	frame.salebox.number:SetScript("OnMouseWheel", function()
+		frame.salebox.number:SetValue(frame.salebox.number:GetValue() + arg1)
+	end)
+	
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.number.label:SetPoint("LEFT", frame.salebox.number, "RIGHT", 33,2)
 	frame.salebox.number.label:SetJustifyH("LEFT")
@@ -1394,6 +1404,11 @@ function private.CreateFrames()
 	AppraiserSaleboxDurationLow:SetText("")
 	AppraiserSaleboxDurationHigh:SetText("")
 
+	frame.salebox.duration:EnableMouseWheel(1)
+	frame.salebox.duration:SetScript("OnMouseWheel", function()
+		frame.salebox.duration:SetValue(frame.salebox.duration:GetValue() + arg1)
+	end)
+	
 	frame.salebox.duration.label = frame.salebox.duration:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.duration.label:SetPoint("LEFT", frame.salebox.duration, "RIGHT", 3,2)
 	frame.salebox.duration.label:SetJustifyH("LEFT")
