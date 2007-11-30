@@ -1108,15 +1108,15 @@ function Enchantrix_GetReagentHSP( itemLink )
 		return 0;
 	end
 
-	local hsp, median, market, prices = Enchantrix.Util.GetReagentPrice( itemLink );
+	local hsp, median, baseline, price5 = Enchantrix.Util.GetReagentPrice( itemLink );
 
 	if hsp == nil then
 		hsp = 0;
 	end
 	
-	-- if auc4 is missing, and auc5 has a price, use the auc5 market price
-	if (hsp == 0 and AucAdvanced and market) then
-		hsp = market;
+	-- if auc4 is missing, and auc5 has a price, use the auc5 price
+	if (hsp == 0 and AucAdvanced and price5) then
+		hsp = price5;
 	end
 
 	return hsp;
