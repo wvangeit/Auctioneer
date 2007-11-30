@@ -443,6 +443,8 @@ function private.CreateFrames()
 			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
+			frame.salebox.stackentry:Hide()
+			frame.salebox.numberentry:Hide()
 			frame.salebox.model:Hide()
 			frame.salebox.matcher:Hide()
 			frame.salebox.bid:Hide()
@@ -470,6 +472,8 @@ function private.CreateFrames()
 		if frame.itembox:IsShown() then
 			frame.salebox.number:Show()
 			frame.salebox.stack:Show()
+			frame.salebox.stackentry:Show()
+			frame.salebox.numberentry:Show()
 			frame.toggleManifest:Show()
 			if not frame.toggleManifest:GetText() then
 				frame.manifest:Show()
@@ -561,10 +565,14 @@ function private.CreateFrames()
 			if (curNumber >= -2 and curNumber < 0) then
 				if (curNumber == -2) then
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
+					frame.salebox.totalsize:SetText("("..(fullPop)..")")
+					frame.salebox.numberentry:SetText("Full")
 				else
 					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
+					frame.salebox.totalsize:SetText("("..(count)..")")
+					frame.salebox.numberentry:SetText("All")
 				end
-				frame.salebox.numberentry:SetNumber(maxStax)
+				--frame.salebox.numberentry:SetNumber(maxStax)
 				
 				if (maxStax > 0) then
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
@@ -594,6 +602,7 @@ function private.CreateFrames()
 				end
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
+				frame.salebox.totalsize:SetText("("..(curNumber*curSize)..")")
 				frame.salebox.numberentry:SetNumber(curNumber)
 				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 				bidVal = lib.RoundBid(curBid * curSize)
@@ -619,8 +628,11 @@ function private.CreateFrames()
 			if (curNumber == -1) then
 				curNumber = frame.salebox.count
 				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
+				frame.salebox.totalsize:SetText("("..(curNumber)..")")
+				frame.salebox.numberentry:SetText("All")
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
+				frame.salebox.totalsize:SetText("("..(curNumber)..")")
 			end
 			frame.salebox.numberentry:SetNumber(curNumber)
 			
@@ -775,12 +787,15 @@ function private.CreateFrames()
 			frame.salebox.info:SetPoint("TOPLEFT", frame.salebox.slot, "BOTTOMLEFT", 0, 8)
 			frame.imageview:Hide()
 			frame.imageviewclassic:Show()
+			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
+			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stacksoflabel, "TOPRIGHT", 5, 0)
 			if not frame.salebox.sig then
 				frame.salebox.info:SetText("Select an item to begin auctioning...")
 			else
 				frame.salebox.stackentry:Show()
 				frame.salebox.stacksoflabel:Show()
 				frame.salebox.numberentry:Show()
+				frame.salebox.totalsize:Show()
 				frame.salebox.depositcost:Show()
 				frame.salebox.totalbid:Show()
 				frame.salebox.totalbuyout:Show()
@@ -791,8 +806,10 @@ function private.CreateFrames()
 			frame.salebox.oldnote = frame.salebox.note
 			frame.salebox.note = frame.salebox.warn
 		else
-			frame.salebox.stackentry:Hide()
+			frame.salebox.stackentry:SetPoint("TOPLEFT", frame.salebox.stack, "TOPRIGHT", 5, 0)
+			frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.number, "TOPRIGHT", 5, 0)
 			frame.salebox.stacksoflabel:Hide()
+			frame.salebox.totalsize:Hide()
 			frame.salebox.numberentry:Hide()
 			frame.salebox.depositcost:Hide()
 			frame.salebox.totalbid:Hide()
@@ -807,6 +824,8 @@ function private.CreateFrames()
 					frame.manifest:Show()
 				end
 				frame.salebox.stack:Show()
+				frame.salebox.stackentry:Show()
+				frame.salebox.numberentry:Show()
 				frame.salebox.number:Show()
 			else
 				frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
@@ -1298,7 +1317,7 @@ function private.CreateFrames()
 	frame.salebox.stack:SetMinMaxValues(1,20)
 	frame.salebox.stack:SetValueStep(1)
 	frame.salebox.stack:SetValue(20)
-	frame.salebox.stack:SetWidth(285)
+	frame.salebox.stack:SetWidth(255)
 	frame.salebox.stack:SetScript("OnValueChanged", frame.ChangeControls)
 	frame.salebox.stack.element = "stack"
 	frame.salebox.stack:Hide()
@@ -1307,7 +1326,7 @@ function private.CreateFrames()
 	AppraiserSaleboxStackHigh:SetText("")
 
 	frame.salebox.stack.label = frame.salebox.stack:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.stack.label:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 3,2)
+	frame.salebox.stack.label:SetPoint("LEFT", frame.salebox.stack, "RIGHT", 33,2)
 	frame.salebox.stack.label:SetJustifyH("LEFT")
 	frame.salebox.stack.label:SetJustifyV("CENTER")
 	
@@ -1317,7 +1336,7 @@ function private.CreateFrames()
 	frame.salebox.number:SetMinMaxValues(1,1)
 	frame.salebox.number:SetValueStep(1)
 	frame.salebox.number:SetValue(1)
-	frame.salebox.number:SetWidth(285)
+	frame.salebox.number:SetWidth(255)
 	frame.salebox.number:SetScript("OnValueChanged", frame.ChangeControls)
 	frame.salebox.number.element = "number"
 	frame.salebox.number:Hide()
@@ -1358,7 +1377,7 @@ function private.CreateFrames()
 	end
 
 	frame.salebox.number.label = frame.salebox.number:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-	frame.salebox.number.label:SetPoint("LEFT", frame.salebox.number, "RIGHT", 3,2)
+	frame.salebox.number.label:SetPoint("LEFT", frame.salebox.number, "RIGHT", 33,2)
 	frame.salebox.number.label:SetJustifyH("LEFT")
 	frame.salebox.number.label:SetJustifyV("CENTER")
 
@@ -1689,17 +1708,29 @@ function private.CreateFrames()
 	
 	frame.salebox.numberentry = CreateFrame("EditBox", "AppraiserSaleboxNumberEntry", frame.salebox, "InputBoxTemplate")
 	frame.salebox.numberentry:SetPoint("TOPLEFT", frame.salebox.duration, "BOTTOMLEFT", 20, -5)
-	frame.salebox.numberentry:SetNumeric(true)
+	frame.salebox.numberentry:SetNumeric(false)
 	frame.salebox.numberentry:SetHeight(16)
 	frame.salebox.numberentry:SetWidth(30)
 	frame.salebox.numberentry:SetNumber(0)
 	frame.salebox.numberentry:SetAutoFocus(false)
 	frame.salebox.numberentry:SetScript("OnEnterPressed", function()
+		local text = frame.salebox.numberentry:GetText()
+		if (text:lower() == "full") then
+			frame.salebox.numberentry:SetNumber(-2)
+		elseif (text:lower() == "all") then
+			frame.salebox.numberentry:SetNumber(-1)
+		end
 		frame.salebox.number:SetAdjustedValue(frame.salebox.numberentry:GetNumber())
 		frame.salebox.numberentry:ClearFocus()
 		frame.UpdateControls()
 	end)
 	frame.salebox.numberentry:SetScript("OnTabPressed", function()
+		local text = frame.salebox.numberentry:GetText()
+		if (text:lower() == "full") then
+			frame.salebox.numberentry:SetNumber(-2)
+		elseif (text:lower() == "all") then
+			frame.salebox.numberentry:SetNumber(-1)
+		end
 		frame.salebox.number:SetAdjustedValue(frame.salebox.numberentry:GetNumber())
 		frame.salebox.stackentry:SetFocus()
 		frame.UpdateControls()
@@ -1737,6 +1768,13 @@ function private.CreateFrames()
 		frame.salebox.stackentry:ClearFocus()
 	end)
 	frame.salebox.stackentry:Hide()
+	
+	frame.salebox.totalsize = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.salebox.totalsize:SetPoint("TOPLEFT", frame.salebox.stackentry, "TOPRIGHT", 3, 0)
+	frame.salebox.totalsize:SetJustifyH("LEFT")
+	frame.salebox.totalsize:SetJustifyV("CENTER")
+	frame.salebox.totalsize:SetText("()")
+	frame.salebox.totalsize:Hide()
 	
 	frame.salebox.depositcost = frame.salebox:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.depositcost:SetPoint("TOPLEFT", frame.salebox.numberentry, "BOTTOMLEFT", -15, -5)
