@@ -730,9 +730,12 @@ function private.HasAllData()
 			-- Already verified 100%
 			return true
 		end
+		local _, owner = 0, {}
 		for i = start, numBatchAuctions do
-			local _,_,_,_,_,_,_,_,_,_,_,owner = GetAuctionItemInfo("list", i)
-			if not owner then
+			_,_,_,_,_,_,_,_,_,_,_,owner[i] = GetAuctionItemInfo("list", i)
+		end
+		for i = start, numBatchAuctions do
+			if not owner[i] then
 				-- We'll start from here again next cycle since we're waiting
 				private.verifyStart = i
 				private.nextCheck = now + 0.25
