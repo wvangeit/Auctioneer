@@ -143,7 +143,7 @@ local function setter(setting, value)
 		end
 		
 		local valid, count = {'a','A','b','B','c','d','H','I','m','M','p','S','U','w','x','X','y', 'Y'} --valid date commands
-		local count = #tbl
+		count = #tbl
 		for i,v in pairs(tbl) do
 			for ii, vv in pairs(valid) do
 				if v == vv then count = count - 1 break end

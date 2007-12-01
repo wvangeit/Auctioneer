@@ -688,9 +688,7 @@ function private.CreateFrames()
 
 end
 
-
 function private.CreateMailFrames()
-
 	local frame = CreateFrame("Frame", "BeanCounterMail", MailFrame)
 	frame:Hide()
 	private.MailGUI = frame
@@ -714,10 +712,39 @@ function private.CreateMailFrames()
 	private.CountGUI = countdown
 	countdown:SetPoint("CENTER", frame, "CENTER", 0, -60)
 	countdown:SetText("Recording: "..count.." of "..total.." items")
-	
 end
 
+--ONLOAD Error frame, used to show missmatched DB versus client errors that stop BC load
+function private.CreateErrorFrames()
+	frame = private.frame
+	frame.loadError = CreateFrame("Frame", "BCTEST", UIParent)
+	frame.loadError:SetFrameStrata("HIGH")
+	frame.loadError:SetBackdrop({
+		bgFile = "Interface/Tooltips/ChatBubble-Background",
+		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 32, right = 32, top = 32, bottom = 32 }
+	})
+	frame.loadError:SetBackdropColor(0,0,0, 1)
+	frame.loadError:Show()
 
+	frame.loadError:SetPoint("CENTER", UIParent, "CENTER")
+	frame.loadError:SetWidth(300)
+	frame.loadError:SetHeight(200)
+
+	frame.loadError.close = CreateFrame("Button", nil, frame.loadError, "OptionsButtonTemplate")
+	frame.loadError.close:SetPoint("BOTTOMRIGHT", frame.loadError, "BOTTOMRIGHT", -10, 10)
+	frame.loadError.close:SetScript("OnClick", function() frame.loadError:Hide() end)
+	frame.loadError.close:SetText("Ok")
+
+	frame.loadError.text = frame.loadError:CreateFontString("TEXTTEST", "OVERLAY", "GameFontNormal")
+	frame.loadError.text:SetPoint("CENTER", frame.loadError, "CENTER", 0, 0)
+	frame.loadError.text:SetText("Your database has been created \n  with a newer version of BeanCounter \n than the one you are currently using.\n BeanCounter will not load to prevent \n possibly corrupting the saved data.")
+
+	frame.loadError.title = frame.loadError:CreateFontString("TITLETEST", "OVERLAY", "GameFontNormalLarge")
+	frame.loadError.title:SetPoint("CENTER", frame.loadError, "TOP", 0,-15)
+	frame.loadError.title:SetText("|CFFFF0000 BEANCOUNTER WARNING")
+end
 
 --Taken from AucCore to make beancounter Standalone, Need to remove Redudundant stuff
 function private.AddTab(tabButton, tabFrame)

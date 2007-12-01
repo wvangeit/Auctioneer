@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.04,
+	version = 1.05,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -90,18 +90,26 @@ function AucModule.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-	private.scriptframe:RegisterEvent("PLAYER_MONEY")
+
+	--Check if user is trying to use old client with newer database
+	if private.version and BeanCounterDB[private.realmName][private.playerName].version and private.version < BeanCounterDB[private.realmName][private.playerName].version then
+		private.CreateErrorFrames()
+		print ("This database has been updated to work with a newer version of BeanCounter than the one you are currently using. BeanCounter will stop loading now.")
+		return
+	end
+
+	private.frame:RegisterEvent("PLAYER_MONEY")
 	
-	private.scriptframe:RegisterEvent("MAIL_INBOX_UPDATE")
-	private.scriptframe:RegisterEvent("UI_ERROR_MESSAGE")
-	private.scriptframe:RegisterEvent("MAIL_SHOW")
-	private.scriptframe:RegisterEvent("MAIL_CLOSED")
-	private.scriptframe:RegisterEvent("UPDATE_PENDING_MAIL")
-	private.scriptframe:RegisterEvent("MERCHANT_SHOW")	
-	private.scriptframe:RegisterEvent("MERCHANT_UPDATE")
-	private.scriptframe:RegisterEvent("MERCHANT_CLOSED")
+	private.frame:RegisterEvent("MAIL_INBOX_UPDATE")
+	private.frame:RegisterEvent("UI_ERROR_MESSAGE")
+	private.frame:RegisterEvent("MAIL_SHOW")
+	private.frame:RegisterEvent("MAIL_CLOSED")
+	private.frame:RegisterEvent("UPDATE_PENDING_MAIL")
+	private.frame:RegisterEvent("MERCHANT_SHOW")	
+	private.frame:RegisterEvent("MERCHANT_UPDATE")
+	private.frame:RegisterEvent("MERCHANT_CLOSED")
 			
-	private.scriptframe:SetScript("OnUpdate", private.onUpdate)
+	private.frame:SetScript("OnUpdate", private.onUpdate)
 	
 	-- Hook all the methods we need
 	Stubby.RegisterAddOnHook("Blizzard_AuctionUi", "BeanCounter", private.AuctionUI) --To be standalone we cannot depend on AucAdv for lib.Processor
@@ -336,6 +344,6 @@ function private.debugPrint(...)
 end
 
 --[[Bootstrap Code]]
-private.scriptframe = CreateFrame("Frame")
-private.scriptframe:RegisterEvent("ADDON_LOADED")
-private.scriptframe:SetScript("OnEvent", private.onEvent)
+private.frame = CreateFrame("Frame")
+private.frame:RegisterEvent("ADDON_LOADED")
+private.frame:SetScript("OnEvent", private.onEvent)
