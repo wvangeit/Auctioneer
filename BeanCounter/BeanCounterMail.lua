@@ -372,7 +372,7 @@ function private.mailBoxColorStart()
 end
 
 function private.hasUnreadMail()
-	if HasNewMail() then MiniMapMailFrame:Show() debugPrint("We have real unread mail, mail icon show/hide code bypassed") return end  --no need to process if we have real unread messages waiting
+	--[[if HasNewMail() then MiniMapMailFrame:Show() debugPrint("We have real unread mail, mail icon show/hide code bypassed") return end  --no need to process if we have real unread messages waiting
 	if not private.getOption("util.beancounter.mailrecolor") then MiniMapMailFrame:Hide() return end --no need to do this if user isn't using recolor system, and mail icon should not show since HasnewMail() failed
 
 	local mailunread = false
@@ -387,5 +387,5 @@ function private.hasUnreadMail()
 	else
 		lib.SetSetting("util.beancounter.hasUnreadMail", false)
 		MiniMapMailFrame:Hide()
-	end
+	end]]
 end
