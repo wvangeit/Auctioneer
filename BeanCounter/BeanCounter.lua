@@ -92,9 +92,9 @@ end
 function lib.OnLoad(addon)
 
 	--Check if user is trying to use old client with newer database
-	if private.version and BeanCounterDB[private.realmName][private.playerName].version and private.version < BeanCounterDB[private.realmName][private.playerName].version then
-		private.CreateErrorFrames()
+	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version and private.version < BeanCounterDB[private.realmName][private.playerName].version then
 		print ("This database has been updated to work with a newer version of BeanCounter than the one you are currently using. BeanCounter will stop loading now.")
+		private.CreateErrorFrames()
 		return
 	end
 
