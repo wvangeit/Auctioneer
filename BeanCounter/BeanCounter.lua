@@ -90,7 +90,11 @@ function AucModule.Processor(callbackType, ...)
 end
 
 function lib.OnLoad(addon)
-
+	private.initializeDB() --create or initialize the saved DB
+	lib.MakeGuiConfig() --create the configurator GUI frame
+	private.CreateFrames() --create our framework used for AH and GUI
+	private.slidebar() --create slidebar icon
+	
 	--Check if user is trying to use old client with newer database
 	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version and private.version < BeanCounterDB[private.realmName][private.playerName].version then
 		print ("This database has been updated to work with a newer version of BeanCounter than the one you are currently using. BeanCounter will stop loading now.")
@@ -123,10 +127,6 @@ function lib.OnLoad(addon)
 	--Vendor
 	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 	
-	private.initializeDB() --create or initialize the saved DB
-	lib.MakeGuiConfig() --create the configurator GUI frame
-	private.CreateFrames() --create our framework used for AH and GUI
-	private.slidebar() --create slidebar icon
 end
 
 --Create the database
