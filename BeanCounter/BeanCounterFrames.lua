@@ -505,8 +505,8 @@ function private.CreateFrames()
 
 								tonumber(deposit) or 0, --deposit
 								0, --fee
-								tonumber(tbl[4]) or 0, --current wealth
-								tbl[3], --time,
+								tonumber(tbl[5]) or 0, --current wealth
+								tbl[4], --time,
 								
 								})
 								style[#data] = {}

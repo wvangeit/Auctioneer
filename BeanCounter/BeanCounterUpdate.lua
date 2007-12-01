@@ -42,6 +42,33 @@ local function debugPrint(...)
     end
 end
 
+function private.fixMissingItemlinks()
+local tbl = {}
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if type(data) == "table" then
+				for itemID, value in pairs(data) do
+					for index, text in ipairs(value) do
+						tbl = {strsplit(";", text)}
+						if tbl[1] == "0" or tbl[1] == "<nil>" then
+							_, link = private.getItemInfo(itemID, "itemid")
+							if link and  tbl[1] == "<nil>" then
+								private.serverData[player][DB][itemID][index] = text:gsub("(<nil>)", link, 1)
+								print("Corrected",private.serverData[player][DB][itemID][index])
+							elseif link and  tbl[1] == "0" then
+								private.serverData[player][DB][itemID][index] = text:gsub("(0)", link, 1)
+								print("Corrected",private.serverData[player][DB][itemID][index])
+							else 
+								print("Server could not find itemID, try again later", itemID)    
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+
+end
 
 function private.UpgradeDatabaseVersion()
 	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
@@ -154,6 +181,8 @@ function private.updateTo1_04()
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
 	end
 	private.playerData.version = 1.04
+	
+	private.updateTo1_05()
 end
 
 --[[This adds the missing stack size count for expired auctions]]--
