@@ -89,10 +89,10 @@ function private.getInvoice(n,sender, subject)
 		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..":%s")) or (string.match( subject , _BC('MailAuctionWonSubject')..":%s")) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n);
 			if  playerName then
-				debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
+				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes", time()
 			else
-				debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no")
+				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "no", time()
 			end
 		end
@@ -116,23 +116,23 @@ local total = #private.inboxStart
 		if not data.retrieved then --Send non invoiceable mails through
 			table.insert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
-			debugPrint("not a invoice mail type")
+			--debugPrint("not a invoice mail type")
 		
 		elseif  data.retrieved == "failed" then
 			table.insert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
-			debugPrint("data.retrieved == failed")
+			--debugPrint("data.retrieved == failed")
 		
 		elseif  data.retrieved == "yes" then
 			table.insert(private.reconcilePending, data)
 			private.inboxStart[i] = nil
-			debugPrint("data.retrieved == yes")
+			--debugPrint("data.retrieved == yes")
 		
 		elseif  time() - data.startTime > private.getOption("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
 			debugPrint("time to retieve invoice exceded")
-			tbl["retrieved"] = "failed" 
+			tbl["retrieved"] = "failed, time to get invoice exceded" 
 		else 
-			debugPrint("Invoice retieve attempt",tbl["subject"])
+			--debugPrint("Invoice retieve attempt",tbl["subject"])
 	tbl["invoiceType"], tbl["itemName"], tbl["Seller/buyer"], tbl['bid'], tbl["buyout"] , tbl["deposit"] , tbl["fee"], tbl["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
 		end
 	end
@@ -161,7 +161,7 @@ function private.mailSort()
 		
 		if (private.reconcilePending[i]["sender"] == _BC('MailAllianceAuctionHouse')) or (private.reconcilePending[i]["sender"] == _BC('MailHordeAuctionHouse')) then
 			if string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
-				debugPrint("Auction successful: ")
+				debugPrint("Auction successful: ",i)
 				--Get itemID from database
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
@@ -176,16 +176,15 @@ function private.mailSort()
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then    
 					local _, _, stack, _, _ = GetInboxItem(i)
-					debugPrint("Auction Expired")
+					debugPrint("Auction Expired",i)
 					local value = private.packString(itemLink, "Auction expired", stack, private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedAuctions", itemID, value)
 				end
-				
 				table.remove(private.reconcilePending,i)
 			
 			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..":%s") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
 				
-				debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
+				--debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 	
@@ -200,7 +199,7 @@ function private.mailSort()
 				end				
 				table.remove(private.reconcilePending,i)			
 			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject')..":%s") then
+			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject').."%s") then
 				debugPrint("Outbid on ")
 				
 				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject').."%s(.*)" )
