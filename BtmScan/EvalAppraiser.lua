@@ -99,14 +99,14 @@ function lib:valuate(item, tooltip)
 	end
 	item:info("Pricing Model:"..curModelText)
 	
-	local newBuy, newBid
+	local newBuy, newBid, seen
 	if curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
 	elseif curModel == "market" then
-		newBuy = AucAdvanced.API.GetMarketValue(link)
+		newBuy, seen = AucAdvanced.API.GetMarketValue(link)
 	else
-		newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 	end
 
 	if curModel ~= "fixed" then
@@ -152,7 +152,7 @@ function lib:valuate(item, tooltip)
 	item:info("Market price", market)
 
 	-- Check to see if it meets the min seen count (if applicable)
-	if (get(lcName..".seen.check")) then
+	if (get(lcName..".seen.check")) and  curModel ~= "fixed" then
 		if (not seen or seen < get(lcName..".seen.mincount")) then
 			item:info("Abort: Seen < "..get(lcName..".seen.mincount"))
 			return
@@ -260,10 +260,24 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
 	id = gui:AddTab(libName)
+	gui:MakeScrollable(id)
+	gui:AddHelp(id, "what appraiser evaluator",
+		"What is the appraiser evaluator?",
+	"This Evaluator uses your Appraiser settings to value items."..
+	"\nFor most items it will use whatever your default Pricing model is, falling back to your alternate model when the default has no value."..
+	"\nIf you have fixed values for some items or another pricing model selected for an item then it will use those instead."..
+	"\nIt takes the markdown percentage you have set into account as well and values things at your Bid price."..
+    "\nYou can take the item you've bought out of the mailbox and post it in the AuctionHouse using Appraiser without changing any settings."..
+    "\nThis should simplify your handling of large numbers of auctions.")
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
+	local defModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+	local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)
+	gui:AddControl(id, "Note",             0, 0, 400, 50, "This Evaluator bases prices on your Appraiser settings."..
+	    "\nWhen you logged on your default pricing plan was: "..defModel..
+	    "\nYour bid price was set to "..markdown.."% of your Buyout price.")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".quality.check", "Enable quality checking:")
