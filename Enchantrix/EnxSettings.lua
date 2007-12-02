@@ -309,6 +309,41 @@ local function setter(setting, value)
 
 		-- Refresh all values to reflect current data
 		gui:Refresh()
+
+
+	elseif (a == "autode") then
+
+		if (setting == "autode.deleteItem") then
+
+			-- User clicked the Delete button, see what the select box's value is.
+			value = gui.elements["autode.selectitem"].value
+
+			-- If there's an item name supplied
+			if (value) then
+				if (AutoDisenchantIgnoreList) then
+					for info,_ in pairs(AutoDisenchantIgnoreList) do
+						-- deserialize and compare the name
+						local thisName = Enchantrix.AutoDisenchant.NameFromIgnoreListItem(info)
+						if (value == thisName) then
+							AutoDisenchantIgnoreList[info] = nil
+							break
+						end
+					end
+				end
+
+			end
+
+		elseif (setting == "autode.reset") then
+			-- User clicked the reset settings button
+			AutoDisenchantIgnoreList = nil
+		elseif (setting == "autode.selectitem") then
+			-- save off the item they selected
+			lib.autoDEListItem = value;
+		end
+
+		-- Refresh all values to reflect current data
+		gui:Refresh()
+
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
@@ -346,6 +381,25 @@ local function getter(setting)
 				pList = { "Default" }
 			end
 			return pList
+		end
+
+	elseif (a == 'autode') then
+		if (b == 'items') then
+			local deiList = {}
+			if (AutoDisenchantIgnoreList) then
+				for info,_ in pairs(AutoDisenchantIgnoreList) do
+					local name = Enchantrix.AutoDisenchant.NameFromIgnoreListItem(info)
+					table.insert( deiList, name )
+				end
+			end
+			if (deiList[1]) then
+				lib.autoDEListItem = deiList[1];
+			else
+				lib.autoDEListItem = nil;
+			end
+			return deiList
+		elseif (b == 'selectitem') then
+			return lib.autoDEListItem
 		end
 	end
 
@@ -460,8 +514,13 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Slider",     0, 2, "miniicon.distance", -80, 80, 1, _ENCH("GuiMinimapButtonDist"))
 	gui:AddControl(id, "Checkbox",   0, 1, "sideIcon.enable", "Display the sidebar button")
 
-	gui:AddControl(id, "Subhead",    0,    _ENCH("GuiAutoDeOptions"))
+	id = gui:AddTab(_ENCH("GuiAutoDeOptions"))
 	gui:AddControl(id, "Checkbox",   0, 1, "AutoDisenchantEnable", _ENCH("GuiAutoDeEnable"))
+	
+	gui:AddControl(id, "Subhead",    0,    "AutoDisenchant: Permanently Ignored Items")
+	gui:AddControl(id, "Selectbox",  0, 1, "autode.items", "autode.selectitem", "this string isn't shown but needs to be long for layout")
+	gui:AddControl(id, "Button",     0, 1, "autode.deleteItem", "remove item")
+	gui:AddControl(id, "Button",     0, 1, "autode.reset", "reset all items")
 
 	id = gui:AddTab(_ENCH("GuiTabProspecting"))
 	gui:AddControl(id, "Header",     0,    _ENCH("GuiProspectingOptions"))

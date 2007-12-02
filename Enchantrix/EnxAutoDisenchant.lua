@@ -87,6 +87,11 @@ local function isItemIgnored(link)
 	return ignoreList[genericLink] or AutoDisenchantIgnoreList[genericLink]
 end
 
+local function nameFromIgnoreListItem(item)
+	local _, _, name = string.find(item, "%[(.+)%]")
+	return name
+end
+
 --------------------------------------------------------------------------------
 -- Main logic
 
@@ -520,4 +525,6 @@ end
 
 Enchantrix.AutoDisenchant = {
 	AddonLoaded = addonLoaded,
+	NameFromIgnoreListItem = nameFromIgnoreListItem,
+	
 }
