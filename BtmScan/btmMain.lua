@@ -1800,6 +1800,13 @@ BtmScan.CreateLogWindow = function()
 	BtmScan.PlayButton:SetWidth(24)
 	BtmScan.PlayButton:SetScript("OnClick", BtmScan.ToggleScan)
 	BtmScan.PlayButton:Show()
+	
+	BtmScan.ConfigButton = CreateFrame("Button", nil, BtmScan.LogParent, "OptionsButtonTemplate")
+	BtmScan.ConfigButton:SetPoint("TOPLEFT", BtmScan.PlayButton, "TOPRIGHT", 10, -2)
+	BtmScan.ConfigButton:SetText("Configure")
+	BtmScan.ConfigButton:SetScript("OnClick", function()
+		BtmScan.Settings.Toggle()
+	end)
 end
 
 -------------------------------------------------------------------------------
