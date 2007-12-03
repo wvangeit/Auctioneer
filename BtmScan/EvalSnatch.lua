@@ -116,6 +116,8 @@ function lib.CommandHandler(msg)
 
 		if (price <= 0) then
 			BtmScan.Print(translate("BottomScanner will now %1 %2", translate("not snatch"), itemlink))
+			itemconfig.buyBelow=price
+			BtmScan.storeItemConfig(itemconfig, itemsig)
 			return
 		end
 
