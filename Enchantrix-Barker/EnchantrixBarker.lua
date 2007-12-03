@@ -272,13 +272,20 @@ end
 
 function Enchantrix_BarkerOptions_SetDefaults()
 	--Barker.Util.ChatPrint("Enchantrix: Setting Barker to defaults"); -- TODO: Localize
-	Barker.Settings.SetSetting("barker.profit_margin", nil)
-	Barker.Settings.SetSetting("barker.randomize", nil)
-	Barker.Settings.SetSetting("barker.lowest_price", nil)
+	
+	-- currently, we have no settings other than what's in the dialog
+	-- resetting the WHOLE profile will reset everything
+	
+	Barker.Settings.SetSetting("barker.reset_all", nil)
 
 	if Enchantrix_BarkerOptions_Frame:IsVisible() then
 		Enchantrix_BarkerOptions_Refresh()
 	end
+end
+
+function Enchantrix_BarkerOptions_ResetButton_OnClick()
+	-- reset all slider values
+	Enchantrix_BarkerOptions_SetDefaults();
 end
 
 function Enchantrix_BarkerOptions_TestButton_OnClick()

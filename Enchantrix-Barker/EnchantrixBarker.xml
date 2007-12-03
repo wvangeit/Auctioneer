@@ -168,7 +168,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 		</Layers>
 
 		<Frames>
-			<Button name="Enchantrix_BarkerOptionsTest_Button" inherits="UIPanelButtonTemplate" text="Bark!">
+			<Button name="Enchantrix_BarkerOptionsBark_Button" inherits="UIPanelButtonTemplate" text="Bark!">
 				<Size>
 					<AbsDimension x="80" y="22"/>
 				</Size>
@@ -203,6 +203,25 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 					</OnClick>
 				</Scripts>
 			</Button>
+
+			<Button name="Enchantrix_BarkerOptionsReset_Button" inherits="UIPanelButtonTemplate" text="Reset All">
+				<Size>
+					<AbsDimension x="80" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="Enchantrix_BarkerOptionsBark_Button" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						Enchantrix_BarkerOptions_ResetButton_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
 			<!--
 			<Frame name="Enchantrix_BarkerOptions_ChanFilterDropDown" inherits="UIDropDownMenuTemplate" id="1" enableMouse="true">
 				<Size>
@@ -226,6 +245,7 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				</Scripts>
 			</Frame>
 			-->
+			
 			<Button name="Enchantrix_BarkerOptions_FrameTab1" inherits="Enchantrix_BarkerOptions_FrameTabTemplate" id="1" text="Pricing">
 				<Anchors>
 					<Anchor point="BOTTOMLEFT">

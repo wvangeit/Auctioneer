@@ -110,9 +110,6 @@ local settingDefaults = {
 
 	['profile.name'] = '',		-- not sure why this gets hit so often, might be a bug
 
-	['miniicon.angle'] = 118,
-	['miniicon.distance'] = 12,
-
 	['barker'] = true,
 	['barker.profit_margin'] = 10,		-- percent
 	['barker.lowest_price'] = 5000,		-- GSC
@@ -323,11 +320,14 @@ local function setter(setting, value)
 
 		-- Refresh all values to reflect current data
 		gui.Refresh()
+	elseif (a == "barker" and b == "reset_all") then
+		-- reset the current profile, by brute force
+		local name = getUserProfileName()
+		EnchantrixBarkerConfig["profile."..name] = {}
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
 		db[setting] = value
-		--setUpdated()
 	end
 
 	if (a == "miniicon") then
@@ -450,7 +450,7 @@ function lib.MakeGuiConfig()
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.chest", 0, 100, 1, "Chest priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.cloak", 0, 100, 1, "Cloak priority: %d%%")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.shield", 0, 100, 1, "Shield priority: %d%%")
-	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.ring", 0, 100, 1, "Ring priority: %d%%")
+--	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_item.ring", 0, 100, 1, "Ring priority: %d%%")
 
 	gui.AddControl(id, "Subhead",        0,    "Statistics priorities")
 	gui.AddControl(id, "WideSlider",     0, 1, "barker.factor_stat", 0, 100, 1, "Overall stats priority: %d%%")
