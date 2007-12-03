@@ -144,6 +144,7 @@ function private.ScanProgressReceiver(state, totalAuctions, scannedAuctions, ela
 		and blnScanMinThresholdMet
 		and blnScanLastPage
 		and blnScanStatsReceived
+		and not (AucAdvanced.Scan.Private.scanStack and #AucAdvanced.Scan.Private.scanStack > 0)
 	) then
 		private.PerformFinishEvents()
 	end
@@ -231,7 +232,7 @@ function AlertShutdownOrLogOff()
 		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: Shutdown is enabled. World of Warcraft will be shut down once the current scan successfully completes.")
 	elseif (AucAdvanced.Settings.GetSetting("util.scanfinish.logout")) then
 		PlaySound("TellMessage")
-		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: LogOut is enabled. This character will be logged of once the current scan successfully completes.")
+		print("AucAdvanced: {{"..libName.."}} |cffff3300Reminder|r: LogOut is enabled. This character will be logged off once the current scan successfully completes.")
 	end
 end
 
