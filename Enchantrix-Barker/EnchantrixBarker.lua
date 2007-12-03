@@ -56,12 +56,12 @@ local print_order = {
 	'factor_item.bracer',
 	'factor_item.gloves',
 	'factor_item.boots',
-	'factor_item.ring',
 	'factor_item.chest',
 	'factor_item.cloak',
 	'factor_item.shield',
 	'factor_item.2hweap',
 	'factor_item.weapon',
+	'factor_item.ring',
 };
 
 
@@ -494,17 +494,6 @@ Enchantrix_BarkerOptions_TabFrames = {
 				max = 100,
 				step = 1,
 				key = 'factor_item.shield',
-				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
-				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
-			},
-			{
-				name = _BARKLOC('Ring'),
-				tooltip = _BARKLOC('BarkerOptionsRingPriorityTooltip'),
-				units = 'percentage',
-				min = 0,
-				max = 100,
-				step = 1,
-				key = 'factor_item.ring',
 				getvalue = Enchantrix_BarkerOptions_Factors_Slider_GetValue,
 				valuechanged = Enchantrix_BarkerOptions_Factors_Slider_OnValueChanged
 			},
