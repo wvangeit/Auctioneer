@@ -47,7 +47,7 @@ local categories = {
 	['factor_item.cloak'] = {search = _BARKLOC('Cloak'), print = _BARKLOC('Cloak') },
 	['factor_item.2hweap'] = {search = _BARKLOC('TwoHandWeapon'), print = _BARKLOC('TwoHandWeapon')},
 	['factor_item.weapon'] = {search = _BARKLOC('Weapon'), print = _BARKLOC('AnyWeapon') },
-	['factor_item.ring'] = {search = _BARKLOC('Ring'), print = _BARKLOC('Ring') },
+	['factor_item.ring'] = {search = _BARKLOC('Ring'), print = _BARKLOC('Ring'), exclude = true },	-- currently applies to the enchanter only, can't sell
 };
 
 
@@ -1143,6 +1143,12 @@ function EnchantrixBarker_AddEnchantToBarker( enchant )
 	local currBarker = EnchantrixBarker_GetBarkerString();
 
 	local category_key = EnchantrixBarker_GetItemCategoryKey( enchant.index )
+	
+	-- see if this category (self enchants) should be excluded from barking
+	if (categories[category_key] and categories[category_key].exclude) then
+		return false;
+	end
+	
 	local category_string = "";
 	local test_category = {};
 	if barkerCategories[ category_key ] then
