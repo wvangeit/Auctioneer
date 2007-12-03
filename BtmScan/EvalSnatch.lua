@@ -83,10 +83,15 @@ end
 
 function lib.PrintHelp()
 	BtmScan.Print("/btm snatch item maxPrice ")
+	BtmScan.Print("/btm snatch list")
 end
 
 function lib.CommandHandler(msg)
 	BtmScan.Print("called snatch-handler"..msg)
+	if (string.lower(msg) == "snatch list") then 
+		lib.PrintList()
+		return
+	end
 	local i,j, ocmd, oparam = string.find(msg, "^([^ ]+) (.*)$")
 	local i,j, cmd, param = string.find(string.lower(msg), "^([^ ]+) (.*)$")
 	if (not i) then cmd = msg param = nil oparam = nil end
@@ -137,6 +142,18 @@ function lib.CommandHandler(msg)
 
 end
 
+function lib.PrintList()
+	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
+	for itemkey, itemConfig in pairs(itemConfigTable) do
+		itemConfig = BtmScan.unpackItemConfiguration(itemConfig)
+		if itemConfig.buyBelow and itemConfig.buyBelow > 0 then
+			local itemID, itemsuffix, itemenchant = strsplit(":", itemkey)
+			itemkey = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
+			local _, itemlink = GetItemInfo(itemkey)
+			BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+		end
+	end
+end
 
 define(lcName..'.enable', true)
 define(lcName..'.allow.bid', true)
