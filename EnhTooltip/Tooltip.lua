@@ -281,7 +281,7 @@ function private.CreateNewFontString(tooltip)
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Text"..currentFontStringIndex, "BOTTOMLEFT", 0, -1)
 	newFontString:Hide()
 	newFontString:SetTextColor(1.0,1.0,1.0)
-	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
+	newFontString:SetFontObject("GameTooltipTextSmall")
 
 	-- we do not update the lastFontStringIndex earlier to make sure that the new font string line has successfully been created
 	private.lastFontStringIndex = nextFontStringIndex
@@ -309,7 +309,7 @@ function private.CreateNewHeaderFontString(tooltip)
 	newFontString:SetPoint("TOPLEFT", tooltipName.."Header"..currentHeaderFontStringIndex, "BOTTOMLEFT", 0, -1)
 	newFontString:Hide()
 	newFontString:SetTextColor(1.0,1.0,1.0)
-	newFontString:SetFont(STANDARD_TEXT_FONT, 10)
+	newFontString:SetFontObject("GameTooltipTextSmall")
 	return newFontString
 end
 
@@ -404,14 +404,14 @@ function public.ClearTooltip()
 		ttText:Hide()
 		ttText.myMoney = nil
 		ttText:SetTextColor(1.0,1.0,1.0)
-		ttText:SetFont(STANDARD_TEXT_FONT, 10)
+		ttText:SetFontObject("GameTooltipTextSmall")
 	end
 
 	for ttHeader in public.GetglobalIterator("EnhancedTooltipHeader%d") do
 		ttHeader:Hide()
 		ttHeader.myMoney = nil
 		ttHeader:SetTextColor(1.0,1.0,1.0)
-		ttHeader:SetFont(STANDARD_TEXT_FONT, 10)
+		ttHeader:SetFontObject("GameTooltipTextSmall")
 	end
 
 	for ttMoney in public.GetglobalIterator("EnhancedTooltipMoney%d") do
