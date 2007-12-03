@@ -606,6 +606,7 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		   -- display EnhTooltip below the currentTooltip
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0, 0)
 		end
+		EnhancedTooltip:SetScale(currentTooltip:GetScale())
 	elseif not currentTooltipOwner or (currentTooltipOwner == UIParent) then
 		-- If currentTooltipOwner is nil or UIParent, the current tooltip is not
 		-- attached to any other frame, so we don't have to bother about correct
@@ -626,6 +627,7 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		else
 			EnhancedTooltip:SetPoint("TOPRIGHT", currentTooltip, "BOTTOMRIGHT", 0,0)
 		end
+		EnhancedTooltip:SetScale(currentTooltip:GetScale())
 	else
 		-- The tooltip is anchored to another frame but not to the cursor. So
 		-- we should properly align it.
@@ -687,6 +689,7 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 			currentTooltip:SetPoint("TOPLEFT", currentTooltipOwner, "BOTTOMRIGHT", 5 + xOffset, -5 + yOffset)
 			EnhancedTooltip:SetPoint("TOPLEFT", currentTooltip, "BOTTOMLEFT", 0,0)
 		end
+		EnhancedTooltip:SetScale(currentTooltip:GetScale())
 	end
 end
 
