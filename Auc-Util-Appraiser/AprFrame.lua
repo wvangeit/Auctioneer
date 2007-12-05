@@ -233,7 +233,8 @@ function private.CreateFrames()
 			suffix = suffix,
 			factor = factor,
 		})
-				
+		itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
+		
 		local data = acquire()
 		local style = acquire()
 		for i = 1, #results do
@@ -257,7 +258,7 @@ function private.CreateFrames()
 				result[Const.CURBID],
 				result[Const.BUYOUT]
 			)
-			local color = frame.SetPriceColor(itemId, count, result[Const.CURBID], result[Const.BUYOUT])
+			local color = frame.SetPriceColor(itemkey, count, result[Const.CURBID], result[Const.BUYOUT])
 			if color then
 				style[i] = acquire()
 				style[i][1] = acquire()
