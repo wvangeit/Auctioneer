@@ -233,7 +233,7 @@ function private.CreateFrames()
 			suffix = suffix,
 			factor = factor,
 		})
-		itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
+		local itemkey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 		
 		local data = acquire()
 		local style = acquire()
