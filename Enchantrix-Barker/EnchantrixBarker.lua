@@ -164,13 +164,11 @@ local addonName = "Enchantrix Barker"
 -- UI code
 
 function EnchantrixBarker_OnEvent()
-	--Barker.Util.ChatPrint("GotUIEvent...");
 
 	--Returns "Enchanting" for enchantwindow and nil for Beast Training
 	local craftName, rank, maxRank = GetCraftDisplaySkillLine()
 
 	if craftName then
-		--Barker.Util.ChatPrint("Barker config is "..tostring(Barker.Settings.GetSetting('barker')) );
 		if( event == "CRAFT_SHOW" ) then
 			if( Barker.Settings.GetSetting('barker') ) then
 				Enchantrix_BarkerDisplayButton:Show();
@@ -179,13 +177,13 @@ function EnchantrixBarker_OnEvent()
 				Enchantrix_BarkerDisplayButton:Hide();
 				Enchantrix_BarkerOptions_Frame:Hide();
 			end
-		elseif( event == "CRAFT_CLOSE" )then
-			Enchantrix_BarkerDisplayButton:Hide();
-			Enchantrix_BarkerOptions_Frame:Hide();
-		--elseif(	event == "ZONE_CHANGED" ) then
-		--	Enchantrix_BarkerOptions_ChanFilterDropDown_Initialize();
 		end
+	elseif (event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_CLOSE" or event == "CRAFT_CLOSE" ) then
+		-- we are closing, or it's a different craft/trade, hide the button and frame
+		Enchantrix_BarkerDisplayButton:Hide();
+		Enchantrix_BarkerOptions_Frame:Hide();
 	end
+	
 end
 
 function Enchantrix_BarkerOptions_OnShow()
@@ -233,7 +231,6 @@ local function craftUILoaded()
 	end
 
 	Enchantrix_BarkerDisplayButton:SetParent(useFrame);
-	--Enchantrix_BarkerDisplayButton:SetPoint("BOTTOMRIGHT", Enchantrix_BarkerButton, "BOTTOMLEFT");
 
 	if (ATSWFrame ~= nil) then
 		-- this works for ATSW

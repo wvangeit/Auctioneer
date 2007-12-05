@@ -400,6 +400,8 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				EnchantrixBarker_OnLoad();
 				this:RegisterEvent("CRAFT_SHOW")
 				this:RegisterEvent("CRAFT_CLOSE")
+				this:RegisterEvent("TRADE_SKILL_SHOW")
+				this:RegisterEvent("TRADE_SKILL_CLOSE")
 			</OnLoad>
 			<OnEvent>
 				EnchantrixBarker_OnEvent();
