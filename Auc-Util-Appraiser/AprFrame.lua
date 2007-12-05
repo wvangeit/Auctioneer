@@ -930,10 +930,6 @@ function private.CreateFrames()
 	function frame.PostBySig(sig, dryRun)
 		local stack = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".stack")
 		local number = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".number")
-		if AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
-			stack = frame.salebox.stackentry:GetNumber()
-			number = frame.salebox.numberentry:GetNumber()
-		end
 		local itemBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".bid")
 		local itemBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".buy")
 		local duration = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".duration")
