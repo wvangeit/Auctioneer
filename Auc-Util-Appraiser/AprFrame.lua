@@ -879,7 +879,7 @@ function private.CreateFrames()
 	end
 	
 	function frame.IconClicked()
-		objtype, _, itemlink = GetCursorInfo()
+		local objtype, _, itemlink = GetCursorInfo()
 		ClearCursor()
 		if objtype == "item" then
 			frame.GetItembyLink(itemlink)
