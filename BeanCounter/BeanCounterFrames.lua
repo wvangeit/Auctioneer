@@ -394,15 +394,28 @@ function private.CreateFrames()
 		{ _BC('UiBuyTransaction') , "COIN", 60 },
 		{ _BC('UiNetHeader'), "COIN", 65},
 		{ _BC('UiQuantityHeader'), "TEXT", 40},
-		{ "Price/Per", "COIN", 65}, --Needs localization
+		{ "Price/Per", "COIN", 70}, --Needs localization
 		
-		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", 80 },
+		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", 90 },
 				
-		{ _BC('UiDepositTransaction'), "COIN", 50 },
+		{ _BC('UiDepositTransaction'), "COIN", 58 },
 		{ "Fee", "COIN", 50 }, --needs localization
 		{ "Wealth", "COIN", 70 }, --needs localization
 		{ _BC('UiDateHeader'), "text", 150 },
 	})
+	
+	--Lengthen the Column Headers for non English localizations.
+	function private.resizeScrollSheetColumns()
+		local count = #frame.resultlist.sheet.labels --Number of Columns
+		for i = 1, count do
+			local Size = floor(frame.resultlist.sheet.labels[i]:GetStringWidth()) --Width of translation text
+			local Button =  floor(frame.resultlist.sheet.labels[i].button:GetWidth()) --Current Colimn Width
+			if Size +10 >= Button then 
+				frame.resultlist.sheet.labels[i].button:SetWidth(Size + 10)
+			end
+		end
+	end	
+	private.resizeScrollSheetColumns() --Pad column widths to match text lengths
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function frame.getCheckboxSettings()
