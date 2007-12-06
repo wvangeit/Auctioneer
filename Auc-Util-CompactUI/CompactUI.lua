@@ -59,6 +59,7 @@ end
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	if SortAuctionApplySort then
+		OldSortAuctionApplySort = SortAuctionApplySort
 		SortAuctionApplySort=private.QueryCurrent
 	end
 	hooksecurefunc("QueryAuctionItems", private.CopyQuery)
@@ -75,8 +76,12 @@ function private.CopyQuery(...)
 	searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll = ...
 end
 
-function private.QueryCurrent()
-	QueryAuctionItems(searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll)
+function private.QueryCurrent(SortTable, SortColumn, reverse)
+	if SortTable == "bidder" or SortTable == "owner" then
+		OldSortAuctionApplySort(SortTable, SortColumn, reverse)
+	else
+		QueryAuctionItems(searchname, searchminLevel, searchmaxLevel, searchinvTypeIndex, searchclassIndex, searchsubclassIndex, searchpage, searchisUsable, searchqualityIndex, searchGetAll)
+	end
 end
 
 function private.HookAH()
