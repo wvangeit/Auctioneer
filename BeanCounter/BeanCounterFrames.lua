@@ -177,7 +177,7 @@ function private.CreateFrames()
 	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
 	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
 	base.Config:SetScript("OnClick", function() base:Hide() end)
-	base.Config:SetText("Done")
+	base.Config:SetText("Done") --LOCALIZE
 			
 	--Create the Actual Usable Frame
 	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
@@ -191,7 +191,7 @@ function private.CreateFrames()
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
-	title:SetText("BeanCounter: Auction History Database")
+	title:SetText("BeanCounter: Auction History Database") --LOCALIZE
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
@@ -247,11 +247,10 @@ function private.CreateFrames()
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.SelectBoxSetting = {"1","server"}
 	function private.ChangeControls(obj, arg1,arg2,...)
-		--debugPrint("Clicked the button Option #", arg1, arg2)
 		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", private.realmName.." Data"},}
+	local vals = {{"server", private.realmName.." Data"},} --LOCALIZE
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, name.."'s Data"})
 	end	
@@ -277,7 +276,7 @@ function private.CreateFrames()
 	--Search Button	
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
-	frame.searchButton:SetText("Search")
+	frame.searchButton:SetText(_BC('UiSearch'))
 	frame.searchButton:SetScript("OnClick", function()
 		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
 	end)
@@ -316,13 +315,13 @@ function private.CreateFrames()
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
 	frame.exactCheck:SetChecked(false)
-	getglobal("BeancounterexactCheckText"):SetText("Exact name search")
+	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
 
 	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
 	frame.classicCheck:SetChecked(false)
-	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data")
+	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data") --LOACLIZE
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
 	frame.classicCheck:Hide()
 	--no need to show this button if theres no classic data to search
@@ -335,27 +334,27 @@ function private.CreateFrames()
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidCheck:SetChecked(true)
-	getglobal("BeancounterbidCheckText"):SetText("Bids")
+	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(false)
 	frame.bidFailedCheck:SetScale(0.85)
-	getglobal("BeancounterbidFailedCheckText"):SetText("Outbids")
+	getglobal("BeancounterbidFailedCheckText"):SetText("Outbids") --LOCALIZE
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(true)
-	getglobal("BeancounterauctionCheckText"):SetText("Auctions")
+	getglobal("BeancounterauctionCheckText"):SetText(_BC('UIAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(false)
 	frame.auctionFailedCheck:SetScale(0.85)
-	getglobal("BeancounterauctionFailedCheckText"):SetText("Failed Auctions")
+	getglobal("BeancounterauctionFailedCheckText"):SetText("Failed Auctions") --LOCALIZE
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
 	
 	
