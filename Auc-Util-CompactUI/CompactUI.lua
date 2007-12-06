@@ -55,6 +55,7 @@ function lib.Processor(callbackType, ...)
 		private.cache = {}
 	end
 end
+local OldSortAuctionApplySort
 
 function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
