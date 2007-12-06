@@ -168,6 +168,8 @@ BtmScan.OnEvent = function(...)
 		if (string.lower(arg) == "btmscan") then
 			BtmScan.OnLoad()
 		end
+	elseif (event == "AUCTION_HOUSE_CLOSED") then
+		BtmScan.ClosePrompt()
 	end
 end
 
@@ -1424,6 +1426,15 @@ local function checkItem(pos, item)
 	return isCorrect
 end
 
+function BtmScan.ClosePrompt()
+	if BtmScan.Prompt and BtmScan.Prompt:IsShown() then
+		BtmScan.Prompt:Hide()
+		BtmScan.scanStage = 2
+		BtmScan.timer = 0
+		BtmScan.pageScan = 0.001
+	end
+end
+
 BtmScan.PerformPurchase = function()
 	local item = BtmScan.Prompt.item
 
@@ -1561,6 +1572,7 @@ end
 
 BtmScan.Frame = CreateFrame("Frame")
 BtmScan.Frame:RegisterEvent("ADDON_LOADED")
+BtmScan.Frame:RegisterEvent("AUCTION_HOUSE_CLOSED")
 BtmScan.Frame:SetScript("OnEvent", BtmScan.OnEvent)
 BtmScan.Frame:SetScript("OnUpdate", BtmScan.OnUpdate)
 
