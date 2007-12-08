@@ -34,16 +34,8 @@ Enchantrix_RegisterRevision("$URL$", "$Rev$")
 local addonLoaded				-- Enchantrix.Command.AddonLoaded()
 local auctioneerLoaded			-- Enchantrix.Command.AuctioneerLoaded()
 local handleCommand				-- Enchantrix.Command.HandleCommand()
-local register					-- Enchantrix.Command.Register()
-local resetKhaos				-- Enchantrix.Command.ResetKhaos()
-local setKhaosSetKeyValue		-- Enchantrix.Command.SetKhaosSetKeyValue()
-local setKhaosSetKeyParameter	-- Enchantrix.Command.SetKhaosSetKeyParameter()
 
 -- Local functions
-local getKhaosLocaleList
-local getKhaosLoadList
-local registerKhaos
-local registerAuctioneerOptions
 local chatPrintHelp
 local onOff
 local clear
@@ -60,494 +52,13 @@ local doFindMaterial
 
 -- GUI Init Variables (Added by MentalPower)
 Enchantrix.State.GUI_Registered = nil
-Enchantrix.State.Khaos_Registered = nil
 
 -- Local variables
-local optionSet			-- used by Khaos UI
 local profitMargins		-- used by PercentLess and BidBroker
 
 
 function addonLoaded()
-	if IsAddOnLoaded("Khaos") then
-		registerKhaos()
-	end
 end
-
-function getKhaosLocaleList()
-	local options = { [_ENCH('CmdDefault')] = 'default' };
-	for locale, data in pairs(EnchantrixLocalizations) do
-		options[locale] = locale;
-	end
-	return options
-end
-
-function getKhaosLoadList()
-	return {
-		[_ENCH('GuiLoad_Always')] = 'always',
-		[_ENCH('GuiLoad_Never')] = 'never',
-	}
-end
-
-function registerKhaos()
-	optionSet = {
-		id="Enchantrix";
-		text="Enchantrix";
-		helptext=function()
-			return _ENCH('GuiMainHelp');
-		end;
-		difficulty=1;
-		default={checked=true};
-		options={
-			{
-				id="Header";
-				text="Enchantrix";
-				helptext=function()
-					return _ENCH('GuiMainHelp')
-				end;
-				type=K_HEADER;
-				difficulty=1;
-			};
-			{
-				id="all";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiMainEnable')
-				end;
-				helptext=function()
-					return _ENCH('HelpOnoff')
-				end;
-				callback=function(state)
-					if (state.checked) then
-						onOff('on');
-					else
-						onOff('off');
-					end
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return _ENCH('StatOn');
-					else
-						return _ENCH('StatOff');
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('all')};
-				disabled={checked=false};
-				difficulty=1;
-			};
-			{
-				id="locale";
-				type=K_PULLDOWN;
-				setup = {
-					options = getKhaosLocaleList;
-					multiSelect = false;
-				};
-				text=function()
-					return _ENCH('GuiLocale')
-				end;
-				helptext=function()
-					return _ENCH('HelpLocale')
-				end;
-				callback = function(state)
-				end;
-				feedback = function (state)
-					Enchantrix.Config.SetLocale(state.value);
-					return _ENCH('FrmtActSet'):format(_ENCH('CmdLocale'), state.value);
-				end;
-				default = {
-					value = Enchantrix.Config.GetLocale();
-				};
-				disabled = {
-					value = Enchantrix.Config.GetLocale();
-				};
-				dependencies={all={checked=true;}};
-				difficulty=2;
-			};
-			{
-				id="LoadSettings";
-				type=K_PULLDOWN;
-				setup = {
-					options = getKhaosLoadList;
-					multiSelect = false;
-				};
-				text=function()
-					return _ENCH('GuiLoad')
-				end;
-				helptext=function()
-					return _ENCH('HelpLoad')
-				end;
-				callback=function(state) end;
-				feedback=function(state)
-					handleCommand("load " .. state.value, "GUI");
-				end;
-				default={value = 'always'};
-				disabled={value = 'never'};
-				difficulty=1;
-			};
-			{
-				id="ToolTipEmbedInGameTip";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiEmbed')
-				end;
-				helptext=function()
-					return _ENCH('HelpEmbed')
-				end;
-				callback=function(state)
-					genVarSet('ToolTipEmbedInGameTip', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowEmbed')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowEmbed')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('ToolTipEmbedInGameTip')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=1;
-			};
-			{
-				id="ToolTipTerseFormat";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiTerse')
-				end;
-				helptext=function()
-					return _ENCH('HelpTerse')
-				end;
-				callback=function(state)
-					genVarSet('ToolTipTerseFormat', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowTerse')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowTerse')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('ToolTipTerseFormat')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=2;
-			};
-			{
-				id="levels";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiDELevels')
-				end;
-				helptext=function()
-					return _ENCH('HelpShowDELevels')
-				end;
-				callback=function(state)
-					genVarSet('TooltipShowDisenchantLevel', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowDELevels')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowDELevels')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('TooltipShowDisenchantLevel')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};
-			{
-				id="materials";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiDEMaterials')
-				end;
-				helptext=function()
-					return _ENCH('HelpShowDEMaterials')
-				end;
-				callback=function(state)
-					genVarSet('TooltipShowDisenchantMats', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowDEMaterials')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowDEMaterials')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('TooltipShowDisenchantMats')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};
-			{
-				id="EnchantrixValuateHeader";
-				type=K_HEADER;
-				text=function()
-					return _ENCH('GuiValuateHeader')
-				end;
-				helptext=function()
-					return _ENCH('HelpValue')
-				end;
-				difficulty=2;
-			};
-			{
-				id="TooltipShowValues";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiValuateEnable')
-				end;
-				helptext=function()
-					return _ENCH('HelpValue').."\n".._ENCH('HelpGuessNoauctioneer')
-				end;
-				callback=function(state)
-					genVarSet('TooltipShowValues', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowValue')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowValue')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('TooltipShowValues')};
-				disabled={checked=false};
-				dependencies={all={checked=true;}};
-				difficulty=1;
-			};
-			{
-				id="TooltipShowBaselineValue";
-				type=K_TEXT;
-				text=function()
-					return _ENCH('GuiValuateBaseline')
-				end;
-				helptext=function()
-					return _ENCH('HelpGuessBaseline')
-				end;
-				callback=function(state)
-					genVarSet('TooltipShowBaselineValue', state.checked);
-				end;
-				feedback=function(state)
-					if (state.checked) then
-						return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessBaseline')));
-					else
-						return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessBaseline')));
-					end
-				end;
-				check=true;
-				default={checked=Enchantrix.Settings.GetDefault('TooltipShowBaselineValue')};
-				disabled={checked=false};
-				dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
-				difficulty=2;
-			};
-			{
-				id="EnchantrixOtherHeader";
-				type=K_HEADER;
-				text=function()
-					return _ENCH('GuiOtherHeader')
-				end;
-				helptext=function()
-					return _ENCH('GuiOtherHelp')
-				end;
-				difficulty=1;
-			};
-			{
-				id="EnchantrixClearAll";
-				type=K_BUTTON;
-				setup={
-					buttonText = function()
-						return _ENCH('GuiClearallButton')
-					end;
-				};
-				text=function()
-					return _ENCH('GuiClearall')
-				end;
-				helptext=function()
-					return _ENCH('GuiClearallHelp')
-				end;
-				callback=function()
-					clear(_ENCH('CmdClearAll'));
-				end;
-				feedback=function()
-					return _ENCH('FrmtActClearall'):format(_ENCH('GuiClearallNote'));
-				end;
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};
-			{
-				id="DefaultAll";
-				type=K_BUTTON;
-				setup={
-					buttonText = function()
-						return _ENCH('GuiDefaultAllButton')
-					end;
-				};
-				text=function()
-					return _ENCH('GuiDefaultAll')
-				end;
-				helptext=function()
-					return _ENCH('GuiDefaultAllHelp')
-				end;
-				callback=function()
-					default(_ENCH('CmdClearAll'));
-				end;
-				feedback=function()
-					return _ENCH('FrmtActDefaultAll');
-				end;
-				dependencies={all={checked=true;}};
-				difficulty=1;
-			};
-			{
-				id="printframe";
-				type=K_PULLDOWN;
-				setup = {
-					options = Enchantrix.Config.GetFrameNames;
-					multiSelect = false;
-				};
-				text=function()
-					return _ENCH('GuiPrintin')
-				end;
-				helptext=function()
-					return _ENCH('HelpPrintin')
-				end;
-				callback=function(state)
-					Enchantrix.Config.SetFrame(state.value);
-				end;
-				feedback=function(state)
-					local _, frameName = Enchantrix.Config.GetFrameNames(state.value)
-					return _ENCH('FrmtPrintin'):format(frameName);
-				end;
-				default = {
-					value=Enchantrix.Config.GetFrameIndex();
-				};
-				disabled = {
-					value=Enchantrix.Config.GetFrameIndex();
-				};
-				dependencies={all={checked=true;}};
-				difficulty=3;
-			};
-			{
-				id="DefaultOption";
-				type=K_EDITBOX;
-				setup = {
-					callOn = {"tab", "escape", "enter"};
-				};
-				text=function()
-					return _ENCH('GuiDefaultOption')
-				end;
-				helptext=function()
-					return _ENCH('HelpDefault')
-				end;
-				callback = function(state)
-					default(state.value);
-				end;
-				feedback = function (state)
-					if (state.value == _ENCH('CmdClearAll')) then
-						return _ENCH('FrmtActDefaultAll');
-					else
-						return _ENCH('FrmtActDefault'):format(state.value);
-					end
-				end;
-				default = {
-					value = "";
-				};
-				disabled = {
-					value = "";
-				};
-				dependencies={all={checked=true;}};
-				difficulty=4;
-			};
-		};
-	};
-
-	Khaos.registerOptionSet("tooltip",optionSet);
-	Enchantrix.State.Khaos_Registered = true;
-	Khaos.refresh();
-
-	return true;
-end
-
-function registerAuctioneerOptions()
-	local insertPos
-	for key, value in ipairs(optionSet.options) do
-		if value.id == "TooltipShowValues" then
-			insertPos = key + 1
-		end
-	end
-
-	if (optionSet.options[insertPos].id == 'TooltipShowAuctValueHSP') then
-		return
-	end
-
-	local AuctioneerOptions = {
-		{
-			id="TooltipShowAuctValueHSP";
-			type=K_TEXT;
-			text=function()
-				return _ENCH('GuiValuateAverages')
-			end;
-			helptext=function()
-				return _ENCH('HelpGuessAuctioneerHsp')
-			end;
-			callback=function(state)
-				genVarSet('TooltipShowAuctValueHSP', state.checked);
-			end;
-			feedback=function(state)
-				if (state.checked) then
-					return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessAuctioneerHsp')));
-				else
-					return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessAuctioneerHsp')));
-				end
-			end;
-			check=true;
-			default={checked = Enchantrix.Settings.GetDefault('TooltipShowAuctValueHSP')};
-			disabled={checked = false};
-			dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
-			difficulty=2;
-		};
-		{
-			id="TooltipShowAuctValueMedian";
-			type=K_TEXT;
-			text=function()
-				return _ENCH('GuiValuateMedian')
-			end;
-			helptext=function()
-				return _ENCH('HelpGuessAuctioneerMedian')
-			end;
-			callback=function(state)
-				genVarSet('TooltipShowAuctValueMedian', state.checked);
-			end;
-			feedback=function(state)
-				if (state.checked) then
-					return (_ENCH('FrmtActEnable'):format(_ENCH('ShowGuessAuctioneerMed')));
-				else
-					return (_ENCH('FrmtActDisable'):format(_ENCH('ShowGuessAuctioneerMed')));
-				end
-			end;
-			check=true;
-			default={checked = Enchantrix.Settings.GetDefault('TooltipShowAuctValueMedian')};
-			disabled={checked = false};
-			dependencies={TooltipShowValues={checked=true;}, all={checked=true;}};
-			difficulty=2;
-		};
-	};
-
-	optionSet.options[insertPos - 1].helptext = function() return _ENCH('HelpValue') end;
-
-	for i, opt in ipairs(AuctioneerOptions) do
-		tinsert(optionSet.options, insertPos + i - 1, opt);
-	end
-
-	Khaos.unregisterOptionSet("Enchantrix");
-	Khaos.registerOptionSet("tooltip", optionSet);
-	Khaos.refresh();
-end
-
 
 function auctioneerLoaded()
 
@@ -610,35 +121,6 @@ function auctioneerLoaded()
 -- that's very, very annoying
 --	EnchantConfig.displayedAuctioneerWarning = nil
 
-	if Enchantrix.State.Khaos_Registered then
-		registerAuctioneerOptions()
-	end
-end
-
-function setKhaosSetKeyParameter(key, parameter, value)
-	if (Enchantrix.State.Khaos_Registered) then
-		if (Khaos.getSetKey("Enchantrix", key)) then
-			Khaos.setSetKeyParameter("Enchantrix", key, parameter, value)
-		else
-			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
-		end
-	end
-end
-
-function setKhaosSetKeyValue(key, value)
-	if (Enchantrix.State.Khaos_Registered) then
-		local kKey = Khaos.getSetKey("Enchantrix", key)
-
-		if (not kKey) then
-			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): key " .. key .. " does not exist")
-		elseif (kKey.checked ~= nil) then
-			Khaos.setSetKeyParameter("Enchantrix", key, "checked", value)
-		elseif (kKey.value ~= nil) then
-			Khaos.setSetKeyParameter("Enchantrix", key, "value", value)
-		else
-			Enchantrix.Util.DebugPrintQuick("setKhaosSetKeyParameter(): don't know how to update key ", key)
-		end
-	end
 end
 
 
@@ -698,7 +180,6 @@ function handleCommand(command, source)
 			Stubby.SetConfig("Enchantrix", "LoadType", param);
 			if (chatprint) then
 				Enchantrix.Util.ChatPrint("Setting Enchantrix to "..param.." load for this toon");
-				setKhaosSetKeyValue("LoadSettings", param)
 			end
 		end
 
@@ -831,7 +312,6 @@ function onOff(state, chatprint)
 	-- Print the change and alert the GUI if the command came from slash commands. Do nothing if they came from the GUI.
 	if (chatprint) then
 		state = Enchantrix.Settings.GetSetting('all')
-		setKhaosSetKeyParameter('all', "checked", state);
 
 		if (state) then
 			Enchantrix.Util.ChatPrint(_ENCH('StatOn'));
@@ -891,16 +371,8 @@ function default(param, chatprint)
 		if (param == "all") then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefaultAll'));
 			Enchantrix.Settings.SetSetting('profile.default', true );
-
-		--[[
-			for k,v in pairs(EnchantConfig.filters) do
-				setKhaosSetKeyValue(k, Enchantrix.Settings.GetSetting(k));
-			end
-		]]
-
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDefault'):format(paramLocalized));
-			setKhaosSetKeyValue(param, Enchantrix.Settings.GetSetting(param));
 		end
 	end
 end
@@ -919,11 +391,8 @@ function genVarSet(variable, param, chatprint)
 	if (chatprint) then
 		if (Enchantrix.Settings.GetSetting(variable)) then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActEnable'):format(Enchantrix.Locale.LocalizeCommand(variable)));
-			setKhaosSetKeyParameter(variable, "checked", true);
-
 		else
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActDisable'):format(Enchantrix.Locale.LocalizeCommand(variable)));
-			setKhaosSetKeyParameter(variable, "checked", false);
 		end
 	end
 end
@@ -1552,9 +1021,4 @@ Enchantrix.Command = {
 
 	HandleCommand			= handleCommand,
 	ChatPrintHelp			= chatPrintHelp,
-
-	Register				= register,
-	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
-	SetKhaosSetKeyParameter	= setKhaosSetKeyParameter,
-	SetKhaosSetKeyValue		= setKhaosSetKeyValue,
 }

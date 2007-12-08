@@ -121,7 +121,6 @@ function setFrame(frame, chatprint)
 
 	if (chatprint == true) then
 		Enchantrix.Util.ChatPrint(_ENCH('FrmtPrintin'):format(frameName));
-		Enchantrix.Command.SetKhaosSetKeyValue("printframe", frameNumber);
 	end
 end
 
@@ -145,7 +144,6 @@ function setLocale(param, chatprint)
 	if chatprint then
 		if validLocale then
 			Enchantrix.Util.ChatPrint(_ENCH('FrmtActSet'):format(_ENCH('CmdLocale'), param))
-			Enchantrix.Command.SetKhaosSetKeyValue('locale', param)
 		else
 			Enchantrix.Util.ChatPrint(_ENCH("FrmtActUnknownLocale"):format(param))
 			local locales = "    "
@@ -154,10 +152,6 @@ function setLocale(param, chatprint)
 			end
 			Enchantrix.Util.ChatPrint(locales)
 		end
-	end
-
-	if (Enchantrix.State.Khaos_Registered) then
-		Khaos.refresh(nil, nil, true)
 	end
 
 	Enchantrix.State.Locale_Changed = true
