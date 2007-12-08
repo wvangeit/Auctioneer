@@ -29,11 +29,10 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "BeanCounter"
-local libType = "Util"
 local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
+local _BC = private.localizations
 
 local function debugPrint(...) 
     if private.getOption("util.beancounter.debugFrames") then
@@ -177,7 +176,7 @@ function private.CreateFrames()
 	base.Config = CreateFrame("Button", nil, base, "OptionsButtonTemplate")
 	base.Config:SetPoint("BOTTOMRIGHT", base, "BOTTOMRIGHT", -10, 10)
 	base.Config:SetScript("OnClick", function() base:Hide() end)
-	base.Config:SetText("Done") --LOCALIZE
+	base.Config:SetText(_BC('UiDone'))
 			
 	--Create the Actual Usable Frame
 	local frame = CreateFrame("Frame", "BeanCounterUiFrame", base)
@@ -191,7 +190,7 @@ function private.CreateFrames()
 	--Add Title to the Top
 	local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("TOPLEFT", frame, "TOPLEFT", 80, -17)
-	title:SetText("BeanCounter: Auction History Database") --LOCALIZE
+	title:SetText(_BC("UiAddonTitle")) 
 
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
@@ -238,11 +237,8 @@ function private.CreateFrames()
 	--help text
 	frame.slot.help = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.slot.help:SetPoint("LEFT", frame.slot, "RIGHT", 2, 7)
-	frame.slot.help:SetText("Drop item into")
-
-	frame.slot.help2 = frame:CreateFontString(nil, "OVERLAY","GameFontNormal")
-	frame.slot.help2:SetPoint("TOP", frame.slot.help, "BOTTOM", 0, 0)
-	frame.slot.help2:SetText("box to search.")
+	frame.slot.help:SetText(_BC('HelpGuiItemBox')) --"Drop item into box to search."
+	frame.slot.help:SetWidth(100)
 			
 	--Select box, used to chooose where the stats comefrom we show server/faction/player/all
 	frame.SelectBoxSetting = {"1","server"}
@@ -250,9 +246,9 @@ function private.CreateFrames()
 		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", private.realmName.." Data"},} --LOCALIZE
+	local vals = {{"server", private.realmName.." ".._BC('UiData')},} --LOCALIZE
 	for name,data in pairs(private.serverData) do 
-		table.insert(vals,{name, name.."'s Data"})
+		table.insert(vals,{name, name.." ".._BC('UiData')})
 	end	
 	
 	frame.selectbox = CreateFrame("Frame", "BeanCounterSelectBox", frame)
@@ -261,7 +257,7 @@ function private.CreateFrames()
 	frame.selectbox.box.element = "selectBox"
 	frame.selectbox.box:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
-	frame.selectbox.box:SetText(private.realmName.." Data")
+	frame.selectbox.box:SetText(private.realmName.." ".._BC('UiData'))
 	
 	--Search box		
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
@@ -321,7 +317,7 @@ function private.CreateFrames()
 	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
 	frame.classicCheck:SetChecked(false)
-	getglobal("BeancounterclassicCheckText"):SetText("Show BC Classic data") --LOACLIZE
+	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
 	frame.classicCheck:Hide()
 	--no need to show this button if theres no classic data to search
@@ -341,20 +337,20 @@ function private.CreateFrames()
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.bidFailedCheck:SetChecked(false)
 	frame.bidFailedCheck:SetScale(0.85)
-	getglobal("BeancounterbidFailedCheckText"):SetText("Outbids") --LOCALIZE
+	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionCheck:SetChecked(true)
-	getglobal("BeancounterauctionCheckText"):SetText(_BC('UIAuctions'))
+	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
 	frame.auctionFailedCheck:SetChecked(false)
 	frame.auctionFailedCheck:SetScale(0.85)
-	getglobal("BeancounterauctionFailedCheckText"):SetText("Failed Auctions") --LOCALIZE
+	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions')) 
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
 	
 	
@@ -393,13 +389,13 @@ function private.CreateFrames()
 		{ _BC('UiBuyTransaction') , "COIN", 60 },
 		{ _BC('UiNetHeader'), "COIN", 65},
 		{ _BC('UiQuantityHeader'), "TEXT", 40},
-		{ "Price/Per", "COIN", 70}, --Needs localization
+		{ _BC('UiPriceper'), "COIN", 70}, 
 		
 		{ "|CFFFFFF00"..Seller.."/|CFF4CE5CC"..Buyer, "TEXT", 90 },
 				
 		{ _BC('UiDepositTransaction'), "COIN", 58 },
-		{ "Fee", "COIN", 50 }, --needs localization
-		{ "Wealth", "COIN", 70 }, --needs localization
+		{ _BC("UiFee"), "COIN", 50 }, 
+		{ _BC('UiWealth'), "COIN", 70 }, 
 		{ _BC('UiDateHeader'), "text", 150 },
 	})
 	
@@ -461,7 +457,7 @@ function private.CreateFrames()
 								
 								table.insert(data,{
 								tbl[1], --itemname
-								"Auc Successful", --status
+								_BC('UiAucSuccessful'), --status
 								 
 								tonumber(tbl[7]) or 0,  --bid
 								tonumber(tbl[6]) or 0,  --buyout
@@ -505,7 +501,7 @@ function private.CreateFrames()
 
 								table.insert(data,{
 								tbl[1], --itemname
-								"Auc Expired", --status
+								_BC('UiAucExpired'), --status
 
 								tonumber(minBid) or 0, --bid
 								tonumber(buyoutPrice) or 0, --buyout
@@ -544,9 +540,9 @@ function private.CreateFrames()
 							if match then
 								local stack, matchedBID = private.reconcileCompletedBids(a, i, tbl[8], tbl[6], tbl[7])
 								local pricePer = 0
-								local text = "Won on Buyout"
+								local text = _BC('UiWononBuyout')
 								if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
-									text = "Won on Bid "
+									text = _BC('UiWononBid')
 									if stack > 0 then	pricePer = tbl[7]/stack end
 									else
 									if stack > 0 then	pricePer = tbl[6]/stack end
@@ -595,7 +591,7 @@ function private.CreateFrames()
 								--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
 								table.insert(data,{
 								tbl[1], --itemname
-								tbl[2], --status
+								tbl[2], --status Should already be a localized text
 
 								tonumber(tbl[3]), --bid
 								0, --buyout
@@ -726,10 +722,10 @@ function private.CreateMailFrames()
 	countdown:SetText("Recording: "..count.." of "..total.." items")
 end
 
---ONLOAD Error frame, used to show missmatched DB versus client errors that stop BC load
+--ONLOAD Error frame, used to show missmatched DB versus client errors that stop BC load NEEDS LOCALIZATION
 function private.CreateErrorFrames()
 	frame = private.frame
-	frame.loadError = CreateFrame("Frame", "BCTEST", UIParent)
+	frame.loadError = CreateFrame("Frame", nil, UIParent)
 	frame.loadError:SetFrameStrata("HIGH")
 	frame.loadError:SetBackdrop({
 		bgFile = "Interface/Tooltips/ChatBubble-Background",
@@ -749,11 +745,11 @@ function private.CreateErrorFrames()
 	frame.loadError.close:SetScript("OnClick", function() frame.loadError:Hide() end)
 	frame.loadError.close:SetText("Ok")
 
-	frame.loadError.text = frame.loadError:CreateFontString("TEXTTEST", "OVERLAY", "GameFontNormal")
+	frame.loadError.text = frame.loadError:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	frame.loadError.text:SetPoint("CENTER", frame.loadError, "CENTER", 0, 0)
 	frame.loadError.text:SetText("Your database has been created \n  with a newer version of BeanCounter \n than the one you are currently using.\n BeanCounter will not load to prevent \n possibly corrupting the saved data.")
 
-	frame.loadError.title = frame.loadError:CreateFontString("TITLETEST", "OVERLAY", "GameFontNormalLarge")
+	frame.loadError.title = frame.loadError:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.loadError.title:SetPoint("CENTER", frame.loadError, "TOP", 0,-15)
 	frame.loadError.title:SetText("|CFFFF0000 BEANCOUNTER WARNING")
 end
@@ -824,11 +820,11 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 					--"time;saleResult;quantity;bid;buyout;netPrice;price;isBuyout;buyerName;sellerId"
 					--"1173571623;1;1;11293;22000;-1500;<nil>;<nil>;<nil>;2"
 					--tbl[2]  0 = sold 1 exp 3 = CANCELED
-					local status = "Auc Successful CL"
+					local status = _BC('UiAucSuccessful').." CL"
 
 					if tbl[2] == "1" then
 						if not settings.failedauction then break end --used to filter Exp auc 
-						status = "Auc Expired CL"
+						status = _BC('UiAucExpired').." CL"
 						tbl[9] = "-"
 					else   
 						if not settings.auction then break end --used to filter comp auc if user only wants expend
@@ -859,7 +855,7 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 							
 					style[#data] = {}
 					style[#data][12] = {["date"] = dateString}
-					if status == "Auc Successful CL" then
+					if status == _BC('UiAucSuccessful').." CL" then
 						style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
 						style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
 					else
@@ -884,11 +880,11 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 					--"1178840165;1;980000;Eruder;1;5",
 					local bid, buyout, status = 0,0,"Invalid data"
 					if tbl[5] == "1" then --is bid
-						status = "Won on Buyout CL"
+						status = _BC('UiWononBuyout').." CL"
 						buyout = tbl[3]
 						bid = 0
 					else
-						status = "Won on Bid CL"
+						status = _BC('UiWononBid').." CL"
 						buyout = 0
 						bid = tbl[3]
 					end

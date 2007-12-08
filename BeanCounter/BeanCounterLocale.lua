@@ -41,7 +41,7 @@ assert(Babylonian, "Babylonian is not installed")
 
 local babylonian = Babylonian(BeanCounterLocalizations)
 
-BeanCounter_CustomLocalizations = {
+local BeanCounter_CustomLocalizations = {
 	['MailAllianceAuctionHouse'] = GetLocale(),
 	['MailAuctionCancelledSubject'] = GetLocale(),
 	['MailAuctionExpiredSubject'] = GetLocale(),
@@ -51,12 +51,13 @@ BeanCounter_CustomLocalizations = {
 	['MailOutbidOnSubject'] = GetLocale(),
 }
 
-function _BC(stringKey, locale)
+function private.localizations(stringKey, locale)
+--locale = "esES"
 	if (locale) then
 		if (type(locale) == "string") then
-			return babylonian(locale, stringKey);
+			return babylonian(locale, stringKey) or stringKey
 		else
-			return babylonian(GetLocale(), stringKey);
+			return babylonian(GetLocale(), stringKey)
 		end
 	elseif (BeanCounter_CustomLocalizations[stringKey]) then
 		return babylonian(BeanCounter_CustomLocalizations[stringKey], stringKey)

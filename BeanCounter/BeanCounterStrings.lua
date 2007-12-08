@@ -1,9 +1,8 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://norganna.org/localizer/
-	URL: http://auctioneeraddon.com/
-	
+	http://localizer.norganna.org/
+
 	AddOn: BeanCounter
 	Revision: $Id$
 	Version: <%version%> (<%codename%>)
@@ -119,35 +118,54 @@ BeanCounterLocalizations = {
 		["MailAuctionWonSubject"]	= "Auktion gewonnen";
 		["MailHordeAuctionHouse"]	= "Auktionshaus der Horde";
 		["MailOutbidOnSubject"]	= "Höheres Gebot für";
+		["MailSalePendingOnSubject"]	= "Ausstehender Verkauf";
 
 		-- Section: User Interface
+		["UiAddonTitle"]	= "BeanCounter: Auktionenverlauf Datenbank";
+		["UiAucExpired"]	= "Auktion abgelaufen";
+		["UiAucSuccessful"]	= "Auktion erfolgreich";
 		["UiAuctions"]	= "Auktionen";
 		["UiAuctionTransaction"]	= "Auktion";
 		["UiBids"]	= "Gebote";
 		["UiBidTransaction"]	= "Gebot";
 		["UiBuyerSellerHeader"]	= "Käufer/Verkäufer";
 		["UiBuyTransaction"]	= "Kaufen";
+		["UiClassicCheckBox"]	= "Zeige klassische BC-Daten";
+		["UiData"]	= "Daten";
 		["UiDateHeader"]	= "Datum";
 		["UiDepositTransaction"]	= "Anzahlung";
+		["UiDone"]	= "Fertig";
 		["UiExactNameSearch"]	= "Genaue Namenssuche";
+		["UiFailedAuctions"]	= "Fehlgeschlagene Auktion";
+		["UiFee"]	= "Gebühr";
 		["UiNameHeader"]	= "Gegenstand";
-		["UiNetHeader"]	= "Netz";
-		["UiNetPerHeader"]	= "Netz pro";
+		["UiNetHeader"]	= "Netto";
+		["UiNetPerHeader"]	= "Netto pro";
+		["UiOutbid"]	= "Überboten";
+		["UiOutbids"]	= "Überboten";
 		["UiPriceHeader"]	= "Preis";
+		["UiPriceper"]	= "Einzelpreis";
 		["UiPricePerHeader"]	= "Preisüberschrift";
 		["UiPurchases"]	= "Einkäufe";
-		["UiQuantityHeader"]	= "Anz";
+		["UiQuantityHeader"]	= "Anz.";
 		["UiSales"]	= "Verkäufe";
 		["UiSearch"]	= "Suche";
 		["UiSearchForLabel"]	= "Suche nach:";
 		["UiSellTransaction"]	= "Verkaufen";
+		["UiServer"]	= "Server";
 		["UiTransactions"]	= "Transaktionen";
 		["UiTransactionsLabel"]	= "Transaktionen:";
 		["UiTransactionTypeHeader"]	= "Typ";
+		["UiWealth"]	= "Vermögen";
+		["UiWononBid"]	= "Gebotskauf";
+		["UiWononBuyout"]	= "Sofortkauf";
 
 	};
 
 	enUS = {
+
+		-- Section: Help Text
+		["HelpGuiItemBox"]	= "Drop item into box to search.";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
@@ -157,21 +175,33 @@ BeanCounterLocalizations = {
 		["MailAuctionWonSubject"]	= "Auction won";
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
 		["MailOutbidOnSubject"]	= "Outbid on";
+		["MailSalePendingOnSubject"]	= "Sale Pending";
 
 		-- Section: User Interface
+		["UiAddonTitle"]	= "BeanCounter: Auction History Database";
+		["UiAucExpired"]	= "Auc Expired";
+		["UiAucSuccessful"]	= "Auc Successful";
 		["UiAuctions"]	= "Auctions";
 		["UiAuctionTransaction"]	= "Auction";
 		["UiBids"]	= "Bids";
 		["UiBidTransaction"]	= "Bid";
 		["UiBuyerSellerHeader"]	= "Buyer/Seller";
 		["UiBuyTransaction"]	= "Buy";
+		["UiClassicCheckBox"]	= "Show BC Classic data.";
+		["UiData"]	= "Data";
 		["UiDateHeader"]	= "Date";
 		["UiDepositTransaction"]	= "Deposit";
+		["UiDone"]	= "Done";
 		["UiExactNameSearch"]	= "Exact name search";
+		["UiFailedAuctions"]	= "Failed Auctions ";
+		["UiFee"]	= "Fee";
 		["UiNameHeader"]	= "Item";
 		["UiNetHeader"]	= "Net";
 		["UiNetPerHeader"]	= "Net Per";
+		["UiOutbid"]	= "Outbid";
+		["UiOutbids"]	= "Outbids";
 		["UiPriceHeader"]	= "Price";
+		["UiPriceper"]	= "Price/Per";
 		["UiPricePerHeader"]	= "Price Header";
 		["UiPurchases"]	= "Purchases";
 		["UiQuantityHeader"]	= "Qty";
@@ -179,9 +209,13 @@ BeanCounterLocalizations = {
 		["UiSearch"]	= "Search";
 		["UiSearchForLabel"]	= "Search for:";
 		["UiSellTransaction"]	= "Sell";
+		["UiServer"]	= "Server";
 		["UiTransactions"]	= "Transactions";
 		["UiTransactionsLabel"]	= "Transactions:";
 		["UiTransactionTypeHeader"]	= "Type";
+		["UiWealth"]	= "Wealth";
+		["UiWononBid"]	= "Won on Bid";
+		["UiWononBuyout"]	= "Won on Buyout";
 
 	};
 

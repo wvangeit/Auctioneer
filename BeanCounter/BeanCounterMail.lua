@@ -29,11 +29,10 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "BeanCounter"
-local libType = "Util"
 local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
+local _BC = private.localizations
 
 local function debugPrint(...) 
     if private.getOption("util.beancounter.debugMail") then
