@@ -994,21 +994,24 @@ BtmScan.Command = function (msg)
 	BtmScan.GetZoneConfig("command")
 
 	local help = false
+	local known = false
 	if (not cmd or cmd == "config" or cmd == "") then
 		BtmScan.Settings.Toggle()
+		known = true
 	elseif (cmd == "load") then
 		if (param == "always") or (param == "never") or (param == "auctionhouse") then
 			Stubby.SetConfig("BtmScan", "LoadType", param)
 			BtmScan.Print(tr("Setting BottomScanner to %1 load for this toon",param))
 		end
+		known = true
 	elseif ((cmd == "end") or (cmd == "stop") or (cmd == "cancel")) then
+		known = true
 		BtmScan.EndScan()
 	elseif ((cmd == "begin") or (cmd == "start") or (cmd == "scan")) then
+		known = true
 		BtmScan.BeginScan()
 	elseif (cmd == "help") then
-		help = true
-	else
-		BtmScan.Print(tr("BottomScanner: %1 [%2]", tr("Unknown command"), cmd))
+		known = true
 		help = true
 	end
 
@@ -1017,9 +1020,15 @@ BtmScan.Command = function (msg)
 		if (name==cmd and valuator.CommandHandler) then
 			valuator.CommandHandler(msg)
 			help=false
+			known = true
 		end
 	end
-
+	
+	if known == false then
+		BtmScan.Print(tr("BottomScanner: %1 [%2]", tr("Unknown command"), cmd))
+		help = true
+	end
+	
 	if (help) then
 		BtmScan.Print(tr("BottomScanner help:"))
 		BtmScan.Print(tr(" %1 [%2]", "config", tr("Opens up the configuration screen")))
