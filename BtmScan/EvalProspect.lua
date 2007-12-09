@@ -84,10 +84,12 @@ function lib:valuate(item, tooltip)
 		local _, _, quality = GetItemInfo(result)
 		if quality == 0 then
 			-- vendor trash (lower level powders)
-			local info = Informant.GetItem(result)
-			local _, powderLink = GetItemInfo(result)
-			if info and info.sell then
-				trashTotal = trashTotal + info.sell * yield
+			-- we need informant to get the vendor prices, if it is missing, use price of zero
+			if Informant then
+				local info = Informant.GetItem(result)
+				if info and info.sell then
+					trashTotal = trashTotal + info.sell * yield
+				end
 			end
 		else
 			-- gem or non-trashy powder
