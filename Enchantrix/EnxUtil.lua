@@ -1016,6 +1016,12 @@ function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 				if (five) then myValue=myValue+five c=c+1 end
 				myValue = myValue / c
 			end
+			
+			-- provide fallbacks in case a valuation is missing
+			-- don't leave a nil value!
+			if (not myValue or myValue == 0) then
+				myValue = hsp or five or mkt or 0;
+			end
 		end
 
 		scanReagentTable[ reagent ] = myValue;
@@ -1037,14 +1043,14 @@ else
 	assert = debug
 end
 
-ENX_CRITICAL = 1
-ENX_ERROR = 2
-ENX_WARNING = 3
-ENX_NOTICE = 4
+ENX_CRITICAL = "Critical"
+ENX_ERROR = "Error"
+ENX_WARNING = "Warning"
+ENX_NOTICE = "Notice"
 -- info will only go to nLog
-ENX_INFO = 5
+ENX_INFO = "Info"
 -- Debug will print to the chat console as well as to nLog
-ENX_DEBUG = 6
+ENX_DEBUG = "Debug"
 
 function Enchantrix.Util.DebugPrint(mType, mLevel, mTitle, ...)
 	-- function libDebugPrint(addon, message, category, title, errorCode, level)
