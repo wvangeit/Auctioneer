@@ -110,6 +110,36 @@ BeanCounterLocalizations = {
 
 	deDE = {
 
+		-- Section: Config Text
+		["C_BeanCounterConfig"]	= "BeanCounter Konfiguration";
+		["C_BeanCounterOptions"]	= "BeanCounter Optionen";
+		["C_DateString"]	= "|CCFFFCC00 Zu verwendendes Datumsformat:";
+		["C_DateStringExample"]	= "|CCFFFCC00 Beispieldatum: 11/28/07 21:34:21";
+		["C_ExtenalSearch"]	= "Externen AddOns die BeanCounter Suche erlauben";
+		["C_MailInvoiceTimeout"]	= "Maileingang Zeitüberschreitung = %d Sekunden";
+		["C_MailRecolor"]	= "Maileinfärbungsmethode";
+
+		-- Section: Generic Strings
+		["NoRe-Color"]	= "Kein einfärben";
+		["off"]	= "aus";
+		["on"]	= "ein";
+		["Re-ColorIcons"]	= "Icons einfärben";
+		["Re-ColorIconsandText"]	= "Icons und Text einfärben";
+		["Re-ColorText"]	= "Text einfärben";
+
+		-- Section: Help Text
+		["A_DateString"]	= "Dies bestimmt, wie das Datum vom GUI BeanCounters angezeigt wird. Befehle werden durch % eingeleitet und mehrfache Befehle und Text können gemischt werden. Z.B. würde %a == %X Mi == 21:34:21 anzeigen";
+		["A_DateStringCommands"]	= "Commands: \n %a = gek. Wochentagsname, \n %A = voller Wochentagsname, \n %b = gek. Monatsname, \n %B = voller Monatsname,\n %c = Datum und Zeit, \n %d = Monatstag (01-31),\n %H = Stunde (24), \n %I = Stunde (12),\n %M = Minute, \n %m = Monat,\n %p = am/pm, \n %S = Sekunde,\n %U = Jahreswochennummer ,\n %w = Nummerischer Wochentag (0-6),\n %x = Datum, \n %X = Zeit,\n %Y = Jahr lang (2007), \n %y = Jahr kurz (07)";
+		["A_ExtenalSearch"]	= "Andere Addons können BeanCounters Suche nutzen, damit ein Item im GUI von BeanCounter angezeigt werden kann. Dies läßt BeanCounter z.B. zeigen, welche Items Sie in Appraiser betrachten";
+		["A_MailInvoiceTimeout"]	= "Die Zeitspanne, die BeanCounter auf eine Antwort des Servers wartet, um auf eine Mailabfrage zu reagieren. Eine Abfrage ist das wer, was, wie von Auktionshausmails.";
+		["A_MailRecolor"]	= "BeanCounter liest alle Mails vom Auktionshaus. Diese Option bestimmt, wie BeanCounter die Anzeige der Mails einfärben soll, um sie als ungelesen darzustellen.";
+		["HelpGuiItemBox"]	= "Ziehe ein Item in die Box für Suche";
+		["Q_DateString"]	= "Anzuwendendes Datumsformat ?";
+		["Q_DateStringCommands"]	= "Gültige Datumsbefehle ?";
+		["Q_ExtenalSearch"]	= "Erlaube externen AddOns die Benutzung von BeanCounter ?";
+		["Q_MailInvoiceTimeout"]	= "Was ist eine Maileingang Zeitüberschreitung ?";
+		["Q_MailRecolor"]	= "Was ist einfärben ?";
+
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Auktionshaus der Allianz";
 		["MailAuctionCancelledSubject"]	= "Auktion abgebrochen";
@@ -119,6 +149,13 @@ BeanCounterLocalizations = {
 		["MailHordeAuctionHouse"]	= "Auktionshaus der Horde";
 		["MailOutbidOnSubject"]	= "Höheres Gebot für";
 		["MailSalePendingOnSubject"]	= "Ausstehender Verkauf";
+
+		-- Section: Tooltip Messages
+		["TTDateString"]	= "Tragen Sie das Format ein, wie Sie das Datum darstellen möchten. Standard ist %c";
+		["TTDateStringExample"]	= "Zeigt ein Beispiel an, wie Ihre Datumsausgabe aussehen wird";
+		["TTExtenalSearch"]	= "Wenn eine Suche in ein anderes AddOn eingetragen wird, zeigt BeanCounter auch eine Suche nach diesem Item an.";
+		["TTMailInvoiceTimeout"]	= "Bestimmt wie lange BeanCounter versucht, eine Mail vom Server zu erhalten, bevor es aufgibt. Tiefer == schneller, aber grössere Wahrscheinlichkeit auf fehlende Daten; Höher == langsamer, verbessert aber die Wahrscheinlichkeit alle Daten zu erhalten, wenn der Mailserver extrem beschäftigt ist.";
+		["TTMailRecolor"]	= "Wählen Sie, wie die Mailanzeige erscheint, nachdem BeanCounter den Briefkasten durchsucht hat.";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auktionenverlauf Datenbank";
@@ -164,8 +201,35 @@ BeanCounterLocalizations = {
 
 	enUS = {
 
+		-- Section: Config Text
+		["C_BeanCounterConfig"]	= "BeanCounter Config";
+		["C_BeanCounterOptions"]	= "BeanCounter options";
+		["C_DateString"]	= "|CCFFFCC00 Date format to use:";
+		["C_DateStringExample"]	= "|CCFFFCC00 Example Date: 11/28/07 21:34:21";
+		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search?";
+		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
+		["C_MailRecolor"]	= "Mail Re-Color Method";
+
+		-- Section: Generic Strings
+		["NoRe-Color"]	= "No Re-Color";
+		["off"]	= "off";
+		["on"]	= "on";
+		["Re-ColorIcons"]	= "Re-Color Icons";
+		["Re-ColorIconsandText"]	= "Re-Color Icons and Text";
+		["Re-ColorText"]	= "Re-Color Text";
+
 		-- Section: Help Text
+		["A_DateString"]	= "This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21";
+		["A_DateStringCommands"]	= "Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = a";
+		["A_ExtenalSearch"]	= "Other addons can have BeanCounter search for an item to be displayed in BeanCounter's GUI. For example this allows BeanCounter to show what items you are looking at in Appraiser";
+		["A_MailInvoiceTimeout"]	= "The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail.";
+		["A_MailRecolor"]	= "BeanCounter reads all mail from the Auction House, This option tells BeanCounter how the user wants to Recolor the messages to make them look unread.";
 		["HelpGuiItemBox"]	= "Drop item into box to search.";
+		["Q_DateString"]	= "Date Format to use?";
+		["Q_DateStringCommands"]	= "Acceptable Date Commands?";
+		["Q_ExtenalSearch"]	= "Allow External Addons to use BeanCounter?";
+		["Q_MailInvoiceTimeout"]	= "What is Mail Invoice Timeout?";
+		["Q_MailRecolor"]	= "What is recolor?";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Alliance Auction House";
@@ -176,6 +240,13 @@ BeanCounterLocalizations = {
 		["MailHordeAuctionHouse"]	= "Horde Auction House";
 		["MailOutbidOnSubject"]	= "Outbid on";
 		["MailSalePendingOnSubject"]	= "Sale Pending";
+
+		-- Section: Tooltip Messages
+		["TTDateString"]	= "Enter the format that you would like your date field to show. Default is %c";
+		["TTDateStringExample"]	= "Displays an example of what your formated date will look like";
+		["TTExtenalSearch"]	= "When entering a search in another addon, BeanCounter will also display a search for that item.";
+		["TTMailInvoiceTimeout"]	= "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.";
+		["TTMailRecolor"]	= "Choose how Mail will appear after BeanCounter has scanned the Mail Box.";
 
 		-- Section: User Interface
 		["UiAddonTitle"]	= "BeanCounter: Auction History Database";

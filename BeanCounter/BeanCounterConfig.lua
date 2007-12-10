@@ -29,14 +29,13 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 --Most of this code is from enchantrix 
-local libName = "BeanCounter"
-local libType = "Util"
 local lib = BeanCounter
 local private = lib.Private
 local print =  BeanCounter.Print
 
 local gui
 local settings
+local _BC = private.localizations
 
 local function debugPrint(...)
     if private.getOption("util.beancounter.debugConfig") then
@@ -341,41 +340,41 @@ function lib.MakeGuiConfig()
 
   	gui:AddCat("BeanCounter")
 	
-	id = gui:AddTab("BeanCounter Config")
+	id = gui:AddTab(_BC('C_BeanCounterConfig')) --"BeanCounter Config")
 	gui:MakeScrollable(id)
-	gui:AddControl(id, "Header",     0,    "BeanCounter options")
-	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, "Mail Invoice Timeout = %d seconds")
-	gui:AddTip(id, "Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy")
-	gui:AddControl(id, "Subhead",    0,    "Mail Re-Color Method")
-	gui:AddControl(id, "Selectbox",  0, 1, {{"off","No Re-Color"},{"icon","Re-Color Icons"},{"both","Re-Color Icons and Text"},{"text","Re-Color Text"}}, "util.beancounter.mailrecolor", "Mail Re-Color Method")
-	gui:AddTip(id, "Choose how Mail will appear after BeanCounter has scanned the Mail Box")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", "Allow External Addons to use BeanCounter's Search?")
-	gui:AddTip(id, "When entering a search in another addon, BeanCounter will also display a search for that item.")
+	gui:AddControl(id, "Header",     0,    _BC('C_BeanCounterOptions')) --"BeanCounter options")
+	gui:AddControl(id, "WideSlider", 0, 1, "util.beacounter.invoicetime",    1, 10, 1, _BC('C_MailInvoiceTimeout')) --"Mail Invoice Timeout = %d seconds")
+	gui:AddTip(id, _BC('TTMailInvoiceTimeout')) --Chooses how long BeanCounter will attempt to get a mail invoice from the server before giving up. Lower == quicker but more chance of missing data, Higher == slower but improves chances of getting data if the Mail server is extremely busy.
+	gui:AddControl(id, "Subhead",    0,    _BC('C_MailRecolor')) --"Mail Re-Color Method")
+	gui:AddControl(id, "Selectbox",  0, 1, {{"off",_BC("NoRe-Color")},{"icon",_BC("Re-ColorIcons")},{"both",_BC("Re-ColorIconsandText")},{"text",_BC("Re-ColorText")}}, "util.beancounter.mailrecolor", _BC("MailRe-ColorMethod"))
+	gui:AddTip(id, _BC('TTMailRecolor')) --"Choose how Mail will appear after BeanCounter has scanned the Mail Box")
+	gui:AddControl(id, "Checkbox",   0, 1, "util.beancounter.externalSearch", _BC('C_ExtenalSearch')) --"Allow External Addons to use BeanCounter's Search?")
+	gui:AddTip(id, _BC('TTExtenalSearch')) --"When entering a search in another addon, BeanCounter will also display a search for that item.")
 	
-	gui:AddControl(id, "Text",       0, 1, "dateString", "|CCFFFCC00Date format to use:")
-	gui:AddTip(id, "Enter the format that you would like your date field to show. Default is %c")
-	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", "|CCFFFCC00Example Date: 11/28/07 21:34:21")
-	gui:AddTip(id, "Displays an example of what your formated date will look like")
+	gui:AddControl(id, "Text",       0, 1, "dateString", _BC('C_DateString')) --"|CCFFFCC00Date format to use:")
+	gui:AddTip(id, _BC('TTDateString'))--"Enter the format that you would like your date field to show. Default is %c")
+	gui:AddControl(id, "Checkbox",   0, 1, "dateStringdisplay", _BC('C_DateStringExample')) --"|CCFFFCC00Example Date: 11/28/07 21:34:21")
+	gui:AddTip(id, _BC('TTDateStringExample'))--"Displays an example of what your formated date will look like")
 	
 	gui:AddHelp(id, "what is invoice",
-		"What is Mail Invoice Timeout?",
-		"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
+		_BC('Q_MailInvoiceTimeout'), --"What is Mail Invoice Timeout?",
+		_BC('A_MailInvoiceTimeout') --"The length of time BeanCounter will wait on the server to respond to an invoice request. A invoice is the who, what, how of an Auction house mail"
 		)
 	gui:AddHelp(id, "what is recolor",
-		"What is Mail Re-Color Method?",
-		"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
+		_BC('Q_MailRecolor'), --"What is Mail Re-Color Method?",
+		_BC('A_MailRecolor') --"BeanCounter reads all mail from the Auction House, This option tells Beancounter how the user want's to Recolor the messages to make them look unread."
 		)
 	gui:AddHelp(id, "what is external",
-		"Allow External Addons to use BeanCounter?",
-		"Other addons can have BeanCounter search for an item to be displayed in BeanCounter's GUI. For example this allows BeanCounter to show what items you are looking at in Appraiser"
+		_BC('Q_ExtenalSearch'), --"Allow External Addons to use BeanCounter?",
+		_BC('A_ExtenalSearch') --"Other addons can have BeanCounter search for an item to be displayed in BeanCounter's GUI. For example this allows BeanCounter to show what items you are looking at in Appraiser"
 		)
 	gui:AddHelp(id, "what is date",
-		"Date Format to use?",
-		"This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21"
+		_BC('Q_DateString'), --"Date Format to use?",
+		_BC('A_DateString') --"This controls how the Date field of BeanCounter's GUI is shown. Commands are prefaced by % and multiple commands and text can be mixed. For example %a == %X would display Wed == 21:34:21"
 		)
 	gui:AddHelp(id, "what is date command",
-			"Acceptable Date Commands?",
-			"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
+			_BC('Q_DateStringCommands'), --"Acceptable Date Commands?",
+			_BC('A_DateStringCommands') --"Commands: \n %a = abr. weekday name, \n %A = weekday name, \n %b = abr. month name, \n %B = month name,\n %c = date and time, \n %d = day of the month (01-31),\n %H = hour (24), \n %I = hour (12),\n %M = minute, \n %m = month,\n %p = am/pm, \n %S = second,\n %U = week number of the year ,\n %w = numerical weekday (0-6),\n %x = date, \n %X = time,\n %Y = full year (2007), \n %y = two-digit year (07)"
 			)			
 	
 	id = gui:AddTab("BeanCounter Debug")

@@ -52,7 +52,7 @@ local BeanCounter_CustomLocalizations = {
 }
 
 function private.localizations(stringKey, locale)
---locale = "esES"
+--locale = "deDE"
 	if (locale) then
 		if (type(locale) == "string") then
 			return babylonian(locale, stringKey) or stringKey

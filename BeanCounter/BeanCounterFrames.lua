@@ -399,7 +399,8 @@ function private.CreateFrames()
 		{ _BC('UiDateHeader'), "text", 150 },
 	})
 	
-	--Lengthen the Column Headers for non English localizations.
+	--[[ADDED THIS FUNCTION TO CONFIGURATOR
+	-Lengthen the Column Headers for non English localizations.
 	function private.resizeScrollSheetColumns()
 		local count = #frame.resultlist.sheet.labels --Number of Columns
 		for i = 1, count do
@@ -410,7 +411,7 @@ function private.CreateFrames()
 			end
 		end
 	end	
-	private.resizeScrollSheetColumns() --Pad column widths to match text lengths
+	private.resizeScrollSheetColumns() --Pad column widths to match text lengths]]
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function frame.getCheckboxSettings()
