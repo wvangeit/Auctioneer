@@ -153,8 +153,18 @@ function lib:valuate(item, tooltip)
 	-- if so, just use the value of the reagent
 	
 	if validReagents[ item.id ] then
+					
+		local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(item.id);
 		
-		local reagentPrice = Enchantrix.Util.GetReagentPrice(item.id);
+		-- if no Auc4 price, use Auc5 price
+		if (not reagentPrice) then
+			reagentPrice = five
+		end
+		
+		-- still nothing, try the baseline (hard coded)
+		if (not reagentPrice) then
+			regentPrice = baseline
+		end
 		
 		-- be safe and handle nil results
 		local adjustment = get(lcName..".PriceAdjust."..item.id) or 0;
@@ -216,7 +226,17 @@ function lib:valuate(item, tooltip)
 				if (result ~= "total") then
 					local resNumber, resQuantity = unpack(resData)
 					
-					local reagentPrice = Enchantrix.Util.GetReagentPrice(result);
+					local reagentPrice, med, baseline, five = Enchantrix.Util.GetReagentPrice(result);
+					
+					-- if no Auc4 price, use Auc5 price
+					if (not reagentPrice) then
+						reagentPrice = five
+					end
+					
+					-- still nothing, try the baseline (hard coded)
+					if (not reagentPrice) then
+						regentPrice = baseline
+					end
 					
 					local resYield = resQuantity / totalNumber;
 					local resPrice = (reagentPrice or 0) * resYield;
