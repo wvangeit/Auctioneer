@@ -102,7 +102,7 @@ define(lcName..'.enable', true)
 --define(lcName..'.profit.min', 20)
 --define(lcName..'.profit.pct', 0)
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	-- TODO: Add extra controls here, eg:

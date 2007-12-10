@@ -161,7 +161,7 @@ define(lcName..'.enable', true)
 define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	
 	gui:AddHelp(id, "what snatch evaluator",
 		"What is the snatch evaluator?",

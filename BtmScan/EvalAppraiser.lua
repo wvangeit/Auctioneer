@@ -259,7 +259,7 @@ define(lcName..'.seen.mincount', 10)
 define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	gui:AddHelp(id, "what appraiser evaluator",
 		"What is the appraiser evaluator?",

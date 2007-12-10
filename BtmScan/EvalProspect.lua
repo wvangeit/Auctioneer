@@ -178,7 +178,7 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")

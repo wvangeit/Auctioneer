@@ -326,7 +326,7 @@ define(lcName..'.PriceAdjust.'..NEXUS, 100)
 
 -- create our UI
 function lib:setup(gui)
-	id = gui:AddTab(libName)
+	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
