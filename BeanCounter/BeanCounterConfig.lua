@@ -133,7 +133,7 @@ local function setter(setting, value)
 		-- Don't save default values
 		value = nil
 	end
-
+	--This is used to do the DateString
 	local a,b = strsplit(".", setting)
 	if (a == "dateString") then --used to update the Config GUI when a user enters a new date string 
 		if not value then value = "%c" end
@@ -142,14 +142,12 @@ local function setter(setting, value)
 			tinsert(tbl, w)
 		end
 		
-		local valid, count = {'a','A','b','B','c','d','H','I','m','M','p','S','U','w','x','X','y', 'Y'} --valid date commands
-		count = #tbl
+		local valid, invalid = {['a']= 1,['A'] =1,['b'] =1,['B'] =1,['c']=1,['d']=1,['H']=1,['I']=1,['m']=1,['M']=1,['p']=1,['S']=1,['U']=1,['w']=1,['x']=1,['X']=1,['y']=1,['Y']=1} --valid date commands
+		
 		for i,v in pairs(tbl) do
-			for ii, vv in pairs(valid) do
-				if v == vv then count = count - 1 break end
-			end
+			 if not valid[v] then  invalid = v break end
 		end
-		if count > 0 then print("Invalid Date Format")  return end --Prevent processing if we have an inalid command
+		if invalid then print("Invalid Date Format", "%"..invalid)  return end --Prevent processing if we have an invalid command
 		
 		local text = gui.elements.dateString:GetText()
 		gui.elements.dateStringdisplay.textEl:SetText("|CCFFFCC00Example Date: "..date(text, 1196303661))
