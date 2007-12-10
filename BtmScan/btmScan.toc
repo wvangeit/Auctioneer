@@ -38,3 +38,4 @@ FilterItemPrice.lua
 FilterTimeLeft.lua
 FilterItemQuality.lua
 EvalEnchantMats.lua
+EvalComparable.lua

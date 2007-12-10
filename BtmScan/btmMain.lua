@@ -1834,6 +1834,16 @@ BtmScan.CreateLogWindow = function()
 	end)
 end
 
+
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib("BtmScan")
+else
+	function debug() end
+	assert = debug
+end
+
 -------------------------------------------------------------------------------
 -- Prints the specified message to nLog.
 --
@@ -1860,7 +1870,13 @@ end
 --                nil, otherwise
 -------------------------------------------------------------------------------
 function BtmScan.DebugPrint(message, category, title, errorCode, level)
-	return DebugLib.DebugPrint(message, category, title, errorCode, level)
+	return debug(message, category, title, errorCode, level)
+end
+
+-- when you just want to print a message and don't care about the rest
+function BtmScan.DebugPrintQuick(...)
+	local message = debug:Dump(...)
+	debug(message)
 end
 
 -------------------------------------------------------------------------------
