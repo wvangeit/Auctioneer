@@ -123,12 +123,16 @@ BtmScan.OnLoad = function ()
 					Stubby.Print("Your command was not understood")
 				end
 			else
-				Stubby.Print("BottomScanner is currently not loaded.")
-				Stubby.Print("  You may load it now by typing |cffffffff/btmscan load|r")
-				Stubby.Print("  You may also set your loading preferences for this character by using the following commands:")
-				Stubby.Print("  |cffffffff/btmscan load auctionhouse|r - BottomScanner will load when you visit the auction house")
-				Stubby.Print("  |cffffffff/btmscan load always|r - BottomScanner will always load for this character")
-				Stubby.Print("  |cffffffff/btmscan load never|r - BottomScanner will never load automatically for this character (you may still load it manually)")
+				if BtmScan and BtmScan.Command then
+					BtmScan.Command(msg)
+				else
+					Stubby.Print("BottomScanner is currently not loaded.")
+					Stubby.Print("  You may load it now by typing |cffffffff/btmscan load|r")
+					Stubby.Print("  You may also set your loading preferences for this character by using the following commands:")
+					Stubby.Print("  |cffffffff/btmscan load auctionhouse|r - BottomScanner will load when you visit the auction house")
+					Stubby.Print("  |cffffffff/btmscan load always|r - BottomScanner will always load for this character")
+					Stubby.Print("  |cffffffff/btmscan load never|r - BottomScanner will never load automatically for this character (you may still load it manually)")
+				end
 			end
 		end
 		SLASH_BTMSCAN1 = "/btm"
