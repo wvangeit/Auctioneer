@@ -163,7 +163,7 @@ function lib:valuate(item, tooltip)
 		
 		-- still nothing, try the baseline (hard coded)
 		if (not reagentPrice) then
-			regentPrice = baseline
+			reagentPrice = baseline
 		end
 		
 		-- be safe and handle nil results
@@ -235,7 +235,7 @@ function lib:valuate(item, tooltip)
 					
 					-- still nothing, try the baseline (hard coded)
 					if (not reagentPrice) then
-						regentPrice = baseline
+						reagentPrice = baseline
 					end
 					
 					local resYield = resQuantity / totalNumber;
