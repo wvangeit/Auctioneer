@@ -178,7 +178,7 @@ function lib.ClearItem(hyperlink, ahKey, realm)
 	if (linkType ~= "item") then
 		return
 	end
-	local ItemString = strjoin(":",itemId,property,enchant)
+	local ItemString = strjoin(":",itemID,property,enchant)
 	if not ahKey then ahKey = AucAdvanced.GetFaction() end
 	ahKey = ahKey:lower()
 	if not realm then realm = GetRealmName() end
