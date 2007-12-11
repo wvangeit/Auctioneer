@@ -634,10 +634,12 @@ function private.CreateFrames()
 		frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
 	end
 	 
-	function private.fragmentsearch(compare, itemName, exact)
-		if exact then 
-			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) --extract item name from itemlink
+	function private.fragmentsearch(compare, itemName, exact, classic)
+		if exact and not classic then 
+			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) or "FAILED ITEM LINK" --extract item name from itemlink 
 			if compare:lower() == itemName:lower() then return true end
+		elseif exact then
+			if compare:lower() == itemName:lower() then return true end --If we are searching older classic data 
 		else
 			local match = (compare:lower():find(itemName:lower(), 1, true) ~= nil)
 			return match
@@ -821,7 +823,7 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 
 				tbl= {strsplit(";", text)}
 				local match = false
-				match = private.fragmentsearch(name, itemName, settings.exact)
+				match = private.fragmentsearch(name, itemName, settings.exact, "classic")
 				if match then
 					--    1    2        3         4       5          6          7           8        9       10
 					--"time;saleResult;quantity;bid;buyout;netPrice;price;isBuyout;buyerName;sellerId"
@@ -880,7 +882,7 @@ function private.classicSearch(data, style, itemName, settings, dateString)
 			for index, text in pairs(v) do
 				tbl= {strsplit(";", text)}
 				local match = false
-				match = private.fragmentsearch(name, itemName, settings.exact)
+				match = private.fragmentsearch(name, itemName, settings.exact, "classic")
 				if match then
 					--    1                 2        3         4       5          6          7           8        9       10
 					--time; quantity;value;seller;isBuyout;buyerId
