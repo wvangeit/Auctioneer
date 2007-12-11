@@ -111,13 +111,13 @@ BeanCounterLocalizations = {
 	deDE = {
 
 		-- Section: Config Text
-		["C_BeanCounterConfig"]	= "BeanCounter Konfiguration";
+		["C_BeanCounterConfig"]	= "BeanCounter Konfig.";
 		["C_BeanCounterOptions"]	= "BeanCounter Optionen";
 		["C_DateString"]	= "|CCFFFCC00 Zu verwendendes Datumsformat:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Beispieldatum: 11/28/07 21:34:21";
+		["C_DateStringExample"]	= "|CCFFFCC00 Beispieldatum:";
 		["C_ExtenalSearch"]	= "Externen AddOns die BeanCounter Suche erlauben";
-		["C_MailInvoiceTimeout"]	= "Maileingang Zeitüberschreitung = %d Sekunden";
-		["C_MailRecolor"]	= "Maileinfärbungsmethode";
+		["C_MailInvoiceTimeout"]	= "Mail-Zeitüberschreitung = %d Sekunden";
+		["C_MailRecolor"]	= "Mail einfärben";
 
 		-- Section: Generic Strings
 		["NoRe-Color"]	= "Kein einfärben";
@@ -136,9 +136,9 @@ BeanCounterLocalizations = {
 		["HelpGuiItemBox"]	= "Ziehe ein Item in die Box für Suche";
 		["Q_DateString"]	= "Anzuwendendes Datumsformat ?";
 		["Q_DateStringCommands"]	= "Gültige Datumsbefehle ?";
-		["Q_ExtenalSearch"]	= "Erlaube externen AddOns die Benutzung von BeanCounter ?";
-		["Q_MailInvoiceTimeout"]	= "Was ist eine Maileingang Zeitüberschreitung ?";
-		["Q_MailRecolor"]	= "Was ist einfärben ?";
+		["Q_ExtenalSearch"]	= "Erlaube ext. AddOns die Benutzung von BeanCounter ?";
+		["Q_MailInvoiceTimeout"]	= "Was ist eine Mail-Zeitüberschreitung ?";
+		["Q_MailRecolor"]	= "Was ist Mail einfärben ?";
 
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Auktionshaus der Allianz";
@@ -205,7 +205,7 @@ BeanCounterLocalizations = {
 		["C_BeanCounterConfig"]	= "BeanCounter Config";
 		["C_BeanCounterOptions"]	= "BeanCounter options";
 		["C_DateString"]	= "|CCFFFCC00 Date format to use:";
-		["C_DateStringExample"]	= "|CCFFFCC00 Example Date: 11/28/07 21:34:21";
+		["C_DateStringExample"]	= "|CCFFFCC00 Example Date:";
 		["C_ExtenalSearch"]	= "Allow External Addons to use BeanCounter's Search?";
 		["C_MailInvoiceTimeout"]	= "Mail Invoice Timeout = %d seconds";
 		["C_MailRecolor"]	= "Mail Re-Color Method";
