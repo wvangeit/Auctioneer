@@ -1530,7 +1530,7 @@ BtmScan.IgnorePurchaseModule = function()
 	if (not item.itemconfig.ignoreModuleList) then
 		item.itemconfig.ignoreModuleList=item.reason
 	else
-		item.itemconfig.ignoreModuleList=item.itemconfig.ignoreModuleList..";"..item.reason
+		item.itemconfig.ignoreModuleList=item.itemconfig.ignoreModuleList..","..item.reason
 	end
 	BtmScan.Print(tr("BottomScanner will now %1 %2 for module %3", tr("ignore"), item.link,item.reason))
 	BtmScan.scanStage = 2
