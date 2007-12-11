@@ -310,13 +310,15 @@ function private.CreateFrames()
 	
 	--Check boxes to narrow our search
 	frame.exactCheck = CreateFrame("CheckButton", "BeancounterexactCheck", frame, "OptionsCheckButtonTemplate")
-	frame.exactCheck:SetChecked(false)
+	frame.exactCheck:SetChecked(private.getOption("util.beancounter.ButtonExactCheck")) --get the last used checked/unchecked value Then use below script to store state changes
+	frame.exactCheck:SetScript("OnClick", function() local set if frame.exactCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonExactCheck", set) end)
 	getglobal("BeancounterexactCheckText"):SetText(_BC('UiExactNameSearch'))
 	frame.exactCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -217)
 
 	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
-	frame.classicCheck:SetChecked(false)
+	frame.classicCheck:SetChecked(private.getOption("util.beancounter.ButtonClassicCheck"))
+	frame.classicCheck:SetScript("OnClick", function() local set if frame.classicCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonClassicCheck", set) end)
 	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
 	frame.classicCheck:Hide()
@@ -329,26 +331,30 @@ function private.CreateFrames()
 	
 	--search bids
 	frame.bidCheck = CreateFrame("CheckButton", "BeancounterbidCheck", frame, "OptionsCheckButtonTemplate")
-	frame.bidCheck:SetChecked(true)
+	frame.bidCheck:SetChecked(private.getOption("util.beancounter.ButtonBidCheck"))
+	frame.bidCheck:SetScript("OnClick", function() local set if frame.bidCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonBidCheck", set) end)
 	getglobal("BeancounterbidCheckText"):SetText(_BC('UiBids'))
 	frame.bidCheck:SetScale(0.85)
 	frame.bidCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -335)
 	
 	frame.bidFailedCheck = CreateFrame("CheckButton", "BeancounterbidFailedCheck", frame, "OptionsCheckButtonTemplate")
-	frame.bidFailedCheck:SetChecked(false)
+	frame.bidFailedCheck:SetChecked(private.getOption("util.beancounter.ButtonBidFailedCheck"))
+	frame.bidFailedCheck:SetScript("OnClick", function() local set if frame.bidFailedCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonBidFailedCheck", set) end)
 	frame.bidFailedCheck:SetScale(0.85)
 	getglobal("BeancounterbidFailedCheckText"):SetText(_BC('UiOutbids'))
 	frame.bidFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -435)
 	
 	--search Auctions
 	frame.auctionCheck = CreateFrame("CheckButton", "BeancounterauctionCheck", frame, "OptionsCheckButtonTemplate")
-	frame.auctionCheck:SetChecked(true)
+	frame.auctionCheck:SetChecked(private.getOption("util.beancounter.ButtonAuctionCheck"))
+	frame.auctionCheck:SetScript("OnClick", function() local set if frame.auctionCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonAuctionCheck", set) end)
 	getglobal("BeancounterauctionCheckText"):SetText(_BC('UiAuctions'))
 	frame.auctionCheck:SetScale(0.85)
 	frame.auctionCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -360)
 	
 	frame.auctionFailedCheck = CreateFrame("CheckButton", "BeancounterauctionFailedCheck", frame, "OptionsCheckButtonTemplate")
-	frame.auctionFailedCheck:SetChecked(false)
+	frame.auctionFailedCheck:SetChecked(private.getOption("util.beancounter.ButtonAuctionFailedCheck"))
+	frame.auctionFailedCheck:SetScript("OnClick", function() local set if frame.auctionFailedCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonAuctionFailedCheck", set) end)
 	frame.auctionFailedCheck:SetScale(0.85)
 	getglobal("BeancounterauctionFailedCheckText"):SetText(_BC('UiFailedAuctions')) 
 	frame.auctionFailedCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 25, -460)
@@ -396,7 +402,7 @@ function private.CreateFrames()
 		{ _BC('UiDepositTransaction'), "COIN", 58 },
 		{ _BC("UiFee"), "COIN", 50 }, 
 		{ _BC('UiWealth'), "COIN", 70 }, 
-		{ _BC('UiDateHeader'), "text", 150 },
+		{ _BC('UiDateHeader'), "text", 250 },
 	})
 	
 	--[[ADDED THIS FUNCTION TO CONFIGURATOR

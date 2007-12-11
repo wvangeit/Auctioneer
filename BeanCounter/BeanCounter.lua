@@ -203,7 +203,9 @@ end
 function private.getOption(option)
 	return lib.GetSetting(option)
 end
-
+function private.setOption(...)
+	return lib.SetSetting(...)
+end
 
 --[[Sidebar Section]]--
 local sideIcon

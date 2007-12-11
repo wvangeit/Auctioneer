@@ -79,6 +79,13 @@ end
 
 -- Default setting values
 private.settingDefaults = {
+	["util.beancounter.ButtonExactCheck"] = false,
+	["util.beancounter.ButtonClassicCheck"] = false,
+	["util.beancounter.ButtonBidCheck"] = false,
+	["util.beancounter.ButtonBidFailedCheck"] = false,
+	["util.beancounter.ButtonAuctionCheck"] = false,
+	["util.beancounter.ButtonAuctionFailedCheck"] = false,	
+
 	["util.beancounter.activated"] = true,
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
