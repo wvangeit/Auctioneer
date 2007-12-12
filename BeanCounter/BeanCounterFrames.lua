@@ -655,6 +655,11 @@ function private.CreateFrames()
 		frame.resultlist.sheet:SetData(data, style)
 		frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 		frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
+		--If the user has scrolled to far and search is not showing scroll back to starting position
+		if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
+			frame.resultlist.sheet.panel:ScrollToCoords(0,0)
+		end
+		
 	end
 	 
 	function private.fragmentsearch(compare, itemName, exact, classic)
