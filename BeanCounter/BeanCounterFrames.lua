@@ -389,11 +389,14 @@ function private.CreateFrames()
 	function BeanCounter.OnEnter(button, row, index)
 		--print("row",row, "index", index)
 		--print(frame.resultlist.sheet.rows[row][index]:GetText())
-		local link = frame.resultlist.sheet.rows[row][index]:GetText()
+		local link, name
+		link = frame.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
+		if link:match("^(|c%x+|H.+|h%[.+%])") then
+			name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
+		end
 		GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 		if frame.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
-			if link then
-				local name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
+			if link and name then
 				GameTooltip:SetHyperlink(link)
 				if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
 			else
