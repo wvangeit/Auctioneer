@@ -811,9 +811,6 @@ end
 function Enchantrix.Util.JewelCraftSkillRequiredForItem(link)
 	local item = getItemIdFromLink(link);
 	local minLevel = Enchantrix.Constants.ProspectMinLevels[item];
-	if (not minLevel) then
-		Enchantrix.Util.DebugPrintQuick("Failed to get min level for prospect item", link, item );
-	end
 	return minLevel;
 end
 
