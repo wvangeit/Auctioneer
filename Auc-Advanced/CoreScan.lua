@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Auctioneer Advanced
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -434,23 +434,66 @@ function lib.GetScanData(faction, realmName)
 	return AucScanData.scans[realmName][faction], idList
 end
 
-function lib.Commit(wasIncomplete, wasGetAll)
-	local inscount, delcount = 0, 0
-	if not private.curScan then return end
-	if not private.curQuery then return end
-	local scandata, idList = lib.GetScanData()
-	local now = time()
+local Commitprogressbar = CreateFrame("STATUSBAR", "$parentHealthBar",UIParent, "TextStatusBar")
+Commitprogressbar:SetWidth(200)
+Commitprogressbar:SetHeight(20)
+Commitprogressbar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 150)
+Commitprogressbar:SetBackdrop({
+  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
+  tile=1, tileSize=10, edgeSize=10, 
+  insets={left=3, right=3, top=3, bottom=3}
+})
 
+Commitprogressbar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+Commitprogressbar:SetStatusBarColor(0.6,0,0,0.4)
+Commitprogressbar:SetMinMaxValues(0,100)
+Commitprogressbar:SetValue(50)
+Commitprogressbar:Hide()
+
+Commitprogressbar.text = Commitprogressbar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+Commitprogressbar.text:SetPoint("CENTER", Commitprogressbar, "CENTER")
+Commitprogressbar.text:SetJustifyH("CENTER")
+Commitprogressbar.text:SetJustifyV("CENTER")
+Commitprogressbar.text:SetText("AucAdv: Processing")
+Commitprogressbar.text:SetTextColor(1,1,1)
+
+local CommitRunning = false
+Commitfunction = function(wasIncomplete, wasGetAll)
+	local ProcessSpeed = AucAdvanced.Settings.GetSetting("scancommit.speed")
+	local inscount, delcount = 0, 0
+	if not private.curScan then CommitRunning = false return end
+	if not private.curQuery then CommitRunning = false return end
+	CommitRunning = true
+	local scandata, idList = lib.GetScanData()
+	
+	--create local copies of private.curScan and private.curQuery, so they are available for use 
+	local TempcurScan = {}
+	TempcurScan, private.curScan = private.curScan, TempcurScan
+	local TempcurQuery = {}
+	TempcurQuery, private.curQuery = private.curQuery ,TempcurQuery
+	local now = time()
+	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
+		Commitprogressbar:Show()
+		Commitprogressbar:SetValue(0)
+	end
+	local totali = 2*(#scandata.image) + #TempcurScan
+	
 	local list, link, flag
 	local lut = acquire()
 
 	-- Mark all matching auctions as DIRTY, and build a LookUpTable
 	local dirtyCount = 0
+	local i = 0
 	for pos, data in ipairs(scandata.image) do
 		link = data[Const.LINK]
-
+		i = i + 1
+		if i % (ProcessSpeed*100) == 0 then
+			Commitprogressbar:SetValue(100*i/totali)
+			coroutine.yield()
+		end
 		if link then
-			if private.IsInQuery(private.curQuery, data) then
+			if private.IsInQuery(TempcurQuery, data) then
 				-- Mark dirty
 				flag = data[Const.FLAG] or 0
 				data[Const.FLAG] = bit.bor(flag, Const.FLAG_DIRTY)
@@ -476,11 +519,16 @@ function lib.Commit(wasIncomplete, wasGetAll)
 
 	local itemPos
 	local oldCount = #scandata.image
-	local scanCount = #private.curScan
+	local scanCount = #TempcurScan
 	local updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0
-
+	
 	processStats("begin")
-	for index, data in ipairs(private.curScan) do
+	for index, data in ipairs(TempcurScan) do
+		i = i + 1
+		if i % (ProcessSpeed*10) == 0 then
+			Commitprogressbar:SetValue(100*i/totali)
+			coroutine.yield()
+		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
 		data[Const.FLAG] = bit.band(data[Const.FLAG] or 0, bit.bnot(Const.FLAG_DIRTY))
 		data[Const.FLAG] = bit.band(data[Const.FLAG], bit.bnot(Const.FLAG_UNSEEN))
@@ -520,6 +568,11 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	local data, flag
 	for pos = #scandata.image, 1, -1 do
 		data = scandata.image[pos]
+		i = i + 1
+		if i % (ProcessSpeed*100) == 0 then
+			Commitprogressbar:SetValue(100*i/totali)
+			coroutine.yield()
+		end
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
 			local stillpossible = false
 			local auctionmaxtime = Const.AucMaxTimes[data[Const.TLEFT]] or 172800
@@ -529,7 +582,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			end
 			if wasGetAll then
 				stillpossible = false
-			elseif #private.curScan <= 50 and not wasIncomplete then
+			elseif #TempcurScan <= 50 and not wasIncomplete then
 				stillpossible = false
 			end
 
@@ -556,6 +609,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 			end
 		end
 	end
+	Commitprogressbar:SetValue(100)
 	processStats("complete")
 
 	local filterCount = private.filteredCount
@@ -576,7 +630,6 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
 	scanTimeMins = mod(scanTimeMins, 60)
-
 	--Hides the end of scan summary if user is not interested
 	if private.getOption("scandata.summary") then
 		if (wasIncomplete) then
@@ -639,19 +692,13 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	scandata.scanstats[0].ended = GetTime()
 	scandata.scanstats[0].elapsed = GetTime() - private.scanStarted - private.totalPaused
 
-	scandata.scanstats[0].query = clone(private.curQuery)
+	scandata.scanstats[0].query = clone(TempcurQuery)
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
 
-	private.scanStartTime = nil
-	private.scanStarted = nil
-	private.totalPaused = nil
-	private.curQuerySig = nil
 	private.filteredCount = 0
-
-	recycle(private, "curQuery")
-	recycle(private, "curScan")
-	recycle(private, "curPages")
+	recycle(TempcurScan)
+	recycle(TempcurQuery)
 
 	-- Tell everyone that our stats are updated
 	for system, systemMods in pairs(AucAdvanced.Modules) do
@@ -663,8 +710,30 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	end
 
 	--Hide the progress indicator
+	Commitprogressbar:Hide()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
+	CommitRunning = false 
+	if not private.curScan or #private.curScan == 0 then
+		private.ResetAll()
+	end
+end
+
+local CoCommit = coroutine.create(Commitfunction)
+
+function lib.Commit(wasIncomplete, wasGetAll)
+	if coroutine.status(CoCommit) ~= "dead" then
+		coroutine.resume(CoCommit, wasIncomplete, wasGetAll)
+	else
+		CoCommit = coroutine.create(Commitfunction)
+		coroutine.resume(CoCommit, wasIncomplete, wasGetAll)
+	end
+end
+
+function lib.LogoutCommit()
+	while coroutine.status(CoCommit) == "suspended" do
+		coroutine.resume(CoCommit)
+	end
 end
 
 function private.QuerySent(query, isSearch, isNavigate, ...)
@@ -1019,9 +1088,18 @@ function lib.SetPaused(pause)
 		private.isPaused = false
 	end
 end
-
 private.unexpectedClose = false
+local flip, flop = false, false
 function private.OnUpdate(me, dur)
+	if coroutine.status(CoCommit) == "suspended" then
+		flip = not flip
+		if flip then
+			flop = not flop
+			if flop then
+				coroutine.resume(CoCommit)
+			end
+		end
+	end
 	if not AuctionFrame then return end
 	if private.isPaused then return end
 
@@ -1099,6 +1177,18 @@ function lib.Abort()
 end
 
 function private.ResetAll()
+	if CommitRunning then
+		recycle(private, "curQuery")
+		recycle(private, "curScan")
+	
+		private.curPage = 0
+		private.isPaused = nil
+		private.sentQuery = nil
+		private.isScanning = false
+		private.unexpectedClose = false
+		private.UpdateScanProgress(false)
+		return
+	end
 	private.scanStartTime = nil
 	private.scanStarted = nil
 	private.totalPaused = nil

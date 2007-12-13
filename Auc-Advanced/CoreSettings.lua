@@ -111,6 +111,8 @@ local settingDefaults = {
 	['scandata.force'] = false,
 	['scandata.summary'] = true,
 	['clickhook.enable'] = true,
+	['scancommit.speed'] = 20,
+	['scancommit.progressbar'] = true,
 }
 
 local function getDefault(setting)
@@ -374,6 +376,12 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "clickhook.enable", "Enable searching click-hooks")
 	gui:AddTip(id, "Enables the click-hooks for searching")
 	
+	gui:AddControl(id, "Slider",     0, 1, "scancommit.speed", 1, 100, 1, "Processing priority: %d")
+	gui:AddTip(id, "Sets the processing priority of the scan data. Higher values take less time, but cause more lag")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
+	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
+	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
 		"The scan data tooltip is a line that appears in your tooltip that informs you how many of the current item have been seen in the auctionhouse image.")
@@ -392,7 +400,10 @@ function lib.MakeGuiConfig()
 	gui:AddHelp(id, "what is clickhook",
 		"What are the click-hooks?",
 		"The click-hooks let you perform a search for an item either by Alt-rightclicking the item in your bags, or by Alt-clicking an itemlink in the chat pane.")
-		
+	gui:AddHelp(id, "what is priority",
+		"What is the Processing Priority?",
+		"The Processing Priority sets the speed to process the data at the end of the scan. Lower values will take longer, but will let you move around more easily.  Higher values will take less time, but may cause jitter.  Updated data will not be available until processing is complete.")
+	
   	gui:AddCat("Stat Modules")
   	gui:AddCat("Filter Modules")
   	gui:AddCat("Match Modules")
