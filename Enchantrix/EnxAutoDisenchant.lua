@@ -113,10 +113,11 @@ local function getDisenchantOrProspectValue(link, count)
 	if quality >= 2 then
 		local enchSkillRequired = Enchantrix.Util.DisenchantSkillRequiredForItemLevel(level, quality)
 		if enchSkillRequired and Enchantrix.Util.GetUserEnchantingSkill() >= enchSkillRequired then
-			local hsp, median, market, valFive = Enchantrix.Storage.GetItemDisenchantTotals(link)
+			local hsp, median, baseline, valFive = Enchantrix.Storage.GetItemDisenchantTotals(link)
 			if (not hsp) or (hsp == 0) then
 				-- what to do when Auc4 isn't loaded, but Auc5 is
-				hsp = valFive;
+				-- or when you have no data for mat prices
+				hsp = valFive or baseline;
 			end
 			if hsp and hsp > 0 then
 				return hsp, _ENCH('ArgSpellname')
@@ -129,10 +130,11 @@ local function getDisenchantOrProspectValue(link, count)
 			if prospect then
 				local prospectValue = 0
 				for result, yield in pairs(prospect) do
-					local hsp, median, market, valFive = Enchantrix.Util.GetReagentPrice(result)
+					local hsp, median, baseline, valFive = Enchantrix.Util.GetReagentPrice(result)
 					if (not hsp) or (hsp == 0) then
 						-- what to do when Auc4 isn't loaded, but Auc5 is
-						hsp = valFive;
+						-- or when you have no data for mat prices
+						hsp = valFive or baseline;
 					end
 					local value = (hsp or 0) * yield
 					prospectValue = prospectValue + value
