@@ -40,7 +40,7 @@
 ]]
 
 -- If auctioneer is not loaded, then we cannot run.
-if not (AucAdvanced) then return end
+if not (AucAdvanced and AucAdvanced.Modules.Util.Appraiser) then return end
 
 local libName = "Appraiser"
 local lcName = libName:lower()
