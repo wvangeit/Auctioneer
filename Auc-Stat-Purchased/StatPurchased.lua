@@ -132,6 +132,10 @@ end
 lib.Private = private
 
 function lib.GetPrice(hyperlink, faction, realm)
+	if (not faction) or (faction == AucAdvanced.GetFaction()) then
+		faction = AucAdvanced.GetFactionGroup()
+	end
+	realm = realm or GetRealmName()
 	local data = private.GetPriceData(faction, realm)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
@@ -165,10 +169,8 @@ local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
 	-- Clean out the old array
 	while (#array > 0) do table.remove(array) end
-
 	-- Get our statistics
 	local dayAverage, avg3, avg7, avg14, _, dayTotal, dayCount, seenDays, seenCount = lib.GetPrice(hyperlink, faction, realm)
-
 	-- These 2 are the ones that most algorithms will look for
 	array.price = avg3 or dayAverage
 	array.seen = seenCount
