@@ -40,7 +40,7 @@
 ]]
 
 -- If auctioneer is not loaded, then we cannot run.
-if not (AucAdvanced and AucAdvanced.Modules.Util.Appraiser) then return end
+if not (AucAdvanced or (Auctioneer and Auctioneer.Statistic)) then return end
 
 local libName = "Appraiser"
 local lcName = libName:lower()
@@ -52,35 +52,20 @@ local set = BtmScan.Settings.SetSetting
 
 BtmScan.evaluators[lcName] = lib
 
-function lib:valuate(item, tooltip)
-	local price = 0
 
-	-- If we're not enabled, scadaddle!
-	if (not get(lcName..".enable")) then return end
 
-	-- If this item is not good enough, forget about it.
-	if (get(lcName..".quality.check")) then
-		if (item.qual < get(lcName..".quality.min")) then
-			item:info("Abort: Quality < min")
-			return
-		end
+function lib.GetAppraiserValue(itemLink, defaultOnly)
+	-- itemLink is a link
+	-- defaultOnly is whether to only use default prices or not (ie. whether to ignore fixed values, etc)
+	
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
+	local sig = tostring(id)
+	local link=itemLink
+	
+	if not sig then 
+		return 0, 0, 0, "Unknown" 
 	end
-
-	-- Valuate this item
 	
-	-- debug to see what's in the item!
-	--for k,v in pairs(item) do 
-	--	AucAdvanced.Print("Link:"..k.."-"..tostring(v))
-	--end
-	
-	-- Largely ripped from AprFrame.lua
-	-- We deliberate want to value it exactly the same as what we'd sell it at by default
-	
-	-- these locals are to keep the naming conventions as close to those is Aprframe as possible.
-	-- cause the item["sig"] we have here doesn't match the one in Aprframe but id does.
-	-- this'll let us largely transplant any Aprframe code changes easily
-	local link = item["link"]
-	local sig = item["id"]
 	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
 	local curModelText = curModel
 
@@ -97,16 +82,26 @@ function lib:valuate(item, tooltip)
 		end
 		curModelText = curModelText.."("..curModel..")"
 	end
-	item:info("Pricing Model:"..curModelText)
-	
+
+	local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+	local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match")
+	if curMatch == nil then
+		curMatch = defMatch
+	end
+	local match = (curMatch == "on")
+		
 	local newBuy, newBid, seen
 	if curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
+		seen = 99
 	elseif curModel == "market" then
 		newBuy, seen = AucAdvanced.API.GetMarketValue(link)
 	else
 		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
+	end
+	if match then
+		newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(link, curModel)
 	end
 
 	if curModel ~= "fixed" then
@@ -137,15 +132,61 @@ function lib:valuate(item, tooltip)
 		end
 	end
 
-	newBid = math.floor((newBid or 0) + 0.5)
-	newBuy = math.floor((newBuy or 0) + 0.5)
-
-	item:info("Estimated Bid: "..item.count.." x",newBid)
-	item:info("Estimated Buy: "..item.count.." x",newBuy)
-	
 	-- Ok, market price is the Bid price, not the buyout. This makes it very conservative, but allows you to use your other settings better and is safer for beginners.
-	local market = newBid
+	
+	return newBid, newBuy, seen, curModelText
+end
 
+function lib:valuate(item, tooltip)
+	local price = 0
+
+	-- If we're not enabled, scadaddle!
+	if (not get(lcName..".enable")) then return end
+
+	-- If this item is not good enough, forget about it.
+	if (get(lcName..".quality.check")) then
+		if (item.qual < get(lcName..".quality.min")) then
+			item:info("Abort: Quality < min")
+			return
+		end
+	end
+
+	-- Valuate this item
+	if not AucAdvanced then
+		-- Auctioneer Classic
+		local market, seen
+		local useFour = get(lcName..".auct.usefour")
+		local useHSP = get(lcName..".auct.usehsp")
+		if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
+			local _, itemId, enchant, _, _, _, _, property, _ = strsplit(":", item.link)
+			local auctKey = strjoin(":",itemId,property,enchant)
+			if (AucAdvanced and useFour) or not AucAdvanced then
+				if (useHSP) then
+					market, seen = Auctioneer.Statistic.GetHSP(auctKey)
+					curModelText = "Classic HSP"
+				end
+				if not market then
+					market, seen = Auctioneer.Statistic.GetUsableMedian(auctKey)
+					curModelText = "Classic Median"
+				end
+			end
+		end
+	elseif (AucAdvanced and not AucAdvanced.Modules.Util.Appraiser) then -- Auctioneer Advanced without Appraiser
+		market, seen = AucAdvanced.API.GetMarketValue(item.link)
+		curModelText = "Market"
+	else -- Auctioneer Advanced with Appraiser
+		newBid, newBuy, seen, curModelText = lib.GetAppraiserValue(item.link)
+		
+		newBid = math.floor((newBid or 0) + 0.5)
+		newBuy = math.floor((newBuy or 0) + 0.5)
+
+		item:info("Estimated Bid: "..item.count.." x",newBid)
+		item:info("Estimated Buy: "..item.count.." x",newBuy)
+		
+		market = newBid
+	end
+	item:info("Pricing Model:"..curModelText)
+	
 	-- If we don't know what it's worth, then there's not much we can do
 	if not market then return end
 	market = market * item.count
@@ -263,7 +304,8 @@ function lib:setup(gui)
 	gui:MakeScrollable(id)
 	gui:AddHelp(id, "what appraiser evaluator",
 		"What is the appraiser evaluator?",
-	"This Evaluator uses your Appraiser settings to value items."..
+	"If you are using Auctioneer Advanced and Appraiser this Evaluator uses your Appraiser settings to value items."..
+	"\nOtherwise it will use the standard pricing schemes that you do have installed."..
 	"\nFor most items it will use whatever your default Pricing model is, falling back to your alternate model when the default has no value."..
 	"\nIf you have fixed values for some items or another pricing model selected for an item then it will use those instead."..
 	"\nIt takes the markdown percentage you have set into account as well and values things at your Bid price."..
@@ -273,11 +315,19 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
-	local defModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-	local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)
-	gui:AddControl(id, "Note",             0, 0, 400, 50, "This Evaluator bases prices on your Appraiser settings."..
-	    "\nWhen you logged on your default pricing plan was: "..defModel..
-	    "\nYour bid price was set to "..markdown.."% of your Buyout price.")
+	local note
+	if not AucAdvanced then
+		note = "You are using Auctioneer Classic for pricing."
+	elseif AucAdvanced.Modules.Util.Appraiser then
+		local defModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
+		local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)
+		note = "You are using Auctioneer Advanced and Appraiser."..
+	    	"\nWhen you logged on your default pricing plan was: "..defModel
+	else
+	    note = "You are using Auctioneer Advanced without Appraiser."..
+	    	"\nUsing market price for evaluations."
+	end
+	gui:AddControl(id, "Note",             0, 0, 400, 50, note)
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".quality.check", "Enable quality checking:")
