@@ -454,7 +454,7 @@ function private.CreateFrames()
 	local style = {}
 	local tbl = {}
 	local dateString = "%c"
-	function private.startSearch(itemName, settings, itemTexture)
+	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryOnly is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		local _  --Cause I fear the norgjira  ;)
@@ -647,19 +647,23 @@ function private.CreateFrames()
 				end
 			end
 		end
-	--BC CLASSIC DATA SEARCH	
-	if settings.classic then
-		data, style = private.classicSearch(data, style, itemName, settings, dateString)
-	end
-	
-		frame.resultlist.sheet:SetData(data, style)
-		frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
-		frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
-		--If the user has scrolled to far and search is not showing scroll back to starting position
-		if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
-			frame.resultlist.sheet.panel:ScrollToCoords(0,0)
+		--BC CLASSIC DATA SEARCH	
+		if settings.classic then
+			data, style = private.classicSearch(data, style, itemName, settings, dateString)
 		end
-		
+	
+		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
+			frame.resultlist.sheet:SetData(data, style)
+			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
+			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
+			--If the user has scrolled to far and search is not showing scroll back to starting position
+			if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
+				frame.resultlist.sheet.panel:ScrollToCoords(0,0)
+			end
+		else --Ok this is an external addon wanting the results of a beancounter search
+			return(data)
+		end
+				
 	end
 	 
 	function private.fragmentsearch(compare, itemName, exact, classic)
