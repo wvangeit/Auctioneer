@@ -90,7 +90,7 @@ function lib.GetAppraiserValue(itemLink, defaultOnly)
 	end
 	local match = (curMatch == "on")
 		
-	local newBuy, newBid, seen
+	local newBuy, newBid, seen, __, DiffFromModel
 	if curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
@@ -139,6 +139,7 @@ end
 
 function lib:valuate(item, tooltip)
 	local price = 0
+	local curModelText = "Unknown"
 
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
@@ -151,10 +152,10 @@ function lib:valuate(item, tooltip)
 		end
 	end
 
+	local market, seen, newBid, newBuy
 	-- Valuate this item
 	if not AucAdvanced then
 		-- Auctioneer Classic
-		local market, seen
 		local useFour = get(lcName..".auct.usefour")
 		local useHSP = get(lcName..".auct.usehsp")
 		if Auctioneer and Auctioneer.Statistic and Auctioneer.Statistic.GetUsableMedian then
