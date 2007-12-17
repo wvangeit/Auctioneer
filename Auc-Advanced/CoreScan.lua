@@ -434,6 +434,13 @@ function lib.GetScanData(faction, realmName)
 	return AucScanData.scans[realmName][faction], idList
 end
 
+private.CommitQueue = {}
+
+private.CommitQueueScan = {}
+private.CommitQueueQuery = {}
+private.CommitQueuewasIncomplete = {}
+private.CommitQueuewasGetAll = {}
+
 local Commitprogressbar = CreateFrame("STATUSBAR", "$parentHealthBar",UIParent, "TextStatusBar")
 Commitprogressbar:SetWidth(200)
 Commitprogressbar:SetHeight(20)
@@ -459,19 +466,33 @@ Commitprogressbar.text:SetText("AucAdv: Processing")
 Commitprogressbar.text:SetTextColor(1,1,1)
 
 local CommitRunning = false
-Commitfunction = function(wasIncomplete, wasGetAll)
+Commitfunction = function()
 	local ProcessSpeed = AucAdvanced.Settings.GetSetting("scancommit.speed")
 	local inscount, delcount = 0, 0
-	if not private.curScan then CommitRunning = false return end
-	if not private.curQuery then CommitRunning = false return end
+	if #private.CommitQueue == 0 then CommitRunning = false return end
+	--	if not private.curQuery then CommitRunning = false return end
 	CommitRunning = true
 	local scandata, idList = lib.GetScanData()
 	
-	--create local copies of private.curScan and private.curQuery, so they are available for use 
+	--grab the first item in the commit queue, and bump everything else down 
+	local wasIncomplete = private.CommitQueue[1]["wasIncomplete"]
+	local wasGetAll = private.CommitQueue[1]["wasGetAll"]
+	local scanStarted = private.CommitQueue[1]["scanStarted"]
+	local scanStartTime = private.CommitQueue[1]["scanStartTime"]
+	local totalPaused = private.CommitQueue[1]["totalPaused"]
 	local TempcurScan = {}
-	TempcurScan, private.curScan = private.curScan, TempcurScan
+	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
 	local TempcurQuery = {}
-	TempcurQuery, private.curQuery = private.curQuery ,TempcurQuery
+	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
+	
+	for i = 1, #private.CommitQueue do
+		if private.CommitQueue[i+1] then
+			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
+		else
+			recycle(private.CommitQueue, i)
+			--private.CommitQueue[i] = nil
+		end
+	end
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
 		Commitprogressbar:Show()
@@ -625,7 +646,7 @@ Commitfunction = function(wasIncomplete, wasGetAll)
 	end
 
 	local now = time()
-	local scanTimeSecs = math.floor(GetTime() - private.scanStarted - private.totalPaused)
+	local scanTimeSecs = math.floor(GetTime() - scanStarted - totalPaused)
 	local scanTimeMins = floor(scanTimeSecs / 60)
 	scanTimeSecs =  mod(scanTimeSecs, 60)
 	local scanTimeHours = floor(scanTimeMins / 60)
@@ -685,13 +706,12 @@ Commitfunction = function(wasIncomplete, wasGetAll)
 	scandata.scanstats[0].missedCount = missedCount
 	scandata.scanstats[0].filteredCount = filterCount
 	scandata.scanstats[0].wasIncomplete = wasIncomplete or false
-	scandata.scanstats[0].startTime = private.scanStartTime
+	scandata.scanstats[0].startTime = scanStartTime
 	scandata.scanstats[0].endTime = now
-	scandata.scanstats[0].started = private.scanStarted
-	scandata.scanstats[0].paused = private.totalPaused
+	scandata.scanstats[0].started = scanStarted
+	scandata.scanstats[0].paused = totalPaused
 	scandata.scanstats[0].ended = GetTime()
-	scandata.scanstats[0].elapsed = GetTime() - private.scanStarted - private.totalPaused
-
+	scandata.scanstats[0].elapsed = GetTime() - scanStarted - totalPaused
 	scandata.scanstats[0].query = clone(TempcurQuery)
 	scandata.time = now
 	if wasGetAll then scandata.LastFullScan = now end
@@ -722,11 +742,24 @@ end
 local CoCommit = coroutine.create(Commitfunction)
 
 function lib.Commit(wasIncomplete, wasGetAll)
+	if not private.curScan or #private.curScan == 0 then return end
+	local Queuelength = #private.CommitQueue
+	private.CommitQueue[Queuelength + 1] = {}
+	private.CommitQueue[Queuelength + 1]["Query"], private.curQuery = private.curQuery, private.CommitQueue[Queuelength + 1]["Query"]
+	private.CommitQueue[Queuelength + 1]["Scan"], private.curScan = private.curScan, private.CommitQueue[Queuelength + 1]["Scan"]
+	private.CommitQueue[Queuelength + 1]["wasIncomplete"] = wasIncomplete
+	private.CommitQueue[Queuelength + 1]["wasGetAll"] = wasGetAll
+	private.CommitQueue[Queuelength + 1]["scanStarted"] = private.scanStarted
+	private.CommitQueue[Queuelength + 1]["scanStartTime"] = private.scanStartTime
+	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
+	recycle(private, "curQuery")
+	recycle(private, "curScan")
+	
 	if coroutine.status(CoCommit) ~= "dead" then
-		coroutine.resume(CoCommit, wasIncomplete, wasGetAll)
+		coroutine.resume(CoCommit)
 	else
 		CoCommit = coroutine.create(Commitfunction)
-		coroutine.resume(CoCommit, wasIncomplete, wasGetAll)
+		coroutine.resume(CoCommit)
 	end
 end
 
@@ -1098,6 +1131,11 @@ function private.OnUpdate(me, dur)
 			if flop then
 				coroutine.resume(CoCommit)
 			end
+		end
+	else
+		if #private.CommitQueue > 0 then
+			CoCommit = coroutine.create(Commitfunction)
+			coroutine.resume(CoCommit)
 		end
 	end
 	if not AuctionFrame then return end
