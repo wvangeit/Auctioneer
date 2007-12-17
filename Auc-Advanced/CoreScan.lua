@@ -742,7 +742,7 @@ end
 local CoCommit = coroutine.create(Commitfunction)
 
 function lib.Commit(wasIncomplete, wasGetAll)
-	if not private.curScan or #private.curScan == 0 then return end
+	if not private.curScan then return end
 	local Queuelength = #private.CommitQueue
 	private.CommitQueue[Queuelength + 1] = {}
 	private.CommitQueue[Queuelength + 1]["Query"], private.curQuery = private.curQuery, private.CommitQueue[Queuelength + 1]["Query"]
