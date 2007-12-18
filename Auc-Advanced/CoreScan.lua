@@ -741,6 +741,14 @@ end
 
 local CoCommit = coroutine.create(Commitfunction)
 
+local function CoroutineResume(...)
+	local status, result = coroutine.resume(...)
+	if not status and result then
+		print("error in coroutine: " .. result)
+	end
+	return status, result
+end
+
 function lib.Commit(wasIncomplete, wasGetAll)
 	if not private.curScan then return end
 	local Queuelength = #private.CommitQueue
@@ -756,16 +764,16 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	recycle(private, "curScan")
 	
 	if coroutine.status(CoCommit) ~= "dead" then
-		coroutine.resume(CoCommit)
+		CoroutineResume(CoCommit)
 	else
 		CoCommit = coroutine.create(Commitfunction)
-		coroutine.resume(CoCommit)
+		CoroutineResume(CoCommit)
 	end
 end
 
 function lib.LogoutCommit()
 	while coroutine.status(CoCommit) == "suspended" do
-		coroutine.resume(CoCommit)
+		CoroutineResume(CoCommit)
 	end
 end
 
@@ -1130,13 +1138,13 @@ function private.OnUpdate(me, dur)
 		if flip then
 			flop = not flop
 			if flop then
-				coroutine.resume(CoCommit)
+				CoroutineResume(CoCommit)
 			end
 		end
 	else
 		if #private.CommitQueue > 0 then
 			CoCommit = coroutine.create(Commitfunction)
-			coroutine.resume(CoCommit)
+			CoroutineResume(CoCommit)
 		end
 	end
 	if not AuctionFrame then return end
