@@ -284,7 +284,7 @@ end
 
 function private.IsIdentical(focus, compare)
 	for i = 1, Const.SELLER do
-		if (i ~= Const.TIME and focus[i] ~= compare[i]) then
+		if (i ~= Const.TIME and i ~= Const.CANUSE and focus[i] ~= compare[i]) then
 			return false
 		end
 	end
@@ -380,11 +380,11 @@ end
 
 function private.IsInQuery(curQuery, data)
 	if 	(not curQuery.class or curQuery.class == data[Const.ITYPE])
-			and (not curQuery.subClass or (curQuery.subClass == data[Const.ISUB]))
+			and (not curQuery.subclass or (curQuery.subclass == data[Const.ISUB]))
 			and (not curQuery.minUseLevel or (data[Const.ULEVEL] >= curQuery.minUseLevel))
 			and (not curQuery.maxUseLevel or (data[Const.ULEVEL] <= curQuery.maxUseLevel))
 			and (not curQuery.name or (data[Const.NAME] and strfind(data[Const.NAME]:lower(), curQuery.name:lower(), 1, true)))
-			and (not curQuery.isUsable or (data[Const.CANUSE]))
+			and (not curQuery.isUsable or (private.CanUse(data[Const.LINK])))
 			and (not curQuery.invType or (data[Const.IEQUIP] == Const.InvTypes[curQuery.invType]))
 			and (not curQuery.quality or (data[Const.QUALITY] >= curQuery.quality))
 			then
@@ -1061,6 +1061,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
 	query.page = page
+	query.isUsable = isUsable
 
 	if (private.curQuery) then
 		for x, y in pairs(query) do
@@ -1249,6 +1250,148 @@ end
 --Did not have a way of easily retrieving options for corescan  Kandoko
 function private.getOption(option)
 	return AucAdvanced.Settings.GetSetting(option)
+end
+
+-- In the absence of a proper API function to do it, it's necessary to inspect an item's tooltip to
+-- figure out if it's usable by the player
+local ItemUsableTooltip = {
+	tooltipFrame = nil,
+	fontString = {},
+	maxLines = 100,
+
+	CanUse = function(this, link)
+		-- quick level check first
+		local minLevel = select(5, GetItemInfo(link)) or 0
+		if UnitLevel("player") < minLevel then
+			return false
+		end
+	
+		-- set up if not done already
+		if not this.tooltipFrame then
+			this.tooltipFrame = CreateFrame("GameTooltip")
+			this.tooltipFrame:SetOwner(UIParent, "ANCHOR_NONE")
+			for i = 1, this.maxLines do
+				this.fontString[i] = {}
+				for j = 1, 2 do
+					this.fontString[i][j] = this.tooltipFrame:CreateFontString()
+					this.fontString[i][j]:SetFontObject(GameFontNormal)
+				end
+				this.tooltipFrame:AddFontStrings(this.fontString[i][1], this.fontString[i][2])
+			end
+		end
+
+		-- clear tooltip
+		local numLines
+		numLines = math.min(this.maxLines, this.tooltipFrame:NumLines())
+		for i = 1, numLines do
+			for j = 1, 2 do
+				this.fontString[i][j]:SetText()
+				this.fontString[i][j]:SetTextColor(0, 0, 0)
+			end
+		end
+
+		-- populate tooltip
+		this.tooltipFrame:SetHyperlink(link)
+
+		-- search tooltip for red text
+		numLines = math.min(this.maxLines, this.tooltipFrame:NumLines())
+		for i = 1, numLines do
+			for j = 1, 2 do
+				local r, g, b = this.fontString[i][j]:GetTextColor()
+				if r > 0.8 and g < 0.2 and b < 0.2 then
+					-- item is not usable, with one exception: if it doesn't have a level
+					-- requirement, red "requires level xxx" text refers to some other item,
+					-- e.g. that created by a recipe
+					local text = string.lower(this.fontString[i][j]:GetText())
+					if not (minLevel == 0 and string.find(text, "requires level")) then	-- TODO: localize
+						return false
+					end
+				end
+			end
+		end
+
+		return true
+	end,
+}
+
+-- Caching wrapper for ItemUsableTooltip. Invalidates cache when certain events occur
+-- (player levels up, learns a new recipe, etc.)
+local ItemUsableCached = {
+	eventFrame = nil,
+	patterns = {},
+	cache = {},
+	tooltip = ItemUsableTooltip,
+
+	OnEvent = function(this, event, arg1, ...)
+		local dirty = false
+		-- print("got event " .. event .. ", arg1 " .. arg1)
+		if event == "CHAT_MSG_SYSTEM" or event == "CHAT_MSG_SKILL" then
+			for _, pattern in pairs(this.patterns) do
+				if string.find(arg1, pattern) then
+					dirty = true
+					break
+				end
+			end
+		elseif event == "PLAYER_LEVEL_UP" then
+			dirty = true
+		end
+
+		if dirty then
+			-- print("invalidating")
+			this.cache = {}
+		end
+	end,
+
+	RegisterChatString = function(this, chatString)
+		local pattern = chatString
+		pattern = string.gsub(pattern, "(%%s)", "(.+)")
+		pattern = string.gsub(pattern, "(%%d)", "(.+)")
+		table.insert(this.patterns, pattern)
+	end,
+
+	CanUse = function(this, link)
+		-- set up if not done already
+		if not this.eventFrame then
+			this.eventFrame = CreateFrame("Frame")
+
+			-- forward events from frame to self
+			this.eventFrame.forwardEventsTo = this
+			this.eventFrame:SetScript(
+				"OnEvent",
+				function(eventFrame, ...)
+					eventFrame.forwardEventsTo:OnEvent(...)
+				end)
+
+			-- register events and chat patterns
+			this.eventFrame:RegisterEvent("CHAT_MSG_SYSTEM")
+			this.eventFrame:RegisterEvent("CHAT_MSG_SKILL")
+			this.eventFrame:RegisterEvent("PLAYER_LEVEL_UP")
+
+			this:RegisterChatString(ERR_LEARN_ABILITY_S)
+			this:RegisterChatString(ERR_LEARN_RECIPE_S)
+			this:RegisterChatString(ERR_LEARN_SPELL_S)
+			this:RegisterChatString(ERR_SPELL_UNLEARNED_S)
+			this:RegisterChatString(ERR_SKILL_GAINED_S)
+			this:RegisterChatString(ERR_SKILL_UP_SI)
+		end
+
+		local id = EnhTooltip.BreakLink(link)
+
+		-- check cache first. failing that, do a tooltip scan
+		if this.cache[id] == nil then
+			-- print("miss " .. link) 
+			this.cache[id] = this.tooltip:CanUse(link)
+		else
+			-- print("hit  " .. link) 
+		end
+		
+		return this.cache[id]
+	end,
+}
+
+private.itemUsable = ItemUsableCached
+function private.CanUse(link)
+	return private.itemUsable:CanUse(link)
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
