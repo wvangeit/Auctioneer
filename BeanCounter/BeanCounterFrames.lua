@@ -454,7 +454,7 @@ function private.CreateFrames()
 	local style = {}
 	local tbl = {}
 	local dateString = "%c"
-	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryOnly is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
+	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		local _  --Cause I fear the norgjira  ;)
@@ -481,9 +481,10 @@ function private.CreateFrames()
 							if match then
 								--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
 								
-								local stack = private.reconcileCompletedAuctions(a, i, tbl[4])
+								local stack, bid = private.reconcileCompletedAuctions(a, i, tbl[4], tbl[6], tbl[9])
 								local pricePer = 0
 								if stack > 0 then	pricePer = tbl[3]/stack end
+								if bid > 0 then tbl[7] = bid end
 								
 								table.insert(data,{
 								tbl[1], --itemname
@@ -701,16 +702,18 @@ function private.CreateFrames()
 		end
 	end
 	--reconcile stack sizes
-	function private.reconcileCompletedAuctions(player, itemID, soldDeposit)
+	function private.reconcileCompletedAuctions(player, itemID, soldDeposit, soldBuy, soldTime)
+		local oldestPossible = soldTime - 144000
 		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
 			tbl2 = private.unpackString(v)
-			local postDeposit = tbl2[6]
-			if postDeposit ==  soldDeposit then
-				return tonumber(tbl2[2])
-			else 
-				return 0
+			local postDeposit, postBuy, postTime = tbl2[6], tbl2[4],tonumber(tbl2[7])
+			if postDeposit ==  soldDeposit  and postBuy == soldBuy then --if the stack sizes and buyouts match, check if time range would make this a possible match
+				if ( tonumber(soldTime) > tonumber(postTime)) and (oldestPossible < tonumber(postTime)) then
+					return tonumber(tbl2[2]), tonumber(tbl2[3])
+				end
 			end
 		end
+		return 0,0 --failed to find an acceptable match
 	end
 	function private.reconcileCompletedBids(player, itemID, seller, buy, bid)
 		if private.serverData[player]["postedBids"][itemID] then
@@ -722,16 +725,16 @@ function private.CreateFrames()
 				end
 			end
 		end
-        if private.serverData[player]["postedBuyouts"][itemID] then
-            for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
-                tbl2 = private.unpackString(v)
-                local postSeller, postbid = tbl2[4], tbl2[3]
-                if seller ==  postSeller and postbid == buy then
-                    return tonumber(tbl2[2])
-                end
-            end
-        end
-		return 0 --if we fail then show 0 
+		if private.serverData[player]["postedBuyouts"][itemID] then
+		    for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
+			tbl2 = private.unpackString(v)
+			local postSeller, postbid = tbl2[4], tbl2[3]
+			if seller ==  postSeller and postbid == buy then
+			    return tonumber(tbl2[2])
+			end
+		    end
+		end
+			return 0 --if we fail then show 0 
 	end
 	private.CreateMailFrames()
 
