@@ -755,16 +755,11 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		local dropdown = getglobal(frameName.."PriceModelDropDown");
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 
-		-- Update the Transactions tab if BeanCounter is loaded.
-		if IsAddOnLoaded("BeanCounter") and AuctionFrameTransactions_UpdateSearchFrame then
-			local transactions = {
-				bidCheck  = true,
-				purchases = true,
-				auctions  = true,
-				sales     = true
-			}
-			AuctionFrameTransactions_UpdateSearchFrame(getglobal("AuctionFrameTransactionsSearch"), name, true, transactions)
+		-- Update the Transactions tab if BeanCounter is loaded. Allows searchs made here to show in BC
+		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch then
+			BeanCounter.externalSearch(itemId) --will accept itemid, string, itemkey, or itemlink
 		end
+		
 	else
 		-- Clear the item's information.
 		frame.itemId = nil;
