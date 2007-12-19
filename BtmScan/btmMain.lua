@@ -339,12 +339,12 @@ function BtmScan.PageScan(resume)
 	local itemConfigTable = BtmScan.Settings.GetSetting("itemconfig.list")
 
 	-- Ok, lets look at all these lovely items
-	if (not resume) then resume = 1 end
-	i = resume
+	if (not resume) then resume = pageCount end
+	local i = resume
 
 	local item = {}
 
-	while ((i <= pageCount) and (BtmScan.scanning == true)) do
+	while ((i >= 1) and (BtmScan.scanning == true)) do
 		item.pos = i
 
 		item.link = GetAuctionItemLink("list", item.pos)
@@ -446,7 +446,7 @@ function BtmScan.PageScan(resume)
 					-- One last check to make sure this is a valid purchase order
 					if purchasable then
 						BtmScan.PromptPurchase(item)
-						BtmScan.resume = i + 1
+						BtmScan.resume = i - 1
 						return
 					end
 				-- check if itemConfig is used now
@@ -454,7 +454,7 @@ function BtmScan.PageScan(resume)
 				end
 			end
 		end
-		i = i + 1
+		i = i - 1
 	end
 
 	BtmScan.scanStage = 0
@@ -482,7 +482,7 @@ local function itemClearInfo(self)
 end
 
 local function ttItemInfo(item)
-	i = 1
+	local i = 1
 	while i <= #item do
 		if (type(item[i+1]) == "number") then
 			local val = item[i+1]
@@ -1456,11 +1456,7 @@ BtmScan.PerformPurchase = function()
 	local pageCount, totalCount = GetNumAuctionItems("list")
 	local i = item.pos
 	if (i <= pageCount) then
-		there = checkItem(item.pos, item)
-	end
-
-	if (not there) then
-		for j = 1, pageCount do
+		for j = i, 1, -1 do
 			there = checkItem(j, item)
 			if (there) then
 				i = j
