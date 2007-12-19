@@ -322,16 +322,22 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Add the last sale price if BeanCounter is loaded.and one exists
-				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.Sales and BeanCounter.Sales.GetLastSaleForItem) then
-					-- TODO: Support should be added to BeanCounter for looking
-					-- up itemKey (itemId:suffixId:enchantID) instead of by name.
-					local lastSale = BeanCounter.Sales.GetLastSaleForItem(name)
-					if (lastSale and lastSale.bid and lastSale.buyout) then
+				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch) then
+					local tbl = BeanCounter.externalSearch(id, true) --returns a table 
+					local lastSale, C = {}, 0
+					for i,v in pairs(tbl)do
+						v[12] = tonumber(v[12]) 
+						if (v[12]) > C then --need to sort for best date
+							C = (v[12]) 
+							lastSale = v
+						end
+					end
+					if (lastSale and lastSale[6] and lastSale[3] and lastSale[4]) then
 						local lastPrice  = {}
 						lastPrice.text   = _AUCT('UiPriceModelLastSold')
-						lastPrice.note   = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale.time))
-						lastPrice.bid    = (lastSale.bid / lastSale.quantity) * count
-						lastPrice.buyout = (lastSale.buyout / lastSale.quantity) * count
+						lastPrice.note   = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale[12]))
+						lastPrice.bid    = (lastSale[3] / lastSale[6]) * count
+						lastPrice.buyout = (lastSale[4] / lastSale[6]) * count
 						table.insert(frame.prices, lastPrice)
 					end
 				end
