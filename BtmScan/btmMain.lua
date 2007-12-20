@@ -22,7 +22,7 @@
 		set to nil once PageScan() begins (to prevent repeated attempts to check this page of items unless we break out early for a purchase and need to resume later)
 	BtmScan.scanStage
 		0 - no longer scanning page / reached end of query page
-		1 - 0.25 seconds before next scan begins - I have no idea what this is used for
+		1 - waiting for query results
 		2 - scanning page
 		3 - prompting for a purchase / scanning paused
 	BtmScan.scanning - are we currently scanning
@@ -198,8 +198,6 @@ BtmScan.OnUpdate = function(...)
 		if (BtmScan.pageScan) then
 			if (BtmScan.timer > BtmScan.pageScan) then
 				BtmScan.PageScan(BtmScan.resume)
-			elseif (BtmScan.timer > BtmScan.pageScan-0.25) then
-				BtmScan.scanStage = 1
 			end
 		end
 
@@ -210,6 +208,7 @@ BtmScan.OnUpdate = function(...)
 			return
 		end
 		BtmScan.timer = BtmScan.timer - BtmScan.interval
+		BtmScan.lastTry = BtmScan.lastTry - BtmScan.interval
 	else
 		BtmScan.timer = 0
 	end
@@ -289,6 +288,8 @@ end
 
 local lastNextPage = 0
 BtmScan.QueryAuctionItems = function(par,ret, name,lmin,lmax,itype,class,sclass,page,able,qual)
+--	BtmScan.Print("QueryAuctionItems (" .. GetTime() .. ")")
+
 	lastNextPage = 0
 
 	if (not BtmScan.scanning) then return end
@@ -297,10 +298,10 @@ BtmScan.QueryAuctionItems = function(par,ret, name,lmin,lmax,itype,class,sclass,
 		return
 	end
 
-	-- Lets guess that the results should be available in about 2 seconds time and
-	-- schedule a scan of this page for 2 seconds into the future.
+	-- Wait at least a second for query results to become available
 	BtmScan.timer = 0
-	BtmScan.pageScan = 2
+	BtmScan.scanStage = 1
+	BtmScan.pageScan = 1
 end
 
 -- Called by AucAdvanced when it's finished it's page to ask us if we're finished with it.
@@ -316,7 +317,32 @@ function BtmScan.FinishedPage(nextPage)
 	end
 end
 
+function BtmScan.IsPageReady()
+	local pageCount, totalCount = GetNumAuctionItems("list")
+	for idx = 1, pageCount do
+		local link = GetAuctionItemLink("list", idx)
+		if not link then return false end
+		local owner = select(12, GetAuctionItemInfo("list", idx))
+		if not owner then return false end
+	end
+	return true
+end
+
 function BtmScan.PageScan(resume)
+	-- BtmScan.Print("PageScan (" .. GetTime() .. ")")
+
+	if not (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
+		if not BtmScan.IsPageReady() then
+			-- Wait a bit
+			BtmScan.pageScan = BtmScan.pageScan + 0.05
+			return
+		end
+	else
+		-- We will get notified when to check the page. No need to poll.
+	end
+	
+	-- BtmScan.Print("Ready (" .. GetTime() .. ")")
+
 	BtmScan.pageScan = nil
 	if (not BtmScan.scanStage or BtmScan.scanStage == 0 or BtmScan.scanStage == 3) then return end
 
@@ -1707,6 +1733,7 @@ BtmScan.Input.Scroll:SetScrollChild(BtmScan.Input.Box)
 BtmScan.CreateLogWindow = function()
 	if (BtmScan.LogFrame) then return end
 	if (not AuctionFrame) then return end
+	if (not ((Auctioneer and Auctioneer.UI) or (AucAdvanced and AucAdvanced.AddTab))) then return end
 
 	local LOG_LINES = 22
 
