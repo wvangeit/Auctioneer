@@ -223,7 +223,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 end
 
 function lib.IsScanning()
-	return private.isScanning
+	return private.isScanning or (private.queueScan ~= nil)
 end
 
 function lib.IsPaused()
