@@ -1286,6 +1286,7 @@ local ItemUsableTooltip = {
 				end
 				this.tooltipFrame:AddFontStrings(this.fontString[i][1], this.fontString[i][2])
 			end
+			this.minLevelPattern = string.gsub(ITEM_MIN_LEVEL, "(%%d)", "(.+)")
 		end
 
 		-- clear tooltip
@@ -1311,7 +1312,7 @@ local ItemUsableTooltip = {
 					-- requirement, red "requires level xxx" text refers to some other item,
 					-- e.g. that created by a recipe
 					local text = string.lower(this.fontString[i][j]:GetText())
-					if not (minLevel == 0 and string.find(text, "requires level")) then	-- TODO: localize
+					if not (minLevel == 0 and string.find(text, this.minLevelPattern)) then
 						return false
 					end
 				end
