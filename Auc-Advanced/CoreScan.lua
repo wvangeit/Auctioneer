@@ -731,7 +731,12 @@ Commitfunction = function()
 
 	--Hide the progress indicator
 	Commitprogressbar:Hide()
+	private.UpdateScanProgress(false)
+	lib.PopScan()
 	CommitRunning = false 
+	if not private.curScan or #private.curScan == 0 then
+		private.ResetAll()
+	end
 end
 
 local CoCommit = coroutine.create(Commitfunction)
@@ -980,7 +985,6 @@ function lib.StorePage()
 			end
 			private.isScanning = false
 			lib.Commit(incomplete)
-			private.UpdateScanProgress(false)
 		end
 	elseif (totalAuctions <= 50) then
 		lib.Commit(false)
