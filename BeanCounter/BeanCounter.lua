@@ -255,22 +255,36 @@ end
 
 --[[ Utility Functions]]--
 --External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
---Can be item Name or link or itemID
-function lib.externalSearch(name, queryReturn)
+--Can be item Name or link or itemID 
+--If itemID or link search will be much faster than a plain text lookup
+function lib.externalSearch(name, settings, queryReturn)
 	 if private.getOption("util.beancounter.externalSearch") then
 		local frame = private.frame
 		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
-		local itemName, itemTexture = private.getItemInfo(name, "name") or name
-		local settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 
+		local itemName, itemlink = private.getItemInfo(name, "itemid")
+		if not itemlink then   itemName, itemlink = name end
+		
+		if not settings then
+			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 
 						["bid"] = true, ["outbid"] = frame.bidFailedCheck:GetChecked(), ["auction"] = true,
 						["failedauction"] = frame.auctionFailedCheck:GetChecked() 
 						}
+		end
 		if not queryReturn then 
-			frame.searchBox:SetText(itemName)
-			private.startSearch(itemName, settings, itemTexture)
+			if itemlink then
+				frame.searchBox:SetText(itemName)
+				private.searchByItemID(itemName, settings, queryReturn)
+			else
+				frame.searchBox:SetText(itemName)
+				private.startSearch(itemName, settings)
+			end
 		else
-			settings.exact = true --If this is an external addon wanting search data returned
-			return(private.startSearch(itemName, settings, itemTexture, queryReturn))
+			if itemlink then
+				return(private.searchByItemID(itemName, settings, queryReturn))
+			else
+				settings.exact = true --If this is an external addon wanting search data returned
+				 return(private.startSearch(itemName, settings, _, queryReturn))
+			end
 		end
 	end
 end

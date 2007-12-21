@@ -456,6 +456,7 @@ function private.CreateFrames()
 	local dateString = "%c"
 	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
+		
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		local _  --Cause I fear the norgjira  ;)
 			if itemTexture then 
@@ -486,24 +487,8 @@ function private.CreateFrames()
 								if stack > 0 then	pricePer = tbl[3]/stack end
 								if bid > 0 then tbl[7] = bid end
 								
-								table.insert(data,{
-								tbl[1], --itemname
-								_BC('UiAucSuccessful'), --status
-								 
-								tonumber(tbl[7]) or 0,  --bid
-								tonumber(tbl[6]) or 0,  --buyout
-								tonumber(tbl[3]), --Profit,
-								tonumber(stack),  --stacksize
-								tonumber(pricePer), --Profit/per
-
-								tbl[8], -- "-",  --seller/seller
-
-								tonumber(tbl[4]), --deposit
-								tonumber(tbl[5]), --fee
-								tonumber(tbl[10]) or 0, --current wealth
-								tbl[9], --time, --Make this a user choosable option.
+								table.insert(data, private.COMPLETEDAUCTIONS(a, i, tbl)) --the data table is created by local function
 								
-								})
 								style[#data] = {}
 								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
@@ -530,24 +515,8 @@ function private.CreateFrames()
 								--Ok we will use the proper stack count from expired auctions, but if thats 0 then we will try to get a stack price from posted auctions
 								if tonumber(tbl[3]) > 0 then count = tbl[3] end
 
-								table.insert(data,{
-								tbl[1], --itemname
-								_BC('UiAucExpired'), --status
-
-								tonumber(minBid) or 0, --bid
-								tonumber(buyoutPrice) or 0, --buyout
-								0, --money,
-								tonumber(count) or 0,
-								0, --Profit/per
-
-								"-",  --seller/buyer
-
-								tonumber(deposit) or 0, --deposit
-								0, --fee
-								tonumber(tbl[5]) or 0, --current wealth
-								tbl[4], --time,
+								table.insert(data, private.FAILEDAUCTIONS(a, i, tbl))--the data table is created by local function
 								
-								})
 								style[#data] = {}
 								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,0,0}}
@@ -578,26 +547,9 @@ function private.CreateFrames()
 									else
 									if stack > 0 then	pricePer = tbl[6]/stack end
 								end
-								--  				1		2	    3	       4	       5       6         7      8                      9				10
-								--'["completedBids"] == itemName, "Auction won", money, deposit , fee, buyout , bid, seller, (time the mail arrived in our mailbox), current wealth',
-								table.insert(data,{
-								tbl[1], --itemname
-								text,--tbl[2], --status
 
-								tonumber(tbl[7]), --bid
-								tonumber(tbl[6]), --buyout
-								tonumber(tbl[3]), --money,
-								tonumber(stack),  --stacksize
-								pricePer, --Profit/per
-
-								tbl[8],   --seller/buyer
-
-								tonumber(tbl[4]), --deposit
-								tonumber(tbl[5]), --fee
-								tonumber(tbl[10]) or 0, --current wealth
-								tbl[9], --time,
+								table.insert(data, private.COMPLETEDBIDSBUYOUTS(a, i, tbl))--the data table is created by local function
 								
-								})
 								style[#data] = {}
 								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,1,0}}
@@ -620,24 +572,8 @@ function private.CreateFrames()
 							if match then
 
 								--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
-								table.insert(data,{
-								tbl[1], --itemname
-								tbl[2], --status Should already be a localized text
-
-								tonumber(tbl[3]), --bid
-								0, --buyout
-								0, --money,
-								0, --stack
-								0, --Profit/per
-
-								"-",  --seller/buyer
-
-								0, --deposit
-								0, --fee
-								tonumber(tbl[5]) or 0, --current wealth
-								tbl[4], --time,
-								--tbl[6], --date
-								})
+								table.insert(data, private.FAILEDBIDS(a, i , tbl))
+								
 								style[#data] = {}
 								style[#data][12] = {["date"] = dateString}	
 								style[#data][2] = {["textColor"] = {1,1,1}}
@@ -666,7 +602,178 @@ function private.CreateFrames()
 		end
 				
 	end
-	 
+	--This search routine is used when we have an itemID or itemlink to work with
+	function private.searchByItemID(id, settings, queryReturn) 
+		data = {}
+		style = {}
+			
+		for i in pairs(private.serverData) do
+			if settings.auction and private.serverData[i]["completedAuctions"][id] then
+				for index,text in pairs(private.serverData[i]["completedAuctions"][id]) do
+						table.insert(data, private.COMPLETEDAUCTIONS(i, id, text))
+							style[#data] = {}
+							style[#data][12] = {["date"] = dateString}	
+							style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
+							style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
+				end				
+			end
+			if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
+				for index,text in pairs(private.serverData[i]["failedAuctions"][id]) do
+						table.insert(data, private.FAILEDAUCTIONS(i, id, text))
+							style[#data] = {}
+							style[#data][12] = {["date"] = dateString}	
+							style[#data][2] = {["textColor"] = {1,0,0}}
+							style[#data][8] ={["textColor"] = {1,0,0}}
+				end		
+			end
+			if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
+				for index,text in pairs(private.serverData[i]["completedBids/Buyouts"][id]) do
+						table.insert(data, private.COMPLETEDBIDSBUYOUTS(i, id, text))
+							style[#data] = {}
+							style[#data][12] = {["date"] = dateString}	
+							style[#data][2] = {["textColor"] = {1,1,0}}
+							style[#data][8] ={["textColor"] = {1,1,0}}
+				end		
+			end
+			if settings.failedbid and private.serverData[i]["failedBids"][id] then
+				for index,text in pairs(private.serverData[i]["failedBids"][id]) do
+						table.insert(data, private.FAILEDBIDS(i, id, text))
+							style[#data] = {}
+							style[#data][12] = {["date"] = dateString}	
+							style[#data][2] = {["textColor"] = {1,1,1}}
+							style[#data][8] ={["textColor"] = {1,1,1}}
+				end		
+			end
+		end
+		--BC CLASSIC DATA SEARCH	
+		if settings.classic then
+			data, style = private.classicSearch(data, style, itemName, settings, dateString)
+		end
+		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
+			frame.resultlist.sheet:SetData(data, style)
+			_, itemTexture = private.getItemInfo(id, "name")
+			frame.icon:SetNormalTexture(itemTexture)
+			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
+			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
+			--If the user has scrolled to far and search is not showing scroll back to starting position
+			if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
+				frame.resultlist.sheet.panel:ScrollToCoords(0,0)
+			end
+		else --Ok this is an external addon wanting the results of a beancounter search
+			return(data)
+		end
+	end
+	
+	--To simplify having two seperate search routines, the Data creation of each table has been made a local function so both searches can use it. 
+		function private.COMPLETEDAUCTIONS(player, id, text) --this passes the player, itemID and text as string or as an already seperated table
+				tbl = text
+				if type(text) == "string" then tbl= private.unpackString(text)	end
+			
+				local stack, bid = private.reconcileCompletedAuctions(player, id, tbl[4], tbl[6], tbl[9])
+				local pricePer = 0
+				if stack > 0 then	pricePer = tbl[3]/stack end
+				if bid > 0 then tbl[7] = bid end
+				
+				return({
+					tbl[1], --itemname
+					_BC('UiAucSuccessful'), --status
+					 
+					tonumber(tbl[7]) or 0,  --bid
+					tonumber(tbl[6]) or 0,  --buyout
+					tonumber(tbl[3]), --Profit,
+					tonumber(stack),  --stacksize
+					tonumber(pricePer), --Profit/per
+
+					tbl[8], -- "-",  --seller/seller
+
+					tonumber(tbl[4]), --deposit
+					tonumber(tbl[5]), --fee
+					tonumber(tbl[10]) or 0, --current wealth
+					tbl[9], --time, --Make this a user choosable option.
+				})
+		end
+		function private.FAILEDAUCTIONS(player, id, text)
+				tbl = text
+				if type(text) == "string" then tbl= private.unpackString(text)	end
+				--Lets try some basic reconciling here
+				local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(player, id, tbl)
+				--Ok we will now use the proper stack count from expired auctions, but if thats 0 then we will try to get a stack price from posted auctions
+				if tonumber(tbl[3]) > 0 then count = tbl[3] end
+
+				return({
+					tbl[1], --itemname
+					_BC('UiAucExpired'), --status
+
+					tonumber(minBid) or 0, --bid
+					tonumber(buyoutPrice) or 0, --buyout
+					0, --money,
+					tonumber(count) or 0,
+					0, --Profit/per
+
+					"-",  --seller/buyer
+
+					tonumber(deposit) or 0, --deposit
+					0, --fee
+					tonumber(tbl[5]) or 0, --current wealth
+					tbl[4], --time,
+				})
+		end
+		function private.COMPLETEDBIDSBUYOUTS(player, id, text)
+				tbl = text
+				if type(text) == "string" then tbl= private.unpackString(text)	end
+				
+				local stack, matchedBID = private.reconcileCompletedBids(player, id, tbl[8], tbl[6], tbl[7])
+				local pricePer = 0
+				local text = _BC('UiWononBuyout')
+				if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
+					text = _BC('UiWononBid')
+					if stack > 0 then	pricePer = tbl[7]/stack end
+					else
+					if stack > 0 then	pricePer = tbl[6]/stack end
+				end
+				
+				return({
+					tbl[1], --itemname
+					text,--tbl[2], --status
+
+					tonumber(tbl[7]), --bid
+					tonumber(tbl[6]), --buyout
+					tonumber(tbl[3]), --money,
+					tonumber(stack),  --stacksize
+					pricePer, --Profit/per
+
+					tbl[8],   --seller/buyer
+
+					tonumber(tbl[4]), --deposit
+					tonumber(tbl[5]), --fee
+					tonumber(tbl[10]) or 0, --current wealth
+					tbl[9], --time,
+				})
+		end
+		function private.FAILEDBIDS(player, id, text)
+				tbl = text
+				if type(text) == "string" then tbl= private.unpackString(text)	end
+
+				return({
+					tbl[1], --itemname
+					tbl[2], --status Should already be a localized text
+
+					tonumber(tbl[3]), --bid
+					0, --buyout
+					0, --money,
+					0, --stack
+					0, --Profit/per
+
+					"-",  --seller/buyer
+
+					0, --deposit
+					0, --fee
+					tonumber(tbl[5]) or 0, --current wealth
+					tbl[4], --time,
+					--tbl[6], --date
+				})
+		end
+		
 	function private.fragmentsearch(compare, itemName, exact, classic)
 		if exact and not classic then 
 			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) or "FAILED ITEM LINK" --extract item name from itemlink 
