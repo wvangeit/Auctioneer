@@ -323,7 +323,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 
 				-- Add the last sale price if BeanCounter is loaded.and one exists
 				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch) then
-					local tbl = BeanCounter.externalSearch(id, true) --returns a table 
+					local tbl = BeanCounter.externalSearch(id, {["auction"] = true}, true) --returns a table 
 					local lastSale, C = {}, 0
 					for i,v in pairs(tbl)do
 						v[12] = tonumber(v[12]) 
