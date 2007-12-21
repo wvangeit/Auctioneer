@@ -272,7 +272,8 @@ function lib.externalSearch(name, settings, queryReturn)
 		end
 		if not queryReturn then 
 			if itemlink then
-				frame.searchBox:SetText(itemName)
+				local name = itemlink:match("^|c%x+|H.+|h%[(.+)%]")
+				frame.searchBox:SetText(name)
 				private.searchByItemID(itemName, settings, queryReturn)
 			else
 				frame.searchBox:SetText(itemName)

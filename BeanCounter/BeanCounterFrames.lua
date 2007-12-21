@@ -647,6 +647,7 @@ function private.CreateFrames()
 		end
 		--BC CLASSIC DATA SEARCH	
 		if settings.classic then
+			local itemName, _ = private.getItemInfo(id, "name") or "FAILED TO GET ITEMNAME"
 			data, style = private.classicSearch(data, style, itemName, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
