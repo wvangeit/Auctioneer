@@ -356,6 +356,12 @@ end
 
 function lib.GetMatcherDropdownList()
 	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
+	if not private.matcherlist or #private.matcherlist == 0 then 
+		lib.GetMatchers() 
+	end
+	if not private.matcherlist or #private.matcherlist == 0 then
+		return
+	end
 	local dropdownlist = {}
 	for index, value in ipairs(private.matcherlist) do
 		dropdownlist[index] = tostring(index)..": "..tostring(private.matcherlist[index])
@@ -364,6 +370,7 @@ function lib.GetMatcherDropdownList()
 end
 
 function lib.GetMatchers(itemLink)
+	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 	local engines = acquire()
 	for system, systemMods in pairs(AucAdvanced.Modules) do
 		for engine, engineLib in pairs(systemMods) do
@@ -386,7 +393,7 @@ function lib.GetMatchers(itemLink)
 				end
 			end
 			if not insetting then
-				AucAdvanced.Print("New matcher found: "..tostring(matcher))
+				AucAdvanced.Print("AucAdvanced: New matcher found: "..tostring(matcher))
 				table.insert(private.matcherlist, matcher)
 			end
 			insetting = false
