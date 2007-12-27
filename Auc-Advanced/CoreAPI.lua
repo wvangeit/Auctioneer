@@ -320,6 +320,7 @@ function lib.IsBlocked()
 end
 
 --Market matcher APIs
+private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
 function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	-- TODO: Make a configurable algorithm.
 	-- This algorithm is currently less than adequate.
@@ -337,16 +338,29 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
 	end
 		
+	local InfoString = ""
 	for index, matcher in ipairs(matchers) do
-		local value, priceArray = lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
-		total = total + value
-		count = count + 1
-		diff = diff + priceArray.diff
+		if lib.IsValidMatcher(matcher, itemLink) then
+			local value, MatchpriceArray = lib.GetMatcherValue(matcher, itemLink, priceArray.price)
+			priceArray.price = value
+			count = count + 1
+			diff = diff + MatchpriceArray.diff
+			InfoString = strjoin("\n", InfoString, MatchpriceArray.returnstring)
+		end
 	end
+	
+	if (priceArray.price > 0) and (count > 0) then
+		return priceArray.price, total, count, diff/count, InfoString
+	end
+end
 
-	if (total > 0) and (count > 0) then
-		return total/count, total, count, diff/count
+function lib.GetMatcherDropdownList()
+	private.matcherlist = AucAdvanced.Settings.GetSetting("matcherlist")
+	local dropdownlist = {}
+	for index, value in ipairs(private.matcherlist) do
+		dropdownlist[index] = tostring(index)..": "..tostring(private.matcherlist[index])
 	end
+	return dropdownlist
 end
 
 function lib.GetMatchers(itemLink)
@@ -361,7 +375,27 @@ function lib.GetMatchers(itemLink)
 			end
 		end
 	end
-	return engines
+	local insetting = false
+	local stillactive = false
+	--check to see if there are any new matchers.  If so, add them to the end of the running order.
+	--There is no check to see if matchers are missing, as this would destroy the saved order.  Instead, invalid matchers can be called without errors.
+	if private.matcherlist then
+		for index, matcher in ipairs(engines) do
+			for i, j in ipairs(private.matcherlist) do
+				if matcher == j then insetting = true
+				end
+			end
+			if not insetting then
+				AucAdvanced.Print("New matcher found: "..tostring(matcher))
+				table.insert(private.matcherlist, matcher)
+			end
+			insetting = false
+		end
+	else
+		private.matcherlist = engines
+	end
+	AucAdvanced.Settings.SetSetting("matcherlist", private.matcherlist)
+	return private.matcherlist
 end
 
 function lib.IsValidMatcher(matcher, itemLink)
@@ -379,16 +413,13 @@ function lib.IsValidMatcher(matcher, itemLink)
 	return false
 end
 
-function lib.GetMatcherValue(matcher, itemLink, algorithm, faction, realm)
+function lib.GetMatcherValue(matcher, itemLink, price)
 	if (type(matcher) == "string") then
 		matcher = lib.IsValidMatcher(matcher, itemLink)
 	end
-
+	if not matcher then return end
 	--If matcher is not a table at this point, the following code will throw an "attempt to index a <something> value" type error
-	faction = faction or AucAdvanced.GetFaction()
-	realm = realm or GetRealmName()
-
-	local matchArray = matcher.GetMatchArray(itemLink, algorithm, faction, realm)
+	local matchArray = matcher.GetMatchArray(itemLink, price)
 
 	return matchArray.value, matchArray
 end

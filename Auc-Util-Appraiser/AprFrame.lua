@@ -51,6 +51,7 @@ function private.CreateFrames()
 	frame = CreateFrame("Frame", nil, AuctionFrame)
 	private.frame = frame
 	local DiffFromModel = 0
+	local MatchString = ""
 	frame.list = {}
 	frame.buffer = {}
 	frame.cache = {}
@@ -319,13 +320,13 @@ function private.CreateFrames()
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
 		elseif curModel == "market" then
 			if match then
-				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
+				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
 			else
 				newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
 			end
 		else
 			if match then
-				newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
+				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
 			else
 				newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
 			end
@@ -655,7 +656,10 @@ function private.CreateFrames()
 		frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
 		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel) and (curModel ~= "fixed")) then
-			frame.manifest.lines:Add(("Difference from Model: "..DiffFromModel.."%"))
+			local MatchStringList = {strsplit("\n", MatchString)}
+			for i in pairs(MatchStringList) do
+				frame.manifest.lines:Add((MatchStringList[i]))
+			end
 		end
 		
 		if (totalBid < 1) then
@@ -1425,7 +1429,7 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
 	frame.salebox.matcher:SetScript("OnClick", frame.ChangeControls)
-	local Matchers = AucAdvanced.API.GetMatchers()
+	local Matchers = AucAdvanced.Settings.GetSetting("matcherlist")--AucAdvanced.API.GetMatchers()
 	if #Matchers == 0 then
 		frame.salebox.matcher:Disable()
 	end

@@ -67,6 +67,7 @@ local lib = {}
 AucAdvanced.Settings = lib
 local private = {}
 local gui
+local Matcherdropdown
 
 local function getUserSig()
 	local userSig = string.format("users.%s.%s", GetRealmName(), UnitName("player"))
@@ -238,6 +239,24 @@ local function setter(setting, value)
 
 		-- Refresh all values to reflect current data
 		gui:Refresh()
+	elseif (a == "matcher") then
+		local matchers = AucAdvanced.Settings.GetSetting("matcherlist")
+		local i = AucAdvanced.Settings.GetSetting("matcherdynamiclist")
+		if i then
+			i = strsplit(":", i)
+			i = tonumber(i)
+			if b == "up" and i > 1 then
+				matchers[i], matchers[i-1] = matchers[i-1], matchers[i]
+			elseif b == "down" and i < #matchers then
+				matchers[i], matchers[i+1] = matchers[i+1], matchers[i]
+			end
+			AucAdvanced.Settings.SetSetting("matcherlist", matchers)
+			for j = 1, #matchers do
+				gui.elements["matcherdynamiclist"].list()[j] = AucAdvanced.API.GetMatcherDropdownList()[j]
+			end
+			AucAdvanced.Settings.SetSetting("matcherdynamiclist", 1)
+			gui:Refresh()
+		end
 	else
 		-- Set the value for this setting in the current profile
 		local db = getUserProfile()
@@ -381,6 +400,14 @@ function lib.MakeGuiConfig()
 	
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
+	
+	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
+	last = gui:GetLast(id)
+	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList(), "matcherdynamiclist")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Button",     0.3,1, "matcher.up", "Up")
+	gui:SetLast(id, last)
+	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
 	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
