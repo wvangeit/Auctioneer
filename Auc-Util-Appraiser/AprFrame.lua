@@ -320,12 +320,14 @@ function private.CreateFrames()
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
 		elseif curModel == "market" then
 			if match then
+				local _
 				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
 			else
 				newBuy = AucAdvanced.API.GetMarketValue(frame.salebox.link)
 			end
 		else
 			if match then
+				local _
 				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, curModel)
 			else
 				newBuy = AucAdvanced.API.GetAlgorithmValue(curModel, frame.salebox.link)
