@@ -50,31 +50,20 @@ function lib.Processor(callbackType, ...)
 	end
 end
 
-function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
+function lib.GetMatchArray(hyperlink, marketprice)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
 
-	if not faction then faction = AucAdvanced.GetFaction() end
-	
 	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
 	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
 	local undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
 	local playerName = UnitName("player")
-	local marketprice = 0
-	if algorithm.price then
-		marketprice = algorithm.price
-	else
-		if algorithm == "market" then
-			marketprice = AucAdvanced.API.GetMarketValue(hyperlink)
-		else
-			marketprice = AucAdvanced.API.GetAlgorithmValue(algorithm, hyperlink)
-		end
-	end
 	local marketdiff = 0
 	local competing = 0
 	local matchprice = 0
 	local minprice = 0
+	local lowest = true
 	if not marketprice then marketprice = 0 end
 	if marketprice > 0 then
 		matchprice = floor(marketprice*(1+(overmarket/100)))
@@ -84,7 +73,6 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 	itemId = tonumber(itemId)
 	property = tonumber(property) or 0
 	factor = tonumber(factor) or 0
-
 	
 	local data = AucAdvanced.API.QueryImage({
 		itemId = itemId,
@@ -105,6 +93,8 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 				if (not (compet.sellerName == playerName)) then
 					matchprice = compet.buyoutPrice
 				end
+			else
+				lowest = false
 			end
 		end
 	end
@@ -120,6 +110,11 @@ function lib.GetMatchArray(hyperlink, algorithm, faction, realm)
 	end
 	local matchArray = {}
 	matchArray.value = matchprice
+	if lowest then
+		matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lowest Price"
+	else
+		matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Can not match lowest price"
+	end
 	matchArray.competing = competing
 	matchArray.diff = marketdiff
 	return matchArray
@@ -151,7 +146,8 @@ function private.SetupConfigGui(gui)
 	gui:AddHelp(id, "what undercut module",
 		"What is this undercut module?",
 		"The undercut module allows you to undercut the lowest price of all currently available "..
-		"items, based on your settings.")
+		"items, based on your settings.\n\n"..
+		"It is recommended to have undercut run after any other matcher modules.")
 
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	
