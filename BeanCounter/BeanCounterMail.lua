@@ -246,17 +246,20 @@ function private.matchDB(key, text)
 end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
+local inboxHookMessage = false --Stops spam of the message.
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
-	if #private.inboxStart > 0 then
+	if #private.inboxStart > 0 and not inboxHookMessage then
 		print("Please allow BeanCounter time to reconcile the mail box")
+		inboxHookMessage = true
 		return "abort"
 	end
 end
 
 --Hook, take item event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 function private.PreTakeInboxItemHook( ignore, retVal, index)
-	if #private.inboxStart > 0 then
+	if #private.inboxStart > 0 and not inboxHookMessage then
 		print("Please allow BeanCounter time to reconcile the mail box")
+		inboxHookMessage = true
 		return "abort"
 	end
 end
