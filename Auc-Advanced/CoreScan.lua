@@ -111,7 +111,6 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	classIndex = tonumber(classIndex) or 0
 	subclassIndex = tonumber(subclassIndex) or 0
 	qualityIndex = tonumber(qualityIndex)
-	page = tonumber(page) or 0
 	if (name and name ~= "") then query.name = name end
 	if (minUseLevel > 0) then query.minUseLevel = minUseLevel end
 	if (maxUseLevel > 0) then query.maxUseLevel = maxUseLevel end
@@ -125,7 +124,7 @@ function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, class
 	end
 	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
 	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
-	query.page = page
+	query.page = 0
 	query.isUsable = isUsable
 	local now = GetTime()
 	table.insert(private.scanStack, acquire(now, false, 0, query, acquire(), acquire(), now, 0, now))
