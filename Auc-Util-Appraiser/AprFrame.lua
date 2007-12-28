@@ -503,8 +503,12 @@ function private.CreateFrames()
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 
-		local itemKey = frame.salebox.sig
-		local itemId, suffix, factor = strsplit(":", itemKey)
+		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
+		itemId = tonumber(itemId)
+		suffix = tonumber(suffix) or 0
+		factor = tonumber(factor) or 0
+
+		local itemKey = string.join(":", "item", itemId, "0", "0", "0", "0", "0", suffix, factor)
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
