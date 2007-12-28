@@ -543,8 +543,32 @@ function private.CreateFrames()
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
 
-		local color, r,g,b
+		local color, r,g,b, a
 		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
+		local tinted = AucAdvanced.Settings.GetSetting('util.appraiser.tint.color')
+		r,g,b, a = 0,0,0, 0
+		if tinted then
+			color = frame.SetPriceColor(itemKey, 1, curBid, curBid)
+			if color then
+				r,g,b = unpack(color)
+				a = 0.4
+				recycle(color)
+			end
+		end
+		AppraiserSaleboxBidGold:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBidSilver:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBidCopper:SetBackdropColor(r,g,b, a)
+		if tinted then
+			color = frame.SetPriceColor(itemKey, 1, curBuy, curBuy)
+			if color then
+				r,g,b = unpack(color)
+				a = 0.4
+				recycle(color)
+			end
+		end
+		AppraiserSaleboxBuyGold:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
+		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
 
 		local depositMult = curDurationMins / 720
 		local curNumber = frame.salebox.number:GetAdjustedValue()
@@ -1510,6 +1534,24 @@ function private.CreateFrames()
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.bid, frame.ChangeControls)
 	frame.salebox.bid.element = "bid"
 	frame.salebox.bid:Hide()
+	AppraiserSaleboxBidGold:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 3, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidGold:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBidSilver:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidSilver:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBidCopper:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBidCopper:SetBackdropColor(0,0,0, 0)
 
 	frame.salebox.bid.label = frame.salebox.bid:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
 	frame.salebox.bid.label:SetPoint("LEFT", frame.salebox.model, "RIGHT", 5,0)
@@ -1523,6 +1565,24 @@ function private.CreateFrames()
 	MoneyInputFrame_SetOnvalueChangedFunc(frame.salebox.buy, frame.ChangeControls)
 	frame.salebox.buy.element = "buy"
 	frame.salebox.buy:Hide()
+	AppraiserSaleboxBuyGold:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 3, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuyGold:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBuySilver:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuySilver:SetBackdropColor(0,0,0, 0)
+	AppraiserSaleboxBuyCopper:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+		tile = true, tileSize = 32, 
+		insets = { left = -2, right = 12, top = 4, bottom = 2}
+	})
+	AppraiserSaleboxBuyCopper:SetBackdropColor(0,0,0, 0)
 
 	MoneyInputFrame_SetNextFocus(frame.salebox.bid, AppraiserSaleboxBuyGold)
 	MoneyInputFrame_SetPreviousFocus(frame.salebox.bid, AppraiserSaleboxBuyCopper)
