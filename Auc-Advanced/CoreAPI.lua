@@ -339,6 +339,7 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	end
 		
 	local InfoString = ""
+	if not priceArray or not priceArray.price then return end
 	for index, matcher in ipairs(matchers) do
 		if lib.IsValidMatcher(matcher, itemLink) then
 			local value, MatchpriceArray = lib.GetMatcherValue(matcher, itemLink, priceArray.price)
