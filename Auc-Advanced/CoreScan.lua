@@ -102,6 +102,35 @@ function lib.GetImage()
 	return image
 end
 
+function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
+	if not private.scanStack then private.scanStack = acquire() end
+	local query = acquire() 
+	name = name or ""
+	minUseLevel = tonumber(minUseLevel) or 0
+	maxUseLevel = tonumber(maxUseLevel) or 0
+	classIndex = tonumber(classIndex) or 0
+	subclassIndex = tonumber(subclassIndex) or 0
+	qualityIndex = tonumber(qualityIndex)
+	page = tonumber(page) or 0
+	if (name and name ~= "") then query.name = name end
+	if (minUseLevel > 0) then query.minUseLevel = minUseLevel end
+	if (maxUseLevel > 0) then query.maxUseLevel = maxUseLevel end
+	if (classIndex > 0) then
+		query.class = private.ClassConvert(classIndex)
+		query.classIndex = classIndex
+	end
+	if (subclassIndex > 0) then
+		query.subclass = private.ClassConvert(classIndex, subclassIndex)
+		query.subclassIndex = subclassIndex
+	end
+	if (qualityIndex and qualityIndex > 0) then query.quality = qualityIndex end
+	if (invTypeIndex and invTypeIndex ~= "") then query.invType = invTypeIndex end
+	query.page = page
+	query.isUsable = isUsable
+	local now = GetTime()
+	table.insert(private.scanStack, acquire(now, false, 0, query, acquire(), acquire(), now, 0, now))
+end
+
 function lib.PushScan()
 	if private.isScanning then
 		print(("Pausing current scan at page {{%d}}."):format(private.curPage+1))
@@ -734,7 +763,7 @@ Commitfunction = function()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
 	CommitRunning = false 
-	if not private.curScan or #private.curScan == 0 then
+	if not private.curScan then
 		private.ResetAll()
 	end
 end
