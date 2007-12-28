@@ -85,7 +85,7 @@ function lib.GetAppraiserValue(itemLink, useMatching)
 		match = true
 	end
 		
-	local newBuy, newBid, seen, __, DiffFromModel
+	local newBuy, newBid, seen, _, DiffFromModel, MatchString
 	if curModel == "fixed" then
 		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
 		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
