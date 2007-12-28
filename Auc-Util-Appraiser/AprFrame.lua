@@ -503,7 +503,8 @@ function private.CreateFrames()
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 
-		local itemId, suffix, factor = strsplit(":", frame.salebox.sig)
+		local itemKey = frame.salebox.sig
+		local itemId, suffix, factor = strsplit(":", itemKey)
 		itemId = tonumber(itemId)
 		suffix = tonumber(suffix) or 0
 		factor = tonumber(factor) or 0
@@ -542,6 +543,9 @@ function private.CreateFrames()
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
 
+		local color, r,g,b
+		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
+
 		local depositMult = curDurationMins / 720
 		local curNumber = frame.salebox.number:GetAdjustedValue()
 
@@ -573,14 +577,28 @@ function private.CreateFrames()
 					frame.salebox.numberentry:SetText("All")
 				end
 				--frame.salebox.numberentry:SetNumber(maxStax)
-				
 				if (maxStax > 0) then
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
 					depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
-					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
-					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
+					
+					if colored then
+						color = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
+						if color then
+							r,g,b = unpack(color)
+							recycle(color)
+						end
+					end
+					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal, r,g,b)
+					if colored then
+						color = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
+						if color then
+							r,g,b = unpack(color)
+							recycle(color)
+						end
+					end
+					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal, r,g,b)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
 
 					totalBid = totalBid + (bidVal * maxStax)
@@ -592,8 +610,22 @@ function private.CreateFrames()
 					buyVal = lib.RoundBuy(curBuy * remain)
 					depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
 					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
-					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal)
-					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal)
+					if colored then
+						color = frame.SetPriceColor(itemKey, remain, bidVal, bidVal)
+						if color then
+							r,g,b = unpack(color)
+							recycle(color)
+						end
+					end
+					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal, r,g,b)
+					if colored then
+						color = frame.SetPriceColor(itemKey, remain, buyVal, buyVal)
+						if color then
+							r,g,b = unpack(color)
+							recycle(color)
+						end
+					end
+					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal, r,g,b)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(remain), depositVal)
 
 					totalBid = totalBid + bidVal
@@ -608,8 +640,22 @@ function private.CreateFrames()
 				bidVal = lib.RoundBid(curBid * curSize)
 				buyVal = lib.RoundBuy(curBuy * curSize)
 				depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
-				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal)
-				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal)
+				if colored then
+					color = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
+					if color then
+						r,g,b = unpack(color)
+						recycle(color)
+					end
+				end
+				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal, r,g,b)
+				if colored then
+					color = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
+					if color then
+						r,g,b = unpack(color)
+						recycle(color)
+					end
+				end
+				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal, r,g,b)
 				frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
 
 				totalBid = totalBid + (bidVal * curNumber)
@@ -641,8 +687,22 @@ function private.CreateFrames()
 				bidVal = lib.RoundBid(curBid)
 				buyVal = lib.RoundBuy(curBuy)
 				depositVal = AucAdvanced.Post.GetDepositAmount(sig) * depositMult
-				frame.manifest.lines:Add(("  Bid /item"), bidVal)
-				frame.manifest.lines:Add(("  Buyout /item"), buyVal)
+				if colored then
+					color = frame.SetPriceColor(itemKey, 1, bidVal, bidVal)
+					if color then
+						r,g,b = unpack(color)
+						recycle(color)
+					end
+				end
+				frame.manifest.lines:Add(("  Bid /item"), bidVal, r,g,b)
+				if colored then
+					color = frame.SetPriceColor(itemKey, 1, buyVal, buyVal)
+					if color then
+						r,g,b = unpack(color)
+						recycle(color)
+					end
+				end
+				frame.manifest.lines:Add(("  Buyout /item"), buyVal, r,g,b)
 				frame.manifest.lines:Add(("  Deposit /item"), depositVal)
 				totalBid = totalBid + (bidVal * curNumber)
 				totalBuy = totalBuy + (buyVal * curNumber)
@@ -1564,10 +1624,15 @@ function private.CreateFrames()
 		line[2]:Hide()
 	end
 
-	local function lineSet(obj, text, coins)
+	local function lineSet(obj, text, coins, r,g,b)
 		local id = obj.id
 		local line = frame.manifest.lines[id]
 		line[1]:SetText(text)
+		if r and g and b then
+			line[1]:SetTextColor(r,g,b)
+		else
+			line[1]:SetTextColor(1,1,1)
+		end
 		line[1]:Show()
 		line[2]:Show()
 
@@ -1597,10 +1662,10 @@ function private.CreateFrames()
 		end
 	end
 
-	local function linesAdd(obj, text, coins)
+	local function linesAdd(obj, text, coins, r,g,b)
 		obj.pos = obj.pos + 1
 		if (obj.pos > obj.max) then return end
-		obj[obj.pos]:Set(text, coins)
+		obj[obj.pos]:Set(text, coins, r,g,b)
 	end
 
 
