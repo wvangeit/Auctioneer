@@ -54,10 +54,7 @@ BtmScan.evaluators[lcName] = lib
 
 
 
-function lib.GetAppraiserValue(itemLink, defaultOnly)
-	-- itemLink is a link
-	-- defaultOnly is whether to only use default prices or not (ie. whether to ignore fixed values, etc)
-	
+function lib.GetAppraiserValue(itemLink, useMatching)	
 	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
 	local sig = tostring(id)
 	local link=itemLink
@@ -69,11 +66,6 @@ function lib.GetAppraiserValue(itemLink, defaultOnly)
 	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
 	local curModelText = curModel
 
-	-- This is the code to get whether the "Price matching" is turned on or not.
-	-- Currently choosing not to use this information as it only applies to current market and BTMscan may not have a current full scan to work with, so it needs to use the historical values	
-	-- 		local Match = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match") or false
-
-
 	if curModel == "default" then
 		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
 		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(link)) or (AucAdvanced.API.GetMarketValue(link) <= 0))) or
@@ -83,12 +75,15 @@ function lib.GetAppraiserValue(itemLink, defaultOnly)
 		curModelText = curModelText.."("..curModel..")"
 	end
 
-	local defMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
+	local defaultMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
 	local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match")
 	if curMatch == nil then
-		curMatch = defMatch
+		curMatch = defaultMatch
 	end
-	local match = (curMatch == "on")
+	local match = false
+	if useMatching and (curMatch or (curMatch =="on")) then
+		match = true
+	end
 		
 	local newBuy, newBid, seen, __, DiffFromModel
 	if curModel == "fixed" then
@@ -101,9 +96,11 @@ function lib.GetAppraiserValue(itemLink, defaultOnly)
 		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 	end
 	if match then
-		newBuy, _, _, DiffFromModel = AucAdvanced.API.GetBestMatch(link, curModel)
+		newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, curModel)
+		if MatchString then
+			curModelText = curModelText..MatchString
+		end
 	end
-
 	if curModel ~= "fixed" then
 		if newBuy and not newBid then
 			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
@@ -176,7 +173,7 @@ function lib:valuate(item, tooltip)
 		market, seen = AucAdvanced.API.GetMarketValue(item.link)
 		curModelText = "Market"
 	else -- Auctioneer Advanced with Appraiser
-		newBid, newBuy, seen, curModelText = lib.GetAppraiserValue(item.link)
+		newBid, newBuy, seen, curModelText = lib.GetAppraiserValue(item.link, get(lcName..".matching.check"))
 		
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)
@@ -184,7 +181,11 @@ function lib:valuate(item, tooltip)
 		item:info("Estimated Bid: "..item.count.." x",newBid)
 		item:info("Estimated Buy: "..item.count.." x",newBuy)
 		
-		market = newBid
+		if get(lcName..".buyout.check") then
+			market = newBuy
+		else
+			market = newBid
+		end
 	end
 	item:info("Pricing Model:"..curModelText)
 	
@@ -300,6 +301,8 @@ define(lcName..'.seen.check', false)
 define(lcName..'.seen.mincount', 10)
 define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
+define(lcName..'.matching.check', false)
+define(lcName..'.buyout.check', false)
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
@@ -335,10 +338,13 @@ function lib:setup(gui)
 	gui:AddControl(id, "Selectbox",        0, 2, qualityTable, lcName..".quality.min", "Minimum item quality")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".seen.check", "Enable checking \"seen\" count:")
 	gui:AddControl(id, "WideSlider",       0, 2, lcName..".seen.mincount", 1, 100, 1, "Minimum seen count: %s")
-		gui:AddControl(id, "Subhead",          0,    "Fees adjustment")
+	gui:AddControl(id, "Subhead",          0, "Fees adjustment")
 	gui:AddControl(id, "Selectbox",        0, 1, ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.brokerage", "Subtract auction fees from projected profit")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".adjust.deposit", "Subtract deposit cost from projected profit")
 	gui:AddControl(id, "WideSlider",       0, 2, lcName..".adjust.listings", 1, 10, 0.1, "Average relistings: %0.1fx")
+	gui:AddControl(id, "Subhead",          0, "Advanced Settings")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "Use Market Matching values from Appraiser:")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".buyout.check", "Use Buyout Price instead of Bid Price:")
 end
 
