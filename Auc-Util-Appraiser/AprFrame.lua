@@ -1431,8 +1431,8 @@ function private.CreateFrames()
 	frame.salebox.matcher:SetWidth(20)
 	frame.salebox.matcher:SetChecked(false)
 	frame.salebox.matcher:SetScript("OnClick", frame.ChangeControls)
-	local Matchers = AucAdvanced.Settings.GetSetting("matcherlist")--AucAdvanced.API.GetMatchers()
-	if #Matchers == 0 then
+	local matchers = AucAdvanced.Settings.GetSetting("matcherlist")
+	if not matchers or #matchers == 0 then
 		frame.salebox.matcher:Disable()
 	end
 	frame.salebox.matcher:Hide()
