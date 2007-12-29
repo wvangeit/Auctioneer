@@ -1086,7 +1086,7 @@ function private.CreateFrames()
 		if equipLoc == "" then equipLoc = nil end
 
 		print(("Refreshing view of {{%s}}"):format(name))
-		if background then
+		if background and type(background) == 'boolean' then
 			AucAdvanced.Scan.StartPushedScan(name, itemMinLevel, itemMinLevel, equipLoc, itemTypeId, itemSubId, nil, rarity)
 		else
 			AucAdvanced.Scan.PushScan()
