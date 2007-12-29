@@ -246,7 +246,7 @@ function private.CreateFrames()
 		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", private.realmName.." ".._BC('UiData')},} --LOCALIZE
+	local vals = {{"server", private.realmName.." ".._BC('UiData')},} 
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, name.." ".._BC('UiData')})
 	end	
@@ -652,7 +652,7 @@ function private.CreateFrames()
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
 			frame.resultlist.sheet:SetData(data, style)
-			_, itemTexture = private.getItemInfo(id, "name")
+			local _, itemTexture = private.getItemInfo(id, "name")
 			frame.icon:SetNormalTexture(itemTexture)
 			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest

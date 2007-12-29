@@ -257,12 +257,14 @@ end
 --External Search Stub, allows other addons searches to search to display in BC or get results of a BC search
 --Can be item Name or link or itemID 
 --If itemID or link search will be much faster than a plain text lookup
+local lastSearchRequest
 function lib.externalSearch(name, settings, queryReturn)
-	 if private.getOption("util.beancounter.externalSearch") then
+	 if private.getOption("util.beancounter.externalSearch") and name ~= lastSearchRequest then --is option enabled and have we already searched for this name (stop spam)
+		lastSearchRequest = name
 		local frame = private.frame
 		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
 		local itemName, itemlink = private.getItemInfo(name, "itemid")
-		if not itemlink then   itemName, itemlink = name end
+		if not itemlink then itemName, itemlink = name end
 		
 		if not settings then
 			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 
@@ -287,7 +289,10 @@ function lib.externalSearch(name, settings, queryReturn)
 				 return(private.startSearch(itemName, settings, _, queryReturn))
 			end
 		end
+	--else
+		--print("Search failed: Option is ", private.getOption("util.beancounter.externalSearch"), "and last search was ", lastSearchRequest,"This search" , name)
 	end
+	
 end
 
 --will return any length arguments into a ; seperated string
