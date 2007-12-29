@@ -1,4 +1,4 @@
---[[
+﻿--[[
 	Auctioneer Advanced - Appraisals and Auction Posting
 	Version: <%version%> (<%codename%>)
 	Revision: $Id$
@@ -2044,6 +2044,24 @@ function private.CreateFrames()
 		frame.salebox.stackentry:SetFocus()
 		frame.UpdateControls()
 	end)
+	frame.salebox.numberentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.numberentry:GetText()
+		if text ~= "" then
+			if (text:lower() == "full") then
+				frame.salebox.numberentry:SetText("Full")
+				frame.salebox.number:SetAdjustedValue(-2)
+			elseif (text:lower() == "all") then
+				frame.salebox.numberentry:SetText("All")
+				frame.salebox.number:SetAdjustedValue(-1)
+			else
+				if frame.salebox.numberentry:GetNumber() ~= 0 or frame.salebox.numberentry:GetText() == "0" then
+					frame.salebox.number:SetAdjustedValue(frame.salebox.numberentry:GetNumber())
+					frame.UpdateControls()
+				end
+			end
+		end
+		--frame.UpdateControls()
+	end)
 	frame.salebox.numberentry:SetScript("OnEscapePressed", function()
 		frame.salebox.numberentry:ClearFocus()
 	end)
@@ -2072,6 +2090,13 @@ function private.CreateFrames()
 		frame.salebox.stack:SetValue(frame.salebox.stackentry:GetNumber())
 		frame.salebox.numberentry:SetFocus()
 		frame.UpdateControls()
+	end)
+	frame.salebox.stackentry:SetScript("OnTextChanged", function()
+		local text = frame.salebox.stackentry:GetText()
+		if text ~= "" then
+			frame.salebox.stack:SetValue(frame.salebox.stackentry:GetNumber())
+			frame.UpdateControls()
+		end
 	end)
 	frame.salebox.stackentry:SetScript("OnEscapePressed", function()
 		frame.salebox.stackentry:ClearFocus()
