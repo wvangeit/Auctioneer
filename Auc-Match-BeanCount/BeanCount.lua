@@ -73,17 +73,17 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	if BeanCounter and BeanCounter.Private.playerData then
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
 			success = #BeanCounter.Private.playerData["completedAuctions"][itemId]
+			success = math.pow(success, 0.8)
 		end
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			failed = #BeanCounter.Private.playerData["failedAuctions"][itemId]
+			failed = math.pow(failed, 0.8)
 		end
 	end
-	for i = 1, success do
-		matchprice = matchprice * increase
-	end
-	for i = 1, failed do
-		matchprice = matchprice * decrease
-	end
+	increase = math.pow(increase, success)
+	decrease = math.pow(decrease, failed)
+	matchprice = matchprice * increase
+	matchprice = matchprice * decrease
 	
 	if (marketprice > 0) then
 		marketdiff = (((matchprice - marketprice)/marketprice)*100)
@@ -132,11 +132,11 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Subhead",    0,    "Price Adjustments")
 	
-	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -100, 0, 1, "Auction failure markdown: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -20, 0, 1, "Auction failure markdown: %d%%")
 	gui:AddTip(id, "This controls how much you want to markdown an auction for every time it has failed to sell.\n"..
 		"This is cumulative.  ie a setting of 10% with two failures will set the price at 81% of market")
 	
-	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 100, 1, "Auction success markup: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 1, "Auction success markup: %d%%")
 	gui:AddTip(id, "This controls how much you want to markup an auction for every time it has sold.\n"..
 		"This is cumulative.  ie a setting of 10% with two successes will set the price at 121% of market")
 end
