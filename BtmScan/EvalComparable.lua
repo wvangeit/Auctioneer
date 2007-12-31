@@ -155,8 +155,12 @@ local function getPriceForCategory( itemID )
 			local itemID = itemList[i]
 			
 -- TODO - allow more flexible pricing
-			local market = AucAdvanced.API.GetMarketValue(itemID)
-			
+			local market
+			if AucAdvanced then
+				market = AucAdvanced.API.GetMarketValue(itemID)
+			else
+				market = Auctioneer.Statistic.GetUsableMedian(itemID)
+			end
 			if (market) then
 				runningSum = runningSum + market
 				itemCount = itemCount + 1
@@ -203,7 +207,15 @@ local function getConvertablePrice(itemID)
 	end
 	
 	-- return the price of the result item divided by the count
-	local resultValue = AucAdvanced.API.GetMarketValue(convertData.result)
+	local resultValue
+	if AucAdvanced then
+		resultValue = AucAdvanced.API.GetMarketValue(convertData.result)
+	else
+		resultValue = Auctioneer.Statistic.GetUsableMedian(convertData.result)
+	end
+	if not resultValue or resultValue == 0 then
+		return
+	end
 	
 	local value = resultValue / convertData.count;
 	
@@ -218,10 +230,7 @@ function lib:valuate(item, tooltip)
 
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
-	
-	-- we need AucAdvanced for prices
-	if (not AucAdvanced or not AucAdvanced.API) then return end
-	
+		
 	-- Check for bogus/corrupted item links
 	if not (item) then return end
 
@@ -236,7 +245,6 @@ function lib:valuate(item, tooltip)
 		market = getConvertablePrice(item.id)
 	end
 
-	
 	if (not market) then
 		return
 	end
