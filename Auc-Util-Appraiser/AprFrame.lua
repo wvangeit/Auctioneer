@@ -543,13 +543,8 @@ function private.CreateFrames()
 			frame.salebox.stackentry:Show()
 			frame.salebox.numberentry:Show()
 			frame.toggleManifest:Enable()
-			if not frame.toggleManifest:GetText() then
+			if frame.toggleManifest:GetText() == "Close Sidebar" then
 				frame.manifest:Show()
-			end
-			if frame.manifest:IsShown() then
-				frame.toggleManifest:SetText("Close Sidebar")
-			else
-				frame.toggleManifest:SetText("Open Sidebar")
 			end
 		else
 			frame.salebox.stackentry:Show()
