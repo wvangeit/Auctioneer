@@ -771,8 +771,8 @@ function private.CreateFrames()
 			else
 				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
 				frame.salebox.totalsize:SetText("("..(curNumber)..")")
+				frame.salebox.numberentry:SetNumber(curNumber)
 			end
-			frame.salebox.numberentry:SetNumber(curNumber)
 			
 			if curNumber > 0 then
 				frame.manifest.lines:Add(("%d items"):format(curNumber))
@@ -2061,8 +2061,13 @@ function private.CreateFrames()
 		local text = frame.salebox.numberentry:GetText()
 		if text ~= "" then
 			if (text:lower() == "full") then
-				frame.salebox.numberentry:SetText("Full")
-				frame.salebox.number:SetAdjustedValue(-2)
+				if (frame.salebox.stacksize > 1) then
+					frame.salebox.numberentry:SetText("Full")
+					frame.salebox.number:SetAdjustedValue(-2)
+				else
+					frame.salebox.numberentry:SetText("All")
+					frame.salebox.number:SetAdjustedValue(-1)
+				end
 			elseif (text:lower() == "all") then
 				frame.salebox.numberentry:SetText("All")
 				frame.salebox.number:SetAdjustedValue(-1)
