@@ -228,9 +228,27 @@ function private.CreateFrames()
 
 	function frame.Reselect(posted)
 		local reselect = (frame.selected == posted[1])
+		local reselectenabled = AucAdvanced.Settings.GetSetting("util.appraiser.reselect")
 		frame.GenerateList()
 		if reselect then
-			frame.SelectItem(frame.selectedObj)
+			if reselectenabled then
+				frame.SelectItem(frame.selectedObj)
+			else
+				frame.selected = nil
+				frame.selectedPos = nil
+				frame.salebox.sig = nil
+				frame.salebox.name:SetText("No item selected")
+				frame.salebox.name:SetTextColor(0.5, 0.5, 0.7)
+				if not AucAdvanced.Settings.GetSetting("util.appraiser.classic") then
+					frame.salebox.info:SetText("Select an item to the left to begin auctioning...")
+				else
+					frame.salebox.info:SetText("Select an item to begin auctioning...")
+				end
+				frame.salebox.info:SetTextColor(0.5, 0.5, 0.7)
+				frame.imageview.sheet:SetData(private.empty)
+				frame.imageviewclassic.sheet:SetData(private.empty)
+				frame.UpdateControls()
+			end
 		end
 	end
 
