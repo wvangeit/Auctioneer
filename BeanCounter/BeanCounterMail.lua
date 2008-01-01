@@ -160,7 +160,7 @@ function private.mailSort()
 		
 		if (private.reconcilePending[i]["sender"] == _BC('MailAllianceAuctionHouse')) or (private.reconcilePending[i]["sender"] == _BC('MailHordeAuctionHouse')) then
 			if string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
-				debugPrint("Auction successful: ",i)
+				debugPrint("Auction successful: ", i)
 				--Get itemID from database
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
@@ -168,7 +168,7 @@ function private.mailSort()
 					local value = private.packString(itemLink, "Auction successful", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("completedAuctions", itemID, value)
 				end
-				table.remove(private.reconcilePending,i)
+				table.remove(private.reconcilePending, i)
 				
 			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..":%s")then
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..":%s(.*)" )
@@ -188,10 +188,9 @@ function private.mailSort()
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 	
 				--try to get itemID from bids, if not then buyouts. One of these DB MUST have it
-				if not itemID then itemID = private.matchDB("postedBuyouts", itemName) end
+				if not itemID then itemID, itemLink = private.matchDB("postedBuyouts", itemName) end
 				
-				if itemID then
-				local  _, itemLink = private.getItemInfo(itemID, "itemid") 
+				if itemID and itemLink then
 					debugPrint("Auction won: ", itemID)
 					local value = private.packString(itemLink, "Auction won", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
 					private.databaseAdd("completedBids/Buyouts", itemID, value)
@@ -203,10 +202,10 @@ function private.mailSort()
 				
 				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject').."%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
-				if itemID then
 				
-				local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
-				private.databaseAdd("failedBids", itemID, value)
+				if itemID then
+					local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
+					private.databaseAdd("failedBids", itemID, value)
 				end
 				
 				table.remove(private.reconcilePending,i)
@@ -231,15 +230,18 @@ end
 function private.matchDB(key, text)
 	for i,v in pairs(private.playerData[key]) do
 		if private.playerData[key][i][1] then
-			if text == (string.match(private.playerData[key][i][1], "^|c%x+|H.+|h%[(.+)%]" )) then
-			    local itemLink = private.playerData[key][i][1]:match("(.-);")
-				--debugPrint("Searching DB for ItemID..",private.playerData[key][i][1], "Sucess")
-				return i, itemLink
-			else
-				--debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
+			--Match the proper Suffix with teh itemID
+			for index = #private.playerData[key][i] , 1, -1 do 
+				if text == (string.match(private.playerData[key][i][index], "^|c%x+|H.+|h%[(.+)%]" )) then
+				    local itemLink = private.playerData[key][i][index]:match("(.-);")
+						debugPrint("Searching DB for ItemID..",private.playerData[key][i][index], "Sucess: link is",itemLink , " not", private.playerData[key][i][1])
+					return i, itemLink
+				else
+					debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
+				end
 			end
 		else 
-				--debugPrint("Searching DB for ItemID..", key, text, "Failed")
+			--debugPrint("Searching DB for ItemID..", key, text, "Failed")
 			return nil
 		end
 	end
