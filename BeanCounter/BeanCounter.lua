@@ -258,7 +258,7 @@ end
 --Can be item Name or link or itemID 
 --If itemID or link search will be much faster than a plain text lookup
 local lastSearchRequest
-function lib.externalSearch(name, settings, queryReturn)
+function lib.externalSearch(name, settings, queryReturn, count)
 	 if private.getOption("util.beancounter.externalSearch") and name ~= lastSearchRequest then --is option enabled and have we already searched for this name (stop spam)
 		lastSearchRequest = name
 		local frame = private.frame
@@ -276,14 +276,14 @@ function lib.externalSearch(name, settings, queryReturn)
 			if itemlink then
 				local name = itemlink:match("^|c%x+|H.+|h%[(.+)%]")
 				frame.searchBox:SetText(name)
-				private.searchByItemID(itemName, settings, queryReturn)
+				private.searchByItemID(itemName, settings, queryReturn, count)
 			else
 				frame.searchBox:SetText(itemName)
 				private.startSearch(itemName, settings)
 			end
 		else
 			if itemlink then
-				return(private.searchByItemID(itemName, settings, queryReturn))
+				return(private.searchByItemID(itemName, settings, queryReturn, count))
 			else
 				settings.exact = true --If this is an external addon wanting search data returned
 				 return(private.startSearch(itemName, settings, _, queryReturn))
