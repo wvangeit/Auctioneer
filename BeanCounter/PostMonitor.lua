@@ -70,7 +70,8 @@ function private.addPendingPost(name, count, minBid, buyoutPrice, runTime, depos
 	-- Register for the response events if this is the first pending post.
 	if (#private.PendingPosts == 1) then
 		debugPrint("private.addPendingPost() - Registering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
-		Stubby.RegisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting)
+		Stubby.RegisterFunctionHook("AuctionFrameAuctions_Update", 10, private.onAuctionCreated)
+				
 		Stubby.RegisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 	end
 end
@@ -88,7 +89,8 @@ function private.removePendingPost()
 		-- Unregister for the response events if this is the last pending post.
 		if (#private.PendingPosts == 0) then
 			debugPrint("private.removePendingPost() - Unregistering for CHAT_MSG_SYSTEM and UI_ERROR_MESSAGE")
-			Stubby.UnregisterEventHook("CHAT_MSG_SYSTEM", "BeanCounter_PostMonitor", private.onEventHookPosting)
+			Stubby.UnregisterFunctionHook("AuctionFrameAuctions_Update", private.onAuctionCreated)
+			
 			Stubby.UnregisterEventHook("UI_ERROR_MESSAGE", "BeanCounter_PostMonitor", private.onEventHookPosting)
 		end
 
@@ -103,13 +105,7 @@ end
 -- OnEvent handler Auctions. these are unhooked when not needed
 -------------------------------------------------------------------------------
 function private.onEventHookPosting(_, event, arg1)
-	if (event == "CHAT_MSG_SYSTEM" and arg1) then
-		debugPrint(event)
-		if (arg1) then debugPrint("    "..arg1) end
-		if (arg1 == ERR_AUCTION_STARTED) then
-		 	private.onAuctionCreated()
-		end
-	elseif (event == "UI_ERROR_MESSAGE" and arg1) then
+	if (event == "UI_ERROR_MESSAGE" and arg1) then
 		debugPrint(event)
 		if (arg1) then debugPrint("    "..arg1) end
 		if (arg1 == ERR_NOT_ENOUGH_MONEY) then
@@ -125,7 +121,17 @@ function private.onAuctionCreated()
 	local post = private.removePendingPost()
 	if (post) then
 		-- Add to sales database
-		local itemID, itemLink = private.getItemInfo(post.name, "itemid")
+		local itemID, itemLink = private.getItemInfo(post.name, "itemid") --"of the" items are not handled well by this 
+		debugPrint("first itemlink lookup", itemLink)
+		local Count = GetNumAuctionItems("owner")
+		Count = Count + 1
+		for i = 1, Count do
+			if post.name == GetAuctionItemInfo("owner",i) then
+				itemLink = GetAuctionItemLink("owner",i) or itemLink--so we try and replace with a better itemlink
+				debugPrint("second itemlink lookup", itemLink)
+				break
+			end
+		end 
 		local text = private.packString(itemLink, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), private.wealth)
 		private.databaseAdd("postedAuctions", itemID, text)
 	end

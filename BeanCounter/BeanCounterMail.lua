@@ -237,11 +237,11 @@ function private.matchDB(key, text)
 						debugPrint("Searching DB for ItemID..",private.playerData[key][i][index], "Sucess: link is",itemLink , " not", private.playerData[key][i][1])
 					return i, itemLink
 				else
-					debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
+					--debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
 				end
 			end
-		else 
-			--debugPrint("Searching DB for ItemID..", key, text, "Failed")
+		else  
+			debugPrint("Searching DB for ItemID..", key, text, "Failed")
 			return nil
 		end
 	end
