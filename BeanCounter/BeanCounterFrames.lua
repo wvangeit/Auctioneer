@@ -624,7 +624,7 @@ function private.CreateFrames()
 			end
 			if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
 				for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
-					table.insert(temp, {["failedAuctions"] = {i, id, text}})
+					table.insert(temp["failedAuctions"], {i, id, text})
 				end		
 			end
 			if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
@@ -646,14 +646,19 @@ function private.CreateFrames()
 			temp.failedAuctions = private.reduceSize(temp.failedAuctions, count)
 		end
 		if #temp["completedBids/Buyouts"] > count then
-			temp["completedBids/Buyouts"] = private.reduceSize(temp.completedAuctions, count)
+			temp["completedBids/Buyouts"] = private.reduceSize(temp["completedBids/Buyouts"], count)
 		end
 		if #temp.failedBids > count then
-			temp.failedBids = private.reduceSizeprivate.reduceSize(temp.failedAuctions, count)
+			temp.failedBids = private.reduceSizeprivate.reduceSize(temp.failedBids, count)
 		end
 		
 		--Return Data as raw if requesting addon wants un-formated data --FAST
 		if queryReturn == "none" then
+			for i,v in pairs(temp)do
+				for a,b in pairs(v)do
+					b[4], b[5] = b[3]:match(".-;(.-);.*;(.-);") --Makes the time stamp more accesable so addon can sort easier
+				end
+			end
 			return temp
 		end
 		--Format Data for display via scroll frame or if requesting addon wants formated data  --SLOW
