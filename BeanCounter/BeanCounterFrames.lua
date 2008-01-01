@@ -605,6 +605,7 @@ function private.CreateFrames()
 	end
 	
 	function private.searchByItemID(id, settings, queryReturn, count) 
+		id = tostring(id)
 		if not count then count = 100000 end --count determines how many results we show or display High # ~to display all
 		data = {}
 		style = {}
