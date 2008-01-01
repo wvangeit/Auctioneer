@@ -73,15 +73,13 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	if BeanCounter and BeanCounter.Private.playerData then
 		if BeanCounter.Private.playerData["completedAuctions"][itemId] then
 			success = #BeanCounter.Private.playerData["completedAuctions"][itemId]
-			success = math.pow(success, 0.8)
 		end
 		if BeanCounter.Private.playerData["failedAuctions"][itemId] then
 			failed = #BeanCounter.Private.playerData["failedAuctions"][itemId]
-			failed = math.pow(failed, 0.8)
 		end
 	end
-	increase = math.pow(increase, success)
-	decrease = math.pow(decrease, failed)
+	increase = math.pow(increase, math.pow(success, 0.8))
+	decrease = math.pow(decrease, math.pow(failed, 0.8))
 	matchprice = matchprice * increase
 	matchprice = matchprice * decrease
 	
@@ -99,6 +97,9 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	matchArray.value = matchprice
 	matchArray.diff = marketdiff
 	matchArray.returnstring = "BeanCount: % change: "..tostring(marketdiff)
+	if AucAdvanced.Settings.GetSetting("match.beancount.showhistory") then
+		matchArray.returnstring = "BeanCount: Succeeded: "..tostring(success).."\nBeanCount: Failed: "..tostring(failed).."\n"..matchArray.returnstring
+	end
 	return matchArray
 end
 
@@ -115,6 +116,7 @@ function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.beancount.failed", -1)
 	AucAdvanced.Settings.SetDefault("match.beancount.success", 1)
+	AucAdvanced.Settings.SetDefault("match.beancount.showhistory", true)
 end
 
 --[[ Local functions ]]--
@@ -139,6 +141,9 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 1, "Auction success markup: %d%%")
 	gui:AddTip(id, "This controls how much you want to markup an auction for every time it has sold.\n"..
 		"This is cumulative.  ie a setting of 10% with two successes will set the price at 121% of market")
+		
+	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.showhistory", "Show history of successes and failures")
+	gui:AddTip(id, "This will add the number of successes and failures for that item to Appraiser's right-hand panel")
 end
 
 AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Match-Undercut/Undercut.lua $", "$Rev: 2537 $")
