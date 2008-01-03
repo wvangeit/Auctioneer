@@ -634,7 +634,7 @@ function private.CreateFrames()
 				end		
 			end
 			if settings.failedbid and private.serverData[i]["failedBids"][id] then
-				for index,text in pairs(private.serverData[i]["failedBids"][id]) do
+				for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
 					table.insert(temp.failedBids, {i, id, text})
 				end		
 			end
@@ -718,7 +718,10 @@ function private.CreateFrames()
 	
 	function private.reduceSize(fin, count)
 		tbl = {}
-		for i = #fin, (#fin-count+1), -1 do
+		--The data provided is from multiple toons tables, so we need to resort the merged data back into sequential time order
+		table.sort(fin, function(a,b) return a[3]:match(".-;.-;.*;(.-);") > b[3]:match(".-;.-;.*;(.-);") end)
+		
+		for i = 1, count do
 			table.insert(tbl, fin[i])
 		end
 		return tbl
