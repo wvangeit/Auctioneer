@@ -200,11 +200,12 @@ function private.CreateFrames()
 	local objtype, _, link = GetCursorInfo()
 		ClearCursor()
 		if objtype == "item" then
-			local itemName, itemTexture = private.getItemInfo(link, "name")
+			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+			local itemTexture = select(2, private.getItemInfo(link, "name")) 
 			frame.icon.tootip = {itemName, link}
-			frame.icon:SetNormalTexture(itemTexture)
+			--frame.icon:SetNormalTexture(itemTexture)
 			frame.searchBox:SetText(itemName)
-			private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)	
+			private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture)
 		end
 	end 
 	
@@ -278,16 +279,17 @@ function private.CreateFrames()
 	end)
 	--Clicking for BC search --Thanks for the code Rockslice
 	function private.ClickBagHook(_,_,button)
-		local bag = this:GetParent():GetID()
-		local slot = this:GetID()
-		local link = GetContainerItemLink(bag, slot)
 		if (frame.searchBox and frame.searchBox:IsVisible()) then
+			local bag = this:GetParent():GetID()
+			local slot = this:GetID()
+			local link = GetContainerItemLink(bag, slot)
 			if link then
-				local itemName, itemTexture = private.getItemInfo(link, "name") 
+				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+				local itemTexture = select(2, private.getItemInfo(link, "name")) 
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
-					debugPrint(itemName, itemTexture, link)
+					debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)
+					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture) 
 				end
 			end
 		end
@@ -297,11 +299,12 @@ function private.CreateFrames()
 	function private.ClickLinkHook(_, _, _, link, button)
 		if (frame.searchBox and frame.searchBox:IsVisible()) then
 			if link then
-				local itemName, itemTexture = private.getItemInfo(link, "name")
+				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+				local itemTexture = select(2, private.getItemInfo(link, "name")) 
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
-					debugPrint(itemName, itemTexture, link)
+					debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.startSearch(itemName, frame.getCheckboxSettings(), itemTexture)	
+					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture) 
 				end
 			end
 		end
@@ -459,13 +462,11 @@ function private.CreateFrames()
 		if not itemName then return end
 		
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
-		local _  --Cause I fear the norgjira  ;)
-			if itemTexture then 
-				frame.icon:SetNormalTexture(itemTexture)
-			else
-				_, itemTexture = private.getItemInfo(itemName, "name")
-				frame.icon:SetNormalTexture(itemTexture)
-			end
+		if not itemTexture then --set search box itemTexture if possible
+			itemTexture = select(2, private.getItemInfo(itemName, "name"))
+		end				
+		frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
+				
 		
 		if private.getOption("dateString") then dateString = private.getOption("dateString") end
 		data = {}
@@ -604,7 +605,7 @@ function private.CreateFrames()
 				
 	end
 	
-	function private.searchByItemID(id, settings, queryReturn, count) 
+	function private.searchByItemID(id, settings, queryReturn, count, itemTexture) 
 		id = tostring(id)
 		if not count then count = 100000 end --count determines how many results we show or display High # ~to display all
 		data = {}
@@ -697,11 +698,15 @@ function private.CreateFrames()
 			data, style = private.classicSearch(data, style, itemName, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-			frame.resultlist.sheet:SetData(data, style)
-			local _, itemTexture = private.getItemInfo(id, "name")
-			frame.icon:SetNormalTexture(itemTexture)
+			if not itemTexture then --set search box itemTexture if possible
+				itemTexture = select(2, private.getItemInfo(id, "name"))
+			end				
+			frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
+			
+			frame.resultlist.sheet:SetData(data, style) --Set the GUI scrollsheet
 			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
 			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
+			
 			--If the user has scrolled to far and search is not showing scroll back to starting position
 			if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
 				frame.resultlist.sheet.panel:ScrollToCoords(0,0)
