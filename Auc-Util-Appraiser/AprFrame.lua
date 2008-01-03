@@ -204,7 +204,7 @@ function private.CreateFrames()
 			frame.InitControls()
 			--Also pass this search to BeanCounter's frame
 			if BeanCounter and BeanCounter.externalSearch then
-				BeanCounter.externalSearch(item[2])
+				BeanCounter.externalSearch(item[1], nil, nil, 50)
 			end			
 		else
 			frame.salebox.name:SetText("No item selected")
