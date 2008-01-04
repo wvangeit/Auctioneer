@@ -96,6 +96,9 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 1.05 then
 		debugPrint("private.updateTo1_05()")
 		private.updateTo1_05()
+	elseif private.playerData["version"] < 1.06 then
+		debugPrint("private.updateTo1_06()")
+		private.updateTo1_06()
 	end
 		
 end
@@ -200,5 +203,25 @@ function private.updateTo1_05()
 		end
 	    end
 	private.serverData[player]["version"] = 1.05
+	end
+end
+
+--[[This adds the ItemID array allowing plain text searches to search via aitemID search routine]]--
+function private.updateTo1_06()
+	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} end
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if type(data) == "table" then
+				for itemID, value in pairs(data) do
+					for index, text in ipairs(value) do
+						local item = text:match("^|c%x+|H.+|h%[(.+)%].-;.*")
+						if item then
+							BeanCounterDB["ItemIDArray"][item] = itemID
+						end
+					end
+				end
+			end
+		end
+	private.serverData[player]["version"] = 1.06
 	end
 end

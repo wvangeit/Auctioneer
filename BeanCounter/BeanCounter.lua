@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.05,
+	version = 1.06,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -134,6 +134,7 @@ function private.initializeDB()
 	if not BeanCounterDB  then
 		BeanCounterDB  = {}
 		BeanCounterDB["settings"] = {}
+		BeanCounterDB["ItemIDArray"] = {}
 	end
 	if not BeanCounterDB[private.realmName] then
 		BeanCounterDB[private.realmName] = {}

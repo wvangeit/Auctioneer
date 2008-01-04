@@ -460,6 +460,13 @@ function private.CreateFrames()
 	local dateString = "%c"
 	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
+		tbl = {}
+		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
+			if i:lower():find(itemName:lower(), 1, true)  then
+				table.insert(tbl, v)
+			end
+		end
+		if tbl then private.searchByItemID(tbl, settings, queryReturn, count, itemTexture) return end
 		
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		if not itemTexture then --set search box itemTexture if possible
@@ -606,7 +613,16 @@ function private.CreateFrames()
 	end
 	
 	function private.searchByItemID(id, settings, queryReturn, count, itemTexture) 
-		id = tostring(id)
+		if not id then return end
+		if not settings then settings = frame.getCheckboxSettings() end
+		tbl = {}
+		if type(id) == "table" then --we can search for a silng itemID or an array of itemIDs
+			for i,v in pairs(id)do
+				tbl[i] = tostring(v)
+			end
+		else
+			tbl[1] = tostring(id)
+		end
 		if not count then count = 100000 end --count determines how many results we show or display High # ~to display all
 		data = {}
 		style = {}
@@ -615,28 +631,30 @@ function private.CreateFrames()
 		temp["completedBids/Buyouts"] = {}
 		temp.failedAuctions = {}
 		temp.failedBids = {}
-		
+		debugPrint(id, settings, queryReturn, count, itemTexture)
 		--Retrives all matching results
 		for i in pairs(private.serverData) do
-			if settings.auction and private.serverData[i]["completedAuctions"][id] then
-				for index,text in ipairs(private.serverData[i]["completedAuctions"][id]) do
-					table.insert(temp.completedAuctions, {i, id, text})
-				end				
-			end
-			if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
-				for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
-					table.insert(temp["failedAuctions"], {i, id, text})
-				end		
-			end
-			if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
-				for index,text in ipairs(private.serverData[i]["completedBids/Buyouts"][id]) do
-					table.insert(temp["completedBids/Buyouts"],{ i, id, text})
-				end		
-			end
-			if settings.failedbid and private.serverData[i]["failedBids"][id] then
-				for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
-					table.insert(temp.failedBids, {i, id, text})
-				end		
+			for _, id in pairs(tbl) do
+				if settings.auction and private.serverData[i]["completedAuctions"][id] then
+					for index,text in ipairs(private.serverData[i]["completedAuctions"][id]) do
+						table.insert(temp.completedAuctions, {i, id, text})
+					end				
+				end
+				if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
+					for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
+						table.insert(temp["failedAuctions"], {i, id, text})
+					end		
+				end
+				if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
+					for index,text in ipairs(private.serverData[i]["completedBids/Buyouts"][id]) do
+						table.insert(temp["completedBids/Buyouts"],{ i, id, text})
+					end		
+				end
+				if settings.failedbid and private.serverData[i]["failedBids"][id] then
+					for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
+						table.insert(temp.failedBids, {i, id, text})
+					end		
+				end
 			end
 		end
 		--reduce results to the latest XXXX ammount based on how many user wants returned or displayed
@@ -699,7 +717,7 @@ function private.CreateFrames()
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
 			if not itemTexture then --set search box itemTexture if possible
-				itemTexture = select(2, private.getItemInfo(id, "name"))
+				itemTexture = select(2, private.getItemInfo(id[1], "name"))
 			end				
 			frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
 			
