@@ -204,6 +204,7 @@ function private.updateTo1_05()
 	    end
 	private.serverData[player]["version"] = 1.05
 	end
+	private.updateTo1_06()
 end
 
 --[[This adds the ItemID array allowing plain text searches to search via aitemID search routine]]--

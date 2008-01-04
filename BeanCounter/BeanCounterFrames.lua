@@ -466,7 +466,7 @@ function private.CreateFrames()
 				table.insert(tbl, v)
 			end
 		end
-		if tbl then private.searchByItemID(tbl, settings, queryReturn, count, itemTexture) return end
+		if tbl[1] then private.searchByItemID(tbl, settings, queryReturn, count, itemTexture) return end
 		
 		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
 		if not itemTexture then --set search box itemTexture if possible
@@ -623,7 +623,7 @@ function private.CreateFrames()
 		else
 			tbl[1] = tostring(id)
 		end
-		if not count then count = 100000 end --count determines how many results we show or display High # ~to display all
+		if not count then count = 500 end --count determines how many results we show or display High # ~to display all
 		data = {}
 		style = {}
 		temp = {}
@@ -668,7 +668,7 @@ function private.CreateFrames()
 			temp["completedBids/Buyouts"] = private.reduceSize(temp["completedBids/Buyouts"], count)
 		end
 		if #temp.failedBids > count then
-			temp.failedBids = private.reduceSizeprivate.reduceSize(temp.failedBids, count)
+			temp.failedBids = private.reduceSize(temp.failedBids, count)
 		end
 		
 		--Return Data as raw if requesting addon wants un-formated data --FAST
@@ -716,7 +716,7 @@ function private.CreateFrames()
 			data, style = private.classicSearch(data, style, itemName, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-			if not itemTexture then --set search box itemTexture if possible
+			if not itemTexture and id[1] then --set search box itemTexture if possible
 				itemTexture = select(2, private.getItemInfo(id[1], "name"))
 			end				
 			frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
@@ -744,70 +744,7 @@ function private.CreateFrames()
 		end
 		return tbl
 	end
-		
-	--[[This search routine is used when we have an itemID or itemlink to work with
-	function private.searchByItemID(id, settings, queryReturn, count) 
-		data = {}
-		style = {}
-			
-		for i in pairs(private.serverData) do
-			if settings.auction and private.serverData[i]["completedAuctions"][id] then
-				for index,text in pairs(private.serverData[i]["completedAuctions"][id]) do
-						table.insert(data, private.COMPLETEDAUCTIONS(i, id, text))
-							style[#data] = {}
-							style[#data][12] = {["date"] = dateString}	
-							style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
-							style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
-				end				
-			end
-			if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
-				for index,text in pairs(private.serverData[i]["failedAuctions"][id]) do
-						table.insert(data, private.FAILEDAUCTIONS(i, id, text))
-							style[#data] = {}
-							style[#data][12] = {["date"] = dateString}	
-							style[#data][2] = {["textColor"] = {1,0,0}}
-							style[#data][8] ={["textColor"] = {1,0,0}}
-				end		
-			end
-			if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
-				for index,text in pairs(private.serverData[i]["completedBids/Buyouts"][id]) do
-						table.insert(data, private.COMPLETEDBIDSBUYOUTS(i, id, text))
-							style[#data] = {}
-							style[#data][12] = {["date"] = dateString}	
-							style[#data][2] = {["textColor"] = {1,1,0}}
-							style[#data][8] ={["textColor"] = {1,1,0}}
-				end		
-			end
-			if settings.failedbid and private.serverData[i]["failedBids"][id] then
-				for index,text in pairs(private.serverData[i]["failedBids"][id]) do
-						table.insert(data, private.FAILEDBIDS(i, id, text))
-							style[#data] = {}
-							style[#data][12] = {["date"] = dateString}	
-							style[#data][2] = {["textColor"] = {1,1,1}}
-							style[#data][8] ={["textColor"] = {1,1,1}}
-				end		
-			end
-		end
-		--BC CLASSIC DATA SEARCH	
-		if settings.classic then
-			local itemName, _ = private.getItemInfo(id, "name") or "FAILED TO GET ITEMNAME"
-			data, style = private.classicSearch(data, style, itemName, settings, dateString)
-		end
-		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-			frame.resultlist.sheet:SetData(data, style)
-			local _, itemTexture = private.getItemInfo(id, "name")
-			frame.icon:SetNormalTexture(itemTexture)
-			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
-			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
-			--If the user has scrolled to far and search is not showing scroll back to starting position
-			if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
-				frame.resultlist.sheet.panel:ScrollToCoords(0,0)
-			end
-		else --Ok this is an external addon wanting the results of a beancounter search
-			return(data)
-		end
-	end
-	]]
+
 	--To simplify having two seperate search routines, the Data creation of each table has been made a local function so both searches can use it. 
 		function private.COMPLETEDAUCTIONS(player, id, text) --this passes the player, itemID and text as string or as an already seperated table
 				tbl = text
