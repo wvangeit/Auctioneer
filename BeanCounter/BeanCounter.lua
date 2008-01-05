@@ -329,6 +329,9 @@ function private.databaseAdd(key, itemID, value)
 	else
 		private.playerData[key][itemID]={value}
 	end
+	--Insert into the ItemName:ItemID dictionary array
+	local name = value:match("^|c%x+|H.+|h%[(.+)%].-;.*")
+	if name and itemID then BeanCounterDB["ItemIDArray"][name] = itemID end
 end
 --remove item (for pending bids only atm)
 function private.databaseRemove(key, itemID, ITEM, NAME)
