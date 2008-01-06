@@ -134,11 +134,11 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Subhead",    0,    "Price Adjustments")
 	
-	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -20, 0, 1, "Auction failure markdown: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -20, 0, 0.1, "Auction failure markdown: %g%%")
 	gui:AddTip(id, "This controls how much you want to markdown an auction for every time it has failed to sell.\n"..
 		"This is cumulative.  ie a setting of 10% with two failures will set the price at 81% of market")
 	
-	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 1, "Auction success markup: %d%%")
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 0.1, "Auction success markup: %g%%")
 	gui:AddTip(id, "This controls how much you want to markup an auction for every time it has sold.\n"..
 		"This is cumulative.  ie a setting of 10% with two successes will set the price at 121% of market")
 		
