@@ -43,9 +43,15 @@ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 				end
 			</OnEvent>
 			<OnUpdate>
-				AucQueryManager_OnUpdate(elapsed);
-				AucScanManager_OnUpdate(elapsed);
-				AucBidScanner_OnUpdate(elapsed);
+				if (AucQueryManager_OnUpdate) then
+					AucQueryManager_OnUpdate(elapsed);
+				end
+				if (AucScanManager_OnUpdate) then
+					AucScanManager_OnUpdate(elapsed);
+				end
+				if (AucBidScanner_OnUpdate) then
+					AucBidScanner_OnUpdate(elapsed);
+				end
 			</OnUpdate>
 		</Scripts>
 	</Frame>
