@@ -53,87 +53,6 @@ local set = BtmScan.Settings.SetSetting
 BtmScan.evaluators[lcName] = lib
 
 
-
-function lib.GetAppraiserValue(itemLink, useMatching)	
-	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(itemLink)
-	local sig = tostring(id)
-	local link=itemLink
-	
-	if not sig then 
-		return 0, 0, 0, "Unknown" 
-	end
-	
-	local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".model") or "default"
-	local curModelText = curModel
-
-	if curModel == "default" then
-		curModel = AucAdvanced.Settings.GetSetting("util.appraiser.model") or "market"
-		if ((curModel == "market") and ((not AucAdvanced.API.GetMarketValue(link)) or (AucAdvanced.API.GetMarketValue(link) <= 0))) or
-		   ((not (curModel == "fixed")) and (not (curModel == "market")) and ((not AucAdvanced.API.GetAlgorithmValue(curModel, link)) or (AucAdvanced.API.GetAlgorithmValue(curModel, link) <= 0))) then
-			curModel = AucAdvanced.Settings.GetSetting("util.appraiser.altModel")
-		end
-		curModelText = curModelText.."("..curModel..")"
-	end
-
-	local defaultMatch = AucAdvanced.Settings.GetSetting("util.appraiser.match")
-	local curMatch = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".match")
-	if curMatch == nil then
-		curMatch = defaultMatch
-	end
-	local match = false
-	if useMatching and (curMatch or (curMatch =="on")) then
-		match = true
-	end
-		
-	local newBuy, newBid, seen, _, DiffFromModel, MatchString
-	if curModel == "fixed" then
-		newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.buy")
-		newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".fixed.bid")
-		seen = 99
-	elseif curModel == "market" then
-		newBuy, seen = AucAdvanced.API.GetMarketValue(link)
-	else
-		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
-	end
-	if match then
-		newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, curModel)
-		if MatchString then
-			curModelText = curModelText..MatchString
-		end
-	end
-	if curModel ~= "fixed" then
-		if newBuy and not newBid then
-			local markdown = math.floor(AucAdvanced.Settings.GetSetting("util.appraiser.bid.markdown") or 0)/100
-			local subtract = AucAdvanced.Settings.GetSetting("util.appraiser.bid.subtract") or 0
-			local deposit = AucAdvanced.Settings.GetSetting("util.appraiser.bid.deposit") or false
-			if (deposit) then
-				local rate
-				deposit, rate = AucAdvanced.Post.GetDepositAmount(sig)
-				if not rate then rate = AucAdvanced.depositRate or 0.05 end
-			end
-			if (not deposit) then deposit = 0 end
-
-			-- Scale up for duration > 12 hours
-			-- Assume 24 hours since we can't get this info
-			if deposit > 0 then
-				deposit = deposit * 2
-			end
-
-			markdown = newBuy * markdown
-
-			newBid = math.max(newBuy - markdown - subtract - deposit, 1)
-		end
-
-		if newBid and (not newBuy or newBid > newBuy) then
-			newBuy = newBid
-		end
-	end
-
-	-- Ok, market price is the Bid price, not the buyout. This makes it very conservative, but allows you to use your other settings better and is safer for beginners.
-	
-	return newBid, newBuy, seen, curModelText
-end
-
 function lib:valuate(item, tooltip)
 	local price = 0
 	local curModelText = "Unknown"
@@ -169,11 +88,9 @@ function lib:valuate(item, tooltip)
 				end
 			end
 		end
-	elseif (AucAdvanced and not AucAdvanced.Modules.Util.Appraiser) then -- Auctioneer Advanced without Appraiser
-		market, seen = AucAdvanced.API.GetMarketValue(item.link)
-		curModelText = "Market"
-	else -- Auctioneer Advanced with Appraiser
-		newBid, newBuy, seen, curModelText = lib.GetAppraiserValue(item.link, get(lcName..".matching.check"))
+	else 
+		-- GetAppraiserValue works whether or not Appraiser is installed. In this case it uses Market Value)
+		newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
 		
 		newBid = math.floor((newBid or 0) + 0.5)
 		newBuy = math.floor((newBuy or 0) + 0.5)

@@ -4,7 +4,7 @@
 ## Interface: 20300
 ## LoadOnDemand: 1
 ## Dependencies: EnhTooltip, Stubby
-## OptionalDeps: !nLog, DebugLib, Configator, SlideBar, Auctioneer
+## OptionalDeps: !nLog, DebugLib, Configator, SlideBar, Auctioneer, Auc-Util-Appraiser
 ## SavedVariables: BtmScanData
 ##
 ## Version: <%version%> (<%codename%>)
@@ -30,7 +30,6 @@ EvalResale.lua
 EvalAppraiser.lua
 EvalVendor.lua
 EvalDisenchant.lua
-EvalDisencraft.lua
 EvalProspect.lua
 EvalSnatch.lua
 FilterItemType.lua
