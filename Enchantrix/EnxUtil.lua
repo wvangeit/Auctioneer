@@ -363,7 +363,12 @@ function getReagentPrice(reagentID, extra)
 		-- not trash, lookup the auction price
 		if AucAdvanced then
 			if extra then
-				price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentID)
+                local _, reagentLink, _, _, _, _, _, _, _ = getReagentInfo(reagentID)
+				if extra == 'appraiser' then
+					_, price5, _, _= AucAdvanced.API.GetAppraiserValue(reagentLink,1)
+				else
+					price5 = AucAdvanced.API.GetAlgorithmValue(extra, reagentLink)
+				end
 			else
 				price5 = AucAdvanced.API.GetMarketValue(reagentID)
 			end
@@ -969,6 +974,18 @@ local function balanceEssencePrices(scanReagentTable, style)
 
 end
 
+function Enchantrix.Util.GetPricingModel()
+	local style = Enchantrix.Settings.GetSetting('ScanValueType');
+	local extra = nil
+	if (not style) then
+		style = "average";
+	end
+	if (style:sub(1,9) == "adv:stat:") then
+		extra = style:sub(10)
+	end
+	return style, extra
+end
+
 function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 	if not scanReagentTable then
 		scanReagentTable = {}
@@ -978,15 +995,8 @@ function Enchantrix.Util.CreateReagentPricingTable(scanReagentTable)
 		end
 	end
 	local n = #Enchantrix.Constants.DisenchantReagentList;
-	local style = Enchantrix.Settings.GetSetting('ScanValueType');
-	local extra = nil
-	if (not style) then
-		style = "average";
-	end
-	if (style:sub(1,9) == "adv:stat:") then
-		extra = style:sub(10)
-	end
-
+	local style, extra = Enchantrix.Util.GetPricingModel();
+	
 	for i = 1, n do
 		local reagent = Enchantrix.Constants.DisenchantReagentList[i];
 		reagent = tonumber(reagent);

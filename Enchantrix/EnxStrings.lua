@@ -1,7 +1,7 @@
 ﻿--[[
 	WARNING: This is a generated file.
 	If you wish to perform or update localizations, please go to our Localizer website at:
-	http://norganna.org/localizer/
+	http://localizer.norganna.org/
 
 	AddOn: Enchantrix
 	Revision: $Id$
@@ -469,6 +469,7 @@ EnchantrixLocalizations = {
 		["TooltipShowDisenchantLevel"]	= "Entzaubern erfordert Skill %d";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "Exportiere Enchantrix-Preise nach AuctioneerAdvanced";
 		["GuiActivateProfile"]	= "Aktiviere ein vorhandenes Profil";
 		["GuiAutoDeEnable"]	= "Suche nach entzauberbaren Items in Taschen - VORSICHTIG VERWENDEN";
 		["GuiAutoDeOptions"]	= "Automatisierung";
@@ -719,6 +720,7 @@ EnchantrixLocalizations = {
 		["GuiIgnore"]	= "Ignore\n";
 		["GuiItemValueAuc4HSP"]	= "Auc4 HSP";
 		["GuiItemValueAuc4Median"]	= "Auc4 Median";
+		["GuiItemValueAuc5Appraiser"]	= "AucAdv Appraiser Value";
 		["GuiItemValueAuc5Market"]	= "AucAdv Market Value";
 		["GuiItemValueAverage"]	= "Average (default)";
 		["GuiItemValueBaseline"]	= "Market Baseline";
@@ -901,7 +903,7 @@ EnchantrixLocalizations = {
 		["FrmtActClearFail"]	= "Impossible de trouver l'objet : %s";
 		["FrmtActClearOk"]	= "Information effacée pour l'objet : %s";
 		["FrmtActDefault"]	= "L'option %s d'Enchantrix a été réinitialisée à sa valeur par défaut";
-		["FrmtActDefaultAll"]	= "Toutes les options d'Enchantrix ont été réinitialisées à  leurs valeurs par défaut.";
+		["FrmtActDefaultAll"]	= "Toutes les options d'Enchantrix ont été réinitialisées à  leurs valeurs par défaut.";
 		["FrmtActDisable"]	= "N'affiche pas les données de l'objet %s";
 		["FrmtActEnable"]	= "Affichage des données de l'objet %s";
 		["FrmtActSet"]	= "Fixe la valeur de %s à '%s'";
@@ -1011,34 +1013,38 @@ EnchantrixLocalizations = {
 		["AuctionScanAuctNotInstalled"]	= "Vous n'avez pas installé Auctioneer. Auctioneer doit être installé afin d'effectuer un scannage des enchères.";
 		["AuctionScanVersionTooOld"]	= "Vous n'avez pas la bonne version d4auctioneer installée, cette fonctionnalité requiert Auctioneer v4.0 ou plus.";
 		["ChatDeletedProfile"]	= "Profil effacé:";
+		["ChatResetProfile"]	= "Effacer tous les réglages pour:";
 		["ChatSavedProfile"]	= "Profil enregistré:";
 		["FrmtBidbrokerCurbid"]	= "EnchAct";
 		["FrmtBidbrokerDone"]	= "L'agent d'enchères a terminé";
 		["FrmtBidbrokerHeader"]	= "Enchères présentant %s pièces d'argent d'économie sur la valeur moyenne de désenchantement (min. %d%% de moins) :";
-		["FrmtBidbrokerLine"]	= "%s, Estimé à : %s, %s: %s, Economie: %s, Moins %s, Temps: %s";
+		["FrmtBidbrokerLine"]	= "%s, Estimé à : %s, %s: %s, Economie: %s, Moins %s, Temps: %s";
 		["FrmtBidbrokerMinbid"]	= "EnchMin";
 		["FrmtBidBrokerSkipped"]	= "%d enchères ignorées pour marge trop faible (%d%%)";
 		["FrmtPctlessDone"]	= "Pourcentage inférieur terminé.";
 		["FrmtPctlessHeader"]	= "Achats immédiats %d%% économisant plus que la valeur moyenne de désenchantement de l'objet (min. %s d'économie) :";
-		["FrmtPctlessLine"]	= "%s, Estimé à : %s, AI: %s, Economie: %s, Moins %s";
+		["FrmtPctlessLine"]	= "%s, Estimé à : %s, AI: %s, Economie: %s, Moins %s";
 		["FrmtPctlessSkillSkipped"]	= "Enchères sautées de %d dues à la coupure de niveau de compétence (%s)";
 		["FrmtPctlessSkipped"]	= "%d enchères ignorées pour marge trop faible (%s)";
 
 		-- Section: Tooltip Messages
-		["FrmtBarkerPrice"]	= "Prix Trader (marge : %d%%)";
+		["FrmtBarkerPrice"]	= "Prix marchand (marge : %d%%)";
 		["FrmtDisinto"]	= "Se désenchante en :";
 		["FrmtFound"]	= "%s se désenchante en :";
-		["FrmtFoundNotDisenchant"]	= "Constaté que %s n'est pas disenchantable";
+		["FrmtFoundNotDisenchant"]	= "%s ne peut pas être désenchanter";
 		["FrmtPriceEach"]	= "(%s l'unité)";
 		["FrmtProspectFound"]	= "Constaté que %s prospecte en:";
 		["FrmtProspectInto"]	= "Prospecte en:";
 		["FrmtProspectValueAuctHsp"]	= "Valeur prospectée (HSP)";
 		["FrmtProspectValueAuctMed"]	= "Valeur prospectée (médiane)";
+		["FrmtProspectValueAuctVal"]	= "Valeur prospectée (AucAdv)";
 		["FrmtProspectValueMarket"]	= "Valeur prospectée (référence)";
-		["FrmtSuggestedPrice"]	= "Prix suggéré:";
+		["FrmtSuggestedPrice"]	= "Prix suggéré :";
 		["FrmtTotal"]	= "Total";
 		["FrmtValueAuctHsp"]	= "Valeur désenchantée (HSP)";
 		["FrmtValueAuctMed"]	= "Valeur désenchantée (Moyenne)";
+		["FrmtValueAuctVal"]	= "Valeur désenchantée (AucAdv)";
+		["FrmtValueFixedVal"]	= "Valeur désenchantée (Fixe)";
 		["FrmtValueMarket"]	= "Valeur désenchantée (Référence)";
 		["FrmtWarnAuctNotLoaded"]	= "[Auctioneer non chargé, utilisation du prix en cache]";
 		["FrmtWarnNoPrices"]	= "[Aucun prix disponible]";
@@ -1047,27 +1053,53 @@ EnchantrixLocalizations = {
 		["TooltipShowDisenchantLevel"]	= "Désenchantement demande niveau %d";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "Exporter les prix Enchantrix vers AuctioneerAdvanced";
 		["GuiActivateProfile"]	= "Activer un profile existant";
 		["GuiAutoDeEnable"]	= "Chercher pour des objets désenchentables - UTILISER PRUDEMMENT!";
 		["GuiAutoDeOptions"]	= "Automatisation";
-		["GuiAutoDePromptLine1"]	= "Veux-tu désenchanter:";
-		["GuiAutoDePromptLine3"]	= "valué à %s";
+		["GuiAutoDePromptLine1"]	= "Voulez-vous désenchanter :";
+		["GuiAutoDePromptLine3"]	= "Évalué à %s";
+		["GuiBBUnbiddedOnly"]	= "BidBroker restreint aux objets non-liés seulement";
 		["GuiConfigProfiles"]	= "Créer, configurer et éditer des profiles";
 		["GuiCreateReplaceProfile"]	= "Créer ou replacer un profile";
-		["GuiDeleteProfileButton"]	= "Éffacer";
+		["GuiDefaultBBProfitPercent"]	= "Pourcentage de profit par défaut du bidbroker : %d";
+		["GuiDefaultLessHSP"]	= "Pourcentage par défaut moin que HSP : %d";
+		["GuiDefaultProfitMargin"]	= "Marge bénéficiaire par défaut :";
+		["GuiDeleteProfileButton"]	= "Supprimer";
+		["GuiFixedSettings"]	= "Prix fixe des réactifs";
+		["GuiFixedSettingsNote"]	= "Remarque : ces valeurs seront utilisées à la place de celles d'Auctioneer ou de n'importe quelles autres méthodes si cette option est cochée. Toutefois, ces valeurs restent dépendantes du poids des réactifs de la section précédente, donc si vous voulez être certain que ces valeurs fixes soient exactement celles que vous voulez, assurez-vous de mettre 100% dans la section des poids.";
+		["GuiGeneralOptions"]	= "Options générales d'Enchantrix";
 		["GuiIgnore"]	= "Ignorer";
-		["GuiItemValueAuc4Median"]	= "Auc4 médiane";
+		["GuiItemValueAuc4HSP"]	= "Auc4 HSP";
+		["GuiItemValueAuc4Median"]	= "Auc4 Moyenne";
+		["GuiItemValueAuc5Market"]	= "AucAdv Prix du marché";
+		["GuiItemValueAverage"]	= "Moyenne (défaut)";
+		["GuiItemValueBaseline"]	= "Basé sur le prix du marché";
 		["GuiItemValueCalc"]	= "Valeur calculée à partir de";
-		["GuiMinimapButtonDist"]	= "Distance: %d";
+		["GuiMaxBuyout"]	= "Prix d'achat maximum :";
+		["GuiMinBBProfitPercent"]	= "Pourcentage de profit minimum du bidboker : %d";
+		["GuiMinimapButtonAngle"]	= "Angle du bouton : %d";
+		["GuiMinimapButtonDist"]	= "Distance : %d";
+		["GuiMinimapOptions"]	= "Options d'affichage sur la minimap";
 		["GuiMinimapShowButton"]	= "Afficher le bouton de la minimap";
-		["GuiNewProfileName"]	= "Nom du nouveau profil:";
+		["GuiMinLessHSP"]	= "Pourcentage minimum moins que l'HSP : %d";
+		["GuiMinProfitMargin"]	= "Marge bénéficiaire minimale :";
+		["GuiNewProfileName"]	= "Nom du nouveau profil :";
 		["GuiNo"]	= "Non";
+		["GuiPLBBOnlyBelowDESkill"]	= "N'afficher que les objets pouvant être désenchantés selon votre niveau actuel d'enchantement";
+		["GuiProspectingLevels"]	= "Voir le niveau nécessaire dans la bulle d'aide";
 		["GuiProspectingOptions"]	= "Options de prospection";
+		["GuiResetProfileButton"]	= "Réinitialiser";
 		["GuiSaveProfileButton"]	= "Sauver";
 		["GuiShowProspecting"]	= "Afficher les données de prospection pour les minerais";
 		["GuiTabFixed"]	= "Valeur fixe";
 		["GuiTabGeneral"]	= "Général";
 		["GuiTabProfiles"]	= "Profils";
+		["GuiValueOptions"]	= "Option d'affichage du prix";
+		["GuiValueShowAuc4Median"]	= "Voir le prix moyen d'Auctioneer";
+		["GuiValueShowAuc5Market"]	= "Voir le prix du marché d'Auctioneer";
+		["GuiValueShowDEValues"]	= "Voir la valeur estimée du désenchantement";
+		["GuiWeightSettings"]	= "réactifs de désenchantement désirés";
 		["GuiYes"]	= "Oui";
 
 	};
@@ -1324,12 +1356,26 @@ EnchantrixLocalizations = {
 		["HelpValue"]	= "가능한 마력추출 비율에 근거한 아이템의 평가값 보기 여부 선택";
 
 		-- Section: Report Messages
+		["AuctionScanAuctNotInstalled"]	= "Auctioneer가 설치되어 있지 않습니다. 경매 검색을 수행하려면 Auctioneer가 설치되어 있어야 합니다.";
+		["AuctionScanVersionTooOld"]	= "설치된 Auctioneer의 버젼이 맞지 않습니다. 이 기능을 이용하려면 Auctioneer 4.0 이상이 필요합니다.";
+		["ChatDeletedProfile"]	= "프로파일 삭제 : ";
+		["ChatResetProfile"]	= "모든 설정값 삭제 : ";
+		["ChatSavedProfile"]	= "저장된 프로파일 : ";
+		["ChatUsingProfile"]	= "사용중인 프로파일 : ";
+		["FrmtAutoDeActive"]	= "자동 마력추출 활성화";
+		["FrmtAutoDeDisabled"]	= "자동 마력추출 disabled";
+		["FrmtAutoDeDisenchantCancelled"]	= "마력추출이 취소되었습니다 : 아이템을 찾을 수 없습니다.";
+		["FrmtAutoDeDisenchanting"]	= "%s를 마력추출합니다.";
+		["FrmtAutoDeIgnorePermanent"]	= "%s를 영원히 무시합니다.";
+		["FrmtAutoDeIgnoreSession"]	= "%s를 이번 접속동안만 무시합니다.";
+		["FrmtAutoDeInactive"]	= "자동 마력추출 비활성화";
 		["FrmtBidbrokerCurbid"]	= "현재 입찰";
 		["FrmtBidbrokerDone"]	= "입찰 중개 완료";
 		["FrmtBidbrokerHeader"]	= "입찰이 평균 마력추출 가격에서 %S 실버 절약되었습니다. (최소 %%less = %d):";
 		["FrmtBidbrokerLine"]	= "%s, 가격: %s, %s: %s, 감소: %s, %s 이하, 시간: %s";
 		["FrmtBidbrokerMinbid"]	= "최소 입찰";
 		["FrmtBidBrokerSkipped"]	= "%d개의 경매품이 마진(%d%%)을 위해 건너뛰어짐";
+		["FrmtBidBrokerSkippedBids"]	= "입찰값이 존재하여 %d개의 경매를 건너뛰었습니다.";
 		["FrmtPctlessDone"]	= "완료 이하 확률. ";
 		["FrmtPctlessHeader"]	= "즉시 구입가격이 평균 마력추출 가격상에서 %d%% 절약되었습니다.:";
 		["FrmtPctlessLine"]	= "%s, 가격: %s, BO: %s, 감소: %s, %s 이하";
@@ -1351,6 +1397,7 @@ EnchantrixLocalizations = {
 		["FrmtWarnPriceUnavail"]	= "[일부 가격을 사용할 수 없음]";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "Enchantrix 가격을 AuctioneerAdvanced로 보냅니다.";
 		["GuiActivateProfile"]	= "현재 프로필 활성화";
 		["GuiAutoDeEnable"]	= "가방에서 마력추출할 아이템을 찾습니다. - \"주의해서 사용하세요.\"";
 		["GuiAutoDeOptions"]	= "자동설정";
@@ -1870,12 +1917,13 @@ EnchantrixLocalizations = {
 		["FrmtValueAuctMed"]	= "分解价值(中位数)";
 		["FrmtValueAuctVal"]	= "分解价值(AucAdv)";
 		["FrmtValueMarket"]	= "分解价值(基准)";
-		["FrmtWarnAuctNotLoaded"]	= "[拍卖助手未加载，使用缓冲价格]";
-		["FrmtWarnNoPrices"]	= "[无价可用]";
-		["FrmtWarnPriceUnavail"]	= "[某些价格不可用]";
+		["FrmtWarnAuctNotLoaded"]	= "[拍卖助手未加载，使用缓存中的价格]";
+		["FrmtWarnNoPrices"]	= "[无价格信息]";
+		["FrmtWarnPriceUnavail"]	= "[某些价格信息不可用]";
 		["TooltipShowDisenchantLevel"]	= "分解必要技能%d";
 
 		-- Section: User Interface
+		["ExportPriceAucAdv"]	= "将Enchantrix的价格信息导出到AuctioneerAdvanced";
 		["GuiActivateProfile"]	= "激活当前配置";
 		["GuiAutoDeOptions"]	= "自动";
 		["GuiAutoDePromptLine1"]	= "确认要分解：";

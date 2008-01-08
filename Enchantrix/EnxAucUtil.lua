@@ -51,6 +51,8 @@ local priceTable = {}
 local priceTableAge
 function lib.IsValidAlgorithm(hyperlink)
 	if not get("export.aucadv") then return false end
+    
+    if get("ScanValueType") == "adv:stat:appraiser" then return false end  -- Stops infinite loop from using Appraiser prices which uses Market Price which uses Enchantrix.
 
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return false end

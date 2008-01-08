@@ -269,7 +269,8 @@ function getItemDisenchantTotals(link)
 			if (result ~= "total") then
 
 				local resNumber, resQuantity = unpack(resData)
-				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
+				local style, extra = Enchantrix.Util.GetPricingModel()
+				local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result,extra)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
 				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
 				local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield

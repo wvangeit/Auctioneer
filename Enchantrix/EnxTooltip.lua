@@ -101,7 +101,8 @@ local function prospectTooltip(prospect, funcVars, retVal, frame, name, link, qu
 
 	for result, resYield in pairs( prospect ) do
 		if (not lines) then lines = {} end
-		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result)
+		local style, extra = Enchantrix.Util.GetPricingModel();
+		local hsp, med, mkt, five = Enchantrix.Util.GetReagentPrice(result,extra)
 		local resHSP, resMed, resMkt, resFive = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield
 		totalHSP = totalHSP + resHSP
 		totalMed = totalMed + resMed
@@ -202,7 +203,7 @@ end
 
 
 function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
-
+	
 	-- first, see if this is a prospectable item (short list)
 	local prospect = Enchantrix.Storage.GetItemProspects(link)
 	if (prospect and Enchantrix.Settings.GetSetting('TooltipShowProspecting')) then
@@ -232,7 +233,8 @@ function itemTooltip(funcVars, retVal, frame, name, link, quality, count)
 				if (not lines) then lines = {} end
 
 				local resNumber, resQuantity = unpack(resData)
-				local hsp, med, mkt, five, fix = Enchantrix.Util.GetReagentPrice(result)
+				local style, extra = Enchantrix.Util.GetPricingModel()
+				local hsp, med, mkt, five, fix = Enchantrix.Util.GetReagentPrice(result, extra)
 				local resProb, resCount = resNumber/totalNumber, resQuantity/resNumber
 				local resYield = resProb * resCount;	-- == resQuantity / totalNumber;
 				local resHSP, resMed, resMkt, resFive, resFix = (hsp or 0)*resYield, (med or 0)*resYield, (mkt or 0)*resYield, (five or 0)*resYield, (fix or 0)*resYield
@@ -494,7 +496,8 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	-- Append additional reagent info
 	for _, reagent in ipairs(reagentList) do
 		local rName, _, rQuality = Enchantrix.Util.GetReagentInfo(reagent[1])
-		local hsp, median, market, five, fix = Enchantrix.Util.GetReagentPrice(reagent[1])
+		local style, extra = Enchantrix.Util.GetPricingModel();
+		local hsp, median, market, five, fix = Enchantrix.Util.GetReagentPrice(reagent[1],extra)
 		local _, _, _, color = GetItemQualityColor(rQuality)
 
 		reagent[1] = rName
