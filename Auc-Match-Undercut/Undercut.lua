@@ -93,7 +93,7 @@ function lib.GetMatchArray(hyperlink, marketprice)
 				if (not (compet.sellerName == playerName)) then
 					matchprice = compet.buyoutPrice
 				end
-			else
+			elseif (compet.buyoutPrice > 0) then
 				lowest = false
 			end
 		end
