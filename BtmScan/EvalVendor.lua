@@ -110,10 +110,23 @@ define(lcName..'.allow.bid', true)
 define(lcName..'.allow.buy', true)
 function lib:setup(gui)
 	local id = gui:AddTab(libName)
-	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
+	
+	gui:AddHelp(id, "what is the vendor evaluator",
+		"What is the vendor evaluator?",
+		"This evaluator allows you to purchase items that can be sold to a vendor for more than you pay for it based on your settings here.\n\n"..
+		""..
+		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout an item for selling to a vendor.\n\n"..
+		""..
+		"Profit Settings: Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
+		""..
+		"\n")
+		
+	gui:AddControl(id, "Subhead",          0,    libName.." General Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.bid", "Allow bid on items")
+
+	gui:AddControl(id, "Subhead",          0,    "Profit Settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",       0, 1, lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
 end
