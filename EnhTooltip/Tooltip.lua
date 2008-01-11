@@ -665,7 +665,7 @@ function private.AnchorEnhancedTooltip(currentTooltip, requestedHeight, requeste
 		-- the parent to display the tooltip. In that case we'll just shift tooltip
 		-- enough up or down so that it doesn't hang off the screen.
 		local yOffset = 0
-		local totalHeight = requestedHeight + currentTooltip:GetHeight()
+		local totalHeight = requestedHeight + (currentTooltip:GetHeight())*(currentTooltip:GetScale())
 		if (yAnchor == "TOP" and top + totalHeight > screenHeight - 5) then
 			yOffset = -(top + totalHeight - screenHeight + 5)
 		elseif (yAnchor == "BOTTOM" and bottom - totalHeight < 5) then
