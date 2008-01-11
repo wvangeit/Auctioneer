@@ -551,10 +551,6 @@ function protectAuctionFrame(enable)
 			else
 				--Put the frame back into the UI frame handling system
 				UIPanelWindows.AuctionFrame = { area = "doublewide", pushable = 0 };
-
-				if ( AuctionFrame:IsVisible() ) then
-					SetUIPanel("doublewide", AuctionFrame)
-				end
 			end
 
 			-- remove the hooks to bypass the dressing feature needing to alter
