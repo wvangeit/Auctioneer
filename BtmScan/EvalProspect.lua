@@ -204,11 +204,12 @@ function lib:setup(gui)
 		""..
 		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout ore for prospecting.\n\n"..
 		""..
-		"Custom Skill & Profit Settings: This section allows you to set your prospecting skill in order to avoid buying ores that you cannot process due to being outside of your prospecting skill range. Minimum profit(discount from market value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
+		"Custom Skill & Profit Settings: This section allows you to set your prospecting skill in order to avoid buying ores that you cannot process due to being outside of your desired prospecting skill range. Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here.\n\n"..
 		""..
 		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) and/or deposit costs figured in when valuating an item to prospect. You may also select how many times you project having to relist the mats before they will sell.\n\n"..
 		""..
 		"\n")
+		
 	gui:AddControl(id, "Subhead",          0,    libName.." General Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".allow.buy", "Allow buyout on items")
