@@ -315,16 +315,16 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 			EnhTooltip.AddLine("  3 day average", avg3*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
-		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
-			EnhTooltip.AddLine("  Min BO", minBuyout*quantity)
-			EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		end
 		if (seenDays > 0) and (avgmins > 0) and dispAvgMBO then
 			EnhTooltip.AddLine("  Average MBO", avgmins*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 		if (dayCount > 0) then
 			EnhTooltip.AddLine("  Seen |cffddeeff"..dayCount.."|r today", dayAverage*quantity)
+			EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		end
+		if (dayCount > 0) and (minBuyout > 0) and dispMinB then
+			EnhTooltip.AddLine(" Today's Min BO", minBuyout*quantity)
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
 	end
