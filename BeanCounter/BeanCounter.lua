@@ -287,7 +287,7 @@ function lib.externalSearch(name, settings, queryReturn, count)
 				return(private.searchByItemID(itemName, settings, queryReturn, count))
 			else
 				settings.exact = true --If this is an external addon wanting search data returned
-				 return(private.startSearch(itemName, settings, _, queryReturn))
+				return(private.startSearch(itemName, settings, queryReturn, count))
 			end
 		end
 	--else
