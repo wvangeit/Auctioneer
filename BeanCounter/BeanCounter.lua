@@ -316,12 +316,14 @@ local String
 	end
 	return(String)
 end
---Will split any string and return a table value
+--Will split any string and return a table value, replace gsub with tbl compare, slightly faster this way.
 function private.unpackString(text)
-	text = text:gsub("<nil>", 0) --Remove out <NIL> holder with 0
-	return {strsplit(";", text)}
+	local tbl = {strsplit(";", text)}
+	for i,v in pairs(tbl) do
+		if v == "<nil>" then tbl[i] = "0" end --0 needs to be a string, we convert to # if its needed in the calling function, and this prevents string/number comparisions if nil is a text place holder
+	end
+	return tbl
 end
-
 --Add data to DB
 function private.databaseAdd(key, itemID, value)
 	if private.playerData[key][itemID] then
