@@ -13085,5 +13085,7 @@ Informant.SetDatabase({
 	[19257]="400000:100000:15:0:1:::0:0:", -- Warlords Deck
 	[19030]="8000000:0:15:0:1:::1:0:774", -- Stormpike Battle Charger
 	[18564]="0:0:15:0:1:::0:0:", -- Bindings of the Windseeker
+	[21991]="9000:3000:5:0:20:::0:0:", -- Heavy Netherweave Bandage
+	[21990]="6000:1275:5:0:20:::0:0:", -- Netherweave Bandage
 })
 
