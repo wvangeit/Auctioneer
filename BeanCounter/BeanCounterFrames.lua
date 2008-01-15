@@ -458,161 +458,25 @@ function private.CreateFrames()
 	local temp ={}
 	local tbl = {}
 	local dateString = "%c"
-	function private.startSearch(itemName, settings, itemTexture, queryReturn) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
+	--This is all handled by ITEMIDS need to remove/rename this to be a utility to convvert text searches to itemID searches
+	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		tbl = {}
-		for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
-			if i:lower():find(itemName:lower(), 1, true)  then
-				table.insert(tbl, v)
+		if settings.exact then 
+			if BeanCounterDB["ItemIDArray"][itemName:lower()] then 
+				table.insert(tbl, BeanCounterDB["ItemIDArray"][itemName:lower()])
 			end
-		end
-		if tbl[1] then private.searchByItemID(tbl, settings, queryReturn, count, itemTexture) return end
-		
-		--Add an item texure to out button icon, this will more than likely fail unless we happen to have teh item cached if itemName is plain text
-		if not itemTexture then --set search box itemTexture if possible
-			itemTexture = select(2, private.getItemInfo(itemName, "name"))
-		end				
-		frame.icon:SetNormalTexture(itemTexture)--set search box itemTexture if possible
-				
-		
-		if private.getOption("dateString") then dateString = private.getOption("dateString") end
-		data = {}
-		style = {}
-		for a,b in pairs(private.serverData) do
-			if settings.auction then
-				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-				else				
-					for i,v in pairs(private.serverData[a]["completedAuctions"]) do 
-						for index, text in pairs(v) do
-							tbl= private.unpackString(text)
-							local match = false
-							match = private.fragmentsearch(tbl[1], itemName, settings.exact)
-							if match then
-								--'["completedAuctions"] == itemName, "Auction successful", money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth', date
-								
-								local stack, bid = private.reconcileCompletedAuctions(a, i, tbl[4], tbl[6], tbl[9])
-								local pricePer = 0
-								if stack > 0 then	pricePer = tbl[3]/stack end
-								if bid > 0 then tbl[7] = bid end
-								
-								table.insert(data, private.COMPLETEDAUCTIONS(a, i, tbl)) --the data table is created by local function
-								
-								style[#data] = {}
-								style[#data][12] = {["date"] = dateString}	
-								style[#data][2] = {["textColor"] = {0.3, 0.9, 0.8}}
-								style[#data][8] ={["textColor"] = {0.3, 0.9, 0.8}}
-							end
-						end
-					end
-				end
-			end
-			if settings.failedauction then
-				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-				else	
-					for i,v in pairs(private.serverData[a]["failedAuctions"]) do
-						for index, text in pairs(v) do
-
-						tbl= private.unpackString(text)
-						local match = false
-						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
-							if match then
-								--'["failedAuctions"] == itemName, "Auction expired",0,(time the mail arrived in our mailbox), curretn wealth',
-								--Lets try some basic reconciling here
-								local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(a, i, tbl)
-								--Ok we will use the proper stack count from expired auctions, but if thats 0 then we will try to get a stack price from posted auctions
-								if tonumber(tbl[3]) > 0 then count = tbl[3] end
-
-								table.insert(data, private.FAILEDAUCTIONS(a, i, tbl))--the data table is created by local function
-								
-								style[#data] = {}
-								style[#data][12] = {["date"] = dateString}	
-								style[#data][2] = {["textColor"] = {1,0,0}}
-								style[#data][8] ={["textColor"] = {1,0,0}}
-							end
-						end
-					end
-				end
-			end
-			
-			if settings.bid then--or settings.buy then
-				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-				else				
-					for i,v in pairs(private.serverData[a]["completedBids/Buyouts"]) do
-						for index, text in pairs(v) do
-
-						tbl= private.unpackString(text)
-						local match = false
-						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
-							if match then
-								local stack, matchedBID = private.reconcileCompletedBids(a, i, tbl[8], tbl[6], tbl[7])
-								local pricePer = 0
-								local text = _BC('UiWononBuyout')
-								if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
-									text = _BC('UiWononBid')
-									if stack > 0 then	pricePer = tbl[7]/stack end
-									else
-									if stack > 0 then	pricePer = tbl[6]/stack end
-								end
-
-								table.insert(data, private.COMPLETEDBIDSBUYOUTS(a, i, tbl))--the data table is created by local function
-								
-								style[#data] = {}
-								style[#data][12] = {["date"] = dateString}	
-								style[#data][2] = {["textColor"] = {1,1,0}}
-								style[#data][8] ={["textColor"] = {1,1,0}}
-							end
-						end
-					end
-				end
-			end
-			if settings.failedbid then--or settings.buy then
-				if settings.selectbox[1] ~= 1 and a ~= settings.selectbox[2] and settings.selectbox[2] ~= "server" then --this allows the player to search a specific toon, rather than whole server
-				--debugPrint("no match found for selectbox", settings.selectbox[2], a)
-				else	
-					for i,v in pairs(private.serverData[a]["failedBids"]) do
-						for index, text in pairs(v) do
-
-						tbl= private.unpackString(text)
-						local match = false
-						match = private.fragmentsearch(tbl[1], itemName, settings.exact)
-							if match then
-
-								--'["failedBids"] == itemName, "Outbid", money, (time the mail arrived in our mailbox)',
-								table.insert(data, private.FAILEDBIDS(a, i , tbl))
-								
-								style[#data] = {}
-								style[#data][12] = {["date"] = dateString}	
-								style[#data][2] = {["textColor"] = {1,1,1}}
-								style[#data][8] ={["textColor"] = {1,1,1}}
-							end
-						end
-					end
+		else
+			for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
+				if i:lower():find(itemName:lower(), 1, true)  then
+					table.insert(tbl, v) --Create a list of itemIDs that match the search text
 				end
 			end
 		end
-		--BC CLASSIC DATA SEARCH	
-		if settings.classic then
-			data, style = private.classicSearch(data, style, itemName, settings, dateString)
-		end
-	
-		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
-			frame.resultlist.sheet:SetData(data, style)
-			frame.resultlist.sheet:ButtonClick(12, "click") --This tells the scroll sheet to sort by column 11 (time)
-			frame.resultlist.sheet:ButtonClick(12, "click") --and fired again puts us most recent to oldest
-			--If the user has scrolled to far and search is not showing scroll back to starting position
-			if  not frame.resultlist.sheet.rows[1][1]:IsShown() then
-				frame.resultlist.sheet.panel:ScrollToCoords(0,0)
-			end
-		else --Ok this is an external addon wanting the results of a beancounter search
-			return(data)
-		end
-				
+		private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName) 
 	end
 	
-	function private.searchByItemID(id, settings, queryReturn, count, itemTexture) 
+	function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic) 
 		if not id then return end
 		if not settings then settings = frame.getCheckboxSettings() end
 		tbl = {}
@@ -715,10 +579,9 @@ function private.CreateFrames()
 			style[#data][8] ={["textColor"] = {1,1,1}}
 			
 		end
-		--BC CLASSIC DATA SEARCH	
-		if settings.classic then
-			local itemName, _ = private.getItemInfo(id[1], "name") or "FAILED TO GET ITEMNAME"
-			data, style = private.classicSearch(data, style, itemName, settings, dateString)
+		--BC CLASSIC DATA SEARCH Only usable when a plain text search is used
+		if settings.classic and not tonumber(classic)then
+			data, style = private.classicSearch(data, style, classic, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
 			if not itemTexture and id[1] then --set search box itemTexture if possible
@@ -859,7 +722,7 @@ function private.CreateFrames()
 					--tbl[6], --date
 				})
 		end
-		
+	--Only used by classic search now	
 	function private.fragmentsearch(compare, itemName, exact, classic)
 		if exact and not classic then 
 			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) or "FAILED ITEM LINK" --extract item name from itemlink 

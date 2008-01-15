@@ -41,8 +41,8 @@ local private = {
 	--BeanCounterCore
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
-	faction, _ = UnitFactionGroup(UnitName("player")),
-	version = 1.06,
+	faction = select(2, UnitFactionGroup(UnitName("player"))),
+	version = 1.07,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -144,7 +144,7 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName] = {}
 		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
 		
-		BeanCounterDB[private.realmName][private.playerName]["faction]"] = private.faction
+		BeanCounterDB[private.realmName][private.playerName]["faction"] = private.faction
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
 		
 		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
@@ -333,7 +333,7 @@ function private.databaseAdd(key, itemID, value)
 	end
 	--Insert into the ItemName:ItemID dictionary array
 	local name = value:match("^|c%x+|H.+|h%[(.+)%].-;.*")
-	if name and itemID then BeanCounterDB["ItemIDArray"][name] = itemID end
+	if name and itemID then BeanCounterDB["ItemIDArray"][name:lower()] = itemID end
 end
 --remove item (for pending bids only atm)
 function private.databaseRemove(key, itemID, ITEM, NAME)

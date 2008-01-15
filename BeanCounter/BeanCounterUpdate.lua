@@ -41,7 +41,7 @@ local function debugPrint(...)
         private.debugPrint("BeanCounterUpdate",...)
     end
 end
-
+--manually ran, not used by any other functions atm
 function private.fixMissingItemlinks()
 local tbl = {}
 	for player, v in pairs(private.serverData)do
@@ -82,7 +82,9 @@ function private.UpgradeDatabaseVersion()
 	if not BeanCounterDB["settings"] then --Added to allow beancounter to be standalone
 	    BeanCounterDB["settings"] = {}
 	end
-	
+	if not BeanCounterDB[private.realmName][private.playerName]["faction"] then --typo corrected in revision 2747 that prevented faction from recording
+		BeanCounterDB[private.realmName][private.playerName]["faction"] = private.faction
+	end
 	
 	if private.playerData["version"] < 1.015 then
 		private.updateTo1_02A()
@@ -99,13 +101,15 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 1.06 then
 		debugPrint("private.updateTo1_06()")
 		private.updateTo1_06()
+	elseif private.playerData["version"] < 1.07 then
+		debugPrint("private.updateTo1_07()")
+		private.updateTo1_07()
 	end
 		
 end
 
 --[[This changes the database to use ; and to replace itemNames with and itemlink]]--
 function private.updateTo1_02A() 
-	
 	--: to ; and itemName to itemlink
 	for player, v in pairs(private.serverData) do
 		for DB, data in pairs(v) do
@@ -217,12 +221,18 @@ function private.updateTo1_06()
 					for index, text in ipairs(value) do
 						local item = text:match("^|c%x+|H.+|h%[(.+)%].-;.*")
 						if item then
-							BeanCounterDB["ItemIDArray"][item] = itemID
+							BeanCounterDB["ItemIDArray"][item:lower()] = itemID
 						end
 					end
 				end
 			end
 		end
-	private.serverData[player]["version"] = 1.06
+	private.serverData[player]["version"] = 1.07 --Since this is actually the 1.07 change item:lower()
 	end
+end
+
+--[[This changes the ItemID array to store names in lower case, needed to easily allow exact match, We also add faction table]]--
+function private.updateTo1_07()
+	BeanCounterDB["ItemIDArray"] = {}
+	private.updateTo1_06() --1.06 has been changed to always record in lower, so reuse that code :)
 end
