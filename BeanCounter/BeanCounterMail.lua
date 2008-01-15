@@ -228,23 +228,19 @@ end
 --|cffffffff|Hitem:4238:0:0:0:0:0:0:801147302|h[Linen Bag]|h|r
 --retrieves the itemID from the DB
 function private.matchDB(key, text)
-	for i,v in pairs(private.playerData[key]) do
-		if private.playerData[key][i][1] then
-			--Match the proper Suffix with teh itemID
-			for index = #private.playerData[key][i] , 1, -1 do 
-				if text == (string.match(private.playerData[key][i][index], "^|c%x+|H.+|h%[(.+)%]" )) then
-				    local itemLink = private.playerData[key][i][index]:match("(.-);")
-						debugPrint("Searching DB for ItemID..",private.playerData[key][i][index], "Sucess: link is",itemLink , " not", private.playerData[key][i][1])
-					return i, itemLink
-				else
-					--debugPrint("Searching DB for ItemID..", key, text, "Item Name does not match")
-				end
+	local itemID = BeanCounterDB["ItemIDArray"][text]
+	if itemID and private.playerData[key][itemID] then
+		for index = #private.playerData[key][itemID] , 1, -1 do
+			if private.playerData[key][itemID][index]:find(text, 1, true) then
+				local itemLink = private.playerData[key][itemID][index]:match("(.-);")
+				debugPrint("Searching",key,"for",text,"Sucess: link is",itemLink)
+				return itemID, itemLink
 			end
-		else  
-			debugPrint("Searching DB for ItemID..", key, text, "Failed")
-			return nil
 		end
+		--debugPrint("Searching", key,"for" ,text, "Item Name does not match any in this database")
 	end
+	debugPrint("Searching DB for ItemID..", key, text, "Failed ItemID does not exist")
+	return nil
 end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
@@ -320,6 +316,8 @@ function private.mailBoxColorStart()
 		mailCurrent[n] = {["time"] = daysLeft ,["sender"] = sender, ["subject"] = subject, ["read"] = wasRead or 0 }
 	end
 	
+	--Fix reported errors of mail DB not existing for some reason.
+	if not BeanCounterDB[private.realmName][private.playerName]["mailbox"] then BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {} end 
 	--Create Characters Mailbox, or resync if we get more that 5 mails out of tune
 	if #BeanCounterDB[private.realmName][private.playerName]["mailbox"] > (#mailCurrent+2) or #BeanCounterDB[private.realmName][private.playerName]["mailbox"] == 0 then
 		debugPrint("Mail tables too far out of sync, resyncing #mailCurrent", #mailCurrent,"#mailData" ,#BeanCounterDB[private.realmName][private.playerName]["mailbox"])
