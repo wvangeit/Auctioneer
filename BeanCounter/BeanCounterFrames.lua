@@ -634,26 +634,31 @@ function private.CreateFrames()
 		debugPrint(id, settings, queryReturn, count, itemTexture)
 		--Retrives all matching results
 		for i in pairs(private.serverData) do
-			for _, id in pairs(tbl) do
-				if settings.auction and private.serverData[i]["completedAuctions"][id] then
-					for index,text in ipairs(private.serverData[i]["completedAuctions"][id]) do
-						table.insert(temp.completedAuctions, {i, id, text})
-					end				
-				end
-				if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
-					for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
-						table.insert(temp["failedAuctions"], {i, id, text})
-					end		
-				end
-				if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
-					for index,text in ipairs(private.serverData[i]["completedBids/Buyouts"][id]) do
-						table.insert(temp["completedBids/Buyouts"],{ i, id, text})
-					end		
-				end
-				if settings.failedbid and private.serverData[i]["failedBids"][id] then
-					for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
-						table.insert(temp.failedBids, {i, id, text})
-					end		
+			if settings.selectbox[2] ~= "server" and i ~= settings.selectbox[2] then
+				--If we are not doing a whole server search and the chosen search player is not "i" then we fall into this null
+				--otherwise we search the server or toon as normal
+			else
+				for _, id in pairs(tbl) do
+					if settings.auction and private.serverData[i]["completedAuctions"][id] then
+						for index,text in ipairs(private.serverData[i]["completedAuctions"][id]) do
+							table.insert(temp.completedAuctions, {i, id, text})
+						end
+					end
+					if settings.failedauction and private.serverData[i]["failedAuctions"][id] then
+						for index,text in ipairs(private.serverData[i]["failedAuctions"][id]) do
+							table.insert(temp["failedAuctions"], {i, id, text})
+						end
+					end
+					if settings.bid and private.serverData[i]["completedBids/Buyouts"][id] then
+						for index,text in ipairs(private.serverData[i]["completedBids/Buyouts"][id]) do
+							table.insert(temp["completedBids/Buyouts"],{ i, id, text})
+						end
+					end
+					if settings.failedbid and private.serverData[i]["failedBids"][id] then
+						for index,text in ipairs(private.serverData[i]["failedBids"][id]) do
+							table.insert(temp.failedBids, {i, id, text})
+						end
+					end
 				end
 			end
 		end
@@ -712,7 +717,7 @@ function private.CreateFrames()
 		end
 		--BC CLASSIC DATA SEARCH	
 		if settings.classic then
-			local itemName, _ = private.getItemInfo(id, "name") or "FAILED TO GET ITEMNAME"
+			local itemName, _ = private.getItemInfo(id[1], "name") or "FAILED TO GET ITEMNAME"
 			data, style = private.classicSearch(data, style, itemName, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
