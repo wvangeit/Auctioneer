@@ -5,6 +5,7 @@
 ## LoadOnDemand: 1
 ## SavedVariables: AucScanData
 ## Dependencies: Auc-Advanced
+## OptionalDeps: Auc-Util-PriceLevel
 ##
 ## Version: <%version%> (<%codename%>)
 ## Revision: $Id$

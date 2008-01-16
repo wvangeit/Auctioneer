@@ -161,19 +161,23 @@ function lib.GetDistribution(hyperlink)
 	local scandata = AucAdvanced.Scan.GetScanData()
 
 	local calcLevel, doColor, myColors
-	if (AucAdvanced.Modules.Util and AucAdvanced.Modules.Util.PriceLevel) then
-		calcLevel = AucAdvanced.Modules.Util.PriceLevel.CalcLevel
-		while (#itemWorth>0) do table.remove(itemWorth) end
-		myColors = {}
-		for k,v in pairs(colorDist) do
-			myColors[k] = {}
-			for c,n in pairs(v) do
-				myColors[k][c] = 0
-			end
+    myColors = {}
+	for k,v in pairs(colorDist) do
+		myColors[k] = {}
+		for c,n in pairs(v) do
+			myColors[k][c] = 0
 		end
 	end
-
+    while (#itemWorth>0) do table.remove(itemWorth) end
+    
 	local exact, suffix, base = 0,0,0
+    
+    if (AucAdvanced.Modules.Util and AucAdvanced.Modules.Util.PriceLevel) then
+        calcLevel = AucAdvanced.Modules.Util.PriceLevel.CalcLevel
+	else
+        -- Don't have functions to calculate color code.
+        return exact, suffix, base, myColors
+    end
 
 	local n = #(scandata.image)
 	local v, vID, vSuffix, vFactor, vSig, vLink, vLevel, vPer, vColor, vBid, vBuy, _
@@ -232,7 +236,8 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 
 	local doColor = false
 	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
-	if hasColor then doColor = true end
+	-- hasColor does not exist. Removing.
+    -- if hasColor then doColor = true end
 
 	if full and (base+suffix+exact > 0) then
 		EnhTooltip.AddLine("Items in image:")
