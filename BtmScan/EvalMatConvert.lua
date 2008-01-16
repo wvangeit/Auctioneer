@@ -113,7 +113,7 @@ reagentPrice = 0
 				reagentPrice = newBid
 			end
 				
-	if (reagentPrice == nil or 0) then item:info("error? reagentPrice is nil") return  end
+--	if (reagentPrice == nil or 0) then item:info("error? reagentPrice is nil") return  end
 	
 	--set item we are looking at to evalPrice\
 	local evalPrice = 0
