@@ -228,7 +228,7 @@ end
 --|cffffffff|Hitem:4238:0:0:0:0:0:0:801147302|h[Linen Bag]|h|r
 --retrieves the itemID from the DB
 function private.matchDB(key, text)
-	local itemID = BeanCounterDB["ItemIDArray"][text]
+	local itemID = BeanCounterDB["ItemIDArray"][text:lower()] --All itemID array names are stored in lowercase ALWAYS use :lower() on any query
 	if itemID and private.playerData[key][itemID] then
 		for index = #private.playerData[key][itemID] , 1, -1 do
 			if private.playerData[key][itemID][index]:find(text, 1, true) then
