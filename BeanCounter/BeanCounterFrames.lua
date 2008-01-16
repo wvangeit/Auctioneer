@@ -581,7 +581,6 @@ function private.CreateFrames()
 		end
 		--BC CLASSIC DATA SEARCH Only usable when a plain text search is used
 		if settings.classic and classic and not tonumber(classic)then
-			print(classic)
 			data, style = private.classicSearch(data, style, classic, settings, dateString)
 		end
 		if not queryReturn then --this lets us know it was not an external addon asking for beancounter data
