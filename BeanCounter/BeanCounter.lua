@@ -336,19 +336,20 @@ function private.databaseAdd(key, itemID, value)
 	if name and itemID then BeanCounterDB["ItemIDArray"][name:lower()] = itemID end
 end
 --remove item (for pending bids only atm)
-function private.databaseRemove(key, itemID, ITEM, NAME)
-	if key == "postedBids" then	
+function private.databaseRemove(key, itemID, ITEM, NAME, COUNT)
+	if key == "postedBids" then
 		for i,v in pairs(private.playerData[key][itemID]) do
 			local tbl = private.unpackString(v)
 			if tbl and itemID and ITEM and NAME then
-				if tbl[1] == ITEM and tbl[4] == NAME then
-				if (#playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value              
-			playerData[key][itemID] = nil
-                        break
-                    else
-                        table.remove(playerData[key][itemID],i)--Just remove the key
-                        break
-                    end
+				if tbl[1] == ITEM and tbl[4] == NAME and tonumber(tbl[2]) == COUNT then
+					debugPrint("Removing entry from postedBids this is a match", itemID, ITEM,"vs",tbl[1], NAME,"vs" ,tbl[4], tbl[2], "vs",  COUNT)
+					if (#private.playerData[key][itemID] == 1) then --itemID needs to be removed if we are deleting the only value
+						private.playerData[key][itemID] = nil
+						break
+					else
+						table.remove(private.playerData[key][itemID],i)--Just remove the key
+						break
+					end
 				end
 			end
 		end

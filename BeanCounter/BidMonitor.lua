@@ -135,7 +135,7 @@ function private.onBidAccepted()
 		if (bid.isBuyout) then
 			if bid.isHighBidder then-- If the player is buying out an auction they already bid on, we need to remove the pending bid
 				debugPrint('private.databaseRemove(',"postedBids", itemID, bid.name, bid.owner, bid.bid)
-				private.databaseRemove("postedBids", itemID, bid.name, bid.owner, bid.bid)
+				private.databaseRemove("postedBids", itemID, bid.itemLink, bid.owner, bid.count)
 			end	
 			private.databaseAdd("postedBuyouts", itemID, text) 
 		else
