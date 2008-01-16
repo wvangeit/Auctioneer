@@ -175,10 +175,10 @@ reagentPrice = 0
 				newBuy = 0
 				seen = 1
 				curModelText = "Unknown"
-				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-				EnhTooltip.AddLine("  greaterbid  ", newBid)
+				--newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
+				--EnhTooltip.AddLine("  greaterbid  ", newBid)
 				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-				EnhTooltip.AddLine("  converttobid  ", newBid)
+	--			EnhTooltip.AddLine("  converttobid  ", newBid)
 				
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy * 3
@@ -190,7 +190,7 @@ reagentPrice = 0
 			--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 			-- convertsToValue = convertsToValue * 3
 			convertsToValue = convertsToValue * stackSize
-			EnhTooltip.AddLine("  |cffddeeff 1x greater = 3x lesser |r  ", convertsToValue)
+			--EnhTooltip.AddLine("  |cffddeeff 1x greater = 3x lesser |r  ", convertsToValue)
 		value = convertsToValue
 	end
 	
@@ -215,7 +215,7 @@ reagentPrice = 0
 				seen = 1
 				curModelText = "Unknown"
 				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-				EnhTooltip.AddLine("  Convert to value  ", newBid)
+			--	EnhTooltip.AddLine("  Convert to value  ", newBid)
 				
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy / 3
@@ -223,11 +223,11 @@ reagentPrice = 0
 						convertsToValue = newBid / 3
 					end
 					
-					EnhTooltip.AddLine("  Convert to greater (gvalue /3) ", convertsToValue)
+			--		EnhTooltip.AddLine("  Convert to greater (gvalue /3) ", convertsToValue)
 			--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )
 			--convertsToValue = convertsToValue / 3
 			convertsToValue = convertsToValue * stackSize
-			EnhTooltip.AddLine("  |cffddeeff converts to * starcksize |r  ", convertsToValue)
+		--	EnhTooltip.AddLine("  |cffddeeff converts to * starcksize |r  ", convertsToValue)
 		value = convertsToValue
 	end	
 	
@@ -254,21 +254,21 @@ reagentPrice = 0
 				newBuy = 0
 				seen = 1
 				curModelText = "Unknown"
-				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-				EnhTooltip.AddLine("  greaterbid  ", newBid)
+		--		newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
+		--		EnhTooltip.AddLine("  greaterbid  ", newBid)
 				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-				EnhTooltip.AddLine("  converttobid  ", newBid)
+		--		EnhTooltip.AddLine("  converttobid  ", newBid)
 				
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy / 10
 					else
 						convertsToValue = newBid / 10
 					end
-					EnhTooltip.AddLine("  converttobid / 10 ", convertsToValue)
+	--				EnhTooltip.AddLine("  converttobid / 10 ", convertsToValue)
 					
 			--update value since 10 motes = 1 primal do primal price / 10 
 			convertsToValue = convertsToValue * stackSize
-			EnhTooltip.AddLine("  |cffddeeff 10x mote = 1x primal |r  ", convertsToValue)
+	--		EnhTooltip.AddLine("  |cffddeeff 10x mote = 1x primal |r  ", convertsToValue)
 		value = convertsToValue
 	end
 	
@@ -303,12 +303,12 @@ reagentPrice = 0
 	curModelText = "Unknown"
 	
 	newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-		EnhTooltip.AddLine("  newBid  ", newBid)
-			EnhTooltip.AddLine("  newBuy  ", newBuy)
-				EnhTooltip.AddLine("  seen  ", seen)
-					EnhTooltip.AddLine(curModelText)
-	EnhTooltip.AddLine("  |cffddeeff (Non-Converted) Mat Value: |r  ", evalPrice)
-	EnhTooltip.LineColor(0.3, 0.9, 0.8)
+	--	EnhTooltip.AddLine("  newBid  ", newBid)
+	--		EnhTooltip.AddLine("  newBuy  ", newBuy)
+	--			EnhTooltip.AddLine("  seen  ", seen)
+	--				EnhTooltip.AddLine("EMC using:", curModelText)
+	--EnhTooltip.AddLine("  |cffddeeff (Non-Converted) Mat Value: |r  ", evalPrice)
+	--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	
 	local value = emcAdjustedValue
 	
@@ -321,27 +321,27 @@ reagentPrice = 0
 	item:info("Final Converted Value", value)
 	
 	if value > evalPrice then
-		EnhTooltip.AddLine("|cff00FF00 (evalPrice) Ok to buy for convert!|r", evalPrice)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		EnhTooltip.AddLine("|cff00FF00(value) Ok to buy for convert!|r", value)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		EnhTooltip.AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		--EnhTooltip.AddLine("|cff00FF00(value) Ok to buy for convert!|r", value)
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	else
-		EnhTooltip.AddLine("|cffFF0000 (evalPrice) Don't buy to Convert!|r", evalPrice)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		EnhTooltip.AddLine("|cffFF0000 (value) Don't buy to Convert|r", value)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		EnhTooltip.AddLine("|cffFF0000 EMC: Don't buy me to convert.|r")
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		--EnhTooltip.AddLine("|cffFF0000 (value) Don't buy to Convert|r", value)
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	end
 	
 	if emcAdjustedValue > evalPrice then
-		EnhTooltip.AddLine("|cff00FF00 (evalPrice) Convert to sell!|r", evalPrice)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		EnhTooltip.AddLine("|cff00FF00(value) Convert to sell!|r", emcAdjustedValue)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		EnhTooltip.AddLine("|cff00FF00 EMC: Convert me to sell! |r")
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		--EnhTooltip.AddLine("|cff00FF00(value) Convert to sell!|r", emcAdjustedValue)
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	else
-		EnhTooltip.AddLine("|cffFF0000 (evalPrice) Don't Convert to sell!|r", evalPrice)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		EnhTooltip.AddLine("|cffFF0000 (value) Don't Convert to sell|r", emcAdjustedValue)
-		EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		--EnhTooltip.AddLine("|cffFF0000 (value) Don't Convert to sell|r", emcAdjustedValue)
+		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	end
 	
 	-- Check for tooltip evaluation
@@ -436,3 +436,15 @@ function lib:setup(gui)
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from convert profit")
 end
+
+--[[
+TODO LIST: 
+
+Finish cleaning up tooltip
+Fix btm prompt visual data 
+do some major code cleaning
+Considering adding weights for conversions 
+Considering adding ability to enable or disable a category or converts
+Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
+
+]]
