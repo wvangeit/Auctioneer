@@ -38,3 +38,4 @@ FilterTimeLeft.lua
 FilterItemQuality.lua
 EvalEnchantMats.lua
 EvalComparable.lua
+EvalMatConvert.lua
