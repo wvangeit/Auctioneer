@@ -39,7 +39,7 @@
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
 ]]
 
-local libName = "ConvertMats"
+local libName = "EMatsConvert"
 local lcName = libName:lower()
 local lib = { name = lcName, propername = libName }
 table.insert(BtmScan.evaluators, lcName)
@@ -63,6 +63,7 @@ function lib:valuate(item, tooltip)
 	if not (Enchantrix and Enchantrix.Storage) then return end
 	
 --Set names to item id's	
+--essence's
 local GPLANAR = 22446
 local GETERNAL = 16203
 local GNETHER = 11175
@@ -75,6 +76,21 @@ local LNETHER = 11174
 local LMYSTIC = 11134
 local LASTRAL = 10998
 local LMAGIC = 10938	
+--motes/primals
+local PAIR = 22451
+local MAIR = 22572	
+local PEARTH= 22452
+local MEARTH = 22573
+local PFIRE = 21884
+local MFIRE = 22574
+local PLIFE = 21886
+local MLIFE = 22575
+local PMANA = 22457
+local MMANA = 22576
+local PSHADOW = 22456
+local MSHADOW = 22577
+local PWATER = 21885
+local MWATER = 22578
 
 --Set convertable items table up
 local convertableMat = {
@@ -90,6 +106,20 @@ local convertableMat = {
 	[LMYSTIC] = true,
 	[LASTRAL] = true,
 	[LMAGIC] = true,
+	--[PAIR] = false,  leaving the placeholders for the primals but keeping the commented for possible future use
+	[MAIR] = true,
+	--[PEARTH] = false, 	-- Blacksmiths can convert them back
+	[MEARTH] = true,
+	--[PFIRE] = false,           -- Blacksmiths can convert them back
+	[MFIRE] = true,
+	--[PLIFE] = false,
+	[MLIFE] = true,
+	--[PMANA] = false,
+	[MMANA] = true,
+	--[PSHADOW]= false,
+	[MSHADOW] = true,
+	--[PWATER] = false,
+	[MWATER] = true,
 }
 
 	--Fail and exit if the item is not in our convertableMat table 
@@ -201,6 +231,47 @@ reagentPrice = 0
 		value = convertsToValue
 	end	
 	
+	local convertsToP = {
+	[MAIR] = true,
+	[MEARTH] = true,
+	[MFIRE] = true,
+	[MLIFE] = true,
+	[MMANA] = true,
+	[MSHADOW] = true,
+	[MWATER] = true,
+	}
+	
+	if convertsToP[ item.id ] then
+		if item.id == MAIR then convertToID = PAIR end
+		if item.id == MEARTH then convertToID = PEARTH end
+		if item.id == MFIRE then convertToID = PFIRE end
+		if item.id == MLIFE then convertToID = PLIFE end
+		if item.id == MMANA then convertToID = PMANA end
+		if item.id == MSHADOW then convertToID = PSHADOW end
+		if item.id == MWATER then convertToID = PWATER end
+		
+				newBid = 0
+				newBuy = 0
+				seen = 1
+				curModelText = "Unknown"
+				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
+				EnhTooltip.AddLine("  greaterbid  ", newBid)
+				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				EnhTooltip.AddLine("  converttobid  ", newBid)
+				
+					if get(lcName..".buyout.check") then
+						convertsToValue = newBuy / 10
+					else
+						convertsToValue = newBid / 10
+					end
+					EnhTooltip.AddLine("  converttobid / 10 ", convertsToValue)
+					
+			--update value since 10 motes = 1 primal do primal price / 10 
+			convertsToValue = convertsToValue * stackSize
+			EnhTooltip.AddLine("  |cffddeeff 10x mote = 1x primal |r  ", convertsToValue)
+		value = convertsToValue
+	end
+	
 		-- Adjust for brokerage costs
 	local brokerage = get(lcName..'.adjust.brokerage')
 	emcAdjustedValue = value
@@ -306,7 +377,7 @@ reagentPrice = 0
 	-- profit, then we "win".
 	if (price >= item.purchase and profit > item.profit) then
 		item.purchase = price
-		item.reason = self.name
+		item.reason = self.name  -- should be 'purchasing for xxx'
 		item.what = self.name
 		item.profit = profit
 		item.valuation = value
