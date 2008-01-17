@@ -320,7 +320,7 @@ function private.CreateFrames()
 
 	--search classic data
 	frame.classicCheck = CreateFrame("CheckButton", "BeancounterclassicCheck", frame, "OptionsCheckButtonTemplate")
-	frame.classicCheck:SetChecked(private.getOption("util.beancounter.ButtonClassicCheck"))
+	frame.classicCheck:SetChecked(false) --Set this to false We only want this to be true/searchabe if there is a classic DB to search
 	frame.classicCheck:SetScript("OnClick", function() local set if frame.classicCheck:GetChecked() then set = true end private.setOption("util.beancounter.ButtonClassicCheck", set) end)
 	getglobal("BeancounterclassicCheckText"):SetText(_BC('UiClassicCheckBox'))
 	frame.classicCheck:SetPoint("TOPLEFT", frame, "TOPLEFT", 19, -242)	
@@ -328,7 +328,8 @@ function private.CreateFrames()
 	--no need to show this button if theres no classic data to search
 	if BeanCounterAccountDB then
 		if BeanCounterAccountDB[private.realmName] then 
-			frame.classicCheck:Show()
+			frame.classicCheck:Show() --Show id classic has server data
+			frame.classicCheck:SetChecked(private.getOption("util.beancounter.ButtonClassicCheck")) --Recall last checked state
 		end
 	end
 	
