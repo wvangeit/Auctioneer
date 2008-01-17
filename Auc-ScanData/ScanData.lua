@@ -56,6 +56,7 @@ local colorDist = {
 	exact = { red=0, orange=0, yellow=0, green=0, blue=0 },
 	suffix = { red=0, orange=0, yellow=0, green=0, blue=0 },
 	base = { red=0, orange=0, yellow=0, green=0, blue=0 },
+    stack = { },
 	all = { red=0, orange=0, yellow=0, green=0, blue=0 },
 }
 function lib.Colored(doIt, counts, alt)
@@ -217,6 +218,9 @@ function lib.GetDistribution(hyperlink)
 			end
 			if (vColor) then
 				myColors.all[vColor] = myColors.all[vColor] + vCount
+                -- Set up colours per stack size as well.
+                if not myColors.stack[vCount] then myColors.stack[vCount] =  { red=0, orange=0, yellow=0, green=0, blue=0 } end
+                myColors.stack[vCount][vColor] = myColors.stack[vCount][vColor] + vCount
 			end
 		end
 	end
@@ -234,9 +238,10 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 		full = true
 	end
 
-	local doColor = false
+	local doColor = true
 	local exact, suffix, base, dist = lib.GetDistribution(hyperlink)
-	-- hasColor does not exist. Removing.
+    local stacksize
+	-- hasColor does not exist and Colored does not use the first argument for anything.
     -- if hasColor then doColor = true end
 
 	if full and (base+suffix+exact > 0) then
@@ -254,11 +259,16 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 			EnhTooltip.AddLine("  |cffddeeff"..exact.."|r base "..lib.Colored(doColor, dist.base, "matches"))
 			EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		end
+        if (dist.stack and #(dist.stack) > 1) then
+            for stackSize, stackColor in pairs(dist.stack) do
+                EnhTooltip.AddLine("  Stacks of "..stackSize.."  "..lib.Colored(doColor, stackColor, "in image"))
+            end
+        end
 	elseif base+suffix+exact > 0 then
 		if (suffix+base > 0) then
 			EnhTooltip.AddLine("|cffddeeff"..exact.." +"..(suffix+base).."|r matches "..lib.Colored(doColor, dist.all, "in image"))
 		else
-			EnhTooltip.AddLine("|cffddeeff"..exact.."|r matches "..lib.Colored(doColor, dist.exact, "in image"))
+            EnhTooltip.AddLine("|cffddeeff"..exact.."|r matches "..lib.Colored(doColor, dist.exact, "in image"))
 		end
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
 	else
