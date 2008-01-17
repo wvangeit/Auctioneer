@@ -1,20 +1,21 @@
 --[[
 	BottomScanner - An AddOn for WoW to alert you to good purchases as they appear on the AH
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: EvalTemplate.lua 2649 2007-12-10 03:59:23Z ccox $
+	Revision: $Id: EvalMatConvert.lua 2649 2007-12-10 03:59:23Z testlek $
 	URL: http://auctioneeraddon.com/dl/BottomScanner/
 	Copyright (c) 2006, Norganna
 
 	This is a module for BtmScan to evaluate an item for purchase.
 
-	If you wish to make your own module, do the following:
-	 -  Make a copy of the supplied "EvalTemplate.lua" file.
-	 -  Rename your copy to a name of your choosing.
-	 -  Edit your copy to do your own valuations of the item.
-	      (search for the "TODO" sections in the file)
-	 -  Insert your new file's name into the "BtmScan.toc" file.
-	 -  Optionally, put it up on the wiki at:
-	      http://norganna.org/wiki/BottomScanner/Evaluators
+TODO LIST: 
+
+Finish cleaning up tooltip
+Fix btm prompt visual data 
+do some major code cleaning
+Considering adding weights for conversions 
+Considering adding ability to enable or disable a category or convertable item (maybe ties into weights?)
+Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
+(Add depleted items) Compare the depleted item cost to the real item cost (cause it's also a boe you can sell)
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -52,7 +53,7 @@ BtmScan.evaluators[lcName] = lib
 function lib:valuate(item, tooltip)
 	local price = 0
 	local value = 0
-
+	emcBuyFor = "EMC: Error.Debug"
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
 
@@ -60,7 +61,10 @@ function lib:valuate(item, tooltip)
 	if (item.qual == 0) then return end
 
 	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
-	if not (Enchantrix and Enchantrix.Storage) then return end
+		if not AucAdvanced.Modules.Util.Appraiser then
+			item:info("EMC Debug: Appraiser not present")
+		return end
+			item:info("EMC: Debug: Appraiser is present")
 	
 --Set names to item id so that I don't loose my mind trying to write this/ understand what I did before
 --essence's
@@ -135,18 +139,16 @@ local convertToID = 0
 --if script breaks on next run its probably here where I did _ instead of seen...
 newBid = 0
 newBuy = 0
---seen = 0
 curModelText = "Unknown"
 newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
---		EnhTooltip.AddLine("  selfbid  ", newBid)
-reagentPrice = 0				
+
+reagentPrice = 0		
+		
 if get(lcName..".buyout.check") then
 	reagentPrice = newBuy
 else
 	reagentPrice = newBid
 end
-				
---	if (reagentPrice == nil or 0) then item:info("error? reagentPrice is nil") return  end
 	
 	--set item we are looking at to evalPrice\
 	local evalPrice = 0
@@ -188,7 +190,7 @@ end
 					else
 						convertsToValue = newBid * 3
 					end
-					EnhTooltip.AddLine("  converttobid *3 ", convertsToValue)
+					--EnhTooltip.AddLine("  converttobid *3 ", convertsToValue)
 					
 			--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 			-- convertsToValue = convertsToValue * 3
@@ -306,13 +308,6 @@ end
 	curModelText = "Unknown"
 	
 	newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-	--	EnhTooltip.AddLine("  newBid  ", newBid)
-	--		EnhTooltip.AddLine("  newBuy  ", newBuy)
-	--			EnhTooltip.AddLine("  seen  ", seen)
-	--				EnhTooltip.AddLine("EMC using:", curModelText)
-	--EnhTooltip.AddLine("  |cffddeeff (Non-Converted) Mat Value: |r  ", evalPrice)
-	--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-	
 	local value = emcAdjustedValue
 	
 		-- Calculate the real value of this item once our profit is taken out
@@ -320,19 +315,15 @@ end
 	local min = get(lcName..".profit.min")
 	local value, mkdown = BtmScan.Markdown(emcAdjustedValue, pct, min)
 	item:info(("(Converted) - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
-	
+	item:info("mkdown", mkdown)
+	item:info("emcAdjustedValue", emcAdjustedValue)
 	item:info("Final Converted Value", value)
 	
 	if value > evalPrice then
 		EnhTooltip.AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		--EnhTooltip.AddLine("|cff00FF00(value) Ok to buy for convert!|r", value)
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		emcBuyFor = "EMC: Convert 2 sell"
 	else
-		EnhTooltip.AddLine("|cffFF0000 EMC: Don't buy me to convert.|r")
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		--EnhTooltip.AddLine("|cffFF0000 (value) Don't buy to Convert|r", value)
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		emcBuyFor = "EMC: Just sell me"
 	end
 	
 	if emcAdjustedValue > evalPrice then
@@ -340,11 +331,13 @@ end
 		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		--EnhTooltip.AddLine("|cff00FF00(value) Convert to sell!|r", emcAdjustedValue)
 		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		emcBuyFor = "EMC: Convert 2 sell"
 	else
 		EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
 		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		--EnhTooltip.AddLine("|cffFF0000 (value) Don't Convert to sell|r", emcAdjustedValue)
 		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
+		emcBuyFor = "EMC: Just sell me"
 	end
 	
 	-- Check for tooltip evaluation
@@ -380,7 +373,8 @@ end
 	-- profit, then we "win".
 	if (price >= item.purchase and profit > item.profit) then
 		item.purchase = price
-		item.reason = self.name  -- should be 'purchasing for xxx'
+		--item.reason = self.name  -- should be 'purchasing for xxx'
+		item.reason = emcBuyFor
 		item.what = self.name
 		item.profit = profit
 		item.valuation = value
@@ -439,15 +433,3 @@ function lib:setup(gui)
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from convert profit")
 end
-
---[[
-TODO LIST: 
-
-Finish cleaning up tooltip
-Fix btm prompt visual data 
-do some major code cleaning
-Considering adding weights for conversions 
-Considering adding ability to enable or disable a category or converts
-Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
-
-]]
