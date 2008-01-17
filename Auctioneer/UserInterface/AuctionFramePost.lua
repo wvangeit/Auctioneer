@@ -323,26 +323,20 @@ function AuctionFramePost_UpdatePriceModels(frame)
 
 				-- Add the last sale price if BeanCounter is loaded.and one exists
 				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch) then
-					local tbl = BeanCounter.externalSearch(id, {["auction"] = true}, true) --returns a table
-					if (tbl) then
-						local lastSale, C = {}, 0
-						for i,v in pairs(tbl)do
-							v[12] = tonumber(v[12]) 
-							if (v[12]) > C then --need to sort for best date
-								C = (v[12]) 
-								lastSale = v
-							end
-						end
-						if (lastSale and lastSale[6] and lastSale[3] and lastSale[4]) then
-							local lastPrice  = {}
-							lastPrice.text   = _AUCT('UiPriceModelLastSold')
-							lastPrice.note   = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale[12]))
-							lastPrice.bid    = (lastSale[3] / lastSale[6]) * count
-							lastPrice.buyout = (lastSale[4] / lastSale[6]) * count
-							table.insert(frame.prices, lastPrice)
-						end
+					local settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = false, 
+						["bid"] = false, ["outbid"] = false, ["auction"] = true, ["failedauction"] = false
+						}
+					local lastSale = BeanCounter.externalSearch(id, settings, true, 1) or {} --returns a table containing last sold
+					BeanCounter.Print("Bean", #lastSale, id)
+					if (lastSale and lastSale[1] and lastSale[1][6] and lastSale[1][3] and lastSale[1][4]) then
+						local lastPrice  = {}
+						lastPrice.text   = _AUCT('UiPriceModelLastSold')
+						lastPrice.note   = _AUCT('FrmtLastSoldOn'):format(date("%x", lastSale[1][12]))
+						lastPrice.bid    = (lastSale[1][3] / lastSale[1][6]) * count
+						lastPrice.buyout = (lastSale[1][4] / lastSale[1][6]) * count
+						table.insert(frame.prices, lastPrice)
 					end
-				end
+				end 
 
 				-- Add any pricing models from external addons
 				for pos, priceFunc in pairs(AuctionFramePost_AdditionalPricingModels) do
