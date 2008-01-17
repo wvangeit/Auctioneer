@@ -59,10 +59,10 @@ function lib:valuate(item, tooltip)
 	-- If this item is grey, forget about it.
 	if (item.qual == 0) then return end
 
-	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call appraiser for squat its all appraiser based pricing now
+	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
 	if not (Enchantrix and Enchantrix.Storage) then return end
 	
---Set names to item id's	
+--Set names to item id so that I don't loose my mind trying to write this/ understand what I did before
 --essence's
 local GPLANAR = 22446
 local GETERNAL = 16203
@@ -106,7 +106,7 @@ local convertableMat = {
 	[LMYSTIC] = true,
 	[LASTRAL] = true,
 	[LMAGIC] = true,
-	--[PAIR] = false,  leaving the placeholders for the primals but keeping the commented for possible future use
+	--[PAIR] = false,  leaving the placeholders for the primals but keeping them commented for possible future use
 	[MAIR] = true,
 	--[PEARTH] = false, 	-- Blacksmiths can convert them back
 	[MEARTH] = true,
@@ -122,26 +122,29 @@ local convertableMat = {
 	[MWATER] = true,
 }
 
-	--Fail and exit if the item is not in our convertableMat table 
-	if not convertableMat[ item.id ] then
-		item:info("MatConvert Fail: Not a convertable item")
-		return
-	end
+--Report failure and exit if the item is not in our convertableMat table 
+if not convertableMat[ item.id ] then
+	item:info("EMC Fail: Not a convertable item")
+	return
+end
 	
-local convertToValue = 0 			--this is just incase we have a mat in the convertableMat table that doesnt have any code value calculations below
+local convertToValue = 0
 local convertToID = 0
-		newBid = 0
-		newBuy = 0
-		seen = 0
-		curModelText = "Unknown"
-		newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
+
+
+--if script breaks on next run its probably here where I did _ instead of seen...
+newBid = 0
+newBuy = 0
+--seen = 0
+curModelText = "Unknown"
+newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
 --		EnhTooltip.AddLine("  selfbid  ", newBid)
 reagentPrice = 0				
-			if get(lcName..".buyout.check") then
-				reagentPrice = newBuy
-			else
-				reagentPrice = newBid
-			end
+if get(lcName..".buyout.check") then
+	reagentPrice = newBuy
+else
+	reagentPrice = newBid
+end
 				
 --	if (reagentPrice == nil or 0) then item:info("error? reagentPrice is nil") return  end
 	
