@@ -71,6 +71,8 @@ local reconcileAuction;
 local getTimeLeft;
 local getMaxBids;
 local getNextAuctionId;
+local getAuctionIdList;
+local LongStringSplit;
 local addAuctionToSnapshot;
 local updateAuctionInSnapshot;
 local removeAuctionFromSnapshot;
@@ -385,11 +387,11 @@ function clear(itemKey, ahKey)
 end
 
 -- Unpacks any src auction items that match the filter and inserts them into dest
-function unpackFiltered(src, key, filter, arg, dest, ...)
+function unpackFiltered(src, key, filter, arg, dest, idlist)
 	local packed, unpacked, argv
-	local argc = select("#", ...)
+	local argc = #idlist
 	for i = 1, argc do
-		argv = select(i, ...)
+		argv = idlist[i]
 		argv = tonumber(argv) or 0
 		packed= src[argv];
 		if (packed) then
@@ -473,7 +475,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 			local auctionsInSnapshotBySignature = {};
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
 
-			local auctionIds = {strsplit(";", auctionIdsForItemKey)}
+			local auctionIds = LongStringSplit(auctionIdsForItemKey)
 			for _,auctionId in ipairs(auctionIds) do
 				auctionId = tonumber(auctionId) or 0
 				local packedAuction = ah.auctions[auctionId];
@@ -556,7 +558,7 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	local itemKey = createItemKeyFromAuctionSignature(auctionSignature);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		local auctionIds = {strsplit(";", auctionIdsForItemKey)}
+		local auctionIds = LongStringSplit(auctionIdsForItemKey)
 		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
 			local packedAuction = ah.auctions[auctionId];
@@ -642,7 +644,7 @@ function query(ahKey, query, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
-			unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, strsplit(";", auctionIdsForItemKey))
+			unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, LongStringSplit(auctionIdsForItemKey))
 		end
 	end
 	return matchingAuctions;
@@ -659,7 +661,7 @@ function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, strsplit(";", auctionIdsForItemKey))
+		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, LongStringSplit(auctionIdsForItemKey))
 	end
 	return matchingAuctions;
 end
@@ -885,9 +887,21 @@ end
 function getNextAuctionId(ah)
 	local auctionId = ah.nextAuctionId;
 	ah.nextAuctionId = auctionId + 1;
+	if (auctionId < 100000) or (auctionId > 999999) then
+		auctionId = 100000
+	end
 	return auctionId;
 end
 
+function LongStringSplit(IDstring)
+	local list = {}
+	local tempstring
+	while string.match(IDstring,";") do
+		tempstring, IDstring = strsplit(";", IDstring, 2)
+		table.insert(list, tempstring)
+	end
+	return list
+end
 -------------------------------------------------------------------------------
 -- Adds the specified auction to the snapshot.
 -------------------------------------------------------------------------------
@@ -954,7 +968,7 @@ function removeAuctionFromSnapshot(ah, auction)
 	-- Remove the auction id from the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	if (ah.auctionIdsByItemKey[itemKey]) then
-		local auctionIds = {strsplit(";", ah.auctionIdsByItemKey[itemKey])}
+		local auctionIds = LongStringSplit(ah.auctionIdsByItemKey[itemKey])
 		ah.auctionIdsByItemKey[itemKey]=nil
 		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
