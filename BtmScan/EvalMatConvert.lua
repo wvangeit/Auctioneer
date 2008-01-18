@@ -8,13 +8,11 @@
 	This is a module for BtmScan to evaluate an item for purchase.
 
 TODO LIST: 
-
-Fix btm prompt visual data fixed everything but discount rate doesnt show true discount rate (I dont think-- still ned to verify)
-do some major code cleaning
 Considering adding weights for conversions 
 Considering adding ability to enable or disable a category or convertable item (maybe ties into weights?)
 Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
-(Add depleted items) Compare the depleted item cost to the real item cost (cause it's also a boe you can sell)
+*IN PROGRESS (Add depleted items) Compare the depleted item cost to the real item cost (cause it's also a boe you can sell) 
+Change over to a more effecient tables... possibly a converts from to table
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -51,17 +49,20 @@ BtmScan.evaluators[lcName] = lib
 
 function lib:valuate(item, tooltip)
 	local	emcBuyFor = "EMC: Error.Debug"
-	-- If we're not enabled, scadaddle!
+	
+	-- If we're not enabled, scadaddle!	
 	if (not get(lcName..".enable")) then return end
-
+	
+	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
+		if not AucAdvanced.Modules.Util.Appraiser then
+			item:info("EMC couldn't find appraiser!")
+		return end
+			item:info("EMC: Debug: Appraiser is present")
+			
 	-- If this item is grey, forget about it.
 	if (item.qual == 0) then return end
 
-	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
-		if not AucAdvanced.Modules.Util.Appraiser then
-			item:info("EMC Debug: Appraiser not present")
-		return end
-			item:info("EMC: Debug: Appraiser is present")
+
 			
 	local price = 0
 	local value = 0	
@@ -96,6 +97,27 @@ function lib:valuate(item, tooltip)
 	local MSHADOW = 22577
 	local PWATER = 21885
 	local MWATER = 22578
+	--Depleted items
+	local DCBRACER = 0			-- crystalweave bracers
+	local DCBRACERTO = 0
+	local DMGAUNTLETS = 0		-- crystalhide handwraps
+	local DMGAUNTLETSTO = 0
+	local DBADGE = 0			-- badge of tenacity
+	local DBADGETO = 0		
+	local DCLOAK = 0			-- crystalweave cape
+	local DCLOAKTO = 0 
+	local DDAGGER = 0			-- crystal-infused shiv
+	local DDAGGERTO = 0
+	local DMACE = 0			-- apexis crystal mace
+	local DMACETO = 0
+	local DRING = 32678			-- dreamcrystal band
+	local DRINGTO = 0
+	local DSTAFF = 0			-- flaming quartz staff
+	local DSTAFFTO = 0
+	local DSWORD = 0			-- crystalforged sword
+	local DSWORDTO = 0
+	local DTHAXE = 0			-- apexis cleaver
+	local DTHAXETO = 0
 
 	--Set convertable items table up
 	local convertableMat = {
@@ -125,6 +147,16 @@ function lib:valuate(item, tooltip)
 		[MSHADOW] = true,
 		--[PWATER] = false,
 		[MWATER] = true,
+	--	[DCBRACER] = true,   --depleted items are disabled until the function is completed and I have all the item id numbers for them and their converted items
+	--	[DMGAUNTLETS] = true,
+	--	[DBADGE] = true,
+	--	[DCLOAK] = true,
+	--	[DDAGGER] = true,
+	--	[DMACE] = true,
+	--	[DRING] = true,
+	--	[DSTAFF] = true,
+	--	[DSWORD] = true,
+	--	[DTHAXE] = true,
 	}
 
 --Report failure and exit if the item is not in our convertableMat table 
@@ -154,6 +186,12 @@ end
 	--set item we are looking at to evalPrice\
 	local evalPrice = 0
 	local evalPrice = reagentPrice
+	
+	--Fail and end if appraiser has no value for the item we want to convert
+	if evalPrice == nill or 0 then
+	item:info("EMC Fail: No appraiser data available")
+	return
+	end
 
 	--get stack size we are dealing with
 	local stackSize = item.count
@@ -183,12 +221,17 @@ end
 				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 
 				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
-					if get(lcName..".buyout.check") then
-						convertsToValue = newBuy * 3
-					else
-						convertsToValue = newBid * 3
-					end
+				if get(lcName..".buyout.check") then
+					convertsToValue = newBuy * 3
+				else
+					convertsToValue = newBid * 3
+				end
 					
+				--Fail and end if appraiser has no value for the item we want to convert
+				if convertsToValue == nill or 0 then
+					item:info("EMC Fail: No appraiser data available")
+					return
+				end
 			
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
@@ -221,7 +264,11 @@ end
 					else
 						convertsToValue = newBid / 3
 					end
-
+				--Fail and end if appraiser has no value for the item we want to convert
+				if convertsToValue == nill or 0 then
+					item:info("EMC Fail: No appraiser data available")
+					return
+				end
 			convertsToValue = convertsToValue * stackSize
 
 		value = convertsToValue
@@ -256,8 +303,58 @@ end
 						convertsToValue = newBuy / 10
 					else
 						convertsToValue = newBid / 10
-					end					
+					end				
+				--Fail and end if appraiser has no value for the item we want to convert
+				if convertsToValue == nill or 0 then
+					item:info("EMC Fail: No appraiser data available")
+					return
+				end					
 
+			convertsToValue = convertsToValue * stackSize
+		value = convertsToValue
+	end
+	
+		local convertsFromDepleted = {
+	--	[DCBRACER] = true,   --depleted items are disabled until the function is completed and I have all the item id numbers for them and their converted items
+	--	[DMGAUNTLETS] = true,
+	--	[DBADGE] = true,
+	--	[DCLOAK] = true,
+	--	[DDAGGER] = true,
+	--	[DMACE] = true,
+	--	[DRING] = true,
+	--	[DSTAFF] = true,
+	--	[DSWORD] = true,
+	--	[DTHAXE] = true,
+	}
+	
+	if convertsFromDepleted[ item.id ] then
+		if item.id == DCBRACER then convertToID = DCBRACERTO end
+		if item.id == DMGAUNTLETS then convertToID = DMGAUNTLETSTO end
+		if item.id == DBADGE then convertToID = DBADGETO end
+		if item.id == DCLOAK then convertToID = DCLOAKTO end
+		if item.id == DDAGGER then convertToID = DDAGGERTO end
+		if item.id == DMACE then convertToID = DMACETO end
+		if item.id == DRING then convertToID = DRINGTO end
+		if item.id == DSTAFF then convertToID = DSTAFFTO end
+		if item.id == DSWORD then convertToID = DSWORDTO end
+		if item.id == DTHAXE then convertToID = DTHAXETO end
+				
+				newBid = 0
+				newBuy = 0
+				curModelText = "Unknown"
+				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+
+			--update value 1 depleted = 1 non depleted item (meaning no modified to newbid or buy below)				
+					if get(lcName..".buyout.check") then
+						convertsToValue = newBuy
+					else
+						convertsToValue = newBid
+					end									
+					--Fail and end if appraiser has no value for the item we want to convert
+					if convertsToValue == nill or 0 then
+						item:info("EMC Fail: No appraiser data available")
+						return
+					end
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
 	end
@@ -368,12 +465,18 @@ define(lcName..'.adjust.basis', "faction")
 define(lcName..'.matching.check', true)
 define(lcName..'.buyout.check', false)
 
+define(lcName..'.enableEssence', true)
+define(lcName..'.enableMote', true)
+define(lcName..'.enableDepleted', false)
+
 function lib:setup(gui)
 	local id = gui:AddTab(libName)	
-	gui:AddHelp(id, "what is the Convert Mats evaluator",
-		"What is the Convert Mats evaluator?",
+	gui:AddHelp(id, "what is EMC",
+		"What is EMC?",
 		"This evaluator allows you to purchase items that can be changed to another item that is worth more (based on your settings here) by simply right clicking the item.\n\n"..
-		""..
+		"\n")
+	gui:AddHelp(id, "EMC: General Settings",
+		"EMC: General Settings",
 		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout items for converting\n\n"..
 		""..
 		"Custom Profit Settings: Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here. You also have the option of turning on/off the use of market matchers when we valuate an item (it is suggested that you leave it on). You can also tell Convert Mats to use Bid price from Appraiser Tab instead of the Buyout price)\n\n"..
@@ -384,12 +487,13 @@ function lib:setup(gui)
 		""..
 		"Please note, this evaluator uses your last used fixed price or last used pricing module from appraiser tab, if you haven't posted a mat from appraiser tab it will use whatever pricing module you set as your default for appraiser.\n\n"..
 		""..
-		"This evaluator is in its very alpha stages and defaults to 'off' because it needs a performance boost and could probably use some more testing. Currently apears to work good for essence's and does not yet work for other non-skill required convertable items. Also it will prompt for bid/buyout sometimes even if converting it to its other form is not the right thing to do (the tooltip will tell you this) however it 's converted value is still meets your 'required' profit settings. When this happens it is a very good deal. buy and then do as your tool tip tells you (convert to sell or not to as the case may be) In the future this will be delivered in a more understandable fashion. \"Potential profit\" & \"Return on investment\" figures in the btm prompt are incorrect, please ignore them. profit over requirement is correct!\n\n"..
+		"This evaluator is in its very alpha stages and defaults to 'off' because it needs a performance boost and additional testing. Currently apears to work good for essence's and motes to primals.Also it will prompt for bid/buyout sometimes even if converting it to its other form is not the right thing to do (the tooltip will tell you this) however it 's converted value is still meets your 'required' profit settings. When this happens it is a very good deal. buy and then do as your tool tip tells you (convert to sell or not to as the case may be) In the future this will be delivered in a more understandable fashion. \"Potential profit\" & \"Return on investment\" figures in the btm prompt are incorrect, please ignore them. profit over requirement is correct!\n\n"..
 		""..
-		"\n")
+	"\n")
 
 	gui:AddControl(id, "Subhead",		0,	libName.." General Settings")
-	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enable", " Read ALL of the help before you enable!!! Enable purchasing for "..lcName)
+	--gui:AddTip(id, "Please read the help before enabling this evaluator.")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.bid", "Allow bid on items")
 		
@@ -402,4 +506,9 @@ function lib:setup(gui)
 	gui:AddControl(id, "Subhead",		0,    	"Fees adjustment")
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from convert profit")
+	
+	gui:AddControl(id, "Subhead",		0,    	"Category's - NOT WORKING YET")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableEssence", "Enable essence conversions")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableMote", "Enable mote to primal conversions")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted item conversions")
 end
