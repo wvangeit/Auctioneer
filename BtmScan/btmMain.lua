@@ -451,22 +451,22 @@ function BtmScan.PageScan(resume)
 					item.ignore = false -- Forcefully ignore this item!
 
 					-- Run through all the evaluators to find the best purchase order
-					local purchasable = BtmScan.EvaluateItem(item)
-					if purchasable then
-						if item.force then
-							if balance - item.purchase < 0 then
-								purchasable = false
-							end
-						else
-							if balance - item.purchase < reserve then
-								purchasable = false
-							end
-							if item.purchase > maxprice then
-								purchasable = false
-							end
-						end
+                    -- Check money first, so we don't waste processing if we can't afford it
+					local purchasable = true
+					if balance - item.purchase < reserve then
+						purchasable = false
 					end
-
+					if item.purchase > maxprice then
+						purchasable = false
+					end
+                    if purchasable then
+                        purchasable = BtmScan.EvaluateItem(item)
+                        if item.force then
+                            if balance - item.purchase < 0 then
+                                purchasable = false
+                            end
+                        end
+                    end
 					-- check if itemConfig is used now
 
 					-- One last check to make sure this is a valid purchase order
