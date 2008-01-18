@@ -102,6 +102,7 @@ end
 function lib.GetFactionGroup()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
+	local testmyfaction = true
 
 	if not AucAdvancedConfig.factions then AucAdvancedConfig.factions = {} end
 	if AucAdvancedConfig.factions[currentZone] then
@@ -114,6 +115,7 @@ function lib.GetFactionGroup()
 		end
 	end
 	AucAdvancedConfig.factions[currentZone] = factionGroup
+	if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = UnitFactionGroup("player") end
 	return factionGroup
 end
 

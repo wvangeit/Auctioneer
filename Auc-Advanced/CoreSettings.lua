@@ -114,6 +114,7 @@ local settingDefaults = {
 	['clickhook.enable'] = true,
 	['scancommit.speed'] = 20,
 	['scancommit.progressbar'] = true,
+	['alwaysHomeFaction'] = false,
 }
 
 local function getDefault(setting)
@@ -348,6 +349,7 @@ function lib.MakeGuiConfig()
   	gui:AddCat("Core Options")
 
 	id = gui:AddTab("Profiles")
+	
 	gui:AddControl(id, "Header",     0,    "Setup, configure and edit profiles")
 	gui:AddControl(id, "Subhead",    0,    "Activate a current profile")
 	gui:AddControl(id, "Selectbox",  0, 1, "profile.profiles", "profile", "Switch to given profile")
@@ -401,6 +403,9 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Checkbox",   0, 1, "scancommit.progressbar", "Enable processing progressbar")
 	gui:AddTip(id, "Displays a progress bar while Auctioneer Advanced is processing data")
 	
+	gui:AddControl(id, "Checkbox",		0, 2, 	"alwaysHomeFaction", "Force home faction data everywhere")
+	gui:AddTip(id, "Warning this will also include neutral data into your home faction data if you scan a neutral AH while checked")
+	
 	gui:AddControl(id, "Subhead",     0,    "Matcher Order")
 	last = gui:GetLast(id)
 	Matcherdropdown = gui:AddControl(id, "Selectbox",  0, 1, AucAdvanced.API.GetMatcherDropdownList(), "matcherdynamiclist")
@@ -408,6 +413,7 @@ function lib.MakeGuiConfig()
 	gui:AddControl(id, "Button",     0.3,1, "matcher.up", "Up")
 	gui:SetLast(id, last)
 	gui:AddControl(id, "Button",     0.45, 1, "matcher.down", "Down")
+	
 	
 	gui:AddHelp(id, "what is scandata",
 		"What is the scan data tooltip?",
