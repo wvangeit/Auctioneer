@@ -9,8 +9,7 @@
 
 TODO LIST: 
 
-Finish cleaning up tooltip
-Fix btm prompt visual data 
+Fix btm prompt visual data fixed everything but discount rate doesnt show true discount rate (I dont think-- still ned to verify)
 do some major code cleaning
 Considering adding weights for conversions 
 Considering adding ability to enable or disable a category or convertable item (maybe ties into weights?)
@@ -51,9 +50,7 @@ local set = BtmScan.Settings.SetSetting
 BtmScan.evaluators[lcName] = lib
 
 function lib:valuate(item, tooltip)
-	local price = 0
-	local value = 0
-	emcBuyFor = "EMC: Error.Debug"
+	local	emcBuyFor = "EMC: Error.Debug"
 	-- If we're not enabled, scadaddle!
 	if (not get(lcName..".enable")) then return end
 
@@ -65,66 +62,70 @@ function lib:valuate(item, tooltip)
 			item:info("EMC Debug: Appraiser not present")
 		return end
 			item:info("EMC: Debug: Appraiser is present")
+			
+	local price = 0
+	local value = 0	
+	local emcTrueSellValue = 0
 	
---Set names to item id so that I don't loose my mind trying to write this/ understand what I did before
---essence's
-local GPLANAR = 22446
-local GETERNAL = 16203
-local GNETHER = 11175
-local GMYSTIC = 11135
-local GASTRAL = 11082
-local GMAGIC = 10939
-local LPLANAR = 22447
-local LETERNAL = 16202
-local LNETHER = 11174
-local LMYSTIC = 11134
-local LASTRAL = 10998
-local LMAGIC = 10938	
---motes/primals
-local PAIR = 22451
-local MAIR = 22572	
-local PEARTH= 22452
-local MEARTH = 22573
-local PFIRE = 21884
-local MFIRE = 22574
-local PLIFE = 21886
-local MLIFE = 22575
-local PMANA = 22457
-local MMANA = 22576
-local PSHADOW = 22456
-local MSHADOW = 22577
-local PWATER = 21885
-local MWATER = 22578
+	--Set names to item id so that I don't loose my mind trying to write this/ understand what I did before
+	--essence's
+	local GPLANAR = 22446
+	local GETERNAL = 16203
+	local GNETHER = 11175
+	local GMYSTIC = 11135
+	local GASTRAL = 11082
+	local GMAGIC = 10939
+	local LPLANAR = 22447
+	local LETERNAL = 16202
+	local LNETHER = 11174
+	local LMYSTIC = 11134
+	local LASTRAL = 10998
+	local LMAGIC = 10938	
+	--motes/primals
+	local PAIR = 22451
+	local MAIR = 22572	
+	local PEARTH= 22452
+	local MEARTH = 22573
+	local PFIRE = 21884
+	local MFIRE = 22574
+	local PLIFE = 21886
+	local MLIFE = 22575
+	local PMANA = 22457
+	local MMANA = 22576
+	local PSHADOW = 22456
+	local MSHADOW = 22577
+	local PWATER = 21885
+	local MWATER = 22578
 
---Set convertable items table up
-local convertableMat = {
-	[GPLANAR] = true,
-	[GETERNAL] = true,
-	[GNETHER] = true,
-	[GMYSTIC] = true,
-	[GASTRAL] = true,
-	[GMAGIC] = true,
-	[LPLANAR] = true,
-	[LETERNAL] = true,
-	[LNETHER] = true,
-	[LMYSTIC] = true,
-	[LASTRAL] = true,
-	[LMAGIC] = true,
-	--[PAIR] = false,  leaving the placeholders for the primals but keeping them commented for possible future use
-	[MAIR] = true,
-	--[PEARTH] = false, 	-- Blacksmiths can convert them back
-	[MEARTH] = true,
-	--[PFIRE] = false,           -- Blacksmiths can convert them back
-	[MFIRE] = true,
-	--[PLIFE] = false,
-	[MLIFE] = true,
-	--[PMANA] = false,
-	[MMANA] = true,
-	--[PSHADOW]= false,
-	[MSHADOW] = true,
-	--[PWATER] = false,
-	[MWATER] = true,
-}
+	--Set convertable items table up
+	local convertableMat = {
+		[GPLANAR] = true,
+		[GETERNAL] = true,
+		[GNETHER] = true,
+		[GMYSTIC] = true,
+		[GASTRAL] = true,
+		[GMAGIC] = true,
+		[LPLANAR] = true,
+		[LETERNAL] = true,
+		[LNETHER] = true,
+		[LMYSTIC] = true,
+		[LASTRAL] = true,
+		[LMAGIC] = true,
+		--[PAIR] = false,  leaving the placeholders for the primals but keeping them commented for possible future use
+		[MAIR] = true,
+		--[PEARTH] = false, 	-- Blacksmiths can convert them back
+		[MEARTH] = true,
+		--[PFIRE] = false,           -- Blacksmiths can convert them back
+		[MFIRE] = true,
+		--[PLIFE] = false,
+		[MLIFE] = true,
+		--[PMANA] = false,
+		[MMANA] = true,
+		--[PSHADOW]= false,
+		[MSHADOW] = true,
+		--[PWATER] = false,
+		[MWATER] = true,
+	}
 
 --Report failure and exit if the item is not in our convertableMat table 
 if not convertableMat[ item.id ] then
@@ -137,12 +138,12 @@ local convertToID = 0
 
 
 --if script breaks on next run its probably here where I did _ instead of seen...
-newBid = 0
-newBuy = 0
-curModelText = "Unknown"
-newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
+local newBid = 0
+local newBuy = 0
+local curModelText = "Unknown"
+local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
 
-reagentPrice = 0		
+local reagentPrice = 0		
 		
 if get(lcName..".buyout.check") then
 	reagentPrice = newBuy
@@ -178,24 +179,18 @@ end
 		if item.id == GMAGIC then convertToID = LMAGIC end
 				newBid = 0
 				newBuy = 0
-				seen = 1
 				curModelText = "Unknown"
-				--newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-				--EnhTooltip.AddLine("  greaterbid  ", newBid)
-				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-	--			EnhTooltip.AddLine("  converttobid  ", newBid)
-				
+				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+
+				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy * 3
 					else
 						convertsToValue = newBid * 3
 					end
-					--EnhTooltip.AddLine("  converttobid *3 ", convertsToValue)
 					
-			--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
-			-- convertsToValue = convertsToValue * 3
+			
 			convertsToValue = convertsToValue * stackSize
-			--EnhTooltip.AddLine("  |cffddeeff 1x greater = 3x lesser |r  ", convertsToValue)
 		value = convertsToValue
 	end
 	
@@ -217,33 +212,29 @@ end
 		if item.id == LMAGIC then convertToID = GMAGIC end
 				newBid = 0
 				newBuy = 0
-				seen = 1
 				curModelText = "Unknown"
-				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-			--	EnhTooltip.AddLine("  Convert to value  ", newBid)
-				
+				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+	
+				--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )				
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy / 3
 					else
 						convertsToValue = newBid / 3
 					end
-					
-			--		EnhTooltip.AddLine("  Convert to greater (gvalue /3) ", convertsToValue)
-			--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )
-			--convertsToValue = convertsToValue / 3
+
 			convertsToValue = convertsToValue * stackSize
-		--	EnhTooltip.AddLine("  |cffddeeff converts to * starcksize |r  ", convertsToValue)
+
 		value = convertsToValue
 	end	
 	
 	local convertsToP = {
-	[MAIR] = true,
-	[MEARTH] = true,
-	[MFIRE] = true,
-	[MLIFE] = true,
-	[MMANA] = true,
-	[MSHADOW] = true,
-	[MWATER] = true,
+		[MAIR] = true,
+		[MEARTH] = true,
+		[MFIRE] = true,
+		[MLIFE] = true,
+		[MMANA] = true,
+		[MSHADOW] = true,
+		[MWATER] = true,
 	}
 	
 	if convertsToP[ item.id ] then
@@ -257,29 +248,23 @@ end
 		
 				newBid = 0
 				newBuy = 0
-				seen = 1
 				curModelText = "Unknown"
-		--		newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-		--		EnhTooltip.AddLine("  greaterbid  ", newBid)
-				newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
-		--		EnhTooltip.AddLine("  converttobid  ", newBid)
-				
+				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+
+			--update value since 10 motes = 1 primal do primal price / 10 				
 					if get(lcName..".buyout.check") then
 						convertsToValue = newBuy / 10
 					else
 						convertsToValue = newBid / 10
-					end
-	--				EnhTooltip.AddLine("  converttobid / 10 ", convertsToValue)
-					
-			--update value since 10 motes = 1 primal do primal price / 10 
+					end					
+
 			convertsToValue = convertsToValue * stackSize
-	--		EnhTooltip.AddLine("  |cffddeeff 10x mote = 1x primal |r  ", convertsToValue)
 		value = convertsToValue
 	end
 	
 		-- Adjust for brokerage costs
 	local brokerage = get(lcName..'.adjust.brokerage')
-	emcAdjustedValue = value
+	local emcAdjustedValue = value
 	if (brokerage) then
 		local basis = get(lcName..'.adjust.basis')
 		local brokerRate, depositRate = 0.05, 0.05
@@ -301,14 +286,8 @@ end
 		end
 
 	end
-	--- most of the next few lines are debug crap
-	newBid = 0
-	newBuy = 0
-	seen = 1
-	curModelText = "Unknown"
-	
-	newBid, newBuy, seen, curModelText = AucAdvanced.API.GetAppraiserValue(item.link, get(lcName..".matching.check"))
-	local value = emcAdjustedValue
+
+	value = emcAdjustedValue
 	
 		-- Calculate the real value of this item once our profit is taken out
 	local pct = get(lcName..".profit.pct")
@@ -328,18 +307,14 @@ end
 	
 	if emcAdjustedValue > evalPrice then
 		EnhTooltip.AddLine("|cff00FF00 EMC: Convert me to sell! |r")
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		--EnhTooltip.AddLine("|cff00FF00(value) Convert to sell!|r", emcAdjustedValue)
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		emcBuyFor = "EMC: Convert 2 sell"
+		emcBuyFor = "EMC: Convert 2 sell"	
+		emcTrueSellValue = emcAdjustedValue
 	else
 		EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
-		--EnhTooltip.AddLine("|cffFF0000 (value) Don't Convert to sell|r", emcAdjustedValue)
-		--EnhTooltip.LineColor(0.3, 0.9, 0.8)
 		emcBuyFor = "EMC: Just sell me"
+		emcTrueSellValue = evalPrice
 	end
-	
+		
 	-- Check for tooltip evaluation
 	if (tooltip) then
 		item.what = self.name
@@ -365,25 +340,20 @@ end
 	if price > 0 then 
 	profit = value - price 
 	end
-
-	--TODO: I think I need to change the profit figure to make the btmprompt display the proper 'potential profit' and 'rio' figures, currently the way I have it all its displaying the end result (meaning that my minimum pct + fixed min values and brokerage(if applicable) costs are already calculated what we need it to still calculate brokerage into this but ignore min profit settings for 'potential profit' and 'roi' displayed figures without screwing up the end valuation of the item.
 	
 	-- If what we are willing to pay for this item beats what
 	-- other modules are willing to pay, and we can make more
 	-- profit, then we "win".
 	if (price >= item.purchase and profit > item.profit) then
 		item.purchase = price
-		--item.reason = self.name  -- should be 'purchasing for xxx'
 		item.reason = emcBuyFor
 		item.what = self.name
 		item.profit = profit
-		item.valuation = value
+		item.valuation = emcTrueSellValue
 	end
 end
 
--- Setting defaults
-
-
+--Setup GUI and GUI Defaults 
 define(lcName..'.enable', false)
 define(lcName..'.allow.buy', true)
 define(lcName..'.allow.bid', true)
