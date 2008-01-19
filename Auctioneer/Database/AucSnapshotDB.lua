@@ -897,6 +897,8 @@ end
 function longStringSplit(IDstring, list)
 	--If a table was not passed, create one here
 	local list = list or {}
+	
+	IDstring = tostring(IDstring)
 
 	--While the string contains our split character...
 	while IDstring:match(";") do
@@ -915,11 +917,11 @@ function multiInsertAndReturnLast(tbl, ...)
 
 	--Add all the extra args, except the last one
 	for i = 1, numArgs - 1 do
-		table.insert(tbl, select(i, ...))
+		table.insert(tbl, (select(i, ...)))
 	end
 
 	--Return that last arg without adding it
-	return select(numArgs, ...)
+	return (select(numArgs, ...))
 end
 
 -------------------------------------------------------------------------------
