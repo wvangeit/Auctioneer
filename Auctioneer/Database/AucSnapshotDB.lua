@@ -1050,7 +1050,7 @@ end
 -- Breaks an auction signature (itemId:suffixId:enchantId:uniqueId:count:minBid:buyoutPrice:owner)
 -------------------------------------------------------------------------------
 function breakAuctionSignature(auctionSignature)
-	itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner = (":"):split(auctionSignature);
+	local itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner = (":"):split(auctionSignature);
 	return tonumber(itemId), tonumber(suffixId), tonumber(enchantId), tonumber(uniqueId), tonumber(count), tonumber(minBid), tonumber(buyoutPrice), owner;
 end
 
