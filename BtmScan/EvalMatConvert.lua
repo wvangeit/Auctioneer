@@ -165,16 +165,12 @@ if not convertableMat[ item.id ] then
 	return
 end
 	
-local convertToValue = 0
+local convertsToValue = 0
 local convertToID = 0
-
-
---if script breaks on next run its probably here where I did _ instead of seen...
 local newBid = 0
 local newBuy = 0
 local curModelText = "Unknown"
 local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
-
 local reagentPrice = 0		
 		
 if get(lcName..".buyout.check") then
@@ -182,16 +178,17 @@ if get(lcName..".buyout.check") then
 else
 	reagentPrice = newBid
 end
+
+--set item we are looking at to evalPrice\
+local evalPrice = 0
+local evalPrice = reagentPrice
 	
-	--set item we are looking at to evalPrice\
-	local evalPrice = 0
-	local evalPrice = reagentPrice
-	
-	--Fail and end if appraiser has no value for the item we want to convert
-	if evalPrice == nill or 0 then
+--Fail and end if appraiser has no value for the item we want to convert
+if (evalPrice == nill or evalPrice == 0) then
 	item:info("EMC Fail: No appraiser data available")
+	item:info("EMC debug: evalPrice = reagentPrice", evalPrice)
 	return
-	end
+end
 
 	--get stack size we are dealing with
 	local stackSize = item.count
@@ -228,10 +225,12 @@ end
 				end
 					
 				--Fail and end if appraiser has no value for the item we want to convert
-				if convertsToValue == nill or 0 then
+				if (convertsToValue == nill or convertsToValue == 0) then
 					item:info("EMC Fail: No appraiser data available")
+					item:info("EMC debug: convertsToValue @ to lesser")
 					return
 				end
+
 			
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
@@ -265,8 +264,9 @@ end
 						convertsToValue = newBid / 3
 					end
 				--Fail and end if appraiser has no value for the item we want to convert
-				if convertsToValue == nill or 0 then
+				if (convertsToValue == nill or convertsToValue == 0) then
 					item:info("EMC Fail: No appraiser data available")
+					item:info("EMC debug: convertsToValue @ to greater")
 					return
 				end
 			convertsToValue = convertsToValue * stackSize
@@ -305,8 +305,9 @@ end
 						convertsToValue = newBid / 10
 					end				
 				--Fail and end if appraiser has no value for the item we want to convert
-				if convertsToValue == nill or 0 then
+				if (convertsToValue == nill or convertsToValue == 0) then
 					item:info("EMC Fail: No appraiser data available")
+					item:info("EMC debug: convertsToValue @ to primal")
 					return
 				end					
 
@@ -351,8 +352,9 @@ end
 						convertsToValue = newBid
 					end									
 					--Fail and end if appraiser has no value for the item we want to convert
-					if convertsToValue == nill or 0 then
+					if (convertsToValue == nill or convertsToValue == 0) then
 						item:info("EMC Fail: No appraiser data available")
+						item:info("EMC debug: convertsToValue @ from depleted")
 						return
 					end
 			convertsToValue = convertsToValue * stackSize
