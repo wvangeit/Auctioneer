@@ -72,7 +72,8 @@ local getTimeLeft;
 local getMaxBids;
 local getNextAuctionId;
 local getAuctionIdList;
-local LongStringSplit;
+local longStringSplit;
+local multiInsertAndReturnLast;
 local addAuctionToSnapshot;
 local updateAuctionInSnapshot;
 local removeAuctionFromSnapshot;
@@ -373,7 +374,7 @@ function clear(itemKey, ahKey)
 			-- Remove the specified item from the database.
 			local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 			if (auctionIdsForItemKey) then
-				nukeMatches(ah.auctions, strsplit(";", auctionIdsForItemKey))
+				nukeMatches(ah.auctions, (";"):split(auctionIdsForItemKey))
 			end
 			ah.auctionIdsByItemKey[itemKey] = nil;
 			debugPrint("Removed "..itemKey.." from snapshot database "..ah.ahKey, DebugLib.Level.Info);
@@ -475,7 +476,7 @@ function updateForQuery(ahKey, query, auctions, partial)
 			local auctionsInSnapshotBySignature = {};
 			auctionsInSnapshotByItemKey[itemKey] = auctionsInSnapshotBySignature;
 
-			local auctionIds = LongStringSplit(auctionIdsForItemKey)
+			local auctionIds = longStringSplit(auctionIdsForItemKey)
 			for _,auctionId in ipairs(auctionIds) do
 				auctionId = tonumber(auctionId) or 0
 				local packedAuction = ah.auctions[auctionId];
@@ -558,7 +559,7 @@ function updateForSignature(ahKey, auctionSignature, auctions, partial)
 	local itemKey = createItemKeyFromAuctionSignature(auctionSignature);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		local auctionIds = LongStringSplit(auctionIdsForItemKey)
+		local auctionIds = longStringSplit(auctionIdsForItemKey)
 		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
 			local packedAuction = ah.auctions[auctionId];
@@ -644,7 +645,7 @@ function query(ahKey, query, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	for itemKey, auctionIdsForItemKey in pairs(ah.auctionIdsByItemKey) do
 		if ((not query) or doesItemKeyMatchQuery(itemKey, query)) then
-			unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, LongStringSplit(auctionIdsForItemKey))
+			unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, longStringSplit(auctionIdsForItemKey))
 		end
 	end
 	return matchingAuctions;
@@ -661,7 +662,7 @@ function queryWithItemKey(itemKey, ahKey, filterFunc, filterArg)
 	local ah = getAHDatabase(ahKey, true);
 	local auctionIdsForItemKey = ah.auctionIdsByItemKey[itemKey];
 	if (auctionIdsForItemKey) then
-		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, LongStringSplit(auctionIdsForItemKey))
+		unpackFiltered(ah.auctions, ahKey, filterFunc, filterArg, matchingAuctions, longStringSplit(auctionIdsForItemKey))
 	end
 	return matchingAuctions;
 end
@@ -893,15 +894,34 @@ function getNextAuctionId(ah)
 	return auctionId;
 end
 
-function LongStringSplit(IDstring)
-	local list = {}
-	local tempstring
-	while string.match(IDstring,";") do
-		tempstring, IDstring = strsplit(";", IDstring, 2)
-		table.insert(list, tempstring)
+function longStringSplit(IDstring, list)
+	--If a table was not passed, create one here
+	local list = list or {}
+
+	--While the string contains our split character...
+	while IDstring:match(";") do
+		--Call our util function that inserts a bunch of args but returns the last one unscathed
+		IDstring = multiInsertAndReturnLast(list, (";"):split(IDstring, 1024))
 	end
+
+	--Then insert that last item, since it has no friends now. And return the list while we're at it
+	table.insert(list, IDstring)
 	return list
 end
+
+function multiInsertAndReturnLast(tbl, ...)
+	--Figure out how many extra args we were given
+	local numArgs = select("#", ...)
+
+	--Add all the extra args, except the last one
+	for i = 1, numArgs - 1 do
+		table.insert(tbl, select(i, ...))
+	end
+
+	--Return that last arg without adding it
+	return select(numArgs, ...)
+end
+
 -------------------------------------------------------------------------------
 -- Adds the specified auction to the snapshot.
 -------------------------------------------------------------------------------
@@ -968,7 +988,7 @@ function removeAuctionFromSnapshot(ah, auction)
 	-- Remove the auction id from the itemKey index table.
 	local itemKey = Auctioneer.ItemDB.CreateItemKeyFromAuction(auction);
 	if (ah.auctionIdsByItemKey[itemKey]) then
-		local auctionIds = LongStringSplit(ah.auctionIdsByItemKey[itemKey])
+		local auctionIds = longStringSplit(ah.auctionIdsByItemKey[itemKey])
 		ah.auctionIdsByItemKey[itemKey]=nil
 		for _, auctionId in ipairs(auctionIds) do
 			auctionId = tonumber(auctionId) or 0
@@ -1019,8 +1039,8 @@ end
 -- Creates an auction signature (itemId:suffixId:enchantId:uniqueId:count:minBid:buyoutPrice:owner)
 -------------------------------------------------------------------------------
 function createAuctionSignatureFromAuction(auction)
-	return strjoin(
-		":", auction.itemId, auction.suffixId, auction.enchantId,
+	return (":"):join(
+		auction.itemId, auction.suffixId, auction.enchantId,
 		auction.uniqueId, auction.count, auction.minBid,
 		auction.buyoutPrice, auction.owner
 	);
@@ -1030,7 +1050,7 @@ end
 -- Breaks an auction signature (itemId:suffixId:enchantId:uniqueId:count:minBid:buyoutPrice:owner)
 -------------------------------------------------------------------------------
 function breakAuctionSignature(auctionSignature)
-	itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner = strsplit(":", auctionSignature);
+	itemId, suffixId, enchantId, uniqueId, count, minBid, buyoutPrice, owner = (":"):split(auctionSignature);
 	return tonumber(itemId), tonumber(suffixId), tonumber(enchantId), tonumber(uniqueId), tonumber(count), tonumber(minBid), tonumber(buyoutPrice), owner;
 end
 
