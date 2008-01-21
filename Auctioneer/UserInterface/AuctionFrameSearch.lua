@@ -1315,11 +1315,10 @@ function AuctionFrameSearch_SelectResultByIndex(frame, index)
 		-- Select the item
 		frame.selectedResult = frame.results[index];
 		ListTemplate_SelectRow(frame.resultsList, index);
-
-		-- If BeanCounter is loaded, do a transaction search.
-		-- Update the Transactions tab if BeanCounter is loaded.
-		if (AuctionFrameTransactions and AuctionFrameTransactions.SearchTransactions) then
-			AuctionFrameTransactions:SearchTransactions(frame.selectedResult.name, true, nil);
+		
+		-- Update the Transactions tab if BeanCounter is loaded. Allows searchs made here to show in BC
+		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch then
+			BeanCounter.externalSearch(frame.selectedResult.name:lower()) --will accept itemid, string, itemkey, or itemlink
 		end
 	else
 		-- Clear the selection
