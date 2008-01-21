@@ -327,7 +327,6 @@ function AuctionFramePost_UpdatePriceModels(frame)
 						["bid"] = false, ["outbid"] = false, ["auction"] = true, ["failedauction"] = false
 						}
 					local lastSale = BeanCounter.externalSearch(id, settings, true, 1) or {} --returns a table containing last sold
-					BeanCounter.Print("Bean", #lastSale, id)
 					if (lastSale and lastSale[1] and lastSale[1][6] and lastSale[1][3] and lastSale[1][4]) then
 						local lastPrice  = {}
 						lastPrice.text   = _AUCT('UiPriceModelLastSold')
