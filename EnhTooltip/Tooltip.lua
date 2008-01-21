@@ -1446,6 +1446,24 @@ function private.GtHookSetAuctionSellItem(funcArgs, retVal, frame)
 	end
 end
 
+function private.GtHookSetTradePlayerItem(funcArgs, retVal, frame, index)
+	local link = GetTradePlayerItemLink(index)
+	local name, texture, itemCount, quality = GetTradePlayerItemInfo(index)
+	
+	if (name) then
+		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+	end
+end
+
+function private.GtHookSetTradeTargetItem(funcArgs, retVal, frame, index)
+	local link = GetTradeTargetItemLink(index)
+	local name, texture, itemCount, quality = GetTradeTargetItemInfo(index)
+	
+	if (name) then
+		return public.TooltipCall(GameTooltip, name, link, quality, itemCount)
+	end
+end
+
 function private.GtHookSetGuildBankItem(funcArgs, retVal, frame, tab, slot)
 	local link = GetGuildBankItemLink(tab, slot)
 	local name = public.NameFromLink(link)
@@ -1659,6 +1677,8 @@ function private.TtInitialize()
 	Stubby.RegisterFunctionHook("GameTooltip.SetTradeSkillItem", 200, private.GtHookSetTradeSkillItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetAuctionSellItem", 200, private.GtHookSetAuctionSellItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetGuildBankItem", 200, private.GtHookSetGuildBankItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetTradePlayerItem", 200, private.GtHookSetTradePlayerItem)
+	Stubby.RegisterFunctionHook("GameTooltip.SetTradeTargetItem", 200, private.GtHookSetTradeTargetItem)
 	Stubby.RegisterFunctionHook("GameTooltip.SetText", 200, private.GtHookSetText)
 	Stubby.RegisterFunctionHook("GameTooltip.AppendText", 200, private.GtHookAppendText)
 	Stubby.RegisterFunctionHook("GameTooltip.Show", 200, private.GtHookShow)
