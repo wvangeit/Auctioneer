@@ -99,6 +99,22 @@ function lib.GetFaction()
 	return AucAdvanced.curFaction, realmName, factionGroup
 end
 
+-- Had to create an event catching frame to allow for disabling // re-enabling use of home faction data everywhere (automagic disable on ah open/ enable on close) ~ this stops neutral ah data from getting in home faction database
+local auctionHouseStatus = 0
+function onEventCatcher(this, event)
+	if event == 'AUCTION_HOUSE_SHOW' then
+		auctionHouseStatus = 1
+	end
+	if event == 'AUCTION_HOUSE_CLOSED' then
+		auctionHouseStatus = 0
+	end
+end
+
+local frame = CreateFrame("Frame","eventCatcherFrame")
+	frame:SetScript("OnEvent", onEventCatcher);
+	frame:RegisterEvent("AUCTION_HOUSE_SHOW");
+	frame:RegisterEvent("AUCTION_HOUSE_CLOSED");
+
 function lib.GetFactionGroup()
 	local currentZone = GetMinimapZoneText()
 	local factionGroup = UnitFactionGroup("player")
@@ -115,7 +131,9 @@ function lib.GetFactionGroup()
 		end
 	end
 	AucAdvancedConfig.factions[currentZone] = factionGroup
-	if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = UnitFactionGroup("player") end
+	if auctionHouseStatus == 0 then
+		if (AucAdvanced.Settings.GetSetting("alwaysHomeFaction") == true) then factionGroup = UnitFactionGroup("player") end 
+	end
 	return factionGroup
 end
 
