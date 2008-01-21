@@ -110,7 +110,7 @@ function onEventCatcher(this, event)
 	end
 end
 
-local frame = CreateFrame("Frame","eventCatcherFrame")
+local frame = CreateFrame("Frame","")
 	frame:SetScript("OnEvent", onEventCatcher);
 	frame:RegisterEvent("AUCTION_HOUSE_SHOW");
 	frame:RegisterEvent("AUCTION_HOUSE_CLOSED");
