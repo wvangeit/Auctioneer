@@ -8,11 +8,18 @@
 	This is a module for BtmScan to evaluate an item for purchase.
 
 TODO LIST: 
+Add relisting deposit fee projections (like appraiser does, project relisting 10x times subtract 10x deposit fees for conversions that involve deposit costs (primals & depleted)
 Considering adding weights for conversions 
-Considering adding ability to enable or disable a category or convertable item (maybe ties into weights?)
 Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
 *IN PROGRESS (Add depleted items) Compare the depleted item cost to the real item cost (cause it's also a boe you can sell) 
 Change over to a more effecient tables... possibly a converts from to table
+
+KNOWN ISSUES:
+A side effect of EMC putting 'always visable' lines into the tooltip is that while scanning, if you have another tooltip open (example, 
+mouse over a hearthstone or anything else in bag and leave tooltip open) anytime the evaluator evaluates an item that would add a 
+tooltip line, it will add the line to the "open" tooltip, it is possible for it to spam a hearthstone with lines like 'EMC: Convert Me!' or 
+'EMC: Just sell me' on items it clearly is not meant to add the tooltip item to. Only thing I can think of atm for fixing this would be to
+ assign the tooltip to only attach itself to the current item id or possibly remove the function out of the evaluator and add it to a util.
 
 	License:
 		This program is free software; you can redistribute it and/or
@@ -57,12 +64,9 @@ function lib:valuate(item, tooltip)
 		if not AucAdvanced.Modules.Util.Appraiser then
 			item:info("EMC couldn't find appraiser!")
 		return end
-			item:info("EMC: Debug: Appraiser is present")
 			
 	-- If this item is grey, forget about it.
 	if (item.qual == 0) then return end
-
-
 			
 	local price = 0
 	local value = 0	
@@ -98,26 +102,26 @@ function lib:valuate(item, tooltip)
 	local PWATER = 21885
 	local MWATER = 22578
 	--Depleted items
-	local DCBRACER = 0			-- crystalweave bracers
-	local DCBRACERTO = 0
-	local DMGAUNTLETS = 0		-- crystalhide handwraps
-	local DMGAUNTLETSTO = 0
-	local DBADGE = 0			-- badge of tenacity
-	local DBADGETO = 0		
-	local DCLOAK = 0			-- crystalweave cape
-	local DCLOAKTO = 0 
-	local DDAGGER = 0			-- crystal-infused shiv
-	local DDAGGERTO = 0
-	local DMACE = 0			-- apexis crystal mace
-	local DMACETO = 0
-	local DRING = 32678			-- dreamcrystal band
-	local DRINGTO = 0
-	local DSTAFF = 0			-- flaming quartz staff
-	local DSTAFFTO = 0
-	local DSWORD = 0			-- crystalforged sword
-	local DSWORDTO = 0
-	local DTHAXE = 0			-- apexis cleaver
-	local DTHAXETO = 0
+	local DCBRACER = 0		
+	local DCBRACERTO = 0	-- crystalweave bracers
+	local DMGAUNTLETS = 0		
+	local DMGAUNTLETSTO = 32656	-- crystalhide handwraps
+	local DBADGE = 0			
+	local DBADGETO = 32658			-- badge of tenacity
+	local DCLOAK = 0			
+	local DCLOAKTO = 32665 	-- crystalweave cape
+	local DDAGGER = 0		
+	local DDAGGERTO = 0	-- crystal-infused shiv
+	local DMACE = 0		
+	local DMACETO = 32661	-- apexis crystal mace
+	local DRING = 32678			
+	local DRINGTO = 0	-- dreamcrystal band
+	local DSTAFF = 0		
+	local DSTAFFTO = 32662	-- flaming quartz staff
+	local DSWORD = 0		
+	local DSWORDTO = 32660	-- crystalforged sword
+	local DTHAXE = 32676	
+	local DTHAXETO = 32663	-- apexis cleaver
 
 	--Set convertable items table up
 	local convertableMat = {
@@ -156,12 +160,12 @@ function lib:valuate(item, tooltip)
 	--	[DRING] = true,
 	--	[DSTAFF] = true,
 	--	[DSWORD] = true,
-	--	[DTHAXE] = true,
+		[DTHAXE] = true,
 	}
 
 --Report failure and exit if the item is not in our convertableMat table 
 if not convertableMat[ item.id ] then
-	item:info("EMC Fail: Not a convertable item")
+	item:info("EMC Fail: Not convertable", item.id)
 	return
 end
 	
@@ -206,6 +210,11 @@ end
 	}
 	
 	if convertsToL[ item.id ] then
+		--If category is disabled we are done here.
+		if (not get(lcName..".enableEssence")) then 
+		item:info("EMC Fail: Category disabled.")
+		return end
+	
 		if item.id == GPLANAR then convertToID = LPLANAR end
 		if item.id == GETERNAL then convertToID = LETERNAL end
 		if item.id == GNETHER then convertToID = LNETHER end
@@ -246,6 +255,11 @@ end
 	}
 	
 	if convertsToG[ item.id ] then
+		--If category is disabled we are done here.
+		if (not get(lcName..".enableEssence")) then 
+		item:info("EMC Fail: Category disabled.")
+		return end
+		
 		if item.id == LPLANAR then convertToID = GPLANAR end
 		if item.id == LETERNAL then convertToID = GETERNAL end
 		if item.id == LNETHER then convertToID = GNETHER end
@@ -285,6 +299,11 @@ end
 	}
 	
 	if convertsToP[ item.id ] then
+		--If category is disabled we are done here.
+		if (not get(lcName..".enableMote")) then 
+		item:info("EMC Fail: Category disabled.")
+		return end
+		
 		if item.id == MAIR then convertToID = PAIR end
 		if item.id == MEARTH then convertToID = PEARTH end
 		if item.id == MFIRE then convertToID = PFIRE end
@@ -325,10 +344,15 @@ end
 	--	[DRING] = true,
 	--	[DSTAFF] = true,
 	--	[DSWORD] = true,
-	--	[DTHAXE] = true,
+		[DTHAXE] = true,
 	}
 	
 	if convertsFromDepleted[ item.id ] then
+		--If category is disabled we are done here.
+		if (not get(lcName..".enableDepleted")) then 
+		item:info("EMC Fail: Category disabled.")
+		return end
+		
 		if item.id == DCBRACER then convertToID = DCBRACERTO end
 		if item.id == DMGAUNTLETS then convertToID = DMGAUNTLETSTO end
 		if item.id == DBADGE then convertToID = DBADGETO end
@@ -453,7 +477,7 @@ end
 end
 
 --Setup GUI and GUI Defaults 
-define(lcName..'.enable', false)
+define(lcName..'.enable', true)
 define(lcName..'.allow.buy', true)
 define(lcName..'.allow.bid', true)
 define(lcName..'.profit.min', 1)
@@ -473,44 +497,56 @@ define(lcName..'.enableDepleted', false)
 
 function lib:setup(gui)
 	local id = gui:AddTab(libName)	
+
 	gui:AddHelp(id, "what is EMC",
 		"What is EMC?",
-		"This evaluator allows you to purchase items that can be changed to another item that is worth more (based on your settings here) by simply right clicking the item.\n\n"..
-		"\n")
-	gui:AddHelp(id, "EMC: General Settings",
-		"EMC: General Settings",
-		"General Settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout items for converting\n\n"..
-		""..
-		"Custom Profit Settings: Minimum profit(discount from mat value) % and fixed $ amounts both must be met in order to allow an item to be purchased for this evaluator based on your settings here. You also have the option of turning on/off the use of market matchers when we valuate an item (it is suggested that you leave it on). You can also tell Convert Mats to use Bid price from Appraiser Tab instead of the Buyout price)\n\n"..
-		""..
-		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) and/or deposit costs figured in when valuating an item to prospect. You may also select how many times you project having to relist the mats before they will sell.\n\n"..
-		""..
-		"An example of a convertable item would be a greater essence into a lesser essence or visa versa.\n\n"..
-		""..
-		"Please note, this evaluator uses your last used fixed price or last used pricing module from appraiser tab, if you haven't posted a mat from appraiser tab it will use whatever pricing module you set as your default for appraiser.\n\n"..
-		""..
-		"This evaluator is in its very alpha stages and defaults to 'off' because it needs a performance boost and additional testing. Currently apears to work good for essence's and motes to primals.Also it will prompt for bid/buyout sometimes even if converting it to its other form is not the right thing to do (the tooltip will tell you this) however it 's converted value is still meets your 'required' profit settings. When this happens it is a very good deal. buy and then do as your tool tip tells you (convert to sell or not to as the case may be) In the future this will be delivered in a more understandable fashion. \"Potential profit\" & \"Return on investment\" figures in the btm prompt are incorrect, please ignore them. profit over requirement is correct!\n\n"..
+		"This evaluator allows you to purchase items that can be changed to another item that is worth more (based on your settings here) by simply right clicking the item to convert it.\n\n"..
+		"An example of a convertable item would be 1x greater essence into 3x lesser essence or visa versa.\n\n"..
+	"\n")
+	
+	gui:AddHelp(id, "EMC: General settings",
+		"EMC: General settings",
+		"General settings: This section allows you to configure if the evaluator is enabled and if it is enabled if you only want to allow it to bid or buyout items for converting\n\n"..
 		""..
 	"\n")
 
-	gui:AddControl(id, "Subhead",		0,	libName.." General Settings")
-	--gui:AddTip(id, "Please read the help before enabling this evaluator.")
+	gui:AddControl(id, "Subhead",		0,	libName.." General settings")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.bid", "Allow bid on items")
-		
-	gui:AddControl(id, "Subhead",		0,	"Custom Profit Settings")
+	
+	gui:AddHelp(id, "EMC: Custom profit settings",
+		"EMC: Custom profit settings",
+		"This section allows you to set your minimum profit requirements for an item to be considered a deal. both minimum profit and discount % must be met for an item to be considered."..
+		""..
+		"Please note, this evaluator uses your last used fixed price or last used pricing module from appraiser tab, if you haven't posted a mat from appraiser tab it will use whatever pricing module you set as your default for appraiser.\n\n"..
+		""..
+	"\n")
+	
+	gui:AddControl(id, "Subhead",		0,	"Custom profit settings")
 	gui:AddControl(id, "MoneyFramePinned", 0, 1, lcName..".profit.min", 1, 99999999, "Minimum Profit")
 	gui:AddControl(id, "WideSlider",		0, 1, 	lcName..".profit.pct", 1, 100, 0.5, "Minimum Discount: %0.01f%%")
-	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "We get a prices from Appraiser Tab. Check to use market matching (if enabled on the item [ Recommended ]")
+	gui:AddControl(id, "Checkbox",         0, 1, lcName..".matching.check", "We get a prices from Appraiser Tab. Check to use market matching (if enabled on the item)")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".buyout.check", "Use Buyout Price instead of Bid Price:")	
+	
+	gui:AddHelp(id, "EMC: Fees adjustment",
+		"EMC: Fees adjustment",
+		"Fees Adjusments: This section allows you to select if you want brokerage (ah cut) figured in when valuating an item for conversion. \n\n"..
+		""..
+	"\n")
 	
 	gui:AddControl(id, "Subhead",		0,    	"Fees adjustment")
 	gui:AddControl(id, "Selectbox",		0, 1, 	ahList, lcName..".adjust.basis", "Deposit/fees basis")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".adjust.brokerage", "Subtract auction fees from convert profit")
-	
-	gui:AddControl(id, "Subhead",		0,    	"Category's - NOT WORKING YET")
+		
+	gui:AddHelp(id, "EMC: Enable or disable by category",
+		"EMC: Enable or disable by category",
+		"This is pretty self explanatory. Either allow the evaluator to look at the specific categorys or not. \n\n"..
+		""..
+	"\n")
+		
+	gui:AddControl(id, "Subhead",		0,    	"Enable or disable by category")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableEssence", "Enable essence conversions")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableMote", "Enable mote to primal conversions")
-	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted item conversions")
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted item conversions") 
 end
