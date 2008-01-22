@@ -470,11 +470,16 @@ function private.CreateFrames()
 		else
 			for i,v in pairs(BeanCounterDB["ItemIDArray"]) do
 				if i:lower():find(itemName:lower(), 1, true)  then
-					table.insert(tbl, v) --Create a list of itemIDs that match the search text
+					--Create a list of itemIDs that match the search text
+					tbl[v] = v --Since its possible to have the same itemID returned multiple times this will only allow one instance to be recorded
 				end
 			end
 		end
-		private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName) 
+		if queryReturn then --need to return the ItemID results to calling function
+			return(private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName))
+		else
+			private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName) 
+		end
 	end
 	
 	function private.searchByItemID(id, settings, queryReturn, count, itemTexture, classic) 
@@ -483,7 +488,7 @@ function private.CreateFrames()
 		tbl = {}
 		if type(id) == "table" then --we can search for a silng itemID or an array of itemIDs
 			for i,v in pairs(id)do
-				tbl[i] = tostring(v)
+				table.insert(tbl, tostring(v))
 			end
 		else
 			tbl[1] = tostring(id)

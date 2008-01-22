@@ -263,7 +263,7 @@ function lib.externalSearch(name, settings, queryReturn, count)
 	if private.getOption("util.beancounter.externalSearch") then --is option enabled and have we already searched for this name (stop spam)
 		if lastSearchRequest[name] then 
 			lastSearchRequest[name] = lastSearchRequest[name] + 1
-			if lastSearchRequest[name] > 2 then return {} end  --We will only respond to 3 search reqyuests for teh same item before ignoring thouse requests.
+			if lastSearchRequest[name] > 2 then return {} end  --We will only respond to 3 search requests for the same item before ignoring those requests.
 		else
 			lastSearchRequest = {}
 			lastSearchRequest[name] = 0
