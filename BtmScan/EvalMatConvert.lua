@@ -60,9 +60,9 @@ function lib:valuate(item, tooltip)
 	-- If we're not enabled, scadaddle!	
 	if (not get(lcName..".enable")) then return end
 	
-	-- Fail and exit if enchantrix is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
-		if not AucAdvanced.Modules.Util.Appraiser then
-			item:info("EMC couldn't find appraiser!")
+	-- Fail and exit if auc adv or appraiser is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
+		if (AucAdvanced == nil or not AucAdvanced.Modules.Util.Appraiser or AucAdvanced.Modules.Util.Appraiser == nil) then
+			item:info("EMC: Requires AADV + Appraiser")
 		return end
 			
 	-- If this item is grey, forget about it.
@@ -103,14 +103,14 @@ function lib:valuate(item, tooltip)
 	local MWATER = 22578
 	--Depleted items
 	local DCBRACER = 0		
-	local DCBRACERTO = 0	-- crystalweave bracers
+	local DCBRACERTO = 32655	-- crystalweave bracers
 	local DMGAUNTLETS = 0		
 	local DMGAUNTLETSTO = 32656	-- crystalhide handwraps
 	local DBADGE = 0			
 	local DBADGETO = 32658			-- badge of tenacity
-	local DCLOAK = 0			
+	local DCLOAK = 32677			
 	local DCLOAKTO = 32665 	-- crystalweave cape
-	local DDAGGER = 0		
+	local DDAGGER = 32673		
 	local DDAGGERTO = 0	-- crystal-infused shiv
 	local DMACE = 0		
 	local DMACETO = 32661	-- apexis crystal mace
@@ -154,7 +154,7 @@ function lib:valuate(item, tooltip)
 	--	[DCBRACER] = true,   --depleted items are disabled until the function is completed and I have all the item id numbers for them and their converted items
 	--	[DMGAUNTLETS] = true,
 	--	[DBADGE] = true,
-	--	[DCLOAK] = true,
+		[DCLOAK] = true,
 	--	[DDAGGER] = true,
 	--	[DMACE] = true,
 	--	[DRING] = true,
@@ -221,10 +221,10 @@ end
 		if item.id == GMYSTIC then convertToID = LMYSTIC end
 		if item.id == GASTRAL then convertToID = LASTRAL end
 		if item.id == GMAGIC then convertToID = LMAGIC end
-				newBid = 0
-				newBuy = 0
-				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				local newBid = 0
+				local newBuy = 0
+				local curModelText = "Unknown"
+				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 
 				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 				if get(lcName..".buyout.check") then
@@ -312,10 +312,10 @@ end
 		if item.id == MSHADOW then convertToID = PSHADOW end
 		if item.id == MWATER then convertToID = PWATER end
 		
-				newBid = 0
-				newBuy = 0
-				curModelText = "Unknown"
-				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
+				local newBid = 0
+				local newBuy = 0
+				local curModelText = "Unknown"
+				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 
 			--update value since 10 motes = 1 primal do primal price / 10 				
 					if get(lcName..".buyout.check") then
@@ -548,5 +548,5 @@ function lib:setup(gui)
 	gui:AddControl(id, "Subhead",		0,    	"Enable or disable by category")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableEssence", "Enable essence conversions")
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableMote", "Enable mote to primal conversions")
-	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted item conversions") 
+	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enableDepleted", "Enable depleted conversions (Warning: if you dont know about depleted items leave off!)") 
 end
