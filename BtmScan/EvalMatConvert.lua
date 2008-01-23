@@ -8,6 +8,7 @@
 	This is a module for BtmScan to evaluate an item for purchase.
 
 TODO LIST: 
+TOP PRIORITY: Gracefully handle any nil results
 Add relisting deposit fee projections (like appraiser does, project relisting 10x times subtract 10x deposit fees for conversions that involve deposit costs (primals & depleted)
 Considering adding weights for conversions 
 Considering adding skillable converts but don't want to step on other evaluators (like prospect or de)
@@ -61,7 +62,7 @@ function lib:valuate(item, tooltip)
 	if (not get(lcName..".enable")) then return end
 	
 	-- Fail and exit if auc adv or appraiser is not available. (really doesnt matter anymore we don't call enchantrix for squat its all appraiser based pricing now
-		if (AucAdvanced == nil or not AucAdvanced.Modules.Util.Appraiser or AucAdvanced.Modules.Util.Appraiser == nil) then
+		if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
 			item:info("EMC: Requires AADV + Appraiser")
 		return end
 			
@@ -477,7 +478,7 @@ end
 end
 
 --Setup GUI and GUI Defaults 
-define(lcName..'.enable', true)
+define(lcName..'.enable', false) -- Evals all default to false
 define(lcName..'.allow.buy', true)
 define(lcName..'.allow.bid', true)
 define(lcName..'.profit.min', 1)
