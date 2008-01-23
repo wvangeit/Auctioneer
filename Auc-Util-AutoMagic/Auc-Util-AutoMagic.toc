@@ -1,0 +1,7 @@
+## Title: Auc:Util:AutoMagic
+## Interface: 20300
+## Dependancies: Auc-Advanced
+##
+## Version: <%version%> (<%codename%>)
+## SavedVariables: AutoMagic
+Embed.xml
