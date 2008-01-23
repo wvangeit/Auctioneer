@@ -61,7 +61,7 @@ end
 function lib.OnLoad()
 -- creates eventcatcherframe to catch events. this is a dummy frame that is hidden.
 local frame = CreateFrame("Frame","")
-	frame:SetScript("OnEvent", onEventDo);
+	frame:SetScript("OnEvent", lib.onEventDo);
 	frame:RegisterEvent("MERCHANT_SHOW");
 	frame:RegisterEvent("MERCHANT_CLOSED");
 -- Sets defaults	
@@ -72,9 +72,9 @@ local frame = CreateFrame("Frame","")
 end
 
 -- define what event fires what function
-function onEventDo(this, event)
-	if event == 'MERCHANT_SHOW' then merchantShow() end
-	if event == "MERCHANT_CLOSED" then merchantClosed() end
+function lib.onEventDo(this, event)
+	if event == 'MERCHANT_SHOW' then lib.merchantShow() end
+	if event == "MERCHANT_CLOSED" then lib.merchantClosed() end
 end
 
 function private.SetupConfigGui(gui)
@@ -95,9 +95,9 @@ end
 
 
 
-function merchantShow()
+function lib.merchantShow()
 	if (get("util.automagic.enable")) then 
-		doBagCheck()
+		lib.doBagCheck()
 		if (get("util.automagic.autoclosemerchant")) then 
 			print("AutoMagic has closed the merchant window for you, to disable you must change this options in the settings.") 
 			CloseMerchant()	
@@ -106,11 +106,11 @@ function merchantShow()
 end
 
 
-function merchantClosed()
+function lib.merchantClosed()
 	--Place holder for limiting chat spam to single output line as an option
 end
 
-function doScanAndSell(bag,bagType)	
+function lib.doScanAndSell(bag,bagType)	
 	for slot=1,GetContainerNumSlots(bag) do
 		if (GetContainerItemLink(bag,slot)) then
 			local _,itemCount = GetContainerItemInfo(bag,slot)
@@ -139,9 +139,9 @@ function doScanAndSell(bag,bagType)
 	end
 end
 
-function doBagCheck()
+function lib.doBagCheck()
 	for bag=0,4 do
-		doScanAndSell(bag,"Bags")
+		lib.doScanAndSell(bag,"Bags")
 	end
 end
 
