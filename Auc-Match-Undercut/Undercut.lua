@@ -53,7 +53,6 @@ end
 function lib.GetMatchArray(hyperlink, marketprice)
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
-	if (factor ~= 0) then property = property.."x"..factor end
 
 	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
 	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
