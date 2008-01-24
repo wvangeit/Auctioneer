@@ -36,7 +36,7 @@ local libType = "Util"
 local lib 
 BeanCounter={}
 lib = BeanCounter
-
+lib.API = {}
 local private = {
 	--BeanCounterCore
 	playerName = UnitName("player"),
@@ -292,7 +292,6 @@ function lib.externalSearch(name, settings, queryReturn, count)
 			if itemlink then
 				return(private.searchByItemID(itemName, settings, queryReturn, count))
 			else
-				settings.exact = true --If this is an external addon wanting search data returned
 				return(private.startSearch(itemName, settings, queryReturn, count))
 			end
 		end
