@@ -41,7 +41,7 @@ If no player name is supplied then the entire server profit will be totaled
 if no item name is provided then all items will be returned
 if no date range is supplied then a sufficently large range to cover the entire BeanCounter History will be used. 
 ]]
-function lib.API.GetAHProfit(player, item, lowDate, highDate)
+function lib.API.getAHProfit(player, item, lowDate, highDate)
 	if not player or player == "" then player = "server" end
 	if not item then item = "" end
 
