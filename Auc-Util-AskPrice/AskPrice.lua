@@ -509,16 +509,12 @@ end
 private.defaults = {
 	["util.askprice.activated"]    = true,
 	["util.askprice.ad"]           = true,
-	["util.askprice.guild"]        = true,
 	["util.askprice.smart"]        = true,
-	["util.askprice.party"]        = true,
 	["util.askprice.trigger"]      = "?",
 	["util.askprice.vendor"]       = false,
 	["util.askprice.whispers"]     = true,
 	["util.askprice.word1"]        = "what",
 	["util.askprice.word2"]        = "worth",
-	["util.askprice.login"]        = true,
-	["util.askprice.debug"]        = true,
 }
 
 function private.getOption(option)
@@ -539,12 +535,6 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.activated", "Respond to queries for item market values sent via chat.")
 	gui:AddTip(id, "This checkbox will enable or disable the module")
 
-	gui:AddControl(id, "Subhead",    0,    "Respond from:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.guild", "Respond to queries made in guild and officer chat.")
-	gui:AddTip(id, "This checkbox enables guild members to ask through /g and /o")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.party", "Respond to queries made in party and raid chat.")
-	gui:AddTip(id, "This checkbox enables party and raid members to ask through /p and /raid")
-
 	gui:AddHelp(id, "what triggers",
 		"What are these triggers, and how are they used?",
 		"The triggers control how someone needs to ask you for the price.\n"..
@@ -559,12 +549,6 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "The smart words allow for natural language queries")
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", "Askprice Trigger character")
 	gui:AddTip(id, "The trigger character allows for querying total price of a stack")
-
-	gui:AddControl(id, "Subhead",    0,    "Swarm:")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.login", "Show Login/Online/Announcer message.")
-	gui:AddTip(id, "Shows (enabled) or hides (disabled) Login/Online/Announcer message.")
-	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.debug", "Show debug messages.")
-	gui:AddTip(id, "Shows (enabled) or hides (disabled) debug messages.")
 
 	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
