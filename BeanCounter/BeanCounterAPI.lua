@@ -101,7 +101,7 @@ function lib.API.getAHProfitGraph(player, item ,days)
 	--sort by date
 	table.sort(tbl, function(a,b) return a[5] > b[5] end)
 	--get min and max dates.	
-	local high, low, count, sum = tbl[1][5], tbl[#tbl][5], 1, 0
+	local high, low, count, sum, number = tbl[1][5], tbl[#tbl][5], 1, 0, 0
 	local range = high - (days* 86400)
 	
 	tbl.sums = {}
