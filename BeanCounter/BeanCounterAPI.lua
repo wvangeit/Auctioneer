@@ -76,3 +76,60 @@ function lib.API.getAHProfit(player, item, lowDate, highDate)
 	end
 	return sum, lowDate or low, highDate or high
 end
+
+--[[This will return profits in date segments  allow easy to create graphs
+Similar to API.getProfit()  This utility return a table containing the profit earned in day based segments. useful for graphing a change over time
+example: entering (player, "arcane dust", 7) would return the the profit for arcane dust in 7 day segments starting from most recent to oldest
+]]
+function lib.API.getAHProfitGraph(player, item ,days)
+	if not player or player == "" then player = "server" end
+	if not item then item = "" end
+	if not days then days = 7 end
+	--Get data from BeanCounter 
+	local settings = {["selectbox"] = {"1", player} , ["bid"] =true, ["auction"] = true} 
+	local tbl = private.startSearch(item, settings, "none") 
+	--Merge and edit provided table to needed format
+	for i,v in pairs(tbl) do
+		for a,b in pairs(v) do
+			table.insert(tbl, b)
+		end
+	end
+	--remove now redundant table entries
+	tbl.completedAuctions, tbl["completedBids/Buyouts"], tbl.failedAuctions, tbl.failedBids = nil, nil, nil, nil
+	--check if we actually have any results from the search
+	if #tbl == 0 then return {0}, 0, 0 end
+	--sort by date
+	table.sort(tbl, function(a,b) return a[5] > b[5] end)
+	--get min and max dates.	
+	local high, low, count, sum = tbl[1][5], tbl[#tbl][5], 1, 0
+	local range = high - (days* 86400)
+	
+	tbl.sums = {}
+	tbl.sums[count] = {}
+	for i,v in ipairs(tbl) do
+		if tonumber(v[5]) >= range then
+			if v[4] == "Auction successful" then
+				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
+				sum = sum + number
+			elseif v[4] == "Auction won" then
+				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
+				sum = sum - number
+			end 
+			tbl.sums[count] = sum	
+		else
+			count = count + 1
+			range = range - (days * 86400)
+			tbl.sums[count] = {}
+			sum = 0
+			if v[4] == "Auction successful" then
+				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;(.-);.*")) or 0
+				sum = sum + number
+			elseif v[4] == "Auction won" then
+				number = tonumber(v[3]:match(".-;.-;.-;.-;.-;.-;(.-);.*")) or 0
+				sum = sum - number
+			end 
+			tbl.sums[count] = sum
+		end
+	end
+	return tbl.sums, low, high
+end
