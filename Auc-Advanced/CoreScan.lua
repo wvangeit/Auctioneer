@@ -897,8 +897,8 @@ function private.NoDupes(pageData, compare)
 	end
 	return true
 end
-
-function lib.StorePage()
+local Getallstarttime = GetTime()
+StorePageFunction = function()
 	if (private.curPage == -1) then
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
@@ -941,6 +941,10 @@ function lib.StorePage()
 
 	local storecount = 0
 	for i = 1, numBatchAuctions do
+		if (i > 50) and ((i % 10) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+			AucAdvanced.Print(i)
+			coroutine.yield()
+		end
 		local itemLink = GetAuctionItemLink("list", i)
 		if itemLink then
 			local _,_,_,itemLevel,_,itemType,itemSubType,_,itemEquipLoc = GetItemInfo(itemLink)
@@ -1032,6 +1036,17 @@ function lib.StorePage()
 		if (pageNumber == maxPages and incomplete < 2 and pctIncomplete < 0.05) or incomplete == 0 then
 			lib.Commit(true)
 		end
+	end
+end
+
+local CoStore = coroutine.create(StorePageFunction)
+
+function lib.StorePage()
+	if coroutine.status(CoStore) ~= "dead" then
+		CoroutineResume(CoStore)
+	else
+		CoStore = coroutine.create(StorePageFunction)
+		CoroutineResume(CoStore)
 	end
 end
 
@@ -1175,6 +1190,18 @@ function private.OnUpdate(me, dur)
 			CoroutineResume(CoCommit)
 		end
 	end
+	local now = GetTime()
+	--if now - Getallstarttime > 300 then
+		if coroutine.status(CoStore) == "suspended" and AuctionFrame:IsVisible() then
+			flip = not flip
+			if flip then
+				flop = not flop
+				if flop then
+					CoroutineResume(CoStore)
+				end
+			end
+		end
+	--end
 	if not AuctionFrame then return end
 	if private.isPaused then return end
 
@@ -1186,7 +1213,6 @@ function private.OnUpdate(me, dur)
 		end
 		return
 	end
-	local now = GetTime()
 	if private.scanDelay then
 		-- If we are within the delay interval
 		if now < private.scanDelay then
