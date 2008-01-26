@@ -909,10 +909,15 @@ StorePageFunction = function()
 	end
 	private.sentQuery = false
 
+	local EventFramesRegistered = {}
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = ceil(totalAuctions / 50);
 	if (numBatchAuctions > 50) then
 		maxPages = 1
+		EventFramesRegistered = {GetFramesRegisteredForEvent("AUCTION_ITEM_LIST_UPDATE")}
+		for _, frame in pairs(EventFramesRegistered) do
+			frame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
+		end
 	end
 	if not private.curScan then 
 		private.curScan = acquire()
@@ -932,7 +937,7 @@ StorePageFunction = function()
 
 
 	local curTime = time()
-	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 10
+	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 200
 
 	-- Take a picture of everything we've got on the page so far.
  	local _, itemLink, itemLevel, itemType, itemSubType, itemEquipLoc
@@ -1000,6 +1005,10 @@ StorePageFunction = function()
 			end
 		end
 	end
+	for _, frame in pairs(EventFramesRegistered) do
+		frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	end
+	recycle(EventFramesRegistered)
 
 	-- Send the next page query or finish scanning
 
@@ -1021,6 +1030,8 @@ StorePageFunction = function()
 		end
 	elseif (totalAuctions <= 50) then
 		lib.Commit(false)
+	elseif (numBatchAuctions > 50) then
+			lib.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
 		if not private.curPages then
 			private.curPages = acquire()
