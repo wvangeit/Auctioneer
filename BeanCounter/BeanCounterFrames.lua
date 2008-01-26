@@ -624,27 +624,28 @@ function private.CreateFrames()
 				tbl = text
 				if type(text) == "string" then tbl= private.unpackString(text) end
 			
-				local stack, bid = private.reconcileCompletedAuctions(player, id, tbl[4], tbl[6], tbl[9])
+				--local stack, bid = private.reconcileCompletedAuctions(player, id, tbl[4], tbl[6], tbl[9])
 				local pricePer = 0
-				if stack > 0 then	pricePer = tbl[3]/stack end
-				if bid > 0 then tbl[7] = bid end
+				local stack = tonumber(tbl[3]) or 0
+				if stack ~= 0 then pricePer = tbl[4]/stack end
+				--if bid > 0 then tbl[7] = bid end
 				
 				return({
 					tbl[1], --itemname
 					_BC('UiAucSuccessful'), --status
 					 
-					tonumber(tbl[7]) or 0,  --bid
-					tonumber(tbl[6]) or 0,  --buyout
-					tonumber(tbl[3]), --Profit,
+					tonumber(tbl[8]) or 0,  --bid
+					tonumber(tbl[7]) or 0,  --buyout
+					tonumber(tbl[4]), --Profit,
 					tonumber(stack),  --stacksize
 					tonumber(pricePer), --Profit/per
 
-					tbl[8], -- "-",  --seller/seller
+					tbl[9], -- "-",  --seller/seller
 
-					tonumber(tbl[4]), --deposit
-					tonumber(tbl[5]), --fee
-					tonumber(tbl[10]) or 0, --current wealth
-					tbl[9], --time, --Make this a user choosable option.
+					tonumber(tbl[5]), --deposit
+					tonumber(tbl[6]), --fee
+					tonumber(tbl[11]) or 0, --current wealth
+					tbl[10], --time, --Make this a user choosable option.
 				})
 		end
 		function private.FAILEDAUCTIONS(player, id, text)

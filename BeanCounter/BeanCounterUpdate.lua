@@ -104,6 +104,8 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 1.07 then
 		debugPrint("private.updateTo1_07()")
 		private.updateTo1_07()
+	elseif private.playerData["version"] < 1.08 then
+		private.updateTo1_075()
 	end
 		
 end
@@ -236,3 +238,47 @@ function private.updateTo1_07()
 	BeanCounterDB["ItemIDArray"] = {}
 	private.updateTo1_06() --1.06 has been changed to always record in lower, so reuse that code :)
 end
+
+--[[Major update Adds the bid and correct Stack to the Completed Auctions Table. From now on bean will alwasy try and match a posted Auction to get stack.]]
+
+--Insert <nil> segment into completed AUctions to make room for stack
+function private.updateTo1_075()
+	for player,data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["completedAuctions"]) do
+			for i, text in pairs(values) do
+				text = text:gsub("Auction successful;", "Auction successful;<nil>;", 1) --Add new Stack size field 
+				private.serverData[player]["completedAuctions"][itemID][i] = text
+			end
+		end
+		private.serverData[player]["version"] = 1.075
+	end
+	private.updateTo1_08()
+end
+--Compare with postedAuctions add as much stack info as we can. Also add the correct Starting Bid 
+function private.updateTo1_08()
+	for player,data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["completedAuctions"]) do
+			local used = {}
+			for i, text in pairs(values) do
+				local tbl = private.unpackString(text)
+				local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(tbl[5]), tonumber(tbl[8]),tonumber(tbl[10]), tonumber(tbl[10]-144000)
+				if not private.serverData[player]["postedAuctions"][itemID] then print("failed", itemID) break end
+				
+				for index, v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
+					local tbl2 = private.unpackString(v)
+					local postDeposit, postBuy, postTime = tonumber(tbl2[6]), tonumber(tbl2[4]),tonumber(tbl2[7])
+					--if the deposits and buyouts match, check if time range would make this a possible match
+					if postDeposit ==  soldDeposit and postBuy == soldBuy and not used[index] then
+						if (soldTime > postTime) and (oldestPossible < postTime) then
+							private.serverData[player]["completedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], tbl2[2], tbl[4], tbl[5], tbl[6], tbl[7], tbl2[3],tbl[9], tbl[10], tbl[11])
+							used[index] = "used"
+							break
+						end
+					end
+				end
+			end
+		end
+	private.serverData[player]["version"] = 1.08
+	end
+end
+

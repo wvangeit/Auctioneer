@@ -164,8 +164,9 @@ function private.mailSort()
 				--Get itemID from database
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
-				if itemID then
-					local value = private.packString(itemLink, "Auction successful", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+				if itemID then  --Get the Bid and stack size if possible
+					local stack, bid = private.findStack("postedAuctions", itemID, private.reconcilePending[i]["deposit"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"]) 
+					local value = private.packString(itemLink, "Auction successful", stack,private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("completedAuctions", itemID, value)
 				end
 				table.remove(private.reconcilePending, i)
@@ -241,6 +242,19 @@ function private.matchDB(key, text)
 	end
 	debugPrint("Searching DB for ItemID..", key, text, "Failed ItemID does not exist")
 	return nil
+end
+function private.findStack(key , itemID, soldDeposit, soldBuy, soldTime)
+	local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(soldDeposit), tonumber(soldBuy),tonumber(soldTime), tonumber(soldTime - 144000)
+	for index = #private.playerData[key][itemID] , 1, -1 do
+		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
+		local postDeposit, postBuy, postTime = tonumber(tbl2[6]), tonumber(tbl2[4]),tonumber(tbl2[7])
+		--if the deposits and buyouts match, check if time range would make this a possible match
+		if postDeposit ==  soldDeposit and postBuy == soldBuy then
+			if (soldTime > postTime) and (oldestPossible < postTime) then
+				return tonumber(tbl2[2]), tonumber(tbl2[3])
+			end
+		end
+	end
 end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
