@@ -74,6 +74,16 @@ function private.CommandHandler(command, subcommand, ...)
 		AucAdvanced.API.ClearItem(subcommand)
 	elseif command == "about" then
 		lib.About(subcommand, ...)
+	elseif command == "getallspeed" then
+		AucAdvanced.Settings.SetSetting("GetAllSpeed", subcommand)
+		AucAdvanced.Print("Setting GetAllSpeed to "..tostring(AucAdvanced.Settings.GetSetting("GetAllSpeed")))
+	elseif command == "getall" then
+		local _, getallready = CanSendAuctionQuery()
+		if getallready then
+			QueryAuctionItems("", "", "", nil, nil, nil, nil, nil, nil, true)
+		else
+			AucAdvanced.Print("Not ready for another GetAll yet")
+		end
 	else
 		if command and subcommand then
 			subcommand = subcommand:lower()

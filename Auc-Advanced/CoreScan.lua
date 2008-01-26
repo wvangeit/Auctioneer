@@ -932,6 +932,7 @@ StorePageFunction = function()
 
 
 	local curTime = time()
+	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 10
 
 	-- Take a picture of everything we've got on the page so far.
  	local _, itemLink, itemLevel, itemType, itemSubType, itemEquipLoc
@@ -941,7 +942,7 @@ StorePageFunction = function()
 
 	local storecount = 0
 	for i = 1, numBatchAuctions do
-		if (i > 50) and ((i % 10) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+		if (i > 50) and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 			AucAdvanced.Print(i)
 			coroutine.yield()
 		end
@@ -1192,7 +1193,7 @@ function private.OnUpdate(me, dur)
 	end
 	local now = GetTime()
 	--if now - Getallstarttime > 300 then
-		if coroutine.status(CoStore) == "suspended" and AuctionFrame:IsVisible() then
+		if coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
 			flip = not flip
 			if flip then
 				flop = not flop
