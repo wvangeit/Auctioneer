@@ -888,9 +888,6 @@ end
 function getNextAuctionId(ah)
 	local auctionId = ah.nextAuctionId;
 	ah.nextAuctionId = auctionId + 1;
-	if (auctionId < 100000) or (auctionId > 999999) then
-		auctionId = 100000
-	end
 	return auctionId;
 end
 
