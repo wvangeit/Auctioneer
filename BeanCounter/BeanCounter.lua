@@ -42,7 +42,7 @@ local private = {
 	playerName = UnitName("player"),
 	realmName = GetRealmName(), 
 	faction = select(2, UnitFactionGroup(UnitName("player"))),
-	version = 1.08,
+	version = 1.09,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
 	serverData, --Alias for BeanCounterDB[private.realmName]
@@ -125,7 +125,7 @@ function lib.OnLoad(addon)
 	--Posting
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
-	hooksecurefunc("BuyMerchantItem", private.merchantBuy)
+	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
 	
 end
 

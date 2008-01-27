@@ -678,16 +678,15 @@ function private.CreateFrames()
 				tbl = text
 				if type(text) == "string" then tbl= private.unpackString(text) end
 				
-				local stack, matchedBID = private.reconcileCompletedBids(player, id, tbl[8], tbl[6], tbl[7])
-				local pricePer = 0
-				local text = _BC('UiWononBuyout')
-				if matchedBID then --if this was a bid we need to divide by bid price else div by buyout
-					text = _BC('UiWononBid')
+				local pricePer, stack, text = 0, tonumber(tbl[3]), _BC('UiWononBuyout')
+				--If the auction was won on bid change text, and adjust ProfitPer
+				if tbl[7] ~= tbl[6] then	
+					text = _BC('UiWononBid') 
 					if stack > 0 then	pricePer = tbl[7]/stack end
-					else
+				else --Devide by BUY price if it was won on Buy
 					if stack > 0 then	pricePer = tbl[6]/stack end
 				end
-				
+								
 				return({
 					tbl[1], --itemname
 					text,--tbl[2], --status

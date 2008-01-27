@@ -106,6 +106,8 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_07()
 	elseif private.playerData["version"] < 1.08 then
 		private.updateTo1_075()
+	elseif private.playerData["version"] < 1.09 then
+		private.updateTo1_09()
 	end
 		
 end
@@ -279,6 +281,46 @@ function private.updateTo1_08()
 			end
 		end
 	private.serverData[player]["version"] = 1.08
+	end
+end
+
+--[[Update the completedBids/Buyouts table to also include stack sizes]]
+function private.updateTo1_09()
+	for player,data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["completedBids/Buyouts"]) do
+			local usedBid = {}
+			local usedBuy = {}
+			for index, text in pairs(values) do
+				local tbl = private.unpackString(text)
+				local seller, buy, bid = tbl[8], tonumber(tbl[6]),tonumber(tbl[7])
+				local found = false --used to skip checking bids if we found in buys table
+				
+				if private.serverData[player]["postedBuyouts"][itemID] then
+					for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
+						local tbl2 = private.unpackString(v)
+						local stack, postBuy, postSeller, Type = tonumber(tbl2[2]), tonumber(tbl2[3]), tbl2[4], tbl2[5]
+						if seller ==  postSeller and postBuy == buy and not usedBid[i] then
+							usedBuy[i] = "used" --stores each item index so each postedBid entry is only allowed one match
+							private.serverData[player]["completedBids/Buyouts"][itemID][index] = private.packString(tbl[1], tbl[2], stack, tbl[4], tbl[5], tbl[6], tbl[7], tbl[8], tbl[9], tbl[10])
+							found = true
+							break
+						end
+					end
+				end
+				if private.serverData[player]["postedBids"][itemID] and not found then
+					for i,v in pairs(private.serverData[player]["postedBids"][itemID]) do
+						local tbl2 = private.unpackString(v)
+						local stack, postBid, postSeller, Type = tonumber(tbl2[2]), tonumber(tbl2[3]), tbl2[4], tbl2[5]
+						if seller ==  postSeller and postBid == bid and not usedBid[i] then
+							usedBid[i] = "used"
+							private.serverData[player]["completedBids/Buyouts"][itemID][index] = private.packString(tbl[1], tbl[2], stack, tbl[4], tbl[5], tbl[6], tbl[7], tbl[8], tbl[9], tbl[10])
+							break
+						end
+					end
+				end
+			end
+		end
+		private.serverData[player]["version"] = 1.09
 	end
 end
 

@@ -155,7 +155,7 @@ function private.mailSort()
 		local messageAgeInSeconds = math.floor((30 - private.reconcilePending[i]["age"]) * 24 * 60 * 60)
 		
 		private.reconcilePending[i]["time"] = (time() - messageAgeInSeconds)
-		
+		 
 		--debugPrint("mail sort")
 		
 		if (private.reconcilePending[i]["sender"] == _BC('MailAllianceAuctionHouse')) or (private.reconcilePending[i]["sender"] == _BC('MailHordeAuctionHouse')) then
@@ -165,8 +165,8 @@ function private.mailSort()
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then  --Get the Bid and stack size if possible
-					local stack, bid = private.findStack("postedAuctions", itemID, private.reconcilePending[i]["deposit"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"]) 
-					local value = private.packString(itemLink, "Auction successful", stack,private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
+					local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, private.reconcilePending[i]["deposit"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"]) 
+					local value = private.packString(itemLink, "Auction successful", stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], bid, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("completedAuctions", itemID, value)
 				end
 				table.remove(private.reconcilePending, i)
@@ -193,7 +193,9 @@ function private.mailSort()
 				
 				if itemID and itemLink then
 					debugPrint("Auction won: ", itemID)
-					local value = private.packString(itemLink, "Auction won", private.reconcilePending[i]["money"], private.reconcilePending[i]["deposit"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
+					--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
+					local stack = private.findStackcompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], itemName)
+					local value = private.packString(itemLink, "Auction won",stack, private.reconcilePending[i]["money"], stack, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
 					private.databaseAdd("completedBids/Buyouts", itemID, value)
 				end				
 				table.remove(private.reconcilePending,i)			
@@ -208,7 +210,7 @@ function private.mailSort()
 					local value = private.packString(itemLink, "Outbid",private.reconcilePending[i]["money"], private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedBids", itemID, value)
 				end
-				
+				 
 				table.remove(private.reconcilePending,i)
 			--Need localization			
 			elseif string.match(private.reconcilePending[i]["subject"], "Sale Pending:%s") then
@@ -243,7 +245,8 @@ function private.matchDB(key, text)
 	debugPrint("Searching DB for ItemID..", key, text, "Failed ItemID does not exist")
 	return nil
 end
-function private.findStack(key , itemID, soldDeposit, soldBuy, soldTime)
+--Find the stack information in postedAuctions to add into the completedAuctions DB on mail arrivial
+function private.findStackcompletedAuctions(key , itemID, soldDeposit, soldBuy, soldTime)
 	local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(soldDeposit), tonumber(soldBuy),tonumber(soldTime), tonumber(soldTime - 144000)
 	for index = #private.playerData[key][itemID] , 1, -1 do
 		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
@@ -256,7 +259,29 @@ function private.findStack(key , itemID, soldDeposit, soldBuy, soldTime)
 		end
 	end
 end
-
+--find stack information from postedBids and postedBuyouts add into the completedBids/Buyouts table
+function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
+	local buy, bid = tonumber(buy),tonumber(bid)
+	if private.playerData["postedBids"][itemID] then
+		for index = #private.playerData["postedBids"][itemID] , 1, -1 do
+			local tbl = private.unpackString(private.playerData["postedBids"][itemID][index])
+			local stack, postBid, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
+			if seller ==  postSeller and postBid == bid and itemName == tbl[1]:match(".-%[(.-)%].-") then
+				return stack
+			end
+		end
+	end
+	if private.playerData["postedBuyouts"][itemID] then
+		for index = #private.playerData["postedBuyouts"][itemID] , 1, -1 do
+			local tbl = private.unpackString(private.playerData["postedBuyouts"][itemID][index])
+			local stack, postBuy, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
+			if seller ==  postSeller and postBuy == buy  and itemName == tbl[1]:match(".-%[(.-)%].-") then
+				return stack
+			end
+		end
+	end
+	return 0 --failed to find stack
+end
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 local inboxHookMessage = false --Stops spam of the message.
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
