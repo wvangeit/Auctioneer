@@ -43,6 +43,7 @@ function private.CommandHandler(command, subcommand, ...)
 		private.Print("Auctioneer Advanced Help")
 		private.Print("  {{/auc help}} - Show this help")
 		private.Print("  {{/auc begin [catid [subcatid]]}} - Scan the auction house (optional catid and subcatid)")
+		private.Print("  {{/auc getall}} - Download auctionhouse using getall")
 		private.Print("  {{/auc pause}} - Pause scanning of the auctionhouse")
 		private.Print("  {{/auc resume||unpause||cont||continue}} - Recommence scanning of the auctionhouse")
 		private.Print("  {{/auc end}} - Stop scanning the auctionhouse, commit current data")
@@ -78,12 +79,7 @@ function private.CommandHandler(command, subcommand, ...)
 		AucAdvanced.Settings.SetSetting("GetAllSpeed", subcommand)
 		AucAdvanced.Print("Setting GetAllSpeed to "..tostring(AucAdvanced.Settings.GetSetting("GetAllSpeed")))
 	elseif command == "getall" then
-		local _, getallready = CanSendAuctionQuery()
-		if getallready then
-			QueryAuctionItems("", "", "", nil, nil, nil, nil, nil, nil, true)
-		else
-			AucAdvanced.Print("Not ready for another GetAll yet")
-		end
+		AucAdvanced.Scan.StartScan(nil, nil, nil, nil, nil, nil, nil, nil, true)
 	else
 		if command and subcommand then
 			subcommand = subcommand:lower()
