@@ -1059,10 +1059,6 @@ StorePageFunction = function()
 	end
 	BrowseSearchButton:Show()
 	
-	--don't unblock updates until user has changed away from GetAll
-	while numBatchAuctions > 50 do
-		coroutine.yield()
-	end
 	AucAdvanced.API.BlockUpdate(false)
 end
 
