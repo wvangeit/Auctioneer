@@ -919,7 +919,9 @@ StorePageFunction = function()
 	local EventFramesRegistered = {}
 	local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 	local maxPages = ceil(totalAuctions / 50);
+	local isGetAll = false
 	if (numBatchAuctions > 50) then
+		isGetAll = true
 		maxPages = 1
 		EventFramesRegistered = {GetFramesRegisteredForEvent("AUCTION_ITEM_LIST_UPDATE")}
 		for _, frame in pairs(EventFramesRegistered) do
@@ -954,7 +956,7 @@ StorePageFunction = function()
 
 	local storecount = 0
 	for i = 1, numBatchAuctions do
-		if (i > 50) and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
+		if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
 			AucProgressBar:SetValue(100*i/numBatchAuctions)
 			coroutine.yield()
 		end
@@ -1021,7 +1023,7 @@ StorePageFunction = function()
 	-- Send the next page query or finish scanning
 
 	if private.isScanning then
-		if numBatchAuctions > 50 and (#(private.curScan) > 0.90 * totalAuctions) then
+		if isGetAll and (#(private.curScan) > 0.90 * totalAuctions) then
 			private.isScanning = false
 			lib.Commit(false, true)
 		--Check against private.curPage + 1 because the first page in the AH is actually page 0, so if you don't then you end up one page over the max at the end of scan
@@ -1038,7 +1040,7 @@ StorePageFunction = function()
 		end
 	elseif (totalAuctions <= 50) then
 		lib.Commit(false)
-	elseif (numBatchAuctions > 50) and (#(private.curScan) > 0.90 * totalAuctions) then
+	elseif isGetAll and (#(private.curScan) > 0.90 * totalAuctions) then
 			lib.Commit(false, true)
 	elseif maxPages and maxPages > 0 then
 		if not private.curPages then
@@ -1058,8 +1060,10 @@ StorePageFunction = function()
 		end
 	end
 	BrowseSearchButton:Show()
-	
-	AucAdvanced.API.BlockUpdate(false)
+	if isGetAll then
+		isGetAll = false
+		AucAdvanced.API.BlockUpdate(false)
+	end
 end
 
 local CoStore = coroutine.create(StorePageFunction)
