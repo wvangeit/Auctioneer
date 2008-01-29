@@ -34,6 +34,9 @@ local lib,private = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 
+	local amgui = CreateFrame("Frame", "", UIParent)
+	amgui:Hide()
+	
 function lib.GetName()
 	return libName
 end
@@ -163,6 +166,7 @@ end
 
 --Fires on mail box closed event & hides mailgui
 function lib.mailClosed()
+		lib.makeMailGUI()
 	if (get("util.automagic.showmailgui")) then
 		amgui:Hide()
 	end
@@ -214,8 +218,8 @@ end
 function lib.makeMailGUI()
 	--print("AutoMagic:Debug: lib.mailGUI()")
 	-- Create then hide frame for faster access later.
-	amgui= CreateFrame("Frame", "", UIParent)
-	amgui:Hide()
+	--local amgui= CreateFrame("Frame", "", UIParent)
+--amgui:Hide()
 
 	-- Set frame visuals
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
