@@ -108,8 +108,10 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_075()
 	elseif private.playerData["version"] < 1.09 then
 		private.updateTo1_09()
+	elseif private.playerData["version"] < 1.10 then
+		private.updateTo1_10()
 	end
-		
+			
 end
 
 --[[This changes the database to use ; and to replace itemNames with and itemlink]]--
@@ -323,4 +325,18 @@ function private.updateTo1_09()
 		private.serverData[player]["version"] = 1.09
 	end
 end
-
+--Correct Bug in 1.09 =, we accidently added a extra stack field for completedbids/buyouts. This update looks over the table and removes that extra data to stop errors on sorting.
+function private.updateTo1_10()
+	for player,data in pairs(private.serverData) do
+		for itemID , values in pairs(private.serverData[player]["completedBids/Buyouts"]) do
+			for i, text in pairs(values)do
+				local tbl = private.unpackString(text)
+				if #tbl == 11 then --if this has the extra entry then repack sans value
+					text = private.packString(tbl[1], tbl[2], tbl[3], tbl[4], tbl[6], tbl[7], tbl[8], tbl[9], tbl[10], tbl[11] )
+					private.serverData[player]["completedBids/Buyouts"][itemID][i] = text
+				end
+			end
+		end
+		private.serverData[player]["version"] = 1.10
+	end
+end

@@ -195,7 +195,7 @@ function private.mailSort()
 					debugPrint("Auction won: ", itemID)
 					--For a Won Auction money, deposit, fee are always 0  so we can use them as placeholders for BeanCounter Data
 					local stack = private.findStackcompletedBids(itemID, private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], itemName)
-					local value = private.packString(itemLink, "Auction won",stack, private.reconcilePending[i]["money"], stack, private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
+					local value = private.packString(itemLink, "Auction won",stack, private.reconcilePending[i]["money"], private.reconcilePending[i]["fee"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["bid"], private.reconcilePending[i]["Seller/buyer"], private.reconcilePending[i]["time"], private.wealth)				
 					private.databaseAdd("completedBids/Buyouts", itemID, value)
 				end				
 				table.remove(private.reconcilePending,i)			
