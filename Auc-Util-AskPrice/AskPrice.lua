@@ -542,13 +542,17 @@ function private.SetupConfigGui(gui)
 		"Custom smartwords defaults respond to \"what is [item link] worth?\"\n"..
 		"Trigger character defaults respond to \"? (stack size) [item link]\"")
 
-	gui:AddControl(id, "Subhead",    0,    "Triggers:")
-	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", "Askprice Custom SmartWord #1")
+	gui:AddControl(id, "Subhead",    0,    "Smart word triggers:")
+	local last = gui:GetLast(id) -- Get the current position so we can return here for the second column
+	gui:AddControl(id, "Text",       0, 1, "util.askprice.word1", "Askprice Custom SmartWord #1        And")
 	gui:AddTip(id, "The smart words allow for natural language queries")
-	gui:AddControl(id, "Text",       0, 1, "util.askprice.word2", "Askprice Custom SmartWord #2")
-	gui:AddTip(id, "The smart words allow for natural language queries")
+	gui:SetLast(id, last) -- Return to the saved position
+	gui:AddControl(id, "Text",       0.5, 1, "util.askprice.word2", "Askprice Custom SmartWord #2")
+	gui:AddTip(id, "The smart words allow for natural language queries, both words must be present")
+	
+	gui:AddControl(id, "Subhead",    0,    "Simple trigger:")
 	gui:AddControl(id, "Text",       0, 1, "util.askprice.trigger", "Askprice Trigger character")
-	gui:AddTip(id, "The trigger character allows for querying total price of a stack")
+	gui:AddTip(id, "The trigger character allows for simple querying of a price")
 
 	gui:AddControl(id, "Subhead",    0,    "Miscellaneous:")
 	gui:AddControl(id, "Checkbox",   0, 1, "util.askprice.ad", "Enable new AskPrice features ad.")
