@@ -34,6 +34,7 @@ local lib,private = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local amBTMRule
+
 local amgui = CreateFrame("Frame", "", UIParent)
 amgui:Hide()
 
@@ -148,7 +149,7 @@ end
 	function lib.onEventDo(this, event)
 		if event == 'MERCHANT_SHOW' then lib.merchantShow() end
 		if event == "MERCHANT_CLOSED" then lib.merchantClosed() end
-		if event == 'MAIL_SHOW' then lib.mailShow() end
+		if event == 'MAIL_SHOW' then lib.mailShow() end  
 		if event == "MAIL_CLOSED" then lib.mailClosed() end
 	end
 
@@ -156,18 +157,30 @@ function private.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 		gui:AddHelp(id, "what is AutoMagic?",
-		"What is AutoMagic?",
-		"AutoMagic is a work-in-progress. Its goal is to automate tasks that auctioneers run into that can be a pain to do, as long as it is within the bounds set by blizzard.\n\n"..
-		"AutoMagic currently will auto sells any item bought via btm for vendor, or any item that is grey (if enabled) there are no warnings they just disapear when a merchant window is opened if enabled.\n\n"..
-		"Auto Close Merchant Window: This is a very advanced command, if enabled it will sell items and close the merchant window without asking to close it. IF THIS IS ENABLED THE SECOND YOU OPEN A MERCHANT WINDOW ITEMS ARE SOLD(if any to sell) AND WINDOW IS CLOSED!!! This is a power user option and most people will want it disabled!\n\n"..
-		"Caution: There are no warnings, open a merchant window and if this is enabled the items are sold without warning!!!  Again... No warnings just poof gone... \n\n"..
-		"\n\n"..
-		"Mail GUI: This enables the mail interface that allows for addition mailbox automation. \n\n"..
-	"\n")
-	gui:AddControl(id, "Header",     0,    libName.." options")
+			"What is AutoMagic?",
+			"AutoMagic is a work-in-progress. Its goal is to automate tasks that auctioneers run into that can be a pain to do, as long as it is within the bounds set by blizzard.\n\n"..
+			"AutoMagic currently will auto sells any item bought via btm for vendor, or any item that is grey (if enabled) there are no warnings they just disapear when a merchant window is opened if enabled.\n\n"..
+			"Auto Close Merchant Window: This is a very advanced command, if enabled it will sell items and close the merchant window without asking to close it. IF THIS IS ENABLED THE SECOND YOU OPEN A MERCHANT WINDOW ITEMS ARE SOLD(if any to sell) AND WINDOW IS CLOSED!!! This is a power user option and most people will want it disabled!\n\n"..
+			"Caution: There are no warnings, open a merchant window and if this is enabled the items are sold without warning!!!  Again... No warnings just poof gone... \n\n"..
+			"\n\n"..
+		"\n")
+		gui:AddHelp(id, "AAMU: vendor options",
+			"AAMU: vendor options?",
+			"AutoMagic will sell items bought for vendoring to the vendor automatically if enabled. It also has the option of auto selling all grey items.\n\n"..
+			"Auto Close Merchant Window: This is a very advanced command, if enabled it will sell items and close the merchant window without asking to close it. IF THIS IS ENABLED THE SECOND YOU OPEN A MERCHANT WINDOW ITEMS ARE SOLD(if any to sell) AND WINDOW IS CLOSED!!! This is a power user option and most people will want it disabled!\n\n"..
+			"Caution: There are no warnings, open a merchant window and if this is enabled the items are sold without warning!!!  Again... No warnings just poof gone... \n\n"..
+			"\n\n"..
+		"\n")
+		gui:AddControl(id, "Header",     0,    libName.." vendor options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
+			
+		gui:AddHelp(id, "what is AutoMagic?",
+			"What is AutoMagic?",
+			"Mail GUI: This enables the mail interface that allows for auto-loading items into the sendmail window based on BTM Rules.\n\n"..
+		"\n")
+		gui:AddControl(id, "Header",     0,    libName.." GUI options")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.showmailgui", "Enable Mail GUI for addition mail features")
 end
 
@@ -184,7 +197,7 @@ end
 
 
 function lib.merchantClosed()
-	--Place holder for limiting chat spam to single output line as an option
+	--Place holder: Is fired when the merchant window is closed.
 end
 
 function lib.doScanAndUse(bag,bagType,amBTMRule)	
@@ -198,47 +211,50 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
 			local _, itemID, _, _, _, _ = decode(itemLink)
-			
+			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
 			if amBTMRule == "demats" then	
 				if isDEMats[ itemID ] then
-					print("AutoMagic has loaded", itemName, " because it is a mat recieved from disenchanting.")
+					print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
 					UseContainerItem(bag, slot) 
 				end
 			end
+			if amBTMRule == "vendor" then
+				if (get("util.automagic.autosellgrey")) then  
+					if itemRarity == 0 then
+						UseContainerItem(bag, slot)
+						print("AutoMagic has sold", itemName," due to item being grey")
+					end			
+				end 			
+			end
 			
-			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
-			local reason, bids
-			local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-			local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-			local bidlist = BtmScan.Settings.GetSetting("bid.list")
-			if (bidlist) then
-				bids = bidlist[sig..":"..seed.."x"..itemCount]
-				if amBTMRule == "vendor" then
-					if (get("util.automagic.autosellgrey")) then  
-						if itemRarity == 0 then
-							UseContainerItem(bag, slot)
-							print("AutoMagic has sold", itemName," due to item being grey")
-						end			
-					end 
-					
-					if(bids and bids[1] and bids[1] == "vendor") then 
-						print("AutoMagic has sold", itemName, " due to vendor btm status")		
-						UseContainerItem(bag, slot) 
-					end 
-				end
+			if BtmScan then
+				local reason, bids
+				local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+				local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+				local bidlist = BtmScan.Settings.GetSetting("bid.list")
+				
+				if (bidlist) then
+					bids = bidlist[sig..":"..seed.."x"..itemCount]
+					if amBTMRule == "vendor" then
+						if(bids and bids[1] and bids[1] == "vendor") then 
+							print("AutoMagic has sold", itemName, " due to vendor btm status")		
+							UseContainerItem(bag, slot) 
+						end 
+					end
 		
-				if amBTMRule == "disenchant" then	
-					if(bids and bids[1] and bids[1] == "disenchant") then 
-						print("AutoMagic has loaded", itemName, " due to disenchant btm status")
-						UseContainerItem(bag, slot) 
-					end 
-				end
-			
-				if amBTMRule == "prospect" then
-					if(bids and bids[1] and bids[1] == "prospect") then 
-						print("AutoMagic has loaded", itemName, " due to prospect btm status")
-						UseContainerItem(bag, slot) 
-					end 
+					if amBTMRule == "disenchant" then	
+						if(bids and bids[1] and bids[1] == "disenchant") then 
+							print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+							UseContainerItem(bag, slot) 
+						end 
+					end
+				
+					if amBTMRule == "prospect" then
+						if(bids and bids[1] and bids[1] == "prospect") then 
+							print("AutoMagic has loaded", itemName, " due to prospect btm status")
+							UseContainerItem(bag, slot) 
+						end 
+					end
 				end
 			end
 		end
@@ -253,10 +269,9 @@ function lib.doVendorSell()
 	end
 end
 function lib.doMailDE()
-	--print("running toggle")
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
-		lib.doScanAndUse(bag,"Bags","disenchant")
+		lib.doScanAndUse(bag,"Bags","disenchant") 
 	end
 end
 function lib.doMailProspect()
@@ -267,7 +282,6 @@ function lib.doMailProspect()
 end
 
 function lib.doMailDEMats()
-	print("AutoMagic:TODO:ADD MATS FUNCTION")
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","demats")
@@ -276,14 +290,13 @@ end
 
 function lib.mailShow()
 	if (get("util.automagic.showmailgui")) then 
-		print("AutoMagic:Debug: lib.mailShow()") 
 		lib.mailGUI()
 	end
 end
 
 --Fires on mail box closed event & hides mailgui
 function lib.mailClosed()
-		lib.makeMailGUI()
+	lib.makeMailGUI()
 	if (get("util.automagic.showmailgui")) then
 		amgui:Hide()
 	end
@@ -291,9 +304,7 @@ end
 
 --Function is called from lib.mailShow()
 function lib.mailGUI()
-	--print("AutoMagic: loading mail gui")
 	lib.makeMailGUI()
-	print("AutoMagic:Debug: Mail GUI loaded... continue")
 	amgui:Show()
 end
 
