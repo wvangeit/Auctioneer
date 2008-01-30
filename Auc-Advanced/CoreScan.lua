@@ -191,29 +191,53 @@ function lib.PopScan()
 	end
 end
 
-local AucProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar",UIParent, "TextStatusBar")
-AucProgressBar:SetWidth(200)
-AucProgressBar:SetHeight(20)
-AucProgressBar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 150)
-AucProgressBar:SetBackdrop({
+local CommitProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar",UIParent, "TextStatusBar")
+CommitProgressBar:SetWidth(200)
+CommitProgressBar:SetHeight(20)
+CommitProgressBar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 150)
+CommitProgressBar:SetBackdrop({
   bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
   edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
   tile=1, tileSize=10, edgeSize=10, 
   insets={left=3, right=3, top=3, bottom=3}
 })
 
-AucProgressBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-AucProgressBar:SetStatusBarColor(0.6,0,0,0.4)
-AucProgressBar:SetMinMaxValues(0,100)
-AucProgressBar:SetValue(50)
-AucProgressBar:Hide()
+CommitProgressBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+CommitProgressBar:SetStatusBarColor(0.6,0,0,0.4)
+CommitProgressBar:SetMinMaxValues(0,100)
+CommitProgressBar:SetValue(50)
+CommitProgressBar:Hide()
 
-AucProgressBar.text = AucProgressBar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
-AucProgressBar.text:SetPoint("CENTER", AucProgressBar, "CENTER")
-AucProgressBar.text:SetJustifyH("CENTER")
-AucProgressBar.text:SetJustifyV("CENTER")
-AucProgressBar.text:SetText("AucAdv: Processing")
-AucProgressBar.text:SetTextColor(1,1,1)
+CommitProgressBar.text = CommitProgressBar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+CommitProgressBar.text:SetPoint("CENTER", CommitProgressBar, "CENTER")
+CommitProgressBar.text:SetJustifyH("CENTER")
+CommitProgressBar.text:SetJustifyV("CENTER")
+CommitProgressBar.text:SetText("AucAdv: Processing")
+CommitProgressBar.text:SetTextColor(1,1,1)
+
+local GetAllProgressBar = CreateFrame("STATUSBAR", "$parentHealthBar",UIParent, "TextStatusBar")
+GetAllProgressBar:SetWidth(200)
+GetAllProgressBar:SetHeight(20)
+GetAllProgressBar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 180)
+GetAllProgressBar:SetBackdrop({
+  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
+  tile=1, tileSize=10, edgeSize=10, 
+  insets={left=3, right=3, top=3, bottom=3}
+})
+
+GetAllProgressBar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+GetAllProgressBar:SetStatusBarColor(0.6,0,0,0.4)
+GetAllProgressBar:SetMinMaxValues(0,100)
+GetAllProgressBar:SetValue(50)
+GetAllProgressBar:Hide()
+
+GetAllProgressBar.text = GetAllProgressBar:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+GetAllProgressBar.text:SetPoint("CENTER", GetAllProgressBar, "CENTER")
+GetAllProgressBar.text:SetJustifyH("CENTER")
+GetAllProgressBar.text:SetJustifyV("CENTER")
+GetAllProgressBar.text:SetText("AucAdv: Scanning")
+GetAllProgressBar.text:SetTextColor(1,1,1)
 
 function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
 	if AuctionFrame and AuctionFrame:IsVisible() then
@@ -254,9 +278,9 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			end
 			AucAdvanced.API.BlockUpdate(true, false)
 			BrowseSearchButton:Hide()
-			AucProgressBar:Show()
-			AucProgressBar:SetValue(0)
-			AucProgressBar.text:SetText("AucAdv: Scanning")
+			GetAllProgressBar:Show()
+			GetAllProgressBar:SetValue(0)
+			GetAllProgressBar.text:SetText("AucAdv: Scanning")
 		end
 
 		if private.curQuery then
@@ -529,9 +553,9 @@ Commitfunction = function()
 	end
 	local now = time()
 	if AucAdvanced.Settings.GetSetting("scancommit.progressbar") then
-		AucProgressBar:Show()
-		AucProgressBar.text:SetText("AucAdv: Processing")
-		AucProgressBar:SetValue(0)
+		CommitProgressBar:Show()
+		CommitProgressBar.text:SetText("AucAdv: Processing")
+		CommitProgressBar:SetValue(0)
 	end
 	local totali = 2*(#scandata.image) + #TempcurScan
 	
@@ -545,7 +569,7 @@ Commitfunction = function()
 		link = data[Const.LINK]
 		i = i + 1
 		if i % (ProcessSpeed*100) == 0 then
-			AucProgressBar:SetValue(100*i/totali)
+			CommitProgressBar:SetValue(100*i/totali)
 			coroutine.yield()
 		end
 		if link then
@@ -582,7 +606,7 @@ Commitfunction = function()
 	for index, data in ipairs(TempcurScan) do
 		i = i + 1
 		if i % (ProcessSpeed*10) == 0 then
-			AucProgressBar:SetValue(100*i/totali)
+			CommitProgressBar:SetValue(100*i/totali)
 			coroutine.yield()
 		end
 		itemPos = lib.FindItem(data, scandata.image, lut)
@@ -626,7 +650,7 @@ Commitfunction = function()
 		data = scandata.image[pos]
 		i = i + 1
 		if i % (ProcessSpeed*100) == 0 then
-			AucProgressBar:SetValue(100*i/totali)
+			CommitProgressBar:SetValue(100*i/totali)
 			coroutine.yield()
 		end
 		if (bit.band(data[Const.FLAG] or 0, Const.FLAG_DIRTY) == Const.FLAG_DIRTY) then
@@ -665,7 +689,7 @@ Commitfunction = function()
 			end
 		end
 	end
-	AucProgressBar:SetValue(100)
+	CommitProgressBar:SetValue(100)
 	processStats("complete")
 
 	local filterCount = private.filteredCount
@@ -765,7 +789,7 @@ Commitfunction = function()
 	end
 
 	--Hide the progress indicator
-	AucProgressBar:Hide()
+	CommitProgressBar:Hide()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
 	CommitRunning = false 
@@ -914,6 +938,7 @@ StorePageFunction = function()
 	if not private.curQuery then
 		return
 	end
+	local now = GetTime()
 	private.sentQuery = false
 
 	local EventFramesRegistered = {}
@@ -927,6 +952,10 @@ StorePageFunction = function()
 		for _, frame in pairs(EventFramesRegistered) do
 			frame:UnregisterEvent("AUCTION_ITEM_LIST_UPDATE")
 		end
+		private.verifyStart = 1
+		private.nextCheck = now
+		private.scanDelay = now + 30
+		coroutine.yield()
 	end
 	if not private.curScan then 
 		private.curScan = acquire()
@@ -934,7 +963,7 @@ StorePageFunction = function()
 
 
 	--Update the progress indicator
-	local now = GetTime()
+	now = GetTime()
 	local elapsed = now - private.scanStarted - private.totalPaused
 	private.UpdateScanProgress(nil, totalAuctions, #private.curScan, elapsed)
 	local pageNumber
@@ -946,7 +975,7 @@ StorePageFunction = function()
 
 
 	local curTime = time()
-	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 2000
+	local getallspeed = AucAdvanced.Settings.GetSetting("GetAllSpeed") or 500
 
 	-- Take a picture of everything we've got on the page so far.
  	local _, itemLink, itemLevel, itemType, itemSubType, itemEquipLoc
@@ -957,7 +986,7 @@ StorePageFunction = function()
 	local storecount = 0
 	for i = 1, numBatchAuctions do
 		if isGetAll and ((i % getallspeed) == 0) then --only start yielding once the first page is done, so it won't affect normal scanning
-			AucProgressBar:SetValue(100*i/numBatchAuctions)
+			GetAllProgressBar:SetValue(100*i/numBatchAuctions)
 			coroutine.yield()
 		end
 		local itemLink = GetAuctionItemLink("list", i)
@@ -1014,11 +1043,20 @@ StorePageFunction = function()
 			end
 		end
 	end
-	AucProgressBar:Hide()
-	for _, frame in pairs(EventFramesRegistered) do
-		frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+	if isGetAll then
+		GetAllProgressBar:Hide()
+		local oldThis = this
+		for _, frame in pairs(EventFramesRegistered) do
+			frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+			this = frame
+			local eventscript = frame:GetScript("OnEvent")
+			if eventscript then
+				pcall(eventscript, this, "AUCTION_ITEM_LIST_UPDATE")
+			end
+		end
+		this = oldThis
+		recycle(EventFramesRegistered)
 	end
-	recycle(EventFramesRegistered)
 	
 	-- Send the next page query or finish scanning
 
@@ -1062,6 +1100,7 @@ StorePageFunction = function()
 	BrowseSearchButton:Show()
 	if isGetAll then
 		isGetAll = false
+		--QueryAuctionItems("", "", "", nil, nil, nil, nil, nil, nil)
 		AucAdvanced.API.BlockUpdate(false)
 	end
 end
@@ -1218,17 +1257,6 @@ function private.OnUpdate(me, dur)
 		end
 	end
 	local now = GetTime()
-	--if now - Getallstarttime > 300 then
-		if coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
-			flipb = not flipb
-			if flipb then
-				flopb = not flopb
-				if flopb then
-					CoroutineResume(CoStore)
-				end
-			end
-		end
-	--end
 	if not AuctionFrame then return end
 	if private.isPaused then return end
 
@@ -1250,6 +1278,15 @@ function private.OnUpdate(me, dur)
 			end
 		end
 		private.scanDelay = nil
+	end
+	if coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
+		flipb = not flipb
+		if flipb then
+			flopb = not flopb
+			if flopb then
+				CoroutineResume(CoStore)
+			end
+		end
 	end
 	if private.scanNext then
 		if now > private.scanNext and CanSendAuctionQuery() then
