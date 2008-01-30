@@ -25,7 +25,7 @@
 		You have an implicit licence to use this AddOn with these facilities
 		since that is its designated purpose as per:
 		http://www.fsf.org/licensing/licenses/gpl-faq.html#InterpreterIncompat
---]]
+--]] 
 local libName = "AutoMagic"
 local libType = "Util"
 
@@ -33,9 +33,76 @@ AucAdvanced.Modules[libType][libName] = {}
 local lib,private = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
+local amBTMRule
+local amgui = CreateFrame("Frame", "", UIParent)
+amgui:Hide()
 
-	local amgui = CreateFrame("Frame", "", UIParent)
-	amgui:Hide()
+-- Reagents list
+local VOID = 22450
+local NEXUS = 20725
+local LPRISMATIC = 22449
+local LBRILLIANT = 14344
+local LRADIANT = 11178
+local LGLOWING = 11139
+local LGLIMMERING = 11084
+local SPRISMATIC = 22448
+local SBRILLIANT = 14343
+local SRADIANT = 11177
+local SGLOWING = 11138
+local SGLIMMERING = 10978
+local GPLANAR = 22446
+local GETERNAL = 16203
+local GNETHER = 11175
+local GMYSTIC = 11135
+local GASTRAL = 11082
+local GMAGIC = 10939
+local LPLANAR = 22447
+local LETERNAL = 16202
+local LNETHER = 11174
+local LMYSTIC = 11134
+local LASTRAL = 10998
+local LMAGIC = 10938
+local ARCANE = 22445
+local ILLUSION = 16204
+local DREAM = 11176
+local VISION = 11137
+local SOUL = 11083
+local STRANGE = 10940
+
+-- a table we can check for item ids
+local isReagent = 
+	{
+	[VOID] = true,
+	[NEXUS] = true,
+	[LPRISMATIC] = true,
+	[LBRILLIANT] = true,
+	[LRADIANT] = true,
+	[LGLOWING] = true,
+	[LGLIMMERING] = true,
+	[SPRISMATIC] = true,
+	[SBRILLIANT] = true,
+	[SRADIANT] = true,
+	[SGLOWING] = true,
+	[SGLIMMERING] = true,
+	[GPLANAR] = true,
+	[GETERNAL] = true,
+	[GNETHER] = true,
+	[GMYSTIC] = true,
+	[GASTRAL] = true,
+	[GMAGIC] = true,
+	[LPLANAR] = true,
+	[LETERNAL] = true,
+	[LNETHER] = true,
+	[LMYSTIC] = true,
+	[LASTRAL] = true,
+	[LMAGIC] = true,
+	[ARCANE] = true,
+	[ILLUSION] = true,
+	[DREAM] = true,
+	[VISION] = true,
+	[SOUL] = true,
+	[STRANGE] = true,
+	}
 	
 function lib.GetName()
 	return libName
@@ -107,7 +174,7 @@ end
 
 function lib.merchantShow()
 	if (get("util.automagic.autovendor")) then 
-		lib.doVendorCheck()
+		lib.doVendorSell()
 		if (get("util.automagic.autoclosemerchant")) then 
 			print("AutoMagic has closed the merchant window for you, to disable you must change this options in the settings.") 
 			CloseMerchant()	
@@ -120,39 +187,78 @@ function lib.merchantClosed()
 	--Place holder for limiting chat spam to single output line as an option
 end
 
-function lib.doScanAndSell(bag,bagType)	
+function lib.doScanAndUse(bag,bagType,amBTMRule)	
+	if amBTMRule == nil then 
+		print("AutoMagic:Debug: How did you get this message? amBTMRule is nil... please report") 
+		return
+	end
+
 	for slot=1,GetContainerNumSlots(bag) do
 		if (GetContainerItemLink(bag,slot)) then
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
 			local _, itemID, _, _, _, _ = decode(itemLink)
 			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
-				if (get("util.automagic.autosellgrey")) then  
-					if itemRarity == 0 then
-						UseContainerItem(bag, slot)
-						print("AutoMagic has sold", itemName," due to item being grey")
-					end
+			local reason, bids
+			local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
+			local sig = ("%d:%d:%d"):format(id, suffix, enchant)
+			local bidlist = BtmScan.Settings.GetSetting("bid.list")
+			if (bidlist) then
+				bids = bidlist[sig..":"..seed.."x"..itemCount]
+				if amBTMRule == "vendor" then
+					if (get("util.automagic.autosellgrey")) then  
+						if itemRarity == 0 then
+							UseContainerItem(bag, slot)
+							print("AutoMagic has sold", itemName," due to item being grey")
+						end			
+					end 
+					
+					if(bids and bids[1] and bids[1] == "vendor") then 
+						print("AutoMagic has sold", itemName, " due to vendor btm status")		
+						UseContainerItem(bag, slot) 
+					end 
 				end
-				local reason, bids
-					local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-					local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-					local bidlist = BtmScan.Settings.GetSetting("bid.list")
-						if (bidlist) then
-							bids = bidlist[sig..":"..seed.."x"..itemCount]
-							if(bids and bids[1] and bids[1] == "vendor") then
-								UseContainerItem(bag, slot)
-								print("AutoMagic has sold", itemName, " due to vendor btm status")
-							end
-						end
-
+		
+				if amBTMRule == "disenchant" then	
+					if(bids and bids[1] and bids[1] == "disenchant") then 
+						print("AutoMagic has loaded", itemName, " due to disenchant btm status")
+						UseContainerItem(bag, slot) 
+					end 
+				end
+			
+				if amBTMRule == "prospect" then
+					if(bids and bids[1] and bids[1] == "prospect") then 
+						print("AutoMagic has loaded", itemName, " due to prospect btm status")
+						UseContainerItem(bag, slot) 
+					end 
+				end
+			end
 		end
 	end
 end
 
-function lib.doVendorCheck()
+
+-- The next few functions just set the bid/list reason check for the scan function depending one why we are using it.		
+function lib.doVendorSell()
 	for bag=0,4 do
-		lib.doScanAndSell(bag,"Bags")
+		lib.doScanAndUse(bag,"Bags","vendor")
 	end
+end
+function lib.doMailDE()
+	--print("running toggle")
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		lib.doScanAndUse(bag,"Bags","disenchant")
+	end
+end
+function lib.doMailProspect()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		lib.doScanAndUse(bag,"Bags","prospect")
+	end
+end
+function lib.doMailDEMats()
+	print("AutoMagic:TODO:ADD MATS FUNCTION")
 end
 
 function lib.mailShow()
@@ -172,39 +278,6 @@ function lib.mailClosed()
 	end
 end
 
---Scans bags for btm reason 'disenchant' and uses them (on use loads into send mail tab)
-function lib.doScanAndMailDE(bag,bagType)	
-	for slot=1,GetContainerNumSlots(bag) do
-		if (GetContainerItemLink(bag,slot)) then
-			local _,itemCount = GetContainerItemInfo(bag,slot)
-			local itemLink = GetContainerItemLink(bag,slot)
-			local _, itemID, _, _, _, _ = decode(itemLink)
-			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
-			local reason, bids
-			local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
-			local sig = ("%d:%d:%d"):format(id, suffix, enchant)
-			local bidlist = BtmScan.Settings.GetSetting("bid.list")
-			if (bidlist) then
-				bids = bidlist[sig..":"..seed.."x"..itemCount]
-				if(bids and bids[1] and bids[1] == "disenchant") then
-					UseContainerItem(bag, slot)
-					print("AutoMagic has loaded", itemName, " due to Disenchant btm rule")
-				end
-			end
-
-		end
-	end
-end
-
---Function toggles to sendmail tab and fires the load disenchants function
-function lib.doMailDE()
-	--print("running toggle")
-	MailFrameTab_OnClick(2)
-	for bag=0,4 do
-		lib.doScanAndMailDE(bag,"Bags")
-	end
-end
-
 --Function is called from lib.mailShow()
 function lib.mailGUI()
 	--print("AutoMagic: loading mail gui")
@@ -216,17 +289,12 @@ end
 
 --Make mail GUI
 function lib.makeMailGUI()
-	--print("AutoMagic:Debug: lib.mailGUI()")
-	-- Create then hide frame for faster access later.
-	--local amgui= CreateFrame("Frame", "", UIParent)
---amgui:Hide()
-
 	-- Set frame visuals
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	amgui:SetPoint("TOPLEFT", "SendMailFrame", "TOPRIGHT", -25, -10)
 	amgui:SetFrameStrata("DIALOG")
 	amgui:SetHeight(75)
-	amgui:SetWidth(100)
+	amgui:SetWidth(110)
 	amgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -258,14 +326,14 @@ function lib.makeMailGUI()
 	
 	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
 	amgui.loadde = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadde:SetText(("test"))
+	amgui.loadde:SetText(("Mail DE"))
 	amgui.loadde:SetPoint("BOTTOM", amgui, "BOTTOM", 0, 12)
 	amgui.loadde:SetScript("OnClick", lib.doMailDE)
 	
 	amgui.loadprospect = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadprospect:SetText(("BTM: DE's"))
+	amgui.loadprospect:SetText(("Mail Prospects"))
 	amgui.loadprospect:SetPoint("BOTTOM", amgui.loadde, "TOP", 0, 5)
-	amgui.loadprospect:SetScript("OnClick", lib.doMailDE)
+	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)
 end
 
 
