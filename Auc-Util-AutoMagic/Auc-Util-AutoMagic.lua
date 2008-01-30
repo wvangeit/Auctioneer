@@ -70,7 +70,7 @@ local SOUL = 11083
 local STRANGE = 10940
 
 -- a table we can check for item ids
-local isReagent = 
+local isDEMats = 
 	{
 	[VOID] = true,
 	[NEXUS] = true,
@@ -198,6 +198,14 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
 			local _, itemID, _, _, _, _ = decode(itemLink)
+			
+			if amBTMRule == "demats" then	
+				if isDEMats[ itemID ] then
+					print("AutoMagic has loaded", itemName, " because it is a mat recieved from disenchanting.")
+					UseContainerItem(bag, slot) 
+				end
+			end
+			
 			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
 			local reason, bids
 			local id, suffix, enchant, seed = BtmScan.BreakLink(itemLink)
@@ -257,17 +265,20 @@ function lib.doMailProspect()
 		lib.doScanAndUse(bag,"Bags","prospect")
 	end
 end
+
 function lib.doMailDEMats()
 	print("AutoMagic:TODO:ADD MATS FUNCTION")
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		lib.doScanAndUse(bag,"Bags","demats")
+	end	
 end
 
 function lib.mailShow()
-	--if (get("util.automagic.enable")) then     --The .enable definition not implemented
 	if (get("util.automagic.showmailgui")) then 
-			print("AutoMagic:Debug: lib.mailShow()") 
-			lib.mailGUI()
-		end
-	--end
+		print("AutoMagic:Debug: lib.mailShow()") 
+		lib.mailGUI()
+	end
 end
 
 --Fires on mail box closed event & hides mailgui
@@ -293,7 +304,7 @@ function lib.makeMailGUI()
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	amgui:SetPoint("TOPLEFT", "SendMailFrame", "TOPRIGHT", -25, -10)
 	amgui:SetFrameStrata("DIALOG")
-	amgui:SetHeight(75)
+	amgui:SetHeight(125)
 	amgui:SetWidth(110)
 	amgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -329,11 +340,18 @@ function lib.makeMailGUI()
 	amgui.loadde:SetText(("Mail DE"))
 	amgui.loadde:SetPoint("BOTTOM", amgui, "BOTTOM", 0, 12)
 	amgui.loadde:SetScript("OnClick", lib.doMailDE)
+
+	amgui.loaddemats = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
+	amgui.loaddemats:SetText(("Mail DE:Mats"))
+	amgui.loaddemats:SetPoint("BOTTOM", amgui.loadde, "TOP", 0, 5)
+	amgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 	
 	amgui.loadprospect = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
 	amgui.loadprospect:SetText(("Mail Prospects"))
-	amgui.loadprospect:SetPoint("BOTTOM", amgui.loadde, "TOP", 0, 5)
+	amgui.loadprospect:SetPoint("BOTTOM", amgui.loaddemats, "TOP", 0, 5)
 	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)
+	
+	
 end
 
 
