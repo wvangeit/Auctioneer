@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AutoMagic Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Auc-Util-AutoMagic.lua 2530 2007-11-18 22:18:59Z testleK $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 	AutoMagic is an Auctioneer Advanced module.
 	License:
@@ -362,7 +362,7 @@ function lib.makeMailGUI()
 	
 	
 end
-AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Auc-Util-AutoMagic.lua $", "$Rev: 2530 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 
 
 
