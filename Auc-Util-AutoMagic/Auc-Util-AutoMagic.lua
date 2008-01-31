@@ -297,10 +297,7 @@ end
 --Fires on mail box closed event & hides mailgui
 function lib.mailClosed()
 	lib.makeMailGUI()
-
-	--if (get("util.automagic.showmailgui")) then
-		amgui:Hide()
-	--end
+	amgui:Hide()
 end
 
 --Function is called from lib.mailShow()
@@ -314,7 +311,7 @@ end
 function lib.makeMailGUI()
 	-- Set frame visuals
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	amgui:SetPoint("TOPLEFT", "SendMailFrame", "TOPRIGHT", -25, -10)
+	amgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 55)
 	amgui:SetFrameStrata("DIALOG")
 	amgui:SetHeight(125)
 	amgui:SetWidth(110)
@@ -365,7 +362,7 @@ function lib.makeMailGUI()
 	
 	
 end
-
+AucAdvanced.RegisterRevision("$URL: http://svn.norganna.org/auctioneer/trunk/Auc-Util-AutoMagic/Auc-Util-AutoMagic.lua $", "$Rev: 2530 $")
 
 
 
