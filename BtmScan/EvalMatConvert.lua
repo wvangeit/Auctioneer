@@ -166,7 +166,9 @@ function lib:valuate(item, tooltip)
 
 --Report failure and exit if the item is not in our convertableMat table 
 if not convertableMat[ item.id ] then
-	item:info("EMC Fail: Not convertable", item.id)
+	if (not get(lcName..".disabletooltip")) then
+		item:info("EMC Fail: Not convertable", item.id)
+	end
 	return
 end
 	
@@ -190,8 +192,11 @@ local evalPrice = reagentPrice
 	
 --Fail and end if appraiser has no value for the item we want to convert
 if (evalPrice == nill or evalPrice == 0) then
-	item:info("EMC Fail: No appraiser data available")
-	item:info("EMC debug: evalPrice = reagentPrice", evalPrice)
+	if (not get(lcName..".disabletooltip")) then
+		item:info("EMC Fail: No appraiser data available")
+		item:info("EMC debug: evalPrice = reagentPrice", evalPrice)
+	end
+
 	return
 end
 
@@ -213,7 +218,9 @@ end
 	if convertsToL[ item.id ] then
 		--If category is disabled we are done here.
 		if (not get(lcName..".enableEssence")) then 
-		item:info("EMC Fail: Category disabled.")
+			if (not get(lcName..".disabletooltip")) then
+				item:info("EMC Fail: Category disabled.")
+			end
 		return end
 	
 		if item.id == GPLANAR then convertToID = LPLANAR end
@@ -236,12 +243,13 @@ end
 					
 				--Fail and end if appraiser has no value for the item we want to convert
 				if (convertsToValue == nill or convertsToValue == 0) then
-					item:info("EMC Fail: No appraiser data available")
-					item:info("EMC debug: convertsToValue @ to lesser")
+					if (not get(lcName..".disabletooltip")) then
+						item:info("EMC Fail: No appraiser data available")
+						item:info("EMC debug: convertsToValue @ to lesser")	
+					end
 					return
 				end
-
-			
+				
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
 	end
@@ -258,7 +266,9 @@ end
 	if convertsToG[ item.id ] then
 		--If category is disabled we are done here.
 		if (not get(lcName..".enableEssence")) then 
-		item:info("EMC Fail: Category disabled.")
+			if (not get(lcName..".disabletooltip")) then
+				item:info("EMC Fail: Category disabled.")
+			end		
 		return end
 		
 		if item.id == LPLANAR then convertToID = GPLANAR end
@@ -280,9 +290,11 @@ end
 					end
 				--Fail and end if appraiser has no value for the item we want to convert
 				if (convertsToValue == nill or convertsToValue == 0) then
-					item:info("EMC Fail: No appraiser data available")
-					item:info("EMC debug: convertsToValue @ to greater")
-					return
+					if (not get(lcName..".disabletooltip")) then
+						item:info("EMC Fail: No appraiser data available")
+						item:info("EMC debug: convertsToValue @ to greater")
+					end	
+				return
 				end
 			convertsToValue = convertsToValue * stackSize
 
@@ -302,7 +314,9 @@ end
 	if convertsToP[ item.id ] then
 		--If category is disabled we are done here.
 		if (not get(lcName..".enableMote")) then 
-		item:info("EMC Fail: Category disabled.")
+			if (not get(lcName..".disabletooltip")) then
+				item:info("EMC Fail: Category disabled.")		
+			end	
 		return end
 		
 		if item.id == MAIR then convertToID = PAIR end
@@ -326,8 +340,10 @@ end
 					end				
 				--Fail and end if appraiser has no value for the item we want to convert
 				if (convertsToValue == nill or convertsToValue == 0) then
-					item:info("EMC Fail: No appraiser data available")
-					item:info("EMC debug: convertsToValue @ to primal")
+					if (not get(lcName..".disabletooltip")) then
+						item:info("EMC Fail: No appraiser data available")
+						item:info("EMC debug: convertsToValue @ to primal")	
+					end	
 					return
 				end					
 
@@ -351,7 +367,9 @@ end
 	if convertsFromDepleted[ item.id ] then
 		--If category is disabled we are done here.
 		if (not get(lcName..".enableDepleted")) then 
-		item:info("EMC Fail: Category disabled.")
+			if (not get(lcName..".disabletooltip")) then
+				item:info("EMC Fail: Category disabled.")			
+			end	
 		return end
 		
 		if item.id == DCBRACER then convertToID = DCBRACERTO end
@@ -378,10 +396,11 @@ end
 					end									
 					--Fail and end if appraiser has no value for the item we want to convert
 					if (convertsToValue == nill or convertsToValue == 0) then
-						item:info("EMC Fail: No appraiser data available")
-						item:info("EMC debug: convertsToValue @ from depleted")
-						return
-					end
+						if (not get(lcName..".disabletooltip")) then
+							item:info("EMC Fail: No appraiser data available")
+							item:info("EMC debug: convertsToValue @ from depleted")
+						end
+					return end
 			convertsToValue = convertsToValue * stackSize
 		value = convertsToValue
 	end
@@ -398,15 +417,24 @@ end
 		if (brokerage) then
 			local amount = (value * brokerRate)
 			emcAdjustedValue = value - amount
-			item:info(" Converted Value", value)
-			item:info(" - Brokerage", amount)
-		item:info(" = Adjusted amount", emcAdjustedValue)		
+			
+			if (not get(lcName..".disabletooltip")) then
+				item:info(" Converted Value", value)
+				item:info(" - Brokerage", amount)
+				item:info(" = Adjusted amount", emcAdjustedValue)		
+			end	
+			
+			local evalPriceAmount = (evalPrice * brokerRate)	
+			
+			if (not get(lcName..".disabletooltip")) then
+				item:info(" Non-Converted Value", evalPrice + evalPriceAmount)
+				item:info(" - Brokerage", evalPriceAmount)
+				item:info(" = Adjusted amount", evalPrice)					
+			end	
 		
 			local evalPriceAmount = (evalPrice * brokerRate)
 			evalPrice = evalPrice - evalPriceAmount
-			item:info(" Non-Converted Value", evalPrice + evalPriceAmount)
-			item:info(" - Brokerage", evalPriceAmount)
-		item:info(" = Adjusted amount", evalPrice)			
+	
 		end
 
 	end
@@ -417,24 +445,34 @@ end
 	local pct = get(lcName..".profit.pct")
 	local min = get(lcName..".profit.min")
 	local value, mkdown = BtmScan.Markdown(emcAdjustedValue, pct, min)
-	item:info(("(Converted) - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
-	item:info("mkdown", mkdown)
-	item:info("emcAdjustedValue", emcAdjustedValue)
-	item:info("Final Converted Value", value)
+	if (not get(lcName..".disabletooltip")) then
+		item:info(("(Converted) - %d%% / %s markdown"):format(pct,BtmScan.GSC(min, true)), mkdown)
+		item:info("mkdown", mkdown)
+		item:info("emcAdjustedValue", emcAdjustedValue)
+		item:info("Final Converted Value", value)	
+	end	
+
 	
 	if value > evalPrice then
-		EnhTooltip.AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")
+		if (not get(lcName..".disabletooltip")) then
+			EnhTooltip.AddLine("|cff00FF00 EMC: Buy me! Convert Me!|r")					
+		end	
+
 		emcBuyFor = "EMC: Convert 2 sell"
 	else
 		emcBuyFor = "EMC: Just sell me"
 	end
 	
 	if emcAdjustedValue > evalPrice then
-		EnhTooltip.AddLine("|cff00FF00 EMC: Convert me to sell! |r")
+		if (not get(lcName..".disabletooltip")) then
+			EnhTooltip.AddLine("|cff00FF00 EMC: Convert me to sell! |r")			
+		end	
 		emcBuyFor = "EMC: Convert 2 sell"	
 		emcTrueSellValue = emcAdjustedValue
 	else
-		EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
+		if (not get(lcName..".disabletooltip")) then
+			EnhTooltip.AddLine("|cffFF0000 EMC: Don't convert me, just sell me! |r")
+		end	
 		emcBuyFor = "EMC: Just sell me"
 		emcTrueSellValue = evalPrice
 	end
@@ -495,6 +533,7 @@ define(lcName..'.buyout.check', false)
 define(lcName..'.enableEssence', true)
 define(lcName..'.enableMote', true)
 define(lcName..'.enableDepleted', false)
+define(lcName..'.disabletooltip', false)
 
 function lib:setup(gui)
 	local id = gui:AddTab(libName)	
@@ -515,6 +554,7 @@ function lib:setup(gui)
 	gui:AddControl(id, "Checkbox",		0, 1, 	lcName..".enable", "Enable purchasing for "..lcName)
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.buy", "Allow buyout on items")
 	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".allow.bid", "Allow bid on items")
+	gui:AddControl(id, "Checkbox",		0, 2, 	lcName..".disabletooltip", "Disable all EMC Tooltips (may increase performance)")
 	
 	gui:AddHelp(id, "EMC: Custom profit settings",
 		"EMC: Custom profit settings",
