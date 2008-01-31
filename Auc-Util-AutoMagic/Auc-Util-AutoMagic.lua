@@ -337,7 +337,7 @@ function lib.makeMailGUI()
 
 	--local mguimailfor, mguiheader, mguibtmrules
 	-- Text Header
-	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
+local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
 	mguiheader:SetText("AutoMagic: Mail GUI")
 	mguiheader:SetJustifyH("CENTER")
 	mguiheader:SetWidth(200)
@@ -356,7 +356,7 @@ function lib.makeMailGUI()
 	amgui.loadprospect:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 35)
 	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
 		
-	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
+local	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
 	mguibtmrules:SetText("Mail by BTM rule")
 	mguibtmrules:SetJustifyH("LEFT")
 	mguibtmrules:SetWidth(250)
@@ -382,7 +382,7 @@ function lib.makeMailGUI()
 	amgui.loadgems:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 35)
 	amgui.loadgems:SetScript("OnClick", lib.doMailDEMats)
 	
-	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
+local	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
 	mguimailfor:SetText("Mail")
 	mguimailfor:SetJustifyH("RIGHT")
 	mguimailfor:SetWidth(220)
