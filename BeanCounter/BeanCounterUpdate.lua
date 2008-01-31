@@ -110,7 +110,9 @@ function private.UpgradeDatabaseVersion()
 		private.updateTo1_09()
 	elseif private.playerData["version"] < 1.10 then
 		private.updateTo1_10()
-	end
+	elseif private.playerData["version"] < 1.11 then
+		private.updateTo1_11A()
+	end	
 			
 end
 
@@ -265,7 +267,7 @@ function private.updateTo1_08()
 			local used = {}
 			for i, text in pairs(values) do
 				local tbl = private.unpackString(text)
-				local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(tbl[5]), tonumber(tbl[8]),tonumber(tbl[10]), tonumber(tbl[10]-144000)
+				local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(tbl[5]), tonumber(tbl[8]),tonumber(tbl[10]), tonumber(tbl[10]-17300)
 				if not private.serverData[player]["postedAuctions"][itemID] then print("failed", itemID) break end
 				
 				for index, v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
@@ -325,7 +327,7 @@ function private.updateTo1_09()
 		private.serverData[player]["version"] = 1.09
 	end
 end
---Correct Bug in 1.09 =, we accidently added a extra stack field for completedbids/buyouts. This update looks over the table and removes that extra data to stop errors on sorting.
+--[[Correct Bug in 1.09 =, we accidently added a extra stack field for completedbids/buyouts. This update looks over the table and removes that extra data to stop errors on sorting.]]
 function private.updateTo1_10()
 	for player,data in pairs(private.serverData) do
 		for itemID , values in pairs(private.serverData[player]["completedBids/Buyouts"]) do
@@ -338,5 +340,46 @@ function private.updateTo1_10()
 			end
 		end
 		private.serverData[player]["version"] = 1.10
+	end
+end
+--[[Updates expired auctions table to hold new values  buy, bid, deposit cost]]
+function private.updateTo1_11A()
+	for player, data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["failedAuctions"]) do
+			for i, text in pairs(values) do
+				local tbl = private.unpackString(text)
+				if #tbl == 5 then
+					private.serverData[player]["failedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], tbl[3], 0, 0, 0, tbl[4], tbl[5])
+				end
+			end
+		end
+	end
+	private.updateTo1_11B()
+end
+--[[Looks in postedAuctions table to get new data fields for failedAuctions, stack, buy, bid, deposit cost]]
+--"|cffffffff|Hitem:32381:0:0:0:0:0:0:0|h[Schematic: Fused Wiring]|h|r;     Auction expired;   0;   new4BUY;  new5BID ; new6DEPOSIT ;  1194214443;     15881251"
+function private.updateTo1_11B()
+	for player,data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["failedAuctions"]) do
+			local used = {}
+			for i, text in pairs(values) do
+				local tbl = private.unpackString(text)
+				local stack, arrivedTime = tonumber(tbl[3]), tonumber(tbl[7])
+				
+				if not private.serverData[player]["postedAuctions"][itemID] then print("failed", itemID) break end
+				
+				for index, v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
+					local tbl2 = private.unpackString(v)
+					local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(tbl[7] - (tbl2[5]*60)) --Time this message should have been posted
+					if  not used[index] and (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
+						private.serverData[player]["failedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], tbl2[2], tbl2[4], tbl2[3], tbl2[6], tbl[7], tbl[8])
+						--add stack size, buy, bid, deposit cost
+						used[index] = "used"
+						break
+					end
+				end
+			end
+		end
+		private.serverData[player]["version"] = 1.11
 	end
 end

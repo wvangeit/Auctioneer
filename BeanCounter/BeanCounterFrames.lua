@@ -648,30 +648,27 @@ function private.CreateFrames()
 					tbl[10], --time, --Make this a user choosable option.
 				})
 		end
+		--"|cffffffff|Hitem:32381:0:0:0:0:0:0:0|h[Schematic: Fused Wiring]|h|r;     Auction expired;   0;   new4BUY;  new5BID ; new6DEPOSIT ;  1194214443;     15881251"
 		function private.FAILEDAUCTIONS(player, id, text)
 				tbl = text
-				if type(text) == "string" then tbl= private.unpackString(text) end
-				--Lets try some basic reconciling here
-				local count, minBid, buyoutPrice, runTime, deposit = private.reconcileFailedAuctions(player, id, tbl)
-				--Ok we will now use the proper stack count from expired auctions, but if thats 0 then we will try to get a stack price from posted auctions
-				if tonumber(tbl[3]) > 0 then count = tbl[3] end
-
+				if type(text) == "string" then tbl = private.unpackString(text) end
+				
 				return({
 					tbl[1], --itemname
 					_BC('UiAucExpired'), --status
 
-					tonumber(minBid) or 0, --bid
-					tonumber(buyoutPrice) or 0, --buyout
+					tonumber(tbl[5]) or 0, --bid
+					tonumber(tbl[4]) or 0, --buyout
 					0, --money,
-					tonumber(count) or 0,
+					tonumber(tbl[3]) or 0,
 					0, --Profit/per
 
 					"-",  --seller/buyer
 
-					tonumber(deposit) or 0, --deposit
+					tonumber(tbl[6]) or 0, --deposit
 					0, --fee
-					tonumber(tbl[5]) or 0, --current wealth
-					tbl[4], --time,
+					tonumber(tbl[8]) or 0, --current wealth
+					tbl[7], --time,
 				})
 		end
 		function private.COMPLETEDBIDSBUYOUTS(player, id, text)

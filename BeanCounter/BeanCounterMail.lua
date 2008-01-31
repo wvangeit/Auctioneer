@@ -175,9 +175,10 @@ function private.mailSort()
 				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..":%s(.*)" )
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then    
-					local _, _, stack, _, _ = GetInboxItem(i)
+					local _, _, stackSecondary, _, _ = GetInboxItem(i)
 					debugPrint("Auction Expired",i)
-					local value = private.packString(itemLink, "Auction expired", stack, private.reconcilePending[i]["time"], private.wealth)
+					local stack, buyout, bid, deposit = private.findStackfailedAuctions("postedAuctions", itemID, private.reconcilePending[i]["time"])
+					local value = private.packString(itemLink, "Auction expired", stack or stackSecondary, buyout, bid, deposit, private.reconcilePending[i]["time"], private.wealth)
 					private.databaseAdd("failedAuctions", itemID, value)
 				end
 				table.remove(private.reconcilePending,i)
@@ -247,7 +248,7 @@ function private.matchDB(key, text)
 end
 --Find the stack information in postedAuctions to add into the completedAuctions DB on mail arrivial
 function private.findStackcompletedAuctions(key , itemID, soldDeposit, soldBuy, soldTime)
-	local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(soldDeposit), tonumber(soldBuy),tonumber(soldTime), tonumber(soldTime - 144000)
+	local soldDeposit, soldBuy, soldTime , oldestPossible = tonumber(soldDeposit), tonumber(soldBuy),tonumber(soldTime), tonumber(soldTime - 173800)
 	for index = #private.playerData[key][itemID] , 1, -1 do
 		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
 		local postDeposit, postBuy, postTime = tonumber(tbl2[6]), tonumber(tbl2[4]),tonumber(tbl2[7])
@@ -282,6 +283,17 @@ function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
 	end
 	return 0 --failed to find stack
 end
+--find stack, bid and buy info for failedauctions
+function private.findStackfailedAuctions(key, itemID, expiredTime)
+	for index = #private.playerData[key][itemID] , 1, -1 do
+		local tbl2 = private.unpackString(v)
+		local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(expiredTime - (tbl2[5]*60)) --Time this message should have been posted
+		if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
+			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
+		end
+	end
+end
+
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
 local inboxHookMessage = false --Stops spam of the message.
 function private.PreTakeInboxMoneyHook(funcArgs, retVal, index, ignore)
