@@ -297,9 +297,10 @@ end
 --Fires on mail box closed event & hides mailgui
 function lib.mailClosed()
 	lib.makeMailGUI()
-	if (get("util.automagic.showmailgui")) then
+
+	--if (get("util.automagic.showmailgui")) then
 		amgui:Hide()
-	end
+	--end
 end
 
 --Function is called from lib.mailShow()
