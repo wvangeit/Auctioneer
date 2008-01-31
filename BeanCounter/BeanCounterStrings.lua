@@ -330,12 +330,19 @@ BeanCounterLocalizations = {
 
 	frFR = {
 
+		-- Section: Config Text
+		["C_BeanCounterConfig"]	= "BeanCounter Configuration";
+		["C_BeanCounterOptions"]	= "BeanCounter Options";
+		["C_DateString"]	= "|CCFFFCC00 Format date a utiliser:";
+		["C_DateStringExample"]	= "|CCFFFCC00 Exemple Date:";
+		["C_ExtenalSearch"]	= "Autorise les Addons Externes a utiliser la recherche BeanCounter?";
+
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "Hôtel des ventes de l'Alliance";
-		["MailAuctionCancelledSubject"]	= "Vente annulée ";
-		["MailAuctionExpiredSubject"]	= "Vente aux enchères terminée ";
-		["MailAuctionSuccessfulSubject"]	= "Vente aux enchères réussie ";
-		["MailAuctionWonSubject"]	= "Vente gagnée ";
+		["MailAuctionCancelledSubject"]	= "Vente annulée";
+		["MailAuctionExpiredSubject"]	= "Vente aux enchères terminée";
+		["MailAuctionSuccessfulSubject"]	= "Vente aux enchères réussie";
+		["MailAuctionWonSubject"]	= "Vente gagnée";
 		["MailHordeAuctionHouse"]	= "Hôtel des ventes de la Horde";
 		["MailOutbidOnSubject"]	= "Augmenter l'offre pour";
 
@@ -406,6 +413,36 @@ BeanCounterLocalizations = {
 
 	koKR = {
 
+		-- Section: Config Text
+		["C_BeanCounterConfig"]	= "콩순이 설정";
+		["C_BeanCounterOptions"]	= "콩순이 옵션";
+		["C_DateString"]	= "|CCFFFCC00 사용할 날짜 형식: ";
+		["C_DateStringExample"]	= "|CCFFFCC00 날짜 예제: ";
+		["C_ExtenalSearch"]	= "외부 애드온이 콩순이 검색을 사용하도록 허락합니까?";
+		["C_MailInvoiceTimeout"]	= "우편 송장 타임아웃 = %d 초";
+		["C_MailRecolor"]	= "우편에 다시 색입히는 방법";
+
+		-- Section: Generic Strings
+		["NoRe-Color"]	= "다시 색을 입히지 않음";
+		["off"]	= "끄기";
+		["on"]	= "켜기";
+		["Re-ColorIcons"]	= "아이콘에 다시 색입히기";
+		["Re-ColorIconsandText"]	= "아이콘과 글자에 다시 색입히기";
+		["Re-ColorText"]	= "글씨에 다시 색입히기";
+
+		-- Section: Help Text
+		["A_DateString"]	= "콩순이의 GUI창에 보이는 날짜의 형식을 결정합니다.\n명령어 앞에 %를 붙여야 하고, 복수의 명령어와 글씨가 혼합될 수 있습니다.\n예를 들어 %a == %X라고 하면 수요일 == 21:34:21로 표시됩니다.";
+		["A_DateStringCommands"]	= "명령어 : \n %a = 요일 약자, \n %A = 요일, \n %b = 월 약자, \n %B = 월,\n %c = 날짜와 시간, \n %d = 일(01-31일),\n %H = 시간 (24시간제), \n %I = 시간(12시간제),\n %M = 분, \n %m = 월(숫자),\n %p = a ";
+		["A_ExtenalSearch"]	= "다른 애드온이 콩순이를 이용해 아이템을 검색하여 콩순이 GUI에 보이도록 할 수 있습니다. 예를 들면 Appraiser에서 보고있는 아이템이 무엇인지 콩순이가 보여주도록 합니다.";
+		["A_MailInvoiceTimeout"]	= "송장 요청에 서버가 반응하기를 기다리는 시간입니다. 송장이란 경매장에서 온 우편의 누구, 무엇, 어떻게 부분입니다.";
+		["A_MailRecolor"]	= "콩순이는 경매장에서 온 모든 우편을 읽습니다. 이 옵션은 우편을 안 읽은 것처럼 다시 색을 입힐지를 결정합니다.";
+		["HelpGuiItemBox"]	= "아이템을 검색창에 떨굽니다.";
+		["Q_DateString"]	= "사용할 날짜 형식이란?";
+		["Q_DateStringCommands"]	= "알맞는 날짜 명령어란?";
+		["Q_ExtenalSearch"]	= "외부 애드온의 콩순이 사용이란?";
+		["Q_MailInvoiceTimeout"]	= "우편 송장 타임아웃이란?";
+		["Q_MailRecolor"]	= "다시 색입히기란?";
+
 		-- Section: Mail
 		["MailAllianceAuctionHouse"]	= "얼라이언스 경매장";
 		["MailAuctionCancelledSubject"]	= "경매 취소";
@@ -414,21 +451,40 @@ BeanCounterLocalizations = {
 		["MailAuctionWonSubject"]	= "경매 낙찰";
 		["MailHordeAuctionHouse"]	= "호드 경매장";
 		["MailOutbidOnSubject"]	= "보다 높은 가격이 제시됨";
+		["MailSalePendingOnSubject"]	= "판매 예정";
+
+		-- Section: Tooltip Messages
+		["TTDateString"]	= "날짜 부분에 보일 형식을 넣습니다. 기본값은 %c입니다.";
+		["TTDateStringExample"]	= "설정된 날짜 형식의 예제를 보여줍니다.";
+		["TTExtenalSearch"]	= "다른 애드온에서 검색을 하면, 콩순이도 그 아이템에 대한 검색결과를 보여줍니다.";
+		["TTMailInvoiceTimeout"]	= "서버로부터 우편 송장을 얻기 위해 몇번이나 시도할지를 정합니다. 값을 낮추면 빠르지만 데이터가 빠져있을 확률이 있고, 값을 높이면 느리지만 우편 서버가 극히 바쁠경우 데이터를 가져올 확률을 높입니다.";
+		["TTMailRecolor"]	= "콩순이가 우편함을 검색한 다음에 우편이 어떻게 보일지를 결정합니다.";
 
 		-- Section: User Interface
+		["UiAddonTitle"]	= "콩순이: 경매결과 데이터베이스";
+		["UiAucExpired"]	= "경매 만료";
+		["UiAucSuccessful"]	= "경매 완료";
 		["UiAuctions"]	= "경매품";
 		["UiAuctionTransaction"]	= "경매";
 		["UiBids"]	= "입찰품";
 		["UiBidTransaction"]	= "입찰";
 		["UiBuyerSellerHeader"]	= "구매자/판매자";
 		["UiBuyTransaction"]	= "구입";
+		["UiClassicCheckBox"]	= "불타는 성전의 옛 데이터 표시";
+		["UiData"]	= "데이터";
 		["UiDateHeader"]	= "날짜";
 		["UiDepositTransaction"]	= "보증금";
+		["UiDone"]	= "완료";
 		["UiExactNameSearch"]	= "정확한 이름 찾기";
+		["UiFailedAuctions"]	= "실패한 경매";
+		["UiFee"]	= "수수료";
 		["UiNameHeader"]	= "아이템";
 		["UiNetHeader"]	= "항목";
 		["UiNetPerHeader"]	= "항목내용";
+		["UiOutbid"]	= "상회 입찰";
+		["UiOutbids"]	= "상회 입찰";
 		["UiPriceHeader"]	= "가격";
+		["UiPriceper"]	= "개당 가격";
 		["UiPricePerHeader"]	= "가격 항목";
 		["UiPurchases"]	= "구입";
 		["UiQuantityHeader"]	= "수량";
@@ -436,9 +492,13 @@ BeanCounterLocalizations = {
 		["UiSearch"]	= "검색";
 		["UiSearchForLabel"]	= "검색:";
 		["UiSellTransaction"]	= "판매";
+		["UiServer"]	= "서버";
 		["UiTransactions"]	= "거래";
 		["UiTransactionsLabel"]	= "거래:";
 		["UiTransactionTypeHeader"]	= "형식";
+		["UiWealth"]	= "재산";
+		["UiWononBid"]	= "구입";
+		["UiWononBuyout"]	= "즉시 구입";
 
 	};
 
