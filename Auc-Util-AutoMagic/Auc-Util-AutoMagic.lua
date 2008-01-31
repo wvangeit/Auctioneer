@@ -311,10 +311,10 @@ end
 function lib.makeMailGUI()
 	-- Set frame visuals
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	amgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 55)
+	amgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 70)
 	amgui:SetFrameStrata("DIALOG")
-	amgui:SetHeight(125)
-	amgui:SetWidth(110)
+	amgui:SetHeight(90)
+	amgui:SetWidth(220)
 	amgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
@@ -335,33 +335,70 @@ function lib.makeMailGUI()
 	amgui.Drag:SetScript("OnMouseUp", function() amgui:StopMovingOrSizing() end)
 	
 
+	--local mguimailfor, mguiheader, mguibtmrules
+	-- Text Header
+	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
+	mguiheader:SetText("AutoMagic: Mail GUI")
+	mguiheader:SetJustifyH("CENTER")
+	mguiheader:SetWidth(200)
+	mguiheader:SetHeight(10)
+	mguiheader:SetPoint("TOPLEFT",  amgui, "TOPLEFT", 0, 0)
+	mguiheader:SetPoint("TOPRIGHT", amgui, "TOPRIGHT", 0, 0)
+	amgui.mguiheader = mguiheader
+	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	
-	--Make text overlays -- Still need to get header text functioning
---	amgui.text = CreateFontString("AutoDisenchantPromptLine","TOP", "HIGH")
---	amgui.text:SetText(("Wowsers its my headers"))
---	amgui.text:SetHeight(30)
---	amgui.text:SetWidth(100)
---	amgui.text:SetPoint("TOP", amgui, "TOP", 0, 0)
-	
 	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
-	amgui.loadde = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadde:SetText(("Mail DE"))
-	amgui.loadde:SetPoint("BOTTOM", amgui, "BOTTOM", 0, 12)
-	amgui.loadde:SetScript("OnClick", lib.doMailDE)
+	-- LEFT COLUMN
 
-	amgui.loaddemats = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loaddemats:SetText(("Mail DE:Mats"))
-	amgui.loaddemats:SetPoint("BOTTOM", amgui.loadde, "TOP", 0, 5)
-	amgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 	
 	amgui.loadprospect = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadprospect:SetText(("Mail Prospects"))
-	amgui.loadprospect:SetPoint("BOTTOM", amgui.loaddemats, "TOP", 0, 5)
-	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)
+	amgui.loadprospect:SetText(("Prospect"))
+	amgui.loadprospect:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 35)
+	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
+		
+	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
+	mguibtmrules:SetText("Mail by BTM rule")
+	mguibtmrules:SetJustifyH("LEFT")
+	mguibtmrules:SetWidth(250)
+	mguibtmrules:SetHeight(10)
+	mguibtmrules:SetPoint("BOTTOMLEFT",  amgui.loadprospect, "TOPLEFT", 0, 0)
+	mguibtmrules:SetPoint("BOTTOMRIGHT", amgui.loadprospect, "TOPRIGHT", 0, 0)
+	amgui.mguibtmrules = mguibtmrules
+	
+	amgui.loadde = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
+	amgui.loadde:SetText(("Disenchant"))
+	amgui.loadde:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 12)
+	amgui.loadde:SetScript("OnClick", lib.doMailDE)
+	
+
 	
 	
-end
+	--RIGHT COLUMN
+	
+
+	
+	amgui.loadgems = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
+	amgui.loadgems:SetText(("DE:Mats2"))
+	amgui.loadgems:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 35)
+	amgui.loadgems:SetScript("OnClick", lib.doMailDEMats)
+	
+	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
+	mguimailfor:SetText("Mail")
+	mguimailfor:SetJustifyH("RIGHT")
+	mguimailfor:SetWidth(220)
+	mguimailfor:SetHeight(10)
+	mguimailfor:SetPoint("BOTTOMLEFT",  amgui.loadgems, "TOPLEFT", 0, 0)
+	mguimailfor:SetPoint("BOTTOMRIGHT", amgui.loadgems, "TOPRIGHT", 0, 0)
+	amgui.mguimailfor = mguimailfor
+	
+	amgui.loaddemats = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
+	amgui.loaddemats:SetText(("DE:Mats1"))
+	amgui.loaddemats:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 12)
+	amgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
+end 
+	
+
+
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 
 
