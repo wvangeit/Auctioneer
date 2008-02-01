@@ -285,8 +285,8 @@ function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
 end
 --find stack, bid and buy info for failedauctions
 function private.findStackfailedAuctions(key, itemID, expiredTime)
-	for index = #private.playerData[key][itemID] , 1, -1 do
-		local tbl2 = private.unpackString(v)
+	for index = #private.playerData[key][itemID], 1, -1 do
+		local tbl2 = private.unpackString(index)
 		local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(expiredTime - (tbl2[5]*60)) --Time this message should have been posted
 		if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
 			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
