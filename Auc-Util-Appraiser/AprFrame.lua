@@ -1956,7 +1956,7 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
-		{ "Item",   "TEXT", 120 },
+		{ "Item",   "TEXT", 105 },
 		{ "Seller", "TEXT", 75  },
 		{ "Left",   "INT",  40  },
 		{ "Stk",    "INT",  30  },
@@ -1981,7 +1981,7 @@ function private.CreateFrames()
 	frame.imageviewclassic:SetPoint("TOPRIGHT", frame, "TOPRIGHT")
 	frame.imageviewclassic:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 	frame.imageviewclassic.sheet = ScrollSheet:Create(frame.imageviewclassic, {
-		{ "Item",   "TEXT", 120 },
+		{ "Item",   "TEXT", 105 },
 		{ "Seller", "TEXT", 75  },
 		{ "Left",   "INT",  40  },
 		{ "Stk",    "INT",  30  },
