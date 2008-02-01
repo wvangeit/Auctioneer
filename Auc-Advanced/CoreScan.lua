@@ -886,36 +886,41 @@ function lib.ScanPage(nextPage, really)
 	end
 	private.curPage = nextPage
 end
-
-function private.HasAllData()
-	local check = private.nextCheck
-	local start = private.verifyStart or 1
-	if not check then return true end
-	local now = GetTime()
-	if now > check then -- Wait at least 1 second before checking
-		-- Check to see if we have all the page data
-		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
-		if start > numBatchAuctions then
-			-- Already verified 100%
-			return true
-		end
-		local _, owner = 0, {}
-		for i = start, numBatchAuctions do
-			_,_,_,_,_,_,_,_,_,_,_,owner[i] = GetAuctionItemInfo("list", i)
-		end
-		for i = start, numBatchAuctions do
-			if not owner[i] then
-				-- We'll start from here again next cycle since we're waiting
-				private.verifyStart = i
-				private.nextCheck = now + 0.25
-				return false
-			end
-		end
-		private.verifyStart = numBatchAuctions + 1
-		return true
-	end
-	return false
-end
+local CoStore
+function private.HasAllData() 
+	local check = private.nextCheck 
+	if not check then return true end 
+	local now = GetTime() 
+	if now > check then -- Wait at least 1 second before checking 
+		-- Check to see if we have all the page data 
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list") 
+		if not private.NoOwnerList then 
+			private.NoOwnerList = acquire() 
+			for i = 1, numBatchAuctions do 
+				private.NoOwnerList[i] = i 
+			end 
+		end 
+		local _, owner = 0, {} 
+		for i, j in ipairs(private.NoOwnerList) do 
+			_,_,_,_,_,_,_,_,_,_,_,owner[j] = GetAuctionItemInfo("list", j) 
+		end 
+		for i = #private.NoOwnerList, 1, -1 do 
+			local j = private.NoOwnerList[i] 
+			if owner[j] then 
+				-- Remove from the lookuptable 
+				table.remove(private.NoOwnerList, i) 
+			end 
+		end 
+		if #private.NoOwnerList ~= 0 then 
+			private.nextCheck = now + 0.25 
+			return false 
+		end 
+		recycle(private.NoOwnerList) 
+		private.NoOwnerList = nil 
+		return true 
+	end 
+	return false 
+end  
 
 function private.NoDupes(pageData, compare)
 	if not pageData then return true end
@@ -1105,7 +1110,7 @@ StorePageFunction = function()
 	end
 end
 
-local CoStore = coroutine.create(StorePageFunction)
+CoStore = coroutine.create(StorePageFunction)
 
 function lib.StorePage()
 	if coroutine.status(CoStore) ~= "dead" then
