@@ -939,8 +939,8 @@ StorePageFunction = function()
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
 	end
-
-	if not private.curQuery then
+	
+	if (not private.curQuery) or (private.curQuery.name == "Empty Page") then
 		return
 	end
 	local now = GetTime()
@@ -1107,6 +1107,7 @@ StorePageFunction = function()
 		isGetAll = false
 		--QueryAuctionItems("", "", "", nil, nil, nil, nil, nil, nil)
 		AucAdvanced.API.BlockUpdate(false)
+		QueryAuctionItems("Empty Page", "", "", nil, nil, nil, nil, nil, nil)--clear the getall output
 	end
 end
 
