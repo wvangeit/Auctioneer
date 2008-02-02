@@ -271,6 +271,8 @@ function private.HookAH()
 				pagesize=GetNumAuctionItems("list")
 				if pagesize <= 50 then
 					SortAuctionApplySort("list")
+				elseif pagesize > 50 then
+					pagesize = 0
 				end
 			end
 		end
@@ -487,6 +489,8 @@ function private.RetrievePage()
 	local pagesize = GetNumAuctionItems("list")
 	if pagesize < 50 then
 		pagesize = 50
+	elseif pagesize > 50 then --If doing a GetAll, don't show anything
+		pagesize = 0
 	end
 	for i = 1, pagesize do
 		if not private.pageElements[i] then private.pageElements[i] = {} end
@@ -674,7 +678,11 @@ function private.MyAuctionFrameUpdate()
 	local index, button
 	BrowseBidButton:Disable()
 	BrowseBuyoutButton:Disable()
-
+	if (numBatchAuctions > 50) then
+		numBatchAuctions = 0
+		totalAuctions = 0
+	end
+	
 	if ( numBatchAuctions == 0 ) then
 		BrowseNoResultsText:Show()
 	else
@@ -685,6 +693,8 @@ function private.MyAuctionFrameUpdate()
 	local pagesize = GetNumAuctionItems("list")
 	if pagesize < 50 then
 		pagesize = 50
+	elseif pagesize > 50 then
+		pagesize = 0
 	end
 	for i=1, NUM_BROWSE_TO_DISPLAY do
 		index = offset + i + (pagesize * AuctionFrameBrowse.page)
