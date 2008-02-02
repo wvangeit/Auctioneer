@@ -382,6 +382,7 @@ local function getReagentsFromTradeFrame(craftIndex)
 	return reagentList
 end
 
+-- NOTE - ccox - to match non enchants, I'd need to search for "Requires (.+)"
 local function getReagentsFromTooltip(frame)
 	local frameName = frame:GetName()
 	local nLines = frame:NumLines()
@@ -394,6 +395,7 @@ local function getReagentsFromTooltip(frame)
 		local _, _, r = text:find(_ENCH('PatReagents'))
 		if r then
 			reagents = r
+			--Enchantrix.Util.DebugPrintQuick("matched reagents line ", reagents )
 			break
 		end
 	end
@@ -404,12 +406,18 @@ local function getReagentsFromTooltip(frame)
 	-- Process reagents separated by ","
 	for reagent in Enchantrix.Util.Spliterator(reagents, ",") do
 		-- Chomp whitespace
-		reagent = reagent:gsub("^%s*", "")
-		reagent = reagent:gsub("%s*$", "")
+		reagent = reagent:gsub("^%s*", "")	-- remove leading spaces
+		reagent = reagent:gsub("%s*$", "")	-- remove trailing spaces
+		--reagent = reagent:gsub("%c*", "")	-- remove all control characters
+		-- ...and newlines
+		reagent = reagent:gsub("%|n", "")	-- remove blizzard style newline codes
 		-- ...and color codes
 		reagent = reagent:gsub("^%|c%x%x%x%x%x%x%x%x", "")
-		reagent = reagent:gsub("%|r$", "")
+		reagent = reagent:gsub("%|r$", "")	-- remove blizzard style return at end of line
 
+		-- NOTE - ccox - if reagents aren't being found, Blizzard may have added more formatting that needs to be removed above
+		-- Enchantrix.Util.DebugPrintQuick("cleaned reagent string ", reagent )
+		
 		-- Get and chomp counts, e.g "Strange Dust (2)"
 		local _, _, count = reagent:find("%((%d+)%)$")
 		if count then
@@ -431,14 +439,12 @@ local function getReagentsFromTooltip(frame)
 end
 
 
+-- this can be used by non enchanters when clicking on an enchant tooltip
+-- this is also used inside the enchanting/crafting trade window
+
 function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 
--- TODO - ccox - this should only be active between event=="TRADE_SKILL_SHOW" / "TRADE_SKILL_CLOSE"
---		or "CRAFT_SHOW" / "CRAFT_CLOSE" -- those should also tell us the API to use
--- but it can be bloody useful in the auction house :-)
-
 -- TODO - ccox - for items, get the number made!  But what about items with random yield?
-
 -- TODO - ccox - this really should recursively descend crafted items for true costs not AH prices
 --		most of the time they'll be in the cache, so it won't add a lot of time to the search
 
@@ -452,10 +458,17 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 	end
 
 	if not reagentList or (#reagentList < 1) then
+	
+		-- clean up the craft item string
+		--Enchantrix.Util.DebugPrintQuick("original name is ", name )
+		name = name:gsub("^%a+:", "")	-- remove crafting type "Enchanting:"
+		name = name:gsub("^%s*", "")	-- remove leading spaces
+		--Enchantrix.Util.DebugPrintQuick("cleaned name is ", name )
 
 		-- first try craft APIs
 		for i = 1, GetNumCrafts() do
 			local craftName = GetCraftInfo(i)
+			--Enchantrix.Util.DebugPrintQuick("testing craft ", name, " equal to ", craftName )
 			if name == craftName then
 				craftIndex = i
 				break
@@ -483,6 +496,7 @@ function enchantTooltip(funcVars, retVal, frame, name, link, isItem)
 		end
 
 		if not reagentList or (#reagentList < 1) then
+			--Enchantrix.Util.DebugPrintQuick("no reagents found for ", link, " in ", name )
 			return
 		end
 
