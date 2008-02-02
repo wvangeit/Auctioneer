@@ -19,7 +19,6 @@ BarkerStrings.lua
 BarkerLocale.lua
 
 BarkerSettings.lua
-BarkerTooltip.lua
 BarkerUtil.lua
 
 EnchantrixBarker.lua

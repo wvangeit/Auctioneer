@@ -36,14 +36,10 @@ local split
 local chatPrint
 local getRevision
 
-local gcd
 local round
 local roundUp
 
 local createProfiler
-
-local DebugLib = LibStub("DebugLib")
-DebugLib = DebugLib("Enchantrix-Barker")
 
 ------------------------
 --   Item functions   --
@@ -105,15 +101,6 @@ end
 ------------------------
 --   Math Functions   --
 ------------------------
-
-function gcd(a, b)
-	-- Greatest Common Divisor, Euclidean algorithm
-	local m, n = tonumber(a), tonumber(b) or 0
-	while (n ~= 0) do
-		m, n = n, math.fmod(m, n)
-	end
-	return m
-end
 
 -- Round up m to nearest multiple of n
 function roundUp(m, n)
@@ -236,7 +223,6 @@ Barker.Util = {
 	ChatPrint			= chatPrint,
 	GetRevision			= getRevision,
 
-	GCD					= gcd,
 	Round				= round,
 	RoundUp				= roundUp,
 
@@ -245,22 +231,31 @@ Barker.Util = {
 
 
 
-ENX_CRITICAL = 1
-ENX_ERROR = 2
-ENX_WARNING = 3
-ENX_NOTICE = 4
+local DebugLib = LibStub("DebugLib")
+local debug, assert
+if DebugLib then
+	debug, assert = DebugLib("Enchantrix-Barker")
+else
+	function debug() end
+	assert = debug
+end
+
+ENX_CRITICAL = "Critical"
+ENX_ERROR = "Error"
+ENX_WARNING = "Warning"
+ENX_NOTICE = "Notice"
 -- info will only go to nLog
-ENX_INFO = 5
+ENX_INFO = "Info"
 -- Debug will print to the chat console as well as to nLog
-ENX_DEBUG = 6
+ENX_DEBUG = "Debug"
 
 function Barker.Util.DebugPrint(mType, mLevel, mTitle, ...)
 	-- function debugPrint(addon, message, category, title, errorCode, level)
-	local message = DebugLib:Dump(...)
-	DebugLib:Debug(message, mType, mTitle, 1, mLevel)
+	local message = debug:Dump(...)
+	debug(message, mType, mTitle, nil, mLevel)
 end
 
 -- when you just want to print a message and don't care about the rest
 function Barker.Util.DebugPrintQuick(...)
-	Barker.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebugMsg:", ... )
+	Barker.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebug:", ... )
 end
