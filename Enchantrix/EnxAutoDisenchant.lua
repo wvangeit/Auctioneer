@@ -201,8 +201,11 @@ local function onEvent(...)
 		if isState("prompt") and arg1 == "player" and arg2 == prompt.Yes:GetAttribute("spell") then
 			-- disenchant started - wait for completion
 			eventSpam(event .." ".. arg1 .." ".. arg2 .." ".. arg3 .." ".. arg4)
-			-- TODO: should refer to prospecting if that's what it's doing
-			Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+			if arg2 == _ENCH('ArgSpellProspectingName') then
+				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspecting"):format(prompt.link))
+			else
+				Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchanting"):format(prompt.link))
+			end
 			hidePrompt()
 			setState("cast")
 		end
@@ -249,8 +252,11 @@ local function onEvent(...)
 					showPrompt(link, bag, slot, value, spell)
 				else
 					-- sold, traded, banked, destroyed, ...
-					-- TODO: should refer to prospecting if that's what it's doing
-					Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
+					if prompt.Yes:GetAttribute("spell") == _ENCH('ArgSpellProspectingName') then
+						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeProspectCancelled"))
+					else
+						Enchantrix.Util.ChatPrint(_ENCH("FrmtAutoDeDisenchantCancelled"))
+					end
 					clearPrompt()
 					beginScan()
 				end
@@ -342,10 +348,11 @@ function showPrompt(link, bag, slot, value, spell)
 	prompt.Yes:SetAttribute("spell", spell)
 
 	-- TODO: should refer to prospecting if that's what it's doing
-	prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
 	if spell == _ENCH('ArgSpellProspectingName') then
+		prompt.Lines[1]:SetText(_ENCH("GuiAutoProspectPromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link .. "x5")
 	else
+		prompt.Lines[1]:SetText(_ENCH("GuiAutoDePromptLine1"))
 		prompt.Lines[2]:SetText("  " .. prompt.link)
 	end
 	prompt.Lines[3]:SetText(_ENCH("GuiAutoDePromptLine3"):format(getTextGSC(floor(value))))
