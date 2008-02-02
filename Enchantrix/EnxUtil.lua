@@ -344,7 +344,7 @@ function getReagentPrice(reagentID, extra)
 	if not reagentID then return nil end
 
 	if Enchantrix.Settings.GetSetting('fixed.'..reagentID) then
-		myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagentID..'.value'))
+		local myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagentID..'.value'))
 		if myValue then
 			local weight = Enchantrix.Settings.GetSetting("weight."..reagentID) / 100
 			myValue = myValue * weight
