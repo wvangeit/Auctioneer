@@ -156,9 +156,9 @@ function private.chatEvent(event, text, player)
 			(
 				private.getOption('util.askprice.smart')
 				and
-				text:lower():find(private.getOption('util.askprice.word1'), 1, true)
+				text:lower():find(private.getOption('util.askprice.word1'):lower(), 1, true)
 				and
-				text:lower():find(private.getOption('util.askprice.word2'), 1, true)
+				text:lower():find(private.getOption('util.askprice.word2'):lower(), 1, true)
 			)
 		)
 	)) then
