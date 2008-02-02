@@ -38,7 +38,8 @@ local amBTMRule
 local amgui = CreateFrame("Frame", "", UIParent)
 amgui:Hide()
 
--- Reagents list
+-- Setting mats and gems itemID's to something understandable 
+-- enchant mats
 local VOID = 22450
 local NEXUS = 20725
 local LPRISMATIC = 22449
@@ -69,8 +70,64 @@ local DREAM = 11176
 local VISION = 11137
 local SOUL = 11083
 local STRANGE = 10940
+-- gems
+local TIGERSEYE = 818
+local MALACHITE = 774
+local SHADOWGEM = 1210
+local LESSERMOONSTONE = 1705
+local MOSSAGATE = 1206
+local CITRINE = 3864
+local JADE = 1529
+local AQUAMARINE = 7909
+local STARRUBY = 7910
+local AZEROTHIANDIAMOND = 12800
+local BLUESAPPHIRE = 12361
+local LARGEOPAL = 12799
+local HUGEEMERALD = 12364
+local BLOODGARNET = 23077
+local FLAMESPESSARITE = 21929
+local GOLDENDRAENITE = 23112
+local DEEPPERIDOT = 23709
+local AZUREMOONSTONE = 23117
+local SHADOWDRAENITE = 23107
+local LIVINGRUBY = 23436
+local NOBLETOPAZ = 23439
+local DAWNSTONE = 23440
+local TALASITE = 23427
+local STAROFELUNE = 23428
+local NIGHTSEYE = 23441
 
--- a table we can check for item ids
+-- This table is validating that each ID within it is a gem from prospecting.
+local isGem = 
+	{
+	[TIGERSEYE] = true,
+	[MALACHITE] = true,
+	[SHADOWGEM] = true,
+	[LESSERMOONSTONE] = true,
+	[MOSSAGATE] = true,
+	[CITRINE] = true,
+	[JADE] = true,
+	[AQUAMARINE] = true,
+	[STARRUBY] = true,
+	[AZEROTHIANDIAMOND] = true,
+	[BLUESAPPHIRE] = true,
+	[LARGEOPAL] = true,
+	[HUGEEMERALD] = true,
+	[BLOODGARNET] = true,
+	[FLAMESPESSARITE] = true,
+	[GOLDENDRAENITE] = true,
+	[DEEPPERIDOT] = true,
+	[AZUREMOONSTONE] = true,
+	[SHADOWDRAENITE] = true,
+	[LIVINGRUBY] = true,
+	[NOBLETOPAZ] = true,
+	[DAWNSTONE] = true,
+	[TALASITE] = true,
+	[STAROFELUNE] = true,
+	[NIGHTSEYE] = true,
+}
+
+-- This table is validating that each ID within it is a mat from disenchanting.
 local isDEMats = 
 	{
 	[VOID] = true,
@@ -103,7 +160,7 @@ local isDEMats =
 	[VISION] = true,
 	[SOUL] = true,
 	[STRANGE] = true,
-	}
+}
 	
 function lib.GetName()
 	return libName
@@ -218,6 +275,12 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 					UseContainerItem(bag, slot) 
 				end
 			end
+			if amBTMRule == "gems" then	
+				if isGem[ itemID ] then
+					print("AutoMagic has loaded", itemName, " because it is a mat used for enchanting.")
+					UseContainerItem(bag, slot) 
+				end
+			end
 			if amBTMRule == "vendor" then
 				if (get("util.automagic.autosellgrey")) then  
 					if itemRarity == 0 then
@@ -281,6 +344,13 @@ function lib.doMailProspect()
 	end
 end
 
+function lib.doMailGems()
+	MailFrameTab_OnClick(2)
+	for bag=0,4 do
+		lib.doScanAndUse(bag,"Bags","gems")
+	end	
+end
+
 function lib.doMailDEMats()
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
@@ -337,8 +407,8 @@ function lib.makeMailGUI()
 
 	--local mguimailfor, mguiheader, mguibtmrules
 	-- Text Header
-local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
-	mguiheader:SetText("AutoMagic: Mail GUI")
+	local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
+	mguiheader:SetText("AutoMagic: Mail Loader")
 	mguiheader:SetJustifyH("CENTER")
 	mguiheader:SetWidth(200)
 	mguiheader:SetHeight(10)
@@ -348,6 +418,8 @@ local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYello
 	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
+	
+	
 	-- LEFT COLUMN
 
 	
@@ -356,8 +428,8 @@ local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYello
 	amgui.loadprospect:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 35)
 	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
 		
-local	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
-	mguibtmrules:SetText("Mail by BTM rule")
+	local	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
+	mguibtmrules:SetText("BTM Rule:")
 	mguibtmrules:SetJustifyH("LEFT")
 	mguibtmrules:SetWidth(250)
 	mguibtmrules:SetHeight(10)
@@ -378,12 +450,12 @@ local	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYel
 
 	
 	amgui.loadgems = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadgems:SetText(("DE:Mats2"))
+	amgui.loadgems:SetText(("Gems"))
 	amgui.loadgems:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 35)
-	amgui.loadgems:SetScript("OnClick", lib.doMailDEMats)
+	amgui.loadgems:SetScript("OnClick", lib.doMailGems)
 	
-local	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
-	mguimailfor:SetText("Mail")
+	local	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
+	mguimailfor:SetText("Other:")
 	mguimailfor:SetJustifyH("RIGHT")
 	mguimailfor:SetWidth(220)
 	mguimailfor:SetHeight(10)
@@ -392,7 +464,7 @@ local	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYe
 	amgui.mguimailfor = mguimailfor
 	
 	amgui.loaddemats = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loaddemats:SetText(("DE:Mats1"))
+	amgui.loaddemats:SetText(("Chant Mats"))
 	amgui.loaddemats:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 12)
 	amgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 end 
