@@ -346,7 +346,9 @@ function getReagentPrice(reagentID, extra)
 	if Enchantrix.Settings.GetSetting('fixed.'..reagentID) then
 		myValue = tonumber(Enchantrix.Settings.GetSetting('fixed.'..reagentID..'.value'))
 		if myValue then
-			-- this function can get called by anyone, and must return usable valuess
+			local weight = Enchantrix.Settings.GetSetting("weight."..reagentID) / 100
+			myValue = myValue * weight
+			-- this function can get called by anyone, and must return usable values
 			return myValue,myValue,myValue,myValue,myValue
 		end
 	end
@@ -1067,7 +1069,7 @@ end
 
 -- when you just want to print a message and don't care about the rest
 function Enchantrix.Util.DebugPrintQuick(...)
-	Enchantrix.Util.DebugPrint("General", "Info", "QuickDebug", "QuickDebug:", ... )
+	Enchantrix.Util.DebugPrint("General", ENX_INFO, "QuickDebug", "QuickDebug:", ... )
 end
 
 
