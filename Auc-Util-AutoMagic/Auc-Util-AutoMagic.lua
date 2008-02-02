@@ -34,6 +34,7 @@ local lib,private = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
 local amBTMRule
+local uiErrorMessage
 
 local amgui = CreateFrame("Frame", "", UIParent)
 amgui:Hide()
@@ -192,6 +193,7 @@ local frame = CreateFrame("Frame","")
 	frame:RegisterEvent("MERCHANT_CLOSED");
 	frame:RegisterEvent("MAIL_SHOW");
 	frame:RegisterEvent("MAIL_CLOSED");
+	frame:RegisterEvent("UI_ERROR_MESSAGE");
 
 -- Sets defaults	
 	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
@@ -208,6 +210,7 @@ end
 		if event == "MERCHANT_CLOSED" then lib.merchantClosed() end
 		if event == 'MAIL_SHOW' then lib.mailShow() end  
 		if event == "MAIL_CLOSED" then lib.mailClosed() end
+		if event == "UI_ERROR_MESSAGE" then uiErrorMessage = 1; print("AutoMagic:Debug: UI_ERROR_MESSAGE fired, STOP AUTO LOADING")end
 	end
 
 function private.SetupConfigGui(gui)
@@ -232,6 +235,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
+
 			
 		gui:AddHelp(id, "what is AutoMagic?",
 			"What is AutoMagic?",
@@ -264,6 +268,9 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 	end
 
 	for slot=1,GetContainerNumSlots(bag) do
+	
+	if uiErrorMessage == 1 then return end   -- Return if ui error msg event is fired.
+	
 		if (GetContainerItemLink(bag,slot)) then
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
@@ -327,17 +334,20 @@ end
 
 -- The next few functions just set the bid/list reason check for the scan function depending one why we are using it.		
 function lib.doVendorSell()
+	uiErrorMessage = 0
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","vendor")
 	end
 end
 function lib.doMailDE()
+	uiErrorMessage = 0
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","disenchant") 
 	end
 end
 function lib.doMailProspect()
+	uiErrorMessage = 0
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","prospect")
@@ -345,6 +355,7 @@ function lib.doMailProspect()
 end
 
 function lib.doMailGems()
+	uiErrorMessage = 0
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","gems")
@@ -352,6 +363,7 @@ function lib.doMailGems()
 end
 
 function lib.doMailDEMats()
+	uiErrorMessage = 0
 	MailFrameTab_OnClick(2)
 	for bag=0,4 do
 		lib.doScanAndUse(bag,"Bags","demats")
