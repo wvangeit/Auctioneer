@@ -268,7 +268,7 @@ function private.HookAH()
 			end
 			if (col ~= "") then
 				SortAuctionSetSort("list", col, dir)
-				pagesize=GetNumAuctionItems("list")
+				local pagesize=GetNumAuctionItems("list")
 				if pagesize <= 50 then
 					SortAuctionApplySort("list")
 				elseif pagesize > 50 then
