@@ -140,7 +140,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 end
 
 function private.SetupConfigGui(gui)
-	id = gui:AddTab(lib.libName, lib.libType.." Modules")
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
 
 	gui:AddHelp(id, "what sales stats",
 		"What are sales stats?",
