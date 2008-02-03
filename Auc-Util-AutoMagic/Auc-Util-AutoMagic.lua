@@ -33,11 +33,15 @@ AucAdvanced.Modules[libType][libName] = {}
 local lib,private = AucAdvanced.Modules[libType][libName]
 local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
-local amBTMRule
-local uiErrorMessage
-
-local amgui = CreateFrame("Frame", "", UIParent)
-amgui:Hide()
+local amBTMRule 
+local uiErrorMessage = 0
+function lib.GetName()
+	return libName
+end
+local ammailgui = CreateFrame("Frame", "", UIParent)
+ammailgui:Hide()
+local amautosellgui = CreateFrame("Frame", "", UIParent)
+amautosellgui:Hide()
 
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats
@@ -162,22 +166,46 @@ local isDEMats =
 	[SOUL] = true,
 	[STRANGE] = true,
 }
-	
-function lib.GetName()
-	return libName
+
+autoSellList ={}
+--default("util.automagic.table", {})
+
+function lib.displayMyAutoSellList()
+	print("--------------------Auto Magic--------------------")
+	print("The following information is in your Auto Sell db and will be sold if in your bags and you visit a merchant (if auto sell is enabled)")
+	for itemID, itemName in pairs(autoSellList) do
+		print(itemName,"itemID: ", itemID)
+	end
+	print("--------------------Auto Magic--------------------")
 end
 
+
+function lib.autoSellListClear()
+	print("--------------------Auto Magic--------------------")
+	for itemID, itemName in pairs (autoSellList) do
+		print(itemName,"itemID: ", itemID, "Removed from the table")
+		autoSellList[itemID] = nil
+	end
+	print("All items you manually added to your Auto Sell list have been deleted!")
+	print("--------------------Auto Magic--------------------")
+	--amautosellgui:Hide()
+	--lib.makeAutoSellGUI()
+	--amautosellgui:Show()
+end
+
+
+
 function lib.Processor(callbackType, ...)
-	if (callbackType == "tooltip") then
-		--Called when the tooltip is being drawn.
-		lib.ProcessTooltip(...)
-	elseif (callbackType == "config") then
-		--Called when you should build your Configator tab.
-		private.SetupConfigGui(...)
-	elseif (callbackType == "listupdate") then
-		--Called when the AH Browse screen receives an update.
-	elseif (callbackType == "configchanged") then
-		--Called when your config options (if Configator) have been changed.
+	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
+	elseif (callbackType == "config") then private.SetupConfigGui(...) --Called when you should build your Configator tab.
+	elseif (callbackType == "listupdate") then --Called when the AH Browse screen receives an update.
+	elseif (callbackType == "configchanged") then --Called when your config options (if Configator) have been changed.
+		if (get("util.automagic.autosellgui")) then
+			ConfigatorDialog_2:Hide()
+			lib.autoSellGUI() 
+			set("util.automagic.autosellgui", false) -- Resetting our toggle switch
+		end
+
 	end
 end
 
@@ -202,15 +230,16 @@ local frame = CreateFrame("Frame","")
 	default("util.automagic.autosellgrey", false)
 	default("util.automagic.autocloseenable", false)
 	default("util.automagic.showmailgui", false)
+	default("util.automagic.autosellgui", false) -- Acts as a button and reverts to false anyway
 end
 
 	-- define what event fires what function
 	function lib.onEventDo(this, event)
-		if event == 'MERCHANT_SHOW' then lib.merchantShow() end
-		if event == "MERCHANT_CLOSED" then lib.merchantClosed() end
-		if event == 'MAIL_SHOW' then lib.mailShow() end  
-		if event == "MAIL_CLOSED" then lib.mailClosed() end
-		if event == "UI_ERROR_MESSAGE" then uiErrorMessage = 1; print("AutoMagic:Debug: UI_ERROR_MESSAGE fired, STOP AUTO LOADING")end
+		if event == 'MERCHANT_SHOW' 		then lib.merchantShow() 		end
+		if event == "MERCHANT_CLOSED" 	then lib.merchantClosed() 		end
+		if event == 'MAIL_SHOW' 			then lib.mailShow() 			end  
+		if event == "MAIL_CLOSED" 		then lib.mailClosed() 			end
+		if event == "UI_ERROR_MESSAGE" 	then uiErrorMessage = 1 		end
 	end
 
 function private.SetupConfigGui(gui)
@@ -235,7 +264,7 @@ function private.SetupConfigGui(gui)
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autovendor", "Enable AutoMagic Vendoring (W A R N I N G: READ HELP) ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autosellgrey", "Allow AutoMagic to auto sell grey items in addition to bought for vendor items ")
 		gui:AddControl(id, "Checkbox",		0, 1, 	"util.automagic.autoclosemerchant", "Auto Merchant Window Close(Power user feature READ HELP)")
-
+		gui:AddControl(id, "Checkbox",     0, 1, "util.automagic.autosellgui", "Check the box to view the Auto-Sell configuration GUI")
 			
 		gui:AddHelp(id, "what is AutoMagic?",
 			"What is AutoMagic?",
@@ -289,7 +318,10 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 				end
 			end
 			if amBTMRule == "vendor" then
-				if (get("util.automagic.autosellgrey")) then  
+				if autoSellList[ itemID ] then 
+					print("AutoMagic is selling", itemName," due to being it your custom auto sell list!")
+					UseContainerItem(bag, slot)
+				elseif (get("util.automagic.autosellgrey")) then  
 					if itemRarity == 0 then
 						UseContainerItem(bag, slot)
 						print("AutoMagic has sold", itemName," due to item being grey")
@@ -376,57 +408,63 @@ function lib.mailShow()
 	end
 end
 
---Fires on mail box closed event & hides mailgui
-function lib.mailClosed()
+function lib.mailClosed() --Fires on mail box closed event & hides mailgui
 	lib.makeMailGUI()
-	amgui:Hide()
+	ammailgui:Hide()
 end
 
---Function is called from lib.mailShow()
-function lib.mailGUI()
+function lib.mailGUI() --Function is called from lib.mailShow()
 	lib.makeMailGUI()
-	amgui:Show()
+	ammailgui:Show()
 end
 
+function lib.autoSellGUI() 
+	lib.makeAutoSellGUI()
+	amautosellgui:Show()
+end
+
+function lib.closeAutoSellGUI()
+	amautosellgui:Hide()
+end
 
 --Make mail GUI
 function lib.makeMailGUI()
 	-- Set frame visuals
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	amgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 70)
-	amgui:SetFrameStrata("DIALOG")
-	amgui:SetHeight(90)
-	amgui:SetWidth(220)
-	amgui:SetBackdrop({
+	ammailgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", -25, 70)
+	ammailgui:SetFrameStrata("DIALOG")
+	ammailgui:SetHeight(90)
+	ammailgui:SetWidth(220)
+	ammailgui:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
 		tile = true, tileSize = 32, edgeSize = 32,
 		insets = { left = 9, right = 9, top = 9, bottom = 9 }
 	})
-	amgui:SetBackdropColor(0,0,0, 0.8)
-	amgui:EnableMouse(true)
-	amgui:SetMovable(true)
+	ammailgui:SetBackdropColor(0,0,0, 0.8)
+	ammailgui:EnableMouse(true)
+	ammailgui:SetMovable(true)
 	
-	-- Make highlightable drag ar
-	amgui.Drag = CreateFrame("Button", "", amgui)
-	amgui.Drag:SetPoint("TOPLEFT", amgui, "TOPLEFT", 10,-5)
-	amgui.Drag:SetPoint("TOPRIGHT", amgui, "TOPRIGHT", -10,-5)
-	amgui.Drag:SetHeight(6)
-	amgui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-	amgui.Drag:SetScript("OnMouseDown", function() amgui:StartMoving() end)
-	amgui.Drag:SetScript("OnMouseUp", function() amgui:StopMovingOrSizing() end)
+	-- Make highlightable drag bar
+	ammailgui.Drag = CreateFrame("Button", "", ammailgui)
+	ammailgui.Drag:SetPoint("TOPLEFT", ammailgui, "TOPLEFT", 10,-5)
+	ammailgui.Drag:SetPoint("TOPRIGHT", ammailgui, "TOPRIGHT", -10,-5)
+	ammailgui.Drag:SetHeight(6)
+	ammailgui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+	ammailgui.Drag:SetScript("OnMouseDown", function() ammailgui:StartMoving() end)
+	ammailgui.Drag:SetScript("OnMouseUp", function() ammailgui:StopMovingOrSizing() end)
 	
 
 	--local mguimailfor, mguiheader, mguibtmrules
 	-- Text Header
-	local	mguiheader = amgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
+	local	mguiheader = ammailgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
 	mguiheader:SetText("AutoMagic: Mail Loader")
 	mguiheader:SetJustifyH("CENTER")
 	mguiheader:SetWidth(200)
 	mguiheader:SetHeight(10)
-	mguiheader:SetPoint("TOPLEFT",  amgui, "TOPLEFT", 0, 0)
-	mguiheader:SetPoint("TOPRIGHT", amgui, "TOPRIGHT", 0, 0)
-	amgui.mguiheader = mguiheader
+	mguiheader:SetPoint("TOPLEFT",  ammailgui, "TOPLEFT", 0, 0)
+	mguiheader:SetPoint("TOPRIGHT", ammailgui, "TOPRIGHT", 0, 0)
+	ammailgui.mguiheader = mguiheader
 	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
 	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
@@ -435,24 +473,24 @@ function lib.makeMailGUI()
 	-- LEFT COLUMN
 
 	
-	amgui.loadprospect = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadprospect:SetText(("Prospect"))
-	amgui.loadprospect:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 35)
-	amgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
+	ammailgui.loadprospect = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
+	ammailgui.loadprospect:SetText(("Prospect"))
+	ammailgui.loadprospect:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 35)
+	ammailgui.loadprospect:SetScript("OnClick", lib.doMailProspect)	
 		
-	local	mguibtmrules = amgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
+	local	mguibtmrules = ammailgui:CreateFontString(two, "OVERLAY", "NumberFontNormalYellow")
 	mguibtmrules:SetText("BTM Rule:")
 	mguibtmrules:SetJustifyH("LEFT")
 	mguibtmrules:SetWidth(250)
 	mguibtmrules:SetHeight(10)
-	mguibtmrules:SetPoint("BOTTOMLEFT",  amgui.loadprospect, "TOPLEFT", 0, 0)
-	mguibtmrules:SetPoint("BOTTOMRIGHT", amgui.loadprospect, "TOPRIGHT", 0, 0)
-	amgui.mguibtmrules = mguibtmrules
+	mguibtmrules:SetPoint("BOTTOMLEFT",  ammailgui.loadprospect, "TOPLEFT", 0, 0)
+	mguibtmrules:SetPoint("BOTTOMRIGHT", ammailgui.loadprospect, "TOPRIGHT", 0, 0)
+	ammailgui.mguibtmrules = mguibtmrules
 	
-	amgui.loadde = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadde:SetText(("Disenchant"))
-	amgui.loadde:SetPoint("BOTTOMLEFT", amgui, "BOTTOMLEFT", 12, 12)
-	amgui.loadde:SetScript("OnClick", lib.doMailDE)
+	ammailgui.loadde = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
+	ammailgui.loadde:SetText(("Disenchant"))
+	ammailgui.loadde:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 12)
+	ammailgui.loadde:SetScript("OnClick", lib.doMailDE)
 	
 
 	
@@ -461,27 +499,165 @@ function lib.makeMailGUI()
 	
 
 	
-	amgui.loadgems = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loadgems:SetText(("Gems"))
-	amgui.loadgems:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 35)
-	amgui.loadgems:SetScript("OnClick", lib.doMailGems)
+	ammailgui.loadgems = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
+	ammailgui.loadgems:SetText(("Gems"))
+	ammailgui.loadgems:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 35)
+	ammailgui.loadgems:SetScript("OnClick", lib.doMailGems)
 	
-	local	mguimailfor = amgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
+	local	mguimailfor = ammailgui:CreateFontString(three, "OVERLAY", "NumberFontNormalYellow")
 	mguimailfor:SetText("Other:")
 	mguimailfor:SetJustifyH("RIGHT")
 	mguimailfor:SetWidth(220)
 	mguimailfor:SetHeight(10)
-	mguimailfor:SetPoint("BOTTOMLEFT",  amgui.loadgems, "TOPLEFT", 0, 0)
-	mguimailfor:SetPoint("BOTTOMRIGHT", amgui.loadgems, "TOPRIGHT", 0, 0)
-	amgui.mguimailfor = mguimailfor
+	mguimailfor:SetPoint("BOTTOMLEFT",  ammailgui.loadgems, "TOPLEFT", 0, 0)
+	mguimailfor:SetPoint("BOTTOMRIGHT", ammailgui.loadgems, "TOPRIGHT", 0, 0)
+	ammailgui.mguimailfor = mguimailfor
 	
-	amgui.loaddemats = CreateFrame("Button", "", amgui, "OptionsButtonTemplate")
-	amgui.loaddemats:SetText(("Chant Mats"))
-	amgui.loaddemats:SetPoint("BOTTOMRIGHT", amgui, "BOTTOMRIGHT", -12, 12)
-	amgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
+	ammailgui.loaddemats = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
+	ammailgui.loaddemats:SetText(("Chant Mats"))
+	ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 12)
+	ammailgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 end 
 	
+local amautoselladjustiframeh = 97
+local amautoselladjustiframew = 200
 
+function lib.makeAutoSellGUI()
+--	local totalsells = 0
+--	for k, v in pairs(autoSellList) do
+--		totalsells = totalsells + 1
+--	end
+--	local amautosellguiheightadjust = totalsells * 5
+--	amautoselladjustiframeh = amautoselladjustiframeh + amautosellguiheightadjust
+		
+	-- Set frame visuals
+	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
+	amautosellgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", 12, 12)
+	amautosellgui:SetFrameStrata("DIALOG")
+	amautosellgui:SetHeight(amautoselladjustiframeh)
+	amautosellgui:SetWidth(amautoselladjustiframew)
+	amautosellgui:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 9, right = 9, top = 9, bottom = 9 }
+	})
+	amautosellgui:SetBackdropColor(0,0,0, 0.8)
+	amautosellgui:EnableMouse(true)
+	amautosellgui:SetMovable(true)
+	
+	-- Make highlightable drag ar
+	amautosellgui.Drag = CreateFrame("Button", "amautoselldragslot", amautosellgui)
+	amautosellgui.Drag:SetPoint("TOPLEFT", amautosellgui, "TOPLEFT", 10,-5)
+	amautosellgui.Drag:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", -10,-5)
+	amautosellgui.Drag:SetHeight(6)
+	amautosellgui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+	amautosellgui.Drag:SetScript("OnMouseDown", function() amautosellgui:StartMoving() end)
+	amautosellgui.Drag:SetScript("OnMouseUp", function() amautosellgui:StopMovingOrSizing() end)
+	
+	-- Text Header
+	local	amautosellguiheader = amautosellgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
+	amautosellguiheader:SetText("AutoMagic: Auto Sell Config")
+	amautosellguiheader:SetJustifyH("CENTER")
+	amautosellguiheader:SetWidth(300)
+	amautosellguiheader:SetHeight(10)
+	amautosellguiheader:SetPoint("TOPLEFT",  amautosellgui, "TOPLEFT", 0, 5)
+	amautosellguiheader:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", 0, 0)
+	amautosellgui.amautosellguiheader = amautosellguiheader
+	
+	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
+	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
+	
+	amautosellgui.done = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
+	amautosellgui.done:SetText(("Close"))
+	amautosellgui.done:SetPoint("BOTTOMRIGHT", amautosellgui, "BOTTOMRIGHT", -12, 12)
+	amautosellgui.done:SetScript("OnClick", lib.closeAutoSellGUI)	
+
+	amautosellgui.displayautoselllist = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
+	amautosellgui.displayautoselllist:SetText(("Auto Sell List"))
+	amautosellgui.displayautoselllist:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", -12, -12)
+	amautosellgui.displayautoselllist:SetScript("OnClick", lib.displayMyAutoSellList)
+
+	amautosellgui.displayautoselllistclear = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
+	amautosellgui.displayautoselllistclear:SetText(("Reset AutoSell"))
+	amautosellgui.displayautoselllistclear:SetPoint("TOPRIGHT", amautosellgui.displayautoselllist, "BOTTOMRIGHT", 0, -5)
+	amautosellgui.displayautoselllistclear:SetScript("OnClick", lib.autoSellListClear)	
+	
+	function lib.GetItemByLink(link)
+		local sig
+		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+		assert(itype and itype == "item", "Item must be a valid link")
+			if enchant ~= 0 then
+			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+		elseif factor ~= 0 then
+			sig = ("%d:%d:%d"):format(id, suffix, factor)
+		elseif suffix ~= 0 then
+			sig = ("%d:%d"):format(id, suffix)
+		else
+			sig = tostring(id)
+		end
+	end
+	function lib.amautosellguidraggedin()
+		local objtype, _, itemlink = GetCursorInfo()
+		ClearCursor()
+		if objtype == "item" then
+			lib.GetItemByLink(itemlink)
+		end
+		print(itemlink, " draged into box!")
+		local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemlink) 
+		local _, itemID, _, _, _, _ = decode(itemlink)
+		print( "Added ID ",itemID," | ",itemName," to the Auto Sell db")		
+		autoSellList[itemID] = itemName
+	--	amautosellgui:Hide()
+	--	lib.makeAutoSellGUI()
+	--	amautosellgui:Show()
+	end
+
+	-- drag item to slot 
+	amautosellgui.item = CreateFrame("Button", "", amautosellgui)
+	amautosellgui.item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
+	amautosellgui.item:SetPoint("TOPLEFT", amautosellgui, "TOPLEFT", 35, -35)
+	amautosellgui.item:SetHeight(37)
+	amautosellgui.item:SetWidth(37)
+	amautosellgui.item:SetScript("OnClick", lib.amautosellguidraggedin)
+	amautosellgui.item:SetScript("OnReceiveDrag", lib.amautosellguidraggedin)	
+	
+--[[		-- Set defaults for the following for ... do loop
+		local amautosellleftright = -15; local amautosellupdown = -5; local amautosellleftright2 = amautosellleftright; local amautosellupdown2 = amautosellupdown; local amautoselltestwidth = 0; local amautosellloopcount = 1; local newwidth = 0
+		-- This loop prints out items in the auto sell list, tests the size of the string and makes the gui wider if it won't if.
+		for itemIDS, itemName in pairs(autoSellList) do
+			local amautosellguitextloop = amautosellgui:CreateFontString("testtext"..itemIDS, "OVERLAY", "NumberFontNormalYellow")
+			
+			if (amautosellloopcount == 1) then
+				amautosellguitextloop:SetPoint("TOPLEFT", amautosellgui.item, "BOTTOMLEFT", amautosellleftright, amautosellupdown)
+			else
+				amautosellguitextloop:SetPoint("TOPLEFT", amautosellgui.item, "BOTTOMLEFT", amautosellleftright2, amautosellupdown2)
+			end
+			
+		--	function dothis()
+		--	print("do this")
+		--	end
+			
+			amautosellguitextloop:SetWidth(350)
+			amautosellguitextloop:SetJustifyH("LEFT")
+			amautosellguitextloop:SetText(itemName)
+			--amautosellguitextloop:SetScript("OnClick", dothis)
+			amautoselltestwidth = amautosellguitextloop:GetStringWidth();
+			
+			if (amautoselladjustiframew - 40 < amautoselltestwidth) then  
+				newwidth = amautoselltestwidth +40
+				amautoselladjustiframew = newwidth
+				amautosellgui:Hide()
+				lib.makeAutoSellGUI()
+				amautosellgui:Show()
+			end 
+			amautosellupdown2 = amautosellupdown2 -13			
+			amautosellloopcount = amautosellloopcount + 1
+			
+			amautosellleftright2 = amautosellleftright2
+
+		end]]
+end 
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 
