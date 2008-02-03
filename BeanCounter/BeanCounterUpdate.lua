@@ -116,7 +116,7 @@ function private.UpgradeDatabaseVersion()
 			
 end
 
---[[This changes the database to use ; and to replace itemNames with and itemlink]]--
+--[[This changes the database to use ; and to replace itemNames with itemlink]]--
 function private.updateTo1_02A() 
 	--: to ; and itemName to itemlink
 	for player, v in pairs(private.serverData) do
@@ -219,7 +219,7 @@ function private.updateTo1_05()
 	private.updateTo1_06()
 end
 
---[[This adds the ItemID array allowing plain text searches to search via aitemID search routine]]--
+--[[This adds the ItemID array allowing plain text searches to search via itemID search routine]]--
 function private.updateTo1_06()
 	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} end
 	for player, v in pairs(private.serverData)do
@@ -237,6 +237,7 @@ function private.updateTo1_06()
 		end
 	private.serverData[player]["version"] = 1.07 --Since this is actually the 1.07 change item:lower()
 	end
+	private.updateTo1_075() --Skip 1_07 it was fixed in 1_06 as well
 end
 
 --[[This changes the ItemID array to store names in lower case, needed to easily allow exact match, We also add faction table]]--
@@ -286,6 +287,7 @@ function private.updateTo1_08()
 		end
 	private.serverData[player]["version"] = 1.08
 	end
+	private.updateTo1_09()
 end
 
 --[[Update the completedBids/Buyouts table to also include stack sizes]]
@@ -326,6 +328,7 @@ function private.updateTo1_09()
 		end
 		private.serverData[player]["version"] = 1.09
 	end
+	private.updateTo1_10()
 end
 --[[Correct Bug in 1.09 =, we accidently added a extra stack field for completedbids/buyouts. This update looks over the table and removes that extra data to stop errors on sorting.]]
 function private.updateTo1_10()
@@ -341,6 +344,7 @@ function private.updateTo1_10()
 		end
 		private.serverData[player]["version"] = 1.10
 	end
+	private.updateTo1_11A()
 end
 --[[Updates expired auctions table to hold new values  buy, bid, deposit cost]]
 function private.updateTo1_11A()
