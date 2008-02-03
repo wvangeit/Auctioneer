@@ -38,6 +38,7 @@ local onLoad
 local pickupInventoryItemHook
 local useContainerItemHook
 local spellTargetItemHook
+local useItemByNameHook
 local onEvent
 
 Enchantrix.Version = "<%version%>"
@@ -98,6 +99,7 @@ function addonLoaded(hookArgs, event, addOnName)
 	hooksecurefunc("UseContainerItem", useContainerItemHook)
 	hooksecurefunc("PickupInventoryItem", pickupInventoryItemHook)
 	hooksecurefunc("SpellTargetItem", spellTargetItemHook)
+	hooksecurefunc("UseItemByName", useItemByNameHook);			-- added in 2.0, used by macro /use 
 
 	-- events that we need to catch
 	Stubby.RegisterEventHook("UNIT_SPELLCAST_SUCCEEDED", "Enchantrix", onEvent)
@@ -240,6 +242,7 @@ function ENX_OnTooltipSetItem()
 end
 
 function pickupInventoryItemHook(slot)
+	--Enchantrix.Util.DebugPrintQuick("pickupInventoryItemHook", slot);
 	-- Remember last activated item
 	if (not UnitCastingInfo("player")) then
 		if slot then
@@ -251,6 +254,7 @@ end
 
 function useContainerItemHook(bag, slot)
 	-- Remember last activated item
+	--Enchantrix.Util.DebugPrintQuick("usecontaineritemhook", bag, slot);
 	if (not UnitCastingInfo("player")) then
 		if bag and slot then
 			DisenchantEvent.spellTarget = GetContainerItemLink(bag, slot)
@@ -261,6 +265,21 @@ end
 
 function spellTargetItemHook(itemString)
 	-- Remember targeted item
+	--Enchantrix.Util.DebugPrintQuick("targetitemhook", itemString);
+	if (not UnitCastingInfo("player")) then
+		if itemString then
+			local _, itemLink = GetItemInfo(itemString)
+			if itemLink then
+				DisenchantEvent.spellTarget = itemLink
+				DisenchantEvent.targetted = GetTime()
+			end
+		end
+	end
+end
+
+function useItemByNameHook(itemString)
+	-- Remember targeted item
+	--Enchantrix.Util.DebugPrintQuick("useItemByNameHook", itemString);
 	if (not UnitCastingInfo("player")) then
 		if itemString then
 			local _, itemLink = GetItemInfo(itemString)
@@ -327,7 +346,7 @@ function onEvent(funcVars, event, player, spell, rank, target)
 
 	elseif event == "UNIT_SPELLCAST_SENT" then
 		-- NOTE: we do get the spell name here
-		if spell == _ENCH('ArgSpellname') then
+		if spell == _ENCH('ArgSpellname') or spell == _ENCH('ArgSpellProspectingName') then
 			if (DisenchantEvent.spellTarget and GetTime() - DisenchantEvent.targetted < 10) then
 				DisenchantEvent.sent = true;
 			end
