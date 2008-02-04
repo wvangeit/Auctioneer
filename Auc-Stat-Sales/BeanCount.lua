@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: BeanCount.lua 2530 2007-11-18 22:18:59Z Kinesia $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced module that does something nifty.
@@ -153,4 +153,4 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "Toggle display of stats from the Sales module on or off")
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Stat-Sales/BeanCount.lua $", "$Rev: 2530 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

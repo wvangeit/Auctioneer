@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - Price Level Utility module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: Undercut.lua 2537 2007-11-19 01:55:03Z speeddymon $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an Auctioneer Advanced Matcher module that returns an undercut price 
@@ -146,4 +146,4 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This will add the number of successes and failures for that item to Appraiser's right-hand panel")
 end
 
-AucAdvanced.RegisterRevision("$URL: http://dev.norganna.org/auctioneer/trunk/Auc-Match-Undercut/Undercut.lua $", "$Rev: 2537 $")
+AucAdvanced.RegisterRevision("$URL$", "$Rev$")

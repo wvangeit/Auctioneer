@@ -1,7 +1,7 @@
 --[[
 	Auctioneer Advanced - AucClassic Statistics module
 	Version: <%version%> (<%codename%>)
-	Revision: $Id: StatStdDev.lua 2534 2007-11-18 23:36:10Z speeddymon $
+	Revision: $Id$
 	URL: http://auctioneeraddon.com/
 
 	This is an addon for World of Warcraft that adds statistical history to the auction data that is collected

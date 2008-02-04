@@ -3,7 +3,7 @@
 ## Dependancies: Auc-Advanced BeanCounter
 ##
 ## Version: <%version%> (<%codename%>)
-## Revision: $Id: Auc-Stat-Sales.toc 2467 2007-11-13 21:59:01Z Kinesia $
+## Revision: $Id$
 ## URL: http://auctioneeraddon.com/
 ##
 Embed.xml
