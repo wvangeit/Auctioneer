@@ -186,6 +186,7 @@ end
 
 function lib.OnLoad()
 -- Create a dummy frame for catching events
+lib.slidebar()
 local frame = CreateFrame("Frame","")
 	frame:SetScript("OnEvent", lib.onEventDo);
 	frame:RegisterEvent("MERCHANT_SHOW");
@@ -275,6 +276,7 @@ function lib.doScanAndUse(bag,bagType,amBTMRule)
 			local _,itemCount = GetContainerItemInfo(bag,slot)
 			local itemLink = GetContainerItemLink(bag,slot)
 			local _, itemID, _, _, _, _ = decode(itemLink)
+			if (itemLink == nil) then return end
 			local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink) 
 			if amBTMRule == "demats" then	
 				if isDEMats[ itemID ] then
@@ -399,6 +401,29 @@ function lib.closeAutoSellGUI()
 	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 end
 
+--Slidebar 
+function lib.autosellslidebar()
+		lib.autoSellGUI() 
+end
+
+local sideIcon
+function lib.slidebar()
+	if LibStub then
+		local SlideBar = LibStub:GetLibrary("SlideBar", true)
+		if SlideBar then
+			sideIcon = SlideBar.AddButton("AutoSell", "Interface\\AddOns\\Auc-Util-AutoMagic\\Images\\slidebar")
+			sideIcon:RegisterForClicks("LeftButtonUp","RightButtonUp")
+			sideIcon:SetScript("OnClick", lib.autosellslidebar)
+			sideIcon.tip = {
+				"AutoMagic: Auto Sell Config",
+				"",
+				"{{Click}} ~Configure your Auto Sell items~",
+				
+			}
+		end
+	end
+end
+
 --Make mail GUI
 function lib.makeMailGUI()
 	-- Set frame visuals
@@ -490,7 +515,8 @@ end
 local wrkname;  local wrkid
 local myworkingtable = {}
 function lib.setWorkingItem(setname, setid)
-
+	if (setid == nil and setname == nil) then return end
+	if (setid == nil) then setid = setname end
 	local wrkname, wrklink, wrkrarity, wrklevel, wrkMinLevel, wrkType, wrkSubType, wrkStackCount, wrkEquipLoc, wrkTexture = GetItemInfo(setid)
 	local _, wrkid, _, _, _, _ = decode(wrklink)
 	autosellframe.workingname:SetText(wrkname)
@@ -568,23 +594,26 @@ function lib.autoSellIconDrag()
 	if objtype == "item" then
 		lib.GetItemByLink(itemlink)
 	end
+	if (itemlink == nil) then return end
 	local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemlink) 
 	local _, itemID, _, _, _, _ = decode(itemlink)
 	lib.setWorkingItem(itemName, itemID)
 end
 
 
-	function lib.ClickLinkHook(_, _, _, link, button)
-		if (autosellframe:IsVisible()) then
-			if link then
-				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
-				local item_Name, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemID) 				
-				if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
-				lib.setWorkingItem(itemName, itemID)
-				end
+function lib.ClickLinkHook(_, _, _, link, button)
+	if (autosellframe:IsVisible()) then
+		if link then
+			local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+			if (itemID == nil) then return end
+			local item_Name, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemID) 				
+			if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
+			--print(itemName, itemID, "@ click hook to working")
+			lib.setWorkingItem(itemName, itemID)
 			end
 		end
 	end
+end
 	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
 
 local autoselldata = {}	
@@ -593,6 +622,7 @@ function lib.populateDataSheet()
 		for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 		
 		for column1, column2 in pairs(autoSellList) do
+			if (column1 == nil) then return end
 			local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(column1)
 			table.insert(autoselldata,{
 						itemLink, --col2(itemname)as link form for mouseover tooltips to work
@@ -612,6 +642,7 @@ function lib.populateBagSheet()
 				local _,itemCount = GetContainerItemInfo(bag,slot)
 				local itemLink = GetContainerItemLink(bag,slot)
 				local _, itemID, _, _, _, _ = decode(itemLink)
+				if (itemLink == nil) then return end
 				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
 				bagcontents[itemID] = itemName	
 			end
@@ -619,6 +650,7 @@ function lib.populateBagSheet()
 	end
 	for k, v in pairs(bagcontentsnodups) do bagcontentsnodups[k] = nil; end --Reset 'data' table to ensure fresh data.
 	for col1, col2 in pairs(bagcontents) do 
+		if (col1 == nil) then return end
 		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(col1)
 		table.insert(bagcontentsnodups,{
 		itemLink, --col2(itemname)as link form for mouseover tooltips to work
@@ -674,12 +706,11 @@ function autosell.OnLeave(button, row, index)
 end
 	
 function autosell.OnClick(button, row, index)
+	if (linkfromenter == nil) then return end
 	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(linkfromenter)
 	local _, itemID, _, _, _, _ = decode(linkfromenter)
 	lib.setWorkingItem(itemName, itemID)
 end	
-
-
 
 function lib.makeautosellgui()
 	autosellframe:SetFrameStrata("HIGH")
@@ -765,7 +796,7 @@ function lib.makeautosellgui()
 	autosellframe.additem:SetScript("OnClick", autosellframe.additemtolist)
 	
 	autosellframe.additem.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	autosellframe.additem.help:SetPoint("TOPLEFT", autosellframe.additem, "TOPRIGHT", 2, 7)
+	autosellframe.additem.help:SetPoint("TOPLEFT", autosellframe.additem, "TOPRIGHT", 1, 1)
 	autosellframe.additem.help:SetText(("(to Auto Sell list)")) 
 	autosellframe.additem.help:SetWidth(90)
 		
@@ -776,9 +807,9 @@ function lib.makeautosellgui()
 	autosellframe.removeitem:SetScript("OnClick", autosellframe.removeitemfromlist)
 	
 	autosellframe.removeitem.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	autosellframe.removeitem.help:SetPoint("TOPLEFT", autosellframe.removeitem, "TOPRIGHT", 2, 7)
+	autosellframe.removeitem.help:SetPoint("TOPLEFT", autosellframe.removeitem, "TOPRIGHT", 1, 1)
 	autosellframe.removeitem.help:SetText(("(from Auto Sell list)")) 
-	autosellframe.removeitem.help:SetWidth(100)
+	autosellframe.removeitem.help:SetWidth(90)
 	
 	--Create the autosell list results frame
 	autosellframe.resultlist = CreateFrame("Frame", nil, autosellframe)
