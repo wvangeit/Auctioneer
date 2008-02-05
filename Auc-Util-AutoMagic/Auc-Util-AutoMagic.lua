@@ -31,17 +31,17 @@ local libType = "Util"
 
 AucAdvanced.Modules[libType][libName] = {}
 local lib,private = AucAdvanced.Modules[libType][libName]
-local private = {}
 local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.GetModuleLocals()
-local amBTMRule 
+local amBTMRule, itemName, itemID
 local uiErrorMessage = 0
 function lib.GetName()
 	return libName
 end
-local ammailgui = CreateFrame("Frame", "", UIParent)
-ammailgui:Hide()
-local amautosellgui = CreateFrame("Frame", "", UIParent)
-amautosellgui:Hide()
+local ammailgui = CreateFrame("Frame", "", UIParent); ammailgui:Hide()
+local autosellframe = CreateFrame("Frame", "autosellframe", UIParent); autosellframe:Hide()
+local autoselldata = {}
+local autosell = {}
+autoSellList ={}
 
 -- Setting mats and gems itemID's to something understandable 
 -- enchant mats
@@ -167,41 +167,12 @@ local isDEMats =
 	[STRANGE] = true,
 }
 
-autoSellList ={}
---default("util.automagic.table", {})
-
-function lib.displayMyAutoSellList()
-	print("--------------------Auto Magic--------------------")
-	print("The following information is in your Auto Sell db and will be sold if in your bags and you visit a merchant (if auto sell is enabled)")
-	for itemID, itemName in pairs(autoSellList) do
-		print(itemName,"itemID: ", itemID)
-	end
-	print("--------------------Auto Magic--------------------")
-end
-
-
-function lib.autoSellListClear()
-	print("--------------------Auto Magic--------------------")
-	for itemID, itemName in pairs (autoSellList) do
-		print(itemName,"itemID: ", itemID, "Removed from the table")
-		autoSellList[itemID] = nil
-	end
-	print("All items you manually added to your Auto Sell list have been deleted!")
-	print("--------------------Auto Magic--------------------")
-	--amautosellgui:Hide()
-	--lib.makeAutoSellGUI()
-	--amautosellgui:Show()
-end
-
-
-
 function lib.Processor(callbackType, ...)
 	if (callbackType == "tooltip") then lib.ProcessTooltip(...) --Called when the tooltip is being drawn.
-	elseif (callbackType == "config") then private.SetupConfigGui(...) --Called when you should build your Configator tab.
+	elseif (callbackType == "config") then lib.SetupConfigGui(...) --Called when you should build your Configator tab.
 	elseif (callbackType == "listupdate") then --Called when the AH Browse screen receives an update.
 	elseif (callbackType == "configchanged") then --Called when your config options (if Configator) have been changed.
 		if (get("util.automagic.autosellgui")) then
-			ConfigatorDialog_2:Hide()
 			lib.autoSellGUI() 
 			set("util.automagic.autosellgui", false) -- Resetting our toggle switch
 		end
@@ -242,7 +213,7 @@ end
 		if event == "UI_ERROR_MESSAGE" 	then uiErrorMessage = 1 		end
 	end
 
-function private.SetupConfigGui(gui)
+function lib.SetupConfigGui(gui)
 	local id = gui:AddTab(libName)
 	gui:MakeScrollable(id)
 		gui:AddHelp(id, "what is AutoMagic?",
@@ -419,12 +390,14 @@ function lib.mailGUI() --Function is called from lib.mailShow()
 end
 
 function lib.autoSellGUI() 
-	lib.makeAutoSellGUI()
-	amautosellgui:Show()
+	if (autosellframe:IsVisible()) then return end
+	lib.makeautosellgui()
+	autosellframe:Show()		
 end
 
 function lib.closeAutoSellGUI()
-	amautosellgui:Hide()
+	autosellframe:Hide()
+	Stubby.UnregisterFunctionHook("ChatFrame_OnHyperlinkShow", lib.ClickLinkHook)
 end
 
 --Make mail GUI
@@ -454,8 +427,6 @@ function lib.makeMailGUI()
 	ammailgui.Drag:SetScript("OnMouseDown", function() ammailgui:StartMoving() end)
 	ammailgui.Drag:SetScript("OnMouseUp", function() ammailgui:StopMovingOrSizing() end)
 	
-
-	--local mguimailfor, mguiheader, mguibtmrules
 	-- Text Header
 	local	mguiheader = ammailgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
 	mguiheader:SetText("AutoMagic: Mail Loader")
@@ -467,12 +438,7 @@ function lib.makeMailGUI()
 	ammailgui.mguiheader = mguiheader
 	
 	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
-	
-	
 	-- LEFT COLUMN
-
-	
 	ammailgui.loadprospect = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
 	ammailgui.loadprospect:SetText(("Prospect"))
 	ammailgui.loadprospect:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 35)
@@ -492,13 +458,7 @@ function lib.makeMailGUI()
 	ammailgui.loadde:SetPoint("BOTTOMLEFT", ammailgui, "BOTTOMLEFT", 12, 12)
 	ammailgui.loadde:SetScript("OnClick", lib.doMailDE)
 	
-
-	
-	
 	--RIGHT COLUMN
-	
-
-	
 	ammailgui.loadgems = CreateFrame("Button", "", ammailgui, "OptionsButtonTemplate")
 	ammailgui.loadgems:SetText(("Gems"))
 	ammailgui.loadgems:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 35)
@@ -518,146 +478,361 @@ function lib.makeMailGUI()
 	ammailgui.loaddemats:SetPoint("BOTTOMRIGHT", ammailgui, "BOTTOMRIGHT", -12, 12)
 	ammailgui.loaddemats:SetScript("OnClick", lib.doMailDEMats)
 end 
-	
-local amautoselladjustiframeh = 97
-local amautoselladjustiframew = 200
 
-function lib.makeAutoSellGUI()
---	local totalsells = 0
---	for k, v in pairs(autoSellList) do
---		totalsells = totalsells + 1
---	end
---	local amautosellguiheightadjust = totalsells * 5
---	amautoselladjustiframeh = amautoselladjustiframeh + amautosellguiheightadjust
+function lib.autoSellListClear()
+	for itemID, itemName in pairs (autoSellList) do
+		autoSellList[itemID] = nil
+	end	
+	lib.populateDataSheet()
+	lib.populateBagSheet()
+	autosellframe.ClearIcon()
+end
+
+local wrkname;  local wrkid
+local myworkingtable = {}
+function lib.setWorkingItem(setname, setid)
+
+	local wrkname, wrklink, wrkrarity, wrklevel, wrkMinLevel, wrkType, wrkSubType, wrkStackCount, wrkEquipLoc, wrkTexture = GetItemInfo(setid)
+	local _, wrkid, _, _, _, _ = decode(wrklink)
+	autosellframe.workingname:SetText(wrkname)
+	autosellframe.slot:SetTexture(wrkTexture)
+	for k, n in pairs(myworkingtable) do	
+		myworkingtable[k] = nil
+	end
+	myworkingtable = {}
+	for k, n in pairs(myworkingtable) do
+		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
+	end
+	myworkingtable[wrkid] = wrkname
+end
+
+function autosellframe.removeitemfromlist()
+	for k, n in pairs(myworkingtable) do
+		autoSellList[k] = nil
+		myworkingtable[k] = nil
+	end
+	myworkingtable = {}
+	lib.populateDataSheet()
+	lib.populateBagSheet()
+	autosellframe.ClearIcon()
+	for k, n in pairs(myworkingtable) do
+		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
+	end
+end
+
+function autosellframe.additemtolist()
+	for k, n in pairs(myworkingtable) do
+		autoSellList[k] = n
+		myworkingtable[k] = nil
+	end
+	myworkingtable = {}
+	lib.populateDataSheet()
+	lib.populateBagSheet()
+	autosellframe.ClearIcon()
+	for k, n in pairs(myworkingtable) do
+		print(k,n, "AutoMagic: Debug: You should not have this message, if you do please report this error along with what you did to recieve it (please be detailed[include specific items] as to the exact point it apeared)")
+	end
+end
+
+function autosellframe.ClearIcon()
+	autosellframe.workingname:SetText("Item Name")
+	autosellframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+	wrkname = nil	
+	wrkid = nil
+end
+
+function autosellframe.IconClicked()
+	autosellframe.ClearIcon()
+end 
+
+function lib.GetItemByLink(link)
+	local sig
+	local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+
+	assert(itype and itype == "item", "Item must be a valid link")
+
+	if enchant ~= 0 then
+		sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+	elseif factor ~= 0 then
+		sig = ("%d:%d:%d"):format(id, suffix, factor)
+	elseif suffix ~= 0 then
+		sig = ("%d:%d"):format(id, suffix)
+	else
+		sig = tostring(id)
+	end
+end
+
+
+function lib.autoSellIconDrag()
+	local objtype, _, itemlink = GetCursorInfo()
+	ClearCursor()
+	if objtype == "item" then
+		lib.GetItemByLink(itemlink)
+	end
+	local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemlink) 
+	local _, itemID, _, _, _, _ = decode(itemlink)
+	lib.setWorkingItem(itemName, itemID)
+end
+
+Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
+	function lib.ClickLinkHook(_, _, _, link, button)
+		if (autosellframe:IsVisible()) then
+			if link then
+				local itemID, itemName = link:match("^|c%x+|Hitem:(.-):.*|h%[(.+)%]")
+				local item_Name, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemID) 				
+				if (button == "LeftButton") then --and (IsAltKeyDown()) and itemName then -- Commented mod key, I want to catch any item clicked.
+				lib.setWorkingItem(itemName, itemID)
+				end
+			end
+		end
+	end
+	Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
+
+local autoselldata = {}	
+
+function lib.populateDataSheet()
+		for k, v in pairs(autoselldata) do autoselldata[k] = nil; end --Reset table to ensure fresh data.
 		
-	-- Set frame visuals
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	amautosellgui:SetPoint("BOTTOMLEFT", "SendMailFrame", "BOTTOMRIGHT", 12, 12)
-	amautosellgui:SetFrameStrata("DIALOG")
-	amautosellgui:SetHeight(amautoselladjustiframeh)
-	amautosellgui:SetWidth(amautoselladjustiframew)
-	amautosellgui:SetBackdrop({
+		for column1, column2 in pairs(autoSellList) do
+			local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(column1)
+			table.insert(autoselldata,{
+						itemLink, --col2(itemname)as link form for mouseover tooltips to work
+						column1, --itemid
+						}) 
+		end
+		autosellframe.resultlist.sheet:SetData(autoselldata, style) --Set the GUI scrollsheet
+end
+
+local bagcontents = {}; local bagcontentsnodups = {}
+
+function lib.populateBagSheet()
+	for k, v in pairs(bagcontents) do bagcontents[k] = nil; end --Reset table to ensure fresh data.
+	for bag=0,4 do
+		for slot=1,GetContainerNumSlots(bag) do
+			if (GetContainerItemLink(bag,slot)) then
+				local _,itemCount = GetContainerItemInfo(bag,slot)
+				local itemLink = GetContainerItemLink(bag,slot)
+				local _, itemID, _, _, _, _ = decode(itemLink)
+				local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemLink)
+				bagcontents[itemID] = itemName	
+			end
+		end
+	end
+	for k, v in pairs(bagcontentsnodups) do bagcontentsnodups[k] = nil; end --Reset 'data' table to ensure fresh data.
+	for col1, col2 in pairs(bagcontents) do 
+		local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(col1)
+		table.insert(bagcontentsnodups,{
+		itemLink, --col2(itemname)as link form for mouseover tooltips to work
+		col1, --itemid
+		}) 
+	end 
+	autosellframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
+end
+local linkfromenter = "emptylink"
+local namefromenter = "emptyname"
+function autosell.OnBagListEnter(button, row, index)
+	local link, name
+	link = autosellframe.baglist.sheet.rows[row][index]:GetText() or "FAILED LINK"
+	if link:match("^(|c%x+|H.+|h%[.+%])") then
+		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
+	end
+	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+	if autosellframe.baglist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		if link and name then
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
+		else
+			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
+		end
+	end		
+	namefromenter = name
+	linkfromenter= link
+end
+
+function autosell.OnEnter(button, row, index)
+	local link, name
+	link = autosellframe.resultlist.sheet.rows[row][index]:GetText() or "FAILED LINK"
+	if link:match("^(|c%x+|H.+|h%[.+%])") then
+		name = string.match(link, "^|c%x+|H.+|h%[(.+)%]")
+	end
+	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
+	if autosellframe.resultlist.sheet.rows[row][index]:IsShown()then --Hide tooltip for hidden cells
+		if link and name then
+			GameTooltip:SetHyperlink(link)
+			if (EnhTooltip) then EnhTooltip.TooltipCall(GameTooltip, name, link, -1, 1) end
+		else
+			GameTooltip:SetText("Unable to get Tooltip Info", 1.0, 1.0, 1.0)
+		end
+	end		
+	namefromenter = name
+	linkfromenter= link
+end
+	
+function autosell.OnLeave(button, row, index)
+	GameTooltip:Hide()
+	linkfromenter = "emptylink"
+	namefromenter = "emptyname"
+end
+	
+function autosell.OnClick(button, row, index)
+	local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(linkfromenter)
+	local _, itemID, _, _, _, _ = decode(linkfromenter)
+	lib.setWorkingItem(itemName, itemID)
+end	
+
+function lib.makeautosellgui()
+	autosellframe:SetFrameStrata("HIGH")
+	autosellframe:SetBackdrop({
+		bgFile = "Interface/Tooltips/ChatBubble-Background",
+		edgeFile = "Interface/Tooltips/ChatBubble-BackDrop",
+		tile = true, tileSize = 32, edgeSize = 32,
+		insets = { left = 32, right = 32, top = 32, bottom = 32 }
+	})
+	autosellframe:SetBackdropColor(0,0,0, 1)
+	autosellframe:Hide()
+	
+	autosellframe:SetPoint("CENTER", UIParent, "CENTER")
+	autosellframe:SetWidth(834.5)
+	autosellframe:SetHeight(450)
+	
+	autosellframe:SetMovable(true)
+	autosellframe:EnableMouse(true)
+	autosellframe.Drag = CreateFrame("Button", nil, autosellframe)
+	autosellframe.Drag:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 10,-5)
+	autosellframe.Drag:SetPoint("TOPRIGHT", autosellframe, "TOPRIGHT", -10,-5)
+	autosellframe.Drag:SetHeight(6)
+	autosellframe.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+	autosellframe.Drag:SetScript("OnMouseDown", function() autosellframe:StartMoving() end)
+	autosellframe.Drag:SetScript("OnMouseUp", function() autosellframe:StopMovingOrSizing() end)
+	
+	autosellframe.DragBottom = CreateFrame("Button",nil, autosellframe)
+	autosellframe.DragBottom:SetPoint("BOTTOMLEFT", autosellframe, "BOTTOMLEFT", 10,5)
+	autosellframe.DragBottom:SetPoint("BOTTOMRIGHT", autosellframe, "BOTTOMRIGHT", -10,5)
+	autosellframe.DragBottom:SetHeight(6)
+	autosellframe.DragBottom:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
+
+	autosellframe.DragBottom:SetScript("OnMouseDown", function() autosellframe:StartMoving() end)
+	autosellframe.DragBottom:SetScript("OnMouseUp", function() autosellframe:StopMovingOrSizing() end)
+	
+	local	autoselltitle = autosellframe:CreateFontString(asuftitle, "OVERLAY", "GameFontNormalLarge")
+	autoselltitle:SetText("AutoMagic: Auto Sell Config")
+	autoselltitle:SetJustifyH("CENTER")
+	autoselltitle:SetWidth(300)
+	autoselltitle:SetHeight(10)
+	autoselltitle:SetPoint("TOPLEFT",  autosellframe, "TOPLEFT", 0, -17)
+	autosellframe.autoselltitle = aautoselltitle
+
+	--Close Button
+	autosellframe.closeButton = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	autosellframe.closeButton:SetPoint("BOTTOMRIGHT", autosellframe, "BOTTOMRIGHT", -10, 10)
+	autosellframe.closeButton:SetText(("Close"))
+	autosellframe.closeButton:SetScript("OnClick",  lib.closeAutoSellGUI)
+	
+	local SelectBox = LibStub:GetLibrary("SelectBox")
+	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
+		
+	autosellframe.slot = autosellframe:CreateTexture(nil, "BORDER")
+	autosellframe.slot:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 23, -75)
+	autosellframe.slot:SetWidth(45)
+	autosellframe.slot:SetHeight(45)
+	autosellframe.slot:SetTexCoord(0.15, 0.85, 0.15, 0.85)
+	autosellframe.slot:SetTexture("Interface\\Buttons\\UI-EmptySlot")
+
+	autosellframe.icon = CreateFrame("Button", nil, autosellframe)
+	autosellframe.icon:SetPoint("TOPLEFT", autosellframe.slot, "TOPLEFT", 3, -3)
+	autosellframe.icon:SetWidth(38)
+	autosellframe.icon:SetHeight(38)
+	autosellframe.icon:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square.blp")
+	autosellframe.icon:SetScript("OnClick", autosellframe.IconClicked)
+	autosellframe.icon:SetScript("OnReceiveDrag", lib.autoSellIconDrag)
+	
+	autosellframe.slot.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	autosellframe.slot.help:SetPoint("LEFT", autosellframe.slot, "RIGHT", 2, 7)
+	autosellframe.slot.help:SetText(("Drop item into box")) --"Drop item into box to search."
+	autosellframe.slot.help:SetWidth(100)
+
+	autosellframe.workingname = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	autosellframe.workingname:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 15, -135)
+	autosellframe.workingname:SetText(("")) 
+	autosellframe.workingname:SetWidth(90)
+
+	--Add Item to list button	
+	autosellframe.additem = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	autosellframe.additem:SetPoint("TOPLEFT", autosellframe, "TOPLEFT", 10, -160)
+	autosellframe.additem:SetText(('Add Item'))
+	autosellframe.additem:SetScript("OnClick", autosellframe.additemtolist)
+	
+	autosellframe.additem.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	autosellframe.additem.help:SetPoint("TOPLEFT", autosellframe.additem, "TOPRIGHT", 2, 7)
+	autosellframe.additem.help:SetText(("(to Auto Sell list)")) 
+	autosellframe.additem.help:SetWidth(90)
+		
+	--Remove Item from list button	
+	autosellframe.removeitem = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	autosellframe.removeitem:SetPoint("TOPLEFT", autosellframe.additem, "BOTTOMLEFT", 0, -20)
+	autosellframe.removeitem:SetText(('Remove Item'))
+	autosellframe.removeitem:SetScript("OnClick", autosellframe.removeitemfromlist)
+	
+	autosellframe.removeitem.help = autosellframe:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	autosellframe.removeitem.help:SetPoint("TOPLEFT", autosellframe.removeitem, "TOPRIGHT", 2, 7)
+	autosellframe.removeitem.help:SetText(("(from Auto Sell list)")) 
+	autosellframe.removeitem.help:SetWidth(100)
+	
+	--Create the autosell list results frame
+	autosellframe.resultlist = CreateFrame("Frame", nil, autosellframe)
+	autosellframe.resultlist:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
 		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
-		tile = true, tileSize = 32, edgeSize = 32,
-		insets = { left = 9, right = 9, top = 9, bottom = 9 }
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
 	})
-	amautosellgui:SetBackdropColor(0,0,0, 0.8)
-	amautosellgui:EnableMouse(true)
-	amautosellgui:SetMovable(true)
 	
-	-- Make highlightable drag ar
-	amautosellgui.Drag = CreateFrame("Button", "amautoselldragslot", amautosellgui)
-	amautosellgui.Drag:SetPoint("TOPLEFT", amautosellgui, "TOPLEFT", 10,-5)
-	amautosellgui.Drag:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", -10,-5)
-	amautosellgui.Drag:SetHeight(6)
-	amautosellgui.Drag:SetHighlightTexture("Interface\\FriendsFrame\\UI-FriendsFrame-HighlightBar")
-	amautosellgui.Drag:SetScript("OnMouseDown", function() amautosellgui:StartMoving() end)
-	amautosellgui.Drag:SetScript("OnMouseUp", function() amautosellgui:StopMovingOrSizing() end)
+	autosellframe.resultlist:SetBackdropColor(0, 0, 0.0, 0.5)
+	autosellframe.resultlist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 187, 417.5)
+	autosellframe.resultlist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 492, 0)
+	autosellframe.resultlist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
 	
-	-- Text Header
-	local	amautosellguiheader = amautosellgui:CreateFontString(one, "OVERLAY", "NumberFontNormalYellow")
-	amautosellguiheader:SetText("AutoMagic: Auto Sell Config")
-	amautosellguiheader:SetJustifyH("CENTER")
-	amautosellguiheader:SetWidth(300)
-	amautosellguiheader:SetHeight(10)
-	amautosellguiheader:SetPoint("TOPLEFT",  amautosellgui, "TOPLEFT", 0, 5)
-	amautosellguiheader:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", 0, 0)
-	amautosellgui.amautosellguiheader = amautosellguiheader
+	autosellframe.resetList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	autosellframe.resetList:SetPoint("TOP", autosellframe.resultlist, "BOTTOM", 0, -15)
+	autosellframe.resetList:SetText(("Reset List"))
+	autosellframe.resetList:SetScript("OnClick", lib.autoSellListClear)
 	
-	-- [name of frame]:SetPoint("[relative to point on my frame]","[frame we want to be relative to]","[point on relative frame]",-left/+right, -down/+up)
-	--Make buttons -- Need slightly longer buttons or get text overlays worked out to better describe function
+	autosellframe.resultlist.sheet = ScrollSheet:Create(autosellframe.resultlist, {
+		{ ('Auto Selling:'), "TOOLTIP", 170 }, 
+		{ ('ID #'), "TEXT", 25 }, 
+	}, autosell.OnEnter, autosell.OnLeave, autosell.OnClick) 
 	
-	amautosellgui.done = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
-	amautosellgui.done:SetText(("Close"))
-	amautosellgui.done:SetPoint("BOTTOMRIGHT", amautosellgui, "BOTTOMRIGHT", -12, 12)
-	amautosellgui.done:SetScript("OnClick", lib.closeAutoSellGUI)	
+	lib.populateDataSheet()
+	
+	--Create the bag contents frame
+	autosellframe.baglist = CreateFrame("Frame", nil, autosellframe)
+	autosellframe.baglist:SetBackdrop({
+		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+		edgeFile = "Interface/Tooltips/UI-Tooltip-Border",
+		tile = true, tileSize = 32, edgeSize = 16,
+		insets = { left = 5, right = 5, top = 5, bottom = 5 }
+	})
+	
+	autosellframe.baglist:SetBackdropColor(0, 0, 0.0, 0.5)
 
-	amautosellgui.displayautoselllist = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
-	amautosellgui.displayautoselllist:SetText(("Auto Sell List"))
-	amautosellgui.displayautoselllist:SetPoint("TOPRIGHT", amautosellgui, "TOPRIGHT", -12, -12)
-	amautosellgui.displayautoselllist:SetScript("OnClick", lib.displayMyAutoSellList)
-
-	amautosellgui.displayautoselllistclear = CreateFrame("Button", "", amautosellgui, "OptionsButtonTemplate")
-	amautosellgui.displayautoselllistclear:SetText(("Reset AutoSell"))
-	amautosellgui.displayautoselllistclear:SetPoint("TOPRIGHT", amautosellgui.displayautoselllist, "BOTTOMRIGHT", 0, -5)
-	amautosellgui.displayautoselllistclear:SetScript("OnClick", lib.autoSellListClear)	
+	autosellframe.baglist:SetPoint("TOPLEFT", autosellframe, "BOTTOMLEFT", 518, 417.5)
+	autosellframe.baglist:SetPoint("TOPRIGHT", autosellframe, "TOPLEFT", 823, 0)
+	autosellframe.baglist:SetPoint("BOTTOM", autosellframe, "BOTTOM", 0, 57)
 	
-	function lib.GetItemByLink(link)
-		local sig
-		local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
-		assert(itype and itype == "item", "Item must be a valid link")
-			if enchant ~= 0 then
-			sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
-		elseif factor ~= 0 then
-			sig = ("%d:%d:%d"):format(id, suffix, factor)
-		elseif suffix ~= 0 then
-			sig = ("%d:%d"):format(id, suffix)
-		else
-			sig = tostring(id)
-		end
-	end
-	function lib.amautosellguidraggedin()
-		local objtype, _, itemlink = GetCursorInfo()
-		ClearCursor()
-		if objtype == "item" then
-			lib.GetItemByLink(itemlink)
-		end
-		print(itemlink, " draged into box!")
-		local itemName, _, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture = GetItemInfo(itemlink) 
-		local _, itemID, _, _, _, _ = decode(itemlink)
-		print( "Added ID ",itemID," | ",itemName," to the Auto Sell db")		
-		autoSellList[itemID] = itemName
-	--	amautosellgui:Hide()
-	--	lib.makeAutoSellGUI()
-	--	amautosellgui:Show()
-	end
-
-	-- drag item to slot 
-	amautosellgui.item = CreateFrame("Button", "", amautosellgui)
-	amautosellgui.item:SetNormalTexture("Interface\\Buttons\\UI-Slot-Background")
-	amautosellgui.item:SetPoint("TOPLEFT", amautosellgui, "TOPLEFT", 35, -35)
-	amautosellgui.item:SetHeight(37)
-	amautosellgui.item:SetWidth(37)
-	amautosellgui.item:SetScript("OnClick", lib.amautosellguidraggedin)
-	amautosellgui.item:SetScript("OnReceiveDrag", lib.amautosellguidraggedin)	
+	autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
+	autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
+	autosellframe.bagList:SetText(("Scan Bags"))
+	autosellframe.bagList:SetScript("OnClick", lib.populateBagSheet)
 	
---[[		-- Set defaults for the following for ... do loop
-		local amautosellleftright = -15; local amautosellupdown = -5; local amautosellleftright2 = amautosellleftright; local amautosellupdown2 = amautosellupdown; local amautoselltestwidth = 0; local amautosellloopcount = 1; local newwidth = 0
-		-- This loop prints out items in the auto sell list, tests the size of the string and makes the gui wider if it won't if.
-		for itemIDS, itemName in pairs(autoSellList) do
-			local amautosellguitextloop = amautosellgui:CreateFontString("testtext"..itemIDS, "OVERLAY", "NumberFontNormalYellow")
-			
-			if (amautosellloopcount == 1) then
-				amautosellguitextloop:SetPoint("TOPLEFT", amautosellgui.item, "BOTTOMLEFT", amautosellleftright, amautosellupdown)
-			else
-				amautosellguitextloop:SetPoint("TOPLEFT", amautosellgui.item, "BOTTOMLEFT", amautosellleftright2, amautosellupdown2)
-			end
-			
-		--	function dothis()
-		--	print("do this")
-		--	end
-			
-			amautosellguitextloop:SetWidth(350)
-			amautosellguitextloop:SetJustifyH("LEFT")
-			amautosellguitextloop:SetText(itemName)
-			--amautosellguitextloop:SetScript("OnClick", dothis)
-			amautoselltestwidth = amautosellguitextloop:GetStringWidth();
-			
-			if (amautoselladjustiframew - 40 < amautoselltestwidth) then  
-				newwidth = amautoselltestwidth +40
-				amautoselladjustiframew = newwidth
-				amautosellgui:Hide()
-				lib.makeAutoSellGUI()
-				amautosellgui:Show()
-			end 
-			amautosellupdown2 = amautosellupdown2 -13			
-			amautosellloopcount = amautosellloopcount + 1
-			
-			amautosellleftright2 = amautosellleftright2
+	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
+		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
+		{ ('ID #'), "TEXT", 25 }, 
+	}, autosell.OnBagListEnter, autosell.OnLeave, autosell.OnClick) 
+	
+	lib.populateBagSheet()
+end
 
-		end]]
-end 
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 
