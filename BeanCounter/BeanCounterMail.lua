@@ -85,7 +85,7 @@ end
 
 function private.getInvoice(n,sender, subject)
 	if (sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse')) then
-		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..":%s")) or (string.match( subject , _BC('MailAuctionWonSubject')..":%s")) then
+		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")) or (string.match( subject , _BC('MailAuctionWonSubject')..".-:.-(%w.*)")) then
 			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n);
 			if  playerName then
 				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
@@ -159,10 +159,10 @@ function private.mailSort()
 		--debugPrint("mail sort")
 		
 		if (private.reconcilePending[i]["sender"] == _BC('MailAllianceAuctionHouse')) or (private.reconcilePending[i]["sender"] == _BC('MailHordeAuctionHouse')) then
-			if string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
+			if string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..".-:.*") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
 				debugPrint("Auction successful: ", i)
 				--Get itemID from database
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..":%s(.*)" )
+				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then  --Get the Bid and stack size if possible
 					local stack, bid = private.findStackcompletedAuctions("postedAuctions", itemID, private.reconcilePending[i]["deposit"], private.reconcilePending[i]["buyout"], private.reconcilePending[i]["time"]) 
@@ -171,8 +171,8 @@ function private.mailSort()
 				end
 				table.remove(private.reconcilePending, i)
 				
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..":%s")then
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..":%s(.*)" )
+			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..".-:.*")then
+				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionExpiredSubject')..".-:.-(%w.*)")
 				local itemID, itemLink = private.matchDB("postedAuctions", itemName)
 				if itemID then    
 					local _, _, stackSecondary, _, _ = GetInboxItem(i)
@@ -183,10 +183,10 @@ function private.mailSort()
 				end
 				table.remove(private.reconcilePending,i)
 			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..":%s") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
+			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..".-:.*") and (private.reconcilePending[i]["retrieved"] == "yes" or private.reconcilePending[i]["retrieved"] == "failed") then
 				
 				--debugPrint("Auction WON", private.reconcilePending[i]["retrieved"])
-				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..":%s(.*)" )
+				local itemName = string.match(private.reconcilePending[i]["subject"], _BC('MailAuctionWonSubject')..".-:.-(%w.*)")
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 	
 				--try to get itemID from bids, if not then buyouts. One of these DB MUST have it
@@ -201,10 +201,10 @@ function private.mailSort()
 				end				
 				table.remove(private.reconcilePending,i)			
 			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject').."%s") then
+			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject')..".-:.*") then
 				debugPrint("Outbid on ")
 				
-				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject').."%s(.*)" )
+				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject')..".-:.-(%w.*)")
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 				
 				if itemID then
@@ -214,7 +214,7 @@ function private.mailSort()
 				 
 				table.remove(private.reconcilePending,i)
 			--Need localization			
-			elseif string.match(private.reconcilePending[i]["subject"], "Sale Pending:%s") then
+			elseif string.match(private.reconcilePending[i]["subject"], "Sale Pending:.-:.*") then
 				debugPrint("Sale Pending: " )	--ignore We dont care about this message
 				table.remove(private.reconcilePending,i)
 			else

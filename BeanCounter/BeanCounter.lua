@@ -271,7 +271,7 @@ function lib.externalSearch(name, settings, queryReturn, count)
 		local frame = private.frame
 		--the function getItemInfo will return a plain text name on itemID or itemlink searches and nil if a plain text search is passed
 		local itemName, itemlink = private.getItemInfo(name, "itemid")
-		if not itemlink then itemName, itemlink = name end
+		if not itemlink then itemName, itemlink = tostring(name) end
 		
 		if not settings then
 			settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = frame.classicCheck:GetChecked(), 

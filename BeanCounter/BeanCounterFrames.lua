@@ -389,8 +389,9 @@ function private.CreateFrames()
 	frame.resultlist:SetPoint("TOPLEFT", frame, "BOTTOMLEFT", 187, 417.5)
 	frame.resultlist:SetPoint("TOPRIGHT", frame, "BOTTOMRIGHT", 3, 0)
 	frame.resultlist:SetPoint("BOTTOM", frame, "BOTTOM", 0, 37)
+	
 	--Scripts that are executed when we mouse over a TOOLTIP frame	
-	function BeanCounter.OnEnter(button, row, index)
+	function private.scrollSheetOnEnter(button, row, index)
 		--print("row",row, "index", index)
 		--print(frame.resultlist.sheet.rows[row][index]:GetText())
 		local link, name
@@ -408,10 +409,9 @@ function private.CreateFrames()
 			end
 		end			
         end
-	function BeanCounter.OnLeave(button, row, index)
+	function private.scrollSheetOnLeave(button, row, index)
 			GameTooltip:Hide()
 	end
-	
 	--localize UI text
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
@@ -430,7 +430,7 @@ function private.CreateFrames()
 		{ _BC("UiFee"), "COIN", 50 }, 
 		{ _BC('UiWealth'), "COIN", 70 }, 
 		{ _BC('UiDateHeader'), "text", 250 },
-	}, BeanCounter.OnEnter, BeanCounter.OnLeave)
+	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave)
 		
 	--[[ADDED THIS FUNCTION TO CONFIGURATOR
 	-Lengthen the Column Headers for non English localizations.
