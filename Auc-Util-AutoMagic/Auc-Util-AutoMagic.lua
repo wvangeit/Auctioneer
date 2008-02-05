@@ -390,8 +390,7 @@ function lib.mailGUI() --Function is called from lib.mailShow()
 end
 
 function lib.autoSellGUI() 
-	if (autosellframe:IsVisible()) then return end
-	lib.makeautosellgui()
+	if (autosellframe:IsVisible()) then autosellframe:Hide() end
 	autosellframe:Show()		
 end
 
@@ -574,7 +573,7 @@ function lib.autoSellIconDrag()
 	lib.setWorkingItem(itemName, itemID)
 end
 
-Stubby.RegisterFunctionHook("ChatFrame_OnHyperlinkShow", -50, lib.ClickLinkHook)
+
 	function lib.ClickLinkHook(_, _, _, link, button)
 		if (autosellframe:IsVisible()) then
 			if link then
@@ -679,6 +678,8 @@ function autosell.OnClick(button, row, index)
 	local _, itemID, _, _, _, _ = decode(linkfromenter)
 	lib.setWorkingItem(itemName, itemID)
 end	
+
+
 
 function lib.makeautosellgui()
 	autosellframe:SetFrameStrata("HIGH")
@@ -822,7 +823,8 @@ function lib.makeautosellgui()
 	
 	autosellframe.bagList = CreateFrame("Button", nil, autosellframe, "OptionsButtonTemplate")
 	autosellframe.bagList:SetPoint("TOP", autosellframe.baglist, "BOTTOM", 0, -15)
-	autosellframe.bagList:SetText(("Scan Bags"))
+	autosellframe.bagList:SetText(("Re-Scan Bags"))
+	--autosellframe.bagList:Disable()
 	autosellframe.bagList:SetScript("OnClick", lib.populateBagSheet)
 	
 	autosellframe.baglist.sheet = ScrollSheet:Create(autosellframe.baglist, {
@@ -832,8 +834,7 @@ function lib.makeautosellgui()
 	
 	lib.populateBagSheet()
 end
-
-
+lib.makeautosellgui()
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
 
 
