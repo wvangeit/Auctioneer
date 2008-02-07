@@ -75,6 +75,8 @@ if not lib then return end
 
 local kit={}
 
+lib.data = {}
+
 local function findFunction(self, index)
 	return kit[index]
 end
@@ -92,11 +94,12 @@ function lib:New(base)
 	local proxy = newproxy(true)
 	local mt = getmetatable(proxy)
 
-	mt.base = base
 	mt.__len = kit.GetNumGroups
 	mt.__sub = kit.RemoveGroup
 	mt.__call = kit.GetGroup
 	mt.__index = findFunction
+
+	lib.data[proxy] = base
 
 	-- Return the data
 	return proxy
@@ -105,7 +108,7 @@ setmetatable(lib, { __call = lib.New })
 
 -- Insert the items on the stack as a group into the storage
 function kit:InsertGroup(...)
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	local pos = #base
 	local len = select('#', ...)
 	table.insert(base.index, pos)
@@ -119,7 +122,7 @@ end
 
 -- Remove specified group from the storage, shifting all higher groups down
 function kit:RemoveGroup(group)
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	local max = #base.index / 2
 	group = tonumber(group)
 	assert(group, "Must specify a group number")
@@ -140,7 +143,7 @@ end
 
 -- Fetch the start, end and length of a specified group (for direct access)
 function kit:GetGroupRange(group)
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	local max = #base.index / 2
 	group = tonumber(group)
 	assert(group, "Must specify a group number")
@@ -156,7 +159,7 @@ end
 -- Return the specified group on the stack
 function kit:GetGroup(group, ...)
 	if not group or group <= 0 then return kit.InsertGroup(self, ...) end
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	local max = #base.index / 2
 	group = tonumber(group)
 	assert(group, "Must specify a group number")
@@ -170,7 +173,7 @@ end
 
 -- Return the number of groups
 function kit:GetNumGroups()
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	return #base.index / 2
 end
 
@@ -181,7 +184,7 @@ end
 
 -- Clear all groups from the entire storage array
 function kit:Clear()
-	local base = rawget(getmetatable(self),'base')
+	local base = lib.data[self]
 	while #base.index > 0 do table.remove(base.index) end
 	while #base > 0 do table.remove(base) end
 
