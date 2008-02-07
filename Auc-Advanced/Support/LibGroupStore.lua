@@ -179,7 +179,7 @@ end
 
 -- Return a reference to the base object (for saves)
 function kit:GetBase()
-	return getmetatable(self).base
+	return lib.data[self]
 end
 
 -- Clear all groups from the entire storage array
