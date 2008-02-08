@@ -793,7 +793,7 @@ Commitfunction = function()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
 	CommitRunning = false 
-	if not private.curScan then
+	if not private.curQuery then
 		private.ResetAll()
 	end
 end
