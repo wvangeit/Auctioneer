@@ -1283,6 +1283,8 @@ function private.OnUpdate(me, dur)
 				return
 			end
 		end
+		recycle(private.NoOwnerList) 
+		private.NoOwnerList = nil
 		private.scanDelay = nil
 	end
 	if coroutine.status(CoStore) == "suspended" and AuctionFrame and AuctionFrame:IsVisible() then
