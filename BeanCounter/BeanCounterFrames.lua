@@ -690,7 +690,7 @@ function private.CreateFrames()
 
 					tonumber(tbl[7]), --bid
 					tonumber(tbl[6]), --buyout
-					tonumber(tbl[3]), --money,
+					tonumber(0), --money,
 					tonumber(stack),  --stacksize
 					pricePer, --Profit/per
 
