@@ -85,6 +85,8 @@ function private.UpgradeDatabaseVersion()
 	if not BeanCounterDB[private.realmName][private.playerName]["faction"] then --typo corrected in revision 2747 that prevented faction from recording
 		BeanCounterDB[private.realmName][private.playerName]["faction"] = private.faction
 	end
+	--Recreate the itemID array if for some reason user lacks it.
+	if not BeanCounterDB["ItemIDArray"] then BeanCounterDB["ItemIDArray"] = {} private.refreshItemIDArray() end
 	
 	if private.playerData["version"] < 1.015 then
 		private.updateTo1_02A()

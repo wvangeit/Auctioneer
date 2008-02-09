@@ -160,7 +160,6 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName]["failedBids"]  = {}
 		
 		BeanCounterDB[private.realmName][private.playerName]["mailbox"] = {}
-		
 	end
 	
 	
@@ -373,6 +372,23 @@ local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSub
 	
 	elseif itemName and itemTexture  and (cmd == "name") then
 		return itemName, itemTexture
+	end
+end
+--Recreate/refresh ItemIName to ItemID array
+function private.refreshItemIDArray()
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if type(data) == "table" then
+				for itemID, value in pairs(data) do
+					for index, text in ipairs(value) do
+						local item = text:match("^|c%x+|H.+|h%[(.+)%].-;.*")
+						if item then
+							BeanCounterDB["ItemIDArray"][item:lower()] = itemID
+						end
+					end
+				end
+			end
+		end
 	end
 end
 
