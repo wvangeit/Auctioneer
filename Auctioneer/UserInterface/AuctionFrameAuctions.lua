@@ -234,11 +234,11 @@ function setAuctionDuration(duration, persist)
 	local durationIndex
 	if (duration >= 1 and duration <= 3) then
 		durationIndex = duration
-	elseif (duration == 120) then
+	elseif (duration == 720) then
 		durationIndex = 1
-	elseif (duration == 480) then
-		durationIndex = 2
 	elseif (duration == 1440) then
+		durationIndex = 2
+	elseif (duration == 2880) then
 		durationIndex = 3
 	else
 		debugPrint("setAuctionDuration(): invalid duration "..duration, DebugLib.Level.Error)
