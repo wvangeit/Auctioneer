@@ -157,7 +157,11 @@ function lib.PrintList()
 			local itemID, itemsuffix, itemenchant = strsplit(":", itemkey)
 			itemkey = strjoin(":", "item", itemID, itemenchant, 0, 0, 0, 0, itemsuffix)
 			local _, itemlink = GetItemInfo(itemkey)
-			BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+			if itemlink then
+				BtmScan.Print(itemlink.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+			else
+				BtmScan.Print("Item not in cache: "..itemkey.."  "..BtmScan.GSC(itemConfig.buyBelow, 1))
+			end
 		end
 	end
 end
