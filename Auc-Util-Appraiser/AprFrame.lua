@@ -368,6 +368,11 @@ function private.CreateFrames()
 		if curModel == "fixed" then
 			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
+			if match then
+				local BidPercent = newBid/newBuy
+				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, newBuy)
+				newBid = newBuy * BidPercent
+			end
 		elseif curModel == "market" then
 			if match then
 				local _
@@ -810,7 +815,7 @@ function private.CreateFrames()
 		frame.salebox.totalbid:SetText("Total Bid:    "..EnhTooltip.GetTextGSC(totalBid, true))
 		frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
 		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
-		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel) and (curModel ~= "fixed")) then
+		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
 			local MatchStringList = {strsplit("\n", MatchString)}
 			for i in pairs(MatchStringList) do
 				frame.manifest.lines:Add((MatchStringList[i]))
@@ -888,6 +893,7 @@ function private.CreateFrames()
 		or frame.salebox.buy.modelvalue ~= curBuy
 		then
 			curModel = "fixed"
+			frame.salebox.matcher:SetChecked(False)
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".model", curModel)
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid", curBid)
 			AucAdvanced.Settings.SetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy", curBuy)
