@@ -334,8 +334,10 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	
 	if algorithm == "market" then
 		priceArray.price, priceArray.seen = lib.GetMarketValue(itemLink, faction, realm)
-	else
+	elseif type(algorithm) == "string" then
 		_, _, priceArray = lib.GetAlgorithmValue(algorithm, itemLink, faction, realm)
+	else
+		priceArray.price = algorithm
 	end
 		
 	local InfoString = ""
