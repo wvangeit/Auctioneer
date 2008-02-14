@@ -326,7 +326,7 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 	-- This algorithm is currently less than adequate.
 
 	local matchers = lib.GetMatchers(itemLink)
-	local total, count, diff = 0, 0, 0
+	local total, count, diff, _ = 0, 0, 0
 
 	faction = faction or AucAdvanced.GetFaction()
 	realm = realm or GetRealmName()
