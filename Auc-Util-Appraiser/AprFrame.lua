@@ -369,6 +369,7 @@ function private.CreateFrames()
 			newBuy = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.buy")
 			newBid = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".fixed.bid")
 			if match then
+				local _
 				local BidPercent = newBid/newBuy
 				newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(frame.salebox.link, newBuy)
 				newBid = newBuy * BidPercent
