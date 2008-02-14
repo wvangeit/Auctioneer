@@ -263,11 +263,30 @@ function lib.populateSnatchSheet()
 		local _, itemlink, _, _, _, _, _, _, _, _ = GetItemInfo(key)
 		local a, b, c = BtmScan.GetGSC(ibelow)
 		local ibelow = strjoin('', a, "g ", b, "s ", c, "c")
-		table.insert(displaysnatchtable,{
-			itemlink, --col2(itemname)as link form for mouseover tooltips to work
-			ibelow, --btm rule
-			key, --itemid
-		}) 
+		if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+			table.insert(displaysnatchtable,{
+				itemlink, --col2(itemname)as link form for mouseover tooltips to work
+				ibelow, --btm rule
+				key, --itemid
+			}) 
+		else
+			local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(key, true)
+			if newBuy == nil then newBuy = newBid end
+			if newBuy == nil then newBuy = "Not Available" end
+			if not(newBuy == "Not Available") then
+				newBuy = math.floor(tonumber(newBuy) or 0)
+				local g = math.floor(newBuy / 10000)
+				local s = math.floor(newBuy % 10000 / 100)
+				local c = newBuy % 100
+				newBuy = strjoin('',g,"g ",s,"s ",c,"c")
+			end
+			table.insert(displaysnatchtable,{
+				itemlink, --col2(itemname)as link form for mouseover tooltips to work
+				ibelow, --btm rule
+				newBuy, --Appraisers buyout value
+				key, --itemid
+			}) 
+		end
 	end
 		
 	snatchconfigframe.snatchlist.sheet:SetData(displaysnatchtable, style) --Set the GUI scrollsheet
@@ -513,11 +532,30 @@ function lib.populateDataSheet()
 		if (col1 == nil) then return end
 		local	iName, iRule = strsplit('|', col2)
 		local _, itemLink, _, _, _, _, _, _, _, _ = GetItemInfo(col1)
-		table.insert(bagcontentsnodups,{
-		itemLink, --col2(itemlink) for mouseover tooltips to work
-		iRule, --btm rule
-		col1, --itemid
-		}) 
+		if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+			table.insert(bagcontentsnodups,{
+				itemLink, --col2(itemlink) for mouseover tooltips to work
+				iRule, --btm rule
+				col1, --itemid
+			}) 
+		else
+			local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(col1, true)
+			if newBuy == nil then newBuy = newBid end
+			if newBuy == nil then newBuy = "Not Available" end
+			if not(newBuy == "Not Available") then
+				newBuy = math.floor(tonumber(newBuy) or 0)
+				local g = math.floor(newBuy / 10000)
+				local s = math.floor(newBuy % 10000 / 100)
+				local c = newBuy % 100
+				newBuy = strjoin('',g,"g ",s,"s ",c,"c")
+			end
+			table.insert(bagcontentsnodups,{
+				itemLink, --col2(itemlink) for mouseover tooltips to work
+				newBuy, --Appraisers buyout value
+				iRule, --btm rule
+				col1, --itemid
+			}) 
+		end
 	end 
 	snatchconfigframe.baglist.sheet:SetData(bagcontentsnodups, style) --Set the GUI scrollsheet
 	lib.populateSnatchSheet()
@@ -626,11 +664,20 @@ function lib.makesnatchgui()
 	snatchconfigframe.bagscan:SetText(("Refresh Data"))
 	snatchconfigframe.bagscan:SetScript("OnClick", lib.populateDataSheet)
 	
-	snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
-		{ ('Bag Contents:'), "TOOLTIP", 170 }, 
+	if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
+		{ ('Bag Contents:'), "TOOLTIP", 150 }, 
 		{ ('BTM Rule'), "TEXT", 25 }, 
 		{ ('ID #'), "TEXT", 25 }, 
-	}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClick)
+		}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClick)
+	else
+		snatchconfigframe.baglist.sheet = ScrollSheet:Create(snatchconfigframe.baglist, {
+		{ ('Bag Contents:'), "TOOLTIP", 150 }, 
+		{ ('Appraiser:'), "TEXT", 25 }, 
+		{ ('BTM Rule'), "TEXT", 25 }, 
+		{ ('ID #'), "TEXT", 25 }, 
+		}, snatch.OnBagListEnter, snatch.OnLeave, snatch.OnClick)
+	end
 		
 	--Create the snatch list results frame
 	snatchconfigframe.snatchlist = CreateFrame("Frame", nil, snatchconfigframe)
@@ -722,13 +769,20 @@ function lib.makesnatchgui()
 	snatchconfigframe.resetList:SetText(("Reset List"))
 	snatchconfigframe.resetList:SetScript("OnClick", lib.snatchListClear)
 	
-	snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
-		{ ('Snatching:'), "TOOLTIP", 170 }, 
+	if (AucAdvanced == nil or AucAdvanced.Modules.Util.Appraiser == nil or not AucAdvanced.Modules.Util.Appraiser)  then
+		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
+		{ ('Snatching:'), "TOOLTIP", 150 }, 
 		{ ('Buy Below:'), "TEXT", 25 }, 
 		{ ('ID #'), "TEXT", 25 }, 
-	}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClick) 
-
-
+		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClick) 
+	else
+		snatchconfigframe.snatchlist.sheet = ScrollSheet:Create(snatchconfigframe.snatchlist, {
+		{ ('Snatching:'), "TOOLTIP", 150 }, 
+		{ ('Buy Below:'), "TEXT", 25 }, 
+		{ ('Appraiser:'), "TEXT", 25 }, 
+		{ ('ID #'), "TEXT", 25 }, 
+		}, snatch.OnSnatchEnter, snatch.OnLeave, snatch.OnClick) 
+	end
 	lib.populateSnatchSheet()
 end
 lib.makesnatchgui()
