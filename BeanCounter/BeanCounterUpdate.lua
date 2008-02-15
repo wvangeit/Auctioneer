@@ -115,7 +115,14 @@ function private.UpgradeDatabaseVersion()
 	elseif private.playerData["version"] < 1.11 then
 		private.updateTo1_11A()
 	end	
-			
+	
+	--Integrity checks of the DB after upgrades to make sure no invalid entries remain
+	if not private.getOption("util.beancounter.integrityCheckComplete") then 
+		private.integrityCheck(true) 
+	elseif not private.getOption("util.beancounter.integrityCheck") then
+		private.integrityCheck()
+	end
+	
 end
 
 --[[This changes the database to use ; and to replace itemNames with itemlink]]--
@@ -391,3 +398,145 @@ function private.updateTo1_11B()
 		private.serverData[player]["version"] = 1.11
 	end
 end
+
+
+
+
+
+
+--[[INTEGRITY CHECKS]]--
+--Make sure the DB format is correct removing any entries that were missed by updating.
+--To be run after every DB update
+ function private.integrityCheck(complete)
+	local tbl,text = {}, nil
+	for player,data in pairs(private.serverData) do
+		for itemID ,values in pairs(private.serverData[player]["postedAuctions"]) do
+			--"|cffffffff|Hitem:24401:0:0:0:0:0:0:1518857512|h[Unidentified Plant Parts]|h|r; 1 ; 3599;3980;1440;222;1200446651;12072651", -- [1]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 8 or (complete and private.IC(tbl, "postedAuctions")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the postedAuctions database")
+					if #values == 1 then
+						private.serverData[player]["postedAuctions"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["postedAuctions"][itemID], i)
+					end	
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["postedBuyouts"]) do
+			--"|cff1eff00|Hitem:7475:0:0:0:0:0:1024:1250482484|h[Regal Cuffs of the Whale]|h|r;1;9484;Imyourpal;boolean true;4;1198790630;5725595", -- [1]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 8 or (complete and private.IC(tbl, "postedBuyouts")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the postedBuyouts database")
+					if #values == 1 then
+						private.serverData[player]["postedBuyouts"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["postedBuyouts"][itemID], i)
+						
+					end
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["postedBids"]) do
+			--"|cff1eff00|Hitem:7924:248:0:0:0:0:0:1436734832|h[Mithril Scale Bracers]|h|r;1;6454;Dviyan;boolean false;4;1198790141;7968164", -- [6]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 8 or (complete and private.IC(tbl, "postedBids")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the postedBids database")
+					if #values == 1 then
+						private.serverData[player]["postedBids"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["postedBids"][itemID], i)
+					end
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["failedAuctions"]) do
+			--"|cffffffff|Hitem:10285:0:0:0:0:0:0:0|h[Shadow Silk]|h|r;Auction expired;1;1673;1499;150;1198835637;7800679", -- [1]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 8 or (complete and private.IC(tbl, "failedAuctions")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the failedAuctions database")
+					if #values == 1 then
+						private.serverData[player]["failedAuctions"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["failedAuctions"][itemID], i)
+					end
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["failedBids"]) do
+			--"|cff1eff00|Hitem:14242:0:0:0:0:0:785:1026408052|h[Darkmist Pants of the Owl]|h|r;Outbid;6019;1198804515;7146455", -- [1]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 5 or (complete and private.IC(tbl, "failedBids")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the failedBids database")
+					if #values == 1 then
+						private.serverData[player]["failedBids"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["failedBids"][itemID], i)
+					end
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["completedAuctions"]) do
+			--"|cffffffff|Hitem:11176:0:0:0:0:0:0:-22442025|h[Dream Dust]|h|r;Auction successful;10;38000;0;2000;40000;36599;Nitehawkx;1200703508;9777695", -- [35]
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 11 or (complete and private.IC(tbl, "completedAuctions")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the completedAuctions database")
+					if #values == 1 then
+						private.serverData[player]["completedAuctions"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["completedAuctions"][itemID], i)
+					end
+				end
+			end
+		end
+		for itemID ,values in pairs(private.serverData[player]["completedBids/Buyouts"]) do
+			for i = #values, 1, -1 do
+				text = values[i]
+				local tbl = private.unpackString(text)
+				if #tbl ~= 10 or (complete and private.IC(tbl, "completedBids/Buyouts")) then
+					print("BeanCounter is removing corupted entry",tbl[1],"from the completedBids/Buyouts database")
+					if #values == 1 then
+						private.serverData[player]["completedBids/Buyouts"][itemID] = nil
+					else
+						table.remove(private.serverData[player]["completedBids/Buyouts"][itemID], i)
+					end
+				end
+				
+			end
+		end
+	end
+	private.setOption("util.beancounter.integrityCheckComplete", true)
+	private.setOption("util.beancounter.integrityCheck", true)
+end
+local integrity = {}
+	integrity["completedBids/Buyouts"] = {"string", "string", "number", "number", "number", "number", "number", "string", "number", "number" } --10
+	integrity["completedAuctions"] = {"string", "string", "number", "number", "number", "number", "number", "number", "string", "number", "number"}--11
+	integrity["failedBids"] = {"string", "string", "number", "number", "number"} --5
+	integrity["failedAuctions"] = {"string", "string", "number", "number", "number", "number", "number", "number"} --8
+	integrity["postedBids"] = {"string", "number", "number", "string", "string", "number", "number", "number" } --8
+	integrity["postedBuyouts"] = {"string", "number", "number", "string", "string", "number", "number", "number" } --8
+	integrity["postedAuctions"] = {"string", "number", "number", "number", "number", "number" ,"number", "number"} --8
+function private.IC(tbl, DB)
+		for i,v in pairs(tbl) do
+			v = tonumber(v) or v
+			if type(v) ~= integrity[DB][i] then
+				return true
+			end
+		end
+		return false
+	end
+
+
+

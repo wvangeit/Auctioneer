@@ -87,6 +87,9 @@ private.settingDefaults = {
 	["util.beancounter.ButtonAuctionFailedCheck"] = false,	
 
 	["util.beancounter.activated"] = true,
+	["util.beancounter.integrityCheckComplete"] = false,
+	["util.beancounter.integrityCheck"] = true,
+	
 	["util.beancounter.debug"] = false,
 	["util.beancounter.debugMail"] = true,
 	["util.beancounter.debugCore"] = true,
