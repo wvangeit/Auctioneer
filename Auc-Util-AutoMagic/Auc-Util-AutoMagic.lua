@@ -181,6 +181,22 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost, additional)
+	
+	if (AucAdvanced and BtmScan) then
+		local itemid, itemsuffix, itemenchant, itemseed = BtmScan.BreakLink(hyperlink)
+		local itemsig = (":"):join(itemid, itemsuffix, itemenchant)
+		local ttdepcost= AucAdvanced.Post.GetDepositAmount(itemsig, quantity) 
+		--ttdepcost = 20
+		if (ttdepcost == 0 or ttdepcost == nil) then 
+			EnhTooltip.AddLine("|cff336699 No or unknown deposit cost |r")	
+		else
+			ttdepcost = ttdepcost * 2
+			local ttdesc = strjoin('', "|cffCCFF99", "Deposit x", quantity, " (24h)", "|r")
+			EnhTooltip.AddLine(ttdesc,ttdepcost)	
+		end
+	else
+		EnhTooltip.AddLine("Cannot calc deposit w/o btm and aadv")
+	end
 	--TODO: Allow for notification of what AutoMagic wants to do to something...
 end
 
