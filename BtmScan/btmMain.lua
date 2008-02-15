@@ -556,6 +556,12 @@ BtmScan.filters = {}
 function BtmScan.EvaluateItem(item, doTooltip)
 	item.info = itemAddInfo
 	item.clear = itemClearInfo
+	
+	if (AucAdvanced) then
+		local ttdepcost= AucAdvanced.Post.GetDepositAmount(item.sig, item.count) * 2
+		local ttdesc = strjoin('', "|cffFFCC33", "Deposit x", item.count, " (24h)", "|r")
+		EnhTooltip.AddLine(ttdesc,ttdepcost)
+	end
 	for pos, name in ipairs(BtmScan.evaluators) do
 		local valuator = BtmScan.evaluators[name]
 
