@@ -477,7 +477,8 @@ local NIGHTSEYE = 23441
 
 --[[
 	Prospectable ores
-	Current percentages from http://www.wowwiki.com/Prospecting
+	percentages from Wowhead
+	last updated Fed 16, 2008
 ]]
 
 const.ProspectMinLevels = {
@@ -489,6 +490,7 @@ const.ProspectMinLevels = {
 	[FEL_IRON_ORE] = 275,
 	[ADAMANTITE_ORE] = 325,
 }
+
 
 const.ProspectableItems = {
 
@@ -512,52 +514,52 @@ const.ProspectableItems = {
 	[IRON_ORE] = {
 			[IRONPOWDER] = 1.0,
 			[CITRINE] = 0.30,
-			[LESSERMOONSTONE] = 0.30,
-			[JADE] = 0.30,
+			[LESSERMOONSTONE] = 0.33,
+			[JADE] = 0.33,
 			[AQUAMARINE] = 0.05,
 			[STARRUBY] = 0.05,
 			},
 
 	[MITHRIL_ORE] = {
 			[MITHRILPOWDER] = 1.0,
-			[CITRINE] = 0.30,
-			[STARRUBY] = 0.30,
-			[AQUAMARINE] = 0.30,
-			[AZEROTHIANDIAMOND] = 0.025,
-			[BLUESAPPHIRE] = 0.025,
-			[LARGEOPAL] = 0.025,
-			[HUGEEMERALD] = 0.025,
+			[CITRINE] = 0.33,
+			[STARRUBY] = 0.33,
+			[AQUAMARINE] = 0.33,
+			[AZEROTHIANDIAMOND] = 0.03,
+			[BLUESAPPHIRE] = 0.03,
+			[LARGEOPAL] = 0.03,
+			[HUGEEMERALD] = 0.03,
 			},
 
 	[THORIUM_ORE] = {
 			[THORIUMPOWDER] = 1.0,
-			[STARRUBY] = 0.30,
-			[LARGEOPAL] = 0.16,
-			[BLUESAPPHIRE] = 0.16,
-			[AZEROTHIANDIAMOND] = 0.16,
-			[HUGEEMERALD] = 0.16,
-			[BLOODGARNET] = 0.0167,
-			[FLAMESPESSARITE] = 0.0167,
-			[GOLDENDRAENITE] = 0.0167,
-			[DEEPPERIDOT] = 0.0167,
-			[AZUREMOONSTONE] = 0.0167,
-			[SHADOWDRAENITE] = 0.0167,
+			[STARRUBY] = 0.26,
+			[LARGEOPAL] = 0.19,
+			[BLUESAPPHIRE] = 0.19,
+			[AZEROTHIANDIAMOND] = 0.19,
+			[HUGEEMERALD] = 0.19,
+			[BLOODGARNET] = 0.01,
+			[FLAMESPESSARITE] = 0.01,
+			[GOLDENDRAENITE] = 0.01,
+			[DEEPPERIDOT] = 0.01,
+			[AZUREMOONSTONE] = 0.01,
+			[SHADOWDRAENITE] = 0.01,
 			},
 
 	[FEL_IRON_ORE] = {
 			[FELIRONPOWDER] = 1.0,
-			[BLOODGARNET] = 0.16,
-			[FLAMESPESSARITE] = 0.16,
-			[GOLDENDRAENITE] = 0.16,
-			[DEEPPERIDOT] = 0.16,
-			[AZUREMOONSTONE] = 0.16,
-			[SHADOWDRAENITE] = 0.16,
-			[LIVINGRUBY] = 0.0083,
-			[NOBLETOPAZ] = 0.0083,
-			[DAWNSTONE] = 0.0083,
-			[TALASITE] = 0.0083,
-			[STAROFELUNE] = 0.0083,
-			[NIGHTSEYE] = 0.0083,
+			[BLOODGARNET] = 0.17,
+			[FLAMESPESSARITE] = 0.17,
+			[GOLDENDRAENITE] = 0.17,
+			[DEEPPERIDOT] = 0.17,
+			[AZUREMOONSTONE] = 0.17,
+			[SHADOWDRAENITE] = 0.17,
+			[LIVINGRUBY] = 0.011,
+			[NOBLETOPAZ] = 0.011,
+			[DAWNSTONE] = 0.011,
+			[TALASITE] = 0.011,
+			[STAROFELUNE] = 0.011,
+			[NIGHTSEYE] = 0.011,
 			},
 
 	[ADAMANTITE_ORE] = {
@@ -568,12 +570,12 @@ const.ProspectableItems = {
 			[DEEPPERIDOT] = 0.19,
 			[AZUREMOONSTONE] = 0.19,
 			[SHADOWDRAENITE] = 0.19,
-			[LIVINGRUBY] = 0.025,
-			[NOBLETOPAZ] = 0.025,
-			[DAWNSTONE] = 0.025,
-			[TALASITE] = 0.025,
-			[STAROFELUNE] = 0.025,
-			[NIGHTSEYE] = 0.025,
+			[LIVINGRUBY] = 0.03,
+			[NOBLETOPAZ] = 0.03,
+			[DAWNSTONE] = 0.03,
+			[TALASITE] = 0.03,
+			[STAROFELUNE] = 0.03,
+			[NIGHTSEYE] = 0.03,
 			},
 }
 
