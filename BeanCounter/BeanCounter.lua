@@ -40,8 +40,8 @@ lib.API = {}
 local private = {
 	--BeanCounterCore
 	playerName = UnitName("player"),
-	realmName = GetRealmName(), 
-	faction = select(2, UnitFactionGroup(UnitName("player"))),
+	realmName = GetRealmName(),
+	faction = nil,
 	version = 1.11,
 	wealth, --This characters current net worth. This will be appended to each transaction.
 	playerData, --Alias for BeanCounterDB[private.realmName][private.playerName]
@@ -103,7 +103,7 @@ function lib.OnLoad(addon)
 	end
 
 	private.scriptframe:RegisterEvent("PLAYER_MONEY")
-	
+	private.scriptframe:RegisterEvent("PLAYER_ENTERING_WORLD")
 	private.scriptframe:RegisterEvent("MAIL_INBOX_UPDATE")
 	private.scriptframe:RegisterEvent("UI_ERROR_MESSAGE")
 	private.scriptframe:RegisterEvent("MAIL_SHOW")
@@ -144,7 +144,7 @@ function private.initializeDB()
 		BeanCounterDB[private.realmName][private.playerName] = {}
 		BeanCounterDB[private.realmName][private.playerName]["version"] = private.version
 		
-		BeanCounterDB[private.realmName][private.playerName]["faction"] = private.faction
+		BeanCounterDB[private.realmName][private.playerName]["faction"] = "unkown" --faction is recorded when we get the login event
 		BeanCounterDB[private.realmName][private.playerName]["wealth"] = GetMoney()
 		
 		BeanCounterDB[private.realmName][private.playerName]["vendorbuy"] = {}
@@ -236,6 +236,11 @@ function private.onEvent(frame, event, arg, ...)
 		private.wealth = GetMoney()
 		private.playerData["wealth"] = private.wealth
 	
+	elseif (event == "PLAYER_ENTERING_WORLD") then --used to record one time info when player loads 
+		private.scriptframe:UnregisterEvent("PLAYER_ENTERING_WORLD") --no longer care about this event after we get our current wealth
+		private.wealth = GetMoney()
+		private.playerData["wealth"] = private.wealth
+		
 	elseif (event == "MAIL_INBOX_UPDATE") or (event == "MAIL_SHOW") or (event == "MAIL_CLOSED") then
 		private.mailMonitor(event, arg, ...)
 	
@@ -244,6 +249,9 @@ function private.onEvent(frame, event, arg, ...)
 			
 	elseif (event == "UPDATE_PENDING_MAIL") then 
 		private.hasUnreadMail()
+		--we also use this event to get faction data since the faction often returns nil if called after "PLAYER_ENTERING_WORLD"
+		private.faction = UnitFactionGroup(UnitName("player"))
+		private.playerData["faction"] =  private.faction or "unknown"
 		
 	elseif (event == "ADDON_LOADED") then
 		if arg == "BeanCounter" then
