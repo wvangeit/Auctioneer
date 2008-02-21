@@ -364,7 +364,13 @@ function private.updateTo1_11A()
 				if #tbl == 5 then
 					private.serverData[player]["failedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], tbl[3], 0, 0, 0, tbl[4], tbl[5])
 				elseif #tbl == 4 then --some expired auctions seem to have made it past the 1.05 update and are missing stack placeholder
-					private.serverData[player]["failedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], 0, tbl[3], tbl[4])
+					private.serverData[player]["failedAuctions"][itemID][i] = private.packString(tbl[1], tbl[2], 0, 0, 0, tbl[3], tbl[4])
+				else --remove the entry
+					if #private.serverData[player]["failedAuctions"][itemID][i] == 1 then
+						private.serverData[player]["failedAuctions"][itemID] = nil
+					else
+						private.serverData[player]["failedAuctions"][itemID][i] = nil
+					end
 				end
 			end
 		end
