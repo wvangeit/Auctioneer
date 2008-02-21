@@ -86,7 +86,7 @@ end
 function private.getInvoice(n,sender, subject)
 	if (sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse')) then
 		if  (string.match(subject, _BC('MailAuctionSuccessfulSubject')..".-:.-(%w.*)")) or (string.match( subject , _BC('MailAuctionWonSubject')..".-:.-(%w.*)")) then
-			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n);
+			local invoiceType, itemName, playerName, bid, buyout, deposit, consignment = GetInboxInvoiceInfo(n)
 			if  playerName then
 				--debugPrint("getInvoice", invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes")
 				return invoiceType, itemName, playerName, bid, buyout, deposit, consignment, "yes", time()
@@ -104,7 +104,7 @@ end
 function private.mailonUpdate()
 local count = 1
 local total = #private.inboxStart
-	for i,data in pairs(private.inboxStart) do
+	for i, data in pairs(private.inboxStart) do
 		--update mail GUI Count
 		if count <= total then 
 			private.CountGUI:SetText("Recording: "..count.." of "..total.." items")
@@ -128,11 +128,11 @@ local total = #private.inboxStart
 			--debugPrint("data.retrieved == yes")
 		
 		elseif  time() - data.startTime > private.getOption("util.beacounter.invoicetime") then --time exceded so fail it and process on next update
-			debugPrint("time to retieve invoice exceded")
-			tbl["retrieved"] = "failed, time to get invoice exceded" 
+			debugPrint("time to retrieve invoice exceeded")
+			tbl["retrieved"] = "failed" --time to get invoice exceded
 		else 
 			--debugPrint("Invoice retieve attempt",tbl["subject"])
-	tbl["invoiceType"], tbl["itemName"], tbl["Seller/buyer"], tbl['bid'], tbl["buyout"] , tbl["deposit"] , tbl["fee"], tbl["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
+			tbl["invoiceType"], tbl["itemName"], tbl["Seller/buyer"], tbl['bid'], tbl["buyout"] , tbl["deposit"] , tbl["fee"], tbl["retrieved"], _ = private.getInvoice(data.n, data.sender, data.subject)
 		end
 	end
 	if (#private.inboxStart == 0) and (HideMailGUI == true) then
