@@ -335,7 +335,7 @@ local function setter(setting, value)
 
 		elseif (setting == "autode.reset") then
 			-- User clicked the reset settings button
-			AutoDisenchantIgnoreList = nil
+			AutoDisenchantIgnoreList = {}
 		elseif (setting == "autode.selectitem") then
 			-- save off the item they selected
 			lib.autoDEListItem = value;
