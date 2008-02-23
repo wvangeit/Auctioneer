@@ -89,19 +89,24 @@ function AucModule.Processor(callbackType, ...)
 	end
 end
 
+lib.API.isLoaded = false
 function lib.OnLoad(addon)
 	private.initializeDB() --create or initialize the saved DB
+	--Check if user is trying to use old client with newer database or if the database has failed to update
+	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version then
+		if private.version < BeanCounterDB[private.realmName][private.playerName].version then
+			private.CreateErrorFrames("bean older", private.version, BeanCounterDB[private.realmName][private.playerName].version)
+			return
+		elseif private.version ~= BeanCounterDB[private.realmName][private.playerName].version then
+			private.CreateErrorFrames("failed update", private.version, BeanCounterDB[private.realmName][private.playerName].version)
+			return
+		end
+	end
+	--Continue loading if the Database is ready
 	lib.MakeGuiConfig() --create the configurator GUI frame
 	private.CreateFrames() --create our framework used for AH and GUI
 	private.slidebar() --create slidebar icon
 	
-	--Check if user is trying to use old client with newer database
-	if private.version and BeanCounterDB and BeanCounterDB[private.realmName][private.playerName].version and private.version < BeanCounterDB[private.realmName][private.playerName].version then
-		print ("This database has been updated to work with a newer version of BeanCounter than the one you are currently using. BeanCounter will stop loading now.")
-		private.CreateErrorFrames()
-		return
-	end
-
 	private.scriptframe:RegisterEvent("PLAYER_MONEY")
 	private.scriptframe:RegisterEvent("PLAYER_ENTERING_WORLD")
 	private.scriptframe:RegisterEvent("MAIL_INBOX_UPDATE")
@@ -126,7 +131,7 @@ function lib.OnLoad(addon)
 	Stubby.RegisterFunctionHook("StartAuction", -50, private.preStartAuctionHook)
 	--Vendor
 	--hooksecurefunc("BuyMerchantItem", private.merchantBuy)
-	
+	lib.API.isLoaded = true
 end
 
 --Create the database
@@ -166,33 +171,6 @@ function private.initializeDB()
 	 --OK we now have our Database ready, lets create an Alias to make refrencing easier
 	private.playerData = BeanCounterDB[private.realmName][private.playerName]
 	private.serverData = BeanCounterDB[private.realmName]
-	
---[[Ok, create a fake table telling folks what our database means
-	BeanCounterDBFormat = {"This is a diagram for the layout of the BeanCounterDB.",
-	'POSTING DATABASE -- records Auction house activities',
-	"['postedAuctions'] == Item, post.count, post.minBid, post.buyoutPrice, post.runTime, post.deposit, time(), current wealth, date",
-	"['postedBids'] == itemName, count, bid, owner, isBuyout, timeLeft, time(),current wealth, date",
-	"['postedBuyouts'] ==  itemName, count, bid, owner, isBuyout, timeLeft, time(), current wealth, date",
-	' ',
-	' ',
-	'MAIL DATABASE --records mail received from Auction House',	
-	'(Some of these values will be nil If we were unable to Retrieve the Invoice), current wealth, date',
-	"['completedAuctions'] == itemName, Auction successful, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth, date",
-	"['failedAuctions'] == itemName, Auction expired, (time the mail arrived in our mailbox), current wealth, date",
-	"completedBids/Buyouts are a combination of the mail data from postedBuyouts and postedBids, current wealth, date",
-	"['completedBids/Buyouts] == itemName, Auction won, money, deposit , fee, buyout , bid, buyer, (time the mail arrived in our mailbox), current wealth, date",
-	"[failedBids] == itemName, Outbid, money, (time the mail arrived in our mailbox), current wealth, date",
-	'',
-	'APIs',
-    'TODO',
-    }]]
-    --[[
-	'private.playerData is an alias for BeanCounterDB[private.realmName][private.playerName]',
-	'private.packString(...) --will return any length arguments into a : seperated string',
-	'private.databaseAdd(key, itemID, value)  --Adds to the DB. Example "postedBids", itemID, ( : seperated string)',
-	'private.databaseRemove(key, itemID, ITEM, NAME, BID) --This is only for ["postedBids"]  NAME == Auction Owners Name',
-	}]]
-	
 	private.wealth = private.playerData["wealth"]
 	private.UpgradeDatabaseVersion() 
 	private.prunePostedDB() --Check the postedDB tablesand remove any entries that are older than 31 Days

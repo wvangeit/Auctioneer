@@ -841,8 +841,8 @@ function private.CreateMailFrames()
 end
 
 --ONLOAD Error frame, used to show missmatched DB versus client errors that stop BC load NEEDS LOCALIZATION
-function private.CreateErrorFrames()
-	frame = private.frame
+function private.CreateErrorFrames(error, expectedVersion, playerVersion)
+	frame = private.scriptframe
 	frame.loadError = CreateFrame("Frame", nil, UIParent)
 	frame.loadError:SetFrameStrata("HIGH")
 	frame.loadError:SetBackdrop({
@@ -864,9 +864,17 @@ function private.CreateErrorFrames()
 	frame.loadError.close:SetText("Ok")
 
 	frame.loadError.text = frame.loadError:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-	frame.loadError.text:SetPoint("CENTER", frame.loadError, "CENTER", 0, 0)
-	frame.loadError.text:SetText("Your database has been created \n  with a newer version of BeanCounter \n than the one you are currently using.\n BeanCounter will not load to prevent \n possibly corrupting the saved data.")
-
+	frame.loadError.text:SetPoint("LEFT", frame.loadError, "LEFT", 25, 30)
+	frame.loadError.text:SetWidth(250)
+	if error == "bean older" then
+		print ("Your database has been created with a newer version of BeanCounter than the one you are currently using. BeanCounter will not load to prevent possibly corrupting the saved data. Please go to http://auctioneeraddon.com and update to the latest version")
+		frame.loadError.text:SetText("Your database has been created with a newer version of BeanCounter "..playerVersion.." than the one you are currently using. "..expectedVersion.." BeanCounter will not load to prevent possibly corrupting the saved data. Please go to http://auctioneeraddon.com and update to the latest version")
+	elseif error == "failed update" then
+		print ("Your database has failed to update. BeanCounter expects "..private.version.."BeanCounter will not load to prevent possibly corrupting the saved data. Please go to the forums at http://auctioneeraddon.com")
+		frame.loadError.text:SetText("Your database has failed to update. BeanCounter expects "..expectedVersion.." But the player's version is still "..playerVersion.." BeanCounter will not load to prevent possibly corrupting the saved data. Please go to the forums at http://auctioneeraddon.com")
+	else
+		frame.loadError.text:SetText("Unknow Error on loading. BeanCounter will not load to prevent possibly corrupting the saved data. Please go to the forums at http://auctioneeraddon.com")
+	end
 	frame.loadError.title = frame.loadError:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	frame.loadError.title:SetPoint("CENTER", frame.loadError, "TOP", 0,-15)
 	frame.loadError.title:SetText("|CFFFF0000 BEANCOUNTER WARNING")
