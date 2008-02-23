@@ -203,7 +203,7 @@ function private.CreateFrames()
 			frame.UpdateImage()
 			frame.InitControls()
 			--Also pass this search to BeanCounter's frame
-			if BeanCounter and BeanCounter.externalSearch then
+			if BeanCounter and BeanCounter.externalSearch and BeanCounter.API.isLoaded then
 				BeanCounter.externalSearch(item[1], nil, nil, 50)
 			end			
 		else
