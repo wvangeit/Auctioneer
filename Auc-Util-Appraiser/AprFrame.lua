@@ -332,7 +332,7 @@ function private.CreateFrames()
 
 	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice)
 		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
-		local _, link, _, _, _, _, _, _, _, _ = GetItemInfo(itemID)
+		local link = select(2,GetItemInfo(itemID))
 		local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
 			if r and g and b then
 				return acquire(r,g,b)
@@ -1962,6 +1962,28 @@ function private.CreateFrames()
 	frame.imageview:SetPoint("TOPRIGHT", frame.salebox, "BOTTOMRIGHT")
 	frame.imageview:SetPoint("BOTTOM", frame.itembox, "BOTTOM")
 
+	function private.onResize(column, name, frame)
+		local originalScript = frame.labels[column].button:GetScript("OnMouseDown") --store the original Sort onclick script will reset it when we are done resizing
+		local point, relativeTo, relativePoint, xOfs, yOfs = frame.labels[column].button:GetPoint() --Store the anchor point since its niled when resizing the button
+		--limit the size we will allow buttons to get
+		local width = frame.labels[column].button:GetWidth()
+		local height = frame.labels[column].button:GetHeight()
+		frame.labels[column].button:SetResizable(true)
+		frame.labels[column].button:SetMaxResize(400, height)
+		frame.labels[column].button:SetMinResize(10, height)
+		--set the resize script	
+		frame.labels[column].button:SetScript("OnMouseDown", function() frame.labels[column].button:StartSizing(frame.labels[column].button) end)
+		--resets the original onclick as well as setting new anchor points for our buttons
+		frame.labels[column].button:SetScript("OnMouseUp", function() 
+									frame.labels[column].button:StopMovingOrSizing() 
+									frame.labels[column].button:SetScript("OnMouseDown", originalScript) 
+									frame.labels[column].button:ClearAllPoints()
+									frame.labels[column].button:SetPoint(point, relativeTo, relativePoint, xOfs,yOfs)
+					end)
+		--start resizing frame			
+		frame.labels[column].button:StartSizing(frame.labels[column].button)
+	end
+	
 	frame.imageview.sheet = ScrollSheet:Create(frame.imageview, {
 		{ "Item",   "TEXT", 105 },
 		{ "Seller", "TEXT", 75  },
@@ -1973,7 +1995,7 @@ function private.CreateFrames()
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	})
+	}, nil, nil, nil, private.onResize)
 	
 	frame.imageviewclassic = CreateFrame("Frame", nil, frame)
 	frame.imageviewclassic:SetBackdrop({
@@ -1998,7 +2020,7 @@ function private.CreateFrames()
 		{ "MinBid", "COIN", 85, { DESCENDING=true } },
 		{ "CurBid", "COIN", 85, { DESCENDING=true } },
 		{ "Buyout", "COIN", 85, { DESCENDING=true } },
-	})
+	}, nil, nil, nil, private.onResize)
 	frame.imageviewclassic:Hide()
 	
 	frame.ScanTab = CreateFrame("Button", "AuctionFrameTabUtilAppraiser", AuctionFrame, "AuctionTabTemplate")
