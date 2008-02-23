@@ -67,13 +67,13 @@ function lib.GetPrice(hyperlink, faction, realm)
 end
 
 function lib.GetPriceColumns()
-    if not (BeanCounter) then return end
+   if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
 	return "Bought Price", "Sold Price", "Bought Quantity", "Sold Quantity", "Bought Times", "Sold Times"
 end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
-	if not (BeanCounter) then return end
+	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
 
 	-- Get our statistics
 	local bought, sold, boughtqty, soldqty, boughtseen, soldseen = lib.GetPrice(hyperlink, faction, realm)
@@ -91,12 +91,12 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 end
 
 function lib.IsValidAlgorithm()
-	if not (BeanCounter) then return false end
+	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
 	return true
 end
 
 function lib.CanSupplyMarket()
-    if not (BeanCounter) then return false end
+    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
 	return true
 end
 
@@ -120,7 +120,7 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	-- desire. You are passed a hyperlink, and it's up to you to determine whether or what you should
 	-- display in the tooltip.
 	
-	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") then return end
+	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
 	
 	local bought, sold, boughtqty, soldqty, boughtseen, soldseen = lib.GetPrice(hyperlink)
 	
