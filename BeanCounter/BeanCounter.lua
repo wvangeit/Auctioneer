@@ -195,6 +195,7 @@ function private.initializeDB()
 	
 	private.wealth = private.playerData["wealth"]
 	private.UpgradeDatabaseVersion() 
+	private.prunePostedDB() --Check the postedDB tablesand remove any entries that are older than 31 Days
 	 
 end
 
@@ -393,6 +394,34 @@ function private.refreshItemIDArray()
 						if item then
 							BeanCounterDB["ItemIDArray"][item:lower()] = itemID
 						end
+					end
+				end
+			end
+		end
+	end
+end
+--Prune Old keys from postedXXXX tables
+--First we find a itemID that needs pruning then we check all other keys for that itemID and prune.
+function private.prunePostedDB()
+	for player, v in pairs(private.serverData)do
+		for DB,data in pairs(private.serverData[player]) do
+			if  DB == "postedBids" or DB == "postedAuctions" or DB == "postedBuyouts"  then
+				for itemID, value in pairs(data) do
+					if private.serverData[player][DB][itemID][1] then
+						local tbl = private.unpackString(private.serverData[player][DB][itemID][1])
+						local  date = tonumber(tbl[#tbl-1])
+						while date + 2678400 < time() do --date+31days
+							table.remove(private.serverData[player][DB][itemID], 1)
+							if private.serverData[player][DB][itemID][1] then
+								tbl = private.unpackString(private.serverData[player][DB][itemID][1])
+								date = tonumber(tbl[#tbl-1])
+							else--This itemID is now empty remove ItemID from postedDB
+								private.serverData[player][DB][itemID] = nil
+								break
+							end
+						end
+					else
+						--print(player,DB,itemID)
 					end
 				end
 			end

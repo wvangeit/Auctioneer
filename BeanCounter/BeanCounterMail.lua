@@ -142,6 +142,7 @@ local total = #private.inboxStart
 		MailFrameTab2:Show()
 		private.MailGUI:Hide()
 		HideMailGUI = false
+		private.mailBoxColorStart() --delay recolor system till we have had a chance to read the mail
 	end
 	
 	if (#private.reconcilePending > 0) then		
@@ -255,8 +256,22 @@ function private.findStackcompletedAuctions(key , itemID, soldDeposit, soldBuy, 
 		--if the deposits and buyouts match, check if time range would make this a possible match
 		if postDeposit ==  soldDeposit and postBuy == soldBuy then
 			if (soldTime > postTime) and (oldestPossible < postTime) then
+				table.remove(private.playerData[key][itemID], index) --remove the matched item From postedAuctions DB
+				if not private.playerData[key][itemID][1] then private.playerData[key][itemID] = nil end --remove itemID from postedAuctionsDB if empty
 				return tonumber(tbl2[2]), tonumber(tbl2[3])
 			end
+		end
+	end
+end
+--find stack, bid and buy info for failedauctions
+function private.findStackfailedAuctions(key, itemID, expiredTime)
+	for index = #private.playerData[key][itemID], 1, -1 do
+		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
+		local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(expiredTime - (tbl2[5]*60)) --Time this message should have been posted
+		if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
+			table.remove(private.playerData[key][itemID], index) --remove the matched item From postedAuctions DB
+			if not private.playerData[key][itemID][1] then private.playerData[key][itemID] = nil end --remove itemID from postedAuctionsDB if empty
+			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
 		end
 	end
 end
@@ -268,6 +283,8 @@ function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
 			local tbl = private.unpackString(private.playerData["postedBids"][itemID][index])
 			local stack, postBid, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
 			if seller ==  postSeller and postBid == bid and itemName == tbl[1]:match(".-%[(.-)%].-") then
+				table.remove(private.playerData["postedBids"][itemID], index) --remove the matched item From postedBids DB
+				if not private.playerData["postedBids"][itemID][1] then private.playerData["postedBids"][itemID] = nil end --remove itemID from postedBidsDB if empty
 				return stack
 			end
 		end
@@ -277,21 +294,13 @@ function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
 			local tbl = private.unpackString(private.playerData["postedBuyouts"][itemID][index])
 			local stack, postBuy, postSeller, Type = tonumber(tbl[2]), tonumber(tbl[3]), tbl[4], tbl[5]
 			if seller ==  postSeller and postBuy == buy  and itemName == tbl[1]:match(".-%[(.-)%].-") then
+				table.remove(private.playerData["postedBuyouts"][itemID], index) --remove the matched item From postedBuyouts DB
+				if not private.playerData["postedBuyouts"][itemID][1] then private.playerData["postedBuyouts"][itemID] = nil end --remove itemID from postedBuyouts DB if empty
 				return stack
 			end
 		end
 	end
 	return 0 --failed to find stack
-end
---find stack, bid and buy info for failedauctions
-function private.findStackfailedAuctions(key, itemID, expiredTime)
-	for index = #private.playerData[key][itemID], 1, -1 do
-		local tbl2 = private.unpackString(private.playerData[key][itemID][index])
-		local timeAuctionPosted, timeFailedAuctionStarted = tonumber(tbl2[7]), tonumber(expiredTime - (tbl2[5]*60)) --Time this message should have been posted
-		if (timeAuctionPosted - 500) <= timeFailedAuctionStarted and timeFailedAuctionStarted <= (timeAuctionPosted + 500) then
-			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
-		end
-	end
 end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved
