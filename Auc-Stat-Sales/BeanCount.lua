@@ -37,7 +37,7 @@ local print,decode,recycle,acquire,clone,scrub,get,set,default = AucAdvanced.Get
 local cache = {}
 
 function lib.GetPrice(hyperlink, faction, realm)
-    if not (BeanCounter) then return false end
+    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
     if cache[hyperlink] then
         return cache[hyperlink][1], cache[hyperlink][2], cache[hyperlink][3], cache[hyperlink][4], cache[hyperlink][5], cache[hyperlink][6]
     end
