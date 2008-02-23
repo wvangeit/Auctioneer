@@ -83,7 +83,7 @@ if AucAdvanced and AucAdvanced.NewModule then
 	AucModule = AucAdvanced.NewModule(libType, libName)
 end
 function AucModule.Processor(callbackType, ...)
-	if (callbackType == "querysent") then
+	if (callbackType == "querysent") and lib.API.isLoaded then --if BeanCounter has disabled itself  dont try looking for auction House links
 		local item = ...
 		if item.name then BeanCounter.externalSearch(item.name) end
 	end
