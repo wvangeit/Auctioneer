@@ -322,7 +322,7 @@ function AuctionFramePost_UpdatePriceModels(frame)
 				end
 
 				-- Add the last sale price if BeanCounter is loaded.and one exists
-				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch) then
+				if (IsAddOnLoaded("BeanCounter") and BeanCounter and BeanCounter.externalSearch and BeanCounter.API.isLoaded) then
 					local settings = {["selectbox"] = {"1","server"}  , ["exact"] = false, ["classic"] = false, 
 						["bid"] = false, ["outbid"] = false, ["auction"] = true, ["failedauction"] = false
 						}
@@ -751,7 +751,7 @@ function AuctionFramePost_SetAuctionItem(frame, bag, item, count)
 		AuctionFramePost_PriceModelDropDownItem_SetSelectedID(dropdown, nil);
 
 		-- Update the Transactions tab if BeanCounter is loaded. Allows searchs made here to show in BC
-		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch then
+		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch and BeanCounter.API.isLoaded then
 			BeanCounter.externalSearch(itemId) --will accept itemid, string, itemkey, or itemlink
 		end
 		

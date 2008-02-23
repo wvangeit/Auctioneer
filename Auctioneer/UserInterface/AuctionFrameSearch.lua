@@ -1317,7 +1317,7 @@ function AuctionFrameSearch_SelectResultByIndex(frame, index)
 		ListTemplate_SelectRow(frame.resultsList, index);
 		
 		-- Update the Transactions tab if BeanCounter is loaded. Allows searchs made here to show in BC
-		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch then
+		if IsAddOnLoaded("BeanCounter") and BeanCounter.externalSearch and BeanCounter.API.isLoaded then
 			BeanCounter.externalSearch(frame.selectedResult.name:lower()) --will accept itemid, string, itemkey, or itemlink
 		end
 	else
