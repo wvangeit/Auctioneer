@@ -412,6 +412,34 @@ function private.CreateFrames()
 	function private.scrollSheetOnLeave(button, row, index)
 			GameTooltip:Hide()
 	end
+	
+	function private.onResize(column, name, frame)
+		
+		if IsShiftKeyDown() then
+			print(column)
+		else
+			local originalScript = frame.labels[column].button:GetScript("OnMouseDown") --store the original Sort onclick script will reset it when we are done resizing
+			local point, relativeTo, relativePoint, xOfs, yOfs = frame.labels[column].button:GetPoint() --Store the anchor point since its niled when resize tha button
+			--limit the size we will allow buttons to get
+			local width = frame.labels[column].button:GetWidth()
+			local height = frame.labels[column].button:GetHeight()
+			frame.labels[column].button:SetResizable(true)
+			frame.labels[column].button:SetMaxResize(400, height)
+			frame.labels[column].button:SetMinResize(10, height)
+			--set the resize script	
+			frame.labels[column].button:SetScript("OnMouseDown", function() frame.labels[column].button:StartSizing(frame.labels[column].button) end)
+			--resets the original onclick as well as setting new anchor points for our buttons
+			frame.labels[column].button:SetScript("OnMouseUp", function() 
+										frame.labels[column].button:StopMovingOrSizing() 
+										frame.labels[column].button:SetScript("OnMouseDown", originalScript) 
+										frame.labels[column].button:ClearAllPoints()
+										frame.labels[column].button:SetPoint(point, relativeTo, relativePoint, xOfs,yOfs)
+						end)
+			--start resizing frame			
+			frame.labels[column].button:StartSizing(frame.labels[column].button)
+		end
+	end
+		
 	--localize UI text
 	local Buyer, Seller = string.match(_BC('UiBuyerSellerHeader'), "(.*)/(.*)")
 	frame.resultlist.sheet = ScrollSheet:Create(frame.resultlist, {
@@ -430,21 +458,8 @@ function private.CreateFrames()
 		{ _BC("UiFee"), "COIN", 50 }, 
 		{ _BC('UiWealth'), "COIN", 70 }, 
 		{ _BC('UiDateHeader'), "text", 250 },
-	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave)
+	}, private.scrollSheetOnEnter, private.scrollSheetOnLeave, nil, private.onResize)
 		
-	--[[ADDED THIS FUNCTION TO CONFIGURATOR
-	-Lengthen the Column Headers for non English localizations.
-	function private.resizeScrollSheetColumns()
-		local count = #frame.resultlist.sheet.labels --Number of Columns
-		for i = 1, count do
-			local Size = floor(frame.resultlist.sheet.labels[i]:GetStringWidth()) --Width of translation text
-			local Button =  floor(frame.resultlist.sheet.labels[i].button:GetWidth()) --Current Colimn Width
-			if Size +10 >= Button then 
-				frame.resultlist.sheet.labels[i].button:SetWidth(Size + 10)
-			end
-		end
-	end	
-	private.resizeScrollSheetColumns() --Pad column widths to match text lengths]]
 	
 	--All the UI settings are stored here. We then split it to get the appropriate search settings
 	function frame.getCheckboxSettings()
