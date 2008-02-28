@@ -360,7 +360,7 @@ EnchantrixLocalizations = {
 		-- Section: Game Constants
 		["ArgSpellname"]	= "Entzaubern";
 		["ArgSpellProspectingName"]	= "Sondieren";
-		["Enchanting"]	= "Verzaubern";
+		["Enchanting"]	= "Verzauberkunst";
 		["Jewelcrafting"]	= "Juwelenschleifen";
 		["PatReagents"]	= "Reagenzien: (.+)";
 		["TextCombat"]	= "Kampflog";
@@ -1373,6 +1373,8 @@ EnchantrixLocalizations = {
 		["FrmtAutoDeIgnorePermanent"]	= "%s를 영원히 무시합니다.";
 		["FrmtAutoDeIgnoreSession"]	= "%s를 이번 접속동안만 무시합니다.";
 		["FrmtAutoDeInactive"]	= "자동 마력추출 비활성화";
+		["FrmtAutoDeProspectCancelled"]	= "보석추출 취소 : 아이템을 찾을 수 없습니다.";
+		["FrmtAutoDeProspecting"]	= "%s를 보석추출합니다.";
 		["FrmtBidbrokerCurbid"]	= "현재 입찰";
 		["FrmtBidbrokerDone"]	= "입찰 중개 완료";
 		["FrmtBidbrokerHeader"]	= "입찰이 평균 마력추출 가격에서 %S 실버 절약되었습니다. (최소 %%less = %d):";
@@ -1380,9 +1382,10 @@ EnchantrixLocalizations = {
 		["FrmtBidbrokerMinbid"]	= "최소 입찰";
 		["FrmtBidBrokerSkipped"]	= "%d개의 경매품이 마진(%d%%)을 위해 건너뛰어짐";
 		["FrmtBidBrokerSkippedBids"]	= "입찰값이 존재하여 %d개의 경매를 건너뛰었습니다.";
-		["FrmtPctlessDone"]	= "완료 이하 확률. ";
+		["FrmtPctlessDone"]	= "%% 덜 됨.";
 		["FrmtPctlessHeader"]	= "즉시 구입가격이 평균 마력추출 가격상에서 %d%% 절약되었습니다.:";
 		["FrmtPctlessLine"]	= "%s, 가격: %s, BO: %s, 감소: %s, %s 이하";
+		["FrmtPctlessSkillSkipped"]	= "%d개의 경매품이 전문기술숙련(%s) 때문에 건너뛰어짐";
 		["FrmtPctlessSkipped"]	= "%d개의 경매품이 수익성(%s)을 위해 건너뛰어짐";
 
 		-- Section: Tooltip Messages
