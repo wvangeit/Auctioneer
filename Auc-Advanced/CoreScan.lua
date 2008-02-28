@@ -104,7 +104,7 @@ end
 
 function lib.StartPushedScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex, subclassIndex, isUsable, qualityIndex, GetAll)
 	if not private.scanStack then private.scanStack = acquire() end
-	local query = acquire() 
+	local query = acquire()
 	name = name or ""
 	minUseLevel = tonumber(minUseLevel) or 0
 	maxUseLevel = tonumber(maxUseLevel) or 0
@@ -196,9 +196,9 @@ CommitProgressBar:SetWidth(200)
 CommitProgressBar:SetHeight(20)
 CommitProgressBar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 150)
 CommitProgressBar:SetBackdrop({
-  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
-  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
-  tile=1, tileSize=10, edgeSize=10, 
+  bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+  tile=1, tileSize=10, edgeSize=10,
   insets={left=3, right=3, top=3, bottom=3}
 })
 
@@ -220,9 +220,9 @@ GetAllProgressBar:SetWidth(200)
 GetAllProgressBar:SetHeight(20)
 GetAllProgressBar:SetPoint("BOTTOM", "UIParent", "BOTTOM", 0, 180)
 GetAllProgressBar:SetBackdrop({
-  bgFile="Interface\\Tooltips\\UI-Tooltip-Background", 
-  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border", 
-  tile=1, tileSize=10, edgeSize=10, 
+  bgFile="Interface\\Tooltips\\UI-Tooltip-Background",
+  edgeFile="Interface\\Tooltips\\UI-Tooltip-Border",
+  tile=1, tileSize=10, edgeSize=10,
   insets={left=3, right=3, top=3, bottom=3}
 })
 
@@ -250,12 +250,12 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			return
 		end
 		local CanQuery, CanQueryAll = CanSendAuctionQuery()
-		local scandata = AucAdvanced.Scan.GetScanData(faction, realm)
+		local scandata = AucAdvanced.Scan.GetScanData()
 		local now = time()
 		if not scandata.LastFullScan then
 			scandata.LastFullScan = 0
 		end
-		local minleft = ceil((now - scandata.LastFullScan) / 60) 
+		local minleft = ceil((now - scandata.LastFullScan) / 60)
 		local secleft = (now - scandata.LastFullScan) - (minleft - 1 ) * 60
 		--this can be removed once 2.3 rolls out
 		if (CanQueryAll == nil) and (minleft > 20) then
@@ -272,7 +272,7 @@ function lib.StartScan(name, minUseLevel, maxUseLevel, invTypeIndex, classIndex,
 			end
 		else
 			if not CanQueryAll then
-				
+
 				message("You must wait "..minleft..":"..secleft.." until you can do a full scan again")
 				return
 			end
@@ -429,7 +429,7 @@ local function processStats(operation, curItem, oldItem)
 		for engine, engineLib in pairs(AucAdvanced.Modules.Filter) do
 			if (engineLib.AuctionFilter) then
 				local result=engineLib.AuctionFilter(operation, statItem)
-				if (result) then 
+				if (result) then
 					private.filteredCount = private.filteredCount + 1
 					curItem[Const.FLAG] = bit.bor(curItem[Const.FLAG] or 0, Const.FLAG_FILTER)
 					operation = "filter"
@@ -504,8 +504,8 @@ function private.GetNextID(idList)
 end
 
 function lib.GetScanData(faction, realmName)
-	if not faction then faction = AucAdvanced.GetFactionGroup() end
-	if not realmName then realmName = GetRealmName() end
+	faction = faction or AucAdvanced.GetFactionGroup() end
+	realmName = realmName or GetRealmName() end
 	local AucScanData = private.LoadAuctionImage()
 	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
 	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, time=time()} end
@@ -531,8 +531,8 @@ Commitfunction = function()
 	--	if not private.curQuery then CommitRunning = false return end
 	CommitRunning = true
 	local scandata, idList = lib.GetScanData()
-	
-	--grab the first item in the commit queue, and bump everything else down 
+
+	--grab the first item in the commit queue, and bump everything else down
 	local wasIncomplete = private.CommitQueue[1]["wasIncomplete"]
 	local wasGetAll = private.CommitQueue[1]["wasGetAll"]
 	local scanStarted = private.CommitQueue[1]["scanStarted"]
@@ -542,7 +542,7 @@ Commitfunction = function()
 	TempcurScan, private.CommitQueue[1]["Scan"] = private.CommitQueue[1]["Scan"], TempcurScan
 	local TempcurQuery = {}
 	TempcurQuery, private.CommitQueue[1]["Query"] = private.CommitQueue[1]["Query"], TempcurQuery
-	
+
 	for i = 1, #private.CommitQueue do
 		if private.CommitQueue[i+1] then
 			private.CommitQueue[i], private.CommitQueue[i+1] = private.CommitQueue[i+1], private.CommitQueue[i]
@@ -558,7 +558,7 @@ Commitfunction = function()
 		CommitProgressBar:SetValue(0)
 	end
 	local totali = 2*(#scandata.image) + #TempcurScan
-	
+
 	local list, link, flag
 	local lut = acquire()
 
@@ -585,7 +585,7 @@ Commitfunction = function()
 					lut[link] = pos
 				else
 					if (type(list) == "number") then
-						lut[link] = acquire() 
+						lut[link] = acquire()
 						table.insert(lut[link], list)
 					end
 					table.insert(lut[link], pos)
@@ -601,7 +601,7 @@ Commitfunction = function()
 	local oldCount = #scandata.image
 	local scanCount = #TempcurScan
 	local updateCount, sameCount, newCount, updateRecoveredCount, sameRecoveredCount, missedCount, earlyDeleteCount, expiredDeleteCount = 0,0,0,0,0,0,0,0
-	
+
 	processStats("begin")
 	for index, data in ipairs(TempcurScan) do
 		i = i + 1
@@ -641,7 +641,7 @@ Commitfunction = function()
 		end
 
 -- end of debugging code
-	
+
 	end
 	recycle(lut)
 
@@ -792,7 +792,7 @@ Commitfunction = function()
 	CommitProgressBar:Hide()
 	private.UpdateScanProgress(false)
 	lib.PopScan()
-	CommitRunning = false 
+	CommitRunning = false
 	if not private.curQuery then
 		private.ResetAll()
 	end
@@ -821,7 +821,7 @@ function lib.Commit(wasIncomplete, wasGetAll)
 	private.CommitQueue[Queuelength + 1]["totalPaused"] = private.totalPaused
 	recycle(private, "curQuery")
 	recycle(private, "curScan")
-	
+
 	if coroutine.status(CoCommit) ~= "dead" then
 		CoroutineResume(CoCommit)
 	else
@@ -887,40 +887,40 @@ function lib.ScanPage(nextPage, really)
 	private.curPage = nextPage
 end
 local CoStore
-function private.HasAllData() 
-	local check = private.nextCheck 
-	if not check then return true end 
-	local now = GetTime() 
-	if now > check then -- Wait at least 1 second before checking 
-		-- Check to see if we have all the page data 
-		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list") 
-		if not private.NoOwnerList then 
-			private.NoOwnerList = acquire() 
-			for i = 1, numBatchAuctions do 
-				private.NoOwnerList[i] = i 
-			end 
-		end 
-		local _, owner = 0, {} 
-		for i, j in ipairs(private.NoOwnerList) do 
-			_,_,_,_,_,_,_,_,_,_,_,owner[j] = GetAuctionItemInfo("list", j) 
-		end 
-		for i = #private.NoOwnerList, 1, -1 do 
-			local j = private.NoOwnerList[i] 
-			if owner[j] then 
-				-- Remove from the lookuptable 
-				table.remove(private.NoOwnerList, i) 
-			end 
-		end 
-		if #private.NoOwnerList ~= 0 then 
-			private.nextCheck = now + 0.25 
-			return false 
-		end 
-		recycle(private.NoOwnerList) 
-		private.NoOwnerList = nil 
-		return true 
-	end 
-	return false 
-end  
+function private.HasAllData()
+	local check = private.nextCheck
+	if not check then return true end
+	local now = GetTime()
+	if now > check then -- Wait at least 1 second before checking
+		-- Check to see if we have all the page data
+		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list")
+		if not private.NoOwnerList then
+			private.NoOwnerList = acquire()
+			for i = 1, numBatchAuctions do
+				private.NoOwnerList[i] = i
+			end
+		end
+		local _, owner = 0, {}
+		for i, j in ipairs(private.NoOwnerList) do
+			_,_,_,_,_,_,_,_,_,_,_,owner[j] = GetAuctionItemInfo("list", j)
+		end
+		for i = #private.NoOwnerList, 1, -1 do
+			local j = private.NoOwnerList[i]
+			if owner[j] then
+				-- Remove from the lookuptable
+				table.remove(private.NoOwnerList, i)
+			end
+		end
+		if #private.NoOwnerList ~= 0 then
+			private.nextCheck = now + 0.25
+			return false
+		end
+		recycle(private.NoOwnerList)
+		private.NoOwnerList = nil
+		return true
+	end
+	return false
+end
 
 function private.NoDupes(pageData, compare)
 	if not pageData then return true end
@@ -939,7 +939,7 @@ StorePageFunction = function()
 		local numBatchAuctions, totalAuctions = GetNumAuctionItems("list");
 		private.curPage = floor(totalAuctions / 50);
 	end
-	
+
 	if (not private.curQuery) or (private.curQuery.name == "Empty Page") then
 		return
 	end
@@ -962,7 +962,7 @@ StorePageFunction = function()
 		private.scanDelay = now + 30
 		coroutine.yield()
 	end
-	if not private.curScan then 
+	if not private.curScan then
 		private.curScan = acquire()
 	end
 
@@ -1062,7 +1062,7 @@ StorePageFunction = function()
 		this = oldThis
 		recycle(EventFramesRegistered)
 	end
-	
+
 	-- Send the next page query or finish scanning
 
 	if private.isScanning then
@@ -1160,9 +1160,9 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 	if private.sentQuery then
 		lib.StorePage()
 	end
-	
+
 	local isSame = true
-	local query = acquire() 
+	local query = acquire()
 	name = name or ""
 	minLevel = tonumber(minLevel) or 0
 	maxLevel = tonumber(maxLevel) or 0
@@ -1210,7 +1210,7 @@ function QueryAuctionItems(name, minLevel, maxLevel, invTypeIndex, classIndex, s
 
 		recycle(private.curQuery)
 		private.curQuery = query
-		
+
 		private.curQuerySig = ("%s-%s-%s-%s-%s-%s-%s"):format(
 			query.name or "",
 			query.minUseLevel or "",
@@ -1283,7 +1283,7 @@ function private.OnUpdate(me, dur)
 				return
 			end
 		end
-		recycle(private.NoOwnerList) 
+		recycle(private.NoOwnerList)
 		private.NoOwnerList = nil
 		private.scanDelay = nil
 	end
@@ -1353,7 +1353,7 @@ function private.ResetAll()
 	if CommitRunning then
 		recycle(private, "curQuery")
 		recycle(private, "curScan")
-	
+
 		private.curPage = 0
 		private.isPaused = nil
 		private.sentQuery = nil
@@ -1399,7 +1399,7 @@ local ItemUsableTooltip = {
 		if UnitLevel("player") < minLevel then
 			return false
 		end
-	
+
 		-- set up if not done already
 		if not this.tooltipFrame then
 			this.tooltipFrame = CreateFrame("GameTooltip")
@@ -1514,12 +1514,12 @@ local ItemUsableCached = {
 
 		-- check cache first. failing that, do a tooltip scan
 		if this.cache[id] == nil then
-			-- print("miss " .. link) 
+			-- print("miss " .. link)
 			this.cache[id] = this.tooltip:CanUse(link)
 		else
-			-- print("hit  " .. link) 
+			-- print("hit  " .. link)
 		end
-		
+
 		return this.cache[id]
 	end,
 }
