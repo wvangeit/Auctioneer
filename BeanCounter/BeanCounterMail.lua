@@ -367,7 +367,7 @@ if private.getOption("util.beancounter.mailrecolor") == "off" then return end
 end
 
 local mailCurrent
-local group = {["n"] = "", ["start"] = nil, ["end"] = nil} --stores the start and end locations for a group of same name items
+local group = {["n"] = "", ["start"] = 1, ["end"] = 1} --stores the start and end locations for a group of same name items
 function private.mailBoxColorStart()
 	mailCurrent = {} --clean table every update
 	
