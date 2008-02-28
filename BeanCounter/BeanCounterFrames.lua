@@ -205,7 +205,7 @@ function private.CreateFrames()
 			frame.icon.tootip = {itemName, link}
 			--frame.icon:SetNormalTexture(itemTexture)
 			frame.searchBox:SetText(itemName)
-			private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture)
+			private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName)
 		end
 	end 
 	
@@ -289,7 +289,7 @@ function private.CreateFrames()
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture) 
+					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
 			end
 		end
@@ -304,7 +304,7 @@ function private.CreateFrames()
 				if (button == "LeftButton") and (IsAltKeyDown()) and itemName then
 					debugPrint(itemName, itemID,itemTexture, link)
 					frame.searchBox:SetText(itemName)
-					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture) 
+					private.searchByItemID(itemID, frame.getCheckboxSettings(), nil, 150, itemTexture, itemName) 
 				end
 			end
 		end
@@ -493,6 +493,7 @@ function private.CreateFrames()
 		if queryReturn then --need to return the ItemID results to calling function
 			return(private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName))
 		else
+			itemTexture = select(2, private.getItemInfo(BeanCounterDB["ItemIDArray"][itemName:lower()] or 0, "name"))
 			private.searchByItemID(tbl, settings, queryReturn, count, itemTexture, itemName) 
 		end
 	end
