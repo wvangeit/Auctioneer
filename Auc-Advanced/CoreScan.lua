@@ -504,8 +504,8 @@ function private.GetNextID(idList)
 end
 
 function lib.GetScanData(faction, realmName)
-	faction = faction or AucAdvanced.GetFactionGroup() end
-	realmName = realmName or GetRealmName() end
+	faction = faction or AucAdvanced.GetFactionGroup()
+	realmName = realmName or GetRealmName()
 	local AucScanData = private.LoadAuctionImage()
 	if not AucScanData.scans[realmName] then AucScanData.scans[realmName] = {} end
 	if not AucScanData.scans[realmName][faction] then AucScanData.scans[realmName][faction] = {image = {}, time=time()} end
