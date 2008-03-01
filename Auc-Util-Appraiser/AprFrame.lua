@@ -993,8 +993,6 @@ function private.CreateFrames()
 			frame.salebox:SetHeight(340) 
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
-			frame.manifest:Hide()
-			frame.toggleManifest:Disable()
 			frame.salebox.model:SetPoint("TOPLEFT", frame.salebox.icon, "BOTTOMLEFT", 0, -45)
 			frame.salebox.bid:ClearAllPoints()
 			frame.salebox.bid:SetPoint("TOP", frame.salebox.model, "BOTTOM", 0, -35)
@@ -1047,14 +1045,6 @@ function private.CreateFrames()
 			frame.salebox:SetPoint("RIGHT", frame, "RIGHT", -5,0)
 			frame.salebox:SetHeight(170)
 			if frame.salebox.sig then
-				frame.toggleManifest:Enable()
-				if (frame.toggleManifest:GetText() == "Close Sidebar") then
-					if not frame.manifest:IsVisible() then
-						frame.manifest:Show()
-					end
-				elseif frame.manifest:IsVisible() then
-					frame.manifest:Hide()
-				end
 				frame.salebox.stack:Show()
 				frame.salebox.stackentry:Show()
 				frame.salebox.numberentry:Show()
