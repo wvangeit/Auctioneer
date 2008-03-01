@@ -488,9 +488,12 @@ function lib.GetAppraiserValue(itemLink, useMatching)
 		newBuy, seen = AucAdvanced.API.GetAlgorithmValue(curModel, link)
 	end
 	if match and (curModel ~= "fixed") then -- Don't match fixed values.
-		newBuy, _, _, DiffFromModel, MatchString = AucAdvanced.API.GetBestMatch(link, curModel)
-		if MatchString then
-			curModelText = curModelText..MatchString
+		local _newBuy, _, _, _DiffFromModel, _MatchString = AucAdvanced.API.GetBestMatch(link, curModel)
+		if _newBuy then
+			newBuy, DiffFromModel, MatchString = _newBuy, _DiffFromModel, _MatchString
+			if MatchString then
+				curModelText = curModelText..MatchString
+			end
 		end
 	end
 	if curModel ~= "fixed" then
