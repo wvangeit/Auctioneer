@@ -507,6 +507,58 @@ function private.CreateFrames()
 		frame.UpdateControls()
 		frame.salebox.config = nil
 	end
+	
+	function frame.ShowOwnAuctionDetails(itemString)
+
+		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color') and AucAdvanced.Modules.Util.PriceLevel
+		
+		local itemName, itemLink = GetItemInfo(itemString)
+		
+		local results={}
+		local counts={}
+		for i=1, GetNumAuctionItems("owner") do
+			local name, _, count, _, _, _, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", i)
+			if itemName==name then
+				local r = results[count] 
+				if not r then
+					r = { stackCount=0, countBid=0, sumBid=0, countBO=0, sumBO=0 }
+					results[count] = r
+					tinsert(counts, count)
+				end
+				if (minBid or 0)>0 then
+					r.countBid = r.countBid + count
+					r.sumBid = r.sumBid + bidAmount
+				end
+				if (buyoutPrice or 0)>0 then
+					r.countBO = r.countBO + count
+					r.sumBO = r.sumBO + buyoutPrice
+				end
+				r.stackCount = r.stackCount + 1
+			end
+		end
+		
+		if #counts>0 then
+			table.sort(counts)
+		
+			frame.manifest.lines:Add("")
+			frame.manifest.lines:Add("Own auctions:       |cffffffff(price/each)", nil, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+
+			for _,count in ipairs(counts) do
+				local res = results[count]
+				local avgBid = res.countBid>0 and (res.sumBid / res.countBid) or nil
+				local avgBO =  res.countBO>0 and (res.sumBO / res.countBO) or nil
+				
+				local r,g,b,_
+				if colored then
+					_, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(itemLink, 1, avgBid, avgBO)
+				end
+				r,g,b = r or 1,g or 1, b or 1
+				
+				frame.manifest.lines:Add(format("  %2d lots of %2dx", res.stackCount, count)..
+					(avgBO and "" or " (bid)"), avgBO or avgBid, r,g,b)
+			end
+		end
+	end
 
 	function frame.UpdateControls()
 		if not frame.salebox.sig then
@@ -827,6 +879,8 @@ function private.CreateFrames()
 			frame.manifest.lines:Add(("------------------------------"))
 			frame.manifest.lines:Add(("Note: No auctionable items"))
 		end
+		
+		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
 		local canAuction = true
 		local warnText = frame.salebox.warn:GetText()
