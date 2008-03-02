@@ -60,6 +60,13 @@ function lib.GetPriceArray(hyperlink, faction, realm)
 	end
 	array.g_price = price
 	array.g_seen = seen
+	
+	if AucAdvanced.Settings.GetSetting("stat.wowecon.useglobal") then
+		array.price = array.g_price
+		array.seen = array.g_seen
+		array.specific = false
+	end
+	
 	return array
 end
 
@@ -71,6 +78,50 @@ end
 function lib.CanSupplyMarket()
 	if not (Wowecon and Wowecon.API) then return false end
 	return true
+end
+
+function lib.Processor(callbackType, ...)
+	if (callbackType == "config") then
+		--Called when you should build your Configator tab.
+		private.SetupConfigGui(...)
+	elseif (callbackType == "load") then
+		lib.OnLoad(...)
+	end
+end
+
+function private.SetupConfigGui(gui)
+	local id = gui:AddTab(lib.libName, lib.libType.." Modules")
+
+	gui:AddHelp(id, "what global price",
+		"What are global prices?",
+		"Wowecon provides two different types of prices: a global price, averaged across "..
+		"all servers, and a server specific price, for just your server and faction.")
+
+	gui:AddHelp(id, "why use global",
+		"Why should I use global prices?",
+		"Server specific prices can be useful if your server has prices which are far "..
+		"removed from the average, but often these prices are based on many "..
+		"fewer data points, causing your server specific price to "..
+		"possibly get out of whack for some items.  This option lets you force the "..
+		"Wowecon stat to always use global prices, if you'd prefer.")
+	
+	gui:AddHelp(id, "prices dont match",
+		"The Wowecon price used by Appraiser doesn't match the Wowecon tooltip.  What gives?",
+		"Wowecon gives you the option to hide server specific prices if seen "..
+		"fewer than a given number of times.  Even though these prices are "..
+		"hidden from the tooltip, they are still reported to Appraiser.  "..
+		"If you are not using the global price option here, you should "..
+		"check to make sure there isn't a hidden server specific price for your server, "..
+		"with just a small number of seen times.")
+	
+	gui:AddControl(id, "Header",     0,    libName.." options")
+	gui:AddControl(id, "Note",       0, 1, nil, nil, " ")
+	gui:AddControl(id, "Checkbox",   0, 1, "stat.wowecon.useglobal", "Always use global price, not server price")
+	gui:AddTip(id, "Toggle use of server specific Wowecon price stats, if they exist")
+end
+
+function lib.OnLoad(addon)
+	AucAdvanced.Settings.SetDefault("stat.wowecon.useglobal", true)
 end
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
