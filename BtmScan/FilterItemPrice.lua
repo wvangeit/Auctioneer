@@ -84,6 +84,26 @@ define(lcName..'.enable', false)
 
 function lib:setup(gui)
 	id = gui:AddTab(libName)
+	
+	gui:AddHelp(id, "what is ignoreitemprice",
+		"What is IgnoreItemPrice?",
+		"The IgnoreItemPrice filter is used by Bottom Scanner to ignore "..
+		"an item at or above a given price.\n\n"..
+		"This option must be enabled for the 'IgnorePrice' button in "..
+		"the Bottom Scanner pop-up dialog to have any effect.")
+	
+	gui:AddHelp(id, "when ignoreitemprice",
+		"When would I use IgnoreItemPrice?",
+		"IgnoreItemPrice can be used whenever you get Bottom Scanner "..
+		"pop-ups for an item at valuation price much higher than you "..
+		"know an item is worth.  Rather than ignore the item completely, "..
+		"you can instead just ignore the item in the future when it is "..
+		"at or above the currently listed price.  \n\n"..
+		"Note that price ignoring is global across all appraisers, "..
+		"so you should be a little careful when using this option.  "..
+		"If needed, you can always disable IgnoreItemPrice for specific "..
+		"evaluators here in these options.")
+	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable price-filtering")
 
@@ -93,7 +113,7 @@ function lib:setup(gui)
 		else
 			define(lcName..".filter."..name, true)
 		end
-		gui:AddControl(id, "Checkbox",         0, 1, lcName..".filter."..name, "activate Filter for module:"..name)
+		gui:AddControl(id, "Checkbox",         0, 2, lcName..".filter."..name, "activate Filter for module:"..name)
 	end
 end
 

@@ -98,6 +98,26 @@ define(lcName..'.onlyonbids', true)
 
 function lib:setup(gui)
 	id = gui:AddTab(libName)
+	
+	gui:AddHelp(id, "what is ignoretimeleft",
+		"What is IgnoreTimeLeft?",
+		"The IgnoreTimeLeft filter allows Bottom Scanner users "..
+		"to allow pop-up dialogs only when an item has less "..
+		"than a certain amount of time left to auction.  "..
+		"It can be applied to all pop-ups, or just those for "..
+		"bid auctions (not buyouts).")
+	
+	gui:AddHelp(id, "when use ignoretimeleft",
+		"When would I use IgnoreTimeLeft?",
+		"The IgnoreTimeLeft filter is primarily used to limit "..
+		"pop-ups for items which are only good purchase candidates "..
+		"at the bid, not buyout price.  But many users don't want to "..
+		"bother bidding on items with a long time left at auction, "..
+		"because more than likely someone else will outbid them before "..
+		"the auction ends.  In this case, you would set the options to "..
+		"enable the filter, only for bids, and set the amount of time to "..
+		"your desired maximum time.")
+	
 	gui:AddControl(id, "Subhead",          0,    libName.." Settings")
 	gui:AddControl(id, "Checkbox",         0, 1, lcName..".enable", "Enable time-left-filtering")
 	gui:AddControl(id, "Checkbox",         0, 2, lcName..".onlyonbids", "Only filter for bids")
