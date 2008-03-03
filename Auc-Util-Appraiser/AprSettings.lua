@@ -67,9 +67,10 @@ private.durations = {
 ----   id, name, texture, quality
 --]]
 function private.sortItems(a,b)
-	if a[0] and b[0] and a[0] ~= b[0] then return a[0] < b[0] end
+	if (not a.ignore)~=(not b.ignore) then return (a.ignore and 1 or 0) < (b.ignore and 1 or 0) end
 	if a[4] ~= b[4] then return a[4] > b[4] end
 	if a[2] ~= b[2] then return a[2] < b[2] end
+	if (not a.auction)~=(not b.auction) then return (a.auction and 1 or 0) < (b.auction and 1 or 0) end	-- sort an auction AFTER its corresponding inventory entry to drag-to-select picks the inventory item
 	return a[1] < b[1]
 end
 

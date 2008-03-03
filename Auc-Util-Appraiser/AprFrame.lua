@@ -53,7 +53,6 @@ function private.CreateFrames()
 	local DiffFromModel = 0
 	local MatchString = ""
 	frame.list = {}
-	frame.buffer = {}
 	frame.cache = {}
 	
 	function frame.GenerateList(repos)
@@ -100,27 +99,16 @@ function private.CreateFrames()
 							end
 
 							if not found then
-								local i = #(frame.list) + 1
-								if not frame.buffer[i] then
-									frame.buffer[i] = {}
-								end
-								local ignore = 0
-								if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".ignore")) then
-									ignore = 1
-								end
+								local ignore = not not AucAdvanced.Settings.GetSetting('util.appraiser.item.'..sig..".ignore")
 
-								if frame.showHidden or ignore == 0 or isDirect then
+								if frame.showHidden or (not ignore) or isDirect then
 									local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
-									frame.buffer[i][0] = ignore
-									frame.buffer[i][1] = sig
-									frame.buffer[i][2] = name
-									frame.buffer[i][3] = texture
-									frame.buffer[i][4] = rarity
-									frame.buffer[i][5] = stack
-									frame.buffer[i][6] = itemCount
-									frame.buffer[i][7] = link
-
-									table.insert(frame.list, frame.buffer[i])
+									
+									table.insert(frame.list, {
+										sig,name,texture,rarity,stack,itemCount,link,  
+										ignore=ignore 
+									} )
+									
 									if AucAdvanced.Modules.Util
 									and AucAdvanced.Modules.Util.ScanData
 									and AucAdvanced.Modules.Util.ScanData.GetDistribution
@@ -139,8 +127,58 @@ function private.CreateFrames()
 			end
 		end
 
-		table.sort(frame.list, private.sortItems)
+		if frame.showAuctions then
+			for auc=1, GetNumAuctionItems("owner") do
+				local name, texture, count, quality, canUse, level, minBid, minIncrement, buyoutPrice, bidAmount, highBidder, owner  = GetAuctionItemInfo("owner", auc)
+				local link = GetAuctionItemLink("owner", auc)
 
+				local itype, id, suffix, factor, enchant, seed = AucAdvanced.DecodeLink(link)
+				if itype == "item" then
+					local sig
+					if enchant ~= 0 then
+						sig = ("%d:%d:%d:%d"):format(id, suffix, factor, enchant)
+					elseif factor ~= 0 then
+						sig = ("%d:%d:%d"):format(id, suffix, factor)
+					elseif suffix ~= 0 then
+						sig = ("%d:%d"):format(id, suffix)
+					else
+						sig = tostring(id)
+					end
+				
+					local found = false
+					for i = 1, #(frame.list) do
+						if frame.list[i][1] == sig and frame.list[i].auction then
+							frame.list[i][6] = frame.list[i][6] + count
+							found = true
+							break
+						end
+					end
+					
+					if not found then
+						local name, _,rarity,_,_,_,_, stack = GetItemInfo(link)
+						
+						table.insert(frame.list, {
+							sig,name,texture,rarity,stack,count,link,  
+							auction=true
+						} )
+						
+						if AucAdvanced.Modules.Util
+						and AucAdvanced.Modules.Util.ScanData
+						and AucAdvanced.Modules.Util.ScanData.GetDistribution
+						and not frame.cache[sig] then
+							local exact, suffix, base, colorDist = AucAdvanced.Modules.Util.ScanData.GetDistribution(link)
+							frame.cache[sig] = { exact, suffix, base, {} }
+							for k,v in pairs(colorDist.exact) do
+								frame.cache[sig][4][k] = v
+							end
+						end
+					end
+				end
+			end
+		end
+		
+		table.sort(frame.list, private.sortItems)
+		
 		local pos = 0
 		n = #frame.list
 		if (n <= NUM_ITEMS) then
@@ -187,6 +225,7 @@ function private.CreateFrames()
 		frame.selected = sig
 		frame.selectedPos = pos
 		frame.selectedObj = obj
+		frame.selectedAuction = item.auction
 		frame.SetScroll()
 
 		frame.salebox.sig = sig
@@ -194,7 +233,11 @@ function private.CreateFrames()
 			local _,_,_, hex = GetItemQualityColor(item[4])
 			frame.salebox.icon:SetNormalTexture(item[3])
 			frame.salebox.name:SetText(hex.."["..item[2].."]|r")
-			frame.salebox.info:SetText("You have "..item[6].." available to auction")
+			if item.auction then
+				frame.salebox.info:SetText("You have "..item[6].." up for auction")
+			else
+				frame.salebox.info:SetText("You have "..item[6].." available to auction")
+			end
 			frame.salebox.info:SetTextColor(1,1,1, 0.8)
 			frame.salebox.link = item[7]
 			frame.salebox.stacksize = item[5]
@@ -309,11 +352,11 @@ function private.CreateFrames()
 				result[Const.CURBID],
 				result[Const.BUYOUT]
 			)
-			local color = frame.SetPriceColor(itemkey, count, result[Const.CURBID], result[Const.BUYOUT])
-			if color then
+			local r,g,b = frame.SetPriceColor(itemkey, count, result[Const.CURBID], result[Const.BUYOUT])
+			if r then
 				style[i] = acquire()
 				style[i][1] = acquire()
-				style[i][1].textColor = color
+				style[i][1].textColor = acquire(r,g,b)
 			end
 		end
 		frame.SetPriceFromModel(curModel)
@@ -330,17 +373,13 @@ function private.CreateFrames()
 		
 	end
 
-	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice)
+	function frame.SetPriceColor(itemID, count, requiredBid, buyoutPrice, rDef, gDef, bDef)
 		if AucAdvanced.Settings.GetSetting('util.appraiser.color') and AucAdvanced.Modules.Util.PriceLevel then
-		local link = select(2,GetItemInfo(itemID))
-		local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
-			if r and g and b then
-				return acquire(r,g,b)
-			else
-				return nil
-			end
+			local _, link = GetItemInfo(itemID)
+			local _, _, r,g,b = AucAdvanced.Modules.Util.PriceLevel.CalcLevel(link, count, requiredBid, buyoutPrice)
+			return r,g,b
 		end
-		return nil
+		return rDef,gDef,bDef
 	end
 		
 	function frame.SetPriceFromModel(curModel)
@@ -561,7 +600,9 @@ function private.CreateFrames()
 	end
 
 	function frame.UpdateControls()
-		if not frame.salebox.sig then
+		if ( not frame.salebox.sig ) or	-- nothing selected
+		   ( frame.selectedAuction and not frame.itembox:IsShown()) -- old UI: don't show auctions
+		   then
 			frame.salebox.icon:SetAlpha(0)
 			frame.salebox.stack:Hide()
 			frame.salebox.number:Hide()
@@ -594,17 +635,22 @@ function private.CreateFrames()
 		frame.manifest.lines:Clear()
 		frame.manifest:SetFrameLevel(AuctionFrame:GetFrameLevel())
 		if frame.itembox:IsShown() then
+			-- new UI
 			frame.salebox.ignore:Show()
 			frame.salebox.bulk:Show()
-			frame.salebox.number:Show()
-			frame.salebox.stack:Show()
-			frame.salebox.stackentry:Show()
-			frame.salebox.numberentry:Show()
-			frame.toggleManifest:Enable()
-			if frame.toggleManifest:GetText() == "Close Sidebar" then
-				frame.manifest:Show()
+			if frame.selectedAuction then
+				frame.salebox.number:Hide()
+				frame.salebox.stack:Hide()
+				frame.salebox.stackentry:Hide()
+				frame.salebox.numberentry:Hide()
+			else
+				frame.salebox.number:Show()
+				frame.salebox.stack:Show()
+				frame.salebox.stackentry:Show()
+				frame.salebox.numberentry:Show()
 			end
 		else
+			-- old UI
 			frame.salebox.stackentry:Show()
 			frame.salebox.stacksoflabel:Show()
 			frame.salebox.numberentry:Show()
@@ -612,6 +658,11 @@ function private.CreateFrames()
 			frame.salebox.totalbid:Show()
 			frame.salebox.totalbuyout:Show()
 		end
+		frame.toggleManifest:Enable()
+		if frame.toggleManifest:GetText() == "Close Sidebar" then
+			frame.manifest:Show()
+		end
+		
 		frame.refresh:Enable()
 		frame.switchUI:Enable()
 
@@ -669,216 +720,190 @@ function private.CreateFrames()
 		local totalBid, totalBuy, totalDeposit = 0,0,0
 		local bidVal, buyVal, depositVal
 
-		local color, r,g,b, a
+		local r,g,b,a
 		local colored = AucAdvanced.Settings.GetSetting('util.appraiser.manifest.color')
 		local tinted = AucAdvanced.Settings.GetSetting('util.appraiser.tint.color')
-		r,g,b, a = 0,0,0, 0
+		
+		r,g,b,a=0,0,0,0
 		if tinted then
-			color = frame.SetPriceColor(itemKey, 1, curBid, curBid)
-			if color then
-				r,g,b = unpack(color)
-				a = 0.4
-				recycle(color)
-			end
+			r,g,b = frame.SetPriceColor(itemKey, 1, curBid, curBid,  r,g,b)
+			if r then a=0.4 end
 		end
 		AppraiserSaleboxBidGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidSilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBidCopper:SetBackdropColor(r,g,b, a)
+		
+		r,g,b,a=0,0,0,0
 		if tinted then
-			color = frame.SetPriceColor(itemKey, 1, curBuy, curBuy)
-			if color then
-				r,g,b = unpack(color)
-				a = 0.4
-				recycle(color)
-			end
+			r,g,b = frame.SetPriceColor(itemKey, 1, curBuy, curBuy,  r,g,b)
+			if r then a=0.4 end
 		end
 		AppraiserSaleboxBuyGold:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuySilver:SetBackdropColor(r,g,b, a)
 		AppraiserSaleboxBuyCopper:SetBackdropColor(r,g,b, a)
+		
+		if not frame.selectedAuction then
 
-		local depositMult = curDurationMins / 720
-		local curNumber = frame.salebox.number:GetAdjustedValue()
+			local depositMult = curDurationMins / 720
+			local curNumber = frame.salebox.number:GetAdjustedValue()
 
-		if (frame.salebox.stacksize > 1) then
-			local count = frame.salebox.count
+			if (frame.salebox.stacksize > 1) then
+				local count = frame.salebox.count
 
-			frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
-			local curSize = frame.salebox.stack:GetValue()
-			local extra = ""
-			if (curSize > count) then
-				extra = "  |cffffaa40" .. "(Stack > Available)"
-			end
-			frame.salebox.stack.label:SetText(("Stack size: %d"):format(curSize)..extra)
-			frame.salebox.stack:SetAlpha(1)
-			frame.salebox.stackentry:SetNumber(curSize)
-
-			local maxStax = math.floor(count / curSize)
-			local fullPop = maxStax*curSize
-			local remain = count - fullPop
-			frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
-			if (curNumber >= -2 and curNumber < 0) then
-				if (curNumber == -2) then
-					frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
-					frame.salebox.totalsize:SetText("("..(fullPop)..")")
-					frame.salebox.numberentry:SetText("Full")
-				else
-					frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
-					frame.salebox.totalsize:SetText("("..(count)..")")
-					frame.salebox.numberentry:SetText("All")
+				frame.salebox.stack:SetMinMaxValues(1, frame.salebox.stacksize)
+				local curSize = frame.salebox.stack:GetValue()
+				local extra = ""
+				if (curSize > count) then
+					extra = "  |cffffaa40" .. "(Stack > Available)"
 				end
-				--frame.salebox.numberentry:SetNumber(maxStax)
-				if (maxStax > 0) then
-					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
+				frame.salebox.stack.label:SetText(("Stack size: %d"):format(curSize)..extra)
+				frame.salebox.stack:SetAlpha(1)
+				frame.salebox.stackentry:SetNumber(curSize)
+
+				local maxStax = math.floor(count / curSize)
+				local fullPop = maxStax*curSize
+				local remain = count - fullPop
+				frame.salebox.number:SetAdjustedRange(maxStax, -2, -1)
+				if (curNumber >= -2 and curNumber < 0) then
+					if (curNumber == -2) then
+						frame.salebox.number.label:SetText(("Number: %s"):format(("All full stacks (%d) = %d"):format(maxStax, fullPop)))
+						frame.salebox.totalsize:SetText("("..(fullPop)..")")
+						frame.salebox.numberentry:SetText("Full")
+					else
+						frame.salebox.number.label:SetText(("Number: %s"):format(("All stacks (%d) plus %d = %d"):format(maxStax, remain, count)))
+						frame.salebox.totalsize:SetText("("..(count)..")")
+						frame.salebox.numberentry:SetText("All")
+					end
+					--frame.salebox.numberentry:SetNumber(maxStax)
+					if (maxStax > 0) then
+						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(maxStax, curSize))
+						bidVal = lib.RoundBid(curBid * curSize)
+						buyVal = lib.RoundBuy(curBuy * curSize)
+						depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
+						
+						r,g,b=nil,nil,nil
+						if colored then
+							r,g,b = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
+						end
+						frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal, r,g,b)
+						r,g,b=nil,nil,nil
+						if colored then
+							r,g,b = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
+						end
+						frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal, r,g,b)
+						frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
+
+						totalBid = totalBid + (bidVal * maxStax)
+						totalBuy = totalBuy + (buyVal * maxStax)
+						totalDeposit = totalDeposit + (depositVal * maxStax)
+					end
+					if (curNumber == -1 and remain > 0) then
+						bidVal = lib.RoundBid(curBid * remain)
+						buyVal = lib.RoundBuy(curBuy * remain)
+						depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
+						frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
+						r,g,b=nil,nil,nil
+						if colored then
+							r,g,b = frame.SetPriceColor(itemKey, remain, bidVal, bidVal)
+						end
+						frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal, r,g,b)
+						r,g,b=nil,nil,nil
+						if colored then
+							r,g,b = frame.SetPriceColor(itemKey, remain, buyVal, buyVal)
+						end
+						frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal, r,g,b)
+						frame.manifest.lines:Add(("  Deposit for %dx"):format(remain), depositVal)
+
+						totalBid = totalBid + bidVal
+						totalBuy = totalBuy + buyVal
+						totalDeposit = totalDeposit + depositVal
+					end
+				else
+					frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
+					frame.salebox.totalsize:SetText("("..(curNumber*curSize)..")")
+					frame.salebox.numberentry:SetNumber(curNumber)
+					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
 					bidVal = lib.RoundBid(curBid * curSize)
 					buyVal = lib.RoundBuy(curBuy * curSize)
 					depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
-					
+					r,g,b=nil,nil,nil
 					if colored then
-						color = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
-						if color then
-							r,g,b = unpack(color)
-							recycle(color)
-						end
+						r,g,b = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
 					end
 					frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal, r,g,b)
+					r,g,b=nil,nil,nil
 					if colored then
-						color = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
-						if color then
-							r,g,b = unpack(color)
-							recycle(color)
-						end
+						r,g,b = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
 					end
 					frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal, r,g,b)
 					frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
 
-					totalBid = totalBid + (bidVal * maxStax)
-					totalBuy = totalBuy + (buyVal * maxStax)
-					totalDeposit = totalDeposit + (depositVal * maxStax)
+					totalBid = totalBid + (bidVal * curNumber)
+					totalBuy = totalBuy + (buyVal * curNumber)
+					totalDeposit = totalDeposit + (depositVal * curNumber)
 				end
-				if (curNumber == -1 and remain > 0) then
-					bidVal = lib.RoundBid(curBid * remain)
-					buyVal = lib.RoundBuy(curBuy * remain)
-					depositVal = AucAdvanced.Post.GetDepositAmount(sig, remain) * depositMult
-					frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(1, remain))
-					if colored then
-						color = frame.SetPriceColor(itemKey, remain, bidVal, bidVal)
-						if color then
-							r,g,b = unpack(color)
-							recycle(color)
-						end
-					end
-					frame.manifest.lines:Add(("  Bid for %dx"):format(remain), bidVal, r,g,b)
-					if colored then
-						color = frame.SetPriceColor(itemKey, remain, buyVal, buyVal)
-						if color then
-							r,g,b = unpack(color)
-							recycle(color)
-						end
-					end
-					frame.manifest.lines:Add(("  Buyout for %dx"):format(remain), buyVal, r,g,b)
-					frame.manifest.lines:Add(("  Deposit for %dx"):format(remain), depositVal)
 
-					totalBid = totalBid + bidVal
-					totalBuy = totalBuy + buyVal
-					totalDeposit = totalDeposit + depositVal
-				end
 			else
-				frame.salebox.number.label:SetText(("Number: %s"):format(("%d stacks = %d"):format(curNumber, curNumber*curSize)))
-				frame.salebox.totalsize:SetText("("..(curNumber*curSize)..")")
-				frame.salebox.numberentry:SetNumber(curNumber)
-				frame.manifest.lines:Add(("%d lots of %dx stacks:"):format(curNumber, curSize))
-				bidVal = lib.RoundBid(curBid * curSize)
-				buyVal = lib.RoundBuy(curBuy * curSize)
-				depositVal = AucAdvanced.Post.GetDepositAmount(sig, curSize) * depositMult
-				if colored then
-					color = frame.SetPriceColor(itemKey, curSize, bidVal, bidVal)
-					if color then
-						r,g,b = unpack(color)
-						recycle(color)
-					end
-				end
-				frame.manifest.lines:Add(("  Bid for %dx"):format(curSize), bidVal, r,g,b)
-				if colored then
-					color = frame.SetPriceColor(itemKey, curSize, buyVal, buyVal)
-					if color then
-						r,g,b = unpack(color)
-						recycle(color)
-					end
-				end
-				frame.manifest.lines:Add(("  Buyout for %dx"):format(curSize), buyVal, r,g,b)
-				frame.manifest.lines:Add(("  Deposit for %dx"):format(curSize), depositVal)
+				frame.salebox.stack:SetMinMaxValues(1,1)
+				frame.salebox.stack:SetValue(1)
+				frame.salebox.stack.label:SetText("Item is not stackable")
+				frame.salebox.stackentry:SetNumber(1)
+				frame.salebox.stack:SetAlpha(0.6)
 
-				totalBid = totalBid + (bidVal * curNumber)
-				totalBuy = totalBuy + (buyVal * curNumber)
-				totalDeposit = totalDeposit + (depositVal * curNumber)
+				frame.salebox.number:SetAdjustedRange(frame.salebox.count, -1)
+				if (curNumber == -1) then
+					curNumber = frame.salebox.count
+					frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
+					frame.salebox.totalsize:SetText("("..(curNumber)..")")
+					frame.salebox.numberentry:SetText("All")
+				else
+					frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
+					frame.salebox.totalsize:SetText("("..(curNumber)..")")
+					frame.salebox.numberentry:SetNumber(curNumber)
+				end
+				
+				if curNumber > 0 then
+					frame.manifest.lines:Add(("%d items"):format(curNumber))
+					bidVal = lib.RoundBid(curBid)
+					buyVal = lib.RoundBuy(curBuy)
+					local baseDeposit = AucAdvanced.Post.GetDepositAmount(sig) or 0 
+					depositVal = baseDeposit * depositMult
+					r,g,b=nil,nil,nil
+					if colored then
+						r,g,b = frame.SetPriceColor(itemKey, 1, bidVal, bidVal)
+					end
+					frame.manifest.lines:Add(("  Bid /item"), bidVal, r,g,b)
+					r,g,b=nil,nil,nil
+					if colored then
+						r,g,b = frame.SetPriceColor(itemKey, 1, buyVal, buyVal)
+					end
+					frame.manifest.lines:Add(("  Buyout /item"), buyVal, r,g,b)
+					frame.manifest.lines:Add(("  Deposit /item"), depositVal)
+					totalBid = totalBid + (bidVal * curNumber)
+					totalBuy = totalBuy + (buyVal * curNumber)
+					totalDeposit = totalDeposit + (depositVal * curNumber)
+				end
 			end
-
-		else
-			frame.salebox.stack:SetMinMaxValues(1,1)
-			frame.salebox.stack:SetValue(1)
-			frame.salebox.stack.label:SetText("Item is not stackable")
-			frame.salebox.stackentry:SetNumber(1)
-			frame.salebox.stack:SetAlpha(0.6)
-
-			frame.salebox.number:SetAdjustedRange(frame.salebox.count, -1)
-			if (curNumber == -1) then
-				curNumber = frame.salebox.count
-				frame.salebox.number.label:SetText(("Number: %s"):format(("All items = %d"):format(curNumber)))
-				frame.salebox.totalsize:SetText("("..(curNumber)..")")
-				frame.salebox.numberentry:SetText("All")
-			else
-				frame.salebox.number.label:SetText(("Number: %s"):format(("%d items"):format(curNumber)))
-				frame.salebox.totalsize:SetText("("..(curNumber)..")")
-				frame.salebox.numberentry:SetNumber(curNumber)
+			frame.manifest.lines:Add(("Totals:"))
+			frame.manifest.lines:Add(("  Total Bid"), totalBid)
+			frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
+			frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
+			frame.salebox.depositcost:SetText("Deposit:      "..EnhTooltip.GetTextGSC(totalDeposit, true))
+			frame.salebox.totalbid:SetText("Total Bid:    "..EnhTooltip.GetTextGSC(totalBid, true))
+			frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
+			local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
+			if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
+				local MatchStringList = {strsplit("\n", MatchString)}
+				for i in pairs(MatchStringList) do
+					frame.manifest.lines:Add((MatchStringList[i]))
+				end
 			end
 			
-			if curNumber > 0 then
-				frame.manifest.lines:Add(("%d items"):format(curNumber))
-				bidVal = lib.RoundBid(curBid)
-				buyVal = lib.RoundBuy(curBuy)
-				local baseDeposit = AucAdvanced.Post.GetDepositAmount(sig) or 0 
-				depositVal = baseDeposit * depositMult
-				if colored then
-					color = frame.SetPriceColor(itemKey, 1, bidVal, bidVal)
-					if color then
-						r,g,b = unpack(color)
-						recycle(color)
-					end
-				end
-				frame.manifest.lines:Add(("  Bid /item"), bidVal, r,g,b)
-				if colored then
-					color = frame.SetPriceColor(itemKey, 1, buyVal, buyVal)
-					if color then
-						r,g,b = unpack(color)
-						recycle(color)
-					end
-				end
-				frame.manifest.lines:Add(("  Buyout /item"), buyVal, r,g,b)
-				frame.manifest.lines:Add(("  Deposit /item"), depositVal)
-				totalBid = totalBid + (bidVal * curNumber)
-				totalBuy = totalBuy + (buyVal * curNumber)
-				totalDeposit = totalDeposit + (depositVal * curNumber)
+			if (totalBid < 1) then
+				frame.manifest.lines:Add(("------------------------------"))
+				frame.manifest.lines:Add(("Note: No auctionable items"))
 			end
-		end
-		frame.manifest.lines:Add(("Totals:"))
-		frame.manifest.lines:Add(("  Total Bid"), totalBid)
-		frame.manifest.lines:Add(("  Total Buyout"), totalBuy)
-		frame.manifest.lines:Add(("  Total Deposit"), totalDeposit)
-		frame.salebox.depositcost:SetText("Deposit:      "..EnhTooltip.GetTextGSC(totalDeposit, true))
-		frame.salebox.totalbid:SetText("Total Bid:    "..EnhTooltip.GetTextGSC(totalBid, true))
-		frame.salebox.totalbuyout:SetText("Total Buyout: "..EnhTooltip.GetTextGSC(totalBuy, true))
-		local curModel = AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".model") or "default"
-		if (frame.salebox.matcher:GetChecked() and (frame.salebox.matcher:IsEnabled()==1) and (DiffFromModel)) then
-			local MatchStringList = {strsplit("\n", MatchString)}
-			for i in pairs(MatchStringList) do
-				frame.manifest.lines:Add((MatchStringList[i]))
-			end
-		end
-		
-		if (totalBid < 1) then
-			frame.manifest.lines:Add(("------------------------------"))
-			frame.manifest.lines:Add(("Note: No auctionable items"))
-		end
+		end -- if not frame.selectedAuction then
 		
 		frame.ShowOwnAuctionDetails(itemKey)	-- Adds lines to frame.manifest
 
@@ -889,6 +914,10 @@ function private.CreateFrames()
 		end
 
 		if totalBid < 1 then
+			canAuction = false
+		end
+		
+		if frame.selectedAuction then
 			canAuction = false
 		end
 
@@ -1079,6 +1108,8 @@ function private.CreateFrames()
 			frame.salebox.note = frame.salebox.oldnote or frame.salebox.note 
 			frame.salebox.oldnote = nil
 		end
+		
+		frame.UpdateControls()
 	end
 
 	function frame.GetItemByLink(link)
@@ -1366,20 +1397,31 @@ function private.CreateFrames()
 			local item = frame.list[pos+i]
 			local button = frame.items[i]
 			if item then
-				local curIgnore = item[0] == 1
+				local curIgnore = item.ignore
 
 				button.icon:SetTexture(item[3])
 				button.icon:SetDesaturated(curIgnore)
 
 				local _,_,_, hex = GetItemQualityColor(item[4])
 				local stackX = "x "
-				if (curIgnore) then
+				if item.auction then
+					stackX = ""
+				end
+				
+				if curIgnore then
 					hex = "|cff444444"
 					stackX = hex..stackX
 				end
 
 				button.name:SetText(hex.."["..item[2].."]|r")
 				button.size:SetText(stackX..item[6])
+				
+				if item.auction then
+					button.size:SetAlpha(0.7)
+				else
+					button.size:SetAlpha(1)
+				end
+				
 				local info = ""
 				if frame.cache[item[1]] and not curIgnore then
 					local exact, suffix, base, dist = unpack(frame.cache[item[1]])
@@ -1390,13 +1432,18 @@ function private.CreateFrames()
 				end
 				button.info:SetText(info)
 				button:Show()
+				button.bg:SetVertexColor(1,1,1)
 				if (item[1] == frame.selected) then
 					button.bg:SetAlpha(0.6)
 				elseif curIgnore then
 					button.bg:SetAlpha(0.1)
+				elseif item.auction then
+					button.bg:SetVertexColor(0.3,0.1,1)	-- very dark red
+					button.bg:SetAlpha(0.3)
 				else
 					button.bg:SetAlpha(0.2)
 				end
+				
 				button.bg:SetDesaturated(curIgnore)
 			else
 				button:Hide()
@@ -1469,19 +1516,44 @@ function private.CreateFrames()
 	frame.itembox:SetWidth(240)
 	frame.itembox:SetHeight(340)
 
-	frame.itembox.hide = CreateFrame("Button", nil, frame.itembox, "OptionsButtonTemplate")
-	frame.itembox.hide:SetPoint("BOTTOM", frame.itembox, "TOP", 0,0)
-	frame.itembox.hide:SetScript("OnClick", function()
-		if (frame.showHidden) then
-			frame.showHidden = false
-		else
-			frame.showHidden = true
-		end
-		frame.GenerateList()
+	-- "Show Auctions" checkbox
+	frame.itembox.showAuctions = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowAuctions", frame.itembox, "OptionsCheckButtonTemplate")
+	frame.itembox.showAuctions.tooltipText = "Include own auctions in the item listing"
+	frame.itembox.showAuctions:SetWidth(24)
+	frame.itembox.showAuctions:SetHeight(24)
+	Auc_Util_Appraiser_ShowAuctionsText:SetText("Auctions ")
+	frame.itembox.showAuctions:SetPoint("BOTTOMRIGHT", frame.itembox, "TOPRIGHT", 0-Auc_Util_Appraiser_ShowAuctionsText:GetWidth(), 0)
+	frame.itembox.showAuctions:SetHitRectInsets(0, 0-Auc_Util_Appraiser_ShowAuctionsText:GetWidth(), 0, 0)
+	frame.itembox.showAuctions:SetScript("OnClick", function()
+		frame.showAuctions = this:GetChecked()
+		frame.GenerateList(true)
+		PlaySound(frame.showAuctions and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
 	end)
-	frame.itembox.hide:SetText("Toggle Hidden")
-	frame.itembox.hide:SetWidth(120)
-	frame.itembox.hide:Show()
+	
+	-- "Show Hidden" checkbox
+	frame.itembox.showHidden = CreateFrame("CheckButton", "Auc_Util_Appraiser_ShowHidden", frame.itembox, "OptionsCheckButtonTemplate")
+	frame.itembox.showHidden.tooltipText = "Include items tagged as 'hidden' in the item listing"
+	frame.itembox.showHidden:SetWidth(24)
+	frame.itembox.showHidden:SetHeight(24)
+	Auc_Util_Appraiser_ShowHiddenText:SetText("Hidden ")
+	frame.itembox.showHidden:SetPoint("BOTTOMRIGHT", frame.itembox.showAuctions, "BOTTOMLEFT", 0-Auc_Util_Appraiser_ShowHiddenText:GetWidth(), 0)
+	frame.itembox.showHidden:SetHitRectInsets(0, 0-Auc_Util_Appraiser_ShowHiddenText:GetWidth(), 0, 0)
+	frame.itembox.showHidden:SetScript("OnClick", function()
+		frame.showHidden = this:GetChecked()
+		frame.GenerateList(true)
+		PlaySound(frame.showHidden and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff");
+	end)
+	
+	-- "Show:" label
+	frame.itembox.showText = CreateFrame("Frame", nil, frame.itembox)
+	frame.itembox.showText:SetPoint("BOTTOMRIGHT", frame.itembox.showHidden, "BOTTOMLEFT", 0,0)
+	frame.itembox.showText.text = frame.itembox.showText:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	frame.itembox.showText.text:SetAllPoints(frame.itembox.showText)
+	frame.itembox.showText.text:SetText("Show: ")
+	frame.itembox.showText:SetWidth(frame.itembox.showText.text:GetWidth())
+	frame.itembox.showText:SetHeight(frame.itembox.showAuctions:GetHeight())
+	
+	
 
 	frame.items = {}
 	for i=1, NUM_ITEMS do
