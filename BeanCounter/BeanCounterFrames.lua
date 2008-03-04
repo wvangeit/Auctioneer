@@ -640,12 +640,10 @@ function private.CreateFrames()
 				tbl = text
 				if type(text) == "string" then tbl= private.unpackString(text) end
 			
-				--local stack, bid = private.reconcileCompletedAuctions(player, id, tbl[4], tbl[6], tbl[9])
 				local pricePer = 0
 				local stack = tonumber(tbl[3]) or 0
-				if stack ~= 0 then pricePer = tbl[4]/stack end
-				--if bid > 0 then tbl[7] = bid end
-				
+				if stack > 0 then pricePer =  (tbl[4]-tbl[5]+tbl[6])/stack end
+	
 				return({
 					tbl[1], --itemname
 					_BC('UiAucSuccessful'), --status
@@ -695,9 +693,9 @@ function private.CreateFrames()
 				--If the auction was won on bid change text, and adjust ProfitPer
 				if tbl[7] ~= tbl[6] then	
 					text = _BC('UiWononBid') 
-					if stack > 0 then	pricePer = tbl[7]/stack end
+					if stack > 0 then	pricePer = (tbl[7]-tbl[4]+tbl[5])/stack end
 				else --Devide by BUY price if it was won on Buy
-					if stack > 0 then	pricePer = tbl[6]/stack end
+					if stack > 0 then	pricePer = (tbl[6]-tbl[4]+tbl[5])/stack end
 				end
 								
 				return({
