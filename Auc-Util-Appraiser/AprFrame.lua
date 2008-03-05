@@ -48,7 +48,7 @@ function private.CreateFrames()
 	local SelectBox = LibStub:GetLibrary("SelectBox")
 	local ScrollSheet = LibStub:GetLibrary("ScrollSheet")
 
-	frame = CreateFrame("Frame", nil, AuctionFrame)
+	frame = CreateFrame("Frame", "AucAdvAppraiserFrame", AuctionFrame)
 	private.frame = frame
 	local DiffFromModel = 0
 	local MatchString = ""
@@ -1954,6 +1954,39 @@ function private.CreateFrames()
 	frame.age:SetText("")
 	frame.age:SetJustifyH("RIGHT")
 	--frame.age:SetJustifyV("BOTTOM")
+	
+	frame.cancel = CreateFrame("Button", "AucAdvAppraiserCancelButton", frame, "OptionsButtonTemplate")
+	frame.cancel:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 180, 15)
+	frame.cancel:SetWidth(22)
+	frame.cancel:SetHeight(18)
+	frame.cancel:Disable()
+	frame.cancel:SetScript("OnClick", function()
+		AucAdvanced.Post.Private.postRequests = {}
+	end)
+	frame.cancel:RegisterEvent("AUCTION_OWNED_LIST_UPDATE")
+	frame.cancel:SetScript("OnUpdate", function()
+		local postnum = #AucAdvanced.Post.Private.postRequests
+		frame.cancel.label:SetText(tostring(postnum))
+		if postnum > 0 then
+			frame.cancel:Enable()
+			frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
+		else
+			frame.cancel:Disable()
+			frame.cancel.tex:SetVertexColor(0.3,0.3,0.3)
+		end
+	end)
+	frame.cancel.tex = frame.cancel:CreateTexture(nil, "OVERLAY")
+	frame.cancel.tex:SetPoint("TOPLEFT", frame.cancel, "TOPLEFT", 4, -2)
+	frame.cancel.tex:SetPoint("BOTTOMRIGHT", frame.cancel, "BOTTOMRIGHT", -4, 2)
+	frame.cancel.tex:SetTexture("Interface\\Addons\\Auc-Advanced\\Textures\\NavButtons")
+	frame.cancel.tex:SetTexCoord(0.25, 0.5, 0, 1)
+	frame.cancel.tex:SetVertexColor(1.0, 0.9, 0.1)
+	
+	frame.cancel.label = frame.cancel:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+	frame.cancel.label:SetPoint("LEFT", frame.cancel, "RIGHT", 5, 0)
+	frame.cancel.label:SetTextColor(1, 0.8, 0)
+	frame.cancel.label:SetText("")
+	frame.cancel.label:SetJustifyH("LEFT")
 
 	frame.manifest = CreateFrame("Frame", nil, frame)
 	frame.manifest:SetBackdrop({
