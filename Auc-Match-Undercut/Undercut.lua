@@ -160,7 +160,7 @@ function private.SetupConfigGui(gui)
 	gui:AddTip(id, "This controls how much above the market price you are willing to mark up.\n"..
 		"If the competition is marked up at 200%, and you set max markup to 10%, Auctioneer will go no more than 10% above market")
 	
-	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 1, "Undercut: %d%%")
+	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, "Undercut: %g%%")
 	gui:AddTip(id, "This controls the minimum undercut.  If there is no competition, or the competition is at market price, Auctioneer will undercut by this amount")
 	
 end
