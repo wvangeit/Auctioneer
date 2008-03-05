@@ -145,12 +145,18 @@ function lib.IsAuctionable(bag, slot)
 	private.tip:ClearLines()
 	private.tip:SetBagItem(bag, slot)
 	local bind = AppraiserTipTextLeft2:GetText()
+	local damage, maxdur = GetContainerItemDurability(bag, slot)
+	if damage then
+		damage = maxdur - damage
+	else damage = 0
+	end
 	private.tip:Hide()
 
 	if bind ~= ITEM_SOULBOUND
 	and bind ~= ITEM_BIND_QUEST
 	and bind ~= ITEM_BIND_ON_PICKUP
 	and bind ~= ITEM_CONJURED
+	and damage == 0
 	then
 		return true
 	end
