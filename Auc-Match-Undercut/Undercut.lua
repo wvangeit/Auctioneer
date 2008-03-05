@@ -56,7 +56,13 @@ function lib.GetMatchArray(hyperlink, marketprice)
 
 	local overmarket = AucAdvanced.Settings.GetSetting("match.undermarket.overmarket")
 	local undermarket = AucAdvanced.Settings.GetSetting("match.undermarket.undermarket")
-	local undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
+	local usevalue = AucAdvanced.Settings.GetSetting("match.undercut.usevalue")
+	local undercut 
+	if usevalue then
+		undercut = AucAdvanced.Settings.GetSetting("match.undercut.value")
+	else
+		undercut = AucAdvanced.Settings.GetSetting("match.undermarket.undercut")
+	end	
 	local playerName = UnitName("player")
 	local marketdiff = 0
 	local competing = 0
@@ -86,7 +92,14 @@ function lib.GetMatchArray(hyperlink, marketprice)
 		local competcost = compet.buyoutPrice or 0
 		local competstack = compet.stackSize or 0
 		compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
-		compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
+		if usevalue then
+			compet.buyoutPrice = compet.buyoutPrice - undercut
+		else		
+			compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
+		end
+		if compet.buyoutPrice <= 0 then
+			compet.buyoutPrice = 1
+		end
 		if (compet.buyoutPrice < matchprice) then
 			if (compet.buyoutPrice > minprice) then
 				if (not (compet.sellerName == playerName)) then
@@ -162,6 +175,11 @@ function private.SetupConfigGui(gui)
 	
 	gui:AddControl(id, "Slider",     0, 1, "match.undermarket.undercut", 0, 20, 0.1, "Undercut: %g%%")
 	gui:AddTip(id, "This controls the minimum undercut.  If there is no competition, or the competition is at market price, Auctioneer will undercut by this amount")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "match.undercut.usevalue", "Specify undercut amount by coin value")
+	gui:AddTip(id, "Specify the amount to undercut by a specific amount, instead of by a percentage")
+	
+	gui:AddControl(id, "MoneyFramePinned", 0, 2, "match.undercut.value", 1, 99999999, "Undercut Amount")
 	
 end
 
