@@ -1263,18 +1263,18 @@ function private.CreateFrames()
 		end
 
 		-- Just a quick bit of sanity checking first
-		assert(stack and stack >= 1)
-		assert(number and number >= -2)
-		assert(number ~= 0)
-		assert(itemBid and itemBid > 0)
-		assert(itemBuy and itemBuy == 0 or itemBuy >= itemBid)
-		assert(duration and duration == 720 or duration == 1440 or duration == 2880)
+		assert(stack and stack >= 1, "Item doesn't have a stack size set")
+		assert(number and number >= -2, "Item doesn't have a valid number of stacks/items set")
+		assert(number ~= 0, "Item doesn't have a valid number of stacks/items set")
+		assert(itemBid and itemBid > 0, "No bid value set")
+		assert(itemBuy and itemBuy == 0 or itemBuy >= itemBid, "Item doesn't have valid Buyout value")
+		assert(duration and duration == 720 or duration == 1440 or duration == 2880, "Duration not valid")
 		if not (total and total > 0) or (number > 0 and number * stack > total) then
 			UIErrorsFrame:AddMessage("You do not have enough items to do that")
 			print("You do not have enough items to do that")
 		end
 		if (number == -2) then
-			assert(stack <= total)
+			assert(stack <= total, "Stack size larger than available")
 		end
 
 		print(("Posting batch of: %s"):format(link))
