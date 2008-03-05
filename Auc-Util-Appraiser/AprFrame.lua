@@ -225,7 +225,7 @@ function private.CreateFrames()
 		frame.selected = sig
 		frame.selectedPos = pos
 		frame.selectedObj = obj
-		frame.selectedAuction = item.auction
+		frame.selectedAuction = item and item.auction
 		frame.SetScroll()
 
 		frame.salebox.sig = sig
