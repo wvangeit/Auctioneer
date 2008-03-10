@@ -83,7 +83,8 @@ function lib:valuate(item, tooltip)
 end
 
 function lib.PrintHelp()
-	BtmScan.Print("/btm snatch item maxPrice ")
+	BtmScan.Print("/btm snatch")
+	BtmScan.Print("/btm snatch [ItemLink] maxPrice")
 	BtmScan.Print("/btm snatch list")
 end
 
