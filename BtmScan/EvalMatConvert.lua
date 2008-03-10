@@ -180,8 +180,8 @@ local curModelText = "Unknown"
 local newBid, newBuy,_, curModelText = AucAdvanced.API.GetAppraiserValue(item.id, get(lcName..".matching.check"))
 local reagentPrice = 0		
 
-if newBuy = nil then newBuy = newBid end
-if newBuy = nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
+if newBuy == nil then newBuy = newBid end
+if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
 		
 if get(lcName..".buyout.check") then
 	reagentPrice = newBuy
@@ -237,8 +237,8 @@ end
 				local curModelText = "Unknown"
 				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 				
-				if newBuy = nil then newBuy = newBid end
-				if newBuy = nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
 				--update value since greater = 3 lesser ( lesser value *  3 = correct value of one greater )
 				if get(lcName..".buyout.check") then
 					convertsToValue = newBuy * 3
@@ -287,8 +287,8 @@ end
 				curModelText = "Unknown"
 				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 				
-				if newBuy = nil then newBuy = newBid end
-				if newBuy = nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
 		
 				--update value since 3 lesser = 1 greater ( greater value /  3 = correct value of one lesser )				
 					if get(lcName..".buyout.check") then
@@ -340,8 +340,8 @@ end
 				local curModelText = "Unknown"
 				local newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 				
-				if newBuy = nil then newBuy = newBid end
-				if newBuy = nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
 				
 			--update value since 10 motes = 1 primal do primal price / 10 				
 					if get(lcName..".buyout.check") then
@@ -399,8 +399,8 @@ end
 				curModelText = "Unknown"
 				newBid, newBuy, _, curModelText = AucAdvanced.API.GetAppraiserValue(convertToID, get(lcName..".matching.check"))
 				
-				if newBuy = nil then newBuy = newBid end
-				if newBuy = nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
+				if newBuy == nil then newBuy = newBid end
+				if newBuy == nil then item:info("EMC Fail: Something went wrong and we have no prices.") return end
 				
 			--update value 1 depleted = 1 non depleted item (meaning no modified to newbid or buy below)				
 					if get(lcName..".buyout.check") then
