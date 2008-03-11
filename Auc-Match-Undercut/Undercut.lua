@@ -85,28 +85,34 @@ function lib.GetMatchArray(hyperlink, marketprice)
 		factor = factor,
 	})
 	competing = #data
+	local lowestBidOnly = matchprice
 	for i = 1, #data do
 		local compet = AucAdvanced.API.UnpackImageItem(data[i])
 		local competname = compet.itemName or " "
 		local competseller = compet.sellerName or " "
 		local competcost = compet.buyoutPrice or 0
 		local competstack = compet.stackSize or 0
-		compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
-		if usevalue then
-			compet.buyoutPrice = compet.buyoutPrice - undercut
-		else		
-			compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
-		end
-		if compet.buyoutPrice <= 0 then
-			compet.buyoutPrice = 1
-		end
-		if (compet.buyoutPrice < matchprice) then
-			if (compet.buyoutPrice > minprice) then
-				if (not (compet.sellerName == playerName)) then
-					matchprice = compet.buyoutPrice
+		if compet.buyoutPrice<1 then
+			-- UCUT-8: Don't try to match bid-only auctions
+			lowestBidOnly = min(lowestBidOnly, (compet.curBid or compet.minBid)/compet.stackSize)
+		else
+			compet.buyoutPrice = (compet.buyoutPrice/compet.stackSize)
+			if usevalue then
+				compet.buyoutPrice = compet.buyoutPrice - undercut
+			else		
+				compet.buyoutPrice = floor(compet.buyoutPrice*((100-undercut)/100))
+			end
+			if compet.buyoutPrice <= 0 then
+				compet.buyoutPrice = 1
+			end
+			if (compet.buyoutPrice < matchprice) then
+				if (compet.buyoutPrice > minprice) then
+					if (not (compet.sellerName == playerName)) then
+						matchprice = compet.buyoutPrice
+					end
+				elseif (compet.buyoutPrice > 0) then
+					lowest = false
 				end
-			elseif (compet.buyoutPrice > 0) then
-				lowest = false
 			end
 		end
 	end
@@ -123,7 +129,11 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local matchArray = {}
 	matchArray.value = matchprice
 	if lowest then
-		matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lowest Price"
+		if matchprice<=lowestBidOnly then
+			matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lowest Price"
+		else
+			matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Lower bid-only auctions"
+		end
 	else
 		matchArray.returnstring = "Undercut: % change: "..marketdiff.."\nUndercut: Can not match lowest price"
 	end
