@@ -359,6 +359,9 @@ local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSub
 	
 	elseif itemName and itemTexture  and (cmd == "name") then
 		return itemName, itemTexture
+	
+	elseif itemStackCount and (cmd == "stack") then
+		return itemStackCount
 	end
 end
 --Recreate/refresh ItemIName to ItemID array

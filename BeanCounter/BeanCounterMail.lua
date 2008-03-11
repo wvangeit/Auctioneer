@@ -262,6 +262,8 @@ function private.findStackcompletedAuctions(key , itemID, soldDeposit, soldBuy, 
 			end
 		end
 	end
+	--return 1 if the item is nonstackable and no match was found
+	if private.getItemInfo(itemID, "stack") == 1 then return 1 end
 end
 --find stack, bid and buy info for failedauctions
 function private.findStackfailedAuctions(key, itemID, expiredTime)
@@ -274,6 +276,8 @@ function private.findStackfailedAuctions(key, itemID, expiredTime)
 			return tonumber(tbl2[2]), tonumber(tbl2[4]), tonumber(tbl2[3]), tonumber(tbl2[6])
 		end
 	end
+	--return 1 if the item is nonstackable and no match was found
+	if private.getItemInfo(itemID, "stack") == 1 then return 1  end
 end
 --find stack information from postedBids and postedBuyouts add into the completedBids/Buyouts table
 function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
@@ -300,7 +304,8 @@ function private.findStackcompletedBids(itemID, seller, buy, bid, itemName)
 			end
 		end
 	end
-	return 0 --failed to find stack
+	--return 1 if the item is nonstackable and no match was found
+	if private.getItemInfo(itemID, "stack") == 1 then return 1 else return 0 end
 end
 
 --Hook, take money event, if this still has an unretrieved invoice we delay X sec or invoice retrieved

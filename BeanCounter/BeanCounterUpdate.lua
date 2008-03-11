@@ -69,6 +69,34 @@ local tbl = {}
 	end
 
 end
+function private.fixMissingStack()
+    local tbl = {}
+    for player, v in pairs(private.serverData)do
+        for DB,data in pairs(private.serverData[player]) do
+            if DB == "completedAuctions" or DB =="failedAuctions" or DB =="completedBids/Buyouts" then
+                for itemID, value in pairs(data) do
+                    for index, text in ipairs(value) do
+                        tbl = {strsplit(";", text)}
+                        if tbl[3] == "0" or tbl[3] == "<nil>" and tbl[1] ~= "<nil>" and tbl[1] ~= 0 then
+                            local stack = private.getItemInfo(itemID, "stack")
+                            if stack == 1 then 
+                                print("Fixing stack count on Database ", DB," entry ", private.serverData[player][DB][itemID][index])
+                                if tbl[3] == "<nil>" then  
+                                    private.serverData[player][DB][itemID][index] = text:gsub("(<nil>)", stack, 1)
+                                else
+                                    private.serverData[player][DB][itemID][index] = text:gsub(";0", ";"..stack, 1)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+--[[end manually run functions]]
+
+
 
 function private.UpgradeDatabaseVersion()
 	if BeanCounterDB["version"] then --Remove the old global version and create new per toon version
