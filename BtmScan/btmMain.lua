@@ -222,6 +222,12 @@ BtmScan.OnUpdate = function(...)
 	-- If we are supposed to be scanning, then let's do it!
 	if (BtmScan.scanning) then
 
+		-- Check to see if the AH is open for business
+		if not (AuctionFrame and AuctionFrame:IsVisible()) then
+			BtmScan.interval = 1 -- Try again in one second
+			return
+		end
+		
 		-- Get the current number of auctions and pages
 		local pageCount, totalCount = GetNumAuctionItems("list")
 		local totalPages = math.floor((totalCount-1)/NUM_AUCTION_ITEMS_PER_PAGE)
@@ -241,8 +247,8 @@ BtmScan.OnUpdate = function(...)
 			BtmScan.interval = BtmScanData.refresh
 		end
 
-		-- Check to see if the AH is open for business
-		if not (AuctionFrame and AuctionFrame:IsVisible() and BtmScan.CanSendAuctionQuery()) then
+		-- Check to see if we can send a query
+		if not (BtmScan.CanSendAuctionQuery()) then
 			BtmScan.interval = 1 -- Try again in one second
 			return
 		end
@@ -302,6 +308,8 @@ BtmScan.QueryAuctionItems = function(par,ret, name,lmin,lmax,itype,class,sclass,
 	BtmScan.timer = 0
 	BtmScan.scanStage = 1
 	BtmScan.pageScan = 1
+	-- And give up after 20 seconds if the page still hasn't arrived
+	BtmScan.pageScanTimeout = GetTime() + 20
 end
 
 -- Called by AucAdvanced when it's finished it's page to ask us if we're finished with it.
@@ -317,7 +325,12 @@ function BtmScan.FinishedPage(nextPage)
 	end
 end
 
-function BtmScan.IsPageReady()
+function BtmScan.IsPageReady(timeout)
+	if GetTime() >= timeout then
+		BtmScan.Print("Page scan timed out (" .. GetTime() .. ")")
+		return true
+	end
+	
 	local pageCount, totalCount = GetNumAuctionItems("list")
 	for idx = 1, pageCount do
 		local link = GetAuctionItemLink("list", idx)
@@ -332,7 +345,7 @@ function BtmScan.PageScan(resume)
 	-- BtmScan.Print("PageScan (" .. GetTime() .. ")")
 
 	if not (AucAdvanced and AucAdvanced.Scan.IsScanning()) then
-		if not BtmScan.IsPageReady() then
+		if not BtmScan.IsPageReady(BtmScan.pageScanTimeout) then
 			-- Wait a bit
 			BtmScan.pageScan = BtmScan.pageScan + 0.05
 			return
