@@ -47,78 +47,84 @@ function private.onEvent(frame, event, arg, ...)
 	end
 end
 
+local settings = {["selectbox"] = {"1", "server"} , ["bid"] =true, ["auction"] = true}
 function lib.GetPrice(hyperlink, faction, realm)
     if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
     if cache[hyperlink] then
-        return cache[hyperlink][1], cache[hyperlink][2], cache[hyperlink][3], cache[hyperlink][4], cache[hyperlink][5], cache[hyperlink][6], cache[hyperlink][7], cache[hyperlink][8], cache[hyperlink][9], cache[hyperlink][10], cache[hyperlink][11], cache[hyperlink][12], cache[hyperlink][13], cache[hyperlink][14]
+        if cache[hyperlink]=={} then return end
+        return unpack(cache[hyperlink])
     end
-    local settings = {["selectbox"] = {"1", "server"} , ["bid"] =true, ["auction"] = true}
 	local tbl = BeanCounter.externalSearch(hyperlink, settings, true)
     local bought, sold, boughtseen, soldseen, boughtqty, soldqty, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0
     local i,v
     if tbl then
         for i,v in pairs(tbl) do
             -- local itemLink, reason, bid, buy, net, qty, priceper, seller, deposit, fee, wealth, date = v
+            -- true price per = (net+fee-deposit)/Qty
             local reason, qty, priceper, thistime = v[2], v[6], v[7], v[12]
             thistime = tonumber(thistime)
-            if not qty then
-                qty = 1
-            end
-            if reason == "Won on Buyout" or reason == "Won on Bid" then
-                boughtqty = boughtqty + qty
-                bought = bought + priceper*qty
-                boughtseen = boughtseen + 1
-                if thistime >= day3time then
-                    boughtqty3 = boughtqty3 + qty
-                    bought3 = bought3 + priceper*qty
-                end
-                if thistime >= day7time then
-                    boughtqty7 = boughtqty7 + qty
-                    bought7 = bought7 + priceper*qty
-                end
-            elseif reason == "Auc Successful" then
-                soldqty = soldqty + qty
-                sold = sold + priceper*qty
-                soldseen = soldseen + 1
-                if thistime >= day3time then
-                    soldqty3 = soldqty3 + qty
-                    sold3 = sold3 + priceper*qty
-                end
-                if thistime >= day7time then
-                    soldqty7 = soldqty7 + qty
-                    sold7 = sold7 + priceper*qty
+            if priceper>0 and qty>0 then
+                if reason == "Won on Buyout" or reason == "Won on Bid" then
+                    boughtqty = boughtqty + qty
+                    bought = bought + priceper*qty
+                    boughtseen = boughtseen + 1
+                    if thistime >= day3time then
+                        boughtqty3 = boughtqty3 + qty
+                        bought3 = bought3 + priceper*qty
+                    end
+                    if thistime >= day7time then
+                        boughtqty7 = boughtqty7 + qty
+                        bought7 = bought7 + priceper*qty
+                    end
+                elseif reason == "Auc Successful" then
+                    soldqty = soldqty + qty
+                    sold = sold + priceper*qty
+                    soldseen = soldseen + 1
+                    if thistime >= day3time then
+                        soldqty3 = soldqty3 + qty
+                        sold3 = sold3 + priceper*qty
+                    end
+                    if thistime >= day7time then
+                        soldqty7 = soldqty7 + qty
+                        sold7 = sold7 + priceper*qty
+                    end 
                 end
             end
         end
-        bought = bought / boughtqty
-        sold = sold / soldqty
-        bought3 = bought3 / boughtqty3
-        sold3 = sold3 / soldqty3
-        bought7 = bought7 / boughtqty7
-        sold7 = sold7 / soldqty7
+        if boughtqty>0 then bought = bought / boughtqty end
+        if soldqty>0 then sold = sold / soldqty end
+        if boughtqty3>0 then bought3 = bought3 / boughtqty3 end
+        if soldqty3>0 then sold3 = sold3 / soldqty3 end
+        if boughtqty7>0 then bought7 = bought7 / boughtqty7 end
+        if soldqty7>0 then sold7 = sold7 / soldqty7 end
     end
     cache[hyperlink] = {bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7}
+    if not sold or sold==0 then cache[hyperlink]={}; return end
     return bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7
 end
 
 function lib.GetPriceColumns()
-   if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
+    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
 	return "Bought Price", "Sold Price", "Bought Quantity", "Sold Quantity", "Bought Times", "Sold Times", "3day Bought Price", "3day Sold Price", "3day Bought Quantity", "3day Sold Quantity", "7day Bought Price", "7day Sold Price", "7day Bought Quantity", "7day Sold Quantity"
 end
 
 local array = {}
 function lib.GetPriceArray(hyperlink, faction, realm)
 	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return end
+    -- Clean out the old array
+	while (#array > 0) do table.remove(array) end
 
-	-- Get our statistics
+    -- Get our statistics
 	local bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink, faction, realm)
-	array.boughtseen = boughtseen
+    if not bought and not sold then return end
+    array.boughtseen = boughtseen
     array.soldseen = soldseen
     array.bought = bought
 	array.sold = sold
     array.boughtqty = boughtqty
     array.soldqty = soldqty
-    array.seen = boughtseen+soldseen
+    array.seen = boughtseen
+    if soldseen then array.seen = array.seen+soldseen end
     array.bought3 = bought3
 	array.sold3 = sold3
     array.boughtqty3 = boughtqty3
@@ -134,20 +140,24 @@ function lib.GetPriceArray(hyperlink, faction, realm)
     else
         array.price = sold
     end
-    array.confidence = 1
+    if sold then
+        array.confidence = 1
+    else
+        array.confidence = 0
+    end
     
 	return array
 end
 
-function lib.IsValidAlgorithm()
-	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
-	return true
-end
+--function lib.IsValidAlgorithm()
+--	if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
+--	return true
+--end
 
-function lib.CanSupplyMarket()
-    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
-	return true
-end
+--function lib.CanSupplyMarket()
+--    if not (BeanCounter) or not (BeanCounter.API.isLoaded) then return false end
+--	return true
+--end
 
 function lib.OnLoad(addon)
 	AucAdvanced.Settings.SetDefault("stat.sales.tooltip", true)
@@ -175,7 +185,8 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost)
 	if not AucAdvanced.Settings.GetSetting("stat.sales.tooltip") or not (BeanCounter.API.isLoaded) then return end --If beancounter disabled itself, boughtseen etc are nil and throw errors
 	
 	local bought, sold, boughtqty, soldqty, boughtseen, soldseen, bought3, sold3, boughtqty3, soldqty3, bought7, sold7, boughtqty7, soldqty7 = lib.GetPrice(hyperlink)
-	
+	if not bought and not sold then return end
+    
     if (boughtseen+soldseen>0) then
 		EnhTooltip.AddLine(libName.." prices:")
 		EnhTooltip.LineColor(0.3, 0.9, 0.8)
