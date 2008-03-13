@@ -741,74 +741,14 @@ function private.CreateFrames()
 		end
 	--Only used by classic search now	
 	function private.fragmentsearch(compare, itemName, exact, classic)
-		if exact and not classic then 
-			compare = (string.match(compare, "^|c%x+|H.+|h%[(.+)%]" )) or "FAILED ITEM LINK" --extract item name from itemlink 
-			if compare:lower() == itemName:lower() then return true end
-		elseif exact then
+		if exact then
 			if compare:lower() == itemName:lower() then return true end --If we are searching older classic data 
 		else
 			local match = (compare:lower():find(itemName:lower(), 1, true) ~= nil)
 			return match
 		end
 	end
-	--reconcile with auction DB to get info for data
-	local tbl2 = {}
-	function private.reconcileFailedAuctions(player, itemID, tbl)
-		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-			tbl2 = private.unpackString(v)
-
-			--Time the auction was set to last
-			local TimeFailedAuctionStarted = tonumber(tbl[4] - (tbl2[5]*60)) --Time this message should have been posted
-			local TimePostedAuction = tonumber(tbl2[7])
-
-			--get a stacksize from the expired auction if it exists(added in 1.05 DB)
-			local stack
-			if tonumber (tbl[3]) > 0 then stack = tbl[3] end
-
-			if (TimePostedAuction - 500) < TimeFailedAuctionStarted and TimeFailedAuctionStarted < (TimePostedAuction+500) then
-				if stack and stack == tonumber(tbl2[2]) then
-					return tbl2[2], tbl2[3], tbl2[4], tbl2[5], tbl2[6]
-				else
-					return 0, tbl2[3], tbl2[4], tbl2[5], tbl2[6]
-				end
-			end
-		end
-	end
-	--reconcile stack sizes
-	function private.reconcileCompletedAuctions(player, itemID, soldDeposit, soldBuy, soldTime)
-		local oldestPossible = soldTime - 144000
-		for i,v in pairs(private.serverData[player]["postedAuctions"][itemID]) do
-			tbl2 = private.unpackString(v)
-			local postDeposit, postBuy, postTime = tbl2[6], tbl2[4],tonumber(tbl2[7])
-			if postDeposit ==  soldDeposit  and postBuy == soldBuy then --if the stack sizes and buyouts match, check if time range would make this a possible match
-				if ( tonumber(soldTime) > tonumber(postTime)) and (oldestPossible < tonumber(postTime)) then
-					return tonumber(tbl2[2]), tonumber(tbl2[3])
-				end
-			end
-		end
-		return 0,0 --failed to find an acceptable match
-	end
-	function private.reconcileCompletedBids(player, itemID, seller, buy, bid)
-		if private.serverData[player]["postedBids"][itemID] then
-			for i,v in pairs(private.serverData[player]["postedBids"][itemID]) do
-				tbl2 = private.unpackString(v)
-				local postSeller, postbid = tbl2[4], tbl2[3]
-				if seller ==  postSeller and postbid == bid then
-					return tonumber(tbl2[2]), true
-				end
-			end
-		end
-		if private.serverData[player]["postedBuyouts"][itemID] then
-		    for i,v in pairs(private.serverData[player]["postedBuyouts"][itemID]) do
-			tbl2 = private.unpackString(v)
-			local postSeller, postbid = tbl2[4], tbl2[3]
-			if seller ==  postSeller and postbid == buy then
-			    return tonumber(tbl2[2])
-			end
-		    end
-		end
-			return 0 --if we fail then show 0 
-	end
+	
 	private.CreateMailFrames()
 
 end
