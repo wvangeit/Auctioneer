@@ -180,6 +180,7 @@ end
 -- Timing routines
 BtmScan.interval = 30
 BtmScan.offset = 0
+BtmScan.pageScanTimeout = 0
 BtmScan.OnUpdate = function(...)
 	local elapsed = select(2, ...)
 
