@@ -478,7 +478,7 @@ function private.CreateFrames()
 	function private.startSearch(itemName, settings, queryReturn, count, itemTexture) --queryReturn is passed by the externalsearch routine, when an addon wants to see what data BeanCounter knows
 		if not itemName then return end
 		tbl = {}
-		if settings.exact then 
+		if settings.exact and  frame.searchBox:GetText() ~= "" then --if the search field is blank do not exact check
 			if BeanCounterDB["ItemIDArray"][itemName:lower()] then 
 				table.insert(tbl, BeanCounterDB["ItemIDArray"][itemName:lower()])
 			end
@@ -741,7 +741,7 @@ function private.CreateFrames()
 		end
 	--Only used by classic search now	
 	function private.fragmentsearch(compare, itemName, exact, classic)
-		if exact then
+		if exact and frame.searchBox:GetText() ~= "" then 
 			if compare:lower() == itemName:lower() then return true end --If we are searching older classic data 
 		else
 			local match = (compare:lower():find(itemName:lower(), 1, true) ~= nil)
