@@ -60,7 +60,7 @@ end
 local HideMailGUI
 function private.updateInboxStart()
 	for n = 1,GetInboxNumItems() do
-		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n);
+		local _, _, sender, subject, money, _, daysLeft, _, wasRead, _, _, _ = GetInboxHeaderInfo(n)
 		if ((sender == _BC('MailAllianceAuctionHouse')) or (sender == _BC('MailHordeAuctionHouse'))) and subject and not wasRead then --record unread messages, so we know what indexes need to be added
 			HideMailGUI = true
 			wasRead = wasRead or 0 --its nil unless its has been read
@@ -202,10 +202,10 @@ function private.mailSort()
 				end				
 				table.remove(private.reconcilePending,i)			
 			
-			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject')..".-:.*") then
+			elseif string.match(private.reconcilePending[i]["subject"], _BC('MailOutbidOnSubject')..".-") then --OUTBIDS DO NOT have  :  in the message unlike other AH messages
 				debugPrint("Outbid on ")
 				
-				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject')..".-:.-(%w.*)")
+				local itemName = string.match(private.reconcilePending[i]["subject"],_BC('MailOutbidOnSubject')..".-(%w.*)")
 				local itemID, itemLink = private.matchDB("postedBids", itemName)
 				
 				if itemID then
