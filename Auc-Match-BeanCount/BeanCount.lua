@@ -64,6 +64,8 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	local matchprice = marketprice
 	local increase = AucAdvanced.Settings.GetSetting("match.beancount.success")
 	local decrease = AucAdvanced.Settings.GetSetting("match.beancount.failed")
+	local maxincrease = AucAdvanced.Settings.GetSetting("match.beancount.maxup")
+	local maxdecrease = AucAdvanced.Settings.GetSetting("match.beancount.maxdown")
 	increase = (increase / 100) + 1
 	decrease = (decrease / 100) + 1
 	itemId = tostring(itemId)
@@ -84,6 +86,11 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	matchprice = matchprice * decrease
 	
 	if (marketprice > 0) then
+		if (matchprice > (marketprice * (maxincrease*0.01))) then
+			matchprice = (marketprice * (maxincrease*0.01))
+		elseif (matchprice < (marketprice * (maxdecrease*0.01))) then
+			matchprice = (marketprice * (maxdecrease*0.01))
+		end		
 		marketdiff = (((matchprice - marketprice)/marketprice)*100)
 		if (marketdiff-floor(marketdiff))<0.5 then
 			marketdiff = floor(marketdiff)
@@ -116,6 +123,8 @@ function lib.OnLoad()
 	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
 	AucAdvanced.Settings.SetDefault("match.beancount.failed", -1)
 	AucAdvanced.Settings.SetDefault("match.beancount.success", 1)
+	AucAdvanced.Settings.SetDefault("match.beancount.maxup", 150)
+	AucAdvanced.Settings.SetDefault("match.beancount.maxdown", 50)
 	AucAdvanced.Settings.SetDefault("match.beancount.showhistory", true)
 end
 
@@ -141,6 +150,12 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.success", 0, 20, 0.1, "Auction success markup: %g%%")
 	gui:AddTip(id, "This controls how much you want to markup an auction for every time it has sold.\n"..
 		"This is cumulative.  ie a setting of 10% with two successes will set the price at 121% of market")
+		
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.maxup", 101, 300, 1, "Maximum: %g%%")
+	gui:AddTip(id, "Sets the maximum that you are willing to set the price at, as a % of baseline")
+		
+	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.maxdown", 1, 99, 1, "Minimum: %g%%")
+	gui:AddTip(id, "Sets the minimum that you are willing to set the price at, as a % of baseline")
 		
 	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.showhistory", "Show history of successes and failures")
 	gui:AddTip(id, "This will add the number of successes and failures for that item to Appraiser's right-hand panel")
