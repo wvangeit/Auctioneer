@@ -247,7 +247,8 @@ function private.CreateFrames()
 		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	local vals = {{"server", private.realmName.." ".._BC('UiData')},} 
+	--Need localization
+	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", "Alliance ".._BC('UiData')},{"horde", "Horde ".._BC('UiData')},}
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, name.." ".._BC('UiData')})
 	end	
@@ -260,7 +261,7 @@ function private.CreateFrames()
 	frame.selectbox.box:SetPoint("BOTTOMLEFT", frame, "TOPLEFT", 0,-90)
 	frame.selectbox.box:SetText(private.realmName.." ".._BC('UiData'))
 	
-	--Search box		
+	--Search box
 	frame.searchBox = CreateFrame("EditBox", "BeancountersearchBox", frame, "InputBoxTemplate")
 	frame.searchBox:SetPoint("TOPLEFT", frame, "TOPLEFT", 29, -180)
 	frame.searchBox:SetAutoFocus(false)
@@ -270,7 +271,7 @@ function private.CreateFrames()
 		private.startSearch(frame.searchBox:GetText(), frame.getCheckboxSettings())
 	end)
 	
-	--Search Button	
+	--Search Button
 	frame.searchButton = CreateFrame("Button", nil, frame, "OptionsButtonTemplate")
 	frame.searchButton:SetPoint("TOPLEFT", frame.searchBox, "BOTTOMLEFT", -6, -1)
 	frame.searchButton:SetText(_BC('UiSearch'))
@@ -520,7 +521,11 @@ function private.CreateFrames()
 		debugPrint(id, settings, queryReturn, count, itemTexture)
 		--Retrives all matching results
 		for i in pairs(private.serverData) do
-			if settings.selectbox[2] ~= "server" and i ~= settings.selectbox[2] then
+			if settings.selectbox[2] == "alliance" and private.serverData[i]["faction"] and private.serverData[i]["faction"]:lower() ~= settings.selectbox[2] then
+				--If looking for alliance and player is not alliance fall into this null
+			elseif settings.selectbox[2] == "horde" and private.serverData[i]["faction"] and private.serverData[i]["faction"]:lower() ~= settings.selectbox[2] then
+				--If looking for horde and player is not horde fall into this null
+			elseif (settings.selectbox[2] ~= "server" and settings.selectbox[2] ~= "alliance" and settings.selectbox[2] ~= "horde") and i ~= settings.selectbox[2] then
 				--If we are not doing a whole server search and the chosen search player is not "i" then we fall into this null
 				--otherwise we search the server or toon as normal
 			else
