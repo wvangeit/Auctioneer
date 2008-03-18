@@ -247,8 +247,8 @@ function private.CreateFrames()
 		frame.SelectBoxSetting = {arg1, arg2}
 	end
 	--Default Server wide
-	--Need localization
-	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", "Alliance ".._BC('UiData')},{"horde", "Horde ".._BC('UiData')},}
+	--Used GLOBALSTRINGS for the horde alliance translations
+	local vals = {{"server", private.realmName.." ".._BC('UiData')},{"alliance", FACTION_ALLIANCE.." ".._BC('UiData')},{"horde", FACTION_HORDE.." ".._BC('UiData')},}
 	for name,data in pairs(private.serverData) do 
 		table.insert(vals,{name, name.." ".._BC('UiData')})
 	end	
