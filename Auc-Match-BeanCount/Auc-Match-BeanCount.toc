@@ -1,9 +1,0 @@
-## Title: Auc:Match:BeanCount
-## Interface: 20300
-## Dependancies: Auc-Advanced, BeanCounter
-##
-## Version: <%version%> (<%codename%>)
-## Revision: 
-## URL: http://auctioneeraddon.com/
-##
-Embed.xml
