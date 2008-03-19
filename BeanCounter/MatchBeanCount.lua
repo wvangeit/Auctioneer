@@ -33,6 +33,7 @@
 --	AucAdvanced.Print("BeanCounter not loaded")
 --	return 
 --end
+if not AucAdvanced then return end
 
 local libType, libName = "Match", "BeanCount"
 local lib,parent,private = AucAdvanced.NewModule(libType, libName)
@@ -54,6 +55,10 @@ function lib.Processor(callbackType, ...)
 end
 
 function lib.GetMatchArray(hyperlink, marketprice)
+	local matchArray = {}
+	if not AucAdvanced.Settings.GetSetting("match.beancount.enable") then
+		return 
+	end
 	local linkType,itemId,property,factor = AucAdvanced.DecodeLink(hyperlink)
 	if (linkType ~= "item") then return end
 	if (factor ~= 0) then property = property.."x"..factor end
@@ -100,7 +105,6 @@ function lib.GetMatchArray(hyperlink, marketprice)
 	else
 		marketdiff = 0
 	end
-	local matchArray = {}
 	matchArray.value = matchprice
 	matchArray.diff = marketdiff
 	matchArray.returnstring = "BeanCount: % change: "..tostring(marketdiff)
@@ -116,17 +120,18 @@ function private.ProcessTooltip(frame, name, hyperlink, quality, quantity, cost,
 
 end
 
-function lib.OnLoad()
+--function lib.OnLoad()
 	--This function is called when your variables have been loaded.
 	--You should also set your Configator defaults here
 
-	--print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
-	AucAdvanced.Settings.SetDefault("match.beancount.failed", -1)
-	AucAdvanced.Settings.SetDefault("match.beancount.success", 1)
+	print("AucAdvanced: {{"..libType..":"..libName.."}} loaded!")
+	AucAdvanced.Settings.SetDefault("match.beancount.enable", false)
+	AucAdvanced.Settings.SetDefault("match.beancount.failed", -0.1)
+	AucAdvanced.Settings.SetDefault("match.beancount.success", 0.1)
 	AucAdvanced.Settings.SetDefault("match.beancount.maxup", 150)
 	AucAdvanced.Settings.SetDefault("match.beancount.maxdown", 50)
 	AucAdvanced.Settings.SetDefault("match.beancount.showhistory", true)
-end
+--end
 
 --[[ Local functions ]]--
 
@@ -142,6 +147,8 @@ function private.SetupConfigGui(gui)
 	gui:AddControl(id, "Header",     0,    libName.." options")
 	
 	gui:AddControl(id, "Subhead",    0,    "Price Adjustments")
+	
+	gui:AddControl(id, "Checkbox",   0, 1, "match.beancount.enable", "Enable Auc-Match-BeanCount")
 	
 	gui:AddControl(id, "WideSlider", 0, 1, "match.beancount.failed", -20, 0, 0.1, "Auction failure markdown: %g%%")
 	gui:AddTip(id, "This controls how much you want to markdown an auction for every time it has failed to sell.\n"..
