@@ -200,7 +200,7 @@ function private.play()
 			--print(#queue)
 			table.remove(queue, 1)
 			--print(#queue)
-			if #queue == 0 then private.AuctionFrameFilters_ClearSelection() print("Finished Scanning") end
+			if #queue == 0 then private.AuctionFrameFilters_ClearSelection() private.AuctionFrameFilters_ClearHighlight() print("Finished Queue") end
 		else
 			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
 		end
@@ -233,9 +233,16 @@ base:EnableMouse(true)
 private.Filters = {}
 function private.AuctionFrameFilters_ClearSelection()
 	for i,v in pairs(CLASS_FILTERS) do
-		private.Filters[v] = {0,i}
+		private.Filters[v] = {0,i} --store cleared table of selections
 	end
 end
+--clear any current highlighting from a prev search
+function private.AuctionFrameFilters_ClearHighlight()
+	for i in pairs(CLASS_FILTERS) do
+		getglobal("AuctionFilterButton"..i):UnlockHighlight() 
+	end
+end
+
 function private.checkedFrames()
 	queue = {}
 	for i,v in pairs(private.Filters) do
@@ -247,67 +254,62 @@ function private.checkedFrames()
 end
 
 function private.CreateSecondaryFilterButtons()
-	
 local frame, prev
-private.AuctionFrameFilters_ClearSelection()
-for i = 1,15 do
-	frame = "AuctioneerFilterButton"..i
-	prev = "AuctioneerFilterButton"..(i - 1)
-	if i == 1 then
-		base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
-		base[frame]:SetText("TICK-"..i)
-		base[frame]:SetPoint("LEFT",0,0)
-		base[frame]:SetWidth(156)
-		base[frame]:SetAlpha(0)
-		base[frame]:SetScript("OnClick", function()
-								if IsControlKeyDown() then
-									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] then
-										if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
-											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
-											getglobal("AuctionFilterButton"..i):UnlockHighlight()
-											--print("false", getglobal("AuctionFilterButton"..i):GetText())
-										else
-											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-											--print("true", getglobal("AuctionFilterButton"..i):GetText())
-											getglobal("AuctionFilterButton"..i):LockHighlight()
+private.AuctionFrameFilters_ClearSelection() --create the filter selection table
+	for i = 1,15 do
+		frame = "AuctioneerFilterButton"..i
+		prev = "AuctioneerFilterButton"..(i - 1)
+		if i == 1 then
+			base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
+			base[frame]:SetText("TICK-"..i)
+			base[frame]:SetPoint("LEFT",0,0)
+			base[frame]:SetWidth(156)
+			base[frame]:SetAlpha(0)
+			base[frame]:SetScript("OnClick", function()
+									if IsControlKeyDown() then
+										if private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] then
+											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
+												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
+												getglobal("AuctionFilterButton"..i):UnlockHighlight()
+												--print("false", getglobal("AuctionFilterButton"..i):GetText())
+											else
+												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
+												--print("true", getglobal("AuctionFilterButton"..i):GetText())
+												getglobal("AuctionFilterButton"..i):LockHighlight()
+											end
 										end
 									else
-										--print(private.Filters[getglobal("AuctionFilterButton"..i):GetText()] )
+										AuctionFrameFilter_OnClick() 
+										private.AuctionFrameFilters_UpdateClasses()
+										private.AuctionFrameFilters_ClearSelection()
 									end
-								else
-									AuctionFrameFilter_OnClick() 
-									private.AuctionFrameFilters_UpdateClasses()
-									private.AuctionFrameFilters_ClearSelection()
-								end
-							end)
-	else
-		base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
-		base[frame]:SetText("TICK-"..i)
-		base[frame]:ClearAllPoints()
-		base[frame]:SetPoint("TOPLEFT", base[prev],"BOTTOMLEFT",0,0)
-		base[frame]:SetWidth(156)
-		base[frame]:SetAlpha(0)
-		base[frame]:SetScript("OnClick", function()
-								if IsControlKeyDown() then
-									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()] then
-										if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
-											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
-											getglobal("AuctionFilterButton"..i):UnlockHighlight()
-											--print("false", getglobal("AuctionFilterButton"..i):GetText())
-										else
-											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
-											--print("true", getglobal("AuctionFilterButton"..i):GetText())
-											getglobal("AuctionFilterButton"..i):LockHighlight()
+								end)
+		else
+			base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
+			base[frame]:SetText("TICK-"..i)
+			base[frame]:ClearAllPoints()
+			base[frame]:SetPoint("TOPLEFT", base[prev],"BOTTOMLEFT",0,0)
+			base[frame]:SetWidth(156)
+			base[frame]:SetAlpha(0)
+			base[frame]:SetScript("OnClick", function()
+									if IsControlKeyDown() then
+										if private.Filters[getglobal("AuctionFilterButton"..i):GetText()] then
+											if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
+												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
+												getglobal("AuctionFilterButton"..i):UnlockHighlight()
+												--print("false", getglobal("AuctionFilterButton"..i):GetText())
+											else
+												private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
+												--print("true", getglobal("AuctionFilterButton"..i):GetText())
+												getglobal("AuctionFilterButton"..i):LockHighlight()
+											end
 										end
 									else
-										--print(private.Filters[getglobal("AuctionFilterButton"..i):GetText()] )
+										AuctionFrameFilter_OnClick() 
+										private.AuctionFrameFilters_UpdateClasses()
+										private.AuctionFrameFilters_ClearSelection()
 									end
-								else
-									AuctionFrameFilter_OnClick() 
-									private.AuctionFrameFilters_UpdateClasses()
-									private.AuctionFrameFilters_ClearSelection()
-								end
-							end)
+								end)
 		end
 	end 
 	private.AuctionFrameFilters_UpdateClasses() --Changes the frame to match current filter frame, needed for 1 refresh after frame creation.
@@ -356,35 +358,5 @@ function private.AuctionFrameFilters_UpdateClasses()
 		
 	end
 end
-
-function private.FilterButton_SetType(button, type, text, isLast)
-	local normalText = getglobal(button:GetName().."NormalText")
-	local normalTexture = getglobal(button:GetName().."NormalTexture")
-	local line = getglobal(button:GetName().."Lines")
-	print(normalText, normalTexture, line)
-	if ( type == "class" ) then
-		button:SetText(text)
-		normalText:SetPoint("LEFT", button, "LEFT", 4, 0)
-		normalTexture:SetAlpha(1.0)
-		line:Hide()
-	elseif ( type == "subclass" ) then
-		button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
-		normalText:SetPoint("LEFT", button, "LEFT", 12, 0)
-		normalTexture:SetAlpha(0.4)
-		line:Hide()
-	elseif ( type == "invtype" ) then
-		button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
-		normalText:SetPoint("LEFT", button, "LEFT", 20, 0)
-		normalTexture:SetAlpha(0.0)
-		if ( isLast ) then
-			line:SetTexCoord(0.4375, 0.875, 0, 0.625)
-		else
-			line:SetTexCoord(0, 0.4375, 0, 0.625)
-		end
-		line:Show()
-	end
-	button.type = type
-end
-
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
