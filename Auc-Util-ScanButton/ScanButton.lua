@@ -98,6 +98,7 @@ function private.HookAH()
 	private.buttons.pause.tex:SetVertexColor(1.0, 0.9, 0.1)
 
 	private.UpdateScanProgress()
+	
 end
 
 function private.UpdateScanProgress()
@@ -128,7 +129,7 @@ function private.UpdateScanProgress()
 		end
 	end
 end
-
+local queue = {}
 function private:OnUpdate(delay)
 	if private.blink then
 		private.timer = (private.timer or 0) - delay
@@ -146,6 +147,14 @@ function private:OnUpdate(delay)
 			end
 			private.timer = 0.75
 		end
+	end
+	--Create the overlay filter buttons the (callbackType == "auctionui") is too early.
+	if not AuctioneerFilterButton1 and AuctionFilterButton1 then
+		private.CreateSecondaryFilterButtons()
+	end
+	--if we still have filters pending process it
+	if #queue > 0 and not AucAdvanced.Scan.IsScanning() then
+		private.play()
 	end
 end
 
@@ -184,7 +193,17 @@ function private.play()
 	if AucAdvanced.Scan.IsPaused() then
 		AucAdvanced.Scan.SetPaused(false)
 	elseif not AucAdvanced.Scan.IsScanning() then
-		AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
+		if #queue == 0 then queue = private.checkedFrames() end --check for user selected frames
+		if #queue > 0  then
+			print("Starting search on filter ", queue[1])
+			AucAdvanced.Scan.StartScan("", "", "", nil, queue[1], nil, nil, nil)
+			--print(#queue)
+			table.remove(queue, 1)
+			--print(#queue)
+			if #queue == 0 then private.AuctionFrameFilters_ClearSelection() print("Finished Scanning") end
+		else
+			AucAdvanced.Scan.StartScan("", "", "", nil, nil, nil, nil, nil)
+		end
 	end
 	private.UpdateScanProgress()
 end
@@ -195,5 +214,177 @@ function private.pause()
 	end
 	private.UpdateScanProgress()
 end
+
+
+--[[frame test code for AH
+This adds a transparent replica of teh HA filters on the browse frame, we have scripts on this frame to select catagories a user chooses to scan
+This means we do not have to directly modify blizzards filter frame
+]]
+local base = CreateFrame("Frame", "AuctionTest", UIParent)
+base:SetFrameStrata("MEDIUM")
+base:Show()
+base:SetPoint("CENTER", UIParent, "CENTER")
+--base:SetToplevel(true)
+base:EnableMouse(true)
+
+--store the primary AH filter catagories, this is a copy of the global table the AH uses
+--CLASS_FILTERS generated via GetAuctionItemClasses()
+--Resets the selections table to 0 if an alt click is not used, or after a scan has been implemented
+private.Filters = {}
+function private.AuctionFrameFilters_ClearSelection()
+	for i,v in pairs(CLASS_FILTERS) do
+		private.Filters[v] = {0,i}
+	end
+end
+function private.checkedFrames()
+	queue = {}
+	for i,v in pairs(private.Filters) do
+		if v[1] == 1 then
+			table.insert(queue, v[2])
+		end
+	end
+	return queue
+end
+
+function private.CreateSecondaryFilterButtons()
+	
+local frame, prev
+private.AuctionFrameFilters_ClearSelection()
+for i = 1,15 do
+	frame = "AuctioneerFilterButton"..i
+	prev = "AuctioneerFilterButton"..(i - 1)
+	if i == 1 then
+		base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
+		base[frame]:SetText("TICK-"..i)
+		base[frame]:SetPoint("LEFT",1000,0)
+		base[frame]:SetWidth(156)
+		base[frame]:SetAlpha(0.5)
+		base[frame]:SetScript("OnClick", function()
+								if IsControlKeyDown() then
+									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] then
+										if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
+											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
+											getglobal("AuctionFilterButton"..i):UnlockHighlight()
+											--print("false", getglobal("AuctionFilterButton"..i):GetText())
+										else
+											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
+											--print("true", getglobal("AuctionFilterButton"..i):GetText())
+											getglobal("AuctionFilterButton"..i):LockHighlight()
+										end
+									else
+										--print(private.Filters[getglobal("AuctionFilterButton"..i):GetText()] )
+									end
+								else
+									AuctionFrameFilter_OnClick() 
+									private.AuctionFrameFilters_UpdateClasses()
+									private.AuctionFrameFilters_ClearSelection()
+								end
+							end)
+	else
+		base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
+		base[frame]:SetText("TICK-"..i)
+		base[frame]:ClearAllPoints()
+		base[frame]:SetPoint("TOPLEFT", base[prev],"BOTTOMLEFT",0,0)
+		base[frame]:SetWidth(156)
+		base[frame]:SetAlpha(0.5)
+		base[frame]:SetScript("OnClick", function()
+								if IsControlKeyDown() then
+									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()] then
+										if  private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] == 1 then
+											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 0
+											getglobal("AuctionFilterButton"..i):UnlockHighlight()
+											--print("false", getglobal("AuctionFilterButton"..i):GetText())
+										else
+											private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] = 1
+											--print("true", getglobal("AuctionFilterButton"..i):GetText())
+											getglobal("AuctionFilterButton"..i):LockHighlight()
+										end
+									else
+										--print(private.Filters[getglobal("AuctionFilterButton"..i):GetText()] )
+									end
+								else
+									AuctionFrameFilter_OnClick() 
+									private.AuctionFrameFilters_UpdateClasses()
+									private.AuctionFrameFilters_ClearSelection()
+								end
+							end)
+		end
+	end 
+	private.AuctionFrameFilters_UpdateClasses() --Changes the frame to match current filter frame, needed for 1 refresh after frame creation.
+end
+
+--Blizzard code base, used to generate a replica of the default filter frame
+function private.AuctionFrameFilters_UpdateClasses()
+	-- Display the list of open filters
+	local button, index, info, isLast
+	local offset = FauxScrollFrame_GetOffset(BrowseFilterScrollFrame)
+	index = offset
+	for i=1, NUM_FILTERS_TO_DISPLAY do
+		button = getglobal("AuctioneerFilterButton"..i)
+			
+		if ( getn(OPEN_FILTER_LIST) > NUM_FILTERS_TO_DISPLAY ) then
+			button:SetWidth(136)
+		else
+			button:SetWidth(156)
+		end
+		index = index + 1
+		if ( index <= getn(OPEN_FILTER_LIST) ) then
+			info = OPEN_FILTER_LIST[index]
+			while ((info[2] == "invtype") and (not info[6])) do
+				index = index + 1
+				if ( index <= getn(OPEN_FILTER_LIST) ) then
+					info = OPEN_FILTER_LIST[index]
+				else
+					info = nil
+					button:Hide()
+					break
+				end
+			end
+			if ( info ) then
+				FilterButton_SetType(button, info[2], info[1], info[5])
+				button.index = info[3]
+				if ( info[4] ) then
+					button:LockHighlight()
+				else
+					button:UnlockHighlight()
+				end
+				button:Show()
+			end
+		else
+			button:Hide()
+		end
+		
+	end
+end
+
+function private.FilterButton_SetType(button, type, text, isLast)
+	local normalText = getglobal(button:GetName().."NormalText")
+	local normalTexture = getglobal(button:GetName().."NormalTexture")
+	local line = getglobal(button:GetName().."Lines")
+	print(normalText, normalTexture, line)
+	if ( type == "class" ) then
+		button:SetText(text)
+		normalText:SetPoint("LEFT", button, "LEFT", 4, 0)
+		normalTexture:SetAlpha(1.0)
+		line:Hide()
+	elseif ( type == "subclass" ) then
+		button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
+		normalText:SetPoint("LEFT", button, "LEFT", 12, 0)
+		normalTexture:SetAlpha(0.4)
+		line:Hide()
+	elseif ( type == "invtype" ) then
+		button:SetText(HIGHLIGHT_FONT_COLOR_CODE..text..FONT_COLOR_CODE_CLOSE)
+		normalText:SetPoint("LEFT", button, "LEFT", 20, 0)
+		normalTexture:SetAlpha(0.0)
+		if ( isLast ) then
+			line:SetTexCoord(0.4375, 0.875, 0, 0.625)
+		else
+			line:SetTexCoord(0, 0.4375, 0, 0.625)
+		end
+		line:Show()
+	end
+	button.type = type
+end
+
 
 AucAdvanced.RegisterRevision("$URL$", "$Rev$")
