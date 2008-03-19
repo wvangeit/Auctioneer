@@ -256,9 +256,9 @@ for i = 1,15 do
 	if i == 1 then
 		base[frame] = CreateFrame("Button", frame, AuctionFilterButton1, "AuctionClassButtonTemplate")
 		base[frame]:SetText("TICK-"..i)
-		base[frame]:SetPoint("LEFT",1000,0)
+		base[frame]:SetPoint("LEFT",0,0)
 		base[frame]:SetWidth(156)
-		base[frame]:SetAlpha(0.5)
+		base[frame]:SetAlpha(0)
 		base[frame]:SetScript("OnClick", function()
 								if IsControlKeyDown() then
 									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()][1] then
@@ -286,7 +286,7 @@ for i = 1,15 do
 		base[frame]:ClearAllPoints()
 		base[frame]:SetPoint("TOPLEFT", base[prev],"BOTTOMLEFT",0,0)
 		base[frame]:SetWidth(156)
-		base[frame]:SetAlpha(0.5)
+		base[frame]:SetAlpha(0)
 		base[frame]:SetScript("OnClick", function()
 								if IsControlKeyDown() then
 									if private.Filters[getglobal("AuctionFilterButton"..i):GetText()] then
