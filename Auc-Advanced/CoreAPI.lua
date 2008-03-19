@@ -348,7 +348,9 @@ function lib.GetBestMatch(itemLink, algorithm, faction, realm)
 			priceArray.price = value
 			count = count + 1
 			diff = diff + MatchpriceArray.diff
-			InfoString = strjoin("\n", InfoString, MatchpriceArray.returnstring)
+			if MatchpriceArray.returnstring then
+				InfoString = strjoin("\n", InfoString, MatchpriceArray.returnstring)
+			end
 		end
 	end
 	
@@ -430,6 +432,11 @@ function lib.GetMatcherValue(matcher, itemLink, price)
 	if not matcher then return end
 	--If matcher is not a table at this point, the following code will throw an "attempt to index a <something> value" type error
 	local matchArray = matcher.GetMatchArray(itemLink, price)
+	if not matchArray then
+		matchArray = {}
+		matchArray.value = price
+		matchArray.diff = 0
+	end
 
 	return matchArray.value, matchArray
 end
