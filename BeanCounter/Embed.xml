@@ -11,4 +11,5 @@
 <Script file="PostMonitor.lua"/>
 <Script file="BidMonitor.lua"/>
 <Script file="BeanCounterAPI.lua"/>
+<Script file="MatchBeanCount.lua"/>
 </Ui>
