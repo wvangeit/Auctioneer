@@ -1559,7 +1559,23 @@ function private.CreateFrames()
 	for i=1, NUM_ITEMS do
 		local item = CreateFrame("Button", nil, frame.itembox)
 		frame.items[i] = item
-		item:SetScript("OnClick", frame.SelectItem)
+		item:SetScript("OnClick", function(obj, button)
+			if IsShiftKeyDown() and IsAltKeyDown() then
+				local pos = math.floor(frame.scroller:GetValue())
+				local id = obj.id
+				pos = math.min(pos + id, #frame.list)
+				local sig = nil
+				if frame.list[pos] then
+					sig = frame.list[pos][1]
+				end
+				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))
+				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))) then
+					frame.PostBySig(sig)
+				end
+			else
+				frame.SelectItem(obj, button)
+			end
+		end)
 		if (i == 1) then
 			item:SetPoint("TOPLEFT", frame.itembox, "TOPLEFT", 5,-8 )
 		else
@@ -1574,7 +1590,24 @@ function private.CreateFrames()
 		item.iconbutton:SetHeight(26)
 		item.iconbutton:SetWidth(26)
 		item.iconbutton:SetPoint("LEFT", item, "LEFT", 3,0)
-		item.iconbutton:SetScript("OnClick", frame.SelectItem)
+		item.iconbutton:SetScript("OnClick", function(obj, button)
+			if IsShiftKeyDown() and IsAltKeyDown() then
+				obj = obj:GetParent()
+				local pos = math.floor(frame.scroller:GetValue())
+				local id = obj.id
+				pos = math.min(pos + id, #frame.list)
+				local sig = nil
+				if frame.list[pos] then
+					sig = frame.list[pos][1]
+				end
+				if (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))
+				and (0 < (AucAdvanced.Settings.GetSetting('util.appraiser.item.'..frame.salebox.sig..".bid"))) then
+					frame.PostBySig(sig)
+				end
+			else
+				frame.SelectItem(obj, button)
+			end
+		end)
 		item.iconbutton:SetScript("OnEnter", frame.DoTooltip)
 		item.iconbutton:SetScript("OnLeave", frame.UndoTooltip)
 
